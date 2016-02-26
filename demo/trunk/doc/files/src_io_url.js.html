@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.14.0-beta</em>
+            <em>API Docs for: 0.13.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -128,7 +128,9 @@
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
-                                <li><a href="../classes/dwv.utils.base.html">dwv.utils.base</a></li>
+                                <li><a href="../classes/dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li>
+                                <li><a href="../classes/dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li>
+                                <li><a href="../classes/dwv.utils.WorkerThread.html">dwv.utils.WorkerThread</a></li>
                                 <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                             </ul>
                 
@@ -223,6 +225,13 @@ dwv.io.Url = function ()
      * @type Array
      */
     var progressList = [];
+    /**
+     * List of data decoders scripts.
+     * @property decoderScripts
+     * @private
+     * @type Array
+     */
+    var decoderScripts = [];
 
     /**
      * Set the number of data to load.
@@ -261,6 +270,23 @@ dwv.io.Url = function ()
             totPercent += progressList[i];
         }
         return totPercent;
+    };
+    
+    /**
+     * Set the web workers decoder scripts.
+     * @method setDecoderScripts
+     * @param {Array} list The list of decoder scripts.
+     */
+    this.setDecoderScripts = function (list) {
+        decoderScripts = list;
+    };
+    /**
+     * Get the web workers decoder scripts.
+     * @method getDecoderScripts
+     * @return {Array} list The list of decoder scripts.
+     */
+    this.getDecoderScripts = function () {
+        return decoderScripts;
     };
 }; // class Url
 
@@ -339,9 +365,8 @@ dwv.io.Url.createProgressHandler = function (n, calculator, baseHandler) {
  * Load a list of URLs.
  * @method load
  * @param {Array} ioArray The list of urls to load.
- * @param {Array} requestHeaders An array of {name, value} to use as request headers.
  */
-dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
+dwv.io.Url.prototype.load = function (ioArray)
 {
     // closure to self for handlers
     var self = this;
@@ -349,57 +374,46 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     this.setNToLoad( ioArray.length );
 
     // call the listeners
-    var onLoad = function (data)
+    var onLoadView = function (data)
     {
         self.onload(data);
         self.addLoaded();
     };
 
-    // DICOM request
-    var onLoadDicomRequest = function (response)
+    // DICOM buffer to dwv.image.View (asynchronous)
+    var db2v = new dwv.image.DicomBufferToView(this.getDecoderScripts());
+    var onLoadDicomBuffer = function (response)
     {
         try {
-            onLoad( dwv.image.getDataFromDicomBuffer(response) );
+            db2v.convert(response, onLoadView);
         } catch (error) {
             self.onerror(error);
         }
     };
 
-    // image request
-    var onLoadImage = function (/*event*/)
+    // DOM Image buffer to dwv.image.View
+    var onLoadDOMImageBuffer = function (/*event*/)
     {
         try {
-            onLoad( dwv.image.getDataFromImage(this) );
+            onLoadView( dwv.image.getViewFromDOMImage(this) );
         } catch (error) {
             self.onerror(error);
         }
     };
 
-    // text request
-    var onLoadTextRequest = function (/*event*/)
+    // load text buffer
+    var onLoadTextBuffer = function (/*event*/)
     {
-        // status 200: &quot;OK&quot;
-        if (this.status !== 200) {
-            this.onerror();
-            return;
-        }
-
         try {
-            onLoad( this.responseText );
+            self.onload( this.responseText );
         } catch (error) {
             self.onerror(error);
         }
     };
 
-    // binary request
-    var onLoadBinaryRequest = function (/*event*/)
+    // load binary buffer
+    var onLoadBinaryBuffer = function (/*event*/)
     {
-        // status 200: &quot;OK&quot;
-        if (this.status !== 200) {
-            this.onerror();
-            return;
-        }
-        
         // find the image type from its signature
         var view = new DataView(this.response);
         var isJpeg = view.getUint32(0) === 0xffd8ffe0;
@@ -439,11 +453,11 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
             // temporary image object
             var tmpImage = new Image();
             tmpImage.src = &quot;data:image/&quot; + imageType + &quot;;base64,&quot; + window.btoa(imageDataStr);
-            tmpImage.onload = onLoadImage;
+            tmpImage.onload = onLoadDOMImageBuffer;
         }
         else
         {
-            onLoadDicomRequest(this.response);
+            onLoadDicomBuffer(this.response);
         }
     };
 
@@ -456,21 +470,13 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
 
         var request = new XMLHttpRequest();
         request.open(&#x27;GET&#x27;, url, true);
-        if ( typeof requestHeaders !== &quot;undefined&quot; ) {
-            for (var j = 0; j &lt; requestHeaders.length; ++j) { 
-                if ( typeof requestHeaders[j].name !== &quot;undefined&quot; &amp;&amp;
-                    typeof requestHeaders[j].value !== &quot;undefined&quot; ) {
-                    request.setRequestHeader(requestHeaders[j].name, requestHeaders[j].value);
-                }
-            }
-        }
         if ( !isText ) {
             request.responseType = &quot;arraybuffer&quot;;
-            request.onload = onLoadBinaryRequest;
+            request.onload = onLoadBinaryBuffer;
             request.onerror = dwv.io.Url.createErrorHandler(url, &quot;binary&quot;, self.onerror);
         }
         else {
-            request.onload = onLoadTextRequest;
+            request.onload = onLoadTextBuffer;
             request.onerror = dwv.io.Url.createErrorHandler(url, &quot;text&quot;, self.onerror);
         }
         request.onprogress = dwv.io.File.createProgressHandler(i,

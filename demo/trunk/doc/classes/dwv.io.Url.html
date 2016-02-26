@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.14.0-beta</em>
+            <em>API Docs for: 0.13.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -128,7 +128,9 @@
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
-                                <li><a href="../classes/dwv.utils.base.html">dwv.utils.base</a></li>
+                                <li><a href="../classes/dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li>
+                                <li><a href="../classes/dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li>
+                                <li><a href="../classes/dwv.utils.WorkerThread.html">dwv.utils.WorkerThread</a></li>
                                 <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                             </ul>
                 
@@ -258,6 +260,10 @@
 
                             </li>
                             <li class="index-item method">
+                                <a href="#method_getDecoderScripts">getDecoderScripts</a>
+
+                            </li>
+                            <li class="index-item method">
                                 <a href="#method_getGlobalPercent">getGlobalPercent</a>
 
                             </li>
@@ -282,6 +288,10 @@
 
                             </li>
                             <li class="index-item method">
+                                <a href="#method_setDecoderScripts">setDecoderScripts</a>
+
+                            </li>
+                            <li class="index-item method">
                                 <a href="#method_setNToLoad">setNToLoad</a>
 
                             </li>
@@ -292,6 +302,10 @@
                     <h3>Properties</h3>
 
                     <ul class="index-list properties">
+                            <li class="index-item property private">
+                                <a href="#property_decoderScripts">decoderScripts</a>
+
+                            </li>
                             <li class="index-item property private">
                                 <a href="#property_nLoaded">nLoaded</a>
 
@@ -328,7 +342,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_io_url.js.html#l55"><code>src&#x2F;io&#x2F;url.js:55</code></a>
+        <a href="../files/src_io_url.js.html#l62"><code>src&#x2F;io&#x2F;url.js:62</code></a>
         </p>
 
 
@@ -372,7 +386,7 @@ and call onloadend if loaded all data.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_io_url.js.html#l121"><code>src&#x2F;io&#x2F;url.js:121</code></a>
+        <a href="../files/src_io_url.js.html#l145"><code>src&#x2F;io&#x2F;url.js:145</code></a>
         </p>
 
 
@@ -454,7 +468,7 @@ and call onloadend if loaded all data.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_io_url.js.html#l136"><code>src&#x2F;io&#x2F;url.js:136</code></a>
+        <a href="../files/src_io_url.js.html#l160"><code>src&#x2F;io&#x2F;url.js:160</code></a>
         </p>
 
 
@@ -509,6 +523,49 @@ and call onloadend if loaded all data.</p>
 
 
 </div>
+<div id="method_getDecoderScripts" class="method item">
+    <h3 class="name"><code>getDecoderScripts</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">Array</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_io_url.js.html#l98"><code>src&#x2F;io&#x2F;url.js:98</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Get the web workers decoder scripts.</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Array</span>:
+                    <p>list The list of decoder scripts.</p>
+
+            </div>
+        </div>
+
+
+</div>
 <div id="method_getGlobalPercent" class="method item">
     <h3 class="name"><code>getGlobalPercent</code></h3>
 
@@ -536,7 +593,7 @@ and call onloadend if loaded all data.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_io_url.js.html#l67"><code>src&#x2F;io&#x2F;url.js:67</code></a>
+        <a href="../files/src_io_url.js.html#l74"><code>src&#x2F;io&#x2F;url.js:74</code></a>
         </p>
 
 
@@ -597,9 +654,6 @@ and call onloadend if loaded all data.</p>
                 <li class="arg">
                         <code>ioArray</code>
                 </li>
-                <li class="arg">
-                        <code>requestHeaders</code>
-                </li>
             </ul><span class="paren">)</span>
         </div>
 
@@ -613,7 +667,7 @@ and call onloadend if loaded all data.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_io_url.js.html#l155"><code>src&#x2F;io&#x2F;url.js:155</code></a>
+        <a href="../files/src_io_url.js.html#l179"><code>src&#x2F;io&#x2F;url.js:179</code></a>
         </p>
 
 
@@ -636,17 +690,6 @@ and call onloadend if loaded all data.</p>
 
                     <div class="param-description">
                         <p>The list of urls to load.</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">requestHeaders</code>
-                        <span class="type">Array</span>
-
-
-                    <div class="param-description">
-                        <p>An array of {name, value} to use as request headers.</p>
 
                     </div>
 
@@ -678,7 +721,7 @@ and call onloadend if loaded all data.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_io_url.js.html#l110"><code>src&#x2F;io&#x2F;url.js:110</code></a>
+        <a href="../files/src_io_url.js.html#l134"><code>src&#x2F;io&#x2F;url.js:134</code></a>
         </p>
 
 
@@ -733,7 +776,7 @@ should be the error message.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_io_url.js.html#l84"><code>src&#x2F;io&#x2F;url.js:84</code></a>
+        <a href="../files/src_io_url.js.html#l108"><code>src&#x2F;io&#x2F;url.js:108</code></a>
         </p>
 
 
@@ -782,7 +825,7 @@ should be the loaded data.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_io_url.js.html#l94"><code>src&#x2F;io&#x2F;url.js:94</code></a>
+        <a href="../files/src_io_url.js.html#l118"><code>src&#x2F;io&#x2F;url.js:118</code></a>
         </p>
 
 
@@ -813,7 +856,7 @@ should be the loaded data.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_io_url.js.html#l102"><code>src&#x2F;io&#x2F;url.js:102</code></a>
+        <a href="../files/src_io_url.js.html#l126"><code>src&#x2F;io&#x2F;url.js:126</code></a>
         </p>
 
 
@@ -825,6 +868,60 @@ should be the loaded data.</p>
 
     </div>
 
+
+
+
+</div>
+<div id="method_setDecoderScripts" class="method item">
+    <h3 class="name"><code>setDecoderScripts</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>list</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_io_url.js.html#l90"><code>src&#x2F;io&#x2F;url.js:90</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Set the web workers decoder scripts.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">list</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <p>The list of decoder scripts.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
 
 
 
@@ -844,7 +941,7 @@ should be the loaded data.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_io_url.js.html#l44"><code>src&#x2F;io&#x2F;url.js:44</code></a>
+        <a href="../files/src_io_url.js.html#l51"><code>src&#x2F;io&#x2F;url.js:51</code></a>
         </p>
 
 
@@ -865,6 +962,32 @@ should be the loaded data.</p>
             <div id="properties" class="api-class-tabpanel">
                 <h2 class="off-left">Properties</h2>
 
+<div id="property_decoderScripts" class="property item private">
+    <h3 class="name"><code>decoderScripts</code></h3>
+    <span class="type">Array</span>
+
+
+        <span class="flag private">private</span>
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_io_url.js.html#l43"><code>src&#x2F;io&#x2F;url.js:43</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>List of data decoders scripts.</p>
+
+    </div>
+
+
+
+</div>
 <div id="property_nLoaded" class="property item private">
     <h3 class="name"><code>nLoaded</code></h3>
     <span class="type">Number</span>

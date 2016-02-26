@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.14.0-beta</em>
+            <em>API Docs for: 0.13.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -128,7 +128,9 @@
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
-                                <li><a href="../classes/dwv.utils.base.html">dwv.utils.base</a></li>
+                                <li><a href="../classes/dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li>
+                                <li><a href="../classes/dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li>
+                                <li><a href="../classes/dwv.utils.WorkerThread.html">dwv.utils.WorkerThread</a></li>
                                 <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                             </ul>
                 
@@ -208,6 +210,39 @@ dwv.utils.capitaliseFirstLetter = function (string)
         res = string.charAt(0).toUpperCase() + string.slice(1);
     }
     return res;
+};
+
+/**
+ * Split query string:
+ *  &#x27;root?key0=val00&amp;key0=val01&amp;key1=val10&#x27; returns
+ *  { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }
+ * Returns an empty object if the input string is not correct (null, empty...)
+ *  or if it is not a query string (no question mark).
+ * @method splitQueryString
+ * @static
+ * @param {String} inputStr The string to split.
+ * @return {Object} The split string.
+ */
+dwv.utils.splitQueryString = function (inputStr)
+{
+    // result
+    var result = {};
+    // check if query string
+    var sepIndex = null;
+    if ( inputStr &amp;&amp; (sepIndex = inputStr.indexOf(&#x27;?&#x27;)) !== -1 ) {
+        // base: before the &#x27;?&#x27;
+        result.base = inputStr.substr(0, sepIndex);
+        // query : after the &#x27;?&#x27; and until possible &#x27;#&#x27;
+        var hashIndex = inputStr.indexOf(&#x27;#&#x27;);
+        if ( hashIndex === -1 ) {
+            hashIndex = inputStr.length;
+        }
+        var query = inputStr.substr(sepIndex + 1, (hashIndex - 1 - sepIndex));
+        // split key/value pairs of the query
+        result.query = dwv.utils.splitKeyValueString(query);
+    }
+    // return
+    return result;
 };
 
 /**
