@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.13.0</em>
+            <em>API Docs for: 0.14.0-beta</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -128,9 +128,7 @@
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
-                                <li><a href="../classes/dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li>
-                                <li><a href="../classes/dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li>
-                                <li><a href="../classes/dwv.utils.WorkerThread.html">dwv.utils.WorkerThread</a></li>
+                                <li><a href="../classes/dwv.utils.base.html">dwv.utils.base</a></li>
                                 <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                             </ul>
                 
@@ -211,9 +209,6 @@ dwv.App = function ()
     var dataHeight = 0;
     // Number of slices to load
     var nSlicesToLoad = 0;
-    
-    // Data decoders scripts
-    var decoderScripts = null;
 
     // Container div id
     var containerDivId = null;
@@ -275,7 +270,7 @@ dwv.App = function ()
      * @method getVersion
      * @return {String} The version of the application.
      */
-    this.getVersion = function () { return &quot;v0.13.0&quot;; };
+    this.getVersion = function () { return &quot;v0.14.0-beta&quot;; };
 
     /**
      * Get the image.
@@ -390,23 +385,14 @@ dwv.App = function ()
     this.getToolboxController = function () { return toolboxController; };
 
     /**
-     * Get the undo stack.
-     * @method getUndoStack
-     * @return {Object} The undo stack.
+     * Add a command to the undo stack.
+     * @method addToUndoStack
+     * @param {Object} The command to add.
      */
-    this.getUndoStack = function () { return undoStack; };
-
-    /**
-     * Get the data loaders.
-     * @method getLoaders
-     * @return {Object} The loaders.
-     */
-    this.getLoaders = function ()
-    {
-        return {
-            &#x27;file&#x27;: dwv.io.File,
-            &#x27;url&#x27;: dwv.io.Url
-        };
+    this.addToUndoStack = function (cmd) { 
+        if ( undoStack !== null ) {
+            undoStack.add(cmd);
+        }
     };
 
     /**
@@ -435,22 +421,13 @@ dwv.App = function ()
                         // setup the shape list
                         var shapeList = {};
                         for ( var s = 0; s &lt; config.shapes.length; ++s ) {
-                            switch( config.shapes[s] ) {
-                            case &quot;Line&quot;:
-                                shapeList.Line = dwv.tool.LineFactory;
-                                break;
-                            case &quot;Protractor&quot;:
-                                shapeList.Protractor = dwv.tool.ProtractorFactory;
-                                break;
-                            case &quot;Rectangle&quot;:
-                                shapeList.Rectangle = dwv.tool.RectangleFactory;
-                                break;
-                            case &quot;Roi&quot;:
-                                shapeList.Roi = dwv.tool.RoiFactory;
-                                break;
-                            case &quot;Ellipse&quot;:
-                                shapeList.Ellipse = dwv.tool.EllipseFactory;
-                                break;
+                            var shapeName = config.shapes[s];
+                            var shapeFactoryClass = shapeName+&quot;Factory&quot;;
+                            if (typeof dwv.tool[shapeFactoryClass] !== &quot;undefined&quot;) {
+                                shapeList[shapeName] = dwv.tool[shapeFactoryClass];
+                            }
+                            else {
+                                console.warn(&quot;Could not initialise unknown shape: &quot;+shapeName);
                             }
                         }
                         toolList.Draw = new dwv.tool.Draw(this, shapeList);
@@ -468,16 +445,12 @@ dwv.App = function ()
                         // setup the filter list
                         var filterList = {};
                         for ( var f = 0; f &lt; config.filters.length; ++f ) {
-                            switch( config.filters[f] ) {
-                            case &quot;Threshold&quot;:
-                                filterList.Threshold = new dwv.tool.filter.Threshold(this);
-                                break;
-                            case &quot;Sharpen&quot;:
-                                filterList.Sharpen = new dwv.tool.filter.Sharpen(this);
-                                break;
-                            case &quot;Sobel&quot;:
-                                filterList.Sobel = new dwv.tool.filter.Sobel(this);
-                                break;
+                            var filterName = config.filters[f];
+                            if (typeof dwv.tool.filter[filterName] !== &quot;undefined&quot;) {
+                                filterList[filterName] = new dwv.tool.filter[filterName](this);
+                            }
+                            else {
+                                console.warn(&quot;Could not initialise unknown filter: &quot;+filterName);
                             }
                         }
                         toolList.Filter = new dwv.tool.Filter(filterList, this);
@@ -498,15 +471,24 @@ dwv.App = function ()
             }
             // load
             if ( config.gui.indexOf(&quot;load&quot;) !== -1 ) {
-                var fileLoadGui = new dwv.gui.FileLoad(this);
-                var urlLoadGui = new dwv.gui.UrlLoad(this);
-                loadbox = new dwv.gui.Loadbox(this,
-                    {&quot;file&quot;: fileLoadGui, &quot;url&quot;: urlLoadGui} );
+                var loaderList = {};
+                for ( var l = 0; l &lt; config.loaders.length; ++l ) {
+                    var loaderName = config.loaders[l];
+                    var loaderClass = loaderName + &quot;Load&quot;;
+                    if (typeof dwv.gui[loaderClass] !== &quot;undefined&quot;) {
+                        loaderList[loaderName] = new dwv.gui[loaderClass](this);
+                    }
+                    else {
+                        console.warn(&quot;Could not initialise unknown loader: &quot;+loaderName);
+                    }
+                }
+                loadbox = new dwv.gui.Loadbox(this, loaderList);
                 loadbox.setup();
-                fileLoadGui.setup();
-                urlLoadGui.setup();
-                fileLoadGui.display(true);
-                urlLoadGui.display(false);
+                var loaderKeys = Object.keys(loaderList);
+                for ( var lk = 0; lk &lt; loaderKeys.length; ++lk ) {
+                    loaderList[loaderKeys[lk]].setup();
+                }
+                loadbox.displayLoader(loaderKeys[0]);
             }
             // undo
             if ( config.gui.indexOf(&quot;undo&quot;) !== -1 ) {
@@ -542,53 +524,28 @@ dwv.App = function ()
             var dropBoxSize = 2 * size.height / 3;
             box.setAttribute(&quot;style&quot;,&quot;width:&quot;+dropBoxSize+&quot;px;height:&quot;+dropBoxSize+&quot;px&quot;);
         }
-        
         // possible load from URL
         if ( typeof config.skipLoadUrl === &quot;undefined&quot; ) {
-            var query = dwv.html.getUriParam(window.location.href);
+            var query = dwv.utils.getUriQuery(window.location.href);
             // check query
             if ( query &amp;&amp; typeof query.input !== &quot;undefined&quot; ) {
-                // manifest
-                if ( query.type &amp;&amp; query.type === &quot;manifest&quot; ) {
-                    var finalUri = &quot;&quot;;
-                    if ( query.input[0] === &#x27;/&#x27; ) {
-                        finalUri = window.location.protocol + &quot;//&quot; + window.location.host;
-                    }
-                    finalUri += query.input;
-                    dwv.html.decodeManifestUri( finalUri, query.nslices, this.onInputURLs );
-                }
-                // urls
-                else {
-                    var urls = dwv.html.decodeKeyValueUri( query.input, query.dwvReplaceMode );
-                    this.loadURL(urls);
-                    if ( typeof query.state !== &quot;undefined&quot; ) {
-                        var onLoadEnd = function (/*event*/) {
-                            loadStateUrl([query.state]);
-                        };
-                        this.addEventListener( &quot;load-end&quot;, onLoadEnd );
-
-                    }
+                dwv.utils.decodeQuery(query, this.onInputURLs);
+                // optional display state
+                if ( typeof query.state !== &quot;undefined&quot; ) {
+                    var onLoadEnd = function (/*event*/) {
+                        loadStateUrl([query.state]);
+                    };
+                    this.addEventListener( &quot;load-end&quot;, onLoadEnd );
                 }
             }
         }
         else{
             console.log(&quot;Not loading url from address since skipLoadUrl is defined.&quot;);
         }
-        
         // align layers when the window is resized
         if ( config.fitToWindow ) {
             fitToWindow = true;
             window.onresize = this.onResize;
-        }
-
-        // use web workers
-        if ( config.useWebWorkers ) {
-            // data decoders
-            var pathToRoot = &quot;../..&quot;;
-            decoderScripts = [];
-            decoderScripts.jpeg2000 = pathToRoot + &quot;/ext/pdfjs/decode-jpeg2000.js&quot;;
-            decoderScripts[&quot;jpeg-lossless&quot;] = pathToRoot + &quot;/ext/rii-mango/decode-jpegloss.js&quot;;
-            decoderScripts[&quot;jpeg-baseline&quot;] = pathToRoot + &quot;/ext/notmasteryet/decode-jpegbaseline.js&quot;;
         }
     };
 
@@ -709,7 +666,6 @@ dwv.App = function ()
         nSlicesToLoad = files.length;
         // create IO
         var fileIO = new dwv.io.File();
-        fileIO.setDecoderScripts(decoderScripts);
         fileIO.onload = function (data) {
 
             var isFirst = true;
@@ -760,15 +716,15 @@ dwv.App = function ()
      * Load a list of URLs.
      * @method loadURL
      * @param {Array} urls The list of urls to load.
+     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
      */
-    this.loadURL = function(urls)
+    this.loadURL = function(urls, requestHeaders)
     {
         // clear variables
-        this.reset();
+        self.reset();
         nSlicesToLoad = urls.length;
         // create IO
         var urlIO = new dwv.io.Url();
-        urlIO.setDecoderScripts(decoderScripts);
         urlIO.onload = function (data) {
             var isFirst = true;
             if ( image ) {
@@ -793,7 +749,7 @@ dwv.App = function ()
         urlIO.onloadend = function (/*event*/) { fireEvent({ &#x27;type&#x27;: &#x27;load-end&#x27; }); };
         urlIO.onprogress = onLoadProgress;
         // main load (asynchronous)
-        urlIO.load(urls);
+        urlIO.load(urls, requestHeaders);
     };
 
     /**
@@ -1109,10 +1065,11 @@ dwv.App = function ()
      * Handle input urls.
      * @method onInputURLs
      * @param {Array} urls The list of input urls.
+     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
      */
-    this.onInputURLs = function (urls)
+    this.onInputURLs = function (urls, requestHeaders)
     {
-        self.loadURL(urls);
+        self.loadURL(urls, requestHeaders);
     };
 
     /**

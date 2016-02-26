@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.13.0</em>
+            <em>API Docs for: 0.14.0-beta</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -128,9 +128,7 @@
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
-                                <li><a href="../classes/dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li>
-                                <li><a href="../classes/dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li>
-                                <li><a href="../classes/dwv.utils.WorkerThread.html">dwv.utils.WorkerThread</a></li>
+                                <li><a href="../classes/dwv.utils.base.html">dwv.utils.base</a></li>
                                 <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                             </ul>
                 
@@ -583,196 +581,6 @@ dwv.html.createHtmlSelect = function (name, list) {
         throw new Error(&quot;Unsupported input list type.&quot;);
     }
     return select;
-};
-
-/**
- * Get a list of parameters from an input URI that looks like:
- *  [dwv root]?input=encodeURI([root]?key0=value0&amp;key1=value1)
- * or
- *  [dwv root]?input=encodeURI([manifest link])&amp;type=manifest
- *
- * @method getUriParam
- * @static
- * @param {String } uri The URI to decode.
- * @return {Object} The parameters found in the input uri.
- */
-dwv.html.getUriParam = function (uri)
-{
-    // split key/value pairs
-    var mainQueryPairs = dwv.utils.splitQueryString(uri);
-    // check pairs
-    if ( Object.keys(mainQueryPairs).length === 0 ) {
-        return null;
-    }
-    // has to have an input key
-    return mainQueryPairs.query;
-};
-
-/**
- * Decode a Key/Value pair uri. If a key is repeated, the result
- * be an array of base + each key.
- * @method decodeKeyValueUri
- * @static
- * @param {String} uri The uri to decode.
- * @param {String} replaceMode The key replace more.
- */
-dwv.html.decodeKeyValueUri = function (uri, replaceMode)
-{
-    var result = [];
-
-    // repeat key replace mode (default to keep key)
-    var repeatKeyReplaceMode = &quot;key&quot;;
-    if ( replaceMode ) {
-        repeatKeyReplaceMode = replaceMode;
-    }
-
-    // decode input URI
-    var queryUri = decodeURIComponent(uri);
-    // get key/value pairs from input URI
-    var inputQueryPairs = dwv.utils.splitQueryString(queryUri);
-    if ( Object.keys(inputQueryPairs).length === 0 )
-    {
-        result.push(queryUri);
-    }
-    else
-    {
-        var keys = Object.keys(inputQueryPairs.query);
-        // find repeat key
-        var repeatKey = null;
-        for ( var i = 0; i &lt; keys.length; ++i )
-        {
-            if ( inputQueryPairs.query[keys[i]] instanceof Array )
-            {
-                repeatKey = keys[i];
-                break;
-            }
-        }
-
-        if ( !repeatKey )
-        {
-            result.push(queryUri);
-        }
-        else
-        {
-            var repeatList = inputQueryPairs.query[repeatKey];
-            // build base uri
-            var baseUrl = inputQueryPairs.base;
-            // do not add &#x27;?&#x27; when the repeatKey is &#x27;file&#x27;
-            // root/path/to/?file=0.jpg&amp;file=1.jpg
-            if ( repeatKey !== &quot;file&quot; ) {
-                baseUrl += &quot;?&quot;;
-            }
-            var gotOneArg = false;
-            for ( var j = 0; j &lt; keys.length; ++j )
-            {
-                if ( keys[j] !== repeatKey ) {
-                    if ( gotOneArg ) {
-                        baseUrl += &quot;&amp;&quot;;
-                    }
-                    baseUrl += keys[j] + &quot;=&quot; + inputQueryPairs.query[keys[j]];
-                    gotOneArg = true;
-                }
-            }
-            // append built urls to result
-            var url;
-            for ( var k = 0; k &lt; repeatList.length; ++k )
-            {
-                url = baseUrl;
-                if ( gotOneArg ) {
-                    url += &quot;&amp;&quot;;
-                }
-                if ( repeatKeyReplaceMode === &quot;key&quot; ) {
-                    url += repeatKey + &quot;=&quot;;
-                }
-                // other than &#x27;key&#x27; mode: do nothing
-                url += repeatList[k];
-                result.push(url);
-            }
-        }
-    }
-    // return
-    return result;
-};
-
-/**
- * Decode a manifest uri.
- * @method decodeManifestUri
- * @static
- * @param {String} uri The uri to decode.
- * @param {number} nslices The number of slices to load.
- * @param {Function} The function to call with the decoded urls.
- */
-dwv.html.decodeManifestUri = function (uri, nslices, callback)
-{
-    // Request error
-    var onErrorRequest = function (/*event*/)
-    {
-        console.warn( &quot;RequestError while receiving manifest: &quot;+this.status );
-    };
-
-    // Request handler
-    var onLoadRequest = function (/*event*/)
-    {
-        var urls = dwv.html.decodeManifest(this.responseXML, nslices);
-        callback(urls);
-    };
-
-    var request = new XMLHttpRequest();
-    request.open(&#x27;GET&#x27;, decodeURIComponent(uri), true);
-    request.responseType = &quot;xml&quot;;
-    request.onload = onLoadRequest;
-    request.onerror = onErrorRequest;
-    request.send(null);
-};
-
-/**
- * Decode an XML manifest.
- * @method decodeManifest
- * @static
- * @param {Object} manifest The manifest to decode.
- * @param {Number} nslices The number of slices to load.
- */
-dwv.html.decodeManifest = function (manifest, nslices)
-{
-    var result = [];
-    // wado url
-    var wadoElement = manifest.getElementsByTagName(&quot;wado_query&quot;);
-    var wadoURL = wadoElement[0].getAttribute(&quot;wadoURL&quot;);
-    var rootURL = wadoURL + &quot;?requestType=WADO&amp;contentType=application/dicom&amp;&quot;;
-    // patient list
-    var patientList = manifest.getElementsByTagName(&quot;Patient&quot;);
-    if ( patientList.length &gt; 1 ) {
-        console.warn(&quot;More than one patient, loading first one.&quot;);
-    }
-    // study list
-    var studyList = patientList[0].getElementsByTagName(&quot;Study&quot;);
-    if ( studyList.length &gt; 1 ) {
-        console.warn(&quot;More than one study, loading first one.&quot;);
-    }
-    var studyUID = studyList[0].getAttribute(&quot;StudyInstanceUID&quot;);
-    // series list
-    var seriesList = studyList[0].getElementsByTagName(&quot;Series&quot;);
-    if ( seriesList.length &gt; 1 ) {
-        console.warn(&quot;More than one series, loading first one.&quot;);
-    }
-    var seriesUID = seriesList[0].getAttribute(&quot;SeriesInstanceUID&quot;);
-    // instance list
-    var instanceList = seriesList[0].getElementsByTagName(&quot;Instance&quot;);
-    // loop on instances and push links
-    var max = instanceList.length;
-    if ( nslices &lt; max ) {
-        max = nslices;
-    }
-    for ( var i = 0; i &lt; max; ++i ) {
-        var sopInstanceUID = instanceList[i].getAttribute(&quot;SOPInstanceUID&quot;);
-        var link = rootURL +
-        &quot;&amp;studyUID=&quot; + studyUID +
-        &quot;&amp;seriesUID=&quot; + seriesUID +
-        &quot;&amp;objectUID=&quot; + sopInstanceUID;
-        result.push( link );
-    }
-    // return
-    return result;
 };
 
 /**

@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.13.0</em>
+            <em>API Docs for: 0.14.0-beta</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -128,9 +128,7 @@
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
-                                <li><a href="../classes/dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li>
-                                <li><a href="../classes/dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li>
-                                <li><a href="../classes/dwv.utils.WorkerThread.html">dwv.utils.WorkerThread</a></li>
+                                <li><a href="../classes/dwv.utils.base.html">dwv.utils.base</a></li>
                                 <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                             </ul>
                 
@@ -196,26 +194,14 @@ var dwv = dwv || {};
  */
 dwv.image = dwv.image || {};
 
-// JPEG Baseline
-var hasJpegBaselineDecoder = (typeof JpegImage !== &quot;undefined&quot;);
-var JpegImage = JpegImage || {};
-// JPEG Lossless
-var hasJpegLosslessDecoder = (typeof jpeg !== &quot;undefined&quot;) &amp;&amp;
-    (typeof jpeg.lossless !== &quot;undefined&quot;);
-var jpeg = jpeg || {};
-jpeg.lossless = jpeg.lossless || {};
-// JPEG 2000
-var hasJpeg2000Decoder = (typeof JpxImage !== &quot;undefined&quot;);
-var JpxImage = JpxImage || {};
-
 /**
  * Get data from an input image using a canvas.
  * @method getDataFromImage
  * @static
- * @param {Image} Image The DOM Image.
+ * @param {Image} image The image.
  * @return {Mixed} The corresponding view and info.
  */
-dwv.image.getViewFromDOMImage = function (image)
+dwv.image.getDataFromImage = function(image)
 {
     // draw the image in the canvas in order to get its data
     var canvas = document.createElement(&#x27;canvas&#x27;);
@@ -266,98 +252,23 @@ dwv.image.getViewFromDOMImage = function (image)
 };
 
 /**
- * Create a dwv.image.View from a DICOM buffer.
+ * Get data from an input buffer using a DICOM parser.
+ * @method getDataFromDicomBuffer
+ * @static
+ * @param {Array} buffer The input data buffer.
+ * @return {Mixed} The corresponding view and info.
  */
-dwv.image.DicomBufferToView = function (decoderScripts) {
-
-    // flag to use workers or not to decode data
-    var useWorkers = false;
-    
-    if (typeof decoderScripts !== &quot;undefined&quot; &amp;&amp; decoderScripts instanceof Array) {
-        useWorkers = true;
-        // thread pool
-        var pool = new dwv.utils.ThreadPool(15);
-        pool.init();
-    }
-
-    /**
-     * Get data from an input buffer using a DICOM parser.
-     * @method getDataFromDicomBuffer
-     * @static
-     * @param {Array} buffer The input data buffer.
-     * @param {Object} callback The callback on the conversion.
-     * @return {Mixed} The corresponding view and info.
-     */
-    this.convert = function(buffer, callback)
-    {
-        // DICOM parser
-        var dicomParser = new dwv.dicom.DicomParser();
-        // parse the buffer
-        dicomParser.parse(buffer);
-    
-        // worker callback
-        var decodedBufferToView = function(event) {
-            // create the view
-            var viewFactory = new dwv.image.ViewFactory();
-            var view = viewFactory.create( dicomParser.getDicomElements(), event.data );
-            // return
-            callback({&quot;view&quot;: view, &quot;info&quot;: dicomParser.getDicomElements().dumpToTable()});
-        };
-        var pixelBuffer = dicomParser.pixelBuffer;
-        
-        var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
-        var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
-        var needDecompression = (algoName !== null);
-        
-        if ( needDecompression ) {
-            if (useWorkers) {
-                var script = decoderScripts[algoName];
-                if ( typeof script === &quot;undefined&quot; ) {
-                    throw new Error(&quot;No script provided to decompress &#x27;&quot; + algoName + &quot;&#x27; data.&quot;);
-                }
-                var workerTask = new dwv.utils.WorkerTask(script, decodedBufferToView, pixelBuffer);
-                pool.addWorkerTask(workerTask);
-            }
-            else {
-
-                var decoder = null;
-                var decodedBuffer = null;
-                
-                if( algoName === &quot;jpeg-lossless&quot; ) {
-                    if ( !hasJpegLosslessDecoder ) {
-                        throw new Error(&quot;No JPEG Lossless decoder provided&quot;);
-                    }
-                    var buf = new Uint8Array( pixelBuffer );
-                    decoder = new jpeg.lossless.Decoder(buf.buffer);
-                    var decoded = decoder.decode();
-                    decodedBuffer = new Uint16Array(decoded.buffer);
-                }
-                else if ( algoName === &quot;jpeg-baseline&quot; ) {
-                    if ( !hasJpegBaselineDecoder ) {
-                        throw new Error(&quot;No JPEG Baseline decoder provided&quot;);
-                    }
-                    decoder = new JpegImage();
-                    decoder.parse( pixelBuffer );
-                    decodedBuffer = decoder.getData(decoder.width,decoder.height);
-                }
-                else if( algoName === &quot;jpeg2000&quot; ) {
-                    if ( !hasJpeg2000Decoder ) {
-                        throw new Error(&quot;No JPEG 2000 decoder provided&quot;);
-                    }
-                    // decompress pixel buffer into Int16 image
-                    decoder = new JpxImage();
-                    decoder.parse( pixelBuffer );
-                    // set the pixel buffer
-                    decodedBuffer = decoder.tiles[0].items;
-                }
-                decodedBufferToView({data: decodedBuffer});
-            }
-       }
-        else {
-            decodedBufferToView({data: pixelBuffer});
-        }
-    };
-
+dwv.image.getDataFromDicomBuffer = function(buffer)
+{
+    // DICOM parser
+    var dicomParser = new dwv.dicom.DicomParser();
+    // parse the buffer
+    dicomParser.parse(buffer);
+    // create the view
+    var viewFactory = new dwv.image.ViewFactory();
+    var view = viewFactory.create( dicomParser.getDicomElements(), dicomParser.getPixelBuffer() );
+    // return
+    return {&quot;view&quot;: view, &quot;info&quot;: dicomParser.getDicomElements().dumpToTable()};
 };
 
     </pre>

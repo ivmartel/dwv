@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.13.0</em>
+            <em>API Docs for: 0.14.0-beta</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -128,9 +128,7 @@
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
-                                <li><a href="../classes/dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li>
-                                <li><a href="../classes/dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li>
-                                <li><a href="../classes/dwv.utils.WorkerThread.html">dwv.utils.WorkerThread</a></li>
+                                <li><a href="../classes/dwv.utils.base.html">dwv.utils.base</a></li>
                                 <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                             </ul>
                 
@@ -258,6 +256,10 @@
                                 <a href="#method_addLayerListeners">addLayerListeners</a>
 
                             </li>
+                            <li class="index-item method">
+                                <a href="#method_addToUndoStack">addToUndoStack</a>
+
+                            </li>
                             <li class="index-item method private">
                                 <a href="#method_createLayers">createLayers</a>
 
@@ -299,10 +301,6 @@
 
                             </li>
                             <li class="index-item method">
-                                <a href="#method_getLoaders">getLoaders</a>
-
-                            </li>
-                            <li class="index-item method">
                                 <a href="#method_getNSlicesToLoad">getNSlicesToLoad</a>
 
                             </li>
@@ -328,10 +326,6 @@
                             </li>
                             <li class="index-item method">
                                 <a href="#method_getTranslation">getTranslation</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_getUndoStack">getUndoStack</a>
 
                             </li>
                             <li class="index-item method">
@@ -580,7 +574,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l465"><code>src&#x2F;app&#x2F;application.js:465</code></a>
+        <a href="../files/src_app_application.js.html#l424"><code>src&#x2F;app&#x2F;application.js:424</code></a>
         </p>
 
 
@@ -640,7 +634,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1176"><code>src&#x2F;app&#x2F;application.js:1176</code></a>
+        <a href="../files/src_app_application.js.html#l1135"><code>src&#x2F;app&#x2F;application.js:1135</code></a>
         </p>
 
 
@@ -671,7 +665,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l709"><code>src&#x2F;app&#x2F;application.js:709</code></a>
+        <a href="../files/src_app_application.js.html#l667"><code>src&#x2F;app&#x2F;application.js:667</code></a>
         </p>
 
 
@@ -683,6 +677,60 @@
 
     </div>
 
+
+
+
+</div>
+<div id="method_addToUndoStack" class="method item">
+    <h3 class="name"><code>addToUndoStack</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>The</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_app_application.js.html#l204"><code>src&#x2F;app&#x2F;application.js:204</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Add a command to the undo stack.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">The</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>command to add.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
 
 
 
@@ -712,7 +760,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1369"><code>src&#x2F;app&#x2F;application.js:1369</code></a>
+        <a href="../files/src_app_application.js.html#l1328"><code>src&#x2F;app&#x2F;application.js:1328</code></a>
         </p>
 
 
@@ -777,7 +825,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1095"><code>src&#x2F;app&#x2F;application.js:1095</code></a>
+        <a href="../files/src_app_application.js.html#l1054"><code>src&#x2F;app&#x2F;application.js:1054</code></a>
         </p>
 
 
@@ -825,7 +873,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l633"><code>src&#x2F;app&#x2F;application.js:633</code></a>
+        <a href="../files/src_app_application.js.html#l591"><code>src&#x2F;app&#x2F;application.js:591</code></a>
         </p>
 
 
@@ -856,7 +904,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1111"><code>src&#x2F;app&#x2F;application.js:1111</code></a>
+        <a href="../files/src_app_application.js.html#l1070"><code>src&#x2F;app&#x2F;application.js:1070</code></a>
         </p>
 
 
@@ -890,7 +938,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l167"><code>src&#x2F;app&#x2F;application.js:167</code></a>
+        <a href="../files/src_app_application.js.html#l164"><code>src&#x2F;app&#x2F;application.js:164</code></a>
         </p>
 
 
@@ -933,7 +981,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l180"><code>src&#x2F;app&#x2F;application.js:180</code></a>
+        <a href="../files/src_app_application.js.html#l177"><code>src&#x2F;app&#x2F;application.js:177</code></a>
         </p>
 
 
@@ -982,7 +1030,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l410"><code>src&#x2F;app&#x2F;application.js:410</code></a>
+        <a href="../files/src_app_application.js.html#l369"><code>src&#x2F;app&#x2F;application.js:369</code></a>
         </p>
 
 
@@ -1041,7 +1089,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l95"><code>src&#x2F;app&#x2F;application.js:95</code></a>
+        <a href="../files/src_app_application.js.html#l92"><code>src&#x2F;app&#x2F;application.js:92</code></a>
         </p>
 
 
@@ -1084,7 +1132,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l120"><code>src&#x2F;app&#x2F;application.js:120</code></a>
+        <a href="../files/src_app_application.js.html#l117"><code>src&#x2F;app&#x2F;application.js:117</code></a>
         </p>
 
 
@@ -1127,7 +1175,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l161"><code>src&#x2F;app&#x2F;application.js:161</code></a>
+        <a href="../files/src_app_application.js.html#l158"><code>src&#x2F;app&#x2F;application.js:158</code></a>
         </p>
 
 
@@ -1152,49 +1200,6 @@
 
 
 </div>
-<div id="method_getLoaders" class="method item">
-    <h3 class="name"><code>getLoaders</code></h3>
-
-        <span class="paren">()</span>
-
-        <span class="returns-inline">
-            <span class="type">Object</span>
-        </span>
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_app_application.js.html#l214"><code>src&#x2F;app&#x2F;application.js:214</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Get the data loaders.</p>
-
-    </div>
-
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                        <span class="type">Object</span>:
-                    <p>The loaders.</p>
-
-            </div>
-        </div>
-
-
-</div>
 <div id="method_getNSlicesToLoad" class="method item">
     <h3 class="name"><code>getNSlicesToLoad</code></h3>
 
@@ -1213,7 +1218,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l126"><code>src&#x2F;app&#x2F;application.js:126</code></a>
+        <a href="../files/src_app_application.js.html#l123"><code>src&#x2F;app&#x2F;application.js:123</code></a>
         </p>
 
 
@@ -1256,7 +1261,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l133"><code>src&#x2F;app&#x2F;application.js:133</code></a>
+        <a href="../files/src_app_application.js.html#l130"><code>src&#x2F;app&#x2F;application.js:130</code></a>
         </p>
 
 
@@ -1299,7 +1304,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l140"><code>src&#x2F;app&#x2F;application.js:140</code></a>
+        <a href="../files/src_app_application.js.html#l137"><code>src&#x2F;app&#x2F;application.js:137</code></a>
         </p>
 
 
@@ -1342,7 +1347,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l187"><code>src&#x2F;app&#x2F;application.js:187</code></a>
+        <a href="../files/src_app_application.js.html#l184"><code>src&#x2F;app&#x2F;application.js:184</code></a>
         </p>
 
 
@@ -1385,7 +1390,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l194"><code>src&#x2F;app&#x2F;application.js:194</code></a>
+        <a href="../files/src_app_application.js.html#l191"><code>src&#x2F;app&#x2F;application.js:191</code></a>
         </p>
 
 
@@ -1428,7 +1433,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l200"><code>src&#x2F;app&#x2F;application.js:200</code></a>
+        <a href="../files/src_app_application.js.html#l197"><code>src&#x2F;app&#x2F;application.js:197</code></a>
         </p>
 
 
@@ -1471,7 +1476,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l147"><code>src&#x2F;app&#x2F;application.js:147</code></a>
+        <a href="../files/src_app_application.js.html#l144"><code>src&#x2F;app&#x2F;application.js:144</code></a>
         </p>
 
 
@@ -1496,49 +1501,6 @@
 
 
 </div>
-<div id="method_getUndoStack" class="method item">
-    <h3 class="name"><code>getUndoStack</code></h3>
-
-        <span class="paren">()</span>
-
-        <span class="returns-inline">
-            <span class="type">Object</span>
-        </span>
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_app_application.js.html#l207"><code>src&#x2F;app&#x2F;application.js:207</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Get the undo stack.</p>
-
-    </div>
-
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                        <span class="type">Object</span>:
-                    <p>The undo stack.</p>
-
-            </div>
-        </div>
-
-
-</div>
 <div id="method_getVersion" class="method item">
     <h3 class="name"><code>getVersion</code></h3>
 
@@ -1557,7 +1519,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l88"><code>src&#x2F;app&#x2F;application.js:88</code></a>
+        <a href="../files/src_app_application.js.html#l85"><code>src&#x2F;app&#x2F;application.js:85</code></a>
         </p>
 
 
@@ -1600,7 +1562,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l154"><code>src&#x2F;app&#x2F;application.js:154</code></a>
+        <a href="../files/src_app_application.js.html#l151"><code>src&#x2F;app&#x2F;application.js:151</code></a>
         </p>
 
 
@@ -1647,7 +1609,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1332"><code>src&#x2F;app&#x2F;application.js:1332</code></a>
+        <a href="../files/src_app_application.js.html#l1291"><code>src&#x2F;app&#x2F;application.js:1291</code></a>
         </p>
 
 
@@ -1695,7 +1657,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l227"><code>src&#x2F;app&#x2F;application.js:227</code></a>
+        <a href="../files/src_app_application.js.html#l215"><code>src&#x2F;app&#x2F;application.js:215</code></a>
         </p>
 
 
@@ -1732,7 +1694,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l498"><code>src&#x2F;app&#x2F;application.js:498</code></a>
+        <a href="../files/src_app_application.js.html#l457"><code>src&#x2F;app&#x2F;application.js:457</code></a>
         </p>
 
 
@@ -1786,7 +1748,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l515"><code>src&#x2F;app&#x2F;application.js:515</code></a>
+        <a href="../files/src_app_application.js.html#l474"><code>src&#x2F;app&#x2F;application.js:474</code></a>
         </p>
 
 
@@ -1840,7 +1802,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l555"><code>src&#x2F;app&#x2F;application.js:555</code></a>
+        <a href="../files/src_app_application.js.html#l513"><code>src&#x2F;app&#x2F;application.js:513</code></a>
         </p>
 
 
@@ -1894,7 +1856,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l614"><code>src&#x2F;app&#x2F;application.js:614</code></a>
+        <a href="../files/src_app_application.js.html#l572"><code>src&#x2F;app&#x2F;application.js:572</code></a>
         </p>
 
 
@@ -1935,6 +1897,9 @@
                 <li class="arg">
                         <code>urls</code>
                 </li>
+                <li class="arg">
+                        <code>requestHeaders</code>
+                </li>
             </ul><span class="paren">)</span>
         </div>
 
@@ -1948,7 +1913,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l574"><code>src&#x2F;app&#x2F;application.js:574</code></a>
+        <a href="../files/src_app_application.js.html#l532"><code>src&#x2F;app&#x2F;application.js:532</code></a>
         </p>
 
 
@@ -1971,6 +1936,17 @@
 
                     <div class="param-description">
                         <p>The list of urls to load.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">requestHeaders</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <p>An array of {name, value} to use as request headers.</p>
 
                     </div>
 
@@ -2002,7 +1978,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l959"><code>src&#x2F;app&#x2F;application.js:959</code></a>
+        <a href="../files/src_app_application.js.html#l918"><code>src&#x2F;app&#x2F;application.js:918</code></a>
         </p>
 
 
@@ -2056,7 +2032,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l933"><code>src&#x2F;app&#x2F;application.js:933</code></a>
+        <a href="../files/src_app_application.js.html#l892"><code>src&#x2F;app&#x2F;application.js:892</code></a>
         </p>
 
 
@@ -2110,7 +2086,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1007"><code>src&#x2F;app&#x2F;application.js:1007</code></a>
+        <a href="../files/src_app_application.js.html#l966"><code>src&#x2F;app&#x2F;application.js:966</code></a>
         </p>
 
 
@@ -2164,7 +2140,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1027"><code>src&#x2F;app&#x2F;application.js:1027</code></a>
+        <a href="../files/src_app_application.js.html#l986"><code>src&#x2F;app&#x2F;application.js:986</code></a>
         </p>
 
 
@@ -2218,7 +2194,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l903"><code>src&#x2F;app&#x2F;application.js:903</code></a>
+        <a href="../files/src_app_application.js.html#l861"><code>src&#x2F;app&#x2F;application.js:861</code></a>
         </p>
 
 
@@ -2272,7 +2248,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1037"><code>src&#x2F;app&#x2F;application.js:1037</code></a>
+        <a href="../files/src_app_application.js.html#l996"><code>src&#x2F;app&#x2F;application.js:996</code></a>
         </p>
 
 
@@ -2326,7 +2302,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l997"><code>src&#x2F;app&#x2F;application.js:997</code></a>
+        <a href="../files/src_app_application.js.html#l956"><code>src&#x2F;app&#x2F;application.js:956</code></a>
         </p>
 
 
@@ -2380,7 +2356,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l987"><code>src&#x2F;app&#x2F;application.js:987</code></a>
+        <a href="../files/src_app_application.js.html#l946"><code>src&#x2F;app&#x2F;application.js:946</code></a>
         </p>
 
 
@@ -2434,7 +2410,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l913"><code>src&#x2F;app&#x2F;application.js:913</code></a>
+        <a href="../files/src_app_application.js.html#l871"><code>src&#x2F;app&#x2F;application.js:871</code></a>
         </p>
 
 
@@ -2488,7 +2464,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l969"><code>src&#x2F;app&#x2F;application.js:969</code></a>
+        <a href="../files/src_app_application.js.html#l928"><code>src&#x2F;app&#x2F;application.js:928</code></a>
         </p>
 
 
@@ -2542,7 +2518,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l832"><code>src&#x2F;app&#x2F;application.js:832</code></a>
+        <a href="../files/src_app_application.js.html#l790"><code>src&#x2F;app&#x2F;application.js:790</code></a>
         </p>
 
 
@@ -2596,7 +2572,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1077"><code>src&#x2F;app&#x2F;application.js:1077</code></a>
+        <a href="../files/src_app_application.js.html#l1036"><code>src&#x2F;app&#x2F;application.js:1036</code></a>
         </p>
 
 
@@ -2651,7 +2627,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1299"><code>src&#x2F;app&#x2F;application.js:1299</code></a>
+        <a href="../files/src_app_application.js.html#l1258"><code>src&#x2F;app&#x2F;application.js:1258</code></a>
         </p>
 
 
@@ -2706,7 +2682,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1281"><code>src&#x2F;app&#x2F;application.js:1281</code></a>
+        <a href="../files/src_app_application.js.html#l1240"><code>src&#x2F;app&#x2F;application.js:1240</code></a>
         </p>
 
 
@@ -2761,7 +2737,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1317"><code>src&#x2F;app&#x2F;application.js:1317</code></a>
+        <a href="../files/src_app_application.js.html#l1276"><code>src&#x2F;app&#x2F;application.js:1276</code></a>
         </p>
 
 
@@ -2802,6 +2778,9 @@
                 <li class="arg">
                         <code>urls</code>
                 </li>
+                <li class="arg">
+                        <code>requestHeaders</code>
+                </li>
             </ul><span class="paren">)</span>
         </div>
 
@@ -2815,7 +2794,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l923"><code>src&#x2F;app&#x2F;application.js:923</code></a>
+        <a href="../files/src_app_application.js.html#l881"><code>src&#x2F;app&#x2F;application.js:881</code></a>
         </p>
 
 
@@ -2838,6 +2817,17 @@
 
                     <div class="param-description">
                         <p>The list of input urls.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">requestHeaders</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                        <p>An array of {name, value} to use as request headers.</p>
 
                     </div>
 
@@ -2869,7 +2859,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l862"><code>src&#x2F;app&#x2F;application.js:862</code></a>
+        <a href="../files/src_app_application.js.html#l820"><code>src&#x2F;app&#x2F;application.js:820</code></a>
         </p>
 
 
@@ -2929,7 +2919,7 @@ Default behavior. Usually used in tools.</li>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1353"><code>src&#x2F;app&#x2F;application.js:1353</code></a>
+        <a href="../files/src_app_application.js.html#l1312"><code>src&#x2F;app&#x2F;application.js:1312</code></a>
         </p>
 
 
@@ -2984,7 +2974,7 @@ Default behavior. Usually used in tools.</li>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1206"><code>src&#x2F;app&#x2F;application.js:1206</code></a>
+        <a href="../files/src_app_application.js.html#l1165"><code>src&#x2F;app&#x2F;application.js:1165</code></a>
         </p>
 
 
@@ -3039,7 +3029,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1057"><code>src&#x2F;app&#x2F;application.js:1057</code></a>
+        <a href="../files/src_app_application.js.html#l1016"><code>src&#x2F;app&#x2F;application.js:1016</code></a>
         </p>
 
 
@@ -3093,7 +3083,7 @@ position relative to the canvas element. It then passes it to the current tool.<
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l882"><code>src&#x2F;app&#x2F;application.js:882</code></a>
+        <a href="../files/src_app_application.js.html#l840"><code>src&#x2F;app&#x2F;application.js:840</code></a>
         </p>
 
 
@@ -3148,7 +3138,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1017"><code>src&#x2F;app&#x2F;application.js:1017</code></a>
+        <a href="../files/src_app_application.js.html#l976"><code>src&#x2F;app&#x2F;application.js:976</code></a>
         </p>
 
 
@@ -3202,7 +3192,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l842"><code>src&#x2F;app&#x2F;application.js:842</code></a>
+        <a href="../files/src_app_application.js.html#l800"><code>src&#x2F;app&#x2F;application.js:800</code></a>
         </p>
 
 
@@ -3256,7 +3246,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l946"><code>src&#x2F;app&#x2F;application.js:946</code></a>
+        <a href="../files/src_app_application.js.html#l905"><code>src&#x2F;app&#x2F;application.js:905</code></a>
         </p>
 
 
@@ -3310,7 +3300,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1067"><code>src&#x2F;app&#x2F;application.js:1067</code></a>
+        <a href="../files/src_app_application.js.html#l1026"><code>src&#x2F;app&#x2F;application.js:1026</code></a>
         </p>
 
 
@@ -3364,7 +3354,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1047"><code>src&#x2F;app&#x2F;application.js:1047</code></a>
+        <a href="../files/src_app_application.js.html#l1006"><code>src&#x2F;app&#x2F;application.js:1006</code></a>
         </p>
 
 
@@ -3418,7 +3408,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l822"><code>src&#x2F;app&#x2F;application.js:822</code></a>
+        <a href="../files/src_app_application.js.html#l780"><code>src&#x2F;app&#x2F;application.js:780</code></a>
         </p>
 
 
@@ -3472,7 +3462,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l893"><code>src&#x2F;app&#x2F;application.js:893</code></a>
+        <a href="../files/src_app_application.js.html#l851"><code>src&#x2F;app&#x2F;application.js:851</code></a>
         </p>
 
 
@@ -3527,7 +3517,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1410"><code>src&#x2F;app&#x2F;application.js:1410</code></a>
+        <a href="../files/src_app_application.js.html#l1369"><code>src&#x2F;app&#x2F;application.js:1369</code></a>
         </p>
 
 
@@ -3584,7 +3574,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l479"><code>src&#x2F;app&#x2F;application.js:479</code></a>
+        <a href="../files/src_app_application.js.html#l438"><code>src&#x2F;app&#x2F;application.js:438</code></a>
         </p>
 
 
@@ -3644,7 +3634,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1191"><code>src&#x2F;app&#x2F;application.js:1191</code></a>
+        <a href="../files/src_app_application.js.html#l1150"><code>src&#x2F;app&#x2F;application.js:1150</code></a>
         </p>
 
 
@@ -3675,7 +3665,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l731"><code>src&#x2F;app&#x2F;application.js:731</code></a>
+        <a href="../files/src_app_application.js.html#l689"><code>src&#x2F;app&#x2F;application.js:689</code></a>
         </p>
 
 
@@ -3706,7 +3696,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l753"><code>src&#x2F;app&#x2F;application.js:753</code></a>
+        <a href="../files/src_app_application.js.html#l711"><code>src&#x2F;app&#x2F;application.js:711</code></a>
         </p>
 
 
@@ -3737,7 +3727,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l421"><code>src&#x2F;app&#x2F;application.js:421</code></a>
+        <a href="../files/src_app_application.js.html#l380"><code>src&#x2F;app&#x2F;application.js:380</code></a>
         </p>
 
 
@@ -3768,7 +3758,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l446"><code>src&#x2F;app&#x2F;application.js:446</code></a>
+        <a href="../files/src_app_application.js.html#l405"><code>src&#x2F;app&#x2F;application.js:405</code></a>
         </p>
 
 
@@ -3799,7 +3789,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l111"><code>src&#x2F;app&#x2F;application.js:111</code></a>
+        <a href="../files/src_app_application.js.html#l108"><code>src&#x2F;app&#x2F;application.js:108</code></a>
         </p>
 
 
@@ -3836,7 +3826,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l101"><code>src&#x2F;app&#x2F;application.js:101</code></a>
+        <a href="../files/src_app_application.js.html#l98"><code>src&#x2F;app&#x2F;application.js:98</code></a>
         </p>
 
 
@@ -3893,7 +3883,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l806"><code>src&#x2F;app&#x2F;application.js:806</code></a>
+        <a href="../files/src_app_application.js.html#l764"><code>src&#x2F;app&#x2F;application.js:764</code></a>
         </p>
 
 
@@ -3964,7 +3954,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l778"><code>src&#x2F;app&#x2F;application.js:778</code></a>
+        <a href="../files/src_app_application.js.html#l736"><code>src&#x2F;app&#x2F;application.js:736</code></a>
         </p>
 
 
@@ -4034,7 +4024,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l676"><code>src&#x2F;app&#x2F;application.js:676</code></a>
+        <a href="../files/src_app_application.js.html#l634"><code>src&#x2F;app&#x2F;application.js:634</code></a>
         </p>
 
 
@@ -4074,7 +4064,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l794"><code>src&#x2F;app&#x2F;application.js:794</code></a>
+        <a href="../files/src_app_application.js.html#l752"><code>src&#x2F;app&#x2F;application.js:752</code></a>
         </p>
 
 
@@ -4133,7 +4123,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1156"><code>src&#x2F;app&#x2F;application.js:1156</code></a>
+        <a href="../files/src_app_application.js.html#l1115"><code>src&#x2F;app&#x2F;application.js:1115</code></a>
         </p>
 
 
@@ -4176,7 +4166,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l762"><code>src&#x2F;app&#x2F;application.js:762</code></a>
+        <a href="../files/src_app_application.js.html#l720"><code>src&#x2F;app&#x2F;application.js:720</code></a>
         </p>
 
 
@@ -4246,7 +4236,7 @@ Fit the display to the window. To be called once the image is loaded.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_app_application.js.html#l1125"><code>src&#x2F;app&#x2F;application.js:1125</code></a>
+        <a href="../files/src_app_application.js.html#l1084"><code>src&#x2F;app&#x2F;application.js:1084</code></a>
         </p>
 
 
