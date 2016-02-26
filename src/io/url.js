@@ -88,13 +88,17 @@ dwv.io.Url = function ()
     };
     
     /**
-     * 
+     * Set the web workers decoder scripts.
+     * @method setDecoderScripts
+     * @param {Array} list The list of decoder scripts.
      */
     this.setDecoderScripts = function (list) {
         decoderScripts = list;
     };
     /**
-     * 
+     * Get the web workers decoder scripts.
+     * @method getDecoderScripts
+     * @return {Array} list The list of decoder scripts.
      */
     this.getDecoderScripts = function () {
         return decoderScripts;
