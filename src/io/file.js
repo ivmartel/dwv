@@ -66,7 +66,6 @@ dwv.io.File = function ()
      */
     this.addLoaded = function () {
         nLoaded++;
-        console.log("nLoaded: "+nLoaded);
         if ( nLoaded === nToLoad ) {
             this.onloadend();
         }
@@ -80,7 +79,6 @@ dwv.io.File = function ()
      * @return {Number} The accumulated percentage.
      */
     this.getGlobalPercent = function (n, percent) {
-        console.log("n: "+n + ", percent: "+percent);
         progressList[n] = percent;
         var totPercent = 0;
         for ( var i = 0; i < progressList.length; ++i ) {
@@ -90,13 +88,17 @@ dwv.io.File = function ()
     };
     
     /**
-     * 
+     * Set the web workers decoder scripts.
+     * @method setDecoderScripts
+     * @param {Array} list The list of decoder scripts.
      */
     this.setDecoderScripts = function (list) {
         decoderScripts = list;
     };
     /**
-     * 
+     * Get the web workers decoder scripts.
+     * @method getDecoderScripts
+     * @return {Array} list The list of decoder scripts.
      */
     this.getDecoderScripts = function () {
         return decoderScripts;

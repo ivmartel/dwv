@@ -18,7 +18,8 @@ $(document).ready( function()
         "filters": ["Threshold", "Sharpen", "Sobel"],
         "shapes": ["Line", "Protractor", "Rectangle", "Roi", "Ellipse"],
         "gui": ["tool", "load", "help", "undo", "version", "tags"],
-        "isMobile": true
+        "isMobile": true,
+        "useWebWorkers": true
     });
 
     // example app listening

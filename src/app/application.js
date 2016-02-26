@@ -28,7 +28,7 @@ dwv.App = function ()
     var nSlicesToLoad = 0;
     
     // Data decoders scripts
-    var decoderScripts = [];
+    var decoderScripts = null;
 
     // Container div id
     var containerDivId = null;
@@ -230,11 +230,6 @@ dwv.App = function ()
      */
     this.init = function ( config ) {
         containerDivId = config.containerDivId;
-        // data decoders
-        var pathToRoot = "../..";
-        decoderScripts.jpeg2000 = pathToRoot + "/ext/pdfjs/decode-jpeg2000.js";
-        decoderScripts["jpeg-lossless"] = pathToRoot + "/ext/rii-mango/decode-jpegloss.js";
-        decoderScripts["jpeg-baseline"] = pathToRoot + "/ext/notmasteryet/decode-jpegbaseline.js";
         // tools
         if ( config.tools && config.tools.length !== 0 ) {
             // setup the tool list
@@ -362,6 +357,7 @@ dwv.App = function ()
             var dropBoxSize = 2 * size.height / 3;
             box.setAttribute("style","width:"+dropBoxSize+"px;height:"+dropBoxSize+"px");
         }
+        
         // possible load from URL
         if ( typeof config.skipLoadUrl === "undefined" ) {
             var query = dwv.html.getUriParam(window.location.href);
@@ -393,10 +389,21 @@ dwv.App = function ()
         else{
             console.log("Not loading url from address since skipLoadUrl is defined.");
         }
+        
         // align layers when the window is resized
         if ( config.fitToWindow ) {
             fitToWindow = true;
             window.onresize = this.onResize;
+        }
+
+        // use web workers
+        if ( config.useWebWorkers ) {
+            // data decoders
+            var pathToRoot = "../..";
+            decoderScripts = [];
+            decoderScripts.jpeg2000 = pathToRoot + "/ext/pdfjs/decode-jpeg2000.js";
+            decoderScripts["jpeg-lossless"] = pathToRoot + "/ext/rii-mango/decode-jpegloss.js";
+            decoderScripts["jpeg-baseline"] = pathToRoot + "/ext/notmasteryet/decode-jpegbaseline.js";
         }
     };
 
