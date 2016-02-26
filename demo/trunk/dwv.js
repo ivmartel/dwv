@@ -26,6 +26,9 @@ dwv.App = function ()
     var dataHeight = 0;
     // Number of slices to load
     var nSlicesToLoad = 0;
+    
+    // Data decoders scripts
+    var decoderScripts = null;
 
     // Container div id
     var containerDivId = null;
@@ -87,7 +90,7 @@ dwv.App = function ()
      * @method getVersion
      * @return {String} The version of the application.
      */
-    this.getVersion = function () { return "v0.14.0-beta"; };
+    this.getVersion = function () { return "v0.13.0"; };
 
     /**
      * Get the image.
@@ -202,14 +205,23 @@ dwv.App = function ()
     this.getToolboxController = function () { return toolboxController; };
 
     /**
-     * Add a command to the undo stack.
-     * @method addToUndoStack
-     * @param {Object} The command to add.
+     * Get the undo stack.
+     * @method getUndoStack
+     * @return {Object} The undo stack.
      */
-    this.addToUndoStack = function (cmd) { 
-        if ( undoStack !== null ) {
-            undoStack.add(cmd);
-        }
+    this.getUndoStack = function () { return undoStack; };
+
+    /**
+     * Get the data loaders.
+     * @method getLoaders
+     * @return {Object} The loaders.
+     */
+    this.getLoaders = function ()
+    {
+        return {
+            'file': dwv.io.File,
+            'url': dwv.io.Url
+        };
     };
 
     /**
@@ -238,13 +250,22 @@ dwv.App = function ()
                         // setup the shape list
                         var shapeList = {};
                         for ( var s = 0; s < config.shapes.length; ++s ) {
-                            var shapeName = config.shapes[s];
-                            var shapeFactoryClass = shapeName+"Factory";
-                            if (typeof dwv.tool[shapeFactoryClass] !== "undefined") {
-                                shapeList[shapeName] = dwv.tool[shapeFactoryClass];
-                            }
-                            else {
-                                console.warn("Could not initialise unknown shape: "+shapeName);
+                            switch( config.shapes[s] ) {
+                            case "Line":
+                                shapeList.Line = dwv.tool.LineFactory;
+                                break;
+                            case "Protractor":
+                                shapeList.Protractor = dwv.tool.ProtractorFactory;
+                                break;
+                            case "Rectangle":
+                                shapeList.Rectangle = dwv.tool.RectangleFactory;
+                                break;
+                            case "Roi":
+                                shapeList.Roi = dwv.tool.RoiFactory;
+                                break;
+                            case "Ellipse":
+                                shapeList.Ellipse = dwv.tool.EllipseFactory;
+                                break;
                             }
                         }
                         toolList.Draw = new dwv.tool.Draw(this, shapeList);
@@ -262,12 +283,16 @@ dwv.App = function ()
                         // setup the filter list
                         var filterList = {};
                         for ( var f = 0; f < config.filters.length; ++f ) {
-                            var filterName = config.filters[f];
-                            if (typeof dwv.tool.filter[filterName] !== "undefined") {
-                                filterList[filterName] = new dwv.tool.filter[filterName](this);
-                            }
-                            else {
-                                console.warn("Could not initialise unknown filter: "+filterName);
+                            switch( config.filters[f] ) {
+                            case "Threshold":
+                                filterList.Threshold = new dwv.tool.filter.Threshold(this);
+                                break;
+                            case "Sharpen":
+                                filterList.Sharpen = new dwv.tool.filter.Sharpen(this);
+                                break;
+                            case "Sobel":
+                                filterList.Sobel = new dwv.tool.filter.Sobel(this);
+                                break;
                             }
                         }
                         toolList.Filter = new dwv.tool.Filter(filterList, this);
@@ -288,24 +313,15 @@ dwv.App = function ()
             }
             // load
             if ( config.gui.indexOf("load") !== -1 ) {
-                var loaderList = {};
-                for ( var l = 0; l < config.loaders.length; ++l ) {
-                    var loaderName = config.loaders[l];
-                    var loaderClass = loaderName + "Load";
-                    if (typeof dwv.gui[loaderClass] !== "undefined") {
-                        loaderList[loaderName] = new dwv.gui[loaderClass](this);
-                    }
-                    else {
-                        console.warn("Could not initialise unknown loader: "+loaderName);
-                    }
-                }
-                loadbox = new dwv.gui.Loadbox(this, loaderList);
+                var fileLoadGui = new dwv.gui.FileLoad(this);
+                var urlLoadGui = new dwv.gui.UrlLoad(this);
+                loadbox = new dwv.gui.Loadbox(this,
+                    {"file": fileLoadGui, "url": urlLoadGui} );
                 loadbox.setup();
-                var loaderKeys = Object.keys(loaderList);
-                for ( var lk = 0; lk < loaderKeys.length; ++lk ) {
-                    loaderList[loaderKeys[lk]].setup();
-                }
-                loadbox.displayLoader(loaderKeys[0]);
+                fileLoadGui.setup();
+                urlLoadGui.setup();
+                fileLoadGui.display(true);
+                urlLoadGui.display(false);
             }
             // undo
             if ( config.gui.indexOf("undo") !== -1 ) {
@@ -341,28 +357,53 @@ dwv.App = function ()
             var dropBoxSize = 2 * size.height / 3;
             box.setAttribute("style","width:"+dropBoxSize+"px;height:"+dropBoxSize+"px");
         }
+        
         // possible load from URL
         if ( typeof config.skipLoadUrl === "undefined" ) {
-            var query = dwv.utils.getUriQuery(window.location.href);
+            var query = dwv.html.getUriParam(window.location.href);
             // check query
             if ( query && typeof query.input !== "undefined" ) {
-                dwv.utils.decodeQuery(query, this.onInputURLs);
-                // optional display state
-                if ( typeof query.state !== "undefined" ) {
-                    var onLoadEnd = function (/*event*/) {
-                        loadStateUrl([query.state]);
-                    };
-                    this.addEventListener( "load-end", onLoadEnd );
+                // manifest
+                if ( query.type && query.type === "manifest" ) {
+                    var finalUri = "";
+                    if ( query.input[0] === '/' ) {
+                        finalUri = window.location.protocol + "//" + window.location.host;
+                    }
+                    finalUri += query.input;
+                    dwv.html.decodeManifestUri( finalUri, query.nslices, this.onInputURLs );
+                }
+                // urls
+                else {
+                    var urls = dwv.html.decodeKeyValueUri( query.input, query.dwvReplaceMode );
+                    this.loadURL(urls);
+                    if ( typeof query.state !== "undefined" ) {
+                        var onLoadEnd = function (/*event*/) {
+                            loadStateUrl([query.state]);
+                        };
+                        this.addEventListener( "load-end", onLoadEnd );
+
+                    }
                 }
             }
         }
         else{
             console.log("Not loading url from address since skipLoadUrl is defined.");
         }
+        
         // align layers when the window is resized
         if ( config.fitToWindow ) {
             fitToWindow = true;
             window.onresize = this.onResize;
+        }
+
+        // use web workers
+        if ( config.useWebWorkers ) {
+            // data decoders
+            var pathToRoot = "../..";
+            decoderScripts = [];
+            decoderScripts.jpeg2000 = pathToRoot + "/ext/pdfjs/decode-jpeg2000.js";
+            decoderScripts["jpeg-lossless"] = pathToRoot + "/ext/rii-mango/decode-jpegloss.js";
+            decoderScripts["jpeg-baseline"] = pathToRoot + "/ext/notmasteryet/decode-jpegbaseline.js";
         }
     };
 
@@ -483,6 +524,7 @@ dwv.App = function ()
         nSlicesToLoad = files.length;
         // create IO
         var fileIO = new dwv.io.File();
+        fileIO.setDecoderScripts(decoderScripts);
         fileIO.onload = function (data) {
 
             var isFirst = true;
@@ -533,15 +575,15 @@ dwv.App = function ()
      * Load a list of URLs.
      * @method loadURL
      * @param {Array} urls The list of urls to load.
-     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
      */
-    this.loadURL = function(urls, requestHeaders)
+    this.loadURL = function(urls)
     {
         // clear variables
-        self.reset();
+        this.reset();
         nSlicesToLoad = urls.length;
         // create IO
         var urlIO = new dwv.io.Url();
+        urlIO.setDecoderScripts(decoderScripts);
         urlIO.onload = function (data) {
             var isFirst = true;
             if ( image ) {
@@ -566,7 +608,7 @@ dwv.App = function ()
         urlIO.onloadend = function (/*event*/) { fireEvent({ 'type': 'load-end' }); };
         urlIO.onprogress = onLoadProgress;
         // main load (asynchronous)
-        urlIO.load(urls, requestHeaders);
+        urlIO.load(urls);
     };
 
     /**
@@ -882,11 +924,10 @@ dwv.App = function ()
      * Handle input urls.
      * @method onInputURLs
      * @param {Array} urls The list of input urls.
-     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
      */
-    this.onInputURLs = function (urls, requestHeaders)
+    this.onInputURLs = function (urls)
     {
-        self.loadURL(urls, requestHeaders);
+        self.loadURL(urls);
     };
 
     /**
@@ -1544,7 +1585,7 @@ dwv.State = function (app)
                     cmd.onUndo = eventCallback;
                 }
                 cmd.execute();
-                app.addToUndoStack(cmd);
+                app.getUndoStack().add(cmd);
             }
         }
     };
@@ -1836,17 +1877,6 @@ dwv.ViewController = function ( view )
  */
 var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
-// JPEG Baseline
-var hasJpegBaselineDecoder = (typeof JpegImage !== "undefined");
-var JpegImage = JpegImage || {};
-// JPEG Lossless
-var hasJpegLosslessDecoder = (typeof jpeg !== "undefined") &&
-    (typeof jpeg.lossless !== "undefined");
-var jpeg = jpeg || {};
-jpeg.lossless = jpeg.lossless || {};
-// JPEG 2000
-var hasJpeg2000Decoder = (typeof JpxImage !== "undefined");
-var JpxImage = JpxImage || {};
 
 /**
  * Clean string: trim and remove ending.
@@ -2221,6 +2251,27 @@ dwv.dicom.isJpeglsTransferSyntax = function(syntax)
 dwv.dicom.isJpeg2000TransferSyntax = function(syntax)
 {
     return syntax.match(/1.2.840.10008.1.2.4.9/) !== null;
+};
+
+/**
+ * Tell if a given syntax needs decompression.
+ * @method syntaxNeedsDecompression
+ * @param {String} The transfer syntax to test.
+ * @returns {String} The name of the decompression algorithm.
+ */
+dwv.dicom.getSyntaxDecompressionName = function(syntax)
+{
+    var algo = null;
+    if ( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
+        algo = "jpeg2000";
+    }
+    else if ( dwv.dicom.isJpegBaselineTransferSyntax(syntax) ) {
+        algo = "jpeg-baseline";
+    }
+    else if ( dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
+        algo = "jpeg-lossless";
+    }
+    return algo;
 };
 
 /**
@@ -2628,9 +2679,6 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
 {
     var offset = 0;
     var implicit = false;
-    var isJpegBaseline = false;
-    var isJpegLossless = false;
-    var isJpeg2000 = false;
     // default readers
     var metaReader = new dwv.dicom.DataReader(buffer);
     var dataReader = new dwv.dicom.DataReader(buffer);
@@ -2687,13 +2735,11 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     }
     // JPEG baseline
     else if( dwv.dicom.isJpegBaselineTransferSyntax(syntax) ) {
-        isJpegBaseline = true;
-        console.log("JPEG Baseline compressed DICOM data: " + syntax);
+        // nothing to do!
     }
     // JPEG Lossless
     else if( dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
-        isJpegLossless = true;
-        console.log("JPEG Lossless compressed DICOM data: " + syntax);
+        // nothing to do!
     }
     // non supported JPEG
     else if( dwv.dicom.isJpegNonSupportedTransferSyntax(syntax) ) {
@@ -2701,13 +2747,11 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     }
     // JPEG-LS
     else if( dwv.dicom.isJpeglsTransferSyntax(syntax) ) {
-        //console.log("JPEG-LS compressed DICOM data: " + syntax);
         throw new Error("Unsupported DICOM transfer syntax (JPEG-LS): "+syntax);
     }
     // JPEG 2000
     else if( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
-        console.log("JPEG 2000 compressed DICOM data: " + syntax);
-        isJpeg2000 = true;
+        // nothing to do!
     }
     // MPEG2 Image Compression
     else if( syntax === "1.2.840.10008.1.2.4.100" ) {
@@ -2762,10 +2806,9 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
             // Item
             if( tagName === "xFFFEE000" ) {
                 if( dataElement.data.length === 4 ) {
-                    console.log("Skipping Basic Offset Table.");
+                    // do nothing
                 }
                 else if( dataElement.data.length !== 0 ) {
-                    console.log("Concatenating multiple pixel data items, length: "+dataElement.data.length);
                     // concat does not work on typed arrays
                     //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
                     // manual concat...
@@ -2835,36 +2878,6 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     if ( typeof this.dicomElements.x00280008 !== 'undefined' &&
             this.dicomElements.x00280008.value[0] > 1 ) {
         throw new Error("Unsupported multi-frame data");
-    }
-
-    // uncompress data if needed
-    var decoder = null;
-    if( isJpegLossless ) {
-        if ( !hasJpegLosslessDecoder ) {
-            throw new Error("No JPEG Lossless decoder provided");
-        }
-        var buf = new Uint8Array(this.pixelBuffer);
-        decoder = new jpeg.lossless.Decoder(buf.buffer);
-        var decoded = decoder.decode();
-        this.pixelBuffer = new Uint16Array(decoded.buffer);
-    }
-    else if ( isJpegBaseline ) {
-        if ( !hasJpegBaselineDecoder ) {
-            throw new Error("No JPEG Baseline decoder provided");
-        }
-        decoder = new JpegImage();
-        decoder.parse( this.pixelBuffer );
-        this.pixelBuffer = decoder.getData(decoder.width,decoder.height);
-    }
-    else if( isJpeg2000 ) {
-        if ( !hasJpeg2000Decoder ) {
-            throw new Error("No JPEG 2000 decoder provided");
-        }
-        // decompress pixel buffer into Int16 image
-        decoder = new JpxImage();
-        decoder.parse( this.pixelBuffer );
-        // set the pixel buffer
-        this.pixelBuffer = decoder.tiles[0].items;
     }
 };
 
@@ -8848,6 +8861,196 @@ dwv.html.createHtmlSelect = function (name, list) {
 };
 
 /**
+ * Get a list of parameters from an input URI that looks like:
+ *  [dwv root]?input=encodeURI([root]?key0=value0&key1=value1)
+ * or
+ *  [dwv root]?input=encodeURI([manifest link])&type=manifest
+ *
+ * @method getUriParam
+ * @static
+ * @param {String } uri The URI to decode.
+ * @return {Object} The parameters found in the input uri.
+ */
+dwv.html.getUriParam = function (uri)
+{
+    // split key/value pairs
+    var mainQueryPairs = dwv.utils.splitQueryString(uri);
+    // check pairs
+    if ( Object.keys(mainQueryPairs).length === 0 ) {
+        return null;
+    }
+    // has to have an input key
+    return mainQueryPairs.query;
+};
+
+/**
+ * Decode a Key/Value pair uri. If a key is repeated, the result
+ * be an array of base + each key.
+ * @method decodeKeyValueUri
+ * @static
+ * @param {String} uri The uri to decode.
+ * @param {String} replaceMode The key replace more.
+ */
+dwv.html.decodeKeyValueUri = function (uri, replaceMode)
+{
+    var result = [];
+
+    // repeat key replace mode (default to keep key)
+    var repeatKeyReplaceMode = "key";
+    if ( replaceMode ) {
+        repeatKeyReplaceMode = replaceMode;
+    }
+
+    // decode input URI
+    var queryUri = decodeURIComponent(uri);
+    // get key/value pairs from input URI
+    var inputQueryPairs = dwv.utils.splitQueryString(queryUri);
+    if ( Object.keys(inputQueryPairs).length === 0 )
+    {
+        result.push(queryUri);
+    }
+    else
+    {
+        var keys = Object.keys(inputQueryPairs.query);
+        // find repeat key
+        var repeatKey = null;
+        for ( var i = 0; i < keys.length; ++i )
+        {
+            if ( inputQueryPairs.query[keys[i]] instanceof Array )
+            {
+                repeatKey = keys[i];
+                break;
+            }
+        }
+
+        if ( !repeatKey )
+        {
+            result.push(queryUri);
+        }
+        else
+        {
+            var repeatList = inputQueryPairs.query[repeatKey];
+            // build base uri
+            var baseUrl = inputQueryPairs.base;
+            // do not add '?' when the repeatKey is 'file'
+            // root/path/to/?file=0.jpg&file=1.jpg
+            if ( repeatKey !== "file" ) {
+                baseUrl += "?";
+            }
+            var gotOneArg = false;
+            for ( var j = 0; j < keys.length; ++j )
+            {
+                if ( keys[j] !== repeatKey ) {
+                    if ( gotOneArg ) {
+                        baseUrl += "&";
+                    }
+                    baseUrl += keys[j] + "=" + inputQueryPairs.query[keys[j]];
+                    gotOneArg = true;
+                }
+            }
+            // append built urls to result
+            var url;
+            for ( var k = 0; k < repeatList.length; ++k )
+            {
+                url = baseUrl;
+                if ( gotOneArg ) {
+                    url += "&";
+                }
+                if ( repeatKeyReplaceMode === "key" ) {
+                    url += repeatKey + "=";
+                }
+                // other than 'key' mode: do nothing
+                url += repeatList[k];
+                result.push(url);
+            }
+        }
+    }
+    // return
+    return result;
+};
+
+/**
+ * Decode a manifest uri.
+ * @method decodeManifestUri
+ * @static
+ * @param {String} uri The uri to decode.
+ * @param {number} nslices The number of slices to load.
+ * @param {Function} The function to call with the decoded urls.
+ */
+dwv.html.decodeManifestUri = function (uri, nslices, callback)
+{
+    // Request error
+    var onErrorRequest = function (/*event*/)
+    {
+        console.warn( "RequestError while receiving manifest: "+this.status );
+    };
+
+    // Request handler
+    var onLoadRequest = function (/*event*/)
+    {
+        var urls = dwv.html.decodeManifest(this.responseXML, nslices);
+        callback(urls);
+    };
+
+    var request = new XMLHttpRequest();
+    request.open('GET', decodeURIComponent(uri), true);
+    request.responseType = "xml";
+    request.onload = onLoadRequest;
+    request.onerror = onErrorRequest;
+    request.send(null);
+};
+
+/**
+ * Decode an XML manifest.
+ * @method decodeManifest
+ * @static
+ * @param {Object} manifest The manifest to decode.
+ * @param {Number} nslices The number of slices to load.
+ */
+dwv.html.decodeManifest = function (manifest, nslices)
+{
+    var result = [];
+    // wado url
+    var wadoElement = manifest.getElementsByTagName("wado_query");
+    var wadoURL = wadoElement[0].getAttribute("wadoURL");
+    var rootURL = wadoURL + "?requestType=WADO&contentType=application/dicom&";
+    // patient list
+    var patientList = manifest.getElementsByTagName("Patient");
+    if ( patientList.length > 1 ) {
+        console.warn("More than one patient, loading first one.");
+    }
+    // study list
+    var studyList = patientList[0].getElementsByTagName("Study");
+    if ( studyList.length > 1 ) {
+        console.warn("More than one study, loading first one.");
+    }
+    var studyUID = studyList[0].getAttribute("StudyInstanceUID");
+    // series list
+    var seriesList = studyList[0].getElementsByTagName("Series");
+    if ( seriesList.length > 1 ) {
+        console.warn("More than one series, loading first one.");
+    }
+    var seriesUID = seriesList[0].getAttribute("SeriesInstanceUID");
+    // instance list
+    var instanceList = seriesList[0].getElementsByTagName("Instance");
+    // loop on instances and push links
+    var max = instanceList.length;
+    if ( nslices < max ) {
+        max = nslices;
+    }
+    for ( var i = 0; i < max; ++i ) {
+        var sopInstanceUID = instanceList[i].getAttribute("SOPInstanceUID");
+        var link = rootURL +
+        "&studyUID=" + studyUID +
+        "&seriesUID=" + seriesUID +
+        "&objectUID=" + sopInstanceUID;
+        result.push( link );
+    }
+    // return
+    return result;
+};
+
+/**
  * Display or not an element.
  * @method displayElement
  * @static
@@ -9353,7 +9556,7 @@ dwv.gui.base.Loadbox = function (app, loaders)
     this.setup = function ()
     {
         // loader select
-        var loaderSelector = dwv.html.createHtmlSelect("loaderSelect", loaders);
+        var loaderSelector = dwv.html.createHtmlSelect("loaderSelect", app.getLoaders());
         loaderSelector.onchange = app.onChangeLoader;
 
         // node
@@ -9395,20 +9598,6 @@ dwv.gui.base.Loadbox = function (app, loaders)
  */
 dwv.gui.base.FileLoad = function (app)
 {
-    // closure to self
-    var self = this;
-    
-    /**
-     * Internal file input change handler.
-     * @param {Object} event The change event.
-     */
-    function onchangeinternal(event) {
-        if (typeof self.onchange == "function") {
-            self.onchange(event);
-        }
-        app.onChangeFiles(event);
-    }
-    
     /**
      * Setup the file load HTML to the page.
      * @method setup
@@ -9417,7 +9606,7 @@ dwv.gui.base.FileLoad = function (app)
     {
         // input
         var fileLoadInput = document.createElement("input");
-        fileLoadInput.onchange = onchangeinternal;
+        fileLoadInput.onchange = app.onChangeFiles;
         fileLoadInput.type = "file";
         fileLoadInput.multiple = true;
         fileLoadInput.className = "imagefiles";
@@ -9461,20 +9650,6 @@ dwv.gui.base.FileLoad = function (app)
  */
 dwv.gui.base.UrlLoad = function (app)
 {
-    // closure to self
-    var self = this;
-    
-    /**
-     * Internal url input change handler.
-     * @param {Object} event The change event.
-     */
-    function onchangeinternal(event) {
-        if (typeof self.onchange == "function") {
-            self.onchange(event);
-        }
-        app.onChangeURL(event);
-    }
-    
     /**
      * Setup the url load HTML to the page.
      * @method setup
@@ -9483,7 +9658,7 @@ dwv.gui.base.UrlLoad = function (app)
     {
         // input
         var urlLoadInput = document.createElement("input");
-        urlLoadInput.onchange = onchangeinternal;
+        urlLoadInput.onchange = app.onChangeURL;
         urlLoadInput.type = "url";
         urlLoadInput.className = "imageurl";
         urlLoadInput.setAttribute("data-clear-btn","true");
@@ -10978,7 +11153,6 @@ dwv.image.Image = function(geometry, buffer)
      * Append a slice to the image.
      * @method appendSlice
      * @param {Image} The slice to append.
-     * @return {Number} The number of the inserted slice.
      */
     this.appendSlice = function(rhs)
     {
@@ -11045,9 +11219,6 @@ dwv.image.Image = function(geometry, buffer)
         // copy to class variables
         buffer = newBuffer;
         originalBuffer = new Int16Array(newBuffer);
-
-        // return the appended slice number
-        return newSliceNb;
     };
 
     /**
@@ -11987,14 +12158,26 @@ var dwv = dwv || {};
  */
 dwv.image = dwv.image || {};
 
+// JPEG Baseline
+var hasJpegBaselineDecoder = (typeof JpegImage !== "undefined");
+var JpegImage = JpegImage || {};
+// JPEG Lossless
+var hasJpegLosslessDecoder = (typeof jpeg !== "undefined") &&
+    (typeof jpeg.lossless !== "undefined");
+var jpeg = jpeg || {};
+jpeg.lossless = jpeg.lossless || {};
+// JPEG 2000
+var hasJpeg2000Decoder = (typeof JpxImage !== "undefined");
+var JpxImage = JpxImage || {};
+
 /**
  * Get data from an input image using a canvas.
  * @method getDataFromImage
  * @static
- * @param {Image} image The image.
+ * @param {Image} Image The DOM Image.
  * @return {Mixed} The corresponding view and info.
  */
-dwv.image.getDataFromImage = function(image)
+dwv.image.getViewFromDOMImage = function (image)
 {
     // draw the image in the canvas in order to get its data
     var canvas = document.createElement('canvas');
@@ -12045,23 +12228,98 @@ dwv.image.getDataFromImage = function(image)
 };
 
 /**
- * Get data from an input buffer using a DICOM parser.
- * @method getDataFromDicomBuffer
- * @static
- * @param {Array} buffer The input data buffer.
- * @return {Mixed} The corresponding view and info.
+ * Create a dwv.image.View from a DICOM buffer.
  */
-dwv.image.getDataFromDicomBuffer = function(buffer)
-{
-    // DICOM parser
-    var dicomParser = new dwv.dicom.DicomParser();
-    // parse the buffer
-    dicomParser.parse(buffer);
-    // create the view
-    var viewFactory = new dwv.image.ViewFactory();
-    var view = viewFactory.create( dicomParser.getDicomElements(), dicomParser.getPixelBuffer() );
-    // return
-    return {"view": view, "info": dicomParser.getDicomElements().dumpToTable()};
+dwv.image.DicomBufferToView = function (decoderScripts) {
+
+    // flag to use workers or not to decode data
+    var useWorkers = false;
+    
+    if (typeof decoderScripts !== "undefined" && decoderScripts instanceof Array) {
+        useWorkers = true;
+        // thread pool
+        var pool = new dwv.utils.ThreadPool(15);
+        pool.init();
+    }
+
+    /**
+     * Get data from an input buffer using a DICOM parser.
+     * @method getDataFromDicomBuffer
+     * @static
+     * @param {Array} buffer The input data buffer.
+     * @param {Object} callback The callback on the conversion.
+     * @return {Mixed} The corresponding view and info.
+     */
+    this.convert = function(buffer, callback)
+    {
+        // DICOM parser
+        var dicomParser = new dwv.dicom.DicomParser();
+        // parse the buffer
+        dicomParser.parse(buffer);
+    
+        // worker callback
+        var decodedBufferToView = function(event) {
+            // create the view
+            var viewFactory = new dwv.image.ViewFactory();
+            var view = viewFactory.create( dicomParser.getDicomElements(), event.data );
+            // return
+            callback({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
+        };
+        var pixelBuffer = dicomParser.pixelBuffer;
+        
+        var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
+        var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
+        var needDecompression = (algoName !== null);
+        
+        if ( needDecompression ) {
+            if (useWorkers) {
+                var script = decoderScripts[algoName];
+                if ( typeof script === "undefined" ) {
+                    throw new Error("No script provided to decompress '" + algoName + "' data.");
+                }
+                var workerTask = new dwv.utils.WorkerTask(script, decodedBufferToView, pixelBuffer);
+                pool.addWorkerTask(workerTask);
+            }
+            else {
+
+                var decoder = null;
+                var decodedBuffer = null;
+                
+                if( algoName === "jpeg-lossless" ) {
+                    if ( !hasJpegLosslessDecoder ) {
+                        throw new Error("No JPEG Lossless decoder provided");
+                    }
+                    var buf = new Uint8Array( pixelBuffer );
+                    decoder = new jpeg.lossless.Decoder(buf.buffer);
+                    var decoded = decoder.decode();
+                    decodedBuffer = new Uint16Array(decoded.buffer);
+                }
+                else if ( algoName === "jpeg-baseline" ) {
+                    if ( !hasJpegBaselineDecoder ) {
+                        throw new Error("No JPEG Baseline decoder provided");
+                    }
+                    decoder = new JpegImage();
+                    decoder.parse( pixelBuffer );
+                    decodedBuffer = decoder.getData(decoder.width,decoder.height);
+                }
+                else if( algoName === "jpeg2000" ) {
+                    if ( !hasJpeg2000Decoder ) {
+                        throw new Error("No JPEG 2000 decoder provided");
+                    }
+                    // decompress pixel buffer into Int16 image
+                    decoder = new JpxImage();
+                    decoder.parse( pixelBuffer );
+                    // set the pixel buffer
+                    decodedBuffer = decoder.tiles[0].items;
+                }
+                decodedBufferToView({data: decodedBuffer});
+            }
+       }
+        else {
+            decodedBufferToView({data: pixelBuffer});
+        }
+    };
+
 };
 ;/** 
  * Image module.
@@ -12228,21 +12486,14 @@ dwv.image.View = function(image, isSigned)
      * Set the current position. Returns false if not in bounds.
      * @method setCurrentPosition
      * @param {Object} pos The current position.
-     * @param {Boolean} silent If true, does not fire a slice-change event.
      */
-    this.setCurrentPosition = function(pos, silent) {
-        // default silent flag to false
-        if ( typeof silent === "undefined" ) {
-            silent = false;
-        }
-        // check if possible
+    this.setCurrentPosition = function(pos) {
         if( !image.getGeometry().getSize().isInBounds(pos.i,pos.j,pos.k) ) {
             return false;
         }
         var oldPosition = currentPosition;
         currentPosition = pos;
-
-        // fire a 'position-change' event
+        // only display value for monochrome data
         if( image.getPhotometricInterpretation().match(/MONOCHROME/) !== null )
         {
             this.fireEvent({"type": "position-change",
@@ -12254,15 +12505,10 @@ dwv.image.View = function(image, isSigned)
             this.fireEvent({"type": "position-change",
                 "i": pos.i, "j": pos.j, "k": pos.k});
         }
-
-        // fire a slice change event (used to trigger redraw)
-        if ( !silent ) {
-          if( oldPosition.k !== currentPosition.k ) {
-              this.fireEvent({"type": "slice-change"});
-          }
+        // slice change event (used to trigger redraw)
+        if( oldPosition.k !== currentPosition.k ) {
+            this.fireEvent({"type": "slice-change"});
         }
-
-        // all good
         return true;
     };
 
@@ -12274,14 +12520,7 @@ dwv.image.View = function(image, isSigned)
     this.append = function( rhs )
     {
        // append images
-       var newSLiceNumber = this.getImage().appendSlice( rhs.getImage() );
-       // update position if a slice was appended before
-       if ( newSLiceNumber <= this.getCurrentPosition().k ) {
-           this.setCurrentPosition(
-             {"i": this.getCurrentPosition().i,
-             "j": this.getCurrentPosition().j,
-             "k": this.getCurrentPosition().k + 1}, true );
-       }
+       this.getImage().appendSlice( rhs.getImage() );
        // init to update self
        this.setWindowLut(rhs.getWindowLut());
     };
@@ -12598,7 +12837,14 @@ dwv.io.File = function ()
      * @type Array
      */
     var progressList = [];
-
+    /**
+     * List of data decoders scripts.
+     * @property decoderScripts
+     * @private
+     * @type Array
+     */
+    var decoderScripts = [];
+    
     /**
      * Set the number of data to load.
      * @method setNToLoad
@@ -12630,12 +12876,29 @@ dwv.io.File = function ()
      * @return {Number} The accumulated percentage.
      */
     this.getGlobalPercent = function (n, percent) {
-        progressList[n] = percent/nToLoad;
+        progressList[n] = percent;
         var totPercent = 0;
         for ( var i = 0; i < progressList.length; ++i ) {
             totPercent += progressList[i];
         }
-        return totPercent;
+        return totPercent/nToLoad;
+    };
+    
+    /**
+     * Set the web workers decoder scripts.
+     * @method setDecoderScripts
+     * @param {Array} list The list of decoder scripts.
+     */
+    this.setDecoderScripts = function (list) {
+        decoderScripts = list;
+    };
+    /**
+     * Get the web workers decoder scripts.
+     * @method getDecoderScripts
+     * @return {Array} list The list of decoder scripts.
+     */
+    this.getDecoderScripts = function () {
+        return decoderScripts;
     };
 }; // class File
 
@@ -12723,44 +12986,45 @@ dwv.io.File.prototype.load = function (ioArray)
     this.setNToLoad( ioArray.length );
 
     // call the listeners
-    var onLoad = function (data)
+    var onLoadView = function (data)
     {
         self.onload(data);
         self.addLoaded();
     };
 
-    // DICOM reader loader
-    var onLoadDicomReader = function (event)
+    // DICOM buffer to dwv.image.View (asynchronous)
+    var db2v = new dwv.image.DicomBufferToView(this.getDecoderScripts());
+    var onLoadDicomBuffer = function (event)
     {
         try {
-            onLoad( dwv.image.getDataFromDicomBuffer(event.target.result) );
+            db2v.convert(event.target.result, onLoadView);
+        } catch (error) {
+            self.onerror(error);
+        }
+    };
+
+    // DOM Image buffer to dwv.image.View 
+    var onLoadDOMImageBuffer = function (/*event*/)
+    {
+        try {
+            onLoadView( dwv.image.getViewFromDOMImage(this) );
+        } catch (error) {
+            self.onerror(error);
+        }
+    };
+
+    // load text buffer
+    var onLoadTextBuffer = function (event)
+    {
+        try {
+            self.onload( event.target.result );
         } catch(error) {
             self.onerror(error);
         }
     };
 
-    // image loader
-    var onLoadImage = function (/*event*/)
-    {
-        try {
-            onLoad( dwv.image.getDataFromImage(this) );
-        } catch(error) {
-            self.onerror(error);
-        }
-    };
-
-    // text reader loader
-    var onLoadTextReader = function (event)
-    {
-        try {
-            onLoad( event.target.result );
-        } catch(error) {
-            self.onerror(error);
-        }
-    };
-
-    // image reader loader
-    var onLoadImageReader = function (event)
+    // raw image to DOM Image
+    var onLoadRawImageBuffer = function (event)
     {
         var theImage = new Image();
         theImage.src = event.target.result;
@@ -12768,7 +13032,7 @@ dwv.io.File.prototype.load = function (ioArray)
         theImage.file = this.file;
         theImage.index = this.index;
         // triggered by ctx.drawImage
-        theImage.onload = onLoadImage;
+        theImage.onload = onLoadDOMImageBuffer;
     };
 
     // loop on I/O elements
@@ -12780,7 +13044,7 @@ dwv.io.File.prototype.load = function (ioArray)
                 self.getGlobalPercent, self.onprogress);
         if ( file.name.split('.').pop().toLowerCase() === "json" )
         {
-            reader.onload = onLoadTextReader;
+            reader.onload = onLoadTextBuffer;
             reader.onerror = dwv.io.File.createErrorHandler(file, "text", self.onerror);
             reader.readAsText(file);
         }
@@ -12790,13 +13054,13 @@ dwv.io.File.prototype.load = function (ioArray)
             reader.file = file;
             reader.index = i;
             // callbacks
-            reader.onload = onLoadImageReader;
+            reader.onload = onLoadRawImageBuffer;
             reader.onerror = dwv.io.File.createErrorHandler(file, "image", self.onerror);
             reader.readAsDataURL(file);
         }
         else
         {
-            reader.onload = onLoadDicomReader;
+            reader.onload = onLoadDicomBuffer;
             reader.onerror = dwv.io.File.createErrorHandler(file, "DICOM", self.onerror);
             reader.readAsArrayBuffer(file);
         }
@@ -12844,6 +13108,13 @@ dwv.io.Url = function ()
      * @type Array
      */
     var progressList = [];
+    /**
+     * List of data decoders scripts.
+     * @property decoderScripts
+     * @private
+     * @type Array
+     */
+    var decoderScripts = [];
 
     /**
      * Set the number of data to load.
@@ -12882,6 +13153,19 @@ dwv.io.Url = function ()
             totPercent += progressList[i];
         }
         return totPercent;
+    };
+    
+    /**
+     * 
+     */
+    this.setDecoderScripts = function (list) {
+        decoderScripts = list;
+    };
+    /**
+     * 
+     */
+    this.getDecoderScripts = function () {
+        return decoderScripts;
     };
 }; // class Url
 
@@ -12960,9 +13244,8 @@ dwv.io.Url.createProgressHandler = function (n, calculator, baseHandler) {
  * Load a list of URLs.
  * @method load
  * @param {Array} ioArray The list of urls to load.
- * @param {Array} requestHeaders An array of {name, value} to use as request headers.
  */
-dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
+dwv.io.Url.prototype.load = function (ioArray)
 {
     // closure to self for handlers
     var self = this;
@@ -12970,57 +13253,46 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     this.setNToLoad( ioArray.length );
 
     // call the listeners
-    var onLoad = function (data)
+    var onLoadView = function (data)
     {
         self.onload(data);
         self.addLoaded();
     };
 
-    // DICOM request
-    var onLoadDicomRequest = function (response)
+    // DICOM buffer to dwv.image.View (asynchronous)
+    var db2v = new dwv.image.DicomBufferToView(this.getDecoderScripts());
+    var onLoadDicomBuffer = function (response)
     {
         try {
-            onLoad( dwv.image.getDataFromDicomBuffer(response) );
+            db2v.convert(response, onLoadView);
         } catch (error) {
             self.onerror(error);
         }
     };
 
-    // image request
-    var onLoadImage = function (/*event*/)
+    // DOM Image buffer to dwv.image.View
+    var onLoadDOMImageBuffer = function (/*event*/)
     {
         try {
-            onLoad( dwv.image.getDataFromImage(this) );
+            onLoadView( dwv.image.getViewFromDOMImage(this) );
         } catch (error) {
             self.onerror(error);
         }
     };
 
-    // text request
-    var onLoadTextRequest = function (/*event*/)
+    // load text buffer
+    var onLoadTextBuffer = function (/*event*/)
     {
-        // status 200: "OK"
-        if (this.status !== 200) {
-            this.onerror();
-            return;
-        }
-
         try {
-            onLoad( this.responseText );
+            self.onload( this.responseText );
         } catch (error) {
             self.onerror(error);
         }
     };
 
-    // binary request
-    var onLoadBinaryRequest = function (/*event*/)
+    // load binary buffer
+    var onLoadBinaryBuffer = function (/*event*/)
     {
-        // status 200: "OK"
-        if (this.status !== 200) {
-            this.onerror();
-            return;
-        }
-        
         // find the image type from its signature
         var view = new DataView(this.response);
         var isJpeg = view.getUint32(0) === 0xffd8ffe0;
@@ -13060,11 +13332,11 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
             // temporary image object
             var tmpImage = new Image();
             tmpImage.src = "data:image/" + imageType + ";base64," + window.btoa(imageDataStr);
-            tmpImage.onload = onLoadImage;
+            tmpImage.onload = onLoadDOMImageBuffer;
         }
         else
         {
-            onLoadDicomRequest(this.response);
+            onLoadDicomBuffer(this.response);
         }
     };
 
@@ -13077,21 +13349,13 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
 
         var request = new XMLHttpRequest();
         request.open('GET', url, true);
-        if ( typeof requestHeaders !== "undefined" ) {
-            for (var j = 0; j < requestHeaders.length; ++j) { 
-                if ( typeof requestHeaders[j].name !== "undefined" &&
-                    typeof requestHeaders[j].value !== "undefined" ) {
-                    request.setRequestHeader(requestHeaders[j].name, requestHeaders[j].value);
-                }
-            }
-        }
         if ( !isText ) {
             request.responseType = "arraybuffer";
-            request.onload = onLoadBinaryRequest;
+            request.onload = onLoadBinaryBuffer;
             request.onerror = dwv.io.Url.createErrorHandler(url, "binary", self.onerror);
         }
         else {
-            request.onload = onLoadTextRequest;
+            request.onload = onLoadTextBuffer;
             request.onerror = dwv.io.Url.createErrorHandler(url, "text", self.onerror);
         }
         request.onprogress = dwv.io.File.createProgressHandler(i,
@@ -14591,7 +14855,7 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onExecute({'type': 'draw-create', 'id': group.id()});
+        this.onExecute({'type': 'draw-create', 'id': group.id});
     };
     /**
      * Undo the command.
@@ -14603,7 +14867,7 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onUndo({'type': 'draw-delete', 'id': group.id()});
+        this.onUndo({'type': 'draw-delete', 'id': group.id});
     };
 }; // DrawGroupCommand class
 
@@ -14654,7 +14918,7 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
         // draw
         layer.draw();
         // callback
-        this.onExecute({'type': 'draw-move', 'id': group.id()});
+        this.onExecute({'type': 'draw-move', 'id': group.id});
     };
     /**
      * Undo the command.
@@ -14669,7 +14933,7 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
         // draw
         layer.draw();
         // callback
-        this.onUndo({'type': 'draw-move', 'id': group.id()});
+        this.onUndo({'type': 'draw-move', 'id': group.id});
     };
 }; // MoveGroupCommand class
 
@@ -14776,7 +15040,7 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onExecute({'type': 'draw-delete', 'id': group.id()});
+        this.onExecute({'type': 'draw-delete', 'id': group.id});
     };
     /**
      * Undo the command.
@@ -14788,7 +15052,7 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onUndo({'type': 'draw-create', 'id': group.id()});
+        this.onUndo({'type': 'draw-create', 'id': group.id});
     };
 }; // DeleteGroupCommand class
 
@@ -15050,7 +15314,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // execute it
             command.execute();
             // save it in undo stack
-            app.addToUndoStack(command);
+            app.getUndoStack().add(command);
 
             // set shape on
             var shape = group.getChildren( function (node) {
@@ -15310,7 +15574,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 delcmd.onExecute = fireEvent;
                 delcmd.onUndo = fireEvent;
                 delcmd.execute();
-                app.addToUndoStack(delcmd);
+                app.getUndoStack().add(delcmd);
             }
             else {
                 // save drag move
@@ -15320,7 +15584,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                     var mvcmd = new dwv.tool.MoveGroupCommand(this.getParent(), cmdName, translation, drawLayer);
                     mvcmd.onExecute = fireEvent;
                     mvcmd.onUndo = fireEvent;
-                    app.addToUndoStack(mvcmd);
+                    app.getUndoStack().add(mvcmd);
                     // the move is handled by kinetic, trigger an event manually
                     fireEvent({'type': 'draw-move'});
                 }
@@ -15840,7 +16104,7 @@ dwv.tool.ShapeEditor = function (app)
             chgcmd.onExecute = drawEventCallback;
             chgcmd.onUndo = drawEventCallback;
             chgcmd.execute();
-            app.addToUndoStack(chgcmd);
+            app.getUndoStack().add(chgcmd);
             // reset start anchor
             startAnchor = endAnchor;
         });
@@ -16286,7 +16550,7 @@ dwv.tool.filter.Threshold = function ( app )
         var command = new dwv.tool.RunFilterCommand(filter, app);
         command.execute();
         // save command in undo stack
-        app.addToUndoStack(command);
+        app.getUndoStack().add(command);
     };
 
 }; // class dwv.tool.filter.Threshold
@@ -16347,7 +16611,7 @@ dwv.tool.filter.Sharpen = function ( app )
         var command = new dwv.tool.RunFilterCommand(filter, app);
         command.execute();
         // save command in undo stack
-        app.addToUndoStack(command);
+        app.getUndoStack().add(command);
     };
 
 }; // dwv.tool.filter.Sharpen
@@ -16407,7 +16671,7 @@ dwv.tool.filter.Sobel = function ( app )
         var command = new dwv.tool.RunFilterCommand(filter, app);
         command.execute();
         // save command in undo stack
-        app.addToUndoStack(command);
+        app.getUndoStack().add(command);
     };
 
 }; // class dwv.tool.filter.Sobel
@@ -16999,7 +17263,7 @@ dwv.tool.Livewire = function(app)
                 self.mousemove(event);
                 console.log("Done.");
                 // save command in undo stack
-                app.addToUndoStack(command);
+                app.getUndoStack().add(command);
                 // set flag
                 self.started = false;
             }
@@ -18679,6 +18943,39 @@ dwv.utils.capitaliseFirstLetter = function (string)
 };
 
 /**
+ * Split query string:
+ *  'root?key0=val00&key0=val01&key1=val10' returns
+ *  { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }
+ * Returns an empty object if the input string is not correct (null, empty...)
+ *  or if it is not a query string (no question mark).
+ * @method splitQueryString
+ * @static
+ * @param {String} inputStr The string to split.
+ * @return {Object} The split string.
+ */
+dwv.utils.splitQueryString = function (inputStr)
+{
+    // result
+    var result = {};
+    // check if query string
+    var sepIndex = null;
+    if ( inputStr && (sepIndex = inputStr.indexOf('?')) !== -1 ) {
+        // base: before the '?'
+        result.base = inputStr.substr(0, sepIndex);
+        // query : after the '?' and until possible '#'
+        var hashIndex = inputStr.indexOf('#');
+        if ( hashIndex === -1 ) {
+            hashIndex = inputStr.length;
+        }
+        var query = inputStr.substr(sepIndex + 1, (hashIndex - 1 - sepIndex));
+        // split key/value pairs of the query
+        result.query = dwv.utils.splitKeyValueString(query);
+    }
+    // return
+    return result;
+};
+
+/**
  * Split key/value string:
  *  key0=val00&key0=val01&key1=val10 returns
 *   { key0 : [val00, val01], key1 : val1 }
@@ -18727,263 +19024,132 @@ var dwv = dwv || {};
  * @static
  */
 dwv.utils = dwv.utils || {};
+
 /**
- * Namespace for base utils functions.
- * @class base
+ * Thread Pool.
+ * @class ThreadPool
  * @namespace dwv.utils
- * @static
+ * @constructor
+ * Highly inspired from http://www.smartjava.org/content/html5-easily-parallelize-jobs-using-web-workers-and-threadpool
+ * @param {Number} size The size of the pool.
  */
-dwv.utils.base = dwv.utils.base || {};
-
-/**
- * Split an input URI:
- *  'root?key0=val00&key0=val01&key1=val10' returns
- *  { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }
- * Returns an empty object if the input string is not correct (null, empty...)
- *  or if it is not a query string (no question mark).
- * @method splitUri
- * @static
- * @param {String} inputStr The string to split.
- * @return {Object} The split string.
- */
-dwv.utils.splitUri = function (uri)
-{
-    // result
-    var result = {};
-    // check if query string
-    var sepIndex = null;
-    if ( uri && (sepIndex = uri.indexOf('?')) !== -1 ) {
-        // base: before the '?'
-        result.base = uri.substr(0, sepIndex);
-        // query : after the '?' and until possible '#'
-        var hashIndex = uri.indexOf('#');
-        if ( hashIndex === -1 ) {
-            hashIndex = uri.length;
+dwv.utils.ThreadPool = function (size) {
+    // closure to self
+    var self = this;
+    // task queue
+    this.taskQueue = [];
+    // worker queue
+    this.workerQueue = [];
+    // pool size
+    this.poolSize = size;
+ 
+    /**
+     * Initialise.
+     * @method init
+     */
+    this.init = function () {
+        // create 'size' number of worker threads
+        for (var i = 0; i < size; ++i) {
+            self.workerQueue.push(new dwv.utils.WorkerThread(self));
         }
-        var query = uri.substr(sepIndex + 1, (hashIndex - 1 - sepIndex));
-        // split key/value pairs of the query
-        result.query = dwv.utils.splitKeyValueString(query);
-    }
-    // return
-    return result;
-};
-
-/**
- * Get the query part, split into an array, of an input URI.
- * The URI scheme is: 'base?query#fragment'
- * @method getUriQuery
- * @static
- * @param {String } uri The input URI.
- * @return {Object} The query part, split into an array, of the input URI.
- */
-dwv.utils.getUriQuery = function (uri)
-{
-    // split
-    var parts = dwv.utils.splitUri(uri);
-    // check not empty
-    if ( Object.keys(parts).length === 0 ) {
-        return null;
-    }
-    // return query
-    return parts.query;
-};
-
-/**
- * Generic URI query decoder. 
- * Supports manifest:
- *   [dwv root]?input=encodeURIComponent('[manifest file]')&type=manifest
- * or encoded URI with base and key value/pairs:
- *   [dwv root]?input=encodeURIComponent([root]?key0=value0&key1=value1)
- *  @param {String} query The query part to the input URI.
- *  @param {Function} callback The function to call with the decoded file urls. 
- */
-dwv.utils.base.decodeQuery = function (query, callback)
-{
-    // manifest
-    if ( query.type && query.type === "manifest" ) {
-        dwv.utils.decodeManifestQuery( query, callback );
-    }
-    // default case: encoded URI with base and key/value pairs
-    else {
-        callback( dwv.utils.decodeKeyValueUri( query.input, query.dwvReplaceMode ) );
-    }
-};
-
-/**
- * Decode a Key/Value pair URI. If a key is repeated, the result
- * be an array of base + each key.
- * @method decodeKeyValueUri
- * @static
- * @param {String} uri The URI to decode.
- * @param {String} replaceMode The key replace more.
- *   replaceMode can be:
- *   - key (default): keep the key
- *   - other than key: do not use the key
- *   'file' is a special case where the '?' of the query is not kept. 
- * @return The list of input file urls.
- */
-dwv.utils.decodeKeyValueUri = function (uri, replaceMode)
-{
-    var result = [];
-
-    // repeat key replace mode (default to keep key)
-    var repeatKeyReplaceMode = "key";
-    if ( replaceMode ) {
-        repeatKeyReplaceMode = replaceMode;
-    }
-
-    // decode input URI
-    var queryUri = decodeURIComponent(uri);
-    // get key/value pairs from input URI
-    var inputQueryPairs = dwv.utils.splitUri(queryUri);
-    if ( Object.keys(inputQueryPairs).length === 0 )
-    {
-        result.push(queryUri);
-    }
-    else
-    {
-        var keys = Object.keys(inputQueryPairs.query);
-        // find repeat key
-        var repeatKey = null;
-        for ( var i = 0; i < keys.length; ++i )
-        {
-            if ( inputQueryPairs.query[keys[i]] instanceof Array )
-            {
-                repeatKey = keys[i];
-                break;
-            }
-        }
-
-        if ( !repeatKey )
-        {
-            result.push(queryUri);
-        }
-        else
-        {
-            var repeatList = inputQueryPairs.query[repeatKey];
-            // build base uri
-            var baseUrl = inputQueryPairs.base;
-            // do not add '?' when the repeatKey is 'file'
-            // root/path/to/?file=0.jpg&file=1.jpg
-            if ( repeatKey !== "file" ) {
-                baseUrl += "?";
-            }
-            var gotOneArg = false;
-            for ( var j = 0; j < keys.length; ++j )
-            {
-                if ( keys[j] !== repeatKey ) {
-                    if ( gotOneArg ) {
-                        baseUrl += "&";
-                    }
-                    baseUrl += keys[j] + "=" + inputQueryPairs.query[keys[j]];
-                    gotOneArg = true;
-                }
-            }
-            // append built urls to result
-            var url;
-            for ( var k = 0; k < repeatList.length; ++k )
-            {
-                url = baseUrl;
-                if ( gotOneArg ) {
-                    url += "&";
-                }
-                if ( repeatKeyReplaceMode === "key" ) {
-                    url += repeatKey + "=";
-                }
-                // other than 'key' mode: do nothing
-                url += repeatList[k];
-                result.push(url);
-            }
-        }
-    }
-    // return
-    return result;
-};
-
-/**
- * Decode a manifest query.
- * @method decodeManifestQuery
- * @static
- * @param {Object} query The manifest query: {input, nslices},
- *   with input the input URI and nslices the number of slices.
- * @param {Function} The function to call with the decoded urls.
- */
-dwv.utils.decodeManifestQuery = function (query, callback)
-{
-    var uri = "";
-    if ( query.input[0] === '/' ) {
-        uri = window.location.protocol + "//" + window.location.host;
-    }
-    // TODO: needs to be decoded (decodeURIComponent?
-    uri += query.input;
-
-    // handle error
-    var onError = function (/*event*/)
-    {
-        console.warn( "RequestError while receiving manifest: "+this.status );
     };
-
-    // handle load
-    var onLoad = function (/*event*/)
-    {
-        callback( dwv.utils.decodeManifest(this.responseXML, query.nslices) );
+ 
+    /**
+     * Add a worker task to the queue.
+     * Will be run when a thread is made available.
+     * @method addWorkerTask
+     * @return {Object} workerTask The task to add.
+     */
+    this.addWorkerTask = function (workerTask) {
+        if (self.workerQueue.length > 0) {
+            // get the worker thread from the front of the queue
+            var workerThread = self.workerQueue.shift();
+            workerThread.run(workerTask);
+        } else {
+            // no free workers, add to queue
+            self.taskQueue.push(workerTask);
+        }
     };
-
-    var request = new XMLHttpRequest();
-    request.open('GET', decodeURIComponent(uri), true);
-    request.responseType = "xml";
-    request.onload = onLoad;
-    request.onerror = onError;
-    request.send(null);
+ 
+    /**
+     * Free a worker thread.
+     * @method freeWorkerThread
+     * @param {Object} workerThread The thread to free.
+     */
+    this.freeWorkerThread = function (workerThread) {
+        if (self.taskQueue.length > 0) {
+            // don't put back in queue, but execute next task
+            var workerTask = self.taskQueue.shift();
+            workerThread.run(workerTask);
+        } else {
+            // no task to run, add to queue
+            self.workerQueue.push(workerThread);
+        }
+    };
 };
-
+ 
 /**
- * Decode an XML manifest.
- * @method decodeManifest
- * @static
- * @param {Object} manifest The manifest to decode.
- * @param {Number} nslices The number of slices to load.
+ * Worker thread.
+ * @class WorkerThread
+ * @namespace dwv.utils
+ * @constructor
+ * @param {Object} parentPool The parent pool.
  */
-dwv.utils.decodeManifest = function (manifest, nslices)
-{
-    var result = [];
-    // wado url
-    var wadoElement = manifest.getElementsByTagName("wado_query");
-    var wadoURL = wadoElement[0].getAttribute("wadoURL");
-    var rootURL = wadoURL + "?requestType=WADO&contentType=application/dicom&";
-    // patient list
-    var patientList = manifest.getElementsByTagName("Patient");
-    if ( patientList.length > 1 ) {
-        console.warn("More than one patient, loading first one.");
+dwv.utils.WorkerThread = function (parentPool) {
+    // closure to self
+    var self = this;
+    // parent pool
+    this.parentPool = parentPool;
+    // associated task
+    this.workerTask = {};
+ 
+    /**
+     * Run a worker task
+     * @method run
+     * @param {Object} workerTask The task to run.
+     */
+    this.run = function (workerTask) {
+        // closure to task
+        this.workerTask = workerTask;
+        // create a new web worker
+        if (this.workerTask.script !== null) {
+            var worker = new Worker(workerTask.script);
+            worker.addEventListener('message', ontaskend, false);
+            // launch the worker
+            worker.postMessage(workerTask.startMessage);
+        }
+    };
+ 
+    /**
+     * Handle once the task is done.
+     * For now assume we only get a single callback from a worker
+     * which also indicates the end of this worker.
+     * @method ontaskend
+     * @param {Object} event The callback event.
+     */
+    function ontaskend(event) {
+        // pass to original callback
+        self.workerTask.callback(event);
+        // tell the parent pool this thread is free
+        self.parentPool.freeWorkerThread(self);
     }
-    // study list
-    var studyList = patientList[0].getElementsByTagName("Study");
-    if ( studyList.length > 1 ) {
-        console.warn("More than one study, loading first one.");
-    }
-    var studyUID = studyList[0].getAttribute("StudyInstanceUID");
-    // series list
-    var seriesList = studyList[0].getElementsByTagName("Series");
-    if ( seriesList.length > 1 ) {
-        console.warn("More than one series, loading first one.");
-    }
-    var seriesUID = seriesList[0].getAttribute("SeriesInstanceUID");
-    // instance list
-    var instanceList = seriesList[0].getElementsByTagName("Instance");
-    // loop on instances and push links
-    var max = instanceList.length;
-    if ( nslices < max ) {
-        max = nslices;
-    }
-    for ( var i = 0; i < max; ++i ) {
-        var sopInstanceUID = instanceList[i].getAttribute("SOPInstanceUID");
-        var link = rootURL +
-        "&studyUID=" + studyUID +
-        "&seriesUID=" + seriesUID +
-        "&objectUID=" + sopInstanceUID;
-        result.push( link );
-    }
-    // return
-    return result;
+ 
 };
-
+ 
+/**
+ * Worker task.
+ * @class WorkerTask
+ * @namespace dwv.utils
+ * @constructor
+ * @param {String} script The worker script.
+ * @param {Function} parentPool The worker callback.
+ * @param {Object} message The data to pass to the worker.
+ */
+dwv.utils.WorkerTask = function (script, callback, message) {
+    // worker script
+    this.script = script;
+    // worker callback
+    this.callback = callback;
+    // worker start message
+    this.startMessage = message;
+};

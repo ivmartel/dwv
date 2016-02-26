@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.14.0-beta</em>
+            <em>API Docs for: 0.13.0</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -128,7 +128,9 @@
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
-                                <li><a href="../classes/dwv.utils.base.html">dwv.utils.base</a></li>
+                                <li><a href="../classes/dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li>
+                                <li><a href="../classes/dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li>
+                                <li><a href="../classes/dwv.utils.WorkerThread.html">dwv.utils.WorkerThread</a></li>
                                 <li><a href="../classes/dwv.ViewController.html">dwv.ViewController</a></li>
                             </ul>
                 
@@ -346,21 +348,14 @@ dwv.image.View = function(image, isSigned)
      * Set the current position. Returns false if not in bounds.
      * @method setCurrentPosition
      * @param {Object} pos The current position.
-     * @param {Boolean} silent If true, does not fire a slice-change event.
      */
-    this.setCurrentPosition = function(pos, silent) {
-        // default silent flag to false
-        if ( typeof silent === &quot;undefined&quot; ) {
-            silent = false;
-        }
-        // check if possible
+    this.setCurrentPosition = function(pos) {
         if( !image.getGeometry().getSize().isInBounds(pos.i,pos.j,pos.k) ) {
             return false;
         }
         var oldPosition = currentPosition;
         currentPosition = pos;
-
-        // fire a &#x27;position-change&#x27; event
+        // only display value for monochrome data
         if( image.getPhotometricInterpretation().match(/MONOCHROME/) !== null )
         {
             this.fireEvent({&quot;type&quot;: &quot;position-change&quot;,
@@ -372,15 +367,10 @@ dwv.image.View = function(image, isSigned)
             this.fireEvent({&quot;type&quot;: &quot;position-change&quot;,
                 &quot;i&quot;: pos.i, &quot;j&quot;: pos.j, &quot;k&quot;: pos.k});
         }
-
-        // fire a slice change event (used to trigger redraw)
-        if ( !silent ) {
-          if( oldPosition.k !== currentPosition.k ) {
-              this.fireEvent({&quot;type&quot;: &quot;slice-change&quot;});
-          }
+        // slice change event (used to trigger redraw)
+        if( oldPosition.k !== currentPosition.k ) {
+            this.fireEvent({&quot;type&quot;: &quot;slice-change&quot;});
         }
-
-        // all good
         return true;
     };
 
@@ -392,14 +382,7 @@ dwv.image.View = function(image, isSigned)
     this.append = function( rhs )
     {
        // append images
-       var newSLiceNumber = this.getImage().appendSlice( rhs.getImage() );
-       // update position if a slice was appended before
-       if ( newSLiceNumber &lt;= this.getCurrentPosition().k ) {
-           this.setCurrentPosition(
-             {&quot;i&quot;: this.getCurrentPosition().i,
-             &quot;j&quot;: this.getCurrentPosition().j,
-             &quot;k&quot;: this.getCurrentPosition().k + 1}, true );
-       }
+       this.getImage().appendSlice( rhs.getImage() );
        // init to update self
        this.setWindowLut(rhs.getWindowLut());
     };
