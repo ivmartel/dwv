@@ -20,11 +20,11 @@
   "devDependencies": {
     "grunt": "~0.4",
     "grunt-cli": "~0.1",
-    "grunt-contrib-jshint": "~0.11",
-    "grunt-qunit-istanbul": "~0.5",
+    "grunt-contrib-jshint": "~1.0",
+    "grunt-qunit-istanbul": "~0.6",
     "grunt-coveralls": "~1.0",
-    "grunt-contrib-concat": "~0.5",
-    "grunt-contrib-uglify": "~0.10",
+    "grunt-contrib-concat": "~1.0",
+    "grunt-contrib-uglify": "~0.11",
     "grunt-contrib-yuidoc": "~0.10"
   }
 }
