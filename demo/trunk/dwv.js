@@ -13125,8 +13125,9 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     // load text buffer
     var onLoadTextBuffer = function (/*event*/)
     {
-        // status 200: "OK"
-        if (this.status !== 200) {
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
+        // status 200: "OK"; status 0: "debug"
+        if (this.status !== 200 && this.status !== 0) {
             this.onerror();
             return;
         }
@@ -13141,8 +13142,9 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     // load binary buffer
     var onLoadBinaryBuffer = function (/*event*/)
     {
-        // status 200: "OK"
-        if (this.status !== 200) {
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
+        // status 200: "OK"; status 0: "debug"
+        if (this.status !== 200 && this.status !== 0) {
             this.onerror();
             return;
         }
