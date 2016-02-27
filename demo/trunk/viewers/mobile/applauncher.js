@@ -19,7 +19,8 @@ $(document).ready( function()
         "tools": ["Scroll", "Window/Level", "Zoom/Pan", "Draw", "Livewire", "Filter"],
         "filters": ["Threshold", "Sharpen", "Sobel"],
         "shapes": ["Line", "Protractor", "Rectangle", "Roi", "Ellipse"],
-        "isMobile": true
+        "isMobile": true,
+        "useWebWorkers": true
     });
 
     // example app listening
