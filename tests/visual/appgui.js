@@ -34,7 +34,8 @@ dwv.addDataLine = function (id, fileroot, doc)
     // dwv application
     var config = {
         "containerDivId": id,
-        "skipLoadUrl": true
+        "skipLoadUrl": true,
+        "useWebWorkers": true
     };
     var url = fileroot + ".dcm";
     var app = new dwv.App();

@@ -26,6 +26,9 @@ dwv.App = function ()
     var dataHeight = 0;
     // Number of slices to load
     var nSlicesToLoad = 0;
+    
+    // Data decoders scripts
+    var decoderScripts = null;
 
     // Container div id
     var containerDivId = null;
@@ -341,6 +344,7 @@ dwv.App = function ()
             var dropBoxSize = 2 * size.height / 3;
             box.setAttribute("style","width:"+dropBoxSize+"px;height:"+dropBoxSize+"px");
         }
+        
         // possible load from URL
         if ( typeof config.skipLoadUrl === "undefined" ) {
             var query = dwv.utils.getUriQuery(window.location.href);
@@ -359,10 +363,21 @@ dwv.App = function ()
         else{
             console.log("Not loading url from address since skipLoadUrl is defined.");
         }
+        
         // align layers when the window is resized
         if ( config.fitToWindow ) {
             fitToWindow = true;
             window.onresize = this.onResize;
+        }
+
+        // use web workers
+        if ( config.useWebWorkers ) {
+            // data decoders
+            var pathToRoot = "../..";
+            decoderScripts = [];
+            decoderScripts.jpeg2000 = pathToRoot + "/ext/pdfjs/decode-jpeg2000.js";
+            decoderScripts["jpeg-lossless"] = pathToRoot + "/ext/rii-mango/decode-jpegloss.js";
+            decoderScripts["jpeg-baseline"] = pathToRoot + "/ext/notmasteryet/decode-jpegbaseline.js";
         }
     };
 
@@ -483,6 +498,7 @@ dwv.App = function ()
         nSlicesToLoad = files.length;
         // create IO
         var fileIO = new dwv.io.File();
+        fileIO.setDecoderScripts(decoderScripts);
         fileIO.onload = function (data) {
 
             var isFirst = true;
@@ -542,6 +558,7 @@ dwv.App = function ()
         nSlicesToLoad = urls.length;
         // create IO
         var urlIO = new dwv.io.Url();
+        urlIO.setDecoderScripts(decoderScripts);
         urlIO.onload = function (data) {
             var isFirst = true;
             if ( image ) {
