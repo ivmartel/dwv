@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.tool.UndoStack - dwv</title>
+    <title>dwv.utils.base - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -180,64 +180,30 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1>dwv.tool.UndoStack Class</h1>
+<h1>dwv.utils.base Class</h1>
 <div class="box meta">
 
 
         <div class="foundat">
-            Defined in: <a href="../files/src_tools_undo.js.html#l8"><code>src&#x2F;tools&#x2F;undo.js:8</code></a>
+            Defined in: <a href="../files/src_utils_uri.js.html#l13"><code>src&#x2F;utils&#x2F;uri.js:13</code></a>
         </div>
 
-            Module: <a href="../modules/tool.html">tool</a>
+            Module: <a href="../modules/utils.html">utils</a>
 
 </div>
 
 
 <div class="box intro">
-    <p>UndoStack class.</p>
+    <p>Namespace for base utils functions.</p>
 
 </div>
 
-    <div class="constructor">
-        <h2>Constructor</h2>
-<div id="method_dwv.tool.UndoStack" class="method item">
-    <h3 class="name"><code>dwv.tool.UndoStack</code></h3>
-
-        <span class="paren">()</span>
-
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_undo.js.html#l8"><code>src&#x2F;tools&#x2F;undo.js:8</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-
-
-
-</div>
-    </div>
 
 <div id="classdocs" class="tabview">
     <ul class="api-class-tabs">
         <li class="api-class-tab index"><a href="#index">Index</a></li>
 
             <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
-            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
     </ul>
 
     <div>
@@ -249,50 +215,33 @@
 
                     <ul class="index-list methods">
                             <li class="index-item method">
-                                <a href="#method_add">add</a>
+                                <a href="#method_decodeKeyValueUri">decodeKeyValueUri</a>
 
+                                    <span class="flag static">static</span>
                             </li>
                             <li class="index-item method">
-                                <a href="#method_getStack">getStack</a>
+                                <a href="#method_decodeManifest">decodeManifest</a>
 
+                                    <span class="flag static">static</span>
                             </li>
                             <li class="index-item method">
-                                <a href="#method_initialise">initialise</a>
+                                <a href="#method_decodeManifestQuery">decodeManifestQuery</a>
 
+                                    <span class="flag static">static</span>
                             </li>
                             <li class="index-item method">
-                                <a href="#method_redo">redo</a>
+                                <a href="#method_getUriQuery">getUriQuery</a>
 
+                                    <span class="flag static">static</span>
                             </li>
                             <li class="index-item method">
-                                <a href="#method_setup">setup</a>
+                                <a href="#method_splitUri">splitUri</a>
 
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_undo">undo</a>
-
+                                    <span class="flag static">static</span>
                             </li>
                     </ul>
                 </div>
 
-                <div class="index-section properties">
-                    <h3>Properties</h3>
-
-                    <ul class="index-list properties">
-                            <li class="index-item property private">
-                                <a href="#property_curCmdIndex">curCmdIndex</a>
-
-                            </li>
-                            <li class="index-item property">
-                                <a href="#property_gui">gui</a>
-
-                            </li>
-                            <li class="index-item property private">
-                                <a href="#property_stack">stack</a>
-
-                            </li>
-                    </ul>
-                </div>
 
 
         </div>
@@ -300,28 +249,35 @@
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
 
-<div id="method_add" class="method item">
-    <h3 class="name"><code>add</code></h3>
+<div id="method_decodeKeyValueUri" class="method item">
+    <h3 class="name"><code>decodeKeyValueUri</code></h3>
 
         <div class="args">
             <span class="paren">(</span><ul class="args-list inline commas">
                 <li class="arg">
-                        <code>cmd</code>
+                        <code>uri</code>
+                </li>
+                <li class="arg">
+                        <code>replaceMode</code>
                 </li>
             </ul><span class="paren">)</span>
         </div>
 
+        <span class="returns-inline">
+            <span class="type"></span>
+        </span>
 
 
 
 
+        <span class="flag static">static</span>
 
 
 
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_undo.js.html#l45"><code>src&#x2F;tools&#x2F;undo.js:45</code></a>
+        <a href="../files/src_utils_uri.js.html#l95"><code>src&#x2F;utils&#x2F;uri.js:95</code></a>
         </p>
 
 
@@ -329,7 +285,8 @@
     </div>
 
     <div class="description">
-        <p>Add a command to the stack.</p>
+        <p>Decode a Key/Value pair URI. If a key is repeated, the result
+be an array of base + each key.</p>
 
     </div>
 
@@ -338,12 +295,106 @@
 
             <ul class="params-list">
                 <li class="param">
-                        <code class="param-name">cmd</code>
+                        <code class="param-name">uri</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>The URI to decode.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">replaceMode</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>The key replace more.
+replaceMode can be:</p>
+<ul>
+<li>key (default): keep the key</li>
+<li>other than key: do not use the key
+'file' is a special case where the '?' of the query is not kept.</li>
+</ul>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                    <p>The list of input file urls.</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_decodeManifest" class="method item">
+    <h3 class="name"><code>decodeManifest</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>manifest</code>
+                </li>
+                <li class="arg">
+                        <code>nslices</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+        <span class="flag static">static</span>
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_utils_uri.js.html#l223"><code>src&#x2F;utils&#x2F;uri.js:223</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Decode an XML manifest.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">manifest</code>
                         <span class="type">Object</span>
 
 
                     <div class="param-description">
-                        <p>The command to add.</p>
+                        <p>The manifest to decode.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">nslices</code>
+                        <span class="type">Number</span>
+
+
+                    <div class="param-description">
+                        <p>The number of slices to load.</p>
 
                     </div>
 
@@ -354,25 +405,32 @@
 
 
 </div>
-<div id="method_getStack" class="method item">
-    <h3 class="name"><code>getStack</code></h3>
+<div id="method_decodeManifestQuery" class="method item">
+    <h3 class="name"><code>decodeManifestQuery</code></h3>
 
-        <span class="paren">()</span>
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>query</code>
+                </li>
+                <li class="arg">
+                        <code>The</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
 
-        <span class="returns-inline">
-            <span class="type">Array</span>
-        </span>
 
 
 
 
+        <span class="flag static">static</span>
 
 
 
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_undo.js.html#l30"><code>src&#x2F;tools&#x2F;undo.js:30</code></a>
+        <a href="../files/src_utils_uri.js.html#l186"><code>src&#x2F;utils&#x2F;uri.js:186</code></a>
         </p>
 
 
@@ -380,39 +438,137 @@
     </div>
 
     <div class="description">
-        <p>Get the stack.</p>
+        <p>Decode a manifest query.</p>
 
     </div>
 
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">query</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>The manifest query: {input, nslices},
+with input the input URI and nslices the number of slices.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">The</code>
+                        <span class="type">Function</span>
+
+
+                    <div class="param-description">
+                        <p>function to call with the decoded urls.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_getUriQuery" class="method item">
+    <h3 class="name"><code>getUriQuery</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>uri</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
+
+
+
+
+        <span class="flag static">static</span>
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_utils_uri.js.html#l54"><code>src&#x2F;utils&#x2F;uri.js:54</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Get the query part, split into an array, of an input URI.
+The URI scheme is: 'base?query#fragment'</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">uri</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>The input URI.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
 
         <div class="returns">
             <h4>Returns:</h4>
 
             <div class="returns-description">
-                        <span class="type">Array</span>:
-                    <p>The list of stored commands.</p>
+                        <span class="type">Object</span>:
+                    <p>The query part, split into an array, of the input URI.</p>
 
             </div>
         </div>
 
 
 </div>
-<div id="method_initialise" class="method item">
-    <h3 class="name"><code>initialise</code></h3>
+<div id="method_splitUri" class="method item">
+    <h3 class="name"><code>splitUri</code></h3>
 
-        <span class="paren">()</span>
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>inputStr</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Object</span>
+        </span>
 
 
 
 
-
+        <span class="flag static">static</span>
 
 
 
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_tools_undo.js.html#l107"><code>src&#x2F;tools&#x2F;undo.js:107</code></a>
+        <a href="../files/src_utils_uri.js.html#l21"><code>src&#x2F;utils&#x2F;uri.js:21</code></a>
         </p>
 
 
@@ -420,190 +576,46 @@
     </div>
 
     <div class="description">
-        <p>Initialise the tool GUI.</p>
+        <p>Split an input URI:
+'root?key0=val00&amp;key0=val01&amp;key1=val10' returns
+{ base : root, query : [ key0 : [val00, val01], key1 : val1 ] }
+Returns an empty object if the input string is not correct (null, empty...)
+or if it is not a query string (no question mark).</p>
 
     </div>
 
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">inputStr</code>
+                        <span class="type">String</span>
 
 
+                    <div class="param-description">
+                        <p>The string to split.</p>
 
-</div>
-<div id="method_redo" class="method item">
-    <h3 class="name"><code>redo</code></h3>
+                    </div>
 
-        <span class="paren">()</span>
+                </li>
+            </ul>
+        </div>
 
+        <div class="returns">
+            <h4>Returns:</h4>
 
+            <div class="returns-description">
+                        <span class="type">Object</span>:
+                    <p>The split string.</p>
 
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_undo.js.html#l81"><code>src&#x2F;tools&#x2F;undo.js:81</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Redo the last command.</p>
-
-    </div>
-
-
-
-
-</div>
-<div id="method_setup" class="method item">
-    <h3 class="name"><code>setup</code></h3>
-
-        <span class="paren">()</span>
-
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_undo.js.html#l98"><code>src&#x2F;tools&#x2F;undo.js:98</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Setup the tool GUI.</p>
-
-    </div>
-
-
-
-
-</div>
-<div id="method_undo" class="method item">
-    <h3 class="name"><code>undo</code></h3>
-
-        <span class="paren">()</span>
-
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_undo.js.html#l63"><code>src&#x2F;tools&#x2F;undo.js:63</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Undo the last command.</p>
-
-    </div>
-
-
+            </div>
+        </div>
 
 
 </div>
             </div>
 
-            <div id="properties" class="api-class-tabpanel">
-                <h2 class="off-left">Properties</h2>
-
-<div id="property_curCmdIndex" class="property item private">
-    <h3 class="name"><code>curCmdIndex</code></h3>
-    <span class="type">Number</span>
-
-
-        <span class="flag private">private</span>
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_undo.js.html#l37"><code>src&#x2F;tools&#x2F;undo.js:37</code></a>
-        </p>
-
-
-    </div>
-
-    <div class="description">
-        <p>Current command index.</p>
-
-    </div>
-
-
-
-</div>
-<div id="property_gui" class="property item">
-    <h3 class="name"><code>gui</code></h3>
-    <span class="type">Object</span>
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_undo.js.html#l16"><code>src&#x2F;tools&#x2F;undo.js:16</code></a>
-        </p>
-
-
-    </div>
-
-    <div class="description">
-        <p>Undo GUI.</p>
-
-    </div>
-
-
-
-</div>
-<div id="property_stack" class="property item private">
-    <h3 class="name"><code>stack</code></h3>
-    <span class="type">Array</span>
-
-
-        <span class="flag private">private</span>
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_undo.js.html#l22"><code>src&#x2F;tools&#x2F;undo.js:22</code></a>
-        </p>
-
-
-    </div>
-
-    <div class="description">
-        <p>Array of commands.</p>
-
-    </div>
-
-
-
-</div>
-            </div>
 
 
     </div>

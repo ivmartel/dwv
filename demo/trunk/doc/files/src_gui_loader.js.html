@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.13.0</em>
+            <em>API Docs for: 0.14.0-beta</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -128,6 +128,7 @@
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
+                                <li><a href="../classes/dwv.utils.base.html">dwv.utils.base</a></li>
                                 <li><a href="../classes/dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li>
                                 <li><a href="../classes/dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li>
                                 <li><a href="../classes/dwv.utils.WorkerThread.html">dwv.utils.WorkerThread</a></li>
@@ -212,7 +213,7 @@ dwv.gui.base.Loadbox = function (app, loaders)
     this.setup = function ()
     {
         // loader select
-        var loaderSelector = dwv.html.createHtmlSelect(&quot;loaderSelect&quot;, app.getLoaders());
+        var loaderSelector = dwv.html.createHtmlSelect(&quot;loaderSelect&quot;, loaders);
         loaderSelector.onchange = app.onChangeLoader;
 
         // node
@@ -254,6 +255,20 @@ dwv.gui.base.Loadbox = function (app, loaders)
  */
 dwv.gui.base.FileLoad = function (app)
 {
+    // closure to self
+    var self = this;
+    
+    /**
+     * Internal file input change handler.
+     * @param {Object} event The change event.
+     */
+    function onchangeinternal(event) {
+        if (typeof self.onchange == &quot;function&quot;) {
+            self.onchange(event);
+        }
+        app.onChangeFiles(event);
+    }
+    
     /**
      * Setup the file load HTML to the page.
      * @method setup
@@ -262,7 +277,7 @@ dwv.gui.base.FileLoad = function (app)
     {
         // input
         var fileLoadInput = document.createElement(&quot;input&quot;);
-        fileLoadInput.onchange = app.onChangeFiles;
+        fileLoadInput.onchange = onchangeinternal;
         fileLoadInput.type = &quot;file&quot;;
         fileLoadInput.multiple = true;
         fileLoadInput.className = &quot;imagefiles&quot;;
@@ -306,6 +321,20 @@ dwv.gui.base.FileLoad = function (app)
  */
 dwv.gui.base.UrlLoad = function (app)
 {
+    // closure to self
+    var self = this;
+    
+    /**
+     * Internal url input change handler.
+     * @param {Object} event The change event.
+     */
+    function onchangeinternal(event) {
+        if (typeof self.onchange == &quot;function&quot;) {
+            self.onchange(event);
+        }
+        app.onChangeURL(event);
+    }
+    
     /**
      * Setup the url load HTML to the page.
      * @method setup
@@ -314,7 +343,7 @@ dwv.gui.base.UrlLoad = function (app)
     {
         // input
         var urlLoadInput = document.createElement(&quot;input&quot;);
-        urlLoadInput.onchange = app.onChangeURL;
+        urlLoadInput.onchange = onchangeinternal;
         urlLoadInput.type = &quot;url&quot;;
         urlLoadInput.className = &quot;imageurl&quot;;
         urlLoadInput.setAttribute(&quot;data-clear-btn&quot;,&quot;true&quot;);

@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.13.0</em>
+            <em>API Docs for: 0.14.0-beta</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -128,6 +128,7 @@
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
+                                <li><a href="../classes/dwv.utils.base.html">dwv.utils.base</a></li>
                                 <li><a href="../classes/dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li>
                                 <li><a href="../classes/dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li>
                                 <li><a href="../classes/dwv.utils.WorkerThread.html">dwv.utils.WorkerThread</a></li>
@@ -215,7 +216,7 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onExecute({&#x27;type&#x27;: &#x27;draw-create&#x27;, &#x27;id&#x27;: group.id});
+        this.onExecute({&#x27;type&#x27;: &#x27;draw-create&#x27;, &#x27;id&#x27;: group.id()});
     };
     /**
      * Undo the command.
@@ -227,7 +228,7 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onUndo({&#x27;type&#x27;: &#x27;draw-delete&#x27;, &#x27;id&#x27;: group.id});
+        this.onUndo({&#x27;type&#x27;: &#x27;draw-delete&#x27;, &#x27;id&#x27;: group.id()});
     };
 }; // DrawGroupCommand class
 
@@ -278,7 +279,7 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
         // draw
         layer.draw();
         // callback
-        this.onExecute({&#x27;type&#x27;: &#x27;draw-move&#x27;, &#x27;id&#x27;: group.id});
+        this.onExecute({&#x27;type&#x27;: &#x27;draw-move&#x27;, &#x27;id&#x27;: group.id()});
     };
     /**
      * Undo the command.
@@ -293,7 +294,7 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
         // draw
         layer.draw();
         // callback
-        this.onUndo({&#x27;type&#x27;: &#x27;draw-move&#x27;, &#x27;id&#x27;: group.id});
+        this.onUndo({&#x27;type&#x27;: &#x27;draw-move&#x27;, &#x27;id&#x27;: group.id()});
     };
 }; // MoveGroupCommand class
 
@@ -400,7 +401,7 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onExecute({&#x27;type&#x27;: &#x27;draw-delete&#x27;, &#x27;id&#x27;: group.id});
+        this.onExecute({&#x27;type&#x27;: &#x27;draw-delete&#x27;, &#x27;id&#x27;: group.id()});
     };
     /**
      * Undo the command.
@@ -412,7 +413,7 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onUndo({&#x27;type&#x27;: &#x27;draw-create&#x27;, &#x27;id&#x27;: group.id});
+        this.onUndo({&#x27;type&#x27;: &#x27;draw-create&#x27;, &#x27;id&#x27;: group.id()});
     };
 }; // DeleteGroupCommand class
 
@@ -674,7 +675,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // execute it
             command.execute();
             // save it in undo stack
-            app.getUndoStack().add(command);
+            app.addToUndoStack(command);
 
             // set shape on
             var shape = group.getChildren( function (node) {
@@ -934,7 +935,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 delcmd.onExecute = fireEvent;
                 delcmd.onUndo = fireEvent;
                 delcmd.execute();
-                app.getUndoStack().add(delcmd);
+                app.addToUndoStack(delcmd);
             }
             else {
                 // save drag move
@@ -944,7 +945,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                     var mvcmd = new dwv.tool.MoveGroupCommand(this.getParent(), cmdName, translation, drawLayer);
                     mvcmd.onExecute = fireEvent;
                     mvcmd.onUndo = fireEvent;
-                    app.getUndoStack().add(mvcmd);
+                    app.addToUndoStack(mvcmd);
                     // the move is handled by kinetic, trigger an event manually
                     fireEvent({&#x27;type&#x27;: &#x27;draw-move&#x27;});
                 }

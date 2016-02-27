@@ -94,7 +94,8 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.utils",
         "dwv.utils.ThreadPool",
         "dwv.utils.WorkerTask",
-        "dwv.utils.WorkerThread"
+        "dwv.utils.WorkerThread",
+        "dwv.utils.base"
     ],
     "modules": [
         "browser",

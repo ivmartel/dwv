@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>dwv.tool.UndoStack - dwv</title>
+    <title>src/utils/uri.js - dwv</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -180,433 +180,284 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1>dwv.tool.UndoStack Class</h1>
-<div class="box meta">
-
-
-        <div class="foundat">
-            Defined in: <a href="../files/src_tools_undo.js.html#l8"><code>src&#x2F;tools&#x2F;undo.js:8</code></a>
-        </div>
-
-            Module: <a href="../modules/tool.html">tool</a>
-
-</div>
-
-
-<div class="box intro">
-    <p>UndoStack class.</p>
-
-</div>
-
-    <div class="constructor">
-        <h2>Constructor</h2>
-<div id="method_dwv.tool.UndoStack" class="method item">
-    <h3 class="name"><code>dwv.tool.UndoStack</code></h3>
-
-        <span class="paren">()</span>
-
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_undo.js.html#l8"><code>src&#x2F;tools&#x2F;undo.js:8</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-
-
-
-</div>
-    </div>
-
-<div id="classdocs" class="tabview">
-    <ul class="api-class-tabs">
-        <li class="api-class-tab index"><a href="#index">Index</a></li>
-
-            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
-            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
-    </ul>
-
-    <div>
-        <div id="index" class="api-class-tabpanel index">
-            <h2 class="off-left">Item Index</h2>
-
-                <div class="index-section methods">
-                    <h3>Methods</h3>
-
-                    <ul class="index-list methods">
-                            <li class="index-item method">
-                                <a href="#method_add">add</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_getStack">getStack</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_initialise">initialise</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_redo">redo</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_setup">setup</a>
-
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_undo">undo</a>
-
-                            </li>
-                    </ul>
-                </div>
-
-                <div class="index-section properties">
-                    <h3>Properties</h3>
-
-                    <ul class="index-list properties">
-                            <li class="index-item property private">
-                                <a href="#property_curCmdIndex">curCmdIndex</a>
-
-                            </li>
-                            <li class="index-item property">
-                                <a href="#property_gui">gui</a>
-
-                            </li>
-                            <li class="index-item property private">
-                                <a href="#property_stack">stack</a>
-
-                            </li>
-                    </ul>
-                </div>
-
-
-        </div>
-
-            <div id="methods" class="api-class-tabpanel">
-                <h2 class="off-left">Methods</h2>
-
-<div id="method_add" class="method item">
-    <h3 class="name"><code>add</code></h3>
-
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>cmd</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
-
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_undo.js.html#l45"><code>src&#x2F;tools&#x2F;undo.js:45</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Add a command to the stack.</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">cmd</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>The command to add.</p>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
-
-
-
-</div>
-<div id="method_getStack" class="method item">
-    <h3 class="name"><code>getStack</code></h3>
-
-        <span class="paren">()</span>
-
-        <span class="returns-inline">
-            <span class="type">Array</span>
-        </span>
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_undo.js.html#l30"><code>src&#x2F;tools&#x2F;undo.js:30</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Get the stack.</p>
-
-    </div>
-
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                        <span class="type">Array</span>:
-                    <p>The list of stored commands.</p>
-
-            </div>
-        </div>
-
-
-</div>
-<div id="method_initialise" class="method item">
-    <h3 class="name"><code>initialise</code></h3>
-
-        <span class="paren">()</span>
-
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_undo.js.html#l107"><code>src&#x2F;tools&#x2F;undo.js:107</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Initialise the tool GUI.</p>
-
-    </div>
-
-
-
-
-</div>
-<div id="method_redo" class="method item">
-    <h3 class="name"><code>redo</code></h3>
-
-        <span class="paren">()</span>
-
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_undo.js.html#l81"><code>src&#x2F;tools&#x2F;undo.js:81</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Redo the last command.</p>
-
-    </div>
-
-
-
-
-</div>
-<div id="method_setup" class="method item">
-    <h3 class="name"><code>setup</code></h3>
-
-        <span class="paren">()</span>
-
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_undo.js.html#l98"><code>src&#x2F;tools&#x2F;undo.js:98</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Setup the tool GUI.</p>
-
-    </div>
-
-
-
-
-</div>
-<div id="method_undo" class="method item">
-    <h3 class="name"><code>undo</code></h3>
-
-        <span class="paren">()</span>
-
-
-
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_undo.js.html#l63"><code>src&#x2F;tools&#x2F;undo.js:63</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Undo the last command.</p>
-
-    </div>
-
-
-
-
-</div>
-            </div>
-
-            <div id="properties" class="api-class-tabpanel">
-                <h2 class="off-left">Properties</h2>
-
-<div id="property_curCmdIndex" class="property item private">
-    <h3 class="name"><code>curCmdIndex</code></h3>
-    <span class="type">Number</span>
-
-
-        <span class="flag private">private</span>
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_undo.js.html#l37"><code>src&#x2F;tools&#x2F;undo.js:37</code></a>
-        </p>
-
-
-    </div>
-
-    <div class="description">
-        <p>Current command index.</p>
-
-    </div>
-
-
-
-</div>
-<div id="property_gui" class="property item">
-    <h3 class="name"><code>gui</code></h3>
-    <span class="type">Object</span>
-
-
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_undo.js.html#l16"><code>src&#x2F;tools&#x2F;undo.js:16</code></a>
-        </p>
-
-
-    </div>
-
-    <div class="description">
-        <p>Undo GUI.</p>
-
-    </div>
-
-
-
-</div>
-<div id="property_stack" class="property item private">
-    <h3 class="name"><code>stack</code></h3>
-    <span class="type">Array</span>
-
-
-        <span class="flag private">private</span>
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_tools_undo.js.html#l22"><code>src&#x2F;tools&#x2F;undo.js:22</code></a>
-        </p>
-
-
-    </div>
-
-    <div class="description">
-        <p>Array of commands.</p>
-
-    </div>
-
-
-
-</div>
-            </div>
-
-
-    </div>
+<h1 class="file-heading">File: src/utils/uri.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/** 
+ * Utility module.
+ * @module utils
+ */
+var dwv = dwv || {};
+/**
+ * Namespace for utility functions.
+ * @class utils
+ * @namespace dwv
+ * @static
+ */
+dwv.utils = dwv.utils || {};
+/**
+ * Namespace for base utils functions.
+ * @class base
+ * @namespace dwv.utils
+ * @static
+ */
+dwv.utils.base = dwv.utils.base || {};
+
+/**
+ * Split an input URI:
+ *  &#x27;root?key0=val00&amp;key0=val01&amp;key1=val10&#x27; returns
+ *  { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }
+ * Returns an empty object if the input string is not correct (null, empty...)
+ *  or if it is not a query string (no question mark).
+ * @method splitUri
+ * @static
+ * @param {String} inputStr The string to split.
+ * @return {Object} The split string.
+ */
+dwv.utils.splitUri = function (uri)
+{
+    // result
+    var result = {};
+    // check if query string
+    var sepIndex = null;
+    if ( uri &amp;&amp; (sepIndex = uri.indexOf(&#x27;?&#x27;)) !== -1 ) {
+        // base: before the &#x27;?&#x27;
+        result.base = uri.substr(0, sepIndex);
+        // query : after the &#x27;?&#x27; and until possible &#x27;#&#x27;
+        var hashIndex = uri.indexOf(&#x27;#&#x27;);
+        if ( hashIndex === -1 ) {
+            hashIndex = uri.length;
+        }
+        var query = uri.substr(sepIndex + 1, (hashIndex - 1 - sepIndex));
+        // split key/value pairs of the query
+        result.query = dwv.utils.splitKeyValueString(query);
+    }
+    // return
+    return result;
+};
+
+/**
+ * Get the query part, split into an array, of an input URI.
+ * The URI scheme is: &#x27;base?query#fragment&#x27;
+ * @method getUriQuery
+ * @static
+ * @param {String } uri The input URI.
+ * @return {Object} The query part, split into an array, of the input URI.
+ */
+dwv.utils.getUriQuery = function (uri)
+{
+    // split
+    var parts = dwv.utils.splitUri(uri);
+    // check not empty
+    if ( Object.keys(parts).length === 0 ) {
+        return null;
+    }
+    // return query
+    return parts.query;
+};
+
+/**
+ * Generic URI query decoder. 
+ * Supports manifest:
+ *   [dwv root]?input=encodeURIComponent(&#x27;[manifest file]&#x27;)&amp;type=manifest
+ * or encoded URI with base and key value/pairs:
+ *   [dwv root]?input=encodeURIComponent([root]?key0=value0&amp;key1=value1)
+ *  @param {String} query The query part to the input URI.
+ *  @param {Function} callback The function to call with the decoded file urls. 
+ */
+dwv.utils.base.decodeQuery = function (query, callback)
+{
+    // manifest
+    if ( query.type &amp;&amp; query.type === &quot;manifest&quot; ) {
+        dwv.utils.decodeManifestQuery( query, callback );
+    }
+    // default case: encoded URI with base and key/value pairs
+    else {
+        callback( dwv.utils.decodeKeyValueUri( query.input, query.dwvReplaceMode ) );
+    }
+};
+
+/**
+ * Decode a Key/Value pair URI. If a key is repeated, the result
+ * be an array of base + each key.
+ * @method decodeKeyValueUri
+ * @static
+ * @param {String} uri The URI to decode.
+ * @param {String} replaceMode The key replace more.
+ *   replaceMode can be:
+ *   - key (default): keep the key
+ *   - other than key: do not use the key
+ *   &#x27;file&#x27; is a special case where the &#x27;?&#x27; of the query is not kept. 
+ * @return The list of input file urls.
+ */
+dwv.utils.decodeKeyValueUri = function (uri, replaceMode)
+{
+    var result = [];
+
+    // repeat key replace mode (default to keep key)
+    var repeatKeyReplaceMode = &quot;key&quot;;
+    if ( replaceMode ) {
+        repeatKeyReplaceMode = replaceMode;
+    }
+
+    // decode input URI
+    var queryUri = decodeURIComponent(uri);
+    // get key/value pairs from input URI
+    var inputQueryPairs = dwv.utils.splitUri(queryUri);
+    if ( Object.keys(inputQueryPairs).length === 0 )
+    {
+        result.push(queryUri);
+    }
+    else
+    {
+        var keys = Object.keys(inputQueryPairs.query);
+        // find repeat key
+        var repeatKey = null;
+        for ( var i = 0; i &lt; keys.length; ++i )
+        {
+            if ( inputQueryPairs.query[keys[i]] instanceof Array )
+            {
+                repeatKey = keys[i];
+                break;
+            }
+        }
+
+        if ( !repeatKey )
+        {
+            result.push(queryUri);
+        }
+        else
+        {
+            var repeatList = inputQueryPairs.query[repeatKey];
+            // build base uri
+            var baseUrl = inputQueryPairs.base;
+            // do not add &#x27;?&#x27; when the repeatKey is &#x27;file&#x27;
+            // root/path/to/?file=0.jpg&amp;file=1.jpg
+            if ( repeatKey !== &quot;file&quot; ) {
+                baseUrl += &quot;?&quot;;
+            }
+            var gotOneArg = false;
+            for ( var j = 0; j &lt; keys.length; ++j )
+            {
+                if ( keys[j] !== repeatKey ) {
+                    if ( gotOneArg ) {
+                        baseUrl += &quot;&amp;&quot;;
+                    }
+                    baseUrl += keys[j] + &quot;=&quot; + inputQueryPairs.query[keys[j]];
+                    gotOneArg = true;
+                }
+            }
+            // append built urls to result
+            var url;
+            for ( var k = 0; k &lt; repeatList.length; ++k )
+            {
+                url = baseUrl;
+                if ( gotOneArg ) {
+                    url += &quot;&amp;&quot;;
+                }
+                if ( repeatKeyReplaceMode === &quot;key&quot; ) {
+                    url += repeatKey + &quot;=&quot;;
+                }
+                // other than &#x27;key&#x27; mode: do nothing
+                url += repeatList[k];
+                result.push(url);
+            }
+        }
+    }
+    // return
+    return result;
+};
+
+/**
+ * Decode a manifest query.
+ * @method decodeManifestQuery
+ * @static
+ * @param {Object} query The manifest query: {input, nslices},
+ *   with input the input URI and nslices the number of slices.
+ * @param {Function} The function to call with the decoded urls.
+ */
+dwv.utils.decodeManifestQuery = function (query, callback)
+{
+    var uri = &quot;&quot;;
+    if ( query.input[0] === &#x27;/&#x27; ) {
+        uri = window.location.protocol + &quot;//&quot; + window.location.host;
+    }
+    // TODO: needs to be decoded (decodeURIComponent?
+    uri += query.input;
+
+    // handle error
+    var onError = function (/*event*/)
+    {
+        console.warn( &quot;RequestError while receiving manifest: &quot;+this.status );
+    };
+
+    // handle load
+    var onLoad = function (/*event*/)
+    {
+        callback( dwv.utils.decodeManifest(this.responseXML, query.nslices) );
+    };
+
+    var request = new XMLHttpRequest();
+    request.open(&#x27;GET&#x27;, decodeURIComponent(uri), true);
+    request.responseType = &quot;xml&quot;;
+    request.onload = onLoad;
+    request.onerror = onError;
+    request.send(null);
+};
+
+/**
+ * Decode an XML manifest.
+ * @method decodeManifest
+ * @static
+ * @param {Object} manifest The manifest to decode.
+ * @param {Number} nslices The number of slices to load.
+ */
+dwv.utils.decodeManifest = function (manifest, nslices)
+{
+    var result = [];
+    // wado url
+    var wadoElement = manifest.getElementsByTagName(&quot;wado_query&quot;);
+    var wadoURL = wadoElement[0].getAttribute(&quot;wadoURL&quot;);
+    var rootURL = wadoURL + &quot;?requestType=WADO&amp;contentType=application/dicom&amp;&quot;;
+    // patient list
+    var patientList = manifest.getElementsByTagName(&quot;Patient&quot;);
+    if ( patientList.length &gt; 1 ) {
+        console.warn(&quot;More than one patient, loading first one.&quot;);
+    }
+    // study list
+    var studyList = patientList[0].getElementsByTagName(&quot;Study&quot;);
+    if ( studyList.length &gt; 1 ) {
+        console.warn(&quot;More than one study, loading first one.&quot;);
+    }
+    var studyUID = studyList[0].getAttribute(&quot;StudyInstanceUID&quot;);
+    // series list
+    var seriesList = studyList[0].getElementsByTagName(&quot;Series&quot;);
+    if ( seriesList.length &gt; 1 ) {
+        console.warn(&quot;More than one series, loading first one.&quot;);
+    }
+    var seriesUID = seriesList[0].getAttribute(&quot;SeriesInstanceUID&quot;);
+    // instance list
+    var instanceList = seriesList[0].getElementsByTagName(&quot;Instance&quot;);
+    // loop on instances and push links
+    var max = instanceList.length;
+    if ( nslices &lt; max ) {
+        max = nslices;
+    }
+    for ( var i = 0; i &lt; max; ++i ) {
+        var sopInstanceUID = instanceList[i].getAttribute(&quot;SOPInstanceUID&quot;);
+        var link = rootURL +
+        &quot;&amp;studyUID=&quot; + studyUID +
+        &quot;&amp;seriesUID=&quot; + seriesUID +
+        &quot;&amp;objectUID=&quot; + sopInstanceUID;
+        result.push( link );
+    }
+    // return
+    return result;
+};
+
+
+    </pre>
 </div>
                     </div>
                 </div>

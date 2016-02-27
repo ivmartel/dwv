@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.13.0</em>
+            <em>API Docs for: 0.14.0-beta</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -128,6 +128,7 @@
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
+                                <li><a href="../classes/dwv.utils.base.html">dwv.utils.base</a></li>
                                 <li><a href="../classes/dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li>
                                 <li><a href="../classes/dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li>
                                 <li><a href="../classes/dwv.utils.WorkerThread.html">dwv.utils.WorkerThread</a></li>
@@ -184,7 +185,7 @@
 
 
         <div class="foundat">
-            Defined in: <a href="../files/src_utils_thread.js.html#l6"><code>src&#x2F;utils&#x2F;thread.js:6</code></a>
+            Defined in: <a href="../files/src_utils_uri.js.html#l6"><code>src&#x2F;utils&#x2F;uri.js:6</code></a>
         </div>
 
             Module: <a href="../modules/utils.html">utils</a>
@@ -220,11 +221,6 @@
                             </li>
                             <li class="index-item method">
                                 <a href="#method_splitKeyValueString">splitKeyValueString</a>
-
-                                    <span class="flag static">static</span>
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_splitQueryString">splitQueryString</a>
 
                                     <span class="flag static">static</span>
                             </li>
@@ -330,7 +326,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/src_utils_string.js.html#l63"><code>src&#x2F;utils&#x2F;string.js:63</code></a>
+        <a href="../files/src_utils_string.js.html#l30"><code>src&#x2F;utils&#x2F;string.js:30</code></a>
         </p>
 
 
@@ -341,77 +337,6 @@
         <p>Split key/value string:
 key0=val00&amp;key0=val01&amp;key1=val10 returns
 { key0 : [val00, val01], key1 : val1 }</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">inputStr</code>
-                        <span class="type">String</span>
-
-
-                    <div class="param-description">
-                        <p>The string to split.</p>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                        <span class="type">Object</span>:
-                    <p>The split string.</p>
-
-            </div>
-        </div>
-
-
-</div>
-<div id="method_splitQueryString" class="method item">
-    <h3 class="name"><code>splitQueryString</code></h3>
-
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>inputStr</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
-
-        <span class="returns-inline">
-            <span class="type">Object</span>
-        </span>
-
-
-
-
-        <span class="flag static">static</span>
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_utils_string.js.html#l30"><code>src&#x2F;utils&#x2F;string.js:30</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Split query string:
-'root?key0=val00&amp;key0=val01&amp;key1=val10' returns
-{ base : root, query : [ key0 : [val00, val01], key1 : val1 ] }
-Returns an empty object if the input string is not correct (null, empty...)
-or if it is not a query string (no question mark).</p>
 
     </div>
 

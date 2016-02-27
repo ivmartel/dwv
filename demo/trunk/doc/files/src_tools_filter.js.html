@@ -17,7 +17,7 @@
                 <h1><img src="../assets/css/logo.png" title="dwv" width="117" height="52"></h1>
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.13.0</em>
+            <em>API Docs for: 0.14.0-beta</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -128,6 +128,7 @@
                                 <li><a href="../classes/dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li>
                                 <li><a href="../classes/dwv.ToolboxController.html">dwv.ToolboxController</a></li>
                                 <li><a href="../classes/dwv.utils.html">dwv.utils</a></li>
+                                <li><a href="../classes/dwv.utils.base.html">dwv.utils.base</a></li>
                                 <li><a href="../classes/dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li>
                                 <li><a href="../classes/dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li>
                                 <li><a href="../classes/dwv.utils.WorkerThread.html">dwv.utils.WorkerThread</a></li>
@@ -429,7 +430,7 @@ dwv.tool.filter.Threshold = function ( app )
         var command = new dwv.tool.RunFilterCommand(filter, app);
         command.execute();
         // save command in undo stack
-        app.getUndoStack().add(command);
+        app.addToUndoStack(command);
     };
 
 }; // class dwv.tool.filter.Threshold
@@ -490,7 +491,7 @@ dwv.tool.filter.Sharpen = function ( app )
         var command = new dwv.tool.RunFilterCommand(filter, app);
         command.execute();
         // save command in undo stack
-        app.getUndoStack().add(command);
+        app.addToUndoStack(command);
     };
 
 }; // dwv.tool.filter.Sharpen
@@ -550,7 +551,7 @@ dwv.tool.filter.Sobel = function ( app )
         var command = new dwv.tool.RunFilterCommand(filter, app);
         command.execute();
         // save command in undo stack
-        app.getUndoStack().add(command);
+        app.addToUndoStack(command);
     };
 
 }; // class dwv.tool.filter.Sobel

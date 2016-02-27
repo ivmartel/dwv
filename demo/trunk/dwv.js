@@ -90,7 +90,7 @@ dwv.App = function ()
      * @method getVersion
      * @return {String} The version of the application.
      */
-    this.getVersion = function () { return "v0.13.0"; };
+    this.getVersion = function () { return "v0.14.0-beta"; };
 
     /**
      * Get the image.
@@ -205,23 +205,14 @@ dwv.App = function ()
     this.getToolboxController = function () { return toolboxController; };
 
     /**
-     * Get the undo stack.
-     * @method getUndoStack
-     * @return {Object} The undo stack.
+     * Add a command to the undo stack.
+     * @method addToUndoStack
+     * @param {Object} The command to add.
      */
-    this.getUndoStack = function () { return undoStack; };
-
-    /**
-     * Get the data loaders.
-     * @method getLoaders
-     * @return {Object} The loaders.
-     */
-    this.getLoaders = function ()
-    {
-        return {
-            'file': dwv.io.File,
-            'url': dwv.io.Url
-        };
+    this.addToUndoStack = function (cmd) { 
+        if ( undoStack !== null ) {
+            undoStack.add(cmd);
+        }
     };
 
     /**
@@ -250,22 +241,13 @@ dwv.App = function ()
                         // setup the shape list
                         var shapeList = {};
                         for ( var s = 0; s < config.shapes.length; ++s ) {
-                            switch( config.shapes[s] ) {
-                            case "Line":
-                                shapeList.Line = dwv.tool.LineFactory;
-                                break;
-                            case "Protractor":
-                                shapeList.Protractor = dwv.tool.ProtractorFactory;
-                                break;
-                            case "Rectangle":
-                                shapeList.Rectangle = dwv.tool.RectangleFactory;
-                                break;
-                            case "Roi":
-                                shapeList.Roi = dwv.tool.RoiFactory;
-                                break;
-                            case "Ellipse":
-                                shapeList.Ellipse = dwv.tool.EllipseFactory;
-                                break;
+                            var shapeName = config.shapes[s];
+                            var shapeFactoryClass = shapeName+"Factory";
+                            if (typeof dwv.tool[shapeFactoryClass] !== "undefined") {
+                                shapeList[shapeName] = dwv.tool[shapeFactoryClass];
+                            }
+                            else {
+                                console.warn("Could not initialise unknown shape: "+shapeName);
                             }
                         }
                         toolList.Draw = new dwv.tool.Draw(this, shapeList);
@@ -283,16 +265,12 @@ dwv.App = function ()
                         // setup the filter list
                         var filterList = {};
                         for ( var f = 0; f < config.filters.length; ++f ) {
-                            switch( config.filters[f] ) {
-                            case "Threshold":
-                                filterList.Threshold = new dwv.tool.filter.Threshold(this);
-                                break;
-                            case "Sharpen":
-                                filterList.Sharpen = new dwv.tool.filter.Sharpen(this);
-                                break;
-                            case "Sobel":
-                                filterList.Sobel = new dwv.tool.filter.Sobel(this);
-                                break;
+                            var filterName = config.filters[f];
+                            if (typeof dwv.tool.filter[filterName] !== "undefined") {
+                                filterList[filterName] = new dwv.tool.filter[filterName](this);
+                            }
+                            else {
+                                console.warn("Could not initialise unknown filter: "+filterName);
                             }
                         }
                         toolList.Filter = new dwv.tool.Filter(filterList, this);
@@ -313,15 +291,24 @@ dwv.App = function ()
             }
             // load
             if ( config.gui.indexOf("load") !== -1 ) {
-                var fileLoadGui = new dwv.gui.FileLoad(this);
-                var urlLoadGui = new dwv.gui.UrlLoad(this);
-                loadbox = new dwv.gui.Loadbox(this,
-                    {"file": fileLoadGui, "url": urlLoadGui} );
+                var loaderList = {};
+                for ( var l = 0; l < config.loaders.length; ++l ) {
+                    var loaderName = config.loaders[l];
+                    var loaderClass = loaderName + "Load";
+                    if (typeof dwv.gui[loaderClass] !== "undefined") {
+                        loaderList[loaderName] = new dwv.gui[loaderClass](this);
+                    }
+                    else {
+                        console.warn("Could not initialise unknown loader: "+loaderName);
+                    }
+                }
+                loadbox = new dwv.gui.Loadbox(this, loaderList);
                 loadbox.setup();
-                fileLoadGui.setup();
-                urlLoadGui.setup();
-                fileLoadGui.display(true);
-                urlLoadGui.display(false);
+                var loaderKeys = Object.keys(loaderList);
+                for ( var lk = 0; lk < loaderKeys.length; ++lk ) {
+                    loaderList[loaderKeys[lk]].setup();
+                }
+                loadbox.displayLoader(loaderKeys[0]);
             }
             // undo
             if ( config.gui.indexOf("undo") !== -1 ) {
@@ -360,29 +347,16 @@ dwv.App = function ()
         
         // possible load from URL
         if ( typeof config.skipLoadUrl === "undefined" ) {
-            var query = dwv.html.getUriParam(window.location.href);
+            var query = dwv.utils.getUriQuery(window.location.href);
             // check query
             if ( query && typeof query.input !== "undefined" ) {
-                // manifest
-                if ( query.type && query.type === "manifest" ) {
-                    var finalUri = "";
-                    if ( query.input[0] === '/' ) {
-                        finalUri = window.location.protocol + "//" + window.location.host;
-                    }
-                    finalUri += query.input;
-                    dwv.html.decodeManifestUri( finalUri, query.nslices, this.onInputURLs );
-                }
-                // urls
-                else {
-                    var urls = dwv.html.decodeKeyValueUri( query.input, query.dwvReplaceMode );
-                    this.loadURL(urls);
-                    if ( typeof query.state !== "undefined" ) {
-                        var onLoadEnd = function (/*event*/) {
-                            loadStateUrl([query.state]);
-                        };
-                        this.addEventListener( "load-end", onLoadEnd );
-
-                    }
+                dwv.utils.decodeQuery(query, this.onInputURLs);
+                // optional display state
+                if ( typeof query.state !== "undefined" ) {
+                    var onLoadEnd = function (/*event*/) {
+                        loadStateUrl([query.state]);
+                    };
+                    this.addEventListener( "load-end", onLoadEnd );
                 }
             }
         }
@@ -575,11 +549,12 @@ dwv.App = function ()
      * Load a list of URLs.
      * @method loadURL
      * @param {Array} urls The list of urls to load.
+     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
      */
-    this.loadURL = function(urls)
+    this.loadURL = function(urls, requestHeaders)
     {
         // clear variables
-        this.reset();
+        self.reset();
         nSlicesToLoad = urls.length;
         // create IO
         var urlIO = new dwv.io.Url();
@@ -608,7 +583,7 @@ dwv.App = function ()
         urlIO.onloadend = function (/*event*/) { fireEvent({ 'type': 'load-end' }); };
         urlIO.onprogress = onLoadProgress;
         // main load (asynchronous)
-        urlIO.load(urls);
+        urlIO.load(urls, requestHeaders);
     };
 
     /**
@@ -924,10 +899,11 @@ dwv.App = function ()
      * Handle input urls.
      * @method onInputURLs
      * @param {Array} urls The list of input urls.
+     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
      */
-    this.onInputURLs = function (urls)
+    this.onInputURLs = function (urls, requestHeaders)
     {
-        self.loadURL(urls);
+        self.loadURL(urls, requestHeaders);
     };
 
     /**
@@ -1585,7 +1561,7 @@ dwv.State = function (app)
                     cmd.onUndo = eventCallback;
                 }
                 cmd.execute();
-                app.getUndoStack().add(cmd);
+                app.addToUndoStack(cmd);
             }
         }
     };
@@ -8861,196 +8837,6 @@ dwv.html.createHtmlSelect = function (name, list) {
 };
 
 /**
- * Get a list of parameters from an input URI that looks like:
- *  [dwv root]?input=encodeURI([root]?key0=value0&key1=value1)
- * or
- *  [dwv root]?input=encodeURI([manifest link])&type=manifest
- *
- * @method getUriParam
- * @static
- * @param {String } uri The URI to decode.
- * @return {Object} The parameters found in the input uri.
- */
-dwv.html.getUriParam = function (uri)
-{
-    // split key/value pairs
-    var mainQueryPairs = dwv.utils.splitQueryString(uri);
-    // check pairs
-    if ( Object.keys(mainQueryPairs).length === 0 ) {
-        return null;
-    }
-    // has to have an input key
-    return mainQueryPairs.query;
-};
-
-/**
- * Decode a Key/Value pair uri. If a key is repeated, the result
- * be an array of base + each key.
- * @method decodeKeyValueUri
- * @static
- * @param {String} uri The uri to decode.
- * @param {String} replaceMode The key replace more.
- */
-dwv.html.decodeKeyValueUri = function (uri, replaceMode)
-{
-    var result = [];
-
-    // repeat key replace mode (default to keep key)
-    var repeatKeyReplaceMode = "key";
-    if ( replaceMode ) {
-        repeatKeyReplaceMode = replaceMode;
-    }
-
-    // decode input URI
-    var queryUri = decodeURIComponent(uri);
-    // get key/value pairs from input URI
-    var inputQueryPairs = dwv.utils.splitQueryString(queryUri);
-    if ( Object.keys(inputQueryPairs).length === 0 )
-    {
-        result.push(queryUri);
-    }
-    else
-    {
-        var keys = Object.keys(inputQueryPairs.query);
-        // find repeat key
-        var repeatKey = null;
-        for ( var i = 0; i < keys.length; ++i )
-        {
-            if ( inputQueryPairs.query[keys[i]] instanceof Array )
-            {
-                repeatKey = keys[i];
-                break;
-            }
-        }
-
-        if ( !repeatKey )
-        {
-            result.push(queryUri);
-        }
-        else
-        {
-            var repeatList = inputQueryPairs.query[repeatKey];
-            // build base uri
-            var baseUrl = inputQueryPairs.base;
-            // do not add '?' when the repeatKey is 'file'
-            // root/path/to/?file=0.jpg&file=1.jpg
-            if ( repeatKey !== "file" ) {
-                baseUrl += "?";
-            }
-            var gotOneArg = false;
-            for ( var j = 0; j < keys.length; ++j )
-            {
-                if ( keys[j] !== repeatKey ) {
-                    if ( gotOneArg ) {
-                        baseUrl += "&";
-                    }
-                    baseUrl += keys[j] + "=" + inputQueryPairs.query[keys[j]];
-                    gotOneArg = true;
-                }
-            }
-            // append built urls to result
-            var url;
-            for ( var k = 0; k < repeatList.length; ++k )
-            {
-                url = baseUrl;
-                if ( gotOneArg ) {
-                    url += "&";
-                }
-                if ( repeatKeyReplaceMode === "key" ) {
-                    url += repeatKey + "=";
-                }
-                // other than 'key' mode: do nothing
-                url += repeatList[k];
-                result.push(url);
-            }
-        }
-    }
-    // return
-    return result;
-};
-
-/**
- * Decode a manifest uri.
- * @method decodeManifestUri
- * @static
- * @param {String} uri The uri to decode.
- * @param {number} nslices The number of slices to load.
- * @param {Function} The function to call with the decoded urls.
- */
-dwv.html.decodeManifestUri = function (uri, nslices, callback)
-{
-    // Request error
-    var onErrorRequest = function (/*event*/)
-    {
-        console.warn( "RequestError while receiving manifest: "+this.status );
-    };
-
-    // Request handler
-    var onLoadRequest = function (/*event*/)
-    {
-        var urls = dwv.html.decodeManifest(this.responseXML, nslices);
-        callback(urls);
-    };
-
-    var request = new XMLHttpRequest();
-    request.open('GET', decodeURIComponent(uri), true);
-    request.responseType = "xml";
-    request.onload = onLoadRequest;
-    request.onerror = onErrorRequest;
-    request.send(null);
-};
-
-/**
- * Decode an XML manifest.
- * @method decodeManifest
- * @static
- * @param {Object} manifest The manifest to decode.
- * @param {Number} nslices The number of slices to load.
- */
-dwv.html.decodeManifest = function (manifest, nslices)
-{
-    var result = [];
-    // wado url
-    var wadoElement = manifest.getElementsByTagName("wado_query");
-    var wadoURL = wadoElement[0].getAttribute("wadoURL");
-    var rootURL = wadoURL + "?requestType=WADO&contentType=application/dicom&";
-    // patient list
-    var patientList = manifest.getElementsByTagName("Patient");
-    if ( patientList.length > 1 ) {
-        console.warn("More than one patient, loading first one.");
-    }
-    // study list
-    var studyList = patientList[0].getElementsByTagName("Study");
-    if ( studyList.length > 1 ) {
-        console.warn("More than one study, loading first one.");
-    }
-    var studyUID = studyList[0].getAttribute("StudyInstanceUID");
-    // series list
-    var seriesList = studyList[0].getElementsByTagName("Series");
-    if ( seriesList.length > 1 ) {
-        console.warn("More than one series, loading first one.");
-    }
-    var seriesUID = seriesList[0].getAttribute("SeriesInstanceUID");
-    // instance list
-    var instanceList = seriesList[0].getElementsByTagName("Instance");
-    // loop on instances and push links
-    var max = instanceList.length;
-    if ( nslices < max ) {
-        max = nslices;
-    }
-    for ( var i = 0; i < max; ++i ) {
-        var sopInstanceUID = instanceList[i].getAttribute("SOPInstanceUID");
-        var link = rootURL +
-        "&studyUID=" + studyUID +
-        "&seriesUID=" + seriesUID +
-        "&objectUID=" + sopInstanceUID;
-        result.push( link );
-    }
-    // return
-    return result;
-};
-
-/**
  * Display or not an element.
  * @method displayElement
  * @static
@@ -9556,7 +9342,7 @@ dwv.gui.base.Loadbox = function (app, loaders)
     this.setup = function ()
     {
         // loader select
-        var loaderSelector = dwv.html.createHtmlSelect("loaderSelect", app.getLoaders());
+        var loaderSelector = dwv.html.createHtmlSelect("loaderSelect", loaders);
         loaderSelector.onchange = app.onChangeLoader;
 
         // node
@@ -9598,6 +9384,20 @@ dwv.gui.base.Loadbox = function (app, loaders)
  */
 dwv.gui.base.FileLoad = function (app)
 {
+    // closure to self
+    var self = this;
+    
+    /**
+     * Internal file input change handler.
+     * @param {Object} event The change event.
+     */
+    function onchangeinternal(event) {
+        if (typeof self.onchange == "function") {
+            self.onchange(event);
+        }
+        app.onChangeFiles(event);
+    }
+    
     /**
      * Setup the file load HTML to the page.
      * @method setup
@@ -9606,7 +9406,7 @@ dwv.gui.base.FileLoad = function (app)
     {
         // input
         var fileLoadInput = document.createElement("input");
-        fileLoadInput.onchange = app.onChangeFiles;
+        fileLoadInput.onchange = onchangeinternal;
         fileLoadInput.type = "file";
         fileLoadInput.multiple = true;
         fileLoadInput.className = "imagefiles";
@@ -9650,6 +9450,20 @@ dwv.gui.base.FileLoad = function (app)
  */
 dwv.gui.base.UrlLoad = function (app)
 {
+    // closure to self
+    var self = this;
+    
+    /**
+     * Internal url input change handler.
+     * @param {Object} event The change event.
+     */
+    function onchangeinternal(event) {
+        if (typeof self.onchange == "function") {
+            self.onchange(event);
+        }
+        app.onChangeURL(event);
+    }
+    
     /**
      * Setup the url load HTML to the page.
      * @method setup
@@ -9658,7 +9472,7 @@ dwv.gui.base.UrlLoad = function (app)
     {
         // input
         var urlLoadInput = document.createElement("input");
-        urlLoadInput.onchange = app.onChangeURL;
+        urlLoadInput.onchange = onchangeinternal;
         urlLoadInput.type = "url";
         urlLoadInput.className = "imageurl";
         urlLoadInput.setAttribute("data-clear-btn","true");
@@ -11153,6 +10967,7 @@ dwv.image.Image = function(geometry, buffer)
      * Append a slice to the image.
      * @method appendSlice
      * @param {Image} The slice to append.
+     * @return {Number} The number of the inserted slice.
      */
     this.appendSlice = function(rhs)
     {
@@ -11219,6 +11034,9 @@ dwv.image.Image = function(geometry, buffer)
         // copy to class variables
         buffer = newBuffer;
         originalBuffer = new Int16Array(newBuffer);
+
+        // return the appended slice number
+        return newSliceNb;
     };
 
     /**
@@ -12486,14 +12304,21 @@ dwv.image.View = function(image, isSigned)
      * Set the current position. Returns false if not in bounds.
      * @method setCurrentPosition
      * @param {Object} pos The current position.
+     * @param {Boolean} silent If true, does not fire a slice-change event.
      */
-    this.setCurrentPosition = function(pos) {
+    this.setCurrentPosition = function(pos, silent) {
+        // default silent flag to false
+        if ( typeof silent === "undefined" ) {
+            silent = false;
+        }
+        // check if possible
         if( !image.getGeometry().getSize().isInBounds(pos.i,pos.j,pos.k) ) {
             return false;
         }
         var oldPosition = currentPosition;
         currentPosition = pos;
-        // only display value for monochrome data
+
+        // fire a 'position-change' event
         if( image.getPhotometricInterpretation().match(/MONOCHROME/) !== null )
         {
             this.fireEvent({"type": "position-change",
@@ -12505,10 +12330,15 @@ dwv.image.View = function(image, isSigned)
             this.fireEvent({"type": "position-change",
                 "i": pos.i, "j": pos.j, "k": pos.k});
         }
-        // slice change event (used to trigger redraw)
-        if( oldPosition.k !== currentPosition.k ) {
-            this.fireEvent({"type": "slice-change"});
+
+        // fire a slice change event (used to trigger redraw)
+        if ( !silent ) {
+          if( oldPosition.k !== currentPosition.k ) {
+              this.fireEvent({"type": "slice-change"});
+          }
         }
+
+        // all good
         return true;
     };
 
@@ -12520,7 +12350,14 @@ dwv.image.View = function(image, isSigned)
     this.append = function( rhs )
     {
        // append images
-       this.getImage().appendSlice( rhs.getImage() );
+       var newSLiceNumber = this.getImage().appendSlice( rhs.getImage() );
+       // update position if a slice was appended before
+       if ( newSLiceNumber <= this.getCurrentPosition().k ) {
+           this.setCurrentPosition(
+             {"i": this.getCurrentPosition().i,
+             "j": this.getCurrentPosition().j,
+             "k": this.getCurrentPosition().k + 1}, true );
+       }
        // init to update self
        this.setWindowLut(rhs.getWindowLut());
     };
@@ -13248,8 +13085,9 @@ dwv.io.Url.createProgressHandler = function (n, calculator, baseHandler) {
  * Load a list of URLs.
  * @method load
  * @param {Array} ioArray The list of urls to load.
+ * @param {Array} requestHeaders An array of {name, value} to use as request headers.
  */
-dwv.io.Url.prototype.load = function (ioArray)
+dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
 {
     // closure to self for handlers
     var self = this;
@@ -13287,6 +13125,12 @@ dwv.io.Url.prototype.load = function (ioArray)
     // load text buffer
     var onLoadTextBuffer = function (/*event*/)
     {
+        // status 200: "OK"
+        if (this.status !== 200) {
+            this.onerror();
+            return;
+        }
+
         try {
             self.onload( this.responseText );
         } catch (error) {
@@ -13297,6 +13141,12 @@ dwv.io.Url.prototype.load = function (ioArray)
     // load binary buffer
     var onLoadBinaryBuffer = function (/*event*/)
     {
+        // status 200: "OK"
+        if (this.status !== 200) {
+            this.onerror();
+            return;
+        }
+        
         // find the image type from its signature
         var view = new DataView(this.response);
         var isJpeg = view.getUint32(0) === 0xffd8ffe0;
@@ -13353,6 +13203,14 @@ dwv.io.Url.prototype.load = function (ioArray)
 
         var request = new XMLHttpRequest();
         request.open('GET', url, true);
+        if ( typeof requestHeaders !== "undefined" ) {
+            for (var j = 0; j < requestHeaders.length; ++j) { 
+                if ( typeof requestHeaders[j].name !== "undefined" &&
+                    typeof requestHeaders[j].value !== "undefined" ) {
+                    request.setRequestHeader(requestHeaders[j].name, requestHeaders[j].value);
+                }
+            }
+        }
         if ( !isText ) {
             request.responseType = "arraybuffer";
             request.onload = onLoadBinaryBuffer;
@@ -14859,7 +14717,7 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onExecute({'type': 'draw-create', 'id': group.id});
+        this.onExecute({'type': 'draw-create', 'id': group.id()});
     };
     /**
      * Undo the command.
@@ -14871,7 +14729,7 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onUndo({'type': 'draw-delete', 'id': group.id});
+        this.onUndo({'type': 'draw-delete', 'id': group.id()});
     };
 }; // DrawGroupCommand class
 
@@ -14922,7 +14780,7 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
         // draw
         layer.draw();
         // callback
-        this.onExecute({'type': 'draw-move', 'id': group.id});
+        this.onExecute({'type': 'draw-move', 'id': group.id()});
     };
     /**
      * Undo the command.
@@ -14937,7 +14795,7 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
         // draw
         layer.draw();
         // callback
-        this.onUndo({'type': 'draw-move', 'id': group.id});
+        this.onUndo({'type': 'draw-move', 'id': group.id()});
     };
 }; // MoveGroupCommand class
 
@@ -15044,7 +14902,7 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onExecute({'type': 'draw-delete', 'id': group.id});
+        this.onExecute({'type': 'draw-delete', 'id': group.id()});
     };
     /**
      * Undo the command.
@@ -15056,7 +14914,7 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onUndo({'type': 'draw-create', 'id': group.id});
+        this.onUndo({'type': 'draw-create', 'id': group.id()});
     };
 }; // DeleteGroupCommand class
 
@@ -15318,7 +15176,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // execute it
             command.execute();
             // save it in undo stack
-            app.getUndoStack().add(command);
+            app.addToUndoStack(command);
 
             // set shape on
             var shape = group.getChildren( function (node) {
@@ -15578,7 +15436,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 delcmd.onExecute = fireEvent;
                 delcmd.onUndo = fireEvent;
                 delcmd.execute();
-                app.getUndoStack().add(delcmd);
+                app.addToUndoStack(delcmd);
             }
             else {
                 // save drag move
@@ -15588,7 +15446,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                     var mvcmd = new dwv.tool.MoveGroupCommand(this.getParent(), cmdName, translation, drawLayer);
                     mvcmd.onExecute = fireEvent;
                     mvcmd.onUndo = fireEvent;
-                    app.getUndoStack().add(mvcmd);
+                    app.addToUndoStack(mvcmd);
                     // the move is handled by kinetic, trigger an event manually
                     fireEvent({'type': 'draw-move'});
                 }
@@ -16108,7 +15966,7 @@ dwv.tool.ShapeEditor = function (app)
             chgcmd.onExecute = drawEventCallback;
             chgcmd.onUndo = drawEventCallback;
             chgcmd.execute();
-            app.getUndoStack().add(chgcmd);
+            app.addToUndoStack(chgcmd);
             // reset start anchor
             startAnchor = endAnchor;
         });
@@ -16554,7 +16412,7 @@ dwv.tool.filter.Threshold = function ( app )
         var command = new dwv.tool.RunFilterCommand(filter, app);
         command.execute();
         // save command in undo stack
-        app.getUndoStack().add(command);
+        app.addToUndoStack(command);
     };
 
 }; // class dwv.tool.filter.Threshold
@@ -16615,7 +16473,7 @@ dwv.tool.filter.Sharpen = function ( app )
         var command = new dwv.tool.RunFilterCommand(filter, app);
         command.execute();
         // save command in undo stack
-        app.getUndoStack().add(command);
+        app.addToUndoStack(command);
     };
 
 }; // dwv.tool.filter.Sharpen
@@ -16675,7 +16533,7 @@ dwv.tool.filter.Sobel = function ( app )
         var command = new dwv.tool.RunFilterCommand(filter, app);
         command.execute();
         // save command in undo stack
-        app.getUndoStack().add(command);
+        app.addToUndoStack(command);
     };
 
 }; // class dwv.tool.filter.Sobel
@@ -17267,7 +17125,7 @@ dwv.tool.Livewire = function(app)
                 self.mousemove(event);
                 console.log("Done.");
                 // save command in undo stack
-                app.getUndoStack().add(command);
+                app.addToUndoStack(command);
                 // set flag
                 self.started = false;
             }
@@ -18947,39 +18805,6 @@ dwv.utils.capitaliseFirstLetter = function (string)
 };
 
 /**
- * Split query string:
- *  'root?key0=val00&key0=val01&key1=val10' returns
- *  { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }
- * Returns an empty object if the input string is not correct (null, empty...)
- *  or if it is not a query string (no question mark).
- * @method splitQueryString
- * @static
- * @param {String} inputStr The string to split.
- * @return {Object} The split string.
- */
-dwv.utils.splitQueryString = function (inputStr)
-{
-    // result
-    var result = {};
-    // check if query string
-    var sepIndex = null;
-    if ( inputStr && (sepIndex = inputStr.indexOf('?')) !== -1 ) {
-        // base: before the '?'
-        result.base = inputStr.substr(0, sepIndex);
-        // query : after the '?' and until possible '#'
-        var hashIndex = inputStr.indexOf('#');
-        if ( hashIndex === -1 ) {
-            hashIndex = inputStr.length;
-        }
-        var query = inputStr.substr(sepIndex + 1, (hashIndex - 1 - sepIndex));
-        // split key/value pairs of the query
-        result.query = dwv.utils.splitKeyValueString(query);
-    }
-    // return
-    return result;
-};
-
-/**
  * Split key/value string:
  *  key0=val00&key0=val01&key1=val10 returns
 *   { key0 : [val00, val01], key1 : val1 }
@@ -19157,3 +18982,275 @@ dwv.utils.WorkerTask = function (script, callback, message) {
     // worker start message
     this.startMessage = message;
 };
+;/** 
+ * Utility module.
+ * @module utils
+ */
+var dwv = dwv || {};
+/**
+ * Namespace for utility functions.
+ * @class utils
+ * @namespace dwv
+ * @static
+ */
+dwv.utils = dwv.utils || {};
+/**
+ * Namespace for base utils functions.
+ * @class base
+ * @namespace dwv.utils
+ * @static
+ */
+dwv.utils.base = dwv.utils.base || {};
+
+/**
+ * Split an input URI:
+ *  'root?key0=val00&key0=val01&key1=val10' returns
+ *  { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }
+ * Returns an empty object if the input string is not correct (null, empty...)
+ *  or if it is not a query string (no question mark).
+ * @method splitUri
+ * @static
+ * @param {String} inputStr The string to split.
+ * @return {Object} The split string.
+ */
+dwv.utils.splitUri = function (uri)
+{
+    // result
+    var result = {};
+    // check if query string
+    var sepIndex = null;
+    if ( uri && (sepIndex = uri.indexOf('?')) !== -1 ) {
+        // base: before the '?'
+        result.base = uri.substr(0, sepIndex);
+        // query : after the '?' and until possible '#'
+        var hashIndex = uri.indexOf('#');
+        if ( hashIndex === -1 ) {
+            hashIndex = uri.length;
+        }
+        var query = uri.substr(sepIndex + 1, (hashIndex - 1 - sepIndex));
+        // split key/value pairs of the query
+        result.query = dwv.utils.splitKeyValueString(query);
+    }
+    // return
+    return result;
+};
+
+/**
+ * Get the query part, split into an array, of an input URI.
+ * The URI scheme is: 'base?query#fragment'
+ * @method getUriQuery
+ * @static
+ * @param {String } uri The input URI.
+ * @return {Object} The query part, split into an array, of the input URI.
+ */
+dwv.utils.getUriQuery = function (uri)
+{
+    // split
+    var parts = dwv.utils.splitUri(uri);
+    // check not empty
+    if ( Object.keys(parts).length === 0 ) {
+        return null;
+    }
+    // return query
+    return parts.query;
+};
+
+/**
+ * Generic URI query decoder. 
+ * Supports manifest:
+ *   [dwv root]?input=encodeURIComponent('[manifest file]')&type=manifest
+ * or encoded URI with base and key value/pairs:
+ *   [dwv root]?input=encodeURIComponent([root]?key0=value0&key1=value1)
+ *  @param {String} query The query part to the input URI.
+ *  @param {Function} callback The function to call with the decoded file urls. 
+ */
+dwv.utils.base.decodeQuery = function (query, callback)
+{
+    // manifest
+    if ( query.type && query.type === "manifest" ) {
+        dwv.utils.decodeManifestQuery( query, callback );
+    }
+    // default case: encoded URI with base and key/value pairs
+    else {
+        callback( dwv.utils.decodeKeyValueUri( query.input, query.dwvReplaceMode ) );
+    }
+};
+
+/**
+ * Decode a Key/Value pair URI. If a key is repeated, the result
+ * be an array of base + each key.
+ * @method decodeKeyValueUri
+ * @static
+ * @param {String} uri The URI to decode.
+ * @param {String} replaceMode The key replace more.
+ *   replaceMode can be:
+ *   - key (default): keep the key
+ *   - other than key: do not use the key
+ *   'file' is a special case where the '?' of the query is not kept. 
+ * @return The list of input file urls.
+ */
+dwv.utils.decodeKeyValueUri = function (uri, replaceMode)
+{
+    var result = [];
+
+    // repeat key replace mode (default to keep key)
+    var repeatKeyReplaceMode = "key";
+    if ( replaceMode ) {
+        repeatKeyReplaceMode = replaceMode;
+    }
+
+    // decode input URI
+    var queryUri = decodeURIComponent(uri);
+    // get key/value pairs from input URI
+    var inputQueryPairs = dwv.utils.splitUri(queryUri);
+    if ( Object.keys(inputQueryPairs).length === 0 )
+    {
+        result.push(queryUri);
+    }
+    else
+    {
+        var keys = Object.keys(inputQueryPairs.query);
+        // find repeat key
+        var repeatKey = null;
+        for ( var i = 0; i < keys.length; ++i )
+        {
+            if ( inputQueryPairs.query[keys[i]] instanceof Array )
+            {
+                repeatKey = keys[i];
+                break;
+            }
+        }
+
+        if ( !repeatKey )
+        {
+            result.push(queryUri);
+        }
+        else
+        {
+            var repeatList = inputQueryPairs.query[repeatKey];
+            // build base uri
+            var baseUrl = inputQueryPairs.base;
+            // do not add '?' when the repeatKey is 'file'
+            // root/path/to/?file=0.jpg&file=1.jpg
+            if ( repeatKey !== "file" ) {
+                baseUrl += "?";
+            }
+            var gotOneArg = false;
+            for ( var j = 0; j < keys.length; ++j )
+            {
+                if ( keys[j] !== repeatKey ) {
+                    if ( gotOneArg ) {
+                        baseUrl += "&";
+                    }
+                    baseUrl += keys[j] + "=" + inputQueryPairs.query[keys[j]];
+                    gotOneArg = true;
+                }
+            }
+            // append built urls to result
+            var url;
+            for ( var k = 0; k < repeatList.length; ++k )
+            {
+                url = baseUrl;
+                if ( gotOneArg ) {
+                    url += "&";
+                }
+                if ( repeatKeyReplaceMode === "key" ) {
+                    url += repeatKey + "=";
+                }
+                // other than 'key' mode: do nothing
+                url += repeatList[k];
+                result.push(url);
+            }
+        }
+    }
+    // return
+    return result;
+};
+
+/**
+ * Decode a manifest query.
+ * @method decodeManifestQuery
+ * @static
+ * @param {Object} query The manifest query: {input, nslices},
+ *   with input the input URI and nslices the number of slices.
+ * @param {Function} The function to call with the decoded urls.
+ */
+dwv.utils.decodeManifestQuery = function (query, callback)
+{
+    var uri = "";
+    if ( query.input[0] === '/' ) {
+        uri = window.location.protocol + "//" + window.location.host;
+    }
+    // TODO: needs to be decoded (decodeURIComponent?
+    uri += query.input;
+
+    // handle error
+    var onError = function (/*event*/)
+    {
+        console.warn( "RequestError while receiving manifest: "+this.status );
+    };
+
+    // handle load
+    var onLoad = function (/*event*/)
+    {
+        callback( dwv.utils.decodeManifest(this.responseXML, query.nslices) );
+    };
+
+    var request = new XMLHttpRequest();
+    request.open('GET', decodeURIComponent(uri), true);
+    request.responseType = "xml";
+    request.onload = onLoad;
+    request.onerror = onError;
+    request.send(null);
+};
+
+/**
+ * Decode an XML manifest.
+ * @method decodeManifest
+ * @static
+ * @param {Object} manifest The manifest to decode.
+ * @param {Number} nslices The number of slices to load.
+ */
+dwv.utils.decodeManifest = function (manifest, nslices)
+{
+    var result = [];
+    // wado url
+    var wadoElement = manifest.getElementsByTagName("wado_query");
+    var wadoURL = wadoElement[0].getAttribute("wadoURL");
+    var rootURL = wadoURL + "?requestType=WADO&contentType=application/dicom&";
+    // patient list
+    var patientList = manifest.getElementsByTagName("Patient");
+    if ( patientList.length > 1 ) {
+        console.warn("More than one patient, loading first one.");
+    }
+    // study list
+    var studyList = patientList[0].getElementsByTagName("Study");
+    if ( studyList.length > 1 ) {
+        console.warn("More than one study, loading first one.");
+    }
+    var studyUID = studyList[0].getAttribute("StudyInstanceUID");
+    // series list
+    var seriesList = studyList[0].getElementsByTagName("Series");
+    if ( seriesList.length > 1 ) {
+        console.warn("More than one series, loading first one.");
+    }
+    var seriesUID = seriesList[0].getAttribute("SeriesInstanceUID");
+    // instance list
+    var instanceList = seriesList[0].getElementsByTagName("Instance");
+    // loop on instances and push links
+    var max = instanceList.length;
+    if ( nslices < max ) {
+        max = nslices;
+    }
+    for ( var i = 0; i < max; ++i ) {
+        var sopInstanceUID = instanceList[i].getAttribute("SOPInstanceUID");
+        var link = rootURL +
+        "&studyUID=" + studyUID +
+        "&seriesUID=" + seriesUID +
+        "&objectUID=" + sopInstanceUID;
+        result.push( link );
+    }
+    // return
+    return result;
+};
+
