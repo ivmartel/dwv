@@ -92,7 +92,7 @@ body { margin: 10px; padding: 0; }
 
 print([[
 <!-- Third party -->
-<script type="text/javascript" src="/dwv/ext/jquery/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="/dwv/ext/jquery/jquery-2.2.1.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/flot/jquery.flot.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/pdfjs/jpx.js"></script>

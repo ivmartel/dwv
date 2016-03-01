@@ -12,7 +12,7 @@
     "test": "grunt publish --verbose"
   },
   "dependencies": {
-    "jquery": "2.1.4",
+    "jquery": "2.2.1",
     "jquery-ui": "~1.10",
     "jquery-mobile": "~1.4",
     "kinetic": "~5"
