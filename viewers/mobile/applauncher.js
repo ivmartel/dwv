@@ -45,7 +45,7 @@ $(document).ready( function()
         "filters": ["Threshold", "Sharpen", "Sobel"],
         "shapes": ["Line", "Protractor", "Rectangle", "Roi", "Ellipse"],
         "isMobile": true,
-        "useWebWorkers": false
+        "useWebWorkers": true
     });
 
 
