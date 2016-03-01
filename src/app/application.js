@@ -521,8 +521,10 @@ dwv.App = function ()
             }
         };
         fileIO.onerror = function (error) { handleError(error); };
+        fileIO.onloadend = function (/*event*/) { fireEvent({ 'type': 'load-end' }); };
         fileIO.onprogress = onLoadProgress;
         // main load (asynchronous)
+        fireEvent({ 'type': 'load-start' });
         fileIO.load(files);
     }
 
@@ -583,6 +585,7 @@ dwv.App = function ()
         urlIO.onloadend = function (/*event*/) { fireEvent({ 'type': 'load-end' }); };
         urlIO.onprogress = onLoadProgress;
         // main load (asynchronous)
+        fireEvent({ 'type': 'load-start' });
         urlIO.load(urls, requestHeaders);
     };
 
