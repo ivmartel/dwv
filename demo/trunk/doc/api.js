@@ -59,7 +59,6 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.math.Circle",
         "dwv.math.Ellipse",
         "dwv.math.FastPoint2D",
-        "dwv.math.IdGenerator",
         "dwv.math.Index3D",
         "dwv.math.Line",
         "dwv.math.Path",

@@ -93,7 +93,6 @@
                                 <li><a href="../classes/dwv.math.Circle.html">dwv.math.Circle</a></li>
                                 <li><a href="../classes/dwv.math.Ellipse.html">dwv.math.Ellipse</a></li>
                                 <li><a href="../classes/dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li>
-                                <li><a href="../classes/dwv.math.IdGenerator.html">dwv.math.IdGenerator</a></li>
                                 <li><a href="../classes/dwv.math.Index3D.html">dwv.math.Index3D</a></li>
                                 <li><a href="../classes/dwv.math.Line.html">dwv.math.Line</a></li>
                                 <li><a href="../classes/dwv.math.Path.html">dwv.math.Path</a></li>
@@ -707,8 +706,10 @@ dwv.App = function ()
             }
         };
         fileIO.onerror = function (error) { handleError(error); };
+        fileIO.onloadend = function (/*event*/) { fireEvent({ &#x27;type&#x27;: &#x27;load-end&#x27; }); };
         fileIO.onprogress = onLoadProgress;
         // main load (asynchronous)
+        fireEvent({ &#x27;type&#x27;: &#x27;load-start&#x27; });
         fileIO.load(files);
     }
 
@@ -769,6 +770,7 @@ dwv.App = function ()
         urlIO.onloadend = function (/*event*/) { fireEvent({ &#x27;type&#x27;: &#x27;load-end&#x27; }); };
         urlIO.onprogress = onLoadProgress;
         // main load (asynchronous)
+        fireEvent({ &#x27;type&#x27;: &#x27;load-start&#x27; });
         urlIO.load(urls, requestHeaders);
     };
 

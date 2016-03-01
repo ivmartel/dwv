@@ -521,8 +521,10 @@ dwv.App = function ()
             }
         };
         fileIO.onerror = function (error) { handleError(error); };
+        fileIO.onloadend = function (/*event*/) { fireEvent({ 'type': 'load-end' }); };
         fileIO.onprogress = onLoadProgress;
         // main load (asynchronous)
+        fireEvent({ 'type': 'load-start' });
         fileIO.load(files);
     }
 
@@ -583,6 +585,7 @@ dwv.App = function ()
         urlIO.onloadend = function (/*event*/) { fireEvent({ 'type': 'load-end' }); };
         urlIO.onprogress = onLoadProgress;
         // main load (asynchronous)
+        fireEvent({ 'type': 'load-start' });
         urlIO.load(urls, requestHeaders);
     };
 
@@ -14665,27 +14668,14 @@ dwv.math.getStats = function (array)
 
 /**
  * Unique ID generator.
- * @class IdGenerator
- * @namespace dwv.math
- * @constructor
+ * See http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
+ * and this answer http://stackoverflow.com/a/13403498.
+ * @method guid
+ * @static
  */
-dwv.math.IdGenerator = function ()
+dwv.math.guid = function ()
 {
-    /**
-     * Root for IDs.
-     * @property root
-     * @private
-     * @type Number
-     */
-    var root = Math.floor( Math.random() * 26 ) + Date.now();
-    /**
-     * Get a unique id.
-     * @method get
-     * @return {Number} The unique Id.
-     */
-    this.get = function () {
-        return root++;
-    };
+    return Math.random().toString(36).substring(2, 15);
 };
 ;/** 
  * Tool module.
@@ -15058,14 +15048,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     var drawLayer = null;
 
     /**
-     * The associated draw layer.
-     * @property drawLayer
-     * @private
-     * @type Object
-     */
-    var idGenerator = new dwv.math.IdGenerator();
-
-    /**
      * Handle mouse down event.
      * @method mousedown
      * @param {Object} event The mouse down event.
@@ -15168,7 +15150,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // create final shape
             var factory = new self.shapeFactoryList[self.shapeName]();
             var group = factory.create(points, app.getStyle(), app.getImage());
-            group.id( idGenerator.get() );
+            group.id( dwv.math.guid() );
             // re-activate layer
             drawLayer.hitGraphEnabled(true);
             // draw shape command
