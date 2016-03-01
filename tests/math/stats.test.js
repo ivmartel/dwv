@@ -34,18 +34,19 @@ QUnit.test("Test GUID.", function (assert) {
     var id1 = dwv.math.guid();
     assert.equal((id0 == id1), false, "Two GUids should not be equal.");
 
-    var duplicate = false;
+    var duplicates = 0;
     // create an array of guids
     var ids = [];
     for (var i = 0; i < 1000; ++i) {
         ids[ids.length] = dwv.math.guid();
     }
     // check duplicates
+    var id = 0;
     for (i = 0; i < ids.length; ++i) {
-        if (ids.indexOf(ids.pop()) !== -1) {
-            duplicate = true;
-            break;
+        id = ids.pop();
+        if (ids.indexOf(id) !== -1) {
+            ++duplicates;
         }
     }
-    assert.ok(!duplicate, "1000 GUids should not be equal.");
+    assert.equal((duplicates === 0), true, "1000 GUids should not be equal.");
 });
