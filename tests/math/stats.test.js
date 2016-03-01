@@ -48,5 +48,5 @@ QUnit.test("Test GUID.", function (assert) {
             ++duplicates;
         }
     }
-    assert.equal((duplicates === 0), true, "1000 GUids should not be equal.");
+    assert.equal(duplicates, 0, "1000 GUids should not be equal.");
 });
