@@ -45,25 +45,12 @@ dwv.math.getStats = function (array)
 
 /**
  * Unique ID generator.
- * @class IdGenerator
- * @namespace dwv.math
- * @constructor
+ * See http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
+ * and this answer http://stackoverflow.com/a/13403498.
+ * @method guid
+ * @static
  */
-dwv.math.IdGenerator = function ()
+dwv.math.guid = function ()
 {
-    /**
-     * Root for IDs.
-     * @property root
-     * @private
-     * @type Number
-     */
-    var root = Math.floor( Math.random() * 26 ) + Date.now();
-    /**
-     * Get a unique id.
-     * @method get
-     * @return {Number} The unique Id.
-     */
-    this.get = function () {
-        return root++;
-    };
+    return Math.random().toString(36).substring(2, 15);
 };
