@@ -3,6 +3,12 @@
  * @module math
  */
 var dwv = dwv || {};
+/**
+ * Namespace for math functions.
+ * @class math
+ * @namespace dwv
+ * @static
+ */
 dwv.math = dwv.math || {};
 
 /**
