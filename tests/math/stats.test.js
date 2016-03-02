@@ -42,7 +42,7 @@ QUnit.test("Test GUID.", function (assert) {
     }
     // check duplicates
     var id = 0;
-    for (i = 0; i < ids.length; ++i) {
+    for (i = 0; i < ids.length - 1; ++i) {
         id = ids.pop();
         if (ids.indexOf(id) !== -1) {
             ++duplicates;
