@@ -11993,7 +11993,7 @@ var JpxImage = JpxImage || {};
 
 /**
  * Get data from an input image using a canvas.
- * @method getDataFromImage
+ * @method getViewFromDOMImage
  * @static
  * @param {Image} Image The DOM Image.
  * @return {Mixed} The corresponding view and info.
@@ -12050,6 +12050,9 @@ dwv.image.getViewFromDOMImage = function (image)
 
 /**
  * Create a dwv.image.View from a DICOM buffer.
+ * @class DicomBufferToView
+ * @namespace dwv.image
+ * @constructor
  */
 dwv.image.DicomBufferToView = function (decoderScripts) {
 
@@ -12065,8 +12068,7 @@ dwv.image.DicomBufferToView = function (decoderScripts) {
 
     /**
      * Get data from an input buffer using a DICOM parser.
-     * @method getDataFromDicomBuffer
-     * @static
+     * @method convert
      * @param {Array} buffer The input data buffer.
      * @param {Object} callback The callback on the conversion.
      * @return {Mixed} The corresponding view and info.
@@ -12135,12 +12137,11 @@ dwv.image.DicomBufferToView = function (decoderScripts) {
                 }
                 decodedBufferToView({data: decodedBuffer});
             }
-       }
+        }
         else {
             decodedBufferToView({data: pixelBuffer});
         }
     };
-
 };
 ;/** 
  * Image module.
@@ -14626,6 +14627,12 @@ dwv.math.Path.prototype.appenPath = function(other) {
  * @module math
  */
 var dwv = dwv || {};
+/**
+ * Namespace for math functions.
+ * @class math
+ * @namespace dwv
+ * @static
+ */
 dwv.math = dwv.math || {};
 
 /**

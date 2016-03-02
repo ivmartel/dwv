@@ -67,6 +67,7 @@
                                 <li><a href="../classes/dwv.html.Layer.html">dwv.html.Layer</a></li>
                                 <li><a href="../classes/dwv.html.Style.html">dwv.html.Style</a></li>
                                 <li><a href="../classes/dwv.image.html">dwv.image</a></li>
+                                <li><a href="../classes/dwv.image.DicomBufferToView.html">dwv.image.DicomBufferToView</a></li>
                                 <li><a href="../classes/dwv.image.filter.Sharpen.html">dwv.image.filter.Sharpen</a></li>
                                 <li><a href="../classes/dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li>
                                 <li><a href="../classes/dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li>
@@ -214,12 +215,7 @@
 
                     <ul class="index-list methods">
                             <li class="index-item method">
-                                <a href="#method_getDataFromDicomBuffer">getDataFromDicomBuffer</a>
-
-                                    <span class="flag static">static</span>
-                            </li>
-                            <li class="index-item method">
-                                <a href="#method_getDataFromImage">getDataFromImage</a>
+                                <a href="#method_getViewFromDOMImage">getViewFromDOMImage</a>
 
                                     <span class="flag static">static</span>
                             </li>
@@ -233,89 +229,8 @@
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
 
-<div id="method_getDataFromDicomBuffer" class="method item">
-    <h3 class="name"><code>getDataFromDicomBuffer</code></h3>
-
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>buffer</code>
-                </li>
-                <li class="arg">
-                        <code>callback</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
-
-        <span class="returns-inline">
-            <span class="type">Mixed</span>
-        </span>
-
-
-
-
-        <span class="flag static">static</span>
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/src_image_reader.js.html#l98"><code>src&#x2F;image&#x2F;reader.js:98</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Get data from an input buffer using a DICOM parser.</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">buffer</code>
-                        <span class="type">Array</span>
-
-
-                    <div class="param-description">
-                        <p>The input data buffer.</p>
-
-                    </div>
-
-                </li>
-                <li class="param">
-                        <code class="param-name">callback</code>
-                        <span class="type">Object</span>
-
-
-                    <div class="param-description">
-                        <p>The callback on the conversion.</p>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                        <span class="type">Mixed</span>:
-                    <p>The corresponding view and info.</p>
-
-            </div>
-        </div>
-
-
-</div>
-<div id="method_getDataFromImage" class="method item">
-    <h3 class="name"><code>getDataFromImage</code></h3>
+<div id="method_getViewFromDOMImage" class="method item">
+    <h3 class="name"><code>getViewFromDOMImage</code></h3>
 
         <div class="args">
             <span class="paren">(</span><ul class="args-list inline commas">

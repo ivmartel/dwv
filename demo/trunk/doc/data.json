@@ -276,11 +276,13 @@
             "name": "src/image/reader.js",
             "modules": {},
             "classes": {
-                "dwv.image": 1
+                "dwv.image": 1,
+                "dwv.image.DicomBufferToView": 1
             },
             "fors": {},
             "namespaces": {
-                "dwv": 1
+                "dwv": 1,
+                "dwv.image": 1
             }
         },
         "src/image/view.js": {
@@ -365,7 +367,6 @@
             "name": "src/math/shapes.js",
             "modules": {},
             "classes": {
-                "dwv.math": 1,
                 "dwv.math.Circle": 1,
                 "dwv.math.Ellipse": 1,
                 "dwv.math.Line": 1,
@@ -382,9 +383,13 @@
         "src/math/stats.js": {
             "name": "src/math/stats.js",
             "modules": {},
-            "classes": {},
+            "classes": {
+                "dwv.math": 1
+            },
             "fors": {},
-            "namespaces": {}
+            "namespaces": {
+                "dwv": 1
+            }
         },
         "src/tools/draw.js": {
             "name": "src/tools/draw.js",
@@ -765,6 +770,7 @@
                 "dwv.image.lut.Rescale": 1,
                 "dwv.image.lut.Window": 1,
                 "dwv.image": 1,
+                "dwv.image.DicomBufferToView": 1,
                 "dwv.image.View": 1,
                 "dwv.image.ViewFactory": 1
             },
@@ -1656,6 +1662,21 @@
             "description": "Namespace for image related functions.",
             "static": 1
         },
+        "dwv.image.DicomBufferToView": {
+            "name": "dwv.image.DicomBufferToView",
+            "shortname": "dwv.image.DicomBufferToView",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "image",
+            "namespace": "dwv.image",
+            "file": "src/image/reader.js",
+            "line": 83,
+            "description": "Create a dwv.image.View from a DICOM buffer.",
+            "is_constructor": 1
+        },
         "dwv.image.View": {
             "name": "dwv.image.View",
             "shortname": "dwv.image.View",
@@ -1769,7 +1790,7 @@
             "extension_for": [],
             "module": "math",
             "namespace": "dwv",
-            "file": "src/math/shapes.js",
+            "file": "src/math/stats.js",
             "line": 6,
             "description": "Namespace for math functions.",
             "static": 1
@@ -8570,7 +8591,7 @@
             "line": 26,
             "description": "Get data from an input image using a canvas.",
             "itemtype": "method",
-            "name": "getDataFromImage",
+            "name": "getViewFromDOMImage",
             "static": 1,
             "params": [
                 {
@@ -8589,19 +8610,10 @@
         },
         {
             "file": "src/image/reader.js",
-            "line": 83,
-            "description": "Create a dwv.image.View from a DICOM buffer.",
-            "class": "dwv.image",
-            "module": "image",
-            "namespace": "dwv"
-        },
-        {
-            "file": "src/image/reader.js",
-            "line": 98,
+            "line": 101,
             "description": "Get data from an input buffer using a DICOM parser.",
             "itemtype": "method",
-            "name": "getDataFromDicomBuffer",
-            "static": 1,
+            "name": "convert",
             "params": [
                 {
                     "name": "buffer",
@@ -8618,9 +8630,9 @@
                 "description": "The corresponding view and info.",
                 "type": "Mixed"
             },
-            "class": "dwv.image",
+            "class": "dwv.image.DicomBufferToView",
             "module": "image",
-            "namespace": "dwv"
+            "namespace": "dwv.image"
         },
         {
             "file": "src/image/view.js",
@@ -10585,23 +10597,25 @@
         },
         {
             "file": "src/math/stats.js",
-            "line": 8,
+            "line": 14,
             "description": "Get the minimum, maximum, mean and standard deviation\nof an array of values.\nNote: could use https://github.com/tmcw/simple-statistics",
             "itemtype": "method",
             "name": "getStats",
             "static": 1,
-            "class": "dwv.tool.DrawGroupCommand",
-            "module": "math"
+            "class": "dwv.math",
+            "module": "math",
+            "namespace": "dwv"
         },
         {
             "file": "src/math/stats.js",
-            "line": 46,
+            "line": 52,
             "description": "Unique ID generator.\nSee http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript\nand this answer http://stackoverflow.com/a/13403498.",
             "itemtype": "method",
             "name": "guid",
             "static": 1,
-            "class": "dwv.tool.DrawGroupCommand",
-            "module": "math"
+            "class": "dwv.math",
+            "module": "math",
+            "namespace": "dwv"
         },
         {
             "file": "src/tools/draw.js",
@@ -14477,10 +14491,6 @@
         {
             "message": "Missing item type\nLookup tables for image colour display.",
             "line": " src/image/luts.js:223"
-        },
-        {
-            "message": "Missing item type\nCreate a dwv.image.View from a DICOM buffer.",
-            "line": " src/image/reader.js:83"
         },
         {
             "message": "Missing item type",

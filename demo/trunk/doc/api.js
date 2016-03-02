@@ -33,6 +33,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "dwv.html.Layer",
         "dwv.html.Style",
         "dwv.image",
+        "dwv.image.DicomBufferToView",
         "dwv.image.Geometry",
         "dwv.image.Image",
         "dwv.image.ImageFactory",
