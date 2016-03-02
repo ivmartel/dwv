@@ -33,7 +33,7 @@ appgui.js
 /dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-icons_cccccc_256x240.png
 /dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-icons_ffffff_256x240.png
 # js
-/dwv/demo/stable/ext/jquery/jquery-2.2.1.min.js
+/dwv/demo/stable/ext/jquery/jquery-2.1.4.min.js
 /dwv/demo/stable/ext/jquery-ui/jquery-ui-1.11.4.min.js
 /dwv/demo/stable/ext/pdfjs/jpx.js
 /dwv/demo/stable/ext/pdfjs/arithmetic_decoder.js
