@@ -1,69 +1,124 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>JSDoc: Class: ShapeEditor</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>DocStrap Class: ShapeEditor</title>
 
-    <script src="scripts/prettify/prettify.js"> </script>
-    <script src="scripts/prettify/lang-css.js"> </script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.cosmo.css">
+
 </head>
 
 <body>
 
-<div id="main">
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">DocStrap</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="dwv.html">dwv</a></li><li><a href="dwv.browser.html">dwv.browser</a></li><li><a href="dwv.dicom.html">dwv.dicom</a></li><li><a href="dwv.gui.html">dwv.gui</a></li><li><a href="dwv.gui.base.html">dwv.gui.base</a></li><li><a href="dwv.gui.filter.html">dwv.gui.filter</a></li><li><a href="dwv.gui.filter.base.html">dwv.gui.filter.base</a></li><li><a href="dwv.html.html">dwv.html</a></li><li><a href="dwv.image.html">dwv.image</a></li><li><a href="dwv.image.filter.html">dwv.image.filter</a></li><li><a href="dwv.image.lut.html">dwv.image.lut</a></li><li><a href="dwv.info.html">dwv.info</a></li><li><a href="dwv.io.html">dwv.io</a></li><li><a href="dwv.math.html">dwv.math</a></li><li><a href="dwv.tool.html">dwv.tool</a></li><li><a href="dwv.tool.filter.html">dwv.tool.filter</a></li><li><a href="dwv.utils.html">dwv.utils</a></li><li><a href="dwv.utils.base.html">dwv.utils.base</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="dwv.App.html">dwv.App</a></li><li><a href="dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li><li><a href="dwv.dicom.DataWriter.html">dwv.dicom.DataWriter</a></li><li><a href="dwv.dicom.DicomElementsWrapper.html">dwv.dicom.DicomElementsWrapper</a></li><li><a href="dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li><li><a href="dwv.dicom.DicomWriter.html">dwv.dicom.DicomWriter</a></li><li><a href="dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li><li><a href="dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li><li><a href="dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li><li><a href="dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li><li><a href="dwv.gui.base.Livewire.html">dwv.gui.base.Livewire</a></li><li><a href="dwv.gui.base.Loadbox.html">dwv.gui.base.Loadbox</a></li><li><a href="dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li><li><a href="dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li><li><a href="dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li><li><a href="dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li><li><a href="dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li><li><a href="dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li><li><a href="dwv.gui.base.Undo.html">dwv.gui.base.Undo</a></li><li><a href="dwv.gui.base.UrlLoad.html">dwv.gui.base.UrlLoad</a></li><li><a href="dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li><li><a href="dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li><li><a href="dwv.html.Layer.html">dwv.html.Layer</a></li><li><a href="dwv.html.Style.html">dwv.html.Style</a></li><li><a href="dwv.image.DicomBufferToView.html">dwv.image.DicomBufferToView</a></li><li><a href="dwv.image.filter.Sharpen.html">dwv.image.filter.Sharpen</a></li><li><a href="dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li><li><a href="dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li><li><a href="dwv.image.Geometry.html">dwv.image.Geometry</a></li><li><a href="dwv.image.Image.html">dwv.image.Image</a></li><li><a href="dwv.image.ImageFactory.html">dwv.image.ImageFactory</a></li><li><a href="dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li><li><a href="dwv.image.lut.Window.html">dwv.image.lut.Window</a></li><li><a href="dwv.image.RescaleSlopeAndIntercept.html">dwv.image.RescaleSlopeAndIntercept</a></li><li><a href="dwv.image.Size.html">dwv.image.Size</a></li><li><a href="dwv.image.Spacing.html">dwv.image.Spacing</a></li><li><a href="dwv.image.View.html">dwv.image.View</a></li><li><a href="dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li><li><a href="dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li><li><a href="dwv.info.Plot.html">dwv.info.Plot</a></li><li><a href="dwv.info.Position.html">dwv.info.Position</a></li><li><a href="dwv.info.Windowing.html">dwv.info.Windowing</a></li><li><a href="dwv.io.File.html">dwv.io.File</a></li><li><a href="dwv.io.Url.html">dwv.io.Url</a></li><li><a href="dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li><li><a href="dwv.math.Circle.html">dwv.math.Circle</a></li><li><a href="dwv.math.Ellipse.html">dwv.math.Ellipse</a></li><li><a href="dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li><li><a href="dwv.math.Index3D.html">dwv.math.Index3D</a></li><li><a href="dwv.math.Line.html">dwv.math.Line</a></li><li><a href="dwv.math.Path.html">dwv.math.Path</a></li><li><a href="dwv.math.Point2D.html">dwv.math.Point2D</a></li><li><a href="dwv.math.Point3D.html">dwv.math.Point3D</a></li><li><a href="dwv.math.Rectangle.html">dwv.math.Rectangle</a></li><li><a href="dwv.math.ROI.html">dwv.math.ROI</a></li><li><a href="dwv.math.Scissors.html">dwv.math.Scissors</a></li><li><a href="dwv.State.html">dwv.State</a></li><li><a href="dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li><li><a href="dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li><li><a href="dwv.tool.Draw.html">dwv.tool.Draw</a></li><li><a href="dwv.tool.DrawGroupCommand.html">dwv.tool.DrawGroupCommand</a></li><li><a href="dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li><li><a href="dwv.tool.Filter_.html">dwv.tool.Filter</a></li><li><a href="dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li><li><a href="dwv.tool.filter.Sobel.html">dwv.tool.filter.Sobel</a></li><li><a href="dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li><li><a href="dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li><li><a href="dwv.tool.Livewire.html">dwv.tool.Livewire</a></li><li><a href="dwv.tool.MoveGroupCommand.html">dwv.tool.MoveGroupCommand</a></li><li><a href="dwv.tool.ProtractorFactory.html">dwv.tool.ProtractorFactory</a></li><li><a href="dwv.tool.RectangleFactory.html">dwv.tool.RectangleFactory</a></li><li><a href="dwv.tool.RoiFactory.html">dwv.tool.RoiFactory</a></li><li><a href="dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li><li><a href="dwv.tool.Scroll.html">dwv.tool.Scroll</a></li><li><a href="dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li><li><a href="dwv.tool.Toolbox.html">dwv.tool.Toolbox</a></li><li><a href="dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li><li><a href="dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li><li><a href="dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li><li><a href="dwv.ToolboxController.html">dwv.ToolboxController</a></li><li><a href="dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li><li><a href="dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li><li><a href="dwv.utils.WorkerThread.html">dwv.utils.WorkerThread</a></li><li><a href="dwv.ViewController.html">dwv.ViewController</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+		<div class="col-sm-3 col-md-3">
+            <form class="navbar-form" role="search">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+	</div>
 
-    <h1 class="page-title">Class: ShapeEditor</h1>
-
-    
-
+</div>
+</div>
 
 
+<div class="container" id="toc-content">
+<div class="row">
 
+	
+	<div class="col-md-8">
+	
+		<div id="main">
+			
+
+	<h1 class="page-title">Class: ShapeEditor</h1>
 <section>
 
 <header>
     
         <h2>
-            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.tool.html">.tool</a>.</span>ShapeEditor</h2>
+            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.tool.html">.tool</a>.</span>
+        
+        ShapeEditor
+        </h2>
         
     
 </header>
+
 
 <article>
     <div class="container-overview">
     
         
+<hr>
+<dt>
+    <h4 class="name" id="ShapeEditor"><span class="type-signature"></span>new ShapeEditor()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Shape editor.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="ShapeEditor"><span class="type-signature"></span>new ShapeEditor<span class="signature">()</span><span class="type-signature"></span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Shape editor.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -73,50 +128,52 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-11">line 11</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line11">line 11</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
     
     </div>
@@ -127,41 +184,50 @@
 
     
 
-     
+    
 
     
 
     
         <h3 class="subsection-title">Members</h3>
 
-        
+        <dl>
             
-<h4 class="name" id="~drawEventCallback"><span class="type-signature">(private, inner) </span>drawEventCallback<span class="type-signature"> :function</span></h4>
+<hr>
+<dt class="name" id="~drawEventCallback">
+    <h4><span class="type-signature">&lt;private, inner> </span>drawEventCallback<span class="type-signature"> :function</span></h4>
 
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Draw event callback.</p>
+    </div>
+    
 
-
-
-<div class="description">
-    Draw event callback.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">function</span>
 
 
-        </li>
-    </ul>
 
+            </li>
+        </ul>
+    
 
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -171,69 +237,78 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-42">line 42</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line42">line 42</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
-
-
-
+    
+</dd>
 
         
             
-<h4 class="name" id="~image"><span class="type-signature">(private, inner) </span>image<span class="type-signature"> :Object</span></h4>
+<hr>
+<dt class="name" id="~image">
+    <h4><span class="type-signature">&lt;private, inner> </span>image<span class="type-signature"> :Object</span></h4>
 
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Edited image. Used for quantification update.</p>
+    </div>
+    
 
-
-
-<div class="description">
-    Edited image. Used for quantification update.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">Object</span>
 
 
-        </li>
-    </ul>
 
+            </li>
+        </ul>
+    
 
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -243,69 +318,78 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-24">line 24</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line24">line 24</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
-
-
-
+    
+</dd>
 
         
             
-<h4 class="name" id="~isActive"><span class="type-signature">(private, inner) </span>isActive<span class="type-signature"> :Boolean</span></h4>
+<hr>
+<dt class="name" id="~isActive">
+    <h4><span class="type-signature">&lt;private, inner> </span>isActive<span class="type-signature"> :Boolean</span></h4>
 
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Active flag.</p>
+    </div>
+    
 
-
-
-<div class="description">
-    Active flag.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">Boolean</span>
 
 
-        </li>
-    </ul>
 
+            </li>
+        </ul>
+    
 
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -315,69 +399,78 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-30">line 30</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line30">line 30</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
-
-
-
+    
+</dd>
 
         
             
-<h4 class="name" id="~shape"><span class="type-signature">(private, inner) </span>shape<span class="type-signature"> :Object</span></h4>
+<hr>
+<dt class="name" id="~shape">
+    <h4><span class="type-signature">&lt;private, inner> </span>shape<span class="type-signature"> :Object</span></h4>
 
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Edited shape.</p>
+    </div>
+    
 
-
-
-<div class="description">
-    Edited shape.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">Object</span>
 
 
-        </li>
-    </ul>
 
+            </li>
+        </ul>
+    
 
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -387,69 +480,78 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-18">line 18</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line18">line 18</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
-
-
-
+    
+</dd>
 
         
             
-<h4 class="name" id="~updateFunction"><span class="type-signature">(private, inner) </span>updateFunction<span class="type-signature"> :function</span></h4>
+<hr>
+<dt class="name" id="~updateFunction">
+    <h4><span class="type-signature">&lt;private, inner> </span>updateFunction<span class="type-signature"> :function</span></h4>
 
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Update function used by anchors to update the shape.</p>
+    </div>
+    
 
-
-
-<div class="description">
-    Update function used by anchors to update the shape.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">function</span>
 
 
-        </li>
-    </ul>
 
+            </li>
+        </ul>
+    
 
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -459,75 +561,79 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-36">line 36</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line36">line 36</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
+</dd>
 
-
-
-
-        
+        </dl>
     
 
     
         <h3 class="subsection-title">Methods</h3>
 
-        
+        <dl>
             
+<hr>
+<dt>
+    <h4 class="name" id="disable"><span class="type-signature"></span>disable()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Disable the editor. Redraws the layer.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="disable"><span class="type-signature"></span>disable<span class="signature">()</span><span class="type-signature"></span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Disable the editor. Redraws the layer.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -537,79 +643,85 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-105">line 105</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line105">line 105</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="enable"><span class="type-signature"></span>enable()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Enable the editor. Redraws the layer.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="enable"><span class="type-signature"></span>enable<span class="signature">()</span><span class="type-signature"></span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Enable the editor. Redraws the layer.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -619,79 +731,85 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-92">line 92</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line92">line 92</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="getShape"><span class="type-signature"></span>getShape()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get the edited shape.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="getShape"><span class="type-signature"></span>getShape<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Get the edited shape.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -701,53 +819,54 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-69">line 69</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line69">line 69</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The edited shape.
+    <p>The edited shape.</p>
 </div>
 
 
@@ -761,41 +880,48 @@
 <span class="param-type">Object</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="isActive"><span class="type-signature"></span>isActive()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get the active flag.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="isActive"><span class="type-signature"></span>isActive<span class="signature">()</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Get the active flag.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -805,53 +931,54 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-77">line 77</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line77">line 77</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The active flag.
+    <p>The active flag.</p>
 </div>
 
 
@@ -865,41 +992,48 @@
 <span class="param-type">Boolean</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="resetAnchors"><span class="type-signature"></span>resetAnchors()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Reset the anchors.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="resetAnchors"><span class="type-signature"></span>resetAnchors<span class="signature">()</span><span class="type-signature"></span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Reset the anchors.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -909,78 +1043,79 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-118">line 118</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line118">line 118</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="setAnchorsActive"><span class="type-signature"></span>setAnchorsActive(flag)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Set anchors active.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="setAnchorsActive"><span class="type-signature"></span>setAnchorsActive<span class="signature">(flag)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    Set anchors active.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -1011,6 +1146,7 @@
 <span class="param-type">Boolean</span>
 
 
+
             
             </td>
 
@@ -1018,19 +1154,24 @@
 
             
 
-            <td class="description last">The active (on/off) flag.</td>
+            <td class="description last"><p>The active (on/off) flag.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1040,78 +1181,79 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-152">line 152</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line152">line 152</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="setDrawEventCallback"><span class="type-signature"></span>setDrawEventCallback(callback)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Set the draw event callback.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="setDrawEventCallback"><span class="type-signature"></span>setDrawEventCallback<span class="signature">(callback)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    Set the draw event callback.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -1142,6 +1284,7 @@
 <span class="param-type">Object</span>
 
 
+
             
             </td>
 
@@ -1149,19 +1292,24 @@
 
             
 
-            <td class="description last">The callback.</td>
+            <td class="description last"><p>The callback.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1171,78 +1319,79 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-85">line 85</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line85">line 85</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="setImage"><span class="type-signature"></span>setImage(img)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Set the associated image.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="setImage"><span class="type-signature"></span>setImage<span class="signature">(img)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    Set the associated image.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -1273,6 +1422,7 @@
 <span class="param-type">Object</span>
 
 
+
             
             </td>
 
@@ -1280,19 +1430,24 @@
 
             
 
-            <td class="description last">The associated image.</td>
+            <td class="description last"><p>The associated image.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1302,78 +1457,79 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-61">line 61</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line61">line 61</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="setShape"><span class="type-signature"></span>setShape(inshape)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Set the shape to edit.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="setShape"><span class="type-signature"></span>setShape<span class="signature">(inshape)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    Set the shape to edit.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -1404,6 +1560,7 @@
 <span class="param-type">Object</span>
 
 
+
             
             </td>
 
@@ -1411,19 +1568,24 @@
 
             
 
-            <td class="description last">The shape to edit.</td>
+            <td class="description last"><p>The shape to edit.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1433,78 +1595,79 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-48">line 48</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line48">line 48</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="~addAnchor"><span class="type-signature">&lt;inner> </span>addAnchor(group, x, y, id)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Create shape editor controls, i.e. the anchors.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="~addAnchor"><span class="type-signature">(inner) </span>addAnchor<span class="signature">(group, x, y, id)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    Create shape editor controls, i.e. the anchors.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -1535,6 +1698,7 @@
 <span class="param-type">Object</span>
 
 
+
             
             </td>
 
@@ -1542,7 +1706,7 @@
 
             
 
-            <td class="description last">The group associated with this anchor.</td>
+            <td class="description last"><p>The group associated with this anchor.</p></td>
         </tr>
 
     
@@ -1558,6 +1722,7 @@
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -1565,7 +1730,7 @@
 
             
 
-            <td class="description last">The X position of the anchor.</td>
+            <td class="description last"><p>The X position of the anchor.</p></td>
         </tr>
 
     
@@ -1581,6 +1746,7 @@
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -1588,7 +1754,7 @@
 
             
 
-            <td class="description last">The Y position of the anchor.</td>
+            <td class="description last"><p>The Y position of the anchor.</p></td>
         </tr>
 
     
@@ -1604,6 +1770,7 @@
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -1611,19 +1778,24 @@
 
             
 
-            <td class="description last">The id of the anchor.</td>
+            <td class="description last"><p>The id of the anchor.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1633,79 +1805,85 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-251">line 251</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line251">line 251</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="~addAnchors"><span class="type-signature">&lt;inner> </span>addAnchors()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Add the shape anchors.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="~addAnchors"><span class="type-signature">(inner) </span>addAnchors<span class="signature">()</span><span class="type-signature"></span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Add the shape anchors.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1715,78 +1893,79 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-179">line 179</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line179">line 179</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="~applyFuncToAnchors"><span class="type-signature">&lt;inner> </span>applyFuncToAnchors(func)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Apply a function on all anchors.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="~applyFuncToAnchors"><span class="type-signature">(inner) </span>applyFuncToAnchors<span class="signature">(func)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    Apply a function on all anchors.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -1817,6 +1996,7 @@
 <span class="param-type">Object</span>
 
 
+
             
             </td>
 
@@ -1824,19 +2004,24 @@
 
             
 
-            <td class="description last">A f(shape) function.</td>
+            <td class="description last"><p>A f(shape) function.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1846,78 +2031,79 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-131">line 131</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line131">line 131</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="~getClone"><span class="type-signature">&lt;inner> </span>getClone(anchor)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get a simple clone of the input anchor.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="~getClone"><span class="type-signature">(inner) </span>getClone<span class="signature">(anchor)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    Get a simple clone of the input anchor.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -1948,6 +2134,7 @@
 <span class="param-type">Object</span>
 
 
+
             
             </td>
 
@@ -1955,19 +2142,24 @@
 
             
 
-            <td class="description last">The anchor to clone.</td>
+            <td class="description last"><p>The anchor to clone.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1977,79 +2169,85 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-279">line 279</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line279">line 279</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="~removeAnchors"><span class="type-signature">&lt;inner> </span>removeAnchors()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Remove anchors.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="~removeAnchors"><span class="type-signature">(inner) </span>removeAnchors<span class="signature">()</span><span class="type-signature"></span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Remove anchors.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -2059,78 +2257,79 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-170">line 170</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line170">line 170</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="~setAnchorOff"><span class="type-signature">&lt;inner> </span>setAnchorOff(anchor)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Set the anchor off listeners.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="~setAnchorOff"><span class="type-signature">(inner) </span>setAnchorOff<span class="signature">(anchor)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    Set the anchor off listeners.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -2161,6 +2360,7 @@
 <span class="param-type">Object</span>
 
 
+
             
             </td>
 
@@ -2168,19 +2368,24 @@
 
             
 
-            <td class="description last">The anchor to set off.</td>
+            <td class="description last"><p>The anchor to set off.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -2190,78 +2395,79 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-390">line 390</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line390">line 390</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="~setAnchorOn"><span class="type-signature">&lt;inner> </span>setAnchorOn(anchor)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Set the anchor on listeners.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="~setAnchorOn"><span class="type-signature">(inner) </span>setAnchorOn<span class="signature">(anchor)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    Set the anchor on listeners.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -2292,6 +2498,7 @@
 <span class="param-type">Object</span>
 
 
+
             
             </td>
 
@@ -2299,19 +2506,24 @@
 
             
 
-            <td class="description last">The anchor to set on.</td>
+            <td class="description last"><p>The anchor to set on.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -2321,78 +2533,79 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-306">line 306</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line306">line 306</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="~setAnchorsVisible"><span class="type-signature">&lt;inner> </span>setAnchorsVisible(flag)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Set anchors visibility.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="~setAnchorsVisible"><span class="type-signature">(inner) </span>setAnchorsVisible<span class="signature">(flag)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    Set anchors visibility.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -2423,6 +2636,7 @@
 <span class="param-type">Boolean</span>
 
 
+
             
             </td>
 
@@ -2430,19 +2644,24 @@
 
             
 
-            <td class="description last">The visible flag.</td>
+            <td class="description last"><p>The visible flag.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -2452,52 +2671,54 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_editor.js.html">src/tools/editor.js</a>,
+				 <a href="src_tools_editor.js.html#sunlight-1-line-142">line 142</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tools_editor.js.html">tools/editor.js</a>, <a href="tools_editor.js.html#line142">line 142</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
+</dd>
 
-
-
-
-
-
-
-
-        
+        </dl>
     
 
     
@@ -2510,19 +2731,131 @@
 
 
 
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
+	
+
+</div>
 </div>
 
-<nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="dwv.App.html">App</a></li><li><a href="dwv.dicom.DataReader.html">DataReader</a></li><li><a href="dwv.dicom.DataWriter.html">DataWriter</a></li><li><a href="dwv.dicom.DicomElementsWrapper.html">DicomElementsWrapper</a></li><li><a href="dwv.dicom.DicomParser.html">DicomParser</a></li><li><a href="dwv.dicom.DicomWriter.html">DicomWriter</a></li><li><a href="dwv.gui.base.DicomTags.html">DicomTags</a></li><li><a href="dwv.gui.base.Draw.html">Draw</a></li><li><a href="dwv.gui.base.FileLoad.html">FileLoad</a></li><li><a href="dwv.gui.base.Filter.html">Filter</a></li><li><a href="dwv.gui.base.Livewire.html">Livewire</a></li><li><a href="dwv.gui.base.Loadbox.html">Loadbox</a></li><li><a href="dwv.gui.base.Scroll.html">Scroll</a></li><li><a href="dwv.gui.base.Sharpen.html">Sharpen</a></li><li><a href="dwv.gui.base.Slider.html">Slider</a></li><li><a href="dwv.gui.base.Sobel.html">Sobel</a></li><li><a href="dwv.gui.base.Threshold.html">Threshold</a></li><li><a href="dwv.gui.base.Toolbox.html">Toolbox</a></li><li><a href="dwv.gui.base.Undo.html">Undo</a></li><li><a href="dwv.gui.base.UrlLoad.html">UrlLoad</a></li><li><a href="dwv.gui.base.WindowLevel.html">WindowLevel</a></li><li><a href="dwv.gui.base.ZoomAndPan.html">ZoomAndPan</a></li><li><a href="dwv.html.Layer.html">Layer</a></li><li><a href="dwv.html.Style.html">Style</a></li><li><a href="dwv.image.DicomBufferToView.html">DicomBufferToView</a></li><li><a href="dwv.image.filter.Sharpen.html">Sharpen</a></li><li><a href="dwv.image.filter.Sobel.html">Sobel</a></li><li><a href="dwv.image.filter.Threshold.html">Threshold</a></li><li><a href="dwv.image.Geometry.html">Geometry</a></li><li><a href="dwv.image.Image.html">Image</a></li><li><a href="dwv.image.ImageFactory.html">ImageFactory</a></li><li><a href="dwv.image.lut.Rescale.html">Rescale</a></li><li><a href="dwv.image.lut.Window.html">Window</a></li><li><a href="dwv.image.RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></li><li><a href="dwv.image.Size.html">Size</a></li><li><a href="dwv.image.Spacing.html">Spacing</a></li><li><a href="dwv.image.View.html">View</a></li><li><a href="dwv.image.ViewFactory.html">ViewFactory</a></li><li><a href="dwv.info.MiniColourMap.html">MiniColourMap</a></li><li><a href="dwv.info.Plot.html">Plot</a></li><li><a href="dwv.info.Position.html">Position</a></li><li><a href="dwv.info.Windowing.html">Windowing</a></li><li><a href="dwv.io.File.html">File</a></li><li><a href="dwv.io.Url.html">Url</a></li><li><a href="dwv.math.BucketQueue.html">BucketQueue</a></li><li><a href="dwv.math.Circle.html">Circle</a></li><li><a href="dwv.math.Ellipse.html">Ellipse</a></li><li><a href="dwv.math.FastPoint2D.html">FastPoint2D</a></li><li><a href="dwv.math.Index3D.html">Index3D</a></li><li><a href="dwv.math.Line.html">Line</a></li><li><a href="dwv.math.Path.html">Path</a></li><li><a href="dwv.math.Point2D.html">Point2D</a></li><li><a href="dwv.math.Point3D.html">Point3D</a></li><li><a href="dwv.math.Rectangle.html">Rectangle</a></li><li><a href="dwv.math.ROI.html">ROI</a></li><li><a href="dwv.math.Scissors.html">Scissors</a></li><li><a href="dwv.State.html">State</a></li><li><a href="dwv.tool.ChangeGroupCommand.html">ChangeGroupCommand</a></li><li><a href="dwv.tool.DeleteGroupCommand.html">DeleteGroupCommand</a></li><li><a href="dwv.tool.Draw.html">Draw</a></li><li><a href="dwv.tool.DrawGroupCommand.html">DrawGroupCommand</a></li><li><a href="dwv.tool.EllipseFactory.html">EllipseFactory</a></li><li><a href="dwv.tool.Filter.html">Filter</a></li><li><a href="dwv.tool.filter.Sharpen.html">Sharpen</a></li><li><a href="dwv.tool.filter.Sobel.html">Sobel</a></li><li><a href="dwv.tool.filter.Threshold.html">Threshold</a></li><li><a href="dwv.tool.LineFactory.html">LineFactory</a></li><li><a href="dwv.tool.Livewire.html">Livewire</a></li><li><a href="dwv.tool.MoveGroupCommand.html">MoveGroupCommand</a></li><li><a href="dwv.tool.ProtractorFactory.html">ProtractorFactory</a></li><li><a href="dwv.tool.RectangleFactory.html">RectangleFactory</a></li><li><a href="dwv.tool.RoiFactory.html">RoiFactory</a></li><li><a href="dwv.tool.RunFilterCommand.html">RunFilterCommand</a></li><li><a href="dwv.tool.Scroll.html">Scroll</a></li><li><a href="dwv.tool.ShapeEditor.html">ShapeEditor</a></li><li><a href="dwv.tool.Toolbox.html">Toolbox</a></li><li><a href="dwv.tool.UndoStack.html">UndoStack</a></li><li><a href="dwv.tool.WindowLevel.html">WindowLevel</a></li><li><a href="dwv.tool.ZoomAndPan.html">ZoomAndPan</a></li><li><a href="dwv.ToolboxController.html">ToolboxController</a></li><li><a href="dwv.utils.ThreadPool.html">ThreadPool</a></li><li><a href="dwv.utils.WorkerTask.html">WorkerTask</a></li><li><a href="dwv.utils.WorkerThread.html">WorkerThread</a></li><li><a href="dwv.ViewController.html">ViewController</a></li></ul><h3>Namespaces</h3><ul><li><a href="dwv.html">dwv</a></li><li><a href="dwv.browser.html">browser</a></li><li><a href="dwv.dicom.html">dicom</a></li><li><a href="dwv.gui.html">gui</a></li><li><a href="dwv.gui.base.html">base</a></li><li><a href="dwv.gui.filter.html">filter</a></li><li><a href="dwv.gui.filter.base.html">base</a></li><li><a href="dwv.html.html">html</a></li><li><a href="dwv.image.html">image</a></li><li><a href="dwv.image.filter.html">filter</a></li><li><a href="dwv.image.lut.html">lut</a></li><li><a href="dwv.info.html">info</a></li><li><a href="dwv.io.html">io</a></li><li><a href="dwv.math.html">math</a></li><li><a href="dwv.tool.html">tool</a></li><li><a href="dwv.tool.filter_.html">filter</a></li><li><a href="dwv.utils.html">utils</a></li><li><a href="dwv.utils.base.html">base</a></li></ul>
-</nav>
-
-<br class="clear">
+<div class="modal fade" id="searchResults">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Search results</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Thu Mar 03 2016 23:23:23 GMT+0000 (UTC)
+
+
+	<span class="copyright">
+	DocStrap Copyright © 2012-2015 The contributors to the JSDoc3 and DocStrap projects.
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	
+		on Thu Mar 3rd 2016
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
 </footer>
 
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"> </script>
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+<script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		SearcherDisplay.init();
+	});
+</script>
+
 </body>
 </html>

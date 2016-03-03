@@ -1,68 +1,118 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>JSDoc: Class: Layer</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>DocStrap Class: Layer</title>
 
-    <script src="scripts/prettify/prettify.js"> </script>
-    <script src="scripts/prettify/lang-css.js"> </script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.cosmo.css">
+
 </head>
 
 <body>
 
-<div id="main">
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">DocStrap</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="dwv.html">dwv</a></li><li><a href="dwv.browser.html">dwv.browser</a></li><li><a href="dwv.dicom.html">dwv.dicom</a></li><li><a href="dwv.gui.html">dwv.gui</a></li><li><a href="dwv.gui.base.html">dwv.gui.base</a></li><li><a href="dwv.gui.filter.html">dwv.gui.filter</a></li><li><a href="dwv.gui.filter.base.html">dwv.gui.filter.base</a></li><li><a href="dwv.html.html">dwv.html</a></li><li><a href="dwv.image.html">dwv.image</a></li><li><a href="dwv.image.filter.html">dwv.image.filter</a></li><li><a href="dwv.image.lut.html">dwv.image.lut</a></li><li><a href="dwv.info.html">dwv.info</a></li><li><a href="dwv.io.html">dwv.io</a></li><li><a href="dwv.math.html">dwv.math</a></li><li><a href="dwv.tool.html">dwv.tool</a></li><li><a href="dwv.tool.filter.html">dwv.tool.filter</a></li><li><a href="dwv.utils.html">dwv.utils</a></li><li><a href="dwv.utils.base.html">dwv.utils.base</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="dwv.App.html">dwv.App</a></li><li><a href="dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li><li><a href="dwv.dicom.DataWriter.html">dwv.dicom.DataWriter</a></li><li><a href="dwv.dicom.DicomElementsWrapper.html">dwv.dicom.DicomElementsWrapper</a></li><li><a href="dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li><li><a href="dwv.dicom.DicomWriter.html">dwv.dicom.DicomWriter</a></li><li><a href="dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li><li><a href="dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li><li><a href="dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li><li><a href="dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li><li><a href="dwv.gui.base.Livewire.html">dwv.gui.base.Livewire</a></li><li><a href="dwv.gui.base.Loadbox.html">dwv.gui.base.Loadbox</a></li><li><a href="dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li><li><a href="dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li><li><a href="dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li><li><a href="dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li><li><a href="dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li><li><a href="dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li><li><a href="dwv.gui.base.Undo.html">dwv.gui.base.Undo</a></li><li><a href="dwv.gui.base.UrlLoad.html">dwv.gui.base.UrlLoad</a></li><li><a href="dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li><li><a href="dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li><li><a href="dwv.html.Layer.html">dwv.html.Layer</a></li><li><a href="dwv.html.Style.html">dwv.html.Style</a></li><li><a href="dwv.image.DicomBufferToView.html">dwv.image.DicomBufferToView</a></li><li><a href="dwv.image.filter.Sharpen.html">dwv.image.filter.Sharpen</a></li><li><a href="dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li><li><a href="dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li><li><a href="dwv.image.Geometry.html">dwv.image.Geometry</a></li><li><a href="dwv.image.Image.html">dwv.image.Image</a></li><li><a href="dwv.image.ImageFactory.html">dwv.image.ImageFactory</a></li><li><a href="dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li><li><a href="dwv.image.lut.Window.html">dwv.image.lut.Window</a></li><li><a href="dwv.image.RescaleSlopeAndIntercept.html">dwv.image.RescaleSlopeAndIntercept</a></li><li><a href="dwv.image.Size.html">dwv.image.Size</a></li><li><a href="dwv.image.Spacing.html">dwv.image.Spacing</a></li><li><a href="dwv.image.View.html">dwv.image.View</a></li><li><a href="dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li><li><a href="dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li><li><a href="dwv.info.Plot.html">dwv.info.Plot</a></li><li><a href="dwv.info.Position.html">dwv.info.Position</a></li><li><a href="dwv.info.Windowing.html">dwv.info.Windowing</a></li><li><a href="dwv.io.File.html">dwv.io.File</a></li><li><a href="dwv.io.Url.html">dwv.io.Url</a></li><li><a href="dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li><li><a href="dwv.math.Circle.html">dwv.math.Circle</a></li><li><a href="dwv.math.Ellipse.html">dwv.math.Ellipse</a></li><li><a href="dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li><li><a href="dwv.math.Index3D.html">dwv.math.Index3D</a></li><li><a href="dwv.math.Line.html">dwv.math.Line</a></li><li><a href="dwv.math.Path.html">dwv.math.Path</a></li><li><a href="dwv.math.Point2D.html">dwv.math.Point2D</a></li><li><a href="dwv.math.Point3D.html">dwv.math.Point3D</a></li><li><a href="dwv.math.Rectangle.html">dwv.math.Rectangle</a></li><li><a href="dwv.math.ROI.html">dwv.math.ROI</a></li><li><a href="dwv.math.Scissors.html">dwv.math.Scissors</a></li><li><a href="dwv.State.html">dwv.State</a></li><li><a href="dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li><li><a href="dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li><li><a href="dwv.tool.Draw.html">dwv.tool.Draw</a></li><li><a href="dwv.tool.DrawGroupCommand.html">dwv.tool.DrawGroupCommand</a></li><li><a href="dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li><li><a href="dwv.tool.Filter_.html">dwv.tool.Filter</a></li><li><a href="dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li><li><a href="dwv.tool.filter.Sobel.html">dwv.tool.filter.Sobel</a></li><li><a href="dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li><li><a href="dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li><li><a href="dwv.tool.Livewire.html">dwv.tool.Livewire</a></li><li><a href="dwv.tool.MoveGroupCommand.html">dwv.tool.MoveGroupCommand</a></li><li><a href="dwv.tool.ProtractorFactory.html">dwv.tool.ProtractorFactory</a></li><li><a href="dwv.tool.RectangleFactory.html">dwv.tool.RectangleFactory</a></li><li><a href="dwv.tool.RoiFactory.html">dwv.tool.RoiFactory</a></li><li><a href="dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li><li><a href="dwv.tool.Scroll.html">dwv.tool.Scroll</a></li><li><a href="dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li><li><a href="dwv.tool.Toolbox.html">dwv.tool.Toolbox</a></li><li><a href="dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li><li><a href="dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li><li><a href="dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li><li><a href="dwv.ToolboxController.html">dwv.ToolboxController</a></li><li><a href="dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li><li><a href="dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li><li><a href="dwv.utils.WorkerThread.html">dwv.utils.WorkerThread</a></li><li><a href="dwv.ViewController.html">dwv.ViewController</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+		<div class="col-sm-3 col-md-3">
+            <form class="navbar-form" role="search">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+	</div>
 
-    <h1 class="page-title">Class: Layer</h1>
-
-    
-
+</div>
+</div>
 
 
+<div class="container" id="toc-content">
+<div class="row">
 
+	
+	<div class="col-md-8">
+	
+		<div id="main">
+			
+
+	<h1 class="page-title">Class: Layer</h1>
 <section>
 
 <header>
     
         <h2>
-            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.html.html">.html</a>.</span>Layer</h2>
+            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.html.html">.html</a>.</span>
+        
+        Layer
+        </h2>
         
     
 </header>
+
 
 <article>
     <div class="container-overview">
     
         
+<hr>
+<dt>
+    <h4 class="name" id="Layer"><span class="type-signature"></span>new Layer(name)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Window layer.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="Layer"><span class="type-signature"></span>new Layer<span class="signature">(name)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    Window layer.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -93,6 +143,7 @@
 <span class="param-type">String</span>
 
 
+
             
             </td>
 
@@ -100,19 +151,24 @@
 
             
 
-            <td class="description last">The name of the layer.</td>
+            <td class="description last"><p>The name of the layer.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -122,50 +178,52 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-10">line 10</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line10">line 10</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
     
     </div>
@@ -176,41 +234,50 @@
 
     
 
-     
+    
 
     
 
     
         <h3 class="subsection-title">Members</h3>
 
-        
+        <dl>
             
-<h4 class="name" id="~cacheCanvas"><span class="type-signature">(private, inner) </span>cacheCanvas<span class="type-signature"> :Object</span></h4>
+<hr>
+<dt class="name" id="~cacheCanvas">
+    <h4><span class="type-signature">&lt;private, inner> </span>cacheCanvas<span class="type-signature"> :Object</span></h4>
 
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>A cache of the initial canvas.</p>
+    </div>
+    
 
-
-
-<div class="description">
-    A cache of the initial canvas.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">Object</span>
 
 
-        </li>
-    </ul>
 
+            </li>
+        </ul>
+    
 
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -220,69 +287,78 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-23">line 23</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line23">line 23</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
-
-
-
+    
+</dd>
 
         
             
-<h4 class="name" id="~context"><span class="type-signature">(private, inner) </span>context<span class="type-signature"> :Object</span></h4>
+<hr>
+<dt class="name" id="~context">
+    <h4><span class="type-signature">&lt;private, inner> </span>context<span class="type-signature"> :Object</span></h4>
 
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>The associated CanvasRenderingContext2D.</p>
+    </div>
+    
 
-
-
-<div class="description">
-    The associated CanvasRenderingContext2D.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">Object</span>
 
 
-        </li>
-    </ul>
 
+            </li>
+        </ul>
+    
 
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -292,69 +368,78 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-29">line 29</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line29">line 29</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
-
-
-
+    
+</dd>
 
         
             
-<h4 class="name" id="~imageData"><span class="type-signature">(private, inner) </span>imageData<span class="type-signature"> :Array</span></h4>
+<hr>
+<dt class="name" id="~imageData">
+    <h4><span class="type-signature">&lt;private, inner> </span>imageData<span class="type-signature"> :Array</span></h4>
 
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>The image data array.</p>
+    </div>
+    
 
-
-
-<div class="description">
-    The image data array.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">Array</span>
 
 
-        </li>
-    </ul>
 
+            </li>
+        </ul>
+    
 
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -364,69 +449,78 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-57">line 57</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line57">line 57</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
-
-
-
+    
+</dd>
 
         
             
-<h4 class="name" id="~origin"><span class="type-signature">(private, inner) </span>origin<span class="type-signature"> :Object</span></h4>
+<hr>
+<dt class="name" id="~origin">
+    <h4><span class="type-signature">&lt;private, inner> </span>origin<span class="type-signature"> :Object</span></h4>
 
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>The layer origin.</p>
+    </div>
+    
 
-
-
-<div class="description">
-    The layer origin.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">Object</span>
 
 
-        </li>
-    </ul>
 
+            </li>
+        </ul>
+    
 
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -436,69 +530,78 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-64">line 64</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line64">line 64</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
-
-
-
+    
+</dd>
 
         
             
-<h4 class="name" id="~zoom"><span class="type-signature">(private, inner) </span>zoom<span class="type-signature"> :Object</span></h4>
+<hr>
+<dt class="name" id="~zoom">
+    <h4><span class="type-signature">&lt;private, inner> </span>zoom<span class="type-signature"> :Object</span></h4>
 
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>The image zoom.</p>
+    </div>
+    
 
-
-
-<div class="description">
-    The image zoom.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">Object</span>
 
 
-        </li>
-    </ul>
 
+            </li>
+        </ul>
+    
 
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -508,74 +611,73 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-77">line 77</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line77">line 77</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
+</dd>
 
-
-
-
-        
+        </dl>
     
 
     
         <h3 class="subsection-title">Methods</h3>
 
-        
+        <dl>
             
+<hr>
+<dt>
+    <h4 class="name" id="align"><span class="type-signature"></span>align(rhs)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Align on another layer.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="align"><span class="type-signature"></span>align<span class="signature">(rhs)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    Align on another layer.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -606,6 +708,7 @@
 <span class="param-type">Layer</span>
 
 
+
             
             </td>
 
@@ -613,19 +716,24 @@
 
             
 
-            <td class="description last">The layer to align on.</td>
+            <td class="description last"><p>The layer to align on.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -635,79 +743,85 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-337">line 337</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line337">line 337</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="clear"><span class="type-signature"></span>clear()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Clear the context and reset the image data.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="clear"><span class="type-signature"></span>clear<span class="signature">()</span><span class="type-signature"></span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Clear the context and reset the image data.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -717,79 +831,85 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-249">line 249</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line249">line 249</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="displayToIndex"><span class="type-signature"></span>displayToIndex()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Transform a display position to an index.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="displayToIndex"><span class="type-signature"></span>displayToIndex<span class="signature">()</span><span class="type-signature"></span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Transform a display position to an index.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -799,80 +919,85 @@
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-167">line 167</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line167">line 167</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="draw"><span class="type-signature"></span>draw()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Draw the content (imageData) of the layer.<br>The imageData variable needs to be set</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="draw"><span class="type-signature"></span>draw<span class="signature">()</span><span class="type-signature"></span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Draw the content (imageData) of the layer.
-The imageData variable needs to be set
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -882,79 +1007,85 @@ The imageData variable needs to be set
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-176">line 176</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line176">line 176</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="fillContext"><span class="type-signature"></span>fillContext()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Fill the full context with the current style.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="fillContext"><span class="type-signature"></span>fillContext<span class="signature">()</span><span class="type-signature"></span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Fill the full context with the current style.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -964,79 +1095,85 @@ The imageData variable needs to be set
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-241">line 241</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line241">line 241</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="getCanvas"><span class="type-signature"></span>getCanvas()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get the layer canvas.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="getCanvas"><span class="type-signature"></span>getCanvas<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Get the layer canvas.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1046,53 +1183,54 @@ The imageData variable needs to be set
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-40">line 40</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line40">line 40</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The layer canvas.
+    <p>The layer canvas.</p>
 </div>
 
 
@@ -1106,41 +1244,48 @@ The imageData variable needs to be set
 <span class="param-type">Object</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="getContext"><span class="type-signature"></span>getContext()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get the layer context.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="getContext"><span class="type-signature"></span>getContext<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Get the layer context.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1150,53 +1295,54 @@ The imageData variable needs to be set
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-45">line 45</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line45">line 45</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The layer context.
+    <p>The layer context.</p>
 </div>
 
 
@@ -1210,41 +1356,48 @@ The imageData variable needs to be set
 <span class="param-type">Object</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="getOffset"><span class="type-signature"></span>getOffset()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get the layer offset on page.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="getOffset"><span class="type-signature"></span>getOffset<span class="signature">()</span><span class="type-signature"> &rarr; {Number}</span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Get the layer offset on page.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1254,53 +1407,54 @@ The imageData variable needs to be set
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-50">line 50</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line50">line 50</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The layer offset on page.
+    <p>The layer offset on page.</p>
 </div>
 
 
@@ -1314,41 +1468,48 @@ The imageData variable needs to be set
 <span class="param-type">Number</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="getOrigin"><span class="type-signature"></span>getOrigin()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get the layer origin.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="getOrigin"><span class="type-signature"></span>getOrigin<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Get the layer origin.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1358,53 +1519,54 @@ The imageData variable needs to be set
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-69">line 69</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line69">line 69</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The layer origin as {'x','y'}.
+    <p>The layer origin as {'x','y'}.</p>
 </div>
 
 
@@ -1418,41 +1580,48 @@ The imageData variable needs to be set
 <span class="param-type">Object</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="getZoom"><span class="type-signature"></span>getZoom()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get the layer zoom.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="getZoom"><span class="type-signature"></span>getZoom<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Get the layer zoom.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1462,53 +1631,54 @@ The imageData variable needs to be set
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-82">line 82</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line82">line 82</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The layer zoom as {'x','y'}.
+    <p>The layer zoom as {'x','y'}.</p>
 </div>
 
 
@@ -1522,41 +1692,48 @@ The imageData variable needs to be set
 <span class="param-type">Object</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="initialise"><span class="type-signature"></span>initialise()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Initialise the layer: set the canvas and context</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="initialise"><span class="type-signature"></span>initialise<span class="signature">()</span><span class="type-signature"></span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Initialise the layer: set the canvas and context
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1566,79 +1743,85 @@ The imageData variable needs to be set
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-204">line 204</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line204">line 204</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="isVisible"><span class="type-signature"></span>isVisible()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Check if the layer is visible.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="isVisible"><span class="type-signature"></span>isVisible<span class="signature">()</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Check if the layer is visible.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1648,53 +1831,54 @@ The imageData variable needs to be set
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-323">line 323</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line323">line 323</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    True if the layer is visible.
+    <p>True if the layer is visible.</p>
 </div>
 
 
@@ -1708,41 +1892,48 @@ The imageData variable needs to be set
 <span class="param-type">Boolean</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="merge"><span class="type-signature"></span>merge()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Merge two layers.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="merge"><span class="type-signature"></span>merge<span class="signature">()</span><span class="type-signature"></span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Merge two layers.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1752,79 +1943,85 @@ The imageData variable needs to be set
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-260">line 260</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line260">line 260</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="resetLayout"><span class="type-signature"></span>resetLayout()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Reset the layout.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="resetLayout"><span class="type-signature"></span>resetLayout<span class="signature">()</span><span class="type-signature"></span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Reset the layout.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1834,78 +2031,79 @@ The imageData variable needs to be set
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-154">line 154</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line154">line 154</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="setHeight"><span class="type-signature"></span>setHeight(height)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Set the canvas height.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="setHeight"><span class="type-signature"></span>setHeight<span class="signature">(height)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    Set the canvas height.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -1936,6 +2134,7 @@ The imageData variable needs to be set
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -1943,19 +2142,24 @@ The imageData variable needs to be set
 
             
 
-            <td class="description last">The new height.</td>
+            <td class="description last"><p>The new height.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1965,78 +2169,79 @@ The imageData variable needs to be set
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-99">line 99</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line99">line 99</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="setImageData"><span class="type-signature"></span>setImageData(data)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Set the image data array.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="setImageData"><span class="type-signature"></span>setImageData<span class="signature">(data)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    Set the image data array.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -2067,6 +2272,7 @@ The imageData variable needs to be set
 <span class="param-type">Array</span>
 
 
+
             
             </td>
 
@@ -2074,19 +2280,24 @@ The imageData variable needs to be set
 
             
 
-            <td class="description last">The data array.</td>
+            <td class="description last"><p>The data array.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -2096,79 +2307,85 @@ The imageData variable needs to be set
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-144">line 144</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line144">line 144</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="setLineColour"><span class="type-signature"></span>setLineColour()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Set the line colour for the layer.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="setLineColour"><span class="type-signature"></span>setLineColour<span class="signature">()</span><span class="type-signature"></span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Set the line colour for the layer.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -2178,79 +2395,85 @@ The imageData variable needs to be set
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-297">line 297</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line297">line 297</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="setStyleDisplay"><span class="type-signature"></span>setStyleDisplay()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Display the layer.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="setStyleDisplay"><span class="type-signature"></span>setStyleDisplay<span class="signature">()</span><span class="type-signature"></span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Display the layer.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -2260,78 +2483,79 @@ The imageData variable needs to be set
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-307">line 307</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line307">line 307</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="setWidth"><span class="type-signature"></span>setWidth(width)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Set the canvas width.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="setWidth"><span class="type-signature"></span>setWidth<span class="signature">(width)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    Set the canvas width.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -2362,6 +2586,7 @@ The imageData variable needs to be set
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -2369,19 +2594,24 @@ The imageData variable needs to be set
 
             
 
-            <td class="description last">The new width.</td>
+            <td class="description last"><p>The new width.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -2391,79 +2621,79 @@ The imageData variable needs to be set
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-92">line 92</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line92">line 92</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="translate"><span class="type-signature"></span>translate(tx, ty)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Set the layer translation.<br>Translation is according to the last one.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="translate"><span class="type-signature"></span>translate<span class="signature">(tx, ty)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    Set the layer translation.
-Translation is according to the last one.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -2494,6 +2724,7 @@ Translation is according to the last one.
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -2501,7 +2732,7 @@ Translation is according to the last one.
 
             
 
-            <td class="description last">The translation in the X direction.</td>
+            <td class="description last"><p>The translation in the X direction.</p></td>
         </tr>
 
     
@@ -2517,6 +2748,7 @@ Translation is according to the last one.
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -2524,19 +2756,24 @@ Translation is according to the last one.
 
             
 
-            <td class="description last">The translation in the Y direction.</td>
+            <td class="description last"><p>The translation in the Y direction.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -2546,78 +2783,79 @@ Translation is according to the last one.
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-134">line 134</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line134">line 134</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="zoom"><span class="type-signature"></span>zoom(newZoomX, newZoomY, centerX, centerY)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Set the layer zoom.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="zoom"><span class="type-signature"></span>zoom<span class="signature">(newZoomX, newZoomY, centerX, centerY)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    Set the layer zoom.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -2648,6 +2886,7 @@ Translation is according to the last one.
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -2655,7 +2894,7 @@ Translation is according to the last one.
 
             
 
-            <td class="description last">The zoom in the X direction.</td>
+            <td class="description last"><p>The zoom in the X direction.</p></td>
         </tr>
 
     
@@ -2671,6 +2910,7 @@ Translation is according to the last one.
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -2678,7 +2918,7 @@ Translation is according to the last one.
 
             
 
-            <td class="description last">The zoom in the Y direction.</td>
+            <td class="description last"><p>The zoom in the Y direction.</p></td>
         </tr>
 
     
@@ -2694,6 +2934,7 @@ Translation is according to the last one.
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -2701,7 +2942,7 @@ Translation is according to the last one.
 
             
 
-            <td class="description last">The zoom center in the X direction.</td>
+            <td class="description last"><p>The zoom center in the X direction.</p></td>
         </tr>
 
     
@@ -2717,6 +2958,7 @@ Translation is according to the last one.
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -2724,19 +2966,24 @@ Translation is according to the last one.
 
             
 
-            <td class="description last">The zoom center in the Y direction.</td>
+            <td class="description last"><p>The zoom center in the Y direction.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -2746,52 +2993,54 @@ Translation is according to the last one.
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_layer.js.html">src/gui/layer.js</a>,
+				 <a href="src_gui_layer.js.html#sunlight-1-line-110">line 110</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="gui_layer.js.html">gui/layer.js</a>, <a href="gui_layer.js.html#line110">line 110</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
+</dd>
 
-
-
-
-
-
-
-
-        
+        </dl>
     
 
     
@@ -2804,19 +3053,131 @@ Translation is according to the last one.
 
 
 
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
+	
+
+</div>
 </div>
 
-<nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="dwv.App.html">App</a></li><li><a href="dwv.dicom.DataReader.html">DataReader</a></li><li><a href="dwv.dicom.DataWriter.html">DataWriter</a></li><li><a href="dwv.dicom.DicomElementsWrapper.html">DicomElementsWrapper</a></li><li><a href="dwv.dicom.DicomParser.html">DicomParser</a></li><li><a href="dwv.dicom.DicomWriter.html">DicomWriter</a></li><li><a href="dwv.gui.base.DicomTags.html">DicomTags</a></li><li><a href="dwv.gui.base.Draw.html">Draw</a></li><li><a href="dwv.gui.base.FileLoad.html">FileLoad</a></li><li><a href="dwv.gui.base.Filter.html">Filter</a></li><li><a href="dwv.gui.base.Livewire.html">Livewire</a></li><li><a href="dwv.gui.base.Loadbox.html">Loadbox</a></li><li><a href="dwv.gui.base.Scroll.html">Scroll</a></li><li><a href="dwv.gui.base.Sharpen.html">Sharpen</a></li><li><a href="dwv.gui.base.Slider.html">Slider</a></li><li><a href="dwv.gui.base.Sobel.html">Sobel</a></li><li><a href="dwv.gui.base.Threshold.html">Threshold</a></li><li><a href="dwv.gui.base.Toolbox.html">Toolbox</a></li><li><a href="dwv.gui.base.Undo.html">Undo</a></li><li><a href="dwv.gui.base.UrlLoad.html">UrlLoad</a></li><li><a href="dwv.gui.base.WindowLevel.html">WindowLevel</a></li><li><a href="dwv.gui.base.ZoomAndPan.html">ZoomAndPan</a></li><li><a href="dwv.html.Layer.html">Layer</a></li><li><a href="dwv.html.Style.html">Style</a></li><li><a href="dwv.image.DicomBufferToView.html">DicomBufferToView</a></li><li><a href="dwv.image.filter.Sharpen.html">Sharpen</a></li><li><a href="dwv.image.filter.Sobel.html">Sobel</a></li><li><a href="dwv.image.filter.Threshold.html">Threshold</a></li><li><a href="dwv.image.Geometry.html">Geometry</a></li><li><a href="dwv.image.Image.html">Image</a></li><li><a href="dwv.image.ImageFactory.html">ImageFactory</a></li><li><a href="dwv.image.lut.Rescale.html">Rescale</a></li><li><a href="dwv.image.lut.Window.html">Window</a></li><li><a href="dwv.image.RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></li><li><a href="dwv.image.Size.html">Size</a></li><li><a href="dwv.image.Spacing.html">Spacing</a></li><li><a href="dwv.image.View.html">View</a></li><li><a href="dwv.image.ViewFactory.html">ViewFactory</a></li><li><a href="dwv.info.MiniColourMap.html">MiniColourMap</a></li><li><a href="dwv.info.Plot.html">Plot</a></li><li><a href="dwv.info.Position.html">Position</a></li><li><a href="dwv.info.Windowing.html">Windowing</a></li><li><a href="dwv.io.File.html">File</a></li><li><a href="dwv.io.Url.html">Url</a></li><li><a href="dwv.math.BucketQueue.html">BucketQueue</a></li><li><a href="dwv.math.Circle.html">Circle</a></li><li><a href="dwv.math.Ellipse.html">Ellipse</a></li><li><a href="dwv.math.FastPoint2D.html">FastPoint2D</a></li><li><a href="dwv.math.Index3D.html">Index3D</a></li><li><a href="dwv.math.Line.html">Line</a></li><li><a href="dwv.math.Path.html">Path</a></li><li><a href="dwv.math.Point2D.html">Point2D</a></li><li><a href="dwv.math.Point3D.html">Point3D</a></li><li><a href="dwv.math.Rectangle.html">Rectangle</a></li><li><a href="dwv.math.ROI.html">ROI</a></li><li><a href="dwv.math.Scissors.html">Scissors</a></li><li><a href="dwv.State.html">State</a></li><li><a href="dwv.tool.ChangeGroupCommand.html">ChangeGroupCommand</a></li><li><a href="dwv.tool.DeleteGroupCommand.html">DeleteGroupCommand</a></li><li><a href="dwv.tool.Draw.html">Draw</a></li><li><a href="dwv.tool.DrawGroupCommand.html">DrawGroupCommand</a></li><li><a href="dwv.tool.EllipseFactory.html">EllipseFactory</a></li><li><a href="dwv.tool.Filter.html">Filter</a></li><li><a href="dwv.tool.filter.Sharpen.html">Sharpen</a></li><li><a href="dwv.tool.filter.Sobel.html">Sobel</a></li><li><a href="dwv.tool.filter.Threshold.html">Threshold</a></li><li><a href="dwv.tool.LineFactory.html">LineFactory</a></li><li><a href="dwv.tool.Livewire.html">Livewire</a></li><li><a href="dwv.tool.MoveGroupCommand.html">MoveGroupCommand</a></li><li><a href="dwv.tool.ProtractorFactory.html">ProtractorFactory</a></li><li><a href="dwv.tool.RectangleFactory.html">RectangleFactory</a></li><li><a href="dwv.tool.RoiFactory.html">RoiFactory</a></li><li><a href="dwv.tool.RunFilterCommand.html">RunFilterCommand</a></li><li><a href="dwv.tool.Scroll.html">Scroll</a></li><li><a href="dwv.tool.ShapeEditor.html">ShapeEditor</a></li><li><a href="dwv.tool.Toolbox.html">Toolbox</a></li><li><a href="dwv.tool.UndoStack.html">UndoStack</a></li><li><a href="dwv.tool.WindowLevel.html">WindowLevel</a></li><li><a href="dwv.tool.ZoomAndPan.html">ZoomAndPan</a></li><li><a href="dwv.ToolboxController.html">ToolboxController</a></li><li><a href="dwv.utils.ThreadPool.html">ThreadPool</a></li><li><a href="dwv.utils.WorkerTask.html">WorkerTask</a></li><li><a href="dwv.utils.WorkerThread.html">WorkerThread</a></li><li><a href="dwv.ViewController.html">ViewController</a></li></ul><h3>Namespaces</h3><ul><li><a href="dwv.html">dwv</a></li><li><a href="dwv.browser.html">browser</a></li><li><a href="dwv.dicom.html">dicom</a></li><li><a href="dwv.gui.html">gui</a></li><li><a href="dwv.gui.base.html">base</a></li><li><a href="dwv.gui.filter.html">filter</a></li><li><a href="dwv.gui.filter.base.html">base</a></li><li><a href="dwv.html.html">html</a></li><li><a href="dwv.image.html">image</a></li><li><a href="dwv.image.filter.html">filter</a></li><li><a href="dwv.image.lut.html">lut</a></li><li><a href="dwv.info.html">info</a></li><li><a href="dwv.io.html">io</a></li><li><a href="dwv.math.html">math</a></li><li><a href="dwv.tool.html">tool</a></li><li><a href="dwv.tool.filter_.html">filter</a></li><li><a href="dwv.utils.html">utils</a></li><li><a href="dwv.utils.base.html">base</a></li></ul>
-</nav>
-
-<br class="clear">
+<div class="modal fade" id="searchResults">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Search results</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Thu Mar 03 2016 23:23:22 GMT+0000 (UTC)
+
+
+	<span class="copyright">
+	DocStrap Copyright © 2012-2015 The contributors to the JSDoc3 and DocStrap projects.
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	
+		on Thu Mar 3rd 2016
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
 </footer>
 
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"> </script>
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+<script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		SearcherDisplay.init();
+	});
+</script>
+
 </body>
 </html>

@@ -1,72 +1,123 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>JSDoc: Class: Image</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>DocStrap Class: Image</title>
 
-    <script src="scripts/prettify/prettify.js"> </script>
-    <script src="scripts/prettify/lang-css.js"> </script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.cosmo.css">
+
 </head>
 
 <body>
 
-<div id="main">
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">DocStrap</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="dwv.html">dwv</a></li><li><a href="dwv.browser.html">dwv.browser</a></li><li><a href="dwv.dicom.html">dwv.dicom</a></li><li><a href="dwv.gui.html">dwv.gui</a></li><li><a href="dwv.gui.base.html">dwv.gui.base</a></li><li><a href="dwv.gui.filter.html">dwv.gui.filter</a></li><li><a href="dwv.gui.filter.base.html">dwv.gui.filter.base</a></li><li><a href="dwv.html.html">dwv.html</a></li><li><a href="dwv.image.html">dwv.image</a></li><li><a href="dwv.image.filter.html">dwv.image.filter</a></li><li><a href="dwv.image.lut.html">dwv.image.lut</a></li><li><a href="dwv.info.html">dwv.info</a></li><li><a href="dwv.io.html">dwv.io</a></li><li><a href="dwv.math.html">dwv.math</a></li><li><a href="dwv.tool.html">dwv.tool</a></li><li><a href="dwv.tool.filter.html">dwv.tool.filter</a></li><li><a href="dwv.utils.html">dwv.utils</a></li><li><a href="dwv.utils.base.html">dwv.utils.base</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="dwv.App.html">dwv.App</a></li><li><a href="dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li><li><a href="dwv.dicom.DataWriter.html">dwv.dicom.DataWriter</a></li><li><a href="dwv.dicom.DicomElementsWrapper.html">dwv.dicom.DicomElementsWrapper</a></li><li><a href="dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li><li><a href="dwv.dicom.DicomWriter.html">dwv.dicom.DicomWriter</a></li><li><a href="dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li><li><a href="dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li><li><a href="dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li><li><a href="dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li><li><a href="dwv.gui.base.Livewire.html">dwv.gui.base.Livewire</a></li><li><a href="dwv.gui.base.Loadbox.html">dwv.gui.base.Loadbox</a></li><li><a href="dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li><li><a href="dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li><li><a href="dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li><li><a href="dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li><li><a href="dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li><li><a href="dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li><li><a href="dwv.gui.base.Undo.html">dwv.gui.base.Undo</a></li><li><a href="dwv.gui.base.UrlLoad.html">dwv.gui.base.UrlLoad</a></li><li><a href="dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li><li><a href="dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li><li><a href="dwv.html.Layer.html">dwv.html.Layer</a></li><li><a href="dwv.html.Style.html">dwv.html.Style</a></li><li><a href="dwv.image.DicomBufferToView.html">dwv.image.DicomBufferToView</a></li><li><a href="dwv.image.filter.Sharpen.html">dwv.image.filter.Sharpen</a></li><li><a href="dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li><li><a href="dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li><li><a href="dwv.image.Geometry.html">dwv.image.Geometry</a></li><li><a href="dwv.image.Image.html">dwv.image.Image</a></li><li><a href="dwv.image.ImageFactory.html">dwv.image.ImageFactory</a></li><li><a href="dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li><li><a href="dwv.image.lut.Window.html">dwv.image.lut.Window</a></li><li><a href="dwv.image.RescaleSlopeAndIntercept.html">dwv.image.RescaleSlopeAndIntercept</a></li><li><a href="dwv.image.Size.html">dwv.image.Size</a></li><li><a href="dwv.image.Spacing.html">dwv.image.Spacing</a></li><li><a href="dwv.image.View.html">dwv.image.View</a></li><li><a href="dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li><li><a href="dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li><li><a href="dwv.info.Plot.html">dwv.info.Plot</a></li><li><a href="dwv.info.Position.html">dwv.info.Position</a></li><li><a href="dwv.info.Windowing.html">dwv.info.Windowing</a></li><li><a href="dwv.io.File.html">dwv.io.File</a></li><li><a href="dwv.io.Url.html">dwv.io.Url</a></li><li><a href="dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li><li><a href="dwv.math.Circle.html">dwv.math.Circle</a></li><li><a href="dwv.math.Ellipse.html">dwv.math.Ellipse</a></li><li><a href="dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li><li><a href="dwv.math.Index3D.html">dwv.math.Index3D</a></li><li><a href="dwv.math.Line.html">dwv.math.Line</a></li><li><a href="dwv.math.Path.html">dwv.math.Path</a></li><li><a href="dwv.math.Point2D.html">dwv.math.Point2D</a></li><li><a href="dwv.math.Point3D.html">dwv.math.Point3D</a></li><li><a href="dwv.math.Rectangle.html">dwv.math.Rectangle</a></li><li><a href="dwv.math.ROI.html">dwv.math.ROI</a></li><li><a href="dwv.math.Scissors.html">dwv.math.Scissors</a></li><li><a href="dwv.State.html">dwv.State</a></li><li><a href="dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li><li><a href="dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li><li><a href="dwv.tool.Draw.html">dwv.tool.Draw</a></li><li><a href="dwv.tool.DrawGroupCommand.html">dwv.tool.DrawGroupCommand</a></li><li><a href="dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li><li><a href="dwv.tool.Filter_.html">dwv.tool.Filter</a></li><li><a href="dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li><li><a href="dwv.tool.filter.Sobel.html">dwv.tool.filter.Sobel</a></li><li><a href="dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li><li><a href="dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li><li><a href="dwv.tool.Livewire.html">dwv.tool.Livewire</a></li><li><a href="dwv.tool.MoveGroupCommand.html">dwv.tool.MoveGroupCommand</a></li><li><a href="dwv.tool.ProtractorFactory.html">dwv.tool.ProtractorFactory</a></li><li><a href="dwv.tool.RectangleFactory.html">dwv.tool.RectangleFactory</a></li><li><a href="dwv.tool.RoiFactory.html">dwv.tool.RoiFactory</a></li><li><a href="dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li><li><a href="dwv.tool.Scroll.html">dwv.tool.Scroll</a></li><li><a href="dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li><li><a href="dwv.tool.Toolbox.html">dwv.tool.Toolbox</a></li><li><a href="dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li><li><a href="dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li><li><a href="dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li><li><a href="dwv.ToolboxController.html">dwv.ToolboxController</a></li><li><a href="dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li><li><a href="dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li><li><a href="dwv.utils.WorkerThread.html">dwv.utils.WorkerThread</a></li><li><a href="dwv.ViewController.html">dwv.ViewController</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+		<div class="col-sm-3 col-md-3">
+            <form class="navbar-form" role="search">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+	</div>
 
-    <h1 class="page-title">Class: Image</h1>
-
-    
-
+</div>
+</div>
 
 
+<div class="container" id="toc-content">
+<div class="row">
 
+	
+	<div class="col-md-8">
+	
+		<div id="main">
+			
+
+	<h1 class="page-title">Class: Image</h1>
 <section>
 
 <header>
     
         <h2>
-            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.image.html">.image</a>.</span>Image</h2>
+            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.image.html">.image</a>.</span>
+        
+        Image
+        </h2>
         
     
 </header>
+
 
 <article>
     <div class="container-overview">
     
         
+<hr>
+<dt>
+    <h4 class="name" id="Image"><span class="type-signature"></span>new Image(geometry, buffer)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Image class.<br>Usable once created, optional are:</p>
+<ul>
+<li>rescale slope and intercept (default 1:0),</li>
+<li>photometric interpretation (default MONOCHROME2),</li>
+<li>planar configuration (default RGBRGB...).</li>
+</ul>
+    </div>
+    
 
     
 
-    <h4 class="name" id="Image"><span class="type-signature"></span>new Image<span class="signature">(geometry, buffer)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    Image class.
-Usable once created, optional are:
-- rescale slope and intercept (default 1:0),
-- photometric interpretation (default MONOCHROME2),
-- planar configuration (default RGBRGB...).
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -97,6 +148,7 @@ Usable once created, optional are:
 <span class="param-type">Object</span>
 
 
+
             
             </td>
 
@@ -104,7 +156,7 @@ Usable once created, optional are:
 
             
 
-            <td class="description last">The geometry of the image.</td>
+            <td class="description last"><p>The geometry of the image.</p></td>
         </tr>
 
     
@@ -120,6 +172,7 @@ Usable once created, optional are:
 <span class="param-type">Array</span>
 
 
+
             
             </td>
 
@@ -127,19 +180,24 @@ Usable once created, optional are:
 
             
 
-            <td class="description last">The image data.</td>
+            <td class="description last"><p>The image data.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -149,50 +207,52 @@ Usable once created, optional are:
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-78">line 78</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line78">line 78</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
     
     </div>
@@ -203,41 +263,50 @@ Usable once created, optional are:
 
     
 
-     
+    
 
     
 
     
         <h3 class="subsection-title">Members</h3>
 
-        
+        <dl>
             
-<h4 class="name" id="~dataRange"><span class="type-signature">(private, inner) </span>dataRange<span class="type-signature"> :Object</span></h4>
+<hr>
+<dt class="name" id="~dataRange">
+    <h4><span class="type-signature">&lt;private, inner> </span>dataRange<span class="type-signature"> :Object</span></h4>
 
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Data range.</p>
+    </div>
+    
 
-
-
-<div class="description">
-    Data range.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">Object</span>
 
 
-        </li>
-    </ul>
 
+            </li>
+        </ul>
+    
 
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -247,69 +316,78 @@ Usable once created, optional are:
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-126">line 126</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line126">line 126</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
-
-
-
+    
+</dd>
 
         
             
-<h4 class="name" id="~histogram"><span class="type-signature">(private, inner) </span>histogram<span class="type-signature"> :Array</span></h4>
+<hr>
+<dt class="name" id="~histogram">
+    <h4><span class="type-signature">&lt;private, inner> </span>histogram<span class="type-signature"> :Array</span></h4>
 
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Histogram.</p>
+    </div>
+    
 
-
-
-<div class="description">
-    Histogram.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">Array</span>
 
 
-        </li>
-    </ul>
 
+            </li>
+        </ul>
+    
 
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -319,69 +397,78 @@ Usable once created, optional are:
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-138">line 138</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line138">line 138</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
-
-
-
+    
+</dd>
 
         
             
-<h4 class="name" id="~meta"><span class="type-signature">(private, inner) </span>meta<span class="type-signature"> :Object</span></h4>
+<hr>
+<dt class="name" id="~meta">
+    <h4><span class="type-signature">&lt;private, inner> </span>meta<span class="type-signature"> :Object</span></h4>
 
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Meta information.</p>
+    </div>
+    
 
-
-
-<div class="description">
-    Meta information.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">Object</span>
 
 
-        </li>
-    </ul>
 
+            </li>
+        </ul>
+    
 
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -391,69 +478,78 @@ Usable once created, optional are:
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-112">line 112</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line112">line 112</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
-
-
-
+    
+</dd>
 
         
             
-<h4 class="name" id="~numberOfComponents"><span class="type-signature">(private, inner) </span>numberOfComponents<span class="type-signature"> :Number</span></h4>
+<hr>
+<dt class="name" id="~numberOfComponents">
+    <h4><span class="type-signature">&lt;private, inner> </span>numberOfComponents<span class="type-signature"> :Number</span></h4>
 
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Number of components.</p>
+    </div>
+    
 
-
-
-<div class="description">
-    Number of components.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">Number</span>
 
 
-        </li>
-    </ul>
 
+            </li>
+        </ul>
+    
 
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -463,69 +559,78 @@ Usable once created, optional are:
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-106">line 106</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line106">line 106</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
-
-
-
+    
+</dd>
 
         
             
-<h4 class="name" id="~originalBuffer"><span class="type-signature">(private, inner) </span>originalBuffer<span class="type-signature"> :Array</span></h4>
+<hr>
+<dt class="name" id="~originalBuffer">
+    <h4><span class="type-signature">&lt;private, inner> </span>originalBuffer<span class="type-signature"> :Array</span></h4>
 
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Original buffer.</p>
+    </div>
+    
 
-
-
-<div class="description">
-    Original buffer.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">Array</span>
 
 
-        </li>
-    </ul>
 
+            </li>
+        </ul>
+    
 
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -535,69 +640,78 @@ Usable once created, optional are:
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-119">line 119</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line119">line 119</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
-
-
-
+    
+</dd>
 
         
             
-<h4 class="name" id="~photometricInterpretation"><span class="type-signature">(private, inner) </span>photometricInterpretation<span class="type-signature"> :String</span></h4>
+<hr>
+<dt class="name" id="~photometricInterpretation">
+    <h4><span class="type-signature">&lt;private, inner> </span>photometricInterpretation<span class="type-signature"> :String</span></h4>
 
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Photometric interpretation (MONOCHROME, RGB...).</p>
+    </div>
+    
 
-
-
-<div class="description">
-    Photometric interpretation (MONOCHROME, RGB...).
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">String</span>
 
 
-        </li>
-    </ul>
 
+            </li>
+        </ul>
+    
 
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -607,69 +721,78 @@ Usable once created, optional are:
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-94">line 94</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line94">line 94</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
-
-
-
+    
+</dd>
 
         
             
-<h4 class="name" id="~planarConfiguration"><span class="type-signature">(private, inner) </span>planarConfiguration<span class="type-signature"> :Number</span></h4>
+<hr>
+<dt class="name" id="~planarConfiguration">
+    <h4><span class="type-signature">&lt;private, inner> </span>planarConfiguration<span class="type-signature"> :Number</span></h4>
 
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Planar configuration for RGB data (0:RGBRGBRGBRGB... or 1:RRR...GGG...BBB...).</p>
+    </div>
+    
 
-
-
-<div class="description">
-    Planar configuration for RGB data (0:RGBRGBRGBRGB... or 1:RRR...GGG...BBB...).
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">Number</span>
 
 
-        </li>
-    </ul>
 
+            </li>
+        </ul>
+    
 
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -679,69 +802,78 @@ Usable once created, optional are:
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-100">line 100</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line100">line 100</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
-
-
-
+    
+</dd>
 
         
             
-<h4 class="name" id="~rescaledDataRange"><span class="type-signature">(private, inner) </span>rescaledDataRange<span class="type-signature"> :Object</span></h4>
+<hr>
+<dt class="name" id="~rescaledDataRange">
+    <h4><span class="type-signature">&lt;private, inner> </span>rescaledDataRange<span class="type-signature"> :Object</span></h4>
 
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Rescaled data range.</p>
+    </div>
+    
 
-
-
-<div class="description">
-    Rescaled data range.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">Object</span>
 
 
-        </li>
-    </ul>
 
+            </li>
+        </ul>
+    
 
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -751,69 +883,78 @@ Usable once created, optional are:
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-132">line 132</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line132">line 132</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
-
-
-
+    
+</dd>
 
         
             
-<h4 class="name" id="~rsis"><span class="type-signature">(private, inner) </span>rsis<span class="type-signature"> :Number</span></h4>
+<hr>
+<dt class="name" id="~rsis">
+    <h4><span class="type-signature">&lt;private, inner> </span>rsis<span class="type-signature"> :Number</span></h4>
 
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Rescale slope and intercept.</p>
+    </div>
+    
 
-
-
-<div class="description">
-    Rescale slope and intercept.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
 <span class="param-type">Number</span>
 
 
-        </li>
-    </ul>
 
+            </li>
+        </ul>
+    
 
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -823,74 +964,73 @@ Usable once created, optional are:
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-85">line 85</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line85">line 85</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
+</dd>
 
-
-
-
-        
+        </dl>
     
 
     
         <h3 class="subsection-title">Methods</h3>
 
-        
+        <dl>
             
+<hr>
+<dt>
+    <h4 class="name" id="appendSlice"><span class="type-signature"></span>appendSlice(The)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Append a slice to the image.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="appendSlice"><span class="type-signature"></span>appendSlice<span class="signature">(The)</span><span class="type-signature"> &rarr; {Number}</span></h4>
-
     
 
-
-
-<div class="description">
-    Append a slice to the image.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -921,6 +1061,7 @@ Usable once created, optional are:
 <span class="param-type">Image</span>
 
 
+
             
             </td>
 
@@ -928,19 +1069,24 @@ Usable once created, optional are:
 
             
 
-            <td class="description last">slice to append.</td>
+            <td class="description last"><p>slice to append.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -950,53 +1096,54 @@ Usable once created, optional are:
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-235">line 235</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line235">line 235</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The number of the inserted slice.
+    <p>The number of the inserted slice.</p>
 </div>
 
 
@@ -1010,41 +1157,48 @@ Usable once created, optional are:
 <span class="param-type">Number</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="calculateDataRange"><span class="type-signature"></span>calculateDataRange()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Calculate the data range of the image.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="calculateDataRange"><span class="type-signature"></span>calculateDataRange<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Calculate the data range of the image.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1054,53 +1208,54 @@ Usable once created, optional are:
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-373">line 373</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line373">line 373</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The range {min, max}.
+    <p>The range {min, max}.</p>
 </div>
 
 
@@ -1114,41 +1269,48 @@ Usable once created, optional are:
 <span class="param-type">Object</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="calculateHistogram"><span class="type-signature"></span>calculateHistogram()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Calculate the histogram of the image.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="calculateHistogram"><span class="type-signature"></span>calculateHistogram<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Calculate the histogram of the image.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1158,53 +1320,54 @@ Usable once created, optional are:
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-415">line 415</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line415">line 415</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The histogram, data range and rescaled data range.
+    <p>The histogram, data range and rescaled data range.</p>
 </div>
 
 
@@ -1218,41 +1381,48 @@ Usable once created, optional are:
 <span class="param-type">Object</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="calculateRescaledDataRange"><span class="type-signature"></span>calculateRescaledDataRange()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Calculate the rescaled data range of the image.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="calculateRescaledDataRange"><span class="type-signature"></span>calculateRescaledDataRange<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Calculate the rescaled data range of the image.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1262,53 +1432,54 @@ Usable once created, optional are:
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-392">line 392</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line392">line 392</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The range {min, max}.
+    <p>The range {min, max}.</p>
 </div>
 
 
@@ -1322,41 +1493,48 @@ Usable once created, optional are:
 <span class="param-type">Object</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="clone"><span class="type-signature"></span>clone()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Clone the image.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="clone"><span class="type-signature"></span>clone<span class="signature">()</span><span class="type-signature"> &rarr; {Image}</span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Clone the image.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1366,53 +1544,54 @@ Usable once created, optional are:
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-217">line 217</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line217">line 217</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    A clone of this image.
+    <p>A clone of this image.</p>
 </div>
 
 
@@ -1426,40 +1605,42 @@ Usable once created, optional are:
 <span class="param-type">Image</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="compose"><span class="type-signature"></span>compose(rhs, operator)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Compose this image with another one and using a specific operator.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="compose"><span class="type-signature"></span>compose<span class="signature">(rhs, operator)</span><span class="type-signature"> &rarr; {Image}</span></h4>
-
     
 
-
-
-<div class="description">
-    Compose this image with another one and using a specific operator.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -1490,6 +1671,7 @@ Usable once created, optional are:
 <span class="param-type">Image</span>
 
 
+
             
             </td>
 
@@ -1497,7 +1679,7 @@ Usable once created, optional are:
 
             
 
-            <td class="description last">The image to compose with.</td>
+            <td class="description last"><p>The image to compose with.</p></td>
         </tr>
 
     
@@ -1513,6 +1695,7 @@ Usable once created, optional are:
 <span class="param-type">function</span>
 
 
+
             
             </td>
 
@@ -1520,19 +1703,24 @@ Usable once created, optional are:
 
             
 
-            <td class="description last">The operator to use when composing.</td>
+            <td class="description last"><p>The operator to use when composing.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1542,54 +1730,54 @@ Usable once created, optional are:
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-625">line 625</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line625">line 625</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The composed image.
-Note: Uses the raw buffer values.
+    <p>The composed image.<br>Note: Uses the raw buffer values.</p>
 </div>
 
 
@@ -1603,40 +1791,42 @@ Note: Uses the raw buffer values.
 <span class="param-type">Image</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="convolute2D"><span class="type-signature"></span>convolute2D(weights)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Convolute the image with a given 2D kernel.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="convolute2D"><span class="type-signature"></span>convolute2D<span class="signature">(weights)</span><span class="type-signature"> &rarr; {Image}</span></h4>
-
     
 
-
-
-<div class="description">
-    Convolute the image with a given 2D kernel.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -1667,6 +1857,7 @@ Note: Uses the raw buffer values.
 <span class="param-type">Array</span>
 
 
+
             
             </td>
 
@@ -1674,19 +1865,24 @@ Note: Uses the raw buffer values.
 
             
 
-            <td class="description last">The weights of the 2D kernel as a 3x3 matrix.</td>
+            <td class="description last"><p>The weights of the 2D kernel as a 3x3 matrix.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1696,54 +1892,54 @@ Note: Uses the raw buffer values.
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-457">line 457</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line457">line 457</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The convoluted image.
-Note: Uses the raw buffer values.
+    <p>The convoluted image.<br>Note: Uses the raw buffer values.</p>
 </div>
 
 
@@ -1757,41 +1953,48 @@ Note: Uses the raw buffer values.
 <span class="param-type">Image</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="getBuffer"><span class="type-signature"></span>getBuffer()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get the data buffer of the image.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="getBuffer"><span class="type-signature"></span>getBuffer<span class="signature">()</span><span class="type-signature"> &rarr; {Array}</span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Get the data buffer of the image.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1801,60 +2004,61 @@ Note: Uses the raw buffer values.
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-150">line 150</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line150">line 150</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
-    <dt class="tag-todo">To Do:</dt>
-    <dd class="tag-todo">
-        <ul>
-            <li>dangerous...</li>
-        </ul>
-    </dd>
-    
+	
+	<dt class="tag-todo method-doc-label method-doc-details-label">To Do:</dt>
+	<dd class="tag-todo">
+		<ul>
+			<li>dangerous...</li>
+			</ul>
+	</dd>
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The data buffer of the image.
+    <p>The data buffer of the image.</p>
 </div>
 
 
@@ -1868,41 +2072,48 @@ Note: Uses the raw buffer values.
 <span class="param-type">Array</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="getDataRange"><span class="type-signature"></span>getDataRange()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get the data range.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="getDataRange"><span class="type-signature"></span>getDataRange<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Get the data range.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -1912,53 +2123,54 @@ Note: Uses the raw buffer values.
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-309">line 309</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line309">line 309</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The data range.
+    <p>The data range.</p>
 </div>
 
 
@@ -1972,41 +2184,48 @@ Note: Uses the raw buffer values.
 <span class="param-type">Object</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="getGeometry"><span class="type-signature"></span>getGeometry()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get the geometry of the image.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="getGeometry"><span class="type-signature"></span>getGeometry<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Get the geometry of the image.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -2016,53 +2235,54 @@ Note: Uses the raw buffer values.
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-144">line 144</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line144">line 144</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The size of the image.
+    <p>The size of the image.</p>
 </div>
 
 
@@ -2076,41 +2296,48 @@ Note: Uses the raw buffer values.
 <span class="param-type">Object</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="getHistogram"><span class="type-signature"></span>getHistogram()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get the histogram.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="getHistogram"><span class="type-signature"></span>getHistogram<span class="signature">()</span><span class="type-signature"> &rarr; {Array}</span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Get the histogram.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -2120,53 +2347,54 @@ Note: Uses the raw buffer values.
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-331">line 331</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line331">line 331</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The histogram.
+    <p>The histogram.</p>
 </div>
 
 
@@ -2180,41 +2408,48 @@ Note: Uses the raw buffer values.
 <span class="param-type">Array</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="getMeta"><span class="type-signature"></span>getMeta()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get the meta information of the image.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="getMeta"><span class="type-signature"></span>getMeta<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Get the meta information of the image.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -2224,53 +2459,54 @@ Note: Uses the raw buffer values.
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-197">line 197</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line197">line 197</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The meta information of the image.
+    <p>The meta information of the image.</p>
 </div>
 
 
@@ -2284,41 +2520,48 @@ Note: Uses the raw buffer values.
 <span class="param-type">Object</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="getNumberOfComponents"><span class="type-signature"></span>getNumberOfComponents()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get the numberOfComponents of the image.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="getNumberOfComponents"><span class="type-signature"></span>getNumberOfComponents<span class="signature">()</span><span class="type-signature"> &rarr; {Number}</span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Get the numberOfComponents of the image.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -2328,53 +2571,54 @@ Note: Uses the raw buffer values.
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-191">line 191</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line191">line 191</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The numberOfComponents of the image.
+    <p>The numberOfComponents of the image.</p>
 </div>
 
 
@@ -2388,41 +2632,48 @@ Note: Uses the raw buffer values.
 <span class="param-type">Number</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="getPhotometricInterpretation"><span class="type-signature"></span>getPhotometricInterpretation()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get the photometricInterpretation of the image.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="getPhotometricInterpretation"><span class="type-signature"></span>getPhotometricInterpretation<span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Get the photometricInterpretation of the image.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -2432,53 +2683,54 @@ Note: Uses the raw buffer values.
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-171">line 171</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line171">line 171</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The photometricInterpretation of the image.
+    <p>The photometricInterpretation of the image.</p>
 </div>
 
 
@@ -2492,41 +2744,48 @@ Note: Uses the raw buffer values.
 <span class="param-type">String</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="getPlanarConfiguration"><span class="type-signature"></span>getPlanarConfiguration()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get the planarConfiguration of the image.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="getPlanarConfiguration"><span class="type-signature"></span>getPlanarConfiguration<span class="signature">()</span><span class="type-signature"> &rarr; {Number}</span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Get the planarConfiguration of the image.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -2536,53 +2795,54 @@ Note: Uses the raw buffer values.
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-181">line 181</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line181">line 181</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The planarConfiguration of the image.
+    <p>The planarConfiguration of the image.</p>
 </div>
 
 
@@ -2596,41 +2856,48 @@ Note: Uses the raw buffer values.
 <span class="param-type">Number</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="getRescaledDataRange"><span class="type-signature"></span>getRescaledDataRange()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get the rescaled data range.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="getRescaledDataRange"><span class="type-signature"></span>getRescaledDataRange<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Get the rescaled data range.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -2640,53 +2907,54 @@ Note: Uses the raw buffer values.
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-320">line 320</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line320">line 320</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The rescaled data range.
+    <p>The rescaled data range.</p>
 </div>
 
 
@@ -2700,40 +2968,42 @@ Note: Uses the raw buffer values.
 <span class="param-type">Object</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="getRescaledValue"><span class="type-signature"></span>getRescaledValue(i, j, k)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get the rescaled value of the image at a specific coordinate.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="getRescaledValue"><span class="type-signature"></span>getRescaledValue<span class="signature">(i, j, k)</span><span class="type-signature"> &rarr; {Number}</span></h4>
-
     
 
-
-
-<div class="description">
-    Get the rescaled value of the image at a specific coordinate.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -2764,6 +3034,7 @@ Note: Uses the raw buffer values.
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -2771,7 +3042,7 @@ Note: Uses the raw buffer values.
 
             
 
-            <td class="description last">The X index.</td>
+            <td class="description last"><p>The X index.</p></td>
         </tr>
 
     
@@ -2787,6 +3058,7 @@ Note: Uses the raw buffer values.
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -2794,7 +3066,7 @@ Note: Uses the raw buffer values.
 
             
 
-            <td class="description last">The Y index.</td>
+            <td class="description last"><p>The Y index.</p></td>
         </tr>
 
     
@@ -2810,6 +3082,7 @@ Note: Uses the raw buffer values.
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -2817,19 +3090,24 @@ Note: Uses the raw buffer values.
 
             
 
-            <td class="description last">The Z index.</td>
+            <td class="description last"><p>The Z index.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -2839,54 +3117,54 @@ Note: Uses the raw buffer values.
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-364">line 364</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line364">line 364</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The rescaled value at the desired position.
-Warning: No size check...
+    <p>The rescaled value at the desired position.<br>Warning: No size check...</p>
 </div>
 
 
@@ -2900,41 +3178,48 @@ Warning: No size check...
 <span class="param-type">Number</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="getRescaleSlopeAndIntercept"><span class="type-signature"></span>getRescaleSlopeAndIntercept()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get the rescale slope and intercept.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="getRescaleSlopeAndIntercept"><span class="type-signature"></span>getRescaleSlopeAndIntercept<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Get the rescale slope and intercept.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -2944,53 +3229,54 @@ Warning: No size check...
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-156">line 156</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line156">line 156</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The rescale slope and intercept.
+    <p>The rescale slope and intercept.</p>
 </div>
 
 
@@ -3004,40 +3290,42 @@ Warning: No size check...
 <span class="param-type">Object</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="getValue"><span class="type-signature"></span>getValue(i, j, k)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get the value of the image at a specific coordinate.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="getValue"><span class="type-signature"></span>getValue<span class="signature">(i, j, k)</span><span class="type-signature"> &rarr; {Number}</span></h4>
-
     
 
-
-
-<div class="description">
-    Get the value of the image at a specific coordinate.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -3068,6 +3356,7 @@ Warning: No size check...
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -3075,7 +3364,7 @@ Warning: No size check...
 
             
 
-            <td class="description last">The X index.</td>
+            <td class="description last"><p>The X index.</p></td>
         </tr>
 
     
@@ -3091,6 +3380,7 @@ Warning: No size check...
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -3098,7 +3388,7 @@ Warning: No size check...
 
             
 
-            <td class="description last">The Y index.</td>
+            <td class="description last"><p>The Y index.</p></td>
         </tr>
 
     
@@ -3114,6 +3404,7 @@ Warning: No size check...
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -3121,19 +3412,24 @@ Warning: No size check...
 
             
 
-            <td class="description last">The Z index.</td>
+            <td class="description last"><p>The Z index.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -3143,54 +3439,54 @@ Warning: No size check...
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-350">line 350</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line350">line 350</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The value at the desired position.
-Warning: No size check...
+    <p>The value at the desired position.<br>Warning: No size check...</p>
 </div>
 
 
@@ -3204,40 +3500,42 @@ Warning: No size check...
 <span class="param-type">Number</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="getValueAtOffset"><span class="type-signature"></span>getValueAtOffset(offset)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get value at offset. Warning: No size check...</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="getValueAtOffset"><span class="type-signature"></span>getValueAtOffset<span class="signature">(offset)</span><span class="type-signature"> &rarr; {Number}</span></h4>
-
     
 
-
-
-<div class="description">
-    Get value at offset. Warning: No size check...
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -3268,6 +3566,7 @@ Warning: No size check...
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -3275,19 +3574,24 @@ Warning: No size check...
 
             
 
-            <td class="description last">The desired offset.</td>
+            <td class="description last"><p>The desired offset.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -3297,53 +3601,54 @@ Warning: No size check...
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-209">line 209</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line209">line 209</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The value at offset.
+    <p>The value at offset.</p>
 </div>
 
 
@@ -3357,40 +3662,42 @@ Warning: No size check...
 <span class="param-type">Number</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="quantifyEllipse"><span class="type-signature"></span>quantifyEllipse(ellipse)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Quantify an ellipse according to image information.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="quantifyEllipse"><span class="type-signature"></span>quantifyEllipse<span class="signature">(ellipse)</span><span class="type-signature"> &rarr; {Object}</span></h4>
-
     
 
-
-
-<div class="description">
-    Quantify an ellipse according to image information.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -3421,6 +3728,7 @@ Warning: No size check...
 <span class="param-type">Object</span>
 
 
+
             
             </td>
 
@@ -3428,19 +3736,24 @@ Warning: No size check...
 
             
 
-            <td class="description last">The ellipse to quantify.</td>
+            <td class="description last"><p>The ellipse to quantify.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -3450,53 +3763,54 @@ Warning: No size check...
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-680">line 680</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line680">line 680</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    A quantification object.
+    <p>A quantification object.</p>
 </div>
 
 
@@ -3510,40 +3824,42 @@ Warning: No size check...
 <span class="param-type">Object</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="quantifyLine"><span class="type-signature"></span>quantifyLine(line)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Quantify a line according to image information.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="quantifyLine"><span class="type-signature"></span>quantifyLine<span class="signature">(line)</span><span class="type-signature"> &rarr; {Object}</span></h4>
-
     
 
-
-
-<div class="description">
-    Quantify a line according to image information.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -3574,6 +3890,7 @@ Warning: No size check...
 <span class="param-type">Object</span>
 
 
+
             
             </td>
 
@@ -3581,19 +3898,24 @@ Warning: No size check...
 
             
 
-            <td class="description last">The line to quantify.</td>
+            <td class="description last"><p>The line to quantify.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -3603,53 +3925,54 @@ Warning: No size check...
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-642">line 642</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line642">line 642</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    A quantification object.
+    <p>A quantification object.</p>
 </div>
 
 
@@ -3663,40 +3986,42 @@ Warning: No size check...
 <span class="param-type">Object</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="quantifyRect"><span class="type-signature"></span>quantifyRect(rect)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Quantify a rectangle according to image information.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="quantifyRect"><span class="type-signature"></span>quantifyRect<span class="signature">(rect)</span><span class="type-signature"> &rarr; {Object}</span></h4>
-
     
 
-
-
-<div class="description">
-    Quantify a rectangle according to image information.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -3727,6 +4052,7 @@ Warning: No size check...
 <span class="param-type">Object</span>
 
 
+
             
             </td>
 
@@ -3734,19 +4060,24 @@ Warning: No size check...
 
             
 
-            <td class="description last">The rectangle to quantify.</td>
+            <td class="description last"><p>The rectangle to quantify.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -3756,53 +4087,54 @@ Warning: No size check...
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-655">line 655</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line655">line 655</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    A quantification object.
+    <p>A quantification object.</p>
 </div>
 
 
@@ -3816,40 +4148,42 @@ Warning: No size check...
 <span class="param-type">Object</span>
 
 
+
     </dd>
 </dl>
 
+
+        
+
     
-
-
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="setMeta"><span class="type-signature"></span>setMeta(rhs)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Set the meta information of the image.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="setMeta"><span class="type-signature"></span>setMeta<span class="signature">(rhs)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    Set the meta information of the image.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -3880,6 +4214,7 @@ Warning: No size check...
 <span class="param-type">Object</span>
 
 
+
             
             </td>
 
@@ -3887,19 +4222,24 @@ Warning: No size check...
 
             
 
-            <td class="description last">The meta information of the image.</td>
+            <td class="description last"><p>The meta information of the image.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -3909,79 +4249,85 @@ Warning: No size check...
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-202">line 202</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line202">line 202</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="setPhotometricInterpretation"><span class="type-signature"></span>setPhotometricInterpretation()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Set the photometricInterpretation of the image.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="setPhotometricInterpretation"><span class="type-signature"></span>setPhotometricInterpretation<span class="signature">()</span><span class="type-signature"></span></h4>
-
     
 
+    
+    
 
-
-<div class="description">
-    Set the photometricInterpretation of the image.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -3991,78 +4337,79 @@ Warning: No size check...
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-176">line 176</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line176">line 176</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="setPlanarConfiguration"><span class="type-signature"></span>setPlanarConfiguration(config)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Set the planarConfiguration of the image.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="setPlanarConfiguration"><span class="type-signature"></span>setPlanarConfiguration<span class="signature">(config)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    Set the planarConfiguration of the image.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -4093,6 +4440,7 @@ Warning: No size check...
 <span class="param-type">Number</span>
 
 
+
             
             </td>
 
@@ -4100,19 +4448,24 @@ Warning: No size check...
 
             
 
-            <td class="description last">The planarConfiguration of the image.</td>
+            <td class="description last"><p>The planarConfiguration of the image.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -4122,78 +4475,79 @@ Warning: No size check...
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-186">line 186</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line186">line 186</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="setRescaleSlopeAndIntercept"><span class="type-signature"></span>setRescaleSlopeAndIntercept(rsi)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Set the rescale slope and intercept.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="setRescaleSlopeAndIntercept"><span class="type-signature"></span>setRescaleSlopeAndIntercept<span class="signature">(rsi)</span><span class="type-signature"></span></h4>
-
     
 
-
-
-<div class="description">
-    Set the rescale slope and intercept.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -4224,6 +4578,7 @@ Warning: No size check...
 <span class="param-type">Object</span>
 
 
+
             
             </td>
 
@@ -4231,19 +4586,24 @@ Warning: No size check...
 
             
 
-            <td class="description last">The rescale slope and intercept.</td>
+            <td class="description last"><p>The rescale slope and intercept.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -4253,78 +4613,79 @@ Warning: No size check...
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-161">line 161</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line161">line 161</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
+    
+</dd>
 
         
             
+<hr>
+<dt>
+    <h4 class="name" id="transform"><span class="type-signature"></span>transform(operator)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Transform an image using a specific operator.</p>
+    </div>
+    
 
     
 
-    <h4 class="name" id="transform"><span class="type-signature"></span>transform<span class="signature">(operator)</span><span class="type-signature"> &rarr; {Image}</span></h4>
-
     
 
-
-
-<div class="description">
-    Transform an image using a specific operator.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
     
+    
+        <h5>Parameters:</h5>
+        
 
-<table class="params">
+<table class="params table table-striped">
     <thead>
     <tr>
         
@@ -4355,6 +4716,7 @@ Warning: No size check...
 <span class="param-type">function</span>
 
 
+
             
             </td>
 
@@ -4362,19 +4724,24 @@ Warning: No size check...
 
             
 
-            <td class="description last">The operator to use when transforming.</td>
+            <td class="description last"><p>The operator to use when transforming.</p></td>
         </tr>
 
     
     </tbody>
 </table>
 
+    
 
-
-
-
-
+    
 <dl class="details">
+    
+
+	
+
+	
+
+	
 
     
 
@@ -4384,54 +4751,54 @@ Warning: No size check...
 
     
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
+	
 
-    
 
-    
 
-    
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-607">line 607</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="image_image.js.html">image/image.js</a>, <a href="image_image.js.html#line607">line 607</a>
-    </li></ul></dd>
-    
+	
 
-    
+	
 
-    
-
-    
+	
 </dl>
 
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
+    
+    <h5>Returns:</h5>
+    
+            
 <div class="param-desc">
-    The transformed image.
-Note: Uses the raw buffer values.
+    <p>The transformed image.<br>Note: Uses the raw buffer values.</p>
 </div>
 
 
@@ -4445,14 +4812,17 @@ Note: Uses the raw buffer values.
 <span class="param-type">Image</span>
 
 
+
     </dd>
 </dl>
 
-    
-
-
 
         
+
+    
+</dd>
+
+        </dl>
     
 
     
@@ -4465,19 +4835,131 @@ Note: Uses the raw buffer values.
 
 
 
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
+	
+
+</div>
 </div>
 
-<nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="dwv.App.html">App</a></li><li><a href="dwv.dicom.DataReader.html">DataReader</a></li><li><a href="dwv.dicom.DataWriter.html">DataWriter</a></li><li><a href="dwv.dicom.DicomElementsWrapper.html">DicomElementsWrapper</a></li><li><a href="dwv.dicom.DicomParser.html">DicomParser</a></li><li><a href="dwv.dicom.DicomWriter.html">DicomWriter</a></li><li><a href="dwv.gui.base.DicomTags.html">DicomTags</a></li><li><a href="dwv.gui.base.Draw.html">Draw</a></li><li><a href="dwv.gui.base.FileLoad.html">FileLoad</a></li><li><a href="dwv.gui.base.Filter.html">Filter</a></li><li><a href="dwv.gui.base.Livewire.html">Livewire</a></li><li><a href="dwv.gui.base.Loadbox.html">Loadbox</a></li><li><a href="dwv.gui.base.Scroll.html">Scroll</a></li><li><a href="dwv.gui.base.Sharpen.html">Sharpen</a></li><li><a href="dwv.gui.base.Slider.html">Slider</a></li><li><a href="dwv.gui.base.Sobel.html">Sobel</a></li><li><a href="dwv.gui.base.Threshold.html">Threshold</a></li><li><a href="dwv.gui.base.Toolbox.html">Toolbox</a></li><li><a href="dwv.gui.base.Undo.html">Undo</a></li><li><a href="dwv.gui.base.UrlLoad.html">UrlLoad</a></li><li><a href="dwv.gui.base.WindowLevel.html">WindowLevel</a></li><li><a href="dwv.gui.base.ZoomAndPan.html">ZoomAndPan</a></li><li><a href="dwv.html.Layer.html">Layer</a></li><li><a href="dwv.html.Style.html">Style</a></li><li><a href="dwv.image.DicomBufferToView.html">DicomBufferToView</a></li><li><a href="dwv.image.filter.Sharpen.html">Sharpen</a></li><li><a href="dwv.image.filter.Sobel.html">Sobel</a></li><li><a href="dwv.image.filter.Threshold.html">Threshold</a></li><li><a href="dwv.image.Geometry.html">Geometry</a></li><li><a href="dwv.image.Image.html">Image</a></li><li><a href="dwv.image.ImageFactory.html">ImageFactory</a></li><li><a href="dwv.image.lut.Rescale.html">Rescale</a></li><li><a href="dwv.image.lut.Window.html">Window</a></li><li><a href="dwv.image.RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></li><li><a href="dwv.image.Size.html">Size</a></li><li><a href="dwv.image.Spacing.html">Spacing</a></li><li><a href="dwv.image.View.html">View</a></li><li><a href="dwv.image.ViewFactory.html">ViewFactory</a></li><li><a href="dwv.info.MiniColourMap.html">MiniColourMap</a></li><li><a href="dwv.info.Plot.html">Plot</a></li><li><a href="dwv.info.Position.html">Position</a></li><li><a href="dwv.info.Windowing.html">Windowing</a></li><li><a href="dwv.io.File.html">File</a></li><li><a href="dwv.io.Url.html">Url</a></li><li><a href="dwv.math.BucketQueue.html">BucketQueue</a></li><li><a href="dwv.math.Circle.html">Circle</a></li><li><a href="dwv.math.Ellipse.html">Ellipse</a></li><li><a href="dwv.math.FastPoint2D.html">FastPoint2D</a></li><li><a href="dwv.math.Index3D.html">Index3D</a></li><li><a href="dwv.math.Line.html">Line</a></li><li><a href="dwv.math.Path.html">Path</a></li><li><a href="dwv.math.Point2D.html">Point2D</a></li><li><a href="dwv.math.Point3D.html">Point3D</a></li><li><a href="dwv.math.Rectangle.html">Rectangle</a></li><li><a href="dwv.math.ROI.html">ROI</a></li><li><a href="dwv.math.Scissors.html">Scissors</a></li><li><a href="dwv.State.html">State</a></li><li><a href="dwv.tool.ChangeGroupCommand.html">ChangeGroupCommand</a></li><li><a href="dwv.tool.DeleteGroupCommand.html">DeleteGroupCommand</a></li><li><a href="dwv.tool.Draw.html">Draw</a></li><li><a href="dwv.tool.DrawGroupCommand.html">DrawGroupCommand</a></li><li><a href="dwv.tool.EllipseFactory.html">EllipseFactory</a></li><li><a href="dwv.tool.Filter.html">Filter</a></li><li><a href="dwv.tool.filter.Sharpen.html">Sharpen</a></li><li><a href="dwv.tool.filter.Sobel.html">Sobel</a></li><li><a href="dwv.tool.filter.Threshold.html">Threshold</a></li><li><a href="dwv.tool.LineFactory.html">LineFactory</a></li><li><a href="dwv.tool.Livewire.html">Livewire</a></li><li><a href="dwv.tool.MoveGroupCommand.html">MoveGroupCommand</a></li><li><a href="dwv.tool.ProtractorFactory.html">ProtractorFactory</a></li><li><a href="dwv.tool.RectangleFactory.html">RectangleFactory</a></li><li><a href="dwv.tool.RoiFactory.html">RoiFactory</a></li><li><a href="dwv.tool.RunFilterCommand.html">RunFilterCommand</a></li><li><a href="dwv.tool.Scroll.html">Scroll</a></li><li><a href="dwv.tool.ShapeEditor.html">ShapeEditor</a></li><li><a href="dwv.tool.Toolbox.html">Toolbox</a></li><li><a href="dwv.tool.UndoStack.html">UndoStack</a></li><li><a href="dwv.tool.WindowLevel.html">WindowLevel</a></li><li><a href="dwv.tool.ZoomAndPan.html">ZoomAndPan</a></li><li><a href="dwv.ToolboxController.html">ToolboxController</a></li><li><a href="dwv.utils.ThreadPool.html">ThreadPool</a></li><li><a href="dwv.utils.WorkerTask.html">WorkerTask</a></li><li><a href="dwv.utils.WorkerThread.html">WorkerThread</a></li><li><a href="dwv.ViewController.html">ViewController</a></li></ul><h3>Namespaces</h3><ul><li><a href="dwv.html">dwv</a></li><li><a href="dwv.browser.html">browser</a></li><li><a href="dwv.dicom.html">dicom</a></li><li><a href="dwv.gui.html">gui</a></li><li><a href="dwv.gui.base.html">base</a></li><li><a href="dwv.gui.filter.html">filter</a></li><li><a href="dwv.gui.filter.base.html">base</a></li><li><a href="dwv.html.html">html</a></li><li><a href="dwv.image.html">image</a></li><li><a href="dwv.image.filter.html">filter</a></li><li><a href="dwv.image.lut.html">lut</a></li><li><a href="dwv.info.html">info</a></li><li><a href="dwv.io.html">io</a></li><li><a href="dwv.math.html">math</a></li><li><a href="dwv.tool.html">tool</a></li><li><a href="dwv.tool.filter_.html">filter</a></li><li><a href="dwv.utils.html">utils</a></li><li><a href="dwv.utils.base.html">base</a></li></ul>
-</nav>
-
-<br class="clear">
+<div class="modal fade" id="searchResults">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Search results</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Thu Mar 03 2016 23:23:22 GMT+0000 (UTC)
+
+
+	<span class="copyright">
+	DocStrap Copyright © 2012-2015 The contributors to the JSDoc3 and DocStrap projects.
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	
+		on Thu Mar 3rd 2016
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
 </footer>
 
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"> </script>
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+<script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		SearcherDisplay.init();
+	});
+</script>
+
 </body>
 </html>
