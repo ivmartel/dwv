@@ -1,30 +1,22 @@
-/** 
- * GUI module.
- * @module gui
- */
+// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for GUI functions.
- * @class gui
- * @namespace dwv
- * @static
- */
+/** @namespace */
 dwv.gui = dwv.gui || {};
+/** @namespace */
 dwv.gui.base = dwv.gui.base || {};
+/** @namespace */
 dwv.gui.filter = dwv.gui.filter || {};
+/** @namespace */
 dwv.gui.filter.base = dwv.gui.filter.base || {};
 
 /**
  * Filter tool base gui.
- * @class Filter
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Filter = function (app)
 {
     /**
      * Setup the filter tool HTML.
-     * @method setup
      */
     this.setup = function (list)
     {
@@ -44,7 +36,6 @@ dwv.gui.base.Filter = function (app)
 
     /**
      * Display the tool HTML.
-     * @method display
      * @param {Boolean} flag True to display, false to hide.
      */
     this.display = function (flag)
@@ -55,7 +46,6 @@ dwv.gui.base.Filter = function (app)
 
     /**
      * Initialise the tool HTML.
-     * @method initialise
      */
     this.initialise = function ()
     {
@@ -70,15 +60,12 @@ dwv.gui.base.Filter = function (app)
 
 /**
  * Threshold filter base gui.
- * @class Threshold
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Threshold = function (app)
 {
     /**
      * Threshold slider.
-     * @property slider
      * @private
      * @type Object
      */
@@ -86,7 +73,6 @@ dwv.gui.base.Threshold = function (app)
 
     /**
      * Setup the threshold filter HTML.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -106,7 +92,6 @@ dwv.gui.base.Threshold = function (app)
 
     /**
      * Clear the threshold filter HTML.
-     * @method display
      * @param {Boolean} flag True to display, false to hide.
      */
     this.display = function (flag)
@@ -117,7 +102,6 @@ dwv.gui.base.Threshold = function (app)
 
     /**
      * Initialise the threshold filter HTML.
-     * @method initialise
      */
     this.initialise = function ()
     {
@@ -129,8 +113,6 @@ dwv.gui.base.Threshold = function (app)
 
 /**
  * Create the apply filter button.
- * @method createFilterApplyButton
- * @static
  */
 dwv.gui.filter.base.createFilterApplyButton = function (app)
 {
@@ -145,15 +127,12 @@ dwv.gui.filter.base.createFilterApplyButton = function (app)
 
 /**
  * Sharpen filter base gui.
- * @class Sharpen
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Sharpen = function (app)
 {
     /**
      * Setup the sharpen filter HTML.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -168,7 +147,6 @@ dwv.gui.base.Sharpen = function (app)
 
     /**
      * Display the sharpen filter HTML.
-     * @method display
      * @param {Boolean} flag True to display, false to hide.
      */
     this.display = function (flag)
@@ -181,15 +159,12 @@ dwv.gui.base.Sharpen = function (app)
 
 /**
  * Sobel filter base gui.
- * @class Sobel
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Sobel = function (app)
 {
     /**
      * Setup the sobel filter HTML.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -204,7 +179,6 @@ dwv.gui.base.Sobel = function (app)
 
     /**
      * Display the sobel filter HTML.
-     * @method display
      * @param {Boolean} flag True to display, false to hide.
      */
     this.display = function (flag)

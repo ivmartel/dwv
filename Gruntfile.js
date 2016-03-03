@@ -49,15 +49,11 @@ module.exports = function(grunt) {
                 }
             }
         },
-        yuidoc: {
-            compile: {
-                name: '<%= pkg.name %>',
-                description: '<%= pkg.description %>',
-                version: '<%= pkg.version %>',
-                url: '<%= pkg.homepage %>',
+        jsdoc: {
+            dist : {
+                src: ['src/*.js', 'test/*.js'],
                 options: {
-                    paths: 'src/',
-                    outdir: 'dist/doc/'
+                    destination: 'dist/doc'
                 }
             }
         }
@@ -68,8 +64,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-coveralls');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-yuidoc');
+    grunt.loadNpmTasks('grunt-jsdoc');
 
     // Task to run tests
-    grunt.registerTask('publish', ['jshint', 'qunit', 'coveralls', 'concat', 'uglify', 'yuidoc']);
+    grunt.registerTask('publish', ['jshint', 'qunit', 'coveralls', 'concat', 'uglify', 'jsdoc']);
 };

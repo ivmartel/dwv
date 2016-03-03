@@ -1,28 +1,22 @@
-/** 
- * Tool module.
- * @module tool
- */
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
+//external
 var Kinetic = Kinetic || {};
 
 /**
  * ROI factory.
- * @class RoiFactory
- * @namespace dwv.tool
  * @constructor
  */
 dwv.tool.RoiFactory = function ()
 {
     /**
      * Get the number of points needed to build the shape.
-     * @method getNPoints
      * @return {Number} The number of points.
      */
     this.getNPoints = function () { return 50; };
     /**
      * Get the timeout between point storage.
-     * @method getTimeout
      * @return {Number} The timeout in milliseconds.
      */
     this.getTimeout = function () { return 100; };
@@ -30,7 +24,6 @@ dwv.tool.RoiFactory = function ()
 
 /**
  * Create a roi shape to be displayed.
- * @method RoiCreator
  * @param {Array} points The points from which to extract the line.
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
@@ -65,8 +58,6 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
 
 /**
  * Update a roi shape.
- * @method UpdateRoi
- * @static
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
  */

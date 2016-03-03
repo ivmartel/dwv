@@ -1,22 +1,11 @@
-/** 
- * Math module.
- * @module math
- */
+// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for math functions.
- * @class math
- * @namespace dwv
- * @static
- */
 dwv.math = dwv.math || {};
 
 /**
  * Get the minimum, maximum, mean and standard deviation
  * of an array of values.
- * Note: could use https://github.com/tmcw/simple-statistics
- * @method getStats
- * @static
+ * Note: could use {@link https://github.com/tmcw/simple-statistics}.
  */
 dwv.math.getStats = function (array)
 {
@@ -51,10 +40,8 @@ dwv.math.getStats = function (array)
 
 /**
  * Unique ID generator.
- * See http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
- * and this answer http://stackoverflow.com/a/13403498.
- * @method guid
- * @static
+ * See {@link http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript}
+ * and this {@link http://stackoverflow.com/a/13403498 answer}.
  */
 dwv.math.guid = function ()
 {

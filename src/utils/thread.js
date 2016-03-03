@@ -1,22 +1,11 @@
-/** 
- * Utility module.
- * @module utils
- */
+// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for utility functions.
- * @class utils
- * @namespace dwv
- * @static
- */
 dwv.utils = dwv.utils || {};
 
 /**
  * Thread Pool.
- * @class ThreadPool
- * @namespace dwv.utils
+ * Highly inspired from {@link http://www.smartjava.org/content/html5-easily-parallelize-jobs-using-web-workers-and-threadpool}.
  * @constructor
- * Highly inspired from http://www.smartjava.org/content/html5-easily-parallelize-jobs-using-web-workers-and-threadpool
  * @param {Number} size The size of the pool.
  */
 dwv.utils.ThreadPool = function (size) {
@@ -31,7 +20,6 @@ dwv.utils.ThreadPool = function (size) {
  
     /**
      * Initialise.
-     * @method init
      */
     this.init = function () {
         // create 'size' number of worker threads
@@ -43,7 +31,6 @@ dwv.utils.ThreadPool = function (size) {
     /**
      * Add a worker task to the queue.
      * Will be run when a thread is made available.
-     * @method addWorkerTask
      * @return {Object} workerTask The task to add.
      */
     this.addWorkerTask = function (workerTask) {
@@ -59,7 +46,6 @@ dwv.utils.ThreadPool = function (size) {
  
     /**
      * Free a worker thread.
-     * @method freeWorkerThread
      * @param {Object} workerThread The thread to free.
      */
     this.freeWorkerThread = function (workerThread) {
@@ -76,8 +62,6 @@ dwv.utils.ThreadPool = function (size) {
  
 /**
  * Worker thread.
- * @class WorkerThread
- * @namespace dwv.utils
  * @constructor
  * @param {Object} parentPool The parent pool.
  */
@@ -91,7 +75,6 @@ dwv.utils.WorkerThread = function (parentPool) {
  
     /**
      * Run a worker task
-     * @method run
      * @param {Object} workerTask The task to run.
      */
     this.run = function (workerTask) {
@@ -110,7 +93,6 @@ dwv.utils.WorkerThread = function (parentPool) {
      * Handle once the task is done.
      * For now assume we only get a single callback from a worker
      * which also indicates the end of this worker.
-     * @method ontaskend
      * @param {Object} event The callback event.
      */
     function ontaskend(event) {
@@ -124,8 +106,6 @@ dwv.utils.WorkerThread = function (parentPool) {
  
 /**
  * Worker task.
- * @class WorkerTask
- * @namespace dwv.utils
  * @constructor
  * @param {String} script The worker script.
  * @param {Function} parentPool The worker callback.

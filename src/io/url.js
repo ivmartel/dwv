@@ -1,48 +1,33 @@
-/** 
- * I/O module.
- * @module io
- */
+// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for I/O functions.
- * @class io
- * @namespace dwv
- * @static
- */
 dwv.io = dwv.io || {};
 
 /**
  * Url loader.
- * @class Url
- * @namespace dwv.io
  * @constructor
  */
 dwv.io.Url = function ()
 {
     /**
      * Number of data to load.
-     * @property nToLoad
      * @private
      * @type Number
      */
     var nToLoad = 0;
     /**
      * Number of loaded data.
-     * @property nLoaded
      * @private
      * @type Number
      */
     var nLoaded = 0;
     /**
      * List of progresses.
-     * @property progressList
      * @private
      * @type Array
      */
     var progressList = [];
     /**
      * List of data decoders scripts.
-     * @property decoderScripts
      * @private
      * @type Array
      */
@@ -50,7 +35,6 @@ dwv.io.Url = function ()
 
     /**
      * Set the number of data to load.
-     * @method setNToLoad
      */
     this.setNToLoad = function (n) {
         nToLoad = n;
@@ -62,7 +46,6 @@ dwv.io.Url = function ()
     /**
      * Increment the number of loaded data
      * and call onloadend if loaded all data.
-     * @method addLoaded
      */
     this.addLoaded = function () {
         nLoaded++;
@@ -73,7 +56,6 @@ dwv.io.Url = function ()
 
     /**
      * Get the global load percent including the provided one.
-     * @method getGlobalPercent
      * @param {Number} n The number of the loaded data.
      * @param {Number} percent The percentage of data 'n' that has been loaded.
      * @return {Number} The accumulated percentage.
@@ -89,7 +71,6 @@ dwv.io.Url = function ()
     
     /**
      * Set the web workers decoder scripts.
-     * @method setDecoderScripts
      * @param {Array} list The list of decoder scripts.
      */
     this.setDecoderScripts = function (list) {
@@ -97,7 +78,6 @@ dwv.io.Url = function ()
     };
     /**
      * Get the web workers decoder scripts.
-     * @method getDecoderScripts
      * @return {Array} list The list of decoder scripts.
      */
     this.getDecoderScripts = function () {
@@ -107,7 +87,6 @@ dwv.io.Url = function ()
 
 /**
  * Handle a load event.
- * @method onload
  * @param {Object} event The load event, event.target
  *  should be the loaded data.
  */
@@ -117,7 +96,6 @@ dwv.io.Url.prototype.onload = function (/*event*/)
 };
 /**
  * Handle a load end event.
- * @method onloadend
  */
 dwv.io.Url.prototype.onloadend = function ()
 {
@@ -125,7 +103,6 @@ dwv.io.Url.prototype.onloadend = function ()
 };
 /**
  * Handle a progress event.
- * @method onprogress
  */
 dwv.io.File.prototype.onprogress = function ()
 {
@@ -133,7 +110,6 @@ dwv.io.File.prototype.onprogress = function ()
 };
 /**
  * Handle an error event.
- * @method onerror
  * @param {Object} event The error event, event.message
  *  should be the error message.
  */
@@ -144,7 +120,6 @@ dwv.io.Url.prototype.onerror = function (/*event*/)
 
 /**
  * Create an error handler from a base one and locals.
- * @method createErrorHandler
  * @param {String} url The related url.
  * @param {String} text The text to insert in the message.
  * @param {Function} baseHandler The base handler.
@@ -159,7 +134,6 @@ dwv.io.Url.createErrorHandler = function (url, text, baseHandler) {
 
 /**
  * Create an progress handler from a base one and locals.
- * @method createProgressHandler
  * @param {Number} n The number of the loaded data.
  * @param {Function} calculator The load progress accumulator.
  * @param {Function} baseHandler The base handler.
@@ -178,7 +152,6 @@ dwv.io.Url.createProgressHandler = function (n, calculator, baseHandler) {
 
 /**
  * Load a list of URLs.
- * @method load
  * @param {Array} ioArray The list of urls to load.
  * @param {Array} requestHeaders An array of {name, value} to use as request headers.
  */

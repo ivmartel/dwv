@@ -1,20 +1,10 @@
-/** 
- * Info module.
- * @module info
- */
+// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for info functions.
- * @class info
- * @namespace dwv
- * @static
- */
+/** @namespace */
 dwv.info = dwv.info || {};
 
 /**
  * WindowLevel info layer.
- * @class Windowing
- * @namespace dwv.info
  * @constructor
  * @param {Object} div The HTML element to add WindowLevel info to.
  */
@@ -22,7 +12,6 @@ dwv.info.Windowing = function ( div )
 {
     /**
      * Create the windowing info div.
-     * @method create
      */
     this.create = function ()
     {
@@ -48,7 +37,6 @@ dwv.info.Windowing = function ( div )
 
     /**
      * Update the windowing info div.
-     * @method update
      * @param {Object} event The windowing change event containing the new values as {wc,ww}.
      * Warning: expects the windowing info div to exist (use after create).
      */
@@ -68,8 +56,6 @@ dwv.info.Windowing = function ( div )
 
 /**
  * Position info layer.
- * @class Position
- * @namespace dwv.info
  * @constructor
  * @param {Object} div The HTML element to add Position info to.
  */
@@ -77,7 +63,6 @@ dwv.info.Position = function ( div )
 {
     /**
      * Create the position info div.
-     * @method create
      */
     this.create = function ()
     {
@@ -103,7 +88,6 @@ dwv.info.Position = function ( div )
 
     /**
      * Update the position info div.
-     * @method update
      * @param {Object} event The position change event containing the new values as {i,j,k}
      *  and optional 'value'.
      * Warning: expects the position info div to exist (use after create).
@@ -127,8 +111,6 @@ dwv.info.Position = function ( div )
 
 /**
  * MiniColourMap info layer.
- * @class MiniColourMap
- * @namespace dwv.info
  * @constructor
  * @param {Object} div The HTML element to add colourMap info to.
  * @param {Object} app The associated application.
@@ -137,7 +119,6 @@ dwv.info.MiniColourMap = function ( div, app )
 {
     /**
      * Create the mini colour map info div.
-     * @method create
      */
     this.create = function ()
     {
@@ -157,7 +138,6 @@ dwv.info.MiniColourMap = function ( div, app )
 
     /**
      * Update the mini colour map info div.
-     * @method update
      * @param {Object} event The windowing change event containing the new values.
      * Warning: expects the mini colour map div to exist (use after createMiniColourMap).
      */
@@ -215,8 +195,6 @@ dwv.info.MiniColourMap = function ( div, app )
 
 /**
  * Plot info layer.
- * @class Plot
- * @namespace dwv.info
  * @constructor
  * @param {Object} div The HTML element to add colourMap info to.
  * @param {Object} app The associated application.
@@ -225,7 +203,6 @@ dwv.info.Plot = function (div, app)
 {
     /**
      * Create the plot info.
-     * @method create
      */
     this.create = function()
     {
@@ -244,7 +221,6 @@ dwv.info.Plot = function (div, app)
 
     /**
      * Update plot.
-     * @method update
      * @param {Object} event The windowing change event containing the new values.
      * Warning: expects the plot to exist (use after createPlot).
      */

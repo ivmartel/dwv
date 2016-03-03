@@ -1,27 +1,10 @@
-/** 
- * GUI module.
- * @module gui
- */
+// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for GUI functions.
- * @class gui
- * @namespace dwv
- * @static
- */
 dwv.gui = dwv.gui || {};
-/**
- * Namespace for base GUI functions.
- * @class base
- * @namespace dwv.gui
- * @static
- */
 dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Get the size of the image display window.
- * @method getWindowSize
- * @static
  */
 dwv.gui.base.getWindowSize = function()
 {
@@ -30,8 +13,6 @@ dwv.gui.base.getWindowSize = function()
 
 /**
  * Display a progress value.
- * @method displayProgress
- * @static
  * @param {Number} percent The progress percentage.
  */
 dwv.gui.base.displayProgress = function(/*percent*/)
@@ -41,8 +22,6 @@ dwv.gui.base.displayProgress = function(/*percent*/)
 
 /**
  * Get a HTML element associated to a container div.
- * @method getElement
- * @static
  * @param containerDivId The id of the container div.
  * @param name The name or id to find.
  * @return The found element or null.
@@ -64,8 +43,6 @@ dwv.gui.base.getElement = function (containerDivId, name)
 
  /**
  * Refresh a HTML element. Mainly for jquery-mobile.
- * @method refreshElement
- * @static
  * @param {String} element The HTML element to refresh.
  */
 dwv.gui.base.refreshElement = function (/*element*/)
@@ -75,8 +52,6 @@ dwv.gui.base.refreshElement = function (/*element*/)
 
 /**
  * Set the selected item of a HTML select.
- * @method setSelected
- * @static
  * @param {String} selectName The name of the HTML select.
  * @param {String} itemName The name of the itme to mark as selected.
  */
@@ -96,15 +71,12 @@ dwv.gui.setSelected = function(element, itemName)
 
 /**
  * Slider base gui.
- * @class Slider
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Slider = function (app)
 {
     /**
      * Append the slider HTML.
-     * @method append
      */
     this.append = function ()
     {
@@ -150,7 +122,6 @@ dwv.gui.base.Slider = function (app)
 
     /**
      * Initialise the slider HTML.
-     * @method initialise
      */
     this.initialise = function ()
     {
@@ -175,15 +146,12 @@ dwv.gui.base.Slider = function (app)
 
 /**
  * DICOM tags base gui.
- * @class DicomTags
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.DicomTags = function (app)
 {
     /**
      * Initialise the DICOM tags table. To be called once the DICOM has been parsed.
-     * @method initialise
      * @param {Object} dataInfo The data information.
      */
     this.initialise = function (dataInfo)

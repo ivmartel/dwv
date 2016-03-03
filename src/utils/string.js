@@ -1,20 +1,10 @@
-/** 
- * Utility module.
- * @module utils
- */
+// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for utility functions.
- * @class utils
- * @namespace dwv
- * @static
- */
+/** @namespace */
 dwv.utils = dwv.utils || {};
 
 /**
  * Capitalise the first letter of a string.
- * @method capitaliseFirstLetter
- * @static
  * @param {String} string The string to capitalise the first letter.
  * @return {String} The new string.
  */
@@ -30,9 +20,7 @@ dwv.utils.capitaliseFirstLetter = function (string)
 /**
  * Split key/value string:
  *  key0=val00&key0=val01&key1=val10 returns
-*   { key0 : [val00, val01], key1 : val1 }
- * @method splitKeyValueString
- * @static
+ *  { key0 : [val00, val01], key1 : val1 }
  * @param {String} inputStr The string to split.
  * @return {Object} The split string.
  */

@@ -1,50 +1,41 @@
-/** 
- * Tool module.
- * @module tool
- */
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
+//external
 var Kinetic = Kinetic || {};
 
 /**
  * Shape editor.
- * @class ShapeEditor
- * @namespace dwv.tool
  * @constructor
  */
 dwv.tool.ShapeEditor = function (app)
 {
     /**
      * Edited shape.
-     * @property shape
      * @private
      * @type Object
      */
     var shape = null;
     /**
      * Edited image. Used for quantification update.
-     * @property image
      * @private
      * @type Object
      */
     var image = null;
     /**
      * Active flag.
-     * @property isActive
      * @private
      * @type Boolean
      */
     var isActive = false;
     /**
      * Update function used by anchors to update the shape.
-     * @property updateFunction
      * @private
      * @type Function
      */
     var updateFunction = null;
     /**
      * Draw event callback.
-     * @property drawEventCallback
      * @private
      * @type Function
      */
@@ -52,7 +43,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Set the shape to edit.
-     * @method setShape
      * @param {Object} inshape The shape to edit.
      */
     this.setShape = function ( inshape ) {
@@ -66,7 +56,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Set the associated image.
-     * @method setImage
      * @param {Object} img The associated image.
      */
     this.setImage = function ( img ) {
@@ -75,7 +64,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Get the edited shape.
-     * @method getShape
      * @return {Object} The edited shape.
      */
     this.getShape = function () {
@@ -84,7 +72,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Get the active flag.
-     * @method isActive
      * @return {Boolean} The active flag.
      */
     this.isActive = function () {
@@ -93,7 +80,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Set the draw event callback.
-     * @method setDrawEventCallback
      * @param {Object} callback The callback.
      */
     this.setDrawEventCallback = function ( callback ) {
@@ -102,7 +88,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Enable the editor. Redraws the layer.
-     * @method enable
      */
     this.enable = function () {
         isActive = true;
@@ -116,7 +101,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Disable the editor. Redraws the layer.
-     * @method disable
      */
     this.disable = function () {
         isActive = false;
@@ -130,7 +114,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Reset the anchors.
-     * @method resetAnchors
      */
     this.resetAnchors = function () {
         // remove previous controls
@@ -154,7 +137,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Set anchors visibility.
-     * @method setAnchorsVisible
      * @param {Boolean} flag The visible flag.
      */
     function setAnchorsVisible( flag ) {
@@ -165,7 +147,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Set anchors active.
-     * @method setAnchorsActive
      * @param {Boolean} flag The active (on/off) flag.
      */
     this.setAnchorsActive = function ( flag ) {
@@ -185,7 +166,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Remove anchors.
-     * @method removeAnchors
      */
     function removeAnchors() {
         applyFuncToAnchors( function (anchor) {
@@ -195,7 +175,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Add the shape anchors.
-     * @method addAnchors
      */
     function addAnchors() {
         // exit if no shape or no layer
@@ -264,7 +243,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Create shape editor controls, i.e. the anchors.
-     * @method addAnchor
      * @param {Object} group The group associated with this anchor.
      * @param {Number} x The X position of the anchor.
      * @param {Number} y The Y position of the anchor.

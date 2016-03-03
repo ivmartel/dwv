@@ -1,28 +1,16 @@
-/** 
- * GUI module.
- * @module gui
- */
+// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for GUI functions.
- * @class gui
- * @namespace dwv
- * @static
- */
 dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Loadbox base gui.
- * @class Loadbox
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Loadbox = function (app, loaders)
 {
     /**
      * Setup the loadbox HTML.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -63,8 +51,6 @@ dwv.gui.base.Loadbox = function (app, loaders)
 
 /**
  * FileLoad base gui.
- * @class FileLoad
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.FileLoad = function (app)
@@ -85,7 +71,6 @@ dwv.gui.base.FileLoad = function (app)
     
     /**
      * Setup the file load HTML to the page.
-     * @method setup
      */
     this.setup = function()
     {
@@ -114,7 +99,6 @@ dwv.gui.base.FileLoad = function (app)
 
     /**
      * Display the file load HTML.
-     * @method display
      * @param {Boolean} bool True to display, false to hide.
      */
     this.display = function (bool)
@@ -129,8 +113,6 @@ dwv.gui.base.FileLoad = function (app)
 
 /**
  * UrlLoad base gui.
- * @class UrlLoad
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.UrlLoad = function (app)
@@ -151,7 +133,6 @@ dwv.gui.base.UrlLoad = function (app)
     
     /**
      * Setup the url load HTML to the page.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -179,7 +160,6 @@ dwv.gui.base.UrlLoad = function (app)
 
     /**
      * Display the url load HTML.
-     * @method display
      * @param {Boolean} bool True to display, false to hide.
      */
     this.display = function (bool)

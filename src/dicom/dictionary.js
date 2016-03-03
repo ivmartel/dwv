@@ -1,21 +1,17 @@
-/** 
- * DICOM module.
- * @module dicom
- */
+// namespaces
 var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
 
 /**
  * DICOM tag dictionary.
  * Generated using xml standard conversion
- *  from https://github.com/ivmartel/dcmbench/tree/master/view/part06
- *  with http://medical.nema.org/medical/dicom/current/source/docbook/part06/part06.xml
+ *  from {@link https://github.com/ivmartel/dcmbench/tree/master/view/part06}
+ *  with {@link http://medical.nema.org/medical/dicom/current/source/docbook/part06/part06.xml}
  * Conversion changes:
  * - (vr) "See Note" -> "NONE", "OB or OW" -> "ox", "US or SS" -> "xs"
  * - added "GenericGroupLength" element to each group
  * Local changes:
  * - tag numbers with 'xx' were replaced with '00', 'xxx' with '001' and 'xxxx' with '0004'
- * @namespace dwv.dicom
  */
 dwv.dicom.dictionary = {
     '0x0000': {

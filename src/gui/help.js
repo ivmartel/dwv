@@ -1,20 +1,10 @@
-/** 
- * GUI module.
- * @module gui
- */
+// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for GUI functions.
- * @class gui
- * @namespace dwv
- * @static
- */
 dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Append the version HTML.
- * @method appendVersionHtml
  */
 dwv.gui.base.appendVersionHtml = function (version)
 {
@@ -28,7 +18,6 @@ dwv.gui.base.appendVersionHtml = function (version)
 
 /**
  * Build the help HTML.
- * @method appendHelpHtml
  * @param {Boolean} mobile Flag for mobile or not environement.
  */
 dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)

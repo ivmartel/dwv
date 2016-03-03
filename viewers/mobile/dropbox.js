@@ -5,21 +5,19 @@
  * API doc page: https://www.dropbox.com/developers/chooser
  */
 var dwv = dwv || {};
+/** @namespace */
 dwv.dropbox = dwv.dropbox || {};
-
+// external
 var Dropbox = Dropbox || {};
 
 /**
  * DropboxLoad gui.
- * @class DropboxLoad
- * @namespace dwv.gui
  * @constructor
  */
 dwv.gui.DropboxLoad = function (app)
 {
     /**
      * Setup the dropbox load HTML to the page.
-     * @method setup
      */
     this.setup = function()
     {
@@ -38,7 +36,6 @@ dwv.gui.DropboxLoad = function (app)
 
     /**
      * Display the file load HTML.
-     * @method display
      * @param {Boolean} bool True to display, false to hide.
      */
     this.display = function (bool)

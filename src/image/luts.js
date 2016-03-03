@@ -1,15 +1,11 @@
-/** 
- * Image module.
- * @module image
- */
+// namespaces
 var dwv = dwv || {};
 dwv.image = dwv.image || {};
+/** @namespace */
 dwv.image.lut = dwv.image.lut || {};
 
 /**
  * Rescale LUT class.
- * @class Rescale
- * @namespace dwv.image.lut
  * @constructor
  * @param {Object} rsi The rescale slope and intercept.
  */
@@ -17,7 +13,6 @@ dwv.image.lut.Rescale = function (rsi)
 {
     /**
      * The internal array.
-     * @property rescaleLut
      * @private
      * @type Array
      */
@@ -25,14 +20,12 @@ dwv.image.lut.Rescale = function (rsi)
 
     /**
      * Get the Rescale Slope and Intercept (RSI).
-     * @method getRSI
      * @return {Object} The rescale slope and intercept.
      */
     this.getRSI = function () { return rsi; };
 
     /**
      * Initialise the LUT.
-     * @method initialise
      * @param {Number} bitsStored The number of bits used to store the data.
      */
     this.initialise = function (bitsStored)
@@ -46,14 +39,12 @@ dwv.image.lut.Rescale = function (rsi)
 
     /**
      * Get the length of the LUT array.
-     * @method getLength
      * @return {Number} The length of the LUT array.
      */
     this.getLength = function () { return rescaleLut.length; };
 
     /**
      * Get the value of the LUT at the given offset.
-     * @method getValue
      * @return {Number} The value of the LUT at the given offset.
      */
     this.getValue = function (offset) { return rescaleLut[offset]; };
@@ -61,8 +52,6 @@ dwv.image.lut.Rescale = function (rsi)
 
 /**
  * Window LUT class.
- * @class Window
- * @namespace dwv.image.lut
  * @constructor
  * @param {Number} rescaleLut_ The associated rescale LUT.
  * @param {Boolean} isSigned_ Flag to know if the data is signed.
@@ -72,7 +61,6 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
     /**
      * The internal array: Uint8ClampedArray clamps between 0 and 255.
      * (not supported on travis yet... using basic array, be sure not to overflow!)
-     * @property rescaleLut
      * @private
      * @type Array
      */
@@ -88,14 +76,12 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
 
     /**
      * The window center.
-     * @property center
      * @private
      * @type Number
      */
     var center = null;
     /**
      * The window width.
-     * @property width
      * @private
      * @type Number
      */
@@ -103,7 +89,6 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
 
     /**
      * Flag to know if the lut needs update or not.
-     * @property needsUpdate
      * @private
      * @type Boolean
      */
@@ -111,32 +96,27 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
 
     /**
      * Get the window center.
-     * @method getCenter
      * @return {Number} The window center.
      */
     this.getCenter = function() { return center; };
     /**
      * Get the window width.
-     * @method getWidth
      * @return {Number} The window width.
      */
     this.getWidth = function() { return width; };
     /**
      * Get the signed flag.
-     * @method isSigned
      * @return {Boolean} The signed flag.
      */
     this.isSigned = function() { return isSigned; };
     /**
      * Get the rescale lut.
-     * @method getRescaleLut
      * @return {Object} The rescale lut.
      */
     this.getRescaleLut = function() { return rescaleLut; };
 
     /**
      * Set the window center and width.
-     * @method setCenterAndWidth
      * @param {Number} inCenter The window center.
      * @param {Number} inWidth The window width.
      */
@@ -150,7 +130,6 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
 
     /**
      * Update the lut if needed..
-     * @method update
      */
     this.update = function ()
     {
@@ -203,14 +182,12 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
 
     /**
      * Get the length of the LUT array.
-     * @method getLength
      * @return {Number} The length of the LUT array.
      */
     this.getLength = function() { return windowLut.length; };
 
     /**
      * Get the value of the LUT at the given offset.
-     * @method getValue
      * @return {Number} The value of the LUT at the given offset.
      */
     this.getValue = function(offset)

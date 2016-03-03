@@ -1,28 +1,16 @@
-/** 
- * GUI module.
- * @module gui
- */
+// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for GUI functions.
- * @class gui
- * @namespace dwv
- * @static
- */
 dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Toolbox base gui.
- * @class Toolbox
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Toolbox = function (app)
 {
     /**
      * Setup the toolbox HTML.
-     * @method setup
      */
     this.setup = function (list)
     {
@@ -51,7 +39,6 @@ dwv.gui.base.Toolbox = function (app)
 
     /**
      * Display the toolbox HTML.
-     * @method display
      * @param {Boolean} bool True to display, false to hide.
      */
     this.display = function (bool)
@@ -63,7 +50,6 @@ dwv.gui.base.Toolbox = function (app)
 
     /**
      * Initialise the toolbox HTML.
-     * @method initialise
      */
     this.initialise = function (displays)
     {
@@ -94,15 +80,12 @@ dwv.gui.base.Toolbox = function (app)
 
 /**
  * WindowLevel tool base gui.
- * @class WindowLevel
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.WindowLevel = function (app)
 {
     /**
      * Setup the tool HTML.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -138,7 +121,6 @@ dwv.gui.base.WindowLevel = function (app)
 
     /**
      * Display the tool HTML.
-     * @method display
      * @param {Boolean} bool True to display, false to hide.
      */
     this.display = function (bool)
@@ -153,7 +135,6 @@ dwv.gui.base.WindowLevel = function (app)
 
     /**
      * Initialise the tool HTML.
-     * @method initialise
      */
     this.initialise = function ()
     {
@@ -187,8 +168,6 @@ dwv.gui.base.WindowLevel = function (app)
 
 /**
  * Draw tool base gui.
- * @class Draw
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Draw = function (app)
@@ -199,13 +178,11 @@ dwv.gui.base.Draw = function (app)
     ];
     /**
      * Get the available colours.
-     * @method getColours
      */
     this.getColours = function () { return colours; };
 
     /**
      * Setup the tool HTML.
-     * @method setup
      */
     this.setup = function (shapeList)
     {
@@ -241,7 +218,6 @@ dwv.gui.base.Draw = function (app)
 
     /**
      * Display the tool HTML.
-     * @method display
      * @param {Boolean} bool True to display, false to hide.
      */
     this.display = function (bool)
@@ -256,7 +232,6 @@ dwv.gui.base.Draw = function (app)
 
     /**
      * Initialise the tool HTML.
-     * @method initialise
      */
     this.initialise = function ()
     {
@@ -277,8 +252,6 @@ dwv.gui.base.Draw = function (app)
 
 /**
  * Livewire tool base gui.
- * @class Livewire
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Livewire = function (app)
@@ -289,13 +262,11 @@ dwv.gui.base.Livewire = function (app)
     ];
     /**
      * Get the available colours.
-     * @method getColours
      */
     this.getColours = function () { return colours; };
 
     /**
      * Setup the tool HTML.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -320,7 +291,6 @@ dwv.gui.base.Livewire = function (app)
 
     /**
      * Display the tool HTML.
-     * @method display
      * @param {Boolean} bool True to display, false to hide.
      */
     this.display = function (bool)
@@ -332,7 +302,6 @@ dwv.gui.base.Livewire = function (app)
 
     /**
      * Initialise the tool HTML.
-     * @method initialise
      */
     this.initialise = function ()
     {
@@ -345,15 +314,12 @@ dwv.gui.base.Livewire = function (app)
 
 /**
  * ZoomAndPan tool base gui.
- * @class ZoomAndPan
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.ZoomAndPan = function (app)
 {
     /**
      * Setup the tool HTML.
-     * @method setup
      */
     this.setup = function()
     {
@@ -384,7 +350,6 @@ dwv.gui.base.ZoomAndPan = function (app)
 
     /**
      * Display the tool HTML.
-     * @method display
      * @param {Boolean} bool True to display, false to hide.
      */
     this.display = function(bool)
@@ -398,15 +363,12 @@ dwv.gui.base.ZoomAndPan = function (app)
 
 /**
  * Scroll tool base gui.
- * @class Scroll
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Scroll = function (app)
 {
     /**
      * Setup the tool HTML.
-     * @method setup
      */
     this.setup = function()
     {
@@ -425,7 +387,6 @@ dwv.gui.base.Scroll = function (app)
 
     /**
      * Display the tool HTML.
-     * @method display
      * @param {Boolean} bool True to display, false to hide.
      */
     this.display = function(bool)

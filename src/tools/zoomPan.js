@@ -1,20 +1,9 @@
-/** 
- * Tool module.
- * @module tool
- */
+// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for tool functions.
- * @class tool
- * @namespace dwv
- * @static
- */
 dwv.tool = dwv.tool || {};
 
 /**
  * ZoomAndPan class.
- * @class ZoomAndPan
- * @namespace dwv.tool
  * @constructor
  * @param {Object} app The associated application.
  */
@@ -22,27 +11,23 @@ dwv.tool.ZoomAndPan = function(app)
 {
     /**
      * Closure to self: to be used by event handlers.
-     * @property self
      * @private
      * @type Object
      */
     var self = this;
     /**
      * ZoomAndPan GUI.
-     * @property gui
      * @type Object
      */
     var gui = null;
     /**
      * Interaction start flag.
-     * @property started
      * @type Boolean
      */
     this.started = false;
 
     /**
      * Handle mouse down event.
-     * @method mousedown
      * @param {Object} event The mouse down event.
      */
     this.mousedown = function(event){
@@ -54,7 +39,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Handle two touch down event.
-     * @method twotouchdown
      * @param {Object} event The touch down event.
      */
     this.twotouchdown = function(event){
@@ -71,7 +55,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Handle mouse move event.
-     * @method mousemove
      * @param {Object} event The mouse move event.
      */
     this.mousemove = function(event){
@@ -92,7 +75,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Handle two touch move event.
-     * @method twotouchmove
      * @param {Object} event The touch move event.
      */
     this.twotouchmove = function(event){
@@ -134,7 +116,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Handle mouse up event.
-     * @method mouseup
      * @param {Object} event The mouse up event.
      */
     this.mouseup = function(/*event*/){
@@ -147,7 +128,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Handle mouse out event.
-     * @method mouseout
      * @param {Object} event The mouse out event.
      */
     this.mouseout = function(event){
@@ -156,7 +136,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Handle touch start event.
-     * @method touchstart
      * @param {Object} event The touch start event.
      */
     this.touchstart = function(event){
@@ -171,7 +150,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Handle touch move event.
-     * @method touchmove
      * @param {Object} event The touch move event.
      */
     this.touchmove = function(event){
@@ -186,7 +164,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Handle touch end event.
-     * @method touchend
      * @param {Object} event The touch end event.
      */
     this.touchend = function(event){
@@ -195,7 +172,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Handle mouse scroll event (fired by Firefox).
-     * @method DOMMouseScroll
      * @param {Object} event The mouse scroll event.
      */
     this.DOMMouseScroll = function(event){
@@ -206,7 +182,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Handle mouse wheel event.
-     * @method mousewheel
      * @param {Object} event The mouse wheel event.
      */
     this.mousewheel = function(event){
@@ -217,7 +192,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Handle key down event.
-     * @method keydown
      * @param {Object} event The key down event.
      */
     this.keydown = function(event){
@@ -226,7 +200,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Setup the tool GUI.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -236,7 +209,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Enable the tool.
-     * @method enable
      * @param {Boolean} bool The flag to enable or not.
      */
     this.display = function(bool){
@@ -249,8 +221,7 @@ dwv.tool.ZoomAndPan = function(app)
 
 /**
  * Help for this tool.
- * @method getHelp
- * @returns {Object} The help content.
+ * @return {Object} The help content.
  */
 dwv.tool.ZoomAndPan.prototype.getHelp = function()
 {
@@ -270,7 +241,6 @@ dwv.tool.ZoomAndPan.prototype.getHelp = function()
 
 /**
  * Initialise the tool.
- * @method init
  */
 dwv.tool.ZoomAndPan.prototype.init = function() {
     return true;

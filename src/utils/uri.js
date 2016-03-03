@@ -1,21 +1,7 @@
-/** 
- * Utility module.
- * @module utils
- */
+// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for utility functions.
- * @class utils
- * @namespace dwv
- * @static
- */
 dwv.utils = dwv.utils || {};
-/**
- * Namespace for base utils functions.
- * @class base
- * @namespace dwv.utils
- * @static
- */
+/** @namespace */
 dwv.utils.base = dwv.utils.base || {};
 
 /**
@@ -24,8 +10,6 @@ dwv.utils.base = dwv.utils.base || {};
  *  { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }
  * Returns an empty object if the input string is not correct (null, empty...)
  *  or if it is not a query string (no question mark).
- * @method splitUri
- * @static
  * @param {String} inputStr The string to split.
  * @return {Object} The split string.
  */
@@ -54,8 +38,6 @@ dwv.utils.splitUri = function (uri)
 /**
  * Get the query part, split into an array, of an input URI.
  * The URI scheme is: 'base?query#fragment'
- * @method getUriQuery
- * @static
  * @param {String } uri The input URI.
  * @return {Object} The query part, split into an array, of the input URI.
  */
@@ -95,8 +77,6 @@ dwv.utils.base.decodeQuery = function (query, callback)
 /**
  * Decode a Key/Value pair URI. If a key is repeated, the result
  * be an array of base + each key.
- * @method decodeKeyValueUri
- * @static
  * @param {String} uri The URI to decode.
  * @param {String} replaceMode The key replace more.
  *   replaceMode can be:
@@ -185,8 +165,6 @@ dwv.utils.decodeKeyValueUri = function (uri, replaceMode)
 
 /**
  * Decode a manifest query.
- * @method decodeManifestQuery
- * @static
  * @param {Object} query The manifest query: {input, nslices},
  *   with input the input URI and nslices the number of slices.
  * @param {Function} The function to call with the decoded urls.
@@ -222,8 +200,6 @@ dwv.utils.decodeManifestQuery = function (query, callback)
 
 /**
  * Decode an XML manifest.
- * @method decodeManifest
- * @static
  * @param {Object} manifest The manifest to decode.
  * @param {Number} nslices The number of slices to load.
  */

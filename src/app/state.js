@@ -1,16 +1,11 @@
-/** 
- * Tool module.
- * @module tool
- */
+// namespaces
 var dwv = dwv || {};
-
+//external
 var Kinetic = Kinetic || {};
 
 /**
  * State class.
  * Saves: data url/path, display info, undo stack.
- * @class State
- * @namespace dwv
  * @constructor
  * @param {Object} app The associated application.
  */
@@ -18,7 +13,6 @@ dwv.State = function (app)
 {
     /**
      * Save state.
-     * @method save
      */
     this.toJSON = function () {
         // store each slice drawings group
@@ -49,7 +43,6 @@ dwv.State = function (app)
     };
     /**
      * Load state.
-     * @method load
      */
     this.fromJSON = function (json, eventCallback) {
         var data = JSON.parse(json);

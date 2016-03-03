@@ -1,12 +1,10 @@
-// Main DWV namespace.
+/** @namespace */
 var dwv = dwv || {};
-
+// external
 var Kinetic = Kinetic || {};
 
 /**
  * Main application class.
- * @class App
- * @namespace dwv
  * @constructor
  */
 dwv.App = function ()
@@ -87,20 +85,17 @@ dwv.App = function ()
 
     /**
      * Get the version of the application.
-     * @method getVersion
      * @return {String} The version of the application.
      */
     this.getVersion = function () { return "v0.14.0-beta"; };
 
     /**
      * Get the image.
-     * @method getImage
      * @return {Image} The associated image.
      */
     this.getImage = function () { return image; };
     /**
      * Set the view.
-     * @method setImage
      * @param {Image} img The associated image.
      */
     this.setImage = function (img)
@@ -110,7 +105,6 @@ dwv.App = function ()
     };
     /**
      * Restore the original image.
-     * @method restoreOriginalImage
      */
     this.restoreOriginalImage = function ()
     {
@@ -119,54 +113,46 @@ dwv.App = function ()
     };
     /**
      * Get the image data array.
-     * @method getImageData
      * @return {Array} The image data array.
      */
     this.getImageData = function () { return imageData; };
     /**
      * Get the number of slices to load.
-     * @method getNSlicesToLoad
      * @return {Number} The number of slices to load.
      */
     this.getNSlicesToLoad = function () { return nSlicesToLoad; };
 
     /**
      * Get the main scale.
-     * @method getScale
      * @return {Number} The main scale.
      */
     this.getScale = function () { return scale / windowScale; };
 
     /**
      * Get the scale center.
-     * @method getScaleCenter
      * @return {Object} The coordinates of the scale center.
      */
     this.getScaleCenter = function () { return scaleCenter; };
 
     /**
      * Get the translation.
-     * @method getTranslation
      * @return {Object} The translation.
      */
     this.getTranslation = function () { return translation; };
 
     /**
      * Get the view controller.
-     * @method getViewController
      * @return {Object} The controller.
      */
     this.getViewController = function () { return viewController; };
 
     /**
      * Get the image layer.
-     * @method getImageLayer
      * @return {Object} The image layer.
      */
     this.getImageLayer = function () { return imageLayer; };
     /**
      * Get the draw layer.
-     * @method getDrawLayer
      * @return {Object} The draw layer.
      */
     this.getDrawLayer = function (k) {
@@ -179,34 +165,29 @@ dwv.App = function ()
     };
     /**
      * Get the draw stage.
-     * @method getDrawStage
      * @return {Object} The draw layer.
      */
     this.getDrawStage = function () { return drawStage; };
 
     /**
      * Get the app style.
-     * @method getStyle
      * @return {Object} The app style.
      */
     this.getStyle = function () { return style; };
 
     /**
      * Get the toolbox.
-     * @method getToolbox
      * @return {Object} The associated toolbox.
      */
     this.getToolbox = function () { return toolbox; };
     /**
      * Get the toolbox controller.
-     * @method getToolboxController
      * @return {Object} The controller.
      */
     this.getToolboxController = function () { return toolboxController; };
 
     /**
      * Add a command to the undo stack.
-     * @method addToUndoStack
      * @param {Object} The command to add.
      */
     this.addToUndoStack = function (cmd) { 
@@ -217,7 +198,6 @@ dwv.App = function ()
 
     /**
      * Initialise the HTML for the application.
-     * @method init
      */
     this.init = function ( config ) {
         containerDivId = config.containerDivId;
@@ -383,7 +363,6 @@ dwv.App = function ()
 
     /**
      * Get a HTML element associated to the application.
-     * @method getElement
      * @param name The name or id to find.
      * @return The found element or null.
      */
@@ -394,7 +373,6 @@ dwv.App = function ()
 
     /**
      * Reset the application.
-     * @method reset
      */
     this.reset = function ()
     {
@@ -419,7 +397,6 @@ dwv.App = function ()
 
     /**
      * Reset the layout of the application.
-     * @method resetLayout
      */
     this.resetLayout = function () {
         scale = windowScale;
@@ -438,7 +415,6 @@ dwv.App = function ()
 
     /**
      * Add an event listener on the app.
-     * @method addEventListener
      * @param {String} type The event type.
      * @param {Object} listener The method associated with the provided event type.
      */
@@ -452,7 +428,6 @@ dwv.App = function ()
 
     /**
      * Remove an event listener from the app.
-     * @method removeEventListener
      * @param {String} type The event type.
      * @param {Object} listener The method associated with the provided event type.
      */
@@ -471,7 +446,6 @@ dwv.App = function ()
 
     /**
      * Load a list of files.
-     * @method loadFiles
      * @param {Array} files The list of files to load.
      */
     this.loadFiles = function (files)
@@ -488,7 +462,6 @@ dwv.App = function ()
 
     /**
      * Load a list of image files.
-     * @method loadImageFiles
      * @param {Array} files The list of image files to load.
      */
     function loadImageFiles (files)
@@ -530,7 +503,6 @@ dwv.App = function ()
 
     /**
      * Load a State file.
-     * @method loadStateFile
      * @param {Array} file An array with the state file to load.
      */
     function loadStateFile(file)
@@ -549,7 +521,6 @@ dwv.App = function ()
 
     /**
      * Load a list of URLs.
-     * @method loadURL
      * @param {Array} urls The list of urls to load.
      * @param {Array} requestHeaders An array of {name, value} to use as request headers.
      */
@@ -591,7 +562,6 @@ dwv.App = function ()
 
     /**
      * Load a State url.
-     * @method loadStateUrl
      * @param {Array} file An array with the state url to load.
      */
     function loadStateUrl(url)
@@ -610,7 +580,6 @@ dwv.App = function ()
 
     /**
      * Fit the display to the given size. To be called once the image is loaded.
-     * @method fitToSize
      */
     this.fitToSize = function (size)
     {
@@ -653,7 +622,6 @@ dwv.App = function ()
 
     /**
      * Toggle the display of the information layer.
-     * @method toggleInfoLayerDisplay
      */
     this.toggleInfoLayerDisplay = function ()
     {
@@ -686,7 +654,6 @@ dwv.App = function ()
 
     /**
      * Add layer mouse and touch listeners.
-     * @method addLayerListeners
      */
     this.addLayerListeners = function (layer)
     {
@@ -708,7 +675,6 @@ dwv.App = function ()
 
     /**
      * Remove layer mouse and touch listeners.
-     * @method removeLayerListeners
      */
     this.removeLayerListeners = function (layer)
     {
@@ -730,7 +696,6 @@ dwv.App = function ()
 
     /**
      * Render the current image.
-     * @method render
      */
     this.render = function ()
     {
@@ -739,7 +704,6 @@ dwv.App = function ()
 
     /**
      * Zoom to the layers.
-     * @method zoom
      * @param {Number} zoom The zoom to apply.
      * @param {Number} cx The zoom center X coordinate.
      * @param {Number} cy The zoom center Y coordinate.
@@ -755,7 +719,6 @@ dwv.App = function ()
 
     /**
      * Add a step to the layers zoom.
-     * @method stepZoom
      * @param {Number} step The zoom step increment. A good step is of 0.1.
      * @param {Number} cx The zoom center X coordinate.
      * @param {Number} cy The zoom center Y coordinate.
@@ -771,7 +734,6 @@ dwv.App = function ()
 
     /**
      * Apply a translation to the layers.
-     * @method translate
      * @param {Number} tx The translation along X.
      * @param {Number} ty The translation along Y.
      */
@@ -783,7 +745,6 @@ dwv.App = function ()
 
     /**
      * Add a translation to the layers.
-     * @method stepTranslate
      * @param {Number} tx The step translation along X.
      * @param {Number} ty The step translation along Y.
      */
@@ -799,7 +760,6 @@ dwv.App = function ()
 
     /**
      * Handle window/level change.
-     * @method onWLChange
      * @param {Object} event The event fired when changing the window/level.
      */
     this.onWLChange = function (/*event*/)
@@ -809,7 +769,6 @@ dwv.App = function ()
 
     /**
      * Handle colour map change.
-     * @method onColourChange
      * @param {Object} event The event fired when changing the colour map.
      */
     this.onColourChange = function (/*event*/)
@@ -819,7 +778,6 @@ dwv.App = function ()
 
     /**
      * Handle slice change.
-     * @method onSliceChange
      * @param {Object} event The event fired when changing the slice.
      */
     this.onSliceChange = function (/*event*/)
@@ -842,7 +800,6 @@ dwv.App = function ()
      * - CRTL-Z: undo
      * - CRTL-Y: redo
      * Default behavior. Usually used in tools.
-     * @method onKeydown
      * @param {Object} event The key down event.
      */
     this.onKeydown = function (event)
@@ -860,7 +817,6 @@ dwv.App = function ()
     /**
      * Handle resize.
      * Fit the display to the window. To be called once the image is loaded.
-     * @method onResize
      * @param {Object} event The change event.
      */
     this.onResize = function (/*event*/)
@@ -870,7 +826,6 @@ dwv.App = function ()
 
     /**
      * Handle zoom reset.
-     * @method onZoomReset
      * @param {Object} event The change event.
      */
     this.onZoomReset = function (/*event*/)
@@ -880,7 +835,6 @@ dwv.App = function ()
 
     /**
      * Handle loader change.
-     * @method onChangeLoader
      * @param {Object} event The change event.
      */
     this.onChangeLoader = function (/*event*/)
@@ -890,7 +844,6 @@ dwv.App = function ()
 
     /**
      * Handle change url event.
-     * @method onChangeURL
      * @param {Object} event The event fired when changing the url field.
      */
     this.onChangeURL = function (event)
@@ -900,7 +853,6 @@ dwv.App = function ()
 
     /**
      * Handle input urls.
-     * @method onInputURLs
      * @param {Array} urls The list of input urls.
      * @param {Array} requestHeaders An array of {name, value} to use as request headers.
      */
@@ -911,7 +863,6 @@ dwv.App = function ()
 
     /**
      * Handle change files event.
-     * @method onChangeFiles
      * @param {Object} event The event fired when changing the file field.
      */
     this.onChangeFiles = function (event)
@@ -924,7 +875,6 @@ dwv.App = function ()
 
     /**
      * Handle state save event.
-     * @method onStateSave
      * @param {Object} event The event fired when changing the state save field.
      */
     this.onStateSave = function (/*event*/)
@@ -937,7 +887,6 @@ dwv.App = function ()
 
     /**
      * Handle colour map change.
-     * @method onChangeColourMap
      * @param {Object} event The change event.
      */
     this.onChangeColourMap = function (/*event*/)
@@ -947,7 +896,6 @@ dwv.App = function ()
 
     /**
      * Handle window/level preset change.
-     * @method onChangeWindowLevelPreset
      * @param {Object} event The change event.
      */
     this.onChangeWindowLevelPreset = function (/*event*/)
@@ -965,7 +913,6 @@ dwv.App = function ()
 
     /**
      * Handle tool change.
-     * @method onChangeTool
      * @param {Object} event The change event.
      */
     this.onChangeTool = function (/*event*/)
@@ -975,7 +922,6 @@ dwv.App = function ()
 
     /**
      * Handle shape change.
-     * @method onChangeShape
      * @param {Object} event The change event.
      */
     this.onChangeShape = function (/*event*/)
@@ -985,7 +931,6 @@ dwv.App = function ()
 
     /**
      * Handle filter change.
-     * @method onChangeFilter
      * @param {Object} event The change event.
      */
     this.onChangeFilter = function (/*event*/)
@@ -995,7 +940,6 @@ dwv.App = function ()
 
     /**
      * Handle filter run.
-     * @method onRunFilter
      * @param {Object} event The run event.
      */
     this.onRunFilter = function (/*event*/)
@@ -1005,7 +949,6 @@ dwv.App = function ()
 
     /**
      * Handle line colour change.
-     * @method onChangeLineColour
      * @param {Object} event The change event.
      */
     this.onChangeLineColour = function (/*event*/)
@@ -1015,7 +958,6 @@ dwv.App = function ()
 
     /**
      * Handle min/max slider change.
-     * @method onChangeMinMax
      * @param {Object} range The new range of the data.
      */
     this.onChangeMinMax = function (range)
@@ -1025,7 +967,6 @@ dwv.App = function ()
 
     /**
      * Handle undo.
-     * @method onUndo
      * @param {Object} event The associated event.
      */
     this.onUndo = function (/*event*/)
@@ -1035,7 +976,6 @@ dwv.App = function ()
 
     /**
      * Handle redo.
-     * @method onRedo
      * @param {Object} event The associated event.
      */
     this.onRedo = function (/*event*/)
@@ -1045,7 +985,6 @@ dwv.App = function ()
 
     /**
      * Handle toggle of info layer.
-     * @method onToggleInfoLayer
      * @param {Object} event The associated event.
      */
     this.onToggleInfoLayer = function (/*event*/)
@@ -1055,7 +994,6 @@ dwv.App = function ()
 
     /**
      * Handle display reset.
-     * @method onDisplayReset
      * @param {Object} event The change event.
      */
     this.onDisplayReset = function (/*event*/)
@@ -1073,7 +1011,6 @@ dwv.App = function ()
 
     /**
      * Fire an event: call all associated listeners.
-     * @method fireEvent
      * @param {Object} event The event to fire.
      */
     function fireEvent (event)
@@ -1089,7 +1026,6 @@ dwv.App = function ()
 
     /**
      * Generate the image data and draw it.
-     * @method generateAndDrawImage
      */
     function generateAndDrawImage()
     {
@@ -1103,7 +1039,6 @@ dwv.App = function ()
 
     /**
      * Apply the stored zoom to the layers.
-     * @method zoomLayers
      */
     function zoomLayers()
     {
@@ -1134,7 +1069,6 @@ dwv.App = function ()
 
     /**
      * Apply the stored translation to the layers.
-     * @method translateLayers
      */
     function translateLayers()
     {
@@ -1154,7 +1088,6 @@ dwv.App = function ()
 
     /**
      * Add image listeners.
-     * @method addImageInfoListeners
      * @private
      */
     function addImageInfoListeners()
@@ -1169,7 +1102,6 @@ dwv.App = function ()
 
     /**
      * Remove image listeners.
-     * @method removeImageInfoListeners
      * @private
      */
     function removeImageInfoListeners()
@@ -1185,7 +1117,6 @@ dwv.App = function ()
     /**
      * Mou(se) and (T)ouch event handler. This function just determines the mouse/touch
      * position relative to the canvas element. It then passes it to the current tool.
-     * @method onMouch
      * @private
      * @param {Object} event The event to handle.
      */
@@ -1259,7 +1190,6 @@ dwv.App = function ()
 
     /**
      * Handle a drag over.
-     * @method onDragOver
      * @private
      * @param {Object} event The event to handle.
      */
@@ -1277,7 +1207,6 @@ dwv.App = function ()
 
     /**
      * Handle a drag leave.
-     * @method onDragLeave
      * @private
      * @param {Object} event The event to handle.
      */
@@ -1295,7 +1224,6 @@ dwv.App = function ()
 
     /**
      * Handle a drop event.
-     * @method onDrop
      * @private
      * @param {Object} event The event to handle.
      */
@@ -1310,7 +1238,6 @@ dwv.App = function ()
 
     /**
      * Handle an error: display it to the user.
-     * @method handleError
      * @private
      * @param {Object} error The error to handle.
      */
@@ -1331,7 +1258,6 @@ dwv.App = function ()
 
     /**
      * Handle a load progress.
-     * @method onLoadProgress
      * @private
      * @param {Object} event The event to handle.
      */
@@ -1347,7 +1273,6 @@ dwv.App = function ()
 
     /**
      * Create the application layers.
-     * @method createLayers
      * @private
      * @param {Number} dataWidth The width of the input data.
      * @param {Number} dataHeight The height of the input data.
@@ -1388,7 +1313,6 @@ dwv.App = function ()
 
     /**
      * Post load application initialisation. To be called once the DICOM has been parsed.
-     * @method postLoadInit
      * @private
      * @param {Object} data The data to display.
      */

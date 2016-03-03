@@ -1,8 +1,6 @@
-/** 
- * Math module.
- * @module math
- */
+// namespaces
 var dwv = dwv || {};
+/** @namespace */
 dwv.math = dwv.math || {};
 
 /**
@@ -14,8 +12,6 @@ dwv.math = dwv.math || {};
  * If the most recent point had a cost of c, any points added should have a cost
  * c' in the range c <= c' <= c + (capacity - 1).
  *
- * @class BucketQueue
- * @namespace dwv.math
  * @constructor
  * @input bits
  * @input cost_functor

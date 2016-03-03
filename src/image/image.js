@@ -1,14 +1,10 @@
-/** 
- * Image module.
- * @module image
- */
+// namespaces
 var dwv = dwv || {};
+/** @namespace */
 dwv.image = dwv.image || {};
 
 /**
  * Rescale Slope and Intercept
- * @class RescaleSlopeAndIntercept
- * @namespace dwv.image
  * @constructor
  * @param slope
  * @param intercept
@@ -26,7 +22,6 @@ dwv.image.RescaleSlopeAndIntercept = function (slope, intercept)
 
     /**
      * Get the slope of the RSI.
-     * @method getSlope
      * @return {Number} The slope of the RSI.
      */
     this.getSlope = function ()
@@ -35,7 +30,6 @@ dwv.image.RescaleSlopeAndIntercept = function (slope, intercept)
     };
     /**
      * Get the intercept of the RSI.
-     * @method getIntercept
      * @return {Number} The intercept of the RSI.
      */
     this.getIntercept = function ()
@@ -44,7 +38,6 @@ dwv.image.RescaleSlopeAndIntercept = function (slope, intercept)
     };
     /**
      * Apply the RSI on an input value.
-     * @method apply
      * @return {Number} The value to rescale.
      */
     this.apply = function (value)
@@ -55,7 +48,6 @@ dwv.image.RescaleSlopeAndIntercept = function (slope, intercept)
 
 /**
  * Check for RSI equality.
- * @method equals
  * @param {Object} rhs The other RSI to compare to.
  * @return {Boolean} True if both RSI are equal.
  */
@@ -67,7 +59,6 @@ dwv.image.RescaleSlopeAndIntercept.prototype.equals = function (rhs) {
 
 /**
  * Get a string representation of the RSI.
- * @method toString
  * @return {String} The RSI as a string.
  */
 dwv.image.RescaleSlopeAndIntercept.prototype.toString = function () {
@@ -80,8 +71,6 @@ dwv.image.RescaleSlopeAndIntercept.prototype.toString = function () {
  * - rescale slope and intercept (default 1:0),
  * - photometric interpretation (default MONOCHROME2),
  * - planar configuration (default RGBRGB...).
- * @class Image
- * @namespace dwv.image
  * @constructor
  * @param {Object} geometry The geometry of the image.
  * @param {Array} buffer The image data.
@@ -90,7 +79,6 @@ dwv.image.Image = function(geometry, buffer)
 {
     /**
      * Rescale slope and intercept.
-     * @property rsi
      * @private
      * @type Number
      */
@@ -100,28 +88,24 @@ dwv.image.Image = function(geometry, buffer)
     }
     /**
      * Photometric interpretation (MONOCHROME, RGB...).
-     * @property photometricInterpretation
      * @private
      * @type String
      */
     var photometricInterpretation = "MONOCHROME2";
     /**
      * Planar configuration for RGB data (0:RGBRGBRGBRGB... or 1:RRR...GGG...BBB...).
-     * @property planarConfiguration
      * @private
      * @type Number
      */
     var planarConfiguration = 0;
     /**
      * Number of components.
-     * @property planarConfiguration
      * @private
      * @type Number
      */
     var numberOfComponents = buffer.length / geometry.getSize().getTotalSize();
     /**
      * Meta information.
-     * @property meta
      * @private
      * @type Object
      */
@@ -129,7 +113,6 @@ dwv.image.Image = function(geometry, buffer)
 
     /**
      * Original buffer.
-     * @property originalBuffer
      * @private
      * @type Array
      */
@@ -137,21 +120,18 @@ dwv.image.Image = function(geometry, buffer)
 
     /**
      * Data range.
-     * @property dataRange
      * @private
      * @type Object
      */
     var dataRange = null;
     /**
      * Rescaled data range.
-     * @property rescaledDataRange
      * @private
      * @type Object
      */
     var rescaledDataRange = null;
     /**
      * Histogram.
-     * @property histogram
      * @private
      * @type Array
      */
@@ -159,26 +139,23 @@ dwv.image.Image = function(geometry, buffer)
 
     /**
      * Get the geometry of the image.
-     * @method getGeometry
      * @return {Object} The size of the image.
      */
     this.getGeometry = function() { return geometry; };
     /**
-     * Get the data buffer of the image. TODO dangerous...
-     * @method getBuffer
+     * Get the data buffer of the image. 
+     * @todo dangerous...
      * @return {Array} The data buffer of the image.
      */
     this.getBuffer = function() { return buffer; };
 
     /**
      * Get the rescale slope and intercept.
-     * @method getRescaleSlopeAndIntercept
      * @return {Object} The rescale slope and intercept.
      */
     this.getRescaleSlopeAndIntercept = function(k) { return rsis[k]; };
     /**
      * Set the rescale slope and intercept.
-     * @method setRescaleSlopeAndIntercept
      * @param {Object} rsi The rescale slope and intercept.
      */
     this.setRescaleSlopeAndIntercept = function(inRsi, k) {
@@ -189,51 +166,43 @@ dwv.image.Image = function(geometry, buffer)
     };
     /**
      * Get the photometricInterpretation of the image.
-     * @method getPhotometricInterpretation
      * @return {String} The photometricInterpretation of the image.
      */
     this.getPhotometricInterpretation = function() { return photometricInterpretation; };
     /**
      * Set the photometricInterpretation of the image.
-     * @method setPhotometricInterpretation
      * @pqrqm {String} interp The photometricInterpretation of the image.
      */
     this.setPhotometricInterpretation = function(interp) { photometricInterpretation = interp; };
     /**
      * Get the planarConfiguration of the image.
-     * @method getPlanarConfiguration
      * @return {Number} The planarConfiguration of the image.
      */
     this.getPlanarConfiguration = function() { return planarConfiguration; };
     /**
      * Set the planarConfiguration of the image.
-     * @method setPlanarConfiguration
      * @param {Number} config The planarConfiguration of the image.
      */
     this.setPlanarConfiguration = function(config) { planarConfiguration = config; };
     /**
      * Get the numberOfComponents of the image.
-     * @method getNumberOfComponents
      * @return {Number} The numberOfComponents of the image.
      */
     this.getNumberOfComponents = function() { return numberOfComponents; };
 
     /**
      * Get the meta information of the image.
-     * @method getMeta
      * @return {Object} The meta information of the image.
      */
     this.getMeta = function() { return meta; };
     /**
      * Set the meta information of the image.
-     * @method setMeta
      * @param {Object} rhs The meta information of the image.
      */
     this.setMeta = function(rhs) { meta = rhs; };
 
     /**
      * Get value at offset. Warning: No size check...
-     * @method getValueAtOffset
      * @param {Number} offset The desired offset.
      * @return {Number} The value at offset.
      */
@@ -243,7 +212,6 @@ dwv.image.Image = function(geometry, buffer)
 
     /**
      * Clone the image.
-     * @method clone
      * @return {Image} A clone of this image.
      */
     this.clone = function()
@@ -261,7 +229,6 @@ dwv.image.Image = function(geometry, buffer)
 
     /**
      * Append a slice to the image.
-     * @method appendSlice
      * @param {Image} The slice to append.
      * @return {Number} The number of the inserted slice.
      */
@@ -337,7 +304,6 @@ dwv.image.Image = function(geometry, buffer)
 
     /**
      * Get the data range.
-     * @method getDataRange
      * @return {Object} The data range.
      */
     this.getDataRange = function() {
@@ -349,7 +315,6 @@ dwv.image.Image = function(geometry, buffer)
 
     /**
      * Get the rescaled data range.
-     * @method getRescaledDataRange
      * @return {Object} The rescaled data range.
      */
     this.getRescaledDataRange = function() {
@@ -361,7 +326,6 @@ dwv.image.Image = function(geometry, buffer)
 
     /**
      * Get the histogram.
-     * @method getHistogram
      * @return {Array} The histogram.
      */
     this.getHistogram = function() {
@@ -377,7 +341,6 @@ dwv.image.Image = function(geometry, buffer)
 
 /**
  * Get the value of the image at a specific coordinate.
- * @method getValue
  * @param {Number} i The X index.
  * @param {Number} j The Y index.
  * @param {Number} k The Z index.
@@ -392,7 +355,6 @@ dwv.image.Image.prototype.getValue = function( i, j, k )
 
 /**
  * Get the rescaled value of the image at a specific coordinate.
- * @method getRescaledValue
  * @param {Number} i The X index.
  * @param {Number} j The Y index.
  * @param {Number} k The Z index.
@@ -406,7 +368,6 @@ dwv.image.Image.prototype.getRescaledValue = function( i, j, k )
 
 /**
  * Calculate the data range of the image.
- * @method calculateDataRange
  * @return {Object} The range {min, max}.
  */
 dwv.image.Image.prototype.calculateDataRange = function ()
@@ -426,7 +387,6 @@ dwv.image.Image.prototype.calculateDataRange = function ()
 
 /**
  * Calculate the rescaled data range of the image.
- * @method calculateRescaledDataRange
  * @return {Object} The range {min, max}.
  */
 dwv.image.Image.prototype.calculateRescaledDataRange = function ()
@@ -450,7 +410,6 @@ dwv.image.Image.prototype.calculateRescaledDataRange = function ()
 
 /**
  * Calculate the histogram of the image.
- * @method calculateHistogram
  * @return {Object} The histogram, data range and rescaled data range.
  */
 dwv.image.Image.prototype.calculateHistogram = function ()
@@ -491,7 +450,6 @@ dwv.image.Image.prototype.calculateHistogram = function ()
 
 /**
  * Convolute the image with a given 2D kernel.
- * @method convolute2D
  * @param {Array} weights The weights of the 2D kernel as a 3x3 matrix.
  * @return {Image} The convoluted image.
  * Note: Uses the raw buffer values.
@@ -642,7 +600,6 @@ dwv.image.Image.prototype.convolute2D = function(weights)
 
 /**
  * Transform an image using a specific operator.
- * @method transform
  * @param {Function} operator The operator to use when transforming.
  * @return {Image} The transformed image.
  * Note: Uses the raw buffer values.
@@ -660,7 +617,6 @@ dwv.image.Image.prototype.transform = function(operator)
 
 /**
  * Compose this image with another one and using a specific operator.
- * @method compose
  * @param {Image} rhs The image to compose with.
  * @param {Function} operator The operator to use when composing.
  * @return {Image} The composed image.
@@ -680,7 +636,6 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
 
 /**
  * Quantify a line according to image information.
- * @method quantifyLine
  * @param {Object} line The line to quantify.
  * @return {Object} A quantification object.
  */
@@ -694,7 +649,6 @@ dwv.image.Image.prototype.quantifyLine = function(line)
 
 /**
  * Quantify a rectangle according to image information.
- * @method quantifyRect
  * @param {Object} rect The rectangle to quantify.
  * @return {Object} A quantification object.
  */
@@ -720,7 +674,6 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
 
 /**
  * Quantify an ellipse according to image information.
- * @method quantifyEllipse
  * @param {Object} ellipse The ellipse to quantify.
  * @return {Object} A quantification object.
  */
@@ -733,19 +686,16 @@ dwv.image.Image.prototype.quantifyEllipse = function(ellipse)
 };
 
 /**
- * Image factory.
- * @class ImageFactory
- * @namespace dwv.image
+ * {@link dwv.image.Image} factory.
  * @constructor
  */
 dwv.image.ImageFactory = function () {};
 
 /**
- * Get an Image object from the read DICOM file.
- * @method create
+ * Get an {@link dwv.image.Image} object from the read DICOM file.
  * @param {Object} dicomElements The DICOM tags.
  * @param {Array} pixelBuffer The pixel buffer.
- * @returns {View} A new Image.
+ * @return {View} A new Image.
  */
 dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
 {

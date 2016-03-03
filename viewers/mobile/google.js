@@ -5,8 +5,9 @@
  * - https://apis.google.com/js/client.js: drive and request
  */
 var dwv = dwv || {};
+/** @namespace */
 dwv.google = dwv.google || {};
-
+// external
 var gapi = gapi || {};
 var google = google || {};
 
@@ -267,15 +268,12 @@ dwv.google.getAuthorizedCallback = function (callback) {
 
 /**
  * GoogleDriveLoad gui.
- * @class GoogleDriveLoad
- * @namespace dwv.gui
  * @constructor
  */
 dwv.gui.GoogleDriveLoad = function (app)
 {
     /**
      * Setup the gdrive load HTML to the page.
-     * @method setup
      */
     this.setup = function()
     {
@@ -298,7 +296,6 @@ dwv.gui.GoogleDriveLoad = function (app)
 
     /**
      * Display the file load HTML.
-     * @method display
      * @param {Boolean} bool True to display, false to hide.
      */
     this.display = function (bool)

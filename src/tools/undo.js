@@ -1,27 +1,20 @@
-/** 
- * Tool module.
- * @module tool
- */
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
 /**
  * UndoStack class.
- * @class UndoStack
- * @namespace dwv.tool
  * @constructor
  */
 dwv.tool.UndoStack = function (app)
 {
     /**
      * Undo GUI.
-     * @property gui
      * @type Object
      */
     var gui = new dwv.gui.Undo(app);
     /**
      * Array of commands.
-     * @property stack
      * @private
      * @type Array
      */
@@ -29,14 +22,12 @@ dwv.tool.UndoStack = function (app)
 
     /**
      * Get the stack.
-     * @method getStack
      * @return {Array} The list of stored commands.
      */
     this.getStack = function () { return stack; };
 
     /**
      * Current command index.
-     * @property curCmdIndex
      * @private
      * @type Number
      */
@@ -44,7 +35,6 @@ dwv.tool.UndoStack = function (app)
 
     /**
      * Add a command to the stack.
-     * @method add
      * @param {Object} cmd The command to add.
      */
     this.add = function(cmd)
@@ -62,7 +52,6 @@ dwv.tool.UndoStack = function (app)
 
     /**
      * Undo the last command.
-     * @method undo
      */
     this.undo = function()
     {
@@ -80,7 +69,6 @@ dwv.tool.UndoStack = function (app)
 
     /**
      * Redo the last command.
-     * @method redo
      */
     this.redo = function()
     {
@@ -97,7 +85,6 @@ dwv.tool.UndoStack = function (app)
 
     /**
      * Setup the tool GUI.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -106,7 +93,6 @@ dwv.tool.UndoStack = function (app)
 
     /**
      * Initialise the tool GUI.
-     * @method initialise
      */
     this.initialise = function ()
     {
