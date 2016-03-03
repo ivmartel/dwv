@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Home</title>
+    <title>JSDoc: Source: app/state.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,32 +17,93 @@
 
 <div id="main">
 
-    <h1 class="page-title">Home</h1>
+    <h1 class="page-title">Source: app/state.js</h1>
 
     
 
 
 
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// namespaces
+var dwv = dwv || {};
+//external
+var Kinetic = Kinetic || {};
 
-
-    <h3> </h3>
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
+/**
+ * State class.
+ * Saves: data url/path, display info, undo stack.
+ * @constructor
+ * @param {Object} app The associated application.
+ */
+dwv.State = function (app)
+{
+    /**
+     * Save state.
+     */
+    this.toJSON = function () {
+        // store each slice drawings group
+        var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
+        var drawings = [];
+        for ( var k = 0; k &lt; nSlices; ++k ) {
+            // getChildren always return, so drawings will have the good size
+            var groups = app.getDrawLayer(k).getChildren();
+            // remove anchors
+            for ( var i = 0; i &lt; groups.length; ++i ) {
+                var anchors  = groups[i].find(".anchor");
+                for ( var a = 0; a &lt; anchors.length; ++a ) {
+                    anchors[a].remove();
+                }
+            }
+            drawings.push(groups);
+        }
+        // return a JSON string
+        return JSON.stringify( {
+            "window-center": app.getViewController().getWindowLevel().center,
+            "window-width": app.getViewController().getWindowLevel().width,
+            "position": app.getViewController().getCurrentPosition(),
+            "scale": app.getScale(),
+            "scaleCenter": app.getScaleCenter(),
+            "translation": app.getTranslation(),
+            "drawings": drawings
+        } );
+    };
+    /**
+     * Load state.
+     */
+    this.fromJSON = function (json, eventCallback) {
+        var data = JSON.parse(json);
+        // display
+        app.getViewController().setWindowLevel(data["window-center"], data["window-width"]);
+        app.getViewController().setCurrentPosition(data.position);
+        app.zoom(data.scale, data.scaleCenter.x, data.scaleCenter.y);
+        app.translate(data.translation.x, data.translation.y);
+        // drawings
+        var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
+        var isShape = function (node) {
+            return node.name() === "shape";
+        };
+        for ( var k = 0 ; k &lt; nSlices; ++k ) {
+            for ( var i = 0 ; i &lt; data.drawings[k].length; ++i ) {
+                var group = Kinetic.Node.create(data.drawings[k][i]);
+                var shape = group.getChildren( isShape )[0];
+                var cmd = new dwv.tool.DrawGroupCommand(
+                    group, shape.className,
+                    app.getDrawLayer(k) );
+                if ( typeof eventCallback !== "undefined" ) {
+                    cmd.onExecute = eventCallback;
+                    cmd.onUndo = eventCallback;
+                }
+                cmd.execute();
+                app.addToUndoStack(cmd);
+            }
+        }
+    };
+}; // State class
+</code></pre>
+        </article>
+    </section>
 
 
 

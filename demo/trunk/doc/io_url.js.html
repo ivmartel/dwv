@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: io/url.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: io/url.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// namespaces
+var dwv = dwv || {};
+dwv.io = dwv.io || {};
+
+/**
+ * Url loader.
+ * @constructor
+ */
+dwv.io.Url = function ()
+{
+    /**
+     * Number of data to load.
+     * @private
+     * @type Number
+     */
+    var nToLoad = 0;
+    /**
+     * Number of loaded data.
+     * @private
+     * @type Number
+     */
+    var nLoaded = 0;
+    /**
+     * List of progresses.
+     * @private
+     * @type Array
+     */
+    var progressList = [];
+    /**
+     * List of data decoders scripts.
+     * @private
+     * @type Array
+     */
+    var decoderScripts = [];
+
+    /**
+     * Set the number of data to load.
+     */
+    this.setNToLoad = function (n) {
+        nToLoad = n;
+        for ( var i = 0; i &lt; nToLoad; ++i ) {
+            progressList[i] = 0;
+        }
+    };
+
+    /**
+     * Increment the number of loaded data
+     * and call onloadend if loaded all data.
+     */
+    this.addLoaded = function () {
+        nLoaded++;
+        if ( nLoaded === nToLoad ) {
+            this.onloadend();
+        }
+    };
+
+    /**
+     * Get the global load percent including the provided one.
+     * @param {Number} n The number of the loaded data.
+     * @param {Number} percent The percentage of data 'n' that has been loaded.
+     * @return {Number} The accumulated percentage.
+     */
+    this.getGlobalPercent = function (n, percent) {
+        progressList[n] = percent/nToLoad;
+        var totPercent = 0;
+        for ( var i = 0; i &lt; progressList.length; ++i ) {
+            totPercent += progressList[i];
+        }
+        return totPercent;
+    };
+    
+    /**
+     * Set the web workers decoder scripts.
+     * @param {Array} list The list of decoder scripts.
+     */
+    this.setDecoderScripts = function (list) {
+        decoderScripts = list;
+    };
+    /**
+     * Get the web workers decoder scripts.
+     * @return {Array} list The list of decoder scripts.
+     */
+    this.getDecoderScripts = function () {
+        return decoderScripts;
+    };
+}; // class Url
+
+/**
+ * Handle a load event.
+ * @param {Object} event The load event, event.target
+ *  should be the loaded data.
+ */
+dwv.io.Url.prototype.onload = function (/*event*/)
+{
+    // default does nothing.
+};
+/**
+ * Handle a load end event.
+ */
+dwv.io.Url.prototype.onloadend = function ()
+{
+    // default does nothing.
+};
+/**
+ * Handle a progress event.
+ */
+dwv.io.File.prototype.onprogress = function ()
+{
+    // default does nothing.
+};
+/**
+ * Handle an error event.
+ * @param {Object} event The error event, event.message
+ *  should be the error message.
+ */
+dwv.io.Url.prototype.onerror = function (/*event*/)
+{
+    // default does nothing.
+};
+
+/**
+ * Create an error handler from a base one and locals.
+ * @param {String} url The related url.
+ * @param {String} text The text to insert in the message.
+ * @param {Function} baseHandler The base handler.
+ */
+dwv.io.Url.createErrorHandler = function (url, text, baseHandler) {
+    return function (/*event*/) {
+        baseHandler( {'name': "RequestError",
+            'message': "An error occurred while retrieving the " + text + " file (via http): " + url +
+            " (status: "+this.status + ")" } );
+    };
+};
+
+/**
+ * Create an progress handler from a base one and locals.
+ * @param {Number} n The number of the loaded data.
+ * @param {Function} calculator The load progress accumulator.
+ * @param {Function} baseHandler The base handler.
+ */
+dwv.io.Url.createProgressHandler = function (n, calculator, baseHandler) {
+    return function (event) {
+        if( event.lengthComputable )
+        {
+            var percent = Math.round((event.loaded / event.total) * 100);
+            var ev = {type: "load-progress", lengthComputable: true,
+                    loaded: calculator(n, percent), total: 100};
+            baseHandler(ev);
+        }
+    };
+};
+
+/**
+ * Load a list of URLs.
+ * @param {Array} ioArray The list of urls to load.
+ * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+ */
+dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
+{
+    // closure to self for handlers
+    var self = this;
+    // set the number of data to load
+    this.setNToLoad( ioArray.length );
+
+    // call the listeners
+    var onLoadView = function (data)
+    {
+        self.onload(data);
+        self.addLoaded();
+    };
+
+    // DICOM buffer to dwv.image.View (asynchronous)
+    var db2v = new dwv.image.DicomBufferToView(this.getDecoderScripts());
+    var onLoadDicomBuffer = function (response)
+    {
+        try {
+            db2v.convert(response, onLoadView);
+        } catch (error) {
+            self.onerror(error);
+        }
+    };
+
+    // DOM Image buffer to dwv.image.View
+    var onLoadDOMImageBuffer = function (/*event*/)
+    {
+        try {
+            onLoadView( dwv.image.getViewFromDOMImage(this) );
+        } catch (error) {
+            self.onerror(error);
+        }
+    };
+
+    // load text buffer
+    var onLoadTextBuffer = function (/*event*/)
+    {
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
+        // status 200: "OK"; status 0: "debug"
+        if (this.status !== 200 &amp;&amp; this.status !== 0) {
+            this.onerror();
+            return;
+        }
+
+        try {
+            self.onload( this.responseText );
+        } catch (error) {
+            self.onerror(error);
+        }
+    };
+
+    // load binary buffer
+    var onLoadBinaryBuffer = function (/*event*/)
+    {
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
+        // status 200: "OK"; status 0: "debug"
+        if (this.status !== 200 &amp;&amp; this.status !== 0) {
+            this.onerror();
+            return;
+        }
+        
+        // find the image type from its signature
+        var view = new DataView(this.response);
+        var isJpeg = view.getUint32(0) === 0xffd8ffe0;
+        var isPng = view.getUint32(0) === 0x89504e47;
+        var isGif = view.getUint32(0) === 0x47494638;
+
+        // check possible extension
+        // (responseURL is supported on major browsers but not IE...)
+        if ( !isJpeg &amp;&amp; !isPng &amp;&amp; !isGif &amp;&amp; this.responseURL )
+        {
+            var ext = this.responseURL.split('.').pop().toLowerCase();
+            isJpeg = (ext === "jpg") || (ext === "jpeg");
+            isPng = (ext === "png");
+            isGif = (ext === "gif");
+        }
+
+        // non DICOM
+        if( isJpeg || isPng || isGif )
+        {
+            // image data as string
+            var bytes = new Uint8Array(this.response);
+            var imageDataStr = '';
+            for( var i = 0; i &lt; bytes.byteLength; ++i ) {
+                imageDataStr += String.fromCharCode(bytes[i]);
+            }
+            // image type
+            var imageType = "unknown";
+            if(isJpeg) {
+                imageType = "jpeg";
+            }
+            else if(isPng) {
+                imageType = "png";
+            }
+            else if(isGif) {
+                imageType = "gif";
+            }
+            // temporary image object
+            var tmpImage = new Image();
+            tmpImage.src = "data:image/" + imageType + ";base64," + window.btoa(imageDataStr);
+            tmpImage.onload = onLoadDOMImageBuffer;
+        }
+        else
+        {
+            onLoadDicomBuffer(this.response);
+        }
+    };
+
+    // loop on I/O elements
+    for (var i = 0; i &lt; ioArray.length; ++i)
+    {
+        var url = ioArray[i];
+        // read as text according to extension
+        var isText = ( url.split('.').pop().toLowerCase() === "json" );
+
+        var request = new XMLHttpRequest();
+        request.open('GET', url, true);
+        if ( typeof requestHeaders !== "undefined" ) {
+            for (var j = 0; j &lt; requestHeaders.length; ++j) { 
+                if ( typeof requestHeaders[j].name !== "undefined" &amp;&amp;
+                    typeof requestHeaders[j].value !== "undefined" ) {
+                    request.setRequestHeader(requestHeaders[j].name, requestHeaders[j].value);
+                }
+            }
+        }
+        if ( !isText ) {
+            request.responseType = "arraybuffer";
+            request.onload = onLoadBinaryBuffer;
+            request.onerror = dwv.io.Url.createErrorHandler(url, "binary", self.onerror);
+        }
+        else {
+            request.onload = onLoadTextBuffer;
+            request.onerror = dwv.io.Url.createErrorHandler(url, "text", self.onerror);
+        }
+        request.onprogress = dwv.io.File.createProgressHandler(i,
+            self.getGlobalPercent, self.onprogress);
+        request.send(null);
+    }
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="dwv.App.html">App</a></li><li><a href="dwv.dicom.DataReader.html">DataReader</a></li><li><a href="dwv.dicom.DataWriter.html">DataWriter</a></li><li><a href="dwv.dicom.DicomElementsWrapper.html">DicomElementsWrapper</a></li><li><a href="dwv.dicom.DicomParser.html">DicomParser</a></li><li><a href="dwv.dicom.DicomWriter.html">DicomWriter</a></li><li><a href="dwv.gui.base.DicomTags.html">DicomTags</a></li><li><a href="dwv.gui.base.Draw.html">Draw</a></li><li><a href="dwv.gui.base.FileLoad.html">FileLoad</a></li><li><a href="dwv.gui.base.Filter.html">Filter</a></li><li><a href="dwv.gui.base.Livewire.html">Livewire</a></li><li><a href="dwv.gui.base.Loadbox.html">Loadbox</a></li><li><a href="dwv.gui.base.Scroll.html">Scroll</a></li><li><a href="dwv.gui.base.Sharpen.html">Sharpen</a></li><li><a href="dwv.gui.base.Slider.html">Slider</a></li><li><a href="dwv.gui.base.Sobel.html">Sobel</a></li><li><a href="dwv.gui.base.Threshold.html">Threshold</a></li><li><a href="dwv.gui.base.Toolbox.html">Toolbox</a></li><li><a href="dwv.gui.base.Undo.html">Undo</a></li><li><a href="dwv.gui.base.UrlLoad.html">UrlLoad</a></li><li><a href="dwv.gui.base.WindowLevel.html">WindowLevel</a></li><li><a href="dwv.gui.base.ZoomAndPan.html">ZoomAndPan</a></li><li><a href="dwv.html.Layer.html">Layer</a></li><li><a href="dwv.html.Style.html">Style</a></li><li><a href="dwv.image.DicomBufferToView.html">DicomBufferToView</a></li><li><a href="dwv.image.filter.Sharpen.html">Sharpen</a></li><li><a href="dwv.image.filter.Sobel.html">Sobel</a></li><li><a href="dwv.image.filter.Threshold.html">Threshold</a></li><li><a href="dwv.image.Geometry.html">Geometry</a></li><li><a href="dwv.image.Image.html">Image</a></li><li><a href="dwv.image.ImageFactory.html">ImageFactory</a></li><li><a href="dwv.image.lut.Rescale.html">Rescale</a></li><li><a href="dwv.image.lut.Window.html">Window</a></li><li><a href="dwv.image.RescaleSlopeAndIntercept.html">RescaleSlopeAndIntercept</a></li><li><a href="dwv.image.Size.html">Size</a></li><li><a href="dwv.image.Spacing.html">Spacing</a></li><li><a href="dwv.image.View.html">View</a></li><li><a href="dwv.image.ViewFactory.html">ViewFactory</a></li><li><a href="dwv.info.MiniColourMap.html">MiniColourMap</a></li><li><a href="dwv.info.Plot.html">Plot</a></li><li><a href="dwv.info.Position.html">Position</a></li><li><a href="dwv.info.Windowing.html">Windowing</a></li><li><a href="dwv.io.File.html">File</a></li><li><a href="dwv.io.Url.html">Url</a></li><li><a href="dwv.math.BucketQueue.html">BucketQueue</a></li><li><a href="dwv.math.Circle.html">Circle</a></li><li><a href="dwv.math.Ellipse.html">Ellipse</a></li><li><a href="dwv.math.FastPoint2D.html">FastPoint2D</a></li><li><a href="dwv.math.Index3D.html">Index3D</a></li><li><a href="dwv.math.Line.html">Line</a></li><li><a href="dwv.math.Path.html">Path</a></li><li><a href="dwv.math.Point2D.html">Point2D</a></li><li><a href="dwv.math.Point3D.html">Point3D</a></li><li><a href="dwv.math.Rectangle.html">Rectangle</a></li><li><a href="dwv.math.ROI.html">ROI</a></li><li><a href="dwv.math.Scissors.html">Scissors</a></li><li><a href="dwv.State.html">State</a></li><li><a href="dwv.tool.ChangeGroupCommand.html">ChangeGroupCommand</a></li><li><a href="dwv.tool.DeleteGroupCommand.html">DeleteGroupCommand</a></li><li><a href="dwv.tool.Draw.html">Draw</a></li><li><a href="dwv.tool.DrawGroupCommand.html">DrawGroupCommand</a></li><li><a href="dwv.tool.EllipseFactory.html">EllipseFactory</a></li><li><a href="dwv.tool.Filter.html">Filter</a></li><li><a href="dwv.tool.filter.Sharpen.html">Sharpen</a></li><li><a href="dwv.tool.filter.Sobel.html">Sobel</a></li><li><a href="dwv.tool.filter.Threshold.html">Threshold</a></li><li><a href="dwv.tool.LineFactory.html">LineFactory</a></li><li><a href="dwv.tool.Livewire.html">Livewire</a></li><li><a href="dwv.tool.MoveGroupCommand.html">MoveGroupCommand</a></li><li><a href="dwv.tool.ProtractorFactory.html">ProtractorFactory</a></li><li><a href="dwv.tool.RectangleFactory.html">RectangleFactory</a></li><li><a href="dwv.tool.RoiFactory.html">RoiFactory</a></li><li><a href="dwv.tool.RunFilterCommand.html">RunFilterCommand</a></li><li><a href="dwv.tool.Scroll.html">Scroll</a></li><li><a href="dwv.tool.ShapeEditor.html">ShapeEditor</a></li><li><a href="dwv.tool.Toolbox.html">Toolbox</a></li><li><a href="dwv.tool.UndoStack.html">UndoStack</a></li><li><a href="dwv.tool.WindowLevel.html">WindowLevel</a></li><li><a href="dwv.tool.ZoomAndPan.html">ZoomAndPan</a></li><li><a href="dwv.ToolboxController.html">ToolboxController</a></li><li><a href="dwv.utils.ThreadPool.html">ThreadPool</a></li><li><a href="dwv.utils.WorkerTask.html">WorkerTask</a></li><li><a href="dwv.utils.WorkerThread.html">WorkerThread</a></li><li><a href="dwv.ViewController.html">ViewController</a></li></ul><h3>Namespaces</h3><ul><li><a href="dwv.html">dwv</a></li><li><a href="dwv.browser.html">browser</a></li><li><a href="dwv.dicom.html">dicom</a></li><li><a href="dwv.gui.html">gui</a></li><li><a href="dwv.gui.base.html">base</a></li><li><a href="dwv.gui.filter.html">filter</a></li><li><a href="dwv.gui.filter.base.html">base</a></li><li><a href="dwv.html.html">html</a></li><li><a href="dwv.image.html">image</a></li><li><a href="dwv.image.filter.html">filter</a></li><li><a href="dwv.image.lut.html">lut</a></li><li><a href="dwv.info.html">info</a></li><li><a href="dwv.io.html">io</a></li><li><a href="dwv.math.html">math</a></li><li><a href="dwv.tool.html">tool</a></li><li><a href="dwv.tool.filter_.html">filter</a></li><li><a href="dwv.utils.html">utils</a></li><li><a href="dwv.utils.base.html">base</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Thu Mar 03 2016 23:23:22 GMT+0000 (UTC)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

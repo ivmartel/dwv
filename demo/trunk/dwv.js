@@ -1,12 +1,10 @@
-// Main DWV namespace.
+/** @namespace */
 var dwv = dwv || {};
-
+// external
 var Kinetic = Kinetic || {};
 
 /**
  * Main application class.
- * @class App
- * @namespace dwv
  * @constructor
  */
 dwv.App = function ()
@@ -87,20 +85,17 @@ dwv.App = function ()
 
     /**
      * Get the version of the application.
-     * @method getVersion
      * @return {String} The version of the application.
      */
     this.getVersion = function () { return "v0.14.0-beta"; };
 
     /**
      * Get the image.
-     * @method getImage
      * @return {Image} The associated image.
      */
     this.getImage = function () { return image; };
     /**
      * Set the view.
-     * @method setImage
      * @param {Image} img The associated image.
      */
     this.setImage = function (img)
@@ -110,7 +105,6 @@ dwv.App = function ()
     };
     /**
      * Restore the original image.
-     * @method restoreOriginalImage
      */
     this.restoreOriginalImage = function ()
     {
@@ -119,54 +113,46 @@ dwv.App = function ()
     };
     /**
      * Get the image data array.
-     * @method getImageData
      * @return {Array} The image data array.
      */
     this.getImageData = function () { return imageData; };
     /**
      * Get the number of slices to load.
-     * @method getNSlicesToLoad
      * @return {Number} The number of slices to load.
      */
     this.getNSlicesToLoad = function () { return nSlicesToLoad; };
 
     /**
      * Get the main scale.
-     * @method getScale
      * @return {Number} The main scale.
      */
     this.getScale = function () { return scale / windowScale; };
 
     /**
      * Get the scale center.
-     * @method getScaleCenter
      * @return {Object} The coordinates of the scale center.
      */
     this.getScaleCenter = function () { return scaleCenter; };
 
     /**
      * Get the translation.
-     * @method getTranslation
      * @return {Object} The translation.
      */
     this.getTranslation = function () { return translation; };
 
     /**
      * Get the view controller.
-     * @method getViewController
      * @return {Object} The controller.
      */
     this.getViewController = function () { return viewController; };
 
     /**
      * Get the image layer.
-     * @method getImageLayer
      * @return {Object} The image layer.
      */
     this.getImageLayer = function () { return imageLayer; };
     /**
      * Get the draw layer.
-     * @method getDrawLayer
      * @return {Object} The draw layer.
      */
     this.getDrawLayer = function (k) {
@@ -179,34 +165,29 @@ dwv.App = function ()
     };
     /**
      * Get the draw stage.
-     * @method getDrawStage
      * @return {Object} The draw layer.
      */
     this.getDrawStage = function () { return drawStage; };
 
     /**
      * Get the app style.
-     * @method getStyle
      * @return {Object} The app style.
      */
     this.getStyle = function () { return style; };
 
     /**
      * Get the toolbox.
-     * @method getToolbox
      * @return {Object} The associated toolbox.
      */
     this.getToolbox = function () { return toolbox; };
     /**
      * Get the toolbox controller.
-     * @method getToolboxController
      * @return {Object} The controller.
      */
     this.getToolboxController = function () { return toolboxController; };
 
     /**
      * Add a command to the undo stack.
-     * @method addToUndoStack
      * @param {Object} The command to add.
      */
     this.addToUndoStack = function (cmd) { 
@@ -217,7 +198,6 @@ dwv.App = function ()
 
     /**
      * Initialise the HTML for the application.
-     * @method init
      */
     this.init = function ( config ) {
         containerDivId = config.containerDivId;
@@ -383,7 +363,6 @@ dwv.App = function ()
 
     /**
      * Get a HTML element associated to the application.
-     * @method getElement
      * @param name The name or id to find.
      * @return The found element or null.
      */
@@ -394,7 +373,6 @@ dwv.App = function ()
 
     /**
      * Reset the application.
-     * @method reset
      */
     this.reset = function ()
     {
@@ -419,7 +397,6 @@ dwv.App = function ()
 
     /**
      * Reset the layout of the application.
-     * @method resetLayout
      */
     this.resetLayout = function () {
         scale = windowScale;
@@ -438,7 +415,6 @@ dwv.App = function ()
 
     /**
      * Add an event listener on the app.
-     * @method addEventListener
      * @param {String} type The event type.
      * @param {Object} listener The method associated with the provided event type.
      */
@@ -452,7 +428,6 @@ dwv.App = function ()
 
     /**
      * Remove an event listener from the app.
-     * @method removeEventListener
      * @param {String} type The event type.
      * @param {Object} listener The method associated with the provided event type.
      */
@@ -471,7 +446,6 @@ dwv.App = function ()
 
     /**
      * Load a list of files.
-     * @method loadFiles
      * @param {Array} files The list of files to load.
      */
     this.loadFiles = function (files)
@@ -488,7 +462,6 @@ dwv.App = function ()
 
     /**
      * Load a list of image files.
-     * @method loadImageFiles
      * @param {Array} files The list of image files to load.
      */
     function loadImageFiles (files)
@@ -530,7 +503,6 @@ dwv.App = function ()
 
     /**
      * Load a State file.
-     * @method loadStateFile
      * @param {Array} file An array with the state file to load.
      */
     function loadStateFile(file)
@@ -549,7 +521,6 @@ dwv.App = function ()
 
     /**
      * Load a list of URLs.
-     * @method loadURL
      * @param {Array} urls The list of urls to load.
      * @param {Array} requestHeaders An array of {name, value} to use as request headers.
      */
@@ -591,7 +562,6 @@ dwv.App = function ()
 
     /**
      * Load a State url.
-     * @method loadStateUrl
      * @param {Array} file An array with the state url to load.
      */
     function loadStateUrl(url)
@@ -610,7 +580,6 @@ dwv.App = function ()
 
     /**
      * Fit the display to the given size. To be called once the image is loaded.
-     * @method fitToSize
      */
     this.fitToSize = function (size)
     {
@@ -653,7 +622,6 @@ dwv.App = function ()
 
     /**
      * Toggle the display of the information layer.
-     * @method toggleInfoLayerDisplay
      */
     this.toggleInfoLayerDisplay = function ()
     {
@@ -686,7 +654,6 @@ dwv.App = function ()
 
     /**
      * Add layer mouse and touch listeners.
-     * @method addLayerListeners
      */
     this.addLayerListeners = function (layer)
     {
@@ -708,7 +675,6 @@ dwv.App = function ()
 
     /**
      * Remove layer mouse and touch listeners.
-     * @method removeLayerListeners
      */
     this.removeLayerListeners = function (layer)
     {
@@ -730,7 +696,6 @@ dwv.App = function ()
 
     /**
      * Render the current image.
-     * @method render
      */
     this.render = function ()
     {
@@ -739,7 +704,6 @@ dwv.App = function ()
 
     /**
      * Zoom to the layers.
-     * @method zoom
      * @param {Number} zoom The zoom to apply.
      * @param {Number} cx The zoom center X coordinate.
      * @param {Number} cy The zoom center Y coordinate.
@@ -755,7 +719,6 @@ dwv.App = function ()
 
     /**
      * Add a step to the layers zoom.
-     * @method stepZoom
      * @param {Number} step The zoom step increment. A good step is of 0.1.
      * @param {Number} cx The zoom center X coordinate.
      * @param {Number} cy The zoom center Y coordinate.
@@ -771,7 +734,6 @@ dwv.App = function ()
 
     /**
      * Apply a translation to the layers.
-     * @method translate
      * @param {Number} tx The translation along X.
      * @param {Number} ty The translation along Y.
      */
@@ -783,7 +745,6 @@ dwv.App = function ()
 
     /**
      * Add a translation to the layers.
-     * @method stepTranslate
      * @param {Number} tx The step translation along X.
      * @param {Number} ty The step translation along Y.
      */
@@ -799,7 +760,6 @@ dwv.App = function ()
 
     /**
      * Handle window/level change.
-     * @method onWLChange
      * @param {Object} event The event fired when changing the window/level.
      */
     this.onWLChange = function (/*event*/)
@@ -809,7 +769,6 @@ dwv.App = function ()
 
     /**
      * Handle colour map change.
-     * @method onColourChange
      * @param {Object} event The event fired when changing the colour map.
      */
     this.onColourChange = function (/*event*/)
@@ -819,7 +778,6 @@ dwv.App = function ()
 
     /**
      * Handle slice change.
-     * @method onSliceChange
      * @param {Object} event The event fired when changing the slice.
      */
     this.onSliceChange = function (/*event*/)
@@ -842,7 +800,6 @@ dwv.App = function ()
      * - CRTL-Z: undo
      * - CRTL-Y: redo
      * Default behavior. Usually used in tools.
-     * @method onKeydown
      * @param {Object} event The key down event.
      */
     this.onKeydown = function (event)
@@ -860,7 +817,6 @@ dwv.App = function ()
     /**
      * Handle resize.
      * Fit the display to the window. To be called once the image is loaded.
-     * @method onResize
      * @param {Object} event The change event.
      */
     this.onResize = function (/*event*/)
@@ -870,7 +826,6 @@ dwv.App = function ()
 
     /**
      * Handle zoom reset.
-     * @method onZoomReset
      * @param {Object} event The change event.
      */
     this.onZoomReset = function (/*event*/)
@@ -880,7 +835,6 @@ dwv.App = function ()
 
     /**
      * Handle loader change.
-     * @method onChangeLoader
      * @param {Object} event The change event.
      */
     this.onChangeLoader = function (/*event*/)
@@ -890,7 +844,6 @@ dwv.App = function ()
 
     /**
      * Handle change url event.
-     * @method onChangeURL
      * @param {Object} event The event fired when changing the url field.
      */
     this.onChangeURL = function (event)
@@ -900,7 +853,6 @@ dwv.App = function ()
 
     /**
      * Handle input urls.
-     * @method onInputURLs
      * @param {Array} urls The list of input urls.
      * @param {Array} requestHeaders An array of {name, value} to use as request headers.
      */
@@ -911,7 +863,6 @@ dwv.App = function ()
 
     /**
      * Handle change files event.
-     * @method onChangeFiles
      * @param {Object} event The event fired when changing the file field.
      */
     this.onChangeFiles = function (event)
@@ -924,7 +875,6 @@ dwv.App = function ()
 
     /**
      * Handle state save event.
-     * @method onStateSave
      * @param {Object} event The event fired when changing the state save field.
      */
     this.onStateSave = function (/*event*/)
@@ -937,7 +887,6 @@ dwv.App = function ()
 
     /**
      * Handle colour map change.
-     * @method onChangeColourMap
      * @param {Object} event The change event.
      */
     this.onChangeColourMap = function (/*event*/)
@@ -947,7 +896,6 @@ dwv.App = function ()
 
     /**
      * Handle window/level preset change.
-     * @method onChangeWindowLevelPreset
      * @param {Object} event The change event.
      */
     this.onChangeWindowLevelPreset = function (/*event*/)
@@ -965,7 +913,6 @@ dwv.App = function ()
 
     /**
      * Handle tool change.
-     * @method onChangeTool
      * @param {Object} event The change event.
      */
     this.onChangeTool = function (/*event*/)
@@ -975,7 +922,6 @@ dwv.App = function ()
 
     /**
      * Handle shape change.
-     * @method onChangeShape
      * @param {Object} event The change event.
      */
     this.onChangeShape = function (/*event*/)
@@ -985,7 +931,6 @@ dwv.App = function ()
 
     /**
      * Handle filter change.
-     * @method onChangeFilter
      * @param {Object} event The change event.
      */
     this.onChangeFilter = function (/*event*/)
@@ -995,7 +940,6 @@ dwv.App = function ()
 
     /**
      * Handle filter run.
-     * @method onRunFilter
      * @param {Object} event The run event.
      */
     this.onRunFilter = function (/*event*/)
@@ -1005,7 +949,6 @@ dwv.App = function ()
 
     /**
      * Handle line colour change.
-     * @method onChangeLineColour
      * @param {Object} event The change event.
      */
     this.onChangeLineColour = function (/*event*/)
@@ -1015,7 +958,6 @@ dwv.App = function ()
 
     /**
      * Handle min/max slider change.
-     * @method onChangeMinMax
      * @param {Object} range The new range of the data.
      */
     this.onChangeMinMax = function (range)
@@ -1025,7 +967,6 @@ dwv.App = function ()
 
     /**
      * Handle undo.
-     * @method onUndo
      * @param {Object} event The associated event.
      */
     this.onUndo = function (/*event*/)
@@ -1035,7 +976,6 @@ dwv.App = function ()
 
     /**
      * Handle redo.
-     * @method onRedo
      * @param {Object} event The associated event.
      */
     this.onRedo = function (/*event*/)
@@ -1045,7 +985,6 @@ dwv.App = function ()
 
     /**
      * Handle toggle of info layer.
-     * @method onToggleInfoLayer
      * @param {Object} event The associated event.
      */
     this.onToggleInfoLayer = function (/*event*/)
@@ -1055,7 +994,6 @@ dwv.App = function ()
 
     /**
      * Handle display reset.
-     * @method onDisplayReset
      * @param {Object} event The change event.
      */
     this.onDisplayReset = function (/*event*/)
@@ -1073,7 +1011,6 @@ dwv.App = function ()
 
     /**
      * Fire an event: call all associated listeners.
-     * @method fireEvent
      * @param {Object} event The event to fire.
      */
     function fireEvent (event)
@@ -1089,7 +1026,6 @@ dwv.App = function ()
 
     /**
      * Generate the image data and draw it.
-     * @method generateAndDrawImage
      */
     function generateAndDrawImage()
     {
@@ -1103,7 +1039,6 @@ dwv.App = function ()
 
     /**
      * Apply the stored zoom to the layers.
-     * @method zoomLayers
      */
     function zoomLayers()
     {
@@ -1134,7 +1069,6 @@ dwv.App = function ()
 
     /**
      * Apply the stored translation to the layers.
-     * @method translateLayers
      */
     function translateLayers()
     {
@@ -1154,7 +1088,6 @@ dwv.App = function ()
 
     /**
      * Add image listeners.
-     * @method addImageInfoListeners
      * @private
      */
     function addImageInfoListeners()
@@ -1169,7 +1102,6 @@ dwv.App = function ()
 
     /**
      * Remove image listeners.
-     * @method removeImageInfoListeners
      * @private
      */
     function removeImageInfoListeners()
@@ -1185,7 +1117,6 @@ dwv.App = function ()
     /**
      * Mou(se) and (T)ouch event handler. This function just determines the mouse/touch
      * position relative to the canvas element. It then passes it to the current tool.
-     * @method onMouch
      * @private
      * @param {Object} event The event to handle.
      */
@@ -1259,7 +1190,6 @@ dwv.App = function ()
 
     /**
      * Handle a drag over.
-     * @method onDragOver
      * @private
      * @param {Object} event The event to handle.
      */
@@ -1277,7 +1207,6 @@ dwv.App = function ()
 
     /**
      * Handle a drag leave.
-     * @method onDragLeave
      * @private
      * @param {Object} event The event to handle.
      */
@@ -1295,7 +1224,6 @@ dwv.App = function ()
 
     /**
      * Handle a drop event.
-     * @method onDrop
      * @private
      * @param {Object} event The event to handle.
      */
@@ -1310,7 +1238,6 @@ dwv.App = function ()
 
     /**
      * Handle an error: display it to the user.
-     * @method handleError
      * @private
      * @param {Object} error The error to handle.
      */
@@ -1331,7 +1258,6 @@ dwv.App = function ()
 
     /**
      * Handle a load progress.
-     * @method onLoadProgress
      * @private
      * @param {Object} event The event to handle.
      */
@@ -1347,7 +1273,6 @@ dwv.App = function ()
 
     /**
      * Create the application layers.
-     * @method createLayers
      * @private
      * @param {Number} dataWidth The width of the input data.
      * @param {Number} dataHeight The height of the input data.
@@ -1388,7 +1313,6 @@ dwv.App = function ()
 
     /**
      * Post load application initialisation. To be called once the DICOM has been parsed.
-     * @method postLoadInit
      * @private
      * @param {Object} data The data to display.
      */
@@ -1487,19 +1411,14 @@ dwv.App = function ()
     }
 
 };
-;/** 
- * Tool module.
- * @module tool
- */
+;// namespaces
 var dwv = dwv || {};
-
+//external
 var Kinetic = Kinetic || {};
 
 /**
  * State class.
  * Saves: data url/path, display info, undo stack.
- * @class State
- * @namespace dwv
  * @constructor
  * @param {Object} app The associated application.
  */
@@ -1507,7 +1426,6 @@ dwv.State = function (app)
 {
     /**
      * Save state.
-     * @method save
      */
     this.toJSON = function () {
         // store each slice drawings group
@@ -1538,7 +1456,6 @@ dwv.State = function (app)
     };
     /**
      * Load state.
-     * @method load
      */
     this.fromJSON = function (json, eventCallback) {
         var data = JSON.parse(json);
@@ -1569,20 +1486,17 @@ dwv.State = function (app)
         }
     };
 }; // State class
-;// Main DWV namespace.
+;// namespaces
 var dwv = dwv || {};
 
 /**
  * Toolbox controller.
- * @class ToolboxController
- * @namespace dwv
  * @constructor
  */
 dwv.ToolboxController = function (toolbox)
 {
     /**
      * Set the selected tool.
-     * @method setSelectedTool
      * @param {String} name The name of the tool.
      */
     this.setSelectedTool = function (name)
@@ -1592,7 +1506,6 @@ dwv.ToolboxController = function (toolbox)
 
     /**
      * Set the selected shape.
-     * @method setSelectedShape
      * @param {String} name The name of the shape.
      */
     this.setSelectedShape = function (name)
@@ -1602,7 +1515,6 @@ dwv.ToolboxController = function (toolbox)
 
     /**
      * Set the selected filter.
-     * @method setSelectedFilter
      * @param {String} name The name of the filter.
      */
     this.setSelectedFilter = function (name)
@@ -1612,7 +1524,6 @@ dwv.ToolboxController = function (toolbox)
 
     /**
      * Run the selected filter.
-     * @method runSelectedFilter
      */
     this.runSelectedFilter = function ()
     {
@@ -1621,7 +1532,6 @@ dwv.ToolboxController = function (toolbox)
 
     /**
      * Set the tool line colour.
-     * @method runFilter
      * @param {String} name The name of the colour.
      */
     this.setLineColour = function (name)
@@ -1631,7 +1541,6 @@ dwv.ToolboxController = function (toolbox)
 
     /**
      * Set the tool range.
-     * @method setRange
      * @param {Object} range The new range of the data.
      */
     this.setRange = function (range)
@@ -1645,13 +1554,11 @@ dwv.ToolboxController = function (toolbox)
     };
 
 }; // class dwv.ToolboxController
-;// Main DWV namespace.
+;// namespaces
 var dwv = dwv || {};
 
 /**
  * View controller.
- * @class ViewController
- * @namespace dwv
  * @constructor
  */
 dwv.ViewController = function ( view )
@@ -1661,14 +1568,12 @@ dwv.ViewController = function ( view )
 
     /**
      * Get the window/level presets.
-     * @method getPresets
      * @return {Object} The presets.
      */
     this.getPresets = function () { return presets; };
 
     /**
      * Get the current position.
-     * @method getCurrentPosition
      * @return {Object} The position.
       */
     this.getCurrentPosition = function ()
@@ -1678,7 +1583,6 @@ dwv.ViewController = function ( view )
 
     /**
      * Set the current position.
-     * @method setCurrentPosition
      * @param {Object} pos The position.
      * @return {Boolean} False if not in bounds.
       */
@@ -1689,7 +1593,6 @@ dwv.ViewController = function ( view )
 
     /**
      * Set the current 2D (i,j) position.
-     * @method setCurrentPosition2D
      * @param {Number} i The column index.
      * @param {Number} j The row index.
      * @return {Boolean} False if not in bounds.
@@ -1705,7 +1608,6 @@ dwv.ViewController = function ( view )
 
     /**
      * Increment the current slice number.
-     * @method incrementSliceNb
      * @return {Boolean} False if not in bounds.
      */
     this.incrementSliceNb = function ()
@@ -1719,7 +1621,6 @@ dwv.ViewController = function ( view )
 
     /**
      * Decrement the current slice number.
-     * @method decrementSliceNb
      * @return {Boolean} False if not in bounds.
      */
     this.decrementSliceNb = function ()
@@ -1733,7 +1634,6 @@ dwv.ViewController = function ( view )
 
     /**
      * Go to first slice .
-     * @method goFirstSlice
      * @return {Boolean} False if not in bounds.
      */
     this.goFirstSlice = function()
@@ -1747,7 +1647,6 @@ dwv.ViewController = function ( view )
 
     /**
      * Get the window/level.
-     * @method getWindowLevel
      * @return {Object} The window center and width.
      */
     this.getWindowLevel = function ()
@@ -1760,7 +1659,6 @@ dwv.ViewController = function ( view )
 
     /**
      * Set the window/level.
-     * @method setWindowLevel
      * @param {Number} wc The window center.
      * @param {Number} ww The window width.
      */
@@ -1771,7 +1669,6 @@ dwv.ViewController = function ( view )
 
     /**
      * Update the window/level presets.
-     * @function updatePresets
      * @param {Object} image The associated image.
      * @param {Boolean} full If true, shows all presets.
      */
@@ -1816,7 +1713,6 @@ dwv.ViewController = function ( view )
 
     /**
      * Get the colour map.
-     * @method getColourMap
      * @return {Object} The colour map.
      */
     this.getColourMap = function ()
@@ -1826,7 +1722,6 @@ dwv.ViewController = function ( view )
 
     /**
      * Set the colour map.
-     * @method setColourMap
      * @param {Object} colourMap The colour map.
      */
     this.setColourMap = function (colourMap)
@@ -1836,7 +1731,6 @@ dwv.ViewController = function ( view )
 
     /**
      * Set the colour map from a name.
-     * @function setColourMapFromName
      * @param {String} name The name of the colour map to set.
      */
     this.setColourMapFromName = function (name)
@@ -1850,17 +1744,13 @@ dwv.ViewController = function ( view )
     };
 
 }; // class dwv.ViewController
-;/** 
- * DICOM module.
- * @module dicom
- */
+;// namespaces
 var dwv = dwv || {};
+/** @namespace */
 dwv.dicom = dwv.dicom || {};
 
 /**
  * Clean string: trim and remove ending.
- * @method cleanString
- * @static
  * @param {String} string The string to clean.
  * @return {String} The cleaned string.
  */
@@ -1880,7 +1770,6 @@ dwv.dicom.cleanString = function (string)
 
 /**
  * Is the Native endianness Little Endian.
- * @property isNativeLittleEndian
  * @type Boolean
  */
 dwv.dicom.isNativeLittleEndian = function ()
@@ -1890,8 +1779,6 @@ dwv.dicom.isNativeLittleEndian = function ()
 
 /**
  * Data reader.
- * @class DataReader
- * @namespace dwv.dicom
  * @constructor
  * @param {Array} buffer The input array buffer.
  * @param {Boolean} isLittleEndian Flag to tell if the data is little or big endian.
@@ -1905,7 +1792,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
 
     /**
      * Is the Native endianness Little Endian.
-     * @property isNativeLittleEndian
      * @private
      * @type Boolean
      */
@@ -1913,7 +1799,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
 
     /**
      * Flag to know if the TypedArray data needs flipping.
-     * @property needFlip
      * @private
      * @type Boolean
      */
@@ -1921,7 +1806,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
 
     /**
      * The main data view.
-     * @property view
      * @private
      * @type DataView
      */
@@ -1929,8 +1813,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
 
     /**
      * Flip an array's endianness.
-     * Inspired from https://github.com/kig/DataStream.js.
-     * @method flipArrayEndianness
+     * Inspired from {@link https://github.com/kig/DataStream.js}.
      * @param {Object} array The array to flip (modified).
      */
     this.flipArrayEndianness = function (array) {
@@ -1949,7 +1832,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
 
     /**
      * Read Uint16 (2 bytes) data.
-     * @method readUint16
      * @param {Number} byteOffset The offset to start reading from.
      * @return {Number} The read data.
      */
@@ -1958,7 +1840,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
     };
     /**
      * Read Uint32 (4 bytes) data.
-     * @method readUint32
      * @param {Number} byteOffset The offset to start reading from.
      * @return {Number} The read data.
      */
@@ -1967,7 +1848,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
     };
     /**
      * Read Int32 (4 bytes) data.
-     * @method readInt32
      * @param {Number} byteOffset The offset to start reading from.
      * @return {Number} The read data.
      */
@@ -1976,7 +1856,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
     };
     /**
      * Read Uint8 array.
-     * @method readUint8Array
      * @param {Number} byteOffset The offset to start reading from.
      * @param {Number} size The size of the array.
      * @return {Array} The read data.
@@ -1986,7 +1865,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
     };
     /**
      * Read Int8 array.
-     * @method readInt8Array
      * @param {Number} byteOffset The offset to start reading from.
      * @param {Number} size The size of the array.
      * @return {Array} The read data.
@@ -1996,7 +1874,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
     };
     /**
      * Read Uint16 array.
-     * @method readUint16Array
      * @param {Number} byteOffset The offset to start reading from.
      * @param {Number} size The size of the array.
      * @return {Array} The read data.
@@ -2010,7 +1887,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
     };
     /**
      * Read Int16 array.
-     * @method readInt16Array
      * @param {Number} byteOffset The offset to start reading from.
      * @param {Number} size The size of the array.
      * @return {Array} The read data.
@@ -2024,7 +1900,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
     };
     /**
      * Read Uint32 array.
-     * @method readUint32Array
      * @param {Number} byteOffset The offset to start reading from.
      * @param {Number} size The size of the array.
      * @return {Array} The read data.
@@ -2049,7 +1924,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
     };
     /**
      * Read Int32 array.
-     * @method readInt32Array
      * @param {Number} byteOffset The offset to start reading from.
      * @param {Number} size The size of the array.
      * @return {Array} The read data.
@@ -2074,7 +1948,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
     };
     /**
      * Read Float32 array.
-     * @method readFloat32Array
      * @param {Number} byteOffset The offset to start reading from.
      * @param {Number} size The size of the array.
      * @return {Array} The read data.
@@ -2099,7 +1972,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
     };
     /**
      * Read Float64 array.
-     * @method readFloat64Array
      * @param {Number} byteOffset The offset to start reading from.
      * @param {Number} size The size of the array.
      * @return {Array} The read data.
@@ -2124,7 +1996,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
     };
     /**
      * Read data as an hexadecimal string.
-     * @method readHex
      * @param {Number} byteOffset The offset to start reading from.
      * @return {Array} The read data.
      */
@@ -2136,7 +2007,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
     };
     /**
      * Read data as a string.
-     * @method readString
      * @param {Number} byteOffset The offset to start reading from.
      * @param {Number} nChars The number of characters to read.
      * @return {String} The read data.
@@ -2155,7 +2025,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
  * Get the group-element key used to store DICOM elements.
  * @param {Number} group The DICOM group.
  * @param {Number} element The DICOM element.
- * @returns {String} The key.
+ * @return {String} The key.
  */
 dwv.dicom.getGroupElementKey = function (group, element)
 {
@@ -2165,7 +2035,7 @@ dwv.dicom.getGroupElementKey = function (group, element)
 /**
  * Split a group-element key used to store DICOM elements.
  * @param key The key in form "x00280102.
- * @returns {Object} The DICOM group and element.
+ * @return {Object} The DICOM group and element.
  */
 dwv.dicom.splitGroupElementKey = function (key)
 {
@@ -2174,9 +2044,8 @@ dwv.dicom.splitGroupElementKey = function (key)
 
 /**
  * Tell if a given syntax is a JPEG baseline one.
- * @method isJpegBaselineTransferSyntax
  * @param {String} The transfer syntax to test.
- * @returns {Boolean} True if a jpeg baseline syntax.
+ * @return {Boolean} True if a jpeg baseline syntax.
  */
 dwv.dicom.isJpegBaselineTransferSyntax = function(syntax)
 {
@@ -2186,9 +2055,8 @@ dwv.dicom.isJpegBaselineTransferSyntax = function(syntax)
 
 /**
  * Tell if a given syntax is a non supported JPEG one.
- * @method isJpegNonSupportedTransferSyntax
  * @param {String} The transfer syntax to test.
- * @returns {Boolean} True if a non supported jpeg syntax.
+ * @return {Boolean} True if a non supported jpeg syntax.
  */
 dwv.dicom.isJpegNonSupportedTransferSyntax = function(syntax)
 {
@@ -2200,9 +2068,8 @@ dwv.dicom.isJpegNonSupportedTransferSyntax = function(syntax)
 
 /**
  * Tell if a given syntax is a JPEG Lossless one.
- * @method isJpegLosslessTransferSyntax
  * @param {String} The transfer syntax to test.
- * @returns {Boolean} True if a jpeg lossless syntax.
+ * @return {Boolean} True if a jpeg lossless syntax.
  */
 dwv.dicom.isJpegLosslessTransferSyntax = function(syntax)
 {
@@ -2212,9 +2079,8 @@ dwv.dicom.isJpegLosslessTransferSyntax = function(syntax)
 
 /**
  * Tell if a given syntax is a JPEG-LS one.
- * @method isJpeglsTransferSyntax
  * @param {String} The transfer syntax to test.
- * @returns {Boolean} True if a jpeg-ls syntax.
+ * @return {Boolean} True if a jpeg-ls syntax.
  */
 dwv.dicom.isJpeglsTransferSyntax = function(syntax)
 {
@@ -2223,9 +2089,8 @@ dwv.dicom.isJpeglsTransferSyntax = function(syntax)
 
 /**
  * Tell if a given syntax is a JPEG 2000 one.
- * @method isJpeg2000TransferSyntax
  * @param {String} The transfer syntax to test.
- * @returns {Boolean} True if a jpeg 2000 syntax.
+ * @return {Boolean} True if a jpeg 2000 syntax.
  */
 dwv.dicom.isJpeg2000TransferSyntax = function(syntax)
 {
@@ -2234,9 +2099,8 @@ dwv.dicom.isJpeg2000TransferSyntax = function(syntax)
 
 /**
  * Tell if a given syntax needs decompression.
- * @method syntaxNeedsDecompression
  * @param {String} The transfer syntax to test.
- * @returns {String} The name of the decompression algorithm.
+ * @return {String} The name of the decompression algorithm.
  */
 dwv.dicom.getSyntaxDecompressionName = function(syntax)
 {
@@ -2255,9 +2119,8 @@ dwv.dicom.getSyntaxDecompressionName = function(syntax)
 
 /**
  * Get the transfer syntax name.
- * @method getTransferSyntaxName
  * @param {String} The transfer syntax.
- * @returns {String} The name of the transfer syntax.
+ * @return {String} The name of the transfer syntax.
  */
 dwv.dicom.getTransferSyntaxName = function (syntax)
 {
@@ -2327,35 +2190,29 @@ dwv.dicom.getTransferSyntaxName = function (syntax)
 
 /**
  * DicomParser class.
- * @class DicomParser
- * @namespace dwv.dicom
  * @constructor
  */
 dwv.dicom.DicomParser = function()
 {
     /**
      * The list of DICOM elements.
-     * @property dicomElements
      * @type Array
      */
     this.dicomElements = {};
     /**
      * The pixel buffer.
-     * @property pixelBuffer
      * @type Array
      */
     this.pixelBuffer = [];
 
     /**
      * Unknown tags count.
-     * @property unknownCount
      * @type Number
      */
     var unknownCount = 0;
     /**
      * Get the next unknown tags count.
-     * @method getNextUnknownCount
-     * @returns {Number} The next count.
+     * @return {Number} The next count.
      */
     this.getNextUnknownCount = function () {
         unknownCount++;
@@ -2365,8 +2222,7 @@ dwv.dicom.DicomParser = function()
 
 /**
  * Get the raw DICOM data elements.
- * @method getRawDicomElements
- * @returns {Object} The raw DICOM elements.
+ * @return {Object} The raw DICOM elements.
  */
 dwv.dicom.DicomParser.prototype.getRawDicomElements = function()
 {
@@ -2375,8 +2231,7 @@ dwv.dicom.DicomParser.prototype.getRawDicomElements = function()
 
 /**
  * Get the DICOM data elements.
- * @method getDicomElements
- * @returns {Object} The DICOM elements.
+ * @return {Object} The DICOM elements.
  */
 dwv.dicom.DicomParser.prototype.getDicomElements = function()
 {
@@ -2385,8 +2240,7 @@ dwv.dicom.DicomParser.prototype.getDicomElements = function()
 
 /**
  * Get the DICOM data pixel buffer.
- * @method getPixelBuffer
- * @returns {Array} The pixel buffer.
+ * @return {Array} The pixel buffer.
  */
 dwv.dicom.DicomParser.prototype.getPixelBuffer = function()
 {
@@ -2398,7 +2252,6 @@ dwv.dicom.DicomParser.prototype.getPixelBuffer = function()
  * Allows for easy retrieval of DICOM tag values from the tag name.
  * If tags have same name (for the 'unknown' private tags cases), a number is appended
  * making the name unique.
- * @method appendDicomElement
  * @param {Object} element The element to add.
  * @param {Object} sequences The sequence the element belongs to (optional).
  */
@@ -2445,7 +2298,6 @@ dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequence
 
 /**
  * Append an element to a sequence.
- * @method appendElementToSequence
  * @param {Object} root The DICOM element root where to append the element.
  * @param {String} sequenceName The tail sequence name.
  * @param {Number} itemNumber The tail item number.
@@ -2483,10 +2335,9 @@ dwv.dicom.DicomParser.prototype.appendElementToSequence = function (
 
 /**
  * Read a DICOM tag.
- * @method readTag
  * @param reader The raw data reader.
  * @param offset The offset where to start to read.
- * @returns An object containing the tags 'group', 'element' and 'name'.
+ * @return An object containing the tags 'group', 'element' and 'name'.
  */
 dwv.dicom.DicomParser.prototype.readTag = function(reader, offset)
 {
@@ -2502,11 +2353,10 @@ dwv.dicom.DicomParser.prototype.readTag = function(reader, offset)
 
 /**
  * Read a DICOM data element.
- * @method readDataElement
  * @param reader The raw data reader.
  * @param offset The offset where to start to read.
  * @param implicit Is the DICOM VR implicit?
- * @returns {Object} An object containing the element 'tag', 'vl', 'vr', 'data' and 'offset'.
+ * @return {Object} An object containing the element 'tag', 'vl', 'vr', 'data' and 'offset'.
  */
 dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, implicit)
 {
@@ -2651,7 +2501,6 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
 /**
  * Parse the complete DICOM file (given as input to the class).
  * Fills in the member object 'dicomElements'.
- * @method parse
  * @param buffer The input array buffer.
  */
 dwv.dicom.DicomParser.prototype.parse = function(buffer)
@@ -2862,8 +2711,6 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
 
 /**
  * DicomElements wrapper.
- * @class DicomElementsWrapper
- * @namespace dwv.dicom
  * @constructor
  * @param {Array} dicomElements The elements to wrap.
  */
@@ -2871,7 +2718,6 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
 
     /**
     * Get a DICOM Element value from a group/element key.
-    * @method getFromKey
     * @param {String} groupElementKey The key to retrieve.
     * @param {Boolean} asArray Get the value as an Array.
     * @return {Object} The DICOM element value.
@@ -2897,7 +2743,7 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
 
     /**
      * Dump the DICOM tags to an array.
-     * @returns {Array}
+     * @return {Array}
      */
     this.dumpToTable = function () {
         var keys = Object.keys(dicomElements);
@@ -2932,7 +2778,7 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
 
     /**
      * Dump the DICOM tags to a string.
-     * @returns {String} The dumped file.
+     * @return {String} The dumped file.
      */
     this.dump = function () {
         var keys = Object.keys(dicomElements);
@@ -2971,7 +2817,6 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
  *
  * @param group
  * @param element
- * @returns
  */
 dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomElement, prefix )
 {
@@ -3223,12 +3068,11 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
 };
 
 /**
-* Get a DICOM Element value from a group and an element.
-* @method getFromGroupElement
-* @param {Number} group The group.
-* @param {Number} element The element.
-* @return {Object} The DICOM element value.
-*/
+ * Get a DICOM Element value from a group and an element.
+ * @param {Number} group The group.
+ * @param {Number} element The element.
+ * @return {Object} The DICOM element value.
+ */
 dwv.dicom.DicomElementsWrapper.prototype.getFromGroupElement = function (
     group, element )
 {
@@ -3237,12 +3081,11 @@ dwv.dicom.DicomElementsWrapper.prototype.getFromGroupElement = function (
 };
 
 /**
-* Get a DICOM Element value from a tag name.
-* Uses the DICOM dictionary.
-* @method getFromName
-* @param {String} name The tag name.
-* @return {Object} The DICOM element value.
-*/
+ * Get a DICOM Element value from a tag name.
+ * Uses the DICOM dictionary.
+ * @param {String} name The tag name.
+ * @return {Object} The DICOM element value.
+ */
 dwv.dicom.DicomElementsWrapper.prototype.getFromName = function ( name )
 {
    var group = null;
@@ -3272,19 +3115,13 @@ dwv.dicom.DicomElementsWrapper.prototype.getFromName = function ( name )
    }
    return dicomElement;
 };
-;/**
- * DICOM module.
- * @module dicom
- */
+;// namespaces
 var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
 
 /**
  * Data writer.
- * @class DataWriter
- * @namespace dwv.dicom
- * @constructor
- * @param {Array} buffer The input array buffer.
+ * 
  * Example usage:
  *   var parser = new dwv.dicom.DicomParser();
  *   parser.parse(this.response);
@@ -3296,6 +3133,8 @@ dwv.dicom = dwv.dicom || {};
  *   element.href = URL.createObjectURL(blob);
  *   element.download = "anonym.dcm";
  *   
+ * @constructor
+ * @param {Array} buffer The input array buffer.
  */
 dwv.dicom.DataWriter = function (buffer)
 {
@@ -3361,8 +3200,6 @@ dwv.dicom.DataWriter = function (buffer)
 
 /**
  * DICOM writer.
- * @class DicomWriter
- * @namespace dwv.dicom
  * @constructor
  * @param {Array} dicomElements The wrapped elements to wrap.
  */
@@ -3475,24 +3312,20 @@ dwv.dicom.DicomWriter = function (dicomElements) {
         return buffer;
     };
 };
-;/** 
- * DICOM module.
- * @module dicom
- */
+;// namespaces
 var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
 
 /**
  * DICOM tag dictionary.
  * Generated using xml standard conversion
- *  from https://github.com/ivmartel/dcmbench/tree/master/view/part06
- *  with http://medical.nema.org/medical/dicom/current/source/docbook/part06/part06.xml
+ *  from {@link https://github.com/ivmartel/dcmbench/tree/master/view/part06}
+ *  with {@link http://medical.nema.org/medical/dicom/current/source/docbook/part06/part06.xml}
  * Conversion changes:
  * - (vr) "See Note" -> "NONE", "OB or OW" -> "ox", "US or SS" -> "xs"
  * - added "GenericGroupLength" element to each group
  * Local changes:
  * - tag numbers with 'xx' were replaced with '00', 'xxx' with '001' and 'xxxx' with '0004'
- * @namespace dwv.dicom
  */
 dwv.dicom.dictionary = {
     '0x0000': {
@@ -7765,23 +7598,13 @@ dwv.dicom.TagGroups = {
   'x7FE0': 'Pixel Data',
   'xFFFF': 'Unknown'
   };
-;/** 
- * Browser module.
- * @module browser
- */
+;// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for browser related functions.
- * @class browser
- * @namespace dwv
- * @static
- */
+/** @namespace */
 dwv.browser = dwv.browser || {};
 
 /**
  * Browser check for the FileAPI.
- * @method hasFileApi
- * @static
  */
 dwv.browser.hasFileApi = function()
 {
@@ -7801,8 +7624,6 @@ dwv.browser.hasFileApi = function()
 
 /**
  * Browser check for the XMLHttpRequest.
- * @method hasXmlHttpRequest
- * @static
  */
 dwv.browser.hasXmlHttpRequest = function()
 {
@@ -7811,8 +7632,6 @@ dwv.browser.hasXmlHttpRequest = function()
 
 /**
  * Browser check for typed array.
- * @method hasTypedArray
- * @static
  */
 dwv.browser.hasTypedArray = function()
 {
@@ -7821,8 +7640,6 @@ dwv.browser.hasTypedArray = function()
 
 /**
  * Browser check for clamped array.
- * @method hasClampedArray
- * @static
  */
 dwv.browser.hasClampedArray = function()
 {
@@ -7831,9 +7648,7 @@ dwv.browser.hasClampedArray = function()
 
 /**
  * Browser checks to see if it can run dwv. Throws an error if not.
- * TODO Maybe use http://modernizr.com/.
- * @method check
- * @static
+ * @todo Maybe use {@link http://modernizr.com/}.
  */
 dwv.browser.check = function()
 {
@@ -7863,33 +7678,25 @@ dwv.browser.check = function()
         console.warn("The Uint8ClampedArray is not supported in this browser. This may impair performance. ");
     }
 };
-;/** 
- * GUI module.
- * @module gui
- */
+;// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for GUI functions.
- * @class gui
- * @namespace dwv
- * @static
- */
+/** @namespace */
 dwv.gui = dwv.gui || {};
+/** @namespace */
 dwv.gui.base = dwv.gui.base || {};
+/** @namespace */
 dwv.gui.filter = dwv.gui.filter || {};
+/** @namespace */
 dwv.gui.filter.base = dwv.gui.filter.base || {};
 
 /**
  * Filter tool base gui.
- * @class Filter
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Filter = function (app)
 {
     /**
      * Setup the filter tool HTML.
-     * @method setup
      */
     this.setup = function (list)
     {
@@ -7909,7 +7716,6 @@ dwv.gui.base.Filter = function (app)
 
     /**
      * Display the tool HTML.
-     * @method display
      * @param {Boolean} flag True to display, false to hide.
      */
     this.display = function (flag)
@@ -7920,7 +7726,6 @@ dwv.gui.base.Filter = function (app)
 
     /**
      * Initialise the tool HTML.
-     * @method initialise
      */
     this.initialise = function ()
     {
@@ -7935,15 +7740,12 @@ dwv.gui.base.Filter = function (app)
 
 /**
  * Threshold filter base gui.
- * @class Threshold
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Threshold = function (app)
 {
     /**
      * Threshold slider.
-     * @property slider
      * @private
      * @type Object
      */
@@ -7951,7 +7753,6 @@ dwv.gui.base.Threshold = function (app)
 
     /**
      * Setup the threshold filter HTML.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -7971,7 +7772,6 @@ dwv.gui.base.Threshold = function (app)
 
     /**
      * Clear the threshold filter HTML.
-     * @method display
      * @param {Boolean} flag True to display, false to hide.
      */
     this.display = function (flag)
@@ -7982,7 +7782,6 @@ dwv.gui.base.Threshold = function (app)
 
     /**
      * Initialise the threshold filter HTML.
-     * @method initialise
      */
     this.initialise = function ()
     {
@@ -7994,8 +7793,6 @@ dwv.gui.base.Threshold = function (app)
 
 /**
  * Create the apply filter button.
- * @method createFilterApplyButton
- * @static
  */
 dwv.gui.filter.base.createFilterApplyButton = function (app)
 {
@@ -8010,15 +7807,12 @@ dwv.gui.filter.base.createFilterApplyButton = function (app)
 
 /**
  * Sharpen filter base gui.
- * @class Sharpen
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Sharpen = function (app)
 {
     /**
      * Setup the sharpen filter HTML.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -8033,7 +7827,6 @@ dwv.gui.base.Sharpen = function (app)
 
     /**
      * Display the sharpen filter HTML.
-     * @method display
      * @param {Boolean} flag True to display, false to hide.
      */
     this.display = function (flag)
@@ -8046,15 +7839,12 @@ dwv.gui.base.Sharpen = function (app)
 
 /**
  * Sobel filter base gui.
- * @class Sobel
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Sobel = function (app)
 {
     /**
      * Setup the sobel filter HTML.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -8069,7 +7859,6 @@ dwv.gui.base.Sobel = function (app)
 
     /**
      * Display the sobel filter HTML.
-     * @method display
      * @param {Boolean} flag True to display, false to hide.
      */
     this.display = function (flag)
@@ -8079,30 +7868,13 @@ dwv.gui.base.Sobel = function (app)
     };
 
 }; // class dwv.gui.base.Sobel
-;/** 
- * GUI module.
- * @module gui
- */
+;// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for GUI functions.
- * @class gui
- * @namespace dwv
- * @static
- */
 dwv.gui = dwv.gui || {};
-/**
- * Namespace for base GUI functions.
- * @class base
- * @namespace dwv.gui
- * @static
- */
 dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Get the size of the image display window.
- * @method getWindowSize
- * @static
  */
 dwv.gui.base.getWindowSize = function()
 {
@@ -8111,8 +7883,6 @@ dwv.gui.base.getWindowSize = function()
 
 /**
  * Display a progress value.
- * @method displayProgress
- * @static
  * @param {Number} percent The progress percentage.
  */
 dwv.gui.base.displayProgress = function(/*percent*/)
@@ -8122,8 +7892,6 @@ dwv.gui.base.displayProgress = function(/*percent*/)
 
 /**
  * Get a HTML element associated to a container div.
- * @method getElement
- * @static
  * @param containerDivId The id of the container div.
  * @param name The name or id to find.
  * @return The found element or null.
@@ -8145,8 +7913,6 @@ dwv.gui.base.getElement = function (containerDivId, name)
 
  /**
  * Refresh a HTML element. Mainly for jquery-mobile.
- * @method refreshElement
- * @static
  * @param {String} element The HTML element to refresh.
  */
 dwv.gui.base.refreshElement = function (/*element*/)
@@ -8156,8 +7922,6 @@ dwv.gui.base.refreshElement = function (/*element*/)
 
 /**
  * Set the selected item of a HTML select.
- * @method setSelected
- * @static
  * @param {String} selectName The name of the HTML select.
  * @param {String} itemName The name of the itme to mark as selected.
  */
@@ -8177,15 +7941,12 @@ dwv.gui.setSelected = function(element, itemName)
 
 /**
  * Slider base gui.
- * @class Slider
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Slider = function (app)
 {
     /**
      * Append the slider HTML.
-     * @method append
      */
     this.append = function ()
     {
@@ -8231,7 +7992,6 @@ dwv.gui.base.Slider = function (app)
 
     /**
      * Initialise the slider HTML.
-     * @method initialise
      */
     this.initialise = function ()
     {
@@ -8256,15 +8016,12 @@ dwv.gui.base.Slider = function (app)
 
 /**
  * DICOM tags base gui.
- * @class DicomTags
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.DicomTags = function (app)
 {
     /**
      * Initialise the DICOM tags table. To be called once the DICOM has been parsed.
-     * @method initialise
      * @param {Object} dataInfo The data information.
      */
     this.initialise = function (dataInfo)
@@ -8297,23 +8054,13 @@ dwv.gui.base.DicomTags = function (app)
     };
 
 }; // class dwv.gui.base.DicomTags
-;/** 
- * GUI module.
- * @module gui
- */
+;// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for GUI functions.
- * @class gui
- * @namespace dwv
- * @static
- */
 dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Append the version HTML.
- * @method appendVersionHtml
  */
 dwv.gui.base.appendVersionHtml = function (version)
 {
@@ -8327,7 +8074,6 @@ dwv.gui.base.appendVersionHtml = function (version)
 
 /**
  * Build the help HTML.
- * @method appendHelpHtml
  * @param {Boolean} mobile Flag for mobile or not environement.
  */
 dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
@@ -8437,23 +8183,13 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
     helpNode.appendChild(toolPara);
     helpNode.appendChild(toolHelpDiv);
 };
-;/** 
- * HTML module.
- * @module html
- */
+;// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for HTML related functions.
- * @class html
- * @namespace dwv
- * @static
- */
+/** @namespace */
 dwv.html = dwv.html || {};
 
 /**
  * Append a cell to a given row.
- * @method appendCell
- * @static
  * @param {Object} row The row to append the cell to.
  * @param {Object} content The content of the cell.
  */
@@ -8478,8 +8214,6 @@ dwv.html.appendCell = function (row, content)
 
 /**
  * Append a header cell to a given row.
- * @method appendHCell
- * @static
  * @param {Object} row The row to append the header cell to.
  * @param {String} text The text of the header cell.
  */
@@ -8496,8 +8230,6 @@ dwv.html.appendHCell = function (row, text)
 
 /**
  * Append a row to an array.
- * @method appendRowForArray
- * @static
  * @param {} table
  * @param {} input
  * @param {} level
@@ -8530,8 +8262,6 @@ dwv.html.appendRowForArray = function (table, input, level, maxLevel, rowHeader)
 
 /**
  * Append a row to an object.
- * @method appendRowForObject
- * @static
  * @param {} table
  * @param {} input
  * @param {} level
@@ -8580,8 +8310,6 @@ dwv.html.appendRowForObject = function (table, input, level, maxLevel, rowHeader
 
 /**
  * Append a row to an object or an array.
- * @method appendRow
- * @static
  * @param {} table
  * @param {} input
  * @param {} level
@@ -8605,8 +8333,6 @@ dwv.html.appendRow = function (table, input, level, maxLevel, rowHeader)
 
 /**
  * Converts the input to an HTML table.
- * @method toTable
- * @static
  * @input {Mixed} input Allowed types are: array, array of object, object.
  * @return {Object} The created HTML table.
  * @warning Null is interpreted differently in browsers, firefox will not display it.
@@ -8620,8 +8346,6 @@ dwv.html.toTable = function (input)
 
 /**
  * Get an HTML search form.
- * @method getHtmlSearchForm
- * @static
  * @param {Object} htmlTableToSearch The table to do the search on.
  * @return {Object} The HTML search form.
  */
@@ -8641,8 +8365,6 @@ dwv.html.getHtmlSearchForm = function (htmlTableToSearch)
 /**
  * Filter a table with a given parameter: sets the display css of rows to
  * true or false if it contains the term.
- * @method filterTable
- * @static
  * @param {String} term The term to filter the table with.
  * @param {Object} table The table to filter.
  */
@@ -8675,8 +8397,6 @@ dwv.html.filterTable = function (term, table) {
  * Transform back each
  * 'preText <span class="highlighted">term</span> postText'
  * into its original 'preText term postText'.
- * @method dehighlight
- * @static
  * @param {Object} container The container to de-highlight.
  */
 dwv.html.dehighlight = function (container) {
@@ -8703,8 +8423,6 @@ dwv.html.dehighlight = function (container) {
  * Create a
  * 'preText <span class="highlighted">term</span> postText'
  * around each search term.
- * @method highlight
- * @static
  * @param {String} term The term to highlight.
  * @param {Object} container The container where to highlight the term.
  */
@@ -8745,8 +8463,6 @@ dwv.html.highlight = function (term, container) {
 
 /**
  * Highlight a HTML node.
- * @method createHighlightNode
- * @static
  * @param {Object} child The child to highlight.
  * @return {Object} The created HTML node.
  */
@@ -8760,8 +8476,6 @@ dwv.html.createHighlightNode = function (child) {
 
 /**
  * Remove all children of a HTML node.
- * @method cleanNode
- * @static
  * @param {Object} node The node to remove kids.
  */
 dwv.html.cleanNode = function (node) {
@@ -8773,8 +8487,6 @@ dwv.html.cleanNode = function (node) {
 
 /**
  * Remove a HTML node and all its children.
- * @method removeNode
- * @static
  * @param {String} nodeId The string id of the node to delete.
  */
 dwv.html.removeNode = function (node) {
@@ -8799,8 +8511,6 @@ dwv.html.removeNodes = function (nodes) {
  * Create a HTML select from an input array of options.
  * The values of the options are the name of the option made lower case.
  * It is left to the user to set the 'onchange' method of the select.
- * @method createHtmlSelect
- * @static
  * @param {String} name The name of the HTML select.
  * @param {Mixed} list The list of options of the HTML select.
  * @return {Object} The created HTML select.
@@ -8841,8 +8551,6 @@ dwv.html.createHtmlSelect = function (name, list) {
 
 /**
  * Display or not an element.
- * @method displayElement
- * @static
  * @param {Object} element The HTML element to display.
  * @param {Boolean} flag True to display the element.
  */
@@ -8853,8 +8561,6 @@ dwv.html.displayElement = function (element, flag)
 
 /**
  * Toggle the display of an element.
- * @method toggleDisplay
- * @static
  * @param {Object} element The HTML element to display.
  */
 dwv.html.toggleDisplay = function (element)
@@ -8869,8 +8575,6 @@ dwv.html.toggleDisplay = function (element)
 
 /**
  * Append an element.
- * @method appendElement
- * @static
  * @param {Object} parent The HTML element to append to.
  * @param {Object} element The HTML element to append.
  */
@@ -8884,8 +8588,6 @@ dwv.html.appendElement = function (parent, element)
 
 /**
  * Create an element.
- * @method createElement
- * @static
  * @param {String} type The type of the elemnt.
  * @param {String} className The className of the element.
  */
@@ -8898,17 +8600,12 @@ dwv.html.createHiddenElement = function (type, className)
     // return
     return element;
 };
-;/** 
- * HTML module.
- * @module html
- */
+;// namespaces
 var dwv = dwv || {};
 dwv.html = dwv.html || {};
 
 /**
  * Window layer.
- * @class Layer
- * @namespace dwv.html
  * @constructor
  * @param {String} name The name of the layer.
  */
@@ -8916,21 +8613,18 @@ dwv.html.Layer = function(canvas)
 {
     /**
      * The associated HTMLCanvasElement.
-     * @property canvas
      * @private
      * @type Object
      */
     //var canvas = null;
     /**
      * A cache of the initial canvas.
-     * @property cacheCanvas
      * @private
      * @type Object
      */
     var cacheCanvas = null;
     /**
      * The associated CanvasRenderingContext2D.
-     * @property context
      * @private
      * @type Object
      */
@@ -8938,32 +8632,27 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Get the layer name.
-     * @method getName
      * @return {String} The layer name.
      */
     //this.getName = function() { return name; };
     /**
      * Get the layer canvas.
-     * @method getCanvas
      * @return {Object} The layer canvas.
      */
     this.getCanvas = function() { return canvas; };
     /**
      * Get the layer context.
-     * @method getContext
      * @return {Object} The layer context.
      */
     this.getContext = function() { return context; };
     /**
      * Get the layer offset on page.
-     * @method getOffset
      * @return {Number} The layer offset on page.
      */
     this.getOffset = function() { return canvas.offset(); };
 
     /**
      * The image data array.
-     * @property imageData
      * @private
      * @type Array
      */
@@ -8971,30 +8660,26 @@ dwv.html.Layer = function(canvas)
 
     /**
      * The layer origin.
-     * @property origin
      * @private
      * @type {Object}
      */
     var origin = {'x': 0, 'y': 0};
     /**
      * Get the layer origin.
-     * @method getOrigin
-     * @returns {Object} The layer origin as {'x','y'}.
+     * @return {Object} The layer origin as {'x','y'}.
      */
     this.getOrigin = function () {
         return origin;
     };
     /**
      * The image zoom.
-     * @property zoom
      * @private
      * @type {Object}
      */
     var zoom = {'x': 1, 'y': 1};
     /**
      * Get the layer zoom.
-     * @method getZoom
-     * @returns {Object} The layer zoom as {'x','y'}.
+     * @return {Object} The layer zoom as {'x','y'}.
      */
     this.getZoom = function () {
         return zoom;
@@ -9004,7 +8689,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Set the canvas width.
-     * @method setWidth
      * @param {Number} width The new width.
      */
     this.setWidth = function ( width ) {
@@ -9012,7 +8696,6 @@ dwv.html.Layer = function(canvas)
     };
     /**
      * Set the canvas height.
-     * @method setHeight
      * @param {Number} height The new height.
      */
     this.setHeight = function ( height ) {
@@ -9021,7 +8704,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Set the layer zoom.
-     * @method setZoom
      * @param {Number} newZoomX The zoom in the X direction.
      * @param {Number} newZoomY The zoom in the Y direction.
      * @param {Number} centerX The zoom center in the X direction.
@@ -9048,7 +8730,6 @@ dwv.html.Layer = function(canvas)
     /**
      * Set the layer translation.
      * Translation is according to the last one.
-     * @method setTranslate
      * @param {Number} tx The translation in the X direction.
      * @param {Number} ty The translation in the Y direction.
      */
@@ -9060,7 +8741,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Set the image data array.
-     * @method setImageData
      * @param {Array} data The data array.
      */
     this.setImageData = function(data)
@@ -9072,7 +8752,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Reset the layout.
-     * @method resetLayout
      */
     this.resetLayout = function(izoom)
     {
@@ -9086,7 +8765,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Transform a display position to an index.
-     * @method displayToIndex
      */
     this.displayToIndex = function ( point2D ) {
         return {'x': ( (point2D.x - origin.x) / zoom.x ) - trans.x,
@@ -9096,7 +8774,6 @@ dwv.html.Layer = function(canvas)
     /**
      * Draw the content (imageData) of the layer.
      * The imageData variable needs to be set
-     * @method draw
      */
     this.draw = function ()
     {
@@ -9123,7 +8800,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Initialise the layer: set the canvas and context
-     * @method initialise
      * @input {Number} inputWidth The width of the canvas.
      * @input {Number} inputHeight The height of the canvas.
      */
@@ -9163,7 +8839,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Fill the full context with the current style.
-     * @method fillContext
      */
     this.fillContext = function()
     {
@@ -9172,7 +8847,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Clear the context and reset the image data.
-     * @method clear
      */
     this.clear = function()
     {
@@ -9183,7 +8857,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Merge two layers.
-     * @method merge
      * @input {Layer} layerToMerge The layer to merge. It will also be emptied.
      */
     this.merge = function(layerToMerge)
@@ -9221,7 +8894,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Set the line colour for the layer.
-     * @method setLineColour
      * @input {String} colour The line colour.
      */
     this.setLineColour = function(colour)
@@ -9232,7 +8904,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Display the layer.
-     * @method setStyleDisplay
      * @input {Boolean} val Whether to display the layer or not.
      */
     this.setStyleDisplay = function(val)
@@ -9249,7 +8920,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Check if the layer is visible.
-     * @method isVisible
      * @return {Boolean} True if the layer is visible.
      */
     this.isVisible = function()
@@ -9264,7 +8934,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Align on another layer.
-     * @method align
      * @param {Layer} rhs The layer to align on.
      */
     this.align = function(rhs)
@@ -9276,8 +8945,6 @@ dwv.html.Layer = function(canvas)
 
 /**
  * Get the offset of an input event.
- * @method getEventOffset
- * @static
  * @param {Object} event The event to get the offset from.
  * @return {Array} The array of offsets.
  */
@@ -9316,31 +8983,19 @@ dwv.html.getEventOffset = function (event) {
     }
     return positions;
 };
-;/** 
- * GUI module.
- * @module gui
- */
+;// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for GUI functions.
- * @class gui
- * @namespace dwv
- * @static
- */
 dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Loadbox base gui.
- * @class Loadbox
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Loadbox = function (app, loaders)
 {
     /**
      * Setup the loadbox HTML.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -9381,8 +9036,6 @@ dwv.gui.base.Loadbox = function (app, loaders)
 
 /**
  * FileLoad base gui.
- * @class FileLoad
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.FileLoad = function (app)
@@ -9403,7 +9056,6 @@ dwv.gui.base.FileLoad = function (app)
     
     /**
      * Setup the file load HTML to the page.
-     * @method setup
      */
     this.setup = function()
     {
@@ -9432,7 +9084,6 @@ dwv.gui.base.FileLoad = function (app)
 
     /**
      * Display the file load HTML.
-     * @method display
      * @param {Boolean} bool True to display, false to hide.
      */
     this.display = function (bool)
@@ -9447,8 +9098,6 @@ dwv.gui.base.FileLoad = function (app)
 
 /**
  * UrlLoad base gui.
- * @class UrlLoad
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.UrlLoad = function (app)
@@ -9469,7 +9118,6 @@ dwv.gui.base.UrlLoad = function (app)
     
     /**
      * Setup the url load HTML to the page.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -9497,7 +9145,6 @@ dwv.gui.base.UrlLoad = function (app)
 
     /**
      * Display the url load HTML.
-     * @method display
      * @param {Boolean} bool True to display, false to hide.
      */
     this.display = function (bool)
@@ -9509,59 +9156,48 @@ dwv.gui.base.UrlLoad = function (app)
     };
 
 }; // class dwv.gui.base.UrlLoad
-;/** 
- * HTML module.
- * @module html
- */
+;// namespaces
 var dwv = dwv || {};
 dwv.html = dwv.html || {};
 
 /**
  * Style class.
- * @class Style
- * @namespace dwv.html
  * @constructor
  */
 dwv.html.Style = function ()
 {
     /**
      * Font size.
-     * @property fontSize
      * @private
      * @type Number
      */
     var fontSize = 12;
     /**
      * Font family.
-     * @property fontFamily
      * @private
      * @type String
      */
     var fontFamily = "Verdana";
     /**
      * Text colour.
-     * @property textColour
      * @private
      * @type String
      */
     var textColour = "#fff";
     /**
      * Line colour.
-     * @property lineColour
      * @private
      * @type String
      */
     var lineColour = "";
     /**
      * Display scale.
-     * @property scale
      * @private
      * @type Number
      */
     var displayScale = 1;
     /**
      * Stroke width.
-     * @property strokeWidth
      * @private
      * @type Number
      */
@@ -9569,56 +9205,48 @@ dwv.html.Style = function ()
 
     /**
      * Get the font family.
-     * @method getFontFamily
      * @return {String} The font family.
      */
     this.getFontFamily = function () { return fontFamily; };
 
     /**
      * Get the font size.
-     * @method getFontSize
      * @return {Number} The font size.
      */
     this.getFontSize = function () { return fontSize; };
 
     /**
      * Get the stroke width.
-     * @method getStrokeWidth
      * @return {Number} The stroke width.
      */
     this.getStrokeWidth = function () { return strokeWidth; };
 
     /**
      * Get the text colour.
-     * @method getTextColour
      * @return {String} The text colour.
      */
     this.getTextColour = function () { return textColour; };
 
     /**
      * Get the line colour.
-     * @method getLineColour
      * @return {String} The line colour.
      */
     this.getLineColour = function () { return lineColour; };
 
     /**
      * Set the line colour.
-     * @method setLineColour
      * @param {String} colour The line colour.
      */
     this.setLineColour = function (colour) { lineColour = colour; };
 
     /**
      * Set the display scale.
-     * @method setScale
      * @param {String} scale The display scale.
      */
     this.setScale = function (scale) { displayScale = scale; };
 
     /**
      * Scale an input value.
-     * @method scale
      * @param {Number} value The value to scale.
      */
     this.scale = function (value) { return value / displayScale; };
@@ -9626,7 +9254,6 @@ dwv.html.Style = function ()
 
 /**
  * Get the font definition string.
- * @method getFontStr
  * @return {String} The font definition string.
  */
 dwv.html.Style.prototype.getFontStr = function ()
@@ -9636,7 +9263,6 @@ dwv.html.Style.prototype.getFontStr = function ()
 
 /**
  * Get the line height.
- * @method getLineHeight
  * @return {Number} The line height.
  */
 dwv.html.Style.prototype.getLineHeight = function ()
@@ -9646,7 +9272,6 @@ dwv.html.Style.prototype.getLineHeight = function ()
 
 /**
  * Get the font size scaled to the display.
- * @method getScaledFontSize
  * @return {Number} The scaled font size.
  */
 dwv.html.Style.prototype.getScaledFontSize = function ()
@@ -9656,38 +9281,25 @@ dwv.html.Style.prototype.getScaledFontSize = function ()
 
 /**
  * Get the stroke width scaled to the display.
- * @method getScaledStrokeWidth
  * @return {Number} The scaled stroke width.
  */
 dwv.html.Style.prototype.getScaledStrokeWidth = function ()
 {
     return this.scale( this.getStrokeWidth() );
 };
-;/** 
- * GUI module.
- * @module gui
- */
+;// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for GUI functions.
- * @class gui
- * @namespace dwv
- * @static
- */
 dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Toolbox base gui.
- * @class Toolbox
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Toolbox = function (app)
 {
     /**
      * Setup the toolbox HTML.
-     * @method setup
      */
     this.setup = function (list)
     {
@@ -9716,7 +9328,6 @@ dwv.gui.base.Toolbox = function (app)
 
     /**
      * Display the toolbox HTML.
-     * @method display
      * @param {Boolean} bool True to display, false to hide.
      */
     this.display = function (bool)
@@ -9728,7 +9339,6 @@ dwv.gui.base.Toolbox = function (app)
 
     /**
      * Initialise the toolbox HTML.
-     * @method initialise
      */
     this.initialise = function (displays)
     {
@@ -9759,15 +9369,12 @@ dwv.gui.base.Toolbox = function (app)
 
 /**
  * WindowLevel tool base gui.
- * @class WindowLevel
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.WindowLevel = function (app)
 {
     /**
      * Setup the tool HTML.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -9803,7 +9410,6 @@ dwv.gui.base.WindowLevel = function (app)
 
     /**
      * Display the tool HTML.
-     * @method display
      * @param {Boolean} bool True to display, false to hide.
      */
     this.display = function (bool)
@@ -9818,7 +9424,6 @@ dwv.gui.base.WindowLevel = function (app)
 
     /**
      * Initialise the tool HTML.
-     * @method initialise
      */
     this.initialise = function ()
     {
@@ -9852,8 +9457,6 @@ dwv.gui.base.WindowLevel = function (app)
 
 /**
  * Draw tool base gui.
- * @class Draw
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Draw = function (app)
@@ -9864,13 +9467,11 @@ dwv.gui.base.Draw = function (app)
     ];
     /**
      * Get the available colours.
-     * @method getColours
      */
     this.getColours = function () { return colours; };
 
     /**
      * Setup the tool HTML.
-     * @method setup
      */
     this.setup = function (shapeList)
     {
@@ -9906,7 +9507,6 @@ dwv.gui.base.Draw = function (app)
 
     /**
      * Display the tool HTML.
-     * @method display
      * @param {Boolean} bool True to display, false to hide.
      */
     this.display = function (bool)
@@ -9921,7 +9521,6 @@ dwv.gui.base.Draw = function (app)
 
     /**
      * Initialise the tool HTML.
-     * @method initialise
      */
     this.initialise = function ()
     {
@@ -9942,8 +9541,6 @@ dwv.gui.base.Draw = function (app)
 
 /**
  * Livewire tool base gui.
- * @class Livewire
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Livewire = function (app)
@@ -9954,13 +9551,11 @@ dwv.gui.base.Livewire = function (app)
     ];
     /**
      * Get the available colours.
-     * @method getColours
      */
     this.getColours = function () { return colours; };
 
     /**
      * Setup the tool HTML.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -9985,7 +9580,6 @@ dwv.gui.base.Livewire = function (app)
 
     /**
      * Display the tool HTML.
-     * @method display
      * @param {Boolean} bool True to display, false to hide.
      */
     this.display = function (bool)
@@ -9997,7 +9591,6 @@ dwv.gui.base.Livewire = function (app)
 
     /**
      * Initialise the tool HTML.
-     * @method initialise
      */
     this.initialise = function ()
     {
@@ -10010,15 +9603,12 @@ dwv.gui.base.Livewire = function (app)
 
 /**
  * ZoomAndPan tool base gui.
- * @class ZoomAndPan
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.ZoomAndPan = function (app)
 {
     /**
      * Setup the tool HTML.
-     * @method setup
      */
     this.setup = function()
     {
@@ -10049,7 +9639,6 @@ dwv.gui.base.ZoomAndPan = function (app)
 
     /**
      * Display the tool HTML.
-     * @method display
      * @param {Boolean} bool True to display, false to hide.
      */
     this.display = function(bool)
@@ -10063,15 +9652,12 @@ dwv.gui.base.ZoomAndPan = function (app)
 
 /**
  * Scroll tool base gui.
- * @class Scroll
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Scroll = function (app)
 {
     /**
      * Setup the tool HTML.
-     * @method setup
      */
     this.setup = function()
     {
@@ -10090,7 +9676,6 @@ dwv.gui.base.Scroll = function (app)
 
     /**
      * Display the tool HTML.
-     * @method display
      * @param {Boolean} bool True to display, false to hide.
      */
     this.display = function(bool)
@@ -10101,32 +9686,19 @@ dwv.gui.base.Scroll = function (app)
     };
 
 }; // class dwv.gui.base.Scroll
-;/** 
- * GUI module.
- * @module gui
- */
+;// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for GUI functions.
- * @class gui
- * @namespace dwv
- * @static
- */
 dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Undo base gui.
- * @class Undo
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Undo = function (app)
 {
     /**
      * Setup the undo HTML.
-     * @method setup
-     * @static
      */
     this.setup = function ()
     {
@@ -10154,7 +9726,6 @@ dwv.gui.base.Undo = function (app)
 
     /**
      * Clear the command list of the undo HTML.
-     * @method cleanUndoHtml
      */
     this.initialise = function ()
     {
@@ -10171,7 +9742,6 @@ dwv.gui.base.Undo = function (app)
 
     /**
      * Add a command to the undo HTML.
-     * @method addCommandToUndoHtml
      * @param {String} commandName The name of the command to add.
      */
     this.addCommandToUndoHtml = function (commandName)
@@ -10199,7 +9769,6 @@ dwv.gui.base.Undo = function (app)
 
     /**
      * Enable the last command of the undo HTML.
-     * @method enableInUndoHtml
      * @param {Boolean} enable Flag to enable or disable the command.
      */
     this.enableInUndoHtml = function (enable)
@@ -10228,32 +9797,26 @@ dwv.gui.base.Undo = function (app)
     };
 
 }; // class dwv.gui.base.Undo
-;/** 
- * Image module.
- * @module image
- */
+;// namespaces
 var dwv = dwv || {};
 dwv.image = dwv.image || {};
+/** @namespace */
 dwv.image.filter = dwv.image.filter || {};
 
 /**
  * Threshold an image between an input minimum and maximum.
- * @class Threshold
- * @namespace dwv.image.filter
  * @constructor
  */
 dwv.image.filter.Threshold = function()
 {
     /**
      * Threshold minimum.
-     * @property min
      * @private
      * @type Number
      */
     var min = 0;
     /**
      * Threshold maximum.
-     * @property max
      * @private
      * @type Number
      */
@@ -10261,51 +9824,43 @@ dwv.image.filter.Threshold = function()
 
     /**
      * Get the threshold minimum.
-     * @method getMin
      * @return {Number} The threshold minimum.
      */
     this.getMin = function() { return min; };
     /**
      * Set the threshold minimum.
-     * @method setMin
      * @param {Number} val The threshold minimum.
      */
     this.setMin = function(val) { min = val; };
     /**
      * Get the threshold maximum.
-     * @method getMax
      * @return {Number} The threshold maximum.
      */
     this.getMax = function() { return max; };
     /**
      * Set the threshold maximum.
-     * @method setMax
      * @param {Number} val The threshold maximum.
      */
     this.setMax = function(val) { max = val; };
     /**
      * Get the name of the filter.
-     * @method getName
      * @return {String} The name of the filter.
      */
     this.getName = function() { return "Threshold"; };
 
     /**
      * Original image.
-     * @property originalImage
      * @private
      * @type Object
      */
     var originalImage = null;
     /**
      * Set the original image.
-     * @method setOriginalImage
      * @param {Object} image The original image.
      */
     this.setOriginalImage = function (image) { originalImage = image; };
     /**
      * Get the original image.
-     * @method getOriginalImage
      * @return {Object} image The original image.
      */
     this.getOriginalImage = function () { return originalImage; };
@@ -10313,7 +9868,6 @@ dwv.image.filter.Threshold = function()
 
 /**
  * Transform the main image using this filter.
- * @method update
  * @return {Object} The transformed image.
  */
 dwv.image.filter.Threshold.prototype.update = function ()
@@ -10334,34 +9888,28 @@ dwv.image.filter.Threshold.prototype.update = function ()
 
 /**
  * Sharpen an image using a sharpen convolution matrix.
- * @class Sharpen
- * @namespace dwv.image.filter
  * @constructor
  */
 dwv.image.filter.Sharpen = function()
 {
     /**
      * Get the name of the filter.
-     * @method getName
      * @return {String} The name of the filter.
      */
     this.getName = function() { return "Sharpen"; };
     /**
      * Original image.
-     * @property originalImage
      * @private
      * @type Object
      */
     var originalImage = null;
     /**
      * Set the original image.
-     * @method setOriginalImage
      * @param {Object} image The original image.
      */
     this.setOriginalImage = function (image) { originalImage = image; };
     /**
      * Get the original image.
-     * @method getOriginalImage
      * @return {Object} image The original image.
      */
     this.getOriginalImage = function () { return originalImage; };
@@ -10369,7 +9917,6 @@ dwv.image.filter.Sharpen = function()
 
 /**
  * Transform the main image using this filter.
- * @method update
  * @return {Object} The transformed image.
  */
 dwv.image.filter.Sharpen.prototype.update = function()
@@ -10384,34 +9931,28 @@ dwv.image.filter.Sharpen.prototype.update = function()
 
 /**
  * Apply a Sobel filter to an image.
- * @class Sobel
- * @namespace dwv.image.filter
  * @constructor
  */
 dwv.image.filter.Sobel = function()
 {
     /**
      * Get the name of the filter.
-     * @method getName
      * @return {String} The name of the filter.
      */
     this.getName = function() { return "Sobel"; };
     /**
      * Original image.
-     * @property originalImage
      * @private
      * @type Object
      */
     var originalImage = null;
     /**
      * Set the original image.
-     * @method setOriginalImage
      * @param {Object} image The original image.
      */
     this.setOriginalImage = function (image) { originalImage = image; };
     /**
      * Get the original image.
-     * @method getOriginalImage
      * @return {Object} image The original image.
      */
     this.getOriginalImage = function () { return originalImage; };
@@ -10419,7 +9960,6 @@ dwv.image.filter.Sobel = function()
 
 /**
  * Transform the main image using this filter.
- * @method update
  * @return {Object} The transformed image.
  */
 dwv.image.filter.Sobel.prototype.update = function()
@@ -10438,17 +9978,12 @@ dwv.image.filter.Sobel.prototype.update = function()
 
     return gradX.compose( gradY, function (x,y) { return Math.sqrt(x*x+y*y); } );
 };
-;/** 
- * Image module.
- * @module image
- */
+;// namespaces
 var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
  * 2D/3D Size class.
- * @class Size
- * @namespace dwv.image
  * @constructor
  * @param {Number} numberOfColumns The number of columns.
  * @param {Number} numberOfRows The number of rows.
@@ -10458,19 +9993,16 @@ dwv.image.Size = function ( numberOfColumns, numberOfRows, numberOfSlices )
 {
     /**
      * Get the number of columns.
-     * @method getNumberOfColumns
      * @return {Number} The number of columns.
      */
     this.getNumberOfColumns = function () { return numberOfColumns; };
     /**
      * Get the number of rows.
-     * @method getNumberOfRows
      * @return {Number} The number of rows.
      */
     this.getNumberOfRows = function () { return numberOfRows; };
     /**
      * Get the number of slices.
-     * @method getNumberOfSlices
      * @return {Number} The number of slices.
      */
     this.getNumberOfSlices = function () { return (numberOfSlices || 1.0); };
@@ -10478,7 +10010,6 @@ dwv.image.Size = function ( numberOfColumns, numberOfRows, numberOfSlices )
 
 /**
  * Get the size of a slice.
- * @method getSliceSize
  * @return {Number} The size of a slice.
  */
 dwv.image.Size.prototype.getSliceSize = function () {
@@ -10487,7 +10018,6 @@ dwv.image.Size.prototype.getSliceSize = function () {
 
 /**
  * Get the total size.
- * @method getTotalSize
  * @return {Number} The total size.
  */
 dwv.image.Size.prototype.getTotalSize = function () {
@@ -10496,7 +10026,6 @@ dwv.image.Size.prototype.getTotalSize = function () {
 
 /**
  * Check for equality.
- * @method equals
  * @param {Size} rhs The object to compare to.
  * @return {Boolean} True if both objects are equal.
  */
@@ -10509,7 +10038,6 @@ dwv.image.Size.prototype.equals = function (rhs) {
 
 /**
  * Check that coordinates are within bounds.
- * @method isInBounds
  * @param {Number} i The column coordinate.
  * @param {Number} j The row coordinate.
  * @param {Number} k The slice coordinate.
@@ -10526,8 +10054,6 @@ dwv.image.Size.prototype.isInBounds = function ( i, j, k ) {
 
 /**
  * 2D/3D Spacing class.
- * @class Spacing
- * @namespace dwv.image
  * @constructor
  * @param {Number} columnSpacing The column spacing.
  * @param {Number} rowSpacing The row spacing.
@@ -10537,19 +10063,16 @@ dwv.image.Spacing = function ( columnSpacing, rowSpacing, sliceSpacing )
 {
     /**
      * Get the column spacing.
-     * @method getColumnSpacing
      * @return {Number} The column spacing.
      */
     this.getColumnSpacing = function () { return columnSpacing; };
     /**
      * Get the row spacing.
-     * @method getRowSpacing
      * @return {Number} The row spacing.
      */
     this.getRowSpacing = function () { return rowSpacing; };
     /**
      * Get the slice spacing.
-     * @method getSliceSpacing
      * @return {Number} The slice spacing.
      */
     this.getSliceSpacing = function () { return (sliceSpacing || 1.0); };
@@ -10557,7 +10080,6 @@ dwv.image.Spacing = function ( columnSpacing, rowSpacing, sliceSpacing )
 
 /**
  * Check for equality.
- * @method equals
  * @param {Spacing} rhs The object to compare to.
  * @return {Boolean} True if both objects are equal.
  */
@@ -10570,8 +10092,6 @@ dwv.image.Spacing.prototype.equals = function (rhs) {
 
 /**
  * 2D/3D Geometry class.
- * @class Geometry
- * @namespace dwv.image
  * @constructor
  * @param {Object} origin The object origin.
  * @param {Object} size The object size.
@@ -10587,32 +10107,27 @@ dwv.image.Geometry = function ( origin, size, spacing )
 
     /**
      * Get the object first origin.
-     * @method getOrigin
      * @return {Object} The object first origin.
      */
     this.getOrigin = function () { return origin; };
     /**
      * Get the object origins.
-     * @method getOrigins
      * @return {Array} The object origins.
      */
     this.getOrigins = function () { return origins; };
     /**
      * Get the object size.
-     * @method getSize
      * @return {Object} The object size.
      */
     this.getSize = function () { return size; };
     /**
      * Get the object spacing.
-     * @method getSpacing
      * @return {Object} The object spacing.
      */
     this.getSpacing = function () { return spacing; };
 
     /**
      * Get the slice position of a point in the current slice layout.
-     * @method getSliceIndex
      * @param {Object} point The point to evaluate.
      */
     this.getSliceIndex = function (point)
@@ -10658,7 +10173,6 @@ dwv.image.Geometry = function ( origin, size, spacing )
 
 /**
  * Check for equality.
- * @method equals
  * @param {Geometry} rhs The object to compare to.
  * @return {Boolean} True if both objects are equal.
  */
@@ -10705,17 +10219,13 @@ dwv.image.Geometry.prototype.worldToIndex = function (point) {
         point.getY() / spacing.getRowSpacing() - origin.getY(),
         point.getZ() / spacing.getSliceSpacing() - origin.getZ() );
 };
-;/** 
- * Image module.
- * @module image
- */
+;// namespaces
 var dwv = dwv || {};
+/** @namespace */
 dwv.image = dwv.image || {};
 
 /**
  * Rescale Slope and Intercept
- * @class RescaleSlopeAndIntercept
- * @namespace dwv.image
  * @constructor
  * @param slope
  * @param intercept
@@ -10733,7 +10243,6 @@ dwv.image.RescaleSlopeAndIntercept = function (slope, intercept)
 
     /**
      * Get the slope of the RSI.
-     * @method getSlope
      * @return {Number} The slope of the RSI.
      */
     this.getSlope = function ()
@@ -10742,7 +10251,6 @@ dwv.image.RescaleSlopeAndIntercept = function (slope, intercept)
     };
     /**
      * Get the intercept of the RSI.
-     * @method getIntercept
      * @return {Number} The intercept of the RSI.
      */
     this.getIntercept = function ()
@@ -10751,7 +10259,6 @@ dwv.image.RescaleSlopeAndIntercept = function (slope, intercept)
     };
     /**
      * Apply the RSI on an input value.
-     * @method apply
      * @return {Number} The value to rescale.
      */
     this.apply = function (value)
@@ -10762,7 +10269,6 @@ dwv.image.RescaleSlopeAndIntercept = function (slope, intercept)
 
 /**
  * Check for RSI equality.
- * @method equals
  * @param {Object} rhs The other RSI to compare to.
  * @return {Boolean} True if both RSI are equal.
  */
@@ -10774,7 +10280,6 @@ dwv.image.RescaleSlopeAndIntercept.prototype.equals = function (rhs) {
 
 /**
  * Get a string representation of the RSI.
- * @method toString
  * @return {String} The RSI as a string.
  */
 dwv.image.RescaleSlopeAndIntercept.prototype.toString = function () {
@@ -10787,8 +10292,6 @@ dwv.image.RescaleSlopeAndIntercept.prototype.toString = function () {
  * - rescale slope and intercept (default 1:0),
  * - photometric interpretation (default MONOCHROME2),
  * - planar configuration (default RGBRGB...).
- * @class Image
- * @namespace dwv.image
  * @constructor
  * @param {Object} geometry The geometry of the image.
  * @param {Array} buffer The image data.
@@ -10797,7 +10300,6 @@ dwv.image.Image = function(geometry, buffer)
 {
     /**
      * Rescale slope and intercept.
-     * @property rsi
      * @private
      * @type Number
      */
@@ -10807,28 +10309,24 @@ dwv.image.Image = function(geometry, buffer)
     }
     /**
      * Photometric interpretation (MONOCHROME, RGB...).
-     * @property photometricInterpretation
      * @private
      * @type String
      */
     var photometricInterpretation = "MONOCHROME2";
     /**
      * Planar configuration for RGB data (0:RGBRGBRGBRGB... or 1:RRR...GGG...BBB...).
-     * @property planarConfiguration
      * @private
      * @type Number
      */
     var planarConfiguration = 0;
     /**
      * Number of components.
-     * @property planarConfiguration
      * @private
      * @type Number
      */
     var numberOfComponents = buffer.length / geometry.getSize().getTotalSize();
     /**
      * Meta information.
-     * @property meta
      * @private
      * @type Object
      */
@@ -10836,7 +10334,6 @@ dwv.image.Image = function(geometry, buffer)
 
     /**
      * Original buffer.
-     * @property originalBuffer
      * @private
      * @type Array
      */
@@ -10844,21 +10341,18 @@ dwv.image.Image = function(geometry, buffer)
 
     /**
      * Data range.
-     * @property dataRange
      * @private
      * @type Object
      */
     var dataRange = null;
     /**
      * Rescaled data range.
-     * @property rescaledDataRange
      * @private
      * @type Object
      */
     var rescaledDataRange = null;
     /**
      * Histogram.
-     * @property histogram
      * @private
      * @type Array
      */
@@ -10866,26 +10360,23 @@ dwv.image.Image = function(geometry, buffer)
 
     /**
      * Get the geometry of the image.
-     * @method getGeometry
      * @return {Object} The size of the image.
      */
     this.getGeometry = function() { return geometry; };
     /**
-     * Get the data buffer of the image. TODO dangerous...
-     * @method getBuffer
+     * Get the data buffer of the image. 
+     * @todo dangerous...
      * @return {Array} The data buffer of the image.
      */
     this.getBuffer = function() { return buffer; };
 
     /**
      * Get the rescale slope and intercept.
-     * @method getRescaleSlopeAndIntercept
      * @return {Object} The rescale slope and intercept.
      */
     this.getRescaleSlopeAndIntercept = function(k) { return rsis[k]; };
     /**
      * Set the rescale slope and intercept.
-     * @method setRescaleSlopeAndIntercept
      * @param {Object} rsi The rescale slope and intercept.
      */
     this.setRescaleSlopeAndIntercept = function(inRsi, k) {
@@ -10896,51 +10387,43 @@ dwv.image.Image = function(geometry, buffer)
     };
     /**
      * Get the photometricInterpretation of the image.
-     * @method getPhotometricInterpretation
      * @return {String} The photometricInterpretation of the image.
      */
     this.getPhotometricInterpretation = function() { return photometricInterpretation; };
     /**
      * Set the photometricInterpretation of the image.
-     * @method setPhotometricInterpretation
      * @pqrqm {String} interp The photometricInterpretation of the image.
      */
     this.setPhotometricInterpretation = function(interp) { photometricInterpretation = interp; };
     /**
      * Get the planarConfiguration of the image.
-     * @method getPlanarConfiguration
      * @return {Number} The planarConfiguration of the image.
      */
     this.getPlanarConfiguration = function() { return planarConfiguration; };
     /**
      * Set the planarConfiguration of the image.
-     * @method setPlanarConfiguration
      * @param {Number} config The planarConfiguration of the image.
      */
     this.setPlanarConfiguration = function(config) { planarConfiguration = config; };
     /**
      * Get the numberOfComponents of the image.
-     * @method getNumberOfComponents
      * @return {Number} The numberOfComponents of the image.
      */
     this.getNumberOfComponents = function() { return numberOfComponents; };
 
     /**
      * Get the meta information of the image.
-     * @method getMeta
      * @return {Object} The meta information of the image.
      */
     this.getMeta = function() { return meta; };
     /**
      * Set the meta information of the image.
-     * @method setMeta
      * @param {Object} rhs The meta information of the image.
      */
     this.setMeta = function(rhs) { meta = rhs; };
 
     /**
      * Get value at offset. Warning: No size check...
-     * @method getValueAtOffset
      * @param {Number} offset The desired offset.
      * @return {Number} The value at offset.
      */
@@ -10950,7 +10433,6 @@ dwv.image.Image = function(geometry, buffer)
 
     /**
      * Clone the image.
-     * @method clone
      * @return {Image} A clone of this image.
      */
     this.clone = function()
@@ -10968,7 +10450,6 @@ dwv.image.Image = function(geometry, buffer)
 
     /**
      * Append a slice to the image.
-     * @method appendSlice
      * @param {Image} The slice to append.
      * @return {Number} The number of the inserted slice.
      */
@@ -11044,7 +10525,6 @@ dwv.image.Image = function(geometry, buffer)
 
     /**
      * Get the data range.
-     * @method getDataRange
      * @return {Object} The data range.
      */
     this.getDataRange = function() {
@@ -11056,7 +10536,6 @@ dwv.image.Image = function(geometry, buffer)
 
     /**
      * Get the rescaled data range.
-     * @method getRescaledDataRange
      * @return {Object} The rescaled data range.
      */
     this.getRescaledDataRange = function() {
@@ -11068,7 +10547,6 @@ dwv.image.Image = function(geometry, buffer)
 
     /**
      * Get the histogram.
-     * @method getHistogram
      * @return {Array} The histogram.
      */
     this.getHistogram = function() {
@@ -11084,7 +10562,6 @@ dwv.image.Image = function(geometry, buffer)
 
 /**
  * Get the value of the image at a specific coordinate.
- * @method getValue
  * @param {Number} i The X index.
  * @param {Number} j The Y index.
  * @param {Number} k The Z index.
@@ -11099,7 +10576,6 @@ dwv.image.Image.prototype.getValue = function( i, j, k )
 
 /**
  * Get the rescaled value of the image at a specific coordinate.
- * @method getRescaledValue
  * @param {Number} i The X index.
  * @param {Number} j The Y index.
  * @param {Number} k The Z index.
@@ -11113,7 +10589,6 @@ dwv.image.Image.prototype.getRescaledValue = function( i, j, k )
 
 /**
  * Calculate the data range of the image.
- * @method calculateDataRange
  * @return {Object} The range {min, max}.
  */
 dwv.image.Image.prototype.calculateDataRange = function ()
@@ -11133,7 +10608,6 @@ dwv.image.Image.prototype.calculateDataRange = function ()
 
 /**
  * Calculate the rescaled data range of the image.
- * @method calculateRescaledDataRange
  * @return {Object} The range {min, max}.
  */
 dwv.image.Image.prototype.calculateRescaledDataRange = function ()
@@ -11157,7 +10631,6 @@ dwv.image.Image.prototype.calculateRescaledDataRange = function ()
 
 /**
  * Calculate the histogram of the image.
- * @method calculateHistogram
  * @return {Object} The histogram, data range and rescaled data range.
  */
 dwv.image.Image.prototype.calculateHistogram = function ()
@@ -11198,7 +10671,6 @@ dwv.image.Image.prototype.calculateHistogram = function ()
 
 /**
  * Convolute the image with a given 2D kernel.
- * @method convolute2D
  * @param {Array} weights The weights of the 2D kernel as a 3x3 matrix.
  * @return {Image} The convoluted image.
  * Note: Uses the raw buffer values.
@@ -11349,7 +10821,6 @@ dwv.image.Image.prototype.convolute2D = function(weights)
 
 /**
  * Transform an image using a specific operator.
- * @method transform
  * @param {Function} operator The operator to use when transforming.
  * @return {Image} The transformed image.
  * Note: Uses the raw buffer values.
@@ -11367,7 +10838,6 @@ dwv.image.Image.prototype.transform = function(operator)
 
 /**
  * Compose this image with another one and using a specific operator.
- * @method compose
  * @param {Image} rhs The image to compose with.
  * @param {Function} operator The operator to use when composing.
  * @return {Image} The composed image.
@@ -11387,7 +10857,6 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
 
 /**
  * Quantify a line according to image information.
- * @method quantifyLine
  * @param {Object} line The line to quantify.
  * @return {Object} A quantification object.
  */
@@ -11401,7 +10870,6 @@ dwv.image.Image.prototype.quantifyLine = function(line)
 
 /**
  * Quantify a rectangle according to image information.
- * @method quantifyRect
  * @param {Object} rect The rectangle to quantify.
  * @return {Object} A quantification object.
  */
@@ -11427,7 +10895,6 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
 
 /**
  * Quantify an ellipse according to image information.
- * @method quantifyEllipse
  * @param {Object} ellipse The ellipse to quantify.
  * @return {Object} A quantification object.
  */
@@ -11440,19 +10907,16 @@ dwv.image.Image.prototype.quantifyEllipse = function(ellipse)
 };
 
 /**
- * Image factory.
- * @class ImageFactory
- * @namespace dwv.image
+ * {@link dwv.image.Image} factory.
  * @constructor
  */
 dwv.image.ImageFactory = function () {};
 
 /**
- * Get an Image object from the read DICOM file.
- * @method create
+ * Get an {@link dwv.image.Image} object from the read DICOM file.
  * @param {Object} dicomElements The DICOM tags.
  * @param {Array} pixelBuffer The pixel buffer.
- * @returns {View} A new Image.
+ * @return {View} A new Image.
  */
 dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
 {
@@ -11580,18 +11044,14 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
 
     return image;
 };
-;/** 
- * Image module.
- * @module image
- */
+;// namespaces
 var dwv = dwv || {};
 dwv.image = dwv.image || {};
+/** @namespace */
 dwv.image.lut = dwv.image.lut || {};
 
 /**
  * Rescale LUT class.
- * @class Rescale
- * @namespace dwv.image.lut
  * @constructor
  * @param {Object} rsi The rescale slope and intercept.
  */
@@ -11599,7 +11059,6 @@ dwv.image.lut.Rescale = function (rsi)
 {
     /**
      * The internal array.
-     * @property rescaleLut
      * @private
      * @type Array
      */
@@ -11607,14 +11066,12 @@ dwv.image.lut.Rescale = function (rsi)
 
     /**
      * Get the Rescale Slope and Intercept (RSI).
-     * @method getRSI
      * @return {Object} The rescale slope and intercept.
      */
     this.getRSI = function () { return rsi; };
 
     /**
      * Initialise the LUT.
-     * @method initialise
      * @param {Number} bitsStored The number of bits used to store the data.
      */
     this.initialise = function (bitsStored)
@@ -11628,14 +11085,12 @@ dwv.image.lut.Rescale = function (rsi)
 
     /**
      * Get the length of the LUT array.
-     * @method getLength
      * @return {Number} The length of the LUT array.
      */
     this.getLength = function () { return rescaleLut.length; };
 
     /**
      * Get the value of the LUT at the given offset.
-     * @method getValue
      * @return {Number} The value of the LUT at the given offset.
      */
     this.getValue = function (offset) { return rescaleLut[offset]; };
@@ -11643,8 +11098,6 @@ dwv.image.lut.Rescale = function (rsi)
 
 /**
  * Window LUT class.
- * @class Window
- * @namespace dwv.image.lut
  * @constructor
  * @param {Number} rescaleLut_ The associated rescale LUT.
  * @param {Boolean} isSigned_ Flag to know if the data is signed.
@@ -11654,7 +11107,6 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
     /**
      * The internal array: Uint8ClampedArray clamps between 0 and 255.
      * (not supported on travis yet... using basic array, be sure not to overflow!)
-     * @property rescaleLut
      * @private
      * @type Array
      */
@@ -11670,14 +11122,12 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
 
     /**
      * The window center.
-     * @property center
      * @private
      * @type Number
      */
     var center = null;
     /**
      * The window width.
-     * @property width
      * @private
      * @type Number
      */
@@ -11685,7 +11135,6 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
 
     /**
      * Flag to know if the lut needs update or not.
-     * @property needsUpdate
      * @private
      * @type Boolean
      */
@@ -11693,32 +11142,27 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
 
     /**
      * Get the window center.
-     * @method getCenter
      * @return {Number} The window center.
      */
     this.getCenter = function() { return center; };
     /**
      * Get the window width.
-     * @method getWidth
      * @return {Number} The window width.
      */
     this.getWidth = function() { return width; };
     /**
      * Get the signed flag.
-     * @method isSigned
      * @return {Boolean} The signed flag.
      */
     this.isSigned = function() { return isSigned; };
     /**
      * Get the rescale lut.
-     * @method getRescaleLut
      * @return {Object} The rescale lut.
      */
     this.getRescaleLut = function() { return rescaleLut; };
 
     /**
      * Set the window center and width.
-     * @method setCenterAndWidth
      * @param {Number} inCenter The window center.
      * @param {Number} inWidth The window width.
      */
@@ -11732,7 +11176,6 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
 
     /**
      * Update the lut if needed..
-     * @method update
      */
     this.update = function ()
     {
@@ -11785,14 +11228,12 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
 
     /**
      * Get the length of the LUT array.
-     * @method getLength
      * @return {Number} The length of the LUT array.
      */
     this.getLength = function() { return windowLut.length; };
 
     /**
      * Get the value of the LUT at the given offset.
-     * @method getValue
      * @return {Number} The value of the LUT at the given offset.
      */
     this.getValue = function(offset)
@@ -11966,17 +11407,8 @@ dwv.image.lut.test = {
    "green": dwv.image.lut.buildLut(dwv.image.lut.id),
    "blue":  dwv.image.lut.buildLut(dwv.image.lut.id)
 };*/
-;/** 
- * Image module.
- * @module image
- */
+;// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for image related functions.
- * @class image
- * @namespace dwv
- * @static
- */
 dwv.image = dwv.image || {};
 
 // JPEG Baseline
@@ -11993,8 +11425,6 @@ var JpxImage = JpxImage || {};
 
 /**
  * Get data from an input image using a canvas.
- * @method getViewFromDOMImage
- * @static
  * @param {Image} Image The DOM Image.
  * @return {Mixed} The corresponding view and info.
  */
@@ -12050,8 +11480,6 @@ dwv.image.getViewFromDOMImage = function (image)
 
 /**
  * Create a dwv.image.View from a DICOM buffer.
- * @class DicomBufferToView
- * @namespace dwv.image
  * @constructor
  */
 dwv.image.DicomBufferToView = function (decoderScripts) {
@@ -12068,7 +11496,6 @@ dwv.image.DicomBufferToView = function (decoderScripts) {
 
     /**
      * Get data from an input buffer using a DICOM parser.
-     * @method convert
      * @param {Array} buffer The input data buffer.
      * @param {Object} callback The callback on the conversion.
      * @return {Mixed} The corresponding view and info.
@@ -12143,17 +11570,12 @@ dwv.image.DicomBufferToView = function (decoderScripts) {
         }
     };
 };
-;/** 
- * Image module.
- * @module image
- */
+;// namespaces
 var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
  * View class.
- * @class View
- * @namespace dwv.image
  * @constructor
  * @param {Image} image The associated image.
  * @param {Boolean} isSigned Is the data signed.
@@ -12164,7 +11586,6 @@ dwv.image.View = function(image, isSigned)
 {
     /**
      * Window lookup tables, indexed per Rescale Slope and Intercept (RSI).
-     * @property windowLuts
      * @private
      * @type Window
      */
@@ -12172,21 +11593,18 @@ dwv.image.View = function(image, isSigned)
 
     /**
      * Window presets.
-     * @property windowPresets
      * @private
      * @type Object
      */
     var windowPresets = null;
     /**
      * colour map
-     * @property colourMap
      * @private
      * @type Object
      */
     var colourMap = dwv.image.lut.plain;
     /**
      * Current position
-     * @property currentPosition
      * @private
      * @type Object
      */
@@ -12194,20 +11612,17 @@ dwv.image.View = function(image, isSigned)
 
     /**
      * Get the associated image.
-     * @method getImage
      * @return {Image} The associated image.
      */
     this.getImage = function() { return image; };
     /**
      * Set the associated image.
-     * @method setImage
      * @param {Image} inImage The associated image.
      */
     this.setImage = function(inImage) { image = inImage; };
 
     /**
      * Get the window LUT of the image.
-     * @method getWindowLut
      * @return {Window} The window LUT of the image.
      */
     this.getWindowLut = function (rsi) {
@@ -12219,7 +11634,6 @@ dwv.image.View = function(image, isSigned)
     };
     /**
      * Set the window LUT of the image.
-     * @method setWindowLut
      * @param {Window} wlut The window LUT of the image.
      */
     this.setWindowLut = function (wlut)
@@ -12232,7 +11646,6 @@ dwv.image.View = function(image, isSigned)
 
     /**
      * Initialise the view. Only called at construction.
-     * @method initialise
      * @private
      */
     function initialise()
@@ -12252,13 +11665,11 @@ dwv.image.View = function(image, isSigned)
 
     /**
      * Get the window presets.
-     * @method getWindowPresets
      * @return {Object} The window presets.
      */
     this.getWindowPresets = function() { return windowPresets; };
     /**
      * Set the window presets.
-     * @method setWindowPresets
      * @param {Object} presets The window presets.
      */
     this.setWindowPresets = function(presets) {
@@ -12268,13 +11679,11 @@ dwv.image.View = function(image, isSigned)
 
     /**
      * Get the colour map of the image.
-     * @method getColourMap
      * @return {Object} The colour map of the image.
      */
     this.getColourMap = function() { return colourMap; };
     /**
      * Set the colour map of the image.
-     * @method setColourMap
      * @param {Object} map The colour map of the image.
      */
     this.setColourMap = function(map) {
@@ -12290,14 +11699,12 @@ dwv.image.View = function(image, isSigned)
 
     /**
      * Is the data signed data.
-     * @method isSigned
      * @return {Boolean} The signed data flag.
      */
     this.isSigned = function() { return isSigned; };
 
     /**
      * Get the current position.
-     * @method getCurrentPosition
      * @return {Object} The current position.
      */
     this.getCurrentPosition = function() {
@@ -12306,7 +11713,6 @@ dwv.image.View = function(image, isSigned)
     };
     /**
      * Set the current position. Returns false if not in bounds.
-     * @method setCurrentPosition
      * @param {Object} pos The current position.
      * @param {Boolean} silent If true, does not fire a slice-change event.
      */
@@ -12348,7 +11754,6 @@ dwv.image.View = function(image, isSigned)
 
     /**
      * Append another view to this one.
-     * @method append
      * @param {Object} rhs The view to append.
      */
     this.append = function( rhs )
@@ -12368,7 +11773,6 @@ dwv.image.View = function(image, isSigned)
 
     /**
      * Set the view window/level.
-     * @method setWindowLevel
      * @param {Number} center The window center.
      * @param {Number} width The window width.
      * Warning: uses the latest set rescale LUT or the default linear one.
@@ -12386,7 +11790,6 @@ dwv.image.View = function(image, isSigned)
 
     /**
      * Clone the image using all meta data and the original data buffer.
-     * @method clone
      * @return {View} A full copy of this {dwv.image.View}.
      */
     this.clone = function ()
@@ -12401,20 +11804,17 @@ dwv.image.View = function(image, isSigned)
 
     /**
      * View listeners
-     * @property listeners
      * @private
      * @type Object
      */
     var listeners = {};
     /**
      * Get the view listeners.
-     * @method getListeners
      * @return {Object} The view listeners.
      */
     this.getListeners = function() { return listeners; };
     /**
      * Set the view listeners.
-     * @method setListeners
      * @param {Object} list The view listeners.
      */
     this.setListeners = function(list) { listeners = list; };
@@ -12422,7 +11822,6 @@ dwv.image.View = function(image, isSigned)
 
 /**
  * Set the image window/level to cover the full data range.
- * @method setWindowLevelMinMax
  * Warning: uses the latest set rescale LUT or the default linear one.
  */
 dwv.image.View.prototype.setWindowLevelMinMax = function()
@@ -12439,7 +11838,6 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
 
 /**
  * Generate display image data to be given to a canvas.
- * @method generateImageData
  * @param {Array} array The array to fill in.
  * @param {Number} sliceNumber The slice position.
  */
@@ -12524,7 +11922,6 @@ dwv.image.View.prototype.generateImageData = function( array )
 
 /**
  * Add an event listener on the view.
- * @method addEventListener
  * @param {String} type The event type.
  * @param {Object} listener The method associated with the provided event type.
  */
@@ -12539,7 +11936,6 @@ dwv.image.View.prototype.addEventListener = function(type, listener)
 
 /**
  * Remove an event listener on the view.
- * @method removeEventListener
  * @param {String} type The event type.
  * @param {Object} listener The method associated with the provided event type.
  */
@@ -12559,7 +11955,6 @@ dwv.image.View.prototype.removeEventListener = function(type, listener)
 
 /**
  * Fire an event: call all associated listeners.
- * @method fireEvent
  * @param {Object} event The event to fire.
  */
 dwv.image.View.prototype.fireEvent = function(event)
@@ -12576,18 +11971,15 @@ dwv.image.View.prototype.fireEvent = function(event)
 
 /**
  * View factory.
- * @class ViewFactory
- * @namespace dwv.image
  * @constructor
  */
 dwv.image.ViewFactory = function () {};
 
 /**
  * Get an View object from the read DICOM file.
- * @method create
  * @param {Object} dicomElements The DICOM tags.
  * @param {Array} pixelBuffer The pixel buffer.
- * @returns {View} The new View.
+ * @return {View} The new View.
  */
 dwv.image.ViewFactory.prototype.create = function (dicomElements, pixelBuffer)
 {
@@ -12636,51 +12028,37 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, pixelBuffer)
 
     return view;
 };
-;/** 
- * I/O module.
- * @module io
- */
+;// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for I/O functions.
- * @class io
- * @namespace dwv
- * @static
- */
+/** @namespace */
 dwv.io = dwv.io || {};
 
 /**
  * File loader.
- * @class File
- * @namespace dwv.io
  * @constructor
  */
 dwv.io.File = function ()
 {
     /**
      * Number of data to load.
-     * @property nToLoad
      * @private
      * @type Number
      */
     var nToLoad = 0;
     /**
      * Number of loaded data.
-     * @property nLoaded
      * @private
      * @type Number
      */
     var nLoaded = 0;
     /**
      * List of progresses.
-     * @property progressList
      * @private
      * @type Array
      */
     var progressList = [];
     /**
      * List of data decoders scripts.
-     * @property decoderScripts
      * @private
      * @type Array
      */
@@ -12688,7 +12066,6 @@ dwv.io.File = function ()
     
     /**
      * Set the number of data to load.
-     * @method setNToLoad
      */
     this.setNToLoad = function (n) {
         nToLoad = n;
@@ -12700,7 +12077,6 @@ dwv.io.File = function ()
     /**
      * Increment the number of loaded data
      * and call onloadend if loaded all data.
-     * @method addLoaded
      */
     this.addLoaded = function () {
         nLoaded++;
@@ -12711,7 +12087,6 @@ dwv.io.File = function ()
 
     /**
      * Get the global load percent including the provided one.
-     * @method getGlobalPercent
      * @param {Number} n The number of the loaded data.
      * @param {Number} percent The percentage of data 'n' that has been loaded.
      * @return {Number} The accumulated percentage.
@@ -12727,7 +12102,6 @@ dwv.io.File = function ()
     
     /**
      * Set the web workers decoder scripts.
-     * @method setDecoderScripts
      * @param {Array} list The list of decoder scripts.
      */
     this.setDecoderScripts = function (list) {
@@ -12735,7 +12109,6 @@ dwv.io.File = function ()
     };
     /**
      * Get the web workers decoder scripts.
-     * @method getDecoderScripts
      * @return {Array} list The list of decoder scripts.
      */
     this.getDecoderScripts = function () {
@@ -12745,7 +12118,6 @@ dwv.io.File = function ()
 
 /**
  * Handle a load event.
- * @method onload
  * @param {Object} event The load event, event.target
  *  should be the loaded data.
  */
@@ -12755,7 +12127,6 @@ dwv.io.File.prototype.onload = function (/*event*/)
 };
 /**
  * Handle a load end event.
- * @method onloadend
  */
 dwv.io.File.prototype.onloadend = function ()
 {
@@ -12763,7 +12134,6 @@ dwv.io.File.prototype.onloadend = function ()
 };
 /**
  * Handle a progress event.
- * @method onprogress
  */
 dwv.io.File.prototype.onprogress = function ()
 {
@@ -12771,7 +12141,6 @@ dwv.io.File.prototype.onprogress = function ()
 };
 /**
  * Handle an error event.
- * @method onerror
  * @param {Object} event The error event, event.message
  *  should be the error message.
  */
@@ -12782,7 +12151,6 @@ dwv.io.File.prototype.onerror = function (/*event*/)
 
 /**
  * Create an error handler from a base one and locals.
- * @method createErrorHandler
  * @param {String} file The related file.
  * @param {String} text The text to insert in the message.
  * @param {Function} baseHandler The base handler.
@@ -12797,7 +12165,6 @@ dwv.io.File.createErrorHandler = function (file, text, baseHandler) {
 
 /**
  * Create an progress handler from a base one and locals.
- * @method createProgressHandler
  * @param {Number} n The number of the loaded data.
  * @param {Function} calculator The load progress accumulator.
  * @param {Function} baseHandler The base handler.
@@ -12816,7 +12183,6 @@ dwv.io.File.createProgressHandler = function (n, calculator, baseHandler) {
 
 /**
  * Load a list of files.
- * @method load
  * @param {Array} ioArray The list of files to load.
  */
 dwv.io.File.prototype.load = function (ioArray)
@@ -12907,51 +12273,36 @@ dwv.io.File.prototype.load = function (ioArray)
         }
     }
 };
-;/** 
- * I/O module.
- * @module io
- */
+;// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for I/O functions.
- * @class io
- * @namespace dwv
- * @static
- */
 dwv.io = dwv.io || {};
 
 /**
  * Url loader.
- * @class Url
- * @namespace dwv.io
  * @constructor
  */
 dwv.io.Url = function ()
 {
     /**
      * Number of data to load.
-     * @property nToLoad
      * @private
      * @type Number
      */
     var nToLoad = 0;
     /**
      * Number of loaded data.
-     * @property nLoaded
      * @private
      * @type Number
      */
     var nLoaded = 0;
     /**
      * List of progresses.
-     * @property progressList
      * @private
      * @type Array
      */
     var progressList = [];
     /**
      * List of data decoders scripts.
-     * @property decoderScripts
      * @private
      * @type Array
      */
@@ -12959,7 +12310,6 @@ dwv.io.Url = function ()
 
     /**
      * Set the number of data to load.
-     * @method setNToLoad
      */
     this.setNToLoad = function (n) {
         nToLoad = n;
@@ -12971,7 +12321,6 @@ dwv.io.Url = function ()
     /**
      * Increment the number of loaded data
      * and call onloadend if loaded all data.
-     * @method addLoaded
      */
     this.addLoaded = function () {
         nLoaded++;
@@ -12982,7 +12331,6 @@ dwv.io.Url = function ()
 
     /**
      * Get the global load percent including the provided one.
-     * @method getGlobalPercent
      * @param {Number} n The number of the loaded data.
      * @param {Number} percent The percentage of data 'n' that has been loaded.
      * @return {Number} The accumulated percentage.
@@ -12998,7 +12346,6 @@ dwv.io.Url = function ()
     
     /**
      * Set the web workers decoder scripts.
-     * @method setDecoderScripts
      * @param {Array} list The list of decoder scripts.
      */
     this.setDecoderScripts = function (list) {
@@ -13006,7 +12353,6 @@ dwv.io.Url = function ()
     };
     /**
      * Get the web workers decoder scripts.
-     * @method getDecoderScripts
      * @return {Array} list The list of decoder scripts.
      */
     this.getDecoderScripts = function () {
@@ -13016,7 +12362,6 @@ dwv.io.Url = function ()
 
 /**
  * Handle a load event.
- * @method onload
  * @param {Object} event The load event, event.target
  *  should be the loaded data.
  */
@@ -13026,7 +12371,6 @@ dwv.io.Url.prototype.onload = function (/*event*/)
 };
 /**
  * Handle a load end event.
- * @method onloadend
  */
 dwv.io.Url.prototype.onloadend = function ()
 {
@@ -13034,7 +12378,6 @@ dwv.io.Url.prototype.onloadend = function ()
 };
 /**
  * Handle a progress event.
- * @method onprogress
  */
 dwv.io.File.prototype.onprogress = function ()
 {
@@ -13042,7 +12385,6 @@ dwv.io.File.prototype.onprogress = function ()
 };
 /**
  * Handle an error event.
- * @method onerror
  * @param {Object} event The error event, event.message
  *  should be the error message.
  */
@@ -13053,7 +12395,6 @@ dwv.io.Url.prototype.onerror = function (/*event*/)
 
 /**
  * Create an error handler from a base one and locals.
- * @method createErrorHandler
  * @param {String} url The related url.
  * @param {String} text The text to insert in the message.
  * @param {Function} baseHandler The base handler.
@@ -13068,7 +12409,6 @@ dwv.io.Url.createErrorHandler = function (url, text, baseHandler) {
 
 /**
  * Create an progress handler from a base one and locals.
- * @method createProgressHandler
  * @param {Number} n The number of the loaded data.
  * @param {Function} calculator The load progress accumulator.
  * @param {Function} baseHandler The base handler.
@@ -13087,7 +12427,6 @@ dwv.io.Url.createProgressHandler = function (n, calculator, baseHandler) {
 
 /**
  * Load a list of URLs.
- * @method load
  * @param {Array} ioArray The list of urls to load.
  * @param {Array} requestHeaders An array of {name, value} to use as request headers.
  */
@@ -13231,11 +12570,9 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
         request.send(null);
     }
 };
-;/** 
- * Math module.
- * @module math
- */
+;// namespaces
 var dwv = dwv || {};
+/** @namespace */
 dwv.math = dwv.math || {};
 
 /**
@@ -13247,8 +12584,6 @@ dwv.math = dwv.math || {};
  * If the most recent point had a cost of c, any points added should have a cost
  * c' in the range c <= c' <= c + (capacity - 1).
  *
- * @class BucketQueue
- * @namespace dwv.math
  * @constructor
  * @input bits
  * @input cost_functor
@@ -13343,23 +12678,12 @@ dwv.math.BucketQueue.prototype.buildArray = function(newSize) {
 
     return buckets;
 };
-;/** 
- * Math module.
- * @module math
- */
+;// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for math functions.
- * @class math
- * @namespace dwv
- * @static
- */
 dwv.math = dwv.math || {};
 
 /**
  * Immutable 2D point.
- * @class Point2D
- * @namespace dwv.math
  * @constructor
  * @param {Number} x The X coordinate for the point.
  * @param {Number} y The Y coordinate for the point.
@@ -13368,13 +12692,11 @@ dwv.math.Point2D = function (x,y)
 {
     /**
      * Get the X position of the point.
-     * @method getX
      * @return {Number} The X position of the point.
      */
     this.getX = function () { return x; };
     /**
      * Get the Y position of the point.
-     * @method getY
      * @return {Number} The Y position of the point.
      */
     this.getY = function () { return y; };
@@ -13382,7 +12704,6 @@ dwv.math.Point2D = function (x,y)
 
 /**
  * Check for Point2D equality.
- * @method equals
  * @param {Point2D} rhs The other Point2D to compare to.
  * @return {Boolean} True if both points are equal.
  */
@@ -13394,7 +12715,6 @@ dwv.math.Point2D.prototype.equals = function (rhs) {
 
 /**
  * Get a string representation of the Point2D.
- * @method toString
  * @return {String} The Point2D as a string.
  */
 dwv.math.Point2D.prototype.toString = function () {
@@ -13403,8 +12723,6 @@ dwv.math.Point2D.prototype.toString = function () {
 
 /**
  * Mutable 2D point.
- * @class FastPoint2D
- * @namespace dwv.math
  * @constructor
  * @param {Number} x The X coordinate for the point.
  * @param {Number} y The Y coordinate for the point.
@@ -13417,7 +12735,6 @@ dwv.math.FastPoint2D = function (x,y)
 
 /**
  * Check for FastPoint2D equality.
- * @method equals
  * @param {FastPoint2D} other The other FastPoint2D to compare to.
  * @return {Boolean} True if both points are equal.
  */
@@ -13429,7 +12746,6 @@ dwv.math.FastPoint2D.prototype.equals = function (rhs) {
 
 /**
  * Get a string representation of the FastPoint2D.
- * @method toString
  * @return {String} The Point2D as a string.
  */
 dwv.math.FastPoint2D.prototype.toString = function () {
@@ -13438,8 +12754,6 @@ dwv.math.FastPoint2D.prototype.toString = function () {
 
 /**
  * Immutable 3D point.
- * @class Point3D
- * @namespace dwv.math
  * @constructor
  * @param {Number} x The X coordinate for the point.
  * @param {Number} y The Y coordinate for the point.
@@ -13449,19 +12763,16 @@ dwv.math.Point3D = function (x,y,z)
 {
     /**
      * Get the X position of the point.
-     * @method getX
      * @return {Number} The X position of the point.
      */
     this.getX = function () { return x; };
     /**
      * Get the Y position of the point.
-     * @method getY
      * @return {Number} The Y position of the point.
      */
     this.getY = function () { return y; };
     /**
      * Get the Z position of the point.
-     * @method getZ
      * @return {Number} The Z position of the point.
      */
     this.getZ = function () { return z; };
@@ -13469,7 +12780,6 @@ dwv.math.Point3D = function (x,y,z)
 
 /**
  * Check for Point3D equality.
- * @method equals
  * @param {Point3D} rhs The other Point3D to compare to.
  * @return {Boolean} True if both points are equal.
  */
@@ -13482,7 +12792,6 @@ dwv.math.Point3D.prototype.equals = function (rhs) {
 
 /**
  * Get a string representation of the Point3D.
- * @method toString
  * @return {String} The Point3D as a string.
  */
 dwv.math.Point3D.prototype.toString = function () {
@@ -13493,8 +12802,6 @@ dwv.math.Point3D.prototype.toString = function () {
 
 /**
  * Immutable 3D index.
- * @class Index3D
- * @namespace dwv.math
  * @constructor
  * @param {Number} i The column index.
  * @param {Number} j The row index.
@@ -13504,19 +12811,16 @@ dwv.math.Index3D = function (i,j,k)
 {
     /**
      * Get the column index.
-     * @method getI
      * @return {Number} The column index.
      */
     this.getI = function () { return i; };
     /**
      * Get the row index.
-     * @method getJ
      * @return {Number} The row index.
      */
     this.getJ = function () { return j; };
     /**
      * Get the slice index.
-     * @method getK
      * @return {Number} The slice index.
      */
     this.getK = function () { return k; };
@@ -13524,7 +12828,6 @@ dwv.math.Index3D = function (i,j,k)
 
 /**
  * Check for Index3D equality.
- * @method equals
  * @param {Index3D} rhs The other Index3D to compare to.
  * @return {Boolean} True if both points are equal.
  */
@@ -13537,7 +12840,6 @@ dwv.math.Index3D.prototype.equals = function (rhs) {
 
 /**
  * Get a string representation of the Index3D.
- * @method toString
  * @return {String} The Index3D as a string.
  */
 dwv.math.Index3D.prototype.toString = function () {
@@ -13545,10 +12847,7 @@ dwv.math.Index3D.prototype.toString = function () {
         ", " + this.getJ() +
         ", " + this.getK() + ")";
 };
-;/** 
- * Math module.
- * @module math
- */
+;// namespaces
 var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
@@ -13826,18 +13125,16 @@ dwv.math.gaussianBlur = function(buffer, out) {
 
 /**
  * Scissors
- * @class Scissors
- * @namespace dwv.math
- * @constructor
  *
  * Ref: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with
  *   Intelligent Scissors, Graphical Models and Image Processing, Volume 60,
  *   Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,
  *   DOI: 10.1006/gmip.1998.0480.
  *
- * (http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579)
+ * {@link http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579}
  *
- * Highly inspired from http://code.google.com/p/livewire-javascript/
+ * Highly inspired from {@link http://code.google.com/p/livewire-javascript/}
+ * @constructor
  */
 dwv.math.Scissors = function()
 {
@@ -14138,23 +13435,12 @@ dwv.math.Scissors.prototype.doWork = function() {
 
     return newPoints;
 };
-;/** 
- * Math module.
- * @module math
- */
+;// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for math functions.
- * @class math
- * @namespace dwv
- * @static
- */
 dwv.math = dwv.math || {};
 
 /**
  * Circle shape.
- * @class Circle
- * @namespace dwv.math
  * @constructor
  * @param {Object} centre A Point2D representing the centre of the circle.
  * @param {Number} radius The radius of the circle.
@@ -14163,7 +13449,6 @@ dwv.math.Circle = function(centre, radius)
 {
     /**
      * Circle surface.
-     * @property surface
      * @private
      * @type Number
      */
@@ -14171,25 +13456,21 @@ dwv.math.Circle = function(centre, radius)
 
     /**
      * Get the centre (point) of the circle.
-     * @method getCenter
      * @return {Object} The center (point) of the circle.
      */
     this.getCenter = function() { return centre; };
     /**
      * Get the radius of the circle.
-     * @method getRadius
      * @return {Number} The radius of the circle.
      */
     this.getRadius = function() { return radius; };
     /**
      * Get the surface of the circle.
-     * @method getSurface
      * @return {Number} The surface of the circle.
      */
     this.getSurface = function() { return surface; };
     /**
      * Get the surface of the circle with a spacing.
-     * @method getWorldSurface
      * @param {Number} spacingX The X spacing.
      * @param {Number} spacingY The Y spacing.
      * @return {Number} The surface of the circle multiplied by the given spacing.
@@ -14202,8 +13483,6 @@ dwv.math.Circle = function(centre, radius)
 
 /**
  * Ellipse shape.
- * @class Ellipse
- * @namespace dwv.math
  * @constructor
  * @param {Object} centre A Point2D representing the centre of the ellipse.
  * @param {Number} a The radius of the ellipse on the horizontal axe.
@@ -14213,7 +13492,6 @@ dwv.math.Ellipse = function(centre, a, b)
 {
     /**
      * Circle surface.
-     * @property surface
      * @private
      * @type Number
      */
@@ -14221,31 +13499,26 @@ dwv.math.Ellipse = function(centre, a, b)
 
     /**
      * Get the centre (point) of the ellipse.
-     * @method getCenter
      * @return {Object} The center (point) of the ellipse.
      */
     this.getCenter = function() { return centre; };
     /**
      * Get the radius of the ellipse on the horizontal axe.
-     * @method getA
      * @return {Number} The radius of the ellipse on the horizontal axe.
      */
     this.getA = function() { return a; };
     /**
      * Get the radius of the ellipse on the vertical axe.
-     * @method getB
      * @return {Number} The radius of the ellipse on the vertical axe.
      */
     this.getB = function() { return b; };
     /**
      * Get the surface of the ellipse.
-     * @method getSurface
      * @return {Number} The surface of the ellipse.
      */
     this.getSurface = function() { return surface; };
     /**
      * Get the surface of the ellipse with a spacing.
-     * @method getWorldSurface
      * @param {Number} spacingX The X spacing.
      * @param {Number} spacingY The Y spacing.
      * @return {Number} The surface of the ellipse multiplied by the given spacing.
@@ -14258,8 +13531,6 @@ dwv.math.Ellipse = function(centre, a, b)
 
 /**
  * Line shape.
- * @class Line
- * @namespace dwv.math
  * @constructor
  * @param {Object} begin A Point2D representing the beginning of the line.
  * @param {Object} end A Point2D representing the end of the line.
@@ -14268,21 +13539,18 @@ dwv.math.Line = function(begin, end)
 {
     /**
      * Line delta in the X direction.
-     * @property dx
      * @private
      * @type Number
      */
     var dx = end.getX() - begin.getX();
     /**
      * Line delta in the Y direction.
-     * @property dy
      * @private
      * @type Number
      */
     var dy = end.getY() - begin.getY();
     /**
      * Line length.
-     * @property length
      * @private
      * @type Number
      */
@@ -14290,37 +13558,31 @@ dwv.math.Line = function(begin, end)
 
     /**
      * Get the begin point of the line.
-     * @method getBegin
      * @return {Object} The beginning point of the line.
      */
     this.getBegin = function() { return begin; };
     /**
      * Get the end point of the line.
-     * @method getEnd
      * @return {Object} The ending point of the line.
      */
     this.getEnd = function() { return end; };
     /**
      * Get the line delta in the X direction.
-     * @method getDeltaX
      * @return {Number} The delta in the X direction.
      */
     this.getDeltaX = function() { return dx; };
     /**
      * Get the line delta in the Y direction.
-     * @method getDeltaX
      * @return {Number} The delta in the Y direction.
      */
     this.getDeltaY = function() { return dy; };
     /**
      * Get the length of the line.
-     * @method getLength
      * @return {Number} The length of the line.
      */
     this.getLength = function() { return length; };
     /**
      * Get the length of the line with spacing.
-     * @method getWorldLength
      * @param {Number} spacingX The X spacing.
      * @param {Number} spacingY The Y spacing.
      * @return {Number} The length of the line with spacing.
@@ -14333,7 +13595,6 @@ dwv.math.Line = function(begin, end)
     };
     /**
      * Get the mid point of the line.
-     * @method getMidpoint
      * @return {Object} The mid point of the line.
      */
     this.getMidpoint = function()
@@ -14344,7 +13605,6 @@ dwv.math.Line = function(begin, end)
     };
     /**
      * Get the slope of the line.
-     * @method getSlope
      * @return {Number} The slope of the line.
      */
     this.getSlope = function()
@@ -14353,7 +13613,6 @@ dwv.math.Line = function(begin, end)
     };
     /**
      * Get the inclination of the line.
-     * @method getInclination
      * @return {Number} The inclination of the line.
      */
     this.getInclination = function()
@@ -14389,8 +13648,6 @@ dwv.math.getAngle = function (line0, line1)
 
 /**
  * Rectangle shape.
- * @class Rectangle
- * @namespace dwv.math
  * @constructor
  * @param {Object} begin A Point2D representing the beginning of the rectangle.
  * @param {Object} end A Point2D representing the end of the rectangle.
@@ -14410,7 +13667,6 @@ dwv.math.Rectangle = function(begin, end)
 
     /**
      * Rectangle surface.
-     * @property surface
      * @private
      * @type Number
      */
@@ -14418,49 +13674,41 @@ dwv.math.Rectangle = function(begin, end)
 
     /**
      * Get the begin point of the rectangle.
-     * @method getBegin
      * @return {Object} The begin point of the rectangle
      */
     this.getBegin = function() { return begin; };
     /**
      * Get the end point of the rectangle.
-     * @method getEnd
      * @return {Object} The end point of the rectangle
      */
     this.getEnd = function() { return end; };
     /**
      * Get the real width of the rectangle.
-     * @method getRealWidth
      * @return {Number} The real width of the rectangle.
      */
     this.getRealWidth = function() { return end.getX() - begin.getX(); };
     /**
      * Get the real height of the rectangle.
-     * @method getRealHeight
      * @return {Number} The real height of the rectangle.
      */
     this.getRealHeight = function() { return end.getY() - begin.getY(); };
     /**
      * Get the width of the rectangle.
-     * @method getWidth
      * @return {Number} The width of the rectangle.
      */
     this.getWidth = function() { return Math.abs(this.getRealWidth()); };
     /**
      * Get the height of the rectangle.
-     * @method getHeight
      * @return {Number} The height of the rectangle.
      */
     this.getHeight = function() { return Math.abs(this.getRealHeight()); };
     /**
      * Get the surface of the rectangle.
-     * @method getSurface
      * @return {Number} The surface of the rectangle.
      */
     this.getSurface = function() { return surface; };
     /**
      * Get the surface of the rectangle with a spacing.
-     * @method getWorldSurface
      * @return {Number} The surface of the rectangle with a spacing.
      */
     this.getWorldSurface = function(spacingX, spacingY)
@@ -14471,16 +13719,13 @@ dwv.math.Rectangle = function(begin, end)
 
 /**
  * Region Of Interest shape.
- * @class ROI
- * @namespace dwv.math
- * @constructor
  * Note: should be a closed path.
+ * @constructor
  */
 dwv.math.ROI = function()
 {
     /**
      * List of points.
-     * @property points
      * @private
      * @type Array
      */
@@ -14488,26 +13733,22 @@ dwv.math.ROI = function()
 
     /**
      * Get a point of the list at a given index.
-     * @method getPoint
      * @param {Number} index The index of the point to get (beware, no size check).
      * @return {Object} The Point2D at the given index.
      */
     this.getPoint = function(index) { return points[index]; };
     /**
      * Get the length of the point list.
-     * @method getLength
      * @return {Number} The length of the point list.
      */
     this.getLength = function() { return points.length; };
     /**
      * Add a point to the ROI.
-     * @method addPoint
      * @param {Object} point The Point2D to add.
      */
     this.addPoint = function(point) { points.push(point); };
     /**
      * Add points to the ROI.
-     * @method addPoints
      * @param {Array} rhs The array of POints2D to add.
      */
     this.addPoints = function(rhs) { points=points.concat(rhs);};
@@ -14515,8 +13756,6 @@ dwv.math.ROI = function()
 
 /**
  * Path shape.
- * @class Path
- * @namespace dwv.math
  * @constructor
  * @param {Array} inputPointArray The list of Point2D that make the path (optional).
  * @param {Array} inputControlPointIndexArray The list of control point of path,
@@ -14527,13 +13766,11 @@ dwv.math.Path = function(inputPointArray, inputControlPointIndexArray)
 {
     /**
      * List of points.
-     * @property pointArray
      * @type Array
      */
     this.pointArray = inputPointArray ? inputPointArray.slice() : [];
     /**
      * List of control points.
-     * @property controlPointIndexArray
      * @type Array
      */
     this.controlPointIndexArray = inputControlPointIndexArray ?
@@ -14542,7 +13779,6 @@ dwv.math.Path = function(inputPointArray, inputControlPointIndexArray)
 
 /**
  * Get a point of the list.
- * @method getPoint
  * @param {Number} index The index of the point to get (beware, no size check).
  * @return {Object} The Point2D at the given index.
  */
@@ -14552,7 +13788,6 @@ dwv.math.Path.prototype.getPoint = function(index) {
 
 /**
  * Is the given point a control point.
- * @method isControlPoint
  * @param {Object} point The Point2D to check.
  * @return {Boolean} True if a control point.
  */
@@ -14568,7 +13803,6 @@ dwv.math.Path.prototype.isControlPoint = function(point) {
 
 /**
  * Get the length of the path.
- * @method getLength
  * @return {Number} The length of the path.
  */
 dwv.math.Path.prototype.getLength = function() {
@@ -14577,7 +13811,6 @@ dwv.math.Path.prototype.getLength = function() {
 
 /**
  * Add a point to the path.
- * @method addPoint
  * @param {Object} point The Point2D to add.
  */
 dwv.math.Path.prototype.addPoint = function(point) {
@@ -14586,7 +13819,6 @@ dwv.math.Path.prototype.addPoint = function(point) {
 
 /**
  * Add a control point to the path.
- * @method addControlPoint
  * @param {Object} point The Point2D to make a control point.
  */
 dwv.math.Path.prototype.addControlPoint = function(point) {
@@ -14601,7 +13833,6 @@ dwv.math.Path.prototype.addControlPoint = function(point) {
 
 /**
  * Add points to the path.
- * @method addPoints
  * @param {Array} points The list of Point2D to add.
  */
 dwv.math.Path.prototype.addPoints = function(newPointArray) {
@@ -14610,7 +13841,6 @@ dwv.math.Path.prototype.addPoints = function(newPointArray) {
 
 /**
  * Append a Path to this one.
- * @method appenPath
  * @param {Path} other The Path to append.
  */
 dwv.math.Path.prototype.appenPath = function(other) {
@@ -14622,25 +13852,14 @@ dwv.math.Path.prototype.appenPath = function(other) {
     }
     this.controlPointIndexArray = this.controlPointIndexArray.concat(indexArray);
 };
-;/** 
- * Math module.
- * @module math
- */
+;// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for math functions.
- * @class math
- * @namespace dwv
- * @static
- */
 dwv.math = dwv.math || {};
 
 /**
  * Get the minimum, maximum, mean and standard deviation
  * of an array of values.
- * Note: could use https://github.com/tmcw/simple-statistics
- * @method getStats
- * @static
+ * Note: could use {@link https://github.com/tmcw/simple-statistics}.
  */
 dwv.math.getStats = function (array)
 {
@@ -14675,40 +13894,33 @@ dwv.math.getStats = function (array)
 
 /**
  * Unique ID generator.
- * See http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
- * and this answer http://stackoverflow.com/a/13403498.
- * @method guid
- * @static
+ * See {@link http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript}
+ * and this {@link http://stackoverflow.com/a/13403498 answer}.
  */
 dwv.math.guid = function ()
 {
     return Math.random().toString(36).substring(2, 15);
 };
-;/** 
- * Tool module.
- * @module tool
- */
+;// namespaces
 var dwv = dwv || {};
+/** @namespace */
 dwv.tool = dwv.tool || {};
+//external
 var Kinetic = Kinetic || {};
 
 /**
  * Draw group command.
- * @class DrawGroupCommand
- * @namespace dwv.tool
  * @constructor
  */
 dwv.tool.DrawGroupCommand = function (group, name, layer)
 {
     /**
      * Get the command name.
-     * @method getName
      * @return {String} The command name.
      */
     this.getName = function () { return "Draw-"+name; };
     /**
      * Execute the command.
-     * @method execute
      */
     this.execute = function () {
         // add the group to the layer
@@ -14720,7 +13932,6 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
     };
     /**
      * Undo the command.
-     * @method undo
      */
     this.undo = function () {
         // remove the group from the parent layer
@@ -14734,7 +13945,6 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
 
 /**
  * Handle an execute event.
- * @method onExecute
  * @param {Object} event The execute event with type and id.
  */
 dwv.tool.DrawGroupCommand.prototype.onExecute = function (/*event*/)
@@ -14743,7 +13953,6 @@ dwv.tool.DrawGroupCommand.prototype.onExecute = function (/*event*/)
 };
 /**
  * Handle an undo event.
- * @method onUndo
  * @param {Object} event The undo event with type and id.
  */
 dwv.tool.DrawGroupCommand.prototype.onUndo = function (/*event*/)
@@ -14753,22 +13962,18 @@ dwv.tool.DrawGroupCommand.prototype.onUndo = function (/*event*/)
 
 /**
  * Move group command.
- * @class MoveGroupCommand
- * @namespace dwv.tool
  * @constructor
  */
 dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
 {
     /**
      * Get the command name.
-     * @method getName
      * @return {String} The command name.
      */
     this.getName = function () { return "Move-"+name; };
 
     /**
      * Execute the command.
-     * @method execute
      */
     this.execute = function () {
         // translate all children of group
@@ -14783,7 +13988,6 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
     };
     /**
      * Undo the command.
-     * @method undo
      */
     this.undo = function () {
         // invert translate all children of group
@@ -14800,7 +14004,6 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
 
 /**
  * Handle an execute event.
- * @method onExecute
  * @param {Object} event The execute event with type and id.
  */
 dwv.tool.MoveGroupCommand.prototype.onExecute = function (/*event*/)
@@ -14809,7 +14012,6 @@ dwv.tool.MoveGroupCommand.prototype.onExecute = function (/*event*/)
 };
 /**
  * Handle an undo event.
- * @method onUndo
  * @param {Object} event The undo event with type and id.
  */
 dwv.tool.MoveGroupCommand.prototype.onUndo = function (/*event*/)
@@ -14819,22 +14021,18 @@ dwv.tool.MoveGroupCommand.prototype.onUndo = function (/*event*/)
 
 /**
  * Change group command.
- * @class ChangeGroupCommand
- * @namespace dwv.tool
  * @constructor
  */
 dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, layer, image)
 {
     /**
      * Get the command name.
-     * @method getName
      * @return {String} The command name.
      */
     this.getName = function () { return "Change-"+name; };
 
     /**
      * Execute the command.
-     * @method execute
      */
     this.execute = function () {
         // change shape
@@ -14846,7 +14044,6 @@ dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, laye
     };
     /**
      * Undo the command.
-     * @method undo
      */
     this.undo = function () {
         // invert change shape
@@ -14860,7 +14057,6 @@ dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, laye
 
 /**
  * Handle an execute event.
- * @method onExecute
  * @param {Object} event The execute event with type and id.
  */
 dwv.tool.ChangeGroupCommand.prototype.onExecute = function (/*event*/)
@@ -14869,7 +14065,6 @@ dwv.tool.ChangeGroupCommand.prototype.onExecute = function (/*event*/)
 };
 /**
  * Handle an undo event.
- * @method onUndo
  * @param {Object} event The undo event with type and id.
  */
 dwv.tool.ChangeGroupCommand.prototype.onUndo = function (/*event*/)
@@ -14879,21 +14074,17 @@ dwv.tool.ChangeGroupCommand.prototype.onUndo = function (/*event*/)
 
 /**
  * Delete group command.
- * @class DeleteGroupCommand
- * @namespace dwv.tool
  * @constructor
  */
 dwv.tool.DeleteGroupCommand = function (group, name, layer)
 {
     /**
      * Get the command name.
-     * @method getName
      * @return {String} The command name.
      */
     this.getName = function () { return "Delete-"+name; };
     /**
      * Execute the command.
-     * @method execute
      */
     this.execute = function () {
         // remove the group from the parent layer
@@ -14905,7 +14096,6 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
     };
     /**
      * Undo the command.
-     * @method undo
      */
     this.undo = function () {
         // add the group to the layer
@@ -14919,7 +14109,6 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
 
 /**
  * Handle an execute event.
- * @method onExecute
  * @param {Object} event The execute event with type and id.
  */
 dwv.tool.DeleteGroupCommand.prototype.onExecute = function (/*event*/)
@@ -14928,7 +14117,6 @@ dwv.tool.DeleteGroupCommand.prototype.onExecute = function (/*event*/)
 };
 /**
  * Handle an undo event.
- * @method onUndo
  * @param {Object} event The undo event with type and id.
  */
 dwv.tool.DeleteGroupCommand.prototype.onUndo = function (/*event*/)
@@ -14938,8 +14126,6 @@ dwv.tool.DeleteGroupCommand.prototype.onUndo = function (/*event*/)
 
 /**
  * Drawing tool.
- * @class Draw
- * @namespace dwv.tool
  * @constructor
  * @param {Object} app The associated application.
  */
@@ -14947,20 +14133,17 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 {
     /**
      * Closure to self: to be used by event handlers.
-     * @property self
      * @private
      * @type WindowLevel
      */
     var self = this;
     /**
      * Draw GUI.
-     * @property gui
      * @type Object
      */
     var gui = null;
     /**
      * Interaction start flag.
-     * @property started
      * @private
      * @type Boolean
      */
@@ -14968,20 +14151,17 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Shape factory list
-     * @property shapeFactoryList
      * @type Object
      */
     this.shapeFactoryList = shapeFactoryList;
     /**
      * Draw command.
-     * @property command
      * @private
      * @type Object
      */
     var command = null;
     /**
      * Current shape group.
-     * @property shapeGroup
      * @private
      * @type Object
      */
@@ -14989,14 +14169,12 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Shape name.
-     * @property shapeName
      * @type String
      */
     this.shapeName = 0;
 
     /**
      * List of points.
-     * @property points
      * @private
      * @type Array
      */
@@ -15004,7 +14182,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Last selected point.
-     * @property lastPoint
      * @private
      * @type Object
      */
@@ -15012,7 +14189,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Shape editor.
-     * @property shapeEditor
      * @private
      * @type Object
      */
@@ -15024,7 +14200,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Trash draw: a cross.
-     * @property trash
      * @private
      * @type Object
      */
@@ -15048,7 +14223,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * The associated draw layer.
-     * @property drawLayer
      * @private
      * @type Object
      */
@@ -15056,7 +14230,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Handle mouse down event.
-     * @method mousedown
      * @param {Object} event The mouse down event.
      */
     this.mousedown = function(event){
@@ -15096,7 +14269,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Handle mouse move event.
-     * @method mousemove
      * @param {Object} event The mouse move event.
      */
     this.mousemove = function(event){
@@ -15144,7 +14316,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Handle mouse up event.
-     * @method mouseup
      * @param {Object} event The mouse up event.
      */
     this.mouseup = function (/*event*/){
@@ -15181,7 +14352,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Handle mouse out event.
-     * @method mouseout
      * @param {Object} event The mouse out event.
      */
     this.mouseout = function(event){
@@ -15190,7 +14360,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Handle touch start event.
-     * @method touchstart
      * @param {Object} event The touch start event.
      */
     this.touchstart = function(event){
@@ -15199,7 +14368,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Handle touch move event.
-     * @method touchmove
      * @param {Object} event The touch move event.
      */
     this.touchmove = function(event){
@@ -15208,7 +14376,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Handle touch end event.
-     * @method touchend
      * @param {Object} event The touch end event.
      */
     this.touchend = function(event){
@@ -15217,7 +14384,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Handle key down event.
-     * @method keydown
      * @param {Object} event The key down event.
      */
     this.keydown = function(event){
@@ -15226,7 +14392,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Setup the tool GUI.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -15236,7 +14401,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Enable the tool.
-     * @method enable
      * @param {Boolean} flag The flag to enable or not.
      */
     this.display = function ( flag ){
@@ -15278,7 +14442,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Set shape off properties.
-     * @method setShapeOff
      * @param {Object} shape The shape to set off.
      */
     function setShapeOff( shape ) {
@@ -15303,7 +14466,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Set shape on properties.
-     * @method setShapeOn
      * @param {Object} shape The shape to set on.
      */
     this.setShapeOn = function ( shape ) {
@@ -15454,7 +14616,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Initialise the tool.
-     * @method init
      */
     this.init = function() {
         // set the default to the first in the list
@@ -15476,7 +14637,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Add an event listener on the app.
-     * @method addEventListener
      * @param {String} type The event type.
      * @param {Object} listener The method associated with the provided event type.
      */
@@ -15490,7 +14650,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Remove an event listener from the app.
-     * @method removeEventListener
      * @param {String} type The event type.
      * @param {Object} listener The method associated with the provided event type.
      */
@@ -15509,7 +14668,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Set the line colour of the drawing.
-     * @method setLineColour
      * @param {String} colour The colour to set.
      */
     this.setLineColour = function (colour)
@@ -15521,7 +14679,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Fire an event: call all associated listeners.
-     * @method fireEvent
      * @param {Object} event The event to fire.
      */
     function fireEvent (event)
@@ -15539,8 +14696,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
 /**
  * Help for this tool.
- * @method getHelp
- * @returns {Object} The help content.
+ * @return {Object} The help content.
  */
 dwv.tool.Draw.prototype.getHelp = function()
 {
@@ -15561,7 +14717,6 @@ dwv.tool.Draw.prototype.getHelp = function()
 
 /**
  * Set the shape name of the drawing.
- * @method setShapeName
  * @param {String} name The name of the shape.
  */
 dwv.tool.Draw.prototype.setShapeName = function(name)
@@ -15576,59 +14731,49 @@ dwv.tool.Draw.prototype.setShapeName = function(name)
 
 /**
  * Check if the shape is in the shape list.
- * @method hasShape
  * @param {String} name The name of the shape.
  */
 dwv.tool.Draw.prototype.hasShape = function(name) {
     return this.shapeFactoryList[name];
 };
-;/** 
- * Tool module.
- * @module tool
- */
+;// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
+//external
 var Kinetic = Kinetic || {};
 
 /**
  * Shape editor.
- * @class ShapeEditor
- * @namespace dwv.tool
  * @constructor
  */
 dwv.tool.ShapeEditor = function (app)
 {
     /**
      * Edited shape.
-     * @property shape
      * @private
      * @type Object
      */
     var shape = null;
     /**
      * Edited image. Used for quantification update.
-     * @property image
      * @private
      * @type Object
      */
     var image = null;
     /**
      * Active flag.
-     * @property isActive
      * @private
      * @type Boolean
      */
     var isActive = false;
     /**
      * Update function used by anchors to update the shape.
-     * @property updateFunction
      * @private
      * @type Function
      */
     var updateFunction = null;
     /**
      * Draw event callback.
-     * @property drawEventCallback
      * @private
      * @type Function
      */
@@ -15636,7 +14781,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Set the shape to edit.
-     * @method setShape
      * @param {Object} inshape The shape to edit.
      */
     this.setShape = function ( inshape ) {
@@ -15650,7 +14794,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Set the associated image.
-     * @method setImage
      * @param {Object} img The associated image.
      */
     this.setImage = function ( img ) {
@@ -15659,7 +14802,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Get the edited shape.
-     * @method getShape
      * @return {Object} The edited shape.
      */
     this.getShape = function () {
@@ -15668,7 +14810,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Get the active flag.
-     * @method isActive
      * @return {Boolean} The active flag.
      */
     this.isActive = function () {
@@ -15677,7 +14818,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Set the draw event callback.
-     * @method setDrawEventCallback
      * @param {Object} callback The callback.
      */
     this.setDrawEventCallback = function ( callback ) {
@@ -15686,7 +14826,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Enable the editor. Redraws the layer.
-     * @method enable
      */
     this.enable = function () {
         isActive = true;
@@ -15700,7 +14839,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Disable the editor. Redraws the layer.
-     * @method disable
      */
     this.disable = function () {
         isActive = false;
@@ -15714,7 +14852,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Reset the anchors.
-     * @method resetAnchors
      */
     this.resetAnchors = function () {
         // remove previous controls
@@ -15738,7 +14875,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Set anchors visibility.
-     * @method setAnchorsVisible
      * @param {Boolean} flag The visible flag.
      */
     function setAnchorsVisible( flag ) {
@@ -15749,7 +14885,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Set anchors active.
-     * @method setAnchorsActive
      * @param {Boolean} flag The active (on/off) flag.
      */
     this.setAnchorsActive = function ( flag ) {
@@ -15769,7 +14904,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Remove anchors.
-     * @method removeAnchors
      */
     function removeAnchors() {
         applyFuncToAnchors( function (anchor) {
@@ -15779,7 +14913,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Add the shape anchors.
-     * @method addAnchors
      */
     function addAnchors() {
         // exit if no shape or no layer
@@ -15848,7 +14981,6 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Create shape editor controls, i.e. the anchors.
-     * @method addAnchor
      * @param {Object} group The group associated with this anchor.
      * @param {Number} x The X position of the anchor.
      * @param {Number} y The Y position of the anchor.
@@ -16002,31 +15134,25 @@ dwv.tool.ShapeEditor = function (app)
         anchor.off('mouseout');
     }
 };
-;/** 
- * Tool module.
- * @module tool
- */
+;// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
+//external
 var Kinetic = Kinetic || {};
 
 /**
  * Ellipse factory.
- * @class EllipseFactory
- * @namespace dwv.tool
  * @constructor
  */
 dwv.tool.EllipseFactory = function ()
 {
     /**
      * Get the number of points needed to build the shape.
-     * @method getNPoints
      * @return {Number} The number of points.
      */
     this.getNPoints = function () { return 2; };
     /**
      * Get the timeout between point storage.
-     * @method getTimeout
      * @return {Number} The timeout in milliseconds.
      */
     this.getTimeout = function () { return 0; };
@@ -16034,7 +15160,6 @@ dwv.tool.EllipseFactory = function ()
 
 /**
  * Create an ellipse shape to be displayed.
- * @method create
  * @param {Array} points The points from which to extract the ellipse.
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
@@ -16079,8 +15204,6 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
 
 /**
  * Update an ellipse shape.
- * @method UpdateEllipse
- * @static
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
  */
@@ -16157,57 +15280,48 @@ dwv.tool.UpdateEllipse = function (anchor, image)
     ktext.position(textPos);
     ktext.text(str);
 };
-;/** 
- * Tool module.
- * @module tool
- */
+;// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
+/** @namespace */
+dwv.tool.filter = dwv.tool.filter || {};
 
 /**
  * Filter tool.
- * @class Filter
- * @namespace dwv.tool
  * @constructor
  * @param {Array} filterList The list of filter objects.
- * @param {Object} gui The associated gui.
+ * @param {Object} app The associated app.
  */
 dwv.tool.Filter = function ( filterList, app )
 {
     /**
      * Filter GUI.
-     * @property gui
      * @type Object
      */
     var gui = null;
     /**
      * Filter list
-     * @property filterList
      * @type Object
      */
     this.filterList = filterList;
     /**
      * Selected filter.
-     * @property selectedFilter
      * @type Object
      */
     this.selectedFilter = 0;
     /**
      * Default filter name.
-     * @property defaultFilterName
      * @type String
      */
     this.defaultFilterName = 0;
     /**
      * Display Flag.
-     * @property displayed
      * @type Boolean
      */
     this.displayed = false;
 
     /**
      * Setup the filter GUI.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -16222,7 +15336,6 @@ dwv.tool.Filter = function ( filterList, app )
 
     /**
      * Enable the filter.
-     * @method enable
      * @param {Boolean} bool Flag to enable or not.
      */
     this.display = function (bool)
@@ -16237,7 +15350,6 @@ dwv.tool.Filter = function ( filterList, app )
 
     /**
      * Initialise the filter.
-     * @method init
      */
     this.init = function ()
     {
@@ -16260,7 +15372,6 @@ dwv.tool.Filter = function ( filterList, app )
 
     /**
      * Handle keydown event.
-     * @method keydown
      * @param {Object} event The keydown event.
      */
     this.keydown = function (event)
@@ -16272,8 +15383,7 @@ dwv.tool.Filter = function ( filterList, app )
 
 /**
  * Help for this tool.
- * @method getHelp
- * @returns {Object} The help content.
+ * @return {Object} The help content.
  */
 dwv.tool.Filter.prototype.getHelp = function ()
 {
@@ -16288,7 +15398,6 @@ dwv.tool.Filter.prototype.getHelp = function ()
 
 /**
  * Get the selected filter.
- * @method getSelectedFilter
  * @return {Object} The selected filter.
  */
 dwv.tool.Filter.prototype.getSelectedFilter = function ()
@@ -16298,7 +15407,6 @@ dwv.tool.Filter.prototype.getSelectedFilter = function ()
 
 /**
  * Set the selected filter.
- * @method setSelectedFilter
  * @return {String} The name of the filter to select.
  */
 dwv.tool.Filter.prototype.setSelectedFilter = function (name)
@@ -16324,7 +15432,6 @@ dwv.tool.Filter.prototype.setSelectedFilter = function (name)
 
 /**
  * Get the list of filters.
- * @method getFilterList
  * @return {Array} The list of filter objects.
  */
 dwv.tool.Filter.prototype.getFilterList = function ()
@@ -16334,7 +15441,6 @@ dwv.tool.Filter.prototype.getFilterList = function ()
 
 /**
  * Check if a filter is in the filter list.
- * @method hasFilter
  * @param {String} name The name to check.
  * @return {String} The filter list element for the given name.
  */
@@ -16343,13 +15449,8 @@ dwv.tool.Filter.prototype.hasFilter = function (name)
     return this.filterList[name];
 };
 
-// Filter namespace
-dwv.tool.filter = dwv.tool.filter || {};
-
 /**
  * Threshold filter tool.
- * @class Threshold
- * @namespace dwv.tool.filter
  * @constructor
  * @param {Object} app The associated application.
  */
@@ -16357,14 +15458,12 @@ dwv.tool.filter.Threshold = function ( app )
 {
     /**
      * Filter GUI.
-     * @property gui
      * @type Object
      */
     var gui = new dwv.gui.Threshold(app);
 
     /**
      * Setup the filter GUI.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -16373,7 +15472,6 @@ dwv.tool.filter.Threshold = function ( app )
 
     /**
      * Display the filter.
-     * @method display
      * @param {Boolean} bool Flag to display or not.
      */
     this.display = function (bool)
@@ -16383,7 +15481,6 @@ dwv.tool.filter.Threshold = function ( app )
 
     /**
      * Initialise the filter.
-     * @method init
      */
     this.init = function ()
     {
@@ -16392,7 +15489,6 @@ dwv.tool.filter.Threshold = function ( app )
 
     /**
      * Run the filter.
-     * @method run
      * @param {Mixed} args The filter arguments.
      */
     this.run = function (args)
@@ -16411,8 +15507,6 @@ dwv.tool.filter.Threshold = function ( app )
 
 /**
  * Sharpen filter tool.
- * @class Sharpen
- * @namespace dwv.tool.filter
  * @constructor
  * @param {Object} app The associated application.
  */
@@ -16420,14 +15514,12 @@ dwv.tool.filter.Sharpen = function ( app )
 {
     /**
      * Filter GUI.
-     * @property gui
      * @type Object
      */
     var gui = new dwv.gui.Sharpen(app);
 
     /**
      * Setup the filter GUI.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -16436,7 +15528,6 @@ dwv.tool.filter.Sharpen = function ( app )
 
     /**
      * Display the filter.
-     * @method display
      * @param {Boolean} bool Flag to enable or not.
      */
     this.display = function (bool)
@@ -16446,7 +15537,6 @@ dwv.tool.filter.Sharpen = function ( app )
 
     /**
      * Initialise the filter.
-     * @method init
      */
     this.init = function()
     {
@@ -16455,7 +15545,6 @@ dwv.tool.filter.Sharpen = function ( app )
 
     /**
      * Run the filter.
-     * @method run
      * @param {Mixed} args The filter arguments.
      */
     this.run = function(/*args*/)
@@ -16471,8 +15560,6 @@ dwv.tool.filter.Sharpen = function ( app )
 
 /**
  * Sobel filter tool.
- * @class Sobel
- * @namespace dwv.tool.filter
  * @constructor
  * @param {Object} app The associated application.
  */
@@ -16480,14 +15567,12 @@ dwv.tool.filter.Sobel = function ( app )
 {
     /**
      * Filter GUI.
-     * @property gui
      * @type Object
      */
     var gui = new dwv.gui.Sobel(app);
 
     /**
      * Setup the filter GUI.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -16496,7 +15581,6 @@ dwv.tool.filter.Sobel = function ( app )
 
     /**
      * Enable the filter.
-     * @method enable
      * @param {Boolean} bool Flag to enable or not.
      */
     this.display = function(bool)
@@ -16506,7 +15590,6 @@ dwv.tool.filter.Sobel = function ( app )
 
     /**
      * Initialise the filter.
-     * @method init
      */
     this.init = function()
     {
@@ -16515,7 +15598,6 @@ dwv.tool.filter.Sobel = function ( app )
 
     /**
      * Run the filter.
-     * @method run
      * @param {Mixed} args The filter arguments.
      */
     dwv.tool.filter.Sobel.prototype.run = function(/*args*/)
@@ -16531,8 +15613,6 @@ dwv.tool.filter.Sobel = function ( app )
 
 /**
  * Run filter command.
- * @class RunFilterCommand
- * @namespace dwv.tool
  * @constructor
  * @param {Object} filter The filter to run.
  * @param {Object} app The associated application.
@@ -16541,14 +15621,12 @@ dwv.tool.RunFilterCommand = function (filter, app) {
 
     /**
      * Get the command name.
-     * @method getName
      * @return {String} The command name.
      */
     this.getName = function () { return "Filter-" + filter.getName(); };
 
     /**
      * Execute the command.
-     * @method execute
      */
     this.execute = function ()
     {
@@ -16558,7 +15636,6 @@ dwv.tool.RunFilterCommand = function (filter, app) {
     };
     /**
      * Undo the command.
-     * @method undo
      */
     this.undo = function () {
         app.setImage(filter.getOriginalImage());
@@ -16566,23 +15643,13 @@ dwv.tool.RunFilterCommand = function (filter, app) {
     };
 
 }; // RunFilterCommand class
-;/** 
- * Info module.
- * @module info
- */
+;// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for info functions.
- * @class info
- * @namespace dwv
- * @static
- */
+/** @namespace */
 dwv.info = dwv.info || {};
 
 /**
  * WindowLevel info layer.
- * @class Windowing
- * @namespace dwv.info
  * @constructor
  * @param {Object} div The HTML element to add WindowLevel info to.
  */
@@ -16590,7 +15657,6 @@ dwv.info.Windowing = function ( div )
 {
     /**
      * Create the windowing info div.
-     * @method create
      */
     this.create = function ()
     {
@@ -16616,7 +15682,6 @@ dwv.info.Windowing = function ( div )
 
     /**
      * Update the windowing info div.
-     * @method update
      * @param {Object} event The windowing change event containing the new values as {wc,ww}.
      * Warning: expects the windowing info div to exist (use after create).
      */
@@ -16636,8 +15701,6 @@ dwv.info.Windowing = function ( div )
 
 /**
  * Position info layer.
- * @class Position
- * @namespace dwv.info
  * @constructor
  * @param {Object} div The HTML element to add Position info to.
  */
@@ -16645,7 +15708,6 @@ dwv.info.Position = function ( div )
 {
     /**
      * Create the position info div.
-     * @method create
      */
     this.create = function ()
     {
@@ -16671,7 +15733,6 @@ dwv.info.Position = function ( div )
 
     /**
      * Update the position info div.
-     * @method update
      * @param {Object} event The position change event containing the new values as {i,j,k}
      *  and optional 'value'.
      * Warning: expects the position info div to exist (use after create).
@@ -16695,8 +15756,6 @@ dwv.info.Position = function ( div )
 
 /**
  * MiniColourMap info layer.
- * @class MiniColourMap
- * @namespace dwv.info
  * @constructor
  * @param {Object} div The HTML element to add colourMap info to.
  * @param {Object} app The associated application.
@@ -16705,7 +15764,6 @@ dwv.info.MiniColourMap = function ( div, app )
 {
     /**
      * Create the mini colour map info div.
-     * @method create
      */
     this.create = function ()
     {
@@ -16725,7 +15783,6 @@ dwv.info.MiniColourMap = function ( div, app )
 
     /**
      * Update the mini colour map info div.
-     * @method update
      * @param {Object} event The windowing change event containing the new values.
      * Warning: expects the mini colour map div to exist (use after createMiniColourMap).
      */
@@ -16783,8 +15840,6 @@ dwv.info.MiniColourMap = function ( div, app )
 
 /**
  * Plot info layer.
- * @class Plot
- * @namespace dwv.info
  * @constructor
  * @param {Object} div The HTML element to add colourMap info to.
  * @param {Object} app The associated application.
@@ -16793,7 +15848,6 @@ dwv.info.Plot = function (div, app)
 {
     /**
      * Create the plot info.
-     * @method create
      */
     this.create = function()
     {
@@ -16812,7 +15866,6 @@ dwv.info.Plot = function (div, app)
 
     /**
      * Update plot.
-     * @method update
      * @param {Object} event The windowing change event containing the new values.
      * Warning: expects the plot to exist (use after createPlot).
      */
@@ -16840,31 +15893,25 @@ dwv.info.Plot = function (div, app)
     };
 
 }; // class dwv.info.Plot
-;/** 
- * Tool module.
- * @module tool
- */
+;// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
+//external
 var Kinetic = Kinetic || {};
 
 /**
  * Line factory.
- * @class LineFactory
- * @namespace dwv.tool
  * @constructor
  */
 dwv.tool.LineFactory = function ()
 {
     /**
      * Get the number of points needed to build the shape.
-     * @method getNPoints
      * @return {Number} The number of points.
      */
     this.getNPoints = function () { return 2; };
     /**
      * Get the timeout between point storage.
-     * @method getTimeout
      * @return {Number} The timeout in milliseconds.
      */
     this.getTimeout = function () { return 0; };
@@ -16872,7 +15919,6 @@ dwv.tool.LineFactory = function ()
 
 /**
  * Create a line shape to be displayed.
- * @method create
  * @param {Array} points The points from which to extract the line.
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
@@ -16914,8 +15960,6 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
 
 /**
  * Update a line shape.
- * @method UpdateLine
- * @static
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
  */
@@ -16970,18 +16014,14 @@ dwv.tool.UpdateLine = function (anchor, image)
     ktext.position( textPos );
     ktext.text(str);
 };
-;/** 
- * Tool module.
- * @module tool
- */
+;// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
+//external
 var Kinetic = Kinetic || {};
 
 /**
  * Livewire painting tool.
- * @class Livewire
- * @namespace dwv.tool
  * @constructor
  * @param {Object} app The associated application.
  */
@@ -16989,69 +16029,59 @@ dwv.tool.Livewire = function(app)
 {
     /**
      * Closure to self: to be used by event handlers.
-     * @property self
      * @private
      * @type WindowLevel
      */
     var self = this;
     /**
      * Livewire GUI.
-     * @property gui
      * @type Object
      */
     var gui = null;
     /**
      * Interaction start flag.
-     * @property started
      * @type Boolean
      */
     this.started = false;
 
     /**
      * Draw command.
-     * @property command
      * @private
      * @type Object
      */
     var command = null;
     /**
      * Current shape group.
-     * @property shapeGroup
      * @private
      * @type Object
      */
     var shapeGroup = null;
     /**
      * Drawing style.
-     * @property style
      * @type Style
      */
     this.style = new dwv.html.Style();
 
     /**
      * Path storage. Paths are stored in reverse order.
-     * @property path
      * @private
      * @type Path
      */
     var path = new dwv.math.Path();
     /**
      * Current path storage. Paths are stored in reverse order.
-     * @property currentPath
      * @private
      * @type Path
      */
     var currentPath = new dwv.math.Path();
     /**
      * List of parent points.
-     * @property parentPoints
      * @private
      * @type Array
      */
     var parentPoints = [];
     /**
      * Tolerance.
-     * @property tolerance
      * @private
      * @type Number
      */
@@ -17059,7 +16089,6 @@ dwv.tool.Livewire = function(app)
 
     /**
      * Clear the parent points list.
-     * @method clearParentPoints
      * @private
      */
     function clearParentPoints() {
@@ -17071,7 +16100,6 @@ dwv.tool.Livewire = function(app)
 
     /**
      * Clear the stored paths.
-     * @method clearPaths
      * @private
      */
     function clearPaths() {
@@ -17081,7 +16109,6 @@ dwv.tool.Livewire = function(app)
 
     /**
      * Scissor representation.
-     * @property scissors
      * @private
      * @type Scissors
      */
@@ -17089,7 +16116,6 @@ dwv.tool.Livewire = function(app)
 
     /**
      * Handle mouse down event.
-     * @method mousedown
      * @param {Object} event The mouse down event.
      */
     this.mousedown = function(event){
@@ -17133,7 +16159,6 @@ dwv.tool.Livewire = function(app)
 
     /**
      * Handle mouse move event.
-     * @method mousemove
      * @param {Object} event The mouse move event.
      */
     this.mousemove = function(event){
@@ -17200,7 +16225,6 @@ dwv.tool.Livewire = function(app)
 
     /**
      * Handle mouse up event.
-     * @method mouseup
      * @param {Object} event The mouse up event.
      */
     this.mouseup = function(/*event*/){
@@ -17209,7 +16233,6 @@ dwv.tool.Livewire = function(app)
 
     /**
      * Handle mouse out event.
-     * @method mouseout
      * @param {Object} event The mouse out event.
      */
     this.mouseout = function(event){
@@ -17219,7 +16242,6 @@ dwv.tool.Livewire = function(app)
 
     /**
      * Handle touch start event.
-     * @method touchstart
      * @param {Object} event The touch start event.
      */
     this.touchstart = function(event){
@@ -17229,7 +16251,6 @@ dwv.tool.Livewire = function(app)
 
     /**
      * Handle touch move event.
-     * @method touchmove
      * @param {Object} event The touch move event.
      */
     this.touchmove = function(event){
@@ -17239,7 +16260,6 @@ dwv.tool.Livewire = function(app)
 
     /**
      * Handle touch end event.
-     * @method touchend
      * @param {Object} event The touch end event.
      */
     this.touchend = function(event){
@@ -17249,7 +16269,6 @@ dwv.tool.Livewire = function(app)
 
     /**
      * Handle key down event.
-     * @method keydown
      * @param {Object} event The key down event.
      */
     this.keydown = function(event){
@@ -17258,7 +16277,6 @@ dwv.tool.Livewire = function(app)
 
     /**
      * Setup the tool GUI.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -17268,7 +16286,6 @@ dwv.tool.Livewire = function(app)
 
     /**
      * Enable the tool.
-     * @method enable
      * @param {Boolean} bool The flag to enable or not.
      */
     this.display = function(bool){
@@ -17281,7 +16298,6 @@ dwv.tool.Livewire = function(app)
 
     /**
      * Initialise the tool.
-     * @method init
      */
     this.init = function()
     {
@@ -17306,8 +16322,7 @@ dwv.tool.Livewire = function(app)
 
 /**
  * Help for this tool.
- * @method getHelp
- * @returns {Object} The help content.
+ * @return {Object} The help content.
  */
 dwv.tool.Livewire.prototype.getHelp = function()
 {
@@ -17324,7 +16339,6 @@ dwv.tool.Livewire.prototype.getHelp = function()
 
 /**
  * Set the line colour of the drawing.
- * @method setLineColour
  * @param {String} colour The colour to set.
  */
 dwv.tool.Livewire.prototype.setLineColour = function(colour)
@@ -17332,31 +16346,25 @@ dwv.tool.Livewire.prototype.setLineColour = function(colour)
     // set style var
     this.style.setLineColour(colour);
 };
-;/** 
- * Tool module.
- * @module tool
- */
+;// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
+//external
 var Kinetic = Kinetic || {};
 
 /**
  * Protractor factory.
- * @class ProtractorFactory
- * @namespace dwv.tool
  * @constructor
  */
 dwv.tool.ProtractorFactory = function ()
 {
     /**
      * Get the number of points needed to build the shape.
-     * @method getNPoints
      * @return {Number} The number of points.
      */
     this.getNPoints = function () { return 3; };
     /**
      * Get the timeout between point storage.
-     * @method getTimeout
      * @return {Number} The timeout in milliseconds.
      */
     this.getTimeout = function () { return 500; };
@@ -17364,8 +16372,6 @@ dwv.tool.ProtractorFactory = function ()
 
 /**
  * Create a protractor shape to be displayed.
- * @method ProtractorCreator
- * @static
  * @param {Array} points The points from which to extract the protractor.
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
@@ -17437,8 +16443,6 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
 
 /**
  * Update a protractor shape.
- * @method UpdateProtractor
- * @static
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
  */
@@ -17519,31 +16523,25 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
     var arcPos = { 'x': mid.x(), 'y': mid.y() };
     karc.position(arcPos);
 };
-;/** 
- * Tool module.
- * @module tool
- */
+;// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
+//external
 var Kinetic = Kinetic || {};
 
 /**
  * Rectangle factory.
- * @class RectangleFactory
- * @namespace dwv.tool
  * @constructor
  */
 dwv.tool.RectangleFactory = function ()
 {
     /**
      * Get the number of points needed to build the shape.
-     * @method getNPoints
      * @return {Number} The number of points.
      */
     this.getNPoints = function () { return 2; };
     /**
      * Get the timeout between point storage.
-     * @method getTimeout
      * @return {Number} The timeout in milliseconds.
      */
     this.getTimeout = function () { return 0; };
@@ -17551,7 +16549,6 @@ dwv.tool.RectangleFactory = function ()
 
 /**
  * Create a rectangle shape to be displayed.
- * @method create
  * @param {Array} points The points from which to extract the rectangle.
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
@@ -17594,8 +16591,6 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
 
 /**
  * Update a rectangle shape.
- * @method UpdateRect
- * @static
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
  */
@@ -17672,31 +16667,25 @@ dwv.tool.UpdateRect = function (anchor, image)
     ktext.position(textPos);
     ktext.text(str);
 };
-;/** 
- * Tool module.
- * @module tool
- */
+;// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
+//external
 var Kinetic = Kinetic || {};
 
 /**
  * ROI factory.
- * @class RoiFactory
- * @namespace dwv.tool
  * @constructor
  */
 dwv.tool.RoiFactory = function ()
 {
     /**
      * Get the number of points needed to build the shape.
-     * @method getNPoints
      * @return {Number} The number of points.
      */
     this.getNPoints = function () { return 50; };
     /**
      * Get the timeout between point storage.
-     * @method getTimeout
      * @return {Number} The timeout in milliseconds.
      */
     this.getTimeout = function () { return 100; };
@@ -17704,7 +16693,6 @@ dwv.tool.RoiFactory = function ()
 
 /**
  * Create a roi shape to be displayed.
- * @method RoiCreator
  * @param {Array} points The points from which to extract the line.
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
@@ -17739,8 +16727,6 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
 
 /**
  * Update a roi shape.
- * @method UpdateRoi
- * @static
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
  */
@@ -17765,23 +16751,12 @@ dwv.tool.UpdateRoi = function (anchor /*, image*/)
     points[anchor.id()+1] = anchor.y() - kroi.y();
     kroi.points( points );
 };
-;/** 
- * Tool module.
- * @module tool
- */
+;// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for tool functions.
- * @class tool
- * @namespace dwv
- * @static
- */
 dwv.tool = dwv.tool || {};
 
 /**
  * Scroll class.
- * @class Scroll
- * @namespace dwv.tool
  * @constructor
  * @param {Object} app The associated application.
  */
@@ -17789,27 +16764,23 @@ dwv.tool.Scroll = function(app)
 {
     /**
      * Closure to self: to be used by event handlers.
-     * @property self
      * @private
      * @type WindowLevel
      */
     var self = this;
     /**
      * Scroll GUI.
-     * @property gui
      * @type Object
      */
     var gui = null;
     /**
      * Interaction start flag.
-     * @property started
      * @type Boolean
      */
     this.started = false;
 
     /**
      * Handle mouse down event.
-     * @method mousedown
      * @param {Object} event The mouse down event.
      */
     this.mousedown = function(event){
@@ -17821,7 +16792,6 @@ dwv.tool.Scroll = function(app)
 
     /**
      * Handle mouse move event.
-     * @method mousemove
      * @param {Object} event The mouse move event.
      */
     this.mousemove = function(event){
@@ -17849,7 +16819,6 @@ dwv.tool.Scroll = function(app)
 
     /**
      * Handle mouse up event.
-     * @method mouseup
      * @param {Object} event The mouse up event.
      */
     this.mouseup = function(/*event*/){
@@ -17862,7 +16831,6 @@ dwv.tool.Scroll = function(app)
 
     /**
      * Handle mouse out event.
-     * @method mouseout
      * @param {Object} event The mouse out event.
      */
     this.mouseout = function(event){
@@ -17871,7 +16839,6 @@ dwv.tool.Scroll = function(app)
 
     /**
      * Handle touch start event.
-     * @method touchstart
      * @param {Object} event The touch start event.
      */
     this.touchstart = function(event){
@@ -17880,7 +16847,6 @@ dwv.tool.Scroll = function(app)
 
     /**
      * Handle touch move event.
-     * @method touchmove
      * @param {Object} event The touch move event.
      */
     this.touchmove = function(event){
@@ -17889,7 +16855,6 @@ dwv.tool.Scroll = function(app)
 
     /**
      * Handle touch end event.
-     * @method touchend
      * @param {Object} event The touch end event.
      */
     this.touchend = function(event){
@@ -17898,7 +16863,6 @@ dwv.tool.Scroll = function(app)
 
     /**
      * Handle mouse scroll event (fired by Firefox).
-     * @method DOMMouseScroll
      * @param {Object} event The mouse scroll event.
      */
     this.DOMMouseScroll = function(event){
@@ -17913,7 +16877,6 @@ dwv.tool.Scroll = function(app)
 
     /**
      * Handle mouse wheel event.
-     * @method mousewheel
      * @param {Object} event The mouse wheel event.
      */
     this.mousewheel = function(event){
@@ -17927,7 +16890,6 @@ dwv.tool.Scroll = function(app)
     };
     /**
      * Handle key down event.
-     * @method keydown
      * @param {Object} event The key down event.
      */
     this.keydown = function(event){
@@ -17936,7 +16898,6 @@ dwv.tool.Scroll = function(app)
 
     /**
      * Setup the tool GUI.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -17946,7 +16907,6 @@ dwv.tool.Scroll = function(app)
 
     /**
      * Enable the tool.
-     * @method enable
      * @param {Boolean} bool The flag to enable or not.
      */
     this.display = function(bool){
@@ -17957,7 +16917,6 @@ dwv.tool.Scroll = function(app)
 
     /**
      * Initialise the tool.
-     * @method init
      */
     this.init = function() {
         if ( app.getNSlicesToLoad() === 1 ) {
@@ -17970,8 +16929,7 @@ dwv.tool.Scroll = function(app)
 
 /**
  * Help for this tool.
- * @method getHelp
- * @returns {Object} The help content.
+ * @return {Object} The help content.
  */
 dwv.tool.Scroll.prototype.getHelp = function()
 {
@@ -17986,23 +16944,12 @@ dwv.tool.Scroll.prototype.getHelp = function()
         }
     };
 };
-;/** 
- * Tool module.
- * @module tool
- */
+;// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for tool functions.
- * @class tool
- * @namespace dwv
- * @static
- */
 dwv.tool = dwv.tool || {};
 
 /**
  * Tool box.
- * @class Toolbox
- * @namespace dwv.tool
  * @constructor
  * @param {Array} toolList The list of tool objects.
  * @param {Object} gui The associated gui.
@@ -18011,26 +16958,22 @@ dwv.tool.Toolbox = function( toolList, app )
 {
     /**
      * Toolbox GUI.
-     * @property gui
      * @type Object
      */
     var gui = null;
     /**
      * Selected tool.
-     * @property selectedTool
      * @type Object
      */
     var selectedTool = null;
     /**
      * Default tool name.
-     * @property defaultToolName
      * @type String
      */
     var defaultToolName = null;
 
     /**
      * Get the list of tools.
-     * @method getToolList
      * @return {Array} The list of tool objects.
      */
     this.getToolList = function ()
@@ -18040,7 +16983,6 @@ dwv.tool.Toolbox = function( toolList, app )
 
     /**
      * Get the selected tool.
-     * @method getSelectedTool
      * @return {Object} The selected tool.
      */
     this.getSelectedTool = function ()
@@ -18050,7 +16992,6 @@ dwv.tool.Toolbox = function( toolList, app )
 
     /**
      * Setup the toolbox GUI.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -18065,7 +17006,6 @@ dwv.tool.Toolbox = function( toolList, app )
 
     /**
      * Display the toolbox.
-     * @method display
      * @param {Boolean} bool Flag to display or not.
      */
     this.display = function (bool)
@@ -18077,7 +17017,6 @@ dwv.tool.Toolbox = function( toolList, app )
 
     /**
      * Initialise the tool box.
-     * @method init
      */
     this.init = function ()
     {
@@ -18106,7 +17045,6 @@ dwv.tool.Toolbox = function( toolList, app )
 
     /**
      * Set the selected tool.
-     * @method setSelectedTool
      * @return {String} The name of the tool to select.
      */
     this.setSelectedTool = function (name)
@@ -18129,7 +17067,6 @@ dwv.tool.Toolbox = function( toolList, app )
 
     /**
      * Reset the tool box.
-     * @method reset
      */
     this.reset = function ()
     {
@@ -18144,7 +17081,6 @@ dwv.tool.Toolbox = function( toolList, app )
 
 /**
  * Check if a tool is in the tool list.
- * @method hasTool
  * @param {String} name The name to check.
  * @return {String} The tool list element for the given name.
  */
@@ -18152,30 +17088,23 @@ dwv.tool.Toolbox.prototype.hasTool = function (name)
 {
     return this.getToolList()[name];
 };
-;/** 
- * Tool module.
- * @module tool
- */
+;// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
 /**
  * UndoStack class.
- * @class UndoStack
- * @namespace dwv.tool
  * @constructor
  */
 dwv.tool.UndoStack = function (app)
 {
     /**
      * Undo GUI.
-     * @property gui
      * @type Object
      */
     var gui = new dwv.gui.Undo(app);
     /**
      * Array of commands.
-     * @property stack
      * @private
      * @type Array
      */
@@ -18183,14 +17112,12 @@ dwv.tool.UndoStack = function (app)
 
     /**
      * Get the stack.
-     * @method getStack
      * @return {Array} The list of stored commands.
      */
     this.getStack = function () { return stack; };
 
     /**
      * Current command index.
-     * @property curCmdIndex
      * @private
      * @type Number
      */
@@ -18198,7 +17125,6 @@ dwv.tool.UndoStack = function (app)
 
     /**
      * Add a command to the stack.
-     * @method add
      * @param {Object} cmd The command to add.
      */
     this.add = function(cmd)
@@ -18216,7 +17142,6 @@ dwv.tool.UndoStack = function (app)
 
     /**
      * Undo the last command.
-     * @method undo
      */
     this.undo = function()
     {
@@ -18234,7 +17159,6 @@ dwv.tool.UndoStack = function (app)
 
     /**
      * Redo the last command.
-     * @method redo
      */
     this.redo = function()
     {
@@ -18251,7 +17175,6 @@ dwv.tool.UndoStack = function (app)
 
     /**
      * Setup the tool GUI.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -18260,7 +17183,6 @@ dwv.tool.UndoStack = function (app)
 
     /**
      * Initialise the tool GUI.
-     * @method initialise
      */
     this.initialise = function ()
     {
@@ -18268,23 +17190,12 @@ dwv.tool.UndoStack = function (app)
     };
 
 }; // UndoStack class
-;/** 
- * Tool module.
- * @module tool
- */
+;// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for tool functions.
- * @class tool
- * @namespace dwv
- * @static
- */
 dwv.tool = dwv.tool || {};
 
 /**
  * WindowLevel tool: handle window/level related events.
- * @class WindowLevel
- * @namespace dwv.tool
  * @constructor
  * @param {Object} app The associated application.
  */
@@ -18292,27 +17203,23 @@ dwv.tool.WindowLevel = function(app)
 {
     /**
      * Closure to self: to be used by event handlers.
-     * @property self
      * @private
      * @type WindowLevel
      */
     var self = this;
     /**
      * WindowLevel GUI.
-     * @property gui
      * @type Object
      */
     var gui = null;
     /**
      * Interaction start flag.
-     * @property started
      * @type Boolean
      */
     this.started = false;
 
     /**
      * Handle mouse down event.
-     * @method mousedown
      * @param {Object} event The mouse down event.
      */
     this.mousedown = function(event){
@@ -18327,7 +17234,6 @@ dwv.tool.WindowLevel = function(app)
 
     /**
      * Handle mouse move event.
-     * @method mousemove
      * @param {Object} event The mouse move event.
      */
     this.mousemove = function(event){
@@ -18350,7 +17256,6 @@ dwv.tool.WindowLevel = function(app)
 
     /**
      * Handle mouse up event.
-     * @method mouseup
      * @param {Object} event The mouse up event.
      */
     this.mouseup = function(/*event*/){
@@ -18372,7 +17277,6 @@ dwv.tool.WindowLevel = function(app)
 
     /**
      * Handle mouse out event.
-     * @method mouseout
      * @param {Object} event The mouse out event.
      */
     this.mouseout = function(event){
@@ -18382,7 +17286,6 @@ dwv.tool.WindowLevel = function(app)
 
     /**
      * Handle touch start event.
-     * @method touchstart
      * @param {Object} event The touch start event.
      */
     this.touchstart = function(event){
@@ -18391,7 +17294,6 @@ dwv.tool.WindowLevel = function(app)
 
     /**
      * Handle touch move event.
-     * @method touchmove
      * @param {Object} event The touch move event.
      */
     this.touchmove = function(event){
@@ -18400,7 +17302,6 @@ dwv.tool.WindowLevel = function(app)
 
     /**
      * Handle touch end event.
-     * @method touchend
      * @param {Object} event The touch end event.
      */
     this.touchend = function(event){
@@ -18409,7 +17310,6 @@ dwv.tool.WindowLevel = function(app)
 
     /**
      * Handle double click event.
-     * @method dblclick
      * @param {Object} event The double click event.
      */
     this.dblclick = function(event){
@@ -18422,7 +17322,6 @@ dwv.tool.WindowLevel = function(app)
 
     /**
      * Handle key down event.
-     * @method keydown
      * @param {Object} event The key down event.
      */
     this.keydown = function(event){
@@ -18432,7 +17331,6 @@ dwv.tool.WindowLevel = function(app)
 
     /**
      * Setup the tool GUI.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -18442,7 +17340,6 @@ dwv.tool.WindowLevel = function(app)
 
     /**
      * Display the tool.
-     * @method display
      * @param {Boolean} bool The flag to display or not.
      */
     this.display = function (bool)
@@ -18460,7 +17357,6 @@ dwv.tool.WindowLevel = function(app)
 
     /**
      * Initialise the tool.
-     * @method init
      */
     this.init = function() {
         if ( gui ) {
@@ -18472,8 +17368,7 @@ dwv.tool.WindowLevel = function(app)
 
 /**
  * Help for this tool.
- * @method getHelp
- * @returns {Object} The help content.
+ * @return {Object} The help content.
  */
 dwv.tool.WindowLevel.prototype.getHelp = function()
 {
@@ -18489,23 +17384,12 @@ dwv.tool.WindowLevel.prototype.getHelp = function()
         }
     };
 };
-;/** 
- * Tool module.
- * @module tool
- */
+;// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for tool functions.
- * @class tool
- * @namespace dwv
- * @static
- */
 dwv.tool = dwv.tool || {};
 
 /**
  * ZoomAndPan class.
- * @class ZoomAndPan
- * @namespace dwv.tool
  * @constructor
  * @param {Object} app The associated application.
  */
@@ -18513,27 +17397,23 @@ dwv.tool.ZoomAndPan = function(app)
 {
     /**
      * Closure to self: to be used by event handlers.
-     * @property self
      * @private
      * @type Object
      */
     var self = this;
     /**
      * ZoomAndPan GUI.
-     * @property gui
      * @type Object
      */
     var gui = null;
     /**
      * Interaction start flag.
-     * @property started
      * @type Boolean
      */
     this.started = false;
 
     /**
      * Handle mouse down event.
-     * @method mousedown
      * @param {Object} event The mouse down event.
      */
     this.mousedown = function(event){
@@ -18545,7 +17425,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Handle two touch down event.
-     * @method twotouchdown
      * @param {Object} event The touch down event.
      */
     this.twotouchdown = function(event){
@@ -18562,7 +17441,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Handle mouse move event.
-     * @method mousemove
      * @param {Object} event The mouse move event.
      */
     this.mousemove = function(event){
@@ -18583,7 +17461,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Handle two touch move event.
-     * @method twotouchmove
      * @param {Object} event The touch move event.
      */
     this.twotouchmove = function(event){
@@ -18625,7 +17502,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Handle mouse up event.
-     * @method mouseup
      * @param {Object} event The mouse up event.
      */
     this.mouseup = function(/*event*/){
@@ -18638,7 +17514,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Handle mouse out event.
-     * @method mouseout
      * @param {Object} event The mouse out event.
      */
     this.mouseout = function(event){
@@ -18647,7 +17522,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Handle touch start event.
-     * @method touchstart
      * @param {Object} event The touch start event.
      */
     this.touchstart = function(event){
@@ -18662,7 +17536,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Handle touch move event.
-     * @method touchmove
      * @param {Object} event The touch move event.
      */
     this.touchmove = function(event){
@@ -18677,7 +17550,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Handle touch end event.
-     * @method touchend
      * @param {Object} event The touch end event.
      */
     this.touchend = function(event){
@@ -18686,7 +17558,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Handle mouse scroll event (fired by Firefox).
-     * @method DOMMouseScroll
      * @param {Object} event The mouse scroll event.
      */
     this.DOMMouseScroll = function(event){
@@ -18697,7 +17568,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Handle mouse wheel event.
-     * @method mousewheel
      * @param {Object} event The mouse wheel event.
      */
     this.mousewheel = function(event){
@@ -18708,7 +17578,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Handle key down event.
-     * @method keydown
      * @param {Object} event The key down event.
      */
     this.keydown = function(event){
@@ -18717,7 +17586,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Setup the tool GUI.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -18727,7 +17595,6 @@ dwv.tool.ZoomAndPan = function(app)
 
     /**
      * Enable the tool.
-     * @method enable
      * @param {Boolean} bool The flag to enable or not.
      */
     this.display = function(bool){
@@ -18740,8 +17607,7 @@ dwv.tool.ZoomAndPan = function(app)
 
 /**
  * Help for this tool.
- * @method getHelp
- * @returns {Object} The help content.
+ * @return {Object} The help content.
  */
 dwv.tool.ZoomAndPan.prototype.getHelp = function()
 {
@@ -18761,28 +17627,17 @@ dwv.tool.ZoomAndPan.prototype.getHelp = function()
 
 /**
  * Initialise the tool.
- * @method init
  */
 dwv.tool.ZoomAndPan.prototype.init = function() {
     return true;
 };
-;/** 
- * Utility module.
- * @module utils
- */
+;// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for utility functions.
- * @class utils
- * @namespace dwv
- * @static
- */
+/** @namespace */
 dwv.utils = dwv.utils || {};
 
 /**
  * Capitalise the first letter of a string.
- * @method capitaliseFirstLetter
- * @static
  * @param {String} string The string to capitalise the first letter.
  * @return {String} The new string.
  */
@@ -18798,9 +17653,7 @@ dwv.utils.capitaliseFirstLetter = function (string)
 /**
  * Split key/value string:
  *  key0=val00&key0=val01&key1=val10 returns
-*   { key0 : [val00, val01], key1 : val1 }
- * @method splitKeyValueString
- * @static
+ *  { key0 : [val00, val01], key1 : val1 }
  * @param {String} inputStr The string to split.
  * @return {Object} The split string.
  */
@@ -18832,25 +17685,14 @@ dwv.utils.splitKeyValueString = function (inputStr)
     }
     return result;
 };
-;/** 
- * Utility module.
- * @module utils
- */
+;// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for utility functions.
- * @class utils
- * @namespace dwv
- * @static
- */
 dwv.utils = dwv.utils || {};
 
 /**
  * Thread Pool.
- * @class ThreadPool
- * @namespace dwv.utils
+ * Highly inspired from {@link http://www.smartjava.org/content/html5-easily-parallelize-jobs-using-web-workers-and-threadpool}.
  * @constructor
- * Highly inspired from http://www.smartjava.org/content/html5-easily-parallelize-jobs-using-web-workers-and-threadpool
  * @param {Number} size The size of the pool.
  */
 dwv.utils.ThreadPool = function (size) {
@@ -18865,7 +17707,6 @@ dwv.utils.ThreadPool = function (size) {
  
     /**
      * Initialise.
-     * @method init
      */
     this.init = function () {
         // create 'size' number of worker threads
@@ -18877,7 +17718,6 @@ dwv.utils.ThreadPool = function (size) {
     /**
      * Add a worker task to the queue.
      * Will be run when a thread is made available.
-     * @method addWorkerTask
      * @return {Object} workerTask The task to add.
      */
     this.addWorkerTask = function (workerTask) {
@@ -18893,7 +17733,6 @@ dwv.utils.ThreadPool = function (size) {
  
     /**
      * Free a worker thread.
-     * @method freeWorkerThread
      * @param {Object} workerThread The thread to free.
      */
     this.freeWorkerThread = function (workerThread) {
@@ -18910,8 +17749,6 @@ dwv.utils.ThreadPool = function (size) {
  
 /**
  * Worker thread.
- * @class WorkerThread
- * @namespace dwv.utils
  * @constructor
  * @param {Object} parentPool The parent pool.
  */
@@ -18925,7 +17762,6 @@ dwv.utils.WorkerThread = function (parentPool) {
  
     /**
      * Run a worker task
-     * @method run
      * @param {Object} workerTask The task to run.
      */
     this.run = function (workerTask) {
@@ -18944,7 +17780,6 @@ dwv.utils.WorkerThread = function (parentPool) {
      * Handle once the task is done.
      * For now assume we only get a single callback from a worker
      * which also indicates the end of this worker.
-     * @method ontaskend
      * @param {Object} event The callback event.
      */
     function ontaskend(event) {
@@ -18958,8 +17793,6 @@ dwv.utils.WorkerThread = function (parentPool) {
  
 /**
  * Worker task.
- * @class WorkerTask
- * @namespace dwv.utils
  * @constructor
  * @param {String} script The worker script.
  * @param {Function} parentPool The worker callback.
@@ -18973,24 +17806,10 @@ dwv.utils.WorkerTask = function (script, callback, message) {
     // worker start message
     this.startMessage = message;
 };
-;/** 
- * Utility module.
- * @module utils
- */
+;// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for utility functions.
- * @class utils
- * @namespace dwv
- * @static
- */
 dwv.utils = dwv.utils || {};
-/**
- * Namespace for base utils functions.
- * @class base
- * @namespace dwv.utils
- * @static
- */
+/** @namespace */
 dwv.utils.base = dwv.utils.base || {};
 
 /**
@@ -18999,8 +17818,6 @@ dwv.utils.base = dwv.utils.base || {};
  *  { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }
  * Returns an empty object if the input string is not correct (null, empty...)
  *  or if it is not a query string (no question mark).
- * @method splitUri
- * @static
  * @param {String} inputStr The string to split.
  * @return {Object} The split string.
  */
@@ -19029,8 +17846,6 @@ dwv.utils.splitUri = function (uri)
 /**
  * Get the query part, split into an array, of an input URI.
  * The URI scheme is: 'base?query#fragment'
- * @method getUriQuery
- * @static
  * @param {String } uri The input URI.
  * @return {Object} The query part, split into an array, of the input URI.
  */
@@ -19070,8 +17885,6 @@ dwv.utils.base.decodeQuery = function (query, callback)
 /**
  * Decode a Key/Value pair URI. If a key is repeated, the result
  * be an array of base + each key.
- * @method decodeKeyValueUri
- * @static
  * @param {String} uri The URI to decode.
  * @param {String} replaceMode The key replace more.
  *   replaceMode can be:
@@ -19160,8 +17973,6 @@ dwv.utils.decodeKeyValueUri = function (uri, replaceMode)
 
 /**
  * Decode a manifest query.
- * @method decodeManifestQuery
- * @static
  * @param {Object} query The manifest query: {input, nslices},
  *   with input the input URI and nslices the number of slices.
  * @param {Function} The function to call with the decoded urls.
@@ -19197,8 +18008,6 @@ dwv.utils.decodeManifestQuery = function (query, callback)
 
 /**
  * Decode an XML manifest.
- * @method decodeManifest
- * @static
  * @param {Object} manifest The manifest to decode.
  * @param {Number} nslices The number of slices to load.
  */

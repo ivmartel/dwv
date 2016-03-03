@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Home</title>
+    <title>JSDoc: Source: utils/string.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,32 +17,72 @@
 
 <div id="main">
 
-    <h1 class="page-title">Home</h1>
+    <h1 class="page-title">Source: utils/string.js</h1>
 
     
 
 
 
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// namespaces
+var dwv = dwv || {};
+/** @namespace */
+dwv.utils = dwv.utils || {};
 
+/**
+ * Capitalise the first letter of a string.
+ * @param {String} string The string to capitalise the first letter.
+ * @return {String} The new string.
+ */
+dwv.utils.capitaliseFirstLetter = function (string)
+{
+    var res = string;
+    if ( string ) {
+        res = string.charAt(0).toUpperCase() + string.slice(1);
+    }
+    return res;
+};
 
-    <h3> </h3>
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
+/**
+ * Split key/value string:
+ *  key0=val00&amp;key0=val01&amp;key1=val10 returns
+ *  { key0 : [val00, val01], key1 : val1 }
+ * @param {String} inputStr The string to split.
+ * @return {Object} The split string.
+ */
+dwv.utils.splitKeyValueString = function (inputStr)
+{
+    // result
+    var result = {};
+    // check input string
+    if ( inputStr ) {
+         // split key/value pairs
+        var pairs = inputStr.split('&amp;');
+        for ( var i = 0; i &lt; pairs.length; ++i )
+        {
+            var pair = pairs[i].split('=');
+            // if the key does not exist, create it
+            if ( !result[pair[0]] )
+            {
+                result[pair[0]] = pair[1];
+            }
+            else
+            {
+                // make it an array
+                if ( !( result[pair[0]] instanceof Array ) ) {
+                    result[pair[0]] = [result[pair[0]]];
+                }
+                result[pair[0]].push(pair[1]);
+            }
+        }
+    }
+    return result;
+};
+</code></pre>
+        </article>
+    </section>
 
 
 
