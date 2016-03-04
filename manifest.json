@@ -8,8 +8,8 @@
     }
   },
   "icons": {
-    "16": "/resources/dwv-16.png",
-    "60": "/resources/dwv-60.png",
-    "128": "/resources/dwv-128.png"
+    "16": "/resources/icons/dwv-16.png",
+    "60": "/resources/icons/dwv-60.png",
+    "128": "/resources/icons/dwv-128.png"
   }
 }
