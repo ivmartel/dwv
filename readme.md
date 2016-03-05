@@ -7,6 +7,6 @@ Try a [live demo](http://ivmartel.github.io/dwv/) and read a lot more informatio
 
 All coding/implementation contributions and comments are welcome.
 
-DWV is not approved for diagnostic use. Released under GNU GPL license (see [license.txt](license.txt)).
+DWV is not certified for diagnostic use. Released under GNU GPL license (see [license.txt](license.txt)).
 
 [![Build Status](https://travis-ci.org/ivmartel/dwv.svg?branch=master)](https://travis-ci.org/ivmartel/dwv) [![Coverage Status](https://img.shields.io/coveralls/ivmartel/dwv.svg?style=flat)](https://coveralls.io/r/ivmartel/dwv?branch=master) [![Code Climate](https://codeclimate.com/github/ivmartel/dwv.svg)](https://codeclimate.com/github/ivmartel/dwv) [![Dependency Status](https://david-dm.org/ivmartel/dwv.svg)](https://david-dm.org/ivmartel/dwv)
