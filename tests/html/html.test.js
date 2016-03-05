@@ -1,10 +1,12 @@
-/**
- * Tests for the 'html/html.js' file.
- */
+/** @module tests/html */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module("html");
 
+/**
+ * Tests for {@link dwv.html.toTable}.
+ * @function module:tests/html~toTable
+ */
 QUnit.test("Test array to html function.", function (assert) {
     // 1D array
     var array0 = [0, 1, 2, 3];

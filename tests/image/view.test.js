@@ -1,10 +1,11 @@
-/**
- * Tests for the 'view/view.js' file.
- */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module("view");
 
+/**
+ * Tests for {@link dwv.image.View} listeners.
+ * @function module:tests/image~listeners
+ */
 QUnit.test("Test listeners.", function (assert) {
     // create an image
     var size0 = 4;
@@ -40,6 +41,10 @@ QUnit.test("Test listeners.", function (assert) {
     view0.setWindowLevel(1,1);
 });
 
+/**
+ * Tests for {@link dwv.image.View} generateImageData MONO.
+ * @function module:tests/image~generateImageDataMONO
+ */
 QUnit.test("Test generate data MONO.", function (assert) {
     // create an image
     var size0 = 2;
@@ -76,6 +81,10 @@ QUnit.test("Test generate data MONO.", function (assert) {
     assert.equal( testContent0, true, "check image data" );
 });
 
+/**
+ * Tests for {@link dwv.image.View} generateImageData RGB.
+ * @function module:tests/image~generateImageDataRGB
+ */
 QUnit.test("Test generate data RGB.", function (assert) {
     // create an image
     var size0 = 2;
@@ -151,6 +160,10 @@ QUnit.test("Test generate data RGB.", function (assert) {
     assert.equal( testContent1, true, "check image data planar" );
 });
 
+/**
+ * Tests for {@link dwv.image.View} generateImageData timing.
+ * @function module:tests/image~generateImageDataTiming
+ */
 QUnit.test("Test generate data timing.", function (assert) {
     // create an image
     var size0 = 128;
