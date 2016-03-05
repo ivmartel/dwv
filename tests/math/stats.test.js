@@ -6,8 +6,8 @@
 QUnit.module("stats");
 
 /**
- * Tests for {@link dwv.math.Path}.
- * @function module:tests/math~Path
+ * Tests for {@link dwv.math.getStats}.
+ * @function module:tests/math~getStats
  */
 QUnit.test("Test getStats.", function (assert) {
     var arr0 = [1, 2, 3, 4, 5];
@@ -33,6 +33,10 @@ QUnit.test("Test getStats.", function (assert) {
     assert.equal(q1.stdDev, 2.9832867780352594, "stdDev.1");
 });
 
+/**
+ * Tests for {@link dwv.math.guid}.
+ * @function module:tests/math~guid
+ */
 QUnit.test("Test GUID.", function (assert) {
     var id0 = dwv.math.guid();
     var id1 = dwv.math.guid();

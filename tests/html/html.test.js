@@ -1,3 +1,6 @@
+/**
+ * Tests for the 'gui/html.js' file.
+ */
 /** @module tests/html */
 // Do not warn if these variables were not defined before.
 /* global QUnit */

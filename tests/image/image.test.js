@@ -1,3 +1,6 @@
+/**
+ * Tests for the 'image/image.js' file.
+ */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module("image");

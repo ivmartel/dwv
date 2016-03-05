@@ -1,3 +1,6 @@
+/**
+ * Tests for the 'image/geometry.js' file.
+ */
 /** @module tests/image */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
