@@ -1,10 +1,15 @@
 /**
  * Tests for the 'utils/string' file.
  */
+/** @module tests/utils */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module("string");
 
+/**
+ * Tests for {@link dwv.utils.capitaliseFirstLetter}.
+ * @function module:tests/utils~CapitaliseFirstLetter
+ */
 QUnit.test("Test CapitaliseFirstLetter.", function (assert) {
     // undefined
     assert.equal(dwv.utils.capitaliseFirstLetter(), null, "Capitalise undefined");

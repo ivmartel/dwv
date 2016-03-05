@@ -5,6 +5,10 @@
 /* global QUnit */
 QUnit.module("utils");
 
+/**
+ * Tests for {@link dwv.utils.splitUri}.
+ * @function module:tests/utils~splitUri
+ */
 QUnit.test("Test splitUri.", function (assert) {
     // using JSON.stringify to compare objects
     var strEmpty = JSON.stringify({});
@@ -53,6 +57,10 @@ QUnit.test("Test splitUri.", function (assert) {
     assert.equal(JSON.stringify(res31), JSON.stringify(ref31), "Split test31");
 });
 
+/**
+ * Tests for {@link dwv.utils.getUriQuery}.
+ * @function module:tests/utils~getUriQuery
+ */
 QUnit.test("Test get URI query.", function (assert) {
     var params;
 
@@ -190,6 +198,10 @@ QUnit.test("Test get URI query.", function (assert) {
 
 });
 
+/**
+ * Tests for {@link dwv.utils.decodeManifest}.
+ * @function module:tests/utils~decodeManifest
+ */
 QUnit.test("Test decode Manifest.", function (assert) {
     // test values
     var wadoUrl = "http://my.pacs.org:8089/wado";

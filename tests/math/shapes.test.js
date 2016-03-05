@@ -5,6 +5,10 @@
 /* global QUnit */
 QUnit.module("shapes");
 
+/**
+ * Tests for {@link dwv.math.Circle}.
+ * @function module:tests/math~Circle
+ */
 QUnit.test("Test Circle.", function (assert) {
     var center = new dwv.math.Point2D(0,0);
     var c0 = new dwv.math.Circle(center,2);
@@ -18,6 +22,10 @@ QUnit.test("Test Circle.", function (assert) {
     assert.equal(c0.getWorldSurface(0.5,0.5), Math.PI, "getWorldSurface");
 });
 
+/**
+ * Tests for {@link dwv.math.Ellipse}.
+ * @function module:tests/math~Ellipse
+ */
 QUnit.test("Test Ellipse.", function (assert) {
     var center = new dwv.math.Point2D(0,0);
     var e0 = new dwv.math.Ellipse(center,2,4);
@@ -33,6 +41,10 @@ QUnit.test("Test Ellipse.", function (assert) {
     assert.equal(e0.getWorldSurface(0.5,0.25), Math.PI, "getWorldSurface");
 });
 
+/**
+ * Tests for {@link dwv.math.Line}.
+ * @function module:tests/math~Line
+ */
 QUnit.test("Test Line.", function (assert) {
     var p0 = new dwv.math.Point2D(0,0);
     var p1 = new dwv.math.Point2D(0,-5);
@@ -74,6 +86,10 @@ QUnit.test("Test Line.", function (assert) {
     assert.equal(dwv.math.getAngle(l0, l4), 180, "getAngle (vertical parallel)");
 });
 
+/**
+ * Tests for {@link dwv.math.Rectangle}.
+ * @function module:tests/math~Rectangle
+ */
 QUnit.test("Test Rectangle.", function (assert) {
     var p0 = new dwv.math.Point2D(0,0);
     var p1 = new dwv.math.Point2D(-4,-4);
@@ -96,6 +112,10 @@ QUnit.test("Test Rectangle.", function (assert) {
     assert.equal(r0.getWorldSurface(0.5,0.5), 4, "getWorldSurface");
 });
 
+/**
+ * Tests for {@link dwv.math.ROI}.
+ * @function module:tests/math~ROI
+ */
 QUnit.test("Test ROI.", function (assert) {
     var r0 = new dwv.math.ROI();
     // getLength
@@ -114,6 +134,10 @@ QUnit.test("Test ROI.", function (assert) {
     assert.equal(r0.getPoint(1), p1, "getPoint second");
 });
 
+/**
+ * Tests for {@link dwv.math.Path}.
+ * @function module:tests/math~Path
+ */
 QUnit.test("Test Path.", function (assert) {
     var path0 = new dwv.math.Path();
     // getLength

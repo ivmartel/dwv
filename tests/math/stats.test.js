@@ -5,6 +5,10 @@
 /* global QUnit */
 QUnit.module("stats");
 
+/**
+ * Tests for {@link dwv.math.Path}.
+ * @function module:tests/math~Path
+ */
 QUnit.test("Test getStats.", function (assert) {
     var arr0 = [1, 2, 3, 4, 5];
     var q0 = dwv.math.getStats(arr0);

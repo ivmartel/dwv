@@ -1,10 +1,15 @@
 /**
  * Tests for the 'math/point.js' file.
  */
+/** @module tests/math */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module("point");
 
+/**
+ * Tests for {@link dwv.math.Point2D}.
+ * @function module:tests/math~Point2D
+ */
 QUnit.test("Test Point2D.", function (assert) {
     var p0 = new dwv.math.Point2D(1,2);
     // getX
@@ -28,6 +33,10 @@ QUnit.test("Test Point2D.", function (assert) {
     assert.equal(p0.toString(), "(1, 2)", "toString");
 });
 
+/**
+ * Tests for {@link dwv.math.FastPoint2D}.
+ * @function module:tests/math~FastPoint2D
+ */
 QUnit.test("Test FastPoint2D.", function (assert) {
     var p0 = new dwv.math.FastPoint2D(1,2);
     // x
