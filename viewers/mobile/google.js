@@ -157,6 +157,9 @@ dwv.google.Drive = function ()
     // list of ids
     var idList = null;
 
+    // The Browser API key obtained from the Google Developers Console.
+    this.apiKey = 'AIzaSyA5YAedAwoQsBZ-TzVEEVkv2ezD5hqe4s0';
+
     /**
     * Set the ids to ask for download link.
     * @param {Array} ids The list of file ids to ask for download link.
@@ -186,6 +189,9 @@ dwv.google.Drive = function ()
     * The ids to ask for have been provided via the setIds.
     */
     this.load = function () {
+        // set the api key
+        gapi.client.setApiKey(self.apiKey);
+        
         // reset
         urls = [];
         finalSize = 0;
