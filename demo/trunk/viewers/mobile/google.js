@@ -94,8 +94,6 @@ dwv.google.Picker = function ()
 {
     // closure to self
     var self = this;
-    // The Browser API key obtained from the Google Developers Console.
-    this.developerKey = 'AIzaSyA5YAedAwoQsBZ-TzVEEVkv2ezD5hqe4s0';
 
     /**
     * Load API and create picker.
@@ -120,7 +118,6 @@ dwv.google.Picker = function ()
         var picker = new google.picker.PickerBuilder()
             .enableFeature(google.picker.Feature.NAV_HIDDEN)
             .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
-            .setDeveloperKey(self.developerKey)
             .setOAuthToken(gapi.auth.getToken().access_token)
             .addView(view)
             .setCallback(handleResult)
