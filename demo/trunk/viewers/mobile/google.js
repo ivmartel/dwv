@@ -189,6 +189,7 @@ dwv.google.Drive = function ()
     * The ids to ask for have been provided via the setIds.
     */
     this.load = function () {
+        // set the api key
         gapi.client.setApiKey(self.apiKey);
         
         // reset
@@ -320,7 +321,7 @@ dwv.gui.GoogleDriveLoad = function (app)
             // pipeline
             gAuth.onload = gPicker.load;
             gPicker.onload = gDrive.loadIds;
-            gDrive.onload = dwv.google.getAuthorizedCallback(app.loadURL);
+            gDrive.onload = dwv.google.getAuthorizedCallback(app.loadURLs);
             // launch
             gAuth.load();
         }
