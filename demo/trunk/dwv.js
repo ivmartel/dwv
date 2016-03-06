@@ -334,7 +334,7 @@ dwv.App = function ()
                 // optional display state
                 if ( typeof query.state !== "undefined" ) {
                     var onLoadEnd = function (/*event*/) {
-                        loadStateUrl([query.state]);
+                        loadStateUrl(query.state);
                     };
                     this.addEventListener( "load-end", onLoadEnd );
                 }
@@ -445,7 +445,7 @@ dwv.App = function ()
     };
 
     /**
-     * Load a list of files.
+     * Load a list of files. Can be image files or a state file.
      * @param {Array} files The list of files to load.
      */
     this.loadFiles = function (files)
@@ -453,7 +453,7 @@ dwv.App = function ()
         // has been checked for emptiness.
         var ext = files[0].name.split('.').pop().toLowerCase();
         if ( ext === "json" ) {
-            loadStateFile(files);
+            loadStateFile(files[0]);
         }
         else {
             loadImageFiles(files);
@@ -462,6 +462,7 @@ dwv.App = function ()
 
     /**
      * Load a list of image files.
+     * @private
      * @param {Array} files The list of image files to load.
      */
     function loadImageFiles(files)
@@ -503,7 +504,8 @@ dwv.App = function ()
 
     /**
      * Load a State file.
-     * @param {Array} file An array with the state file to load.
+     * @private
+     * @param {String} file The state file to load.
      */
     function loadStateFile(file)
     {
@@ -516,15 +518,33 @@ dwv.App = function ()
         };
         fileIO.onerror = function (error) { handleError(error); };
         // main load (asynchronous)
-        fileIO.load(file);
+        fileIO.load([file]);
     }
 
     /**
-     * Load a list of URLs.
+     * Load a list of URLs. Can be image files or a state file.
      * @param {Array} urls The list of urls to load.
      * @param {Array} requestHeaders An array of {name, value} to use as request headers.
      */
-    this.loadURLs = function(urls, requestHeaders)
+    this.loadURLs = function (urls, requestHeaders)
+    {
+        // has been checked for emptiness.
+        var ext = urls[0].split('.').pop().toLowerCase();
+        if ( ext === "json" ) {
+            loadStateUrl(urls[0]);
+        }
+        else {
+            loadImageUrls(urls, requestHeaders);
+        }
+    };
+    
+    /**
+     * Load a list of image URLs.
+     * @private
+     * @param {Array} urls The list of urls to load.
+     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+     */
+    function loadImageUrls(urls, requestHeaders)
     {
         // clear variables
         self.reset();
@@ -558,11 +578,12 @@ dwv.App = function ()
         // main load (asynchronous)
         fireEvent({ 'type': 'load-start' });
         urlIO.load(urls, requestHeaders);
-    };
+    }
 
     /**
      * Load a State url.
-     * @param {Array} file An array with the state url to load.
+     * @private
+     * @param {String} url The state url to load.
      */
     function loadStateUrl(url)
     {
@@ -575,7 +596,7 @@ dwv.App = function ()
         };
         urlIO.onerror = function (error) { handleError(error); };
         // main load (asynchronous)
-        urlIO.load(url);
+        urlIO.load([url]);
     }
 
     /**
