@@ -321,7 +321,7 @@ dwv.gui.GoogleDriveLoad = function (app)
             // pipeline
             gAuth.onload = gPicker.load;
             gPicker.onload = gDrive.loadIds;
-            gDrive.onload = dwv.google.getAuthorizedCallback(app.loadURL);
+            gDrive.onload = dwv.google.getAuthorizedCallback(app.loadURLs);
             // launch
             gAuth.load();
         }

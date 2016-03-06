@@ -56,7 +56,7 @@ dwv.gui.DropboxLoad = function (app)
                     for (var i = 0; i < files.length; ++i) {
                         urls[urls.length] = files[i].link;
                     }
-                    app.loadURL(urls);
+                    app.loadURLs(urls);
                 },
                 // Optional. Called when the user closes the dialog without selecting a file
                 // and does not include any parameters.

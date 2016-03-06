@@ -464,7 +464,7 @@ dwv.App = function ()
      * Load a list of image files.
      * @param {Array} files The list of image files to load.
      */
-    function loadImageFiles (files)
+    function loadImageFiles(files)
     {
         // clear variables
         self.reset();
@@ -524,7 +524,7 @@ dwv.App = function ()
      * @param {Array} urls The list of urls to load.
      * @param {Array} requestHeaders An array of {name, value} to use as request headers.
      */
-    this.loadURL = function(urls, requestHeaders)
+    this.loadURLs = function(urls, requestHeaders)
     {
         // clear variables
         self.reset();
@@ -848,7 +848,7 @@ dwv.App = function ()
      */
     this.onChangeURL = function (event)
     {
-        self.loadURL([event.target.value]);
+        self.loadURLs([event.target.value]);
     };
 
     /**
@@ -858,7 +858,7 @@ dwv.App = function ()
      */
     this.onInputURLs = function (urls, requestHeaders)
     {
-        self.loadURL(urls, requestHeaders);
+        self.loadURLs(urls, requestHeaders);
     };
 
     /**

@@ -40,7 +40,7 @@ dwv.addDataLine = function (id, fileroot, doc)
     var url = fileroot + ".dcm";
     var app = new dwv.App();
     app.init(config);
-    app.loadURL([url]);
+    app.loadURLs([url]);
 
     // parsing timing
     var request = new XMLHttpRequest();
