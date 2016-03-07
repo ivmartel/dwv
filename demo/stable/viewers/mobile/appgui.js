@@ -24,6 +24,34 @@ dwv.tool.defaultpresets.CT = {
     "head": {"center": 90, "width": 350}
 };
 
+//decode query
+dwv.utils.decodeQuery = function (query, callback)
+{
+    if (query.type === "gdrive") {
+        var gAuth = new dwv.google.Auth();
+        var gDrive = new dwv.google.Drive();
+        gDrive.setIds( query.input.split(',') );
+        // pipeline
+        gAuth.onload = gDrive.load;
+        gAuth.onfail = function () {
+            $("#popupAuth").popup("open");
+            var authorizeButton = document.getElementById('gauth-button');
+            // explicit auth from button to allow popup
+            authorizeButton.onclick = function() {
+                $("#popupAuth").popup("close");
+                gAuth.load();
+            };
+        };
+        gDrive.onload = dwv.google.getAuthorizedCallback(callback);
+        // launch with silent auth
+        gAuth.loadSilent();
+    }
+    else {
+        // default
+        dwv.utils.base.decodeQuery(query, callback);
+    }
+};
+
 // Window
 dwv.gui.getWindowSize = function () {
     return { 'width': ($(window).width()), 'height': ($(window).height() - 147) };
@@ -57,39 +85,45 @@ dwv.gui.DicomTags = dwv.gui.base.DicomTags;
 dwv.gui.Loadbox = dwv.gui.base.Loadbox;
 // File loader
 dwv.gui.FileLoad = dwv.gui.base.FileLoad;
+dwv.gui.FileLoad.prototype.onchange = function (/*event*/) {
+    $("#popupOpen").popup("close");
+};
 // Url loader
-dwv.gui.UrlLoad =  dwv.gui.base.UrlLoad;
+dwv.gui.UrlLoad = dwv.gui.base.UrlLoad;
+dwv.gui.UrlLoad.prototype.onchange = function (/*event*/) {
+    $("#popupOpen").popup("close");
+};
 
-// Toolbox 
+// Toolbox
 dwv.gui.Toolbox = function (app)
 {
     var base = new dwv.gui.base.Toolbox(app);
-    
+
     this.setup = function (list)
     {
         base.setup(list);
-        
+
         // toolbar
-        var buttonClass = "ui-btn ui-btn-inline ui-btn-icon-notext ui-mini"; 
-        
+        var buttonClass = "ui-btn ui-btn-inline ui-btn-icon-notext ui-mini";
+
         var open = document.createElement("a");
         open.href = "#popupOpen";
         open.setAttribute("class", buttonClass + " ui-icon-plus");
         open.setAttribute("data-rel", "popup");
         open.setAttribute("data-position-to", "window");
-    
+
         var undo = document.createElement("a");
         undo.setAttribute("class", buttonClass + " ui-icon-back");
         undo.onclick = app.onUndo;
-    
+
         var redo = document.createElement("a");
         redo.setAttribute("class", buttonClass + " ui-icon-forward");
         redo.onclick = app.onRedo;
-    
+
         var toggleInfo = document.createElement("a");
         toggleInfo.setAttribute("class", buttonClass + " ui-icon-info");
         toggleInfo.onclick = app.onToggleInfoLayer;
-    
+
         var toggleSaveState = document.createElement("a");
         toggleSaveState.setAttribute("class", buttonClass + " download-state ui-icon-action");
         toggleSaveState.onclick = app.onStateSave;
@@ -98,7 +132,7 @@ dwv.gui.Toolbox = function (app)
         var tags = document.createElement("a");
         tags.href = "#tags_page";
         tags.setAttribute("class", buttonClass + " ui-icon-grid");
-    
+
         var node = app.getElement("toolbar");
         node.appendChild(open);
         node.appendChild(undo);
@@ -123,7 +157,7 @@ dwv.gui.WindowLevel = dwv.gui.base.WindowLevel;
 // Draw
 dwv.gui.Draw = dwv.gui.base.Draw;
 // Livewire
-dwv.gui.Livewire = dwv.gui.base.Livewire;  
+dwv.gui.Livewire = dwv.gui.base.Livewire;
 // ZoomAndPan
 dwv.gui.ZoomAndPan = dwv.gui.base.ZoomAndPan;
 // Scroll

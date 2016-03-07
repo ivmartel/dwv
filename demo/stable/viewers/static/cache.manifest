@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# v8 2015-11-20
+# v10 2016-03-07
 
 CACHE:
 
@@ -8,7 +8,7 @@ index.html
 # css
 /dwv/demo/stable/css/style.css
 # js
-/dwv/demo/stable/dwv-0.13.0.min.js
+/dwv/demo/stable/dwv-0.14.0.min.js
 applauncher.js
 appgui.js
 # images
@@ -19,9 +19,7 @@ appgui.js
 # third party
 
 # css
-/dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/jquery-ui-1.11.2.min.css
-/dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-bg_flat_30_cccccc_40x100.png
-/dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-bg_flat_50_5c5c5c_40x100.png
+/dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/jquery-ui-1.11.4.min.css
 /dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-bg_glass_20_555555_1x400.png
 /dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-bg_glass_40_0078a3_1x400.png
 /dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-bg_glass_40_ffc73d_1x400.png
@@ -29,14 +27,14 @@ appgui.js
 /dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-bg_highlight-soft_80_eeeeee_1x100.png
 /dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-bg_inset-soft_25_000000_1x100.png
 /dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-bg_inset-soft_30_f58400_1x100.png
-/dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-icons_4b8e0b_256x240.png
 /dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-icons_222222_256x240.png
+/dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-icons_4b8e0b_256x240.png
 /dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-icons_a83300_256x240.png
 /dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-icons_cccccc_256x240.png
 /dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-icons_ffffff_256x240.png
 # js
 /dwv/demo/stable/ext/jquery/jquery-2.1.4.min.js
-/dwv/demo/stable/ext/jquery-ui/jquery-ui-1.11.2.min.js
+/dwv/demo/stable/ext/jquery-ui/jquery-ui-1.11.4.min.js
 /dwv/demo/stable/ext/pdfjs/jpx.js
 /dwv/demo/stable/ext/pdfjs/arithmetic_decoder.js
 /dwv/demo/stable/ext/pdfjs/util.js

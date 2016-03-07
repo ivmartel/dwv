@@ -1,4 +1,4 @@
-/** 
+/**
  * Application launcher.
  */
 
@@ -14,8 +14,8 @@ $(document).ready( function()
     myapp.init({
         "containerDivId": "dwv",
         "fitToWindow": true,
-        "tools": ["Scroll", "Zoom/Pan", "Window/Level"],
         "gui": ["tool"],
+        "tools": ["Scroll", "Zoom/Pan", "Window/Level"],
         "isMobile": true
     });
     dwv.gui.appendResetHtml(myapp);

@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>dwv Source: src/math/scissors.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.yeti.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">dwv</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="dwv.html">dwv</a></li><li><a href="dwv.browser.html">dwv.browser</a></li><li><a href="dwv.dicom.html">dwv.dicom</a></li><li><a href="dwv.gui.html">dwv.gui</a></li><li><a href="dwv.gui.base.html">dwv.gui.base</a></li><li><a href="dwv.gui.filter.html">dwv.gui.filter</a></li><li><a href="dwv.gui.filter.base.html">dwv.gui.filter.base</a></li><li><a href="dwv.html.html">dwv.html</a></li><li><a href="dwv.image.html">dwv.image</a></li><li><a href="dwv.image.filter.html">dwv.image.filter</a></li><li><a href="dwv.image.lut.html">dwv.image.lut</a></li><li><a href="dwv.info.html">dwv.info</a></li><li><a href="dwv.io.html">dwv.io</a></li><li><a href="dwv.math.html">dwv.math</a></li><li><a href="dwv.tool.html">dwv.tool</a></li><li><a href="dwv.tool.filter.html">dwv.tool.filter</a></li><li><a href="dwv.utils.html">dwv.utils</a></li><li><a href="dwv.utils.base.html">dwv.utils.base</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="module-tests_dicom.html">tests/dicom</a></li><li><a href="module-tests_html.html">tests/html</a></li><li><a href="module-tests_image.html">tests/image</a></li><li><a href="module-tests_math.html">tests/math</a></li><li><a href="module-tests_utils.html">tests/utils</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="dwv.App.html">dwv.App</a></li><li><a href="dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li><li><a href="dwv.dicom.DataWriter.html">dwv.dicom.DataWriter</a></li><li><a href="dwv.dicom.DicomElementsWrapper.html">dwv.dicom.DicomElementsWrapper</a></li><li><a href="dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li><li><a href="dwv.dicom.DicomWriter.html">dwv.dicom.DicomWriter</a></li><li><a href="dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li><li><a href="dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li><li><a href="dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li><li><a href="dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li><li><a href="dwv.gui.base.Livewire.html">dwv.gui.base.Livewire</a></li><li><a href="dwv.gui.base.Loadbox.html">dwv.gui.base.Loadbox</a></li><li><a href="dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li><li><a href="dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li><li><a href="dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li><li><a href="dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li><li><a href="dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li><li><a href="dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li><li><a href="dwv.gui.base.Undo.html">dwv.gui.base.Undo</a></li><li><a href="dwv.gui.base.UrlLoad.html">dwv.gui.base.UrlLoad</a></li><li><a href="dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li><li><a href="dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li><li><a href="dwv.html.Layer.html">dwv.html.Layer</a></li><li><a href="dwv.html.Style.html">dwv.html.Style</a></li><li><a href="dwv.image.DicomBufferToView.html">dwv.image.DicomBufferToView</a></li><li><a href="dwv.image.filter.Sharpen.html">dwv.image.filter.Sharpen</a></li><li><a href="dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li><li><a href="dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li><li><a href="dwv.image.Geometry.html">dwv.image.Geometry</a></li><li><a href="dwv.image.Image.html">dwv.image.Image</a></li><li><a href="dwv.image.ImageFactory.html">dwv.image.ImageFactory</a></li><li><a href="dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li><li><a href="dwv.image.lut.Window.html">dwv.image.lut.Window</a></li><li><a href="dwv.image.RescaleSlopeAndIntercept.html">dwv.image.RescaleSlopeAndIntercept</a></li><li><a href="dwv.image.Size.html">dwv.image.Size</a></li><li><a href="dwv.image.Spacing.html">dwv.image.Spacing</a></li><li><a href="dwv.image.View.html">dwv.image.View</a></li><li><a href="dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li><li><a href="dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li><li><a href="dwv.info.Plot.html">dwv.info.Plot</a></li><li><a href="dwv.info.Position.html">dwv.info.Position</a></li><li><a href="dwv.info.Windowing.html">dwv.info.Windowing</a></li><li><a href="dwv.io.File.html">dwv.io.File</a></li><li><a href="dwv.io.Url.html">dwv.io.Url</a></li><li><a href="dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li><li><a href="dwv.math.Circle.html">dwv.math.Circle</a></li><li><a href="dwv.math.Ellipse.html">dwv.math.Ellipse</a></li><li><a href="dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li><li><a href="dwv.math.Index3D.html">dwv.math.Index3D</a></li><li><a href="dwv.math.Line.html">dwv.math.Line</a></li><li><a href="dwv.math.Path.html">dwv.math.Path</a></li><li><a href="dwv.math.Point2D.html">dwv.math.Point2D</a></li><li><a href="dwv.math.Point3D.html">dwv.math.Point3D</a></li><li><a href="dwv.math.Rectangle.html">dwv.math.Rectangle</a></li><li><a href="dwv.math.ROI.html">dwv.math.ROI</a></li><li><a href="dwv.math.Scissors.html">dwv.math.Scissors</a></li><li><a href="dwv.State.html">dwv.State</a></li><li><a href="dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li><li><a href="dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li><li><a href="dwv.tool.Draw.html">dwv.tool.Draw</a></li><li><a href="dwv.tool.DrawGroupCommand.html">dwv.tool.DrawGroupCommand</a></li><li><a href="dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li><li><a href="dwv.tool.Filter_.html">dwv.tool.Filter</a></li><li><a href="dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li><li><a href="dwv.tool.filter.Sobel.html">dwv.tool.filter.Sobel</a></li><li><a href="dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li><li><a href="dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li><li><a href="dwv.tool.Livewire.html">dwv.tool.Livewire</a></li><li><a href="dwv.tool.MoveGroupCommand.html">dwv.tool.MoveGroupCommand</a></li><li><a href="dwv.tool.ProtractorFactory.html">dwv.tool.ProtractorFactory</a></li><li><a href="dwv.tool.RectangleFactory.html">dwv.tool.RectangleFactory</a></li><li><a href="dwv.tool.RoiFactory.html">dwv.tool.RoiFactory</a></li><li><a href="dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li><li><a href="dwv.tool.Scroll.html">dwv.tool.Scroll</a></li><li><a href="dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li><li><a href="dwv.tool.Toolbox.html">dwv.tool.Toolbox</a></li><li><a href="dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li><li><a href="dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li><li><a href="dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li><li><a href="dwv.ToolboxController.html">dwv.ToolboxController</a></li><li><a href="dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li><li><a href="dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li><li><a href="dwv.utils.WorkerThread.html">dwv.utils.WorkerThread</a></li><li><a href="dwv.ViewController.html">dwv.ViewController</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+		<div class="col-sm-3 col-md-3">
+            <form class="navbar-form" role="search">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: src/math/scissors.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">// namespaces
+var dwv = dwv || {};
+dwv.math = dwv.math || {};
+
+// Pre-created to reduce allocation in inner loops
+var __twothirdpi = ( 2 / (3 * Math.PI) );
+
+/**
+ *
+ */
+dwv.math.computeGreyscale = function(data, width, height) {
+    // Returns 2D augmented array containing greyscale data
+    // Greyscale values found by averaging colour channels
+    // Input should be in a flat RGBA array, with values between 0 and 255
+    var greyscale = [];
+
+    // Compute actual values
+    for (var y = 0; y &lt; height; y++) {
+        greyscale[y] = [];
+
+        for (var x = 0; x &lt; width; x++) {
+            var p = (y*width + x)*4;
+            greyscale[y][x] = (data[p] + data[p+1] + data[p+2]) / (3*255);
+        }
+    }
+
+    // Augment with convenience functions
+    greyscale.dx = function(x,y) {
+        if ( x+1 === this[y].length ) {
+            // If we're at the end, back up one
+            x--;
+        }
+        return this[y][x+1] - this[y][x];
+    };
+
+    greyscale.dy = function(x,y) {
+        if ( y+1 === this.length ) {
+            // If we're at the end, back up one
+            y--;
+        }
+        return this[y][x] - this[y+1][x];
+    };
+
+    greyscale.gradMagnitude = function(x,y) {
+        var dx = this.dx(x,y);
+        var dy = this.dy(x,y);
+        return Math.sqrt(dx*dx + dy*dy);
+    };
+
+    greyscale.laplace = function(x,y) {
+        // Laplacian of Gaussian
+        var lap = -16 * this[y][x];
+        lap += this[y-2][x];
+        lap += this[y-1][x-1] + 2*this[y-1][x] + this[y-1][x+1];
+        lap += this[y][x-2]   + 2*this[y][x-1] + 2*this[y][x+1] + this[y][x+2];
+        lap += this[y+1][x-1] + 2*this[y+1][x] + this[y+1][x+1];
+        lap += this[y+2][x];
+
+        return lap;
+    };
+
+    return greyscale;
+};
+
+/**
+ *
+ */
+dwv.math.computeGradient = function(greyscale) {
+    // Returns a 2D array of gradient magnitude values for greyscale. The values
+    // are scaled between 0 and 1, and then flipped, so that it works as a cost
+    // function.
+    var gradient = [];
+
+    var max = 0; // Maximum gradient found, for scaling purposes
+
+    var x = 0;
+    var y = 0;
+
+    for (y = 0; y &lt; greyscale.length-1; y++) {
+        gradient[y] = [];
+
+        for (x = 0; x &lt; greyscale[y].length-1; x++) {
+            gradient[y][x] = greyscale.gradMagnitude(x,y);
+            max = Math.max(gradient[y][x], max);
+        }
+
+        gradient[y][greyscale[y].length-1] = gradient[y][greyscale.length-2];
+    }
+
+    gradient[greyscale.length-1] = [];
+    for (var i = 0; i &lt; gradient[0].length; i++) {
+        gradient[greyscale.length-1][i] = gradient[greyscale.length-2][i];
+    }
+
+    // Flip and scale.
+    for (y = 0; y &lt; gradient.length; y++) {
+        for (x = 0; x &lt; gradient[y].length; x++) {
+            gradient[y][x] = 1 - (gradient[y][x] / max);
+        }
+    }
+
+    return gradient;
+};
+
+/**
+ *
+ */
+dwv.math.computeLaplace = function(greyscale) {
+    // Returns a 2D array of Laplacian of Gaussian values
+    var laplace = [];
+
+    // Make the edges low cost here.
+
+    laplace[0] = [];
+    laplace[1] = [];
+    for (var i = 1; i &lt; greyscale.length; i++) {
+        // Pad top, since we can't compute Laplacian
+        laplace[0][i] = 1;
+        laplace[1][i] = 1;
+    }
+
+    for (var y = 2; y &lt; greyscale.length-2; y++) {
+        laplace[y] = [];
+        // Pad left, ditto
+        laplace[y][0] = 1;
+        laplace[y][1] = 1;
+
+        for (var x = 2; x &lt; greyscale[y].length-2; x++) {
+            // Threshold needed to get rid of clutter.
+            laplace[y][x] = (greyscale.laplace(x,y) > 0.33) ? 0 : 1;
+        }
+
+        // Pad right, ditto
+        laplace[y][greyscale[y].length-2] = 1;
+        laplace[y][greyscale[y].length-1] = 1;
+    }
+
+    laplace[greyscale.length-2] = [];
+    laplace[greyscale.length-1] = [];
+    for (var j = 1; j &lt; greyscale.length; j++) {
+        // Pad bottom, ditto
+        laplace[greyscale.length-2][j] = 1;
+        laplace[greyscale.length-1][j] = 1;
+    }
+
+    return laplace;
+};
+
+dwv.math.computeGradX = function(greyscale) {
+    // Returns 2D array of x-gradient values for greyscale
+    var gradX = [];
+
+    for ( var y = 0; y &lt; greyscale.length; y++ ) {
+        gradX[y] = [];
+
+        for ( var x = 0; x &lt; greyscale[y].length-1; x++ ) {
+            gradX[y][x] = greyscale.dx(x,y);
+        }
+
+        gradX[y][greyscale[y].length-1] = gradX[y][greyscale[y].length-2];
+    }
+
+    return gradX;
+};
+
+dwv.math.computeGradY = function(greyscale) {
+    // Returns 2D array of y-gradient values for greyscale
+    var gradY = [];
+
+    for (var y = 0; y &lt; greyscale.length-1; y++) {
+        gradY[y] = [];
+
+        for ( var x = 0; x &lt; greyscale[y].length; x++ ) {
+            gradY[y][x] = greyscale.dy(x,y);
+        }
+    }
+
+    gradY[greyscale.length-1] = [];
+    for ( var i = 0; i &lt; greyscale[0].length; i++ ) {
+        gradY[greyscale.length-1][i] = gradY[greyscale.length-2][i];
+    }
+
+    return gradY;
+};
+
+dwv.math.gradUnitVector = function(gradX, gradY, px, py, out) {
+    // Returns the gradient vector at (px,py), scaled to a magnitude of 1
+    var ox = gradX[py][px];
+    var oy = gradY[py][px];
+
+    var gvm = Math.sqrt(ox*ox + oy*oy);
+    gvm = Math.max(gvm, 1e-100); // To avoid possible divide-by-0 errors
+
+    out.x = ox / gvm;
+    out.y = oy / gvm;
+};
+
+dwv.math.gradDirection = function(gradX, gradY, px, py, qx, qy) {
+    var __dgpuv = new dwv.math.FastPoint2D(-1, -1);
+    var __gdquv = new dwv.math.FastPoint2D(-1, -1);
+    // Compute the gradiant direction, in radians, between to points
+    dwv.math.gradUnitVector(gradX, gradY, px, py, __dgpuv);
+    dwv.math.gradUnitVector(gradX, gradY, qx, qy, __gdquv);
+
+    var dp = __dgpuv.y * (qx - px) - __dgpuv.x * (qy - py);
+    var dq = __gdquv.y * (qx - px) - __gdquv.x * (qy - py);
+
+    // Make sure dp is positive, to keep things consistant
+    if (dp &lt; 0) {
+        dp = -dp;
+        dq = -dq;
+    }
+
+    if ( px !== qx &amp;&amp; py !== qy ) {
+        // We're going diagonally between pixels
+        dp *= Math.SQRT1_2;
+        dq *= Math.SQRT1_2;
+    }
+
+    return __twothirdpi * (Math.acos(dp) + Math.acos(dq));
+};
+
+dwv.math.computeSides = function(dist, gradX, gradY, greyscale) {
+    // Returns 2 2D arrays, containing inside and outside greyscale values.
+    // These greyscale values are the intensity just a little bit along the
+    // gradient vector, in either direction, from the supplied point. These
+    // values are used when using active-learning Intelligent Scissors
+
+    var sides = {};
+    sides.inside = [];
+    sides.outside = [];
+
+    var guv = new dwv.math.FastPoint2D(-1, -1); // Current gradient unit vector
+
+    for ( var y = 0; y &lt; gradX.length; y++ ) {
+        sides.inside[y] = [];
+        sides.outside[y] = [];
+
+        for ( var x = 0; x &lt; gradX[y].length; x++ ) {
+            dwv.math.gradUnitVector(gradX, gradY, x, y, guv);
+
+            //(x, y) rotated 90 = (y, -x)
+
+            var ix = Math.round(x + dist*guv.y);
+            var iy = Math.round(y - dist*guv.x);
+            var ox = Math.round(x - dist*guv.y);
+            var oy = Math.round(y + dist*guv.x);
+
+            ix = Math.max(Math.min(ix, gradX[y].length-1), 0);
+            ox = Math.max(Math.min(ox, gradX[y].length-1), 0);
+            iy = Math.max(Math.min(iy, gradX.length-1), 0);
+            oy = Math.max(Math.min(oy, gradX.length-1), 0);
+
+            sides.inside[y][x] = greyscale[iy][ix];
+            sides.outside[y][x] = greyscale[oy][ox];
+        }
+    }
+
+    return sides;
+};
+
+dwv.math.gaussianBlur = function(buffer, out) {
+    // Smooth values over to fill in gaps in the mapping
+    out[0] = 0.4*buffer[0] + 0.5*buffer[1] + 0.1*buffer[1];
+    out[1] = 0.25*buffer[0] + 0.4*buffer[1] + 0.25*buffer[2] + 0.1*buffer[3];
+
+    for ( var i = 2; i &lt; buffer.length-2; i++ ) {
+        out[i] = 0.05*buffer[i-2] + 0.25*buffer[i-1] + 0.4*buffer[i] + 0.25*buffer[i+1] + 0.05*buffer[i+2];
+    }
+
+    var len = buffer.length;
+    out[len-2] = 0.25*buffer[len-1] + 0.4*buffer[len-2] + 0.25*buffer[len-3] + 0.1*buffer[len-4];
+    out[len-1] = 0.4*buffer[len-1] + 0.5*buffer[len-2] + 0.1*buffer[len-3];
+};
+
+
+/**
+ * Scissors
+ *
+ * Ref: Eric N. Mortensen, William A. Barrett, Interactive Segmentation with
+ *   Intelligent Scissors, Graphical Models and Image Processing, Volume 60,
+ *   Issue 5, September 1998, Pages 349-384, ISSN 1077-3169,
+ *   DOI: 10.1006/gmip.1998.0480.
+ *
+ * {@link http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579}
+ *
+ * Highly inspired from {@link http://code.google.com/p/livewire-javascript/}
+ * @constructor
+ */
+dwv.math.Scissors = function()
+{
+    this.width = -1;
+    this.height = -1;
+
+    this.curPoint = null; // Corrent point we're searching on.
+    this.searchGranBits = 8; // Bits of resolution for BucketQueue.
+    this.searchGran = 1 &lt;&lt; this.earchGranBits; //bits.
+    this.pointsPerPost = 500;
+
+    // Precomputed image data. All in ranges 0 >= x >= 1 and all inverted (1 - x).
+    this.greyscale = null; // Greyscale of image
+    this.laplace = null; // Laplace zero-crossings (either 0 or 1).
+    this.gradient = null; // Gradient magnitudes.
+    this.gradX = null; // X-differences.
+    this.gradY = null; // Y-differences.
+
+    this.parents = null; // Matrix mapping point => parent along shortest-path to root.
+
+    this.working = false; // Currently computing shortest paths?
+
+    // Begin Training:
+    this.trained = false;
+    this.trainingPoints = null;
+
+    this.edgeWidth = 2;
+    this.trainingLength = 32;
+
+    this.edgeGran = 256;
+    this.edgeTraining = null;
+
+    this.gradPointsNeeded = 32;
+    this.gradGran = 1024;
+    this.gradTraining = null;
+
+    this.insideGran = 256;
+    this.insideTraining = null;
+
+    this.outsideGran = 256;
+    this.outsideTraining = null;
+    // End Training
+}; // Scissors class
+
+// Begin training methods //
+dwv.math.Scissors.prototype.getTrainingIdx = function(granularity, value) {
+    return Math.round((granularity - 1) * value);
+};
+
+dwv.math.Scissors.prototype.getTrainedEdge = function(edge) {
+    return this.edgeTraining[this.getTrainingIdx(this.edgeGran, edge)];
+};
+
+dwv.math.Scissors.prototype.getTrainedGrad = function(grad) {
+    return this.gradTraining[this.getTrainingIdx(this.gradGran, grad)];
+};
+
+dwv.math.Scissors.prototype.getTrainedInside = function(inside) {
+    return this.insideTraining[this.getTrainingIdx(this.insideGran, inside)];
+};
+
+dwv.math.Scissors.prototype.getTrainedOutside = function(outside) {
+    return this.outsideTraining[this.getTrainingIdx(this.outsideGran, outside)];
+};
+// End training methods //
+
+dwv.math.Scissors.prototype.setWorking = function(working) {
+    // Sets working flag
+    this.working = working;
+};
+
+dwv.math.Scissors.prototype.setDimensions = function(width, height) {
+    this.width = width;
+    this.height = height;
+};
+
+dwv.math.Scissors.prototype.setData = function(data) {
+    if ( this.width === -1 || this.height === -1 ) {
+        // The width and height should have already been set
+        throw new Error("Dimensions have not been set.");
+    }
+
+    this.greyscale = dwv.math.computeGreyscale(data, this.width, this.height);
+    this.laplace = dwv.math.computeLaplace(this.greyscale);
+    this.gradient = dwv.math.computeGradient(this.greyscale);
+    this.gradX = dwv.math.computeGradX(this.greyscale);
+    this.gradY = dwv.math.computeGradY(this.greyscale);
+
+    var sides = dwv.math.computeSides(this.edgeWidth, this.gradX, this.gradY, this.greyscale);
+    this.inside = sides.inside;
+    this.outside = sides.outside;
+    this.edgeTraining = [];
+    this.gradTraining = [];
+    this.insideTraining = [];
+    this.outsideTraining = [];
+};
+
+dwv.math.Scissors.prototype.findTrainingPoints = function(p) {
+    // Grab the last handful of points for training
+    var points = [];
+
+    if ( this.parents !== null ) {
+        for ( var i = 0; i &lt; this.trainingLength &amp;&amp; p; i++ ) {
+            points.push(p);
+            p = this.parents[p.y][p.x];
+        }
+    }
+
+    return points;
+};
+
+dwv.math.Scissors.prototype.resetTraining = function() {
+    this.trained = false; // Training is ignored with this flag set
+};
+
+dwv.math.Scissors.prototype.doTraining = function(p) {
+    // Compute training weights and measures
+    this.trainingPoints = this.findTrainingPoints(p);
+
+    if ( this.trainingPoints.length &lt; 8 ) {
+        return; // Not enough points, I think. It might crash if length = 0.
+    }
+
+    var buffer = [];
+    this.calculateTraining(buffer, this.edgeGran, this.greyscale, this.edgeTraining);
+    this.calculateTraining(buffer, this.gradGran, this.gradient, this.gradTraining);
+    this.calculateTraining(buffer, this.insideGran, this.inside, this.insideTraining);
+    this.calculateTraining(buffer, this.outsideGran, this.outside, this.outsideTraining);
+
+    if ( this.trainingPoints.length &lt; this.gradPointsNeeded ) {
+        // If we have two few training points, the gradient weight map might not
+        // be smooth enough, so average with normal weights.
+        this.addInStaticGrad(this.trainingPoints.length, this.gradPointsNeeded);
+    }
+
+    this.trained = true;
+};
+
+dwv.math.Scissors.prototype.calculateTraining = function(buffer, granularity, input, output) {
+    var i = 0;
+    // Build a map of raw-weights to trained-weights by favoring input values
+    buffer.length = granularity;
+    for ( i = 0; i &lt; granularity; i++ ) {
+        buffer[i] = 0;
+    }
+
+    var maxVal = 1;
+    for ( i = 0; i &lt; this.trainingPoints.length; i++ ) {
+        var p = this.trainingPoints[i];
+        var idx = this.getTrainingIdx(granularity, input[p.y][p.x]);
+        buffer[idx] += 1;
+
+        maxVal = Math.max(maxVal, buffer[idx]);
+    }
+
+    // Invert and scale.
+    for ( i = 0; i &lt; granularity; i++ ) {
+        buffer[i] = 1 - buffer[i] / maxVal;
+    }
+
+    // Blur it, as suggested. Gets rid of static.
+    dwv.math.gaussianBlur(buffer, output);
+};
+
+dwv.math.Scissors.prototype.addInStaticGrad = function(have, need) {
+    // Average gradient raw-weights to trained-weights map with standard weight
+    // map so that we don't end up with something to spiky
+    for ( var i = 0; i &lt; this.gradGran; i++ ) {
+        this.gradTraining[i] = Math.min(this.gradTraining[i],  1 - i*(need - have)/(need*this.gradGran));
+    }
+};
+
+dwv.math.Scissors.prototype.gradDirection = function(px, py, qx, qy) {
+    return dwv.math.gradDirection(this.gradX, this.gradY, px, py, qx, qy);
+};
+
+dwv.math.Scissors.prototype.dist = function(px, py, qx, qy) {
+    // The grand culmunation of most of the code: the weighted distance function
+    var grad =  this.gradient[qy][qx];
+
+    if ( px === qx || py === qy ) {
+        // The distance is Euclidean-ish; non-diagonal edges should be shorter
+        grad *= Math.SQRT1_2;
+    }
+
+    var lap = this.laplace[qy][qx];
+    var dir = this.gradDirection(px, py, qx, qy);
+
+    if ( this.trained ) {
+        // Apply training magic
+        var gradT = this.getTrainedGrad(grad);
+        var edgeT = this.getTrainedEdge(this.greyscale[py][px]);
+        var insideT = this.getTrainedInside(this.inside[py][px]);
+        var outsideT = this.getTrainedOutside(this.outside[py][px]);
+
+        return 0.3*gradT + 0.3*lap + 0.1*(dir + edgeT + insideT + outsideT);
+    } else {
+        // Normal weights
+        return 0.43*grad + 0.43*lap + 0.11*dir;
+    }
+};
+
+dwv.math.Scissors.prototype.adj = function(p) {
+    var list = [];
+
+    var sx = Math.max(p.x-1, 0);
+    var sy = Math.max(p.y-1, 0);
+    var ex = Math.min(p.x+1, this.greyscale[0].length-1);
+    var ey = Math.min(p.y+1, this.greyscale.length-1);
+
+    var idx = 0;
+    for ( var y = sy; y &lt;= ey; y++ ) {
+        for ( var x = sx; x &lt;= ex; x++ ) {
+            if ( x !== p.x || y !== p.y ) {
+                list[idx++] = new dwv.math.FastPoint2D(x,y);
+            }
+        }
+    }
+
+    return list;
+};
+
+dwv.math.Scissors.prototype.setPoint = function(sp) {
+    this.setWorking(true);
+
+    this.curPoint = sp;
+
+    var x = 0;
+    var y = 0;
+
+    this.visited = [];
+    for ( y = 0; y &lt; this.height; y++ ) {
+        this.visited[y] = [];
+        for ( x = 0; x &lt; this.width; x++ ) {
+            this.visited[y][x] = false;
+        }
+    }
+
+    this.parents = [];
+    for ( y = 0; y &lt; this.height; y++ ) {
+        this.parents[y] = [];
+    }
+
+    this.cost = [];
+    for ( y = 0; y &lt; this.height; y++ ) {
+        this.cost[y] = [];
+        for ( x = 0; x &lt; this.width; x++ ) {
+            this.cost[y][x] = Number.MAX_VALUE;
+        }
+    }
+
+    this.pq = new dwv.math.BucketQueue(this.searchGranBits, function(p) {
+        return Math.round(this.searchGran * this.costArr[p.y][p.x]);
+    });
+    this.pq.searchGran = this.searchGran;
+    this.pq.costArr = this.cost;
+
+    this.pq.push(sp);
+    this.cost[sp.y][sp.x] = 0;
+};
+
+dwv.math.Scissors.prototype.doWork = function() {
+    if ( !this.working ) {
+        return;
+    }
+
+    this.timeout = null;
+
+    var pointCount = 0;
+    var newPoints = [];
+    while ( !this.pq.isEmpty() &amp;&amp; pointCount &lt; this.pointsPerPost ) {
+        var p = this.pq.pop();
+        newPoints.push(p);
+        newPoints.push(this.parents[p.y][p.x]);
+
+        this.visited[p.y][p.x] = true;
+
+        var adjList = this.adj(p);
+        for ( var i = 0; i &lt; adjList.length; i++) {
+            var q = adjList[i];
+
+            var pqCost = this.cost[p.y][p.x] + this.dist(p.x, p.y, q.x, q.y);
+
+            if ( pqCost &lt; this.cost[q.y][q.x] ) {
+                if ( this.cost[q.y][q.x] !== Number.MAX_VALUE ) {
+                    // Already in PQ, must remove it so we can re-add it.
+                    this.pq.remove(q);
+                }
+
+                this.cost[q.y][q.x] = pqCost;
+                this.parents[q.y][q.x] = p;
+                this.pq.push(q);
+            }
+        }
+
+        pointCount++;
+    }
+
+    return newPoints;
+};
+</pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+<div class="modal fade" id="searchResults">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Search results</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+
+<footer>
+
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	
+		on Monday, March 7th 2016
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+<script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		SearcherDisplay.init();
+	});
+</script>
+
+</body>
+</html>

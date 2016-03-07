@@ -1,4 +1,4 @@
-/** 
+/**
  * Application GUI.
  */
 
@@ -23,6 +23,9 @@ dwv.tool.defaultpresets.CT = {
     "brain": {"center": 40, "width": 80},
     "head": {"center": 90, "width": 350}
 };
+
+//decode query
+dwv.utils.decodeQuery = dwv.utils.base.decodeQuery;
 
 // Window
 dwv.gui.getWindowSize = function () {
@@ -50,7 +53,7 @@ dwv.gui.Slider = function (app)
     {
         var min = app.getImage().getDataRange().min;
         var max = app.getImage().getDataRange().max;
-        
+
         // jquery-ui slider
         $( ".thresholdLi" ).slider({
             range: true,
@@ -67,7 +70,7 @@ dwv.gui.Slider = function (app)
 
 function toggle(dialogId)
 {
-    if( $(dialogId).dialog('isOpen') ) { 
+    if( $(dialogId).dialog('isOpen') ) {
         $(dialogId).dialog('close');
     }
     else {
@@ -84,44 +87,44 @@ dwv.gui.FileLoad = dwv.gui.base.FileLoad;
 // Url loader
 dwv.gui.UrlLoad =  dwv.gui.base.UrlLoad;
 
-// Toolbox 
+// Toolbox
 dwv.gui.Toolbox = function (app)
 {
     var base = new dwv.gui.base.Toolbox(app);
-    
+
     this.setup = function(list)
     {
         base.setup(list);
-        
+
         // toolbar
         var open = document.createElement("button");
         open.appendChild(document.createTextNode("File"));
         open.onclick = function() { toggle(".openData"); };
-        
+
         var toolbox = document.createElement("button");
         toolbox.appendChild(document.createTextNode("Toolbox"));
         toolbox.onclick = function() { toggle(".toolList"); };
-    
+
         var history = document.createElement("button");
         history.appendChild(document.createTextNode("History"));
         history.onclick = function() { toggle(".history"); };
-    
+
         var tags = document.createElement("button");
         tags.appendChild(document.createTextNode("Tags"));
         tags.onclick = function() { toggle(".tags"); };
-    
+
         var image = document.createElement("button");
         image.appendChild(document.createTextNode("Image"));
         image.onclick = function() { toggle(".layerDialog"); };
-    
+
         var info = document.createElement("button");
         info.appendChild(document.createTextNode("Info"));
         info.onclick = app.onToggleInfoLayer;
-    
+
         var help = document.createElement("button");
         help.appendChild(document.createTextNode("Help"));
         help.onclick = function() { toggle(".help"); };
-    
+
         var node = app.getElement("toolbar");
         node.appendChild(open);
         node.appendChild(toolbox);
@@ -130,10 +133,10 @@ dwv.gui.Toolbox = function (app)
         node.appendChild(image);
         node.appendChild(info);
         node.appendChild(help);
-        
+
         // apply button style
         $("button").button();
-        
+
         // save state button
         var saveButton = document.createElement("button");
         saveButton.appendChild(document.createTextNode("Download State"));
@@ -162,7 +165,7 @@ dwv.gui.WindowLevel = dwv.gui.base.WindowLevel;
 // Draw
 dwv.gui.Draw = dwv.gui.base.Draw;
 // Livewire
-dwv.gui.Livewire = dwv.gui.base.Livewire;  
+dwv.gui.Livewire = dwv.gui.base.Livewire;
 // ZoomAndPan
 dwv.gui.ZoomAndPan = dwv.gui.base.ZoomAndPan;
 // Scroll
@@ -186,36 +189,36 @@ dwv.gui.appendVersionHtml = dwv.gui.base.appendVersionHtml;
 
 // special setup
 dwv.gui.setup = function () {
-    $(".toggleInfoLayer").button({ icons: 
+    $(".toggleInfoLayer").button({ icons:
         { primary: "ui-icon-comment" }, text: false,
         appendTo: "#dwv"
     });
     // create dialogs
-    $(".openData").dialog({ position: 
+    $(".openData").dialog({ position:
         {my: "left top", at: "left top", of: "#pageMain"},
         appendTo: "#dwv"
     });
-    $(".toolList").dialog({ position: 
+    $(".toolList").dialog({ position:
         {my: "left top+160", at: "left top", of: "#pageMain"},
         appendTo: "#dwv"
     });
-    $(".history").dialog({ position: 
+    $(".history").dialog({ position:
         {my: "left top+350", at: "left top", of: "#pageMain"},
         appendTo: "#dwv"
     });
-    $(".tags").dialog({ position: 
+    $(".tags").dialog({ position:
         {my: "right top", at: "right top", of: "#pageMain"},
         autoOpen: false, width: 500, height: 590,
         appendTo: "#dwv"
     });
-    $(".help").dialog({ position: 
+    $(".help").dialog({ position:
         {my: "right top", at: "right top", of: "#pageMain"},
         autoOpen: false, width: 500, height: 590,
         appendTo: "#dwv"
     });
-    
+
     // image dialog
-    $(".layerDialog").dialog({ position: 
+    $(".layerDialog").dialog({ position:
         {my: "left+320 top", at: "left top", of: "#pageMain"},
         appendTo: "#dwv"
     });

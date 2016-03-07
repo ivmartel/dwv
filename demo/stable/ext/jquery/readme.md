@@ -7,7 +7,7 @@ Third Party: jquery
 * Download: from CDN
 * License: MIT (see http://jquery.org/license)
 * CDN: [jquery-2.1.4.min.js](http://code.jquery.com/jquery-2.1.4.min.js)
-* Description: jQuery is a fast and concise JavaScript Library that simplifies HTML 
+* Description: jQuery is a fast and concise JavaScript Library that simplifies HTML
   document traversing, event handling, animating, and Ajax interactions
   for rapid web development.
 * Purpose for dwv: Core of jqueryui and jquery.mobile user interface.

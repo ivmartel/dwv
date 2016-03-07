@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>dwv Source: src/gui/html.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.yeti.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">dwv</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="dwv.html">dwv</a></li><li><a href="dwv.browser.html">dwv.browser</a></li><li><a href="dwv.dicom.html">dwv.dicom</a></li><li><a href="dwv.gui.html">dwv.gui</a></li><li><a href="dwv.gui.base.html">dwv.gui.base</a></li><li><a href="dwv.gui.filter.html">dwv.gui.filter</a></li><li><a href="dwv.gui.filter.base.html">dwv.gui.filter.base</a></li><li><a href="dwv.html.html">dwv.html</a></li><li><a href="dwv.image.html">dwv.image</a></li><li><a href="dwv.image.filter.html">dwv.image.filter</a></li><li><a href="dwv.image.lut.html">dwv.image.lut</a></li><li><a href="dwv.info.html">dwv.info</a></li><li><a href="dwv.io.html">dwv.io</a></li><li><a href="dwv.math.html">dwv.math</a></li><li><a href="dwv.tool.html">dwv.tool</a></li><li><a href="dwv.tool.filter.html">dwv.tool.filter</a></li><li><a href="dwv.utils.html">dwv.utils</a></li><li><a href="dwv.utils.base.html">dwv.utils.base</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="module-tests_dicom.html">tests/dicom</a></li><li><a href="module-tests_html.html">tests/html</a></li><li><a href="module-tests_image.html">tests/image</a></li><li><a href="module-tests_math.html">tests/math</a></li><li><a href="module-tests_utils.html">tests/utils</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="dwv.App.html">dwv.App</a></li><li><a href="dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li><li><a href="dwv.dicom.DataWriter.html">dwv.dicom.DataWriter</a></li><li><a href="dwv.dicom.DicomElementsWrapper.html">dwv.dicom.DicomElementsWrapper</a></li><li><a href="dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li><li><a href="dwv.dicom.DicomWriter.html">dwv.dicom.DicomWriter</a></li><li><a href="dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li><li><a href="dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li><li><a href="dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li><li><a href="dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li><li><a href="dwv.gui.base.Livewire.html">dwv.gui.base.Livewire</a></li><li><a href="dwv.gui.base.Loadbox.html">dwv.gui.base.Loadbox</a></li><li><a href="dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li><li><a href="dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li><li><a href="dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li><li><a href="dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li><li><a href="dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li><li><a href="dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li><li><a href="dwv.gui.base.Undo.html">dwv.gui.base.Undo</a></li><li><a href="dwv.gui.base.UrlLoad.html">dwv.gui.base.UrlLoad</a></li><li><a href="dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li><li><a href="dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li><li><a href="dwv.html.Layer.html">dwv.html.Layer</a></li><li><a href="dwv.html.Style.html">dwv.html.Style</a></li><li><a href="dwv.image.DicomBufferToView.html">dwv.image.DicomBufferToView</a></li><li><a href="dwv.image.filter.Sharpen.html">dwv.image.filter.Sharpen</a></li><li><a href="dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li><li><a href="dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li><li><a href="dwv.image.Geometry.html">dwv.image.Geometry</a></li><li><a href="dwv.image.Image.html">dwv.image.Image</a></li><li><a href="dwv.image.ImageFactory.html">dwv.image.ImageFactory</a></li><li><a href="dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li><li><a href="dwv.image.lut.Window.html">dwv.image.lut.Window</a></li><li><a href="dwv.image.RescaleSlopeAndIntercept.html">dwv.image.RescaleSlopeAndIntercept</a></li><li><a href="dwv.image.Size.html">dwv.image.Size</a></li><li><a href="dwv.image.Spacing.html">dwv.image.Spacing</a></li><li><a href="dwv.image.View.html">dwv.image.View</a></li><li><a href="dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li><li><a href="dwv.info.MiniColourMap.html">dwv.info.MiniColourMap</a></li><li><a href="dwv.info.Plot.html">dwv.info.Plot</a></li><li><a href="dwv.info.Position.html">dwv.info.Position</a></li><li><a href="dwv.info.Windowing.html">dwv.info.Windowing</a></li><li><a href="dwv.io.File.html">dwv.io.File</a></li><li><a href="dwv.io.Url.html">dwv.io.Url</a></li><li><a href="dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li><li><a href="dwv.math.Circle.html">dwv.math.Circle</a></li><li><a href="dwv.math.Ellipse.html">dwv.math.Ellipse</a></li><li><a href="dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li><li><a href="dwv.math.Index3D.html">dwv.math.Index3D</a></li><li><a href="dwv.math.Line.html">dwv.math.Line</a></li><li><a href="dwv.math.Path.html">dwv.math.Path</a></li><li><a href="dwv.math.Point2D.html">dwv.math.Point2D</a></li><li><a href="dwv.math.Point3D.html">dwv.math.Point3D</a></li><li><a href="dwv.math.Rectangle.html">dwv.math.Rectangle</a></li><li><a href="dwv.math.ROI.html">dwv.math.ROI</a></li><li><a href="dwv.math.Scissors.html">dwv.math.Scissors</a></li><li><a href="dwv.State.html">dwv.State</a></li><li><a href="dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li><li><a href="dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li><li><a href="dwv.tool.Draw.html">dwv.tool.Draw</a></li><li><a href="dwv.tool.DrawGroupCommand.html">dwv.tool.DrawGroupCommand</a></li><li><a href="dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li><li><a href="dwv.tool.Filter_.html">dwv.tool.Filter</a></li><li><a href="dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li><li><a href="dwv.tool.filter.Sobel.html">dwv.tool.filter.Sobel</a></li><li><a href="dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li><li><a href="dwv.tool.LineFactory.html">dwv.tool.LineFactory</a></li><li><a href="dwv.tool.Livewire.html">dwv.tool.Livewire</a></li><li><a href="dwv.tool.MoveGroupCommand.html">dwv.tool.MoveGroupCommand</a></li><li><a href="dwv.tool.ProtractorFactory.html">dwv.tool.ProtractorFactory</a></li><li><a href="dwv.tool.RectangleFactory.html">dwv.tool.RectangleFactory</a></li><li><a href="dwv.tool.RoiFactory.html">dwv.tool.RoiFactory</a></li><li><a href="dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li><li><a href="dwv.tool.Scroll.html">dwv.tool.Scroll</a></li><li><a href="dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li><li><a href="dwv.tool.Toolbox.html">dwv.tool.Toolbox</a></li><li><a href="dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li><li><a href="dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li><li><a href="dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li><li><a href="dwv.ToolboxController.html">dwv.ToolboxController</a></li><li><a href="dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li><li><a href="dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li><li><a href="dwv.utils.WorkerThread.html">dwv.utils.WorkerThread</a></li><li><a href="dwv.ViewController.html">dwv.ViewController</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+		<div class="col-sm-3 col-md-3">
+            <form class="navbar-form" role="search">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: src/gui/html.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">// namespaces
+var dwv = dwv || {};
+/** @namespace */
+dwv.html = dwv.html || {};
+
+/**
+ * Append a cell to a given row.
+ * @param {Object} row The row to append the cell to.
+ * @param {Object} content The content of the cell.
+ */
+dwv.html.appendCell = function (row, content)
+{
+    var cell = row.insertCell(-1);
+    var str = content;
+    // special care for arrays
+    if ( content instanceof Array ||
+            content instanceof Uint8Array ||
+            content instanceof Uint16Array ||
+            content instanceof Uint32Array ) {
+        if ( content.length > 10 ) {
+            content = Array.prototype.slice.call( content, 0, 10 );
+            content[10] = "...";
+        }
+        str = Array.prototype.join.call( content, ', ' );
+    }
+    // append
+    cell.appendChild(document.createTextNode(str));
+};
+
+/**
+ * Append a header cell to a given row.
+ * @param {Object} row The row to append the header cell to.
+ * @param {String} text The text of the header cell.
+ */
+dwv.html.appendHCell = function (row, text)
+{
+    var cell = document.createElement("th");
+    // TODO jquery-mobile specific...
+    if ( text !== "Value" &amp;&amp; text !== "Name" ) {
+        cell.setAttribute("data-priority", "1");
+    }
+    cell.appendChild(document.createTextNode(text));
+    row.appendChild(cell);
+};
+
+/**
+ * Append a row to an array.
+ * @param {} table
+ * @param {} input
+ * @param {} level
+ * @param {} maxLevel
+ * @param {} rowHeader
+ */
+dwv.html.appendRowForArray = function (table, input, level, maxLevel, rowHeader)
+{
+    var row = null;
+    // loop through
+    for ( var i=0; i&lt;input.length; ++i ) {
+        var value = input[i];
+        // last level
+        if ( typeof value === 'number' ||
+                typeof value === 'string' ||
+                value === null ||
+                value === undefined ||
+                level >= maxLevel ) {
+            if ( !row ) {
+                row = table.insertRow(-1);
+            }
+            dwv.html.appendCell(row, value);
+        }
+        // more to come
+        else {
+            dwv.html.appendRow(table, value, level+i, maxLevel, rowHeader);
+        }
+    }
+};
+
+/**
+ * Append a row to an object.
+ * @param {} table
+ * @param {} input
+ * @param {} level
+ * @param {} maxLevel
+ * @param {} rowHeader
+ */
+dwv.html.appendRowForObject = function (table, input, level, maxLevel, rowHeader)
+{
+    var keys = Object.keys(input);
+    var row = null;
+    for ( var o=0; o&lt;keys.length; ++o ) {
+        var value = input[keys[o]];
+        // last level
+        if ( typeof value === 'number' ||
+                typeof value === 'string' ||
+                value === null ||
+                value === undefined ||
+                level >= maxLevel ) {
+            if ( !row ) {
+                row = table.insertRow(-1);
+            }
+            if ( o === 0 &amp;&amp; rowHeader) {
+                dwv.html.appendCell(row, rowHeader);
+            }
+            dwv.html.appendCell(row, value);
+        }
+        // more to come
+        else {
+            dwv.html.appendRow(table, value, level+o, maxLevel, keys[o]);
+        }
+    }
+    // header row
+    // warn: need to create the header after the rest
+    // otherwise the data will inserted in the thead...
+    if ( level === 2 ) {
+        var header = table.createTHead();
+        var th = header.insertRow(-1);
+        if ( rowHeader ) {
+            dwv.html.appendHCell(th, "Name");
+        }
+        for ( var k=0; k&lt;keys.length; ++k ) {
+            dwv.html.appendHCell(th, dwv.utils.capitaliseFirstLetter(keys[k]));
+        }
+    }
+};
+
+/**
+ * Append a row to an object or an array.
+ * @param {} table
+ * @param {} input
+ * @param {} level
+ * @param {} maxLevel
+ * @param {} rowHeader
+ */
+dwv.html.appendRow = function (table, input, level, maxLevel, rowHeader)
+{
+    // array
+    if ( input instanceof Array ) {
+        dwv.html.appendRowForArray(table, input, level+1, maxLevel, rowHeader);
+    }
+    // object
+    else if ( typeof input === 'object') {
+        dwv.html.appendRowForObject(table, input, level+1, maxLevel, rowHeader);
+    }
+    else {
+        throw new Error("Unsupported input data type.");
+    }
+};
+
+/**
+ * Converts the input to an HTML table.
+ * @input {Mixed} input Allowed types are: array, array of object, object.
+ * @return {Object} The created HTML table.
+ * @warning Null is interpreted differently in browsers, firefox will not display it.
+ */
+dwv.html.toTable = function (input)
+{
+    var table = document.createElement('table');
+    dwv.html.appendRow(table, input, 0, 2);
+    return table;
+};
+
+/**
+ * Get an HTML search form.
+ * @param {Object} htmlTableToSearch The table to do the search on.
+ * @return {Object} The HTML search form.
+ */
+dwv.html.getHtmlSearchForm = function (htmlTableToSearch)
+{
+    var form = document.createElement("form");
+    form.setAttribute("class", "filter");
+    var input = document.createElement("input");
+    input.onkeyup = function () {
+        dwv.html.filterTable(input, htmlTableToSearch);
+    };
+    form.appendChild(input);
+
+    return form;
+};
+
+/**
+ * Filter a table with a given parameter: sets the display css of rows to
+ * true or false if it contains the term.
+ * @param {String} term The term to filter the table with.
+ * @param {Object} table The table to filter.
+ */
+dwv.html.filterTable = function (term, table) {
+    // de-highlight
+    dwv.html.dehighlight(table);
+    // split search terms
+    var terms = term.value.toLowerCase().split(" ");
+
+    // search
+    var text = 0;
+    var display = 0;
+    for (var r = 1; r &lt; table.rows.length; ++r) {
+        display = '';
+        for (var i = 0; i &lt; terms.length; ++i) {
+            text = table.rows[r].innerHTML.replace(/&lt;[^>]+>/g, "").toLowerCase();
+            if (text.indexOf(terms[i]) &lt; 0) {
+                display = 'none';
+            } else {
+                if (terms[i].length) {
+                    dwv.html.highlight(terms[i], table.rows[r]);
+                }
+            }
+            table.rows[r].style.display = display;
+        }
+    }
+};
+
+/**
+ * Transform back each
+ * 'preText &lt;span class="highlighted">term&lt;/span> postText'
+ * into its original 'preText term postText'.
+ * @param {Object} container The container to de-highlight.
+ */
+dwv.html.dehighlight = function (container) {
+    for (var i = 0; i &lt; container.childNodes.length; i++) {
+        var node = container.childNodes[i];
+
+        if (node.attributes &amp;&amp;
+                node.attributes['class'] &amp;&amp;
+                node.attributes['class'].value === 'highlighted') {
+            node.parentNode.parentNode.replaceChild(
+                    document.createTextNode(
+                        node.parentNode.innerHTML.replace(/&lt;[^>]+>/g, "")),
+                    node.parentNode);
+            // Stop here and process next parent
+            return;
+        } else if (node.nodeType !== 3) {
+            // Keep going onto other elements
+            dwv.html.dehighlight(node);
+        }
+    }
+};
+
+/**
+ * Create a
+ * 'preText &lt;span class="highlighted">term&lt;/span> postText'
+ * around each search term.
+ * @param {String} term The term to highlight.
+ * @param {Object} container The container where to highlight the term.
+ */
+dwv.html.highlight = function (term, container) {
+    for (var i = 0; i &lt; container.childNodes.length; i++) {
+        var node = container.childNodes[i];
+
+        if (node.nodeType === 3) {
+            // Text node
+            var data = node.data;
+            var data_low = data.toLowerCase();
+            if (data_low.indexOf(term) >= 0) {
+                //term found!
+                var new_node = document.createElement('span');
+                node.parentNode.replaceChild(new_node, node);
+
+                var result;
+                while ((result = data_low.indexOf(term)) !== -1) {
+                    // before term
+                    new_node.appendChild(document.createTextNode(
+                                data.substr(0, result)));
+                    // term
+                    new_node.appendChild(dwv.html.createHighlightNode(
+                                document.createTextNode(data.substr(
+                                        result, term.length))));
+                    // reduce search string
+                    data = data.substr(result + term.length);
+                    data_low = data_low.substr(result + term.length);
+                }
+                new_node.appendChild(document.createTextNode(data));
+            }
+        } else {
+            // Keep going onto other elements
+            dwv.html.highlight(term, node);
+        }
+    }
+};
+
+/**
+ * Highlight a HTML node.
+ * @param {Object} child The child to highlight.
+ * @return {Object} The created HTML node.
+ */
+dwv.html.createHighlightNode = function (child) {
+    var node = document.createElement('span');
+    node.setAttribute('class', 'highlighted');
+    node.attributes['class'].value = 'highlighted';
+    node.appendChild(child);
+    return node;
+};
+
+/**
+ * Remove all children of a HTML node.
+ * @param {Object} node The node to remove kids.
+ */
+dwv.html.cleanNode = function (node) {
+    // remove its children
+    while (node.hasChildNodes()) {
+        node.removeChild(node.firstChild);
+    }
+};
+
+/**
+ * Remove a HTML node and all its children.
+ * @param {String} nodeId The string id of the node to delete.
+ */
+dwv.html.removeNode = function (node) {
+    // check node
+    if ( !node ) {
+        return;
+    }
+    // remove its children
+    dwv.html.cleanNode(node);
+    // remove it from its parent
+    var top = node.parentNode;
+    top.removeChild(node);
+};
+
+dwv.html.removeNodes = function (nodes) {
+    for ( var i = 0; i &lt; nodes.length; ++i ) {
+        dwv.html.removeNode(nodes[i]);
+    }
+};
+
+/**
+ * Create a HTML select from an input array of options.
+ * The values of the options are the name of the option made lower case.
+ * It is left to the user to set the 'onchange' method of the select.
+ * @param {String} name The name of the HTML select.
+ * @param {Mixed} list The list of options of the HTML select.
+ * @return {Object} The created HTML select.
+ */
+dwv.html.createHtmlSelect = function (name, list) {
+    // select
+    var select = document.createElement("select");
+    //select.name = name;
+    select.className = name;
+    // options
+    var option;
+    if ( list instanceof Array )
+    {
+        for ( var i in list )
+        {
+            option = document.createElement("option");
+            option.value = list[i];
+            option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(list[i])));
+            select.appendChild(option);
+        }
+    }
+    else if ( typeof list === 'object')
+    {
+        for ( var item in list )
+        {
+            option = document.createElement("option");
+            option.value = item;
+            option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(item)));
+            select.appendChild(option);
+        }
+    }
+    else
+    {
+        throw new Error("Unsupported input list type.");
+    }
+    return select;
+};
+
+/**
+ * Display or not an element.
+ * @param {Object} element The HTML element to display.
+ * @param {Boolean} flag True to display the element.
+ */
+dwv.html.displayElement = function (element, flag)
+{
+    element.style.display = flag ? "" : "none";
+};
+
+/**
+ * Toggle the display of an element.
+ * @param {Object} element The HTML element to display.
+ */
+dwv.html.toggleDisplay = function (element)
+{
+    if ( element.style.display === "none" ) {
+        element.style.display = '';
+    }
+    else {
+        element.style.display = "none";
+    }
+};
+
+/**
+ * Append an element.
+ * @param {Object} parent The HTML element to append to.
+ * @param {Object} element The HTML element to append.
+ */
+dwv.html.appendElement = function (parent, element)
+{
+    // append
+    parent.appendChild(element);
+    // refresh
+    dwv.gui.refreshElement(parent);
+};
+
+/**
+ * Create an element.
+ * @param {String} type The type of the elemnt.
+ * @param {String} className The className of the element.
+ */
+dwv.html.createHiddenElement = function (type, className)
+{
+    var element = document.createElement(type);
+    element.className = className;
+    // hide by default
+    element.style.display = "none";
+    // return
+    return element;
+};
+</pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+<div class="modal fade" id="searchResults">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Search results</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+
+<footer>
+
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	
+		on Monday, March 7th 2016
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+<script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		SearcherDisplay.init();
+	});
+</script>
+
+</body>
+</html>
