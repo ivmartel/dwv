@@ -2,7 +2,7 @@
   "name": "dwv",
   "short_name": "dwv",
   "description": "DICOM Web Viewer.",
-  "version": "0.14.0-beta",
+  "version": "0.14.0",
   "manifest_version": 2,
   "app": {
     "urls": [

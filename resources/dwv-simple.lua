@@ -95,7 +95,7 @@ print([[
 <script type="text/javascript" src="/dwv/ext/notmasteryet/jpg.js"></script>
 
 <!-- Local -->
-<script type="text/javascript" src="/dwv/dwv-0.14.0-beta.0.min.js"></script>
+<script type="text/javascript" src="/dwv/dwv-0.14.0.min.js"></script>
 <!-- Launch the app -->
 <script type="text/javascript" src="/dwv/viewers/simple/appgui.js"></script>
 ]])

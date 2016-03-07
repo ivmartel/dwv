@@ -1,8 +1,8 @@
 {
   "name": "dwv",
-  "version": "0.14.0-beta",
+  "version": "0.14.0",
   "homepage": "http://ivmartel.github.io/dwv/",
-  "description": "Dicom Web Viewer.",
+  "description": "DICOM Web Viewer.",
   "license": "GPL-3.0",
   "repository": {
     "type": "git",
