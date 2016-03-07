@@ -860,7 +860,16 @@ dwv.App = function ()
      */
     this.onChangeLoader = function (/*event*/)
     {
+        // called from an HTML select, use its value
         loadbox.displayLoader( this.value );
+    };
+
+    /**
+     * Reset the load box to its original state.
+     */
+    this.resetLoadbox = function ()
+    {
+        loadbox.reset();
     };
 
     /**
@@ -912,6 +921,7 @@ dwv.App = function ()
      */
     this.onChangeColourMap = function (/*event*/)
     {
+        // called from an HTML select, use its value
         viewController.setColourMapFromName(this.value);
     };
 
@@ -938,6 +948,7 @@ dwv.App = function ()
      */
     this.onChangeTool = function (/*event*/)
     {
+        // called from an HTML select, use its value
         toolboxController.setSelectedTool(this.value);
     };
 
@@ -947,6 +958,7 @@ dwv.App = function ()
      */
     this.onChangeShape = function (/*event*/)
     {
+        // called from an HTML select, use its value
         toolboxController.setSelectedShape(this.value);
     };
 
@@ -956,6 +968,7 @@ dwv.App = function ()
      */
     this.onChangeFilter = function (/*event*/)
     {
+        // called from an HTML select, use its value
         toolboxController.setSelectedFilter(this.value);
     };
 
@@ -974,6 +987,7 @@ dwv.App = function ()
      */
     this.onChangeLineColour = function (/*event*/)
     {
+        // called from an HTML select, use its value
         toolboxController.setLineColour(this.value);
     };
 
@@ -9016,12 +9030,18 @@ dwv.gui.base = dwv.gui.base || {};
 dwv.gui.base.Loadbox = function (app, loaders)
 {
     /**
+     * Loader HTML select.
+     * @private
+     */
+    var loaderSelector = null;
+    
+    /**
      * Setup the loadbox HTML.
      */
     this.setup = function ()
     {
         // loader select
-        var loaderSelector = dwv.html.createHtmlSelect("loaderSelect", loaders);
+        loaderSelector = dwv.html.createHtmlSelect("loaderSelect", loaders);
         loaderSelector.onchange = app.onChangeLoader;
 
         // node
@@ -9050,6 +9070,20 @@ dwv.gui.base.Loadbox = function (app, loaders)
             else {
                 loaders[keys[i]].display(false);
             }
+        }
+    };
+    
+    /**
+     * Reset to its original state.
+     */
+    this.reset = function () 
+    {
+        // display first loader
+        var keys = Object.keys(loaders);
+        this.displayLoader(keys[0]);
+        // reset HTML select
+        if (loaderSelector) {
+            loaderSelector.selectedIndex = 0;
         }
     };
 
