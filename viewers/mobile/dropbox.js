@@ -48,6 +48,7 @@ dwv.gui.DropboxLoad = function (app)
         if (bool) {
             // jquery mobile dependent
             $("#popupOpen").popup("close");
+            app.resetLoadbox();
 
             var options = {
                 // Required. Called when a user selects an item in the Chooser.

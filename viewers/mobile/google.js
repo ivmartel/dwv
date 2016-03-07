@@ -314,6 +314,7 @@ dwv.gui.GoogleDriveLoad = function (app)
         if (bool) {
             // jquery mobile dependent
             $("#popupOpen").popup("close");
+            app.resetLoadbox();
             
             var gAuth = new dwv.google.Auth();
             var gPicker = new dwv.google.Picker();
