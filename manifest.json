@@ -6,10 +6,10 @@
   "manifest_version": 2,
   "app": {
     "urls": [
-      "http://ivmartel.github.io/dwv/demo/stable/"
+      "https://ivmartel.github.io/dwv/demo/stable/"
     ],
     "launch": {
-      "web_url": "http://ivmartel.github.io/dwv/demo/stable/viewers/mobile/index.html"
+      "web_url": "https://ivmartel.github.io/dwv/demo/stable/viewers/mobile/index.html"
     }
   },
   "icons": {
@@ -23,7 +23,7 @@
     "http://drive.google.com/intents/opendrivedoc": [
       {
         "type": ["application/dicom", "application/vnd.google.drive.ext-type.dcm"],
-        "href": "http://ivmartel.github.io/dwv/demo/stable/viewers/mobile/index.html",
+        "href": "https://ivmartel.github.io/dwv/demo/stable/viewers/mobile/index.html",
         "title": "Open",
         "disposition": "window"
       }

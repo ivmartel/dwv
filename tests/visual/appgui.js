@@ -1,5 +1,10 @@
 /** 
  * Application GUI.
+ * 
+ * Snapshots were created using synedra View Personal (http://www.synedra.com),
+ *  version 14 for Microsoft Windows:
+ * - Right click on the thumbnail in the left 'Document tree area',
+ * - Choose 'Convert to JPEG'.
  */
 
 // Default window level presets.
@@ -37,7 +42,7 @@ dwv.addDataLine = function (id, fileroot, doc)
         "skipLoadUrl": true,
         "useWebWorkers": true
     };
-    var url = fileroot + ".dcm";
+    var url = "../data/" + fileroot + ".dcm";
     var app = new dwv.App();
     app.init(config);
     app.loadURLs([url]);
@@ -58,7 +63,7 @@ dwv.addDataLine = function (id, fileroot, doc)
 
     // image
     var image = document.createElement("img");
-    image.src = fileroot + ".jpg";
+    image.src = "./images/" + fileroot + ".jpg";
     image.setAttribute("class", "snapshot");
     mainDiv.appendChild(image);
 
