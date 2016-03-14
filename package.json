@@ -26,6 +26,9 @@
     "grunt-contrib-concat": "~1.0",
     "grunt-contrib-uglify": "~1.0",
     "grunt-jsdoc": "~1.1",
-    "ink-docstrap": "~1.1"
+    "ink-docstrap": "~1.1",
+    "grunt-execute": "^0.2",
+    "selenium-webdriver": "^2.52",
+    "saucelabs": "^1.2"
   }
 }
