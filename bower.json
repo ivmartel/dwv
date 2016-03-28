@@ -1,0 +1,22 @@
+{
+    "name": "dwv",
+    "version": "0.14.0",
+    "homepage": "https://ivmartel.github.io/dwv/",
+    "authors" : [
+    	"Yves Martelli"
+    ],
+    "description": "DICOM Web Viewer",
+    "keywords": [
+    	"DICOM", 
+    	"medical", 
+    	"imaging"
+    ],
+	"license": "GNU General Public License v3.0",
+    "ignore": [
+        "**/.*",
+        "tests",
+        "Gruntfile.js",
+        "package.json",
+        "bower.json"
+    ]
+}
