@@ -18,7 +18,7 @@
     "kinetic": "~5"
   },
   "devDependencies": {
-    "grunt": "~1.0",
+    "grunt": "~0.4",
     "grunt-cli": "~1.2",
     "grunt-contrib-jshint": "~1.0",
     "grunt-qunit-istanbul": "~0.6",
