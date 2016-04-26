@@ -711,13 +711,14 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         });
         shape.on('dblclick', function () {
 
-            var group = this.getParent();
-            var labelText = prompt("Add label");
+            var group = this.getParent(),
+                labelText = prompt("Add label"),
+                klabel;
             // if user introduce a text, create or update label
             if(labelText && labelText.length){
                 klabel = group.getChildren(function(node){
                     return node.getClassName() === 'Label';
-                })
+                });
                 // update label
                 if (klabel.length){
                     console.warn(klabel.getText());
@@ -725,27 +726,40 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 }
                 // create label
                 else{
-                    var style = app.getStyle();
-                    var lpos = group.getChildren(function(node){
-                        return node.getClassName() === 'Text';
-                    })[0].getPosition();
+                    var labelStyle = app.getStyle(),
+                        labelPos,
+                        labelDraw;
+                    try{
+                        // For all drawings
+                        labelDraw = group.getChildren(function(node){
+                            return node.getClassName() === 'Text';
+                        });
+                    }
+                    catch(e){
+                        // for Livewire
+                        labelDraw = group.getChildren(function(node){
+                            return node.getClassName() === 'Circle';
+                        });
+                    }
+                    finally{
+                        labelPos = labelDraw[0].getPosition();
+                    }
 
-                    var klabel = new Kinetic.Label({
-                        x: lpos.x,
-                        y: lpos.y + style.getFontSize() * 1.1,
+                    klabel = new Kinetic.Label({
+                        x: labelPos.x,
+                        y: labelPos.y + labelStyle.getFontSize() * 1.1,
                         draggable: true
                     });
 
                     klabel.add(new Kinetic.Tag({
                         fill: 'rgba(0,0,0,.25)',
-                        stroke: style.getLineColour()
+                        stroke: labelStyle.getLineColour()
                     }));
 
-                    var style = app.getStyle();
                     klabel.add(new Kinetic.Text({
                         text: labelText,
-                        fontSize: style.getFontSize(),
-                        fill: style.getLineColour(),
+                        fontSize: labelStyle.getFontSize(),
+                        fill: labelStyle.getLineColour(),
                         padding: 5
                     }));
                 }
@@ -753,7 +767,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             }
             // else remove label
             else{
-                var klabel = group.getChildren(function(node){
+                klabel = group.getChildren(function(node){
                     return node.getClassName() === 'Label';
                 });
                 klabel.remove();
