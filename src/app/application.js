@@ -850,19 +850,33 @@ dwv.App = function ()
      * Handle key down event.
      * - CRTL-Z: undo
      * - CRTL-Y: redo
+     * - arrow-up: next slide
+     * - arrow-down: prev slide
      * Default behavior. Usually used in tools.
      * @method onKeydown
      * @param {Object} event The key down event.
      */
     this.onKeydown = function (event)
     {
-        if ( event.keyCode === 90 && event.ctrlKey ) // ctrl-z
-        {
-            undoStack.undo();
-        }
-        else if ( event.keyCode === 89 && event.ctrlKey ) // ctrl-y
-        {
-            undoStack.redo();
+        if (event.ctrlKey){             // true if ctrlKey is pressed
+            if ( event.keyCode === 90 ) // ctrl + z
+            {
+                return undoStack.undo();
+            }
+            if ( event.keyCode === 89 ) // ctrl + y
+            {
+                return undoStack.redo();
+            }
+            if ( event.keyCode === 38 ) // ctrl + arrow-up
+            {
+                event.preventDefault();
+                return self.getViewController().incrementSliceNb();
+            }
+            if ( event.keyCode === 40 ) // ctrl + arrow-down
+            {
+                event.preventDefault();
+                return self.getViewController().decrementSliceNb();
+            }
         }
     };
 
