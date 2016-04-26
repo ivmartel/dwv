@@ -239,6 +239,8 @@ dwv.App = function ()
                     break;
                 case "Livewire":
                     toolList.Livewire = new dwv.tool.Livewire(this);
+                    toolList.Livewire.addEventListener("livewire-start", fireEvent);
+                    toolList.Livewire.addEventListener("livewire-end", fireEvent);
                     break;
                 case "Filter":
                     if ( config.filters.length !== 0 ) {
