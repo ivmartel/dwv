@@ -1,12 +1,10 @@
-// Main DWV namespace.
+/** @namespace */
 var dwv = dwv || {};
-
+// external
 var Kinetic = Kinetic || {};
 
 /**
  * Main application class.
- * @class App
- * @namespace dwv
  * @constructor
  */
 dwv.App = function ()
@@ -26,6 +24,9 @@ dwv.App = function ()
     var dataHeight = 0;
     // Number of slices to load
     var nSlicesToLoad = 0;
+    
+    // Data decoders scripts
+    var decoderScripts = null;
 
     // Container div id
     var containerDivId = null;
@@ -84,20 +85,17 @@ dwv.App = function ()
 
     /**
      * Get the version of the application.
-     * @method getVersion
      * @return {String} The version of the application.
      */
-    this.getVersion = function () { return "v0.13.0"; };
+    this.getVersion = function () { return "v0.15.0-beta"; };
 
     /**
      * Get the image.
-     * @method getImage
      * @return {Image} The associated image.
      */
     this.getImage = function () { return image; };
     /**
      * Set the view.
-     * @method setImage
      * @param {Image} img The associated image.
      */
     this.setImage = function (img)
@@ -107,7 +105,6 @@ dwv.App = function ()
     };
     /**
      * Restore the original image.
-     * @method restoreOriginalImage
      */
     this.restoreOriginalImage = function ()
     {
@@ -116,54 +113,46 @@ dwv.App = function ()
     };
     /**
      * Get the image data array.
-     * @method getImageData
      * @return {Array} The image data array.
      */
     this.getImageData = function () { return imageData; };
     /**
      * Get the number of slices to load.
-     * @method getNSlicesToLoad
      * @return {Number} The number of slices to load.
      */
     this.getNSlicesToLoad = function () { return nSlicesToLoad; };
 
     /**
      * Get the main scale.
-     * @method getScale
      * @return {Number} The main scale.
      */
     this.getScale = function () { return scale / windowScale; };
 
     /**
      * Get the scale center.
-     * @method getScaleCenter
      * @return {Object} The coordinates of the scale center.
      */
     this.getScaleCenter = function () { return scaleCenter; };
 
     /**
      * Get the translation.
-     * @method getTranslation
      * @return {Object} The translation.
      */
     this.getTranslation = function () { return translation; };
 
     /**
      * Get the view controller.
-     * @method getViewController
      * @return {Object} The controller.
      */
     this.getViewController = function () { return viewController; };
 
     /**
      * Get the image layer.
-     * @method getImageLayer
      * @return {Object} The image layer.
      */
     this.getImageLayer = function () { return imageLayer; };
     /**
      * Get the draw layer.
-     * @method getDrawLayer
      * @return {Object} The draw layer.
      */
     this.getDrawLayer = function (k) {
@@ -176,34 +165,29 @@ dwv.App = function ()
     };
     /**
      * Get the draw stage.
-     * @method getDrawStage
      * @return {Object} The draw layer.
      */
     this.getDrawStage = function () { return drawStage; };
 
     /**
      * Get the app style.
-     * @method getStyle
      * @return {Object} The app style.
      */
     this.getStyle = function () { return style; };
 
     /**
      * Get the toolbox.
-     * @method getToolbox
      * @return {Object} The associated toolbox.
      */
     this.getToolbox = function () { return toolbox; };
     /**
      * Get the toolbox controller.
-     * @method getToolboxController
      * @return {Object} The controller.
      */
     this.getToolboxController = function () { return toolboxController; };
 
     /**
      * Add a command to the undo stack.
-     * @method addToUndoStack
      * @param {Object} The command to add.
      */
     this.addToUndoStack = function (cmd) { 
@@ -213,21 +197,7 @@ dwv.App = function ()
     };
 
     /**
-     * Get the data loaders.
-     * @method getLoaders
-     * @return {Object} The loaders.
-     */
-    this.getLoaders = function ()
-    {
-        return {
-            'file': dwv.io.File,
-            'url': dwv.io.Url
-        };
-    };
-
-    /**
      * Initialise the HTML for the application.
-     * @method init
      */
     this.init = function ( config ) {
         containerDivId = config.containerDivId;
@@ -251,22 +221,13 @@ dwv.App = function ()
                         // setup the shape list
                         var shapeList = {};
                         for ( var s = 0; s < config.shapes.length; ++s ) {
-                            switch( config.shapes[s] ) {
-                            case "Line":
-                                shapeList.Line = dwv.tool.LineFactory;
-                                break;
-                            case "Protractor":
-                                shapeList.Protractor = dwv.tool.ProtractorFactory;
-                                break;
-                            case "Rectangle":
-                                shapeList.Rectangle = dwv.tool.RectangleFactory;
-                                break;
-                            case "Roi":
-                                shapeList.Roi = dwv.tool.RoiFactory;
-                                break;
-                            case "Ellipse":
-                                shapeList.Ellipse = dwv.tool.EllipseFactory;
-                                break;
+                            var shapeName = config.shapes[s];
+                            var shapeFactoryClass = shapeName+"Factory";
+                            if (typeof dwv.tool[shapeFactoryClass] !== "undefined") {
+                                shapeList[shapeName] = dwv.tool[shapeFactoryClass];
+                            }
+                            else {
+                                console.warn("Could not initialise unknown shape: "+shapeName);
                             }
                         }
                         toolList.Draw = new dwv.tool.Draw(this, shapeList);
@@ -284,16 +245,12 @@ dwv.App = function ()
                         // setup the filter list
                         var filterList = {};
                         for ( var f = 0; f < config.filters.length; ++f ) {
-                            switch( config.filters[f] ) {
-                            case "Threshold":
-                                filterList.Threshold = new dwv.tool.filter.Threshold(this);
-                                break;
-                            case "Sharpen":
-                                filterList.Sharpen = new dwv.tool.filter.Sharpen(this);
-                                break;
-                            case "Sobel":
-                                filterList.Sobel = new dwv.tool.filter.Sobel(this);
-                                break;
+                            var filterName = config.filters[f];
+                            if (typeof dwv.tool.filter[filterName] !== "undefined") {
+                                filterList[filterName] = new dwv.tool.filter[filterName](this);
+                            }
+                            else {
+                                console.warn("Could not initialise unknown filter: "+filterName);
                             }
                         }
                         toolList.Filter = new dwv.tool.Filter(filterList, this);
@@ -314,15 +271,24 @@ dwv.App = function ()
             }
             // load
             if ( config.gui.indexOf("load") !== -1 ) {
-                var fileLoadGui = new dwv.gui.FileLoad(this);
-                var urlLoadGui = new dwv.gui.UrlLoad(this);
-                loadbox = new dwv.gui.Loadbox(this,
-                    {"file": fileLoadGui, "url": urlLoadGui} );
+                var loaderList = {};
+                for ( var l = 0; l < config.loaders.length; ++l ) {
+                    var loaderName = config.loaders[l];
+                    var loaderClass = loaderName + "Load";
+                    if (typeof dwv.gui[loaderClass] !== "undefined") {
+                        loaderList[loaderName] = new dwv.gui[loaderClass](this);
+                    }
+                    else {
+                        console.warn("Could not initialise unknown loader: "+loaderName);
+                    }
+                }
+                loadbox = new dwv.gui.Loadbox(this, loaderList);
                 loadbox.setup();
-                fileLoadGui.setup();
-                urlLoadGui.setup();
-                fileLoadGui.display(true);
-                urlLoadGui.display(false);
+                var loaderKeys = Object.keys(loaderList);
+                for ( var lk = 0; lk < loaderKeys.length; ++lk ) {
+                    loaderList[loaderKeys[lk]].setup();
+                }
+                loadbox.displayLoader(loaderKeys[0]);
             }
             // undo
             if ( config.gui.indexOf("undo") !== -1 ) {
@@ -358,47 +324,45 @@ dwv.App = function ()
             var dropBoxSize = 2 * size.height / 3;
             box.setAttribute("style","width:"+dropBoxSize+"px;height:"+dropBoxSize+"px");
         }
+        
         // possible load from URL
         if ( typeof config.skipLoadUrl === "undefined" ) {
-            var query = dwv.html.getUriParam(window.location.href);
+            var query = dwv.utils.getUriQuery(window.location.href);
             // check query
             if ( query && typeof query.input !== "undefined" ) {
-                // manifest
-                if ( query.type && query.type === "manifest" ) {
-                    var finalUri = "";
-                    if ( query.input[0] === '/' ) {
-                        finalUri = window.location.protocol + "//" + window.location.host;
-                    }
-                    finalUri += query.input;
-                    dwv.html.decodeManifestUri( finalUri, query.nslices, this.onInputURLs );
-                }
-                // urls
-                else {
-                    var urls = dwv.html.decodeKeyValueUri( query.input, query.dwvReplaceMode );
-                    this.loadURL(urls);
-                    if ( typeof query.state !== "undefined" ) {
-                        var onLoadEnd = function (/*event*/) {
-                            loadStateUrl([query.state]);
-                        };
-                        this.addEventListener( "load-end", onLoadEnd );
-
-                    }
+                dwv.utils.decodeQuery(query, this.onInputURLs);
+                // optional display state
+                if ( typeof query.state !== "undefined" ) {
+                    var onLoadEnd = function (/*event*/) {
+                        loadStateUrl(query.state);
+                    };
+                    this.addEventListener( "load-end", onLoadEnd );
                 }
             }
         }
         else{
             console.log("Not loading url from address since skipLoadUrl is defined.");
         }
+        
         // align layers when the window is resized
         if ( config.fitToWindow ) {
             fitToWindow = true;
             window.onresize = this.onResize;
         }
+
+        // use web workers
+        if ( config.useWebWorkers ) {
+            // data decoders
+            var pathToRoot = "../..";
+            decoderScripts = [];
+            decoderScripts.jpeg2000 = pathToRoot + "/ext/pdfjs/decode-jpeg2000.js";
+            decoderScripts["jpeg-lossless"] = pathToRoot + "/ext/rii-mango/decode-jpegloss.js";
+            decoderScripts["jpeg-baseline"] = pathToRoot + "/ext/notmasteryet/decode-jpegbaseline.js";
+        }
     };
 
     /**
      * Get a HTML element associated to the application.
-     * @method getElement
      * @param name The name or id to find.
      * @return The found element or null.
      */
@@ -409,7 +373,6 @@ dwv.App = function ()
 
     /**
      * Reset the application.
-     * @method reset
      */
     this.reset = function ()
     {
@@ -434,7 +397,6 @@ dwv.App = function ()
 
     /**
      * Reset the layout of the application.
-     * @method resetLayout
      */
     this.resetLayout = function () {
         scale = windowScale;
@@ -453,7 +415,6 @@ dwv.App = function ()
 
     /**
      * Add an event listener on the app.
-     * @method addEventListener
      * @param {String} type The event type.
      * @param {Object} listener The method associated with the provided event type.
      */
@@ -467,7 +428,6 @@ dwv.App = function ()
 
     /**
      * Remove an event listener from the app.
-     * @method removeEventListener
      * @param {String} type The event type.
      * @param {Object} listener The method associated with the provided event type.
      */
@@ -485,8 +445,7 @@ dwv.App = function ()
     };
 
     /**
-     * Load a list of files.
-     * @method loadFiles
+     * Load a list of files. Can be image files or a state file.
      * @param {Array} files The list of files to load.
      */
     this.loadFiles = function (files)
@@ -494,7 +453,7 @@ dwv.App = function ()
         // has been checked for emptiness.
         var ext = files[0].name.split('.').pop().toLowerCase();
         if ( ext === "json" ) {
-            loadStateFile(files);
+            loadStateFile(files[0]);
         }
         else {
             loadImageFiles(files);
@@ -503,16 +462,17 @@ dwv.App = function ()
 
     /**
      * Load a list of image files.
-     * @method loadImageFiles
+     * @private
      * @param {Array} files The list of image files to load.
      */
-    function loadImageFiles (files)
+    function loadImageFiles(files)
     {
         // clear variables
         self.reset();
         nSlicesToLoad = files.length;
         // create IO
         var fileIO = new dwv.io.File();
+        fileIO.setDecoderScripts(decoderScripts);
         fileIO.onload = function (data) {
 
             var isFirst = true;
@@ -535,15 +495,17 @@ dwv.App = function ()
             }
         };
         fileIO.onerror = function (error) { handleError(error); };
+        fileIO.onloadend = function (/*event*/) { fireEvent({ 'type': 'load-end' }); };
         fileIO.onprogress = onLoadProgress;
         // main load (asynchronous)
+        fireEvent({ 'type': 'load-start' });
         fileIO.load(files);
     }
 
     /**
      * Load a State file.
-     * @method loadStateFile
-     * @param {Array} file An array with the state file to load.
+     * @private
+     * @param {String} file The state file to load.
      */
     function loadStateFile(file)
     {
@@ -556,21 +518,40 @@ dwv.App = function ()
         };
         fileIO.onerror = function (error) { handleError(error); };
         // main load (asynchronous)
-        fileIO.load(file);
+        fileIO.load([file]);
     }
 
     /**
-     * Load a list of URLs.
-     * @method loadURL
+     * Load a list of URLs. Can be image files or a state file.
      * @param {Array} urls The list of urls to load.
+     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
      */
-    this.loadURL = function(urls)
+    this.loadURLs = function (urls, requestHeaders)
+    {
+        // has been checked for emptiness.
+        var ext = urls[0].split('.').pop().toLowerCase();
+        if ( ext === "json" ) {
+            loadStateUrl(urls[0]);
+        }
+        else {
+            loadImageUrls(urls, requestHeaders);
+        }
+    };
+    
+    /**
+     * Load a list of image URLs.
+     * @private
+     * @param {Array} urls The list of urls to load.
+     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+     */
+    function loadImageUrls(urls, requestHeaders)
     {
         // clear variables
-        this.reset();
+        self.reset();
         nSlicesToLoad = urls.length;
         // create IO
         var urlIO = new dwv.io.Url();
+        urlIO.setDecoderScripts(decoderScripts);
         urlIO.onload = function (data) {
             var isFirst = true;
             if ( image ) {
@@ -595,13 +576,14 @@ dwv.App = function ()
         urlIO.onloadend = function (/*event*/) { fireEvent({ 'type': 'load-end' }); };
         urlIO.onprogress = onLoadProgress;
         // main load (asynchronous)
-        urlIO.load(urls);
-    };
+        fireEvent({ 'type': 'load-start' });
+        urlIO.load(urls, requestHeaders);
+    }
 
     /**
      * Load a State url.
-     * @method loadStateUrl
-     * @param {Array} file An array with the state url to load.
+     * @private
+     * @param {String} url The state url to load.
      */
     function loadStateUrl(url)
     {
@@ -614,12 +596,11 @@ dwv.App = function ()
         };
         urlIO.onerror = function (error) { handleError(error); };
         // main load (asynchronous)
-        urlIO.load(url);
+        urlIO.load([url]);
     }
 
     /**
      * Fit the display to the given size. To be called once the image is loaded.
-     * @method fitToSize
      */
     this.fitToSize = function (size)
     {
@@ -662,7 +643,6 @@ dwv.App = function ()
 
     /**
      * Toggle the display of the information layer.
-     * @method toggleInfoLayerDisplay
      */
     this.toggleInfoLayerDisplay = function ()
     {
@@ -695,7 +675,6 @@ dwv.App = function ()
 
     /**
      * Add layer mouse and touch listeners.
-     * @method addLayerListeners
      */
     this.addLayerListeners = function (layer)
     {
@@ -717,7 +696,6 @@ dwv.App = function ()
 
     /**
      * Remove layer mouse and touch listeners.
-     * @method removeLayerListeners
      */
     this.removeLayerListeners = function (layer)
     {
@@ -739,7 +717,6 @@ dwv.App = function ()
 
     /**
      * Render the current image.
-     * @method render
      */
     this.render = function ()
     {
@@ -748,7 +725,6 @@ dwv.App = function ()
 
     /**
      * Zoom to the layers.
-     * @method zoom
      * @param {Number} zoom The zoom to apply.
      * @param {Number} cx The zoom center X coordinate.
      * @param {Number} cy The zoom center Y coordinate.
@@ -764,7 +740,6 @@ dwv.App = function ()
 
     /**
      * Add a step to the layers zoom.
-     * @method stepZoom
      * @param {Number} step The zoom step increment. A good step is of 0.1.
      * @param {Number} cx The zoom center X coordinate.
      * @param {Number} cy The zoom center Y coordinate.
@@ -780,7 +755,6 @@ dwv.App = function ()
 
     /**
      * Apply a translation to the layers.
-     * @method translate
      * @param {Number} tx The translation along X.
      * @param {Number} ty The translation along Y.
      */
@@ -792,7 +766,6 @@ dwv.App = function ()
 
     /**
      * Add a translation to the layers.
-     * @method stepTranslate
      * @param {Number} tx The step translation along X.
      * @param {Number} ty The step translation along Y.
      */
@@ -808,7 +781,6 @@ dwv.App = function ()
 
     /**
      * Handle window/level change.
-     * @method onWLChange
      * @param {Object} event The event fired when changing the window/level.
      */
     this.onWLChange = function (/*event*/)
@@ -818,7 +790,6 @@ dwv.App = function ()
 
     /**
      * Handle colour map change.
-     * @method onColourChange
      * @param {Object} event The event fired when changing the colour map.
      */
     this.onColourChange = function (/*event*/)
@@ -828,7 +799,6 @@ dwv.App = function ()
 
     /**
      * Handle slice change.
-     * @method onSliceChange
      * @param {Object} event The event fired when changing the slice.
      */
     this.onSliceChange = function (/*event*/)
@@ -853,7 +823,6 @@ dwv.App = function ()
      * - arrow-up: next slide
      * - arrow-down: prev slide
      * Default behavior. Usually used in tools.
-     * @method onKeydown
      * @param {Object} event The key down event.
      */
     this.onKeydown = function (event)
@@ -883,7 +852,6 @@ dwv.App = function ()
     /**
      * Handle resize.
      * Fit the display to the window. To be called once the image is loaded.
-     * @method onResize
      * @param {Object} event The change event.
      */
     this.onResize = function (/*event*/)
@@ -893,7 +861,6 @@ dwv.App = function ()
 
     /**
      * Handle zoom reset.
-     * @method onZoomReset
      * @param {Object} event The change event.
      */
     this.onZoomReset = function (/*event*/)
@@ -903,37 +870,43 @@ dwv.App = function ()
 
     /**
      * Handle loader change.
-     * @method onChangeLoader
      * @param {Object} event The change event.
      */
     this.onChangeLoader = function (/*event*/)
     {
+        // called from an HTML select, use its value
         loadbox.displayLoader( this.value );
     };
 
     /**
+     * Reset the load box to its original state.
+     */
+    this.resetLoadbox = function ()
+    {
+        loadbox.reset();
+    };
+
+    /**
      * Handle change url event.
-     * @method onChangeURL
      * @param {Object} event The event fired when changing the url field.
      */
     this.onChangeURL = function (event)
     {
-        self.loadURL([event.target.value]);
+        self.loadURLs([event.target.value]);
     };
 
     /**
      * Handle input urls.
-     * @method onInputURLs
      * @param {Array} urls The list of input urls.
+     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
      */
-    this.onInputURLs = function (urls)
+    this.onInputURLs = function (urls, requestHeaders)
     {
-        self.loadURL(urls);
+        self.loadURLs(urls, requestHeaders);
     };
 
     /**
      * Handle change files event.
-     * @method onChangeFiles
      * @param {Object} event The event fired when changing the file field.
      */
     this.onChangeFiles = function (event)
@@ -946,7 +919,6 @@ dwv.App = function ()
 
     /**
      * Handle state save event.
-     * @method onStateSave
      * @param {Object} event The event fired when changing the state save field.
      */
     this.onStateSave = function (/*event*/)
@@ -959,17 +931,16 @@ dwv.App = function ()
 
     /**
      * Handle colour map change.
-     * @method onChangeColourMap
      * @param {Object} event The change event.
      */
     this.onChangeColourMap = function (/*event*/)
     {
+        // called from an HTML select, use its value
         viewController.setColourMapFromName(this.value);
     };
 
     /**
      * Handle window/level preset change.
-     * @method onChangeWindowLevelPreset
      * @param {Object} event The change event.
      */
     this.onChangeWindowLevelPreset = function (/*event*/)
@@ -987,37 +958,36 @@ dwv.App = function ()
 
     /**
      * Handle tool change.
-     * @method onChangeTool
      * @param {Object} event The change event.
      */
     this.onChangeTool = function (/*event*/)
     {
+        // called from an HTML select, use its value
         toolboxController.setSelectedTool(this.value);
     };
 
     /**
      * Handle shape change.
-     * @method onChangeShape
      * @param {Object} event The change event.
      */
     this.onChangeShape = function (/*event*/)
     {
+        // called from an HTML select, use its value
         toolboxController.setSelectedShape(this.value);
     };
 
     /**
      * Handle filter change.
-     * @method onChangeFilter
      * @param {Object} event The change event.
      */
     this.onChangeFilter = function (/*event*/)
     {
+        // called from an HTML select, use its value
         toolboxController.setSelectedFilter(this.value);
     };
 
     /**
      * Handle filter run.
-     * @method onRunFilter
      * @param {Object} event The run event.
      */
     this.onRunFilter = function (/*event*/)
@@ -1027,17 +997,16 @@ dwv.App = function ()
 
     /**
      * Handle line colour change.
-     * @method onChangeLineColour
      * @param {Object} event The change event.
      */
     this.onChangeLineColour = function (/*event*/)
     {
+        // called from an HTML select, use its value
         toolboxController.setLineColour(this.value);
     };
 
     /**
      * Handle min/max slider change.
-     * @method onChangeMinMax
      * @param {Object} range The new range of the data.
      */
     this.onChangeMinMax = function (range)
@@ -1047,7 +1016,6 @@ dwv.App = function ()
 
     /**
      * Handle undo.
-     * @method onUndo
      * @param {Object} event The associated event.
      */
     this.onUndo = function (/*event*/)
@@ -1057,7 +1025,6 @@ dwv.App = function ()
 
     /**
      * Handle redo.
-     * @method onRedo
      * @param {Object} event The associated event.
      */
     this.onRedo = function (/*event*/)
@@ -1067,7 +1034,6 @@ dwv.App = function ()
 
     /**
      * Handle toggle of info layer.
-     * @method onToggleInfoLayer
      * @param {Object} event The associated event.
      */
     this.onToggleInfoLayer = function (/*event*/)
@@ -1077,7 +1043,6 @@ dwv.App = function ()
 
     /**
      * Handle display reset.
-     * @method onDisplayReset
      * @param {Object} event The change event.
      */
     this.onDisplayReset = function (/*event*/)
@@ -1095,7 +1060,6 @@ dwv.App = function ()
 
     /**
      * Fire an event: call all associated listeners.
-     * @method fireEvent
      * @param {Object} event The event to fire.
      */
     function fireEvent (event)
@@ -1111,7 +1075,6 @@ dwv.App = function ()
 
     /**
      * Generate the image data and draw it.
-     * @method generateAndDrawImage
      */
     function generateAndDrawImage()
     {
@@ -1125,7 +1088,6 @@ dwv.App = function ()
 
     /**
      * Apply the stored zoom to the layers.
-     * @method zoomLayers
      */
     function zoomLayers()
     {
@@ -1156,7 +1118,6 @@ dwv.App = function ()
 
     /**
      * Apply the stored translation to the layers.
-     * @method translateLayers
      */
     function translateLayers()
     {
@@ -1176,7 +1137,6 @@ dwv.App = function ()
 
     /**
      * Add image listeners.
-     * @method addImageInfoListeners
      * @private
      */
     function addImageInfoListeners()
@@ -1191,7 +1151,6 @@ dwv.App = function ()
 
     /**
      * Remove image listeners.
-     * @method removeImageInfoListeners
      * @private
      */
     function removeImageInfoListeners()
@@ -1207,7 +1166,6 @@ dwv.App = function ()
     /**
      * Mou(se) and (T)ouch event handler. This function just determines the mouse/touch
      * position relative to the canvas element. It then passes it to the current tool.
-     * @method onMouch
      * @private
      * @param {Object} event The event to handle.
      */
@@ -1281,7 +1239,6 @@ dwv.App = function ()
 
     /**
      * Handle a drag over.
-     * @method onDragOver
      * @private
      * @param {Object} event The event to handle.
      */
@@ -1299,7 +1256,6 @@ dwv.App = function ()
 
     /**
      * Handle a drag leave.
-     * @method onDragLeave
      * @private
      * @param {Object} event The event to handle.
      */
@@ -1317,7 +1273,6 @@ dwv.App = function ()
 
     /**
      * Handle a drop event.
-     * @method onDrop
      * @private
      * @param {Object} event The event to handle.
      */
@@ -1332,7 +1287,6 @@ dwv.App = function ()
 
     /**
      * Handle an error: display it to the user.
-     * @method handleError
      * @private
      * @param {Object} error The error to handle.
      */
@@ -1353,7 +1307,6 @@ dwv.App = function ()
 
     /**
      * Handle a load progress.
-     * @method onLoadProgress
      * @private
      * @param {Object} event The event to handle.
      */
@@ -1369,7 +1322,6 @@ dwv.App = function ()
 
     /**
      * Create the application layers.
-     * @method createLayers
      * @private
      * @param {Number} dataWidth The width of the input data.
      * @param {Number} dataHeight The height of the input data.
@@ -1410,7 +1362,6 @@ dwv.App = function ()
 
     /**
      * Post load application initialisation. To be called once the DICOM has been parsed.
-     * @method postLoadInit
      * @private
      * @param {Object} data The data to display.
      */

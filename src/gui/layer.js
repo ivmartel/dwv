@@ -1,14 +1,9 @@
-/** 
- * HTML module.
- * @module html
- */
+// namespaces
 var dwv = dwv || {};
 dwv.html = dwv.html || {};
 
 /**
  * Window layer.
- * @class Layer
- * @namespace dwv.html
  * @constructor
  * @param {String} name The name of the layer.
  */
@@ -16,21 +11,18 @@ dwv.html.Layer = function(canvas)
 {
     /**
      * The associated HTMLCanvasElement.
-     * @property canvas
      * @private
      * @type Object
      */
     //var canvas = null;
     /**
      * A cache of the initial canvas.
-     * @property cacheCanvas
      * @private
      * @type Object
      */
     var cacheCanvas = null;
     /**
      * The associated CanvasRenderingContext2D.
-     * @property context
      * @private
      * @type Object
      */
@@ -38,32 +30,27 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Get the layer name.
-     * @method getName
      * @return {String} The layer name.
      */
     //this.getName = function() { return name; };
     /**
      * Get the layer canvas.
-     * @method getCanvas
      * @return {Object} The layer canvas.
      */
     this.getCanvas = function() { return canvas; };
     /**
      * Get the layer context.
-     * @method getContext
      * @return {Object} The layer context.
      */
     this.getContext = function() { return context; };
     /**
      * Get the layer offset on page.
-     * @method getOffset
      * @return {Number} The layer offset on page.
      */
     this.getOffset = function() { return canvas.offset(); };
 
     /**
      * The image data array.
-     * @property imageData
      * @private
      * @type Array
      */
@@ -71,30 +58,26 @@ dwv.html.Layer = function(canvas)
 
     /**
      * The layer origin.
-     * @property origin
      * @private
      * @type {Object}
      */
     var origin = {'x': 0, 'y': 0};
     /**
      * Get the layer origin.
-     * @method getOrigin
-     * @returns {Object} The layer origin as {'x','y'}.
+     * @return {Object} The layer origin as {'x','y'}.
      */
     this.getOrigin = function () {
         return origin;
     };
     /**
      * The image zoom.
-     * @property zoom
      * @private
      * @type {Object}
      */
     var zoom = {'x': 1, 'y': 1};
     /**
      * Get the layer zoom.
-     * @method getZoom
-     * @returns {Object} The layer zoom as {'x','y'}.
+     * @return {Object} The layer zoom as {'x','y'}.
      */
     this.getZoom = function () {
         return zoom;
@@ -104,7 +87,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Set the canvas width.
-     * @method setWidth
      * @param {Number} width The new width.
      */
     this.setWidth = function ( width ) {
@@ -112,7 +94,6 @@ dwv.html.Layer = function(canvas)
     };
     /**
      * Set the canvas height.
-     * @method setHeight
      * @param {Number} height The new height.
      */
     this.setHeight = function ( height ) {
@@ -121,7 +102,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Set the layer zoom.
-     * @method setZoom
      * @param {Number} newZoomX The zoom in the X direction.
      * @param {Number} newZoomY The zoom in the Y direction.
      * @param {Number} centerX The zoom center in the X direction.
@@ -148,7 +128,6 @@ dwv.html.Layer = function(canvas)
     /**
      * Set the layer translation.
      * Translation is according to the last one.
-     * @method setTranslate
      * @param {Number} tx The translation in the X direction.
      * @param {Number} ty The translation in the Y direction.
      */
@@ -160,7 +139,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Set the image data array.
-     * @method setImageData
      * @param {Array} data The data array.
      */
     this.setImageData = function(data)
@@ -172,7 +150,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Reset the layout.
-     * @method resetLayout
      */
     this.resetLayout = function(izoom)
     {
@@ -186,7 +163,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Transform a display position to an index.
-     * @method displayToIndex
      */
     this.displayToIndex = function ( point2D ) {
         return {'x': ( (point2D.x - origin.x) / zoom.x ) - trans.x,
@@ -196,7 +172,6 @@ dwv.html.Layer = function(canvas)
     /**
      * Draw the content (imageData) of the layer.
      * The imageData variable needs to be set
-     * @method draw
      */
     this.draw = function ()
     {
@@ -223,7 +198,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Initialise the layer: set the canvas and context
-     * @method initialise
      * @input {Number} inputWidth The width of the canvas.
      * @input {Number} inputHeight The height of the canvas.
      */
@@ -263,7 +237,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Fill the full context with the current style.
-     * @method fillContext
      */
     this.fillContext = function()
     {
@@ -272,7 +245,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Clear the context and reset the image data.
-     * @method clear
      */
     this.clear = function()
     {
@@ -283,7 +255,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Merge two layers.
-     * @method merge
      * @input {Layer} layerToMerge The layer to merge. It will also be emptied.
      */
     this.merge = function(layerToMerge)
@@ -321,7 +292,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Set the line colour for the layer.
-     * @method setLineColour
      * @input {String} colour The line colour.
      */
     this.setLineColour = function(colour)
@@ -332,7 +302,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Display the layer.
-     * @method setStyleDisplay
      * @input {Boolean} val Whether to display the layer or not.
      */
     this.setStyleDisplay = function(val)
@@ -349,7 +318,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Check if the layer is visible.
-     * @method isVisible
      * @return {Boolean} True if the layer is visible.
      */
     this.isVisible = function()
@@ -364,7 +332,6 @@ dwv.html.Layer = function(canvas)
 
     /**
      * Align on another layer.
-     * @method align
      * @param {Layer} rhs The layer to align on.
      */
     this.align = function(rhs)
@@ -376,8 +343,6 @@ dwv.html.Layer = function(canvas)
 
 /**
  * Get the offset of an input event.
- * @method getEventOffset
- * @static
  * @param {Object} event The event to get the offset from.
  * @return {Array} The array of offsets.
  */

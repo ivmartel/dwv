@@ -1,10 +1,15 @@
 /**
  * Tests for the 'dicom/dicomParser.js' file.
  */
+/** @module tests/dicom */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module("dicomParser");
 
+/**
+ * Tests for {@link dwv.dicom.DicomParser}.
+ * @function module:tests/dicom~dicomParser
+ */
 QUnit.test("Test DICOM parsing.", function (assert) {
     // Local file: forbidden...
     // parse the DICOM file
@@ -73,6 +78,10 @@ QUnit.test("Test DICOM parsing.", function (assert) {
     request.send(null);
 });
 
+/**
+ * Tests for {@link dwv.dicom.cleanString}.
+ * @function module:tests/dicom~cleanString
+ */
 QUnit.test("Test cleanString.", function (assert) {
     // undefined
     assert.equal(dwv.dicom.cleanString(), null, "Clean undefined");

@@ -1,24 +1,25 @@
-/** 
- * Image module.
- * @module image
- */
+// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for image related functions.
- * @class image
- * @namespace dwv
- * @static
- */
 dwv.image = dwv.image || {};
+
+// JPEG Baseline
+var hasJpegBaselineDecoder = (typeof JpegImage !== "undefined");
+var JpegImage = JpegImage || {};
+// JPEG Lossless
+var hasJpegLosslessDecoder = (typeof jpeg !== "undefined") &&
+    (typeof jpeg.lossless !== "undefined");
+var jpeg = jpeg || {};
+jpeg.lossless = jpeg.lossless || {};
+// JPEG 2000
+var hasJpeg2000Decoder = (typeof JpxImage !== "undefined");
+var JpxImage = JpxImage || {};
 
 /**
  * Get data from an input image using a canvas.
- * @method getDataFromImage
- * @static
- * @param {Image} image The image.
+ * @param {Image} Image The DOM Image.
  * @return {Mixed} The corresponding view and info.
  */
-dwv.image.getDataFromImage = function(image)
+dwv.image.getViewFromDOMImage = function (image)
 {
     // draw the image in the canvas in order to get its data
     var canvas = document.createElement('canvas');
@@ -69,21 +70,94 @@ dwv.image.getDataFromImage = function(image)
 };
 
 /**
- * Get data from an input buffer using a DICOM parser.
- * @method getDataFromDicomBuffer
- * @static
- * @param {Array} buffer The input data buffer.
- * @return {Mixed} The corresponding view and info.
+ * Create a dwv.image.View from a DICOM buffer.
+ * @constructor
  */
-dwv.image.getDataFromDicomBuffer = function(buffer)
-{
-    // DICOM parser
-    var dicomParser = new dwv.dicom.DicomParser();
-    // parse the buffer
-    dicomParser.parse(buffer);
-    // create the view
-    var viewFactory = new dwv.image.ViewFactory();
-    var view = viewFactory.create( dicomParser.getDicomElements(), dicomParser.getPixelBuffer() );
-    // return
-    return {"view": view, "info": dicomParser.getDicomElements().dumpToTable()};
+dwv.image.DicomBufferToView = function (decoderScripts) {
+
+    // flag to use workers or not to decode data
+    var useWorkers = false;
+    
+    if (typeof decoderScripts !== "undefined" && decoderScripts instanceof Array) {
+        useWorkers = true;
+        // thread pool
+        var pool = new dwv.utils.ThreadPool(15);
+        pool.init();
+    }
+
+    /**
+     * Get data from an input buffer using a DICOM parser.
+     * @param {Array} buffer The input data buffer.
+     * @param {Object} callback The callback on the conversion.
+     * @return {Mixed} The corresponding view and info.
+     */
+    this.convert = function(buffer, callback)
+    {
+        // DICOM parser
+        var dicomParser = new dwv.dicom.DicomParser();
+        // parse the buffer
+        dicomParser.parse(buffer);
+    
+        // worker callback
+        var decodedBufferToView = function(event) {
+            // create the view
+            var viewFactory = new dwv.image.ViewFactory();
+            var view = viewFactory.create( dicomParser.getDicomElements(), event.data );
+            // return
+            callback({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
+        };
+        var pixelBuffer = dicomParser.pixelBuffer;
+        
+        var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
+        var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
+        var needDecompression = (algoName !== null);
+        
+        if ( needDecompression ) {
+            if (useWorkers) {
+                var script = decoderScripts[algoName];
+                if ( typeof script === "undefined" ) {
+                    throw new Error("No script provided to decompress '" + algoName + "' data.");
+                }
+                var workerTask = new dwv.utils.WorkerTask(script, decodedBufferToView, pixelBuffer);
+                pool.addWorkerTask(workerTask);
+            }
+            else {
+
+                var decoder = null;
+                var decodedBuffer = null;
+                
+                if( algoName === "jpeg-lossless" ) {
+                    if ( !hasJpegLosslessDecoder ) {
+                        throw new Error("No JPEG Lossless decoder provided");
+                    }
+                    var buf = new Uint8Array( pixelBuffer );
+                    decoder = new jpeg.lossless.Decoder(buf.buffer);
+                    var decoded = decoder.decode();
+                    decodedBuffer = new Uint16Array(decoded.buffer);
+                }
+                else if ( algoName === "jpeg-baseline" ) {
+                    if ( !hasJpegBaselineDecoder ) {
+                        throw new Error("No JPEG Baseline decoder provided");
+                    }
+                    decoder = new JpegImage();
+                    decoder.parse( pixelBuffer );
+                    decodedBuffer = decoder.getData(decoder.width,decoder.height);
+                }
+                else if( algoName === "jpeg2000" ) {
+                    if ( !hasJpeg2000Decoder ) {
+                        throw new Error("No JPEG 2000 decoder provided");
+                    }
+                    // decompress pixel buffer into Int16 image
+                    decoder = new JpxImage();
+                    decoder.parse( pixelBuffer );
+                    // set the pixel buffer
+                    decodedBuffer = decoder.tiles[0].items;
+                }
+                decodedBufferToView({data: decodedBuffer});
+            }
+        }
+        else {
+            decodedBufferToView({data: pixelBuffer});
+        }
+    };
 };

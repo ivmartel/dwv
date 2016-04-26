@@ -1,29 +1,16 @@
-/** 
- * GUI module.
- * @module gui
- */
+// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for GUI functions.
- * @class gui
- * @namespace dwv
- * @static
- */
 dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Undo base gui.
- * @class Undo
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Undo = function (app)
 {
     /**
      * Setup the undo HTML.
-     * @method setup
-     * @static
      */
     this.setup = function ()
     {
@@ -51,7 +38,6 @@ dwv.gui.base.Undo = function (app)
 
     /**
      * Clear the command list of the undo HTML.
-     * @method cleanUndoHtml
      */
     this.initialise = function ()
     {
@@ -68,7 +54,6 @@ dwv.gui.base.Undo = function (app)
 
     /**
      * Add a command to the undo HTML.
-     * @method addCommandToUndoHtml
      * @param {String} commandName The name of the command to add.
      */
     this.addCommandToUndoHtml = function (commandName)
@@ -96,7 +81,6 @@ dwv.gui.base.Undo = function (app)
 
     /**
      * Enable the last command of the undo HTML.
-     * @method enableInUndoHtml
      * @param {Boolean} enable Flag to enable or disable the command.
      */
     this.enableInUndoHtml = function (enable)

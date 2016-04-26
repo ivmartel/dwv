@@ -1,20 +1,10 @@
-/** 
- * HTML module.
- * @module html
- */
+// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for HTML related functions.
- * @class html
- * @namespace dwv
- * @static
- */
+/** @namespace */
 dwv.html = dwv.html || {};
 
 /**
  * Append a cell to a given row.
- * @method appendCell
- * @static
  * @param {Object} row The row to append the cell to.
  * @param {Object} content The content of the cell.
  */
@@ -39,8 +29,6 @@ dwv.html.appendCell = function (row, content)
 
 /**
  * Append a header cell to a given row.
- * @method appendHCell
- * @static
  * @param {Object} row The row to append the header cell to.
  * @param {String} text The text of the header cell.
  */
@@ -57,8 +45,6 @@ dwv.html.appendHCell = function (row, text)
 
 /**
  * Append a row to an array.
- * @method appendRowForArray
- * @static
  * @param {} table
  * @param {} input
  * @param {} level
@@ -91,8 +77,6 @@ dwv.html.appendRowForArray = function (table, input, level, maxLevel, rowHeader)
 
 /**
  * Append a row to an object.
- * @method appendRowForObject
- * @static
  * @param {} table
  * @param {} input
  * @param {} level
@@ -141,8 +125,6 @@ dwv.html.appendRowForObject = function (table, input, level, maxLevel, rowHeader
 
 /**
  * Append a row to an object or an array.
- * @method appendRow
- * @static
  * @param {} table
  * @param {} input
  * @param {} level
@@ -166,8 +148,6 @@ dwv.html.appendRow = function (table, input, level, maxLevel, rowHeader)
 
 /**
  * Converts the input to an HTML table.
- * @method toTable
- * @static
  * @input {Mixed} input Allowed types are: array, array of object, object.
  * @return {Object} The created HTML table.
  * @warning Null is interpreted differently in browsers, firefox will not display it.
@@ -181,8 +161,6 @@ dwv.html.toTable = function (input)
 
 /**
  * Get an HTML search form.
- * @method getHtmlSearchForm
- * @static
  * @param {Object} htmlTableToSearch The table to do the search on.
  * @return {Object} The HTML search form.
  */
@@ -202,8 +180,6 @@ dwv.html.getHtmlSearchForm = function (htmlTableToSearch)
 /**
  * Filter a table with a given parameter: sets the display css of rows to
  * true or false if it contains the term.
- * @method filterTable
- * @static
  * @param {String} term The term to filter the table with.
  * @param {Object} table The table to filter.
  */
@@ -236,8 +212,6 @@ dwv.html.filterTable = function (term, table) {
  * Transform back each
  * 'preText <span class="highlighted">term</span> postText'
  * into its original 'preText term postText'.
- * @method dehighlight
- * @static
  * @param {Object} container The container to de-highlight.
  */
 dwv.html.dehighlight = function (container) {
@@ -264,8 +238,6 @@ dwv.html.dehighlight = function (container) {
  * Create a
  * 'preText <span class="highlighted">term</span> postText'
  * around each search term.
- * @method highlight
- * @static
  * @param {String} term The term to highlight.
  * @param {Object} container The container where to highlight the term.
  */
@@ -306,8 +278,6 @@ dwv.html.highlight = function (term, container) {
 
 /**
  * Highlight a HTML node.
- * @method createHighlightNode
- * @static
  * @param {Object} child The child to highlight.
  * @return {Object} The created HTML node.
  */
@@ -321,8 +291,6 @@ dwv.html.createHighlightNode = function (child) {
 
 /**
  * Remove all children of a HTML node.
- * @method cleanNode
- * @static
  * @param {Object} node The node to remove kids.
  */
 dwv.html.cleanNode = function (node) {
@@ -334,8 +302,6 @@ dwv.html.cleanNode = function (node) {
 
 /**
  * Remove a HTML node and all its children.
- * @method removeNode
- * @static
  * @param {String} nodeId The string id of the node to delete.
  */
 dwv.html.removeNode = function (node) {
@@ -360,8 +326,6 @@ dwv.html.removeNodes = function (nodes) {
  * Create a HTML select from an input array of options.
  * The values of the options are the name of the option made lower case.
  * It is left to the user to set the 'onchange' method of the select.
- * @method createHtmlSelect
- * @static
  * @param {String} name The name of the HTML select.
  * @param {Mixed} list The list of options of the HTML select.
  * @return {Object} The created HTML select.
@@ -401,199 +365,7 @@ dwv.html.createHtmlSelect = function (name, list) {
 };
 
 /**
- * Get a list of parameters from an input URI that looks like:
- *  [dwv root]?input=encodeURI([root]?key0=value0&key1=value1)
- * or
- *  [dwv root]?input=encodeURI([manifest link])&type=manifest
- *
- * @method getUriParam
- * @static
- * @param {String } uri The URI to decode.
- * @return {Object} The parameters found in the input uri.
- */
-dwv.html.getUriParam = function (uri)
-{
-    // split key/value pairs
-    var mainQueryPairs = dwv.utils.splitQueryString(uri);
-    // check pairs
-    if ( Object.keys(mainQueryPairs).length === 0 ) {
-        return null;
-    }
-    // has to have an input key
-    return mainQueryPairs.query;
-};
-
-/**
- * Decode a Key/Value pair uri. If a key is repeated, the result
- * be an array of base + each key.
- * @method decodeKeyValueUri
- * @static
- * @param {String} uri The uri to decode.
- * @param {String} replaceMode The key replace more.
- */
-dwv.html.decodeKeyValueUri = function (uri, replaceMode)
-{
-    var result = [];
-
-    // repeat key replace mode (default to keep key)
-    var repeatKeyReplaceMode = "key";
-    if ( replaceMode ) {
-        repeatKeyReplaceMode = replaceMode;
-    }
-
-    // decode input URI
-    var queryUri = decodeURIComponent(uri);
-    // get key/value pairs from input URI
-    var inputQueryPairs = dwv.utils.splitQueryString(queryUri);
-    if ( Object.keys(inputQueryPairs).length === 0 )
-    {
-        result.push(queryUri);
-    }
-    else
-    {
-        var keys = Object.keys(inputQueryPairs.query);
-        // find repeat key
-        var repeatKey = null;
-        for ( var i = 0; i < keys.length; ++i )
-        {
-            if ( inputQueryPairs.query[keys[i]] instanceof Array )
-            {
-                repeatKey = keys[i];
-                break;
-            }
-        }
-
-        if ( !repeatKey )
-        {
-            result.push(queryUri);
-        }
-        else
-        {
-            var repeatList = inputQueryPairs.query[repeatKey];
-            // build base uri
-            var baseUrl = inputQueryPairs.base;
-            // do not add '?' when the repeatKey is 'file'
-            // root/path/to/?file=0.jpg&file=1.jpg
-            if ( repeatKey !== "file" ) {
-                baseUrl += "?";
-            }
-            var gotOneArg = false;
-            for ( var j = 0; j < keys.length; ++j )
-            {
-                if ( keys[j] !== repeatKey ) {
-                    if ( gotOneArg ) {
-                        baseUrl += "&";
-                    }
-                    baseUrl += keys[j] + "=" + inputQueryPairs.query[keys[j]];
-                    gotOneArg = true;
-                }
-            }
-            // append built urls to result
-            var url;
-            for ( var k = 0; k < repeatList.length; ++k )
-            {
-                url = baseUrl;
-                if ( gotOneArg ) {
-                    url += "&";
-                }
-                if ( repeatKeyReplaceMode === "key" ) {
-                    url += repeatKey + "=";
-                }
-                // other than 'key' mode: do nothing
-                url += repeatList[k];
-                result.push(url);
-            }
-        }
-    }
-    // return
-    return result;
-};
-
-/**
- * Decode a manifest uri.
- * @method decodeManifestUri
- * @static
- * @param {String} uri The uri to decode.
- * @param {number} nslices The number of slices to load.
- * @param {Function} The function to call with the decoded urls.
- */
-dwv.html.decodeManifestUri = function (uri, nslices, callback)
-{
-    // Request error
-    var onErrorRequest = function (/*event*/)
-    {
-        console.warn( "RequestError while receiving manifest: "+this.status );
-    };
-
-    // Request handler
-    var onLoadRequest = function (/*event*/)
-    {
-        var urls = dwv.html.decodeManifest(this.responseXML, nslices);
-        callback(urls);
-    };
-
-    var request = new XMLHttpRequest();
-    request.open('GET', decodeURIComponent(uri), true);
-    request.responseType = "xml";
-    request.onload = onLoadRequest;
-    request.onerror = onErrorRequest;
-    request.send(null);
-};
-
-/**
- * Decode an XML manifest.
- * @method decodeManifest
- * @static
- * @param {Object} manifest The manifest to decode.
- * @param {Number} nslices The number of slices to load.
- */
-dwv.html.decodeManifest = function (manifest, nslices)
-{
-    var result = [];
-    // wado url
-    var wadoElement = manifest.getElementsByTagName("wado_query");
-    var wadoURL = wadoElement[0].getAttribute("wadoURL");
-    var rootURL = wadoURL + "?requestType=WADO&contentType=application/dicom&";
-    // patient list
-    var patientList = manifest.getElementsByTagName("Patient");
-    if ( patientList.length > 1 ) {
-        console.warn("More than one patient, loading first one.");
-    }
-    // study list
-    var studyList = patientList[0].getElementsByTagName("Study");
-    if ( studyList.length > 1 ) {
-        console.warn("More than one study, loading first one.");
-    }
-    var studyUID = studyList[0].getAttribute("StudyInstanceUID");
-    // series list
-    var seriesList = studyList[0].getElementsByTagName("Series");
-    if ( seriesList.length > 1 ) {
-        console.warn("More than one series, loading first one.");
-    }
-    var seriesUID = seriesList[0].getAttribute("SeriesInstanceUID");
-    // instance list
-    var instanceList = seriesList[0].getElementsByTagName("Instance");
-    // loop on instances and push links
-    var max = instanceList.length;
-    if ( nslices < max ) {
-        max = nslices;
-    }
-    for ( var i = 0; i < max; ++i ) {
-        var sopInstanceUID = instanceList[i].getAttribute("SOPInstanceUID");
-        var link = rootURL +
-        "&studyUID=" + studyUID +
-        "&seriesUID=" + seriesUID +
-        "&objectUID=" + sopInstanceUID;
-        result.push( link );
-    }
-    // return
-    return result;
-};
-
-/**
  * Display or not an element.
- * @method displayElement
- * @static
  * @param {Object} element The HTML element to display.
  * @param {Boolean} flag True to display the element.
  */
@@ -604,8 +376,6 @@ dwv.html.displayElement = function (element, flag)
 
 /**
  * Toggle the display of an element.
- * @method toggleDisplay
- * @static
  * @param {Object} element The HTML element to display.
  */
 dwv.html.toggleDisplay = function (element)
@@ -620,8 +390,6 @@ dwv.html.toggleDisplay = function (element)
 
 /**
  * Append an element.
- * @method appendElement
- * @static
  * @param {Object} parent The HTML element to append to.
  * @param {Object} element The HTML element to append.
  */
@@ -635,8 +403,6 @@ dwv.html.appendElement = function (parent, element)
 
 /**
  * Create an element.
- * @method createElement
- * @static
  * @param {String} type The type of the elemnt.
  * @param {String} className The className of the element.
  */

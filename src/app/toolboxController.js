@@ -1,17 +1,14 @@
-// Main DWV namespace.
+// namespaces
 var dwv = dwv || {};
 
 /**
  * Toolbox controller.
- * @class ToolboxController
- * @namespace dwv
  * @constructor
  */
 dwv.ToolboxController = function (toolbox)
 {
     /**
      * Set the selected tool.
-     * @method setSelectedTool
      * @param {String} name The name of the tool.
      */
     this.setSelectedTool = function (name)
@@ -21,7 +18,6 @@ dwv.ToolboxController = function (toolbox)
 
     /**
      * Set the selected shape.
-     * @method setSelectedShape
      * @param {String} name The name of the shape.
      */
     this.setSelectedShape = function (name)
@@ -31,7 +27,6 @@ dwv.ToolboxController = function (toolbox)
 
     /**
      * Set the selected filter.
-     * @method setSelectedFilter
      * @param {String} name The name of the filter.
      */
     this.setSelectedFilter = function (name)
@@ -41,7 +36,6 @@ dwv.ToolboxController = function (toolbox)
 
     /**
      * Run the selected filter.
-     * @method runSelectedFilter
      */
     this.runSelectedFilter = function ()
     {
@@ -50,7 +44,6 @@ dwv.ToolboxController = function (toolbox)
 
     /**
      * Set the tool line colour.
-     * @method runFilter
      * @param {String} name The name of the colour.
      */
     this.setLineColour = function (name)
@@ -60,7 +53,6 @@ dwv.ToolboxController = function (toolbox)
 
     /**
      * Set the tool range.
-     * @method setRange
      * @param {Object} range The new range of the data.
      */
     this.setRange = function (range)

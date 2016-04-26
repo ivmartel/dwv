@@ -93,13 +93,13 @@ body { background-color: #222; color: white;
 .infotr { color: #333; text-shadow: 0 1px 0 #fff; }
 .dropBox { margin: 20px; }
 </style>
-<link type="text/css" rel="stylesheet" href="/dwv/ext/jquery-ui/themes/ui-darkness/jquery-ui-1.11.2.min.css">
+<link type="text/css" rel="stylesheet" href="/dwv/ext/jquery-ui/themes/ui-darkness/jquery-ui-1.11.4.min.css">
 ]])
 
 print([[
 <!-- Third party -->
 <script type="text/javascript" src="/dwv/ext/jquery/jquery-2.1.4.min.js"></script>
-<script type="text/javascript" src="/dwv/ext/jquery-ui/jquery-ui-1.11.2.min.js"></script>
+<script type="text/javascript" src="/dwv/ext/jquery-ui/jquery-ui-1.11.4.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/flot/jquery.flot.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/pdfjs/jpx.js"></script>
 <script type="text/javascript" src="/dwv/ext/pdfjs/util.js"></script>
@@ -109,7 +109,7 @@ print([[
 <script type="text/javascript" src="/dwv/ext/kinetic/kinetic-v5.1.1-06.10.min.js"></script>
 
 <!-- Local -->
-<script type="text/javascript" src="/dwv/dwv-0.13.0.min.js"></script>
+<script type="text/javascript" src="/dwv/dwv-0.15.0-beta.min.js"></script>
 <!-- Launch the app -->
 <script type="text/javascript" src="/dwv/viewers/static/appgui.js"></script>
 ]])

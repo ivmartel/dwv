@@ -1,28 +1,23 @@
-/** 
- * Tool module.
- * @module tool
- */
+// namespaces
 var dwv = dwv || {};
+/** @namespace */
 dwv.tool = dwv.tool || {};
+//external
 var Kinetic = Kinetic || {};
 
 /**
  * Draw group command.
- * @class DrawGroupCommand
- * @namespace dwv.tool
  * @constructor
  */
 dwv.tool.DrawGroupCommand = function (group, name, layer)
 {
     /**
      * Get the command name.
-     * @method getName
      * @return {String} The command name.
      */
     this.getName = function () { return "Draw-"+name; };
     /**
      * Execute the command.
-     * @method execute
      */
     this.execute = function () {
         // add the group to the layer
@@ -34,7 +29,6 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
     };
     /**
      * Undo the command.
-     * @method undo
      */
     this.undo = function () {
         // remove the group from the parent layer
@@ -48,7 +42,6 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
 
 /**
  * Handle an execute event.
- * @method onExecute
  * @param {Object} event The execute event with type and id.
  */
 dwv.tool.DrawGroupCommand.prototype.onExecute = function (/*event*/)
@@ -57,7 +50,6 @@ dwv.tool.DrawGroupCommand.prototype.onExecute = function (/*event*/)
 };
 /**
  * Handle an undo event.
- * @method onUndo
  * @param {Object} event The undo event with type and id.
  */
 dwv.tool.DrawGroupCommand.prototype.onUndo = function (/*event*/)
@@ -67,22 +59,18 @@ dwv.tool.DrawGroupCommand.prototype.onUndo = function (/*event*/)
 
 /**
  * Move group command.
- * @class MoveGroupCommand
- * @namespace dwv.tool
  * @constructor
  */
 dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
 {
     /**
      * Get the command name.
-     * @method getName
      * @return {String} The command name.
      */
     this.getName = function () { return "Move-"+name; };
 
     /**
      * Execute the command.
-     * @method execute
      */
     this.execute = function () {
         // translate all children of group
@@ -97,7 +85,6 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
     };
     /**
      * Undo the command.
-     * @method undo
      */
     this.undo = function () {
         // invert translate all children of group
@@ -114,7 +101,6 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
 
 /**
  * Handle an execute event.
- * @method onExecute
  * @param {Object} event The execute event with type and id.
  */
 dwv.tool.MoveGroupCommand.prototype.onExecute = function (/*event*/)
@@ -123,7 +109,6 @@ dwv.tool.MoveGroupCommand.prototype.onExecute = function (/*event*/)
 };
 /**
  * Handle an undo event.
- * @method onUndo
  * @param {Object} event The undo event with type and id.
  */
 dwv.tool.MoveGroupCommand.prototype.onUndo = function (/*event*/)
@@ -133,22 +118,18 @@ dwv.tool.MoveGroupCommand.prototype.onUndo = function (/*event*/)
 
 /**
  * Change group command.
- * @class ChangeGroupCommand
- * @namespace dwv.tool
  * @constructor
  */
 dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, layer, image)
 {
     /**
      * Get the command name.
-     * @method getName
      * @return {String} The command name.
      */
     this.getName = function () { return "Change-"+name; };
 
     /**
      * Execute the command.
-     * @method execute
      */
     this.execute = function () {
         // change shape
@@ -160,7 +141,6 @@ dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, laye
     };
     /**
      * Undo the command.
-     * @method undo
      */
     this.undo = function () {
         // invert change shape
@@ -174,7 +154,6 @@ dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, laye
 
 /**
  * Handle an execute event.
- * @method onExecute
  * @param {Object} event The execute event with type and id.
  */
 dwv.tool.ChangeGroupCommand.prototype.onExecute = function (/*event*/)
@@ -183,7 +162,6 @@ dwv.tool.ChangeGroupCommand.prototype.onExecute = function (/*event*/)
 };
 /**
  * Handle an undo event.
- * @method onUndo
  * @param {Object} event The undo event with type and id.
  */
 dwv.tool.ChangeGroupCommand.prototype.onUndo = function (/*event*/)
@@ -193,21 +171,17 @@ dwv.tool.ChangeGroupCommand.prototype.onUndo = function (/*event*/)
 
 /**
  * Delete group command.
- * @class DeleteGroupCommand
- * @namespace dwv.tool
  * @constructor
  */
 dwv.tool.DeleteGroupCommand = function (group, name, layer)
 {
     /**
      * Get the command name.
-     * @method getName
      * @return {String} The command name.
      */
     this.getName = function () { return "Delete-"+name; };
     /**
      * Execute the command.
-     * @method execute
      */
     this.execute = function () {
         // remove the group from the parent layer
@@ -219,7 +193,6 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
     };
     /**
      * Undo the command.
-     * @method undo
      */
     this.undo = function () {
         // add the group to the layer
@@ -233,7 +206,6 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
 
 /**
  * Handle an execute event.
- * @method onExecute
  * @param {Object} event The execute event with type and id.
  */
 dwv.tool.DeleteGroupCommand.prototype.onExecute = function (/*event*/)
@@ -242,7 +214,6 @@ dwv.tool.DeleteGroupCommand.prototype.onExecute = function (/*event*/)
 };
 /**
  * Handle an undo event.
- * @method onUndo
  * @param {Object} event The undo event with type and id.
  */
 dwv.tool.DeleteGroupCommand.prototype.onUndo = function (/*event*/)
@@ -252,8 +223,6 @@ dwv.tool.DeleteGroupCommand.prototype.onUndo = function (/*event*/)
 
 /**
  * Drawing tool.
- * @class Draw
- * @namespace dwv.tool
  * @constructor
  * @param {Object} app The associated application.
  */
@@ -261,20 +230,17 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 {
     /**
      * Closure to self: to be used by event handlers.
-     * @property self
      * @private
      * @type WindowLevel
      */
     var self = this;
     /**
      * Draw GUI.
-     * @property gui
      * @type Object
      */
     var gui = null;
     /**
      * Interaction start flag.
-     * @property started
      * @private
      * @type Boolean
      */
@@ -282,20 +248,17 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Shape factory list
-     * @property shapeFactoryList
      * @type Object
      */
     this.shapeFactoryList = shapeFactoryList;
     /**
      * Draw command.
-     * @property command
      * @private
      * @type Object
      */
     var command = null;
     /**
      * Current shape group.
-     * @property shapeGroup
      * @private
      * @type Object
      */
@@ -303,14 +266,12 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Shape name.
-     * @property shapeName
      * @type String
      */
     this.shapeName = 0;
 
     /**
      * List of points.
-     * @property points
      * @private
      * @type Array
      */
@@ -318,7 +279,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Last selected point.
-     * @property lastPoint
      * @private
      * @type Object
      */
@@ -326,7 +286,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Shape editor.
-     * @property shapeEditor
      * @private
      * @type Object
      */
@@ -338,7 +297,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Trash draw: a cross.
-     * @property trash
      * @private
      * @type Object
      */
@@ -362,23 +320,13 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * The associated draw layer.
-     * @property drawLayer
      * @private
      * @type Object
      */
     var drawLayer = null;
 
     /**
-     * The associated draw layer.
-     * @property drawLayer
-     * @private
-     * @type Object
-     */
-    var idGenerator = new dwv.math.IdGenerator();
-
-    /**
      * Handle mouse down event.
-     * @method mousedown
      * @param {Object} event The mouse down event.
      */
     this.mousedown = function(event){
@@ -418,7 +366,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Handle mouse move event.
-     * @method mousemove
      * @param {Object} event The mouse move event.
      */
     this.mousemove = function(event){
@@ -466,7 +413,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Handle mouse up event.
-     * @method mouseup
      * @param {Object} event The mouse up event.
      */
     this.mouseup = function (/*event*/){
@@ -479,7 +425,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // create final shape
             var factory = new self.shapeFactoryList[self.shapeName]();
             var group = factory.create(points, app.getStyle(), app.getImage());
-            group.id( idGenerator.get() );
+            group.id( dwv.math.guid() );
             // re-activate layer
             drawLayer.hitGraphEnabled(true);
             // draw shape command
@@ -503,7 +449,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Handle mouse out event.
-     * @method mouseout
      * @param {Object} event The mouse out event.
      */
     this.mouseout = function(event){
@@ -512,7 +457,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Handle touch start event.
-     * @method touchstart
      * @param {Object} event The touch start event.
      */
     this.touchstart = function(event){
@@ -521,7 +465,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Handle touch move event.
-     * @method touchmove
      * @param {Object} event The touch move event.
      */
     this.touchmove = function(event){
@@ -530,7 +473,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Handle touch end event.
-     * @method touchend
      * @param {Object} event The touch end event.
      */
     this.touchend = function(event){
@@ -539,7 +481,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Handle key down event.
-     * @method keydown
      * @param {Object} event The key down event.
      */
     this.keydown = function(event){
@@ -548,7 +489,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Setup the tool GUI.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -558,7 +498,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Enable the tool.
-     * @method enable
      * @param {Boolean} flag The flag to enable or not.
      */
     this.display = function ( flag ){
@@ -600,7 +539,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Set shape off properties.
-     * @method setShapeOff
      * @param {Object} shape The shape to set off.
      */
     function setShapeOff( shape ) {
@@ -625,7 +563,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Set shape on properties.
-     * @method setShapeOn
      * @param {Object} shape The shape to set on.
      */
     this.setShapeOn = function ( shape ) {
@@ -828,7 +765,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Initialise the tool.
-     * @method init
      */
     this.init = function() {
         // set the default to the first in the list
@@ -850,7 +786,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Add an event listener on the app.
-     * @method addEventListener
      * @param {String} type The event type.
      * @param {Object} listener The method associated with the provided event type.
      */
@@ -864,7 +799,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Remove an event listener from the app.
-     * @method removeEventListener
      * @param {String} type The event type.
      * @param {Object} listener The method associated with the provided event type.
      */
@@ -883,7 +817,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Set the line colour of the drawing.
-     * @method setLineColour
      * @param {String} colour The colour to set.
      */
     this.setLineColour = function (colour)
@@ -895,7 +828,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
     /**
      * Fire an event: call all associated listeners.
-     * @method fireEvent
      * @param {Object} event The event to fire.
      */
     function fireEvent (event)
@@ -913,8 +845,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
 /**
  * Help for this tool.
- * @method getHelp
- * @returns {Object} The help content.
+ * @return {Object} The help content.
  */
 dwv.tool.Draw.prototype.getHelp = function()
 {
@@ -935,7 +866,6 @@ dwv.tool.Draw.prototype.getHelp = function()
 
 /**
  * Set the shape name of the drawing.
- * @method setShapeName
  * @param {String} name The name of the shape.
  */
 dwv.tool.Draw.prototype.setShapeName = function(name)
@@ -950,7 +880,6 @@ dwv.tool.Draw.prototype.setShapeName = function(name)
 
 /**
  * Check if the shape is in the shape list.
- * @method hasShape
  * @param {String} name The name of the shape.
  */
 dwv.tool.Draw.prototype.hasShape = function(name) {

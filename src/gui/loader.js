@@ -1,33 +1,27 @@
-/** 
- * GUI module.
- * @module gui
- */
+// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for GUI functions.
- * @class gui
- * @namespace dwv
- * @static
- */
 dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Loadbox base gui.
- * @class Loadbox
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.Loadbox = function (app, loaders)
 {
     /**
+     * Loader HTML select.
+     * @private
+     */
+    var loaderSelector = null;
+    
+    /**
      * Setup the loadbox HTML.
-     * @method setup
      */
     this.setup = function ()
     {
         // loader select
-        var loaderSelector = dwv.html.createHtmlSelect("loaderSelect", app.getLoaders());
+        loaderSelector = dwv.html.createHtmlSelect("loaderSelect", loaders);
         loaderSelector.onchange = app.onChangeLoader;
 
         // node
@@ -58,26 +52,51 @@ dwv.gui.base.Loadbox = function (app, loaders)
             }
         }
     };
+    
+    /**
+     * Reset to its original state.
+     */
+    this.reset = function () 
+    {
+        // display first loader
+        var keys = Object.keys(loaders);
+        this.displayLoader(keys[0]);
+        // reset HTML select
+        if (loaderSelector) {
+            loaderSelector.selectedIndex = 0;
+        }
+    };
 
 }; // class dwv.gui.base.Loadbox
 
 /**
  * FileLoad base gui.
- * @class FileLoad
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.FileLoad = function (app)
 {
+    // closure to self
+    var self = this;
+    
+    /**
+     * Internal file input change handler.
+     * @param {Object} event The change event.
+     */
+    function onchangeinternal(event) {
+        if (typeof self.onchange == "function") {
+            self.onchange(event);
+        }
+        app.onChangeFiles(event);
+    }
+    
     /**
      * Setup the file load HTML to the page.
-     * @method setup
      */
     this.setup = function()
     {
         // input
         var fileLoadInput = document.createElement("input");
-        fileLoadInput.onchange = app.onChangeFiles;
+        fileLoadInput.onchange = onchangeinternal;
         fileLoadInput.type = "file";
         fileLoadInput.multiple = true;
         fileLoadInput.className = "imagefiles";
@@ -100,7 +119,6 @@ dwv.gui.base.FileLoad = function (app)
 
     /**
      * Display the file load HTML.
-     * @method display
      * @param {Boolean} bool True to display, false to hide.
      */
     this.display = function (bool)
@@ -115,21 +133,32 @@ dwv.gui.base.FileLoad = function (app)
 
 /**
  * UrlLoad base gui.
- * @class UrlLoad
- * @namespace dwv.gui.base
  * @constructor
  */
 dwv.gui.base.UrlLoad = function (app)
 {
+    // closure to self
+    var self = this;
+    
+    /**
+     * Internal url input change handler.
+     * @param {Object} event The change event.
+     */
+    function onchangeinternal(event) {
+        if (typeof self.onchange == "function") {
+            self.onchange(event);
+        }
+        app.onChangeURL(event);
+    }
+    
     /**
      * Setup the url load HTML to the page.
-     * @method setup
      */
     this.setup = function ()
     {
         // input
         var urlLoadInput = document.createElement("input");
-        urlLoadInput.onchange = app.onChangeURL;
+        urlLoadInput.onchange = onchangeinternal;
         urlLoadInput.type = "url";
         urlLoadInput.className = "imageurl";
         urlLoadInput.setAttribute("data-clear-btn","true");
@@ -151,7 +180,6 @@ dwv.gui.base.UrlLoad = function (app)
 
     /**
      * Display the url load HTML.
-     * @method display
      * @param {Boolean} bool True to display, false to hide.
      */
     this.display = function (bool)

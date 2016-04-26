@@ -5,6 +5,10 @@
 /* global QUnit */
 QUnit.module("stats");
 
+/**
+ * Tests for {@link dwv.math.getStats}.
+ * @function module:tests/math~getStats
+ */
 QUnit.test("Test getStats.", function (assert) {
     var arr0 = [1, 2, 3, 4, 5];
     var q0 = dwv.math.getStats(arr0);
@@ -29,15 +33,28 @@ QUnit.test("Test getStats.", function (assert) {
     assert.equal(q1.stdDev, 2.9832867780352594, "stdDev.1");
 });
 
-QUnit.test("Test IdGenerator.", function (assert) {
-    var generator = new dwv.math.IdGenerator();
-    var id0 = generator.get();
-    var id1 = generator.get();
-    assert.equal((id0 == id1), false, "Ids should not be equal for the same generator.");
+/**
+ * Tests for {@link dwv.math.guid}.
+ * @function module:tests/math~guid
+ */
+QUnit.test("Test GUID.", function (assert) {
+    var id0 = dwv.math.guid();
+    var id1 = dwv.math.guid();
+    assert.equal((id0 == id1), false, "Two GUids should not be equal.");
 
-    var generator2 = new dwv.math.IdGenerator();
-    var id2 = generator2.get();
-    assert.equal((id0 == id2), false, "Ids should not be equal for different generators (1).");
-    assert.equal((id1 == id2), false, "Ids should not be equal for different generators (2).");
-
+    var duplicates = 0;
+    // create an array of guids
+    var ids = [];
+    for (var i = 0; i < 1000; ++i) {
+        ids[ids.length] = dwv.math.guid();
+    }
+    // check duplicates
+    var id = 0;
+    for (i = 0; i < ids.length - 1; ++i) {
+        id = ids.pop();
+        if (ids.indexOf(id) !== -1) {
+            ++duplicates;
+        }
+    }
+    assert.equal(duplicates, 0, "1000 GUids should not be equal.");
 });

@@ -1,10 +1,8 @@
-// Main DWV namespace.
+// namespaces
 var dwv = dwv || {};
 
 /**
  * View controller.
- * @class ViewController
- * @namespace dwv
  * @constructor
  */
 dwv.ViewController = function ( view )
@@ -14,14 +12,12 @@ dwv.ViewController = function ( view )
 
     /**
      * Get the window/level presets.
-     * @method getPresets
      * @return {Object} The presets.
      */
     this.getPresets = function () { return presets; };
 
     /**
      * Get the current position.
-     * @method getCurrentPosition
      * @return {Object} The position.
       */
     this.getCurrentPosition = function ()
@@ -31,7 +27,6 @@ dwv.ViewController = function ( view )
 
     /**
      * Set the current position.
-     * @method setCurrentPosition
      * @param {Object} pos The position.
      * @return {Boolean} False if not in bounds.
       */
@@ -42,7 +37,6 @@ dwv.ViewController = function ( view )
 
     /**
      * Set the current 2D (i,j) position.
-     * @method setCurrentPosition2D
      * @param {Number} i The column index.
      * @param {Number} j The row index.
      * @return {Boolean} False if not in bounds.
@@ -58,7 +52,6 @@ dwv.ViewController = function ( view )
 
     /**
      * Increment the current slice number.
-     * @method incrementSliceNb
      * @return {Boolean} False if not in bounds.
      */
     this.incrementSliceNb = function ()
@@ -72,7 +65,6 @@ dwv.ViewController = function ( view )
 
     /**
      * Decrement the current slice number.
-     * @method decrementSliceNb
      * @return {Boolean} False if not in bounds.
      */
     this.decrementSliceNb = function ()
@@ -86,7 +78,6 @@ dwv.ViewController = function ( view )
 
     /**
      * Go to first slice .
-     * @method goFirstSlice
      * @return {Boolean} False if not in bounds.
      */
     this.goFirstSlice = function()
@@ -100,7 +91,6 @@ dwv.ViewController = function ( view )
 
     /**
      * Get the window/level.
-     * @method getWindowLevel
      * @return {Object} The window center and width.
      */
     this.getWindowLevel = function ()
@@ -113,7 +103,6 @@ dwv.ViewController = function ( view )
 
     /**
      * Set the window/level.
-     * @method setWindowLevel
      * @param {Number} wc The window center.
      * @param {Number} ww The window width.
      */
@@ -124,7 +113,6 @@ dwv.ViewController = function ( view )
 
     /**
      * Update the window/level presets.
-     * @function updatePresets
      * @param {Object} image The associated image.
      * @param {Boolean} full If true, shows all presets.
      */
@@ -169,7 +157,6 @@ dwv.ViewController = function ( view )
 
     /**
      * Get the colour map.
-     * @method getColourMap
      * @return {Object} The colour map.
      */
     this.getColourMap = function ()
@@ -179,7 +166,6 @@ dwv.ViewController = function ( view )
 
     /**
      * Set the colour map.
-     * @method setColourMap
      * @param {Object} colourMap The colour map.
      */
     this.setColourMap = function (colourMap)
@@ -189,7 +175,6 @@ dwv.ViewController = function ( view )
 
     /**
      * Set the colour map from a name.
-     * @function setColourMapFromName
      * @param {String} name The name of the colour map to set.
      */
     this.setColourMapFromName = function (name)

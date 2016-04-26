@@ -49,16 +49,22 @@ module.exports = function(grunt) {
                 }
             }
         },
-        yuidoc: {
-            compile: {
-                name: '<%= pkg.name %>',
-                description: '<%= pkg.description %>',
-                version: '<%= pkg.version %>',
-                url: '<%= pkg.homepage %>',
+        jsdoc: {
+            dist : {
+                src: ['src/**/*.js', 'tests/**/*.js', 'resources/readme-doc.md'],
                 options: {
-                    paths: 'src/',
-                    outdir: 'dist/doc/'
+                    destination: 'dist/doc',
+                    template: 'node_modules/ink-docstrap/template',
+                    configure: 'resources/jsdoc.conf.json'
                 }
+            }
+        },
+        execute: {
+            sauce_full: {
+                options: {
+                    args: ['full']
+                },
+                src: ['tests/visual/sauce.js']
             }
         }
     });
@@ -68,8 +74,10 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-coveralls');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-yuidoc');
+    grunt.loadNpmTasks('grunt-jsdoc');
+    grunt.loadNpmTasks('grunt-execute');
 
     // Task to run tests
-    grunt.registerTask('publish', ['jshint', 'qunit', 'coveralls', 'concat', 'uglify', 'yuidoc']);
+    grunt.registerTask('publish', ['jshint', 'qunit', 'coveralls', 'concat', 'uglify', 'jsdoc']);
+    grunt.registerTask('sauce', ['execute:sauce_full']);
 };

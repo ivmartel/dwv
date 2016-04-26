@@ -5,6 +5,10 @@
 /* global QUnit */
 QUnit.module("image");
 
+/**
+ * Tests for {@link dwv.image.Image} getValue.
+ * @function module:tests/image~getvalue
+ */
 QUnit.test("Test Image getValue.", function (assert) {
     // create a simple image
     var size0 = 4;
@@ -58,6 +62,10 @@ QUnit.test("Test Image getValue.", function (assert) {
     assert.equal( image1.getRescaledValue(3, 3, 0), (3*size0 + 3)*slope1+intercept1, "Value at 3,3,0" );
 });
 
+/**
+ * Tests for {@link dwv.image.Image} append.
+ * @function module:tests/image~append
+ */
 QUnit.test("Test Image append slice.", function (assert) {
     var size = 4;
     var imgSize = new dwv.image.Size(size, size, 2);
@@ -156,6 +164,10 @@ QUnit.test("Test Image append slice.", function (assert) {
     assert.deepEqual( imgGeometry2.getOrigins(), sliceOrigins2, "Slice positions (append between)" );
 });
 
+/**
+ * Tests for {@link dwv.image.Image} convolute2D.
+ * @function module:tests/image~convolute2D
+ */
 QUnit.test("Test Image convolute2D.", function (assert) {
     // create a simple image
     var size0 = 3;
@@ -194,6 +206,10 @@ QUnit.test("Test Image convolute2D.", function (assert) {
     assert.equal( testContent1, true, "convolute2D blur" );
 });
 
+/**
+ * Tests for {@link dwv.image.Image} transform.
+ * @function module:tests/image~transform
+ */
 QUnit.test("Test Image transform.", function (assert) {
     // create a simple image
     var size0 = 3;

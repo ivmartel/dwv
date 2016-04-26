@@ -1,20 +1,9 @@
-/** 
- * Tool module.
- * @module tool
- */
+// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for tool functions.
- * @class tool
- * @namespace dwv
- * @static
- */
 dwv.tool = dwv.tool || {};
 
 /**
  * WindowLevel tool: handle window/level related events.
- * @class WindowLevel
- * @namespace dwv.tool
  * @constructor
  * @param {Object} app The associated application.
  */
@@ -22,27 +11,23 @@ dwv.tool.WindowLevel = function(app)
 {
     /**
      * Closure to self: to be used by event handlers.
-     * @property self
      * @private
      * @type WindowLevel
      */
     var self = this;
     /**
      * WindowLevel GUI.
-     * @property gui
      * @type Object
      */
     var gui = null;
     /**
      * Interaction start flag.
-     * @property started
      * @type Boolean
      */
     this.started = false;
 
     /**
      * Handle mouse down event.
-     * @method mousedown
      * @param {Object} event The mouse down event.
      */
     this.mousedown = function(event){
@@ -57,7 +42,6 @@ dwv.tool.WindowLevel = function(app)
 
     /**
      * Handle mouse move event.
-     * @method mousemove
      * @param {Object} event The mouse move event.
      */
     this.mousemove = function(event){
@@ -80,7 +64,6 @@ dwv.tool.WindowLevel = function(app)
 
     /**
      * Handle mouse up event.
-     * @method mouseup
      * @param {Object} event The mouse up event.
      */
     this.mouseup = function(/*event*/){
@@ -102,7 +85,6 @@ dwv.tool.WindowLevel = function(app)
 
     /**
      * Handle mouse out event.
-     * @method mouseout
      * @param {Object} event The mouse out event.
      */
     this.mouseout = function(event){
@@ -112,7 +94,6 @@ dwv.tool.WindowLevel = function(app)
 
     /**
      * Handle touch start event.
-     * @method touchstart
      * @param {Object} event The touch start event.
      */
     this.touchstart = function(event){
@@ -121,7 +102,6 @@ dwv.tool.WindowLevel = function(app)
 
     /**
      * Handle touch move event.
-     * @method touchmove
      * @param {Object} event The touch move event.
      */
     this.touchmove = function(event){
@@ -130,7 +110,6 @@ dwv.tool.WindowLevel = function(app)
 
     /**
      * Handle touch end event.
-     * @method touchend
      * @param {Object} event The touch end event.
      */
     this.touchend = function(event){
@@ -139,7 +118,6 @@ dwv.tool.WindowLevel = function(app)
 
     /**
      * Handle double click event.
-     * @method dblclick
      * @param {Object} event The double click event.
      */
     this.dblclick = function(event){
@@ -152,7 +130,6 @@ dwv.tool.WindowLevel = function(app)
 
     /**
      * Handle key down event.
-     * @method keydown
      * @param {Object} event The key down event.
      */
     this.keydown = function(event){
@@ -162,7 +139,6 @@ dwv.tool.WindowLevel = function(app)
 
     /**
      * Setup the tool GUI.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -172,7 +148,6 @@ dwv.tool.WindowLevel = function(app)
 
     /**
      * Display the tool.
-     * @method display
      * @param {Boolean} bool The flag to display or not.
      */
     this.display = function (bool)
@@ -190,7 +165,6 @@ dwv.tool.WindowLevel = function(app)
 
     /**
      * Initialise the tool.
-     * @method init
      */
     this.init = function() {
         if ( gui ) {
@@ -202,8 +176,7 @@ dwv.tool.WindowLevel = function(app)
 
 /**
  * Help for this tool.
- * @method getHelp
- * @returns {Object} The help content.
+ * @return {Object} The help content.
  */
 dwv.tool.WindowLevel.prototype.getHelp = function()
 {

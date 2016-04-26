@@ -24,6 +24,34 @@ dwv.tool.defaultpresets.CT = {
     "head": {"center": 90, "width": 350}
 };
 
+//decode query
+dwv.utils.decodeQuery = function (query, callback)
+{
+    if (query.type === "gdrive") {
+        var gAuth = new dwv.google.Auth();
+        var gDrive = new dwv.google.Drive();
+        gDrive.setIds( query.input.split(',') );
+        // pipeline
+        gAuth.onload = gDrive.load;
+        gAuth.onfail = function () {
+            $("#popupAuth").popup("open");
+            var authorizeButton = document.getElementById('gauth-button');
+            // explicit auth from button to allow popup
+            authorizeButton.onclick = function() {
+                $("#popupAuth").popup("close");
+                gAuth.load();
+            };
+        };
+        gDrive.onload = dwv.google.getAuthorizedCallback(callback);
+        // launch with silent auth
+        gAuth.loadSilent();
+    }
+    else {
+        // default
+        dwv.utils.base.decodeQuery(query, callback);
+    }
+};
+
 // Window
 dwv.gui.getWindowSize = function () {
     return { 'width': ($(window).width()), 'height': ($(window).height() - 147) };
@@ -57,8 +85,14 @@ dwv.gui.DicomTags = dwv.gui.base.DicomTags;
 dwv.gui.Loadbox = dwv.gui.base.Loadbox;
 // File loader
 dwv.gui.FileLoad = dwv.gui.base.FileLoad;
+dwv.gui.FileLoad.prototype.onchange = function (/*event*/) {
+    $("#popupOpen").popup("close");
+};
 // Url loader
-dwv.gui.UrlLoad =  dwv.gui.base.UrlLoad;
+dwv.gui.UrlLoad = dwv.gui.base.UrlLoad;
+dwv.gui.UrlLoad.prototype.onchange = function (/*event*/) {
+    $("#popupOpen").popup("close");
+};
 
 // Toolbox
 dwv.gui.Toolbox = function (app)

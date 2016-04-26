@@ -18,25 +18,26 @@ body { margin: 10px; padding: 0; }
 <link type="text/css" rel="stylesheet" href="../../ext/jquery-mobile/jquery.mobile-1.4.5.min.css" />
 <!-- mobile web app -->
 <meta name="mobile-web-app-capable" content="yes" />
-<link rel="shortcut icon" sizes="16x16" href="../../resources/dwv-16.png" />
-<link rel="shortcut icon" sizes="60x60" href="../../resources/dwv-60.png" />
-<link rel="shortcut icon" sizes="128x128" href="../../resources/dwv-128.png" />
+<link rel="shortcut icon" sizes="16x16" href="../../resources/icons/dwv-16.png" />
+<link rel="shortcut icon" sizes="60x60" href="../../resources/icons/dwv-60.png" />
+<link rel="shortcut icon" sizes="128x128" href="../../resources/icons/dwv-128.png" />
 <!-- apple specific -->
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-<link rel="apple-touch-icon" sizes="16x16" href="../../resources/dwv-16.png" />
-<link rel="apple-touch-icon" sizes="60x60" href="../../resources/dwv-60.png" />
-<link rel="apple-touch-icon" sizes="128x128" href="../../resources/dwv-128.png" />
+<link rel="apple-touch-icon" sizes="16x16" href="../../resources/icons/dwv-16.png" />
+<link rel="apple-touch-icon" sizes="60x60" href="../../resources/icons/dwv-60.png" />
+<link rel="apple-touch-icon" sizes="128x128" href="../../resources/icons/dwv-128.png" />
 <!-- Third party -->
 <script type="text/javascript" src="../../ext/jquery/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" src="../../ext/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
 <script type="text/javascript" src="../../ext/flot/jquery.flot.min.js"></script>
+<script type="text/javascript" src="../../ext/kinetic/kinetic-v5.1.1-06.10.min.js"></script>
+<!-- decoders -->
 <script type="text/javascript" src="../../ext/pdfjs/jpx.js"></script>
 <script type="text/javascript" src="../../ext/pdfjs/util.js"></script>
 <script type="text/javascript" src="../../ext/pdfjs/arithmetic_decoder.js"></script>
 <script type="text/javascript" src="../../ext/rii-mango/lossless-min.js"></script>
 <script type="text/javascript" src="../../ext/notmasteryet/jpg.js"></script>
-<script type="text/javascript" src="../../ext/kinetic/kinetic-v5.1.1-06.10.min.js"></script>
 <!-- Local -->
 <script type="text/javascript" src="../../src/app/application.js"></script>
 <script type="text/javascript" src="../../src/app/state.js"></script>
@@ -83,6 +84,18 @@ body { margin: 10px; padding: 0; }
 <script type="text/javascript" src="../../src/tools/windowLevel.js"></script>
 <script type="text/javascript" src="../../src/tools/zoomPan.js"></script>
 <script type="text/javascript" src="../../src/utils/string.js"></script>
+<script type="text/javascript" src="../../src/utils/uri.js"></script>
+<script type="text/javascript" src="../../src/utils/thread.js"></script>
+
+<!-- Google -->
+<script type="text/javascript" src="https://apis.google.com/js/client.js"></script>
+<script type="text/javascript" src="https://apis.google.com/js/api.js"></script>
+<script type="text/javascript" src="google.js"></script>
+
+<!-- Dropbox -->
+<script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" 
+    id="dropboxjs" data-app-key="96u3396jtx3bwr8"></script>
+<script type="text/javascript" src="dropbox.js"></script>
 
 <!-- Launch the app -->
 <script type="text/javascript" src="appgui.js"></script>
@@ -108,6 +121,18 @@ body { margin: 10px; padding: 0; }
 
 <!-- Toolbar -->
 <div class="toolbar"></div>
+
+<!-- Auth popup -->
+<div data-role="popup" id="popupAuth">
+<a href="#" data-rel="back" data-role="button"
+  data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+<div style="padding:10px 20px;">
+<h3>Google Drive Authorization</h3>
+<p>Please authorize DWV to access your Google Drive.
+<br>This is only needed the first time you connect.</p>
+<button id="gauth-button" class="ui-btn">Authorize</button>
+</div>
+</div><!-- /popup -->
 
 <!-- Open popup -->
 <div data-role="popup" id="popupOpen">

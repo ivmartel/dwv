@@ -1,20 +1,10 @@
-/** 
- * Browser module.
- * @module browser
- */
+// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for browser related functions.
- * @class browser
- * @namespace dwv
- * @static
- */
+/** @namespace */
 dwv.browser = dwv.browser || {};
 
 /**
  * Browser check for the FileAPI.
- * @method hasFileApi
- * @static
  */
 dwv.browser.hasFileApi = function()
 {
@@ -34,8 +24,6 @@ dwv.browser.hasFileApi = function()
 
 /**
  * Browser check for the XMLHttpRequest.
- * @method hasXmlHttpRequest
- * @static
  */
 dwv.browser.hasXmlHttpRequest = function()
 {
@@ -44,8 +32,6 @@ dwv.browser.hasXmlHttpRequest = function()
 
 /**
  * Browser check for typed array.
- * @method hasTypedArray
- * @static
  */
 dwv.browser.hasTypedArray = function()
 {
@@ -54,8 +40,6 @@ dwv.browser.hasTypedArray = function()
 
 /**
  * Browser check for clamped array.
- * @method hasClampedArray
- * @static
  */
 dwv.browser.hasClampedArray = function()
 {
@@ -64,9 +48,7 @@ dwv.browser.hasClampedArray = function()
 
 /**
  * Browser checks to see if it can run dwv. Throws an error if not.
- * TODO Maybe use http://modernizr.com/.
- * @method check
- * @static
+ * @todo Maybe use {@link http://modernizr.com/}.
  */
 dwv.browser.check = function()
 {

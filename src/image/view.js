@@ -1,14 +1,9 @@
-/** 
- * Image module.
- * @module image
- */
+// namespaces
 var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
  * View class.
- * @class View
- * @namespace dwv.image
  * @constructor
  * @param {Image} image The associated image.
  * @param {Boolean} isSigned Is the data signed.
@@ -19,7 +14,6 @@ dwv.image.View = function(image, isSigned)
 {
     /**
      * Window lookup tables, indexed per Rescale Slope and Intercept (RSI).
-     * @property windowLuts
      * @private
      * @type Window
      */
@@ -27,21 +21,18 @@ dwv.image.View = function(image, isSigned)
 
     /**
      * Window presets.
-     * @property windowPresets
      * @private
      * @type Object
      */
     var windowPresets = null;
     /**
      * colour map
-     * @property colourMap
      * @private
      * @type Object
      */
     var colourMap = dwv.image.lut.plain;
     /**
      * Current position
-     * @property currentPosition
      * @private
      * @type Object
      */
@@ -49,20 +40,17 @@ dwv.image.View = function(image, isSigned)
 
     /**
      * Get the associated image.
-     * @method getImage
      * @return {Image} The associated image.
      */
     this.getImage = function() { return image; };
     /**
      * Set the associated image.
-     * @method setImage
      * @param {Image} inImage The associated image.
      */
     this.setImage = function(inImage) { image = inImage; };
 
     /**
      * Get the window LUT of the image.
-     * @method getWindowLut
      * @return {Window} The window LUT of the image.
      */
     this.getWindowLut = function (rsi) {
@@ -74,7 +62,6 @@ dwv.image.View = function(image, isSigned)
     };
     /**
      * Set the window LUT of the image.
-     * @method setWindowLut
      * @param {Window} wlut The window LUT of the image.
      */
     this.setWindowLut = function (wlut)
@@ -87,7 +74,6 @@ dwv.image.View = function(image, isSigned)
 
     /**
      * Initialise the view. Only called at construction.
-     * @method initialise
      * @private
      */
     function initialise()
@@ -107,13 +93,11 @@ dwv.image.View = function(image, isSigned)
 
     /**
      * Get the window presets.
-     * @method getWindowPresets
      * @return {Object} The window presets.
      */
     this.getWindowPresets = function() { return windowPresets; };
     /**
      * Set the window presets.
-     * @method setWindowPresets
      * @param {Object} presets The window presets.
      */
     this.setWindowPresets = function(presets) {
@@ -123,13 +107,11 @@ dwv.image.View = function(image, isSigned)
 
     /**
      * Get the colour map of the image.
-     * @method getColourMap
      * @return {Object} The colour map of the image.
      */
     this.getColourMap = function() { return colourMap; };
     /**
      * Set the colour map of the image.
-     * @method setColourMap
      * @param {Object} map The colour map of the image.
      */
     this.setColourMap = function(map) {
@@ -145,14 +127,12 @@ dwv.image.View = function(image, isSigned)
 
     /**
      * Is the data signed data.
-     * @method isSigned
      * @return {Boolean} The signed data flag.
      */
     this.isSigned = function() { return isSigned; };
 
     /**
      * Get the current position.
-     * @method getCurrentPosition
      * @return {Object} The current position.
      */
     this.getCurrentPosition = function() {
@@ -161,7 +141,6 @@ dwv.image.View = function(image, isSigned)
     };
     /**
      * Set the current position. Returns false if not in bounds.
-     * @method setCurrentPosition
      * @param {Object} pos The current position.
      * @param {Boolean} silent If true, does not fire a slice-change event.
      */
@@ -203,7 +182,6 @@ dwv.image.View = function(image, isSigned)
 
     /**
      * Append another view to this one.
-     * @method append
      * @param {Object} rhs The view to append.
      */
     this.append = function( rhs )
@@ -223,7 +201,6 @@ dwv.image.View = function(image, isSigned)
 
     /**
      * Set the view window/level.
-     * @method setWindowLevel
      * @param {Number} center The window center.
      * @param {Number} width The window width.
      * Warning: uses the latest set rescale LUT or the default linear one.
@@ -241,7 +218,6 @@ dwv.image.View = function(image, isSigned)
 
     /**
      * Clone the image using all meta data and the original data buffer.
-     * @method clone
      * @return {View} A full copy of this {dwv.image.View}.
      */
     this.clone = function ()
@@ -256,20 +232,17 @@ dwv.image.View = function(image, isSigned)
 
     /**
      * View listeners
-     * @property listeners
      * @private
      * @type Object
      */
     var listeners = {};
     /**
      * Get the view listeners.
-     * @method getListeners
      * @return {Object} The view listeners.
      */
     this.getListeners = function() { return listeners; };
     /**
      * Set the view listeners.
-     * @method setListeners
      * @param {Object} list The view listeners.
      */
     this.setListeners = function(list) { listeners = list; };
@@ -277,7 +250,6 @@ dwv.image.View = function(image, isSigned)
 
 /**
  * Set the image window/level to cover the full data range.
- * @method setWindowLevelMinMax
  * Warning: uses the latest set rescale LUT or the default linear one.
  */
 dwv.image.View.prototype.setWindowLevelMinMax = function()
@@ -294,7 +266,6 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
 
 /**
  * Generate display image data to be given to a canvas.
- * @method generateImageData
  * @param {Array} array The array to fill in.
  * @param {Number} sliceNumber The slice position.
  */
@@ -379,7 +350,6 @@ dwv.image.View.prototype.generateImageData = function( array )
 
 /**
  * Add an event listener on the view.
- * @method addEventListener
  * @param {String} type The event type.
  * @param {Object} listener The method associated with the provided event type.
  */
@@ -394,7 +364,6 @@ dwv.image.View.prototype.addEventListener = function(type, listener)
 
 /**
  * Remove an event listener on the view.
- * @method removeEventListener
  * @param {String} type The event type.
  * @param {Object} listener The method associated with the provided event type.
  */
@@ -414,7 +383,6 @@ dwv.image.View.prototype.removeEventListener = function(type, listener)
 
 /**
  * Fire an event: call all associated listeners.
- * @method fireEvent
  * @param {Object} event The event to fire.
  */
 dwv.image.View.prototype.fireEvent = function(event)
@@ -431,18 +399,15 @@ dwv.image.View.prototype.fireEvent = function(event)
 
 /**
  * View factory.
- * @class ViewFactory
- * @namespace dwv.image
  * @constructor
  */
 dwv.image.ViewFactory = function () {};
 
 /**
  * Get an View object from the read DICOM file.
- * @method create
  * @param {Object} dicomElements The DICOM tags.
  * @param {Array} pixelBuffer The pixel buffer.
- * @returns {View} The new View.
+ * @return {View} The new View.
  */
 dwv.image.ViewFactory.prototype.create = function (dicomElements, pixelBuffer)
 {

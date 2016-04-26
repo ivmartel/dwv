@@ -1,20 +1,9 @@
-/** 
- * Tool module.
- * @module tool
- */
+// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for tool functions.
- * @class tool
- * @namespace dwv
- * @static
- */
 dwv.tool = dwv.tool || {};
 
 /**
  * Tool box.
- * @class Toolbox
- * @namespace dwv.tool
  * @constructor
  * @param {Array} toolList The list of tool objects.
  * @param {Object} gui The associated gui.
@@ -23,26 +12,22 @@ dwv.tool.Toolbox = function( toolList, app )
 {
     /**
      * Toolbox GUI.
-     * @property gui
      * @type Object
      */
     var gui = null;
     /**
      * Selected tool.
-     * @property selectedTool
      * @type Object
      */
     var selectedTool = null;
     /**
      * Default tool name.
-     * @property defaultToolName
      * @type String
      */
     var defaultToolName = null;
 
     /**
      * Get the list of tools.
-     * @method getToolList
      * @return {Array} The list of tool objects.
      */
     this.getToolList = function ()
@@ -52,7 +37,6 @@ dwv.tool.Toolbox = function( toolList, app )
 
     /**
      * Get the selected tool.
-     * @method getSelectedTool
      * @return {Object} The selected tool.
      */
     this.getSelectedTool = function ()
@@ -62,7 +46,6 @@ dwv.tool.Toolbox = function( toolList, app )
 
     /**
      * Setup the toolbox GUI.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -77,7 +60,6 @@ dwv.tool.Toolbox = function( toolList, app )
 
     /**
      * Display the toolbox.
-     * @method display
      * @param {Boolean} bool Flag to display or not.
      */
     this.display = function (bool)
@@ -89,7 +71,6 @@ dwv.tool.Toolbox = function( toolList, app )
 
     /**
      * Initialise the tool box.
-     * @method init
      */
     this.init = function ()
     {
@@ -118,7 +99,6 @@ dwv.tool.Toolbox = function( toolList, app )
 
     /**
      * Set the selected tool.
-     * @method setSelectedTool
      * @return {String} The name of the tool to select.
      */
     this.setSelectedTool = function (name)
@@ -141,7 +121,6 @@ dwv.tool.Toolbox = function( toolList, app )
 
     /**
      * Reset the tool box.
-     * @method reset
      */
     this.reset = function ()
     {
@@ -156,7 +135,6 @@ dwv.tool.Toolbox = function( toolList, app )
 
 /**
  * Check if a tool is in the tool list.
- * @method hasTool
  * @param {String} name The name to check.
  * @return {String} The tool list element for the given name.
  */

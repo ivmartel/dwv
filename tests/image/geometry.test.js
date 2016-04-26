@@ -1,10 +1,15 @@
 /**
  * Tests for the 'image/geometry.js' file.
  */
+/** @module tests/image */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module("geometry");
 
+/**
+ * Tests for {@link dwv.image.Size}.
+ * @function module:tests/image~size
+ */
 QUnit.test("Test Size.", function (assert) {
     var size0 = new dwv.image.Size(2, 3, 4);
     // test its values
@@ -26,6 +31,10 @@ QUnit.test("Test Size.", function (assert) {
     assert.equal( size0.isInBounds(-1,2,3), 0, "isInBounds too small" );
 });
 
+/**
+ * Tests for {@link dwv.image.Spacing}.
+ * @function module:tests/image~spacing
+ */
 QUnit.test("Test Spacing.", function (assert) {
     var spacing0 = new dwv.image.Spacing(2, 3, 4);
     // test its values

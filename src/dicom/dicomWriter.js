@@ -1,16 +1,10 @@
-/**
- * DICOM module.
- * @module dicom
- */
+// namespaces
 var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
 
 /**
  * Data writer.
- * @class DataWriter
- * @namespace dwv.dicom
- * @constructor
- * @param {Array} buffer The input array buffer.
+ * 
  * Example usage:
  *   var parser = new dwv.dicom.DicomParser();
  *   parser.parse(this.response);
@@ -22,6 +16,8 @@ dwv.dicom = dwv.dicom || {};
  *   element.href = URL.createObjectURL(blob);
  *   element.download = "anonym.dcm";
  *   
+ * @constructor
+ * @param {Array} buffer The input array buffer.
  */
 dwv.dicom.DataWriter = function (buffer)
 {
@@ -87,8 +83,6 @@ dwv.dicom.DataWriter = function (buffer)
 
 /**
  * DICOM writer.
- * @class DicomWriter
- * @namespace dwv.dicom
  * @constructor
  * @param {Array} dicomElements The wrapped elements to wrap.
  */

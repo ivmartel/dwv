@@ -14,8 +14,8 @@ document.addEventListener("DOMContentLoaded", function (/*event*/)
     myapp.init({
         "containerDivId": "dwv",
         "fitToWindow": true,
-        "tools": ["Scroll", "Zoom/Pan", "Window/Level"],
         "gui": ["tool"],
+        "tools": ["Scroll", "Zoom/Pan", "Window/Level"],
         "isMobile": true
     });
     dwv.gui.appendResetHtml(myapp);

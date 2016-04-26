@@ -1,28 +1,22 @@
-/** 
- * Tool module.
- * @module tool
- */
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
+//external
 var Kinetic = Kinetic || {};
 
 /**
  * Line factory.
- * @class LineFactory
- * @namespace dwv.tool
  * @constructor
  */
 dwv.tool.LineFactory = function ()
 {
     /**
      * Get the number of points needed to build the shape.
-     * @method getNPoints
      * @return {Number} The number of points.
      */
     this.getNPoints = function () { return 2; };
     /**
      * Get the timeout between point storage.
-     * @method getTimeout
      * @return {Number} The timeout in milliseconds.
      */
     this.getTimeout = function () { return 0; };
@@ -30,7 +24,6 @@ dwv.tool.LineFactory = function ()
 
 /**
  * Create a line shape to be displayed.
- * @method create
  * @param {Array} points The points from which to extract the line.
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
@@ -72,8 +65,6 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
 
 /**
  * Update a line shape.
- * @method UpdateLine
- * @static
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
  */

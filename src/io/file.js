@@ -1,49 +1,41 @@
-/** 
- * I/O module.
- * @module io
- */
+// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for I/O functions.
- * @class io
- * @namespace dwv
- * @static
- */
+/** @namespace */
 dwv.io = dwv.io || {};
 
 /**
  * File loader.
- * @class File
- * @namespace dwv.io
  * @constructor
  */
 dwv.io.File = function ()
 {
     /**
      * Number of data to load.
-     * @property nToLoad
      * @private
      * @type Number
      */
     var nToLoad = 0;
     /**
      * Number of loaded data.
-     * @property nLoaded
      * @private
      * @type Number
      */
     var nLoaded = 0;
     /**
      * List of progresses.
-     * @property progressList
      * @private
      * @type Array
      */
     var progressList = [];
-
+    /**
+     * List of data decoders scripts.
+     * @private
+     * @type Array
+     */
+    var decoderScripts = [];
+    
     /**
      * Set the number of data to load.
-     * @method setNToLoad
      */
     this.setNToLoad = function (n) {
         nToLoad = n;
@@ -55,7 +47,6 @@ dwv.io.File = function ()
     /**
      * Increment the number of loaded data
      * and call onloadend if loaded all data.
-     * @method addLoaded
      */
     this.addLoaded = function () {
         nLoaded++;
@@ -66,24 +57,37 @@ dwv.io.File = function ()
 
     /**
      * Get the global load percent including the provided one.
-     * @method getGlobalPercent
      * @param {Number} n The number of the loaded data.
      * @param {Number} percent The percentage of data 'n' that has been loaded.
      * @return {Number} The accumulated percentage.
      */
     this.getGlobalPercent = function (n, percent) {
-        progressList[n] = percent/nToLoad;
+        progressList[n] = percent;
         var totPercent = 0;
         for ( var i = 0; i < progressList.length; ++i ) {
             totPercent += progressList[i];
         }
-        return totPercent;
+        return totPercent/nToLoad;
+    };
+    
+    /**
+     * Set the web workers decoder scripts.
+     * @param {Array} list The list of decoder scripts.
+     */
+    this.setDecoderScripts = function (list) {
+        decoderScripts = list;
+    };
+    /**
+     * Get the web workers decoder scripts.
+     * @return {Array} list The list of decoder scripts.
+     */
+    this.getDecoderScripts = function () {
+        return decoderScripts;
     };
 }; // class File
 
 /**
  * Handle a load event.
- * @method onload
  * @param {Object} event The load event, event.target
  *  should be the loaded data.
  */
@@ -93,7 +97,6 @@ dwv.io.File.prototype.onload = function (/*event*/)
 };
 /**
  * Handle a load end event.
- * @method onloadend
  */
 dwv.io.File.prototype.onloadend = function ()
 {
@@ -101,7 +104,6 @@ dwv.io.File.prototype.onloadend = function ()
 };
 /**
  * Handle a progress event.
- * @method onprogress
  */
 dwv.io.File.prototype.onprogress = function ()
 {
@@ -109,7 +111,6 @@ dwv.io.File.prototype.onprogress = function ()
 };
 /**
  * Handle an error event.
- * @method onerror
  * @param {Object} event The error event, event.message
  *  should be the error message.
  */
@@ -120,7 +121,6 @@ dwv.io.File.prototype.onerror = function (/*event*/)
 
 /**
  * Create an error handler from a base one and locals.
- * @method createErrorHandler
  * @param {String} file The related file.
  * @param {String} text The text to insert in the message.
  * @param {Function} baseHandler The base handler.
@@ -135,7 +135,6 @@ dwv.io.File.createErrorHandler = function (file, text, baseHandler) {
 
 /**
  * Create an progress handler from a base one and locals.
- * @method createProgressHandler
  * @param {Number} n The number of the loaded data.
  * @param {Function} calculator The load progress accumulator.
  * @param {Function} baseHandler The base handler.
@@ -154,7 +153,6 @@ dwv.io.File.createProgressHandler = function (n, calculator, baseHandler) {
 
 /**
  * Load a list of files.
- * @method load
  * @param {Array} ioArray The list of files to load.
  */
 dwv.io.File.prototype.load = function (ioArray)
@@ -165,44 +163,45 @@ dwv.io.File.prototype.load = function (ioArray)
     this.setNToLoad( ioArray.length );
 
     // call the listeners
-    var onLoad = function (data)
+    var onLoadView = function (data)
     {
         self.onload(data);
         self.addLoaded();
     };
 
-    // DICOM reader loader
-    var onLoadDicomReader = function (event)
+    // DICOM buffer to dwv.image.View (asynchronous)
+    var db2v = new dwv.image.DicomBufferToView(this.getDecoderScripts());
+    var onLoadDicomBuffer = function (event)
     {
         try {
-            onLoad( dwv.image.getDataFromDicomBuffer(event.target.result) );
+            db2v.convert(event.target.result, onLoadView);
+        } catch (error) {
+            self.onerror(error);
+        }
+    };
+
+    // DOM Image buffer to dwv.image.View 
+    var onLoadDOMImageBuffer = function (/*event*/)
+    {
+        try {
+            onLoadView( dwv.image.getViewFromDOMImage(this) );
+        } catch (error) {
+            self.onerror(error);
+        }
+    };
+
+    // load text buffer
+    var onLoadTextBuffer = function (event)
+    {
+        try {
+            self.onload( event.target.result );
         } catch(error) {
             self.onerror(error);
         }
     };
 
-    // image loader
-    var onLoadImage = function (/*event*/)
-    {
-        try {
-            onLoad( dwv.image.getDataFromImage(this) );
-        } catch(error) {
-            self.onerror(error);
-        }
-    };
-
-    // text reader loader
-    var onLoadTextReader = function (event)
-    {
-        try {
-            onLoad( event.target.result );
-        } catch(error) {
-            self.onerror(error);
-        }
-    };
-
-    // image reader loader
-    var onLoadImageReader = function (event)
+    // raw image to DOM Image
+    var onLoadRawImageBuffer = function (event)
     {
         var theImage = new Image();
         theImage.src = event.target.result;
@@ -210,7 +209,7 @@ dwv.io.File.prototype.load = function (ioArray)
         theImage.file = this.file;
         theImage.index = this.index;
         // triggered by ctx.drawImage
-        theImage.onload = onLoadImage;
+        theImage.onload = onLoadDOMImageBuffer;
     };
 
     // loop on I/O elements
@@ -222,7 +221,7 @@ dwv.io.File.prototype.load = function (ioArray)
                 self.getGlobalPercent, self.onprogress);
         if ( file.name.split('.').pop().toLowerCase() === "json" )
         {
-            reader.onload = onLoadTextReader;
+            reader.onload = onLoadTextBuffer;
             reader.onerror = dwv.io.File.createErrorHandler(file, "text", self.onerror);
             reader.readAsText(file);
         }
@@ -232,13 +231,13 @@ dwv.io.File.prototype.load = function (ioArray)
             reader.file = file;
             reader.index = i;
             // callbacks
-            reader.onload = onLoadImageReader;
+            reader.onload = onLoadRawImageBuffer;
             reader.onerror = dwv.io.File.createErrorHandler(file, "image", self.onerror);
             reader.readAsDataURL(file);
         }
         else
         {
-            reader.onload = onLoadDicomReader;
+            reader.onload = onLoadDicomBuffer;
             reader.onerror = dwv.io.File.createErrorHandler(file, "DICOM", self.onerror);
             reader.readAsArrayBuffer(file);
         }

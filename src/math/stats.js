@@ -1,16 +1,11 @@
-/** 
- * Math module.
- * @module math
- */
+// namespaces
 var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
 /**
  * Get the minimum, maximum, mean and standard deviation
  * of an array of values.
- * Note: could use https://github.com/tmcw/simple-statistics
- * @method getStats
- * @static
+ * Note: could use {@link https://github.com/tmcw/simple-statistics}.
  */
 dwv.math.getStats = function (array)
 {
@@ -45,25 +40,10 @@ dwv.math.getStats = function (array)
 
 /**
  * Unique ID generator.
- * @class IdGenerator
- * @namespace dwv.math
- * @constructor
+ * See {@link http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript}
+ * and this {@link http://stackoverflow.com/a/13403498 answer}.
  */
-dwv.math.IdGenerator = function ()
+dwv.math.guid = function ()
 {
-    /**
-     * Root for IDs.
-     * @property root
-     * @private
-     * @type Number
-     */
-    var root = Math.floor( Math.random() * 26 ) + Date.now();
-    /**
-     * Get a unique id.
-     * @method get
-     * @return {Number} The unique Id.
-     */
-    this.get = function () {
-        return root++;
-    };
+    return Math.random().toString(36).substring(2, 15);
 };

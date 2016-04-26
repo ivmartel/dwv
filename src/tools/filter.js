@@ -1,54 +1,45 @@
-/** 
- * Tool module.
- * @module tool
- */
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
+/** @namespace */
+dwv.tool.filter = dwv.tool.filter || {};
 
 /**
  * Filter tool.
- * @class Filter
- * @namespace dwv.tool
  * @constructor
  * @param {Array} filterList The list of filter objects.
- * @param {Object} gui The associated gui.
+ * @param {Object} app The associated app.
  */
 dwv.tool.Filter = function ( filterList, app )
 {
     /**
      * Filter GUI.
-     * @property gui
      * @type Object
      */
     var gui = null;
     /**
      * Filter list
-     * @property filterList
      * @type Object
      */
     this.filterList = filterList;
     /**
      * Selected filter.
-     * @property selectedFilter
      * @type Object
      */
     this.selectedFilter = 0;
     /**
      * Default filter name.
-     * @property defaultFilterName
      * @type String
      */
     this.defaultFilterName = 0;
     /**
      * Display Flag.
-     * @property displayed
      * @type Boolean
      */
     this.displayed = false;
 
     /**
      * Setup the filter GUI.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -63,7 +54,6 @@ dwv.tool.Filter = function ( filterList, app )
 
     /**
      * Enable the filter.
-     * @method enable
      * @param {Boolean} bool Flag to enable or not.
      */
     this.display = function (bool)
@@ -78,7 +68,6 @@ dwv.tool.Filter = function ( filterList, app )
 
     /**
      * Initialise the filter.
-     * @method init
      */
     this.init = function ()
     {
@@ -101,7 +90,6 @@ dwv.tool.Filter = function ( filterList, app )
 
     /**
      * Handle keydown event.
-     * @method keydown
      * @param {Object} event The keydown event.
      */
     this.keydown = function (event)
@@ -113,8 +101,7 @@ dwv.tool.Filter = function ( filterList, app )
 
 /**
  * Help for this tool.
- * @method getHelp
- * @returns {Object} The help content.
+ * @return {Object} The help content.
  */
 dwv.tool.Filter.prototype.getHelp = function ()
 {
@@ -129,7 +116,6 @@ dwv.tool.Filter.prototype.getHelp = function ()
 
 /**
  * Get the selected filter.
- * @method getSelectedFilter
  * @return {Object} The selected filter.
  */
 dwv.tool.Filter.prototype.getSelectedFilter = function ()
@@ -139,7 +125,6 @@ dwv.tool.Filter.prototype.getSelectedFilter = function ()
 
 /**
  * Set the selected filter.
- * @method setSelectedFilter
  * @return {String} The name of the filter to select.
  */
 dwv.tool.Filter.prototype.setSelectedFilter = function (name)
@@ -165,7 +150,6 @@ dwv.tool.Filter.prototype.setSelectedFilter = function (name)
 
 /**
  * Get the list of filters.
- * @method getFilterList
  * @return {Array} The list of filter objects.
  */
 dwv.tool.Filter.prototype.getFilterList = function ()
@@ -175,7 +159,6 @@ dwv.tool.Filter.prototype.getFilterList = function ()
 
 /**
  * Check if a filter is in the filter list.
- * @method hasFilter
  * @param {String} name The name to check.
  * @return {String} The filter list element for the given name.
  */
@@ -184,13 +167,8 @@ dwv.tool.Filter.prototype.hasFilter = function (name)
     return this.filterList[name];
 };
 
-// Filter namespace
-dwv.tool.filter = dwv.tool.filter || {};
-
 /**
  * Threshold filter tool.
- * @class Threshold
- * @namespace dwv.tool.filter
  * @constructor
  * @param {Object} app The associated application.
  */
@@ -198,14 +176,12 @@ dwv.tool.filter.Threshold = function ( app )
 {
     /**
      * Filter GUI.
-     * @property gui
      * @type Object
      */
     var gui = new dwv.gui.Threshold(app);
 
     /**
      * Setup the filter GUI.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -214,7 +190,6 @@ dwv.tool.filter.Threshold = function ( app )
 
     /**
      * Display the filter.
-     * @method display
      * @param {Boolean} bool Flag to display or not.
      */
     this.display = function (bool)
@@ -224,7 +199,6 @@ dwv.tool.filter.Threshold = function ( app )
 
     /**
      * Initialise the filter.
-     * @method init
      */
     this.init = function ()
     {
@@ -233,7 +207,6 @@ dwv.tool.filter.Threshold = function ( app )
 
     /**
      * Run the filter.
-     * @method run
      * @param {Mixed} args The filter arguments.
      */
     this.run = function (args)
@@ -252,8 +225,6 @@ dwv.tool.filter.Threshold = function ( app )
 
 /**
  * Sharpen filter tool.
- * @class Sharpen
- * @namespace dwv.tool.filter
  * @constructor
  * @param {Object} app The associated application.
  */
@@ -261,14 +232,12 @@ dwv.tool.filter.Sharpen = function ( app )
 {
     /**
      * Filter GUI.
-     * @property gui
      * @type Object
      */
     var gui = new dwv.gui.Sharpen(app);
 
     /**
      * Setup the filter GUI.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -277,7 +246,6 @@ dwv.tool.filter.Sharpen = function ( app )
 
     /**
      * Display the filter.
-     * @method display
      * @param {Boolean} bool Flag to enable or not.
      */
     this.display = function (bool)
@@ -287,7 +255,6 @@ dwv.tool.filter.Sharpen = function ( app )
 
     /**
      * Initialise the filter.
-     * @method init
      */
     this.init = function()
     {
@@ -296,7 +263,6 @@ dwv.tool.filter.Sharpen = function ( app )
 
     /**
      * Run the filter.
-     * @method run
      * @param {Mixed} args The filter arguments.
      */
     this.run = function(/*args*/)
@@ -312,8 +278,6 @@ dwv.tool.filter.Sharpen = function ( app )
 
 /**
  * Sobel filter tool.
- * @class Sobel
- * @namespace dwv.tool.filter
  * @constructor
  * @param {Object} app The associated application.
  */
@@ -321,14 +285,12 @@ dwv.tool.filter.Sobel = function ( app )
 {
     /**
      * Filter GUI.
-     * @property gui
      * @type Object
      */
     var gui = new dwv.gui.Sobel(app);
 
     /**
      * Setup the filter GUI.
-     * @method setup
      */
     this.setup = function ()
     {
@@ -337,7 +299,6 @@ dwv.tool.filter.Sobel = function ( app )
 
     /**
      * Enable the filter.
-     * @method enable
      * @param {Boolean} bool Flag to enable or not.
      */
     this.display = function(bool)
@@ -347,7 +308,6 @@ dwv.tool.filter.Sobel = function ( app )
 
     /**
      * Initialise the filter.
-     * @method init
      */
     this.init = function()
     {
@@ -356,7 +316,6 @@ dwv.tool.filter.Sobel = function ( app )
 
     /**
      * Run the filter.
-     * @method run
      * @param {Mixed} args The filter arguments.
      */
     dwv.tool.filter.Sobel.prototype.run = function(/*args*/)
@@ -372,8 +331,6 @@ dwv.tool.filter.Sobel = function ( app )
 
 /**
  * Run filter command.
- * @class RunFilterCommand
- * @namespace dwv.tool
  * @constructor
  * @param {Object} filter The filter to run.
  * @param {Object} app The associated application.
@@ -382,14 +339,12 @@ dwv.tool.RunFilterCommand = function (filter, app) {
 
     /**
      * Get the command name.
-     * @method getName
      * @return {String} The command name.
      */
     this.getName = function () { return "Filter-" + filter.getName(); };
 
     /**
      * Execute the command.
-     * @method execute
      */
     this.execute = function ()
     {
@@ -399,7 +354,6 @@ dwv.tool.RunFilterCommand = function (filter, app) {
     };
     /**
      * Undo the command.
-     * @method undo
      */
     this.undo = function () {
         app.setImage(filter.getOriginalImage());

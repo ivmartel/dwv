@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <title>DWV Tests</title>
-<link rel="stylesheet" href="../ext/qunit/qunit-1.19.0.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../ext/qunit/qunit-1.22.0.css" type="text/css" media="screen" />
 <style>
 .footer {
     font-family: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif;
@@ -16,9 +16,10 @@
 <div id="qunit"></div>
 <div id="qunit-fixture"></div>
 <!-- Third party -->
-<script type="text/javascript" src="../ext/qunit/qunit-1.19.0.js"></script>
+<script type="text/javascript" src="../ext/qunit/qunit-1.22.0.js"></script>
 <!-- Source -->
 <script type="text/javascript" src="../src/utils/string.js" data-cover></script>
+<script type="text/javascript" src="../src/utils/uri.js" data-cover></script>
 <script type="text/javascript" src="../src/dicom/dicomParser.js" data-cover></script>
 <script type="text/javascript" src="../src/dicom/dictionary.js" data-cover></script>
 <script type="text/javascript" src="../src/gui/browser.js" data-cover></script>
@@ -32,6 +33,7 @@
 <script type="text/javascript" src="../src/math/point.js" data-cover></script>
 <script type="text/javascript" src="../src/math/shapes.js" data-cover></script>
 <script type="text/javascript" src="../src/math/stats.js" data-cover></script>
+<script type="text/javascript" src="../src/utils/thread.js" data-cover></script>
 <!-- Tests -->
 <script type="text/javascript" src="dicom/dicomParser.test.js"></script>
 <script type="text/javascript" src="html/html.test.js"></script>
@@ -42,13 +44,14 @@
 <script type="text/javascript" src="math/shapes.test.js"></script>
 <script type="text/javascript" src="math/stats.test.js"></script>
 <script type="text/javascript" src="utils/string.test.js"></script>
+<script type="text/javascript" src="utils/uri.test.js"></script>
 
 <div class="footer">
 <p>See also:</p>
 <ul>
-<li>Visual tests: <a href="./pacs/data/index.html">DICOM</a>,
-    <a href="./pacs/data/index-jpeg.html">DICOM jpg</a>,
-    <a href="./pacs/data/index-jpeg2000.html">DICOM jpg2000</a></li>
+<li>Visual tests: <a href="./visual/index.html">DICOM</a>,
+    <a href="./visual/index-jpeg.html">DICOM jpg</a>,
+    <a href="./visual/index-jpeg2000.html">DICOM jpg2000</a></li>
 <li><a href="./pacs/index.html">Fake PACS</a></li>
 <li><a href="./image/index.html">Colour maps</a></li>
 </ul>

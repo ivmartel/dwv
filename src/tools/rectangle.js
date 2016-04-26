@@ -1,28 +1,22 @@
-/** 
- * Tool module.
- * @module tool
- */
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
+//external
 var Kinetic = Kinetic || {};
 
 /**
  * Rectangle factory.
- * @class RectangleFactory
- * @namespace dwv.tool
  * @constructor
  */
 dwv.tool.RectangleFactory = function ()
 {
     /**
      * Get the number of points needed to build the shape.
-     * @method getNPoints
      * @return {Number} The number of points.
      */
     this.getNPoints = function () { return 2; };
     /**
      * Get the timeout between point storage.
-     * @method getTimeout
      * @return {Number} The timeout in milliseconds.
      */
     this.getTimeout = function () { return 0; };
@@ -30,7 +24,6 @@ dwv.tool.RectangleFactory = function ()
 
 /**
  * Create a rectangle shape to be displayed.
- * @method create
  * @param {Array} points The points from which to extract the rectangle.
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
@@ -73,8 +66,6 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
 
 /**
  * Update a rectangle shape.
- * @method UpdateRect
- * @static
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
  */

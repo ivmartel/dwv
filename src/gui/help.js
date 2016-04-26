@@ -1,20 +1,10 @@
-/** 
- * GUI module.
- * @module gui
- */
+// namespaces
 var dwv = dwv || {};
-/**
- * Namespace for GUI functions.
- * @class gui
- * @namespace dwv
- * @static
- */
 dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Append the version HTML.
- * @method appendVersionHtml
  */
 dwv.gui.base.appendVersionHtml = function (version)
 {
@@ -28,7 +18,6 @@ dwv.gui.base.appendVersionHtml = function (version)
 
 /**
  * Build the help HTML.
- * @method appendHelpHtml
  * @param {Boolean} mobile Flag for mobile or not environement.
  */
 dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
@@ -103,38 +92,31 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
     var dwvLink = document.createElement("a");
     dwvLink.href = "https://github.com/ivmartel/dwv/wiki";
     dwvLink.title = "DWV wiki on github.";
-    dwvLink.appendChild(document.createTextNode("DWV"));
-
-    var dwvExampleLink = document.createElement("a");
-    var inputIdx = document.URL.indexOf("?input=");
-    dwvExampleLink.href = document.URL.substr(0, inputIdx+7) +
-        "http%3A%2F%2Fx.babymri.org%2F%3F53320924%26.dcm";
-    dwvExampleLink.title = "Brain MRI in DWV.";
-    dwvExampleLink.target = "_top";
-    dwvExampleLink.appendChild(document.createTextNode("MRI"));
-
-    var bbmriLink = document.createElement("a");
-    bbmriLink.href = "http://www.babymri.org";
-    bbmriLink.title = "babymri.org";
-    bbmriLink.appendChild(document.createTextNode("babymri.org"));
+    dwvLink.appendChild(document.createTextNode("wiki"));
 
     var headPara = document.createElement("p");
+    headPara.appendChild(document.createTextNode("DWV (DICOM Web Viewer) is an open source " +
+    	"zero footprint medical image viewer. It uses only javascript and HTML5 technologies, " +
+    	"meaning that it can be run on any platform that provides a modern browser " +
+    	"(laptop, tablet, phone and even modern TVs). It can load local or remote data " +
+    	"in DICOM format (the standard for medical imaging data such as MR, CT, Echo, Mammo, NM...) " +
+    	"and provides standard tools for its manipulation such as contrast, zoom, " +
+    	"drag, possibility to draw regions on top of the image and imaging filters " +
+    	"such as threshold and sharpening. Find out more from the DWV "));
     headPara.appendChild(dwvLink);
-    headPara.appendChild(document.createTextNode(" can load DICOM data " +
-        "either from a local file or from an URL. All DICOM tags are available " +
+    headPara.appendChild(document.createTextNode("."));
+    helpNode.appendChild(headPara);
+
+    var secondPara = document.createElement("p");
+    secondPara.appendChild(document.createTextNode("All DICOM tags are available " +
         "in a searchable table, press the 'tags' or grid button. " +
         "You can choose to display the image information overlay by pressing the " +
-        "'info' or i button. For some example data, check this "));
-    headPara.appendChild(dwvExampleLink);
-    headPara.appendChild(document.createTextNode(" from the " ));
-    headPara.appendChild(bbmriLink);
-    headPara.appendChild(document.createTextNode(" database." ));
-    helpNode.appendChild(headPara);
+        "'info' or i button."));
+    helpNode.appendChild(secondPara);
 
     var toolPara = document.createElement("p");
     toolPara.appendChild(document.createTextNode("Each tool defines the possible " +
-        "user interactions. The default tool is the window/level one. " +
-        "Here are the available tools:"));
+        "user interactions. Here are the available tools:"));
     helpNode.appendChild(toolPara);
     helpNode.appendChild(toolHelpDiv);
 };
