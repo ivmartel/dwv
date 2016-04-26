@@ -772,6 +772,58 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // draw
             drawLayer.draw();
         });
+        shape.on('dblclick', function () {
+
+            var group = this.getParent();
+            var labelText = prompt("Add label");
+            // if user introduce a text, create or update label
+            if(labelText && labelText.length){
+                klabel = group.getChildren(function(node){
+                    return node.getClassName() === 'Label';
+                })
+                // update label
+                if (klabel.length){
+                    console.warn(klabel.getText());
+                    klabel[0].getText().setText(labelText);
+                }
+                // create label
+                else{
+                    var style = app.getStyle();
+                    var lpos = group.getChildren(function(node){
+                        return node.getClassName() === 'Text';
+                    })[0].getPosition();
+
+                    var klabel = new Kinetic.Label({
+                        x: lpos.x,
+                        y: lpos.y + style.getFontSize() * 1.1,
+                        draggable: true
+                    });
+
+                    klabel.add(new Kinetic.Tag({
+                        fill: 'rgba(0,0,0,.25)',
+                        stroke: style.getLineColour()
+                    }));
+
+                    var style = app.getStyle();
+                    klabel.add(new Kinetic.Text({
+                        text: labelText,
+                        fontSize: style.getFontSize(),
+                        fill: style.getLineColour(),
+                        padding: 5
+                    }));
+                }
+                group.add(klabel);
+            }
+            // else remove label
+            else{
+                var klabel = group.getChildren(function(node){
+                    return node.getClassName() === 'Label';
+                });
+                klabel.remove();
+            }
+            // draw label
+            drawLayer.draw();
+        });
     };
 
     /**
