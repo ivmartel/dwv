@@ -2,12 +2,9 @@
  * Application launcher.
  */
 
-// check browser support
-dwv.browser.check();
+// start app function
+function startApp() {
 
-// launch when page is loaded
-$(document).ready( function()
-{
     // main application
     var myapp = new dwv.App();
 
@@ -51,5 +48,16 @@ $(document).ready( function()
 
     var size = dwv.gui.getWindowSize();
     $(".layerContainer").height(size.height);
+    
+}
 
+// check browser support
+dwv.browser.check();
+// initialise i18n
+dwv.i18nInitialise();
+// launch when page is ready
+$(document).ready( function()
+{
+    // and i18n is loaded
+    dwv.i18nOnLoaded( startApp );
 });
