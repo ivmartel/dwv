@@ -711,38 +711,39 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         });
         shape.on('dblclick', function () {
 
+            var labelText = prompt("Add label");
+            // if press cancel do nothing
+            if(labelText == null){
+                return false
+            }
             var group = this.getParent(),
-                labelText = prompt("Add label"),
                 klabel;
             // if user introduce a text, create or update label
-            if(labelText && labelText.length){
+            if(labelText.length > 0){
+
                 klabel = group.getChildren(function(node){
                     return node.getClassName() === 'Label';
                 });
                 // update label
                 if (klabel.length){
-                    console.warn(klabel.getText());
                     klabel[0].getText().setText(labelText);
                 }
                 // create label
                 else{
                     var labelStyle = app.getStyle(),
-                        labelPos,
-                        labelDraw;
+                        labelPos;
+
                     try{
                         // For all drawings
-                        labelDraw = group.getChildren(function(node){
+                        labelPos = group.getChildren(function(node){
                             return node.getClassName() === 'Text';
-                        });
+                        })[0].getPosition();
                     }
                     catch(e){
                         // for Livewire
-                        labelDraw = group.getChildren(function(node){
+                        labelPos = group.getChildren(function(node){
                             return node.getClassName() === 'Circle';
-                        });
-                    }
-                    finally{
-                        labelPos = labelDraw[0].getPosition();
+                        })[0].getPosition();
                     }
 
                     klabel = new Kinetic.Label({
@@ -765,7 +766,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 }
                 group.add(klabel);
             }
-            // else remove label
+            // if user does not introduce a text, remove label.
             else{
                 klabel = group.getChildren(function(node){
                     return node.getClassName() === 'Label';
