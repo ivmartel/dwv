@@ -181,14 +181,14 @@ dwv.tool.WindowLevel = function(app)
 dwv.tool.WindowLevel.prototype.getHelp = function()
 {
     return {
-        'title': "Window/Level",
-        'brief': "Changes the Window and Level of the image.",
-        'mouse': {
-            'mouse_drag': "A single mouse drag changes the window in the horizontal direction and the level in the vertical one.",
-            'double_click': "A double click will center the window and level on the clicked intensity.",
+        "title": dwv.i18n("tool.wl.name"),
+        "brief": dwv.i18n("tool.wl.brief"),
+        "mouse": {
+            "mouse_drag": dwv.i18n("tool.wl.mouse_drag"),
+            "double_click": dwv.i18n("tool.wl.double_click")
         },
-        'touch': {
-            'touch_drag': "A single touch drag changes the window in the horizontal direction and the level in the vertical one.",
+        "touch": {
+            "touch_drag": dwv.i18n("tool.wl.touch_drag")
         }
     };
 };

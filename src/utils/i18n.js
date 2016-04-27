@@ -7,12 +7,6 @@ var i18next = i18next || {};
 var i18nextXHRBackend = i18nextXHRBackend || {};
 
 var devlng = {
-    "help": {
-        "scroll": {
-            "name": "(d) Scrool"
-        }
-    },
-    "bye": "dev-bye"
 };
 
 /**
@@ -45,6 +39,6 @@ dwv.i18nOnLoaded = function (callback) {
 /**
  * Get the translated text.
  */
-dwv.i18n = function (text) {
-    return i18next.t(text);
+dwv.i18n = function (text, options) {
+    return i18next.t(text, options);
 };
