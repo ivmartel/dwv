@@ -8180,34 +8180,16 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
 
     var helpNode = app.getElement("help");
 
-    var dwvLink = document.createElement("a");
-    dwvLink.href = "https://github.com/ivmartel/dwv/wiki";
-    dwvLink.title = "DWV wiki on github.";
-    dwvLink.appendChild(document.createTextNode("wiki"));
-
     var headPara = document.createElement("p");
-    headPara.appendChild(document.createTextNode("DWV (DICOM Web Viewer) is an open source " +
-    	"zero footprint medical image viewer. It uses only javascript and HTML5 technologies, " +
-    	"meaning that it can be run on any platform that provides a modern browser " +
-    	"(laptop, tablet, phone and even modern TVs). It can load local or remote data " +
-    	"in DICOM format (the standard for medical imaging data such as MR, CT, Echo, Mammo, NM...) " +
-    	"and provides standard tools for its manipulation such as contrast, zoom, " +
-    	"drag, possibility to draw regions on top of the image and imaging filters " +
-    	"such as threshold and sharpening. Find out more from the DWV "));
-    headPara.appendChild(dwvLink);
-    headPara.appendChild(document.createTextNode("."));
+    headPara.appendChild(document.createTextNode(dwv.i18n("help.intro.p0")));
     helpNode.appendChild(headPara);
 
     var secondPara = document.createElement("p");
-    secondPara.appendChild(document.createTextNode("All DICOM tags are available " +
-        "in a searchable table, press the 'tags' or grid button. " +
-        "You can choose to display the image information overlay by pressing the " +
-        "'info' or i button."));
+    secondPara.appendChild(document.createTextNode(dwv.i18n("help.intro.p1")));
     helpNode.appendChild(secondPara);
 
     var toolPara = document.createElement("p");
-    toolPara.appendChild(document.createTextNode("Each tool defines the possible " +
-        "user interactions. Here are the available tools:"));
+    toolPara.appendChild(document.createTextNode(dwv.i18n("help.tool_intro")));
     helpNode.appendChild(toolPara);
     helpNode.appendChild(toolHelpDiv);
 };
@@ -9033,8 +9015,15 @@ dwv.gui.base.Loadbox = function (app, loaders)
      */
     this.setup = function ()
     {
+        // create gui
+        var loaderNames = [];
+        var loaderKeys = Object.keys(loaders);
+        for ( var i = 0; i < loaderKeys.length; ++i ) {
+            loaderNames.push(loaders[loaderKeys[i]].getDisplayName());
+        }
+        
         // loader select
-        loaderSelector = dwv.html.createHtmlSelect("loaderSelect", loaders);
+        loaderSelector = dwv.html.createHtmlSelect("loaderSelect", loaderNames);
         loaderSelector.onchange = app.onChangeLoader;
 
         // node
@@ -9091,6 +9080,14 @@ dwv.gui.base.FileLoad = function (app)
     // closure to self
     var self = this;
     
+    /**
+     * Get the loader display name.
+     */
+    this.getDisplayName = function()
+    {
+        return dwv.i18n("io.file.name");
+    };
+
     /**
      * Internal file input change handler.
      * @param {Object} event The change event.
@@ -9153,6 +9150,14 @@ dwv.gui.base.UrlLoad = function (app)
     // closure to self
     var self = this;
     
+    /**
+     * Get the loader display name.
+     */
+    this.getDisplayName = function()
+    {
+        return dwv.i18n("io.url.name");
+    };
+
     /**
      * Internal url input change handler.
      * @param {Object} event The change event.
@@ -14749,16 +14754,13 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 dwv.tool.Draw.prototype.getHelp = function()
 {
     return {
-        'title': "Draw",
-        'brief': "Allows to draw shapes on the image. " +
-            "Choose the shape and its colour from the drop down menus. Once created, shapes " +
-            "can be edited by selecting them. Anchors will appear and allow specific shape edition. " +
-            "Drag the shape on the top red cross to delete it. All actions are undoable. ",
-        'mouse': {
-            'mouse_drag': "A single mouse drag draws the desired shape.",
+        "title": dwv.i18n("tool.draw.name"),
+        "brief": dwv.i18n("tool.draw.brief"),
+        "mouse": {
+            "mouse_drag": dwv.i18n("tool.draw.mouse_drag")
         },
-        'touch': {
-            'touch_drag': "A single touch drag draws the desired shape.",
+        "touch": {
+            "touch_drag": dwv.i18n("tool.draw.touch_drag")
         }
     };
 };
@@ -15436,11 +15438,8 @@ dwv.tool.Filter = function ( filterList, app )
 dwv.tool.Filter.prototype.getHelp = function ()
 {
     return {
-        'title': "Filter",
-        'brief': "A few simple image filters are available: a Threshold filter to " +
-            "limit the image intensities between a chosen minimum and maximum, " +
-            "a Sharpen filter to convolute the image with a sharpen matrix, " +
-            "a Sobel filter to get the gradient of the image in both directions."
+        "title": dwv.i18n("tool.filter.name"),
+        "brief": dwv.i18n("tool.filter.brief")
     };
 };
 
@@ -15738,11 +15737,13 @@ dwv.info.Windowing = function ( div )
         // window center list item
         var liwc = div.getElementsByClassName("window-center")[0];
         dwv.html.cleanNode(liwc);
-        liwc.appendChild(document.createTextNode("WindowCenter = "+event.wc));
+        liwc.appendChild( document.createTextNode(
+            dwv.i18n("tool.info.window_center", {value: event.wc}) ) );
         // window width list item
         var liww = div.getElementsByClassName("window-width")[0];
         dwv.html.cleanNode(liww);
-        liww.appendChild(document.createTextNode("WindowWidth = "+event.ww));
+        liww.appendChild( document.createTextNode(
+            dwv.i18n("tool.info.window_width", {value: event.ww}) ) );
     };
 
 }; // class dwv.info.Windowing
@@ -15790,14 +15791,15 @@ dwv.info.Position = function ( div )
         // position list item
         var lipos = div.getElementsByClassName("position")[0];
         dwv.html.cleanNode(lipos);
-        lipos.appendChild(document.createTextNode(
-            "Pos = "+event.i+", "+event.j+", "+event.k));
+        lipos.appendChild( document.createTextNode(
+            dwv.i18n("tool.info.position", {value: event.i+", "+event.j+", "+event.k}) ) );
         // value list item
         if( typeof(event.value) != "undefined" )
         {
             var livalue = div.getElementsByClassName("value")[0];
             dwv.html.cleanNode(livalue);
-            livalue.appendChild(document.createTextNode("Value = "+event.value));
+            livalue.appendChild( document.createTextNode(
+                dwv.i18n("tool.info.value", {value: event.value}) ) );
         }
     };
 }; // class dwv.info.Position
@@ -15985,7 +15987,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
     });
     // quantification
     var quant = image.quantifyLine( line );
-    var str = quant.length.toPrecision(4) + " mm";
+    var str = quant.length.toPrecision(4) + " " + dwv.i18n("mm");
     // quantification text
     var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
     var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
@@ -16053,7 +16055,7 @@ dwv.tool.UpdateLine = function (anchor, image)
     var p2d1 = new dwv.math.Point2D(end.x(), end.y());
     var line = new dwv.math.Line(p2d0, p2d1);
     var quant = image.quantifyLine( line );
-    var str = quant.length.toPrecision(4) + " mm";
+    var str = quant.length.toPrecision(4) + " " + dwv.i18n("mm");
     var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
     var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
     var textPos = {
@@ -16375,13 +16377,8 @@ dwv.tool.Livewire = function(app)
 dwv.tool.Livewire.prototype.getHelp = function()
 {
     return {
-        'title': "Livewire",
-        'brief': "The Livewire tool is a semi-automatic segmentation tool " +
-            "that proposes to the user paths that follow intensity edges." +
-            "Click once to initialise and then move the mouse to see " +
-            "the proposed paths. Click again to build your contour. " +
-            "The process stops when you click on the first root point. " +
-            "BEWARE: the process can take time!"
+        "title": dwv.i18n("tool.livewire.name"),
+        "brief": dwv.i18n("tool.livewire.brief")
     };
 };
 
@@ -16982,13 +16979,13 @@ dwv.tool.Scroll = function(app)
 dwv.tool.Scroll.prototype.getHelp = function()
 {
     return {
-        'title': dwv.i18n("help.scroll.name"),
-        'brief': "The scroll tool allows to scroll through slices.",
-        'mouse': {
-            'mouse_drag': "A single vertical mouse drag changes the current slice.",
+        "title": dwv.i18n("tool.scroll.name"),
+        "brief": dwv.i18n("tool.scroll.brief"),
+        "mouse": {
+            "mouse_drag": dwv.i18n("tool.scroll.mouse_drag")
         },
-        'touch': {
-            'touch_drag': "A single vertical touch drag changes the current slice.",
+        "touch": {
+            'touch_drag': dwv.i18n("tool.scroll.touch_drag")
         }
     };
 };
@@ -17421,14 +17418,14 @@ dwv.tool.WindowLevel = function(app)
 dwv.tool.WindowLevel.prototype.getHelp = function()
 {
     return {
-        'title': "Window/Level",
-        'brief': "Changes the Window and Level of the image.",
-        'mouse': {
-            'mouse_drag': "A single mouse drag changes the window in the horizontal direction and the level in the vertical one.",
-            'double_click': "A double click will center the window and level on the clicked intensity.",
+        "title": dwv.i18n("tool.wl.name"),
+        "brief": dwv.i18n("tool.wl.brief"),
+        "mouse": {
+            "mouse_drag": dwv.i18n("tool.wl.mouse_drag"),
+            "double_click": dwv.i18n("tool.wl.double_click")
         },
-        'touch': {
-            'touch_drag': "A single touch drag changes the window in the horizontal direction and the level in the vertical one.",
+        "touch": {
+            "touch_drag": dwv.i18n("tool.wl.touch_drag")
         }
     };
 };
@@ -17660,15 +17657,15 @@ dwv.tool.ZoomAndPan = function(app)
 dwv.tool.ZoomAndPan.prototype.getHelp = function()
 {
     return {
-        'title': "Zoom/Pan",
-        'brief': "The Zoom/Pan tool allows to zoom and pan the image.",
-        'mouse': {
-            'mouse_wheel': "The mouse wheel is used to zoom the image.",
-            'mouse_drag': "A single mouse drag drags the image in the desired direction."
+        "title": dwv.i18n("tool.zoompan.name"),
+        "brief": dwv.i18n("tool.zoompan.brief"),
+        "mouse": {
+            "mouse_wheel": dwv.i18n("tool.zoompan.mouse_wheel"),
+            "mouse_drag": dwv.i18n("tool.zoompan.mouse_drag")
         },
-        'touch': {
-            'twotouch_pinch': "A pinch in or out allows to zoom the image.",
-            'touch_drag': "A single touch drag drags the image in the desired direction."
+        "touch": {
+            'twotouch_pinch': dwv.i18n("tool.zoompan.twotouch_pinch"),
+            'touch_drag': dwv.i18n("tool.zoompan.touch_drag")
         }
     };
 };
@@ -17688,12 +17685,6 @@ var i18next = i18next || {};
 var i18nextXHRBackend = i18nextXHRBackend || {};
 
 var devlng = {
-    "help": {
-        "scroll": {
-            "name": "(d) Scrool"
-        }
-    },
-    "bye": "dev-bye"
 };
 
 /**
@@ -17726,8 +17717,8 @@ dwv.i18nOnLoaded = function (callback) {
 /**
  * Get the translated text.
  */
-dwv.i18n = function (text) {
-    return i18next.t(text);
+dwv.i18n = function (text, options) {
+    return i18next.t(text, options);
 };
 ;// namespaces
 var dwv = dwv || {};
