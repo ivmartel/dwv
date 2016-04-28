@@ -9017,9 +9017,8 @@ dwv.gui.base.Loadbox = function (app, loaders)
     {
         // create gui
         var loaderNames = [];
-        var loaderKeys = Object.keys(loaders);
-        for ( var i = 0; i < loaderKeys.length; ++i ) {
-            loaderNames.push(loaders[loaderKeys[i]].getDisplayName());
+        for( var key in loaders ) {
+            loaderNames.push(loaders[key].getDisplayName());
         }
         
         // loader select
@@ -14282,6 +14281,14 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     var drawLayer = null;
 
     /**
+     * Get the tool display name.
+     */
+    this.getDisplayName = function()
+    {
+        return dwv.i18n("tool.draw.name");
+    };
+
+    /**
      * Handle mouse down event.
      * @param {Object} event The mouse down event.
      */
@@ -15371,6 +15378,14 @@ dwv.tool.Filter = function ( filterList, app )
     this.displayed = false;
 
     /**
+     * Get the tool display name.
+     */
+    this.getDisplayName = function()
+    {
+        return dwv.i18n("tool.filter.name");
+    };
+
+    /**
      * Setup the filter GUI.
      */
     this.setup = function ()
@@ -16138,6 +16153,14 @@ dwv.tool.Livewire = function(app)
     var tolerance = 5;
 
     /**
+     * Get the tool display name.
+     */
+    this.getDisplayName = function()
+    {
+        return dwv.i18n("tool.livewire.name");
+    };
+
+    /**
      * Clear the parent points list.
      * @private
      */
@@ -16825,6 +16848,14 @@ dwv.tool.Scroll = function(app)
     this.started = false;
 
     /**
+     * Get the tool display name.
+     */
+    this.getDisplayName = function()
+    {
+        return dwv.i18n("tool.scroll.name");
+    };
+
+    /**
      * Handle mouse down event.
      * @param {Object} event The mouse down event.
      */
@@ -17041,8 +17072,14 @@ dwv.tool.Toolbox = function( toolList, app )
     this.setup = function ()
     {
         if ( Object.keys(toolList).length !== 0 ) {
+            var toolNames = [];
+            for( var key0 in toolList ) {
+                toolNames.push(toolList[key0].getDisplayName());
+            }
+
             gui = new dwv.gui.Toolbox(app);
-            gui.setup(toolList);
+            gui.setup(toolNames);
+            
             for( var key in toolList ) {
                 toolList[key].setup();
             }
@@ -17264,6 +17301,14 @@ dwv.tool.WindowLevel = function(app)
     this.started = false;
 
     /**
+     * Get the tool display name.
+     */
+    this.getDisplayName = function()
+    {
+        return dwv.i18n("tool.wl.name");
+    };
+
+    /**
      * Handle mouse down event.
      * @param {Object} event The mouse down event.
      */
@@ -17456,6 +17501,14 @@ dwv.tool.ZoomAndPan = function(app)
      * @type Boolean
      */
     this.started = false;
+
+    /**
+     * Get the tool display name.
+     */
+    this.getDisplayName = function()
+    {
+        return dwv.i18n("tool.zoompan.name");
+    };
 
     /**
      * Handle mouse down event.
