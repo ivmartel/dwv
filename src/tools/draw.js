@@ -326,6 +326,14 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     var drawLayer = null;
 
     /**
+     * Get the tool display name.
+     */
+    this.getDisplayName = function()
+    {
+        return dwv.i18n("tool.draw.name");
+    };
+
+    /**
      * Handle mouse down event.
      * @param {Object} event The mouse down event.
      */

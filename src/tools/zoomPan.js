@@ -27,6 +27,14 @@ dwv.tool.ZoomAndPan = function(app)
     this.started = false;
 
     /**
+     * Get the tool display name.
+     */
+    this.getDisplayName = function()
+    {
+        return dwv.i18n("tool.zoompan.name");
+    };
+
+    /**
      * Handle mouse down event.
      * @param {Object} event The mouse down event.
      */

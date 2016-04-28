@@ -27,6 +27,14 @@ dwv.tool.Scroll = function(app)
     this.started = false;
 
     /**
+     * Get the tool display name.
+     */
+    this.getDisplayName = function()
+    {
+        return dwv.i18n("tool.scroll.name");
+    };
+
+    /**
      * Handle mouse down event.
      * @param {Object} event The mouse down event.
      */

@@ -22,9 +22,8 @@ dwv.gui.base.Loadbox = function (app, loaders)
     {
         // create gui
         var loaderNames = [];
-        var loaderKeys = Object.keys(loaders);
-        for ( var i = 0; i < loaderKeys.length; ++i ) {
-            loaderNames.push(loaders[loaderKeys[i]].getDisplayName());
+        for( var key in loaders ) {
+            loaderNames.push(loaders[key].getDisplayName());
         }
         
         // loader select

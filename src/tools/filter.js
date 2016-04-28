@@ -39,6 +39,14 @@ dwv.tool.Filter = function ( filterList, app )
     this.displayed = false;
 
     /**
+     * Get the tool display name.
+     */
+    this.getDisplayName = function()
+    {
+        return dwv.i18n("tool.filter.name");
+    };
+
+    /**
      * Setup the filter GUI.
      */
     this.setup = function ()

@@ -72,6 +72,14 @@ dwv.tool.Livewire = function(app)
     var tolerance = 5;
 
     /**
+     * Get the tool display name.
+     */
+    this.getDisplayName = function()
+    {
+        return dwv.i18n("tool.livewire.name");
+    };
+
+    /**
      * Clear the parent points list.
      * @private
      */

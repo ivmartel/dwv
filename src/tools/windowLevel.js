@@ -27,6 +27,14 @@ dwv.tool.WindowLevel = function(app)
     this.started = false;
 
     /**
+     * Get the tool display name.
+     */
+    this.getDisplayName = function()
+    {
+        return dwv.i18n("tool.wl.name");
+    };
+
+    /**
      * Handle mouse down event.
      * @param {Object} event The mouse down event.
      */

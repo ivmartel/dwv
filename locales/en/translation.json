@@ -78,5 +78,24 @@
         "dropbox": {
             "name": "Dropbox"
         }
+    },
+    "colourmap": {
+        "plain": "Plain",
+        "invplain": "Invplain",
+        "rainbow": "Rainbow",
+        "hot": "Hot",
+        "hot iron": "Iron",
+        "pet": "Pet",
+        "hot metal blue": "Hot metal blue",
+        "pet 20 step": "Pet 20 steps"
+    },
+    "wl": {
+        "presets": {
+            "mediastinum": "Mediastinum",
+            "lung": "Lung",
+            "bone": "Bone",
+            "brain": "Brain",
+            "head": "Head"
+         }
     }
 }
