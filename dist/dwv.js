@@ -15790,22 +15790,53 @@ var MagicWand = MagicWand || {};
 /**
  * Floodfill painting tool.
  * @constructor
- * @param {Object} app The associated application.
+ * @param {Object} app The associated application.  
+ * Found in {@link  https://github.com/Tamersoul/magic-wand-js}
  */
 dwv.tool.Floodfill = function(app)
 {
     /**
-     * Original variables from external library.
+     * Original variables from external library. Used as in the lib example.
      * @private
-     * @type WindowLevel
+     * @type Number
      */
     var blurRadius = 5;
+    /**
+     * Original variables from external library. Used as in the lib example.
+     * @private
+     * @type Number
+     */
     var simplifyTolerant = 0;
+    /**
+     * Original variables from external library. Used as in the lib example.
+     * @private
+     * @type Number
+     */
     var simplifyCount = 30;
+    /**
+     * Canvas info
+     * @private
+     * @type Object
+     */
     var imageInfo = null;
+    /**
+     * Object created by MagicWand lib containing border points
+     * @private
+     * @type Object
+     */
     var mask = null;
+    /**
+     * threshold default tolerance of the tool border
+     * @private
+     * @type Number
+     */
     var initialthreshold = 15;
-
+    /**
+     * threshold tolerance of the tool border
+     * @private
+     * @type Number
+     */
+    var currentthreshold = null;
     /**
      * Closure to self: to be used by event handlers.
      * @private
@@ -15852,7 +15883,7 @@ dwv.tool.Floodfill = function(app)
      * @private
      * @type Boolean
      */
-    var extend = false;
+    var extender = false;
     /**
      * Assistant variable to avoid painting twice.
      * @private
@@ -15871,12 +15902,19 @@ dwv.tool.Floodfill = function(app)
     this.style = new dwv.html.Style();
 
     /**
-     * Set extend option for  paint border on all slices.
+     * Set extend option for painting border on all slices.
      * @param {Boolean} The option to set
      */
     this.setExtend = function(Bool){
-        extend = Bool;
-        return extend;
+        extender = Bool;
+    };
+
+    /**
+     * Get extend option for painting border on all slices.
+     * @return {Boolean} The actual value of of the variable to use Floodfill on museup.
+     */
+    this.getExtend = function(){
+        return extender;
     };
 
     /**
@@ -15901,6 +15939,7 @@ dwv.tool.Floodfill = function(app)
 
         var cs = MagicWand.traceContours(mask);
         cs = MagicWand.simplifyContours(cs, simplifyTolerant, simplifyCount);
+
         if(cs.length > 0 && cs[0].points[0].x){
             // console.log(cs.length)
             for(var j=0, icsl=cs[0].points.length; j<icsl; j++){
@@ -15930,6 +15969,10 @@ dwv.tool.Floodfill = function(app)
             command = new dwv.tool.DrawGroupCommand(shapeGroup, "floodfill", app.getDrawLayer());
             // // draw
             command.execute();
+            return true;
+        }
+        else{
+            return false;
         }
     };
 
@@ -15963,11 +16006,11 @@ dwv.tool.Floodfill = function(app)
         }
         clearTimeout(painterTimeout);
         painterTimeout = setTimeout(function(){
-                            var movedpoint      = getCoord(event);
-                            var new_threshold   = Math.round(Math.sqrt( Math.pow((initialpoint.x-movedpoint.x), 2) + Math.pow((initialpoint.y-movedpoint.y), 2) )/2);
+                            var movedpoint     = getCoord(event);
+                            currentthreshold   = Math.round(Math.sqrt( Math.pow((initialpoint.x-movedpoint.x), 2) + Math.pow((initialpoint.y-movedpoint.y), 2) )/2);
                             //if( new_threshold>100){new_threshold = 100;}
                             // else{if( new_threshold<initialthreshold){new_threshold = initialthreshold;}}
-                            paintBorder(initialpoint,  new_threshold);
+                            paintBorder(initialpoint,  currentthreshold);
                         },100);
     };
 
@@ -15975,45 +16018,46 @@ dwv.tool.Floodfill = function(app)
      * Handle mouse up event.
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function(event){
+    this.mouseup = function(/*event*/){
         stopped = true;
-        extend = false;
-        if(extend){
-
-            var movedpoint      = getCoord(event);
-            var new_threshold   = Math.round(Math.sqrt( Math.pow((initialpoint.x-movedpoint.x), 2) + Math.pow((initialpoint.y-movedpoint.y), 2) )/2);
-            var pos = app.getViewController().getCurrentPosition();
-
-            // remove previous draw
-            if ( shapeGroup ) {
-                shapeGroup.destroy();
-            }
-            // Iterate over the next images and paint border on each slice.
-            for(var i=pos.k, len=app.getImage().getGeometry().getSize().getNumberOfSlices(); i<len; i++){
-                border = calcBorder(initialpoint, new_threshold);
-                if(border){
-                    paintBorder(initialpoint,  new_threshold);
-                }
-                else{
-                    break;
-                }
-                app.getViewController().incrementSliceNb();
-            }
-            app.getViewController().setCurrentPosition(pos);
-
-            // Iterate over the prev images and paint border on each slice.
-            for(var j=pos.k; j>0; j--){
-                border = calcBorder(initialpoint, new_threshold);
-                if(border){
-                    paintBorder(initialpoint,  new_threshold);
-                }
-                else{
-                    break;
-                }
-                app.getViewController().decrementSliceNb();
-            }
-            app.getViewController().setCurrentPosition(pos);
+        if(extender){
+            self.extend();
         }
+    };
+
+    /**
+     * Create Floodfill in prev and next slices while border is found
+     */
+    this.extend = function(){
+        //avoid errors
+        if(!initialpoint){
+            throw "'initialpoint' not found. User must click before use extend!";
+        }
+        // remove previous draw
+        if ( shapeGroup ) {
+            shapeGroup.destroy();
+        }
+
+        var pos = app.getViewController().getCurrentPosition();
+        var threshold = currentthreshold || initialthreshold;
+
+        // Iterate over the next images and paint border on each slice.
+        for(var i=pos.k, len=app.getImage().getGeometry().getSize().getNumberOfSlices(); i<len; i++){
+            if(!paintBorder(initialpoint, threshold)){
+                break;
+            }
+            app.getViewController().incrementSliceNb();
+        }
+        app.getViewController().setCurrentPosition(pos);
+
+        // Iterate over the prev images and paint border on each slice.
+        for(var j=pos.k; j>0; j--){
+            if(!paintBorder(initialpoint, threshold)){
+                break;
+            }
+            app.getViewController().decrementSliceNb();
+        }
+        app.getViewController().setCurrentPosition(pos);
     };
 
     /**
