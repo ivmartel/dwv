@@ -15918,6 +15918,14 @@ dwv.tool.Floodfill = function(app)
     };
 
     /**
+     * Get (x, y) coordinates referenced to the canvas
+     * @param {Object} event The original event.
+     */
+    var getCoord = function(event){
+        return { x: event._x, y: event._y };
+    };
+
+    /**
      * Calculate border.
      * @private
      * @param {Object} Start point.
@@ -15976,8 +15984,39 @@ dwv.tool.Floodfill = function(app)
         }
     };
 
-    var getCoord = function(event){
-        return { x: event._x, y: event._y };
+    /**
+     * Create Floodfill in all the prev and next slices while border is found
+     */
+    this.extend = function(){
+        //avoid errors
+        if(!initialpoint){
+            throw "'initialpoint' not found. User must click before use extend!";
+        }
+        // remove previous draw
+        if ( shapeGroup ) {
+            shapeGroup.destroy();
+        }
+
+        var pos = app.getViewController().getCurrentPosition();
+        var threshold = currentthreshold || initialthreshold;
+
+        // Iterate over the next images and paint border on each slice.
+        for(var i=pos.k, len=app.getImage().getGeometry().getSize().getNumberOfSlices(); i<len; i++){
+            if(!paintBorder(initialpoint, threshold)){
+                break;
+            }
+            app.getViewController().incrementSliceNb();
+        }
+        app.getViewController().setCurrentPosition(pos);
+
+        // Iterate over the prev images and paint border on each slice.
+        for(var j=pos.k; j>=0; j--){
+            if(!paintBorder(initialpoint, threshold)){
+                break;
+            }
+            app.getViewController().decrementSliceNb();
+        }
+        app.getViewController().setCurrentPosition(pos);
     };
 
     /**
@@ -16023,41 +16062,6 @@ dwv.tool.Floodfill = function(app)
         if(extender){
             self.extend();
         }
-    };
-
-    /**
-     * Create Floodfill in prev and next slices while border is found
-     */
-    this.extend = function(){
-        //avoid errors
-        if(!initialpoint){
-            throw "'initialpoint' not found. User must click before use extend!";
-        }
-        // remove previous draw
-        if ( shapeGroup ) {
-            shapeGroup.destroy();
-        }
-
-        var pos = app.getViewController().getCurrentPosition();
-        var threshold = currentthreshold || initialthreshold;
-
-        // Iterate over the next images and paint border on each slice.
-        for(var i=pos.k, len=app.getImage().getGeometry().getSize().getNumberOfSlices(); i<len; i++){
-            if(!paintBorder(initialpoint, threshold)){
-                break;
-            }
-            app.getViewController().incrementSliceNb();
-        }
-        app.getViewController().setCurrentPosition(pos);
-
-        // Iterate over the prev images and paint border on each slice.
-        for(var j=pos.k; j>=0; j--){
-            if(!paintBorder(initialpoint, threshold)){
-                break;
-            }
-            app.getViewController().decrementSliceNb();
-        }
-        app.getViewController().setCurrentPosition(pos);
     };
 
     /**
