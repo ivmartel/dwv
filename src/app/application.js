@@ -242,6 +242,9 @@ dwv.App = function ()
                     toolList.Livewire.addEventListener("livewire-start", fireEvent);
                     toolList.Livewire.addEventListener("livewire-end", fireEvent);
                     break;
+                case "Floodfill":
+                    toolList.Floodfill = new dwv.tool.Floodfill(this);
+                    break;
                 case "Filter":
                     if ( config.filters.length !== 0 ) {
                         // setup the filter list

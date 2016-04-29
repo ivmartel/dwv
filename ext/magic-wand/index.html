@@ -115,6 +115,7 @@
                 height: img.height,
                 context: cvs.getContext("2d")
             };
+            console.log(cvs.getContext("2d"))
             mask = null;
 
             var tempCtx = document.createElement("canvas").getContext("2d");
@@ -182,7 +183,7 @@
                 height: imageInfo.height,
                 bytes: 4
             };
-
+            console.log(image)
             mask = MagicWand.floodFill(image, x, y, currentThreshold);
             mask = MagicWand.gaussBlurOnlyBorder(mask, blurRadius);
             drawBorder();

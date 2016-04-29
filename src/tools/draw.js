@@ -713,8 +713,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
             var labelText = prompt("Add label");
             // if press cancel do nothing
-            if(labelText == null){
-                return false
+            if(labelText === null){
+                return false;
             }
             var group = this.getParent(),
                 klabel;

@@ -19,7 +19,7 @@ $(document).ready( function()
         "fitToWindow": true,
         "gui": ["tool", "load", "help", "undo", "version", "tags"],
         "loaders": ["File", "Url"],
-        "tools": ["Scroll", "Window/Level", "Zoom/Pan", "Draw", "Livewire", "Filter"],
+        "tools": ["Scroll", "Window/Level", "Zoom/Pan", "Draw", "Livewire", "Filter", "Floodfill"],
         "filters": ["Threshold", "Sharpen", "Sobel"],
         "shapes": ["Line", "Protractor", "Rectangle", "Roi", "Ellipse"],
         "isMobile": false
@@ -30,9 +30,9 @@ $(document).ready( function()
     $("#accordion").accordion({ collapsible: "true", active: "false", heightStyle: "content" });
 
     myapp.addEventListener("livewire-start", function(){
-        console.log('Getting ready...')
+        console.log('Getting ready...');
     });
     myapp.addEventListener("livewire-end", function(){
-        console.log('Ready!')
+        console.log('Ready!');
     });
 });
