@@ -270,7 +270,7 @@ dwv.tool.Floodfill = function(app)
         app.getViewController().setCurrentPosition(pos);
 
         // Iterate over the prev images and paint border on each slice.
-        for(var j=pos.k; j>0; j--){
+        for(var j=pos.k; j>=0; j--){
             if(!paintBorder(initialpoint, threshold)){
                 break;
             }
