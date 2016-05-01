@@ -27,14 +27,6 @@ dwv.tool.WindowLevel = function(app)
     this.started = false;
 
     /**
-     * Get the tool display name.
-     */
-    this.getDisplayName = function()
-    {
-        return dwv.i18n("tool.wl.name");
-    };
-
-    /**
      * Handle mouse down event.
      * @param {Object} event The mouse down event.
      */
@@ -86,7 +78,7 @@ dwv.tool.WindowLevel = function(app)
             if ( gui ) {
                 gui.initialise();
                 // set selected
-                dwv.gui.setSelected(app.getElement("presetSelect"), "Manual");
+                dwv.gui.setSelected(app.getElement("presetSelect"), "manual");
             }
         }
     };
@@ -189,14 +181,14 @@ dwv.tool.WindowLevel = function(app)
 dwv.tool.WindowLevel.prototype.getHelp = function()
 {
     return {
-        "title": dwv.i18n("tool.wl.name"),
-        "brief": dwv.i18n("tool.wl.brief"),
+        "title": dwv.i18n("tool.WindowLevel.name"),
+        "brief": dwv.i18n("tool.WindowLevel.brief"),
         "mouse": {
-            "mouse_drag": dwv.i18n("tool.wl.mouse_drag"),
-            "double_click": dwv.i18n("tool.wl.double_click")
+            "mouse_drag": dwv.i18n("tool.WindowLevel.mouse_drag"),
+            "double_click": dwv.i18n("tool.WindowLevel.double_click")
         },
         "touch": {
-            "touch_drag": dwv.i18n("tool.wl.touch_drag")
+            "touch_drag": dwv.i18n("tool.WindowLevel.touch_drag")
         }
     };
 };

@@ -52,15 +52,15 @@ dwv.gui.base.refreshElement = function (/*element*/)
 
 /**
  * Set the selected item of a HTML select.
- * @param {String} selectName The name of the HTML select.
- * @param {String} itemName The name of the itme to mark as selected.
+ * @param {String} element The HTML select element.
+ * @param {String} value The value of the option to mark as selected.
  */
-dwv.gui.setSelected = function(element, itemName)
+dwv.gui.setSelected = function(element, value)
 {
     if ( element ) {
         var index = 0;
         for( index in element.options){
-            if( element.options[index].text === itemName ) {
+            if( element.options[index].value === value ) {
                 break;
             }
         }

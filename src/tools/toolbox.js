@@ -50,13 +50,8 @@ dwv.tool.Toolbox = function( toolList, app )
     this.setup = function ()
     {
         if ( Object.keys(toolList).length !== 0 ) {
-            var toolNames = [];
-            for( var key0 in toolList ) {
-                toolNames.push(toolList[key0].getDisplayName());
-            }
-
             gui = new dwv.gui.Toolbox(app);
-            gui.setup(toolNames);
+            gui.setup(toolList);
             
             for( var key in toolList ) {
                 toolList[key].setup();

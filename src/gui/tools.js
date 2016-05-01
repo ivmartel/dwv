@@ -15,7 +15,7 @@ dwv.gui.base.Toolbox = function (app)
     this.setup = function (list)
     {
         // tool select
-        var toolSelector = dwv.html.createHtmlSelect("toolSelect", list);
+        var toolSelector = dwv.html.createHtmlSelect("toolSelect", list, "tool");
         toolSelector.onchange = app.onChangeTool;
 
         // tool list element
@@ -93,7 +93,7 @@ dwv.gui.base.WindowLevel = function (app)
         var wlSelector = dwv.html.createHtmlSelect("presetSelect", []);
         wlSelector.onchange = app.onChangeWindowLevelPreset;
         // colour map select
-        var cmSelector = dwv.html.createHtmlSelect("colourMapSelect", dwv.tool.colourMaps);
+        var cmSelector = dwv.html.createHtmlSelect("colourMapSelect", dwv.tool.colourMaps, "colourmap");
         cmSelector.onchange = app.onChangeColourMap;
 
         // preset list element
@@ -139,7 +139,7 @@ dwv.gui.base.WindowLevel = function (app)
     this.initialise = function ()
     {
         // create new preset select
-        var wlSelector = dwv.html.createHtmlSelect("presetSelect", app.getViewController().getPresets());
+        var wlSelector = dwv.html.createHtmlSelect("presetSelect", app.getViewController().getPresets(), "wl.presets");
         wlSelector.onchange = app.onChangeWindowLevelPreset;
         wlSelector.title = "Select w/l preset.";
 
@@ -187,10 +187,10 @@ dwv.gui.base.Draw = function (app)
     this.setup = function (shapeList)
     {
         // shape select
-        var shapeSelector = dwv.html.createHtmlSelect("shapeSelect", shapeList);
+        var shapeSelector = dwv.html.createHtmlSelect("shapeSelect", shapeList, "shape");
         shapeSelector.onchange = app.onChangeShape;
         // colour select
-        var colourSelector = dwv.html.createHtmlSelect("colourSelect", colours);
+        var colourSelector = dwv.html.createHtmlSelect("colourSelect", colours, "colour");
         colourSelector.onchange = app.onChangeLineColour;
 
         // shape list element
@@ -271,7 +271,7 @@ dwv.gui.base.Livewire = function (app)
     this.setup = function ()
     {
         // colour select
-        var colourSelector = dwv.html.createHtmlSelect("lwColourSelect", colours);
+        var colourSelector = dwv.html.createHtmlSelect("lwColourSelect", colours, "colour");
         colourSelector.onchange = app.onChangeLineColour;
 
         // colour list element

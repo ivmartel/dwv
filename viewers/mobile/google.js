@@ -279,14 +279,6 @@ dwv.google.getAuthorizedCallback = function (callback) {
 dwv.gui.GoogleDriveLoad = function (app)
 {
     /**
-     * Get the loader display name.
-     */
-    this.getDisplayName = function()
-    {
-        return dwv.i18n("io.gdrive.name");
-    };
-    
-    /**
      * Setup the gdrive load HTML to the page.
      */
     this.setup = function()

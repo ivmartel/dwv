@@ -21,7 +21,7 @@ dwv.gui.base.Filter = function (app)
     this.setup = function (list)
     {
         // filter select
-        var filterSelector = dwv.html.createHtmlSelect("filterSelect", list);
+        var filterSelector = dwv.html.createHtmlSelect("filterSelect", list, "filter");
         filterSelector.onchange = app.onChangeFilter;
 
         // filter list element

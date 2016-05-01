@@ -20,14 +20,8 @@ dwv.gui.base.Loadbox = function (app, loaders)
      */
     this.setup = function ()
     {
-        // create gui
-        var loaderNames = [];
-        for( var key in loaders ) {
-            loaderNames.push(loaders[key].getDisplayName());
-        }
-        
         // loader select
-        loaderSelector = dwv.html.createHtmlSelect("loaderSelect", loaderNames);
+        loaderSelector = dwv.html.createHtmlSelect("loaderSelect", loaders, "io");
         loaderSelector.onchange = app.onChangeLoader;
 
         // node
@@ -84,14 +78,6 @@ dwv.gui.base.FileLoad = function (app)
     // closure to self
     var self = this;
     
-    /**
-     * Get the loader display name.
-     */
-    this.getDisplayName = function()
-    {
-        return dwv.i18n("io.file.name");
-    };
-
     /**
      * Internal file input change handler.
      * @param {Object} event The change event.
@@ -154,14 +140,6 @@ dwv.gui.base.UrlLoad = function (app)
     // closure to self
     var self = this;
     
-    /**
-     * Get the loader display name.
-     */
-    this.getDisplayName = function()
-    {
-        return dwv.i18n("io.url.name");
-    };
-
     /**
      * Internal url input change handler.
      * @param {Object} event The change event.

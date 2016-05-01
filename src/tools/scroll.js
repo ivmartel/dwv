@@ -27,14 +27,6 @@ dwv.tool.Scroll = function(app)
     this.started = false;
 
     /**
-     * Get the tool display name.
-     */
-    this.getDisplayName = function()
-    {
-        return dwv.i18n("tool.scroll.name");
-    };
-
-    /**
      * Handle mouse down event.
      * @param {Object} event The mouse down event.
      */
@@ -189,13 +181,13 @@ dwv.tool.Scroll = function(app)
 dwv.tool.Scroll.prototype.getHelp = function()
 {
     return {
-        "title": dwv.i18n("tool.scroll.name"),
-        "brief": dwv.i18n("tool.scroll.brief"),
+        "title": dwv.i18n("tool.Scroll.name"),
+        "brief": dwv.i18n("tool.Scroll.brief"),
         "mouse": {
-            "mouse_drag": dwv.i18n("tool.scroll.mouse_drag")
+            "mouse_drag": dwv.i18n("tool.Scroll.mouse_drag")
         },
         "touch": {
-            'touch_drag': dwv.i18n("tool.scroll.touch_drag")
+            'touch_drag': dwv.i18n("tool.Scroll.touch_drag")
         }
     };
 };

@@ -15,7 +15,7 @@ var devlng = {
 dwv.i18nInitialise = function ()
 {
     var options = {
-        lng: "en",
+        lng: "fr",
         fallbackLng: "en",
         debug: true           
     };

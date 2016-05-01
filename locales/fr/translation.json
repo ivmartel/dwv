@@ -1,27 +1,27 @@
 {
     "basics": {
-        "open": "Open",
-        "close": "Close",
-        "help": "Help",
-        "back": "Back",
-        "name": "Name",
-        "value": "Value"
+        "open": "Ouvrir",
+        "close": "Fermer",
+        "help": "Aide",
+        "back": "Retour",
+        "name": "Nom",
+        "value": "Valeur"
     },
     "colour": {
         "Yellow": {
-            "name": "Yellow"
+            "name": "Jaune"
         },
         "Red": {
-            "name": "Red"
+            "name": "Rouge"
         },
         "White": {
-            "name": "White"
+            "name": "Blanc"
         },
         "Green": {
-            "name": "Green"
+            "name": "Vert"
         },
         "Blue": {
-            "name": "Blue"
+            "name": "Bleu"
         },
         "Lime": {
             "name": "Lime"
@@ -30,7 +30,7 @@
             "name": "Fuchsia"
         },
         "Black": {
-            "name": "Black"
+            "name": "Noir"
         }
     },
     "unit": {
@@ -45,7 +45,7 @@
     },
     "tool": {
         "WindowLevel": {
-            "name": "Window/Level",
+            "name": "Contraste",
             "brief": "Changes the Window and Level of the image.",
             "mouse_drag": "A single mouse drag changes the window in the horizontal direction and the level in the vertical one.",
             "double_click": "A double click will center the window and level on the clicked intensity.",
@@ -66,13 +66,13 @@
             "touch_drag": "A single vertical touch drag changes the current slice."
         },
         "Draw": {
-            "name": "Draw",
+            "name": "Dessin",
             "brief": "Allows to draw shapes on the image. Choose the shape and its colour from the drop down menus. Once created, shapes can be edited by selecting them. Anchors will appear and allow specific shape edition. Drag the shape on the top red cross to delete it. All actions are undoable.",
             "mouse_drag": "A single mouse drag draws the desired shape.",
             "touch_drag": "A single touch drag draws the desired shape."
         },
         "Filter": {
-            "name": "Filter",
+            "name": "Filtre",
             "brief": "A few simple image filters are available: a Threshold filter to limit the image intensities between a chosen minimum and maximum, a Sharpen filter to convolute the image with a sharpen matrix, a Sobel filter to get the gradient of the image in both directions."
         },
         "Livewire": {
@@ -81,14 +81,14 @@
         },
         "info": {
             "position": "Pos = {{value}}",
-            "value": "Value = {{value}}",
+            "value": "Valeur = {{value}}",
             "window_center": "WindowCenter = {{value}}",
             "window_width": "WindowWidth = {{value}}"
         }
     },
     "shape": {
         "Line": {
-            "name": "Line"
+            "name": "Ligne"
         },
         "Protractor": {
             "name": "Protractor"
@@ -105,10 +105,10 @@
     },
     "io": {
         "File": {
-            "name": "File"
+            "name": "Fichier"
         },
         "Url": {
-            "name": "Url"
+            "name": "Lien"
         },
         "GoogleDrive": {
             "name": "GoogleDrive",
@@ -124,7 +124,7 @@
     },
     "filter": {
         "Threshold": {
-            "name": "Threshold"
+            "name": "Seuillage"
         },
         "Sharpen": {
             "name": "Sharpen"
@@ -141,7 +141,7 @@
             "name": "Invplain"
         },
         "rainbow": {
-            "name": "Rainbow"
+            "name": "Arc en ciel"
         },
         "hot": {
             "name": "Hot"
@@ -165,19 +165,19 @@
                 "name": "Mediastinum"
             },
             "lung": {
-                "name": "Lung"
+                "name": "Poumon"
             },
             "bone": {
-                "name": "Bone"
+                "name": "Os"
             },
             "brain": {
-                "name": "Brain"
+                "name": "Cerveau"
             },
             "head": {
-                "name": "Head"
+                "name": "Tete"
             },
             "manual": {
-                "name": "Manual"
+                "name": "Manuel"
             },
             "minmax": {
                 "name": "Min/Max"

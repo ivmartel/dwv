@@ -326,14 +326,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     var drawLayer = null;
 
     /**
-     * Get the tool display name.
-     */
-    this.getDisplayName = function()
-    {
-        return dwv.i18n("tool.draw.name");
-    };
-
-    /**
      * Handle mouse down event.
      * @param {Object} event The mouse down event.
      */
@@ -806,13 +798,13 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 dwv.tool.Draw.prototype.getHelp = function()
 {
     return {
-        "title": dwv.i18n("tool.draw.name"),
-        "brief": dwv.i18n("tool.draw.brief"),
+        "title": dwv.i18n("tool.Draw.name"),
+        "brief": dwv.i18n("tool.Draw.brief"),
         "mouse": {
-            "mouse_drag": dwv.i18n("tool.draw.mouse_drag")
+            "mouse_drag": dwv.i18n("tool.Draw.mouse_drag")
         },
         "touch": {
-            "touch_drag": dwv.i18n("tool.draw.touch_drag")
+            "touch_drag": dwv.i18n("tool.Draw.touch_drag")
         }
     };
 };

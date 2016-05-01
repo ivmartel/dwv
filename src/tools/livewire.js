@@ -72,14 +72,6 @@ dwv.tool.Livewire = function(app)
     var tolerance = 5;
 
     /**
-     * Get the tool display name.
-     */
-    this.getDisplayName = function()
-    {
-        return dwv.i18n("tool.livewire.name");
-    };
-
-    /**
      * Clear the parent points list.
      * @private
      */
@@ -319,8 +311,8 @@ dwv.tool.Livewire = function(app)
 dwv.tool.Livewire.prototype.getHelp = function()
 {
     return {
-        "title": dwv.i18n("tool.livewire.name"),
-        "brief": dwv.i18n("tool.livewire.brief")
+        "title": dwv.i18n("tool.Livewire.name"),
+        "brief": dwv.i18n("tool.Livewire.brief")
     };
 };
 

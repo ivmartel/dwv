@@ -328,13 +328,15 @@ dwv.html.removeNodes = function (nodes) {
  * It is left to the user to set the 'onchange' method of the select.
  * @param {String} name The name of the HTML select.
  * @param {Mixed} list The list of options of the HTML select.
+ * @param {String} prefix An optional namespace prefix to find the display values.
  * @return {Object} The created HTML select.
  */
-dwv.html.createHtmlSelect = function (name, list) {
+dwv.html.createHtmlSelect = function (name, list, keyPrefix) {
     // select
     var select = document.createElement("select");
     //select.name = name;
     select.className = name;
+    var prefix = (typeof keyPrefix === "undefined") ? "" : keyPrefix + ".";
     // options
     var option;
     if ( list instanceof Array )
@@ -343,7 +345,8 @@ dwv.html.createHtmlSelect = function (name, list) {
         {
             option = document.createElement("option");
             option.value = list[i];
-            option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(list[i])));
+            //option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(list[i])));
+            option.appendChild(document.createTextNode(dwv.i18n(prefix + list[i] + ".name")));
             select.appendChild(option);
         }
     }
@@ -353,7 +356,8 @@ dwv.html.createHtmlSelect = function (name, list) {
         {
             option = document.createElement("option");
             option.value = item;
-            option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(item)));
+            //option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(item)));
+            option.appendChild(document.createTextNode(dwv.i18n(prefix + item + ".name")));
             select.appendChild(option);
         }
     }

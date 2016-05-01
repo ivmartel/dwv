@@ -17,13 +17,6 @@ var Dropbox = Dropbox || {};
 dwv.gui.DropboxLoad = function (app)
 {
     /**
-     * Get the loader display name.
-     */
-    this.getDisplayName = function()
-    {
-        return dwv.i18n("io.dropbox.name");
-    };
-    /**
      * Setup the dropbox load HTML to the page.
      */
     this.setup = function()

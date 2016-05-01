@@ -27,14 +27,6 @@ dwv.tool.ZoomAndPan = function(app)
     this.started = false;
 
     /**
-     * Get the tool display name.
-     */
-    this.getDisplayName = function()
-    {
-        return dwv.i18n("tool.zoompan.name");
-    };
-
-    /**
      * Handle mouse down event.
      * @param {Object} event The mouse down event.
      */
@@ -234,15 +226,15 @@ dwv.tool.ZoomAndPan = function(app)
 dwv.tool.ZoomAndPan.prototype.getHelp = function()
 {
     return {
-        "title": dwv.i18n("tool.zoompan.name"),
-        "brief": dwv.i18n("tool.zoompan.brief"),
+        "title": dwv.i18n("tool.ZoomAndPan.name"),
+        "brief": dwv.i18n("tool.ZoomAndPan.brief"),
         "mouse": {
-            "mouse_wheel": dwv.i18n("tool.zoompan.mouse_wheel"),
-            "mouse_drag": dwv.i18n("tool.zoompan.mouse_drag")
+            "mouse_wheel": dwv.i18n("tool.ZoomAndPan.mouse_wheel"),
+            "mouse_drag": dwv.i18n("tool.ZoomAndPan.mouse_drag")
         },
         "touch": {
-            'twotouch_pinch': dwv.i18n("tool.zoompan.twotouch_pinch"),
-            'touch_drag': dwv.i18n("tool.zoompan.touch_drag")
+            'twotouch_pinch': dwv.i18n("tool.ZoomAndPan.twotouch_pinch"),
+            'touch_drag': dwv.i18n("tool.ZoomAndPan.touch_drag")
         }
     };
 };
