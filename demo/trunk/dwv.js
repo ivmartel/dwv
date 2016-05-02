@@ -7836,7 +7836,7 @@ dwv.gui.filter.base.createFilterApplyButton = function (app)
     button.onclick = app.onRunFilter;
     button.setAttribute("style","width:100%; margin-top:0.5em;");
     button.setAttribute("class","ui-btn ui-btn-b");
-    button.appendChild(document.createTextNode("Apply"));
+    button.appendChild(document.createTextNode(dwv.i18n("basics.apply")));
     return button;
 };
 
@@ -8080,6 +8080,7 @@ dwv.gui.base.DicomTags = function (app)
         //table.setAttribute("class", "tagsList");
         table.setAttribute("data-role", "table");
         table.setAttribute("data-mode", "columntoggle");
+        table.setAttribute("data-column-btn-text", dwv.i18n("basics.columns") + "...");
         // search form
         node.appendChild(dwv.html.getHtmlSearchForm(table));
         // tags table
@@ -8231,10 +8232,10 @@ dwv.html.appendHCell = function (row, text)
 {
     var cell = document.createElement("th");
     // TODO jquery-mobile specific...
-    if ( text !== "Value" && text !== "Name" ) {
+    if ( text !== "value" && text !== "name" ) {
         cell.setAttribute("data-priority", "1");
     }
-    cell.appendChild(document.createTextNode(text));
+    cell.appendChild(document.createTextNode(dwv.i18n("basics." + text)));
     row.appendChild(cell);
 };
 
@@ -8310,10 +8311,10 @@ dwv.html.appendRowForObject = function (table, input, level, maxLevel, rowHeader
         var header = table.createTHead();
         var th = header.insertRow(-1);
         if ( rowHeader ) {
-            dwv.html.appendHCell(th, "Name");
+            dwv.html.appendHCell(th, "name");
         }
         for ( var k=0; k<keys.length; ++k ) {
-            dwv.html.appendHCell(th, dwv.utils.capitaliseFirstLetter(keys[k]));
+            dwv.html.appendHCell(th, keys[k]);
         }
     }
 };
@@ -8523,15 +8524,33 @@ dwv.html.removeNodes = function (nodes) {
  * It is left to the user to set the 'onchange' method of the select.
  * @param {String} name The name of the HTML select.
  * @param {Mixed} list The list of options of the HTML select.
- * @param {String} prefix An optional namespace prefix to find the display values.
+ * @param {String} i18nPrefix An optional namespace prefix to find the translation values.
+ * @param {Bool} i18nSafe An optional flag to check translation existence.
  * @return {Object} The created HTML select.
  */
-dwv.html.createHtmlSelect = function (name, list, keyPrefix) {
+dwv.html.createHtmlSelect = function (name, list, i18nPrefix, i18nSafe) {
     // select
     var select = document.createElement("select");
     //select.name = name;
     select.className = name;
-    var prefix = (typeof keyPrefix === "undefined") ? "" : keyPrefix + ".";
+    var prefix = (typeof i18nPrefix === "undefined") ? "" : i18nPrefix + ".";
+    var safe = (typeof i18nSafe === "undefined") ? false : true;
+    var getText = function(value) {
+        var key = prefix + value + ".name";
+        var text = "";
+        if (safe) {
+            if (dwv.i18nExists(key)) {
+                text = dwv.i18n(key);
+            }
+            else {
+                text = value;
+            }
+        }
+        else {
+            text = dwv.i18n(key);
+        }
+        return text;
+    };
     // options
     var option;
     if ( list instanceof Array )
@@ -8540,8 +8559,7 @@ dwv.html.createHtmlSelect = function (name, list, keyPrefix) {
         {
             option = document.createElement("option");
             option.value = list[i];
-            //option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(list[i])));
-            option.appendChild(document.createTextNode(dwv.i18n(prefix + list[i] + ".name")));
+            option.appendChild(document.createTextNode(getText(list[i])));
             select.appendChild(option);
         }
     }
@@ -8551,8 +8569,7 @@ dwv.html.createHtmlSelect = function (name, list, keyPrefix) {
         {
             option = document.createElement("option");
             option.value = item;
-            //option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(item)));
-            option.appendChild(document.createTextNode(dwv.i18n(prefix + item + ".name")));
+            option.appendChild(document.createTextNode(getText(item)));
             select.appendChild(option);
         }
     }
@@ -9462,7 +9479,8 @@ dwv.gui.base.WindowLevel = function (app)
     this.initialise = function ()
     {
         // create new preset select
-        var wlSelector = dwv.html.createHtmlSelect("presetSelect", app.getViewController().getPresets(), "wl.presets");
+        var wlSelector = dwv.html.createHtmlSelect("presetSelect", 
+            app.getViewController().getPresets(), "wl.presets", true);
         wlSelector.onchange = app.onChangeWindowLevelPreset;
         wlSelector.title = "Select w/l preset.";
 
@@ -9653,7 +9671,7 @@ dwv.gui.base.ZoomAndPan = function (app)
         button.onclick = app.onZoomReset;
         button.setAttribute("style","width:100%; margin-top:0.5em;");
         button.setAttribute("class","ui-btn ui-btn-b");
-        var text = document.createTextNode("Reset");
+        var text = document.createTextNode(dwv.i18n("basics.reset"));
         button.appendChild(text);
 
         // list element
@@ -17701,6 +17719,25 @@ dwv.i18nOnLoaded = function (callback) {
  */
 dwv.i18n = function (text, options) {
     return i18next.t(text, options);
+};
+
+/**
+ * Check the existence of a translation.
+ */
+dwv.i18nExists = function (text, options) {
+    return i18next.exists(text, options);
+};
+
+/**
+ * Translate all data-i18n tags.
+ */
+dwv.i18nPage = function () {
+    var elements = document.getElementsByTagName("*");
+    for (var i = 0; i < elements.length; ++i) { 
+        if (typeof elements[i].dataset.i18n !== "undefined") {
+            elements[i].innerHTML = dwv.i18n(elements[i].dataset.i18n);
+        }
+    }
 };
 ;// namespaces
 var dwv = dwv || {};
