@@ -207,11 +207,11 @@ dwv.App = function ()
             var toolList = {};
             for ( var t = 0; t < config.tools.length; ++t ) {
                 switch( config.tools[t] ) {
-                case "Window/Level":
-                    toolList["Window/Level"] = new dwv.tool.WindowLevel(this);
+                case "WindowLevel":
+                    toolList.WindowLevel = new dwv.tool.WindowLevel(this);
                     break;
-                case "Zoom/Pan":
-                    toolList["Zoom/Pan"] = new dwv.tool.ZoomAndPan(this);
+                case "ZoomAndPan":
+                    toolList.ZoomAndPan = new dwv.tool.ZoomAndPan(this);
                     break;
                 case "Scroll":
                     toolList.Scroll = new dwv.tool.Scroll(this);
@@ -1731,7 +1731,7 @@ dwv.ViewController = function ( view )
         var range = image.getRescaledDataRange();
         var width = range.max - range.min;
         var center = range.min + width/2;
-        presets["min/max"] = {"center": center, "width": width};
+        presets.minmax = {"center": center, "width": width};
         // optional modality presets
         if ( typeof dwv.tool.defaultpresets != "undefined" ) {
             var modality = image.getMeta().Modality;
@@ -7736,7 +7736,7 @@ dwv.gui.base.Filter = function (app)
     this.setup = function (list)
     {
         // filter select
-        var filterSelector = dwv.html.createHtmlSelect("filterSelect", list);
+        var filterSelector = dwv.html.createHtmlSelect("filterSelect", list, "filter");
         filterSelector.onchange = app.onChangeFilter;
 
         // filter list element
@@ -7957,15 +7957,15 @@ dwv.gui.base.refreshElement = function (/*element*/)
 
 /**
  * Set the selected item of a HTML select.
- * @param {String} selectName The name of the HTML select.
- * @param {String} itemName The name of the itme to mark as selected.
+ * @param {String} element The HTML select element.
+ * @param {String} value The value of the option to mark as selected.
  */
-dwv.gui.setSelected = function(element, itemName)
+dwv.gui.setSelected = function(element, value)
 {
     if ( element ) {
         var index = 0;
         for( index in element.options){
-            if( element.options[index].text === itemName ) {
+            if( element.options[index].value === value ) {
                 break;
             }
         }
@@ -8523,13 +8523,15 @@ dwv.html.removeNodes = function (nodes) {
  * It is left to the user to set the 'onchange' method of the select.
  * @param {String} name The name of the HTML select.
  * @param {Mixed} list The list of options of the HTML select.
+ * @param {String} prefix An optional namespace prefix to find the display values.
  * @return {Object} The created HTML select.
  */
-dwv.html.createHtmlSelect = function (name, list) {
+dwv.html.createHtmlSelect = function (name, list, keyPrefix) {
     // select
     var select = document.createElement("select");
     //select.name = name;
     select.className = name;
+    var prefix = (typeof keyPrefix === "undefined") ? "" : keyPrefix + ".";
     // options
     var option;
     if ( list instanceof Array )
@@ -8538,7 +8540,8 @@ dwv.html.createHtmlSelect = function (name, list) {
         {
             option = document.createElement("option");
             option.value = list[i];
-            option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(list[i])));
+            //option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(list[i])));
+            option.appendChild(document.createTextNode(dwv.i18n(prefix + list[i] + ".name")));
             select.appendChild(option);
         }
     }
@@ -8548,7 +8551,8 @@ dwv.html.createHtmlSelect = function (name, list) {
         {
             option = document.createElement("option");
             option.value = item;
-            option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(item)));
+            //option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(item)));
+            option.appendChild(document.createTextNode(dwv.i18n(prefix + item + ".name")));
             select.appendChild(option);
         }
     }
@@ -9015,14 +9019,8 @@ dwv.gui.base.Loadbox = function (app, loaders)
      */
     this.setup = function ()
     {
-        // create gui
-        var loaderNames = [];
-        for( var key in loaders ) {
-            loaderNames.push(loaders[key].getDisplayName());
-        }
-        
         // loader select
-        loaderSelector = dwv.html.createHtmlSelect("loaderSelect", loaderNames);
+        loaderSelector = dwv.html.createHtmlSelect("loaderSelect", loaders, "io");
         loaderSelector.onchange = app.onChangeLoader;
 
         // node
@@ -9079,14 +9077,6 @@ dwv.gui.base.FileLoad = function (app)
     // closure to self
     var self = this;
     
-    /**
-     * Get the loader display name.
-     */
-    this.getDisplayName = function()
-    {
-        return dwv.i18n("io.file.name");
-    };
-
     /**
      * Internal file input change handler.
      * @param {Object} event The change event.
@@ -9149,14 +9139,6 @@ dwv.gui.base.UrlLoad = function (app)
     // closure to self
     var self = this;
     
-    /**
-     * Get the loader display name.
-     */
-    this.getDisplayName = function()
-    {
-        return dwv.i18n("io.url.name");
-    };
-
     /**
      * Internal url input change handler.
      * @param {Object} event The change event.
@@ -9356,7 +9338,7 @@ dwv.gui.base.Toolbox = function (app)
     this.setup = function (list)
     {
         // tool select
-        var toolSelector = dwv.html.createHtmlSelect("toolSelect", list);
+        var toolSelector = dwv.html.createHtmlSelect("toolSelect", list, "tool");
         toolSelector.onchange = app.onChangeTool;
 
         // tool list element
@@ -9434,7 +9416,7 @@ dwv.gui.base.WindowLevel = function (app)
         var wlSelector = dwv.html.createHtmlSelect("presetSelect", []);
         wlSelector.onchange = app.onChangeWindowLevelPreset;
         // colour map select
-        var cmSelector = dwv.html.createHtmlSelect("colourMapSelect", dwv.tool.colourMaps);
+        var cmSelector = dwv.html.createHtmlSelect("colourMapSelect", dwv.tool.colourMaps, "colourmap");
         cmSelector.onchange = app.onChangeColourMap;
 
         // preset list element
@@ -9480,7 +9462,7 @@ dwv.gui.base.WindowLevel = function (app)
     this.initialise = function ()
     {
         // create new preset select
-        var wlSelector = dwv.html.createHtmlSelect("presetSelect", app.getViewController().getPresets());
+        var wlSelector = dwv.html.createHtmlSelect("presetSelect", app.getViewController().getPresets(), "wl.presets");
         wlSelector.onchange = app.onChangeWindowLevelPreset;
         wlSelector.title = "Select w/l preset.";
 
@@ -9528,10 +9510,10 @@ dwv.gui.base.Draw = function (app)
     this.setup = function (shapeList)
     {
         // shape select
-        var shapeSelector = dwv.html.createHtmlSelect("shapeSelect", shapeList);
+        var shapeSelector = dwv.html.createHtmlSelect("shapeSelect", shapeList, "shape");
         shapeSelector.onchange = app.onChangeShape;
         // colour select
-        var colourSelector = dwv.html.createHtmlSelect("colourSelect", colours);
+        var colourSelector = dwv.html.createHtmlSelect("colourSelect", colours, "colour");
         colourSelector.onchange = app.onChangeLineColour;
 
         // shape list element
@@ -9612,7 +9594,7 @@ dwv.gui.base.Livewire = function (app)
     this.setup = function ()
     {
         // colour select
-        var colourSelector = dwv.html.createHtmlSelect("lwColourSelect", colours);
+        var colourSelector = dwv.html.createHtmlSelect("lwColourSelect", colours, "colour");
         colourSelector.onchange = app.onChangeLineColour;
 
         // colour list element
@@ -14281,14 +14263,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     var drawLayer = null;
 
     /**
-     * Get the tool display name.
-     */
-    this.getDisplayName = function()
-    {
-        return dwv.i18n("tool.draw.name");
-    };
-
-    /**
      * Handle mouse down event.
      * @param {Object} event The mouse down event.
      */
@@ -14761,13 +14735,13 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 dwv.tool.Draw.prototype.getHelp = function()
 {
     return {
-        "title": dwv.i18n("tool.draw.name"),
-        "brief": dwv.i18n("tool.draw.brief"),
+        "title": dwv.i18n("tool.Draw.name"),
+        "brief": dwv.i18n("tool.Draw.brief"),
         "mouse": {
-            "mouse_drag": dwv.i18n("tool.draw.mouse_drag")
+            "mouse_drag": dwv.i18n("tool.Draw.mouse_drag")
         },
         "touch": {
-            "touch_drag": dwv.i18n("tool.draw.touch_drag")
+            "touch_drag": dwv.i18n("tool.Draw.touch_drag")
         }
     };
 };
@@ -15378,14 +15352,6 @@ dwv.tool.Filter = function ( filterList, app )
     this.displayed = false;
 
     /**
-     * Get the tool display name.
-     */
-    this.getDisplayName = function()
-    {
-        return dwv.i18n("tool.filter.name");
-    };
-
-    /**
      * Setup the filter GUI.
      */
     this.setup = function ()
@@ -15453,8 +15419,8 @@ dwv.tool.Filter = function ( filterList, app )
 dwv.tool.Filter.prototype.getHelp = function ()
 {
     return {
-        "title": dwv.i18n("tool.filter.name"),
-        "brief": dwv.i18n("tool.filter.brief")
+        "title": dwv.i18n("tool.Filter.name"),
+        "brief": dwv.i18n("tool.Filter.brief")
     };
 };
 
@@ -16153,14 +16119,6 @@ dwv.tool.Livewire = function(app)
     var tolerance = 5;
 
     /**
-     * Get the tool display name.
-     */
-    this.getDisplayName = function()
-    {
-        return dwv.i18n("tool.livewire.name");
-    };
-
-    /**
      * Clear the parent points list.
      * @private
      */
@@ -16400,8 +16358,8 @@ dwv.tool.Livewire = function(app)
 dwv.tool.Livewire.prototype.getHelp = function()
 {
     return {
-        "title": dwv.i18n("tool.livewire.name"),
-        "brief": dwv.i18n("tool.livewire.brief")
+        "title": dwv.i18n("tool.Livewire.name"),
+        "brief": dwv.i18n("tool.Livewire.brief")
     };
 };
 
@@ -16848,14 +16806,6 @@ dwv.tool.Scroll = function(app)
     this.started = false;
 
     /**
-     * Get the tool display name.
-     */
-    this.getDisplayName = function()
-    {
-        return dwv.i18n("tool.scroll.name");
-    };
-
-    /**
      * Handle mouse down event.
      * @param {Object} event The mouse down event.
      */
@@ -17010,13 +16960,13 @@ dwv.tool.Scroll = function(app)
 dwv.tool.Scroll.prototype.getHelp = function()
 {
     return {
-        "title": dwv.i18n("tool.scroll.name"),
-        "brief": dwv.i18n("tool.scroll.brief"),
+        "title": dwv.i18n("tool.Scroll.name"),
+        "brief": dwv.i18n("tool.Scroll.brief"),
         "mouse": {
-            "mouse_drag": dwv.i18n("tool.scroll.mouse_drag")
+            "mouse_drag": dwv.i18n("tool.Scroll.mouse_drag")
         },
         "touch": {
-            'touch_drag': dwv.i18n("tool.scroll.touch_drag")
+            'touch_drag': dwv.i18n("tool.Scroll.touch_drag")
         }
     };
 };
@@ -17072,13 +17022,8 @@ dwv.tool.Toolbox = function( toolList, app )
     this.setup = function ()
     {
         if ( Object.keys(toolList).length !== 0 ) {
-            var toolNames = [];
-            for( var key0 in toolList ) {
-                toolNames.push(toolList[key0].getDisplayName());
-            }
-
             gui = new dwv.gui.Toolbox(app);
-            gui.setup(toolNames);
+            gui.setup(toolList);
             
             for( var key in toolList ) {
                 toolList[key].setup();
@@ -17301,14 +17246,6 @@ dwv.tool.WindowLevel = function(app)
     this.started = false;
 
     /**
-     * Get the tool display name.
-     */
-    this.getDisplayName = function()
-    {
-        return dwv.i18n("tool.wl.name");
-    };
-
-    /**
      * Handle mouse down event.
      * @param {Object} event The mouse down event.
      */
@@ -17360,7 +17297,7 @@ dwv.tool.WindowLevel = function(app)
             if ( gui ) {
                 gui.initialise();
                 // set selected
-                dwv.gui.setSelected(app.getElement("presetSelect"), "Manual");
+                dwv.gui.setSelected(app.getElement("presetSelect"), "manual");
             }
         }
     };
@@ -17463,14 +17400,14 @@ dwv.tool.WindowLevel = function(app)
 dwv.tool.WindowLevel.prototype.getHelp = function()
 {
     return {
-        "title": dwv.i18n("tool.wl.name"),
-        "brief": dwv.i18n("tool.wl.brief"),
+        "title": dwv.i18n("tool.WindowLevel.name"),
+        "brief": dwv.i18n("tool.WindowLevel.brief"),
         "mouse": {
-            "mouse_drag": dwv.i18n("tool.wl.mouse_drag"),
-            "double_click": dwv.i18n("tool.wl.double_click")
+            "mouse_drag": dwv.i18n("tool.WindowLevel.mouse_drag"),
+            "double_click": dwv.i18n("tool.WindowLevel.double_click")
         },
         "touch": {
-            "touch_drag": dwv.i18n("tool.wl.touch_drag")
+            "touch_drag": dwv.i18n("tool.WindowLevel.touch_drag")
         }
     };
 };
@@ -17501,14 +17438,6 @@ dwv.tool.ZoomAndPan = function(app)
      * @type Boolean
      */
     this.started = false;
-
-    /**
-     * Get the tool display name.
-     */
-    this.getDisplayName = function()
-    {
-        return dwv.i18n("tool.zoompan.name");
-    };
 
     /**
      * Handle mouse down event.
@@ -17710,15 +17639,15 @@ dwv.tool.ZoomAndPan = function(app)
 dwv.tool.ZoomAndPan.prototype.getHelp = function()
 {
     return {
-        "title": dwv.i18n("tool.zoompan.name"),
-        "brief": dwv.i18n("tool.zoompan.brief"),
+        "title": dwv.i18n("tool.ZoomAndPan.name"),
+        "brief": dwv.i18n("tool.ZoomAndPan.brief"),
         "mouse": {
-            "mouse_wheel": dwv.i18n("tool.zoompan.mouse_wheel"),
-            "mouse_drag": dwv.i18n("tool.zoompan.mouse_drag")
+            "mouse_wheel": dwv.i18n("tool.ZoomAndPan.mouse_wheel"),
+            "mouse_drag": dwv.i18n("tool.ZoomAndPan.mouse_drag")
         },
         "touch": {
-            'twotouch_pinch': dwv.i18n("tool.zoompan.twotouch_pinch"),
-            'touch_drag': dwv.i18n("tool.zoompan.touch_drag")
+            'twotouch_pinch': dwv.i18n("tool.ZoomAndPan.twotouch_pinch"),
+            'touch_drag': dwv.i18n("tool.ZoomAndPan.touch_drag")
         }
     };
 };
@@ -17746,7 +17675,7 @@ var devlng = {
 dwv.i18nInitialise = function ()
 {
     var options = {
-        lng: "en",
+        lng: "fr",
         fallbackLng: "en",
         debug: true           
     };
