@@ -175,6 +175,7 @@ dwv.gui.base.DicomTags = function (app)
         //table.setAttribute("class", "tagsList");
         table.setAttribute("data-role", "table");
         table.setAttribute("data-mode", "columntoggle");
+        table.setAttribute("data-column-btn-text", dwv.i18n("basics.columns") + "...");
         // search form
         node.appendChild(dwv.html.getHtmlSearchForm(table));
         // tags table

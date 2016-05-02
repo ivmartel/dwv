@@ -5,6 +5,9 @@
 // start app function
 function startApp() {
 
+    // translate page
+    dwv.i18nPage();
+    
     // main application
     var myapp = new dwv.App();
 

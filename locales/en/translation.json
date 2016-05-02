@@ -4,8 +4,16 @@
         "close": "Close",
         "help": "Help",
         "back": "Back",
+        "reset": "Reset",
+        "apply": "Apply",
         "name": "Name",
-        "value": "Value"
+        "value": "Value",
+        "dicomTags": "DICOM Tags",
+        "columns": "Columns",
+        "group": "Group",
+        "element": "Element",
+        "vr": "VR",
+        "vl": "VL"
     },
     "colour": {
         "Yellow": {

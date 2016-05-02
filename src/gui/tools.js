@@ -139,7 +139,8 @@ dwv.gui.base.WindowLevel = function (app)
     this.initialise = function ()
     {
         // create new preset select
-        var wlSelector = dwv.html.createHtmlSelect("presetSelect", app.getViewController().getPresets(), "wl.presets");
+        var wlSelector = dwv.html.createHtmlSelect("presetSelect", 
+            app.getViewController().getPresets(), "wl.presets", true);
         wlSelector.onchange = app.onChangeWindowLevelPreset;
         wlSelector.title = "Select w/l preset.";
 
@@ -330,7 +331,7 @@ dwv.gui.base.ZoomAndPan = function (app)
         button.onclick = app.onZoomReset;
         button.setAttribute("style","width:100%; margin-top:0.5em;");
         button.setAttribute("class","ui-btn ui-btn-b");
-        var text = document.createTextNode("Reset");
+        var text = document.createTextNode(dwv.i18n("basics.reset"));
         button.appendChild(text);
 
         // list element

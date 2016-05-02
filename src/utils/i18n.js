@@ -42,3 +42,22 @@ dwv.i18nOnLoaded = function (callback) {
 dwv.i18n = function (text, options) {
     return i18next.t(text, options);
 };
+
+/**
+ * Check the existence of a translation.
+ */
+dwv.i18nExists = function (text, options) {
+    return i18next.exists(text, options);
+};
+
+/**
+ * Translate all data-i18n tags.
+ */
+dwv.i18nPage = function () {
+    var elements = document.getElementsByTagName("*");
+    for (var i = 0; i < elements.length; ++i) { 
+        if (typeof elements[i].dataset.i18n !== "undefined") {
+            elements[i].innerHTML = dwv.i18n(elements[i].dataset.i18n);
+        }
+    }
+};

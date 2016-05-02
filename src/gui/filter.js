@@ -121,7 +121,7 @@ dwv.gui.filter.base.createFilterApplyButton = function (app)
     button.onclick = app.onRunFilter;
     button.setAttribute("style","width:100%; margin-top:0.5em;");
     button.setAttribute("class","ui-btn ui-btn-b");
-    button.appendChild(document.createTextNode("Apply"));
+    button.appendChild(document.createTextNode(dwv.i18n("basics.apply")));
     return button;
 };
 
