@@ -4,7 +4,6 @@
 
 // start app function
 function startApp() {
-
     // translate page
     dwv.i18nPage();
     
@@ -48,10 +47,8 @@ function startApp() {
         "useWebWorkers": true
     });
 
-
     var size = dwv.gui.getWindowSize();
     $(".layerContainer").height(size.height);
-    
 }
 
 // check browser support

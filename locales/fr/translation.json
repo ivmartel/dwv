@@ -13,7 +13,13 @@
         "group": "Groupe",
         "element": "Element",
         "vr": "VR",
-        "vl": "VL"
+        "vl": "VL",
+        "presets": "Presets",
+        "toolbox": "Boite à outils",
+        "history": "Historique",
+        "image": "Image",
+        "info": "Info",
+        "downloadState": "Télécharger state"
     },
     "colour": {
         "Yellow": {
@@ -42,7 +48,8 @@
         }
     },
     "unit": {
-        "mm": "mm"
+        "mm": "mm",
+        "cm2": "cm2"
     },
     "help": {
         "intro": {
