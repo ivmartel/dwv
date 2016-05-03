@@ -1,44 +1,44 @@
 {
     "basics": {
-        "open": "Open",
-        "close": "Close",
-        "help": "Help",
-        "back": "Back",
-        "reset": "Reset",
-        "apply": "Apply",
+        "open": "Öffnen",
+        "close": "Schließen",
+        "help": "Hilfe",
+        "back": "Zurück",
+        "reset": "Zurücksetzen",
+        "apply": "Anwenden",
         "name": "Name",
-        "value": "Value",
-        "dicomTags": "DICOM Tags",
-        "columns": "Columns",
-        "group": "Group",
+        "value": "Wert",
+        "dicomTags": "DICOM-Tags",
+        "columns": "Spalten",
+        "group": "Gruppe",
         "element": "Element",
         "vr": "VR",
         "vl": "VL"
     },
     "colour": {
         "Yellow": {
-            "name": "Yellow"
+            "name": "Gelb"
         },
         "Red": {
-            "name": "Red"
+            "name": "Rot"
         },
         "White": {
-            "name": "White"
+            "name": "Weiß"
         },
         "Green": {
-            "name": "Green"
+            "name": "Olivgrün"
         },
         "Blue": {
-            "name": "Blue"
+            "name": "Blau"
         },
         "Lime": {
-            "name": "Lime"
+            "name": "Lindgrün"
         },
         "Fuchsia": {
-            "name": "Fuchsia"
+            "name": "Magenta"
         },
         "Black": {
-            "name": "Black"
+            "name": "Schwarz"
         }
     },
     "unit": {
@@ -46,66 +46,66 @@
     },
     "help": {
         "intro": {
-            "p0": "DWV (DICOM Web Viewer) is an open source zero footprint medical image viewer. It uses only javascript and HTML5 technologies, meaning that it can be run on any platform that provides a modern browser (laptop, tablet, phone and even modern TVs). It can load local or remote data in DICOM format (the standard for medical imaging data such as MR, CT, Echo, Mammo, NM...) and provides standard tools for its manipulation such as contrast, zoom, drag, possibility to draw regions on top of the image and imaging filters such as threshold and sharpening.",
-            "p1": "All DICOM tags are available in a searchable table, press the 'tags' or grid button. You can choose to display the image information overlay by pressing the 'info' or i button."
+            "p0": "DWV (DICOM Web Viewer) ist ein Open-Source-Betrachter für medizinische Bilddaten. Er basiert auf dem Zero-Footprint-Prinzip und nutzt nur JavaScript- und HTML5-Technologie, d.h. er ist auf allen Plattformen lauffähig, die einen modernen Browser bereitstellen (Laptops, Tablets, Mobiltelefone und sogar moderne Fernseher). Er kann sowohl lokale als auch in Cloud-Systemen gespeicherte DICOM-Dateien (das Standardformat für medizinische Bilddaten wie MRT, CT, Echografie, Mammografie,...) laden und enthält Standard-Tools für deren Verarbeitung, wie z.B. Kontrast, Zoom, Verschieben, Zeichnen von Regionen und Bildverarbeitungsfilter wie Schwellwertfilter und Schärfen.",
+            "p1": "Alle DICOM-Tags sind in einer durchsuchbaren Tabelle verfügbar. Klicken Sie dazu auf den \"Tags\"-Button mit dem Gittersymbol. Durch Klicken auf den Info-Button mit dem i-Symbol können Sie die Bildinformationen über dem Bild einblenden."
         },
-        "tool_intro": "Each tool defines the possible user interactions. Here are the available tools:"
+        "tool_intro": "Die Werkzeuge legen die möglichen Benutzerinteraktionen fest. Es sind foldende Werkzeuge verfügbar:"
     },
     "tool": {
         "WindowLevel": {
-            "name": "Window/Level",
-            "brief": "Changes the Window and Level of the image.",
-            "mouse_drag": "A single mouse drag changes the window in the horizontal direction and the level in the vertical one.",
-            "double_click": "A double click will center the window and level on the clicked intensity.",
-            "touch_drag": "A single touch drag changes the window in the horizontal direction and the level in the vertical one."
+            "name": "Fensterung",
+            "brief": "Verändert das Fenster der Grauwertskalierung.",
+            "mouse_drag": "Horizontales Ziehen mit der Maus verändert die Fenstergröße, vertikales Ziehen verschiebt das Fenster.",
+            "double_click": "Ein Doppelklick zentriert das Grauwertfenster über dem angeklickten Grauwert.",
+            "touch_drag": "Horizontales Ziehen mit dem Finger verändert die Fenstergröße, vertikales Ziehen verschiebt das Fenster."
         },
         "ZoomAndPan": {
-            "name": "Zoom/Pan",
-            "brief": "The Zoom/Pan tool allows to zoom and pan the image.",
-            "mouse_wheel": "The mouse wheel is used to zoom the image.",
-            "mouse_drag": "A single mouse drag drags the image in the desired direction.",
-            "twotouch_pinch": "A pinch in or out allows to zoom the image.",
-            "touch_drag": "A single touch drag drags the image in the desired direction."
+            "name": "Zoom/Verschieben",
+            "brief": "Mit dem Zoom/Verschieben-Werkzeug kann das Bild vergrößert, verkleinert und verschoben werden.",
+            "mouse_wheel": "Das Mausrad vergrößert oder verkleinert das Bild.",
+            "mouse_drag": "Ziehen mit der Maus verschiebt das Bild in die gewünschte Richtung.",
+            "twotouch_pinch": "Durch Auseinander- oder Zusammenbewegen zweier Finger auf dem Touchscreen kann das Bild vergrößert oder verkleinert werden.",
+            "touch_drag": "Ziehen mit dem Finger verschiebt das Bild in die gewünschte Richtung."
         },
         "Scroll": {
-            "name": "Scroll",
-            "brief": "The scroll tool allows to scroll through slices.",
-            "mouse_drag": "A single vertical mouse drag changes the current slice.",
-            "touch_drag": "A single vertical touch drag changes the current slice."
+            "name": "Scrollen",
+            "brief": "Das Scrollwerkzeug ermöglicht das Scrollen durch die Schnittbilder.",
+            "mouse_drag": "Vertikales Ziehen mit der Maus ändert das aktuelle Schnittbild.",
+            "touch_drag": "Vertikales Ziehen mit dem Finger ändert das aktuelle Schnittbild."
         },
         "Draw": {
-            "name": "Draw",
-            "brief": "Allows to draw shapes on the image. Choose the shape and its colour from the drop down menus. Once created, shapes can be edited by selecting them. Anchors will appear and allow specific shape edition. Drag the shape on the top red cross to delete it. All actions are undoable.",
-            "mouse_drag": "A single mouse drag draws the desired shape.",
-            "touch_drag": "A single touch drag draws the desired shape."
+            "name": "Zeichnen",
+            "brief": "Ermöglicht das Zeichnen von Formen in das Bild. Wählen Sie Form und Farbe aus den Drop-Down-Menüs. Die Formen können nach ihrer Erstellung ausgewählt werden. Das Verschieben der dann erscheinenden formspezifischen Ankerpunkte erlaubt eine nachträgliche Bearbeitung. Wird eine Form auf das rote Kreuz gezogen, wird sie gelöscht. Alle Aktionen können rückgängige gemacht werden.",
+            "mouse_drag": "Zeichnen Sie mit der Maus das gewünschte Objekt mit gedrückter Maustaste.",
+            "touch_drag": "Zeichnen Sie mit dem Finger das gewünschte Objekt."
         },
         "Filter": {
             "name": "Filter",
-            "brief": "A few simple image filters are available: a Threshold filter to limit the image intensities between a chosen minimum and maximum, a Sharpen filter to convolute the image with a sharpen matrix, a Sobel filter to get the gradient of the image in both directions."
+            "brief": "Es sind einige einfache Bildbearbeitungsfilter verfügbar: Ein Schwellwertfilter, um das Bild auf eine Region mit Grauwerten in einem vorgegebenen Fenster zu beschränken, ein Filter zum Schärfen und ein Sobel-Filter zum Berechnen eines Gradienten-Bildes."
         },
         "Livewire": {
             "name": "Livewire",
-            "brief": "The Livewire tool is a semi-automatic segmentation tool that proposes to the user paths that follow intensity edges. Click once to initialise and then move the mouse to see the proposed paths. Click again to build your contour. The process stops when you click on the first root point. BEWARE: the process can take time!"
+            "brief": "Das Livewire-Werkzeug ist ein halbautomatisches Segmentierungswerkzeug, das automatisch Grauwertkanten folgt. Erstmaliger Klick initialisiert die Segmentierungsgrenze. Danach kann das vorgeschlagene Segment durch Mausbewegung geändert werden. Nochmaliger Klick übernimmt das aktuell dargestellte Segment in die Gesamtlinie und startet ein neues Segment. Das Verfahren endet, sobald der erste Punkt nochmals angeklickt wird. ACHTUNG: Das Verfahren kann viel Zeit in Anspruch nehmen!"
         },
         "info": {
-            "position": "Pos = {{value}}",
-            "value": "Value = {{value}}",
-            "window_center": "WindowCenter = {{value}}",
-            "window_width": "WindowWidth = {{value}}"
+            "position": "Position = {{value}}",
+            "value": "Grauwert = {{value}}",
+            "window_center": "Fensterzentrum = {{value}}",
+            "window_width": "Fensterbreite = {{value}}"
         }
     },
     "shape": {
         "Line": {
-            "name": "Line"
+            "name": "Linie"
         },
         "Protractor": {
-            "name": "Protractor"
+            "name": "Winkelmesser"
         },
         "Rectangle": {
-            "name": "Rectangle"
+            "name": "Rechteck"
         },
         "Roi": {
-            "name": "Roi"
+            "name": "Freihandform"
         },
         "Ellipse": {
             "name": "Ellipse"
@@ -113,17 +113,17 @@
     },
     "io": {
         "File": {
-            "name": "File"
+            "name": "Datei"
         },
         "Url": {
-            "name": "Url"
+            "name": "URL"
         },
         "GoogleDrive": {
             "name": "GoogleDrive",
             "auth": {
-                "title": "Google Drive Authorization",
-                "body": "Please authorize DWV to access your Google Drive. \nThis is only needed the first time you connect.",
-                "button": "Authorize"
+                "title": "Google Drive Autorisierung",
+                "body": "Bitte autorisieren Sie DWV, auf Ihr Google Drive zugreifen zu dürfen.\nDies ist nur bei der ersten Verwendung nötig.",
+                "button": "Autorisieren"
             }
         },
         "Dropbox": {
@@ -132,10 +132,10 @@
     },
     "filter": {
         "Threshold": {
-            "name": "Threshold"
+            "name": "Schwellwert"
         },
         "Sharpen": {
-            "name": "Sharpen"
+            "name": "Schärfen"
         },
         "Sobel": {
             "name": "Sobel"
@@ -143,49 +143,49 @@
     },
     "colourmap": {
         "plain": {
-            "name": "Plain"
+            "name": "Schwarzweiß"
         },
         "invplain": {
-            "name": "Invplain"
+            "name": "Schwarzweiß invertiert"
         },
         "rainbow": {
-            "name": "Rainbow"
+            "name": "Regenbogen"
         },
         "hot": {
-            "name": "Hot"
+            "name": "Warm"
         },
         "hotiron": {
-            "name": "Hot Iron"
+            "name": "Heißes Eisen"
         },
         "pet": {
-            "name": "Pet"
+            "name": "PET"
         },
         "hotmetalblue": {
-            "name": "Hot Metal Blue"
+            "name": "Heißes Eisen weiß"
         },
         "pet20step": {
-            "name": "Pet 20 steps"
+            "name": "PET 20 Stufen"
         }
     },
     "wl": {
         "presets": {
             "mediastinum": {
-                "name": "Mediastinum"
+                "name": "Mittelfellraum"
             },
             "lung": {
-                "name": "Lung"
+                "name": "Lunge"
             },
             "bone": {
-                "name": "Bone"
+                "name": "Knochen"
             },
             "brain": {
-                "name": "Brain"
+                "name": "Gehirn"
             },
             "head": {
-                "name": "Head"
+                "name": "Kopf"
             },
             "manual": {
-                "name": "Manual"
+                "name": "Manuell"
             },
             "minmax": {
                 "name": "Min/Max"
