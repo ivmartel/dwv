@@ -15232,7 +15232,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
     // quantification
     var quant = image.quantifyEllipse( ellipse );
     var cm2 = quant.surface / 100;
-    var str = cm2.toPrecision(4) + " cm2";
+    var str = cm2.toPrecision(4) + " " + dwv.i18n("unit.cm2");
     // quantification text
     var ktext = new Kinetic.Text({
         x: ellipse.getCenter().getX(),
@@ -15986,7 +15986,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
     });
     // quantification
     var quant = image.quantifyLine( line );
-    var str = quant.length.toPrecision(4) + " " + dwv.i18n("mm");
+    var str = quant.length.toPrecision(4) + " " + dwv.i18n("unit.mm");
     // quantification text
     var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
     var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
@@ -16614,7 +16614,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
     // quantification
     var quant = image.quantifyRect( rectangle );
     var cm2 = quant.surface / 100;
-    var str = cm2.toPrecision(4) + " cm2";
+    var str = cm2.toPrecision(4) + " " + dwv.i18n("unit.cm2");
     // quantification text
     var ktext = new Kinetic.Text({
         x: rectangle.getBegin().getX(),
