@@ -2311,7 +2311,7 @@ dwv.dicom.DicomParser.prototype.getPixelBuffer = function()
  * @param {Object} element The element to add.
  * @param {Object} sequences The sequence the element belongs to (optional).
  */
-dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequences )
+dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequences, offset )
 {
     // simple case: not a Sequence or a SequenceDelimitationItem
     if ( ( typeof sequences === "undefined" || sequences.length === 0 ) &&
@@ -2321,7 +2321,8 @@ dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequence
             "element": element.tag.element,
             "vr": element.vr,
             "vl": element.vl,
-            "value": element.data
+            "value": element.data,
+            "offset": offset - element.vl
         };
     }
     else {
@@ -2405,6 +2406,32 @@ dwv.dicom.DicomParser.prototype.readTag = function(reader, offset)
     var name = dwv.dicom.getGroupElementKey(group, element);
     // return
     return {'group': group, 'element': element, 'name': name};
+};
+
+/**
+ * Remove dicom tags replacing characters by spaces
+ * @param {Array} buffer The input array buffer.
+ * @param {Array} ElementTags The tags to be removed.
+ * @param {boolean} If true, the function will return a blob else return Uint8Array.
+ * @return {Object} Blob or Uint8Array depending on last parameter.
+ */
+dwv.dicom.DicomParser.prototype.cleanTags = function(arraybuffer, tags, blob){
+    var elem = this.getRawDicomElements();
+    // Check if dicomElements is empty to force parse
+    if(Object.getOwnPropertyNames(elem).length === 0){
+        var parser = new dwv.dicom.DicomParser();
+        parser.parse(arraybuffer);
+        elem = parser.getRawDicomElements();
+    }
+    var array = new Uint8Array(arraybuffer);
+    for(var t=0, tl=tags.length; t<tl; t++){
+        var item = elem[tags[t]];
+        for(var i=item.offset, il=item.offset+item.vl; i<il; i++){
+            array[i] = 32;
+        }
+    }
+    if(blob){ return new Blob([array]);}
+    return array;
 };
 
 /**
@@ -2728,7 +2755,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         }
 
         // store the data element
-        this.appendDicomElement( dataElement, sequences );
+        this.appendDicomElement( dataElement, sequences, i+tagOffset);
 
         // end of sequence with explicit length
         if ( dataElement.vr !== "SQ" && sequences.length !== 0 ) {
@@ -15844,6 +15871,11 @@ dwv.tool.Floodfill = function(app)
      */
     var self = this;
     /**
+     * Interaction start flag.
+     * @type Boolean
+     */
+    this.started = false;
+    /**
      * Livewire GUI.
      * @type Object
      */
@@ -15884,12 +15916,6 @@ dwv.tool.Floodfill = function(app)
      * @type Boolean
      */
     var extender = false;
-    /**
-     * Assistant variable to avoid painting twice.
-     * @private
-     * @type Boolean
-     */
-    var stopped = false;
     /**
      * Timeout for painting on mousemove.
      * @private
@@ -15949,7 +15975,6 @@ dwv.tool.Floodfill = function(app)
         cs = MagicWand.simplifyContours(cs, simplifyTolerant, simplifyCount);
 
         if(cs.length > 0 && cs[0].points[0].x){
-            // console.log(cs.length)
             for(var j=0, icsl=cs[0].points.length; j<icsl; j++){
                 parentPoints.push(new dwv.math.Point2D(cs[0].points[j].x, cs[0].points[j].y));
             }
@@ -16020,6 +16045,21 @@ dwv.tool.Floodfill = function(app)
     };
 
     /**
+     * Modify tolerance threshold and redraw ROI.
+     * @param {Number} New threshold.
+     */
+    this.modifyThreshold = function(modifyThreshold){
+        // remove previous draw
+        clearTimeout(painterTimeout);
+        painterTimeout = setTimeout(function(){
+                                        if ( shapeGroup && self.started) {
+                                            shapeGroup.destroy();
+                                        }
+                                        paintBorder(initialpoint,  modifyThreshold);
+                                    },100);
+    };
+
+    /**
      * Handle mouse down event.
      * @param {Object} event The mouse down event.
      */
@@ -16027,7 +16067,7 @@ dwv.tool.Floodfill = function(app)
         imageInfo = app.getImageData();
         if (!imageInfo){ return console.error('No image found');}
 
-        stopped = false;
+        self.started = true;
         initialpoint = getCoord(event);
         paintBorder(initialpoint, initialthreshold);
     };
@@ -16037,20 +16077,14 @@ dwv.tool.Floodfill = function(app)
      * @param {Object} event The mouse move event.
      */
     this.mousemove = function(event){
-        // nothing to do
-        if(!mask || stopped){return false;}
-        // remove previous draw
-        if ( shapeGroup ) {
-            shapeGroup.destroy();
+        if (!self.started)
+        {
+            return;
         }
-        clearTimeout(painterTimeout);
-        painterTimeout = setTimeout(function(){
-                            var movedpoint     = getCoord(event);
-                            currentthreshold   = Math.round(Math.sqrt( Math.pow((initialpoint.x-movedpoint.x), 2) + Math.pow((initialpoint.y-movedpoint.y), 2) )/2);
-                            //if( new_threshold>100){new_threshold = 100;}
-                            // else{if( new_threshold<initialthreshold){new_threshold = initialthreshold;}}
-                            paintBorder(initialpoint,  currentthreshold);
-                        },100);
+        var movedpoint   = getCoord(event);
+        currentthreshold = Math.round(Math.sqrt( Math.pow((initialpoint.x-movedpoint.x), 2) + Math.pow((initialpoint.y-movedpoint.y), 2) )/2);
+        currentthreshold = currentthreshold < initialthreshold ? initialthreshold : currentthreshold - initialthreshold;
+        self.modifyThreshold(currentthreshold);
     };
 
     /**
@@ -16058,7 +16092,7 @@ dwv.tool.Floodfill = function(app)
      * @param {Object} event The mouse up event.
      */
     this.mouseup = function(/*event*/){
-        stopped = true;
+        self.started = false;
         if(extender){
             self.extend();
         }
@@ -16069,7 +16103,7 @@ dwv.tool.Floodfill = function(app)
      * @param {Object} event The mouse out event.
      */
     this.mouseout = function(/*event*/){
-        stopped = true;
+        self.mouseup(/*event*/);
     };
 
     /**
@@ -16094,9 +16128,9 @@ dwv.tool.Floodfill = function(app)
      * Handle touch end event.
      * @param {Object} event The touch end event.
      */
-    this.touchend = function(event){
+    this.touchend = function(/*event*/){
         // treat as mouse up
-        self.mouseup(event);
+        self.mouseup(/*event*/);
     };
 
     /**

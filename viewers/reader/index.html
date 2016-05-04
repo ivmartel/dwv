@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<!-- <html manifest="cache.manifest"> -->
+<html>
+
+<head>
+	<title>DICOM Web Viewer</title>
+	<meta charset="UTF-8">
+	<meta name="description" content="DICOM Web Viewer (DWV) static version">
+	<meta name="keywords" content="DICOM,HTML5,JavaScript,medical,imaging,DWV">
+	<link type="text/css" rel="stylesheet" href="../../css/style.css">
+	<style type="text/css" >
+		body { background-color: #222; color: white;
+			margin: 10px; padding: 0; font-size: 80%; }
+			#pageHeader h1 { display: inline-block; margin: 0; color: #fff; }
+			#pageHeader a { color: #ddf; }
+			#pageHeader .toolbar { display: inline-block; float: right; }
+			.toolbox li:first-child { list-style-type: none; padding-bottom: 10px; margin-left: -20px; }
+			#pageMain { position: absolute; height: 92%; width: 99%; bottom: 5px; left: 5px; background-color: #333; }
+			.infotl { color: #333; text-shadow: 0 1px 0 #fff; }
+			.infotr { color: #333; text-shadow: 0 1px 0 #fff; }
+			.dropBox { margin: 20px; }
+		</style>
+		<!-- <link type="text/css" rel="stylesheet" href="../../ext/jquery-ui/themes/ui-darkness/jquery-ui-1.11.4.min.css"> -->
+		<!-- Third party -->
+		<script type="text/javascript" src="../../ext/jquery/jquery-2.1.4.min.js"></script>
+		<!-- <script type="text/javascript" src="../../ext/jquery-ui/jquery-ui-1.11.4.min.js"></script>
+		<script type="text/javascript" src="../../ext/flot/jquery.flot.min.js"></script>
+		<script type="text/javascript" src="../../ext/kinetic/kinetic-v5.1.1-06.10.min.js"></script>
+		<script type="text/javascript" src="../../ext/magic-wand/magic-wand.js"></script> -->
+		<!-- decoders -->
+		<!-- <script type="text/javascript" src="../../ext/pdfjs/jpx.js"></script>
+		<script type="text/javascript" src="../../ext/pdfjs/util.js"></script>
+		<script type="text/javascript" src="../../ext/pdfjs/arithmetic_decoder.js"></script>
+		<script type="text/javascript" src="../../ext/rii-mango/lossless-min.js"></script>
+		<script type="text/javascript" src="../../ext/notmasteryet/jpg.js"></script> -->
+		<!-- Local -->
+		<!-- <script type="text/javascript" src="../../src/app/application.js"></script>
+		<script type="text/javascript" src="../../src/app/toolboxController.js"></script>
+		<script type="text/javascript" src="../../src/app/viewController.js"></script>
+		<script type="text/javascript" src="../../src/app/state.js"></script> -->
+		 <script type="text/javascript" src="../../src/dicom/dicomParser.js"></script>
+		<script type="text/javascript" src="../../src/dicom/dictionary.js"></script>
+		<script type="text/javascript" src="dicomParser.js"></script>
+		<script type="text/javascript" src="FileSaver.js"></script>
+		<!--<script type="text/javascript" src="../../src/gui/browser.js"></script>
+		<script type="text/javascript" src="../../src/gui/filter.js"></script>
+		<script type="text/javascript" src="../../src/gui/generic.js"></script>
+		<script type="text/javascript" src="../../src/gui/help.js"></script>
+		<script type="text/javascript" src="../../src/gui/html.js"></script>
+		<script type="text/javascript" src="../../src/gui/layer.js"></script>
+		<script type="text/javascript" src="../../src/gui/loader.js"></script>
+		<script type="text/javascript" src="../../src/gui/style.js"></script>
+		<script type="text/javascript" src="../../src/gui/tools.js"></script>
+		<script type="text/javascript" src="../../src/gui/undo.js"></script>
+		<script type="text/javascript" src="../../src/image/filter.js"></script>
+		<script type="text/javascript" src="../../src/image/geometry.js"></script>
+		<script type="text/javascript" src="../../src/image/image.js"></script>
+		<script type="text/javascript" src="../../src/image/luts.js"></script>
+		<script type="text/javascript" src="../../src/image/reader.js"></script>
+		<script type="text/javascript" src="../../src/image/view.js"></script>
+		<script type="text/javascript" src="../../src/io/file.js"></script>
+		<script type="text/javascript" src="../../src/io/url.js"></script>
+		<script type="text/javascript" src="../../src/math/bucketQueue.js"></script>
+		<script type="text/javascript" src="../../src/math/point.js"></script>
+		<script type="text/javascript" src="../../src/math/scissors.js"></script>
+		<script type="text/javascript" src="../../src/math/shapes.js"></script>
+		<script type="text/javascript" src="../../src/math/stats.js"></script>
+		<script type="text/javascript" src="../../src/tools/draw.js"></script>
+		<script type="text/javascript" src="../../src/tools/editor.js"></script>
+		<script type="text/javascript" src="../../src/tools/ellipse.js"></script>
+		<script type="text/javascript" src="../../src/tools/filter.js"></script>
+		<script type="text/javascript" src="../../src/tools/floodfill.js"></script>
+		<script type="text/javascript" src="../../src/tools/info.js"></script>
+		<script type="text/javascript" src="../../src/tools/line.js"></script>
+		<script type="text/javascript" src="../../src/tools/livewire.js"></script>
+		<script type="text/javascript" src="../../src/tools/protractor.js"></script>
+		<script type="text/javascript" src="../../src/tools/rectangle.js"></script>
+		<script type="text/javascript" src="../../src/tools/roi.js"></script>
+		<script type="text/javascript" src="../../src/tools/scroll.js"></script>
+		<script type="text/javascript" src="../../src/tools/toolbox.js"></script>
+		<script type="text/javascript" src="../../src/tools/undo.js"></script>
+		<script type="text/javascript" src="../../src/tools/windowLevel.js"></script>
+		<script type="text/javascript" src="../../src/tools/zoomPan.js"></script>
+		<script type="text/javascript" src="../../src/utils/string.js"></script>
+		<script type="text/javascript" src="../../src/utils/uri.js"></script>
+		<script type="text/javascript" src="../../src/utils/thread.js"></script> -->
+
+		<!-- Launch the app -->
+		<!-- <script type="text/javascript" src="appgui.js"></script>
+		<script type="text/javascript" src="applauncher.js"></script> -->
+	</head>
+
+	<body>
+
+		<!-- DWV -->
+		<input id="dwv" type="file">
+
+		<script>
+			$(document).ready(function(){
+				console.log(dwv.dicom)
+				var parser = new dwv.dicom.DicomParser()
+				reader = new FileReader();
+				$('#dwv').change(function(e){
+					console.log(e)
+
+					reader.onload = function(e){
+						// console.log(e)
+						// parser.parse(e.target.result)
+						clean = parser.cleanTags(e.target.result, ['x00100010', 'x00100030', 'x00100020', 'x00200010'], true)
+						// b= new Blob([clean])
+						console.log(clean)
+						saveAs(clean, 'rafa.dcm')
+						// console.log(parser.getRawDicomElements())
+
+
+						byteArray = new Uint8Array(e.target.result)
+						var dataSet = dicomParser.parseDicom(byteArray)
+						console.log(dataSet.elements)
+					}
+					reader.readAsArrayBuffer(e.target.files[0])
+				})
+			})
+		</script>
+	</body>
+</html>
