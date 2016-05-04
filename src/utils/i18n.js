@@ -5,28 +5,41 @@ dwv.utils = dwv.utils || {};
 //external
 var i18next = i18next || {};
 var i18nextXHRBackend = i18nextXHRBackend || {};
+var i18nextBrowserLanguageDetector = i18nextBrowserLanguageDetector || {};
 
 var devlng = {
 };
 
 /**
  * Initialise i18n.
+ * @param {String} language The language to translate to. Defaults to 'auto' and 
+ *   gets the language from the browser.
  */
-dwv.i18nInitialise = function ()
+dwv.i18nInitialise = function (language)
 {
+    var lng = (typeof language === "undefined") ? "auto" : language;
+    
     var options = {
-        lng: "fr",
         fallbackLng: "en",
-        debug: true           
+        //debug: true           
     };
-
-    i18next.use(i18nextXHRBackend).init(options, function() {
+    
+    var i18n = i18next.use(i18nextXHRBackend);
+    
+    if (lng != "auto") {
+        options.lng = lng;
+    }
+    else {
+        i18n.use(i18nextBrowserLanguageDetector);
+    }
+    
+    i18n.init(options, function() {
         // in case no translation file is found
         if ( !i18next.hasResourceBundle("en", "translation") ) {
+            console.log("Loading backup translation.");
             i18next.addResourceBundle("en", "translation", devlng);
         }
     });
-
 };
     
 /**

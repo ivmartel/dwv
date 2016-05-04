@@ -16,3 +16,11 @@ i18next-xhr-backend
 * Date: 10/03/2016
 * Description: backend layer for i18next using browsers xhr.
 * Purpose for dwv: load translation files.
+
+i18next-browser-languageDetector
+--------------------------------
+* Web: https://github.com/i18next/i18next-browser-languageDetector
+* Version: [0.3.0](https://github.com/i18next/i18next-browser-languageDetector/releases/tag/v0.3.0)
+* Date: 21/04/2016
+* Description: language detector used in browser environment for i18next
+* Purpose for dwv: detect user language.
