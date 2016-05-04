@@ -63,6 +63,11 @@ dwv.tool.Floodfill = function(app)
      */
     var self = this;
     /**
+     * Interaction start flag.
+     * @type Boolean
+     */
+    this.started = false;
+    /**
      * Livewire GUI.
      * @type Object
      */
@@ -103,12 +108,6 @@ dwv.tool.Floodfill = function(app)
      * @type Boolean
      */
     var extender = false;
-    /**
-     * Assistant variable to avoid painting twice.
-     * @private
-     * @type Boolean
-     */
-    var stopped = false;
     /**
      * Timeout for painting on mousemove.
      * @private
@@ -168,7 +167,6 @@ dwv.tool.Floodfill = function(app)
         cs = MagicWand.simplifyContours(cs, simplifyTolerant, simplifyCount);
 
         if(cs.length > 0 && cs[0].points[0].x){
-            // console.log(cs.length)
             for(var j=0, icsl=cs[0].points.length; j<icsl; j++){
                 parentPoints.push(new dwv.math.Point2D(cs[0].points[j].x, cs[0].points[j].y));
             }
@@ -239,6 +237,21 @@ dwv.tool.Floodfill = function(app)
     };
 
     /**
+     * Modify tolerance threshold and redraw ROI.
+     * @param {Number} New threshold.
+     */
+    this.modifyThreshold = function(modifyThreshold){
+        // remove previous draw
+        clearTimeout(painterTimeout);
+        painterTimeout = setTimeout(function(){
+                                        if ( shapeGroup && self.started) {
+                                            shapeGroup.destroy();
+                                        }
+                                        paintBorder(initialpoint,  modifyThreshold);
+                                    },100);
+    };
+
+    /**
      * Handle mouse down event.
      * @param {Object} event The mouse down event.
      */
@@ -246,7 +259,7 @@ dwv.tool.Floodfill = function(app)
         imageInfo = app.getImageData();
         if (!imageInfo){ return console.error('No image found');}
 
-        stopped = false;
+        self.started = true;
         initialpoint = getCoord(event);
         paintBorder(initialpoint, initialthreshold);
     };
@@ -256,20 +269,14 @@ dwv.tool.Floodfill = function(app)
      * @param {Object} event The mouse move event.
      */
     this.mousemove = function(event){
-        // nothing to do
-        if(!mask || stopped){return false;}
-        // remove previous draw
-        if ( shapeGroup ) {
-            shapeGroup.destroy();
+        if (!self.started)
+        {
+            return;
         }
-        clearTimeout(painterTimeout);
-        painterTimeout = setTimeout(function(){
-                            var movedpoint     = getCoord(event);
-                            currentthreshold   = Math.round(Math.sqrt( Math.pow((initialpoint.x-movedpoint.x), 2) + Math.pow((initialpoint.y-movedpoint.y), 2) )/2);
-                            //if( new_threshold>100){new_threshold = 100;}
-                            // else{if( new_threshold<initialthreshold){new_threshold = initialthreshold;}}
-                            paintBorder(initialpoint,  currentthreshold);
-                        },100);
+        var movedpoint   = getCoord(event);
+        currentthreshold = Math.round(Math.sqrt( Math.pow((initialpoint.x-movedpoint.x), 2) + Math.pow((initialpoint.y-movedpoint.y), 2) )/2);
+        currentthreshold = currentthreshold < initialthreshold ? initialthreshold : currentthreshold - initialthreshold;
+        self.modifyThreshold(currentthreshold);
     };
 
     /**
@@ -277,7 +284,7 @@ dwv.tool.Floodfill = function(app)
      * @param {Object} event The mouse up event.
      */
     this.mouseup = function(/*event*/){
-        stopped = true;
+        self.started = false;
         if(extender){
             self.extend();
         }
@@ -288,7 +295,7 @@ dwv.tool.Floodfill = function(app)
      * @param {Object} event The mouse out event.
      */
     this.mouseout = function(/*event*/){
-        stopped = true;
+        self.mouseup(/*event*/);
     };
 
     /**
@@ -313,9 +320,9 @@ dwv.tool.Floodfill = function(app)
      * Handle touch end event.
      * @param {Object} event The touch end event.
      */
-    this.touchend = function(event){
+    this.touchend = function(/*event*/){
         // treat as mouse up
-        self.mouseup(event);
+        self.mouseup(/*event*/);
     };
 
     /**
