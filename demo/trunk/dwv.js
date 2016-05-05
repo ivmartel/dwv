@@ -17692,15 +17692,18 @@ var i18nextBrowserLanguageDetector = i18nextBrowserLanguageDetector || {};
  * Initialise i18n.
  * @param {String} language The language to translate to. Defaults to 'auto' and 
  *   gets the language from the browser.
+ * @param {String} localesPath Path the locales directory.
  */
-dwv.i18nInitialise = function (language)
+dwv.i18nInitialise = function (language, localesPath)
 {
     var lng = (typeof language === "undefined") ? "auto" : language;
+    var lpath = (typeof localesPath === "undefined") ? "" : localesPath;
     // i18n options: default 'en' language and
     //  only load language, not specialised (for ex en-GB)  
     var options = {
         fallbackLng: "en",
-        load: "languageOnly"
+        load: "languageOnly",
+        backend: { loadPath: lpath + "/locales/{{lng}}/{{ns}}.json" }
     };
     // use the XHR backend to get translation files
     var i18n = i18next.use(i18nextXHRBackend);
