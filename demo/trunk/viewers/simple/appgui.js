@@ -91,12 +91,12 @@ dwv.gui.WindowLevel = function (app)
         input.className = "wlLi";
         input.name = "radio-choice";
         input.type = "radio";
-        input.value = "Window/Level";
+        input.value = "WindowLevel";
         input.onclick = app.onChangeTool;
 
         var label = document.createElement("label");
         label.setAttribute("for", "wlLi");
-        label.appendChild(document.createTextNode("W/L"));
+        label.appendChild(document.createTextNode(dwv.i18n("tool.WindowLevel.name")));
 
         var node = app.getElement("toolfieldset");
         $(node).controlgroup("container").append(input);
@@ -114,7 +114,8 @@ dwv.gui.WindowLevel = function (app)
         $(".presetLabel").remove();
 
         // create preset select
-        var select = dwv.html.createHtmlSelect("presetSelect", app.getViewController().getPresets());
+        var select = dwv.html.createHtmlSelect("presetSelect", 
+            app.getViewController().getPresets(), "wl.presets", true);
         select.onchange = app.onChangeWindowLevelPreset;
         select.title = "Select w/l preset.";
         select.setAttribute("data-inline","true");
@@ -122,7 +123,7 @@ dwv.gui.WindowLevel = function (app)
         // label as span (otherwise creates new line)
         var span = document.createElement("span");
         span.className = "presetLabel";
-        span.appendChild(document.createTextNode("Presets: "));
+        span.appendChild(document.createTextNode(dwv.i18n("basics.presets") + ": "));
 
         var node = app.getElement("mainfieldset");
         node.appendChild(span);
@@ -141,12 +142,12 @@ dwv.gui.ZoomAndPan = function (app)
         input.className = "zoomLi";
         input.name = "radio-choice";
         input.type = "radio";
-        input.value = "Zoom/Pan";
+        input.value = "ZoomAndPan";
         input.onclick = app.onChangeTool;
 
         var label = document.createElement("label");
         label.setAttribute("for", "zoomLi");
-        label.appendChild(document.createTextNode("Zoom/Pan"));
+        label.appendChild(document.createTextNode(dwv.i18n("tool.ZoomAndPan.name")));
 
         var node = app.getElement("toolfieldset");
         $(node).controlgroup("container").append(input);
@@ -175,7 +176,7 @@ dwv.gui.Scroll = function (app)
 
         var label = document.createElement("label");
         label.setAttribute("for", "scrollLi");
-        label.appendChild(document.createTextNode("Scroll"));
+        label.appendChild(document.createTextNode(dwv.i18n("tool.Scroll.name") ));
 
         var node = app.getElement("toolfieldset");
         $(node).controlgroup("container").append(input);
@@ -195,7 +196,7 @@ dwv.gui.appendResetHtml = function (app)
     button.className = "resetLi";
     button.value = "reset";
     button.onclick = app.onDisplayReset;
-    button.appendChild(document.createTextNode("Reset"));
+    button.appendChild(document.createTextNode(dwv.i18n("basics.reset")));
     button.setAttribute("class","ui-btn ui-btn-inline");
 
     var node = app.getElement("mainfieldset");

@@ -32,6 +32,9 @@ body { margin: 10px; padding: 0; }
 <script type="text/javascript" src="../../ext/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
 <script type="text/javascript" src="../../ext/flot/jquery.flot.min.js"></script>
 <script type="text/javascript" src="../../ext/kinetic/kinetic-v5.1.1-06.10.min.js"></script>
+<script type="text/javascript" src="../../ext/i18next/i18next.min.js"></script>
+<script type="text/javascript" src="../../ext/i18next/i18nextXHRBackend.min.js"></script>
+<script type="text/javascript" src="../../ext/i18next/i18nextBrowserLanguageDetector.min.js"></script>
 <!-- decoders -->
 <script type="text/javascript" src="../../ext/pdfjs/jpx.js"></script>
 <script type="text/javascript" src="../../ext/pdfjs/util.js"></script>
@@ -65,7 +68,7 @@ body { margin: 10px; padding: 0; }
 <div id="pageHeader" data-role="header">
 <h1>DWV <span class="dwv-version"></span></h1>
 <a href="#help_page" data-icon="carat-r" class="ui-btn-right"
-  data-transition="slide">Help</a>
+  data-transition="slide" data-i18n="basics.help">Help</a>
 </div><!-- /pageHeader -->
 
 <!-- DWV -->
@@ -78,22 +81,22 @@ body { margin: 10px; padding: 0; }
 
 <!-- Auth popup -->
 <div data-role="popup" id="popupAuth">
-<a href="#" data-rel="back" data-role="button"
-  data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+<a href="#" data-rel="back" data-role="button" data-icon="delete"
+  data-iconpos="notext" class="ui-btn-right" data-i18n="basics.close">Close</a>
 <div style="padding:10px 20px;">
-<h3>Google Drive Authorization</h3>
-<p>Please authorize DWV to access your Google Drive.
+<h3 data-i18n="io.GoogleDrive.auth.title">Google Drive Authorization</h3>
+<p data-i18n="io.GoogleDrive.auth.body">Please authorize DWV to access your Google Drive.
 <br>This is only needed the first time you connect.</p>
-<button id="gauth-button" class="ui-btn">Authorize</button>
+<button id="gauth-button" class="ui-btn" data-i18n="io.GoogleDrive.auth.button">Authorize</button>
 </div>
 </div><!-- /popup -->
 
 <!-- Open popup -->
 <div data-role="popup" id="popupOpen">
-<a href="#" data-rel="back" data-role="button"
-  data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+<a href="#" data-rel="back" data-role="button" data-icon="delete"
+  data-iconpos="notext" class="ui-btn-right" data-i18n="basics.close">Close</a>
 <div style="padding:10px 20px;">
-<h3>Open</h3>
+<h3 data-i18n="basics.open">Open</h3>
 <div id="dwv-loaderlist"></div>
 </div>
 </div><!-- /popup -->
@@ -129,9 +132,9 @@ body { margin: 10px; padding: 0; }
 <div data-role="page" data-theme="b" id="tags_page">
 
 <div data-role="header">
-<a href="#main" data-icon="back"
-  data-transition="slide" data-direction="reverse">Back</a>
-<h1>DICOM Tags</h1>
+<a href="#main" data-icon="back" data-transition="slide"
+  data-direction="reverse" data-i18n="basics.back">Back</a>
+<h1 data-i18n="basics.dicomTags">DICOM Tags</h1>
 </div><!-- /header -->
 
 <div data-role="content">
@@ -145,13 +148,13 @@ body { margin: 10px; padding: 0; }
 <div data-role="page" data-theme="b" id="help_page">
 
 <div data-role="header">
-<a href="#main" data-icon="back"
-  data-transition="slide" data-direction="reverse">Back</a>
-<h1>DWV Help</h1>
+<a href="#main" data-icon="back" data-transition="slide"
+  data-direction="reverse" data-i18n="basics.back">Back</a>
+<h1 data-i18n="basics.help">Help</h1>
 </div><!-- /header -->
 
 <div data-role="content">
-<!-- Tags -->
+<!-- Help -->
 <div id="dwv-help" title="Help"></div>
 </div><!-- /content -->
 
