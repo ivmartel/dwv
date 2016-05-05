@@ -231,7 +231,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id=".i18n"><span class="type-signature">&lt;static> </span>i18n()</h4>
+    <h4 class="name" id=".i18n"><span class="type-signature">&lt;static> </span>i18n(key, options)</h4>
     
     
 </dt>
@@ -248,6 +248,80 @@
     
 
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The key to the text entry.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The translation options such as plural, context...</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
     
 
     
@@ -286,7 +360,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="src_utils_i18n.js.html">src/utils/i18n.js</a>,
-				 <a href="src_utils_i18n.js.html#sunlight-1-line-55">line 55</a>
+				 <a href="src_utils_i18n.js.html#sunlight-1-line-53">line 53</a>
 			</li>
 		</ul>
 	</dd>
@@ -319,7 +393,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id=".i18nExists"><span class="type-signature">&lt;static> </span>i18nExists()</h4>
+    <h4 class="name" id=".i18nExists"><span class="type-signature">&lt;static> </span>i18nExists(key, options)</h4>
     
     
 </dt>
@@ -336,6 +410,80 @@
     
 
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The key to the text entry.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The translation options such as plural, context...</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
     
 
     
@@ -546,7 +694,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id=".i18nOnLoaded"><span class="type-signature">&lt;static> </span>i18nOnLoaded()</h4>
+    <h4 class="name" id=".i18nOnLoaded"><span class="type-signature">&lt;static> </span>i18nOnLoaded(callback)</h4>
     
     
 </dt>
@@ -563,6 +711,56 @@
     
 
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The callback function to call when i18n is loaded.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
     
 
     
@@ -601,7 +799,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="src_utils_i18n.js.html">src/utils/i18n.js</a>,
-				 <a href="src_utils_i18n.js.html#sunlight-1-line-48">line 48</a>
+				 <a href="src_utils_i18n.js.html#sunlight-1-line-44">line 44</a>
 			</li>
 		</ul>
 	</dd>
@@ -642,7 +840,9 @@
 
     
     <div class="description">
-        Translate all data-i18n tags.
+        Translate all data-i18n tags in the current html page. If an html tag defines the 
+data-i18n attribute, its value will be used as key to find its corresponding text
+and will replace the content of the html tag.
     </div>
     
 
@@ -689,7 +889,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="src_utils_i18n.js.html">src/utils/i18n.js</a>,
-				 <a href="src_utils_i18n.js.html#sunlight-1-line-69">line 69</a>
+				 <a href="src_utils_i18n.js.html#sunlight-1-line-71">line 71</a>
 			</li>
 		</ul>
 	</dd>
