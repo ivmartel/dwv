@@ -15,6 +15,10 @@ appgui.js
 /dwv/demo/stable/resources/double_click.png
 /dwv/demo/stable/resources/mouse_drag.png
 /dwv/demo/stable/resources/mouse_wheel.png
+# translations
+/dwv/demo/locales/de/translation.json
+/dwv/demo/locales/en/translation.json
+/dwv/demo/locales/fr/translation.json
 
 # third party
 
@@ -35,6 +39,9 @@ appgui.js
 # js
 /dwv/demo/stable/ext/jquery/jquery-2.1.4.min.js
 /dwv/demo/stable/ext/jquery-ui/jquery-ui-1.11.4.min.js
+/dwv/demo/stable/ext/i18next.min.js
+/dwv/demo/stable/ext/i18nextXHRBackend.min.js
+/dwv/demo/stable/ext/i18nextBrowserLanguageDetector.min.js
 /dwv/demo/stable/ext/pdfjs/jpx.js
 /dwv/demo/stable/ext/pdfjs/arithmetic_decoder.js
 /dwv/demo/stable/ext/pdfjs/util.js
