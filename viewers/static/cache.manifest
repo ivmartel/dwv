@@ -16,9 +16,9 @@ appgui.js
 /dwv/demo/stable/resources/mouse_drag.png
 /dwv/demo/stable/resources/mouse_wheel.png
 # translations
-/dwv/demo/locales/de/translation.json
-/dwv/demo/locales/en/translation.json
-/dwv/demo/locales/fr/translation.json
+/dwv/demo/stable/locales/de/translation.json
+/dwv/demo/stable/locales/en/translation.json
+/dwv/demo/stable/locales/fr/translation.json
 
 # third party
 
