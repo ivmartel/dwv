@@ -106,11 +106,8 @@ dwv.tool.Filter = function ( filterList, app )
 dwv.tool.Filter.prototype.getHelp = function ()
 {
     return {
-        'title': "Filter",
-        'brief': "A few simple image filters are available: a Threshold filter to " +
-            "limit the image intensities between a chosen minimum and maximum, " +
-            "a Sharpen filter to convolute the image with a sharpen matrix, " +
-            "a Sobel filter to get the gradient of the image in both directions."
+        "title": dwv.i18n("tool.Filter.name"),
+        "brief": dwv.i18n("tool.Filter.brief")
     };
 };
 

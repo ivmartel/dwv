@@ -8,10 +8,10 @@ dwv.tool.colourMaps = {
     "invplain": dwv.image.lut.invPlain,
     "rainbow": dwv.image.lut.rainbow,
     "hot": dwv.image.lut.hot,
-    "hot iron": dwv.image.lut.hot_iron,
+    "hotiron": dwv.image.lut.hot_iron,
     "pet": dwv.image.lut.pet,
-    "hot metal blue": dwv.image.lut.hot_metal_blue,
-    "pet 20 step": dwv.image.lut.pet_20step
+    "hotmetalblue": dwv.image.lut.hot_metal_blue,
+    "pet20step": dwv.image.lut.pet_20step
 };
 // Default window level presets.
 dwv.tool.defaultpresets = {};

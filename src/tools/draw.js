@@ -798,16 +798,13 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 dwv.tool.Draw.prototype.getHelp = function()
 {
     return {
-        'title': "Draw",
-        'brief': "Allows to draw shapes on the image. " +
-            "Choose the shape and its colour from the drop down menus. Once created, shapes " +
-            "can be edited by selecting them. Anchors will appear and allow specific shape edition. " +
-            "Drag the shape on the top red cross to delete it. All actions are undoable. ",
-        'mouse': {
-            'mouse_drag': "A single mouse drag draws the desired shape.",
+        "title": dwv.i18n("tool.Draw.name"),
+        "brief": dwv.i18n("tool.Draw.brief"),
+        "mouse": {
+            "mouse_drag": dwv.i18n("tool.Draw.mouse_drag")
         },
-        'touch': {
-            'touch_drag': "A single touch drag draws the desired shape.",
+        "touch": {
+            "touch_drag": dwv.i18n("tool.Draw.touch_drag")
         }
     };
 };

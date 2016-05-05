@@ -226,15 +226,15 @@ dwv.tool.ZoomAndPan = function(app)
 dwv.tool.ZoomAndPan.prototype.getHelp = function()
 {
     return {
-        'title': "Zoom/Pan",
-        'brief': "The Zoom/Pan tool allows to zoom and pan the image.",
-        'mouse': {
-            'mouse_wheel': "The mouse wheel is used to zoom the image.",
-            'mouse_drag': "A single mouse drag drags the image in the desired direction."
+        "title": dwv.i18n("tool.ZoomAndPan.name"),
+        "brief": dwv.i18n("tool.ZoomAndPan.brief"),
+        "mouse": {
+            "mouse_wheel": dwv.i18n("tool.ZoomAndPan.mouse_wheel"),
+            "mouse_drag": dwv.i18n("tool.ZoomAndPan.mouse_drag")
         },
-        'touch': {
-            'twotouch_pinch': "A pinch in or out allows to zoom the image.",
-            'touch_drag': "A single touch drag drags the image in the desired direction."
+        "touch": {
+            'twotouch_pinch': dwv.i18n("tool.ZoomAndPan.twotouch_pinch"),
+            'touch_drag': dwv.i18n("tool.ZoomAndPan.touch_drag")
         }
     };
 };

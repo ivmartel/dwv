@@ -8,10 +8,10 @@ dwv.tool.colourMaps = {
     "invplain": dwv.image.lut.invPlain,
     "rainbow": dwv.image.lut.rainbow,
     "hot": dwv.image.lut.hot,
-    "hot iron": dwv.image.lut.hot_iron,
+    "hotiron": dwv.image.lut.hot_iron,
     "pet": dwv.image.lut.pet,
-    "hot metal blue": dwv.image.lut.hot_metal_blue,
-    "pet 20 step": dwv.image.lut.pet_20step
+    "hotmetalblue": dwv.image.lut.hot_metal_blue,
+    "pet20step": dwv.image.lut.pet_20step
 };
 // Default window level presets.
 dwv.tool.defaultpresets = {};
@@ -98,31 +98,31 @@ dwv.gui.Toolbox = function (app)
 
         // toolbar
         var open = document.createElement("button");
-        open.appendChild(document.createTextNode("File"));
+        open.appendChild(document.createTextNode(dwv.i18n("basics.open")));
         open.onclick = function() { toggle(".openData"); };
 
         var toolbox = document.createElement("button");
-        toolbox.appendChild(document.createTextNode("Toolbox"));
+        toolbox.appendChild(document.createTextNode(dwv.i18n("basics.toolbox")));
         toolbox.onclick = function() { toggle(".toolList"); };
 
         var history = document.createElement("button");
-        history.appendChild(document.createTextNode("History"));
+        history.appendChild(document.createTextNode(dwv.i18n("basics.history")));
         history.onclick = function() { toggle(".history"); };
 
         var tags = document.createElement("button");
-        tags.appendChild(document.createTextNode("Tags"));
+        tags.appendChild(document.createTextNode(dwv.i18n("basics.dicomTags")));
         tags.onclick = function() { toggle(".tags"); };
 
         var image = document.createElement("button");
-        image.appendChild(document.createTextNode("Image"));
+        image.appendChild(document.createTextNode(dwv.i18n("basics.image")));
         image.onclick = function() { toggle(".layerDialog"); };
 
         var info = document.createElement("button");
-        info.appendChild(document.createTextNode("Info"));
+        info.appendChild(document.createTextNode(dwv.i18n("basics.info")));
         info.onclick = app.onToggleInfoLayer;
 
         var help = document.createElement("button");
-        help.appendChild(document.createTextNode("Help"));
+        help.appendChild(document.createTextNode(dwv.i18n("basics.help")));
         help.onclick = function() { toggle(".help"); };
 
         var node = app.getElement("toolbar");
@@ -139,7 +139,7 @@ dwv.gui.Toolbox = function (app)
 
         // save state button
         var saveButton = document.createElement("button");
-        saveButton.appendChild(document.createTextNode("Download State"));
+        saveButton.appendChild(document.createTextNode(dwv.i18n("basics.downloadState")));
         // save state link
         var toggleSaveState = document.createElement("a");
         toggleSaveState.onclick = app.onStateSave;

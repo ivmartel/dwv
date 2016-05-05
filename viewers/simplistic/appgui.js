@@ -57,9 +57,9 @@ dwv.gui.WindowLevel = function (app)
     {
         var button = document.createElement("button");
         button.className = "wl-button";
-        button.value = "Window/Level";
+        button.value = "WindowLevel";
         button.onclick = app.onChangeTool;
-        button.appendChild(document.createTextNode("Window/Level"));
+        button.appendChild(document.createTextNode(dwv.i18n("tool.WindowLevel.name")));
 
         var node = app.getElement("toolbar");
         node.appendChild(button);
@@ -76,7 +76,8 @@ dwv.gui.WindowLevel = function (app)
         dwv.html.removeNode(app.getElement("presetLabel"));
 
         // create preset select
-        var select = dwv.html.createHtmlSelect("presetSelect", app.getViewController().getPresets());
+        var select = dwv.html.createHtmlSelect("presetSelect", 
+            app.getViewController().getPresets(), "wl.presets", true);
         select.className = "presetSelect";
         select.onchange = app.onChangeWindowLevelPreset;
         select.title = "Select w/l preset.";
@@ -84,7 +85,7 @@ dwv.gui.WindowLevel = function (app)
         var label = document.createElement("label");
         label.className = "presetLabel";
         label.setAttribute("for", "presetSelect");
-        label.appendChild(document.createTextNode("Presets: "));
+        label.appendChild(document.createTextNode(dwv.i18n("basics.presets") + ": "));
 
         var node = app.getElement("toolbar");
         node.appendChild(label);
@@ -99,9 +100,9 @@ dwv.gui.ZoomAndPan = function (app)
     {
         var button = document.createElement("button");
         button.className = "zoom-button";
-        button.value = "Zoom/Pan";
+        button.value = "ZoomAndPan";
         button.onclick = app.onChangeTool;
-        button.appendChild(document.createTextNode("Zoom/Pan"));
+        button.appendChild(document.createTextNode(dwv.i18n("tool.ZoomAndPan.name")));
 
         var node = app.getElement("toolbar");
         node.appendChild(button);
@@ -122,7 +123,7 @@ dwv.gui.Scroll = function (app)
         button.className = "scroll-button";
         button.value = "Scroll";
         button.onclick = app.onChangeTool;
-        button.appendChild(document.createTextNode("Scroll"));
+        button.appendChild(document.createTextNode(dwv.i18n("tool.Scroll.name")));
 
         var node = app.getElement("toolbar");
         node.appendChild(button);
@@ -141,7 +142,7 @@ dwv.gui.appendResetHtml = function (app)
     button.className = "reset-button";
     button.value = "reset";
     button.onclick = app.onDisplayReset;
-    button.appendChild(document.createTextNode("Reset"));
+    button.appendChild(document.createTextNode(dwv.i18n("basics.reset")));
 
     var node = app.getElement("toolbar");
     node.appendChild(button);
