@@ -820,18 +820,32 @@ dwv.App = function ()
      * Handle key down event.
      * - CRTL-Z: undo
      * - CRTL-Y: redo
+     * - CRTL-ARROW_UP: next slice
+     * - CRTL-ARROW_DOWN: previous slice
      * Default behavior. Usually used in tools.
      * @param {Object} event The key down event.
      */
     this.onKeydown = function (event)
     {
-        if ( event.keyCode === 90 && event.ctrlKey ) // ctrl-z
-        {
-            undoStack.undo();
-        }
-        else if ( event.keyCode === 89 && event.ctrlKey ) // ctrl-y
-        {
-            undoStack.redo();
+        if (event.ctrlKey) {
+            if ( event.keyCode === 38 ) // crtl-arrow-up
+            {
+                event.preventDefault();
+                self.getViewController().incrementSliceNb();
+            }
+            else if ( event.keyCode === 40 ) // crtl-arrow-down
+            {
+                event.preventDefault();
+                self.getViewController().decrementSliceNb();
+            }
+            else if ( event.keyCode === 89 ) // crtl-y
+            {
+                undoStack.redo();
+            }
+            else if ( event.keyCode === 90 ) // crtl-z
+            {
+                undoStack.undo();
+            }
         }
     };
 
@@ -14662,6 +14676,73 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // remove trash
             trash.remove();
             // draw
+            drawLayer.draw();
+        });
+        // double click handling: create label
+        shape.on('dblclick', function () {
+            var labelText = prompt("Add label");
+            // if press cancel do nothing
+            if (labelText === null) {
+                return false;
+            }
+            var group = this.getParent();
+            var klabel;
+            // if user introduce a text, create or update label
+            if (labelText.length > 0) {
+
+                klabel = group.getChildren( function (node) {
+                    return node.getClassName() === 'Label';
+                });
+                // update label
+                if (klabel.length) {
+                    klabel[0].getText().setText(labelText);
+                }
+                // create label
+                else {
+                    var labelStyle = app.getStyle();
+                    var labelPos;
+
+                    try {
+                        // For all drawings
+                        labelPos = group.getChildren( function (node) {
+                            return node.getClassName() === 'Text';
+                        })[0].getPosition();
+                    }
+                    catch (error) {
+                        // for Livewire
+                        labelPos = group.getChildren( function (node) {
+                            return node.getClassName() === 'Circle';
+                        })[0].getPosition();
+                    }
+
+                    klabel = new Kinetic.Label({
+                        x: labelPos.x,
+                        y: labelPos.y + labelStyle.getFontSize() * 1.1,
+                        draggable: true
+                    });
+
+                    klabel.add(new Kinetic.Tag({
+                        fill: 'rgba(0,0,0,.25)',
+                        stroke: labelStyle.getLineColour()
+                    }));
+
+                    klabel.add(new Kinetic.Text({
+                        text: labelText,
+                        fontSize: labelStyle.getFontSize(),
+                        fill: labelStyle.getLineColour(),
+                        padding: 5
+                    }));
+                }
+                group.add(klabel);
+            }
+            // if user does not introduce a text, remove label.
+            else{
+                klabel = group.getChildren( function (node) {
+                    return node.getClassName() === 'Label';
+                });
+                klabel.remove();
+            }
+            // draw label
             drawLayer.draw();
         });
     };
