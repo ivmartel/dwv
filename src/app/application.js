@@ -820,18 +820,32 @@ dwv.App = function ()
      * Handle key down event.
      * - CRTL-Z: undo
      * - CRTL-Y: redo
+     * - CRTL-ARROW_UP: next slice
+     * - CRTL-ARROW_DOWN: previous slice
      * Default behavior. Usually used in tools.
      * @param {Object} event The key down event.
      */
     this.onKeydown = function (event)
     {
-        if ( event.keyCode === 90 && event.ctrlKey ) // ctrl-z
-        {
-            undoStack.undo();
-        }
-        else if ( event.keyCode === 89 && event.ctrlKey ) // ctrl-y
-        {
-            undoStack.redo();
+        if (event.ctrlKey) {
+            if ( event.keyCode === 38 ) // crtl-arrow-up
+            {
+                event.preventDefault();
+                self.getViewController().incrementSliceNb();
+            }
+            else if ( event.keyCode === 40 ) // crtl-arrow-down
+            {
+                event.preventDefault();
+                self.getViewController().decrementSliceNb();
+            }
+            else if ( event.keyCode === 89 ) // crtl-y
+            {
+                undoStack.redo();
+            }
+            else if ( event.keyCode === 90 ) // crtl-z
+            {
+                undoStack.undo();
+            }
         }
     };
 
