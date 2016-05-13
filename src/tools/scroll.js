@@ -181,13 +181,13 @@ dwv.tool.Scroll = function(app)
 dwv.tool.Scroll.prototype.getHelp = function()
 {
     return {
-        'title': "Scroll",
-        'brief': "The scroll tool allows to scroll through slices.",
-        'mouse': {
-            'mouse_drag': "A single vertical mouse drag changes the current slice.",
+        "title": dwv.i18n("tool.Scroll.name"),
+        "brief": dwv.i18n("tool.Scroll.brief"),
+        "mouse": {
+            "mouse_drag": dwv.i18n("tool.Scroll.mouse_drag")
         },
-        'touch': {
-            'touch_drag': "A single vertical touch drag changes the current slice.",
+        "touch": {
+            'touch_drag': dwv.i18n("tool.Scroll.touch_drag")
         }
     };
 };

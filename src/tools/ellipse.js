@@ -47,7 +47,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
     // quantification
     var quant = image.quantifyEllipse( ellipse );
     var cm2 = quant.surface / 100;
-    var str = cm2.toPrecision(4) + " cm2";
+    var str = cm2.toPrecision(4) + " " + dwv.i18n("unit.cm2");
     // quantification text
     var ktext = new Kinetic.Text({
         x: ellipse.getCenter().getX(),

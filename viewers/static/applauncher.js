@@ -2,12 +2,8 @@
  * Application launcher.
  */
 
-// check browser support
-dwv.browser.check();
-
-// launch when page is loaded
-$(document).ready( function()
-{
+// start app function
+function startApp() {
     // gui setup
     dwv.gui.setup();
 
@@ -19,7 +15,7 @@ $(document).ready( function()
         "fitToWindow": true,
         "gui": ["tool", "load", "help", "undo", "version", "tags"],
         "loaders": ["File", "Url"],
-        "tools": ["Scroll", "Window/Level", "Zoom/Pan", "Draw", "Livewire", "Filter"],
+        "tools": ["Scroll", "WindowLevel", "ZoomAndPan", "Draw", "Livewire", "Filter"],
         "filters": ["Threshold", "Sharpen", "Sobel"],
         "shapes": ["Line", "Protractor", "Rectangle", "Roi", "Ellipse"],
         "isMobile": false
@@ -35,4 +31,16 @@ $(document).ready( function()
     myapp.addEventListener("livewire-end", function(){
         console.log('Ready!');
     });
+
+}
+
+// check browser support
+dwv.browser.check();
+//initialise i18n
+dwv.i18nInitialise();
+// launch when page is loaded
+$(document).ready( function()
+{
+    // and i18n is loaded
+    dwv.i18nOnLoaded( startApp );
 });

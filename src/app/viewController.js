@@ -140,7 +140,7 @@ dwv.ViewController = function ( view )
         var range = image.getRescaledDataRange();
         var width = range.max - range.min;
         var center = range.min + width/2;
-        presets["min/max"] = {"center": center, "width": width};
+        presets.minmax = {"center": center, "width": width};
         // optional modality presets
         if ( typeof dwv.tool.defaultpresets != "undefined" ) {
             var modality = image.getMeta().Modality;

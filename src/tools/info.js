@@ -45,11 +45,13 @@ dwv.info.Windowing = function ( div )
         // window center list item
         var liwc = div.getElementsByClassName("window-center")[0];
         dwv.html.cleanNode(liwc);
-        liwc.appendChild(document.createTextNode("WindowCenter = "+event.wc));
+        liwc.appendChild( document.createTextNode(
+            dwv.i18n("tool.info.window_center", {value: event.wc}) ) );
         // window width list item
         var liww = div.getElementsByClassName("window-width")[0];
         dwv.html.cleanNode(liww);
-        liww.appendChild(document.createTextNode("WindowWidth = "+event.ww));
+        liww.appendChild( document.createTextNode(
+            dwv.i18n("tool.info.window_width", {value: event.ww}) ) );
     };
 
 }; // class dwv.info.Windowing
@@ -97,14 +99,15 @@ dwv.info.Position = function ( div )
         // position list item
         var lipos = div.getElementsByClassName("position")[0];
         dwv.html.cleanNode(lipos);
-        lipos.appendChild(document.createTextNode(
-            "Pos = "+event.i+", "+event.j+", "+event.k));
+        lipos.appendChild( document.createTextNode(
+            dwv.i18n("tool.info.position", {value: event.i+", "+event.j+", "+event.k}) ) );
         // value list item
         if( typeof(event.value) != "undefined" )
         {
             var livalue = div.getElementsByClassName("value")[0];
             dwv.html.cleanNode(livalue);
-            livalue.appendChild(document.createTextNode("Value = "+event.value));
+            livalue.appendChild( document.createTextNode(
+                dwv.i18n("tool.info.value", {value: event.value}) ) );
         }
     };
 }; // class dwv.info.Position
