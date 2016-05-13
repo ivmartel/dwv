@@ -239,6 +239,8 @@ dwv.App = function ()
                     break;
                 case "Livewire":
                     toolList.Livewire = new dwv.tool.Livewire(this);
+                    toolList.Livewire.addEventListener("livewire-start", fireEvent);
+                    toolList.Livewire.addEventListener("livewire-end", fireEvent);
                     break;
                 case "Filter":
                     if ( config.filters.length !== 0 ) {
@@ -1051,8 +1053,10 @@ dwv.App = function ()
         self.initWLDisplay();
         // update preset select
         var select = self.getElement("presetSelect");
-        select.selectedIndex = 0;
-        dwv.gui.refreshElement(select);
+        if (select) {
+            select.selectedIndex = 0;
+            dwv.gui.refreshElement(select);
+        }
     };
 
 
@@ -12304,16 +12308,23 @@ dwv.io.File.prototype.load = function (ioArray)
         theImage.onload = onLoadDOMImageBuffer;
     };
 
-    // loop on I/O elements
-    for (var i = 0; i < ioArray.length; ++i)
-    {
+    /* this way increase time needed to load images but reduce FileReader memory consume. Also improve progressive image display. */
+    /* tested in Chrome width 500Dicom, 600kb each, time increase ~400ms and memory decrease ~200Mg */
+    var reader = new FileReader();
+    (function readFiles(i){
+        i++;
+        if(i===ioArray.length){ return; }
         var file = ioArray[i];
-        var reader = new FileReader();
+
         reader.onprogress = dwv.io.File.createProgressHandler(i,
                 self.getGlobalPercent, self.onprogress);
+
         if ( file.name.split('.').pop().toLowerCase() === "json" )
         {
-            reader.onload = onLoadTextBuffer;
+            reader.onload = function(event){
+                                onLoadTextBuffer(event);
+                                readFiles(i);
+                            };
             reader.onerror = dwv.io.File.createErrorHandler(file, "text", self.onerror);
             reader.readAsText(file);
         }
@@ -12323,19 +12334,25 @@ dwv.io.File.prototype.load = function (ioArray)
             reader.file = file;
             reader.index = i;
             // callbacks
-            reader.onload = onLoadRawImageBuffer;
+            reader.onload = function(event){
+                                onLoadRawImageBuffer(event);
+                                readFiles(i);
+                            };
             reader.onerror = dwv.io.File.createErrorHandler(file, "image", self.onerror);
             reader.readAsDataURL(file);
         }
         else
         {
-            reader.onload = onLoadDicomBuffer;
+            reader.onload = function(event){
+                                onLoadDicomBuffer(event);
+                                readFiles(i);
+                            };
             reader.onerror = dwv.io.File.createErrorHandler(file, "DICOM", self.onerror);
             reader.readAsArrayBuffer(file);
         }
-    }
-};
-;// namespaces
+    })(-1);
+
+};;// namespaces
 var dwv = dwv || {};
 dwv.io = dwv.io || {};
 
@@ -14676,38 +14693,39 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         });
         shape.on('dblclick', function () {
 
+            var labelText = prompt("Add label");
+            // if press cancel do nothing
+            if(labelText === null){
+                return false;
+            }
             var group = this.getParent(),
-                labelText = prompt("Add label"),
                 klabel;
             // if user introduce a text, create or update label
-            if(labelText && labelText.length){
+            if(labelText.length > 0){
+
                 klabel = group.getChildren(function(node){
                     return node.getClassName() === 'Label';
                 });
                 // update label
                 if (klabel.length){
-                    console.warn(klabel.getText());
                     klabel[0].getText().setText(labelText);
                 }
                 // create label
                 else{
                     var labelStyle = app.getStyle(),
-                        labelPos,
-                        labelDraw;
+                        labelPos;
+
                     try{
                         // For all drawings
-                        labelDraw = group.getChildren(function(node){
+                        labelPos = group.getChildren(function(node){
                             return node.getClassName() === 'Text';
-                        });
+                        })[0].getPosition();
                     }
                     catch(e){
                         // for Livewire
-                        labelDraw = group.getChildren(function(node){
+                        labelPos = group.getChildren(function(node){
                             return node.getClassName() === 'Circle';
-                        });
-                    }
-                    finally{
-                        labelPos = labelDraw[0].getPosition();
+                        })[0].getPosition();
                     }
 
                     klabel = new Kinetic.Label({
@@ -14730,7 +14748,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 }
                 group.add(klabel);
             }
-            // else remove label
+            // if user does not introduce a text, remove label.
             else{
                 klabel = group.getChildren(function(node){
                     return node.getClassName() === 'Label';
@@ -16215,6 +16233,9 @@ dwv.tool.Livewire = function(app)
      */
     var tolerance = 5;
 
+    // listeners
+    var listeners = {};
+
     /**
      * Clear the parent points list.
      * @private
@@ -16300,9 +16321,10 @@ dwv.tool.Livewire = function(app)
         // do the work
         var results = 0;
         var stop = false;
+        fireEvent({ 'type': 'livewire-start' });
         while( !parentPoints[p.y][p.x] && !stop)
         {
-            console.log("Getting ready...");
+            //console.log("Getting ready...");
             results = scissors.doWork();
 
             if( results.length === 0 ) {
@@ -16317,7 +16339,8 @@ dwv.tool.Livewire = function(app)
                 }
             }
         }
-        console.log("Ready!");
+        // console.log("Ready!");
+        fireEvent({ 'type': 'livewire-end' });
 
         // get the path
         currentPath = new dwv.math.Path();
@@ -16445,6 +16468,54 @@ dwv.tool.Livewire = function(app)
 
         return true;
     };
+
+    /**
+     * Add an event listener on the app.
+     * @param {String} type The event type.
+     * @param {Object} listener The method associated with the provided event type.
+     */
+    this.addEventListener = function (type, listener)
+    {
+        if ( typeof listeners[type] === "undefined" ) {
+            listeners[type] = [];
+        }
+        listeners[type].push(listener);
+    };
+
+    /**
+     * Remove an event listener from the app.
+     * @param {String} type The event type.
+     * @param {Object} listener The method associated with the provided event type.
+     */
+    this.removeEventListener = function (type, listener)
+    {
+        if( typeof listeners[type] === "undefined" ) {
+            return;
+        }
+        for ( var i = 0; i < listeners[type].length; ++i )
+        {
+            if ( listeners[type][i] === listener ) {
+                listeners[type].splice(i,1);
+            }
+        }
+    };
+
+    // Private Methods -----------------------------------------------------------
+
+    /**
+     * Fire an event: call all associated listeners.
+     * @param {Object} event The event to fire.
+     */
+    function fireEvent (event)
+    {
+        if ( typeof listeners[event.type] === "undefined" ) {
+            return;
+        }
+        for ( var i = 0; i < listeners[event.type].length; ++i )
+        {
+            listeners[event.type][i](event);
+        }
+    }
 
 }; // Livewire class
 

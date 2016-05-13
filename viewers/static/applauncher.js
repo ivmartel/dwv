@@ -30,9 +30,9 @@ $(document).ready( function()
     $("#accordion").accordion({ collapsible: "true", active: "false", heightStyle: "content" });
 
     myapp.addEventListener("livewire-start", function(){
-        console.log('Getting ready...')
+        console.log('Getting ready...');
     });
     myapp.addEventListener("livewire-end", function(){
-        console.log('Ready!')
+        console.log('Ready!');
     });
 });
