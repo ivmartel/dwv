@@ -36,10 +36,10 @@ dwv.html.appendHCell = function (row, text)
 {
     var cell = document.createElement("th");
     // TODO jquery-mobile specific...
-    if ( text !== "Value" && text !== "Name" ) {
+    if ( text !== "value" && text !== "name" ) {
         cell.setAttribute("data-priority", "1");
     }
-    cell.appendChild(document.createTextNode(text));
+    cell.appendChild(document.createTextNode(dwv.i18n("basics." + text)));
     row.appendChild(cell);
 };
 
@@ -115,10 +115,10 @@ dwv.html.appendRowForObject = function (table, input, level, maxLevel, rowHeader
         var header = table.createTHead();
         var th = header.insertRow(-1);
         if ( rowHeader ) {
-            dwv.html.appendHCell(th, "Name");
+            dwv.html.appendHCell(th, "name");
         }
         for ( var k=0; k<keys.length; ++k ) {
-            dwv.html.appendHCell(th, dwv.utils.capitaliseFirstLetter(keys[k]));
+            dwv.html.appendHCell(th, keys[k]);
         }
     }
 };
@@ -328,13 +328,33 @@ dwv.html.removeNodes = function (nodes) {
  * It is left to the user to set the 'onchange' method of the select.
  * @param {String} name The name of the HTML select.
  * @param {Mixed} list The list of options of the HTML select.
+ * @param {String} i18nPrefix An optional namespace prefix to find the translation values.
+ * @param {Bool} i18nSafe An optional flag to check translation existence.
  * @return {Object} The created HTML select.
  */
-dwv.html.createHtmlSelect = function (name, list) {
+dwv.html.createHtmlSelect = function (name, list, i18nPrefix, i18nSafe) {
     // select
     var select = document.createElement("select");
     //select.name = name;
     select.className = name;
+    var prefix = (typeof i18nPrefix === "undefined") ? "" : i18nPrefix + ".";
+    var safe = (typeof i18nSafe === "undefined") ? false : true;
+    var getText = function(value) {
+        var key = prefix + value + ".name";
+        var text = "";
+        if (safe) {
+            if (dwv.i18nExists(key)) {
+                text = dwv.i18n(key);
+            }
+            else {
+                text = value;
+            }
+        }
+        else {
+            text = dwv.i18n(key);
+        }
+        return text;
+    };
     // options
     var option;
     if ( list instanceof Array )
@@ -343,7 +363,7 @@ dwv.html.createHtmlSelect = function (name, list) {
         {
             option = document.createElement("option");
             option.value = list[i];
-            option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(list[i])));
+            option.appendChild(document.createTextNode(getText(list[i])));
             select.appendChild(option);
         }
     }
@@ -353,7 +373,7 @@ dwv.html.createHtmlSelect = function (name, list) {
         {
             option = document.createElement("option");
             option.value = item;
-            option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(item)));
+            option.appendChild(document.createTextNode(getText(item)));
             select.appendChild(option);
         }
     }

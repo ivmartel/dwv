@@ -207,11 +207,11 @@ dwv.App = function ()
             var toolList = {};
             for ( var t = 0; t < config.tools.length; ++t ) {
                 switch( config.tools[t] ) {
-                case "Window/Level":
-                    toolList["Window/Level"] = new dwv.tool.WindowLevel(this);
+                case "WindowLevel":
+                    toolList.WindowLevel = new dwv.tool.WindowLevel(this);
                     break;
-                case "Zoom/Pan":
-                    toolList["Zoom/Pan"] = new dwv.tool.ZoomAndPan(this);
+                case "ZoomAndPan":
+                    toolList.ZoomAndPan = new dwv.tool.ZoomAndPan(this);
                     break;
                 case "Scroll":
                     toolList.Scroll = new dwv.tool.Scroll(this);
@@ -822,31 +822,31 @@ dwv.App = function ()
      * Handle key down event.
      * - CRTL-Z: undo
      * - CRTL-Y: redo
-     * - arrow-up: next slide
-     * - arrow-down: prev slide
+     * - CRTL-ARROW_UP: next slice
+     * - CRTL-ARROW_DOWN: previous slice
      * Default behavior. Usually used in tools.
      * @param {Object} event The key down event.
      */
     this.onKeydown = function (event)
     {
-        if (event.ctrlKey){             // true if ctrlKey is pressed
-            if ( event.keyCode === 90 ) // ctrl + z
-            {
-                return undoStack.undo();
-            }
-            if ( event.keyCode === 89 ) // ctrl + y
-            {
-                return undoStack.redo();
-            }
-            if ( event.keyCode === 38 ) // ctrl + arrow-up
+        if (event.ctrlKey) {
+            if ( event.keyCode === 38 ) // crtl-arrow-up
             {
                 event.preventDefault();
-                return self.getViewController().incrementSliceNb();
+                self.getViewController().incrementSliceNb();
             }
-            if ( event.keyCode === 40 ) // ctrl + arrow-down
+            else if ( event.keyCode === 40 ) // crtl-arrow-down
             {
                 event.preventDefault();
-                return self.getViewController().decrementSliceNb();
+                self.getViewController().decrementSliceNb();
+            }
+            else if ( event.keyCode === 89 ) // crtl-y
+            {
+                undoStack.redo();
+            }
+            else if ( event.keyCode === 90 ) // crtl-z
+            {
+                undoStack.undo();
             }
         }
     };
