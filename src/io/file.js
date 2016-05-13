@@ -212,16 +212,23 @@ dwv.io.File.prototype.load = function (ioArray)
         theImage.onload = onLoadDOMImageBuffer;
     };
 
-    // loop on I/O elements
-    for (var i = 0; i < ioArray.length; ++i)
-    {
+    /* this way increase time needed to load images but reduce FileReader memory consume. Also improve progressive image display. */
+    /* tested in Chrome width 500Dicom, 600kb each, time increase ~400ms and memory decrease ~200Mg */
+    var reader = new FileReader();
+    (function readFiles(i){
+        i++;
+        if(i===ioArray.length){ return; }
         var file = ioArray[i];
-        var reader = new FileReader();
+
         reader.onprogress = dwv.io.File.createProgressHandler(i,
                 self.getGlobalPercent, self.onprogress);
+
         if ( file.name.split('.').pop().toLowerCase() === "json" )
         {
-            reader.onload = onLoadTextBuffer;
+            reader.onload = function(event){
+                                onLoadTextBuffer(event);
+                                readFiles(i);
+                            };
             reader.onerror = dwv.io.File.createErrorHandler(file, "text", self.onerror);
             reader.readAsText(file);
         }
@@ -231,15 +238,22 @@ dwv.io.File.prototype.load = function (ioArray)
             reader.file = file;
             reader.index = i;
             // callbacks
-            reader.onload = onLoadRawImageBuffer;
+            reader.onload = function(event){
+                                onLoadRawImageBuffer(event);
+                                readFiles(i);
+                            };
             reader.onerror = dwv.io.File.createErrorHandler(file, "image", self.onerror);
             reader.readAsDataURL(file);
         }
         else
         {
-            reader.onload = onLoadDicomBuffer;
+            reader.onload = function(event){
+                                onLoadDicomBuffer(event);
+                                readFiles(i);
+                            };
             reader.onerror = dwv.io.File.createErrorHandler(file, "DICOM", self.onerror);
             reader.readAsArrayBuffer(file);
         }
-    }
+    })(-1);
+
 };

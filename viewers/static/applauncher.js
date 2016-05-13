@@ -24,6 +24,14 @@ function startApp() {
     // help
     // TODO Seems accordion only works when at end...
     $("#accordion").accordion({ collapsible: "true", active: "false", heightStyle: "content" });
+
+    myapp.addEventListener("livewire-start", function(){
+        console.log('Getting ready...');
+    });
+    myapp.addEventListener("livewire-end", function(){
+        console.log('Ready!');
+    });
+
 }
 
 // check browser support

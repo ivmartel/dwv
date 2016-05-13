@@ -1,1 +1,8 @@
 /.settings
+dwv.sublime-project
+dwv.sublime-workspace
+/viewers/examples
+/node_modules
+/build
+/dist
+/doc

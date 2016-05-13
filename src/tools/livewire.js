@@ -71,6 +71,9 @@ dwv.tool.Livewire = function(app)
      */
     var tolerance = 5;
 
+    // listeners
+    var listeners = {};
+
     /**
      * Clear the parent points list.
      * @private
@@ -156,9 +159,10 @@ dwv.tool.Livewire = function(app)
         // do the work
         var results = 0;
         var stop = false;
+        fireEvent({ 'type': 'livewire-start' });
         while( !parentPoints[p.y][p.x] && !stop)
         {
-            console.log("Getting ready...");
+            //console.log("Getting ready...");
             results = scissors.doWork();
 
             if( results.length === 0 ) {
@@ -173,7 +177,8 @@ dwv.tool.Livewire = function(app)
                 }
             }
         }
-        console.log("Ready!");
+        // console.log("Ready!");
+        fireEvent({ 'type': 'livewire-end' });
 
         // get the path
         currentPath = new dwv.math.Path();
@@ -301,6 +306,54 @@ dwv.tool.Livewire = function(app)
 
         return true;
     };
+
+    /**
+     * Add an event listener on the app.
+     * @param {String} type The event type.
+     * @param {Object} listener The method associated with the provided event type.
+     */
+    this.addEventListener = function (type, listener)
+    {
+        if ( typeof listeners[type] === "undefined" ) {
+            listeners[type] = [];
+        }
+        listeners[type].push(listener);
+    };
+
+    /**
+     * Remove an event listener from the app.
+     * @param {String} type The event type.
+     * @param {Object} listener The method associated with the provided event type.
+     */
+    this.removeEventListener = function (type, listener)
+    {
+        if( typeof listeners[type] === "undefined" ) {
+            return;
+        }
+        for ( var i = 0; i < listeners[type].length; ++i )
+        {
+            if ( listeners[type][i] === listener ) {
+                listeners[type].splice(i,1);
+            }
+        }
+    };
+
+    // Private Methods -----------------------------------------------------------
+
+    /**
+     * Fire an event: call all associated listeners.
+     * @param {Object} event The event to fire.
+     */
+    function fireEvent (event)
+    {
+        if ( typeof listeners[event.type] === "undefined" ) {
+            return;
+        }
+        for ( var i = 0; i < listeners[event.type].length; ++i )
+        {
+            listeners[event.type][i](event);
+        }
+    }
 
 }; // Livewire class
 
