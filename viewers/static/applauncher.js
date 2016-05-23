@@ -2,8 +2,12 @@
  * Application launcher.
  */
 
-// start app function
-function startApp() {
+// check browser support
+dwv.browser.check();
+
+// launch when page is loaded
+$(document).ready( function()
+{
     // gui setup
     dwv.gui.setup();
 
@@ -31,16 +35,4 @@ function startApp() {
     myapp.addEventListener("livewire-end", function(){
         console.log('Ready!');
     });
-
-}
-
-// check browser support
-dwv.browser.check();
-//initialise i18n
-dwv.i18nInitialise();
-// launch when page is loaded
-$(document).ready( function()
-{
-    // and i18n is loaded
-    dwv.i18nOnLoaded( startApp );
 });
