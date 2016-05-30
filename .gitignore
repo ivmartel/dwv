@@ -1,1 +1,3 @@
 /.settings
+node_modules
+build
