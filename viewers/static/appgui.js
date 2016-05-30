@@ -145,7 +145,7 @@ dwv.gui.Toolbox = function (app)
         toggleSaveState.onclick = app.onStateSave;
         toggleSaveState.download = "state.json";
         toggleSaveState.id = "download-state";
-        toggleSaveState.classList.add("download-state");
+        toggleSaveState.className += "download-state";
         toggleSaveState.appendChild(saveButton);
         // add to openData window
         node = app.getElement("openData");
