@@ -24,7 +24,7 @@ dwv.App = function ()
     var dataHeight = 0;
     // Number of slices to load
     var nSlicesToLoad = 0;
-    
+
     // Data decoders scripts
     var decoderScripts = null;
 
@@ -190,7 +190,7 @@ dwv.App = function ()
      * Add a command to the undo stack.
      * @param {Object} The command to add.
      */
-    this.addToUndoStack = function (cmd) { 
+    this.addToUndoStack = function (cmd) {
         if ( undoStack !== null ) {
             undoStack.add(cmd);
         }
@@ -207,11 +207,11 @@ dwv.App = function ()
             var toolList = {};
             for ( var t = 0; t < config.tools.length; ++t ) {
                 switch( config.tools[t] ) {
-                case "Window/Level":
-                    toolList["Window/Level"] = new dwv.tool.WindowLevel(this);
+                case "WindowLevel":
+                    toolList.WindowLevel = new dwv.tool.WindowLevel(this);
                     break;
-                case "Zoom/Pan":
-                    toolList["Zoom/Pan"] = new dwv.tool.ZoomAndPan(this);
+                case "ZoomAndPan":
+                    toolList.ZoomAndPan = new dwv.tool.ZoomAndPan(this);
                     break;
                 case "Scroll":
                     toolList.Scroll = new dwv.tool.Scroll(this);
@@ -241,6 +241,9 @@ dwv.App = function ()
                     toolList.Livewire = new dwv.tool.Livewire(this);
                     toolList.Livewire.addEventListener("livewire-start", fireEvent);
                     toolList.Livewire.addEventListener("livewire-end", fireEvent);
+                    break;
+                case "Floodfill":
+                    toolList.Floodfill = new dwv.tool.Floodfill(this);
                     break;
                 case "Filter":
                     if ( config.filters.length !== 0 ) {
@@ -326,7 +329,7 @@ dwv.App = function ()
             var dropBoxSize = 2 * size.height / 3;
             box.setAttribute("style","width:"+dropBoxSize+"px;height:"+dropBoxSize+"px");
         }
-        
+
         // possible load from URL
         if ( typeof config.skipLoadUrl === "undefined" ) {
             var query = dwv.utils.getUriQuery(window.location.href);
@@ -345,7 +348,7 @@ dwv.App = function ()
         else{
             console.log("Not loading url from address since skipLoadUrl is defined.");
         }
-        
+
         // align layers when the window is resized
         if ( config.fitToWindow ) {
             fitToWindow = true;
@@ -355,7 +358,8 @@ dwv.App = function ()
         // use web workers
         if ( config.useWebWorkers ) {
             // data decoders
-            var pathToRoot = "../..";
+            var useWebWorkers = config.useWebWorkers;
+            var pathToRoot = (typeof useWebWorkers === 'string' && useWebWorkers != 'true') ? useWebWorkers : "../..";
             decoderScripts = [];
             decoderScripts.jpeg2000 = pathToRoot + "/ext/pdfjs/decode-jpeg2000.js";
             decoderScripts["jpeg-lossless"] = pathToRoot + "/ext/rii-mango/decode-jpegloss.js";
@@ -539,7 +543,7 @@ dwv.App = function ()
             loadImageUrls(urls, requestHeaders);
         }
     };
-    
+
     /**
      * Load a list of image URLs.
      * @private
@@ -822,31 +826,31 @@ dwv.App = function ()
      * Handle key down event.
      * - CRTL-Z: undo
      * - CRTL-Y: redo
-     * - arrow-up: next slide
-     * - arrow-down: prev slide
+     * - CRTL-ARROW_UP: next slice
+     * - CRTL-ARROW_DOWN: previous slice
      * Default behavior. Usually used in tools.
      * @param {Object} event The key down event.
      */
     this.onKeydown = function (event)
     {
-        if (event.ctrlKey){             // true if ctrlKey is pressed
-            if ( event.keyCode === 90 ) // ctrl + z
-            {
-                return undoStack.undo();
-            }
-            if ( event.keyCode === 89 ) // ctrl + y
-            {
-                return undoStack.redo();
-            }
-            if ( event.keyCode === 38 ) // ctrl + arrow-up
+        if (event.ctrlKey) {
+            if ( event.keyCode === 38 ) // crtl-arrow-up
             {
                 event.preventDefault();
-                return self.getViewController().incrementSliceNb();
+                self.getViewController().incrementSliceNb();
             }
-            if ( event.keyCode === 40 ) // ctrl + arrow-down
+            else if ( event.keyCode === 40 ) // crtl-arrow-down
             {
                 event.preventDefault();
-                return self.getViewController().decrementSliceNb();
+                self.getViewController().decrementSliceNb();
+            }
+            else if ( event.keyCode === 89 ) // crtl-y
+            {
+                undoStack.redo();
+            }
+            else if ( event.keyCode === 90 ) // crtl-z
+            {
+                undoStack.undo();
             }
         }
     };
@@ -1749,7 +1753,7 @@ dwv.ViewController = function ( view )
         var range = image.getRescaledDataRange();
         var width = range.max - range.min;
         var center = range.min + width/2;
-        presets["min/max"] = {"center": center, "width": width};
+        presets.minmax = {"center": center, "width": width};
         // optional modality presets
         if ( typeof dwv.tool.defaultpresets != "undefined" ) {
             var modality = image.getMeta().Modality;
@@ -2308,7 +2312,7 @@ dwv.dicom.DicomParser.prototype.getPixelBuffer = function()
  * @param {Object} element The element to add.
  * @param {Object} sequences The sequence the element belongs to (optional).
  */
-dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequences )
+dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequences, offset )
 {
     // simple case: not a Sequence or a SequenceDelimitationItem
     if ( ( typeof sequences === "undefined" || sequences.length === 0 ) &&
@@ -2318,7 +2322,8 @@ dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequence
             "element": element.tag.element,
             "vr": element.vr,
             "vl": element.vl,
-            "value": element.data
+            "value": element.data,
+            "offset": offset - element.vl
         };
     }
     else {
@@ -2402,6 +2407,32 @@ dwv.dicom.DicomParser.prototype.readTag = function(reader, offset)
     var name = dwv.dicom.getGroupElementKey(group, element);
     // return
     return {'group': group, 'element': element, 'name': name};
+};
+
+/**
+ * Remove dicom tags replacing characters by spaces
+ * @param {Array} buffer The input array buffer.
+ * @param {Array} ElementTags The tags to be removed.
+ * @param {boolean} If true, the function will return a blob else return Uint8Array.
+ * @return {Object} Blob or Uint8Array depending on last parameter.
+ */
+dwv.dicom.DicomParser.prototype.cleanTags = function(arraybuffer, tags, blob){
+    var elem = this.getRawDicomElements();
+    // Check if dicomElements is empty to force parse
+    if(Object.getOwnPropertyNames(elem).length === 0){
+        var parser = new dwv.dicom.DicomParser();
+        parser.parse(arraybuffer);
+        elem = parser.getRawDicomElements();
+    }
+    var array = new Uint8Array(arraybuffer);
+    for(var t=0, tl=tags.length; t<tl; t++){
+        var item = elem[tags[t]];
+        for(var i=item.offset, il=item.offset+item.vl; i<il; i++){
+            array[i] = 32;
+        }
+    }
+    if(blob){ return new Blob([array]);}
+    return array;
 };
 
 /**
@@ -2725,7 +2756,7 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         }
 
         // store the data element
-        this.appendDicomElement( dataElement, sequences );
+        this.appendDicomElement( dataElement, sequences, i+tagOffset);
 
         // end of sequence with explicit length
         if ( dataElement.vr !== "SQ" && sequences.length !== 0 ) {
@@ -7754,7 +7785,7 @@ dwv.gui.base.Filter = function (app)
     this.setup = function (list)
     {
         // filter select
-        var filterSelector = dwv.html.createHtmlSelect("filterSelect", list);
+        var filterSelector = dwv.html.createHtmlSelect("filterSelect", list, "filter");
         filterSelector.onchange = app.onChangeFilter;
 
         // filter list element
@@ -7854,7 +7885,7 @@ dwv.gui.filter.base.createFilterApplyButton = function (app)
     button.onclick = app.onRunFilter;
     button.setAttribute("style","width:100%; margin-top:0.5em;");
     button.setAttribute("class","ui-btn ui-btn-b");
-    button.appendChild(document.createTextNode("Apply"));
+    button.appendChild(document.createTextNode(dwv.i18n("basics.apply")));
     return button;
 };
 
@@ -7975,15 +8006,15 @@ dwv.gui.base.refreshElement = function (/*element*/)
 
 /**
  * Set the selected item of a HTML select.
- * @param {String} selectName The name of the HTML select.
- * @param {String} itemName The name of the itme to mark as selected.
+ * @param {String} element The HTML select element.
+ * @param {String} value The value of the option to mark as selected.
  */
-dwv.gui.setSelected = function(element, itemName)
+dwv.gui.setSelected = function(element, value)
 {
     if ( element ) {
         var index = 0;
         for( index in element.options){
-            if( element.options[index].text === itemName ) {
+            if( element.options[index].value === value ) {
                 break;
             }
         }
@@ -8098,6 +8129,7 @@ dwv.gui.base.DicomTags = function (app)
         //table.setAttribute("class", "tagsList");
         table.setAttribute("data-role", "table");
         table.setAttribute("data-mode", "columntoggle");
+        table.setAttribute("data-column-btn-text", dwv.i18n("basics.columns") + "...");
         // search form
         node.appendChild(dwv.html.getHtmlSearchForm(table));
         // tags table
@@ -8198,34 +8230,16 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
 
     var helpNode = app.getElement("help");
 
-    var dwvLink = document.createElement("a");
-    dwvLink.href = "https://github.com/ivmartel/dwv/wiki";
-    dwvLink.title = "DWV wiki on github.";
-    dwvLink.appendChild(document.createTextNode("wiki"));
-
     var headPara = document.createElement("p");
-    headPara.appendChild(document.createTextNode("DWV (DICOM Web Viewer) is an open source " +
-    	"zero footprint medical image viewer. It uses only javascript and HTML5 technologies, " +
-    	"meaning that it can be run on any platform that provides a modern browser " +
-    	"(laptop, tablet, phone and even modern TVs). It can load local or remote data " +
-    	"in DICOM format (the standard for medical imaging data such as MR, CT, Echo, Mammo, NM...) " +
-    	"and provides standard tools for its manipulation such as contrast, zoom, " +
-    	"drag, possibility to draw regions on top of the image and imaging filters " +
-    	"such as threshold and sharpening. Find out more from the DWV "));
-    headPara.appendChild(dwvLink);
-    headPara.appendChild(document.createTextNode("."));
+    headPara.appendChild(document.createTextNode(dwv.i18n("help.intro.p0")));
     helpNode.appendChild(headPara);
 
     var secondPara = document.createElement("p");
-    secondPara.appendChild(document.createTextNode("All DICOM tags are available " +
-        "in a searchable table, press the 'tags' or grid button. " +
-        "You can choose to display the image information overlay by pressing the " +
-        "'info' or i button."));
+    secondPara.appendChild(document.createTextNode(dwv.i18n("help.intro.p1")));
     helpNode.appendChild(secondPara);
 
     var toolPara = document.createElement("p");
-    toolPara.appendChild(document.createTextNode("Each tool defines the possible " +
-        "user interactions. Here are the available tools:"));
+    toolPara.appendChild(document.createTextNode(dwv.i18n("help.tool_intro")));
     helpNode.appendChild(toolPara);
     helpNode.appendChild(toolHelpDiv);
 };
@@ -8267,10 +8281,10 @@ dwv.html.appendHCell = function (row, text)
 {
     var cell = document.createElement("th");
     // TODO jquery-mobile specific...
-    if ( text !== "Value" && text !== "Name" ) {
+    if ( text !== "value" && text !== "name" ) {
         cell.setAttribute("data-priority", "1");
     }
-    cell.appendChild(document.createTextNode(text));
+    cell.appendChild(document.createTextNode(dwv.i18n("basics." + text)));
     row.appendChild(cell);
 };
 
@@ -8346,10 +8360,10 @@ dwv.html.appendRowForObject = function (table, input, level, maxLevel, rowHeader
         var header = table.createTHead();
         var th = header.insertRow(-1);
         if ( rowHeader ) {
-            dwv.html.appendHCell(th, "Name");
+            dwv.html.appendHCell(th, "name");
         }
         for ( var k=0; k<keys.length; ++k ) {
-            dwv.html.appendHCell(th, dwv.utils.capitaliseFirstLetter(keys[k]));
+            dwv.html.appendHCell(th, keys[k]);
         }
     }
 };
@@ -8559,13 +8573,33 @@ dwv.html.removeNodes = function (nodes) {
  * It is left to the user to set the 'onchange' method of the select.
  * @param {String} name The name of the HTML select.
  * @param {Mixed} list The list of options of the HTML select.
+ * @param {String} i18nPrefix An optional namespace prefix to find the translation values.
+ * @param {Bool} i18nSafe An optional flag to check translation existence.
  * @return {Object} The created HTML select.
  */
-dwv.html.createHtmlSelect = function (name, list) {
+dwv.html.createHtmlSelect = function (name, list, i18nPrefix, i18nSafe) {
     // select
     var select = document.createElement("select");
     //select.name = name;
     select.className = name;
+    var prefix = (typeof i18nPrefix === "undefined") ? "" : i18nPrefix + ".";
+    var safe = (typeof i18nSafe === "undefined") ? false : true;
+    var getText = function(value) {
+        var key = prefix + value + ".name";
+        var text = "";
+        if (safe) {
+            if (dwv.i18nExists(key)) {
+                text = dwv.i18n(key);
+            }
+            else {
+                text = value;
+            }
+        }
+        else {
+            text = dwv.i18n(key);
+        }
+        return text;
+    };
     // options
     var option;
     if ( list instanceof Array )
@@ -8574,7 +8608,7 @@ dwv.html.createHtmlSelect = function (name, list) {
         {
             option = document.createElement("option");
             option.value = list[i];
-            option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(list[i])));
+            option.appendChild(document.createTextNode(getText(list[i])));
             select.appendChild(option);
         }
     }
@@ -8584,7 +8618,7 @@ dwv.html.createHtmlSelect = function (name, list) {
         {
             option = document.createElement("option");
             option.value = item;
-            option.appendChild(document.createTextNode(dwv.utils.capitaliseFirstLetter(item)));
+            option.appendChild(document.createTextNode(getText(item)));
             select.appendChild(option);
         }
     }
@@ -9052,7 +9086,7 @@ dwv.gui.base.Loadbox = function (app, loaders)
     this.setup = function ()
     {
         // loader select
-        loaderSelector = dwv.html.createHtmlSelect("loaderSelect", loaders);
+        loaderSelector = dwv.html.createHtmlSelect("loaderSelect", loaders, "io");
         loaderSelector.onchange = app.onChangeLoader;
 
         // node
@@ -9370,7 +9404,7 @@ dwv.gui.base.Toolbox = function (app)
     this.setup = function (list)
     {
         // tool select
-        var toolSelector = dwv.html.createHtmlSelect("toolSelect", list);
+        var toolSelector = dwv.html.createHtmlSelect("toolSelect", list, "tool");
         toolSelector.onchange = app.onChangeTool;
 
         // tool list element
@@ -9448,7 +9482,7 @@ dwv.gui.base.WindowLevel = function (app)
         var wlSelector = dwv.html.createHtmlSelect("presetSelect", []);
         wlSelector.onchange = app.onChangeWindowLevelPreset;
         // colour map select
-        var cmSelector = dwv.html.createHtmlSelect("colourMapSelect", dwv.tool.colourMaps);
+        var cmSelector = dwv.html.createHtmlSelect("colourMapSelect", dwv.tool.colourMaps, "colourmap");
         cmSelector.onchange = app.onChangeColourMap;
 
         // preset list element
@@ -9494,7 +9528,8 @@ dwv.gui.base.WindowLevel = function (app)
     this.initialise = function ()
     {
         // create new preset select
-        var wlSelector = dwv.html.createHtmlSelect("presetSelect", app.getViewController().getPresets());
+        var wlSelector = dwv.html.createHtmlSelect("presetSelect", 
+            app.getViewController().getPresets(), "wl.presets", true);
         wlSelector.onchange = app.onChangeWindowLevelPreset;
         wlSelector.title = "Select w/l preset.";
 
@@ -9542,10 +9577,10 @@ dwv.gui.base.Draw = function (app)
     this.setup = function (shapeList)
     {
         // shape select
-        var shapeSelector = dwv.html.createHtmlSelect("shapeSelect", shapeList);
+        var shapeSelector = dwv.html.createHtmlSelect("shapeSelect", shapeList, "shape");
         shapeSelector.onchange = app.onChangeShape;
         // colour select
-        var colourSelector = dwv.html.createHtmlSelect("colourSelect", colours);
+        var colourSelector = dwv.html.createHtmlSelect("colourSelect", colours, "colour");
         colourSelector.onchange = app.onChangeLineColour;
 
         // shape list element
@@ -9626,7 +9661,7 @@ dwv.gui.base.Livewire = function (app)
     this.setup = function ()
     {
         // colour select
-        var colourSelector = dwv.html.createHtmlSelect("lwColourSelect", colours);
+        var colourSelector = dwv.html.createHtmlSelect("lwColourSelect", colours, "colour");
         colourSelector.onchange = app.onChangeLineColour;
 
         // colour list element
@@ -9685,7 +9720,7 @@ dwv.gui.base.ZoomAndPan = function (app)
         button.onclick = app.onZoomReset;
         button.setAttribute("style","width:100%; margin-top:0.5em;");
         button.setAttribute("class","ui-btn ui-btn-b");
-        var text = document.createTextNode("Reset");
+        var text = document.createTextNode(dwv.i18n("basics.reset"));
         button.appendChild(text);
 
         // list element
@@ -14847,16 +14882,13 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 dwv.tool.Draw.prototype.getHelp = function()
 {
     return {
-        'title': "Draw",
-        'brief': "Allows to draw shapes on the image. " +
-            "Choose the shape and its colour from the drop down menus. Once created, shapes " +
-            "can be edited by selecting them. Anchors will appear and allow specific shape edition. " +
-            "Drag the shape on the top red cross to delete it. All actions are undoable. ",
-        'mouse': {
-            'mouse_drag': "A single mouse drag draws the desired shape.",
+        "title": dwv.i18n("tool.Draw.name"),
+        "brief": dwv.i18n("tool.Draw.brief"),
+        "mouse": {
+            "mouse_drag": dwv.i18n("tool.Draw.mouse_drag")
         },
-        'touch': {
-            'touch_drag': "A single touch drag draws the desired shape.",
+        "touch": {
+            "touch_drag": dwv.i18n("tool.Draw.touch_drag")
         }
     };
 };
@@ -15329,7 +15361,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
     // quantification
     var quant = image.quantifyEllipse( ellipse );
     var cm2 = quant.surface / 100;
-    var str = cm2.toPrecision(4) + " cm2";
+    var str = cm2.toPrecision(4) + " " + dwv.i18n("unit.cm2");
     // quantification text
     var ktext = new Kinetic.Text({
         x: ellipse.getCenter().getX(),
@@ -15534,11 +15566,8 @@ dwv.tool.Filter = function ( filterList, app )
 dwv.tool.Filter.prototype.getHelp = function ()
 {
     return {
-        'title': "Filter",
-        'brief': "A few simple image filters are available: a Threshold filter to " +
-            "limit the image intensities between a chosen minimum and maximum, " +
-            "a Sharpen filter to convolute the image with a sharpen matrix, " +
-            "a Sobel filter to get the gradient of the image in both directions."
+        "title": dwv.i18n("tool.Filter.name"),
+        "brief": dwv.i18n("tool.Filter.brief")
     };
 };
 
@@ -15791,6 +15820,401 @@ dwv.tool.RunFilterCommand = function (filter, app) {
 }; // RunFilterCommand class
 ;// namespaces
 var dwv = dwv || {};
+    dwv.tool = dwv.tool || {};
+
+//external
+var Kinetic = Kinetic || {};
+var MagicWand = MagicWand || {};
+
+/**
+ * Floodfill painting tool.
+ * @constructor
+ * @param {Object} app The associated application.  
+ * Found in {@link  https://github.com/Tamersoul/magic-wand-js}
+ */
+dwv.tool.Floodfill = function(app)
+{
+    /**
+     * Original variables from external library. Used as in the lib example.
+     * @private
+     * @type Number
+     */
+    var blurRadius = 5;
+    /**
+     * Original variables from external library. Used as in the lib example.
+     * @private
+     * @type Number
+     */
+    var simplifyTolerant = 0;
+    /**
+     * Original variables from external library. Used as in the lib example.
+     * @private
+     * @type Number
+     */
+    var simplifyCount = 30;
+    /**
+     * Canvas info
+     * @private
+     * @type Object
+     */
+    var imageInfo = null;
+    /**
+     * Object created by MagicWand lib containing border points
+     * @private
+     * @type Object
+     */
+    var mask = null;
+    /**
+     * threshold default tolerance of the tool border
+     * @private
+     * @type Number
+     */
+    var initialthreshold = 15;
+    /**
+     * threshold tolerance of the tool border
+     * @private
+     * @type Number
+     */
+    var currentthreshold = null;
+    /**
+     * Closure to self: to be used by event handlers.
+     * @private
+     * @type WindowLevel
+     */
+    var self = this;
+    /**
+     * Interaction start flag.
+     * @type Boolean
+     */
+    this.started = false;
+    /**
+     * Livewire GUI.
+     * @type Object
+     */
+    var gui = null;
+    /**
+     * Draw command.
+     * @private
+     * @type Object
+     */
+    var command = null;
+    /**
+     * Current shape group.
+     * @private
+     * @type Object
+     */
+    var shapeGroup = null;
+    /**
+     * Coordinates of the fist mousedown event.
+     * @private
+     * @type Object
+     */
+    var initialpoint;
+    /**
+     * Floodfill border.
+     * @private
+     * @type Object
+     */
+    var border = null;
+    /**
+     * List of parent points.
+     * @private
+     * @type Array
+     */
+    var parentPoints = [];
+    /**
+     * Assistant variable to paint border on all slices.
+     * @private
+     * @type Boolean
+     */
+    var extender = false;
+    /**
+     * Timeout for painting on mousemove.
+     * @private
+     */
+    var painterTimeout;
+    /**
+     * Drawing style.
+     * @type Style
+     */
+    this.style = new dwv.html.Style();
+
+    /**
+     * Set extend option for painting border on all slices.
+     * @param {Boolean} The option to set
+     */
+    this.setExtend = function(Bool){
+        extender = Bool;
+    };
+
+    /**
+     * Get extend option for painting border on all slices.
+     * @return {Boolean} The actual value of of the variable to use Floodfill on museup.
+     */
+    this.getExtend = function(){
+        return extender;
+    };
+
+    /**
+     * Get (x, y) coordinates referenced to the canvas
+     * @param {Object} event The original event.
+     */
+    var getCoord = function(event){
+        return { x: event._x, y: event._y };
+    };
+
+    /**
+     * Calculate border.
+     * @private
+     * @param {Object} Start point.
+     * @param {Number} Threshold tolerance.
+     */
+    var calcBorder = function(points, threshold){
+
+        parentPoints = [];
+        var image = {
+            data: imageInfo.data,
+            width: imageInfo.width,
+            height: imageInfo.height,
+            bytes: 4
+        };
+
+        // var p = new dwv.math.FastPoint2D(points.x, points.y);
+        mask = MagicWand.floodFill(image, points.x, points.y, threshold);
+        mask = MagicWand.gaussBlurOnlyBorder(mask, blurRadius);
+
+        var cs = MagicWand.traceContours(mask);
+        cs = MagicWand.simplifyContours(cs, simplifyTolerant, simplifyCount);
+
+        if(cs.length > 0 && cs[0].points[0].x){
+            for(var j=0, icsl=cs[0].points.length; j<icsl; j++){
+                parentPoints.push(new dwv.math.Point2D(cs[0].points[j].x, cs[0].points[j].y));
+            }
+            return parentPoints;
+        }
+        else{
+            return false;
+        }
+    };
+
+    /**
+     * Paint Floodfill.
+     * @private
+     * @param {Object} Start point.
+     * @param {Number} Threshold tolerance.
+     */
+    var paintBorder = function(point, threshold){
+        // Calculate the border
+        border = calcBorder(point, threshold);
+        // Paint the border
+        if(border){
+            var factory = new dwv.tool.RoiFactory();
+            shapeGroup = factory.create(border, self.style);
+            // draw shape command
+            command = new dwv.tool.DrawGroupCommand(shapeGroup, "floodfill", app.getDrawLayer());
+            // // draw
+            command.execute();
+            return true;
+        }
+        else{
+            return false;
+        }
+    };
+
+    /**
+     * Create Floodfill in all the prev and next slices while border is found
+     */
+    this.extend = function(){
+        //avoid errors
+        if(!initialpoint){
+            throw "'initialpoint' not found. User must click before use extend!";
+        }
+        // remove previous draw
+        if ( shapeGroup ) {
+            shapeGroup.destroy();
+        }
+
+        var pos = app.getViewController().getCurrentPosition();
+        var threshold = currentthreshold || initialthreshold;
+
+        // Iterate over the next images and paint border on each slice.
+        for(var i=pos.k, len=app.getImage().getGeometry().getSize().getNumberOfSlices(); i<len; i++){
+            if(!paintBorder(initialpoint, threshold)){
+                break;
+            }
+            app.getViewController().incrementSliceNb();
+        }
+        app.getViewController().setCurrentPosition(pos);
+
+        // Iterate over the prev images and paint border on each slice.
+        for(var j=pos.k; j>=0; j--){
+            if(!paintBorder(initialpoint, threshold)){
+                break;
+            }
+            app.getViewController().decrementSliceNb();
+        }
+        app.getViewController().setCurrentPosition(pos);
+    };
+
+    /**
+     * Modify tolerance threshold and redraw ROI.
+     * @param {Number} New threshold.
+     */
+    this.modifyThreshold = function(modifyThreshold){
+        // remove previous draw
+        clearTimeout(painterTimeout);
+        painterTimeout = setTimeout(function(){
+                                        if ( shapeGroup && self.started) {
+                                            shapeGroup.destroy();
+                                        }
+                                        paintBorder(initialpoint,  modifyThreshold);
+                                    },100);
+    };
+
+    /**
+     * Handle mouse down event.
+     * @param {Object} event The mouse down event.
+     */
+    this.mousedown = function(event){
+        imageInfo = app.getImageData();
+        if (!imageInfo){ return console.error('No image found');}
+
+        self.started = true;
+        initialpoint = getCoord(event);
+        paintBorder(initialpoint, initialthreshold);
+    };
+
+    /**
+     * Handle mouse move event.
+     * @param {Object} event The mouse move event.
+     */
+    this.mousemove = function(event){
+        if (!self.started)
+        {
+            return;
+        }
+        var movedpoint   = getCoord(event);
+        currentthreshold = Math.round(Math.sqrt( Math.pow((initialpoint.x-movedpoint.x), 2) + Math.pow((initialpoint.y-movedpoint.y), 2) )/2);
+        currentthreshold = currentthreshold < initialthreshold ? initialthreshold : currentthreshold - initialthreshold;
+        self.modifyThreshold(currentthreshold);
+    };
+
+    /**
+     * Handle mouse up event.
+     * @param {Object} event The mouse up event.
+     */
+    this.mouseup = function(/*event*/){
+        self.started = false;
+        if(extender){
+            self.extend();
+        }
+    };
+
+    /**
+     * Handle mouse out event.
+     * @param {Object} event The mouse out event.
+     */
+    this.mouseout = function(/*event*/){
+        self.mouseup(/*event*/);
+    };
+
+    /**
+     * Handle touch start event.
+     * @param {Object} event The touch start event.
+     */
+    this.touchstart = function(event){
+        // treat as mouse down
+        self.mousedown(event);
+    };
+
+    /**
+     * Handle touch move event.
+     * @param {Object} event The touch move event.
+     */
+    this.touchmove = function(event){
+        // treat as mouse move
+        self.mousemove(event);
+    };
+
+    /**
+     * Handle touch end event.
+     * @param {Object} event The touch end event.
+     */
+    this.touchend = function(/*event*/){
+        // treat as mouse up
+        self.mouseup(/*event*/);
+    };
+
+    /**
+     * Handle key down event.
+     * @param {Object} event The key down event.
+     */
+    this.keydown = function(event){
+        app.onKeydown(event);
+    };
+
+    /**
+     * Setup the tool GUI.
+     */
+    this.setup = function ()
+    {
+        gui = new dwv.gui.Livewire(app);
+        gui.setup();
+    };
+
+    /**
+     * Enable the tool.
+     * @param {Boolean} bool The flag to enable or not.
+     */
+    this.display = function(bool){
+        if ( gui ) {
+            gui.display(bool);
+        }
+        // TODO why twice?
+        this.init();
+    };
+
+    /**
+     * Initialise the tool.
+     */
+    this.init = function()
+    {
+        if ( gui ) {
+            // set the default to the first in the list
+            this.setLineColour(gui.getColours()[0]);
+            // init html
+            gui.initialise();
+        }
+
+        return true;
+    };
+}; // Floodfill class
+
+/**
+ * Help for this tool.
+ * @return {Object} The help content.
+ */
+dwv.tool.Floodfill.prototype.getHelp = function()
+{
+    return {
+        'title': "Floodfill",
+        'brief': "The Floodfill tool is a semi-automatic segmentation tool " +
+            "that proposes to the user paths that follow intensity edges." +
+            "Mouse down once to initialise and then move the mouse to see " +
+            "the proposed paths. Mouse up to build your contour. "
+    };
+};
+
+/**
+ * Set the line colour of the drawing.
+ * @param {String} colour The colour to set.
+ */
+dwv.tool.Floodfill.prototype.setLineColour = function(colour)
+{
+    // set style var
+    this.style.setLineColour(colour);
+};;// namespaces
+var dwv = dwv || {};
 /** @namespace */
 dwv.info = dwv.info || {};
 
@@ -15836,11 +16260,13 @@ dwv.info.Windowing = function ( div )
         // window center list item
         var liwc = div.getElementsByClassName("window-center")[0];
         dwv.html.cleanNode(liwc);
-        liwc.appendChild(document.createTextNode("WindowCenter = "+event.wc));
+        liwc.appendChild( document.createTextNode(
+            dwv.i18n("tool.info.window_center", {value: event.wc}) ) );
         // window width list item
         var liww = div.getElementsByClassName("window-width")[0];
         dwv.html.cleanNode(liww);
-        liww.appendChild(document.createTextNode("WindowWidth = "+event.ww));
+        liww.appendChild( document.createTextNode(
+            dwv.i18n("tool.info.window_width", {value: event.ww}) ) );
     };
 
 }; // class dwv.info.Windowing
@@ -15888,14 +16314,15 @@ dwv.info.Position = function ( div )
         // position list item
         var lipos = div.getElementsByClassName("position")[0];
         dwv.html.cleanNode(lipos);
-        lipos.appendChild(document.createTextNode(
-            "Pos = "+event.i+", "+event.j+", "+event.k));
+        lipos.appendChild( document.createTextNode(
+            dwv.i18n("tool.info.position", {value: event.i+", "+event.j+", "+event.k}) ) );
         // value list item
         if( typeof(event.value) != "undefined" )
         {
             var livalue = div.getElementsByClassName("value")[0];
             dwv.html.cleanNode(livalue);
-            livalue.appendChild(document.createTextNode("Value = "+event.value));
+            livalue.appendChild( document.createTextNode(
+                dwv.i18n("tool.info.value", {value: event.value}) ) );
         }
     };
 }; // class dwv.info.Position
@@ -16083,7 +16510,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
     });
     // quantification
     var quant = image.quantifyLine( line );
-    var str = quant.length.toPrecision(4) + " mm";
+    var str = quant.length.toPrecision(4) + " " + dwv.i18n("unit.mm");
     // quantification text
     var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
     var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
@@ -16151,7 +16578,7 @@ dwv.tool.UpdateLine = function (anchor, image)
     var p2d1 = new dwv.math.Point2D(end.x(), end.y());
     var line = new dwv.math.Line(p2d0, p2d1);
     var quant = image.quantifyLine( line );
-    var str = quant.length.toPrecision(4) + " mm";
+    var str = quant.length.toPrecision(4) + " " + dwv.i18n("mm");
     var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
     var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
     var textPos = {
@@ -16526,13 +16953,8 @@ dwv.tool.Livewire = function(app)
 dwv.tool.Livewire.prototype.getHelp = function()
 {
     return {
-        'title': "Livewire",
-        'brief': "The Livewire tool is a semi-automatic segmentation tool " +
-            "that proposes to the user paths that follow intensity edges." +
-            "Click once to initialise and then move the mouse to see " +
-            "the proposed paths. Click again to build your contour. " +
-            "The process stops when you click on the first root point. " +
-            "BEWARE: the process can take time!"
+        "title": dwv.i18n("tool.Livewire.name"),
+        "brief": dwv.i18n("tool.Livewire.brief")
     };
 };
 
@@ -16769,7 +17191,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
     // quantification
     var quant = image.quantifyRect( rectangle );
     var cm2 = quant.surface / 100;
-    var str = cm2.toPrecision(4) + " cm2";
+    var str = cm2.toPrecision(4) + " " + dwv.i18n("unit.cm2");
     // quantification text
     var ktext = new Kinetic.Text({
         x: rectangle.getBegin().getX(),
@@ -17133,13 +17555,13 @@ dwv.tool.Scroll = function(app)
 dwv.tool.Scroll.prototype.getHelp = function()
 {
     return {
-        'title': "Scroll",
-        'brief': "The scroll tool allows to scroll through slices.",
-        'mouse': {
-            'mouse_drag': "A single vertical mouse drag changes the current slice.",
+        "title": dwv.i18n("tool.Scroll.name"),
+        "brief": dwv.i18n("tool.Scroll.brief"),
+        "mouse": {
+            "mouse_drag": dwv.i18n("tool.Scroll.mouse_drag")
         },
-        'touch': {
-            'touch_drag': "A single vertical touch drag changes the current slice.",
+        "touch": {
+            'touch_drag': dwv.i18n("tool.Scroll.touch_drag")
         }
     };
 };
@@ -17197,6 +17619,7 @@ dwv.tool.Toolbox = function( toolList, app )
         if ( Object.keys(toolList).length !== 0 ) {
             gui = new dwv.gui.Toolbox(app);
             gui.setup(toolList);
+            
             for( var key in toolList ) {
                 toolList[key].setup();
             }
@@ -17469,7 +17892,7 @@ dwv.tool.WindowLevel = function(app)
             if ( gui ) {
                 gui.initialise();
                 // set selected
-                dwv.gui.setSelected(app.getElement("presetSelect"), "Manual");
+                dwv.gui.setSelected(app.getElement("presetSelect"), "manual");
             }
         }
     };
@@ -17572,14 +17995,14 @@ dwv.tool.WindowLevel = function(app)
 dwv.tool.WindowLevel.prototype.getHelp = function()
 {
     return {
-        'title': "Window/Level",
-        'brief': "Changes the Window and Level of the image.",
-        'mouse': {
-            'mouse_drag': "A single mouse drag changes the window in the horizontal direction and the level in the vertical one.",
-            'double_click': "A double click will center the window and level on the clicked intensity.",
+        "title": dwv.i18n("tool.WindowLevel.name"),
+        "brief": dwv.i18n("tool.WindowLevel.brief"),
+        "mouse": {
+            "mouse_drag": dwv.i18n("tool.WindowLevel.mouse_drag"),
+            "double_click": dwv.i18n("tool.WindowLevel.double_click")
         },
-        'touch': {
-            'touch_drag': "A single touch drag changes the window in the horizontal direction and the level in the vertical one.",
+        "touch": {
+            "touch_drag": dwv.i18n("tool.WindowLevel.touch_drag")
         }
     };
 };
@@ -17811,15 +18234,15 @@ dwv.tool.ZoomAndPan = function(app)
 dwv.tool.ZoomAndPan.prototype.getHelp = function()
 {
     return {
-        'title': "Zoom/Pan",
-        'brief': "The Zoom/Pan tool allows to zoom and pan the image.",
-        'mouse': {
-            'mouse_wheel': "The mouse wheel is used to zoom the image.",
-            'mouse_drag': "A single mouse drag drags the image in the desired direction."
+        "title": dwv.i18n("tool.ZoomAndPan.name"),
+        "brief": dwv.i18n("tool.ZoomAndPan.brief"),
+        "mouse": {
+            "mouse_wheel": dwv.i18n("tool.ZoomAndPan.mouse_wheel"),
+            "mouse_drag": dwv.i18n("tool.ZoomAndPan.mouse_drag")
         },
-        'touch': {
-            'twotouch_pinch': "A pinch in or out allows to zoom the image.",
-            'touch_drag': "A single touch drag drags the image in the desired direction."
+        "touch": {
+            'twotouch_pinch': dwv.i18n("tool.ZoomAndPan.twotouch_pinch"),
+            'touch_drag': dwv.i18n("tool.ZoomAndPan.touch_drag")
         }
     };
 };
@@ -17829,6 +18252,89 @@ dwv.tool.ZoomAndPan.prototype.getHelp = function()
  */
 dwv.tool.ZoomAndPan.prototype.init = function() {
     return true;
+};
+;// namespaces
+var dwv = dwv || {};
+/** @namespace */
+dwv.utils = dwv.utils || {};
+// external
+var i18next = i18next || {};
+var i18nextXHRBackend = i18nextXHRBackend || {};
+var i18nextBrowserLanguageDetector = i18nextBrowserLanguageDetector || {};
+
+// This is mainly a wrapper around the i18next object.
+// see its API: http://i18next.com/docs/api/
+
+/**
+ * Initialise i18n.
+ * @param {String} language The language to translate to. Defaults to 'auto' and 
+ *   gets the language from the browser.
+ * @param {String} localesPath Path the locales directory.
+ */
+dwv.i18nInitialise = function (language, localesPath)
+{
+    var lng = (typeof language === "undefined") ? "auto" : language;
+    var lpath = (typeof localesPath === "undefined") ? "" : localesPath;
+    // i18n options: default 'en' language and
+    //  only load language, not specialised (for ex en-GB)  
+    var options = {
+        fallbackLng: "en",
+        load: "languageOnly",
+        backend: { loadPath: lpath + "/locales/{{lng}}/{{ns}}.json" }
+    };
+    // use the XHR backend to get translation files
+    var i18n = i18next.use(i18nextXHRBackend);
+    // use browser language or the specified one
+    if (lng == "auto") {
+        i18n.use(i18nextBrowserLanguageDetector);
+    }
+    else {
+        options.lng = lng;
+    }
+    // init i18n: will be ready when the 'loaded' event is fired
+    i18n.init(options);
+};
+    
+/**
+ * Handle i18n load event.
+ * @param {Object} callback The callback function to call when i18n is loaded.
+ */
+dwv.i18nOnLoaded = function (callback) {
+    i18next.on('loaded', callback);
+};
+
+/**
+ * Get the translated text.
+ * @param {String} key The key to the text entry.
+ * @param {Object} options The translation options such as plural, context...
+ */
+dwv.i18n = function (key, options) {
+    return i18next.t(key, options);
+};
+
+/**
+ * Check the existence of a translation.
+ * @param {String} key The key to the text entry.
+ * @param {Object} options The translation options such as plural, context...
+ */
+dwv.i18nExists = function (key, options) {
+    return i18next.exists(key, options);
+};
+
+/**
+ * Translate all data-i18n tags in the current html page. If an html tag defines the 
+ * data-i18n attribute, its value will be used as key to find its corresponding text
+ * and will replace the content of the html tag.
+ */
+dwv.i18nPage = function () {
+    // get all elements
+    var elements = document.getElementsByTagName("*");
+    // if the element defines data-i18n, replace its content with the tranlation
+    for (var i = 0; i < elements.length; ++i) { 
+        if (typeof elements[i].dataset.i18n !== "undefined") {
+            elements[i].innerHTML = dwv.i18n(elements[i].dataset.i18n);
+        }
+    }
 };
 ;// namespaces
 var dwv = dwv || {};
