@@ -709,6 +709,73 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // draw
             drawLayer.draw();
         });
+        shape.on('dblclick', function () {
+
+            var labelText = prompt("Add label");
+            // if press cancel do nothing
+            if(labelText === null){
+                return false;
+            }
+            var group = this.getParent(),
+                klabel;
+            // if user introduce a text, create or update label
+            if(labelText.length > 0){
+
+                klabel = group.getChildren(function(node){
+                    return node.getClassName() === 'Label';
+                });
+                // update label
+                if (klabel.length){
+                    klabel[0].getText().setText(labelText);
+                }
+                // create label
+                else{
+                    var labelStyle = app.getStyle(),
+                        labelPos;
+
+                    try{
+                        // For all drawings
+                        labelPos = group.getChildren(function(node){
+                            return node.getClassName() === 'Text';
+                        })[0].getPosition();
+                    }
+                    catch(e){
+                        // for Livewire
+                        labelPos = group.getChildren(function(node){
+                            return node.getClassName() === 'Circle';
+                        })[0].getPosition();
+                    }
+
+                    klabel = new Kinetic.Label({
+                        x: labelPos.x,
+                        y: labelPos.y + labelStyle.getFontSize() * 1.1,
+                        draggable: true
+                    });
+
+                    klabel.add(new Kinetic.Tag({
+                        fill: 'rgba(0,0,0,.25)',
+                        stroke: labelStyle.getLineColour()
+                    }));
+
+                    klabel.add(new Kinetic.Text({
+                        text: labelText,
+                        fontSize: labelStyle.getFontSize(),
+                        fill: labelStyle.getLineColour(),
+                        padding: 5
+                    }));
+                }
+                group.add(klabel);
+            }
+            // if user does not introduce a text, remove label.
+            else{
+                klabel = group.getChildren(function(node){
+                    return node.getClassName() === 'Label';
+                });
+                klabel.remove();
+            }
+            // draw label
+            drawLayer.draw();
+        });
     };
 
     /**

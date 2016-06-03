@@ -15,10 +15,17 @@ function startApp() {
         "fitToWindow": true,
         "gui": ["tool", "load", "help", "undo", "version", "tags"],
         "loaders": ["File", "Url"],
-        "tools": ["Scroll", "WindowLevel", "ZoomAndPan", "Draw", "Livewire", "Filter"],
+        "tools": ["Scroll", "WindowLevel", "ZoomAndPan", "Draw", "Livewire", "Filter", "Floodfill"],
         "filters": ["Threshold", "Sharpen", "Sobel"],
         "shapes": ["Line", "Protractor", "Rectangle", "Roi", "Ellipse"],
         "isMobile": false
+    });
+
+    myapp.addEventListener("livewire-start", function(){
+        console.log('Getting ready...');
+    });
+    myapp.addEventListener("livewire-end", function(){
+        console.log('Ready!');
     });
 
     // help

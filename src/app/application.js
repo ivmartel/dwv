@@ -239,6 +239,11 @@ dwv.App = function ()
                     break;
                 case "Livewire":
                     toolList.Livewire = new dwv.tool.Livewire(this);
+                    toolList.Livewire.addEventListener("livewire-start", fireEvent);
+                    toolList.Livewire.addEventListener("livewire-end", fireEvent);
+                    break;
+                case "Floodfill":
+                    toolList.Floodfill = new dwv.tool.Floodfill(this);
                     break;
                 case "Filter":
                     if ( config.filters.length !== 0 ) {
@@ -1052,8 +1057,10 @@ dwv.App = function ()
         self.initWLDisplay();
         // update preset select
         var select = self.getElement("presetSelect");
-        select.selectedIndex = 0;
-        dwv.gui.refreshElement(select);
+        if (select) {
+            select.selectedIndex = 0;
+            dwv.gui.refreshElement(select);
+        }
     };
 
 

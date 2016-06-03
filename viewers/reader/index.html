@@ -20,30 +20,29 @@
 			.infotr { color: #333; text-shadow: 0 1px 0 #fff; }
 			.dropBox { margin: 20px; }
 		</style>
-		<link type="text/css" rel="stylesheet" href="../../ext/jquery-ui/themes/ui-darkness/jquery-ui-1.11.4.min.css">
+		<!-- <link type="text/css" rel="stylesheet" href="../../ext/jquery-ui/themes/ui-darkness/jquery-ui-1.11.4.min.css"> -->
 		<!-- Third party -->
 		<script type="text/javascript" src="../../ext/jquery/jquery-2.1.4.min.js"></script>
-		<script type="text/javascript" src="../../ext/jquery-ui/jquery-ui-1.11.4.min.js"></script>
+		<!-- <script type="text/javascript" src="../../ext/jquery-ui/jquery-ui-1.11.4.min.js"></script>
 		<script type="text/javascript" src="../../ext/flot/jquery.flot.min.js"></script>
 		<script type="text/javascript" src="../../ext/kinetic/kinetic-v5.1.1-06.10.min.js"></script>
-		<script type="text/javascript" src="../../ext/magic-wand/magic-wand.js"></script>
-		<script type="text/javascript" src="../../ext/i18next/i18next.min.js"></script>
-		<script type="text/javascript" src="../../ext/i18next/i18nextXHRBackend.min.js"></script>
-		<script type="text/javascript" src="../../ext/i18next/i18nextBrowserLanguageDetector.min.js"></script>
+		<script type="text/javascript" src="../../ext/magic-wand/magic-wand.js"></script> -->
 		<!-- decoders -->
-		<script type="text/javascript" src="../../ext/pdfjs/jpx.js"></script>
+		<!-- <script type="text/javascript" src="../../ext/pdfjs/jpx.js"></script>
 		<script type="text/javascript" src="../../ext/pdfjs/util.js"></script>
 		<script type="text/javascript" src="../../ext/pdfjs/arithmetic_decoder.js"></script>
 		<script type="text/javascript" src="../../ext/rii-mango/lossless-min.js"></script>
-		<script type="text/javascript" src="../../ext/notmasteryet/jpg.js"></script>
+		<script type="text/javascript" src="../../ext/notmasteryet/jpg.js"></script> -->
 		<!-- Local -->
-		<script type="text/javascript" src="../../src/app/application.js"></script>
+		<!-- <script type="text/javascript" src="../../src/app/application.js"></script>
 		<script type="text/javascript" src="../../src/app/toolboxController.js"></script>
 		<script type="text/javascript" src="../../src/app/viewController.js"></script>
-		<script type="text/javascript" src="../../src/app/state.js"></script>
-		<script type="text/javascript" src="../../src/dicom/dicomParser.js"></script>
+		<script type="text/javascript" src="../../src/app/state.js"></script> -->
+		 <script type="text/javascript" src="../../src/dicom/dicomParser.js"></script>
 		<script type="text/javascript" src="../../src/dicom/dictionary.js"></script>
-		<script type="text/javascript" src="../../src/gui/browser.js"></script>
+		<script type="text/javascript" src="dicomParser.js"></script>
+		<script type="text/javascript" src="FileSaver.js"></script>
+		<!--<script type="text/javascript" src="../../src/gui/browser.js"></script>
 		<script type="text/javascript" src="../../src/gui/filter.js"></script>
 		<script type="text/javascript" src="../../src/gui/generic.js"></script>
 		<script type="text/javascript" src="../../src/gui/help.js"></script>
@@ -82,71 +81,45 @@
 		<script type="text/javascript" src="../../src/tools/undo.js"></script>
 		<script type="text/javascript" src="../../src/tools/windowLevel.js"></script>
 		<script type="text/javascript" src="../../src/tools/zoomPan.js"></script>
-		<script type="text/javascript" src="../../src/utils/i18n.js"></script>
 		<script type="text/javascript" src="../../src/utils/string.js"></script>
 		<script type="text/javascript" src="../../src/utils/uri.js"></script>
-		<script type="text/javascript" src="../../src/utils/thread.js"></script>
+		<script type="text/javascript" src="../../src/utils/thread.js"></script> -->
 
 		<!-- Launch the app -->
-		<script type="text/javascript" src="appgui.js"></script>
-		<script type="text/javascript" src="applauncher.js"></script>
+		<!-- <script type="text/javascript" src="appgui.js"></script>
+		<script type="text/javascript" src="applauncher.js"></script> -->
 	</head>
 
 	<body>
 
 		<!-- DWV -->
-		<div id="dwv">
+		<input id="dwv" type="file">
 
-			<div id="pageHeader">
+		<script>
+			$(document).ready(function(){
+				console.log(dwv.dicom)
+				var parser = new dwv.dicom.DicomParser()
+				reader = new FileReader();
+				$('#dwv').change(function(e){
+					console.log(e)
 
-				<!-- Title -->
-				<h1>DICOM Web Viewer
-					(<a href="https://github.com/ivmartel/dwv">dwv</a>
-					<span class="dwv-version"></span>)</h1>
+					reader.onload = function(e){
+						// console.log(e)
+						// parser.parse(e.target.result)
+						clean = parser.cleanTags(e.target.result, ['x00100010', 'x00100030', 'x00100020', 'x00200010'], true)
+						// b= new Blob([clean])
+						console.log(clean)
+						saveAs(clean, 'rafa.dcm')
+						// console.log(parser.getRawDicomElements())
 
-					<!-- Toolbar -->
-					<div class="toolbar"></div>
 
-				</div><!-- /pageHeader -->
-
-				<div id="pageMain">
-
-					<!-- Open file -->
-					<div class="openData" title="File">
-						<div class="loaderlist"></div>
-						<div id="progressbar"></div>
-					</div>
-
-					<!-- Toolbox -->
-					<div class="toolList" title="Toolbox"></div>
-
-					<!-- History -->
-					<div class="history" title="History"></div>
-
-					<!-- Tags -->
-					<div class="tags" title="Tags"></div>
-
-					<!-- Help -->
-					<div class="help" title="Help"></div>
-
-					<!-- Layer Container -->
-					<div class="layerDialog" title="Image">
-						<div class="dropBox"></div>
-						<div class="layerContainer">
-							<canvas class="imageLayer">Only for HTML5 compatible browsers...</canvas>
-							<div class="drawDiv"></div>
-							<div class="infoLayer">
-								<div class="infotl"></div>
-								<div class="infotr"></div>
-								<div class="infobl"></div>
-								<div class="infobr"><div class="plot"></div></div>
-							</div><!-- /infoLayer -->
-						</div><!-- /layerContainer -->
-					</div><!-- /layerDialog -->
-
-				</div><!-- /pageMain -->
-
-			</div><!-- /dwv -->
-
-		</body>
-		</html>
+						byteArray = new Uint8Array(e.target.result)
+						var dataSet = dicomParser.parseDicom(byteArray)
+						console.log(dataSet.elements)
+					}
+					reader.readAsArrayBuffer(e.target.files[0])
+				})
+			})
+		</script>
+	</body>
+</html>
