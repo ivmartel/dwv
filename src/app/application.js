@@ -24,7 +24,7 @@ dwv.App = function ()
     var dataHeight = 0;
     // Number of slices to load
     var nSlicesToLoad = 0;
-    
+
     // Data decoders scripts
     var decoderScripts = null;
 
@@ -190,7 +190,7 @@ dwv.App = function ()
      * Add a command to the undo stack.
      * @param {Object} The command to add.
      */
-    this.addToUndoStack = function (cmd) { 
+    this.addToUndoStack = function (cmd) {
         if ( undoStack !== null ) {
             undoStack.add(cmd);
         }
@@ -324,7 +324,7 @@ dwv.App = function ()
             var dropBoxSize = 2 * size.height / 3;
             box.setAttribute("style","width:"+dropBoxSize+"px;height:"+dropBoxSize+"px");
         }
-        
+
         // possible load from URL
         if ( typeof config.skipLoadUrl === "undefined" ) {
             var query = dwv.utils.getUriQuery(window.location.href);
@@ -343,7 +343,7 @@ dwv.App = function ()
         else{
             console.log("Not loading url from address since skipLoadUrl is defined.");
         }
-        
+
         // align layers when the window is resized
         if ( config.fitToWindow ) {
             fitToWindow = true;
@@ -353,7 +353,8 @@ dwv.App = function ()
         // use web workers
         if ( config.useWebWorkers ) {
             // data decoders
-            var pathToRoot = "../..";
+            var useWebWorkers = config.useWebWorkers;
+            var pathToRoot = (typeof useWebWorkers === 'string' && useWebWorkers != 'true') ? useWebWorkers : "../..";
             decoderScripts = [];
             decoderScripts.jpeg2000 = pathToRoot + "/ext/pdfjs/decode-jpeg2000.js";
             decoderScripts["jpeg-lossless"] = pathToRoot + "/ext/rii-mango/decode-jpegloss.js";
@@ -537,7 +538,7 @@ dwv.App = function ()
             loadImageUrls(urls, requestHeaders);
         }
     };
-    
+
     /**
      * Load a list of image URLs.
      * @private
