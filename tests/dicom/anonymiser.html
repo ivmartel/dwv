@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>DICOM Anonymiser</title>
+<meta charset="UTF-8">
+<script type="text/javascript" src="../../src/dicom/dicomParser.js"></script>
+<script type="text/javascript" src="../../src/dicom/dicomWriter.js"></script>
+<script type="text/javascript" src="../../src/dicom/dictionary.js"></script>
+<script type="text/javascript" >
+
+function onLoadInputFile(event)
+{
+    var data = event.target.result; // FileReader
+    //var data = this.response; // XMLHttpRequest
+        
+    var dcmBytes = new Uint8Array(data);
+    console.log("response length: "+dcmBytes.length);
+
+    var parser = new dwv.dicom.DicomParser();
+    parser.parse(data);
+
+    var writer = new dwv.dicom.DicomWriter(parser.getRawDicomElements());
+    writer.rules = {'default': {'action': 'remove', 'value': null } };
+    var blob = new Blob([writer.getBuffer()], {type: 'application/dicom'});
+
+    var element = document.getElementById("download");
+    element.href = URL.createObjectURL(blob);
+    element.download = "anonym.dcm";
+}
+function onInputFile(event)
+{
+    var files = event.target.files;
+    
+    var reader = new FileReader();
+    reader.onload = onLoadInputFile;
+    reader.readAsArrayBuffer(files[0]);
+    
+    //var request = new XMLHttpRequest();
+    //request.open('GET', files[0], true);
+    //request.responseType = "arraybuffer";
+    //request.onload = onLoadInputFile;
+    //request.send(null);
+}
+</script>
+<style>
+body { font-family: Arial; }
+</style>
+
+</head>
+
+<body>
+
+<h1>DICOM Anonymiser</h1>
+<input id="infile" type="file" name="file" onchange="onInputFile(event);">
+<br><br><a href="#" id="download">download</a>
+
+</body>
+</html>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>DWV DICOM generator</title>
+<title>DICOM Generator</title>
 <meta charset="UTF-8">
 <script type="text/javascript" src="../../src/dicom/dicomWriter.js"></script>
 <script type="text/javascript" src="../../src/dicom/dictionary.js"></script>
@@ -67,10 +67,16 @@ function generate()
     // pixels
     var pixels = new Array(64*64);
     pixels.fill(0);
-    for ( var p = 0; p < 64; ++p ) {
-        pixels[64*32 + p] = 1000;
+    var center = 64/2;
+    for ( var j = 0; j < 64; ++j ) {
+        var jc = Math.abs(j-center);
+	    for ( var i = 0; i < 64; ++i ) {
+	        var ic = Math.abs(i-center);
+	        if ( jc < 10 && ic < 10) {
+	            pixels[64*j + i] = i * j;
+	        }
+	    }
     }
-    
     
     elements["x7FE00010"] = {
         element: "0x0010",
@@ -83,6 +89,8 @@ function generate()
     console.log(elements);
     
     var writer = new dwv.dicom.DicomWriter(elements);
+    writer.rules.default = {'action': 'copy', 'value': null };
+    writer.rules.PatientName = {'action': 'copy', 'value': null };
     var blob = new Blob([writer.getBuffer()], {type: 'application/dicom'});
     
     var element = document.getElementById("generate");
@@ -114,7 +122,7 @@ textarea { width:100%; }
 
 <body>
 
-<h1>DWV DICOM Generator</h1>
+<h1>DICOM Generator</h1>
 
 <form name="genform">
 <fieldset>
@@ -125,6 +133,8 @@ textarea { width:100%; }
   "Modality": "MR",
   "PatientName": "dwv-patient-name",
   "PhotometricInterpretation": "MONOCHROME2",
+  "SamplesPerPixel": 1,
+  "PixelRepresentation": 0,
   "Rows": 64,
   "Columns": 64,
   "BitsAllocated": 16,

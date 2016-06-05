@@ -88,7 +88,7 @@ dwv.dicom.DataWriter = function (buffer)
  */
 dwv.dicom.DicomWriter = function (dicomElements) {
 
-    var actions = {
+    this.actions = {
         'copy': function (item) { return item; },
         'remove': function () { return null; },
         'clear': function (item) { item.value[0] = ""; return item; },
@@ -97,8 +97,9 @@ dwv.dicom.DicomWriter = function (dicomElements) {
 
     // names: 'default', tagName or groupName
     // priority: tagName, groupName, default
-    var rules = {
-        'default': {'action': 'copy', 'value': null },
+    this.rules = {
+        //'default': {'action': 'copy', 'value': null },
+        'default': {'action': 'remove', 'value': null },
         'PatientName': {'action': 'replace', 'value': 'Anonymized'}, // tag
         'Meta Element' : {'action': 'copy', 'value': null }, // group 'x0002'
         'Acquisition' : {'action': 'copy', 'value': null }, // group 'x0018'
@@ -108,7 +109,6 @@ dwv.dicom.DicomWriter = function (dicomElements) {
     };
 
     this.getElementToWrite = function (element) {
-        var result = null;
         var tagName = null;
         var dict = dwv.dicom.dictionary;
         var group = element.group;
@@ -117,19 +117,20 @@ dwv.dicom.DicomWriter = function (dicomElements) {
             tagName = dict[group][element.element][2];
         }
         // apply rules:
+        var rule;
         // 1. tag name
-        if ( tagName !== null && typeof rules[tagName] !== 'undefined' ) {
-            result = actions[rules[tagName].action](element, rules[tagName].value);
+        if ( tagName !== null && typeof this.rules[tagName] !== 'undefined' ) {
+            rule = this.rules[tagName];
         }
         // 2. group name
-        else if ( typeof rules[groupName] !== 'undefined' ) {
-            result = actions[rules[groupName].action](element, rules[groupName].value);
+        else if ( typeof this.rules[groupName] !== 'undefined' ) {
+            rule = this.rules[groupName];
         }
         // 3. default
         else {
-            result = actions[rules['default'].action](element, rules['default'].value);
+            rule = this.rules['default'];
         }
-        return result;
+        return this.actions[rule.action](element, rule.value);
     };
     
     this.writeElement = function (element, writer, offset) {
@@ -162,6 +163,9 @@ dwv.dicom.DicomWriter = function (dicomElements) {
         }
         else if ( element.vr === "UL") {
             writer.writeUint32Array(offset, element.value);
+        }
+        else if ( element.vr === "SQ") {
+            // not yet...
         }
         else {
             writer.writeStringArray(offset, element.value);
