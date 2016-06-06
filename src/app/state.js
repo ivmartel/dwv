@@ -18,9 +18,11 @@ dwv.State = function (app)
         // store each slice drawings group
         var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
         var drawings = [];
+        var slices = [];
         for ( var k = 0; k < nSlices; ++k ) {
+            var layer = app.getDrawLayer(k)
             // getChildren always return, so drawings will have the good size
-            var groups = app.getDrawLayer(k).getChildren();
+            var groups = layer.getChildren();
             // remove anchors
             for ( var i = 0; i < groups.length; ++i ) {
                 var anchors  = groups[i].find(".anchor");
@@ -29,9 +31,11 @@ dwv.State = function (app)
                 }
             }
             drawings.push(groups);
+            slices.push(layer.attrs.name)
         }
         // return a JSON string
         return JSON.stringify( {
+            "slices": slices,
             "window-center": app.getViewController().getWindowLevel().center,
             "window-width": app.getViewController().getWindowLevel().width,
             "position": app.getViewController().getCurrentPosition(),
