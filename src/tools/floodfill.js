@@ -240,15 +240,15 @@ dwv.tool.Floodfill = function(app)
      * Modify tolerance threshold and redraw ROI.
      * @param {Number} New threshold.
      */
-    this.modifyThreshold = function(modifyThreshold){
+    this.modifyThreshold = function(modifyThreshold, force){
         // remove previous draw
         clearTimeout(painterTimeout);
         painterTimeout = setTimeout(function(){
-                                        if ( shapeGroup && self.started) {
-                                            shapeGroup.destroy();
-                                        }
-                                        paintBorder(initialpoint,  modifyThreshold);
-                                    },100);
+            if ( (shapeGroup && self.started) || force ) {
+                shapeGroup.destroy();
+            }
+            paintBorder(initialpoint,  modifyThreshold);
+        },100);
     };
 
     /**

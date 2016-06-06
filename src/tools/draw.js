@@ -247,6 +247,13 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     var started = false;
 
     /**
+     * Auxiliar var to allow editing but not painting.
+     * @private
+     * @type Boolean
+     */
+    this.onlyEdit = false;
+
+    /**
      * Shape factory list
      * @type Object
      */
@@ -354,13 +361,15 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             shapeEditor.disable();
             shapeEditor.setShape(null);
             shapeEditor.setImage(null);
-            // start storing points
-            started = true;
-            // clear array
-            points = [];
-            // store point
-            lastPoint = new dwv.math.Point2D(event._x, event._y);
-            points.push(lastPoint);
+            if ( !onlyEdit ){
+                // start storing points
+                started = true;
+                // clear array
+                points = [];
+                // store point
+                lastPoint = new dwv.math.Point2D(event._x, event._y);
+                points.push(lastPoint);
+            }
         }
     };
 
@@ -550,6 +559,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         shape.off('dragstart');
         shape.off('dragmove');
         shape.off('dragend');
+        shape.off('dblclick');
     }
 
     /**
@@ -748,20 +758,23 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
                     klabel = new Kinetic.Label({
                         x: labelPos.x,
-                        y: labelPos.y + labelStyle.getFontSize() * 1.1,
+                        y: labelPos.y + labelStyle.getScaledFontSize(),
                         draggable: true
                     });
 
                     klabel.add(new Kinetic.Tag({
                         fill: 'rgba(0,0,0,.25)',
-                        stroke: labelStyle.getLineColour()
+                        stroke: labelStyle.getLineColour(),
+                        pointerWidth: 2,
+                        pointerHeight: 2,
                     }));
 
                     klabel.add(new Kinetic.Text({
                         text: labelText,
-                        fontSize: labelStyle.getFontSize(),
+                        fontSize: labelStyle.getScaledFontSize() * 1.25,
+                        fontFamily: labelStyle.getFontFamily(),
                         fill: labelStyle.getLineColour(),
-                        padding: 5
+                        padding: 4
                     }));
                 }
                 group.add(klabel);
