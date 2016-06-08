@@ -20,13 +20,14 @@ function onLoadInputFile(event)
     parser.parse(data);
 
     var writer = new dwv.dicom.DicomWriter(parser.getRawDicomElements());
-    writer.rules = {'default': {'action': 'remove', 'value': null } };
+    writer.rules.default = {'action': 'copy', 'value': null };
     var blob = new Blob([writer.getBuffer()], {type: 'application/dicom'});
 
     var element = document.getElementById("download");
     element.href = URL.createObjectURL(blob);
     element.download = "anonym.dcm";
 }
+
 function onInputFile(event)
 {
     var files = event.target.files;
