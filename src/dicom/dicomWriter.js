@@ -423,7 +423,6 @@ dwv.dicom.DicomWriter = function (dicomElements) {
         var offset = 128;
         // DICM
         offset = writer.writeString(offset, "DICM");
-        console.log("offset = " + offset);
         // write meta
         for ( var l = 0; l < metaElements.length; ++l ) {
             offset = writer.writeDataElement(metaElements[l], offset);
