@@ -77,7 +77,7 @@ dwv.image.DicomBufferToView = function (decoderScripts) {
 
     // flag to use workers or not to decode data
     var useWorkers = false;
-    
+
     if (typeof decoderScripts !== "undefined" && decoderScripts instanceof Array) {
         useWorkers = true;
         // thread pool
@@ -97,7 +97,7 @@ dwv.image.DicomBufferToView = function (decoderScripts) {
         var dicomParser = new dwv.dicom.DicomParser();
         // parse the buffer
         dicomParser.parse(buffer);
-    
+
         // worker callback
         var decodedBufferToView = function(event) {
             // create the view
@@ -107,11 +107,11 @@ dwv.image.DicomBufferToView = function (decoderScripts) {
             callback({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
         };
         var pixelBuffer = dicomParser.pixelBuffer;
-        
+
         var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
         var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
         var needDecompression = (algoName !== null);
-        
+
         if ( needDecompression ) {
             if (useWorkers) {
                 var script = decoderScripts[algoName];
@@ -125,7 +125,7 @@ dwv.image.DicomBufferToView = function (decoderScripts) {
 
                 var decoder = null;
                 var decodedBuffer = null;
-                
+
                 if( algoName === "jpeg-lossless" ) {
                     if ( !hasJpegLosslessDecoder ) {
                         throw new Error("No JPEG Lossless decoder provided");

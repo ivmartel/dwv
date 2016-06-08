@@ -333,6 +333,60 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     var drawLayer = null;
 
     /**
+     * Auxiliar variable to avoid create new draws when editing.
+     * @private
+     * @type Object
+     */
+    this.onlyEdit = false;
+
+    /**
+     * Selected shape.
+     * @private
+     * @type Object
+     */
+    this.currentShape = null;
+
+    /**
+     * Clone selected shape to an interval of slices. If the shape has its own method, only the method will be applied.
+     * @param {Number} Shape First slice to clone shape.
+     * @param {Number} Shape Last slice to clone shape.
+     */
+    this.extend = function(ini, end){
+
+        var shape = self.currentShape;
+        if(!shape){return}
+        var tool = app.getToolbox().getToolList()[ (shape.name).charAt(0).toUpperCase() + (shape.name).slice(1) ]
+
+        // disable edition
+        shapeEditor.disable();
+        shapeEditor.setShape(null);
+        shapeEditor.setImage(null);
+
+        if(typeof tool != 'undefined' && tool.hasOwnProperty('extend')){
+            return tool.extend(ini, end)
+        }
+
+        var pos = app.getViewController().getCurrentPosition();
+
+        // Iterate over the next images and paint border on each slice.
+        for(var i=pos.k+1, il=end; i<end; i++){
+            command = new dwv.tool.DrawGroupCommand(shape.clone(), shape.name, app.getDrawLayer());
+            // // draw
+            command.execute();
+            app.getViewController().incrementSliceNb();
+        }
+        app.getViewController().setCurrentPosition(pos);
+
+        // Iterate over the prev images and paint border on each slice.
+        for(var j=pos.k-1; j>ini; j--){
+            command = new dwv.tool.DrawGroupCommand(shape.clone(), shape.name, app.getDrawLayer());
+            // // draw
+            command.execute();
+            app.getViewController().decrementSliceNb();
+        }
+        app.getViewController().setCurrentPosition(pos);
+    };
+    /**
      * Handle mouse down event.
      * @param {Object} event The mouse down event.
      */
@@ -347,6 +401,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         if ( kshape ) {
             var group = kshape.getParent();
             var selectedShape = group.find(".shape")[0];
+            self.currentShape = group;
             // reset editor if click on other shape
             // (and avoid anchors mouse down)
             if ( selectedShape && selectedShape !== shapeEditor.getShape() ) {
@@ -361,7 +416,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             shapeEditor.disable();
             shapeEditor.setShape(null);
             shapeEditor.setImage(null);
-            if ( !onlyEdit ){
+            // Set current shape to null
+            self.currentShape = null;
+            // start storing points if onlyEdit allow it (default allowed)
+            if ( !self.onlyEdit ){
                 // start storing points
                 started = true;
                 // clear array

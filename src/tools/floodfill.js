@@ -204,7 +204,7 @@ dwv.tool.Floodfill = function(app)
     /**
      * Create Floodfill in all the prev and next slices while border is found
      */
-    this.extend = function(){
+    this.extend = function(ini, end){
         //avoid errors
         if(!initialpoint){
             throw "'initialpoint' not found. User must click before use extend!";
@@ -218,7 +218,7 @@ dwv.tool.Floodfill = function(app)
         var threshold = currentthreshold || initialthreshold;
 
         // Iterate over the next images and paint border on each slice.
-        for(var i=pos.k, len=app.getImage().getGeometry().getSize().getNumberOfSlices(); i<len; i++){
+        for(var i=pos.k+1, len = end ? end : app.getImage().getGeometry().getSize().getNumberOfSlices(); i<=len ; i++){
             if(!paintBorder(initialpoint, threshold)){
                 break;
             }
@@ -227,7 +227,7 @@ dwv.tool.Floodfill = function(app)
         app.getViewController().setCurrentPosition(pos);
 
         // Iterate over the prev images and paint border on each slice.
-        for(var j=pos.k; j>=0; j--){
+        for(var j=pos.k-1, jl = ini ? ini : 0 ; j>=jl ; j--){
             if(!paintBorder(initialpoint, threshold)){
                 break;
             }
