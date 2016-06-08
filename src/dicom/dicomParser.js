@@ -444,6 +444,9 @@ dwv.dicom.getTransferSyntaxName = function (syntax)
 
 /**
  * DicomParser class.
+ * Ref:
+ * - http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1
+ * - http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_7.5.html#table_7.5-1
  * @constructor
  */
 dwv.dicom.DicomParser = function()
@@ -1271,14 +1274,14 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
             }
             message += ")";
             var itemDelimElement = {
-                    "group": "0xFFFE",
-                    "element": "0xE00D",
-                    "vr": "na",
-                    "vl": "0",
-                    "value": [message],
-                };
-                line += "\n";
-                line += this.getElementAsString(itemDelimElement, prefix + "  ");
+                "group": "0xFFFE",
+                "element": "0xE00D",
+                "vr": "na",
+                "vl": "0",
+                "value": [message]
+            };
+            line += "\n";
+            line += this.getElementAsString(itemDelimElement, prefix + "  ");
 
         }
 
