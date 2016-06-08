@@ -20,6 +20,7 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
      * Execute the command.
      */
     this.execute = function () {
+        group.setAttr("drawType", name);
         // add the group to the layer
         layer.add(group);
         // draw
@@ -355,7 +356,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
         var shape = self.currentShape;
         if(!shape){return}
-        var tool = app.getToolbox().getToolList()[ (shape.name).charAt(0).toUpperCase() + (shape.name).slice(1) ]
+
+        // console.log(shape)
+        var shapename = shape.getAttr('drawType');
+        var tool = app.getToolbox().getToolList()[ (shapename).charAt(0).toUpperCase() + (shapename).slice(1) ]
 
         // disable edition
         shapeEditor.disable();
@@ -369,23 +373,26 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         var pos = app.getViewController().getCurrentPosition();
 
         // Iterate over the next images and paint border on each slice.
-        for(var i=pos.k+1, il=end; i<end; i++){
+        for(var i=pos.k, il=end; i<end; i++){
+            app.getViewController().incrementSliceNb();
             command = new dwv.tool.DrawGroupCommand(shape.clone(), shape.name, app.getDrawLayer());
             // // draw
             command.execute();
-            app.getViewController().incrementSliceNb();
         }
+
         app.getViewController().setCurrentPosition(pos);
 
         // Iterate over the prev images and paint border on each slice.
-        for(var j=pos.k-1; j>ini; j--){
+        for(var j=pos.k; j>ini; j--){
+            app.getViewController().decrementSliceNb();
             command = new dwv.tool.DrawGroupCommand(shape.clone(), shape.name, app.getDrawLayer());
             // // draw
             command.execute();
-            app.getViewController().decrementSliceNb();
         }
         app.getViewController().setCurrentPosition(pos);
+        self.currentShape = null;
     };
+
     /**
      * Handle mouse down event.
      * @param {Object} event The mouse down event.

@@ -210,28 +210,28 @@ dwv.tool.Floodfill = function(app)
             throw "'initialpoint' not found. User must click before use extend!";
         }
         // remove previous draw
-        if ( shapeGroup ) {
-            shapeGroup.destroy();
-        }
+        // if ( shapeGroup ) {
+        //     shapeGroup.destroy();
+        // }
 
         var pos = app.getViewController().getCurrentPosition();
         var threshold = currentthreshold || initialthreshold;
 
         // Iterate over the next images and paint border on each slice.
-        for(var i=pos.k+1, len = end ? end : app.getImage().getGeometry().getSize().getNumberOfSlices(); i<=len ; i++){
+        for(var i=pos.k, len = end ? end : app.getImage().getGeometry().getSize().getNumberOfSlices(); i<len ; i++){
+            app.getViewController().incrementSliceNb();
             if(!paintBorder(initialpoint, threshold)){
                 break;
             }
-            app.getViewController().incrementSliceNb();
         }
         app.getViewController().setCurrentPosition(pos);
 
         // Iterate over the prev images and paint border on each slice.
-        for(var j=pos.k-1, jl = ini ? ini : 0 ; j>=jl ; j--){
+        for(var j=pos.k, jl = ini ? ini : 0 ; j>jl ; j--){
+            app.getViewController().decrementSliceNb();
             if(!paintBorder(initialpoint, threshold)){
                 break;
             }
-            app.getViewController().decrementSliceNb();
         }
         app.getViewController().setCurrentPosition(pos);
     };
@@ -247,6 +247,7 @@ dwv.tool.Floodfill = function(app)
             if ( (shapeGroup && self.started) || force ) {
                 shapeGroup.destroy();
             }
+            currentthreshold = modifyThreshold;
             paintBorder(initialpoint,  modifyThreshold);
         },100);
     };
