@@ -3507,31 +3507,54 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset)
 /**
  * DICOM writer.
  * @constructor
- * @param {Array} dicomElements The wrapped elements to wrap.
  */
-dwv.dicom.DicomWriter = function (dicomElements) {
+dwv.dicom.DicomWriter = function () {
 
-    this.actions = {
+    // possible tag actions
+    var actions = {
         'copy': function (item) { return item; },
         'remove': function () { return null; },
         'clear': function (item) { item.value[0] = ""; return item; },
         'replace': function (item, value) { item.value[0] = value; item.vl = value.length; return item; }
     };
 
-    // names: 'default', tagName or groupName
-    // priority: tagName, groupName, default
-    this.rules = {
-        //'default': {'action': 'copy', 'value': null },
-        'default': {'action': 'remove', 'value': null },
-        'PatientName': {'action': 'replace', 'value': 'Anonymized'}, // tag
-        'Meta Element' : {'action': 'copy', 'value': null }, // group 'x0002'
-        'Acquisition' : {'action': 'copy', 'value': null }, // group 'x0018'
-        'Image Presentation' : {'action': 'copy', 'value': null }, // group 'x0028'
-        'Procedure' : {'action': 'copy', 'value': null }, // group 'x0040'
-        'Pixel Data' : {'action': 'copy', 'value': null } // group 'x7fe0'
+    // default rules: just copy
+    var defaultRules = {
+        'default': {action: 'copy', value: null }
     };
 
+    /**
+     * Public (modifiable) rules.
+     * Set of objects as:
+     *   name : { action: 'actionName', value: 'optionalValue }
+     * The names are either 'default', tagName or groupName.
+     * Each DICOM element will be checked to see if a rule is applicable.
+     * First checked by tagName and then by groupName, 
+     * if nothing is found the default rule is applied.
+     */
+    this.rules = defaultRules;
+    
+    /**
+     * Example anonymisation rules.
+     */ 
+    this.anonymisationRules = {
+        'default': {action: 'remove', value: null },
+        'PatientName': {action: 'replace', value: 'Anonymized'}, // tag
+        'Meta Element' : {action: 'copy', value: null }, // group 'x0002'
+        'Acquisition' : {action: 'copy', value: null }, // group 'x0018'
+        'Image Presentation' : {action: 'copy', value: null }, // group 'x0028'
+        'Procedure' : {action: 'copy', value: null }, // group 'x0040'
+        'Pixel Data' : {action: 'copy', value: null } // group 'x7fe0'
+    };
+
+    /**
+     * Get the element to write according to the class rules.
+     * Priority order: tagName, groupName, default.
+     * @param {Object} element The element to check
+     * @return {Object} The element to write, can be null.
+     */
     this.getElementToWrite = function (element) {
+        // get group and tag string name
         var tagName = null;
         var dict = dwv.dicom.dictionary;
         var group = element.group;
@@ -3553,60 +3576,67 @@ dwv.dicom.DicomWriter = function (dicomElements) {
         else {
             rule = this.rules['default'];
         }
-        return this.actions[rule.action](element, rule.value);
-    };
-    
-    this.getBuffer = function () {
-        var keys = Object.keys(dicomElements);
-        var element;
-        
-        // calculate buffer size
-        var size = 128 + 4; // DICM
-        for ( var i = 0; i < keys.length; ++i ) {
-            element = this.getElementToWrite(dicomElements[keys[i]]);
-            if ( element !== null ) {
-                if ( element.vr[0] === 'O' || element.vr === "SQ" ) {
-                    size += 4;
-                }
-                size += 8 + parseInt(element.vl, 10);
-            }
-        }
-        console.log("size: "+size);
-
-        // split meta and non meta elements
-        var metaElements = [];
-        var rawElements = [];
-        var groupName;
-        for ( var k = 0; k < keys.length; ++k ) {
-            element = this.getElementToWrite(dicomElements[keys[k]]);
-            if ( element !== null ) {
-                groupName = dwv.dicom.TagGroups[element.group.substr(1)]; // remove first 0
-                if ( groupName === 'Meta Element' ) {
-                    metaElements.push(element);
-                }
-                else {
-                    rawElements.push(element);
-                }
-            }
-        }
-        
-        // create buffer
-        var buffer = new ArrayBuffer(size);
-        var writer = new dwv.dicom.DataWriter(buffer);
-        var offset = 128;
-        // DICM
-        offset = writer.writeString(offset, "DICM");
-        // write meta
-        for ( var l = 0; l < metaElements.length; ++l ) {
-            offset = writer.writeDataElement(metaElements[l], offset);
-        }
-        // write non meta
-        for ( var j = 0; j < rawElements.length; ++j ) {
-            offset = writer.writeDataElement(rawElements[j], offset);
-        }
-        return buffer;
+        // apply action on element and return
+        return actions[rule.action](element, rule.value);
     };
 };
+    
+/**
+ * Get the ArrayBuffer corresponding to input DICOM elements.
+ * @param {Array} dicomElements The wrapped elements to write.
+ * @returns {ArrayBuffer} The elements as a buffer.
+ */
+dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
+    // array keys
+    var keys = Object.keys(dicomElements);
+    
+    // calculate buffer size and split elements (meta and non meta)
+    var size = 128 + 4; // DICM
+    var metaElements = [];
+    var rawElements = [];
+    var element;
+    var groupName;
+    for ( var i = 0, leni = keys.length; i < leni; ++i ) {
+        element = this.getElementToWrite(dicomElements[keys[i]]);
+        if ( element !== null ) {
+            // size
+            if ( element.vr[0] === 'O' || element.vr === "SQ" ) {
+                size += 4;
+            }
+            size += 8 + parseInt(element.vl, 10);
+            
+            // sort element
+            groupName = dwv.dicom.TagGroups[element.group.substr(1)]; // remove first 0
+            if ( groupName === 'Meta Element' ) {
+                metaElements.push(element);
+            }
+            else {
+                rawElements.push(element);
+            }
+        }
+    }
+    
+    console.log("size: "+size);
+
+    // create buffer
+    var buffer = new ArrayBuffer(size);
+    var writer = new dwv.dicom.DataWriter(buffer);
+    var offset = 128;
+    // DICM
+    offset = writer.writeString(offset, "DICM");
+    // write meta
+    for ( var j = 0, lenj = metaElements.length; j < lenj; ++j ) {
+        offset = writer.writeDataElement(metaElements[j], offset);
+    }
+    // write non meta
+    for ( var k = 0, lenk = rawElements.length; k < lenk; ++k ) {
+        offset = writer.writeDataElement(rawElements[k], offset);
+    }
+    
+    // return
+    return buffer;
+};
+
 ;// namespaces
 var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};

@@ -105,7 +105,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="DicomWriter"><span class="type-signature"></span>new DicomWriter(dicomElements)</h4>
+    <h4 class="name" id="DicomWriter"><span class="type-signature"></span>new DicomWriter()</h4>
     
     
 </dt>
@@ -114,6 +114,262 @@
     
     <div class="description">
         DICOM writer.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_dicom_dicomWriter.js.html">src/dicom/dicomWriter.js</a>,
+				 <a href="src_dicom_dicomWriter.js.html#sunlight-1-line-338">line 338</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        <dl>
+            
+<hr>
+<dt class="name" id="anonymisationRules">
+    <h4><span class="type-signature"></span>anonymisationRules<span class="type-signature"></span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Example anonymisation rules.
+    </div>
+    
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_dicom_dicomWriter.js.html">src/dicom/dicomWriter.js</a>,
+				 <a href="src_dicom_dicomWriter.js.html#sunlight-1-line-367">line 367</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id="rules">
+    <h4><span class="type-signature"></span>rules<span class="type-signature"></span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Public (modifiable) rules.
+Set of objects as:
+  name : { action: 'actionName', value: 'optionalValue }
+The names are either 'default', tagName or groupName.
+Each DICOM element will be checked to see if a rule is applicable.
+First checked by tagName and then by groupName, 
+if nothing is found the default rule is applied.
+    </div>
+    
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_dicom_dicomWriter.js.html">src/dicom/dicomWriter.js</a>,
+				 <a href="src_dicom_dicomWriter.js.html#sunlight-1-line-362">line 362</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+            
+<hr>
+<dt>
+    <h4 class="name" id="getBuffer"><span class="type-signature"></span>getBuffer(dicomElements)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get the ArrayBuffer corresponding to input DICOM elements.
     </div>
     
 
@@ -165,7 +421,7 @@
 
             
 
-            <td class="description last">The wrapped elements to wrap.</td>
+            <td class="description last">The wrapped elements to write.</td>
         </tr>
 
     
@@ -210,7 +466,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="src_dicom_dicomWriter.js.html">src/dicom/dicomWriter.js</a>,
-				 <a href="src_dicom_dicomWriter.js.html#sunlight-1-line-339">line 339</a>
+				 <a href="src_dicom_dicomWriter.js.html#sunlight-1-line-416">line 416</a>
 			</li>
 		</ul>
 	</dd>
@@ -235,12 +491,157 @@
     
 
     
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    The elements as a buffer.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">ArrayBuffer</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
 
     
 </dd>
 
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getElementToWrite"><span class="type-signature"></span>getElementToWrite(element)</h4>
     
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get the element to write according to the class rules.
+Priority order: tagName, groupName, default.
     </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>element</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The element to check</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_dicom_dicomWriter.js.html">src/dicom/dicomWriter.js</a>,
+				 <a href="src_dicom_dicomWriter.js.html#sunlight-1-line-383">line 383</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
 
     
 
@@ -253,7 +654,35 @@
     
 
     
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    The element to write, can be null.
+</div>
 
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        </dl>
     
 
     
@@ -301,7 +730,7 @@
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
 	
-		on Wednesday, June 8th 2016
+		on Thursday, June 9th 2016
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>
