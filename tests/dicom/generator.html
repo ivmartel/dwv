@@ -37,6 +37,78 @@ function getGroupElementKey(group, element)
 {
     return 'x' + group.substr(2,6) + element.substr(2,6);
 }
+function setElementValue(element, value) {
+    
+    var size = 0;
+    // value length
+    var vl = 1;
+    
+    if ( element.vr === "SQ") {
+        
+        var elements = {};
+        var name;
+        
+        // sequence elements
+        var sqElement;
+        var keys = Object.keys(value);
+        for ( var i = 0, len = keys.length; i < len; ++i )
+        {
+            sqElement = getDicomElement(keys[i]);
+            size += setElementValue(sqElement, value[keys[i]]);
+            
+            name = getGroupElementKey(sqElement.group, sqElement.element);
+            elements[name] = sqElement;
+        }
+        
+        // item
+        var itemElement =  {
+               element: "0xE000",
+               group: "0xFFFE",
+               vr: "UN",
+               vl: size,
+               value: []
+           };
+        name = getGroupElementKey(itemElement.group, itemElement.element);
+        elements[name] = itemElement;
+        
+        vl = itemElement.vl + 8; 
+        
+        element.value = [elements];
+        element.vl = vl;
+    }
+    else {
+        if (typeof value !== "undefined" && typeof value.length !== "undefined") {
+            vl = value.length;
+        }
+        
+        size = vl + 8;
+
+        if ( element.vr === "US" || element.vr === "OW") {
+            vl *= Uint16Array.BYTES_PER_ELEMENT;
+            size += 4;
+	    }
+	    else if ( element.vr === "SS") {
+	        vl *= Int16Array.BYTES_PER_ELEMENT;
+	    }
+	    else if ( element.vr === "UL") {
+	        vl *= Uint32Array.BYTES_PER_ELEMENT;
+	    }
+	    else if ( element.vr === "SL") {
+	        vl *= Int32Array.BYTES_PER_ELEMENT;
+	    }
+	    else if ( element.vr === "FL") {
+	        vl *= Float32Array.BYTES_PER_ELEMENT;
+	    }
+	    else if ( element.vr === "FD") {
+	        vl *= Float64Array.BYTES_PER_ELEMENT;
+	    }
+        
+        element.value = [value];
+        element.vl = vl;
+    }
+    
+    return size;
+}
 function generate()
 {
     var tags = JSON.parse(document.getElementById('tags').value);
@@ -48,19 +120,9 @@ function generate()
     for ( var i = 0, len = keys.length; i < len; ++i )
     {
         element = getDicomElement(keys[i]);
+        setElementValue(element, tags[keys[i]]);
+        
         name = getGroupElementKey(element.group, element.element);
-        value = tags[keys[i]];
-        var size = 1;
-        if (typeof value === "string") {
-            size = value.length;
-            if (size % 2 !== 0) size += 1;
-        }
-        
-        if (element.vr === "UL") size *= 4;
-        else if (element.vr === "OW" || element.vr === "US") size *= 2;
-        
-        element.vl = size;
-        element.value = [value];
         elements[name] = element;
     }
     
@@ -77,21 +139,16 @@ function generate()
 	        }
 	    }
     }
-    
     elements["x7FE00010"] = {
         element: "0x0010",
         group: "0x7FE0",
         vr: "OW",
-        vl: 2*64*64 + 8,
-        value : pixels
+        vl: 2*64*64 + 12,
+        value: pixels
     };
     
-    console.log(elements);
-    
-    var writer = new dwv.dicom.DicomWriter(elements);
-    writer.rules.default = {'action': 'copy', 'value': null };
-    writer.rules.PatientName = {'action': 'copy', 'value': null };
-    var blob = new Blob([writer.getBuffer()], {type: 'application/dicom'});
+    var writer = new dwv.dicom.DicomWriter();
+    var blob = new Blob([writer.getBuffer(elements)], {type: 'application/dicom'});
     
     var element = document.getElementById("generate");
     element.download = "new.dcm";
@@ -128,7 +185,7 @@ textarea { width:100%; }
 <fieldset>
 <textarea id="tags" rows="20">
 {
-  "FileMetaInformationGroupLength": 38,
+  "FileMetaInformationGroupLength": 28,
   "TransferSyntaxUID": "1.2.840.10008.1.2.1",
   "Modality": "MR",
   "PatientName": "dwv-patient-name",
@@ -139,7 +196,11 @@ textarea { width:100%; }
   "Columns": 64,
   "BitsAllocated": 16,
   "BitsStored": 12,
-  "HighBit": 11
+  "HighBit": 11,
+  "ReferencedImageSequence": { 
+    "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+    "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
+  }
 }
 </textarea>
 <a href="#" id="save" class="button" onclick="saveFile();">Save Config</a>

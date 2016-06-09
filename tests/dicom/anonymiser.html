@@ -19,9 +19,9 @@ function onLoadInputFile(event)
     var parser = new dwv.dicom.DicomParser();
     parser.parse(data);
 
-    var writer = new dwv.dicom.DicomWriter(parser.getRawDicomElements());
-    writer.rules.default = {'action': 'copy', 'value': null };
-    var blob = new Blob([writer.getBuffer()], {type: 'application/dicom'});
+    var writer = new dwv.dicom.DicomWriter();
+    writer.rules = writer.anonymisationRules;
+    var blob = new Blob([writer.getBuffer(parser.getRawDicomElements())], {type: 'application/dicom'});
 
     var element = document.getElementById("download");
     element.href = URL.createObjectURL(blob);
