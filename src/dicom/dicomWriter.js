@@ -247,7 +247,7 @@ dwv.dicom.DataWriter.prototype.writeStringArray = function (byteOffset, array) {
  * @param {Array} value The array to write.
  * @returns {Number} The new offset position.
  */
-dwv.dicom.DataWriter.prototype.writeVR = function (vr, byteOffset, value) {
+dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset, value) {
     // switch according to VR
     if ( vr === "OB") {
         byteOffset = this.writeUint8Array(byteOffset, value);
@@ -310,22 +310,22 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset)
     // element
     byteOffset = this.writeHex(byteOffset, element.element);
     // VR
-    if ( element.vr !== "N/A" ) {
+    if ( element.vr !== "UN" ) {
         byteOffset = this.writeString(byteOffset, element.vr);
     }
-    // VL
-    var isOtherVR = (element.vr[0] === 'O' || element.vr === "SQ" );
-    if ( isOtherVR ) {
+    var is32bitVLVR = dwv.dicom.is32bitVLVR(element.vr);
+    if ( is32bitVLVR ) {
         byteOffset += 2;
     }
-    if ( isOtherVR || element.group === "0xFFFE") {
+    // VL
+    if ( is32bitVLVR || element.group === "0xFFFE") {
         byteOffset = this.writeUint32(byteOffset, element.vl);
     }
     else {
         byteOffset = this.writeUint16(byteOffset, element.vl);
     }
     // value
-    byteOffset = this.writeVR(element.vr, byteOffset, element.value);
+    byteOffset = this.writeDataElementValue(element.vr, byteOffset, element.value);
     
     // return new offset
     return byteOffset;

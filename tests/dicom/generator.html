@@ -3,6 +3,7 @@
 <head>
 <title>DICOM Generator</title>
 <meta charset="UTF-8">
+<script type="text/javascript" src="../../src/dicom/dicomParser.js"></script>
 <script type="text/javascript" src="../../src/dicom/dicomWriter.js"></script>
 <script type="text/javascript" src="../../src/dicom/dictionary.js"></script>
 <script type="text/javascript">
@@ -33,10 +34,6 @@ function getDicomElement(tagName)
      vl: dict[group][element][1]
    }
 }
-function getGroupElementKey(group, element)
-{
-    return 'x' + group.substr(2,6) + element.substr(2,6);
-}
 function setElementValue(element, value) {
     
     var size = 0;
@@ -56,7 +53,7 @@ function setElementValue(element, value) {
             sqElement = getDicomElement(keys[i]);
             size += setElementValue(sqElement, value[keys[i]]);
             
-            name = getGroupElementKey(sqElement.group, sqElement.element);
+            name = dwv.dicom.getGroupElementKey(sqElement.group, sqElement.element);
             elements[name] = sqElement;
         }
         
@@ -68,7 +65,7 @@ function setElementValue(element, value) {
                vl: size,
                value: []
            };
-        name = getGroupElementKey(itemElement.group, itemElement.element);
+        name = dwv.dicom.getGroupElementKey(itemElement.group, itemElement.element);
         elements[name] = itemElement;
         
         vl = itemElement.vl + 8; 
@@ -122,7 +119,7 @@ function generate()
         element = getDicomElement(keys[i]);
         setElementValue(element, tags[keys[i]]);
         
-        name = getGroupElementKey(element.group, element.element);
+        name = dwv.dicom.getGroupElementKey(element.group, element.element);
         elements[name] = element;
     }
     
@@ -151,7 +148,7 @@ function generate()
     var blob = new Blob([writer.getBuffer(elements)], {type: 'application/dicom'});
     
     var element = document.getElementById("generate");
-    element.download = "new.dcm";
+    element.download = "dwv-generated.dcm";
     element.href = URL.createObjectURL(blob);
 }
 function saveFile()

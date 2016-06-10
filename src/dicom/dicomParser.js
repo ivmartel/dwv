@@ -133,9 +133,22 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      * @return {Array} The read data.
      */
     this.readUint16Array = function(byteOffset, size) {
-        var data = new Uint16Array(buffer, byteOffset, (size / 2));
-        if ( needFlip ) {
-            this.flipArrayEndianness(data);
+        var arraySize = size / Uint16Array.BYTES_PER_ELEMENT;
+        var data = null;
+        // byteOffset should be a multiple of Uint16Array.BYTES_PER_ELEMENT (=2)
+        if ( (byteOffset % Uint16Array.BYTES_PER_ELEMENT) === 0 ) {
+            data = new Uint16Array(buffer, byteOffset, arraySize);
+            if ( needFlip ) {
+                this.flipArrayEndianness(data);
+            }
+        }
+        else {
+            data = new Uint16Array(arraySize);
+            for ( var i = 0; i < arraySize; ++i ) {
+                data[i] = view.getInt16(
+                        (byteOffset + Uint16Array.BYTES_PER_ELEMENT * i), 
+                        isLittleEndian);
+            }
         }
         return data;
     };
@@ -146,9 +159,22 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      * @return {Array} The read data.
      */
     this.readInt16Array = function(byteOffset, size) {
-        var data = new Int16Array(buffer, byteOffset, (size / 2));
-        if ( needFlip ) {
-            this.flipArrayEndianness(data);
+        var arraySize = size / Int16Array.BYTES_PER_ELEMENT;
+        var data = null;
+        // byteOffset should be a multiple of Int16Array.BYTES_PER_ELEMENT (=2)
+        if ( (byteOffset % Int16Array.BYTES_PER_ELEMENT) === 0 ) {
+            data = new Int16Array(buffer, byteOffset, arraySize);
+            if ( needFlip ) {
+                this.flipArrayEndianness(data);
+            }
+        }
+        else {
+            data = new Int16Array(arraySize);
+            for ( var i = 0; i < arraySize; ++i ) {
+                data[i] = view.getInt16(
+                        (byteOffset + Int16Array.BYTES_PER_ELEMENT * i),
+                        isLittleEndian);
+            }
         }
         return data;
     };
@@ -159,10 +185,10 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      * @return {Array} The read data.
      */
     this.readUint32Array = function(byteOffset, size) {
-        var arraySize = size / 4;
+        var arraySize = size / Uint32Array.BYTES_PER_ELEMENT;
         var data = null;
-        // start offset of Uint32Array should be a multiple of 4
-        if ( (byteOffset % 4) === 0 ) {
+        // byteOffset should be a multiple of Uint32Array.BYTES_PER_ELEMENT (=4)
+        if ( (byteOffset % Uint32Array.BYTES_PER_ELEMENT) === 0 ) {
             data = new Uint32Array(buffer, byteOffset, arraySize);
             if ( needFlip ) {
                 this.flipArrayEndianness(data);
@@ -171,7 +197,9 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         else {
             data = new Uint32Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
-                data[i] = view.getUint32((byteOffset + 4*i), isLittleEndian);
+                data[i] = view.getUint32(
+                        (byteOffset + Uint32Array.BYTES_PER_ELEMENT * i),
+                        isLittleEndian);
             }
         }
         return data;
@@ -183,10 +211,10 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      * @return {Array} The read data.
      */
     this.readInt32Array = function(byteOffset, size) {
-        var arraySize = size / 4;
+        var arraySize = size / Int32Array.BYTES_PER_ELEMENT;
         var data = null;
-        // start offset of Int32Array should be a multiple of 4
-        if ( (byteOffset % 4) === 0 ) {
+        // byteOffset should be a multiple of Int32Array.BYTES_PER_ELEMENT (=4)
+        if ( (byteOffset % Int32Array.BYTES_PER_ELEMENT) === 0 ) {
             data = new Int32Array(buffer, byteOffset, arraySize);
             if ( needFlip ) {
                 this.flipArrayEndianness(data);
@@ -195,7 +223,9 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         else {
             data = new Int32Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
-                data[i] = view.getInt32((byteOffset + 4*i), isLittleEndian);
+                data[i] = view.getInt32(
+                        (byteOffset + Int32Array.BYTES_PER_ELEMENT * i),
+                        isLittleEndian);
             }
         }
         return data;
@@ -207,10 +237,10 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      * @return {Array} The read data.
      */
     this.readFloat32Array = function(byteOffset, size) {
-        var arraySize = size / 4;
+        var arraySize = size / Float32Array.BYTES_PER_ELEMENT;
         var data = null;
-        // start offset of Float32Array should be a multiple of 4
-        if ( (byteOffset % 4) === 0 ) {
+        // byteOffset should be a multiple of Float32Array.BYTES_PER_ELEMENT (=4)
+        if ( (byteOffset % Float32Array.BYTES_PER_ELEMENT) === 0 ) {
             data = new Float32Array(buffer, byteOffset, arraySize);
             if ( needFlip ) {
                 this.flipArrayEndianness(data);
@@ -219,7 +249,9 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         else {
             data = new Float32Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
-                data[i] = view.getFloat32((byteOffset + 4*i), isLittleEndian);
+                data[i] = view.getFloat32(
+                        (byteOffset + Float32Array.BYTES_PER_ELEMENT * i), 
+                        isLittleEndian);
             }
         }
         return data;
@@ -231,10 +263,10 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      * @return {Array} The read data.
      */
     this.readFloat64Array = function(byteOffset, size) {
-        var arraySize = size / 8;
+        var arraySize = size / Float64Array.BYTES_PER_ELEMENT;
         var data = null;
-        // start offset of Float64Array should be a multiple of 8
-        if ( (byteOffset % 8) === 0 ) {
+        // byteOffset should be a multiple of Float64Array.BYTES_PER_ELEMENT (=8)
+        if ( (byteOffset % Float64Array.BYTES_PER_ELEMENT) === 0 ) {
             data = new Float64Array(buffer, byteOffset, arraySize);
             if ( needFlip ) {
                 this.flipArrayEndianness(data);
@@ -243,7 +275,9 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         else {
             data = new Float64Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
-                data[i] = view.getFloat64((byteOffset + 8*i), isLittleEndian);
+                data[i] = view.getFloat64(
+                        (byteOffset + Float64Array.BYTES_PER_ELEMENT*i),
+                        isLittleEndian);
             }
         }
         return data;
@@ -443,6 +477,22 @@ dwv.dicom.getTransferSyntaxName = function (syntax)
 };
 
 /**
+ * Does this Value Representation (VR) have a 32bit Value Length (VL).
+ * Ref: http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1
+ * @param {String} vr The data Value Representation (VR).
+ */
+dwv.dicom.is32bitVLVR = function (vr)
+{
+    if ( vr === "OB" || vr === "OW" || vr === "OF" ||
+            vr === "SQ" ) { // ||
+            //vr === "UN" ) {
+        return true;
+    }
+    // default
+    return false;
+};
+
+/**
  * DicomParser class.
  * Ref:
  * - http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1
@@ -630,7 +680,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
 
     // (private) Item group case
     if( tag.group === "0xFFFE" ) {
-        vr = "N/A";
+        vr = "UN";
         vrOffset = 0;
         vl = reader.readUint32( offset+tagOffset );
         vlOffset = 4;
@@ -639,7 +689,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     else {
         // implicit VR?
         if(implicit) {
-            vr = "UN";
+            vr = null;
             var dict = dwv.dicom.dictionary;
             if ( typeof dict[tag.group] !== "undefined" &&
                     typeof dict[tag.group][tag.element] !== "undefined" ) {
@@ -731,7 +781,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
         }
     }
     // not available
-    else if( vr === "N/A")
+    else if( vr === "UN")
     {
         data = reader.readUint8Array( dataOffset, vl );
     }
