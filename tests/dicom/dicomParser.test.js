@@ -24,7 +24,7 @@ QUnit.test("Test DICOM parsing.", function (assert) {
     var done = assert.async();
 
     var request = new XMLHttpRequest();
-    var url = "https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/dwv-test-0.dcm";
+    var url = "https://raw.githubusercontent.com/ivmartel/dwv/238-empty-seq/tests/data/dwv-test-0.dcm";
     request.open('GET', url, true);
     request.responseType = "arraybuffer";
     request.onload = function (/*event*/) {
