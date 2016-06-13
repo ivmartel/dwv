@@ -61,8 +61,8 @@ QUnit.test("Test DICOM parsing.", function (assert) {
         assert.equal(tags.getFromKey("x00280010"), 64, "Good key");
         assert.ok(tags.getFromKey("x00280010"), "Good key passes if test" );
         // zero value (passes test since it is a string)
-        assert.equal(tags.getFromKey("x00280103"), 0, "Good key, zero value");
-        assert.ok(tags.getFromKey("x00280103"), "Good key, zero value passes if test" );
+        assert.equal(tags.getFromKey("x00181318"), 0, "Good key, zero value");
+        assert.ok(tags.getFromKey("x00181318"), "Good key, zero value passes if test" );
 
         // check values
         assert.equal(tags.getFromName("Rows"), 64, "Number of rows");
