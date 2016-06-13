@@ -24,7 +24,7 @@ QUnit.test("Test DICOM parsing.", function (assert) {
     var done = assert.async();
 
     var request = new XMLHttpRequest();
-    var url = "http://x.babymri.org/?53320924&.dcm";
+    var url = "https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/dwv-test-0.dcm";
     request.open('GET', url, true);
     request.responseType = "arraybuffer";
     request.onload = function (/*event*/) {
@@ -42,8 +42,8 @@ QUnit.test("Test DICOM parsing.", function (assert) {
         // raw tags
         var rawTags = dicomParser.getRawDicomElements();
         // check values
-        assert.equal(rawTags.x00280010.value[0], 256, "Number of rows (raw)");
-        assert.equal(rawTags.x00280011.value[0], 256, "Number of columns (raw)");
+        assert.equal(rawTags.x00280010.value[0], 64, "Number of rows (raw)");
+        assert.equal(rawTags.x00280011.value[0], 64, "Number of columns (raw)");
         // ReferencedImageSequence - ReferencedSOPInstanceUID
         assert.equal(rawTags.x00081140.value[0].x00081155.value[0],
             "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094",
@@ -58,15 +58,15 @@ QUnit.test("Test DICOM parsing.", function (assert) {
         assert.equal(tags.getFromKey("x00081050"), "", "Empty key");
         assert.notOk(tags.getFromKey("x00081050"), "Empty key fails if test" );
         // good key
-        assert.equal(tags.getFromKey("x00280010"), 256, "Good key");
+        assert.equal(tags.getFromKey("x00280010"), 64, "Good key");
         assert.ok(tags.getFromKey("x00280010"), "Good key passes if test" );
         // zero value (passes test since it is a string)
-        assert.equal(tags.getFromKey("x00181318"), 0, "Good key, zero value");
-        assert.ok(tags.getFromKey("x00181318"), "Good key, zero value passes if test" );
+        assert.equal(tags.getFromKey("x00280103"), 0, "Good key, zero value");
+        assert.ok(tags.getFromKey("x00280103"), "Good key, zero value passes if test" );
 
         // check values
-        assert.equal(tags.getFromName("Rows"), 256, "Number of rows");
-        assert.equal(tags.getFromName("Columns"), 256, "Number of columns");
+        assert.equal(tags.getFromName("Rows"), 64, "Number of rows");
+        assert.equal(tags.getFromName("Columns"), 64, "Number of columns");
         // ReferencedImageSequence - ReferencedSOPInstanceUID
         assert.equal(tags.getFromName("ReferencedImageSequence")[0].x00081155.value[0],
             "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094",
