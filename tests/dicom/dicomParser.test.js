@@ -68,7 +68,9 @@ QUnit.test("Test DICOM parsing.", function (assert) {
         assert.equal(tags.getFromName("Rows"), 64, "Number of rows");
         assert.equal(tags.getFromName("Columns"), 64, "Number of columns");
         // ReferencedImageSequence - ReferencedSOPInstanceUID
-        assert.equal(tags.getFromName("ReferencedImageSequence")[0].x00081155.value[0],
+        // only one item value -> returns the object directly
+        // (no need for tags.getFromName("ReferencedImageSequence")[0])
+        assert.equal(tags.getFromName("ReferencedImageSequence").x00081155.value[0],
             "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094",
             "ReferencedImageSequence SQ");
 
