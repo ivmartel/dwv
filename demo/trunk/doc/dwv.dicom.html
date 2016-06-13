@@ -440,6 +440,108 @@ Local changes:
             
 <hr>
 <dt>
+    <h4 class="name" id=".getDataElementPrefixByteSize"><span class="type-signature">&lt;static> </span>getDataElementPrefixByteSize()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get the number of bytes occupied by a data element prefix, i.e. without its value.
+WARNING: this is valid for tags with a VR, if not sure use the 'isTagWithVR' function first.
+Reference:
+- http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1
+- http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_7.5.html#table_7.5-1
+
+| Tag | VR  | VL | Value |
+| 4   | 2   | 2  | X     | -> regular explicit: 8 + X
+| 4   | 2+2 | 4  | X     | -> 32bit VL: 12 + X
+
+| Tag | VL | Value |
+| 4   | 4  | X     | -> implicit (32bit VL): 8 + X
+
+| Tag | Len | Value |
+| 4   | 4   | X     | -> item: 8 + X
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_dicom_dicomParser.js.html">src/dicom/dicomParser.js</a>,
+				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-522">line 522</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
     <h4 class="name" id=".getGroupElementKey"><span class="type-signature">&lt;static> </span>getGroupElementKey(group, element)</h4>
     
     
@@ -1056,7 +1158,7 @@ Ref: http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7
 		<ul class="dummy">
 			<li>
 				<a href="src_dicom_dicomParser.js.html">src/dicom/dicomParser.js</a>,
-				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-484">line 484</a>
+				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-485">line 485</a>
 			</li>
 		</ul>
 	</dd>
@@ -1081,6 +1183,30 @@ Ref: http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7
     
 
     
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    True if this VR has a 32-bit VL.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
 
     
 </dd>
@@ -1987,6 +2113,193 @@ Ref: http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7
             
 <hr>
 <dt>
+    <h4 class="name" id=".isTagWithVR"><span class="type-signature">&lt;static> </span>isTagWithVR(group, element)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Does this tag have a VR. 
+Basically the Item, ItemDelimitationItem and SequenceDelimitationItem tags.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>group</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The tag group.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>element</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The tag element.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_dicom_dicomParser.js.html">src/dicom/dicomParser.js</a>,
+				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-499">line 499</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    True if this tar has a VR.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
     <h4 class="name" id=".splitGroupElementKey"><span class="type-signature">&lt;static> </span>splitGroupElementKey(key)</h4>
     
     
@@ -2187,7 +2500,7 @@ Ref: http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
 	
-		on Friday, June 10th 2016
+		on Monday, June 13th 2016
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>
