@@ -305,20 +305,22 @@ dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset,
  * @returns {Number} The new offset position.
  */
 dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset) {
+    var isTagWithVR = dwv.dicom.isTagWithVR(element.group, element.element);
+    var is32bitVLVR = dwv.dicom.is32bitVLVR(element.vr);
     // group
     byteOffset = this.writeHex(byteOffset, element.group);
     // element
     byteOffset = this.writeHex(byteOffset, element.element);
     // VR
-    if ( element.vr !== "UN" ) {
+    if ( isTagWithVR ) {
         byteOffset = this.writeString(byteOffset, element.vr);
-    }
-    var is32bitVLVR = dwv.dicom.is32bitVLVR(element.vr);
-    if ( is32bitVLVR ) {
-        byteOffset += 2;
+        // reserved 2 bytes for 32bit VL
+        if ( is32bitVLVR ) {
+            byteOffset += 2;
+        }
     }
     // VL
-    if ( is32bitVLVR || element.group === "0xFFFE") {
+    if ( is32bitVLVR || !isTagWithVR ) {
         byteOffset = this.writeUint32(byteOffset, element.vl);
     }
     else {

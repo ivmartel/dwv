@@ -42,35 +42,42 @@ function setElementValue(element, value) {
     
     if ( element.vr === "SQ") {
         
-        var elements = {};
-        var name;
-        
-        // sequence elements
-        var sqElement;
-        var keys = Object.keys(value);
-        for ( var i = 0, len = keys.length; i < len; ++i )
-        {
-            sqElement = getDicomElement(keys[i]);
-            size += setElementValue(sqElement, value[keys[i]]);
-            
-            name = dwv.dicom.getGroupElementKey(sqElement.group, sqElement.element);
-            elements[name] = sqElement;
+        // default vl
+        vl = 0;
+        element.value = {};
+
+        if ( value !== null ) {
+	        var elements = {};
+	        var name;
+	        
+	        // sequence elements
+	        var sqElement;
+	        var keys = Object.keys(value);
+	        for ( var i = 0, len = keys.length; i < len; ++i )
+	        {
+	            sqElement = getDicomElement(keys[i]);
+	            size += setElementValue(sqElement, value[keys[i]]);
+	            
+	            name = dwv.dicom.getGroupElementKey(sqElement.group, sqElement.element);
+	            elements[name] = sqElement;
+	        }
+	        
+	        // item
+	        var itemElement =  {
+	               element: "0xE000",
+	               group: "0xFFFE",
+	               vr: "NONE",
+	               vl: size,
+	               value: []
+	           };
+	        name = dwv.dicom.getGroupElementKey(itemElement.group, itemElement.element);
+	        elements[name] = itemElement;
+	        
+	        // add the size of item
+	        vl = itemElement.vl + dwv.dicom.getDataElementPrefixByteSize("NONE"); 
+	        element.value = [elements];
         }
         
-        // item
-        var itemElement =  {
-               element: "0xE000",
-               group: "0xFFFE",
-               vr: "UN",
-               vl: size,
-               value: []
-           };
-        name = dwv.dicom.getGroupElementKey(itemElement.group, itemElement.element);
-        elements[name] = itemElement;
-        
-        vl = itemElement.vl + 8; 
-        
-        element.value = [elements];
         element.vl = vl;
     }
     else {
@@ -78,11 +85,10 @@ function setElementValue(element, value) {
             vl = value.length;
         }
         
-        size = vl + 8;
+        size = vl + dwv.dicom.getDataElementPrefixByteSize(element.vr);
 
         if ( element.vr === "US" || element.vr === "OW") {
             vl *= Uint16Array.BYTES_PER_ELEMENT;
-            size += 4;
 	    }
 	    else if ( element.vr === "SS") {
 	        vl *= Int16Array.BYTES_PER_ELEMENT;
@@ -124,23 +130,26 @@ function generate()
     }
     
     // pixels
-    var pixels = new Array(64*64);
-    pixels.fill(0);
-    var center = 64/2;
-    for ( var j = 0; j < 64; ++j ) {
-        var jc = Math.abs(j-center);
-	    for ( var i = 0; i < 64; ++i ) {
-	        var ic = Math.abs(i-center);
+    var numberOfRows = ( typeof tags.Rows === 'undefined' ) ? 64 : tags.Rows;
+    var numberOfColumns = ( typeof tags.Columns === 'undefined' ) ? 64 : tags.Columns;
+    var pixels = new Uint16Array(numberOfRows*numberOfColumns);
+    pixels.fill(100);
+    for ( var j = 0; j < numberOfRows; ++j ) {
+        var jc = Math.abs( j - (numberOfRows/2) );
+	    for ( var i = 0; i < numberOfColumns; ++i ) {
+	        var ic = Math.abs( i - (numberOfColumns/2) );
 	        if ( jc < 10 && ic < 10) {
-	            pixels[64*j + i] = i * j;
+	            pixels[numberOfColumns*j + i] = i * j;
 	        }
 	    }
     }
+    var pixVL = dwv.dicom.getDataElementPrefixByteSize("OW") +
+       (Uint16Array.BYTES_PER_ELEMENT * numberOfRows * numberOfColumns);
     elements["x7FE00010"] = {
         element: "0x0010",
         group: "0x7FE0",
         vr: "OW",
-        vl: 2*64*64 + 12,
+        vl: pixVL,
         value: pixels
     };
     
@@ -177,6 +186,13 @@ textarea { width:100%; }
 <body>
 
 <h1>DICOM Generator</h1>
+
+<p>Simple DICOM data generator from json tags. 
+Mainly used for generating test data, <b>use at your own risks!</b>
+
+Only tested with explicit data (transfer syntax: <code>1.2.840.10008.1.2.1</code>). 
+Sequences can have a <code>null</code> value.
+</p>
 
 <form name="genform">
 <fieldset>

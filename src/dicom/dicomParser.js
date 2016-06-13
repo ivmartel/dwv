@@ -480,23 +480,51 @@ dwv.dicom.getTransferSyntaxName = function (syntax)
  * Does this Value Representation (VR) have a 32bit Value Length (VL).
  * Ref: http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1
  * @param {String} vr The data Value Representation (VR).
+ * @returns {Boolean} True if this VR has a 32-bit VL.
  */
 dwv.dicom.is32bitVLVR = function (vr)
 {
-    if ( vr === "OB" || vr === "OW" || vr === "OF" ||
-            vr === "SQ" ) { // ||
-            //vr === "UN" ) {
-        return true;
-    }
-    // default
-    return false;
+    // added locally used 'ox'
+    return ( vr === "OB" || vr === "OW" || vr === "OF" || vr === "ox" ||
+            vr === "SQ" || vr === "UN" );
+};
+
+/**
+ * Does this tag have a VR. 
+ * Basically the Item, ItemDelimitationItem and SequenceDelimitationItem tags.
+ * @param {String} group The tag group.
+ * @param {String} element The tag element.
+ * @returns {Boolean} True if this tar has a VR.
+ */
+dwv.dicom.isTagWithVR = function (group, element) {
+    return !(group === "0xFFFE" &&
+            (element === "0xE000" || element === "0xE00D" || element === "0xE0DD" ));
+};
+
+
+/**
+ * Get the number of bytes occupied by a data element prefix, i.e. without its value.
+ * WARNING: this is valid for tags with a VR, if not sure use the 'isTagWithVR' function first.
+ * Reference:
+ * - http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1
+ * - http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_7.5.html#table_7.5-1
+ *
+ * | Tag | VR  | VL | Value |
+ * | 4   | 2   | 2  | X     | -> regular explicit: 8 + X
+ * | 4   | 2+2 | 4  | X     | -> 32bit VL: 12 + X
+ * 
+ * | Tag | VL | Value |
+ * | 4   | 4  | X     | -> implicit (32bit VL): 8 + X
+ * 
+ * | Tag | Len | Value |
+ * | 4   | 4   | X     | -> item: 8 + X
+ */
+dwv.dicom.getDataElementPrefixByteSize = function (vr) {
+    return dwv.dicom.is32bitVLVR(vr) ? 12 : 8;
 };
 
 /**
  * DicomParser class.
- * Ref:
- * - http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1
- * - http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_7.5.html#table_7.5-1
  * @constructor
  */
 dwv.dicom.DicomParser = function()
@@ -660,6 +688,7 @@ dwv.dicom.DicomParser.prototype.readTag = function(reader, offset)
 
 /**
  * Read a DICOM data element.
+ * Reference: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#table_6.2-1
  * @param reader The raw data reader.
  * @param offset The offset where to start to read.
  * @param implicit Is the DICOM VR implicit?
