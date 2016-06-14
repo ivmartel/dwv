@@ -229,11 +229,11 @@ textarea { width:100%; }
 Mainly used for generating test data, <b>use at your own risks!</b>
 
 Only tested with explicit data (transfer syntax: <code>1.2.840.10008.1.2.1</code>). 
+Values should not be <code>null</code>...
 <br>Sequences have an optional <code>explicitLength</code> boolean parameter to write them 
-and all their elements with 
-implicit or explicit length. Set as <code>{}</code>, a sequence will
-be written with explicit zero length, a <code>null</code> or <code>0</code> 
-value will mean implicit length.
+and all their elements with implicit or explicit length. Its default value is <code>true</code>.
+Set as <code>{}</code>, a sequence will
+be written with explicit zero length, a <code>0</code> value will mean implicit length.
 </p>
 
 <form name="genform">
