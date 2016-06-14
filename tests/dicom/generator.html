@@ -44,38 +44,76 @@ function setElementValue(element, value) {
         
         // default vl
         vl = 0;
-        element.value = {};
+        element.value = value;
 
-        if ( value !== null ) {
-	        var elements = {};
+        if ( value !== null && value !== 0 ) {
+	        var sqItems = [];
 	        var name;
 	        
-	        // sequence elements
-	        var sqElement;
-	        var keys = Object.keys(value);
-	        for ( var i = 0, len = keys.length; i < len; ++i )
-	        {
-	            sqElement = getDicomElement(keys[i]);
-	            size += setElementValue(sqElement, value[keys[i]]);
-	            
-	            name = dwv.dicom.getGroupElementKey(sqElement.group, sqElement.element);
-	            elements[name] = sqElement;
+	        // explicit or implicit length
+	        var explicitLength = true;
+	        if ( typeof value.explicitLength !== "undefined" ) {
+	            explicitLength = value.explicitLength;
+	            delete value.explicitLength;
 	        }
 	        
-	        // item
-	        var itemElement =  {
-	               element: "0xE000",
-	               group: "0xFFFE",
-	               vr: "NONE",
-	               vl: size,
-	               value: []
-	           };
-	        name = dwv.dicom.getGroupElementKey(itemElement.group, itemElement.element);
-	        elements[name] = itemElement;
+            // items
+	        var itemData;
+	        var itemKeys = Object.keys(value);
+	        for ( var i = 0, leni = itemKeys.length; i < leni; ++i )
+	        {
+                var itemElements = {};
+	            var subSize = 0;
+	            var subVL = 0;
+	            itemData = value[itemKeys[i]];
+	            
+	            // elements
+	            var subElement;
+	            var elemKeys = Object.keys(itemData);
+	            for ( var j = 0, lenj = elemKeys.length; j < lenj; ++j )
+	            {
+	                subElement = getDicomElement(elemKeys[j]);
+	                subSize += setElementValue(subElement, itemData[elemKeys[j]]);
+		            
+		            name = dwv.dicom.getGroupElementKey(subElement.group, subElement.element);
+		            itemElements[name] = subElement;
+	            }
+	            
+	            // sequence vl 
+	            // (stored to calculate size at writing time and then replaced with 0xffffffff)
+	            subVL = subSize + dwv.dicom.getDataElementPrefixByteSize("NONE"); 
+
+	            // item (after elements to get the size)
+	            var itemElement = {
+	                   element: "0xE000",
+	                   group: "0xFFFE",
+	                   vr: "NONE",
+	                   vl: (explicitLength ? subSize : 0xffffffff),
+	                   value: []
+	               };
+	            name = dwv.dicom.getGroupElementKey(itemElement.group, itemElement.element);
+	            itemElements[name] = itemElement;
+
+	            // item delimitation
+	            if (!explicitLength) {
+	                var itemDelimElement = {
+	                        element: "0xE00D",
+	                        group: "0xFFFE",
+	                        vr: "NONE",
+	                        vl: 0,
+	                        value: []  
+	                    };
+	                name = dwv.dicom.getGroupElementKey(itemDelimElement.group, itemDelimElement.element);
+	                itemElements[name] = itemDelimElement;
+	                subVL += dwv.dicom.getDataElementPrefixByteSize("NONE"); 
+	            }
+	            
+	            size += subSize;
+	            vl += subVL;
+	            sqItems.push(itemElements);
+	        }
 	        
-	        // add the size of item
-	        vl = itemElement.vl + dwv.dicom.getDataElementPrefixByteSize("NONE"); 
-	        element.value = [elements];
+	        element.value = sqItems;
         }
         
         element.vl = vl;
@@ -191,12 +229,16 @@ textarea { width:100%; }
 Mainly used for generating test data, <b>use at your own risks!</b>
 
 Only tested with explicit data (transfer syntax: <code>1.2.840.10008.1.2.1</code>). 
-Sequences can have a <code>null</code> value.
+<br>Sequences have an optional <code>explicitLength</code> boolean parameter to write them 
+and all their elements with 
+implicit or explicit length. Set as <code>{}</code>, a sequence will
+be written with explicit zero length, a <code>null</code> or <code>0</code> 
+value will mean implicit length.
 </p>
 
 <form name="genform">
 <fieldset>
-<textarea id="tags" rows="20">
+<textarea id="tags" rows="30">
 {
   "FileMetaInformationGroupLength": 28,
   "TransferSyntaxUID": "1.2.840.10008.1.2.1",
@@ -213,8 +255,15 @@ Sequences can have a <code>null</code> value.
   "BitsStored": 12,
   "HighBit": 11,
   "ReferencedImageSequence": { 
-    "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-    "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
+    "explicitLength": false,
+    "item0": {
+      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+      "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
+    },
+    "item1": {
+      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+      "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
+    }
   }
 }
 </textarea>
