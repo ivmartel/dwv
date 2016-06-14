@@ -3536,9 +3536,15 @@ dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset,
             byteOffset = this.writeDataElement(itemElement, byteOffset);
             // write rest
             for ( var m = 0; m < itemKeys.length; ++m ) {
-                if ( itemKeys[m] !== "xFFFEE000" ) {
+                if ( itemKeys[m] !== "xFFFEE000" && itemKeys[m] !== "xFFFEE00D") {
                     byteOffset = this.writeDataElement(item[itemKeys[m]], byteOffset);
                 }
+            }
+            // item delimitation
+            if (typeof item.xFFFEE00D !== "undefined") {
+                var itemDelimElement = item.xFFFEE00D;
+                itemDelimElement.value = [];
+                byteOffset = this.writeDataElement(itemDelimElement, byteOffset);
             }
         }
     }
@@ -3580,9 +3586,35 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset)
     }
     // value
     byteOffset = this.writeDataElementValue(element.vr, byteOffset, element.value);
-    
+
+    // sequence delimitation item for sequence with implicit length
+    if ( dwv.dicom.isImplicitLengthSequence(element) ) {
+        var seqDelimElement = {
+                element: "0xE0DD",
+                group: "0xFFFE",
+                vr: "NONE",
+                vl: 0,
+                value: []
+            };
+        byteOffset = this.writeDataElement(seqDelimElement, byteOffset);
+    }
+
     // return new offset
     return byteOffset;
+};
+
+/**
+ * Is this element an implicit length sequence?
+ * @param {Object} element The element to check.
+ * @returns {Boolean} True if it is.
+ */
+dwv.dicom.isImplicitLengthSequence = function (element) {
+    return (element.vr === "SQ" && 
+        typeof element.value !== "undefined" &&
+        ( ( Object.keys(element.value).length !== 0 &&
+                typeof element.value[0] !== "undefined" &&
+                typeof element.value[0].xFFFEE00D !== "undefined" ) ||
+        ( element.value === 0 ) ) );
 };
 
 /**
@@ -3681,10 +3713,15 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
         element = this.getElementToWrite(dicomElements[keys[i]]);
         if ( element !== null ) {
             // size
-            if ( element.vr[0] === 'O' || element.vr === "SQ" ) {
-                size += 4;
+            size += dwv.dicom.getDataElementPrefixByteSize(element.vr) + parseInt(element.vl, 10);
+            
+            // update vl and size for sequence with implicit length
+            if ( dwv.dicom.isImplicitLengthSequence(element) ) {
+                // implicit length
+                element.vl = 0xffffffff;
+                // add size of sequence delimitation item
+                size += dwv.dicom.getDataElementPrefixByteSize("NONE");
             }
-            size += 8 + parseInt(element.vl, 10);
             
             // sort element
             groupName = dwv.dicom.TagGroups[element.group.substr(1)]; // remove first 0
