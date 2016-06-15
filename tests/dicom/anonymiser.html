@@ -45,6 +45,14 @@ function onInputFile(event)
 </script>
 <style>
 body { font-family: Arial; }
+.button {
+    background: #E3E3E3;
+    padding: 3px;
+    text-align: center;
+    border-radius: 3px;
+    color: black;
+    text-decoration : none;
+}
 </style>
 
 </head>
@@ -53,7 +61,7 @@ body { font-family: Arial; }
 
 <h1>DICOM Anonymiser</h1>
 <input id="infile" type="file" name="file" onchange="onInputFile(event);">
-<br><br><a href="#" id="download">download</a>
+<br><br><a href="#" class="button" id="download">Download</a>
 
 </body>
 </html>
