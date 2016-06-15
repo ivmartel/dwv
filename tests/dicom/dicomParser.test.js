@@ -8,23 +8,15 @@ QUnit.module("dicomParser");
 
 /**
  * Tests for {@link dwv.dicom.DicomParser}.
+ * Using remote file for CI integration.
  * @function module:tests/dicom~dicomParser
  */
 QUnit.test("Test DICOM parsing.", function (assert) {
-    // Local file: forbidden...
-    // parse the DICOM file
-    /*var reader = new FileReader();
-    reader.onload = function(event) {
-        // parse DICOM file
-        var data = dwv.image.getDataFromDicomBuffer(event.target.result);
-    };
-    var file = new File("cta.dcm");
-    reader.readAsArrayBuffer(file);*/
-
     var done = assert.async();
 
     var request = new XMLHttpRequest();
-    var url = "https://raw.githubusercontent.com/ivmartel/dwv/238-empty-seq/tests/data/dwv-test-0.dcm";
+    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/238-empty-seq";
+    var url = urlRoot + "/tests/data/dwv-test-basic.dcm";
     request.open('GET', url, true);
     request.responseType = "arraybuffer";
     request.onload = function (/*event*/) {
@@ -39,11 +31,14 @@ QUnit.test("Test DICOM parsing.", function (assert) {
         var dicomParser = new dwv.dicom.DicomParser();
         dicomParser.parse(this.response);
 
+        var numRows = 32;
+        var numCols = 32;
+        
         // raw tags
         var rawTags = dicomParser.getRawDicomElements();
         // check values
-        assert.equal(rawTags.x00280010.value[0], 64, "Number of rows (raw)");
-        assert.equal(rawTags.x00280011.value[0], 64, "Number of columns (raw)");
+        assert.equal(rawTags.x00280010.value[0], numRows, "Number of rows (raw)");
+        assert.equal(rawTags.x00280011.value[0], numCols, "Number of columns (raw)");
         // ReferencedImageSequence - ReferencedSOPInstanceUID
         assert.equal(rawTags.x00081140.value[0].x00081155.value[0],
             "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094",
@@ -58,15 +53,15 @@ QUnit.test("Test DICOM parsing.", function (assert) {
         assert.equal(tags.getFromKey("x00081050"), "", "Empty key");
         assert.notOk(tags.getFromKey("x00081050"), "Empty key fails if test" );
         // good key
-        assert.equal(tags.getFromKey("x00280010"), 64, "Good key");
+        assert.equal(tags.getFromKey("x00280010"), numRows, "Good key");
         assert.ok(tags.getFromKey("x00280010"), "Good key passes if test" );
         // zero value (passes test since it is a string)
         assert.equal(tags.getFromKey("x00181318"), 0, "Good key, zero value");
         assert.ok(tags.getFromKey("x00181318"), "Good key, zero value passes if test" );
 
         // check values
-        assert.equal(tags.getFromName("Rows"), 64, "Number of rows");
-        assert.equal(tags.getFromName("Columns"), 64, "Number of columns");
+        assert.equal(tags.getFromName("Rows"), numRows, "Number of rows");
+        assert.equal(tags.getFromName("Columns"), numCols, "Number of columns");
         // ReferencedImageSequence - ReferencedSOPInstanceUID
         // only one item value -> returns the object directly
         // (no need for tags.getFromName("ReferencedImageSequence")[0])
