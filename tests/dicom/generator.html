@@ -37,13 +37,10 @@ function getDicomElement(tagName)
 function setElementValue(element, value) {
     
     var size = 0;
-    // value length
-    var vl = 1;
     
     if ( element.vr === "SQ") {
         
-        // default vl
-        vl = 0;
+        // set the value
         element.value = value;
 
         if ( value !== null && value !== 0 ) {
@@ -64,7 +61,6 @@ function setElementValue(element, value) {
 	        {
                 var itemElements = {};
 	            var subSize = 0;
-	            var subVL = 0;
 	            itemData = value[itemKeys[i]];
 	            
 	            // elements
@@ -75,14 +71,15 @@ function setElementValue(element, value) {
 	                subElement = getDicomElement(elemKeys[j]);
 	                subSize += setElementValue(subElement, itemData[elemKeys[j]]);
 		            
+	                // add sequence delimitation size for sub sequences
+	                if (dwv.dicom.isImplicitLengthSequence(subElement)) {
+	                    subSize += dwv.dicom.getDataElementPrefixByteSize("NONE"); 
+	                }
+	                
 		            name = dwv.dicom.getGroupElementKey(subElement.group, subElement.element);
 		            itemElements[name] = subElement;
 	            }
 	            
-	            // sequence vl 
-	            // (stored to calculate size at writing time and then replaced with 0xffffffff)
-	            subVL = subSize + dwv.dicom.getDataElementPrefixByteSize("NONE"); 
-
 	            // item (after elements to get the size)
 	            var itemElement = {
 	                   element: "0xE000",
@@ -93,6 +90,7 @@ function setElementValue(element, value) {
 	               };
 	            name = dwv.dicom.getGroupElementKey(itemElement.group, itemElement.element);
 	            itemElements[name] = itemElement;
+                subSize += dwv.dicom.getDataElementPrefixByteSize("NONE"); 
 
 	            // item delimitation
 	            if (!explicitLength) {
@@ -105,50 +103,50 @@ function setElementValue(element, value) {
 	                    };
 	                name = dwv.dicom.getGroupElementKey(itemDelimElement.group, itemDelimElement.element);
 	                itemElements[name] = itemDelimElement;
-	                subVL += dwv.dicom.getDataElementPrefixByteSize("NONE"); 
+	                subSize += dwv.dicom.getDataElementPrefixByteSize("NONE"); 
 	            }
 	            
 	            size += subSize;
-	            vl += subVL;
 	            sqItems.push(itemElements);
 	        }
 	        
 	        element.value = sqItems;
         }
         
-        element.vl = vl;
+        element.vl = size;
     }
     else {
+        // set the value
+        element.value = [value];
+        // calculate the size
+        size = 1;
         if (typeof value !== "undefined" && typeof value.length !== "undefined") {
-            vl = value.length;
+            size = value.length;
         }
-        
-        size = vl + dwv.dicom.getDataElementPrefixByteSize(element.vr);
-
+        // convert VL to bytes
         if ( element.vr === "US" || element.vr === "OW") {
-            vl *= Uint16Array.BYTES_PER_ELEMENT;
+            size *= Uint16Array.BYTES_PER_ELEMENT;
 	    }
 	    else if ( element.vr === "SS") {
-	        vl *= Int16Array.BYTES_PER_ELEMENT;
+	        size *= Int16Array.BYTES_PER_ELEMENT;
 	    }
 	    else if ( element.vr === "UL") {
-	        vl *= Uint32Array.BYTES_PER_ELEMENT;
+	        size *= Uint32Array.BYTES_PER_ELEMENT;
 	    }
 	    else if ( element.vr === "SL") {
-	        vl *= Int32Array.BYTES_PER_ELEMENT;
+	        size *= Int32Array.BYTES_PER_ELEMENT;
 	    }
 	    else if ( element.vr === "FL") {
-	        vl *= Float32Array.BYTES_PER_ELEMENT;
+	        size *= Float32Array.BYTES_PER_ELEMENT;
 	    }
 	    else if ( element.vr === "FD") {
-	        vl *= Float64Array.BYTES_PER_ELEMENT;
+	        size *= Float64Array.BYTES_PER_ELEMENT;
 	    }
-        
-        element.value = [value];
-        element.vl = vl;
+        element.vl = size;
     }
     
-    return size;
+    // return the size plus the prefix byte size
+    return (size + dwv.dicom.getDataElementPrefixByteSize(element.vr));
 }
 function generate()
 {
@@ -200,12 +198,31 @@ function generate()
 }
 function saveFile()
 {
-    var tags = JSON.stringify(JSON.parse(document.getElementById('tags').value));
+    var text = document.getElementById('tags').value;
+    var textToSaveAsBlob = new Blob([text], {type:"text/plain"});
+    var textToSaveAsURL = window.URL.createObjectURL(textToSaveAsBlob);
     
     var element = document.getElementById("save");
     element.download = "tags.json";
-    element.href = "data:application/json," + tags;
+    element.href = textToSaveAsURL;
 }
+function validate()
+{
+    var text = document.getElementById('tags').value;
+    var link = "http://jsonlint.com/?json=" + encodeURIComponent(text);
+    window.open(link);
+}
+function onInputFile(event)
+{
+    var files = event.target.files;
+    var reader = new FileReader();
+    reader.onload = function (event) {
+        var text = event.target.result;
+        document.getElementById('tags').value = text;
+    };
+    reader.readAsText(files[0]);
+}
+
 </script>
 <style>
 body { font-family: Arial; }
@@ -236,9 +253,13 @@ Set as <code>{}</code>, a sequence will
 be written with explicit zero length, a <code>0</code> value will mean implicit length.
 </p>
 
+<input id="infile" type="file" name="file" onchange="onInputFile(event);">
+
+<br>&nbsp;
+
 <form name="genform">
 <fieldset>
-<textarea id="tags" rows="30">
+<textarea id="tags" rows="25">
 {
   "FileMetaInformationGroupLength": 28,
   "TransferSyntaxUID": "1.2.840.10008.1.2.1",
@@ -255,18 +276,25 @@ be written with explicit zero length, a <code>0</code> value will mean implicit 
   "BitsStored": 12,
   "HighBit": 11,
   "ReferencedImageSequence": { 
-    "explicitLength": false,
+    "explicitLength": true,
     "item0": {
       "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
       "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
     },
     "item1": {
       "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
-      "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
+      "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
+    }
+  },
+  "RelatedSeriesSequence": {
+    "item0": {
+      "StudyInstanceUID": "1.2.276.0.76.3.1.73.1.1.445244141.1562",
+      "PurposeOfReferenceCodeSequence": {}
     }
   }
 }
 </textarea>
+<a href="#" id="validate" class="button" onclick="validate();">Validate</a>
 <a href="#" id="save" class="button" onclick="saveFile();">Save Config</a>
 <a href="#" id="generate" class="button" onclick="generate();">Generate</a>
 </fieldset>

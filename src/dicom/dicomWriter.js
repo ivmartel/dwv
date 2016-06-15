@@ -325,6 +325,10 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset)
             byteOffset += 2;
         }
     }
+    // update vl for sequence with implicit length
+    if ( dwv.dicom.isImplicitLengthSequence(element) ) {
+        element.vl = 0xffffffff;
+    }
     // VL
     if ( is32bitVLVR || !isTagWithVR ) {
         byteOffset = this.writeUint32(byteOffset, element.vl);
@@ -376,7 +380,11 @@ dwv.dicom.DicomWriter = function () {
         'copy': function (item) { return item; },
         'remove': function () { return null; },
         'clear': function (item) { item.value[0] = ""; return item; },
-        'replace': function (item, value) { item.value[0] = value; item.vl = value.length; return item; }
+        'replace': function (item, value) { 
+            item.value[0] = value; 
+            item.vl = value.length; 
+            return item;
+        }
     };
 
     // default rules: just copy
@@ -463,11 +471,8 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
             // size
             size += dwv.dicom.getDataElementPrefixByteSize(element.vr) + parseInt(element.vl, 10);
             
-            // update vl and size for sequence with implicit length
+            // add size of sequence delimitation item
             if ( dwv.dicom.isImplicitLengthSequence(element) ) {
-                // implicit length
-                element.vl = 0xffffffff;
-                // add size of sequence delimitation item
                 size += dwv.dicom.getDataElementPrefixByteSize("NONE");
             }
             
