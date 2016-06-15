@@ -1,0 +1,72 @@
+{
+  "FileMetaInformationGroupLength": 28,
+  "TransferSyntaxUID": "1.2.840.10008.1.2.1",
+  "Modality": "MR",
+  "PatientName": "dwv-patient-name",
+  "PerformingPhysicianName": "",
+  "dBdt": "0",
+  "PhotometricInterpretation": "MONOCHROME2",
+  "SamplesPerPixel": 1,
+  "PixelRepresentation": 0,
+  "Rows": 32,
+  "Columns": 32,
+  "BitsAllocated": 16,
+  "BitsStored": 12,
+  "HighBit": 11,
+  "ReferencedImageSequence": { 
+    "explicitLength": true,
+    "item0": {
+      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+      "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
+    },
+    "item1": {
+      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+      "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
+    }
+  },
+  "SourceImageSequence": { 
+    "explicitLength": false,
+    "item0": {
+      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+      "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
+    },
+    "item1": {
+      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+      "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
+    }
+  },
+  "ReferencedPatientSequence": {},
+  "ReferencedVisitSequence": 0,
+  "ReferencedStudySequence": {
+    "explicitLength": true,
+    "item0": {
+      "PurposeOfReferenceCodeSequence": {
+        "item0": {
+          "CodeValue": "123456"
+        }  
+      }
+    }
+  },
+  "ReferencedSeriesSequence": {
+    "explicitLength": false,
+    "item0": {
+      "PurposeOfReferenceCodeSequence": {
+        "item0": {
+          "CodeValue": "789101"
+        }  
+      }
+    }
+  },
+  "ReferencedInstanceSequence": {
+    "explicitLength": true,
+    "item0": {
+      "PurposeOfReferenceCodeSequence": {}
+    }
+  },
+  "ReferencedVisitSequence": {
+    "explicitLength": false,
+    "item0": {
+      "PurposeOfReferenceCodeSequence": 0
+    }
+  }
+}
