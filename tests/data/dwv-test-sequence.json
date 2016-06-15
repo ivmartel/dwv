@@ -36,7 +36,7 @@
     }
   },
   "ReferencedPatientSequence": {},
-  "ReferencedVisitSequence": 0,
+  "ReferencedOverlaySequence": 0,
   "ReferencedStudySequence": {
     "explicitLength": true,
     "item0": {
