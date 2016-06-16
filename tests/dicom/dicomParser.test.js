@@ -96,23 +96,23 @@ QUnit.test("Test sequence DICOM parsing.", function (assert) {
             Float64Array = Float32Array; // jshint ignore:line
         }
 
-        // parse DICOM
-        var dicomParser = new dwv.dicom.DicomParser();
-        dicomParser.parse(this.response);
-
-        // (wrapped) tags
-        var tags = dicomParser.getDicomElements();
-        
-        // ReferencedImageSequence: explicit sequence
-        var seq0 = tags.getFromName("ReferencedImageSequence");
-        assert.equal(seq0.length, 2, "ReferencedImageSequence length");
-        assert.equal(seq0[0].x00081155.value[0], 
-                "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094", 
-                "ReferencedImageSequence item0 ReferencedSOPInstanceUID");
-        assert.equal(seq0[1].x00081155.value[0], 
-                "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090", 
-                "ReferencedImageSequence - item1 - ReferencedSOPInstanceUID");
-
+//        // parse DICOM
+//        var dicomParser = new dwv.dicom.DicomParser();
+//        dicomParser.parse(this.response);
+//
+//        // (wrapped) tags
+//        var tags = dicomParser.getDicomElements();
+//        
+//        // ReferencedImageSequence: explicit sequence
+//        var seq0 = tags.getFromName("ReferencedImageSequence");
+//        assert.equal(seq0.length, 2, "ReferencedImageSequence length");
+//        assert.equal(seq0[0].x00081155.value[0], 
+//                "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094", 
+//                "ReferencedImageSequence item0 ReferencedSOPInstanceUID");
+//        assert.equal(seq0[1].x00081155.value[0], 
+//                "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090", 
+//                "ReferencedImageSequence - item1 - ReferencedSOPInstanceUID");
+//
 //        // SourceImageSequence: implicit sequence
 //        var seq1 = tags.getFromName("SourceImageSequence");
 //        assert.equal(seq1.length, 2, "SourceImageSequence length");
