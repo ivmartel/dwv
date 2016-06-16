@@ -33,7 +33,7 @@ QUnit.module("dicomParser");
 //
 //        var numRows = 32;
 //        var numCols = 32;
-//        
+//
 //        // raw tags
 //        var rawTags = dicomParser.getRawDicomElements();
 //        // check values
@@ -85,7 +85,7 @@ QUnit.test("Test sequence DICOM parsing.", function (assert) {
 
     var request = new XMLHttpRequest();
     var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/238-empty-seq";
-    var url = urlRoot + "/tests/data/dwv-test-simple.dcm";
+    var url = urlRoot + "/tests/data/dwv-test-sequence.dcm";
     request.open('GET', url, true);
     request.responseType = "arraybuffer";
     request.onload = function (/*event*/) {
@@ -102,29 +102,29 @@ QUnit.test("Test sequence DICOM parsing.", function (assert) {
 
         var rawTags = dicomParser.getRawDicomElements();
         assert.ok((Object.keys(rawTags).length!==0), "Got tags.");
-        
+
         // (wrapped) tags
         //var tags = dicomParser.getDicomElements();
         //assert.ok((tags.dumpToTable().length!==0), "Got tags.");
-        
+
 //        // ReferencedImageSequence: explicit sequence
 //        var seq0 = tags.getFromName("ReferencedImageSequence");
 //        assert.equal(seq0.length, 2, "ReferencedImageSequence length");
-//        assert.equal(seq0[0].x00081155.value[0], 
-//                "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094", 
+//        assert.equal(seq0[0].x00081155.value[0],
+//                "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094",
 //                "ReferencedImageSequence item0 ReferencedSOPInstanceUID");
-//        assert.equal(seq0[1].x00081155.value[0], 
-//                "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090", 
+//        assert.equal(seq0[1].x00081155.value[0],
+//                "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090",
 //                "ReferencedImageSequence - item1 - ReferencedSOPInstanceUID");
 //
 //        // SourceImageSequence: implicit sequence
 //        var seq1 = tags.getFromName("SourceImageSequence");
 //        assert.equal(seq1.length, 2, "SourceImageSequence length");
-//        assert.equal(seq1[0].x00081155.value[0], 
-//                "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094", 
+//        assert.equal(seq1[0].x00081155.value[0],
+//                "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094",
 //                "SourceImageSequence - item0 - ReferencedSOPInstanceUID");
-//        assert.equal(seq1[1].x00081155.value[0], 
-//                "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090", 
+//        assert.equal(seq1[1].x00081155.value[0],
+//                "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090",
 //                "SourceImageSequence - item1 - ReferencedSOPInstanceUID");
 //
 //        // ReferencedPatientSequence: explicit empty sequence
@@ -139,26 +139,26 @@ QUnit.test("Test sequence DICOM parsing.", function (assert) {
 //        var seq4 = tags.getFromName("ReferencedStudySequence");
 //        // just one element
 //        //assert.equal(seq1.length, 2, "ReferencedStudySequence length");
-//        assert.equal(seq4.x0040A170.value[0].x00080100.value[0], 
-//                "123456", 
+//        assert.equal(seq4.x0040A170.value[0].x00080100.value[0],
+//                "123456",
 //                "ReferencedStudySequence - seq - item0 - CodeValue");
 //
 //        // ReferencedSeriesSequence: implicit sequence of sequence
 //        var seq5 = tags.getFromName("ReferencedSeriesSequence");
 //        // just one element
 //        //assert.equal(seq1.length, 2, "ReferencedSeriesSequence length");
-//        assert.equal(seq5.x0040A170.value[0].x00080100.value[0], 
-//                "789101", 
+//        assert.equal(seq5.x0040A170.value[0].x00080100.value[0],
+//                "789101",
 //                "ReferencedSeriesSequence - seq - item0 - CodeValue");
 //
 //        // ReferencedInstanceSequence: explicit empty sequence of sequence
 //        var seq6 = tags.getFromName("ReferencedInstanceSequence");
-//        assert.equal(seq6.x0040A170.value.length, 0, 
+//        assert.equal(seq6.x0040A170.value.length, 0,
 //                "ReferencedInstanceSequence - seq - length");
-//                
+//
 //        // ReferencedVisitSequence: implicit empty sequence of sequence
 //        var seq7 = tags.getFromName("ReferencedVisitSequence");
-//        assert.equal(seq7.x0040A170.value.length, 0, 
+//        assert.equal(seq7.x0040A170.value.length, 0,
 //                "ReferencedVisitSequence - seq - length");
 
         // finish async test
