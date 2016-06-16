@@ -7,11 +7,11 @@
 <script type="text/javascript" src="../../src/dicom/dicomWriter.js"></script>
 <script type="text/javascript" src="../../src/dicom/dictionary.js"></script>
 <script type="text/javascript" >
+var _dicomElements = null;
 
 function onLoadInputFile(event)
 {
-    var data = event.target.result; // FileReader
-    //var data = this.response; // XMLHttpRequest
+    var data = event.target.result;
         
     var dcmBytes = new Uint8Array(data);
     console.log("response length: "+dcmBytes.length);
@@ -19,49 +19,135 @@ function onLoadInputFile(event)
     var parser = new dwv.dicom.DicomParser();
     parser.parse(data);
 
+    _dicomElements = parser.getRawDicomElements();
+    
+    var element = document.getElementById("generate");
+    element.className = "button button-active"
+}    
+function generate()
+{
     var writer = new dwv.dicom.DicomWriter();
-    writer.rules = writer.anonymisationRules;
-    var blob = new Blob([writer.getBuffer(parser.getRawDicomElements())], {type: 'application/dicom'});
-
-    var element = document.getElementById("download");
+    writer.rules = JSON.parse(document.getElementById('rules').value);
+    
+    var blob = new Blob(
+            [writer.getBuffer(_dicomElements)],
+            {type: 'application/dicom'} );
+    
+    var element = document.getElementById("generate");
     element.href = URL.createObjectURL(blob);
     element.download = "anonym.dcm";
 }
-
-function onInputFile(event)
+function saveRulesFile()
+{
+    var text = document.getElementById('rules').value;
+    var textToSaveAsBlob = new Blob([text], {type:"text/plain"});
+    var textToSaveAsURL = window.URL.createObjectURL(textToSaveAsBlob);
+    
+    var element = document.getElementById("generate");
+    element.download = "rules.json";
+    element.href = textToSaveAsURL;
+}
+function validateRulesFile()
+{
+    var text = document.getElementById('rules').value;
+    var link = "http://jsonlint.com/?json=" + encodeURIComponent(text);
+    window.open(link);
+}
+function onInputDICOMFile(event)
 {
     var files = event.target.files;
-    
     var reader = new FileReader();
     reader.onload = onLoadInputFile;
     reader.readAsArrayBuffer(files[0]);
-    
-    //var request = new XMLHttpRequest();
-    //request.open('GET', files[0], true);
-    //request.responseType = "arraybuffer";
-    //request.onload = onLoadInputFile;
-    //request.send(null);
+}
+function onInputRulesFile(event)
+{
+    var files = event.target.files;
+    var reader = new FileReader();
+    reader.onload = function (event) {
+        var text = event.target.result;
+        document.getElementById('rules').value = text;
+    };
+    reader.readAsText(files[0]);
 }
 </script>
 <style>
 body { font-family: Arial; }
+textarea { width: 99%; margin: 2px; }
+fieldset { background: whitesmoke; border: 1px solid grey; }
 .button {
-    background: #E3E3E3;
-    padding: 3px;
+    padding: 3px 7px 3px 7px;
     text-align: center;
     border-radius: 3px;
+    border: 1px solid grey;
+    text-decoration: none;
+    font: 80% sans-serif;
     color: black;
-    text-decoration : none;
+    background: #E3E3E3;
+}
+.button-active {
+    color: black;
+    background: #E3E3E3;
+}
+.button-disabled {
+    color: grey;
+    background: #F3F3F3;
+}
+.button:hover {
+    border: 1px solid black;
 }
 </style>
-
 </head>
 
 <body>
 
 <h1>DICOM Anonymiser</h1>
-<input id="infile" type="file" name="file" onchange="onInputFile(event);">
-<br><br><a href="#" class="button" id="download">Download</a>
+
+<p>Simple DICOM anonymisation tool. Available rules: <code>copy</code>,
+<code>remove</code>, <code>clear</code>, <code>replace(value)</code>.</p>
+
+<form name="genform">
+
+<fieldset>
+<label for="infile">DICOM file: </label>
+<input id="infile" type="file" name="file" onchange="onInputDICOMFile(event);">
+<br>&nbsp;
+<br><label for="inrulesfile">JSON rule file: </label>
+<input id="inrulesfile" type="file" name="file" onchange="onInputRulesFile(event);">
+</fieldset>
+
+<textarea id="rules" rows="25">
+{
+  "default": {
+    "action": "remove", "value": null
+  },
+  "PatientName": {
+    "action": "replace", "value": "Anonymised"
+  },
+  "Meta Element": {
+    "action": "copy", "value": null
+  },
+  "Acquisition": {
+    "action": "copy", "value": null
+  },
+  "Image Presentation": {
+    "action": "copy", "value": null
+  },
+  "Procedure": {
+    "action": "copy", "value": null
+  },
+  "Pixel Data": {
+    "action": "copy", "value": null
+  }
+}
+</textarea>
+
+<fieldset>
+<a href="#" id="validate" class="button" onclick="validateRulesFile();">Validate</a>
+<a href="#" id="save" class="button" onclick="saveRulesFile();">Save Config</a>
+<a href="#" id="generate" class="button button-disabled" onclick="generate();">Generate</a>
+</fieldset>
+</form>
 
 </body>
 </html>

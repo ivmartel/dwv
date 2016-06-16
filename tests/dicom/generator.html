@@ -196,7 +196,7 @@ function generate()
     element.download = "dwv-generated.dcm";
     element.href = URL.createObjectURL(blob);
 }
-function saveFile()
+function saveTagsFile()
 {
     var text = document.getElementById('tags').value;
     var textToSaveAsBlob = new Blob([text], {type:"text/plain"});
@@ -206,34 +206,47 @@ function saveFile()
     element.download = "tags.json";
     element.href = textToSaveAsURL;
 }
-function validate()
+function validateTagsFile()
 {
     var text = document.getElementById('tags').value;
     var link = "http://jsonlint.com/?json=" + encodeURIComponent(text);
     window.open(link);
 }
-function onInputFile(event)
+function onInputTagsFile(event)
 {
-    var files = event.target.files;
+    var file = event.target.files[0];
     var reader = new FileReader();
     reader.onload = function (event) {
         var text = event.target.result;
         document.getElementById('tags').value = text;
     };
-    reader.readAsText(files[0]);
+    reader.readAsText(files);
 }
-
 </script>
 <style>
 body { font-family: Arial; }
-textarea { width:100%; }
+textarea { width: 99%; margin: 2px; }
+fieldset { background: whitesmoke; border: 1px solid grey; }
 .button {
-    background: #E3E3E3;
-    padding: 3px;
+    padding: 3px 7px 3px 7px;
     text-align: center;
     border-radius: 3px;
+    border: 1px solid grey;
+    text-decoration: none;
+    font: 80% sans-serif;
     color: black;
-    text-decoration : none;
+    background: #E3E3E3;
+}
+.button-active {
+    color: black;
+    background: #E3E3E3;
+}
+.button-disabled {
+    color: grey;
+    background: #F3F3F3;
+}
+.button:hover {
+    border: 1px solid black;
 }
 </style>
 </head>
@@ -253,25 +266,24 @@ Set as <code>{}</code>, a sequence will
 be written with explicit zero length, a <code>0</code> value will mean implicit length.
 </p>
 
-<input id="infile" type="file" name="file" onchange="onInputFile(event);">
-
-<br>&nbsp;
-
 <form name="genform">
+
 <fieldset>
+<label for="intagsfile">Input json DICOM tags file: </label>
+<input id="intagsfile" type="file" name="file" onchange="onInputTagsFile(event);">
+</fieldset>
+
 <textarea id="tags" rows="25">
 {
   "FileMetaInformationGroupLength": 28,
   "TransferSyntaxUID": "1.2.840.10008.1.2.1",
   "Modality": "MR",
   "PatientName": "dwv-patient-name",
-  "PerformingPhysicianName": "",
-  "dBdt": "0",
   "PhotometricInterpretation": "MONOCHROME2",
   "SamplesPerPixel": 1,
   "PixelRepresentation": 0,
-  "Rows": 64,
-  "Columns": 64,
+  "Rows": 32,
+  "Columns": 32,
   "BitsAllocated": 16,
   "BitsStored": 12,
   "HighBit": 11,
@@ -285,17 +297,13 @@ be written with explicit zero length, a <code>0</code> value will mean implicit 
       "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
       "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
     }
-  },
-  "RelatedSeriesSequence": {
-    "item0": {
-      "StudyInstanceUID": "1.2.276.0.76.3.1.73.1.1.445244141.1562",
-      "PurposeOfReferenceCodeSequence": {}
-    }
   }
 }
 </textarea>
-<a href="#" id="validate" class="button" onclick="validate();">Validate</a>
-<a href="#" id="save" class="button" onclick="saveFile();">Save Config</a>
+
+<fieldset>
+<a href="#" id="validate" class="button" onclick="validateTagsFile();">Validate</a>
+<a href="#" id="save" class="button" onclick="saveTagsFile();">Save Config</a>
 <a href="#" id="generate" class="button" onclick="generate();">Generate</a>
 </fieldset>
 </form>
