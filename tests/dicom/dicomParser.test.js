@@ -96,13 +96,14 @@ QUnit.test("Test sequence DICOM parsing.", function (assert) {
             Float64Array = Float32Array; // jshint ignore:line
         }
 
-//        // parse DICOM
-//        var dicomParser = new dwv.dicom.DicomParser();
-//        dicomParser.parse(this.response);
-//
-//        // (wrapped) tags
-//        var tags = dicomParser.getDicomElements();
-//        
+        // parse DICOM
+        var dicomParser = new dwv.dicom.DicomParser();
+        dicomParser.parse(this.response);
+
+        // (wrapped) tags
+        var tags = dicomParser.getDicomElements();
+        assert.ok((tags.dumpToTable().length!==0), "Got tags.");
+        
 //        // ReferencedImageSequence: explicit sequence
 //        var seq0 = tags.getFromName("ReferencedImageSequence");
 //        assert.equal(seq0.length, 2, "ReferencedImageSequence length");
