@@ -176,7 +176,7 @@ QUnit.test("Test sequence DICOM parsing.", function (assert) {
 
     var request = new XMLHttpRequest();
     var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/238-empty-seq";
-    var url = urlRoot + "/tests/data/dwv-test-sequence.dcm";
+    var url = urlRoot + "/tests/data/dwv-test-simple.dcm";
     request.open('GET', url, true);
     request.responseType = "arraybuffer";
     request.onload = function (/*event*/) {
@@ -187,13 +187,17 @@ QUnit.test("Test sequence DICOM parsing.", function (assert) {
             Float64Array = Float32Array; // jshint ignore:line
         }
 
-//        // parse DICOM
-//        var dicomParser = new dwv.dicom.DicomParser();
-//        dicomParser.parse(this.response);
-//
-//        // (wrapped) tags
-//        var tags = dicomParser.getDicomElements();
-//        
+        // parse DICOM
+        var dicomParser = new dwv.dicom.DicomParser();
+        dicomParser.parse(this.response);
+
+        var rawTags = dicomParser.getRawDicomElements();
+        assert.ok((Object.keys(rawTags).length!==0), "Got tags.");
+        
+        // (wrapped) tags
+        //var tags = dicomParser.getDicomElements();
+        //assert.ok((tags.dumpToTable().length!==0), "Got tags.");
+        
 //        // ReferencedImageSequence: explicit sequence
 //        var seq0 = tags.getFromName("ReferencedImageSequence");
 //        assert.equal(seq0.length, 2, "ReferencedImageSequence length");
