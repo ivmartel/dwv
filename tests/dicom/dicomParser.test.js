@@ -100,9 +100,12 @@ QUnit.test("Test sequence DICOM parsing.", function (assert) {
         var dicomParser = new dwv.dicom.DicomParser();
         dicomParser.parse(this.response);
 
+        var rawTags = dicomParser.getRawDicomElements();
+        assert.ok((Object.keys(rawTags).length!==0), "Got tags.");
+        
         // (wrapped) tags
-        var tags = dicomParser.getDicomElements();
-        assert.ok((tags.dumpToTable().length!==0), "Got tags.");
+        //var tags = dicomParser.getDicomElements();
+        //assert.ok((tags.dumpToTable().length!==0), "Got tags.");
         
 //        // ReferencedImageSequence: explicit sequence
 //        var seq0 = tags.getFromName("ReferencedImageSequence");
