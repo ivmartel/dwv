@@ -26,7 +26,7 @@ QUnit.test("Test simple DICOM parsing.", function (assert) {
     var done = assert.async();
 
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/238-empty-seq";
+    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
     var url = urlRoot + "/tests/data/dwv-test-simple.dcm";
     request.open('GET', url, true);
     request.responseType = "arraybuffer";
@@ -95,7 +95,7 @@ QUnit.test("Test sequence DICOM parsing.", function (assert) {
     var done = assert.async();
 
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/238-empty-seq";
+    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
     var url = urlRoot + "/tests/data/dwv-test-sequence.dcm";
     request.open('GET', url, true);
     request.responseType = "arraybuffer";
