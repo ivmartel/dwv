@@ -6,69 +6,93 @@
 <script type="text/javascript" src="../../src/dicom/dicomParser.js"></script>
 <script type="text/javascript" src="../../src/dicom/dicomWriter.js"></script>
 <script type="text/javascript" src="../../src/dicom/dictionary.js"></script>
-<script type="text/javascript" >
+<script type="text/javascript">
+// rules file
+var _rulesFile = null;
+// DICOM elements
 var _dicomElements = null;
-
-function onLoadInputFile(event)
+// handle DICOM file load
+function onLoadDICOMFile(event)
 {
-    var data = event.target.result;
-        
-    var dcmBytes = new Uint8Array(data);
-    console.log("response length: "+dcmBytes.length);
-
+    // parse DICOM
     var parser = new dwv.dicom.DicomParser();
-    parser.parse(data);
-
+    parser.parse(event.target.result);
+    // store elements
     _dicomElements = parser.getRawDicomElements();
-    
+    // activate generate button
     var element = document.getElementById("generate");
-    element.className = "button button-active"
-}    
+    element.className = "button button-active";
+}
+// generate DICOM data
 function generate()
 {
+    // check validity
+    if (!isValidRules()) {
+        return;
+    }
+    // create writer with textarea rules
     var writer = new dwv.dicom.DicomWriter();
     writer.rules = JSON.parse(document.getElementById('rules').value);
-    
+    // view as Blob to allow download
     var blob = new Blob(
             [writer.getBuffer(_dicomElements)],
-            {type: 'application/dicom'} );
-    
+            {type: 'application/dicom'}
+        );
+    // update generate button
     var element = document.getElementById("generate");
     element.href = URL.createObjectURL(blob);
     element.download = "anonym.dcm";
 }
-function saveRulesFile()
+// save the rules as a JSON file
+function saveRules()
 {
+    // check validity
+    if (!isValidRules()) {
+        return;
+    }
+    // get text from the textarea
     var text = document.getElementById('rules').value;
-    var textToSaveAsBlob = new Blob([text], {type:"text/plain"});
-    var textToSaveAsURL = window.URL.createObjectURL(textToSaveAsBlob);
-    
-    var element = document.getElementById("generate");
-    element.download = "rules.json";
-    element.href = textToSaveAsURL;
+    // view as Blob to allow download
+    var blob = new Blob([text], {type:"text/plain"});
+    // update save button
+    var element = document.getElementById("save");
+    element.download = (_rulesFile === null ? "rules.json" : _rulesFile.name);
+    element.href = URL.createObjectURL(blob);
 }
-function validateRulesFile()
+// is the JSON valid?
+function isValidRules()
+{
+    try {
+        JSON.parse(document.getElementById('rules').value);
+    }
+    catch (error) {
+        alert("The JSON is not valid, please check it with JSONLint.");
+    }
+}
+// open JSONLint to check the rules
+function launchJSONLint()
 {
     var text = document.getElementById('rules').value;
     var link = "http://jsonlint.com/?json=" + encodeURIComponent(text);
     window.open(link);
 }
+// handle input DICOM file
 function onInputDICOMFile(event)
 {
     var files = event.target.files;
     var reader = new FileReader();
-    reader.onload = onLoadInputFile;
+    reader.onload = onLoadDICOMFile;
     reader.readAsArrayBuffer(files[0]);
 }
+// handle input rules file
 function onInputRulesFile(event)
 {
-    var files = event.target.files;
+    _rulesFile = event.target.files[0];
     var reader = new FileReader();
     reader.onload = function (event) {
-        var text = event.target.result;
-        document.getElementById('rules').value = text;
+        document.getElementById('rules').value = event.target.result;
     };
-    reader.readAsText(files[0]);
+    reader.readAsText(_rulesFile);
 }
 </script>
 <style>
@@ -103,7 +127,7 @@ fieldset { background: whitesmoke; border: 1px solid grey; }
 
 <h1>DICOM Anonymiser</h1>
 
-<p>Simple DICOM anonymisation tool. Available rules: <code>copy</code>,
+<p>Simple DICOM "anonymisation" tool. Available rules: <code>copy</code>,
 <code>remove</code>, <code>clear</code>, <code>replace(value)</code>.</p>
 
 <form name="genform">
@@ -112,7 +136,7 @@ fieldset { background: whitesmoke; border: 1px solid grey; }
 <label for="infile">DICOM file: </label>
 <input id="infile" type="file" name="file" onchange="onInputDICOMFile(event);">
 <br>&nbsp;
-<br><label for="inrulesfile">JSON rule file: </label>
+<br><label for="inrulesfile">JSON rules file: </label>
 <input id="inrulesfile" type="file" name="file" onchange="onInputRulesFile(event);">
 </fieldset>
 
@@ -143,8 +167,8 @@ fieldset { background: whitesmoke; border: 1px solid grey; }
 </textarea>
 
 <fieldset>
-<a href="#" id="validate" class="button" onclick="validateRulesFile();">Validate</a>
-<a href="#" id="save" class="button" onclick="saveRulesFile();">Save Config</a>
+<a href="#" id="jsonlint" class="button" onclick="launchJSONLint();">JSONLint</a>
+<a href="#" id="save" class="button" onclick="saveRules();">Save Rules</a>
 <a href="#" id="generate" class="button button-disabled" onclick="generate();">Generate</a>
 </fieldset>
 </form>
