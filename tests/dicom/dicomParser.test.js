@@ -6,25 +6,28 @@
 /* global QUnit */
 QUnit.module("dicomParser");
 
+// WARNING about PhantomJS 1.9
+// ---------------------------
+// TypedArray implementation seems incomplete, at least different than observed
+// behavior in browsers... 
+// For a DICOM dataset, it was giving an: 
+// 'RangeError: ArrayBuffer length minus the byteOffset is not a multiple of the element size.'
+// error which, according to specs, should be thrown when the size of the data
+// to read is not specified (see
+// https://www.khronos.org/registry/typedarray/specs/latest/#7). But it is specified...
+// So I updated the data to be of the correct size...
+
 /**
- * Tests for {@link dwv.dicom.DicomParser}.
+ * Tests for {@link dwv.dicom.DicomParser} using simple DICOM data.
+ * Using remote file for CI integration.
  * @function module:tests/dicom~dicomParser
  */
-QUnit.test("Test DICOM parsing.", function (assert) {
-    // Local file: forbidden...
-    // parse the DICOM file
-    /*var reader = new FileReader();
-    reader.onload = function(event) {
-        // parse DICOM file
-        var data = dwv.image.getDataFromDicomBuffer(event.target.result);
-    };
-    var file = new File("cta.dcm");
-    reader.readAsArrayBuffer(file);*/
-
+QUnit.test("Test simple DICOM parsing.", function (assert) {
     var done = assert.async();
 
     var request = new XMLHttpRequest();
-    var url = "http://x.babymri.org/?53320924&.dcm";
+    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/238-empty-seq";
+    var url = urlRoot + "/tests/data/dwv-test-simple.dcm";
     request.open('GET', url, true);
     request.responseType = "arraybuffer";
     request.onload = function (/*event*/) {
@@ -39,11 +42,14 @@ QUnit.test("Test DICOM parsing.", function (assert) {
         var dicomParser = new dwv.dicom.DicomParser();
         dicomParser.parse(this.response);
 
+        var numRows = 32;
+        var numCols = 32;
+
         // raw tags
         var rawTags = dicomParser.getRawDicomElements();
         // check values
-        assert.equal(rawTags.x00280010.value[0], 256, "Number of rows (raw)");
-        assert.equal(rawTags.x00280011.value[0], 256, "Number of columns (raw)");
+        assert.equal(rawTags.x00280010.value[0], numRows, "Number of rows (raw)");
+        assert.equal(rawTags.x00280011.value[0], numCols, "Number of columns (raw)");
         // ReferencedImageSequence - ReferencedSOPInstanceUID
         assert.equal(rawTags.x00081140.value[0].x00081155.value[0],
             "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094",
@@ -58,19 +64,112 @@ QUnit.test("Test DICOM parsing.", function (assert) {
         assert.equal(tags.getFromKey("x00081050"), "", "Empty key");
         assert.notOk(tags.getFromKey("x00081050"), "Empty key fails if test" );
         // good key
-        assert.equal(tags.getFromKey("x00280010"), 256, "Good key");
+        assert.equal(tags.getFromKey("x00280010"), numRows, "Good key");
         assert.ok(tags.getFromKey("x00280010"), "Good key passes if test" );
         // zero value (passes test since it is a string)
         assert.equal(tags.getFromKey("x00181318"), 0, "Good key, zero value");
         assert.ok(tags.getFromKey("x00181318"), "Good key, zero value passes if test" );
 
         // check values
-        assert.equal(tags.getFromName("Rows"), 256, "Number of rows");
-        assert.equal(tags.getFromName("Columns"), 256, "Number of columns");
+        assert.equal(tags.getFromName("Rows"), numRows, "Number of rows");
+        assert.equal(tags.getFromName("Columns"), numCols, "Number of columns");
         // ReferencedImageSequence - ReferencedSOPInstanceUID
-        assert.equal(tags.getFromName("ReferencedImageSequence")[0].x00081155.value[0],
+        // only one item value -> returns the object directly
+        // (no need for tags.getFromName("ReferencedImageSequence")[0])
+        assert.equal(tags.getFromName("ReferencedImageSequence").x00081155.value[0],
             "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094",
             "ReferencedImageSequence SQ");
+
+        // finish async test
+        done();
+    };
+    request.send(null);
+});
+
+/**
+ * Tests for {@link dwv.dicom.DicomParser} using sequence test DICOM data.
+ * Using remote file for CI integration.
+ * @function module:tests/dicom~dicomParser
+ */
+QUnit.test("Test sequence DICOM parsing.", function (assert) {
+    var done = assert.async();
+
+    var request = new XMLHttpRequest();
+    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/238-empty-seq";
+    var url = urlRoot + "/tests/data/dwv-test-sequence.dcm";
+    request.open('GET', url, true);
+    request.responseType = "arraybuffer";
+    request.onload = function (/*event*/) {
+        assert.ok((this.response.byteLength!==0), "Got a response.");
+
+        // cope with no support for Float64Array (Phantomjs for ex...)
+        if ( typeof Float64Array === "undefined" ) {
+            Float64Array = Float32Array; // jshint ignore:line
+        }
+
+        // parse DICOM
+        var dicomParser = new dwv.dicom.DicomParser();
+        dicomParser.parse(this.response);
+        // raw tags
+        var rawTags = dicomParser.getRawDicomElements();
+        assert.ok((Object.keys(rawTags).length!==0), "Got raw tags.");
+        // wrapped tags
+        var tags = dicomParser.getDicomElements();
+        assert.ok((tags.dumpToTable().length!==0), "Got wrapped tags.");
+
+        // ReferencedImageSequence: explicit sequence
+        var seq0 = tags.getFromName("ReferencedImageSequence");
+        assert.equal(seq0.length, 2, "ReferencedImageSequence length");
+        assert.equal(seq0[0].x00081155.value[0],
+                "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094",
+                "ReferencedImageSequence item0 ReferencedSOPInstanceUID");
+        assert.equal(seq0[1].x00081155.value[0],
+                "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090",
+                "ReferencedImageSequence - item1 - ReferencedSOPInstanceUID");
+
+        // SourceImageSequence: implicit sequence
+        var seq1 = tags.getFromName("SourceImageSequence");
+        assert.equal(seq1.length, 2, "SourceImageSequence length");
+        assert.equal(seq1[0].x00081155.value[0],
+                "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094",
+                "SourceImageSequence - item0 - ReferencedSOPInstanceUID");
+        assert.equal(seq1[1].x00081155.value[0],
+                "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090",
+                "SourceImageSequence - item1 - ReferencedSOPInstanceUID");
+
+        // ReferencedPatientSequence: explicit empty sequence
+        var seq2 = tags.getFromName("ReferencedPatientSequence");
+        assert.equal(seq2.length, 0, "ReferencedPatientSequence length");
+
+        // ReferencedOverlaySequence: implicit empty sequence
+        var seq3 = tags.getFromName("ReferencedOverlaySequence");
+        assert.equal(seq3.length, 0, "ReferencedOverlaySequence length");
+
+        // ReferencedStudySequence: explicit sequence of sequence
+        var seq4 = tags.getFromName("ReferencedStudySequence");
+        // just one element
+        //assert.equal(seq1.length, 2, "ReferencedStudySequence length");
+        assert.equal(seq4.x0040A170.value[0].x00080100.value[0],
+                "123456",
+                "ReferencedStudySequence - seq - item0 - CodeValue");
+
+        // ReferencedSeriesSequence: implicit sequence of sequence
+        var seq5 = tags.getFromName("ReferencedSeriesSequence");
+        // just one element
+        //assert.equal(seq1.length, 2, "ReferencedSeriesSequence length");
+        assert.equal(seq5.x0040A170.value[0].x00080100.value[0],
+                "789101",
+                "ReferencedSeriesSequence - seq - item0 - CodeValue");
+
+        // ReferencedInstanceSequence: explicit empty sequence of sequence
+        var seq6 = tags.getFromName("ReferencedInstanceSequence");
+        assert.equal(seq6.x0040A170.value.length, 0,
+                "ReferencedInstanceSequence - seq - length");
+
+        // ReferencedVisitSequence: implicit empty sequence of sequence
+        var seq7 = tags.getFromName("ReferencedVisitSequence");
+        assert.equal(seq7.x0040A170.value.length, 0,
+                "ReferencedVisitSequence - seq - length");
 
         // finish async test
         done();
