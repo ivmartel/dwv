@@ -2513,7 +2513,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     else {
         // implicit VR?
         if(implicit) {
-            vr = null;
+            vr = "UN";
             var dict = dwv.dicom.dictionary;
             if ( typeof dict[tag.group] !== "undefined" &&
                     typeof dict[tag.group][tag.element] !== "undefined" ) {
@@ -3148,12 +3148,12 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
             }
             message += ")";
             var itemDelimElement = {
-                "group": "0xFFFE",
-                "element": "0xE00D",
-                "vr": "na",
-                "vl": "0",
-                "value": [message]
-            };
+                    "group": "0xFFFE",
+                    "element": "0xE00D",
+                    "vr": "na",
+                    "vl": "0",
+                    "value": [message]
+                };
             line += "\n";
             line += this.getElementAsString(itemDelimElement, prefix + "  ");
 
