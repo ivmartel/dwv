@@ -67,7 +67,9 @@ function isValidRules()
     }
     catch (error) {
         alert("The JSON is not valid, please check it with JSONLint.");
+        return false;
     }
+    return true;
 }
 // open JSONLint to check the rules
 function launchJSONLint()
@@ -79,14 +81,20 @@ function launchJSONLint()
 // handle input DICOM file
 function onInputDICOMFile(event)
 {
-    var files = event.target.files;
+    if (event.target.files.length === 0) {
+        return;
+    }
+    var file = event.target.files[0];
     var reader = new FileReader();
     reader.onload = onLoadDICOMFile;
-    reader.readAsArrayBuffer(files[0]);
+    reader.readAsArrayBuffer(file);
 }
 // handle input rules file
 function onInputRulesFile(event)
 {
+    if (event.target.files.length === 0) {
+        return;
+    }
     _rulesFile = event.target.files[0];
     var reader = new FileReader();
     reader.onload = function (event) {
