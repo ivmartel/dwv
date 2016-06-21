@@ -458,381 +458,6 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="appendDicomElement"><span class="type-signature"></span>appendDicomElement(element, sequences)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Append a DICOM element to the dicomElements member object.
-Allows for easy retrieval of DICOM tag values from the tag name.
-If tags have same name (for the 'unknown' private tags cases), a number is appended
-making the name unique.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>element</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The element to add.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>sequences</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The sequence the element belongs to (optional).</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_dicom_dicomParser.js.html">src/dicom/dicomParser.js</a>,
-				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-594">line 594</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="appendElementToSequence"><span class="type-signature"></span>appendElementToSequence(root, sequenceName, itemNumber, element)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Append an element to a sequence.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>root</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The DICOM element root where to append the element.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>sequenceName</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The tail sequence name.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>itemNumber</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The tail item number.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>element</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The element to append.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_dicom_dicomParser.js.html">src/dicom/dicomParser.js</a>,
-				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-642">line 642</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
     <h4 class="name" id="getDicomElements"><span class="type-signature"></span>getDicomElements()</h4>
     
     
@@ -1381,7 +1006,7 @@ Fills in the member object 'dicomElements'.
 		<ul class="dummy">
 			<li>
 				<a href="src_dicom_dicomParser.js.html">src/dicom/dicomParser.js</a>,
-				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-845">line 845</a>
+				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-901">line 901</a>
 			</li>
 		</ul>
 	</dd>
@@ -1463,6 +1088,12 @@ Reference: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#ta
 
             <td class="type">
             
+                
+<span class="param-type">Object</span>
+
+
+
+            
             </td>
 
             
@@ -1481,6 +1112,12 @@ Reference: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#ta
 
             <td class="type">
             
+                
+<span class="param-type">Number</span>
+
+
+
+            
             </td>
 
             
@@ -1498,6 +1135,12 @@ Reference: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#ta
             
 
             <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+
             
             </td>
 
@@ -1550,7 +1193,7 @@ Reference: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#ta
 		<ul class="dummy">
 			<li>
 				<a href="src_dicom_dicomParser.js.html">src/dicom/dicomParser.js</a>,
-				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-698">line 698</a>
+				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-711">line 711</a>
 			</li>
 		</ul>
 	</dd>
@@ -1579,7 +1222,7 @@ Reference: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#ta
     
             
 <div class="param-desc">
-    An object containing the element 'tag', 'vl', 'vr', 'data' and 'offset'.
+    An object containing the element 'tag', 'vl', 'vr', 'data' and 'endOffset'.
 </div>
 
 
@@ -1591,6 +1234,427 @@ Reference: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#ta
     <dd>
         
 <span class="param-type">Object</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="readItemDataElement"><span class="type-signature"></span>readItemDataElement(reader, offset, implicit)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Read an item data element.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>reader</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The raw data reader.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>offset</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The offset where to start to read.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>implicit</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Is the DICOM VR implicit?</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_dicom_dicomParser.js.html">src/dicom/dicomParser.js</a>,
+				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-617">line 617</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    The item data as a list of data elements.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="readPixelItemDataElement"><span class="type-signature"></span>readPixelItemDataElement(reader, offset, implicit)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Read the pixel item data element. 
+Ref: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_A.4.html#table_A.4-1
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>reader</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The raw data reader.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>offset</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The offset where to start to read.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>implicit</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Is the DICOM VR implicit?</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_dicom_dicomParser.js.html">src/dicom/dicomParser.js</a>,
+				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-679">line 679</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    The item data as an array of data elements.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
 
 
 
@@ -1724,7 +1788,7 @@ Reference: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#ta
 		<ul class="dummy">
 			<li>
 				<a href="src_dicom_dicomParser.js.html">src/dicom/dicomParser.js</a>,
-				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-678">line 678</a>
+				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-592">line 592</a>
 			</li>
 		</ul>
 	</dd>

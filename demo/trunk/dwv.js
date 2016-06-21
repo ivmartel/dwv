@@ -2379,92 +2379,6 @@ dwv.dicom.DicomParser.prototype.getPixelBuffer = function()
 };
 
 /**
- * Append a DICOM element to the dicomElements member object.
- * Allows for easy retrieval of DICOM tag values from the tag name.
- * If tags have same name (for the 'unknown' private tags cases), a number is appended
- * making the name unique.
- * @param {Object} element The element to add.
- * @param {Object} sequences The sequence the element belongs to (optional).
- */
-dwv.dicom.DicomParser.prototype.appendDicomElement = function( element, sequences )
-{
-    // simple case: not a Sequence or a SequenceDelimitationItem
-    if ( ( typeof sequences === "undefined" || sequences.length === 0 ) &&
-            element.tag.name !== "xFFFEE0DD" ) {
-        this.dicomElements[element.tag.name] = {
-            "group": element.tag.group,
-            "element": element.tag.element,
-            "vr": element.vr,
-            "vl": element.vl,
-            "value": element.data
-        };
-    }
-    else {
-        // storing item element as other elements
-
-        // nothing to do for delimitations
-        // (ItemDelimitationItem, SequenceDelimitationItem)
-        if ( element.tag.name === "xFFFEE00D" ||
-                element.tag.name === "xFFFEE0DD" ) {
-            return;
-        }
-        // create root for nested sequences
-        var sequenceName = sequences[0].name;
-        var itemNumber = sequences[0].itemNumber;
-        var root = this.dicomElements;
-        for ( var i = 1; i < sequences.length; ++i ) {
-            // update root with previous name and number
-            if ( typeof root[sequenceName].value[itemNumber] !== "undefined" ) {
-                root = root[sequenceName].value[itemNumber];
-            }
-            // update name and number
-            sequenceName = sequences[i].name;
-            itemNumber = sequences[i].itemNumber;
-        }
-
-        // append
-        this.appendElementToSequence(root, sequenceName, itemNumber, element);
-    }
-};
-
-/**
- * Append an element to a sequence.
- * @param {Object} root The DICOM element root where to append the element.
- * @param {String} sequenceName The tail sequence name.
- * @param {Number} itemNumber The tail item number.
- * @param {Object} element The element to append.
- */
-dwv.dicom.DicomParser.prototype.appendElementToSequence = function (
-    root, sequenceName, itemNumber, element)
-{
-    // start the sequence
-    if ( typeof root[sequenceName] === "undefined" ) {
-        root[sequenceName] = {
-            "group": element.tag.group,
-            "element": element.tag.element,
-            "vr": element.vr,
-            "vl": element.vl,
-            "value": []
-        };
-    }
-    // continue the sequence
-    else {
-        // add item array if needed
-        if ( typeof root[sequenceName].value[itemNumber] === "undefined" ) {
-            root[sequenceName].value[itemNumber] = {};
-        }
-        // append element
-        root[sequenceName].value[itemNumber][element.tag.name] = {
-            "group": element.tag.group,
-            "element": element.tag.element,
-            "vr": element.vr,
-            "vl": element.vl,
-            "value": element.data
-        };
-    }
-};
-
-/**
  * Read a DICOM tag.
  * @param reader The raw data reader.
  * @param offset The offset where to start to read.
@@ -2474,34 +2388,132 @@ dwv.dicom.DicomParser.prototype.readTag = function(reader, offset)
 {
     // group
     var group = reader.readHex(offset);
+    offset += Uint16Array.BYTES_PER_ELEMENT;
     // element
-    var element = reader.readHex(offset+2);
+    var element = reader.readHex(offset);
+    offset += Uint16Array.BYTES_PER_ELEMENT;
     // name
     var name = dwv.dicom.getGroupElementKey(group, element);
     // return
-    return {'group': group, 'element': element, 'name': name};
+    return {
+        'group': group, 
+        'element': element,
+        'name': name,
+        'endOffset': offset };
+};
+
+/**
+ * Read an item data element.
+ * @param {Object} reader The raw data reader.
+ * @param {Number} offset The offset where to start to read.
+ * @param {Boolean} implicit Is the DICOM VR implicit?
+ * @returns {Object} The item data as a list of data elements.
+ */
+dwv.dicom.DicomParser.prototype.readItemDataElement = function (reader, offset, implicit)
+{
+    var itemData = {};
+
+    // read the first item
+    var item = this.readDataElement(reader, offset, implicit);
+    offset = item.endOffset;
+    
+    // exit if it is a sequence delimitation item
+    var isSeqDelim = ( item.tag.name === "xFFFEE0DD" );
+    if (isSeqDelim) {
+        return {
+            data: itemData, 
+            endOffset: item.endOffset, 
+            isSeqDelim: isSeqDelim };
+    }
+    
+    // store it
+    itemData[item.tag.name] = item;
+    
+    // explicit VR items
+    if (item.vl !== "u/l") {
+        // not empty
+        if (item.vl !== 0) {
+            // read until the end offset
+            var endOffset = offset;
+            offset -= item.vl;
+            while (offset < endOffset) {
+                item = this.readDataElement(reader, offset, implicit);
+                offset = item.endOffset; 
+                itemData[item.tag.name] = item;
+            }
+        }
+    }
+    // implicit VR items
+    else {
+        // read until the item delimitation item
+        var isItemDelim = false;
+        while (!isItemDelim) {
+            item = this.readDataElement(reader, offset, implicit);
+            offset = item.endOffset; 
+            isItemDelim = ( item.tag.name === "xFFFEE00D" );
+            if (!isItemDelim) {
+                itemData[item.tag.name] = item;
+            }
+        }
+    }
+    
+    return {
+        'data': itemData, 
+        'endOffset': offset, 
+        'isSeqDelim': false };
+};
+
+/**
+ * Read the pixel item data element. 
+ * Ref: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_A.4.html#table_A.4-1
+ * @param {Object} reader The raw data reader.
+ * @param {Number} offset The offset where to start to read.
+ * @param {Boolean} implicit Is the DICOM VR implicit?
+ * @returns {Array} The item data as an array of data elements.
+ */
+dwv.dicom.DicomParser.prototype.readPixelItemDataElement = function (reader, offset, implicit)
+{
+    var itemData = [];
+
+    // first item: basic offset table
+    var item = this.readDataElement(reader, offset, implicit);
+    offset = item.endOffset;
+    
+    // read until the sequence delimitation item
+    var isSeqDelim = false;
+    while (!isSeqDelim) {
+        item = this.readDataElement(reader, offset, implicit);
+        offset = item.endOffset; 
+        isSeqDelim = ( item.tag.name === "xFFFEE0DD" );
+        if (!isSeqDelim) {
+            itemData.push(item);
+        }
+    }
+    
+    return {
+        'data': itemData, 
+        'endOffset': offset };
 };
 
 /**
  * Read a DICOM data element.
  * Reference: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#table_6.2-1
- * @param reader The raw data reader.
- * @param offset The offset where to start to read.
- * @param implicit Is the DICOM VR implicit?
- * @return {Object} An object containing the element 'tag', 'vl', 'vr', 'data' and 'offset'.
+ * @param {Object} reader The raw data reader.
+ * @param {Number} offset The offset where to start to read.
+ * @param {Boolean} implicit Is the DICOM VR implicit?
+ * @return {Object} An object containing the element 'tag', 'vl', 'vr', 'data' and 'endOffset'.
  */
 dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, implicit)
 {
     // Tag: group, element
     var tag = this.readTag(reader, offset);
-    var tagOffset = 4;
+    offset = tag.endOffset;
 
     // Value Representation (VR)
     var vr = null; 
-    var vrOffset = 0;
     var is32bitVLVR = false;
     if (dwv.dicom.isTagWithVR(tag.group, tag.element)) {
-        // implicit VR?
+        // implicit VR
         if (implicit) {
             vr = "UN";
             var dict = dwv.dicom.dictionary;
@@ -2510,34 +2522,31 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
                 vr = dwv.dicom.dictionary[tag.group][tag.element][0];
             }
             is32bitVLVR = true;
-            vrOffset = 0;
         }
         else {
-            vr = reader.readString( offset+tagOffset, 2 );
+            vr = reader.readString( offset, 2 );
+            offset += 2 * Uint8Array.BYTES_PER_ELEMENT;
             is32bitVLVR = dwv.dicom.is32bitVLVR(vr);
-            vrOffset = 2;
             // reserved 2 bytes
             if ( is32bitVLVR ) {
-                vrOffset += 2;
+                offset += 2 * Uint8Array.BYTES_PER_ELEMENT;
             }
         }
     }
     else {
         vr = "UN";
         is32bitVLVR = true;
-        vrOffset = 0;
     }
 
     // Value Length (VL)
     var vl = 0;
-    var vlOffset = 0;
     if ( is32bitVLVR ) {
-        vl = reader.readUint32( offset+tagOffset+vrOffset );
-        vlOffset = 4;
+        vl = reader.readUint32( offset );
+        offset += Uint32Array.BYTES_PER_ELEMENT;
     }
     else {
-        vl = reader.readUint16( offset+tagOffset+vrOffset );
-        vlOffset = 2;
+        vl = reader.readUint16( offset );
+        offset += Uint16Array.BYTES_PER_ELEMENT;
     }
     
     // check the value of VL
@@ -2549,52 +2558,68 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
 
     // data
     var data = null;
-    var dataOffset = offset+tagOffset+vrOffset+vlOffset;
-    if ( vr === "OW" || vr === "OF" || vr === "ox" )
+    // pixel data sequence (implicit)
+    if (tag.name === "x7FE00010" && vlString === "u/l")
+    {
+        var pixItemData = this.readPixelItemDataElement(reader, offset, implicit);
+        offset = pixItemData.endOffset;
+        data = pixItemData.data;
+    }
+    else if ( vr === "OW" || vr === "OF" || vr === "ox" )
     {
         // BitsAllocated == 8
         if ( typeof this.dicomElements.x00280100 !== 'undefined' &&
                     this.dicomElements.x00280100.value[0] === 8 ) {
-            data = reader.readUint8Array( dataOffset, vl );
+            data = reader.readUint8Array( offset, vl );
+            offset += vl;
         }
         else {
-            data = reader.readUint16Array( dataOffset, vl );
+            data = reader.readUint16Array( offset, vl );
+            offset += vl;
         }
     }
     // OB
     else if( vr === "OB")
     {
-        data = reader.readUint8Array( dataOffset, vl );
+        data = reader.readUint8Array( offset, vl );
+        offset += vl;
     }
     // numbers
     else if( vr === "US")
     {
-        data = reader.readUint16Array( dataOffset, vl );
+        data = reader.readUint16Array( offset, vl );
+        offset += vl;
     }
     else if( vr === "UL")
     {
-        data = reader.readUint32Array( dataOffset, vl );
+        data = reader.readUint32Array( offset, vl );
+        offset += vl;
     }
     else if( vr === "SS")
     {
-        data = reader.readInt16Array( dataOffset, vl );
+        data = reader.readInt16Array( offset, vl );
+        offset += vl;
     }
     else if( vr === "SL")
     {
-        data = reader.readInt32Array( dataOffset, vl );
+        data = reader.readInt32Array( offset, vl );
+        offset += vl;
     }
     else if( vr === "FL")
     {
-        data = reader.readFloat32Array( dataOffset, vl );
+        data = reader.readFloat32Array( offset, vl );
+        offset += vl;
     }
     else if( vr === "FD")
     {
-        data = reader.readFloat64Array( dataOffset, vl );
+        data = reader.readFloat64Array( offset, vl );
+        offset += vl;
     }
     // attribute
     else if( vr === "AT")
     {
-        var raw = reader.readUint16Array( dataOffset, vl );
+        var raw = reader.readUint16Array( offset, vl );
+        offset += vl;
         data = [];
         for ( var i = 0; i < raw.length; i+=2 ) {
             var stri = raw[i].toString(16);
@@ -2610,25 +2635,56 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
     // not available
     else if( vr === "UN")
     {
-        data = reader.readUint8Array( dataOffset, vl );
+        data = reader.readUint8Array( offset, vl );
+        offset += vl;
+    }
+    // sequence
+    else if (vr === "SQ")
+    {
+        data = [];
+        var itemData;
+        // explicit VR sequence
+        if (vlString !== "u/l") {
+            // not empty
+            if (vl !== 0) {
+                var sqEndOffset = offset + vl;
+                while (offset < sqEndOffset) {
+                     itemData = this.readItemDataElement(reader, offset, implicit);
+                     data.push( itemData.data );
+                     offset = itemData.endOffset;
+                }
+            }
+        }
+        // implicit VR sequence
+        else {
+            // read until the sequence delimitation item
+            var isSeqDelim = false;
+            while (!isSeqDelim) {
+                itemData = this.readItemDataElement(reader, offset, implicit);
+                isSeqDelim = itemData.isSeqDelim;
+                offset = itemData.endOffset;
+                // do not store the delimitation item
+                if (!isSeqDelim) {
+                    data.push( itemData.data );
+                }
+            }
+        }
     }
     // raw
     else
     {
-        data = reader.readString( dataOffset, vl);
+        data = reader.readString( offset, vl);
+        offset += vl;
         data = data.split("\\");
     }
-
-    // total element offset
-    var elementOffset = tagOffset + vrOffset + vlOffset + vl;
 
     // return
     return {
         'tag': tag,
         'vr': vr,
         'vl': vlString,
-        'data': data,
-        'offset': elementOffset
+        'value': data,
+        'endOffset': offset
     };
 };
 
@@ -2648,32 +2704,30 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
     // 128 -> 132: magic word
     offset = 128;
     var magicword = metaReader.readString( offset, 4 );
+    offset += 4 * Uint8Array.BYTES_PER_ELEMENT;
     if(magicword !== "DICM")
     {
         throw new Error("Not a valid DICOM file (no magic DICM word found)");
     }
-    offset += 4;
 
     // 0x0002, 0x0000: FileMetaInformationGroupLength
     var dataElement = this.readDataElement(metaReader, offset);
+    offset = dataElement.endOffset;
     // store the data element
-    this.appendDicomElement( dataElement );
+    this.dicomElements[dataElement.tag.name] = dataElement;
     // get meta length
-    var metaLength = parseInt(dataElement.data[0], 10);
-    offset += dataElement.offset;
+    var metaLength = parseInt(dataElement.value[0], 10);
 
     // meta elements
-    var metaStart = offset;
-    var metaEnd = metaStart + metaLength;
-    var i = metaStart;
-    while( i < metaEnd )
+    var metaEnd = offset + metaLength;
+    while( offset < metaEnd )
     {
         // get the data element
-        dataElement = this.readDataElement(metaReader, i, false);
+        dataElement = this.readDataElement(metaReader, offset, false);
+        offset = dataElement.endOffset;
         // store the data element
-        this.appendDicomElement( dataElement );
-        // increment index
-        i += dataElement.offset;
+        this.dicomElements[dataElement.tag.name] = dataElement;
+
     }
 
     // check the TransferSyntaxUID (has to be there!)
@@ -2727,117 +2781,34 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         throw new Error("Unknown transfer syntax: "+syntax);
     }
 
-    var startedPixelItems = false;
-    var tagName = "";
-    var tagOffset = 0;
-    var sequences = [];
-
     // DICOM data elements
-    while( i < buffer.byteLength )
+    while ( offset < buffer.byteLength )
     {
         // get the data element
-        dataElement = this.readDataElement(dataReader, i, implicit);
-
-        // locals
-        tagName = dataElement.tag.name;
-        tagOffset = dataElement.offset;
-        var vlNumber = (dataElement.vl === "u/l") ? 0 : dataElement.vl;
-
-        // new sequence (either vl="u/l" or vl!=0)
-        if ( dataElement.vr === "SQ" ) {
-            sequences.push( {
-                'name': tagName, 'itemNumber': -1,
-                'vl': dataElement.vl, 'vlCount': 0
-            });
-            tagOffset -= vlNumber;
-        }
-        // new Item
-        if ( sequences.length !== 0 && tagName === "xFFFEE000" ) {
-            sequences[sequences.length-1].itemNumber += 1;
-            if ( !startedPixelItems ) {
-                tagOffset -= vlNumber;
-            }
-        }
-        // end of sequence with implicit length (SequenceDelimitationItem)
-        else if ( tagName === "xFFFEE0DD" ) {
-            sequences = sequences.slice(0, -1);
-        }
-
-        // store pixel data from multiple Items
-        if( startedPixelItems ) {
-            // Item
-            if( tagName === "xFFFEE000" ) {
-                if( dataElement.data.length === 4 ) {
-                    // do nothing
-                }
-                else if( dataElement.data.length !== 0 ) {
-                    // concat does not work on typed arrays
-                    //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
-                    // manual concat...
-                    var size = dataElement.data.length + this.pixelBuffer.length;
-                    var newBuffer = new Uint16Array(size);
-                    newBuffer.set( this.pixelBuffer, 0 );
-                    newBuffer.set( dataElement.data, this.pixelBuffer.length );
-                    this.pixelBuffer = newBuffer;
-                }
-            }
-            // SequenceDelimitationItem
-            else if( tagName === "xFFFEE0DD" ) {
-                startedPixelItems = false;
-            }
-            else {
-                throw new Error("Unexpected tag in encapsulated pixel data: "+dataElement.tag.name);
-            }
-        }
-        // check the PixelData tag
-        if( tagName === "x7FE00010") {
-            if( dataElement.data.length !== 0 ) {
-                this.pixelBuffer = dataElement.data;
-            }
-            else {
-                // pixel data sequence
-                startedPixelItems = true;
-                sequences.push( {
-                    'name': tagName, 'itemNumber': -1,
-                    'vl': dataElement.vl, 'vlCount': 0
-                });
-                tagOffset -= vlNumber;
-            }
-        }
-
+        dataElement = this.readDataElement(dataReader, offset, implicit);
+        // increment offset
+        offset = dataElement.endOffset;
         // store the data element
-        this.appendDicomElement( dataElement, sequences );
-
-        // end of sequence with explicit length
-        if ( sequences.length !== 0 && (
-                dataElement.vr !== "SQ" || (
-                dataElement.vr === "SQ" && dataElement.vl === 0 ) ) ) {
-            var last = sequences.length - 1;
-            if (dataElement.vr !== "SQ") {
-                sequences[last].vlCount += tagOffset;
-            }
-            // check if we have reached the sequence vl
-            //  and the next ones
-            while ( sequences.length > 0 &&
-                    sequences[last].vlCount === sequences[last].vl ) {
-                // last count + size of a sequence
-                var lastVlCount = sequences[last].vlCount + 8;
-                // add VR size for explicit encoding
-                if ( !implicit ) {
-                    lastVlCount += 4;
-                }
-                // remove last sequence
-                sequences = sequences.slice(0, -1);
-                // add nested sequence vl
-                if ( sequences.length !== 0 ) {
-                    last = sequences.length - 1;
-                    sequences[last].vlCount += lastVlCount;
-                }
-            }
+        this.dicomElements[dataElement.tag.name] = dataElement;
+    }
+    
+    // pixel buffer
+    if (this.dicomElements.x7FE00010.vl !== "u/l") {
+        this.pixelBuffer = this.dicomElements.x7FE00010.value;
+    }
+    else {
+        // concatenate pixel data items
+        // concat does not work on typed arrays
+        //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
+        // manual concat...
+        var items = this.dicomElements.x7FE00010.value;
+        for (var i = 0; i < items.length; ++i) {
+            var size = items[i].value.length + this.pixelBuffer.length;
+            var newBuffer = new Uint16Array(size);
+            newBuffer.set( this.pixelBuffer, 0 );
+            newBuffer.set( items[i].value, this.pixelBuffer.length );
+            this.pixelBuffer = newBuffer;
         }
-
-        // increment index
-        i += tagOffset;
     }
 
     // check numberOfFrames
@@ -2895,9 +2866,9 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
             row = {};
             // trying to have name first in row
             dictElement = null;
-            if ( typeof dict[dicomElement.group] !== "undefined" &&
-                    typeof dict[dicomElement.group][dicomElement.element] !== "undefined") {
-                dictElement = dict[dicomElement.group][dicomElement.element];
+            if ( typeof dict[dicomElement.tag.group] !== "undefined" &&
+                    typeof dict[dicomElement.tag.group][dicomElement.tag.element] !== "undefined") {
+                dictElement = dict[dicomElement.tag.group][dicomElement.tag.element];
             }
             if ( dictElement !== null ) {
                 row.name = dictElement[2];
@@ -2935,7 +2906,7 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
         var checkHeader = true;
         for ( var i = 0 ; i < keys.length; ++i ) {
             dicomElement = dicomElements[keys[i]];
-            if ( checkHeader && dicomElement.group !== "0x0002" ) {
+            if ( checkHeader && dicomElement.tag.group !== "0x0002" ) {
                 result += "\n";
                 result += "# Dicom-Data-Set\n";
                 result += "# Used TransferSyntax: ";
@@ -2964,35 +2935,35 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
     // get element from dictionary
     var dict = dwv.dicom.dictionary;
     var dictElement = null;
-    if ( typeof dict[dicomElement.group] !== "undefined" &&
-            typeof dict[dicomElement.group][dicomElement.element] !== "undefined") {
-        dictElement = dict[dicomElement.group][dicomElement.element];
+    if ( typeof dict[dicomElement.tag.group] !== "undefined" &&
+            typeof dict[dicomElement.tag.group][dicomElement.tag.element] !== "undefined") {
+        dictElement = dict[dicomElement.tag.group][dicomElement.tag.element];
     }
 
     var deSize = dicomElement.value.length;
     var isOtherVR = ( dicomElement.vr[0].toUpperCase() === "O" );
 
     // no size for delimitations
-    if ( dicomElement.group === "0xFFFE" && (
-            dicomElement.element === "0xE00D" ||
-            dicomElement.element === "0xE0DD" ) ) {
+    if ( dicomElement.tag.group === "0xFFFE" && (
+            dicomElement.tag.element === "0xE00D" ||
+            dicomElement.tag.element === "0xE0DD" ) ) {
         deSize = 0;
     }
     else if ( isOtherVR ) {
         deSize = 1;
     }
 
-    var isPixSequence = (dicomElement.group === '0x7FE0' &&
-        dicomElement.element === '0x0010' &&
+    var isPixSequence = (dicomElement.tag.group === '0x7FE0' &&
+        dicomElement.tag.element === '0x0010' &&
         dicomElement.vl === 'u/l');
 
     var line = null;
 
     // (group,element)
     line = "(";
-    line += dicomElement.group.substr(2,5).toLowerCase();
+    line += dicomElement.tag.group.substr(2,5).toLowerCase();
     line += ",";
-    line += dicomElement.element.substr(2,5).toLowerCase();
+    line += dicomElement.tag.element.substr(2,5).toLowerCase();
     line += ") ";
     // value representation
     line += dicomElement.vr;
@@ -3151,8 +3122,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
             }
             message += ")";
             var itemDelimElement = {
-                    "group": "0xFFFE",
-                    "element": "0xE00D",
+                    "tag": { "group": "0xFFFE", "element": "0xE00D" },
                     "vr": "na",
                     "vl": "0",
                     "value": [message]
@@ -3168,12 +3138,11 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
         }
         message += ")";
         var sqDelimElement = {
-            "group": "0xFFFE",
-            "element": "0xE0DD",
-            "vr": "na",
-            "vl": "0",
-            "value": [message],
-        };
+                "tag": { "group": "0xFFFE", "element": "0xE0DD" },
+                "vr": "na",
+                "vl": "0",
+                "value": [message],
+            };
         line += "\n";
         line += this.getElementAsString(sqDelimElement, prefix);
     }
@@ -3182,22 +3151,17 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
         var pixItem = null;
         for ( var n = 0; n < dicomElement.value.length; ++n ) {
             pixItem = dicomElement.value[n];
-            var pixItemKeys = Object.keys(pixItem);
-            for ( var o = 0; o < pixItemKeys.length; ++o ) {
-                line += "\n";
-                var pixElement = pixItem[pixItemKeys[o]];
-                pixElement.vr = 'pi';
-                line += this.getElementAsString(pixElement, prefix + "  ");
-            }
+            line += "\n";
+            pixItem.vr = 'pi';
+            line += this.getElementAsString(pixItem, prefix + "  ");
         }
 
         var pixDelimElement = {
-            "group": "0xFFFE",
-            "element": "0xE0DD",
-            "vr": "na",
-            "vl": "0",
-            "value": ["(SequenceDelimitationItem)"],
-        };
+                "tag": { "group": "0xFFFE", "element": "0xE0DD" },
+                "vr": "na",
+                "vl": "0",
+                "value": ["(SequenceDelimitationItem)"],
+            };
         line += "\n";
         line += this.getElementAsString(pixDelimElement, prefix);
     }
@@ -3566,12 +3530,12 @@ dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset,
  * @returns {Number} The new offset position.
  */
 dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset) {
-    var isTagWithVR = dwv.dicom.isTagWithVR(element.group, element.element);
+    var isTagWithVR = dwv.dicom.isTagWithVR(element.tag.group, element.tag.element);
     var is32bitVLVR = dwv.dicom.is32bitVLVR(element.vr);
     // group
-    byteOffset = this.writeHex(byteOffset, element.group);
+    byteOffset = this.writeHex(byteOffset, element.tag.group);
     // element
-    byteOffset = this.writeHex(byteOffset, element.element);
+    byteOffset = this.writeHex(byteOffset, element.tag.element);
     // VR
     if ( isTagWithVR ) {
         byteOffset = this.writeString(byteOffset, element.vr);
@@ -3597,11 +3561,10 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset)
     // sequence delimitation item for sequence with implicit length
     if ( dwv.dicom.isImplicitLengthSequence(element) ) {
         var seqDelimElement = {
-                element: "0xE0DD",
-                group: "0xFFFE",
-                vr: "NONE",
-                vl: 0,
-                value: []
+                'tag': { group: "0xFFFE", element: "0xE0DD" },
+                'vr': "NONE",
+                'vl': 0,
+                'value': []
             };
         byteOffset = this.writeDataElement(seqDelimElement, byteOffset);
     }
@@ -3681,10 +3644,10 @@ dwv.dicom.DicomWriter = function () {
         // get group and tag string name
         var tagName = null;
         var dict = dwv.dicom.dictionary;
-        var group = element.group;
+        var group = element.tag.group;
         var groupName = dwv.dicom.TagGroups[group.substr(1)]; // remove first 0
         if ( typeof dict[group] !== 'undefined' ) {
-            tagName = dict[group][element.element][2];
+            tagName = dict[group][element.tag.element][2];
         }
         // apply rules:
         var rule;
@@ -3732,7 +3695,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
             }
             
             // sort element
-            groupName = dwv.dicom.TagGroups[element.group.substr(1)]; // remove first 0
+            groupName = dwv.dicom.TagGroups[element.tag.group.substr(1)]; // remove first 0
             if ( groupName === 'Meta Element' ) {
                 metaElements.push(element);
             }
