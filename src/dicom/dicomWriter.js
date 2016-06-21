@@ -311,12 +311,12 @@ dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset,
  * @returns {Number} The new offset position.
  */
 dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset) {
-    var isTagWithVR = dwv.dicom.isTagWithVR(element.group, element.element);
+    var isTagWithVR = dwv.dicom.isTagWithVR(element.tag.group, element.tag.element);
     var is32bitVLVR = dwv.dicom.is32bitVLVR(element.vr);
     // group
-    byteOffset = this.writeHex(byteOffset, element.group);
+    byteOffset = this.writeHex(byteOffset, element.tag.group);
     // element
-    byteOffset = this.writeHex(byteOffset, element.element);
+    byteOffset = this.writeHex(byteOffset, element.tag.element);
     // VR
     if ( isTagWithVR ) {
         byteOffset = this.writeString(byteOffset, element.vr);
@@ -342,11 +342,10 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset)
     // sequence delimitation item for sequence with implicit length
     if ( dwv.dicom.isImplicitLengthSequence(element) ) {
         var seqDelimElement = {
-                element: "0xE0DD",
-                group: "0xFFFE",
-                vr: "NONE",
-                vl: 0,
-                value: []
+                'tag': { group: "0xFFFE", element: "0xE0DD" },
+                'vr': "NONE",
+                'vl': 0,
+                'value': []
             };
         byteOffset = this.writeDataElement(seqDelimElement, byteOffset);
     }
@@ -426,10 +425,10 @@ dwv.dicom.DicomWriter = function () {
         // get group and tag string name
         var tagName = null;
         var dict = dwv.dicom.dictionary;
-        var group = element.group;
+        var group = element.tag.group;
         var groupName = dwv.dicom.TagGroups[group.substr(1)]; // remove first 0
         if ( typeof dict[group] !== 'undefined' ) {
-            tagName = dict[group][element.element][2];
+            tagName = dict[group][element.tag.element][2];
         }
         // apply rules:
         var rule;
@@ -477,7 +476,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
             }
             
             // sort element
-            groupName = dwv.dicom.TagGroups[element.group.substr(1)]; // remove first 0
+            groupName = dwv.dicom.TagGroups[element.tag.group.substr(1)]; // remove first 0
             if ( groupName === 'Meta Element' ) {
                 metaElements.push(element);
             }

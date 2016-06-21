@@ -32,10 +32,9 @@ function getDicomElement(tagName)
    }
    // return element definition
    return {
-     element: element,
-     group: group,
-     vr: dict[group][element][0],
-     vl: dict[group][element][1]
+     'tag': { 'group': group, 'element': element },
+     'vr': dict[group][element][0],
+     'vl': dict[group][element][1]
    };
 }
 // set a DICOM element value according to its VR (Value Representation)
@@ -81,32 +80,30 @@ function setElementValue(element, value) {
 	                    subSize += dwv.dicom.getDataElementPrefixByteSize("NONE");
 	                }
 
-		            name = dwv.dicom.getGroupElementKey(subElement.group, subElement.element);
+		            name = dwv.dicom.getGroupElementKey(subElement.tag.group, subElement.tag.element);
 		            itemElements[name] = subElement;
 	            }
 
 	            // item (after elements to get the size)
 	            var itemElement = {
-	                   element: "0xE000",
-	                   group: "0xFFFE",
-	                   vr: "NONE",
-	                   vl: (explicitLength ? subSize : 0xffffffff),
-	                   value: []
-	               };
-	            name = dwv.dicom.getGroupElementKey(itemElement.group, itemElement.element);
+	                     'tag': { 'group': "0xFFFE", 'element': "0xE000" },
+			             'vr': "NONE",
+			             'vl': (explicitLength ? subSize : 0xffffffff),
+			             'value': []
+			         };
+	            name = dwv.dicom.getGroupElementKey(itemElement.tag.group, itemElement.tag.element);
 	            itemElements[name] = itemElement;
                 subSize += dwv.dicom.getDataElementPrefixByteSize("NONE");
 
 	            // item delimitation
 	            if (!explicitLength) {
 	                var itemDelimElement = {
-	                        element: "0xE00D",
-	                        group: "0xFFFE",
-	                        vr: "NONE",
-	                        vl: 0,
-	                        value: []
+	                        'tag': { 'group': "0xFFFE", 'element': "0xE00D" },
+	                        'vr': "NONE",
+	                        'vl': 0,
+	                        'value': []
 	                    };
-	                name = dwv.dicom.getGroupElementKey(itemDelimElement.group, itemDelimElement.element);
+	                name = dwv.dicom.getGroupElementKey(itemDelimElement.tag.group, itemDelimElement.tag.element);
 	                itemElements[name] = itemDelimElement;
 	                subSize += dwv.dicom.getDataElementPrefixByteSize("NONE");
 	            }
@@ -175,7 +172,7 @@ function generate()
         // set its value
         setElementValue(dicomElement, tags[keys[k]]);
         // create the tag group/element key
-        name = dwv.dicom.getGroupElementKey(dicomElement.group, dicomElement.element);
+        name = dwv.dicom.getGroupElementKey(dicomElement.tag.group, dicomElement.tag.element);
         // store
         dicomElements[name] = dicomElement;
     }
@@ -197,12 +194,11 @@ function generate()
     var pixVL = dwv.dicom.getDataElementPrefixByteSize("OW") +
        (Uint16Array.BYTES_PER_ELEMENT * numberOfRows * numberOfColumns);
     dicomElements.x7FE00010 = {
-        element: "0x0010",
-        group: "0x7FE0",
-        vr: "OW",
-        vl: pixVL,
-        value: pixels
-    };
+            'tag': { 'group': "0x7FE0", 'element': "0x0010" },
+	        'vr': "OW",
+	        'vl': pixVL,
+	        'value': pixels
+	    };
 
     // create writer
     var writer = new dwv.dicom.DicomWriter();
@@ -226,6 +222,7 @@ function saveTags()
     var blob = new Blob([text], {type:"text/plain"});
     // update save button
     var element = document.getElementById("save");
+    console.log(_tagsFile);
     element.download = (_tagsFile === null ? "tags.json" : _tagsFile.name);
     element.href = URL.createObjectURL(blob);
 }
@@ -251,6 +248,9 @@ function launchJSONlint()
 // handle input tags file
 function onInputTagsFile(event)
 {
+    if (event.target.files.length === 0) {
+        return;
+    }
     _tagsFile = event.target.files[0];
     var reader = new FileReader();
     reader.onload = function (event) {
