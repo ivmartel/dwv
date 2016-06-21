@@ -103,10 +103,15 @@ QUnit.module("dicomParser");
 // behavior in browsers... 
 // For a DICOM dataset, it was giving an: 
 // 'RangeError: ArrayBuffer length minus the byteOffset is not a multiple of the element size.'
-// error which, according to specs, should be thrown when the size of the data
+// Which seem to originate from reading the data of first tag 
+// (FileMetaInformationGroupLength, Uint32 -> size=4)
+// at offset 140 of a file of size 3070. 3070-140=2930; 2930/4=732.5...
+//
+// Error which, according to specs, should be thrown when the size of the data
 // to read is not specified (see
 // https://www.khronos.org/registry/typedarray/specs/latest/#7). But it is specified...
-// So I updated the data to be of the correct size...
+// 
+// So I updated the data to be of the correct size (in this case 3072)... 
 
 /**
  * Tests for {@link dwv.dicom.DicomParser} using simple DICOM data.
@@ -209,57 +214,67 @@ QUnit.test("Test sequence DICOM parsing.", function (assert) {
         assert.ok((tags.dumpToTable().length!==0), "Got wrapped tags.");
 
         // ReferencedImageSequence: explicit sequence
-        var seq0 = tags.getFromName("ReferencedImageSequence");
-        assert.equal(seq0.length, 2, "ReferencedImageSequence length");
-        assert.equal(seq0[0].x00081155.value[0],
+        var seq00 = tags.getFromName("ReferencedImageSequence");
+        assert.equal(seq00.length, 3, "ReferencedImageSequence length");
+        assert.equal(seq00[0].x00081155.value[0],
                 "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094",
-                "ReferencedImageSequence item0 ReferencedSOPInstanceUID");
-        assert.equal(seq0[1].x00081155.value[0],
+                "ReferencedImageSequence - item0 - ReferencedSOPInstanceUID");
+        assert.equal(seq00[1].x00081155.value[0],
                 "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090",
                 "ReferencedImageSequence - item1 - ReferencedSOPInstanceUID");
 
         // SourceImageSequence: implicit sequence
-        var seq1 = tags.getFromName("SourceImageSequence");
-        assert.equal(seq1.length, 2, "SourceImageSequence length");
-        assert.equal(seq1[0].x00081155.value[0],
+        var seq01 = tags.getFromName("SourceImageSequence");
+        assert.equal(seq01.length, 3, "SourceImageSequence length");
+        assert.equal(seq01[0].x00081155.value[0],
                 "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094",
                 "SourceImageSequence - item0 - ReferencedSOPInstanceUID");
-        assert.equal(seq1[1].x00081155.value[0],
+        assert.equal(seq01[1].x00081155.value[0],
                 "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090",
                 "SourceImageSequence - item1 - ReferencedSOPInstanceUID");
 
         // ReferencedPatientSequence: explicit empty sequence
-        var seq2 = tags.getFromName("ReferencedPatientSequence");
-        assert.equal(seq2.length, 0, "ReferencedPatientSequence length");
+        var seq10 = tags.getFromName("ReferencedPatientSequence");
+        assert.equal(seq10.length, 0, "ReferencedPatientSequence length");
 
         // ReferencedOverlaySequence: implicit empty sequence
-        var seq3 = tags.getFromName("ReferencedOverlaySequence");
-        assert.equal(seq3.length, 0, "ReferencedOverlaySequence length");
+        var seq11 = tags.getFromName("ReferencedOverlaySequence");
+        assert.equal(seq11.length, 0, "ReferencedOverlaySequence length");
 
+        // ReferringPhysicianIdentificationSequence: explicit empty item
+        var seq12 = tags.getFromName("ReferringPhysicianIdentificationSequence");
+        assert.equal(seq12.xFFFEE000.value.length, 0, 
+                "ReferringPhysicianIdentificationSequence item length");
+        
+        // ConsultingPhysicianIdentificationSequence: implicit empty item
+        var seq13 = tags.getFromName("ConsultingPhysicianIdentificationSequence");
+        assert.equal(seq13.xFFFEE000.value.length, 0, 
+            "ConsultingPhysicianIdentificationSequence item length");
+        
         // ReferencedStudySequence: explicit sequence of sequence
-        var seq4 = tags.getFromName("ReferencedStudySequence");
+        var seq20 = tags.getFromName("ReferencedStudySequence");
         // just one element
-        //assert.equal(seq1.length, 2, "ReferencedStudySequence length");
-        assert.equal(seq4.x0040A170.value[0].x00080100.value[0],
+        //assert.equal(seq20.length, 2, "ReferencedStudySequence length");
+        assert.equal(seq20.x0040A170.value[0].x00080100.value[0],
                 "123456",
                 "ReferencedStudySequence - seq - item0 - CodeValue");
 
         // ReferencedSeriesSequence: implicit sequence of sequence
-        var seq5 = tags.getFromName("ReferencedSeriesSequence");
+        var seq21 = tags.getFromName("ReferencedSeriesSequence");
         // just one element
-        //assert.equal(seq1.length, 2, "ReferencedSeriesSequence length");
-        assert.equal(seq5.x0040A170.value[0].x00080100.value[0],
+        //assert.equal(seq21.length, 2, "ReferencedSeriesSequence length");
+        assert.equal(seq21.x0040A170.value[0].x00080100.value[0],
                 "789101",
                 "ReferencedSeriesSequence - seq - item0 - CodeValue");
 
         // ReferencedInstanceSequence: explicit empty sequence of sequence
-        var seq6 = tags.getFromName("ReferencedInstanceSequence");
-        assert.equal(seq6.x0040A170.value.length, 0,
+        var seq30 = tags.getFromName("ReferencedInstanceSequence");
+        assert.equal(seq30.x0040A170.value.length, 0,
                 "ReferencedInstanceSequence - seq - length");
 
         // ReferencedVisitSequence: implicit empty sequence of sequence
-        var seq7 = tags.getFromName("ReferencedVisitSequence");
-        assert.equal(seq7.x0040A170.value.length, 0,
+        var seq31 = tags.getFromName("ReferencedVisitSequence");
+        assert.equal(seq31.x0040A170.value.length, 0,
                 "ReferencedVisitSequence - seq - length");
 
         // finish async test
