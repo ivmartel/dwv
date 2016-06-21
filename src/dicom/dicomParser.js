@@ -89,7 +89,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      * @param {Number} byteOffset The offset to start reading from.
      * @return {Number} The read data.
      */
-    this.readUint16 = function(byteOffset) {
+    this.readUint16 = function (byteOffset) {
         return view.getUint16(byteOffset, isLittleEndian);
     };
     /**
@@ -97,7 +97,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      * @param {Number} byteOffset The offset to start reading from.
      * @return {Number} The read data.
      */
-    this.readUint32 = function(byteOffset) {
+    this.readUint32 = function (byteOffset) {
         return view.getUint32(byteOffset, isLittleEndian);
     };
     /**
@@ -105,7 +105,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      * @param {Number} byteOffset The offset to start reading from.
      * @return {Number} The read data.
      */
-    this.readInt32 = function(byteOffset) {
+    this.readInt32 = function (byteOffset) {
         return view.getInt32(byteOffset, isLittleEndian);
     };
     /**
@@ -114,7 +114,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      * @param {Number} size The size of the array.
      * @return {Array} The read data.
      */
-    this.readUint8Array = function(byteOffset, size) {
+    this.readUint8Array = function (byteOffset, size) {
         return new Uint8Array(buffer, byteOffset, size);
     };
     /**
@@ -123,7 +123,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      * @param {Number} size The size of the array.
      * @return {Array} The read data.
      */
-    this.readInt8Array = function(byteOffset, size) {
+    this.readInt8Array = function (byteOffset, size) {
         return new Int8Array(buffer, byteOffset, size);
     };
     /**
@@ -132,7 +132,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      * @param {Number} size The size of the array.
      * @return {Array} The read data.
      */
-    this.readUint16Array = function(byteOffset, size) {
+    this.readUint16Array = function (byteOffset, size) {
         var arraySize = size / Uint16Array.BYTES_PER_ELEMENT;
         var data = null;
         // byteOffset should be a multiple of Uint16Array.BYTES_PER_ELEMENT (=2)
@@ -158,7 +158,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      * @param {Number} size The size of the array.
      * @return {Array} The read data.
      */
-    this.readInt16Array = function(byteOffset, size) {
+    this.readInt16Array = function (byteOffset, size) {
         var arraySize = size / Int16Array.BYTES_PER_ELEMENT;
         var data = null;
         // byteOffset should be a multiple of Int16Array.BYTES_PER_ELEMENT (=2)
@@ -184,7 +184,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      * @param {Number} size The size of the array.
      * @return {Array} The read data.
      */
-    this.readUint32Array = function(byteOffset, size) {
+    this.readUint32Array = function (byteOffset, size) {
         var arraySize = size / Uint32Array.BYTES_PER_ELEMENT;
         var data = null;
         // byteOffset should be a multiple of Uint32Array.BYTES_PER_ELEMENT (=4)
@@ -210,7 +210,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      * @param {Number} size The size of the array.
      * @return {Array} The read data.
      */
-    this.readInt32Array = function(byteOffset, size) {
+    this.readInt32Array = function (byteOffset, size) {
         var arraySize = size / Int32Array.BYTES_PER_ELEMENT;
         var data = null;
         // byteOffset should be a multiple of Int32Array.BYTES_PER_ELEMENT (=4)
@@ -236,7 +236,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      * @param {Number} size The size of the array.
      * @return {Array} The read data.
      */
-    this.readFloat32Array = function(byteOffset, size) {
+    this.readFloat32Array = function (byteOffset, size) {
         var arraySize = size / Float32Array.BYTES_PER_ELEMENT;
         var data = null;
         // byteOffset should be a multiple of Float32Array.BYTES_PER_ELEMENT (=4)
@@ -262,7 +262,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      * @param {Number} size The size of the array.
      * @return {Array} The read data.
      */
-    this.readFloat64Array = function(byteOffset, size) {
+    this.readFloat64Array = function (byteOffset, size) {
         var arraySize = size / Float64Array.BYTES_PER_ELEMENT;
         var data = null;
         // byteOffset should be a multiple of Float64Array.BYTES_PER_ELEMENT (=8)
@@ -287,7 +287,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      * @param {Number} byteOffset The offset to start reading from.
      * @return {Array} The read data.
      */
-    this.readHex = function(byteOffset) {
+    this.readHex = function (byteOffset) {
         // read and convert to hex string
         var str = this.readUint16(byteOffset).toString(16);
         // return padded
@@ -299,7 +299,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      * @param {Number} nChars The number of characters to read.
      * @return {String} The read data.
      */
-    this.readString = function(byteOffset, nChars) {
+    this.readString = function (byteOffset, nChars) {
         var result = "";
         var data = this.readUint8Array(byteOffset, nChars);
         for ( var i = 0; i < nChars; ++i ) {
@@ -335,7 +335,7 @@ dwv.dicom.splitGroupElementKey = function (key)
  * @param {String} The transfer syntax to test.
  * @return {Boolean} True if a jpeg baseline syntax.
  */
-dwv.dicom.isJpegBaselineTransferSyntax = function(syntax)
+dwv.dicom.isJpegBaselineTransferSyntax = function (syntax)
 {
     return syntax === "1.2.840.10008.1.2.4.50" ||
         syntax === "1.2.840.10008.1.2.4.51";
@@ -346,7 +346,7 @@ dwv.dicom.isJpegBaselineTransferSyntax = function(syntax)
  * @param {String} The transfer syntax to test.
  * @return {Boolean} True if a non supported jpeg syntax.
  */
-dwv.dicom.isJpegNonSupportedTransferSyntax = function(syntax)
+dwv.dicom.isJpegNonSupportedTransferSyntax = function (syntax)
 {
     return ( syntax.match(/1.2.840.10008.1.2.4.5/) !== null &&
         !dwv.dicom.isJpegBaselineTransferSyntax() &&
@@ -359,7 +359,7 @@ dwv.dicom.isJpegNonSupportedTransferSyntax = function(syntax)
  * @param {String} The transfer syntax to test.
  * @return {Boolean} True if a jpeg lossless syntax.
  */
-dwv.dicom.isJpegLosslessTransferSyntax = function(syntax)
+dwv.dicom.isJpegLosslessTransferSyntax = function (syntax)
 {
     return syntax === "1.2.840.10008.1.2.4.57" ||
         syntax === "1.2.840.10008.1.2.4.70";
@@ -370,7 +370,7 @@ dwv.dicom.isJpegLosslessTransferSyntax = function(syntax)
  * @param {String} The transfer syntax to test.
  * @return {Boolean} True if a jpeg-ls syntax.
  */
-dwv.dicom.isJpeglsTransferSyntax = function(syntax)
+dwv.dicom.isJpeglsTransferSyntax = function (syntax)
 {
     return syntax.match(/1.2.840.10008.1.2.4.8/) !== null;
 };
@@ -380,7 +380,7 @@ dwv.dicom.isJpeglsTransferSyntax = function(syntax)
  * @param {String} The transfer syntax to test.
  * @return {Boolean} True if a jpeg 2000 syntax.
  */
-dwv.dicom.isJpeg2000TransferSyntax = function(syntax)
+dwv.dicom.isJpeg2000TransferSyntax = function (syntax)
 {
     return syntax.match(/1.2.840.10008.1.2.4.9/) !== null;
 };
@@ -390,7 +390,7 @@ dwv.dicom.isJpeg2000TransferSyntax = function(syntax)
  * @param {String} The transfer syntax to test.
  * @return {String} The name of the decompression algorithm.
  */
-dwv.dicom.getSyntaxDecompressionName = function(syntax)
+dwv.dicom.getSyntaxDecompressionName = function (syntax)
 {
     var algo = null;
     if ( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
@@ -528,7 +528,7 @@ dwv.dicom.getDataElementPrefixByteSize = function (vr) {
  * DicomParser class.
  * @constructor
  */
-dwv.dicom.DicomParser = function()
+dwv.dicom.DicomParser = function ()
 {
     /**
      * The list of DICOM elements.
@@ -560,7 +560,7 @@ dwv.dicom.DicomParser = function()
  * Get the raw DICOM data elements.
  * @return {Object} The raw DICOM elements.
  */
-dwv.dicom.DicomParser.prototype.getRawDicomElements = function()
+dwv.dicom.DicomParser.prototype.getRawDicomElements = function ()
 {
     return this.dicomElements;
 };
@@ -569,7 +569,7 @@ dwv.dicom.DicomParser.prototype.getRawDicomElements = function()
  * Get the DICOM data elements.
  * @return {Object} The DICOM elements.
  */
-dwv.dicom.DicomParser.prototype.getDicomElements = function()
+dwv.dicom.DicomParser.prototype.getDicomElements = function ()
 {
     return new dwv.dicom.DicomElementsWrapper(this.dicomElements);
 };
@@ -578,7 +578,7 @@ dwv.dicom.DicomParser.prototype.getDicomElements = function()
  * Get the DICOM data pixel buffer.
  * @return {Array} The pixel buffer.
  */
-dwv.dicom.DicomParser.prototype.getPixelBuffer = function()
+dwv.dicom.DicomParser.prototype.getPixelBuffer = function ()
 {
     return this.pixelBuffer;
 };
@@ -589,7 +589,7 @@ dwv.dicom.DicomParser.prototype.getPixelBuffer = function()
  * @param offset The offset where to start to read.
  * @return An object containing the tags 'group', 'element' and 'name'.
  */
-dwv.dicom.DicomParser.prototype.readTag = function(reader, offset)
+dwv.dicom.DicomParser.prototype.readTag = function (reader, offset)
 {
     // group
     var group = reader.readHex(offset);
@@ -708,7 +708,7 @@ dwv.dicom.DicomParser.prototype.readPixelItemDataElement = function (reader, off
  * @param {Boolean} implicit Is the DICOM VR implicit?
  * @return {Object} An object containing the element 'tag', 'vl', 'vr', 'data' and 'endOffset'.
  */
-dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, implicit)
+dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, implicit)
 {
     // Tag: group, element
     var tag = this.readTag(reader, offset);
@@ -898,7 +898,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function(reader, offset, impli
  * Fills in the member object 'dicomElements'.
  * @param buffer The input array buffer.
  */
-dwv.dicom.DicomParser.prototype.parse = function(buffer)
+dwv.dicom.DicomParser.prototype.parse = function (buffer)
 {
     var offset = 0;
     var implicit = false;
@@ -932,7 +932,6 @@ dwv.dicom.DicomParser.prototype.parse = function(buffer)
         offset = dataElement.endOffset;
         // store the data element
         this.dicomElements[dataElement.tag.name] = dataElement;
-
     }
 
     // check the TransferSyntaxUID (has to be there!)
@@ -1128,9 +1127,9 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
 };
 
 /**
- *
- * @param group
- * @param element
+ * Get a data element as a string.
+ * @param {Object} dicomElement The DICOM element.
+ * @param {String} prefix A string to prepend this one.
  */
 dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomElement, prefix )
 {
