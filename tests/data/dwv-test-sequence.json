@@ -38,6 +38,14 @@
   },
   "ReferencedPatientSequence": {},
   "ReferencedOverlaySequence": 0,
+  "ReferringPhysicianIdentificationSequence": {
+    "explicitLength": true,
+    "item0": {}
+  },
+  "ConsultingPhysicianIdentificationSequence": {
+    "explicitLength": false,
+    "item0": 0 
+  },
   "ReferencedStudySequence": {
     "explicitLength": true,
     "item0": {
