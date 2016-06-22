@@ -18,6 +18,9 @@ QUnit.test("Test Size.", function (assert) {
     assert.equal( size0.getNumberOfSlices(), 4, "getNumberOfSlices" );
     assert.equal( size0.getSliceSize(), 6, "getSliceSize" );
     assert.equal( size0.getTotalSize(), 24, "getTotalSize" );
+    // defaults
+    var size00 = new dwv.image.Size(2, 3);
+    assert.equal( size00.getNumberOfSlices(), 1, "getNumberOfSlices default" );
     // equality
     assert.equal( size0.equals(size0), 1, "equals self true" );
     var size1 = new dwv.image.Size(2, 3, 4);
@@ -25,7 +28,8 @@ QUnit.test("Test Size.", function (assert) {
     var size2 = new dwv.image.Size(3, 3, 4);
     assert.equal( size0.equals(size2), 0, "equals false" );
     // is in bounds
-    assert.equal( size0.isInBounds(0,0,0), 1, "isInBounds 0" );
+    assert.equal( size0.isInBounds(0,0,0), 1, "isInBounds 0,0,0" );
+    assert.equal( size0.isInBounds(0,0), 1, "isInBounds 0,0" );
     assert.equal( size0.isInBounds(1,2,3), 1, "isInBounds max" );
     assert.equal( size0.isInBounds(2,3,4), 0, "isInBounds too big" );
     assert.equal( size0.isInBounds(-1,2,3), 0, "isInBounds too small" );
