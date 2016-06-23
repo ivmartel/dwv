@@ -168,7 +168,7 @@ dwv.image.View = function(image, isSigned)
         {
             this.fireEvent({"type": "position-change",
                 "i": pos.i, "j": pos.j, "k": pos.k,
-                "value": image.getRescaledValue(pos.i,pos.j,pos.k)});
+                "value": image.getRescaledValue(pos.i,pos.j,pos.k, this.getCurrentFrame())});
         }
         else
         {
@@ -211,6 +211,8 @@ dwv.image.View = function(image, isSigned)
         // fire event
         if( oldFrame !== currentFrame ) {
             this.fireEvent({"type": "frame-change", "frame": currentFrame});
+            // silent set current position to update info text
+            this.setCurrentPosition(this.getCurrentPosition(),true);
         }
         // all good
         return true;

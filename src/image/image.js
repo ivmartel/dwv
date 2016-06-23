@@ -77,9 +77,19 @@ dwv.image.RescaleSlopeAndIntercept.prototype.toString = function () {
  */
 dwv.image.Image = function(geometry, buffer, numberOfFrames)
 {
+    /**
+     * Number of frames.
+     * @private
+     * @type Number
+     */
     if (typeof numberOfFrames === "undefined" ) {
         numberOfFrames = 1;
     }
+    
+    /**
+     * Get the number of frames.
+     * @returns {Number} The number of frames.
+     */
     this.getNumberOfFrames = function () {
         return numberOfFrames;
     };
@@ -351,13 +361,16 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
  * @param {Number} i The X index.
  * @param {Number} j The Y index.
  * @param {Number} k The Z index.
+ * @param {Number} f The frame number.
  * @return {Number} The value at the desired position.
  * Warning: No size check...
  */
-dwv.image.Image.prototype.getValue = function( i, j, k )
+dwv.image.Image.prototype.getValue = function( i, j, k, f )
 {
+    var frame = (f || 0);
     var index = new dwv.math.Index3D(i,j,k);
-    return this.getValueAtOffset( this.getGeometry().indexToOffset(index) );
+    return this.getValueAtOffset( this.getGeometry().getSize().getTotalSize() * frame + 
+            this.getGeometry().indexToOffset(index) );
 };
 
 /**
@@ -365,12 +378,14 @@ dwv.image.Image.prototype.getValue = function( i, j, k )
  * @param {Number} i The X index.
  * @param {Number} j The Y index.
  * @param {Number} k The Z index.
+ * @param {Number} f The frame number.
  * @return {Number} The rescaled value at the desired position.
  * Warning: No size check...
  */
-dwv.image.Image.prototype.getRescaledValue = function( i, j, k )
+dwv.image.Image.prototype.getRescaledValue = function( i, j, k, f )
 {
-    return this.getRescaleSlopeAndIntercept(k).apply( this.getValue(i,j,k) );
+    var frame = (f || 0);
+    return this.getRescaleSlopeAndIntercept(k).apply( this.getValue(i,j,k,frame) );
 };
 
 /**
