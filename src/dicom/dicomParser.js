@@ -1014,12 +1014,6 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
             this.pixelBuffer = newBuffer;
         }
     }
-
-    // check numberOfFrames
-    if ( typeof this.dicomElements.x00280008 !== 'undefined' &&
-            this.dicomElements.x00280008.value[0] > 1 ) {
-        throw new Error("Unsupported multi-frame data");
-    }
 };
 
 /**

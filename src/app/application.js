@@ -24,7 +24,7 @@ dwv.App = function ()
     var dataHeight = 0;
     // Number of slices to load
     var nSlicesToLoad = 0;
-    
+
     // Data decoders scripts
     var decoderScripts = null;
 
@@ -190,7 +190,7 @@ dwv.App = function ()
      * Add a command to the undo stack.
      * @param {Object} The command to add.
      */
-    this.addToUndoStack = function (cmd) { 
+    this.addToUndoStack = function (cmd) {
         if ( undoStack !== null ) {
             undoStack.add(cmd);
         }
@@ -324,7 +324,7 @@ dwv.App = function ()
             var dropBoxSize = 2 * size.height / 3;
             box.setAttribute("style","width:"+dropBoxSize+"px;height:"+dropBoxSize+"px");
         }
-        
+
         // possible load from URL
         if ( typeof config.skipLoadUrl === "undefined" ) {
             var query = dwv.utils.getUriQuery(window.location.href);
@@ -343,7 +343,7 @@ dwv.App = function ()
         else{
             console.log("Not loading url from address since skipLoadUrl is defined.");
         }
-        
+
         // align layers when the window is resized
         if ( config.fitToWindow ) {
             fitToWindow = true;
@@ -537,7 +537,7 @@ dwv.App = function ()
             loadImageUrls(urls, requestHeaders);
         }
     };
-    
+
     /**
      * Load a list of image URLs.
      * @private
@@ -671,6 +671,10 @@ dwv.App = function ()
             presets[keys[0]].width );
         // default position
         viewController.setCurrentPosition2D(0,0);
+        // default frame
+        if (self.getImage().getNumberOfFrames() !== 1) {
+            viewController.setCurrentFrame(0);
+        }
     };
 
     /**
@@ -797,6 +801,11 @@ dwv.App = function ()
         generateAndDrawImage();
     };
 
+    this.onFrameChange = function (/*event*/)
+    {
+        generateAndDrawImage();
+    };
+
     /**
      * Handle slice change.
      * @param {Object} event The event fired when changing the slice.
@@ -820,7 +829,9 @@ dwv.App = function ()
      * Handle key down event.
      * - CRTL-Z: undo
      * - CRTL-Y: redo
+     * - CRTL-ARROW_LEFT: next frame
      * - CRTL-ARROW_UP: next slice
+     * - CRTL-ARROW_RIGHT: previous frame
      * - CRTL-ARROW_DOWN: previous slice
      * Default behavior. Usually used in tools.
      * @param {Object} event The key down event.
@@ -828,10 +839,20 @@ dwv.App = function ()
     this.onKeydown = function (event)
     {
         if (event.ctrlKey) {
-            if ( event.keyCode === 38 ) // crtl-arrow-up
+            if ( event.keyCode === 37 ) // crtl-arrow-left
+            {
+                event.preventDefault();
+                self.getViewController().decrementFrameNb();
+            }
+            else if ( event.keyCode === 38 ) // crtl-arrow-up
             {
                 event.preventDefault();
                 self.getViewController().incrementSliceNb();
+            }
+            else if ( event.keyCode === 39 ) // crtl-arrow-right
+            {
+                event.preventDefault();
+                self.getViewController().incrementFrameNb();
             }
             else if ( event.keyCode === 40 ) // crtl-arrow-down
             {
@@ -1146,6 +1167,7 @@ dwv.App = function ()
         view.addEventListener("wl-change", plotInfo.update);
         view.addEventListener("colour-change", miniColourMap.update);
         view.addEventListener("position-change", positionInfo.update);
+        view.addEventListener("frame-change", positionInfo.update);
         isInfoLayerListening = true;
     }
 
@@ -1160,6 +1182,7 @@ dwv.App = function ()
         view.removeEventListener("wl-change", plotInfo.update);
         view.removeEventListener("colour-change", miniColourMap.update);
         view.removeEventListener("position-change", positionInfo.update);
+        view.removeEventListener("frame-change", positionInfo.update);
         isInfoLayerListening = false;
     }
 
@@ -1397,12 +1420,14 @@ dwv.App = function ()
         view.addEventListener("wl-change", self.onWLChange);
         view.addEventListener("colour-change", self.onColourChange);
         view.addEventListener("slice-change", self.onSliceChange);
+        view.addEventListener("frame-change", self.onFrameChange);
 
         // connect with local listeners
         view.addEventListener("wl-change", fireEvent);
         view.addEventListener("colour-change", fireEvent);
         view.addEventListener("position-change", fireEvent);
         view.addEventListener("slice-change", fireEvent);
+        view.addEventListener("frame-change", fireEvent);
 
         // update presets with loaded image (used in w/l tool)
         viewController.updatePresets(image, true);

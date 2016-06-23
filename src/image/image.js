@@ -75,8 +75,15 @@ dwv.image.RescaleSlopeAndIntercept.prototype.toString = function () {
  * @param {Object} geometry The geometry of the image.
  * @param {Array} buffer The image data.
  */
-dwv.image.Image = function(geometry, buffer)
+dwv.image.Image = function(geometry, buffer, numberOfFrames)
 {
+    if (typeof numberOfFrames === "undefined" ) {
+        numberOfFrames = 1;
+    }
+    this.getNumberOfFrames = function () {
+        return numberOfFrames;
+    };
+
     /**
      * Rescale slope and intercept.
      * @private
@@ -143,7 +150,7 @@ dwv.image.Image = function(geometry, buffer)
      */
     this.getGeometry = function() { return geometry; };
     /**
-     * Get the data buffer of the image. 
+     * Get the data buffer of the image.
      * @todo dangerous...
      * @return {Array} The data buffer of the image.
      */
@@ -216,7 +223,7 @@ dwv.image.Image = function(geometry, buffer)
      */
     this.clone = function()
     {
-        var copy = new dwv.image.Image(this.getGeometry(), originalBuffer);
+        var copy = new dwv.image.Image(this.getGeometry(), originalBuffer, numberOfFrames);
         var nslices = this.getGeometry().getSize().getNumberOfSlices();
         for ( var k = 0; k < nslices; ++k ) {
             copy.setRescaleSlopeAndIntercept(this.getRescaleSlopeAndIntercept(k), k);
@@ -764,8 +771,17 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var origin = new dwv.math.Point3D(slicePosition[0], slicePosition[1], slicePosition[2]);
     var geometry = new dwv.image.Geometry( origin, size, spacing );
 
+    // numberOfFrames
+    var numberOfFrames = dicomElements.getFromKey("x00280008");
+    if ( !numberOfFrames ) {
+        numberOfFrames = 1;
+    }
+    else {
+        numberOfFrames = parseInt(numberOfFrames, 10);
+    }
+
     // image
-    var image = new dwv.image.Image( geometry, buffer );
+    var image = new dwv.image.Image( geometry, buffer, numberOfFrames );
     // PhotometricInterpretation
     var photometricInterpretation = dicomElements.getFromKey("x00280004");
     if ( photometricInterpretation ) {
