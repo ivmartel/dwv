@@ -24,7 +24,7 @@ dwv.App = function ()
     var dataHeight = 0;
     // Number of slices to load
     var nSlicesToLoad = 0;
-    
+
     // Data decoders scripts
     var decoderScripts = null;
 
@@ -190,7 +190,7 @@ dwv.App = function ()
      * Add a command to the undo stack.
      * @param {Object} The command to add.
      */
-    this.addToUndoStack = function (cmd) { 
+    this.addToUndoStack = function (cmd) {
         if ( undoStack !== null ) {
             undoStack.add(cmd);
         }
@@ -324,7 +324,7 @@ dwv.App = function ()
             var dropBoxSize = 2 * size.height / 3;
             box.setAttribute("style","width:"+dropBoxSize+"px;height:"+dropBoxSize+"px");
         }
-        
+
         // possible load from URL
         if ( typeof config.skipLoadUrl === "undefined" ) {
             var query = dwv.utils.getUriQuery(window.location.href);
@@ -343,7 +343,7 @@ dwv.App = function ()
         else{
             console.log("Not loading url from address since skipLoadUrl is defined.");
         }
-        
+
         // align layers when the window is resized
         if ( config.fitToWindow ) {
             fitToWindow = true;
@@ -537,7 +537,7 @@ dwv.App = function ()
             loadImageUrls(urls, requestHeaders);
         }
     };
-    
+
     /**
      * Load a list of image URLs.
      * @private
@@ -671,6 +671,10 @@ dwv.App = function ()
             presets[keys[0]].width );
         // default position
         viewController.setCurrentPosition2D(0,0);
+        // default frame
+        if (self.getImage().getNumberOfFrames() !== 1) {
+            viewController.setCurrentFrame(0);
+        }
     };
 
     /**
@@ -797,6 +801,11 @@ dwv.App = function ()
         generateAndDrawImage();
     };
 
+    this.onFrameChange = function (/*event*/)
+    {
+        generateAndDrawImage();
+    };
+
     /**
      * Handle slice change.
      * @param {Object} event The event fired when changing the slice.
@@ -820,7 +829,9 @@ dwv.App = function ()
      * Handle key down event.
      * - CRTL-Z: undo
      * - CRTL-Y: redo
+     * - CRTL-ARROW_LEFT: next frame
      * - CRTL-ARROW_UP: next slice
+     * - CRTL-ARROW_RIGHT: previous frame
      * - CRTL-ARROW_DOWN: previous slice
      * Default behavior. Usually used in tools.
      * @param {Object} event The key down event.
@@ -828,10 +839,20 @@ dwv.App = function ()
     this.onKeydown = function (event)
     {
         if (event.ctrlKey) {
-            if ( event.keyCode === 38 ) // crtl-arrow-up
+            if ( event.keyCode === 37 ) // crtl-arrow-left
+            {
+                event.preventDefault();
+                self.getViewController().decrementFrameNb();
+            }
+            else if ( event.keyCode === 38 ) // crtl-arrow-up
             {
                 event.preventDefault();
                 self.getViewController().incrementSliceNb();
+            }
+            else if ( event.keyCode === 39 ) // crtl-arrow-right
+            {
+                event.preventDefault();
+                self.getViewController().incrementFrameNb();
             }
             else if ( event.keyCode === 40 ) // crtl-arrow-down
             {
@@ -1146,6 +1167,7 @@ dwv.App = function ()
         view.addEventListener("wl-change", plotInfo.update);
         view.addEventListener("colour-change", miniColourMap.update);
         view.addEventListener("position-change", positionInfo.update);
+        view.addEventListener("frame-change", positionInfo.update);
         isInfoLayerListening = true;
     }
 
@@ -1160,6 +1182,7 @@ dwv.App = function ()
         view.removeEventListener("wl-change", plotInfo.update);
         view.removeEventListener("colour-change", miniColourMap.update);
         view.removeEventListener("position-change", positionInfo.update);
+        view.removeEventListener("frame-change", positionInfo.update);
         isInfoLayerListening = false;
     }
 
@@ -1397,12 +1420,14 @@ dwv.App = function ()
         view.addEventListener("wl-change", self.onWLChange);
         view.addEventListener("colour-change", self.onColourChange);
         view.addEventListener("slice-change", self.onSliceChange);
+        view.addEventListener("frame-change", self.onFrameChange);
 
         // connect with local listeners
         view.addEventListener("wl-change", fireEvent);
         view.addEventListener("colour-change", fireEvent);
         view.addEventListener("position-change", fireEvent);
         view.addEventListener("slice-change", fireEvent);
+        view.addEventListener("frame-change", fireEvent);
 
         // update presets with loaded image (used in w/l tool)
         viewController.updatePresets(image, true);
@@ -1682,6 +1707,34 @@ dwv.ViewController = function ( view )
     };
 
     /**
+     * Set the current frame.
+     * @param {Number} number The frame number.
+     * @return {Boolean} False if not in bounds.
+      */
+    this.setCurrentFrame = function (number)
+    {
+        return view.setCurrentFrame(number);
+    };
+
+    /**
+     * Increment the current frame.
+     * @return {Boolean} False if not in bounds.
+     */
+    this.incrementFrameNb = function ()
+    {
+        return view.setCurrentFrame( view.getCurrentFrame() + 1 );
+    };
+
+    /**
+     * Decrement the current frame.
+     * @return {Boolean} False if not in bounds.
+     */
+    this.decrementFrameNb = function ()
+    {
+        return view.setCurrentFrame( view.getCurrentFrame() - 1 );
+    };
+
+    /**
      * Go to first slice .
      * @return {Boolean} False if not in bounds.
      */
@@ -1690,7 +1743,7 @@ dwv.ViewController = function ( view )
         return view.setCurrentPosition({
             "i": view.getCurrentPosition().i,
             "j": view.getCurrentPosition().j,
-            "k":  0
+            "k": 0
         });
     };
 
@@ -2792,28 +2845,24 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     }
     
     // pixel buffer
-    if (this.dicomElements.x7FE00010.vl !== "u/l") {
-        this.pixelBuffer = this.dicomElements.x7FE00010.value;
-    }
-    else {
-        // concatenate pixel data items
-        // concat does not work on typed arrays
-        //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
-        // manual concat...
-        var items = this.dicomElements.x7FE00010.value;
-        for (var i = 0; i < items.length; ++i) {
-            var size = items[i].value.length + this.pixelBuffer.length;
-            var newBuffer = new Uint16Array(size);
-            newBuffer.set( this.pixelBuffer, 0 );
-            newBuffer.set( items[i].value, this.pixelBuffer.length );
-            this.pixelBuffer = newBuffer;
+    if (typeof this.dicomElements.x7FE00010 !== "undefined") {
+        if (this.dicomElements.x7FE00010.vl !== "u/l") {
+            this.pixelBuffer = this.dicomElements.x7FE00010.value;
         }
-    }
-
-    // check numberOfFrames
-    if ( typeof this.dicomElements.x00280008 !== 'undefined' &&
-            this.dicomElements.x00280008.value[0] > 1 ) {
-        throw new Error("Unsupported multi-frame data");
+        else {
+            // concatenate pixel data items
+            // concat does not work on typed arrays
+            //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
+            // manual concat...
+            var items = this.dicomElements.x7FE00010.value;
+            for (var i = 0; i < items.length; ++i) {
+                var size = items[i].value.length + this.pixelBuffer.length;
+                var newBuffer = new Uint16Array(size);
+                newBuffer.set( this.pixelBuffer, 0 );
+                newBuffer.set( items[i].value, this.pixelBuffer.length );
+                this.pixelBuffer = newBuffer;
+            }
+        }
     }
 };
 
@@ -10726,8 +10775,25 @@ dwv.image.RescaleSlopeAndIntercept.prototype.toString = function () {
  * @param {Object} geometry The geometry of the image.
  * @param {Array} buffer The image data.
  */
-dwv.image.Image = function(geometry, buffer)
+dwv.image.Image = function(geometry, buffer, numberOfFrames)
 {
+    /**
+     * Number of frames.
+     * @private
+     * @type Number
+     */
+    if (typeof numberOfFrames === "undefined" ) {
+        numberOfFrames = 1;
+    }
+    
+    /**
+     * Get the number of frames.
+     * @returns {Number} The number of frames.
+     */
+    this.getNumberOfFrames = function () {
+        return numberOfFrames;
+    };
+
     /**
      * Rescale slope and intercept.
      * @private
@@ -10794,7 +10860,7 @@ dwv.image.Image = function(geometry, buffer)
      */
     this.getGeometry = function() { return geometry; };
     /**
-     * Get the data buffer of the image. 
+     * Get the data buffer of the image.
      * @todo dangerous...
      * @return {Array} The data buffer of the image.
      */
@@ -10867,7 +10933,7 @@ dwv.image.Image = function(geometry, buffer)
      */
     this.clone = function()
     {
-        var copy = new dwv.image.Image(this.getGeometry(), originalBuffer);
+        var copy = new dwv.image.Image(this.getGeometry(), originalBuffer, numberOfFrames);
         var nslices = this.getGeometry().getSize().getNumberOfSlices();
         for ( var k = 0; k < nslices; ++k ) {
             copy.setRescaleSlopeAndIntercept(this.getRescaleSlopeAndIntercept(k), k);
@@ -10995,13 +11061,16 @@ dwv.image.Image = function(geometry, buffer)
  * @param {Number} i The X index.
  * @param {Number} j The Y index.
  * @param {Number} k The Z index.
+ * @param {Number} f The frame number.
  * @return {Number} The value at the desired position.
  * Warning: No size check...
  */
-dwv.image.Image.prototype.getValue = function( i, j, k )
+dwv.image.Image.prototype.getValue = function( i, j, k, f )
 {
+    var frame = (f || 0);
     var index = new dwv.math.Index3D(i,j,k);
-    return this.getValueAtOffset( this.getGeometry().indexToOffset(index) );
+    return this.getValueAtOffset( this.getGeometry().getSize().getTotalSize() * frame + 
+            this.getGeometry().indexToOffset(index) );
 };
 
 /**
@@ -11009,12 +11078,14 @@ dwv.image.Image.prototype.getValue = function( i, j, k )
  * @param {Number} i The X index.
  * @param {Number} j The Y index.
  * @param {Number} k The Z index.
+ * @param {Number} f The frame number.
  * @return {Number} The rescaled value at the desired position.
  * Warning: No size check...
  */
-dwv.image.Image.prototype.getRescaledValue = function( i, j, k )
+dwv.image.Image.prototype.getRescaledValue = function( i, j, k, f )
 {
-    return this.getRescaleSlopeAndIntercept(k).apply( this.getValue(i,j,k) );
+    var frame = (f || 0);
+    return this.getRescaleSlopeAndIntercept(k).apply( this.getValue(i,j,k,frame) );
 };
 
 /**
@@ -11415,8 +11486,17 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var origin = new dwv.math.Point3D(slicePosition[0], slicePosition[1], slicePosition[2]);
     var geometry = new dwv.image.Geometry( origin, size, spacing );
 
+    // numberOfFrames
+    var numberOfFrames = dicomElements.getFromKey("x00280008");
+    if ( !numberOfFrames ) {
+        numberOfFrames = 1;
+    }
+    else {
+        numberOfFrames = parseInt(numberOfFrames, 10);
+    }
+
     // image
-    var image = new dwv.image.Image( geometry, buffer );
+    var image = new dwv.image.Image( geometry, buffer, numberOfFrames );
     // PhotometricInterpretation
     var photometricInterpretation = dicomElements.getFromKey("x00280004");
     if ( photometricInterpretation ) {
@@ -12028,17 +12108,23 @@ dwv.image.View = function(image, isSigned)
      */
     var windowPresets = null;
     /**
-     * colour map
+     * colour map.
      * @private
      * @type Object
      */
     var colourMap = dwv.image.lut.plain;
     /**
-     * Current position
+     * Current position.
      * @private
      * @type Object
      */
     var currentPosition = {"i":0,"j":0,"k":0};
+    /**
+     * Current frame. Zero based.
+     * @private
+     * @type Number
+     */
+    var currentFrame = null;
 
     /**
      * Get the associated image.
@@ -12142,9 +12228,10 @@ dwv.image.View = function(image, isSigned)
         return {"i": currentPosition.i, "j": currentPosition.j, "k": currentPosition.k};
     };
     /**
-     * Set the current position. Returns false if not in bounds.
+     * Set the current position.
      * @param {Object} pos The current position.
      * @param {Boolean} silent If true, does not fire a slice-change event.
+     * @return {Boolean} False if not in bounds
      */
     this.setCurrentPosition = function(pos, silent) {
         // default silent flag to false
@@ -12163,7 +12250,7 @@ dwv.image.View = function(image, isSigned)
         {
             this.fireEvent({"type": "position-change",
                 "i": pos.i, "j": pos.j, "k": pos.k,
-                "value": image.getRescaledValue(pos.i,pos.j,pos.k)});
+                "value": image.getRescaledValue(pos.i,pos.j,pos.k, this.getCurrentFrame())});
         }
         else
         {
@@ -12178,6 +12265,37 @@ dwv.image.View = function(image, isSigned)
           }
         }
 
+        // all good
+        return true;
+    };
+
+    /**
+     * Get the current frame number.
+     * @return {Number} The current frame number.
+     */
+    this.getCurrentFrame = function() {
+        return currentFrame;
+    };
+
+    /**
+     * Set the current frame number.
+     * @param {Number} The current frame number.
+     * @return {Boolean} False if not in bounds
+     */
+    this.setCurrentFrame = function (frame) {
+        // check if possible
+        if( frame < 0 || frame >= image.getNumberOfFrames() ) {
+            return false;
+        }
+        // assign
+        var oldFrame = currentFrame;
+        currentFrame = frame;
+        // fire event
+        if( oldFrame !== currentFrame ) {
+            this.fireEvent({"type": "frame-change", "frame": currentFrame});
+            // silent set current position to update info text
+            this.setCurrentPosition(this.getCurrentPosition(),true);
+        }
         // all good
         return true;
     };
@@ -12273,22 +12391,22 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
  */
 dwv.image.View.prototype.generateImageData = function( array )
 {
-    var sliceNumber = this.getCurrentPosition().k;
     var image = this.getImage();
-    var pxValue = 0;
-    var photoInterpretation = image.getPhotometricInterpretation();
-    var planarConfig = image.getPlanarConfiguration();
     var windowLut = this.getWindowLut();
     windowLut.update();
-    var colourMap = this.getColourMap();
-    var index = 0;
     var sliceSize = image.getGeometry().getSize().getSliceSize();
-    var sliceOffset = 0;
+    var sliceOffset = image.getGeometry().getSize().getTotalSize() * this.getCurrentFrame() +
+        sliceSize * this.getCurrentPosition().k;
+
+    var index = 0;
+    var pxValue = 0;
+
+    var photoInterpretation = image.getPhotometricInterpretation();
     switch (photoInterpretation)
     {
     case "MONOCHROME1":
     case "MONOCHROME2":
-        sliceOffset = (sliceNumber || 0) * sliceSize;
+        var colourMap = this.getColourMap();
         var iMax = sliceOffset + sliceSize;
         for(var i=sliceOffset; i < iMax; ++i)
         {
@@ -12303,11 +12421,13 @@ dwv.image.View.prototype.generateImageData = function( array )
         break;
 
     case "RGB":
+        // 3 times bigger...
+        sliceOffset *= 3;
         // the planar configuration defines the memory layout
+        var planarConfig = image.getPlanarConfiguration();
         if( planarConfig !== 0 && planarConfig !== 1 ) {
             throw new Error("Unsupported planar configuration: "+planarConfig);
         }
-        sliceOffset = (sliceNumber || 0) * 3 * sliceSize;
         // default: RGBRGBRGBRGB...
         var posR = sliceOffset;
         var posG = sliceOffset + 1;
@@ -12321,21 +12441,14 @@ dwv.image.View.prototype.generateImageData = function( array )
             stepPos = 1;
         }
 
-        var redValue = 0;
-        var greenValue = 0;
-        var blueValue = 0;
         for(var j=0; j < sliceSize; ++j)
         {
-            redValue = parseInt( windowLut.getValue(
+            array.data[index] = parseInt( windowLut.getValue(
                     image.getValueAtOffset(posR) ), 10 );
-            greenValue = parseInt( windowLut.getValue(
+            array.data[index+1] = parseInt( windowLut.getValue(
                     image.getValueAtOffset(posG) ), 10 );
-            blueValue = parseInt( windowLut.getValue(
+            array.data[index+2] = parseInt( windowLut.getValue(
                     image.getValueAtOffset(posB) ), 10 );
-
-            array.data[index] = redValue;
-            array.data[index+1] = greenValue;
-            array.data[index+2] = blueValue;
             array.data[index+3] = 0xff;
             index += 4;
 
@@ -16149,6 +16262,10 @@ dwv.info.Position = function ( div )
         var lipos = document.createElement("li");
         lipos.className = "position";
         ul.appendChild(lipos);
+        // frame
+        var liframe = document.createElement("li");
+        liframe.className = "frame";
+        ul.appendChild(liframe);
         // value
         var livalue = document.createElement("li");
         livalue.className = "value";
@@ -16166,12 +16283,23 @@ dwv.info.Position = function ( div )
     this.update = function (event)
     {
         // position list item
-        var lipos = div.getElementsByClassName("position")[0];
-        dwv.html.cleanNode(lipos);
-        lipos.appendChild( document.createTextNode(
+        if( typeof(event.i) !== "undefined" )
+        {
+            var lipos = div.getElementsByClassName("position")[0];
+            dwv.html.cleanNode(lipos);
+            lipos.appendChild(document.createTextNode(
             dwv.i18n("tool.info.position", {value: event.i+", "+event.j+", "+event.k}) ) );
+        }
+        // frame list item
+        if( typeof(event.frame) !== "undefined" )
+        {
+            var liframe = div.getElementsByClassName("frame")[0];
+            dwv.html.cleanNode(liframe);
+            liframe.appendChild( document.createTextNode(
+                dwv.i18n("tool.info.frame", {value: event.frame}) ) );
+        }
         // value list item
-        if( typeof(event.value) != "undefined" )
+        if( typeof(event.value) !== "undefined" )
         {
             var livalue = div.getElementsByClassName("value")[0];
             dwv.html.cleanNode(livalue);
@@ -17221,22 +17349,41 @@ dwv.tool.Scroll = function(app)
             return;
         }
 
-        // difference to last position
+        // difference to last Y position
         var diffY = event._y - self.y0;
+        var yMove = (Math.abs(diffY) > 15);
         // do not trigger for small moves
-        if( Math.abs(diffY) < 15 ) {
-            return;
+        if( yMove ) {
+            // update GUI
+            if( diffY > 0 ) {
+                app.getViewController().incrementSliceNb();
+            }
+            else {
+                app.getViewController().decrementSliceNb();
+            }
         }
-        // update GUI
-        if( diffY > 0 ) {
-            app.getViewController().incrementSliceNb();
+
+        // difference to last X position
+        var diffX = event._x - self.x0;
+        var xMove = (Math.abs(diffX) > 15);
+        // do not trigger for small moves
+        if( xMove ) {
+            // update GUI
+            if( diffX > 0 ) {
+                app.getViewController().incrementFrameNb();
+            }
+            else {
+                app.getViewController().decrementFrameNb();
+            }
         }
-        else {
-            app.getViewController().decrementSliceNb();
-        }
+
         // reset origin point
-        self.x0 = event._x;
-        self.y0 = event._y;
+        if (xMove) {
+            self.x0 = event._x;
+        }
+        if (yMove) {
+            self.y0 = event._y;
+        }
     };
 
     /**
@@ -17341,7 +17488,7 @@ dwv.tool.Scroll = function(app)
      * Initialise the tool.
      */
     this.init = function() {
-        if ( app.getNSlicesToLoad() === 1 ) {
+        if ( app.getNSlicesToLoad() === 1 && app.getImage().getNumberOfFrames() === 1 ) {
             return false;
         }
         return true;
