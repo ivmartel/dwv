@@ -153,15 +153,14 @@ dwv.App = function ()
     this.getImageLayer = function () { return imageLayer; };
     /**
      * Get the draw layer.
+     * @param {Number} slice Optional slice position (uses the current slice position if not provided).
+     * @param {Number} frame Optional frame position (uses the current frame position if not provided).
      * @return {Object} The draw layer.
      */
-    this.getDrawLayer = function (k) {
-        if ( typeof  k === "undefined" ) {
-            return drawLayers[view.getCurrentPosition().k];
-        }
-        else {
-            return drawLayers[k];
-        }
+    this.getDrawLayer = function (slice, frame) {
+        var k = (typeof slice === "undefined") ? view.getCurrentPosition().k : slice;
+        var f = (typeof frame === "undefined") ? view.getCurrentFrame() : frame;
+        return drawLayers[k][f];
     };
     /**
      * Get the draw stage.
@@ -474,28 +473,21 @@ dwv.App = function ()
         var fileIO = new dwv.io.File();
         fileIO.setDecoderScripts(decoderScripts);
         fileIO.onload = function (data) {
-
-            var isFirst = true;
             if ( image ) {
                 view.append( data.view );
-                isFirst = false;
             }
             postLoadInit(data);
             if ( drawStage ) {
-                // create slice draw layer
-                var drawLayer = new Kinetic.Layer({
-                    listening: false,
-                    hitGraphEnabled: false,
-                    visible: isFirst
-                });
-                // add to layers array
-                drawLayers.push(drawLayer);
-                // add the layer to the stage
-                drawStage.add(drawLayer);
+                appendDrawLayer(image.getNumberOfFrames());
             }
         };
         fileIO.onerror = function (error) { handleError(error); };
-        fileIO.onloadend = function (/*event*/) { fireEvent({ 'type': 'load-end' }); };
+        fileIO.onloadend = function (/*event*/) { 
+            if ( drawStage ) {
+                activateDrawLayer();
+            }
+            fireEvent({ 'type': 'load-end' });
+        };
         fileIO.onprogress = onLoadProgress;
         // main load (asynchronous)
         fireEvent({ 'type': 'load-start' });
@@ -553,27 +545,21 @@ dwv.App = function ()
         var urlIO = new dwv.io.Url();
         urlIO.setDecoderScripts(decoderScripts);
         urlIO.onload = function (data) {
-            var isFirst = true;
             if ( image ) {
                 view.append( data.view );
-                isFirst = false;
             }
             postLoadInit(data);
             if ( drawStage ) {
-                // create slice draw layer
-                var drawLayer = new Kinetic.Layer({
-                    listening: false,
-                    hitGraphEnabled: false,
-                    visible: isFirst
-                });
-                // add to layers array
-                drawLayers.push(drawLayer);
-                // add the layer to the stage
-                drawStage.add(drawLayer);
+                appendDrawLayer(image.getNumberOfFrames());
             }
         };
         urlIO.onerror = function (error) { handleError(error); };
-        urlIO.onloadend = function (/*event*/) { fireEvent({ 'type': 'load-end' }); };
+        urlIO.onloadend = function (/*event*/) { 
+            if ( drawStage ) {
+                activateDrawLayer();
+            }
+            fireEvent({ 'type': 'load-end' });
+        };
         urlIO.onprogress = onLoadProgress;
         // main load (asynchronous)
         fireEvent({ 'type': 'load-start' });
@@ -599,6 +585,45 @@ dwv.App = function ()
         urlIO.load([url]);
     }
 
+    /**
+     * Append a new draw layer list to the list.
+     * @private
+     */
+    function appendDrawLayer(number) {
+        // add a new dimension
+        drawLayers.push([]);
+        // fill it
+        for (var i=0; i<number; ++i) {
+            // create draw layer
+            var drawLayer = new Kinetic.Layer({
+                'listening': false,
+                'hitGraphEnabled': false,
+                'visible': false
+            });
+            drawLayers[drawLayers.length - 1].push(drawLayer);
+            // add the layer to the stage
+            drawStage.add(drawLayer);
+        }
+    }
+    
+    /**
+     * Activate the current draw layer.
+     * @private
+     */
+    function activateDrawLayer() {
+        // hide all draw layers
+        for ( var i = 0; i < drawLayers.length; ++i ) {
+            //drawLayers[i].visible( false );
+            for ( var j = 0; j < drawLayers[i].length; ++j ) {
+                drawLayers[i][j].visible( false );
+            }
+        }
+        // show current draw layer
+        var currentLayer = self.getDrawLayer();
+        currentLayer.visible( true );
+        currentLayer.draw();
+    }
+    
     /**
      * Fit the display to the given size. To be called once the image is loaded.
      */
@@ -801,9 +826,16 @@ dwv.App = function ()
         generateAndDrawImage();
     };
 
+    /**
+     * Handle frame change.
+     * @param {Object} event The event fired when changing the frame.
+     */
     this.onFrameChange = function (/*event*/)
     {
         generateAndDrawImage();
+        if ( drawStage ) {
+            activateDrawLayer();
+        }
     };
 
     /**
@@ -814,14 +846,7 @@ dwv.App = function ()
     {
         generateAndDrawImage();
         if ( drawStage ) {
-            // hide all draw layers
-            for ( var i = 0; i < drawLayers.length; ++i ) {
-                drawLayers[i].visible( false );
-            }
-            // show current draw layer
-            var currentLayer = drawLayers[view.getCurrentPosition().k];
-            currentLayer.visible( true );
-            currentLayer.draw();
+            activateDrawLayer();
         }
     };
 
@@ -12124,7 +12149,7 @@ dwv.image.View = function(image, isSigned)
      * @private
      * @type Number
      */
-    var currentFrame = null;
+    var currentFrame = 0;
 
     /**
      * Get the associated image.
@@ -14957,9 +14982,40 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         document.body.style.cursor = 'default';
         // make layer listen or not to events
         app.getDrawStage().listening( flag );
+        // get the current draw layer
         drawLayer = app.getDrawLayer();
-        drawLayer.listening( flag );
-        drawLayer.hitGraphEnabled( flag );
+        updateDrawLayer(flag);
+        // listen to app change to update the draw layer
+        if (flag) {
+            app.addEventListener("slice-change", updateDrawLayer);
+            app.addEventListener("frame-change", updateDrawLayer);
+        }
+        else {
+            app.removeEventListener("slice-change", updateDrawLayer);
+            app.removeEventListener("frame-change", updateDrawLayer);
+        }
+    };
+    
+    /**
+     * Get the current app draw layer.
+     */
+    function updateDrawLayer() {
+        // deactivate the old draw layer
+        renderDrawLayer(false);
+        // get the current draw layer
+        drawLayer = app.getDrawLayer();
+        console.log(drawLayer);
+        // activate the new draw layer
+        renderDrawLayer(true);
+    }
+    
+    /**
+     * Render (or not) the draw layer.
+     * @param {Boolean} visible Set the draw layer visible or not.
+     */
+    function renderDrawLayer(visible) {
+        drawLayer.listening( visible );
+        drawLayer.hitGraphEnabled( visible );
         // get the list of shapes
         var groups = drawLayer.getChildren();
         var shapes = [];
@@ -14971,7 +15027,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             shapes.push( groups[i].getChildren(fshape)[0] );
         }
         // set shape display properties
-        if ( flag ) {
+        if ( visible ) {
             app.addLayerListeners( app.getDrawStage().getContent() );
             shapes.forEach( function (shape){ self.setShapeOn( shape ); });
         }
@@ -14981,7 +15037,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         }
         // draw
         drawLayer.draw();
-    };
+    }
 
     /**
      * Set shape off properties.
