@@ -42,7 +42,7 @@ dwv.image.View = function(image, isSigned)
      * @private
      * @type Number
      */
-    var currentFrame = null;
+    var currentFrame = 0;
 
     /**
      * Get the associated image.

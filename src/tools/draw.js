@@ -511,9 +511,40 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         document.body.style.cursor = 'default';
         // make layer listen or not to events
         app.getDrawStage().listening( flag );
+        // get the current draw layer
         drawLayer = app.getDrawLayer();
-        drawLayer.listening( flag );
-        drawLayer.hitGraphEnabled( flag );
+        updateDrawLayer(flag);
+        // listen to app change to update the draw layer
+        if (flag) {
+            app.addEventListener("slice-change", updateDrawLayer);
+            app.addEventListener("frame-change", updateDrawLayer);
+        }
+        else {
+            app.removeEventListener("slice-change", updateDrawLayer);
+            app.removeEventListener("frame-change", updateDrawLayer);
+        }
+    };
+    
+    /**
+     * Get the current app draw layer.
+     */
+    function updateDrawLayer() {
+        // deactivate the old draw layer
+        renderDrawLayer(false);
+        // get the current draw layer
+        drawLayer = app.getDrawLayer();
+        console.log(drawLayer);
+        // activate the new draw layer
+        renderDrawLayer(true);
+    }
+    
+    /**
+     * Render (or not) the draw layer.
+     * @param {Boolean} visible Set the draw layer visible or not.
+     */
+    function renderDrawLayer(visible) {
+        drawLayer.listening( visible );
+        drawLayer.hitGraphEnabled( visible );
         // get the list of shapes
         var groups = drawLayer.getChildren();
         var shapes = [];
@@ -525,7 +556,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             shapes.push( groups[i].getChildren(fshape)[0] );
         }
         // set shape display properties
-        if ( flag ) {
+        if ( visible ) {
             app.addLayerListeners( app.getDrawStage().getContent() );
             shapes.forEach( function (shape){ self.setShapeOn( shape ); });
         }
@@ -535,7 +566,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         }
         // draw
         drawLayer.draw();
-    };
+    }
 
     /**
      * Set shape off properties.
