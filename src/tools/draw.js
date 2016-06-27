@@ -533,7 +533,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         renderDrawLayer(false);
         // get the current draw layer
         drawLayer = app.getDrawLayer();
-        console.log(drawLayer);
         // activate the new draw layer
         renderDrawLayer(true);
     }
