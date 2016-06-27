@@ -26,17 +26,23 @@ dwv.image.View = function(image, isSigned)
      */
     var windowPresets = null;
     /**
-     * colour map
+     * colour map.
      * @private
      * @type Object
      */
     var colourMap = dwv.image.lut.plain;
     /**
-     * Current position
+     * Current position.
      * @private
      * @type Object
      */
     var currentPosition = {"i":0,"j":0,"k":0};
+    /**
+     * Current frame. Zero based.
+     * @private
+     * @type Number
+     */
+    var currentFrame = null;
 
     /**
      * Get the associated image.
@@ -140,9 +146,10 @@ dwv.image.View = function(image, isSigned)
         return {"i": currentPosition.i, "j": currentPosition.j, "k": currentPosition.k};
     };
     /**
-     * Set the current position. Returns false if not in bounds.
+     * Set the current position.
      * @param {Object} pos The current position.
      * @param {Boolean} silent If true, does not fire a slice-change event.
+     * @return {Boolean} False if not in bounds
      */
     this.setCurrentPosition = function(pos, silent) {
         // default silent flag to false
@@ -161,7 +168,7 @@ dwv.image.View = function(image, isSigned)
         {
             this.fireEvent({"type": "position-change",
                 "i": pos.i, "j": pos.j, "k": pos.k,
-                "value": image.getRescaledValue(pos.i,pos.j,pos.k)});
+                "value": image.getRescaledValue(pos.i,pos.j,pos.k, this.getCurrentFrame())});
         }
         else
         {
@@ -176,6 +183,37 @@ dwv.image.View = function(image, isSigned)
           }
         }
 
+        // all good
+        return true;
+    };
+
+    /**
+     * Get the current frame number.
+     * @return {Number} The current frame number.
+     */
+    this.getCurrentFrame = function() {
+        return currentFrame;
+    };
+
+    /**
+     * Set the current frame number.
+     * @param {Number} The current frame number.
+     * @return {Boolean} False if not in bounds
+     */
+    this.setCurrentFrame = function (frame) {
+        // check if possible
+        if( frame < 0 || frame >= image.getNumberOfFrames() ) {
+            return false;
+        }
+        // assign
+        var oldFrame = currentFrame;
+        currentFrame = frame;
+        // fire event
+        if( oldFrame !== currentFrame && image.getNumberOfFrames() !== 1 ) {
+            this.fireEvent({"type": "frame-change", "frame": currentFrame});
+            // silent set current position to update info text
+            this.setCurrentPosition(this.getCurrentPosition(),true);
+        }
         // all good
         return true;
     };
@@ -271,22 +309,22 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
  */
 dwv.image.View.prototype.generateImageData = function( array )
 {
-    var sliceNumber = this.getCurrentPosition().k;
     var image = this.getImage();
-    var pxValue = 0;
-    var photoInterpretation = image.getPhotometricInterpretation();
-    var planarConfig = image.getPlanarConfiguration();
     var windowLut = this.getWindowLut();
     windowLut.update();
-    var colourMap = this.getColourMap();
-    var index = 0;
     var sliceSize = image.getGeometry().getSize().getSliceSize();
-    var sliceOffset = 0;
+    var sliceOffset = image.getGeometry().getSize().getTotalSize() * this.getCurrentFrame() +
+        sliceSize * this.getCurrentPosition().k;
+
+    var index = 0;
+    var pxValue = 0;
+
+    var photoInterpretation = image.getPhotometricInterpretation();
     switch (photoInterpretation)
     {
     case "MONOCHROME1":
     case "MONOCHROME2":
-        sliceOffset = (sliceNumber || 0) * sliceSize;
+        var colourMap = this.getColourMap();
         var iMax = sliceOffset + sliceSize;
         for(var i=sliceOffset; i < iMax; ++i)
         {
@@ -301,11 +339,13 @@ dwv.image.View.prototype.generateImageData = function( array )
         break;
 
     case "RGB":
+        // 3 times bigger...
+        sliceOffset *= 3;
         // the planar configuration defines the memory layout
+        var planarConfig = image.getPlanarConfiguration();
         if( planarConfig !== 0 && planarConfig !== 1 ) {
             throw new Error("Unsupported planar configuration: "+planarConfig);
         }
-        sliceOffset = (sliceNumber || 0) * 3 * sliceSize;
         // default: RGBRGBRGBRGB...
         var posR = sliceOffset;
         var posG = sliceOffset + 1;
@@ -319,21 +359,14 @@ dwv.image.View.prototype.generateImageData = function( array )
             stepPos = 1;
         }
 
-        var redValue = 0;
-        var greenValue = 0;
-        var blueValue = 0;
         for(var j=0; j < sliceSize; ++j)
         {
-            redValue = parseInt( windowLut.getValue(
+            array.data[index] = parseInt( windowLut.getValue(
                     image.getValueAtOffset(posR) ), 10 );
-            greenValue = parseInt( windowLut.getValue(
+            array.data[index+1] = parseInt( windowLut.getValue(
                     image.getValueAtOffset(posG) ), 10 );
-            blueValue = parseInt( windowLut.getValue(
+            array.data[index+2] = parseInt( windowLut.getValue(
                     image.getValueAtOffset(posB) ), 10 );
-
-            array.data[index] = redValue;
-            array.data[index+1] = greenValue;
-            array.data[index+2] = blueValue;
             array.data[index+3] = 0xff;
             index += 4;
 

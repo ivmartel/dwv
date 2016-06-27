@@ -997,28 +997,24 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     }
     
     // pixel buffer
-    if (this.dicomElements.x7FE00010.vl !== "u/l") {
-        this.pixelBuffer = this.dicomElements.x7FE00010.value;
-    }
-    else {
-        // concatenate pixel data items
-        // concat does not work on typed arrays
-        //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
-        // manual concat...
-        var items = this.dicomElements.x7FE00010.value;
-        for (var i = 0; i < items.length; ++i) {
-            var size = items[i].value.length + this.pixelBuffer.length;
-            var newBuffer = new Uint16Array(size);
-            newBuffer.set( this.pixelBuffer, 0 );
-            newBuffer.set( items[i].value, this.pixelBuffer.length );
-            this.pixelBuffer = newBuffer;
+    if (typeof this.dicomElements.x7FE00010 !== "undefined") {
+        if (this.dicomElements.x7FE00010.vl !== "u/l") {
+            this.pixelBuffer = this.dicomElements.x7FE00010.value;
         }
-    }
-
-    // check numberOfFrames
-    if ( typeof this.dicomElements.x00280008 !== 'undefined' &&
-            this.dicomElements.x00280008.value[0] > 1 ) {
-        throw new Error("Unsupported multi-frame data");
+        else {
+            // concatenate pixel data items
+            // concat does not work on typed arrays
+            //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
+            // manual concat...
+            var items = this.dicomElements.x7FE00010.value;
+            for (var i = 0; i < items.length; ++i) {
+                var size = items[i].value.length + this.pixelBuffer.length;
+                var newBuffer = new Uint16Array(size);
+                newBuffer.set( this.pixelBuffer, 0 );
+                newBuffer.set( items[i].value, this.pixelBuffer.length );
+                this.pixelBuffer = newBuffer;
+            }
+        }
     }
 };
 

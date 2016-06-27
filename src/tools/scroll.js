@@ -46,22 +46,41 @@ dwv.tool.Scroll = function(app)
             return;
         }
 
-        // difference to last position
+        // difference to last Y position
         var diffY = event._y - self.y0;
+        var yMove = (Math.abs(diffY) > 15);
         // do not trigger for small moves
-        if( Math.abs(diffY) < 15 ) {
-            return;
+        if( yMove ) {
+            // update GUI
+            if( diffY > 0 ) {
+                app.getViewController().incrementSliceNb();
+            }
+            else {
+                app.getViewController().decrementSliceNb();
+            }
         }
-        // update GUI
-        if( diffY > 0 ) {
-            app.getViewController().incrementSliceNb();
+
+        // difference to last X position
+        var diffX = event._x - self.x0;
+        var xMove = (Math.abs(diffX) > 15);
+        // do not trigger for small moves
+        if( xMove ) {
+            // update GUI
+            if( diffX > 0 ) {
+                app.getViewController().incrementFrameNb();
+            }
+            else {
+                app.getViewController().decrementFrameNb();
+            }
         }
-        else {
-            app.getViewController().decrementSliceNb();
-        }
+
         // reset origin point
-        self.x0 = event._x;
-        self.y0 = event._y;
+        if (xMove) {
+            self.x0 = event._x;
+        }
+        if (yMove) {
+            self.y0 = event._y;
+        }
     };
 
     /**
@@ -166,7 +185,7 @@ dwv.tool.Scroll = function(app)
      * Initialise the tool.
      */
     this.init = function() {
-        if ( app.getNSlicesToLoad() === 1 ) {
+        if ( app.getNSlicesToLoad() === 1 && app.getImage().getNumberOfFrames() === 1 ) {
             return false;
         }
         return true;

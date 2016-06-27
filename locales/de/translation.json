@@ -97,6 +97,7 @@
         "info": {
             "position": "Position = {{value}}",
             "value": "Grauwert = {{value}}",
+            "frame": "Frame = {{value}}",
             "window_center": "Fensterzentrum = {{value}}",
             "window_width": "Fensterbreite = {{value}}"
         }

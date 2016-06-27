@@ -80,6 +80,10 @@ dwv.info.Position = function ( div )
         var lipos = document.createElement("li");
         lipos.className = "position";
         ul.appendChild(lipos);
+        // frame
+        var liframe = document.createElement("li");
+        liframe.className = "frame";
+        ul.appendChild(liframe);
         // value
         var livalue = document.createElement("li");
         livalue.className = "value";
@@ -97,12 +101,23 @@ dwv.info.Position = function ( div )
     this.update = function (event)
     {
         // position list item
-        var lipos = div.getElementsByClassName("position")[0];
-        dwv.html.cleanNode(lipos);
-        lipos.appendChild( document.createTextNode(
+        if( typeof(event.i) !== "undefined" )
+        {
+            var lipos = div.getElementsByClassName("position")[0];
+            dwv.html.cleanNode(lipos);
+            lipos.appendChild(document.createTextNode(
             dwv.i18n("tool.info.position", {value: event.i+", "+event.j+", "+event.k}) ) );
+        }
+        // frame list item
+        if( typeof(event.frame) !== "undefined" )
+        {
+            var liframe = div.getElementsByClassName("frame")[0];
+            dwv.html.cleanNode(liframe);
+            liframe.appendChild( document.createTextNode(
+                dwv.i18n("tool.info.frame", {value: event.frame}) ) );
+        }
         // value list item
-        if( typeof(event.value) != "undefined" )
+        if( typeof(event.value) !== "undefined" )
         {
             var livalue = div.getElementsByClassName("value")[0];
             dwv.html.cleanNode(livalue);

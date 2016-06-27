@@ -24,7 +24,7 @@ dwv.App = function ()
     var dataHeight = 0;
     // Number of slices to load
     var nSlicesToLoad = 0;
-    
+
     // Data decoders scripts
     var decoderScripts = null;
 
@@ -153,15 +153,14 @@ dwv.App = function ()
     this.getImageLayer = function () { return imageLayer; };
     /**
      * Get the draw layer.
+     * @param {Number} slice Optional slice position (uses the current slice position if not provided).
+     * @param {Number} frame Optional frame position (uses the current frame position if not provided).
      * @return {Object} The draw layer.
      */
-    this.getDrawLayer = function (k) {
-        if ( typeof  k === "undefined" ) {
-            return drawLayers[view.getCurrentPosition().k];
-        }
-        else {
-            return drawLayers[k];
-        }
+    this.getDrawLayer = function (slice, frame) {
+        var k = (typeof slice === "undefined") ? view.getCurrentPosition().k : slice;
+        var f = (typeof frame === "undefined") ? view.getCurrentFrame() : frame;
+        return drawLayers[k][f];
     };
     /**
      * Get the draw stage.
@@ -190,7 +189,7 @@ dwv.App = function ()
      * Add a command to the undo stack.
      * @param {Object} The command to add.
      */
-    this.addToUndoStack = function (cmd) { 
+    this.addToUndoStack = function (cmd) {
         if ( undoStack !== null ) {
             undoStack.add(cmd);
         }
@@ -324,7 +323,7 @@ dwv.App = function ()
             var dropBoxSize = 2 * size.height / 3;
             box.setAttribute("style","width:"+dropBoxSize+"px;height:"+dropBoxSize+"px");
         }
-        
+
         // possible load from URL
         if ( typeof config.skipLoadUrl === "undefined" ) {
             var query = dwv.utils.getUriQuery(window.location.href);
@@ -343,7 +342,7 @@ dwv.App = function ()
         else{
             console.log("Not loading url from address since skipLoadUrl is defined.");
         }
-        
+
         // align layers when the window is resized
         if ( config.fitToWindow ) {
             fitToWindow = true;
@@ -474,28 +473,21 @@ dwv.App = function ()
         var fileIO = new dwv.io.File();
         fileIO.setDecoderScripts(decoderScripts);
         fileIO.onload = function (data) {
-
-            var isFirst = true;
             if ( image ) {
                 view.append( data.view );
-                isFirst = false;
+                if ( drawStage ) {
+                    appendDrawLayer(image.getNumberOfFrames());
+                }
             }
             postLoadInit(data);
-            if ( drawStage ) {
-                // create slice draw layer
-                var drawLayer = new Kinetic.Layer({
-                    listening: false,
-                    hitGraphEnabled: false,
-                    visible: isFirst
-                });
-                // add to layers array
-                drawLayers.push(drawLayer);
-                // add the layer to the stage
-                drawStage.add(drawLayer);
-            }
         };
         fileIO.onerror = function (error) { handleError(error); };
-        fileIO.onloadend = function (/*event*/) { fireEvent({ 'type': 'load-end' }); };
+        fileIO.onloadend = function (/*event*/) { 
+            if ( drawStage ) {
+                activateDrawLayer();
+            }
+            fireEvent({ 'type': 'load-end' });
+        };
         fileIO.onprogress = onLoadProgress;
         // main load (asynchronous)
         fireEvent({ 'type': 'load-start' });
@@ -537,7 +529,7 @@ dwv.App = function ()
             loadImageUrls(urls, requestHeaders);
         }
     };
-    
+
     /**
      * Load a list of image URLs.
      * @private
@@ -553,27 +545,21 @@ dwv.App = function ()
         var urlIO = new dwv.io.Url();
         urlIO.setDecoderScripts(decoderScripts);
         urlIO.onload = function (data) {
-            var isFirst = true;
             if ( image ) {
                 view.append( data.view );
-                isFirst = false;
+                if ( drawStage ) {
+                    appendDrawLayer(image.getNumberOfFrames());
+                }
             }
             postLoadInit(data);
-            if ( drawStage ) {
-                // create slice draw layer
-                var drawLayer = new Kinetic.Layer({
-                    listening: false,
-                    hitGraphEnabled: false,
-                    visible: isFirst
-                });
-                // add to layers array
-                drawLayers.push(drawLayer);
-                // add the layer to the stage
-                drawStage.add(drawLayer);
-            }
         };
         urlIO.onerror = function (error) { handleError(error); };
-        urlIO.onloadend = function (/*event*/) { fireEvent({ 'type': 'load-end' }); };
+        urlIO.onloadend = function (/*event*/) { 
+            if ( drawStage ) {
+                activateDrawLayer();
+            }
+            fireEvent({ 'type': 'load-end' });
+        };
         urlIO.onprogress = onLoadProgress;
         // main load (asynchronous)
         fireEvent({ 'type': 'load-start' });
@@ -599,6 +585,45 @@ dwv.App = function ()
         urlIO.load([url]);
     }
 
+    /**
+     * Append a new draw layer list to the list.
+     * @private
+     */
+    function appendDrawLayer(number) {
+    	// add a new dimension
+        drawLayers.push([]);
+        // fill it
+        for (var i=0; i<number; ++i) {
+            // create draw layer
+            var drawLayer = new Kinetic.Layer({
+                'listening': false,
+                'hitGraphEnabled': false,
+                'visible': false
+            });
+            drawLayers[drawLayers.length - 1].push(drawLayer);
+            // add the layer to the stage
+            drawStage.add(drawLayer);
+        }
+    }
+    
+    /**
+     * Activate the current draw layer.
+     * @private
+     */
+    function activateDrawLayer() {
+        // hide all draw layers
+        for ( var i = 0; i < drawLayers.length; ++i ) {
+            //drawLayers[i].visible( false );
+            for ( var j = 0; j < drawLayers[i].length; ++j ) {
+                drawLayers[i][j].visible( false );
+            }
+        }
+        // show current draw layer
+        var currentLayer = self.getDrawLayer();
+        currentLayer.visible( true );
+        currentLayer.draw();
+    }
+    
     /**
      * Fit the display to the given size. To be called once the image is loaded.
      */
@@ -671,6 +696,8 @@ dwv.App = function ()
             presets[keys[0]].width );
         // default position
         viewController.setCurrentPosition2D(0,0);
+        // default frame
+        viewController.setCurrentFrame(0);
     };
 
     /**
@@ -798,6 +825,18 @@ dwv.App = function ()
     };
 
     /**
+     * Handle frame change.
+     * @param {Object} event The event fired when changing the frame.
+     */
+    this.onFrameChange = function (/*event*/)
+    {
+        generateAndDrawImage();
+        if ( drawStage ) {
+            activateDrawLayer();
+        }
+    };
+
+    /**
      * Handle slice change.
      * @param {Object} event The event fired when changing the slice.
      */
@@ -805,14 +844,7 @@ dwv.App = function ()
     {
         generateAndDrawImage();
         if ( drawStage ) {
-            // hide all draw layers
-            for ( var i = 0; i < drawLayers.length; ++i ) {
-                drawLayers[i].visible( false );
-            }
-            // show current draw layer
-            var currentLayer = drawLayers[view.getCurrentPosition().k];
-            currentLayer.visible( true );
-            currentLayer.draw();
+            activateDrawLayer();
         }
     };
 
@@ -820,7 +852,9 @@ dwv.App = function ()
      * Handle key down event.
      * - CRTL-Z: undo
      * - CRTL-Y: redo
+     * - CRTL-ARROW_LEFT: next frame
      * - CRTL-ARROW_UP: next slice
+     * - CRTL-ARROW_RIGHT: previous frame
      * - CRTL-ARROW_DOWN: previous slice
      * Default behavior. Usually used in tools.
      * @param {Object} event The key down event.
@@ -828,10 +862,20 @@ dwv.App = function ()
     this.onKeydown = function (event)
     {
         if (event.ctrlKey) {
-            if ( event.keyCode === 38 ) // crtl-arrow-up
+            if ( event.keyCode === 37 ) // crtl-arrow-left
+            {
+                event.preventDefault();
+                self.getViewController().decrementFrameNb();
+            }
+            else if ( event.keyCode === 38 ) // crtl-arrow-up
             {
                 event.preventDefault();
                 self.getViewController().incrementSliceNb();
+            }
+            else if ( event.keyCode === 39 ) // crtl-arrow-right
+            {
+                event.preventDefault();
+                self.getViewController().incrementFrameNb();
             }
             else if ( event.keyCode === 40 ) // crtl-arrow-down
             {
@@ -1146,6 +1190,7 @@ dwv.App = function ()
         view.addEventListener("wl-change", plotInfo.update);
         view.addEventListener("colour-change", miniColourMap.update);
         view.addEventListener("position-change", positionInfo.update);
+        view.addEventListener("frame-change", positionInfo.update);
         isInfoLayerListening = true;
     }
 
@@ -1160,6 +1205,7 @@ dwv.App = function ()
         view.removeEventListener("wl-change", plotInfo.update);
         view.removeEventListener("colour-change", miniColourMap.update);
         view.removeEventListener("position-change", positionInfo.update);
+        view.removeEventListener("frame-change", positionInfo.update);
         isInfoLayerListening = false;
     }
 
@@ -1397,12 +1443,14 @@ dwv.App = function ()
         view.addEventListener("wl-change", self.onWLChange);
         view.addEventListener("colour-change", self.onColourChange);
         view.addEventListener("slice-change", self.onSliceChange);
+        view.addEventListener("frame-change", self.onFrameChange);
 
         // connect with local listeners
         view.addEventListener("wl-change", fireEvent);
         view.addEventListener("colour-change", fireEvent);
         view.addEventListener("position-change", fireEvent);
         view.addEventListener("slice-change", fireEvent);
+        view.addEventListener("frame-change", fireEvent);
 
         // update presets with loaded image (used in w/l tool)
         viewController.updatePresets(image, true);
@@ -1416,6 +1464,10 @@ dwv.App = function ()
 
             toolbox.init();
             toolbox.display(true);
+        }
+
+        if ( drawStage ) {
+            appendDrawLayer(image.getNumberOfFrames());
         }
 
         // stop box listening to drag (after first drag)

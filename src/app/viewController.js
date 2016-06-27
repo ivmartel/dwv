@@ -77,6 +77,34 @@ dwv.ViewController = function ( view )
     };
 
     /**
+     * Set the current frame.
+     * @param {Number} number The frame number.
+     * @return {Boolean} False if not in bounds.
+      */
+    this.setCurrentFrame = function (number)
+    {
+        return view.setCurrentFrame(number);
+    };
+
+    /**
+     * Increment the current frame.
+     * @return {Boolean} False if not in bounds.
+     */
+    this.incrementFrameNb = function ()
+    {
+        return view.setCurrentFrame( view.getCurrentFrame() + 1 );
+    };
+
+    /**
+     * Decrement the current frame.
+     * @return {Boolean} False if not in bounds.
+     */
+    this.decrementFrameNb = function ()
+    {
+        return view.setCurrentFrame( view.getCurrentFrame() - 1 );
+    };
+
+    /**
      * Go to first slice .
      * @return {Boolean} False if not in bounds.
      */
@@ -85,7 +113,7 @@ dwv.ViewController = function ( view )
         return view.setCurrentPosition({
             "i": view.getCurrentPosition().i,
             "j": view.getCurrentPosition().j,
-            "k":  0
+            "k": 0
         });
     };
 
