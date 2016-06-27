@@ -475,11 +475,11 @@ dwv.App = function ()
         fileIO.onload = function (data) {
             if ( image ) {
                 view.append( data.view );
+                if ( drawStage ) {
+                    appendDrawLayer(image.getNumberOfFrames());
+                }
             }
             postLoadInit(data);
-            if ( drawStage ) {
-                appendDrawLayer(image.getNumberOfFrames());
-            }
         };
         fileIO.onerror = function (error) { handleError(error); };
         fileIO.onloadend = function (/*event*/) { 
@@ -547,11 +547,11 @@ dwv.App = function ()
         urlIO.onload = function (data) {
             if ( image ) {
                 view.append( data.view );
+                if ( drawStage ) {
+                    appendDrawLayer(image.getNumberOfFrames());
+                }
             }
             postLoadInit(data);
-            if ( drawStage ) {
-                appendDrawLayer(image.getNumberOfFrames());
-            }
         };
         urlIO.onerror = function (error) { handleError(error); };
         urlIO.onloadend = function (/*event*/) { 
@@ -590,7 +590,7 @@ dwv.App = function ()
      * @private
      */
     function appendDrawLayer(number) {
-        // add a new dimension
+    	// add a new dimension
         drawLayers.push([]);
         // fill it
         for (var i=0; i<number; ++i) {
@@ -697,9 +697,7 @@ dwv.App = function ()
         // default position
         viewController.setCurrentPosition2D(0,0);
         // default frame
-        if (self.getImage().getNumberOfFrames() !== 1) {
-            viewController.setCurrentFrame(0);
-        }
+        viewController.setCurrentFrame(0);
     };
 
     /**
@@ -1468,6 +1466,10 @@ dwv.App = function ()
             toolbox.display(true);
         }
 
+        if ( drawStage ) {
+            appendDrawLayer(image.getNumberOfFrames());
+        }
+
         // stop box listening to drag (after first drag)
         var box = self.getElement("dropBox");
         if ( box ) {
@@ -1524,27 +1526,32 @@ var Kinetic = Kinetic || {};
 dwv.State = function (app)
 {
     /**
-     * Save state.
+     * Save the application state as JSON.
      */
     this.toJSON = function () {
         // store each slice drawings group
         var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
+        var nFrames = app.getImage().getNumberOfFrames();
         var drawings = [];
         for ( var k = 0; k < nSlices; ++k ) {
-            // getChildren always return, so drawings will have the good size
-            var groups = app.getDrawLayer(k).getChildren();
-            // remove anchors
-            for ( var i = 0; i < groups.length; ++i ) {
-                var anchors  = groups[i].find(".anchor");
-                for ( var a = 0; a < anchors.length; ++a ) {
-                    anchors[a].remove();
-                }
-            }
-            drawings.push(groups);
+        	drawings[k] = [];
+        	for ( var f = 0; f < nFrames; ++f ) {
+	            // getChildren always return, so drawings will have the good size
+	            var groups = app.getDrawLayer(k,f).getChildren();
+	            // remove anchors
+	            for ( var i = 0; i < groups.length; ++i ) {
+	                var anchors  = groups[i].find(".anchor");
+	                for ( var a = 0; a < anchors.length; ++a ) {
+	                    anchors[a].remove();
+	                }
+	            }
+	            drawings[k].push(groups);
+	        }
         }
         // return a JSON string
         return JSON.stringify( {
-            "window-center": app.getViewController().getWindowLevel().center,
+            "version": "0.1",
+        	"window-center": app.getViewController().getWindowLevel().center,
             "window-width": app.getViewController().getWindowLevel().width,
             "position": app.getViewController().getCurrentPosition(),
             "scale": app.getScale(),
@@ -1554,10 +1561,25 @@ dwv.State = function (app)
         } );
     };
     /**
-     * Load state.
+     * Load an application state from JSON.
+     * @param {String} json The JSON representation of the state.
+     * @param {Object} eventCallback The callback to associate to draw commands.
      */
     this.fromJSON = function (json, eventCallback) {
         var data = JSON.parse(json);
+        if (data.version === "0.1") {
+        	readV01(data, eventCallback);
+        }
+        else {
+        	throw new Error("Unknown state file format version: '"+data.version+"'.");
+        }
+    };
+    /**
+     * Read an application state from an Object.
+     * @param {Object} data The Object representation of the state.
+     * @param {Object} eventCallback The callback to associate to draw commands.
+     */
+    function readV01(data, eventCallback) {
         // display
         app.getViewController().setWindowLevel(data["window-center"], data["window-width"]);
         app.getViewController().setCurrentPosition(data.position);
@@ -1565,25 +1587,28 @@ dwv.State = function (app)
         app.translate(data.translation.x, data.translation.y);
         // drawings
         var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
+        var nFrames = app.getImage().getNumberOfFrames();
         var isShape = function (node) {
             return node.name() === "shape";
         };
         for ( var k = 0 ; k < nSlices; ++k ) {
-            for ( var i = 0 ; i < data.drawings[k].length; ++i ) {
-                var group = Kinetic.Node.create(data.drawings[k][i]);
-                var shape = group.getChildren( isShape )[0];
-                var cmd = new dwv.tool.DrawGroupCommand(
-                    group, shape.className,
-                    app.getDrawLayer(k) );
-                if ( typeof eventCallback !== "undefined" ) {
-                    cmd.onExecute = eventCallback;
-                    cmd.onUndo = eventCallback;
-                }
-                cmd.execute();
-                app.addToUndoStack(cmd);
-            }
+        	for ( var f = 0; f < nFrames; ++f ) {
+	            for ( var i = 0 ; i < data.drawings[k][f].length; ++i ) {
+	                var group = Kinetic.Node.create(data.drawings[k][f][i]);
+	                var shape = group.getChildren( isShape )[0];
+	                var cmd = new dwv.tool.DrawGroupCommand(
+	                    group, shape.className,
+	                    app.getDrawLayer(k,f) );
+	                if ( typeof eventCallback !== "undefined" ) {
+	                    cmd.onExecute = eventCallback;
+	                    cmd.onUndo = eventCallback;
+	                }
+	                cmd.execute();
+	                app.addToUndoStack(cmd);
+	            }
+	        }
         }
-    };
+    }
 }; // State class
 ;// namespaces
 var dwv = dwv || {};
@@ -12159,7 +12184,7 @@ dwv.image.View = function(image, isSigned)
      * @private
      * @type Number
      */
-    var currentFrame = 0;
+    var currentFrame = null;
 
     /**
      * Get the associated image.
@@ -12326,7 +12351,7 @@ dwv.image.View = function(image, isSigned)
         var oldFrame = currentFrame;
         currentFrame = frame;
         // fire event
-        if( oldFrame !== currentFrame ) {
+        if( oldFrame !== currentFrame && image.getNumberOfFrames() !== 1 ) {
             this.fireEvent({"type": "frame-change", "frame": currentFrame});
             // silent set current position to update info text
             this.setCurrentPosition(this.getCurrentPosition(),true);
@@ -15014,7 +15039,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         renderDrawLayer(false);
         // get the current draw layer
         drawLayer = app.getDrawLayer();
-        console.log(drawLayer);
         // activate the new draw layer
         renderDrawLayer(true);
     }
