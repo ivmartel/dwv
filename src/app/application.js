@@ -475,11 +475,11 @@ dwv.App = function ()
         fileIO.onload = function (data) {
             if ( image ) {
                 view.append( data.view );
+                if ( drawStage ) {
+                    appendDrawLayer(image.getNumberOfFrames());
+                }
             }
             postLoadInit(data);
-            if ( drawStage ) {
-                appendDrawLayer(image.getNumberOfFrames());
-            }
         };
         fileIO.onerror = function (error) { handleError(error); };
         fileIO.onloadend = function (/*event*/) { 
@@ -547,11 +547,11 @@ dwv.App = function ()
         urlIO.onload = function (data) {
             if ( image ) {
                 view.append( data.view );
+                if ( drawStage ) {
+                    appendDrawLayer(image.getNumberOfFrames());
+                }
             }
             postLoadInit(data);
-            if ( drawStage ) {
-                appendDrawLayer(image.getNumberOfFrames());
-            }
         };
         urlIO.onerror = function (error) { handleError(error); };
         urlIO.onloadend = function (/*event*/) { 
@@ -590,7 +590,7 @@ dwv.App = function ()
      * @private
      */
     function appendDrawLayer(number) {
-        // add a new dimension
+    	// add a new dimension
         drawLayers.push([]);
         // fill it
         for (var i=0; i<number; ++i) {
@@ -697,9 +697,7 @@ dwv.App = function ()
         // default position
         viewController.setCurrentPosition2D(0,0);
         // default frame
-        if (self.getImage().getNumberOfFrames() !== 1) {
-            viewController.setCurrentFrame(0);
-        }
+        viewController.setCurrentFrame(0);
     };
 
     /**
@@ -1466,6 +1464,10 @@ dwv.App = function ()
 
             toolbox.init();
             toolbox.display(true);
+        }
+
+        if ( drawStage ) {
+            appendDrawLayer(image.getNumberOfFrames());
         }
 
         // stop box listening to drag (after first drag)

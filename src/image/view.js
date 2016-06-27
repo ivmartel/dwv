@@ -42,7 +42,7 @@ dwv.image.View = function(image, isSigned)
      * @private
      * @type Number
      */
-    var currentFrame = 0;
+    var currentFrame = null;
 
     /**
      * Get the associated image.
@@ -209,7 +209,7 @@ dwv.image.View = function(image, isSigned)
         var oldFrame = currentFrame;
         currentFrame = frame;
         // fire event
-        if( oldFrame !== currentFrame ) {
+        if( oldFrame !== currentFrame && image.getNumberOfFrames() !== 1 ) {
             this.fireEvent({"type": "frame-change", "frame": currentFrame});
             // silent set current position to update info text
             this.setCurrentPosition(this.getCurrentPosition(),true);
