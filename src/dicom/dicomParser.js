@@ -322,7 +322,7 @@ dwv.dicom.getGroupElementKey = function (group, element)
 
 /**
  * Split a group-element key used to store DICOM elements.
- * @param key The key in form "x00280102.
+ * @param {String} key The key in form "x00280102.
  * @return {Object} The DICOM group and element.
  */
 dwv.dicom.splitGroupElementKey = function (key)
@@ -332,7 +332,7 @@ dwv.dicom.splitGroupElementKey = function (key)
 
 /**
  * Tell if a given syntax is a JPEG baseline one.
- * @param {String} The transfer syntax to test.
+ * @param {String} syntax The transfer syntax to test.
  * @return {Boolean} True if a jpeg baseline syntax.
  */
 dwv.dicom.isJpegBaselineTransferSyntax = function (syntax)
@@ -343,7 +343,7 @@ dwv.dicom.isJpegBaselineTransferSyntax = function (syntax)
 
 /**
  * Tell if a given syntax is a non supported JPEG one.
- * @param {String} The transfer syntax to test.
+ * @param {String} syntax The transfer syntax to test.
  * @return {Boolean} True if a non supported jpeg syntax.
  */
 dwv.dicom.isJpegNonSupportedTransferSyntax = function (syntax)
@@ -356,7 +356,7 @@ dwv.dicom.isJpegNonSupportedTransferSyntax = function (syntax)
 
 /**
  * Tell if a given syntax is a JPEG Lossless one.
- * @param {String} The transfer syntax to test.
+ * @param {String} syntax The transfer syntax to test.
  * @return {Boolean} True if a jpeg lossless syntax.
  */
 dwv.dicom.isJpegLosslessTransferSyntax = function (syntax)
@@ -367,7 +367,7 @@ dwv.dicom.isJpegLosslessTransferSyntax = function (syntax)
 
 /**
  * Tell if a given syntax is a JPEG-LS one.
- * @param {String} The transfer syntax to test.
+ * @param {String} syntax The transfer syntax to test.
  * @return {Boolean} True if a jpeg-ls syntax.
  */
 dwv.dicom.isJpeglsTransferSyntax = function (syntax)
@@ -377,7 +377,7 @@ dwv.dicom.isJpeglsTransferSyntax = function (syntax)
 
 /**
  * Tell if a given syntax is a JPEG 2000 one.
- * @param {String} The transfer syntax to test.
+ * @param {String} syntax The transfer syntax to test.
  * @return {Boolean} True if a jpeg 2000 syntax.
  */
 dwv.dicom.isJpeg2000TransferSyntax = function (syntax)
@@ -387,7 +387,7 @@ dwv.dicom.isJpeg2000TransferSyntax = function (syntax)
 
 /**
  * Tell if a given syntax needs decompression.
- * @param {String} The transfer syntax to test.
+ * @param {String} syntax The transfer syntax to test.
  * @return {String} The name of the decompression algorithm.
  */
 dwv.dicom.getSyntaxDecompressionName = function (syntax)
@@ -407,7 +407,7 @@ dwv.dicom.getSyntaxDecompressionName = function (syntax)
 
 /**
  * Get the transfer syntax name.
- * @param {String} The transfer syntax.
+ * @param {String} syntax The transfer syntax.
  * @return {String} The name of the transfer syntax.
  */
 dwv.dicom.getTransferSyntaxName = function (syntax)
