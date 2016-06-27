@@ -97,6 +97,7 @@
         "info": {
             "position": "Pos = {{value}}",
             "value": "Valeur = {{value}}",
+            "frame": "Frame = {{value}}",
             "window_center": "Centre = {{value}}",
             "window_width": "Largeur = {{value}}"
         }
