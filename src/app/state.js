@@ -20,24 +20,24 @@ dwv.State = function (app)
         var nFrames = app.getImage().getNumberOfFrames();
         var drawings = [];
         for ( var k = 0; k < nSlices; ++k ) {
-        	drawings[k] = [];
-        	for ( var f = 0; f < nFrames; ++f ) {
-	            // getChildren always return, so drawings will have the good size
-	            var groups = app.getDrawLayer(k,f).getChildren();
-	            // remove anchors
-	            for ( var i = 0; i < groups.length; ++i ) {
-	                var anchors  = groups[i].find(".anchor");
-	                for ( var a = 0; a < anchors.length; ++a ) {
-	                    anchors[a].remove();
-	                }
-	            }
-	            drawings[k].push(groups);
-	        }
+        drawings[k] = [];
+        for ( var f = 0; f < nFrames; ++f ) {
+            // getChildren always return, so drawings will have the good size
+            var groups = app.getDrawLayer(k,f).getChildren();
+            // remove anchors
+            for ( var i = 0; i < groups.length; ++i ) {
+                var anchors  = groups[i].find(".anchor");
+                for ( var a = 0; a < anchors.length; ++a ) {
+                    anchors[a].remove();
+                }
+            }
+            drawings[k].push(groups);
+        }
         }
         // return a JSON string
         return JSON.stringify( {
             "version": "0.1",
-        	"window-center": app.getViewController().getWindowLevel().center,
+        "window-center": app.getViewController().getWindowLevel().center,
             "window-width": app.getViewController().getWindowLevel().width,
             "position": app.getViewController().getCurrentPosition(),
             "scale": app.getScale(),
@@ -54,10 +54,10 @@ dwv.State = function (app)
     this.fromJSON = function (json, eventCallback) {
         var data = JSON.parse(json);
         if (data.version === "0.1") {
-        	readV01(data, eventCallback);
+        readV01(data, eventCallback);
         }
         else {
-        	throw new Error("Unknown state file format version: '"+data.version+"'.");
+        throw new Error("Unknown state file format version: '"+data.version+"'.");
         }
     };
     /**
@@ -78,21 +78,21 @@ dwv.State = function (app)
             return node.name() === "shape";
         };
         for ( var k = 0 ; k < nSlices; ++k ) {
-        	for ( var f = 0; f < nFrames; ++f ) {
-	            for ( var i = 0 ; i < data.drawings[k][f].length; ++i ) {
-	                var group = Kinetic.Node.create(data.drawings[k][f][i]);
-	                var shape = group.getChildren( isShape )[0];
-	                var cmd = new dwv.tool.DrawGroupCommand(
-	                    group, shape.className,
-	                    app.getDrawLayer(k,f) );
-	                if ( typeof eventCallback !== "undefined" ) {
-	                    cmd.onExecute = eventCallback;
-	                    cmd.onUndo = eventCallback;
-	                }
-	                cmd.execute();
-	                app.addToUndoStack(cmd);
-	            }
-	        }
+        for ( var f = 0; f < nFrames; ++f ) {
+            for ( var i = 0 ; i < data.drawings[k][f].length; ++i ) {
+                var group = Kinetic.Node.create(data.drawings[k][f][i]);
+                var shape = group.getChildren( isShape )[0];
+                var cmd = new dwv.tool.DrawGroupCommand(
+                    group, shape.className,
+                    app.getDrawLayer(k,f) );
+                if ( typeof eventCallback !== "undefined" ) {
+                    cmd.onExecute = eventCallback;
+                    cmd.onUndo = eventCallback;
+                }
+                cmd.execute();
+                app.addToUndoStack(cmd);
+            }
+        }
         }
     }
 }; // State class

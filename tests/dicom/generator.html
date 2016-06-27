@@ -48,71 +48,71 @@ function setElementValue(element, value) {
         element.value = value;
 
         if ( value !== null && value !== 0 ) {
-	        var sqItems = [];
-	        var name;
+            var sqItems = [];
+            var name;
 
-	        // explicit or implicit length
-	        var explicitLength = true;
-	        if ( typeof value.explicitLength !== "undefined" ) {
-	            explicitLength = value.explicitLength;
-	            delete value.explicitLength;
-	        }
+            // explicit or implicit length
+            var explicitLength = true;
+            if ( typeof value.explicitLength !== "undefined" ) {
+                explicitLength = value.explicitLength;
+                delete value.explicitLength;
+            }
 
             // items
-	        var itemData;
-	        var itemKeys = Object.keys(value);
-	        for ( var i = 0, leni = itemKeys.length; i < leni; ++i )
-	        {
+            var itemData;
+            var itemKeys = Object.keys(value);
+            for ( var i = 0, leni = itemKeys.length; i < leni; ++i )
+            {
                 var itemElements = {};
-	            var subSize = 0;
-	            itemData = value[itemKeys[i]];
+                var subSize = 0;
+                itemData = value[itemKeys[i]];
 
-	            // elements
-	            var subElement;
-	            var elemKeys = Object.keys(itemData);
-	            for ( var j = 0, lenj = elemKeys.length; j < lenj; ++j )
-	            {
-	                subElement = getDicomElement(elemKeys[j]);
-	                subSize += setElementValue(subElement, itemData[elemKeys[j]]);
+                // elements
+                var subElement;
+                var elemKeys = Object.keys(itemData);
+                for ( var j = 0, lenj = elemKeys.length; j < lenj; ++j )
+                {
+                    subElement = getDicomElement(elemKeys[j]);
+                    subSize += setElementValue(subElement, itemData[elemKeys[j]]);
 
-	                // add sequence delimitation size for sub sequences
-	                if (dwv.dicom.isImplicitLengthSequence(subElement)) {
-	                    subSize += dwv.dicom.getDataElementPrefixByteSize("NONE");
-	                }
+                    // add sequence delimitation size for sub sequences
+                    if (dwv.dicom.isImplicitLengthSequence(subElement)) {
+                        subSize += dwv.dicom.getDataElementPrefixByteSize("NONE");
+                    }
 
-		            name = dwv.dicom.getGroupElementKey(subElement.tag.group, subElement.tag.element);
-		            itemElements[name] = subElement;
-	            }
+                    name = dwv.dicom.getGroupElementKey(subElement.tag.group, subElement.tag.element);
+                    itemElements[name] = subElement;
+                }
 
-	            // item (after elements to get the size)
-	            var itemElement = {
-	                     'tag': { 'group': "0xFFFE", 'element': "0xE000" },
-			             'vr': "NONE",
-			             'vl': (explicitLength ? subSize : 0xffffffff),
-			             'value': []
-			         };
-	            name = dwv.dicom.getGroupElementKey(itemElement.tag.group, itemElement.tag.element);
-	            itemElements[name] = itemElement;
+                // item (after elements to get the size)
+                var itemElement = {
+                         'tag': { 'group': "0xFFFE", 'element': "0xE000" },
+                         'vr': "NONE",
+                         'vl': (explicitLength ? subSize : 0xffffffff),
+                         'value': []
+                     };
+                name = dwv.dicom.getGroupElementKey(itemElement.tag.group, itemElement.tag.element);
+                itemElements[name] = itemElement;
                 subSize += dwv.dicom.getDataElementPrefixByteSize("NONE");
 
-	            // item delimitation
-	            if (!explicitLength) {
-	                var itemDelimElement = {
-	                        'tag': { 'group': "0xFFFE", 'element': "0xE00D" },
-	                        'vr': "NONE",
-	                        'vl': 0,
-	                        'value': []
-	                    };
-	                name = dwv.dicom.getGroupElementKey(itemDelimElement.tag.group, itemDelimElement.tag.element);
-	                itemElements[name] = itemDelimElement;
-	                subSize += dwv.dicom.getDataElementPrefixByteSize("NONE");
-	            }
+                // item delimitation
+                if (!explicitLength) {
+                    var itemDelimElement = {
+                            'tag': { 'group': "0xFFFE", 'element': "0xE00D" },
+                            'vr': "NONE",
+                            'vl': 0,
+                            'value': []
+                        };
+                    name = dwv.dicom.getGroupElementKey(itemDelimElement.tag.group, itemDelimElement.tag.element);
+                    itemElements[name] = itemDelimElement;
+                    subSize += dwv.dicom.getDataElementPrefixByteSize("NONE");
+                }
 
-	            size += subSize;
-	            sqItems.push(itemElements);
-	        }
+                size += subSize;
+                sqItems.push(itemElements);
+            }
 
-	        element.value = sqItems;
+            element.value = sqItems;
         }
 
         element.vl = size;
@@ -128,22 +128,22 @@ function setElementValue(element, value) {
         // convert VL to bytes
         if ( element.vr === "US" || element.vr === "OW") {
             size *= Uint16Array.BYTES_PER_ELEMENT;
-	    }
-	    else if ( element.vr === "SS") {
-	        size *= Int16Array.BYTES_PER_ELEMENT;
-	    }
-	    else if ( element.vr === "UL") {
-	        size *= Uint32Array.BYTES_PER_ELEMENT;
-	    }
-	    else if ( element.vr === "SL") {
-	        size *= Int32Array.BYTES_PER_ELEMENT;
-	    }
-	    else if ( element.vr === "FL") {
-	        size *= Float32Array.BYTES_PER_ELEMENT;
-	    }
-	    else if ( element.vr === "FD") {
-	        size *= Float64Array.BYTES_PER_ELEMENT;
-	    }
+        }
+        else if ( element.vr === "SS") {
+            size *= Int16Array.BYTES_PER_ELEMENT;
+        }
+        else if ( element.vr === "UL") {
+            size *= Uint32Array.BYTES_PER_ELEMENT;
+        }
+        else if ( element.vr === "SL") {
+            size *= Int32Array.BYTES_PER_ELEMENT;
+        }
+        else if ( element.vr === "FL") {
+            size *= Float32Array.BYTES_PER_ELEMENT;
+        }
+        else if ( element.vr === "FD") {
+            size *= Float64Array.BYTES_PER_ELEMENT;
+        }
         element.vl = size;
     }
 
@@ -184,21 +184,21 @@ function generate()
     pixels.fill(100);
     for ( var j = 0; j < numberOfRows; ++j ) {
         var jc = Math.abs( j - (numberOfRows/2) );
-	    for ( var i = 0; i < numberOfColumns; ++i ) {
-	        var ic = Math.abs( i - (numberOfColumns/2) );
-	        if ( jc < 10 && ic < 10) {
-	            pixels[numberOfColumns*j + i] = i * j;
-	        }
-	    }
+        for ( var i = 0; i < numberOfColumns; ++i ) {
+            var ic = Math.abs( i - (numberOfColumns/2) );
+            if ( jc < 10 && ic < 10) {
+                pixels[numberOfColumns*j + i] = i * j;
+            }
+        }
     }
     var pixVL = dwv.dicom.getDataElementPrefixByteSize("OW") +
        (Uint16Array.BYTES_PER_ELEMENT * numberOfRows * numberOfColumns);
     dicomElements.x7FE00010 = {
             'tag': { 'group': "0x7FE0", 'element': "0x0010" },
-	        'vr': "OW",
-	        'vl': pixVL,
-	        'value': pixels
-	    };
+            'vr': "OW",
+            'vl': pixVL,
+            'value': pixels
+        };
 
     // create writer
     var writer = new dwv.dicom.DicomWriter();

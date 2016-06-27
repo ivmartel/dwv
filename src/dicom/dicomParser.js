@@ -1235,8 +1235,8 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
                 line += " explicit";
             }
             line += " length #=";
-    		line += dicomElement.value.length;
-    		line += ")";
+            line += dicomElement.value.length;
+            line += ")";
         }
         // default
         else {

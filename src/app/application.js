@@ -590,7 +590,7 @@ dwv.App = function ()
      * @private
      */
     function appendDrawLayer(number) {
-    	// add a new dimension
+        // add a new dimension
         drawLayers.push([]);
         // fill it
         for (var i=0; i<number; ++i) {
