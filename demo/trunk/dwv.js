@@ -1185,12 +1185,20 @@ dwv.App = function ()
      */
     function addImageInfoListeners()
     {
-        view.addEventListener("wl-change", windowingInfo.update);
-        view.addEventListener("wl-change", miniColourMap.update);
-        view.addEventListener("wl-change", plotInfo.update);
-        view.addEventListener("colour-change", miniColourMap.update);
-        view.addEventListener("position-change", positionInfo.update);
-        view.addEventListener("frame-change", positionInfo.update);
+        if (windowingInfo) {
+            view.addEventListener("wl-change", windowingInfo.update);
+        }
+        if (plotInfo) {
+            view.addEventListener("wl-change", plotInfo.update);
+        }
+        if (miniColourMap) {
+            view.addEventListener("wl-change", miniColourMap.update);
+            view.addEventListener("colour-change", miniColourMap.update);
+        }
+        if (positionInfo) {
+            view.addEventListener("position-change", positionInfo.update);
+            view.addEventListener("frame-change", positionInfo.update);
+        }
         isInfoLayerListening = true;
     }
 
@@ -1200,12 +1208,20 @@ dwv.App = function ()
      */
     function removeImageInfoListeners()
     {
-        view.removeEventListener("wl-change", windowingInfo.update);
-        view.removeEventListener("wl-change", miniColourMap.update);
-        view.removeEventListener("wl-change", plotInfo.update);
-        view.removeEventListener("colour-change", miniColourMap.update);
-        view.removeEventListener("position-change", positionInfo.update);
-        view.removeEventListener("frame-change", positionInfo.update);
+	if (windowingInfo) {
+	    view.removeEventListener("wl-change", windowingInfo.update);
+	}
+	if (plotInfo) {
+	    view.removeEventListener("wl-change", plotInfo.update);
+	}
+	if (miniColourMap) {
+	    view.removeEventListener("wl-change", miniColourMap.update);
+	    view.removeEventListener("colour-change", miniColourMap.update);
+	}
+	if (positionInfo) {
+	    view.removeEventListener("position-change", positionInfo.update);
+	    view.removeEventListener("frame-change", positionInfo.update);
+	}
         isInfoLayerListening = false;
     }
 
@@ -1488,20 +1504,28 @@ dwv.App = function ()
         var infoLayer = self.getElement("infoLayer");
         if ( infoLayer ) {
             var infotr = self.getElement("infotr");
-            windowingInfo = new dwv.info.Windowing(infotr);
-            windowingInfo.create();
+            if (infotr) {
+                windowingInfo = new dwv.info.Windowing(infotr);
+                windowingInfo.create();
+            }
 
             var infotl = self.getElement("infotl");
-            positionInfo = new dwv.info.Position(infotl);
-            positionInfo.create();
+            if (infotl) {
+                positionInfo = new dwv.info.Position(infotl);
+                positionInfo.create();
+            }
 
             var infobr = self.getElement("infobr");
-            miniColourMap = new dwv.info.MiniColourMap(infobr, self);
-            miniColourMap.create();
+            if (infobr) {
+                miniColourMap = new dwv.info.MiniColourMap(infobr, self);
+                miniColourMap.create();
+            }
 
             var plot = self.getElement("plot");
-            plotInfo = new dwv.info.Plot(plot, self);
-            plotInfo.create();
+            if (plot) {
+                plotInfo = new dwv.info.Plot(plot, self);
+                plotInfo.create();
+            }
 
             addImageInfoListeners();
         }
