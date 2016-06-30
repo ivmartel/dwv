@@ -10840,6 +10840,14 @@ dwv.image.RescaleSlopeAndIntercept.prototype.toString = function () {
 };
 
 /**
+ * Is this RSI an ID RSI.
+ * @return {Boolean} True if the RSI has a slope of 1 and no intercept.
+ */
+dwv.image.RescaleSlopeAndIntercept.prototype.isID = function () {
+    return (this.getSlope() === 1 && this.getIntercept() === 0);
+};
+
+/**
  * Image class.
  * Usable once created, optional are:
  * - rescale slope and intercept (default 1:0),
@@ -10874,9 +10882,22 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
      * @type Number
      */
     var rsis = [];
-    for ( var s = 0; s < geometry.getSize().getNumberOfSlices(); ++s ) {
+    // initialise RSIs
+    for ( var s = 0, nslices = geometry.getSize().getNumberOfSlices(); s < nslices; ++s ) {
         rsis.push( new dwv.image.RescaleSlopeAndIntercept( 1, 0 ) );
     }
+    /**
+     * Flag to know if the RSIs are all identity (1,0).
+     * @private
+     * @type Boolean
+     */
+    var isIdentityRSI = true;
+    /**
+     * Flag to know if the RSIs are all equals.
+     * @private
+     * @type Boolean
+     */
+    var isConstantRSI = true;
     /**
      * Photometric interpretation (MONOCHROME, RGB...).
      * @private
@@ -10894,7 +10915,8 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
      * @private
      * @type Number
      */
-    var numberOfComponents = buffer.length / geometry.getSize().getTotalSize();
+    var numberOfComponents = buffer.length / (
+	    geometry.getSize().getTotalSize() * numberOfFrames );
     /**
      * Meta information.
      * @private
@@ -10942,19 +10964,43 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
 
     /**
      * Get the rescale slope and intercept.
+     * @param {Number} k The slice index.
      * @return {Object} The rescale slope and intercept.
      */
     this.getRescaleSlopeAndIntercept = function(k) { return rsis[k]; };
     /**
      * Set the rescale slope and intercept.
-     * @param {Object} rsi The rescale slope and intercept.
+     * @param {Array} inRsi The input rescale slope and intercept.
+     * @param {Number} k The slice index (optional).
      */
     this.setRescaleSlopeAndIntercept = function(inRsi, k) {
         if ( typeof k === 'undefined' ) {
             k = 0;
         }
         rsis[k] = inRsi;
+
+        var size = geometry.getSize();
+        isIdentityRSI = true;
+        isConstantRSI = true;
+        for ( var s = 0, nslices = size.getNumberOfSlices(); s < nslices; ++s ) {
+            if (!rsis[s].isID()) {
+                isIdentityRSI = false;
+            }
+            if (s > 0 && !rsis[s].equals(rsis[s-1])) {
+                isConstantRSI = false;
+            }
+        }
     };
+    /**
+     * Are all the RSIs identity (1,0).
+     * @return {Boolean} True if they are.
+     */
+    this.isIdentityRSI = function () { return isIdentityRSI; };
+    /**
+     * Are all the RSIs equal.
+     * @return {Boolean} True if they are.
+     */
+    this.isConstantRSI = function () { return isConstantRSI; };
     /**
      * Get the photometricInterpretation of the image.
      * @return {String} The photometricInterpretation of the image.
@@ -11159,7 +11205,11 @@ dwv.image.Image.prototype.getValue = function( i, j, k, f )
 dwv.image.Image.prototype.getRescaledValue = function( i, j, k, f )
 {
     var frame = (f || 0);
-    return this.getRescaleSlopeAndIntercept(k).apply( this.getValue(i,j,k,frame) );
+    var val = this.getValue(i,j,k,frame);
+    if (!this.isIdentityRSI()) {
+        val = this.getRescaleSlopeAndIntercept(k).apply(val);
+    }
+    return val;
 };
 
 /**
@@ -11187,23 +11237,37 @@ dwv.image.Image.prototype.calculateDataRange = function ()
  */
 dwv.image.Image.prototype.calculateRescaledDataRange = function ()
 {
-    var size = this.getGeometry().getSize();
-    var rmin = this.getRescaledValue(0,0,0);
-    var rmax = rmin;
-    var rvalue = 0;
-    for ( var f = 0, nframes = this.getNumberOfFrames(); f < nframes; ++f ) {
-        for ( var k = 0, nslices = size.getNumberOfSlices(); k < nslices; ++k ) {
-            for ( var j = 0, nrows = size.getNumberOfRows(); j < nrows; ++j ) {
-                for ( var i = 0, ncols = size.getNumberOfColumns(); i < ncols; ++i ) {
-                    rvalue = this.getRescaledValue(i,j,k,f);
-                    if( rvalue > rmax ) { rmax = rvalue; }
-                    if( rvalue < rmin ) { rmin = rvalue; }
+    if (this.isIdentityRSI()) {
+        return this.calculateDataRange();
+    }
+    else if (this.isConstantRSI()) {
+        var range = this.calculateDataRange();
+        var resmin = this.getRescaleSlopeAndIntercept(0).apply(range.min);
+        var resmax = this.getRescaleSlopeAndIntercept(0).apply(range.max);
+        return {
+            "min": ((resmin < resmax) ? resmin : resmax),
+            "max": ((resmin > resmax) ? resmin : resmax)
+        };
+    }
+    else {
+        var size = this.getGeometry().getSize();
+        var rmin = this.getRescaledValue(0,0,0);
+        var rmax = rmin;
+        var rvalue = 0;
+        for ( var f = 0, nframes = this.getNumberOfFrames(); f < nframes; ++f ) {
+            for ( var k = 0, nslices = size.getNumberOfSlices(); k < nslices; ++k ) {
+                for ( var j = 0, nrows = size.getNumberOfRows(); j < nrows; ++j ) {
+                    for ( var i = 0, ncols = size.getNumberOfColumns(); i < ncols; ++i ) {
+                        rvalue = this.getRescaledValue(i,j,k,f);
+                        if( rvalue > rmax ) { rmax = rvalue; }
+                        if( rvalue < rmin ) { rmin = rvalue; }
+                    }
                 }
             }
         }
+        // return
+        return { "min": rmin, "max": rmax };
     }
-    // return
-    return { "min": rmin, "max": rmax };
 };
 
 /**
