@@ -261,3 +261,43 @@ QUnit.test("Test Image transform.", function (assert) {
     }
     assert.equal( testContent1, true, "transform multiply" );
 });
+
+/**
+ * Tests for {@link dwv.image.Image} compose.
+ * @function module:tests/image~compose
+ */
+QUnit.test("Test Image compose.", function (assert) {
+    // create two simple images
+    var size0 = 3;
+    var imgSize0 = new dwv.image.Size(size0, size0, 1);
+    var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+    var imgOrigin0 = new dwv.math.Point3D(0,0,0);
+    var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
+    var buffer0 = [];
+    for ( var i = 0; i < size0*size0; ++i ) {
+        buffer0[i] = i;
+    }
+    var image0 = new dwv.image.Image(imgGeometry0, buffer0);
+    var buffer1 = [];
+    for ( i = 0; i < size0*size0; ++i ) {
+        buffer1[i] = i;
+    }
+    var image1 = new dwv.image.Image(imgGeometry0, buffer1);
+
+    // addition function
+    var func0 = function ( a, b ) {
+        return a + b;
+    };
+    var resImage0 = image0.compose( image1, func0 );
+    console.log(resImage0.getBuffer());
+    var theoResImage0 = [ 0, 2, 4, 6, 8, 10, 12, 14, 16 ];
+    var testContent0 = true;
+    for ( i = 0; i < size0*size0; ++i) {
+        if ( theoResImage0[i] !== resImage0.getValueAtOffset(i,0) ) {
+            testContent0 = false;
+            break;
+        }
+    }
+    assert.equal( testContent0, true, "compose addition" );
+});
+
