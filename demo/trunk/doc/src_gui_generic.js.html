@@ -256,10 +256,6 @@ dwv.gui.base.DicomTags = function (app)
         while (node.hasChildNodes()) {
             node.removeChild(node.firstChild);
         }
-        // tag list table (without the pixel data)
-        if(dataInfo.PixelData) {
-            dataInfo.PixelData.value = "...";
-        }
         // tags HTML table
         var table = dwv.html.toTable(dataInfo);
         table.className = "tagsTable";

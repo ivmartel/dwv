@@ -2986,22 +2986,32 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
         for ( var i = 0 ; i < keys.length; ++i ) {
             dicomElement = dicomElements[keys[i]];
             row = {};
-            // trying to have name first in row
+            // dictionnary entry (to get name)
             dictElement = null;
             if ( typeof dict[dicomElement.tag.group] !== "undefined" &&
                     typeof dict[dicomElement.tag.group][dicomElement.tag.element] !== "undefined") {
                 dictElement = dict[dicomElement.tag.group][dicomElement.tag.element];
             }
+            // name
             if ( dictElement !== null ) {
                 row.name = dictElement[2];
             }
             else {
                 row.name = "Unknown Tag & Data";
             }
-            var deKeys = Object.keys(dicomElement);
-            for ( var j = 0 ; j < deKeys.length; ++j ) {
-                row[deKeys[j]] = dicomElement[deKeys[j]];
+            // value
+            if ( dicomElement.tag.name !== "x7FE00010" ) {
+                row.value = dicomElement.value;
             }
+            else {
+                row.value = "...";
+            }
+            // others
+            row.group = dicomElement.tag.group;
+            row.element = dicomElement.tag.element;
+            row.vr = dicomElement.vr;
+            row.vl = dicomElement.vl;
+
             table.push( row );
         }
         return table;
@@ -8570,10 +8580,6 @@ dwv.gui.base.DicomTags = function (app)
         // remove possible previous
         while (node.hasChildNodes()) {
             node.removeChild(node.firstChild);
-        }
-        // tag list table (without the pixel data)
-        if(dataInfo.PixelData) {
-            dataInfo.PixelData.value = "...";
         }
         // tags HTML table
         var table = dwv.html.toTable(dataInfo);
