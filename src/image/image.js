@@ -836,21 +836,6 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var jpegBase = dwv.dicom.isJpegBaselineTransferSyntax( syntax );
     var jpegLoss = dwv.dicom.isJpegLosslessTransferSyntax( syntax );
 
-    // buffer data
-    var buffer = pixelBuffer;
-    // PixelRepresentation
-    var pixelRepresentation = dicomElements.getFromKey("x00280103");
-    if ( pixelRepresentation === 1 ) {
-        // unsigned to signed data
-        buffer = new Int16Array(pixelBuffer.length);
-        for ( var i = 0, leni = pixelBuffer.length; i < leni; ++i ) {
-            buffer[i] = pixelBuffer[i];
-            if ( buffer[i] >= Math.pow(2, 15) ) {
-                buffer[i] -= Math.pow(2, 16);
-            }
-        }
-    }
-
     // slice position
     var slicePosition = new Array(0,0,0);
     // ImagePositionPatient
@@ -875,7 +860,7 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     }
 
     // image
-    var image = new dwv.image.Image( geometry, buffer, numberOfFrames );
+    var image = new dwv.image.Image( geometry, pixelBuffer, numberOfFrames );
     // PhotometricInterpretation
     var photometricInterpretation = dicomElements.getFromKey("x00280004");
     if ( photometricInterpretation ) {

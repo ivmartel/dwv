@@ -478,6 +478,43 @@ dwv.dicom.getTransferSyntaxName = function (syntax)
 };
 
 /**
+ * Get the appropriate TypedArray in function of arguments.
+ * @param {Number} bitsAllocated The number of bites used to store the data: [8, 16, 32].
+ * @param {Number} pixelRepresentation The pixel representation, 0:unsigned;1:signed.
+ * @param {Size} size The size of the new array.
+ * @return The good typed array.
+ */
+dwv.dicom.getTypedArray = function (bitsAllocated, pixelRepresentation, size)
+{
+    var res = null;
+    if (bitsAllocated === 8) {
+        if (pixelRepresentation === 0) {
+            res = new Uint8Array(size);
+        }
+        else {
+            res = new Int8Array(size);
+        }
+    }
+    else if (bitsAllocated === 16) {
+        if (pixelRepresentation === 0) {
+            res = new Uint16Array(size);
+        }
+        else {
+            res = new Int16Array(size);
+        }
+    }
+    else if (bitsAllocated === 32) {
+        if (pixelRepresentation === 0) {
+            res = new Uint32Array(size);
+        }
+        else {
+            res = new Int32Array(size);
+        }
+    }
+    return res;
+};
+
+/**
  * Does this Value Representation (VR) have a 32bit Value Length (VL).
  * Ref: [Data Element explicit]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1}.
  * @param {String} vr The data Value Representation (VR).
@@ -535,11 +572,6 @@ dwv.dicom.DicomParser = function ()
      * @type Array
      */
     this.dicomElements = {};
-    /**
-     * The pixel buffer.
-     * @type Array
-     */
-    this.pixelBuffer = [];
 
     /**
      * Unknown tags count.
@@ -572,15 +604,6 @@ dwv.dicom.DicomParser.prototype.getRawDicomElements = function ()
 dwv.dicom.DicomParser.prototype.getDicomElements = function ()
 {
     return new dwv.dicom.DicomElementsWrapper(this.dicomElements);
-};
-
-/**
- * Get the DICOM data pixel buffer.
- * @return {Array} The pixel buffer.
- */
-dwv.dicom.DicomParser.prototype.getPixelBuffer = function ()
-{
-    return this.pixelBuffer;
 };
 
 /**
@@ -772,21 +795,53 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
     }
     else if ( vr === "OW" || vr === "OF" || vr === "ox" )
     {
-        // BitsAllocated == 8
-        if ( typeof this.dicomElements.x00280100 !== 'undefined' &&
-                    this.dicomElements.x00280100.value[0] === 8 ) {
-            data = reader.readUint8Array( offset, vl );
-            offset += vl;
+        // BitsAllocated
+        var bitsAllocated = 16;
+        if ( typeof this.dicomElements.x00280100 !== 'undefined' ) {
+            bitsAllocated = this.dicomElements.x00280100.value[0];
+        }
+        // PixelRepresentation 0->unsigned, 1->signed
+        var pixelRepresentation = 0;
+        if ( typeof this.dicomElements.x00280103 !== 'undefined' ) {
+            pixelRepresentation = this.dicomElements.x00280103.value[0];
+        }
+        // read accordingly
+        if ( bitsAllocated === 8 ) {
+            if (pixelRepresentation === 0) {
+                data = reader.readUint8Array( offset, vl );
+            }
+            else {
+                data = reader.readInt8Array( offset, vl );
+            }
+        }
+        else if ( bitsAllocated === 16 ) {
+            if (pixelRepresentation === 0) {
+                data = reader.readUint16Array( offset, vl );
+            }
+            else {
+                data = reader.readInt16Array( offset, vl );
+            }
         }
         else {
             data = reader.readUint16Array( offset, vl );
-            offset += vl;
         }
+        offset += vl;
     }
     // OB
     else if( vr === "OB")
     {
-        data = reader.readUint8Array( offset, vl );
+        // PixelRepresentation 0->unsigned, 1->signed
+        var pixelRep = 0;
+        if ( typeof this.dicomElements.x00280103 !== 'undefined' ) {
+            pixelRep = this.dicomElements.x00280103.value[0];
+        }
+        // read accordingly
+        if (pixelRep === 0) {
+           data = reader.readUint8Array( offset, vl );
+        }
+        else {
+           data = reader.readInt8Array( offset, vl );
+        }
         offset += vl;
     }
     // numbers
@@ -999,21 +1054,30 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     // pixel buffer
     if (typeof this.dicomElements.x7FE00010 !== "undefined") {
         if (this.dicomElements.x7FE00010.vl !== "u/l") {
-            this.pixelBuffer = this.dicomElements.x7FE00010.value;
+            //this.pixelBuffer = this.dicomElements.x7FE00010.value;
         }
         else {
+            var bitsAllocated = this.dicomElements.x00280100.value[0];
+            var pixelRepresentation = this.dicomElements.x00280103.value[0];
             // concatenate pixel data items
             // concat does not work on typed arrays
             //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
             // manual concat...
-            var items = this.dicomElements.x7FE00010.value;
-            for (var i = 0; i < items.length; ++i) {
-                var size = items[i].value.length + this.pixelBuffer.length;
-                var newBuffer = new Uint16Array(size);
-                newBuffer.set( this.pixelBuffer, 0 );
-                newBuffer.set( items[i].value, this.pixelBuffer.length );
-                this.pixelBuffer = newBuffer;
+            var pixItems = this.dicomElements.x7FE00010.value;
+            // calculate the size of the concatenated data
+            var size = 0;
+            for (var i = 0; i < pixItems.length; ++i) {
+                size += pixItems[i].value.length;
             }
+            // create new buffer
+            var newBuffer = dwv.dicom.getTypedArray(bitsAllocated, pixelRepresentation, size);
+            // fill new buffer
+            var fragOffset = 0;
+            for (var j = 0; j < pixItems.length; ++j) {
+                newBuffer.set( pixItems[j].value, fragOffset );
+                fragOffset += pixItems[j].value.length;
+            }
+            this.dicomElements.x7FE00010.value = newBuffer;
         }
     }
 };
