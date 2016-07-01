@@ -67,7 +67,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
 
     /**
      * Flip an array's endianness.
-     * Inspired from {@link https://github.com/kig/DataStream.js}.
+     * Inspired from [DataStream.js]{@link https://github.com/kig/DataStream.js}.
      * @param {Object} array The array to flip (modified).
      */
     this.flipArrayEndianness = function (array) {
@@ -407,6 +407,7 @@ dwv.dicom.getSyntaxDecompressionName = function (syntax)
 
 /**
  * Get the transfer syntax name.
+ * Reference: [UID Values]{@link http://dicom.nema.org/dicom/2013/output/chtml/part06/chapter_A.html}.
  * @param {String} syntax The transfer syntax.
  * @return {String} The name of the transfer syntax.
  */
@@ -478,8 +479,7 @@ dwv.dicom.getTransferSyntaxName = function (syntax)
 
 /**
  * Does this Value Representation (VR) have a 32bit Value Length (VL).
- * Ref: http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1
- * Update to 2016c? http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_7.html#table_7.1-1
+ * Ref: [Data Element explicit]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1}.
  * @param {String} vr The data Value Representation (VR).
  * @returns {Boolean} True if this VR has a 32-bit VL.
  */
@@ -507,8 +507,8 @@ dwv.dicom.isTagWithVR = function (group, element) {
  * Get the number of bytes occupied by a data element prefix, i.e. without its value.
  * WARNING: this is valid for tags with a VR, if not sure use the 'isTagWithVR' function first.
  * Reference:
- * - http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1
- * - http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_7.5.html#table_7.5-1
+ * - [Data Element explicit]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1},
+ * - [Data Element implicit]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_7.5.html#table_7.5-1}.
  *
  * | Tag | VR  | VL | Value |
  * | 4   | 2   | 2  | X     | -> regular explicit: 8 + X
@@ -670,7 +670,7 @@ dwv.dicom.DicomParser.prototype.readItemDataElement = function (reader, offset, 
 
 /**
  * Read the pixel item data element. 
- * Ref: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_A.4.html#table_A.4-1
+ * Ref: [Single frame fragments]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_A.4.html#table_A.4-1}.
  * @param {Object} reader The raw data reader.
  * @param {Number} offset The offset where to start to read.
  * @param {Boolean} implicit Is the DICOM VR implicit?
@@ -702,7 +702,7 @@ dwv.dicom.DicomParser.prototype.readPixelItemDataElement = function (reader, off
 
 /**
  * Read a DICOM data element.
- * Reference: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#table_6.2-1
+ * Reference: [DICOM VRs]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#table_6.2-1}.
  * @param {Object} reader The raw data reader.
  * @param {Number} offset The offset where to start to read.
  * @param {Boolean} implicit Is the DICOM VR implicit?
