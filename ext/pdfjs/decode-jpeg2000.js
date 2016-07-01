@@ -6,11 +6,11 @@
 
 importScripts('jpx.js', 'util.js', 'arithmetic_decoder.js'); 
 
-self.addEventListener('message', function (e) {
+self.addEventListener('message', function (event) {
     
     // decode DICOM buffer
     var decoder = new JpxImage();
-    decoder.parse( e.data );
+    decoder.parse( event.data.buffer );
     // post decoded data
     var res = decoder.tiles[0].items;
     self.postMessage(res);

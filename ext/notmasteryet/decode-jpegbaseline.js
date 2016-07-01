@@ -6,11 +6,11 @@
 
 importScripts('jpg.js'); 
 
-self.addEventListener('message', function (e) {
+self.addEventListener('message', function (event) {
     
     // decode DICOM buffer
     var decoder = new JpegImage();
-    decoder.parse( e.data );
+    decoder.parse( event.data.buffer );
     // post decoded data
     var res = decoder.getData(decoder.width,decoder.height);
     self.postMessage(res);
