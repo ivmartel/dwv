@@ -10931,13 +10931,6 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
     var meta = {};
 
     /**
-     * Original buffer.
-     * @private
-     * @type Array
-     */
-    var originalBuffer = new Int16Array(buffer);
-
-    /**
      * Data range.
      * @private
      * @type Object
@@ -10985,10 +10978,10 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
         }
         rsis[k] = inRsi;
 
-        var size = geometry.getSize();
+        // update RSI flags
         isIdentityRSI = true;
         isConstantRSI = true;
-        for ( var s = 0, nslices = size.getNumberOfSlices(); s < nslices; ++s ) {
+        for ( var s = 0, lens = rsis.length; s < lens; ++s ) {
             if (!rsis[s].isID()) {
                 isIdentityRSI = false;
             }
@@ -11059,14 +11052,20 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
      */
     this.clone = function()
     {
-        var copy = new dwv.image.Image(this.getGeometry(), originalBuffer, numberOfFrames);
+        // clone the image buffer
+        var clonedBuffer = buffer.slice(0);
+        // create the image copy
+        var copy = new dwv.image.Image(this.getGeometry(), clonedBuffer, numberOfFrames);
+        // copy the RSIs
         var nslices = this.getGeometry().getSize().getNumberOfSlices();
         for ( var k = 0; k < nslices; ++k ) {
             copy.setRescaleSlopeAndIntercept(this.getRescaleSlopeAndIntercept(k), k);
         }
+        // copy extras
         copy.setPhotometricInterpretation(this.getPhotometricInterpretation());
         copy.setPlanarConfiguration(this.getPlanarConfiguration());
         copy.setMeta(this.getMeta());
+        // return
         return copy;
     };
 
@@ -11139,7 +11138,6 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
 
         // copy to class variables
         buffer = newBuffer;
-        originalBuffer = new Int16Array(newBuffer);
 
         // return the appended slice number
         return newSliceNb;
@@ -11225,13 +11223,16 @@ dwv.image.Image.prototype.getRescaledValue = function( i, j, k, f )
 dwv.image.Image.prototype.calculateDataRange = function ()
 {
     var size = this.getGeometry().getSize().getTotalSize();
+    var nFrames = this.getNumberOfFrames();
     var min = this.getValueAtOffset(0);
     var max = min;
     var value = 0;
-    for ( var i = 0; i < size; ++i ) {
-        value = this.getValueAtOffset(i);
-        if( value > max ) { max = value; }
-        if( value < min ) { min = value; }
+    for ( var f = 0; f < nFrames; ++f ) {
+        for ( var i = 0; i < size; ++i ) {
+            value = this.getValueAtOffset(f*size + i);
+            if( value > max ) { max = value; }
+            if( value < min ) { min = value; }
+        }
     }
     // return
     return { "min": min, "max": max };
@@ -11476,6 +11477,7 @@ dwv.image.Image.prototype.convolute2D = function(weights)
 
 /**
  * Transform an image using a specific operator.
+ * WARNING: no size check!
  * @param {Function} operator The operator to use when transforming.
  * @return {Image} The transformed image.
  * Note: Uses the raw buffer values.
@@ -11493,6 +11495,7 @@ dwv.image.Image.prototype.transform = function(operator)
 
 /**
  * Compose this image with another one and using a specific operator.
+ * WARNING: no size check!
  * @param {Image} rhs The image to compose with.
  * @param {Function} operator The operator to use when composing.
  * @return {Image} The composed image.
