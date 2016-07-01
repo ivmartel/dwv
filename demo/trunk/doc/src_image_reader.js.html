@@ -202,7 +202,7 @@ dwv.image.DicomBufferToView = function (decoderScripts) {
         var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
         var needDecompression = (algoName !== null);
 
-        var pixelBuffer = dicomParser.pixelBuffer;
+        var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
         var bitsAllocated = dicomParser.getRawDicomElements().x00280100.value[0];
         var pixelRepresentation = dicomParser.getRawDicomElements().x00280103.value[0];
         var isSigned = (pixelRepresentation === 1);

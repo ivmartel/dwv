@@ -451,8 +451,8 @@ Local changes:
         Get the number of bytes occupied by a data element prefix, i.e. without its value.
 WARNING: this is valid for tags with a VR, if not sure use the 'isTagWithVR' function first.
 Reference:
-- http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1
-- http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_7.5.html#table_7.5-1
+- <a href="http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1">Data Element explicit</a>,
+- <a href="http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_7.5.html#table_7.5-1">Data Element implicit</a>.
 
 | Tag | VR  | VL | Value |
 | 4   | 2   | 2  | X     | -> regular explicit: 8 + X
@@ -509,7 +509,7 @@ Reference:
 		<ul class="dummy">
 			<li>
 				<a href="src_dicom_dicomParser.js.html">src/dicom/dicomParser.js</a>,
-				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-523">line 523</a>
+				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-560">line 560</a>
 			</li>
 		</ul>
 	</dd>
@@ -899,6 +899,7 @@ Reference:
     
     <div class="description">
         Get the transfer syntax name.
+Reference: <a href="http://dicom.nema.org/dicom/2013/output/chtml/part06/chapter_A.html">UID Values</a>.
     </div>
     
 
@@ -995,7 +996,7 @@ Reference:
 		<ul class="dummy">
 			<li>
 				<a href="src_dicom_dicomParser.js.html">src/dicom/dicomParser.js</a>,
-				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-413">line 413</a>
+				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-414">line 414</a>
 			</li>
 		</ul>
 	</dd>
@@ -1052,6 +1053,203 @@ Reference:
             
 <hr>
 <dt>
+    <h4 class="name" id=".getTypedArray"><span class="type-signature">&lt;static> </span>getTypedArray(bitsAllocated, pixelRepresentation, size)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get the appropriate TypedArray in function of arguments.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>bitsAllocated</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The number of bites used to store the data: [8, 16, 32].</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>pixelRepresentation</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The pixel representation, 0:unsigned;1:signed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>size</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Size</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The size of the new array.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_dicom_dicomParser.js.html">src/dicom/dicomParser.js</a>,
+				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-487">line 487</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    The good typed array.
+</div>
+
+
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
     <h4 class="name" id=".is32bitVLVR"><span class="type-signature">&lt;static> </span>is32bitVLVR(vr)</h4>
     
     
@@ -1061,8 +1259,7 @@ Reference:
     
     <div class="description">
         Does this Value Representation (VR) have a 32bit Value Length (VL).
-Ref: http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1
-Update to 2016c? http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_7.html#table_7.1-1
+Ref: <a href="http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1">Data Element explicit</a>.
     </div>
     
 
@@ -1159,7 +1356,7 @@ Update to 2016c? http://dicom.nema.org/medical/dicom/current/output/chtml/part05
 		<ul class="dummy">
 			<li>
 				<a href="src_dicom_dicomParser.js.html">src/dicom/dicomParser.js</a>,
-				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-486">line 486</a>
+				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-523">line 523</a>
 			</li>
 		</ul>
 	</dd>
@@ -2406,7 +2603,7 @@ Basically the Item, ItemDelimitationItem and SequenceDelimitationItem tags.
 		<ul class="dummy">
 			<li>
 				<a href="src_dicom_dicomParser.js.html">src/dicom/dicomParser.js</a>,
-				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-500">line 500</a>
+				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-537">line 537</a>
 			</li>
 		</ul>
 	</dd>

@@ -1989,7 +1989,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
 
     /**
      * Flip an array's endianness.
-     * Inspired from {@link https://github.com/kig/DataStream.js}.
+     * Inspired from [DataStream.js]{@link https://github.com/kig/DataStream.js}.
      * @param {Object} array The array to flip (modified).
      */
     this.flipArrayEndianness = function (array) {
@@ -2329,6 +2329,7 @@ dwv.dicom.getSyntaxDecompressionName = function (syntax)
 
 /**
  * Get the transfer syntax name.
+ * Reference: [UID Values]{@link http://dicom.nema.org/dicom/2013/output/chtml/part06/chapter_A.html}.
  * @param {String} syntax The transfer syntax.
  * @return {String} The name of the transfer syntax.
  */
@@ -2399,9 +2400,45 @@ dwv.dicom.getTransferSyntaxName = function (syntax)
 };
 
 /**
+ * Get the appropriate TypedArray in function of arguments.
+ * @param {Number} bitsAllocated The number of bites used to store the data: [8, 16, 32].
+ * @param {Number} pixelRepresentation The pixel representation, 0:unsigned;1:signed.
+ * @param {Size} size The size of the new array.
+ * @return The good typed array.
+ */
+dwv.dicom.getTypedArray = function (bitsAllocated, pixelRepresentation, size)
+{
+    var res = null;
+    if (bitsAllocated === 8) {
+        if (pixelRepresentation === 0) {
+            res = new Uint8Array(size);
+        }
+        else {
+            res = new Int8Array(size);
+        }
+    }
+    else if (bitsAllocated === 16) {
+        if (pixelRepresentation === 0) {
+            res = new Uint16Array(size);
+        }
+        else {
+            res = new Int16Array(size);
+        }
+    }
+    else if (bitsAllocated === 32) {
+        if (pixelRepresentation === 0) {
+            res = new Uint32Array(size);
+        }
+        else {
+            res = new Int32Array(size);
+        }
+    }
+    return res;
+};
+
+/**
  * Does this Value Representation (VR) have a 32bit Value Length (VL).
- * Ref: http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1
- * Update to 2016c? http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_7.html#table_7.1-1
+ * Ref: [Data Element explicit]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1}.
  * @param {String} vr The data Value Representation (VR).
  * @returns {Boolean} True if this VR has a 32-bit VL.
  */
@@ -2429,8 +2466,8 @@ dwv.dicom.isTagWithVR = function (group, element) {
  * Get the number of bytes occupied by a data element prefix, i.e. without its value.
  * WARNING: this is valid for tags with a VR, if not sure use the 'isTagWithVR' function first.
  * Reference:
- * - http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1
- * - http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_7.5.html#table_7.5-1
+ * - [Data Element explicit]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1},
+ * - [Data Element implicit]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_7.5.html#table_7.5-1}.
  *
  * | Tag | VR  | VL | Value |
  * | 4   | 2   | 2  | X     | -> regular explicit: 8 + X
@@ -2457,11 +2494,6 @@ dwv.dicom.DicomParser = function ()
      * @type Array
      */
     this.dicomElements = {};
-    /**
-     * The pixel buffer.
-     * @type Array
-     */
-    this.pixelBuffer = [];
 
     /**
      * Unknown tags count.
@@ -2494,15 +2526,6 @@ dwv.dicom.DicomParser.prototype.getRawDicomElements = function ()
 dwv.dicom.DicomParser.prototype.getDicomElements = function ()
 {
     return new dwv.dicom.DicomElementsWrapper(this.dicomElements);
-};
-
-/**
- * Get the DICOM data pixel buffer.
- * @return {Array} The pixel buffer.
- */
-dwv.dicom.DicomParser.prototype.getPixelBuffer = function ()
-{
-    return this.pixelBuffer;
 };
 
 /**
@@ -2592,7 +2615,7 @@ dwv.dicom.DicomParser.prototype.readItemDataElement = function (reader, offset, 
 
 /**
  * Read the pixel item data element. 
- * Ref: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_A.4.html#table_A.4-1
+ * Ref: [Single frame fragments]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_A.4.html#table_A.4-1}.
  * @param {Object} reader The raw data reader.
  * @param {Number} offset The offset where to start to read.
  * @param {Boolean} implicit Is the DICOM VR implicit?
@@ -2624,7 +2647,7 @@ dwv.dicom.DicomParser.prototype.readPixelItemDataElement = function (reader, off
 
 /**
  * Read a DICOM data element.
- * Reference: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#table_6.2-1
+ * Reference: [DICOM VRs]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#table_6.2-1}.
  * @param {Object} reader The raw data reader.
  * @param {Number} offset The offset where to start to read.
  * @param {Boolean} implicit Is the DICOM VR implicit?
@@ -2694,21 +2717,53 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
     }
     else if ( vr === "OW" || vr === "OF" || vr === "ox" )
     {
-        // BitsAllocated == 8
-        if ( typeof this.dicomElements.x00280100 !== 'undefined' &&
-                    this.dicomElements.x00280100.value[0] === 8 ) {
-            data = reader.readUint8Array( offset, vl );
-            offset += vl;
+        // BitsAllocated
+        var bitsAllocated = 16;
+        if ( typeof this.dicomElements.x00280100 !== 'undefined' ) {
+            bitsAllocated = this.dicomElements.x00280100.value[0];
+        }
+        // PixelRepresentation 0->unsigned, 1->signed
+        var pixelRepresentation = 0;
+        if ( typeof this.dicomElements.x00280103 !== 'undefined' ) {
+            pixelRepresentation = this.dicomElements.x00280103.value[0];
+        }
+        // read accordingly
+        if ( bitsAllocated === 8 ) {
+            if (pixelRepresentation === 0) {
+                data = reader.readUint8Array( offset, vl );
+            }
+            else {
+                data = reader.readInt8Array( offset, vl );
+            }
+        }
+        else if ( bitsAllocated === 16 ) {
+            if (pixelRepresentation === 0) {
+                data = reader.readUint16Array( offset, vl );
+            }
+            else {
+                data = reader.readInt16Array( offset, vl );
+            }
         }
         else {
             data = reader.readUint16Array( offset, vl );
-            offset += vl;
         }
+        offset += vl;
     }
     // OB
     else if( vr === "OB")
     {
-        data = reader.readUint8Array( offset, vl );
+        // PixelRepresentation 0->unsigned, 1->signed
+        var pixelRep = 0;
+        if ( typeof this.dicomElements.x00280103 !== 'undefined' ) {
+            pixelRep = this.dicomElements.x00280103.value[0];
+        }
+        // read accordingly
+        if (pixelRep === 0) {
+           data = reader.readUint8Array( offset, vl );
+        }
+        else {
+           data = reader.readInt8Array( offset, vl );
+        }
         offset += vl;
     }
     // numbers
@@ -2921,21 +2976,30 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     // pixel buffer
     if (typeof this.dicomElements.x7FE00010 !== "undefined") {
         if (this.dicomElements.x7FE00010.vl !== "u/l") {
-            this.pixelBuffer = this.dicomElements.x7FE00010.value;
+            //this.pixelBuffer = this.dicomElements.x7FE00010.value;
         }
         else {
+            var bitsAllocated = this.dicomElements.x00280100.value[0];
+            var pixelRepresentation = this.dicomElements.x00280103.value[0];
             // concatenate pixel data items
             // concat does not work on typed arrays
             //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
             // manual concat...
-            var items = this.dicomElements.x7FE00010.value;
-            for (var i = 0; i < items.length; ++i) {
-                var size = items[i].value.length + this.pixelBuffer.length;
-                var newBuffer = new Uint16Array(size);
-                newBuffer.set( this.pixelBuffer, 0 );
-                newBuffer.set( items[i].value, this.pixelBuffer.length );
-                this.pixelBuffer = newBuffer;
+            var pixItems = this.dicomElements.x7FE00010.value;
+            // calculate the size of the concatenated data
+            var size = 0;
+            for (var i = 0; i < pixItems.length; ++i) {
+                size += pixItems[i].value.length;
             }
+            // create new buffer
+            var newBuffer = dwv.dicom.getTypedArray(bitsAllocated, pixelRepresentation, size);
+            // fill new buffer
+            var fragOffset = 0;
+            for (var j = 0; j < pixItems.length; ++j) {
+                newBuffer.set( pixItems[j].value, fragOffset );
+                fragOffset += pixItems[j].value.length;
+            }
+            this.dicomElements.x7FE00010.value = newBuffer;
         }
     }
 };
@@ -11616,21 +11680,6 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var jpegBase = dwv.dicom.isJpegBaselineTransferSyntax( syntax );
     var jpegLoss = dwv.dicom.isJpegLosslessTransferSyntax( syntax );
 
-    // buffer data
-    var buffer = pixelBuffer;
-    // PixelRepresentation
-    var pixelRepresentation = dicomElements.getFromKey("x00280103");
-    if ( pixelRepresentation === 1 ) {
-        // unsigned to signed data
-        buffer = new Int16Array(pixelBuffer.length);
-        for ( var i = 0, leni = pixelBuffer.length; i < leni; ++i ) {
-            buffer[i] = pixelBuffer[i];
-            if ( buffer[i] >= Math.pow(2, 15) ) {
-                buffer[i] -= Math.pow(2, 16);
-            }
-        }
-    }
-
     // slice position
     var slicePosition = new Array(0,0,0);
     // ImagePositionPatient
@@ -11655,7 +11704,7 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     }
 
     // image
-    var image = new dwv.image.Image( geometry, buffer, numberOfFrames );
+    var image = new dwv.image.Image( geometry, pixelBuffer, numberOfFrames );
     // PhotometricInterpretation
     var photometricInterpretation = dicomElements.getFromKey("x00280004");
     if ( photometricInterpretation ) {
@@ -12191,7 +12240,7 @@ dwv.image.DicomBufferToView = function (decoderScripts) {
         var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
         var needDecompression = (algoName !== null);
 
-        var pixelBuffer = dicomParser.pixelBuffer;
+        var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
         var bitsAllocated = dicomParser.getRawDicomElements().x00280100.value[0];
         var pixelRepresentation = dicomParser.getRawDicomElements().x00280103.value[0];
         var isSigned = (pixelRepresentation === 1);
