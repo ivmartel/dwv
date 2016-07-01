@@ -324,7 +324,7 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
 
         // calculate slice size
         var mul = 1;
-        if( photometricInterpretation === "RGB" ) {
+        if( photometricInterpretation === "RGB" || photometricInterpretation === "YBR_FULL_422") {
             mul = 3;
         }
         var sliceSize = mul * size.getSliceSize();
@@ -830,6 +830,8 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var transferSyntaxUID = dicomElements.getFromKey("x00020010");
     var syntax = dwv.dicom.cleanString( transferSyntaxUID );
     var jpeg2000 = dwv.dicom.isJpeg2000TransferSyntax( syntax );
+    var jpegBase = dwv.dicom.isJpegBaselineTransferSyntax( syntax );
+    var jpegLoss = dwv.dicom.isJpegLosslessTransferSyntax( syntax );
 
     // buffer data
     var buffer = pixelBuffer;
@@ -875,7 +877,9 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var photometricInterpretation = dicomElements.getFromKey("x00280004");
     if ( photometricInterpretation ) {
         var photo = dwv.dicom.cleanString(photometricInterpretation).toUpperCase();
-        if ( jpeg2000 && photo.match(/YBR/) ) {
+        // jpeg decoders output RGB data
+        if ( (jpeg2000 || jpegBase || jpegLoss) &&
+        	(photo !== "MONOCHROME1" && photo !== "MONOCHROME2") ) {
             photo = "RGB";
         }
         image.setPhotometricInterpretation( photo );

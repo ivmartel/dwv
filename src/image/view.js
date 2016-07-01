@@ -313,11 +313,14 @@ dwv.image.View.prototype.generateImageData = function( array )
     var windowLut = this.getWindowLut();
     windowLut.update();
     var sliceSize = image.getGeometry().getSize().getSliceSize();
-    var sliceOffset = image.getGeometry().getSize().getTotalSize() * this.getCurrentFrame() +
-        sliceSize * this.getCurrentPosition().k;
+    var sliceOffset = sliceSize * this.getCurrentPosition().k;
+    if (this.getCurrentFrame()) {
+        sliceOffset += image.getGeometry().getSize().getTotalSize() * this.getCurrentFrame();
+    }
 
     var index = 0;
     var pxValue = 0;
+    var stepPos = 0;
 
     var photoInterpretation = image.getPhotometricInterpretation();
     switch (photoInterpretation)
@@ -350,7 +353,7 @@ dwv.image.View.prototype.generateImageData = function( array )
         var posR = sliceOffset;
         var posG = sliceOffset + 1;
         var posB = sliceOffset + 2;
-        var stepPos = 3;
+        stepPos = 3;
         // RRRR...GGGG...BBBB...
         if (planarConfig === 1) {
             posR = sliceOffset;
@@ -373,6 +376,56 @@ dwv.image.View.prototype.generateImageData = function( array )
             posR += stepPos;
             posG += stepPos;
             posB += stepPos;
+        }
+        break;
+
+    case "YBR_FULL_422":
+        // theory:
+        // http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.7.html#sect_C.7.6.3.1.2
+        // reverse equation:
+        // https://en.wikipedia.org/wiki/YCbCr#JPEG_conversion
+
+        // 3 times bigger...
+        sliceOffset *= 3;
+        // the planar configuration defines the memory layout
+        var planarConfigYBR = image.getPlanarConfiguration();
+        if( planarConfigYBR !== 0 && planarConfigYBR !== 1 ) {
+            throw new Error("Unsupported planar configuration: "+planarConfigYBR);
+        }
+        // default: YBRYBRYBR...
+        var posY = sliceOffset;
+        var posCB = sliceOffset + 1;
+        var posCR = sliceOffset + 2;
+        stepPos = 3;
+        // YYYY...BBBB...RRRR...
+        if (planarConfigYBR === 1) {
+            posY = sliceOffset;
+            posCB = sliceOffset + sliceSize;
+            posCR = sliceOffset + 2 * sliceSize;
+            stepPos = 1;
+        }
+
+        var y, cb, cr;
+        var r, g, b;
+        for (var k=0; k < sliceSize; ++k)
+        {
+            y = image.getValueAtOffset(posY);
+            cb = image.getValueAtOffset(posCB);
+            cr = image.getValueAtOffset(posCR);
+
+            r = y + 1.402 * (cr - 128);
+            g = y - 0.34414 * (cb - 128) - 0.71414 * (cr - 128);
+            b = y + 1.772 * (cb - 128);
+
+            array.data[index] = parseInt( windowLut.getValue(r), 10 );
+            array.data[index+1] = parseInt( windowLut.getValue(g), 10 );
+            array.data[index+2] = parseInt( windowLut.getValue(b), 10 );
+            array.data[index+3] = 0xff;
+            index += 4;
+
+            posY += stepPos;
+            posCB += stepPos;
+            posCR += stepPos;
         }
         break;
 
