@@ -12183,19 +12183,26 @@ dwv.image.DicomBufferToView = function (decoderScripts) {
             // return
             callback({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
         };
-        var pixelBuffer = dicomParser.pixelBuffer;
-        
+
         var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
         var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
         var needDecompression = (algoName !== null);
-        
+
+        var pixelBuffer = dicomParser.pixelBuffer;
+        var bitsAllocated = dicomParser.getRawDicomElements().x00280100.value[0];
+        var pixelRepresentation = dicomParser.getRawDicomElements().x00280103.value[0];
+        var isSigned = (pixelRepresentation === 1);
+
         if ( needDecompression ) {
             if (useWorkers) {
                 var script = decoderScripts[algoName];
                 if ( typeof script === "undefined" ) {
                     throw new Error("No script provided to decompress '" + algoName + "' data.");
                 }
-                var workerTask = new dwv.utils.WorkerTask(script, decodedBufferToView, pixelBuffer);
+                var workerTask = new dwv.utils.WorkerTask(script, decodedBufferToView, {
+                    'buffer': pixelBuffer,
+                    'bitsAllocated': bitsAllocated,
+                    'isSigned': isSigned } );
                 pool.addWorkerTask(workerTask);
             }
             else {
@@ -12207,10 +12214,27 @@ dwv.image.DicomBufferToView = function (decoderScripts) {
                     if ( !hasJpegLosslessDecoder ) {
                         throw new Error("No JPEG Lossless decoder provided");
                     }
+                    // bytes per element
+                    var bpe = bitsAllocated / 8;
                     var buf = new Uint8Array( pixelBuffer );
-                    decoder = new jpeg.lossless.Decoder(buf.buffer);
-                    var decoded = decoder.decode();
-                    decodedBuffer = new Uint16Array(decoded.buffer);
+                    decoder = new jpeg.lossless.Decoder();
+                    var decoded = decoder.decode(buf.buffer, 0, buf.buffer.byteLength, bpe);
+                    if (bitsAllocated === 8) {
+                        if (isSigned) {
+                            decodedBuffer = new Int8Array(decoded.buffer);
+                        }
+                        else {
+                            decodedBuffer = new Uint8Array(decoded.buffer);
+                        }
+                    }
+                    else if (bitsAllocated === 16) {
+                        if (isSigned) {
+                            decodedBuffer = new Int16Array(decoded.buffer);
+                        }
+                        else {
+                            decodedBuffer = new Uint16Array(decoded.buffer);
+                        }
+                    }
                 }
                 else if ( algoName === "jpeg-baseline" ) {
                     if ( !hasJpegBaselineDecoder ) {
