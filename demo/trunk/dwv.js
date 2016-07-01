@@ -11244,10 +11244,10 @@ dwv.image.Image.prototype.calculateDataRange = function ()
 dwv.image.Image.prototype.calculateRescaledDataRange = function ()
 {
     if (this.isIdentityRSI()) {
-        return this.calculateDataRange();
+        return this.getDataRange();
     }
     else if (this.isConstantRSI()) {
-        var range = this.calculateDataRange();
+        var range = this.getDataRange();
         var resmin = this.getRescaleSlopeAndIntercept(0).apply(range.min);
         var resmax = this.getRescaleSlopeAndIntercept(0).apply(range.max);
         return {
