@@ -13,6 +13,6 @@ self.addEventListener('message', function (event) {
     decoder.parse( event.data.buffer );
     // post decoded data
     var res = decoder.getData(decoder.width,decoder.height);
-    self.postMessage(res);
+    self.postMessage([res]);
     
 }, false);
