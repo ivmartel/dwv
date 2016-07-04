@@ -178,7 +178,7 @@ QUnit.test("Test generate data timing.", function (assert) {
     for(var i=0; i<size0*size0; ++i) {
         buffer0[i] = i;
     }
-    var image0 = new dwv.image.Image(imgGeometry0, buffer0);
+    var image0 = new dwv.image.Image(imgGeometry0, [buffer0]);
     image0.setMeta( { BitsStored: 8 } );
     // create a view
     var view0 = new dwv.image.View(image0);

@@ -198,7 +198,6 @@ QUnit.test("Test Image convolute2D.", function (assert) {
     var testContent1 = true;
     for ( i = 0; i < size0*size0; ++i ) {
         if ( theoResImage1[i] !== resImage1.getValueAtOffset(i,0) ) {
-            console.log(i);
             testContent1 = false;
             break;
         }
@@ -289,7 +288,6 @@ QUnit.test("Test Image compose.", function (assert) {
         return a + b;
     };
     var resImage0 = image0.compose( image1, func0 );
-    console.log(resImage0.getBuffer());
     var theoResImage0 = [ 0, 2, 4, 6, 8, 10, 12, 14, 16 ];
     var testContent0 = true;
     for ( i = 0; i < size0*size0; ++i) {
