@@ -2636,7 +2636,7 @@ dwv.dicom.DicomParser.prototype.readPixelItemDataElement = function (reader, off
         offset = item.endOffset; 
         isSeqDelim = ( item.tag.name === "xFFFEE0DD" );
         if (!isSeqDelim) {
-            itemData.push(item);
+            itemData.push(item.value);
         }
     }
     
@@ -2973,33 +2973,81 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
         this.dicomElements[dataElement.tag.name] = dataElement;
     }
     
+    // safety check...
+    if (buffer.byteLength != offset) {
+        console.warn("Did not reach the end of the buffer: "+
+            offset+" != "+buffer.byteLength);
+    }
+
     // pixel buffer
     if (typeof this.dicomElements.x7FE00010 !== "undefined") {
+        
+        var numberOfFrames = 1;
+        if (typeof this.dicomElements.x00280008 !== "undefined") {
+            numberOfFrames = this.dicomElements.x00280008.value[0];
+        }
+        
         if (this.dicomElements.x7FE00010.vl !== "u/l") {
-            //this.pixelBuffer = this.dicomElements.x7FE00010.value;
+            // compressed should be encapsulated...
+            if (dwv.dicom.isJpeg2000TransferSyntax( syntax ) ||
+                dwv.dicom.isJpegBaselineTransferSyntax( syntax ) ||
+                dwv.dicom.isJpegLosslessTransferSyntax( syntax ) ) {
+                console.warn("Compressed but no items...");
+            }
+            
+            // calculate the slice size
+            var pixData = this.dicomElements.x7FE00010.value;
+            var columns = this.dicomElements.x00280011.value[0];
+            var rows = this.dicomElements.x00280010.value[0];
+            var samplesPerPixel = this.dicomElements.x00280002.value[0];
+            var sliceSize = columns * rows * samplesPerPixel;
+            // slice data in an array of frames
+            var newPixData = [];
+            var frameOffset = 0;
+            for (var g = 0; g < numberOfFrames; ++g) {
+                newPixData[g] = pixData.slice(frameOffset, frameOffset+sliceSize);
+                frameOffset += sliceSize;
+            }
+            // store as pixel data
+            this.dicomElements.x7FE00010.value = newPixData;
         }
         else {
-            var bitsAllocated = this.dicomElements.x00280100.value[0];
-            var pixelRepresentation = this.dicomElements.x00280103.value[0];
-            // concatenate pixel data items
-            // concat does not work on typed arrays
-            //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
-            // manual concat...
+            // handle fragmented pixel buffer
+            // Reference: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_8.2.html
+            // (third note, "Depending on the transfer syntax...")
             var pixItems = this.dicomElements.x7FE00010.value;
-            // calculate the size of the concatenated data
-            var size = 0;
-            for (var i = 0; i < pixItems.length; ++i) {
-                size += pixItems[i].value.length;
+            if (pixItems.length > 1 && pixItems.length > numberOfFrames ) {
+
+                var bitsAllocated = this.dicomElements.x00280100.value[0];
+                var pixelRepresentation = this.dicomElements.x00280103.value[0];
+
+                // concatenate pixel data items
+                // concat does not work on typed arrays
+                //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
+                // manual concat...
+                var nItemPerFrame = pixItems.length / numberOfFrames;
+                var newPixItems = [];
+                var index = 0;
+                for (var f = 0; f < numberOfFrames; ++f) {
+                    index = f * nItemPerFrame;
+                    // calculate the size of a frame
+                    var size = 0;
+                    for (var i = 0; i < nItemPerFrame; ++i) {
+                        size += pixItems[index + i].length;
+                    }
+                    // create new buffer
+                    var newBuffer = dwv.dicom.getTypedArray(bitsAllocated, pixelRepresentation, size);
+                    // fill new buffer
+                    var fragOffset = 0;
+                    for (var j = 0; j < nItemPerFrame; ++j) {
+                        newBuffer.set( pixItems[index + j], fragOffset );
+                        fragOffset += pixItems[index + j].length;
+                    }
+                    newPixItems[f] = newBuffer;
+                }
+                // store as pixel data
+                this.dicomElements.x7FE00010.value = newPixItems;
             }
-            // create new buffer
-            var newBuffer = dwv.dicom.getTypedArray(bitsAllocated, pixelRepresentation, size);
-            // fill new buffer
-            var fragOffset = 0;
-            for (var j = 0; j < pixItems.length; ++j) {
-                newBuffer.set( pixItems[j].value, fragOffset );
-                fragOffset += pixItems[j].value.length;
-            }
-            this.dicomElements.x7FE00010.value = newBuffer;
         }
     }
 };
@@ -10925,25 +10973,16 @@ dwv.image.RescaleSlopeAndIntercept.prototype.isID = function () {
  * - planar configuration (default RGBRGB...).
  * @constructor
  * @param {Object} geometry The geometry of the image.
- * @param {Array} buffer The image data.
+ * @param {Array} buffer The image data as an array of frame buffers.
  */
-dwv.image.Image = function(geometry, buffer, numberOfFrames)
+dwv.image.Image = function(geometry, buffer)
 {
-    /**
-     * Number of frames.
-     * @private
-     * @type Number
-     */
-    if (typeof numberOfFrames === "undefined" ) {
-        numberOfFrames = 1;
-    }
-    
     /**
      * Get the number of frames.
      * @returns {Number} The number of frames.
      */
     this.getNumberOfFrames = function () {
-        return numberOfFrames;
+        return buffer.length;
     };
 
     /**
@@ -10985,8 +11024,8 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
      * @private
      * @type Number
      */
-    var numberOfComponents = buffer.length / (
-	    geometry.getSize().getTotalSize() * numberOfFrames );
+    var numberOfComponents = buffer[0].length / (
+        geometry.getSize().getTotalSize() );
     /**
      * Meta information.
      * @private
@@ -11018,12 +11057,19 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
      * @return {Object} The size of the image.
      */
     this.getGeometry = function() { return geometry; };
+
     /**
      * Get the data buffer of the image.
      * @todo dangerous...
      * @return {Array} The data buffer of the image.
      */
     this.getBuffer = function() { return buffer; };
+    /**
+     * Get the data buffer of the image.
+     * @todo dangerous...
+     * @return {Array} The data buffer of the frame.
+     */
+    this.getFrame = function (frame) { return buffer[frame]; };
 
     /**
      * Get the rescale slope and intercept.
@@ -11104,10 +11150,11 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
     /**
      * Get value at offset. Warning: No size check...
      * @param {Number} offset The desired offset.
+     * @param {Number} frame The desired frame.
      * @return {Number} The value at offset.
      */
-    this.getValueAtOffset = function(offset) {
-        return buffer[offset];
+    this.getValueAtOffset = function (offset, frame) {
+        return buffer[frame][offset];
     };
 
     /**
@@ -11117,9 +11164,12 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
     this.clone = function()
     {
         // clone the image buffer
-        var clonedBuffer = buffer.slice(0);
+        var clonedBuffer = [];
+        for (var f = 0, lenf = this.getNumberOfFrames(); f < lenf; ++f) {
+            clonedBuffer[f] = buffer[f].slice(0);
+        }
         // create the image copy
-        var copy = new dwv.image.Image(this.getGeometry(), clonedBuffer, numberOfFrames);
+        var copy = new dwv.image.Image(this.getGeometry(), clonedBuffer);
         // copy the RSIs
         var nslices = this.getGeometry().getSize().getNumberOfSlices();
         for ( var k = 0; k < nslices; ++k ) {
@@ -11138,7 +11188,7 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
      * @param {Image} The slice to append.
      * @return {Number} The number of the inserted slice.
      */
-    this.appendSlice = function(rhs)
+    this.appendSlice = function (rhs, frame)
     {
         // check input
         if( rhs === null ) {
@@ -11165,6 +11215,8 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
             }
         }
 
+        var f = (typeof frame === "undefined") ? 0 : frame;
+
         // calculate slice size
         var mul = 1;
         if( photometricInterpretation === "RGB" || photometricInterpretation === "YBR_FULL_422") {
@@ -11179,20 +11231,20 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
         var newSliceNb = geometry.getSliceIndex( rhs.getGeometry().getOrigin() );
         if( newSliceNb === 0 )
         {
-            newBuffer.set(rhs.getBuffer());
-            newBuffer.set(buffer, sliceSize);
+            newBuffer.set(rhs.getFrame(f));
+            newBuffer.set(buffer[f], sliceSize);
         }
         else if( newSliceNb === size.getNumberOfSlices() )
         {
-            newBuffer.set(buffer);
-            newBuffer.set(rhs.getBuffer(), size.getNumberOfSlices() * sliceSize);
+            newBuffer.set(buffer[f]);
+            newBuffer.set(rhs.getFrame(f), size.getNumberOfSlices() * sliceSize);
         }
         else
         {
             var offset = newSliceNb * sliceSize;
-            newBuffer.set(buffer.subarray(0, offset - 1));
-            newBuffer.set(rhs.getBuffer(), offset);
-            newBuffer.set(buffer.subarray(offset), offset + sliceSize);
+            newBuffer.set(buffer[f].subarray(0, offset - 1));
+            newBuffer.set(rhs.getFrame(f), offset);
+            newBuffer.set(buffer[f].subarray(offset), offset + sliceSize);
         }
 
         // update geometry
@@ -11201,7 +11253,7 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
         rsis.splice(newSliceNb, 0, rhs.getRescaleSlopeAndIntercept(0));
 
         // copy to class variables
-        buffer = newBuffer;
+        buffer[f] = newBuffer;
 
         // return the appended slice number
         return newSliceNb;
@@ -11257,8 +11309,7 @@ dwv.image.Image.prototype.getValue = function( i, j, k, f )
 {
     var frame = (f || 0);
     var index = new dwv.math.Index3D(i,j,k);
-    return this.getValueAtOffset( this.getGeometry().getSize().getTotalSize() * frame + 
-            this.getGeometry().indexToOffset(index) );
+    return this.getValueAtOffset( this.getGeometry().indexToOffset(index), frame );
 };
 
 /**
@@ -11288,12 +11339,12 @@ dwv.image.Image.prototype.calculateDataRange = function ()
 {
     var size = this.getGeometry().getSize().getTotalSize();
     var nFrames = this.getNumberOfFrames();
-    var min = this.getValueAtOffset(0);
+    var min = this.getValueAtOffset(0,0);
     var max = min;
     var value = 0;
     for ( var f = 0; f < nFrames; ++f ) {
         for ( var i = 0; i < size; ++i ) {
-            value = this.getValueAtOffset(f*size + i);
+            value = this.getValueAtOffset(i,f);
             if( value > max ) { max = value; }
             if( value < min ) { min = value; }
         }
@@ -11526,9 +11577,9 @@ dwv.image.Image.prototype.convolute2D = function(weights)
                         newValue = 0;
                         for( var wi=0; wi<9; ++wi )
                         {
-                            newValue += this.getValueAtOffset(pixelOffset + wOffFinal[wi]) * weights[wi];
+                            newValue += this.getValueAtOffset(pixelOffset + wOffFinal[wi], f) * weights[wi];
                         }
-                        newBuffer[pixelOffset] = newValue;
+                        newBuffer[f][pixelOffset] = newValue;
                         // increment pixel offset
                         pixelOffset += factor;
                     }
@@ -11550,9 +11601,12 @@ dwv.image.Image.prototype.transform = function(operator)
 {
     var newImage = this.clone();
     var newBuffer = newImage.getBuffer();
-    for( var i = 0, leni = newBuffer.length; i < leni; ++i )
+    for ( var f = 0, lenf = this.getNumberOfFrames(); f < lenf; ++f )
     {
-        newBuffer[i] = operator( newImage.getValueAtOffset(i) );
+        for( var i = 0, leni = newBuffer[f].length; i < leni; ++i )
+        {
+            newBuffer[f][i] = operator( newImage.getValueAtOffset(i,f) );
+        }
     }
     return newImage;
 };
@@ -11569,10 +11623,13 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
 {
     var newImage = this.clone();
     var newBuffer = newImage.getBuffer();
-    for( var i = 0, leni = newBuffer.length; i < leni; ++i )
+    for ( var f = 0, lenf = this.getNumberOfFrames(); f < lenf; ++f ) 
     {
-        // using the operator on the local buffer, i.e. the latest (not original) data
-        newBuffer[i] = Math.floor( operator( this.getValueAtOffset(i), rhs.getValueAtOffset(i) ) );
+        for( var i = 0, leni = newBuffer[f].length; i < leni; ++i )
+        {
+            // using the operator on the local buffer, i.e. the latest (not original) data
+            newBuffer[f][i] = Math.floor( operator( this.getValueAtOffset(i,f), rhs.getValueAtOffset(i,f) ) );
+        }
     }
     return newImage;
 };
@@ -12252,7 +12309,7 @@ dwv.image.DicomBufferToView = function (decoderScripts) {
                     throw new Error("No script provided to decompress '" + algoName + "' data.");
                 }
                 var workerTask = new dwv.utils.WorkerTask(script, decodedBufferToView, {
-                    'buffer': pixelBuffer,
+                    'buffer': pixelBuffer[0], // TODO only first frame...
                     'bitsAllocated': bitsAllocated,
                     'isSigned': isSigned } );
                 pool.addWorkerTask(workerTask);
@@ -12630,9 +12687,7 @@ dwv.image.View.prototype.generateImageData = function( array )
     windowLut.update();
     var sliceSize = image.getGeometry().getSize().getSliceSize();
     var sliceOffset = sliceSize * this.getCurrentPosition().k;
-    if (this.getCurrentFrame()) {
-        sliceOffset += image.getGeometry().getSize().getTotalSize() * this.getCurrentFrame();
-    }
+    var frame = (this.getCurrentFrame()) ? this.getCurrentFrame() : 0;
 
     var index = 0;
     var pxValue = 0;
@@ -12648,7 +12703,7 @@ dwv.image.View.prototype.generateImageData = function( array )
         for(var i=sliceOffset; i < iMax; ++i)
         {
             pxValue = parseInt( windowLut.getValue(
-                    image.getValueAtOffset(i) ), 10 );
+                    image.getValueAtOffset(i, frame) ), 10 );
             array.data[index] = colourMap.red[pxValue];
             array.data[index+1] = colourMap.green[pxValue];
             array.data[index+2] = colourMap.blue[pxValue];
@@ -12681,11 +12736,11 @@ dwv.image.View.prototype.generateImageData = function( array )
         for(var j=0; j < sliceSize; ++j)
         {
             array.data[index] = parseInt( windowLut.getValue(
-                    image.getValueAtOffset(posR) ), 10 );
+                    image.getValueAtOffset(posR, frame) ), 10 );
             array.data[index+1] = parseInt( windowLut.getValue(
-                    image.getValueAtOffset(posG) ), 10 );
+                    image.getValueAtOffset(posG, frame) ), 10 );
             array.data[index+2] = parseInt( windowLut.getValue(
-                    image.getValueAtOffset(posB) ), 10 );
+                    image.getValueAtOffset(posB, frame) ), 10 );
             array.data[index+3] = 0xff;
             index += 4;
 
@@ -12725,9 +12780,9 @@ dwv.image.View.prototype.generateImageData = function( array )
         var r, g, b;
         for (var k=0; k < sliceSize; ++k)
         {
-            y = image.getValueAtOffset(posY);
-            cb = image.getValueAtOffset(posCB);
-            cr = image.getValueAtOffset(posCR);
+            y = image.getValueAtOffset(posY, frame);
+            cb = image.getValueAtOffset(posCB, frame);
+            cr = image.getValueAtOffset(posCR, frame);
 
             r = y + 1.402 * (cr - 128);
             g = y - 0.34414 * (cb - 128) - 0.71414 * (cr - 128);
