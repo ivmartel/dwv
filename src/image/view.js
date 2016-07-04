@@ -314,9 +314,7 @@ dwv.image.View.prototype.generateImageData = function( array )
     windowLut.update();
     var sliceSize = image.getGeometry().getSize().getSliceSize();
     var sliceOffset = sliceSize * this.getCurrentPosition().k;
-    if (this.getCurrentFrame()) {
-        sliceOffset += image.getGeometry().getSize().getTotalSize() * this.getCurrentFrame();
-    }
+    var frame = (this.getCurrentFrame()) ? this.getCurrentFrame() : 0;
 
     var index = 0;
     var pxValue = 0;
@@ -332,7 +330,7 @@ dwv.image.View.prototype.generateImageData = function( array )
         for(var i=sliceOffset; i < iMax; ++i)
         {
             pxValue = parseInt( windowLut.getValue(
-                    image.getValueAtOffset(i) ), 10 );
+                    image.getValueAtOffset(i, frame) ), 10 );
             array.data[index] = colourMap.red[pxValue];
             array.data[index+1] = colourMap.green[pxValue];
             array.data[index+2] = colourMap.blue[pxValue];
@@ -365,11 +363,11 @@ dwv.image.View.prototype.generateImageData = function( array )
         for(var j=0; j < sliceSize; ++j)
         {
             array.data[index] = parseInt( windowLut.getValue(
-                    image.getValueAtOffset(posR) ), 10 );
+                    image.getValueAtOffset(posR, frame) ), 10 );
             array.data[index+1] = parseInt( windowLut.getValue(
-                    image.getValueAtOffset(posG) ), 10 );
+                    image.getValueAtOffset(posG, frame) ), 10 );
             array.data[index+2] = parseInt( windowLut.getValue(
-                    image.getValueAtOffset(posB) ), 10 );
+                    image.getValueAtOffset(posB, frame) ), 10 );
             array.data[index+3] = 0xff;
             index += 4;
 
@@ -409,9 +407,9 @@ dwv.image.View.prototype.generateImageData = function( array )
         var r, g, b;
         for (var k=0; k < sliceSize; ++k)
         {
-            y = image.getValueAtOffset(posY);
-            cb = image.getValueAtOffset(posCB);
-            cr = image.getValueAtOffset(posCR);
+            y = image.getValueAtOffset(posY, frame);
+            cb = image.getValueAtOffset(posCB, frame);
+            cr = image.getValueAtOffset(posCR, frame);
 
             r = y + 1.402 * (cr - 128);
             g = y - 0.34414 * (cb - 128) - 0.71414 * (cr - 128);

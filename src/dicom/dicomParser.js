@@ -714,7 +714,7 @@ dwv.dicom.DicomParser.prototype.readPixelItemDataElement = function (reader, off
         offset = item.endOffset; 
         isSeqDelim = ( item.tag.name === "xFFFEE0DD" );
         if (!isSeqDelim) {
-            itemData.push(item);
+            itemData.push(item.value);
         }
     }
     
@@ -1051,33 +1051,81 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
         this.dicomElements[dataElement.tag.name] = dataElement;
     }
     
+    // safety check...
+    if (buffer.byteLength != offset) {
+        console.warn("Did not reach the end of the buffer: "+
+            offset+" != "+buffer.byteLength);
+    }
+
     // pixel buffer
     if (typeof this.dicomElements.x7FE00010 !== "undefined") {
+        
+        var numberOfFrames = 1;
+        if (typeof this.dicomElements.x00280008 !== "undefined") {
+            numberOfFrames = this.dicomElements.x00280008.value[0];
+        }
+        
         if (this.dicomElements.x7FE00010.vl !== "u/l") {
-            //this.pixelBuffer = this.dicomElements.x7FE00010.value;
+            // compressed should be encapsulated...
+            if (dwv.dicom.isJpeg2000TransferSyntax( syntax ) ||
+                dwv.dicom.isJpegBaselineTransferSyntax( syntax ) ||
+                dwv.dicom.isJpegLosslessTransferSyntax( syntax ) ) {
+                console.warn("Compressed but no items...");
+            }
+            
+            // calculate the slice size
+            var pixData = this.dicomElements.x7FE00010.value;
+            var columns = this.dicomElements.x00280011.value[0];
+            var rows = this.dicomElements.x00280010.value[0];
+            var samplesPerPixel = this.dicomElements.x00280002.value[0];
+            var sliceSize = columns * rows * samplesPerPixel;
+            // slice data in an array of frames
+            var newPixData = [];
+            var frameOffset = 0;
+            for (var g = 0; g < numberOfFrames; ++g) {
+                newPixData[g] = pixData.slice(frameOffset, frameOffset+sliceSize);
+                frameOffset += sliceSize;
+            }
+            // store as pixel data
+            this.dicomElements.x7FE00010.value = newPixData;
         }
         else {
-            var bitsAllocated = this.dicomElements.x00280100.value[0];
-            var pixelRepresentation = this.dicomElements.x00280103.value[0];
-            // concatenate pixel data items
-            // concat does not work on typed arrays
-            //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
-            // manual concat...
+            // handle fragmented pixel buffer
+            // Reference: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_8.2.html
+            // (third note, "Depending on the transfer syntax...")
             var pixItems = this.dicomElements.x7FE00010.value;
-            // calculate the size of the concatenated data
-            var size = 0;
-            for (var i = 0; i < pixItems.length; ++i) {
-                size += pixItems[i].value.length;
+            if (pixItems.length > 1 && pixItems.length > numberOfFrames ) {
+
+                var bitsAllocated = this.dicomElements.x00280100.value[0];
+                var pixelRepresentation = this.dicomElements.x00280103.value[0];
+
+                // concatenate pixel data items
+                // concat does not work on typed arrays
+                //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
+                // manual concat...
+                var nItemPerFrame = pixItems.length / numberOfFrames;
+                var newPixItems = [];
+                var index = 0;
+                for (var f = 0; f < numberOfFrames; ++f) {
+                    index = f * nItemPerFrame;
+                    // calculate the size of a frame
+                    var size = 0;
+                    for (var i = 0; i < nItemPerFrame; ++i) {
+                        size += pixItems[index + i].length;
+                    }
+                    // create new buffer
+                    var newBuffer = dwv.dicom.getTypedArray(bitsAllocated, pixelRepresentation, size);
+                    // fill new buffer
+                    var fragOffset = 0;
+                    for (var j = 0; j < nItemPerFrame; ++j) {
+                        newBuffer.set( pixItems[index + j], fragOffset );
+                        fragOffset += pixItems[index + j].length;
+                    }
+                    newPixItems[f] = newBuffer;
+                }
+                // store as pixel data
+                this.dicomElements.x7FE00010.value = newPixItems;
             }
-            // create new buffer
-            var newBuffer = dwv.dicom.getTypedArray(bitsAllocated, pixelRepresentation, size);
-            // fill new buffer
-            var fragOffset = 0;
-            for (var j = 0; j < pixItems.length; ++j) {
-                newBuffer.set( pixItems[j].value, fragOffset );
-                fragOffset += pixItems[j].value.length;
-            }
-            this.dicomElements.x7FE00010.value = newBuffer;
         }
     }
 };

@@ -123,7 +123,7 @@ dwv.image.DicomBufferToView = function (decoderScripts) {
                     throw new Error("No script provided to decompress '" + algoName + "' data.");
                 }
                 var workerTask = new dwv.utils.WorkerTask(script, decodedBufferToView, {
-                    'buffer': pixelBuffer,
+                    'buffer': pixelBuffer[0], // TODO only first frame...
                     'bitsAllocated': bitsAllocated,
                     'isSigned': isSigned } );
                 pool.addWorkerTask(workerTask);

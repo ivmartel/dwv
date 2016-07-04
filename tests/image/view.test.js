@@ -20,7 +20,7 @@ QUnit.test("Test listeners.", function (assert) {
     for(var i=0; i<size0*size0; ++i) {
         buffer0[i] = i;
     }
-    var image0 = new dwv.image.Image(imgGeometry0, buffer0);
+    var image0 = new dwv.image.Image(imgGeometry0, [buffer0]);
     image0.setMeta( { BitsStored: 8 } );
     // create a view
     var view0 = new dwv.image.View(image0);
@@ -59,7 +59,7 @@ QUnit.test("Test generate data MONO.", function (assert) {
     for ( var i = 0; i < size0 * size0; ++i ) {
         buffer0[i] = i;
     }
-    var image0 = new dwv.image.Image(imgGeometry0, buffer0);
+    var image0 = new dwv.image.Image(imgGeometry0, [buffer0]);
     image0.setMeta( { 'BitsStored': 8 } );
     // create a view
     var view0 = new dwv.image.View(image0);
@@ -106,7 +106,7 @@ QUnit.test("Test generate data RGB.", function (assert) {
         buffer0[index+2] = value;
         index += 3;
     }
-    var image0 = new dwv.image.Image(imgGeometry0, buffer0);
+    var image0 = new dwv.image.Image(imgGeometry0, [buffer0]);
     image0.setPhotometricInterpretation('RGB');
     image0.setMeta( { 'BitsStored': 8 } );
     // create a view
@@ -141,7 +141,7 @@ QUnit.test("Test generate data RGB.", function (assert) {
         buffer1[index+3] = 255;
         index += 4;
     }
-    var image1 = new dwv.image.Image(imgGeometry0, buffer1);
+    var image1 = new dwv.image.Image(imgGeometry0, [buffer1]);
     image1.setPhotometricInterpretation('RGB');
     image1.setPlanarConfiguration(1);
     image1.setMeta( { 'BitsStored': 8 } );

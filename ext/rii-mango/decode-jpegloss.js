@@ -32,6 +32,6 @@ self.addEventListener('message', function (event) {
             res = new Uint16Array(decoded.buffer);
         }
     }
-    self.postMessage(res);
+    self.postMessage([res]);
     
 }, false);
