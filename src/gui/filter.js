@@ -96,6 +96,12 @@ dwv.gui.base.Threshold = function (app)
      */
     this.display = function (flag)
     {
+        // only initialise at display time
+        // (avoids min/max calculation at startup)
+        if (flag) {
+            slider.initialise();
+        }
+        
         var node = app.getElement("thresholdLi");
         dwv.html.displayElement(node, flag);
     };
@@ -105,8 +111,7 @@ dwv.gui.base.Threshold = function (app)
      */
     this.initialise = function ()
     {
-        // threshold slider
-        slider.initialise();
+        // nothing to do
     };
 
 }; // class dwv.gui.base.Threshold
