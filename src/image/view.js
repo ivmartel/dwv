@@ -6,11 +6,10 @@ dwv.image = dwv.image || {};
  * View class.
  * @constructor
  * @param {Image} image The associated image.
- * @param {Boolean} isSigned Is the data signed.
  * Need to set the window lookup table once created
  * (either directly or with helper methods).
  */
-dwv.image.View = function(image, isSigned)
+dwv.image.View = function (image)
 {
     /**
      * Window lookup tables, indexed per Rescale Slope and Intercept (RSI).
@@ -44,6 +43,9 @@ dwv.image.View = function(image, isSigned)
      */
     var currentFrame = null;
 
+    // closure to self
+    var self = this;
+
     /**
      * Get the associated image.
      * @return {Image} The associated image.
@@ -76,8 +78,6 @@ dwv.image.View = function(image, isSigned)
         windowLuts[rsi.toString()] = wlut;
     };
 
-    var self = this;
-
     /**
      * Initialise the view. Only called at construction.
      * @private
@@ -90,7 +90,7 @@ dwv.image.View = function(image, isSigned)
         // initialise the rescale lookup table
         rescaleLut.initialise(image.getMeta().BitsStored);
         // create the window lookup table
-        var windowLut = new dwv.image.lut.Window(rescaleLut, isSigned);
+        var windowLut = new dwv.image.lut.Window(rescaleLut, image.getMeta().IsSigned);
         self.setWindowLut(windowLut);
     }
 
@@ -130,12 +130,6 @@ dwv.image.View = function(image, isSigned)
            "wc": this.getWindowLut().getCenter(),
            "ww": this.getWindowLut().getWidth() });
     };
-
-    /**
-     * Is the data signed data.
-     * @return {Boolean} The signed data flag.
-     */
-    this.isSigned = function() { return isSigned; };
 
     /**
      * Get the current position.
@@ -490,23 +484,13 @@ dwv.image.ViewFactory = function () {};
 /**
  * Get an View object from the read DICOM file.
  * @param {Object} dicomElements The DICOM tags.
- * @param {Array} pixelBuffer The pixel buffer.
+ * @param {Object} image The associated image.
  * @return {View} The new View.
  */
-dwv.image.ViewFactory.prototype.create = function (dicomElements, pixelBuffer)
+dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
 {
-    // create the image
-    var imageFactory = new dwv.image.ImageFactory();
-    var image = imageFactory.create(dicomElements, pixelBuffer);
-
-    // PixelRepresentation
-    var isSigned = false;
-    var pixelRepresentation = dicomElements.getFromKey("x00280103");
-    if ( pixelRepresentation === 1 ) {
-        isSigned = true;
-    }
     // view
-    var view = new dwv.image.View(image, isSigned);
+    var view = new dwv.image.View(image);
     // presets
     var windowPresets = [];
     // WindowCenter and WindowWidth

@@ -859,17 +859,8 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var origin = new dwv.math.Point3D(slicePosition[0], slicePosition[1], slicePosition[2]);
     var geometry = new dwv.image.Geometry( origin, size, spacing );
 
-    // numberOfFrames
-    var numberOfFrames = dicomElements.getFromKey("x00280008");
-    if ( !numberOfFrames ) {
-        numberOfFrames = 1;
-    }
-    else {
-        numberOfFrames = parseInt(numberOfFrames, 10);
-    }
-
     // image
-    var image = new dwv.image.Image( geometry, pixelBuffer, numberOfFrames );
+    var image = new dwv.image.Image( geometry, pixelBuffer );
     // PhotometricInterpretation
     var photometricInterpretation = dicomElements.getFromKey("x00280004");
     if ( photometricInterpretation ) {
@@ -924,6 +915,12 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var bitsStored = dicomElements.getFromKey("x00280101");
     if ( bitsStored ) {
         meta.BitsStored = parseInt(bitsStored, 10);
+    }
+    // PixelRepresentation -> is signed
+    var pixelRepresentation = dicomElements.getFromKey("x00280103");
+    meta.IsSigned = false;
+    if ( pixelRepresentation ) {
+        meta.IsSigned = (pixelRepresentation === 1);
     }
     image.setMeta(meta);
 

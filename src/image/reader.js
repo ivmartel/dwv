@@ -99,10 +99,13 @@ dwv.image.DicomBufferToView = function (decoderScripts) {
         dicomParser.parse(buffer);
     
         // worker callback
-        var decodedBufferToView = function(event) {
+        var decodedBufferToView = function (event) {
+            // create the image
+            var imageFactory = new dwv.image.ImageFactory();
+            var image = imageFactory.create( dicomParser.getDicomElements(), event.data );
             // create the view
             var viewFactory = new dwv.image.ViewFactory();
-            var view = viewFactory.create( dicomParser.getDicomElements(), event.data );
+            var view = viewFactory.create( dicomParser.getDicomElements(), image );
             // return
             callback({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
         };
