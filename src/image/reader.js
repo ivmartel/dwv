@@ -70,26 +70,121 @@ dwv.image.getViewFromDOMImage = function (image)
 };
 
 /**
+ * Asynchronous pixel buffer decoder.
+ * @param {Array} decoderScripts An array of decoder scripts paths.
+ */
+dwv.image.AsynchPixelBufferDecoder = function (decoderScripts)
+{
+    // initialise the thread pool 
+    var pool = new dwv.utils.ThreadPool(15);
+    pool.init();
+
+    /**
+     * Decode a pixel buffer.
+     * @param {Array} pixelBuffer The pixel buffer.
+     * @param {String} algoName The decompression algorithm name.
+     * @param {Number} bitsAllocated The bits allocated per element in the buffer.
+     * @param {Boolean} isSigned Is the data signed.
+     * @param {Function} callback Callback function to handle decoded data.
+     */
+    this.decode = function (pixelBuffer, algoName, bitsAllocated, isSigned, callback) {
+        var script = decoderScripts[algoName];
+        if ( typeof script === "undefined" ) {
+            throw new Error("No script provided to decompress '" + algoName + "' data.");
+        }
+        var workerTask = new dwv.utils.WorkerTask(script, callback, {
+            'buffer': pixelBuffer,
+            'bitsAllocated': bitsAllocated,
+            'isSigned': isSigned } );
+        pool.addWorkerTask(workerTask);
+    };
+};
+
+/**
+ * Synchronous pixel buffer decoder.
+ */
+dwv.image.SynchPixelBufferDecoder = function ()
+{
+    /**
+     * Decode a pixel buffer.
+     * @param {Array} pixelBuffer The pixel buffer.
+     * @param {String} algoName The decompression algorithm name.
+     * @param {Number} bitsAllocated The bits allocated per element in the buffer.
+     * @param {Boolean} isSigned Is the data signed.
+     * @return {Array} The decoded pixel buffer.
+     */
+    this.decode = function (pixelBuffer, algoName, bitsAllocated, isSigned) {
+        var decoder = null;
+        var decodedBuffer = null;
+        if( algoName === "jpeg-lossless" ) {
+            if ( !hasJpegLosslessDecoder ) {
+                throw new Error("No JPEG Lossless decoder provided");
+            }
+            // bytes per element
+            var bpe = bitsAllocated / 8;
+            var buf = new Uint8Array( pixelBuffer );
+            decoder = new jpeg.lossless.Decoder();
+            var decoded = decoder.decode(buf.buffer, 0, buf.buffer.byteLength, bpe);
+            if (bitsAllocated === 8) {
+                if (isSigned) {
+                    decodedBuffer = new Int8Array(decoded.buffer);
+                }
+                else {
+                    decodedBuffer = new Uint8Array(decoded.buffer);
+                }
+            }
+            else if (bitsAllocated === 16) {
+                if (isSigned) {
+                    decodedBuffer = new Int16Array(decoded.buffer);
+                }
+                else {
+                    decodedBuffer = new Uint16Array(decoded.buffer);
+                }
+            }
+        }
+        else if ( algoName === "jpeg-baseline" ) {
+            if ( !hasJpegBaselineDecoder ) {
+                throw new Error("No JPEG Baseline decoder provided");
+            }
+            decoder = new JpegImage();
+            decoder.parse( pixelBuffer );
+            decodedBuffer = decoder.getData(decoder.width,decoder.height);
+        }
+        else if( algoName === "jpeg2000" ) {
+            if ( !hasJpeg2000Decoder ) {
+                throw new Error("No JPEG 2000 decoder provided");
+            }
+            // decompress pixel buffer into Int16 image
+            decoder = new JpxImage();
+            decoder.parse( pixelBuffer );
+            // set the pixel buffer
+            decodedBuffer = decoder.tiles[0].items;
+        }
+        // return result as array
+        return [decodedBuffer];
+    };
+};
+
+/**
  * Create a dwv.image.View from a DICOM buffer.
  * @constructor
  */
-dwv.image.DicomBufferToView = function (decoderScripts) {
-
+dwv.image.DicomBufferToView = function (decoderScripts)
+{
     // flag to use workers or not to decode data
     var useWorkers = false;
-    
     if (typeof decoderScripts !== "undefined" && decoderScripts instanceof Array) {
         useWorkers = true;
-        // thread pool
-        var pool = new dwv.utils.ThreadPool(15);
-        pool.init();
     }
+
+    // asynchronous decoder
+    var asynchDecoder = null;
+    
 
     /**
      * Get data from an input buffer using a DICOM parser.
      * @param {Array} buffer The input data buffer.
      * @param {Object} callback The callback on the conversion.
-     * @return {Mixed} The corresponding view and info.
      */
     this.convert = function(buffer, callback)
     {
@@ -120,71 +215,26 @@ dwv.image.DicomBufferToView = function (decoderScripts) {
         var isSigned = (pixelRepresentation === 1);
 
         if ( needDecompression ) {
+            // only decompress the first frame
             if (useWorkers) {
-                var script = decoderScripts[algoName];
-                if ( typeof script === "undefined" ) {
-                    throw new Error("No script provided to decompress '" + algoName + "' data.");
+                if (!asynchDecoder) {
+                    // create the decoder
+                    asynchDecoder = new dwv.image.AsynchPixelBufferDecoder(decoderScripts);
                 }
-                var workerTask = new dwv.utils.WorkerTask(script, decodedBufferToView, {
-                    'buffer': pixelBuffer[0], // TODO only first frame...
-                    'bitsAllocated': bitsAllocated,
-                    'isSigned': isSigned } );
-                pool.addWorkerTask(workerTask);
+                asynchDecoder.decode(pixelBuffer[0], algoName, 
+                        bitsAllocated, isSigned, decodedBufferToView);
             }
             else {
-
-                var decoder = null;
-                var decodedBuffer = null;
-                
-                if( algoName === "jpeg-lossless" ) {
-                    if ( !hasJpegLosslessDecoder ) {
-                        throw new Error("No JPEG Lossless decoder provided");
-                    }
-                    // bytes per element
-                    var bpe = bitsAllocated / 8;
-                    var buf = new Uint8Array( pixelBuffer );
-                    decoder = new jpeg.lossless.Decoder();
-                    var decoded = decoder.decode(buf.buffer, 0, buf.buffer.byteLength, bpe);
-                    if (bitsAllocated === 8) {
-                        if (isSigned) {
-                            decodedBuffer = new Int8Array(decoded.buffer);
-                        }
-                        else {
-                            decodedBuffer = new Uint8Array(decoded.buffer);
-                        }
-                    }
-                    else if (bitsAllocated === 16) {
-                        if (isSigned) {
-                            decodedBuffer = new Int16Array(decoded.buffer);
-                        }
-                        else {
-                            decodedBuffer = new Uint16Array(decoded.buffer);
-                        }
-                    }
-                }
-                else if ( algoName === "jpeg-baseline" ) {
-                    if ( !hasJpegBaselineDecoder ) {
-                        throw new Error("No JPEG Baseline decoder provided");
-                    }
-                    decoder = new JpegImage();
-                    decoder.parse( pixelBuffer );
-                    decodedBuffer = decoder.getData(decoder.width,decoder.height);
-                }
-                else if( algoName === "jpeg2000" ) {
-                    if ( !hasJpeg2000Decoder ) {
-                        throw new Error("No JPEG 2000 decoder provided");
-                    }
-                    // decompress pixel buffer into Int16 image
-                    decoder = new JpxImage();
-                    decoder.parse( pixelBuffer );
-                    // set the pixel buffer
-                    decodedBuffer = decoder.tiles[0].items;
-                }
+                var synchDecoder = new dwv.image.SynchPixelBufferDecoder();
+                var decodedBuffer = synchDecoder.decode(pixelBuffer[0], algoName, 
+                        bitsAllocated, isSigned);
                 decodedBufferToView({data: decodedBuffer});
             }
         }
         else {
+            // no decompression
             decodedBufferToView({data: pixelBuffer});
         }
     };
 };
+
