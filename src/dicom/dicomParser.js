@@ -32,6 +32,72 @@ dwv.dicom.isNativeLittleEndian = function ()
 };
 
 /**
+ * Get the utfLabel (used by the TextDecoder) from a character set term
+ * References:
+ * - DICOM [Value Encoding]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_6.html}
+ * - DICOM [Specific Character Set]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.12.html#sect_C.12.1.1.2}
+ * - [TextDecoder#Parameters]{@link https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder/TextDecoder#Parameters}
+ */
+dwv.dicom.getUtfLabel = function (charSetTerm)
+{
+    var label = "utf-8";
+    if (charSetTerm === "ISO_IR 100" ) {
+        label = "iso-8859-1";
+    }
+    else if (charSetTerm === "ISO_IR 101" ) {
+        label = "iso-8859-2";
+    }
+    else if (charSetTerm === "ISO_IR 109" ) {
+        label = "iso-8859-3";
+    }
+    else if (charSetTerm === "ISO_IR 110" ) {
+        label = "iso-8859-4";
+    }
+    else if (charSetTerm === "ISO_IR 144" ) {
+        label = "iso-8859-5";
+    }
+    else if (charSetTerm === "ISO_IR 127" ) {
+        label = "iso-8859-6";
+    }
+    else if (charSetTerm === "ISO_IR 126" ) {
+        label = "iso-8859-7";
+    }
+    else if (charSetTerm === "ISO_IR 138" ) {
+        label = "iso-8859-8";
+    }
+    else if (charSetTerm === "ISO_IR 148" ) {
+        label = "iso-8859-9";
+    }
+    else if (charSetTerm === "ISO_IR 13" ) {
+        label = "shift-jis";
+    }
+    else if (charSetTerm === "ISO_IR 166" ) {
+        label = "iso-8859-11";
+    }
+    else if (charSetTerm === "ISO 2022 IR 87" ) {
+        label = "iso-2022-jp";
+    }
+    else if (charSetTerm === "ISO 2022 IR 149" ) {
+        // not supported by TextDecoder when it says it should...
+        //label = "iso-2022-kr";
+    }
+    else if (charSetTerm === "ISO 2022 IR 58") {
+        // not supported by TextDecoder...
+        //label = "iso-2022-cn";
+    }
+    else if (charSetTerm === "ISO_IR 192" ) {
+        label = "utf-8";
+    }
+    else if (charSetTerm === "GB18030" ) {
+        label = "gb18030";
+    }
+    else if (charSetTerm === "GBK" ) {
+        label = "chinese";
+    }
+    return label;
+};
+
+/**
  * Data reader.
  * @constructor
  * @param {Array} buffer The input array buffer.
@@ -43,6 +109,17 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
     if ( typeof isLittleEndian === 'undefined' ) {
         isLittleEndian = true;
     }
+
+    // Default text encoding
+    var utfLabel = "iso-8859-1";
+    
+    /**
+     * Set the utfLabel used to construct the TextDecoder.
+     * @param {String} label The encoding label.
+     */
+    this.setUtfLabel = function (label) {
+        utfLabel = label;
+    };
 
     /**
      * Is the Native endianness Little Endian.
@@ -293,6 +370,24 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         // return padded
         return "0x0000".substr(0, 6 - str.length) + str.toUpperCase();
     };
+    
+    /**
+     * Decode an input string.
+     */
+    function decodeString(buffer) {
+        var result = "";
+        if (typeof window.TextDecoder !== "undefined") {
+            var td = new TextDecoder(utfLabel);
+            result = td.decode(buffer);
+        }
+        else {
+            for ( var i = 0; i < buffer.length; ++i ) {
+                result += String.fromCharCode( buffer[ i ] );
+            }
+        }
+        return result;
+    }
+    
     /**
      * Read data as a string.
      * @param {Number} byteOffset The offset to start reading from.
@@ -300,12 +395,8 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      * @return {String} The read data.
      */
     this.readString = function (byteOffset, nChars) {
-        var result = "";
         var data = this.readUint8Array(byteOffset, nChars);
-        for ( var i = 0; i < nChars; ++i ) {
-            result += String.fromCharCode( data[ i ] );
-        }
-        return result;
+        return decodeString(data);
     };
 };
 
@@ -1045,6 +1136,18 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     {
         // get the data element
         dataElement = this.readDataElement(dataReader, offset, implicit);
+        // check character set
+        if (dataElement.tag.name === "x00080005") {
+            var charSetTerm;
+            if (dataElement.value.length === 1) {
+                charSetTerm = dwv.dicom.cleanString(dataElement.value[0]);
+            }
+            else {
+                charSetTerm = dwv.dicom.cleanString(dataElement.value[1]);
+                console.warn("Unsupported character set with code extensions: '"+charSetTerm+"'.");
+            }
+            dataReader.setUtfLabel(dwv.dicom.getUtfLabel(charSetTerm));
+        }
         // increment offset
         offset = dataElement.endOffset;
         // store the data element
