@@ -488,14 +488,14 @@ dwv.App = function ()
             }
             postLoadInit(data);
             if ( drawStage ) {
-                // get image SliceLocation tag to identify
-                var sliceLocation = (data.info).filter(function(tag){return tag.name === 'SliceLocation'});
+                // get image ImagePositionPatient tag to identify
+                var ImagePositionPatient = (data.info).filter(function(tag){return tag.name === 'ImagePositionPatient';});
                 // create slice draw layer
                 var drawLayer = new Kinetic.Layer({
                     listening: false,
                     hitGraphEnabled: false,
                     visible: isFirst,
-                    name: (sliceLocation && sliceLocation.length > 0) ? sliceLocation[0].value[0] : 'undefined'
+                    name: (ImagePositionPatient && ImagePositionPatient.length > 0) ? ImagePositionPatient[0].value.join() : 'undefined'
                 });
                 // add to layers array
                 drawLayers.push(drawLayer);
@@ -569,14 +569,14 @@ dwv.App = function ()
             }
             postLoadInit(data);
             if ( drawStage ) {
-                // get image SliceLocation tag to identify
-                var sliceLocation = (data.info).filter(function(tag){return tag.name === 'SliceLocation'});
+                // get image ImagePositionPatient tag to identify
+                var ImagePositionPatient = (data.info).filter(function(tag){return tag.name === 'ImagePositionPatient';});
                 // create slice draw layer
                 var drawLayer = new Kinetic.Layer({
                     listening: false,
                     hitGraphEnabled: false,
                     visible: isFirst,
-                    name: (sliceLocation && sliceLocation.length > 0) ? sliceLocation[0].value[0] : 'undefined'
+                    name: (ImagePositionPatient && ImagePositionPatient.length > 0) ? ImagePositionPatient[0].value.join() : 'undefined'
                 });
                 // add to layers array
                 drawLayers.push(drawLayer);

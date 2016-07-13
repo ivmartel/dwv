@@ -488,11 +488,14 @@ dwv.App = function ()
             }
             postLoadInit(data);
             if ( drawStage ) {
+                // get image ImagePositionPatient tag to identify
+                var ImagePositionPatient = (data.info).filter(function(tag){return tag.name === 'ImagePositionPatient';});
                 // create slice draw layer
                 var drawLayer = new Kinetic.Layer({
                     listening: false,
                     hitGraphEnabled: false,
-                    visible: isFirst
+                    visible: isFirst,
+                    name: (ImagePositionPatient && ImagePositionPatient.length > 0) ? ImagePositionPatient[0].value.join() : 'undefined'
                 });
                 // add to layers array
                 drawLayers.push(drawLayer);
@@ -566,11 +569,14 @@ dwv.App = function ()
             }
             postLoadInit(data);
             if ( drawStage ) {
+                // get image ImagePositionPatient tag to identify
+                var ImagePositionPatient = (data.info).filter(function(tag){return tag.name === 'ImagePositionPatient';});
                 // create slice draw layer
                 var drawLayer = new Kinetic.Layer({
                     listening: false,
                     hitGraphEnabled: false,
-                    visible: isFirst
+                    visible: isFirst,
+                    name: (ImagePositionPatient && ImagePositionPatient.length > 0) ? ImagePositionPatient[0].value.join() : 'undefined'
                 });
                 // add to layers array
                 drawLayers.push(drawLayer);
@@ -1488,9 +1494,11 @@ dwv.State = function (app)
         // store each slice drawings group
         var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
         var drawings = [];
+        var slices = [];
         for ( var k = 0; k < nSlices; ++k ) {
+            var layer = app.getDrawLayer(k);
             // getChildren always return, so drawings will have the good size
-            var groups = app.getDrawLayer(k).getChildren();
+            var groups = layer.getChildren();
             // remove anchors
             for ( var i = 0; i < groups.length; ++i ) {
                 var anchors  = groups[i].find(".anchor");
@@ -1499,9 +1507,11 @@ dwv.State = function (app)
                 }
             }
             drawings.push(groups);
+            slices.push(layer.attrs.name);
         }
         // return a JSON string
         return JSON.stringify( {
+            "slices": slices,
             "window-center": app.getViewController().getWindowLevel().center,
             "window-width": app.getViewController().getWindowLevel().width,
             "position": app.getViewController().getCurrentPosition(),
@@ -11587,7 +11597,7 @@ dwv.image.DicomBufferToView = function (decoderScripts) {
 
     // flag to use workers or not to decode data
     var useWorkers = false;
-    
+
     if (typeof decoderScripts !== "undefined" && decoderScripts instanceof Array) {
         useWorkers = true;
         // thread pool
@@ -11607,7 +11617,7 @@ dwv.image.DicomBufferToView = function (decoderScripts) {
         var dicomParser = new dwv.dicom.DicomParser();
         // parse the buffer
         dicomParser.parse(buffer);
-    
+
         // worker callback
         var decodedBufferToView = function(event) {
             // create the view
@@ -11617,11 +11627,11 @@ dwv.image.DicomBufferToView = function (decoderScripts) {
             callback({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
         };
         var pixelBuffer = dicomParser.pixelBuffer;
-        
+
         var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
         var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
         var needDecompression = (algoName !== null);
-        
+
         if ( needDecompression ) {
             if (useWorkers) {
                 var script = decoderScripts[algoName];
@@ -11635,7 +11645,7 @@ dwv.image.DicomBufferToView = function (decoderScripts) {
 
                 var decoder = null;
                 var decodedBuffer = null;
-                
+
                 if( algoName === "jpeg-lossless" ) {
                     if ( !hasJpegLosslessDecoder ) {
                         throw new Error("No JPEG Lossless decoder provided");
@@ -14037,6 +14047,7 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
      * Execute the command.
      */
     this.execute = function () {
+        group.setAttr("drawType", name);
         // add the group to the layer
         layer.add(group);
         // draw
@@ -14264,6 +14275,13 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     var started = false;
 
     /**
+     * Auxiliar var to allow editing but not painting.
+     * @private
+     * @type Boolean
+     */
+    this.onlyEdit = false;
+
+    /**
      * Shape factory list
      * @type Object
      */
@@ -14343,6 +14361,66 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     var drawLayer = null;
 
     /**
+     * Auxiliar variable to avoid create new draws when editing.
+     * @private
+     * @type Object
+     */
+    this.onlyEdit = false;
+
+    /**
+     * Selected shape.
+     * @private
+     * @type Object
+     */
+    this.currentShape = null;
+
+    /**
+     * Clone selected shape to an interval of slices. If the shape has its own method, only the method will be applied.
+     * @param {Number} Shape First slice to clone shape.
+     * @param {Number} Shape Last slice to clone shape.
+     */
+    this.extend = function(ini, end){
+
+        var shape = self.currentShape;
+        if(!shape){return;}
+
+        // console.log(shape)
+        var shapename = shape.getAttr('drawType');
+        var tool = app.getToolbox().getToolList()[ (shapename).charAt(0).toUpperCase() + (shapename).slice(1) ];
+
+        // disable edition
+        shapeEditor.disable();
+        shapeEditor.setShape(null);
+        shapeEditor.setImage(null);
+
+        if(typeof tool != 'undefined' && tool.hasOwnProperty('extend')){
+            return tool.extend(ini, end);
+        }
+
+        var pos = app.getViewController().getCurrentPosition();
+
+        // Iterate over the next images and paint border on each slice.
+        for(var i=pos.k, il= end ? end : app.getImage().getGeometry().getSize().getNumberOfSlices(); i<il; i++){
+            app.getViewController().incrementSliceNb();
+            command = new dwv.tool.DrawGroupCommand(shape.clone(), shape.name, app.getDrawLayer());
+            // // draw
+            command.execute();
+        }
+
+        app.getViewController().setCurrentPosition(pos);
+
+        // Iterate over the prev images and paint border on each slice.
+        for(var j=pos.k, jl = ini ? ini : 0; j>jl; j--){
+            app.getViewController().decrementSliceNb();
+            command = new dwv.tool.DrawGroupCommand(shape.clone(), shape.name, app.getDrawLayer());
+            // // draw
+            command.execute();
+        }
+        app.getViewController().setCurrentPosition(pos);
+        self.currentShape = null;
+    };
+
+    /**
      * Handle mouse down event.
      * @param {Object} event The mouse down event.
      */
@@ -14357,6 +14435,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         if ( kshape ) {
             var group = kshape.getParent();
             var selectedShape = group.find(".shape")[0];
+            self.currentShape = group;
             // reset editor if click on other shape
             // (and avoid anchors mouse down)
             if ( selectedShape && selectedShape !== shapeEditor.getShape() ) {
@@ -14371,13 +14450,18 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             shapeEditor.disable();
             shapeEditor.setShape(null);
             shapeEditor.setImage(null);
-            // start storing points
-            started = true;
-            // clear array
-            points = [];
-            // store point
-            lastPoint = new dwv.math.Point2D(event._x, event._y);
-            points.push(lastPoint);
+            // Set current shape to null
+            self.currentShape = null;
+            // start storing points if onlyEdit allow it (default allowed)
+            if ( !self.onlyEdit ){
+                // start storing points
+                started = true;
+                // clear array
+                points = [];
+                // store point
+                lastPoint = new dwv.math.Point2D(event._x, event._y);
+                points.push(lastPoint);
+            }
         }
     };
 
@@ -14567,6 +14651,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         shape.off('dragstart');
         shape.off('dragmove');
         shape.off('dragend');
+        shape.off('dblclick');
     }
 
     /**
@@ -14765,20 +14850,23 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
                     klabel = new Kinetic.Label({
                         x: labelPos.x,
-                        y: labelPos.y + labelStyle.getFontSize() * 1.1,
+                        y: labelPos.y + labelStyle.getScaledFontSize(),
                         draggable: true
                     });
 
                     klabel.add(new Kinetic.Tag({
                         fill: 'rgba(0,0,0,.25)',
-                        stroke: labelStyle.getLineColour()
+                        stroke: labelStyle.getLineColour(),
+                        pointerWidth: 2,
+                        pointerHeight: 2,
                     }));
 
                     klabel.add(new Kinetic.Text({
                         text: labelText,
-                        fontSize: labelStyle.getFontSize(),
+                        fontSize: labelStyle.getScaledFontSize() * 1.25,
+                        fontFamily: labelStyle.getFontFamily(),
                         fill: labelStyle.getLineColour(),
-                        padding: 5
+                        padding: 4
                     }));
                 }
                 group.add(klabel);
@@ -16024,34 +16112,34 @@ dwv.tool.Floodfill = function(app)
     /**
      * Create Floodfill in all the prev and next slices while border is found
      */
-    this.extend = function(){
+    this.extend = function(ini, end){
         //avoid errors
         if(!initialpoint){
             throw "'initialpoint' not found. User must click before use extend!";
         }
         // remove previous draw
-        if ( shapeGroup ) {
-            shapeGroup.destroy();
-        }
+        // if ( shapeGroup ) {
+        //     shapeGroup.destroy();
+        // }
 
         var pos = app.getViewController().getCurrentPosition();
         var threshold = currentthreshold || initialthreshold;
 
         // Iterate over the next images and paint border on each slice.
-        for(var i=pos.k, len=app.getImage().getGeometry().getSize().getNumberOfSlices(); i<len; i++){
+        for(var i=pos.k, len = end ? end : app.getImage().getGeometry().getSize().getNumberOfSlices(); i<len ; i++){
+            app.getViewController().incrementSliceNb();
             if(!paintBorder(initialpoint, threshold)){
                 break;
             }
-            app.getViewController().incrementSliceNb();
         }
         app.getViewController().setCurrentPosition(pos);
 
         // Iterate over the prev images and paint border on each slice.
-        for(var j=pos.k; j>=0; j--){
+        for(var j=pos.k, jl = ini ? ini : 0 ; j>jl ; j--){
+            app.getViewController().decrementSliceNb();
             if(!paintBorder(initialpoint, threshold)){
                 break;
             }
-            app.getViewController().decrementSliceNb();
         }
         app.getViewController().setCurrentPosition(pos);
     };
@@ -16060,15 +16148,16 @@ dwv.tool.Floodfill = function(app)
      * Modify tolerance threshold and redraw ROI.
      * @param {Number} New threshold.
      */
-    this.modifyThreshold = function(modifyThreshold){
+    this.modifyThreshold = function(modifyThreshold, force){
         // remove previous draw
         clearTimeout(painterTimeout);
         painterTimeout = setTimeout(function(){
-                                        if ( shapeGroup && self.started) {
-                                            shapeGroup.destroy();
-                                        }
-                                        paintBorder(initialpoint,  modifyThreshold);
-                                    },100);
+            if ( (shapeGroup && self.started) || force ) {
+                shapeGroup.destroy();
+            }
+            currentthreshold = modifyThreshold;
+            paintBorder(initialpoint,  modifyThreshold);
+        },100);
     };
 
     /**

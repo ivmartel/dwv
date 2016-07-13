@@ -355,11 +355,11 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     this.extend = function(ini, end){
 
         var shape = self.currentShape;
-        if(!shape){return}
+        if(!shape){return;}
 
         // console.log(shape)
         var shapename = shape.getAttr('drawType');
-        var tool = app.getToolbox().getToolList()[ (shapename).charAt(0).toUpperCase() + (shapename).slice(1) ]
+        var tool = app.getToolbox().getToolList()[ (shapename).charAt(0).toUpperCase() + (shapename).slice(1) ];
 
         // disable edition
         shapeEditor.disable();
@@ -367,13 +367,13 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         shapeEditor.setImage(null);
 
         if(typeof tool != 'undefined' && tool.hasOwnProperty('extend')){
-            return tool.extend(ini, end)
+            return tool.extend(ini, end);
         }
 
         var pos = app.getViewController().getCurrentPosition();
 
         // Iterate over the next images and paint border on each slice.
-        for(var i=pos.k, il=end; i<end; i++){
+        for(var i=pos.k, il= end ? end : app.getImage().getGeometry().getSize().getNumberOfSlices(); i<il; i++){
             app.getViewController().incrementSliceNb();
             command = new dwv.tool.DrawGroupCommand(shape.clone(), shape.name, app.getDrawLayer());
             // // draw
@@ -383,7 +383,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         app.getViewController().setCurrentPosition(pos);
 
         // Iterate over the prev images and paint border on each slice.
-        for(var j=pos.k; j>ini; j--){
+        for(var j=pos.k, jl = ini ? ini : 0; j>jl; j--){
             app.getViewController().decrementSliceNb();
             command = new dwv.tool.DrawGroupCommand(shape.clone(), shape.name, app.getDrawLayer());
             // // draw
@@ -829,16 +829,16 @@ dwv.tool.Draw = function (app, shapeFactoryList)
 
                     klabel.add(new Kinetic.Tag({
                         fill: 'rgba(0,0,0,.25)',
-                        stroke: labelStyle.getLineColour(),
+                        stroke: colour,
                         pointerWidth: 2,
                         pointerHeight: 2,
                     }));
 
                     klabel.add(new Kinetic.Text({
                         text: labelText,
-                        fontSize: labelStyle.getScaledFontSize() * 1.25,
+                        fontSize: Math.floor(labelStyle.getScaledFontSize() * 1.2),
                         fontFamily: labelStyle.getFontFamily(),
-                        fill: labelStyle.getLineColour(),
+                        fill: colour,
                         padding: 4
                     }));
                 }

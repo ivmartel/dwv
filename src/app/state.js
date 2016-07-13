@@ -20,7 +20,7 @@ dwv.State = function (app)
         var drawings = [];
         var slices = [];
         for ( var k = 0; k < nSlices; ++k ) {
-            var layer = app.getDrawLayer(k)
+            var layer = app.getDrawLayer(k);
             // getChildren always return, so drawings will have the good size
             var groups = layer.getChildren();
             // remove anchors
@@ -31,7 +31,7 @@ dwv.State = function (app)
                 }
             }
             drawings.push(groups);
-            slices.push(layer.attrs.name)
+            slices.push(layer.attrs.name);
         }
         // return a JSON string
         return JSON.stringify( {
