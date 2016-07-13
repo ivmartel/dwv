@@ -11855,6 +11855,45 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var origin = new dwv.math.Point3D(slicePosition[0], slicePosition[1], slicePosition[2]);
     var geometry = new dwv.image.Geometry( origin, size, spacing );
 
+    // decode multi-frame data
+    var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
+    var needDecompression = (algoName !== null);
+    // TODO Find a better way!
+    if (pixelBuffer.length > 1 &&  needDecompression) {
+
+        console.warn("Temporary limitation: only decoding the first 20 frames...");
+        
+        var pool = new dwv.utils.ThreadPool(15);
+        pool.init();
+        
+        var pixelRep = dicomElements.getFromKey("x00280103");
+        var isSigned = (pixelRep === 1);
+        var bitsAllocated = dicomElements.getFromKey("x00280100");
+        // data decoders
+        var pathToRoot = "../..";
+        var decoderScripts = [];
+        decoderScripts.jpeg2000 = pathToRoot + "/ext/pdfjs/decode-jpeg2000.js";
+        decoderScripts["jpeg-lossless"] = pathToRoot + "/ext/rii-mango/decode-jpegloss.js";
+        decoderScripts["jpeg-baseline"] = pathToRoot + "/ext/notmasteryet/decode-jpegbaseline.js";
+        var script = decoderScripts[algoName];
+        
+        // worker callback to replace the coded by the decoded frame content
+        var func = function (frame) {
+            return function (event) { pixelBuffer[frame] = event.data[0]; };
+        };
+
+        var nFrames = 20; //pixelBuffer.length;
+        for (var f = 1; f < nFrames; ++f) {
+            // decode pixel buffer
+            var workerTask = new dwv.utils.WorkerTask(script, func(f), {
+                'buffer': pixelBuffer[f],
+                'bitsAllocated': bitsAllocated,
+                'isSigned': isSigned } );
+            // add to thread pool
+            pool.addWorkerTask(workerTask);
+        }
+    }
+
     // image
     var image = new dwv.image.Image( geometry, pixelBuffer );
     // PhotometricInterpretation
@@ -12482,9 +12521,12 @@ dwv.image.DicomBufferToView = function (decoderScripts)
     
         // worker callback
         var decodedBufferToView = function (event) {
+            // when decoded, only the first frame is decoded
+            // so just replace the first frame content.
+            pixelBuffer[0] = event.data[0];
             // create the image
             var imageFactory = new dwv.image.ImageFactory();
-            var image = imageFactory.create( dicomParser.getDicomElements(), event.data );
+            var image = imageFactory.create( dicomParser.getDicomElements(), pixelBuffer );
             // create the view
             var viewFactory = new dwv.image.ViewFactory();
             var view = viewFactory.create( dicomParser.getDicomElements(), image );
@@ -12495,14 +12537,14 @@ dwv.image.DicomBufferToView = function (decoderScripts)
         var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
         var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
         var needDecompression = (algoName !== null);
-
+        
         var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
         var bitsAllocated = dicomParser.getRawDicomElements().x00280100.value[0];
         var pixelRepresentation = dicomParser.getRawDicomElements().x00280103.value[0];
         var isSigned = (pixelRepresentation === 1);
 
         if ( needDecompression ) {
-            // only decompress the first frame
+            // only decompress the first frame to not block the system
             if (useWorkers) {
                 if (!asynchDecoder) {
                     // create the decoder
