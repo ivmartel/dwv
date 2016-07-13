@@ -205,17 +205,8 @@ dwv.App = function ()
             // setup the tool list
             var toolList = {};
             for ( var t = 0; t < config.tools.length; ++t ) {
-                switch( config.tools[t] ) {
-                case "WindowLevel":
-                    toolList.WindowLevel = new dwv.tool.WindowLevel(this);
-                    break;
-                case "ZoomAndPan":
-                    toolList.ZoomAndPan = new dwv.tool.ZoomAndPan(this);
-                    break;
-                case "Scroll":
-                    toolList.Scroll = new dwv.tool.Scroll(this);
-                    break;
-                case "Draw":
+                var toolName = config.tools[t];
+                if ( toolName === "Draw" ) {
                     if ( config.shapes !== 0 ) {
                         // setup the shape list
                         var shapeList = {};
@@ -235,11 +226,8 @@ dwv.App = function ()
                         toolList.Draw.addEventListener("draw-move", fireEvent);
                         toolList.Draw.addEventListener("draw-delete", fireEvent);
                     }
-                    break;
-                case "Livewire":
-                    toolList.Livewire = new dwv.tool.Livewire(this);
-                    break;
-                case "Filter":
+                }
+                else if ( toolName === "Filter" ) {
                     if ( config.filters.length !== 0 ) {
                         // setup the filter list
                         var filterList = {};
@@ -254,9 +242,16 @@ dwv.App = function ()
                         }
                         toolList.Filter = new dwv.tool.Filter(filterList, this);
                     }
-                    break;
-                default:
-                    throw new Error("Unknown tool: '" + config.tools[t] + "'");
+                }
+                else {
+                    // default: find the tool in the dwv.tool namespace
+                    var toolClass = toolName;
+                    if (typeof dwv.tool[toolClass] !== "undefined") {
+                        toolList[toolClass] = new dwv.tool[toolClass](this);
+                    }
+                    else {
+                        console.warn("Could not initialise unknown tool: "+toolName);
+                    }
                 }
             }
             toolbox = new dwv.tool.Toolbox(toolList, this);
@@ -274,6 +269,7 @@ dwv.App = function ()
                 for ( var l = 0; l < config.loaders.length; ++l ) {
                     var loaderName = config.loaders[l];
                     var loaderClass = loaderName + "Load";
+                    // default: find the loader in the dwv.gui namespace
                     if (typeof dwv.gui[loaderClass] !== "undefined") {
                         loaderList[loaderName] = new dwv.gui[loaderClass](this);
                     }
