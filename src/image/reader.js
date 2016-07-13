@@ -195,9 +195,12 @@ dwv.image.DicomBufferToView = function (decoderScripts)
     
         // worker callback
         var decodedBufferToView = function (event) {
+            // when decoded, only the first frame is decoded
+            // so just replace the first frame content.
+            pixelBuffer[0] = event.data[0];
             // create the image
             var imageFactory = new dwv.image.ImageFactory();
-            var image = imageFactory.create( dicomParser.getDicomElements(), event.data );
+            var image = imageFactory.create( dicomParser.getDicomElements(), pixelBuffer );
             // create the view
             var viewFactory = new dwv.image.ViewFactory();
             var view = viewFactory.create( dicomParser.getDicomElements(), image );
@@ -208,14 +211,14 @@ dwv.image.DicomBufferToView = function (decoderScripts)
         var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
         var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
         var needDecompression = (algoName !== null);
-
+        
         var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
         var bitsAllocated = dicomParser.getRawDicomElements().x00280100.value[0];
         var pixelRepresentation = dicomParser.getRawDicomElements().x00280103.value[0];
         var isSigned = (pixelRepresentation === 1);
 
         if ( needDecompression ) {
-            // only decompress the first frame
+            // only decompress the first frame to not block the system
             if (useWorkers) {
                 if (!asynchDecoder) {
                     // create the decoder
