@@ -40,7 +40,7 @@ function startApp() {
         "fitToWindow": true,
         "gui": ["tool", "load", "help", "undo", "version", "tags"],
         "loaders": ["File", "Url", "GoogleDrive", "Dropbox"],
-        "tools": ["Scroll", "WindowLevel", "ZoomAndPan", "Draw", "Livewire", "Filter"],
+        "tools": ["Scroll", "WindowLevel", "ZoomAndPan", "Draw", "Livewire", "Filter", "Floodfill"],
         "filters": ["Threshold", "Sharpen", "Sobel"],
         "shapes": ["Line", "Protractor", "Rectangle", "Roi", "Ellipse"],
         "isMobile": true,
