@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>dwv Class: View</title>
+	<title>dwv Class: Floodfill</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -84,15 +84,15 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: View</h1>
+	<h1 class="page-title">Class: Floodfill</h1>
 <section>
 
 <header>
     
         <h2>
-            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.image.html">.image</a>.</span>
+            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.tool.html">.tool</a>.</span>
         
-        View
+        Floodfill
         </h2>
         
     
@@ -105,7 +105,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="View"><span class="type-signature"></span>new View(image)</h4>
+    <h4 class="name" id="Floodfill"><span class="type-signature"></span>new Floodfill(app)</h4>
     
     
 </dt>
@@ -113,7 +113,7 @@
 
     
     <div class="description">
-        View class.
+        Floodfill painting tool.
     </div>
     
 
@@ -148,13 +148,13 @@
 
         <tr>
             
-                <td class="name"><code>image</code></td>
+                <td class="name"><code>app</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Image</span>
+<span class="param-type">Object</span>
 
 
 
@@ -165,9 +165,8 @@
 
             
 
-            <td class="description last">The associated image.
-Need to set the window lookup table once created
-(either directly or with helper methods).</td>
+            <td class="description last">The associated application.
+Found in <a href="https://github.com/Tamersoul/magic-wand-js">https://github.com/Tamersoul/magic-wand-js</a></td>
         </tr>
 
     
@@ -211,8 +210,8 @@ Need to set the window lookup table once created
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-12">line 12</a>
+				<a href="src_tools_floodfill.js.html">src/tools/floodfill.js</a>,
+				 <a href="src_tools_floodfill.js.html#sunlight-1-line-15">line 15</a>
 			</li>
 		</ul>
 	</dd>
@@ -254,6 +253,253 @@ Need to set the window lookup table once created
 
     
 
+    
+        <h3 class="subsection-title">Members</h3>
+
+        <dl>
+            
+<hr>
+<dt class="name" id="started">
+    <h4><span class="type-signature"></span>started<span class="type-signature"> :Boolean</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Interaction start flag.
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Boolean</span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_floodfill.js.html">src/tools/floodfill.js</a>,
+				 <a href="src_tools_floodfill.js.html#sunlight-1-line-69">line 69</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id="style">
+    <h4><span class="type-signature"></span>style<span class="type-signature"> :Style</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Drawing style.
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Style</span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_floodfill.js.html">src/tools/floodfill.js</a>,
+				 <a href="src_tools_floodfill.js.html#sunlight-1-line-120">line 120</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id="~gui">
+    <h4><span class="type-signature">&lt;inner> </span>gui<span class="type-signature"> :Object</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Livewire GUI.
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Object</span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_floodfill.js.html">src/tools/floodfill.js</a>,
+				 <a href="src_tools_floodfill.js.html#sunlight-1-line-74">line 74</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        </dl>
     
 
     
@@ -263,7 +509,7 @@ Need to set the window lookup table once created
             
 <hr>
 <dt>
-    <h4 class="name" id="addEventListener"><span class="type-signature"></span>addEventListener(type, listener)</h4>
+    <h4 class="name" id="display"><span class="type-signature"></span>display(bool)</h4>
     
     
 </dt>
@@ -271,7 +517,7 @@ Need to set the window lookup table once created
 
     
     <div class="description">
-        Add an event listener on the view.
+        Enable the tool.
     </div>
     
 
@@ -306,13 +552,13 @@ Need to set the window lookup table once created
 
         <tr>
             
-                <td class="name"><code>type</code></td>
+                <td class="name"><code>bool</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">Boolean</span>
 
 
 
@@ -323,31 +569,7 @@ Need to set the window lookup table once created
 
             
 
-            <td class="description last">The event type.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>listener</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The method associated with the provided event type.</td>
+            <td class="description last">The flag to enable or not.</td>
         </tr>
 
     
@@ -391,8 +613,8 @@ Need to set the window lookup table once created
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-434">line 434</a>
+				<a href="src_tools_floodfill.js.html">src/tools/floodfill.js</a>,
+				 <a href="src_tools_floodfill.js.html#sunlight-1-line-349">line 349</a>
 			</li>
 		</ul>
 	</dd>
@@ -425,7 +647,7 @@ Need to set the window lookup table once created
             
 <hr>
 <dt>
-    <h4 class="name" id="append"><span class="type-signature"></span>append(rhs)</h4>
+    <h4 class="name" id="extend"><span class="type-signature"></span>extend()</h4>
     
     
 </dt>
@@ -433,145 +655,7 @@ Need to set the window lookup table once created
 
     
     <div class="description">
-        Append another view to this one.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>rhs</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The view to append.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-219">line 219</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="clone"><span class="type-signature"></span>clone()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Clone the image using all meta data and the original data buffer.
+        Create Floodfill in all the prev and next slices while border is found
     </div>
     
 
@@ -617,8 +701,96 @@ Need to set the window lookup table once created
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-255">line 255</a>
+				<a href="src_tools_floodfill.js.html">src/tools/floodfill.js</a>,
+				 <a href="src_tools_floodfill.js.html#sunlight-1-line-207">line 207</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getExtend"><span class="type-signature"></span>getExtend()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get extend option for painting border on all slices.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_floodfill.js.html">src/tools/floodfill.js</a>,
+				 <a href="src_tools_floodfill.js.html#sunlight-1-line-134">line 134</a>
 			</li>
 		</ul>
 	</dd>
@@ -647,7 +819,7 @@ Need to set the window lookup table once created
     
             
 <div class="param-desc">
-    A full copy of this {dwv.image.View}.
+    The actual value of of the variable to use Floodfill on museup.
 </div>
 
 
@@ -658,7 +830,7 @@ Need to set the window lookup table once created
     </dt>
     <dd>
         
-<span class="param-type">View</span>
+<span class="param-type">Boolean</span>
 
 
 
@@ -675,7 +847,7 @@ Need to set the window lookup table once created
             
 <hr>
 <dt>
-    <h4 class="name" id="fireEvent"><span class="type-signature"></span>fireEvent(event)</h4>
+    <h4 class="name" id="getHelp"><span class="type-signature"></span>getHelp()</h4>
     
     
 </dt>
@@ -683,7 +855,207 @@ Need to set the window lookup table once created
 
     
     <div class="description">
-        Fire an event: call all associated listeners.
+        Help for this tool.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_floodfill.js.html">src/tools/floodfill.js</a>,
+				 <a href="src_tools_floodfill.js.html#sunlight-1-line-377">line 377</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    The help content.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="init"><span class="type-signature"></span>init()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Initialise the tool.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_floodfill.js.html">src/tools/floodfill.js</a>,
+				 <a href="src_tools_floodfill.js.html#sunlight-1-line-360">line 360</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="keydown"><span class="type-signature"></span>keydown(event)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Handle key down event.
     </div>
     
 
@@ -735,7 +1107,7 @@ Need to set the window lookup table once created
 
             
 
-            <td class="description last">The event to fire.</td>
+            <td class="description last">The key down event.</td>
         </tr>
 
     
@@ -779,8 +1151,8 @@ Need to set the window lookup table once created
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-466">line 466</a>
+				<a href="src_tools_floodfill.js.html">src/tools/floodfill.js</a>,
+				 <a href="src_tools_floodfill.js.html#sunlight-1-line-332">line 332</a>
 			</li>
 		</ul>
 	</dd>
@@ -813,7 +1185,7 @@ Need to set the window lookup table once created
             
 <hr>
 <dt>
-    <h4 class="name" id="generateImageData"><span class="type-signature"></span>generateImageData(array, sliceNumber)</h4>
+    <h4 class="name" id="modifyThreshold"><span class="type-signature"></span>modifyThreshold(New)</h4>
     
     
 </dt>
@@ -821,7 +1193,7 @@ Need to set the window lookup table once created
 
     
     <div class="description">
-        Generate display image data to be given to a canvas.
+        Modify tolerance threshold and redraw ROI.
     </div>
     
 
@@ -856,31 +1228,7 @@ Need to set the window lookup table once created
 
         <tr>
             
-                <td class="name"><code>array</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The array to fill in.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>sliceNumber</code></td>
+                <td class="name"><code>New</code></td>
             
 
             <td class="type">
@@ -897,7 +1245,7 @@ Need to set the window lookup table once created
 
             
 
-            <td class="description last">The slice position.</td>
+            <td class="description last">threshold.</td>
         </tr>
 
     
@@ -941,8 +1289,8 @@ Need to set the window lookup table once created
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-304">line 304</a>
+				<a href="src_tools_floodfill.js.html">src/tools/floodfill.js</a>,
+				 <a href="src_tools_floodfill.js.html#sunlight-1-line-243">line 243</a>
 			</li>
 		</ul>
 	</dd>
@@ -975,7 +1323,7 @@ Need to set the window lookup table once created
             
 <hr>
 <dt>
-    <h4 class="name" id="getColourMap"><span class="type-signature"></span>getColourMap()</h4>
+    <h4 class="name" id="mousedown"><span class="type-signature"></span>mousedown(event)</h4>
     
     
 </dt>
@@ -983,791 +1331,7 @@ Need to set the window lookup table once created
 
     
     <div class="description">
-        Get the colour map of the image.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-118">line 118</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    The colour map of the image.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getCurrentFrame"><span class="type-signature"></span>getCurrentFrame()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get the current frame number.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-188">line 188</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    The current frame number.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Number</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getCurrentPosition"><span class="type-signature"></span>getCurrentPosition()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get the current position.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-138">line 138</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    The current position.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getImage"><span class="type-signature"></span>getImage()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get the associated image.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-53">line 53</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    The associated image.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Image</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getListeners"><span class="type-signature"></span>getListeners()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get the view listeners.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-275">line 275</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    The view listeners.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getWindowLut"><span class="type-signature"></span>getWindowLut()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get the window LUT of the image.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-64">line 64</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    The window LUT of the image.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Window</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getWindowPresets"><span class="type-signature"></span>getWindowPresets()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get the window presets.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-104">line 104</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    The window presets.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="removeEventListener"><span class="type-signature"></span>removeEventListener(type, listener)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Remove an event listener on the view.
+        Handle mouse down event.
     </div>
     
 
@@ -1802,31 +1366,7 @@ Need to set the window lookup table once created
 
         <tr>
             
-                <td class="name"><code>type</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The event type.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>listener</code></td>
+                <td class="name"><code>event</code></td>
             
 
             <td class="type">
@@ -1843,7 +1383,7 @@ Need to set the window lookup table once created
 
             
 
-            <td class="description last">The method associated with the provided event type.</td>
+            <td class="description last">The mouse down event.</td>
         </tr>
 
     
@@ -1887,8 +1427,8 @@ Need to set the window lookup table once created
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-448">line 448</a>
+				<a href="src_tools_floodfill.js.html">src/tools/floodfill.js</a>,
+				 <a href="src_tools_floodfill.js.html#sunlight-1-line-258">line 258</a>
 			</li>
 		</ul>
 	</dd>
@@ -1921,7 +1461,7 @@ Need to set the window lookup table once created
             
 <hr>
 <dt>
-    <h4 class="name" id="setColourMap"><span class="type-signature"></span>setColourMap(map)</h4>
+    <h4 class="name" id="mousemove"><span class="type-signature"></span>mousemove(event)</h4>
     
     
 </dt>
@@ -1929,7 +1469,7 @@ Need to set the window lookup table once created
 
     
     <div class="description">
-        Set the colour map of the image.
+        Handle mouse move event.
     </div>
     
 
@@ -1964,7 +1504,7 @@ Need to set the window lookup table once created
 
         <tr>
             
-                <td class="name"><code>map</code></td>
+                <td class="name"><code>event</code></td>
             
 
             <td class="type">
@@ -1981,7 +1521,7 @@ Need to set the window lookup table once created
 
             
 
-            <td class="description last">The colour map of the image.</td>
+            <td class="description last">The mouse move event.</td>
         </tr>
 
     
@@ -2025,8 +1565,8 @@ Need to set the window lookup table once created
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-123">line 123</a>
+				<a href="src_tools_floodfill.js.html">src/tools/floodfill.js</a>,
+				 <a href="src_tools_floodfill.js.html#sunlight-1-line-271">line 271</a>
 			</li>
 		</ul>
 	</dd>
@@ -2059,7 +1599,7 @@ Need to set the window lookup table once created
             
 <hr>
 <dt>
-    <h4 class="name" id="setCurrentFrame"><span class="type-signature"></span>setCurrentFrame(The)</h4>
+    <h4 class="name" id="mouseout"><span class="type-signature"></span>mouseout(event)</h4>
     
     
 </dt>
@@ -2067,7 +1607,283 @@ Need to set the window lookup table once created
 
     
     <div class="description">
-        Set the current frame number.
+        Handle mouse out event.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The mouse out event.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_floodfill.js.html">src/tools/floodfill.js</a>,
+				 <a href="src_tools_floodfill.js.html#sunlight-1-line-297">line 297</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="mouseup"><span class="type-signature"></span>mouseup(event)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Handle mouse up event.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The mouse up event.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_floodfill.js.html">src/tools/floodfill.js</a>,
+				 <a href="src_tools_floodfill.js.html#sunlight-1-line-286">line 286</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="setExtend"><span class="type-signature"></span>setExtend(The)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Set extend option for painting border on all slices.
     </div>
     
 
@@ -2108,7 +1924,7 @@ Need to set the window lookup table once created
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">Boolean</span>
 
 
 
@@ -2119,7 +1935,7 @@ Need to set the window lookup table once created
 
             
 
-            <td class="description last">current frame number.</td>
+            <td class="description last">option to set</td>
         </tr>
 
     
@@ -2163,8 +1979,8 @@ Need to set the window lookup table once created
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-197">line 197</a>
+				<a href="src_tools_floodfill.js.html">src/tools/floodfill.js</a>,
+				 <a href="src_tools_floodfill.js.html#sunlight-1-line-126">line 126</a>
 			</li>
 		</ul>
 	</dd>
@@ -2189,30 +2005,6 @@ Need to set the window lookup table once created
     
 
     
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    False if not in bounds
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Boolean</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
 
     
 </dd>
@@ -2221,7 +2013,7 @@ Need to set the window lookup table once created
             
 <hr>
 <dt>
-    <h4 class="name" id="setCurrentPosition"><span class="type-signature"></span>setCurrentPosition(pos, silent)</h4>
+    <h4 class="name" id="setLineColour"><span class="type-signature"></span>setLineColour(colour)</h4>
     
     
 </dt>
@@ -2229,7 +2021,7 @@ Need to set the window lookup table once created
 
     
     <div class="description">
-        Set the current position.
+        Set the line colour of the drawing.
     </div>
     
 
@@ -2264,7 +2056,233 @@ Need to set the window lookup table once created
 
         <tr>
             
-                <td class="name"><code>pos</code></td>
+                <td class="name"><code>colour</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The colour to set.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_floodfill.js.html">src/tools/floodfill.js</a>,
+				 <a href="src_tools_floodfill.js.html#sunlight-1-line-392">line 392</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="setup"><span class="type-signature"></span>setup()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Setup the tool GUI.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_floodfill.js.html">src/tools/floodfill.js</a>,
+				 <a href="src_tools_floodfill.js.html#sunlight-1-line-339">line 339</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="touchend"><span class="type-signature"></span>touchend(event)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Handle touch end event.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
             
 
             <td class="type">
@@ -2281,31 +2299,7 @@ Need to set the window lookup table once created
 
             
 
-            <td class="description last">The current position.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>silent</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">If true, does not fire a slice-change event.</td>
+            <td class="description last">The touch end event.</td>
         </tr>
 
     
@@ -2349,8 +2343,8 @@ Need to set the window lookup table once created
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-148">line 148</a>
+				<a href="src_tools_floodfill.js.html">src/tools/floodfill.js</a>,
+				 <a href="src_tools_floodfill.js.html#sunlight-1-line-323">line 323</a>
 			</li>
 		</ul>
 	</dd>
@@ -2375,30 +2369,6 @@ Need to set the window lookup table once created
     
 
     
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    False if not in bounds
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Boolean</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
 
     
 </dd>
@@ -2407,7 +2377,7 @@ Need to set the window lookup table once created
             
 <hr>
 <dt>
-    <h4 class="name" id="setImage"><span class="type-signature"></span>setImage(inImage)</h4>
+    <h4 class="name" id="touchmove"><span class="type-signature"></span>touchmove(event)</h4>
     
     
 </dt>
@@ -2415,7 +2385,7 @@ Need to set the window lookup table once created
 
     
     <div class="description">
-        Set the associated image.
+        Handle touch move event.
     </div>
     
 
@@ -2450,145 +2420,7 @@ Need to set the window lookup table once created
 
         <tr>
             
-                <td class="name"><code>inImage</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Image</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The associated image.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-58">line 58</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="setListeners"><span class="type-signature"></span>setListeners(list)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Set the view listeners.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>list</code></td>
+                <td class="name"><code>event</code></td>
             
 
             <td class="type">
@@ -2605,7 +2437,7 @@ Need to set the window lookup table once created
 
             
 
-            <td class="description last">The view listeners.</td>
+            <td class="description last">The touch move event.</td>
         </tr>
 
     
@@ -2649,8 +2481,8 @@ Need to set the window lookup table once created
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-280">line 280</a>
+				<a href="src_tools_floodfill.js.html">src/tools/floodfill.js</a>,
+				 <a href="src_tools_floodfill.js.html#sunlight-1-line-314">line 314</a>
 			</li>
 		</ul>
 	</dd>
@@ -2683,7 +2515,7 @@ Need to set the window lookup table once created
             
 <hr>
 <dt>
-    <h4 class="name" id="setWindowLevel"><span class="type-signature"></span>setWindowLevel(center, width)</h4>
+    <h4 class="name" id="touchstart"><span class="type-signature"></span>touchstart(event)</h4>
     
     
 </dt>
@@ -2691,7 +2523,7 @@ Need to set the window lookup table once created
 
     
     <div class="description">
-        Set the view window/level.
+        Handle touch start event.
     </div>
     
 
@@ -2726,397 +2558,7 @@ Need to set the window lookup table once created
 
         <tr>
             
-                <td class="name"><code>center</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The window center.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>width</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The window width.
-Warning: uses the latest set rescale LUT or the default linear one.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-240">line 240</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="setWindowLevelMinMax"><span class="type-signature"></span>setWindowLevelMinMax()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Set the image window/level to cover the full data range.
-Warning: uses the latest set rescale LUT or the default linear one.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-287">line 287</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="setWindowLut"><span class="type-signature"></span>setWindowLut(wlut)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Set the window LUT of the image.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>wlut</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Window</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The window LUT of the image.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-75">line 75</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="setWindowPresets"><span class="type-signature"></span>setWindowPresets(presets)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Set the window presets.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>presets</code></td>
+                <td class="name"><code>event</code></td>
             
 
             <td class="type">
@@ -3133,7 +2575,7 @@ Warning: uses the latest set rescale LUT or the default linear one.
 
             
 
-            <td class="description last">The window presets.</td>
+            <td class="description last">The touch start event.</td>
         </tr>
 
     
@@ -3177,8 +2619,146 @@ Warning: uses the latest set rescale LUT or the default linear one.
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_image_view.js.html">src/image/view.js</a>,
-				 <a href="src_image_view.js.html#sunlight-1-line-109">line 109</a>
+				<a href="src_tools_floodfill.js.html">src/tools/floodfill.js</a>,
+				 <a href="src_tools_floodfill.js.html#sunlight-1-line-305">line 305</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="~getCoord"><span class="type-signature">&lt;inner> </span>getCoord(event)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get (x, y) coordinates referenced to the canvas
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The original event.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_floodfill.js.html">src/tools/floodfill.js</a>,
+				 <a href="src_tools_floodfill.js.html#sunlight-1-line-142">line 142</a>
 			</li>
 		</ul>
 	</dd>
