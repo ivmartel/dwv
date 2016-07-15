@@ -93,6 +93,12 @@
             "name": "Livewire",
             "brief": "Инструмент Livewire - полуавтоматический инструмент сегментации, который прокладывает линию по границе интенсивности. Кликните один раз, чтобы инициализировать процесс и затем перемещайте мышь, чтобы отслежимать предпологаемый путь. Кликните снова для построения контура. Процесс останавливается, когда вы кликните на начальной точке. ОСТЕРЕГАЙТЕСЬ: процесс может занять некоторое время!"
         },
+        "Floodfill": {
+            "name": "Floodfill",
+            "brief": "The Floodfill tool is a semi-automatic segmentation tool that contours pixel of similar values.",
+            "click": "Click on pixel to create a contour based on its intensity.",
+            "tap": "Touch a pixel to create a contour based on its intensity."
+        },
         "info": {
             "position": "Позиция = {{value}}",
             "value": "Зрачение = {{value}}",
