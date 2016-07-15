@@ -1091,8 +1091,10 @@ dwv.App = function ()
         self.initWLDisplay();
         // update preset select
         var select = self.getElement("presetSelect");
-        select.selectedIndex = 0;
-        dwv.gui.refreshElement(select);
+        if (select) {
+            select.selectedIndex = 0;
+            dwv.gui.refreshElement(select);
+        }
     };
 
 
