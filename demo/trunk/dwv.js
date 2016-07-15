@@ -1091,8 +1091,10 @@ dwv.App = function ()
         self.initWLDisplay();
         // update preset select
         var select = self.getElement("presetSelect");
-        select.selectedIndex = 0;
-        dwv.gui.refreshElement(select);
+        if (select) {
+            select.selectedIndex = 0;
+            dwv.gui.refreshElement(select);
+        }
     };
 
 
@@ -17111,11 +17113,14 @@ dwv.tool.Floodfill = function(app)
 dwv.tool.Floodfill.prototype.getHelp = function()
 {
     return {
-        'title': "Floodfill",
-        'brief': "The Floodfill tool is a semi-automatic segmentation tool " +
-            "that proposes to the user paths that follow intensity edges." +
-            "Mouse down once to initialise and then move the mouse to see " +
-            "the proposed paths. Mouse up to build your contour. "
+        'title': dwv.i18n("tool.Floodfill.name"),
+        'brief': dwv.i18n("tool.Floodfill.brief"),
+        "mouse": {
+            "click": dwv.i18n("tool.Floodfill.click")
+        },
+        "touch": {
+            "tap": dwv.i18n("tool.Floodfill.tap")
+        }
     };
 };
 
