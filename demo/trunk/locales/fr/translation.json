@@ -94,6 +94,12 @@
             "name": "Livewire",
             "brief": "L'outil Livewire permet une segmentation semi-automatique. Il suggère à l'utilisateur des chemins passant par des crêtes d'intensité. Cliquer pour initialiser, relâcher et déplacer la souris pour visualiser les chemins proposés. Cliquer pour valider et un point et continuer. Terminer le chemin en re-cliquant sur le premier point. ATTENTION: les calcules peuvent prendre du temps!"
         },
+        "Floodfill": {
+            "name": "Floodfill",
+            "brief": "L'outil Floodfill permet une segmentation semi-automatique de pixels, il crée un coutour autour de pixels d'intensitée similaire.",
+            "click": "Cliquer sur un pixel pour créer un coutour basé sur son intensité.",
+            "tap": "Appuyer sur un pixel pour créer un coutour basé sur son intensité."
+        },
         "info": {
             "position": "Pos = {{value}}",
             "value": "Valeur = {{value}}",

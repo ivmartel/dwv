@@ -94,6 +94,12 @@
             "name": "Livewire",
             "brief": "Das Livewire-Werkzeug ist ein halbautomatisches Segmentierungswerkzeug, das automatisch Grauwertkanten folgt. Erstmaliger Klick initialisiert die Segmentierungsgrenze. Danach kann das vorgeschlagene Segment durch Mausbewegung geändert werden. Nochmaliger Klick übernimmt das aktuell dargestellte Segment in die Gesamtlinie und startet ein neues Segment. Das Verfahren endet, sobald der erste Punkt nochmals angeklickt wird. ACHTUNG: Das Verfahren kann viel Zeit in Anspruch nehmen!"
         },
+        "Floodfill": {
+            "name": "Floodfill",
+            "brief": "The Floodfill tool is a semi-automatic segmentation tool that contours pixel of similar values.",
+            "click": "Click on pixel to create a contour based on its intensity.",
+            "tap": "Touch a pixel to create a contour based on its intensity."
+        },
         "info": {
             "position": "Position = {{value}}",
             "value": "Grauwert = {{value}}",

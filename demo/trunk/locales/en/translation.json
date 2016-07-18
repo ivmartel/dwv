@@ -94,6 +94,12 @@
             "name": "Livewire",
             "brief": "The Livewire tool is a semi-automatic segmentation tool that proposes to the user paths that follow intensity edges. Click once to initialise and then move the mouse to see the proposed paths. Click again to build your contour. The process stops when you click on the first root point. BEWARE: the process can take time!"
         },
+        "Floodfill": {
+            "name": "Floodfill",
+            "brief": "The Floodfill tool is a semi-automatic segmentation tool that contours pixel of similar values.",
+            "click": "Click on pixel to create a contour based on its intensity.",
+            "tap": "Touch a pixel to create a contour based on its intensity."
+        },
         "info": {
             "position": "Pos = {{value}}",
             "value": "Value = {{value}}",
