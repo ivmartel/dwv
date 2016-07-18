@@ -27,6 +27,8 @@ dwv.App = function ()
 
     // Data decoders scripts
     var decoderScripts = null;
+    // Default character set
+    var defaultCharacterSet;
 
     // Container div id
     var containerDivId = null;
@@ -354,6 +356,11 @@ dwv.App = function ()
             decoderScripts["jpeg-lossless"] = pathToRoot + "/ext/rii-mango/decode-jpegloss.js";
             decoderScripts["jpeg-baseline"] = pathToRoot + "/ext/notmasteryet/decode-jpegbaseline.js";
         }
+        
+        // default character set
+        if ( typeof config.defaultCharacterSet !== "undefined" ) {
+            defaultCharacterSet = config.defaultCharacterSet;
+        }
     };
 
     /**
@@ -468,6 +475,7 @@ dwv.App = function ()
         // create IO
         var fileIO = new dwv.io.File();
         fileIO.setDecoderScripts(decoderScripts);
+        fileIO.setDefaultCharacterSet(defaultCharacterSet);
         fileIO.onload = function (data) {
             if ( image ) {
                 view.append( data.view );
@@ -540,6 +548,7 @@ dwv.App = function ()
         // create IO
         var urlIO = new dwv.io.Url();
         urlIO.setDecoderScripts(decoderScripts);
+        urlIO.setDefaultCharacterSet(defaultCharacterSet);
         urlIO.onload = function (data) {
             if ( image ) {
                 view.append( data.view );

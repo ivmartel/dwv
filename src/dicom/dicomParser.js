@@ -663,6 +663,27 @@ dwv.dicom.DicomParser = function ()
      * @type Array
      */
     this.dicomElements = {};
+
+    /**
+     * Default character set (optional).
+     * @private
+     * @type String
+    */
+    var defaultCharacterSet;
+    /**
+     * Get the default character set.
+     * @return {String} The default character set.
+     */
+    this.getDefaultCharacterSet = function () {
+        return defaultCharacterSet;
+    };
+    /**
+     * Set the default character set.
+     * param {String} The character set.
+     */
+    this.setDefaultCharacterSet = function (characterSet) {
+        defaultCharacterSet = characterSet;
+    };
 };
 
 /**
@@ -1117,6 +1138,11 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
         throw new Error("Unknown transfer syntax: "+syntax);
     }
 
+    // default character set
+    if (typeof this.getDefaultCharacterSet() !== "undefined") {
+        dataReader.setUtfLabel(this.getDefaultCharacterSet());
+    }
+    
     // DICOM data elements
     while ( offset < buffer.byteLength )
     {

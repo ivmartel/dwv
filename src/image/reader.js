@@ -167,6 +167,7 @@ dwv.image.SynchPixelBufferDecoder = function ()
 
 /**
  * Create a dwv.image.View from a DICOM buffer.
+ * @param {Array} decoderScripts An array of decoder scripts paths.
  * @constructor
  */
 dwv.image.DicomBufferToView = function (decoderScripts)
@@ -180,6 +181,20 @@ dwv.image.DicomBufferToView = function (decoderScripts)
     // asynchronous decoder
     var asynchDecoder = null;
     
+    /**
+     * The default character set (optional).
+     * @private
+     * @type String
+     */
+    var defaultCharacterSet;
+    
+    /**
+     * Set the default character set.
+     * param {String} The character set.
+     */
+    this.setDefaultCharacterSet = function (characterSet) {
+        defaultCharacterSet = characterSet;
+    };
 
     /**
      * Get data from an input buffer using a DICOM parser.
@@ -190,6 +205,7 @@ dwv.image.DicomBufferToView = function (decoderScripts)
     {
         // DICOM parser
         var dicomParser = new dwv.dicom.DicomParser();
+        dicomParser.setDefaultCharacterSet(defaultCharacterSet);
         // parse the buffer
         dicomParser.parse(buffer);
     

@@ -44,12 +44,14 @@ function startApp() {
         "filters": ["Threshold", "Sharpen", "Sobel"],
         "shapes": ["Line", "Protractor", "Rectangle", "Roi", "Ellipse"],
         "isMobile": true,
-        "useWebWorkers": true
+        "useWebWorkers": true,
+        //"defaultCharacterSet": "chinese"
     });
 
     var size = dwv.gui.getWindowSize();
     $(".layerContainer").height(size.height);
 }
+
 
 // check browser support
 dwv.browser.check();

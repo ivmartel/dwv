@@ -35,6 +35,29 @@ dwv.io.File = function ()
     var decoderScripts = [];
     
     /**
+     * The default character set (optional).
+     * @private
+     * @type String
+     */
+    var defaultCharacterSet;
+    
+    /**
+     * Get the default character set.
+     * @return {String} The default character set.
+     */
+    this.getDefaultCharacterSet = function () {
+        return defaultCharacterSet;
+    };
+    
+    /**
+     * Set the default character set.
+     * param {String} The character set.
+     */
+    this.setDefaultCharacterSet = function (characterSet) {
+        defaultCharacterSet = characterSet;
+    };
+
+    /**
      * Set the number of data to load.
      */
     this.setNToLoad = function (n) {
@@ -171,6 +194,8 @@ dwv.io.File.prototype.load = function (ioArray)
 
     // DICOM buffer to dwv.image.View (asynchronous)
     var db2v = new dwv.image.DicomBufferToView(this.getDecoderScripts());
+    db2v.setDefaultCharacterSet(this.getDefaultCharacterSet());
+    // callback
     var onLoadDicomBuffer = function (event)
     {
         try {
