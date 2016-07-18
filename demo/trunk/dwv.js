@@ -27,6 +27,8 @@ dwv.App = function ()
 
     // Data decoders scripts
     var decoderScripts = null;
+    // Default character set
+    var defaultCharacterSet;
 
     // Container div id
     var containerDivId = null;
@@ -354,6 +356,11 @@ dwv.App = function ()
             decoderScripts["jpeg-lossless"] = pathToRoot + "/ext/rii-mango/decode-jpegloss.js";
             decoderScripts["jpeg-baseline"] = pathToRoot + "/ext/notmasteryet/decode-jpegbaseline.js";
         }
+        
+        // default character set
+        if ( typeof config.defaultCharacterSet !== "undefined" ) {
+            defaultCharacterSet = config.defaultCharacterSet;
+        }
     };
 
     /**
@@ -468,6 +475,7 @@ dwv.App = function ()
         // create IO
         var fileIO = new dwv.io.File();
         fileIO.setDecoderScripts(decoderScripts);
+        fileIO.setDefaultCharacterSet(defaultCharacterSet);
         fileIO.onload = function (data) {
             if ( image ) {
                 view.append( data.view );
@@ -540,6 +548,7 @@ dwv.App = function ()
         // create IO
         var urlIO = new dwv.io.Url();
         urlIO.setDecoderScripts(decoderScripts);
+        urlIO.setDefaultCharacterSet(defaultCharacterSet);
         urlIO.onload = function (data) {
             if ( image ) {
                 view.append( data.view );
@@ -2585,17 +2594,24 @@ dwv.dicom.DicomParser = function ()
     this.dicomElements = {};
 
     /**
-     * Unknown tags count.
-     * @type Number
-     */
-    var unknownCount = 0;
+     * Default character set (optional).
+     * @private
+     * @type String
+    */
+    var defaultCharacterSet;
     /**
-     * Get the next unknown tags count.
-     * @return {Number} The next count.
+     * Get the default character set.
+     * @return {String} The default character set.
      */
-    this.getNextUnknownCount = function () {
-        unknownCount++;
-        return unknownCount;
+    this.getDefaultCharacterSet = function () {
+        return defaultCharacterSet;
+    };
+    /**
+     * Set the default character set.
+     * param {String} The character set.
+     */
+    this.setDefaultCharacterSet = function (characterSet) {
+        defaultCharacterSet = characterSet;
     };
 };
 
@@ -3051,6 +3067,11 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
         throw new Error("Unknown transfer syntax: "+syntax);
     }
 
+    // default character set
+    if (typeof this.getDefaultCharacterSet() !== "undefined") {
+        dataReader.setUtfLabel(this.getDefaultCharacterSet());
+    }
+    
     // DICOM data elements
     while ( offset < buffer.byteLength )
     {
@@ -12495,6 +12516,7 @@ dwv.image.SynchPixelBufferDecoder = function ()
 
 /**
  * Create a dwv.image.View from a DICOM buffer.
+ * @param {Array} decoderScripts An array of decoder scripts paths.
  * @constructor
  */
 dwv.image.DicomBufferToView = function (decoderScripts)
@@ -12508,6 +12530,20 @@ dwv.image.DicomBufferToView = function (decoderScripts)
     // asynchronous decoder
     var asynchDecoder = null;
     
+    /**
+     * The default character set (optional).
+     * @private
+     * @type String
+     */
+    var defaultCharacterSet;
+    
+    /**
+     * Set the default character set.
+     * param {String} The character set.
+     */
+    this.setDefaultCharacterSet = function (characterSet) {
+        defaultCharacterSet = characterSet;
+    };
 
     /**
      * Get data from an input buffer using a DICOM parser.
@@ -12518,6 +12554,7 @@ dwv.image.DicomBufferToView = function (decoderScripts)
     {
         // DICOM parser
         var dicomParser = new dwv.dicom.DicomParser();
+        dicomParser.setDefaultCharacterSet(defaultCharacterSet);
         // parse the buffer
         dicomParser.parse(buffer);
     
@@ -13132,6 +13169,29 @@ dwv.io.File = function ()
     var decoderScripts = [];
     
     /**
+     * The default character set (optional).
+     * @private
+     * @type String
+     */
+    var defaultCharacterSet;
+    
+    /**
+     * Get the default character set.
+     * @return {String} The default character set.
+     */
+    this.getDefaultCharacterSet = function () {
+        return defaultCharacterSet;
+    };
+    
+    /**
+     * Set the default character set.
+     * param {String} The character set.
+     */
+    this.setDefaultCharacterSet = function (characterSet) {
+        defaultCharacterSet = characterSet;
+    };
+
+    /**
      * Set the number of data to load.
      */
     this.setNToLoad = function (n) {
@@ -13268,6 +13328,8 @@ dwv.io.File.prototype.load = function (ioArray)
 
     // DICOM buffer to dwv.image.View (asynchronous)
     var db2v = new dwv.image.DicomBufferToView(this.getDecoderScripts());
+    db2v.setDefaultCharacterSet(this.getDefaultCharacterSet());
+    // callback
     var onLoadDicomBuffer = function (event)
     {
         try {
@@ -13374,6 +13436,29 @@ dwv.io.Url = function ()
      * @type Array
      */
     var decoderScripts = [];
+
+    /**
+     * The default character set (optional).
+     * @private
+     * @type String
+     */
+    var defaultCharacterSet;
+    
+    /**
+     * Get the default character set.
+     * @return {String} The default character set.
+     */
+    this.getDefaultCharacterSet = function () {
+        return defaultCharacterSet;
+    };
+    
+    /**
+     * Set the default character set.
+     * param {String} The character set.
+     */
+    this.setDefaultCharacterSet = function (characterSet) {
+        defaultCharacterSet = characterSet;
+    };
 
     /**
      * Set the number of data to load.
@@ -13513,6 +13598,8 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
 
     // DICOM buffer to dwv.image.View (asynchronous)
     var db2v = new dwv.image.DicomBufferToView(this.getDecoderScripts());
+    db2v.setDefaultCharacterSet(this.getDefaultCharacterSet());
+    // callback
     var onLoadDicomBuffer = function (response)
     {
         try {
