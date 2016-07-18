@@ -663,20 +663,6 @@ dwv.dicom.DicomParser = function ()
      * @type Array
      */
     this.dicomElements = {};
-
-    /**
-     * Unknown tags count.
-     * @type Number
-     */
-    var unknownCount = 0;
-    /**
-     * Get the next unknown tags count.
-     * @return {Number} The next count.
-     */
-    this.getNextUnknownCount = function () {
-        unknownCount++;
-        return unknownCount;
-    };
 };
 
 /**
