@@ -22,23 +22,6 @@ QUnit.module("dicomParser");
 // 
 // So I updated the data to be of the correct size (in this case 3072)... 
 
-// Float64Array (missing in phantom)
-if ( typeof Float64Array === "undefined" ) {
-    Float64Array = Float32Array; // jshint ignore:line
-}
-
-// array slice method (missing in phantom)
-if (!Uint16Array.prototype.slice) {
-    Uint16Array.prototype.slice = function (begin, end) {
-        var size = end - begin;
-        var cloned = new Array(size);
-        for (var i = 0; i < size; i++) {
-            cloned[i] = this[begin + i];
-        }
-        return cloned;
-    };
-}
-
 /**
  * Tests for {@link dwv.dicom.DicomParser} using simple DICOM data.
  * Using remote file for CI integration.
@@ -75,8 +58,6 @@ QUnit.test("Test simple DICOM parsing.", function (assert) {
             "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094",
             "ReferencedImageSequence SQ (raw)");
 
-        console.log("DP test 1");
-        
         // wrapped tags
         var tags = dicomParser.getDicomElements();
         // wrong key

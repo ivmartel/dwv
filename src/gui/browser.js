@@ -39,7 +39,29 @@ dwv.browser.hasTypedArray = function()
 };
 
 /**
+ * Browser check for typed array slice method.
+ * Missing in Internet Explorer 11.
+ */
+dwv.browser.hasTypedArraySlice = function()
+{
+    return (typeof Uint8Array.prototype.slice !== "undefined");
+};
+
+/**
+ * Browser check for Float64Array array.
+ * Missing in PhantomJS 1.9.20 (on Travis).
+ */
+dwv.browser.hasFloat64Array = function()
+{
+    return "Float64Array" in window;
+};
+
+
+/**
  * Browser check for clamped array.
+ * Missing in 
+ * - Safari 5.1.7 for Windows
+ * - PhantomJS 1.9.20 (on Travis).
  */
 dwv.browser.hasClampedArray = function()
 {
@@ -48,6 +70,7 @@ dwv.browser.hasClampedArray = function()
 
 /**
  * Browser checks to see if it can run dwv. Throws an error if not.
+ * Silently replaces basic functions.
  * @todo Maybe use {@link http://modernizr.com/}.
  */
 dwv.browser.check = function()
@@ -72,9 +95,35 @@ dwv.browser.check = function()
         alert(message+appnorun);
         throw new Error(message);
     }
+    // Check typed array slice
+    if( !dwv.browser.hasTypedArraySlice() ) {
+        // silent fail with warning
+        console.warn("The TypedArray.slice method is not supported in this browser. This may impair performance. ");
+        // basic Uint16Array implementation
+        Uint16Array.prototype.slice = function (begin, end) {
+            var size = end - begin;
+            var cloned = new Uint16Array(size);
+            for (var i = 0; i < size; i++) {
+                cloned[i] = this[begin + i];
+            }
+            return cloned;
+        };
+        // basic Uint8Array implementation
+        Uint8Array.prototype.slice = function (begin, end) {
+            var size = end - begin;
+            var cloned = new Uint8Array(size);
+            for (var i = 0; i < size; i++) {
+                cloned[i] = this[begin + i];
+            }
+            return cloned;
+        };
+    }
     // check clamped array
     if( !dwv.browser.hasClampedArray() ) {
-        // silent fail since IE does not support it...
+        // silent fail with warning
         console.warn("The Uint8ClampedArray is not supported in this browser. This may impair performance. ");
+        // Use Uint8Array instead... Not good
+        // TODO Find better replacement!
+        window.Uint8ClampedArray = window.Uint8Array;
     }
 };
