@@ -46,7 +46,7 @@ dwv.image.getViewFromDOMImage = function (image)
     var sliceIndex = image.index ? image.index : 0;
     var origin = new dwv.math.Point3D(0,0,sliceIndex);
     var geometry = new dwv.image.Geometry(origin, imageSize, imageSpacing );
-    var dwvImage = new dwv.image.Image( geometry, buffer );
+    var dwvImage = new dwv.image.Image( geometry, [buffer] );
     dwvImage.setPhotometricInterpretation("RGB");
     // meta information
     var meta = {};
