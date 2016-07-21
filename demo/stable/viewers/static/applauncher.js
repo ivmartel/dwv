@@ -2,12 +2,8 @@
  * Application launcher.
  */
 
-// check browser support
-dwv.browser.check();
-
-// launch when page is loaded
-$(document).ready( function()
-{
+// start app function
+function startApp() {
     // gui setup
     dwv.gui.setup();
 
@@ -19,7 +15,7 @@ $(document).ready( function()
         "fitToWindow": true,
         "gui": ["tool", "load", "help", "undo", "version", "tags"],
         "loaders": ["File", "Url"],
-        "tools": ["Scroll", "Window/Level", "Zoom/Pan", "Draw", "Livewire", "Filter"],
+        "tools": ["Scroll", "WindowLevel", "ZoomAndPan", "Draw", "Livewire", "Filter", "Floodfill"],
         "filters": ["Threshold", "Sharpen", "Sobel"],
         "shapes": ["Line", "Protractor", "Rectangle", "Roi", "Ellipse"],
         "isMobile": false
@@ -28,4 +24,15 @@ $(document).ready( function()
     // help
     // TODO Seems accordion only works when at end...
     $("#accordion").accordion({ collapsible: "true", active: "false", heightStyle: "content" });
+}
+
+// check browser support
+dwv.browser.check();
+//initialise i18n
+dwv.i18nInitialise("auto", "/dwv/demo/trunk");
+// launch when page is loaded
+$(document).ready( function()
+{
+    // and i18n is loaded
+    dwv.i18nOnLoaded( startApp );
 });
