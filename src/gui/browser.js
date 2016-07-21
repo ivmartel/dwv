@@ -38,14 +38,20 @@ dwv.browser.hasTypedArray = function()
     return "Uint8Array" in window && "Uint16Array" in window;
 };
 
+//only check at startup (since we propose a replacement)
+dwv.browser._hasTypedArraySlice = (typeof Uint8Array.prototype.slice !== "undefined");
+
 /**
  * Browser check for typed array slice method.
  * Missing in Internet Explorer 11.
  */
 dwv.browser.hasTypedArraySlice = function()
 {
-    return (typeof Uint8Array.prototype.slice !== "undefined");
+    return dwv.browser._hasTypedArraySlice;
 };
+
+// only check at startup (since we propose a replacement)
+dwv.browser._hasFloat64Array = ("Float64Array" in window);
 
 /**
  * Browser check for Float64Array array.
@@ -53,9 +59,11 @@ dwv.browser.hasTypedArraySlice = function()
  */
 dwv.browser.hasFloat64Array = function()
 {
-    return "Float64Array" in window;
+    return dwv.browser._hasFloat64Array;
 };
 
+//only check at startup (since we propose a replacement)
+dwv.browser._hasClampedArray = ("Uint8ClampedArray" in window);
 
 /**
  * Browser check for clamped array.
@@ -65,7 +73,7 @@ dwv.browser.hasFloat64Array = function()
  */
 dwv.browser.hasClampedArray = function()
 {
-    return "Uint8ClampedArray" in window;
+    return dwv.browser._hasClampedArray;
 };
 
 /**
@@ -125,5 +133,13 @@ dwv.browser.check = function()
         // Use Uint8Array instead... Not good
         // TODO Find better replacement!
         window.Uint8ClampedArray = window.Uint8Array;
+    }
+    // check Float64 array
+    if( !dwv.browser.hasFloat64Array() ) {
+        // silent fail with warning
+        console.warn("The Float64Array is not supported in this browser. This may impair performance. ");
+        // Use Float32Array instead... Not good
+        // TODO Find better replacement!
+        window.Float64Array = window.Float32Array;
     }
 };

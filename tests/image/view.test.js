@@ -64,8 +64,7 @@ QUnit.test("Test generate data MONO.", function (assert) {
     // create a view
     var view0 = new dwv.image.View(image0);
     // create the image data
-    // TODO Uint8ClampedArray not in phantom??
-    var imageData = {'width': size0, 'height': size0, 'data': new Uint8Array(size0*size0*4) };
+    var imageData = {'width': size0, 'height': size0, 'data': new Uint8ClampedArray(size0*size0*4) };
 
     // default window level
     view0.setWindowLevelMinMax();
@@ -112,8 +111,7 @@ QUnit.test("Test generate data RGB.", function (assert) {
     // create a view
     var view0 = new dwv.image.View(image0);
     // create the image data
-    // TODO Uint8ClampedArray not in phantom??
-    var imageData = {'width': size0, 'height': size0, 'data': new Uint8Array(size0*size0*4) };
+    var imageData = {'width': size0, 'height': size0, 'data': new Uint8ClampedArray(size0*size0*4) };
 
     // default window level
     view0.setWindowLevel(127, 255);
