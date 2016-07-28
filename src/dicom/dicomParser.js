@@ -624,11 +624,14 @@ dwv.dicom.DicomParser.prototype.cleanTags = function(arraybuffer, tags, blob){
     var array = new Uint8Array(arraybuffer);
     for(var t=0, tl=tags.length; t<tl; t++){
         var item = elem[tags[t]];
-        for(var i=item.offset, il=item.offset+item.vl; i<il; i++){
-            array[i] = 32;
+        var offset = item ? item.offset : undefined;
+        if(typeof offset !== 'undefined'){
+            for(var i=offset, il=offset+item.vl; i<il; i++){
+                array[i] = 32;
+            }
         }
     }
-    if(blob){ return new Blob([array]);}
+    if(blob){ return new Blob([array], {type: 'application/dicom'});}
     return array;
 };
 

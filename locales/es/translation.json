@@ -1,0 +1,203 @@
+{
+    "basics": {
+        "open": "Abrir",
+        "close": "Cerrar",
+        "help": "Ayuda",
+        "back": "Atrás",
+        "reset": "Reiniciar",
+        "apply": "Aplicar",
+        "name": "Nombre",
+        "value": "Valor",
+        "dicomTags": "Tags DICOM",
+        "columns": "Columnas",
+        "group": "Grupo",
+        "element": "Elemento",
+        "vr": "VR",
+        "vl": "VL",
+        "presets": "Preajustes",
+        "toolbox": "Herramientas",
+        "history": "Historico",
+        "image": "Imagen",
+        "info": "Info",
+        "downloadState": "Descargar estado"
+    },
+    "colour": {
+        "Yellow": {
+            "name": "Amarillo"
+        },
+        "Red": {
+            "name": "Rojo"
+        },
+        "White": {
+            "name": "Blanco"
+        },
+        "Green": {
+            "name": "Verde"
+        },
+        "Blue": {
+            "name": "Azul"
+        },
+        "Lime": {
+            "name": "Lima"
+        },
+        "Fuchsia": {
+            "name": "Fucsia"
+        },
+        "Black": {
+            "name": "Negro"
+        }
+    },
+    "unit": {
+        "mm": "mm",
+        "cm2": "cm2"
+    },
+    "help": {
+        "intro": {
+            "p0": "DWV (DICOM Web Viewer) es un visor de imagen médica de código abierto sin instalación (zero footprint). Usa javascript y HTML5 como tecnologías, lo que significa que puede puede utilizarse en cualquier sobre cualquier plataforma con un navegador web moderno (ordenadores, tablets, teléfonos e incluso pantallas modernas). Puede cargar datos en formato DICOM (el estandard para imagen médica como RM, CT, Echo, Mammogragías, MN...) tanto en local como en remoto y proporciona herramientas estandard para su manipulación tales como contraste, zoom, arrastrar, posibilidad de dibujar regiones sobre las regiones y filtros como los de tolarancia(threshold) o afilado(sharpening)."
+            "p1": "Todas las etiquetas DICOM están disponibles en una tabla que permite hacer búsquedas, presionando las etiquetas o el boton de la cuadricula. Se puede escoger si mostrar la información sobre la imagen en una capa superpuesta al presionar el boton 'info' o i."
+        },
+        "tool_intro": "Cada herramienta define las pobibles interacciones. Aquí se muestran las herramientas disponibles:"
+    },
+    "tool": {
+        "WindowLevel": {
+            "name": "Window/Level",
+            "brief": "Cambia la ventana y el nivel de la imagen.",
+            "mouse_drag": "Arrastrando el ratón sobre la imagen en horizontal se modifica la ventana y al arrastrarlo en vertical se modifica el nivel."
+            "double_click": "Un doble click centrará la ventana y el nivel ajustandolo a la intensidad de punto sobre el que se hya clicado.",
+            "touch_drag": "Deslizando el dedo sobre la imagen en horizontal se modifica la ventana y al arrastrarlo en vertical se modifica el nivel."
+        },
+        "ZoomAndPan": {
+            "name": "Zoom/Pan",
+            "brief": "La herramienta de Zoom/Pan permite hacer zoom y mover la imagen.",
+            "mouse_wheel": "La rueda del ratón se puede usar para hacer zoom en la imagen.",
+            "mouse_drag": "A single mouse drag drags the image in the desired direction.",
+            "twotouch_pinch": "A pinch in or out allows to zoom the image.",
+            "touch_drag": "A single touch drag drags the image in the desired direction."
+        },
+        "Scroll": {
+            "name": "Desplazamiento",
+            "brief": "La herramienta de desplazamiento permite navegar entre los diferentes cortes.",
+            "mouse_drag": "El arrastre vertical del ratón cambia el corte actual.",
+            "touch_drag": "El toque vertical cambia el corte actual."
+        },
+        "Draw": {
+            "name": "Dibujo",
+            "brief": "Le permite dibujar formas sobre la imagen actual. Elija la forma y el color de los menús desplegables. Una vez creadas, las formas pueden ser editadas tras seleccionarlas. Los puntos de anclaje van a aparecer y permitirán la edición de forma específica. Arrastre el dibujo sobre la cruz roja para eliminarlo. Todas las acciones que se pueden deshacer",
+            "mouse_drag": "Un solo arrastre vertical del ratón dibuja la forma deseada.",
+            "touch_drag": "Un solo toque vertical dibuja la forma deseada."
+        },
+        "Filter": {
+            "name": "Filtro",
+            "brief": "Algunos simples filtros de imagen están disponibles: un filtro de umbral para limitar las intensidades de las imagenes entre un mínimo y máximo elegido, un filtro de nitidez para enrollar la imagen con una matriz de nitidez, un filtro de Sobel para obtener el gradiente de la imagen en ambas direcciones."
+            "A few simple image filters are available: a Threshold filter to limit the image intensities between a chosen minimum and maximum, a Sharpen filter to convolute the image with a sharpen matrix, a Sobel filter to get the gradient of the image in both directions."
+        },
+        "Livewire": {
+            "name": "Livewire",
+            "brief": "La herramienta Livewire es una herramienta de segmentación semiautomática que propone caminos al usuario según los bordes de intensidad. Haga clic una vez para inicializarla y luego mueva el ratón para ver las rutas propuestas. Haga clic de nuevo para construir su contorno. El proceso se detiene cuando se hace clic en el primer punto iniial. CUIDADO: el proceso puede tomar tiempo!"
+        },
+        "info": {
+            "position": "Pos = {{value}}",
+            "value": "Valor = {{value}}",
+            "window_center": "CentrodeVentana = {{value}}",
+            "window_width": "AnchodeVentana = {{value}}"
+        }
+    },
+    "shape": {
+        "Line": {
+            "name": "Linea"
+        },
+        "Protractor": {
+            "name": "Ángulo"
+        },
+        "Rectangle": {
+            "name": "Rectangulo"
+        },
+        "Roi": {
+            "name": "Roi"
+        },
+        "Ellipse": {
+            "name": "Elipse"
+        }
+    },
+    "io": {
+        "File": {
+            "name": "Archivo"
+        },
+        "Url": {
+            "name": "Url"
+        },
+        "GoogleDrive": {
+            "name": "GoogleDrive",
+            "auth": {
+                "title": "Google Drive Authorization",
+                "body": "Por favor, autorice DWV a acceder a su cuenta de Google Drive. \nEsto sólo es necesario la primera vez que conecta.",
+                "button": "Autorizar"
+            }
+        },
+        "Dropbox": {
+            "name": "Dropbox"
+        }
+    },
+    "filter": {
+        "Threshold": {
+            "name": "Límite"
+        },
+        "Sharpen": {
+            "name": "Agudizar"
+        },
+        "Sobel": {
+            "name": "Sobel"
+        }
+    },
+    "colourmap": {
+        "plain": {
+            "name": "Plano"
+        },
+        "invplain": {
+            "name": "Inveso"
+        },
+        "rainbow": {
+            "name": "Arcoiris"
+        },
+        "hot": {
+            "name": "Calor"
+        },
+        "hotiron": {
+            "name": "Calor Hierro"
+        },
+        "pet": {
+            "name": "Pet"
+        },
+        "hotmetalblue": {
+            "name": "Metal caliente azul"
+        },
+        "pet20step": {
+            "name": "Pet 20 pasos"
+        }
+    },
+    "wl": {
+        "presets": {
+            "mediastinum": {
+                "name": "Mediastino"
+            },
+            "lung": {
+                "name": "Pulmón"
+            },
+            "bone": {
+                "name": "Hueso"
+            },
+            "brain": {
+                "name": "Cerebro"
+            },
+            "head": {
+                "name": "Cabeza"
+            },
+            "manual": {
+                "name": "Manual"
+            },
+            "minmax": {
+                "name": "Min/Max"
+            }
+        }
+    }
+}
