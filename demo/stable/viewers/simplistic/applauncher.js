@@ -19,8 +19,8 @@ function startApp() {
 
 // check browser support
 dwv.browser.check();
-//initialise i18n
-dwv.i18nInitialise("auto", "/dwv/demo/trunk");
+// initialise i18n
+dwv.i18nInitialise("auto", "/dwv/demo/stable");
 // launch when page is loaded
 document.addEventListener("DOMContentLoaded", function (/*event*/)
 {
