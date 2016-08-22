@@ -25,8 +25,6 @@ dwv.App = function ()
     // Number of slices to load
     var nSlicesToLoad = 0;
 
-    // Data decoders scripts
-    var decoderScripts = null;
     // Default character set
     var defaultCharacterSet;
 
@@ -347,16 +345,6 @@ dwv.App = function ()
             window.onresize = this.onResize;
         }
 
-        // use web workers
-        if ( config.useWebWorkers ) {
-            // data decoders
-            var pathToRoot = "../..";
-            decoderScripts = [];
-            decoderScripts.jpeg2000 = pathToRoot + "/ext/pdfjs/decode-jpeg2000.js";
-            decoderScripts["jpeg-lossless"] = pathToRoot + "/ext/rii-mango/decode-jpegloss.js";
-            decoderScripts["jpeg-baseline"] = pathToRoot + "/ext/notmasteryet/decode-jpegbaseline.js";
-        }
-        
         // default character set
         if ( typeof config.defaultCharacterSet !== "undefined" ) {
             defaultCharacterSet = config.defaultCharacterSet;
@@ -474,7 +462,6 @@ dwv.App = function ()
         nSlicesToLoad = files.length;
         // create IO
         var fileIO = new dwv.io.File();
-        fileIO.setDecoderScripts(decoderScripts);
         fileIO.setDefaultCharacterSet(defaultCharacterSet);
         fileIO.onload = function (data) {
             if ( image ) {
@@ -547,7 +534,6 @@ dwv.App = function ()
         nSlicesToLoad = urls.length;
         // create IO
         var urlIO = new dwv.io.Url();
-        urlIO.setDecoderScripts(decoderScripts);
         urlIO.setDefaultCharacterSet(defaultCharacterSet);
         urlIO.onload = function (data) {
             if ( image ) {

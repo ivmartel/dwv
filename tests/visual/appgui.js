@@ -10,6 +10,13 @@
 // Default window level presets.
 dwv.tool.defaultpresets = {};
 
+// Image decoders (for web workers)
+dwv.image.decoderScripts = {
+    "jpeg2000": "../../ext/pdfjs/decode-jpeg2000.js",
+    "jpeg-lossless": "../../ext/rii-mango/decode-jpegloss.js",
+    "jpeg-baseline": "../../ext/notmasteryet/decode-jpegbaseline.js"
+};
+
 // Window
 dwv.gui.getWindowSize = dwv.gui.base.getWindowSize;
 // get element

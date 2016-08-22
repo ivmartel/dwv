@@ -863,38 +863,24 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
     var needDecompression = (algoName !== null);
     // TODO Find a better way!
-    if (pixelBuffer.length > 1 &&  needDecompression) {
+    if (pixelBuffer.length > 1 && needDecompression) {
 
         console.warn("Temporary limitation: only decoding the first 20 frames...");
         
-        var pool = new dwv.utils.ThreadPool(15);
-        pool.init();
-        
+        var bitsAllocated = dicomElements.getFromKey("x00280100");
         var pixelRep = dicomElements.getFromKey("x00280103");
         var isSigned = (pixelRep === 1);
-        var bitsAllocated = dicomElements.getFromKey("x00280100");
-        // data decoders
-        var pathToRoot = "../..";
-        var decoderScripts = [];
-        decoderScripts.jpeg2000 = pathToRoot + "/ext/pdfjs/decode-jpeg2000.js";
-        decoderScripts["jpeg-lossless"] = pathToRoot + "/ext/rii-mango/decode-jpegloss.js";
-        decoderScripts["jpeg-baseline"] = pathToRoot + "/ext/notmasteryet/decode-jpegbaseline.js";
-        var script = decoderScripts[algoName];
-        
+
         // worker callback to replace the coded by the decoded frame content
         var func = function (frame) {
             return function (event) { pixelBuffer[frame] = event.data[0]; };
         };
 
+        var pixelDecoder = new dwv.image.PixelBufferDecoder();
         var nFrames = 20; //pixelBuffer.length;
         for (var f = 1; f < nFrames; ++f) {
-            // decode pixel buffer
-            var workerTask = new dwv.utils.WorkerTask(script, func(f), {
-                'buffer': pixelBuffer[f],
-                'bitsAllocated': bitsAllocated,
-                'isSigned': isSigned } );
-            // add to thread pool
-            pool.addWorkerTask(workerTask);
+            pixelDecoder.decode(pixelBuffer[f], algoName, 
+                bitsAllocated, isSigned, func(f));
         }
     }
 

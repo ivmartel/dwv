@@ -26,12 +26,6 @@ dwv.io.Url = function ()
      * @type Array
      */
     var progressList = [];
-    /**
-     * List of data decoders scripts.
-     * @private
-     * @type Array
-     */
-    var decoderScripts = [];
 
     /**
      * The default character set (optional).
@@ -92,20 +86,6 @@ dwv.io.Url = function ()
         return totPercent;
     };
     
-    /**
-     * Set the web workers decoder scripts.
-     * @param {Array} list The list of decoder scripts.
-     */
-    this.setDecoderScripts = function (list) {
-        decoderScripts = list;
-    };
-    /**
-     * Get the web workers decoder scripts.
-     * @return {Array} list The list of decoder scripts.
-     */
-    this.getDecoderScripts = function () {
-        return decoderScripts;
-    };
 }; // class Url
 
 /**
@@ -193,7 +173,7 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     };
 
     // DICOM buffer to dwv.image.View (asynchronous)
-    var db2v = new dwv.image.DicomBufferToView(this.getDecoderScripts());
+    var db2v = new dwv.image.DicomBufferToView();
     db2v.setDefaultCharacterSet(this.getDefaultCharacterSet());
     // callback
     var onLoadDicomBuffer = function (response)

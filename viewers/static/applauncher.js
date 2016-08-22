@@ -26,9 +26,16 @@ function startApp() {
     $("#accordion").accordion({ collapsible: "true", active: "false", heightStyle: "content" });
 }
 
+// Image decoders (for web workers)
+dwv.image.decoderScripts = {
+    "jpeg2000": "../../ext/pdfjs/decode-jpeg2000.js",
+    "jpeg-lossless": "../../ext/rii-mango/decode-jpegloss.js",
+    "jpeg-baseline": "../../ext/notmasteryet/decode-jpegbaseline.js"
+};
+
 // check browser support
 dwv.browser.check();
-//initialise i18n
+// initialise i18n
 dwv.i18nInitialise();
 // launch when page is loaded
 $(document).ready( function()
