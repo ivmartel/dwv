@@ -17,9 +17,16 @@ function startApp() {
     dwv.gui.appendResetHtml(myapp);
 }
 
+// Image decoders (for web workers)
+dwv.image.decoderScripts = {
+    "jpeg2000": "../../ext/pdfjs/decode-jpeg2000.js",
+    "jpeg-lossless": "../../ext/rii-mango/decode-jpegloss.js",
+    "jpeg-baseline": "../../ext/notmasteryet/decode-jpegbaseline.js"
+};
+
 // check browser support
 dwv.browser.check();
-//initialise i18n
+// initialise i18n
 dwv.i18nInitialise("auto", "/dwv/demo/trunk");
 // launch when page is loaded
 document.addEventListener("DOMContentLoaded", function (/*event*/)

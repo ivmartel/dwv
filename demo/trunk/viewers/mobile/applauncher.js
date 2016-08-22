@@ -43,8 +43,7 @@ function startApp() {
         "tools": ["Scroll", "WindowLevel", "ZoomAndPan", "Draw", "Livewire", "Filter", "Floodfill"],
         "filters": ["Threshold", "Sharpen", "Sobel"],
         "shapes": ["Line", "Protractor", "Rectangle", "Roi", "Ellipse"],
-        "isMobile": true,
-        "useWebWorkers": true,
+        "isMobile": true
         //"defaultCharacterSet": "chinese"
     });
 
@@ -52,6 +51,12 @@ function startApp() {
     $(".layerContainer").height(size.height);
 }
 
+// Image decoders (for web workers)
+dwv.image.decoderScripts = {
+    "jpeg2000": "../../ext/pdfjs/decode-jpeg2000.js",
+    "jpeg-lossless": "../../ext/rii-mango/decode-jpegloss.js",
+    "jpeg-baseline": "../../ext/notmasteryet/decode-jpegbaseline.js"
+};
 
 // check browser support
 dwv.browser.check();
