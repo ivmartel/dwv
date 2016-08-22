@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>dwv Class: Path</title>
+	<title>dwv Class: PixelBufferDecoder</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -84,15 +84,15 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: Path</h1>
+	<h1 class="page-title">Class: PixelBufferDecoder</h1>
 <section>
 
 <header>
     
         <h2>
-            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.math.html">.math</a>.</span>
+            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.image.html">.image</a>.</span>
         
-        Path
+        PixelBufferDecoder
         </h2>
         
     
@@ -105,7 +105,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="Path"><span class="type-signature"></span>new Path(inputPointArray, inputControlPointIndexArray)</h4>
+    <h4 class="name" id="PixelBufferDecoder"><span class="type-signature"></span>new PixelBufferDecoder()</h4>
     
     
 </dt>
@@ -113,7 +113,9 @@
 
     
     <div class="description">
-        Path shape.
+        Decode a pixel buffer.
+Switches between a asynchronous/synchronous mode according to the definition of the 
+'dwv.image.decoderScripts' variable.
     </div>
     
 
@@ -122,82 +124,6 @@
     
 
     
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>inputPointArray</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The list of Point2D that make the path (optional).</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>inputControlPointIndexArray</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The list of control point of path,
- as indexes (optional).
-Note: first and last point do not need to be equal.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
     
 
     
@@ -235,8 +161,8 @@ Note: first and last point do not need to be equal.</td>
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_math_shapes.js.html">src/math/shapes.js</a>,
-				 <a href="src_math_shapes.js.html#sunlight-1-line-328">line 328</a>
+				<a href="src_image_decoder.js.html">src/image/decoder.js</a>,
+				 <a href="src_image_decoder.js.html#sunlight-1-line-119">line 119</a>
 			</li>
 		</ul>
 	</dd>
@@ -278,172 +204,6 @@ Note: first and last point do not need to be equal.</td>
 
     
 
-    
-        <h3 class="subsection-title">Members</h3>
-
-        <dl>
-            
-<hr>
-<dt class="name" id="controlPointIndexArray">
-    <h4><span class="type-signature"></span>controlPointIndexArray<span class="type-signature"> :Array</span></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        List of control points.
-    </div>
-    
-
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">Array</span>
-
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_math_shapes.js.html">src/math/shapes.js</a>,
-				 <a href="src_math_shapes.js.html#sunlight-1-line-339">line 339</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt class="name" id="pointArray">
-    <h4><span class="type-signature"></span>pointArray<span class="type-signature"> :Array</span></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        List of points.
-    </div>
-    
-
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">Array</span>
-
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_math_shapes.js.html">src/math/shapes.js</a>,
-				 <a href="src_math_shapes.js.html#sunlight-1-line-334">line 334</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-</dd>
-
-        </dl>
     
 
     
@@ -453,7 +213,7 @@ Note: first and last point do not need to be equal.</td>
             
 <hr>
 <dt>
-    <h4 class="name" id="addControlPoint"><span class="type-signature"></span>addControlPoint(point)</h4>
+    <h4 class="name" id="decode"><span class="type-signature"></span>decode(pixelBuffer, algoName, bitsAllocated, isSigned, callback)</h4>
     
     
 </dt>
@@ -461,7 +221,7 @@ Note: first and last point do not need to be equal.</td>
 
     
     <div class="description">
-        Add a control point to the path.
+        Get data from an input buffer using a DICOM parser.
     </div>
     
 
@@ -496,283 +256,7 @@ Note: first and last point do not need to be equal.</td>
 
         <tr>
             
-                <td class="name"><code>point</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The Point2D to make a control point.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_math_shapes.js.html">src/math/shapes.js</a>,
-				 <a href="src_math_shapes.js.html#sunlight-1-line-387">line 387</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="addPoint"><span class="type-signature"></span>addPoint(point)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Add a point to the path.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>point</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The Point2D to add.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_math_shapes.js.html">src/math/shapes.js</a>,
-				 <a href="src_math_shapes.js.html#sunlight-1-line-379">line 379</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="addPoints"><span class="type-signature"></span>addPoints(points)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Add points to the path.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>points</code></td>
+                <td class="name"><code>pixelBuffer</code></td>
             
 
             <td class="type">
@@ -789,134 +273,20 @@ Note: first and last point do not need to be equal.</td>
 
             
 
-            <td class="description last">The list of Point2D to add.</td>
+            <td class="description last">The input data buffer.</td>
         </tr>
 
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_math_shapes.js.html">src/math/shapes.js</a>,
-				 <a href="src_math_shapes.js.html#sunlight-1-line-401">line 401</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="appenPath"><span class="type-signature"></span>appenPath(other)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Append a Path to this one.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
     
 
         <tr>
             
-                <td class="name"><code>other</code></td>
+                <td class="name"><code>algoName</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Path</span>
+<span class="param-type">String</span>
 
 
 
@@ -927,240 +297,14 @@ Note: first and last point do not need to be equal.</td>
 
             
 
-            <td class="description last">The Path to append.</td>
+            <td class="description last">The decompression algorithm name.</td>
         </tr>
 
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_math_shapes.js.html">src/math/shapes.js</a>,
-				 <a href="src_math_shapes.js.html#sunlight-1-line-409">line 409</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getLength"><span class="type-signature"></span>getLength()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get the length of the path.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_math_shapes.js.html">src/math/shapes.js</a>,
-				 <a href="src_math_shapes.js.html#sunlight-1-line-371">line 371</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    The length of the path.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Number</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getPoint"><span class="type-signature"></span>getPoint(index)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get a point of the list.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
     
 
         <tr>
             
-                <td class="name"><code>index</code></td>
+                <td class="name"><code>bitsAllocated</code></td>
             
 
             <td class="type">
@@ -1177,262 +321,124 @@ Note: first and last point do not need to be equal.</td>
 
             
 
-            <td class="description last">The index of the point to get (beware, no size check).</td>
+            <td class="description last">The bits allocated per element in the buffer.</td>
         </tr>
 
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_math_shapes.js.html">src/math/shapes.js</a>,
-				 <a href="src_math_shapes.js.html#sunlight-1-line-348">line 348</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    The Point2D at the given index.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="isControlPoint"><span class="type-signature"></span>isControlPoint(point)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Is the given point a control point.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
     
 
         <tr>
             
-                <td class="name"><code>point</code></td>
+                <td class="name"><code>isSigned</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The Point2D to check.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_math_shapes.js.html">src/math/shapes.js</a>,
-				 <a href="src_math_shapes.js.html#sunlight-1-line-357">line 357</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    True if a control point.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
 <span class="param-type">Boolean</span>
 
 
 
-    </dd>
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Is the data signed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The callback on the conversion.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_decoder.js.html">src/image/decoder.js</a>,
+				 <a href="src_image_decoder.js.html#sunlight-1-line-137">line 137</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
 </dl>
 
 
-        
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 
     
 </dd>

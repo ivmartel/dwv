@@ -25,8 +25,6 @@ dwv.App = function ()
     // Number of slices to load
     var nSlicesToLoad = 0;
 
-    // Data decoders scripts
-    var decoderScripts = null;
     // Default character set
     var defaultCharacterSet;
 
@@ -347,16 +345,6 @@ dwv.App = function ()
             window.onresize = this.onResize;
         }
 
-        // use web workers
-        if ( config.useWebWorkers ) {
-            // data decoders
-            var pathToRoot = "../..";
-            decoderScripts = [];
-            decoderScripts.jpeg2000 = pathToRoot + "/ext/pdfjs/decode-jpeg2000.js";
-            decoderScripts["jpeg-lossless"] = pathToRoot + "/ext/rii-mango/decode-jpegloss.js";
-            decoderScripts["jpeg-baseline"] = pathToRoot + "/ext/notmasteryet/decode-jpegbaseline.js";
-        }
-        
         // default character set
         if ( typeof config.defaultCharacterSet !== "undefined" ) {
             defaultCharacterSet = config.defaultCharacterSet;
@@ -474,7 +462,6 @@ dwv.App = function ()
         nSlicesToLoad = files.length;
         // create IO
         var fileIO = new dwv.io.File();
-        fileIO.setDecoderScripts(decoderScripts);
         fileIO.setDefaultCharacterSet(defaultCharacterSet);
         fileIO.onload = function (data) {
             if ( image ) {
@@ -547,7 +534,6 @@ dwv.App = function ()
         nSlicesToLoad = urls.length;
         // create IO
         var urlIO = new dwv.io.Url();
-        urlIO.setDecoderScripts(decoderScripts);
         urlIO.setDefaultCharacterSet(defaultCharacterSet);
         urlIO.onload = function (data) {
             if ( image ) {
@@ -10518,6 +10504,165 @@ dwv.gui.base.Undo = function (app)
 ;// namespaces
 var dwv = dwv || {};
 dwv.image = dwv.image || {};
+
+// JPEG Baseline
+var hasJpegBaselineDecoder = (typeof JpegImage !== "undefined");
+var JpegImage = JpegImage || {};
+// JPEG Lossless
+var hasJpegLosslessDecoder = (typeof jpeg !== "undefined") &&
+    (typeof jpeg.lossless !== "undefined");
+var jpeg = jpeg || {};
+jpeg.lossless = jpeg.lossless || {};
+// JPEG 2000
+var hasJpeg2000Decoder = (typeof JpxImage !== "undefined");
+var JpxImage = JpxImage || {};
+
+/**
+ * Asynchronous pixel buffer decoder.
+ * @param {Array} decoderScripts An array of decoder scripts paths.
+ */
+dwv.image.AsynchPixelBufferDecoder = function (decoderScripts)
+{
+    // initialise the thread pool 
+    var pool = new dwv.utils.ThreadPool(15);
+    pool.init();
+
+    /**
+     * Decode a pixel buffer.
+     * @param {Array} pixelBuffer The pixel buffer.
+     * @param {String} algoName The decompression algorithm name.
+     * @param {Number} bitsAllocated The bits allocated per element in the buffer.
+     * @param {Boolean} isSigned Is the data signed.
+     * @param {Function} callback Callback function to handle decoded data.
+     */
+    this.decode = function (pixelBuffer, algoName, bitsAllocated, isSigned, callback) {
+        var script = decoderScripts[algoName];
+        if ( typeof script === "undefined" ) {
+            throw new Error("No script provided to decompress '" + algoName + "' data.");
+        }
+        var workerTask = new dwv.utils.WorkerTask(script, callback, {
+            'buffer': pixelBuffer,
+            'bitsAllocated': bitsAllocated,
+            'isSigned': isSigned } );
+        pool.addWorkerTask(workerTask);
+    };
+};
+
+/**
+ * Synchronous pixel buffer decoder.
+ */
+dwv.image.SynchPixelBufferDecoder = function ()
+{
+    /**
+     * Decode a pixel buffer.
+     * @param {Array} pixelBuffer The pixel buffer.
+     * @param {String} algoName The decompression algorithm name.
+     * @param {Number} bitsAllocated The bits allocated per element in the buffer.
+     * @param {Boolean} isSigned Is the data signed.
+     * @return {Array} The decoded pixel buffer.
+     */
+    this.decode = function (pixelBuffer, algoName, bitsAllocated, isSigned) {
+        var decoder = null;
+        var decodedBuffer = null;
+        if( algoName === "jpeg-lossless" ) {
+            if ( !hasJpegLosslessDecoder ) {
+                throw new Error("No JPEG Lossless decoder provided");
+            }
+            // bytes per element
+            var bpe = bitsAllocated / 8;
+            var buf = new Uint8Array( pixelBuffer );
+            decoder = new jpeg.lossless.Decoder();
+            var decoded = decoder.decode(buf.buffer, 0, buf.buffer.byteLength, bpe);
+            if (bitsAllocated === 8) {
+                if (isSigned) {
+                    decodedBuffer = new Int8Array(decoded.buffer);
+                }
+                else {
+                    decodedBuffer = new Uint8Array(decoded.buffer);
+                }
+            }
+            else if (bitsAllocated === 16) {
+                if (isSigned) {
+                    decodedBuffer = new Int16Array(decoded.buffer);
+                }
+                else {
+                    decodedBuffer = new Uint16Array(decoded.buffer);
+                }
+            }
+        }
+        else if ( algoName === "jpeg-baseline" ) {
+            if ( !hasJpegBaselineDecoder ) {
+                throw new Error("No JPEG Baseline decoder provided");
+            }
+            decoder = new JpegImage();
+            decoder.parse( pixelBuffer );
+            decodedBuffer = decoder.getData(decoder.width,decoder.height);
+        }
+        else if( algoName === "jpeg2000" ) {
+            if ( !hasJpeg2000Decoder ) {
+                throw new Error("No JPEG 2000 decoder provided");
+            }
+            // decompress pixel buffer into Int16 image
+            decoder = new JpxImage();
+            decoder.parse( pixelBuffer );
+            // set the pixel buffer
+            decodedBuffer = decoder.tiles[0].items;
+        }
+        // return result as array
+        return [decodedBuffer];
+    };
+};
+
+/**
+ * Decode a pixel buffer.
+ * Switches between a asynchronous/synchronous mode according to the definition of the 
+ * 'dwv.image.decoderScripts' variable.
+ * @constructor
+ */
+dwv.image.PixelBufferDecoder = function ()
+{
+    /**
+     * Asynchronous decoder.
+     * Defined only once.
+     * @private
+     * @type Object
+     */ 
+    var asynchDecoder = null;
+    
+    /**
+     * Get data from an input buffer using a DICOM parser.
+     * @param {Array} pixelBuffer The input data buffer.
+     * @param {String} algoName The decompression algorithm name.
+     * @param {Number} bitsAllocated The bits allocated per element in the buffer.
+     * @param {Boolean} isSigned Is the data signed.
+     * @param {Object} callback The callback on the conversion.
+     */
+    this.decode = function (pixelBuffer, algoName, bitsAllocated, isSigned, callback)
+    {
+        // run asynchronous if we have scripts
+        if (typeof dwv.image.decoderScripts !== "undefined") {
+            if (!asynchDecoder) {
+                // create the decoder (only once)
+                asynchDecoder = new dwv.image.AsynchPixelBufferDecoder(dwv.image.decoderScripts);
+            }
+            // decode and call the callback
+            asynchDecoder.decode(pixelBuffer, algoName, 
+                    bitsAllocated, isSigned, callback);
+        }
+        else {
+            // create the decoder
+            var synchDecoder = new dwv.image.SynchPixelBufferDecoder();
+            // decode
+            var decodedBuffer = synchDecoder.decode(pixelBuffer, algoName, 
+                    bitsAllocated, isSigned);
+            // call the callback
+            callback({data: decodedBuffer});
+        }
+    };
+};
+;// namespaces
+var dwv = dwv || {};
+dwv.image = dwv.image || {};
 /** @namespace */
 dwv.image.filter = dwv.image.filter || {};
 
@@ -11802,38 +11947,24 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
     var needDecompression = (algoName !== null);
     // TODO Find a better way!
-    if (pixelBuffer.length > 1 &&  needDecompression) {
+    if (pixelBuffer.length > 1 && needDecompression) {
 
         console.warn("Temporary limitation: only decoding the first 20 frames...");
         
-        var pool = new dwv.utils.ThreadPool(15);
-        pool.init();
-        
+        var bitsAllocated = dicomElements.getFromKey("x00280100");
         var pixelRep = dicomElements.getFromKey("x00280103");
         var isSigned = (pixelRep === 1);
-        var bitsAllocated = dicomElements.getFromKey("x00280100");
-        // data decoders
-        var pathToRoot = "../..";
-        var decoderScripts = [];
-        decoderScripts.jpeg2000 = pathToRoot + "/ext/pdfjs/decode-jpeg2000.js";
-        decoderScripts["jpeg-lossless"] = pathToRoot + "/ext/rii-mango/decode-jpegloss.js";
-        decoderScripts["jpeg-baseline"] = pathToRoot + "/ext/notmasteryet/decode-jpegbaseline.js";
-        var script = decoderScripts[algoName];
-        
+
         // worker callback to replace the coded by the decoded frame content
         var func = function (frame) {
             return function (event) { pixelBuffer[frame] = event.data[0]; };
         };
 
+        var pixelDecoder = new dwv.image.PixelBufferDecoder();
         var nFrames = 20; //pixelBuffer.length;
         for (var f = 1; f < nFrames; ++f) {
-            // decode pixel buffer
-            var workerTask = new dwv.utils.WorkerTask(script, func(f), {
-                'buffer': pixelBuffer[f],
-                'bitsAllocated': bitsAllocated,
-                'isSigned': isSigned } );
-            // add to thread pool
-            pool.addWorkerTask(workerTask);
+            pixelDecoder.decode(pixelBuffer[f], algoName, 
+                bitsAllocated, isSigned, func(f));
         }
     }
 
@@ -12262,18 +12393,6 @@ dwv.image.lut.test = {
 var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
-// JPEG Baseline
-var hasJpegBaselineDecoder = (typeof JpegImage !== "undefined");
-var JpegImage = JpegImage || {};
-// JPEG Lossless
-var hasJpegLosslessDecoder = (typeof jpeg !== "undefined") &&
-    (typeof jpeg.lossless !== "undefined");
-var jpeg = jpeg || {};
-jpeg.lossless = jpeg.lossless || {};
-// JPEG 2000
-var hasJpeg2000Decoder = (typeof JpxImage !== "undefined");
-var JpxImage = JpxImage || {};
-
 /**
  * Get data from an input image using a canvas.
  * @param {Image} Image The DOM Image.
@@ -12330,117 +12449,11 @@ dwv.image.getViewFromDOMImage = function (image)
 };
 
 /**
- * Asynchronous pixel buffer decoder.
- * @param {Array} decoderScripts An array of decoder scripts paths.
- */
-dwv.image.AsynchPixelBufferDecoder = function (decoderScripts)
-{
-    // initialise the thread pool 
-    var pool = new dwv.utils.ThreadPool(15);
-    pool.init();
-
-    /**
-     * Decode a pixel buffer.
-     * @param {Array} pixelBuffer The pixel buffer.
-     * @param {String} algoName The decompression algorithm name.
-     * @param {Number} bitsAllocated The bits allocated per element in the buffer.
-     * @param {Boolean} isSigned Is the data signed.
-     * @param {Function} callback Callback function to handle decoded data.
-     */
-    this.decode = function (pixelBuffer, algoName, bitsAllocated, isSigned, callback) {
-        var script = decoderScripts[algoName];
-        if ( typeof script === "undefined" ) {
-            throw new Error("No script provided to decompress '" + algoName + "' data.");
-        }
-        var workerTask = new dwv.utils.WorkerTask(script, callback, {
-            'buffer': pixelBuffer,
-            'bitsAllocated': bitsAllocated,
-            'isSigned': isSigned } );
-        pool.addWorkerTask(workerTask);
-    };
-};
-
-/**
- * Synchronous pixel buffer decoder.
- */
-dwv.image.SynchPixelBufferDecoder = function ()
-{
-    /**
-     * Decode a pixel buffer.
-     * @param {Array} pixelBuffer The pixel buffer.
-     * @param {String} algoName The decompression algorithm name.
-     * @param {Number} bitsAllocated The bits allocated per element in the buffer.
-     * @param {Boolean} isSigned Is the data signed.
-     * @return {Array} The decoded pixel buffer.
-     */
-    this.decode = function (pixelBuffer, algoName, bitsAllocated, isSigned) {
-        var decoder = null;
-        var decodedBuffer = null;
-        if( algoName === "jpeg-lossless" ) {
-            if ( !hasJpegLosslessDecoder ) {
-                throw new Error("No JPEG Lossless decoder provided");
-            }
-            // bytes per element
-            var bpe = bitsAllocated / 8;
-            var buf = new Uint8Array( pixelBuffer );
-            decoder = new jpeg.lossless.Decoder();
-            var decoded = decoder.decode(buf.buffer, 0, buf.buffer.byteLength, bpe);
-            if (bitsAllocated === 8) {
-                if (isSigned) {
-                    decodedBuffer = new Int8Array(decoded.buffer);
-                }
-                else {
-                    decodedBuffer = new Uint8Array(decoded.buffer);
-                }
-            }
-            else if (bitsAllocated === 16) {
-                if (isSigned) {
-                    decodedBuffer = new Int16Array(decoded.buffer);
-                }
-                else {
-                    decodedBuffer = new Uint16Array(decoded.buffer);
-                }
-            }
-        }
-        else if ( algoName === "jpeg-baseline" ) {
-            if ( !hasJpegBaselineDecoder ) {
-                throw new Error("No JPEG Baseline decoder provided");
-            }
-            decoder = new JpegImage();
-            decoder.parse( pixelBuffer );
-            decodedBuffer = decoder.getData(decoder.width,decoder.height);
-        }
-        else if( algoName === "jpeg2000" ) {
-            if ( !hasJpeg2000Decoder ) {
-                throw new Error("No JPEG 2000 decoder provided");
-            }
-            // decompress pixel buffer into Int16 image
-            decoder = new JpxImage();
-            decoder.parse( pixelBuffer );
-            // set the pixel buffer
-            decodedBuffer = decoder.tiles[0].items;
-        }
-        // return result as array
-        return [decodedBuffer];
-    };
-};
-
-/**
  * Create a dwv.image.View from a DICOM buffer.
- * @param {Array} decoderScripts An array of decoder scripts paths.
  * @constructor
  */
-dwv.image.DicomBufferToView = function (decoderScripts)
+dwv.image.DicomBufferToView = function ()
 {
-    // flag to use workers or not to decode data
-    var useWorkers = false;
-    if (typeof decoderScripts !== "undefined" && decoderScripts instanceof Array) {
-        useWorkers = true;
-    }
-
-    // asynchronous decoder
-    var asynchDecoder = null;
-    
     /**
      * The default character set (optional).
      * @private
@@ -12457,11 +12470,19 @@ dwv.image.DicomBufferToView = function (decoderScripts)
     };
 
     /**
+     * Pixel buffer decoder. 
+     * Define only once to allow optional asynchronous mode.
+     * @private
+     * @type Object
+     */ 
+    var pixelDecoder = null;
+
+    /**
      * Get data from an input buffer using a DICOM parser.
      * @param {Array} buffer The input data buffer.
      * @param {Object} callback The callback on the conversion.
      */
-    this.convert = function(buffer, callback)
+    this.convert = function (buffer, callback)
     {
         // DICOM parser
         var dicomParser = new dwv.dicom.DicomParser();
@@ -12484,31 +12505,23 @@ dwv.image.DicomBufferToView = function (decoderScripts)
             callback({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
         };
 
+        var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
+
         var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
         var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
         var needDecompression = (algoName !== null);
-        
-        var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
-        var bitsAllocated = dicomParser.getRawDicomElements().x00280100.value[0];
-        var pixelRepresentation = dicomParser.getRawDicomElements().x00280103.value[0];
-        var isSigned = (pixelRepresentation === 1);
 
         if ( needDecompression ) {
+            var bitsAllocated = dicomParser.getRawDicomElements().x00280100.value[0];
+            var pixelRepresentation = dicomParser.getRawDicomElements().x00280103.value[0];
+            var isSigned = (pixelRepresentation === 1);
+
+            if (!pixelDecoder){
+                pixelDecoder = new dwv.image.PixelBufferDecoder();
+            }
             // only decompress the first frame to not block the system
-            if (useWorkers) {
-                if (!asynchDecoder) {
-                    // create the decoder
-                    asynchDecoder = new dwv.image.AsynchPixelBufferDecoder(decoderScripts);
-                }
-                asynchDecoder.decode(pixelBuffer[0], algoName, 
-                        bitsAllocated, isSigned, decodedBufferToView);
-            }
-            else {
-                var synchDecoder = new dwv.image.SynchPixelBufferDecoder();
-                var decodedBuffer = synchDecoder.decode(pixelBuffer[0], algoName, 
-                        bitsAllocated, isSigned);
-                decodedBufferToView({data: decodedBuffer});
-            }
+            pixelDecoder.decode(pixelBuffer[0], algoName, 
+                bitsAllocated, isSigned, decodedBufferToView);
         }
         else {
             // no decompression
@@ -13072,12 +13085,6 @@ dwv.io.File = function ()
      * @type Array
      */
     var progressList = [];
-    /**
-     * List of data decoders scripts.
-     * @private
-     * @type Array
-     */
-    var decoderScripts = [];
     
     /**
      * The default character set (optional).
@@ -13138,20 +13145,6 @@ dwv.io.File = function ()
         return totPercent/nToLoad;
     };
     
-    /**
-     * Set the web workers decoder scripts.
-     * @param {Array} list The list of decoder scripts.
-     */
-    this.setDecoderScripts = function (list) {
-        decoderScripts = list;
-    };
-    /**
-     * Get the web workers decoder scripts.
-     * @return {Array} list The list of decoder scripts.
-     */
-    this.getDecoderScripts = function () {
-        return decoderScripts;
-    };
 }; // class File
 
 /**
@@ -13238,7 +13231,7 @@ dwv.io.File.prototype.load = function (ioArray)
     };
 
     // DICOM buffer to dwv.image.View (asynchronous)
-    var db2v = new dwv.image.DicomBufferToView(this.getDecoderScripts());
+    var db2v = new dwv.image.DicomBufferToView();
     db2v.setDefaultCharacterSet(this.getDefaultCharacterSet());
     // callback
     var onLoadDicomBuffer = function (event)
@@ -13341,12 +13334,6 @@ dwv.io.Url = function ()
      * @type Array
      */
     var progressList = [];
-    /**
-     * List of data decoders scripts.
-     * @private
-     * @type Array
-     */
-    var decoderScripts = [];
 
     /**
      * The default character set (optional).
@@ -13407,20 +13394,6 @@ dwv.io.Url = function ()
         return totPercent;
     };
     
-    /**
-     * Set the web workers decoder scripts.
-     * @param {Array} list The list of decoder scripts.
-     */
-    this.setDecoderScripts = function (list) {
-        decoderScripts = list;
-    };
-    /**
-     * Get the web workers decoder scripts.
-     * @return {Array} list The list of decoder scripts.
-     */
-    this.getDecoderScripts = function () {
-        return decoderScripts;
-    };
 }; // class Url
 
 /**
@@ -13508,7 +13481,7 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     };
 
     // DICOM buffer to dwv.image.View (asynchronous)
-    var db2v = new dwv.image.DicomBufferToView(this.getDecoderScripts());
+    var db2v = new dwv.image.DicomBufferToView();
     db2v.setDefaultCharacterSet(this.getDefaultCharacterSet());
     // callback
     var onLoadDicomBuffer = function (response)
