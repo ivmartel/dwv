@@ -47,9 +47,12 @@ appgui.js
 /dwv/demo/stable/ext/i18next/i18nextBrowserLanguageDetector.min.js
 /dwv/demo/stable/ext/pdfjs/jpx.js
 /dwv/demo/stable/ext/pdfjs/arithmetic_decoder.js
+/dwv/demo/stable/ext/pdfjs/decode-jpeg2000.js
 /dwv/demo/stable/ext/pdfjs/util.js
 /dwv/demo/stable/ext/rii-mango/lossless-min.js
+/dwv/demo/stable/ext/rii-mango/decode-jpegloss.js
 /dwv/demo/stable/ext/notmasteryet/jpg.js
+/dwv/demo/stable/ext/notmasteryet/decode-jpegbaseline.js
 /dwv/demo/stable/ext/kinetic/kinetic-v5.1.1-06.10.min.js
 /dwv/demo/stable/ext/magic-wand/magic-wand.js
 
