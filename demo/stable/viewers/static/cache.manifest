@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# v11 2016-07-19
+# v12 2016-08-22
 
 CACHE:
 
@@ -8,7 +8,7 @@ index.html
 # css
 /dwv/demo/stable/css/style.css
 # js
-/dwv/demo/stable/dwv-0.15.0.min.js
+/dwv/demo/stable/dwv-0.16.0.min.js
 applauncher.js
 appgui.js
 # images
