@@ -1,17 +1,16 @@
-/**
- * @namespace Image related.
- */
+// namespaces
+var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
  * Get data from an input image using a canvas.
- * @param image The image.
- * @param file The corresponding file.
+ * @param {Image} Image The DOM Image.
+ * @return {Mixed} The corresponding view and info.
  */
-dwv.image.getDataFromImage = function(image, file)
+dwv.image.getViewFromDOMImage = function (image)
 {
     // draw the image in the canvas in order to get its data
-    var canvas = document.getElementById('imageLayer');
+    var canvas = document.createElement('canvas');
     canvas.width = image.width;
     canvas.height = image.height;
     var ctx = canvas.getContext('2d');
@@ -29,36 +28,114 @@ dwv.image.getDataFromImage = function(image, file)
         j+=3;
     }
     // create dwv Image
-    var imageSize = new dwv.image.ImageSize(image.width, image.height);
+    var imageSize = new dwv.image.Size(image.width, image.height);
     // TODO: wrong info...
-    var imageSpacing = new dwv.image.ImageSpacing(1,1);
-    var dwvImage = new dwv.image.Image(imageSize, imageSpacing, buffer);
-    dwvImage.setIdRescaleLut();
-    dwvImage.setWindowLevelMinMax();
+    var imageSpacing = new dwv.image.Spacing(1,1);
+    var sliceIndex = image.index ? image.index : 0;
+    var origin = new dwv.math.Point3D(0,0,sliceIndex);
+    var geometry = new dwv.image.Geometry(origin, imageSize, imageSpacing );
+    var dwvImage = new dwv.image.Image( geometry, [buffer] );
     dwvImage.setPhotometricInterpretation("RGB");
-    dwvImage.setPlanarConfiguration(0);
+    // meta information
+    var meta = {};
+    meta.BitsStored = 8;
+    dwvImage.setMeta(meta);
+    // view
+    var view = new dwv.image.View(dwvImage);
+    view.setWindowLevelMinMax();
     // properties
     var info = {};
-    info["FileName"] = { "value": file.name };
-    info["FileType"] = { "value": file.type };
-    info["FileLastModifiedDate"] = { "value": file.lastModifiedDate };
-    info["ImageWidth"] = { "value": image.width };
-    info["ImageHeight"] = { "value": image.height };
+    if( image.file )
+    {
+        info.fileName = { "value": image.file.name };
+        info.fileType = { "value": image.file.type };
+        info.fileLastModifiedDate = { "value": image.file.lastModifiedDate };
+    }
+    info.imageWidth = { "value": image.width };
+    info.imageHeight = { "value": image.height };
     // return
-    return {"image": dwvImage, "info": info};
+    return {"view": view, "info": info};
 };
 
 /**
- * Get data from an input buffer using a DICOM parser.
- * @param buffer The input data buffer.
+ * Create a dwv.image.View from a DICOM buffer.
+ * @constructor
  */
-dwv.image.getDataFromDicomBuffer = function(buffer)
+dwv.image.DicomBufferToView = function ()
 {
-    // DICOM parser
-    var dicomParser = new dwv.dicom.DicomParser();
-    // parse the buffer
-    dicomParser.parse(buffer);
-    // return
-    return {'image': dicomParser.getImage(), 'info': dicomParser.dicomElements};
+    /**
+     * The default character set (optional).
+     * @private
+     * @type String
+     */
+    var defaultCharacterSet;
+    
+    /**
+     * Set the default character set.
+     * param {String} The character set.
+     */
+    this.setDefaultCharacterSet = function (characterSet) {
+        defaultCharacterSet = characterSet;
+    };
+
+    /**
+     * Pixel buffer decoder. 
+     * Define only once to allow optional asynchronous mode.
+     * @private
+     * @type Object
+     */ 
+    var pixelDecoder = null;
+
+    /**
+     * Get data from an input buffer using a DICOM parser.
+     * @param {Array} buffer The input data buffer.
+     * @param {Object} callback The callback on the conversion.
+     */
+    this.convert = function (buffer, callback)
+    {
+        // DICOM parser
+        var dicomParser = new dwv.dicom.DicomParser();
+        dicomParser.setDefaultCharacterSet(defaultCharacterSet);
+        // parse the buffer
+        dicomParser.parse(buffer);
+    
+        // worker callback
+        var decodedBufferToView = function (event) {
+            // when decoded, only the first frame is decoded
+            // so just replace the first frame content.
+            pixelBuffer[0] = event.data[0];
+            // create the image
+            var imageFactory = new dwv.image.ImageFactory();
+            var image = imageFactory.create( dicomParser.getDicomElements(), pixelBuffer );
+            // create the view
+            var viewFactory = new dwv.image.ViewFactory();
+            var view = viewFactory.create( dicomParser.getDicomElements(), image );
+            // return
+            callback({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
+        };
+
+        var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
+
+        var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
+        var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
+        var needDecompression = (algoName !== null);
+
+        if ( needDecompression ) {
+            var bitsAllocated = dicomParser.getRawDicomElements().x00280100.value[0];
+            var pixelRepresentation = dicomParser.getRawDicomElements().x00280103.value[0];
+            var isSigned = (pixelRepresentation === 1);
+
+            if (!pixelDecoder){
+                pixelDecoder = new dwv.image.PixelBufferDecoder();
+            }
+            // only decompress the first frame to not block the system
+            pixelDecoder.decode(pixelBuffer[0], algoName, 
+                bitsAllocated, isSigned, decodedBufferToView);
+        }
+        else {
+            // no decompression
+            decodedBufferToView({data: pixelBuffer});
+        }
+    };
 };
 

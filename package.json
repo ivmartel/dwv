@@ -1,0 +1,34 @@
+{
+  "name": "dwv",
+  "version": "0.16.0",
+  "homepage": "https://ivmartel.github.io/dwv/",
+  "description": "DICOM Web Viewer.",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ivmartel/dwv.git"
+  },
+  "scripts": {
+    "test": "grunt publish --verbose"
+  },
+  "dependencies": {
+    "jquery": "2.1.4",
+    "jquery-ui": "~1.10",
+    "jquery-mobile": "~1.4",
+    "kinetic": "~5"
+  },
+  "devDependencies": {
+    "grunt": "~0.4",
+    "grunt-cli": "~1.2",
+    "grunt-contrib-jshint": "~1.0",
+    "grunt-qunit-istanbul": "~0.6",
+    "grunt-coveralls": "~1.0",
+    "grunt-contrib-concat": "~1.0",
+    "grunt-contrib-uglify": "~1.0",
+    "grunt-jsdoc": "~2.1",
+    "ink-docstrap": "~1.2",
+    "grunt-execute": "^0.2",
+    "selenium-webdriver": "^2.52",
+    "saucelabs": "^1.2"
+  }
+}

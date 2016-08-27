@@ -1,86 +1,102 @@
-/**
- * @namespace Tool classes.
- */
+// namespaces
+var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
 /**
- * @class UndoStack class.
- * @param app
+ * UndoStack class.
+ * @constructor
  */
-dwv.tool.UndoStack = function(app)
-{ 
-	// Array of commands.
-	var stack = [];
-	// Current command index.
-	var curCmdIndex = 0;
+dwv.tool.UndoStack = function (app)
+{
+    /**
+     * Undo GUI.
+     * @type Object
+     */
+    var gui = new dwv.gui.Undo(app);
+    /**
+     * Array of commands.
+     * @private
+     * @type Array
+     */
+    var stack = [];
 
-	/**
-	 * Add a command to the stack.
-	 * @param cmd The command to add.
-	 */
-	this.add = function(cmd)
-	{ 
-		// clear commands after current index
-		stack = stack.slice(0,curCmdIndex);
-		// store command
-		stack[curCmdIndex] = cmd;
+    /**
+     * Get the stack.
+     * @return {Array} The list of stored commands.
+     */
+    this.getStack = function () { return stack; };
+
+    /**
+     * Current command index.
+     * @private
+     * @type Number
+     */
+    var curCmdIndex = 0;
+
+    /**
+     * Add a command to the stack.
+     * @param {Object} cmd The command to add.
+     */
+    this.add = function(cmd)
+    {
+        // clear commands after current index
+        stack = stack.slice(0,curCmdIndex);
+        // store command
+        stack.push(cmd);
+        //stack[curCmdIndex] = cmd;
         // increment index
         ++curCmdIndex;
-		// add command to display history
-		dwv.gui.addCommandToUndoHtml(cmd.getName());
-	};
+        // add command to display history
+        gui.addCommandToUndoHtml(cmd.getName());
+    };
 
-	/**
-	 * Undo the last command. 
-	 */
-	this.undo = function()
-	{ 
-		// a bit inefficient...
-		if( curCmdIndex > 0 )
-		{
-			// decrement index
-		    --curCmdIndex; 
-            // reset image
-            app.restoreOriginalImage();
-		    // clear layers
-			app.getDrawLayer().clearContextRect();
-			app.getTempLayer().clearContextRect();
-			// redo from first command
-			for( var i = 0; i < curCmdIndex; ++i)
-			{
-				stack[i].execute(); 
-			}
-			// display
-			if( curCmdIndex === 0 ) {
-			    // just draw the image
-			    app.generateAndDrawImage();
-			}
-			else {
-			    // merge the temporary layer
-			    app.getDrawLayer().merge(app.getTempLayer());
-			}
-			// disable last in display history
-			dwv.gui.enableInUndoHtml(false);
-		}
-	}; 
+    /**
+     * Undo the last command.
+     */
+    this.undo = function()
+    {
+        // a bit inefficient...
+        if( curCmdIndex > 0 )
+        {
+            // decrement command index
+            --curCmdIndex;
+            // undo last command
+            stack[curCmdIndex].undo();
+            // disable last in display history
+            gui.enableInUndoHtml(false);
+        }
+    };
 
-	/**
-	 * Redo the last command.
-	 */
-	this.redo = function()
-	{ 
-		if( curCmdIndex < stack.length )
-		{
-		    // run command
-		    var cmd = stack[curCmdIndex];
-			cmd.execute();
-            // increment index
+    /**
+     * Redo the last command.
+     */
+    this.redo = function()
+    {
+        if( curCmdIndex < stack.length )
+        {
+            // run last command
+            stack[curCmdIndex].execute();
+            // increment command index
             ++curCmdIndex;
-			// merge the temporary layer
-			app.getDrawLayer().merge(app.getTempLayer());
-			// enable next in display history
-			dwv.gui.enableInUndoHtml(true);
-		}
-	};
+            // enable next in display history
+            gui.enableInUndoHtml(true);
+        }
+    };
+
+    /**
+     * Setup the tool GUI.
+     */
+    this.setup = function ()
+    {
+        gui.setup();
+    };
+
+    /**
+     * Initialise the tool GUI.
+     */
+    this.initialise = function ()
+    {
+        gui.initialise();
+    };
 
 }; // UndoStack class

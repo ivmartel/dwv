@@ -1,94 +1,43 @@
-/**
- * @namespace Math related.
- */
+// namespaces
+var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
 /**
- * shapes.js
- * Definition of basic shapes.
- */
-
-/**
- * @class 2D point. Immutable.
- * @param x The X coordinate for the point.
- * @param y The Y coordinate for the point.
- */
-dwv.math.Point2D = function(x,y)
-{
-    // Get the X position of the point.
-    this.getX = function() { return x; };
-    // Get the Y position of the point.
-    this.getY = function() { return y; };
-}; // Point2D class
-
-/**
- * Check for Point2D equality.
- * @param other The other Point2D to compare to.
- * @return True if both points are equal.
- */ 
-dwv.math.Point2D.prototype.equals = function(other) {
-    if( !other ) { 
-        return false;
-    }
-    return ( this.getX() === other.getX() && this.getY() === other.getY() );
-};
-
-/**
- * Get a string representation of the Point2D.
- * @return The Point2D as string.
- */ 
-dwv.math.Point2D.prototype.toString = function() {
-    return "(" + this.getX() + ", " + this.getY() + ")";
-};
-
-/**
- * @class Fast 2D point since it's mutable!
- * @param x The X coordinate for the point.
- * @param y The Y coordinate for the point.
- */
-dwv.math.FastPoint2D = function(x,y)
-{
-    this.x = x;
-    this.y = y;
-}; // FastPoint2D class
-
-/**
- * Check for FastPoint2D equality.
- * @param other The other FastPoint2D to compare to.
- * @return True if both points are equal.
- */ 
-dwv.math.FastPoint2D.prototype.equals = function(other) {
-    if( !other ) { 
-        return false;
-    }
-    return ( this.x === other.x && this.y === other.y );
-};
-
-/**
- * Get a string representation of the FastPoint2D.
- * @return The Point2D as string.
- */ 
-dwv.math.FastPoint2D.prototype.toString = function() {
-    return "(" + this.x + ", " + this.y + ")";
-};
-
-/**
- * @class Circle shape.
- * @param centre A Point2D representing the centre of the circle.
- * @param radius The radius of the circle.
+ * Circle shape.
+ * @constructor
+ * @param {Object} centre A Point2D representing the centre of the circle.
+ * @param {Number} radius The radius of the circle.
  */
 dwv.math.Circle = function(centre, radius)
 {
-    // Cache the surface
+    /**
+     * Circle surface.
+     * @private
+     * @type Number
+     */
     var surface = Math.PI*radius*radius;
 
-    // Get the centre of the circle.
+    /**
+     * Get the centre (point) of the circle.
+     * @return {Object} The center (point) of the circle.
+     */
     this.getCenter = function() { return centre; };
-    // Get the radius of the circle.
+    /**
+     * Get the radius of the circle.
+     * @return {Number} The radius of the circle.
+     */
     this.getRadius = function() { return radius; };
-    // Get the surface of the circle.
+    /**
+     * Get the surface of the circle.
+     * @return {Number} The surface of the circle.
+     */
     this.getSurface = function() { return surface; };
-    // Get the surface of the circle with a spacing.
+    /**
+     * Get the surface of the circle with a spacing.
+     * @param {Number} spacingX The X spacing.
+     * @param {Number} spacingY The Y spacing.
+     * @return {Number} The surface of the circle multiplied by the given spacing.
+     */
     this.getWorldSurface = function(spacingX, spacingY)
     {
         return surface * spacingX * spacingY;
@@ -96,64 +45,235 @@ dwv.math.Circle = function(centre, radius)
 }; // Circle class
 
 /**
- * @class Line shape.
- * @param begin A Point2D representing the beginning of the line.
- * @param end A Point2D representing the end of the line.
+ * Ellipse shape.
+ * @constructor
+ * @param {Object} centre A Point2D representing the centre of the ellipse.
+ * @param {Number} a The radius of the ellipse on the horizontal axe.
+ * @param {Number} b The radius of the ellipse on the vertical axe.
+ */
+dwv.math.Ellipse = function(centre, a, b)
+{
+    /**
+     * Circle surface.
+     * @private
+     * @type Number
+     */
+    var surface = Math.PI*a*b;
+
+    /**
+     * Get the centre (point) of the ellipse.
+     * @return {Object} The center (point) of the ellipse.
+     */
+    this.getCenter = function() { return centre; };
+    /**
+     * Get the radius of the ellipse on the horizontal axe.
+     * @return {Number} The radius of the ellipse on the horizontal axe.
+     */
+    this.getA = function() { return a; };
+    /**
+     * Get the radius of the ellipse on the vertical axe.
+     * @return {Number} The radius of the ellipse on the vertical axe.
+     */
+    this.getB = function() { return b; };
+    /**
+     * Get the surface of the ellipse.
+     * @return {Number} The surface of the ellipse.
+     */
+    this.getSurface = function() { return surface; };
+    /**
+     * Get the surface of the ellipse with a spacing.
+     * @param {Number} spacingX The X spacing.
+     * @param {Number} spacingY The Y spacing.
+     * @return {Number} The surface of the ellipse multiplied by the given spacing.
+     */
+    this.getWorldSurface = function(spacingX, spacingY)
+    {
+        return surface * spacingX * spacingY;
+    };
+}; // Circle class
+
+/**
+ * Line shape.
+ * @constructor
+ * @param {Object} begin A Point2D representing the beginning of the line.
+ * @param {Object} end A Point2D representing the end of the line.
  */
 dwv.math.Line = function(begin, end)
 {
-    // cache the length
-    var length = Math.sqrt(
-            Math.abs(end.getX() - begin.getX()) * Math.abs(end.getX() - begin.getX())
-            + Math.abs(end.getY() - begin.getY()) * Math.abs(end.getY() - begin.getY() ) );
-    
-    // Get the begin point of the line.
+    /**
+     * Line delta in the X direction.
+     * @private
+     * @type Number
+     */
+    var dx = end.getX() - begin.getX();
+    /**
+     * Line delta in the Y direction.
+     * @private
+     * @type Number
+     */
+    var dy = end.getY() - begin.getY();
+    /**
+     * Line length.
+     * @private
+     * @type Number
+     */
+    var length = Math.sqrt( dx * dx + dy * dy );
+
+    /**
+     * Get the begin point of the line.
+     * @return {Object} The beginning point of the line.
+     */
     this.getBegin = function() { return begin; };
-    // Get the end point of the line.
+    /**
+     * Get the end point of the line.
+     * @return {Object} The ending point of the line.
+     */
     this.getEnd = function() { return end; };
-    // Get the length of the line.
+    /**
+     * Get the line delta in the X direction.
+     * @return {Number} The delta in the X direction.
+     */
+    this.getDeltaX = function() { return dx; };
+    /**
+     * Get the line delta in the Y direction.
+     * @return {Number} The delta in the Y direction.
+     */
+    this.getDeltaY = function() { return dy; };
+    /**
+     * Get the length of the line.
+     * @return {Number} The length of the line.
+     */
     this.getLength = function() { return length; };
-    // Get the length of the line with a spacing.
+    /**
+     * Get the length of the line with spacing.
+     * @param {Number} spacingX The X spacing.
+     * @param {Number} spacingY The Y spacing.
+     * @return {Number} The length of the line with spacing.
+     */
     this.getWorldLength = function(spacingX, spacingY)
     {
-        var lx = Math.abs(end.getX() - begin.getX()) * spacingX;
-        var ly = Math.abs(end.getY() - begin.getY()) * spacingY;
-        return Math.sqrt( lx * lx + ly * ly );
+        var dxs = dx * spacingX;
+        var dys = dy * spacingY;
+        return Math.sqrt( dxs * dxs + dys * dys );
     };
-    // Get the mid point of the line.
+    /**
+     * Get the mid point of the line.
+     * @return {Object} The mid point of the line.
+     */
     this.getMidpoint = function()
     {
-        return new dwv.math.Point2D( 
-            parseInt( (begin.getX()+end.getX()) / 2, 10 ), 
+        return new dwv.math.Point2D(
+            parseInt( (begin.getX()+end.getX()) / 2, 10 ),
             parseInt( (begin.getY()+end.getY()) / 2, 10 ) );
+    };
+    /**
+     * Get the slope of the line.
+     * @return {Number} The slope of the line.
+     */
+    this.getSlope = function()
+    {
+        return dy / dx;
+    };
+    /**
+     * Get the inclination of the line.
+     * @return {Number} The inclination of the line.
+     */
+    this.getInclination = function()
+    {
+        // tan(theta) = slope
+        var angle = Math.atan2( dy, dx ) * 180 / Math.PI;
+        // shift?
+        return 180 - angle;
     };
 }; // Line class
 
 /**
- * @class Rectangle shape.
- * @param begin A Point2D representing the beginning of the rectangle.
- * @param end A Point2D representing the end of the rectangle.
+ * Get the angle between two lines.
+ * @param line0 The first line.
+ * @param line1 The second line.
+ */
+dwv.math.getAngle = function (line0, line1)
+{
+    var dx0 = line0.getDeltaX();
+    var dy0 = line0.getDeltaY();
+    var dx1 = line1.getDeltaX();
+    var dy1 = line1.getDeltaY();
+    // dot = ||a||*||b||*cos(theta)
+    var dot = dx0 * dx1 + dy0 * dy1;
+    // cross = ||a||*||b||*sin(theta)
+    var det = dx0 * dy1 - dy0 * dx1;
+    // tan = sin / cos
+    var angle = Math.atan2( det, dot ) * 180 / Math.PI;
+    // complementary angle
+    // shift?
+    return 360 - (180 - angle);
+};
+
+/**
+ * Rectangle shape.
+ * @constructor
+ * @param {Object} begin A Point2D representing the beginning of the rectangle.
+ * @param {Object} end A Point2D representing the end of the rectangle.
  */
 dwv.math.Rectangle = function(begin, end)
 {
-    // cache the length
+    if ( end.getX() < begin.getX() ) {
+        var tmpX = begin.getX();
+        begin = new dwv.math.Point2D( end.getX(), begin.getY() );
+        end = new dwv.math.Point2D( tmpX, end.getY() );
+    }
+    if ( end.getY() < begin.getY() ) {
+        var tmpY = begin.getY();
+        begin = new dwv.math.Point2D( begin.getX(), end.getY() );
+        end = new dwv.math.Point2D( end.getX(), tmpY );
+    }
+
+    /**
+     * Rectangle surface.
+     * @private
+     * @type Number
+     */
     var surface = Math.abs(end.getX() - begin.getX()) * Math.abs(end.getY() - begin.getY() );
 
-    // Get the begin point of the rectangle.
+    /**
+     * Get the begin point of the rectangle.
+     * @return {Object} The begin point of the rectangle
+     */
     this.getBegin = function() { return begin; };
-    // Get the end point of the rectangle.
+    /**
+     * Get the end point of the rectangle.
+     * @return {Object} The end point of the rectangle
+     */
     this.getEnd = function() { return end; };
-    // Get the real width of the rectangle.
+    /**
+     * Get the real width of the rectangle.
+     * @return {Number} The real width of the rectangle.
+     */
     this.getRealWidth = function() { return end.getX() - begin.getX(); };
-    // Get the real height of the rectangle.
+    /**
+     * Get the real height of the rectangle.
+     * @return {Number} The real height of the rectangle.
+     */
     this.getRealHeight = function() { return end.getY() - begin.getY(); };
-    // Get the width of the rectangle.
+    /**
+     * Get the width of the rectangle.
+     * @return {Number} The width of the rectangle.
+     */
     this.getWidth = function() { return Math.abs(this.getRealWidth()); };
-    // Get the height of the rectangle.
+    /**
+     * Get the height of the rectangle.
+     * @return {Number} The height of the rectangle.
+     */
     this.getHeight = function() { return Math.abs(this.getRealHeight()); };
-    // Get the surface of the rectangle.
+    /**
+     * Get the surface of the rectangle.
+     * @return {Number} The surface of the rectangle.
+     */
     this.getSurface = function() { return surface; };
-    // Get the surface of the rectangle with a spacing.
+    /**
+     * Get the surface of the rectangle with a spacing.
+     * @return {Number} The surface of the rectangle with a spacing.
+     */
     this.getWorldSurface = function(spacingX, spacingY)
     {
         return surface * spacingX * spacingY;
@@ -161,82 +281,100 @@ dwv.math.Rectangle = function(begin, end)
 }; // Rectangle class
 
 /**
- * @class Region Of Interest shape.
+ * Region Of Interest shape.
  * Note: should be a closed path.
+ * @constructor
  */
 dwv.math.ROI = function()
 {
-    // list of points.
-    var points = [];
-    
     /**
-     * Get a point of the list.
-     * @param index The index of the point to get (beware, no size check).
-     * @return The Point2D at the given index.
-     */ 
+     * List of points.
+     * @private
+     * @type Array
+     */
+    var points = [];
+
+    /**
+     * Get a point of the list at a given index.
+     * @param {Number} index The index of the point to get (beware, no size check).
+     * @return {Object} The Point2D at the given index.
+     */
     this.getPoint = function(index) { return points[index]; };
-    // Get the length of the list
+    /**
+     * Get the length of the point list.
+     * @return {Number} The length of the point list.
+     */
     this.getLength = function() { return points.length; };
     /**
      * Add a point to the ROI.
-     * @param point The Point2D to add.
+     * @param {Object} point The Point2D to add.
      */
     this.addPoint = function(point) { points.push(point); };
     /**
      * Add points to the ROI.
-     * @param rhs The array of POints2D to add.
+     * @param {Array} rhs The array of POints2D to add.
      */
     this.addPoints = function(rhs) { points=points.concat(rhs);};
 }; // ROI class
 
 /**
- * @class Path shape.
- * @param points The list of Point2D that make the path (optional).
- * @param points The list of control point of path, as indexes (optional).
+ * Path shape.
+ * @constructor
+ * @param {Array} inputPointArray The list of Point2D that make the path (optional).
+ * @param {Array} inputControlPointIndexArray The list of control point of path,
+ *  as indexes (optional).
  * Note: first and last point do not need to be equal.
  */
 dwv.math.Path = function(inputPointArray, inputControlPointIndexArray)
 {
-    // list of points.
+    /**
+     * List of points.
+     * @type Array
+     */
     this.pointArray = inputPointArray ? inputPointArray.slice() : [];
-    // list of control points
-    this.controlPointIndexArray = inputControlPointIndexArray ? inputControlPointIndexArray.slice() : [];
+    /**
+     * List of control points.
+     * @type Array
+     */
+    this.controlPointIndexArray = inputControlPointIndexArray ?
+        inputControlPointIndexArray.slice() : [];
 }; // Path class
 
 /**
  * Get a point of the list.
- * @param index The index of the point to get (beware, no size check).
- * @return The Point2D at the given index.
- */ 
+ * @param {Number} index The index of the point to get (beware, no size check).
+ * @return {Object} The Point2D at the given index.
+ */
 dwv.math.Path.prototype.getPoint = function(index) {
     return this.pointArray[index];
 };
 
 /**
- * Is is a control point.
- * @param point The Point2D to check.
- * @return True if a control point.
- */ 
+ * Is the given point a control point.
+ * @param {Object} point The Point2D to check.
+ * @return {Boolean} True if a control point.
+ */
 dwv.math.Path.prototype.isControlPoint = function(point) {
     var index = this.pointArray.indexOf(point);
     if( index !== -1 ) {
         return this.controlPointIndexArray.indexOf(index) !== -1;
     }
     else {
-        throw Error("Error: isControlPoint called with not in list point.");
+        throw new Error("Error: isControlPoint called with not in list point.");
     }
 };
 
 /**
  * Get the length of the path.
- */ 
-dwv.math.Path.prototype.getLength = function() { 
+ * @return {Number} The length of the path.
+ */
+dwv.math.Path.prototype.getLength = function() {
     return this.pointArray.length;
 };
 
 /**
  * Add a point to the path.
- * @param point The Point2D to add.
+ * @param {Object} point The Point2D to add.
  */
 dwv.math.Path.prototype.addPoint = function(point) {
     this.pointArray.push(point);
@@ -244,7 +382,7 @@ dwv.math.Path.prototype.addPoint = function(point) {
 
 /**
  * Add a control point to the path.
- * @param point The Point2D to make a control point.
+ * @param {Object} point The Point2D to make a control point.
  */
 dwv.math.Path.prototype.addControlPoint = function(point) {
     var index = this.pointArray.indexOf(point);
@@ -252,21 +390,21 @@ dwv.math.Path.prototype.addControlPoint = function(point) {
         this.controlPointIndexArray.push(index);
     }
     else {
-        throw Error("Error: addControlPoint called with not in list point.");
+        throw new Error("Error: addControlPoint called with no point in list point.");
     }
 };
 
 /**
  * Add points to the path.
- * @param points The list of Point2D to add.
+ * @param {Array} points The list of Point2D to add.
  */
-dwv.math.Path.prototype.addPoints = function(newPointArray) { 
+dwv.math.Path.prototype.addPoints = function(newPointArray) {
     this.pointArray = this.pointArray.concat(newPointArray);
 };
 
 /**
  * Append a Path to this one.
- * @param other The Path to append.
+ * @param {Path} other The Path to append.
  */
 dwv.math.Path.prototype.appenPath = function(other) {
     var oldSize = this.pointArray.length;

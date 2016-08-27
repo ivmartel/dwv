@@ -1,49 +1,84 @@
-/**
- * @namespace Tool classes.
- */
+// namespaces
+var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
+//external
+var Kinetic = Kinetic || {};
 
 /**
- * @class Draw ROI command.
- * @param points The points from which to extract the line.
- * @param app The application to draw the line on.
- * @param style The drawing style.
+ * ROI factory.
+ * @constructor
  */
-dwv.tool.DrawRoiCommand = function(points, app, style)
+dwv.tool.RoiFactory = function ()
 {
+    /**
+     * Get the number of points needed to build the shape.
+     * @return {Number} The number of points.
+     */
+    this.getNPoints = function () { return 50; };
+    /**
+     * Get the timeout between point storage.
+     * @return {Number} The timeout in milliseconds.
+     */
+    this.getTimeout = function () { return 100; };
+};
+
+/**
+ * Create a roi shape to be displayed.
+ * @param {Array} points The points from which to extract the line.
+ * @param {Object} style The drawing style.
+ * @param {Object} image The associated image.
+ */
+dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
+{
+    // physical shape
     var roi = new dwv.math.ROI();
+    // add input points to the ROI
     roi.addPoints(points);
-
-    var lineColor = style.getLineColor();
-    var context = app.getTempLayer().getContext();
-    
-    // command name
-    var name = "DrawRoiCommand";
-    this.setName = function(str) { name = str; };
-    this.getName = function() { return name; };
-
-    // main method
-    this.execute = function()
+    // points stored the kineticjs way
+    var arr = [];
+    for( var i = 0; i < roi.getLength(); ++i )
     {
-        // style
-        context.fillStyle = lineColor;
-        context.strokeStyle = lineColor;
-        // path
-        context.beginPath();
-        context.moveTo(
-                roi.getPoint(0).getX(), 
-                roi.getPoint(0).getY());
-        for( var i = 1; i < roi.getLength(); ++i )
-        {
-            context.lineTo(
-                    roi.getPoint(i).getX(), 
-                    roi.getPoint(i).getY());
-            context.stroke();
-        }
-        context.closePath();
-        context.stroke();
-    }; 
-}; // DrawRoiCommand class
+        arr.push( roi.getPoint(i).getX() );
+        arr.push( roi.getPoint(i).getY() );
+    }
+    // draw shape
+    var kshape = new Kinetic.Line({
+        points: arr,
+        stroke: style.getLineColour(),
+        strokeWidth: style.getScaledStrokeWidth(),
+        name: "shape",
+        closed: true
+    });
+    // return group
+    var group = new Kinetic.Group();
+    group.name("roi-group");
+    group.add(kshape);
+    return group;
+};
 
-//Add the shape command to the list
-dwv.tool.shapes["roi"] = dwv.tool.DrawRoiCommand;
+/**
+ * Update a roi shape.
+ * @param {Object} anchor The active anchor.
+ * @param {Object} image The associated image.
+ */
+dwv.tool.UpdateRoi = function (anchor /*, image*/)
+{
+    // parent group
+    var group = anchor.getParent();
+    // associated shape
+    var kroi = group.getChildren( function (node) {
+        return node.name() === 'shape';
+    })[0];
+    // update self
+    var point = group.getChildren( function (node) {
+        return node.id() === anchor.id();
+    })[0];
+    point.x( anchor.x() );
+    point.y( anchor.y() );
+    // update the roi point and compensate for possible drag
+    // (the anchor id is the index of the point in the list)
+    var points = kroi.points();
+    points[anchor.id()] = anchor.x() - kroi.x();
+    points[anchor.id()+1] = anchor.y() - kroi.y();
+    kroi.points( points );
+};

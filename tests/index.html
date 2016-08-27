@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>DWV Tests</title>
+<link rel="stylesheet" href="../ext/qunit/qunit-1.22.0.css" type="text/css" media="screen" />
+<style>
+.footer {
+    font-family: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif;
+    }
+</style>
+</head>
+
+<body>
+<div id="qunit"></div>
+<div id="qunit-fixture"></div>
+<!-- Third party -->
+<script type="text/javascript" src="../ext/qunit/qunit-1.22.0.js"></script>
+<!-- Source -->
+<script type="text/javascript" src="../src/utils/string.js" data-cover></script>
+<script type="text/javascript" src="../src/utils/uri.js" data-cover></script>
+<script type="text/javascript" src="../src/dicom/dicomParser.js" data-cover></script>
+<script type="text/javascript" src="../src/dicom/dictionary.js" data-cover></script>
+<script type="text/javascript" src="../src/gui/html.js" data-cover></script>
+<script type="text/javascript" src="../src/image/filter.js" data-cover></script>
+<script type="text/javascript" src="../src/image/geometry.js" data-cover></script>
+<script type="text/javascript" src="../src/image/image.js" data-cover></script>
+<script type="text/javascript" src="../src/image/luts.js" data-cover></script>
+<script type="text/javascript" src="../src/image/reader.js" data-cover></script>
+<script type="text/javascript" src="../src/image/view.js" data-cover></script>
+<script type="text/javascript" src="../src/math/point.js" data-cover></script>
+<script type="text/javascript" src="../src/math/shapes.js" data-cover></script>
+<script type="text/javascript" src="../src/math/stats.js" data-cover></script>
+<script type="text/javascript" src="../src/utils/browser.js" data-cover></script>
+<script type="text/javascript" src="../src/utils/thread.js" data-cover></script>
+<!-- Tests -->
+<script type="text/javascript" src="dicom/dicomParser.test.js"></script>
+<script type="text/javascript" src="html/html.test.js"></script>
+<script type="text/javascript" src="image/geometry.test.js"></script>
+<script type="text/javascript" src="image/image.test.js"></script>
+<script type="text/javascript" src="image/view.test.js"></script>
+<script type="text/javascript" src="math/point.test.js"></script>
+<script type="text/javascript" src="math/shapes.test.js"></script>
+<script type="text/javascript" src="math/stats.test.js"></script>
+<script type="text/javascript" src="utils/string.test.js"></script>
+<script type="text/javascript" src="utils/uri.test.js"></script>
+
+<script type="text/javascript">
+// check browser support (and provide missing functions)
+dwv.browser.check();
+</script>
+
+<div class="footer">
+<p>See also:</p>
+<ul>
+<li>Visual tests: <a href="./visual/index.html">DICOM</a>,
+    <a href="./visual/index-jpeg.html">DICOM jpg</a>,
+    <a href="./visual/index-jpeg2000.html">DICOM jpg2000</a></li>
+<li><a href="./pacs/index.html">Fake PACS</a></li>
+<li><a href="./image/index.html">Colour maps</a></li>
+</ul>
+<br>&nbsp;
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>DICOM Generator</title>
+<meta charset="UTF-8">
+<script type="text/javascript" src="../../src/dicom/dicomParser.js"></script>
+<script type="text/javascript" src="../../src/dicom/dicomWriter.js"></script>
+<script type="text/javascript" src="../../src/dicom/dictionary.js"></script>
+<script type="text/javascript">
+// tags file
+var _tagsFile = null;
+// get a full DICOM element from its tag name
+function getDicomElement(tagName)
+{
+   var group = null;
+   var element = null;
+   var dict = dwv.dicom.dictionary;
+   var keys0 = Object.keys(dict);
+   var keys1 = null;
+   // label for nested loop break
+   outLabel:
+   // search through dictionary
+   for ( var k0 = 0, lenK0 = keys0.length; k0 < lenK0; ++k0 ) {
+       group = keys0[k0];
+       keys1 = Object.keys( dict[group] );
+       for ( var k1 = 0, lenK1 = keys1.length; k1 < lenK1; ++k1 ) {
+           element = keys1[k1];
+           if ( dict[group][element][2] === tagName ) {
+               break outLabel;
+           }
+       }
+   }
+   // return element definition
+   return {
+     'tag': { 'group': group, 'element': element },
+     'vr': dict[group][element][0],
+     'vl': dict[group][element][1]
+   };
+}
+// set a DICOM element value according to its VR (Value Representation)
+function setElementValue(element, value) {
+    // byte size of the element
+    var size = 0;
+    // special sequence case
+    if ( element.vr === "SQ") {
+
+        // set the value
+        element.value = value;
+
+        if ( value !== null && value !== 0 ) {
+            var sqItems = [];
+            var name;
+
+            // explicit or implicit length
+            var explicitLength = true;
+            if ( typeof value.explicitLength !== "undefined" ) {
+                explicitLength = value.explicitLength;
+                delete value.explicitLength;
+            }
+
+            // items
+            var itemData;
+            var itemKeys = Object.keys(value);
+            for ( var i = 0, leni = itemKeys.length; i < leni; ++i )
+            {
+                var itemElements = {};
+                var subSize = 0;
+                itemData = value[itemKeys[i]];
+
+                // elements
+                var subElement;
+                var elemKeys = Object.keys(itemData);
+                for ( var j = 0, lenj = elemKeys.length; j < lenj; ++j )
+                {
+                    subElement = getDicomElement(elemKeys[j]);
+                    subSize += setElementValue(subElement, itemData[elemKeys[j]]);
+
+                    // add sequence delimitation size for sub sequences
+                    if (dwv.dicom.isImplicitLengthSequence(subElement)) {
+                        subSize += dwv.dicom.getDataElementPrefixByteSize("NONE");
+                    }
+
+                    name = dwv.dicom.getGroupElementKey(subElement.tag.group, subElement.tag.element);
+                    itemElements[name] = subElement;
+                }
+
+                // item (after elements to get the size)
+                var itemElement = {
+                         'tag': { 'group': "0xFFFE", 'element': "0xE000" },
+                         'vr': "NONE",
+                         'vl': (explicitLength ? subSize : 0xffffffff),
+                         'value': []
+                     };
+                name = dwv.dicom.getGroupElementKey(itemElement.tag.group, itemElement.tag.element);
+                itemElements[name] = itemElement;
+                subSize += dwv.dicom.getDataElementPrefixByteSize("NONE");
+
+                // item delimitation
+                if (!explicitLength) {
+                    var itemDelimElement = {
+                            'tag': { 'group': "0xFFFE", 'element': "0xE00D" },
+                            'vr': "NONE",
+                            'vl': 0,
+                            'value': []
+                        };
+                    name = dwv.dicom.getGroupElementKey(itemDelimElement.tag.group, itemDelimElement.tag.element);
+                    itemElements[name] = itemDelimElement;
+                    subSize += dwv.dicom.getDataElementPrefixByteSize("NONE");
+                }
+
+                size += subSize;
+                sqItems.push(itemElements);
+            }
+
+            element.value = sqItems;
+        }
+
+        element.vl = size;
+    }
+    else {
+        // set the value
+        element.value = [value];
+        // calculate the size
+        size = 1;
+        if (typeof value !== "undefined" && typeof value.length !== "undefined") {
+            size = value.length;
+        }
+        // convert VL to bytes
+        if ( element.vr === "US" || element.vr === "OW") {
+            size *= Uint16Array.BYTES_PER_ELEMENT;
+        }
+        else if ( element.vr === "SS") {
+            size *= Int16Array.BYTES_PER_ELEMENT;
+        }
+        else if ( element.vr === "UL") {
+            size *= Uint32Array.BYTES_PER_ELEMENT;
+        }
+        else if ( element.vr === "SL") {
+            size *= Int32Array.BYTES_PER_ELEMENT;
+        }
+        else if ( element.vr === "FL") {
+            size *= Float32Array.BYTES_PER_ELEMENT;
+        }
+        else if ( element.vr === "FD") {
+            size *= Float64Array.BYTES_PER_ELEMENT;
+        }
+        element.vl = size;
+    }
+
+    // return the size plus the prefix byte size
+    return (size + dwv.dicom.getDataElementPrefixByteSize(element.vr));
+}
+// generate DICOM data
+function generate()
+{
+    // check validity
+    if (!isValidTags()) {
+        return;
+    }
+
+    // get tags from the textarea
+    var tags = JSON.parse(document.getElementById('tags').value);
+    // convert JSON to DICOM element object
+    var keys = Object.keys(tags);
+    var dicomElements = {};
+    var dicomElement;
+    var name;
+    for ( var k = 0, len = keys.length; k < len; ++k )
+    {
+        // get the DICOM element definition from its name
+        dicomElement = getDicomElement(keys[k]);
+        // set its value
+        setElementValue(dicomElement, tags[keys[k]]);
+        // create the tag group/element key
+        name = dwv.dicom.getGroupElementKey(dicomElement.tag.group, dicomElement.tag.element);
+        // store
+        dicomElements[name] = dicomElement;
+    }
+
+    // pixels: small gradient square
+    var numberOfRows = ( typeof tags.Rows === 'undefined' ) ? 64 : tags.Rows;
+    var numberOfColumns = ( typeof tags.Columns === 'undefined' ) ? 64 : tags.Columns;
+    var pixels = new Uint16Array(numberOfRows*numberOfColumns);
+    pixels.fill(100);
+    for ( var j = 0; j < numberOfRows; ++j ) {
+        var jc = Math.abs( j - (numberOfRows/2) );
+        for ( var i = 0; i < numberOfColumns; ++i ) {
+            var ic = Math.abs( i - (numberOfColumns/2) );
+            if ( jc < 10 && ic < 10) {
+                pixels[numberOfColumns*j + i] = i * j;
+            }
+        }
+    }
+    var pixVL = dwv.dicom.getDataElementPrefixByteSize("OW") +
+       (Uint16Array.BYTES_PER_ELEMENT * numberOfRows * numberOfColumns);
+    dicomElements.x7FE00010 = {
+            'tag': { 'group': "0x7FE0", 'element': "0x0010" },
+            'vr': "OW",
+            'vl': pixVL,
+            'value': pixels
+        };
+
+    // create writer
+    var writer = new dwv.dicom.DicomWriter();
+    // view as Blob to allow download
+    var blob = new Blob([writer.getBuffer(dicomElements)], {type: 'application/dicom'});
+    // update generate button
+    var element = document.getElementById("generate");
+    element.download = "dwv-generated.dcm";
+    element.href = URL.createObjectURL(blob);
+}
+// save the tags as a JSON file
+function saveTags()
+{
+    // check validity
+    if (!isValidTags()) {
+        return;
+    }
+    // get text from the textarea
+    var text = document.getElementById('tags').value;
+    // view as Blob to allow download
+    var blob = new Blob([text], {type:"text/plain"});
+    // update save button
+    var element = document.getElementById("save");
+    console.log(_tagsFile);
+    element.download = (_tagsFile === null ? "tags.json" : _tagsFile.name);
+    element.href = URL.createObjectURL(blob);
+}
+// is the JSON valid?
+function isValidTags()
+{
+    try {
+        JSON.parse(document.getElementById('tags').value);
+    }
+    catch (error) {
+        alert("The JSON is not valid, please check it with JSONLint.");
+        return false;
+    }
+    return true;
+}
+// open JSONLint to check the tags
+function launchJSONlint()
+{
+    var text = document.getElementById('tags').value;
+    var link = "http://jsonlint.com/?json=" + encodeURIComponent(text);
+    window.open(link);
+}
+// handle input tags file
+function onInputTagsFile(event)
+{
+    if (event.target.files.length === 0) {
+        return;
+    }
+    _tagsFile = event.target.files[0];
+    var reader = new FileReader();
+    reader.onload = function (event) {
+        document.getElementById('tags').value = event.target.result;
+    };
+    reader.readAsText(_tagsFile);
+}
+</script>
+<style>
+body { font-family: Arial; }
+textarea { width: 99%; margin: 2px; }
+fieldset { background: whitesmoke; border: 1px solid grey; }
+.button {
+    padding: 3px 7px 3px 7px;
+    text-align: center;
+    border-radius: 3px;
+    border: 1px solid grey;
+    text-decoration: none;
+    font: 80% sans-serif;
+    color: black;
+    background: #E3E3E3;
+}
+.button-active {
+    color: black;
+    background: #E3E3E3;
+}
+.button-disabled {
+    color: grey;
+    background: #F3F3F3;
+}
+.button:hover {
+    border: 1px solid black;
+}
+</style>
+</head>
+
+<body>
+
+<h1>DICOM Generator</h1>
+
+<p>Simple DICOM data generator from json tags.
+Mainly used for generating test data, <b>use at your own risks!</b>
+
+Only tested with explicit data (transfer syntax: <code>1.2.840.10008.1.2.1</code>).
+Values should not be <code>null</code>...
+<br>Sequences have an optional <code>explicitLength</code> boolean parameter to write them
+and all their elements with implicit or explicit length. Its default value is <code>true</code>.
+Set as <code>{}</code>, a sequence will
+be written with explicit zero length, a <code>0</code> value will mean implicit length.
+</p>
+
+<form name="genform">
+
+<fieldset>
+<label for="intagsfile">JSON DICOM tags file: </label>
+<input id="intagsfile" type="file" name="file" onchange="onInputTagsFile(event);">
+</fieldset>
+
+<textarea id="tags" rows="25">
+{
+  "FileMetaInformationGroupLength": 28,
+  "TransferSyntaxUID": "1.2.840.10008.1.2.1",
+  "Modality": "MR",
+  "PatientName": "dwv-patient-name",
+  "PhotometricInterpretation": "MONOCHROME2",
+  "SamplesPerPixel": 1,
+  "PixelRepresentation": 0,
+  "Rows": 32,
+  "Columns": 32,
+  "BitsAllocated": 16,
+  "BitsStored": 12,
+  "HighBit": 11,
+  "ReferencedImageSequence": {
+    "explicitLength": true,
+    "item0": {
+      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+      "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
+    },
+    "item1": {
+      "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+      "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
+    }
+  }
+}
+</textarea>
+
+<fieldset>
+<a href="#" id="jsonlint" class="button" onclick="launchJSONlint();">JSONLint</a>
+<a href="#" id="save" class="button" onclick="saveTags();">Save Tags</a>
+<a href="#" id="generate" class="button" onclick="generate();">Generate</a>
+</fieldset>
+</form>
+
+</body>
+</html>

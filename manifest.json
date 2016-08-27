@@ -1,0 +1,32 @@
+{
+  "name": "dwv",
+  "short_name": "dwv",
+  "description": "DICOM Web Viewer.",
+  "version": "0.16.0",
+  "manifest_version": 2,
+  "app": {
+    "urls": [
+      "https://ivmartel.github.io/dwv/demo/stable/"
+    ],
+    "launch": {
+      "web_url": "https://ivmartel.github.io/dwv/demo/stable/viewers/mobile/index.html"
+    }
+  },
+  "icons": {
+    "16": "resources/icons/dwv-16.png",
+    "60": "resources/icons/dwv-60.png",
+    "128": "resources/icons/dwv-128.png"
+  },
+  "container": "GOOGLE_DRIVE",
+  "api_console_project_id": "544445548355",
+  "gdrive_mime_types": {
+    "http://drive.google.com/intents/opendrivedoc": [
+      {
+        "type": ["application/dicom", "application/vnd.google.drive.ext-type.dcm"],
+        "href": "https://ivmartel.github.io/dwv/demo/stable/viewers/mobile/index.html",
+        "title": "Open",
+        "disposition": "window"
+      }
+    ]
+  }
+}
