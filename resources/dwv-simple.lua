@@ -91,8 +91,8 @@ print([[
 <script type="text/javascript" src="/dwv/ext/pdfjs/jpx.js"></script>
 <script type="text/javascript" src="/dwv/ext/pdfjs/util.js"></script>
 <script type="text/javascript" src="/dwv/ext/pdfjs/arithmetic_decoder.js"></script>
+<script type="text/javascript" src="/dwv/ext/pdfjs/jpg.js"></script>
 <script type="text/javascript" src="/dwv/ext/rii-mango/lossless-min.js"></script>
-<script type="text/javascript" src="/dwv/ext/notmasteryet/jpg.js"></script>
 
 <!-- Local -->
 <script type="text/javascript" src="/dwv/dwv-0.17.0-beta.min.js"></script>
