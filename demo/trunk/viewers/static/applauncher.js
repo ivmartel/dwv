@@ -30,7 +30,7 @@ function startApp() {
 dwv.image.decoderScripts = {
     "jpeg2000": "../../ext/pdfjs/decode-jpeg2000.js",
     "jpeg-lossless": "../../ext/rii-mango/decode-jpegloss.js",
-    "jpeg-baseline": "../../ext/notmasteryet/decode-jpegbaseline.js"
+    "jpeg-baseline": "../../ext/pdfjs/decode-jpegbaseline.js"
 };
 
 // check browser support
