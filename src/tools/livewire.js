@@ -225,6 +225,18 @@ dwv.tool.Livewire = function(app)
     };
 
     /**
+     * Handle double click event.
+     * @param {Object} event The double click event.
+     */
+    this.dblclick = function(/*event*/){
+        console.log("dblclick");
+        // save command in undo stack
+        app.addToUndoStack(command);
+        // set flag
+        self.started = false;
+    };
+    
+    /**
      * Handle touch start event.
      * @param {Object} event The touch start event.
      */
@@ -276,8 +288,15 @@ dwv.tool.Livewire = function(app)
         if ( gui ) {
             gui.display(bool);
         }
-        // TODO why twice?
-        this.init();
+        // start scissors if displayed
+        if (bool) {
+            //scissors = new dwv.math.Scissors();
+            var size = app.getImage().getGeometry().getSize();
+            scissors.setDimensions(
+                    size.getNumberOfColumns(),
+                    size.getNumberOfRows() );
+            scissors.setData(app.getImageData().data);
+        }
     };
 
     /**
@@ -291,13 +310,6 @@ dwv.tool.Livewire = function(app)
             // init html
             gui.initialise();
         }
-
-        //scissors = new dwv.math.Scissors();
-        var size = app.getImage().getGeometry().getSize();
-        scissors.setDimensions(
-                size.getNumberOfColumns(),
-                size.getNumberOfRows() );
-        scissors.setData(app.getImageData().data);
 
         return true;
     };
