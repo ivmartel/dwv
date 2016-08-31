@@ -11525,12 +11525,13 @@ dwv.image.Image.prototype.getRescaledValue = function( i, j, k, f )
 
 /**
  * Calculate the data range of the image.
+ * WARNING: for speed reasons, only calculated on the first frame...
  * @return {Object} The range {min, max}.
  */
 dwv.image.Image.prototype.calculateDataRange = function ()
 {
     var size = this.getGeometry().getSize().getTotalSize();
-    var nFrames = this.getNumberOfFrames();
+    var nFrames = 1; //this.getNumberOfFrames();
     var min = this.getValueAtOffset(0,0);
     var max = min;
     var value = 0;
@@ -11547,6 +11548,7 @@ dwv.image.Image.prototype.calculateDataRange = function ()
 
 /**
  * Calculate the rescaled data range of the image.
+ * WARNING: for speed reasons, only calculated on the first frame...
  * @return {Object} The range {min, max}.
  */
 dwv.image.Image.prototype.calculateRescaledDataRange = function ()
@@ -11565,10 +11567,11 @@ dwv.image.Image.prototype.calculateRescaledDataRange = function ()
     }
     else {
         var size = this.getGeometry().getSize();
+        var nFrames = 1; //this.getNumberOfFrames();
         var rmin = this.getRescaledValue(0,0,0);
         var rmax = rmin;
         var rvalue = 0;
-        for ( var f = 0, nframes = this.getNumberOfFrames(); f < nframes; ++f ) {
+        for ( var f = 0, nframes = nFrames; f < nframes; ++f ) {
             for ( var k = 0, nslices = size.getNumberOfSlices(); k < nslices; ++k ) {
                 for ( var j = 0, nrows = size.getNumberOfRows(); j < nrows; ++j ) {
                     for ( var i = 0, ncols = size.getNumberOfColumns(); i < ncols; ++i ) {
