@@ -879,10 +879,10 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
             return function (event) { pixelBuffer[frame] = event.data[0]; };
         };
 
-        var pixelDecoder = new dwv.image.PixelBufferDecoder();
+        var pixelDecoder = new dwv.image.PixelBufferDecoder(algoName);
         var nFrames = 20; //pixelBuffer.length;
         for (var f = 1; f < nFrames; ++f) {
-            pixelDecoder.decode(pixelBuffer[f], algoName, 
+            pixelDecoder.decode(pixelBuffer[f], 
                 bitsAllocated, isSigned, func(f));
         }
     }

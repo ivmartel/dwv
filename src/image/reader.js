@@ -126,10 +126,10 @@ dwv.image.DicomBufferToView = function ()
             var isSigned = (pixelRepresentation === 1);
 
             if (!pixelDecoder){
-                pixelDecoder = new dwv.image.PixelBufferDecoder();
+                pixelDecoder = new dwv.image.PixelBufferDecoder(algoName);
             }
             // only decompress the first frame to not block the system
-            pixelDecoder.decode(pixelBuffer[0], algoName, 
+            pixelDecoder.decode(pixelBuffer[0], 
                 bitsAllocated, isSigned, decodedBufferToView);
         }
         else {

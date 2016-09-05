@@ -16,9 +16,9 @@ var JpxImage = JpxImage || {};
 
 /**
  * Asynchronous pixel buffer decoder.
- * @param {Array} decoderScripts An array of decoder scripts paths.
+ * @param {String} script The path to the decoder script to be used by the web worker.
  */
-dwv.image.AsynchPixelBufferDecoder = function (decoderScripts)
+dwv.image.AsynchPixelBufferDecoder = function (script)
 {
     // initialise the thread pool 
     var pool = new dwv.utils.ThreadPool(15);
@@ -27,38 +27,45 @@ dwv.image.AsynchPixelBufferDecoder = function (decoderScripts)
     /**
      * Decode a pixel buffer.
      * @param {Array} pixelBuffer The pixel buffer.
-     * @param {String} algoName The decompression algorithm name.
      * @param {Number} bitsAllocated The bits allocated per element in the buffer.
      * @param {Boolean} isSigned Is the data signed.
      * @param {Function} callback Callback function to handle decoded data.
      */
-    this.decode = function (pixelBuffer, algoName, bitsAllocated, isSigned, callback) {
-        var script = decoderScripts[algoName];
-        if ( typeof script === "undefined" ) {
-            throw new Error("No script provided to decompress '" + algoName + "' data.");
-        }
+    this.decode = function (pixelBuffer, bitsAllocated, isSigned, callback) {
+        // (re)set event handler
+        pool.onpoolworkend = this.ondecodeend;
+        // create worker task
         var workerTask = new dwv.utils.WorkerTask(script, callback, {
             'buffer': pixelBuffer,
             'bitsAllocated': bitsAllocated,
             'isSigned': isSigned } );
+        // add it the queue and run it
         pool.addWorkerTask(workerTask);
     };
 };
 
 /**
- * Synchronous pixel buffer decoder.
+ * Handle a decode end event.
  */
-dwv.image.SynchPixelBufferDecoder = function ()
+dwv.image.AsynchPixelBufferDecoder.prototype.ondecodeend = function ()
+{
+    // default does nothing.
+};
+
+/**
+ * Synchronous pixel buffer decoder.
+ * @param {String} algoName The decompression algorithm name.
+ */
+dwv.image.SynchPixelBufferDecoder = function (algoName)
 {
     /**
      * Decode a pixel buffer.
      * @param {Array} pixelBuffer The pixel buffer.
-     * @param {String} algoName The decompression algorithm name.
      * @param {Number} bitsAllocated The bits allocated per element in the buffer.
      * @param {Boolean} isSigned Is the data signed.
      * @return {Array} The decoded pixel buffer.
      */
-    this.decode = function (pixelBuffer, algoName, bitsAllocated, isSigned) {
+    this.decode = function (pixelBuffer, bitsAllocated, isSigned) {
         var decoder = null;
         var decodedBuffer = null;
         if( algoName === "jpeg-lossless" ) {
@@ -111,12 +118,20 @@ dwv.image.SynchPixelBufferDecoder = function ()
 };
 
 /**
+ * Handle a decode end event.
+ */
+dwv.image.SynchPixelBufferDecoder.prototype.ondecodeend = function ()
+{
+    // default does nothing.
+};
+
+/**
  * Decode a pixel buffer.
  * Switches between a asynchronous/synchronous mode according to the definition of the 
  * 'dwv.image.decoderScripts' variable.
  * @constructor
  */
-dwv.image.PixelBufferDecoder = function ()
+dwv.image.PixelBufferDecoder = function (algoName)
 {
     /**
      * Asynchronous decoder.
@@ -126,6 +141,12 @@ dwv.image.PixelBufferDecoder = function ()
      */ 
     var asynchDecoder = null;
     
+    // initialise the asynch decoder (if possible)
+    if (typeof dwv.image.decoderScripts !== "undefined" &&
+            typeof dwv.image.decoderScripts[algoName] !== "undefined") {
+        asynchDecoder = new dwv.image.AsynchPixelBufferDecoder(dwv.image.decoderScripts[algoName]);
+    }
+
     /**
      * Get data from an input buffer using a DICOM parser.
      * @param {Array} pixelBuffer The input data buffer.
@@ -134,26 +155,32 @@ dwv.image.PixelBufferDecoder = function ()
      * @param {Boolean} isSigned Is the data signed.
      * @param {Object} callback The callback on the conversion.
      */
-    this.decode = function (pixelBuffer, algoName, bitsAllocated, isSigned, callback)
+    this.decode = function (pixelBuffer, bitsAllocated, isSigned, callback)
     {
         // run asynchronous if we have scripts
-        if (typeof dwv.image.decoderScripts !== "undefined") {
-            if (!asynchDecoder) {
-                // create the decoder (only once)
-                asynchDecoder = new dwv.image.AsynchPixelBufferDecoder(dwv.image.decoderScripts);
-            }
+        if (asynchDecoder !== null) {
+            // (re)set event handler
+            asynchDecoder.ondecodeend = this.ondecodeend;
             // decode and call the callback
-            asynchDecoder.decode(pixelBuffer, algoName, 
-                    bitsAllocated, isSigned, callback);
+            asynchDecoder.decode(pixelBuffer, bitsAllocated, isSigned, callback);
         }
         else {
             // create the decoder
-            var synchDecoder = new dwv.image.SynchPixelBufferDecoder();
+            var synchDecoder = new dwv.image.SynchPixelBufferDecoder(algoName);
+            synchDecoder.ondecodeend = this.ondecodeend;
             // decode
-            var decodedBuffer = synchDecoder.decode(pixelBuffer, algoName, 
-                    bitsAllocated, isSigned);
+            var decodedBuffer = synchDecoder.decode(pixelBuffer, bitsAllocated, isSigned);
             // call the callback
             callback({data: decodedBuffer});
         }
     };
 };
+
+/**
+ * Handle a decode end event.
+ */
+dwv.image.PixelBufferDecoder.prototype.ondecodeend = function ()
+{
+    // default does nothing.
+};
+

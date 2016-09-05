@@ -56,9 +56,22 @@ dwv.utils.ThreadPool = function (size) {
         } else {
             // no task to run, add to queue
             self.workerQueue.push(workerThread);
+            // the work is done when the queue is back to its initial size
+            if ( self.workerQueue.length === size ) {
+                self.onpoolworkend();
+            }
         }
     };
 };
+
+/**
+ * Handle a pool work end event.
+ */
+dwv.utils.ThreadPool.prototype.onpoolworkend = function ()
+{
+    // default does nothing.
+};
+
  
 /**
  * Worker thread.
