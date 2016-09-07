@@ -127,11 +127,12 @@ dwv.image.SynchPixelBufferDecoder.prototype.ondecodeend = function ()
 
 /**
  * Decode a pixel buffer.
- * Switches between a asynchronous/synchronous mode according to the definition of the 
- * 'dwv.image.decoderScripts' variable.
  * @constructor
+ * @param {String} algoName The decompression algorithm name.
+ * If the 'dwv.image.decoderScripts' variable does not contain the desired algorythm,
+ * the decoder will switch to the synchronous mode.
  */
-dwv.image.PixelBufferDecoder = function (algoName)
+dwv.image.PixelBufferDecoder = function (algoName, asynch)
 {
     /**
      * Asynchronous decoder.
@@ -150,15 +151,18 @@ dwv.image.PixelBufferDecoder = function (algoName)
     /**
      * Get data from an input buffer using a DICOM parser.
      * @param {Array} pixelBuffer The input data buffer.
-     * @param {String} algoName The decompression algorithm name.
      * @param {Number} bitsAllocated The bits allocated per element in the buffer.
      * @param {Boolean} isSigned Is the data signed.
      * @param {Object} callback The callback on the conversion.
+     * @param {Boolean} asynch Should the decoder run asynchronously, default to true.
      */
     this.decode = function (pixelBuffer, bitsAllocated, isSigned, callback)
     {
-        // run asynchronous if we have scripts
-        if (asynchDecoder !== null) {
+        // default to asynch
+        asynch = (typeof asynch === 'undefined') ? true : asynch;
+        
+        // run asynchronous if asked and we have scripts
+        if (asynch && asynchDecoder !== null) {
             // (re)set event handler
             asynchDecoder.ondecodeend = this.ondecodeend;
             // decode and call the callback

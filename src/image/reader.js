@@ -100,7 +100,7 @@ dwv.image.DicomBufferToView = function ()
         dicomParser.parse(buffer);
     
         // worker callback
-        var decodedBufferToView = function (event) {
+        var onDecodedFirstFrame = function (event) {
             // when decoded, only the first frame is decoded
             // so just replace the first frame content.
             pixelBuffer[0] = event.data[0];
@@ -128,13 +128,35 @@ dwv.image.DicomBufferToView = function ()
             if (!pixelDecoder){
                 pixelDecoder = new dwv.image.PixelBufferDecoder(algoName);
             }
-            // only decompress the first frame to not block the system
+            
+            // decompress synchronously the first frame to create the image
             pixelDecoder.decode(pixelBuffer[0], 
-                bitsAllocated, isSigned, decodedBufferToView);
+                bitsAllocated, isSigned, onDecodedFirstFrame, false);
+            
+            // decompress the possible other frames
+            var nFrames = pixelBuffer.length;
+            if ( nFrames != 1 ) {
+                // decoder callback
+                var onDecodedFrame = function (frame) {
+                    return function (event) { 
+                        pixelBuffer[frame] = event.data[0];
+                    };
+                };
+                // timing
+                console.time("decode-multiframe");
+                pixelDecoder.ondecodeend = function () {
+                    console.timeEnd("decode-multiframe");
+                };
+                // decode (synchronously if possible)
+                for (var f = 1; f < nFrames; ++f) {
+                    pixelDecoder.decode(pixelBuffer[f], 
+                        bitsAllocated, isSigned, onDecodedFrame(f));
+                }
+            }
         }
         else {
             // no decompression
-            decodedBufferToView({data: pixelBuffer});
+            onDecodedFirstFrame({data: pixelBuffer});
         }
     };
 };

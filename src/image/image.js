@@ -862,31 +862,6 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var origin = new dwv.math.Point3D(slicePosition[0], slicePosition[1], slicePosition[2]);
     var geometry = new dwv.image.Geometry( origin, size, spacing );
 
-    // decode multi-frame data
-    var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
-    var needDecompression = (algoName !== null);
-    // TODO Find a better way!
-    if (pixelBuffer.length > 1 && needDecompression) {
-
-        console.warn("Temporary limitation: only decoding the first 20 frames...");
-        
-        var bitsAllocated = dicomElements.getFromKey("x00280100");
-        var pixelRep = dicomElements.getFromKey("x00280103");
-        var isSigned = (pixelRep === 1);
-
-        // worker callback to replace the coded by the decoded frame content
-        var func = function (frame) {
-            return function (event) { pixelBuffer[frame] = event.data[0]; };
-        };
-
-        var pixelDecoder = new dwv.image.PixelBufferDecoder(algoName);
-        var nFrames = 20; //pixelBuffer.length;
-        for (var f = 1; f < nFrames; ++f) {
-            pixelDecoder.decode(pixelBuffer[f], 
-                bitsAllocated, isSigned, func(f));
-        }
-    }
-
     // image
     var image = new dwv.image.Image( geometry, pixelBuffer );
     // PhotometricInterpretation
