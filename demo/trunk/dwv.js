@@ -10630,11 +10630,12 @@ dwv.image.SynchPixelBufferDecoder.prototype.ondecodeend = function ()
 
 /**
  * Decode a pixel buffer.
- * Switches between a asynchronous/synchronous mode according to the definition of the 
- * 'dwv.image.decoderScripts' variable.
  * @constructor
+ * @param {String} algoName The decompression algorithm name.
+ * If the 'dwv.image.decoderScripts' variable does not contain the desired algorythm,
+ * the decoder will switch to the synchronous mode.
  */
-dwv.image.PixelBufferDecoder = function (algoName)
+dwv.image.PixelBufferDecoder = function (algoName, asynch)
 {
     /**
      * Asynchronous decoder.
@@ -10653,15 +10654,18 @@ dwv.image.PixelBufferDecoder = function (algoName)
     /**
      * Get data from an input buffer using a DICOM parser.
      * @param {Array} pixelBuffer The input data buffer.
-     * @param {String} algoName The decompression algorithm name.
      * @param {Number} bitsAllocated The bits allocated per element in the buffer.
      * @param {Boolean} isSigned Is the data signed.
      * @param {Object} callback The callback on the conversion.
+     * @param {Boolean} asynch Should the decoder run asynchronously, default to true.
      */
     this.decode = function (pixelBuffer, bitsAllocated, isSigned, callback)
     {
-        // run asynchronous if we have scripts
-        if (asynchDecoder !== null) {
+        // default to asynch
+        asynch = (typeof asynch === 'undefined') ? true : asynch;
+        
+        // run asynchronous if asked and we have scripts
+        if (asynch && asynchDecoder !== null) {
             // (re)set event handler
             asynchDecoder.ondecodeend = this.ondecodeend;
             // decode and call the callback
@@ -11973,31 +11977,6 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var origin = new dwv.math.Point3D(slicePosition[0], slicePosition[1], slicePosition[2]);
     var geometry = new dwv.image.Geometry( origin, size, spacing );
 
-    // decode multi-frame data
-    var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
-    var needDecompression = (algoName !== null);
-    // TODO Find a better way!
-    if (pixelBuffer.length > 1 && needDecompression) {
-
-        console.warn("Temporary limitation: only decoding the first 20 frames...");
-        
-        var bitsAllocated = dicomElements.getFromKey("x00280100");
-        var pixelRep = dicomElements.getFromKey("x00280103");
-        var isSigned = (pixelRep === 1);
-
-        // worker callback to replace the coded by the decoded frame content
-        var func = function (frame) {
-            return function (event) { pixelBuffer[frame] = event.data[0]; };
-        };
-
-        var pixelDecoder = new dwv.image.PixelBufferDecoder(algoName);
-        var nFrames = 20; //pixelBuffer.length;
-        for (var f = 1; f < nFrames; ++f) {
-            pixelDecoder.decode(pixelBuffer[f], 
-                bitsAllocated, isSigned, func(f));
-        }
-    }
-
     // image
     var image = new dwv.image.Image( geometry, pixelBuffer );
     // PhotometricInterpretation
@@ -12521,7 +12500,7 @@ dwv.image.DicomBufferToView = function ()
         dicomParser.parse(buffer);
     
         // worker callback
-        var decodedBufferToView = function (event) {
+        var onDecodedFirstFrame = function (event) {
             // when decoded, only the first frame is decoded
             // so just replace the first frame content.
             pixelBuffer[0] = event.data[0];
@@ -12549,13 +12528,35 @@ dwv.image.DicomBufferToView = function ()
             if (!pixelDecoder){
                 pixelDecoder = new dwv.image.PixelBufferDecoder(algoName);
             }
-            // only decompress the first frame to not block the system
+            
+            // decompress synchronously the first frame to create the image
             pixelDecoder.decode(pixelBuffer[0], 
-                bitsAllocated, isSigned, decodedBufferToView);
+                bitsAllocated, isSigned, onDecodedFirstFrame, false);
+            
+            // decompress the possible other frames
+            var nFrames = pixelBuffer.length;
+            if ( nFrames != 1 ) {
+                // decoder callback
+                var onDecodedFrame = function (frame) {
+                    return function (event) { 
+                        pixelBuffer[frame] = event.data[0];
+                    };
+                };
+                // timing
+                console.time("decode-multiframe");
+                pixelDecoder.ondecodeend = function () {
+                    console.timeEnd("decode-multiframe");
+                };
+                // decode (synchronously if possible)
+                for (var f = 1; f < nFrames; ++f) {
+                    pixelDecoder.decode(pixelBuffer[f], 
+                        bitsAllocated, isSigned, onDecodedFrame(f));
+                }
+            }
         }
         else {
             // no decompression
-            decodedBufferToView({data: pixelBuffer});
+            onDecodedFirstFrame({data: pixelBuffer});
         }
     };
 };
@@ -19536,6 +19537,8 @@ dwv.utils.WorkerThread = function (parentPool) {
     this.parentPool = parentPool;
     // associated task
     this.workerTask = {};
+    // associated web worker
+    var worker;
  
     /**
      * Run a worker task
@@ -19546,7 +19549,7 @@ dwv.utils.WorkerThread = function (parentPool) {
         this.workerTask = workerTask;
         // create a new web worker
         if (this.workerTask.script !== null) {
-            var worker = new Worker(workerTask.script);
+            worker = new Worker(workerTask.script);
             worker.addEventListener('message', ontaskend, false);
             // launch the worker
             worker.postMessage(workerTask.startMessage);
@@ -19562,6 +19565,8 @@ dwv.utils.WorkerThread = function (parentPool) {
     function ontaskend(event) {
         // pass to original callback
         self.workerTask.callback(event);
+        // stop the worker
+        worker.terminate();
         // tell the parent pool this thread is free
         self.parentPool.freeWorkerThread(self);
     }
