@@ -85,6 +85,8 @@ dwv.utils.WorkerThread = function (parentPool) {
     this.parentPool = parentPool;
     // associated task
     this.workerTask = {};
+    // associated web worker
+    var worker;
  
     /**
      * Run a worker task
@@ -95,7 +97,7 @@ dwv.utils.WorkerThread = function (parentPool) {
         this.workerTask = workerTask;
         // create a new web worker
         if (this.workerTask.script !== null) {
-            var worker = new Worker(workerTask.script);
+            worker = new Worker(workerTask.script);
             worker.addEventListener('message', ontaskend, false);
             // launch the worker
             worker.postMessage(workerTask.startMessage);
@@ -111,6 +113,8 @@ dwv.utils.WorkerThread = function (parentPool) {
     function ontaskend(event) {
         // pass to original callback
         self.workerTask.callback(event);
+        // stop the worker
+        worker.terminate();
         // tell the parent pool this thread is free
         self.parentPool.freeWorkerThread(self);
     }
