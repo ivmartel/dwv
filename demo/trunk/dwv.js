@@ -10537,6 +10537,7 @@ dwv.image.AsynchPixelBufferDecoder = function (script)
     this.decode = function (pixelBuffer, bitsAllocated, isSigned, callback) {
         // (re)set event handler
         pool.onpoolworkend = this.ondecodeend;
+        pool.onworkerend = this.ondecoded;
         // create worker task
         var workerTask = new dwv.utils.WorkerTask(script, callback, {
             'buffer': pixelBuffer,
@@ -10551,6 +10552,14 @@ dwv.image.AsynchPixelBufferDecoder = function (script)
  * Handle a decode end event.
  */
 dwv.image.AsynchPixelBufferDecoder.prototype.ondecodeend = function ()
+{
+    // default does nothing.
+};
+
+/**
+ * Handle a decode event.
+ */
+dwv.image.AsynchPixelBufferDecoder.prototype.ondecoded = function ()
 {
     // default does nothing.
 };
@@ -10615,6 +10624,9 @@ dwv.image.SynchPixelBufferDecoder = function (algoName)
             // set the pixel buffer
             decodedBuffer = decoder.tiles[0].items;
         }
+        // send events
+        this.ondecoded();
+        this.ondecodeend();
         // return result as array
         return [decodedBuffer];
     };
@@ -10624,6 +10636,14 @@ dwv.image.SynchPixelBufferDecoder = function (algoName)
  * Handle a decode end event.
  */
 dwv.image.SynchPixelBufferDecoder.prototype.ondecodeend = function ()
+{
+    // default does nothing.
+};
+
+/**
+ * Handle a decode event.
+ */
+dwv.image.SynchPixelBufferDecoder.prototype.ondecoded = function ()
 {
     // default does nothing.
 };
@@ -10668,6 +10688,7 @@ dwv.image.PixelBufferDecoder = function (algoName, asynch)
         if (asynch && asynchDecoder !== null) {
             // (re)set event handler
             asynchDecoder.ondecodeend = this.ondecodeend;
+            asynchDecoder.ondecoded = this.ondecoded;
             // decode and call the callback
             asynchDecoder.decode(pixelBuffer, bitsAllocated, isSigned, callback);
         }
@@ -10675,6 +10696,7 @@ dwv.image.PixelBufferDecoder = function (algoName, asynch)
             // create the decoder
             var synchDecoder = new dwv.image.SynchPixelBufferDecoder(algoName);
             synchDecoder.ondecodeend = this.ondecodeend;
+            synchDecoder.ondecoded = this.ondecoded;
             // decode
             var decodedBuffer = synchDecoder.decode(pixelBuffer, bitsAllocated, isSigned);
             // call the callback
@@ -10687,6 +10709,14 @@ dwv.image.PixelBufferDecoder = function (algoName, asynch)
  * Handle a decode end event.
  */
 dwv.image.PixelBufferDecoder.prototype.ondecodeend = function ()
+{
+    // default does nothing.
+};
+
+/**
+ * Handle a decode end event.
+ */
+dwv.image.PixelBufferDecoder.prototype.ondecoded = function ()
 {
     // default does nothing.
 };
@@ -12463,6 +12493,9 @@ dwv.image.getViewFromDOMImage = function (image)
  */
 dwv.image.DicomBufferToView = function ()
 {
+    // closure to self
+    var self = this;
+
     /**
      * The default character set (optional).
      * @private
@@ -12499,11 +12532,13 @@ dwv.image.DicomBufferToView = function ()
         // parse the buffer
         dicomParser.parse(buffer);
     
+        var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
+        var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
+        var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
+        var needDecompression = (algoName !== null);
+
         // worker callback
-        var onDecodedFirstFrame = function (event) {
-            // when decoded, only the first frame is decoded
-            // so just replace the first frame content.
-            pixelBuffer[0] = event.data[0];
+        var onDecodedFirstFrame = function (/*event*/) {
             // create the image
             var imageFactory = new dwv.image.ImageFactory();
             var image = imageFactory.create( dicomParser.getDicomElements(), pixelBuffer );
@@ -12514,53 +12549,91 @@ dwv.image.DicomBufferToView = function ()
             callback({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
         };
 
-        var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
-
-        var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
-        var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
-        var needDecompression = (algoName !== null);
-
         if ( needDecompression ) {
             var bitsAllocated = dicomParser.getRawDicomElements().x00280100.value[0];
             var pixelRepresentation = dicomParser.getRawDicomElements().x00280103.value[0];
             var isSigned = (pixelRepresentation === 1);
+            var nFrames = pixelBuffer.length;
 
             if (!pixelDecoder){
                 pixelDecoder = new dwv.image.PixelBufferDecoder(algoName);
             }
             
+            // loadend event
+            console.time("decode-multiframe");
+            pixelDecoder.ondecodeend = function () {
+                self.onloadend();
+                console.timeEnd("decode-multiframe");
+            };
+
+            // send an onload event for mono frame
+            if ( nFrames === 1 ) {
+                pixelDecoder.ondecoded = function () {
+                    self.onload();
+                };
+            }
+
+            // decoder callback
+            var countDecodedFrames = 0;
+            var onDecodedFrame = function (frame) {
+                return function (event) {
+                    ++countDecodedFrames;
+                    var ev = {type: "read-progress", lengthComputable: true,
+                        loaded: (countDecodedFrames * 100 / nFrames), total: 100};
+                    self.onprogress(ev);
+                    pixelBuffer[frame] = event.data[0];
+                    if ( frame === 0 ) {
+                        onDecodedFirstFrame();
+                    }
+                };
+            };
+
             // decompress synchronously the first frame to create the image
             pixelDecoder.decode(pixelBuffer[0], 
-                bitsAllocated, isSigned, onDecodedFirstFrame, false);
+                bitsAllocated, isSigned, onDecodedFrame(0), false);
             
             // decompress the possible other frames
-            var nFrames = pixelBuffer.length;
             if ( nFrames != 1 ) {
-                // decoder callback
-                var onDecodedFrame = function (frame) {
-                    return function (event) { 
-                        pixelBuffer[frame] = event.data[0];
-                    };
-                };
-                // timing
-                console.time("decode-multiframe");
-                pixelDecoder.ondecodeend = function () {
-                    console.timeEnd("decode-multiframe");
-                };
-                // decode (synchronously if possible)
+                // decode (asynchronously if possible)
                 for (var f = 1; f < nFrames; ++f) {
                     pixelDecoder.decode(pixelBuffer[f], 
                         bitsAllocated, isSigned, onDecodedFrame(f));
                 }
             }
         }
+        // no decompression
         else {
-            // no decompression
-            onDecodedFirstFrame({data: pixelBuffer});
+            // send events
+            self.onprogress({type: "read-progress", lengthComputable: true,
+                loaded: 100, total: 100});
+            self.onload();
+            self.onloadend();
+            onDecodedFirstFrame();
         }
     };
 };
 
+/**
+ * Handle a load end event.
+ */
+dwv.image.DicomBufferToView.prototype.onloadend = function ()
+{
+    // default does nothing.
+};
+/**
+ * Handle a load event.
+ */
+dwv.image.DicomBufferToView.prototype.onload = function ()
+{
+    // default does nothing.
+};
+/**
+ * Handle a load progress event.
+ */
+dwv.image.DicomBufferToView.prototype.onprogress = function ()
+{
+    // default does nothing.
+};
 ;// namespaces
 var dwv = dwv || {};
 dwv.image = dwv.image || {};
@@ -13099,6 +13172,13 @@ dwv.io = dwv.io || {};
 dwv.io.File = function ()
 {
     /**
+     * CLosure to self.
+     * @private
+     * @type Object
+     */
+    var self = this;
+    
+    /**
      * Number of data to load.
      * @private
      * @type Number
@@ -13111,11 +13191,17 @@ dwv.io.File = function ()
      */
     var nLoaded = 0;
     /**
-     * List of progresses.
+     * List of load progresses.
      * @private
      * @type Array
      */
-    var progressList = [];
+    var loadProgresses = [];
+    /**
+     * List of decode progresses.
+     * @private
+     * @type Array
+     */
+    var decodeProgresses = [];
     
     /**
      * The default character set (optional).
@@ -13134,7 +13220,7 @@ dwv.io.File = function ()
     
     /**
      * Set the default character set.
-     * param {String} The character set.
+     * @param {String} characterSet The character set.
      */
     this.setDefaultCharacterSet = function (characterSet) {
         defaultCharacterSet = characterSet;
@@ -13142,11 +13228,13 @@ dwv.io.File = function ()
 
     /**
      * Set the number of data to load.
+     * @param {Number} n The number of data to load.
      */
     this.setNToLoad = function (n) {
         nToLoad = n;
         for ( var i = 0; i < nToLoad; ++i ) {
-            progressList[i] = 0;
+            loadProgresses[i] = 0;
+            decodeProgresses[i] = 0;
         }
     };
 
@@ -13162,19 +13250,40 @@ dwv.io.File = function ()
     };
 
     /**
-     * Get the global load percent including the provided one.
+     * Handle a load progress.
      * @param {Number} n The number of the loaded data.
      * @param {Number} percent The percentage of data 'n' that has been loaded.
+     */
+    this.onLoadProgress = function (n, percent) {
+        loadProgresses[n] = percent;
+        self.onprogress({type: "load-progress", lengthComputable: true,
+            loaded: getGlobalPercent(), total: 100});
+    };
+
+    /**
+     * Handle a decode progress.
+     * @param {Object} event The progress event.
+     */
+    this.onDecodeProgress = function (event) {
+        // use the internal count as index
+        decodeProgresses[nLoaded] = event.loaded;
+        self.onprogress({type: "load-progress", lengthComputable: true,
+            loaded: getGlobalPercent(), total: 100});
+    };
+
+    /**
+     * Get the global load percent including the provided one.
      * @return {Number} The accumulated percentage.
      */
-    this.getGlobalPercent = function (n, percent) {
-        progressList[n] = percent;
-        var totPercent = 0;
-        for ( var i = 0; i < progressList.length; ++i ) {
-            totPercent += progressList[i];
+    function getGlobalPercent() {
+        var sum = 0;
+        for ( var i = 0; i < loadProgresses.length; ++i ) {
+            sum += loadProgresses[i];
+            sum += decodeProgresses[i];
         }
-        return totPercent/nToLoad;
-    };
+        // half loading, half decoding
+        return sum / (2 * nToLoad);
+    }
     
 }; // class File
 
@@ -13226,19 +13335,16 @@ dwv.io.File.createErrorHandler = function (file, text, baseHandler) {
 };
 
 /**
- * Create an progress handler from a base one and locals.
+ * Create a load progress event handler.
  * @param {Number} n The number of the loaded data.
- * @param {Function} calculator The load progress accumulator.
- * @param {Function} baseHandler The base handler.
+ * @param {Function} loadProgressHandler A load progress percent handler.
  */
-dwv.io.File.createProgressHandler = function (n, calculator, baseHandler) {
+dwv.io.File.createLoadProgressHandler = function (n, loadProgressHandler) {
     return function (event) {
         if( event.lengthComputable )
         {
             var percent = Math.round((event.loaded / event.total) * 100);
-            var ev = {type: "load-progress", lengthComputable: true,
-                loaded: calculator(n, percent), total: 100};
-            baseHandler(ev);
+            loadProgressHandler(n, percent);
         }
     };
 };
@@ -13254,17 +13360,22 @@ dwv.io.File.prototype.load = function (ioArray)
     // set the number of data to load
     this.setNToLoad( ioArray.length );
 
-    // call the listeners
+    // call the onload listener
     var onLoadView = function (data)
     {
         self.onload(data);
-        self.addLoaded();
     };
 
     // DICOM buffer to dwv.image.View (asynchronous)
     var db2v = new dwv.image.DicomBufferToView();
     db2v.setDefaultCharacterSet(this.getDefaultCharacterSet());
-    // callback
+    db2v.onload = function () {
+        self.addLoaded();
+    };
+    db2v.onprogress = function (event) {
+        self.onDecodeProgress(event);
+    };
+    // reader callback
     var onLoadDicomBuffer = function (event)
     {
         try {
@@ -13311,8 +13422,7 @@ dwv.io.File.prototype.load = function (ioArray)
     {
         var file = ioArray[i];
         var reader = new FileReader();
-        reader.onprogress = dwv.io.File.createProgressHandler(i,
-                self.getGlobalPercent, self.onprogress);
+        reader.onprogress = dwv.io.File.createLoadProgressHandler(i, self.onLoadProgress);
         if ( file.name.split('.').pop().toLowerCase() === "json" )
         {
             reader.onload = onLoadTextBuffer;
@@ -13348,6 +13458,13 @@ dwv.io = dwv.io || {};
 dwv.io.Url = function ()
 {
     /**
+     * CLosure to self.
+     * @private
+     * @type Object
+     */
+    var self = this;
+
+    /**
      * Number of data to load.
      * @private
      * @type Number
@@ -13360,11 +13477,17 @@ dwv.io.Url = function ()
      */
     var nLoaded = 0;
     /**
-     * List of progresses.
+     * List of load progresses.
      * @private
      * @type Array
      */
-    var progressList = [];
+    var loadProgresses = [];
+    /**
+     * List of decode progresses.
+     * @private
+     * @type Array
+     */
+    var decodeProgresses = [];
 
     /**
      * The default character set (optional).
@@ -13383,7 +13506,7 @@ dwv.io.Url = function ()
     
     /**
      * Set the default character set.
-     * param {String} The character set.
+     * @param {String} characterSet The character set.
      */
     this.setDefaultCharacterSet = function (characterSet) {
         defaultCharacterSet = characterSet;
@@ -13391,11 +13514,13 @@ dwv.io.Url = function ()
 
     /**
      * Set the number of data to load.
+     * @param {Number} n The number of data to load.
      */
     this.setNToLoad = function (n) {
         nToLoad = n;
         for ( var i = 0; i < nToLoad; ++i ) {
-            progressList[i] = 0;
+            loadProgresses[i] = 0;
+            decodeProgresses[i] = 0;
         }
     };
 
@@ -13411,19 +13536,40 @@ dwv.io.Url = function ()
     };
 
     /**
-     * Get the global load percent including the provided one.
+     * Handle a load progress.
      * @param {Number} n The number of the loaded data.
      * @param {Number} percent The percentage of data 'n' that has been loaded.
+     */
+    this.onLoadProgress = function (n, percent) {
+        loadProgresses[n] = percent;
+        self.onprogress({type: "load-progress", lengthComputable: true,
+            loaded: getGlobalPercent(), total: 100});
+    };
+
+    /**
+     * Handle a decode progress.
+     * @param {Object} event The progress event.
+     */
+    this.onDecodeProgress = function (event) {
+        // use the internal count as index
+        decodeProgresses[nLoaded] = event.loaded;
+        self.onprogress({type: "load-progress", lengthComputable: true,
+            loaded: getGlobalPercent(), total: 100});
+    };
+
+    /**
+     * Get the global load percent including the provided one.
      * @return {Number} The accumulated percentage.
      */
-    this.getGlobalPercent = function (n, percent) {
-        progressList[n] = percent/nToLoad;
-        var totPercent = 0;
-        for ( var i = 0; i < progressList.length; ++i ) {
-            totPercent += progressList[i];
+    function getGlobalPercent() {
+        var sum = 0;
+        for ( var i = 0; i < loadProgresses.length; ++i ) {
+            sum += loadProgresses[i];
+            sum += decodeProgresses[i];
         }
-        return totPercent;
-    };
+        // half loading, half decoding
+        return sum / (2 * nToLoad);
+    }
     
 }; // class Url
 
@@ -13475,19 +13621,16 @@ dwv.io.Url.createErrorHandler = function (url, text, baseHandler) {
 };
 
 /**
- * Create an progress handler from a base one and locals.
+ * Create a load progress event handler.
  * @param {Number} n The number of the loaded data.
- * @param {Function} calculator The load progress accumulator.
- * @param {Function} baseHandler The base handler.
+ * @param {Function} loadProgressHandler A load progress percent handler.
  */
-dwv.io.Url.createProgressHandler = function (n, calculator, baseHandler) {
+dwv.io.File.createLoadProgressHandler = function (n, loadProgressHandler) {
     return function (event) {
         if( event.lengthComputable )
         {
             var percent = Math.round((event.loaded / event.total) * 100);
-            var ev = {type: "load-progress", lengthComputable: true,
-                    loaded: calculator(n, percent), total: 100};
-            baseHandler(ev);
+            loadProgressHandler(n, percent);
         }
     };
 };
@@ -13508,12 +13651,17 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     var onLoadView = function (data)
     {
         self.onload(data);
-        self.addLoaded();
     };
 
     // DICOM buffer to dwv.image.View (asynchronous)
     var db2v = new dwv.image.DicomBufferToView();
     db2v.setDefaultCharacterSet(this.getDefaultCharacterSet());
+    db2v.onload = function () {
+        self.addLoaded();
+    };
+    db2v.onprogress = function (event) {
+        self.onDecodeProgress(event);
+    };
     // callback
     var onLoadDicomBuffer = function (response)
     {
@@ -13634,8 +13782,7 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
             request.onload = onLoadTextBuffer;
             request.onerror = dwv.io.Url.createErrorHandler(url, "text", self.onerror);
         }
-        request.onprogress = dwv.io.File.createProgressHandler(i,
-            self.getGlobalPercent, self.onprogress);
+        request.onprogress = dwv.io.File.createLoadProgressHandler(i, self.onLoadProgress);
         request.send(null);
     }
 };
@@ -19501,6 +19648,7 @@ dwv.utils.ThreadPool = function (size) {
      * @param {Object} workerThread The thread to free.
      */
     this.freeWorkerThread = function (workerThread) {
+        self.onworkerend();
         if (self.taskQueue.length > 0) {
             // don't put back in queue, but execute next task
             var workerTask = self.taskQueue.shift();
@@ -19524,7 +19672,14 @@ dwv.utils.ThreadPool.prototype.onpoolworkend = function ()
     // default does nothing.
 };
 
- 
+/**
+ * Handle a pool worker end event.
+ */
+dwv.utils.ThreadPool.prototype.onworkerend = function ()
+{
+    // default does nothing.
+};
+
 /**
  * Worker thread.
  * @constructor
