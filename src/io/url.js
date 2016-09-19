@@ -9,6 +9,13 @@ dwv.io = dwv.io || {};
 dwv.io.Url = function ()
 {
     /**
+     * CLosure to self.
+     * @private
+     * @type Object
+     */
+    var self = this;
+
+    /**
      * Number of data to load.
      * @private
      * @type Number
@@ -21,11 +28,17 @@ dwv.io.Url = function ()
      */
     var nLoaded = 0;
     /**
-     * List of progresses.
+     * List of load progresses.
      * @private
      * @type Array
      */
-    var progressList = [];
+    var loadProgresses = [];
+    /**
+     * List of decode progresses.
+     * @private
+     * @type Array
+     */
+    var decodeProgresses = [];
 
     /**
      * The default character set (optional).
@@ -44,7 +57,7 @@ dwv.io.Url = function ()
     
     /**
      * Set the default character set.
-     * param {String} The character set.
+     * @param {String} characterSet The character set.
      */
     this.setDefaultCharacterSet = function (characterSet) {
         defaultCharacterSet = characterSet;
@@ -52,11 +65,13 @@ dwv.io.Url = function ()
 
     /**
      * Set the number of data to load.
+     * @param {Number} n The number of data to load.
      */
     this.setNToLoad = function (n) {
         nToLoad = n;
         for ( var i = 0; i < nToLoad; ++i ) {
-            progressList[i] = 0;
+            loadProgresses[i] = 0;
+            decodeProgresses[i] = 0;
         }
     };
 
@@ -72,19 +87,40 @@ dwv.io.Url = function ()
     };
 
     /**
-     * Get the global load percent including the provided one.
+     * Handle a load progress.
      * @param {Number} n The number of the loaded data.
      * @param {Number} percent The percentage of data 'n' that has been loaded.
+     */
+    this.onLoadProgress = function (n, percent) {
+        loadProgresses[n] = percent;
+        self.onprogress({type: "load-progress", lengthComputable: true,
+            loaded: getGlobalPercent(), total: 100});
+    };
+
+    /**
+     * Handle a decode progress.
+     * @param {Object} event The progress event.
+     */
+    this.onDecodeProgress = function (event) {
+        // use the internal count as index
+        decodeProgresses[nLoaded] = event.loaded;
+        self.onprogress({type: "load-progress", lengthComputable: true,
+            loaded: getGlobalPercent(), total: 100});
+    };
+
+    /**
+     * Get the global load percent including the provided one.
      * @return {Number} The accumulated percentage.
      */
-    this.getGlobalPercent = function (n, percent) {
-        progressList[n] = percent/nToLoad;
-        var totPercent = 0;
-        for ( var i = 0; i < progressList.length; ++i ) {
-            totPercent += progressList[i];
+    function getGlobalPercent() {
+        var sum = 0;
+        for ( var i = 0; i < loadProgresses.length; ++i ) {
+            sum += loadProgresses[i];
+            sum += decodeProgresses[i];
         }
-        return totPercent;
-    };
+        // half loading, half decoding
+        return sum / (2 * nToLoad);
+    }
     
 }; // class Url
 
@@ -136,19 +172,16 @@ dwv.io.Url.createErrorHandler = function (url, text, baseHandler) {
 };
 
 /**
- * Create an progress handler from a base one and locals.
+ * Create a load progress event handler.
  * @param {Number} n The number of the loaded data.
- * @param {Function} calculator The load progress accumulator.
- * @param {Function} baseHandler The base handler.
+ * @param {Function} loadProgressHandler A load progress percent handler.
  */
-dwv.io.Url.createProgressHandler = function (n, calculator, baseHandler) {
+dwv.io.File.createLoadProgressHandler = function (n, loadProgressHandler) {
     return function (event) {
         if( event.lengthComputable )
         {
             var percent = Math.round((event.loaded / event.total) * 100);
-            var ev = {type: "load-progress", lengthComputable: true,
-                    loaded: calculator(n, percent), total: 100};
-            baseHandler(ev);
+            loadProgressHandler(n, percent);
         }
     };
 };
@@ -169,12 +202,17 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     var onLoadView = function (data)
     {
         self.onload(data);
-        self.addLoaded();
     };
 
     // DICOM buffer to dwv.image.View (asynchronous)
     var db2v = new dwv.image.DicomBufferToView();
     db2v.setDefaultCharacterSet(this.getDefaultCharacterSet());
+    db2v.onload = function () {
+        self.addLoaded();
+    };
+    db2v.onprogress = function (event) {
+        self.onDecodeProgress(event);
+    };
     // callback
     var onLoadDicomBuffer = function (response)
     {
@@ -295,8 +333,7 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
             request.onload = onLoadTextBuffer;
             request.onerror = dwv.io.Url.createErrorHandler(url, "text", self.onerror);
         }
-        request.onprogress = dwv.io.File.createProgressHandler(i,
-            self.getGlobalPercent, self.onprogress);
+        request.onprogress = dwv.io.File.createLoadProgressHandler(i, self.onLoadProgress);
         request.send(null);
     }
 };

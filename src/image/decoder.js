@@ -34,6 +34,7 @@ dwv.image.AsynchPixelBufferDecoder = function (script)
     this.decode = function (pixelBuffer, bitsAllocated, isSigned, callback) {
         // (re)set event handler
         pool.onpoolworkend = this.ondecodeend;
+        pool.onworkerend = this.ondecoded;
         // create worker task
         var workerTask = new dwv.utils.WorkerTask(script, callback, {
             'buffer': pixelBuffer,
@@ -48,6 +49,14 @@ dwv.image.AsynchPixelBufferDecoder = function (script)
  * Handle a decode end event.
  */
 dwv.image.AsynchPixelBufferDecoder.prototype.ondecodeend = function ()
+{
+    // default does nothing.
+};
+
+/**
+ * Handle a decode event.
+ */
+dwv.image.AsynchPixelBufferDecoder.prototype.ondecoded = function ()
 {
     // default does nothing.
 };
@@ -112,6 +121,9 @@ dwv.image.SynchPixelBufferDecoder = function (algoName)
             // set the pixel buffer
             decodedBuffer = decoder.tiles[0].items;
         }
+        // send events
+        this.ondecoded();
+        this.ondecodeend();
         // return result as array
         return [decodedBuffer];
     };
@@ -121,6 +133,14 @@ dwv.image.SynchPixelBufferDecoder = function (algoName)
  * Handle a decode end event.
  */
 dwv.image.SynchPixelBufferDecoder.prototype.ondecodeend = function ()
+{
+    // default does nothing.
+};
+
+/**
+ * Handle a decode event.
+ */
+dwv.image.SynchPixelBufferDecoder.prototype.ondecoded = function ()
 {
     // default does nothing.
 };
@@ -165,6 +185,7 @@ dwv.image.PixelBufferDecoder = function (algoName, asynch)
         if (asynch && asynchDecoder !== null) {
             // (re)set event handler
             asynchDecoder.ondecodeend = this.ondecodeend;
+            asynchDecoder.ondecoded = this.ondecoded;
             // decode and call the callback
             asynchDecoder.decode(pixelBuffer, bitsAllocated, isSigned, callback);
         }
@@ -172,6 +193,7 @@ dwv.image.PixelBufferDecoder = function (algoName, asynch)
             // create the decoder
             var synchDecoder = new dwv.image.SynchPixelBufferDecoder(algoName);
             synchDecoder.ondecodeend = this.ondecodeend;
+            synchDecoder.ondecoded = this.ondecoded;
             // decode
             var decodedBuffer = synchDecoder.decode(pixelBuffer, bitsAllocated, isSigned);
             // call the callback
@@ -184,6 +206,14 @@ dwv.image.PixelBufferDecoder = function (algoName, asynch)
  * Handle a decode end event.
  */
 dwv.image.PixelBufferDecoder.prototype.ondecodeend = function ()
+{
+    // default does nothing.
+};
+
+/**
+ * Handle a decode end event.
+ */
+dwv.image.PixelBufferDecoder.prototype.ondecoded = function ()
 {
     // default does nothing.
 };

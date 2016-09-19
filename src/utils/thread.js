@@ -49,6 +49,7 @@ dwv.utils.ThreadPool = function (size) {
      * @param {Object} workerThread The thread to free.
      */
     this.freeWorkerThread = function (workerThread) {
+        self.onworkerend();
         if (self.taskQueue.length > 0) {
             // don't put back in queue, but execute next task
             var workerTask = self.taskQueue.shift();
@@ -72,7 +73,14 @@ dwv.utils.ThreadPool.prototype.onpoolworkend = function ()
     // default does nothing.
 };
 
- 
+/**
+ * Handle a pool worker end event.
+ */
+dwv.utils.ThreadPool.prototype.onworkerend = function ()
+{
+    // default does nothing.
+};
+
 /**
  * Worker thread.
  * @constructor

@@ -63,6 +63,9 @@ dwv.image.getViewFromDOMImage = function (image)
  */
 dwv.image.DicomBufferToView = function ()
 {
+    // closure to self
+    var self = this;
+
     /**
      * The default character set (optional).
      * @private
@@ -99,11 +102,13 @@ dwv.image.DicomBufferToView = function ()
         // parse the buffer
         dicomParser.parse(buffer);
     
+        var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
+        var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
+        var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
+        var needDecompression = (algoName !== null);
+
         // worker callback
-        var onDecodedFirstFrame = function (event) {
-            // when decoded, only the first frame is decoded
-            // so just replace the first frame content.
-            pixelBuffer[0] = event.data[0];
+        var onDecodedFirstFrame = function (/*event*/) {
             // create the image
             var imageFactory = new dwv.image.ImageFactory();
             var image = imageFactory.create( dicomParser.getDicomElements(), pixelBuffer );
@@ -114,50 +119,88 @@ dwv.image.DicomBufferToView = function ()
             callback({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
         };
 
-        var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
-
-        var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
-        var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
-        var needDecompression = (algoName !== null);
-
         if ( needDecompression ) {
             var bitsAllocated = dicomParser.getRawDicomElements().x00280100.value[0];
             var pixelRepresentation = dicomParser.getRawDicomElements().x00280103.value[0];
             var isSigned = (pixelRepresentation === 1);
+            var nFrames = pixelBuffer.length;
 
             if (!pixelDecoder){
                 pixelDecoder = new dwv.image.PixelBufferDecoder(algoName);
             }
             
+            // loadend event
+            console.time("decode-multiframe");
+            pixelDecoder.ondecodeend = function () {
+                self.onloadend();
+                console.timeEnd("decode-multiframe");
+            };
+
+            // send an onload event for mono frame
+            if ( nFrames === 1 ) {
+                pixelDecoder.ondecoded = function () {
+                    self.onload();
+                };
+            }
+
+            // decoder callback
+            var countDecodedFrames = 0;
+            var onDecodedFrame = function (frame) {
+                return function (event) {
+                    ++countDecodedFrames;
+                    var ev = {type: "read-progress", lengthComputable: true,
+                        loaded: (countDecodedFrames * 100 / nFrames), total: 100};
+                    self.onprogress(ev);
+                    pixelBuffer[frame] = event.data[0];
+                    if ( frame === 0 ) {
+                        onDecodedFirstFrame();
+                    }
+                };
+            };
+
             // decompress synchronously the first frame to create the image
             pixelDecoder.decode(pixelBuffer[0], 
-                bitsAllocated, isSigned, onDecodedFirstFrame, false);
+                bitsAllocated, isSigned, onDecodedFrame(0), false);
             
             // decompress the possible other frames
-            var nFrames = pixelBuffer.length;
             if ( nFrames != 1 ) {
-                // decoder callback
-                var onDecodedFrame = function (frame) {
-                    return function (event) { 
-                        pixelBuffer[frame] = event.data[0];
-                    };
-                };
-                // timing
-                console.time("decode-multiframe");
-                pixelDecoder.ondecodeend = function () {
-                    console.timeEnd("decode-multiframe");
-                };
-                // decode (synchronously if possible)
+                // decode (asynchronously if possible)
                 for (var f = 1; f < nFrames; ++f) {
                     pixelDecoder.decode(pixelBuffer[f], 
                         bitsAllocated, isSigned, onDecodedFrame(f));
                 }
             }
         }
+        // no decompression
         else {
-            // no decompression
-            onDecodedFirstFrame({data: pixelBuffer});
+            // send events
+            self.onprogress({type: "read-progress", lengthComputable: true,
+                loaded: 100, total: 100});
+            self.onload();
+            self.onloadend();
+            onDecodedFirstFrame();
         }
     };
 };
 
+/**
+ * Handle a load end event.
+ */
+dwv.image.DicomBufferToView.prototype.onloadend = function ()
+{
+    // default does nothing.
+};
+/**
+ * Handle a load event.
+ */
+dwv.image.DicomBufferToView.prototype.onload = function ()
+{
+    // default does nothing.
+};
+/**
+ * Handle a load progress event.
+ */
+dwv.image.DicomBufferToView.prototype.onprogress = function ()
+{
+    // default does nothing.
+};
