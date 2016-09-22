@@ -12560,10 +12560,8 @@ dwv.image.DicomBufferToView = function ()
             }
             
             // loadend event
-            console.time("decode-multiframe");
             pixelDecoder.ondecodeend = function () {
                 self.onloadend();
-                console.timeEnd("decode-multiframe");
             };
 
             // send an onload event for mono frame
@@ -12577,11 +12575,14 @@ dwv.image.DicomBufferToView = function ()
             var countDecodedFrames = 0;
             var onDecodedFrame = function (frame) {
                 return function (event) {
+                    // send progress
                     ++countDecodedFrames;
                     var ev = {type: "read-progress", lengthComputable: true,
                         loaded: (countDecodedFrames * 100 / nFrames), total: 100};
                     self.onprogress(ev);
+                    // store data
                     pixelBuffer[frame] = event.data[0];
+                    // create image for first frame
                     if ( frame === 0 ) {
                         onDecodedFirstFrame();
                     }
@@ -12603,12 +12604,14 @@ dwv.image.DicomBufferToView = function ()
         }
         // no decompression
         else {
-            // send events
+            // send progress
             self.onprogress({type: "read-progress", lengthComputable: true,
                 loaded: 100, total: 100});
+            // create image
+            onDecodedFirstFrame();
+            // send load events
             self.onload();
             self.onloadend();
-            onDecodedFirstFrame();
         }
     };
 };
@@ -15856,73 +15859,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // remove trash
             trash.remove();
             // draw
-            drawLayer.draw();
-        });
-        // double click handling: create label
-        shape.on('dblclick', function () {
-            var labelText = prompt("Add label");
-            // if press cancel do nothing
-            if (labelText === null) {
-                return false;
-            }
-            var group = this.getParent();
-            var klabel;
-            // if user introduce a text, create or update label
-            if (labelText.length > 0) {
-
-                klabel = group.getChildren( function (node) {
-                    return node.getClassName() === 'Label';
-                });
-                // update label
-                if (klabel.length) {
-                    klabel[0].getText().setText(labelText);
-                }
-                // create label
-                else {
-                    var labelStyle = app.getStyle();
-                    var labelPos;
-
-                    try {
-                        // For all drawings
-                        labelPos = group.getChildren( function (node) {
-                            return node.getClassName() === 'Text';
-                        })[0].getPosition();
-                    }
-                    catch (error) {
-                        // for Livewire
-                        labelPos = group.getChildren( function (node) {
-                            return node.getClassName() === 'Circle';
-                        })[0].getPosition();
-                    }
-
-                    klabel = new Kinetic.Label({
-                        x: labelPos.x,
-                        y: labelPos.y + labelStyle.getFontSize() * 1.1,
-                        draggable: true
-                    });
-
-                    klabel.add(new Kinetic.Tag({
-                        fill: 'rgba(0,0,0,.25)',
-                        stroke: labelStyle.getLineColour()
-                    }));
-
-                    klabel.add(new Kinetic.Text({
-                        text: labelText,
-                        fontSize: labelStyle.getFontSize(),
-                        fill: labelStyle.getLineColour(),
-                        padding: 5
-                    }));
-                }
-                group.add(klabel);
-            }
-            // if user does not introduce a text, remove label.
-            else{
-                klabel = group.getChildren( function (node) {
-                    return node.getClassName() === 'Label';
-                });
-                klabel.remove();
-            }
-            // draw label
             drawLayer.draw();
         });
     };
