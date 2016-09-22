@@ -15863,68 +15863,29 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         });
         // double click handling: create label
         shape.on('dblclick', function () {
-            var labelText = prompt("Add label");
+            
+            var defaultText = "";
+            var group = this.getParent();
+            
+            // get label
+            var labels = group.find('Label');
+            var klabel = null;
+            if (labels.length !== 0) {
+                klabel = labels[0];
+                defaultText = klabel.getText().textExpr;
+            }
+            
+            var labelText = prompt("Add label", defaultText);
+            
             // if press cancel do nothing
             if (labelText === null) {
                 return false;
             }
-            var group = this.getParent();
-            var klabel;
-            // if user introduce a text, create or update label
-            if (labelText.length > 0) {
-
-                klabel = group.getChildren( function (node) {
-                    return node.getClassName() === 'Label';
-                });
-                // update label
-                if (klabel.length) {
-                    klabel[0].getText().setText(labelText);
-                }
-                // create label
-                else {
-                    var labelStyle = app.getStyle();
-                    var labelPos;
-
-                    try {
-                        // For all drawings
-                        labelPos = group.getChildren( function (node) {
-                            return node.getClassName() === 'Text';
-                        })[0].getPosition();
-                    }
-                    catch (error) {
-                        // for Livewire
-                        labelPos = group.getChildren( function (node) {
-                            return node.getClassName() === 'Circle';
-                        })[0].getPosition();
-                    }
-
-                    klabel = new Kinetic.Label({
-                        x: labelPos.x,
-                        y: labelPos.y + labelStyle.getFontSize() * 1.1,
-                        draggable: true
-                    });
-
-                    klabel.add(new Kinetic.Tag({
-                        fill: 'rgba(0,0,0,.25)',
-                        stroke: labelStyle.getLineColour()
-                    }));
-
-                    klabel.add(new Kinetic.Text({
-                        text: labelText,
-                        fontSize: labelStyle.getFontSize(),
-                        fill: labelStyle.getLineColour(),
-                        padding: 5
-                    }));
-                }
-                group.add(klabel);
-            }
-            // if user does not introduce a text, remove label.
-            else{
-                klabel = group.getChildren( function (node) {
-                    return node.getClassName() === 'Label';
-                });
-                klabel.remove();
-            }
+            
+            var ktext = klabel.getText();
+            ktext.textExpr = labelText;
+            ktext.setText(labelText.replace("{value}", ktext.quantStr));
+            
             // draw label
             drawLayer.draw();
         });
@@ -17664,24 +17625,33 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
     });
     // quantification
     var quant = image.quantifyLine( line );
-    var str = quant.length.toPrecision(4) + " " + dwv.i18n("unit.mm");
+    var quantStr = quant.length.toPrecision(4) + " " + dwv.i18n("unit.mm");
     // quantification text
     var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
     var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
     var ktext = new Kinetic.Text({
-        x: line.getEnd().getX() + dX * 25,
-        y: line.getEnd().getY() + dY * 15,
-        text: str,
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
         name: "text"
     });
+    ktext.textExpr = "{value}";
+    ktext.quantStr = quantStr;
+    ktext.setText(ktext.textExpr.replace("{value}", quantStr));
+    // label
+    var klabel = new Kinetic.Label({
+        x: line.getEnd().getX() + dX * 25,
+        y: line.getEnd().getY() + dY * 15,
+        name: "label"
+    });
+    klabel.add(ktext);
+    klabel.add(new Kinetic.Tag());
+    
     // return group
     var group = new Kinetic.Group();
     group.name("line-group");
     group.add(kshape);
-    group.add(ktext);
+    group.add(klabel);
     return group;
 };
 
@@ -17698,9 +17668,9 @@ dwv.tool.UpdateLine = function (anchor, image)
     var kline = group.getChildren( function (node) {
         return node.name() === 'shape';
     })[0];
-    // associated text
-    var ktext = group.getChildren( function (node) {
-        return node.name() === 'text';
+    // associated label
+    var klabel = group.getChildren( function (node) {
+        return node.name() === 'label';
     })[0];
     // find special points
     var begin = group.getChildren( function (node) {
@@ -17732,14 +17702,16 @@ dwv.tool.UpdateLine = function (anchor, image)
     var p2d1 = new dwv.math.Point2D(end.x(), end.y());
     var line = new dwv.math.Line(p2d0, p2d1);
     var quant = image.quantifyLine( line );
-    var str = quant.length.toPrecision(4) + " " + dwv.i18n("mm");
+    var quantStr = quant.length.toPrecision(4) + " " + dwv.i18n("mm");
     var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
     var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
     var textPos = {
         'x': line.getEnd().getX() + dX * 25,
         'y': line.getEnd().getY() + dY * 15, };
-    ktext.position( textPos );
-    ktext.text(str);
+    klabel.position( textPos );
+    var ktext = klabel.getText();
+    ktext.quantStr = quantStr;
+    ktext.setText(ktext.textExpr.replace("{value}", quantStr));
 };
 ;// namespaces
 var dwv = dwv || {};
