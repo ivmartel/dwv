@@ -52,21 +52,19 @@ dwv.addDataLine = function (id, fileroot, doc)
     var url = "../data/" + fileroot + ".dcm";
     var app = new dwv.App();
     app.init(config);
-    app.loadURLs([url]);
-
-    // parsing timing
-    var request = new XMLHttpRequest();
-    request.open('GET', url, true);
-    request.responseType = "arraybuffer";
-    request.onload = function (/*event*/) {
-        // setup the dicom parser
-        var dicomParser = new dwv.dicom.DicomParser();
-        // parse the buffer
-        console.time("parse::"+fileroot);
-        dicomParser.parse(this.response);
-        console.timeEnd("parse::"+fileroot);
+    // display loading time
+    var listener = function (event) { 
+        if (event.type === "load-start") {
+            console.time("load-data");
+        }
+        else {
+            console.timeEnd("load-data");
+        }
     };
-    request.send(null);
+    app.addEventListener("load-start", listener);
+    app.addEventListener("load-end", listener);
+    // load data
+    app.loadURLs([url]);
 
     // image
     var image = document.createElement("img");
