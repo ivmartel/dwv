@@ -130,10 +130,8 @@ dwv.image.DicomBufferToView = function ()
             }
             
             // loadend event
-            console.time("decode-multiframe");
             pixelDecoder.ondecodeend = function () {
                 self.onloadend();
-                console.timeEnd("decode-multiframe");
             };
 
             // send an onload event for mono frame
@@ -147,11 +145,14 @@ dwv.image.DicomBufferToView = function ()
             var countDecodedFrames = 0;
             var onDecodedFrame = function (frame) {
                 return function (event) {
+                    // send progress
                     ++countDecodedFrames;
                     var ev = {type: "read-progress", lengthComputable: true,
                         loaded: (countDecodedFrames * 100 / nFrames), total: 100};
                     self.onprogress(ev);
+                    // store data
                     pixelBuffer[frame] = event.data[0];
+                    // create image for first frame
                     if ( frame === 0 ) {
                         onDecodedFirstFrame();
                     }
@@ -173,12 +174,14 @@ dwv.image.DicomBufferToView = function ()
         }
         // no decompression
         else {
-            // send events
+            // send progress
             self.onprogress({type: "read-progress", lengthComputable: true,
                 loaded: 100, total: 100});
+            // create image
+            onDecodedFirstFrame();
+            // send load events
             self.onload();
             self.onloadend();
-            onDecodedFirstFrame();
         }
     };
 };
