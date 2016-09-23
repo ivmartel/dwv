@@ -11827,7 +11827,7 @@ dwv.image.Image.prototype.convolute2D = function(weights)
                         else if( i !== 0 && i !== (ncols-1) && j === (nrows-1) ) {
                             wOffFinal = wOffxn;
                         }
-    
+
                         // calculate the weighed sum of the source image pixels that
                         // fall under the convolution matrix
                         newValue = 0;
@@ -11879,7 +11879,7 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
 {
     var newImage = this.clone();
     var newBuffer = newImage.getBuffer();
-    for ( var f = 0, lenf = this.getNumberOfFrames(); f < lenf; ++f ) 
+    for ( var f = 0, lenf = this.getNumberOfFrames(); f < lenf; ++f )
     {
         for( var i = 0, leni = newBuffer[f].length; i < leni; ++i )
         {
@@ -11900,7 +11900,7 @@ dwv.image.Image.prototype.quantifyLine = function(line)
     var spacing = this.getGeometry().getSpacing();
     var length = line.getWorldLength( spacing.getColumnSpacing(),
             spacing.getRowSpacing() );
-    return {"length": length};
+    return { "length": { "value": length, "unit": "mm"} };
 };
 
 /**
@@ -11924,8 +11924,13 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
         }
     }
     var quantif = dwv.math.getStats( subBuffer );
-    return {"surface": surface, "min": quantif.min, 'max': quantif.max,
-        "mean": quantif.mean, 'stdDev': quantif.stdDev};
+    return {
+        "surface": {"value": surface/100, "unit": "cm2"},
+        "min": {"value": quantif.min, "unit": ""},
+        "max": {"value": quantif.max, "unit": ""},
+        "mean": {"value": quantif.mean, "unit": ""},
+        "stdDev": {"value": quantif.stdDev, "unit": ""}
+    };
 };
 
 /**
@@ -11938,7 +11943,7 @@ dwv.image.Image.prototype.quantifyEllipse = function(ellipse)
     var spacing = this.getGeometry().getSpacing();
     var surface = ellipse.getWorldSurface( spacing.getColumnSpacing(),
             spacing.getRowSpacing());
-    return {"surface": surface};
+    return { "surface": {"value": surface/100, "unit": "cm2"} };
 };
 
 /**
@@ -15646,7 +15651,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             app.removeEventListener("frame-change", updateDrawLayer);
         }
     };
-    
+
     /**
      * Get the current app draw layer.
      */
@@ -15658,7 +15663,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         // activate the new draw layer
         renderDrawLayer(true);
     }
-    
+
     /**
      * Render (or not) the draw layer.
      * @param {Boolean} visible Set the draw layer visible or not.
@@ -15863,10 +15868,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         });
         // double click handling: create label
         shape.on('dblclick', function () {
-            
+
             var defaultText = "";
             var group = this.getParent();
-            
+
             // get label
             var labels = group.find('Label');
             var klabel = null;
@@ -15874,18 +15879,18 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 klabel = labels[0];
                 defaultText = klabel.getText().textExpr;
             }
-            
+
             var labelText = prompt("Add label", defaultText);
-            
+
             // if press cancel do nothing
             if (labelText === null) {
                 return false;
             }
-            
+
             var ktext = klabel.getText();
             ktext.textExpr = labelText;
-            ktext.setText(labelText.replace("{value}", ktext.quantStr));
-            
+            ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+
             // draw label
             drawLayer.draw();
         });
@@ -16456,23 +16461,29 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
     });
     // quantification
     var quant = image.quantifyEllipse( ellipse );
-    var cm2 = quant.surface / 100;
-    var str = cm2.toPrecision(4) + " " + dwv.i18n("unit.cm2");
-    // quantification text
     var ktext = new Kinetic.Text({
-        x: ellipse.getCenter().getX(),
-        y: ellipse.getCenter().getY(),
-        text: str,
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
         name: "text"
     });
+    ktext.textExpr = "{surface}";
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    // label
+    var klabel = new Kinetic.Label({
+        x: ellipse.getCenter().getX(),
+        y: ellipse.getCenter().getY(),
+        name: "label"
+    });
+    klabel.add(ktext);
+    klabel.add(new Kinetic.Tag());
+
     // return group
     var group = new Kinetic.Group();
     group.name("ellipse-group");
     group.add(kshape);
-    group.add(ktext);
+    group.add(klabel);
     return group;
 };
 
@@ -16489,9 +16500,9 @@ dwv.tool.UpdateEllipse = function (anchor, image)
     var kellipse = group.getChildren( function (node) {
         return node.name() === 'shape';
     })[0];
-    // associated text
-    var ktext = group.getChildren(function(node){
-        return node.name() === 'text';
+    // associated label
+    var klabel = group.getChildren( function (node) {
+        return node.name() === 'label';
     })[0];
     // find special points
     var topLeft = group.getChildren( function (node) {
@@ -16545,14 +16556,16 @@ dwv.tool.UpdateEllipse = function (anchor, image)
     if ( radiusAbs ) {
         kellipse.radius( radiusAbs );
     }
-    // update text
+    // new ellipse
     var ellipse = new dwv.math.Ellipse(center, radiusX, radiusY);
+    // update text
     var quant = image.quantifyEllipse( ellipse );
-    var cm2 = quant.surface / 100;
-    var str = cm2.toPrecision(4) + " cm2";
+    var ktext = klabel.getText();
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    // update position
     var textPos = { 'x': center.x, 'y': center.y };
-    ktext.position(textPos);
-    ktext.text(str);
+    klabel.position( textPos );
 };
 ;// namespaces
 var dwv = dwv || {};
@@ -17625,20 +17638,18 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
     });
     // quantification
     var quant = image.quantifyLine( line );
-    var quantStr = quant.length.toPrecision(4) + " " + dwv.i18n("unit.mm");
-    // quantification text
-    var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
-    var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
     var ktext = new Kinetic.Text({
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
         name: "text"
     });
-    ktext.textExpr = "{value}";
-    ktext.quantStr = quantStr;
-    ktext.setText(ktext.textExpr.replace("{value}", quantStr));
+    ktext.textExpr = "{length}";
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
     // label
+    var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
+    var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
     var klabel = new Kinetic.Label({
         x: line.getEnd().getX() + dX * 25,
         y: line.getEnd().getY() + dY * 15,
@@ -17646,7 +17657,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
     });
     klabel.add(ktext);
     klabel.add(new Kinetic.Tag());
-    
+
     // return group
     var group = new Kinetic.Group();
     group.name("line-group");
@@ -17697,21 +17708,22 @@ dwv.tool.UpdateLine = function (anchor, image)
     var ex = end.x() - kline.x();
     var ey = end.y() - kline.y();
     kline.points( [bx,by,ex,ey] );
-    // update text
+    // new line
     var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
     var p2d1 = new dwv.math.Point2D(end.x(), end.y());
     var line = new dwv.math.Line(p2d0, p2d1);
+    // update text
     var quant = image.quantifyLine( line );
-    var quantStr = quant.length.toPrecision(4) + " " + dwv.i18n("mm");
+    var ktext = klabel.getText();
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    // update position
     var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
     var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
     var textPos = {
         'x': line.getEnd().getX() + dX * 25,
         'y': line.getEnd().getY() + dY * 15, };
     klabel.position( textPos );
-    var ktext = klabel.getText();
-    ktext.quantStr = quantStr;
-    ktext.setText(ktext.textExpr.replace("{value}", quantStr));
 };
 ;// namespaces
 var dwv = dwv || {};
@@ -18113,19 +18125,30 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
             angle = 360 - angle;
             inclination += angle;
         }
-        var angleStr = angle.toPrecision(4) + "\u00B0";
-        // quantification text
-        var midX = ( line0.getMidpoint().getX() + line1.getMidpoint().getX() ) / 2;
-        var midY = ( line0.getMidpoint().getY() + line1.getMidpoint().getY() ) / 2;
+
+        // quantification
+        var quant = { "angle": { "value": angle, "unit": "degree"} };
         var ktext = new Kinetic.Text({
-            x: midX,
-            y: midY - 15,
-            text: angleStr,
             fontSize: style.getScaledFontSize(),
             fontFamily: style.getFontFamily(),
             fill: style.getLineColour(),
             name: "text"
         });
+        ktext.textExpr = "{angle}";
+        ktext.quant = quant;
+        ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+
+        // label
+        var midX = ( line0.getMidpoint().getX() + line1.getMidpoint().getX() ) / 2;
+        var midY = ( line0.getMidpoint().getY() + line1.getMidpoint().getY() ) / 2;
+        var klabel = new Kinetic.Label({
+            x: midX,
+            y: midY - 15,
+            name: "label"
+        });
+        klabel.add(ktext);
+        klabel.add(new Kinetic.Tag());
+
         // arc
         var radius = Math.min(line0.getLength(), line1.getLength()) * 33 / 100;
         var karc = new Kinetic.Arc({
@@ -18140,7 +18163,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
             name: "arc"
          });
         // add to group
-        group.add(ktext);
+        group.add(klabel);
         group.add(karc);
     }
     // return group
@@ -18160,9 +18183,9 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
     var kline = group.getChildren( function (node) {
         return node.name() === 'shape';
     })[0];
-    // associated text
-    var ktext = group.getChildren( function (node) {
-        return node.name() === 'text';
+    // associated label
+    var klabel = group.getChildren( function (node) {
+        return node.name() === 'label';
     })[0];
     // associated arc
     var karc = group.getChildren( function (node) {
@@ -18214,12 +18237,18 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
         angle = 360 - angle;
         inclination += angle;
     }
-    var str = angle.toPrecision(4) + "\u00B0";
+
+    // update text
+    var quant = { "angle": { "value": angle, "unit": "degree"} };
+    var ktext = klabel.getText();
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    // update position
     var midX = ( line0.getMidpoint().getX() + line1.getMidpoint().getX() ) / 2;
     var midY = ( line0.getMidpoint().getY() + line1.getMidpoint().getY() ) / 2;
     var textPos = { 'x': midX, 'y': midY - 15 };
-    ktext.position( textPos );
-    ktext.text(str);
+    klabel.position( textPos );
+
     // arc
     var radius = Math.min(line0.getLength(), line1.getLength()) * 33 / 100;
     karc.innerRadius(radius);
@@ -18275,23 +18304,30 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
     });
     // quantification
     var quant = image.quantifyRect( rectangle );
-    var cm2 = quant.surface / 100;
-    var str = cm2.toPrecision(4) + " " + dwv.i18n("unit.cm2");
-    // quantification text
     var ktext = new Kinetic.Text({
-        x: rectangle.getBegin().getX(),
-        y: rectangle.getEnd().getY() + 10,
-        text: str,
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
         name: "text"
     });
+    ktext.textExpr = "{surface}";
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+
+    // label
+    var klabel = new Kinetic.Label({
+        x: rectangle.getBegin().getX(),
+        y: rectangle.getEnd().getY() + 10,
+        name: "label"
+    });
+    klabel.add(ktext);
+    klabel.add(new Kinetic.Tag());
+
     // return group
     var group = new Kinetic.Group();
     group.name("rectangle-group");
     group.add(kshape);
-    group.add(ktext);
+    group.add(klabel);
     return group;
 };
 
@@ -18308,9 +18344,9 @@ dwv.tool.UpdateRect = function (anchor, image)
     var krect = group.getChildren( function (node) {
         return node.name() === 'shape';
     })[0];
-    // associated text
-    var ktext = group.getChildren( function (node) {
-        return node.name() === 'text';
+    // associated label
+    var klabel = group.getChildren( function (node) {
+        return node.name() === 'label';
     })[0];
     // find special points
     var topLeft = group.getChildren( function (node) {
@@ -18362,16 +18398,18 @@ dwv.tool.UpdateRect = function (anchor, image)
     if ( width && height ) {
         krect.size({'width': width, 'height': height});
     }
-    // update text
+    // new rect
     var p2d0 = new dwv.math.Point2D(topLeft.x(), topLeft.y());
     var p2d1 = new dwv.math.Point2D(bottomRight.x(), bottomRight.y());
     var rect = new dwv.math.Rectangle(p2d0, p2d1);
+    // update text
     var quant = image.quantifyRect( rect );
-    var cm2 = quant.surface / 100;
-    var str = cm2.toPrecision(4) + " cm2";
+    var ktext = klabel.getText();
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    // update position
     var textPos = { 'x': rect.getBegin().getX(), 'y': rect.getEnd().getY() + 10 };
-    ktext.position(textPos);
-    ktext.text(str);
+    klabel.position( textPos );
 };
 ;// namespaces
 var dwv = dwv || {};
@@ -18424,10 +18462,32 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
         name: "shape",
         closed: true
     });
+
+    // text
+    var ktext = new Kinetic.Text({
+        fontSize: style.getScaledFontSize(),
+        fontFamily: style.getFontFamily(),
+        fill: style.getLineColour(),
+        name: "text"
+    });
+    ktext.textExpr = "";
+    ktext.quant = null;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+
+    // label
+    var klabel = new Kinetic.Label({
+        x: roi.getPoint(0).getX(),
+        y: roi.getPoint(0).getY() + 10,
+        name: "label"
+    });
+    klabel.add(ktext);
+    klabel.add(new Kinetic.Tag());
+
     // return group
     var group = new Kinetic.Group();
     group.name("roi-group");
     group.add(kshape);
+    group.add(klabel);
     return group;
 };
 
@@ -18444,6 +18504,11 @@ dwv.tool.UpdateRoi = function (anchor /*, image*/)
     var kroi = group.getChildren( function (node) {
         return node.name() === 'shape';
     })[0];
+    // associated label
+    var klabel = group.getChildren( function (node) {
+        return node.name() === 'label';
+    })[0];
+
     // update self
     var point = group.getChildren( function (node) {
         return node.id() === anchor.id();
@@ -18456,6 +18521,15 @@ dwv.tool.UpdateRoi = function (anchor /*, image*/)
     points[anchor.id()] = anchor.x() - kroi.x();
     points[anchor.id()+1] = anchor.y() - kroi.y();
     kroi.points( points );
+
+    // update text
+    var ktext = klabel.getText();
+    ktext.quant = null;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    // update position
+    var textPos = { 'x': points[0] + kroi.x(), 'y': points[1] +  kroi.y() + 10 };
+    klabel.position( textPos );
+
 };
 ;// namespaces
 var dwv = dwv || {};
@@ -19638,6 +19712,31 @@ dwv.utils.splitKeyValueString = function (inputStr)
         }
     }
     return result;
+};
+
+/**
+ * @param {String} inputStr The input string.
+ * @param {Object} values A object of {value, unit}.
+ */
+dwv.utils.replaceFlags = function (inputStr, values)
+{
+    var res = inputStr;
+    if (values === null) {
+        return res;
+    }
+    var keys = Object.keys(values);
+    for (var i = 0; i < keys.length; ++i) {
+        if ( values[keys[i]] !== null && typeof values[keys[i]] !== "undefined" &&
+             values[keys[i]].value !== null && typeof values[keys[i]].value !== "undefined") {
+            var valueStr = values[keys[i]].value.toPrecision(4);
+            if (values[keys[i]].unit.length !== 0) {
+                valueStr += " " + dwv.i18n("unit."+values[keys[i]].unit);
+            }
+            var flag = '{' + keys[i] + '}';
+            res = res.replace(flag, valueStr);
+        }
+    }
+    return res;
 };
 ;// namespaces
 var dwv = dwv || {};
