@@ -682,7 +682,7 @@ dwv.image.Image.prototype.convolute2D = function(weights)
                         else if( i !== 0 && i !== (ncols-1) && j === (nrows-1) ) {
                             wOffFinal = wOffxn;
                         }
-    
+
                         // calculate the weighed sum of the source image pixels that
                         // fall under the convolution matrix
                         newValue = 0;
@@ -734,7 +734,7 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
 {
     var newImage = this.clone();
     var newBuffer = newImage.getBuffer();
-    for ( var f = 0, lenf = this.getNumberOfFrames(); f < lenf; ++f ) 
+    for ( var f = 0, lenf = this.getNumberOfFrames(); f < lenf; ++f )
     {
         for( var i = 0, leni = newBuffer[f].length; i < leni; ++i )
         {
@@ -755,7 +755,7 @@ dwv.image.Image.prototype.quantifyLine = function(line)
     var spacing = this.getGeometry().getSpacing();
     var length = line.getWorldLength( spacing.getColumnSpacing(),
             spacing.getRowSpacing() );
-    return {"length": length};
+    return { "length": { "value": length, "unit": "mm"} };
 };
 
 /**
@@ -779,8 +779,13 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
         }
     }
     var quantif = dwv.math.getStats( subBuffer );
-    return {"surface": surface, "min": quantif.min, 'max': quantif.max,
-        "mean": quantif.mean, 'stdDev': quantif.stdDev};
+    return {
+        "surface": {"value": surface/100, "unit": "cm2"},
+        "min": {"value": quantif.min, "unit": ""},
+        "max": {"value": quantif.max, "unit": ""},
+        "mean": {"value": quantif.mean, "unit": ""},
+        "stdDev": {"value": quantif.stdDev, "unit": ""}
+    };
 };
 
 /**
@@ -793,7 +798,7 @@ dwv.image.Image.prototype.quantifyEllipse = function(ellipse)
     var spacing = this.getGeometry().getSpacing();
     var surface = ellipse.getWorldSurface( spacing.getColumnSpacing(),
             spacing.getRowSpacing());
-    return {"surface": surface};
+    return { "surface": {"value": surface/100, "unit": "cm2"} };
 };
 
 /**

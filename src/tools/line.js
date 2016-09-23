@@ -42,20 +42,18 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
     });
     // quantification
     var quant = image.quantifyLine( line );
-    var quantStr = quant.length.toPrecision(4) + " " + dwv.i18n("unit.mm");
-    // quantification text
-    var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
-    var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
     var ktext = new Kinetic.Text({
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
         name: "text"
     });
-    ktext.textExpr = "{value}";
-    ktext.quantStr = quantStr;
-    ktext.setText(ktext.textExpr.replace("{value}", quantStr));
+    ktext.textExpr = "{length}";
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
     // label
+    var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
+    var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
     var klabel = new Kinetic.Label({
         x: line.getEnd().getX() + dX * 25,
         y: line.getEnd().getY() + dY * 15,
@@ -63,7 +61,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
     });
     klabel.add(ktext);
     klabel.add(new Kinetic.Tag());
-    
+
     // return group
     var group = new Kinetic.Group();
     group.name("line-group");
@@ -114,19 +112,20 @@ dwv.tool.UpdateLine = function (anchor, image)
     var ex = end.x() - kline.x();
     var ey = end.y() - kline.y();
     kline.points( [bx,by,ex,ey] );
-    // update text
+    // new line
     var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
     var p2d1 = new dwv.math.Point2D(end.x(), end.y());
     var line = new dwv.math.Line(p2d0, p2d1);
+    // update text
     var quant = image.quantifyLine( line );
-    var quantStr = quant.length.toPrecision(4) + " " + dwv.i18n("mm");
+    var ktext = klabel.getText();
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    // update position
     var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
     var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
     var textPos = {
         'x': line.getEnd().getX() + dX * 25,
         'y': line.getEnd().getY() + dY * 15, };
     klabel.position( textPos );
-    var ktext = klabel.getText();
-    ktext.quantStr = quantStr;
-    ktext.setText(ktext.textExpr.replace("{value}", quantStr));
 };

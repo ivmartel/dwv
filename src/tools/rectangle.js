@@ -44,23 +44,30 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
     });
     // quantification
     var quant = image.quantifyRect( rectangle );
-    var cm2 = quant.surface / 100;
-    var str = cm2.toPrecision(4) + " " + dwv.i18n("unit.cm2");
-    // quantification text
     var ktext = new Kinetic.Text({
-        x: rectangle.getBegin().getX(),
-        y: rectangle.getEnd().getY() + 10,
-        text: str,
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
         name: "text"
     });
+    ktext.textExpr = "{surface}";
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+
+    // label
+    var klabel = new Kinetic.Label({
+        x: rectangle.getBegin().getX(),
+        y: rectangle.getEnd().getY() + 10,
+        name: "label"
+    });
+    klabel.add(ktext);
+    klabel.add(new Kinetic.Tag());
+
     // return group
     var group = new Kinetic.Group();
     group.name("rectangle-group");
     group.add(kshape);
-    group.add(ktext);
+    group.add(klabel);
     return group;
 };
 
@@ -77,9 +84,9 @@ dwv.tool.UpdateRect = function (anchor, image)
     var krect = group.getChildren( function (node) {
         return node.name() === 'shape';
     })[0];
-    // associated text
-    var ktext = group.getChildren( function (node) {
-        return node.name() === 'text';
+    // associated label
+    var klabel = group.getChildren( function (node) {
+        return node.name() === 'label';
     })[0];
     // find special points
     var topLeft = group.getChildren( function (node) {
@@ -131,14 +138,16 @@ dwv.tool.UpdateRect = function (anchor, image)
     if ( width && height ) {
         krect.size({'width': width, 'height': height});
     }
-    // update text
+    // new rect
     var p2d0 = new dwv.math.Point2D(topLeft.x(), topLeft.y());
     var p2d1 = new dwv.math.Point2D(bottomRight.x(), bottomRight.y());
     var rect = new dwv.math.Rectangle(p2d0, p2d1);
+    // update text
     var quant = image.quantifyRect( rect );
-    var cm2 = quant.surface / 100;
-    var str = cm2.toPrecision(4) + " cm2";
+    var ktext = klabel.getText();
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    // update position
     var textPos = { 'x': rect.getBegin().getX(), 'y': rect.getEnd().getY() + 10 };
-    ktext.position(textPos);
-    ktext.text(str);
+    klabel.position( textPos );
 };

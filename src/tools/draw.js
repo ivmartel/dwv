@@ -524,7 +524,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             app.removeEventListener("frame-change", updateDrawLayer);
         }
     };
-    
+
     /**
      * Get the current app draw layer.
      */
@@ -536,7 +536,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         // activate the new draw layer
         renderDrawLayer(true);
     }
-    
+
     /**
      * Render (or not) the draw layer.
      * @param {Boolean} visible Set the draw layer visible or not.
@@ -741,10 +741,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         });
         // double click handling: create label
         shape.on('dblclick', function () {
-            
+
             var defaultText = "";
             var group = this.getParent();
-            
+
             // get label
             var labels = group.find('Label');
             var klabel = null;
@@ -752,18 +752,18 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 klabel = labels[0];
                 defaultText = klabel.getText().textExpr;
             }
-            
+
             var labelText = prompt("Add label", defaultText);
-            
+
             // if press cancel do nothing
             if (labelText === null) {
                 return false;
             }
-            
+
             var ktext = klabel.getText();
             ktext.textExpr = labelText;
-            ktext.setText(labelText.replace("{value}", ktext.quantStr));
-            
+            ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+
             // draw label
             drawLayer.draw();
         });

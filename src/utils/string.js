@@ -52,3 +52,28 @@ dwv.utils.splitKeyValueString = function (inputStr)
     }
     return result;
 };
+
+/**
+ * @param {String} inputStr The input string.
+ * @param {Object} values A object of {value, unit}.
+ */
+dwv.utils.replaceFlags = function (inputStr, values)
+{
+    var res = inputStr;
+    if (values === null) {
+        return res;
+    }
+    var keys = Object.keys(values);
+    for (var i = 0; i < keys.length; ++i) {
+        if ( values[keys[i]] !== null && typeof values[keys[i]] !== "undefined" &&
+             values[keys[i]].value !== null && typeof values[keys[i]].value !== "undefined") {
+            var valueStr = values[keys[i]].value.toPrecision(4);
+            if (values[keys[i]].unit.length !== 0) {
+                valueStr += " " + dwv.i18n("unit."+values[keys[i]].unit);
+            }
+            var flag = '{' + keys[i] + '}';
+            res = res.replace(flag, valueStr);
+        }
+    }
+    return res;
+};

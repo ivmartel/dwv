@@ -49,10 +49,32 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
         name: "shape",
         closed: true
     });
+
+    // text
+    var ktext = new Kinetic.Text({
+        fontSize: style.getScaledFontSize(),
+        fontFamily: style.getFontFamily(),
+        fill: style.getLineColour(),
+        name: "text"
+    });
+    ktext.textExpr = "";
+    ktext.quant = null;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+
+    // label
+    var klabel = new Kinetic.Label({
+        x: roi.getPoint(0).getX(),
+        y: roi.getPoint(0).getY() + 10,
+        name: "label"
+    });
+    klabel.add(ktext);
+    klabel.add(new Kinetic.Tag());
+
     // return group
     var group = new Kinetic.Group();
     group.name("roi-group");
     group.add(kshape);
+    group.add(klabel);
     return group;
 };
 
@@ -69,6 +91,11 @@ dwv.tool.UpdateRoi = function (anchor /*, image*/)
     var kroi = group.getChildren( function (node) {
         return node.name() === 'shape';
     })[0];
+    // associated label
+    var klabel = group.getChildren( function (node) {
+        return node.name() === 'label';
+    })[0];
+
     // update self
     var point = group.getChildren( function (node) {
         return node.id() === anchor.id();
@@ -81,4 +108,13 @@ dwv.tool.UpdateRoi = function (anchor /*, image*/)
     points[anchor.id()] = anchor.x() - kroi.x();
     points[anchor.id()+1] = anchor.y() - kroi.y();
     kroi.points( points );
+
+    // update text
+    var ktext = klabel.getText();
+    ktext.quant = null;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    // update position
+    var textPos = { 'x': points[0] + kroi.x(), 'y': points[1] +  kroi.y() + 10 };
+    klabel.position( textPos );
+
 };

@@ -49,7 +49,8 @@
     },
     "unit": {
         "mm": "mm",
-        "cm2": "cm2"
+        "cm2": "cm2",
+        "degree": "\u00B0"
     },
     "help": {
         "intro": {
