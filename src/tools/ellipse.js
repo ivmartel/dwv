@@ -139,7 +139,7 @@ dwv.tool.UpdateEllipse = function (anchor, image)
     var ellipse = new dwv.math.Ellipse(center, radiusX, radiusY);
     var quant = image.quantifyEllipse( ellipse );
     var cm2 = quant.surface / 100;
-    var str = cm2.toPrecision(4) + " cm2";
+    var str = Math.abs(cm2.toPrecision(4)) + " " + dwv.i18n("unit.cm2")
     var textPos = { 'x': center.x, 'y': center.y };
     ktext.position(textPos);
     ktext.text(str);
