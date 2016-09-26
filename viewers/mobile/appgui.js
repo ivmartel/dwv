@@ -1,4 +1,4 @@
-/** 
+/**
  * Application GUI.
  */
 
@@ -56,6 +56,8 @@ dwv.utils.decodeQuery = function (query, callback)
 dwv.gui.getWindowSize = function () {
     return { 'width': ($(window).width()), 'height': ($(window).height() - 147) };
 };
+// Prompt
+dwv.gui.prompt = dwv.gui.base.prompt;
 // Progress
 dwv.gui.displayProgress = function (percent) {
     if( percent < 100 ) {

@@ -61,7 +61,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
         }
 
         // quantification
-        var quant = { "angle": { "value": angle, "unit": "degree"} };
+        var quant = { "angle": { "value": angle, "unit": dwv.i18n("unit.degree")} };
         var ktext = new Kinetic.Text({
             fontSize: style.getScaledFontSize(),
             fontFamily: style.getFontFamily(),
@@ -173,7 +173,7 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
     }
 
     // update text
-    var quant = { "angle": { "value": angle, "unit": "degree"} };
+    var quant = { "angle": { "value": angle, "unit": dwv.i18n("unit.degree")} };
     var ktext = klabel.getText();
     ktext.quant = quant;
     ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));

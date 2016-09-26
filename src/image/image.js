@@ -755,7 +755,7 @@ dwv.image.Image.prototype.quantifyLine = function(line)
     var spacing = this.getGeometry().getSpacing();
     var length = line.getWorldLength( spacing.getColumnSpacing(),
             spacing.getRowSpacing() );
-    return { "length": { "value": length, "unit": "mm"} };
+    return { "length": {"value": length, "unit": dwv.i18n("unit.mm")} };
 };
 
 /**
@@ -780,7 +780,7 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
     }
     var quantif = dwv.math.getStats( subBuffer );
     return {
-        "surface": {"value": surface/100, "unit": "cm2"},
+        "surface": {"value": surface/100, "unit": dwv.i18n("unit.cm2")},
         "min": {"value": quantif.min, "unit": ""},
         "max": {"value": quantif.max, "unit": ""},
         "mean": {"value": quantif.mean, "unit": ""},
@@ -798,7 +798,7 @@ dwv.image.Image.prototype.quantifyEllipse = function(ellipse)
     var spacing = this.getGeometry().getSpacing();
     var surface = ellipse.getWorldSurface( spacing.getColumnSpacing(),
             spacing.getRowSpacing());
-    return { "surface": {"value": surface/100, "unit": "cm2"} };
+    return { "surface": {"value": surface/100, "unit": dwv.i18n("unit.cm2")} };
 };
 
 /**

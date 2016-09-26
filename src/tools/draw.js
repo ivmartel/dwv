@@ -580,6 +580,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         shape.off('dragstart');
         shape.off('dragmove');
         shape.off('dragend');
+        shape.off('dblclick');
     }
 
     /**
@@ -739,32 +740,30 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // draw
             drawLayer.draw();
         });
-        // double click handling: create label
+        // double click handling: update label
         shape.on('dblclick', function () {
 
-            var defaultText = "";
+            // get the label object for this shape
             var group = this.getParent();
-
-            // get label
             var labels = group.find('Label');
-            var klabel = null;
-            if (labels.length !== 0) {
-                klabel = labels[0];
-                defaultText = klabel.getText().textExpr;
+            // should just be one
+            if (labels.length !== 1) {
+                throw new Error("Could not find the shape label.");
             }
+            var ktext = labels[0].getText();
 
-            var labelText = prompt("Add label", defaultText);
+            // ask user for new label
+            var labelText = dwv.gui.prompt("Add label", ktext.textExpr);
 
             // if press cancel do nothing
             if (labelText === null) {
                 return false;
             }
-
-            var ktext = klabel.getText();
+            // update text expression and set text
             ktext.textExpr = labelText;
             ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
 
-            // draw label
+            // draw
             drawLayer.draw();
         });
     };
