@@ -16567,7 +16567,7 @@ dwv.tool.UpdateEllipse = function (anchor, image)
         kellipse.radius( radiusAbs );
     }
     // new ellipse
-    var ellipse = new dwv.math.Ellipse(center, radiusX, radiusY);
+    var ellipse = new dwv.math.Ellipse(center, radiusAbs.x, radiusAbs.y);
     // update text
     var quant = image.quantifyEllipse( ellipse );
     var ktext = klabel.getText();
