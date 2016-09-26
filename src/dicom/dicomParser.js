@@ -1299,23 +1299,23 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
             }
             // name
             if ( dictElement !== null ) {
-                row.name = dictElement[2];
+                row[dwv.i18n("basics.name")] = dictElement[2];
             }
             else {
-                row.name = "Unknown Tag & Data";
+                row[dwv.i18n("basics.name")] = "Unknown Tag & Data";
             }
             // value
             if ( dicomElement.tag.name !== "x7FE00010" ) {
-                row.value = dicomElement.value;
+                row[dwv.i18n("basics.value")] = dicomElement.value;
             }
             else {
-                row.value = "...";
+                row[dwv.i18n("basics.value")] = "...";
             }
             // others
-            row.group = dicomElement.tag.group;
-            row.element = dicomElement.tag.element;
-            row.vr = dicomElement.vr;
-            row.vl = dicomElement.vl;
+            row[dwv.i18n("basics.group")] = dicomElement.tag.group;
+            row[dwv.i18n("basics.element")] = dicomElement.tag.element;
+            row[dwv.i18n("basics.vr")] = dicomElement.vr;
+            row[dwv.i18n("basics.vl")] = dicomElement.vl;
 
             table.push( row );
         }

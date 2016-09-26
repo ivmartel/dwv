@@ -39,7 +39,7 @@ dwv.html.appendHCell = function (row, text)
     if ( text !== "value" && text !== "name" ) {
         cell.setAttribute("data-priority", "1");
     }
-    cell.appendChild(document.createTextNode(dwv.i18n("basics." + text)));
+    cell.appendChild(document.createTextNode(text));
     row.appendChild(cell);
 };
 

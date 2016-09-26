@@ -6,11 +6,6 @@
 /* global QUnit */
 QUnit.module("html");
 
-// fake translation function used in table creation.
-dwv.i18n = function (text) {
-    return text.substring(text.lastIndexOf('.') + 1, text.length);
-};
-
 /**
  * Tests for {@link dwv.html.toTable}.
  * @function module:tests/html~toTable
