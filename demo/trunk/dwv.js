@@ -8567,25 +8567,36 @@ dwv.gui.base = dwv.gui.base || {};
 /**
  * Get the size of the image display window.
  */
-dwv.gui.base.getWindowSize = function()
+dwv.gui.base.getWindowSize = function ()
 {
     return { 'width': window.innerWidth, 'height': window.innerHeight - 147 };
+};
+
+/**
+ * Ask some text to the user.
+ * @param {String} message Text to display to the user.
+ * @param {String} defaultText Default value displayed in the text input field.
+ * @return {String} Text entered by the user.
+ */
+dwv.gui.base.prompt = function (message, defaultText)
+{
+    return prompt(message, defaultText);
 };
 
 /**
  * Display a progress value.
  * @param {Number} percent The progress percentage.
  */
-dwv.gui.base.displayProgress = function(/*percent*/)
+dwv.gui.base.displayProgress = function (/*percent*/)
 {
     // default does nothing...
 };
 
 /**
  * Get a HTML element associated to a container div.
- * @param containerDivId The id of the container div.
- * @param name The name or id to find.
- * @return The found element or null.
+ * @param {Number} containerDivId The id of the container div.
+ * @param {String} name The name or id to find.
+ * @return {Object} The found element or null.
  */
 dwv.gui.base.getElement = function (containerDivId, name)
 {
@@ -8616,7 +8627,7 @@ dwv.gui.base.refreshElement = function (/*element*/)
  * @param {String} element The HTML select element.
  * @param {String} value The value of the option to mark as selected.
  */
-dwv.gui.setSelected = function(element, value)
+dwv.gui.setSelected = function (element, value)
 {
     if ( element ) {
         var index = 0;
@@ -11900,7 +11911,7 @@ dwv.image.Image.prototype.quantifyLine = function(line)
     var spacing = this.getGeometry().getSpacing();
     var length = line.getWorldLength( spacing.getColumnSpacing(),
             spacing.getRowSpacing() );
-    return { "length": { "value": length, "unit": "mm"} };
+    return { "length": {"value": length, "unit": dwv.i18n("unit.mm")} };
 };
 
 /**
@@ -11925,7 +11936,7 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
     }
     var quantif = dwv.math.getStats( subBuffer );
     return {
-        "surface": {"value": surface/100, "unit": "cm2"},
+        "surface": {"value": surface/100, "unit": dwv.i18n("unit.cm2")},
         "min": {"value": quantif.min, "unit": ""},
         "max": {"value": quantif.max, "unit": ""},
         "mean": {"value": quantif.mean, "unit": ""},
@@ -11943,7 +11954,7 @@ dwv.image.Image.prototype.quantifyEllipse = function(ellipse)
     var spacing = this.getGeometry().getSpacing();
     var surface = ellipse.getWorldSurface( spacing.getColumnSpacing(),
             spacing.getRowSpacing());
-    return { "surface": {"value": surface/100, "unit": "cm2"} };
+    return { "surface": {"value": surface/100, "unit": dwv.i18n("unit.cm2")} };
 };
 
 /**
@@ -15707,6 +15718,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         shape.off('dragstart');
         shape.off('dragmove');
         shape.off('dragend');
+        shape.off('dblclick');
     }
 
     /**
@@ -15866,32 +15878,30 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // draw
             drawLayer.draw();
         });
-        // double click handling: create label
+        // double click handling: update label
         shape.on('dblclick', function () {
 
-            var defaultText = "";
+            // get the label object for this shape
             var group = this.getParent();
-
-            // get label
             var labels = group.find('Label');
-            var klabel = null;
-            if (labels.length !== 0) {
-                klabel = labels[0];
-                defaultText = klabel.getText().textExpr;
+            // should just be one
+            if (labels.length !== 1) {
+                throw new Error("Could not find the shape label.");
             }
+            var ktext = labels[0].getText();
 
-            var labelText = prompt("Add label", defaultText);
+            // ask user for new label
+            var labelText = dwv.gui.prompt("Add label", ktext.textExpr);
 
             // if press cancel do nothing
             if (labelText === null) {
                 return false;
             }
-
-            var ktext = klabel.getText();
+            // update text expression and set text
             ktext.textExpr = labelText;
             ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
 
-            // draw label
+            // draw
             drawLayer.draw();
         });
     };
@@ -18127,7 +18137,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
         }
 
         // quantification
-        var quant = { "angle": { "value": angle, "unit": "degree"} };
+        var quant = { "angle": { "value": angle, "unit": dwv.i18n("unit.degree")} };
         var ktext = new Kinetic.Text({
             fontSize: style.getScaledFontSize(),
             fontFamily: style.getFontFamily(),
@@ -18239,7 +18249,7 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
     }
 
     // update text
-    var quant = { "angle": { "value": angle, "unit": "degree"} };
+    var quant = { "angle": { "value": angle, "unit": dwv.i18n("unit.degree")} };
     var ktext = klabel.getText();
     ktext.quant = quant;
     ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
@@ -19715,27 +19725,53 @@ dwv.utils.splitKeyValueString = function (inputStr)
 };
 
 /**
+ * Replace flags in a input string. Flags are keywords surrounded with curly
+ * braces.
  * @param {String} inputStr The input string.
  * @param {Object} values A object of {value, unit}.
+ * @example
+ *    var values = {"length": { "value": 33, "unit": "cm" } };
+ *    var str = "The length is: {length}.";
+ *    var res = dwv.utils.replaceFlags(str, values); // "The length is: 33 cm."
+ * @return {String} The result string.
  */
 dwv.utils.replaceFlags = function (inputStr, values)
 {
-    var res = inputStr;
-    if (values === null) {
+    var res = "";
+    // check input string
+    if (inputStr === null || typeof inputStr === "undefined") {
         return res;
     }
+    res = inputStr;
+    // check values
+    if (values === null || typeof values === "undefined") {
+        return res;
+    }
+    // loop through values keys
     var keys = Object.keys(values);
     for (var i = 0; i < keys.length; ++i) {
-        if ( values[keys[i]] !== null && typeof values[keys[i]] !== "undefined" &&
-             values[keys[i]].value !== null && typeof values[keys[i]].value !== "undefined") {
-            var valueStr = values[keys[i]].value.toPrecision(4);
-            if (values[keys[i]].unit.length !== 0) {
-                valueStr += " " + dwv.i18n("unit."+values[keys[i]].unit);
+        var valueObj = values[keys[i]];
+        if ( valueObj !== null && typeof valueObj !== "undefined" &&
+             valueObj.value !== null && typeof valueObj.value !== "undefined") {
+            // value string
+            var valueStr = valueObj.value.toPrecision(4);
+            // add unit if available
+            // space or no space? Yes apart from degree...
+            // check: https://en.wikipedia.org/wiki/Space_(punctuation)#Spaces_and_unit_symbols
+            if (valueObj.unit !== null && typeof valueObj.unit !== "undefined" &&
+                valueObj.unit.length !== 0) {
+                if (valueObj.unit !== "degree") {
+                    valueStr += " ";
+                }
+                valueStr += valueObj.unit;
             }
+            // flag to replace
             var flag = '{' + keys[i] + '}';
+            // replace
             res = res.replace(flag, valueStr);
         }
     }
+    // return
     return res;
 };
 ;// namespaces
