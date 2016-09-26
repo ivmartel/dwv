@@ -524,7 +524,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             app.removeEventListener("frame-change", updateDrawLayer);
         }
     };
-    
+
     /**
      * Get the current app draw layer.
      */
@@ -536,7 +536,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         // activate the new draw layer
         renderDrawLayer(true);
     }
-    
+
     /**
      * Render (or not) the draw layer.
      * @param {Boolean} visible Set the draw layer visible or not.
@@ -580,6 +580,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         shape.off('dragstart');
         shape.off('dragmove');
         shape.off('dragend');
+        shape.off('dblclick');
     }
 
     /**
@@ -736,6 +737,32 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             }
             // remove trash
             trash.remove();
+            // draw
+            drawLayer.draw();
+        });
+        // double click handling: update label
+        shape.on('dblclick', function () {
+
+            // get the label object for this shape
+            var group = this.getParent();
+            var labels = group.find('Label');
+            // should just be one
+            if (labels.length !== 1) {
+                throw new Error("Could not find the shape label.");
+            }
+            var ktext = labels[0].getText();
+
+            // ask user for new label
+            var labelText = dwv.gui.prompt("Add label", ktext.textExpr);
+
+            // if press cancel do nothing
+            if (labelText === null) {
+                return false;
+            }
+            // update text expression and set text
+            ktext.textExpr = labelText;
+            ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+
             // draw
             drawLayer.draw();
         });

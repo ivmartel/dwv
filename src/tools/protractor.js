@@ -59,19 +59,30 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
             angle = 360 - angle;
             inclination += angle;
         }
-        var angleStr = angle.toPrecision(4) + "\u00B0";
-        // quantification text
-        var midX = ( line0.getMidpoint().getX() + line1.getMidpoint().getX() ) / 2;
-        var midY = ( line0.getMidpoint().getY() + line1.getMidpoint().getY() ) / 2;
+
+        // quantification
+        var quant = { "angle": { "value": angle, "unit": dwv.i18n("unit.degree")} };
         var ktext = new Kinetic.Text({
-            x: midX,
-            y: midY - 15,
-            text: angleStr,
             fontSize: style.getScaledFontSize(),
             fontFamily: style.getFontFamily(),
             fill: style.getLineColour(),
             name: "text"
         });
+        ktext.textExpr = "{angle}";
+        ktext.quant = quant;
+        ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+
+        // label
+        var midX = ( line0.getMidpoint().getX() + line1.getMidpoint().getX() ) / 2;
+        var midY = ( line0.getMidpoint().getY() + line1.getMidpoint().getY() ) / 2;
+        var klabel = new Kinetic.Label({
+            x: midX,
+            y: midY - 15,
+            name: "label"
+        });
+        klabel.add(ktext);
+        klabel.add(new Kinetic.Tag());
+
         // arc
         var radius = Math.min(line0.getLength(), line1.getLength()) * 33 / 100;
         var karc = new Kinetic.Arc({
@@ -86,7 +97,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
             name: "arc"
          });
         // add to group
-        group.add(ktext);
+        group.add(klabel);
         group.add(karc);
     }
     // return group
@@ -106,9 +117,9 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
     var kline = group.getChildren( function (node) {
         return node.name() === 'shape';
     })[0];
-    // associated text
-    var ktext = group.getChildren( function (node) {
-        return node.name() === 'text';
+    // associated label
+    var klabel = group.getChildren( function (node) {
+        return node.name() === 'label';
     })[0];
     // associated arc
     var karc = group.getChildren( function (node) {
@@ -160,12 +171,18 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
         angle = 360 - angle;
         inclination += angle;
     }
-    var str = angle.toPrecision(4) + "\u00B0";
+
+    // update text
+    var quant = { "angle": { "value": angle, "unit": dwv.i18n("unit.degree")} };
+    var ktext = klabel.getText();
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    // update position
     var midX = ( line0.getMidpoint().getX() + line1.getMidpoint().getX() ) / 2;
     var midY = ( line0.getMidpoint().getY() + line1.getMidpoint().getY() ) / 2;
     var textPos = { 'x': midX, 'y': midY - 15 };
-    ktext.position( textPos );
-    ktext.text(str);
+    klabel.position( textPos );
+
     // arc
     var radius = Math.min(line0.getLength(), line1.getLength()) * 33 / 100;
     karc.innerRadius(radius);

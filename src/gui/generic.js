@@ -6,25 +6,36 @@ dwv.gui.base = dwv.gui.base || {};
 /**
  * Get the size of the image display window.
  */
-dwv.gui.base.getWindowSize = function()
+dwv.gui.base.getWindowSize = function ()
 {
     return { 'width': window.innerWidth, 'height': window.innerHeight - 147 };
+};
+
+/**
+ * Ask some text to the user.
+ * @param {String} message Text to display to the user.
+ * @param {String} defaultText Default value displayed in the text input field.
+ * @return {String} Text entered by the user.
+ */
+dwv.gui.base.prompt = function (message, defaultText)
+{
+    return prompt(message, defaultText);
 };
 
 /**
  * Display a progress value.
  * @param {Number} percent The progress percentage.
  */
-dwv.gui.base.displayProgress = function(/*percent*/)
+dwv.gui.base.displayProgress = function (/*percent*/)
 {
     // default does nothing...
 };
 
 /**
  * Get a HTML element associated to a container div.
- * @param containerDivId The id of the container div.
- * @param name The name or id to find.
- * @return The found element or null.
+ * @param {Number} containerDivId The id of the container div.
+ * @param {String} name The name or id to find.
+ * @return {Object} The found element or null.
  */
 dwv.gui.base.getElement = function (containerDivId, name)
 {
@@ -55,7 +66,7 @@ dwv.gui.base.refreshElement = function (/*element*/)
  * @param {String} element The HTML select element.
  * @param {String} value The value of the option to mark as selected.
  */
-dwv.gui.setSelected = function(element, value)
+dwv.gui.setSelected = function (element, value)
 {
     if ( element ) {
         var index = 0;

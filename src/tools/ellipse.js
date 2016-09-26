@@ -46,23 +46,29 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
     });
     // quantification
     var quant = image.quantifyEllipse( ellipse );
-    var cm2 = quant.surface / 100;
-    var str = cm2.toPrecision(4) + " " + dwv.i18n("unit.cm2");
-    // quantification text
     var ktext = new Kinetic.Text({
-        x: ellipse.getCenter().getX(),
-        y: ellipse.getCenter().getY(),
-        text: str,
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
         name: "text"
     });
+    ktext.textExpr = "{surface}";
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    // label
+    var klabel = new Kinetic.Label({
+        x: ellipse.getCenter().getX(),
+        y: ellipse.getCenter().getY(),
+        name: "label"
+    });
+    klabel.add(ktext);
+    klabel.add(new Kinetic.Tag());
+
     // return group
     var group = new Kinetic.Group();
     group.name("ellipse-group");
     group.add(kshape);
-    group.add(ktext);
+    group.add(klabel);
     return group;
 };
 
@@ -79,9 +85,9 @@ dwv.tool.UpdateEllipse = function (anchor, image)
     var kellipse = group.getChildren( function (node) {
         return node.name() === 'shape';
     })[0];
-    // associated text
-    var ktext = group.getChildren(function(node){
-        return node.name() === 'text';
+    // associated label
+    var klabel = group.getChildren( function (node) {
+        return node.name() === 'label';
     })[0];
     // find special points
     var topLeft = group.getChildren( function (node) {
@@ -135,12 +141,14 @@ dwv.tool.UpdateEllipse = function (anchor, image)
     if ( radiusAbs ) {
         kellipse.radius( radiusAbs );
     }
-    // update text
+    // new ellipse
     var ellipse = new dwv.math.Ellipse(center, radiusX, radiusY);
+    // update text
     var quant = image.quantifyEllipse( ellipse );
-    var cm2 = quant.surface / 100;
-    var str = cm2.toPrecision(4) + " cm2";
+    var ktext = klabel.getText();
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    // update position
     var textPos = { 'x': center.x, 'y': center.y };
-    ktext.position(textPos);
-    ktext.text(str);
+    klabel.position( textPos );
 };

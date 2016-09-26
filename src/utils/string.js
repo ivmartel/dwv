@@ -52,3 +52,54 @@ dwv.utils.splitKeyValueString = function (inputStr)
     }
     return result;
 };
+
+/**
+ * Replace flags in a input string. Flags are keywords surrounded with curly
+ * braces.
+ * @param {String} inputStr The input string.
+ * @param {Object} values A object of {value, unit}.
+ * @example
+ *    var values = {"length": { "value": 33, "unit": "cm" } };
+ *    var str = "The length is: {length}.";
+ *    var res = dwv.utils.replaceFlags(str, values); // "The length is: 33 cm."
+ * @return {String} The result string.
+ */
+dwv.utils.replaceFlags = function (inputStr, values)
+{
+    var res = "";
+    // check input string
+    if (inputStr === null || typeof inputStr === "undefined") {
+        return res;
+    }
+    res = inputStr;
+    // check values
+    if (values === null || typeof values === "undefined") {
+        return res;
+    }
+    // loop through values keys
+    var keys = Object.keys(values);
+    for (var i = 0; i < keys.length; ++i) {
+        var valueObj = values[keys[i]];
+        if ( valueObj !== null && typeof valueObj !== "undefined" &&
+             valueObj.value !== null && typeof valueObj.value !== "undefined") {
+            // value string
+            var valueStr = valueObj.value.toPrecision(4);
+            // add unit if available
+            // space or no space? Yes apart from degree...
+            // check: https://en.wikipedia.org/wiki/Space_(punctuation)#Spaces_and_unit_symbols
+            if (valueObj.unit !== null && typeof valueObj.unit !== "undefined" &&
+                valueObj.unit.length !== 0) {
+                if (valueObj.unit !== "degree") {
+                    valueStr += " ";
+                }
+                valueStr += valueObj.unit;
+            }
+            // flag to replace
+            var flag = '{' + keys[i] + '}';
+            // replace
+            res = res.replace(flag, valueStr);
+        }
+    }
+    // return
+    return res;
+};
