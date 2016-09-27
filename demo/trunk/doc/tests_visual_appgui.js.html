@@ -120,6 +120,11 @@ dwv.gui.displayProgress = function (/*percent*/) {};
 // check browser support
 dwv.browser.check();
 
+// fake translation function used in table creation.
+dwv.i18n = function (text) {
+    return text.substring(text.lastIndexOf('.') + 1, text.length);
+};
+
 // test data line
 dwv.addDataLine = function (id, fileroot, doc)
 {
@@ -139,8 +144,7 @@ dwv.addDataLine = function (id, fileroot, doc)
     // dwv application
     var config = {
         "containerDivId": id,
-        "skipLoadUrl": true,
-        "useWebWorkers": true
+        "skipLoadUrl": true
     };
     var url = "../data/" + fileroot + ".dcm";
     var app = new dwv.App();

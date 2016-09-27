@@ -130,7 +130,7 @@ QUnit.test("Test array to html function.", function (assert) {
     obj.first = {"a":0, "b":1};
     obj.second = {"a":"hello", "b":undefined};
     var table3 = dwv.html.toTable(obj);
-    var table3_ref = "&lt;table>&lt;thead>&lt;tr>&lt;th>name&lt;/th>&lt;th data-priority=\"1\">a&lt;/th>&lt;th data-priority=\"1\">b&lt;/th>&lt;/tr>&lt;/thead>&lt;tbody>&lt;tr>&lt;td>first&lt;/td>&lt;td>0&lt;/td>&lt;td>1&lt;/td>&lt;/tr>&lt;tr>&lt;td>second&lt;/td>&lt;td>hello&lt;/td>&lt;td>undefined&lt;/td>&lt;/tr>&lt;/tbody>&lt;/table>";
+    var table3_ref = "&lt;table>&lt;thead>&lt;tr>&lt;th data-priority=\"1\">name&lt;/th>&lt;th data-priority=\"1\">a&lt;/th>&lt;th data-priority=\"1\">b&lt;/th>&lt;/tr>&lt;/thead>&lt;tbody>&lt;tr>&lt;td>first&lt;/td>&lt;td>0&lt;/td>&lt;td>1&lt;/td>&lt;/tr>&lt;tr>&lt;td>second&lt;/td>&lt;td>hello&lt;/td>&lt;td>undefined&lt;/td>&lt;/tr>&lt;/tbody>&lt;/table>";
     assert.equal(table3.outerHTML, table3_ref, "Object");
 });
 </pre>
