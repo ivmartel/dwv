@@ -31,6 +31,8 @@ dwv.utils.decodeQuery = dwv.utils.base.decodeQuery;
 dwv.gui.getWindowSize = function () {
     return { 'width': ($('#pageMain').width() - 360), 'height': ($('#pageMain').height() - 75) };
 };
+// Prompt
+dwv.gui.prompt = dwv.gui.base.prompt;
 // Progress
 dwv.gui.displayProgress = function (percent) {
     // jquery-ui progress bar
