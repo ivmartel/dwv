@@ -120,10 +120,10 @@
 Example usage:
   var parser = new dwv.dicom.DicomParser();
   parser.parse(this.response);
-  
+
   var writer = new dwv.dicom.DicomWriter(parser.getRawDicomElements());
   var blob = new Blob([writer.getBuffer()], {type: 'application/dicom'});
-  
+
   var element = document.getElementById("download");
   element.href = URL.createObjectURL(blob);
   element.download = "anonym.dcm";

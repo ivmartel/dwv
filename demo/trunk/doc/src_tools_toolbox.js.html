@@ -145,7 +145,7 @@ dwv.tool.Toolbox = function( toolList, app )
         if ( Object.keys(toolList).length !== 0 ) {
             gui = new dwv.gui.Toolbox(app);
             gui.setup(toolList);
-            
+
             for( var key in toolList ) {
                 toolList[key].setup();
             }
