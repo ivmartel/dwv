@@ -894,7 +894,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
         offset = pixItemData.endOffset;
         data = pixItemData.data;
     }
-    else if ( vr === "OW" || vr === "OF" || vr === "ox" )
+    else if ( vr === "OW" || vr === "OB" || vr === "OF" || vr === "ox" )
     {
         // BitsAllocated
         var bitsAllocated = 16;
@@ -925,23 +925,6 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
         }
         else {
             data = reader.readUint16Array( offset, vl );
-        }
-        offset += vl;
-    }
-    // OB
-    else if( vr === "OB")
-    {
-        // PixelRepresentation 0->unsigned, 1->signed
-        var pixelRep = 0;
-        if ( typeof this.dicomElements.x00280103 !== 'undefined' ) {
-            pixelRep = this.dicomElements.x00280103.value[0];
-        }
-        // read accordingly
-        if (pixelRep === 0) {
-           data = reader.readUint8Array( offset, vl );
-        }
-        else {
-           data = reader.readInt8Array( offset, vl );
         }
         offset += vl;
     }
