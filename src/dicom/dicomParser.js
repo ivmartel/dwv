@@ -91,6 +91,9 @@ dwv.dicom.getUtfLabel = function (charSetTerm)
     else if (charSetTerm === "GB18030" ) {
         label = "gb18030";
     }
+    else if (charSetTerm === "GB2312" ) {
+        label = "gb2312";
+    }
     else if (charSetTerm === "GBK" ) {
         label = "chinese";
     }
