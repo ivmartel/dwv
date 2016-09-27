@@ -4,18 +4,18 @@ dwv.dicom = dwv.dicom || {};
 
 /**
  * Data writer.
- * 
+ *
  * Example usage:
  *   var parser = new dwv.dicom.DicomParser();
  *   parser.parse(this.response);
- *   
+ *
  *   var writer = new dwv.dicom.DicomWriter(parser.getRawDicomElements());
  *   var blob = new Blob([writer.getBuffer()], {type: 'application/dicom'});
- *   
+ *
  *   var element = document.getElementById("download");
  *   element.href = URL.createObjectURL(blob);
  *   element.download = "anonym.dcm";
- *   
+ *
  * @constructor
  * @param {Array} buffer The input array buffer.
  */
@@ -25,7 +25,7 @@ dwv.dicom.DataWriter = function (buffer)
     var view = new DataView(buffer);
     // endianness flag
     var isLittleEndian = true;
-    
+
     /**
      * Write Uint8 data.
      * @param {Number} byteOffset The offset to start writing from.
@@ -299,7 +299,7 @@ dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset,
     else {
         byteOffset = this.writeStringArray(byteOffset, value);
     }
-    
+
     // return new offset
     return byteOffset;
 };
@@ -360,7 +360,7 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset)
  * @returns {Boolean} True if it is.
  */
 dwv.dicom.isImplicitLengthSequence = function (element) {
-    return (element.vr === "SQ" && 
+    return (element.vr === "SQ" &&
         typeof element.value !== "undefined" &&
         ( ( Object.keys(element.value).length !== 0 &&
                 typeof element.value[0] !== "undefined" &&
@@ -379,9 +379,9 @@ dwv.dicom.DicomWriter = function () {
         'copy': function (item) { return item; },
         'remove': function () { return null; },
         'clear': function (item) { item.value[0] = ""; return item; },
-        'replace': function (item, value) { 
-            item.value[0] = value; 
-            item.vl = value.length; 
+        'replace': function (item, value) {
+            item.value[0] = value;
+            item.vl = value.length;
             return item;
         }
     };
@@ -397,14 +397,14 @@ dwv.dicom.DicomWriter = function () {
      *   name : { action: 'actionName', value: 'optionalValue }
      * The names are either 'default', tagName or groupName.
      * Each DICOM element will be checked to see if a rule is applicable.
-     * First checked by tagName and then by groupName, 
+     * First checked by tagName and then by groupName,
      * if nothing is found the default rule is applied.
      */
     this.rules = defaultRules;
-    
+
     /**
      * Example anonymisation rules.
-     */ 
+     */
     this.anonymisationRules = {
         'default': {action: 'remove', value: null },
         'PatientName': {action: 'replace', value: 'Anonymized'}, // tag
@@ -448,7 +448,7 @@ dwv.dicom.DicomWriter = function () {
         return actions[rule.action](element, rule.value);
     };
 };
-    
+
 /**
  * Get the ArrayBuffer corresponding to input DICOM elements.
  * @param {Array} dicomElements The wrapped elements to write.
@@ -457,7 +457,7 @@ dwv.dicom.DicomWriter = function () {
 dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     // array keys
     var keys = Object.keys(dicomElements);
-    
+
     // calculate buffer size and split elements (meta and non meta)
     var size = 128 + 4; // DICM
     var metaElements = [];
@@ -469,12 +469,12 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
         if ( element !== null ) {
             // size
             size += dwv.dicom.getDataElementPrefixByteSize(element.vr) + parseInt(element.vl, 10);
-            
+
             // add size of sequence delimitation item
             if ( dwv.dicom.isImplicitLengthSequence(element) ) {
                 size += dwv.dicom.getDataElementPrefixByteSize("NONE");
             }
-            
+
             // sort element
             groupName = dwv.dicom.TagGroups[element.tag.group.substr(1)]; // remove first 0
             if ( groupName === 'Meta Element' ) {
@@ -485,7 +485,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
             }
         }
     }
-    
+
     console.log("size: "+size);
 
     // create buffer
@@ -502,8 +502,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     for ( var k = 0, lenk = rawElements.length; k < lenk; ++k ) {
         offset = writer.writeDataElement(rawElements[k], offset);
     }
-    
+
     // return
     return buffer;
 };
-

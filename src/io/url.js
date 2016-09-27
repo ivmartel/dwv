@@ -46,7 +46,7 @@ dwv.io.Url = function ()
      * @type String
      */
     var defaultCharacterSet;
-    
+
     /**
      * Get the default character set.
      * @return {String} The default character set.
@@ -54,7 +54,7 @@ dwv.io.Url = function ()
     this.getDefaultCharacterSet = function () {
         return defaultCharacterSet;
     };
-    
+
     /**
      * Set the default character set.
      * @param {String} characterSet The character set.
@@ -121,7 +121,7 @@ dwv.io.Url = function ()
         // half loading, half decoding
         return sum / (2 * nToLoad);
     }
-    
+
 }; // class Url
 
 /**
@@ -259,7 +259,7 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
             this.onerror();
             return;
         }
-        
+
         // find the image type from its signature
         var view = new DataView(this.response);
         var isJpeg = view.getUint32(0) === 0xffd8ffe0;
@@ -317,7 +317,7 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
         var request = new XMLHttpRequest();
         request.open('GET', url, true);
         if ( typeof requestHeaders !== "undefined" ) {
-            for (var j = 0; j < requestHeaders.length; ++j) { 
+            for (var j = 0; j < requestHeaders.length; ++j) {
                 if ( typeof requestHeaders[j].name !== "undefined" &&
                     typeof requestHeaders[j].value !== "undefined" ) {
                     request.setRequestHeader(requestHeaders[j].name, requestHeaders[j].value);

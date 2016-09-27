@@ -115,7 +115,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
 
     // Default text encoding
     var utfLabel = "iso-8859-1";
-    
+
     /**
      * Set the utfLabel used to construct the TextDecoder.
      * @param {String} label The encoding label.
@@ -226,7 +226,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
             data = new Uint16Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
                 data[i] = view.getInt16(
-                        (byteOffset + Uint16Array.BYTES_PER_ELEMENT * i), 
+                        (byteOffset + Uint16Array.BYTES_PER_ELEMENT * i),
                         isLittleEndian);
             }
         }
@@ -330,7 +330,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
             data = new Float32Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
                 data[i] = view.getFloat32(
-                        (byteOffset + Float32Array.BYTES_PER_ELEMENT * i), 
+                        (byteOffset + Float32Array.BYTES_PER_ELEMENT * i),
                         isLittleEndian);
             }
         }
@@ -373,7 +373,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         // return padded
         return "0x0000".substr(0, 6 - str.length) + str.toUpperCase();
     };
-    
+
     /**
      * Decode an input string.
      */
@@ -390,7 +390,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         }
         return result;
     }
-    
+
     /**
      * Read data as a string.
      * @param {Number} byteOffset The offset to start reading from.
@@ -622,7 +622,7 @@ dwv.dicom.is32bitVLVR = function (vr)
 };
 
 /**
- * Does this tag have a VR. 
+ * Does this tag have a VR.
  * Basically the Item, ItemDelimitationItem and SequenceDelimitationItem tags.
  * @param {String} group The tag group.
  * @param {String} element The tag element.
@@ -644,10 +644,10 @@ dwv.dicom.isTagWithVR = function (group, element) {
  * | Tag | VR  | VL | Value |
  * | 4   | 2   | 2  | X     | -> regular explicit: 8 + X
  * | 4   | 2+2 | 4  | X     | -> 32bit VL: 12 + X
- * 
+ *
  * | Tag | VL | Value |
  * | 4   | 4  | X     | -> implicit (32bit VL): 8 + X
- * 
+ *
  * | Tag | Len | Value |
  * | 4   | 4   | X     | -> item: 8 + X
  */
@@ -725,7 +725,7 @@ dwv.dicom.DicomParser.prototype.readTag = function (reader, offset)
     var name = dwv.dicom.getGroupElementKey(group, element);
     // return
     return {
-        'group': group, 
+        'group': group,
         'element': element,
         'name': name,
         'endOffset': offset };
@@ -745,19 +745,19 @@ dwv.dicom.DicomParser.prototype.readItemDataElement = function (reader, offset, 
     // read the first item
     var item = this.readDataElement(reader, offset, implicit);
     offset = item.endOffset;
-    
+
     // exit if it is a sequence delimitation item
     var isSeqDelim = ( item.tag.name === "xFFFEE0DD" );
     if (isSeqDelim) {
         return {
-            data: itemData, 
-            endOffset: item.endOffset, 
+            data: itemData,
+            endOffset: item.endOffset,
             isSeqDelim: isSeqDelim };
     }
-    
+
     // store it
     itemData[item.tag.name] = item;
-    
+
     // explicit VR items
     if (item.vl !== "u/l") {
         // not empty
@@ -767,7 +767,7 @@ dwv.dicom.DicomParser.prototype.readItemDataElement = function (reader, offset, 
             offset -= item.vl;
             while (offset < endOffset) {
                 item = this.readDataElement(reader, offset, implicit);
-                offset = item.endOffset; 
+                offset = item.endOffset;
                 itemData[item.tag.name] = item;
             }
         }
@@ -778,22 +778,22 @@ dwv.dicom.DicomParser.prototype.readItemDataElement = function (reader, offset, 
         var isItemDelim = false;
         while (!isItemDelim) {
             item = this.readDataElement(reader, offset, implicit);
-            offset = item.endOffset; 
+            offset = item.endOffset;
             isItemDelim = ( item.tag.name === "xFFFEE00D" );
             if (!isItemDelim) {
                 itemData[item.tag.name] = item;
             }
         }
     }
-    
+
     return {
-        'data': itemData, 
-        'endOffset': offset, 
+        'data': itemData,
+        'endOffset': offset,
         'isSeqDelim': false };
 };
 
 /**
- * Read the pixel item data element. 
+ * Read the pixel item data element.
  * Ref: [Single frame fragments]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_A.4.html#table_A.4-1}.
  * @param {Object} reader The raw data reader.
  * @param {Number} offset The offset where to start to read.
@@ -807,20 +807,20 @@ dwv.dicom.DicomParser.prototype.readPixelItemDataElement = function (reader, off
     // first item: basic offset table
     var item = this.readDataElement(reader, offset, implicit);
     offset = item.endOffset;
-    
+
     // read until the sequence delimitation item
     var isSeqDelim = false;
     while (!isSeqDelim) {
         item = this.readDataElement(reader, offset, implicit);
-        offset = item.endOffset; 
+        offset = item.endOffset;
         isSeqDelim = ( item.tag.name === "xFFFEE0DD" );
         if (!isSeqDelim) {
             itemData.push(item.value);
         }
     }
-    
+
     return {
-        'data': itemData, 
+        'data': itemData,
         'endOffset': offset };
 };
 
@@ -839,7 +839,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
     offset = tag.endOffset;
 
     // Value Representation (VR)
-    var vr = null; 
+    var vr = null;
     var is32bitVLVR = false;
     if (dwv.dicom.isTagWithVR(tag.group, tag.element)) {
         // implicit VR
@@ -877,7 +877,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
         vl = reader.readUint16( offset );
         offset += Uint16Array.BYTES_PER_ELEMENT;
     }
-    
+
     // check the value of VL
     var vlString = vl;
     if( vl === 0xffffffff ) {
@@ -1128,7 +1128,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     if (typeof this.getDefaultCharacterSet() !== "undefined") {
         dataReader.setUtfLabel(this.getDefaultCharacterSet());
     }
-    
+
     // DICOM data elements
     while ( offset < buffer.byteLength )
     {
@@ -1151,7 +1151,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
         // store the data element
         this.dicomElements[dataElement.tag.name] = dataElement;
     }
-    
+
     // safety check...
     if (buffer.byteLength != offset) {
         console.warn("Did not reach the end of the buffer: "+
@@ -1160,12 +1160,12 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
 
     // pixel buffer
     if (typeof this.dicomElements.x7FE00010 !== "undefined") {
-        
+
         var numberOfFrames = 1;
         if (typeof this.dicomElements.x00280008 !== "undefined") {
             numberOfFrames = this.dicomElements.x00280008.value[0];
         }
-        
+
         if (this.dicomElements.x7FE00010.vl !== "u/l") {
             // compressed should be encapsulated...
             if (dwv.dicom.isJpeg2000TransferSyntax( syntax ) ||
@@ -1173,7 +1173,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
                 dwv.dicom.isJpegLosslessTransferSyntax( syntax ) ) {
                 console.warn("Compressed but no items...");
             }
-            
+
             // calculate the slice size
             var pixData = this.dicomElements.x7FE00010.value;
             var columns = this.dicomElements.x00280011.value[0];

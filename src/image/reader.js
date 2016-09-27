@@ -72,7 +72,7 @@ dwv.image.DicomBufferToView = function ()
      * @type String
      */
     var defaultCharacterSet;
-    
+
     /**
      * Set the default character set.
      * param {String} The character set.
@@ -82,11 +82,11 @@ dwv.image.DicomBufferToView = function ()
     };
 
     /**
-     * Pixel buffer decoder. 
+     * Pixel buffer decoder.
      * Define only once to allow optional asynchronous mode.
      * @private
      * @type Object
-     */ 
+     */
     var pixelDecoder = null;
 
     /**
@@ -101,7 +101,7 @@ dwv.image.DicomBufferToView = function ()
         dicomParser.setDefaultCharacterSet(defaultCharacterSet);
         // parse the buffer
         dicomParser.parse(buffer);
-    
+
         var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
         var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
         var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
@@ -128,7 +128,7 @@ dwv.image.DicomBufferToView = function ()
             if (!pixelDecoder){
                 pixelDecoder = new dwv.image.PixelBufferDecoder(algoName);
             }
-            
+
             // loadend event
             pixelDecoder.ondecodeend = function () {
                 self.onloadend();
@@ -160,14 +160,14 @@ dwv.image.DicomBufferToView = function ()
             };
 
             // decompress synchronously the first frame to create the image
-            pixelDecoder.decode(pixelBuffer[0], 
+            pixelDecoder.decode(pixelBuffer[0],
                 bitsAllocated, isSigned, onDecodedFrame(0), false);
-            
+
             // decompress the possible other frames
             if ( nFrames != 1 ) {
                 // decode (asynchronously if possible)
                 for (var f = 1; f < nFrames; ++f) {
-                    pixelDecoder.decode(pixelBuffer[f], 
+                    pixelDecoder.decode(pixelBuffer[f],
                         bitsAllocated, isSigned, onDecodedFrame(f));
                 }
             }

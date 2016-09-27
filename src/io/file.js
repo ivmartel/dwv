@@ -15,7 +15,7 @@ dwv.io.File = function ()
      * @type Object
      */
     var self = this;
-    
+
     /**
      * Number of data to load.
      * @private
@@ -40,14 +40,14 @@ dwv.io.File = function ()
      * @type Array
      */
     var decodeProgresses = [];
-    
+
     /**
      * The default character set (optional).
      * @private
      * @type String
      */
     var defaultCharacterSet;
-    
+
     /**
      * Get the default character set.
      * @return {String} The default character set.
@@ -55,7 +55,7 @@ dwv.io.File = function ()
     this.getDefaultCharacterSet = function () {
         return defaultCharacterSet;
     };
-    
+
     /**
      * Set the default character set.
      * @param {String} characterSet The character set.
@@ -122,7 +122,7 @@ dwv.io.File = function ()
         // half loading, half decoding
         return sum / (2 * nToLoad);
     }
-    
+
 }; // class File
 
 /**
@@ -223,7 +223,7 @@ dwv.io.File.prototype.load = function (ioArray)
         }
     };
 
-    // DOM Image buffer to dwv.image.View 
+    // DOM Image buffer to dwv.image.View
     var onLoadDOMImageBuffer = function (/*event*/)
     {
         try {

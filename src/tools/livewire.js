@@ -235,7 +235,7 @@ dwv.tool.Livewire = function(app)
         // set flag
         self.started = false;
     };
-    
+
     /**
      * Handle touch start event.
      * @param {Object} event The touch start event.

@@ -20,7 +20,7 @@ var JpxImage = JpxImage || {};
  */
 dwv.image.AsynchPixelBufferDecoder = function (script)
 {
-    // initialise the thread pool 
+    // initialise the thread pool
     var pool = new dwv.utils.ThreadPool(15);
     pool.init();
 
@@ -159,9 +159,9 @@ dwv.image.PixelBufferDecoder = function (algoName, asynch)
      * Defined only once.
      * @private
      * @type Object
-     */ 
+     */
     var asynchDecoder = null;
-    
+
     // initialise the asynch decoder (if possible)
     if (typeof dwv.image.decoderScripts !== "undefined" &&
             typeof dwv.image.decoderScripts[algoName] !== "undefined") {
@@ -180,7 +180,7 @@ dwv.image.PixelBufferDecoder = function (algoName, asynch)
     {
         // default to asynch
         asynch = (typeof asynch === 'undefined') ? true : asynch;
-        
+
         // run asynchronous if asked and we have scripts
         if (asynch && asynchDecoder !== null) {
             // (re)set event handler
@@ -217,4 +217,3 @@ dwv.image.PixelBufferDecoder.prototype.ondecoded = function ()
 {
     // default does nothing.
 };
-

@@ -473,7 +473,7 @@ dwv.App = function ()
             postLoadInit(data);
         };
         fileIO.onerror = function (error) { handleError(error); };
-        fileIO.onloadend = function (/*event*/) { 
+        fileIO.onloadend = function (/*event*/) {
             if ( drawStage ) {
                 activateDrawLayer();
             }
@@ -545,7 +545,7 @@ dwv.App = function ()
             postLoadInit(data);
         };
         urlIO.onerror = function (error) { handleError(error); };
-        urlIO.onloadend = function (/*event*/) { 
+        urlIO.onloadend = function (/*event*/) {
             if ( drawStage ) {
                 activateDrawLayer();
             }
@@ -596,7 +596,7 @@ dwv.App = function ()
             drawStage.add(drawLayer);
         }
     }
-    
+
     /**
      * Activate the current draw layer.
      * @private
@@ -614,7 +614,7 @@ dwv.App = function ()
         currentLayer.visible( true );
         currentLayer.draw();
     }
-    
+
     /**
      * Fit the display to the given size. To be called once the image is loaded.
      */

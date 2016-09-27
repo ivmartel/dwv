@@ -17,7 +17,7 @@ dwv.utils.ThreadPool = function (size) {
     this.workerQueue = [];
     // pool size
     this.poolSize = size;
- 
+
     /**
      * Initialise.
      */
@@ -27,7 +27,7 @@ dwv.utils.ThreadPool = function (size) {
             self.workerQueue.push(new dwv.utils.WorkerThread(self));
         }
     };
- 
+
     /**
      * Add a worker task to the queue.
      * Will be run when a thread is made available.
@@ -43,7 +43,7 @@ dwv.utils.ThreadPool = function (size) {
             self.taskQueue.push(workerTask);
         }
     };
- 
+
     /**
      * Free a worker thread.
      * @param {Object} workerThread The thread to free.
@@ -95,7 +95,7 @@ dwv.utils.WorkerThread = function (parentPool) {
     this.workerTask = {};
     // associated web worker
     var worker;
- 
+
     /**
      * Run a worker task
      * @param {Object} workerTask The task to run.
@@ -111,7 +111,7 @@ dwv.utils.WorkerThread = function (parentPool) {
             worker.postMessage(workerTask.startMessage);
         }
     };
- 
+
     /**
      * Handle once the task is done.
      * For now assume we only get a single callback from a worker
@@ -126,9 +126,9 @@ dwv.utils.WorkerThread = function (parentPool) {
         // tell the parent pool this thread is free
         self.parentPool.freeWorkerThread(self);
     }
- 
+
 };
- 
+
 /**
  * Worker task.
  * @constructor
