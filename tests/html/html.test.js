@@ -37,6 +37,6 @@ QUnit.test("Test array to html function.", function (assert) {
     obj.first = {"a":0, "b":1};
     obj.second = {"a":"hello", "b":undefined};
     var table3 = dwv.html.toTable(obj);
-    var table3_ref = "<table><thead><tr><th>name</th><th data-priority=\"1\">a</th><th data-priority=\"1\">b</th></tr></thead><tbody><tr><td>first</td><td>0</td><td>1</td></tr><tr><td>second</td><td>hello</td><td>undefined</td></tr></tbody></table>";
+    var table3_ref = "<table><thead><tr><th data-priority=\"1\">name</th><th data-priority=\"1\">a</th><th data-priority=\"1\">b</th></tr></thead><tbody><tr><td>first</td><td>0</td><td>1</td></tr><tr><td>second</td><td>hello</td><td>undefined</td></tr></tbody></table>";
     assert.equal(table3.outerHTML, table3_ref, "Object");
 });

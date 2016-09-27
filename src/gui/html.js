@@ -36,7 +36,7 @@ dwv.html.appendHCell = function (row, text)
 {
     var cell = document.createElement("th");
     // TODO jquery-mobile specific...
-    if ( text !== "value" && text !== "name" ) {
+    if ( text !== dwv.i18n("basics.value") && text !== dwv.i18n("basics.name") ) {
         cell.setAttribute("data-priority", "1");
     }
     cell.appendChild(document.createTextNode(text));
