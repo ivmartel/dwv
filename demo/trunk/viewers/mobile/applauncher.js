@@ -61,7 +61,7 @@ dwv.image.decoderScripts = {
 // check browser support
 dwv.browser.check();
 // initialise i18n
-dwv.i18nInitialise("auto", "/dwv/demo/trunk");
+dwv.i18nInitialise();
 // launch when page is ready
 $(document).ready( function()
 {
