@@ -17,7 +17,7 @@ var i18nextBrowserLanguageDetector = i18nextBrowserLanguageDetector || {};
 dwv.i18nInitialise = function (language, localesPath)
 {
     var lng = (typeof language === "undefined") ? "auto" : language;
-    var lpath = (typeof localesPath === "undefined") ? "" : localesPath;
+    var lpath = (typeof localesPath === "undefined") ? "../.." : localesPath;
     // i18n options: default 'en' language and
     //  only load language, not specialised (for ex en-GB)
     var options = {
