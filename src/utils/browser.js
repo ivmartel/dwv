@@ -77,6 +77,30 @@ dwv.browser.hasClampedArray = function()
 };
 
 /**
+ * Return a shallow copy of a portion of a typed array into a new typed array object.
+ * Used for browsers that do not provide this method.
+ * @param {Object} array The typed array to slice.
+ * @param {Number} sliceBegin Zero-based index at which to begin extraction.
+ * @param {Number} sliceEnd Zero-based index at which to end extraction.
+ * @return {Object} A new typed array containing the extracted elements..
+ * Inspired from [generic-slice]{@link https://github.com/mikolalysenko/generic-slice}.
+ */
+dwv.browser.sliceTypedArray = function (array, sliceBegin, sliceEnd) {
+    var bpe = array.BYTES_PER_ELEMENT;
+    var boff = array.byteOffset;
+    var len = array.length;
+    sliceBegin = (sliceBegin|0) || 0;
+    sliceEnd = (sliceEnd === undefined) ? len : (sliceEnd|0);
+    if (sliceBegin < 0) {
+        sliceBegin += len;
+    }
+    if (sliceEnd < 0) {
+        sliceEnd += len;
+    }
+    return new array.constructor(array.buffer.slice(boff + bpe*sliceBegin, boff + bpe*sliceEnd));
+};
+
+/**
  * Browser checks to see if it can run dwv. Throws an error if not.
  * Silently replaces basic functions.
  * @todo Maybe use {@link http://modernizr.com/}.
@@ -107,23 +131,21 @@ dwv.browser.check = function()
     if( !dwv.browser.hasTypedArraySlice() ) {
         // silent fail with warning
         console.warn("The TypedArray.slice method is not supported in this browser. This may impair performance. ");
-        // basic Uint16Array implementation
+        // Uint16Array implementation
         Uint16Array.prototype.slice = function (begin, end) {
-            var size = end - begin;
-            var cloned = new Uint16Array(size);
-            for (var i = 0; i < size; i++) {
-                cloned[i] = this[begin + i];
-            }
-            return cloned;
+            return dwv.browser.sliceTypedArray(this, begin, end);
         };
-        // basic Uint8Array implementation
+        // Int16Array implementation
+        Int16Array.prototype.slice = function (begin, end) {
+            return dwv.browser.sliceTypedArray(this, begin, end);
+        };
+        // Uint8Array implementation
         Uint8Array.prototype.slice = function (begin, end) {
-            var size = end - begin;
-            var cloned = new Uint8Array(size);
-            for (var i = 0; i < size; i++) {
-                cloned[i] = this[begin + i];
-            }
-            return cloned;
+            return dwv.browser.sliceTypedArray(this, begin, end);
+        };
+        // Int8Array implementation
+        Int8Array.prototype.slice = function (begin, end) {
+            return dwv.browser.sliceTypedArray(this, begin, end);
         };
     }
     // check clamped array
