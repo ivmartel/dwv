@@ -116,10 +116,28 @@ dwv.browser.check = function()
             }
             return cloned;
         };
+        // basic Int16Array implementation
+        Int16Array.prototype.slice = function (begin, end) {
+            var size = end - begin;
+            var cloned = new Int16Array(size);
+            for (var i = 0; i < size; i++) {
+                cloned[i] = this[begin + i];
+            }
+            return cloned;
+        };
         // basic Uint8Array implementation
         Uint8Array.prototype.slice = function (begin, end) {
             var size = end - begin;
             var cloned = new Uint8Array(size);
+            for (var i = 0; i < size; i++) {
+                cloned[i] = this[begin + i];
+            }
+            return cloned;
+        };
+        // basic Int8Array implementation
+        Int8Array.prototype.slice = function (begin, end) {
+            var size = end - begin;
+            var cloned = new Int8Array(size);
             for (var i = 0; i < size; i++) {
                 cloned[i] = this[begin + i];
             }
