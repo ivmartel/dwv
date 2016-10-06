@@ -887,26 +887,34 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
 
     // data
     var data = null;
+    var isPixelData = (tag.name === "x7FE00010");
     // pixel data sequence (implicit)
-    if (tag.name === "x7FE00010" && vlString === "u/l")
+    if (isPixelData && vlString === "u/l")
     {
         var pixItemData = this.readPixelItemDataElement(reader, offset, implicit);
         offset = pixItemData.endOffset;
         data = pixItemData.data;
     }
-    else if ( vr === "OW" || vr === "OB" || vr === "OF" || vr === "ox" )
-    {
+    else if (isPixelData && (vr === "OB" || vr === "OW" || vr === "OF" || vr === "ox")) {
         // BitsAllocated
         var bitsAllocated = 16;
         if ( typeof this.dicomElements.x00280100 !== 'undefined' ) {
             bitsAllocated = this.dicomElements.x00280100.value[0];
+        } else {
+            console.warn("Reading DICOM pixel data with default bitsAllocated.");
+        }
+        if (bitsAllocated === 8 && vr === "OW") {
+            console.warn("Reading DICOM pixel data with vr=OW and bitsAllocated=8 (should be 16).");
+        }
+        if (bitsAllocated === 16 && vr === "OB") {
+            console.warn("Reading DICOM pixel data with vr=OB and bitsAllocated=16 (should be 8).");
         }
         // PixelRepresentation 0->unsigned, 1->signed
         var pixelRepresentation = 0;
         if ( typeof this.dicomElements.x00280103 !== 'undefined' ) {
             pixelRepresentation = this.dicomElements.x00280103.value[0];
         }
-        // read accordingly
+        // read
         if ( bitsAllocated === 8 ) {
             if (pixelRepresentation === 0) {
                 data = reader.readUint8Array( offset, vl );
@@ -923,9 +931,43 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
                 data = reader.readInt16Array( offset, vl );
             }
         }
-        else {
-            data = reader.readUint16Array( offset, vl );
+        else if ( bitsAllocated === 32 ) {
+            if (pixelRepresentation === 0) {
+                data = reader.readUint32Array( offset, vl );
+            }
+            else {
+                data = reader.readInt32Array( offset, vl );
+            }
         }
+        else if ( bitsAllocated === 64 ) {
+            if (pixelRepresentation === 0) {
+                data = reader.readUint64Array( offset, vl );
+            }
+            else {
+                data = reader.readInt64Array( offset, vl );
+            }
+        }
+        offset += vl;
+    }
+    // others
+    else if ( vr === "OB" )
+    {
+        data = reader.readInt8Array( offset, vl );
+        offset += vl;
+    }
+    else if ( vr === "OW" )
+    {
+        data = reader.readInt16Array( offset, vl );
+        offset += vl;
+    }
+    else if ( vr === "OF" )
+    {
+        data = reader.readInt32Array( offset, vl );
+        offset += vl;
+    }
+    else if ( vr === "OD" )
+    {
+        data = reader.readInt64Array( offset, vl );
         offset += vl;
     }
     // numbers
@@ -1074,6 +1116,10 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     }
 
     // check the TransferSyntaxUID (has to be there!)
+    if (typeof this.dicomElements.x00020010 === "undefined")
+    {
+        throw new Error("Not a valid DICOM file (no TransferSyntaxUID found)");
+    }
     var syntax = dwv.dicom.cleanString(this.dicomElements.x00020010.value[0]);
 
     // Explicit VR - Little Endian
