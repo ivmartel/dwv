@@ -1358,6 +1358,8 @@ dwv.App = function ()
         if ( error.stack ) {
             console.error(error.stack);
         }
+        // stop progress
+        dwv.gui.displayProgress(100);
     }
 
     /**
