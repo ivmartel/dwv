@@ -87,7 +87,7 @@ dwv.App = function ()
      * Get the version of the application.
      * @return {String} The version of the application.
      */
-    this.getVersion = function () { return "v0.16.1"; };
+    this.getVersion = function () { return "v0.17.0-beta"; };
 
     /**
      * Get the image.
@@ -1358,6 +1358,8 @@ dwv.App = function ()
         if ( error.stack ) {
             console.error(error.stack);
         }
+        // stop progress
+        dwv.gui.displayProgress(100);
     }
 
     /**
@@ -2006,6 +2008,9 @@ dwv.dicom.getUtfLabel = function (charSetTerm)
     else if (charSetTerm === "GB18030" ) {
         label = "gb18030";
     }
+    else if (charSetTerm === "GB2312" ) {
+        label = "gb2312";
+    }
     else if (charSetTerm === "GBK" ) {
         label = "chinese";
     }
@@ -2027,7 +2032,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
 
     // Default text encoding
     var utfLabel = "iso-8859-1";
-    
+
     /**
      * Set the utfLabel used to construct the TextDecoder.
      * @param {String} label The encoding label.
@@ -2138,7 +2143,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
             data = new Uint16Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
                 data[i] = view.getInt16(
-                        (byteOffset + Uint16Array.BYTES_PER_ELEMENT * i), 
+                        (byteOffset + Uint16Array.BYTES_PER_ELEMENT * i),
                         isLittleEndian);
             }
         }
@@ -2242,7 +2247,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
             data = new Float32Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
                 data[i] = view.getFloat32(
-                        (byteOffset + Float32Array.BYTES_PER_ELEMENT * i), 
+                        (byteOffset + Float32Array.BYTES_PER_ELEMENT * i),
                         isLittleEndian);
             }
         }
@@ -2285,7 +2290,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         // return padded
         return "0x0000".substr(0, 6 - str.length) + str.toUpperCase();
     };
-    
+
     /**
      * Decode an input string.
      */
@@ -2302,7 +2307,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         }
         return result;
     }
-    
+
     /**
      * Read data as a string.
      * @param {Number} byteOffset The offset to start reading from.
@@ -2534,7 +2539,7 @@ dwv.dicom.is32bitVLVR = function (vr)
 };
 
 /**
- * Does this tag have a VR. 
+ * Does this tag have a VR.
  * Basically the Item, ItemDelimitationItem and SequenceDelimitationItem tags.
  * @param {String} group The tag group.
  * @param {String} element The tag element.
@@ -2556,10 +2561,10 @@ dwv.dicom.isTagWithVR = function (group, element) {
  * | Tag | VR  | VL | Value |
  * | 4   | 2   | 2  | X     | -> regular explicit: 8 + X
  * | 4   | 2+2 | 4  | X     | -> 32bit VL: 12 + X
- * 
+ *
  * | Tag | VL | Value |
  * | 4   | 4  | X     | -> implicit (32bit VL): 8 + X
- * 
+ *
  * | Tag | Len | Value |
  * | 4   | 4   | X     | -> item: 8 + X
  */
@@ -2637,7 +2642,7 @@ dwv.dicom.DicomParser.prototype.readTag = function (reader, offset)
     var name = dwv.dicom.getGroupElementKey(group, element);
     // return
     return {
-        'group': group, 
+        'group': group,
         'element': element,
         'name': name,
         'endOffset': offset };
@@ -2657,19 +2662,19 @@ dwv.dicom.DicomParser.prototype.readItemDataElement = function (reader, offset, 
     // read the first item
     var item = this.readDataElement(reader, offset, implicit);
     offset = item.endOffset;
-    
+
     // exit if it is a sequence delimitation item
     var isSeqDelim = ( item.tag.name === "xFFFEE0DD" );
     if (isSeqDelim) {
         return {
-            data: itemData, 
-            endOffset: item.endOffset, 
+            data: itemData,
+            endOffset: item.endOffset,
             isSeqDelim: isSeqDelim };
     }
-    
+
     // store it
     itemData[item.tag.name] = item;
-    
+
     // explicit VR items
     if (item.vl !== "u/l") {
         // not empty
@@ -2679,7 +2684,7 @@ dwv.dicom.DicomParser.prototype.readItemDataElement = function (reader, offset, 
             offset -= item.vl;
             while (offset < endOffset) {
                 item = this.readDataElement(reader, offset, implicit);
-                offset = item.endOffset; 
+                offset = item.endOffset;
                 itemData[item.tag.name] = item;
             }
         }
@@ -2690,22 +2695,22 @@ dwv.dicom.DicomParser.prototype.readItemDataElement = function (reader, offset, 
         var isItemDelim = false;
         while (!isItemDelim) {
             item = this.readDataElement(reader, offset, implicit);
-            offset = item.endOffset; 
+            offset = item.endOffset;
             isItemDelim = ( item.tag.name === "xFFFEE00D" );
             if (!isItemDelim) {
                 itemData[item.tag.name] = item;
             }
         }
     }
-    
+
     return {
-        'data': itemData, 
-        'endOffset': offset, 
+        'data': itemData,
+        'endOffset': offset,
         'isSeqDelim': false };
 };
 
 /**
- * Read the pixel item data element. 
+ * Read the pixel item data element.
  * Ref: [Single frame fragments]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_A.4.html#table_A.4-1}.
  * @param {Object} reader The raw data reader.
  * @param {Number} offset The offset where to start to read.
@@ -2719,20 +2724,20 @@ dwv.dicom.DicomParser.prototype.readPixelItemDataElement = function (reader, off
     // first item: basic offset table
     var item = this.readDataElement(reader, offset, implicit);
     offset = item.endOffset;
-    
+
     // read until the sequence delimitation item
     var isSeqDelim = false;
     while (!isSeqDelim) {
         item = this.readDataElement(reader, offset, implicit);
-        offset = item.endOffset; 
+        offset = item.endOffset;
         isSeqDelim = ( item.tag.name === "xFFFEE0DD" );
         if (!isSeqDelim) {
             itemData.push(item.value);
         }
     }
-    
+
     return {
-        'data': itemData, 
+        'data': itemData,
         'endOffset': offset };
 };
 
@@ -2751,7 +2756,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
     offset = tag.endOffset;
 
     // Value Representation (VR)
-    var vr = null; 
+    var vr = null;
     var is32bitVLVR = false;
     if (dwv.dicom.isTagWithVR(tag.group, tag.element)) {
         // implicit VR
@@ -2789,7 +2794,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
         vl = reader.readUint16( offset );
         offset += Uint16Array.BYTES_PER_ELEMENT;
     }
-    
+
     // check the value of VL
     var vlString = vl;
     if( vl === 0xffffffff ) {
@@ -2799,26 +2804,34 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
 
     // data
     var data = null;
+    var isPixelData = (tag.name === "x7FE00010");
     // pixel data sequence (implicit)
-    if (tag.name === "x7FE00010" && vlString === "u/l")
+    if (isPixelData && vlString === "u/l")
     {
         var pixItemData = this.readPixelItemDataElement(reader, offset, implicit);
         offset = pixItemData.endOffset;
         data = pixItemData.data;
     }
-    else if ( vr === "OW" || vr === "OF" || vr === "ox" )
-    {
+    else if (isPixelData && (vr === "OB" || vr === "OW" || vr === "OF" || vr === "ox")) {
         // BitsAllocated
         var bitsAllocated = 16;
         if ( typeof this.dicomElements.x00280100 !== 'undefined' ) {
             bitsAllocated = this.dicomElements.x00280100.value[0];
+        } else {
+            console.warn("Reading DICOM pixel data with default bitsAllocated.");
+        }
+        if (bitsAllocated === 8 && vr === "OW") {
+            console.warn("Reading DICOM pixel data with vr=OW and bitsAllocated=8 (should be 16).");
+        }
+        if (bitsAllocated === 16 && vr === "OB") {
+            console.warn("Reading DICOM pixel data with vr=OB and bitsAllocated=16 (should be 8).");
         }
         // PixelRepresentation 0->unsigned, 1->signed
         var pixelRepresentation = 0;
         if ( typeof this.dicomElements.x00280103 !== 'undefined' ) {
             pixelRepresentation = this.dicomElements.x00280103.value[0];
         }
-        // read accordingly
+        // read
         if ( bitsAllocated === 8 ) {
             if (pixelRepresentation === 0) {
                 data = reader.readUint8Array( offset, vl );
@@ -2835,26 +2848,43 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
                 data = reader.readInt16Array( offset, vl );
             }
         }
-        else {
-            data = reader.readUint16Array( offset, vl );
+        else if ( bitsAllocated === 32 ) {
+            if (pixelRepresentation === 0) {
+                data = reader.readUint32Array( offset, vl );
+            }
+            else {
+                data = reader.readInt32Array( offset, vl );
+            }
+        }
+        else if ( bitsAllocated === 64 ) {
+            if (pixelRepresentation === 0) {
+                data = reader.readUint64Array( offset, vl );
+            }
+            else {
+                data = reader.readInt64Array( offset, vl );
+            }
         }
         offset += vl;
     }
-    // OB
-    else if( vr === "OB")
+    // others
+    else if ( vr === "OB" )
     {
-        // PixelRepresentation 0->unsigned, 1->signed
-        var pixelRep = 0;
-        if ( typeof this.dicomElements.x00280103 !== 'undefined' ) {
-            pixelRep = this.dicomElements.x00280103.value[0];
-        }
-        // read accordingly
-        if (pixelRep === 0) {
-           data = reader.readUint8Array( offset, vl );
-        }
-        else {
-           data = reader.readInt8Array( offset, vl );
-        }
+        data = reader.readInt8Array( offset, vl );
+        offset += vl;
+    }
+    else if ( vr === "OW" )
+    {
+        data = reader.readInt16Array( offset, vl );
+        offset += vl;
+    }
+    else if ( vr === "OF" )
+    {
+        data = reader.readInt32Array( offset, vl );
+        offset += vl;
+    }
+    else if ( vr === "OD" )
+    {
+        data = reader.readInt64Array( offset, vl );
         offset += vl;
     }
     // numbers
@@ -3003,6 +3033,10 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     }
 
     // check the TransferSyntaxUID (has to be there!)
+    if (typeof this.dicomElements.x00020010 === "undefined")
+    {
+        throw new Error("Not a valid DICOM file (no TransferSyntaxUID found)");
+    }
     var syntax = dwv.dicom.cleanString(this.dicomElements.x00020010.value[0]);
 
     // Explicit VR - Little Endian
@@ -3057,7 +3091,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     if (typeof this.getDefaultCharacterSet() !== "undefined") {
         dataReader.setUtfLabel(this.getDefaultCharacterSet());
     }
-    
+
     // DICOM data elements
     while ( offset < buffer.byteLength )
     {
@@ -3080,7 +3114,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
         // store the data element
         this.dicomElements[dataElement.tag.name] = dataElement;
     }
-    
+
     // safety check...
     if (buffer.byteLength != offset) {
         console.warn("Did not reach the end of the buffer: "+
@@ -3089,12 +3123,12 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
 
     // pixel buffer
     if (typeof this.dicomElements.x7FE00010 !== "undefined") {
-        
+
         var numberOfFrames = 1;
         if (typeof this.dicomElements.x00280008 !== "undefined") {
             numberOfFrames = this.dicomElements.x00280008.value[0];
         }
-        
+
         if (this.dicomElements.x7FE00010.vl !== "u/l") {
             // compressed should be encapsulated...
             if (dwv.dicom.isJpeg2000TransferSyntax( syntax ) ||
@@ -3102,7 +3136,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
                 dwv.dicom.isJpegLosslessTransferSyntax( syntax ) ) {
                 console.warn("Compressed but no items...");
             }
-            
+
             // calculate the slice size
             var pixData = this.dicomElements.x7FE00010.value;
             var columns = this.dicomElements.x00280011.value[0];
@@ -3214,23 +3248,23 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
             }
             // name
             if ( dictElement !== null ) {
-                row.name = dictElement[2];
+                row[dwv.i18n("basics.name")] = dictElement[2];
             }
             else {
-                row.name = "Unknown Tag & Data";
+                row[dwv.i18n("basics.name")] = "Unknown Tag & Data";
             }
             // value
             if ( dicomElement.tag.name !== "x7FE00010" ) {
-                row.value = dicomElement.value;
+                row[dwv.i18n("basics.value")] = dicomElement.value;
             }
             else {
-                row.value = "...";
+                row[dwv.i18n("basics.value")] = "...";
             }
             // others
-            row.group = dicomElement.tag.group;
-            row.element = dicomElement.tag.element;
-            row.vr = dicomElement.vr;
-            row.vl = dicomElement.vl;
+            row[dwv.i18n("basics.group")] = dicomElement.tag.group;
+            row[dwv.i18n("basics.element")] = dicomElement.tag.element;
+            row[dwv.i18n("basics.vr")] = dicomElement.vr;
+            row[dwv.i18n("basics.vl")] = dicomElement.vl;
 
             table.push( row );
         }
@@ -3575,18 +3609,18 @@ dwv.dicom = dwv.dicom || {};
 
 /**
  * Data writer.
- * 
+ *
  * Example usage:
  *   var parser = new dwv.dicom.DicomParser();
  *   parser.parse(this.response);
- *   
+ *
  *   var writer = new dwv.dicom.DicomWriter(parser.getRawDicomElements());
  *   var blob = new Blob([writer.getBuffer()], {type: 'application/dicom'});
- *   
+ *
  *   var element = document.getElementById("download");
  *   element.href = URL.createObjectURL(blob);
  *   element.download = "anonym.dcm";
- *   
+ *
  * @constructor
  * @param {Array} buffer The input array buffer.
  */
@@ -3596,7 +3630,7 @@ dwv.dicom.DataWriter = function (buffer)
     var view = new DataView(buffer);
     // endianness flag
     var isLittleEndian = true;
-    
+
     /**
      * Write Uint8 data.
      * @param {Number} byteOffset The offset to start writing from.
@@ -3870,7 +3904,7 @@ dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset,
     else {
         byteOffset = this.writeStringArray(byteOffset, value);
     }
-    
+
     // return new offset
     return byteOffset;
 };
@@ -3931,7 +3965,7 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset)
  * @returns {Boolean} True if it is.
  */
 dwv.dicom.isImplicitLengthSequence = function (element) {
-    return (element.vr === "SQ" && 
+    return (element.vr === "SQ" &&
         typeof element.value !== "undefined" &&
         ( ( Object.keys(element.value).length !== 0 &&
                 typeof element.value[0] !== "undefined" &&
@@ -3950,9 +3984,9 @@ dwv.dicom.DicomWriter = function () {
         'copy': function (item) { return item; },
         'remove': function () { return null; },
         'clear': function (item) { item.value[0] = ""; return item; },
-        'replace': function (item, value) { 
-            item.value[0] = value; 
-            item.vl = value.length; 
+        'replace': function (item, value) {
+            item.value[0] = value;
+            item.vl = value.length;
             return item;
         }
     };
@@ -3968,14 +4002,14 @@ dwv.dicom.DicomWriter = function () {
      *   name : { action: 'actionName', value: 'optionalValue }
      * The names are either 'default', tagName or groupName.
      * Each DICOM element will be checked to see if a rule is applicable.
-     * First checked by tagName and then by groupName, 
+     * First checked by tagName and then by groupName,
      * if nothing is found the default rule is applied.
      */
     this.rules = defaultRules;
-    
+
     /**
      * Example anonymisation rules.
-     */ 
+     */
     this.anonymisationRules = {
         'default': {action: 'remove', value: null },
         'PatientName': {action: 'replace', value: 'Anonymized'}, // tag
@@ -4019,7 +4053,7 @@ dwv.dicom.DicomWriter = function () {
         return actions[rule.action](element, rule.value);
     };
 };
-    
+
 /**
  * Get the ArrayBuffer corresponding to input DICOM elements.
  * @param {Array} dicomElements The wrapped elements to write.
@@ -4028,7 +4062,7 @@ dwv.dicom.DicomWriter = function () {
 dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     // array keys
     var keys = Object.keys(dicomElements);
-    
+
     // calculate buffer size and split elements (meta and non meta)
     var size = 128 + 4; // DICM
     var metaElements = [];
@@ -4040,12 +4074,12 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
         if ( element !== null ) {
             // size
             size += dwv.dicom.getDataElementPrefixByteSize(element.vr) + parseInt(element.vl, 10);
-            
+
             // add size of sequence delimitation item
             if ( dwv.dicom.isImplicitLengthSequence(element) ) {
                 size += dwv.dicom.getDataElementPrefixByteSize("NONE");
             }
-            
+
             // sort element
             groupName = dwv.dicom.TagGroups[element.tag.group.substr(1)]; // remove first 0
             if ( groupName === 'Meta Element' ) {
@@ -4056,7 +4090,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
             }
         }
     }
-    
+
     console.log("size: "+size);
 
     // create buffer
@@ -4073,11 +4107,10 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     for ( var k = 0, lenk = rawElements.length; k < lenk; ++k ) {
         offset = writer.writeDataElement(rawElements[k], offset);
     }
-    
+
     // return
     return buffer;
 };
-
 ;// namespaces
 var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
@@ -8567,25 +8600,36 @@ dwv.gui.base = dwv.gui.base || {};
 /**
  * Get the size of the image display window.
  */
-dwv.gui.base.getWindowSize = function()
+dwv.gui.base.getWindowSize = function ()
 {
     return { 'width': window.innerWidth, 'height': window.innerHeight - 147 };
+};
+
+/**
+ * Ask some text to the user.
+ * @param {String} message Text to display to the user.
+ * @param {String} defaultText Default value displayed in the text input field.
+ * @return {String} Text entered by the user.
+ */
+dwv.gui.base.prompt = function (message, defaultText)
+{
+    return prompt(message, defaultText);
 };
 
 /**
  * Display a progress value.
  * @param {Number} percent The progress percentage.
  */
-dwv.gui.base.displayProgress = function(/*percent*/)
+dwv.gui.base.displayProgress = function (/*percent*/)
 {
     // default does nothing...
 };
 
 /**
  * Get a HTML element associated to a container div.
- * @param containerDivId The id of the container div.
- * @param name The name or id to find.
- * @return The found element or null.
+ * @param {Number} containerDivId The id of the container div.
+ * @param {String} name The name or id to find.
+ * @return {Object} The found element or null.
  */
 dwv.gui.base.getElement = function (containerDivId, name)
 {
@@ -8616,7 +8660,7 @@ dwv.gui.base.refreshElement = function (/*element*/)
  * @param {String} element The HTML select element.
  * @param {String} value The value of the option to mark as selected.
  */
-dwv.gui.setSelected = function(element, value)
+dwv.gui.setSelected = function (element, value)
 {
     if ( element ) {
         var index = 0;
@@ -8884,10 +8928,10 @@ dwv.html.appendHCell = function (row, text)
 {
     var cell = document.createElement("th");
     // TODO jquery-mobile specific...
-    if ( text !== "value" && text !== "name" ) {
+    if ( text !== dwv.i18n("basics.value") && text !== dwv.i18n("basics.name") ) {
         cell.setAttribute("data-priority", "1");
     }
-    cell.appendChild(document.createTextNode(dwv.i18n("basics." + text)));
+    cell.appendChild(document.createTextNode(text));
     row.appendChild(cell);
 };
 
@@ -10519,49 +10563,65 @@ var JpxImage = JpxImage || {};
 
 /**
  * Asynchronous pixel buffer decoder.
- * @param {Array} decoderScripts An array of decoder scripts paths.
+ * @param {String} script The path to the decoder script to be used by the web worker.
  */
-dwv.image.AsynchPixelBufferDecoder = function (decoderScripts)
+dwv.image.AsynchPixelBufferDecoder = function (script)
 {
-    // initialise the thread pool 
+    // initialise the thread pool
     var pool = new dwv.utils.ThreadPool(15);
     pool.init();
 
     /**
      * Decode a pixel buffer.
      * @param {Array} pixelBuffer The pixel buffer.
-     * @param {String} algoName The decompression algorithm name.
      * @param {Number} bitsAllocated The bits allocated per element in the buffer.
      * @param {Boolean} isSigned Is the data signed.
      * @param {Function} callback Callback function to handle decoded data.
      */
-    this.decode = function (pixelBuffer, algoName, bitsAllocated, isSigned, callback) {
-        var script = decoderScripts[algoName];
-        if ( typeof script === "undefined" ) {
-            throw new Error("No script provided to decompress '" + algoName + "' data.");
-        }
+    this.decode = function (pixelBuffer, bitsAllocated, isSigned, callback) {
+        // (re)set event handler
+        pool.onpoolworkend = this.ondecodeend;
+        pool.onworkerend = this.ondecoded;
+        // create worker task
         var workerTask = new dwv.utils.WorkerTask(script, callback, {
             'buffer': pixelBuffer,
             'bitsAllocated': bitsAllocated,
             'isSigned': isSigned } );
+        // add it the queue and run it
         pool.addWorkerTask(workerTask);
     };
 };
 
 /**
- * Synchronous pixel buffer decoder.
+ * Handle a decode end event.
  */
-dwv.image.SynchPixelBufferDecoder = function ()
+dwv.image.AsynchPixelBufferDecoder.prototype.ondecodeend = function ()
+{
+    // default does nothing.
+};
+
+/**
+ * Handle a decode event.
+ */
+dwv.image.AsynchPixelBufferDecoder.prototype.ondecoded = function ()
+{
+    // default does nothing.
+};
+
+/**
+ * Synchronous pixel buffer decoder.
+ * @param {String} algoName The decompression algorithm name.
+ */
+dwv.image.SynchPixelBufferDecoder = function (algoName)
 {
     /**
      * Decode a pixel buffer.
      * @param {Array} pixelBuffer The pixel buffer.
-     * @param {String} algoName The decompression algorithm name.
      * @param {Number} bitsAllocated The bits allocated per element in the buffer.
      * @param {Boolean} isSigned Is the data signed.
      * @return {Array} The decoded pixel buffer.
      */
-    this.decode = function (pixelBuffer, algoName, bitsAllocated, isSigned) {
+    this.decode = function (pixelBuffer, bitsAllocated, isSigned) {
         var decoder = null;
         var decodedBuffer = null;
         if( algoName === "jpeg-lossless" ) {
@@ -10608,57 +10668,101 @@ dwv.image.SynchPixelBufferDecoder = function ()
             // set the pixel buffer
             decodedBuffer = decoder.tiles[0].items;
         }
+        // send events
+        this.ondecoded();
+        this.ondecodeend();
         // return result as array
         return [decodedBuffer];
     };
 };
 
 /**
- * Decode a pixel buffer.
- * Switches between a asynchronous/synchronous mode according to the definition of the 
- * 'dwv.image.decoderScripts' variable.
- * @constructor
+ * Handle a decode end event.
  */
-dwv.image.PixelBufferDecoder = function ()
+dwv.image.SynchPixelBufferDecoder.prototype.ondecodeend = function ()
+{
+    // default does nothing.
+};
+
+/**
+ * Handle a decode event.
+ */
+dwv.image.SynchPixelBufferDecoder.prototype.ondecoded = function ()
+{
+    // default does nothing.
+};
+
+/**
+ * Decode a pixel buffer.
+ * @constructor
+ * @param {String} algoName The decompression algorithm name.
+ * If the 'dwv.image.decoderScripts' variable does not contain the desired algorythm,
+ * the decoder will switch to the synchronous mode.
+ */
+dwv.image.PixelBufferDecoder = function (algoName, asynch)
 {
     /**
      * Asynchronous decoder.
      * Defined only once.
      * @private
      * @type Object
-     */ 
+     */
     var asynchDecoder = null;
-    
+
+    // initialise the asynch decoder (if possible)
+    if (typeof dwv.image.decoderScripts !== "undefined" &&
+            typeof dwv.image.decoderScripts[algoName] !== "undefined") {
+        asynchDecoder = new dwv.image.AsynchPixelBufferDecoder(dwv.image.decoderScripts[algoName]);
+    }
+
     /**
      * Get data from an input buffer using a DICOM parser.
      * @param {Array} pixelBuffer The input data buffer.
-     * @param {String} algoName The decompression algorithm name.
      * @param {Number} bitsAllocated The bits allocated per element in the buffer.
      * @param {Boolean} isSigned Is the data signed.
      * @param {Object} callback The callback on the conversion.
+     * @param {Boolean} asynch Should the decoder run asynchronously, default to true.
      */
-    this.decode = function (pixelBuffer, algoName, bitsAllocated, isSigned, callback)
+    this.decode = function (pixelBuffer, bitsAllocated, isSigned, callback)
     {
-        // run asynchronous if we have scripts
-        if (typeof dwv.image.decoderScripts !== "undefined") {
-            if (!asynchDecoder) {
-                // create the decoder (only once)
-                asynchDecoder = new dwv.image.AsynchPixelBufferDecoder(dwv.image.decoderScripts);
-            }
+        // default to asynch
+        asynch = (typeof asynch === 'undefined') ? true : asynch;
+
+        // run asynchronous if asked and we have scripts
+        if (asynch && asynchDecoder !== null) {
+            // (re)set event handler
+            asynchDecoder.ondecodeend = this.ondecodeend;
+            asynchDecoder.ondecoded = this.ondecoded;
             // decode and call the callback
-            asynchDecoder.decode(pixelBuffer, algoName, 
-                    bitsAllocated, isSigned, callback);
+            asynchDecoder.decode(pixelBuffer, bitsAllocated, isSigned, callback);
         }
         else {
             // create the decoder
-            var synchDecoder = new dwv.image.SynchPixelBufferDecoder();
+            var synchDecoder = new dwv.image.SynchPixelBufferDecoder(algoName);
+            synchDecoder.ondecodeend = this.ondecodeend;
+            synchDecoder.ondecoded = this.ondecoded;
             // decode
-            var decodedBuffer = synchDecoder.decode(pixelBuffer, algoName, 
-                    bitsAllocated, isSigned);
+            var decodedBuffer = synchDecoder.decode(pixelBuffer, bitsAllocated, isSigned);
             // call the callback
             callback({data: decodedBuffer});
         }
     };
+};
+
+/**
+ * Handle a decode end event.
+ */
+dwv.image.PixelBufferDecoder.prototype.ondecodeend = function ()
+{
+    // default does nothing.
+};
+
+/**
+ * Handle a decode end event.
+ */
+dwv.image.PixelBufferDecoder.prototype.ondecoded = function ()
+{
+    // default does nothing.
 };
 ;// namespaces
 var dwv = dwv || {};
@@ -11525,12 +11629,13 @@ dwv.image.Image.prototype.getRescaledValue = function( i, j, k, f )
 
 /**
  * Calculate the data range of the image.
+ * WARNING: for speed reasons, only calculated on the first frame...
  * @return {Object} The range {min, max}.
  */
 dwv.image.Image.prototype.calculateDataRange = function ()
 {
     var size = this.getGeometry().getSize().getTotalSize();
-    var nFrames = this.getNumberOfFrames();
+    var nFrames = 1; //this.getNumberOfFrames();
     var min = this.getValueAtOffset(0,0);
     var max = min;
     var value = 0;
@@ -11547,6 +11652,7 @@ dwv.image.Image.prototype.calculateDataRange = function ()
 
 /**
  * Calculate the rescaled data range of the image.
+ * WARNING: for speed reasons, only calculated on the first frame...
  * @return {Object} The range {min, max}.
  */
 dwv.image.Image.prototype.calculateRescaledDataRange = function ()
@@ -11565,10 +11671,11 @@ dwv.image.Image.prototype.calculateRescaledDataRange = function ()
     }
     else {
         var size = this.getGeometry().getSize();
+        var nFrames = 1; //this.getNumberOfFrames();
         var rmin = this.getRescaledValue(0,0,0);
         var rmax = rmin;
         var rvalue = 0;
-        for ( var f = 0, nframes = this.getNumberOfFrames(); f < nframes; ++f ) {
+        for ( var f = 0, nframes = nFrames; f < nframes; ++f ) {
             for ( var k = 0, nslices = size.getNumberOfSlices(); k < nslices; ++k ) {
                 for ( var j = 0, nrows = size.getNumberOfRows(); j < nrows; ++j ) {
                     for ( var i = 0, ncols = size.getNumberOfColumns(); i < ncols; ++i ) {
@@ -11763,7 +11870,7 @@ dwv.image.Image.prototype.convolute2D = function(weights)
                         else if( i !== 0 && i !== (ncols-1) && j === (nrows-1) ) {
                             wOffFinal = wOffxn;
                         }
-    
+
                         // calculate the weighed sum of the source image pixels that
                         // fall under the convolution matrix
                         newValue = 0;
@@ -11815,7 +11922,7 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
 {
     var newImage = this.clone();
     var newBuffer = newImage.getBuffer();
-    for ( var f = 0, lenf = this.getNumberOfFrames(); f < lenf; ++f ) 
+    for ( var f = 0, lenf = this.getNumberOfFrames(); f < lenf; ++f )
     {
         for( var i = 0, leni = newBuffer[f].length; i < leni; ++i )
         {
@@ -11836,7 +11943,7 @@ dwv.image.Image.prototype.quantifyLine = function(line)
     var spacing = this.getGeometry().getSpacing();
     var length = line.getWorldLength( spacing.getColumnSpacing(),
             spacing.getRowSpacing() );
-    return {"length": length};
+    return { "length": {"value": length, "unit": dwv.i18n("unit.mm")} };
 };
 
 /**
@@ -11860,8 +11967,13 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
         }
     }
     var quantif = dwv.math.getStats( subBuffer );
-    return {"surface": surface, "min": quantif.min, 'max': quantif.max,
-        "mean": quantif.mean, 'stdDev': quantif.stdDev};
+    return {
+        "surface": {"value": surface/100, "unit": dwv.i18n("unit.cm2")},
+        "min": {"value": quantif.min, "unit": ""},
+        "max": {"value": quantif.max, "unit": ""},
+        "mean": {"value": quantif.mean, "unit": ""},
+        "stdDev": {"value": quantif.stdDev, "unit": ""}
+    };
 };
 
 /**
@@ -11874,7 +11986,7 @@ dwv.image.Image.prototype.quantifyEllipse = function(ellipse)
     var spacing = this.getGeometry().getSpacing();
     var surface = ellipse.getWorldSurface( spacing.getColumnSpacing(),
             spacing.getRowSpacing());
-    return {"surface": surface};
+    return { "surface": {"value": surface/100, "unit": dwv.i18n("unit.cm2")} };
 };
 
 /**
@@ -11942,31 +12054,6 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     // geometry
     var origin = new dwv.math.Point3D(slicePosition[0], slicePosition[1], slicePosition[2]);
     var geometry = new dwv.image.Geometry( origin, size, spacing );
-
-    // decode multi-frame data
-    var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
-    var needDecompression = (algoName !== null);
-    // TODO Find a better way!
-    if (pixelBuffer.length > 1 && needDecompression) {
-
-        console.warn("Temporary limitation: only decoding the first 20 frames...");
-        
-        var bitsAllocated = dicomElements.getFromKey("x00280100");
-        var pixelRep = dicomElements.getFromKey("x00280103");
-        var isSigned = (pixelRep === 1);
-
-        // worker callback to replace the coded by the decoded frame content
-        var func = function (frame) {
-            return function (event) { pixelBuffer[frame] = event.data[0]; };
-        };
-
-        var pixelDecoder = new dwv.image.PixelBufferDecoder();
-        var nFrames = 20; //pixelBuffer.length;
-        for (var f = 1; f < nFrames; ++f) {
-            pixelDecoder.decode(pixelBuffer[f], algoName, 
-                bitsAllocated, isSigned, func(f));
-        }
-    }
 
     // image
     var image = new dwv.image.Image( geometry, pixelBuffer );
@@ -12454,13 +12541,16 @@ dwv.image.getViewFromDOMImage = function (image)
  */
 dwv.image.DicomBufferToView = function ()
 {
+    // closure to self
+    var self = this;
+
     /**
      * The default character set (optional).
      * @private
      * @type String
      */
     var defaultCharacterSet;
-    
+
     /**
      * Set the default character set.
      * param {String} The character set.
@@ -12470,11 +12560,11 @@ dwv.image.DicomBufferToView = function ()
     };
 
     /**
-     * Pixel buffer decoder. 
+     * Pixel buffer decoder.
      * Define only once to allow optional asynchronous mode.
      * @private
      * @type Object
-     */ 
+     */
     var pixelDecoder = null;
 
     /**
@@ -12489,12 +12579,14 @@ dwv.image.DicomBufferToView = function ()
         dicomParser.setDefaultCharacterSet(defaultCharacterSet);
         // parse the buffer
         dicomParser.parse(buffer);
-    
+
+        var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
+        var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
+        var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
+        var needDecompression = (algoName !== null);
+
         // worker callback
-        var decodedBufferToView = function (event) {
-            // when decoded, only the first frame is decoded
-            // so just replace the first frame content.
-            pixelBuffer[0] = event.data[0];
+        var onDecodedFirstFrame = function (/*event*/) {
             // create the image
             var imageFactory = new dwv.image.ImageFactory();
             var image = imageFactory.create( dicomParser.getDicomElements(), pixelBuffer );
@@ -12505,31 +12597,94 @@ dwv.image.DicomBufferToView = function ()
             callback({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
         };
 
-        var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
-
-        var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
-        var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
-        var needDecompression = (algoName !== null);
-
         if ( needDecompression ) {
             var bitsAllocated = dicomParser.getRawDicomElements().x00280100.value[0];
             var pixelRepresentation = dicomParser.getRawDicomElements().x00280103.value[0];
             var isSigned = (pixelRepresentation === 1);
+            var nFrames = pixelBuffer.length;
 
             if (!pixelDecoder){
-                pixelDecoder = new dwv.image.PixelBufferDecoder();
+                pixelDecoder = new dwv.image.PixelBufferDecoder(algoName);
             }
-            // only decompress the first frame to not block the system
-            pixelDecoder.decode(pixelBuffer[0], algoName, 
-                bitsAllocated, isSigned, decodedBufferToView);
+
+            // loadend event
+            pixelDecoder.ondecodeend = function () {
+                self.onloadend();
+            };
+
+            // send an onload event for mono frame
+            if ( nFrames === 1 ) {
+                pixelDecoder.ondecoded = function () {
+                    self.onload();
+                };
+            }
+
+            // decoder callback
+            var countDecodedFrames = 0;
+            var onDecodedFrame = function (frame) {
+                return function (event) {
+                    // send progress
+                    ++countDecodedFrames;
+                    var ev = {type: "read-progress", lengthComputable: true,
+                        loaded: (countDecodedFrames * 100 / nFrames), total: 100};
+                    self.onprogress(ev);
+                    // store data
+                    pixelBuffer[frame] = event.data[0];
+                    // create image for first frame
+                    if ( frame === 0 ) {
+                        onDecodedFirstFrame();
+                    }
+                };
+            };
+
+            // decompress synchronously the first frame to create the image
+            pixelDecoder.decode(pixelBuffer[0],
+                bitsAllocated, isSigned, onDecodedFrame(0), false);
+
+            // decompress the possible other frames
+            if ( nFrames != 1 ) {
+                // decode (asynchronously if possible)
+                for (var f = 1; f < nFrames; ++f) {
+                    pixelDecoder.decode(pixelBuffer[f],
+                        bitsAllocated, isSigned, onDecodedFrame(f));
+                }
+            }
         }
+        // no decompression
         else {
-            // no decompression
-            decodedBufferToView({data: pixelBuffer});
+            // send progress
+            self.onprogress({type: "read-progress", lengthComputable: true,
+                loaded: 100, total: 100});
+            // create image
+            onDecodedFirstFrame();
+            // send load events
+            self.onload();
+            self.onloadend();
         }
     };
 };
 
+/**
+ * Handle a load end event.
+ */
+dwv.image.DicomBufferToView.prototype.onloadend = function ()
+{
+    // default does nothing.
+};
+/**
+ * Handle a load event.
+ */
+dwv.image.DicomBufferToView.prototype.onload = function ()
+{
+    // default does nothing.
+};
+/**
+ * Handle a load progress event.
+ */
+dwv.image.DicomBufferToView.prototype.onprogress = function ()
+{
+    // default does nothing.
+};
 ;// namespaces
 var dwv = dwv || {};
 dwv.image = dwv.image || {};
@@ -13068,6 +13223,13 @@ dwv.io = dwv.io || {};
 dwv.io.File = function ()
 {
     /**
+     * CLosure to self.
+     * @private
+     * @type Object
+     */
+    var self = this;
+
+    /**
      * Number of data to load.
      * @private
      * @type Number
@@ -13080,19 +13242,25 @@ dwv.io.File = function ()
      */
     var nLoaded = 0;
     /**
-     * List of progresses.
+     * List of load progresses.
      * @private
      * @type Array
      */
-    var progressList = [];
-    
+    var loadProgresses = [];
+    /**
+     * List of decode progresses.
+     * @private
+     * @type Array
+     */
+    var decodeProgresses = [];
+
     /**
      * The default character set (optional).
      * @private
      * @type String
      */
     var defaultCharacterSet;
-    
+
     /**
      * Get the default character set.
      * @return {String} The default character set.
@@ -13100,10 +13268,10 @@ dwv.io.File = function ()
     this.getDefaultCharacterSet = function () {
         return defaultCharacterSet;
     };
-    
+
     /**
      * Set the default character set.
-     * param {String} The character set.
+     * @param {String} characterSet The character set.
      */
     this.setDefaultCharacterSet = function (characterSet) {
         defaultCharacterSet = characterSet;
@@ -13111,11 +13279,13 @@ dwv.io.File = function ()
 
     /**
      * Set the number of data to load.
+     * @param {Number} n The number of data to load.
      */
     this.setNToLoad = function (n) {
         nToLoad = n;
         for ( var i = 0; i < nToLoad; ++i ) {
-            progressList[i] = 0;
+            loadProgresses[i] = 0;
+            decodeProgresses[i] = 0;
         }
     };
 
@@ -13131,20 +13301,41 @@ dwv.io.File = function ()
     };
 
     /**
-     * Get the global load percent including the provided one.
+     * Handle a load progress.
      * @param {Number} n The number of the loaded data.
      * @param {Number} percent The percentage of data 'n' that has been loaded.
+     */
+    this.onLoadProgress = function (n, percent) {
+        loadProgresses[n] = percent;
+        self.onprogress({type: "load-progress", lengthComputable: true,
+            loaded: getGlobalPercent(), total: 100});
+    };
+
+    /**
+     * Handle a decode progress.
+     * @param {Object} event The progress event.
+     */
+    this.onDecodeProgress = function (event) {
+        // use the internal count as index
+        decodeProgresses[nLoaded] = event.loaded;
+        self.onprogress({type: "load-progress", lengthComputable: true,
+            loaded: getGlobalPercent(), total: 100});
+    };
+
+    /**
+     * Get the global load percent including the provided one.
      * @return {Number} The accumulated percentage.
      */
-    this.getGlobalPercent = function (n, percent) {
-        progressList[n] = percent;
-        var totPercent = 0;
-        for ( var i = 0; i < progressList.length; ++i ) {
-            totPercent += progressList[i];
+    function getGlobalPercent() {
+        var sum = 0;
+        for ( var i = 0; i < loadProgresses.length; ++i ) {
+            sum += loadProgresses[i];
+            sum += decodeProgresses[i];
         }
-        return totPercent/nToLoad;
-    };
-    
+        // half loading, half decoding
+        return sum / (2 * nToLoad);
+    }
+
 }; // class File
 
 /**
@@ -13195,19 +13386,16 @@ dwv.io.File.createErrorHandler = function (file, text, baseHandler) {
 };
 
 /**
- * Create an progress handler from a base one and locals.
+ * Create a load progress event handler.
  * @param {Number} n The number of the loaded data.
- * @param {Function} calculator The load progress accumulator.
- * @param {Function} baseHandler The base handler.
+ * @param {Function} loadProgressHandler A load progress percent handler.
  */
-dwv.io.File.createProgressHandler = function (n, calculator, baseHandler) {
+dwv.io.File.createLoadProgressHandler = function (n, loadProgressHandler) {
     return function (event) {
         if( event.lengthComputable )
         {
             var percent = Math.round((event.loaded / event.total) * 100);
-            var ev = {type: "load-progress", lengthComputable: true,
-                loaded: calculator(n, percent), total: 100};
-            baseHandler(ev);
+            loadProgressHandler(n, percent);
         }
     };
 };
@@ -13223,17 +13411,22 @@ dwv.io.File.prototype.load = function (ioArray)
     // set the number of data to load
     this.setNToLoad( ioArray.length );
 
-    // call the listeners
+    // call the onload listener
     var onLoadView = function (data)
     {
         self.onload(data);
-        self.addLoaded();
     };
 
     // DICOM buffer to dwv.image.View (asynchronous)
     var db2v = new dwv.image.DicomBufferToView();
     db2v.setDefaultCharacterSet(this.getDefaultCharacterSet());
-    // callback
+    db2v.onload = function () {
+        self.addLoaded();
+    };
+    db2v.onprogress = function (event) {
+        self.onDecodeProgress(event);
+    };
+    // reader callback
     var onLoadDicomBuffer = function (event)
     {
         try {
@@ -13243,7 +13436,7 @@ dwv.io.File.prototype.load = function (ioArray)
         }
     };
 
-    // DOM Image buffer to dwv.image.View 
+    // DOM Image buffer to dwv.image.View
     var onLoadDOMImageBuffer = function (/*event*/)
     {
         try {
@@ -13280,8 +13473,7 @@ dwv.io.File.prototype.load = function (ioArray)
     {
         var file = ioArray[i];
         var reader = new FileReader();
-        reader.onprogress = dwv.io.File.createProgressHandler(i,
-                self.getGlobalPercent, self.onprogress);
+        reader.onprogress = dwv.io.File.createLoadProgressHandler(i, self.onLoadProgress);
         if ( file.name.split('.').pop().toLowerCase() === "json" )
         {
             reader.onload = onLoadTextBuffer;
@@ -13317,6 +13509,13 @@ dwv.io = dwv.io || {};
 dwv.io.Url = function ()
 {
     /**
+     * CLosure to self.
+     * @private
+     * @type Object
+     */
+    var self = this;
+
+    /**
      * Number of data to load.
      * @private
      * @type Number
@@ -13329,11 +13528,17 @@ dwv.io.Url = function ()
      */
     var nLoaded = 0;
     /**
-     * List of progresses.
+     * List of load progresses.
      * @private
      * @type Array
      */
-    var progressList = [];
+    var loadProgresses = [];
+    /**
+     * List of decode progresses.
+     * @private
+     * @type Array
+     */
+    var decodeProgresses = [];
 
     /**
      * The default character set (optional).
@@ -13341,7 +13546,7 @@ dwv.io.Url = function ()
      * @type String
      */
     var defaultCharacterSet;
-    
+
     /**
      * Get the default character set.
      * @return {String} The default character set.
@@ -13349,10 +13554,10 @@ dwv.io.Url = function ()
     this.getDefaultCharacterSet = function () {
         return defaultCharacterSet;
     };
-    
+
     /**
      * Set the default character set.
-     * param {String} The character set.
+     * @param {String} characterSet The character set.
      */
     this.setDefaultCharacterSet = function (characterSet) {
         defaultCharacterSet = characterSet;
@@ -13360,11 +13565,13 @@ dwv.io.Url = function ()
 
     /**
      * Set the number of data to load.
+     * @param {Number} n The number of data to load.
      */
     this.setNToLoad = function (n) {
         nToLoad = n;
         for ( var i = 0; i < nToLoad; ++i ) {
-            progressList[i] = 0;
+            loadProgresses[i] = 0;
+            decodeProgresses[i] = 0;
         }
     };
 
@@ -13380,20 +13587,41 @@ dwv.io.Url = function ()
     };
 
     /**
-     * Get the global load percent including the provided one.
+     * Handle a load progress.
      * @param {Number} n The number of the loaded data.
      * @param {Number} percent The percentage of data 'n' that has been loaded.
+     */
+    this.onLoadProgress = function (n, percent) {
+        loadProgresses[n] = percent;
+        self.onprogress({type: "load-progress", lengthComputable: true,
+            loaded: getGlobalPercent(), total: 100});
+    };
+
+    /**
+     * Handle a decode progress.
+     * @param {Object} event The progress event.
+     */
+    this.onDecodeProgress = function (event) {
+        // use the internal count as index
+        decodeProgresses[nLoaded] = event.loaded;
+        self.onprogress({type: "load-progress", lengthComputable: true,
+            loaded: getGlobalPercent(), total: 100});
+    };
+
+    /**
+     * Get the global load percent including the provided one.
      * @return {Number} The accumulated percentage.
      */
-    this.getGlobalPercent = function (n, percent) {
-        progressList[n] = percent/nToLoad;
-        var totPercent = 0;
-        for ( var i = 0; i < progressList.length; ++i ) {
-            totPercent += progressList[i];
+    function getGlobalPercent() {
+        var sum = 0;
+        for ( var i = 0; i < loadProgresses.length; ++i ) {
+            sum += loadProgresses[i];
+            sum += decodeProgresses[i];
         }
-        return totPercent;
-    };
-    
+        // half loading, half decoding
+        return sum / (2 * nToLoad);
+    }
+
 }; // class Url
 
 /**
@@ -13444,19 +13672,16 @@ dwv.io.Url.createErrorHandler = function (url, text, baseHandler) {
 };
 
 /**
- * Create an progress handler from a base one and locals.
+ * Create a load progress event handler.
  * @param {Number} n The number of the loaded data.
- * @param {Function} calculator The load progress accumulator.
- * @param {Function} baseHandler The base handler.
+ * @param {Function} loadProgressHandler A load progress percent handler.
  */
-dwv.io.Url.createProgressHandler = function (n, calculator, baseHandler) {
+dwv.io.File.createLoadProgressHandler = function (n, loadProgressHandler) {
     return function (event) {
         if( event.lengthComputable )
         {
             var percent = Math.round((event.loaded / event.total) * 100);
-            var ev = {type: "load-progress", lengthComputable: true,
-                    loaded: calculator(n, percent), total: 100};
-            baseHandler(ev);
+            loadProgressHandler(n, percent);
         }
     };
 };
@@ -13477,12 +13702,17 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     var onLoadView = function (data)
     {
         self.onload(data);
-        self.addLoaded();
     };
 
     // DICOM buffer to dwv.image.View (asynchronous)
     var db2v = new dwv.image.DicomBufferToView();
     db2v.setDefaultCharacterSet(this.getDefaultCharacterSet());
+    db2v.onload = function () {
+        self.addLoaded();
+    };
+    db2v.onprogress = function (event) {
+        self.onDecodeProgress(event);
+    };
     // callback
     var onLoadDicomBuffer = function (response)
     {
@@ -13529,7 +13759,7 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
             this.onerror();
             return;
         }
-        
+
         // find the image type from its signature
         var view = new DataView(this.response);
         var isJpeg = view.getUint32(0) === 0xffd8ffe0;
@@ -13587,7 +13817,7 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
         var request = new XMLHttpRequest();
         request.open('GET', url, true);
         if ( typeof requestHeaders !== "undefined" ) {
-            for (var j = 0; j < requestHeaders.length; ++j) { 
+            for (var j = 0; j < requestHeaders.length; ++j) {
                 if ( typeof requestHeaders[j].name !== "undefined" &&
                     typeof requestHeaders[j].value !== "undefined" ) {
                     request.setRequestHeader(requestHeaders[j].name, requestHeaders[j].value);
@@ -13603,8 +13833,7 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
             request.onload = onLoadTextBuffer;
             request.onerror = dwv.io.Url.createErrorHandler(url, "text", self.onerror);
         }
-        request.onprogress = dwv.io.File.createProgressHandler(i,
-            self.getGlobalPercent, self.onprogress);
+        request.onprogress = dwv.io.File.createLoadProgressHandler(i, self.onLoadProgress);
         request.send(null);
     }
 };
@@ -15465,7 +15694,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             app.removeEventListener("frame-change", updateDrawLayer);
         }
     };
-    
+
     /**
      * Get the current app draw layer.
      */
@@ -15477,7 +15706,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         // activate the new draw layer
         renderDrawLayer(true);
     }
-    
+
     /**
      * Render (or not) the draw layer.
      * @param {Boolean} visible Set the draw layer visible or not.
@@ -15521,6 +15750,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         shape.off('dragstart');
         shape.off('dragmove');
         shape.off('dragend');
+        shape.off('dblclick');
     }
 
     /**
@@ -15677,6 +15907,32 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             }
             // remove trash
             trash.remove();
+            // draw
+            drawLayer.draw();
+        });
+        // double click handling: update label
+        shape.on('dblclick', function () {
+
+            // get the label object for this shape
+            var group = this.getParent();
+            var labels = group.find('Label');
+            // should just be one
+            if (labels.length !== 1) {
+                throw new Error("Could not find the shape label.");
+            }
+            var ktext = labels[0].getText();
+
+            // ask user for new label
+            var labelText = dwv.gui.prompt("Add label", ktext.textExpr);
+
+            // if press cancel do nothing
+            if (labelText === null) {
+                return false;
+            }
+            // update text expression and set text
+            ktext.textExpr = labelText;
+            ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+
             // draw
             drawLayer.draw();
         });
@@ -16247,23 +16503,29 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
     });
     // quantification
     var quant = image.quantifyEllipse( ellipse );
-    var cm2 = quant.surface / 100;
-    var str = cm2.toPrecision(4) + " " + dwv.i18n("unit.cm2");
-    // quantification text
     var ktext = new Kinetic.Text({
-        x: ellipse.getCenter().getX(),
-        y: ellipse.getCenter().getY(),
-        text: str,
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
         name: "text"
     });
+    ktext.textExpr = "{surface}";
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    // label
+    var klabel = new Kinetic.Label({
+        x: ellipse.getCenter().getX(),
+        y: ellipse.getCenter().getY(),
+        name: "label"
+    });
+    klabel.add(ktext);
+    klabel.add(new Kinetic.Tag());
+
     // return group
     var group = new Kinetic.Group();
     group.name("ellipse-group");
     group.add(kshape);
-    group.add(ktext);
+    group.add(klabel);
     return group;
 };
 
@@ -16280,9 +16542,9 @@ dwv.tool.UpdateEllipse = function (anchor, image)
     var kellipse = group.getChildren( function (node) {
         return node.name() === 'shape';
     })[0];
-    // associated text
-    var ktext = group.getChildren(function(node){
-        return node.name() === 'text';
+    // associated label
+    var klabel = group.getChildren( function (node) {
+        return node.name() === 'label';
     })[0];
     // find special points
     var topLeft = group.getChildren( function (node) {
@@ -16336,14 +16598,16 @@ dwv.tool.UpdateEllipse = function (anchor, image)
     if ( radiusAbs ) {
         kellipse.radius( radiusAbs );
     }
+    // new ellipse
+    var ellipse = new dwv.math.Ellipse(center, radiusAbs.x, radiusAbs.y);
     // update text
-    var ellipse = new dwv.math.Ellipse(center, radiusX, radiusY);
     var quant = image.quantifyEllipse( ellipse );
-    var cm2 = quant.surface / 100;
-    var str = cm2.toPrecision(4) + " cm2";
+    var ktext = klabel.getText();
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    // update position
     var textPos = { 'x': center.x, 'y': center.y };
-    ktext.position(textPos);
-    ktext.text(str);
+    klabel.position( textPos );
 };
 ;// namespaces
 var dwv = dwv || {};
@@ -17416,24 +17680,31 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
     });
     // quantification
     var quant = image.quantifyLine( line );
-    var str = quant.length.toPrecision(4) + " " + dwv.i18n("unit.mm");
-    // quantification text
-    var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
-    var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
     var ktext = new Kinetic.Text({
-        x: line.getEnd().getX() + dX * 25,
-        y: line.getEnd().getY() + dY * 15,
-        text: str,
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
         name: "text"
     });
+    ktext.textExpr = "{length}";
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    // label
+    var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
+    var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
+    var klabel = new Kinetic.Label({
+        x: line.getEnd().getX() + dX * 25,
+        y: line.getEnd().getY() + dY * 15,
+        name: "label"
+    });
+    klabel.add(ktext);
+    klabel.add(new Kinetic.Tag());
+
     // return group
     var group = new Kinetic.Group();
     group.name("line-group");
     group.add(kshape);
-    group.add(ktext);
+    group.add(klabel);
     return group;
 };
 
@@ -17450,9 +17721,9 @@ dwv.tool.UpdateLine = function (anchor, image)
     var kline = group.getChildren( function (node) {
         return node.name() === 'shape';
     })[0];
-    // associated text
-    var ktext = group.getChildren( function (node) {
-        return node.name() === 'text';
+    // associated label
+    var klabel = group.getChildren( function (node) {
+        return node.name() === 'label';
     })[0];
     // find special points
     var begin = group.getChildren( function (node) {
@@ -17479,19 +17750,22 @@ dwv.tool.UpdateLine = function (anchor, image)
     var ex = end.x() - kline.x();
     var ey = end.y() - kline.y();
     kline.points( [bx,by,ex,ey] );
-    // update text
+    // new line
     var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
     var p2d1 = new dwv.math.Point2D(end.x(), end.y());
     var line = new dwv.math.Line(p2d0, p2d1);
+    // update text
     var quant = image.quantifyLine( line );
-    var str = quant.length.toPrecision(4) + " " + dwv.i18n("mm");
+    var ktext = klabel.getText();
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    // update position
     var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
     var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
     var textPos = {
         'x': line.getEnd().getX() + dX * 25,
         'y': line.getEnd().getY() + dY * 15, };
-    ktext.position( textPos );
-    ktext.text(str);
+    klabel.position( textPos );
 };
 ;// namespaces
 var dwv = dwv || {};
@@ -17720,6 +17994,18 @@ dwv.tool.Livewire = function(app)
     };
 
     /**
+     * Handle double click event.
+     * @param {Object} event The double click event.
+     */
+    this.dblclick = function(/*event*/){
+        console.log("dblclick");
+        // save command in undo stack
+        app.addToUndoStack(command);
+        // set flag
+        self.started = false;
+    };
+
+    /**
      * Handle touch start event.
      * @param {Object} event The touch start event.
      */
@@ -17771,8 +18057,15 @@ dwv.tool.Livewire = function(app)
         if ( gui ) {
             gui.display(bool);
         }
-        // TODO why twice?
-        this.init();
+        // start scissors if displayed
+        if (bool) {
+            //scissors = new dwv.math.Scissors();
+            var size = app.getImage().getGeometry().getSize();
+            scissors.setDimensions(
+                    size.getNumberOfColumns(),
+                    size.getNumberOfRows() );
+            scissors.setData(app.getImageData().data);
+        }
     };
 
     /**
@@ -17786,13 +18079,6 @@ dwv.tool.Livewire = function(app)
             // init html
             gui.initialise();
         }
-
-        //scissors = new dwv.math.Scissors();
-        var size = app.getImage().getGeometry().getSize();
-        scissors.setDimensions(
-                size.getNumberOfColumns(),
-                size.getNumberOfRows() );
-        scissors.setData(app.getImageData().data);
 
         return true;
     };
@@ -17881,19 +18167,30 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
             angle = 360 - angle;
             inclination += angle;
         }
-        var angleStr = angle.toPrecision(4) + "\u00B0";
-        // quantification text
-        var midX = ( line0.getMidpoint().getX() + line1.getMidpoint().getX() ) / 2;
-        var midY = ( line0.getMidpoint().getY() + line1.getMidpoint().getY() ) / 2;
+
+        // quantification
+        var quant = { "angle": { "value": angle, "unit": dwv.i18n("unit.degree")} };
         var ktext = new Kinetic.Text({
-            x: midX,
-            y: midY - 15,
-            text: angleStr,
             fontSize: style.getScaledFontSize(),
             fontFamily: style.getFontFamily(),
             fill: style.getLineColour(),
             name: "text"
         });
+        ktext.textExpr = "{angle}";
+        ktext.quant = quant;
+        ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+
+        // label
+        var midX = ( line0.getMidpoint().getX() + line1.getMidpoint().getX() ) / 2;
+        var midY = ( line0.getMidpoint().getY() + line1.getMidpoint().getY() ) / 2;
+        var klabel = new Kinetic.Label({
+            x: midX,
+            y: midY - 15,
+            name: "label"
+        });
+        klabel.add(ktext);
+        klabel.add(new Kinetic.Tag());
+
         // arc
         var radius = Math.min(line0.getLength(), line1.getLength()) * 33 / 100;
         var karc = new Kinetic.Arc({
@@ -17908,7 +18205,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
             name: "arc"
          });
         // add to group
-        group.add(ktext);
+        group.add(klabel);
         group.add(karc);
     }
     // return group
@@ -17928,9 +18225,9 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
     var kline = group.getChildren( function (node) {
         return node.name() === 'shape';
     })[0];
-    // associated text
-    var ktext = group.getChildren( function (node) {
-        return node.name() === 'text';
+    // associated label
+    var klabel = group.getChildren( function (node) {
+        return node.name() === 'label';
     })[0];
     // associated arc
     var karc = group.getChildren( function (node) {
@@ -17982,12 +18279,18 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
         angle = 360 - angle;
         inclination += angle;
     }
-    var str = angle.toPrecision(4) + "\u00B0";
+
+    // update text
+    var quant = { "angle": { "value": angle, "unit": dwv.i18n("unit.degree")} };
+    var ktext = klabel.getText();
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    // update position
     var midX = ( line0.getMidpoint().getX() + line1.getMidpoint().getX() ) / 2;
     var midY = ( line0.getMidpoint().getY() + line1.getMidpoint().getY() ) / 2;
     var textPos = { 'x': midX, 'y': midY - 15 };
-    ktext.position( textPos );
-    ktext.text(str);
+    klabel.position( textPos );
+
     // arc
     var radius = Math.min(line0.getLength(), line1.getLength()) * 33 / 100;
     karc.innerRadius(radius);
@@ -18043,23 +18346,30 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
     });
     // quantification
     var quant = image.quantifyRect( rectangle );
-    var cm2 = quant.surface / 100;
-    var str = cm2.toPrecision(4) + " " + dwv.i18n("unit.cm2");
-    // quantification text
     var ktext = new Kinetic.Text({
-        x: rectangle.getBegin().getX(),
-        y: rectangle.getEnd().getY() + 10,
-        text: str,
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
         name: "text"
     });
+    ktext.textExpr = "{surface}";
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+
+    // label
+    var klabel = new Kinetic.Label({
+        x: rectangle.getBegin().getX(),
+        y: rectangle.getEnd().getY() + 10,
+        name: "label"
+    });
+    klabel.add(ktext);
+    klabel.add(new Kinetic.Tag());
+
     // return group
     var group = new Kinetic.Group();
     group.name("rectangle-group");
     group.add(kshape);
-    group.add(ktext);
+    group.add(klabel);
     return group;
 };
 
@@ -18076,9 +18386,9 @@ dwv.tool.UpdateRect = function (anchor, image)
     var krect = group.getChildren( function (node) {
         return node.name() === 'shape';
     })[0];
-    // associated text
-    var ktext = group.getChildren( function (node) {
-        return node.name() === 'text';
+    // associated label
+    var klabel = group.getChildren( function (node) {
+        return node.name() === 'label';
     })[0];
     // find special points
     var topLeft = group.getChildren( function (node) {
@@ -18130,16 +18440,18 @@ dwv.tool.UpdateRect = function (anchor, image)
     if ( width && height ) {
         krect.size({'width': width, 'height': height});
     }
-    // update text
+    // new rect
     var p2d0 = new dwv.math.Point2D(topLeft.x(), topLeft.y());
     var p2d1 = new dwv.math.Point2D(bottomRight.x(), bottomRight.y());
     var rect = new dwv.math.Rectangle(p2d0, p2d1);
+    // update text
     var quant = image.quantifyRect( rect );
-    var cm2 = quant.surface / 100;
-    var str = cm2.toPrecision(4) + " cm2";
+    var ktext = klabel.getText();
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    // update position
     var textPos = { 'x': rect.getBegin().getX(), 'y': rect.getEnd().getY() + 10 };
-    ktext.position(textPos);
-    ktext.text(str);
+    klabel.position( textPos );
 };
 ;// namespaces
 var dwv = dwv || {};
@@ -18192,10 +18504,32 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
         name: "shape",
         closed: true
     });
+
+    // text
+    var ktext = new Kinetic.Text({
+        fontSize: style.getScaledFontSize(),
+        fontFamily: style.getFontFamily(),
+        fill: style.getLineColour(),
+        name: "text"
+    });
+    ktext.textExpr = "";
+    ktext.quant = null;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+
+    // label
+    var klabel = new Kinetic.Label({
+        x: roi.getPoint(0).getX(),
+        y: roi.getPoint(0).getY() + 10,
+        name: "label"
+    });
+    klabel.add(ktext);
+    klabel.add(new Kinetic.Tag());
+
     // return group
     var group = new Kinetic.Group();
     group.name("roi-group");
     group.add(kshape);
+    group.add(klabel);
     return group;
 };
 
@@ -18212,6 +18546,11 @@ dwv.tool.UpdateRoi = function (anchor /*, image*/)
     var kroi = group.getChildren( function (node) {
         return node.name() === 'shape';
     })[0];
+    // associated label
+    var klabel = group.getChildren( function (node) {
+        return node.name() === 'label';
+    })[0];
+
     // update self
     var point = group.getChildren( function (node) {
         return node.id() === anchor.id();
@@ -18224,6 +18563,15 @@ dwv.tool.UpdateRoi = function (anchor /*, image*/)
     points[anchor.id()] = anchor.x() - kroi.x();
     points[anchor.id()+1] = anchor.y() - kroi.y();
     kroi.points( points );
+
+    // update text
+    var ktext = klabel.getText();
+    ktext.quant = null;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    // update position
+    var textPos = { 'x': points[0] + kroi.x(), 'y': points[1] +  kroi.y() + 10 };
+    klabel.position( textPos );
+
 };
 ;// namespaces
 var dwv = dwv || {};
@@ -18491,7 +18839,7 @@ dwv.tool.Toolbox = function( toolList, app )
         if ( Object.keys(toolList).length !== 0 ) {
             gui = new dwv.gui.Toolbox(app);
             gui.setup(toolList);
-            
+
             for( var key in toolList ) {
                 toolList[key].setup();
             }
@@ -19194,7 +19542,7 @@ dwv.browser._hasClampedArray = ("Uint8ClampedArray" in window);
 
 /**
  * Browser check for clamped array.
- * Missing in 
+ * Missing in
  * - Safari 5.1.7 for Windows
  * - PhantomJS 1.9.20 (on Travis).
  */
@@ -19290,8 +19638,6 @@ dwv.browser.check = function()
 };
 ;// namespaces
 var dwv = dwv || {};
-/** @namespace */
-dwv.utils = dwv.utils || {};
 // external
 var i18next = i18next || {};
 var i18nextXHRBackend = i18nextXHRBackend || {};
@@ -19302,16 +19648,16 @@ var i18nextBrowserLanguageDetector = i18nextBrowserLanguageDetector || {};
 
 /**
  * Initialise i18n.
- * @param {String} language The language to translate to. Defaults to 'auto' and 
+ * @param {String} language The language to translate to. Defaults to 'auto' and
  *   gets the language from the browser.
- * @param {String} localesPath Path the locales directory.
+ * @param {String} localesPath Path to the locales directory.
  */
 dwv.i18nInitialise = function (language, localesPath)
 {
     var lng = (typeof language === "undefined") ? "auto" : language;
-    var lpath = (typeof localesPath === "undefined") ? "" : localesPath;
+    var lpath = (typeof localesPath === "undefined") ? "../.." : localesPath;
     // i18n options: default 'en' language and
-    //  only load language, not specialised (for ex en-GB)  
+    //  only load language, not specialised (for ex en-GB)
     var options = {
         fallbackLng: "en",
         load: "languageOnly",
@@ -19329,13 +19675,37 @@ dwv.i18nInitialise = function (language, localesPath)
     // init i18n: will be ready when the 'loaded' event is fired
     i18n.init(options);
 };
-    
+
 /**
  * Handle i18n load event.
  * @param {Object} callback The callback function to call when i18n is loaded.
+ *  It can take one argument that will be replaced with the loaded languages.
  */
 dwv.i18nOnLoaded = function (callback) {
     i18next.on('loaded', callback);
+};
+
+/**
+ * Stop handling i18n load event.
+ */
+dwv.i18nOffLoaded = function () {
+    i18next.off('loaded');
+};
+
+/**
+ * Handle i18n failed load event.
+ * @param {Object} callback The callback function to call when i18n is loaded.
+ *  It can take three arguments: lng, ns and msg.
+ */
+dwv.i18nOnFailedLoad = function (callback) {
+    i18next.on('failedLoading', callback);
+};
+
+/**
+ * Stop handling i18n failed load event.
+ */
+dwv.i18nOffFailedLoad = function () {
+    i18next.off('failedLoading');
 };
 
 /**
@@ -19357,7 +19727,7 @@ dwv.i18nExists = function (key, options) {
 };
 
 /**
- * Translate all data-i18n tags in the current html page. If an html tag defines the 
+ * Translate all data-i18n tags in the current html page. If an html tag defines the
  * data-i18n attribute, its value will be used as key to find its corresponding text
  * and will replace the content of the html tag.
  */
@@ -19365,7 +19735,7 @@ dwv.i18nPage = function () {
     // get all elements
     var elements = document.getElementsByTagName("*");
     // if the element defines data-i18n, replace its content with the tranlation
-    for (var i = 0; i < elements.length; ++i) { 
+    for (var i = 0; i < elements.length; ++i) {
         if (typeof elements[i].dataset.i18n !== "undefined") {
             elements[i].innerHTML = dwv.i18n(elements[i].dataset.i18n);
         }
@@ -19425,6 +19795,57 @@ dwv.utils.splitKeyValueString = function (inputStr)
     }
     return result;
 };
+
+/**
+ * Replace flags in a input string. Flags are keywords surrounded with curly
+ * braces.
+ * @param {String} inputStr The input string.
+ * @param {Object} values A object of {value, unit}.
+ * @example
+ *    var values = {"length": { "value": 33, "unit": "cm" } };
+ *    var str = "The length is: {length}.";
+ *    var res = dwv.utils.replaceFlags(str, values); // "The length is: 33 cm."
+ * @return {String} The result string.
+ */
+dwv.utils.replaceFlags = function (inputStr, values)
+{
+    var res = "";
+    // check input string
+    if (inputStr === null || typeof inputStr === "undefined") {
+        return res;
+    }
+    res = inputStr;
+    // check values
+    if (values === null || typeof values === "undefined") {
+        return res;
+    }
+    // loop through values keys
+    var keys = Object.keys(values);
+    for (var i = 0; i < keys.length; ++i) {
+        var valueObj = values[keys[i]];
+        if ( valueObj !== null && typeof valueObj !== "undefined" &&
+             valueObj.value !== null && typeof valueObj.value !== "undefined") {
+            // value string
+            var valueStr = valueObj.value.toPrecision(4);
+            // add unit if available
+            // space or no space? Yes apart from degree...
+            // check: https://en.wikipedia.org/wiki/Space_(punctuation)#Spaces_and_unit_symbols
+            if (valueObj.unit !== null && typeof valueObj.unit !== "undefined" &&
+                valueObj.unit.length !== 0) {
+                if (valueObj.unit !== "degree") {
+                    valueStr += " ";
+                }
+                valueStr += valueObj.unit;
+            }
+            // flag to replace
+            var flag = '{' + keys[i] + '}';
+            // replace
+            res = res.replace(flag, valueStr);
+        }
+    }
+    // return
+    return res;
+};
 ;// namespaces
 var dwv = dwv || {};
 dwv.utils = dwv.utils || {};
@@ -19444,7 +19865,7 @@ dwv.utils.ThreadPool = function (size) {
     this.workerQueue = [];
     // pool size
     this.poolSize = size;
- 
+
     /**
      * Initialise.
      */
@@ -19454,7 +19875,7 @@ dwv.utils.ThreadPool = function (size) {
             self.workerQueue.push(new dwv.utils.WorkerThread(self));
         }
     };
- 
+
     /**
      * Add a worker task to the queue.
      * Will be run when a thread is made available.
@@ -19470,12 +19891,13 @@ dwv.utils.ThreadPool = function (size) {
             self.taskQueue.push(workerTask);
         }
     };
- 
+
     /**
      * Free a worker thread.
      * @param {Object} workerThread The thread to free.
      */
     this.freeWorkerThread = function (workerThread) {
+        self.onworkerend();
         if (self.taskQueue.length > 0) {
             // don't put back in queue, but execute next task
             var workerTask = self.taskQueue.shift();
@@ -19483,10 +19905,30 @@ dwv.utils.ThreadPool = function (size) {
         } else {
             // no task to run, add to queue
             self.workerQueue.push(workerThread);
+            // the work is done when the queue is back to its initial size
+            if ( self.workerQueue.length === size ) {
+                self.onpoolworkend();
+            }
         }
     };
 };
- 
+
+/**
+ * Handle a pool work end event.
+ */
+dwv.utils.ThreadPool.prototype.onpoolworkend = function ()
+{
+    // default does nothing.
+};
+
+/**
+ * Handle a pool worker end event.
+ */
+dwv.utils.ThreadPool.prototype.onworkerend = function ()
+{
+    // default does nothing.
+};
+
 /**
  * Worker thread.
  * @constructor
@@ -19499,7 +19941,9 @@ dwv.utils.WorkerThread = function (parentPool) {
     this.parentPool = parentPool;
     // associated task
     this.workerTask = {};
- 
+    // associated web worker
+    var worker;
+
     /**
      * Run a worker task
      * @param {Object} workerTask The task to run.
@@ -19509,13 +19953,13 @@ dwv.utils.WorkerThread = function (parentPool) {
         this.workerTask = workerTask;
         // create a new web worker
         if (this.workerTask.script !== null) {
-            var worker = new Worker(workerTask.script);
+            worker = new Worker(workerTask.script);
             worker.addEventListener('message', ontaskend, false);
             // launch the worker
             worker.postMessage(workerTask.startMessage);
         }
     };
- 
+
     /**
      * Handle once the task is done.
      * For now assume we only get a single callback from a worker
@@ -19525,12 +19969,14 @@ dwv.utils.WorkerThread = function (parentPool) {
     function ontaskend(event) {
         // pass to original callback
         self.workerTask.callback(event);
+        // stop the worker
+        worker.terminate();
         // tell the parent pool this thread is free
         self.parentPool.freeWorkerThread(self);
     }
- 
+
 };
- 
+
 /**
  * Worker task.
  * @constructor
@@ -19602,13 +20048,13 @@ dwv.utils.getUriQuery = function (uri)
 };
 
 /**
- * Generic URI query decoder. 
+ * Generic URI query decoder.
  * Supports manifest:
  *   [dwv root]?input=encodeURIComponent('[manifest file]')&type=manifest
  * or encoded URI with base and key value/pairs:
  *   [dwv root]?input=encodeURIComponent([root]?key0=value0&key1=value1)
  *  @param {String} query The query part to the input URI.
- *  @param {Function} callback The function to call with the decoded file urls. 
+ *  @param {Function} callback The function to call with the decoded file urls.
  */
 dwv.utils.base.decodeQuery = function (query, callback)
 {
@@ -19630,7 +20076,7 @@ dwv.utils.base.decodeQuery = function (query, callback)
  *   replaceMode can be:
  *   - key (default): keep the key
  *   - other than key: do not use the key
- *   'file' is a special case where the '?' of the query is not kept. 
+ *   'file' is a special case where the '?' of the query is not kept.
  * @return The list of input file urls.
  */
 dwv.utils.decodeKeyValueUri = function (uri, replaceMode)
@@ -19793,4 +20239,3 @@ dwv.utils.decodeManifest = function (manifest, nslices)
     // return
     return result;
 };
-

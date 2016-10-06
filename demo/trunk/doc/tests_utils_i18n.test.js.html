@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>dwv Source: src/math/stats.js</title>
+	<title>dwv Source: tests/utils/i18n.test.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -86,60 +86,65 @@
 		<div id="main">
 			
 
-		<h1 class="page-title">Source: src/math/stats.js</h1>
+		<h1 class="page-title">Source: tests/utils/i18n.test.js</h1>
     
 <section>
     <article>
         <pre
-            class="sunlight-highlight-javascript linenums">// namespaces
-var dwv = dwv || {};
-dwv.math = dwv.math || {};
+            class="sunlight-highlight-javascript linenums">/**
+ * Tests for the 'utils/i18n' file.
+ */
+/** @module tests/utils */
+// Do not warn if these variables were not defined before.
+/* global QUnit */
+QUnit.module("i18n");
 
 /**
- * Get the minimum, maximum, mean and standard deviation
- * of an array of values.
- * Note: could use {@link https://github.com/tmcw/simple-statistics}.
+ *
  */
-dwv.math.getStats = function (array)
-{
-    var min = array[0];
-    var max = min;
-    var mean = 0;
-    var sum = 0;
-    var sumSqr = 0;
-    var stdDev = 0;
-    var variance = 0;
-
-    var val = 0;
-    for ( var i = 0; i &lt; array.length; ++i ) {
-        val = array[i];
-        if ( val &lt; min ) {
-            min = val;
+function checkLanguage(language, keys, assert) {
+    var done = assert.async();
+    // initialise with auto language
+    dwv.i18nInitialise(language, "..");
+    // fail test if load fails
+    dwv.i18nOnFailedLoad( function (lng /*, ns, msg*/) {
+        assert.ok(false, "Failed loading '" + lng + "' language.");
+        // stop linstening
+        dwv.i18nOffFailedLoad();
+        // finish async test
+        done();
+    });
+    // test once loaded
+    dwv.i18nOnLoaded( function (/*loaded*/) {
+        // check some values
+        for (var i = 0; i &lt; keys.length; ++i ) {
+            assert.equal(dwv.i18nExists(keys[i][0]), true, "i18n "+language+" translation exists");
+            assert.equal(dwv.i18n(keys[i][0]), keys[i][1], "i18n "+language+" translation is ok");
         }
-        else if ( val > max ) {
-            max = val;
-        }
-        sum += val;
-        sumSqr += val * val;
-    }
-
-    mean = sum / array.length;
-    // see http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
-    variance = sumSqr / array.length - mean * mean;
-    stdDev = Math.sqrt(variance);
-
-    return { 'min': min, 'max': max, 'mean': mean, 'stdDev': stdDev };
-};
+        // stop linstening
+        dwv.i18nOffLoaded();
+        // finish async test
+        done();
+    });
+}
 
 /**
- * Unique ID generator.
- * See {@link http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript}
- * and this {@link http://stackoverflow.com/a/13403498 answer}.
+ * Tests for {@link dwv.i18n} with en language.
+ * @function module:tests/i18n
  */
-dwv.math.guid = function ()
-{
-    return Math.random().toString(36).substring(2, 15);
-};
+QUnit.test("Test i18n en.", function (assert) {
+    var keys = [["basics.open", "Open"], ["basics.close", "Close"]];
+    checkLanguage("en", keys, assert);
+});
+
+/**
+ * Tests for {@link dwv.i18n} with fr language.
+ * @function module:tests/i18n
+ */
+QUnit.test("Test i18n fr.", function (assert) {
+    var keys = [["basics.open", "Ouvrir"], ["basics.close", "Fermer"]];
+    checkLanguage("fr", keys, assert);
+});
 </pre>
     </article>
 </section>

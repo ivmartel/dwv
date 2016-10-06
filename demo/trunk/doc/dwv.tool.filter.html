@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>dwv Source: src/math/stats.js</title>
+	<title>dwv Namespace: filter</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -81,69 +81,118 @@
 <div class="row">
 
 	
-	<div class="col-md-12">
+	<div class="col-md-8">
 	
 		<div id="main">
 			
 
-		<h1 class="page-title">Source: src/math/stats.js</h1>
-    
+	<h1 class="page-title">Namespace: filter</h1>
 <section>
-    <article>
-        <pre
-            class="sunlight-highlight-javascript linenums">// namespaces
-var dwv = dwv || {};
-dwv.math = dwv.math || {};
 
-/**
- * Get the minimum, maximum, mean and standard deviation
- * of an array of values.
- * Note: could use {@link https://github.com/tmcw/simple-statistics}.
- */
-dwv.math.getStats = function (array)
-{
-    var min = array[0];
-    var max = min;
-    var mean = 0;
-    var sum = 0;
-    var sumSqr = 0;
-    var stdDev = 0;
-    var variance = 0;
+<header>
+    
+        <h2>
+            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.tool.html">.tool</a>.</span>
+        
+        filter
+        </h2>
+        
+    
+</header>
 
-    var val = 0;
-    for ( var i = 0; i &lt; array.length; ++i ) {
-        val = array[i];
-        if ( val &lt; min ) {
-            min = val;
-        }
-        else if ( val > max ) {
-            max = val;
-        }
-        sum += val;
-        sumSqr += val * val;
-    }
 
-    mean = sum / array.length;
-    // see http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
-    variance = sumSqr / array.length - mean * mean;
-    stdDev = Math.sqrt(variance);
+<article>
+    <div class="container-overview">
+    
+        
 
-    return { 'min': min, 'max': max, 'mean': mean, 'stdDev': stdDev };
-};
+        
+<dl class="details">
+    
 
-/**
- * Unique ID generator.
- * See {@link http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript}
- * and this {@link http://stackoverflow.com/a/13403498 answer}.
- */
-dwv.math.guid = function ()
-{
-    return Math.random().toString(36).substring(2, 15);
-};
-</pre>
-    </article>
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_filter.js.html">src/tools/filter.js</a>,
+				 <a href="src_tools_filter.js.html#sunlight-1-line-5">line 5</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Classes</h3>
+
+        <dl>
+            <dt><a href="dwv.tool.filter.Sharpen.html">Sharpen</a></dt>
+            <dd></dd>
+        
+            <dt><a href="dwv.tool.filter.Sobel.html">Sobel</a></dt>
+            <dd></dd>
+        
+            <dt><a href="dwv.tool.filter.Threshold.html">Threshold</a></dt>
+            <dd></dd>
+        </dl>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
 </section>
-
 
 
 
@@ -153,6 +202,10 @@ dwv.math.guid = function ()
 
 	<div class="clearfix"></div>
 
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
 	
 
 </div>
