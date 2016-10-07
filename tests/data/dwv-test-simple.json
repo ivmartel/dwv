@@ -2,7 +2,7 @@
   "FileMetaInformationGroupLength": 28,
   "TransferSyntaxUID": "1.2.840.10008.1.2.1",
   "Modality": "MR",
-  "PatientName": "dwv-patient-name",
+  "PatientName": "dwv--patient-name",
   "PerformingPhysicianName": "",
   "dBdt": "0",
   "PhotometricInterpretation": "MONOCHROME2",
