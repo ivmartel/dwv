@@ -118,14 +118,31 @@ function setElementValue(element, value) {
         element.vl = size;
     }
     else {
-        // set the value
-        element.value = [value];
-        // calculate the size
-        size = 1;
-        if (typeof value !== "undefined" && typeof value.length !== "undefined") {
-            size = value.length;
+        // set the value and calculate size
+        size = 0;
+        if (value instanceof Array) {
+            element.value = value;
+            for (var k = 0; k < value.length; ++k) {
+                // spearator
+                if (k !== 0) {
+                    size += 1;
+                }
+                // value
+                size += value[k].toString().length;
+            }
         }
-        // convert VL to bytes
+        else {
+            element.value = [value];
+            if (typeof value !== "undefined" && typeof value.length !== "undefined") {
+                size = value.length;
+            }
+            else {
+                // numbers
+                size = 1;
+            }
+        }
+
+        // convert size to bytes
         if ( element.vr === "US" || element.vr === "OW") {
             size *= Uint16Array.BYTES_PER_ELEMENT;
         }
@@ -143,6 +160,9 @@ function setElementValue(element, value) {
         }
         else if ( element.vr === "FD") {
             size *= Float64Array.BYTES_PER_ELEMENT;
+        }
+        else {
+            size *= Uint8Array.BYTES_PER_ELEMENT;
         }
         element.vl = size;
     }
@@ -182,12 +202,16 @@ function generate()
     var numberOfColumns = ( typeof tags.Columns === 'undefined' ) ? 64 : tags.Columns;
     var pixels = new Uint16Array(numberOfRows*numberOfColumns);
     pixels.fill(100);
+    var widthI = numberOfColumns * 0.5;
+    var widthJ = numberOfRows * 0.5;
+    var maxNoBounds =  (numberOfColumns/2 + widthI/2) * (numberOfRows/2 + widthJ/2);
+    var max = 100;
     for ( var j = 0; j < numberOfRows; ++j ) {
         var jc = Math.abs( j - (numberOfRows/2) );
         for ( var i = 0; i < numberOfColumns; ++i ) {
             var ic = Math.abs( i - (numberOfColumns/2) );
-            if ( jc < 10 && ic < 10) {
-                pixels[numberOfColumns*j + i] = i * j;
+            if ( jc < widthJ/2 && ic < widthI/2) {
+                pixels[numberOfColumns*j + i] += (i * j) * max / maxNoBounds;
             }
         }
     }
@@ -320,6 +344,7 @@ be written with explicit zero length, a <code>0</code> value will mean implicit 
   "PixelRepresentation": 0,
   "Rows": 32,
   "Columns": 32,
+  "PixelSpacing": [1,1],
   "BitsAllocated": 16,
   "BitsStored": 12,
   "HighBit": 11,
