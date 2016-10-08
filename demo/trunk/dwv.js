@@ -3643,6 +3643,17 @@ dwv.dicom.DataWriter = function (buffer)
     };
 
     /**
+     * Write Int8 data.
+     * @param {Number} byteOffset The offset to start writing from.
+     * @param {Number} value The data to write.
+     * @returns {Number} The new offset position.
+     */
+    this.writeInt8 = function (byteOffset, value) {
+        view.setInt8(byteOffset, value);
+        return byteOffset + Int8Array.BYTES_PER_ELEMENT;
+    };
+
+    /**
      * Write Uint16 data.
      * @param {Number} byteOffset The offset to start writing from.
      * @param {Number} value The data to write.
@@ -3751,6 +3762,19 @@ dwv.dicom.DataWriter.prototype.writeUint8Array = function (byteOffset, array) {
 };
 
 /**
+ * Write Int8 array.
+ * @param {Number} byteOffset The offset to start writing from.
+ * @param {Array} array The array to write.
+ * @returns {Number} The new offset position.
+ */
+dwv.dicom.DataWriter.prototype.writeInt8Array = function (byteOffset, array) {
+    for ( var i = 0, len = array.length; i < len; ++i ) {
+        byteOffset = this.writeInt8(byteOffset, array[i]);
+    }
+    return byteOffset;
+};
+
+/**
  * Write Uint16 array.
  * @param {Number} byteOffset The offset to start writing from.
  * @param {Array} array The array to write.
@@ -3836,11 +3860,12 @@ dwv.dicom.DataWriter.prototype.writeFloat64Array = function (byteOffset, array) 
  */
 dwv.dicom.DataWriter.prototype.writeStringArray = function (byteOffset, array) {
     for ( var i = 0, len = array.length; i < len; ++i ) {
-        byteOffset = this.writeString(byteOffset, array[i]);
         // separator
-        if ( len !== 1 && i !== array.length - 1 ) {
+        if ( i !== 0 ) {
             byteOffset = this.writeString(byteOffset, "\\");
         }
+        // value
+        byteOffset = this.writeString(byteOffset, array[i].toString());
     }
     return byteOffset;
 };
@@ -3942,7 +3967,12 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset)
         byteOffset = this.writeUint16(byteOffset, element.vl);
     }
     // value
-    byteOffset = this.writeDataElementValue(element.vr, byteOffset, element.value);
+    var value = element.value;
+    // pixel data: array of arrays, yet only supports one frame...
+    if (element.tag.name === "x7FE00010") {
+        value = element.value[0];
+    }
+    byteOffset = this.writeDataElementValue(element.vr, byteOffset, value);
 
     // sequence delimitation item for sequence with implicit length
     if ( dwv.dicom.isImplicitLengthSequence(element) ) {
