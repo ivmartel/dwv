@@ -60,6 +60,8 @@ dwv.App = function ()
     // Dicom tags gui
     var tagsGui = null;
 
+    var drawListGui = null;
+
     // Image layer
     var imageLayer = null;
     // Draw layers
@@ -293,6 +295,10 @@ dwv.App = function ()
             // DICOM Tags
             if ( config.gui.indexOf("tags") !== -1 ) {
                 tagsGui = new dwv.gui.DicomTags(this);
+            }
+            // DICOM Tags
+            if ( config.gui.indexOf("drawList") !== -1 ) {
+                drawListGui = new dwv.gui.DrawList(this);
             }
             // version number
             if ( config.gui.indexOf("version") !== -1 ) {
@@ -793,6 +799,43 @@ dwv.App = function ()
         var tyy = translation.y + ty / scale;
         translation = {"x": txx, "y": tyy};
         translateLayers();
+    };
+
+    this.getDrawList = function ()
+    {
+        var collec = this.getDrawLayer().getChildren();
+
+        var list = [];
+        for ( var i = 0; i < collec.length; ++i ) {
+            var shape = collec[i].getChildren()[0];
+            var label = collec[i].getChildren()[1];
+            var text = label.getChildren()[0];
+            list.push( {
+                "id": i,
+                "type": shape.className,
+                "color": shape.stroke(),
+                "text": text.textExpr,
+                "longtext": text.longText
+            });
+        }
+
+        return list;
+    };
+
+    this.updateDraw = function (drawId, newDraw)
+    {
+        var collec = this.getDrawLayer().getChildren()[drawId];
+        // shape
+        var shape = collec.getChildren()[0];
+        shape.stroke(newDraw.color);
+        // label
+        var label = collec.getChildren()[1];
+        var text = label.getChildren()[0];
+        text.fill(newDraw.color);
+        text.textExpr = newDraw.text;
+        text.setText(dwv.utils.replaceFlags(text.textExpr, text.quant));
+        // udpate layer
+        this.getDrawLayer().draw();
     };
 
     // Handler Methods -----------------------------------------------------------
@@ -1479,6 +1522,12 @@ dwv.App = function ()
 
         if ( drawStage ) {
             appendDrawLayer(image.getNumberOfFrames());
+
+            if (drawListGui) {
+                toolbox.getToolList().Draw.addEventListener("draw-create", drawListGui.update);
+                toolbox.getToolList().Draw.addEventListener("draw-change", drawListGui.update);
+                toolbox.getToolList().Draw.addEventListener("draw-delete", drawListGui.update);
+            }
         }
 
         // stop box listening to drag (after first drag)
@@ -8803,10 +8852,23 @@ dwv.gui.base.DicomTags = function (app)
         // tags HTML table
         var table = dwv.html.toTable(dataInfo);
         table.className = "tagsTable";
-        //table.setAttribute("class", "tagsList");
+
+        // TODO jquery-mobile specific...
         table.setAttribute("data-role", "table");
         table.setAttribute("data-mode", "columntoggle");
         table.setAttribute("data-column-btn-text", dwv.i18n("basics.columns") + "...");
+        // add priority on first row for columntoggle
+        var addDataPriority = function (cell) {
+            var text = cell.firstChild.data;
+            if ( text !== dwv.i18n("basics.value") && text !== dwv.i18n("basics.name") ) {
+                cell.setAttribute("data-priority", "1");
+            }
+        };
+        var hCells = table.rows.item(0).cells;
+        for (var c = 0; c < hCells.length; ++c) {
+            addDataPriority(hCells[c]);
+        }
+
         // search form
         node.appendChild(dwv.html.getHtmlSearchForm(table));
         // tags table
@@ -8816,6 +8878,97 @@ dwv.gui.base.DicomTags = function (app)
     };
 
 }; // class dwv.gui.base.DicomTags
+
+/**
+ * Drawing list base gui.
+ * @constructor
+ */
+dwv.gui.base.DrawList = function (app)
+{
+    /**
+     * Update the draw list html element
+     * @param {Object} event The drawing list.
+     */
+    this.update = function (/*event*/)
+    {
+        // HTML node
+        var node = app.getElement("draw-list");
+        if( node === null ) {
+            return;
+        }
+        // remove possible previous
+        while (node.hasChildNodes()) {
+            node.removeChild(node.firstChild);
+        }
+        // tags HTML table
+        var table = dwv.html.toTable(app.getDrawList());
+        table.className = "drawsTable";
+
+        table.style.width = "100%";
+        table.style["text-align"] = "left";
+
+        //
+        var makeCellEditable = function (rowId, changeType, cell) {
+            // check event
+            if (typeof rowId === "undefined" &&
+                typeof changeType === "undefined" &&
+                typeof cell === "undefined" ) {
+                    return;
+            }
+            // process
+            var form = document.createElement("form");
+            var input = document.createElement("input");
+            input.onkeyup = function () {
+                var draw = app.getDrawList()[rowId];
+                if (changeType === "color") {
+                    draw.color = input.value;
+                    app.updateDraw(rowId, draw);
+                }
+                else if (changeType === "text") {
+                    draw.text = input.value;
+                    app.updateDraw(rowId, draw);
+                }
+                else if (changeType === "longText") {
+                    draw.longText = input.value;
+                    app.updateDraw(rowId, draw);
+                }
+            };
+            input.value = cell.firstChild.data;
+            form.appendChild(input);
+
+            dwv.html.cleanNode(cell);
+            cell.appendChild(form);
+
+        };
+        for (var r = 0; r < table.rows.length; ++r) {
+            var cells = table.rows.item(r).cells;
+            for (var c = 0; c < cells.length; ++c) {
+                if (r !== 0) {
+                    // color
+                    if (c === 2) {
+                        makeCellEditable(r-1, "color", cells[c]);
+                    }
+                    // text
+                    else if (c === 3) {
+                        makeCellEditable(r-1, "text", cells[c]);
+                    }
+                    // long text
+                    else if (c === 3) {
+                        makeCellEditable(r-1, "longText", cells[c]);
+                    }
+                }
+            }
+        }
+
+        // search form
+        node.appendChild(dwv.html.getHtmlSearchForm(table));
+        // tags table
+        node.appendChild(table);
+        // refresh
+        dwv.gui.refreshElement(node);
+    };
+
+}; // class dwv.gui.base.DrawList
 ;// namespaces
 var dwv = dwv || {};
 dwv.gui = dwv.gui || {};
@@ -8957,21 +9110,17 @@ dwv.html.appendCell = function (row, content)
 dwv.html.appendHCell = function (row, text)
 {
     var cell = document.createElement("th");
-    // TODO jquery-mobile specific...
-    if ( text !== dwv.i18n("basics.value") && text !== dwv.i18n("basics.name") ) {
-        cell.setAttribute("data-priority", "1");
-    }
     cell.appendChild(document.createTextNode(text));
     row.appendChild(cell);
 };
 
 /**
  * Append a row to an array.
- * @param {} table
- * @param {} input
- * @param {} level
- * @param {} maxLevel
- * @param {} rowHeader
+ * @param {Object} table The HTML table to append a row to.
+ * @param {Array} input The input row array.
+ * @param {Number} level The depth level of the input array.
+ * @param {Number} maxLevel The maximum depth level.
+ * @param {String} rowHeader The content of the first cell of a row (mainly for objects).
  */
 dwv.html.appendRowForArray = function (table, input, level, maxLevel, rowHeader)
 {
@@ -8999,11 +9148,11 @@ dwv.html.appendRowForArray = function (table, input, level, maxLevel, rowHeader)
 
 /**
  * Append a row to an object.
- * @param {} table
- * @param {} input
- * @param {} level
- * @param {} maxLevel
- * @param {} rowHeader
+ * @param {Object} table The HTML table to append a row to.
+ * @param {Array} input The input row array.
+ * @param {Number} level The depth level of the input array.
+ * @param {Number} maxLevel The maximum depth level.
+ * @param {String} rowHeader The content of the first cell of a row (mainly for objects).
  */
 dwv.html.appendRowForObject = function (table, input, level, maxLevel, rowHeader)
 {
@@ -9037,7 +9186,7 @@ dwv.html.appendRowForObject = function (table, input, level, maxLevel, rowHeader
         var header = table.createTHead();
         var th = header.insertRow(-1);
         if ( rowHeader ) {
-            dwv.html.appendHCell(th, "name");
+            dwv.html.appendHCell(th, "");
         }
         for ( var k=0; k<keys.length; ++k ) {
             dwv.html.appendHCell(th, keys[k]);
@@ -9047,11 +9196,11 @@ dwv.html.appendRowForObject = function (table, input, level, maxLevel, rowHeader
 
 /**
  * Append a row to an object or an array.
- * @param {} table
- * @param {} input
- * @param {} level
- * @param {} maxLevel
- * @param {} rowHeader
+ * @param {Object} table The HTML table to append a row to.
+ * @param {Array} input The input row array.
+ * @param {Number} level The depth level of the input array.
+ * @param {Number} maxLevel The maximum depth level.
+ * @param {String} rowHeader The content of the first cell of a row (mainly for objects).
  */
 dwv.html.appendRow = function (table, input, level, maxLevel, rowHeader)
 {
@@ -15831,9 +15980,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             cmdName = "ellipse";
         }
 
-        // shape colour
-        var colour = shape.stroke();
-
         // drag start event handling
         shape.on('dragstart', function (event) {
             // save start position
@@ -15867,6 +16013,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             }
             dragLastPos = pos;
             // highlight trash when on it
+            var colour = shape.stroke();
             if ( Math.abs( pos.x - trash.x() ) < 10 &&
                     Math.abs( pos.y - trash.y() ) < 10   ) {
                 trash.getChildren().each( function (tshape){ tshape.stroke('orange'); });
@@ -15906,7 +16053,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                     shape.y( shape.y() - delTranslation.y );
                 });
                 // restore colour
-                shape.stroke(colour);
+                //shape.stroke(colour);
                 // disable editor
                 shapeEditor.disable();
                 shapeEditor.setShape(null);
@@ -15953,15 +16100,21 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             var ktext = labels[0].getText();
 
             // ask user for new label
-            var labelText = dwv.gui.prompt("Add label", ktext.textExpr);
+            var labelText = dwv.gui.prompt("Shape label", ktext.textExpr);
 
             // if press cancel do nothing
             if (labelText === null) {
-                return false;
+                return;
+            }
+            else if (labelText === ktext.textExpr) {
+                return;
             }
             // update text expression and set text
             ktext.textExpr = labelText;
             ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+
+            // trigger event
+            fireEvent({'type': 'draw-change'});
 
             // draw
             drawLayer.draw();
@@ -17717,6 +17870,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
         name: "text"
     });
     ktext.textExpr = "{length}";
+    ktext.longText = " ";
     ktext.quant = quant;
     ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
     // label

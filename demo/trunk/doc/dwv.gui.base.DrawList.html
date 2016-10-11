@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>dwv Class: DrawGroupCommand</title>
+	<title>dwv Class: DrawList</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -86,15 +86,15 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: DrawGroupCommand</h1>
+	<h1 class="page-title">Class: DrawList</h1>
 <section>
 
 <header>
     
         <h2>
-            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.tool.html">.tool</a>.</span>
+            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.gui.html">.gui</a><a href="dwv.gui.base.html">.base</a>.</span>
         
-        DrawGroupCommand
+        DrawList
         </h2>
         
     
@@ -107,7 +107,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="DrawGroupCommand"><span class="type-signature"></span>new DrawGroupCommand()</h4>
+    <h4 class="name" id="DrawList"><span class="type-signature"></span>new DrawList()</h4>
     
     
 </dt>
@@ -115,7 +115,7 @@
 
     
     <div class="description">
-        Draw group command.
+        Drawing list base gui.
     </div>
     
 
@@ -161,8 +161,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_tools_draw.js.html">src/tools/draw.js</a>,
-				 <a href="src_tools_draw.js.html#sunlight-1-line-12">line 12</a>
+				<a href="src_gui_generic.js.html">src/gui/generic.js</a>,
+				 <a href="src_gui_generic.js.html#sunlight-1-line-213">line 213</a>
 			</li>
 		</ul>
 	</dd>
@@ -213,7 +213,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="execute"><span class="type-signature"></span>execute()</h4>
+    <h4 class="name" id="update"><span class="type-signature"></span>update(event)</h4>
     
     
 </dt>
@@ -221,207 +221,7 @@
 
     
     <div class="description">
-        Execute the command.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_tools_draw.js.html">src/tools/draw.js</a>,
-				 <a href="src_tools_draw.js.html#sunlight-1-line-22">line 22</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getName"><span class="type-signature"></span>getName()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get the command name.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_tools_draw.js.html">src/tools/draw.js</a>,
-				 <a href="src_tools_draw.js.html#sunlight-1-line-18">line 18</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    The command name.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">String</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="onExecute"><span class="type-signature"></span>onExecute(event)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Handle an execute event.
+        Update the draw list html element
     </div>
     
 
@@ -473,7 +273,7 @@
 
             
 
-            <td class="description last">The execute event with type and id.</td>
+            <td class="description last">The drawing list.</td>
         </tr>
 
     
@@ -517,234 +317,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_tools_draw.js.html">src/tools/draw.js</a>,
-				 <a href="src_tools_draw.js.html#sunlight-1-line-47">line 47</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="onUndo"><span class="type-signature"></span>onUndo(event)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Handle an undo event.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>event</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The undo event with type and id.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_tools_draw.js.html">src/tools/draw.js</a>,
-				 <a href="src_tools_draw.js.html#sunlight-1-line-55">line 55</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="undo"><span class="type-signature"></span>undo()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Undo the command.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_tools_draw.js.html">src/tools/draw.js</a>,
-				 <a href="src_tools_draw.js.html#sunlight-1-line-33">line 33</a>
+				<a href="src_gui_generic.js.html">src/gui/generic.js</a>,
+				 <a href="src_gui_generic.js.html#sunlight-1-line-219">line 219</a>
 			</li>
 		</ul>
 	</dd>
