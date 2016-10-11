@@ -631,9 +631,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             cmdName = "ellipse";
         }
 
-        // shape colour
-        var colour = shape.stroke();
-
         // drag start event handling
         shape.on('dragstart', function (event) {
             // save start position
@@ -667,6 +664,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             }
             dragLastPos = pos;
             // highlight trash when on it
+            var colour = shape.stroke();
             if ( Math.abs( pos.x - trash.x() ) < 10 &&
                     Math.abs( pos.y - trash.y() ) < 10   ) {
                 trash.getChildren().each( function (tshape){ tshape.stroke('orange'); });
@@ -706,7 +704,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                     shape.y( shape.y() - delTranslation.y );
                 });
                 // restore colour
-                shape.stroke(colour);
+                //shape.stroke(colour);
                 // disable editor
                 shapeEditor.disable();
                 shapeEditor.setShape(null);
@@ -753,15 +751,21 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             var ktext = labels[0].getText();
 
             // ask user for new label
-            var labelText = dwv.gui.prompt("Add label", ktext.textExpr);
+            var labelText = dwv.gui.prompt("Shape label", ktext.textExpr);
 
             // if press cancel do nothing
             if (labelText === null) {
-                return false;
+                return;
+            }
+            else if (labelText === ktext.textExpr) {
+                return;
             }
             // update text expression and set text
             ktext.textExpr = labelText;
             ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+
+            // trigger event
+            fireEvent({'type': 'draw-change'});
 
             // draw
             drawLayer.draw();

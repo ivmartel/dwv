@@ -179,10 +179,23 @@ dwv.gui.base.DicomTags = function (app)
         // tags HTML table
         var table = dwv.html.toTable(dataInfo);
         table.className = "tagsTable";
-        //table.setAttribute("class", "tagsList");
+
+        // TODO jquery-mobile specific...
         table.setAttribute("data-role", "table");
         table.setAttribute("data-mode", "columntoggle");
         table.setAttribute("data-column-btn-text", dwv.i18n("basics.columns") + "...");
+        // add priority on first row for columntoggle
+        var addDataPriority = function (cell) {
+            var text = cell.firstChild.data;
+            if ( text !== dwv.i18n("basics.value") && text !== dwv.i18n("basics.name") ) {
+                cell.setAttribute("data-priority", "1");
+            }
+        };
+        var hCells = table.rows.item(0).cells;
+        for (var c = 0; c < hCells.length; ++c) {
+            addDataPriority(hCells[c]);
+        }
+
         // search form
         node.appendChild(dwv.html.getHtmlSearchForm(table));
         // tags table
@@ -192,3 +205,94 @@ dwv.gui.base.DicomTags = function (app)
     };
 
 }; // class dwv.gui.base.DicomTags
+
+/**
+ * Drawing list base gui.
+ * @constructor
+ */
+dwv.gui.base.DrawList = function (app)
+{
+    /**
+     * Update the draw list html element
+     * @param {Object} event The drawing list.
+     */
+    this.update = function (/*event*/)
+    {
+        // HTML node
+        var node = app.getElement("draw-list");
+        if( node === null ) {
+            return;
+        }
+        // remove possible previous
+        while (node.hasChildNodes()) {
+            node.removeChild(node.firstChild);
+        }
+        // tags HTML table
+        var table = dwv.html.toTable(app.getDrawList());
+        table.className = "drawsTable";
+
+        table.style.width = "100%";
+        table.style["text-align"] = "left";
+
+        //
+        var makeCellEditable = function (rowId, changeType, cell) {
+            // check event
+            if (typeof rowId === "undefined" &&
+                typeof changeType === "undefined" &&
+                typeof cell === "undefined" ) {
+                    return;
+            }
+            // process
+            var form = document.createElement("form");
+            var input = document.createElement("input");
+            input.onkeyup = function () {
+                var draw = app.getDrawList()[rowId];
+                if (changeType === "color") {
+                    draw.color = input.value;
+                    app.updateDraw(rowId, draw);
+                }
+                else if (changeType === "text") {
+                    draw.text = input.value;
+                    app.updateDraw(rowId, draw);
+                }
+                else if (changeType === "longText") {
+                    draw.longText = input.value;
+                    app.updateDraw(rowId, draw);
+                }
+            };
+            input.value = cell.firstChild.data;
+            form.appendChild(input);
+
+            dwv.html.cleanNode(cell);
+            cell.appendChild(form);
+
+        };
+        for (var r = 0; r < table.rows.length; ++r) {
+            var cells = table.rows.item(r).cells;
+            for (var c = 0; c < cells.length; ++c) {
+                if (r !== 0) {
+                    // color
+                    if (c === 2) {
+                        makeCellEditable(r-1, "color", cells[c]);
+                    }
+                    // text
+                    else if (c === 3) {
+                        makeCellEditable(r-1, "text", cells[c]);
+                    }
+                    // long text
+                    else if (c === 3) {
+                        makeCellEditable(r-1, "longText", cells[c]);
+                    }
+                }
+            }
+        }
+
+        // search form
+        node.appendChild(dwv.html.getHtmlSearchForm(table));
+        // tags table
+        node.appendChild(table);
+        // refresh
+        dwv.gui.refreshElement(node);
+    };
+
+}; // class dwv.gui.base.DrawList

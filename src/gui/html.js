@@ -35,21 +35,17 @@ dwv.html.appendCell = function (row, content)
 dwv.html.appendHCell = function (row, text)
 {
     var cell = document.createElement("th");
-    // TODO jquery-mobile specific...
-    if ( text !== dwv.i18n("basics.value") && text !== dwv.i18n("basics.name") ) {
-        cell.setAttribute("data-priority", "1");
-    }
     cell.appendChild(document.createTextNode(text));
     row.appendChild(cell);
 };
 
 /**
  * Append a row to an array.
- * @param {} table
- * @param {} input
- * @param {} level
- * @param {} maxLevel
- * @param {} rowHeader
+ * @param {Object} table The HTML table to append a row to.
+ * @param {Array} input The input row array.
+ * @param {Number} level The depth level of the input array.
+ * @param {Number} maxLevel The maximum depth level.
+ * @param {String} rowHeader The content of the first cell of a row (mainly for objects).
  */
 dwv.html.appendRowForArray = function (table, input, level, maxLevel, rowHeader)
 {
@@ -77,11 +73,11 @@ dwv.html.appendRowForArray = function (table, input, level, maxLevel, rowHeader)
 
 /**
  * Append a row to an object.
- * @param {} table
- * @param {} input
- * @param {} level
- * @param {} maxLevel
- * @param {} rowHeader
+ * @param {Object} table The HTML table to append a row to.
+ * @param {Array} input The input row array.
+ * @param {Number} level The depth level of the input array.
+ * @param {Number} maxLevel The maximum depth level.
+ * @param {String} rowHeader The content of the first cell of a row (mainly for objects).
  */
 dwv.html.appendRowForObject = function (table, input, level, maxLevel, rowHeader)
 {
@@ -115,7 +111,7 @@ dwv.html.appendRowForObject = function (table, input, level, maxLevel, rowHeader
         var header = table.createTHead();
         var th = header.insertRow(-1);
         if ( rowHeader ) {
-            dwv.html.appendHCell(th, "name");
+            dwv.html.appendHCell(th, "");
         }
         for ( var k=0; k<keys.length; ++k ) {
             dwv.html.appendHCell(th, keys[k]);
@@ -125,11 +121,11 @@ dwv.html.appendRowForObject = function (table, input, level, maxLevel, rowHeader
 
 /**
  * Append a row to an object or an array.
- * @param {} table
- * @param {} input
- * @param {} level
- * @param {} maxLevel
- * @param {} rowHeader
+ * @param {Object} table The HTML table to append a row to.
+ * @param {Array} input The input row array.
+ * @param {Number} level The depth level of the input array.
+ * @param {Number} maxLevel The maximum depth level.
+ * @param {String} rowHeader The content of the first cell of a row (mainly for objects).
  */
 dwv.html.appendRow = function (table, input, level, maxLevel, rowHeader)
 {

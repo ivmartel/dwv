@@ -82,6 +82,7 @@ dwv.gui.refreshElement = function (element) {
 dwv.gui.Slider = dwv.gui.base.Slider;
 // Tags gui
 dwv.gui.DicomTags = dwv.gui.base.DicomTags;
+dwv.gui.DrawList = dwv.gui.base.DrawList;
 
 // Loaders
 dwv.gui.Loadbox = dwv.gui.base.Loadbox;
@@ -135,6 +136,10 @@ dwv.gui.Toolbox = function (app)
         tags.href = "#tags_page";
         tags.setAttribute("class", buttonClass + " ui-icon-grid");
 
+        var drawList = document.createElement("a");
+        drawList.href = "#draw-list_page";
+        drawList.setAttribute("class", buttonClass + " ui-icon-edit");
+
         var node = app.getElement("toolbar");
         node.appendChild(open);
         node.appendChild(undo);
@@ -142,6 +147,7 @@ dwv.gui.Toolbox = function (app)
         node.appendChild(toggleInfo);
         node.appendChild(toggleSaveState);
         node.appendChild(tags);
+        node.appendChild(drawList);
         dwv.gui.refreshElement(node);
     };
     this.display = function (flag)

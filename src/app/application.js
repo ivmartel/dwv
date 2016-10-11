@@ -60,6 +60,8 @@ dwv.App = function ()
     // Dicom tags gui
     var tagsGui = null;
 
+    var drawListGui = null;
+
     // Image layer
     var imageLayer = null;
     // Draw layers
@@ -293,6 +295,10 @@ dwv.App = function ()
             // DICOM Tags
             if ( config.gui.indexOf("tags") !== -1 ) {
                 tagsGui = new dwv.gui.DicomTags(this);
+            }
+            // DICOM Tags
+            if ( config.gui.indexOf("drawList") !== -1 ) {
+                drawListGui = new dwv.gui.DrawList(this);
             }
             // version number
             if ( config.gui.indexOf("version") !== -1 ) {
@@ -793,6 +799,43 @@ dwv.App = function ()
         var tyy = translation.y + ty / scale;
         translation = {"x": txx, "y": tyy};
         translateLayers();
+    };
+
+    this.getDrawList = function ()
+    {
+        var collec = this.getDrawLayer().getChildren();
+
+        var list = [];
+        for ( var i = 0; i < collec.length; ++i ) {
+            var shape = collec[i].getChildren()[0];
+            var label = collec[i].getChildren()[1];
+            var text = label.getChildren()[0];
+            list.push( {
+                "id": i,
+                "type": shape.className,
+                "color": shape.stroke(),
+                "text": text.textExpr,
+                "longtext": text.longText
+            });
+        }
+
+        return list;
+    };
+
+    this.updateDraw = function (drawId, newDraw)
+    {
+        var collec = this.getDrawLayer().getChildren()[drawId];
+        // shape
+        var shape = collec.getChildren()[0];
+        shape.stroke(newDraw.color);
+        // label
+        var label = collec.getChildren()[1];
+        var text = label.getChildren()[0];
+        text.fill(newDraw.color);
+        text.textExpr = newDraw.text;
+        text.setText(dwv.utils.replaceFlags(text.textExpr, text.quant));
+        // udpate layer
+        this.getDrawLayer().draw();
     };
 
     // Handler Methods -----------------------------------------------------------
@@ -1479,6 +1522,12 @@ dwv.App = function ()
 
         if ( drawStage ) {
             appendDrawLayer(image.getNumberOfFrames());
+
+            if (drawListGui) {
+                toolbox.getToolList().Draw.addEventListener("draw-create", drawListGui.update);
+                toolbox.getToolList().Draw.addEventListener("draw-change", drawListGui.update);
+                toolbox.getToolList().Draw.addEventListener("draw-delete", drawListGui.update);
+            }
         }
 
         // stop box listening to drag (after first drag)
