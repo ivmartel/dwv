@@ -801,30 +801,44 @@ dwv.App = function ()
         translateLayers();
     };
 
+    /**
+     * Get the list of drawings.
+     */
     this.getDrawList = function ()
     {
-        var collec = this.getDrawLayer().getChildren();
-
         var list = [];
-        for ( var i = 0; i < collec.length; ++i ) {
-            var shape = collec[i].getChildren()[0];
-            var label = collec[i].getChildren()[1];
-            var text = label.getChildren()[0];
-            list.push( {
-                "id": i,
-                "type": shape.className,
-                "color": shape.stroke(),
-                "text": text.textExpr,
-                "longtext": text.longText
-            });
+        var size = image.getGeometry().getSize();
+        for ( var z = 0; z < size.getNumberOfSlices(); ++z ) {
+
+            for ( var f = 0; f < image.getNumberOfFrames(); ++f ) {
+
+                var collec = this.getDrawLayer(z,f).getChildren();
+                for ( var i = 0; i < collec.length; ++i ) {
+                    var shape = collec[i].getChildren()[0];
+                    var label = collec[i].getChildren()[1];
+                    var text = label.getChildren()[0];
+                    list.push( {
+                        "id": i,
+                        "slice": z,
+                        "frame": f,
+                        "type": shape.className,
+                        "color": shape.stroke(),
+                        "text": text.textExpr,
+                        "longtext": text.longText
+                    });
+                }
+            }
         }
 
         return list;
     };
 
-    this.updateDraw = function (drawId, newDraw)
+    /**
+     * Update a drawing.
+     */
+    this.updateDraw = function (newDraw)
     {
-        var collec = this.getDrawLayer().getChildren()[drawId];
+        var collec = this.getDrawLayer(newDraw.slice, newDraw.frame).getChildren()[newDraw.id];
         // shape
         var shape = collec.getChildren()[0];
         shape.stroke(newDraw.color);
@@ -8922,15 +8936,15 @@ dwv.gui.base.DrawList = function (app)
                 var draw = app.getDrawList()[rowId];
                 if (changeType === "color") {
                     draw.color = input.value;
-                    app.updateDraw(rowId, draw);
+                    app.updateDraw(draw);
                 }
                 else if (changeType === "text") {
                     draw.text = input.value;
-                    app.updateDraw(rowId, draw);
+                    app.updateDraw(draw);
                 }
                 else if (changeType === "longText") {
                     draw.longText = input.value;
-                    app.updateDraw(rowId, draw);
+                    app.updateDraw(draw);
                 }
             };
             input.value = cell.firstChild.data;
@@ -8945,15 +8959,15 @@ dwv.gui.base.DrawList = function (app)
             for (var c = 0; c < cells.length; ++c) {
                 if (r !== 0) {
                     // color
-                    if (c === 2) {
+                    if (c === 4) {
                         makeCellEditable(r-1, "color", cells[c]);
                     }
                     // text
-                    else if (c === 3) {
+                    else if (c === 5) {
                         makeCellEditable(r-1, "text", cells[c]);
                     }
                     // long text
-                    else if (c === 3) {
+                    else if (c === 6) {
                         makeCellEditable(r-1, "longText", cells[c]);
                     }
                 }
@@ -16693,6 +16707,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
         name: "text"
     });
     ktext.textExpr = "{surface}";
+    ktext.longText = "";
     ktext.quant = quant;
     ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
     // label
@@ -17870,7 +17885,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
         name: "text"
     });
     ktext.textExpr = "{length}";
-    ktext.longText = " ";
+    ktext.longText = "";
     ktext.quant = quant;
     ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
     // label
@@ -18361,6 +18376,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
             name: "text"
         });
         ktext.textExpr = "{angle}";
+        ktext.longText = "";
         ktext.quant = quant;
         ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
 
@@ -18537,6 +18553,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
         name: "text"
     });
     ktext.textExpr = "{surface}";
+    ktext.longText = "";
     ktext.quant = quant;
     ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
 
@@ -18697,6 +18714,7 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
         name: "text"
     });
     ktext.textExpr = "";
+    ktext.longText = "";
     ktext.quant = null;
     ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
 
