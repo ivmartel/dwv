@@ -801,30 +801,44 @@ dwv.App = function ()
         translateLayers();
     };
 
+    /**
+     * Get the list of drawings.
+     */
     this.getDrawList = function ()
     {
-        var collec = this.getDrawLayer().getChildren();
-
         var list = [];
-        for ( var i = 0; i < collec.length; ++i ) {
-            var shape = collec[i].getChildren()[0];
-            var label = collec[i].getChildren()[1];
-            var text = label.getChildren()[0];
-            list.push( {
-                "id": i,
-                "type": shape.className,
-                "color": shape.stroke(),
-                "text": text.textExpr,
-                "longtext": text.longText
-            });
+        var size = image.getGeometry().getSize();
+        for ( var z = 0; z < size.getNumberOfSlices(); ++z ) {
+
+            for ( var f = 0; f < image.getNumberOfFrames(); ++f ) {
+
+                var collec = this.getDrawLayer(z,f).getChildren();
+                for ( var i = 0; i < collec.length; ++i ) {
+                    var shape = collec[i].getChildren()[0];
+                    var label = collec[i].getChildren()[1];
+                    var text = label.getChildren()[0];
+                    list.push( {
+                        "id": i,
+                        "slice": z,
+                        "frame": f,
+                        "type": shape.className,
+                        "color": shape.stroke(),
+                        "text": text.textExpr,
+                        "longtext": text.longText
+                    });
+                }
+            }
         }
 
         return list;
     };
 
-    this.updateDraw = function (drawId, newDraw)
+    /**
+     * Update a drawing.
+     */
+    this.updateDraw = function (newDraw)
     {
-        var collec = this.getDrawLayer().getChildren()[drawId];
+        var collec = this.getDrawLayer(newDraw.slice, newDraw.frame).getChildren()[newDraw.id];
         // shape
         var shape = collec.getChildren()[0];
         shape.stroke(newDraw.color);

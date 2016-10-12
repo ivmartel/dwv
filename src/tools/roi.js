@@ -58,6 +58,7 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
         name: "text"
     });
     ktext.textExpr = "";
+    ktext.longText = "";
     ktext.quant = null;
     ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
 
