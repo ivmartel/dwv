@@ -16,6 +16,15 @@ body { margin: 10px; padding: 0; }
 .dropBox { margin: 20px auto; }
 </style>
 <link type="text/css" rel="stylesheet" href="../../ext/jquery-mobile/jquery.mobile-1.4.5.min.css" />
+<style type="text/css" >
+.ui-popup .ui-controlgroup { background-color: #252525; }
+/* jquery-mobile strip not visible enough */
+.table-stripe tbody tr:nth-child(odd) td,
+.table-stripe tbody tr:nth-child(odd) th {
+  background-color: #eeeeee; /* non-RGBA fallback  */
+  background-color: rgba(0,0,0,0.1);
+}
+</style>
 <!-- mobile web app -->
 <meta name="mobile-web-app-capable" content="yes" />
 <link rel="shortcut icon" sizes="16x16" href="../../resources/icons/dwv-16.png" />

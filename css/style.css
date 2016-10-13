@@ -17,8 +17,11 @@ body { font-family: Verdana, Arial, Helvetica, sans-serif; }
 .infoLayer canvas { margin: 0; padding: 2px; }
 
 /* Tag list */
-table.tagList { border-collapse: collapse; }
-table.tagList thead td { font-weight: bold; }
-table.tagList td { border: 1px solid grey; padding: 2px; }
-.tags .highlighted { background: #f87217; }
+table.tagsTable { border-collapse: collapse; }
+table.tagsTable thead th { text-transform: uppercase;
+    font-weight: bold; opacity: 0.5;}
+table.drawsTable { border-collapse: collapse; }
+table.drawsTable thead th { text-transform: uppercase;
+    font-weight: bold; opacity: 0.5;}
+.highlighted { background: #f87217; }
 .tags form { width: 50%; }

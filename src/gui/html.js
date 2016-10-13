@@ -14,8 +14,8 @@ dwv.html.appendCell = function (row, content)
     var str = content;
     // special care for arrays
     if ( content instanceof Array ||
-            content instanceof Uint8Array ||
-            content instanceof Uint16Array ||
+            content instanceof Uint8Array || content instanceof Int8Array ||
+            content instanceof Uint16Array || content instanceof Int16Array ||
             content instanceof Uint32Array ) {
         if ( content.length > 10 ) {
             content = Array.prototype.slice.call( content, 0, 10 );
