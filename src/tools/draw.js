@@ -7,10 +7,16 @@ var Kinetic = Kinetic || {};
 
 /**
  * Draw group command.
+ * @param {Object} group The group draw.
+ * @param {String} name The name of the shape.
+ * @param {Object} layer The layer where to draw the group.
+ * @param {Object} silent Whether to send a creation event or not.
  * @constructor
  */
-dwv.tool.DrawGroupCommand = function (group, name, layer)
+dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
 {
+    var isSilent = (typeof silent === "undefined") ? false : true;
+
     /**
      * Get the command name.
      * @return {String} The command name.
@@ -25,7 +31,9 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onExecute({'type': 'draw-create', 'id': group.id()});
+        if (!isSilent) {
+            this.onExecute({'type': 'draw-create', 'id': group.id()});
+        }
     };
     /**
      * Undo the command.
@@ -59,6 +67,10 @@ dwv.tool.DrawGroupCommand.prototype.onUndo = function (/*event*/)
 
 /**
  * Move group command.
+ * @param {Object} group The group draw.
+ * @param {String} name The name of the shape.
+ * @param {Object} translation A 2D translation to move the group by.
+ * @param {Object} layer The layer where to move the group.
  * @constructor
  */
 dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
@@ -118,6 +130,12 @@ dwv.tool.MoveGroupCommand.prototype.onUndo = function (/*event*/)
 
 /**
  * Change group command.
+ * @param {String} name The name of the shape.
+ * @param {Object} func The change function.
+ * @param {Object} startAnchor The anchor that starts the change.
+ * @param {Object} endAnchor The anchor that ends the change.
+ * @param {Object} layer The layer where to change the group.
+ * @param {Object} image The associated image.
  * @constructor
  */
 dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, layer, image)
@@ -171,6 +189,9 @@ dwv.tool.ChangeGroupCommand.prototype.onUndo = function (/*event*/)
 
 /**
  * Delete group command.
+ * @param {Object} group The group draw.
+ * @param {String} name The name of the shape.
+ * @param {Object} layer The layer where to delete the group.
  * @constructor
  */
 dwv.tool.DeleteGroupCommand = function (group, name, layer)
@@ -405,7 +426,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             shape.listening(false);
             drawLayer.hitGraphEnabled(false);
             // draw shape command
-            command = new dwv.tool.DrawGroupCommand(shapeGroup, self.shapeName, drawLayer);
+            command = new dwv.tool.DrawGroupCommand(shapeGroup, self.shapeName, drawLayer, true);
             // draw
             command.execute();
         }
@@ -703,8 +724,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                     shape.x( shape.x() - delTranslation.x );
                     shape.y( shape.y() - delTranslation.y );
                 });
-                // restore colour
-                //shape.stroke(colour);
+                // remove trash
+                trash.remove();
                 // disable editor
                 shapeEditor.disable();
                 shapeEditor.setShape(null);
@@ -733,8 +754,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 shapeEditor.setAnchorsActive(true);
                 shapeEditor.resetAnchors();
             }
-            // remove trash
-            trash.remove();
             // draw
             drawLayer.draw();
         });
