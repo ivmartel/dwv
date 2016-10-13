@@ -178,7 +178,7 @@ dwv.gui.base.DicomTags = function (app)
         }
         // tags HTML table
         var table = dwv.html.toTable(dataInfo);
-        table.className = "tagsTable";
+        table.className = "tagsTable table-stripe";
 
         // TODO jquery-mobile specific...
         table.setAttribute("data-role", "table");
@@ -212,12 +212,77 @@ dwv.gui.base.DicomTags = function (app)
  */
 dwv.gui.base.DrawList = function (app)
 {
+    var self = this;
+
+    /**
+     *
+     */
+    function makeCellEditable(cell, drawId, changeType) {
+        // check event
+        if (typeof rowId === "undefined" &&
+            typeof changeType === "undefined" &&
+            typeof cell === "undefined" ) {
+                return;
+        }
+        // HTML input
+        var input = document.createElement("input");
+        // handle change
+        input.onkeyup = function (/*event*/) {
+            var draw = app.getDrawList()[drawId];
+            if (changeType === "color") {
+                draw.color = this.value;
+                app.updateDraw(draw);
+            }
+            else if (changeType === "text") {
+                draw.text = this.value;
+                app.updateDraw(draw);
+            }
+            else if (changeType === "longText") {
+                draw.longText = this.value;
+                app.updateDraw(draw);
+            }
+        };
+        // set input value
+        input.value = cell.firstChild.data;
+
+        // HTML form
+        var form = document.createElement("form");
+        form.appendChild(input);
+        // clean cell
+        dwv.html.cleanNode(cell);
+        // add form to cell
+        cell.appendChild(form);
+    }
+
+    /**
+     *
+     */
+    function createClickHandler(inputRow) {
+        return function () {
+            // slice
+            var pos = app.getViewController().getCurrentPosition();
+            pos.k = inputRow.cells[1].firstChild.data;
+            app.getViewController().setCurrentPosition(pos);
+            // frame
+            var frame = inputRow.cells[2].firstChild.data;
+            app.getViewController().setCurrentFrame(frame);
+
+            // specific...
+            $.mobile.changePage("#main");
+        };
+    }
+
     /**
      * Update the draw list html element
-     * @param {Object} event The drawing list.
+     * @param {Object} event A change event.
      */
-    this.update = function (/*event*/)
+    this.update = function (event)
     {
+        var isEditable = false;
+        if (typeof event.editable !== "undefined") {
+            isEditable = event.editable;
+        }
+
         // HTML node
         var node = app.getElement("draw-list");
         if( node === null ) {
@@ -229,66 +294,72 @@ dwv.gui.base.DrawList = function (app)
         }
         // tags HTML table
         var table = dwv.html.toTable(app.getDrawList());
-        table.className = "drawsTable";
+        //table.className = "drawsTable";
 
-        table.style.width = "100%";
-        table.style["text-align"] = "left";
+        table.className = "drawsTable table-stripe";
 
-        //
-        var makeCellEditable = function (rowId, changeType, cell) {
-            // check event
-            if (typeof rowId === "undefined" &&
-                typeof changeType === "undefined" &&
-                typeof cell === "undefined" ) {
-                    return;
-            }
-            // process
-            var form = document.createElement("form");
-            var input = document.createElement("input");
-            input.onkeyup = function () {
-                var draw = app.getDrawList()[rowId];
-                if (changeType === "color") {
-                    draw.color = input.value;
-                    app.updateDraw(draw);
-                }
-                else if (changeType === "text") {
-                    draw.text = input.value;
-                    app.updateDraw(draw);
-                }
-                else if (changeType === "longText") {
-                    draw.longText = input.value;
-                    app.updateDraw(draw);
-                }
-            };
-            input.value = cell.firstChild.data;
-            form.appendChild(input);
+        // TODO jquery-mobile specific...
+        table.setAttribute("data-role", "table");
+        table.setAttribute("data-mode", "columntoggle");
+        table.setAttribute("data-column-btn-text", dwv.i18n("basics.columns") + "...");
 
-            dwv.html.cleanNode(cell);
-            cell.appendChild(form);
 
-        };
+        //table.style.width = "100%";
+        //table.style["text-align"] = "left";
+
         for (var r = 0; r < table.rows.length; ++r) {
-            var cells = table.rows.item(r).cells;
+            var drawId = r - 1;
+            var row = table.rows.item(r);
+            var cells = row.cells;
+
             for (var c = 0; c < cells.length; ++c) {
                 if (r !== 0) {
-                    // color
-                    if (c === 4) {
-                        makeCellEditable(r-1, "color", cells[c]);
+                    if (isEditable) {
+                        // color
+                        if (c === 4) {
+                            makeCellEditable(cells[c], drawId, "color");
+                        }
+                        // text
+                        else if (c === 5) {
+                            makeCellEditable(cells[c], drawId, "text");
+                        }
+                        // long text
+                        else if (c === 6) {
+                            makeCellEditable(cells[c], drawId, "longText");
+                        }
                     }
-                    // text
-                    else if (c === 5) {
-                        makeCellEditable(r-1, "text", cells[c]);
-                    }
-                    // long text
-                    else if (c === 6) {
-                        makeCellEditable(r-1, "longText", cells[c]);
+                    else {
+                        row.onclick = createClickHandler(row);
+                        row.onmouseover = function () {
+                            document.body.style.cursor = 'pointer';
+                        };
+                        row.onmouseout = function () {
+                            document.body.style.cursor = 'default';
+                        };
                     }
                 }
             }
         }
 
+        // editable checkbox
+        var tickBox = document.createElement("input");
+        tickBox.setAttribute("type", "checkbox");
+        tickBox.id = "checkbox-editable";
+        tickBox.checked = isEditable;
+        tickBox.onclick = function () { self.update({"editable": this.checked}); };
+        // checkbox label
+        var tickLabel = document.createElement("label");
+        tickLabel.setAttribute( "for", tickBox.id);
+        tickLabel.appendChild(document.createTextNode("Edit mode"));
+        // checkbox div
+        var tickDiv = document.createElement("div");
+        tickDiv.appendChild(tickLabel);
+        tickDiv.appendChild(tickBox);
+
         // search form
         node.appendChild(dwv.html.getHtmlSearchForm(table));
+        // tick form
+        node.appendChild(tickDiv);
         // tags table
         node.appendChild(table);
         // refresh
