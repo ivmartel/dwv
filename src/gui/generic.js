@@ -312,8 +312,8 @@ dwv.gui.base.DrawList = function (app)
             }
         };
         var hCells = table.rows.item(0).cells;
-        for (var c = 0; c < hCells.length; ++c) {
-            addDataPriority(hCells[c]);
+        for (var hc = 0; hc < hCells.length; ++hc) {
+            addDataPriority(hCells[hc]);
         }
 
         //table.style.width = "100%";
