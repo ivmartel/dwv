@@ -296,7 +296,7 @@ dwv.gui.base.DrawList = function (app)
         var table = dwv.html.toTable(app.getDrawList());
         //table.className = "drawsTable";
 
-        table.className = "drawsTable table-stripe";
+        table.className = "drawsTable ui-responsive table-stripe";
 
         // TODO jquery-mobile specific...
         table.setAttribute("data-role", "table");
@@ -304,8 +304,27 @@ dwv.gui.base.DrawList = function (app)
         table.setAttribute("data-column-btn-text", dwv.i18n("basics.columns") + "...");
 
 
+        // add priority on first row for columntoggle
+        var addDataPriority = function (cell) {
+            var text = cell.firstChild.data;
+            if ( text !== "text" && text !== "longtext" ) {
+                cell.setAttribute("data-priority", "1");
+            }
+        };
+        var hCells = table.rows.item(0).cells;
+        for (var c = 0; c < hCells.length; ++c) {
+            addDataPriority(hCells[c]);
+        }
+
         //table.style.width = "100%";
         //table.style["text-align"] = "left";
+
+        var setCursorToPointer = function () {
+            document.body.style.cursor = 'pointer';
+        };
+        var setCursorToDefault = function () {
+            document.body.style.cursor = 'default';
+        };
 
         for (var r = 0; r < table.rows.length; ++r) {
             var drawId = r - 1;
@@ -330,12 +349,8 @@ dwv.gui.base.DrawList = function (app)
                     }
                     else {
                         row.onclick = createClickHandler(row);
-                        row.onmouseover = function () {
-                            document.body.style.cursor = 'pointer';
-                        };
-                        row.onmouseout = function () {
-                            document.body.style.cursor = 'default';
-                        };
+                        row.onmouseover = setCursorToPointer;
+                        row.onmouseout = setCursorToDefault;
                     }
                 }
             }
@@ -349,7 +364,8 @@ dwv.gui.base.DrawList = function (app)
         tickBox.onclick = function () { self.update({"editable": this.checked}); };
         // checkbox label
         var tickLabel = document.createElement("label");
-        tickLabel.setAttribute( "for", tickBox.id);
+        tickLabel.setAttribute( "for", tickBox.id );
+        tickLabel.setAttribute( "class", "inline" );
         tickLabel.appendChild(document.createTextNode("Edit mode"));
         // checkbox div
         var tickDiv = document.createElement("div");
