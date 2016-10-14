@@ -713,6 +713,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         shape.on('dragend', function (/*event*/) {
             var pos = dragLastPos;
             dragLastPos = null;
+            // remove trash
+            trash.remove();
             // delete case
             if ( Math.abs( pos.x - trash.x() ) < 10 &&
                     Math.abs( pos.y - trash.y() ) < 10   ) {
@@ -724,8 +726,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                     shape.x( shape.x() - delTranslation.x );
                     shape.y( shape.y() - delTranslation.y );
                 });
-                // remove trash
-                trash.remove();
                 // disable editor
                 shapeEditor.disable();
                 shapeEditor.setShape(null);
