@@ -284,7 +284,7 @@ dwv.gui.base.DrawList = function (app)
         }
 
         // HTML node
-        var node = app.getElement("draw-list");
+        var node = app.getElement("drawList");
         if( node === null ) {
             return;
         }

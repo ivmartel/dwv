@@ -137,7 +137,7 @@ dwv.gui.Toolbox = function (app)
         tags.setAttribute("class", buttonClass + " ui-icon-grid");
 
         var drawList = document.createElement("a");
-        drawList.href = "#draw-list_page";
+        drawList.href = "#drawList_page";
         drawList.setAttribute("class", buttonClass + " ui-icon-edit");
 
         var node = app.getElement("toolbar");
