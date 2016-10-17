@@ -247,32 +247,32 @@ dwv.gui.base.DrawList = function (app)
             node.removeChild(node.firstChild);
         }
         // tags HTML table
-        var drawList = app.getDrawList();
-        var table = dwv.html.toTable(drawList);
+        var drawDetailsList = app.getDrawDetailsList();
+        var table = dwv.html.toTable(drawDetailsList);
         table.className = "drawsTable";
 
         // optional gui specific table post process
         dwv.gui.postProcessTable(table);
 
         // create a color onkeyup handler
-        var createColorOnKeyUp = function (draw) {
+        var createColorOnKeyUp = function (details) {
             return function () {
-                draw.color = this.value;
-                app.updateDraw(draw);
+                details.color = this.value;
+                app.updateDraw(details);
             };
         };
         // create a text onkeyup handler
-        var createTextOnKeyUp = function (draw) {
+        var createTextOnKeyUp = function (details) {
             return function () {
-                draw.text = this.value;
-                app.updateDraw(draw);
+                details.label = this.value;
+                app.updateDraw(details);
             };
         };
         // create a long text onkeyup handler
-        var createLongTextOnKeyUp = function (draw) {
+        var createLongTextOnKeyUp = function (details) {
             return function () {
-                draw.longText = this.value;
-                app.updateDraw(draw);
+                details.description = this.value;
+                app.updateDraw(details);
             };
         };
         // create a row onclick handler
@@ -292,7 +292,7 @@ dwv.gui.base.DrawList = function (app)
         // loop through rows
         for (var r = 0; r < table.rows.length; ++r) {
             var drawId = r - 1;
-            var draw = drawList[drawId];
+            var drawDetails = drawDetailsList[drawId];
             var row = table.rows.item(r);
             var cells = row.cells;
 
@@ -301,15 +301,15 @@ dwv.gui.base.DrawList = function (app)
                     if (isEditable) {
                         // color
                         if (c === 4) {
-                            dwv.html.makeCellEditable(cells[c], createColorOnKeyUp(draw));
+                            dwv.html.makeCellEditable(cells[c], createColorOnKeyUp(drawDetails));
                         }
                         // text
                         else if (c === 5) {
-                            dwv.html.makeCellEditable(cells[c], createTextOnKeyUp(draw));
+                            dwv.html.makeCellEditable(cells[c], createTextOnKeyUp(drawDetails));
                         }
                         // long text
                         else if (c === 6) {
-                            dwv.html.makeCellEditable(cells[c], createLongTextOnKeyUp(draw));
+                            dwv.html.makeCellEditable(cells[c], createLongTextOnKeyUp(drawDetails));
                         }
                     }
                     else {
