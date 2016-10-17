@@ -104,6 +104,7 @@ dwv.gui.postProcessTable = function (table)
             }
         }
         else if ( tableClass === "drawsTable" ) {
+            if ( text === "id" || text === "frame" || text === "slice" ) {
                 cell.setAttribute("data-priority", "1");
             }
         }
