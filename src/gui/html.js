@@ -312,11 +312,58 @@ dwv.html.removeNode = function (node) {
     top.removeChild(node);
 };
 
+/**
+ *
+ */
 dwv.html.removeNodes = function (nodes) {
     for ( var i = 0; i < nodes.length; ++i ) {
         dwv.html.removeNode(nodes[i]);
     }
 };
+
+/**
+ * Make a HTML table cell editable by putting its content inside an input element.
+ * @param {Object} cell The cell to make editable.
+ * @param {Function} onkeyup The callback to call when the key up event is fired.
+ */
+dwv.html.makeCellEditable = function (cell, onkeyup) {
+    // check event
+    if (typeof cell === "undefined" ||
+        typeof onkeyup === "undefined" ) {
+            console.warn("Cannot create input for cell.");
+            return;
+    }
+    // HTML input
+    var input = document.createElement("input");
+    // handle change
+    input.onkeyup = onkeyup;
+    // set input value
+    input.value = cell.firstChild.data;
+
+    // clean cell
+    dwv.html.cleanNode(cell);
+
+    // HTML form
+    var form = document.createElement("form");
+    form.appendChild(input);
+    // add form to cell
+    cell.appendChild(form);
+};
+
+/**
+ * Set the document cursor to 'pointer'.
+ */
+dwv.html.setCursorToPointer = function () {
+    document.body.style.cursor = 'pointer';
+};
+
+/**
+ * Set the document cursor to 'default'.
+ */
+dwv.html.setCursorToDefault = function () {
+    document.body.style.cursor = 'default';
+};
+
 
 /**
  * Create a HTML select from an input array of options.

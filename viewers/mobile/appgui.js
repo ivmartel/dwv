@@ -67,6 +67,11 @@ dwv.gui.displayProgress = function (percent) {
         $.mobile.loading("hide");
     }
 };
+// Focus
+dwv.gui.focusImage = function ()
+{
+    $.mobile.changePage("#main");
+};
 // get element
 dwv.gui.getElement = dwv.gui.base.getElement;
 // refresh
@@ -80,8 +85,39 @@ dwv.gui.refreshElement = function (element) {
 };
 // Slider
 dwv.gui.Slider = dwv.gui.base.Slider;
-// Tags gui
+// Post process table
+dwv.gui.postProcessTable = function (table)
+{
+    var tableClass = table.className;
+    // css
+    table.className += " table-stripe";
+    // add columntoggle
+    table.setAttribute("data-role", "table");
+    table.setAttribute("data-mode", "columntoggle");
+    table.setAttribute("data-column-btn-text", dwv.i18n("basics.columns") + "...");
+    // add priority columns for columntoggle
+    var addDataPriority = function (cell) {
+        var text = cell.firstChild.data;
+        if ( tableClass === "tagsTable" ) {
+            if ( text !== dwv.i18n("basics.value") && text !== dwv.i18n("basics.name") ) {
+                cell.setAttribute("data-priority", "1");
+            }
+        }
+        else if ( tableClass === "drawsTable" ) {
+                cell.setAttribute("data-priority", "1");
+            }
+        }
+    };
+    var hCells = table.rows.item(0).cells;
+    for (var c = 0; c < hCells.length; ++c) {
+        addDataPriority(hCells[c]);
+    }
+    // return
+    return table;
+};
+// Tags table
 dwv.gui.DicomTags = dwv.gui.base.DicomTags;
+// DrawList table
 dwv.gui.DrawList = dwv.gui.base.DrawList;
 
 // Loaders

@@ -40,6 +40,8 @@ dwv.gui.displayProgress = function (percent) {
         $("#progressbar").progressbar({ value: percent });
     }
 };
+// Focus
+dwv.gui.focusImage = dwv.gui.base.focusImage;
 // get element
 dwv.gui.getElement = dwv.gui.base.getElement;
 // refresh
@@ -79,6 +81,8 @@ function toggle(dialogId)
         $(dialogId).dialog('open');
     }
 }
+// post process table
+dwv.gui.postProcessTable = dwv.gui.base.postProcessTable;
 // Tags table
 dwv.gui.DicomTags = dwv.gui.base.DicomTags;
 // DrawList table
@@ -222,7 +226,7 @@ dwv.gui.setup = function () {
     });
     $(".drawList").dialog({ position:
         {my: "right top", at: "right top", of: "#pageMain"},
-        autoOpen: false, width: 500, height: 590,
+        autoOpen: false, width: 500, height: 250,
         appendTo: "#dwv"
     });
     $(".help").dialog({ position:

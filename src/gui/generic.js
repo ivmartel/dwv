@@ -32,6 +32,24 @@ dwv.gui.base.displayProgress = function (/*percent*/)
 };
 
 /**
+ * Focus the view on the image.
+ */
+dwv.gui.base.focusImage = function ()
+{
+    // default does nothing...
+};
+
+/**
+ * Post process a HTML table.
+ * @param {Object} table The HTML table to process.
+ * @return The processed HTML table.
+ */
+dwv.gui.base.postProcessTable = function (/*table*/)
+{
+    // default does nothing...
+};
+
+/**
  * Get a HTML element associated to a container div.
  * @param {Number} containerDivId The id of the container div.
  * @param {String} name The name or id to find.
@@ -157,19 +175,21 @@ dwv.gui.base.Slider = function (app)
 
 /**
  * DICOM tags base gui.
+ * @param {Object} app The associated application.
  * @constructor
  */
 dwv.gui.base.DicomTags = function (app)
 {
     /**
-     * Initialise the DICOM tags table. To be called once the DICOM has been parsed.
+     * Update the DICOM tags table with the input info.
      * @param {Object} dataInfo The data information.
      */
-    this.initialise = function (dataInfo)
+    this.update = function (dataInfo)
     {
         // HTML node
         var node = app.getElement("tags");
         if( node === null ) {
+            console.warn("Cannot find a node to append the DICOM tags.");
             return;
         }
         // remove possible previous
@@ -178,27 +198,15 @@ dwv.gui.base.DicomTags = function (app)
         }
         // tags HTML table
         var table = dwv.html.toTable(dataInfo);
-        table.className = "tagsTable table-stripe";
+        // css
+        table.className = "tagsTable";
 
-        // TODO jquery-mobile specific...
-        table.setAttribute("data-role", "table");
-        table.setAttribute("data-mode", "columntoggle");
-        table.setAttribute("data-column-btn-text", dwv.i18n("basics.columns") + "...");
-        // add priority on first row for columntoggle
-        var addDataPriority = function (cell) {
-            var text = cell.firstChild.data;
-            if ( text !== dwv.i18n("basics.value") && text !== dwv.i18n("basics.name") ) {
-                cell.setAttribute("data-priority", "1");
-            }
-        };
-        var hCells = table.rows.item(0).cells;
-        for (var c = 0; c < hCells.length; ++c) {
-            addDataPriority(hCells[c]);
-        }
+        // optional gui specific table post process
+        dwv.gui.postProcessTable(table);
 
-        // search form
+        // append search form
         node.appendChild(dwv.html.getHtmlSearchForm(table));
-        // tags table
+        // append tags table
         node.appendChild(table);
         // refresh
         dwv.gui.refreshElement(node);
@@ -208,73 +216,19 @@ dwv.gui.base.DicomTags = function (app)
 
 /**
  * Drawing list base gui.
+ * @param {Object} app The associated application.
  * @constructor
  */
 dwv.gui.base.DrawList = function (app)
 {
+    /**
+     * Closure to self.
+     */
     var self = this;
 
     /**
-     *
-     */
-    function makeCellEditable(cell, drawId, changeType) {
-        // check event
-        if (typeof rowId === "undefined" &&
-            typeof changeType === "undefined" &&
-            typeof cell === "undefined" ) {
-                return;
-        }
-        // HTML input
-        var input = document.createElement("input");
-        // handle change
-        input.onkeyup = function (/*event*/) {
-            var draw = app.getDrawList()[drawId];
-            if (changeType === "color") {
-                draw.color = this.value;
-                app.updateDraw(draw);
-            }
-            else if (changeType === "text") {
-                draw.text = this.value;
-                app.updateDraw(draw);
-            }
-            else if (changeType === "longText") {
-                draw.longText = this.value;
-                app.updateDraw(draw);
-            }
-        };
-        // set input value
-        input.value = cell.firstChild.data;
-
-        // HTML form
-        var form = document.createElement("form");
-        form.appendChild(input);
-        // clean cell
-        dwv.html.cleanNode(cell);
-        // add form to cell
-        cell.appendChild(form);
-    }
-
-    /**
-     *
-     */
-    function createClickHandler(inputRow) {
-        return function () {
-            // slice
-            var pos = app.getViewController().getCurrentPosition();
-            pos.k = inputRow.cells[1].firstChild.data;
-            app.getViewController().setCurrentPosition(pos);
-            // frame
-            var frame = inputRow.cells[2].firstChild.data;
-            app.getViewController().setCurrentFrame(frame);
-
-            // specific...
-            $.mobile.changePage("#main");
-        };
-    }
-
-    /**
      * Update the draw list html element
-     * @param {Object} event A change event.
+     * @param {Object} event A change event, decides if the table is editable or not.
      */
     this.update = function (event)
     {
@@ -293,64 +247,77 @@ dwv.gui.base.DrawList = function (app)
             node.removeChild(node.firstChild);
         }
         // tags HTML table
-        var table = dwv.html.toTable(app.getDrawList());
-        //table.className = "drawsTable";
+        var drawList = app.getDrawList();
+        var table = dwv.html.toTable(drawList);
+        table.className = "drawsTable";
 
-        table.className = "drawsTable ui-responsive table-stripe";
+        // optional gui specific table post process
+        dwv.gui.postProcessTable(table);
 
-        // TODO jquery-mobile specific...
-        table.setAttribute("data-role", "table");
-        table.setAttribute("data-mode", "columntoggle");
-        table.setAttribute("data-column-btn-text", dwv.i18n("basics.columns") + "...");
-
-
-        // add priority on first row for columntoggle
-        var addDataPriority = function (cell) {
-            var text = cell.firstChild.data;
-            if ( text !== "text" && text !== "longtext" ) {
-                cell.setAttribute("data-priority", "1");
-            }
+        // create a color onkeyup handler
+        var createColorOnKeyUp = function (draw) {
+            return function () {
+                draw.color = this.value;
+                app.updateDraw(draw);
+            };
         };
-        var hCells = table.rows.item(0).cells;
-        for (var hc = 0; hc < hCells.length; ++hc) {
-            addDataPriority(hCells[hc]);
-        }
-
-        //table.style.width = "100%";
-        //table.style["text-align"] = "left";
-
-        var setCursorToPointer = function () {
-            document.body.style.cursor = 'pointer';
+        // create a text onkeyup handler
+        var createTextOnKeyUp = function (draw) {
+            return function () {
+                draw.text = this.value;
+                app.updateDraw(draw);
+            };
         };
-        var setCursorToDefault = function () {
-            document.body.style.cursor = 'default';
+        // create a long text onkeyup handler
+        var createLongTextOnKeyUp = function (draw) {
+            return function () {
+                draw.longText = this.value;
+                app.updateDraw(draw);
+            };
+        };
+        // create a row onclick handler
+        var createRowOnClick = function (slice, frame) {
+            return function () {
+                // update slice
+                var pos = app.getViewController().getCurrentPosition();
+                pos.k = slice;
+                app.getViewController().setCurrentPosition(pos);
+                // update frame
+                app.getViewController().setCurrentFrame(frame);
+                // focus on the image
+                dwv.gui.focusImage();
+            };
         };
 
+        // loop through rows
         for (var r = 0; r < table.rows.length; ++r) {
             var drawId = r - 1;
+            var draw = drawList[drawId];
             var row = table.rows.item(r);
             var cells = row.cells;
 
-            for (var c = 0; c < cells.length; ++c) {
-                if (r !== 0) {
+            if (r !== 0) {
+                for (var c = 0; c < cells.length; ++c) {
                     if (isEditable) {
                         // color
                         if (c === 4) {
-                            makeCellEditable(cells[c], drawId, "color");
+                            dwv.html.makeCellEditable(cells[c], createColorOnKeyUp(draw));
                         }
                         // text
                         else if (c === 5) {
-                            makeCellEditable(cells[c], drawId, "text");
+                            dwv.html.makeCellEditable(cells[c], createTextOnKeyUp(draw));
                         }
                         // long text
                         else if (c === 6) {
-                            makeCellEditable(cells[c], drawId, "longText");
+                            dwv.html.makeCellEditable(cells[c], createLongTextOnKeyUp(draw));
                         }
                     }
                     else {
-                        row.onclick = createClickHandler(row);
-                        row.onmouseover = setCursorToPointer;
-                        row.onmouseout = setCursorToDefault;
+                        row.onclick = createRowOnClick(
+                            cells[1].firstChild.data,
+                            cells[2].firstChild.data);
+                        row.onmouseover = dwv.html.setCursorToPointer;
+                        row.onmouseout = dwv.html.setCursorToDefault;
                     }
                 }
             }
