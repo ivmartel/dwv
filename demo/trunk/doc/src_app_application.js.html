@@ -895,9 +895,10 @@ dwv.App = function ()
     };
 
     /**
-     * Get the list of drawings.
+     * Get a list of drawing details.
+     * @return {Object} A list of draw details including id, slice, frame...
      */
-    this.getDrawList = function ()
+    this.getDrawDetailsList = function ()
     {
         var list = [];
         var size = image.getGeometry().getSize();
@@ -916,30 +917,32 @@ dwv.App = function ()
                         "frame": f,
                         "type": shape.className,
                         "color": shape.stroke(),
-                        "text": text.textExpr,
-                        "longtext": text.longText
+                        "label": text.textExpr,
+                        "description": text.longText
                     });
                 }
             }
         }
-
+        // return
         return list;
     };
 
     /**
      * Update a drawing.
+     * @param {Object} drawDetails Details of the drawing to update.
      */
-    this.updateDraw = function (newDraw)
+    this.updateDraw = function (drawDetails)
     {
-        var collec = this.getDrawLayer(newDraw.slice, newDraw.frame).getChildren()[newDraw.id];
+        var collec = this.getDrawLayer(drawDetails.slice, drawDetails.frame).getChildren()[drawDetails.id];
         // shape
         var shape = collec.getChildren()[0];
-        shape.stroke(newDraw.color);
+        shape.stroke(drawDetails.color);
         // label
         var label = collec.getChildren()[1];
         var text = label.getChildren()[0];
-        text.fill(newDraw.color);
-        text.textExpr = newDraw.text;
+        text.fill(drawDetails.color);
+        text.textExpr = drawDetails.label;
+        text.longText = drawDetails.description;
         text.setText(dwv.utils.replaceFlags(text.textExpr, text.quant));
         // udpate layer
         this.getDrawLayer().draw();
