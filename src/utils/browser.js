@@ -77,6 +77,22 @@ dwv.browser.hasClampedArray = function()
 };
 
 /**
+ * Browser check for input with type='color'.
+ * Missing in IE 11.
+ */
+dwv.browser.hasInputColor = function()
+{
+    var caughtException = false;
+    var colorInput = document.createElement("input");
+    try {
+        colorInput.type = "color";
+    } catch (error) {
+        caughtException = true;
+    }
+    return !caughtException;
+};
+
+/**
  * Browser checks to see if it can run dwv. Throws an error if not.
  * Silently replaces basic functions.
  * @todo Maybe use {@link http://modernizr.com/}.

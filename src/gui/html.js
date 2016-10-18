@@ -162,14 +162,26 @@ dwv.html.toTable = function (input)
  */
 dwv.html.getHtmlSearchForm = function (htmlTableToSearch)
 {
-    var form = document.createElement("form");
-    form.setAttribute("class", "filter");
+    // input
     var input = document.createElement("input");
+    input.id = "table-search";
+    //input.setAttribute("type", "search");
     input.onkeyup = function () {
         dwv.html.filterTable(input, htmlTableToSearch);
     };
+    // label
+    var label = document.createElement("label");
+    label.setAttribute("for", input.id);
+    label.appendChild(document.createTextNode("Search" + ": "));
+    // form
+    var form = document.createElement("form");
+    form.setAttribute("class", "filter");
+    form.onsubmit = function (event) {
+        event.preventDefault();
+    };
+    form.appendChild(label);
     form.appendChild(input);
-
+    // return
     return form;
 };
 
@@ -324,27 +336,44 @@ dwv.html.removeNodes = function (nodes) {
 /**
  * Make a HTML table cell editable by putting its content inside an input element.
  * @param {Object} cell The cell to make editable.
- * @param {Function} onkeyup The callback to call when the key up event is fired.
+ * @param {Function} onchange The callback to call when cell's content is changed.
+ *    if set to null, the HTML input will be disabled.
+ * @param {String} inputType The type of the HTML input, default to 'text'.
  */
-dwv.html.makeCellEditable = function (cell, onkeyup) {
+dwv.html.makeCellEditable = function (cell, onchange, inputType) {
     // check event
-    if (typeof cell === "undefined" ||
-        typeof onkeyup === "undefined" ) {
-            console.warn("Cannot create input for cell.");
-            return;
+    if (typeof cell === "undefined" ) {
+        console.warn("Cannot create input for non existing cell.");
+        return;
     }
     // HTML input
     var input = document.createElement("input");
     // handle change
-    input.onkeyup = onkeyup;
+    if (onchange) {
+        input.onchange = onchange;
+    }
+    else {
+        input.disabled = true;
+    }
     // set input value
     input.value = cell.firstChild.data;
+    // input type
+    if (typeof inputType === "undefined" ||
+        (inputType === "color" && !dwv.browser.hasInputColor() ) ) {
+        input.type = "text";
+    }
+    else {
+        input.type = inputType;
+    }
 
     // clean cell
     dwv.html.cleanNode(cell);
 
     // HTML form
     var form = document.createElement("form");
+    form.onsubmit = function (event) {
+        event.preventDefault();
+    };
     form.appendChild(input);
     // add form to cell
     cell.appendChild(form);

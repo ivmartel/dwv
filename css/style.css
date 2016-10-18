@@ -21,6 +21,7 @@ table.tagsTable { border-collapse: collapse; }
 table.tagsTable thead th { text-transform: uppercase;
     font-weight: bold; opacity: 0.5;}
 table.drawsTable { border-collapse: collapse; }
+table.drawsTable td { vertical-align: middle; }
 table.drawsTable thead th { text-transform: uppercase;
     font-weight: bold; opacity: 0.5;}
 .highlighted { background: #f87217; }

@@ -652,6 +652,9 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             cmdName = "ellipse";
         }
 
+        // store original colour
+        var colour = shape.stroke();
+
         // drag start event handling
         shape.on('dragstart', function (event) {
             // save start position
@@ -685,7 +688,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             }
             dragLastPos = pos;
             // highlight trash when on it
-            var colour = shape.stroke();
             if ( Math.abs( pos.x - trash.x() ) < 10 &&
                     Math.abs( pos.y - trash.y() ) < 10   ) {
                 trash.getChildren().each( function (tshape){ tshape.stroke('orange'); });
@@ -805,7 +807,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         // init gui
         if ( gui ) {
             // same for colour
-            this.setLineColour(gui.getColours()[0]);
+            this.setLineColour(gui.getDefaultColour());
             // init html
             gui.initialise();
         }

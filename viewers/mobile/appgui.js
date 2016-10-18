@@ -201,8 +201,8 @@ dwv.gui.Toolbox = function (app)
 dwv.gui.WindowLevel = dwv.gui.base.WindowLevel;
 // Draw
 dwv.gui.Draw = dwv.gui.base.Draw;
-// Livewire
-dwv.gui.Livewire = dwv.gui.base.Livewire;
+// ColourTool
+dwv.gui.ColourTool = dwv.gui.base.ColourTool;
 // ZoomAndPan
 dwv.gui.ZoomAndPan = dwv.gui.base.ZoomAndPan;
 // Scroll

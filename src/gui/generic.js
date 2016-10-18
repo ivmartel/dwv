@@ -301,7 +301,7 @@ dwv.gui.base.DrawList = function (app)
                     if (isEditable) {
                         // color
                         if (c === 4) {
-                            dwv.html.makeCellEditable(cells[c], createColorOnKeyUp(drawDetails));
+                            dwv.html.makeCellEditable(cells[c], createColorOnKeyUp(drawDetails), "color");
                         }
                         // text
                         else if (c === 5) {
@@ -318,6 +318,10 @@ dwv.gui.base.DrawList = function (app)
                             cells[2].firstChild.data);
                         row.onmouseover = dwv.html.setCursorToPointer;
                         row.onmouseout = dwv.html.setCursorToDefault;
+                        // color
+                        if (c === 4) {
+                            dwv.html.makeCellEditable(cells[c], null, "color");
+                        }
                     }
                 }
             }

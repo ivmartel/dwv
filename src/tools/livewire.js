@@ -276,7 +276,7 @@ dwv.tool.Livewire = function(app)
      */
     this.setup = function ()
     {
-        gui = new dwv.gui.Livewire(app);
+        gui = new dwv.gui.ColourTool(app, "lw");
         gui.setup();
     };
 
@@ -306,7 +306,7 @@ dwv.tool.Livewire = function(app)
     {
         if ( gui ) {
             // set the default to the first in the list
-            this.setLineColour(gui.getColours()[0]);
+            this.setLineColour(gui.getDefaultColour());
             // init html
             gui.initialise();
         }
