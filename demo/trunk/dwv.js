@@ -250,6 +250,9 @@ dwv.App = function ()
                     var toolClass = toolName;
                     if (typeof dwv.tool[toolClass] !== "undefined") {
                         toolList[toolClass] = new dwv.tool[toolClass](this);
+                        if (typeof toolList[toolClass].addEventListener !== "undefined") {
+                            toolList[toolClass].addEventListener(fireEvent);
+                        }
                     }
                     else {
                         console.warn("Could not initialise unknown tool: "+toolName);
@@ -296,9 +299,13 @@ dwv.App = function ()
             if ( config.gui.indexOf("tags") !== -1 ) {
                 tagsGui = new dwv.gui.DicomTags(this);
             }
-            // DICOM Tags
+            // Draw list
             if ( config.gui.indexOf("drawList") !== -1 ) {
                 drawListGui = new dwv.gui.DrawList(this);
+                // update list on draw events
+                this.addEventListener("draw-create", drawListGui.update);
+                this.addEventListener("draw-change", drawListGui.update);
+                this.addEventListener("draw-delete", drawListGui.update);
             }
             // version number
             if ( config.gui.indexOf("version") !== -1 ) {
@@ -1539,12 +1546,6 @@ dwv.App = function ()
 
         if ( drawStage ) {
             appendDrawLayer(image.getNumberOfFrames());
-
-            if (drawListGui) {
-                toolbox.getToolList().Draw.addEventListener("draw-create", drawListGui.update);
-                toolbox.getToolList().Draw.addEventListener("draw-change", drawListGui.update);
-                toolbox.getToolList().Draw.addEventListener("draw-delete", drawListGui.update);
-            }
         }
 
         // stop box listening to drag (after first drag)
@@ -1618,31 +1619,45 @@ dwv.State = function (app)
         var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
         var nFrames = app.getImage().getNumberOfFrames();
         var drawings = [];
+        var drawingsDetails = [];
         for ( var k = 0; k < nSlices; ++k ) {
-        drawings[k] = [];
-        for ( var f = 0; f < nFrames; ++f ) {
-            // getChildren always return, so drawings will have the good size
-            var groups = app.getDrawLayer(k,f).getChildren();
-            // remove anchors
-            for ( var i = 0; i < groups.length; ++i ) {
-                var anchors  = groups[i].find(".anchor");
-                for ( var a = 0; a < anchors.length; ++a ) {
-                    anchors[a].remove();
+            drawings[k] = [];
+            drawingsDetails[k] = [];
+            for ( var f = 0; f < nFrames; ++f ) {
+                // getChildren always return, so drawings will have the good size
+                var groups = app.getDrawLayer(k,f).getChildren();
+                var details = [];
+                // remove anchors
+                for ( var i = 0; i < groups.length; ++i ) {
+                    var anchors = groups[i].find(".anchor");
+                    for ( var a = 0; a < anchors.length; ++a ) {
+                        anchors[a].remove();
+                    }
+                    var texts = groups[i].find(".text");
+                    for ( var b = 0; b < texts.length; ++b ) {
+                        details.push({
+                            "textExpr": texts[b].textExpr,
+                            "longText": texts[b].longText,
+                            "quant": texts[b].quant
+                        });
+                    }
                 }
+                drawings[k].push(groups);
+                drawingsDetails[k].push(details);
             }
-            drawings[k].push(groups);
-        }
         }
         // return a JSON string
         return JSON.stringify( {
-            "version": "0.1",
-        "window-center": app.getViewController().getWindowLevel().center,
+            "version": "0.2",
+            "window-center": app.getViewController().getWindowLevel().center,
             "window-width": app.getViewController().getWindowLevel().width,
             "position": app.getViewController().getCurrentPosition(),
             "scale": app.getScale(),
             "scaleCenter": app.getScaleCenter(),
             "translation": app.getTranslation(),
-            "drawings": drawings
+            "drawings": drawings,
+            // new in v0.2
+            "drawingsDetails": drawingsDetails
         } );
     };
     /**
@@ -1653,14 +1668,17 @@ dwv.State = function (app)
     this.fromJSON = function (json, eventCallback) {
         var data = JSON.parse(json);
         if (data.version === "0.1") {
-        readV01(data, eventCallback);
+            readV01(data, eventCallback);
+        }
+        else if (data.version === "0.2") {
+            readV02(data, eventCallback);
         }
         else {
-        throw new Error("Unknown state file format version: '"+data.version+"'.");
+            throw new Error("Unknown state file format version: '"+data.version+"'.");
         }
     };
     /**
-     * Read an application state from an Object.
+     * Read an application state from an Object in v0.1 format.
      * @param {Object} data The Object representation of the state.
      * @param {Object} eventCallback The callback to associate to draw commands.
      */
@@ -1677,21 +1695,67 @@ dwv.State = function (app)
             return node.name() === "shape";
         };
         for ( var k = 0 ; k < nSlices; ++k ) {
-        for ( var f = 0; f < nFrames; ++f ) {
-            for ( var i = 0 ; i < data.drawings[k][f].length; ++i ) {
-                var group = Kinetic.Node.create(data.drawings[k][f][i]);
-                var shape = group.getChildren( isShape )[0];
-                var cmd = new dwv.tool.DrawGroupCommand(
-                    group, shape.className,
-                    app.getDrawLayer(k,f) );
-                if ( typeof eventCallback !== "undefined" ) {
-                    cmd.onExecute = eventCallback;
-                    cmd.onUndo = eventCallback;
+            for ( var f = 0; f < nFrames; ++f ) {
+                for ( var i = 0 ; i < data.drawings[k][f].length; ++i ) {
+                    var group = Kinetic.Node.create(data.drawings[k][f][i]);
+                    var shape = group.getChildren( isShape )[0];
+                    var cmd = new dwv.tool.DrawGroupCommand(
+                        group, shape.className,
+                        app.getDrawLayer(k,f) );
+                    if ( typeof eventCallback !== "undefined" ) {
+                        cmd.onExecute = eventCallback;
+                        cmd.onUndo = eventCallback;
+                    }
+                    cmd.execute();
+                    app.addToUndoStack(cmd);
                 }
-                cmd.execute();
-                app.addToUndoStack(cmd);
             }
         }
+    }
+    /**
+     * Read an application state from an Object in v0.2 format.
+     * @param {Object} data The Object representation of the state.
+     * @param {Object} eventCallback The callback to associate to draw commands.
+     */
+    function readV02(data, eventCallback) {
+        // display
+        app.getViewController().setWindowLevel(data["window-center"], data["window-width"]);
+        app.getViewController().setCurrentPosition(data.position);
+        app.zoom(data.scale, data.scaleCenter.x, data.scaleCenter.y);
+        app.translate(data.translation.x, data.translation.y);
+        // drawings
+        var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
+        var nFrames = app.getImage().getNumberOfFrames();
+        var isShape = function (node) {
+            return node.name() === "shape";
+        };
+        var isLabel = function (node) {
+            return node.name() === "label";
+        };
+        for ( var k = 0 ; k < nSlices; ++k ) {
+            for ( var f = 0; f < nFrames; ++f ) {
+                for ( var i = 0 ; i < data.drawings[k][f].length; ++i ) {
+                    var group = Kinetic.Node.create(data.drawings[k][f][i]);
+                    var shape = group.getChildren( isShape )[0];
+                    var cmd = new dwv.tool.DrawGroupCommand(
+                        group, shape.className,
+                        app.getDrawLayer(k,f) );
+                    if ( typeof eventCallback !== "undefined" ) {
+                        cmd.onExecute = eventCallback;
+                        cmd.onUndo = eventCallback;
+                    }
+                    // text (new in v0.2)
+                    var details = data.drawingsDetails[k][f][i];
+                    var label = group.getChildren( isLabel )[0];
+                    var text = label.getText();
+                    text.textExpr = details.textExpr;
+                    text.longText = details.longText;
+                    text.quant = details.quant;
+                    // execute
+                    cmd.execute();
+                    app.addToUndoStack(cmd);
+                }
+            }
         }
     }
 }; // State class
@@ -9301,7 +9365,13 @@ dwv.html.appendRow = function (table, input, level, maxLevel, rowHeader)
 dwv.html.toTable = function (input)
 {
     var table = document.createElement('table');
-    dwv.html.appendRow(table, input, 0, 2);
+    if (input.length === 0) {
+        var row = table.insertRow(-1);
+        dwv.html.appendCell(row, "No content to show!");
+    }
+    else {
+        dwv.html.appendRow(table, input, 0, 2);
+    }
     return table;
 };
 
@@ -15877,7 +15947,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     trash.add(trashLine1);
     trash.add(trashLine2);
 
-    // listeners
+    /**
+     * Event listeners.
+     * @private
+     */
     var listeners = {};
 
     /**
@@ -16194,13 +16267,15 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         }
 
         // store original colour
-        var colour = shape.stroke();
+        var colour = null;
 
         // drag start event handling
         shape.on('dragstart', function (event) {
             // save start position
             var offset = dwv.html.getEventOffset( event.evt )[0];
             dragStartPos = getRealPosition( offset );
+            // colour
+            colour = shape.stroke();
             // display trash
             var stage = app.getDrawStage();
             var scale = stage.scale();
@@ -17488,6 +17563,12 @@ dwv.tool.Floodfill = function(app)
     this.style = new dwv.html.Style();
 
     /**
+     * Event listeners.
+     * @private
+     */
+    var listeners = [];
+
+    /**
      * Set extend option for painting border on all slices.
      * @param {Boolean} The option to set
      */
@@ -17560,8 +17641,13 @@ dwv.tool.Floodfill = function(app)
             shapeGroup = factory.create(border, self.style);
             // draw shape command
             command = new dwv.tool.DrawGroupCommand(shapeGroup, "floodfill", app.getDrawLayer());
+            command.onExecute = fireEvent;
+            command.onUndo = fireEvent;
             // // draw
             command.execute();
+            // save it in undo stack
+            app.addToUndoStack(command);
+
             return true;
         }
         else{
@@ -17736,6 +17822,44 @@ dwv.tool.Floodfill = function(app)
 
         return true;
     };
+
+    /**
+     * Add an event listener on the app.
+     * @param {Object} listener The method associated with the provided event type.
+     */
+    this.addEventListener = function (listener)
+    {
+        listeners.push(listener);
+    };
+
+    /**
+     * Remove an event listener from the app.
+     * @param {Object} listener The method associated with the provided event type.
+     */
+    this.removeEventListener = function (listener)
+    {
+        for ( var i = 0; i < listeners.length; ++i )
+        {
+            if ( listeners[i] === listener ) {
+                listeners.splice(i,1);
+            }
+        }
+    };
+
+    // Private Methods -----------------------------------------------------------
+
+    /**
+     * Fire an event: call all associated listeners.
+     * @param {Object} event The event to fire.
+     */
+    function fireEvent (event)
+    {
+        for ( var i=0; i < listeners.length; ++i )
+        {
+            listeners[i](event);
+        }
+    }
+
 }; // Floodfill class
 
 /**
@@ -18239,6 +18363,12 @@ dwv.tool.Livewire = function(app)
     var tolerance = 5;
 
     /**
+     * Event listeners.
+     * @private
+     */
+    var listeners = [];
+
+    /**
      * Clear the parent points list.
      * @private
      */
@@ -18291,6 +18421,10 @@ dwv.tool.Livewire = function(app)
             if( (Math.abs(event._x - self.x0) < tolerance) && (Math.abs(event._y - self.y0) < tolerance) ) {
                 // draw
                 self.mousemove(event);
+                // listen
+                command.onExecute = fireEvent;
+                command.onUndo = fireEvent;
+                // debug
                 console.log("Done.");
                 // save command in undo stack
                 app.addToUndoStack(command);
@@ -18480,6 +18614,43 @@ dwv.tool.Livewire = function(app)
 
         return true;
     };
+
+    /**
+     * Add an event listener on the app.
+     * @param {Object} listener The method associated with the provided event type.
+     */
+    this.addEventListener = function (listener)
+    {
+        listeners.push(listener);
+    };
+
+    /**
+     * Remove an event listener from the app.
+     * @param {Object} listener The method associated with the provided event type.
+     */
+    this.removeEventListener = function (listener)
+    {
+        for ( var i = 0; i < listeners.length; ++i )
+        {
+            if ( listeners[i] === listener ) {
+                listeners.splice(i,1);
+            }
+        }
+    };
+
+    // Private Methods -----------------------------------------------------------
+
+    /**
+     * Fire an event: call all associated listeners.
+     * @param {Object} event The event to fire.
+     */
+    function fireEvent (event)
+    {
+        for ( var i=0; i < listeners.length; ++i )
+        {
+            listeners[i](event);
+        }
+    }
 
 }; // Livewire class
 
