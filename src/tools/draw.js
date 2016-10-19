@@ -336,7 +336,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     trash.add(trashLine1);
     trash.add(trashLine2);
 
-    // listeners
+    /**
+     * Event listeners.
+     * @private
+     */
     var listeners = {};
 
     /**
@@ -653,13 +656,15 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         }
 
         // store original colour
-        var colour = shape.stroke();
+        var colour = null;
 
         // drag start event handling
         shape.on('dragstart', function (event) {
             // save start position
             var offset = dwv.html.getEventOffset( event.evt )[0];
             dragStartPos = getRealPosition( offset );
+            // colour
+            colour = shape.stroke();
             // display trash
             var stage = app.getDrawStage();
             var scale = stage.scale();
