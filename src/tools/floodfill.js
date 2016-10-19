@@ -120,6 +120,12 @@ dwv.tool.Floodfill = function(app)
     this.style = new dwv.html.Style();
 
     /**
+     * Event listeners.
+     * @private
+     */
+    var listeners = [];
+
+    /**
      * Set extend option for painting border on all slices.
      * @param {Boolean} The option to set
      */
@@ -192,8 +198,13 @@ dwv.tool.Floodfill = function(app)
             shapeGroup = factory.create(border, self.style);
             // draw shape command
             command = new dwv.tool.DrawGroupCommand(shapeGroup, "floodfill", app.getDrawLayer());
+            command.onExecute = fireEvent;
+            command.onUndo = fireEvent;
             // // draw
             command.execute();
+            // save it in undo stack
+            app.addToUndoStack(command);
+
             return true;
         }
         else{
@@ -368,6 +379,44 @@ dwv.tool.Floodfill = function(app)
 
         return true;
     };
+
+    /**
+     * Add an event listener on the app.
+     * @param {Object} listener The method associated with the provided event type.
+     */
+    this.addEventListener = function (listener)
+    {
+        listeners.push(listener);
+    };
+
+    /**
+     * Remove an event listener from the app.
+     * @param {Object} listener The method associated with the provided event type.
+     */
+    this.removeEventListener = function (listener)
+    {
+        for ( var i = 0; i < listeners.length; ++i )
+        {
+            if ( listeners[i] === listener ) {
+                listeners.splice(i,1);
+            }
+        }
+    };
+
+    // Private Methods -----------------------------------------------------------
+
+    /**
+     * Fire an event: call all associated listeners.
+     * @param {Object} event The event to fire.
+     */
+    function fireEvent (event)
+    {
+        for ( var i=0; i < listeners.length; ++i )
+        {
+            listeners[i](event);
+        }
+    }
+
 }; // Floodfill class
 
 /**

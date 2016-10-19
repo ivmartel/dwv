@@ -250,6 +250,9 @@ dwv.App = function ()
                     var toolClass = toolName;
                     if (typeof dwv.tool[toolClass] !== "undefined") {
                         toolList[toolClass] = new dwv.tool[toolClass](this);
+                        if (typeof toolList[toolClass].addEventListener !== "undefined") {
+                            toolList[toolClass].addEventListener(fireEvent);
+                        }
                     }
                     else {
                         console.warn("Could not initialise unknown tool: "+toolName);
@@ -296,9 +299,13 @@ dwv.App = function ()
             if ( config.gui.indexOf("tags") !== -1 ) {
                 tagsGui = new dwv.gui.DicomTags(this);
             }
-            // DICOM Tags
+            // Draw list
             if ( config.gui.indexOf("drawList") !== -1 ) {
                 drawListGui = new dwv.gui.DrawList(this);
+                // update list on draw events
+                this.addEventListener("draw-create", drawListGui.update);
+                this.addEventListener("draw-change", drawListGui.update);
+                this.addEventListener("draw-delete", drawListGui.update);
             }
             // version number
             if ( config.gui.indexOf("version") !== -1 ) {
@@ -1539,12 +1546,6 @@ dwv.App = function ()
 
         if ( drawStage ) {
             appendDrawLayer(image.getNumberOfFrames());
-
-            if (drawListGui) {
-                toolbox.getToolList().Draw.addEventListener("draw-create", drawListGui.update);
-                toolbox.getToolList().Draw.addEventListener("draw-change", drawListGui.update);
-                toolbox.getToolList().Draw.addEventListener("draw-delete", drawListGui.update);
-            }
         }
 
         // stop box listening to drag (after first drag)

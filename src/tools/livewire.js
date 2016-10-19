@@ -72,6 +72,12 @@ dwv.tool.Livewire = function(app)
     var tolerance = 5;
 
     /**
+     * Event listeners.
+     * @private
+     */
+    var listeners = [];
+
+    /**
      * Clear the parent points list.
      * @private
      */
@@ -124,6 +130,10 @@ dwv.tool.Livewire = function(app)
             if( (Math.abs(event._x - self.x0) < tolerance) && (Math.abs(event._y - self.y0) < tolerance) ) {
                 // draw
                 self.mousemove(event);
+                // listen
+                command.onExecute = fireEvent;
+                command.onUndo = fireEvent;
+                // debug
                 console.log("Done.");
                 // save command in undo stack
                 app.addToUndoStack(command);
@@ -313,6 +323,43 @@ dwv.tool.Livewire = function(app)
 
         return true;
     };
+
+    /**
+     * Add an event listener on the app.
+     * @param {Object} listener The method associated with the provided event type.
+     */
+    this.addEventListener = function (listener)
+    {
+        listeners.push(listener);
+    };
+
+    /**
+     * Remove an event listener from the app.
+     * @param {Object} listener The method associated with the provided event type.
+     */
+    this.removeEventListener = function (listener)
+    {
+        for ( var i = 0; i < listeners.length; ++i )
+        {
+            if ( listeners[i] === listener ) {
+                listeners.splice(i,1);
+            }
+        }
+    };
+
+    // Private Methods -----------------------------------------------------------
+
+    /**
+     * Fire an event: call all associated listeners.
+     * @param {Object} event The event to fire.
+     */
+    function fireEvent (event)
+    {
+        for ( var i=0; i < listeners.length; ++i )
+        {
+            listeners[i](event);
+        }
+    }
 
 }; // Livewire class
 
