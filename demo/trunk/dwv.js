@@ -14084,7 +14084,7 @@ dwv.io.Url.prototype.onloadend = function ()
 /**
  * Handle a progress event.
  */
-dwv.io.File.prototype.onprogress = function ()
+dwv.io.Url.prototype.onprogress = function ()
 {
     // default does nothing.
 };
@@ -14117,7 +14117,7 @@ dwv.io.Url.createErrorHandler = function (url, text, baseHandler) {
  * @param {Number} n The number of the loaded data.
  * @param {Function} loadProgressHandler A load progress percent handler.
  */
-dwv.io.File.createLoadProgressHandler = function (n, loadProgressHandler) {
+dwv.io.Url.createLoadProgressHandler = function (n, loadProgressHandler) {
     return function (event) {
         if( event.lengthComputable )
         {
@@ -14274,7 +14274,7 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
             request.onload = onLoadTextBuffer;
             request.onerror = dwv.io.Url.createErrorHandler(url, "text", self.onerror);
         }
-        request.onprogress = dwv.io.File.createLoadProgressHandler(i, self.onLoadProgress);
+        request.onprogress = dwv.io.Url.createLoadProgressHandler(i, self.onLoadProgress);
         request.send(null);
     }
 };
