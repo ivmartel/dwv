@@ -151,7 +151,13 @@ dwv.html.appendRow = function (table, input, level, maxLevel, rowHeader)
 dwv.html.toTable = function (input)
 {
     var table = document.createElement('table');
-    dwv.html.appendRow(table, input, 0, 2);
+    if (input.length === 0) {
+        var row = table.insertRow(-1);
+        dwv.html.appendCell(row, "No content to show!");
+    }
+    else {
+        dwv.html.appendRow(table, input, 0, 2);
+    }
     return table;
 };
 

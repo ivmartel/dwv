@@ -109,9 +109,11 @@ dwv.gui.postProcessTable = function (table)
             }
         }
     };
-    var hCells = table.rows.item(0).cells;
-    for (var c = 0; c < hCells.length; ++c) {
-        addDataPriority(hCells[c]);
+    if (table.rows.length !== 0) {
+        var hCells = table.rows.item(0).cells;
+        for (var c = 0; c < hCells.length; ++c) {
+            addDataPriority(hCells[c]);
+        }
     }
     // return
     return table;
