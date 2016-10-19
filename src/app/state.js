@@ -19,31 +19,45 @@ dwv.State = function (app)
         var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
         var nFrames = app.getImage().getNumberOfFrames();
         var drawings = [];
+        var drawingsDetails = [];
         for ( var k = 0; k < nSlices; ++k ) {
-        drawings[k] = [];
-        for ( var f = 0; f < nFrames; ++f ) {
-            // getChildren always return, so drawings will have the good size
-            var groups = app.getDrawLayer(k,f).getChildren();
-            // remove anchors
-            for ( var i = 0; i < groups.length; ++i ) {
-                var anchors  = groups[i].find(".anchor");
-                for ( var a = 0; a < anchors.length; ++a ) {
-                    anchors[a].remove();
+            drawings[k] = [];
+            drawingsDetails[k] = [];
+            for ( var f = 0; f < nFrames; ++f ) {
+                // getChildren always return, so drawings will have the good size
+                var groups = app.getDrawLayer(k,f).getChildren();
+                var details = [];
+                // remove anchors
+                for ( var i = 0; i < groups.length; ++i ) {
+                    var anchors = groups[i].find(".anchor");
+                    for ( var a = 0; a < anchors.length; ++a ) {
+                        anchors[a].remove();
+                    }
+                    var texts = groups[i].find(".text");
+                    for ( var b = 0; b < texts.length; ++b ) {
+                        details.push({
+                            "textExpr": texts[b].textExpr,
+                            "longText": texts[b].longText,
+                            "quant": texts[b].quant
+                        });
+                    }
                 }
+                drawings[k].push(groups);
+                drawingsDetails[k].push(details);
             }
-            drawings[k].push(groups);
-        }
         }
         // return a JSON string
         return JSON.stringify( {
-            "version": "0.1",
-        "window-center": app.getViewController().getWindowLevel().center,
+            "version": "0.2",
+            "window-center": app.getViewController().getWindowLevel().center,
             "window-width": app.getViewController().getWindowLevel().width,
             "position": app.getViewController().getCurrentPosition(),
             "scale": app.getScale(),
             "scaleCenter": app.getScaleCenter(),
             "translation": app.getTranslation(),
-            "drawings": drawings
+            "drawings": drawings,
+            // new in v0.2
+            "drawingsDetails": drawingsDetails
         } );
     };
     /**
@@ -54,14 +68,17 @@ dwv.State = function (app)
     this.fromJSON = function (json, eventCallback) {
         var data = JSON.parse(json);
         if (data.version === "0.1") {
-        readV01(data, eventCallback);
+            readV01(data, eventCallback);
+        }
+        else if (data.version === "0.2") {
+            readV02(data, eventCallback);
         }
         else {
-        throw new Error("Unknown state file format version: '"+data.version+"'.");
+            throw new Error("Unknown state file format version: '"+data.version+"'.");
         }
     };
     /**
-     * Read an application state from an Object.
+     * Read an application state from an Object in v0.1 format.
      * @param {Object} data The Object representation of the state.
      * @param {Object} eventCallback The callback to associate to draw commands.
      */
@@ -78,21 +95,67 @@ dwv.State = function (app)
             return node.name() === "shape";
         };
         for ( var k = 0 ; k < nSlices; ++k ) {
-        for ( var f = 0; f < nFrames; ++f ) {
-            for ( var i = 0 ; i < data.drawings[k][f].length; ++i ) {
-                var group = Kinetic.Node.create(data.drawings[k][f][i]);
-                var shape = group.getChildren( isShape )[0];
-                var cmd = new dwv.tool.DrawGroupCommand(
-                    group, shape.className,
-                    app.getDrawLayer(k,f) );
-                if ( typeof eventCallback !== "undefined" ) {
-                    cmd.onExecute = eventCallback;
-                    cmd.onUndo = eventCallback;
+            for ( var f = 0; f < nFrames; ++f ) {
+                for ( var i = 0 ; i < data.drawings[k][f].length; ++i ) {
+                    var group = Kinetic.Node.create(data.drawings[k][f][i]);
+                    var shape = group.getChildren( isShape )[0];
+                    var cmd = new dwv.tool.DrawGroupCommand(
+                        group, shape.className,
+                        app.getDrawLayer(k,f) );
+                    if ( typeof eventCallback !== "undefined" ) {
+                        cmd.onExecute = eventCallback;
+                        cmd.onUndo = eventCallback;
+                    }
+                    cmd.execute();
+                    app.addToUndoStack(cmd);
                 }
-                cmd.execute();
-                app.addToUndoStack(cmd);
             }
         }
+    }
+    /**
+     * Read an application state from an Object in v0.2 format.
+     * @param {Object} data The Object representation of the state.
+     * @param {Object} eventCallback The callback to associate to draw commands.
+     */
+    function readV02(data, eventCallback) {
+        // display
+        app.getViewController().setWindowLevel(data["window-center"], data["window-width"]);
+        app.getViewController().setCurrentPosition(data.position);
+        app.zoom(data.scale, data.scaleCenter.x, data.scaleCenter.y);
+        app.translate(data.translation.x, data.translation.y);
+        // drawings
+        var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
+        var nFrames = app.getImage().getNumberOfFrames();
+        var isShape = function (node) {
+            return node.name() === "shape";
+        };
+        var isLabel = function (node) {
+            return node.name() === "label";
+        };
+        for ( var k = 0 ; k < nSlices; ++k ) {
+            for ( var f = 0; f < nFrames; ++f ) {
+                for ( var i = 0 ; i < data.drawings[k][f].length; ++i ) {
+                    var group = Kinetic.Node.create(data.drawings[k][f][i]);
+                    var shape = group.getChildren( isShape )[0];
+                    var cmd = new dwv.tool.DrawGroupCommand(
+                        group, shape.className,
+                        app.getDrawLayer(k,f) );
+                    if ( typeof eventCallback !== "undefined" ) {
+                        cmd.onExecute = eventCallback;
+                        cmd.onUndo = eventCallback;
+                    }
+                    // text (new in v0.2)
+                    var details = data.drawingsDetails[k][f][i];
+                    var label = group.getChildren( isLabel )[0];
+                    var text = label.getText();
+                    text.textExpr = details.textExpr;
+                    text.longText = details.longText;
+                    text.quant = details.quant;
+                    // execute
+                    cmd.execute();
+                    app.addToUndoStack(cmd);
+                }
+            }
         }
     }
 }; // State class
