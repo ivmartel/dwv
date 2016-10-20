@@ -90,7 +90,7 @@ dwv.gui.postProcessTable = function (table)
 {
     var tableClass = table.className;
     // css
-    table.className += " table-stripe";
+    table.className += " table-stripe ui-responsive";
     // add columntoggle
     table.setAttribute("data-role", "table");
     table.setAttribute("data-mode", "columntoggle");
@@ -100,13 +100,17 @@ dwv.gui.postProcessTable = function (table)
         var text = cell.firstChild.data;
         if ( tableClass === "tagsTable" ) {
             if ( text !== dwv.i18n("basics.value") && text !== dwv.i18n("basics.name") ) {
-                cell.setAttribute("data-priority", "1");
+                cell.setAttribute("data-priority", "5");
             }
         }
         else if ( tableClass === "drawsTable" ) {
-            if ( text === "id" || text === "frame" || text === "slice" ) {
+            if ( text === "description" ) {
                 cell.setAttribute("data-priority", "1");
             }
+            else if ( text === "id" || text === "frame" || text === "slice" ) {
+                cell.setAttribute("data-priority", "5");
+            }
+
         }
     };
     if (table.rows.length !== 0) {
