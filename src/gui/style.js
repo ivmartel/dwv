@@ -31,7 +31,7 @@ dwv.html.Style = function ()
      * @private
      * @type String
      */
-    var lineColour = "";
+    var lineColour = "#ffff80";
     /**
      * Display scale.
      * @private

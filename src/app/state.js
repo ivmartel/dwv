@@ -36,6 +36,7 @@ dwv.State = function (app)
                     var texts = groups[i].find(".text");
                     for ( var b = 0; b < texts.length; ++b ) {
                         details.push({
+                            "id": groups[i].id(),
                             "textExpr": texts[b].textExpr,
                             "longText": texts[b].longText,
                             "quant": texts[b].quant
@@ -145,6 +146,7 @@ dwv.State = function (app)
                         cmd.onUndo = eventCallback;
                     }
                     // text (new in v0.2)
+                    // TODO Verify ID?
                     var details = data.drawingsDetails[k][f][i];
                     var label = group.getChildren( isLabel )[0];
                     var text = label.getText();

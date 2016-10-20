@@ -337,6 +337,12 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     trash.add(trashLine2);
 
     /**
+     * Drawing style.
+     * @type Style
+     */
+    this.style = new dwv.html.Style();
+
+    /**
      * Event listeners.
      * @private
      */
@@ -421,7 +427,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 shapeGroup.destroy();
             }
             // create shape group
-            shapeGroup = factory.create(points, app.getStyle(), app.getImage());
+            shapeGroup = factory.create(points, self.style, app.getImage());
             // do not listen during creation
             var shape = shapeGroup.getChildren( function (node) {
                 return node.name() === 'shape';
@@ -448,7 +454,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             }
             // create final shape
             var factory = new self.shapeFactoryList[self.shapeName]();
-            var group = factory.create(points, app.getStyle(), app.getImage());
+            var group = factory.create(points, self.style, app.getImage());
             group.id( dwv.math.guid() );
             // re-activate layer
             drawLayer.hitGraphEnabled(true);
@@ -811,8 +817,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         this.setShapeName(shapeName);
         // init gui
         if ( gui ) {
+            // init with the app window scale
+            this.style.setScale(app.getWindowScale());
             // same for colour
-            this.setLineColour(gui.getDefaultColour());
+            this.setLineColour(this.style.getLineColour());
             // init html
             gui.initialise();
         }
@@ -856,7 +864,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      */
     this.setLineColour = function (colour)
     {
-        app.getStyle().setLineColour(colour);
+        this.style.setLineColour(colour);
     };
 
     // Private Methods -----------------------------------------------------------

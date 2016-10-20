@@ -371,8 +371,10 @@ dwv.tool.Floodfill = function(app)
     this.init = function()
     {
         if ( gui ) {
+            // init with the app window scale
+            this.style.setScale(app.getWindowScale());
             // set the default to the first in the list
-            this.setLineColour(gui.getDefaultColour());
+            this.setLineColour(this.style.getLineColour());
             // init html
             gui.initialise();
         }

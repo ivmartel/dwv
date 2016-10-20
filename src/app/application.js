@@ -131,6 +131,12 @@ dwv.App = function ()
     this.getScale = function () { return scale / windowScale; };
 
     /**
+     * Get the window scale.
+     * @return {Number} The window scale.
+     */
+    this.getWindowScale = function () { return windowScale; };
+
+    /**
      * Get the scale center.
      * @return {Object} The coordinates of the scale center.
      */
@@ -825,11 +831,16 @@ dwv.App = function ()
                     var shape = collec[i].getChildren()[0];
                     var label = collec[i].getChildren()[1];
                     var text = label.getChildren()[0];
+                    var type = shape.className;
+                    if (type === "Line" && shape.closed()) {
+                        type = "ROI";
+                    }
                     list.push( {
-                        "id": i,
+                        "id": collec[i].id(),
+                        //"id": i,
                         "slice": z,
                         "frame": f,
-                        "type": shape.className,
+                        "type": type,
                         "color": shape.stroke(),
                         "label": text.textExpr,
                         "description": text.longText
@@ -847,7 +858,11 @@ dwv.App = function ()
      */
     this.updateDraw = function (drawDetails)
     {
-        var collec = this.getDrawLayer(drawDetails.slice, drawDetails.frame).getChildren()[drawDetails.id];
+        var layer = this.getDrawLayer(drawDetails.slice, drawDetails.frame);
+        //var collec = layer.getChildren()[drawDetails.id];
+        var collec = layer.getChildren( function (node) {
+            return node.id() === drawDetails.id;
+        })[0];
         // shape
         var shape = collec.getChildren()[0];
         shape.stroke(drawDetails.color);
