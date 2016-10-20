@@ -306,6 +306,7 @@ dwv.tool.Livewire = function(app)
         // create shape
         var factory = new dwv.tool.RoiFactory();
         shapeGroup = factory.create(currentPath.pointArray, self.style);
+        shapeGroup.id( dwv.math.guid() );
         // draw shape command
         command = new dwv.tool.DrawGroupCommand(shapeGroup, "livewire", app.getDrawLayer());
         // draw
