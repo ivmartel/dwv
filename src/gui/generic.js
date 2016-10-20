@@ -254,49 +254,61 @@ dwv.gui.base.DrawList = function (app)
         // optional gui specific table post process
         dwv.gui.postProcessTable(table);
 
-        // create a color onkeyup handler
-        var createColorOnKeyUp = function (details) {
-            return function () {
-                details.color = this.value;
-                app.updateDraw(details);
-            };
-        };
-        // create a text onkeyup handler
-        var createTextOnKeyUp = function (details) {
-            return function () {
-                details.label = this.value;
-                app.updateDraw(details);
-            };
-        };
-        // create a long text onkeyup handler
-        var createLongTextOnKeyUp = function (details) {
-            return function () {
-                details.description = this.value;
-                app.updateDraw(details);
-            };
-        };
-        // create a row onclick handler
-        var createRowOnClick = function (slice, frame) {
-            return function () {
-                // update slice
-                var pos = app.getViewController().getCurrentPosition();
-                pos.k = slice;
-                app.getViewController().setCurrentPosition(pos);
-                // update frame
-                app.getViewController().setCurrentFrame(frame);
-                // focus on the image
-                dwv.gui.focusImage();
-            };
-        };
+        // do not go there if just one row...
+        if ( table.rows.length > 0 ) {
 
-        // loop through rows
-        for (var r = 0; r < table.rows.length; ++r) {
-            var drawId = r - 1;
-            var drawDetails = drawDetailsList[drawId];
-            var row = table.rows.item(r);
-            var cells = row.cells;
+            // create a color onkeyup handler
+            var createColorOnKeyUp = function (details) {
+                return function () {
+                    details.color = this.value;
+                    app.updateDraw(details);
+                };
+            };
+            // create a text onkeyup handler
+            var createTextOnKeyUp = function (details) {
+                return function () {
+                    details.label = this.value;
+                    app.updateDraw(details);
+                };
+            };
+            // create a long text onkeyup handler
+            var createLongTextOnKeyUp = function (details) {
+                return function () {
+                    details.description = this.value;
+                    app.updateDraw(details);
+                };
+            };
+            // create a row onclick handler
+            var createRowOnClick = function (slice, frame) {
+                return function () {
+                    // update slice
+                    var pos = app.getViewController().getCurrentPosition();
+                    pos.k = slice;
+                    app.getViewController().setCurrentPosition(pos);
+                    // update frame
+                    app.getViewController().setCurrentFrame(frame);
+                    // focus on the image
+                    dwv.gui.focusImage();
+                };
+            };
 
-            if (r !== 0) {
+            // loop through rows
+            for (var r = 1; r < table.rows.length; ++r) {
+                var drawId = r - 1;
+                var drawDetails = drawDetailsList[drawId];
+                var row = table.rows.item(r);
+                var cells = row.cells;
+
+                // if not editable, allow click on row
+                if (!isEditable) {
+                    row.onclick = createRowOnClick(
+                        cells[1].firstChild.data,
+                        cells[2].firstChild.data);
+                    row.onmouseover = dwv.html.setCursorToPointer;
+                    row.onmouseout = dwv.html.setCursorToDefault;
+                }
+
+                // loop through cells
                 for (var c = 0; c < cells.length; ++c) {
                     if (isEditable) {
                         // color
@@ -313,41 +325,38 @@ dwv.gui.base.DrawList = function (app)
                         }
                     }
                     else {
-                        row.onclick = createRowOnClick(
-                            cells[1].firstChild.data,
-                            cells[2].firstChild.data);
-                        row.onmouseover = dwv.html.setCursorToPointer;
-                        row.onmouseout = dwv.html.setCursorToDefault;
-                        // color
+                        // color: just display the input color with no callback
                         if (c === 4) {
                             dwv.html.makeCellEditable(cells[c], null, "color");
                         }
                     }
                 }
             }
-        }
 
-        // editable checkbox
-        var tickBox = document.createElement("input");
-        tickBox.setAttribute("type", "checkbox");
-        tickBox.id = "checkbox-editable";
-        tickBox.checked = isEditable;
-        tickBox.onclick = function () { self.update({"editable": this.checked}); };
-        // checkbox label
-        var tickLabel = document.createElement("label");
-        tickLabel.setAttribute( "for", tickBox.id );
-        tickLabel.setAttribute( "class", "inline" );
-        tickLabel.appendChild(document.createTextNode("Edit mode"));
-        // checkbox div
-        var tickDiv = document.createElement("div");
-        tickDiv.appendChild(tickLabel);
-        tickDiv.appendChild(tickBox);
+            // editable checkbox
+            var tickBox = document.createElement("input");
+            tickBox.setAttribute("type", "checkbox");
+            tickBox.id = "checkbox-editable";
+            tickBox.checked = isEditable;
+            tickBox.onclick = function () { self.update({"editable": this.checked}); };
+            // checkbox label
+            var tickLabel = document.createElement("label");
+            tickLabel.setAttribute( "for", tickBox.id );
+            tickLabel.setAttribute( "class", "inline" );
+            tickLabel.appendChild(document.createTextNode("Edit mode"));
+            // checkbox div
+            var tickDiv = document.createElement("div");
+            tickDiv.appendChild(tickLabel);
+            tickDiv.appendChild(tickBox);
 
-        // search form
-        node.appendChild(dwv.html.getHtmlSearchForm(table));
-        // tick form
-        node.appendChild(tickDiv);
-        // tags table
+            // search form
+            node.appendChild(dwv.html.getHtmlSearchForm(table));
+            // tick form
+            node.appendChild(tickDiv);
+
+        } // if more than one row
+
+        // draw list table
         node.appendChild(table);
         // refresh
         dwv.gui.refreshElement(node);
