@@ -196,6 +196,7 @@ dwv.tool.Floodfill = function(app)
         if(border){
             var factory = new dwv.tool.RoiFactory();
             shapeGroup = factory.create(border, self.style);
+            shapeGroup.id( dwv.math.guid() );
             // draw shape command
             command = new dwv.tool.DrawGroupCommand(shapeGroup, "floodfill", app.getDrawLayer());
             command.onExecute = fireEvent;
@@ -254,12 +255,12 @@ dwv.tool.Floodfill = function(app)
     this.modifyThreshold = function(modifyThreshold){
         // remove previous draw
         clearTimeout(painterTimeout);
-        painterTimeout = setTimeout(function(){
-                                        if ( shapeGroup && self.started) {
-                                            shapeGroup.destroy();
-                                        }
-                                        paintBorder(initialpoint,  modifyThreshold);
-                                    },100);
+        painterTimeout = setTimeout( function () {
+            if ( shapeGroup && self.started) {
+                shapeGroup.destroy();
+            }
+            paintBorder(initialpoint, modifyThreshold);
+        }, 100);
     };
 
     /**
