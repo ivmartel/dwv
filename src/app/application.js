@@ -833,7 +833,10 @@ dwv.App = function ()
                     var text = label.getChildren()[0];
                     var type = shape.className;
                     if (type === "Line" && shape.closed()) {
-                        type = "ROI";
+                        type = "Roi";
+                    }
+                    if (type === "Rect") {
+                        type = "Rectangle";
                     }
                     list.push( {
                         "id": collec[i].id(),

@@ -19,7 +19,17 @@
         "history": "Historique",
         "image": "Image",
         "info": "Info",
-        "downloadState": "Télécharger state"
+        "downloadState": "Télécharger state",
+        "drawList": "Annotations",
+        "search": "Recherche",
+        "id": "ID",
+        "slice": "Coupe",
+        "frame": "Frame",
+        "type": "Type",
+        "color": "Couleur",
+        "label": "Label",
+        "description": "Description",
+        "editMode": "Mode Edition"
     },
     "colour": {
         "Yellow": {
