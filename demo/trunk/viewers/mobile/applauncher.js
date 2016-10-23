@@ -6,12 +6,12 @@
 function startApp() {
     // translate page
     dwv.i18nPage();
-    
+
     // main application
     var myapp = new dwv.App();
 
     // display loading time
-    var listener = function (event) { 
+    var listener = function (event) {
         if (event.type === "load-start") {
             console.time("load-data");
         }
@@ -22,7 +22,7 @@ function startApp() {
     // before myapp.init since it does the url load
     myapp.addEventListener("load-start", listener);
     myapp.addEventListener("load-end", listener);
-    
+
     // also available:
     //myapp.addEventListener("load-progress", listener);
     //myapp.addEventListener("draw-create", listener);
@@ -38,7 +38,7 @@ function startApp() {
     myapp.init({
         "containerDivId": "dwv",
         "fitToWindow": true,
-        "gui": ["tool", "load", "help", "undo", "version", "tags"],
+        "gui": ["tool", "load", "help", "undo", "version", "tags", "drawList"],
         "loaders": ["File", "Url", "GoogleDrive", "Dropbox"],
         "tools": ["Scroll", "WindowLevel", "ZoomAndPan", "Draw", "Livewire", "Filter", "Floodfill"],
         "filters": ["Threshold", "Sharpen", "Sobel"],

@@ -14,8 +14,24 @@ body { margin: 10px; padding: 0; }
 .layerContainer { margin: auto; text-align: center; }
 .imageLayer { left: 0px; }
 .dropBox { margin: 20px auto; }
+.inline { display: inline-block !important; }
 </style>
 <link type="text/css" rel="stylesheet" href="../../ext/jquery-mobile/jquery.mobile-1.4.5.min.css" />
+<style type="text/css" >
+.ui-popup .ui-controlgroup { background-color: #252525; }
+.colourLi > .ui-input-text { text-align: center; }
+.colourLi > .ui-input-text input { min-height: 2em; width: 7em; display:inline-block }
+.lwColourLi > .ui-input-text { text-align: center; }
+.lwColourLi > .ui-input-text input { min-height: 2em; width: 7em; display:inline-block }
+.ffColourLi > .ui-input-text { text-align: center; }
+.ffColourLi > .ui-input-text input { min-height: 2em; width: 7em; display:inline-block }
+/* jquery-mobile strip not visible enough */
+.table-stripe tbody tr:nth-child(odd) td,
+.table-stripe tbody tr:nth-child(odd) th {
+  background-color: #eeeeee; /* non-RGBA fallback  */
+  background-color: rgba(0,0,0,0.1);
+}
+</style>
 <!-- mobile web app -->
 <meta name="mobile-web-app-capable" content="yes" />
 <link rel="shortcut icon" sizes="16x16" href="../../resources/icons/dwv-16.png" />
@@ -51,7 +67,7 @@ body { margin: 10px; padding: 0; }
 <script type="text/javascript" src="google.js"></script>
 
 <!-- Dropbox -->
-<script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" 
+<script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js"
     id="dropboxjs" data-app-key="96u3396jtx3bwr8"></script>
 <script type="text/javascript" src="dropbox.js"></script>
 
@@ -144,6 +160,23 @@ body { margin: 10px; padding: 0; }
 </div><!-- /content -->
 
 </div><!-- /page tags_page-->
+
+<!-- Draw list page -->
+<div data-role="page" data-theme="b" id="drawList_page">
+
+<div data-role="header">
+<a href="#main" data-icon="back" data-transition="slide"
+  data-direction="reverse" data-i18n="basics.back">Back</a>
+<h1 data-i18n="basics.drawList">Draw list</h1>
+</div><!-- /header -->
+
+<div data-role="content">
+<!-- DrawList -->
+<div id="dwv-drawList" title="Draw list"></div>
+</div><!-- /content -->
+
+</div><!-- /page draw-list_page-->
+
 
 <!-- Help page -->
 <div data-role="page" data-theme="b" id="help_page">
