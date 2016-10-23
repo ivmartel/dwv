@@ -833,7 +833,10 @@ dwv.App = function ()
                     var text = label.getChildren()[0];
                     var type = shape.className;
                     if (type === "Line" && shape.closed()) {
-                        type = "ROI";
+                        type = "Roi";
+                    }
+                    if (type === "Rect") {
+                        type = "Rectangle";
                     }
                     list.push( {
                         "id": collec[i].id(),
@@ -3395,23 +3398,23 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
             }
             // name
             if ( dictElement !== null ) {
-                row[dwv.i18n("basics.name")] = dictElement[2];
+                row.name = dictElement[2];
             }
             else {
-                row[dwv.i18n("basics.name")] = "Unknown Tag & Data";
+                row.name = "Unknown Tag & Data";
             }
             // value
             if ( dicomElement.tag.name !== "x7FE00010" ) {
-                row[dwv.i18n("basics.value")] = dicomElement.value;
+                row.value = dicomElement.value;
             }
             else {
-                row[dwv.i18n("basics.value")] = "...";
+                row.value = "...";
             }
             // others
-            row[dwv.i18n("basics.group")] = dicomElement.tag.group;
-            row[dwv.i18n("basics.element")] = dicomElement.tag.element;
-            row[dwv.i18n("basics.vr")] = dicomElement.vr;
-            row[dwv.i18n("basics.vl")] = dicomElement.vl;
+            row.group = dicomElement.tag.group;
+            row.element = dicomElement.tag.element;
+            row.vr = dicomElement.vr;
+            row.vl = dicomElement.vl;
 
             table.push( row );
         }
@@ -8975,6 +8978,11 @@ dwv.gui.base.DicomTags = function (app)
         // optional gui specific table post process
         dwv.gui.postProcessTable(table);
 
+        // translate first row
+        if (table.rows.length !== 0) {
+            dwv.html.translateTableRow(table.rows.item(0));
+        }
+
         // append search form
         node.appendChild(dwv.html.getHtmlSearchForm(table));
         // append tags table
@@ -9024,6 +9032,14 @@ dwv.gui.base.DrawList = function (app)
 
         // optional gui specific table post process
         dwv.gui.postProcessTable(table);
+
+        // translate first row
+        if (table.rows.length !== 0) {
+            dwv.html.translateTableRow(table.rows.item(0));
+        }
+
+        // translate shape names
+        dwv.html.translateTableColumn(table, 3, "shape", "name");
 
         // do not go there if just one row...
         if ( table.rows.length > 0 ) {
@@ -9114,7 +9130,7 @@ dwv.gui.base.DrawList = function (app)
             var tickLabel = document.createElement("label");
             tickLabel.setAttribute( "for", tickBox.id );
             tickLabel.setAttribute( "class", "inline" );
-            tickLabel.appendChild(document.createTextNode("Edit mode"));
+            tickLabel.appendChild( document.createTextNode( dwv.i18n("basics.editMode") ) );
             // checkbox div
             var tickDiv = document.createElement("div");
             tickDiv.appendChild(tickLabel);
@@ -9411,6 +9427,7 @@ dwv.html.getHtmlSearchForm = function (htmlTableToSearch)
     // input
     var input = document.createElement("input");
     input.id = "table-search";
+    // TODO Use new html5 search type
     //input.setAttribute("type", "search");
     input.onkeyup = function () {
         dwv.html.filterTable(input, htmlTableToSearch);
@@ -9418,7 +9435,7 @@ dwv.html.getHtmlSearchForm = function (htmlTableToSearch)
     // label
     var label = document.createElement("label");
     label.setAttribute("for", input.id);
-    label.appendChild(document.createTextNode("Search" + ": "));
+    label.appendChild(document.createTextNode(dwv.i18n("basics.search") + ": "));
     // form
     var form = document.createElement("form");
     form.setAttribute("class", "filter");
@@ -9576,6 +9593,50 @@ dwv.html.removeNode = function (node) {
 dwv.html.removeNodes = function (nodes) {
     for ( var i = 0; i < nodes.length; ++i ) {
         dwv.html.removeNode(nodes[i]);
+    }
+};
+
+/**
+ * Translate the content of an HTML row.
+ * @param {Object} row The HTML row to parse.
+ * @param {String} i18nPrefix The i18n prefix to use to find the translation.
+ */
+dwv.html.translateTableRow = function (row, i18nPrefix) {
+    var prefix = (typeof i18nPrefix === "undefined") ? "basics" : i18nPrefix;
+    if (prefix.length !== 0) {
+        prefix += ".";
+    }
+    var cells = row.cells;
+    for (var c = 0; c < cells.length; ++c) {
+        var text = cells[c].firstChild.data;
+        cells[c].firstChild.data = dwv.i18n( prefix + text );
+    }
+};
+
+/**
+ * Translate the content of an HTML column.
+ * @param {Object} table The HTML table to parse.
+ * @param {Number} columnNumber The number of the column to translate.
+ * @param {String} i18nPrefix The i18n prefix to use to find the translation.
+ * @param {String} i18nSuffix The i18n suffix to use to find the translation.
+ */
+dwv.html.translateTableColumn = function (table, columnNumber, i18nPrefix, i18nSuffix) {
+    var prefix = (typeof i18nPrefix === "undefined") ? "basics" : i18nPrefix;
+    if (prefix.length !== 0) {
+        prefix += ".";
+    }
+    var suffix = (typeof i18nSuffix === "undefined") ? "" : i18nSuffix;
+    if (suffix.length !== 0) {
+        suffix = "." + suffix;
+    }
+    if (table.rows.length !== 0) {
+        for (var r = 1; r < table.rows.length; ++r) {
+            var cells = table.rows.item(r).cells;
+            if (cells.length >= columnNumber) {
+                var text = cells[columnNumber].firstChild.data;
+                cells[columnNumber].firstChild.data = dwv.i18n( prefix + text + suffix );
+            }
+        }
     }
 };
 
