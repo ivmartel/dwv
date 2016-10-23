@@ -14,8 +14,8 @@ dwv.html.appendCell = function (row, content)
     var str = content;
     // special care for arrays
     if ( content instanceof Array ||
-            content instanceof Uint8Array ||
-            content instanceof Uint16Array ||
+            content instanceof Uint8Array || content instanceof Int8Array ||
+            content instanceof Uint16Array || content instanceof Int16Array ||
             content instanceof Uint32Array ) {
         if ( content.length > 10 ) {
             content = Array.prototype.slice.call( content, 0, 10 );
@@ -35,21 +35,17 @@ dwv.html.appendCell = function (row, content)
 dwv.html.appendHCell = function (row, text)
 {
     var cell = document.createElement("th");
-    // TODO jquery-mobile specific...
-    if ( text !== dwv.i18n("basics.value") && text !== dwv.i18n("basics.name") ) {
-        cell.setAttribute("data-priority", "1");
-    }
     cell.appendChild(document.createTextNode(text));
     row.appendChild(cell);
 };
 
 /**
  * Append a row to an array.
- * @param {} table
- * @param {} input
- * @param {} level
- * @param {} maxLevel
- * @param {} rowHeader
+ * @param {Object} table The HTML table to append a row to.
+ * @param {Array} input The input row array.
+ * @param {Number} level The depth level of the input array.
+ * @param {Number} maxLevel The maximum depth level.
+ * @param {String} rowHeader The content of the first cell of a row (mainly for objects).
  */
 dwv.html.appendRowForArray = function (table, input, level, maxLevel, rowHeader)
 {
@@ -77,11 +73,11 @@ dwv.html.appendRowForArray = function (table, input, level, maxLevel, rowHeader)
 
 /**
  * Append a row to an object.
- * @param {} table
- * @param {} input
- * @param {} level
- * @param {} maxLevel
- * @param {} rowHeader
+ * @param {Object} table The HTML table to append a row to.
+ * @param {Array} input The input row array.
+ * @param {Number} level The depth level of the input array.
+ * @param {Number} maxLevel The maximum depth level.
+ * @param {String} rowHeader The content of the first cell of a row (mainly for objects).
  */
 dwv.html.appendRowForObject = function (table, input, level, maxLevel, rowHeader)
 {
@@ -115,7 +111,7 @@ dwv.html.appendRowForObject = function (table, input, level, maxLevel, rowHeader
         var header = table.createTHead();
         var th = header.insertRow(-1);
         if ( rowHeader ) {
-            dwv.html.appendHCell(th, "name");
+            dwv.html.appendHCell(th, "");
         }
         for ( var k=0; k<keys.length; ++k ) {
             dwv.html.appendHCell(th, keys[k]);
@@ -125,11 +121,11 @@ dwv.html.appendRowForObject = function (table, input, level, maxLevel, rowHeader
 
 /**
  * Append a row to an object or an array.
- * @param {} table
- * @param {} input
- * @param {} level
- * @param {} maxLevel
- * @param {} rowHeader
+ * @param {Object} table The HTML table to append a row to.
+ * @param {Array} input The input row array.
+ * @param {Number} level The depth level of the input array.
+ * @param {Number} maxLevel The maximum depth level.
+ * @param {String} rowHeader The content of the first cell of a row (mainly for objects).
  */
 dwv.html.appendRow = function (table, input, level, maxLevel, rowHeader)
 {
@@ -155,7 +151,13 @@ dwv.html.appendRow = function (table, input, level, maxLevel, rowHeader)
 dwv.html.toTable = function (input)
 {
     var table = document.createElement('table');
-    dwv.html.appendRow(table, input, 0, 2);
+    if (input.length === 0) {
+        var row = table.insertRow(-1);
+        dwv.html.appendCell(row, "No content to show!");
+    }
+    else {
+        dwv.html.appendRow(table, input, 0, 2);
+    }
     return table;
 };
 
@@ -166,14 +168,27 @@ dwv.html.toTable = function (input)
  */
 dwv.html.getHtmlSearchForm = function (htmlTableToSearch)
 {
-    var form = document.createElement("form");
-    form.setAttribute("class", "filter");
+    // input
     var input = document.createElement("input");
+    input.id = "table-search";
+    // TODO Use new html5 search type
+    //input.setAttribute("type", "search");
     input.onkeyup = function () {
         dwv.html.filterTable(input, htmlTableToSearch);
     };
+    // label
+    var label = document.createElement("label");
+    label.setAttribute("for", input.id);
+    label.appendChild(document.createTextNode(dwv.i18n("basics.search") + ": "));
+    // form
+    var form = document.createElement("form");
+    form.setAttribute("class", "filter");
+    form.onsubmit = function (event) {
+        event.preventDefault();
+    };
+    form.appendChild(label);
     form.appendChild(input);
-
+    // return
     return form;
 };
 
@@ -316,11 +331,119 @@ dwv.html.removeNode = function (node) {
     top.removeChild(node);
 };
 
+/**
+ *
+ */
 dwv.html.removeNodes = function (nodes) {
     for ( var i = 0; i < nodes.length; ++i ) {
         dwv.html.removeNode(nodes[i]);
     }
 };
+
+/**
+ * Translate the content of an HTML row.
+ * @param {Object} row The HTML row to parse.
+ * @param {String} i18nPrefix The i18n prefix to use to find the translation.
+ */
+dwv.html.translateTableRow = function (row, i18nPrefix) {
+    var prefix = (typeof i18nPrefix === "undefined") ? "basics" : i18nPrefix;
+    if (prefix.length !== 0) {
+        prefix += ".";
+    }
+    var cells = row.cells;
+    for (var c = 0; c < cells.length; ++c) {
+        var text = cells[c].firstChild.data;
+        cells[c].firstChild.data = dwv.i18n( prefix + text );
+    }
+};
+
+/**
+ * Translate the content of an HTML column.
+ * @param {Object} table The HTML table to parse.
+ * @param {Number} columnNumber The number of the column to translate.
+ * @param {String} i18nPrefix The i18n prefix to use to find the translation.
+ * @param {String} i18nSuffix The i18n suffix to use to find the translation.
+ */
+dwv.html.translateTableColumn = function (table, columnNumber, i18nPrefix, i18nSuffix) {
+    var prefix = (typeof i18nPrefix === "undefined") ? "basics" : i18nPrefix;
+    if (prefix.length !== 0) {
+        prefix += ".";
+    }
+    var suffix = (typeof i18nSuffix === "undefined") ? "" : i18nSuffix;
+    if (suffix.length !== 0) {
+        suffix = "." + suffix;
+    }
+    if (table.rows.length !== 0) {
+        for (var r = 1; r < table.rows.length; ++r) {
+            var cells = table.rows.item(r).cells;
+            if (cells.length >= columnNumber) {
+                var text = cells[columnNumber].firstChild.data;
+                cells[columnNumber].firstChild.data = dwv.i18n( prefix + text + suffix );
+            }
+        }
+    }
+};
+
+/**
+ * Make a HTML table cell editable by putting its content inside an input element.
+ * @param {Object} cell The cell to make editable.
+ * @param {Function} onchange The callback to call when cell's content is changed.
+ *    if set to null, the HTML input will be disabled.
+ * @param {String} inputType The type of the HTML input, default to 'text'.
+ */
+dwv.html.makeCellEditable = function (cell, onchange, inputType) {
+    // check event
+    if (typeof cell === "undefined" ) {
+        console.warn("Cannot create input for non existing cell.");
+        return;
+    }
+    // HTML input
+    var input = document.createElement("input");
+    // handle change
+    if (onchange) {
+        input.onchange = onchange;
+    }
+    else {
+        input.disabled = true;
+    }
+    // set input value
+    input.value = cell.firstChild.data;
+    // input type
+    if (typeof inputType === "undefined" ||
+        (inputType === "color" && !dwv.browser.hasInputColor() ) ) {
+        input.type = "text";
+    }
+    else {
+        input.type = inputType;
+    }
+
+    // clean cell
+    dwv.html.cleanNode(cell);
+
+    // HTML form
+    var form = document.createElement("form");
+    form.onsubmit = function (event) {
+        event.preventDefault();
+    };
+    form.appendChild(input);
+    // add form to cell
+    cell.appendChild(form);
+};
+
+/**
+ * Set the document cursor to 'pointer'.
+ */
+dwv.html.setCursorToPointer = function () {
+    document.body.style.cursor = 'pointer';
+};
+
+/**
+ * Set the document cursor to 'default'.
+ */
+dwv.html.setCursorToDefault = function () {
+    document.body.style.cursor = 'default';
+};
+
 
 /**
  * Create a HTML select from an input array of options.

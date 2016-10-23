@@ -69,6 +69,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
             name: "text"
         });
         ktext.textExpr = "{angle}";
+        ktext.longText = "";
         ktext.quant = quant;
         ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
 

@@ -7,10 +7,16 @@ var Kinetic = Kinetic || {};
 
 /**
  * Draw group command.
+ * @param {Object} group The group draw.
+ * @param {String} name The name of the shape.
+ * @param {Object} layer The layer where to draw the group.
+ * @param {Object} silent Whether to send a creation event or not.
  * @constructor
  */
-dwv.tool.DrawGroupCommand = function (group, name, layer)
+dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
 {
+    var isSilent = (typeof silent === "undefined") ? false : true;
+
     /**
      * Get the command name.
      * @return {String} The command name.
@@ -25,7 +31,9 @@ dwv.tool.DrawGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onExecute({'type': 'draw-create', 'id': group.id()});
+        if (!isSilent) {
+            this.onExecute({'type': 'draw-create', 'id': group.id()});
+        }
     };
     /**
      * Undo the command.
@@ -59,6 +67,10 @@ dwv.tool.DrawGroupCommand.prototype.onUndo = function (/*event*/)
 
 /**
  * Move group command.
+ * @param {Object} group The group draw.
+ * @param {String} name The name of the shape.
+ * @param {Object} translation A 2D translation to move the group by.
+ * @param {Object} layer The layer where to move the group.
  * @constructor
  */
 dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
@@ -118,6 +130,12 @@ dwv.tool.MoveGroupCommand.prototype.onUndo = function (/*event*/)
 
 /**
  * Change group command.
+ * @param {String} name The name of the shape.
+ * @param {Object} func The change function.
+ * @param {Object} startAnchor The anchor that starts the change.
+ * @param {Object} endAnchor The anchor that ends the change.
+ * @param {Object} layer The layer where to change the group.
+ * @param {Object} image The associated image.
  * @constructor
  */
 dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, layer, image)
@@ -171,6 +189,9 @@ dwv.tool.ChangeGroupCommand.prototype.onUndo = function (/*event*/)
 
 /**
  * Delete group command.
+ * @param {Object} group The group draw.
+ * @param {String} name The name of the shape.
+ * @param {Object} layer The layer where to delete the group.
  * @constructor
  */
 dwv.tool.DeleteGroupCommand = function (group, name, layer)
@@ -315,7 +336,16 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     trash.add(trashLine1);
     trash.add(trashLine2);
 
-    // listeners
+    /**
+     * Drawing style.
+     * @type Style
+     */
+    this.style = new dwv.html.Style();
+
+    /**
+     * Event listeners.
+     * @private
+     */
     var listeners = {};
 
     /**
@@ -397,7 +427,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 shapeGroup.destroy();
             }
             // create shape group
-            shapeGroup = factory.create(points, app.getStyle(), app.getImage());
+            shapeGroup = factory.create(points, self.style, app.getImage());
             // do not listen during creation
             var shape = shapeGroup.getChildren( function (node) {
                 return node.name() === 'shape';
@@ -405,7 +435,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             shape.listening(false);
             drawLayer.hitGraphEnabled(false);
             // draw shape command
-            command = new dwv.tool.DrawGroupCommand(shapeGroup, self.shapeName, drawLayer);
+            command = new dwv.tool.DrawGroupCommand(shapeGroup, self.shapeName, drawLayer, true);
             // draw
             command.execute();
         }
@@ -424,7 +454,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             }
             // create final shape
             var factory = new self.shapeFactoryList[self.shapeName]();
-            var group = factory.create(points, app.getStyle(), app.getImage());
+            var group = factory.create(points, self.style, app.getImage());
             group.id( dwv.math.guid() );
             // re-activate layer
             drawLayer.hitGraphEnabled(true);
@@ -631,14 +661,16 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             cmdName = "ellipse";
         }
 
-        // shape colour
-        var colour = shape.stroke();
+        // store original colour
+        var colour = null;
 
         // drag start event handling
         shape.on('dragstart', function (event) {
             // save start position
             var offset = dwv.html.getEventOffset( event.evt )[0];
             dragStartPos = getRealPosition( offset );
+            // colour
+            colour = shape.stroke();
             // display trash
             var stage = app.getDrawStage();
             var scale = stage.scale();
@@ -694,6 +726,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         shape.on('dragend', function (/*event*/) {
             var pos = dragLastPos;
             dragLastPos = null;
+            // remove trash
+            trash.remove();
             // delete case
             if ( Math.abs( pos.x - trash.x() ) < 10 &&
                     Math.abs( pos.y - trash.y() ) < 10   ) {
@@ -705,8 +739,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                     shape.x( shape.x() - delTranslation.x );
                     shape.y( shape.y() - delTranslation.y );
                 });
-                // restore colour
-                shape.stroke(colour);
                 // disable editor
                 shapeEditor.disable();
                 shapeEditor.setShape(null);
@@ -735,8 +767,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 shapeEditor.setAnchorsActive(true);
                 shapeEditor.resetAnchors();
             }
-            // remove trash
-            trash.remove();
             // draw
             drawLayer.draw();
         });
@@ -753,15 +783,21 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             var ktext = labels[0].getText();
 
             // ask user for new label
-            var labelText = dwv.gui.prompt("Add label", ktext.textExpr);
+            var labelText = dwv.gui.prompt("Shape label", ktext.textExpr);
 
             // if press cancel do nothing
             if (labelText === null) {
-                return false;
+                return;
+            }
+            else if (labelText === ktext.textExpr) {
+                return;
             }
             // update text expression and set text
             ktext.textExpr = labelText;
             ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+
+            // trigger event
+            fireEvent({'type': 'draw-change'});
 
             // draw
             drawLayer.draw();
@@ -781,8 +817,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         this.setShapeName(shapeName);
         // init gui
         if ( gui ) {
+            // init with the app window scale
+            this.style.setScale(app.getWindowScale());
             // same for colour
-            this.setLineColour(gui.getColours()[0]);
+            this.setLineColour(this.style.getLineColour());
             // init html
             gui.initialise();
         }
@@ -826,7 +864,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      */
     this.setLineColour = function (colour)
     {
-        app.getStyle().setLineColour(colour);
+        this.style.setLineColour(colour);
     };
 
     // Private Methods -----------------------------------------------------------

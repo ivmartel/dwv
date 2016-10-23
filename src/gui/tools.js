@@ -139,7 +139,7 @@ dwv.gui.base.WindowLevel = function (app)
     this.initialise = function ()
     {
         // create new preset select
-        var wlSelector = dwv.html.createHtmlSelect("presetSelect", 
+        var wlSelector = dwv.html.createHtmlSelect("presetSelect",
             app.getViewController().getPresets(), "wl.presets", true);
         wlSelector.onchange = app.onChangeWindowLevelPreset;
         wlSelector.title = "Select w/l preset.";
@@ -178,9 +178,16 @@ dwv.gui.base.Draw = function (app)
        "Yellow", "Red", "White", "Green", "Blue", "Lime", "Fuchsia", "Black"
     ];
     /**
-     * Get the available colours.
+     * Get the default colour.
      */
-    this.getColours = function () { return colours; };
+    this.getDefaultColour = function () {
+        if ( dwv.browser.hasInputColor() ) {
+            return "#FFFF80";
+        }
+        else {
+            return colours[0];
+        }
+    };
 
     /**
      * Setup the tool HTML.
@@ -191,7 +198,16 @@ dwv.gui.base.Draw = function (app)
         var shapeSelector = dwv.html.createHtmlSelect("shapeSelect", shapeList, "shape");
         shapeSelector.onchange = app.onChangeShape;
         // colour select
-        var colourSelector = dwv.html.createHtmlSelect("colourSelect", colours, "colour");
+        var colourSelector = null;
+        if ( dwv.browser.hasInputColor() ) {
+            colourSelector = document.createElement("input");
+            colourSelector.className = "colourSelect";
+            colourSelector.type = "color";
+            colourSelector.value = "#FFFF80";
+        }
+        else {
+            colourSelector = dwv.html.createHtmlSelect("colourSelect", colours, "colour");
+        }
         colourSelector.onchange = app.onChangeLineColour;
 
         // shape list element
@@ -244,7 +260,9 @@ dwv.gui.base.Draw = function (app)
 
         // colour select: reset selected option
         var colourSelector = app.getElement("colourSelect");
-        colourSelector.selectedIndex = 0;
+        if ( !dwv.browser.hasInputColor() ) {
+            colourSelector.selectedIndex = 0;
+        }
         // refresh
         dwv.gui.refreshElement(colourSelector);
     };
@@ -252,19 +270,31 @@ dwv.gui.base.Draw = function (app)
 }; // class dwv.gui.base.Draw
 
 /**
- * Livewire tool base gui.
+ * Base gui for a tool with a colour setting.
  * @constructor
  */
-dwv.gui.base.Livewire = function (app)
+dwv.gui.base.ColourTool = function (app, prefix)
 {
     // default colours
     var colours = [
        "Yellow", "Red", "White", "Green", "Blue", "Lime", "Fuchsia", "Black"
     ];
+    // colour selector class
+    var colourSelectClassName = prefix + "ColourSelect";
+    // colour selector class
+    var colourLiClassName = prefix + "ColourLi";
+
     /**
-     * Get the available colours.
+     * Get the default colour.
      */
-    this.getColours = function () { return colours; };
+    this.getDefaultColour = function () {
+        if ( dwv.browser.hasInputColor() ) {
+            return "#FFFF80";
+        }
+        else {
+            return colours[0];
+        }
+    };
 
     /**
      * Setup the tool HTML.
@@ -272,12 +302,21 @@ dwv.gui.base.Livewire = function (app)
     this.setup = function ()
     {
         // colour select
-        var colourSelector = dwv.html.createHtmlSelect("lwColourSelect", colours, "colour");
+        var colourSelector = null;
+        if ( dwv.browser.hasInputColor() ) {
+            colourSelector = document.createElement("input");
+            colourSelector.className = colourSelectClassName;
+            colourSelector.type = "color";
+            colourSelector.value = "#FFFF80";
+        }
+        else {
+            colourSelector = dwv.html.createHtmlSelect(colourSelectClassName, colours, "colour");
+        }
         colourSelector.onchange = app.onChangeLineColour;
 
         // colour list element
         var colourLi = document.createElement("li");
-        colourLi.className = "lwColourLi ui-block-b";
+        colourLi.className = colourLiClassName + " ui-block-b";
         colourLi.style.display = "none";
         //colourLi.setAttribute("class","ui-block-b");
         colourLi.appendChild(colourSelector);
@@ -297,7 +336,7 @@ dwv.gui.base.Livewire = function (app)
     this.display = function (bool)
     {
         // colour list
-        var node = app.getElement("lwColourLi");
+        var node = app.getElement(colourLiClassName);
         dwv.html.displayElement(node, bool);
     };
 
@@ -306,12 +345,14 @@ dwv.gui.base.Livewire = function (app)
      */
     this.initialise = function ()
     {
-        var colourSelector = app.getElement("lwColourSelect");
-        colourSelector.selectedIndex = 0;
+        var colourSelector = app.getElement(colourSelectClassName);
+        if ( !dwv.browser.hasInputColor() ) {
+            colourSelector.selectedIndex = 0;
+        }
         dwv.gui.refreshElement(colourSelector);
     };
 
-}; // class dwv.gui.base.Livewire
+}; // class dwv.gui.base.ColourTool
 
 /**
  * ZoomAndPan tool base gui.

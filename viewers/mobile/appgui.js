@@ -67,6 +67,11 @@ dwv.gui.displayProgress = function (percent) {
         $.mobile.loading("hide");
     }
 };
+// Focus
+dwv.gui.focusImage = function ()
+{
+    $.mobile.changePage("#main");
+};
 // get element
 dwv.gui.getElement = dwv.gui.base.getElement;
 // refresh
@@ -80,8 +85,47 @@ dwv.gui.refreshElement = function (element) {
 };
 // Slider
 dwv.gui.Slider = dwv.gui.base.Slider;
-// Tags gui
+// Post process table
+dwv.gui.postProcessTable = function (table)
+{
+    var tableClass = table.className;
+    // css
+    table.className += " table-stripe ui-responsive";
+    // add columntoggle
+    table.setAttribute("data-role", "table");
+    table.setAttribute("data-mode", "columntoggle");
+    table.setAttribute("data-column-btn-text", dwv.i18n("basics.columns") + "...");
+    // add priority columns for columntoggle
+    var addDataPriority = function (cell) {
+        var text = cell.firstChild.data;
+        if ( tableClass === "tagsTable" ) {
+            if ( text !== "value" && text !== "name" ) {
+                cell.setAttribute("data-priority", "5");
+            }
+        }
+        else if ( tableClass === "drawsTable" ) {
+            if ( text === "description" ) {
+                cell.setAttribute("data-priority", "1");
+            }
+            else if ( text === "id" || text === "frame" || text === "slice" ) {
+                cell.setAttribute("data-priority", "5");
+            }
+
+        }
+    };
+    if (table.rows.length !== 0) {
+        var hCells = table.rows.item(0).cells;
+        for (var c = 0; c < hCells.length; ++c) {
+            addDataPriority(hCells[c]);
+        }
+    }
+    // return
+    return table;
+};
+// Tags table
 dwv.gui.DicomTags = dwv.gui.base.DicomTags;
+// DrawList table
+dwv.gui.DrawList = dwv.gui.base.DrawList;
 
 // Loaders
 dwv.gui.Loadbox = dwv.gui.base.Loadbox;
@@ -135,6 +179,10 @@ dwv.gui.Toolbox = function (app)
         tags.href = "#tags_page";
         tags.setAttribute("class", buttonClass + " ui-icon-grid");
 
+        var drawList = document.createElement("a");
+        drawList.href = "#drawList_page";
+        drawList.setAttribute("class", buttonClass + " ui-icon-edit");
+
         var node = app.getElement("toolbar");
         node.appendChild(open);
         node.appendChild(undo);
@@ -142,6 +190,7 @@ dwv.gui.Toolbox = function (app)
         node.appendChild(toggleInfo);
         node.appendChild(toggleSaveState);
         node.appendChild(tags);
+        node.appendChild(drawList);
         dwv.gui.refreshElement(node);
     };
     this.display = function (flag)
@@ -158,8 +207,8 @@ dwv.gui.Toolbox = function (app)
 dwv.gui.WindowLevel = dwv.gui.base.WindowLevel;
 // Draw
 dwv.gui.Draw = dwv.gui.base.Draw;
-// Livewire
-dwv.gui.Livewire = dwv.gui.base.Livewire;
+// ColourTool
+dwv.gui.ColourTool = dwv.gui.base.ColourTool;
 // ZoomAndPan
 dwv.gui.ZoomAndPan = dwv.gui.base.ZoomAndPan;
 // Scroll

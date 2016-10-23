@@ -1,6 +1,6 @@
-/** 
+/**
  * Application GUI.
- * 
+ *
  * Snapshots were created using synedra View Personal (http://www.synedra.com),
  *  version 14 for Microsoft Windows:
  * - Right click on the thumbnail in the left 'Document tree area',
@@ -27,11 +27,6 @@ dwv.gui.displayProgress = function (/*percent*/) {};
 // check browser support
 dwv.browser.check();
 
-// fake translation function used in table creation.
-dwv.i18n = function (text) {
-    return text.substring(text.lastIndexOf('.') + 1, text.length);
-};
-
 // test data line
 dwv.addDataLine = function (id, fileroot, doc)
 {
@@ -57,7 +52,7 @@ dwv.addDataLine = function (id, fileroot, doc)
     var app = new dwv.App();
     app.init(config);
     // display loading time
-    var listener = function (event) { 
+    var listener = function (event) {
         if (event.type === "load-start") {
             console.time("load-data");
         }

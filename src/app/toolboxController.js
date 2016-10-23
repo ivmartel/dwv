@@ -44,11 +44,11 @@ dwv.ToolboxController = function (toolbox)
 
     /**
      * Set the tool line colour.
-     * @param {String} name The name of the colour.
+     * @param {String} colour The colour.
      */
-    this.setLineColour = function (name)
+    this.setLineColour = function (colour)
     {
-        toolbox.getSelectedTool().setLineColour(name);
+        toolbox.getSelectedTool().setLineColour(colour);
     };
 
     /**

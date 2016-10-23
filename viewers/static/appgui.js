@@ -40,6 +40,8 @@ dwv.gui.displayProgress = function (percent) {
         $("#progressbar").progressbar({ value: percent });
     }
 };
+// Focus
+dwv.gui.focusImage = dwv.gui.base.focusImage;
 // get element
 dwv.gui.getElement = dwv.gui.base.getElement;
 // refresh
@@ -79,8 +81,12 @@ function toggle(dialogId)
         $(dialogId).dialog('open');
     }
 }
+// post process table
+dwv.gui.postProcessTable = dwv.gui.base.postProcessTable;
 // Tags table
 dwv.gui.DicomTags = dwv.gui.base.DicomTags;
+// DrawList table
+dwv.gui.DrawList = dwv.gui.base.DrawList;
 
 // Loaders
 dwv.gui.Loadbox = dwv.gui.base.Loadbox;
@@ -115,6 +121,10 @@ dwv.gui.Toolbox = function (app)
         tags.appendChild(document.createTextNode(dwv.i18n("basics.dicomTags")));
         tags.onclick = function() { toggle(".tags"); };
 
+        var drawList = document.createElement("button");
+        drawList.appendChild(document.createTextNode(dwv.i18n("basics.drawList")));
+        drawList.onclick = function() { toggle(".drawList"); };
+
         var image = document.createElement("button");
         image.appendChild(document.createTextNode(dwv.i18n("basics.image")));
         image.onclick = function() { toggle(".layerDialog"); };
@@ -132,6 +142,7 @@ dwv.gui.Toolbox = function (app)
         node.appendChild(toolbox);
         node.appendChild(history);
         node.appendChild(tags);
+        node.appendChild(drawList);
         node.appendChild(image);
         node.appendChild(info);
         node.appendChild(help);
@@ -166,8 +177,8 @@ dwv.gui.Toolbox = function (app)
 dwv.gui.WindowLevel = dwv.gui.base.WindowLevel;
 // Draw
 dwv.gui.Draw = dwv.gui.base.Draw;
-// Livewire
-dwv.gui.Livewire = dwv.gui.base.Livewire;
+// ColourTool
+dwv.gui.ColourTool = dwv.gui.base.ColourTool;
 // ZoomAndPan
 dwv.gui.ZoomAndPan = dwv.gui.base.ZoomAndPan;
 // Scroll
@@ -211,6 +222,11 @@ dwv.gui.setup = function () {
     $(".tags").dialog({ position:
         {my: "right top", at: "right top", of: "#pageMain"},
         autoOpen: false, width: 500, height: 590,
+        appendTo: "#dwv"
+    });
+    $(".drawList").dialog({ position:
+        {my: "right top", at: "right top", of: "#pageMain"},
+        autoOpen: false, width: 500, height: 250,
         appendTo: "#dwv"
     });
     $(".help").dialog({ position:

@@ -45,6 +45,8 @@ dwv.tool.Livewire = function(app)
      * @type Style
      */
     this.style = new dwv.html.Style();
+    // init with the app window scale
+    this.style.setScale(app.getWindowScale());
 
     /**
      * Path storage. Paths are stored in reverse order.
@@ -70,6 +72,12 @@ dwv.tool.Livewire = function(app)
      * @type Number
      */
     var tolerance = 5;
+
+    /**
+     * Event listeners.
+     * @private
+     */
+    var listeners = [];
 
     /**
      * Clear the parent points list.
@@ -124,6 +132,10 @@ dwv.tool.Livewire = function(app)
             if( (Math.abs(event._x - self.x0) < tolerance) && (Math.abs(event._y - self.y0) < tolerance) ) {
                 // draw
                 self.mousemove(event);
+                // listen
+                command.onExecute = fireEvent;
+                command.onUndo = fireEvent;
+                // debug
                 console.log("Done.");
                 // save command in undo stack
                 app.addToUndoStack(command);
@@ -201,6 +213,7 @@ dwv.tool.Livewire = function(app)
         // create shape
         var factory = new dwv.tool.RoiFactory();
         shapeGroup = factory.create(currentPath.pointArray, self.style);
+        shapeGroup.id( dwv.math.guid() );
         // draw shape command
         command = new dwv.tool.DrawGroupCommand(shapeGroup, "livewire", app.getDrawLayer());
         // draw
@@ -276,7 +289,7 @@ dwv.tool.Livewire = function(app)
      */
     this.setup = function ()
     {
-        gui = new dwv.gui.Livewire(app);
+        gui = new dwv.gui.ColourTool(app, "lw");
         gui.setup();
     };
 
@@ -305,14 +318,53 @@ dwv.tool.Livewire = function(app)
     this.init = function()
     {
         if ( gui ) {
+            // init with the app window scale
+            this.style.setScale(app.getWindowScale());
             // set the default to the first in the list
-            this.setLineColour(gui.getColours()[0]);
+            this.setLineColour(this.style.getLineColour());
             // init html
             gui.initialise();
         }
 
         return true;
     };
+
+    /**
+     * Add an event listener on the app.
+     * @param {Object} listener The method associated with the provided event type.
+     */
+    this.addEventListener = function (listener)
+    {
+        listeners.push(listener);
+    };
+
+    /**
+     * Remove an event listener from the app.
+     * @param {Object} listener The method associated with the provided event type.
+     */
+    this.removeEventListener = function (listener)
+    {
+        for ( var i = 0; i < listeners.length; ++i )
+        {
+            if ( listeners[i] === listener ) {
+                listeners.splice(i,1);
+            }
+        }
+    };
+
+    // Private Methods -----------------------------------------------------------
+
+    /**
+     * Fire an event: call all associated listeners.
+     * @param {Object} event The event to fire.
+     */
+    function fireEvent (event)
+    {
+        for ( var i=0; i < listeners.length; ++i )
+        {
+            listeners[i](event);
+        }
+    }
 
 }; // Livewire class
 

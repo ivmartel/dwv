@@ -120,6 +120,12 @@ dwv.tool.Floodfill = function(app)
     this.style = new dwv.html.Style();
 
     /**
+     * Event listeners.
+     * @private
+     */
+    var listeners = [];
+
+    /**
      * Set extend option for painting border on all slices.
      * @param {Boolean} The option to set
      */
@@ -190,10 +196,16 @@ dwv.tool.Floodfill = function(app)
         if(border){
             var factory = new dwv.tool.RoiFactory();
             shapeGroup = factory.create(border, self.style);
+            shapeGroup.id( dwv.math.guid() );
             // draw shape command
             command = new dwv.tool.DrawGroupCommand(shapeGroup, "floodfill", app.getDrawLayer());
+            command.onExecute = fireEvent;
+            command.onUndo = fireEvent;
             // // draw
             command.execute();
+            // save it in undo stack
+            app.addToUndoStack(command);
+
             return true;
         }
         else{
@@ -243,12 +255,12 @@ dwv.tool.Floodfill = function(app)
     this.modifyThreshold = function(modifyThreshold){
         // remove previous draw
         clearTimeout(painterTimeout);
-        painterTimeout = setTimeout(function(){
-                                        if ( shapeGroup && self.started) {
-                                            shapeGroup.destroy();
-                                        }
-                                        paintBorder(initialpoint,  modifyThreshold);
-                                    },100);
+        painterTimeout = setTimeout( function () {
+            if ( shapeGroup && self.started) {
+                shapeGroup.destroy();
+            }
+            paintBorder(initialpoint, modifyThreshold);
+        }, 100);
     };
 
     /**
@@ -338,7 +350,7 @@ dwv.tool.Floodfill = function(app)
      */
     this.setup = function ()
     {
-        gui = new dwv.gui.Livewire(app);
+        gui = new dwv.gui.ColourTool(app, "ff");
         gui.setup();
     };
 
@@ -360,14 +372,54 @@ dwv.tool.Floodfill = function(app)
     this.init = function()
     {
         if ( gui ) {
+            // init with the app window scale
+            this.style.setScale(app.getWindowScale());
             // set the default to the first in the list
-            this.setLineColour(gui.getColours()[0]);
+            this.setLineColour(this.style.getLineColour());
             // init html
             gui.initialise();
         }
 
         return true;
     };
+
+    /**
+     * Add an event listener on the app.
+     * @param {Object} listener The method associated with the provided event type.
+     */
+    this.addEventListener = function (listener)
+    {
+        listeners.push(listener);
+    };
+
+    /**
+     * Remove an event listener from the app.
+     * @param {Object} listener The method associated with the provided event type.
+     */
+    this.removeEventListener = function (listener)
+    {
+        for ( var i = 0; i < listeners.length; ++i )
+        {
+            if ( listeners[i] === listener ) {
+                listeners.splice(i,1);
+            }
+        }
+    };
+
+    // Private Methods -----------------------------------------------------------
+
+    /**
+     * Fire an event: call all associated listeners.
+     * @param {Object} event The event to fire.
+     */
+    function fireEvent (event)
+    {
+        for ( var i=0; i < listeners.length; ++i )
+        {
+            listeners[i](event);
+        }
+    }
+
 }; // Floodfill class
 
 /**

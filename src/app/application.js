@@ -60,6 +60,8 @@ dwv.App = function ()
     // Dicom tags gui
     var tagsGui = null;
 
+    var drawListGui = null;
+
     // Image layer
     var imageLayer = null;
     // Draw layers
@@ -127,6 +129,12 @@ dwv.App = function ()
      * @return {Number} The main scale.
      */
     this.getScale = function () { return scale / windowScale; };
+
+    /**
+     * Get the window scale.
+     * @return {Number} The window scale.
+     */
+    this.getWindowScale = function () { return windowScale; };
 
     /**
      * Get the scale center.
@@ -248,6 +256,9 @@ dwv.App = function ()
                     var toolClass = toolName;
                     if (typeof dwv.tool[toolClass] !== "undefined") {
                         toolList[toolClass] = new dwv.tool[toolClass](this);
+                        if (typeof toolList[toolClass].addEventListener !== "undefined") {
+                            toolList[toolClass].addEventListener(fireEvent);
+                        }
                     }
                     else {
                         console.warn("Could not initialise unknown tool: "+toolName);
@@ -293,6 +304,14 @@ dwv.App = function ()
             // DICOM Tags
             if ( config.gui.indexOf("tags") !== -1 ) {
                 tagsGui = new dwv.gui.DicomTags(this);
+            }
+            // Draw list
+            if ( config.gui.indexOf("drawList") !== -1 ) {
+                drawListGui = new dwv.gui.DrawList(this);
+                // update list on draw events
+                this.addEventListener("draw-create", drawListGui.update);
+                this.addEventListener("draw-change", drawListGui.update);
+                this.addEventListener("draw-delete", drawListGui.update);
             }
             // version number
             if ( config.gui.indexOf("version") !== -1 ) {
@@ -793,6 +812,72 @@ dwv.App = function ()
         var tyy = translation.y + ty / scale;
         translation = {"x": txx, "y": tyy};
         translateLayers();
+    };
+
+    /**
+     * Get a list of drawing details.
+     * @return {Object} A list of draw details including id, slice, frame...
+     */
+    this.getDrawDetailsList = function ()
+    {
+        var list = [];
+        var size = image.getGeometry().getSize();
+        for ( var z = 0; z < size.getNumberOfSlices(); ++z ) {
+
+            for ( var f = 0; f < image.getNumberOfFrames(); ++f ) {
+
+                var collec = this.getDrawLayer(z,f).getChildren();
+                for ( var i = 0; i < collec.length; ++i ) {
+                    var shape = collec[i].getChildren()[0];
+                    var label = collec[i].getChildren()[1];
+                    var text = label.getChildren()[0];
+                    var type = shape.className;
+                    if (type === "Line" && shape.closed()) {
+                        type = "Roi";
+                    }
+                    if (type === "Rect") {
+                        type = "Rectangle";
+                    }
+                    list.push( {
+                        "id": collec[i].id(),
+                        //"id": i,
+                        "slice": z,
+                        "frame": f,
+                        "type": type,
+                        "color": shape.stroke(),
+                        "label": text.textExpr,
+                        "description": text.longText
+                    });
+                }
+            }
+        }
+        // return
+        return list;
+    };
+
+    /**
+     * Update a drawing.
+     * @param {Object} drawDetails Details of the drawing to update.
+     */
+    this.updateDraw = function (drawDetails)
+    {
+        var layer = this.getDrawLayer(drawDetails.slice, drawDetails.frame);
+        //var collec = layer.getChildren()[drawDetails.id];
+        var collec = layer.getChildren( function (node) {
+            return node.id() === drawDetails.id;
+        })[0];
+        // shape
+        var shape = collec.getChildren()[0];
+        shape.stroke(drawDetails.color);
+        // label
+        var label = collec.getChildren()[1];
+        var text = label.getChildren()[0];
+        text.fill(drawDetails.color);
+        text.textExpr = drawDetails.label;
+        text.longText = drawDetails.description;
+        text.setText(dwv.utils.replaceFlags(text.textExpr, text.quant));
+        // udpate layer
+        this.getDrawLayer().draw();
     };
 
     // Handler Methods -----------------------------------------------------------
@@ -1434,7 +1519,7 @@ dwv.App = function ()
         viewController = new dwv.ViewController(view);
         // append the DICOM tags table
         if ( tagsGui ) {
-            tagsGui.initialise(data.info);
+            tagsGui.update(data.info);
         }
         // store image
         originalImage = view.getImage();
