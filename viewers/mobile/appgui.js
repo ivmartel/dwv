@@ -99,7 +99,7 @@ dwv.gui.postProcessTable = function (table)
     var addDataPriority = function (cell) {
         var text = cell.firstChild.data;
         if ( tableClass === "tagsTable" ) {
-            if ( text !== dwv.i18n("basics.value") && text !== dwv.i18n("basics.name") ) {
+            if ( text !== "value" && text !== "name" ) {
                 cell.setAttribute("data-priority", "5");
             }
         }
