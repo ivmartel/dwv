@@ -204,6 +204,11 @@ dwv.gui.base.DicomTags = function (app)
         // optional gui specific table post process
         dwv.gui.postProcessTable(table);
 
+        // translate first row
+        if (table.rows.length !== 0) {
+            dwv.html.translateTableRow(table.rows.item(0));
+        }
+
         // append search form
         node.appendChild(dwv.html.getHtmlSearchForm(table));
         // append tags table
@@ -253,6 +258,14 @@ dwv.gui.base.DrawList = function (app)
 
         // optional gui specific table post process
         dwv.gui.postProcessTable(table);
+
+        // translate first row
+        if (table.rows.length !== 0) {
+            dwv.html.translateTableRow(table.rows.item(0));
+        }
+
+        // translate shape names
+        dwv.html.translateTableColumn(table, 3, "shape", "name");
 
         // do not go there if just one row...
         if ( table.rows.length > 0 ) {
@@ -343,7 +356,7 @@ dwv.gui.base.DrawList = function (app)
             var tickLabel = document.createElement("label");
             tickLabel.setAttribute( "for", tickBox.id );
             tickLabel.setAttribute( "class", "inline" );
-            tickLabel.appendChild(document.createTextNode("Edit mode"));
+            tickLabel.appendChild( document.createTextNode( dwv.i18n("basics.editMode") ) );
             // checkbox div
             var tickDiv = document.createElement("div");
             tickDiv.appendChild(tickLabel);

@@ -171,6 +171,7 @@ dwv.html.getHtmlSearchForm = function (htmlTableToSearch)
     // input
     var input = document.createElement("input");
     input.id = "table-search";
+    // TODO Use new html5 search type
     //input.setAttribute("type", "search");
     input.onkeyup = function () {
         dwv.html.filterTable(input, htmlTableToSearch);
@@ -178,7 +179,7 @@ dwv.html.getHtmlSearchForm = function (htmlTableToSearch)
     // label
     var label = document.createElement("label");
     label.setAttribute("for", input.id);
-    label.appendChild(document.createTextNode("Search" + ": "));
+    label.appendChild(document.createTextNode(dwv.i18n("basics.search") + ": "));
     // form
     var form = document.createElement("form");
     form.setAttribute("class", "filter");
@@ -336,6 +337,50 @@ dwv.html.removeNode = function (node) {
 dwv.html.removeNodes = function (nodes) {
     for ( var i = 0; i < nodes.length; ++i ) {
         dwv.html.removeNode(nodes[i]);
+    }
+};
+
+/**
+ * Translate the content of an HTML row.
+ * @param {Object} row The HTML row to parse.
+ * @param {String} i18nPrefix The i18n prefix to use to find the translation.
+ */
+dwv.html.translateTableRow = function (row, i18nPrefix) {
+    var prefix = (typeof i18nPrefix === "undefined") ? "basics" : i18nPrefix;
+    if (prefix.length !== 0) {
+        prefix += ".";
+    }
+    var cells = row.cells;
+    for (var c = 0; c < cells.length; ++c) {
+        var text = cells[c].firstChild.data;
+        cells[c].firstChild.data = dwv.i18n( prefix + text );
+    }
+};
+
+/**
+ * Translate the content of an HTML column.
+ * @param {Object} table The HTML table to parse.
+ * @param {Number} columnNumber The number of the column to translate.
+ * @param {String} i18nPrefix The i18n prefix to use to find the translation.
+ * @param {String} i18nSuffix The i18n suffix to use to find the translation.
+ */
+dwv.html.translateTableColumn = function (table, columnNumber, i18nPrefix, i18nSuffix) {
+    var prefix = (typeof i18nPrefix === "undefined") ? "basics" : i18nPrefix;
+    if (prefix.length !== 0) {
+        prefix += ".";
+    }
+    var suffix = (typeof i18nSuffix === "undefined") ? "" : i18nSuffix;
+    if (suffix.length !== 0) {
+        suffix = "." + suffix;
+    }
+    if (table.rows.length !== 0) {
+        for (var r = 1; r < table.rows.length; ++r) {
+            var cells = table.rows.item(r).cells;
+            if (cells.length >= columnNumber) {
+                var text = cells[columnNumber].firstChild.data;
+                cells[columnNumber].firstChild.data = dwv.i18n( prefix + text + suffix );
+            }
+        }
     }
 };
 
