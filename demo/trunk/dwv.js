@@ -1645,21 +1645,24 @@ dwv.State = function (app)
                 // getChildren always return, so drawings will have the good size
                 var groups = app.getDrawLayer(k,f).getChildren();
                 var details = [];
-                // remove anchors
                 for ( var i = 0; i < groups.length; ++i ) {
+                    // remove anchors
                     var anchors = groups[i].find(".anchor");
                     for ( var a = 0; a < anchors.length; ++a ) {
                         anchors[a].remove();
                     }
+                    // get text
                     var texts = groups[i].find(".text");
-                    for ( var b = 0; b < texts.length; ++b ) {
-                        details.push({
-                            "id": groups[i].id(),
-                            "textExpr": texts[b].textExpr,
-                            "longText": texts[b].longText,
-                            "quant": texts[b].quant
-                        });
+                    if ( texts.length !== 1 ) {
+                        console.warn("There should not be more than one text per shape.");
                     }
+                    // get details (non Kinetic vars)
+                    details.push({
+                        "id": groups[i].id(),
+                        "textExpr": encodeURIComponent(texts[0].textExpr),
+                        "longText": encodeURIComponent(texts[0].longText),
+                        "quant": texts[0].quant
+                    });
                 }
                 drawings[k].push(groups);
                 drawingsDetails[k].push(details);
@@ -1768,9 +1771,12 @@ dwv.State = function (app)
                     var details = data.drawingsDetails[k][f][i];
                     var label = group.getChildren( isLabel )[0];
                     var text = label.getText();
+                    // store details
                     text.textExpr = details.textExpr;
                     text.longText = details.longText;
                     text.quant = details.quant;
+                    // reset text (it was not encoded)
+                    text.setText(dwv.utils.replaceFlags(text.textExpr, text.quant));
                     // execute
                     cmd.execute();
                     app.addToUndoStack(cmd);
