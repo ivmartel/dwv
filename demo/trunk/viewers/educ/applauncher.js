@@ -51,7 +51,7 @@ function startApp(caseNumber) {
     });
     dwv.gui.appendResetHtml(myapp);
 
-    var rootDir = "/dwv/demo/trunk//viewers/educ/data";
+    var rootDir = "/dwv/demo/trunk/viewers/educ/data";
     if (caseNumber === 0) {
         myapp.loadURLs([
             rootDir+"/case"+caseNumber+"/data-1.dcm",
