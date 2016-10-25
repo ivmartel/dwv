@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>DICOM Web Viewer</title>
+<meta charset="UTF-8">
+<meta name="description" content="DICOM Web Viewer (DWV) simple version">
+<meta name="keywords" content="DICOM,HTML5,JavaScript,medical,imaging,DWV">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<link type="text/css" rel="stylesheet" href="../../css/style.css" />
+<link type="text/css" rel="stylesheet" href="../../ext/jquery-mobile/jquery.mobile-1.4.5.min.css" />
+<style type="text/css" >
+/* Small display */
+/* hide large display items */
+.main .navmenu-div { display: none; }
+
+/* Big display */
+@media (min-width: 60em) {
+    /* hide small display items */
+    .main .navmenu-link{ display: none; }
+    .main .navmenu-panel{ display: none; }
+
+    /* show large display items */
+    .main .navmenu-div {
+        display: block;
+        position: relative;
+        left: 0;
+        float: left;
+        width: 15%;
+    }
+    .main .navmenu-div ul li:first-child{
+        border-top: none;
+    }
+    .main .mainContent {
+        width: 85%;
+        padding-top: 2em;
+        padding-left: 5%;
+        padding-right: 3%;
+        float: right;
+    }
+}
+
+
+.layerContainer { width: 500px; height: 500px; margin: 1em; }
+.layerContainer { display: inline-block; }
+#dwv-0-drawList { display: inline-block; vertical-align: top; margin: 1em; width: 35%; }
+#dwv-1-drawList { display: inline-block; vertical-align: top; margin: 1em; width: 35%; }
+.toolbar { font: 14px arial, sans-serif; margin-left: 1em; }
+.wl-button, .reset-button { margin-right: 5px; }
+/* jquery-mobile strip not visible enough */
+.table-stripe tbody tr:nth-child(odd) td,
+.table-stripe tbody tr:nth-child(odd) th {
+  background-color: #eeeeee; /* non-RGBA fallback  */
+  background-color: rgba(0,0,0,0.1);
+}
+</style>
+<!-- mobile web app -->
+<meta name="mobile-web-app-capable" content="yes" />
+<link rel="shortcut icon" sizes="16x16" href="../../resources/icons/dwv-16.png" />
+<link rel="shortcut icon" sizes="60x60" href="../../resources/icons/dwv-60.png" />
+<link rel="shortcut icon" sizes="128x128" href="../../resources/icons/dwv-128.png" />
+<!-- apple specific -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<link rel="apple-touch-icon" sizes="16x16" href="../../resources/icons/dwv-16.png" />
+<link rel="apple-touch-icon" sizes="60x60" href="../../resources/icons/dwv-60.png" />
+<link rel="apple-touch-icon" sizes="128x128" href="../../resources/icons/dwv-128.png" />
+<!-- Third party -->
+<script type="text/javascript" src="../../ext/jquery/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="../../ext/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
+<script type="text/javascript" src="../../ext/i18next/i18next.min.js"></script>
+<script type="text/javascript" src="../../ext/i18next/i18nextXHRBackend.min.js"></script>
+<script type="text/javascript" src="../../ext/i18next/i18nextBrowserLanguageDetector.min.js"></script>
+<script type="text/javascript" src="../../ext/kinetic/kinetic-v5.1.1-06.10.min.js"></script>
+<!-- decoders -->
+<script type="text/javascript" src="../../ext/pdfjs/jpx.js"></script>
+<script type="text/javascript" src="../../ext/pdfjs/util.js"></script>
+<script type="text/javascript" src="../../ext/pdfjs/arithmetic_decoder.js"></script>
+<script type="text/javascript" src="../../ext/pdfjs/jpg.js"></script>
+<script type="text/javascript" src="../../ext/rii-mango/lossless-min.js"></script>
+<!-- Local -->
+<script type="text/javascript" src="../../dwv-0.17.0-beta.min.js"></script>
+
+<!-- Launch the app -->
+<script type="text/javascript" src="appgui.js"></script>
+<script type="text/javascript" src="applauncher.js"></script>
+</head>
+
+<body>
+
+<!-- Main page -->
+<div data-role="page" class="main" data-theme="b">
+
+
+<div class="navmenu-div">
+<ul data-role="listview">
+    <li><a href="#" data-rel="close" onclick="startApp(0);">Case0</a></li>
+    <li><a href="#" data-rel="close" onclick="startApp(1);">Case1</a></li>
+    <li><a href="#" data-rel="close" onclick="startApp(2);">Case2</a></li>
+</ul>
+</div><!-- /navmenu-div -->
+
+<div data-role="panel" class="navmenu-panel" data-display="overlay" id="nav-panel">
+<ul data-role="listview">
+    <li><a href="#" data-rel="close" onclick="startApp(0);">Case0</a></li>
+    <li><a href="#" data-rel="close" onclick="startApp(1);">Case1</a></li>
+    <li><a href="#" data-rel="close" onclick="startApp(2);">Case2</a></li>
+</ul>
+</div><!-- /navmenu-panel -->
+
+
+<div data-role="header" data-position="fixed">
+    <h1>Nerve Educ</h1>
+    <a href="#nav-panel" data-icon="bars" data-iconpos="notext" class="navmenu-link">Menu</a>
+</div><!-- /header -->
+
+<!-- Main content -->
+<div id="mainContent" data-role="content">
+</div><!-- /content -->
+
+</div><!-- /page -->
+
+</body>
+</html>
