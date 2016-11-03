@@ -12,6 +12,29 @@ var Kinetic = Kinetic || {};
 dwv.State = function (app)
 {
     /**
+     * Remove all Draws from all layers
+     */
+    this.cleanDraws = function(){
+        var delcmd, layer, groups, slice, frame;
+        var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
+        var nFrames = app.getImage().getNumberOfFrames();
+        slice = 0;
+        while (slice < nSlices) {
+            frame = 0;
+            while (frame < nFrames) {
+                layer  = app.getDrawLayer(slice, frame);
+                groups = layer.getChildren();
+                while (groups.length) {
+                    delcmd = new dwv.tool.DeleteGroupCommand(groups[0], (groups[0].getAttr('drawType')).toLowerCase(), layer);
+                    delcmd.execute();
+                    app.addToUndoStack(delcmd);
+                }
+                frame++;
+            }
+            slice++;
+        }
+    }
+    /**
      * Save the application state as JSON.
      */
     this.toJSON = function () {
