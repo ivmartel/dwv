@@ -260,7 +260,16 @@ dwv.tool.Floodfill = function(app)
                 shapeGroup.destroy();
             }
             paintBorder(initialpoint, modifyThreshold);
+            self.onThresholdChange(modifyThreshold);
         }, 100);
+    };
+
+    /**
+     * Event fired when threshold change
+     * @param {Number} Current threshold
+     */
+    this.onThresholdChange = function(value){
+        // Defaults do nothing
     };
 
     /**
@@ -274,6 +283,7 @@ dwv.tool.Floodfill = function(app)
         self.started = true;
         initialpoint = getCoord(event);
         paintBorder(initialpoint, initialthreshold);
+        self.onThresholdChange(initialthreshold);
     };
 
     /**
