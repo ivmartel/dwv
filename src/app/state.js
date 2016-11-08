@@ -13,7 +13,7 @@ dwv.State = function (app)
 {
     /**
      * Remove all Draws from all layers
-     */
+    */
     this.cleanDraws = function(){
         var delcmd, layer, groups, slice, frame;
         var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
@@ -33,7 +33,7 @@ dwv.State = function (app)
             }
             slice++;
         }
-    }
+    };
     /**
      * Save the application state as JSON.
      */
