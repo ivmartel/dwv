@@ -105,36 +105,62 @@ dwv.gui.Toolbox = function (app)
         base.setup(list);
 
         // toolbar
+
+        // open
+        var openSpan = document.createElement("span");
+        openSpan.className = "ui-icon ui-icon-plus";
         var open = document.createElement("button");
-        open.appendChild(document.createTextNode(dwv.i18n("basics.open")));
+        open.appendChild(openSpan);
+        open.title = dwv.i18n("basics.open");
         open.onclick = function() { toggle(".openData"); };
-
+        // toolbox
+        var toolboxSpan = document.createElement("span");
+        toolboxSpan.className = "ui-icon ui-icon-wrench";
         var toolbox = document.createElement("button");
-        toolbox.appendChild(document.createTextNode(dwv.i18n("basics.toolbox")));
+        toolbox.appendChild(toolboxSpan);
+        toolbox.title = dwv.i18n("basics.toolbox");
         toolbox.onclick = function() { toggle(".toolList"); };
-
+        // history
+        var historySpan = document.createElement("span");
+        historySpan.className = "ui-icon ui-icon-clipboard";
         var history = document.createElement("button");
-        history.appendChild(document.createTextNode(dwv.i18n("basics.history")));
+        history.appendChild(historySpan);
+        history.title = dwv.i18n("basics.history");
         history.onclick = function() { toggle(".history"); };
-
+        // DICOM tags
+        var tagsSpan = document.createElement("span");
+        tagsSpan.className = "ui-icon ui-icon-tag";
         var tags = document.createElement("button");
-        tags.appendChild(document.createTextNode(dwv.i18n("basics.dicomTags")));
+        tags.appendChild(tagsSpan);
+        tags.title = dwv.i18n("basics.dicomTags");
         tags.onclick = function() { toggle(".tags"); };
-
+        // draw list
+        var drawListSpan = document.createElement("span");
+        drawListSpan.className = "ui-icon ui-icon-pencil";
         var drawList = document.createElement("button");
-        drawList.appendChild(document.createTextNode(dwv.i18n("basics.drawList")));
+        drawList.appendChild(drawListSpan);
+        drawList.title = dwv.i18n("basics.drawList");
         drawList.onclick = function() { toggle(".drawList"); };
-
+        // image
+        var imageSpan = document.createElement("span");
+        imageSpan.className = "ui-icon ui-icon-image";
         var image = document.createElement("button");
-        image.appendChild(document.createTextNode(dwv.i18n("basics.image")));
+        image.appendChild(imageSpan);
+        image.title = dwv.i18n("basics.image");
         image.onclick = function() { toggle(".layerDialog"); };
-
+        // info
+        var infoSpan = document.createElement("span");
+        infoSpan.className = "ui-icon ui-icon-info";
         var info = document.createElement("button");
-        info.appendChild(document.createTextNode(dwv.i18n("basics.info")));
+        info.appendChild(infoSpan);
+        info.title = dwv.i18n("basics.info");
         info.onclick = app.onToggleInfoLayer;
-
+        // help
+        var helpSpan = document.createElement("span");
+        helpSpan.className = "ui-icon ui-icon-help";
         var help = document.createElement("button");
-        help.appendChild(document.createTextNode(dwv.i18n("basics.help")));
+        help.appendChild(helpSpan);
+        help.title = dwv.i18n("basics.help");
         help.onclick = function() { toggle(".help"); };
 
         var node = app.getElement("toolbar");
