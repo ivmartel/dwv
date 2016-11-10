@@ -357,10 +357,16 @@ dwv.gui.base.DrawList = function (app)
             tickLabel.setAttribute( "for", tickBox.id );
             tickLabel.setAttribute( "class", "inline" );
             tickLabel.appendChild( document.createTextNode( dwv.i18n("basics.editMode") ) );
+            // delete draw button
+            var deleteButton = document.createElement("button");
+            deleteButton.onclick = function () { app.deleteDraws(); };
+            deleteButton.setAttribute( "class", "ui-btn ui-btn-inline" );
+            deleteButton.appendChild( document.createTextNode( dwv.i18n("basics.deleteDraws") ) );
             // checkbox div
             var tickDiv = document.createElement("div");
             tickDiv.appendChild(tickLabel);
             tickDiv.appendChild(tickBox);
+            tickDiv.appendChild(deleteButton);
 
             // search form
             node.appendChild(dwv.html.getHtmlSearchForm(table));
