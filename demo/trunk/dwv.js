@@ -880,6 +880,51 @@ dwv.App = function ()
         this.getDrawLayer().draw();
     };
 
+    /**
+     * Delete all Draws from all layers.
+    */
+    this.deleteDraws = function () {
+        var delcmd, layer, groups, slice, frame;
+        var nSlices = this.getImage().getGeometry().getSize().getNumberOfSlices();
+        var nFrames = this.getImage().getNumberOfFrames();
+        slice = 0;
+        while (slice < nSlices) {
+            frame = 0;
+            while (frame < nFrames) {
+                layer = this.getDrawLayer(slice, frame);
+                groups = layer.getChildren();
+                while (groups.length) {
+                    var shape = groups[0].getChildren()[0];
+                    var cmdName = "shape";
+                    if ( shape instanceof Kinetic.Line ) {
+                        if ( shape.points().length == 4 ) {
+                            cmdName = "line";
+                        }
+                        else if ( shape.points().length == 6 ) {
+                            cmdName = "protractor";
+                        }
+                        else {
+                            cmdName = "roi";
+                        }
+                    }
+                    else if ( shape instanceof Kinetic.Rect ) {
+                        cmdName = "rectangle";
+                    }
+                    else if ( shape instanceof Kinetic.Ellipse ) {
+                        cmdName = "ellipse";
+                    }
+                    delcmd = new dwv.tool.DeleteGroupCommand( groups[0],
+                        cmdName, layer);
+                    delcmd.onExecute = fireEvent;
+                    delcmd.execute();
+                    this.addToUndoStack(delcmd);
+                }
+                frame++;
+            }
+            slice++;
+        }
+    };
+
     // Handler Methods -----------------------------------------------------------
 
     /**
@@ -9137,10 +9182,16 @@ dwv.gui.base.DrawList = function (app)
             tickLabel.setAttribute( "for", tickBox.id );
             tickLabel.setAttribute( "class", "inline" );
             tickLabel.appendChild( document.createTextNode( dwv.i18n("basics.editMode") ) );
+            // delete draw button
+            var deleteButton = document.createElement("button");
+            deleteButton.onclick = function () { app.deleteDraws(); };
+            deleteButton.setAttribute( "class", "ui-btn ui-btn-inline" );
+            deleteButton.appendChild( document.createTextNode( dwv.i18n("basics.deleteDraws") ) );
             // checkbox div
             var tickDiv = document.createElement("div");
             tickDiv.appendChild(tickLabel);
             tickDiv.appendChild(tickBox);
+            tickDiv.appendChild(deleteButton);
 
             // search form
             node.appendChild(dwv.html.getHtmlSearchForm(table));
