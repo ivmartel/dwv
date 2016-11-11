@@ -895,26 +895,8 @@ dwv.App = function ()
                 groups = layer.getChildren();
                 while (groups.length) {
                     var shape = groups[0].getChildren()[0];
-                    var cmdName = "shape";
-                    if ( shape instanceof Kinetic.Line ) {
-                        if ( shape.points().length == 4 ) {
-                            cmdName = "line";
-                        }
-                        else if ( shape.points().length == 6 ) {
-                            cmdName = "protractor";
-                        }
-                        else {
-                            cmdName = "roi";
-                        }
-                    }
-                    else if ( shape instanceof Kinetic.Rect ) {
-                        cmdName = "rectangle";
-                    }
-                    else if ( shape instanceof Kinetic.Ellipse ) {
-                        cmdName = "ellipse";
-                    }
                     delcmd = new dwv.tool.DeleteGroupCommand( groups[0],
-                        cmdName, layer);
+                        dwv.tool.GetShapeDisplayName(shape), layer);
                     delcmd.onExecute = fireEvent;
                     delcmd.execute();
                     this.addToUndoStack(delcmd);
