@@ -71,6 +71,21 @@ dwv.gui.Slider = function (app)
         });
     };
 };
+// plot
+dwv.gui.plot = function (div, data, options)
+{
+    var plotOptions = {
+        "bars": { "show": true },
+        "grid": { "backgroundcolor": null },
+        "xaxis": { "show": true },
+        "yaxis": { "show": false }
+    };
+    if (typeof options !== "undefined" &&
+        typeof options.markings !== "undefined") {
+        plotOptions.grid.markings = options.markings;
+    }
+    $.plot(div, [ data ], plotOptions);
+};
 
 function toggle(dialogId)
 {

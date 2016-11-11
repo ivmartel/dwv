@@ -46,16 +46,8 @@ dwv.App = function ()
     // View controller
     var viewController = null;
 
-    // Info layer plot gui
-    var plotInfo = null;
-    // Info layer windowing gui
-    var windowingInfo = null;
-    // Info layer position gui
-    var positionInfo = null;
-    // Info layer colour map gui
-    var miniColourMap = null;
-    // flag to know if the info layer is listening on the image.
-    var isInfoLayerListening = false;
+    // Info layer controller
+    var infoController = null;
 
     // Dicom tags gui
     var tagsGui = null;
@@ -685,12 +677,7 @@ dwv.App = function ()
         var infoLayer = self.getElement("infoLayer");
         dwv.html.toggleDisplay(infoLayer);
         // toggle listeners
-        if ( isInfoLayerListening ) {
-            removeImageInfoListeners();
-        }
-        else {
-            addImageInfoListeners();
-        }
+        infoController.toggleImageInfoListeners(view);
     };
 
     /**
@@ -1285,52 +1272,6 @@ dwv.App = function ()
     }
 
     /**
-     * Add image listeners.
-     * @private
-     */
-    function addImageInfoListeners()
-    {
-        if (windowingInfo) {
-            view.addEventListener("wl-change", windowingInfo.update);
-        }
-        if (plotInfo) {
-            view.addEventListener("wl-change", plotInfo.update);
-        }
-        if (miniColourMap) {
-            view.addEventListener("wl-change", miniColourMap.update);
-            view.addEventListener("colour-change", miniColourMap.update);
-        }
-        if (positionInfo) {
-            view.addEventListener("position-change", positionInfo.update);
-            view.addEventListener("frame-change", positionInfo.update);
-        }
-        isInfoLayerListening = true;
-    }
-
-    /**
-     * Remove image listeners.
-     * @private
-     */
-    function removeImageInfoListeners()
-    {
-	if (windowingInfo) {
-	    view.removeEventListener("wl-change", windowingInfo.update);
-	}
-	if (plotInfo) {
-	    view.removeEventListener("wl-change", plotInfo.update);
-	}
-	if (miniColourMap) {
-	    view.removeEventListener("wl-change", miniColourMap.update);
-	    view.removeEventListener("colour-change", miniColourMap.update);
-	}
-	if (positionInfo) {
-	    view.removeEventListener("position-change", positionInfo.update);
-	    view.removeEventListener("frame-change", positionInfo.update);
-	}
-        isInfoLayerListening = false;
-    }
-
-    /**
      * Mou(se) and (T)ouch event handler. This function just determines the mouse/touch
      * position relative to the canvas element. It then passes it to the current tool.
      * @private
@@ -1610,31 +1551,9 @@ dwv.App = function ()
         // info layer
         var infoLayer = self.getElement("infoLayer");
         if ( infoLayer ) {
-            var infotr = self.getElement("infotr");
-            if (infotr) {
-                windowingInfo = new dwv.info.Windowing(infotr);
-                windowingInfo.create();
-            }
-
-            var infotl = self.getElement("infotl");
-            if (infotl) {
-                positionInfo = new dwv.info.Position(infotl);
-                positionInfo.create();
-            }
-
-            var infobr = self.getElement("infobr");
-            if (infobr) {
-                miniColourMap = new dwv.info.MiniColourMap(infobr, self);
-                miniColourMap.create();
-            }
-
-            var plot = self.getElement("plot");
-            if (plot) {
-                plotInfo = new dwv.info.Plot(plot, self);
-                plotInfo.create();
-            }
-
-            addImageInfoListeners();
+            infoController = new dwv.InfoController(containerDivId);
+            infoController.create(self);
+            infoController.toggleImageInfoListeners(view);
         }
 
         // init W/L display: triggers a wlchange event
