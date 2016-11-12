@@ -664,7 +664,7 @@ dwv.App = function ()
         var infoLayer = self.getElement("infoLayer");
         dwv.html.toggleDisplay(infoLayer);
         // toggle listeners
-        infoController.toggleImageInfoListeners(view);
+        infoController.toggleViewListeners(view);
     };
 
     /**
@@ -1436,7 +1436,7 @@ dwv.App = function ()
         if ( infoLayer ) {
             infoController = new dwv.InfoController(containerDivId);
             infoController.create(self);
-            infoController.toggleImageInfoListeners(view);
+            infoController.toggleViewListeners(view);
         }
 
         // init W/L display: triggers a wlchange event

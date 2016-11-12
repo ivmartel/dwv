@@ -54,13 +54,13 @@ dwv.InfoController = function (containerDivId)
      * Toggle info listeners to the view.
      * @param {Object} view The view to listen or not to.
      */
-    this.toggleImageInfoListeners = function (view)
+    this.toggleViewListeners = function (view)
     {
         if (isInfoLayerListening) {
-            removeImageInfoListeners(view);
+            removeViewListeners(view);
         }
         else {
-            addImageInfoListeners(view);
+            addViewListeners(view);
         }
     };
 
@@ -78,7 +78,7 @@ dwv.InfoController = function (containerDivId)
      * Add info listeners to the view.
      * @param {Object} view The view to listen to.
      */
-    function addImageInfoListeners(view)
+    function addViewListeners(view)
     {
         if (windowingInfo) {
             view.addEventListener("wl-change", windowingInfo.update);
@@ -102,7 +102,7 @@ dwv.InfoController = function (containerDivId)
      * Remove info listeners to the view.
      * @param {Object} view The view to stop listening to.
      */
-    function removeImageInfoListeners(view)
+    function removeViewListeners(view)
     {
         if (windowingInfo) {
             view.removeEventListener("wl-change", windowingInfo.update);
