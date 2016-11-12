@@ -349,11 +349,11 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         }
         // set shape display properties
         if ( visible ) {
-            app.addLayerListeners( app.getDrawStage().getContent() );
+            app.addToolCanvasListeners( app.getDrawStage().getContent() );
             shapes.forEach( function (shape){ self.setShapeOn( shape ); });
         }
         else {
-            app.removeLayerListeners( app.getDrawStage().getContent() );
+            app.removeToolCanvasListeners( app.getDrawStage().getContent() );
             shapes.forEach( function (shape){ setShapeOff( shape ); });
         }
         // draw

@@ -64,8 +64,6 @@ dwv.App = function ()
     // Generic style
     var style = new dwv.html.Style();
 
-    // Toolbox
-    var toolbox = null;
     // Toolbox controller
     var toolboxController = null;
 
@@ -175,17 +173,6 @@ dwv.App = function ()
     this.getStyle = function () { return style; };
 
     /**
-     * Get the toolbox.
-     * @return {Object} The associated toolbox.
-     */
-    this.getToolbox = function () { return toolbox; };
-    /**
-     * Get the toolbox controller.
-     * @return {Object} The controller.
-     */
-    this.getToolboxController = function () { return toolboxController; };
-
-    /**
      * Add a command to the undo stack.
      * @param {Object} The command to add.
      */
@@ -257,14 +244,14 @@ dwv.App = function ()
                     }
                 }
             }
-            toolbox = new dwv.tool.Toolbox(toolList, this);
-            toolboxController = new dwv.ToolboxController(toolbox);
+            toolboxController = new dwv.ToolboxController();
+            toolboxController.create(toolList, this);
         }
         // gui
         if ( config.gui ) {
             // tools
-            if ( config.gui.indexOf("tool") !== -1 && toolbox) {
-                toolbox.setup();
+            if ( config.gui.indexOf("tool") !== -1 && toolboxController) {
+                toolboxController.setup();
             }
             // load
             if ( config.gui.indexOf("load") !== -1 ) {
@@ -315,7 +302,7 @@ dwv.App = function ()
                 if ( config.isMobile ) {
                     isMobile = config.isMobile;
                 }
-                dwv.gui.appendHelpHtml( toolbox.getToolList(), isMobile, this );
+                dwv.gui.appendHelpHtml( toolboxController.getToolList(), isMobile, this );
             }
         }
 
@@ -378,8 +365,8 @@ dwv.App = function ()
     this.reset = function ()
     {
         // clear tools
-        if ( toolbox ) {
-            toolbox.reset();
+        if ( toolboxController ) {
+            toolboxController.reset();
         }
         // clear draw
         if ( drawStage ) {
@@ -698,45 +685,21 @@ dwv.App = function ()
     };
 
     /**
-     * Add layer mouse and touch listeners.
+     * Add canvas mouse and touch listeners.
+     * @param {Object} canvas The canvas to listen to.
      */
-    this.addLayerListeners = function (layer)
+    this.addToolCanvasListeners = function (layer)
     {
-        // allow pointer events
-        layer.setAttribute("style", "pointer-events: auto;");
-        // mouse listeners
-        layer.addEventListener("mousedown", onMouch);
-        layer.addEventListener("mousemove", onMouch);
-        layer.addEventListener("mouseup", onMouch);
-        layer.addEventListener("mouseout", onMouch);
-        layer.addEventListener("mousewheel", onMouch);
-        layer.addEventListener("DOMMouseScroll", onMouch);
-        layer.addEventListener("dblclick", onMouch);
-        // touch listeners
-        layer.addEventListener("touchstart", onMouch);
-        layer.addEventListener("touchmove", onMouch);
-        layer.addEventListener("touchend", onMouch);
+        toolboxController.addCanvasListeners(layer);
     };
 
     /**
      * Remove layer mouse and touch listeners.
+     * @param {Object} canvas The canvas to stop listening to.
      */
-    this.removeLayerListeners = function (layer)
+    this.removeToolCanvasListeners = function (layer)
     {
-        // disable pointer events
-        layer.setAttribute("style", "pointer-events: none;");
-        // mouse listeners
-        layer.removeEventListener("mousedown", onMouch);
-        layer.removeEventListener("mousemove", onMouch);
-        layer.removeEventListener("mouseup", onMouch);
-        layer.removeEventListener("mouseout", onMouch);
-        layer.removeEventListener("mousewheel", onMouch);
-        layer.removeEventListener("DOMMouseScroll", onMouch);
-        layer.removeEventListener("dblclick", onMouch);
-        // touch listeners
-        layer.removeEventListener("touchstart", onMouch);
-        layer.removeEventListener("touchmove", onMouch);
-        layer.removeEventListener("touchend", onMouch);
+        toolboxController.removeCanvasListeners(layer);
     };
 
     /**
@@ -1272,80 +1235,6 @@ dwv.App = function ()
     }
 
     /**
-     * Mou(se) and (T)ouch event handler. This function just determines the mouse/touch
-     * position relative to the canvas element. It then passes it to the current tool.
-     * @private
-     * @param {Object} event The event to handle.
-     */
-    function onMouch(event)
-    {
-        // flag not to get confused between touch and mouse
-        var handled = false;
-        // Store the event position relative to the image canvas
-        // in an extra member of the event:
-        // event._x and event._y.
-        var offsets = null;
-        var position = null;
-        if ( event.type === "touchstart" ||
-            event.type === "touchmove")
-        {
-            // event offset(s)
-            offsets = dwv.html.getEventOffset(event);
-            // should have at least one offset
-            event._xs = offsets[0].x;
-            event._ys = offsets[0].y;
-            position = self.getImageLayer().displayToIndex( offsets[0] );
-            event._x = parseInt( position.x, 10 );
-            event._y = parseInt( position.y, 10 );
-            // possible second
-            if ( offsets.length === 2 ) {
-                event._x1s = offsets[1].x;
-                event._y1s = offsets[1].y;
-                position = self.getImageLayer().displayToIndex( offsets[1] );
-                event._x1 = parseInt( position.x, 10 );
-                event._y1 = parseInt( position.y, 10 );
-            }
-            // set handle event flag
-            handled = true;
-        }
-        else if ( event.type === "mousemove" ||
-            event.type === "mousedown" ||
-            event.type === "mouseup" ||
-            event.type === "mouseout" ||
-            event.type === "mousewheel" ||
-            event.type === "dblclick" ||
-            event.type === "DOMMouseScroll" )
-        {
-            offsets = dwv.html.getEventOffset(event);
-            event._xs = offsets[0].x;
-            event._ys = offsets[0].y;
-            position = self.getImageLayer().displayToIndex( offsets[0] );
-            event._x = parseInt( position.x, 10 );
-            event._y = parseInt( position.y, 10 );
-            // set handle event flag
-            handled = true;
-        }
-        else if ( event.type === "keydown" ||
-                event.type === "touchend")
-        {
-            handled = true;
-        }
-
-        // Call the event handler of the tool.
-        if ( handled )
-        {
-            if ( event.type !== "keydown" ) {
-                event.preventDefault();
-            }
-            var func = self.getToolbox().getSelectedTool()[event.type];
-            if ( func )
-            {
-                func(event);
-            }
-        }
-    }
-
-    /**
      * Handle a drag over.
      * @private
      * @param {Object} event The event to handle.
@@ -1520,14 +1409,8 @@ dwv.App = function ()
         viewController.updatePresets(image, true);
 
         // initialise the toolbox
-        if ( toolbox ) {
-            // mouse and touch listeners
-            self.addLayerListeners( imageLayer.getCanvas() );
-            // keydown listener
-            window.addEventListener("keydown", onMouch, true);
-
-            toolbox.init();
-            toolbox.display(true);
+        if ( toolboxController ) {
+            toolboxController.initAndDisplay( imageLayer );
         }
 
         if ( drawStage ) {
