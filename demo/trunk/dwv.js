@@ -46,16 +46,8 @@ dwv.App = function ()
     // View controller
     var viewController = null;
 
-    // Info layer plot gui
-    var plotInfo = null;
-    // Info layer windowing gui
-    var windowingInfo = null;
-    // Info layer position gui
-    var positionInfo = null;
-    // Info layer colour map gui
-    var miniColourMap = null;
-    // flag to know if the info layer is listening on the image.
-    var isInfoLayerListening = false;
+    // Info layer controller
+    var infoController = null;
 
     // Dicom tags gui
     var tagsGui = null;
@@ -72,8 +64,6 @@ dwv.App = function ()
     // Generic style
     var style = new dwv.html.Style();
 
-    // Toolbox
-    var toolbox = null;
     // Toolbox controller
     var toolboxController = null;
 
@@ -183,17 +173,6 @@ dwv.App = function ()
     this.getStyle = function () { return style; };
 
     /**
-     * Get the toolbox.
-     * @return {Object} The associated toolbox.
-     */
-    this.getToolbox = function () { return toolbox; };
-    /**
-     * Get the toolbox controller.
-     * @return {Object} The controller.
-     */
-    this.getToolboxController = function () { return toolboxController; };
-
-    /**
      * Add a command to the undo stack.
      * @param {Object} The command to add.
      */
@@ -265,14 +244,14 @@ dwv.App = function ()
                     }
                 }
             }
-            toolbox = new dwv.tool.Toolbox(toolList, this);
-            toolboxController = new dwv.ToolboxController(toolbox);
+            toolboxController = new dwv.ToolboxController();
+            toolboxController.create(toolList, this);
         }
         // gui
         if ( config.gui ) {
             // tools
-            if ( config.gui.indexOf("tool") !== -1 && toolbox) {
-                toolbox.setup();
+            if ( config.gui.indexOf("tool") !== -1 && toolboxController) {
+                toolboxController.setup();
             }
             // load
             if ( config.gui.indexOf("load") !== -1 ) {
@@ -323,7 +302,7 @@ dwv.App = function ()
                 if ( config.isMobile ) {
                     isMobile = config.isMobile;
                 }
-                dwv.gui.appendHelpHtml( toolbox.getToolList(), isMobile, this );
+                dwv.gui.appendHelpHtml( toolboxController.getToolList(), isMobile, this );
             }
         }
 
@@ -386,8 +365,8 @@ dwv.App = function ()
     this.reset = function ()
     {
         // clear tools
-        if ( toolbox ) {
-            toolbox.reset();
+        if ( toolboxController ) {
+            toolboxController.reset();
         }
         // clear draw
         if ( drawStage ) {
@@ -685,12 +664,7 @@ dwv.App = function ()
         var infoLayer = self.getElement("infoLayer");
         dwv.html.toggleDisplay(infoLayer);
         // toggle listeners
-        if ( isInfoLayerListening ) {
-            removeImageInfoListeners();
-        }
-        else {
-            addImageInfoListeners();
-        }
+        infoController.toggleViewListeners(view);
     };
 
     /**
@@ -711,45 +685,21 @@ dwv.App = function ()
     };
 
     /**
-     * Add layer mouse and touch listeners.
+     * Add canvas mouse and touch listeners.
+     * @param {Object} canvas The canvas to listen to.
      */
-    this.addLayerListeners = function (layer)
+    this.addToolCanvasListeners = function (layer)
     {
-        // allow pointer events
-        layer.setAttribute("style", "pointer-events: auto;");
-        // mouse listeners
-        layer.addEventListener("mousedown", onMouch);
-        layer.addEventListener("mousemove", onMouch);
-        layer.addEventListener("mouseup", onMouch);
-        layer.addEventListener("mouseout", onMouch);
-        layer.addEventListener("mousewheel", onMouch);
-        layer.addEventListener("DOMMouseScroll", onMouch);
-        layer.addEventListener("dblclick", onMouch);
-        // touch listeners
-        layer.addEventListener("touchstart", onMouch);
-        layer.addEventListener("touchmove", onMouch);
-        layer.addEventListener("touchend", onMouch);
+        toolboxController.addCanvasListeners(layer);
     };
 
     /**
      * Remove layer mouse and touch listeners.
+     * @param {Object} canvas The canvas to stop listening to.
      */
-    this.removeLayerListeners = function (layer)
+    this.removeToolCanvasListeners = function (layer)
     {
-        // disable pointer events
-        layer.setAttribute("style", "pointer-events: none;");
-        // mouse listeners
-        layer.removeEventListener("mousedown", onMouch);
-        layer.removeEventListener("mousemove", onMouch);
-        layer.removeEventListener("mouseup", onMouch);
-        layer.removeEventListener("mouseout", onMouch);
-        layer.removeEventListener("mousewheel", onMouch);
-        layer.removeEventListener("DOMMouseScroll", onMouch);
-        layer.removeEventListener("dblclick", onMouch);
-        // touch listeners
-        layer.removeEventListener("touchstart", onMouch);
-        layer.removeEventListener("touchmove", onMouch);
-        layer.removeEventListener("touchend", onMouch);
+        toolboxController.removeCanvasListeners(layer);
     };
 
     /**
@@ -895,26 +845,8 @@ dwv.App = function ()
                 groups = layer.getChildren();
                 while (groups.length) {
                     var shape = groups[0].getChildren()[0];
-                    var cmdName = "shape";
-                    if ( shape instanceof Kinetic.Line ) {
-                        if ( shape.points().length == 4 ) {
-                            cmdName = "line";
-                        }
-                        else if ( shape.points().length == 6 ) {
-                            cmdName = "protractor";
-                        }
-                        else {
-                            cmdName = "roi";
-                        }
-                    }
-                    else if ( shape instanceof Kinetic.Rect ) {
-                        cmdName = "rectangle";
-                    }
-                    else if ( shape instanceof Kinetic.Ellipse ) {
-                        cmdName = "ellipse";
-                    }
                     delcmd = new dwv.tool.DeleteGroupCommand( groups[0],
-                        cmdName, layer);
+                        dwv.tool.GetShapeDisplayName(shape), layer);
                     delcmd.onExecute = fireEvent;
                     delcmd.execute();
                     this.addToUndoStack(delcmd);
@@ -1303,126 +1235,6 @@ dwv.App = function ()
     }
 
     /**
-     * Add image listeners.
-     * @private
-     */
-    function addImageInfoListeners()
-    {
-        if (windowingInfo) {
-            view.addEventListener("wl-change", windowingInfo.update);
-        }
-        if (plotInfo) {
-            view.addEventListener("wl-change", plotInfo.update);
-        }
-        if (miniColourMap) {
-            view.addEventListener("wl-change", miniColourMap.update);
-            view.addEventListener("colour-change", miniColourMap.update);
-        }
-        if (positionInfo) {
-            view.addEventListener("position-change", positionInfo.update);
-            view.addEventListener("frame-change", positionInfo.update);
-        }
-        isInfoLayerListening = true;
-    }
-
-    /**
-     * Remove image listeners.
-     * @private
-     */
-    function removeImageInfoListeners()
-    {
-	if (windowingInfo) {
-	    view.removeEventListener("wl-change", windowingInfo.update);
-	}
-	if (plotInfo) {
-	    view.removeEventListener("wl-change", plotInfo.update);
-	}
-	if (miniColourMap) {
-	    view.removeEventListener("wl-change", miniColourMap.update);
-	    view.removeEventListener("colour-change", miniColourMap.update);
-	}
-	if (positionInfo) {
-	    view.removeEventListener("position-change", positionInfo.update);
-	    view.removeEventListener("frame-change", positionInfo.update);
-	}
-        isInfoLayerListening = false;
-    }
-
-    /**
-     * Mou(se) and (T)ouch event handler. This function just determines the mouse/touch
-     * position relative to the canvas element. It then passes it to the current tool.
-     * @private
-     * @param {Object} event The event to handle.
-     */
-    function onMouch(event)
-    {
-        // flag not to get confused between touch and mouse
-        var handled = false;
-        // Store the event position relative to the image canvas
-        // in an extra member of the event:
-        // event._x and event._y.
-        var offsets = null;
-        var position = null;
-        if ( event.type === "touchstart" ||
-            event.type === "touchmove")
-        {
-            // event offset(s)
-            offsets = dwv.html.getEventOffset(event);
-            // should have at least one offset
-            event._xs = offsets[0].x;
-            event._ys = offsets[0].y;
-            position = self.getImageLayer().displayToIndex( offsets[0] );
-            event._x = parseInt( position.x, 10 );
-            event._y = parseInt( position.y, 10 );
-            // possible second
-            if ( offsets.length === 2 ) {
-                event._x1s = offsets[1].x;
-                event._y1s = offsets[1].y;
-                position = self.getImageLayer().displayToIndex( offsets[1] );
-                event._x1 = parseInt( position.x, 10 );
-                event._y1 = parseInt( position.y, 10 );
-            }
-            // set handle event flag
-            handled = true;
-        }
-        else if ( event.type === "mousemove" ||
-            event.type === "mousedown" ||
-            event.type === "mouseup" ||
-            event.type === "mouseout" ||
-            event.type === "mousewheel" ||
-            event.type === "dblclick" ||
-            event.type === "DOMMouseScroll" )
-        {
-            offsets = dwv.html.getEventOffset(event);
-            event._xs = offsets[0].x;
-            event._ys = offsets[0].y;
-            position = self.getImageLayer().displayToIndex( offsets[0] );
-            event._x = parseInt( position.x, 10 );
-            event._y = parseInt( position.y, 10 );
-            // set handle event flag
-            handled = true;
-        }
-        else if ( event.type === "keydown" ||
-                event.type === "touchend")
-        {
-            handled = true;
-        }
-
-        // Call the event handler of the tool.
-        if ( handled )
-        {
-            if ( event.type !== "keydown" ) {
-                event.preventDefault();
-            }
-            var func = self.getToolbox().getSelectedTool()[event.type];
-            if ( func )
-            {
-                func(event);
-            }
-        }
-    }
-
-    /**
      * Handle a drag over.
      * @private
      * @param {Object} event The event to handle.
@@ -1597,14 +1409,8 @@ dwv.App = function ()
         viewController.updatePresets(image, true);
 
         // initialise the toolbox
-        if ( toolbox ) {
-            // mouse and touch listeners
-            self.addLayerListeners( imageLayer.getCanvas() );
-            // keydown listener
-            window.addEventListener("keydown", onMouch, true);
-
-            toolbox.init();
-            toolbox.display(true);
+        if ( toolboxController ) {
+            toolboxController.initAndDisplay( imageLayer );
         }
 
         if ( drawStage ) {
@@ -1628,31 +1434,9 @@ dwv.App = function ()
         // info layer
         var infoLayer = self.getElement("infoLayer");
         if ( infoLayer ) {
-            var infotr = self.getElement("infotr");
-            if (infotr) {
-                windowingInfo = new dwv.info.Windowing(infotr);
-                windowingInfo.create();
-            }
-
-            var infotl = self.getElement("infotl");
-            if (infotl) {
-                positionInfo = new dwv.info.Position(infotl);
-                positionInfo.create();
-            }
-
-            var infobr = self.getElement("infobr");
-            if (infobr) {
-                miniColourMap = new dwv.info.MiniColourMap(infobr, self);
-                miniColourMap.create();
-            }
-
-            var plot = self.getElement("plot");
-            if (plot) {
-                plotInfo = new dwv.info.Plot(plot, self);
-                plotInfo.create();
-            }
-
-            addImageInfoListeners();
+            infoController = new dwv.InfoController(containerDivId);
+            infoController.create(self);
+            infoController.toggleViewListeners(view);
         }
 
         // init W/L display: triggers a wlchange event
@@ -1661,6 +1445,131 @@ dwv.App = function ()
     }
 
 };
+;// namespaces
+var dwv = dwv || {};
+
+/**
+ * Info controller.
+ * @constructor
+ */
+dwv.InfoController = function (containerDivId)
+{
+
+    // Info layer plot gui
+    var plotInfo = null;
+    // Info layer windowing gui
+    var windowingInfo = null;
+    // Info layer position gui
+    var positionInfo = null;
+    // Info layer colour map gui
+    var miniColourMap = null;
+    // flag to know if the info layer is listening on the image.
+    var isInfoLayerListening = false;
+
+    /**
+     * Create the different info elements.
+     * TODO Get rid of the app input arg...
+     */
+    this.create = function (app)
+    {
+        var infotr = getElement("infotr");
+        if (infotr) {
+            windowingInfo = new dwv.gui.info.Windowing(infotr);
+            windowingInfo.create();
+        }
+
+        var infotl = getElement("infotl");
+        if (infotl) {
+            positionInfo = new dwv.gui.info.Position(infotl);
+            positionInfo.create();
+        }
+
+        var infobr = getElement("infobr");
+        if (infobr) {
+            miniColourMap = new dwv.gui.info.MiniColourMap(infobr, app);
+            miniColourMap.create();
+        }
+
+        var plot = getElement("plot");
+        if (plot) {
+            plotInfo = new dwv.gui.info.Plot(plot, app);
+            plotInfo.create();
+        }
+    };
+
+    /**
+     * Toggle info listeners to the view.
+     * @param {Object} view The view to listen or not to.
+     */
+    this.toggleViewListeners = function (view)
+    {
+        if (isInfoLayerListening) {
+            removeViewListeners(view);
+        }
+        else {
+            addViewListeners(view);
+        }
+    };
+
+    /**
+     * Get a HTML element associated to the application.
+     * @param name The name or id to find.
+     * @return The found element or null.
+     */
+    function getElement(name)
+    {
+        return dwv.gui.getElement(containerDivId, name);
+    }
+
+    /**
+     * Add info listeners to the view.
+     * @param {Object} view The view to listen to.
+     */
+    function addViewListeners(view)
+    {
+        if (windowingInfo) {
+            view.addEventListener("wl-change", windowingInfo.update);
+        }
+        if (plotInfo) {
+            view.addEventListener("wl-change", plotInfo.update);
+        }
+        if (miniColourMap) {
+            view.addEventListener("wl-change", miniColourMap.update);
+            view.addEventListener("colour-change", miniColourMap.update);
+        }
+        if (positionInfo) {
+            view.addEventListener("position-change", positionInfo.update);
+            view.addEventListener("frame-change", positionInfo.update);
+        }
+        // udpate listening flag
+        isInfoLayerListening = true;
+    }
+
+    /**
+     * Remove info listeners to the view.
+     * @param {Object} view The view to stop listening to.
+     */
+    function removeViewListeners(view)
+    {
+        if (windowingInfo) {
+            view.removeEventListener("wl-change", windowingInfo.update);
+        }
+        if (plotInfo) {
+            view.removeEventListener("wl-change", plotInfo.update);
+        }
+        if (miniColourMap) {
+            view.removeEventListener("wl-change", miniColourMap.update);
+            view.removeEventListener("colour-change", miniColourMap.update);
+        }
+        if (positionInfo) {
+            view.removeEventListener("position-change", positionInfo.update);
+            view.removeEventListener("frame-change", positionInfo.update);
+        }
+        // udpate listening flag
+        isInfoLayerListening = false;
+    }
+
+}; // class dwv.infoController
 ;// namespaces
 var dwv = dwv || {};
 //external
@@ -1837,8 +1746,66 @@ var dwv = dwv || {};
  * Toolbox controller.
  * @constructor
  */
-dwv.ToolboxController = function (toolbox)
+dwv.ToolboxController = function ()
 {
+    // internal toolbox
+    var toolbox = null;
+    // point converter function
+    var displayToIndexConverter = null;
+
+    /**
+     * Create the internal toolbox.
+     * @param {Array} toolList The list of tools instances.
+     * @param {Object} app The associated app.
+     */
+    this.create = function (toolList, app) {
+        toolbox = new dwv.tool.Toolbox(toolList, app);
+    };
+
+    /**
+     * Setup the internal toolbox.
+     */
+    this.setup = function () {
+        toolbox.setup();
+    };
+
+    /**
+     * Reset the internal toolbox.
+     */
+    this.reset = function () {
+        toolbox.reset();
+    };
+
+    /**
+     * Initialise and display the internal toolbox.
+     */
+    this.initAndDisplay = function (layer) {
+        // initialise
+        toolbox.init();
+        // display
+        toolbox.display(true);
+        // TODO Would prefer to have this done in the addLayerListeners
+        displayToIndexConverter = layer.displayToIndex;
+        // add layer listeners
+        this.addCanvasListeners(layer.getCanvas());
+    };
+
+    /**
+     * Get the tool list.
+     */
+    this.getToolList = function () {
+        return toolbox.getToolList();
+    };
+
+    /**
+     * Get the selected tool event handler.
+     * @param {String} eventType The event type, for example mousedown, touchstart...
+     */
+    this.getSelectedToolEventHandler = function (eventType)
+    {
+        return toolbox.getSelectedTool()[eventType];
+    };
+
     /**
      * Set the selected tool.
      * @param {String} name The name of the tool.
@@ -1896,6 +1863,130 @@ dwv.ToolboxController = function (toolbox)
             toolbox.getSelectedTool().getSelectedFilter().run(range);
         }
     };
+
+    /**
+     * Add canvas mouse and touch listeners.
+     * @param {Object} canvas The canvas to listen to.
+     */
+    this.addCanvasListeners = function (canvas)
+    {
+        // allow pointer events
+        canvas.setAttribute("style", "pointer-events: auto;");
+        // mouse listeners
+        canvas.addEventListener("mousedown", onMouch);
+        canvas.addEventListener("mousemove", onMouch);
+        canvas.addEventListener("mouseup", onMouch);
+        canvas.addEventListener("mouseout", onMouch);
+        canvas.addEventListener("mousewheel", onMouch);
+        canvas.addEventListener("DOMMouseScroll", onMouch);
+        canvas.addEventListener("dblclick", onMouch);
+        // touch listeners
+        canvas.addEventListener("touchstart", onMouch);
+        canvas.addEventListener("touchmove", onMouch);
+        canvas.addEventListener("touchend", onMouch);
+
+        // keydown listener
+        window.addEventListener("keydown", onMouch, true);
+    };
+
+    /**
+     * Remove canvas mouse and touch listeners.
+     * @param {Object} canvas The canvas to stop listening to.
+     */
+    this.removeCanvasListeners = function (canvas)
+    {
+        // disable pointer events
+        canvas.setAttribute("style", "pointer-events: none;");
+        // mouse listeners
+        canvas.removeEventListener("mousedown", onMouch);
+        canvas.removeEventListener("mousemove", onMouch);
+        canvas.removeEventListener("mouseup", onMouch);
+        canvas.removeEventListener("mouseout", onMouch);
+        canvas.removeEventListener("mousewheel", onMouch);
+        canvas.removeEventListener("DOMMouseScroll", onMouch);
+        canvas.removeEventListener("dblclick", onMouch);
+        // touch listeners
+        canvas.removeEventListener("touchstart", onMouch);
+        canvas.removeEventListener("touchmove", onMouch);
+        canvas.removeEventListener("touchend", onMouch);
+
+        // keydown listener
+        window.removeEventListener("keydown", onMouch, true);
+    };
+
+    /**
+     * Mou(se) and (T)ouch event handler. This function just determines the mouse/touch
+     * position relative to the canvas element. It then passes it to the current tool.
+     * @private
+     * @param {Object} event The event to handle.
+     */
+    function onMouch(event)
+    {
+        // flag not to get confused between touch and mouse
+        var handled = false;
+        // Store the event position relative to the image canvas
+        // in an extra member of the event:
+        // event._x and event._y.
+        var offsets = null;
+        var position = null;
+        if ( event.type === "touchstart" ||
+            event.type === "touchmove")
+        {
+            // event offset(s)
+            offsets = dwv.html.getEventOffset(event);
+            // should have at least one offset
+            event._xs = offsets[0].x;
+            event._ys = offsets[0].y;
+            position = displayToIndexConverter( offsets[0] );
+            event._x = parseInt( position.x, 10 );
+            event._y = parseInt( position.y, 10 );
+            // possible second
+            if ( offsets.length === 2 ) {
+                event._x1s = offsets[1].x;
+                event._y1s = offsets[1].y;
+                position = displayToIndexConverter( offsets[1] );
+                event._x1 = parseInt( position.x, 10 );
+                event._y1 = parseInt( position.y, 10 );
+            }
+            // set handle event flag
+            handled = true;
+        }
+        else if ( event.type === "mousemove" ||
+            event.type === "mousedown" ||
+            event.type === "mouseup" ||
+            event.type === "mouseout" ||
+            event.type === "mousewheel" ||
+            event.type === "dblclick" ||
+            event.type === "DOMMouseScroll" )
+        {
+            offsets = dwv.html.getEventOffset(event);
+            event._xs = offsets[0].x;
+            event._ys = offsets[0].y;
+            position = displayToIndexConverter( offsets[0] );
+            event._x = parseInt( position.x, 10 );
+            event._y = parseInt( position.y, 10 );
+            // set handle event flag
+            handled = true;
+        }
+        else if ( event.type === "keydown" ||
+                event.type === "touchend")
+        {
+            handled = true;
+        }
+
+        // Call the event handler of the curently selected tool.
+        if ( handled )
+        {
+            if ( event.type !== "keydown" ) {
+                event.preventDefault();
+            }
+            var func = toolbox.getSelectedTool()[event.type];
+            if ( func )
+            {
+                func(event);
+            }
+        }
+    }
 
 }; // class dwv.ToolboxController
 ;// namespaces
@@ -9873,6 +9964,288 @@ dwv.html.createHiddenElement = function (type, className)
 };
 ;// namespaces
 var dwv = dwv || {};
+dwv.gui = dwv.gui || {};
+dwv.gui.base = dwv.gui.base || {};
+dwv.gui.info = dwv.gui.info || {};
+
+/**
+ * Plot some data in a given div.
+ * @param {Object} div The HTML element to add WindowLevel info to.
+ * @param {Array} data The data array to plot.
+ * @param {Object} options Plot options.
+ */
+dwv.gui.base.plot = function (/*div, data, options*/)
+{
+    // default does nothing...
+};
+
+/**
+ * WindowLevel info layer.
+ * @constructor
+ * @param {Object} div The HTML element to add WindowLevel info to.
+ */
+dwv.gui.info.Windowing = function ( div )
+{
+    /**
+     * Create the windowing info div.
+     */
+    this.create = function ()
+    {
+        // clean div
+        var elems = div.getElementsByClassName("wl-info");
+        if ( elems.length !== 0 ) {
+            dwv.html.removeNodes(elems);
+        }
+        // create windowing list
+        var ul = document.createElement("ul");
+        ul.className = "wl-info";
+        // window center list item
+        var liwc = document.createElement("li");
+        liwc.className = "window-center";
+        ul.appendChild(liwc);
+        // window width list item
+        var liww = document.createElement("li");
+        liww.className = "window-width";
+        ul.appendChild(liww);
+        // add list to div
+        div.appendChild(ul);
+    };
+
+    /**
+     * Update the windowing info div.
+     * @param {Object} event The windowing change event containing the new values as {wc,ww}.
+     * Warning: expects the windowing info div to exist (use after create).
+     */
+    this.update = function (event)
+    {
+        // window center list item
+        var liwc = div.getElementsByClassName("window-center")[0];
+        dwv.html.cleanNode(liwc);
+        liwc.appendChild( document.createTextNode(
+            dwv.i18n("tool.info.window_center", {value: event.wc}) ) );
+        // window width list item
+        var liww = div.getElementsByClassName("window-width")[0];
+        dwv.html.cleanNode(liww);
+        liww.appendChild( document.createTextNode(
+            dwv.i18n("tool.info.window_width", {value: event.ww}) ) );
+    };
+
+}; // class dwv.gui.info.Windowing
+
+/**
+ * Position info layer.
+ * @constructor
+ * @param {Object} div The HTML element to add Position info to.
+ */
+dwv.gui.info.Position = function ( div )
+{
+    /**
+     * Create the position info div.
+     */
+    this.create = function ()
+    {
+        // clean div
+        var elems = div.getElementsByClassName("pos-info");
+        if ( elems.length !== 0 ) {
+            dwv.html.removeNodes(elems);
+        }
+        // position list
+        var ul = document.createElement("ul");
+        ul.className = "pos-info";
+        // position
+        var lipos = document.createElement("li");
+        lipos.className = "position";
+        ul.appendChild(lipos);
+        // frame
+        var liframe = document.createElement("li");
+        liframe.className = "frame";
+        ul.appendChild(liframe);
+        // value
+        var livalue = document.createElement("li");
+        livalue.className = "value";
+        ul.appendChild(livalue);
+        // add list to div
+        div.appendChild(ul);
+    };
+
+    /**
+     * Update the position info div.
+     * @param {Object} event The position change event containing the new values as {i,j,k}
+     *  and optional 'value'.
+     * Warning: expects the position info div to exist (use after create).
+     */
+    this.update = function (event)
+    {
+        // position list item
+        if( typeof(event.i) !== "undefined" )
+        {
+            var lipos = div.getElementsByClassName("position")[0];
+            dwv.html.cleanNode(lipos);
+            lipos.appendChild(document.createTextNode(
+            dwv.i18n("tool.info.position", {value: event.i+", "+event.j+", "+event.k}) ) );
+        }
+        // frame list item
+        if( typeof(event.frame) !== "undefined" )
+        {
+            var liframe = div.getElementsByClassName("frame")[0];
+            dwv.html.cleanNode(liframe);
+            liframe.appendChild( document.createTextNode(
+                dwv.i18n("tool.info.frame", {value: event.frame}) ) );
+        }
+        // value list item
+        if( typeof(event.value) !== "undefined" )
+        {
+            var livalue = div.getElementsByClassName("value")[0];
+            dwv.html.cleanNode(livalue);
+            livalue.appendChild( document.createTextNode(
+                dwv.i18n("tool.info.value", {value: event.value}) ) );
+        }
+    };
+}; // class dwv.gui.info.Position
+
+/**
+ * MiniColourMap info layer.
+ * @constructor
+ * @param {Object} div The HTML element to add colourMap info to.
+ * @param {Object} app The associated application.
+ */
+dwv.gui.info.MiniColourMap = function ( div, app )
+{
+    /**
+     * Create the mini colour map info div.
+     */
+    this.create = function ()
+    {
+        // clean div
+        var elems = div.getElementsByClassName("colour-map-info");
+        if ( elems.length !== 0 ) {
+            dwv.html.removeNodes(elems);
+        }
+        // colour map
+        var canvas = document.createElement("canvas");
+        canvas.className = "colour-map-info";
+        canvas.width = 98;
+        canvas.height = 10;
+        // add canvas to div
+        div.appendChild(canvas);
+    };
+
+    /**
+     * Update the mini colour map info div.
+     * @param {Object} event The windowing change event containing the new values.
+     * Warning: expects the mini colour map div to exist (use after createMiniColourMap).
+     */
+    this.update = function (event)
+    {
+        var windowCenter = event.wc;
+        var windowWidth = event.ww;
+
+        var canvas = div.getElementsByClassName("colour-map-info")[0];
+        var context = canvas.getContext('2d');
+
+        // fill in the image data
+        var colourMap = app.getViewController().getColourMap();
+        var imageData = context.getImageData(0,0,canvas.width, canvas.height);
+
+        var c = 0;
+        var minInt = app.getImage().getRescaledDataRange().min;
+        var range = app.getImage().getRescaledDataRange().max - minInt;
+        var incrC = range / canvas.width;
+        var y = 0;
+
+        var yMax = 255;
+        var yMin = 0;
+        var xMin = windowCenter - 0.5 - (windowWidth-1) / 2;
+        var xMax = windowCenter - 0.5 + (windowWidth-1) / 2;
+
+        var index;
+        for( var j=0; j<canvas.height; ++j ) {
+            c = minInt;
+            for( var i=0; i<canvas.width; ++i ) {
+                if( c <= xMin ) {
+                    y = yMin;
+                }
+                else if( c > xMax ) {
+                    y = yMax;
+                }
+                else {
+                    y = ( (c - (windowCenter-0.5) ) / (windowWidth-1) + 0.5 ) *
+                        (yMax-yMin) + yMin;
+                    y = parseInt(y,10);
+                }
+                index = (i + j * canvas.width) * 4;
+                imageData.data[index] = colourMap.red[y];
+                imageData.data[index+1] = colourMap.green[y];
+                imageData.data[index+2] = colourMap.blue[y];
+                imageData.data[index+3] = 0xff;
+                c += incrC;
+            }
+        }
+        // put the image data in the context
+        context.putImageData(imageData, 0, 0);
+    };
+}; // class dwv.gui.info.MiniColourMap
+
+
+/**
+ * Plot info layer.
+ * @constructor
+ * @param {Object} div The HTML element to add colourMap info to.
+ * @param {Object} app The associated application.
+ */
+dwv.gui.info.Plot = function (div, app)
+{
+    /**
+     * Create the plot info.
+     */
+    this.create = function()
+    {
+        // clean div
+        if ( div ) {
+            dwv.html.cleanNode(div);
+        }
+        // create
+        dwv.gui.plot(div, app.getImage().getHistogram());
+        /*$.plot(div, [ app.getImage().getHistogram() ], {
+            "bars": { "show": true },
+            "grid": { "backgroundcolor": null },
+            "xaxis": { "show": true },
+            "yaxis": { "show": false }
+        });*/
+    };
+
+    /**
+     * Update plot.
+     * @param {Object} event The windowing change event containing the new values.
+     * Warning: expects the plot to exist (use after createPlot).
+     */
+    this.update = function (event)
+    {
+        var wc = event.wc;
+        var ww = event.ww;
+
+        var half = parseInt( (ww-1) / 2, 10 );
+        var center = parseInt( (wc-0.5), 10 );
+        var min = center - half;
+        var max = center + half;
+
+        var markings = [
+            { "color": "#faa", "lineWidth": 1, "xaxis": { "from": min, "to": min } },
+            { "color": "#aaf", "lineWidth": 1, "xaxis": { "from": max, "to": max } }
+        ];
+
+        dwv.gui.plot(div, app.getImage().getHistogram(), {markings: markings});
+        /*$.plot(div, [ app.getImage().getHistogram() ], {
+            "bars": { "show": true },
+            "grid": { "markings": markings, "backgroundcolour": null },
+            "xaxis": { "show": false },
+            "yaxis": { "show": false }
+        });*/
+    };
+
+}; // class dwv.gui.info.Plot
+;// namespaces
+var dwv = dwv || {};
 dwv.html = dwv.html || {};
 
 /**
@@ -15757,245 +16130,8 @@ dwv.math.guid = function ()
 var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
-//external
+// external
 var Kinetic = Kinetic || {};
-
-/**
- * Draw group command.
- * @param {Object} group The group draw.
- * @param {String} name The name of the shape.
- * @param {Object} layer The layer where to draw the group.
- * @param {Object} silent Whether to send a creation event or not.
- * @constructor
- */
-dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
-{
-    var isSilent = (typeof silent === "undefined") ? false : true;
-
-    /**
-     * Get the command name.
-     * @return {String} The command name.
-     */
-    this.getName = function () { return "Draw-"+name; };
-    /**
-     * Execute the command.
-     */
-    this.execute = function () {
-        // add the group to the layer
-        layer.add(group);
-        // draw
-        layer.draw();
-        // callback
-        if (!isSilent) {
-            this.onExecute({'type': 'draw-create', 'id': group.id()});
-        }
-    };
-    /**
-     * Undo the command.
-     */
-    this.undo = function () {
-        // remove the group from the parent layer
-        group.remove();
-        // draw
-        layer.draw();
-        // callback
-        this.onUndo({'type': 'draw-delete', 'id': group.id()});
-    };
-}; // DrawGroupCommand class
-
-/**
- * Handle an execute event.
- * @param {Object} event The execute event with type and id.
- */
-dwv.tool.DrawGroupCommand.prototype.onExecute = function (/*event*/)
-{
-    // default does nothing.
-};
-/**
- * Handle an undo event.
- * @param {Object} event The undo event with type and id.
- */
-dwv.tool.DrawGroupCommand.prototype.onUndo = function (/*event*/)
-{
-    // default does nothing.
-};
-
-/**
- * Move group command.
- * @param {Object} group The group draw.
- * @param {String} name The name of the shape.
- * @param {Object} translation A 2D translation to move the group by.
- * @param {Object} layer The layer where to move the group.
- * @constructor
- */
-dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
-{
-    /**
-     * Get the command name.
-     * @return {String} The command name.
-     */
-    this.getName = function () { return "Move-"+name; };
-
-    /**
-     * Execute the command.
-     */
-    this.execute = function () {
-        // translate all children of group
-        group.getChildren().each( function (shape) {
-            shape.x( shape.x() + translation.x );
-            shape.y( shape.y() + translation.y );
-        });
-        // draw
-        layer.draw();
-        // callback
-        this.onExecute({'type': 'draw-move', 'id': group.id()});
-    };
-    /**
-     * Undo the command.
-     */
-    this.undo = function () {
-        // invert translate all children of group
-        group.getChildren().each( function (shape) {
-            shape.x( shape.x() - translation.x );
-            shape.y( shape.y() - translation.y );
-        });
-        // draw
-        layer.draw();
-        // callback
-        this.onUndo({'type': 'draw-move', 'id': group.id()});
-    };
-}; // MoveGroupCommand class
-
-/**
- * Handle an execute event.
- * @param {Object} event The execute event with type and id.
- */
-dwv.tool.MoveGroupCommand.prototype.onExecute = function (/*event*/)
-{
-    // default does nothing.
-};
-/**
- * Handle an undo event.
- * @param {Object} event The undo event with type and id.
- */
-dwv.tool.MoveGroupCommand.prototype.onUndo = function (/*event*/)
-{
-    // default does nothing.
-};
-
-/**
- * Change group command.
- * @param {String} name The name of the shape.
- * @param {Object} func The change function.
- * @param {Object} startAnchor The anchor that starts the change.
- * @param {Object} endAnchor The anchor that ends the change.
- * @param {Object} layer The layer where to change the group.
- * @param {Object} image The associated image.
- * @constructor
- */
-dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, layer, image)
-{
-    /**
-     * Get the command name.
-     * @return {String} The command name.
-     */
-    this.getName = function () { return "Change-"+name; };
-
-    /**
-     * Execute the command.
-     */
-    this.execute = function () {
-        // change shape
-        func( endAnchor, image );
-        // draw
-        layer.draw();
-        // callback
-        this.onExecute({'type': 'draw-change'});
-    };
-    /**
-     * Undo the command.
-     */
-    this.undo = function () {
-        // invert change shape
-        func( startAnchor, image );
-        // draw
-        layer.draw();
-        // callback
-        this.onUndo({'type': 'draw-change'});
-    };
-}; // ChangeGroupCommand class
-
-/**
- * Handle an execute event.
- * @param {Object} event The execute event with type and id.
- */
-dwv.tool.ChangeGroupCommand.prototype.onExecute = function (/*event*/)
-{
-    // default does nothing.
-};
-/**
- * Handle an undo event.
- * @param {Object} event The undo event with type and id.
- */
-dwv.tool.ChangeGroupCommand.prototype.onUndo = function (/*event*/)
-{
-    // default does nothing.
-};
-
-/**
- * Delete group command.
- * @param {Object} group The group draw.
- * @param {String} name The name of the shape.
- * @param {Object} layer The layer where to delete the group.
- * @constructor
- */
-dwv.tool.DeleteGroupCommand = function (group, name, layer)
-{
-    /**
-     * Get the command name.
-     * @return {String} The command name.
-     */
-    this.getName = function () { return "Delete-"+name; };
-    /**
-     * Execute the command.
-     */
-    this.execute = function () {
-        // remove the group from the parent layer
-        group.remove();
-        // draw
-        layer.draw();
-        // callback
-        this.onExecute({'type': 'draw-delete', 'id': group.id()});
-    };
-    /**
-     * Undo the command.
-     */
-    this.undo = function () {
-        // add the group to the layer
-        layer.add(group);
-        // draw
-        layer.draw();
-        // callback
-        this.onUndo({'type': 'draw-create', 'id': group.id()});
-    };
-}; // DeleteGroupCommand class
-
-/**
- * Handle an execute event.
- * @param {Object} event The execute event with type and id.
- */
-dwv.tool.DeleteGroupCommand.prototype.onExecute = function (/*event*/)
-{
-    // default does nothing.
-};
-/**
- * Handle an undo event.
- * @param {Object} event The undo event with type and id.
- */
-dwv.tool.DeleteGroupCommand.prototype.onUndo = function (/*event*/)
-{
-    // default does nothing.
-};
 
 /**
  * Drawing tool.
@@ -16341,11 +16477,11 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         }
         // set shape display properties
         if ( visible ) {
-            app.addLayerListeners( app.getDrawStage().getContent() );
+            app.addToolCanvasListeners( app.getDrawStage().getContent() );
             shapes.forEach( function (shape){ self.setShapeOn( shape ); });
         }
         else {
-            app.removeLayerListeners( app.getDrawStage().getContent() );
+            app.removeToolCanvasListeners( app.getDrawStage().getContent() );
             shapes.forEach( function (shape){ setShapeOff( shape ); });
         }
         // draw
@@ -16397,24 +16533,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         var dragLastPos = null;
 
         // command name based on shape type
-        var cmdName = "shape";
-        if ( shape instanceof Kinetic.Line ) {
-            if ( shape.points().length == 4 ) {
-                cmdName = "line";
-            }
-            else if ( shape.points().length == 6 ) {
-                cmdName = "protractor";
-            }
-            else {
-                cmdName = "roi";
-            }
-        }
-        else if ( shape instanceof Kinetic.Rect ) {
-            cmdName = "rectangle";
-        }
-        else if ( shape instanceof Kinetic.Ellipse ) {
-            cmdName = "ellipse";
-        }
+        var shapeDisplayName = dwv.tool.GetShapeDisplayName(shape);
 
         // store original colour
         var colour = null;
@@ -16500,7 +16619,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 shapeEditor.setImage(null);
                 document.body.style.cursor = 'default';
                 // delete command
-                var delcmd = new dwv.tool.DeleteGroupCommand(this.getParent(), cmdName, drawLayer);
+                var delcmd = new dwv.tool.DeleteGroupCommand(this.getParent(),
+                    shapeDisplayName, drawLayer);
                 delcmd.onExecute = fireEvent;
                 delcmd.onUndo = fireEvent;
                 delcmd.execute();
@@ -16511,7 +16631,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 var translation = {'x': pos.x - dragStartPos.x,
                         'y': pos.y - dragStartPos.y};
                 if ( translation.x !== 0 || translation.y !== 0 ) {
-                    var mvcmd = new dwv.tool.MoveGroupCommand(this.getParent(), cmdName, translation, drawLayer);
+                    var mvcmd = new dwv.tool.MoveGroupCommand(this.getParent(),
+                        shapeDisplayName, translation, drawLayer);
                     mvcmd.onExecute = fireEvent;
                     mvcmd.onUndo = fireEvent;
                     app.addToUndoStack(mvcmd);
@@ -16679,6 +16800,278 @@ dwv.tool.Draw.prototype.setShapeName = function(name)
  */
 dwv.tool.Draw.prototype.hasShape = function(name) {
     return this.shapeFactoryList[name];
+};
+;// namespaces
+var dwv = dwv || {};
+/** @namespace */
+dwv.tool = dwv.tool || {};
+//external
+var Kinetic = Kinetic || {};
+
+/**
+ * Get the display name of the input Kinetic shape.
+ * @param {Object} shape The Kinetic shape.
+ * @return {String} The display name.
+ */
+dwv.tool.GetShapeDisplayName = function (shape)
+{
+    var displayName = "shape";
+    if ( shape instanceof Kinetic.Line ) {
+        if ( shape.points().length == 4 ) {
+            displayName = "line";
+        }
+        else if ( shape.points().length == 6 ) {
+            displayName = "protractor";
+        }
+        else {
+            displayName = "roi";
+        }
+    }
+    else if ( shape instanceof Kinetic.Rect ) {
+        displayName = "rectangle";
+    }
+    else if ( shape instanceof Kinetic.Ellipse ) {
+        displayName = "ellipse";
+    }
+    // return
+    return displayName;
+};
+
+/**
+ * Draw group command.
+ * @param {Object} group The group draw.
+ * @param {String} name The shape display name.
+ * @param {Object} layer The layer where to draw the group.
+ * @param {Object} silent Whether to send a creation event or not.
+ * @constructor
+ */
+dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
+{
+    var isSilent = (typeof silent === "undefined") ? false : true;
+
+    /**
+     * Get the command name.
+     * @return {String} The command name.
+     */
+    this.getName = function () { return "Draw-"+name; };
+    /**
+     * Execute the command.
+     */
+    this.execute = function () {
+        // add the group to the layer
+        layer.add(group);
+        // draw
+        layer.draw();
+        // callback
+        if (!isSilent) {
+            this.onExecute({'type': 'draw-create', 'id': group.id()});
+        }
+    };
+    /**
+     * Undo the command.
+     */
+    this.undo = function () {
+        // remove the group from the parent layer
+        group.remove();
+        // draw
+        layer.draw();
+        // callback
+        this.onUndo({'type': 'draw-delete', 'id': group.id()});
+    };
+}; // DrawGroupCommand class
+
+/**
+ * Handle an execute event.
+ * @param {Object} event The execute event with type and id.
+ */
+dwv.tool.DrawGroupCommand.prototype.onExecute = function (/*event*/)
+{
+    // default does nothing.
+};
+/**
+ * Handle an undo event.
+ * @param {Object} event The undo event with type and id.
+ */
+dwv.tool.DrawGroupCommand.prototype.onUndo = function (/*event*/)
+{
+    // default does nothing.
+};
+
+/**
+ * Move group command.
+ * @param {Object} group The group draw.
+ * @param {String} name The shape display name.
+ * @param {Object} translation A 2D translation to move the group by.
+ * @param {Object} layer The layer where to move the group.
+ * @constructor
+ */
+dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
+{
+    /**
+     * Get the command name.
+     * @return {String} The command name.
+     */
+    this.getName = function () { return "Move-"+name; };
+
+    /**
+     * Execute the command.
+     */
+    this.execute = function () {
+        // translate all children of group
+        group.getChildren().each( function (shape) {
+            shape.x( shape.x() + translation.x );
+            shape.y( shape.y() + translation.y );
+        });
+        // draw
+        layer.draw();
+        // callback
+        this.onExecute({'type': 'draw-move', 'id': group.id()});
+    };
+    /**
+     * Undo the command.
+     */
+    this.undo = function () {
+        // invert translate all children of group
+        group.getChildren().each( function (shape) {
+            shape.x( shape.x() - translation.x );
+            shape.y( shape.y() - translation.y );
+        });
+        // draw
+        layer.draw();
+        // callback
+        this.onUndo({'type': 'draw-move', 'id': group.id()});
+    };
+}; // MoveGroupCommand class
+
+/**
+ * Handle an execute event.
+ * @param {Object} event The execute event with type and id.
+ */
+dwv.tool.MoveGroupCommand.prototype.onExecute = function (/*event*/)
+{
+    // default does nothing.
+};
+/**
+ * Handle an undo event.
+ * @param {Object} event The undo event with type and id.
+ */
+dwv.tool.MoveGroupCommand.prototype.onUndo = function (/*event*/)
+{
+    // default does nothing.
+};
+
+/**
+ * Change group command.
+ * @param {String} name The shape display name.
+ * @param {Object} func The change function.
+ * @param {Object} startAnchor The anchor that starts the change.
+ * @param {Object} endAnchor The anchor that ends the change.
+ * @param {Object} layer The layer where to change the group.
+ * @param {Object} image The associated image.
+ * @constructor
+ */
+dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, layer, image)
+{
+    /**
+     * Get the command name.
+     * @return {String} The command name.
+     */
+    this.getName = function () { return "Change-"+name; };
+
+    /**
+     * Execute the command.
+     */
+    this.execute = function () {
+        // change shape
+        func( endAnchor, image );
+        // draw
+        layer.draw();
+        // callback
+        this.onExecute({'type': 'draw-change'});
+    };
+    /**
+     * Undo the command.
+     */
+    this.undo = function () {
+        // invert change shape
+        func( startAnchor, image );
+        // draw
+        layer.draw();
+        // callback
+        this.onUndo({'type': 'draw-change'});
+    };
+}; // ChangeGroupCommand class
+
+/**
+ * Handle an execute event.
+ * @param {Object} event The execute event with type and id.
+ */
+dwv.tool.ChangeGroupCommand.prototype.onExecute = function (/*event*/)
+{
+    // default does nothing.
+};
+/**
+ * Handle an undo event.
+ * @param {Object} event The undo event with type and id.
+ */
+dwv.tool.ChangeGroupCommand.prototype.onUndo = function (/*event*/)
+{
+    // default does nothing.
+};
+
+/**
+ * Delete group command.
+ * @param {Object} group The group draw.
+ * @param {String} name The shape display name.
+ * @param {Object} layer The layer where to delete the group.
+ * @constructor
+ */
+dwv.tool.DeleteGroupCommand = function (group, name, layer)
+{
+    /**
+     * Get the command name.
+     * @return {String} The command name.
+     */
+    this.getName = function () { return "Delete-"+name; };
+    /**
+     * Execute the command.
+     */
+    this.execute = function () {
+        // remove the group from the parent layer
+        group.remove();
+        // draw
+        layer.draw();
+        // callback
+        this.onExecute({'type': 'draw-delete', 'id': group.id()});
+    };
+    /**
+     * Undo the command.
+     */
+    this.undo = function () {
+        // add the group to the layer
+        layer.add(group);
+        // draw
+        layer.draw();
+        // callback
+        this.onUndo({'type': 'draw-create', 'id': group.id()});
+    };
+}; // DeleteGroupCommand class
+
+/**
+ * Handle an execute event.
+ * @param {Object} event The execute event with type and id.
+ */
+dwv.tool.DeleteGroupCommand.prototype.onExecute = function (/*event*/)
+{
+    // default does nothing.
+};
+/**
+ * Handle an undo event.
+ * @param {Object} event The undo event with type and id.
+ */
+dwv.tool.DeleteGroupCommand.prototype.onUndo = function (/*event*/)
+{
+    // default does nothing.
 };
 ;// namespaces
 var dwv = dwv || {};
