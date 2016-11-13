@@ -175,33 +175,33 @@ dwv.gui.info.MiniColourMap = function ( div, app )
     {
         var windowCenter = event.wc;
         var windowWidth = event.ww;
-
+        // retrieve canvas and context
         var canvas = div.getElementsByClassName("colour-map-info")[0];
         var context = canvas.getContext('2d');
-
         // fill in the image data
         var colourMap = app.getViewController().getColourMap();
         var imageData = context.getImageData(0,0,canvas.width, canvas.height);
-
+        // histogram sampling
         var c = 0;
         var minInt = app.getImage().getRescaledDataRange().min;
         var range = app.getImage().getRescaledDataRange().max - minInt;
         var incrC = range / canvas.width;
+        // Y scale
         var y = 0;
-
         var yMax = 255;
         var yMin = 0;
+        // X scale
         var xMin = windowCenter - 0.5 - (windowWidth-1) / 2;
         var xMax = windowCenter - 0.5 + (windowWidth-1) / 2;
-
+        // loop through values
         var index;
-        for( var j=0; j<canvas.height; ++j ) {
+        for ( var j = 0; j < canvas.height; ++j ) {
             c = minInt;
-            for( var i=0; i<canvas.width; ++i ) {
-                if( c <= xMin ) {
+            for ( var i = 0; i < canvas.width; ++i ) {
+                if ( c <= xMin ) {
                     y = yMin;
                 }
-                else if( c > xMax ) {
+                else if ( c > xMax ) {
                     y = yMax;
                 }
                 else {
