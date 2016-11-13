@@ -240,14 +240,8 @@ dwv.gui.info.Plot = function (div, app)
         if ( div ) {
             dwv.html.cleanNode(div);
         }
-        // create
+        // plot
         dwv.gui.plot(div, app.getImage().getHistogram());
-        /*$.plot(div, [ app.getImage().getHistogram() ], {
-            "bars": { "show": true },
-            "grid": { "backgroundcolor": null },
-            "xaxis": { "show": true },
-            "yaxis": { "show": false }
-        });*/
     };
 
     /**
@@ -270,13 +264,8 @@ dwv.gui.info.Plot = function (div, app)
             { "color": "#aaf", "lineWidth": 1, "xaxis": { "from": max, "to": max } }
         ];
 
+        // plot
         dwv.gui.plot(div, app.getImage().getHistogram(), {markings: markings});
-        /*$.plot(div, [ app.getImage().getHistogram() ], {
-            "bars": { "show": true },
-            "grid": { "markings": markings, "backgroundcolour": null },
-            "xaxis": { "show": false },
-            "yaxis": { "show": false }
-        });*/
     };
 
 }; // class dwv.gui.info.Plot
