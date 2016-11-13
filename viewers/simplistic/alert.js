@@ -27,7 +27,7 @@ dwv.tool.Alert = function (app)
         console.log(event);
         alert("Alert: mousedown.");
     };
-    
+
     /**
      * Handle mouse move event.
      * @param {Object} event The mouse move event.
@@ -36,7 +36,7 @@ dwv.tool.Alert = function (app)
         console.log("[alert:tool:mousemove]");
         console.log(event);
     };
-    
+
     /**
      * Handle mouse up event.
      * @param {Object} event The mouse up event.
@@ -60,13 +60,13 @@ dwv.tool.Alert = function (app)
 
     /**
      * Display the tool.
-     * Called when switching tools: the last enabled tool is hidden and the current one shown. 
+     * Called when switching tools: the last enabled tool is hidden and the current one shown.
      * @param {Boolean} bool The flag to display or not.
      */
     this.display = function (bool) {
         console.log("[alert:tool:display]");
         console.log("bool: "+bool);
-        
+
         gui.display(bool);
     };
 
@@ -76,7 +76,7 @@ dwv.tool.Alert = function (app)
      */
     this.init = function () {
         console.log("[alert:tool:init]");
-        
+
         gui.initialise();
     };
 
@@ -92,7 +92,7 @@ dwv.tool.Alert.prototype.getHelp = function ()
         "title": "Alert",
         "brief": "Keeps calling alert!",
         "mouse": {
-            "mouse_drag": "This will launch an alert!",
+            "mouse_drag": "This will launch an alert!"
         },
         "touch": {
             "touch_drag": "This will launch an alert!"
@@ -112,7 +112,7 @@ dwv.gui.Alert = function (app)
      */
     this.setup = function () {
         console.log("[alert:gui:setup]");
-        
+
         var button = document.createElement("button");
         button.className = "alert-button";
         button.value = "Alert";
@@ -125,7 +125,7 @@ dwv.gui.Alert = function (app)
         var node = app.getElement("toolbar");
         node.appendChild(button);
     };
-    
+
     /**
      * Display the tool.
      * Called by the tool display method.
@@ -134,11 +134,11 @@ dwv.gui.Alert = function (app)
     this.display = function (bool) {
         console.log("[alert:gui:display]");
         console.log("bool: "+bool);
-        
+
         var button = app.getElement("alert-button");
         button.disabled = bool;
     };
-    
+
     /**
      * Initialise the tool.
      * Called by the tool init method.

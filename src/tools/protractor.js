@@ -50,7 +50,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
     group.name("protractor-group");
     group.add(kshape);
     // text and decoration
-    if ( points.length == 3 ) {
+    if ( points.length === 3 ) {
         var line1 = new dwv.math.Line(points[1], points[2]);
         // quantification
         var angle = dwv.math.getAngle(line0, line1);

@@ -307,24 +307,7 @@ dwv.tool.ShapeEditor = function (app)
         var startAnchor = null;
 
         // command name based on shape type
-        var cmdName = "shape";
-        if ( shape instanceof Kinetic.Line ) {
-            if ( shape.points().length == 4 ) {
-                cmdName = "line";
-            }
-            else if ( shape.points().length == 6 ) {
-                cmdName = "protractor";
-            }
-            else {
-                cmdName = "roi";
-            }
-        }
-        else if ( shape instanceof Kinetic.Rect ) {
-            cmdName = "rectangle";
-        }
-        else if ( shape instanceof Kinetic.Ellipse ) {
-            cmdName = "ellipse";
-        }
+        var shapeDisplayName = dwv.tool.GetShapeDisplayName(shape);
 
         // drag start listener
         anchor.on('dragstart', function () {
@@ -347,7 +330,7 @@ dwv.tool.ShapeEditor = function (app)
             var endAnchor = getClone(this);
             // store the change command
             var chgcmd = new dwv.tool.ChangeGroupCommand(
-                    cmdName, updateFunction, startAnchor, endAnchor, this.getLayer(), image);
+                    shapeDisplayName, updateFunction, startAnchor, endAnchor, this.getLayer(), image);
             chgcmd.onExecute = drawEventCallback;
             chgcmd.onUndo = drawEventCallback;
             chgcmd.execute();

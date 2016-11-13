@@ -28,7 +28,7 @@ dwv.i18nInitialise = function (language, localesPath)
     // use the XHR backend to get translation files
     var i18n = i18next.use(i18nextXHRBackend);
     // use browser language or the specified one
-    if (lng == "auto") {
+    if (lng === "auto") {
         i18n.use(i18nextBrowserLanguageDetector);
     }
     else {

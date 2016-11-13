@@ -8,7 +8,7 @@ dwv.tool.defaultpresets = {};
 dwv.tool.defaultpresets.CT = {
     "mediastinum": {"center": 40, "width": 400},
     "lung": {"center": -500, "width": 1500},
-    "bone": {"center": 500, "width": 2000},
+    "bone": {"center": 500, "width": 2000}
 };
 
 // decode query

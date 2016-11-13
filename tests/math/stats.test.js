@@ -40,7 +40,7 @@ QUnit.test("Test getStats.", function (assert) {
 QUnit.test("Test GUID.", function (assert) {
     var id0 = dwv.math.guid();
     var id1 = dwv.math.guid();
-    assert.equal((id0 == id1), false, "Two GUids should not be equal.");
+    assert.equal((id0 === id1), false, "Two GUids should not be equal.");
 
     var duplicates = 0;
     // create an array of guids

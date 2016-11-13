@@ -14,10 +14,10 @@ dwv.tool.GetShapeDisplayName = function (shape)
 {
     var displayName = "shape";
     if ( shape instanceof Kinetic.Line ) {
-        if ( shape.points().length == 4 ) {
+        if ( shape.points().length === 4 ) {
             displayName = "line";
         }
-        else if ( shape.points().length == 6 ) {
+        else if ( shape.points().length === 6 ) {
             displayName = "protractor";
         }
         else {

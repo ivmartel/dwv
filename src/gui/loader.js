@@ -14,7 +14,7 @@ dwv.gui.base.Loadbox = function (app, loaders)
      * @private
      */
     var loaderSelector = null;
-    
+
     /**
      * Setup the loadbox HTML.
      */
@@ -52,11 +52,11 @@ dwv.gui.base.Loadbox = function (app, loaders)
             }
         }
     };
-    
+
     /**
      * Reset to its original state.
      */
-    this.reset = function () 
+    this.reset = function ()
     {
         // display first loader
         var keys = Object.keys(loaders);
@@ -77,18 +77,18 @@ dwv.gui.base.FileLoad = function (app)
 {
     // closure to self
     var self = this;
-    
+
     /**
      * Internal file input change handler.
      * @param {Object} event The change event.
      */
     function onchangeinternal(event) {
-        if (typeof self.onchange == "function") {
+        if (typeof self.onchange === "function") {
             self.onchange(event);
         }
         app.onChangeFiles(event);
     }
-    
+
     /**
      * Setup the file load HTML to the page.
      */
@@ -139,18 +139,18 @@ dwv.gui.base.UrlLoad = function (app)
 {
     // closure to self
     var self = this;
-    
+
     /**
      * Internal url input change handler.
      * @param {Object} event The change event.
      */
     function onchangeinternal(event) {
-        if (typeof self.onchange == "function") {
+        if (typeof self.onchange === "function") {
             self.onchange(event);
         }
         app.onChangeURL(event);
     }
-    
+
     /**
      * Setup the url load HTML to the page.
      */

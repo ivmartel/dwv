@@ -164,7 +164,7 @@ dwv.image.DicomBufferToView = function ()
                 bitsAllocated, isSigned, onDecodedFrame(0), false);
 
             // decompress the possible other frames
-            if ( nFrames != 1 ) {
+            if ( nFrames !== 1 ) {
                 // decode (asynchronously if possible)
                 for (var f = 1; f < nFrames; ++f) {
                     pixelDecoder.decode(pixelBuffer[f],

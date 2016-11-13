@@ -127,6 +127,6 @@ dwv.tool.UpdateLine = function (anchor, image)
     var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
     var textPos = {
         'x': line.getEnd().getX() + dX * 25,
-        'y': line.getEnd().getY() + dY * 15, };
+        'y': line.getEnd().getY() + dY * 15 };
     klabel.position( textPos );
 };

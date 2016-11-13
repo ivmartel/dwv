@@ -225,9 +225,9 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         else {
             data = new Uint16Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
-                data[i] = view.getInt16(
-                        (byteOffset + Uint16Array.BYTES_PER_ELEMENT * i),
-                        isLittleEndian);
+                data[i] = view.getInt16( (byteOffset +
+                    Uint16Array.BYTES_PER_ELEMENT * i),
+                    isLittleEndian);
             }
         }
         return data;
@@ -251,9 +251,9 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         else {
             data = new Int16Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
-                data[i] = view.getInt16(
-                        (byteOffset + Int16Array.BYTES_PER_ELEMENT * i),
-                        isLittleEndian);
+                data[i] = view.getInt16( (byteOffset +
+                    Int16Array.BYTES_PER_ELEMENT * i),
+                    isLittleEndian);
             }
         }
         return data;
@@ -277,9 +277,9 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         else {
             data = new Uint32Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
-                data[i] = view.getUint32(
-                        (byteOffset + Uint32Array.BYTES_PER_ELEMENT * i),
-                        isLittleEndian);
+                data[i] = view.getUint32( (byteOffset +
+                    Uint32Array.BYTES_PER_ELEMENT * i),
+                    isLittleEndian);
             }
         }
         return data;
@@ -303,9 +303,9 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         else {
             data = new Int32Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
-                data[i] = view.getInt32(
-                        (byteOffset + Int32Array.BYTES_PER_ELEMENT * i),
-                        isLittleEndian);
+                data[i] = view.getInt32( (byteOffset +
+                    Int32Array.BYTES_PER_ELEMENT * i),
+                    isLittleEndian);
             }
         }
         return data;
@@ -329,9 +329,9 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         else {
             data = new Float32Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
-                data[i] = view.getFloat32(
-                        (byteOffset + Float32Array.BYTES_PER_ELEMENT * i),
-                        isLittleEndian);
+                data[i] = view.getFloat32( (byteOffset +
+                    Float32Array.BYTES_PER_ELEMENT * i),
+                    isLittleEndian);
             }
         }
         return data;
@@ -355,9 +355,9 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         else {
             data = new Float64Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
-                data[i] = view.getFloat64(
-                        (byteOffset + Float64Array.BYTES_PER_ELEMENT*i),
-                        isLittleEndian);
+                data[i] = view.getFloat64( (byteOffset +
+                    Float64Array.BYTES_PER_ELEMENT*i),
+                    isLittleEndian);
             }
         }
         return data;
@@ -1199,7 +1199,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     }
 
     // safety check...
-    if (buffer.byteLength != offset) {
+    if (buffer.byteLength !== offset) {
         console.warn("Did not reach the end of the buffer: "+
             offset+" != "+buffer.byteLength);
     }
@@ -1610,7 +1610,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
                 "tag": { "group": "0xFFFE", "element": "0xE0DD" },
                 "vr": "na",
                 "vl": "0",
-                "value": [message],
+                "value": [message]
             };
         line += "\n";
         line += this.getElementAsString(sqDelimElement, prefix);
@@ -1629,7 +1629,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
                 "tag": { "group": "0xFFFE", "element": "0xE0DD" },
                 "vr": "na",
                 "vl": "0",
-                "value": ["(SequenceDelimitationItem)"],
+                "value": ["(SequenceDelimitationItem)"]
             };
         line += "\n";
         line += this.getElementAsString(pixDelimElement, prefix);

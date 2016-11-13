@@ -89,7 +89,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     // first line of the cross
     var trashLine1 = new Kinetic.Line({
         points: [-10, -10, 10, 10 ],
-        stroke: 'red',
+        stroke: 'red'
     });
     // second line of the cross
     var trashLine2 = new Kinetic.Line({
@@ -457,7 +457,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // update group but not 'this' shape
             var group = this.getParent();
             group.getChildren().each( function (shape) {
-                if ( shape === this ) {
+                if ( shape == this ) {
                     return;
                 }
                 shape.x( shape.x() + translation.x );
