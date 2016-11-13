@@ -2161,7 +2161,7 @@ dwv.ViewController = function ( view )
         var center = range.min + width/2;
         presets.minmax = {"center": center, "width": width};
         // optional modality presets
-        if ( typeof dwv.tool.defaultpresets != "undefined" ) {
+        if ( typeof dwv.tool.defaultpresets !== "undefined" ) {
             var modality = image.getMeta().Modality;
             for( var key in dwv.tool.defaultpresets[modality] ) {
                 presets[key] = dwv.tool.defaultpresets[modality][key];
@@ -2434,9 +2434,9 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         else {
             data = new Uint16Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
-                data[i] = view.getInt16(
-                        (byteOffset + Uint16Array.BYTES_PER_ELEMENT * i),
-                        isLittleEndian);
+                data[i] = view.getInt16( (byteOffset +
+                    Uint16Array.BYTES_PER_ELEMENT * i),
+                    isLittleEndian);
             }
         }
         return data;
@@ -2460,9 +2460,9 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         else {
             data = new Int16Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
-                data[i] = view.getInt16(
-                        (byteOffset + Int16Array.BYTES_PER_ELEMENT * i),
-                        isLittleEndian);
+                data[i] = view.getInt16( (byteOffset +
+                    Int16Array.BYTES_PER_ELEMENT * i),
+                    isLittleEndian);
             }
         }
         return data;
@@ -2486,9 +2486,9 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         else {
             data = new Uint32Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
-                data[i] = view.getUint32(
-                        (byteOffset + Uint32Array.BYTES_PER_ELEMENT * i),
-                        isLittleEndian);
+                data[i] = view.getUint32( (byteOffset +
+                    Uint32Array.BYTES_PER_ELEMENT * i),
+                    isLittleEndian);
             }
         }
         return data;
@@ -2512,9 +2512,9 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         else {
             data = new Int32Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
-                data[i] = view.getInt32(
-                        (byteOffset + Int32Array.BYTES_PER_ELEMENT * i),
-                        isLittleEndian);
+                data[i] = view.getInt32( (byteOffset +
+                    Int32Array.BYTES_PER_ELEMENT * i),
+                    isLittleEndian);
             }
         }
         return data;
@@ -2538,9 +2538,9 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         else {
             data = new Float32Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
-                data[i] = view.getFloat32(
-                        (byteOffset + Float32Array.BYTES_PER_ELEMENT * i),
-                        isLittleEndian);
+                data[i] = view.getFloat32( (byteOffset +
+                    Float32Array.BYTES_PER_ELEMENT * i),
+                    isLittleEndian);
             }
         }
         return data;
@@ -2564,9 +2564,9 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         else {
             data = new Float64Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
-                data[i] = view.getFloat64(
-                        (byteOffset + Float64Array.BYTES_PER_ELEMENT*i),
-                        isLittleEndian);
+                data[i] = view.getFloat64( (byteOffset +
+                    Float64Array.BYTES_PER_ELEMENT*i),
+                    isLittleEndian);
             }
         }
         return data;
@@ -3408,7 +3408,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     }
 
     // safety check...
-    if (buffer.byteLength != offset) {
+    if (buffer.byteLength !== offset) {
         console.warn("Did not reach the end of the buffer: "+
             offset+" != "+buffer.byteLength);
     }
@@ -3819,7 +3819,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
                 "tag": { "group": "0xFFFE", "element": "0xE0DD" },
                 "vr": "na",
                 "vl": "0",
-                "value": [message],
+                "value": [message]
             };
         line += "\n";
         line += this.getElementAsString(sqDelimElement, prefix);
@@ -3838,7 +3838,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
                 "tag": { "group": "0xFFFE", "element": "0xE0DD" },
                 "vr": "na",
                 "vl": "0",
-                "value": ["(SequenceDelimitationItem)"],
+                "value": ["(SequenceDelimitationItem)"]
             };
         line += "\n";
         line += this.getElementAsString(pixDelimElement, prefix);
@@ -4502,7 +4502,7 @@ dwv.dicom.dictionary = {
         '0x5180': ['CS', '1', 'OldMagnificationType'],
         '0x5190': ['CS', '1', 'Erase'],
         '0x51A0': ['CS', '1', 'Print'],
-        '0x51B0': ['US', '1-n', 'Overlays'],
+        '0x51B0': ['US', '1-n', 'Overlays']
     },
     '0x0002': {
         '0x0000': ['UL', '1', 'FileMetaInformationGroupLength'],
@@ -4516,7 +4516,7 @@ dwv.dicom.dictionary = {
         '0x0017': ['AE', '1', 'SendingApplicationEntityTitle'],
         '0x0018': ['AE', '1', 'ReceivingApplicationEntityTitle'],
         '0x0100': ['UI', '1', 'PrivateInformationCreatorUID'],
-        '0x0102': ['OB', '1', 'PrivateInformation'],
+        '0x0102': ['OB', '1', 'PrivateInformation']
     },
     '0x0004': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -4538,7 +4538,7 @@ dwv.dicom.dictionary = {
         '0x1511': ['UI', '1', 'ReferencedSOPInstanceUIDInFile'],
         '0x1512': ['UI', '1', 'ReferencedTransferSyntaxUIDInFile'],
         '0x151A': ['UI', '1-n', 'ReferencedRelatedGeneralSOPClassUIDInFile'],
-        '0x1600': ['UL', '1', 'NumberOfReferences'],
+        '0x1600': ['UL', '1', 'NumberOfReferences']
     },
     '0x0008': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -4733,7 +4733,7 @@ dwv.dicom.dictionary = {
         '0x9410': ['SQ', '1', 'ReferencedOtherPlaneSequence'],
         '0x9458': ['SQ', '1', 'FrameDisplaySequence'],
         '0x9459': ['FL', '1', 'RecommendedDisplayFrameRateInFloat'],
-        '0x9460': ['CS', '1', 'SkipFrameRangeFlag'],
+        '0x9460': ['CS', '1', 'SkipFrameRangeFlag']
     },
     '0x0010': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -4791,7 +4791,7 @@ dwv.dicom.dictionary = {
         '0x2298': ['CS', '1', 'ResponsiblePersonRole'],
         '0x2299': ['LO', '1', 'ResponsibleOrganization'],
         '0x4000': ['LT', '1', 'PatientComments'],
-        '0x9431': ['FL', '1', 'ExaminedBodyThickness'],
+        '0x9431': ['FL', '1', 'ExaminedBodyThickness']
     },
     '0x0012': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -4814,7 +4814,7 @@ dwv.dicom.dictionary = {
         '0x0082': ['LO', '1', 'ClinicalTrialProtocolEthicsCommitteeApprovalNumber'],
         '0x0083': ['SQ', '1', 'ConsentForClinicalTrialUseSequence'],
         '0x0084': ['CS', '1', 'DistributionType'],
-        '0x0085': ['CS', '1', 'ConsentForDistributionFlag'],
+        '0x0085': ['CS', '1', 'ConsentForDistributionFlag']
     },
     '0x0014': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -5000,7 +5000,7 @@ dwv.dicom.dictionary = {
         '0x511C': ['DS', '1', 'WedgeInContactWidth'],
         '0x511D': ['DS', '1', 'WedgeChamferHeight'],
         '0x511E': ['CS', '1', 'WedgeCurve'],
-        '0x511F': ['DS', '1', 'RadiusAlongWedge'],
+        '0x511F': ['DS', '1', 'RadiusAlongWedge']
     },
     '0x0018': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -5739,7 +5739,7 @@ dwv.dicom.dictionary = {
         '0x9810': ['xs', '1', 'ZeroVelocityPixelValue'],
         '0xA001': ['SQ', '1', 'ContributingEquipmentSequence'],
         '0xA002': ['DT', '1', 'ContributionDateTime'],
-        '0xA003': ['ST', '1', 'ContributionDescription'],
+        '0xA003': ['ST', '1', 'ContributionDescription']
     },
     '0x0020': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -5863,7 +5863,7 @@ dwv.dicom.dictionary = {
         '0x9453': ['LO', '1', 'FrameLabel'],
         '0x9518': ['US', '1-n', 'AcquisitionIndex'],
         '0x9529': ['SQ', '1', 'ContributingSOPInstancesReferenceSequence'],
-        '0x9536': ['US', '1', 'ReconstructionIndex'],
+        '0x9536': ['US', '1', 'ReconstructionIndex']
     },
     '0x0022': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -6010,7 +6010,7 @@ dwv.dicom.dictionary = {
         '0x1528': ['FL', '1', 'XCoordinatesCenterPixelViewAngle'],
         '0x1529': ['FL', '1', 'YCoordinatesCenterPixelViewAngle'],
         '0x1530': ['UL', '1', 'NumberOfMapPoints'],
-        '0x1531': ['OF', '1', 'TwoDimensionalToThreeDimensionalMapData'],
+        '0x1531': ['OF', '1', 'TwoDimensionalToThreeDimensionalMapData']
     },
     '0x0024': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -6114,7 +6114,7 @@ dwv.dicom.dictionary = {
         '0x0325': ['SQ', '1', 'DataObservationSequence'],
         '0x0338': ['CS', '1', 'IndexNormalsFlag'],
         '0x0341': ['FL', '1', 'IndexProbability'],
-        '0x0344': ['SQ', '1', 'IndexProbabilitySequence'],
+        '0x0344': ['SQ', '1', 'IndexProbabilitySequence']
     },
     '0x0028': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -6359,7 +6359,7 @@ dwv.dicom.dictionary = {
         '0x9506': ['US', '2-2n', 'PixelShiftFrameRange'],
         '0x9507': ['US', '2-2n', 'LUTFrameRange'],
         '0x9520': ['DS', '16', 'ImageToEquipmentMappingMatrix'],
-        '0x9537': ['CS', '1', 'EquipmentCoordinateSystemIdentification'],
+        '0x9537': ['CS', '1', 'EquipmentCoordinateSystemIdentification']
     },
     '0x0032': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -6389,7 +6389,7 @@ dwv.dicom.dictionary = {
         '0x1060': ['LO', '1', 'RequestedProcedureDescription'],
         '0x1064': ['SQ', '1', 'RequestedProcedureCodeSequence'],
         '0x1070': ['LO', '1', 'RequestedContrastAgent'],
-        '0x4000': ['LT', '1', 'StudyComments'],
+        '0x4000': ['LT', '1', 'StudyComments']
     },
     '0x0038': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -6422,7 +6422,7 @@ dwv.dicom.dictionary = {
         '0x0400': ['LO', '1', 'PatientInstitutionResidence'],
         '0x0500': ['LO', '1', 'PatientState'],
         '0x0502': ['SQ', '1', 'PatientClinicalTrialParticipationSequence'],
-        '0x4000': ['LT', '1', 'VisitComments'],
+        '0x4000': ['LT', '1', 'VisitComments']
     },
     '0x003A': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -6463,7 +6463,7 @@ dwv.dicom.dictionary = {
         '0x0248': ['FL', '1', 'AbsoluteChannelDisplayScale'],
         '0x0300': ['SQ', '1', 'MultiplexedAudioChannelsDescriptionCodeSequence'],
         '0x0301': ['IS', '1', 'ChannelIdentificationCode'],
-        '0x0302': ['CS', '1', 'ChannelMode'],
+        '0x0302': ['CS', '1', 'ChannelMode']
     },
     '0x0040': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -6775,7 +6775,7 @@ dwv.dicom.dictionary = {
         '0xE024': ['SQ', '1', 'XDSRetrievalSequence'],
         '0xE025': ['SQ', '1', 'WADORSRetrievalSequence'],
         '0xE030': ['UI', '1', 'RepositoryUniqueID'],
-        '0xE031': ['UI', '1', 'HomeCommunityID'],
+        '0xE031': ['UI', '1', 'HomeCommunityID']
     },
     '0x0042': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -6783,7 +6783,7 @@ dwv.dicom.dictionary = {
         '0x0011': ['OB', '1', 'EncapsulatedDocument'],
         '0x0012': ['LO', '1', 'MIMETypeOfEncapsulatedDocument'],
         '0x0013': ['SQ', '1', 'SourceInstanceSequence'],
-        '0x0014': ['LO', '1-n', 'ListOfMIMETypes'],
+        '0x0014': ['LO', '1-n', 'ListOfMIMETypes']
     },
     '0x0044': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -6800,7 +6800,7 @@ dwv.dicom.dictionary = {
         '0x0011': ['LO', '1', 'SubstanceAdministrationNotes'],
         '0x0012': ['LO', '1', 'SubstanceAdministrationDeviceID'],
         '0x0013': ['SQ', '1', 'ProductParameterSequence'],
-        '0x0019': ['SQ', '1', 'SubstanceAdministrationParameterSequence'],
+        '0x0019': ['SQ', '1', 'SubstanceAdministrationParameterSequence']
     },
     '0x0046': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -6882,7 +6882,7 @@ dwv.dicom.dictionary = {
         '0x0250': ['FL', '1', 'TangentialPower'],
         '0x0251': ['FL', '1', 'RefractivePower'],
         '0x0252': ['FL', '1', 'RelativeElevation'],
-        '0x0253': ['FL', '1', 'CornealWavefront'],
+        '0x0253': ['FL', '1', 'CornealWavefront']
     },
     '0x0048': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -6916,7 +6916,7 @@ dwv.dicom.dictionary = {
         '0x021A': ['SQ', '1', 'PlanePositionSlideSequence'],
         '0x021E': ['SL', '1', 'ColumnPositionInTotalImagePixelMatrix'],
         '0x021F': ['SL', '1', 'RowPositionInTotalImagePixelMatrix'],
-        '0x0301': ['CS', '1', 'PixelOriginInterpretation'],
+        '0x0301': ['CS', '1', 'PixelOriginInterpretation']
     },
     '0x0050': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -6935,7 +6935,7 @@ dwv.dicom.dictionary = {
         '0x001C': ['FD', '1', 'ContainerComponentLength'],
         '0x001D': ['FD', '1', 'ContainerComponentDiameter'],
         '0x001E': ['LO', '1', 'ContainerComponentDescription'],
-        '0x0020': ['LO', '1', 'DeviceDescription'],
+        '0x0020': ['LO', '1', 'DeviceDescription']
     },
     '0x0052': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -6964,7 +6964,7 @@ dwv.dicom.dictionary = {
         '0x0036': ['US', '1', 'SeamLineIndex'],
         '0x0038': ['US', '1', 'NumberOfPaddedALines'],
         '0x0039': ['CS', '1', 'InterpolationType'],
-        '0x003A': ['CS', '1', 'RefractiveIndexApplied'],
+        '0x003A': ['CS', '1', 'RefractiveIndexApplied']
     },
     '0x0054': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7048,7 +7048,7 @@ dwv.dicom.dictionary = {
         '0x1324': ['DS', '1', 'DeadTimeFactor'],
         '0x1330': ['US', '1', 'ImageIndex'],
         '0x1400': ['CS', '1-n', 'CountsIncluded'],
-        '0x1401': ['CS', '1', 'DeadTimeCorrectionFlag'],
+        '0x1401': ['CS', '1', 'DeadTimeCorrectionFlag']
     },
     '0x0060': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7058,7 +7058,7 @@ dwv.dicom.dictionary = {
         '0x3006': ['xs', '1', 'HistogramLastBinValue'],
         '0x3008': ['US', '1', 'HistogramBinWidth'],
         '0x3010': ['LO', '1', 'HistogramExplanation'],
-        '0x3020': ['UL', '1-n', 'HistogramData'],
+        '0x3020': ['UL', '1-n', 'HistogramData']
     },
     '0x0062': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7078,7 +7078,7 @@ dwv.dicom.dictionary = {
         '0x000F': ['SQ', '1', 'SegmentedPropertyTypeCodeSequence'],
         '0x0010': ['CS', '1', 'SegmentationFractionalType'],
         '0x0011': ['SQ', '1', 'SegmentedPropertyTypeModifierCodeSequence'],
-        '0x0012': ['SQ', '1', 'UsedSegmentsSequence'],
+        '0x0012': ['SQ', '1', 'UsedSegmentsSequence']
     },
     '0x0064': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7089,7 +7089,7 @@ dwv.dicom.dictionary = {
         '0x0008': ['FD', '3', 'GridResolution'],
         '0x0009': ['OF', '1', 'VectorGridData'],
         '0x000F': ['SQ', '1', 'PreDeformationMatrixRegistrationSequence'],
-        '0x0010': ['SQ', '1', 'PostDeformationMatrixRegistrationSequence'],
+        '0x0010': ['SQ', '1', 'PostDeformationMatrixRegistrationSequence']
     },
     '0x0066': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7143,7 +7143,7 @@ dwv.dicom.dictionary = {
         '0x0040': ['UL', '1-n', 'LongPrimitivePointIndexList'],
         '0x0041': ['UL', '3-3n', 'LongTrianglePointIndexList'],
         '0x0042': ['UL', '2-2n', 'LongEdgePointIndexList'],
-        '0x0043': ['UL', '1-n', 'LongVertexPointIndexList'],
+        '0x0043': ['UL', '1-n', 'LongVertexPointIndexList']
     },
     '0x0068': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7216,7 +7216,7 @@ dwv.dicom.dictionary = {
         '0x65E0': ['SQ', '1', 'TwoDPlaneCoordinatesSequence'],
         '0x65F0': ['FD', '4', 'TwoDPlaneIntersection'],
         '0x6610': ['FD', '3', 'ThreeDPlaneOrigin'],
-        '0x6620': ['FD', '3', 'ThreeDPlaneNormal'],
+        '0x6620': ['FD', '3', 'ThreeDPlaneNormal']
     },
     '0x0070': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7325,7 +7325,7 @@ dwv.dicom.dictionary = {
         '0x0402': ['SQ', '1', 'BlendingSequence'],
         '0x0403': ['FL', '1', 'RelativeOpacity'],
         '0x0404': ['SQ', '1', 'ReferencedSpatialRegistrationSequence'],
-        '0x0405': ['CS', '1', 'BlendingPosition'],
+        '0x0405': ['CS', '1', 'BlendingPosition']
     },
     '0x0072': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7436,7 +7436,7 @@ dwv.dicom.dictionary = {
         '0x0714': ['CS', '1', 'ShowPatientDemographicsFlag'],
         '0x0716': ['CS', '1', 'ShowAcquisitionTechniquesFlag'],
         '0x0717': ['CS', '1', 'DisplaySetHorizontalJustification'],
-        '0x0718': ['CS', '1', 'DisplaySetVerticalJustification'],
+        '0x0718': ['CS', '1', 'DisplaySetVerticalJustification']
     },
     '0x0074': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7498,7 +7498,7 @@ dwv.dicom.dictionary = {
         '0x1246': ['CS', '1', 'UnifiedProcedureStepListStatus'],
         '0x1324': ['UL', '1', 'BeamOrderIndex'],
         '0x1338': ['FD', '1', 'DoubleExposureMeterset'],
-        '0x133A': ['FD', '4', 'DoubleExposureFieldDelta'],
+        '0x133A': ['FD', '4', 'DoubleExposureFieldDelta']
     },
     '0x0076': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7524,7 +7524,7 @@ dwv.dicom.dictionary = {
         '0x0090': ['US', '1', 'Component1ReferencedMatingFeatureID'],
         '0x00A0': ['US', '1', 'Component2ReferencedID'],
         '0x00B0': ['US', '1', 'Component2ReferencedMatingFeatureSetID'],
-        '0x00C0': ['US', '1', 'Component2ReferencedMatingFeatureID'],
+        '0x00C0': ['US', '1', 'Component2ReferencedMatingFeatureID']
     },
     '0x0078': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7545,7 +7545,7 @@ dwv.dicom.dictionary = {
         '0x00B2': ['LO', '1', 'ImplantTemplateGroupVariationDimensionName'],
         '0x00B4': ['SQ', '1', 'ImplantTemplateGroupVariationDimensionRankSequence'],
         '0x00B6': ['US', '1', 'ReferencedImplantTemplateGroupMemberID'],
-        '0x00B8': ['US', '1', 'ImplantTemplateGroupVariationDimensionRank'],
+        '0x00B8': ['US', '1', 'ImplantTemplateGroupVariationDimensionRank']
     },
     '0x0080': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7561,7 +7561,7 @@ dwv.dicom.dictionary = {
         '0x0010': ['OF', '1-n', 'UValueData'],
         '0x0011': ['OF', '1-n', 'VValueData'],
         '0x0012': ['SQ', '1', 'ReferencedTextureSequence'],
-        '0x0013': ['SQ', '1', 'ReferencedSurfaceDataSequence'],
+        '0x0013': ['SQ', '1', 'ReferencedSurfaceDataSequence']
     },
     '0x0088': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7571,14 +7571,14 @@ dwv.dicom.dictionary = {
         '0x0904': ['LO', '1', 'TopicTitle'],
         '0x0906': ['ST', '1', 'TopicSubject'],
         '0x0910': ['LO', '1', 'TopicAuthor'],
-        '0x0912': ['LO', '1-32', 'TopicKeywords'],
+        '0x0912': ['LO', '1-32', 'TopicKeywords']
     },
     '0x0100': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
         '0x0410': ['CS', '1', 'SOPInstanceStatus'],
         '0x0420': ['DT', '1', 'SOPAuthorizationDateTime'],
         '0x0424': ['LT', '1', 'SOPAuthorizationComment'],
-        '0x0426': ['LO', '1', 'AuthorizationEquipmentCertificationNumber'],
+        '0x0426': ['LO', '1', 'AuthorizationEquipmentCertificationNumber']
     },
     '0x0400': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7605,7 +7605,7 @@ dwv.dicom.dictionary = {
         '0x0562': ['DT', '1', 'AttributeModificationDateTime'],
         '0x0563': ['LO', '1', 'ModifyingSystem'],
         '0x0564': ['LO', '1', 'SourceOfPreviousValues'],
-        '0x0565': ['CS', '1', 'ReasonForTheAttributeModification'],
+        '0x0565': ['CS', '1', 'ReasonForTheAttributeModification']
     },
     '0x1000': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7614,11 +7614,11 @@ dwv.dicom.dictionary = {
         '0x0012': ['US', '1', 'HuffmanTableSize'],
         '0x0013': ['US', '3', 'HuffmanTableTriplet'],
         '0x0014': ['US', '1', 'ShiftTableSize'],
-        '0x0015': ['US', '3', 'ShiftTableTriplet'],
+        '0x0015': ['US', '3', 'ShiftTableTriplet']
     },
     '0x1010': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
-        '0x0004': ['US', '1-n', 'ZonalMap'],
+        '0x0004': ['US', '1-n', 'ZonalMap']
     },
     '0x2000': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7642,7 +7642,7 @@ dwv.dicom.dictionary = {
         '0x00A4': ['SQ', '1', 'OtherMediaAvailableSequence'],
         '0x00A8': ['SQ', '1', 'SupportedImageDisplayFormatsSequence'],
         '0x0500': ['SQ', '1', 'ReferencedFilmBoxSequence'],
-        '0x0510': ['SQ', '1', 'ReferencedStoredPrintSequence'],
+        '0x0510': ['SQ', '1', 'ReferencedStoredPrintSequence']
     },
     '0x2010': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7671,7 +7671,7 @@ dwv.dicom.dictionary = {
         '0x0376': ['DS', '2', 'PrinterPixelSpacing'],
         '0x0500': ['SQ', '1', 'ReferencedFilmSessionSequence'],
         '0x0510': ['SQ', '1', 'ReferencedImageBoxSequence'],
-        '0x0520': ['SQ', '1', 'ReferencedBasicAnnotationBoxSequence'],
+        '0x0520': ['SQ', '1', 'ReferencedBasicAnnotationBoxSequence']
     },
     '0x2020': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7685,12 +7685,12 @@ dwv.dicom.dictionary = {
         '0x0110': ['SQ', '1', 'BasicGrayscaleImageSequence'],
         '0x0111': ['SQ', '1', 'BasicColorImageSequence'],
         '0x0130': ['SQ', '1', 'ReferencedImageOverlayBoxSequence'],
-        '0x0140': ['SQ', '1', 'ReferencedVOILUTBoxSequence'],
+        '0x0140': ['SQ', '1', 'ReferencedVOILUTBoxSequence']
     },
     '0x2030': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
         '0x0010': ['US', '1', 'AnnotationPosition'],
-        '0x0020': ['LO', '1', 'TextString'],
+        '0x0020': ['LO', '1', 'TextString']
     },
     '0x2040': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7705,13 +7705,13 @@ dwv.dicom.dictionary = {
         '0x0082': ['CS', '1', 'OverlayBackgroundDensity'],
         '0x0090': ['CS', '1', 'OverlayMode'],
         '0x0100': ['CS', '1', 'ThresholdDensity'],
-        '0x0500': ['SQ', '1', 'ReferencedImageBoxSequenceRetired'],
+        '0x0500': ['SQ', '1', 'ReferencedImageBoxSequenceRetired']
     },
     '0x2050': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
         '0x0010': ['SQ', '1', 'PresentationLUTSequence'],
         '0x0020': ['CS', '1', 'PresentationLUTShape'],
-        '0x0500': ['SQ', '1', 'ReferencedPresentationLUTSequence'],
+        '0x0500': ['SQ', '1', 'ReferencedPresentationLUTSequence']
     },
     '0x2100': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7724,20 +7724,20 @@ dwv.dicom.dictionary = {
         '0x0140': ['AE', '1', 'DestinationAE'],
         '0x0160': ['SH', '1', 'OwnerID'],
         '0x0170': ['IS', '1', 'NumberOfFilms'],
-        '0x0500': ['SQ', '1', 'ReferencedPrintJobSequencePullStoredPrint'],
+        '0x0500': ['SQ', '1', 'ReferencedPrintJobSequencePullStoredPrint']
     },
     '0x2110': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
         '0x0010': ['CS', '1', 'PrinterStatus'],
         '0x0020': ['CS', '1', 'PrinterStatusInfo'],
         '0x0030': ['LO', '1', 'PrinterName'],
-        '0x0099': ['SH', '1', 'PrintQueueID'],
+        '0x0099': ['SH', '1', 'PrintQueueID']
     },
     '0x2120': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
         '0x0010': ['CS', '1', 'QueueStatus'],
         '0x0050': ['SQ', '1', 'PrintJobDescriptionSequence'],
-        '0x0070': ['SQ', '1', 'ReferencedPrintJobSequence'],
+        '0x0070': ['SQ', '1', 'ReferencedPrintJobSequence']
     },
     '0x2130': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7749,7 +7749,7 @@ dwv.dicom.dictionary = {
         '0x0060': ['SQ', '1', 'ImageOverlayBoxContentSequence'],
         '0x0080': ['SQ', '1', 'PresentationLUTContentSequence'],
         '0x00A0': ['SQ', '1', 'ProposedStudySequence'],
-        '0x00C0': ['SQ', '1', 'OriginalImageSequence'],
+        '0x00C0': ['SQ', '1', 'OriginalImageSequence']
     },
     '0x2200': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7768,7 +7768,7 @@ dwv.dicom.dictionary = {
         '0x000D': ['SQ', '1', 'ReferencedStorageMediaSequence'],
         '0x000E': ['AT', '1-n', 'FailureAttributes'],
         '0x000F': ['CS', '1', 'AllowLossyCompression'],
-        '0x0020': ['CS', '1', 'RequestPriority'],
+        '0x0020': ['CS', '1', 'RequestPriority']
     },
     '0x3002': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7796,7 +7796,7 @@ dwv.dicom.dictionary = {
         '0x0042': ['DS', '1', 'FluenceDataScale'],
         '0x0050': ['SQ', '1', 'PrimaryFluenceModeSequence'],
         '0x0051': ['CS', '1', 'FluenceMode'],
-        '0x0052': ['SH', '1', 'FluenceModeID'],
+        '0x0052': ['SH', '1', 'FluenceModeID']
     },
     '0x3004': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7823,7 +7823,7 @@ dwv.dicom.dictionary = {
         '0x0062': ['CS', '1', 'DVHROIContributionType'],
         '0x0070': ['DS', '1', 'DVHMinimumDose'],
         '0x0072': ['DS', '1', 'DVHMaximumDose'],
-        '0x0074': ['DS', '1', 'DVHMeanDose'],
+        '0x0074': ['DS', '1', 'DVHMeanDose']
     },
     '0x3006': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7877,7 +7877,7 @@ dwv.dicom.dictionary = {
         '0x00C2': ['UI', '1', 'RelatedFrameOfReferenceUID'],
         '0x00C4': ['CS', '1', 'FrameOfReferenceTransformationType'],
         '0x00C6': ['DS', '16', 'FrameOfReferenceTransformationMatrix'],
-        '0x00C8': ['LO', '1', 'FrameOfReferenceTransformationComment'],
+        '0x00C8': ['LO', '1', 'FrameOfReferenceTransformationComment']
     },
     '0x3008': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -7974,7 +7974,7 @@ dwv.dicom.dictionary = {
         '0x0230': ['CS', '1', 'BeamStopperPosition'],
         '0x0240': ['SQ', '1', 'FractionStatusSummarySequence'],
         '0x0250': ['DA', '1', 'TreatmentDate'],
-        '0x0251': ['TM', '1', 'TreatmentTime'],
+        '0x0251': ['TM', '1', 'TreatmentTime']
     },
     '0x300A': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -8343,7 +8343,7 @@ dwv.dicom.dictionary = {
         '0x0450': ['SQ', '1', 'DeviceMotionControlSequence'],
         '0x0451': ['CS', '1', 'DeviceMotionExecutionMode'],
         '0x0452': ['CS', '1', 'DeviceMotionObservationMode'],
-        '0x0453': ['SQ', '1', 'DeviceMotionParameterCodeSequence'],
+        '0x0453': ['SQ', '1', 'DeviceMotionParameterCodeSequence']
     },
     '0x300C': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -8380,19 +8380,19 @@ dwv.dicom.dictionary = {
         '0x0104': ['IS', '1', 'ReferencedRangeModulatorNumber'],
         '0x0111': ['SQ', '1', 'OmittedBeamTaskSequence'],
         '0x0112': ['CS', '1', 'ReasonForOmission'],
-        '0x0113': ['LO', '1', 'ReasonForOmissionDescription'],
+        '0x0113': ['LO', '1', 'ReasonForOmissionDescription']
     },
     '0x300E': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
         '0x0002': ['CS', '1', 'ApprovalStatus'],
         '0x0004': ['DA', '1', 'ReviewDate'],
         '0x0005': ['TM', '1', 'ReviewTime'],
-        '0x0008': ['PN', '1', 'ReviewerName'],
+        '0x0008': ['PN', '1', 'ReviewerName']
     },
     '0x4000': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
         '0x0010': ['LT', '1', 'Arbitrary'],
-        '0x4000': ['LT', '1', 'TextComments'],
+        '0x4000': ['LT', '1', 'TextComments']
     },
     '0x4008': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -8423,7 +8423,7 @@ dwv.dicom.dictionary = {
         '0x0210': ['CS', '1', 'InterpretationTypeID'],
         '0x0212': ['CS', '1', 'InterpretationStatusID'],
         '0x0300': ['ST', '1', 'Impressions'],
-        '0x4000': ['ST', '1', 'ResultsComments'],
+        '0x4000': ['ST', '1', 'ResultsComments']
     },
     '0x4010': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -8512,11 +8512,11 @@ dwv.dicom.dictionary = {
         '0x107B': ['SQ', '1', 'PTORegionSequence'],
         '0x107C': ['CS', '1', 'InspectionSelectionCriteria'],
         '0x107D': ['SQ', '1', 'SecondaryInspectionMethodSequence'],
-        '0x107E': ['DS', '6', 'PRCSToRCSOrientation'],
+        '0x107E': ['DS', '6', 'PRCSToRCSOrientation']
     },
     '0x4FFE': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
-        '0x0001': ['SQ', '1', 'MACParametersSequence'],
+        '0x0001': ['SQ', '1', 'MACParametersSequence']
     },
     '0x5000': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -8545,12 +8545,12 @@ dwv.dicom.dictionary = {
         '0x2500': ['LO', '1', 'CurveLabel'],
         '0x2600': ['SQ', '1', 'CurveReferencedOverlaySequence'],
         '0x2610': ['US', '1', 'CurveReferencedOverlayGroup'],
-        '0x3000': ['ox', '1', 'CurveData'],
+        '0x3000': ['ox', '1', 'CurveData']
     },
     '0x5200': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
         '0x9229': ['SQ', '1', 'SharedFunctionalGroupsSequence'],
-        '0x9230': ['SQ', '1', 'PerFrameFunctionalGroupsSequence'],
+        '0x9230': ['SQ', '1', 'PerFrameFunctionalGroupsSequence']
     },
     '0x5400': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -8560,12 +8560,12 @@ dwv.dicom.dictionary = {
         '0x1004': ['US', '1', 'WaveformBitsAllocated'],
         '0x1006': ['CS', '1', 'WaveformSampleInterpretation'],
         '0x100A': ['ox', '1', 'WaveformPaddingValue'],
-        '0x1010': ['ox', '1', 'WaveformData'],
+        '0x1010': ['ox', '1', 'WaveformData']
     },
     '0x5600': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
         '0x0010': ['OF', '1', 'FirstOrderPhaseCorrectionAngle'],
-        '0x0020': ['OF', '1', 'SpectroscopyData'],
+        '0x0020': ['OF', '1', 'SpectroscopyData']
     },
     '0x6000': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -8608,7 +8608,7 @@ dwv.dicom.dictionary = {
         '0x1303': ['DS', '1', 'ROIStandardDeviation'],
         '0x1500': ['LO', '1', 'OverlayLabel'],
         '0x3000': ['ox', '1', 'OverlayData'],
-        '0x4000': ['LT', '1', 'OverlayComments'],
+        '0x4000': ['LT', '1', 'OverlayComments']
     },
     '0x7FE0': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -8617,7 +8617,7 @@ dwv.dicom.dictionary = {
         '0x0010': ['ox', '1', 'PixelData'],
         '0x0020': ['OW', '1', 'CoefficientsSDVN'],
         '0x0030': ['OW', '1', 'CoefficientsSDHN'],
-        '0x0040': ['OW', '1', 'CoefficientsSDDN'],
+        '0x0040': ['OW', '1', 'CoefficientsSDDN']
     },
     '0x7F00': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
@@ -8625,21 +8625,21 @@ dwv.dicom.dictionary = {
         '0x0011': ['US', '1', 'VariableNextDataGroup'],
         '0x0020': ['OW', '1', 'VariableCoefficientsSDVN'],
         '0x0030': ['OW', '1', 'VariableCoefficientsSDHN'],
-        '0x0040': ['OW', '1', 'VariableCoefficientsSDDN'],
+        '0x0040': ['OW', '1', 'VariableCoefficientsSDDN']
     },
     '0xFFFA': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
-        '0xFFFA': ['SQ', '1', 'DigitalSignaturesSequence'],
+        '0xFFFA': ['SQ', '1', 'DigitalSignaturesSequence']
     },
     '0xFFFC': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
-        '0xFFFC': ['OB', '1', 'DataSetTrailingPadding'],
+        '0xFFFC': ['OB', '1', 'DataSetTrailingPadding']
     },
     '0xFFFE': {
         '0x0000': ['UL', '1', 'GenericGroupLength'],
         '0xE000': ['NONE', '1', 'Item'],
         '0xE00D': ['NONE', '1', 'ItemDelimitationItem'],
-        '0xE0DD': ['NONE', '1', 'SequenceDelimitationItem'],
+        '0xE0DD': ['NONE', '1', 'SequenceDelimitationItem']
     }
 }; // dwv.dicom.Dictionnary
 
@@ -10643,7 +10643,7 @@ dwv.gui.base.Loadbox = function (app, loaders)
      * @private
      */
     var loaderSelector = null;
-    
+
     /**
      * Setup the loadbox HTML.
      */
@@ -10681,11 +10681,11 @@ dwv.gui.base.Loadbox = function (app, loaders)
             }
         }
     };
-    
+
     /**
      * Reset to its original state.
      */
-    this.reset = function () 
+    this.reset = function ()
     {
         // display first loader
         var keys = Object.keys(loaders);
@@ -10706,18 +10706,18 @@ dwv.gui.base.FileLoad = function (app)
 {
     // closure to self
     var self = this;
-    
+
     /**
      * Internal file input change handler.
      * @param {Object} event The change event.
      */
     function onchangeinternal(event) {
-        if (typeof self.onchange == "function") {
+        if (typeof self.onchange === "function") {
             self.onchange(event);
         }
         app.onChangeFiles(event);
     }
-    
+
     /**
      * Setup the file load HTML to the page.
      */
@@ -10768,18 +10768,18 @@ dwv.gui.base.UrlLoad = function (app)
 {
     // closure to self
     var self = this;
-    
+
     /**
      * Internal url input change handler.
      * @param {Object} event The change event.
      */
     function onchangeinternal(event) {
-        if (typeof self.onchange == "function") {
+        if (typeof self.onchange === "function") {
             self.onchange(event);
         }
         app.onChangeURL(event);
     }
-    
+
     /**
      * Setup the url load HTML to the page.
      */
@@ -13600,7 +13600,7 @@ dwv.image.DicomBufferToView = function ()
                 bitsAllocated, isSigned, onDecodedFrame(0), false);
 
             // decompress the possible other frames
-            if ( nFrames != 1 ) {
+            if ( nFrames !== 1 ) {
                 // decode (asynchronously if possible)
                 for (var f = 1; f < nFrames; ++f) {
                     pixelDecoder.decode(pixelBuffer[f],
@@ -16217,7 +16217,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     // first line of the cross
     var trashLine1 = new Kinetic.Line({
         points: [-10, -10, 10, 10 ],
-        stroke: 'red',
+        stroke: 'red'
     });
     // second line of the cross
     var trashLine2 = new Kinetic.Line({
@@ -16585,7 +16585,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // update group but not 'this' shape
             var group = this.getParent();
             group.getChildren().each( function (shape) {
-                if ( shape === this ) {
+                if ( shape == this ) {
                     return;
                 }
                 shape.x( shape.x() + translation.x );
@@ -16817,10 +16817,10 @@ dwv.tool.GetShapeDisplayName = function (shape)
 {
     var displayName = "shape";
     if ( shape instanceof Kinetic.Line ) {
-        if ( shape.points().length == 4 ) {
+        if ( shape.points().length === 4 ) {
             displayName = "line";
         }
-        else if ( shape.points().length == 6 ) {
+        else if ( shape.points().length === 6 ) {
             displayName = "protractor";
         }
         else {
@@ -17382,24 +17382,7 @@ dwv.tool.ShapeEditor = function (app)
         var startAnchor = null;
 
         // command name based on shape type
-        var cmdName = "shape";
-        if ( shape instanceof Kinetic.Line ) {
-            if ( shape.points().length == 4 ) {
-                cmdName = "line";
-            }
-            else if ( shape.points().length == 6 ) {
-                cmdName = "protractor";
-            }
-            else {
-                cmdName = "roi";
-            }
-        }
-        else if ( shape instanceof Kinetic.Rect ) {
-            cmdName = "rectangle";
-        }
-        else if ( shape instanceof Kinetic.Ellipse ) {
-            cmdName = "ellipse";
-        }
+        var shapeDisplayName = dwv.tool.GetShapeDisplayName(shape);
 
         // drag start listener
         anchor.on('dragstart', function () {
@@ -17422,7 +17405,7 @@ dwv.tool.ShapeEditor = function (app)
             var endAnchor = getClone(this);
             // store the change command
             var chgcmd = new dwv.tool.ChangeGroupCommand(
-                    cmdName, updateFunction, startAnchor, endAnchor, this.getLayer(), image);
+                    shapeDisplayName, updateFunction, startAnchor, endAnchor, this.getLayer(), image);
             chgcmd.onExecute = drawEventCallback;
             chgcmd.onUndo = drawEventCallback;
             chgcmd.execute();
@@ -18834,7 +18817,7 @@ dwv.tool.UpdateLine = function (anchor, image)
     var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
     var textPos = {
         'x': line.getEnd().getX() + dX * 25,
-        'y': line.getEnd().getY() + dY * 15, };
+        'y': line.getEnd().getY() + dY * 15 };
     klabel.position( textPos );
 };
 ;// namespaces
@@ -19280,7 +19263,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
     group.name("protractor-group");
     group.add(kshape);
     // text and decoration
-    if ( points.length == 3 ) {
+    if ( points.length === 3 ) {
         var line1 = new dwv.math.Line(points[1], points[2]);
         // quantification
         var angle = dwv.math.getAngle(line0, line1);
@@ -20807,7 +20790,7 @@ dwv.i18nInitialise = function (language, localesPath)
     // use the XHR backend to get translation files
     var i18n = i18next.use(i18nextXHRBackend);
     // use browser language or the specified one
-    if (lng == "auto") {
+    if (lng === "auto") {
         i18n.use(i18nextBrowserLanguageDetector);
     }
     else {
