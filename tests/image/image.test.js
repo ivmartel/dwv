@@ -29,21 +29,6 @@ QUnit.test("Test Image getValue.", function (assert) {
     assert.equal( isNaN(image0.getValue(4, 3, 0)), true, "Value outside is NaN" );
     // TODO: wrong, should not be accessed
     assert.equal( image0.getValue(5, 0, 0), 1*size0 + 1, "Value at 5,0,0" );
-    // histogram
-    var histogram = image0.getHistogram();
-    assert.equal( histogram.length, size0*size0, "histogram size" );
-    var histoContentTest = true;
-    for ( var j=0; j<size0*size0; ++j) {
-        if ( histogram[j][0] !== j ) {
-            histoContentTest = false;
-            break;
-        }
-        if ( histogram[j][1] !== 1 ) {
-            histoContentTest = false;
-            break;
-        }
-    }
-    assert.equal( histoContentTest, true, "histogram content" );
 
     // image with rescale
     var image1 = new dwv.image.Image(imgGeometry0, [buffer0]);
@@ -60,6 +45,40 @@ QUnit.test("Test Image getValue.", function (assert) {
     assert.equal( image1.getRescaledValue(1, 0, 0), 1*slope1+intercept1, "Value at 1,0,0" );
     assert.equal( image1.getRescaledValue(1, 1, 0), (1*size0 + 1)*slope1+intercept1, "Value at 1,1,0" );
     assert.equal( image1.getRescaledValue(3, 3, 0), (3*size0 + 3)*slope1+intercept1, "Value at 3,3,0" );
+});
+
+/**
+ * Tests for {@link dwv.image.Image} histogram.
+ * @function module:tests/image~histogram
+ */
+QUnit.test("Test Image histogram.", function (assert) {
+    // create a simple image
+    var size0 = 4;
+    var imgSize0 = new dwv.image.Size(size0, size0, 1);
+    var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+    var imgOrigin0 = new dwv.math.Point3D(0,0,0);
+    var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
+    var buffer0 = [];
+    for(var i=0; i<size0*size0; ++i) {
+        buffer0[i] = i;
+    }
+    var image0 = new dwv.image.Image(imgGeometry0, [buffer0]);
+
+    // histogram
+    var histogram = image0.getHistogram();
+    assert.equal( histogram.length, size0*size0, "histogram size" );
+    var histoContentTest = true;
+    for ( var j=0; j<size0*size0; ++j) {
+        if ( histogram[j][0] !== j ) {
+            histoContentTest = false;
+            break;
+        }
+        if ( histogram[j][1] !== 1 ) {
+            histoContentTest = false;
+            break;
+        }
+    }
+    assert.equal( histoContentTest, true, "histogram content" );
 });
 
 /**
@@ -298,4 +317,3 @@ QUnit.test("Test Image compose.", function (assert) {
     }
     assert.equal( testContent0, true, "compose addition" );
 });
-
