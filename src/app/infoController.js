@@ -122,4 +122,4 @@ dwv.InfoController = function (containerDivId)
         isInfoLayerListening = false;
     }
 
-}; // class dwv.infoController
+}; // class dwv.InfoController
