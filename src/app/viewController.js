@@ -77,6 +77,15 @@ dwv.ViewController = function ( view )
     };
 
     /**
+     * Get the current frame.
+     * @return {Number} The frame number.
+      */
+    this.getCurrentFrame = function ()
+    {
+        return view.getCurrentFrame();
+    };
+
+    /**
      * Set the current frame.
      * @param {Number} number The frame number.
      * @return {Boolean} False if not in bounds.

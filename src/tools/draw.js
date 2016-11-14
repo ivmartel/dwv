@@ -305,8 +305,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         // make layer listen or not to events
         app.getDrawStage().listening( flag );
         // get the current draw layer
-        drawLayer = app.getDrawLayer();
-        updateDrawLayer(flag);
+        drawLayer = app.getCurrentDrawLayer();
+        updateDrawLayer();
         // listen to app change to update the draw layer
         if (flag) {
             app.addEventListener("slice-change", updateDrawLayer);
@@ -325,7 +325,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         // deactivate the old draw layer
         renderDrawLayer(false);
         // get the current draw layer
-        drawLayer = app.getDrawLayer();
+        drawLayer = app.getCurrentDrawLayer();
         // activate the new draw layer
         renderDrawLayer(true);
     }

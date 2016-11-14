@@ -252,8 +252,8 @@ dwv.gui.base.DrawList = function (app)
             node.removeChild(node.firstChild);
         }
         // tags HTML table
-        var drawDetailsList = app.getDrawDetailsList();
-        var table = dwv.html.toTable(drawDetailsList);
+        var drawDisplayDetails = app.getDrawDisplayDetails();
+        var table = dwv.html.toTable(drawDisplayDetails);
         table.className = "drawsTable";
 
         // optional gui specific table post process
@@ -308,7 +308,7 @@ dwv.gui.base.DrawList = function (app)
             // loop through rows
             for (var r = 1; r < table.rows.length; ++r) {
                 var drawId = r - 1;
-                var drawDetails = drawDetailsList[drawId];
+                var drawDetails = drawDisplayDetails[drawId];
                 var row = table.rows.item(r);
                 var cells = row.cells;
 

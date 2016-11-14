@@ -16,40 +16,8 @@ dwv.State = function (app)
      */
     this.toJSON = function () {
         // store each slice drawings group
-        var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
-        var nFrames = app.getImage().getNumberOfFrames();
-        var drawings = [];
-        var drawingsDetails = [];
-        for ( var k = 0; k < nSlices; ++k ) {
-            drawings[k] = [];
-            drawingsDetails[k] = [];
-            for ( var f = 0; f < nFrames; ++f ) {
-                // getChildren always return, so drawings will have the good size
-                var groups = app.getDrawLayer(k,f).getChildren();
-                var details = [];
-                for ( var i = 0; i < groups.length; ++i ) {
-                    // remove anchors
-                    var anchors = groups[i].find(".anchor");
-                    for ( var a = 0; a < anchors.length; ++a ) {
-                        anchors[a].remove();
-                    }
-                    // get text
-                    var texts = groups[i].find(".text");
-                    if ( texts.length !== 1 ) {
-                        console.warn("There should not be more than one text per shape.");
-                    }
-                    // get details (non Kinetic vars)
-                    details.push({
-                        "id": groups[i].id(),
-                        "textExpr": encodeURIComponent(texts[0].textExpr),
-                        "longText": encodeURIComponent(texts[0].longText),
-                        "quant": texts[0].quant
-                    });
-                }
-                drawings[k].push(groups);
-                drawingsDetails[k].push(details);
-            }
-        }
+        var drawings = app.getDraws();
+        var drawingsDetails = app.getDrawStoreDetails();
         // return a JSON string
         return JSON.stringify( {
             "version": "0.2",
@@ -67,15 +35,14 @@ dwv.State = function (app)
     /**
      * Load an application state from JSON.
      * @param {String} json The JSON representation of the state.
-     * @param {Object} eventCallback The callback to associate to draw commands.
      */
-    this.fromJSON = function (json, eventCallback) {
+    this.fromJSON = function (json) {
         var data = JSON.parse(json);
         if (data.version === "0.1") {
-            readV01(data, eventCallback);
+            readV01(data);
         }
         else if (data.version === "0.2") {
-            readV02(data, eventCallback);
+            readV02(data);
         }
         else {
             throw new Error("Unknown state file format version: '"+data.version+"'.");
@@ -84,16 +51,16 @@ dwv.State = function (app)
     /**
      * Read an application state from an Object in v0.1 format.
      * @param {Object} data The Object representation of the state.
-     * @param {Object} eventCallback The callback to associate to draw commands.
      */
-    function readV01(data, eventCallback) {
+    function readV01(data) {
         // display
         app.getViewController().setWindowLevel(data["window-center"], data["window-width"]);
         app.getViewController().setCurrentPosition(data.position);
         app.zoom(data.scale, data.scaleCenter.x, data.scaleCenter.y);
         app.translate(data.translation.x, data.translation.y);
         // drawings
-        var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
+        app.setDrawings( data.drawings, null);
+        /*var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
         var nFrames = app.getImage().getNumberOfFrames();
         var isShape = function (node) {
             return node.name() === "shape";
@@ -114,21 +81,21 @@ dwv.State = function (app)
                     app.addToUndoStack(cmd);
                 }
             }
-        }
+        }*/
     }
     /**
      * Read an application state from an Object in v0.2 format.
      * @param {Object} data The Object representation of the state.
-     * @param {Object} eventCallback The callback to associate to draw commands.
      */
-    function readV02(data, eventCallback) {
+    function readV02(data) {
         // display
         app.getViewController().setWindowLevel(data["window-center"], data["window-width"]);
         app.getViewController().setCurrentPosition(data.position);
         app.zoom(data.scale, data.scaleCenter.x, data.scaleCenter.y);
         app.translate(data.translation.x, data.translation.y);
         // drawings
-        var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
+        app.setDrawings( data.drawings, data.drawingsDetails);
+        /*var nSlices = app.getImage().getGeometry().getSize().getNumberOfSlices();
         var nFrames = app.getImage().getNumberOfFrames();
         var isShape = function (node) {
             return node.name() === "shape";
@@ -164,6 +131,6 @@ dwv.State = function (app)
                     app.addToUndoStack(cmd);
                 }
             }
-        }
+        }*/
     }
 }; // State class
