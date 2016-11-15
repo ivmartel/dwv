@@ -58,14 +58,6 @@ module.exports = function(grunt) {
                     configure: 'resources/jsdoc.conf.json'
                 }
             }
-        },
-        execute: {
-            sauce_full: {
-                options: {
-                    args: ['full']
-                },
-                src: ['tests/visual/sauce.js']
-            }
         }
     });
 
@@ -75,9 +67,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-jsdoc');
-    grunt.loadNpmTasks('grunt-execute');
 
     // Task to run tests
     grunt.registerTask('publish', ['jshint', 'qunit', 'coveralls', 'concat', 'uglify', 'jsdoc']);
-    grunt.registerTask('sauce', ['execute:sauce_full']);
 };

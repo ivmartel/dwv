@@ -11,8 +11,23 @@ var process = process || {};
  * Has to be launched from the root dir with grunt: `grunt sauce`
  * If it is the first time, install all dependencies by running:
  *  `npm install` (from the root dir, will install locally).
- * 
+ *
  * Results are published publicly at: https://saucelabs.com/u/ivmartel
+ *
+ * Removed to solve dependencies... TODO Find another way?
+ * Gruntfile:
+grunt.initConfig({
+    execute: {
+        sauce_full: {
+            options: {
+                args: ['full']
+            },
+            src: ['tests/visual/sauce.js']
+        }
+    }
+});
+grunt.loadNpmTasks('grunt-execute');
+grunt.registerTask('sauce', ['execute:sauce_full']);
  */
 
 // selenium webdriver
