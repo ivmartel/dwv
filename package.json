@@ -18,10 +18,10 @@
     "kinetic": "~5"
   },
   "devDependencies": {
-    "grunt": "~1.0",
+    "grunt": "~0.4",
     "grunt-cli": "~1.2",
     "grunt-contrib-jshint": "~1.0",
-    "grunt-qunit-istanbul": "~1.0",
+    "grunt-qunit-istanbul": "~0.6",
     "grunt-coveralls": "~1.0",
     "grunt-contrib-concat": "~1.0",
     "grunt-contrib-uglify": "~2.0",
