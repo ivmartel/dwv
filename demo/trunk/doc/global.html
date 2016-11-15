@@ -178,6 +178,21 @@ If it is the first time, install all dependencies by running:
  `npm install` (from the root dir, will install locally).
 
 Results are published publicly at: https://saucelabs.com/u/ivmartel
+
+Removed to solve dependencies... TODO Find another way?
+Gruntfile:
+grunt.initConfig({
+    execute: {
+        sauce_full: {
+            options: {
+                args: ['full']
+            },
+            src: ['tests/visual/sauce.js']
+        }
+    }
+});
+grunt.loadNpmTasks('grunt-execute');
+grunt.registerTask('sauce', ['execute:sauce_full']);
     </div>
     
 
@@ -219,7 +234,7 @@ Results are published publicly at: https://saucelabs.com/u/ivmartel
 		<ul class="dummy">
 			<li>
 				<a href="tests_visual_sauce.js.html">tests/visual/sauce.js</a>,
-				 <a href="tests_visual_sauce.js.html#sunlight-1-line-19">line 19</a>
+				 <a href="tests_visual_sauce.js.html#sunlight-1-line-34">line 34</a>
 			</li>
 		</ul>
 	</dd>
