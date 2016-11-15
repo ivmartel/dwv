@@ -52,14 +52,14 @@ dwv.App = function ()
     // Dicom tags gui
     var tagsGui = null;
 
+    // Drawing list gui
     var drawListGui = null;
 
     // Image layer
     var imageLayer = null;
-    // Draw layers
-    var drawLayers = [];
-    // Draw stage
-    var drawStage = null;
+
+    // Draw controller
+    var drawController = null;
 
     // Generic style
     var style = new dwv.html.Style();
@@ -150,21 +150,19 @@ dwv.App = function ()
      */
     this.getImageLayer = function () { return imageLayer; };
     /**
-     * Get the draw layer.
-     * @param {Number} slice Optional slice position (uses the current slice position if not provided).
-     * @param {Number} frame Optional frame position (uses the current frame position if not provided).
+     * Get the current draw layer.
      * @return {Object} The draw layer.
      */
-    this.getDrawLayer = function (slice, frame) {
-        var k = (typeof slice === "undefined") ? view.getCurrentPosition().k : slice;
-        var f = (typeof frame === "undefined") ? view.getCurrentFrame() : frame;
-        return drawLayers[k][f];
+    this.getCurrentDrawLayer = function () {
+        return drawController.getCurrentDrawLayer();
     };
     /**
      * Get the draw stage.
-     * @return {Object} The draw layer.
+     * @return {Object} The draw stage.
      */
-    this.getDrawStage = function () { return drawStage; };
+    this.getDrawStage = function () {
+        return drawController.getDrawStage();
+     };
 
     /**
      * Get the app style.
@@ -369,8 +367,8 @@ dwv.App = function ()
             toolboxController.reset();
         }
         // clear draw
-        if ( drawStage ) {
-            drawLayers = [];
+        if ( drawController ) {
+            drawController.reset();
         }
         // clear objects
         image = null;
@@ -394,10 +392,8 @@ dwv.App = function ()
             imageLayer.resetLayout(windowScale);
             imageLayer.draw();
         }
-        if ( drawStage ) {
-            drawStage.offset( {'x': 0, 'y': 0} );
-            drawStage.scale( {'x': windowScale, 'y': windowScale} );
-            drawStage.draw();
+        if ( drawController ) {
+            drawController.resetStage(windowScale);
         }
     };
 
@@ -464,16 +460,16 @@ dwv.App = function ()
         fileIO.onload = function (data) {
             if ( image ) {
                 view.append( data.view );
-                if ( drawStage ) {
-                    appendDrawLayer(image.getNumberOfFrames());
+                if ( drawController ) {
+                    drawController.appendDrawLayer(image.getNumberOfFrames());
                 }
             }
             postLoadInit(data);
         };
         fileIO.onerror = function (error) { handleError(error); };
         fileIO.onloadend = function (/*event*/) {
-            if ( drawStage ) {
-                activateDrawLayer();
+            if ( drawController ) {
+                drawController.activateDrawLayer(viewController);
             }
             fireEvent({ 'type': 'load-end' });
         };
@@ -495,7 +491,7 @@ dwv.App = function ()
         fileIO.onload = function (data) {
             // load state
             var state = new dwv.State(self);
-            state.fromJSON(data, fireEvent);
+            state.fromJSON(data);
         };
         fileIO.onerror = function (error) { handleError(error); };
         // main load (asynchronous)
@@ -536,16 +532,16 @@ dwv.App = function ()
         urlIO.onload = function (data) {
             if ( image ) {
                 view.append( data.view );
-                if ( drawStage ) {
-                    appendDrawLayer(image.getNumberOfFrames());
+                if ( drawController ) {
+                    drawController.appendDrawLayer(image.getNumberOfFrames());
                 }
             }
             postLoadInit(data);
         };
         urlIO.onerror = function (error) { handleError(error); };
         urlIO.onloadend = function (/*event*/) {
-            if ( drawStage ) {
-                activateDrawLayer();
+            if ( drawController ) {
+                drawController.activateDrawLayer(viewController);
             }
             fireEvent({ 'type': 'load-end' });
         };
@@ -567,50 +563,11 @@ dwv.App = function ()
         urlIO.onload = function (data) {
             // load state
             var state = new dwv.State(self);
-            state.fromJSON(data, fireEvent);
+            state.fromJSON(data);
         };
         urlIO.onerror = function (error) { handleError(error); };
         // main load (asynchronous)
         urlIO.load([url]);
-    }
-
-    /**
-     * Append a new draw layer list to the list.
-     * @private
-     */
-    function appendDrawLayer(number) {
-        // add a new dimension
-        drawLayers.push([]);
-        // fill it
-        for (var i=0; i<number; ++i) {
-            // create draw layer
-            var drawLayer = new Kinetic.Layer({
-                'listening': false,
-                'hitGraphEnabled': false,
-                'visible': false
-            });
-            drawLayers[drawLayers.length - 1].push(drawLayer);
-            // add the layer to the stage
-            drawStage.add(drawLayer);
-        }
-    }
-
-    /**
-     * Activate the current draw layer.
-     * @private
-     */
-    function activateDrawLayer() {
-        // hide all draw layers
-        for ( var i = 0; i < drawLayers.length; ++i ) {
-            //drawLayers[i].visible( false );
-            for ( var j = 0; j < drawLayers[i].length; ++j ) {
-                drawLayers[i][j].visible( false );
-            }
-        }
-        // show current draw layer
-        var currentLayer = self.getDrawLayer();
-        currentLayer.visible( true );
-        currentLayer.draw();
     }
 
     /**
@@ -643,15 +600,8 @@ dwv.App = function ()
             imageLayer.draw();
         }
         // resize draw stage
-        if ( drawStage ) {
-            // resize div
-            var drawDiv = this.getElement("drawDiv");
-            drawDiv.setAttribute("style","width:"+newWidth+"px;height:"+newHeight+"px");
-           // resize stage
-            drawStage.setWidth(newWidth);
-            drawStage.setHeight(newHeight);
-            drawStage.scale( {x: scale, y: scale} );
-            drawStage.draw();
+        if ( drawController ) {
+            drawController.resizeStage(newWidth, newHeight, scale);
         }
     };
 
@@ -765,96 +715,51 @@ dwv.App = function ()
     };
 
     /**
-     * Get a list of drawing details.
-     * @return {Object} A list of draw details including id, slice, frame...
+     * Get the list of drawing display details.
+     * @return {Object} The list of draw details including id, slice, frame...
      */
-    this.getDrawDetailsList = function ()
+    this.getDrawDisplayDetails = function ()
     {
-        var list = [];
-        var size = image.getGeometry().getSize();
-        for ( var z = 0; z < size.getNumberOfSlices(); ++z ) {
-
-            for ( var f = 0; f < image.getNumberOfFrames(); ++f ) {
-
-                var collec = this.getDrawLayer(z,f).getChildren();
-                for ( var i = 0; i < collec.length; ++i ) {
-                    var shape = collec[i].getChildren()[0];
-                    var label = collec[i].getChildren()[1];
-                    var text = label.getChildren()[0];
-                    var type = shape.className;
-                    if (type === "Line" && shape.closed()) {
-                        type = "Roi";
-                    }
-                    if (type === "Rect") {
-                        type = "Rectangle";
-                    }
-                    list.push( {
-                        "id": collec[i].id(),
-                        //"id": i,
-                        "slice": z,
-                        "frame": f,
-                        "type": type,
-                        "color": shape.stroke(),
-                        "label": text.textExpr,
-                        "description": text.longText
-                    });
-                }
-            }
-        }
-        // return
-        return list;
+        return drawController.getDrawDisplayDetails();
     };
-
     /**
-     * Update a drawing.
+     * Get the list of drawings.
+     * @return {Object} The list of drawings.
+     */
+    this.getDraws = function ()
+    {
+        return drawController.getDraws();
+    };
+    /**
+     * Get a list of drawing store details.
+     * @return {Object} A list of draw details including id, text, quant...
+     */
+    this.getDrawStoreDetails = function ()
+    {
+        return drawController.getDrawStoreDetails();
+    };
+    /**
+     * Set the drawings on the current stage.
+     * @param {Array} drawings An array of drawings.
+     * @param {Array} drawingsDetails An array of drawings details.
+     */
+    this.setDrawings = function (drawings, drawingsDetails)
+    {
+        drawController.setDrawings(drawings, drawingsDetails, fireEvent, this.addToUndoStack);
+    };
+    /**
+     * Update a drawing from its details.
      * @param {Object} drawDetails Details of the drawing to update.
      */
     this.updateDraw = function (drawDetails)
     {
-        var layer = this.getDrawLayer(drawDetails.slice, drawDetails.frame);
-        //var collec = layer.getChildren()[drawDetails.id];
-        var collec = layer.getChildren( function (node) {
-            return node.id() === drawDetails.id;
-        })[0];
-        // shape
-        var shape = collec.getChildren()[0];
-        shape.stroke(drawDetails.color);
-        // label
-        var label = collec.getChildren()[1];
-        var text = label.getChildren()[0];
-        text.fill(drawDetails.color);
-        text.textExpr = drawDetails.label;
-        text.longText = drawDetails.description;
-        text.setText(dwv.utils.replaceFlags(text.textExpr, text.quant));
-        // udpate layer
-        this.getDrawLayer().draw();
+        drawController.updateDraw(drawDetails);
     };
-
     /**
      * Delete all Draws from all layers.
     */
     this.deleteDraws = function () {
-        var delcmd, layer, groups, slice, frame;
-        var nSlices = this.getImage().getGeometry().getSize().getNumberOfSlices();
-        var nFrames = this.getImage().getNumberOfFrames();
-        slice = 0;
-        while (slice < nSlices) {
-            frame = 0;
-            while (frame < nFrames) {
-                layer = this.getDrawLayer(slice, frame);
-                groups = layer.getChildren();
-                while (groups.length) {
-                    var shape = groups[0].getChildren()[0];
-                    delcmd = new dwv.tool.DeleteGroupCommand( groups[0],
-                        dwv.tool.GetShapeDisplayName(shape), layer);
-                    delcmd.onExecute = fireEvent;
-                    delcmd.execute();
-                    this.addToUndoStack(delcmd);
-                }
-                frame++;
-            }
-            slice++;
-        }
+        drawController.deleteDraws(fireEvent, this.addToUndoStack);
     };
 
     // Handler Methods -----------------------------------------------------------
@@ -884,8 +789,8 @@ dwv.App = function ()
     this.onFrameChange = function (/*event*/)
     {
         generateAndDrawImage();
-        if ( drawStage ) {
-            activateDrawLayer();
+        if ( drawController ) {
+            drawController.activateDrawLayer(viewController);
         }
     };
 
@@ -896,8 +801,8 @@ dwv.App = function ()
     this.onSliceChange = function (/*event*/)
     {
         generateAndDrawImage();
-        if ( drawStage ) {
-            activateDrawLayer();
+        if ( drawController ) {
+            drawController.activateDrawLayer(viewController);
         }
     };
 
@@ -1196,22 +1101,8 @@ dwv.App = function ()
             imageLayer.draw();
         }
         // draw layer
-        if( drawStage ) {
-            // zoom
-            var newKZoom = {'x': scale, 'y': scale};
-            // offset
-            // TODO different from the imageLayer offset?
-            var oldKZoom = drawStage.scale();
-            var oldOffset = drawStage.offset();
-            var newOffsetX = (scaleCenter.x / oldKZoom.x) +
-                oldOffset.x - (scaleCenter.x / newKZoom.x);
-            var newOffsetY = (scaleCenter.y / oldKZoom.y) +
-                oldOffset.y - (scaleCenter.y / newKZoom.y);
-            var newOffset = { 'x': newOffsetX, 'y': newOffsetY };
-            // store
-            drawStage.offset( newOffset );
-            drawStage.scale( newKZoom );
-            drawStage.draw();
+        if( drawController ) {
+            drawController.zoomStage(scale, scaleCenter);
         }
     }
 
@@ -1224,13 +1115,12 @@ dwv.App = function ()
         if( imageLayer ) {
             imageLayer.translate(translation.x, translation.y);
             imageLayer.draw();
-        }
-        // draw layer
-        if( drawStage && imageLayer ) {
-            var ox = - imageLayer.getOrigin().x / scale - translation.x;
-            var oy = - imageLayer.getOrigin().y / scale - translation.y;
-            drawStage.offset( { 'x': ox, 'y': oy } );
-            drawStage.draw();
+            // draw layer
+            if( drawController ) {
+                var ox = - imageLayer.getOrigin().x / scale - translation.x;
+                var oy = - imageLayer.getOrigin().y / scale - translation.y;
+                drawController.translateStage(ox, oy);
+            }
         }
     }
 
@@ -1336,16 +1226,8 @@ dwv.App = function ()
         // draw layer
         var drawDiv = self.getElement("drawDiv");
         if ( drawDiv ) {
-            // create stage
-            drawStage = new Kinetic.Stage({
-                container: drawDiv,
-                width: dataWidth,
-                height: dataHeight,
-                listening: false
-            });
-            // reset style
-            // (avoids a not needed vertical scrollbar)
-            drawStage.getContent().setAttribute("style", "");
+            drawController = new dwv.DrawController(drawDiv);
+            drawController.create(dataWidth, dataHeight);
         }
         // resize app
         if ( fitToWindow ) {
@@ -1413,8 +1295,9 @@ dwv.App = function ()
             toolboxController.initAndDisplay( imageLayer );
         }
 
-        if ( drawStage ) {
-            appendDrawLayer(image.getNumberOfFrames());
+        // append draw layers
+        if ( drawController ) {
+            drawController.appendDrawLayer(image.getNumberOfFrames());
         }
 
         // stop box listening to drag (after first drag)

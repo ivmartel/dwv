@@ -198,7 +198,7 @@ dwv.tool.Floodfill = function(app)
             shapeGroup = factory.create(border, self.style);
             shapeGroup.id( dwv.math.guid() );
             // draw shape command
-            command = new dwv.tool.DrawGroupCommand(shapeGroup, "floodfill", app.getDrawLayer());
+            command = new dwv.tool.DrawGroupCommand(shapeGroup, "floodfill", app.getCurrentDrawLayer());
             command.onExecute = fireEvent;
             command.onUndo = fireEvent;
             // // draw

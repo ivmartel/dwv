@@ -215,7 +215,7 @@ dwv.tool.Livewire = function(app)
         shapeGroup = factory.create(currentPath.pointArray, self.style);
         shapeGroup.id( dwv.math.guid() );
         // draw shape command
-        command = new dwv.tool.DrawGroupCommand(shapeGroup, "livewire", app.getDrawLayer());
+        command = new dwv.tool.DrawGroupCommand(shapeGroup, "livewire", app.getCurrentDrawLayer());
         // draw
         command.execute();
     };
