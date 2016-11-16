@@ -18152,7 +18152,7 @@ dwv.tool.Floodfill = function(app)
      * @private
      * @type Number
      */
-    var simplifyCount = 30;
+    var simplifyCount = 2000;
     /**
      * Canvas info
      * @private
@@ -18170,7 +18170,7 @@ dwv.tool.Floodfill = function(app)
      * @private
      * @type Number
      */
-    var initialthreshold = 15;
+    var initialthreshold = 10;
     /**
      * threshold tolerance of the tool border
      * @private
@@ -18276,7 +18276,7 @@ dwv.tool.Floodfill = function(app)
      * @param {Object} Start point.
      * @param {Number} Threshold tolerance.
      */
-    var calcBorder = function(points, threshold){
+    var calcBorder = function(points, threshold, simple){
 
         parentPoints = [];
         var image = {
@@ -18294,6 +18294,9 @@ dwv.tool.Floodfill = function(app)
         cs = MagicWand.simplifyContours(cs, simplifyTolerant, simplifyCount);
 
         if(cs.length > 0 && cs[0].points[0].x){
+            if(simple){
+                return cs[0].points;
+            }
             for(var j=0, icsl=cs[0].points.length; j<icsl; j++){
                 parentPoints.push(new dwv.math.Point2D(cs[0].points[j].x, cs[0].points[j].y));
             }
@@ -18337,7 +18340,7 @@ dwv.tool.Floodfill = function(app)
     /**
      * Create Floodfill in all the prev and next slices while border is found
      */
-    this.extend = function(){
+    this.extend = function(ini, end){
         //avoid errors
         if(!initialpoint){
             throw "'initialpoint' not found. User must click before use extend!";
@@ -18351,7 +18354,7 @@ dwv.tool.Floodfill = function(app)
         var threshold = currentthreshold || initialthreshold;
 
         // Iterate over the next images and paint border on each slice.
-        for(var i=pos.k, len=app.getImage().getGeometry().getSize().getNumberOfSlices(); i<len; i++){
+        for(var i=pos.k, len = end ? end : app.getImage().getGeometry().getSize().getNumberOfSlices(); i<len ; i++){
             if(!paintBorder(initialpoint, threshold)){
                 break;
             }
@@ -18360,7 +18363,7 @@ dwv.tool.Floodfill = function(app)
         app.getViewController().setCurrentPosition(pos);
 
         // Iterate over the prev images and paint border on each slice.
-        for(var j=pos.k; j>=0; j--){
+        for(var j=pos.k, jl = ini ? ini : 0 ; j>jl ; j--){
             if(!paintBorder(initialpoint, threshold)){
                 break;
             }
@@ -18373,15 +18376,42 @@ dwv.tool.Floodfill = function(app)
      * Modify tolerance threshold and redraw ROI.
      * @param {Number} New threshold.
      */
-    this.modifyThreshold = function(modifyThreshold){
-        // remove previous draw
+    this.modifyThreshold = function(modifyThreshold, shape){
+
+        if(!shape && shapeGroup){
+            shape = shapeGroup.getChildren( function (node) {
+                return node.name() === 'shape';
+            })[0];
+        }
+        else{
+            throw 'No shape found';
+        }
+
         clearTimeout(painterTimeout);
         painterTimeout = setTimeout( function () {
-            if ( shapeGroup && self.started) {
-                shapeGroup.destroy();
+            border = calcBorder(initialpoint, modifyThreshold, true);
+            if(!border){
+                return false;
             }
-            paintBorder(initialpoint, modifyThreshold);
+            var arr = [];
+            for( var i = 0, bl = border.length; i < bl ; ++i )
+            {
+                arr.push( border[i].x );
+                arr.push( border[i].y );
+            }
+            shape.setPoints(arr);
+            var shapeLayer = shape.getLayer();
+            shapeLayer.draw();
+            self.onThresholdChange(modifyThreshold);
         }, 100);
+    };
+
+    /**
+     * Event fired when threshold change
+     * @param {Number} Current threshold
+     */
+    this.onThresholdChange = function(/*value*/){
+        // Defaults do nothing
     };
 
     /**
@@ -18395,6 +18425,7 @@ dwv.tool.Floodfill = function(app)
         self.started = true;
         initialpoint = getCoord(event);
         paintBorder(initialpoint, initialthreshold);
+        self.onThresholdChange(initialthreshold);
     };
 
     /**
