@@ -44,7 +44,7 @@ dwv.google.Auth = function ()
      };
 
     /**
-    * Called if the authentification is successful. 
+    * Called if the authentification is successful.
     * Default does nothing. No input parameters.
     */
     this.onload = function () {};
@@ -131,7 +131,7 @@ dwv.google.Picker = function ()
     * See https://developers.google.com/picker/docs/results
     */
     function handleResult(data) {
-        if (data.action == google.picker.Action.PICKED &&
+        if (data.action === google.picker.Action.PICKED &&
             data.docs.length !== 0 ) {
             var ids = [];
             for (var i = 0; i < data.docs.length; ++i) {
@@ -191,7 +191,7 @@ dwv.google.Drive = function ()
     this.load = function () {
         // set the api key
         gapi.client.setApiKey(self.apiKey);
-        
+
         // reset
         urls = [];
         finalSize = 0;
@@ -310,12 +310,12 @@ dwv.gui.GoogleDriveLoad = function (app)
         var node = app.getElement("loaderlist");
         var filediv = node.getElementsByClassName("gdrivediv")[0];
         filediv.style.display = bool ? "" : "none";
-        
+
         if (bool) {
             // jquery mobile dependent
             $("#popupOpen").popup("close");
             app.resetLoadbox();
-            
+
             var gAuth = new dwv.google.Auth();
             var gPicker = new dwv.google.Picker();
             var gDrive = new dwv.google.Drive();

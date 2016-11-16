@@ -44,7 +44,7 @@ dwv.gui.DropboxLoad = function (app)
         var node = app.getElement("loaderlist");
         var filediv = node.getElementsByClassName("dropboxdiv")[0];
         filediv.style.display = bool ? "" : "none";
-        
+
         if (bool) {
             // jquery mobile dependent
             $("#popupOpen").popup("close");
@@ -70,7 +70,7 @@ dwv.gui.DropboxLoad = function (app)
                 // true enables multiple file selection.
                 multiselect: true, // true or false
                 // Optional. List of file extensions
-                extensions: ['.dcm'],
+                extensions: ['.dcm']
             };
             Dropbox.choose(options);
         }

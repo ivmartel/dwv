@@ -8,7 +8,7 @@ dwv.tool.defaultpresets = {};
 dwv.tool.defaultpresets.CT = {
     "mediastinum": {"center": 40, "width": 400},
     "lung": {"center": -500, "width": 1500},
-    "bone": {"center": 500, "width": 2000},
+    "bone": {"center": 500, "width": 2000}
 };
 
 // decode query
@@ -96,7 +96,10 @@ dwv.gui.WindowLevel = function (app)
 
         var label = document.createElement("label");
         label.setAttribute("for", "wlLi");
-        label.appendChild(document.createTextNode(dwv.i18n("tool.WindowLevel.name")));
+        var image = document.createElement("img");
+        image.src = "../../resources/contrast-64.png";
+        image.title = dwv.i18n("tool.WindowLevel.name");
+        label.appendChild(image);
 
         var node = app.getElement("toolfieldset");
         $(node).controlgroup("container").append(input);
@@ -114,7 +117,7 @@ dwv.gui.WindowLevel = function (app)
         $(".presetLabel").remove();
 
         // create preset select
-        var select = dwv.html.createHtmlSelect("presetSelect", 
+        var select = dwv.html.createHtmlSelect("presetSelect",
             app.getViewController().getPresets(), "wl.presets", true);
         select.onchange = app.onChangeWindowLevelPreset;
         select.title = "Select w/l preset.";
@@ -147,7 +150,10 @@ dwv.gui.ZoomAndPan = function (app)
 
         var label = document.createElement("label");
         label.setAttribute("for", "zoomLi");
-        label.appendChild(document.createTextNode(dwv.i18n("tool.ZoomAndPan.name")));
+        var image = document.createElement("img");
+        image.src = "../../ext/jquery-mobile/images/icons-png/search-white.png";
+        image.title = dwv.i18n("tool.ZoomAndPan.name");
+        label.appendChild(image);
 
         var node = app.getElement("toolfieldset");
         $(node).controlgroup("container").append(input);
@@ -176,7 +182,10 @@ dwv.gui.Scroll = function (app)
 
         var label = document.createElement("label");
         label.setAttribute("for", "scrollLi");
-        label.appendChild(document.createTextNode(dwv.i18n("tool.Scroll.name") ));
+        var image = document.createElement("img");
+        image.src = "../../ext/jquery-mobile/images/icons-png/bars-white.png";
+        image.title = dwv.i18n("tool.Scroll.name");
+        label.appendChild(image);
 
         var node = app.getElement("toolfieldset");
         $(node).controlgroup("container").append(input);
