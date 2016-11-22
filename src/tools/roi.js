@@ -76,6 +76,7 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
     group.name("roi-group");
     group.add(kshape);
     group.add(klabel);
+    group.visible(true); // dont inherit
     return group;
 };
 

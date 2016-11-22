@@ -49,6 +49,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
     var group = new Kinetic.Group();
     group.name("protractor-group");
     group.add(kshape);
+    group.visible(true); // dont inherit
     // text and decoration
     if ( points.length === 3 ) {
         var line1 = new dwv.math.Line(points[1], points[2]);

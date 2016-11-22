@@ -69,6 +69,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
     group.name("rectangle-group");
     group.add(kshape);
     group.add(klabel);
+    group.visible(true); // dont inherit
     return group;
 };
 
