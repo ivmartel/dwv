@@ -761,6 +761,22 @@ dwv.App = function ()
     this.deleteDraws = function () {
         drawController.deleteDraws(fireEvent, this.addToUndoStack);
     };
+    /**
+     * Check the visibility of a given group.
+     * @param {Object} drawDetails Details of the drawing to check.
+     */
+    this.isGroupVisible = function (drawDetails)
+    {
+        return drawController.isGroupVisible(drawDetails);
+    };
+    /**
+     * Toggle group visibility.
+     * @param {Object} drawDetails Details of the drawing to update.
+     */
+    this.toogleGroupVisibility = function (drawDetails)
+    {
+        drawController.toogleGroupVisibility(drawDetails);
+    };
 
     // Handler Methods -----------------------------------------------------------
 

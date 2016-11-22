@@ -122,7 +122,7 @@ dwv.gui.postProcessTable = function (table)
             if ( text === "description" ) {
                 cell.setAttribute("data-priority", "1");
             }
-            else if ( text === "id" || text === "frame" || text === "slice" ) {
+            else if ( text === "frame" || text === "slice" ) {
                 cell.setAttribute("data-priority", "5");
             }
 

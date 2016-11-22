@@ -315,21 +315,43 @@ dwv.DrawController = function (drawDiv)
      */
     this.updateDraw = function (drawDetails)
     {
-        var layer = drawLayers[drawDetails.slice][drawDetails.frame];
-        //var collec = layer.getChildren()[drawDetails.id];
-        var collec = layer.getChildren( function (node) {
-            return node.id() === drawDetails.id;
-        })[0];
+        // get the group
+        var group = getDrawGroup(drawDetails.slice, drawDetails.frame, drawDetails.id);
         // shape
-        var shape = collec.getChildren()[0];
+        var shape = group.getChildren()[0];
         shape.stroke(drawDetails.color);
         // label
-        var label = collec.getChildren()[1];
+        var label = group.getChildren()[1];
         var text = label.getChildren()[0];
         text.fill(drawDetails.color);
         text.textExpr = drawDetails.label;
         text.longText = drawDetails.description;
         text.setText(dwv.utils.replaceFlags(text.textExpr, text.quant));
+
+        // udpate current layer
+        this.getCurrentDrawLayer().draw();
+    };
+
+    /**
+     * Check the visibility of a given group.
+     * @param {Object} drawDetails Details of the group to check.
+     */
+    this.isGroupVisible = function (drawDetails) {
+        // get the group
+        var group = getDrawGroup(drawDetails.slice, drawDetails.frame, drawDetails.id);
+        // get visibility
+        return group.isVisible();
+    };
+
+    /**
+     * Toggle the visibility of a given group.
+     * @param {Object} drawDetails Details of the group to update.
+     */
+    this.toogleGroupVisibility = function (drawDetails) {
+        // get the group
+        var group = getDrawGroup(drawDetails.slice, drawDetails.frame, drawDetails.id);
+        // toggle visible
+        group.visible(!group.isVisible());
 
         // udpate current layer
         this.getCurrentDrawLayer().draw();
@@ -357,5 +379,29 @@ dwv.DrawController = function (drawDiv)
             }
         }
     };
+
+    /**
+     * Get a draw group.
+     * @param {Number} slice The slice position.
+     * @param {Number} frame The frame position.
+     * @param {Number} id The group id.
+     */
+    function getDrawGroup(slice, frame, id) {
+        var layer = drawLayers[slice][frame];
+        //var collec = layer.getChildren()[drawDetails.id];
+        var collec = layer.getChildren( function (node) {
+            return node.id() === id;
+        });
+
+        var res = null;
+        if (collec.length !== 0) {
+            res = collec[0];
+        }
+        else {
+            console.warn("Could not find draw group for slice='" +
+                slice + "', frame='" + frame + "', id='" + id + "'.");
+        }
+        return res;
+    }
 
 }; // class dwv.DrawController
