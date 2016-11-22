@@ -9,19 +9,27 @@
 <meta name="keywords" content="DICOM,HTML5,JavaScript,medical,imaging,DWV">
 <link type="text/css" rel="stylesheet" href="../../css/style.css">
 <style type="text/css" >
-body { background-color: #222; color: white;
-  margin: 10px; padding: 0; font-size: 80%; }
+body { background-color: #222; color: white; font-size: 80%; }
 #pageHeader h1 { display: inline-block; margin: 0; color: #fff; }
 #pageHeader a { color: #ddf; }
 #pageHeader .toolbar { display: inline-block; float: right; }
-.toolbox li:first-child { list-style-type: none; padding-bottom: 10px; margin-left: -20px; }
+.toolList ul { padding: 0; }
+.toolList li { list-style-type: none; }
 #pageMain { position: absolute; height: 92%; width: 99%; bottom: 5px; left: 5px; background-color: #333; }
 .infotl { color: #333; text-shadow: 0 1px 0 #fff; }
 .infotr { color: #333; text-shadow: 0 1px 0 #fff; }
 .dropBox { margin: 20px; }
 .ui-icon { zoom: 125%; }
+.tagsTable tr:nth-child(even) { background-color: #333; }
+.drawList tr:nth-child(even) { background-color: #333; }
+button, input, li, table { margin-top: 0.2em; }
+li button, li input { margin: 0; }
+.history_list { width: 100%; }
 </style>
 <link type="text/css" rel="stylesheet" href="../../ext/jquery-ui/themes/ui-darkness/jquery-ui-1.12.0.min.css">
+<style type="text/css" >
+.ui-widget-content { background-color: #222; background-image: url();}
+</style>
 <!-- Third party -->
 <script type="text/javascript" src="../../ext/jquery/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" src="../../ext/jquery-ui/jquery-ui-1.12.0.min.js"></script>
