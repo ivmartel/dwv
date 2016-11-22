@@ -1719,6 +1719,7 @@ dwv.DrawController = function (drawDiv)
                     delcmd = new dwv.tool.DeleteGroupCommand( groups[0],
                         dwv.tool.GetShapeDisplayName(shape), layer);
                     delcmd.onExecute = cmdCallback;
+                    delcmd.onUndo = cmdCallback;
                     delcmd.execute();
                     exeCallback(delcmd);
                 }
@@ -9464,6 +9465,11 @@ dwv.gui.base.DrawList = function (app)
 
                 // loop through cells
                 for (var c = 0; c < cells.length; ++c) {
+                    // show short ID
+                    if (c === 0) {
+                        cells[c].firstChild.data = cells[c].firstChild.data.substring(0, 5);
+                    }
+
                     if (isEditable) {
                         // color
                         if (c === 4) {
@@ -16853,6 +16859,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 shapeEditor.disable();
                 shapeEditor.setShape(null);
                 shapeEditor.setImage(null);
+                // reset
+                shape.stroke(colour);
                 document.body.style.cursor = 'default';
                 // delete command
                 var delcmd = new dwv.tool.DeleteGroupCommand(this.getParent(),
@@ -17762,6 +17770,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
     group.name("ellipse-group");
     group.add(kshape);
     group.add(klabel);
+    group.visible(true); // dont inherit
     return group;
 };
 
@@ -18757,6 +18766,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
     group.name("line-group");
     group.add(kshape);
     group.add(klabel);
+    group.visible(true); // dont inherit
     return group;
 };
 
@@ -19261,6 +19271,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
     var group = new Kinetic.Group();
     group.name("protractor-group");
     group.add(kshape);
+    group.visible(true); // dont inherit
     // text and decoration
     if ( points.length === 3 ) {
         var line1 = new dwv.math.Line(points[1], points[2]);
@@ -19476,6 +19487,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
     group.name("rectangle-group");
     group.add(kshape);
     group.add(klabel);
+    group.visible(true); // dont inherit
     return group;
 };
 
@@ -19637,6 +19649,7 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
     group.name("roi-group");
     group.add(kshape);
     group.add(klabel);
+    group.visible(true); // dont inherit
     return group;
 };
 

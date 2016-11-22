@@ -582,6 +582,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 shapeEditor.disable();
                 shapeEditor.setShape(null);
                 shapeEditor.setImage(null);
+                // reset
+                shape.stroke(colour);
                 document.body.style.cursor = 'default';
                 // delete command
                 var delcmd = new dwv.tool.DeleteGroupCommand(this.getParent(),

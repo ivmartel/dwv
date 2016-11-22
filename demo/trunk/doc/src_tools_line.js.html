@@ -161,6 +161,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
     group.name("line-group");
     group.add(kshape);
     group.add(klabel);
+    group.visible(true); // dont inherit
     return group;
 };
 
