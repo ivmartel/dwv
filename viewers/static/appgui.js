@@ -267,7 +267,7 @@ dwv.gui.setup = function () {
     });
     $(".drawList").dialog({ position:
         {my: "right top", at: "right top", of: "#pageMain"},
-        autoOpen: false, width: 500, height: 250,
+        autoOpen: false, width: 500, height: 590,
         appendTo: "#dwv"
     });
     $(".help").dialog({ position:

@@ -373,6 +373,7 @@ dwv.DrawController = function (drawDiv)
                     delcmd = new dwv.tool.DeleteGroupCommand( groups[0],
                         dwv.tool.GetShapeDisplayName(shape), layer);
                     delcmd.onExecute = cmdCallback;
+                    delcmd.onUndo = cmdCallback;
                     delcmd.execute();
                     exeCallback(delcmd);
                 }

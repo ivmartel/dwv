@@ -325,6 +325,11 @@ dwv.gui.base.DrawList = function (app)
 
                 // loop through cells
                 for (var c = 0; c < cells.length; ++c) {
+                    // show short ID
+                    if (c === 0) {
+                        cells[c].firstChild.data = cells[c].firstChild.data.substring(0, 5);
+                    }
+
                     if (isEditable) {
                         // color
                         if (c === 4) {
