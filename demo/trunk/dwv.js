@@ -761,6 +761,22 @@ dwv.App = function ()
     this.deleteDraws = function () {
         drawController.deleteDraws(fireEvent, this.addToUndoStack);
     };
+    /**
+     * Check the visibility of a given group.
+     * @param {Object} drawDetails Details of the drawing to check.
+     */
+    this.isGroupVisible = function (drawDetails)
+    {
+        return drawController.isGroupVisible(drawDetails);
+    };
+    /**
+     * Toggle group visibility.
+     * @param {Object} drawDetails Details of the drawing to update.
+     */
+    this.toogleGroupVisibility = function (drawDetails)
+    {
+        drawController.toogleGroupVisibility(drawDetails);
+    };
 
     // Handler Methods -----------------------------------------------------------
 
@@ -1645,21 +1661,43 @@ dwv.DrawController = function (drawDiv)
      */
     this.updateDraw = function (drawDetails)
     {
-        var layer = drawLayers[drawDetails.slice][drawDetails.frame];
-        //var collec = layer.getChildren()[drawDetails.id];
-        var collec = layer.getChildren( function (node) {
-            return node.id() === drawDetails.id;
-        })[0];
+        // get the group
+        var group = getDrawGroup(drawDetails.slice, drawDetails.frame, drawDetails.id);
         // shape
-        var shape = collec.getChildren()[0];
+        var shape = group.getChildren()[0];
         shape.stroke(drawDetails.color);
         // label
-        var label = collec.getChildren()[1];
+        var label = group.getChildren()[1];
         var text = label.getChildren()[0];
         text.fill(drawDetails.color);
         text.textExpr = drawDetails.label;
         text.longText = drawDetails.description;
         text.setText(dwv.utils.replaceFlags(text.textExpr, text.quant));
+
+        // udpate current layer
+        this.getCurrentDrawLayer().draw();
+    };
+
+    /**
+     * Check the visibility of a given group.
+     * @param {Object} drawDetails Details of the group to check.
+     */
+    this.isGroupVisible = function (drawDetails) {
+        // get the group
+        var group = getDrawGroup(drawDetails.slice, drawDetails.frame, drawDetails.id);
+        // get visibility
+        return group.isVisible();
+    };
+
+    /**
+     * Toggle the visibility of a given group.
+     * @param {Object} drawDetails Details of the group to update.
+     */
+    this.toogleGroupVisibility = function (drawDetails) {
+        // get the group
+        var group = getDrawGroup(drawDetails.slice, drawDetails.frame, drawDetails.id);
+        // toggle visible
+        group.visible(!group.isVisible());
 
         // udpate current layer
         this.getCurrentDrawLayer().draw();
@@ -1687,6 +1725,30 @@ dwv.DrawController = function (drawDiv)
             }
         }
     };
+
+    /**
+     * Get a draw group.
+     * @param {Number} slice The slice position.
+     * @param {Number} frame The frame position.
+     * @param {Number} id The group id.
+     */
+    function getDrawGroup(slice, frame, id) {
+        var layer = drawLayers[slice][frame];
+        //var collec = layer.getChildren()[drawDetails.id];
+        var collec = layer.getChildren( function (node) {
+            return node.id() === id;
+        });
+
+        var res = null;
+        if (collec.length !== 0) {
+            res = collec[0];
+        }
+        else {
+            console.warn("Could not find draw group for slice='" +
+                slice + "', frame='" + frame + "', id='" + id + "'.");
+        }
+        return res;
+    }
 
 }; // class dwv.DrawController
 ;// namespaces
@@ -9345,7 +9407,7 @@ dwv.gui.base.DrawList = function (app)
         dwv.html.translateTableColumn(table, 3, "shape", "name");
 
         // do not go there if just one row...
-        if ( table.rows.length > 0 ) {
+        if ( table.rows.length > 1 ) {
 
             // create a color onkeyup handler
             var createColorOnKeyUp = function (details) {
@@ -9381,6 +9443,17 @@ dwv.gui.base.DrawList = function (app)
                     dwv.gui.focusImage();
                 };
             };
+            // create visibility handler
+            var createVisibleOnClick = function (details) {
+                return function () {
+                    app.toogleGroupVisibility(details);
+                };
+            };
+
+            // append visible column to the header row
+            var row0 = table.rows.item(0);
+            var cell00 = row0.insertCell(0);
+            cell00.outerHTML = "<th>" + dwv.i18n("basics.visible") + "</th>";
 
             // loop through rows
             for (var r = 1; r < table.rows.length; ++r) {
@@ -9388,15 +9461,6 @@ dwv.gui.base.DrawList = function (app)
                 var drawDetails = drawDisplayDetails[drawId];
                 var row = table.rows.item(r);
                 var cells = row.cells;
-
-                // if not editable, allow click on row
-                if (!isEditable) {
-                    row.onclick = createRowOnClick(
-                        cells[1].firstChild.data,
-                        cells[2].firstChild.data);
-                    row.onmouseover = dwv.html.setCursorToPointer;
-                    row.onmouseout = dwv.html.setCursorToDefault;
-                }
 
                 // loop through cells
                 for (var c = 0; c < cells.length; ++c) {
@@ -9415,12 +9479,26 @@ dwv.gui.base.DrawList = function (app)
                         }
                     }
                     else {
+                        // id: link to image
+                        cells[0].onclick = createRowOnClick(
+                            cells[1].firstChild.data,
+                            cells[2].firstChild.data);
+                        cells[0].onmouseover = dwv.html.setCursorToPointer;
+                        cells[0].onmouseout = dwv.html.setCursorToDefault;
                         // color: just display the input color with no callback
                         if (c === 4) {
                             dwv.html.makeCellEditable(cells[c], null, "color");
                         }
                     }
                 }
+
+                // append visible column
+                var cell0 = row.insertCell(0);
+                var input = document.createElement("input");
+                input.setAttribute("type", "checkbox");
+                input.checked = app.isGroupVisible(drawDetails);
+                input.onclick = createVisibleOnClick(drawDetails);
+                cell0.appendChild(input);
             }
 
             // editable checkbox
@@ -9434,16 +9512,10 @@ dwv.gui.base.DrawList = function (app)
             tickLabel.setAttribute( "for", tickBox.id );
             tickLabel.setAttribute( "class", "inline" );
             tickLabel.appendChild( document.createTextNode( dwv.i18n("basics.editMode") ) );
-            // delete draw button
-            var deleteButton = document.createElement("button");
-            deleteButton.onclick = function () { app.deleteDraws(); };
-            deleteButton.setAttribute( "class", "ui-btn ui-btn-inline" );
-            deleteButton.appendChild( document.createTextNode( dwv.i18n("basics.deleteDraws") ) );
             // checkbox div
             var tickDiv = document.createElement("div");
             tickDiv.appendChild(tickLabel);
             tickDiv.appendChild(tickBox);
-            tickDiv.appendChild(deleteButton);
 
             // search form
             node.appendChild(dwv.html.getHtmlSearchForm(table));
@@ -9454,6 +9526,20 @@ dwv.gui.base.DrawList = function (app)
 
         // draw list table
         node.appendChild(table);
+
+        // delete button
+        if ( table.rows.length > 0 ) {
+            // delete draw button
+            var deleteButton = document.createElement("button");
+            deleteButton.onclick = function () { app.deleteDraws(); };
+            deleteButton.setAttribute( "class", "ui-btn ui-btn-inline" );
+            deleteButton.appendChild( document.createTextNode( dwv.i18n("basics.deleteDraws") ) );
+            if (!isEditable) {
+                deleteButton.style.display = "none";
+            }
+            node.appendChild(deleteButton);
+        }
+
         // refresh
         dwv.gui.refreshElement(node);
     };
