@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>dwv Class: Sobel</title>
+	<title>dwv Class: ArrowFactory</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -86,15 +86,15 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: Sobel</h1>
+	<h1 class="page-title">Class: ArrowFactory</h1>
 <section>
 
 <header>
     
         <h2>
-            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.image.html">.image</a><a href="dwv.image.filter.html">.filter</a>.</span>
+            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.tool.html">.tool</a>.</span>
         
-        Sobel
+        ArrowFactory
         </h2>
         
     
@@ -107,7 +107,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="Sobel"><span class="type-signature"></span>new Sobel()</h4>
+    <h4 class="name" id="ArrowFactory"><span class="type-signature"></span>new ArrowFactory()</h4>
     
     
 </dt>
@@ -115,7 +115,7 @@
 
     
     <div class="description">
-        Apply a Sobel filter to an image.
+        Arrow factory.
     </div>
     
 
@@ -161,8 +161,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_image_filter.js.html">src/image/filter.js</a>,
-				 <a href="src_image_filter.js.html#sunlight-1-line-137">line 137</a>
+				<a href="src_tools_arrow.js.html">src/tools/arrow.js</a>,
+				 <a href="src_tools_arrow.js.html#sunlight-1-line-11">line 11</a>
 			</li>
 		</ul>
 	</dd>
@@ -213,7 +213,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="getName"><span class="type-signature"></span>getName()</h4>
+    <h4 class="name" id="create"><span class="type-signature"></span>create(points, style, image)</h4>
     
     
 </dt>
@@ -221,231 +221,7 @@
 
     
     <div class="description">
-        Get the name of the filter.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_filter.js.html">src/image/filter.js</a>,
-				 <a href="src_image_filter.js.html#sunlight-1-line-143">line 143</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    The name of the filter.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">String</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getOriginalImage"><span class="type-signature"></span>getOriginalImage()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get the original image.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_filter.js.html">src/image/filter.js</a>,
-				 <a href="src_image_filter.js.html#sunlight-1-line-159">line 159</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    image The original image.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="setOriginalImage"><span class="type-signature"></span>setOriginalImage(image)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Set the original image.
+        Create an arrow shape to be displayed.
     </div>
     
 
@@ -480,6 +256,54 @@
 
         <tr>
             
+                <td class="name"><code>points</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The points from which to extract the line.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>style</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The drawing style.</td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>image</code></td>
             
 
@@ -497,7 +321,7 @@
 
             
 
-            <td class="description last">The original image.</td>
+            <td class="description last">The associated image.</td>
         </tr>
 
     
@@ -541,8 +365,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_image_filter.js.html">src/image/filter.js</a>,
-				 <a href="src_image_filter.js.html#sunlight-1-line-154">line 154</a>
+				<a href="src_tools_arrow.js.html">src/tools/arrow.js</a>,
+				 <a href="src_tools_arrow.js.html#sunlight-1-line-31">line 31</a>
 			</li>
 		</ul>
 	</dd>
@@ -575,7 +399,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="update"><span class="type-signature"></span>update()</h4>
+    <h4 class="name" id="getNPoints"><span class="type-signature"></span>getNPoints()</h4>
     
     
 </dt>
@@ -583,7 +407,7 @@
 
     
     <div class="description">
-        Transform the main image using this filter.
+        Get the number of points needed to build the shape.
     </div>
     
 
@@ -629,8 +453,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_image_filter.js.html">src/image/filter.js</a>,
-				 <a href="src_image_filter.js.html#sunlight-1-line-166">line 166</a>
+				<a href="src_tools_arrow.js.html">src/tools/arrow.js</a>,
+				 <a href="src_tools_arrow.js.html#sunlight-1-line-17">line 17</a>
 			</li>
 		</ul>
 	</dd>
@@ -659,7 +483,7 @@
     
             
 <div class="param-desc">
-    The transformed image.
+    The number of points.
 </div>
 
 
@@ -670,7 +494,119 @@
     </dt>
     <dd>
         
-<span class="param-type">Object</span>
+<span class="param-type">Number</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getTimeout"><span class="type-signature"></span>getTimeout()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get the timeout between point storage.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_arrow.js.html">src/tools/arrow.js</a>,
+				 <a href="src_tools_arrow.js.html#sunlight-1-line-22">line 22</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    The timeout in milliseconds.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Number</span>
 
 
 

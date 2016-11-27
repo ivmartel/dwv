@@ -1521,12 +1521,17 @@ dwv.DrawController = function (drawDiv)
             for ( var f = 0, lenf = drawLayers[k].length; f < lenf; ++f ) {
                 var collec = drawLayers[k][f].getChildren();
                 for ( var i = 0, leni = collec.length; i < leni; ++i ) {
-                    var shape = collec[i].getChildren( isShape )[0];
-                    var label = collec[i].getChildren( isLabel )[0];
+                    var shape = collec[i].getChildren( isNodeNameShape )[0];
+                    var label = collec[i].getChildren( isNodeNameLabel )[0];
                     var text = label.getChildren()[0];
                     var type = shape.className;
-                    if (type === "Line" && shape.closed()) {
-                        type = "Roi";
+                    if (type === "Line") {
+                        var shape2kids = collec[i].getChildren( isNodeNameShape2 );
+                        if (shape.closed()) {
+                            type = "Roi";
+                        } else if (shape2kids.length !== 0) {
+                            type = "Arrow";
+                        }
                     }
                     if (type === "Rect") {
                         type = "Rectangle";
@@ -1618,7 +1623,7 @@ dwv.DrawController = function (drawDiv)
                 for ( var i = 0, leni = drawings[k][f].length; i < leni; ++i ) {
                     // create the group
                     var group = Kinetic.Node.create(drawings[k][f][i]);
-                    var shape = group.getChildren( isShape )[0];
+                    var shape = group.getChildren( isNodeNameShape )[0];
                     // create the draw command
                     var cmd = new dwv.tool.DrawGroupCommand(
                         group, shape.className,
@@ -1630,7 +1635,7 @@ dwv.DrawController = function (drawDiv)
                     // TODO Verify ID?
                     if (drawingsDetails) {
                         var details = drawingsDetails[k][f][i];
-                        var label = group.getChildren( isLabel )[0];
+                        var label = group.getChildren( isNodeNameLabel )[0];
                         var text = label.getText();
                         // store details
                         text.textExpr = details.textExpr;
@@ -1656,10 +1661,19 @@ dwv.DrawController = function (drawDiv)
         // get the group
         var group = getDrawGroup(drawDetails.slice, drawDetails.frame, drawDetails.id);
         // shape
-        var shape = group.getChildren( isShape )[0];
-        shape.stroke(drawDetails.color);
+        var shapes = group.getChildren( isNodeNameShape );
+        for (var i = 0; i < shapes.length; ++i ) {
+            shapes[i].stroke(drawDetails.color);
+        }
+        // shape2
+        var shapes2 = group.getChildren( isNodeNameShape2 );
+        for (var j = 0; j < shapes2.length; ++j ) {
+            if (typeof shapes2[j].fill() !== "undefined") {
+                shapes2[j].fill(drawDetails.color);
+            }
+        }
         // label
-        var label = group.getChildren( isLabel )[0];
+        var label = group.getChildren( isNodeNameLabel )[0];
         var text = label.getChildren()[0];
         text.fill(drawDetails.color);
         text.textExpr = drawDetails.label;
@@ -1707,7 +1721,7 @@ dwv.DrawController = function (drawDiv)
                 layer = drawLayers[k][f];
                 groups = layer.getChildren();
                 while (groups.length) {
-                    var shape = groups[0].getChildren( isShape )[0];
+                    var shape = groups[0].getChildren( isNodeNameShape )[0];
                     delcmd = new dwv.tool.DeleteGroupCommand( groups[0],
                         dwv.tool.GetShapeDisplayName(shape), layer);
                     delcmd.onExecute = cmdCallback;
@@ -1747,15 +1761,23 @@ dwv.DrawController = function (drawDiv)
      * Is an input node's name 'shape'.
      * @param {Object} node A Kineticjs node.
      */
-    function isShape( node ) {
+    function isNodeNameShape( node ) {
         return node.name() === "shape";
+    }
+
+    /**
+     * Is an input node's name 'shape2'.
+     * @param {Object} node A Kineticjs node.
+     */
+    function isNodeNameShape2( node ) {
+        return node.name() === "shape2";
     }
 
     /**
      * Is an input node's name 'label'.
      * @param {Object} node A Kineticjs node.
      */
-    function isLabel( node ) {
+    function isNodeNameLabel( node ) {
         return node.name() === "label";
     }
 
@@ -16393,6 +16415,166 @@ dwv.math.guid = function ()
 };
 ;// namespaces
 var dwv = dwv || {};
+dwv.tool = dwv.tool || {};
+//external
+var Kinetic = Kinetic || {};
+
+/**
+ * Arrow factory.
+ * @constructor
+ */
+dwv.tool.ArrowFactory = function ()
+{
+    /**
+     * Get the number of points needed to build the shape.
+     * @return {Number} The number of points.
+     */
+    this.getNPoints = function () { return 2; };
+    /**
+     * Get the timeout between point storage.
+     * @return {Number} The timeout in milliseconds.
+     */
+    this.getTimeout = function () { return 0; };
+};
+
+/**
+ * Create an arrow shape to be displayed.
+ * @param {Array} points The points from which to extract the line.
+ * @param {Object} style The drawing style.
+ * @param {Object} image The associated image.
+ */
+dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
+{
+    // physical shape
+    var line = new dwv.math.Line(points[0], points[1]);
+    // draw shape
+    var kshape = new Kinetic.Line({
+        points: [line.getBegin().getX(), line.getBegin().getY(),
+                 line.getEnd().getX(), line.getEnd().getY() ],
+        stroke: style.getLineColour(),
+        strokeWidth: style.getScaledStrokeWidth(),
+        name: "shape"
+    });
+    // triangle
+    var beginTy = new dwv.math.Point2D(line.getBegin().getX(), line.getBegin().getY() - 10);
+    var verticalLine = new dwv.math.Line(line.getBegin(), beginTy);
+    var angle = dwv.math.getAngle(line, verticalLine);
+    var angleRad = angle * Math.PI / 180;
+    var radius = 5;
+    var poly = new Kinetic.RegularPolygon({
+        x: line.getBegin().getX() + radius * Math.sin(angleRad),
+        y: line.getBegin().getY() + radius * Math.cos(angleRad),
+        sides: 3,
+        radius: radius,
+        rotation: -angle,
+        fill: style.getLineColour(),
+        strokeWidth: style.getScaledStrokeWidth(),
+        name: "shape2"
+    });
+    // quantification
+    var ktext = new Kinetic.Text({
+        fontSize: style.getScaledFontSize(),
+        fontFamily: style.getFontFamily(),
+        fill: style.getLineColour(),
+        name: "text"
+    });
+    ktext.textExpr = "";
+    ktext.longText = "";
+    ktext.quant = null;
+    ktext.setText(ktext.textExpr);
+    // label
+    var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
+    var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
+    var klabel = new Kinetic.Label({
+        x: line.getEnd().getX() + dX * 25,
+        y: line.getEnd().getY() + dY * 15,
+        name: "label"
+    });
+    klabel.add(ktext);
+    klabel.add(new Kinetic.Tag());
+
+    // return group
+    var group = new Kinetic.Group();
+    group.name("line-group");
+    group.add(kshape);
+    group.add(poly);
+    group.add(klabel);
+    group.visible(true); // dont inherit
+    return group;
+};
+
+/**
+ * Update an arrow shape.
+ * @param {Object} anchor The active anchor.
+ * @param {Object} image The associated image.
+ */
+dwv.tool.UpdateArrow = function (anchor/*, image*/)
+{
+    // parent group
+    var group = anchor.getParent();
+    // associated shape
+    var kline = group.getChildren( function (node) {
+        return node.name() === 'shape';
+    })[0];
+    // associated triangle shape
+    var ktriangle = group.getChildren( function (node) {
+        return node.name() === 'shape2';
+    })[0];
+    // associated label
+    var klabel = group.getChildren( function (node) {
+        return node.name() === 'label';
+    })[0];
+    // find special points
+    var begin = group.getChildren( function (node) {
+        return node.id() === 'begin';
+    })[0];
+    var end = group.getChildren( function (node) {
+        return node.id() === 'end';
+    })[0];
+    // update special points
+    switch ( anchor.id() ) {
+    case 'begin':
+        begin.x( anchor.x() );
+        begin.y( anchor.y() );
+        break;
+    case 'end':
+        end.x( anchor.x() );
+        end.y( anchor.y() );
+        break;
+    }
+    // update shape and compensate for possible drag
+    // note: shape.position() and shape.size() won't work...
+    var bx = begin.x() - kline.x();
+    var by = begin.y() - kline.y();
+    var ex = end.x() - kline.x();
+    var ey = end.y() - kline.y();
+    kline.points( [bx,by,ex,ey] );
+    // new line
+    var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
+    var p2d1 = new dwv.math.Point2D(end.x(), end.y());
+    var line = new dwv.math.Line(p2d0, p2d1);
+    // udate triangle
+    var beginTy = new dwv.math.Point2D(line.getBegin().getX(), line.getBegin().getY() - 10);
+    var verticalLine = new dwv.math.Line(line.getBegin(), beginTy);
+    var angle = dwv.math.getAngle(line, verticalLine);
+    var angleRad = angle * Math.PI / 180;
+    ktriangle.x(line.getBegin().getX() + ktriangle.radius() * Math.sin(angleRad));
+    ktriangle.y(line.getBegin().getY() + ktriangle.radius() * Math.cos(angleRad));
+    ktriangle.rotation(-angle);
+    // update text
+    var ktext = klabel.getText();
+    ktext.quant = null;
+    ktext.setText(ktext.textExpr);
+    // update position
+    var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
+    var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
+    var textPos = {
+        'x': line.getEnd().getX() + dX * 25,
+        'y': line.getEnd().getY() + dY * 15 };
+    klabel.position( textPos );
+};
+;// namespaces
+var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
 // external
@@ -17536,7 +17718,14 @@ dwv.tool.ShapeEditor = function (app)
                 var p1y = points[3] + shape.y();
                 addAnchor(group, p0x, p0y, 'begin');
                 if ( points.length === 4 ) {
-                    updateFunction = dwv.tool.UpdateLine;
+                    var shape2kids = group.getChildren( function ( node ) {
+                        return node.name() === "shape2";
+                    });
+                    if (shape2kids.length === 0) {
+                        updateFunction = dwv.tool.UpdateLine;
+                    } else {
+                        updateFunction = dwv.tool.UpdateArrow;
+                    }
                     addAnchor(group, p1x, p1y, 'end');
                 }
                 else {

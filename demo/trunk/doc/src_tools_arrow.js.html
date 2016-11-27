@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>dwv Class: Sobel</title>
+	<title>dwv Source: src/tools/arrow.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -81,617 +81,180 @@
 <div class="row">
 
 	
-	<div class="col-md-8">
+	<div class="col-md-12">
 	
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: Sobel</h1>
+		<h1 class="page-title">Source: src/tools/arrow.js</h1>
+    
 <section>
-
-<header>
-    
-        <h2>
-            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.image.html">.image</a><a href="dwv.image.filter.html">.filter</a>.</span>
-        
-        Sobel
-        </h2>
-        
-    
-</header>
-
-
-<article>
-    <div class="container-overview">
-    
-        
-<hr>
-<dt>
-    <h4 class="name" id="Sobel"><span class="type-signature"></span>new Sobel()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Apply a Sobel filter to an image.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_filter.js.html">src/image/filter.js</a>,
-				 <a href="src_image_filter.js.html#sunlight-1-line-137">line 137</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        <dl>
-            
-<hr>
-<dt>
-    <h4 class="name" id="getName"><span class="type-signature"></span>getName()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get the name of the filter.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_filter.js.html">src/image/filter.js</a>,
-				 <a href="src_image_filter.js.html#sunlight-1-line-143">line 143</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    The name of the filter.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">String</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getOriginalImage"><span class="type-signature"></span>getOriginalImage()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get the original image.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_filter.js.html">src/image/filter.js</a>,
-				 <a href="src_image_filter.js.html#sunlight-1-line-159">line 159</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    image The original image.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="setOriginalImage"><span class="type-signature"></span>setOriginalImage(image)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Set the original image.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>image</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The original image.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_filter.js.html">src/image/filter.js</a>,
-				 <a href="src_image_filter.js.html#sunlight-1-line-154">line 154</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="update"><span class="type-signature"></span>update()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Transform the main image using this filter.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_filter.js.html">src/image/filter.js</a>,
-				 <a href="src_image_filter.js.html#sunlight-1-line-166">line 166</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    The transformed image.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        </dl>
-    
-
-    
-
-    
-</article>
-
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">// namespaces
+var dwv = dwv || {};
+dwv.tool = dwv.tool || {};
+//external
+var Kinetic = Kinetic || {};
+
+/**
+ * Arrow factory.
+ * @constructor
+ */
+dwv.tool.ArrowFactory = function ()
+{
+    /**
+     * Get the number of points needed to build the shape.
+     * @return {Number} The number of points.
+     */
+    this.getNPoints = function () { return 2; };
+    /**
+     * Get the timeout between point storage.
+     * @return {Number} The timeout in milliseconds.
+     */
+    this.getTimeout = function () { return 0; };
+};
+
+/**
+ * Create an arrow shape to be displayed.
+ * @param {Array} points The points from which to extract the line.
+ * @param {Object} style The drawing style.
+ * @param {Object} image The associated image.
+ */
+dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
+{
+    // physical shape
+    var line = new dwv.math.Line(points[0], points[1]);
+    // draw shape
+    var kshape = new Kinetic.Line({
+        points: [line.getBegin().getX(), line.getBegin().getY(),
+                 line.getEnd().getX(), line.getEnd().getY() ],
+        stroke: style.getLineColour(),
+        strokeWidth: style.getScaledStrokeWidth(),
+        name: "shape"
+    });
+    // triangle
+    var beginTy = new dwv.math.Point2D(line.getBegin().getX(), line.getBegin().getY() - 10);
+    var verticalLine = new dwv.math.Line(line.getBegin(), beginTy);
+    var angle = dwv.math.getAngle(line, verticalLine);
+    var angleRad = angle * Math.PI / 180;
+    var radius = 5;
+    var poly = new Kinetic.RegularPolygon({
+        x: line.getBegin().getX() + radius * Math.sin(angleRad),
+        y: line.getBegin().getY() + radius * Math.cos(angleRad),
+        sides: 3,
+        radius: radius,
+        rotation: -angle,
+        fill: style.getLineColour(),
+        strokeWidth: style.getScaledStrokeWidth(),
+        name: "shape2"
+    });
+    // quantification
+    var ktext = new Kinetic.Text({
+        fontSize: style.getScaledFontSize(),
+        fontFamily: style.getFontFamily(),
+        fill: style.getLineColour(),
+        name: "text"
+    });
+    ktext.textExpr = "";
+    ktext.longText = "";
+    ktext.quant = null;
+    ktext.setText(ktext.textExpr);
+    // label
+    var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
+    var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
+    var klabel = new Kinetic.Label({
+        x: line.getEnd().getX() + dX * 25,
+        y: line.getEnd().getY() + dY * 15,
+        name: "label"
+    });
+    klabel.add(ktext);
+    klabel.add(new Kinetic.Tag());
+
+    // return group
+    var group = new Kinetic.Group();
+    group.name("line-group");
+    group.add(kshape);
+    group.add(poly);
+    group.add(klabel);
+    group.visible(true); // dont inherit
+    return group;
+};
+
+/**
+ * Update an arrow shape.
+ * @param {Object} anchor The active anchor.
+ * @param {Object} image The associated image.
+ */
+dwv.tool.UpdateArrow = function (anchor/*, image*/)
+{
+    // parent group
+    var group = anchor.getParent();
+    // associated shape
+    var kline = group.getChildren( function (node) {
+        return node.name() === 'shape';
+    })[0];
+    // associated triangle shape
+    var ktriangle = group.getChildren( function (node) {
+        return node.name() === 'shape2';
+    })[0];
+    // associated label
+    var klabel = group.getChildren( function (node) {
+        return node.name() === 'label';
+    })[0];
+    // find special points
+    var begin = group.getChildren( function (node) {
+        return node.id() === 'begin';
+    })[0];
+    var end = group.getChildren( function (node) {
+        return node.id() === 'end';
+    })[0];
+    // update special points
+    switch ( anchor.id() ) {
+    case 'begin':
+        begin.x( anchor.x() );
+        begin.y( anchor.y() );
+        break;
+    case 'end':
+        end.x( anchor.x() );
+        end.y( anchor.y() );
+        break;
+    }
+    // update shape and compensate for possible drag
+    // note: shape.position() and shape.size() won't work...
+    var bx = begin.x() - kline.x();
+    var by = begin.y() - kline.y();
+    var ex = end.x() - kline.x();
+    var ey = end.y() - kline.y();
+    kline.points( [bx,by,ex,ey] );
+    // new line
+    var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
+    var p2d1 = new dwv.math.Point2D(end.x(), end.y());
+    var line = new dwv.math.Line(p2d0, p2d1);
+    // udate triangle
+    var beginTy = new dwv.math.Point2D(line.getBegin().getX(), line.getBegin().getY() - 10);
+    var verticalLine = new dwv.math.Line(line.getBegin(), beginTy);
+    var angle = dwv.math.getAngle(line, verticalLine);
+    var angleRad = angle * Math.PI / 180;
+    ktriangle.x(line.getBegin().getX() + ktriangle.radius() * Math.sin(angleRad));
+    ktriangle.y(line.getBegin().getY() + ktriangle.radius() * Math.cos(angleRad));
+    ktriangle.rotation(-angle);
+    // update text
+    var ktext = klabel.getText();
+    ktext.quant = null;
+    ktext.setText(ktext.textExpr);
+    // update position
+    var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
+    var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
+    var textPos = {
+        'x': line.getEnd().getX() + dX * 25,
+        'y': line.getEnd().getY() + dY * 15 };
+    klabel.position( textPos );
+};
+</pre>
+    </article>
 </section>
+
 
 
 
@@ -701,10 +264,6 @@
 
 	<div class="clearfix"></div>
 
-	
-		<div class="col-md-3">
-			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
-		</div>
 	
 
 </div>
