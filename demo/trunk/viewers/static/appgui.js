@@ -253,7 +253,7 @@ dwv.gui.setup = function () {
         appendTo: "#dwv"
     });
     $(".toolList").dialog({ position:
-        {my: "left top+160", at: "left top", of: "#pageMain"},
+        {my: "left top+180", at: "left top", of: "#pageMain"},
         appendTo: "#dwv"
     });
     $(".history").dialog({ position:
@@ -267,7 +267,7 @@ dwv.gui.setup = function () {
     });
     $(".drawList").dialog({ position:
         {my: "right top", at: "right top", of: "#pageMain"},
-        autoOpen: false, width: 500, height: 250,
+        autoOpen: false, width: 500, height: 590,
         appendTo: "#dwv"
     });
     $(".help").dialog({ position:
