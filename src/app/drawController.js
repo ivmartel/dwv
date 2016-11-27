@@ -175,12 +175,17 @@ dwv.DrawController = function (drawDiv)
             for ( var f = 0, lenf = drawLayers[k].length; f < lenf; ++f ) {
                 var collec = drawLayers[k][f].getChildren();
                 for ( var i = 0, leni = collec.length; i < leni; ++i ) {
-                    var shape = collec[i].getChildren( isShape )[0];
-                    var label = collec[i].getChildren( isLabel )[0];
+                    var shape = collec[i].getChildren( isNodeNameShape )[0];
+                    var label = collec[i].getChildren( isNodeNameLabel )[0];
                     var text = label.getChildren()[0];
                     var type = shape.className;
-                    if (type === "Line" && shape.closed()) {
-                        type = "Roi";
+                    if (type === "Line") {
+                        var shape2kids = collec[i].getChildren( isNodeNameShape2 );
+                        if (shape.closed()) {
+                            type = "Roi";
+                        } else if (shape2kids.length !== 0) {
+                            type = "Arrow";
+                        }
                     }
                     if (type === "Rect") {
                         type = "Rectangle";
@@ -272,7 +277,7 @@ dwv.DrawController = function (drawDiv)
                 for ( var i = 0, leni = drawings[k][f].length; i < leni; ++i ) {
                     // create the group
                     var group = Kinetic.Node.create(drawings[k][f][i]);
-                    var shape = group.getChildren( isShape )[0];
+                    var shape = group.getChildren( isNodeNameShape )[0];
                     // create the draw command
                     var cmd = new dwv.tool.DrawGroupCommand(
                         group, shape.className,
@@ -284,7 +289,7 @@ dwv.DrawController = function (drawDiv)
                     // TODO Verify ID?
                     if (drawingsDetails) {
                         var details = drawingsDetails[k][f][i];
-                        var label = group.getChildren( isLabel )[0];
+                        var label = group.getChildren( isNodeNameLabel )[0];
                         var text = label.getText();
                         // store details
                         text.textExpr = details.textExpr;
@@ -310,10 +315,19 @@ dwv.DrawController = function (drawDiv)
         // get the group
         var group = getDrawGroup(drawDetails.slice, drawDetails.frame, drawDetails.id);
         // shape
-        var shape = group.getChildren( isShape )[0];
-        shape.stroke(drawDetails.color);
+        var shapes = group.getChildren( isNodeNameShape );
+        for (var i = 0; i < shapes.length; ++i ) {
+            shapes[i].stroke(drawDetails.color);
+        }
+        // shape2
+        var shapes2 = group.getChildren( isNodeNameShape2 );
+        for (var j = 0; j < shapes2.length; ++j ) {
+            if (typeof shapes2[j].fill() !== "undefined") {
+                shapes2[j].fill(drawDetails.color);
+            }
+        }
         // label
-        var label = group.getChildren( isLabel )[0];
+        var label = group.getChildren( isNodeNameLabel )[0];
         var text = label.getChildren()[0];
         text.fill(drawDetails.color);
         text.textExpr = drawDetails.label;
@@ -361,7 +375,7 @@ dwv.DrawController = function (drawDiv)
                 layer = drawLayers[k][f];
                 groups = layer.getChildren();
                 while (groups.length) {
-                    var shape = groups[0].getChildren( isShape )[0];
+                    var shape = groups[0].getChildren( isNodeNameShape )[0];
                     delcmd = new dwv.tool.DeleteGroupCommand( groups[0],
                         dwv.tool.GetShapeDisplayName(shape), layer);
                     delcmd.onExecute = cmdCallback;
@@ -401,15 +415,23 @@ dwv.DrawController = function (drawDiv)
      * Is an input node's name 'shape'.
      * @param {Object} node A Kineticjs node.
      */
-    function isShape( node ) {
+    function isNodeNameShape( node ) {
         return node.name() === "shape";
+    }
+
+    /**
+     * Is an input node's name 'shape2'.
+     * @param {Object} node A Kineticjs node.
+     */
+    function isNodeNameShape2( node ) {
+        return node.name() === "shape2";
     }
 
     /**
      * Is an input node's name 'label'.
      * @param {Object} node A Kineticjs node.
      */
-    function isLabel( node ) {
+    function isNodeNameLabel( node ) {
         return node.name() === "label";
     }
 

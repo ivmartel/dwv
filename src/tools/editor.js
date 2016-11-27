@@ -194,7 +194,14 @@ dwv.tool.ShapeEditor = function (app)
                 var p1y = points[3] + shape.y();
                 addAnchor(group, p0x, p0y, 'begin');
                 if ( points.length === 4 ) {
-                    updateFunction = dwv.tool.UpdateLine;
+                    var shape2kids = group.getChildren( function ( node ) {
+                        return node.name() === "shape2";
+                    });
+                    if (shape2kids.length === 0) {
+                        updateFunction = dwv.tool.UpdateLine;
+                    } else {
+                        updateFunction = dwv.tool.UpdateArrow;
+                    }
                     addAnchor(group, p1x, p1y, 'end');
                 }
                 else {

@@ -136,6 +136,9 @@
         },
         "Ellipse": {
             "name": "Ellipse"
+        },
+        "Arrow": {
+            "name": "Pointeur"
         }
     },
     "io": {

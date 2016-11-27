@@ -17,7 +17,7 @@ function startApp() {
         "loaders": ["File", "Url"],
         "tools": ["Scroll", "WindowLevel", "ZoomAndPan", "Draw", "Livewire", "Filter", "Floodfill"],
         "filters": ["Threshold", "Sharpen", "Sobel"],
-        "shapes": ["Line", "Protractor", "Rectangle", "Roi", "Ellipse"],
+        "shapes": ["Arrow", "Line", "Protractor", "Rectangle", "Roi", "Ellipse"],
         "isMobile": false
     });
 
