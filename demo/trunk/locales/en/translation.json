@@ -29,7 +29,9 @@
         "color": "Color",
         "label": "Label",
         "description": "Description",
-        "editMode": "Edit Mode"
+        "editMode": "Edit Mode",
+        "deleteDraws": "Delete All",
+        "visible": "Visible"
     },
     "colour": {
         "Yellow": {
@@ -134,6 +136,9 @@
         },
         "Ellipse": {
             "name": "Ellipse"
+        },
+        "Arrow": {
+            "name": "Arrow"
         }
     },
     "io": {
