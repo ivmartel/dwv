@@ -412,6 +412,25 @@ dwv.dicom.isImplicitLengthSequence = function (element) {
 };
 
 /**
+ * Helper method to flatten an array of typed arrays to 2D typed array
+ * @param {Array} array of typed arrays
+ * @returns {Object} a typed array containing all values 
+ */
+dwv.dicom.flattenArrayOfTypedArrays = function(initialArray) {
+    var initialArrayLength = initialArray.length;
+    var arrayLength = initialArray[0].length;
+    var flattenendArrayLength = initialArrayLength * arrayLength;
+
+    var flattenedArray = new initialArray[0].constructor(flattenendArrayLength);
+
+    for (var i = 0; i < initialArrayLength; i++) {
+        var indexFlattenedArray = i * arrayLength;
+        flattenedArray.set(initialArray[i], indexFlattenedArray);
+    }
+    return flattenedArray;
+};
+
+/**
  * DICOM writer.
  * @constructor
  */
