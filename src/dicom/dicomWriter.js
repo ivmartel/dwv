@@ -374,6 +374,9 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset)
     // pixel data: array of arrays, yet only supports one frame...
     if (element.tag.name === "x7FE00010") {
         value = element.value[0];
+        if(element.value.length > 1) {
+        	value = dwv.dicom.flattenArrayOfTypedArrays(element.value);
+        }
     }
     
     if(typeof value === 'undefined') {
