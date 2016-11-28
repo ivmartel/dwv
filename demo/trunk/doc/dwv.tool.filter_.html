@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>dwv Source: tests/utils/i18n.test.js</title>
+	<title>dwv Namespace: filter</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -81,74 +81,118 @@
 <div class="row">
 
 	
-	<div class="col-md-12">
+	<div class="col-md-8">
 	
 		<div id="main">
 			
 
-		<h1 class="page-title">Source: tests/utils/i18n.test.js</h1>
-    
+	<h1 class="page-title">Namespace: filter</h1>
 <section>
-    <article>
-        <pre
-            class="sunlight-highlight-javascript linenums">/**
- * Tests for the 'utils/i18n' file.
- */
-/** @module tests/utils */
-// Do not warn if these variables were not defined before.
-/* global QUnit */
-QUnit.module("i18n");
 
-/**
- *
- */
-function checkLanguage(language, keys, assert) {
-    var done = assert.async();
-    // initialise with auto language
-    dwv.i18nInitialise(language, "..");
-    // fail test if load fails
-    dwv.i18nOnFailedLoad( function (lng /*, ns, msg*/) {
-        assert.ok(false, "Failed loading '" + lng + "' language.");
-        // stop linstening
-        dwv.i18nOffFailedLoad();
-        // finish async test
-        done();
-    });
-    // test once loaded
-    dwv.i18nOnLoaded( function (/*loaded*/) {
-        // check some values
-        for (var i = 0; i &lt; keys.length; ++i ) {
-            assert.equal(dwv.i18nExists(keys[i][0]), true, "i18n "+language+" translation exists");
-            assert.equal(dwv.i18n(keys[i][0]), keys[i][1], "i18n "+language+" translation is ok");
-        }
-        // stop linstening
-        dwv.i18nOffLoaded();
-        // finish async test
-        done();
-    });
-}
+<header>
+    
+        <h2>
+            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.tool.html">.tool</a>.</span>
+        
+        filter
+        </h2>
+        
+    
+</header>
 
-/**
- * Tests for {@link dwv.i18n} with en language.
- * @function module:tests/i18n
- */
-QUnit.test("Test i18n en.", function (assert) {
-    var keys = [["basics.open", "Open"], ["basics.close", "Close"]];
-    checkLanguage("en", keys, assert);
-});
 
-/**
- * Tests for {@link dwv.i18n} with fr language.
- * @function module:tests/i18n
- */
-QUnit.test("Test i18n fr.", function (assert) {
-    var keys = [["basics.open", "Ouvrir"], ["basics.close", "Fermer"]];
-    checkLanguage("fr", keys, assert);
-});
-</pre>
-    </article>
+<article>
+    <div class="container-overview">
+    
+        
+
+        
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_filter.js.html">src/tools/filter.js</a>,
+				 <a href="src_tools_filter.js.html#sunlight-1-line-5">line 5</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Classes</h3>
+
+        <dl>
+            <dt><a href="dwv.tool.filter.Sharpen.html">Sharpen</a></dt>
+            <dd></dd>
+        
+            <dt><a href="dwv.tool.filter.Sobel.html">Sobel</a></dt>
+            <dd></dd>
+        
+            <dt><a href="dwv.tool.filter.Threshold.html">Threshold</a></dt>
+            <dd></dd>
+        </dl>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
 </section>
-
 
 
 
@@ -158,6 +202,10 @@ QUnit.test("Test i18n fr.", function (assert) {
 
 	<div class="clearfix"></div>
 
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
 	
 
 </div>

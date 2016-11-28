@@ -4471,6 +4471,14 @@ dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset,
                 byteOffset = this.writeDataElement(itemDelimElement, byteOffset);
             }
         }
+    } else if ( vr === "AT") {
+        var hexString = value + '';
+        var hexString1 = hexString.substring(1, 5);
+        var hexString2 = hexString.substring(6, 10);
+        var dec1 = parseInt(hexString1, 16);
+        var dec2 = parseInt(hexString2, 16);
+        value = new Uint16Array([dec1, dec2]);
+        byteOffset = this.writeUint16Array(byteOffset, value);
     }
     else {
         byteOffset = this.writeStringArray(byteOffset, value);
@@ -4514,10 +4522,19 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset)
     }
     // value
     var value = element.value;
-    // pixel data: array of arrays, yet only supports one frame...
+    // pixel data: array of arrays of size 1 for single frame 
+    // is flattened to a single array for multi frame support
     if (element.tag.name === "x7FE00010") {
         value = element.value[0];
+        if(element.value.length > 1) {
+        	value = dwv.dicom.flattenArrayOfTypedArrays(element.value);
+        }
     }
+    
+    if(typeof value === 'undefined') {
+        value = [];
+    }
+    
     byteOffset = this.writeDataElementValue(element.vr, byteOffset, value);
 
     // sequence delimitation item for sequence with implicit length
@@ -4547,6 +4564,25 @@ dwv.dicom.isImplicitLengthSequence = function (element) {
                 typeof element.value[0] !== "undefined" &&
                 typeof element.value[0].xFFFEE00D !== "undefined" ) ||
         ( element.value === 0 ) ) );
+};
+
+/**
+ * Helper method to flatten an array of typed arrays to 2D typed array
+ * @param {Array} array of typed arrays
+ * @returns {Object} a typed array containing all values 
+ */
+dwv.dicom.flattenArrayOfTypedArrays = function(initialArray) {
+    var initialArrayLength = initialArray.length;
+    var arrayLength = initialArray[0].length;
+    var flattenendArrayLength = initialArrayLength * arrayLength;
+
+    var flattenedArray = new initialArray[0].constructor(flattenendArrayLength);
+
+    for (var i = 0; i < initialArrayLength; i++) {
+        var indexFlattenedArray = i * arrayLength;
+        flattenedArray.set(initialArray[i], indexFlattenedArray);
+    }
+    return flattenedArray;
 };
 
 /**
@@ -4608,7 +4644,7 @@ dwv.dicom.DicomWriter = function () {
         var dict = dwv.dicom.dictionary;
         var group = element.tag.group;
         var groupName = dwv.dicom.TagGroups[group.substr(1)]; // remove first 0
-        if ( typeof dict[group] !== 'undefined' ) {
+        if ( typeof dict[group] !== 'undefined' && typeof dict[group][element.tag.element] !== 'undefined') {
             tagName = dict[group][element.tag.element][2];
         }
         // apply rules:
