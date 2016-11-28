@@ -371,7 +371,8 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset)
     }
     // value
     var value = element.value;
-    // pixel data: array of arrays, yet only supports one frame...
+    // pixel data: array of arrays of size 1 for single frame 
+    // is flattened to a single array for multi frame support
     if (element.tag.name === "x7FE00010") {
         value = element.value[0];
         if(element.value.length > 1) {
