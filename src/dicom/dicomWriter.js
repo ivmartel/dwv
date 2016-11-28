@@ -375,6 +375,11 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset)
     if (element.tag.name === "x7FE00010") {
         value = element.value[0];
     }
+    
+    if(typeof value === 'undefined') {
+        value = [];
+    }
+    
     byteOffset = this.writeDataElementValue(element.vr, byteOffset, value);
 
     // sequence delimitation item for sequence with implicit length
