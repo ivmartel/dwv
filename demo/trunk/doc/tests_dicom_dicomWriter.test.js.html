@@ -108,7 +108,7 @@ QUnit.test("Test multiframe writer support.", function (assert) {
     var done = assert.async();
 
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/yulia-tue/dwv/master";
+    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
     var url = urlRoot + "/tests/data/multiframe-test1.dcm";
     request.open('GET', url, true);
     request.responseType = "arraybuffer";
@@ -130,25 +130,26 @@ QUnit.test("Test multiframe writer support.", function (assert) {
         assert.equal(rawTags.x00280008.value[0], numFrames, "Number of frames");
         // length of value array for pixel data
         assert.equal(rawTags.x7FE00010.value.length, numFrames, "Length of value array for pixel data");
-        
+
         var dicomWriter = new dwv.dicom.DicomWriter();
         var buffer = dicomWriter.getBuffer(rawTags);
-        
+
         dicomParser = new dwv.dicom.DicomParser();
         dicomParser.parse(buffer);
 
         rawTags = dicomParser.getRawDicomElements();
-        
+
         // check values
         assert.equal(rawTags.x00280008.value[0], numFrames, "Number of frames");
         // length of value array for pixel data
         assert.equal(rawTags.x7FE00010.value.length, numFrames, "Length of value array for pixel data");
-        
+
         // finish async test
         done();
     };
     request.send(null);
-});</pre>
+});
+</pre>
     </article>
 </section>
 
