@@ -457,7 +457,7 @@ dwv.dicom.DicomWriter = function () {
         var dict = dwv.dicom.dictionary;
         var group = element.tag.group;
         var groupName = dwv.dicom.TagGroups[group.substr(1)]; // remove first 0
-        if ( typeof dict[group] !== 'undefined' ) {
+        if ( typeof dict[group] !== 'undefined' && typeof dict[group][element.tag.element] !== 'undefined') {
             tagName = dict[group][element.tag.element][2];
         }
         // apply rules:
