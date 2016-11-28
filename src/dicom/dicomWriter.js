@@ -320,6 +320,14 @@ dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset,
                 byteOffset = this.writeDataElement(itemDelimElement, byteOffset);
             }
         }
+    } else if ( vr === "AT") {
+        var hexString = value + '';
+        var hexString1 = hexString.substring(1, 5);
+        var hexString2 = hexString.substring(6, 10);
+        var dec1 = parseInt(hexString1, 16);
+        var dec2 = parseInt(hexString2, 16);
+        value = new Uint16Array([dec1, dec2]);
+        byteOffset = this.writeUint16Array(byteOffset, value);
     }
     else {
         byteOffset = this.writeStringArray(byteOffset, value);
