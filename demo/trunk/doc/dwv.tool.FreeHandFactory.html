@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>dwv Source: src/tools/rectangle.js</title>
+	<title>dwv Class: FreeHandFactory</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -81,175 +81,553 @@
 <div class="row">
 
 	
-	<div class="col-md-12">
+	<div class="col-md-8">
 	
 		<div id="main">
 			
 
-		<h1 class="page-title">Source: src/tools/rectangle.js</h1>
-    
+	<h1 class="page-title">Class: FreeHandFactory</h1>
 <section>
-    <article>
-        <pre
-            class="sunlight-highlight-javascript linenums">// namespaces
-var dwv = dwv || {};
-dwv.tool = dwv.tool || {};
-//external
-var Kinetic = Kinetic || {};
 
-/**
- * Rectangle factory.
- * @constructor
- */
-dwv.tool.RectangleFactory = function ()
-{
-    /**
-     * Get the number of points needed to build the shape.
-     * @return {Number} The number of points.
-     */
-    this.getNPoints = function () { return 2; };
-    /**
-     * Get the timeout between point storage.
-     * @return {Number} The timeout in milliseconds.
-     */
-    this.getTimeout = function () { return 0; };
-};
+<header>
+    
+        <h2>
+            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.tool.html">.tool</a>.</span>
+        
+        FreeHandFactory
+        </h2>
+        
+    
+</header>
 
-/**
- * Create a rectangle shape to be displayed.
- * @param {Array} points The points from which to extract the rectangle.
- * @param {Object} style The drawing style.
- * @param {Object} image The associated image.
- */
-dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
-{
-    // physical shape
-    var rectangle = new dwv.math.Rectangle(points[0], points[1]);
-    // draw shape
-    var kshape = new Kinetic.Rect({
-        x: rectangle.getBegin().getX(),
-        y: rectangle.getBegin().getY(),
-        width: rectangle.getWidth(),
-        height: rectangle.getHeight(),
-        stroke: style.getLineColour(),
-        strokeWidth: style.getScaledStrokeWidth(),
-        name: "shape"
-    });
-    // quantification
-    var quant = image.quantifyRect( rectangle );
-    var ktext = new Kinetic.Text({
-        fontSize: style.getScaledFontSize(),
-        fontFamily: style.getFontFamily(),
-        fill: style.getLineColour(),
-        name: "text"
-    });
-    ktext.textExpr = "{surface}";
-    ktext.longText = "";
-    ktext.quant = quant;
-    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
 
-    // label
-    var klabel = new Kinetic.Label({
-        x: rectangle.getBegin().getX(),
-        y: rectangle.getEnd().getY() + 10,
-        name: "label"
-    });
-    klabel.add(ktext);
-    klabel.add(new Kinetic.Tag());
+<article>
+    <div class="container-overview">
+    
+        
+<hr>
+<dt>
+    <h4 class="name" id="FreeHandFactory"><span class="type-signature"></span>new FreeHandFactory()</h4>
+    
+    
+</dt>
+<dd>
 
-    // return group
-    var group = new Kinetic.Group();
-    group.name("rectangle-group");
-    group.add(kshape);
-    group.add(klabel);
-    group.visible(true); // dont inherit
-    return group;
-};
+    
+    <div class="description">
+        FreeHand factory.
+    </div>
+    
 
-/**
- * Update a rectangle shape.
- * @param {Object} anchor The active anchor.
- * @param {Object} image The associated image.
- */
-dwv.tool.UpdateRect = function (anchor, image)
-{
-    // parent group
-    var group = anchor.getParent();
-    // associated shape
-    var krect = group.getChildren( function (node) {
-        return node.name() === 'shape';
-    })[0];
-    // associated label
-    var klabel = group.getChildren( function (node) {
-        return node.name() === 'label';
-    })[0];
-    // find special points
-    var topLeft = group.getChildren( function (node) {
-        return node.id() === 'topLeft';
-    })[0];
-    var topRight = group.getChildren( function (node) {
-        return node.id() === 'topRight';
-    })[0];
-    var bottomRight = group.getChildren( function (node) {
-        return node.id() === 'bottomRight';
-    })[0];
-    var bottomLeft = group.getChildren( function (node) {
-        return node.id() === 'bottomLeft';
-    })[0];
-    // update 'self' (undo case) and special points
-    switch ( anchor.id() ) {
-    case 'topLeft':
-        topLeft.x( anchor.x() );
-        topLeft.y( anchor.y() );
-        topRight.y( anchor.y() );
-        bottomLeft.x( anchor.x() );
-        break;
-    case 'topRight':
-        topRight.x( anchor.x() );
-        topRight.y( anchor.y() );
-        topLeft.y( anchor.y() );
-        bottomRight.x( anchor.x() );
-        break;
-    case 'bottomRight':
-        bottomRight.x( anchor.x() );
-        bottomRight.y( anchor.y() );
-        bottomLeft.y( anchor.y() );
-        topRight.x( anchor.x() );
-        break;
-    case 'bottomLeft':
-        bottomLeft.x( anchor.x() );
-        bottomLeft.y( anchor.y() );
-        bottomRight.y( anchor.y() );
-        topLeft.x( anchor.x() );
-        break;
-    default :
-        console.error('Unhandled anchor id: '+anchor.id());
-        break;
-    }
-    // update shape
-    krect.position(topLeft.position());
-    var width = topRight.x() - topLeft.x();
-    var height = bottomLeft.y() - topLeft.y();
-    if ( width &amp;&amp; height ) {
-        krect.size({'width': width, 'height': height});
-    }
-    // new rect
-    var p2d0 = new dwv.math.Point2D(topLeft.x(), topLeft.y());
-    var p2d1 = new dwv.math.Point2D(bottomRight.x(), bottomRight.y());
-    var rect = new dwv.math.Rectangle(p2d0, p2d1);
-    // update text
-    var quant = image.quantifyRect( rect );
-    var ktext = klabel.getText();
-    ktext.quant = quant;
-    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
-    // update position
-    var textPos = { 'x': rect.getBegin().getX(), 'y': rect.getEnd().getY() + 10 };
-    klabel.position( textPos );
-};
-</pre>
-    </article>
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_freeHand.js.html">src/tools/freeHand.js</a>,
+				 <a href="src_tools_freeHand.js.html#sunlight-1-line-11">line 11</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+            
+<hr>
+<dt>
+    <h4 class="name" id="create"><span class="type-signature"></span>create(points, style, image)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Create a roi shape to be displayed.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>points</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The points from which to extract the line.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>style</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The drawing style.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>image</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The associated image.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_freeHand.js.html">src/tools/freeHand.js</a>,
+				 <a href="src_tools_freeHand.js.html#sunlight-1-line-31">line 31</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getNPoints"><span class="type-signature"></span>getNPoints()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get the number of points needed to build the shape.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_freeHand.js.html">src/tools/freeHand.js</a>,
+				 <a href="src_tools_freeHand.js.html#sunlight-1-line-17">line 17</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    The number of points.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Number</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getTimeout"><span class="type-signature"></span>getTimeout()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get the timeout between point storage.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_freeHand.js.html">src/tools/freeHand.js</a>,
+				 <a href="src_tools_freeHand.js.html#sunlight-1-line-22">line 22</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    The timeout in milliseconds.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Number</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+
+    
+</article>
+
 </section>
-
 
 
 
@@ -259,6 +637,10 @@ dwv.tool.UpdateRect = function (anchor, image)
 
 	<div class="clearfix"></div>
 
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
 	
 
 </div>
