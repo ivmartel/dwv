@@ -493,20 +493,25 @@ dwv.dicom.DicomWriter = function () {
         var dict = dwv.dicom.dictionary;
         var group = element.tag.group;
         var groupName = dwv.dicom.TagGroups[group.substr(1)]; // remove first 0
+        
         if ( typeof dict[group] !== 'undefined' && typeof dict[group][element.tag.element] !== 'undefined') {
             tagName = dict[group][element.tag.element][2];
         }
         // apply rules:
         var rule;
-        // 1. tag name
-        if ( tagName !== null && typeof this.rules[tagName] !== 'undefined' ) {
+        // 1. tag itself 
+        if (typeof this.rules[element.tag.name] !== 'undefined') {
+        	rule = this.rules[element.tag.name];
+        } 
+        // 2. tag name
+        else if ( tagName !== null && typeof this.rules[tagName] !== 'undefined' ) {
             rule = this.rules[tagName];
         }
-        // 2. group name
+        // 3. group name
         else if ( typeof this.rules[groupName] !== 'undefined' ) {
             rule = this.rules[groupName];
         }
-        // 3. default
+        // 4. default
         else {
             rule = this.rules['default'];
         }
