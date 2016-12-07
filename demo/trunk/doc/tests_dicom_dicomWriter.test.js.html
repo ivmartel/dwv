@@ -154,7 +154,7 @@ QUnit.test("Test patient anonymisation", function (assert) {
     var done = assert.async();
 
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/yulia-tue/dwv/master";
+    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
     var url = urlRoot + "/tests/data/dwv-test-anonymise.dcm";
     request.open('GET', url, true);
     request.responseType = "arraybuffer";
