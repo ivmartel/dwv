@@ -139,6 +139,9 @@
         },
         "Arrow": {
             "name": "Arrow"
+        },
+        "FreeHand": {
+            "name": "Free hand"
         }
     },
     "io": {
