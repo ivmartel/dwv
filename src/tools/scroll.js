@@ -25,12 +25,19 @@ dwv.tool.Scroll = function(app)
      * @type Boolean
      */
     this.started = false;
+    // touch timer ID (created by setTimeout)
+    var touchTimerID = null;
 
     /**
      * Handle mouse down event.
      * @param {Object} event The mouse down event.
      */
     this.mousedown = function(event){
+        // stop viewer if playing
+        if ( app.getViewController().isPlaying() ) {
+            app.getViewController().stop();
+        }
+        // start flag
         self.started = true;
         // first position
         self.x0 = event._x;
@@ -108,6 +115,8 @@ dwv.tool.Scroll = function(app)
      * @param {Object} event The touch start event.
      */
     this.touchstart = function(event){
+        // long touch triggers the dblclick
+        touchTimerID = setTimeout(self.dblclick, 500);
         self.mousedown(event);
     };
 
@@ -124,6 +133,10 @@ dwv.tool.Scroll = function(app)
      * @param {Object} event The touch end event.
      */
     this.touchend = function(event){
+        if (touchTimerID !== null) {
+            clearTimeout(touchTimerID);
+            touchTimerID = null;
+        }
         self.mouseup(event);
     };
 
@@ -161,6 +174,13 @@ dwv.tool.Scroll = function(app)
     this.keydown = function(event){
         app.onKeydown(event);
     };
+    /**
+     * Handle double click.
+     * @param {Object} event The key down event.
+     */
+     this.dblclick = function (/*event*/) {
+         app.getViewController().play();
+     };
 
     /**
      * Setup the tool GUI.

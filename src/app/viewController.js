@@ -7,14 +7,24 @@ var dwv = dwv || {};
  */
 dwv.ViewController = function ( view )
 {
+    // closure to self
+    var self = this;
     // Window/level presets
     var presets = null;
+    // Slice/frame player ID (created by setInterval)
+    var playerID = null;
 
     /**
      * Get the window/level presets.
      * @return {Object} The presets.
      */
     this.getPresets = function () { return presets; };
+
+    /**
+     * Check if the controller is playing.
+     * @return {Boolean} True is the controler is playing slices/frames.
+     */
+    this.isPlaying = function () { return (playerID !== null); };
 
     /**
      * Get the current position.
@@ -51,16 +61,26 @@ dwv.ViewController = function ( view )
     };
 
     /**
+     * Set the current slice position.
+     * @param {Number} k The slice index.
+     * @return {Boolean} False if not in bounds.
+      */
+    this.setCurrentSlice = function (k)
+    {
+        return view.setCurrentPosition({
+            "i": view.getCurrentPosition().i,
+            "j": view.getCurrentPosition().j,
+            "k": k
+        });
+    };
+
+    /**
      * Increment the current slice number.
      * @return {Boolean} False if not in bounds.
      */
     this.incrementSliceNb = function ()
     {
-        return view.setCurrentPosition({
-            "i": view.getCurrentPosition().i,
-            "j": view.getCurrentPosition().j,
-            "k": view.getCurrentPosition().k + 1
-        });
+        return self.setCurrentSlice( view.getCurrentPosition().k + 1 );
     };
 
     /**
@@ -69,11 +89,7 @@ dwv.ViewController = function ( view )
      */
     this.decrementSliceNb = function ()
     {
-        return view.setCurrentPosition({
-            "i": view.getCurrentPosition().i,
-            "j": view.getCurrentPosition().j,
-            "k": view.getCurrentPosition().k - 1
-        });
+        return self.setCurrentSlice( view.getCurrentPosition().k - 1 );
     };
 
     /**
@@ -116,6 +132,7 @@ dwv.ViewController = function ( view )
     /**
      * Go to first slice .
      * @return {Boolean} False if not in bounds.
+     * @deprecated Use the setCurrentSlice function.
      */
     this.goFirstSlice = function()
     {
@@ -125,6 +142,43 @@ dwv.ViewController = function ( view )
             "k": 0
         });
     };
+
+    /**
+     *
+     */
+     this.play = function ()
+     {
+         if ( playerID === null ) {
+             var nSlices = view.getImage().getGeometry().getSize().getNumberOfSlices();
+             var nFrames = view.getImage().getNumberOfFrames();
+
+             playerID = setInterval( function () {
+                 if ( nSlices !== 1 ) {
+                     if ( !self.incrementSliceNb() ) {
+                         self.setCurrentSlice(0);
+                     }
+                 } else if ( nFrames !== 1 ) {
+                     if ( !self.incrementFrameNb() ) {
+                         self.setCurrentFrame(0);
+                     }
+                 }
+
+             }, 300);
+         } else {
+             this.stop();
+         }
+     };
+
+     /**
+      *
+      */
+      this.stop = function ()
+      {
+          if ( playerID !== null ) {
+              clearInterval(playerID);
+              playerID = null;
+          }
+      };
 
     /**
      * Get the window/level.
