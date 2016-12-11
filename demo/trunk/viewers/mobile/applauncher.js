@@ -42,7 +42,7 @@ function startApp() {
         "loaders": ["File", "Url", "GoogleDrive", "Dropbox"],
         "tools": ["Scroll", "WindowLevel", "ZoomAndPan", "Draw", "Livewire", "Filter", "Floodfill"],
         "filters": ["Threshold", "Sharpen", "Sobel"],
-        "shapes": ["Arrow", "Line", "Protractor", "Rectangle", "Roi", "Ellipse"],
+        "shapes": ["Arrow", "Line", "Protractor", "Rectangle", "Roi", "Ellipse", "FreeHand"],
         "isMobile": true
         //"defaultCharacterSet": "chinese"
     });
