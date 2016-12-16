@@ -40,6 +40,27 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
         strokeWidth: style.getScaledStrokeWidth(),
         name: "shape"
     });
+
+    // tick begin
+    var linePerp0 = dwv.math.getPerpendicularLine( line, points[0], 10 );
+    var ktick0 = new Kinetic.Line({
+        points: [linePerp0.getBegin().getX(), linePerp0.getBegin().getY(),
+                 linePerp0.getEnd().getX(), linePerp0.getEnd().getY() ],
+        stroke: style.getLineColour(),
+        strokeWidth: style.getScaledStrokeWidth(),
+        name: "tick0"
+    });
+
+    // tick end
+    var linePerp1 = dwv.math.getPerpendicularLine( line, points[1], 10 );
+    var ktick1 = new Kinetic.Line({
+        points: [linePerp1.getBegin().getX(), linePerp1.getBegin().getY(),
+                 linePerp1.getEnd().getX(), linePerp1.getEnd().getY() ],
+        stroke: style.getLineColour(),
+        strokeWidth: style.getScaledStrokeWidth(),
+        name: "tick1"
+    });
+
     // quantification
     var quant = image.quantifyLine( line );
     var ktext = new Kinetic.Text({
@@ -67,6 +88,8 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
     var group = new Kinetic.Group();
     group.name("line-group");
     group.add(kshape);
+    group.add(ktick0);
+    group.add(ktick1);
     group.add(klabel);
     group.visible(true); // dont inherit
     return group;
@@ -84,6 +107,14 @@ dwv.tool.UpdateLine = function (anchor, image)
     // associated shape
     var kline = group.getChildren( function (node) {
         return node.name() === 'shape';
+    })[0];
+    // associated tick0
+    var ktick0 = group.getChildren( function (node) {
+        return node.name() === 'tick0';
+    })[0];
+    // associated tick1
+    var ktick1 = group.getChildren( function (node) {
+        return node.name() === 'tick1';
     })[0];
     // associated label
     var klabel = group.getChildren( function (node) {
@@ -118,6 +149,15 @@ dwv.tool.UpdateLine = function (anchor, image)
     var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
     var p2d1 = new dwv.math.Point2D(end.x(), end.y());
     var line = new dwv.math.Line(p2d0, p2d1);
+    // tick
+    var p2b = new dwv.math.Point2D(bx, by);
+    var p2e = new dwv.math.Point2D(ex, ey);
+    var linePerp0 = dwv.math.getPerpendicularLine( line, p2b, 10 );
+    ktick0.points( [linePerp0.getBegin().getX(), linePerp0.getBegin().getY(),
+        linePerp0.getEnd().getX(), linePerp0.getEnd().getY()] );
+    var linePerp1 = dwv.math.getPerpendicularLine( line, p2e, 10 );
+    ktick1.points( [linePerp1.getBegin().getX(), linePerp1.getBegin().getY(),
+        linePerp1.getEnd().getX(), linePerp1.getEnd().getY()] );
     // update text
     var quant = image.quantifyLine( line );
     var ktext = klabel.getText();
