@@ -141,7 +141,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
                  linePerp0.getEnd().getX(), linePerp0.getEnd().getY() ],
         stroke: style.getLineColour(),
         strokeWidth: style.getScaledStrokeWidth(),
-        name: "tick0"
+        name: "shape-tick0"
     });
 
     // tick end
@@ -151,7 +151,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
                  linePerp1.getEnd().getX(), linePerp1.getEnd().getY() ],
         stroke: style.getLineColour(),
         strokeWidth: style.getScaledStrokeWidth(),
-        name: "tick1"
+        name: "shape-tick1"
     });
 
     // quantification
@@ -203,11 +203,11 @@ dwv.tool.UpdateLine = function (anchor, image)
     })[0];
     // associated tick0
     var ktick0 = group.getChildren( function (node) {
-        return node.name() === 'tick0';
+        return node.name() === 'shape-tick0';
     })[0];
     // associated tick1
     var ktick1 = group.getChildren( function (node) {
-        return node.name() === 'tick1';
+        return node.name() === 'shape-tick1';
     })[0];
     // associated label
     var klabel = group.getChildren( function (node) {

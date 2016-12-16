@@ -189,7 +189,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
             rotationDeg: -inclination,
             x: points[1].getX(),
             y: points[1].getY(),
-            name: "arc"
+            name: "shape-arc"
          });
         // add to group
         group.add(klabel);
@@ -218,7 +218,7 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
     })[0];
     // associated arc
     var karc = group.getChildren( function (node) {
-        return node.name() === 'arc';
+        return node.name() === 'shape-arc';
     })[0];
     // find special points
     var begin = group.getChildren( function (node) {

@@ -1526,10 +1526,10 @@ dwv.DrawController = function (drawDiv)
                     var text = label.getChildren()[0];
                     var type = shape.className;
                     if (type === "Line") {
-                        var shape2kids = collec[i].getChildren( isNodeNameShape2 );
+                        var shapeExtrakids = collec[i].getChildren( isNodeNameShapeExtra );
                         if (shape.closed()) {
                             type = "Roi";
-                        } else if (shape2kids.length !== 0) {
+                        } else if (shapeExtrakids.length !== 0) {
                             type = "Arrow";
                         }
                     }
@@ -1666,10 +1666,13 @@ dwv.DrawController = function (drawDiv)
             shapes[i].stroke(drawDetails.color);
         }
         // shape2
-        var shapes2 = group.getChildren( isNodeNameShape2 );
-        for (var j = 0; j < shapes2.length; ++j ) {
-            if (typeof shapes2[j].fill() !== "undefined") {
-                shapes2[j].fill(drawDetails.color);
+        var shapesExtra = group.getChildren( isNodeNameShapeExtra );
+        for (var j = 0; j < shapesExtra.length; ++j ) {
+            if (typeof shapesExtra[j].stroke() !== "undefined") {
+                shapesExtra[j].stroke(drawDetails.color);
+            }
+            else if (typeof shapesExtra[j].fill() !== "undefined") {
+                shapesExtra[j].fill(drawDetails.color);
             }
         }
         // label
@@ -1769,8 +1772,8 @@ dwv.DrawController = function (drawDiv)
      * Is an input node's name 'shape2'.
      * @param {Object} node A Kineticjs node.
      */
-    function isNodeNameShape2( node ) {
-        return node.name() === "shape2";
+    function isNodeNameShapeExtra( node ) {
+        return node.name().startsWith("shape-");
     }
 
     /**
@@ -16619,7 +16622,7 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
     var angle = dwv.math.getAngle(line, verticalLine);
     var angleRad = angle * Math.PI / 180;
     var radius = 5;
-    var poly = new Kinetic.RegularPolygon({
+    var kpoly = new Kinetic.RegularPolygon({
         x: line.getBegin().getX() + radius * Math.sin(angleRad),
         y: line.getBegin().getY() + radius * Math.cos(angleRad),
         sides: 3,
@@ -16627,7 +16630,7 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
         rotation: -angle,
         fill: style.getLineColour(),
         strokeWidth: style.getScaledStrokeWidth(),
-        name: "shape2"
+        name: "shape-triangle"
     });
     // quantification
     var ktext = new Kinetic.Text({
@@ -16655,7 +16658,7 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
     var group = new Kinetic.Group();
     group.name("line-group");
     group.add(kshape);
-    group.add(poly);
+    group.add(kpoly);
     group.add(klabel);
     group.visible(true); // dont inherit
     return group;
@@ -16676,7 +16679,7 @@ dwv.tool.UpdateArrow = function (anchor/*, image*/)
     })[0];
     // associated triangle shape
     var ktriangle = group.getChildren( function (node) {
-        return node.name() === 'shape2';
+        return node.name() === 'shape-triangle';
     })[0];
     // associated label
     var klabel = group.getChildren( function (node) {
@@ -19233,7 +19236,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
                  linePerp0.getEnd().getX(), linePerp0.getEnd().getY() ],
         stroke: style.getLineColour(),
         strokeWidth: style.getScaledStrokeWidth(),
-        name: "tick0"
+        name: "shape-tick0"
     });
 
     // tick end
@@ -19243,7 +19246,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
                  linePerp1.getEnd().getX(), linePerp1.getEnd().getY() ],
         stroke: style.getLineColour(),
         strokeWidth: style.getScaledStrokeWidth(),
-        name: "tick1"
+        name: "shape-tick1"
     });
 
     // quantification
@@ -19295,11 +19298,11 @@ dwv.tool.UpdateLine = function (anchor, image)
     })[0];
     // associated tick0
     var ktick0 = group.getChildren( function (node) {
-        return node.name() === 'tick0';
+        return node.name() === 'shape-tick0';
     })[0];
     // associated tick1
     var ktick1 = group.getChildren( function (node) {
-        return node.name() === 'tick1';
+        return node.name() === 'shape-tick1';
     })[0];
     // associated label
     var klabel = group.getChildren( function (node) {
@@ -19845,7 +19848,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
             rotationDeg: -inclination,
             x: points[1].getX(),
             y: points[1].getY(),
-            name: "arc"
+            name: "shape-arc"
          });
         // add to group
         group.add(klabel);
@@ -19874,7 +19877,7 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
     })[0];
     // associated arc
     var karc = group.getChildren( function (node) {
-        return node.name() === 'arc';
+        return node.name() === 'shape-arc';
     })[0];
     // find special points
     var begin = group.getChildren( function (node) {
