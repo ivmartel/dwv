@@ -175,6 +175,14 @@ dwv.math.Line = function(begin, end)
         return dy / dx;
     };
     /**
+     * Get the intercept of the line.
+     * @return {Number} The slope of the line.
+     */
+    this.getIntercept = function()
+    {
+        return (end.getX() * begin.getY() - begin.getX() * end.getY()) / dx;
+    };
+    /**
      * Get the inclination of the line.
      * @return {Number} The inclination of the line.
      */
@@ -207,6 +215,61 @@ dwv.math.getAngle = function (line0, line1)
     // complementary angle
     // shift?
     return 360 - (180 - angle);
+};
+
+/**
+ * Get a perpendicular line to an input one.
+ * @param {Object} line The line to be perpendicular to.
+ * @param {Object} point The middle point of the perpendicular line.
+ * @param {Number} length The length of the perpendicular line.
+ */
+dwv.math.getPerpendicularLine = function (line, point, length)
+{
+    // begin point
+    var beginX = 0;
+    var beginY = 0;
+    // end point
+    var endX = 0;
+    var endY = 0;
+
+    // check slope:
+    // 0 -> horizontal
+    // Infinite -> vertical (a/Infinite = 0)
+    if ( line.getSlope() !== 0 ) {
+        // a0 * a1 = -1
+        var slope = -1 / line.getSlope();
+        // y0 = a1*x0 + b1 -> b1 = y0 - a1*x0
+        var intercept = point.getY() - slope * point.getX();
+
+        // 1. (x - x0)^2 + (y - y0)^2 = d^2
+        // 2. a = (y - y0) / (x - x0) -> y = a*(x - x0) + y0
+        // ->  (x - x0)^2 + m^2 * (x - x0)^2 = d^2
+        // -> x = x0 +- d / sqrt(1+m^2)
+
+        // length is the distance between begin and end,
+        // point is half way between both -> d = length / 2
+        var dx = length / ( 2 * Math.sqrt( 1 + slope * slope ) );
+
+        // begin point
+        beginX = point.getX() - dx;
+        beginY = slope * beginX + intercept;
+        // end point
+        endX = point.getX() + dx;
+        endY = slope * endX + intercept;
+    }
+    else {
+      // horizontal input line -> perpendicular is vertical!
+      // begin point
+      beginX = point.getX();
+      beginY = point.getY() - length / 2;
+      // end point
+      endX = point.getX();
+      endY = point.getY() + length / 2;
+    }
+    // perpendicalar line
+    return new dwv.math.Line(
+        new dwv.math.Point2D(beginX, beginY),
+        new dwv.math.Point2D(endX, endY) );
 };
 
 /**
