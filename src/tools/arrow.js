@@ -46,7 +46,7 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
     var angle = dwv.math.getAngle(line, verticalLine);
     var angleRad = angle * Math.PI / 180;
     var radius = 5;
-    var poly = new Kinetic.RegularPolygon({
+    var kpoly = new Kinetic.RegularPolygon({
         x: line.getBegin().getX() + radius * Math.sin(angleRad),
         y: line.getBegin().getY() + radius * Math.cos(angleRad),
         sides: 3,
@@ -54,7 +54,7 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
         rotation: -angle,
         fill: style.getLineColour(),
         strokeWidth: style.getScaledStrokeWidth(),
-        name: "shape2"
+        name: "shape-triangle"
     });
     // quantification
     var ktext = new Kinetic.Text({
@@ -82,7 +82,7 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
     var group = new Kinetic.Group();
     group.name("line-group");
     group.add(kshape);
-    group.add(poly);
+    group.add(kpoly);
     group.add(klabel);
     group.visible(true); // dont inherit
     return group;
@@ -103,7 +103,7 @@ dwv.tool.UpdateArrow = function (anchor/*, image*/)
     })[0];
     // associated triangle shape
     var ktriangle = group.getChildren( function (node) {
-        return node.name() === 'shape2';
+        return node.name() === 'shape-triangle';
     })[0];
     // associated label
     var klabel = group.getChildren( function (node) {

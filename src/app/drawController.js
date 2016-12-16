@@ -180,10 +180,10 @@ dwv.DrawController = function (drawDiv)
                     var text = label.getChildren()[0];
                     var type = shape.className;
                     if (type === "Line") {
-                        var shape2kids = collec[i].getChildren( isNodeNameShape2 );
+                        var shapeExtrakids = collec[i].getChildren( isNodeNameShapeExtra );
                         if (shape.closed()) {
                             type = "Roi";
-                        } else if (shape2kids.length !== 0) {
+                        } else if (shapeExtrakids.length !== 0) {
                             type = "Arrow";
                         }
                     }
@@ -320,10 +320,13 @@ dwv.DrawController = function (drawDiv)
             shapes[i].stroke(drawDetails.color);
         }
         // shape2
-        var shapes2 = group.getChildren( isNodeNameShape2 );
-        for (var j = 0; j < shapes2.length; ++j ) {
-            if (typeof shapes2[j].fill() !== "undefined") {
-                shapes2[j].fill(drawDetails.color);
+        var shapesExtra = group.getChildren( isNodeNameShapeExtra );
+        for (var j = 0; j < shapesExtra.length; ++j ) {
+            if (typeof shapesExtra[j].stroke() !== "undefined") {
+                shapesExtra[j].stroke(drawDetails.color);
+            }
+            else if (typeof shapesExtra[j].fill() !== "undefined") {
+                shapesExtra[j].fill(drawDetails.color);
             }
         }
         // label
@@ -423,8 +426,8 @@ dwv.DrawController = function (drawDiv)
      * Is an input node's name 'shape2'.
      * @param {Object} node A Kineticjs node.
      */
-    function isNodeNameShape2( node ) {
-        return node.name() === "shape2";
+    function isNodeNameShapeExtra( node ) {
+        return node.name().startsWith("shape-");
     }
 
     /**
