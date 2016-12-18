@@ -198,7 +198,7 @@ dwv.tool.ShapeEditor = function (app)
                         return node.name() === "shape2";
                     });
                     if (shape2kids.length === 0) {
-                        updateFunction = dwv.tool.UpdateLine;
+                        updateFunction = dwv.tool.UpdateRuler;
                     } else {
                         updateFunction = dwv.tool.UpdateArrow;
                     }

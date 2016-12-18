@@ -184,7 +184,12 @@ dwv.DrawController = function (drawDiv)
                         if (shape.closed()) {
                             type = "Roi";
                         } else if (shapeExtrakids.length !== 0) {
-                            type = "Arrow";
+                            if ( shapeExtrakids[0].name().indexOf("triangle") !== -1 ) {
+                                type = "Arrow";
+                            }
+                            else {
+                                type = "Ruler";
+                            }
                         }
                     }
                     if (type === "Rect") {

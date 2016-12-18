@@ -5,10 +5,10 @@ dwv.tool = dwv.tool || {};
 var Kinetic = Kinetic || {};
 
 /**
- * Line factory.
+ * Ruler factory.
  * @constructor
  */
-dwv.tool.LineFactory = function ()
+dwv.tool.RulerFactory = function ()
 {
     /**
      * Get the number of points needed to build the shape.
@@ -23,12 +23,12 @@ dwv.tool.LineFactory = function ()
 };
 
 /**
- * Create a line shape to be displayed.
+ * Create a ruler shape to be displayed.
  * @param {Array} points The points from which to extract the line.
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
  */
-dwv.tool.LineFactory.prototype.create = function (points, style, image)
+dwv.tool.RulerFactory.prototype.create = function (points, style, image)
 {
     // physical shape
     var line = new dwv.math.Line(points[0], points[1]);
@@ -86,7 +86,7 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
 
     // return group
     var group = new Kinetic.Group();
-    group.name("line-group");
+    group.name("ruler-group");
     group.add(kshape);
     group.add(ktick0);
     group.add(ktick1);
@@ -96,11 +96,11 @@ dwv.tool.LineFactory.prototype.create = function (points, style, image)
 };
 
 /**
- * Update a line shape.
+ * Update a ruler shape.
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
  */
-dwv.tool.UpdateLine = function (anchor, image)
+dwv.tool.UpdateRuler = function (anchor, image)
 {
     // parent group
     var group = anchor.getParent();

@@ -125,6 +125,9 @@
         "Line": {
             "name": "Ligne"
         },
+        "Ruler": {
+            "name": "Règle"
+        },
         "Protractor": {
             "name": "Rapporteur"
         },
