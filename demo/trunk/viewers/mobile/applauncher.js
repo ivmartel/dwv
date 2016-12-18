@@ -42,7 +42,7 @@ function startApp() {
         "loaders": ["File", "Url", "GoogleDrive", "Dropbox"],
         "tools": ["Scroll", "WindowLevel", "ZoomAndPan", "Draw", "Livewire", "Filter", "Floodfill"],
         "filters": ["Threshold", "Sharpen", "Sobel"],
-        "shapes": ["Arrow", "Line", "Protractor", "Rectangle", "Roi", "Ellipse", "FreeHand"],
+        "shapes": ["Arrow", "Ruler", "Protractor", "Rectangle", "Roi", "Ellipse", "FreeHand"],
         "isMobile": true
         //"defaultCharacterSet": "chinese"
     });
@@ -62,9 +62,23 @@ dwv.image.decoderScripts = {
 dwv.browser.check();
 // initialise i18n
 dwv.i18nInitialise();
-// launch when page is ready
-$(document).ready( function()
-{
-    // and i18n is loaded
-    dwv.i18nOnLoaded( startApp );
+
+// status flags
+var domContentLoaded = false;
+var i18nLoaded = false;
+// launch when both DOM and i18n are ready
+function launchApp() {
+    if ( domContentLoaded && i18nLoaded ) {
+        startApp();
+    }
+}
+// DOM ready?
+$(document).ready( function() {
+    domContentLoaded = true;
+    launchApp();
+});
+// i18n ready?
+dwv.i18nOnLoaded( function () {
+    i18nLoaded = true;
+    launchApp();
 });
