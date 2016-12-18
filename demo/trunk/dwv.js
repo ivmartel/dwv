@@ -1530,7 +1530,12 @@ dwv.DrawController = function (drawDiv)
                         if (shape.closed()) {
                             type = "Roi";
                         } else if (shapeExtrakids.length !== 0) {
-                            type = "Arrow";
+                            if ( shapeExtrakids[0].name().indexOf("triangle") !== -1 ) {
+                                type = "Arrow";
+                            }
+                            else {
+                                type = "Ruler";
+                            }
                         }
                     }
                     if (type === "Rect") {
@@ -17883,7 +17888,7 @@ dwv.tool.ShapeEditor = function (app)
                         return node.name() === "shape2";
                     });
                     if (shape2kids.length === 0) {
-                        updateFunction = dwv.tool.UpdateLine;
+                        updateFunction = dwv.tool.UpdateRuler;
                     } else {
                         updateFunction = dwv.tool.UpdateArrow;
                     }
@@ -19193,179 +19198,6 @@ dwv.tool = dwv.tool || {};
 var Kinetic = Kinetic || {};
 
 /**
- * Line factory.
- * @constructor
- */
-dwv.tool.LineFactory = function ()
-{
-    /**
-     * Get the number of points needed to build the shape.
-     * @return {Number} The number of points.
-     */
-    this.getNPoints = function () { return 2; };
-    /**
-     * Get the timeout between point storage.
-     * @return {Number} The timeout in milliseconds.
-     */
-    this.getTimeout = function () { return 0; };
-};
-
-/**
- * Create a line shape to be displayed.
- * @param {Array} points The points from which to extract the line.
- * @param {Object} style The drawing style.
- * @param {Object} image The associated image.
- */
-dwv.tool.LineFactory.prototype.create = function (points, style, image)
-{
-    // physical shape
-    var line = new dwv.math.Line(points[0], points[1]);
-    // draw shape
-    var kshape = new Kinetic.Line({
-        points: [line.getBegin().getX(), line.getBegin().getY(),
-                 line.getEnd().getX(), line.getEnd().getY() ],
-        stroke: style.getLineColour(),
-        strokeWidth: style.getScaledStrokeWidth(),
-        name: "shape"
-    });
-
-    // tick begin
-    var linePerp0 = dwv.math.getPerpendicularLine( line, points[0], 10 );
-    var ktick0 = new Kinetic.Line({
-        points: [linePerp0.getBegin().getX(), linePerp0.getBegin().getY(),
-                 linePerp0.getEnd().getX(), linePerp0.getEnd().getY() ],
-        stroke: style.getLineColour(),
-        strokeWidth: style.getScaledStrokeWidth(),
-        name: "shape-tick0"
-    });
-
-    // tick end
-    var linePerp1 = dwv.math.getPerpendicularLine( line, points[1], 10 );
-    var ktick1 = new Kinetic.Line({
-        points: [linePerp1.getBegin().getX(), linePerp1.getBegin().getY(),
-                 linePerp1.getEnd().getX(), linePerp1.getEnd().getY() ],
-        stroke: style.getLineColour(),
-        strokeWidth: style.getScaledStrokeWidth(),
-        name: "shape-tick1"
-    });
-
-    // quantification
-    var quant = image.quantifyLine( line );
-    var ktext = new Kinetic.Text({
-        fontSize: style.getScaledFontSize(),
-        fontFamily: style.getFontFamily(),
-        fill: style.getLineColour(),
-        name: "text"
-    });
-    ktext.textExpr = "{length}";
-    ktext.longText = "";
-    ktext.quant = quant;
-    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
-    // label
-    var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
-    var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
-    var klabel = new Kinetic.Label({
-        x: line.getEnd().getX() + dX * 25,
-        y: line.getEnd().getY() + dY * 15,
-        name: "label"
-    });
-    klabel.add(ktext);
-    klabel.add(new Kinetic.Tag());
-
-    // return group
-    var group = new Kinetic.Group();
-    group.name("line-group");
-    group.add(kshape);
-    group.add(ktick0);
-    group.add(ktick1);
-    group.add(klabel);
-    group.visible(true); // dont inherit
-    return group;
-};
-
-/**
- * Update a line shape.
- * @param {Object} anchor The active anchor.
- * @param {Object} image The associated image.
- */
-dwv.tool.UpdateLine = function (anchor, image)
-{
-    // parent group
-    var group = anchor.getParent();
-    // associated shape
-    var kline = group.getChildren( function (node) {
-        return node.name() === 'shape';
-    })[0];
-    // associated tick0
-    var ktick0 = group.getChildren( function (node) {
-        return node.name() === 'shape-tick0';
-    })[0];
-    // associated tick1
-    var ktick1 = group.getChildren( function (node) {
-        return node.name() === 'shape-tick1';
-    })[0];
-    // associated label
-    var klabel = group.getChildren( function (node) {
-        return node.name() === 'label';
-    })[0];
-    // find special points
-    var begin = group.getChildren( function (node) {
-        return node.id() === 'begin';
-    })[0];
-    var end = group.getChildren( function (node) {
-        return node.id() === 'end';
-    })[0];
-    // update special points
-    switch ( anchor.id() ) {
-    case 'begin':
-        begin.x( anchor.x() );
-        begin.y( anchor.y() );
-        break;
-    case 'end':
-        end.x( anchor.x() );
-        end.y( anchor.y() );
-        break;
-    }
-    // update shape and compensate for possible drag
-    // note: shape.position() and shape.size() won't work...
-    var bx = begin.x() - kline.x();
-    var by = begin.y() - kline.y();
-    var ex = end.x() - kline.x();
-    var ey = end.y() - kline.y();
-    kline.points( [bx,by,ex,ey] );
-    // new line
-    var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
-    var p2d1 = new dwv.math.Point2D(end.x(), end.y());
-    var line = new dwv.math.Line(p2d0, p2d1);
-    // tick
-    var p2b = new dwv.math.Point2D(bx, by);
-    var p2e = new dwv.math.Point2D(ex, ey);
-    var linePerp0 = dwv.math.getPerpendicularLine( line, p2b, 10 );
-    ktick0.points( [linePerp0.getBegin().getX(), linePerp0.getBegin().getY(),
-        linePerp0.getEnd().getX(), linePerp0.getEnd().getY()] );
-    var linePerp1 = dwv.math.getPerpendicularLine( line, p2e, 10 );
-    ktick1.points( [linePerp1.getBegin().getX(), linePerp1.getBegin().getY(),
-        linePerp1.getEnd().getX(), linePerp1.getEnd().getY()] );
-    // update text
-    var quant = image.quantifyLine( line );
-    var ktext = klabel.getText();
-    ktext.quant = quant;
-    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
-    // update position
-    var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
-    var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
-    var textPos = {
-        'x': line.getEnd().getX() + dX * 25,
-        'y': line.getEnd().getY() + dY * 15 };
-    klabel.position( textPos );
-};
-;// namespaces
-var dwv = dwv || {};
-dwv.tool = dwv.tool || {};
-//external
-var Kinetic = Kinetic || {};
-
-/**
  * Livewire painting tool.
  * @constructor
  * @param {Object} app The associated application.
@@ -20222,6 +20054,179 @@ dwv.tool.UpdateRoi = function (anchor /*, image*/)
     var textPos = { 'x': points[0] + kroi.x(), 'y': points[1] +  kroi.y() + 10 };
     klabel.position( textPos );
 
+};
+;// namespaces
+var dwv = dwv || {};
+dwv.tool = dwv.tool || {};
+//external
+var Kinetic = Kinetic || {};
+
+/**
+ * Ruler factory.
+ * @constructor
+ */
+dwv.tool.RulerFactory = function ()
+{
+    /**
+     * Get the number of points needed to build the shape.
+     * @return {Number} The number of points.
+     */
+    this.getNPoints = function () { return 2; };
+    /**
+     * Get the timeout between point storage.
+     * @return {Number} The timeout in milliseconds.
+     */
+    this.getTimeout = function () { return 0; };
+};
+
+/**
+ * Create a ruler shape to be displayed.
+ * @param {Array} points The points from which to extract the line.
+ * @param {Object} style The drawing style.
+ * @param {Object} image The associated image.
+ */
+dwv.tool.RulerFactory.prototype.create = function (points, style, image)
+{
+    // physical shape
+    var line = new dwv.math.Line(points[0], points[1]);
+    // draw shape
+    var kshape = new Kinetic.Line({
+        points: [line.getBegin().getX(), line.getBegin().getY(),
+                 line.getEnd().getX(), line.getEnd().getY() ],
+        stroke: style.getLineColour(),
+        strokeWidth: style.getScaledStrokeWidth(),
+        name: "shape"
+    });
+
+    // tick begin
+    var linePerp0 = dwv.math.getPerpendicularLine( line, points[0], 10 );
+    var ktick0 = new Kinetic.Line({
+        points: [linePerp0.getBegin().getX(), linePerp0.getBegin().getY(),
+                 linePerp0.getEnd().getX(), linePerp0.getEnd().getY() ],
+        stroke: style.getLineColour(),
+        strokeWidth: style.getScaledStrokeWidth(),
+        name: "shape-tick0"
+    });
+
+    // tick end
+    var linePerp1 = dwv.math.getPerpendicularLine( line, points[1], 10 );
+    var ktick1 = new Kinetic.Line({
+        points: [linePerp1.getBegin().getX(), linePerp1.getBegin().getY(),
+                 linePerp1.getEnd().getX(), linePerp1.getEnd().getY() ],
+        stroke: style.getLineColour(),
+        strokeWidth: style.getScaledStrokeWidth(),
+        name: "shape-tick1"
+    });
+
+    // quantification
+    var quant = image.quantifyLine( line );
+    var ktext = new Kinetic.Text({
+        fontSize: style.getScaledFontSize(),
+        fontFamily: style.getFontFamily(),
+        fill: style.getLineColour(),
+        name: "text"
+    });
+    ktext.textExpr = "{length}";
+    ktext.longText = "";
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    // label
+    var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
+    var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
+    var klabel = new Kinetic.Label({
+        x: line.getEnd().getX() + dX * 25,
+        y: line.getEnd().getY() + dY * 15,
+        name: "label"
+    });
+    klabel.add(ktext);
+    klabel.add(new Kinetic.Tag());
+
+    // return group
+    var group = new Kinetic.Group();
+    group.name("ruler-group");
+    group.add(kshape);
+    group.add(ktick0);
+    group.add(ktick1);
+    group.add(klabel);
+    group.visible(true); // dont inherit
+    return group;
+};
+
+/**
+ * Update a ruler shape.
+ * @param {Object} anchor The active anchor.
+ * @param {Object} image The associated image.
+ */
+dwv.tool.UpdateRuler = function (anchor, image)
+{
+    // parent group
+    var group = anchor.getParent();
+    // associated shape
+    var kline = group.getChildren( function (node) {
+        return node.name() === 'shape';
+    })[0];
+    // associated tick0
+    var ktick0 = group.getChildren( function (node) {
+        return node.name() === 'shape-tick0';
+    })[0];
+    // associated tick1
+    var ktick1 = group.getChildren( function (node) {
+        return node.name() === 'shape-tick1';
+    })[0];
+    // associated label
+    var klabel = group.getChildren( function (node) {
+        return node.name() === 'label';
+    })[0];
+    // find special points
+    var begin = group.getChildren( function (node) {
+        return node.id() === 'begin';
+    })[0];
+    var end = group.getChildren( function (node) {
+        return node.id() === 'end';
+    })[0];
+    // update special points
+    switch ( anchor.id() ) {
+    case 'begin':
+        begin.x( anchor.x() );
+        begin.y( anchor.y() );
+        break;
+    case 'end':
+        end.x( anchor.x() );
+        end.y( anchor.y() );
+        break;
+    }
+    // update shape and compensate for possible drag
+    // note: shape.position() and shape.size() won't work...
+    var bx = begin.x() - kline.x();
+    var by = begin.y() - kline.y();
+    var ex = end.x() - kline.x();
+    var ey = end.y() - kline.y();
+    kline.points( [bx,by,ex,ey] );
+    // new line
+    var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
+    var p2d1 = new dwv.math.Point2D(end.x(), end.y());
+    var line = new dwv.math.Line(p2d0, p2d1);
+    // tick
+    var p2b = new dwv.math.Point2D(bx, by);
+    var p2e = new dwv.math.Point2D(ex, ey);
+    var linePerp0 = dwv.math.getPerpendicularLine( line, p2b, 10 );
+    ktick0.points( [linePerp0.getBegin().getX(), linePerp0.getBegin().getY(),
+        linePerp0.getEnd().getX(), linePerp0.getEnd().getY()] );
+    var linePerp1 = dwv.math.getPerpendicularLine( line, p2e, 10 );
+    ktick1.points( [linePerp1.getBegin().getX(), linePerp1.getBegin().getY(),
+        linePerp1.getEnd().getX(), linePerp1.getEnd().getY()] );
+    // update text
+    var quant = image.quantifyLine( line );
+    var ktext = klabel.getText();
+    ktext.quant = quant;
+    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    // update position
+    var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
+    var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
+    var textPos = {
+        'x': line.getEnd().getX() + dX * 25,
+        'y': line.getEnd().getY() + dY * 15 };
+    klabel.position( textPos );
 };
 ;// namespaces
 var dwv = dwv || {};
