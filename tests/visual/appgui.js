@@ -54,10 +54,10 @@ dwv.addDataLine = function (id, fileroot, doc)
     // display loading time
     var listener = function (event) {
         if (event.type === "load-start") {
-            console.time("load-data");
+            console.time("load-data::"+fileroot);
         }
         else {
-            console.timeEnd("load-data");
+            console.timeEnd("load-data::"+fileroot);
         }
     };
     app.addEventListener("load-start", listener);
