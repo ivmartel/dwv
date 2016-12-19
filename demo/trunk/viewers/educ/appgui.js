@@ -56,8 +56,8 @@ dwv.gui.DrawList = function (app)
             node.removeChild(node.firstChild);
         }
         // tags HTML table
-        var drawDetailsList = app.getDrawDetailsList();
-        var table = dwv.html.toTable(drawDetailsList);
+        var drawDisplayDetails = app.getDrawDisplayDetails();
+        var table = dwv.html.toTable(drawDisplayDetails);
         table.className = "drawsTable";
 
         // optional gui specific table post process
