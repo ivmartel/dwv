@@ -297,7 +297,7 @@ dwv.App = function ()
             // help
             if ( config.gui.indexOf("help") !== -1 ) {
                 var isMobile = true;
-                if ( config.isMobile ) {
+                if ( config.isMobile !== "undefined" ) {
                     isMobile = config.isMobile;
                 }
                 dwv.gui.appendHelpHtml( toolboxController.getToolList(), isMobile, this );

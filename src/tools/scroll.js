@@ -223,10 +223,12 @@ dwv.tool.Scroll.prototype.getHelp = function()
         "title": dwv.i18n("tool.Scroll.name"),
         "brief": dwv.i18n("tool.Scroll.brief"),
         "mouse": {
-            "mouse_drag": dwv.i18n("tool.Scroll.mouse_drag")
+            "mouse_drag": dwv.i18n("tool.Scroll.mouse_drag"),
+            "double_click": dwv.i18n("tool.Scroll.double_click")
         },
         "touch": {
-            'touch_drag': dwv.i18n("tool.Scroll.touch_drag")
+            'touch_drag': dwv.i18n("tool.Scroll.touch_drag"),
+            'tap_and_hold': dwv.i18n("tool.Scroll.tap_and_hold")
         }
     };
 };

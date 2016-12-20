@@ -89,15 +89,17 @@
         },
         "Scroll": {
             "name": "Scroll",
-            "brief": "The scroll tool allows to scroll through slices.",
-            "mouse_drag": "A single vertical mouse drag changes the current slice.",
-            "touch_drag": "A single vertical touch drag changes the current slice."
+            "brief": "The scroll tool allows to scroll through slices/frames. ",
+            "double_click": "A double click launches a slice or frame play. A single click stops it.",
+            "tap_and_hold": "A tap and hold launches a slice or frame play. A single tap stops it.",
+            "mouse_drag": "Drag the mouse vertically to change the slice, horizontally to change the frame. Keyboard shortcuts: CTRL + up or down arrow to change slices, CTRL + left or right arrow to change frames.",
+            "touch_drag": "Drag your finger vertically to change the slice, horizontally to change the frame."
         },
         "Draw": {
             "name": "Draw",
             "brief": "Allows to draw shapes on the image. Choose the shape and its colour from the drop down menus. Once created, shapes can be edited by selecting them. Anchors will appear and allow specific shape edition. Drag the shape on the top red cross to delete it. All actions are undoable.",
-            "mouse_drag": "A single mouse drag draws the desired shape.",
-            "touch_drag": "A single touch drag draws the desired shape."
+            "mouse_drag": "A single mouse drag draws the desired shape. For the protractor, click to start, draw the first ray to the vertex, wait half a second and draw the second ray.",
+            "touch_drag": "A single touch drag draws the desired shape. For the protractor, tap to start, draw the first ray to the vertex, wait half a second and draw the second ray."
         },
         "Filter": {
             "name": "Filter",
