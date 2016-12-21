@@ -103,7 +103,7 @@ print([[
 <script type="text/javascript" src="/dwv/ext/kinetic/kinetic-v5.1.1-06.10.min.js"></script>
 
 <!-- Local -->
-<script type="text/javascript" src="/dwv/dwv-0.17.0-beta.min.js"></script>
+<script type="text/javascript" src="/dwv/dwv-0.17.0.min.js"></script>
 <!-- Launch the app -->
 <script type="text/javascript" src="/dwv/viewers/mobile/appgui.js"></script>
 ]])

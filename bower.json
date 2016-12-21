@@ -1,14 +1,14 @@
 {
     "name": "dwv",
-    "version": "0.17.0-beta",
+    "version": "0.17.0",
     "homepage": "https://ivmartel.github.io/dwv/",
     "authors" : [
         "ivmartel"
     ],
     "description": "DICOM Web Viewer",
     "keywords": [
-        "DICOM", 
-        "medical", 
+        "DICOM",
+        "medical",
         "imaging"
     ],
     "license": "GNU General Public License v3.0",
