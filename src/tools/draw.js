@@ -306,7 +306,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         app.getDrawStage().listening( flag );
         // get the current draw layer
         drawLayer = app.getCurrentDrawLayer();
-        updateDrawLayer();
+        renderDrawLayer(flag);
         // listen to app change to update the draw layer
         if (flag) {
             app.addEventListener("slice-change", updateDrawLayer);
