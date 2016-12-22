@@ -13,11 +13,11 @@ function startApp() {
     myapp.init({
         "containerDivId": "dwv",
         "fitToWindow": true,
-        "gui": ["tool", "load", "help", "undo", "version", "tags"],
+        "gui": ["tool", "load", "help", "undo", "version", "tags", "drawList"],
         "loaders": ["File", "Url"],
         "tools": ["Scroll", "WindowLevel", "ZoomAndPan", "Draw", "Livewire", "Filter", "Floodfill"],
         "filters": ["Threshold", "Sharpen", "Sobel"],
-        "shapes": ["Line", "Protractor", "Rectangle", "Roi", "Ellipse"],
+        "shapes": ["Arrow", "Ruler", "Protractor", "Rectangle", "Roi", "Ellipse", "FreeHand"],
         "isMobile": false
     });
 
@@ -30,16 +30,30 @@ function startApp() {
 dwv.image.decoderScripts = {
     "jpeg2000": "../../ext/pdfjs/decode-jpeg2000.js",
     "jpeg-lossless": "../../ext/rii-mango/decode-jpegloss.js",
-    "jpeg-baseline": "../../ext/notmasteryet/decode-jpegbaseline.js"
+    "jpeg-baseline": "../../ext/pdfjs/decode-jpegbaseline.js"
 };
 
 // check browser support
 dwv.browser.check();
 // initialise i18n
-dwv.i18nInitialise("auto", "/dwv/demo/stable");
-// launch when page is loaded
-$(document).ready( function()
-{
-    // and i18n is loaded
-    dwv.i18nOnLoaded( startApp );
+dwv.i18nInitialise();
+
+// status flags
+var domContentLoaded = false;
+var i18nLoaded = false;
+// launch when both DOM and i18n are ready
+function launchApp() {
+    if ( domContentLoaded && i18nLoaded ) {
+        startApp();
+    }
+}
+// DOM ready?
+$(document).ready( function() {
+    domContentLoaded = true;
+    launchApp();
+});
+// i18n ready?
+dwv.i18nOnLoaded( function () {
+    i18nLoaded = true;
+    launchApp();
 });

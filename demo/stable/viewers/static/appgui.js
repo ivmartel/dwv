@@ -31,6 +31,8 @@ dwv.utils.decodeQuery = dwv.utils.base.decodeQuery;
 dwv.gui.getWindowSize = function () {
     return { 'width': ($('#pageMain').width() - 360), 'height': ($('#pageMain').height() - 75) };
 };
+// Prompt
+dwv.gui.prompt = dwv.gui.base.prompt;
 // Progress
 dwv.gui.displayProgress = function (percent) {
     // jquery-ui progress bar
@@ -38,6 +40,8 @@ dwv.gui.displayProgress = function (percent) {
         $("#progressbar").progressbar({ value: percent });
     }
 };
+// Focus
+dwv.gui.focusImage = dwv.gui.base.focusImage;
 // get element
 dwv.gui.getElement = dwv.gui.base.getElement;
 // refresh
@@ -67,6 +71,21 @@ dwv.gui.Slider = function (app)
         });
     };
 };
+// plot
+dwv.gui.plot = function (div, data, options)
+{
+    var plotOptions = {
+        "bars": { "show": true },
+        "grid": { "backgroundcolor": null },
+        "xaxis": { "show": true },
+        "yaxis": { "show": false }
+    };
+    if (typeof options !== "undefined" &&
+        typeof options.markings !== "undefined") {
+        plotOptions.grid.markings = options.markings;
+    }
+    $.plot(div, [ data ], plotOptions);
+};
 
 function toggle(dialogId)
 {
@@ -77,8 +96,12 @@ function toggle(dialogId)
         $(dialogId).dialog('open');
     }
 }
+// post process table
+dwv.gui.postProcessTable = dwv.gui.base.postProcessTable;
 // Tags table
 dwv.gui.DicomTags = dwv.gui.base.DicomTags;
+// DrawList table
+dwv.gui.DrawList = dwv.gui.base.DrawList;
 
 // Loaders
 dwv.gui.Loadbox = dwv.gui.base.Loadbox;
@@ -97,32 +120,62 @@ dwv.gui.Toolbox = function (app)
         base.setup(list);
 
         // toolbar
+
+        // open
+        var openSpan = document.createElement("span");
+        openSpan.className = "ui-icon ui-icon-plus";
         var open = document.createElement("button");
-        open.appendChild(document.createTextNode(dwv.i18n("basics.open")));
+        open.appendChild(openSpan);
+        open.title = dwv.i18n("basics.open");
         open.onclick = function() { toggle(".openData"); };
-
+        // toolbox
+        var toolboxSpan = document.createElement("span");
+        toolboxSpan.className = "ui-icon ui-icon-wrench";
         var toolbox = document.createElement("button");
-        toolbox.appendChild(document.createTextNode(dwv.i18n("basics.toolbox")));
+        toolbox.appendChild(toolboxSpan);
+        toolbox.title = dwv.i18n("basics.toolbox");
         toolbox.onclick = function() { toggle(".toolList"); };
-
+        // history
+        var historySpan = document.createElement("span");
+        historySpan.className = "ui-icon ui-icon-clipboard";
         var history = document.createElement("button");
-        history.appendChild(document.createTextNode(dwv.i18n("basics.history")));
+        history.appendChild(historySpan);
+        history.title = dwv.i18n("basics.history");
         history.onclick = function() { toggle(".history"); };
-
+        // DICOM tags
+        var tagsSpan = document.createElement("span");
+        tagsSpan.className = "ui-icon ui-icon-tag";
         var tags = document.createElement("button");
-        tags.appendChild(document.createTextNode(dwv.i18n("basics.dicomTags")));
+        tags.appendChild(tagsSpan);
+        tags.title = dwv.i18n("basics.dicomTags");
         tags.onclick = function() { toggle(".tags"); };
-
+        // draw list
+        var drawListSpan = document.createElement("span");
+        drawListSpan.className = "ui-icon ui-icon-pencil";
+        var drawList = document.createElement("button");
+        drawList.appendChild(drawListSpan);
+        drawList.title = dwv.i18n("basics.drawList");
+        drawList.onclick = function() { toggle(".drawList"); };
+        // image
+        var imageSpan = document.createElement("span");
+        imageSpan.className = "ui-icon ui-icon-image";
         var image = document.createElement("button");
-        image.appendChild(document.createTextNode(dwv.i18n("basics.image")));
+        image.appendChild(imageSpan);
+        image.title = dwv.i18n("basics.image");
         image.onclick = function() { toggle(".layerDialog"); };
-
+        // info
+        var infoSpan = document.createElement("span");
+        infoSpan.className = "ui-icon ui-icon-info";
         var info = document.createElement("button");
-        info.appendChild(document.createTextNode(dwv.i18n("basics.info")));
+        info.appendChild(infoSpan);
+        info.title = dwv.i18n("basics.info");
         info.onclick = app.onToggleInfoLayer;
-
+        // help
+        var helpSpan = document.createElement("span");
+        helpSpan.className = "ui-icon ui-icon-help";
         var help = document.createElement("button");
-        help.appendChild(document.createTextNode(dwv.i18n("basics.help")));
+        help.appendChild(helpSpan);
+        help.title = dwv.i18n("basics.help");
         help.onclick = function() { toggle(".help"); };
 
         var node = app.getElement("toolbar");
@@ -130,6 +183,7 @@ dwv.gui.Toolbox = function (app)
         node.appendChild(toolbox);
         node.appendChild(history);
         node.appendChild(tags);
+        node.appendChild(drawList);
         node.appendChild(image);
         node.appendChild(info);
         node.appendChild(help);
@@ -145,6 +199,7 @@ dwv.gui.Toolbox = function (app)
         toggleSaveState.onclick = app.onStateSave;
         toggleSaveState.download = "state.json";
         toggleSaveState.id = "download-state";
+        toggleSaveState.className += "download-state";
         toggleSaveState.appendChild(saveButton);
         // add to openData window
         node = app.getElement("openData");
@@ -164,8 +219,8 @@ dwv.gui.Toolbox = function (app)
 dwv.gui.WindowLevel = dwv.gui.base.WindowLevel;
 // Draw
 dwv.gui.Draw = dwv.gui.base.Draw;
-// Livewire
-dwv.gui.Livewire = dwv.gui.base.Livewire;
+// ColourTool
+dwv.gui.ColourTool = dwv.gui.base.ColourTool;
 // ZoomAndPan
 dwv.gui.ZoomAndPan = dwv.gui.base.ZoomAndPan;
 // Scroll
@@ -199,7 +254,7 @@ dwv.gui.setup = function () {
         appendTo: "#dwv"
     });
     $(".toolList").dialog({ position:
-        {my: "left top+160", at: "left top", of: "#pageMain"},
+        {my: "left top+180", at: "left top", of: "#pageMain"},
         appendTo: "#dwv"
     });
     $(".history").dialog({ position:
@@ -207,6 +262,11 @@ dwv.gui.setup = function () {
         appendTo: "#dwv"
     });
     $(".tags").dialog({ position:
+        {my: "right top", at: "right top", of: "#pageMain"},
+        autoOpen: false, width: 500, height: 590,
+        appendTo: "#dwv"
+    });
+    $(".drawList").dialog({ position:
         {my: "right top", at: "right top", of: "#pageMain"},
         autoOpen: false, width: 500, height: 590,
         appendTo: "#dwv"

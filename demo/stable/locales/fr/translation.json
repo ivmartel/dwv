@@ -19,7 +19,19 @@
         "history": "Historique",
         "image": "Image",
         "info": "Info",
-        "downloadState": "Télécharger state"
+        "downloadState": "Télécharger state",
+        "drawList": "Annotations",
+        "search": "Recherche",
+        "id": "ID",
+        "slice": "Coupe",
+        "frame": "Frame",
+        "type": "Type",
+        "color": "Couleur",
+        "label": "Label",
+        "description": "Description",
+        "editMode": "Mode Edition",
+        "deleteDraws": "Tout Supprimer",
+        "visible": "Visible"
     },
     "colour": {
         "Yellow": {
@@ -49,7 +61,8 @@
     },
     "unit": {
         "mm": "mm",
-        "cm2": "cm2"
+        "cm2": "cm2",
+        "degree": "\u00B0"
     },
     "help": {
         "intro": {
@@ -77,14 +90,16 @@
         "Scroll": {
             "name": "Navigation",
             "brief": "Permet de naviguer dans les coupes de l'image.",
-            "mouse_drag": "Appuyer et glisser la souris pour changer de coupe.",
-            "touch_drag": "Appuyer et glisser un doigt pour changer de coupe."
+            "double_click": "Un double clic lance la lecture automatique des coupes ou frames. Un clic simple l'arrète.",
+            "tap_and_hold": "Rester appuyer une seconde pour lancer la lecture automatique des coupes ou frames. Un appui simple l'arrète.",
+            "mouse_drag": "Appuyer et glisser la souris verticalement pour changer de coupe, horizontalement pour changer de frame. Raccourcis clavier: CTRL + flèche haut ou bas pour changer de coupe, CTRL + flèche gauche ou droite pour changer de frame.",
+            "touch_drag": "Appuyer et glisser un doigt verticalement pour changer de coupe, horizontalement pour changer de frame."
         },
         "Draw": {
             "name": "Dessin",
             "brief": "Permet de dessiner des formes sur l'image. Les menus permettent de choisir la forme et la couleur. Une fois créés, les formes sont éditables. Cliquer sur la forme et des ancres apparaissent. Appuyer et glisser sur la croix rouge pour éliminer le dessin. Toutes les actions sont re-faisables.",
-            "mouse_drag": "Appuyer et glisser la souris pour créer une forme.",
-            "touch_drag": "Appuyer et glisser un doigt pour créer une forme."
+            "mouse_drag": "Appuyer et glisser la souris pour créer une forme. Pour le rapporteur: clic pour commencer, dessiner la droite jusqu'au sommet de l'angle, patienter une demi seconde et dessiner la seconde droite.",
+            "touch_drag": "Appuyer et glisser un doigt pour créer une forme. Pour le rapporteur: appui pour commencer, dessiner la droite jusqu'au sommet de l'angle, patienter une demi seconde et dessiner la seconde droite."
         },
         "Filter": {
             "name": "Filtre",
@@ -112,6 +127,9 @@
         "Line": {
             "name": "Ligne"
         },
+        "Ruler": {
+            "name": "Règle"
+        },
         "Protractor": {
             "name": "Rapporteur"
         },
@@ -123,6 +141,12 @@
         },
         "Ellipse": {
             "name": "Ellipse"
+        },
+        "Arrow": {
+            "name": "Pointeur"
+        },
+        "FreeHand": {
+            "name": "Main levée"
         }
     },
     "io": {
