@@ -39,6 +39,12 @@ dwv.io.Url = function ()
      * @type Array
      */
     var decodeProgresses = [];
+    /**
+     * Flag to tell if the IO needs decoding.
+     * @private
+     * @type Boolean
+     */
+    var needDecoding = false;
 
     /**
      * The default character set (optional).
@@ -61,6 +67,14 @@ dwv.io.Url = function ()
      */
     this.setDefaultCharacterSet = function (characterSet) {
         defaultCharacterSet = characterSet;
+    };
+
+    /**
+     * Set the need decodign flag
+     * @param {Boolean} flag True if the data needs decoding.
+     */
+    this.setNeedDecoding = function (flag) {
+        needDecoding = flag;
     };
 
     /**
@@ -116,10 +130,16 @@ dwv.io.Url = function ()
         var sum = 0;
         for ( var i = 0; i < loadProgresses.length; ++i ) {
             sum += loadProgresses[i];
-            sum += decodeProgresses[i];
+            if ( needDecoding ) {
+                sum += decodeProgresses[i];
+            }
         }
+        var percent = sum / nToLoad;
         // half loading, half decoding
-        return sum / (2 * nToLoad);
+        if ( needDecoding ) {
+            percent = percent / 2;
+        }
+        return percent;
     }
 
 }; // class Url
@@ -216,6 +236,7 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     // callback
     var onLoadDicomBuffer = function (response)
     {
+        self.setNeedDecoding(true);
         try {
             db2v.convert(response, onLoadView);
         } catch (error) {

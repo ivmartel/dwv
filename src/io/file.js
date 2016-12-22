@@ -40,6 +40,12 @@ dwv.io.File = function ()
      * @type Array
      */
     var decodeProgresses = [];
+    /**
+     * Flag to tell if the IO needs decoding.
+     * @private
+     * @type Boolean
+     */
+    var needDecoding = false;
 
     /**
      * The default character set (optional).
@@ -62,6 +68,14 @@ dwv.io.File = function ()
      */
     this.setDefaultCharacterSet = function (characterSet) {
         defaultCharacterSet = characterSet;
+    };
+
+    /**
+     * Set the need decodign flag
+     * @param {Boolean} flag True if the data needs decoding.
+     */
+    this.setNeedDecoding = function (flag) {
+        needDecoding = flag;
     };
 
     /**
@@ -117,10 +131,16 @@ dwv.io.File = function ()
         var sum = 0;
         for ( var i = 0; i < loadProgresses.length; ++i ) {
             sum += loadProgresses[i];
-            sum += decodeProgresses[i];
+            if ( needDecoding ) {
+                sum += decodeProgresses[i];
+            }
         }
+        var percent = sum / nToLoad;
         // half loading, half decoding
-        return sum / (2 * nToLoad);
+        if ( needDecoding ) {
+            percent = percent / 2;
+        }
+        return percent;
     }
 
 }; // class File
@@ -216,6 +236,7 @@ dwv.io.File.prototype.load = function (ioArray)
     // reader callback
     var onLoadDicomBuffer = function (event)
     {
+        self.setNeedDecoding(true);
         try {
             db2v.convert(event.target.result, onLoadView);
         } catch (error) {
