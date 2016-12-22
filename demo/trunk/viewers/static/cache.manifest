@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# v13 2016-12-21
+# v14 2016-12-23
 
 CACHE:
 
@@ -17,11 +17,11 @@ appgui.js
 /dwv/demo/stable/resources/mouse_drag.png
 /dwv/demo/stable/resources/mouse_wheel.png
 # translations
-/dwv/demo/stable/locales/cn/translation.json
 /dwv/demo/stable/locales/de/translation.json
 /dwv/demo/stable/locales/en/translation.json
 /dwv/demo/stable/locales/fr/translation.json
 /dwv/demo/stable/locales/ru/translation.json
+/dwv/demo/stable/locales/zh/translation.json
 
 # third party
 
