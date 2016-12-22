@@ -2041,6 +2041,8 @@ dwv.ToolboxController = function ()
         displayToIndexConverter = layer.displayToIndex;
         // add layer listeners
         this.addCanvasListeners(layer.getCanvas());
+        // keydown listener
+        window.addEventListener("keydown", onMouch, true);
     };
 
     /**
@@ -2137,9 +2139,6 @@ dwv.ToolboxController = function ()
         canvas.addEventListener("touchstart", onMouch);
         canvas.addEventListener("touchmove", onMouch);
         canvas.addEventListener("touchend", onMouch);
-
-        // keydown listener
-        window.addEventListener("keydown", onMouch, true);
     };
 
     /**
@@ -2162,9 +2161,6 @@ dwv.ToolboxController = function ()
         canvas.removeEventListener("touchstart", onMouch);
         canvas.removeEventListener("touchmove", onMouch);
         canvas.removeEventListener("touchend", onMouch);
-
-        // keydown listener
-        window.removeEventListener("keydown", onMouch, true);
     };
 
     /**
