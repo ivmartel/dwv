@@ -1670,7 +1670,7 @@ dwv.DrawController = function (drawDiv)
         for (var i = 0; i < shapes.length; ++i ) {
             shapes[i].stroke(drawDetails.color);
         }
-        // shape2
+        // shape extra
         var shapesExtra = group.getChildren( isNodeNameShapeExtra );
         for (var j = 0; j < shapesExtra.length; ++j ) {
             if (typeof shapesExtra[j].stroke() !== "undefined") {
@@ -1774,7 +1774,7 @@ dwv.DrawController = function (drawDiv)
     }
 
     /**
-     * Is an input node's name 'shape2'.
+     * Is a node an extra shape associated with a main one.
      * @param {Object} node A Kineticjs node.
      */
     function isNodeNameShapeExtra( node ) {
@@ -14601,6 +14601,12 @@ dwv.io.File = function ()
      * @type Array
      */
     var decodeProgresses = [];
+    /**
+     * Flag to tell if the IO needs decoding.
+     * @private
+     * @type Boolean
+     */
+    var needDecoding = false;
 
     /**
      * The default character set (optional).
@@ -14623,6 +14629,14 @@ dwv.io.File = function ()
      */
     this.setDefaultCharacterSet = function (characterSet) {
         defaultCharacterSet = characterSet;
+    };
+
+    /**
+     * Set the need decodign flag
+     * @param {Boolean} flag True if the data needs decoding.
+     */
+    this.setNeedDecoding = function (flag) {
+        needDecoding = flag;
     };
 
     /**
@@ -14678,10 +14692,16 @@ dwv.io.File = function ()
         var sum = 0;
         for ( var i = 0; i < loadProgresses.length; ++i ) {
             sum += loadProgresses[i];
-            sum += decodeProgresses[i];
+            if ( needDecoding ) {
+                sum += decodeProgresses[i];
+            }
         }
+        var percent = sum / nToLoad;
         // half loading, half decoding
-        return sum / (2 * nToLoad);
+        if ( needDecoding ) {
+            percent = percent / 2;
+        }
+        return percent;
     }
 
 }; // class File
@@ -14777,6 +14797,7 @@ dwv.io.File.prototype.load = function (ioArray)
     // reader callback
     var onLoadDicomBuffer = function (event)
     {
+        self.setNeedDecoding(true);
         try {
             db2v.convert(event.target.result, onLoadView);
         } catch (error) {
@@ -14887,6 +14908,12 @@ dwv.io.Url = function ()
      * @type Array
      */
     var decodeProgresses = [];
+    /**
+     * Flag to tell if the IO needs decoding.
+     * @private
+     * @type Boolean
+     */
+    var needDecoding = false;
 
     /**
      * The default character set (optional).
@@ -14909,6 +14936,14 @@ dwv.io.Url = function ()
      */
     this.setDefaultCharacterSet = function (characterSet) {
         defaultCharacterSet = characterSet;
+    };
+
+    /**
+     * Set the need decodign flag
+     * @param {Boolean} flag True if the data needs decoding.
+     */
+    this.setNeedDecoding = function (flag) {
+        needDecoding = flag;
     };
 
     /**
@@ -14964,10 +14999,16 @@ dwv.io.Url = function ()
         var sum = 0;
         for ( var i = 0; i < loadProgresses.length; ++i ) {
             sum += loadProgresses[i];
-            sum += decodeProgresses[i];
+            if ( needDecoding ) {
+                sum += decodeProgresses[i];
+            }
         }
+        var percent = sum / nToLoad;
         // half loading, half decoding
-        return sum / (2 * nToLoad);
+        if ( needDecoding ) {
+            percent = percent / 2;
+        }
+        return percent;
     }
 
 }; // class Url
@@ -15064,6 +15105,7 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     // callback
     var onLoadDicomBuffer = function (response)
     {
+        self.setNeedDecoding(true);
         try {
             db2v.convert(response, onLoadView);
         } catch (error) {
@@ -17047,7 +17089,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         app.getDrawStage().listening( flag );
         // get the current draw layer
         drawLayer = app.getCurrentDrawLayer();
-        updateDrawLayer();
+        renderDrawLayer(flag);
         // listen to app change to update the draw layer
         if (flag) {
             app.addEventListener("slice-change", updateDrawLayer);
@@ -17884,10 +17926,10 @@ dwv.tool.ShapeEditor = function (app)
                 var p1y = points[3] + shape.y();
                 addAnchor(group, p0x, p0y, 'begin');
                 if ( points.length === 4 ) {
-                    var shape2kids = group.getChildren( function ( node ) {
-                        return node.name() === "shape2";
+                    var shapekids = group.getChildren( function ( node ) {
+                        return node.name().startsWith("shape-");
                     });
-                    if (shape2kids.length === 0) {
+                    if (shapekids.length === 2) {
                         updateFunction = dwv.tool.UpdateRuler;
                     } else {
                         updateFunction = dwv.tool.UpdateArrow;
