@@ -324,7 +324,7 @@ dwv.DrawController = function (drawDiv)
         for (var i = 0; i < shapes.length; ++i ) {
             shapes[i].stroke(drawDetails.color);
         }
-        // shape2
+        // shape extra
         var shapesExtra = group.getChildren( isNodeNameShapeExtra );
         for (var j = 0; j < shapesExtra.length; ++j ) {
             if (typeof shapesExtra[j].stroke() !== "undefined") {
@@ -428,7 +428,7 @@ dwv.DrawController = function (drawDiv)
     }
 
     /**
-     * Is an input node's name 'shape2'.
+     * Is a node an extra shape associated with a main one.
      * @param {Object} node A Kineticjs node.
      */
     function isNodeNameShapeExtra( node ) {
