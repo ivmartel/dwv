@@ -14,7 +14,7 @@ module.exports = function(grunt) {
             options: {
                 coverage: {
                     src: [ "src/**/*.js" ],
-                    instrumentedFiles: "temp/",
+                    instrumentedFiles: "/tmp/ivmartel/dwv",
                     htmlReport: "build/report/coverage",
                     lcovReport: "build/report/lcov",
                     linesThresholdPct: 0
