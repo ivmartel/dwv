@@ -12,16 +12,16 @@
     "test": "grunt publish --verbose"
   },
   "dependencies": {
-    "jquery": "2.1.4",
+    "jquery": "3.1.1",
     "jquery-ui": "~1.12",
     "jquery-mobile": "~1.4",
     "kinetic": "~5"
   },
   "devDependencies": {
-    "grunt": "~0.4",
+    "grunt": "~1.0.1",
     "grunt-cli": "~1.2",
-    "grunt-contrib-jshint": "~1.0",
-    "grunt-qunit-istanbul": "~0.6",
+    "grunt-contrib-jshint": "~1.1.0",
+    "grunt-qunit-istanbul": "~1.0.0",
     "grunt-coveralls": "~1.0",
     "grunt-contrib-concat": "~1.0",
     "grunt-contrib-uglify": "~2.0",
