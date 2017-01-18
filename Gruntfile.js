@@ -12,9 +12,11 @@ module.exports = function(grunt) {
         qunit: {
             all: ['tests/index.html'],
             options: {
+                '--web-security': 'no',
                 coverage: {
+                    disposeCollector: true,
                     src: [ "src/**/*.js" ],
-                    instrumentedFiles: "temp/",
+                    instrumentedFiles: "/tmp/ivmartel/dwv",
                     htmlReport: "build/report/coverage",
                     lcovReport: "build/report/lcov",
                     linesThresholdPct: 0
