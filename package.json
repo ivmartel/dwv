@@ -12,10 +12,18 @@
     "test": "grunt publish --verbose"
   },
   "dependencies": {
-    "jquery": "3.1.1",
+    "jquery": "2.1.4",
     "jquery-ui": "~1.12",
     "jquery-mobile": "~1.4",
     "kinetic": "~5"
+  },
+  "greenkeeper": {
+    "ignore": [
+      "jquery",
+      "jquery-ui",
+      "jquery-mobile",
+      "kinetic"
+    ]
   },
   "devDependencies": {
     "grunt": "~1.0.1",
