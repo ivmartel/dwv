@@ -161,6 +161,19 @@ dwv.image.Image = function(geometry, buffer)
     var histogram = null;
 
     /**
+     * Variable to storage ImagePositionPatient tags.
+     * @private
+     * @type Array
+     */
+    var sliceSort = [];
+
+    /**
+     * Get sorted array of all ImagePositionPatient tags
+     * @return {Array} ImagePositionPatient tags.
+     */
+    this.getSlideSort = function(){ return sliceSort; };
+
+    /**
      * Get the geometry of the image.
      * @return {Object} The size of the image.
      */
@@ -336,7 +349,8 @@ dwv.image.Image = function(geometry, buffer)
         var newBuffer = new Int16Array(sliceSize * (size.getNumberOfSlices() + 1) );
 
         // append slice at new position
-        var newSliceNb = geometry.getSliceIndex( rhs.getGeometry().getOrigin() );
+        var origin = rhs.getGeometry().getOrigin();
+        var newSliceNb = geometry.getSliceIndex(origin);
         if( newSliceNb === 0 )
         {
             newBuffer.set(rhs.getFrame(f));
@@ -362,6 +376,9 @@ dwv.image.Image = function(geometry, buffer)
 
         // copy to class variables
         buffer[f] = newBuffer;
+
+        // Add item to sliceSort array on its correct position
+        sliceSort.splice(newSliceNb, 0, '' + origin.getX() + ',' + origin.getY() + ',' + origin.getZ());
 
         // return the appended slice number
         return newSliceNb;
