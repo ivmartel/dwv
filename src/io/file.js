@@ -277,10 +277,14 @@ dwv.io.File.prototype.load = function (ioArray)
     };
 
     // loop on I/O elements
-    for (var i = 0; i < ioArray.length; ++i)
+    // for (var i = 0; i < ioArray.length; ++i)
+    var reader = new FileReader();
+    (function readFile(i)
     {
+        i++;
+        if(i===ioArray.length){ return; }
+
         var file = ioArray[i];
-        var reader = new FileReader();
         reader.onprogress = dwv.io.File.createLoadProgressHandler(i, self.onLoadProgress);
         if ( file.name.split('.').pop().toLowerCase() === "json" )
         {
@@ -304,5 +308,8 @@ dwv.io.File.prototype.load = function (ioArray)
             reader.onerror = dwv.io.File.createErrorHandler(file, "DICOM", self.onerror);
             reader.readAsArrayBuffer(file);
         }
+
+        reader.onloadend = function(){ readFile(i); };
     }
+    )(-1);
 };

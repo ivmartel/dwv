@@ -329,13 +329,17 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     };
 
     // loop on I/O elements
-    for (var i = 0; i < ioArray.length; ++i)
+    // for (var i = 0; i < ioArray.length; ++i)
+    var request = new XMLHttpRequest();
+    (function reqFile(i)
     {
+        i++;
+        if(i===ioArray.length){ return; }
+
         var url = ioArray[i];
         // read as text according to extension
         var isText = ( url.split('.').pop().toLowerCase() === "json" );
 
-        var request = new XMLHttpRequest();
         request.open('GET', url, true);
         if ( typeof requestHeaders !== "undefined" ) {
             for (var j = 0; j < requestHeaders.length; ++j) {
@@ -355,6 +359,8 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
             request.onerror = dwv.io.Url.createErrorHandler(url, "text", self.onerror);
         }
         request.onprogress = dwv.io.Url.createLoadProgressHandler(i, self.onLoadProgress);
+        request.onloadend  = function(){ reqFile(i); };
         request.send(null);
     }
+    )(-1);
 };
