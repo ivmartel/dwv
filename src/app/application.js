@@ -139,6 +139,12 @@ dwv.App = function ()
     this.getTranslation = function () { return translation; };
 
     /**
+     * Get the toolbox controller.
+     * @return {Object} The toolbox controller.
+     */
+    this.getToolboxController = function () { return toolboxController; };
+
+    /**
      * Get the view controller.
      * @return {Object} The controller.
      */
