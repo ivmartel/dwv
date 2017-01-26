@@ -266,7 +266,7 @@ dwv.tool.ShapeEditor = function (app)
             fillGreen: 100,
             fillAlpha: 0.7,
             strokeWidth: app.getStyle().getScaledStrokeWidth() / app.getScale(),
-            radius: app.getStyle().scale(6) / app.getScale()
+            radius: app.getStyle().scale(6) / app.getScale(),
             name: 'anchor',
             id: id,
             dragOnTop: false,
