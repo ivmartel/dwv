@@ -150,10 +150,6 @@ dwv.google.Drive = function ()
 {
     // closure to self
     var self = this;
-    // list of urls
-    var urls = [];
-    // total number of ids
-    var finalSize = 0;
     // list of ids
     var idList = null;
 
@@ -192,10 +188,6 @@ dwv.google.Drive = function ()
         // set the api key
         gapi.client.setApiKey(self.apiKey);
 
-        // reset
-        urls = [];
-        finalSize = 0;
-
         var func = createApiLoad(self.getIds());
         gapi.client.load('drive', 'v3', func);
     };
@@ -220,8 +212,9 @@ dwv.google.Drive = function ()
     * @param {Array} ids The list of file ids to ask for download link.
     */
     function onApiLoad(ids) {
-        finalSize = ids.length;
+        // group requests in batch (ans stay bellow quotas)
         var batch = gapi.client.newBatch();
+
         for (var i = 0; i < ids.length; ++i) {
             // Can't make it work, HTTPRequest sends CORS error...
             // see https://developers.google.com/drive/v3/reference/files/get
@@ -237,31 +230,30 @@ dwv.google.Drive = function ()
                 'method': 'GET'
             });
 
-            //request.execute( handleDriveLoad );
+            // add to batch
             batch.add(request);
         }
+
+        // execute the batch
         batch.execute( handleDriveLoad );
     }
 
     /**
     * Launch callback when all queries have returned.
-    * @param {Object} resp The request response.
+    * @param {Object} resp The batch request response.
     * See https://developers.google.com/api-client-library/...
     *   ...javascript/reference/referencedocs#gapiclientRequestexecute
     */
     function handleDriveLoad(resp) {
-        // append link to list
-        //for (var i = 0; i < resp.length; ++i) {
-        console.log(resp);
+        // link list
+        var urls = [];
+        // ID-response map of each requests response
         var respKeys = Object.keys(resp);
         for ( var i = 0; i < respKeys.length; ++i ) {
             urls[urls.length] = resp[respKeys[i]].result.downloadUrl;
         }
-        //urls[urls.length] = resp.downloadUrl;
-        // call onload when finished
-        if (urls.length === finalSize) {
-            self.onload(urls);
-        }
+        // call onload
+        self.onload(urls);
     }
 };
 
