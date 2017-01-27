@@ -221,6 +221,7 @@ dwv.google.Drive = function ()
     */
     function onApiLoad(ids) {
         finalSize = ids.length;
+        var batch = gapi.client.newBatch();
         for (var i = 0; i < ids.length; ++i) {
             // Can't make it work, HTTPRequest sends CORS error...
             // see https://developers.google.com/drive/v3/reference/files/get
@@ -236,8 +237,10 @@ dwv.google.Drive = function ()
                 'method': 'GET'
             });
 
-            request.execute( handleDriveLoad );
+            //request.execute( handleDriveLoad );
+            batch.add(request);
         }
+        batch.execute( handleDriveLoad );
     }
 
     /**
@@ -248,7 +251,10 @@ dwv.google.Drive = function ()
     */
     function handleDriveLoad(resp) {
         // append link to list
-        urls[urls.length] = resp.downloadUrl;
+        for (var i = 0; i < resp.length; ++i) {
+            urls[urls.length] = resp[i].downloadUrl;
+        }
+        //urls[urls.length] = resp.downloadUrl;
         // call onload when finished
         if (urls.length === finalSize) {
             self.onload(urls);
