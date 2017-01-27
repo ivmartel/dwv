@@ -255,7 +255,7 @@ dwv.google.Drive = function ()
         console.log(resp);
         var respKeys = Object.keys(resp);
         for ( var i = 0; i < respKeys.length; ++i ) {
-            urls[urls.length] = resp[respKeys[i]].downloadUrl;
+            urls[urls.length] = resp[respKeys[i]].result.downloadUrl;
         }
         //urls[urls.length] = resp.downloadUrl;
         // call onload when finished
