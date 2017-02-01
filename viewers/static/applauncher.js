@@ -1,6 +1,7 @@
 /**
  * Application launcher.
  */
+// var myapp = {};
 
 // start app function
 function startApp() {
@@ -20,6 +21,8 @@ function startApp() {
         "shapes": ["Arrow", "Ruler", "Protractor", "Rectangle", "Roi", "Ellipse", "FreeHand"],
         "isMobile": false
     });
+
+    myapp.addEventListener('load-end', function(){ window.loadend(myapp); } );
 
     // help
     // TODO Seems accordion only works when at end...

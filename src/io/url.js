@@ -222,13 +222,13 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     var onLoadView = function (data)
     {
         self.onload(data);
+        self.addLoaded();
     };
 
     // DICOM buffer to dwv.image.View (asynchronous)
     var db2v = new dwv.image.DicomBufferToView();
     db2v.setDefaultCharacterSet(this.getDefaultCharacterSet());
     db2v.onload = function () {
-        self.addLoaded();
     };
     db2v.onprogress = function (event) {
         self.onDecodeProgress(event);

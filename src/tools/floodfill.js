@@ -157,27 +157,31 @@ dwv.tool.Floodfill = function(app)
      */
     var calcBorder = function(points, threshold, simple){
 
-        parentPoints = [];
-        var image = {
-            data: imageInfo.data,
-            width: imageInfo.width,
+        if(!imageInfo){imageInfo = app.getImageData();}
+        var imageData = {
+            data  : imageInfo.data,
+            width : imageInfo.width,
             height: imageInfo.height,
-            bytes: 4
+            bytes : 4
         };
 
-        // var p = new dwv.math.FastPoint2D(points.x, points.y);
-        mask = MagicWand.floodFill(image, points.x, points.y, threshold);
+        parentPoints = [];
+
+        mask = MagicWand.floodFill(imageData, parseInt(points.x), parseInt(points.y), threshold);
         mask = MagicWand.gaussBlurOnlyBorder(mask, blurRadius);
 
         var cs = MagicWand.traceContours(mask);
         cs = MagicWand.simplifyContours(cs, simplifyTolerant, simplifyCount);
 
-        if(cs.length > 0 && cs[0].points[0].x){
+        var border = cs.filter(function(b){ return !b.inner; });
+        // console.log(border)
+        if(border.length){
+            points = border[0].points;
             if(simple){
-                return cs[0].points;
+                return points;
             }
-            for(var j=0, icsl=cs[0].points.length; j<icsl; j++){
-                parentPoints.push(new dwv.math.Point2D(cs[0].points[j].x, cs[0].points[j].y));
+            for(var b=0, bl=points.length; b<bl; b++){
+                parentPoints.push(new dwv.math.Point2D(points[b].x, points[b].y));
             }
             return parentPoints;
         }
@@ -200,6 +204,11 @@ dwv.tool.Floodfill = function(app)
             var factory = new dwv.tool.RoiFactory();
             shapeGroup = factory.create(border, self.style);
             shapeGroup.id( dwv.math.guid() );
+            shapeGroup.setAttrs({
+                "center": point,
+                "threshold": threshold
+            });
+
             // draw shape command
             command = new dwv.tool.DrawGroupCommand(shapeGroup, "floodfill", app.getCurrentDrawLayer());
             command.onExecute = fireEvent;
@@ -218,32 +227,35 @@ dwv.tool.Floodfill = function(app)
 
     /**
      * Create Floodfill in all the prev and next slices while border is found
+     * @param  {Object} inShapeGroup ShapeGroup to extend
+     * @param  {Number} ini          Initial layer index
+     * @param  {Number} end          End layer index
      */
-    this.extend = function(ini, end){
-        //avoid errors
-        if(!initialpoint){
-            throw "'initialpoint' not found. User must click before use extend!";
-        }
-        // remove previous draw
-        if ( shapeGroup ) {
-            shapeGroup.destroy();
+    this.extend = function(inShapeGroup, ini, end){
+
+        var center    = inShapeGroup.getAttr('center');
+        var threshold = inShapeGroup.getAttr('threshold');
+
+        if(app.getShapeEditor().isActive())
+        {
+            app.getShapeEditor().disable();
         }
 
         var pos = app.getViewController().getCurrentPosition();
-        var threshold = currentthreshold || initialthreshold;
 
+        app.getViewController().setCurrentPosition({i: pos.i, j: pos.j, k: pos.k+1});
         // Iterate over the next images and paint border on each slice.
-        for(var i=pos.k, len = end ? end : app.getImage().getGeometry().getSize().getNumberOfSlices(); i<len ; i++){
-            if(!paintBorder(initialpoint, threshold)){
+        for(var i=pos.k, len = (end || app.getNSlicesToLoad()); i<len ; i++){
+            if(!paintBorder(center, threshold)){
                 break;
             }
             app.getViewController().incrementSliceNb();
         }
-        app.getViewController().setCurrentPosition(pos);
 
+        app.getViewController().setCurrentPosition({i: pos.i, j: pos.j, k: pos.k-1});
         // Iterate over the prev images and paint border on each slice.
-        for(var j=pos.k, jl = ini ? ini : 0 ; j>jl ; j--){
-            if(!paintBorder(initialpoint, threshold)){
+        for(var j=pos.k, jl = (ini || 0) ; j>jl ; j--){
+            if(!paintBorder(center, threshold)){
                 break;
             }
             app.getViewController().decrementSliceNb();
@@ -255,20 +267,17 @@ dwv.tool.Floodfill = function(app)
      * Modify tolerance threshold and redraw ROI.
      * @param {Number} New threshold.
      */
-    this.modifyThreshold = function(modifyThreshold, shape){
+    this.modifyThreshold = function(inShapeGroup, modifyThreshold, silent){
 
-        if(!shape && shapeGroup){
-            shape = shapeGroup.getChildren( function (node) {
-                return node.name() === 'shape';
-            })[0];
-        }
-        else{
-            throw 'No shape found';
-        }
+        if (!inShapeGroup){ throw new Error('No draw selected'); }
+
+        var shape = inShapeGroup.getChildren( function (node) {
+            return node.name() === 'shape';
+        })[0];
 
         clearTimeout(painterTimeout);
         painterTimeout = setTimeout( function () {
-            border = calcBorder(initialpoint, modifyThreshold, true);
+            border = calcBorder(inShapeGroup.getAttr('center'), modifyThreshold, true);
             if(!border){
                 return false;
             }
@@ -278,9 +287,14 @@ dwv.tool.Floodfill = function(app)
                 arr.push( border[i].x );
                 arr.push( border[i].y );
             }
+            if(app.getShapeEditor().isActive())
+            {
+                app.getShapeEditor().disable();
+            }
             shape.setPoints(arr);
-            var shapeLayer = shape.getLayer();
-            shapeLayer.draw();
+            shape.getLayer().draw();
+            inShapeGroup.setAttr( "threshold", modifyThreshold );
+            if(silent){ return; }
             self.onThresholdChange(modifyThreshold);
         }, 100);
     };
@@ -299,7 +313,7 @@ dwv.tool.Floodfill = function(app)
      */
     this.mousedown = function(event){
         imageInfo = app.getImageData();
-        if (!imageInfo){ return console.error('No image found');}
+        if (!imageInfo){ return console.error('No image found'); }
 
         self.started = true;
         initialpoint = getCoord(event);
@@ -319,7 +333,7 @@ dwv.tool.Floodfill = function(app)
         var movedpoint   = getCoord(event);
         currentthreshold = Math.round(Math.sqrt( Math.pow((initialpoint.x-movedpoint.x), 2) + Math.pow((initialpoint.y-movedpoint.y), 2) )/2);
         currentthreshold = currentthreshold < initialthreshold ? initialthreshold : currentthreshold - initialthreshold;
-        self.modifyThreshold(currentthreshold);
+        self.modifyThreshold(shapeGroup, currentthreshold);
     };
 
     /**
@@ -328,6 +342,8 @@ dwv.tool.Floodfill = function(app)
      */
     this.mouseup = function(/*event*/){
         self.started = false;
+        initialpoint = false;
+        shapeGroup   = null;
         if(extender){
             self.extend();
         }
