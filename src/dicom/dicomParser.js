@@ -885,6 +885,8 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
         vl = 0;
     }
 
+    var startOffset = offset;
+
     // data
     var data = null;
     var isPixelData = (tag.name === "x7FE00010");
@@ -1070,6 +1072,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
         'vr': vr,
         'vl': vlString,
         'value': data,
+        'startOffset': startOffset,
         'endOffset': offset
     };
 };
