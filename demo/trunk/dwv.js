@@ -3406,6 +3406,8 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
         vl = 0;
     }
 
+    var startOffset = offset;
+
     // data
     var data = null;
     var isPixelData = (tag.name === "x7FE00010");
@@ -3591,6 +3593,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
         'vr': vr,
         'vl': vlString,
         'value': data,
+        'startOffset': startOffset,
         'endOffset': offset
     };
 };
@@ -4475,6 +4478,48 @@ dwv.dicom.DataWriter.prototype.writeStringArray = function (byteOffset, array) {
 };
 
 /**
+ * Write a list of items.
+ * @param {Number} byteOffset The offset to start writing from.
+ * @param {Array} items The list of items to write.
+ * @returns {Number} The new offset position.
+ */
+dwv.dicom.DataWriter.prototype.writeDataElementItems = function (byteOffset, items) {
+    var item = null;
+    for ( var i = 0; i < items.length; ++i ) {
+        item = items[i];
+        var itemKeys = Object.keys(item);
+        if ( itemKeys.length === 0 ) {
+            continue;
+        }
+        // write item
+        var itemElement = item.xFFFEE000;
+        itemElement.value = [];
+        byteOffset = this.writeDataElement(itemElement, byteOffset);
+        // write rest
+        for ( var m = 0; m < itemKeys.length; ++m ) {
+            if ( itemKeys[m] !== "xFFFEE000" && itemKeys[m] !== "xFFFEE00D") {
+                byteOffset = this.writeDataElement(item[itemKeys[m]], byteOffset);
+            }
+        }
+        // item delimitation
+        if (itemElement.vl === "u/l") {
+            var itemDelimElement = {
+                'tag': { group: "0xFFFE",
+                    element: "0xE00D",
+                    name: "ItemDelimitationItem" },
+                'vr': "NONE",
+                'vl': 0,
+                'value': []
+            };
+            byteOffset = this.writeDataElement(itemDelimElement, byteOffset);
+        }
+    }
+
+    // return new offset
+    return byteOffset;
+};
+
+/**
  * Write data with a specific Value Representation (VR).
  * @param {String} vr The data Value Representation (VR).
  * @param {Number} byteOffset The offset to start writing from.
@@ -4483,7 +4528,7 @@ dwv.dicom.DataWriter.prototype.writeStringArray = function (byteOffset, array) {
  */
 dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset, value) {
     // switch according to VR
-    if ( vr === "OB") {
+    if ( vr === "OB" || vr === "UN") {
         byteOffset = this.writeUint8Array(byteOffset, value);
     }
     else if ( vr === "US" || vr === "OW") {
@@ -4505,31 +4550,9 @@ dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset,
         byteOffset = this.writeFloat64Array(byteOffset, value);
     }
     else if ( vr === "SQ") {
-        var item = null;
-        for ( var i = 0; i < value.length; ++i ) {
-            item = value[i];
-            var itemKeys = Object.keys(item);
-            if ( itemKeys.length === 0 ) {
-                continue;
-            }
-            // write item
-            var itemElement = item.xFFFEE000;
-            itemElement.value = [];
-            byteOffset = this.writeDataElement(itemElement, byteOffset);
-            // write rest
-            for ( var m = 0; m < itemKeys.length; ++m ) {
-                if ( itemKeys[m] !== "xFFFEE000" && itemKeys[m] !== "xFFFEE00D") {
-                    byteOffset = this.writeDataElement(item[itemKeys[m]], byteOffset);
-                }
-            }
-            // item delimitation
-            if (typeof item.xFFFEE00D !== "undefined") {
-                var itemDelimElement = item.xFFFEE00D;
-                itemDelimElement.value = [];
-                byteOffset = this.writeDataElement(itemDelimElement, byteOffset);
-            }
-        }
-    } else if ( vr === "AT") {
+        byteOffset = this.writeDataElementItems(byteOffset, value);
+    }
+    else if ( vr === "AT") {
         var hexString = value + '';
         var hexString1 = hexString.substring(1, 5);
         var hexString2 = hexString.substring(6, 10);
@@ -4540,6 +4563,64 @@ dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset,
     }
     else {
         byteOffset = this.writeStringArray(byteOffset, value);
+    }
+
+    // return new offset
+    return byteOffset;
+};
+
+/**
+ * Write a pixel data element.
+ * @param {String} vr The data Value Representation (VR).
+ * @param {String} vl The data Value Length (VL).
+ * @param {Number} byteOffset The offset to start writing from.
+ * @param {Array} value The array to write.
+ * @returns {Number} The new offset position.
+ */
+dwv.dicom.DataWriter.prototype.writePixelDataElementValue = function (vr, vl, byteOffset, value) {
+    // explicit length
+    if (vl !== "u/l") {
+        var finalValue = value[0];
+        // flatten multi frame
+        if (value.length > 1) {
+            finalValue = dwv.dicom.flattenArrayOfTypedArrays(value);
+        }
+        // write
+        byteOffset = this.writeDataElementValue(vr, byteOffset, finalValue);
+    } else {
+        // pixel data as sequence
+        var item = {};
+        // first item: basic offset table
+        item.xFFFEE000 = {
+            'tag': { group: "0xFFFE",
+                element: "0xE000",
+                name: "xFFFEE000" },
+            'vr': "UN",
+            'vl': 0,
+            'value': []
+        };
+        // data
+        for (var i = 0; i < value.length; ++i) {
+            item[i] = {
+                'tag': { group: "0xFFFE",
+                    element: "0xE000",
+                    name: "xFFFEE000" },
+                'vr': vr,
+                'vl': value[i].length,
+                'value': value[i]
+            };
+        }
+        // sequence delimitation item
+        item.end = {
+            'tag': { group: "0xFFFE",
+                element: "0xE0DD",
+                name: "xFFFEE0DD" },
+            'vr': "UN",
+            'vl': 0,
+            'value': []
+        };
+        // write
+        byteOffset = this.writeDataElementItems(byteOffset, [item]);
     }
 
     // return new offset
@@ -4567,42 +4648,45 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset)
             byteOffset += 2;
         }
     }
-    // update vl for sequence with implicit length
-    if ( dwv.dicom.isImplicitLengthSequence(element) ) {
-        element.vl = 0xffffffff;
+
+    // update vl for sequence or item with implicit length
+    var vl = element.vl;
+    if ( dwv.dicom.isImplicitLengthSequence(element) ||
+        dwv.dicom.isImplicitLengthItem(element) ||
+        dwv.dicom.isImplicitLengthPixels(element) ) {
+        vl = 0xffffffff;
     }
     // VL
     if ( is32bitVLVR || !isTagWithVR ) {
-        byteOffset = this.writeUint32(byteOffset, element.vl);
+        byteOffset = this.writeUint32(byteOffset, vl);
     }
     else {
-        byteOffset = this.writeUint16(byteOffset, element.vl);
+        byteOffset = this.writeUint16(byteOffset, vl);
     }
+
     // value
     var value = element.value;
-    // pixel data: array of arrays of size 1 for single frame 
-    // is flattened to a single array for multi frame support
-    if (element.tag.name === "x7FE00010") {
-        value = element.value[0];
-        if(element.value.length > 1) {
-        	value = dwv.dicom.flattenArrayOfTypedArrays(element.value);
-        }
-    }
-    
-    if(typeof value === 'undefined') {
+    // check value
+    if (typeof value === 'undefined') {
         value = [];
     }
-    
-    byteOffset = this.writeDataElementValue(element.vr, byteOffset, value);
+    // write
+    if (element.tag.name === "x7FE00010") {
+        byteOffset = this.writePixelDataElementValue(element.vr, element.vl, byteOffset, value);
+    } else {
+        byteOffset = this.writeDataElementValue(element.vr, byteOffset, value);
+    }
 
     // sequence delimitation item for sequence with implicit length
     if ( dwv.dicom.isImplicitLengthSequence(element) ) {
         var seqDelimElement = {
-                'tag': { group: "0xFFFE", element: "0xE0DD" },
-                'vr': "NONE",
-                'vl': 0,
-                'value': []
-            };
+            'tag': { group: "0xFFFE",
+                element: "0xE0DD",
+                name: "SequenceDelimitationItem" },
+            'vr': "NONE",
+            'vl': 0,
+            'value': []
+        };
         byteOffset = this.writeDataElement(seqDelimElement, byteOffset);
     }
 
@@ -4616,18 +4700,37 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset)
  * @returns {Boolean} True if it is.
  */
 dwv.dicom.isImplicitLengthSequence = function (element) {
-    return (element.vr === "SQ" &&
-        typeof element.value !== "undefined" &&
-        ( ( Object.keys(element.value).length !== 0 &&
-                typeof element.value[0] !== "undefined" &&
-                typeof element.value[0].xFFFEE00D !== "undefined" ) ||
-        ( element.value === 0 ) ) );
+    // sequence with no length
+    return (element.vr === "SQ") &&
+        (element.vl === "u/l");
+};
+
+/**
+ * Is this element an implicit length item?
+ * @param {Object} element The element to check.
+ * @returns {Boolean} True if it is.
+ */
+dwv.dicom.isImplicitLengthItem = function (element) {
+    // item with no length
+    return (element.tag.name === "xFFFEE000") &&
+        (element.vl === "u/l");
+};
+
+/**
+ * Is this element an implicit length pixel data?
+ * @param {Object} element The element to check.
+ * @returns {Boolean} True if it is.
+ */
+dwv.dicom.isImplicitLengthPixels = function (element) {
+    // pixel data with no length
+    return (element.tag.name === "x7FE00010") &&
+        (element.vl === "u/l");
 };
 
 /**
  * Helper method to flatten an array of typed arrays to 2D typed array
  * @param {Array} array of typed arrays
- * @returns {Object} a typed array containing all values 
+ * @returns {Object} a typed array containing all values
  */
 dwv.dicom.flattenArrayOfTypedArrays = function(initialArray) {
     var initialArrayLength = initialArray.length;
@@ -4653,10 +4756,16 @@ dwv.dicom.DicomWriter = function () {
     var actions = {
         'copy': function (item) { return item; },
         'remove': function () { return null; },
-        'clear': function (item) { item.value[0] = ""; return item; },
+        'clear': function (item) {
+            item.value[0] = "";
+            item.vl = 0;
+            item.endOffset = item.startOffset;
+            return item;
+        },
         'replace': function (item, value) {
             item.value[0] = value;
             item.vl = value.length;
+            item.endOffset = item.startOffset + value.length;
             return item;
         }
     };
@@ -4702,16 +4811,16 @@ dwv.dicom.DicomWriter = function () {
         var dict = dwv.dicom.dictionary;
         var group = element.tag.group;
         var groupName = dwv.dicom.TagGroups[group.substr(1)]; // remove first 0
-        
+
         if ( typeof dict[group] !== 'undefined' && typeof dict[group][element.tag.element] !== 'undefined') {
             tagName = dict[group][element.tag.element][2];
         }
         // apply rules:
         var rule;
-        // 1. tag itself 
+        // 1. tag itself
         if (typeof this.rules[element.tag.name] !== 'undefined') {
         	rule = this.rules[element.tag.name];
-        } 
+        }
         // 2. tag name
         else if ( tagName !== null && typeof this.rules[tagName] !== 'undefined' ) {
             rule = this.rules[tagName];
@@ -4747,8 +4856,11 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     for ( var i = 0, leni = keys.length; i < leni; ++i ) {
         element = this.getElementToWrite(dicomElements[keys[i]]);
         if ( element !== null ) {
+
             // size
-            size += dwv.dicom.getDataElementPrefixByteSize(element.vr) + parseInt(element.vl, 10);
+            size += dwv.dicom.getDataElementPrefixByteSize(element.vr);
+            var realVl = element.endOffset - element.startOffset;
+            size += parseInt(realVl, 10);
 
             // add size of sequence delimitation item
             if ( dwv.dicom.isImplicitLengthSequence(element) ) {
@@ -4765,8 +4877,6 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
             }
         }
     }
-
-    console.log("size: "+size);
 
     // create buffer
     var buffer = new ArrayBuffer(size);
