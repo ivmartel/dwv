@@ -659,8 +659,8 @@ dwv.dicom.getTypedArray = function (bitsAllocated, pixelRepresentation, size)
 dwv.dicom.is32bitVLVR = function (vr)
 {
     // added locally used 'ox'
-    return ( vr === "OB" || vr === "OW" || vr === "OF" || vr === "ox" ||
-            vr === "SQ" || vr === "UN" );
+    return ( vr === "OB" || vr === "OW" || vr === "OF" || vr === "ox" ||  vr === "UT" ||
+    vr === "SQ" || vr === "UN" );
 };
 
 /**
@@ -848,6 +848,7 @@ dwv.dicom.DicomParser.prototype.readPixelItemDataElement = function (reader, off
 
     // first item: basic offset table
     var item = this.readDataElement(reader, offset, implicit);
+    var offsetVl = item.vl;
     offset = item.endOffset;
 
     // read until the sequence delimitation item
@@ -863,7 +864,8 @@ dwv.dicom.DicomParser.prototype.readPixelItemDataElement = function (reader, off
 
     return {
         'data': itemData,
-        'endOffset': offset };
+        'endOffset': offset,
+        'offsetVl': offsetVl };
 };
 
 /**
@@ -937,6 +939,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
     {
         var pixItemData = this.readPixelItemDataElement(reader, offset, implicit);
         offset = pixItemData.endOffset;
+        startOffset += pixItemData.offsetVl;
         data = pixItemData.data;
     }
     else if (isPixelData && (vr === "OB" || vr === "OW" || vr === "OF" || vr === "ox")) {
