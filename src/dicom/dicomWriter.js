@@ -319,8 +319,15 @@ dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset,
     if ( vr === "OB" || vr === "UN") {
         byteOffset = this.writeUint8Array(byteOffset, value);
     }
-    else if ( vr === "US" || vr === "OW") {
+    else if ( vr === "US") {
         byteOffset = this.writeUint16Array(byteOffset, value);
+    }
+    else if (vr === "OW") {
+        if (value.BYTES_PER_ELEMENT === 1) {
+            byteOffset = this.writeUint8Array(byteOffset, value);
+        } else {
+            byteOffset = this.writeUint16Array(byteOffset, value);
+        }
     }
     else if ( vr === "SS") {
         byteOffset = this.writeInt16Array(byteOffset, value);
