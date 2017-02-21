@@ -33,11 +33,15 @@ function generate()
     // create writer with textarea rules
     var writer = new dwv.dicom.DicomWriter();
     writer.rules = JSON.parse(document.getElementById('rules').value);
+    var dicomBuffer = null;
+    try {
+        dicomBuffer = writer.getBuffer(_dicomElements);
+    } catch (error) {
+        console.error(error);
+        alert(error.message);
+    }
     // view as Blob to allow download
-    var blob = new Blob(
-            [writer.getBuffer(_dicomElements)],
-            {type: 'application/dicom'}
-        );
+    var blob = new Blob([dicomBuffer], {type: 'application/dicom'});
     // update generate button
     var element = document.getElementById("generate");
     element.href = URL.createObjectURL(blob);
