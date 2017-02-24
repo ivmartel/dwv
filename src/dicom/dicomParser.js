@@ -848,7 +848,7 @@ dwv.dicom.DicomParser.prototype.readPixelItemDataElement = function (reader, off
 
     // first item: basic offset table
     var item = this.readDataElement(reader, offset, implicit);
-    var offsetVl = item.vl;
+    var offsetTableVl = item.vl;
     offset = item.endOffset;
 
     // read until the sequence delimitation item
@@ -865,7 +865,7 @@ dwv.dicom.DicomParser.prototype.readPixelItemDataElement = function (reader, off
     return {
         'data': itemData,
         'endOffset': offset,
-        'offsetVl': offsetVl };
+        'offsetTableVl': offsetTableVl };
 };
 
 /**
@@ -939,7 +939,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
     {
         var pixItemData = this.readPixelItemDataElement(reader, offset, implicit);
         offset = pixItemData.endOffset;
-        startOffset += pixItemData.offsetVl;
+        startOffset += pixItemData.offsetTableVl;
         data = pixItemData.data;
     }
     else if (isPixelData && (vr === "OB" || vr === "OW" || vr === "OF" || vr === "ox")) {
