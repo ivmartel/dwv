@@ -425,6 +425,26 @@ dwv.dicom.splitGroupElementKey = function (key)
 };
 
 /**
+ * Tell if a given syntax is an implicit one (element with no VR).
+ * @param {String} syntax The transfer syntax to test.
+ * @return {Boolean} True if an implicit syntax.
+ */
+dwv.dicom.isImplicitTransferSyntax = function (syntax)
+{
+    return syntax === "1.2.840.10008.1.2";
+};
+
+/**
+ * Tell if a given syntax is a big endian syntax.
+ * @param {String} syntax The transfer syntax to test.
+ * @return {Boolean} True if a big endian syntax.
+ */
+dwv.dicom.isBigEndianTransferSyntax = function (syntax)
+{
+    return syntax === "1.2.840.10008.1.2.2";
+};
+
+/**
  * Tell if a given syntax is a JPEG baseline one.
  * @param {String} syntax The transfer syntax to test.
  * @return {Boolean} True if a jpeg baseline syntax.
@@ -436,11 +456,11 @@ dwv.dicom.isJpegBaselineTransferSyntax = function (syntax)
 };
 
 /**
- * Tell if a given syntax is a non supported JPEG one.
+ * Tell if a given syntax is a retired JPEG one.
  * @param {String} syntax The transfer syntax to test.
- * @return {Boolean} True if a non supported jpeg syntax.
+ * @return {Boolean} True if a retired jpeg syntax.
  */
-dwv.dicom.isJpegNonSupportedTransferSyntax = function (syntax)
+dwv.dicom.isJpegRetiredTransferSyntax = function (syntax)
 {
     return ( syntax.match(/1.2.840.10008.1.2.4.5/) !== null &&
         !dwv.dicom.isJpegBaselineTransferSyntax() &&
@@ -500,6 +520,28 @@ dwv.dicom.getSyntaxDecompressionName = function (syntax)
 };
 
 /**
+ * Tell if a given syntax is supported for reading.
+ * @param {String} syntax The transfer syntax to test.
+ * @return {Boolean} True if a supported syntax.
+ */
+dwv.dicom.isReadSupportedTransferSyntax = function (syntax) {
+
+    // Unsupported:
+    // "1.2.840.10008.1.2.1.99": Deflated Explicit VR - Little Endian
+    // "1.2.840.10008.1.2.4.100": MPEG2 Image Compression
+    // dwv.dicom.isJpegRetiredTransferSyntax(syntax): non supported JPEG
+    // dwv.dicom.isJpeglsTransferSyntax(syntax): JPEG-LS
+    // "1.2.840.10008.1.2.5": RLE (lossless)
+
+    return( syntax === "1.2.840.10008.1.2" || // Implicit VR - Little Endian
+        syntax === "1.2.840.10008.1.2.1" || // Explicit VR - Little Endian
+        syntax === "1.2.840.10008.1.2.2" || // Explicit VR - Big Endian
+        dwv.dicom.isJpegBaselineTransferSyntax(syntax) || // JPEG baseline
+        dwv.dicom.isJpegLosslessTransferSyntax(syntax) || // JPEG Lossless
+        dwv.dicom.isJpeg2000TransferSyntax(syntax) ); // JPEG 2000
+};
+
+/**
  * Get the transfer syntax name.
  * Reference: [UID Values]{@link http://dicom.nema.org/dicom/2013/output/chtml/part06/chapter_A.html}.
  * @param {String} syntax The transfer syntax.
@@ -507,7 +549,7 @@ dwv.dicom.getSyntaxDecompressionName = function (syntax)
  */
 dwv.dicom.getTransferSyntaxName = function (syntax)
 {
-    var name = "unknown";
+    var name = "Unknown";
     // Implicit VR - Little Endian
     if( syntax === "1.2.840.10008.1.2" ) {
         name = "Little Endian Implicit";
@@ -542,9 +584,9 @@ dwv.dicom.getTransferSyntaxName = function (syntax)
             name = "JPEG Lossless, Non-hierarchical, 1st Order Prediction";
         }
     }
-    // Non supported JPEG
-    else if( dwv.dicom.isJpegNonSupportedTransferSyntax(syntax) ) {
-        name = "Non supported JPEG";
+    // Retired JPEG
+    else if( dwv.dicom.isJpegRetiredTransferSyntax(syntax) ) {
+        name = "Retired JPEG";
     }
     // JPEG-LS
     else if( dwv.dicom.isJpeglsTransferSyntax(syntax) ) {
@@ -617,8 +659,8 @@ dwv.dicom.getTypedArray = function (bitsAllocated, pixelRepresentation, size)
 dwv.dicom.is32bitVLVR = function (vr)
 {
     // added locally used 'ox'
-    return ( vr === "OB" || vr === "OW" || vr === "OF" || vr === "ox" ||
-            vr === "SQ" || vr === "UN" );
+    return ( vr === "OB" || vr === "OW" || vr === "OF" || vr === "ox" ||  vr === "UT" ||
+    vr === "SQ" || vr === "UN" );
 };
 
 /**
@@ -806,6 +848,7 @@ dwv.dicom.DicomParser.prototype.readPixelItemDataElement = function (reader, off
 
     // first item: basic offset table
     var item = this.readDataElement(reader, offset, implicit);
+    var offsetTableVl = item.vl;
     offset = item.endOffset;
 
     // read until the sequence delimitation item
@@ -821,7 +864,8 @@ dwv.dicom.DicomParser.prototype.readPixelItemDataElement = function (reader, off
 
     return {
         'data': itemData,
-        'endOffset': offset };
+        'endOffset': offset,
+        'offsetTableVl': offsetTableVl };
 };
 
 /**
@@ -885,6 +929,8 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
         vl = 0;
     }
 
+    var startOffset = offset;
+
     // data
     var data = null;
     var isPixelData = (tag.name === "x7FE00010");
@@ -893,6 +939,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
     {
         var pixItemData = this.readPixelItemDataElement(reader, offset, implicit);
         offset = pixItemData.endOffset;
+        startOffset += pixItemData.offsetTableVl;
         data = pixItemData.data;
     }
     else if (isPixelData && (vr === "OB" || vr === "OW" || vr === "OF" || vr === "ox")) {
@@ -1070,6 +1117,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
         'vr': vr,
         'vl': vlString,
         'value': data,
+        'startOffset': startOffset,
         'endOffset': offset
     };
 };
@@ -1122,52 +1170,20 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     }
     var syntax = dwv.dicom.cleanString(this.dicomElements.x00020010.value[0]);
 
-    // Explicit VR - Little Endian
-    if( syntax === "1.2.840.10008.1.2.1" ) {
-        // nothing to do!
+    // check support
+    if (!dwv.dicom.isReadSupportedTransferSyntax(syntax)) {
+        throw new Error("Unsupported DICOM transfer syntax: '"+syntax+
+            "' ("+dwv.dicom.getTransferSyntaxName(syntax)+")");
     }
-    // Implicit VR - Little Endian
-    else if( syntax === "1.2.840.10008.1.2" ) {
+
+    // Implicit VR
+    if (dwv.dicom.isImplicitTransferSyntax(syntax)) {
         implicit = true;
     }
-    // Deflated Explicit VR - Little Endian
-    else if( syntax === "1.2.840.10008.1.2.1.99" ) {
-        throw new Error("Unsupported DICOM transfer syntax (Deflated Explicit VR): "+syntax);
-    }
-    // Explicit VR - Big Endian
-    else if( syntax === "1.2.840.10008.1.2.2" ) {
+
+    // Big Endian
+    if (dwv.dicom.isBigEndianTransferSyntax(syntax)) {
         dataReader = new dwv.dicom.DataReader(buffer,false);
-    }
-    // JPEG baseline
-    else if( dwv.dicom.isJpegBaselineTransferSyntax(syntax) ) {
-        // nothing to do!
-    }
-    // JPEG Lossless
-    else if( dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
-        // nothing to do!
-    }
-    // non supported JPEG
-    else if( dwv.dicom.isJpegNonSupportedTransferSyntax(syntax) ) {
-        throw new Error("Unsupported DICOM transfer syntax (retired JPEG): "+syntax);
-    }
-    // JPEG-LS
-    else if( dwv.dicom.isJpeglsTransferSyntax(syntax) ) {
-        throw new Error("Unsupported DICOM transfer syntax (JPEG-LS): "+syntax);
-    }
-    // JPEG 2000
-    else if( dwv.dicom.isJpeg2000TransferSyntax(syntax) ) {
-        // nothing to do!
-    }
-    // MPEG2 Image Compression
-    else if( syntax === "1.2.840.10008.1.2.4.100" ) {
-        throw new Error("Unsupported DICOM transfer syntax (MPEG2): "+syntax);
-    }
-    // RLE (lossless)
-    else if( syntax === "1.2.840.10008.1.2.5" ) {
-        throw new Error("Unsupported DICOM transfer syntax (RLE): "+syntax);
-    }
-    else {
-        throw new Error("Unknown transfer syntax: "+syntax);
     }
 
     // default character set
