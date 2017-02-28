@@ -144,13 +144,12 @@ dwv.tool.Scroll = function(app)
      * Handle mouse scroll event (fired by Firefox).
      * @param {Object} event The mouse scroll event.
      */
-    this.DOMMouseScroll = function(event){
+    this.DOMMouseScroll = function (event) {
         // ev.detail on firefox is 3
-        if( event.detail < 0 ) {
-            app.getViewController().incrementSliceNb();
-        }
-        else {
-            app.getViewController().decrementSliceNb();
+        if ( event.detail < 0 ) {
+            mouseScroll(true);
+        } else {
+            mouseScroll(false);
         }
     };
 
@@ -158,15 +157,37 @@ dwv.tool.Scroll = function(app)
      * Handle mouse wheel event.
      * @param {Object} event The mouse wheel event.
      */
-    this.mousewheel = function(event){
+    this.mousewheel = function (event) {
         // ev.wheelDelta on chrome is 120
-        if( event.wheelDelta > 0 ) {
-            app.getViewController().incrementSliceNb();
-        }
-        else {
-            app.getViewController().decrementSliceNb();
+        if ( event.wheelDelta > 0 ) {
+            mouseScroll(true);
+        } else {
+            mouseScroll(false);
         }
     };
+
+    /**
+     * Mouse scroll action.
+     * @param {Boolean} up True to increment, false to decrement.
+     */
+    function mouseScroll (up) {
+        var hasSlices = (app.getImage().getGeometry().getSize().getNumberOfSlices() !== 1);
+        var hasFrames = (app.getImage().getNumberOfFrames() !== 1);
+        if ( up ) {
+            if (hasSlices) {
+                app.getViewController().incrementSliceNb();
+            } else if (hasFrames) {
+                app.getViewController().incrementFrameNb();
+            }
+        } else {
+            if (hasSlices) {
+                app.getViewController().decrementSliceNb();
+            } else if (hasFrames) {
+                app.getViewController().decrementFrameNb();
+            }
+        }
+    }
+
     /**
      * Handle key down event.
      * @param {Object} event The key down event.
