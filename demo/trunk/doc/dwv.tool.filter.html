@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>dwv Source: src/gui/style.js</title>
+	<title>dwv Namespace: filter</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -81,151 +81,118 @@
 <div class="row">
 
 	
-	<div class="col-md-12">
+	<div class="col-md-8">
 	
 		<div id="main">
 			
 
-		<h1 class="page-title">Source: src/gui/style.js</h1>
-    
+	<h1 class="page-title">Namespace: filter</h1>
 <section>
-    <article>
-        <pre
-            class="sunlight-highlight-javascript linenums">// namespaces
-var dwv = dwv || {};
-dwv.html = dwv.html || {};
 
-/**
- * Style class.
- * @constructor
- */
-dwv.html.Style = function ()
-{
-    /**
-     * Font size.
-     * @private
-     * @type Number
-     */
-    var fontSize = 12;
-    /**
-     * Font family.
-     * @private
-     * @type String
-     */
-    var fontFamily = "Verdana";
-    /**
-     * Text colour.
-     * @private
-     * @type String
-     */
-    var textColour = "#fff";
-    /**
-     * Line colour.
-     * @private
-     * @type String
-     */
-    var lineColour = "#ffff80";
-    /**
-     * Display scale.
-     * @private
-     * @type Number
-     */
-    var displayScale = 1;
-    /**
-     * Stroke width.
-     * @private
-     * @type Number
-     */
-    var strokeWidth = 2;
+<header>
+    
+        <h2>
+            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.tool.html">.tool</a>.</span>
+        
+        filter
+        </h2>
+        
+    
+</header>
 
-    /**
-     * Get the font family.
-     * @return {String} The font family.
-     */
-    this.getFontFamily = function () { return fontFamily; };
 
-    /**
-     * Get the font size.
-     * @return {Number} The font size.
-     */
-    this.getFontSize = function () { return fontSize; };
+<article>
+    <div class="container-overview">
+    
+        
 
-    /**
-     * Get the stroke width.
-     * @return {Number} The stroke width.
-     */
-    this.getStrokeWidth = function () { return strokeWidth; };
+        
+<dl class="details">
+    
 
-    /**
-     * Get the text colour.
-     * @return {String} The text colour.
-     */
-    this.getTextColour = function () { return textColour; };
+	
 
-    /**
-     * Get the line colour.
-     * @return {String} The line colour.
-     */
-    this.getLineColour = function () { return lineColour; };
+	
 
-    /**
-     * Set the line colour.
-     * @param {String} colour The line colour.
-     */
-    this.setLineColour = function (colour) { lineColour = colour; };
+	
 
-    /**
-     * Set the display scale.
-     * @param {String} scale The display scale.
-     */
-    this.setScale = function (scale) { displayScale = scale; };
+    
 
-    /**
-     * Scale an input value.
-     * @param {Number} value The value to scale.
-     */
-    this.scale = function (value) { return value / displayScale; };
-};
+    
 
-/**
- * Get the font definition string.
- * @return {String} The font definition string.
- */
-dwv.html.Style.prototype.getFontStr = function ()
-{
-    return ("normal " + this.getFontSize() + "px sans-serif");
-};
+    
 
-/**
- * Get the line height.
- * @return {Number} The line height.
- */
-dwv.html.Style.prototype.getLineHeight = function ()
-{
-    return ( this.getFontSize() + this.getFontSize() / 5 );
-};
+    
 
-/**
- * Get the font size scaled to the display.
- * @return {Number} The scaled font size.
- */
-dwv.html.Style.prototype.getScaledFontSize = function ()
-{
-    return this.scale( this.getFontSize() );
-};
+	
 
-/**
- * Get the stroke width scaled to the display.
- * @return {Number} The scaled stroke width.
- */
-dwv.html.Style.prototype.getScaledStrokeWidth = function ()
-{
-    return this.scale( this.getStrokeWidth() );
-};
-</pre>
-    </article>
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_filter.js.html">src/tools/filter.js</a>,
+				 <a href="src_tools_filter.js.html#sunlight-1-line-5">line 5</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Classes</h3>
+
+        <dl>
+            <dt><a href="dwv.tool.filter.Sharpen.html">Sharpen</a></dt>
+            <dd></dd>
+        
+            <dt><a href="dwv.tool.filter.Sobel.html">Sobel</a></dt>
+            <dd></dd>
+        
+            <dt><a href="dwv.tool.filter.Threshold.html">Threshold</a></dt>
+            <dd></dd>
+        </dl>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
 </section>
-
 
 
 
@@ -235,6 +202,10 @@ dwv.html.Style.prototype.getScaledStrokeWidth = function ()
 
 	<div class="clearfix"></div>
 
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
 	
 
 </div>
