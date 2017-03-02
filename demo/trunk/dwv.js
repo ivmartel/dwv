@@ -14275,8 +14275,7 @@ dwv.image.WindowLevel = function (center, width)
 dwv.image.WindowLevel.prototype.equals = function (rhs) {
     return rhs !== null &&
         this.getCenter() === rhs.getCenter() &&
-        this.getWidth() === rhs.getWidth() &&
-        this.isSigned() === rhs.isSigned();
+        this.getWidth() === rhs.getWidth();
 };
 
 /**
