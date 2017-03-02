@@ -13683,17 +13683,11 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
     var windowLut = new Uint8ClampedArray(rescaleLut.getLength());
 
     /**
-     * The window center.
+     * The window level.
      * @private
-     * @type Number
+     * @type {Object}
      */
-    var center = null;
-    /**
-     * The window width.
-     * @private
-     * @type Number
-     */
-    var width = null;
+    var windowLevel = null;
 
     /**
      * Flag to know if the lut needs update or not.
@@ -13706,12 +13700,12 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
      * Get the window center.
      * @return {Number} The window center.
      */
-    this.getCenter = function() { return center; };
+    this.getCenter = function() { return windowLevel.getCenter(); };
     /**
      * Get the window width.
      * @return {Number} The window width.
      */
-    this.getWidth = function() { return width; };
+    this.getWidth = function() { return windowLevel.getWidth(); };
     /**
      * Get the signed flag.
      * @return {Boolean} The signed flag.
@@ -13725,14 +13719,12 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
 
     /**
      * Set the window center and width.
-     * @param {Number} inCenter The window center.
-     * @param {Number} inWidth The window width.
+     * @param {Object} wl The window level.
      */
-    this.setCenterAndWidth = function (inCenter, inWidth)
+    this.setWindowLevel = function (wl)
     {
         // store the window values
-        center = inCenter;
-        width = inWidth;
+        windowLevel = wl;
         needsUpdate = true;
     };
 
@@ -13746,45 +13738,16 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
         }
         // pre calculate loop values
         var size = windowLut.length;
-        var center0 = center - 0.5;
         if ( isSigned ) {
-            center0 += rescaleLut.getRSI().getSlope() * (size / 2);
+            windowLevel.addSignedOffset(rescaleLut.getRSI().getSlope() * (size / 2));
         }
-        var width0 = width - 1;
-        var dispval = 0;
-        if( !dwv.browser.hasClampedArray() )
+        // by default WindowLevel returns a value in the [0,255] range
+        // this is ok with regular Arrays and ClampedArray.
+        for ( var i = 0; i < size; ++i )
         {
-            var yMax = 255;
-            var yMin = 0;
-            for(var j=0; j<size; ++j)
-            {
-                // from the DICOM specification (https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
-                // y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin )+ ymin
-                dispval = ((rescaleLut.getValue(j) - center0 ) / width0 + 0.5) * 255;
-                dispval = parseInt(dispval, 10);
-                if ( dispval <= yMin ) {
-                    windowLut[j] = yMin;
-                }
-                else if ( dispval > yMax ) {
-                    windowLut[j] = yMax;
-                }
-                else {
-                    windowLut[j] = dispval;
-                }
-            }
+            windowLut[i] = windowLevel.apply( rescaleLut.getValue(i) );
         }
-        else
-        {
-            // when using Uint8ClampedArray, values are clamped between 0 and 255
-            // no need to check
-            for(var i=0; i<size; ++i)
-            {
-                // from the DICOM specification (https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
-                // y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin )+ ymin
-                dispval = ((rescaleLut.getValue(i) - center0 ) / width0 + 0.5) * 255;
-                windowLut[i]= parseInt(dispval, 10);
-            }
-        }
+        // set update flag
         needsUpdate = false;
     };
 
@@ -14183,6 +14146,148 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
+ * WindowLevel class.
+ * References:
+ * - DICOM [Window Center and Window Width]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2}
+ * Pseudo-code:
+ *  if (x <= c - 0.5 - (w-1)/2), then y = ymin
+ *  else if (x > c - 0.5 + (w-1)/2), then y = ymax,
+ *  else y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin) + ymin
+ */
+dwv.image.WindowLevel = function (center, width)
+{
+    // avoid zero width
+    if ( width === 0 ) {
+        throw new Error("A window level with a width of zero is not possible.");
+    }
+
+    /**
+     * Output value minimum.
+     * @private
+     * @type Number
+     */
+    var ymin = 0;
+    /**
+     * Output value maximum.
+     * @private
+     * @type Number
+     */
+    var ymax = 255;
+
+    /**
+     * Input value minimum (calculated).
+     * @private
+     * @type Number
+     */
+    var xmin = null;
+    /**
+     * Input value maximum (calculated).
+     * @private
+     * @type Number
+     */
+    var xmax = null;
+    /**
+     * Window level equation slope (calculated).
+     * @private
+     * @type Number
+     */
+    var slope = null;
+    /**
+     * Window level equation intercept (calculated).
+     * @private
+     * @type Number
+     */
+    var inter = null;
+
+    /**
+     * Initialise members.
+     */
+    function init() {
+        // from the standard
+        xmin = center - 0.5 - ( (width-1) / 2 );
+        xmax = center - 0.5 + ( (width-1) / 2 );
+        // develop the equation:
+        // y = ( ( x - (c - 0.5) ) / (w-1) + 0.5 ) * (ymax - ymin) + ymin
+        // y = ( x / (w-1) ) * (ymax - ymin) + ( -(c - 0.5) / (w-1) + 0.5 ) * (ymax - ymin) + ymin
+        slope = (ymax - ymin) / (width-1);
+        inter = ( -(center - 0.5) / (width-1) + 0.5 ) * (ymax - ymin) + ymin;
+    }
+
+    // call init
+    init();
+
+    /**
+     * Get the window center.
+     * @return {Number} The window center.
+     */
+    this.getCenter = function () { return center; };
+    /**
+     * Get the window width.
+     * @return {Number} The window width.
+     */
+    this.getWidth = function () { return width; };
+
+    /**
+     * Set the output value range.
+     * @param {Number} min The output value minimum.
+     * @param {Number} max The output value maximum.
+     */
+    this.setRange = function (min, max) {
+        ymin = parseInt( min, 10 );
+        ymax = parseInt( max, 10 ) ;
+        // re-initialise
+        init();
+    };
+    /**
+     * Set the signed offset.
+     * @param {Number} The signed data offset, typically: slope * ( size / 2).
+     */
+    this.addSignedOffset = function (offset) {
+        center += offset;
+        // re-initialise
+        init();
+    };
+
+    /**
+     * Apply the window level on an input value.
+     * @param {Number} The value to rescale as an integer.
+     * @return {Number} The leveled value, in the
+     *  [ymin, ymax] range (default [0,255]).
+     */
+    this.apply = function (value)
+    {
+        if ( value <= xmin ) {
+            return ymin;
+        } else if ( value > xmax ) {
+            return ymax;
+        } else {
+            return parseInt( ((value * slope) + inter), 10);
+        }
+    };
+
+};
+
+/**
+ * Check for window level equality.
+ * @param {Object} rhs The other window level to compare to.
+ * @return {Boolean} True if both window level are equal.
+ */
+dwv.image.WindowLevel.prototype.equals = function (rhs) {
+    return rhs !== null &&
+        this.getCenter() === rhs.getCenter() &&
+        this.getWidth() === rhs.getWidth() &&
+        this.isSigned() === rhs.isSigned();
+};
+
+/**
+ * Get a string representation of the window level.
+ * @return {String} The window level as a string.
+ */
+dwv.image.WindowLevel.prototype.toString = function () {
+    return (this.getCenter() + ", " + this.getWidth());
+};
+
+/**
  * View class.
  * @constructor
  * @param {Image} image The associated image.
@@ -14421,8 +14526,9 @@ dwv.image.View = function (image)
     {
         // window width shall be >= 1 (see https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
         if ( width >= 1 ) {
+            var wl = new dwv.image.WindowLevel(center, width);
             for ( var key in windowLuts ) {
-                windowLuts[key].setCenterAndWidth(center, width);
+                windowLuts[key].setWindowLevel(wl);
             }
             this.fireEvent({"type": "wl-change", "wc": center, "ww": width });
         }
