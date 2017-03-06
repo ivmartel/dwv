@@ -210,10 +210,10 @@ dwv.image.View = function (image)
         return windowLuts[ rsi.toString() ];
     };
     /**
-     * Set the window LUT of the image.
+     * Add the window LUT to the list.
      * @param {Window} wlut The window LUT of the image.
      */
-    this.setWindowLut = function (wlut)
+    this.addWindowLut = function (wlut)
     {
         var rsi = wlut.getRescaleLut().getRSI();
         windowLuts[rsi.toString()] = wlut;
@@ -227,12 +227,10 @@ dwv.image.View = function (image)
     {
         // create the rescale lookup table
         var rescaleLut = new dwv.image.lut.Rescale(
-            image.getRescaleSlopeAndIntercept(0) );
-        // initialise the rescale lookup table
-        rescaleLut.initialise(image.getMeta().BitsStored);
+            image.getRescaleSlopeAndIntercept(0), image.getMeta().BitsStored );
         // create the window lookup table
         var windowLut = new dwv.image.lut.Window(rescaleLut, image.getMeta().IsSigned);
-        self.setWindowLut(windowLut);
+        self.addWindowLut(windowLut);
     }
 
     // default constructor
@@ -369,7 +367,7 @@ dwv.image.View = function (image)
              "k": this.getCurrentPosition().k + 1}, true );
        }
        // init to update self
-       this.setWindowLut(rhs.getWindowLut());
+       this.addWindowLut(rhs.getWindowLut());
     };
 
     /**
@@ -398,7 +396,7 @@ dwv.image.View = function (image)
     {
         var copy = new dwv.image.View(this.getImage());
         for ( var key in windowLuts ) {
-            copy.setWindowLut(windowLuts[key]);
+            copy.addWindowLut(windowLuts[key]);
         }
         copy.setListeners(this.getListeners());
         return copy;
