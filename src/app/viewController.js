@@ -187,8 +187,8 @@ dwv.ViewController = function ( view )
     this.getWindowLevel = function ()
     {
         return {
-            "width": view.getWindowLut().getWidth(),
-            "center": view.getWindowLut().getCenter()
+            "width": view.getCurrentWindowLut().getWindowLevel().getWidth(),
+            "center": view.getCurrentWindowLut().getWindowLevel().getCenter()
         };
     };
 

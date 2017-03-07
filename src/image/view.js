@@ -202,7 +202,7 @@ dwv.image.View = function (image)
      * Get the window LUT of the image.
      * @return {Window} The window LUT of the image.
      */
-    this.getWindowLut = function (rsi) {
+    this.getCurrentWindowLut = function (rsi) {
         if ( typeof rsi === "undefined" ) {
             var sliceNumber = this.getCurrentPosition().k;
             rsi = image.getRescaleSlopeAndIntercept(sliceNumber);
@@ -266,8 +266,8 @@ dwv.image.View = function (image)
             colourMap = dwv.image.lut.invPlain;
         }
         this.fireEvent({"type": "colour-change",
-           "wc": this.getWindowLut().getCenter(),
-           "ww": this.getWindowLut().getWidth() });
+           "wc": this.getCurrentWindowLut().getWindowLevel().getCenter(),
+           "ww": this.getCurrentWindowLut().getWindowLevel().getWidth() });
     };
 
     /**
@@ -366,8 +366,8 @@ dwv.image.View = function (image)
              "j": this.getCurrentPosition().j,
              "k": this.getCurrentPosition().k + 1}, true );
        }
-       // init to update self
-       this.addWindowLut(rhs.getWindowLut());
+       // update window lut
+       this.addWindowLut(rhs.getCurrentWindowLut());
     };
 
     /**
@@ -444,7 +444,7 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
 dwv.image.View.prototype.generateImageData = function( array )
 {
     var image = this.getImage();
-    var windowLut = this.getWindowLut();
+    var windowLut = this.getCurrentWindowLut();
     windowLut.update();
     var sliceSize = image.getGeometry().getSize().getSliceSize();
     var sliceOffset = sliceSize * this.getCurrentPosition().k;

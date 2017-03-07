@@ -117,15 +117,10 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
     var signedShift = 0;
 
     /**
-     * Get the window center.
-     * @return {Number} The window center.
+     * Get the window / level.
+     * @return {Object} The window / level.
      */
-    this.getCenter = function () { return windowLevel.getCenter(); };
-    /**
-     * Get the window width.
-     * @return {Number} The window width.
-     */
-    this.getWidth = function () { return windowLevel.getWidth(); };
+    this.getWindowLevel = function () { return windowLevel; };
     /**
      * Get the signed flag.
      * @return {Boolean} The signed flag.
