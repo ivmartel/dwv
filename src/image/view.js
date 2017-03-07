@@ -643,7 +643,7 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
             var center = parseFloat( windowCenter[j], 10 );
             if ( width ) {
                 name = "Default"+j;
-                var windowCenterWidthExplanation = dicomElements.getFromKey("x00281055");
+                var windowCenterWidthExplanation = dicomElements.getFromKey("x00281055", true);
                 if ( windowCenterWidthExplanation ) {
                     name = windowCenterWidthExplanation[j];
                 }
