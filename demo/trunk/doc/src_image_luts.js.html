@@ -196,11 +196,11 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
     var windowLevel = null;
 
     /**
-     * Flag to know if the lut needs update or not.
+     * Flag to know if the lut is ready or not.
      * @private
      * @type Boolean
      */
-    var needsUpdate = false;
+    var isReady = false;
 
     /**
      * Shift for signed data.
@@ -226,6 +226,13 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
     this.getRescaleLut = function () { return rescaleLut; };
 
     /**
+     * Is the lut ready to use or not? If not, the user must
+     * call 'update'.
+     * @return {Boolean} True if the lut is ready to use.
+     */
+    this.isReady = function () { return isReady; };
+
+    /**
      * Set the window center and width.
      * @param {Object} wl The window level.
      */
@@ -233,7 +240,8 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
     {
         // store the window values
         windowLevel = wl;
-        needsUpdate = true;
+        // update ready flag
+        isReady = false;
     };
 
     /**
@@ -241,7 +249,8 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
      */
     this.update = function ()
     {
-        if ( !needsUpdate ) {
+        // check if we need to update
+        if ( isReady ) {
             return;
         }
 
@@ -266,8 +275,9 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
         {
             lut[i] = windowLevel.apply( rescaleLut.getValue(i) );
         }
-        // set update flag
-        needsUpdate = false;
+
+        // update ready flag
+        isReady = true;
     };
 
     /**

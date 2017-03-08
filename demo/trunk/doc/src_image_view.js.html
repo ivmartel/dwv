@@ -277,9 +277,6 @@ dwv.image.View = function (image)
      */
     var currentFrame = null;
 
-    // closure to self
-    var self = this;
-
     /**
      * Get the associated image.
      * @return {Image} The associated image.
@@ -293,6 +290,7 @@ dwv.image.View = function (image)
 
     /**
      * Get the window LUT of the image.
+     * Warning: can be undefined in no window/level was set.
      * @return {Window} The window LUT of the image.
      */
     this.getCurrentWindowLut = function (rsi) {
@@ -313,23 +311,6 @@ dwv.image.View = function (image)
     };
 
     /**
-     * Initialise the view. Only called at construction.
-     * @private
-     */
-    function initialise()
-    {
-        // create the rescale lookup table
-        var rescaleLut = new dwv.image.lut.Rescale(
-            image.getRescaleSlopeAndIntercept(0), image.getMeta().BitsStored );
-        // create the window lookup table
-        var windowLut = new dwv.image.lut.Window(rescaleLut, image.getMeta().IsSigned);
-        self.addWindowLut(windowLut);
-    }
-
-    // default constructor
-    initialise();
-
-    /**
      * Get the window presets.
      * @return {Object} The window presets.
      */
@@ -338,10 +319,23 @@ dwv.image.View = function (image)
      * Set the window presets.
      * @param {Object} presets The window presets.
      */
-    this.setWindowPresets = function(presets) {
+    this.setWindowPresets = function (presets) {
         windowPresets = presets;
-        var key0 = Object.keys(presets)[0];
-        this.setWindowLevel(presets[key0].wl.getCenter(), presets[key0].wl.getWidth());
+    };
+    /**
+     * Add window presets to the existing ones.
+     * @param {Number} k The slice the preset belong to.
+     * @param {Object} presets The window presets.
+     */
+    this.addWindowPresets = function (k, presets) {
+        // TODO...
+        // update minmax
+        //if (typeof windowPresets.minmax !== "undefined" &amp;&amp;
+        //    typeof presets.minmax !== "undefined") {
+        //}
+        // update dicom
+        // ...
+        windowPresets = presets;
     };
 
     /**
@@ -460,8 +454,8 @@ dwv.image.View = function (image)
              "j": this.getCurrentPosition().j,
              "k": this.getCurrentPosition().k + 1}, true );
        }
-       // update window lut
-       this.addWindowLut(rhs.getCurrentWindowLut());
+       // add window presets
+       this.addWindowPresets( newSLiceNumber, rhs.getWindowPresets() );
     };
 
     /**
@@ -475,11 +469,46 @@ dwv.image.View = function (image)
         // window width shall be >= 1 (see https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
         if ( width >= 1 ) {
             var wl = new dwv.image.WindowLevel(center, width);
+            var keys = Object.keys(windowLuts);
+
+            // create the first lut if none exists
+            if (keys.length === 0) {
+                // create the rescale lookup table
+                var rescaleLut = new dwv.image.lut.Rescale(
+                    image.getRescaleSlopeAndIntercept(0), image.getMeta().BitsStored );
+                // create the window lookup table
+                var windowLut = new dwv.image.lut.Window(rescaleLut, image.getMeta().IsSigned);
+                this.addWindowLut(windowLut);
+            }
+
+            // set window level on luts
             for ( var key in windowLuts ) {
                 windowLuts[key].setWindowLevel(wl);
             }
+
             this.fireEvent({"type": "wl-change", "wc": center, "ww": width });
         }
+    };
+
+    /**
+     * Set the window level to the preset with the input name.
+     * @param {String} name The name of the preset to activate.
+     */
+    this.setWindowLevelPreset = function (name) {
+        var preset = this.getWindowPresets()[name];
+        if ( typeof preset === "undefined" ) {
+            throw new Error("Unknown window level preset: '" + name + "'");
+        }
+        this.setWindowLevel( preset.wl.getCenter(), preset.wl.getWidth() );
+    };
+
+    /**
+     * Set the window level to the preset with the input id.
+     * @param {Number} id The id of the preset to activate.
+     */
+    this.setWindowLevelPresetById = function (id) {
+        var keys = Object.keys(this.getWindowPresets());
+        this.setWindowLevelPreset( keys[id] );
     };
 
     /**

@@ -715,12 +715,8 @@ dwv.App = function ()
      */
     this.initWLDisplay = function ()
     {
-        // set window/level from first preset
-        var presets = viewController.getPresets();
-        var key0 = Object.keys(presets)[0];
-        viewController.setWindowLevel(
-            presets[key0].wl.getCenter(),
-            presets[key0].wl.getWidth() );
+        // set window/level to first preset
+        viewController.setWindowLevelPresetById(0);
         // default position
         viewController.setCurrentPosition2D(0,0);
         // default frame
@@ -1056,15 +1052,8 @@ dwv.App = function ()
      */
     this.onChangeWindowLevelPreset = function (/*event*/)
     {
-        var name = this.value;
-        var preset = viewController.getPresets()[name];
-        // check if we have it
-        if ( !preset ) {
-            throw new Error("Unknown window level preset: '" + name + "'");
-        }
-        // enable it
-        viewController.setWindowLevel(
-            preset.wl.getCenter(), preset.wl.getWidth() );
+        // value should be the name of the preset
+        viewController.setWindowLevelPreset( this.value );
     };
 
     /**
