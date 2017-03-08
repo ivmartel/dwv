@@ -624,10 +624,10 @@ dwv.App = function ()
     {
         // set window/level from first preset
         var presets = viewController.getPresets();
-        var keys = Object.keys(presets);
+        var key0 = Object.keys(presets)[0];
         viewController.setWindowLevel(
-            presets[keys[0]].center,
-            presets[keys[0]].width );
+            presets[key0].wl.getCenter(),
+            presets[key0].wl.getWidth() );
         // default position
         viewController.setCurrentPosition2D(0,0);
         // default frame
@@ -971,7 +971,7 @@ dwv.App = function ()
         }
         // enable it
         viewController.setWindowLevel(
-            preset.center, preset.width );
+            preset.wl.getCenter(), preset.wl.getWidth() );
     };
 
     /**
@@ -1302,9 +1302,6 @@ dwv.App = function ()
         view.addEventListener("position-change", fireEvent);
         view.addEventListener("slice-change", fireEvent);
         view.addEventListener("frame-change", fireEvent);
-
-        // update presets with loaded image (used in w/l tool)
-        viewController.updatePresets(image, true);
 
         // initialise the toolbox
         if ( toolboxController ) {
@@ -2249,8 +2246,6 @@ dwv.ViewController = function ( view )
 {
     // closure to self
     var self = this;
-    // Window/level presets
-    var presets = null;
     // Slice/frame player ID (created by setInterval)
     var playerID = null;
 
@@ -2258,7 +2253,7 @@ dwv.ViewController = function ( view )
      * Get the window/level presets.
      * @return {Object} The presets.
      */
-    this.getPresets = function () { return presets; };
+    this.getPresets = function () { return view.getWindowPresets(); };
 
     /**
      * Check if the controller is playing.
@@ -2440,50 +2435,6 @@ dwv.ViewController = function ( view )
     this.setWindowLevel = function (wc, ww)
     {
         view.setWindowLevel(wc,ww);
-    };
-
-    /**
-     * Update the window/level presets.
-     * @param {Object} image The associated image.
-     * @param {Boolean} full If true, shows all presets.
-     */
-    this.updatePresets = function (image)
-    {
-        // store the manual preset
-        var manual = null;
-        if ( presets ) {
-            manual = presets.manual;
-        }
-        // reinitialize the presets
-        presets = {};
-
-        // DICOM presets
-        var dicomPresets = view.getWindowPresets();
-        if ( dicomPresets ) {
-            for( var i = 0; i < dicomPresets.length; ++i ) {
-                presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
-            }
-        }
-
-        // Image presets
-
-        // min/max preset
-        var range = image.getRescaledDataRange();
-        var width = range.max - range.min;
-        var center = range.min + width/2;
-        presets.minmax = {"center": center, "width": width};
-        // optional modality presets
-        if ( typeof dwv.tool.defaultpresets !== "undefined" ) {
-            var modality = image.getMeta().Modality;
-            for( var key in dwv.tool.defaultpresets[modality] ) {
-                presets[key] = dwv.tool.defaultpresets[modality][key];
-            }
-        }
-
-        // Manual preset
-        if ( manual ){
-            presets.manual = manual;
-        }
     };
 
     /**
@@ -14432,7 +14383,8 @@ dwv.image.View = function (image)
      */
     this.setWindowPresets = function(presets) {
         windowPresets = presets;
-        this.setWindowLevel(presets[0].center, presets[0].width);
+        var key0 = Object.keys(presets)[0];
+        this.setWindowLevel(presets[key0].wl.getCenter(), presets[key0].wl.getWidth());
     };
 
     /**
@@ -14606,19 +14558,29 @@ dwv.image.View = function (image)
 };
 
 /**
+ * Get the image window/level that covers the full data range.
+ * Warning: uses the latest set rescale LUT or the default linear one.
+ */
+dwv.image.View.prototype.getWindowLevelMinMax = function ()
+{
+    var range = this.getImage().getRescaledDataRange();
+    var min = range.min;
+    var max = range.max;
+    var width = max - min;
+    var center = min + width/2;
+    return new dwv.image.WindowLevel(center, width);
+};
+
+/**
  * Set the image window/level to cover the full data range.
  * Warning: uses the latest set rescale LUT or the default linear one.
  */
 dwv.image.View.prototype.setWindowLevelMinMax = function()
 {
     // calculate center and width
-    var range = this.getImage().getRescaledDataRange();
-    var min = range.min;
-    var max = range.max;
-    var width = max - min;
-    var center = min + width/2;
+    var wl = this.getWindowLevelMinMax();
     // set window level
-    this.setWindowLevel(center,width);
+    this.setWindowLevel(wl.getCenter(), wl.getWidth());
 };
 
 /**
@@ -14816,36 +14778,49 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
 {
     // view
     var view = new dwv.image.View(image);
+
     // presets
-    var windowPresets = [];
-    // WindowCenter and WindowWidth
+    var windowPresets = {};
+
+    // DICOM presets
     var windowCenter = dicomElements.getFromKey("x00281050", true);
     var windowWidth = dicomElements.getFromKey("x00281051", true);
+    var windowCWExplanation = dicomElements.getFromKey("x00281055", true);
     if ( windowCenter && windowWidth ) {
         var name;
         for ( var j = 0; j < windowCenter.length; ++j) {
-            var width = parseFloat( windowWidth[j], 10 );
             var center = parseFloat( windowCenter[j], 10 );
-            if ( width ) {
+            var width = parseFloat( windowWidth[j], 10 );
+            if ( center && width ) {
                 name = "Default"+j;
-                var windowCenterWidthExplanation = dicomElements.getFromKey("x00281055", true);
-                if ( windowCenterWidthExplanation ) {
-                    name = windowCenterWidthExplanation[j];
+                if ( windowCWExplanation ) {
+                    name = windowCWExplanation[j];
                 }
-                windowPresets.push({
-                    "center": center,
-                    "width": width,
-                    "name": name
-                });
+                windowPresets[name] = {
+                    "wl": new dwv.image.WindowLevel(center, width),
+                    "name": name };
             }
         }
     }
-    if ( windowPresets.length !== 0 ) {
-        view.setWindowPresets( windowPresets );
+
+    // min/max
+    windowPresets.minmax = {
+        "wl": view.getWindowLevelMinMax(),
+        "name": "minmax" };
+
+    // optional modality presets
+    if ( typeof dwv.tool.defaultpresets !== "undefined" ) {
+        var modality = image.getMeta().Modality;
+        for( var key in dwv.tool.defaultpresets[modality] ) {
+            var preset = dwv.tool.defaultpresets[modality][key];
+            windowPresets[key] = {
+                "wl": new dwv.image.WindowLevel(preset.center, preset.width),
+                "name": key };
+        }
     }
-    else {
-        view.setWindowLevelMinMax();
-    }
+
+    // store
+    view.setWindowPresets( windowPresets );
 
     return view;
 };
@@ -21137,7 +21112,9 @@ dwv.tool.WindowLevel = function(app)
             // store the manual preset
             var windowCenter = parseInt(app.getViewController().getWindowLevel().center, 10);
             var windowWidth = parseInt(app.getViewController().getWindowLevel().width, 10);
-            app.getViewController().getPresets().manual = {"center": windowCenter, "width": windowWidth};
+            app.getViewController().getPresets().manual = {
+                "wl": new dwv.image.WindowLevel(windowCenter, windowWidth),
+                "name": "manual"};
             // update gui
             if ( gui ) {
                 gui.initialise();
