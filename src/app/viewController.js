@@ -16,7 +16,28 @@ dwv.ViewController = function ( view )
      * Get the window/level presets.
      * @return {Object} The presets.
      */
-    this.getPresets = function () { return view.getWindowPresets(); };
+    this.getWindowLevelPresets = function ()
+    {
+        return view.getWindowPresets();
+    };
+
+    /**
+     * Set the window level to the preset with the input name.
+     * @param {String} name The name of the preset to activate.
+     */
+    this.setWindowLevelPreset = function (name)
+    {
+        view.setWindowLevelPreset(name);
+    };
+
+    /**
+     * Set the window level to the preset with the input id.
+     * @param {Number} id The id of the preset to activate.
+     */
+    this.setWindowLevelPresetById = function (id)
+    {
+        view.setWindowLevelPresetById(id);
+    };
 
     /**
      * Check if the controller is playing.
