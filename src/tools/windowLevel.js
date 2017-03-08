@@ -73,7 +73,9 @@ dwv.tool.WindowLevel = function(app)
             // store the manual preset
             var windowCenter = parseInt(app.getViewController().getWindowLevel().center, 10);
             var windowWidth = parseInt(app.getViewController().getWindowLevel().width, 10);
-            app.getViewController().getPresets().manual = {"center": windowCenter, "width": windowWidth};
+            app.getViewController().getPresets().manual = {
+                "wl": new dwv.image.WindowLevel(windowCenter, windowWidth),
+                "name": "manual"};
             // update gui
             if ( gui ) {
                 gui.initialise();

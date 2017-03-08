@@ -624,10 +624,10 @@ dwv.App = function ()
     {
         // set window/level from first preset
         var presets = viewController.getPresets();
-        var keys = Object.keys(presets);
+        var key0 = Object.keys(presets)[0];
         viewController.setWindowLevel(
-            presets[keys[0]].center,
-            presets[keys[0]].width );
+            presets[key0].wl.getCenter(),
+            presets[key0].wl.getWidth() );
         // default position
         viewController.setCurrentPosition2D(0,0);
         // default frame
@@ -971,7 +971,7 @@ dwv.App = function ()
         }
         // enable it
         viewController.setWindowLevel(
-            preset.center, preset.width );
+            preset.wl.getCenter(), preset.wl.getWidth() );
     };
 
     /**
@@ -1302,9 +1302,6 @@ dwv.App = function ()
         view.addEventListener("position-change", fireEvent);
         view.addEventListener("slice-change", fireEvent);
         view.addEventListener("frame-change", fireEvent);
-
-        // update presets with loaded image (used in w/l tool)
-        viewController.updatePresets(image, true);
 
         // initialise the toolbox
         if ( toolboxController ) {
