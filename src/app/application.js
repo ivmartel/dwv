@@ -780,9 +780,13 @@ dwv.App = function ()
      * Handle window/level change.
      * @param {Object} event The event fired when changing the window/level.
      */
-    this.onWLChange = function (/*event*/)
+    this.onWLChange = function (event)
     {
-        generateAndDrawImage();
+        // generate and draw if no skip flag
+        if (typeof event.skipGenerate === "undefined" ||
+            event.skipGenerate === false) {
+            generateAndDrawImage();
+        }
     };
 
     /**
