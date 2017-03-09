@@ -118,7 +118,7 @@ dwv.gui.WindowLevel = function (app)
 
         // create preset select
         var select = dwv.html.createHtmlSelect("presetSelect",
-            app.getViewController().getWindowLevelPresets(), "wl.presets", true);
+            app.getViewController().getWindowLevelPresetsNames(), "wl.presets", true);
         select.onchange = app.onChangeWindowLevelPreset;
         select.title = "Select w/l preset.";
         select.setAttribute("data-inline","true");

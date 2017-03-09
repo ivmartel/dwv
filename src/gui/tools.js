@@ -140,7 +140,7 @@ dwv.gui.base.WindowLevel = function (app)
     {
         // create new preset select
         var wlSelector = dwv.html.createHtmlSelect("presetSelect",
-            app.getViewController().getWindowLevelPresets(), "wl.presets", true);
+            app.getViewController().getWindowLevelPresetsNames(), "wl.presets", true);
         wlSelector.onchange = app.onChangeWindowLevelPreset;
         wlSelector.title = "Select w/l preset.";
 

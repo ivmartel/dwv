@@ -55,8 +55,21 @@ dwv.tool.WindowLevel = function(app)
         // calculate new window level
         var windowCenter = parseInt(app.getViewController().getWindowLevel().center, 10) + diffY;
         var windowWidth = parseInt(app.getViewController().getWindowLevel().width, 10) + diffX;
-        // update GUI
-        app.getViewController().setWindowLevel(windowCenter,windowWidth);
+
+        // add the manual preset to the view
+        app.getViewController().addWindowLevelPresets( { "manual": {
+            "wl": new dwv.image.WindowLevel(windowCenter, windowWidth),
+            "name": "manual"} } );
+        app.getViewController().setWindowLevelPreset("manual");
+
+        // update gui
+        if ( gui ) {
+            // initialise to add the manual preset
+            gui.initialise();
+            // set selected preset
+            dwv.gui.setSelected(app.getElement("presetSelect"), "manual");
+        }
+
         // store position
         self.x0 = event._x;
         self.y0 = event._y;
@@ -70,18 +83,6 @@ dwv.tool.WindowLevel = function(app)
         // set start flag
         if( self.started ) {
             self.started = false;
-            // store the manual preset
-            var windowCenter = parseInt(app.getViewController().getWindowLevel().center, 10);
-            var windowWidth = parseInt(app.getViewController().getWindowLevel().width, 10);
-            app.getViewController().getWindowLevelPresets().manual = {
-                "wl": new dwv.image.WindowLevel(windowCenter, windowWidth),
-                "name": "manual"};
-            // update gui
-            if ( gui ) {
-                gui.initialise();
-                // set selected
-                dwv.gui.setSelected(app.getElement("presetSelect"), "manual");
-            }
         }
     };
 

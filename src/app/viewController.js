@@ -13,12 +13,21 @@ dwv.ViewController = function ( view )
     var playerID = null;
 
     /**
-     * Get the window/level presets.
-     * @return {Object} The presets.
+     * Get the window/level presets names.
+     * @return {Array} The presets names.
      */
-    this.getWindowLevelPresets = function ()
+    this.getWindowLevelPresetsNames = function ()
     {
-        return view.getWindowPresets();
+        return view.getWindowPresetsNames();
+    };
+
+    /**
+     * Add window/level presets to the view.
+     * @return {Object} The list of presets.
+     */
+    this.addWindowLevelPresets = function (presets)
+    {
+        return view.addWindowPresets(presets);
     };
 
     /**

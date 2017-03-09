@@ -165,6 +165,14 @@ dwv.image.View = function (image)
      * @type Object
      */
     var windowPresets = null;
+
+    /**
+     * Current window preset name.
+     * @private
+     * @type String
+     */
+    var currentPresetName = null;
+
     /**
      * colour map.
      * @private
@@ -201,11 +209,30 @@ dwv.image.View = function (image)
      * @return {Window} The window LUT of the image.
      */
     this.getCurrentWindowLut = function (rsi) {
+        var sliceNumber = this.getCurrentPosition().k;
+        // use current rsi if not provided
         if ( typeof rsi === "undefined" ) {
-            var sliceNumber = this.getCurrentPosition().k;
             rsi = image.getRescaleSlopeAndIntercept(sliceNumber);
         }
-        return windowLuts[ rsi.toString() ];
+        // get the lut
+        var wlut = windowLuts[ rsi.toString() ];
+        // special case for 'perslice' presets
+        if (currentPresetName &&
+            typeof windowPresets[currentPresetName].perslice !== "undefined" &&
+            windowPresets[currentPresetName].perslice === true ) {
+            // get the preset for this slice
+            var wl = windowPresets[currentPresetName].wl[sliceNumber];
+            // apply it if different from previous
+            if (!wlut.getWindowLevel().equals(wl)) {
+                // set slice window level
+                wlut.setWindowLevel(wl);
+                // TODO update InfoController window/level...
+            }
+        }
+        // update in case of wl change
+        wlut.update();
+        // return
+        return wlut;
     };
     /**
      * Add the window LUT to the list.
@@ -221,7 +248,18 @@ dwv.image.View = function (image)
      * Get the window presets.
      * @return {Object} The window presets.
      */
-    this.getWindowPresets = function() { return windowPresets; };
+    this.getWindowPresets = function () {
+        return windowPresets;
+    };
+
+    /**
+     * Get the window presets names.
+     * @return {Object} The list of window presets names.
+     */
+    this.getWindowPresetsNames = function () {
+        return Object.keys(windowPresets);
+    };
+
     /**
      * Set the window presets.
      * @param {Object} presets The window presets.
@@ -231,18 +269,27 @@ dwv.image.View = function (image)
     };
     /**
      * Add window presets to the existing ones.
-     * @param {Number} k The slice the preset belong to.
      * @param {Object} presets The window presets.
+     * @param {Number} k The slice the preset belong to.
      */
-    this.addWindowPresets = function (k, presets) {
-        // TODO...
-        // update minmax
-        //if (typeof windowPresets.minmax !== "undefined" &&
-        //    typeof presets.minmax !== "undefined") {
-        //}
-        // update dicom
-        // ...
-        windowPresets = presets;
+    this.addWindowPresets = function (presets, k) {
+        var keys = Object.keys(presets);
+        var key = null;
+        for (var i = 0; i < keys.length; ++i) {
+            key = keys[i];
+            if (typeof windowPresets[key] !== "undefined") {
+                if (typeof windowPresets[key].perslice !== "undefined" &&
+                    windowPresets[key].perslice === true) {
+                    // use first new preset wl...
+                    windowPresets[key].wl.splice(k, 0, presets[key].wl[0]);
+                } else {
+                    windowPresets[key] = presets[key];
+                }
+            } else {
+                // add new
+                windowPresets[key] = presets[key];
+            }
+        }
     };
 
     /**
@@ -353,16 +400,16 @@ dwv.image.View = function (image)
     this.append = function( rhs )
     {
        // append images
-       var newSLiceNumber = this.getImage().appendSlice( rhs.getImage() );
+       var newSliceNumber = this.getImage().appendSlice( rhs.getImage() );
        // update position if a slice was appended before
-       if ( newSLiceNumber <= this.getCurrentPosition().k ) {
+       if ( newSliceNumber <= this.getCurrentPosition().k ) {
            this.setCurrentPosition(
              {"i": this.getCurrentPosition().i,
              "j": this.getCurrentPosition().j,
              "k": this.getCurrentPosition().k + 1}, true );
        }
        // add window presets
-       this.addWindowPresets( newSLiceNumber, rhs.getWindowPresets() );
+       this.addWindowPresets( rhs.getWindowPresets(), newSliceNumber );
     };
 
     /**
@@ -393,6 +440,7 @@ dwv.image.View = function (image)
                 windowLuts[key].setWindowLevel(wl);
             }
 
+            // fire window level change event
             this.fireEvent({"type": "wl-change", "wc": center, "ww": width });
         }
     };
@@ -405,6 +453,13 @@ dwv.image.View = function (image)
         var preset = this.getWindowPresets()[name];
         if ( typeof preset === "undefined" ) {
             throw new Error("Unknown window level preset: '" + name + "'");
+        }
+        // update member preset name
+        currentPresetName = name;
+        // special 'perslice' case
+        if (typeof preset.perslice !== "undefined" &&
+            preset.perslice === true) {
+            preset = { "wl": preset.wl[this.getCurrentPosition().k] };
         }
         this.setWindowLevel( preset.wl.getCenter(), preset.wl.getWidth() );
     };
@@ -479,13 +534,12 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
 /**
  * Generate display image data to be given to a canvas.
  * @param {Array} array The array to fill in.
- * @param {Number} sliceNumber The slice position.
  */
 dwv.image.View.prototype.generateImageData = function( array )
 {
-    var image = this.getImage();
     var windowLut = this.getCurrentWindowLut();
-    windowLut.update();
+
+    var image = this.getImage();
     var sliceSize = image.getGeometry().getSize().getSliceSize();
     var sliceOffset = sliceSize * this.getCurrentPosition().k;
     var frame = (this.getCurrentFrame()) ? this.getCurrentFrame() : 0;
@@ -687,19 +741,21 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
             if ( center && width ) {
                 name = "Default"+j;
                 if ( windowCWExplanation ) {
-                    name = windowCWExplanation[j];
+                    name = dwv.dicom.cleanString(windowCWExplanation[j]);
                 }
                 windowPresets[name] = {
-                    "wl": new dwv.image.WindowLevel(center, width),
-                    "name": name };
+                    "wl": [new dwv.image.WindowLevel(center, width)],
+                    "name": name,
+                    "perslice": true};
             }
         }
     }
 
     // min/max
     windowPresets.minmax = {
-        "wl": view.getWindowLevelMinMax(),
-        "name": "minmax" };
+        "wl": [view.getWindowLevelMinMax()],
+        "name": "minmax",
+        "perslice": true };
 
     // optional modality presets
     if ( typeof dwv.tool.defaultpresets !== "undefined" ) {
@@ -708,7 +764,7 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
             var preset = dwv.tool.defaultpresets[modality][key];
             windowPresets[key] = {
                 "wl": new dwv.image.WindowLevel(preset.center, preset.width),
-                "name": key };
+                "name": key};
         }
     }
 
