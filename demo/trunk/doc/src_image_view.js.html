@@ -319,7 +319,10 @@ dwv.image.View = function (image)
             if (!wlut.getWindowLevel().equals(wl)) {
                 // set slice window level
                 wlut.setWindowLevel(wl);
-                // TODO update InfoController window/level...
+                // update InfoController window/level by firing special event
+                this.fireEvent({"type": "wl-change",
+                    "wc": wl.getCenter(), "ww": wl.getWidth(),
+                    "skipGenerate": true});
             }
         }
         // update in case of wl change

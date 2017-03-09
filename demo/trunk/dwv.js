@@ -780,9 +780,13 @@ dwv.App = function ()
      * Handle window/level change.
      * @param {Object} event The event fired when changing the window/level.
      */
-    this.onWLChange = function (/*event*/)
+    this.onWLChange = function (event)
     {
-        generateAndDrawImage();
+        // generate and draw if no skip flag
+        if (typeof event.skipGenerate === "undefined" ||
+            event.skipGenerate === false) {
+            generateAndDrawImage();
+        }
     };
 
     /**
@@ -14391,7 +14395,10 @@ dwv.image.View = function (image)
             if (!wlut.getWindowLevel().equals(wl)) {
                 // set slice window level
                 wlut.setWindowLevel(wl);
-                // TODO update InfoController window/level...
+                // update InfoController window/level by firing special event
+                this.fireEvent({"type": "wl-change",
+                    "wc": wl.getCenter(), "ww": wl.getWidth(),
+                    "skipGenerate": true});
             }
         }
         // update in case of wl change
