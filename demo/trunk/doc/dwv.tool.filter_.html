@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>dwv Source: src/app/viewController.js</title>
+	<title>dwv Namespace: filter</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -81,285 +81,118 @@
 <div class="row">
 
 	
-	<div class="col-md-12">
+	<div class="col-md-8">
 	
 		<div id="main">
 			
 
-		<h1 class="page-title">Source: src/app/viewController.js</h1>
-    
+	<h1 class="page-title">Namespace: filter</h1>
 <section>
-    <article>
-        <pre
-            class="sunlight-highlight-javascript linenums">// namespaces
-var dwv = dwv || {};
 
-/**
- * View controller.
- * @constructor
- */
-dwv.ViewController = function ( view )
-{
-    // closure to self
-    var self = this;
-    // Slice/frame player ID (created by setInterval)
-    var playerID = null;
+<header>
+    
+        <h2>
+            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.tool.html">.tool</a>.</span>
+        
+        filter
+        </h2>
+        
+    
+</header>
 
-    /**
-     * Get the window/level presets names.
-     * @return {Array} The presets names.
-     */
-    this.getWindowLevelPresetsNames = function ()
-    {
-        return view.getWindowPresetsNames();
-    };
 
-    /**
-     * Add window/level presets to the view.
-     * @return {Object} The list of presets.
-     */
-    this.addWindowLevelPresets = function (presets)
-    {
-        return view.addWindowPresets(presets);
-    };
+<article>
+    <div class="container-overview">
+    
+        
 
-    /**
-     * Set the window level to the preset with the input name.
-     * @param {String} name The name of the preset to activate.
-     */
-    this.setWindowLevelPreset = function (name)
-    {
-        view.setWindowLevelPreset(name);
-    };
+        
+<dl class="details">
+    
 
-    /**
-     * Set the window level to the preset with the input id.
-     * @param {Number} id The id of the preset to activate.
-     */
-    this.setWindowLevelPresetById = function (id)
-    {
-        view.setWindowLevelPresetById(id);
-    };
+	
 
-    /**
-     * Check if the controller is playing.
-     * @return {Boolean} True is the controler is playing slices/frames.
-     */
-    this.isPlaying = function () { return (playerID !== null); };
+	
 
-    /**
-     * Get the current position.
-     * @return {Object} The position.
-      */
-    this.getCurrentPosition = function ()
-    {
-        return view.getCurrentPosition();
-    };
+	
 
-    /**
-     * Set the current position.
-     * @param {Object} pos The position.
-     * @return {Boolean} False if not in bounds.
-      */
-    this.setCurrentPosition = function (pos)
-    {
-        return view.setCurrentPosition(pos);
-    };
+    
 
-    /**
-     * Set the current 2D (i,j) position.
-     * @param {Number} i The column index.
-     * @param {Number} j The row index.
-     * @return {Boolean} False if not in bounds.
-      */
-    this.setCurrentPosition2D = function (i, j)
-    {
-        return view.setCurrentPosition({
-            "i": i,
-            "j": j,
-            "k": view.getCurrentPosition().k
-        });
-    };
+    
 
-    /**
-     * Set the current slice position.
-     * @param {Number} k The slice index.
-     * @return {Boolean} False if not in bounds.
-      */
-    this.setCurrentSlice = function (k)
-    {
-        return view.setCurrentPosition({
-            "i": view.getCurrentPosition().i,
-            "j": view.getCurrentPosition().j,
-            "k": k
-        });
-    };
+    
 
-    /**
-     * Increment the current slice number.
-     * @return {Boolean} False if not in bounds.
-     */
-    this.incrementSliceNb = function ()
-    {
-        return self.setCurrentSlice( view.getCurrentPosition().k + 1 );
-    };
+    
 
-    /**
-     * Decrement the current slice number.
-     * @return {Boolean} False if not in bounds.
-     */
-    this.decrementSliceNb = function ()
-    {
-        return self.setCurrentSlice( view.getCurrentPosition().k - 1 );
-    };
+	
 
-    /**
-     * Get the current frame.
-     * @return {Number} The frame number.
-      */
-    this.getCurrentFrame = function ()
-    {
-        return view.getCurrentFrame();
-    };
+	
 
-    /**
-     * Set the current frame.
-     * @param {Number} number The frame number.
-     * @return {Boolean} False if not in bounds.
-      */
-    this.setCurrentFrame = function (number)
-    {
-        return view.setCurrentFrame(number);
-    };
+	
 
-    /**
-     * Increment the current frame.
-     * @return {Boolean} False if not in bounds.
-     */
-    this.incrementFrameNb = function ()
-    {
-        return view.setCurrentFrame( view.getCurrentFrame() + 1 );
-    };
+	
 
-    /**
-     * Decrement the current frame.
-     * @return {Boolean} False if not in bounds.
-     */
-    this.decrementFrameNb = function ()
-    {
-        return view.setCurrentFrame( view.getCurrentFrame() - 1 );
-    };
+	
 
-    /**
-     * Go to first slice .
-     * @return {Boolean} False if not in bounds.
-     * @deprecated Use the setCurrentSlice function.
-     */
-    this.goFirstSlice = function()
-    {
-        return view.setCurrentPosition({
-            "i": view.getCurrentPosition().i,
-            "j": view.getCurrentPosition().j,
-            "k": 0
-        });
-    };
 
-    /**
-     *
-     */
-     this.play = function ()
-     {
-         if ( playerID === null ) {
-             var nSlices = view.getImage().getGeometry().getSize().getNumberOfSlices();
-             var nFrames = view.getImage().getNumberOfFrames();
 
-             playerID = setInterval( function () {
-                 if ( nSlices !== 1 ) {
-                     if ( !self.incrementSliceNb() ) {
-                         self.setCurrentSlice(0);
-                     }
-                 } else if ( nFrames !== 1 ) {
-                     if ( !self.incrementFrameNb() ) {
-                         self.setCurrentFrame(0);
-                     }
-                 }
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_tools_filter.js.html">src/tools/filter.js</a>,
+				 <a href="src_tools_filter.js.html#sunlight-1-line-5">line 5</a>
+			</li>
+		</ul>
+	</dd>
+	
 
-             }, 300);
-         } else {
-             this.stop();
-         }
-     };
+	
 
-     /**
-      *
-      */
-      this.stop = function ()
-      {
-          if ( playerID !== null ) {
-              clearInterval(playerID);
-              playerID = null;
-          }
-      };
+	
 
-    /**
-     * Get the window/level.
-     * @return {Object} The window center and width.
-     */
-    this.getWindowLevel = function ()
-    {
-        return {
-            "width": view.getCurrentWindowLut().getWindowLevel().getWidth(),
-            "center": view.getCurrentWindowLut().getWindowLevel().getCenter()
-        };
-    };
+	
+</dl>
 
-    /**
-     * Set the window/level.
-     * @param {Number} wc The window center.
-     * @param {Number} ww The window width.
-     */
-    this.setWindowLevel = function (wc, ww)
-    {
-        view.setWindowLevel(wc,ww);
-    };
 
-    /**
-     * Get the colour map.
-     * @return {Object} The colour map.
-     */
-    this.getColourMap = function ()
-    {
-        return view.getColourMap();
-    };
+        
+    
+    </div>
 
-    /**
-     * Set the colour map.
-     * @param {Object} colourMap The colour map.
-     */
-    this.setColourMap = function (colourMap)
-    {
-        view.setColourMap(colourMap);
-    };
+    
 
-    /**
-     * Set the colour map from a name.
-     * @param {String} name The name of the colour map to set.
-     */
-    this.setColourMapFromName = function (name)
-    {
-        // check if we have it
-        if ( !dwv.tool.colourMaps[name] ) {
-            throw new Error("Unknown colour map: '" + name + "'");
-        }
-        // enable it
-        this.setColourMap( dwv.tool.colourMaps[name] );
-    };
+    
 
-}; // class dwv.ViewController
-</pre>
-    </article>
+    
+        <h3 class="subsection-title">Classes</h3>
+
+        <dl>
+            <dt><a href="dwv.tool.filter.Sharpen.html">Sharpen</a></dt>
+            <dd></dd>
+        
+            <dt><a href="dwv.tool.filter.Sobel.html">Sobel</a></dt>
+            <dd></dd>
+        
+            <dt><a href="dwv.tool.filter.Threshold.html">Threshold</a></dt>
+            <dd></dd>
+        </dl>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
 </section>
-
 
 
 
@@ -369,6 +202,10 @@ dwv.ViewController = function ( view )
 
 	<div class="clearfix"></div>
 
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
 	
 
 </div>
