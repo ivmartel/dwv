@@ -147,6 +147,14 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
     {
         // store the window values
         windowLevel = wl;
+        // possible signed shift
+        signedShift = 0;
+        windowLevel.setSignedOffset(0);
+        if ( isSigned ) {
+            var size = rescaleLut.getLength();
+            signedShift = size / 2;
+            windowLevel.setSignedOffset(rescaleLut.getRSI().getSlope() * signedShift);
+        }
         // update ready flag
         isReady = false;
     };
@@ -161,20 +169,15 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
             return;
         }
 
-        // check reascale lut
+        // check rescale lut
         if (!rescaleLut.isReady()) {
             rescaleLut.initialise();
         }
         // create window lut
+        var size = rescaleLut.getLength();
         if (!lut) {
             // use clamped array (polyfilled in browser.js)
-            lut = new Uint8ClampedArray(rescaleLut.getLength());
-        }
-        // calculate class members
-        var size = lut.length;
-        if ( isSigned ) {
-            signedShift = size / 2;
-            windowLevel.addSignedOffset(rescaleLut.getRSI().getSlope() * signedShift);
+            lut = new Uint8ClampedArray(size);
         }
         // by default WindowLevel returns a value in the [0,255] range
         // this is ok with regular Arrays and ClampedArray.

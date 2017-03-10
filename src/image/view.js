@@ -19,6 +19,12 @@ dwv.image.WindowLevel = function (center, width)
     }
 
     /**
+     * Signed data offset.
+     * @private
+     * @type Number
+     */
+    var signedOffset = 0;
+    /**
      * Output value minimum.
      * @private
      * @type Number
@@ -60,14 +66,15 @@ dwv.image.WindowLevel = function (center, width)
      * Initialise members.
      */
     function init() {
+        var c = center + signedOffset;
         // from the standard
-        xmin = center - 0.5 - ( (width-1) / 2 );
-        xmax = center - 0.5 + ( (width-1) / 2 );
+        xmin = c - 0.5 - ( (width-1) / 2 );
+        xmax = c - 0.5 + ( (width-1) / 2 );
         // develop the equation:
         // y = ( ( x - (c - 0.5) ) / (w-1) + 0.5 ) * (ymax - ymin) + ymin
         // y = ( x / (w-1) ) * (ymax - ymin) + ( -(c - 0.5) / (w-1) + 0.5 ) * (ymax - ymin) + ymin
         slope = (ymax - ymin) / (width-1);
-        inter = ( -(center - 0.5) / (width-1) + 0.5 ) * (ymax - ymin) + ymin;
+        inter = ( -(c - 0.5) / (width-1) + 0.5 ) * (ymax - ymin) + ymin;
     }
 
     // call init
@@ -99,8 +106,8 @@ dwv.image.WindowLevel = function (center, width)
      * Set the signed offset.
      * @param {Number} The signed data offset, typically: slope * ( size / 2).
      */
-    this.addSignedOffset = function (offset) {
-        center += offset;
+    this.setSignedOffset = function (offset) {
+        signedOffset = offset;
         // re-initialise
         init();
     };
