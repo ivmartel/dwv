@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>dwv Class: BucketQueue</title>
+	<title>dwv Namespace: filter</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -86,15 +86,15 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: BucketQueue</h1>
+	<h1 class="page-title">Namespace: filter</h1>
 <section>
 
 <header>
     
         <h2>
-            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.math.html">.math</a>.</span>
+            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.tool.html">.tool</a>.</span>
         
-        BucketQueue
+        filter
         </h2>
         
     
@@ -105,34 +105,8 @@
     <div class="container-overview">
     
         
-<hr>
-<dt>
-    <h4 class="name" id="BucketQueue"><span class="type-signature"></span>new BucketQueue()</h4>
-    
-    
-</dt>
-<dd>
 
-    
-    <div class="description">
-        Circular Bucket Queue.
-
-Returns input'd points in sorted order. All operations run in roughly O(1)
-time (for input with small cost values), but it has a strict requirement:
-
-If the most recent point had a cost of c, any points added should have a cost
-c' in the range c <= c' <= c + (capacity - 1).
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
+        
 <dl class="details">
     
 
@@ -167,8 +141,8 @@ c' in the range c <= c' <= c + (capacity - 1).
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_math_bucketQueue.js.html">src/math/bucketQueue.js</a>,
-				 <a href="src_math_bucketQueue.js.html#sunlight-1-line-19">line 19</a>
+				<a href="src_tools_filter.js.html">src/tools/filter.js</a>,
+				 <a href="src_tools_filter.js.html#sunlight-1-line-5">line 5</a>
 			</li>
 		</ul>
 	</dd>
@@ -182,21 +156,7 @@ c' in the range c <= c' <= c + (capacity - 1).
 </dl>
 
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
+        
     
     </div>
 
@@ -204,6 +164,19 @@ c' in the range c <= c' <= c + (capacity - 1).
 
     
 
+    
+        <h3 class="subsection-title">Classes</h3>
+
+        <dl>
+            <dt><a href="dwv.tool.filter.Sharpen.html">Sharpen</a></dt>
+            <dd></dd>
+        
+            <dt><a href="dwv.tool.filter.Sobel.html">Sobel</a></dt>
+            <dd></dd>
+        
+            <dt><a href="dwv.tool.filter.Threshold.html">Threshold</a></dt>
+            <dd></dd>
+        </dl>
     
 
     
