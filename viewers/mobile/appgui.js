@@ -63,7 +63,7 @@ dwv.gui.displayProgress = function (percent) {
     if( percent < 100 ) {
         $.mobile.loading("show", {text: percent+"%", textVisible: true, theme: "b"} );
     }
-    else if( percent === 100 ) {
+    else if( percent >= 100 ) {
         $.mobile.loading("hide");
     }
 };

@@ -471,6 +471,8 @@ dwv.App = function ()
             if ( drawController ) {
                 drawController.activateDrawLayer(viewController);
             }
+            fireEvent({type: "load-progress", lengthComputable: true,
+                loaded: 100, total: 100});
             fireEvent({ 'type': 'load-end' });
         };
         fileIO.onprogress = onLoadProgress;
@@ -543,6 +545,8 @@ dwv.App = function ()
             if ( drawController ) {
                 drawController.activateDrawLayer(viewController);
             }
+            fireEvent({type: "load-progress", lengthComputable: true,
+                loaded: 100, total: 100});
             fireEvent({ 'type': 'load-end' });
         };
         urlIO.onprogress = onLoadProgress;
@@ -1220,7 +1224,7 @@ dwv.App = function ()
         fireEvent(event);
         if( event.lengthComputable )
         {
-            var percent = Math.round((event.loaded / event.total) * 100);
+            var percent = Math.ceil((event.loaded / event.total) * 100);
             dwv.gui.displayProgress(percent);
         }
     }
