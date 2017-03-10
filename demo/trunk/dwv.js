@@ -13738,6 +13738,14 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
     {
         // store the window values
         windowLevel = wl;
+        // possible signed shift
+        signedShift = 0;
+        windowLevel.setSignedOffset(0);
+        if ( isSigned ) {
+            var size = rescaleLut.getLength();
+            signedShift = size / 2;
+            windowLevel.setSignedOffset(rescaleLut.getRSI().getSlope() * signedShift);
+        }
         // update ready flag
         isReady = false;
     };
@@ -13752,20 +13760,15 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
             return;
         }
 
-        // check reascale lut
+        // check rescale lut
         if (!rescaleLut.isReady()) {
             rescaleLut.initialise();
         }
         // create window lut
+        var size = rescaleLut.getLength();
         if (!lut) {
             // use clamped array (polyfilled in browser.js)
-            lut = new Uint8ClampedArray(rescaleLut.getLength());
-        }
-        // calculate class members
-        var size = lut.length;
-        if ( isSigned ) {
-            signedShift = size / 2;
-            windowLevel.addSignedOffset(rescaleLut.getRSI().getSlope() * signedShift);
+            lut = new Uint8ClampedArray(size);
         }
         // by default WindowLevel returns a value in the [0,255] range
         // this is ok with regular Arrays and ClampedArray.
@@ -14188,6 +14191,12 @@ dwv.image.WindowLevel = function (center, width)
     }
 
     /**
+     * Signed data offset.
+     * @private
+     * @type Number
+     */
+    var signedOffset = 0;
+    /**
      * Output value minimum.
      * @private
      * @type Number
@@ -14229,14 +14238,15 @@ dwv.image.WindowLevel = function (center, width)
      * Initialise members.
      */
     function init() {
+        var c = center + signedOffset;
         // from the standard
-        xmin = center - 0.5 - ( (width-1) / 2 );
-        xmax = center - 0.5 + ( (width-1) / 2 );
+        xmin = c - 0.5 - ( (width-1) / 2 );
+        xmax = c - 0.5 + ( (width-1) / 2 );
         // develop the equation:
         // y = ( ( x - (c - 0.5) ) / (w-1) + 0.5 ) * (ymax - ymin) + ymin
         // y = ( x / (w-1) ) * (ymax - ymin) + ( -(c - 0.5) / (w-1) + 0.5 ) * (ymax - ymin) + ymin
         slope = (ymax - ymin) / (width-1);
-        inter = ( -(center - 0.5) / (width-1) + 0.5 ) * (ymax - ymin) + ymin;
+        inter = ( -(c - 0.5) / (width-1) + 0.5 ) * (ymax - ymin) + ymin;
     }
 
     // call init
@@ -14268,8 +14278,8 @@ dwv.image.WindowLevel = function (center, width)
      * Set the signed offset.
      * @param {Number} The signed data offset, typically: slope * ( size / 2).
      */
-    this.addSignedOffset = function (offset) {
-        center += offset;
+    this.setSignedOffset = function (offset) {
+        signedOffset = offset;
         // re-initialise
         init();
     };
