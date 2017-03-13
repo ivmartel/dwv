@@ -471,8 +471,6 @@ dwv.App = function ()
             if ( drawController ) {
                 drawController.activateDrawLayer(viewController);
             }
-            fireEvent({type: "load-progress", lengthComputable: true,
-                loaded: 100, total: 100});
             fireEvent({ 'type': 'load-end' });
         };
         fileIO.onprogress = onLoadProgress;
@@ -545,8 +543,6 @@ dwv.App = function ()
             if ( drawController ) {
                 drawController.activateDrawLayer(viewController);
             }
-            fireEvent({type: "load-progress", lengthComputable: true,
-                loaded: 100, total: 100});
             fireEvent({ 'type': 'load-end' });
         };
         urlIO.onprogress = onLoadProgress;
@@ -626,12 +622,8 @@ dwv.App = function ()
      */
     this.initWLDisplay = function ()
     {
-        // set window/level from first preset
-        var presets = viewController.getPresets();
-        var keys = Object.keys(presets);
-        viewController.setWindowLevel(
-            presets[keys[0]].center,
-            presets[keys[0]].width );
+        // set window/level to first preset
+        viewController.setWindowLevelPresetById(0);
         // default position
         viewController.setCurrentPosition2D(0,0);
         // default frame
@@ -788,9 +780,13 @@ dwv.App = function ()
      * Handle window/level change.
      * @param {Object} event The event fired when changing the window/level.
      */
-    this.onWLChange = function (/*event*/)
+    this.onWLChange = function (event)
     {
-        generateAndDrawImage();
+        // generate and draw if no skip flag
+        if (typeof event.skipGenerate === "undefined" ||
+            event.skipGenerate === false) {
+            generateAndDrawImage();
+        }
     };
 
     /**
@@ -967,15 +963,8 @@ dwv.App = function ()
      */
     this.onChangeWindowLevelPreset = function (/*event*/)
     {
-        var name = this.value;
-        var preset = viewController.getPresets()[name];
-        // check if we have it
-        if ( !preset ) {
-            throw new Error("Unknown window level preset: '" + name + "'");
-        }
-        // enable it
-        viewController.setWindowLevel(
-            preset.center, preset.width );
+        // value should be the name of the preset
+        viewController.setWindowLevelPreset( this.value );
     };
 
     /**
@@ -1224,7 +1213,7 @@ dwv.App = function ()
         fireEvent(event);
         if( event.lengthComputable )
         {
-            var percent = Math.ceil((event.loaded / event.total) * 100);
+            var percent = Math.round((event.loaded / event.total) * 100);
             dwv.gui.displayProgress(percent);
         }
     }
@@ -1276,6 +1265,9 @@ dwv.App = function ()
         // get the view from the loaded data
         view = data.view;
         viewController = new dwv.ViewController(view);
+        // add the min/max preset (just the first time)
+        view.addWindowLevelMinMax();
+
         // append the DICOM tags table
         if ( tagsGui ) {
             tagsGui.update(data.info);
@@ -1306,9 +1298,6 @@ dwv.App = function ()
         view.addEventListener("position-change", fireEvent);
         view.addEventListener("slice-change", fireEvent);
         view.addEventListener("frame-change", fireEvent);
-
-        // update presets with loaded image (used in w/l tool)
-        viewController.updatePresets(image, true);
 
         // initialise the toolbox
         if ( toolboxController ) {
@@ -2253,16 +2242,44 @@ dwv.ViewController = function ( view )
 {
     // closure to self
     var self = this;
-    // Window/level presets
-    var presets = null;
     // Slice/frame player ID (created by setInterval)
     var playerID = null;
 
     /**
-     * Get the window/level presets.
-     * @return {Object} The presets.
+     * Get the window/level presets names.
+     * @return {Array} The presets names.
      */
-    this.getPresets = function () { return presets; };
+    this.getWindowLevelPresetsNames = function ()
+    {
+        return view.getWindowPresetsNames();
+    };
+
+    /**
+     * Add window/level presets to the view.
+     * @return {Object} The list of presets.
+     */
+    this.addWindowLevelPresets = function (presets)
+    {
+        return view.addWindowPresets(presets);
+    };
+
+    /**
+     * Set the window level to the preset with the input name.
+     * @param {String} name The name of the preset to activate.
+     */
+    this.setWindowLevelPreset = function (name)
+    {
+        view.setWindowLevelPreset(name);
+    };
+
+    /**
+     * Set the window level to the preset with the input id.
+     * @param {Number} id The id of the preset to activate.
+     */
+    this.setWindowLevelPresetById = function (id)
+    {
+        view.setWindowLevelPresetById(id);
+    };
 
     /**
      * Check if the controller is playing.
@@ -2431,8 +2448,8 @@ dwv.ViewController = function ( view )
     this.getWindowLevel = function ()
     {
         return {
-            "width": view.getWindowLut().getWidth(),
-            "center": view.getWindowLut().getCenter()
+            "width": view.getCurrentWindowLut().getWindowLevel().getWidth(),
+            "center": view.getCurrentWindowLut().getWindowLevel().getCenter()
         };
     };
 
@@ -2444,50 +2461,6 @@ dwv.ViewController = function ( view )
     this.setWindowLevel = function (wc, ww)
     {
         view.setWindowLevel(wc,ww);
-    };
-
-    /**
-     * Update the window/level presets.
-     * @param {Object} image The associated image.
-     * @param {Boolean} full If true, shows all presets.
-     */
-    this.updatePresets = function (image)
-    {
-        // store the manual preset
-        var manual = null;
-        if ( presets ) {
-            manual = presets.manual;
-        }
-        // reinitialize the presets
-        presets = {};
-
-        // DICOM presets
-        var dicomPresets = view.getWindowPresets();
-        if ( dicomPresets ) {
-            for( var i = 0; i < dicomPresets.length; ++i ) {
-                presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
-            }
-        }
-
-        // Image presets
-
-        // min/max preset
-        var range = image.getRescaledDataRange();
-        var width = range.max - range.min;
-        var center = range.min + width/2;
-        presets.minmax = {"center": center, "width": width};
-        // optional modality presets
-        if ( typeof dwv.tool.defaultpresets !== "undefined" ) {
-            var modality = image.getMeta().Modality;
-            for( var key in dwv.tool.defaultpresets[modality] ) {
-                presets[key] = dwv.tool.defaultpresets[modality][key];
-            }
-        }
-
-        // Manual preset
-        if ( manual ){
-            presets.manual = manual;
-        }
     };
 
     /**
@@ -11632,7 +11605,7 @@ dwv.gui.base.WindowLevel = function (app)
     {
         // create new preset select
         var wlSelector = dwv.html.createHtmlSelect("presetSelect",
-            app.getViewController().getPresets(), "wl.presets", true);
+            app.getViewController().getWindowLevelPresetsNames(), "wl.presets", true);
         wlSelector.onchange = app.onChangeWindowLevelPreset;
         wlSelector.title = "Select w/l preset.";
 
@@ -13629,15 +13602,30 @@ dwv.image.lut = dwv.image.lut || {};
  * Rescale LUT class.
  * @constructor
  * @param {Object} rsi The rescale slope and intercept.
+ * @param {Number} bitsStored The number of bits used to store the data.
  */
-dwv.image.lut.Rescale = function (rsi)
+dwv.image.lut.Rescale = function (rsi, bitsStored)
 {
     /**
      * The internal array.
      * @private
      * @type Array
      */
-    var rescaleLut = null;
+    var lut = null;
+
+    /**
+     * Flag to know if the lut is ready or not.
+     * @private
+     * @type Boolean
+     */
+    var isReady = false;
+
+    /**
+     * The size of the LUT array.
+     * @private
+     * @type Number
+     */
+    var length = Math.pow(2, bitsStored);
 
     /**
      * Get the Rescale Slope and Intercept (RSI).
@@ -13646,36 +13634,51 @@ dwv.image.lut.Rescale = function (rsi)
     this.getRSI = function () { return rsi; };
 
     /**
-     * Initialise the LUT.
-     * @param {Number} bitsStored The number of bits used to store the data.
+     * Is the lut ready to use or not? If not, the user must
+     * call 'initialise'.
+     * @return {Boolean} True if the lut is ready to use.
      */
-    this.initialise = function (bitsStored)
+    this.isReady = function () { return isReady; };
+
+    /**
+     * Initialise the LUT.
+     */
+    this.initialise = function ()
     {
-        var size = Math.pow(2, bitsStored);
-        rescaleLut = new Float32Array(size);
-        for ( var i = 0; i < size; ++i ) {
-            rescaleLut[i] = rsi.apply(i);
+        // check if already initialised
+        if (isReady) {
+            return;
         }
+        // create lut and fill it
+        lut = new Float32Array(length);
+        for ( var i = 0; i < length; ++i ) {
+            lut[i] = rsi.apply(i);
+        }
+        // update ready flag
+        isReady = true;
     };
 
     /**
      * Get the length of the LUT array.
      * @return {Number} The length of the LUT array.
      */
-    this.getLength = function () { return rescaleLut.length; };
+    this.getLength = function () { return length; };
 
     /**
      * Get the value of the LUT at the given offset.
      * @return {Number} The value of the LUT at the given offset.
      */
-    this.getValue = function (offset) { return rescaleLut[offset]; };
+    this.getValue = function (offset)
+    {
+        return lut[ offset ];
+    };
 };
 
 /**
  * Window LUT class.
  * @constructor
- * @param {Number} rescaleLut_ The associated rescale LUT.
- * @param {Boolean} isSigned_ Flag to know if the data is signed.
+ * @param {Number} rescaleLut The associated rescale LUT.
+ * @param {Boolean} isSigned Flag to know if the data is signed or not.
  */
 dwv.image.lut.Window = function (rescaleLut, isSigned)
 {
@@ -13684,7 +13687,7 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
      * @private
      * @type Array
      */
-    var windowLut = new Uint8ClampedArray(rescaleLut.getLength());
+    var lut = null;
 
     /**
      * The window level.
@@ -13694,32 +13697,41 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
     var windowLevel = null;
 
     /**
-     * Flag to know if the lut needs update or not.
+     * Flag to know if the lut is ready or not.
      * @private
      * @type Boolean
      */
-    var needsUpdate = false;
+    var isReady = false;
 
     /**
-     * Get the window center.
-     * @return {Number} The window center.
+     * Shift for signed data.
+     * @private
+     * @type Number
      */
-    this.getCenter = function() { return windowLevel.getCenter(); };
+    var signedShift = 0;
+
     /**
-     * Get the window width.
-     * @return {Number} The window width.
+     * Get the window / level.
+     * @return {Object} The window / level.
      */
-    this.getWidth = function() { return windowLevel.getWidth(); };
+    this.getWindowLevel = function () { return windowLevel; };
     /**
      * Get the signed flag.
      * @return {Boolean} The signed flag.
      */
-    this.isSigned = function() { return isSigned; };
+    this.isSigned = function () { return isSigned; };
     /**
      * Get the rescale lut.
      * @return {Object} The rescale lut.
      */
-    this.getRescaleLut = function() { return rescaleLut; };
+    this.getRescaleLut = function () { return rescaleLut; };
+
+    /**
+     * Is the lut ready to use or not? If not, the user must
+     * call 'update'.
+     * @return {Boolean} True if the lut is ready to use.
+     */
+    this.isReady = function () { return isReady; };
 
     /**
      * Set the window center and width.
@@ -13729,7 +13741,16 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
     {
         // store the window values
         windowLevel = wl;
-        needsUpdate = true;
+        // possible signed shift
+        signedShift = 0;
+        windowLevel.setSignedOffset(0);
+        if ( isSigned ) {
+            var size = rescaleLut.getLength();
+            signedShift = size / 2;
+            windowLevel.setSignedOffset(rescaleLut.getRSI().getSlope() * signedShift);
+        }
+        // update ready flag
+        isReady = false;
     };
 
     /**
@@ -13737,38 +13758,45 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
      */
     this.update = function ()
     {
-        if ( !needsUpdate ) {
+        // check if we need to update
+        if ( isReady ) {
             return;
         }
-        // pre calculate loop values
-        var size = windowLut.length;
-        if ( isSigned ) {
-            windowLevel.addSignedOffset(rescaleLut.getRSI().getSlope() * (size / 2));
+
+        // check rescale lut
+        if (!rescaleLut.isReady()) {
+            rescaleLut.initialise();
+        }
+        // create window lut
+        var size = rescaleLut.getLength();
+        if (!lut) {
+            // use clamped array (polyfilled in browser.js)
+            lut = new Uint8ClampedArray(size);
         }
         // by default WindowLevel returns a value in the [0,255] range
         // this is ok with regular Arrays and ClampedArray.
         for ( var i = 0; i < size; ++i )
         {
-            windowLut[i] = windowLevel.apply( rescaleLut.getValue(i) );
+            lut[i] = windowLevel.apply( rescaleLut.getValue(i) );
         }
-        // set update flag
-        needsUpdate = false;
+
+        // update ready flag
+        isReady = true;
     };
 
     /**
      * Get the length of the LUT array.
      * @return {Number} The length of the LUT array.
      */
-    this.getLength = function() { return windowLut.length; };
+    this.getLength = function () { return lut.length; };
 
     /**
      * Get the value of the LUT at the given offset.
      * @return {Number} The value of the LUT at the given offset.
      */
-    this.getValue = function(offset)
+    this.getValue = function (offset)
     {
-        var shift = isSigned ? windowLut.length / 2 : 0;
-        return windowLut[offset+shift];
+        return lut[ offset + signedShift ];
     };
 };
 
@@ -14166,6 +14194,12 @@ dwv.image.WindowLevel = function (center, width)
     }
 
     /**
+     * Signed data offset.
+     * @private
+     * @type Number
+     */
+    var signedOffset = 0;
+    /**
      * Output value minimum.
      * @private
      * @type Number
@@ -14207,14 +14241,15 @@ dwv.image.WindowLevel = function (center, width)
      * Initialise members.
      */
     function init() {
+        var c = center + signedOffset;
         // from the standard
-        xmin = center - 0.5 - ( (width-1) / 2 );
-        xmax = center - 0.5 + ( (width-1) / 2 );
+        xmin = c - 0.5 - ( (width-1) / 2 );
+        xmax = c - 0.5 + ( (width-1) / 2 );
         // develop the equation:
         // y = ( ( x - (c - 0.5) ) / (w-1) + 0.5 ) * (ymax - ymin) + ymin
         // y = ( x / (w-1) ) * (ymax - ymin) + ( -(c - 0.5) / (w-1) + 0.5 ) * (ymax - ymin) + ymin
         slope = (ymax - ymin) / (width-1);
-        inter = ( -(center - 0.5) / (width-1) + 0.5 ) * (ymax - ymin) + ymin;
+        inter = ( -(c - 0.5) / (width-1) + 0.5 ) * (ymax - ymin) + ymin;
     }
 
     // call init
@@ -14246,8 +14281,8 @@ dwv.image.WindowLevel = function (center, width)
      * Set the signed offset.
      * @param {Number} The signed data offset, typically: slope * ( size / 2).
      */
-    this.addSignedOffset = function (offset) {
-        center += offset;
+    this.setSignedOffset = function (offset) {
+        signedOffset = offset;
         // re-initialise
         init();
     };
@@ -14312,6 +14347,14 @@ dwv.image.View = function (image)
      * @type Object
      */
     var windowPresets = null;
+
+    /**
+     * Current window preset name.
+     * @private
+     * @type String
+     */
+    var currentPresetName = null;
+
     /**
      * colour map.
      * @private
@@ -14331,9 +14374,6 @@ dwv.image.View = function (image)
      */
     var currentFrame = null;
 
-    // closure to self
-    var self = this;
-
     /**
      * Get the associated image.
      * @return {Image} The associated image.
@@ -14347,56 +14387,94 @@ dwv.image.View = function (image)
 
     /**
      * Get the window LUT of the image.
+     * Warning: can be undefined in no window/level was set.
      * @return {Window} The window LUT of the image.
      */
-    this.getWindowLut = function (rsi) {
+    this.getCurrentWindowLut = function (rsi) {
+        var sliceNumber = this.getCurrentPosition().k;
+        // use current rsi if not provided
         if ( typeof rsi === "undefined" ) {
-            var sliceNumber = this.getCurrentPosition().k;
             rsi = image.getRescaleSlopeAndIntercept(sliceNumber);
         }
-        return windowLuts[ rsi.toString() ];
+        // get the lut
+        var wlut = windowLuts[ rsi.toString() ];
+        // special case for 'perslice' presets
+        if (currentPresetName &&
+            typeof windowPresets[currentPresetName].perslice !== "undefined" &&
+            windowPresets[currentPresetName].perslice === true ) {
+            // get the preset for this slice
+            var wl = windowPresets[currentPresetName].wl[sliceNumber];
+            // apply it if different from previous
+            if (!wlut.getWindowLevel().equals(wl)) {
+                // set slice window level
+                wlut.setWindowLevel(wl);
+                // update InfoController window/level by firing special event
+                this.fireEvent({"type": "wl-change",
+                    "wc": wl.getCenter(), "ww": wl.getWidth(),
+                    "skipGenerate": true});
+            }
+        }
+        // update in case of wl change
+        wlut.update();
+        // return
+        return wlut;
     };
     /**
-     * Set the window LUT of the image.
+     * Add the window LUT to the list.
      * @param {Window} wlut The window LUT of the image.
      */
-    this.setWindowLut = function (wlut)
+    this.addWindowLut = function (wlut)
     {
         var rsi = wlut.getRescaleLut().getRSI();
         windowLuts[rsi.toString()] = wlut;
     };
 
     /**
-     * Initialise the view. Only called at construction.
-     * @private
-     */
-    function initialise()
-    {
-        // create the rescale lookup table
-        var rescaleLut = new dwv.image.lut.Rescale(
-            image.getRescaleSlopeAndIntercept(0) );
-        // initialise the rescale lookup table
-        rescaleLut.initialise(image.getMeta().BitsStored);
-        // create the window lookup table
-        var windowLut = new dwv.image.lut.Window(rescaleLut, image.getMeta().IsSigned);
-        self.setWindowLut(windowLut);
-    }
-
-    // default constructor
-    initialise();
-
-    /**
      * Get the window presets.
      * @return {Object} The window presets.
      */
-    this.getWindowPresets = function() { return windowPresets; };
+    this.getWindowPresets = function () {
+        return windowPresets;
+    };
+
+    /**
+     * Get the window presets names.
+     * @return {Object} The list of window presets names.
+     */
+    this.getWindowPresetsNames = function () {
+        return Object.keys(windowPresets);
+    };
+
     /**
      * Set the window presets.
      * @param {Object} presets The window presets.
      */
-    this.setWindowPresets = function(presets) {
+    this.setWindowPresets = function (presets) {
         windowPresets = presets;
-        this.setWindowLevel(presets[0].center, presets[0].width);
+    };
+    /**
+     * Add window presets to the existing ones.
+     * @param {Object} presets The window presets.
+     * @param {Number} k The slice the preset belong to.
+     */
+    this.addWindowPresets = function (presets, k) {
+        var keys = Object.keys(presets);
+        var key = null;
+        for (var i = 0; i < keys.length; ++i) {
+            key = keys[i];
+            if (typeof windowPresets[key] !== "undefined") {
+                if (typeof windowPresets[key].perslice !== "undefined" &&
+                    windowPresets[key].perslice === true) {
+                    // use first new preset wl...
+                    windowPresets[key].wl.splice(k, 0, presets[key].wl[0]);
+                } else {
+                    windowPresets[key] = presets[key];
+                }
+            } else {
+                // add new
+                windowPresets[key] = presets[key];
+            }
+        }
     };
 
     /**
@@ -14415,8 +14493,8 @@ dwv.image.View = function (image)
             colourMap = dwv.image.lut.invPlain;
         }
         this.fireEvent({"type": "colour-change",
-           "wc": this.getWindowLut().getCenter(),
-           "ww": this.getWindowLut().getWidth() });
+           "wc": this.getCurrentWindowLut().getWindowLevel().getCenter(),
+           "ww": this.getCurrentWindowLut().getWindowLevel().getWidth() });
     };
 
     /**
@@ -14507,16 +14585,16 @@ dwv.image.View = function (image)
     this.append = function( rhs )
     {
        // append images
-       var newSLiceNumber = this.getImage().appendSlice( rhs.getImage() );
+       var newSliceNumber = this.getImage().appendSlice( rhs.getImage() );
        // update position if a slice was appended before
-       if ( newSLiceNumber <= this.getCurrentPosition().k ) {
+       if ( newSliceNumber <= this.getCurrentPosition().k ) {
            this.setCurrentPosition(
              {"i": this.getCurrentPosition().i,
              "j": this.getCurrentPosition().j,
              "k": this.getCurrentPosition().k + 1}, true );
        }
-       // init to update self
-       this.setWindowLut(rhs.getWindowLut());
+       // add window presets
+       this.addWindowPresets( rhs.getWindowPresets(), newSliceNumber );
     };
 
     /**
@@ -14530,11 +14608,54 @@ dwv.image.View = function (image)
         // window width shall be >= 1 (see https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
         if ( width >= 1 ) {
             var wl = new dwv.image.WindowLevel(center, width);
+            var keys = Object.keys(windowLuts);
+
+            // create the first lut if none exists
+            if (keys.length === 0) {
+                // create the rescale lookup table
+                var rescaleLut = new dwv.image.lut.Rescale(
+                    image.getRescaleSlopeAndIntercept(0), image.getMeta().BitsStored );
+                // create the window lookup table
+                var windowLut = new dwv.image.lut.Window(rescaleLut, image.getMeta().IsSigned);
+                this.addWindowLut(windowLut);
+            }
+
+            // set window level on luts
             for ( var key in windowLuts ) {
                 windowLuts[key].setWindowLevel(wl);
             }
+
+            // fire window level change event
             this.fireEvent({"type": "wl-change", "wc": center, "ww": width });
         }
+    };
+
+    /**
+     * Set the window level to the preset with the input name.
+     * @param {String} name The name of the preset to activate.
+     */
+    this.setWindowLevelPreset = function (name) {
+        var preset = this.getWindowPresets()[name];
+        if ( typeof preset === "undefined" ) {
+            throw new Error("Unknown window level preset: '" + name + "'");
+        }
+        // update member preset name
+        currentPresetName = name;
+        // special 'perslice' case
+        if (typeof preset.perslice !== "undefined" &&
+            preset.perslice === true) {
+            preset = { "wl": preset.wl[this.getCurrentPosition().k] };
+        }
+        this.setWindowLevel( preset.wl.getCenter(), preset.wl.getWidth() );
+    };
+
+    /**
+     * Set the window level to the preset with the input id.
+     * @param {Number} id The id of the preset to activate.
+     */
+    this.setWindowLevelPresetById = function (id) {
+        var keys = Object.keys(this.getWindowPresets());
+        this.setWindowLevelPreset( keys[id] );
     };
 
     /**
@@ -14545,7 +14666,7 @@ dwv.image.View = function (image)
     {
         var copy = new dwv.image.View(this.getImage());
         for ( var key in windowLuts ) {
-            copy.setWindowLut(windowLuts[key]);
+            copy.addWindowLut(windowLuts[key]);
         }
         copy.setListeners(this.getListeners());
         return copy;
@@ -14570,31 +14691,50 @@ dwv.image.View = function (image)
 };
 
 /**
+ * Get the image window/level that covers the full data range.
+ * Warning: uses the latest set rescale LUT or the default linear one.
+ */
+dwv.image.View.prototype.getWindowLevelMinMax = function ()
+{
+    var range = this.getImage().getRescaledDataRange();
+    var min = range.min;
+    var max = range.max;
+    var width = max - min;
+    var center = min + width/2;
+    return new dwv.image.WindowLevel(center, width);
+};
+
+/**
  * Set the image window/level to cover the full data range.
  * Warning: uses the latest set rescale LUT or the default linear one.
  */
 dwv.image.View.prototype.setWindowLevelMinMax = function()
 {
     // calculate center and width
-    var range = this.getImage().getRescaledDataRange();
-    var min = range.min;
-    var max = range.max;
-    var width = max - min;
-    var center = min + width/2;
+    var wl = this.getWindowLevelMinMax();
     // set window level
-    this.setWindowLevel(center,width);
+    this.setWindowLevel(wl.getCenter(), wl.getWidth());
+};
+
+/**
+ * Add the image min/max window/level to the list of presets.
+ */
+dwv.image.View.prototype.addWindowLevelMinMax = function ()
+{
+    this.addWindowPresets( { "minmax": {
+        "wl": this.getWindowLevelMinMax(),
+        "name": "minmax" } } );
 };
 
 /**
  * Generate display image data to be given to a canvas.
  * @param {Array} array The array to fill in.
- * @param {Number} sliceNumber The slice position.
  */
 dwv.image.View.prototype.generateImageData = function( array )
 {
+    var windowLut = this.getCurrentWindowLut();
+
     var image = this.getImage();
-    var windowLut = this.getWindowLut();
-    windowLut.update();
     var sliceSize = image.getGeometry().getSize().getSliceSize();
     var sliceOffset = sliceSize * this.getCurrentPosition().k;
     var frame = (this.getCurrentFrame()) ? this.getCurrentFrame() : 0;
@@ -14780,36 +14920,49 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
 {
     // view
     var view = new dwv.image.View(image);
+
     // presets
-    var windowPresets = [];
-    // WindowCenter and WindowWidth
+    var windowPresets = {};
+
+    // DICOM presets
     var windowCenter = dicomElements.getFromKey("x00281050", true);
     var windowWidth = dicomElements.getFromKey("x00281051", true);
+    var windowCWExplanation = dicomElements.getFromKey("x00281055", true);
     if ( windowCenter && windowWidth ) {
         var name;
         for ( var j = 0; j < windowCenter.length; ++j) {
-            var width = parseFloat( windowWidth[j], 10 );
             var center = parseFloat( windowCenter[j], 10 );
-            if ( width ) {
+            var width = parseFloat( windowWidth[j], 10 );
+            if ( center && width ) {
                 name = "Default"+j;
-                var windowCenterWidthExplanation = dicomElements.getFromKey("x00281055");
-                if ( windowCenterWidthExplanation ) {
-                    name = windowCenterWidthExplanation[j];
+                if ( windowCWExplanation ) {
+                    name = dwv.dicom.cleanString(windowCWExplanation[j]);
                 }
-                windowPresets.push({
-                    "center": center,
-                    "width": width,
-                    "name": name
-                });
+                windowPresets[name] = {
+                    "wl": [new dwv.image.WindowLevel(center, width)],
+                    "name": name,
+                    "perslice": true};
             }
         }
     }
-    if ( windowPresets.length !== 0 ) {
-        view.setWindowPresets( windowPresets );
+
+    // optional modality presets
+    if ( typeof dwv.tool.defaultpresets !== "undefined" ) {
+        var modality = image.getMeta().Modality;
+        for( var key in dwv.tool.defaultpresets[modality] ) {
+            var preset = dwv.tool.defaultpresets[modality][key];
+            windowPresets[key] = {
+                "wl": new dwv.image.WindowLevel(preset.center, preset.width),
+                "name": key};
+        }
     }
-    else {
-        view.setWindowLevelMinMax();
-    }
+
+    // TODO min/max preset
+    // not yet since it is stil too costly to calculate min/max
+    // for each slice...
+
+    // store
+    view.setWindowPresets( windowPresets );
 
     return view;
 };
@@ -21083,8 +21236,21 @@ dwv.tool.WindowLevel = function(app)
         // calculate new window level
         var windowCenter = parseInt(app.getViewController().getWindowLevel().center, 10) + diffY;
         var windowWidth = parseInt(app.getViewController().getWindowLevel().width, 10) + diffX;
-        // update GUI
-        app.getViewController().setWindowLevel(windowCenter,windowWidth);
+
+        // add the manual preset to the view
+        app.getViewController().addWindowLevelPresets( { "manual": {
+            "wl": new dwv.image.WindowLevel(windowCenter, windowWidth),
+            "name": "manual"} } );
+        app.getViewController().setWindowLevelPreset("manual");
+
+        // update gui
+        if ( gui ) {
+            // initialise to add the manual preset
+            gui.initialise();
+            // set selected preset
+            dwv.gui.setSelected(app.getElement("presetSelect"), "manual");
+        }
+
         // store position
         self.x0 = event._x;
         self.y0 = event._y;
@@ -21098,16 +21264,6 @@ dwv.tool.WindowLevel = function(app)
         // set start flag
         if( self.started ) {
             self.started = false;
-            // store the manual preset
-            var windowCenter = parseInt(app.getViewController().getWindowLevel().center, 10);
-            var windowWidth = parseInt(app.getViewController().getWindowLevel().width, 10);
-            app.getViewController().getPresets().manual = {"center": windowCenter, "width": windowWidth};
-            // update gui
-            if ( gui ) {
-                gui.initialise();
-                // set selected
-                dwv.gui.setSelected(app.getElement("presetSelect"), "manual");
-            }
         }
     };
 
