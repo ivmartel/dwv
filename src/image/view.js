@@ -542,6 +542,16 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
 };
 
 /**
+ * Add the image min/max window/level to the list of presets.
+ */
+dwv.image.View.prototype.addWindowLevelMinMax = function ()
+{
+    this.addWindowPresets( { "minmax": {
+        "wl": this.getWindowLevelMinMax(),
+        "name": "minmax" } } );
+};
+
+/**
  * Generate display image data to be given to a canvas.
  * @param {Array} array The array to fill in.
  */
@@ -761,12 +771,6 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
         }
     }
 
-    // min/max
-    windowPresets.minmax = {
-        "wl": [view.getWindowLevelMinMax()],
-        "name": "minmax",
-        "perslice": true };
-
     // optional modality presets
     if ( typeof dwv.tool.defaultpresets !== "undefined" ) {
         var modality = image.getMeta().Modality;
@@ -777,6 +781,10 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
                 "name": key};
         }
     }
+
+    // TODO min/max preset
+    // not yet since it is stil too costly to calculate min/max
+    // for each slice...
 
     // store
     view.setWindowPresets( windowPresets );

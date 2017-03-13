@@ -1265,6 +1265,9 @@ dwv.App = function ()
         // get the view from the loaded data
         view = data.view;
         viewController = new dwv.ViewController(view);
+        // add the min/max preset (just the first time)
+        view.addWindowLevelMinMax();
+
         // append the DICOM tags table
         if ( tagsGui ) {
             tagsGui.update(data.info);
