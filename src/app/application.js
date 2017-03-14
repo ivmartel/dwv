@@ -626,12 +626,8 @@ dwv.App = function ()
      */
     this.initWLDisplay = function ()
     {
-        // set window/level from first preset
-        var presets = viewController.getPresets();
-        var keys = Object.keys(presets);
-        viewController.setWindowLevel(
-            presets[keys[0]].center,
-            presets[keys[0]].width );
+        // set window/level to first preset
+        viewController.setWindowLevelPresetById(0);
         // default position
         viewController.setCurrentPosition2D(0,0);
         // default frame
@@ -788,9 +784,13 @@ dwv.App = function ()
      * Handle window/level change.
      * @param {Object} event The event fired when changing the window/level.
      */
-    this.onWLChange = function (/*event*/)
+    this.onWLChange = function (event)
     {
-        generateAndDrawImage();
+        // generate and draw if no skip flag
+        if (typeof event.skipGenerate === "undefined" ||
+            event.skipGenerate === false) {
+            generateAndDrawImage();
+        }
     };
 
     /**
@@ -967,15 +967,8 @@ dwv.App = function ()
      */
     this.onChangeWindowLevelPreset = function (/*event*/)
     {
-        var name = this.value;
-        var preset = viewController.getPresets()[name];
-        // check if we have it
-        if ( !preset ) {
-            throw new Error("Unknown window level preset: '" + name + "'");
-        }
-        // enable it
-        viewController.setWindowLevel(
-            preset.center, preset.width );
+        // value should be the name of the preset
+        viewController.setWindowLevelPreset( this.value );
     };
 
     /**
@@ -1276,6 +1269,9 @@ dwv.App = function ()
         // get the view from the loaded data
         view = data.view;
         viewController = new dwv.ViewController(view);
+        // add the min/max preset (just the first time)
+        view.addWindowLevelMinMax();
+
         // append the DICOM tags table
         if ( tagsGui ) {
             tagsGui.update(data.info);
@@ -1306,9 +1302,6 @@ dwv.App = function ()
         view.addEventListener("position-change", fireEvent);
         view.addEventListener("slice-change", fireEvent);
         view.addEventListener("frame-change", fireEvent);
-
-        // update presets with loaded image (used in w/l tool)
-        viewController.updatePresets(image, true);
 
         // initialise the toolbox
         if ( toolboxController ) {
