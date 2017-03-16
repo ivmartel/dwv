@@ -863,9 +863,26 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
             parseFloat( imagePositionPatient[2] ) ];
     }
 
+    // slice orientation
+    var imageOrientationPatient = dicomElements.getFromKey("x00200037");
+    var orientationMatrix;
+    if ( imageOrientationPatient ) {
+        var rowCosines = new dwv.math.Vector3D( parseFloat( imageOrientationPatient[0] ),
+            parseFloat( imageOrientationPatient[1] ),
+            parseFloat( imageOrientationPatient[2] ) );
+        var colCosines = new dwv.math.Vector3D( parseFloat( imageOrientationPatient[3] ),
+            parseFloat( imageOrientationPatient[4] ),
+            parseFloat( imageOrientationPatient[5] ) );
+        var normal = rowCosines.crossProduct(colCosines);
+        orientationMatrix = new dwv.math.Matrix33(
+            rowCosines.getX(), rowCosines.getY(), rowCosines.getZ(),
+            colCosines.getX(), colCosines.getY(), colCosines.getZ(),
+            normal.getX(), normal.getY(), normal.getZ() );
+    }
+
     // geometry
     var origin = new dwv.math.Point3D(slicePosition[0], slicePosition[1], slicePosition[2]);
-    var geometry = new dwv.image.Geometry( origin, size, spacing );
+    var geometry = new dwv.image.Geometry( origin, size, spacing, orientationMatrix );
 
     // image
     var image = new dwv.image.Image( geometry, pixelBuffer );
