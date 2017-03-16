@@ -12534,17 +12534,22 @@ dwv.image.Spacing.prototype.equals = function (rhs) {
 /**
  * 2D/3D Geometry class.
  * @constructor
- * @param {Object} origin The object origin.
+ * @param {Object} origin The object origin (a 3D point).
  * @param {Object} size The object size.
  * @param {Object} spacing The object spacing.
+ * @param {Object} orientation The object orientation (3*3 matrix, default to 3*3 identity).
  */
-dwv.image.Geometry = function ( origin, size, spacing )
+dwv.image.Geometry = function ( origin, size, spacing, orientation )
 {
-    // check input origin.
-    if( typeof(origin) === 'undefined' ) {
+    // check input origin
+    if( typeof origin === 'undefined' ) {
         origin = new dwv.math.Point3D(0,0,0);
     }
     var origins = [origin];
+    // check input orientation
+    if( typeof orientation === 'undefined' ) {
+        orientation = new dwv.math.getIdentityMat33();
+    }
 
     /**
      * Get the object first origin.
@@ -12566,6 +12571,11 @@ dwv.image.Geometry = function ( origin, size, spacing )
      * @return {Object} The object spacing.
      */
     this.getSpacing = function () { return spacing; };
+    /**
+     * Get the object orientation.
+     * @return {Object} The object orientation.
+     */
+    this.getOrientation = function () { return orientation; };
 
     /**
      * Get the slice position of a point in the current slice layout.
@@ -12578,19 +12588,22 @@ dwv.image.Geometry = function ( origin, size, spacing )
 
         // find the closest index
         var closestSliceIndex = 0;
-        var minDiff = Math.abs( origins[0].getZ() - point.getZ() );
-        var diff = 0;
+        var minDist = point.getDistance(origins[0]);
+        var dist = 0;
         for( var i = 0; i < origins.length; ++i )
         {
-            diff = Math.abs( origins[i].getZ() - point.getZ() );
-            if( diff < minDiff )
+            dist = point.getDistance(origins[i]);
+            if( dist < minDist )
             {
-                minDiff = diff;
+                minDist = dist;
                 closestSliceIndex = i;
             }
         }
-        diff = origins[closestSliceIndex].getZ() - point.getZ();
-        var sliceIndex = ( diff > 0 ) ? closestSliceIndex : closestSliceIndex + 1;
+        // we have the closest point, are we before or after
+        var normal = new dwv.math.Vector3D(
+            orientation.get(2,0), orientation.get(2,1), orientation.get(2,2));
+        var dotProd = normal.dotProduct( point.minus(origins[closestSliceIndex]) );
+        var sliceIndex = ( dotProd > 0 ) ? closestSliceIndex + 1 : closestSliceIndex;
         return sliceIndex;
     };
 
@@ -13525,9 +13538,26 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
             parseFloat( imagePositionPatient[2] ) ];
     }
 
+    // slice orientation
+    var imageOrientationPatient = dicomElements.getFromKey("x00200037");
+    var orientationMatrix;
+    if ( imageOrientationPatient ) {
+        var rowCosines = new dwv.math.Vector3D( parseFloat( imageOrientationPatient[0] ),
+            parseFloat( imageOrientationPatient[1] ),
+            parseFloat( imageOrientationPatient[2] ) );
+        var colCosines = new dwv.math.Vector3D( parseFloat( imageOrientationPatient[3] ),
+            parseFloat( imageOrientationPatient[4] ),
+            parseFloat( imageOrientationPatient[5] ) );
+        var normal = rowCosines.crossProduct(colCosines);
+        orientationMatrix = new dwv.math.Matrix33(
+            rowCosines.getX(), rowCosines.getY(), rowCosines.getZ(),
+            colCosines.getX(), colCosines.getY(), colCosines.getZ(),
+            normal.getX(), normal.getY(), normal.getZ() );
+    }
+
     // geometry
     var origin = new dwv.math.Point3D(slicePosition[0], slicePosition[1], slicePosition[2]);
-    var geometry = new dwv.image.Geometry( origin, size, spacing );
+    var geometry = new dwv.image.Geometry( origin, size, spacing, orientationMatrix );
 
     // image
     var image = new dwv.image.Image( geometry, pixelBuffer );
@@ -15751,6 +15781,89 @@ var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
 /**
+ * Immutable 3x3 Matrix.
+ * @constructor
+ */
+dwv.math.Matrix33 = function (
+    m00, m01, m02,
+    m10, m11, m12,
+    m20, m21, m22 )
+{
+    // row-major order
+    var mat = new Float32Array(9);
+    mat[0] = m00; mat[1] = m01; mat[2] = m02;
+    mat[3] = m10; mat[4] = m11; mat[5] = m12;
+    mat[6] = m20; mat[7] = m21; mat[8] = m22;
+
+    /**
+     * Get a value of the matrix.
+     * @param {Number} row The row at wich to get the value.
+     * @param {Number} col The column at wich to get the value.
+     */
+    this.get = function (row, col) {
+        return mat[row*3 + col];
+    };
+}; // Matrix33
+
+/**
+ * Check for Matrix33 equality.
+ * @param {Object} rhs The other matrix to compare to.
+ * @return {Boolean} True if both matrices are equal.
+ */
+dwv.math.Matrix33.prototype.equals = function (rhs) {
+    return this.get(0,0) === rhs.get(0,0) && this.get(0,1) === rhs.get(0,1) &&
+        this.get(0,2) === rhs.get(0,2) && this.get(1,0) === rhs.get(1,0) &&
+        this.get(1,1) === rhs.get(1,1) && this.get(1,2) === rhs.get(1,2) &&
+        this.get(2,0) === rhs.get(2,0) && this.get(2,1) === rhs.get(2,1) &&
+        this.get(2,2) === rhs.get(2,2);
+};
+
+/**
+ * Get a string representation of the Matrix33.
+ * @return {String} The matrix as a string.
+ */
+dwv.math.Matrix33.prototype.toString = function () {
+    return "[" + this.get(0,0) + ", " + this.get(0,1) + ", " + this.get(0,2) +
+        "\n " + this.get(1,0) + ", " + this.get(1,1) + ", " + this.get(1,2) +
+        "\n " + this.get(2,0) + ", " + this.get(2,1) + ", " + this.get(2,2) + "]";
+};
+
+/**
+ * Multiply this matrix by a 3D vector.
+ * @param {Object} vector3D The input 3D vector
+ * @return {Object} The result 3D vector
+ */
+dwv.math.Matrix33.multiplyVector3D = function (vector3D) {
+    // cache matrix values
+    var m00 = this.get(0,0); var m01 = this.get(0,1); var m02 = this.get(0,2);
+    var m10 = this.get(1,0); var m11 = this.get(1,1); var m12 = this.get(1,2);
+    var m20 = this.get(2,0); var m21 = this.get(2,1); var m22 = this.get(2,2);
+    // cache vector values
+    var vx = vector3D.getX();
+    var vy = vector3D.getY();
+    var vz = vector3D.getZ();
+    // calculate
+    return new dwv.math.Vector3D(
+        (m00 * vx) + (m01 * vy) + (m02 * vz),
+        (m10 * vx) + (m11 * vy) + (m12 * vz),
+        (m20 * vx) + (m21 * vy) + (m22 * vz) );
+};
+
+/**
+ * Create a 3x3 identity matrix.
+ * @return {Object} The identity matrix.
+ */
+dwv.math.getIdentityMat33= function () {
+    return new dwv.math.Matrix33(
+        1, 0, 0,
+        0, 1, 0,
+        0, 0, 1 );
+};
+;// namespaces
+var dwv = dwv || {};
+dwv.math = dwv.math || {};
+
+/**
  * Immutable 2D point.
  * @constructor
  * @param {Number} x The X coordinate for the point.
@@ -15772,7 +15885,7 @@ dwv.math.Point2D = function (x,y)
 
 /**
  * Check for Point2D equality.
- * @param {Point2D} rhs The other Point2D to compare to.
+ * @param {Object} rhs The other point to compare to.
  * @return {Boolean} True if both points are equal.
  */
 dwv.math.Point2D.prototype.equals = function (rhs) {
@@ -15783,10 +15896,20 @@ dwv.math.Point2D.prototype.equals = function (rhs) {
 
 /**
  * Get a string representation of the Point2D.
- * @return {String} The Point2D as a string.
+ * @return {String} The point as a string.
  */
 dwv.math.Point2D.prototype.toString = function () {
     return "(" + this.getX() + ", " + this.getY() + ")";
+};
+
+/**
+ * Get the distance to another Point2D.
+ * @param {Object} point2D The input point.
+ */
+dwv.math.Point2D.prototype.getDistance = function (point2D) {
+    return Math.sqrt(
+        (this.getX() - point2D.getX()) * (this.getX() - point2D.getX()) +
+        (this.getY() - point2D.getY()) * (this.getY() - point2D.getY()) );
 };
 
 /**
@@ -15803,7 +15926,7 @@ dwv.math.FastPoint2D = function (x,y)
 
 /**
  * Check for FastPoint2D equality.
- * @param {FastPoint2D} other The other FastPoint2D to compare to.
+ * @param {Object} other The other point to compare to.
  * @return {Boolean} True if both points are equal.
  */
 dwv.math.FastPoint2D.prototype.equals = function (rhs) {
@@ -15814,7 +15937,7 @@ dwv.math.FastPoint2D.prototype.equals = function (rhs) {
 
 /**
  * Get a string representation of the FastPoint2D.
- * @return {String} The Point2D as a string.
+ * @return {String} The point as a string.
  */
 dwv.math.FastPoint2D.prototype.toString = function () {
     return "(" + this.x + ", " + this.y + ")";
@@ -15848,7 +15971,7 @@ dwv.math.Point3D = function (x,y,z)
 
 /**
  * Check for Point3D equality.
- * @param {Point3D} rhs The other Point3D to compare to.
+ * @param {Object} rhs The other point to compare to.
  * @return {Boolean} True if both points are equal.
  */
 dwv.math.Point3D.prototype.equals = function (rhs) {
@@ -15860,12 +15983,35 @@ dwv.math.Point3D.prototype.equals = function (rhs) {
 
 /**
  * Get a string representation of the Point3D.
- * @return {String} The Point3D as a string.
+ * @return {String} The point as a string.
  */
 dwv.math.Point3D.prototype.toString = function () {
     return "(" + this.getX() +
         ", " + this.getY() +
         ", " + this.getZ() + ")";
+};
+
+/**
+ * Get the distance to another Point3D.
+ * @param {Object} point3D The input point.
+ */
+dwv.math.Point3D.prototype.getDistance = function (point3D) {
+    return Math.sqrt(
+        (this.getX() - point3D.getX()) * (this.getX() - point3D.getX()) +
+        (this.getY() - point3D.getY()) * (this.getY() - point3D.getY()) +
+        (this.getZ() - point3D.getZ()) * (this.getZ() - point3D.getZ()) );
+};
+
+/**
+ * Get the difference to another Point3D.
+ * @param {Object} point3D The input point.
+ * @return {Object} The 3D vector from the input point to this one.
+ */
+dwv.math.Point3D.prototype.minus = function (point3D) {
+    return new dwv.math.Vector3D(
+        (this.getX() - point3D.getX()),
+        (this.getY() - point3D.getY()),
+        (this.getZ() - point3D.getZ()) );
 };
 
 /**
@@ -15896,8 +16042,8 @@ dwv.math.Index3D = function (i,j,k)
 
 /**
  * Check for Index3D equality.
- * @param {Index3D} rhs The other Index3D to compare to.
- * @return {Boolean} True if both points are equal.
+ * @param {Object} rhs The other index to compare to.
+ * @return {Boolean} True if both indices are equal.
  */
 dwv.math.Index3D.prototype.equals = function (rhs) {
     return rhs !== null &&
@@ -17031,6 +17177,92 @@ dwv.math.getStats = function (array)
 dwv.math.guid = function ()
 {
     return Math.random().toString(36).substring(2, 15);
+};
+;// namespaces
+var dwv = dwv || {};
+dwv.math = dwv.math || {};
+
+/**
+ * Immutable 3D vector.
+ * @constructor
+ * @param {Number} x The X component of the vector.
+ * @param {Number} y The Y component of the vector.
+ * @param {Number} z The Z component of the vector.
+ */
+dwv.math.Vector3D = function (x,y,z)
+{
+    /**
+     * Get the X component of the vector.
+     * @return {Number} The X component of the vector.
+     */
+    this.getX = function () { return x; };
+    /**
+     * Get the Y component of the vector.
+     * @return {Number} The Y component of the vector.
+     */
+    this.getY = function () { return y; };
+    /**
+     * Get the Z component of the vector.
+     * @return {Number} The Z component of the vector.
+     */
+    this.getZ = function () { return z; };
+}; // Vector3D class
+
+/**
+ * Check for Vector3D equality.
+ * @param {Object} rhs The other vector to compare to.
+ * @return {Boolean} True if both vectors are equal.
+ */
+dwv.math.Vector3D.prototype.equals = function (rhs) {
+    return rhs !== null &&
+        this.getX() === rhs.getX() &&
+        this.getY() === rhs.getY() &&
+        this.getZ() === rhs.getZ();
+};
+
+/**
+ * Get a string representation of the Vector3D.
+ * @return {String} The vector as a string.
+ */
+dwv.math.Vector3D.prototype.toString = function () {
+    return "(" + this.getX() +
+        ", " + this.getY() +
+        ", " + this.getZ() + ")";
+};
+
+/**
+ * Get the norm of the vector.
+  * @return {Number} The norm.
+ */
+dwv.math.Vector3D.prototype.norm = function () {
+    return Math.sqrt( (this.getX() * this.getX()) +
+        (this.getY() * this.getY()) +
+        (this.getZ() * this.getZ()) );
+};
+
+/**
+ * Get the cross product with another Vector3D, ie the
+ * vector that is perpendicular to both a and b.
+ * If both vectors are parallel, the cross product is a zero vector.
+ * @param {Object} vector3D The input vector.
+  * @return {Object} The result vector.
+ */
+dwv.math.Vector3D.prototype.crossProduct = function (vector3D) {
+    return new dwv.math.Vector3D(
+        (this.getY() * vector3D.getZ()) - (vector3D.getY() * this.getZ()),
+        (this.getZ() * vector3D.getX()) - (vector3D.getZ() * this.getX()),
+        (this.getX() * vector3D.getY()) - (vector3D.getX() * this.getY()) );
+};
+
+/**
+ * Get the dot product with another Vector3D.
+ * @param {Object} vector3D The input vector.
+ * @return {Number} The dot product.
+ */
+dwv.math.Vector3D.prototype.dotProduct = function (vector3D) {
+    return (this.getX() * vector3D.getX()) +
+        (this.getY() * vector3D.getY()) +
+        (this.getZ() * vector3D.getZ());
 };
 ;// namespaces
 var dwv = dwv || {};
