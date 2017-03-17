@@ -759,9 +759,12 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
             var center = parseFloat( windowCenter[j], 10 );
             var width = parseFloat( windowWidth[j], 10 );
             if ( center && width ) {
-                name = "Default"+j;
+                name = "";
                 if ( windowCWExplanation ) {
                     name = dwv.dicom.cleanString(windowCWExplanation[j]);
+                }
+                if (name === "") {
+                    name = "Default"+j;
                 }
                 windowPresets[name] = {
                     "wl": [new dwv.image.WindowLevel(center, width)],
