@@ -58,12 +58,12 @@ dwv.gui.info.Windowing = function ( div )
         var liwc = div.getElementsByClassName("window-center")[0];
         dwv.html.cleanNode(liwc);
         liwc.appendChild( document.createTextNode(
-            dwv.i18n("tool.info.window_center", {value: event.wc}) ) );
+            dwv.i18n("tool.info.window_center", {value: Math.round(event.wc)}) ) );
         // window width list item
         var liww = div.getElementsByClassName("window-width")[0];
         dwv.html.cleanNode(liww);
         liww.appendChild( document.createTextNode(
-            dwv.i18n("tool.info.window_width", {value: event.ww}) ) );
+            dwv.i18n("tool.info.window_width", {value: Math.round(event.ww)}) ) );
     };
 
 }; // class dwv.gui.info.Windowing
