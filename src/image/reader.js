@@ -3,20 +3,14 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
- * Get data from an input image using a canvas.
- * @param {Image} Image The DOM Image.
- * @return {Mixed} The corresponding view and info.
+ * Get data from an input context imageData.
+ * @param {Object} imageData The context imageData.
+ * @param {Number} width The width of the coresponding image.
+ * @param {Number} height The height of the coresponding image.
+ * @param {Number} sliceIndex The slice index of the imageData.
+ * @return {Object} The corresponding view.
  */
-dwv.image.getViewFromDOMImage = function (image)
-{
-    // draw the image in the canvas in order to get its data
-    var canvas = document.createElement('canvas');
-    canvas.width = image.width;
-    canvas.height = image.height;
-    var ctx = canvas.getContext('2d');
-    ctx.drawImage(image, 0, 0, image.width, image.height);
-    // get the image data
-    var imageData = ctx.getImageData(0, 0, image.width, image.height);
+dwv.image.getViewFromImageData = function (imageData, width, height, sliceIndex) {
     // remove alpha
     // TODO support passing the full image data
     var buffer = [];
@@ -28,21 +22,49 @@ dwv.image.getViewFromDOMImage = function (image)
         j+=3;
     }
     // create dwv Image
-    var imageSize = new dwv.image.Size(image.width, image.height);
+    var imageSize = new dwv.image.Size(width, height);
+
     // TODO: wrong info...
     var imageSpacing = new dwv.image.Spacing(1,1);
-    var sliceIndex = image.index ? image.index : 0;
+
     var origin = new dwv.math.Point3D(0,0,sliceIndex);
     var geometry = new dwv.image.Geometry(origin, imageSize, imageSpacing );
-    var dwvImage = new dwv.image.Image( geometry, [buffer] );
-    dwvImage.setPhotometricInterpretation("RGB");
+    var image = new dwv.image.Image( geometry, [buffer] );
+    image.setPhotometricInterpretation("RGB");
     // meta information
     var meta = {};
     meta.BitsStored = 8;
-    dwvImage.setMeta(meta);
+    image.setMeta(meta);
     // view
-    var view = new dwv.image.View(dwvImage);
+    var view = new dwv.image.View(image);
+    // defaut preset
     view.setWindowLevelMinMax();
+    // return
+    return view;
+};
+
+/**
+ * Get data from an input image using a canvas.
+ * @param {Object} image The DOM Image.
+ * @return {Mixed} The corresponding view and info.
+ */
+dwv.image.getViewFromDOMImage = function (image)
+{
+    var width = image.width;
+    var height = image.height;
+
+    // draw the image in the canvas in order to get its data
+    var canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(image, 0, 0);
+    // get the image data
+    var imageData = ctx.getImageData(0, 0, width, height);
+    // view
+    var sliceIndex = image.index ? image.index : 0;
+    var view = dwv.image.getViewFromImageData(
+        imageData, width, height, sliceIndex);
     // properties
     var info = {};
     if( image.file )
@@ -51,8 +73,8 @@ dwv.image.getViewFromDOMImage = function (image)
         info.fileType = { "value": image.file.type };
         info.fileLastModifiedDate = { "value": image.file.lastModifiedDate };
     }
-    info.imageWidth = { "value": image.width };
-    info.imageHeight = { "value": image.height };
+    info.imageWidth = { "value": width };
+    info.imageHeight = { "value": height };
     // return
     return {"view": view, "info": info};
 };
