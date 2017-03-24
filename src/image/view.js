@@ -171,7 +171,7 @@ dwv.image.View = function (image)
      * @private
      * @type Object
      */
-    var windowPresets = null;
+    var windowPresets = [];
 
     /**
      * Current window preset name.
