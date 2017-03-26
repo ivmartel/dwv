@@ -79,7 +79,7 @@ dwv.App = function ()
      * Get the version of the application.
      * @return {String} The version of the application.
      */
-    this.getVersion = function () { return "v0.18.0-beta"; };
+    this.getVersion = function () { return "v0.18.0"; };
 
     /**
      * Get the image.
