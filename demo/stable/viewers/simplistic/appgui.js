@@ -76,8 +76,8 @@ dwv.gui.WindowLevel = function (app)
         dwv.html.removeNode(app.getElement("presetLabel"));
 
         // create preset select
-        var select = dwv.html.createHtmlSelect("presetSelect", 
-            app.getViewController().getPresets(), "wl.presets", true);
+        var select = dwv.html.createHtmlSelect("presetSelect",
+            app.getViewController().getWindowLevelPresetsNames(), "wl.presets", true);
         select.className = "presetSelect";
         select.onchange = app.onChangeWindowLevelPreset;
         select.title = "Select w/l preset.";

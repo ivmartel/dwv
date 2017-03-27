@@ -9,10 +9,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 <link type="text/css" rel="stylesheet" href="../../css/style.css" />
 <style type="text/css" >
-.toolbar { font: 14px arial, sans-serif; margin-bottom: 2px; }
+body { background: #252525; color: #fff; }
+button {
+    margin: 5px; padding: 10px 10px;
+    border: 0 none; border-radius: 4px;
+    font-size: 14px; font-weight: 600;
+    color: #fff; background-color: #444; }
+button:hover { background-color: #555; }
+button:disabled { background-color: #08b; }
+.toolbar { font: 14px arial, sans-serif; margin-bottom: 5px; text-align: center; }
 .wl-button, .reset-button { margin-right: 5px; }
-</style>
-<!-- mobile web app -->
+.layerContainer { margin: auto; text-align: center; }
+.imageLayer { left: 0px; }
+</style><!-- mobile web app -->
 <meta name="mobile-web-app-capable" content="yes" />
 <link rel="shortcut icon" sizes="16x16" href="../../resources/icons/dwv-16.png" />
 <link rel="shortcut icon" sizes="60x60" href="../../resources/icons/dwv-60.png" />
@@ -34,7 +43,7 @@
 <script type="text/javascript" src="../../ext/pdfjs/jpg.js"></script>
 <script type="text/javascript" src="../../ext/rii-mango/lossless-min.js"></script>
 <!-- Local -->
-<script type="text/javascript" src="../../dwv-0.17.0.min.js"></script>
+<script type="text/javascript" src="../../dwv-0.18.0.min.js"></script>
 <!-- Launch the app -->
 <script type="text/javascript" src="appgui.js"></script>
 <script type="text/javascript" src="applauncher.js"></script>
