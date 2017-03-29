@@ -168,10 +168,11 @@ dwv.image.View = function (image)
 
     /**
      * Window presets.
+     * Minmax will be filled at first use (see view.setWindowLevelPreset).
      * @private
      * @type Object
      */
-    var windowPresets = [];
+    var windowPresets = { "minmax": {"name": "minmax"} };
 
     /**
      * Current window preset name.
@@ -464,6 +465,10 @@ dwv.image.View = function (image)
         if ( typeof preset === "undefined" ) {
             throw new Error("Unknown window level preset: '" + name + "'");
         }
+        // special min/max
+        if (name === "minmax" && typeof preset.wl === "undefined") {
+            preset.wl = this.getWindowLevelMinMax();
+        }
         // update member preset name
         currentPresetName = name;
         // special 'perslice' case
@@ -539,16 +544,6 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
     var wl = this.getWindowLevelMinMax();
     // set window level
     this.setWindowLevel(wl.getCenter(), wl.getWidth());
-};
-
-/**
- * Add the image min/max window/level to the list of presets.
- */
-dwv.image.View.prototype.addWindowLevelMinMax = function ()
-{
-    this.addWindowPresets( { "minmax": {
-        "wl": this.getWindowLevelMinMax(),
-        "name": "minmax" } } );
 };
 
 /**
@@ -774,6 +769,12 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
         }
     }
 
+    // min/max
+    // Not filled yet since it is stil too costly to calculate min/max
+    // for each slice... It will be filled at first use (see view.setWindowLevelPreset).
+    // Order is important, if no wl from DICOM, this will be the default.
+    windowPresets.minmax = { "name": "minmax" };
+
     // optional modality presets
     if ( typeof dwv.tool.defaultpresets !== "undefined" ) {
         var modality = image.getMeta().Modality;
@@ -784,10 +785,6 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
                 "name": key};
         }
     }
-
-    // TODO min/max preset
-    // not yet since it is stil too costly to calculate min/max
-    // for each slice...
 
     // store
     view.setWindowPresets( windowPresets );
