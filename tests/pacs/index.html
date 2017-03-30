@@ -86,9 +86,9 @@ var dataImg = [
 function setDwv(obj)
 {
     // update page links
-    elements = document.getElementsByClassName('dwvlink');
+    var elements = document.getElementsByClassName('dwvlink');
     var tmp;
-    for (i = 0; i < elements.length; ++i) {
+    for (var i = 0; i < elements.length; ++i) {
         tmp = elements[i].href.split('?');
         elements[i].href = getDwvBaseUrl(obj.value)+'?'+tmp[1];
     }
@@ -96,10 +96,15 @@ function setDwv(obj)
 function getDwvBaseUrl(flag)
 {
     var path = "../../viewers";
-    if( flag === "dwvmobile" ) path += "/mobile";
-    else if( flag === "dwvstatic" ) path += "/static";
-    else if( flag === "dwvsimple" ) path += "/simple";
-    else if( flag === "dwvsimplistic" ) path += "/simplistic";
+    if( flag === "dwvmobile" ) {
+        path += "/mobile";
+    } else if( flag === "dwvstatic" ) {
+        path += "/static";
+    } else if( flag === "dwvsimple" ) {
+        path += "/simple";
+    } else if( flag === "dwvsimplistic" ) {
+        path += "/simplistic";
+    }
     path += "/index.html";
     return path;
 }
@@ -134,7 +139,9 @@ function createAndPutHtml(data, id)
         // link
         var link = document.createElement("a");
         link.href = getDwvUrl(data[i].uri);
-        if( data[i].uriargs ) link.href += data[i].uriargs;
+        if( data[i].uriargs ) {
+            link.href += data[i].uriargs;
+        }
         link.className = "dwvlink";
         link.appendChild(image);
 
@@ -152,7 +159,7 @@ function createAndPutHtml(data, id)
 window.onload = function() {
     createAndPutHtml(dataDicom, "uldatadicom");
     createAndPutHtml(dataImg, "uldataimg");
-}
+};
 </script>
 </head>
 <body>
