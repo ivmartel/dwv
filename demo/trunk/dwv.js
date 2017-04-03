@@ -1301,14 +1301,14 @@ dwv.App = function ()
         view.addEventListener("slice-change", fireEvent);
         view.addEventListener("frame-change", fireEvent);
 
+        // append draw layers (before initialising the toolbox)
+        if ( drawController ) {
+            drawController.appendDrawLayer(image.getNumberOfFrames());
+        }
+
         // initialise the toolbox
         if ( toolboxController ) {
             toolboxController.initAndDisplay( imageLayer );
-        }
-
-        // append draw layers
-        if ( drawController ) {
-            drawController.appendDrawLayer(image.getNumberOfFrames());
         }
 
         // stop box listening to drag (after first drag)
