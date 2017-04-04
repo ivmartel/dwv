@@ -2,18 +2,20 @@
 var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
-//external
-var Kinetic = Kinetic || {};
+// external
+dwv.ext = dwv.ext || {};
+/* global Konva */
+dwv.ext.Konva = Konva || {};
 
 /**
- * Get the display name of the input Kinetic shape.
- * @param {Object} shape The Kinetic shape.
+ * Get the display name of the input shape.
+ * @param {Object} shape The Konva shape.
  * @return {String} The display name.
  */
 dwv.tool.GetShapeDisplayName = function (shape)
 {
     var displayName = "shape";
-    if ( shape instanceof Kinetic.Line ) {
+    if ( shape instanceof dwv.ext.Konva.Line ) {
         if ( shape.points().length === 4 ) {
             displayName = "line";
         }
@@ -24,10 +26,10 @@ dwv.tool.GetShapeDisplayName = function (shape)
             displayName = "roi";
         }
     }
-    else if ( shape instanceof Kinetic.Rect ) {
+    else if ( shape instanceof dwv.ext.Konva.Rect ) {
         displayName = "rectangle";
     }
-    else if ( shape instanceof Kinetic.Ellipse ) {
+    else if ( shape instanceof dwv.ext.Konva.Ellipse ) {
         displayName = "ellipse";
     }
     // return

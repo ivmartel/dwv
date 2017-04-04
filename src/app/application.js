@@ -1,7 +1,5 @@
 /** @namespace */
 var dwv = dwv || {};
-// external
-var Kinetic = Kinetic || {};
 
 /**
  * Main application class.

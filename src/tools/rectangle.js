@@ -1,8 +1,10 @@
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-//external
-var Kinetic = Kinetic || {};
+// external
+dwv.ext = dwv.ext || {};
+/* global Konva */
+dwv.ext.Konva = Konva || {};
 
 /**
  * Rectangle factory.
@@ -33,7 +35,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
     // physical shape
     var rectangle = new dwv.math.Rectangle(points[0], points[1]);
     // draw shape
-    var kshape = new Kinetic.Rect({
+    var kshape = new dwv.ext.Konva.Rect({
         x: rectangle.getBegin().getX(),
         y: rectangle.getBegin().getY(),
         width: rectangle.getWidth(),
@@ -44,7 +46,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
     });
     // quantification
     var quant = image.quantifyRect( rectangle );
-    var ktext = new Kinetic.Text({
+    var ktext = new dwv.ext.Konva.Text({
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
@@ -56,16 +58,16 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
     ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
 
     // label
-    var klabel = new Kinetic.Label({
+    var klabel = new dwv.ext.Konva.Label({
         x: rectangle.getBegin().getX(),
         y: rectangle.getEnd().getY() + 10,
         name: "label"
     });
     klabel.add(ktext);
-    klabel.add(new Kinetic.Tag());
+    klabel.add(new dwv.ext.Konva.Tag());
 
     // return group
-    var group = new Kinetic.Group();
+    var group = new dwv.ext.Konva.Group();
     group.name("rectangle-group");
     group.add(kshape);
     group.add(klabel);

@@ -1,9 +1,7 @@
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-
-//external
-var Kinetic = Kinetic || {};
+// external
 var MagicWand = MagicWand || {};
 
 /**
