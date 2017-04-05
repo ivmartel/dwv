@@ -1,8 +1,10 @@
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-//external
-var Kinetic = Kinetic || {};
+// external
+dwv.ext = dwv.ext || {};
+/* global Konva */
+dwv.ext.Konva = Konva || {};
 
 /**
  * Ruler factory.
@@ -33,7 +35,7 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
     // physical shape
     var line = new dwv.math.Line(points[0], points[1]);
     // draw shape
-    var kshape = new Kinetic.Line({
+    var kshape = new dwv.ext.Konva.Line({
         points: [line.getBegin().getX(), line.getBegin().getY(),
                  line.getEnd().getX(), line.getEnd().getY() ],
         stroke: style.getLineColour(),
@@ -43,7 +45,7 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
 
     // tick begin
     var linePerp0 = dwv.math.getPerpendicularLine( line, points[0], 10 );
-    var ktick0 = new Kinetic.Line({
+    var ktick0 = new dwv.ext.Konva.Line({
         points: [linePerp0.getBegin().getX(), linePerp0.getBegin().getY(),
                  linePerp0.getEnd().getX(), linePerp0.getEnd().getY() ],
         stroke: style.getLineColour(),
@@ -53,7 +55,7 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
 
     // tick end
     var linePerp1 = dwv.math.getPerpendicularLine( line, points[1], 10 );
-    var ktick1 = new Kinetic.Line({
+    var ktick1 = new dwv.ext.Konva.Line({
         points: [linePerp1.getBegin().getX(), linePerp1.getBegin().getY(),
                  linePerp1.getEnd().getX(), linePerp1.getEnd().getY() ],
         stroke: style.getLineColour(),
@@ -63,7 +65,7 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
 
     // quantification
     var quant = image.quantifyLine( line );
-    var ktext = new Kinetic.Text({
+    var ktext = new dwv.ext.Konva.Text({
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
@@ -76,16 +78,16 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
     // label
     var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
     var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
-    var klabel = new Kinetic.Label({
+    var klabel = new dwv.ext.Konva.Label({
         x: line.getEnd().getX() + dX * 25,
         y: line.getEnd().getY() + dY * 15,
         name: "label"
     });
     klabel.add(ktext);
-    klabel.add(new Kinetic.Tag());
+    klabel.add(new dwv.ext.Konva.Tag());
 
     // return group
-    var group = new Kinetic.Group();
+    var group = new dwv.ext.Konva.Group();
     group.name("ruler-group");
     group.add(kshape);
     group.add(ktick0);

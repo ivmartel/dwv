@@ -1,8 +1,10 @@
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-//external
-var Kinetic = Kinetic || {};
+// external
+dwv.ext = dwv.ext || {};
+/* global Konva */
+dwv.ext.Konva = Konva || {};
 
 /**
  * ROI factory.
@@ -34,7 +36,7 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
     var roi = new dwv.math.ROI();
     // add input points to the ROI
     roi.addPoints(points);
-    // points stored the kineticjs way
+    // points stored the Konvajs way
     var arr = [];
     for( var i = 0; i < roi.getLength(); ++i )
     {
@@ -42,7 +44,7 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
         arr.push( roi.getPoint(i).getY() );
     }
     // draw shape
-    var kshape = new Kinetic.Line({
+    var kshape = new dwv.ext.Konva.Line({
         points: arr,
         stroke: style.getLineColour(),
         strokeWidth: style.getScaledStrokeWidth(),
@@ -51,7 +53,7 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
     });
 
     // text
-    var ktext = new Kinetic.Text({
+    var ktext = new dwv.ext.Konva.Text({
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
@@ -63,16 +65,16 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
     ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
 
     // label
-    var klabel = new Kinetic.Label({
+    var klabel = new dwv.ext.Konva.Label({
         x: roi.getPoint(0).getX(),
         y: roi.getPoint(0).getY() + 10,
         name: "label"
     });
     klabel.add(ktext);
-    klabel.add(new Kinetic.Tag());
+    klabel.add(new dwv.ext.Konva.Tag());
 
     // return group
-    var group = new Kinetic.Group();
+    var group = new dwv.ext.Konva.Group();
     group.name("roi-group");
     group.add(kshape);
     group.add(klabel);

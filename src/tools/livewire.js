@@ -1,8 +1,6 @@
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-//external
-var Kinetic = Kinetic || {};
 
 /**
  * Livewire painting tool.

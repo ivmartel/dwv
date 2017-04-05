@@ -1,8 +1,10 @@
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-//external
-var Kinetic = Kinetic || {};
+// external
+dwv.ext = dwv.ext || {};
+/* global Konva */
+dwv.ext.Konva = Konva || {};
 
 /**
  * Shape editor.
@@ -184,7 +186,7 @@ dwv.tool.ShapeEditor = function (app)
         // get shape group
         var group = shape.getParent();
         // add shape specific anchors to the shape group
-        if ( shape instanceof Kinetic.Line ) {
+        if ( shape instanceof dwv.ext.Konva.Line ) {
             var points = shape.points();
             if ( points.length === 4 || points.length === 6) {
                 // add shape offset
@@ -223,7 +225,7 @@ dwv.tool.ShapeEditor = function (app)
                 }
             }
         }
-        else if ( shape instanceof Kinetic.Rect ) {
+        else if ( shape instanceof dwv.ext.Konva.Rect ) {
             updateFunction = dwv.tool.UpdateRect;
             var rectX = shape.x();
             var rectY = shape.y();
@@ -234,7 +236,7 @@ dwv.tool.ShapeEditor = function (app)
             addAnchor(group, rectX+rectWidth, rectY+rectHeight, 'bottomRight');
             addAnchor(group, rectX, rectY+rectHeight, 'bottomLeft');
         }
-        else if ( shape instanceof Kinetic.Ellipse ) {
+        else if ( shape instanceof dwv.ext.Konva.Ellipse ) {
             updateFunction = dwv.tool.UpdateEllipse;
             var ellipseX = shape.x();
             var ellipseY = shape.y();
@@ -257,14 +259,11 @@ dwv.tool.ShapeEditor = function (app)
      */
     function addAnchor(group, x, y, id) {
         // anchor shape
-        var anchor = new Kinetic.Circle({
+        var anchor = new dwv.ext.Konva.Circle({
             x: x,
             y: y,
             stroke: '#999',
-            fillRed: 100,
-            fillBlue: 100,
-            fillGreen: 100,
-            fillAlpha: 0.7,
+            fill: 'rgba(100,100,100,0.7',
             strokeWidth: app.getStyle().getScaledStrokeWidth() / app.getScale(),
             radius: app.getStyle().scale(6) / app.getScale(),
             name: 'anchor',

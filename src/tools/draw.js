@@ -3,7 +3,9 @@ var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
 // external
-var Kinetic = Kinetic || {};
+dwv.ext = dwv.ext || {};
+/* global Konva */
+dwv.ext.Konva = Konva || {};
 
 /**
  * Drawing tool.
@@ -84,15 +86,15 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @private
      * @type Object
      */
-    var trash = new Kinetic.Group();
+    var trash = new dwv.ext.Konva.Group();
 
     // first line of the cross
-    var trashLine1 = new Kinetic.Line({
+    var trashLine1 = new dwv.ext.Konva.Line({
         points: [-10, -10, 10, 10 ],
         stroke: 'red'
     });
     // second line of the cross
-    var trashLine2 = new Kinetic.Line({
+    var trashLine2 = new dwv.ext.Konva.Line({
         points: [10, -10, -10, 10 ],
         stroke: 'red'
     });
@@ -510,7 +512,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                     mvcmd.onExecute = fireEvent;
                     mvcmd.onUndo = fireEvent;
                     app.addToUndoStack(mvcmd);
-                    // the move is handled by kinetic, trigger an event manually
+                    // the move is handled by Konva, trigger an event manually
                     fireEvent({'type': 'draw-move'});
                 }
                 // reset anchors

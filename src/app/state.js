@@ -1,7 +1,5 @@
 // namespaces
 var dwv = dwv || {};
-//external
-var Kinetic = Kinetic || {};
 
 /**
  * State class.
