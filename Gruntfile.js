@@ -34,7 +34,10 @@ module.exports = function(grunt) {
         },
         concat: {
             options: {
-                separator: ';'
+                separator: ';',
+                banner: '(function() {var dwv = (function() {',
+                footer: 'return dwv;})();if (typeof module !== \'undefined\' && typeof module.exports !== \'undefined\')module.exports = dwv;else window.dwv = dwv;})();',
+                sourceMap: true
             },
             dist: {
                 src: ['resources/module/intro.js', 'src/**/*.js', 'resources/module/outro.js'],
