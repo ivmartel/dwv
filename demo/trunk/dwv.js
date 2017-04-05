@@ -1,7 +1,5 @@
 /** @namespace */
 var dwv = dwv || {};
-// external
-var Kinetic = Kinetic || {};
 
 /**
  * Main application class.
@@ -1342,7 +1340,9 @@ dwv.App = function ()
 ;// namespaces
 var dwv = dwv || {};
 // external
-var Kinetic = Kinetic || {};
+dwv.ext = dwv.ext || {};
+/* global Konva */
+dwv.ext.Konva = Konva || {};
 
 /**
  * Draw controller.
@@ -1369,7 +1369,7 @@ dwv.DrawController = function (drawDiv)
      */
     this.create = function (width, height) {
         // create stage
-        drawStage = new Kinetic.Stage({
+        drawStage = new dwv.ext.Konva.Stage({
             'container': drawDiv,
             'width': width,
             'height': height,
@@ -1494,7 +1494,7 @@ dwv.DrawController = function (drawDiv)
         // fill it
         for (var i = 0; i < nLayers; ++i) {
             // create draw layer
-            var drawLayer = new Kinetic.Layer({
+            var drawLayer = new dwv.ext.Konva.Layer({
                 'listening': false,
                 'hitGraphEnabled': false,
                 'visible': false
@@ -1594,7 +1594,7 @@ dwv.DrawController = function (drawDiv)
                     if ( texts.length !== 1 ) {
                         console.warn("There should not be more than one text per shape.");
                     }
-                    // get details (non Kinetic vars)
+                    // get details (non konva vars)
                     details.push({
                         "id": groups[i].id(),
                         "textExpr": encodeURIComponent(texts[0].textExpr),
@@ -1622,7 +1622,7 @@ dwv.DrawController = function (drawDiv)
             for ( var f = 0, lenf = drawLayers[k].length; f < lenf; ++f ) {
                 for ( var i = 0, leni = drawings[k][f].length; i < leni; ++i ) {
                     // create the group
-                    var group = Kinetic.Node.create(drawings[k][f][i]);
+                    var group = dwv.ext.Konva.Node.create(drawings[k][f][i]);
                     var shape = group.getChildren( isNodeNameShape )[0];
                     // create the draw command
                     var cmd = new dwv.tool.DrawGroupCommand(
@@ -1762,7 +1762,7 @@ dwv.DrawController = function (drawDiv)
 
     /**
      * Is an input node's name 'shape'.
-     * @param {Object} node A Kineticjs node.
+     * @param {Object} node A Konva node.
      */
     function isNodeNameShape( node ) {
         return node.name() === "shape";
@@ -1770,7 +1770,7 @@ dwv.DrawController = function (drawDiv)
 
     /**
      * Is a node an extra shape associated with a main one.
-     * @param {Object} node A Kineticjs node.
+     * @param {Object} node A Konva node.
      */
     function isNodeNameShapeExtra( node ) {
         return node.name().startsWith("shape-");
@@ -1778,7 +1778,7 @@ dwv.DrawController = function (drawDiv)
 
     /**
      * Is an input node's name 'label'.
-     * @param {Object} node A Kineticjs node.
+     * @param {Object} node A Konva node.
      */
     function isNodeNameLabel( node ) {
         return node.name() === "label";
@@ -1912,8 +1912,6 @@ dwv.InfoController = function (containerDivId)
 }; // class dwv.InfoController
 ;// namespaces
 var dwv = dwv || {};
-//external
-var Kinetic = Kinetic || {};
 
 /**
  * State class.
@@ -17287,8 +17285,10 @@ dwv.math.Vector3D.prototype.dotProduct = function (vector3D) {
 ;// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-//external
-var Kinetic = Kinetic || {};
+// external
+dwv.ext = dwv.ext || {};
+/* global Konva */
+dwv.ext.Konva = Konva || {};
 
 /**
  * Arrow factory.
@@ -17319,7 +17319,7 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
     // physical shape
     var line = new dwv.math.Line(points[0], points[1]);
     // draw shape
-    var kshape = new Kinetic.Line({
+    var kshape = new dwv.ext.Konva.Line({
         points: [line.getBegin().getX(), line.getBegin().getY(),
                  line.getEnd().getX(), line.getEnd().getY() ],
         stroke: style.getLineColour(),
@@ -17332,7 +17332,7 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
     var angle = dwv.math.getAngle(line, verticalLine);
     var angleRad = angle * Math.PI / 180;
     var radius = 5;
-    var kpoly = new Kinetic.RegularPolygon({
+    var kpoly = new dwv.ext.Konva.RegularPolygon({
         x: line.getBegin().getX() + radius * Math.sin(angleRad),
         y: line.getBegin().getY() + radius * Math.cos(angleRad),
         sides: 3,
@@ -17343,7 +17343,7 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
         name: "shape-triangle"
     });
     // quantification
-    var ktext = new Kinetic.Text({
+    var ktext = new dwv.ext.Konva.Text({
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
@@ -17356,16 +17356,16 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
     // label
     var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
     var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
-    var klabel = new Kinetic.Label({
+    var klabel = new dwv.ext.Konva.Label({
         x: line.getEnd().getX() + dX * 25,
         y: line.getEnd().getY() + dY * 15,
         name: "label"
     });
     klabel.add(ktext);
-    klabel.add(new Kinetic.Tag());
+    klabel.add(new dwv.ext.Konva.Tag());
 
     // return group
-    var group = new Kinetic.Group();
+    var group = new dwv.ext.Konva.Group();
     group.name("line-group");
     group.add(kshape);
     group.add(kpoly);
@@ -17449,7 +17449,9 @@ var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
 // external
-var Kinetic = Kinetic || {};
+dwv.ext = dwv.ext || {};
+/* global Konva */
+dwv.ext.Konva = Konva || {};
 
 /**
  * Drawing tool.
@@ -17530,15 +17532,15 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @private
      * @type Object
      */
-    var trash = new Kinetic.Group();
+    var trash = new dwv.ext.Konva.Group();
 
     // first line of the cross
-    var trashLine1 = new Kinetic.Line({
+    var trashLine1 = new dwv.ext.Konva.Line({
         points: [-10, -10, 10, 10 ],
         stroke: 'red'
     });
     // second line of the cross
-    var trashLine2 = new Kinetic.Line({
+    var trashLine2 = new dwv.ext.Konva.Line({
         points: [10, -10, -10, 10 ],
         stroke: 'red'
     });
@@ -17956,7 +17958,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                     mvcmd.onExecute = fireEvent;
                     mvcmd.onUndo = fireEvent;
                     app.addToUndoStack(mvcmd);
-                    // the move is handled by kinetic, trigger an event manually
+                    // the move is handled by Konva, trigger an event manually
                     fireEvent({'type': 'draw-move'});
                 }
                 // reset anchors
@@ -18125,18 +18127,20 @@ dwv.tool.Draw.prototype.hasShape = function(name) {
 var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
-//external
-var Kinetic = Kinetic || {};
+// external
+dwv.ext = dwv.ext || {};
+/* global Konva */
+dwv.ext.Konva = Konva || {};
 
 /**
- * Get the display name of the input Kinetic shape.
- * @param {Object} shape The Kinetic shape.
+ * Get the display name of the input shape.
+ * @param {Object} shape The Konva shape.
  * @return {String} The display name.
  */
 dwv.tool.GetShapeDisplayName = function (shape)
 {
     var displayName = "shape";
-    if ( shape instanceof Kinetic.Line ) {
+    if ( shape instanceof dwv.ext.Konva.Line ) {
         if ( shape.points().length === 4 ) {
             displayName = "line";
         }
@@ -18147,10 +18151,10 @@ dwv.tool.GetShapeDisplayName = function (shape)
             displayName = "roi";
         }
     }
-    else if ( shape instanceof Kinetic.Rect ) {
+    else if ( shape instanceof dwv.ext.Konva.Rect ) {
         displayName = "rectangle";
     }
-    else if ( shape instanceof Kinetic.Ellipse ) {
+    else if ( shape instanceof dwv.ext.Konva.Ellipse ) {
         displayName = "ellipse";
     }
     // return
@@ -18396,8 +18400,10 @@ dwv.tool.DeleteGroupCommand.prototype.onUndo = function (/*event*/)
 ;// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-//external
-var Kinetic = Kinetic || {};
+// external
+dwv.ext = dwv.ext || {};
+/* global Konva */
+dwv.ext.Konva = Konva || {};
 
 /**
  * Shape editor.
@@ -18579,7 +18585,7 @@ dwv.tool.ShapeEditor = function (app)
         // get shape group
         var group = shape.getParent();
         // add shape specific anchors to the shape group
-        if ( shape instanceof Kinetic.Line ) {
+        if ( shape instanceof dwv.ext.Konva.Line ) {
             var points = shape.points();
             if ( points.length === 4 || points.length === 6) {
                 // add shape offset
@@ -18618,7 +18624,7 @@ dwv.tool.ShapeEditor = function (app)
                 }
             }
         }
-        else if ( shape instanceof Kinetic.Rect ) {
+        else if ( shape instanceof dwv.ext.Konva.Rect ) {
             updateFunction = dwv.tool.UpdateRect;
             var rectX = shape.x();
             var rectY = shape.y();
@@ -18629,7 +18635,7 @@ dwv.tool.ShapeEditor = function (app)
             addAnchor(group, rectX+rectWidth, rectY+rectHeight, 'bottomRight');
             addAnchor(group, rectX, rectY+rectHeight, 'bottomLeft');
         }
-        else if ( shape instanceof Kinetic.Ellipse ) {
+        else if ( shape instanceof dwv.ext.Konva.Ellipse ) {
             updateFunction = dwv.tool.UpdateEllipse;
             var ellipseX = shape.x();
             var ellipseY = shape.y();
@@ -18652,14 +18658,11 @@ dwv.tool.ShapeEditor = function (app)
      */
     function addAnchor(group, x, y, id) {
         // anchor shape
-        var anchor = new Kinetic.Circle({
+        var anchor = new dwv.ext.Konva.Circle({
             x: x,
             y: y,
             stroke: '#999',
-            fillRed: 100,
-            fillBlue: 100,
-            fillGreen: 100,
-            fillAlpha: 0.7,
+            fill: 'rgba(100,100,100,0.7',
             strokeWidth: app.getStyle().getScaledStrokeWidth() / app.getScale(),
             radius: app.getStyle().scale(6) / app.getScale(),
             name: 'anchor',
@@ -18784,8 +18787,10 @@ dwv.tool.ShapeEditor = function (app)
 ;// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-//external
-var Kinetic = Kinetic || {};
+// external
+dwv.ext = dwv.ext || {};
+/* global Konva */
+dwv.ext.Konva = Konva || {};
 
 /**
  * Ellipse factory.
@@ -18819,7 +18824,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
     // physical shape
     var ellipse = new dwv.math.Ellipse(points[0], a, b);
     // draw shape
-    var kshape = new Kinetic.Ellipse({
+    var kshape = new dwv.ext.Konva.Ellipse({
         x: ellipse.getCenter().getX(),
         y: ellipse.getCenter().getY(),
         radius: { x: ellipse.getA(), y: ellipse.getB() },
@@ -18829,7 +18834,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
     });
     // quantification
     var quant = image.quantifyEllipse( ellipse );
-    var ktext = new Kinetic.Text({
+    var ktext = new dwv.ext.Konva.Text({
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
@@ -18840,16 +18845,16 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
     ktext.quant = quant;
     ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
     // label
-    var klabel = new Kinetic.Label({
+    var klabel = new dwv.ext.Konva.Label({
         x: ellipse.getCenter().getX(),
         y: ellipse.getCenter().getY(),
         name: "label"
     });
     klabel.add(ktext);
-    klabel.add(new Kinetic.Tag());
+    klabel.add(new dwv.ext.Konva.Tag());
 
     // return group
-    var group = new Kinetic.Group();
+    var group = new dwv.ext.Konva.Group();
     group.name("ellipse-group");
     group.add(kshape);
     group.add(klabel);
@@ -19300,9 +19305,7 @@ dwv.tool.RunFilterCommand = function (filter, app) {
 ;// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-
-//external
-var Kinetic = Kinetic || {};
+// external
 var MagicWand = MagicWand || {};
 
 /**
@@ -19782,8 +19785,10 @@ dwv.tool.Floodfill.prototype.setLineColour = function(colour)
 ;// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-//external
-var Kinetic = Kinetic || {};
+// external
+dwv.ext = dwv.ext || {};
+/* global Konva */
+dwv.ext.Konva = Konva || {};
 
 /**
  * FreeHand factory.
@@ -19811,7 +19816,7 @@ dwv.tool.FreeHandFactory = function ()
  */
 dwv.tool.FreeHandFactory.prototype.create = function (points, style /*, image*/)
 {
-    // points stored the kineticjs way
+    // points stored the Konvajs way
     var arr = [];
     for( var i = 0; i < points.length; ++i )
     {
@@ -19819,7 +19824,7 @@ dwv.tool.FreeHandFactory.prototype.create = function (points, style /*, image*/)
         arr.push( points[i].getY() );
     }
     // draw shape
-    var kshape = new Kinetic.Line({
+    var kshape = new dwv.ext.Konva.Line({
         points: arr,
         stroke: style.getLineColour(),
         strokeWidth: style.getScaledStrokeWidth(),
@@ -19828,7 +19833,7 @@ dwv.tool.FreeHandFactory.prototype.create = function (points, style /*, image*/)
     });
 
     // text
-    var ktext = new Kinetic.Text({
+    var ktext = new dwv.ext.Konva.Text({
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
@@ -19840,16 +19845,16 @@ dwv.tool.FreeHandFactory.prototype.create = function (points, style /*, image*/)
     ktext.setText(ktext.textExpr);
 
     // label
-    var klabel = new Kinetic.Label({
+    var klabel = new dwv.ext.Konva.Label({
         x: points[0].getX(),
         y: points[0].getY() + 10,
         name: "label"
     });
     klabel.add(ktext);
-    klabel.add(new Kinetic.Tag());
+    klabel.add(new dwv.ext.Konva.Tag());
 
     // return group
-    var group = new Kinetic.Group();
+    var group = new dwv.ext.Konva.Group();
     group.name("freeHand-group");
     group.add(kshape);
     group.add(klabel);
@@ -19899,8 +19904,6 @@ dwv.tool.UpdateFreeHand = function (anchor /*, image*/)
 ;// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-//external
-var Kinetic = Kinetic || {};
 
 /**
  * Livewire painting tool.
@@ -20290,8 +20293,10 @@ dwv.tool.Livewire.prototype.setLineColour = function(colour)
 ;// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-//external
-var Kinetic = Kinetic || {};
+// external
+dwv.ext = dwv.ext || {};
+/* global Konva */
+dwv.ext.Konva = Konva || {};
 
 /**
  * Protractor factory.
@@ -20321,7 +20326,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
 {
     // physical shape
     var line0 = new dwv.math.Line(points[0], points[1]);
-    // points stored the kineticjs way
+    // points stored the Konvajs way
     var pointsArray = [];
     for( var i = 0; i < points.length; ++i )
     {
@@ -20329,13 +20334,13 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
         pointsArray.push( points[i].getY() );
     }
     // draw shape
-    var kshape = new Kinetic.Line({
+    var kshape = new dwv.ext.Konva.Line({
         points: pointsArray,
         stroke: style.getLineColour(),
         strokeWidth: style.getScaledStrokeWidth(),
         name: "shape"
     });
-    var group = new Kinetic.Group();
+    var group = new dwv.ext.Konva.Group();
     group.name("protractor-group");
     group.add(kshape);
     group.visible(true); // dont inherit
@@ -20352,7 +20357,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
 
         // quantification
         var quant = { "angle": { "value": angle, "unit": dwv.i18n("unit.degree")} };
-        var ktext = new Kinetic.Text({
+        var ktext = new dwv.ext.Konva.Text({
             fontSize: style.getScaledFontSize(),
             fontFamily: style.getFontFamily(),
             fill: style.getLineColour(),
@@ -20366,23 +20371,23 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
         // label
         var midX = ( line0.getMidpoint().getX() + line1.getMidpoint().getX() ) / 2;
         var midY = ( line0.getMidpoint().getY() + line1.getMidpoint().getY() ) / 2;
-        var klabel = new Kinetic.Label({
+        var klabel = new dwv.ext.Konva.Label({
             x: midX,
             y: midY - 15,
             name: "label"
         });
         klabel.add(ktext);
-        klabel.add(new Kinetic.Tag());
+        klabel.add(new dwv.ext.Konva.Tag());
 
         // arc
         var radius = Math.min(line0.getLength(), line1.getLength()) * 33 / 100;
-        var karc = new Kinetic.Arc({
+        var karc = new dwv.ext.Konva.Arc({
             innerRadius: radius,
             outerRadius: radius,
             stroke: style.getLineColour(),
             strokeWidth: style.getScaledStrokeWidth(),
             angle: angle,
-            rotationDeg: -inclination,
+            rotation: -inclination,
             x: points[1].getX(),
             y: points[1].getY(),
             name: "shape-arc"
@@ -20486,8 +20491,10 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
 ;// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-//external
-var Kinetic = Kinetic || {};
+// external
+dwv.ext = dwv.ext || {};
+/* global Konva */
+dwv.ext.Konva = Konva || {};
 
 /**
  * Rectangle factory.
@@ -20518,7 +20525,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
     // physical shape
     var rectangle = new dwv.math.Rectangle(points[0], points[1]);
     // draw shape
-    var kshape = new Kinetic.Rect({
+    var kshape = new dwv.ext.Konva.Rect({
         x: rectangle.getBegin().getX(),
         y: rectangle.getBegin().getY(),
         width: rectangle.getWidth(),
@@ -20529,7 +20536,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
     });
     // quantification
     var quant = image.quantifyRect( rectangle );
-    var ktext = new Kinetic.Text({
+    var ktext = new dwv.ext.Konva.Text({
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
@@ -20541,16 +20548,16 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
     ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
 
     // label
-    var klabel = new Kinetic.Label({
+    var klabel = new dwv.ext.Konva.Label({
         x: rectangle.getBegin().getX(),
         y: rectangle.getEnd().getY() + 10,
         name: "label"
     });
     klabel.add(ktext);
-    klabel.add(new Kinetic.Tag());
+    klabel.add(new dwv.ext.Konva.Tag());
 
     // return group
-    var group = new Kinetic.Group();
+    var group = new dwv.ext.Konva.Group();
     group.name("rectangle-group");
     group.add(kshape);
     group.add(klabel);
@@ -20641,8 +20648,10 @@ dwv.tool.UpdateRect = function (anchor, image)
 ;// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-//external
-var Kinetic = Kinetic || {};
+// external
+dwv.ext = dwv.ext || {};
+/* global Konva */
+dwv.ext.Konva = Konva || {};
 
 /**
  * ROI factory.
@@ -20674,7 +20683,7 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
     var roi = new dwv.math.ROI();
     // add input points to the ROI
     roi.addPoints(points);
-    // points stored the kineticjs way
+    // points stored the Konvajs way
     var arr = [];
     for( var i = 0; i < roi.getLength(); ++i )
     {
@@ -20682,7 +20691,7 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
         arr.push( roi.getPoint(i).getY() );
     }
     // draw shape
-    var kshape = new Kinetic.Line({
+    var kshape = new dwv.ext.Konva.Line({
         points: arr,
         stroke: style.getLineColour(),
         strokeWidth: style.getScaledStrokeWidth(),
@@ -20691,7 +20700,7 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
     });
 
     // text
-    var ktext = new Kinetic.Text({
+    var ktext = new dwv.ext.Konva.Text({
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
@@ -20703,16 +20712,16 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
     ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
 
     // label
-    var klabel = new Kinetic.Label({
+    var klabel = new dwv.ext.Konva.Label({
         x: roi.getPoint(0).getX(),
         y: roi.getPoint(0).getY() + 10,
         name: "label"
     });
     klabel.add(ktext);
-    klabel.add(new Kinetic.Tag());
+    klabel.add(new dwv.ext.Konva.Tag());
 
     // return group
-    var group = new Kinetic.Group();
+    var group = new dwv.ext.Konva.Group();
     group.name("roi-group");
     group.add(kshape);
     group.add(klabel);
@@ -20763,8 +20772,10 @@ dwv.tool.UpdateRoi = function (anchor /*, image*/)
 ;// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-//external
-var Kinetic = Kinetic || {};
+// external
+dwv.ext = dwv.ext || {};
+/* global Konva */
+dwv.ext.Konva = Konva || {};
 
 /**
  * Ruler factory.
@@ -20795,7 +20806,7 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
     // physical shape
     var line = new dwv.math.Line(points[0], points[1]);
     // draw shape
-    var kshape = new Kinetic.Line({
+    var kshape = new dwv.ext.Konva.Line({
         points: [line.getBegin().getX(), line.getBegin().getY(),
                  line.getEnd().getX(), line.getEnd().getY() ],
         stroke: style.getLineColour(),
@@ -20805,7 +20816,7 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
 
     // tick begin
     var linePerp0 = dwv.math.getPerpendicularLine( line, points[0], 10 );
-    var ktick0 = new Kinetic.Line({
+    var ktick0 = new dwv.ext.Konva.Line({
         points: [linePerp0.getBegin().getX(), linePerp0.getBegin().getY(),
                  linePerp0.getEnd().getX(), linePerp0.getEnd().getY() ],
         stroke: style.getLineColour(),
@@ -20815,7 +20826,7 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
 
     // tick end
     var linePerp1 = dwv.math.getPerpendicularLine( line, points[1], 10 );
-    var ktick1 = new Kinetic.Line({
+    var ktick1 = new dwv.ext.Konva.Line({
         points: [linePerp1.getBegin().getX(), linePerp1.getBegin().getY(),
                  linePerp1.getEnd().getX(), linePerp1.getEnd().getY() ],
         stroke: style.getLineColour(),
@@ -20825,7 +20836,7 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
 
     // quantification
     var quant = image.quantifyLine( line );
-    var ktext = new Kinetic.Text({
+    var ktext = new dwv.ext.Konva.Text({
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
@@ -20838,16 +20849,16 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
     // label
     var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
     var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
-    var klabel = new Kinetic.Label({
+    var klabel = new dwv.ext.Konva.Label({
         x: line.getEnd().getX() + dX * 25,
         y: line.getEnd().getY() + dY * 15,
         name: "label"
     });
     klabel.add(ktext);
-    klabel.add(new Kinetic.Tag());
+    klabel.add(new dwv.ext.Konva.Tag());
 
     // return group
-    var group = new Kinetic.Group();
+    var group = new dwv.ext.Konva.Group();
     group.name("ruler-group");
     group.add(kshape);
     group.add(ktick0);
