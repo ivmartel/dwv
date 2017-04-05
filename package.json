@@ -12,18 +12,10 @@
     "test": "grunt publish --verbose"
   },
   "dependencies": {
-    "jquery": "2.1.4",
-    "jquery-ui": "~1.12",
-    "jquery-mobile": "~1.4",
-    "kinetic": "~5"
-  },
-  "greenkeeper": {
-    "ignore": [
-      "jquery",
-      "jquery-ui",
-      "jquery-mobile",
-      "kinetic"
-    ]
+    "i18next": "~7.1.3",
+    "i18next-xhr-backend": "~1.4.1",
+    "i18next-browser-languageDetector": "~1.0.1",
+    "konva": "~1.5.0"
   },
   "devDependencies": {
     "grunt": "~1.0.1",
