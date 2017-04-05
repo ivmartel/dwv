@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# v15 2017-03-27
+# v16 2017-03-29
 
 CACHE:
 
@@ -8,7 +8,7 @@ index.html
 # css
 /dwv/demo/stable/css/style.css
 # js
-/dwv/demo/stable/dwv-0.18.0.min.js
+/dwv/demo/stable/dwv-0.19.0-beta.min.js
 applauncher.js
 appgui.js
 # images
@@ -53,7 +53,7 @@ appgui.js
 /dwv/demo/stable/ext/pdfjs/decode-jpegbaseline.js
 /dwv/demo/stable/ext/rii-mango/lossless-min.js
 /dwv/demo/stable/ext/rii-mango/decode-jpegloss.js
-/dwv/demo/stable/ext/kinetic/kinetic-v5.1.1-06.10.min.js
+/dwv/demo/stable/ext/konva/konva-1.5.0.min.js
 /dwv/demo/stable/ext/magic-wand/magic-wand.js
 
 NETWORK:
