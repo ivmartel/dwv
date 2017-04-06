@@ -33,7 +33,8 @@
     i18nextXHRBackend,
     i18nextBrowserLanguageDetector,
     Konva) {
-;/** @namespace */
+
+/** @namespace */
 var dwv = dwv || {};
 
 /**
@@ -1372,7 +1373,8 @@ dwv.App = function ()
     }
 
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 // external
 dwv.ext = dwv.ext || {};
@@ -1820,7 +1822,8 @@ dwv.DrawController = function (drawDiv)
     }
 
 }; // class dwv.DrawController
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 
 /**
@@ -1945,7 +1948,8 @@ dwv.InfoController = function (containerDivId)
     }
 
 }; // class dwv.InfoController
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 
 /**
@@ -2020,7 +2024,8 @@ dwv.State = function (app)
         app.setDrawings( data.drawings, data.drawingsDetails );
     }
 }; // State class
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 
 /**
@@ -2266,7 +2271,8 @@ dwv.ToolboxController = function ()
     }
 
 }; // class dwv.ToolboxController
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 
 /**
@@ -2531,7 +2537,8 @@ dwv.ViewController = function ( view )
     };
 
 }; // class dwv.ViewController
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 /** @namespace */
 dwv.dicom = dwv.dicom || {};
@@ -4235,7 +4242,8 @@ dwv.dicom.DicomElementsWrapper.prototype.getFromName = function ( name )
    }
    return dicomElement;
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
 
@@ -4947,7 +4955,8 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     // return
     return buffer;
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
 
@@ -9233,7 +9242,8 @@ dwv.dicom.TagGroups = {
   'x7FE0': 'Pixel Data',
   'xFFFF': 'Unknown'
   };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 /** @namespace */
 dwv.gui = dwv.gui || {};
@@ -9428,7 +9438,8 @@ dwv.gui.base.Sobel = function (app)
     };
 
 }; // class dwv.gui.base.Sobel
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
@@ -9857,7 +9868,8 @@ dwv.gui.base.DrawList = function (app)
     };
 
 }; // class dwv.gui.base.DrawList
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
@@ -9961,7 +9973,8 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
     helpNode.appendChild(toolPara);
     helpNode.appendChild(toolHelpDiv);
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 /** @namespace */
 dwv.html = dwv.html || {};
@@ -10520,7 +10533,8 @@ dwv.html.createHiddenElement = function (type, className)
     // return
     return element;
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
@@ -10791,7 +10805,8 @@ dwv.gui.info.Plot = function (div, app)
     };
 
 }; // class dwv.gui.info.Plot
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.html = dwv.html || {};
 
@@ -11174,7 +11189,8 @@ dwv.html.getEventOffset = function (event) {
     }
     return positions;
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
@@ -11367,7 +11383,8 @@ dwv.gui.base.UrlLoad = function (app)
     };
 
 }; // class dwv.gui.base.UrlLoad
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.html = dwv.html || {};
 
@@ -11498,7 +11515,8 @@ dwv.html.Style.prototype.getScaledStrokeWidth = function ()
 {
     return this.scale( this.getStrokeWidth() );
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
@@ -11939,7 +11957,8 @@ dwv.gui.base.Scroll = function (app)
     };
 
 }; // class dwv.gui.base.Scroll
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
@@ -12050,7 +12069,8 @@ dwv.gui.base.Undo = function (app)
     };
 
 }; // class dwv.gui.base.Undo
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
@@ -12269,7 +12289,8 @@ dwv.image.PixelBufferDecoder.prototype.ondecoded = function ()
 {
     // default does nothing.
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.image = dwv.image || {};
 /** @namespace */
@@ -12450,7 +12471,8 @@ dwv.image.filter.Sobel.prototype.update = function()
 
     return gradX.compose( gradY, function (x,y) { return Math.sqrt(x*x+y*y); } );
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
@@ -12704,7 +12726,8 @@ dwv.image.Geometry.prototype.worldToIndex = function (point) {
         point.getY() / spacing.getRowSpacing() - origin.getY(),
         point.getZ() / spacing.getSliceSpacing() - origin.getZ() );
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 /** @namespace */
 dwv.image = dwv.image || {};
@@ -13657,7 +13680,8 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
 
     return image;
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.image = dwv.image || {};
 /** @namespace */
@@ -14029,7 +14053,8 @@ dwv.image.lut.test = {
    "green": dwv.image.lut.buildLut(dwv.image.lut.id),
    "blue":  dwv.image.lut.buildLut(dwv.image.lut.id)
 };*/
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
@@ -14260,7 +14285,8 @@ dwv.image.DicomBufferToView.prototype.onprogress = function ()
 {
     // default does nothing.
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
@@ -15053,7 +15079,8 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
 
     return view;
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 /** @namespace */
 dwv.io = dwv.io || {};
@@ -15361,7 +15388,8 @@ dwv.io.File.prototype.load = function (ioArray)
         }
     }
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.io = dwv.io || {};
 
@@ -15721,7 +15749,8 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
         request.send(null);
     }
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 /** @namespace */
 dwv.math = dwv.math || {};
@@ -15829,7 +15858,8 @@ dwv.math.BucketQueue.prototype.buildArray = function(newSize) {
 
     return buckets;
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
@@ -15912,7 +15942,8 @@ dwv.math.getIdentityMat33= function () {
         0, 1, 0,
         0, 0, 1 );
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
@@ -16114,7 +16145,8 @@ dwv.math.Index3D.prototype.toString = function () {
         ", " + this.getJ() +
         ", " + this.getK() + ")";
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
@@ -16702,7 +16734,8 @@ dwv.math.Scissors.prototype.doWork = function() {
 
     return newPoints;
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
@@ -17182,7 +17215,8 @@ dwv.math.Path.prototype.appenPath = function(other) {
     }
     this.controlPointIndexArray = this.controlPointIndexArray.concat(indexArray);
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
@@ -17231,7 +17265,8 @@ dwv.math.guid = function ()
 {
     return Math.random().toString(36).substring(2, 15);
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
@@ -17317,7 +17352,8 @@ dwv.math.Vector3D.prototype.dotProduct = function (vector3D) {
         (this.getY() * vector3D.getY()) +
         (this.getZ() * vector3D.getZ());
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 // external
@@ -17479,7 +17515,8 @@ dwv.tool.UpdateArrow = function (anchor/*, image*/)
         'y': line.getEnd().getY() + dY * 15 };
     klabel.position( textPos );
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
@@ -18158,7 +18195,8 @@ dwv.tool.Draw.prototype.setShapeName = function(name)
 dwv.tool.Draw.prototype.hasShape = function(name) {
     return this.shapeFactoryList[name];
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
@@ -18432,7 +18470,8 @@ dwv.tool.DeleteGroupCommand.prototype.onUndo = function (/*event*/)
 {
     // default does nothing.
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 // external
@@ -18819,7 +18858,8 @@ dwv.tool.ShapeEditor = function (app)
         anchor.off('mouseout');
     }
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 // external
@@ -18977,7 +19017,8 @@ dwv.tool.UpdateEllipse = function (anchor, image)
     var textPos = { 'x': center.x, 'y': center.y };
     klabel.position( textPos );
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 /** @namespace */
@@ -19337,7 +19378,8 @@ dwv.tool.RunFilterCommand = function (filter, app) {
     };
 
 }; // RunFilterCommand class
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 // external
@@ -19817,7 +19859,8 @@ dwv.tool.Floodfill.prototype.setLineColour = function(colour)
     // set style var
     this.style.setLineColour(colour);
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 // external
@@ -19936,7 +19979,8 @@ dwv.tool.UpdateFreeHand = function (anchor /*, image*/)
     var textPos = { 'x': points[0] + kline.x(), 'y': points[1] +  kline.y() + 10 };
     klabel.position( textPos );
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
@@ -20325,7 +20369,8 @@ dwv.tool.Livewire.prototype.setLineColour = function(colour)
     // set style var
     this.style.setLineColour(colour);
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 // external
@@ -20523,7 +20568,8 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
     var arcPos = { 'x': mid.x(), 'y': mid.y() };
     karc.position(arcPos);
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 // external
@@ -20680,7 +20726,8 @@ dwv.tool.UpdateRect = function (anchor, image)
     var textPos = { 'x': rect.getBegin().getX(), 'y': rect.getEnd().getY() + 10 };
     klabel.position( textPos );
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 // external
@@ -20804,7 +20851,8 @@ dwv.tool.UpdateRoi = function (anchor /*, image*/)
     klabel.position( textPos );
 
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 // external
@@ -20979,7 +21027,8 @@ dwv.tool.UpdateRuler = function (anchor, image)
         'y': line.getEnd().getY() + dY * 15 };
     klabel.position( textPos );
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
@@ -21234,7 +21283,8 @@ dwv.tool.Scroll.prototype.getHelp = function()
         }
     };
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
@@ -21379,7 +21429,8 @@ dwv.tool.Toolbox.prototype.hasTool = function (name)
 {
     return this.getToolList()[name];
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
@@ -21481,7 +21532,8 @@ dwv.tool.UndoStack = function (app)
     };
 
 }; // UndoStack class
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
@@ -21678,7 +21730,8 @@ dwv.tool.WindowLevel.prototype.getHelp = function()
         }
     };
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
@@ -21925,7 +21978,8 @@ dwv.tool.ZoomAndPan.prototype.getHelp = function()
 dwv.tool.ZoomAndPan.prototype.init = function() {
     return true;
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 /** @namespace */
 dwv.browser = dwv.browser || {};
@@ -22104,7 +22158,8 @@ dwv.browser.check = function()
         window.Float64Array = window.Float32Array;
     }
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 // external
 var i18next = i18next || {};
@@ -22209,7 +22264,8 @@ dwv.i18nPage = function () {
         }
     }
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 /** @namespace */
 dwv.utils = dwv.utils || {};
@@ -22314,7 +22370,8 @@ dwv.utils.replaceFlags = function (inputStr, values)
     // return
     return res;
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.utils = dwv.utils || {};
 
@@ -22460,7 +22517,8 @@ dwv.utils.WorkerTask = function (script, callback, message) {
     // worker start message
     this.startMessage = message;
 };
-;// namespaces
+
+// namespaces
 var dwv = dwv || {};
 dwv.utils = dwv.utils || {};
 /** @namespace */
@@ -22707,5 +22765,6 @@ dwv.utils.decodeManifest = function (manifest, nslices)
     // return
     return result;
 };
-;    return dwv;
+
+    return dwv;
 }));
