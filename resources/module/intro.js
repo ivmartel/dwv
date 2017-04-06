@@ -33,3 +33,10 @@
     i18nextXHRBackend,
     i18nextBrowserLanguageDetector,
     Konva) {
+
+    // similar to what browserify does but reversed
+    //https://www.contentful.com/blog/2017/01/17/the-global-object-in-javascript/
+    var window = typeof window !== 'undefined' ? 
+        window : typeof self !== 'undefined' ? 
+        self : typeof global !== 'undefined' ?
+        global : {};
