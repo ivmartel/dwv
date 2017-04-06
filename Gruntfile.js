@@ -33,9 +33,6 @@ module.exports = function(grunt) {
             }
         },
         concat: {
-            options: {
-                separator: ';'
-            },
             dist: {
                 src: ['resources/module/intro.js', 'src/**/*.js', 'resources/module/outro.js'],
                 dest: 'dist/<%= pkg.name %>.js'
