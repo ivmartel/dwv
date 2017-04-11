@@ -55,7 +55,7 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
                 var action = tool.getHelp()[actionType][keys[i]];
 
                 var img = document.createElement("img");
-                img.src = dir + "/../../resources/doc/"+keys[i]+".png";
+                img.src = dir + "/../../resources/help/"+keys[i]+".png";
                 img.style.float = "left";
                 img.style.margin = "0px 15px 15px 0px";
 

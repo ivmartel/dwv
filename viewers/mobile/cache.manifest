@@ -12,12 +12,12 @@ index.html
 applauncher.js
 appgui.js
 # images
-/dwv/demo/stable/resources/doc/double_tap.png
-/dwv/demo/stable/resources/doc/tap_and_hold.png
-/dwv/demo/stable/resources/doc/tap.png
-/dwv/demo/stable/resources/doc/touch_drag.png
-/dwv/demo/stable/resources/doc/twotouch_drag.png
-/dwv/demo/stable/resources/doc/twotouch_pinch.png
+/dwv/demo/stable/resources/help/double_tap.png
+/dwv/demo/stable/resources/help/tap_and_hold.png
+/dwv/demo/stable/resources/help/tap.png
+/dwv/demo/stable/resources/help/touch_drag.png
+/dwv/demo/stable/resources/help/twotouch_drag.png
+/dwv/demo/stable/resources/help/twotouch_pinch.png
 # translations
 /dwv/demo/stable/locales/de/translation.json
 /dwv/demo/stable/locales/en/translation.json
