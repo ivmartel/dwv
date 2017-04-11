@@ -94,9 +94,7 @@
             class="sunlight-highlight-javascript linenums">// namespaces
 var dwv = dwv || {};
 // external
-dwv.ext = dwv.ext || {};
-/* global Konva */
-dwv.ext.Konva = Konva || {};
+var Konva = Konva || {};
 
 /**
  * Draw controller.
@@ -123,7 +121,7 @@ dwv.DrawController = function (drawDiv)
      */
     this.create = function (width, height) {
         // create stage
-        drawStage = new dwv.ext.Konva.Stage({
+        drawStage = new Konva.Stage({
             'container': drawDiv,
             'width': width,
             'height': height,
@@ -248,7 +246,7 @@ dwv.DrawController = function (drawDiv)
         // fill it
         for (var i = 0; i &lt; nLayers; ++i) {
             // create draw layer
-            var drawLayer = new dwv.ext.Konva.Layer({
+            var drawLayer = new Konva.Layer({
                 'listening': false,
                 'hitGraphEnabled': false,
                 'visible': false
@@ -376,7 +374,7 @@ dwv.DrawController = function (drawDiv)
             for ( var f = 0, lenf = drawLayers[k].length; f &lt; lenf; ++f ) {
                 for ( var i = 0, leni = drawings[k][f].length; i &lt; leni; ++i ) {
                     // create the group
-                    var group = dwv.ext.Konva.Node.create(drawings[k][f][i]);
+                    var group = Konva.Node.create(drawings[k][f][i]);
                     var shape = group.getChildren( isNodeNameShape )[0];
                     // create the draw command
                     var cmd = new dwv.tool.DrawGroupCommand(

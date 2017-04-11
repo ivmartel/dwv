@@ -1384,9 +1384,7 @@ dwv.App = function ()
 // namespaces
 var dwv = dwv || {};
 // external
-dwv.ext = dwv.ext || {};
-/* global Konva */
-dwv.ext.Konva = Konva || {};
+var Konva = Konva || {};
 
 /**
  * Draw controller.
@@ -1413,7 +1411,7 @@ dwv.DrawController = function (drawDiv)
      */
     this.create = function (width, height) {
         // create stage
-        drawStage = new dwv.ext.Konva.Stage({
+        drawStage = new Konva.Stage({
             'container': drawDiv,
             'width': width,
             'height': height,
@@ -1538,7 +1536,7 @@ dwv.DrawController = function (drawDiv)
         // fill it
         for (var i = 0; i < nLayers; ++i) {
             // create draw layer
-            var drawLayer = new dwv.ext.Konva.Layer({
+            var drawLayer = new Konva.Layer({
                 'listening': false,
                 'hitGraphEnabled': false,
                 'visible': false
@@ -1666,7 +1664,7 @@ dwv.DrawController = function (drawDiv)
             for ( var f = 0, lenf = drawLayers[k].length; f < lenf; ++f ) {
                 for ( var i = 0, leni = drawings[k][f].length; i < leni; ++i ) {
                     // create the group
-                    var group = dwv.ext.Konva.Node.create(drawings[k][f][i]);
+                    var group = Konva.Node.create(drawings[k][f][i]);
                     var shape = group.getChildren( isNodeNameShape )[0];
                     // create the draw command
                     var cmd = new dwv.tool.DrawGroupCommand(
@@ -17364,9 +17362,7 @@ dwv.math.Vector3D.prototype.dotProduct = function (vector3D) {
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 // external
-dwv.ext = dwv.ext || {};
-/* global Konva */
-dwv.ext.Konva = Konva || {};
+var Konva = Konva || {};
 
 /**
  * Arrow factory.
@@ -17397,7 +17393,7 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
     // physical shape
     var line = new dwv.math.Line(points[0], points[1]);
     // draw shape
-    var kshape = new dwv.ext.Konva.Line({
+    var kshape = new Konva.Line({
         points: [line.getBegin().getX(), line.getBegin().getY(),
                  line.getEnd().getX(), line.getEnd().getY() ],
         stroke: style.getLineColour(),
@@ -17410,7 +17406,7 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
     var angle = dwv.math.getAngle(line, verticalLine);
     var angleRad = angle * Math.PI / 180;
     var radius = 5;
-    var kpoly = new dwv.ext.Konva.RegularPolygon({
+    var kpoly = new Konva.RegularPolygon({
         x: line.getBegin().getX() + radius * Math.sin(angleRad),
         y: line.getBegin().getY() + radius * Math.cos(angleRad),
         sides: 3,
@@ -17421,7 +17417,7 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
         name: "shape-triangle"
     });
     // quantification
-    var ktext = new dwv.ext.Konva.Text({
+    var ktext = new Konva.Text({
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
@@ -17434,16 +17430,16 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
     // label
     var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
     var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
-    var klabel = new dwv.ext.Konva.Label({
+    var klabel = new Konva.Label({
         x: line.getEnd().getX() + dX * 25,
         y: line.getEnd().getY() + dY * 15,
         name: "label"
     });
     klabel.add(ktext);
-    klabel.add(new dwv.ext.Konva.Tag());
+    klabel.add(new Konva.Tag());
 
     // return group
-    var group = new dwv.ext.Konva.Group();
+    var group = new Konva.Group();
     group.name("line-group");
     group.add(kshape);
     group.add(kpoly);
@@ -17528,9 +17524,7 @@ var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
 // external
-dwv.ext = dwv.ext || {};
-/* global Konva */
-dwv.ext.Konva = Konva || {};
+var Konva = Konva || {};
 
 /**
  * Drawing tool.
@@ -17611,15 +17605,15 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @private
      * @type Object
      */
-    var trash = new dwv.ext.Konva.Group();
+    var trash = new Konva.Group();
 
     // first line of the cross
-    var trashLine1 = new dwv.ext.Konva.Line({
+    var trashLine1 = new Konva.Line({
         points: [-10, -10, 10, 10 ],
         stroke: 'red'
     });
     // second line of the cross
-    var trashLine2 = new dwv.ext.Konva.Line({
+    var trashLine2 = new Konva.Line({
         points: [10, -10, -10, 10 ],
         stroke: 'red'
     });
@@ -18208,9 +18202,7 @@ var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
 // external
-dwv.ext = dwv.ext || {};
-/* global Konva */
-dwv.ext.Konva = Konva || {};
+var Konva = Konva || {};
 
 /**
  * Get the display name of the input shape.
@@ -18220,7 +18212,7 @@ dwv.ext.Konva = Konva || {};
 dwv.tool.GetShapeDisplayName = function (shape)
 {
     var displayName = "shape";
-    if ( shape instanceof dwv.ext.Konva.Line ) {
+    if ( shape instanceof Konva.Line ) {
         if ( shape.points().length === 4 ) {
             displayName = "line";
         }
@@ -18231,10 +18223,10 @@ dwv.tool.GetShapeDisplayName = function (shape)
             displayName = "roi";
         }
     }
-    else if ( shape instanceof dwv.ext.Konva.Rect ) {
+    else if ( shape instanceof Konva.Rect ) {
         displayName = "rectangle";
     }
-    else if ( shape instanceof dwv.ext.Konva.Ellipse ) {
+    else if ( shape instanceof Konva.Ellipse ) {
         displayName = "ellipse";
     }
     // return
@@ -18482,9 +18474,7 @@ dwv.tool.DeleteGroupCommand.prototype.onUndo = function (/*event*/)
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 // external
-dwv.ext = dwv.ext || {};
-/* global Konva */
-dwv.ext.Konva = Konva || {};
+var Konva = Konva || {};
 
 /**
  * Shape editor.
@@ -18666,7 +18656,7 @@ dwv.tool.ShapeEditor = function (app)
         // get shape group
         var group = shape.getParent();
         // add shape specific anchors to the shape group
-        if ( shape instanceof dwv.ext.Konva.Line ) {
+        if ( shape instanceof Konva.Line ) {
             var points = shape.points();
             if ( points.length === 4 || points.length === 6) {
                 // add shape offset
@@ -18705,7 +18695,7 @@ dwv.tool.ShapeEditor = function (app)
                 }
             }
         }
-        else if ( shape instanceof dwv.ext.Konva.Rect ) {
+        else if ( shape instanceof Konva.Rect ) {
             updateFunction = dwv.tool.UpdateRect;
             var rectX = shape.x();
             var rectY = shape.y();
@@ -18716,7 +18706,7 @@ dwv.tool.ShapeEditor = function (app)
             addAnchor(group, rectX+rectWidth, rectY+rectHeight, 'bottomRight');
             addAnchor(group, rectX, rectY+rectHeight, 'bottomLeft');
         }
-        else if ( shape instanceof dwv.ext.Konva.Ellipse ) {
+        else if ( shape instanceof Konva.Ellipse ) {
             updateFunction = dwv.tool.UpdateEllipse;
             var ellipseX = shape.x();
             var ellipseY = shape.y();
@@ -18739,7 +18729,7 @@ dwv.tool.ShapeEditor = function (app)
      */
     function addAnchor(group, x, y, id) {
         // anchor shape
-        var anchor = new dwv.ext.Konva.Circle({
+        var anchor = new Konva.Circle({
             x: x,
             y: y,
             stroke: '#999',
@@ -18870,9 +18860,7 @@ dwv.tool.ShapeEditor = function (app)
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 // external
-dwv.ext = dwv.ext || {};
-/* global Konva */
-dwv.ext.Konva = Konva || {};
+var Konva = Konva || {};
 
 /**
  * Ellipse factory.
@@ -18906,7 +18894,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
     // physical shape
     var ellipse = new dwv.math.Ellipse(points[0], a, b);
     // draw shape
-    var kshape = new dwv.ext.Konva.Ellipse({
+    var kshape = new Konva.Ellipse({
         x: ellipse.getCenter().getX(),
         y: ellipse.getCenter().getY(),
         radius: { x: ellipse.getA(), y: ellipse.getB() },
@@ -18916,7 +18904,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
     });
     // quantification
     var quant = image.quantifyEllipse( ellipse );
-    var ktext = new dwv.ext.Konva.Text({
+    var ktext = new Konva.Text({
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
@@ -18927,16 +18915,16 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
     ktext.quant = quant;
     ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
     // label
-    var klabel = new dwv.ext.Konva.Label({
+    var klabel = new Konva.Label({
         x: ellipse.getCenter().getX(),
         y: ellipse.getCenter().getY(),
         name: "label"
     });
     klabel.add(ktext);
-    klabel.add(new dwv.ext.Konva.Tag());
+    klabel.add(new Konva.Tag());
 
     // return group
-    var group = new dwv.ext.Konva.Group();
+    var group = new Konva.Group();
     group.name("ellipse-group");
     group.add(kshape);
     group.add(klabel);
@@ -19871,9 +19859,7 @@ dwv.tool.Floodfill.prototype.setLineColour = function(colour)
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 // external
-dwv.ext = dwv.ext || {};
-/* global Konva */
-dwv.ext.Konva = Konva || {};
+var Konva = Konva || {};
 
 /**
  * FreeHand factory.
@@ -19909,7 +19895,7 @@ dwv.tool.FreeHandFactory.prototype.create = function (points, style /*, image*/)
         arr.push( points[i].getY() );
     }
     // draw shape
-    var kshape = new dwv.ext.Konva.Line({
+    var kshape = new Konva.Line({
         points: arr,
         stroke: style.getLineColour(),
         strokeWidth: style.getScaledStrokeWidth(),
@@ -19918,7 +19904,7 @@ dwv.tool.FreeHandFactory.prototype.create = function (points, style /*, image*/)
     });
 
     // text
-    var ktext = new dwv.ext.Konva.Text({
+    var ktext = new Konva.Text({
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
@@ -19930,16 +19916,16 @@ dwv.tool.FreeHandFactory.prototype.create = function (points, style /*, image*/)
     ktext.setText(ktext.textExpr);
 
     // label
-    var klabel = new dwv.ext.Konva.Label({
+    var klabel = new Konva.Label({
         x: points[0].getX(),
         y: points[0].getY() + 10,
         name: "label"
     });
     klabel.add(ktext);
-    klabel.add(new dwv.ext.Konva.Tag());
+    klabel.add(new Konva.Tag());
 
     // return group
-    var group = new dwv.ext.Konva.Group();
+    var group = new Konva.Group();
     group.name("freeHand-group");
     group.add(kshape);
     group.add(klabel);
@@ -20381,9 +20367,7 @@ dwv.tool.Livewire.prototype.setLineColour = function(colour)
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 // external
-dwv.ext = dwv.ext || {};
-/* global Konva */
-dwv.ext.Konva = Konva || {};
+var Konva = Konva || {};
 
 /**
  * Protractor factory.
@@ -20421,13 +20405,13 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
         pointsArray.push( points[i].getY() );
     }
     // draw shape
-    var kshape = new dwv.ext.Konva.Line({
+    var kshape = new Konva.Line({
         points: pointsArray,
         stroke: style.getLineColour(),
         strokeWidth: style.getScaledStrokeWidth(),
         name: "shape"
     });
-    var group = new dwv.ext.Konva.Group();
+    var group = new Konva.Group();
     group.name("protractor-group");
     group.add(kshape);
     group.visible(true); // dont inherit
@@ -20444,7 +20428,7 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
 
         // quantification
         var quant = { "angle": { "value": angle, "unit": dwv.i18n("unit.degree")} };
-        var ktext = new dwv.ext.Konva.Text({
+        var ktext = new Konva.Text({
             fontSize: style.getScaledFontSize(),
             fontFamily: style.getFontFamily(),
             fill: style.getLineColour(),
@@ -20458,17 +20442,17 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
         // label
         var midX = ( line0.getMidpoint().getX() + line1.getMidpoint().getX() ) / 2;
         var midY = ( line0.getMidpoint().getY() + line1.getMidpoint().getY() ) / 2;
-        var klabel = new dwv.ext.Konva.Label({
+        var klabel = new Konva.Label({
             x: midX,
             y: midY - 15,
             name: "label"
         });
         klabel.add(ktext);
-        klabel.add(new dwv.ext.Konva.Tag());
+        klabel.add(new Konva.Tag());
 
         // arc
         var radius = Math.min(line0.getLength(), line1.getLength()) * 33 / 100;
-        var karc = new dwv.ext.Konva.Arc({
+        var karc = new Konva.Arc({
             innerRadius: radius,
             outerRadius: radius,
             stroke: style.getLineColour(),
@@ -20580,9 +20564,7 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 // external
-dwv.ext = dwv.ext || {};
-/* global Konva */
-dwv.ext.Konva = Konva || {};
+var Konva = Konva || {};
 
 /**
  * Rectangle factory.
@@ -20613,7 +20595,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
     // physical shape
     var rectangle = new dwv.math.Rectangle(points[0], points[1]);
     // draw shape
-    var kshape = new dwv.ext.Konva.Rect({
+    var kshape = new Konva.Rect({
         x: rectangle.getBegin().getX(),
         y: rectangle.getBegin().getY(),
         width: rectangle.getWidth(),
@@ -20624,7 +20606,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
     });
     // quantification
     var quant = image.quantifyRect( rectangle );
-    var ktext = new dwv.ext.Konva.Text({
+    var ktext = new Konva.Text({
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
@@ -20636,16 +20618,16 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
     ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
 
     // label
-    var klabel = new dwv.ext.Konva.Label({
+    var klabel = new Konva.Label({
         x: rectangle.getBegin().getX(),
         y: rectangle.getEnd().getY() + 10,
         name: "label"
     });
     klabel.add(ktext);
-    klabel.add(new dwv.ext.Konva.Tag());
+    klabel.add(new Konva.Tag());
 
     // return group
-    var group = new dwv.ext.Konva.Group();
+    var group = new Konva.Group();
     group.name("rectangle-group");
     group.add(kshape);
     group.add(klabel);
@@ -20738,9 +20720,7 @@ dwv.tool.UpdateRect = function (anchor, image)
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 // external
-dwv.ext = dwv.ext || {};
-/* global Konva */
-dwv.ext.Konva = Konva || {};
+var Konva = Konva || {};
 
 /**
  * ROI factory.
@@ -20780,7 +20760,7 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
         arr.push( roi.getPoint(i).getY() );
     }
     // draw shape
-    var kshape = new dwv.ext.Konva.Line({
+    var kshape = new Konva.Line({
         points: arr,
         stroke: style.getLineColour(),
         strokeWidth: style.getScaledStrokeWidth(),
@@ -20789,7 +20769,7 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
     });
 
     // text
-    var ktext = new dwv.ext.Konva.Text({
+    var ktext = new Konva.Text({
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
@@ -20801,16 +20781,16 @@ dwv.tool.RoiFactory.prototype.create = function (points, style /*, image*/)
     ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
 
     // label
-    var klabel = new dwv.ext.Konva.Label({
+    var klabel = new Konva.Label({
         x: roi.getPoint(0).getX(),
         y: roi.getPoint(0).getY() + 10,
         name: "label"
     });
     klabel.add(ktext);
-    klabel.add(new dwv.ext.Konva.Tag());
+    klabel.add(new Konva.Tag());
 
     // return group
-    var group = new dwv.ext.Konva.Group();
+    var group = new Konva.Group();
     group.name("roi-group");
     group.add(kshape);
     group.add(klabel);
@@ -20863,9 +20843,7 @@ dwv.tool.UpdateRoi = function (anchor /*, image*/)
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 // external
-dwv.ext = dwv.ext || {};
-/* global Konva */
-dwv.ext.Konva = Konva || {};
+var Konva = Konva || {};
 
 /**
  * Ruler factory.
@@ -20896,7 +20874,7 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
     // physical shape
     var line = new dwv.math.Line(points[0], points[1]);
     // draw shape
-    var kshape = new dwv.ext.Konva.Line({
+    var kshape = new Konva.Line({
         points: [line.getBegin().getX(), line.getBegin().getY(),
                  line.getEnd().getX(), line.getEnd().getY() ],
         stroke: style.getLineColour(),
@@ -20906,7 +20884,7 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
 
     // tick begin
     var linePerp0 = dwv.math.getPerpendicularLine( line, points[0], 10 );
-    var ktick0 = new dwv.ext.Konva.Line({
+    var ktick0 = new Konva.Line({
         points: [linePerp0.getBegin().getX(), linePerp0.getBegin().getY(),
                  linePerp0.getEnd().getX(), linePerp0.getEnd().getY() ],
         stroke: style.getLineColour(),
@@ -20916,7 +20894,7 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
 
     // tick end
     var linePerp1 = dwv.math.getPerpendicularLine( line, points[1], 10 );
-    var ktick1 = new dwv.ext.Konva.Line({
+    var ktick1 = new Konva.Line({
         points: [linePerp1.getBegin().getX(), linePerp1.getBegin().getY(),
                  linePerp1.getEnd().getX(), linePerp1.getEnd().getY() ],
         stroke: style.getLineColour(),
@@ -20926,7 +20904,7 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
 
     // quantification
     var quant = image.quantifyLine( line );
-    var ktext = new dwv.ext.Konva.Text({
+    var ktext = new Konva.Text({
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
@@ -20939,16 +20917,16 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
     // label
     var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
     var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
-    var klabel = new dwv.ext.Konva.Label({
+    var klabel = new Konva.Label({
         x: line.getEnd().getX() + dX * 25,
         y: line.getEnd().getY() + dY * 15,
         name: "label"
     });
     klabel.add(ktext);
-    klabel.add(new dwv.ext.Konva.Tag());
+    klabel.add(new Konva.Tag());
 
     // return group
-    var group = new dwv.ext.Konva.Group();
+    var group = new Konva.Group();
     group.name("ruler-group");
     group.add(kshape);
     group.add(ktick0);
