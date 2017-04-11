@@ -12,10 +12,10 @@ index.html
 applauncher.js
 appgui.js
 # images
-/dwv/demo/stable/resources/click.png
-/dwv/demo/stable/resources/double_click.png
-/dwv/demo/stable/resources/mouse_drag.png
-/dwv/demo/stable/resources/mouse_wheel.png
+/dwv/demo/stable/resources/doc/click.png
+/dwv/demo/stable/resources/doc/double_click.png
+/dwv/demo/stable/resources/doc/mouse_drag.png
+/dwv/demo/stable/resources/doc/mouse_wheel.png
 # translations
 /dwv/demo/stable/locales/de/translation.json
 /dwv/demo/stable/locales/en/translation.json
