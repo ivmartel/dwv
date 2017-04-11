@@ -2,9 +2,7 @@
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 // external
-dwv.ext = dwv.ext || {};
-/* global Konva */
-var Konva =Konva || {};
+var Konva = Konva || {};
 
 /**
  * Protractor factory.

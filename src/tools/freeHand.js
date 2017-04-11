@@ -2,7 +2,7 @@
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 // external
-var Konva =Konva || {};
+var Konva = Konva || {};
 
 /**
  * FreeHand factory.

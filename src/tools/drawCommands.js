@@ -3,7 +3,7 @@ var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
 // external
-var Konva =Konva || {};
+var Konva = Konva || {};
 
 /**
  * Get the display name of the input shape.
