@@ -1,11 +1,9 @@
 Resources
 =========
 
-* The touch icons are modified versions of a theme set by P.J. Onori found on [icon finder](https://www.iconfinder.com/iconsets/cue).
- * [touch](https://www.iconfinder.com/iconsets/cue)
-
 * `conquest`: Conquest PACS lua files.
 * `doc`: dwv help and doc resources.
+    The touch icons are modified versions of a theme set by P.J. Onori found on [icon finder](https://www.iconfinder.com/iconsets/cue).
 * `icons`: dwv icons.
 * `img`: misc images.
 * `module`: javascript module scripts.
