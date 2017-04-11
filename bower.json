@@ -1,22 +1,33 @@
 {
-    "name": "dwv",
-    "version": "0.19.0-beta",
-    "homepage": "https://ivmartel.github.io/dwv/",
-    "authors" : [
-        "ivmartel"
-    ],
-    "description": "DICOM Web Viewer",
-    "keywords": [
-        "DICOM",
-        "medical",
-        "imaging"
-    ],
-    "license": "GNU General Public License v3.0",
-    "ignore": [
-        "**/.*",
-        "tests",
-        "Gruntfile.js",
-        "package.json",
-        "bower.json"
-    ]
+  "name": "dwv",
+  "description": "DICOM Web Viewer.",
+  "keywords": ["DICOM", "medical", "imaging"],
+  "license": "GPL-3.0",
+  "authors" : ["ivmartel <ivmartel@gmail.com>"],
+  "homepage": "https://ivmartel.github.io/dwv/",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ivmartel/dwv.git"
+  },
+  "main": "dist/dwv.min.js",
+  "dependencies": {
+    "i18next": "~7.2.1",
+    "i18next-xhr-backend": "~1.4.1",
+    "i18next-browser-languagedetector": "~1.0.1",
+    "konva": "~1.5.0"
+  },
+  "devDependencies": {
+    "qunit": "~2.3.0"
+  },
+  "ignore": [
+    "**/.*",
+    "css",
+    "ext",
+    "src",
+    "tests",
+    "viewers",
+    "Gruntfile.js",
+    "manifest.json",
+    "package.json"
+  ]
 }
