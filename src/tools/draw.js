@@ -3,9 +3,7 @@ var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
 // external
-dwv.ext = dwv.ext || {};
-/* global Konva */
-dwv.ext.Konva = Konva || {};
+var Konva =Konva || {};
 
 /**
  * Drawing tool.
@@ -86,15 +84,15 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @private
      * @type Object
      */
-    var trash = new dwv.ext.Konva.Group();
+    var trash = new Konva.Group();
 
     // first line of the cross
-    var trashLine1 = new dwv.ext.Konva.Line({
+    var trashLine1 = new Konva.Line({
         points: [-10, -10, 10, 10 ],
         stroke: 'red'
     });
     // second line of the cross
-    var trashLine2 = new dwv.ext.Konva.Line({
+    var trashLine2 = new Konva.Line({
         points: [10, -10, -10, 10 ],
         stroke: 'red'
     });

@@ -2,9 +2,7 @@
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 // external
-dwv.ext = dwv.ext || {};
-/* global Konva */
-dwv.ext.Konva = Konva || {};
+var Konva =Konva || {};
 
 /**
  * FreeHand factory.
@@ -40,7 +38,7 @@ dwv.tool.FreeHandFactory.prototype.create = function (points, style /*, image*/)
         arr.push( points[i].getY() );
     }
     // draw shape
-    var kshape = new dwv.ext.Konva.Line({
+    var kshape = new Konva.Line({
         points: arr,
         stroke: style.getLineColour(),
         strokeWidth: style.getScaledStrokeWidth(),
@@ -49,7 +47,7 @@ dwv.tool.FreeHandFactory.prototype.create = function (points, style /*, image*/)
     });
 
     // text
-    var ktext = new dwv.ext.Konva.Text({
+    var ktext = new Konva.Text({
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
@@ -61,16 +59,16 @@ dwv.tool.FreeHandFactory.prototype.create = function (points, style /*, image*/)
     ktext.setText(ktext.textExpr);
 
     // label
-    var klabel = new dwv.ext.Konva.Label({
+    var klabel = new Konva.Label({
         x: points[0].getX(),
         y: points[0].getY() + 10,
         name: "label"
     });
     klabel.add(ktext);
-    klabel.add(new dwv.ext.Konva.Tag());
+    klabel.add(new Konva.Tag());
 
     // return group
-    var group = new dwv.ext.Konva.Group();
+    var group = new Konva.Group();
     group.name("freeHand-group");
     group.add(kshape);
     group.add(klabel);

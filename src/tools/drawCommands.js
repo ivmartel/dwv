@@ -3,9 +3,7 @@ var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
 // external
-dwv.ext = dwv.ext || {};
-/* global Konva */
-dwv.ext.Konva = Konva || {};
+var Konva =Konva || {};
 
 /**
  * Get the display name of the input shape.
@@ -15,7 +13,7 @@ dwv.ext.Konva = Konva || {};
 dwv.tool.GetShapeDisplayName = function (shape)
 {
     var displayName = "shape";
-    if ( shape instanceof dwv.ext.Konva.Line ) {
+    if ( shape instanceof Konva.Line ) {
         if ( shape.points().length === 4 ) {
             displayName = "line";
         }
@@ -26,10 +24,10 @@ dwv.tool.GetShapeDisplayName = function (shape)
             displayName = "roi";
         }
     }
-    else if ( shape instanceof dwv.ext.Konva.Rect ) {
+    else if ( shape instanceof Konva.Rect ) {
         displayName = "rectangle";
     }
-    else if ( shape instanceof dwv.ext.Konva.Ellipse ) {
+    else if ( shape instanceof Konva.Ellipse ) {
         displayName = "ellipse";
     }
     // return

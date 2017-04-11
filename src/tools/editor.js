@@ -2,9 +2,7 @@
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 // external
-dwv.ext = dwv.ext || {};
-/* global Konva */
-dwv.ext.Konva = Konva || {};
+var Konva =Konva || {};
 
 /**
  * Shape editor.
@@ -186,7 +184,7 @@ dwv.tool.ShapeEditor = function (app)
         // get shape group
         var group = shape.getParent();
         // add shape specific anchors to the shape group
-        if ( shape instanceof dwv.ext.Konva.Line ) {
+        if ( shape instanceof Konva.Line ) {
             var points = shape.points();
             if ( points.length === 4 || points.length === 6) {
                 // add shape offset
@@ -225,7 +223,7 @@ dwv.tool.ShapeEditor = function (app)
                 }
             }
         }
-        else if ( shape instanceof dwv.ext.Konva.Rect ) {
+        else if ( shape instanceof Konva.Rect ) {
             updateFunction = dwv.tool.UpdateRect;
             var rectX = shape.x();
             var rectY = shape.y();
@@ -236,7 +234,7 @@ dwv.tool.ShapeEditor = function (app)
             addAnchor(group, rectX+rectWidth, rectY+rectHeight, 'bottomRight');
             addAnchor(group, rectX, rectY+rectHeight, 'bottomLeft');
         }
-        else if ( shape instanceof dwv.ext.Konva.Ellipse ) {
+        else if ( shape instanceof Konva.Ellipse ) {
             updateFunction = dwv.tool.UpdateEllipse;
             var ellipseX = shape.x();
             var ellipseY = shape.y();
@@ -259,7 +257,7 @@ dwv.tool.ShapeEditor = function (app)
      */
     function addAnchor(group, x, y, id) {
         // anchor shape
-        var anchor = new dwv.ext.Konva.Circle({
+        var anchor = new Konva.Circle({
             x: x,
             y: y,
             stroke: '#999',
