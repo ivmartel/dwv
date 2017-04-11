@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# v16 2017-03-29
+# v17 2017-04-12
 
 CACHE:
 
@@ -8,14 +8,14 @@ index.html
 # css
 /dwv/demo/stable/css/style.css
 # js
-/dwv/demo/stable/dwv-0.19.0-beta.min.js
+/dwv/demo/stable/dwv-0.19.0.min.js
 applauncher.js
 appgui.js
 # images
-/dwv/demo/stable/resources/click.png
-/dwv/demo/stable/resources/double_click.png
-/dwv/demo/stable/resources/mouse_drag.png
-/dwv/demo/stable/resources/mouse_wheel.png
+/dwv/demo/stable/resources/help/click.png
+/dwv/demo/stable/resources/help/double_click.png
+/dwv/demo/stable/resources/help/mouse_drag.png
+/dwv/demo/stable/resources/help/mouse_wheel.png
 # translations
 /dwv/demo/stable/locales/de/translation.json
 /dwv/demo/stable/locales/en/translation.json
