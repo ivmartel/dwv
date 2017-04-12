@@ -5,19 +5,23 @@
         // AMD. Register as an anonymous module.
         define([
             'i18next',
-            'i18next-xhr-backend',
-            'i18next-browser-languagedetector',
+            'i18nextXHRBackend',
+            'i18nextBrowserLanguageDetector',
             'konva'
         ], factory);
     } else if (typeof module === 'object' && module.exports) {
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like environments that support module.exports,
         // like Node.
+
+        // Konva: requires 'canvas' -> deactivated for now...
+        // i18next-xhr-backend: requires XMlHttpRequest
+
         module.exports = factory(
             require('i18next'),
             require('i18next-xhr-backend'),
             require('i18next-browser-languagedetector'),
-            require('konva')
+            null
         );
     } else {
         // Browser globals (root is window)
@@ -36,8 +40,8 @@
 
     // similar to what browserify does but reversed
     //https://www.contentful.com/blog/2017/01/17/the-global-object-in-javascript/
-    var window = typeof window !== 'undefined' ? 
-        window : typeof self !== 'undefined' ? 
+    var window = typeof window !== 'undefined' ?
+        window : typeof self !== 'undefined' ?
         self : typeof global !== 'undefined' ?
         global : {};
 
@@ -120,7 +124,7 @@ dwv.App = function ()
      * Get the version of the application.
      * @return {String} The version of the application.
      */
-    this.getVersion = function () { return "v0.19.0"; };
+    this.getVersion = function () { return "v0.19.1"; };
 
     /**
      * Get the image.
