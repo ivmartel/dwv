@@ -4,7 +4,7 @@
 if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   echo -e "Starting to update gh-pages\n"
   #copy data we're interested in to other place
-  cp -R dist $HOME/dist
+  cp -R build $HOME/build
   #go to home and setup git
   cd $HOME
   git config --global user.email "travis@travis-ci.org"
@@ -15,8 +15,8 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   cd gh-pages
   #clean doc dir
   rm -Rf demo/trunk/doc/*
-  #copy new dist
-  cp -Rf $HOME/dist/* demo/trunk
+  #copy new build
+  cp -Rf $HOME/build/* demo/trunk
   #add, commit and push files
   git add -Af .
   git commit -m "Travis build $TRAVIS_BUILD_NUMBER pushed to gh-pages"

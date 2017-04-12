@@ -35,7 +35,7 @@ module.exports = function(grunt) {
         concat: {
             dist: {
                 src: ['resources/module/intro.js', 'src/**/*.js', 'resources/module/outro.js'],
-                dest: 'dist/<%= pkg.name %>.js'
+                dest: 'build/<%= pkg.name %>.js'
             }
         },
         uglify: {
@@ -44,7 +44,7 @@ module.exports = function(grunt) {
             },
             dist: {
                 files: {
-                    'dist/<%= pkg.name %>-<%= pkg.version %>.min.js': ['<%= concat.dist.dest %>']
+                    'build/<%= pkg.name %>-<%= pkg.version %>.min.js': ['<%= concat.dist.dest %>']
                 }
             }
         },
@@ -52,7 +52,7 @@ module.exports = function(grunt) {
             dist : {
                 src: ['src/**/*.js', 'tests/**/*.js', 'resources/doc/readme-doc.md'],
                 options: {
-                    destination: 'dist/doc',
+                    destination: 'build/doc',
                     template: 'node_modules/ink-docstrap/template',
                     configure: 'resources/doc/jsdoc.conf.json'
                 }
