@@ -17,4 +17,5 @@ ratings:
   - "**.inc"
   - "**.js"
 exclude_paths:
+- dist/
 - ext/
