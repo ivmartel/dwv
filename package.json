@@ -1,6 +1,6 @@
 {
   "name": "dwv",
-  "version": "0.19.0",
+  "version": "0.19.1",
   "description": "DICOM Web Viewer.",
   "keywords": [ "DICOM", "medical", "imaging" ],
   "license": "GPL-3.0",
