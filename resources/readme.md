@@ -7,6 +7,4 @@ Resources
 * `icons`: dwv icons.
 * `img`: misc images.
 * `module`: javascript module scripts.
-* `chrome-background.js`: Google Chrome local app settings.
-* `manifest.webapp`: Firefox OS app configuration (has to be in the root folder).
-* `update-gh-pages.sh`: Travis script to update gh-pages branch with successful build.
+* `scripts`: apps and update scripts.

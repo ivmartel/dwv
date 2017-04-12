@@ -6,7 +6,7 @@
 //
 //  "app": {
 //    "background": {
-//      "scripts": ["/resources/chrome-background.js"]
+//      "scripts": ["/resources/scripts/chrome-background.js"]
 //    }
 //  },
 
