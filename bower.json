@@ -9,7 +9,7 @@
     "type": "git",
     "url": "git://github.com/ivmartel/dwv.git"
   },
-  "main": "dist/dwv.min.js",
+  "main": "dist/dwv.js",
   "dependencies": {
     "i18next": "~7.2.0",
     "i18next-xhr-backend": "~1.4.1",
@@ -19,13 +19,23 @@
   "devDependencies": {
     "qunit": "~2.3.0"
   },
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
   "ignore": [
     "**/.*",
     "css",
     "ext",
+    "resources/conquest",
+    "resources/doc",
+    "resources/module",
+    "resources/scripts",
     "src",
     "tests",
     "viewers",
+    "eclipse.epf",
     "Gruntfile.js",
     "manifest.json",
     "package.json"
