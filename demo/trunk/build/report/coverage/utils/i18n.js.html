@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for utils/i18n.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">utils/</a> i18n.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">80% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>24/30</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">43.75% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>7/16</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">75% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>6/8</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">80% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>24/30</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// namespaces
+var dwv = dwv || <span class="branch-1 cbranch-no" title="branch not covered" >{};</span>
+// external
+var i18next = i18next || <span class="branch-1 cbranch-no" title="branch not covered" >{};</span>
+var i18nextXHRBackend = i18nextXHRBackend || <span class="branch-1 cbranch-no" title="branch not covered" >{};</span>
+var i18nextBrowserLanguageDetector = i18nextBrowserLanguageDetector || <span class="branch-1 cbranch-no" title="branch not covered" >{};</span>
+&nbsp;
+// This is mainly a wrapper around the i18next object.
+// see its API: http://i18next.com/docs/api/
+&nbsp;
+/**
+ * Initialise i18n.
+ * @param {String} language The language to translate to. Defaults to 'auto' and
+ *   gets the language from the browser.
+ * @param {String} localesPath Path to the locales directory.
+ */
+dwv.i18nInitialise = function (language, localesPath)
+{
+    var lng = (typeof language === "undefined") ? <span class="branch-0 cbranch-no" title="branch not covered" >"auto" </span>: language;
+    var lpath = (typeof localesPath === "undefined") ? <span class="branch-0 cbranch-no" title="branch not covered" >"../.." </span>: localesPath;
+    // i18n options: default 'en' language and
+    //  only load language, not specialised (for ex en-GB)
+    var options = {
+        fallbackLng: "en",
+        load: "languageOnly",
+        backend: { loadPath: lpath + "/locales/{{lng}}/{{ns}}.json" }
+    };
+    // use the XHR backend to get translation files
+    var i18n = i18next.use(i18nextXHRBackend);
+    // use browser language or the specified one
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (lng === "auto") {
+<span class="cstat-no" title="statement not covered" >        i18n.use(i18nextBrowserLanguageDetector);</span>
+    }
+    else {
+        options.lng = lng;
+    }
+    // init i18n: will be ready when the 'loaded' event is fired
+    i18n.init(options);
+};
+&nbsp;
+/**
+ * Handle i18n load event.
+ * @param {Object} callback The callback function to call when i18n is loaded.
+ *  It can take one argument that will be replaced with the loaded languages.
+ */
+dwv.i18nOnLoaded = function (callback) {
+    i18next.on('loaded', callback);
+};
+&nbsp;
+/**
+ * Stop handling i18n load event.
+ */
+dwv.i18nOffLoaded = function () {
+    i18next.off('loaded');
+};
+&nbsp;
+/**
+ * Handle i18n failed load event.
+ * @param {Object} callback The callback function to call when i18n is loaded.
+ *  It can take three arguments: lng, ns and msg.
+ */
+dwv.i18nOnFailedLoad = function (callback) {
+    i18next.on('failedLoading', callback);
+};
+&nbsp;
+/**
+ * Stop handling i18n failed load event.
+ */
+dwv.i18nOffFailedLoad = <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >    i18next.off('failedLoading');</span>
+};
+&nbsp;
+/**
+ * Get the translated text.
+ * @param {String} key The key to the text entry.
+ * @param {Object} options The translation options such as plural, context...
+ */
+dwv.i18n = function (key, options) {
+    return i18next.t(key, options);
+};
+&nbsp;
+/**
+ * Check the existence of a translation.
+ * @param {String} key The key to the text entry.
+ * @param {Object} options The translation options such as plural, context...
+ */
+dwv.i18nExists = function (key, options) {
+    return i18next.exists(key, options);
+};
+&nbsp;
+/**
+ * Translate all data-i18n tags in the current html page. If an html tag defines the
+ * data-i18n attribute, its value will be used as key to find its corresponding text
+ * and will replace the content of the html tag.
+ */
+dwv.i18nPage = <span class="fstat-no" title="function not covered" >function () {</span>
+    // get all elements
+<span class="cstat-no" title="statement not covered" >    var elements = document.getElementsByTagName("*");</span>
+    // if the element defines data-i18n, replace its content with the tranlation
+<span class="cstat-no" title="statement not covered" >    for (var i = 0; i &lt; elements.length; ++i) {</span>
+<span class="cstat-no" title="statement not covered" >        if (typeof elements[i].dataset.i18n !== "undefined") {</span>
+<span class="cstat-no" title="statement not covered" >            elements[i].innerHTML = dwv.i18n(elements[i].dataset.i18n);</span>
+        }
+    }
+};
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Apr 12 2017 23:21:18 GMT+0000 (UTC)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>
