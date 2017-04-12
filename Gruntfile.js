@@ -35,7 +35,7 @@ module.exports = function(grunt) {
         concat: {
             dist: {
                 src: ['resources/module/intro.js', 'src/**/*.js', 'resources/module/outro.js'],
-                dest: 'build/<%= pkg.name %>.js'
+                dest: 'build/dist/<%= pkg.name %>.js'
             }
         },
         uglify: {
@@ -44,7 +44,7 @@ module.exports = function(grunt) {
             },
             dist: {
                 files: {
-                    'build/<%= pkg.name %>-<%= pkg.version %>.min.js': ['<%= concat.dist.dest %>']
+                    'build/dist/<%= pkg.name %>-<%= pkg.version %>.min.js': ['<%= concat.dist.dest %>']
                 }
             }
         },
