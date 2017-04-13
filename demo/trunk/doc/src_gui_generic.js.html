@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>dwv Source: src/gui/generic.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.yeti.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">dwv</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="dwv.html">dwv</a></li><li><a href="dwv.browser.html">dwv.browser</a></li><li><a href="dwv.dicom.html">dwv.dicom</a></li><li><a href="dwv.gui.html">dwv.gui</a></li><li><a href="dwv.gui.base.html">dwv.gui.base</a></li><li><a href="dwv.gui.filter.html">dwv.gui.filter</a></li><li><a href="dwv.gui.filter.base.html">dwv.gui.filter.base</a></li><li><a href="dwv.html.html">dwv.html</a></li><li><a href="dwv.image.html">dwv.image</a></li><li><a href="dwv.image.filter.html">dwv.image.filter</a></li><li><a href="dwv.image.lut.html">dwv.image.lut</a></li><li><a href="dwv.io.html">dwv.io</a></li><li><a href="dwv.math.html">dwv.math</a></li><li><a href="dwv.tests.html">dwv.tests</a></li><li><a href="dwv.tool.html">dwv.tool</a></li><li><a href="dwv.tool.filter.html">dwv.tool.filter</a></li><li><a href="dwv.utils.html">dwv.utils</a></li><li><a href="dwv.utils.base.html">dwv.utils.base</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="module-tests_dicom.html">tests/dicom</a></li><li><a href="module-tests_html.html">tests/html</a></li><li><a href="module-tests_image.html">tests/image</a></li><li><a href="module-tests_math.html">tests/math</a></li><li><a href="module-tests_utils.html">tests/utils</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="dwv.App.html">dwv.App</a></li><li><a href="dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li><li><a href="dwv.dicom.DataWriter.html">dwv.dicom.DataWriter</a></li><li><a href="dwv.dicom.DicomElementsWrapper.html">dwv.dicom.DicomElementsWrapper</a></li><li><a href="dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li><li><a href="dwv.dicom.DicomWriter.html">dwv.dicom.DicomWriter</a></li><li><a href="dwv.DrawController.html">dwv.DrawController</a></li><li><a href="dwv.gui.base.ColourTool.html">dwv.gui.base.ColourTool</a></li><li><a href="dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li><li><a href="dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li><li><a href="dwv.gui.base.DrawList.html">dwv.gui.base.DrawList</a></li><li><a href="dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li><li><a href="dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li><li><a href="dwv.gui.base.Loadbox.html">dwv.gui.base.Loadbox</a></li><li><a href="dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li><li><a href="dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li><li><a href="dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li><li><a href="dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li><li><a href="dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li><li><a href="dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li><li><a href="dwv.gui.base.Undo.html">dwv.gui.base.Undo</a></li><li><a href="dwv.gui.base.UrlLoad.html">dwv.gui.base.UrlLoad</a></li><li><a href="dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li><li><a href="dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li><li><a href="dwv.gui.info.MiniColourMap.html">dwv.gui.info.MiniColourMap</a></li><li><a href="dwv.gui.info.Plot.html">dwv.gui.info.Plot</a></li><li><a href="dwv.gui.info.Position.html">dwv.gui.info.Position</a></li><li><a href="dwv.gui.info.Windowing.html">dwv.gui.info.Windowing</a></li><li><a href="dwv.html.Layer.html">dwv.html.Layer</a></li><li><a href="dwv.html.Style.html">dwv.html.Style</a></li><li><a href="dwv.image.DicomBufferToView.html">dwv.image.DicomBufferToView</a></li><li><a href="dwv.image.filter.Sharpen.html">dwv.image.filter.Sharpen</a></li><li><a href="dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li><li><a href="dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li><li><a href="dwv.image.Geometry.html">dwv.image.Geometry</a></li><li><a href="dwv.image.Image.html">dwv.image.Image</a></li><li><a href="dwv.image.ImageFactory.html">dwv.image.ImageFactory</a></li><li><a href="dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li><li><a href="dwv.image.lut.Window.html">dwv.image.lut.Window</a></li><li><a href="dwv.image.PixelBufferDecoder.html">dwv.image.PixelBufferDecoder</a></li><li><a href="dwv.image.RescaleSlopeAndIntercept.html">dwv.image.RescaleSlopeAndIntercept</a></li><li><a href="dwv.image.Size.html">dwv.image.Size</a></li><li><a href="dwv.image.Spacing.html">dwv.image.Spacing</a></li><li><a href="dwv.image.View.html">dwv.image.View</a></li><li><a href="dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li><li><a href="dwv.InfoController.html">dwv.InfoController</a></li><li><a href="dwv.io.File.html">dwv.io.File</a></li><li><a href="dwv.io.Url.html">dwv.io.Url</a></li><li><a href="dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li><li><a href="dwv.math.Circle.html">dwv.math.Circle</a></li><li><a href="dwv.math.Ellipse.html">dwv.math.Ellipse</a></li><li><a href="dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li><li><a href="dwv.math.Index3D.html">dwv.math.Index3D</a></li><li><a href="dwv.math.Line.html">dwv.math.Line</a></li><li><a href="dwv.math.Matrix33.html">dwv.math.Matrix33</a></li><li><a href="dwv.math.Path.html">dwv.math.Path</a></li><li><a href="dwv.math.Point2D.html">dwv.math.Point2D</a></li><li><a href="dwv.math.Point3D.html">dwv.math.Point3D</a></li><li><a href="dwv.math.Rectangle.html">dwv.math.Rectangle</a></li><li><a href="dwv.math.ROI.html">dwv.math.ROI</a></li><li><a href="dwv.math.Scissors.html">dwv.math.Scissors</a></li><li><a href="dwv.math.Vector3D.html">dwv.math.Vector3D</a></li><li><a href="dwv.State.html">dwv.State</a></li><li><a href="dwv.tool.ArrowFactory.html">dwv.tool.ArrowFactory</a></li><li><a href="dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li><li><a href="dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li><li><a href="dwv.tool.Draw.html">dwv.tool.Draw</a></li><li><a href="dwv.tool.DrawGroupCommand.html">dwv.tool.DrawGroupCommand</a></li><li><a href="dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li><li><a href="dwv.tool.Filter_.html">dwv.tool.Filter</a></li><li><a href="dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li><li><a href="dwv.tool.filter.Sobel.html">dwv.tool.filter.Sobel</a></li><li><a href="dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li><li><a href="dwv.tool.Floodfill.html">dwv.tool.Floodfill</a></li><li><a href="dwv.tool.FreeHandFactory.html">dwv.tool.FreeHandFactory</a></li><li><a href="dwv.tool.Livewire.html">dwv.tool.Livewire</a></li><li><a href="dwv.tool.MoveGroupCommand.html">dwv.tool.MoveGroupCommand</a></li><li><a href="dwv.tool.ProtractorFactory.html">dwv.tool.ProtractorFactory</a></li><li><a href="dwv.tool.RectangleFactory.html">dwv.tool.RectangleFactory</a></li><li><a href="dwv.tool.RoiFactory.html">dwv.tool.RoiFactory</a></li><li><a href="dwv.tool.RulerFactory.html">dwv.tool.RulerFactory</a></li><li><a href="dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li><li><a href="dwv.tool.Scroll.html">dwv.tool.Scroll</a></li><li><a href="dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li><li><a href="dwv.tool.Toolbox.html">dwv.tool.Toolbox</a></li><li><a href="dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li><li><a href="dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li><li><a href="dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li><li><a href="dwv.ToolboxController.html">dwv.ToolboxController</a></li><li><a href="dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li><li><a href="dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li><li><a href="dwv.utils.WorkerThread.html">dwv.utils.WorkerThread</a></li><li><a href="dwv.ViewController.html">dwv.ViewController</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="global.html#webdriver">webdriver</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+        
+            <div class="col-sm-3 col-md-3">
+                <form class="navbar-form" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: src/gui/generic.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">// namespaces
+var dwv = dwv || {};
+dwv.gui = dwv.gui || {};
+dwv.gui.base = dwv.gui.base || {};
+
+/**
+ * Get the size of the image display window.
+ */
+dwv.gui.base.getWindowSize = function ()
+{
+    return { 'width': window.innerWidth, 'height': window.innerHeight - 147 };
+};
+
+/**
+ * Ask some text to the user.
+ * @param {String} message Text to display to the user.
+ * @param {String} defaultText Default value displayed in the text input field.
+ * @return {String} Text entered by the user.
+ */
+dwv.gui.base.prompt = function (message, defaultText)
+{
+    return prompt(message, defaultText);
+};
+
+/**
+ * Display a progress value.
+ * @param {Number} percent The progress percentage.
+ */
+dwv.gui.base.displayProgress = function (/*percent*/)
+{
+    // default does nothing...
+};
+
+/**
+ * Focus the view on the image.
+ */
+dwv.gui.base.focusImage = function ()
+{
+    // default does nothing...
+};
+
+/**
+ * Post process a HTML table.
+ * @param {Object} table The HTML table to process.
+ * @return The processed HTML table.
+ */
+dwv.gui.base.postProcessTable = function (/*table*/)
+{
+    // default does nothing...
+};
+
+/**
+ * Get a HTML element associated to a container div.
+ * @param {Number} containerDivId The id of the container div.
+ * @param {String} name The name or id to find.
+ * @return {Object} The found element or null.
+ */
+dwv.gui.base.getElement = function (containerDivId, name)
+{
+    // get by class in the container div
+    var parent = document.getElementById(containerDivId);
+    var elements = parent.getElementsByClassName(name);
+    // getting the last element since some libraries (ie jquery-mobile) creates
+    // span in front of regular tags (such as select)...
+    var element = elements[elements.length-1];
+    // if not found get by id with 'containerDivId-className'
+    if ( typeof element === "undefined" ) {
+        element = document.getElementById(containerDivId + '-' + name);
+    }
+    return element;
+ };
+
+ /**
+ * Refresh a HTML element. Mainly for jquery-mobile.
+ * @param {String} element The HTML element to refresh.
+ */
+dwv.gui.base.refreshElement = function (/*element*/)
+{
+    // base does nothing...
+};
+
+/**
+ * Set the selected item of a HTML select.
+ * @param {String} element The HTML select element.
+ * @param {String} value The value of the option to mark as selected.
+ */
+dwv.gui.setSelected = function (element, value)
+{
+    if ( element ) {
+        var index = 0;
+        for( index in element.options){
+            if( element.options[index].value === value ) {
+                break;
+            }
+        }
+        element.selectedIndex = index;
+        dwv.gui.refreshElement(element);
+    }
+};
+
+/**
+ * Slider base gui.
+ * @constructor
+ */
+dwv.gui.base.Slider = function (app)
+{
+    /**
+     * Append the slider HTML.
+     */
+    this.append = function ()
+    {
+        // default values
+        var min = 0;
+        var max = 1;
+
+        // jquery-mobile range slider
+        // minimum input
+        var inputMin = document.createElement("input");
+        inputMin.id = "threshold-min";
+        inputMin.type = "range";
+        inputMin.max = max;
+        inputMin.min = min;
+        inputMin.value = min;
+        // maximum input
+        var inputMax = document.createElement("input");
+        inputMax.id = "threshold-max";
+        inputMax.type = "range";
+        inputMax.max = max;
+        inputMax.min = min;
+        inputMax.value = max;
+        // slicer div
+        var div = document.createElement("div");
+        div.id = "threshold-div";
+        div.setAttribute("data-role", "rangeslider");
+        div.appendChild(inputMin);
+        div.appendChild(inputMax);
+        div.setAttribute("data-mini", "true");
+        // append to document
+        app.getElement("thresholdLi").appendChild(div);
+        // bind change
+        $("#threshold-div").on("change",
+                function(/*event*/) {
+                    app.onChangeMinMax(
+                        { "min":$("#threshold-min").val(),
+                          "max":$("#threshold-max").val() } );
+                }
+            );
+        // refresh
+        dwv.gui.refreshElement(app.getElement("toolList"));
+    };
+
+    /**
+     * Initialise the slider HTML.
+     */
+    this.initialise = function ()
+    {
+        var min = app.getImage().getDataRange().min;
+        var max = app.getImage().getDataRange().max;
+
+        // minimum input
+        var inputMin = document.getElementById("threshold-min");
+        inputMin.max = max;
+        inputMin.min = min;
+        inputMin.value = min;
+        // maximum input
+        var inputMax = document.getElementById("threshold-max");
+        inputMax.max = max;
+        inputMax.min = min;
+        inputMax.value = max;
+        // refresh
+        dwv.gui.refreshElement(app.getElement("toolList"));
+    };
+
+}; // class dwv.gui.base.Slider
+
+/**
+ * DICOM tags base gui.
+ * @param {Object} app The associated application.
+ * @constructor
+ */
+dwv.gui.base.DicomTags = function (app)
+{
+    /**
+     * Update the DICOM tags table with the input info.
+     * @param {Object} dataInfo The data information.
+     */
+    this.update = function (dataInfo)
+    {
+        // HTML node
+        var node = app.getElement("tags");
+        if( node === null ) {
+            console.warn("Cannot find a node to append the DICOM tags.");
+            return;
+        }
+        // remove possible previous
+        while (node.hasChildNodes()) {
+            node.removeChild(node.firstChild);
+        }
+
+        // exit if no tags
+        if (dataInfo.length === 0) {
+            console.warn("No DICOM tags to show.");
+            return;
+        }
+
+        // tags HTML table
+        var table = dwv.html.toTable(dataInfo);
+        table.className = "tagsTable";
+
+        // optional gui specific table post process
+        dwv.gui.postProcessTable(table);
+
+        // check processed table
+        if (table.rows.length === 0) {
+            console.warn("The processed table does not contain data.");
+            return;
+        }
+        
+        // translate first row
+        dwv.html.translateTableRow(table.rows.item(0));
+
+        // append search form
+        node.appendChild(dwv.html.getHtmlSearchForm(table));
+        // append tags table
+        node.appendChild(table);
+
+        // refresh
+        dwv.gui.refreshElement(node);
+    };
+
+}; // class dwv.gui.base.DicomTags
+
+/**
+ * Drawing list base gui.
+ * @param {Object} app The associated application.
+ * @constructor
+ */
+dwv.gui.base.DrawList = function (app)
+{
+    /**
+     * Closure to self.
+     */
+    var self = this;
+
+    /**
+     * Update the draw list html element
+     * @param {Object} event A change event, decides if the table is editable or not.
+     */
+    this.update = function (event)
+    {
+        var isEditable = false;
+        if (typeof event.editable !== "undefined") {
+            isEditable = event.editable;
+        }
+
+        // HTML node
+        var node = app.getElement("drawList");
+        if( node === null ) {
+            console.warn("Cannot find a node to append the drawing list.");
+            return;
+        }
+        // remove possible previous
+        while (node.hasChildNodes()) {
+            node.removeChild(node.firstChild);
+        }
+
+        // drawing details
+        var drawDisplayDetails = app.getDrawDisplayDetails();
+
+        // exit if no details
+        if (drawDisplayDetails.length === 0) {
+            return;
+        }
+
+        // tags HTML table
+        var table = dwv.html.toTable(drawDisplayDetails);
+        table.className = "drawsTable";
+
+        // optional gui specific table post process
+        dwv.gui.postProcessTable(table);
+
+        // check processed table
+        if (table.rows.length === 0) {
+            console.warn("The processed table does not contain data.");
+            return;
+        }
+
+        // translate first row
+        dwv.html.translateTableRow(table.rows.item(0));
+
+        // translate shape names
+        dwv.html.translateTableColumn(table, 3, "shape", "name");
+
+        // create a color onkeyup handler
+        var createColorOnKeyUp = function (details) {
+            return function () {
+                details.color = this.value;
+                app.updateDraw(details);
+            };
+        };
+        // create a text onkeyup handler
+        var createTextOnKeyUp = function (details) {
+            return function () {
+                details.label = this.value;
+                app.updateDraw(details);
+            };
+        };
+        // create a long text onkeyup handler
+        var createLongTextOnKeyUp = function (details) {
+            return function () {
+                details.description = this.value;
+                app.updateDraw(details);
+            };
+        };
+        // create a row onclick handler
+        var createRowOnClick = function (slice, frame) {
+            return function () {
+                // update slice
+                var pos = app.getViewController().getCurrentPosition();
+                pos.k = slice;
+                app.getViewController().setCurrentPosition(pos);
+                // update frame
+                app.getViewController().setCurrentFrame(frame);
+                // focus on the image
+                dwv.gui.focusImage();
+            };
+        };
+        // create visibility handler
+        var createVisibleOnClick = function (details) {
+            return function () {
+                app.toogleGroupVisibility(details);
+            };
+        };
+
+        // append visible column to the header row
+        var row0 = table.rows.item(0);
+        var cell00 = row0.insertCell(0);
+        cell00.outerHTML = "&lt;th>" + dwv.i18n("basics.visible") + "&lt;/th>";
+
+        // loop through rows
+        for (var r = 1; r &lt; table.rows.length; ++r) {
+            var drawId = r - 1;
+            var drawDetails = drawDisplayDetails[drawId];
+            var row = table.rows.item(r);
+            var cells = row.cells;
+
+            // loop through cells
+            for (var c = 0; c &lt; cells.length; ++c) {
+                // show short ID
+                if (c === 0) {
+                    cells[c].firstChild.data = cells[c].firstChild.data.substring(0, 5);
+                }
+
+                if (isEditable) {
+                    // color
+                    if (c === 4) {
+                        dwv.html.makeCellEditable(cells[c], createColorOnKeyUp(drawDetails), "color");
+                    }
+                    // text
+                    else if (c === 5) {
+                        dwv.html.makeCellEditable(cells[c], createTextOnKeyUp(drawDetails));
+                    }
+                    // long text
+                    else if (c === 6) {
+                        dwv.html.makeCellEditable(cells[c], createLongTextOnKeyUp(drawDetails));
+                    }
+                }
+                else {
+                    // id: link to image
+                    cells[0].onclick = createRowOnClick(
+                        cells[1].firstChild.data,
+                        cells[2].firstChild.data);
+                    cells[0].onmouseover = dwv.html.setCursorToPointer;
+                    cells[0].onmouseout = dwv.html.setCursorToDefault;
+                    // color: just display the input color with no callback
+                    if (c === 4) {
+                        dwv.html.makeCellEditable(cells[c], null, "color");
+                    }
+                }
+            }
+
+            // append visible column
+            var cell0 = row.insertCell(0);
+            var input = document.createElement("input");
+            input.setAttribute("type", "checkbox");
+            input.checked = app.isGroupVisible(drawDetails);
+            input.onclick = createVisibleOnClick(drawDetails);
+            cell0.appendChild(input);
+        }
+
+        // editable checkbox
+        var tickBox = document.createElement("input");
+        tickBox.setAttribute("type", "checkbox");
+        tickBox.id = "checkbox-editable";
+        tickBox.checked = isEditable;
+        tickBox.onclick = function () { self.update({"editable": this.checked}); };
+        // checkbox label
+        var tickLabel = document.createElement("label");
+        tickLabel.setAttribute( "for", tickBox.id );
+        tickLabel.setAttribute( "class", "inline" );
+        tickLabel.appendChild( document.createTextNode( dwv.i18n("basics.editMode") ) );
+        // checkbox div
+        var tickDiv = document.createElement("div");
+        tickDiv.appendChild(tickLabel);
+        tickDiv.appendChild(tickBox);
+
+        // search form
+        node.appendChild(dwv.html.getHtmlSearchForm(table));
+        // tick form
+        node.appendChild(tickDiv);
+
+        // draw list table
+        node.appendChild(table);
+
+        // delete draw button
+        var deleteButton = document.createElement("button");
+        deleteButton.onclick = function () { app.deleteDraws(); };
+        deleteButton.setAttribute( "class", "ui-btn ui-btn-inline" );
+        deleteButton.appendChild( document.createTextNode( dwv.i18n("basics.deleteDraws") ) );
+        if (!isEditable) {
+            deleteButton.style.display = "none";
+        }
+        node.appendChild(deleteButton);
+
+        // refresh
+        dwv.gui.refreshElement(node);
+    };
+
+}; // class dwv.gui.base.DrawList
+</pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+    <div class="modal fade" id="searchResults">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Search results</h4>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+
+
+<footer>
+
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a>
+	
+		on Thursday, April 13th 2017
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+
+    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            SearcherDisplay.init();
+        });
+    </script>
+
+
+</body>
+</html>
