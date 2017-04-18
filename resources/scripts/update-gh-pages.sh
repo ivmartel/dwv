@@ -17,7 +17,7 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   rm -Rf demo/trunk/doc/*
   #copy new build
   cp -Rf $HOME/built/dist/* demo/trunk
-  cp -Rf $HOME/built/doc demo/trunk/doc
+  cp -Rf $HOME/built/doc demo/trunk
   #add, commit and push files
   git add -Af .
   git commit -m "Travis build $TRAVIS_BUILD_NUMBER pushed to gh-pages"
