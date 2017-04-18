@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# v16 2017-03-29
+# v17 2017-04-12
 
 CACHE:
 
@@ -8,14 +8,16 @@ index.html
 # css
 /dwv/demo/stable/css/style.css
 # js
-/dwv/demo/stable/dwv-0.18.0.min.js
+/dwv/demo/stable/dwv-0.19.1.min.js
 applauncher.js
 appgui.js
 # images
-/dwv/demo/stable/resources/double_tap.png
-/dwv/demo/stable/resources/tap.png
-/dwv/demo/stable/resources/touch_drag.png
-/dwv/demo/stable/resources/twotouch_drag.png
+/dwv/demo/stable/resources/help/double_tap.png
+/dwv/demo/stable/resources/help/tap_and_hold.png
+/dwv/demo/stable/resources/help/tap.png
+/dwv/demo/stable/resources/help/touch_drag.png
+/dwv/demo/stable/resources/help/twotouch_drag.png
+/dwv/demo/stable/resources/help/twotouch_pinch.png
 # translations
 /dwv/demo/stable/locales/de/translation.json
 /dwv/demo/stable/locales/en/translation.json
@@ -53,7 +55,7 @@ appgui.js
 /dwv/demo/stable/ext/pdfjs/decode-jpegbaseline.js
 /dwv/demo/stable/ext/rii-mango/lossless-min.js
 /dwv/demo/stable/ext/rii-mango/decode-jpegloss.js
-/dwv/demo/stable/ext/kinetic/kinetic-v5.1.1-06.10.min.js
+/dwv/demo/stable/ext/konva/konva-1.5.0.min.js
 /dwv/demo/stable/ext/magic-wand/magic-wand.js
 
 NETWORK:

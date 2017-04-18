@@ -97,7 +97,7 @@ dwv.gui.WindowLevel = function (app)
         var label = document.createElement("label");
         label.setAttribute("for", "wlLi");
         var image = document.createElement("img");
-        image.src = "../../resources/contrast-64.png";
+        image.src = "../../resources/img/contrast-64.png";
         image.title = dwv.i18n("tool.WindowLevel.name");
         label.appendChild(image);
 
