@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>dwv Source: tests/utils/uri.test.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.yeti.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">dwv</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="dwv.html">dwv</a></li><li><a href="dwv.browser.html">dwv.browser</a></li><li><a href="dwv.dicom.html">dwv.dicom</a></li><li><a href="dwv.gui.html">dwv.gui</a></li><li><a href="dwv.gui.base.html">dwv.gui.base</a></li><li><a href="dwv.gui.filter.html">dwv.gui.filter</a></li><li><a href="dwv.gui.filter.base.html">dwv.gui.filter.base</a></li><li><a href="dwv.html.html">dwv.html</a></li><li><a href="dwv.image.html">dwv.image</a></li><li><a href="dwv.image.filter.html">dwv.image.filter</a></li><li><a href="dwv.image.lut.html">dwv.image.lut</a></li><li><a href="dwv.io.html">dwv.io</a></li><li><a href="dwv.math.html">dwv.math</a></li><li><a href="dwv.tests.html">dwv.tests</a></li><li><a href="dwv.tool.html">dwv.tool</a></li><li><a href="dwv.tool.filter.html">dwv.tool.filter</a></li><li><a href="dwv.utils.html">dwv.utils</a></li><li><a href="dwv.utils.base.html">dwv.utils.base</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="module-tests_dicom.html">tests/dicom</a></li><li><a href="module-tests_html.html">tests/html</a></li><li><a href="module-tests_image.html">tests/image</a></li><li><a href="module-tests_math.html">tests/math</a></li><li><a href="module-tests_utils.html">tests/utils</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="dwv.App.html">dwv.App</a></li><li><a href="dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li><li><a href="dwv.dicom.DataWriter.html">dwv.dicom.DataWriter</a></li><li><a href="dwv.dicom.DicomElementsWrapper.html">dwv.dicom.DicomElementsWrapper</a></li><li><a href="dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li><li><a href="dwv.dicom.DicomWriter.html">dwv.dicom.DicomWriter</a></li><li><a href="dwv.DrawController.html">dwv.DrawController</a></li><li><a href="dwv.gui.base.ColourTool.html">dwv.gui.base.ColourTool</a></li><li><a href="dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li><li><a href="dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li><li><a href="dwv.gui.base.DrawList.html">dwv.gui.base.DrawList</a></li><li><a href="dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li><li><a href="dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li><li><a href="dwv.gui.base.Loadbox.html">dwv.gui.base.Loadbox</a></li><li><a href="dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li><li><a href="dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li><li><a href="dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li><li><a href="dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li><li><a href="dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li><li><a href="dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li><li><a href="dwv.gui.base.Undo.html">dwv.gui.base.Undo</a></li><li><a href="dwv.gui.base.UrlLoad.html">dwv.gui.base.UrlLoad</a></li><li><a href="dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li><li><a href="dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li><li><a href="dwv.gui.info.MiniColourMap.html">dwv.gui.info.MiniColourMap</a></li><li><a href="dwv.gui.info.Plot.html">dwv.gui.info.Plot</a></li><li><a href="dwv.gui.info.Position.html">dwv.gui.info.Position</a></li><li><a href="dwv.gui.info.Windowing.html">dwv.gui.info.Windowing</a></li><li><a href="dwv.html.Layer.html">dwv.html.Layer</a></li><li><a href="dwv.html.Style.html">dwv.html.Style</a></li><li><a href="dwv.image.DicomBufferToView.html">dwv.image.DicomBufferToView</a></li><li><a href="dwv.image.filter.Sharpen.html">dwv.image.filter.Sharpen</a></li><li><a href="dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li><li><a href="dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li><li><a href="dwv.image.Geometry.html">dwv.image.Geometry</a></li><li><a href="dwv.image.Image.html">dwv.image.Image</a></li><li><a href="dwv.image.ImageFactory.html">dwv.image.ImageFactory</a></li><li><a href="dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li><li><a href="dwv.image.lut.Window.html">dwv.image.lut.Window</a></li><li><a href="dwv.image.PixelBufferDecoder.html">dwv.image.PixelBufferDecoder</a></li><li><a href="dwv.image.RescaleSlopeAndIntercept.html">dwv.image.RescaleSlopeAndIntercept</a></li><li><a href="dwv.image.Size.html">dwv.image.Size</a></li><li><a href="dwv.image.Spacing.html">dwv.image.Spacing</a></li><li><a href="dwv.image.View.html">dwv.image.View</a></li><li><a href="dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li><li><a href="dwv.InfoController.html">dwv.InfoController</a></li><li><a href="dwv.io.File.html">dwv.io.File</a></li><li><a href="dwv.io.Url.html">dwv.io.Url</a></li><li><a href="dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li><li><a href="dwv.math.Circle.html">dwv.math.Circle</a></li><li><a href="dwv.math.Ellipse.html">dwv.math.Ellipse</a></li><li><a href="dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li><li><a href="dwv.math.Index3D.html">dwv.math.Index3D</a></li><li><a href="dwv.math.Line.html">dwv.math.Line</a></li><li><a href="dwv.math.Matrix33.html">dwv.math.Matrix33</a></li><li><a href="dwv.math.Path.html">dwv.math.Path</a></li><li><a href="dwv.math.Point2D.html">dwv.math.Point2D</a></li><li><a href="dwv.math.Point3D.html">dwv.math.Point3D</a></li><li><a href="dwv.math.Rectangle.html">dwv.math.Rectangle</a></li><li><a href="dwv.math.ROI.html">dwv.math.ROI</a></li><li><a href="dwv.math.Scissors.html">dwv.math.Scissors</a></li><li><a href="dwv.math.Vector3D.html">dwv.math.Vector3D</a></li><li><a href="dwv.State.html">dwv.State</a></li><li><a href="dwv.tool.ArrowFactory.html">dwv.tool.ArrowFactory</a></li><li><a href="dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li><li><a href="dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li><li><a href="dwv.tool.Draw.html">dwv.tool.Draw</a></li><li><a href="dwv.tool.DrawGroupCommand.html">dwv.tool.DrawGroupCommand</a></li><li><a href="dwv.tool.EllipseFactory.html">dwv.tool.EllipseFactory</a></li><li><a href="dwv.tool.Filter_.html">dwv.tool.Filter</a></li><li><a href="dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li><li><a href="dwv.tool.filter.Sobel.html">dwv.tool.filter.Sobel</a></li><li><a href="dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li><li><a href="dwv.tool.Floodfill.html">dwv.tool.Floodfill</a></li><li><a href="dwv.tool.FreeHandFactory.html">dwv.tool.FreeHandFactory</a></li><li><a href="dwv.tool.Livewire.html">dwv.tool.Livewire</a></li><li><a href="dwv.tool.MoveGroupCommand.html">dwv.tool.MoveGroupCommand</a></li><li><a href="dwv.tool.ProtractorFactory.html">dwv.tool.ProtractorFactory</a></li><li><a href="dwv.tool.RectangleFactory.html">dwv.tool.RectangleFactory</a></li><li><a href="dwv.tool.RoiFactory.html">dwv.tool.RoiFactory</a></li><li><a href="dwv.tool.RulerFactory.html">dwv.tool.RulerFactory</a></li><li><a href="dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li><li><a href="dwv.tool.Scroll.html">dwv.tool.Scroll</a></li><li><a href="dwv.tool.ShapeEditor.html">dwv.tool.ShapeEditor</a></li><li><a href="dwv.tool.Toolbox.html">dwv.tool.Toolbox</a></li><li><a href="dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li><li><a href="dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li><li><a href="dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li><li><a href="dwv.ToolboxController.html">dwv.ToolboxController</a></li><li><a href="dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li><li><a href="dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li><li><a href="dwv.utils.WorkerThread.html">dwv.utils.WorkerThread</a></li><li><a href="dwv.ViewController.html">dwv.ViewController</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="global.html#webdriver">webdriver</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+        
+            <div class="col-sm-3 col-md-3">
+                <form class="navbar-form" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: tests/utils/uri.test.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">/**
+ * Tests for the 'utils/uri.js' file.
+ */
+// Do not warn if these variables were not defined before.
+/* global QUnit */
+QUnit.module("utils");
+
+/**
+ * Tests for {@link dwv.utils.splitUri}.
+ * @function module:tests/utils~splitUri
+ */
+QUnit.test("Test splitUri.", function (assert) {
+    // using JSON.stringify to compare objects
+    var strEmpty = JSON.stringify({});
+
+    // undefined
+    var res00 = dwv.utils.splitUri();
+    assert.equal(JSON.stringify(res00), strEmpty, "Split null");
+    // null
+    var res01 = dwv.utils.splitUri(null);
+    assert.equal(JSON.stringify(res01), strEmpty, "Split null");
+    // empty
+    var res02 = dwv.utils.splitUri("");
+    assert.equal(JSON.stringify(res02), strEmpty, "Split empty");
+
+    // test10
+    var test10 = "root?key0";
+    var res10 = dwv.utils.splitUri(test10);
+    var ref10 = {'base': "root", 'query': {}};
+    assert.equal(JSON.stringify(res10), JSON.stringify(ref10), "Split test10");
+    // test11
+    var test11 = "root?key0=val00";
+    var res11 = dwv.utils.splitUri(test11);
+    var ref11 = {'base': "root", 'query': {'key0': "val00"}};
+    assert.equal(JSON.stringify(res11), JSON.stringify(ref11), "Split test11");
+
+    // test20
+    var test20 = "root?key0=val00&amp;key1";
+    var res20 = dwv.utils.splitUri(test20);
+    var ref20 = {'base': "root", 'query': {'key0': "val00"}};
+    assert.equal(JSON.stringify(res20), JSON.stringify(ref20), "Split test20");
+    // test21
+    var test21 = "root?key0=val00&amp;key1=val10";
+    var res21 = dwv.utils.splitUri(test21);
+    var ref21 = {'base': "root", 'query': {'key0': "val00", 'key1': "val10"}};
+    assert.equal(JSON.stringify(res21), JSON.stringify(ref21), "Split test21");
+
+    // test30
+    var test30 = "root?key0=val00&amp;key0&amp;key1=val10";
+    var res30 = dwv.utils.splitUri(test30);
+    var ref30 = {'base': "root", 'query': {'key0': ["val00", null], 'key1': "val10"}};
+    assert.equal(JSON.stringify(res30), JSON.stringify(ref30), "Split test30");
+    // test31
+    var test31 = "root?key0=val00&amp;key0=val01&amp;key1=val10";
+    var res31 = dwv.utils.splitUri(test31);
+    var ref31 = {'base': "root", 'query': {'key0': ["val00", "val01"], 'key1': "val10"}};
+    assert.equal(JSON.stringify(res31), JSON.stringify(ref31), "Split test31");
+});
+
+/**
+ * Tests for {@link dwv.utils.getUriQuery}.
+ * @function module:tests/utils~getUriQuery
+ */
+QUnit.test("Test get URI query.", function (assert) {
+    var params;
+
+    // test 00
+    var root00 = "http://test.com?input=";
+    var uri00 = "result";
+    var full00 = root00 + encodeURIComponent(uri00);
+    params = dwv.utils.getUriQuery(full00);
+    var res00 = dwv.utils.decodeKeyValueUri( params.input, params.dwvReplaceMode );
+    var theo00 = [uri00];
+    assert.equal(res00.toString(), theo00.toString(), "Http uri");
+    // test 01
+    var root01 = "file:///test.html?input=";
+    var uri01 = "result";
+    var full01 = root01 + encodeURIComponent(uri01);
+    params = dwv.utils.getUriQuery(full01);
+    var res01 = dwv.utils.decodeKeyValueUri( params.input, params.dwvReplaceMode );
+    var theo01 = [uri01];
+    assert.equal(res01.toString(), theo01.toString(), "File uri");
+    // test 02
+    var root02 = "file:///test.html?input=";
+    var uri02 = "result?a=0&amp;b=1";
+    var full02 = root02 + encodeURIComponent(uri02);
+    params = dwv.utils.getUriQuery(full02);
+    var res02 = dwv.utils.decodeKeyValueUri( params.input, params.dwvReplaceMode );
+    var theo02 = [uri02];
+    assert.equal(res02.toString(), theo02.toString(), "File uri with args");
+
+    // test 03
+    var root03 = "file:///test.html";
+    var full03 = root03 + encodeURIComponent(root03);
+    var res03 = dwv.utils.getUriQuery(full03);
+    assert.equal(res03, null, "File uri with no args");
+
+    // real world URI
+
+    // wado (called 'anonymised')
+    var root10 = "http://ivmartel.github.io/dwv/demo/static/index.html?input=";
+    var uri10 = "http://dicom.vital-it.ch:8089/wado?requestType=WADO&amp;contentType=application/dicom&amp;studyUID=1.3.6.1.4.1.19291.2.1.1.2675258517533100002&amp;seriesUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.88493&amp;objectUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.96207";
+    var full10 = root10 + encodeURIComponent(uri10);
+    params = dwv.utils.getUriQuery(full10);
+    var res10 = dwv.utils.decodeKeyValueUri( params.input, params.dwvReplaceMode );
+    var theo10 = [uri10];
+    assert.equal(res10.toString(), theo10.toString(), "Wado url");
+
+    // babymri
+    var root11 = "http://ivmartel.github.io/dwv/demo/static/index.html?input=";
+    var uri11 = "http://x.babymri.org/?53320924&amp;.dcm";
+    var full11 = root11 + encodeURIComponent(uri11);
+    params = dwv.utils.getUriQuery(full11);
+    var res11 = dwv.utils.decodeKeyValueUri( params.input, params.dwvReplaceMode );
+    var theo11 = [uri11];
+    assert.equal(res11.toString(), theo11.toString(), "Babymri uri");
+
+    // github
+    var root12 = "http://ivmartel.github.io/dwv/demo/static/index.html?input=";
+    var uri12 = "https://github.com/ivmartel/dwv/blob/master/data/cta0.dcm?raw=true";
+    var full12 = root12 + encodeURIComponent(uri12);
+    params = dwv.utils.getUriQuery(full12);
+    var res12 = dwv.utils.decodeKeyValueUri( params.input, params.dwvReplaceMode );
+    var theo12 = [uri12];
+    assert.equal(res12.toString(), theo12.toString(), "Github uri");
+
+    // multiple URI
+
+    // simple test: one argument
+    var root20 = "file:///test.html?input=";
+    var uri20 = "result?a=0";
+    var full20 = root20 + encodeURIComponent(uri20);
+    params = dwv.utils.getUriQuery(full20);
+    var res20 = dwv.utils.decodeKeyValueUri( params.input, params.dwvReplaceMode );
+    var theo20 = ["result?a=0"];
+    assert.equal(res20.toString(), theo20.toString(), "Multiple key uri with one arg");
+
+    // simple test: two arguments
+    var root21 = "file:///test.html?input=";
+    var uri21 = "result?a=0&amp;a=1";
+    var full21 = root21 + encodeURIComponent(uri21);
+    params = dwv.utils.getUriQuery(full21);
+    var res21 = dwv.utils.decodeKeyValueUri( params.input, params.dwvReplaceMode );
+    var theo21 = ["result?a=0", "result?a=1"];
+    assert.equal(res21.toString(), theo21.toString(), "Multiple key uri with two args");
+
+    // simple test: three arguments
+    var root22 = "file:///test.html?input=";
+    var uri22 = "result?a=0&amp;a=1&amp;a=2";
+    var full22 = root22 + encodeURIComponent(uri22);
+    params = dwv.utils.getUriQuery(full22);
+    var res22 = dwv.utils.decodeKeyValueUri( params.input, params.dwvReplaceMode );
+    var theo22 = ["result?a=0", "result?a=1", "result?a=2"];
+    assert.equal(res22.toString(), theo22.toString(), "Multiple key uri with three args");
+
+    // simple test: plenty arguments
+    var root23 = "file:///test.html?input=";
+    var uri23 = "result?a=0&amp;a=1&amp;a=2&amp;b=3&amp;c=4";
+    var full23 = root23 + encodeURIComponent(uri23);
+    params = dwv.utils.getUriQuery(full23);
+    var res23 = dwv.utils.decodeKeyValueUri( params.input, params.dwvReplaceMode );
+    var theo23 = ["result?b=3&amp;c=4&amp;a=0", "result?b=3&amp;c=4&amp;a=1", "result?b=3&amp;c=4&amp;a=2"];
+    assert.equal(res23.toString(), theo23.toString(), "Multiple key uri with plenty args");
+
+    // real world multiple URI
+
+    // wado (called 'anonymised')
+    var root30 = "http://ivmartel.github.io/dwv/demo/static/index.html?input=";
+    var uri30 = "http://dicom.vital-it.ch:8089/wado?requestType=WADO&amp;contentType=application/dicom&amp;studyUID=1.3.6.1.4.1.19291.2.1.1.2675258517533100002&amp;seriesUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.88493&amp;objectUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.96207&amp;objectUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749216.165708";
+    var full30 = root30 + encodeURIComponent(uri30);
+    params = dwv.utils.getUriQuery(full30);
+    var res30 = dwv.utils.decodeKeyValueUri( params.input, params.dwvReplaceMode );
+    var theo30 = ["http://dicom.vital-it.ch:8089/wado?requestType=WADO&amp;contentType=application/dicom&amp;studyUID=1.3.6.1.4.1.19291.2.1.1.2675258517533100002&amp;seriesUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.88493&amp;objectUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.96207",
+                  "http://dicom.vital-it.ch:8089/wado?requestType=WADO&amp;contentType=application/dicom&amp;studyUID=1.3.6.1.4.1.19291.2.1.1.2675258517533100002&amp;seriesUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.88493&amp;objectUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749216.165708"];
+    assert.equal(res30.toString(), theo30.toString(), "Multiple Wado url");
+
+    // babymri: test for replaceMode
+    var root31 = "http://ivmartel.github.io/dwv/demo/static/index.html?input=";
+    var uri31 = "http://x.babymri.org/?key=53320924&amp;key=53320925&amp;key=53320926";
+    var full31 = root31 + encodeURIComponent(uri31) + "&amp;dwvReplaceMode=void";
+    params = dwv.utils.getUriQuery(full31);
+    var res31 = dwv.utils.decodeKeyValueUri( params.input, params.dwvReplaceMode );
+    var theo31 = ["http://x.babymri.org/?53320924", "http://x.babymri.org/?53320925", "http://x.babymri.org/?53320926"];
+    assert.equal(res31.toString(), theo31.toString(), "Multiple baby mri (replaceMode)");
+
+    // github: not supported
+
+    // simple links (no query)
+
+    // simple test: plenty arguments
+    var root40 = "file:///test.html?input=";
+    var uri40 = "web/path/to/file/?file=0.dcm&amp;file=1.dcm&amp;file=2.dcm";
+    var full40 = root40 + encodeURIComponent(uri40) + "&amp;dwvReplaceMode=void";
+    params = dwv.utils.getUriQuery(full40);
+    var res40 = dwv.utils.decodeKeyValueUri( params.input, params.dwvReplaceMode );
+    var theo40 = ["web/path/to/file/0.dcm", "web/path/to/file/1.dcm", "web/path/to/file/2.dcm"];
+    assert.equal(res40.toString(), theo40.toString(), "Multiple file-like uri");
+
+});
+
+/**
+ * Tests for {@link dwv.utils.decodeManifest}.
+ * @function module:tests/utils~decodeManifest
+ */
+QUnit.test("Test decode Manifest.", function (assert) {
+    // test values
+    var wadoUrl = "http://my.pacs.org:8089/wado";
+    var studyInstanceUID = "1.2.840.113619.2.134.1762680288.2032.1122564926.252";
+    var seriesInstanceUID0 = "1.2.840.113619.2.134.1762680288.2032.1122564926.253";
+    var sOPInstanceUID00 = "1.2.840.113619.2.134.1762680288.2032.1122564926.254";
+    var sOPInstanceUID01 = "1.2.840.113619.2.134.1762680288.2032.1122564926.255";
+    var seriesInstanceUID1 = "1.2.840.113619.2.134.1762680288.2032.1122564926.275";
+    var sOPInstanceUID10 = "1.2.840.113619.2.134.1762680288.2032.1122564926.276";
+    var sOPInstanceUID11 = "1.2.840.113619.2.134.1762680288.2032.1122564926.277";
+    var sOPInstanceUID12 = "1.2.840.113619.2.134.1762680288.2032.1122564926.275";
+
+    // create a test manifest
+    var doc = document.implementation.createDocument(null, "wado_query", null);
+    doc.documentElement.setAttribute("wadoURL", wadoUrl);
+    // series 0
+    var instance00 = doc.createElement("Instance");
+    instance00.setAttribute("SOPInstanceUID", sOPInstanceUID00);
+    var instance01 = doc.createElement("Instance");
+    instance01.setAttribute("SOPInstanceUID", sOPInstanceUID01);
+    var series0 = doc.createElement("Series");
+    series0.setAttribute("SeriesInstanceUID", seriesInstanceUID0);
+    series0.appendChild(instance00);
+    series0.appendChild(instance01);
+    // series 1
+    var instance10 = doc.createElement("Instance");
+    instance10.setAttribute("SOPInstanceUID", sOPInstanceUID10);
+    var instance11 = doc.createElement("Instance");
+    instance11.setAttribute("SOPInstanceUID", sOPInstanceUID11);
+    var instance12 = doc.createElement("Instance");
+    instance12.setAttribute("SOPInstanceUID", sOPInstanceUID12);
+    var series1 = doc.createElement("Series");
+    series1.setAttribute("SeriesInstanceUID", seriesInstanceUID1);
+    series1.appendChild(instance10);
+    series1.appendChild(instance11);
+    series1.appendChild(instance12);
+    // study
+    var study = doc.createElement("Study");
+    study.setAttribute("StudyInstanceUID", studyInstanceUID);
+    study.appendChild(series0);
+    study.appendChild(series1);
+    // patient
+    var patient = doc.createElement("Patient");
+    patient.appendChild(study);
+    // main
+    doc.documentElement.appendChild(patient);
+
+    // decode (only reads first series)
+    var res = dwv.utils.decodeManifest(doc, 2);
+    // theoretical test decode result
+    var middle = "?requestType=WADO&amp;contentType=application/dicom&amp;";
+    var theoLinkRoot = wadoUrl + middle + "&amp;studyUID=" + studyInstanceUID +
+        "&amp;seriesUID=" + seriesInstanceUID0;
+    var theoLink = [ theoLinkRoot + "&amp;objectUID=" + sOPInstanceUID00,
+                     theoLinkRoot + "&amp;objectUID=" + sOPInstanceUID01];
+
+    assert.equal(res[0], theoLink[0], "Read regular manifest link0");
+    assert.equal(res[1], theoLink[1], "Read regular manifest link1");
+});
+</pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+    <div class="modal fade" id="searchResults">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Search results</h4>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+
+
+<footer>
+
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a>
+	
+		on Tuesday, April 18th 2017
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+
+    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            SearcherDisplay.init();
+        });
+    </script>
+
+
+</body>
+</html>
