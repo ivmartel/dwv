@@ -7,20 +7,23 @@
             'i18next',
             'i18nextXHRBackend',
             'i18nextBrowserLanguageDetector',
-            'konva'
+            'konva',
+            ''
         ], factory);
     } else if (typeof module === 'object' && module.exports) {
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like environments that support module.exports,
         // like Node.
 
-        // Konva: requires 'canvas' -> deactivated for now...
         // i18next-xhr-backend: requires XMlHttpRequest
+        // Konva: requires 'canvas' -> deactivated for now...
+        // MagicWand: no package -> deactivated
 
         module.exports = factory(
             require('i18next'),
             require('i18next-xhr-backend'),
             require('i18next-browser-languagedetector'),
+            null,
             null
         );
     } else {
@@ -29,14 +32,16 @@
             root.i18next,
             root.i18nextXHRBackend,
             root.i18nextBrowserLanguageDetector,
-            root.Konva
+            root.Konva,
+            root.MagicWand
         );
     }
 }(this, function (
     i18next,
     i18nextXHRBackend,
     i18nextBrowserLanguageDetector,
-    Konva) {
+    Konva,
+    MagicWand) {
 
     // similar to what browserify does but reversed
     //https://www.contentful.com/blog/2017/01/17/the-global-object-in-javascript/
@@ -124,7 +129,7 @@ dwv.App = function ()
      * Get the version of the application.
      * @return {String} The version of the application.
      */
-    this.getVersion = function () { return "v0.19.1"; };
+    this.getVersion = function () { return "v0.19.2"; };
 
     /**
      * Get the image.
@@ -1394,6 +1399,7 @@ var Konva = Konva || {};
  * Draw controller.
  * @constructor
  * @param {Object} drawDiv The HTML div used to store the drawings.
+ * @external Konva
  */
 dwv.DrawController = function (drawDiv)
 {
@@ -12154,6 +12160,9 @@ dwv.image.SynchPixelBufferDecoder = function (algoName)
      * @param {Number} bitsAllocated The bits allocated per element in the buffer.
      * @param {Boolean} isSigned Is the data signed.
      * @return {Array} The decoded pixel buffer.
+     * @external jpeg
+     * @external JpegImage
+     * @external JpxImage
      */
     this.decode = function (pixelBuffer, bitsAllocated, isSigned) {
         var decoder = null;
@@ -15301,6 +15310,7 @@ dwv.io.File.createLoadProgressHandler = function (n, loadProgressHandler) {
 /**
  * Load a list of files.
  * @param {Array} ioArray The list of files to load.
+ * @external FileReader
  */
 dwv.io.File.prototype.load = function (ioArray)
 {
@@ -15610,6 +15620,7 @@ dwv.io.Url.createLoadProgressHandler = function (n, loadProgressHandler) {
  * Load a list of URLs.
  * @param {Array} ioArray The list of urls to load.
  * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+ * @external XMLHttpRequest
  */
 dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
 {
@@ -17371,6 +17382,7 @@ var Konva = Konva || {};
 /**
  * Arrow factory.
  * @constructor
+ * @external Konva
  */
 dwv.tool.ArrowFactory = function ()
 {
@@ -17534,6 +17546,7 @@ var Konva = Konva || {};
  * Drawing tool.
  * @constructor
  * @param {Object} app The associated application.
+ * @external Konva
  */
 dwv.tool.Draw = function (app, shapeFactoryList)
 {
@@ -18212,6 +18225,7 @@ var Konva = Konva || {};
  * Get the display name of the input shape.
  * @param {Object} shape The Konva shape.
  * @return {String} The display name.
+ * @external Konva
  */
 dwv.tool.GetShapeDisplayName = function (shape)
 {
@@ -18483,6 +18497,7 @@ var Konva = Konva || {};
 /**
  * Shape editor.
  * @constructor
+ * @external Konva
  */
 dwv.tool.ShapeEditor = function (app)
 {
@@ -18869,6 +18884,7 @@ var Konva = Konva || {};
 /**
  * Ellipse factory.
  * @constructor
+ * @external Konva
  */
 dwv.tool.EllipseFactory = function ()
 {
@@ -19388,7 +19404,8 @@ var MagicWand = MagicWand || {};
  * Floodfill painting tool.
  * @constructor
  * @param {Object} app The associated application.
- * Found in {@link  https://github.com/Tamersoul/magic-wand-js}
+ * @external MagicWand
+ * @see {@link  https://github.com/Tamersoul/magic-wand-js}
  */
 dwv.tool.Floodfill = function(app)
 {
@@ -19868,6 +19885,7 @@ var Konva = Konva || {};
 /**
  * FreeHand factory.
  * @constructor
+ * @external Konva
  */
 dwv.tool.FreeHandFactory = function ()
 {
@@ -20376,6 +20394,7 @@ var Konva = Konva || {};
 /**
  * Protractor factory.
  * @constructor
+ * @external Konva
  */
 dwv.tool.ProtractorFactory = function ()
 {
@@ -20573,6 +20592,7 @@ var Konva = Konva || {};
 /**
  * Rectangle factory.
  * @constructor
+ * @external Konva
  */
 dwv.tool.RectangleFactory = function ()
 {
@@ -20729,6 +20749,7 @@ var Konva = Konva || {};
 /**
  * ROI factory.
  * @constructor
+ * @external Konva
  */
 dwv.tool.RoiFactory = function ()
 {
@@ -20852,6 +20873,7 @@ var Konva = Konva || {};
 /**
  * Ruler factory.
  * @constructor
+ * @external Konva
  */
 dwv.tool.RulerFactory = function ()
 {
@@ -22163,6 +22185,9 @@ var i18nextBrowserLanguageDetector = i18nextBrowserLanguageDetector || {};
  * @param {String} language The language to translate to. Defaults to 'auto' and
  *   gets the language from the browser.
  * @param {String} localesPath Path to the locales directory.
+ * @external i18next
+ * @external i18nextXHRBackend
+ * @external i18nextBrowserLanguageDetector
  */
 dwv.i18nInitialise = function (language, localesPath)
 {
@@ -22192,6 +22217,7 @@ dwv.i18nInitialise = function (language, localesPath)
  * Handle i18n load event.
  * @param {Object} callback The callback function to call when i18n is loaded.
  *  It can take one argument that will be replaced with the loaded languages.
+ * @external i18next
  */
 dwv.i18nOnLoaded = function (callback) {
     i18next.on('loaded', callback);
@@ -22199,6 +22225,7 @@ dwv.i18nOnLoaded = function (callback) {
 
 /**
  * Stop handling i18n load event.
+ * @external i18next
  */
 dwv.i18nOffLoaded = function () {
     i18next.off('loaded');
@@ -22208,6 +22235,7 @@ dwv.i18nOffLoaded = function () {
  * Handle i18n failed load event.
  * @param {Object} callback The callback function to call when i18n is loaded.
  *  It can take three arguments: lng, ns and msg.
+ * @external i18next
  */
 dwv.i18nOnFailedLoad = function (callback) {
     i18next.on('failedLoading', callback);
@@ -22215,6 +22243,7 @@ dwv.i18nOnFailedLoad = function (callback) {
 
 /**
  * Stop handling i18n failed load event.
+ * @external i18next
  */
 dwv.i18nOffFailedLoad = function () {
     i18next.off('failedLoading');
@@ -22224,6 +22253,7 @@ dwv.i18nOffFailedLoad = function () {
  * Get the translated text.
  * @param {String} key The key to the text entry.
  * @param {Object} options The translation options such as plural, context...
+ * @external i18next
  */
 dwv.i18n = function (key, options) {
     return i18next.t(key, options);
@@ -22233,6 +22263,7 @@ dwv.i18n = function (key, options) {
  * Check the existence of a translation.
  * @param {String} key The key to the text entry.
  * @param {Object} options The translation options such as plural, context...
+ * @external i18next
  */
 dwv.i18nExists = function (key, options) {
     return i18next.exists(key, options);
@@ -22445,6 +22476,7 @@ dwv.utils.ThreadPool.prototype.onworkerend = function ()
 
 /**
  * Worker thread.
+ * @external Worker
  * @constructor
  * @param {Object} parentPool The parent pool.
  */
@@ -22674,6 +22706,7 @@ dwv.utils.decodeKeyValueUri = function (uri, replaceMode)
 
 /**
  * Decode a manifest query.
+ * @external XMLHttpRequest
  * @param {Object} query The manifest query: {input, nslices},
  *   with input the input URI and nslices the number of slices.
  * @param {Function} The function to call with the decoded urls.
