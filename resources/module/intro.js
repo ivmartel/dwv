@@ -7,20 +7,23 @@
             'i18next',
             'i18nextXHRBackend',
             'i18nextBrowserLanguageDetector',
-            'konva'
+            'konva',
+            ''
         ], factory);
     } else if (typeof module === 'object' && module.exports) {
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like environments that support module.exports,
         // like Node.
 
-        // Konva: requires 'canvas' -> deactivated for now...
         // i18next-xhr-backend: requires XMlHttpRequest
+        // Konva: requires 'canvas' -> deactivated for now...
+        // MagicWand: no package -> deactivated
 
         module.exports = factory(
             require('i18next'),
             require('i18next-xhr-backend'),
             require('i18next-browser-languagedetector'),
+            null,
             null
         );
     } else {
@@ -29,14 +32,16 @@
             root.i18next,
             root.i18nextXHRBackend,
             root.i18nextBrowserLanguageDetector,
-            root.Konva
+            root.Konva,
+            root.MagicWand
         );
     }
 }(this, function (
     i18next,
     i18nextXHRBackend,
     i18nextBrowserLanguageDetector,
-    Konva) {
+    Konva,
+    MagicWand) {
 
     // similar to what browserify does but reversed
     //https://www.contentful.com/blog/2017/01/17/the-global-object-in-javascript/
