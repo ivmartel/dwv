@@ -1392,7 +1392,7 @@ dwv.App = function ()
 
 // namespaces
 var dwv = dwv || {};
-// external
+// @external Konva
 var Konva = Konva || {};
 
 /**
@@ -15613,6 +15613,7 @@ dwv.io.Url.createLoadProgressHandler = function (n, loadProgressHandler) {
 
 /**
  * Load a list of URLs.
+ * @external XMLHttpRequest
  * @param {Array} ioArray The list of urls to load.
  * @param {Array} requestHeaders An array of {name, value} to use as request headers.
  */
@@ -17532,7 +17533,7 @@ dwv.tool.UpdateArrow = function (anchor/*, image*/)
 var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
-// external
+// @external Konva
 var Konva = Konva || {};
 
 /**
@@ -18210,7 +18211,7 @@ dwv.tool.Draw.prototype.hasShape = function(name) {
 var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
-// external
+// @external Konva
 var Konva = Konva || {};
 
 /**
@@ -18482,7 +18483,7 @@ dwv.tool.DeleteGroupCommand.prototype.onUndo = function (/*event*/)
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// external
+// @external Konva
 var Konva = Konva || {};
 
 /**
@@ -18868,7 +18869,7 @@ dwv.tool.ShapeEditor = function (app)
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// external
+// @external Konva
 var Konva = Konva || {};
 
 /**
@@ -19386,7 +19387,7 @@ dwv.tool.RunFilterCommand = function (filter, app) {
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// external
+// @external MagicWand
 var MagicWand = MagicWand || {};
 
 /**
@@ -19867,7 +19868,7 @@ dwv.tool.Floodfill.prototype.setLineColour = function(colour)
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// external
+// @external Konva
 var Konva = Konva || {};
 
 /**
@@ -20375,7 +20376,7 @@ dwv.tool.Livewire.prototype.setLineColour = function(colour)
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// external
+// @external Konva
 var Konva = Konva || {};
 
 /**
@@ -20572,7 +20573,7 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// external
+// @external Konva
 var Konva = Konva || {};
 
 /**
@@ -20728,7 +20729,7 @@ dwv.tool.UpdateRect = function (anchor, image)
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// external
+// @external Konva
 var Konva = Konva || {};
 
 /**
@@ -20851,7 +20852,7 @@ dwv.tool.UpdateRoi = function (anchor /*, image*/)
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// external
+// @external Konva
 var Konva = Konva || {};
 
 /**
@@ -22155,9 +22156,11 @@ dwv.browser.check = function()
 
 // namespaces
 var dwv = dwv || {};
-// external
+// @external i18next
 var i18next = i18next || {};
+// @external i18nextXHRBackend
 var i18nextXHRBackend = i18nextXHRBackend || {};
+// @external i18nextBrowserLanguageDetector
 var i18nextBrowserLanguageDetector = i18nextBrowserLanguageDetector || {};
 
 // This is mainly a wrapper around the i18next object.
@@ -22450,6 +22453,7 @@ dwv.utils.ThreadPool.prototype.onworkerend = function ()
 
 /**
  * Worker thread.
+ * @external Worker
  * @constructor
  * @param {Object} parentPool The parent pool.
  */
@@ -22679,6 +22683,7 @@ dwv.utils.decodeKeyValueUri = function (uri, replaceMode)
 
 /**
  * Decode a manifest query.
+ * @external XMLHttpRequest
  * @param {Object} query The manifest query: {input, nslices},
  *   with input the input URI and nslices the number of slices.
  * @param {Function} The function to call with the decoded urls.
