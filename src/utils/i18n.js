@@ -1,8 +1,10 @@
 // namespaces
 var dwv = dwv || {};
-// external
+// @external i18next
 var i18next = i18next || {};
+// @external i18nextXHRBackend
 var i18nextXHRBackend = i18nextXHRBackend || {};
+// @external i18nextBrowserLanguageDetector
 var i18nextBrowserLanguageDetector = i18nextBrowserLanguageDetector || {};
 
 // This is mainly a wrapper around the i18next object.

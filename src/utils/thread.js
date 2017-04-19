@@ -83,6 +83,7 @@ dwv.utils.ThreadPool.prototype.onworkerend = function ()
 
 /**
  * Worker thread.
+ * @external Worker
  * @constructor
  * @param {Object} parentPool The parent pool.
  */

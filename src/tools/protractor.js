@@ -1,7 +1,7 @@
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// external
+// @external Konva
 var Konva = Konva || {};
 
 /**
