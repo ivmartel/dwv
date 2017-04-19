@@ -1392,13 +1392,14 @@ dwv.App = function ()
 
 // namespaces
 var dwv = dwv || {};
-// @external Konva
+// external
 var Konva = Konva || {};
 
 /**
  * Draw controller.
  * @constructor
  * @param {Object} drawDiv The HTML div used to store the drawings.
+ * @external Konva
  */
 dwv.DrawController = function (drawDiv)
 {
@@ -12159,6 +12160,9 @@ dwv.image.SynchPixelBufferDecoder = function (algoName)
      * @param {Number} bitsAllocated The bits allocated per element in the buffer.
      * @param {Boolean} isSigned Is the data signed.
      * @return {Array} The decoded pixel buffer.
+     * @external jpeg
+     * @external JpegImage
+     * @external JpxImage
      */
     this.decode = function (pixelBuffer, bitsAllocated, isSigned) {
         var decoder = null;
@@ -15306,6 +15310,7 @@ dwv.io.File.createLoadProgressHandler = function (n, loadProgressHandler) {
 /**
  * Load a list of files.
  * @param {Array} ioArray The list of files to load.
+ * @external FileReader
  */
 dwv.io.File.prototype.load = function (ioArray)
 {
@@ -15613,9 +15618,9 @@ dwv.io.Url.createLoadProgressHandler = function (n, loadProgressHandler) {
 
 /**
  * Load a list of URLs.
- * @external XMLHttpRequest
  * @param {Array} ioArray The list of urls to load.
  * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+ * @external XMLHttpRequest
  */
 dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
 {
@@ -17377,6 +17382,7 @@ var Konva = Konva || {};
 /**
  * Arrow factory.
  * @constructor
+ * @external Konva
  */
 dwv.tool.ArrowFactory = function ()
 {
@@ -17533,13 +17539,14 @@ dwv.tool.UpdateArrow = function (anchor/*, image*/)
 var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
-// @external Konva
+// external
 var Konva = Konva || {};
 
 /**
  * Drawing tool.
  * @constructor
  * @param {Object} app The associated application.
+ * @external Konva
  */
 dwv.tool.Draw = function (app, shapeFactoryList)
 {
@@ -18211,13 +18218,14 @@ dwv.tool.Draw.prototype.hasShape = function(name) {
 var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
-// @external Konva
+// external
 var Konva = Konva || {};
 
 /**
  * Get the display name of the input shape.
  * @param {Object} shape The Konva shape.
  * @return {String} The display name.
+ * @external Konva
  */
 dwv.tool.GetShapeDisplayName = function (shape)
 {
@@ -18483,12 +18491,13 @@ dwv.tool.DeleteGroupCommand.prototype.onUndo = function (/*event*/)
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// @external Konva
+// external
 var Konva = Konva || {};
 
 /**
  * Shape editor.
  * @constructor
+ * @external Konva
  */
 dwv.tool.ShapeEditor = function (app)
 {
@@ -18869,12 +18878,13 @@ dwv.tool.ShapeEditor = function (app)
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// @external Konva
+// external
 var Konva = Konva || {};
 
 /**
  * Ellipse factory.
  * @constructor
+ * @external Konva
  */
 dwv.tool.EllipseFactory = function ()
 {
@@ -19387,14 +19397,15 @@ dwv.tool.RunFilterCommand = function (filter, app) {
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// @external MagicWand
+// external
 var MagicWand = MagicWand || {};
 
 /**
  * Floodfill painting tool.
  * @constructor
  * @param {Object} app The associated application.
- * Found in {@link  https://github.com/Tamersoul/magic-wand-js}
+ * @external MagicWand
+ * @see {@link  https://github.com/Tamersoul/magic-wand-js}
  */
 dwv.tool.Floodfill = function(app)
 {
@@ -19868,12 +19879,13 @@ dwv.tool.Floodfill.prototype.setLineColour = function(colour)
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// @external Konva
+// external
 var Konva = Konva || {};
 
 /**
  * FreeHand factory.
  * @constructor
+ * @external Konva
  */
 dwv.tool.FreeHandFactory = function ()
 {
@@ -20376,12 +20388,13 @@ dwv.tool.Livewire.prototype.setLineColour = function(colour)
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// @external Konva
+// external
 var Konva = Konva || {};
 
 /**
  * Protractor factory.
  * @constructor
+ * @external Konva
  */
 dwv.tool.ProtractorFactory = function ()
 {
@@ -20573,12 +20586,13 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// @external Konva
+// external
 var Konva = Konva || {};
 
 /**
  * Rectangle factory.
  * @constructor
+ * @external Konva
  */
 dwv.tool.RectangleFactory = function ()
 {
@@ -20729,12 +20743,13 @@ dwv.tool.UpdateRect = function (anchor, image)
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// @external Konva
+// external
 var Konva = Konva || {};
 
 /**
  * ROI factory.
  * @constructor
+ * @external Konva
  */
 dwv.tool.RoiFactory = function ()
 {
@@ -20852,12 +20867,13 @@ dwv.tool.UpdateRoi = function (anchor /*, image*/)
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// @external Konva
+// external
 var Konva = Konva || {};
 
 /**
  * Ruler factory.
  * @constructor
+ * @external Konva
  */
 dwv.tool.RulerFactory = function ()
 {
@@ -22156,11 +22172,9 @@ dwv.browser.check = function()
 
 // namespaces
 var dwv = dwv || {};
-// @external i18next
+// external
 var i18next = i18next || {};
-// @external i18nextXHRBackend
 var i18nextXHRBackend = i18nextXHRBackend || {};
-// @external i18nextBrowserLanguageDetector
 var i18nextBrowserLanguageDetector = i18nextBrowserLanguageDetector || {};
 
 // This is mainly a wrapper around the i18next object.
@@ -22171,6 +22185,9 @@ var i18nextBrowserLanguageDetector = i18nextBrowserLanguageDetector || {};
  * @param {String} language The language to translate to. Defaults to 'auto' and
  *   gets the language from the browser.
  * @param {String} localesPath Path to the locales directory.
+ * @external i18next
+ * @external i18nextXHRBackend
+ * @external i18nextBrowserLanguageDetector
  */
 dwv.i18nInitialise = function (language, localesPath)
 {
@@ -22200,6 +22217,7 @@ dwv.i18nInitialise = function (language, localesPath)
  * Handle i18n load event.
  * @param {Object} callback The callback function to call when i18n is loaded.
  *  It can take one argument that will be replaced with the loaded languages.
+ * @external i18next
  */
 dwv.i18nOnLoaded = function (callback) {
     i18next.on('loaded', callback);
@@ -22207,6 +22225,7 @@ dwv.i18nOnLoaded = function (callback) {
 
 /**
  * Stop handling i18n load event.
+ * @external i18next
  */
 dwv.i18nOffLoaded = function () {
     i18next.off('loaded');
@@ -22216,6 +22235,7 @@ dwv.i18nOffLoaded = function () {
  * Handle i18n failed load event.
  * @param {Object} callback The callback function to call when i18n is loaded.
  *  It can take three arguments: lng, ns and msg.
+ * @external i18next
  */
 dwv.i18nOnFailedLoad = function (callback) {
     i18next.on('failedLoading', callback);
@@ -22223,6 +22243,7 @@ dwv.i18nOnFailedLoad = function (callback) {
 
 /**
  * Stop handling i18n failed load event.
+ * @external i18next
  */
 dwv.i18nOffFailedLoad = function () {
     i18next.off('failedLoading');
@@ -22232,6 +22253,7 @@ dwv.i18nOffFailedLoad = function () {
  * Get the translated text.
  * @param {String} key The key to the text entry.
  * @param {Object} options The translation options such as plural, context...
+ * @external i18next
  */
 dwv.i18n = function (key, options) {
     return i18next.t(key, options);
@@ -22241,6 +22263,7 @@ dwv.i18n = function (key, options) {
  * Check the existence of a translation.
  * @param {String} key The key to the text entry.
  * @param {Object} options The translation options such as plural, context...
+ * @external i18next
  */
 dwv.i18nExists = function (key, options) {
     return i18next.exists(key, options);
