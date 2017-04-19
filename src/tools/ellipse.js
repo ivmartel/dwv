@@ -1,12 +1,13 @@
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// @external Konva
+// external
 var Konva = Konva || {};
 
 /**
  * Ellipse factory.
  * @constructor
+ * @external Konva
  */
 dwv.tool.EllipseFactory = function ()
 {

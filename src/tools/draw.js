@@ -2,13 +2,14 @@
 var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
-// @external Konva
+// external
 var Konva = Konva || {};
 
 /**
  * Drawing tool.
  * @constructor
  * @param {Object} app The associated application.
+ * @external Konva
  */
 dwv.tool.Draw = function (app, shapeFactoryList)
 {

@@ -1,12 +1,13 @@
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// @external Konva
+// external
 var Konva = Konva || {};
 
 /**
  * Shape editor.
  * @constructor
+ * @external Konva
  */
 dwv.tool.ShapeEditor = function (app)
 {

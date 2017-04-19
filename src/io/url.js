@@ -208,9 +208,9 @@ dwv.io.Url.createLoadProgressHandler = function (n, loadProgressHandler) {
 
 /**
  * Load a list of URLs.
- * @external XMLHttpRequest
  * @param {Array} ioArray The list of urls to load.
  * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+ * @external XMLHttpRequest
  */
 dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
 {

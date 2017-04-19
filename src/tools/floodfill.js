@@ -1,14 +1,15 @@
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// @external MagicWand
+// external
 var MagicWand = MagicWand || {};
 
 /**
  * Floodfill painting tool.
  * @constructor
  * @param {Object} app The associated application.
- * Found in {@link  https://github.com/Tamersoul/magic-wand-js}
+ * @external MagicWand
+ * @see {@link  https://github.com/Tamersoul/magic-wand-js}
  */
 dwv.tool.Floodfill = function(app)
 {

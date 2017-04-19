@@ -1,12 +1,13 @@
 // namespaces
 var dwv = dwv || {};
-// @external Konva
+// external
 var Konva = Konva || {};
 
 /**
  * Draw controller.
  * @constructor
  * @param {Object} drawDiv The HTML div used to store the drawings.
+ * @external Konva
  */
 dwv.DrawController = function (drawDiv)
 {

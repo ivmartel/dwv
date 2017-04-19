@@ -1,10 +1,8 @@
 // namespaces
 var dwv = dwv || {};
-// @external i18next
+// external
 var i18next = i18next || {};
-// @external i18nextXHRBackend
 var i18nextXHRBackend = i18nextXHRBackend || {};
-// @external i18nextBrowserLanguageDetector
 var i18nextBrowserLanguageDetector = i18nextBrowserLanguageDetector || {};
 
 // This is mainly a wrapper around the i18next object.
@@ -15,6 +13,9 @@ var i18nextBrowserLanguageDetector = i18nextBrowserLanguageDetector || {};
  * @param {String} language The language to translate to. Defaults to 'auto' and
  *   gets the language from the browser.
  * @param {String} localesPath Path to the locales directory.
+ * @external i18next
+ * @external i18nextXHRBackend
+ * @external i18nextBrowserLanguageDetector
  */
 dwv.i18nInitialise = function (language, localesPath)
 {
@@ -44,6 +45,7 @@ dwv.i18nInitialise = function (language, localesPath)
  * Handle i18n load event.
  * @param {Object} callback The callback function to call when i18n is loaded.
  *  It can take one argument that will be replaced with the loaded languages.
+ * @external i18next
  */
 dwv.i18nOnLoaded = function (callback) {
     i18next.on('loaded', callback);
@@ -51,6 +53,7 @@ dwv.i18nOnLoaded = function (callback) {
 
 /**
  * Stop handling i18n load event.
+ * @external i18next
  */
 dwv.i18nOffLoaded = function () {
     i18next.off('loaded');
@@ -60,6 +63,7 @@ dwv.i18nOffLoaded = function () {
  * Handle i18n failed load event.
  * @param {Object} callback The callback function to call when i18n is loaded.
  *  It can take three arguments: lng, ns and msg.
+ * @external i18next
  */
 dwv.i18nOnFailedLoad = function (callback) {
     i18next.on('failedLoading', callback);
@@ -67,6 +71,7 @@ dwv.i18nOnFailedLoad = function (callback) {
 
 /**
  * Stop handling i18n failed load event.
+ * @external i18next
  */
 dwv.i18nOffFailedLoad = function () {
     i18next.off('failedLoading');
@@ -76,6 +81,7 @@ dwv.i18nOffFailedLoad = function () {
  * Get the translated text.
  * @param {String} key The key to the text entry.
  * @param {Object} options The translation options such as plural, context...
+ * @external i18next
  */
 dwv.i18n = function (key, options) {
     return i18next.t(key, options);
@@ -85,6 +91,7 @@ dwv.i18n = function (key, options) {
  * Check the existence of a translation.
  * @param {String} key The key to the text entry.
  * @param {Object} options The translation options such as plural, context...
+ * @external i18next
  */
 dwv.i18nExists = function (key, options) {
     return i18next.exists(key, options);

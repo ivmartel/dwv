@@ -7,6 +7,7 @@ var Konva = Konva || {};
 /**
  * Arrow factory.
  * @constructor
+ * @external Konva
  */
 dwv.tool.ArrowFactory = function ()
 {

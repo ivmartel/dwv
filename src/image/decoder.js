@@ -73,6 +73,9 @@ dwv.image.SynchPixelBufferDecoder = function (algoName)
      * @param {Number} bitsAllocated The bits allocated per element in the buffer.
      * @param {Boolean} isSigned Is the data signed.
      * @return {Array} The decoded pixel buffer.
+     * @external jpeg
+     * @external JpegImage
+     * @external JpxImage
      */
     this.decode = function (pixelBuffer, bitsAllocated, isSigned) {
         var decoder = null;

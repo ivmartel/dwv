@@ -2,13 +2,14 @@
 var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
-// @external Konva
+// external
 var Konva = Konva || {};
 
 /**
  * Get the display name of the input shape.
  * @param {Object} shape The Konva shape.
  * @return {String} The display name.
+ * @external Konva
  */
 dwv.tool.GetShapeDisplayName = function (shape)
 {

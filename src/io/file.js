@@ -210,6 +210,7 @@ dwv.io.File.createLoadProgressHandler = function (n, loadProgressHandler) {
 /**
  * Load a list of files.
  * @param {Array} ioArray The list of files to load.
+ * @external FileReader
  */
 dwv.io.File.prototype.load = function (ioArray)
 {
