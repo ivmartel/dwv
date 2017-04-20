@@ -219,12 +219,6 @@ dwv.io.File.prototype.load = function (ioArray)
     // set the number of data to load
     this.setNToLoad( ioArray.length );
 
-    // call the onload listener
-    var onLoadView = function (data)
-    {
-        self.onload(data);
-    };
-
     // DICOM buffer to dwv.image.View (asynchronous)
     var db2v = new dwv.image.DicomBufferToView();
     db2v.setDefaultCharacterSet(this.getDefaultCharacterSet());
@@ -239,7 +233,9 @@ dwv.io.File.prototype.load = function (ioArray)
     {
         self.setNeedDecoding(true);
         try {
-            db2v.convert(event.target.result, onLoadView);
+            db2v.convert(event.target.result, function (data) {
+                self.onload(data);
+            });
         } catch (error) {
             self.onerror(error);
         }
@@ -249,7 +245,19 @@ dwv.io.File.prototype.load = function (ioArray)
     var onLoadDOMImageBuffer = function (/*event*/)
     {
         try {
-            onLoadView( dwv.image.getViewFromDOMImage(this) );
+            self.onload( dwv.image.getViewFromDOMImage(this) );
+        } catch (error) {
+            self.onerror(error);
+        }
+    };
+
+    // DOM Video buffer to dwv.image.View
+    var onLoadDOMVideoBuffer = function (/*event*/)
+    {
+        try {
+            dwv.image.getViewFromDOMVideo(this, function (data) {
+                self.onload(data);
+            });
         } catch (error) {
             self.onerror(error);
         }
@@ -277,6 +285,18 @@ dwv.io.File.prototype.load = function (ioArray)
         theImage.onload = onLoadDOMImageBuffer;
     };
 
+    // raw video to DOM Image
+    var onLoadRawVideoBuffer = function (event)
+    {
+        var video = document.createElement('video');
+        video.src = event.target.result;
+        // storing values to pass them on
+        video.file = this.file;
+        video.index = this.index;
+        // triggered by ctx.drawImage
+        video.onloadedmetadata = onLoadDOMVideoBuffer;
+    };
+
     // loop on I/O elements
     for (var i = 0; i < ioArray.length; ++i)
     {
@@ -297,6 +317,16 @@ dwv.io.File.prototype.load = function (ioArray)
             // callbacks
             reader.onload = onLoadRawImageBuffer;
             reader.onerror = dwv.io.File.createErrorHandler(file, "image", self.onerror);
+            reader.readAsDataURL(file);
+        }
+        else if ( file.type.match("video.*") )
+        {
+            // storing values to pass them on
+            reader.file = file;
+            reader.index = i;
+            // callbacks
+            reader.onload = onLoadRawVideoBuffer;
+            reader.onerror = dwv.io.File.createErrorHandler(file, "video", self.onerror);
             reader.readAsDataURL(file);
         }
         else

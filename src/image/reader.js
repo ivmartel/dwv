@@ -80,6 +80,65 @@ dwv.image.getViewFromDOMImage = function (image)
 };
 
 /**
+ * Get data from an input image using a canvas.
+ * @param {Image} video The DOM Video.
+ * @return {Mixed} The corresponding view and info.
+ */
+dwv.image.getViewFromDOMVideo = function (video, callback)
+{
+    console.log("loading video...");
+
+    var frames = [];
+    var frameRate = 30;
+    var frameIndex = 0;
+
+    var width = video.videoWidth;
+    var height = video.videoHeight;
+
+    // draw the image in the canvas in order to get its data
+    var canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    var ctx = canvas.getContext('2d');
+
+    video.addEventListener('seeked', onseeked, false);
+
+    function storeFrame() {
+        ++frameIndex;
+        console.log("frame: " + frameIndex);
+        ctx.drawImage(video, 0, 0);
+
+        frames.push( dwv.image.getViewFromImageData(
+            ctx.getImageData(0, 0, width, height),
+            width, height, 0) );
+    }
+
+    function onseeked() {
+      ++frameIndex;
+      storeFrame();
+      // set the next time
+      // (do not use currentTime, it seems to get offseted)
+      var nextTime = frameIndex / frameRate;
+      if (nextTime <= this.duration) {
+          // next frame
+          this.currentTime = nextTime;
+      } else {
+          // end
+          ondone();
+      }
+    }
+
+    function ondone() {
+        video.removeEventListener('seeked', onseeked);
+
+        callback( {"view": frames[2], "info": {} } );
+    }
+
+    // trigger the first seeked
+    video.currentTime = 0;
+};
+
+/**
  * Create a dwv.image.View from a DICOM buffer.
  * @constructor
  */
