@@ -14154,65 +14154,6 @@ dwv.image.getViewFromDOMImage = function (image)
 };
 
 /**
- * Get data from an input image using a canvas.
- * @param {Image} video The DOM Video.
- * @return {Mixed} The corresponding view and info.
- */
-dwv.image.getViewFromDOMVideo = function (video, callback)
-{
-    console.log("loading video...");
-
-    var frames = [];
-    var frameRate = 30;
-    var frameIndex = 0;
-
-    var width = video.videoWidth;
-    var height = video.videoHeight;
-
-    // draw the image in the canvas in order to get its data
-    var canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    var ctx = canvas.getContext('2d');
-
-    video.addEventListener('seeked', onseeked, false);
-
-    function storeFrame() {
-        ++frameIndex;
-        console.log("frame: " + frameIndex);
-        ctx.drawImage(video, 0, 0);
-
-        frames.push( dwv.image.getViewFromImageData(
-            ctx.getImageData(0, 0, width, height),
-            width, height, 0) );
-    }
-
-    function onseeked() {
-      ++frameIndex;
-      storeFrame();
-      // set the next time
-      // (do not use currentTime, it seems to get offseted)
-      var nextTime = frameIndex / frameRate;
-      if (nextTime <= this.duration) {
-          // next frame
-          this.currentTime = nextTime;
-      } else {
-          // end
-          ondone();
-      }
-    }
-
-    function ondone() {
-        video.removeEventListener('seeked', onseeked);
-
-        callback( {"view": frames[2], "info": {} } );
-    }
-
-    // trigger the first seeked
-    video.currentTime = 0;
-};
-
-/**
  * Create a dwv.image.View from a DICOM buffer.
  * @constructor
  */
@@ -15378,6 +15319,12 @@ dwv.io.File.prototype.load = function (ioArray)
     // set the number of data to load
     this.setNToLoad( ioArray.length );
 
+    // call the onload listener
+    var onLoadView = function (data)
+    {
+        self.onload(data);
+    };
+
     // DICOM buffer to dwv.image.View (asynchronous)
     var db2v = new dwv.image.DicomBufferToView();
     db2v.setDefaultCharacterSet(this.getDefaultCharacterSet());
@@ -15392,9 +15339,7 @@ dwv.io.File.prototype.load = function (ioArray)
     {
         self.setNeedDecoding(true);
         try {
-            db2v.convert(event.target.result, function (data) {
-                self.onload(data);
-            });
+            db2v.convert(event.target.result, onLoadView);
         } catch (error) {
             self.onerror(error);
         }
@@ -15404,19 +15349,7 @@ dwv.io.File.prototype.load = function (ioArray)
     var onLoadDOMImageBuffer = function (/*event*/)
     {
         try {
-            self.onload( dwv.image.getViewFromDOMImage(this) );
-        } catch (error) {
-            self.onerror(error);
-        }
-    };
-
-    // DOM Video buffer to dwv.image.View
-    var onLoadDOMVideoBuffer = function (/*event*/)
-    {
-        try {
-            dwv.image.getViewFromDOMVideo(this, function (data) {
-                self.onload(data);
-            });
+            onLoadView( dwv.image.getViewFromDOMImage(this) );
         } catch (error) {
             self.onerror(error);
         }
@@ -15444,18 +15377,6 @@ dwv.io.File.prototype.load = function (ioArray)
         theImage.onload = onLoadDOMImageBuffer;
     };
 
-    // raw video to DOM Image
-    var onLoadRawVideoBuffer = function (event)
-    {
-        var video = document.createElement('video');
-        video.src = event.target.result;
-        // storing values to pass them on
-        video.file = this.file;
-        video.index = this.index;
-        // triggered by ctx.drawImage
-        video.onloadedmetadata = onLoadDOMVideoBuffer;
-    };
-
     // loop on I/O elements
     for (var i = 0; i < ioArray.length; ++i)
     {
@@ -15476,16 +15397,6 @@ dwv.io.File.prototype.load = function (ioArray)
             // callbacks
             reader.onload = onLoadRawImageBuffer;
             reader.onerror = dwv.io.File.createErrorHandler(file, "image", self.onerror);
-            reader.readAsDataURL(file);
-        }
-        else if ( file.type.match("video.*") )
-        {
-            // storing values to pass them on
-            reader.file = file;
-            reader.index = i;
-            // callbacks
-            reader.onload = onLoadRawVideoBuffer;
-            reader.onerror = dwv.io.File.createErrorHandler(file, "video", self.onerror);
             reader.readAsDataURL(file);
         }
         else
@@ -15718,6 +15629,12 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     // set the number of data to load
     this.setNToLoad( ioArray.length );
 
+    // call the listeners
+    var onLoadView = function (data)
+    {
+        self.onload(data);
+    };
+
     // DICOM buffer to dwv.image.View (asynchronous)
     var db2v = new dwv.image.DicomBufferToView();
     db2v.setDefaultCharacterSet(this.getDefaultCharacterSet());
@@ -15732,9 +15649,7 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     {
         self.setNeedDecoding(true);
         try {
-            db2v.convert(response, function (data) {
-                self.onload(data);
-            });
+            db2v.convert(response, onLoadView);
         } catch (error) {
             self.onerror(error);
         }
@@ -15744,7 +15659,7 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     var onLoadDOMImageBuffer = function (/*event*/)
     {
         try {
-            self.onload( dwv.image.getViewFromDOMImage(this) );
+            onLoadView( dwv.image.getViewFromDOMImage(this) );
         } catch (error) {
             self.onerror(error);
         }
