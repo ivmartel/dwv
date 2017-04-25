@@ -246,6 +246,7 @@ dwv.io.File.prototype.load = function (ioArray)
     {
         try {
             self.onload( dwv.image.getViewFromDOMImage(this) );
+            self.addLoaded();
         } catch (error) {
             self.onerror(error);
         }
@@ -257,6 +258,7 @@ dwv.io.File.prototype.load = function (ioArray)
         try {
             dwv.image.getViewFromDOMVideo(this, function (data) {
                 self.onload(data);
+            self.addLoaded();
             });
         } catch (error) {
             self.onerror(error);

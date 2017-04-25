@@ -3,14 +3,11 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
- * Get data from an input context imageData.
- * @param {Object} imageData The context imageData.
- * @param {Number} width The width of the coresponding image.
- * @param {Number} height The height of the coresponding image.
- * @param {Number} sliceIndex The slice index of the imageData.
- * @return {Object} The corresponding view.
+ * Create a simple array buffer from an ImageData buffer.
+ * @param {Object} imageData The ImageData taken from a context.
+ * @return {Array} The image buffer.
  */
-dwv.image.getViewFromImageData = function (imageData, width, height, sliceIndex) {
+dwv.image.imageDataToBuffer = function (imageData) {
     // remove alpha
     // TODO support passing the full image data
     var buffer = [];
@@ -21,15 +18,28 @@ dwv.image.getViewFromImageData = function (imageData, width, height, sliceIndex)
         buffer[j+2] = imageData.data[i+2];
         j+=3;
     }
-    // create dwv Image
+    return buffer;
+};
+
+/**
+ * Get data from an input context imageData.
+ * @param {Number} width The width of the coresponding image.
+ * @param {Number} height The height of the coresponding image.
+ * @param {Number} sliceIndex The slice index of the imageData.
+ * @param {Object} imageBuffer The image buffer.
+ * @return {Object} The corresponding view.
+ */
+dwv.image.getDefaultView = function (width, height, sliceIndex, imageBuffer) {
+    // image size
     var imageSize = new dwv.image.Size(width, height);
-
-    // TODO: wrong info...
+    // default spacing
+    // TODO: misleading...
     var imageSpacing = new dwv.image.Spacing(1,1);
-
+    // default origin
     var origin = new dwv.math.Point3D(0,0,sliceIndex);
+    // create image
     var geometry = new dwv.image.Geometry(origin, imageSize, imageSpacing );
-    var image = new dwv.image.Image( geometry, [buffer] );
+    var image = new dwv.image.Image( geometry, imageBuffer );
     image.setPhotometricInterpretation("RGB");
     // meta information
     var meta = {};
@@ -50,6 +60,7 @@ dwv.image.getViewFromImageData = function (imageData, width, height, sliceIndex)
  */
 dwv.image.getViewFromDOMImage = function (image)
 {
+    // image size
     var width = image.width;
     var height = image.height;
 
@@ -61,39 +72,49 @@ dwv.image.getViewFromDOMImage = function (image)
     ctx.drawImage(image, 0, 0);
     // get the image data
     var imageData = ctx.getImageData(0, 0, width, height);
-    // view
+
+    // create view
     var sliceIndex = image.index ? image.index : 0;
-    var view = dwv.image.getViewFromImageData(
-        imageData, width, height, sliceIndex);
-    // properties
-    var info = {};
+    var imageBuffer = dwv.image.imageDataToBuffer(imageData);
+    var view = dwv.image.getDefaultView(
+        width, height, sliceIndex, [imageBuffer]);
+
+    // image properties
+    var info = [];
     if( image.file )
     {
-        info.fileName = { "value": image.file.name };
-        info.fileType = { "value": image.file.type };
-        info.fileLastModifiedDate = { "value": image.file.lastModifiedDate };
+        info.push({ "name": "fileName", "value": image.file.name });
+        info.push({ "name": "fileType", "value": image.file.type });
+        info.push({ "name": "fileLastModifiedDate", "value": image.file.lastModifiedDate });
     }
-    info.imageWidth = { "value": width };
-    info.imageHeight = { "value": height };
+    info.push({ "name": "imageWidth", "value": width });
+    info.push({ "name": "imageHeight", "value": height });
+
     // return
     return {"view": view, "info": info};
 };
 
 /**
  * Get data from an input image using a canvas.
- * @param {Image} video The DOM Video.
- * @return {Mixed} The corresponding view and info.
+ * @param {Object} video The DOM Video.
+ * @param {Object} callback The function to call once the data is loaded.
  */
 dwv.image.getViewFromDOMVideo = function (video, callback)
 {
-    console.log("loading video...");
-
-    var frames = [];
-    var frameRate = 30;
-    var frameIndex = 0;
-
+    // video size
     var width = video.videoWidth;
     var height = video.videoHeight;
+
+    // video properties
+    var info = [];
+    if( video.file )
+    {
+        info.push({ "name": "fileName", "value": video.file.name });
+        info.push({ "name": "fileType", "value": video.file.type });
+        info.push({ "name": "fileLastModifiedDate", "value": video.file.lastModifiedDate });
+    }
+    info.push({ "name": "imageWidth", "value": width });
+    info.push({ "name": "imageHeight", "value": height });
 
     // draw the image in the canvas in order to get its data
     var canvas = document.createElement('canvas');
@@ -101,37 +122,52 @@ dwv.image.getViewFromDOMVideo = function (video, callback)
     canvas.height = height;
     var ctx = canvas.getContext('2d');
 
+    // frame storage
+    var frames = [];
+    // default frame rate...
+    var frameRate = 30;
+    // current frame index
+    var frameIndex = 0;
+
+    // using seeked to loop through all video frames
     video.addEventListener('seeked', onseeked, false);
 
+    // draw the context and store it as a frame
     function storeFrame() {
-        ++frameIndex;
-        console.log("frame: " + frameIndex);
+        console.log("frame #" + frameIndex);
+        // draw image
         ctx.drawImage(video, 0, 0);
-
-        frames.push( dwv.image.getViewFromImageData(
-            ctx.getImageData(0, 0, width, height),
-            width, height, 0) );
+        // context to image buffer
+        frames.push( dwv.image.imageDataToBuffer(
+            ctx.getImageData(0, 0, width, height) ) );
     }
 
+    // handle seeked event
     function onseeked() {
-      ++frameIndex;
-      storeFrame();
-      // set the next time
-      // (do not use currentTime, it seems to get offseted)
-      var nextTime = frameIndex / frameRate;
-      if (nextTime <= this.duration) {
-          // next frame
-          this.currentTime = nextTime;
-      } else {
-          // end
-          ondone();
-      }
+        // store
+        storeFrame();
+        // increment index
+        ++frameIndex;
+        // set the next time
+        // (not using currentTime, it seems to get offseted)
+        var nextTime = frameIndex / frameRate;
+        if (nextTime <= this.duration) {
+            this.currentTime = nextTime;
+        } else {
+            // end
+            ondone();
+        }
     }
 
+    // on done looping through slices
     function ondone() {
+        // stop listening
         video.removeEventListener('seeked', onseeked);
-
-        callback( {"view": frames[2], "info": {} } );
+        // create view
+        var view = dwv.image.getDefaultView(
+            width, height, 1, frames);
+        // pass it to the callback
+        callback( {"view": view, "info": info } );
     }
 
     // trigger the first seeked
