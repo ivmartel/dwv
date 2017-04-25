@@ -14077,14 +14077,11 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
- * Get data from an input context imageData.
- * @param {Object} imageData The context imageData.
- * @param {Number} width The width of the coresponding image.
- * @param {Number} height The height of the coresponding image.
- * @param {Number} sliceIndex The slice index of the imageData.
- * @return {Object} The corresponding view.
+ * Create a simple array buffer from an ImageData buffer.
+ * @param {Object} imageData The ImageData taken from a context.
+ * @return {Array} The image buffer.
  */
-dwv.image.getViewFromImageData = function (imageData, width, height, sliceIndex) {
+dwv.image.imageDataToBuffer = function (imageData) {
     // remove alpha
     // TODO support passing the full image data
     var buffer = [];
@@ -14095,15 +14092,28 @@ dwv.image.getViewFromImageData = function (imageData, width, height, sliceIndex)
         buffer[j+2] = imageData.data[i+2];
         j+=3;
     }
-    // create dwv Image
+    return buffer;
+};
+
+/**
+ * Get data from an input context imageData.
+ * @param {Number} width The width of the coresponding image.
+ * @param {Number} height The height of the coresponding image.
+ * @param {Number} sliceIndex The slice index of the imageData.
+ * @param {Object} imageBuffer The image buffer.
+ * @return {Object} The corresponding view.
+ */
+dwv.image.getDefaultView = function (width, height, sliceIndex, imageBuffer) {
+    // image size
     var imageSize = new dwv.image.Size(width, height);
-
-    // TODO: wrong info...
+    // default spacing
+    // TODO: misleading...
     var imageSpacing = new dwv.image.Spacing(1,1);
-
+    // default origin
     var origin = new dwv.math.Point3D(0,0,sliceIndex);
+    // create image
     var geometry = new dwv.image.Geometry(origin, imageSize, imageSpacing );
-    var image = new dwv.image.Image( geometry, [buffer] );
+    var image = new dwv.image.Image( geometry, imageBuffer );
     image.setPhotometricInterpretation("RGB");
     // meta information
     var meta = {};
@@ -14124,6 +14134,7 @@ dwv.image.getViewFromImageData = function (imageData, width, height, sliceIndex)
  */
 dwv.image.getViewFromDOMImage = function (image)
 {
+    // image size
     var width = image.width;
     var height = image.height;
 
@@ -14135,22 +14146,106 @@ dwv.image.getViewFromDOMImage = function (image)
     ctx.drawImage(image, 0, 0);
     // get the image data
     var imageData = ctx.getImageData(0, 0, width, height);
-    // view
+
+    // create view
     var sliceIndex = image.index ? image.index : 0;
-    var view = dwv.image.getViewFromImageData(
-        imageData, width, height, sliceIndex);
-    // properties
-    var info = {};
+    var imageBuffer = dwv.image.imageDataToBuffer(imageData);
+    var view = dwv.image.getDefaultView(
+        width, height, sliceIndex, [imageBuffer]);
+
+    // image properties
+    var info = [];
     if( image.file )
     {
-        info.fileName = { "value": image.file.name };
-        info.fileType = { "value": image.file.type };
-        info.fileLastModifiedDate = { "value": image.file.lastModifiedDate };
+        info.push({ "name": "fileName", "value": image.file.name });
+        info.push({ "name": "fileType", "value": image.file.type });
+        info.push({ "name": "fileLastModifiedDate", "value": image.file.lastModifiedDate });
     }
-    info.imageWidth = { "value": width };
-    info.imageHeight = { "value": height };
+    info.push({ "name": "imageWidth", "value": width });
+    info.push({ "name": "imageHeight", "value": height });
+
     // return
     return {"view": view, "info": info};
+};
+
+/**
+ * Get data from an input image using a canvas.
+ * @param {Object} video The DOM Video.
+ * @param {Object} callback The function to call once the data is loaded.
+ */
+dwv.image.getViewFromDOMVideo = function (video, callback)
+{
+    // video size
+    var width = video.videoWidth;
+    var height = video.videoHeight;
+
+    // video properties
+    var info = [];
+    if( video.file )
+    {
+        info.push({ "name": "fileName", "value": video.file.name });
+        info.push({ "name": "fileType", "value": video.file.type });
+        info.push({ "name": "fileLastModifiedDate", "value": video.file.lastModifiedDate });
+    }
+    info.push({ "name": "imageWidth", "value": width });
+    info.push({ "name": "imageHeight", "value": height });
+
+    // draw the image in the canvas in order to get its data
+    var canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    var ctx = canvas.getContext('2d');
+
+    // frame storage
+    var frames = [];
+    // default frame rate...
+    var frameRate = 30;
+    // current frame index
+    var frameIndex = 0;
+
+    // using seeked to loop through all video frames
+    video.addEventListener('seeked', onseeked, false);
+
+    // draw the context and store it as a frame
+    function storeFrame() {
+        console.log("frame #" + frameIndex);
+        // draw image
+        ctx.drawImage(video, 0, 0);
+        // context to image buffer
+        frames.push( dwv.image.imageDataToBuffer(
+            ctx.getImageData(0, 0, width, height) ) );
+    }
+
+    // handle seeked event
+    function onseeked() {
+        // store
+        storeFrame();
+        // increment index
+        ++frameIndex;
+        // set the next time
+        // (not using currentTime, it seems to get offseted)
+        var nextTime = frameIndex / frameRate;
+        if (nextTime <= this.duration) {
+            this.currentTime = nextTime;
+        } else {
+            // end
+            ondone();
+        }
+    }
+
+    // on done looping through slices
+    function ondone() {
+        // stop listening
+        video.removeEventListener('seeked', onseeked);
+        // create view
+        var view = dwv.image.getDefaultView(
+            width, height, 1, frames);
+        // pass it to the callback
+        callback( {"view": view, "info": info } );
+    }
+
+    // trigger the first seeked
+    video.currentTime = 0;
 };
 
 /**
@@ -15319,12 +15414,6 @@ dwv.io.File.prototype.load = function (ioArray)
     // set the number of data to load
     this.setNToLoad( ioArray.length );
 
-    // call the onload listener
-    var onLoadView = function (data)
-    {
-        self.onload(data);
-    };
-
     // DICOM buffer to dwv.image.View (asynchronous)
     var db2v = new dwv.image.DicomBufferToView();
     db2v.setDefaultCharacterSet(this.getDefaultCharacterSet());
@@ -15339,7 +15428,9 @@ dwv.io.File.prototype.load = function (ioArray)
     {
         self.setNeedDecoding(true);
         try {
-            db2v.convert(event.target.result, onLoadView);
+            db2v.convert(event.target.result, function (data) {
+                self.onload(data);
+            });
         } catch (error) {
             self.onerror(error);
         }
@@ -15349,7 +15440,21 @@ dwv.io.File.prototype.load = function (ioArray)
     var onLoadDOMImageBuffer = function (/*event*/)
     {
         try {
-            onLoadView( dwv.image.getViewFromDOMImage(this) );
+            self.onload( dwv.image.getViewFromDOMImage(this) );
+            self.addLoaded();
+        } catch (error) {
+            self.onerror(error);
+        }
+    };
+
+    // DOM Video buffer to dwv.image.View
+    var onLoadDOMVideoBuffer = function (/*event*/)
+    {
+        try {
+            dwv.image.getViewFromDOMVideo(this, function (data) {
+                self.onload(data);
+            self.addLoaded();
+            });
         } catch (error) {
             self.onerror(error);
         }
@@ -15377,6 +15482,18 @@ dwv.io.File.prototype.load = function (ioArray)
         theImage.onload = onLoadDOMImageBuffer;
     };
 
+    // raw video to DOM Image
+    var onLoadRawVideoBuffer = function (event)
+    {
+        var video = document.createElement('video');
+        video.src = event.target.result;
+        // storing values to pass them on
+        video.file = this.file;
+        video.index = this.index;
+        // triggered by ctx.drawImage
+        video.onloadedmetadata = onLoadDOMVideoBuffer;
+    };
+
     // loop on I/O elements
     for (var i = 0; i < ioArray.length; ++i)
     {
@@ -15397,6 +15514,16 @@ dwv.io.File.prototype.load = function (ioArray)
             // callbacks
             reader.onload = onLoadRawImageBuffer;
             reader.onerror = dwv.io.File.createErrorHandler(file, "image", self.onerror);
+            reader.readAsDataURL(file);
+        }
+        else if ( file.type.match("video.*") )
+        {
+            // storing values to pass them on
+            reader.file = file;
+            reader.index = i;
+            // callbacks
+            reader.onload = onLoadRawVideoBuffer;
+            reader.onerror = dwv.io.File.createErrorHandler(file, "video", self.onerror);
             reader.readAsDataURL(file);
         }
         else
@@ -15629,12 +15756,6 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     // set the number of data to load
     this.setNToLoad( ioArray.length );
 
-    // call the listeners
-    var onLoadView = function (data)
-    {
-        self.onload(data);
-    };
-
     // DICOM buffer to dwv.image.View (asynchronous)
     var db2v = new dwv.image.DicomBufferToView();
     db2v.setDefaultCharacterSet(this.getDefaultCharacterSet());
@@ -15649,7 +15770,9 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     {
         self.setNeedDecoding(true);
         try {
-            db2v.convert(response, onLoadView);
+            db2v.convert(response, function (data) {
+                self.onload(data);
+            });
         } catch (error) {
             self.onerror(error);
         }
@@ -15659,7 +15782,7 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     var onLoadDOMImageBuffer = function (/*event*/)
     {
         try {
-            onLoadView( dwv.image.getViewFromDOMImage(this) );
+            self.onload( dwv.image.getViewFromDOMImage(this) );
         } catch (error) {
             self.onerror(error);
         }
