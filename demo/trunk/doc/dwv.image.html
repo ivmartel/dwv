@@ -368,6 +368,264 @@
             
 <hr>
 <dt>
+    <h4 class="name" id=".getDefaultView"><span class="type-signature">&lt;static> </span>getDefaultView(width, height, sliceIndex, imageBuffer, numberOfFrames)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get data from an input context imageData.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>width</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The width of the coresponding image.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>height</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The height of the coresponding image.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>sliceIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The slice index of the imageData.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>imageBuffer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The image buffer.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>numberOfFrames</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The final number of frames.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_reader.js.html">src/image/reader.js</a>,
+				 <a href="src_image_reader.js.html#sunlight-1-line-33">line 33</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    The corresponding view.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
     <h4 class="name" id=".getViewFromDOMImage"><span class="type-signature">&lt;static> </span>getViewFromDOMImage(image)</h4>
     
     
@@ -473,7 +731,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="src_image_reader.js.html">src/image/reader.js</a>,
-				 <a href="src_image_reader.js.html#sunlight-1-line-51">line 51</a>
+				 <a href="src_image_reader.js.html#sunlight-1-line-64">line 64</a>
 			</li>
 		</ul>
 	</dd>
@@ -530,7 +788,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id=".getViewFromImageData"><span class="type-signature">&lt;static> </span>getViewFromImageData(imageData, width, height, sliceIndex)</h4>
+    <h4 class="name" id=".getViewFromDOMVideo"><span class="type-signature">&lt;static> </span>getViewFromDOMVideo(video, callback)</h4>
     
     
 </dt>
@@ -538,7 +796,169 @@
 
     
     <div class="description">
-        Get data from an input context imageData.
+        Get data from an input image using a canvas.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>video</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The DOM Video.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The function to call once the data is loaded.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_reader.js.html">src/image/reader.js</a>,
+				 <a href="src_image_reader.js.html#sunlight-1-line-105">line 105</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".imageDataToBuffer"><span class="type-signature">&lt;static> </span>imageDataToBuffer(imageData)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Create a simple array buffer from an ImageData buffer.
     </div>
     
 
@@ -590,79 +1010,7 @@
 
             
 
-            <td class="description last">The context imageData.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>width</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The width of the coresponding image.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>height</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The height of the coresponding image.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>sliceIndex</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The slice index of the imageData.</td>
+            <td class="description last">The ImageData taken from a context.</td>
         </tr>
 
     
@@ -707,7 +1055,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="src_image_reader.js.html">src/image/reader.js</a>,
-				 <a href="src_image_reader.js.html#sunlight-1-line-13">line 13</a>
+				 <a href="src_image_reader.js.html#sunlight-1-line-10">line 10</a>
 			</li>
 		</ul>
 	</dd>
@@ -736,7 +1084,7 @@
     
             
 <div class="param-desc">
-    The corresponding view.
+    The image buffer.
 </div>
 
 
@@ -747,7 +1095,7 @@
     </dt>
     <dd>
         
-<span class="param-type">Object</span>
+<span class="param-type">Array</span>
 
 
 
@@ -1042,7 +1390,7 @@ Pseudo-code:
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a>
 	
-		on Tuesday, April 25th 2017
+		on Wednesday, April 26th 2017
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

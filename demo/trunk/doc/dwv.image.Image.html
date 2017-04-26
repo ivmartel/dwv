@@ -114,7 +114,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="Image"><span class="type-signature"></span>new Image(geometry, buffer)</h4>
+    <h4 class="name" id="Image"><span class="type-signature"></span>new Image(geometry, buffer, numberOfFrames)</h4>
     
     
 </dt>
@@ -206,6 +206,31 @@ Usable once created, optional are:
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>numberOfFrames</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The number of frames (optional, can be used
+     to anticipate the final number after appends).</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -247,7 +272,7 @@ Usable once created, optional are:
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-86">line 86</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-88">line 88</a>
 			</li>
 		</ul>
 	</dd>
@@ -295,6 +320,144 @@ Usable once created, optional are:
         <h3 class="subsection-title">Methods</h3>
 
         <dl>
+            
+<hr>
+<dt>
+    <h4 class="name" id="appendFrameBuffer"><span class="type-signature"></span>appendFrameBuffer(frameBuffer)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Append a frame buffer to the image.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>frameBuffer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The frame buffer to append.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_image_image.js.html">src/image/image.js</a>,
+				 <a href="src_image_image.js.html#sunlight-1-line-381">line 381</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
             
 <hr>
 <dt>
@@ -403,7 +566,7 @@ Usable once created, optional are:
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-299">line 299</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-306">line 306</a>
 			</li>
 		</ul>
 	</dd>
@@ -516,7 +679,7 @@ WARNING: for speed reasons, only calculated on the first frame...
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-447">line 447</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-463">line 463</a>
 			</li>
 		</ul>
 	</dd>
@@ -628,7 +791,7 @@ WARNING: for speed reasons, only calculated on the first frame...
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-510">line 510</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-526">line 526</a>
 			</li>
 		</ul>
 	</dd>
@@ -741,7 +904,7 @@ WARNING: for speed reasons, only calculated on the first frame...
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-470">line 470</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-486">line 486</a>
 			</li>
 		</ul>
 	</dd>
@@ -853,7 +1016,7 @@ WARNING: for speed reasons, only calculated on the first frame...
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-272">line 272</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-279">line 279</a>
 			</li>
 		</ul>
 	</dd>
@@ -1040,7 +1203,7 @@ WARNING: no size check!
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-733">line 733</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-749">line 749</a>
 			</li>
 		</ul>
 	</dd>
@@ -1203,7 +1366,7 @@ Note: Uses the raw buffer values.
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-554">line 554</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-570">line 570</a>
 			</li>
 		</ul>
 	</dd>
@@ -1316,7 +1479,7 @@ Note: Uses the raw buffer values.
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-174">line 174</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-181">line 181</a>
 			</li>
 		</ul>
 	</dd>
@@ -1435,7 +1598,7 @@ Note: Uses the raw buffer values.
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-374">line 374</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-390">line 390</a>
 			</li>
 		</ul>
 	</dd>
@@ -1547,7 +1710,7 @@ Note: Uses the raw buffer values.
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-180">line 180</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-187">line 187</a>
 			</li>
 		</ul>
 	</dd>
@@ -1666,7 +1829,7 @@ Note: Uses the raw buffer values.
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-167">line 167</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-174">line 174</a>
 			</li>
 		</ul>
 	</dd>
@@ -1778,7 +1941,7 @@ Note: Uses the raw buffer values.
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-396">line 396</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-412">line 412</a>
 			</li>
 		</ul>
 	</dd>
@@ -1890,7 +2053,7 @@ Note: Uses the raw buffer values.
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-251">line 251</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-258">line 258</a>
 			</li>
 		</ul>
 	</dd>
@@ -2002,7 +2165,7 @@ Note: Uses the raw buffer values.
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-245">line 245</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-252">line 252</a>
 			</li>
 		</ul>
 	</dd>
@@ -2114,7 +2277,7 @@ Note: Uses the raw buffer values.
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-92">line 92</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-99">line 99</a>
 			</li>
 		</ul>
 	</dd>
@@ -2226,7 +2389,7 @@ Note: Uses the raw buffer values.
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-225">line 225</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-232">line 232</a>
 			</li>
 		</ul>
 	</dd>
@@ -2338,7 +2501,7 @@ Note: Uses the raw buffer values.
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-235">line 235</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-242">line 242</a>
 			</li>
 		</ul>
 	</dd>
@@ -2450,7 +2613,7 @@ Note: Uses the raw buffer values.
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-385">line 385</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-401">line 401</a>
 			</li>
 		</ul>
 	</dd>
@@ -2684,7 +2847,7 @@ Note: Uses the raw buffer values.
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-432">line 432</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-448">line 448</a>
 			</li>
 		</ul>
 	</dd>
@@ -2847,7 +3010,7 @@ Warning: No size check...
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-187">line 187</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-194">line 194</a>
 			</li>
 		</ul>
 	</dd>
@@ -3081,7 +3244,7 @@ Warning: No size check...
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-416">line 416</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-432">line 432</a>
 			</li>
 		</ul>
 	</dd>
@@ -3268,7 +3431,7 @@ Warning: No size check...
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-264">line 264</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-271">line 271</a>
 			</li>
 		</ul>
 	</dd>
@@ -3380,7 +3543,7 @@ Warning: No size check...
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-220">line 220</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-227">line 227</a>
 			</li>
 		</ul>
 	</dd>
@@ -3492,7 +3655,7 @@ Warning: No size check...
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-215">line 215</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-222">line 222</a>
 			</li>
 		</ul>
 	</dd>
@@ -3654,7 +3817,7 @@ Warning: No size check...
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-796">line 796</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-812">line 812</a>
 			</li>
 		</ul>
 	</dd>
@@ -3816,7 +3979,7 @@ Warning: No size check...
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-753">line 753</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-769">line 769</a>
 			</li>
 		</ul>
 	</dd>
@@ -3978,7 +4141,7 @@ Warning: No size check...
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-766">line 766</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-782">line 782</a>
 			</li>
 		</ul>
 	</dd>
@@ -4140,7 +4303,7 @@ Warning: No size check...
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-256">line 256</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-263">line 263</a>
 			</li>
 		</ul>
 	</dd>
@@ -4228,7 +4391,7 @@ Warning: No size check...
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-230">line 230</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-237">line 237</a>
 			</li>
 		</ul>
 	</dd>
@@ -4366,7 +4529,7 @@ Warning: No size check...
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-240">line 240</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-247">line 247</a>
 			</li>
 		</ul>
 	</dd>
@@ -4528,7 +4691,7 @@ Warning: No size check...
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-193">line 193</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-200">line 200</a>
 			</li>
 		</ul>
 	</dd>
@@ -4667,7 +4830,7 @@ WARNING: no size check!
 		<ul class="dummy">
 			<li>
 				<a href="src_image_image.js.html">src/image/image.js</a>,
-				 <a href="src_image_image.js.html#sunlight-1-line-711">line 711</a>
+				 <a href="src_image_image.js.html#sunlight-1-line-727">line 727</a>
 			</li>
 		</ul>
 	</dd>
@@ -4771,7 +4934,7 @@ Note: Uses the raw buffer values.
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a>
 	
-		on Tuesday, April 25th 2017
+		on Wednesday, April 26th 2017
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>
