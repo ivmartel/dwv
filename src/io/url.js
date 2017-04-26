@@ -219,12 +219,6 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     // set the number of data to load
     this.setNToLoad( ioArray.length );
 
-    // call the listeners
-    var onLoadView = function (data)
-    {
-        self.onload(data);
-    };
-
     // DICOM buffer to dwv.image.View (asynchronous)
     var db2v = new dwv.image.DicomBufferToView();
     db2v.setDefaultCharacterSet(this.getDefaultCharacterSet());
@@ -239,7 +233,9 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     {
         self.setNeedDecoding(true);
         try {
-            db2v.convert(response, onLoadView);
+            db2v.convert(response, function (data) {
+                self.onload(data);
+            });
         } catch (error) {
             self.onerror(error);
         }
@@ -249,7 +245,7 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     var onLoadDOMImageBuffer = function (/*event*/)
     {
         try {
-            onLoadView( dwv.image.getViewFromDOMImage(this) );
+            self.onload( dwv.image.getViewFromDOMImage(this) );
         } catch (error) {
             self.onerror(error);
         }
