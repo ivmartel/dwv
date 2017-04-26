@@ -82,15 +82,22 @@ dwv.image.RescaleSlopeAndIntercept.prototype.isID = function () {
  * @constructor
  * @param {Object} geometry The geometry of the image.
  * @param {Array} buffer The image data as an array of frame buffers.
+ * @param {Number} numberOfFrames The number of frames (optional, can be used
+     to anticipate the final number after appends).
  */
-dwv.image.Image = function(geometry, buffer)
+dwv.image.Image = function(geometry, buffer, numberOfFrames)
 {
+    // use buffer length in not specified
+    if (typeof numberOfFrames === "undefined") {
+        numberOfFrames = buffer.length;
+    }
+
     /**
      * Get the number of frames.
      * @returns {Number} The number of frames.
      */
     this.getNumberOfFrames = function () {
-        return buffer.length;
+        return numberOfFrames;
     };
 
     /**
@@ -365,6 +372,15 @@ dwv.image.Image = function(geometry, buffer)
 
         // return the appended slice number
         return newSliceNb;
+    };
+
+    /**
+     * Append a frame buffer to the image.
+     * @param {Object} frameBuffer The frame buffer to append.
+     */
+    this.appendFrameBuffer = function (frameBuffer)
+    {
+        buffer.push(frameBuffer);
     };
 
     /**

@@ -27,9 +27,12 @@ dwv.image.imageDataToBuffer = function (imageData) {
  * @param {Number} height The height of the coresponding image.
  * @param {Number} sliceIndex The slice index of the imageData.
  * @param {Object} imageBuffer The image buffer.
+ * @param {Number} numberOfFrames The final number of frames.
  * @return {Object} The corresponding view.
  */
-dwv.image.getDefaultView = function (width, height, sliceIndex, imageBuffer) {
+dwv.image.getDefaultView = function (
+    width, height, sliceIndex,
+    imageBuffer, numberOfFrames) {
     // image size
     var imageSize = new dwv.image.Size(width, height);
     // default spacing
@@ -39,7 +42,7 @@ dwv.image.getDefaultView = function (width, height, sliceIndex, imageBuffer) {
     var origin = new dwv.math.Point3D(0,0,sliceIndex);
     // create image
     var geometry = new dwv.image.Geometry(origin, imageSize, imageSpacing );
-    var image = new dwv.image.Image( geometry, imageBuffer );
+    var image = new dwv.image.Image( geometry, imageBuffer, numberOfFrames );
     image.setPhotometricInterpretation("RGB");
     // meta information
     var meta = {};
@@ -105,6 +108,11 @@ dwv.image.getViewFromDOMVideo = function (video, callback)
     var width = video.videoWidth;
     var height = video.videoHeight;
 
+    // default frame rate...
+    var frameRate = 30;
+    // number of frames
+    var numberOfFrames = Math.floor(video.duration * frameRate);
+
     // video properties
     var info = [];
     if( video.file )
@@ -115,6 +123,7 @@ dwv.image.getViewFromDOMVideo = function (video, callback)
     }
     info.push({ "name": "imageWidth", "value": width });
     info.push({ "name": "imageHeight", "value": height });
+    info.push({ "name": "numberOfFrames", "value": numberOfFrames });
 
     // draw the image in the canvas in order to get its data
     var canvas = document.createElement('canvas');
@@ -122,15 +131,13 @@ dwv.image.getViewFromDOMVideo = function (video, callback)
     canvas.height = height;
     var ctx = canvas.getContext('2d');
 
-    // frame storage
-    var frames = [];
-    // default frame rate...
-    var frameRate = 30;
-    // current frame index
-    var frameIndex = 0;
-
     // using seeked to loop through all video frames
     video.addEventListener('seeked', onseeked, false);
+
+    // current frame index
+    var frameIndex = 0;
+    // video view
+    var view = null;
 
     // draw the context and store it as a frame
     function storeFrame() {
@@ -138,8 +145,17 @@ dwv.image.getViewFromDOMVideo = function (video, callback)
         // draw image
         ctx.drawImage(video, 0, 0);
         // context to image buffer
-        frames.push( dwv.image.imageDataToBuffer(
-            ctx.getImageData(0, 0, width, height) ) );
+        var imgBuffer = dwv.image.imageDataToBuffer(
+            ctx.getImageData(0, 0, width, height) );
+        if (frameIndex === 0) {
+            // create view
+            view = dwv.image.getDefaultView(
+                width, height, 1, [imgBuffer], numberOfFrames);
+            // call callback
+            callback( {"view": view, "info": info } );
+        } else {
+            view.appendFrameBuffer(imgBuffer);
+        }
     }
 
     // handle seeked event
@@ -154,20 +170,9 @@ dwv.image.getViewFromDOMVideo = function (video, callback)
         if (nextTime <= this.duration) {
             this.currentTime = nextTime;
         } else {
-            // end
-            ondone();
+            // stop listening
+            video.removeEventListener('seeked', onseeked);
         }
-    }
-
-    // on done looping through slices
-    function ondone() {
-        // stop listening
-        video.removeEventListener('seeked', onseeked);
-        // create view
-        var view = dwv.image.getDefaultView(
-            width, height, 1, frames);
-        // pass it to the callback
-        callback( {"view": view, "info": info } );
     }
 
     // trigger the first seeked

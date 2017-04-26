@@ -424,6 +424,15 @@ dwv.image.View = function (image)
     };
 
     /**
+     * Append a frame buffer to the included image.
+     * @param {Object} frameBuffer The frame buffer to append.
+     */
+    this.appendFrameBuffer = function (frameBuffer)
+    {
+        this.getImage().appendFrameBuffer(frameBuffer);
+    };
+
+    /**
      * Set the view window/level.
      * @param {Number} center The window center.
      * @param {Number} width The window width.
