@@ -3,6 +3,97 @@ var dwv = dwv || {};
 /** @namespace */
 dwv.io = dwv.io || {};
 
+dwv.io.MultiProgressHandler = function (callback)
+{
+    // closure to self
+    var self = this;
+
+    /**
+     * List of progresses.
+     * @private
+     * @type Array
+     */
+    var progresses = [];
+
+    /**
+     * Multiplier.
+     * @private
+     * @type Number
+     */
+    var multi = 2;
+
+    /**
+     * Set the mulitplier.
+     * @param {Number} mul The mulitplier.
+     */
+    this.setMulti = function (mul) {
+        multi = mul;
+    };
+
+    /**
+     * Set the number of data to load.
+     * @param {Number} n The number of data to load.
+     */
+    this.setNToLoad = function (n) {
+        for ( var i = 0; i < n; ++i ) {
+            progresses[i] = [];
+            for ( var j = 0; j < multi; ++j ) {
+                progresses[i][j] = 0;
+            }
+        }
+    };
+
+    /**
+     * Handle a load progress.
+     * @param {Object} evet The progress event.
+     */
+    this.onprogress = function (event) {
+        console.log(event);
+        // check event
+        if ( !event.lengthComputable ) {
+            return;
+        }
+        if ( typeof event.myindex === "undefined" ) {
+            return;
+        }
+        if ( typeof event.subindex === "undefined" ) {
+            return;
+        }
+        // set percent for index
+        var percent = (event.loaded * 100) / event.total;
+        progresses[event.myindex][event.subindex] = percent;
+        // call callback
+        callback({type: event.type, lengthComputable: true,
+            loaded: getGlobalPercent(), total: 100});
+    };
+
+    /**
+     * Get the global load percent including the provided one.
+     * @return {Number} The accumulated percentage.
+     */
+    function getGlobalPercent() {
+        var sum = 0;
+        for ( var i = 0; i < progresses.length; ++i ) {
+            for ( var j = 0; j < multi; ++j ) {
+                sum += progresses[i][j];
+            }
+        }
+        return Math.round( sum / (progresses.length * multi) );
+    }
+
+    /**
+     * Create a mono progress event handler.
+     * @param {Number} index The number of the data.
+     */
+    this.getMonoProgressHandler = function (index, subindex) {
+        return function (event) {
+            event.myindex = index;
+            event.subindex = subindex;
+            self.onprogress(event);
+        };
+    };
+};
+
 /**
  * File loader.
  * @constructor
@@ -28,24 +119,6 @@ dwv.io.File = function ()
      * @type Number
      */
     var nLoaded = 0;
-    /**
-     * List of load progresses.
-     * @private
-     * @type Array
-     */
-    var loadProgresses = [];
-    /**
-     * List of decode progresses.
-     * @private
-     * @type Array
-     */
-    var decodeProgresses = [];
-    /**
-     * Flag to tell if the IO needs decoding.
-     * @private
-     * @type Boolean
-     */
-    var needDecoding = false;
 
     /**
      * The default character set (optional).
@@ -71,23 +144,11 @@ dwv.io.File = function ()
     };
 
     /**
-     * Set the need decodign flag
-     * @param {Boolean} flag True if the data needs decoding.
-     */
-    this.setNeedDecoding = function (flag) {
-        needDecoding = flag;
-    };
-
-    /**
      * Set the number of data to load.
      * @param {Number} n The number of data to load.
      */
     this.setNToLoad = function (n) {
         nToLoad = n;
-        for ( var i = 0; i < nToLoad; ++i ) {
-            loadProgresses[i] = 0;
-            decodeProgresses[i] = 0;
-        }
     };
 
     /**
@@ -97,51 +158,9 @@ dwv.io.File = function ()
     this.addLoaded = function () {
         nLoaded++;
         if ( nLoaded === nToLoad ) {
-            this.onloadend();
+            self.onloadend();
         }
     };
-
-    /**
-     * Handle a load progress.
-     * @param {Number} n The number of the loaded data.
-     * @param {Number} percent The percentage of data 'n' that has been loaded.
-     */
-    this.onLoadProgress = function (n, percent) {
-        loadProgresses[n] = percent;
-        self.onprogress({type: "load-progress", lengthComputable: true,
-            loaded: getGlobalPercent(), total: 100});
-    };
-
-    /**
-     * Handle a decode progress.
-     * @param {Object} event The progress event.
-     */
-    this.onDecodeProgress = function (event) {
-        // use the internal count as index
-        decodeProgresses[nLoaded] = event.loaded;
-        self.onprogress({type: "load-progress", lengthComputable: true,
-            loaded: getGlobalPercent(), total: 100});
-    };
-
-    /**
-     * Get the global load percent including the provided one.
-     * @return {Number} The accumulated percentage.
-     */
-    function getGlobalPercent() {
-        var sum = 0;
-        for ( var i = 0; i < loadProgresses.length; ++i ) {
-            sum += loadProgresses[i];
-            if ( needDecoding ) {
-                sum += decodeProgresses[i];
-            }
-        }
-        var percent = sum / nToLoad;
-        // half loading, half decoding
-        if ( needDecoding ) {
-            percent = percent / 2;
-        }
-        return percent;
-    }
 
 }; // class File
 
@@ -178,33 +197,249 @@ dwv.io.File.prototype.onerror = function (/*event*/)
     // default does nothing.
 };
 
-/**
- * Create an error handler from a base one and locals.
- * @param {String} file The related file.
- * @param {String} text The text to insert in the message.
- * @param {Function} baseHandler The base handler.
- */
-dwv.io.File.createErrorHandler = function (file, text, baseHandler) {
-    return function (event) {
-        baseHandler( {'name': "RequestError",
-            'message': "An error occurred while reading the " + text + " file: " + file +
-            " ("+event.getMessage() + ")" } );
-    };
+dwv.io.loadTypes = {
+    'Text': 0,
+    'ArrayBuffer': 1,
+    'DataURL': 2
 };
 
 /**
- * Create a load progress event handler.
- * @param {Number} n The number of the loaded data.
- * @param {Function} loadProgressHandler A load progress percent handler.
+ *
  */
-dwv.io.File.createLoadProgressHandler = function (n, loadProgressHandler) {
-    return function (event) {
-        if( event.lengthComputable )
-        {
-            var percent = Math.round((event.loaded / event.total) * 100);
-            loadProgressHandler(n, percent);
-        }
+dwv.io.DicomDataLoader = function () {
+    // closure to self
+    var self = this;
+
+    var options = {};
+
+    this.setOptions = function (opt) {
+        options = opt;
     };
+
+    this.getLoadHandler = function (/*file, index*/) {
+        return function (event) {
+            // DICOM buffer to dwv.image.View (asynchronous)
+            var db2v = new dwv.image.DicomBufferToView();
+            if (typeof options.defaultCharacterSet !== "undefined") {
+                db2v.setDefaultCharacterSet(options.defaultCharacterSet);
+            }
+            db2v.onload = self.addLoaded;
+            db2v.onprogress = self.onprogress;
+            try {
+                db2v.convert( event.target.result, self.onload );
+            } catch (error) {
+                self.onerror(error);
+            }
+        };
+    };
+
+    this.getErrorHandler = function (file) {
+        return function (event) {
+            self.onerror( {'name': "RequestError",
+                'message': "An error occurred while reading the file: " + file +
+                " (" + event.getMessage() + ") [DicomDataLoader]" } );
+        };
+    };
+
+};
+dwv.io.DicomDataLoader.prototype.canLoad = function (file) {
+    var split = file.name.split('.');
+    var ext = "";
+    if (split.length !== 1) {
+        ext = split.pop().toLowerCase();
+    }
+    var hasExt = (ext.length === 3);
+    return !hasExt || (ext === "dcm");
+};
+dwv.io.DicomDataLoader.prototype.loadAs = function () {
+    return dwv.io.loadTypes.ArrayBuffer;
+};
+dwv.io.DicomDataLoader.prototype.onload = function () {
+    // default does nothing.
+};
+dwv.io.DicomDataLoader.prototype.addLoaded = function () {
+    // default does nothing.
+};
+dwv.io.DicomDataLoader.prototype.onerror = function () {
+    // default does nothing.
+};
+dwv.io.DicomDataLoader.prototype.onprogress = function () {
+    // default does nothing.
+};
+
+/**
+ *
+ */
+dwv.io.RawImageLoader = function () {
+    // closure to self
+    var self = this;
+
+    this.setOptions = function () {
+        // does nothing
+    };
+
+    this.getLoadHandler = function (file, index) {
+        return function (event) {
+            // create a DOM image
+            var image = new Image();
+            image.src = event.target.result;
+            // storing values to pass them on
+            image.file = file;
+            image.index = index;
+            // triggered by ctx.drawImage
+            image.onload = function (/*event*/) {
+                try {
+                    self.onload( dwv.image.getViewFromDOMImage(this) );
+                    self.addLoaded();
+                } catch (error) {
+                    self.onerror(error);
+                }
+                self.onprogress({type: event.type, lengthComputable: true,
+                    loaded: 100, total: 100});
+            };
+        };
+    };
+
+    this.getErrorHandler = function (file) {
+        return function (event) {
+            self.onerror( {'name': "RequestError",
+                'message': "An error occurred while reading the file: " + file +
+                " (" + event.getMessage() + ") [RawImageLoader]" } );
+        };
+    };
+
+};
+dwv.io.RawImageLoader.prototype.canLoad = function (file) {
+    return file.type.match("image.*");
+};
+dwv.io.RawImageLoader.prototype.loadAs = function () {
+    return dwv.io.loadTypes.DataURL;
+};
+dwv.io.RawImageLoader.prototype.onload = function () {
+    // default does nothing.
+};
+dwv.io.RawImageLoader.prototype.addLoaded = function () {
+    // default does nothing.
+};
+dwv.io.RawImageLoader.prototype.onerror = function () {
+    // default does nothing.
+};
+dwv.io.RawImageLoader.prototype.onprogress = function () {
+    // default does nothing.
+};
+
+/**
+ *
+ */
+dwv.io.RawVideoLoader = function () {
+    // closure to self
+    var self = this;
+
+    this.setOptions = function () {
+        // does nothing
+    };
+
+    this.getLoadHandler = function (file, index) {
+        return function (event) {
+            // create a DOM video
+            var video = document.createElement('video');
+            video.src = event.target.result;
+            // storing values to pass them on
+            video.file = file;
+            video.index = index;
+            // onload handler
+            video.onloadedmetadata = function (/*event*/) {
+                try {
+                    dwv.image.getViewFromDOMVideo(this, self.onload);
+                    self.addLoaded();
+                } catch (error) {
+                    self.onerror(error);
+                }
+                self.onprogress({type: event.type, lengthComputable: true,
+                    loaded: 100, total: 100});
+            };
+        };
+    };
+
+    this.getErrorHandler = function (file) {
+        return function (event) {
+            self.onerror( {'name': "RequestError",
+                'message': "An error occurred while reading the file: " + file +
+                " (" + event.getMessage() + ") [RawVideoLoader]" } );
+        };
+    };
+
+};
+dwv.io.RawVideoLoader.prototype.canLoad = function (file) {
+    return file.type.match("video.*");
+};
+dwv.io.RawVideoLoader.prototype.loadAs = function () {
+    return dwv.io.loadTypes.DataURL;
+};
+dwv.io.RawVideoLoader.prototype.onload = function () {
+    // default does nothing.
+};
+dwv.io.RawVideoLoader.prototype.addLoaded = function () {
+    // default does nothing.
+};
+dwv.io.RawVideoLoader.prototype.onerror = function () {
+    // default does nothing.
+};
+dwv.io.RawVideoLoader.prototype.onprogress = function () {
+    // default does nothing.
+};
+
+/**
+ *
+ */
+dwv.io.JSONTextLoader = function () {
+    // closure to self
+    var self = this;
+
+    this.setOptions = function () {
+        // does nothing
+    };
+
+    this.getLoadHandler = function (/*file, index*/) {
+        return function (event) {
+            try {
+                self.onload( event.target.result );
+                //self.addLoaded();
+            } catch (error) {
+                self.onerror(error);
+            }
+            self.onprogress({type: event.type, lengthComputable: true,
+                loaded: 100, total: 100});
+        };
+    };
+
+    this.getErrorHandler = function (file) {
+        return function (event) {
+            self.onerror( {'name': "RequestError",
+                'message': "An error occurred while reading the file: " + file +
+                " (" + event.getMessage() + ") [JSONTextLoader]" } );
+        };
+    };
+
+};
+dwv.io.JSONTextLoader.prototype.canLoad = function (file) {
+    var ext = file.name.split('.').pop().toLowerCase();
+    return (ext === "json");
+};
+dwv.io.JSONTextLoader.prototype.loadAs = function () {
+    return dwv.io.loadTypes.Text;
+};
+dwv.io.JSONTextLoader.prototype.onload = function () {
+    // default does nothing.
+};
+dwv.io.JSONTextLoader.prototype.addLoaded = function () {
+    // default does nothing.
+};
+dwv.io.JSONTextLoader.prototype.onerror = function () {
+    // default does nothing.
+};
+dwv.io.JSONTextLoader.prototype.onprogress = function () {
+    // default does nothing.
 };
 
 /**
@@ -219,123 +454,63 @@ dwv.io.File.prototype.load = function (ioArray)
     // set the number of data to load
     this.setNToLoad( ioArray.length );
 
-    // DICOM buffer to dwv.image.View (asynchronous)
-    var db2v = new dwv.image.DicomBufferToView();
-    db2v.setDefaultCharacterSet(this.getDefaultCharacterSet());
-    db2v.onload = function () {
-        self.addLoaded();
-    };
-    db2v.onprogress = function (event) {
-        self.onDecodeProgress(event);
-    };
-    // reader callback
-    var onLoadDicomBuffer = function (event)
-    {
-        self.setNeedDecoding(true);
-        try {
-            db2v.convert(event.target.result, function (data) {
-                self.onload(data);
-            });
-        } catch (error) {
-            self.onerror(error);
-        }
-    };
+    var mproghandler = new dwv.io.MultiProgressHandler(self.onprogress);
+    mproghandler.setNToLoad( ioArray.length );
 
-    // DOM Image buffer to dwv.image.View
-    var onLoadDOMImageBuffer = function (/*event*/)
-    {
-        try {
-            self.onload( dwv.image.getViewFromDOMImage(this) );
-            self.addLoaded();
-        } catch (error) {
-            self.onerror(error);
-        }
-    };
+    // create loaders
+    var loaders = [];
+    loaders.push( new dwv.io.DicomDataLoader() );
+    loaders.push( new dwv.io.RawImageLoader() );
+    loaders.push( new dwv.io.RawVideoLoader() );
+    loaders.push( new dwv.io.JSONTextLoader() );
 
-    // DOM Video buffer to dwv.image.View
-    var onLoadDOMVideoBuffer = function (/*event*/)
-    {
-        try {
-            dwv.image.getViewFromDOMVideo(this, function (data) {
-                self.onload(data);
-            self.addLoaded();
-            });
-        } catch (error) {
-            self.onerror(error);
-        }
-    };
-
-    // load text buffer
-    var onLoadTextBuffer = function (event)
-    {
-        try {
-            self.onload( event.target.result );
-        } catch(error) {
-            self.onerror(error);
-        }
-    };
-
-    // raw image to DOM Image
-    var onLoadRawImageBuffer = function (event)
-    {
-        var theImage = new Image();
-        theImage.src = event.target.result;
-        // storing values to pass them on
-        theImage.file = this.file;
-        theImage.index = this.index;
-        // triggered by ctx.drawImage
-        theImage.onload = onLoadDOMImageBuffer;
-    };
-
-    // raw video to DOM Image
-    var onLoadRawVideoBuffer = function (event)
-    {
-        var video = document.createElement('video');
-        video.src = event.target.result;
-        // storing values to pass them on
-        video.file = this.file;
-        video.index = this.index;
-        // triggered by ctx.drawImage
-        video.onloadedmetadata = onLoadDOMVideoBuffer;
-    };
+    // set loaders callbacks
+    var loader = null;
+    for (var k = 0; k < loaders.length; ++k) {
+        loader = loaders[k];
+        loader.onload = self.onload;
+        loader.addLoaded = self.addLoaded;
+        loader.onerror = self.onerror;
+        loader.setOptions({
+            'defaultCharacterSet': this.getDefaultCharacterSet()
+        });
+    }
 
     // loop on I/O elements
     for (var i = 0; i < ioArray.length; ++i)
     {
         var file = ioArray[i];
         var reader = new FileReader();
-        reader.onprogress = dwv.io.File.createLoadProgressHandler(i, self.onLoadProgress);
-        if ( file.name.split('.').pop().toLowerCase() === "json" )
-        {
-            reader.onload = onLoadTextBuffer;
-            reader.onerror = dwv.io.File.createErrorHandler(file, "text", self.onerror);
-            reader.readAsText(file);
+
+        // bind reader progress
+        reader.onprogress = mproghandler.getMonoProgressHandler(i, 0);
+
+        // find a loader
+        var foundLoader = false;
+        for (var l = 0; l < loaders.length; ++l) {
+            loader = loaders[l];
+            if (loader.canLoad(file)) {
+                foundLoader = true;
+                // bind loader progress
+                loader.onprogress = mproghandler.getMonoProgressHandler(i, 1);
+                // set reader callbacks
+                reader.onload = loader.getLoadHandler(file, i);
+                reader.onerror = loader.getErrorHandler(file);
+                // read
+                if (loader.loadAs() === dwv.io.loadTypes.Text) {
+                    reader.readAsText(file);
+                } else if (loader.loadAs() === dwv.io.loadTypes.DataURL) {
+                    reader.readAsDataURL(file);
+                } else if (loader.loadAs() === dwv.io.loadTypes.ArrayBuffer) {
+                    reader.readAsArrayBuffer(file);
+                }
+                // next file
+                break;
+            }
         }
-        else if ( file.type.match("image.*") )
-        {
-            // storing values to pass them on
-            reader.file = file;
-            reader.index = i;
-            // callbacks
-            reader.onload = onLoadRawImageBuffer;
-            reader.onerror = dwv.io.File.createErrorHandler(file, "image", self.onerror);
-            reader.readAsDataURL(file);
-        }
-        else if ( file.type.match("video.*") )
-        {
-            // storing values to pass them on
-            reader.file = file;
-            reader.index = i;
-            // callbacks
-            reader.onload = onLoadRawVideoBuffer;
-            reader.onerror = dwv.io.File.createErrorHandler(file, "video", self.onerror);
-            reader.readAsDataURL(file);
-        }
-        else
-        {
-            reader.onload = onLoadDicomBuffer;
-            reader.onerror = dwv.io.File.createErrorHandler(file, "DICOM", self.onerror);
-            reader.readAsArrayBuffer(file);
+        // TODO: throw?
+        if (!foundLoader) {
+            throw new Error("No loader found for file: "+file);
         }
     }
 };
