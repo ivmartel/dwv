@@ -16,6 +16,13 @@ dwv.io.MultiProgressHandler = function (callback)
     var progresses = [];
 
     /**
+     * Current progress index.
+     * @private
+     * @type Number
+     */
+    var currentIndex = 0;
+
+    /**
      * Multiplier.
      * @private
      * @type Number
@@ -48,20 +55,37 @@ dwv.io.MultiProgressHandler = function (callback)
      * @param {Object} evet The progress event.
      */
     this.onprogress = function (event) {
-        console.log(event);
         // check event
         if ( !event.lengthComputable ) {
-            return;
-        }
-        if ( typeof event.myindex === "undefined" ) {
             return;
         }
         if ( typeof event.subindex === "undefined" ) {
             return;
         }
-        // set percent for index
+        var index = currentIndex;
+        if ( typeof event.index !== "undefined" ) {
+            index = event.index;
+        }
+        // calculate percent
         var percent = (event.loaded * 100) / event.total;
-        progresses[event.myindex][event.subindex] = percent;
+        // set percent for index
+        progresses[index][event.subindex] = percent;
+
+        // increment currnetIndex if needed
+        var done = true;
+        for (var i = 0; i < multi; ++i) {
+            if (progresses[currentIndex][i] !== 100) {
+                done = false;
+                break;
+            }
+        }
+        if (done) {
+            ++currentIndex;
+            if (currentIndex === progresses.length) {
+                currentIndex = 0;
+            }
+        }
+
         // call callback
         callback({type: event.type, lengthComputable: true,
             loaded: getGlobalPercent(), total: 100});
@@ -83,11 +107,24 @@ dwv.io.MultiProgressHandler = function (callback)
 
     /**
      * Create a mono progress event handler.
-     * @param {Number} index The number of the data.
+     * @param {Number} index The index of the data.
+     * @param {Number} subindex The sub-index of the data.
      */
     this.getMonoProgressHandler = function (index, subindex) {
         return function (event) {
-            event.myindex = index;
+            event.index = index;
+            event.subindex = subindex;
+            self.onprogress(event);
+        };
+    };
+
+    /**
+     * Create a mono progress event handler.
+     * The class handles the progress index.
+     * @param {Number} subindex The sub-index of the data.
+     */
+    this.getUndefinedMonoProgressHandler = function (subindex) {
+        return function (event) {
             event.subindex = subindex;
             self.onprogress(event);
         };
@@ -197,6 +234,7 @@ dwv.io.File.prototype.onerror = function (/*event*/)
     // default does nothing.
 };
 
+// File loading data types
 dwv.io.loadTypes = {
     'Text': 0,
     'ArrayBuffer': 1,
@@ -216,15 +254,20 @@ dwv.io.DicomDataLoader = function () {
         options = opt;
     };
 
+    // DICOM buffer to dwv.image.View (asynchronous)
+    var db2v = new dwv.image.DicomBufferToView();
+
     this.getLoadHandler = function (/*file, index*/) {
         return function (event) {
-            // DICOM buffer to dwv.image.View (asynchronous)
-            var db2v = new dwv.image.DicomBufferToView();
+
+            // options
             if (typeof options.defaultCharacterSet !== "undefined") {
                 db2v.setDefaultCharacterSet(options.defaultCharacterSet);
             }
+            // connect handlers
             db2v.onload = self.addLoaded;
             db2v.onprogress = self.onprogress;
+            // convert
             try {
                 db2v.convert( event.target.result, self.onload );
             } catch (error) {
@@ -350,13 +393,11 @@ dwv.io.RawVideoLoader = function () {
             // onload handler
             video.onloadedmetadata = function (/*event*/) {
                 try {
-                    dwv.image.getViewFromDOMVideo(this, self.onload);
+                    dwv.image.getViewFromDOMVideo(this, self.onload, self.onprogress);
                     self.addLoaded();
                 } catch (error) {
                     self.onerror(error);
                 }
-                self.onprogress({type: event.type, lengthComputable: true,
-                    loaded: 100, total: 100});
             };
         };
     };
@@ -474,6 +515,7 @@ dwv.io.File.prototype.load = function (ioArray)
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
         });
+        loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
     }
 
     // loop on I/O elements
@@ -491,8 +533,6 @@ dwv.io.File.prototype.load = function (ioArray)
             loader = loaders[l];
             if (loader.canLoad(file)) {
                 foundLoader = true;
-                // bind loader progress
-                loader.onprogress = mproghandler.getMonoProgressHandler(i, 1);
                 // set reader callbacks
                 reader.onload = loader.getLoadHandler(file, i);
                 reader.onerror = loader.getErrorHandler(file);

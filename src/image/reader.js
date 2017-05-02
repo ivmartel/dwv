@@ -101,8 +101,9 @@ dwv.image.getViewFromDOMImage = function (image)
  * Get data from an input image using a canvas.
  * @param {Object} video The DOM Video.
  * @param {Object} callback The function to call once the data is loaded.
+ * @param {Object} cbprogress The function to call to report progress.
  */
-dwv.image.getViewFromDOMVideo = function (video, callback)
+dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress)
 {
     // video size
     var width = video.videoWidth;
@@ -141,7 +142,9 @@ dwv.image.getViewFromDOMVideo = function (video, callback)
 
     // draw the context and store it as a frame
     function storeFrame() {
-        console.log("frame #" + frameIndex);
+        // send progress
+        cbprogress({type: event.type, lengthComputable: true,
+            loaded: frameIndex, total: numberOfFrames});
         // draw image
         ctx.drawImage(video, 0, 0);
         // context to image buffer
