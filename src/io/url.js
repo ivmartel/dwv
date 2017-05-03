@@ -27,24 +27,6 @@ dwv.io.Url = function ()
      * @type Number
      */
     var nLoaded = 0;
-    /**
-     * List of load progresses.
-     * @private
-     * @type Array
-     */
-    var loadProgresses = [];
-    /**
-     * List of decode progresses.
-     * @private
-     * @type Array
-     */
-    var decodeProgresses = [];
-    /**
-     * Flag to tell if the IO needs decoding.
-     * @private
-     * @type Boolean
-     */
-    var needDecoding = false;
 
     /**
      * The default character set (optional).
@@ -70,23 +52,11 @@ dwv.io.Url = function ()
     };
 
     /**
-     * Set the need decodign flag
-     * @param {Boolean} flag True if the data needs decoding.
-     */
-    this.setNeedDecoding = function (flag) {
-        needDecoding = flag;
-    };
-
-    /**
      * Set the number of data to load.
      * @param {Number} n The number of data to load.
      */
     this.setNToLoad = function (n) {
         nToLoad = n;
-        for ( var i = 0; i < nToLoad; ++i ) {
-            loadProgresses[i] = 0;
-            decodeProgresses[i] = 0;
-        }
     };
 
     /**
@@ -96,51 +66,9 @@ dwv.io.Url = function ()
     this.addLoaded = function () {
         nLoaded++;
         if ( nLoaded === nToLoad ) {
-            this.onloadend();
+            self.onloadend();
         }
     };
-
-    /**
-     * Handle a load progress.
-     * @param {Number} n The number of the loaded data.
-     * @param {Number} percent The percentage of data 'n' that has been loaded.
-     */
-    this.onLoadProgress = function (n, percent) {
-        loadProgresses[n] = percent;
-        self.onprogress({type: "load-progress", lengthComputable: true,
-            loaded: getGlobalPercent(), total: 100});
-    };
-
-    /**
-     * Handle a decode progress.
-     * @param {Object} event The progress event.
-     */
-    this.onDecodeProgress = function (event) {
-        // use the internal count as index
-        decodeProgresses[nLoaded] = event.loaded;
-        self.onprogress({type: "load-progress", lengthComputable: true,
-            loaded: getGlobalPercent(), total: 100});
-    };
-
-    /**
-     * Get the global load percent including the provided one.
-     * @return {Number} The accumulated percentage.
-     */
-    function getGlobalPercent() {
-        var sum = 0;
-        for ( var i = 0; i < loadProgresses.length; ++i ) {
-            sum += loadProgresses[i];
-            if ( needDecoding ) {
-                sum += decodeProgresses[i];
-            }
-        }
-        var percent = sum / nToLoad;
-        // half loading, half decoding
-        if ( needDecoding ) {
-            percent = percent / 2;
-        }
-        return percent;
-    }
 
 }; // class Url
 
@@ -178,35 +106,6 @@ dwv.io.Url.prototype.onerror = function (/*event*/)
 };
 
 /**
- * Create an error handler from a base one and locals.
- * @param {String} url The related url.
- * @param {String} text The text to insert in the message.
- * @param {Function} baseHandler The base handler.
- */
-dwv.io.Url.createErrorHandler = function (url, text, baseHandler) {
-    return function (/*event*/) {
-        baseHandler( {'name': "RequestError",
-            'message': "An error occurred while retrieving the " + text + " file (via http): " + url +
-            " (status: "+this.status + ")" } );
-    };
-};
-
-/**
- * Create a load progress event handler.
- * @param {Number} n The number of the loaded data.
- * @param {Function} loadProgressHandler A load progress percent handler.
- */
-dwv.io.Url.createLoadProgressHandler = function (n, loadProgressHandler) {
-    return function (event) {
-        if( event.lengthComputable )
-        {
-            var percent = Math.round((event.loaded / event.total) * 100);
-            loadProgressHandler(n, percent);
-        }
-    };
-};
-
-/**
  * Load a list of URLs.
  * @param {Array} ioArray The list of urls to load.
  * @param {Array} requestHeaders An array of {name, value} to use as request headers.
@@ -219,121 +118,37 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     // set the number of data to load
     this.setNToLoad( ioArray.length );
 
-    // DICOM buffer to dwv.image.View (asynchronous)
-    var db2v = new dwv.image.DicomBufferToView();
-    db2v.setDefaultCharacterSet(this.getDefaultCharacterSet());
-    db2v.onload = function () {
-        self.addLoaded();
-    };
-    db2v.onprogress = function (event) {
-        self.onDecodeProgress(event);
-    };
-    // callback
-    var onLoadDicomBuffer = function (response)
-    {
-        self.setNeedDecoding(true);
-        try {
-            db2v.convert(response, function (data) {
-                self.onload(data);
-            });
-        } catch (error) {
-            self.onerror(error);
-        }
-    };
+    var mproghandler = new dwv.io.MultiProgressHandler(self.onprogress);
+    mproghandler.setNToLoad( ioArray.length );
 
-    // DOM Image buffer to dwv.image.View
-    var onLoadDOMImageBuffer = function (/*event*/)
-    {
-        try {
-            self.onload( dwv.image.getViewFromDOMImage(this) );
-        } catch (error) {
-            self.onerror(error);
-        }
-    };
+    // create loaders
+    var loaders = [];
+    loaders.push( new dwv.io.DicomDataLoader() );
+    loaders.push( new dwv.io.RawImageLoader() );
+    loaders.push( new dwv.io.RawVideoLoader() );
+    loaders.push( new dwv.io.JSONTextLoader() );
 
-    // load text buffer
-    var onLoadTextBuffer = function (/*event*/)
-    {
-        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
-        // status 200: "OK"; status 0: "debug"
-        if (this.status !== 200 && this.status !== 0) {
-            this.onerror();
-            return;
-        }
-
-        try {
-            self.onload( this.responseText );
-        } catch (error) {
-            self.onerror(error);
-        }
-    };
-
-    // load binary buffer
-    var onLoadBinaryBuffer = function (/*event*/)
-    {
-        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
-        // status 200: "OK"; status 0: "debug"
-        if (this.status !== 200 && this.status !== 0) {
-            this.onerror();
-            return;
-        }
-
-        // find the image type from its signature
-        var view = new DataView(this.response);
-        var isJpeg = view.getUint32(0) === 0xffd8ffe0;
-        var isPng = view.getUint32(0) === 0x89504e47;
-        var isGif = view.getUint32(0) === 0x47494638;
-
-        // check possible extension
-        // (responseURL is supported on major browsers but not IE...)
-        if ( !isJpeg && !isPng && !isGif && this.responseURL )
-        {
-            var ext = this.responseURL.split('.').pop().toLowerCase();
-            isJpeg = (ext === "jpg") || (ext === "jpeg");
-            isPng = (ext === "png");
-            isGif = (ext === "gif");
-        }
-
-        // non DICOM
-        if( isJpeg || isPng || isGif )
-        {
-            // image data as string
-            var bytes = new Uint8Array(this.response);
-            var imageDataStr = '';
-            for( var i = 0; i < bytes.byteLength; ++i ) {
-                imageDataStr += String.fromCharCode(bytes[i]);
-            }
-            // image type
-            var imageType = "unknown";
-            if(isJpeg) {
-                imageType = "jpeg";
-            }
-            else if(isPng) {
-                imageType = "png";
-            }
-            else if(isGif) {
-                imageType = "gif";
-            }
-            // temporary image object
-            var tmpImage = new Image();
-            tmpImage.src = "data:image/" + imageType + ";base64," + window.btoa(imageDataStr);
-            tmpImage.onload = onLoadDOMImageBuffer;
-        }
-        else
-        {
-            onLoadDicomBuffer(this.response);
-        }
-    };
+    // set loaders callbacks
+    var loader = null;
+    for (var k = 0; k < loaders.length; ++k) {
+        loader = loaders[k];
+        loader.onload = self.onload;
+        loader.addLoaded = self.addLoaded;
+        loader.onerror = self.onerror;
+        loader.setOptions({
+            'defaultCharacterSet': this.getDefaultCharacterSet()
+        });
+        loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
+    }
 
     // loop on I/O elements
     for (var i = 0; i < ioArray.length; ++i)
     {
         var url = ioArray[i];
-        // read as text according to extension
-        var isText = ( url.split('.').pop().toLowerCase() === "json" );
-
         var request = new XMLHttpRequest();
         request.open('GET', url, true);
+
+        // optional request headers
         if ( typeof requestHeaders !== "undefined" ) {
             for (var j = 0; j < requestHeaders.length; ++j) {
                 if ( typeof requestHeaders[j].name !== "undefined" &&
@@ -342,16 +157,31 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
                 }
             }
         }
-        if ( !isText ) {
-            request.responseType = "arraybuffer";
-            request.onload = onLoadBinaryBuffer;
-            request.onerror = dwv.io.Url.createErrorHandler(url, "binary", self.onerror);
+
+        // bind reader progress
+        request.onprogress = mproghandler.getMonoProgressHandler(i, 0);
+
+        // find a loader
+        var foundLoader = false;
+        for (var l = 0; l < loaders.length; ++l) {
+            loader = loaders[l];
+            if (loader.canLoadUrl(url)) {
+                foundLoader = true;
+                // set reader callbacks
+                request.onload = loader.getUrlLoadHandler(url, i);
+                request.onerror = loader.getErrorHandler(url);
+                // read
+                if (loader.loadUrlAs() === dwv.io.urlContentTypes.ArrayBuffer) {
+                    request.responseType = "arraybuffer";
+                }
+                request.send(null);
+                // next file
+                break;
+            }
         }
-        else {
-            request.onload = onLoadTextBuffer;
-            request.onerror = dwv.io.Url.createErrorHandler(url, "text", self.onerror);
+        // TODO: throw?
+        if (!foundLoader) {
+            throw new Error("No loader found for url: "+url);
         }
-        request.onprogress = dwv.io.Url.createLoadProgressHandler(i, self.onLoadProgress);
-        request.send(null);
     }
 };
