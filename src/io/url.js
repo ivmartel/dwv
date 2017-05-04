@@ -2,6 +2,13 @@
 var dwv = dwv || {};
 dwv.io = dwv.io || {};
 
+// url content types
+dwv.io.urlContentTypes = {
+    'Text': 0,
+    'ArrayBuffer': 1,
+    'oups': 2
+};
+
 /**
  * Url loader.
  * @constructor
@@ -118,15 +125,14 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
     // set the number of data to load
     this.setNToLoad( ioArray.length );
 
-    var mproghandler = new dwv.io.MultiProgressHandler(self.onprogress);
+    var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
     mproghandler.setNToLoad( ioArray.length );
 
-    // create loaders
+    // get loaders
     var loaders = [];
-    loaders.push( new dwv.io.DicomDataLoader() );
-    loaders.push( new dwv.io.RawImageLoader() );
-    loaders.push( new dwv.io.RawVideoLoader() );
-    loaders.push( new dwv.io.JSONTextLoader() );
+    for (var m = 0; m < dwv.io.loaderList.length; ++m) {
+        loaders.push( new dwv.io[dwv.io.loaderList[m]]() );
+    }
 
     // set loaders callbacks
     var loader = null;
