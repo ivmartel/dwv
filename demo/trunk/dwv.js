@@ -501,34 +501,10 @@ dwv.App = function ()
      */
     function loadImageFiles(files)
     {
-        // clear variables
-        self.reset();
-        nSlicesToLoad = files.length;
         // create IO
         var fileIO = new dwv.io.File();
-        fileIO.setDefaultCharacterSet(defaultCharacterSet);
-        fileIO.onload = function (data) {
-            if ( image ) {
-                view.append( data.view );
-                if ( drawController ) {
-                    drawController.appendDrawLayer(image.getNumberOfFrames());
-                }
-            }
-            postLoadInit(data);
-        };
-        fileIO.onerror = function (error) { handleError(error); };
-        fileIO.onloadend = function (/*event*/) {
-            if ( drawController ) {
-                drawController.activateDrawLayer(viewController);
-            }
-            fireEvent({type: "load-progress", lengthComputable: true,
-                loaded: 100, total: 100});
-            fireEvent({ 'type': 'load-end' });
-        };
-        fileIO.onprogress = onLoadProgress;
-        // main load (asynchronous)
-        fireEvent({ 'type': 'load-start' });
-        fileIO.load(files);
+        // load data
+        loadImageData(files, fileIO);
     }
 
     /**
@@ -575,13 +551,26 @@ dwv.App = function ()
      */
     function loadImageUrls(urls, requestHeaders)
     {
-        // clear variables
-        self.reset();
-        nSlicesToLoad = urls.length;
         // create IO
         var urlIO = new dwv.io.Url();
-        urlIO.setDefaultCharacterSet(defaultCharacterSet);
-        urlIO.onload = function (data) {
+        // load data
+        loadImageData(urls, urlIO, requestHeaders);
+    }
+
+    /**
+     * Load a list of image URLs.
+     * @private
+     * @param {Array} urls The list of urls to load.
+     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+     */
+    function loadImageData(data, loader, requestHeaders)
+    {
+        // clear variables
+        self.reset();
+        nSlicesToLoad = data.length;
+        // set IO
+        loader.setDefaultCharacterSet(defaultCharacterSet);
+        loader.onload = function (data) {
             if ( image ) {
                 view.append( data.view );
                 if ( drawController ) {
@@ -590,8 +579,8 @@ dwv.App = function ()
             }
             postLoadInit(data);
         };
-        urlIO.onerror = function (error) { handleError(error); };
-        urlIO.onloadend = function (/*event*/) {
+        loader.onerror = function (error) { handleError(error); };
+        loader.onloadend = function (/*event*/) {
             if ( drawController ) {
                 drawController.activateDrawLayer(viewController);
             }
@@ -599,12 +588,11 @@ dwv.App = function ()
                 loaded: 100, total: 100});
             fireEvent({ 'type': 'load-end' });
         };
-        urlIO.onprogress = onLoadProgress;
+        loader.onprogress = onLoadProgress;
         // main load (asynchronous)
         fireEvent({ 'type': 'load-start' });
-        urlIO.load(urls, requestHeaders);
+        loader.load(data, requestHeaders);
     }
-
     /**
      * Load a State url.
      * @private
@@ -15607,11 +15595,12 @@ dwv.io.DicomDataLoader = function ()
     var db2v = new dwv.image.DicomBufferToView();
 
     /**
-     * Internal DICOM load.
+     * Load data.
      * @param {Object} buffer The DICOM buffer.
+     * @param {String} origin The data origin.
      * @param {Number} index The data index.
      */
-    function loadDicomBuffer(buffer, index) {
+    this.load = function (buffer, origin, index) {
         // set character set
         if (typeof options.defaultCharacterSet !== "undefined") {
             db2v.setDefaultCharacterSet(options.defaultCharacterSet);
@@ -15625,7 +15614,7 @@ dwv.io.DicomDataLoader = function ()
         } catch (error) {
             self.onerror(error);
         }
-    }
+    };
 
     /**
      * Get a file load handler.
@@ -15635,7 +15624,7 @@ dwv.io.DicomDataLoader = function ()
      */
     this.getFileLoadHandler = function (file, index) {
         return function (event) {
-            loadDicomBuffer(event.target.result, index);
+            self.load(event.target.result, file, index);
         };
     };
 
@@ -15657,7 +15646,7 @@ dwv.io.DicomDataLoader = function ()
                 return;
             }
             // load
-            loadDicomBuffer(this.response, index);
+            self.load(this.response, url, index);
         };
     };
 
@@ -15960,11 +15949,12 @@ dwv.io.JSONTextLoader = function ()
     };
 
     /**
-     * Internal JSON text load.
+     * Load data.
      * @param {Object} text The input text.
+     * @param {String} origin The data origin.
      * @param {Number} index The data index.
      */
-    function loadJsonText(text, index) {
+    this.load = function (text, origin, index) {
         try {
             self.onload( text );
             //self.addLoaded();
@@ -15973,7 +15963,7 @@ dwv.io.JSONTextLoader = function ()
         }
         self.onprogress({'type': 'read-progress', 'lengthComputable': true,
             'loaded': 100, 'total': 100, 'index': index});
-    }
+    };
 
     /**
      * Get a file load handler.
@@ -15983,7 +15973,7 @@ dwv.io.JSONTextLoader = function ()
      */
     this.getFileLoadHandler = function (file, index) {
         return function (event) {
-            loadJsonText(event.target.result, index);
+            self.load(event.target.result, file, index);
         };
     };
 
@@ -16005,7 +15995,7 @@ dwv.io.JSONTextLoader = function ()
                 return;
             }
             // load
-            loadJsonText(this.responseText, index);
+            self.load(this.responseText, url, index);
         };
     };
 
@@ -16103,6 +16093,163 @@ var dwv = dwv || {};
 dwv.io = dwv.io || {};
 
 /**
+ * Memory loader.
+ * @constructor
+ */
+dwv.io.Memory = function ()
+{
+    /**
+     * CLosure to self.
+     * @private
+     * @type Object
+     */
+    var self = this;
+
+    /**
+     * Number of data to load.
+     * @private
+     * @type Number
+     */
+    var nToLoad = 0;
+    /**
+     * Number of loaded data.
+     * @private
+     * @type Number
+     */
+    var nLoaded = 0;
+
+    /**
+     * The default character set (optional).
+     * @private
+     * @type String
+     */
+    var defaultCharacterSet;
+
+    /**
+     * Get the default character set.
+     * @return {String} The default character set.
+     */
+    this.getDefaultCharacterSet = function () {
+        return defaultCharacterSet;
+    };
+
+    /**
+     * Set the default character set.
+     * @param {String} characterSet The character set.
+     */
+    this.setDefaultCharacterSet = function (characterSet) {
+        defaultCharacterSet = characterSet;
+    };
+
+    /**
+     * Set the number of data to load.
+     * @param {Number} n The number of data to load.
+     */
+    this.setNToLoad = function (n) {
+        nToLoad = n;
+    };
+
+    /**
+     * Increment the number of loaded data
+     * and call onloadend if loaded all data.
+     */
+    this.addLoaded = function () {
+        nLoaded++;
+        if ( nLoaded === nToLoad ) {
+            self.onloadend();
+        }
+    };
+
+}; // class Memory
+
+/**
+ * Handle a load event.
+ * @param {Object} event The load event, 'event.target'
+ *  should be the loaded data.
+ * Default does nothing.
+ */
+dwv.io.Memory.prototype.onload = function (/*event*/) {};
+/**
+ * Handle a load end event.
+ * Default does nothing.
+ */
+dwv.io.Memory.prototype.onloadend = function () {};
+/**
+ * Handle a progress event.
+ * @param {Object} event The progress event.
+ * Default does nothing.
+ */
+dwv.io.Memory.prototype.onprogress = function (/*event*/) {};
+/**
+ * Handle an error event.
+ * @param {Object} event The error event, 'event.message'
+ *  should be the error message.
+ * Default does nothing.
+ */
+dwv.io.Memory.prototype.onerror = function (/*event*/) {};
+
+/**
+ * Load a list of buffers.
+ * @param {Array} ioArray The list of buffers to load.
+ */
+dwv.io.Memory.prototype.load = function (ioArray)
+{
+    // closure to self for handlers
+    var self = this;
+    // set the number of data to load
+    this.setNToLoad( ioArray.length );
+
+    var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
+    mproghandler.setNToLoad( ioArray.length );
+
+    // get loaders
+    var loaders = [];
+    for (var m = 0; m < dwv.io.loaderList.length; ++m) {
+        loaders.push( new dwv.io[dwv.io.loaderList[m]]() );
+    }
+
+    // set loaders callbacks
+    var loader = null;
+    for (var k = 0; k < loaders.length; ++k) {
+        loader = loaders[k];
+        loader.onload = self.onload;
+        loader.addLoaded = self.addLoaded;
+        loader.onerror = self.onerror;
+        loader.setOptions({
+            'defaultCharacterSet': this.getDefaultCharacterSet()
+        });
+        loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
+    }
+
+    // loop on I/O elements
+    for (var i = 0; i < ioArray.length; ++i)
+    {
+        var iodata = ioArray[i];
+
+        // find a loader
+        var foundLoader = false;
+        for (var l = 0; l < loaders.length; ++l) {
+            loader = loaders[l];
+            if (loader.canLoadUrl(iodata.filename)) {
+                foundLoader = true;
+                // read
+                loader.load(iodata.data, iodata.filename, i);
+                // next file
+                break;
+            }
+        }
+        // TODO: throw?
+        if (!foundLoader) {
+            throw new Error("No loader found for file: "+iodata.filename);
+        }
+    }
+};
+
+// namespaces
+var dwv = dwv || {};
+dwv.io = dwv.io || {};
+
+/**
  * Raw image loader.
  */
 dwv.io.RawImageLoader = function ()
@@ -16117,32 +16264,6 @@ dwv.io.RawImageLoader = function ()
     this.setOptions = function () {
         // does nothing
     };
-
-    /**
-     * Internal Data URI load.
-     * @param {Object} dataUri The data URI.
-     * @param {String} origin The data origin.
-     * @param {Number} index The data index.
-     */
-    function loadDataUri( dataUri, origin, index ) {
-        // create a DOM image
-        var image = new Image();
-        image.src = dataUri;
-        // storing values to pass them on
-        image.origin = origin;
-        image.index = index;
-        // triggered by ctx.drawImage
-        image.onload = function (/*event*/) {
-            try {
-                self.onload( dwv.image.getViewFromDOMImage(this) );
-                self.addLoaded();
-            } catch (error) {
-                self.onerror(error);
-            }
-            self.onprogress({'type': 'read-progress', 'lengthComputable': true,
-                'loaded': 100, 'total': 100, 'index': index});
-        };
-    }
 
     /**
      * Create a Data URI from an HTTP request response.
@@ -16167,6 +16288,32 @@ dwv.io.RawImageLoader = function ()
     }
 
     /**
+     * Load data.
+     * @param {Object} dataUri The data URI.
+     * @param {String} origin The data origin.
+     * @param {Number} index The data index.
+     */
+    this.load = function ( dataUri, origin, index ) {
+        // create a DOM image
+        var image = new Image();
+        image.src = dataUri;
+        // storing values to pass them on
+        image.origin = origin;
+        image.index = index;
+        // triggered by ctx.drawImage
+        image.onload = function (/*event*/) {
+            try {
+                self.onload( dwv.image.getViewFromDOMImage(this) );
+                self.addLoaded();
+            } catch (error) {
+                self.onerror(error);
+            }
+            self.onprogress({'type': 'read-progress', 'lengthComputable': true,
+                'loaded': 100, 'total': 100, 'index': index});
+        };
+    };
+
+    /**
      * Get a file load handler.
      * @param {Object} file The file to load.
      * @param {Number} index The index 'id' of the file.
@@ -16174,7 +16321,7 @@ dwv.io.RawImageLoader = function ()
      */
     this.getFileLoadHandler = function (file, index) {
         return function (event) {
-            loadDataUri(event.target.result, file, index);
+            self.load(event.target.result, file, index);
         };
     };
 
@@ -16197,7 +16344,7 @@ dwv.io.RawImageLoader = function ()
             }
             // load
             var ext = url.split('.').pop().toLowerCase();
-            loadDataUri(createDataUri(this.response, ext), url, index);
+            self.load(createDataUri(this.response, ext), url, index);
         };
     };
 
@@ -16296,6 +16443,8 @@ dwv.io = dwv.io || {};
 
 /**
  * Raw video loader.
+ * url example (cors enabled):
+ *   https://raw.githubusercontent.com/clappr/clappr/master/test/fixtures/SampleVideo_360x240_1mb.mp4
  */
 dwv.io.RawVideoLoader = function ()
 {
@@ -16309,30 +16458,6 @@ dwv.io.RawVideoLoader = function ()
     this.setOptions = function () {
         // does nothing
     };
-
-    /**
-     * Internal Data URI load.
-     * @param {Object} dataUri The data URI.
-     * @param {String} origin The data origin.
-     * @param {Number} index The data index.
-     */
-    function loadDataUri( dataUri, origin, index ) {
-        // create a DOM video
-        var video = document.createElement('video');
-        video.src = dataUri;
-        // storing values to pass them on
-        video.file = origin;
-        video.index = index;
-        // onload handler
-        video.onloadedmetadata = function (/*event*/) {
-            try {
-                dwv.image.getViewFromDOMVideo(this, self.onload, self.onprogress, index);
-                self.addLoaded();
-            } catch (error) {
-                self.onerror(error);
-            }
-        };
-    }
 
     /**
      * Create a Data URI from an HTTP request response.
@@ -16352,6 +16477,30 @@ dwv.io.RawVideoLoader = function ()
     }
 
     /**
+     * Internal Data URI load.
+     * @param {Object} dataUri The data URI.
+     * @param {String} origin The data origin.
+     * @param {Number} index The data index.
+     */
+    this.load = function ( dataUri, origin, index ) {
+        // create a DOM video
+        var video = document.createElement('video');
+        video.src = dataUri;
+        // storing values to pass them on
+        video.file = origin;
+        video.index = index;
+        // onload handler
+        video.onloadedmetadata = function (/*event*/) {
+            try {
+                dwv.image.getViewFromDOMVideo(this, self.onload, self.onprogress, index);
+                self.addLoaded();
+            } catch (error) {
+                self.onerror(error);
+            }
+        };
+    };
+
+    /**
      * Get a file load handler.
      * @param {Object} file The file to load.
      * @param {Number} index The index 'id' of the file.
@@ -16359,7 +16508,7 @@ dwv.io.RawVideoLoader = function ()
      */
     this.getFileLoadHandler = function (file, index) {
         return function (event) {
-            loadDataUri(event.target.result, file, index);
+            self.load(event.target.result, file, index);
         };
     };
 
@@ -16382,7 +16531,7 @@ dwv.io.RawVideoLoader = function ()
             }
             // load
             var ext = url.split('.').pop().toLowerCase();
-            loadDataUri(createDataUri(this.response, ext), url, index);
+            self.load(createDataUri(this.response, ext), url, index);
         };
     };
 
@@ -16421,11 +16570,10 @@ dwv.io.RawVideoLoader.prototype.canLoadFile = function (file) {
  * @param {String} url The url to check.
  * @return True if the url can be loaded.
  */
-dwv.io.RawVideoLoader.prototype.canLoadUrl = function (/*url*/) {
-    //var ext = url.split('.').pop().toLowerCase();
-    //return (ext === "mp4") || (ext === "ogg") ||
-    //        (ext === "webm");
-    return false;
+dwv.io.RawVideoLoader.prototype.canLoadUrl = function (url) {
+    var ext = url.split('.').pop().toLowerCase();
+    return (ext === "mp4") || (ext === "ogg") ||
+            (ext === "webm");
 };
 
 /**
