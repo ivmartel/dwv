@@ -449,34 +449,10 @@ dwv.App = function ()
      */
     function loadImageFiles(files)
     {
-        // clear variables
-        self.reset();
-        nSlicesToLoad = files.length;
         // create IO
         var fileIO = new dwv.io.File();
-        fileIO.setDefaultCharacterSet(defaultCharacterSet);
-        fileIO.onload = function (data) {
-            if ( image ) {
-                view.append( data.view );
-                if ( drawController ) {
-                    drawController.appendDrawLayer(image.getNumberOfFrames());
-                }
-            }
-            postLoadInit(data);
-        };
-        fileIO.onerror = function (error) { handleError(error); };
-        fileIO.onloadend = function (/*event*/) {
-            if ( drawController ) {
-                drawController.activateDrawLayer(viewController);
-            }
-            fireEvent({type: "load-progress", lengthComputable: true,
-                loaded: 100, total: 100});
-            fireEvent({ 'type': 'load-end' });
-        };
-        fileIO.onprogress = onLoadProgress;
-        // main load (asynchronous)
-        fireEvent({ 'type': 'load-start' });
-        fileIO.load(files);
+        // load data
+        loadImageData(files, fileIO);
     }
 
     /**
@@ -523,13 +499,26 @@ dwv.App = function ()
      */
     function loadImageUrls(urls, requestHeaders)
     {
-        // clear variables
-        self.reset();
-        nSlicesToLoad = urls.length;
         // create IO
         var urlIO = new dwv.io.Url();
-        urlIO.setDefaultCharacterSet(defaultCharacterSet);
-        urlIO.onload = function (data) {
+        // load data
+        loadImageData(urls, urlIO, requestHeaders);
+    }
+
+    /**
+     * Load a list of image URLs.
+     * @private
+     * @param {Array} urls The list of urls to load.
+     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+     */
+    function loadImageData(data, loader, requestHeaders)
+    {
+        // clear variables
+        self.reset();
+        nSlicesToLoad = data.length;
+        // set IO
+        loader.setDefaultCharacterSet(defaultCharacterSet);
+        loader.onload = function (data) {
             if ( image ) {
                 view.append( data.view );
                 if ( drawController ) {
@@ -538,8 +527,8 @@ dwv.App = function ()
             }
             postLoadInit(data);
         };
-        urlIO.onerror = function (error) { handleError(error); };
-        urlIO.onloadend = function (/*event*/) {
+        loader.onerror = function (error) { handleError(error); };
+        loader.onloadend = function (/*event*/) {
             if ( drawController ) {
                 drawController.activateDrawLayer(viewController);
             }
@@ -547,12 +536,11 @@ dwv.App = function ()
                 loaded: 100, total: 100});
             fireEvent({ 'type': 'load-end' });
         };
-        urlIO.onprogress = onLoadProgress;
+        loader.onprogress = onLoadProgress;
         // main load (asynchronous)
         fireEvent({ 'type': 'load-start' });
-        urlIO.load(urls, requestHeaders);
+        loader.load(data, requestHeaders);
     }
-
     /**
      * Load a State url.
      * @private
