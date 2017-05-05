@@ -19,11 +19,12 @@ dwv.io.JSONTextLoader = function ()
     };
 
     /**
-     * Internal JSON text load.
+     * Load data.
      * @param {Object} text The input text.
+     * @param {String} origin The data origin.
      * @param {Number} index The data index.
      */
-    function loadJsonText(text, index) {
+    this.load = function (text, origin, index) {
         try {
             self.onload( text );
             //self.addLoaded();
@@ -32,7 +33,7 @@ dwv.io.JSONTextLoader = function ()
         }
         self.onprogress({'type': 'read-progress', 'lengthComputable': true,
             'loaded': 100, 'total': 100, 'index': index});
-    }
+    };
 
     /**
      * Get a file load handler.
@@ -42,7 +43,7 @@ dwv.io.JSONTextLoader = function ()
      */
     this.getFileLoadHandler = function (file, index) {
         return function (event) {
-            loadJsonText(event.target.result, index);
+            self.load(event.target.result, file, index);
         };
     };
 
@@ -64,7 +65,7 @@ dwv.io.JSONTextLoader = function ()
                 return;
             }
             // load
-            loadJsonText(this.responseText, index);
+            self.load(this.responseText, url, index);
         };
     };
 

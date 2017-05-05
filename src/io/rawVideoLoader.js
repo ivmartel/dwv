@@ -4,6 +4,8 @@ dwv.io = dwv.io || {};
 
 /**
  * Raw video loader.
+ * url example (cors enabled):
+ *   https://raw.githubusercontent.com/clappr/clappr/master/test/fixtures/SampleVideo_360x240_1mb.mp4
  */
 dwv.io.RawVideoLoader = function ()
 {
@@ -17,30 +19,6 @@ dwv.io.RawVideoLoader = function ()
     this.setOptions = function () {
         // does nothing
     };
-
-    /**
-     * Internal Data URI load.
-     * @param {Object} dataUri The data URI.
-     * @param {String} origin The data origin.
-     * @param {Number} index The data index.
-     */
-    function loadDataUri( dataUri, origin, index ) {
-        // create a DOM video
-        var video = document.createElement('video');
-        video.src = dataUri;
-        // storing values to pass them on
-        video.file = origin;
-        video.index = index;
-        // onload handler
-        video.onloadedmetadata = function (/*event*/) {
-            try {
-                dwv.image.getViewFromDOMVideo(this, self.onload, self.onprogress, index);
-                self.addLoaded();
-            } catch (error) {
-                self.onerror(error);
-            }
-        };
-    }
 
     /**
      * Create a Data URI from an HTTP request response.
@@ -60,6 +38,30 @@ dwv.io.RawVideoLoader = function ()
     }
 
     /**
+     * Internal Data URI load.
+     * @param {Object} dataUri The data URI.
+     * @param {String} origin The data origin.
+     * @param {Number} index The data index.
+     */
+    this.load = function ( dataUri, origin, index ) {
+        // create a DOM video
+        var video = document.createElement('video');
+        video.src = dataUri;
+        // storing values to pass them on
+        video.file = origin;
+        video.index = index;
+        // onload handler
+        video.onloadedmetadata = function (/*event*/) {
+            try {
+                dwv.image.getViewFromDOMVideo(this, self.onload, self.onprogress, index);
+                self.addLoaded();
+            } catch (error) {
+                self.onerror(error);
+            }
+        };
+    };
+
+    /**
      * Get a file load handler.
      * @param {Object} file The file to load.
      * @param {Number} index The index 'id' of the file.
@@ -67,7 +69,7 @@ dwv.io.RawVideoLoader = function ()
      */
     this.getFileLoadHandler = function (file, index) {
         return function (event) {
-            loadDataUri(event.target.result, file, index);
+            self.load(event.target.result, file, index);
         };
     };
 
@@ -90,7 +92,7 @@ dwv.io.RawVideoLoader = function ()
             }
             // load
             var ext = url.split('.').pop().toLowerCase();
-            loadDataUri(createDataUri(this.response, ext), url, index);
+            self.load(createDataUri(this.response, ext), url, index);
         };
     };
 
@@ -129,11 +131,10 @@ dwv.io.RawVideoLoader.prototype.canLoadFile = function (file) {
  * @param {String} url The url to check.
  * @return True if the url can be loaded.
  */
-dwv.io.RawVideoLoader.prototype.canLoadUrl = function (/*url*/) {
-    //var ext = url.split('.').pop().toLowerCase();
-    //return (ext === "mp4") || (ext === "ogg") ||
-    //        (ext === "webm");
-    return false;
+dwv.io.RawVideoLoader.prototype.canLoadUrl = function (url) {
+    var ext = url.split('.').pop().toLowerCase();
+    return (ext === "mp4") || (ext === "ogg") ||
+            (ext === "webm");
 };
 
 /**

@@ -31,11 +31,12 @@ dwv.io.DicomDataLoader = function ()
     var db2v = new dwv.image.DicomBufferToView();
 
     /**
-     * Internal DICOM load.
+     * Load data.
      * @param {Object} buffer The DICOM buffer.
+     * @param {String} origin The data origin.
      * @param {Number} index The data index.
      */
-    function loadDicomBuffer(buffer, index) {
+    this.load = function (buffer, origin, index) {
         // set character set
         if (typeof options.defaultCharacterSet !== "undefined") {
             db2v.setDefaultCharacterSet(options.defaultCharacterSet);
@@ -49,7 +50,7 @@ dwv.io.DicomDataLoader = function ()
         } catch (error) {
             self.onerror(error);
         }
-    }
+    };
 
     /**
      * Get a file load handler.
@@ -59,7 +60,7 @@ dwv.io.DicomDataLoader = function ()
      */
     this.getFileLoadHandler = function (file, index) {
         return function (event) {
-            loadDicomBuffer(event.target.result, index);
+            self.load(event.target.result, file, index);
         };
     };
 
@@ -81,7 +82,7 @@ dwv.io.DicomDataLoader = function ()
                 return;
             }
             // load
-            loadDicomBuffer(this.response, index);
+            self.load(this.response, url, index);
         };
     };
 

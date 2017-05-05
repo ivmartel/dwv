@@ -19,32 +19,6 @@ dwv.io.RawImageLoader = function ()
     };
 
     /**
-     * Internal Data URI load.
-     * @param {Object} dataUri The data URI.
-     * @param {String} origin The data origin.
-     * @param {Number} index The data index.
-     */
-    function loadDataUri( dataUri, origin, index ) {
-        // create a DOM image
-        var image = new Image();
-        image.src = dataUri;
-        // storing values to pass them on
-        image.origin = origin;
-        image.index = index;
-        // triggered by ctx.drawImage
-        image.onload = function (/*event*/) {
-            try {
-                self.onload( dwv.image.getViewFromDOMImage(this) );
-                self.addLoaded();
-            } catch (error) {
-                self.onerror(error);
-            }
-            self.onprogress({'type': 'read-progress', 'lengthComputable': true,
-                'loaded': 100, 'total': 100, 'index': index});
-        };
-    }
-
-    /**
      * Create a Data URI from an HTTP request response.
      * @param {Object} response The HTTP request response.
      * @param {String} dataType The data type.
@@ -67,6 +41,32 @@ dwv.io.RawImageLoader = function ()
     }
 
     /**
+     * Load data.
+     * @param {Object} dataUri The data URI.
+     * @param {String} origin The data origin.
+     * @param {Number} index The data index.
+     */
+    this.load = function ( dataUri, origin, index ) {
+        // create a DOM image
+        var image = new Image();
+        image.src = dataUri;
+        // storing values to pass them on
+        image.origin = origin;
+        image.index = index;
+        // triggered by ctx.drawImage
+        image.onload = function (/*event*/) {
+            try {
+                self.onload( dwv.image.getViewFromDOMImage(this) );
+                self.addLoaded();
+            } catch (error) {
+                self.onerror(error);
+            }
+            self.onprogress({'type': 'read-progress', 'lengthComputable': true,
+                'loaded': 100, 'total': 100, 'index': index});
+        };
+    };
+
+    /**
      * Get a file load handler.
      * @param {Object} file The file to load.
      * @param {Number} index The index 'id' of the file.
@@ -74,7 +74,7 @@ dwv.io.RawImageLoader = function ()
      */
     this.getFileLoadHandler = function (file, index) {
         return function (event) {
-            loadDataUri(event.target.result, file, index);
+            self.load(event.target.result, file, index);
         };
     };
 
@@ -97,7 +97,7 @@ dwv.io.RawImageLoader = function ()
             }
             // load
             var ext = url.split('.').pop().toLowerCase();
-            loadDataUri(createDataUri(this.response, ext), url, index);
+            self.load(createDataUri(this.response, ext), url, index);
         };
     };
 
