@@ -553,17 +553,19 @@ dwv.App = function ()
     {
         // create IO
         var urlIO = new dwv.io.Url();
+        // create options
+        var options = {'requestHeaders': requestHeaders};
         // load data
-        loadImageData(urls, urlIO, requestHeaders);
+        loadImageData(urls, urlIO, options);
     }
 
     /**
      * Load a list of image URLs.
      * @private
      * @param {Array} urls The list of urls to load.
-     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+     * @param {Object} options Options passed to the final loader.
      */
-    function loadImageData(data, loader, requestHeaders)
+    function loadImageData(data, loader, options)
     {
         // clear variables
         self.reset();
@@ -591,7 +593,7 @@ dwv.App = function ()
         loader.onprogress = onLoadProgress;
         // main load (asynchronous)
         fireEvent({ 'type': 'load-start' });
-        loader.load(data, requestHeaders);
+        loader.load(data, options);
     }
     /**
      * Load a State url.
@@ -16707,44 +16709,37 @@ dwv.io.Url = function ()
 
 /**
  * Handle a load event.
- * @param {Object} event The load event, event.target
+ * @param {Object} event The load event, 'event.target'
  *  should be the loaded data.
+ * Default does nothing.
  */
-dwv.io.Url.prototype.onload = function (/*event*/)
-{
-    // default does nothing.
-};
+dwv.io.Url.prototype.onload = function (/*event*/) {};
 /**
  * Handle a load end event.
+ * Default does nothing.
  */
-dwv.io.Url.prototype.onloadend = function ()
-{
-    // default does nothing.
-};
+dwv.io.Url.prototype.onloadend = function () {};
 /**
  * Handle a progress event.
+ * @param {Object} event The progress event.
+ * Default does nothing.
  */
-dwv.io.Url.prototype.onprogress = function ()
-{
-    // default does nothing.
-};
+dwv.io.Url.prototype.onprogress = function (/*event*/) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event, event.message
+ * @param {Object} event The error event, 'event.message'
  *  should be the error message.
+ * Default does nothing.
  */
-dwv.io.Url.prototype.onerror = function (/*event*/)
-{
-    // default does nothing.
-};
+dwv.io.Url.prototype.onerror = function (/*event*/) {};
 
 /**
  * Load a list of URLs.
  * @param {Array} ioArray The list of urls to load.
- * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+ * @param {Object} options Load options.
  * @external XMLHttpRequest
  */
-dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
+dwv.io.Url.prototype.load = function (ioArray, options)
 {
     // closure to self for handlers
     var self = this;
@@ -16781,7 +16776,8 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
         request.open('GET', url, true);
 
         // optional request headers
-        if ( typeof requestHeaders !== "undefined" ) {
+        if ( typeof options.requestHeaders !== "undefined" ) {
+            var requestHeaders = options.requestHeaders;
             for (var j = 0; j < requestHeaders.length; ++j) {
                 if ( typeof requestHeaders[j].name !== "undefined" &&
                     typeof requestHeaders[j].value !== "undefined" ) {
