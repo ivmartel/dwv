@@ -81,44 +81,37 @@ dwv.io.Url = function ()
 
 /**
  * Handle a load event.
- * @param {Object} event The load event, event.target
+ * @param {Object} event The load event, 'event.target'
  *  should be the loaded data.
+ * Default does nothing.
  */
-dwv.io.Url.prototype.onload = function (/*event*/)
-{
-    // default does nothing.
-};
+dwv.io.Url.prototype.onload = function (/*event*/) {};
 /**
  * Handle a load end event.
+ * Default does nothing.
  */
-dwv.io.Url.prototype.onloadend = function ()
-{
-    // default does nothing.
-};
+dwv.io.Url.prototype.onloadend = function () {};
 /**
  * Handle a progress event.
+ * @param {Object} event The progress event.
+ * Default does nothing.
  */
-dwv.io.Url.prototype.onprogress = function ()
-{
-    // default does nothing.
-};
+dwv.io.Url.prototype.onprogress = function (/*event*/) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event, event.message
+ * @param {Object} event The error event, 'event.message'
  *  should be the error message.
+ * Default does nothing.
  */
-dwv.io.Url.prototype.onerror = function (/*event*/)
-{
-    // default does nothing.
-};
+dwv.io.Url.prototype.onerror = function (/*event*/) {};
 
 /**
  * Load a list of URLs.
  * @param {Array} ioArray The list of urls to load.
- * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+ * @param {Object} options Load options.
  * @external XMLHttpRequest
  */
-dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
+dwv.io.Url.prototype.load = function (ioArray, options)
 {
     // closure to self for handlers
     var self = this;
@@ -155,7 +148,8 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
         request.open('GET', url, true);
 
         // optional request headers
-        if ( typeof requestHeaders !== "undefined" ) {
+        if ( typeof options.requestHeaders !== "undefined" ) {
+            var requestHeaders = options.requestHeaders;
             for (var j = 0; j < requestHeaders.length; ++j) {
                 if ( typeof requestHeaders[j].name !== "undefined" &&
                     typeof requestHeaders[j].value !== "undefined" ) {

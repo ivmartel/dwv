@@ -501,17 +501,19 @@ dwv.App = function ()
     {
         // create IO
         var urlIO = new dwv.io.Url();
+        // create options
+        var options = {'requestHeaders': requestHeaders};
         // load data
-        loadImageData(urls, urlIO, requestHeaders);
+        loadImageData(urls, urlIO, options);
     }
 
     /**
      * Load a list of image URLs.
      * @private
      * @param {Array} urls The list of urls to load.
-     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+     * @param {Object} options Options passed to the final loader.
      */
-    function loadImageData(data, loader, requestHeaders)
+    function loadImageData(data, loader, options)
     {
         // clear variables
         self.reset();
@@ -539,7 +541,7 @@ dwv.App = function ()
         loader.onprogress = onLoadProgress;
         // main load (asynchronous)
         fireEvent({ 'type': 'load-start' });
-        loader.load(data, requestHeaders);
+        loader.load(data, options);
     }
     /**
      * Load a State url.
