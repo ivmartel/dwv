@@ -72,8 +72,8 @@ dwv.App = function ()
     var dataWidth = 0;
     // Image data height
     var dataHeight = 0;
-    // Number of slices to load
-    var nSlicesToLoad = 0;
+    // Is the data mono-slice?
+    var isMonoSliceData = 0;
 
     // Default character set
     var defaultCharacterSet;
@@ -159,10 +159,10 @@ dwv.App = function ()
      */
     this.getImageData = function () { return imageData; };
     /**
-     * Get the number of slices to load.
-     * @return {Number} The number of slices to load.
+     * Is the data mono-slice?
+     * @return {Boolean} True if the data is mono-slice.
      */
-    this.getNSlicesToLoad = function () { return nSlicesToLoad; };
+    this.isMonoSliceData = function () { return isMonoSliceData; };
 
     /**
      * Get the main scale.
@@ -423,7 +423,7 @@ dwv.App = function ()
         // clear objects
         image = null;
         view = null;
-        nSlicesToLoad = 0;
+        isMonoSliceData = false;
         // reset undo/redo
         if ( undoStack ) {
             undoStack = new dwv.tool.UndoStack(this);
@@ -569,7 +569,7 @@ dwv.App = function ()
     {
         // clear variables
         self.reset();
-        nSlicesToLoad = data.length;
+        isMonoSliceData = (data.length === 1);
         // set IO
         loader.setDefaultCharacterSet(defaultCharacterSet);
         loader.onload = function (data) {
@@ -22311,7 +22311,7 @@ dwv.tool.Scroll = function(app)
      * Initialise the tool.
      */
     this.init = function() {
-        if ( app.getNSlicesToLoad() === 1 && app.getImage().getNumberOfFrames() === 1 ) {
+        if ( app.isMonoSliceData() && app.getImage().getNumberOfFrames() === 1 ) {
             return false;
         }
         return true;
