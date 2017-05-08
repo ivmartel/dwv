@@ -1,6 +1,8 @@
 // namespaces
 var dwv = dwv || {};
 dwv.io = dwv.io || {};
+// external
+var JSZip = JSZip || {};
 
 /**
  * ZIP data loader.

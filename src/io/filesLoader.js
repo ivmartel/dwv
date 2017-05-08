@@ -17,7 +17,7 @@ dwv.io.fileContentTypes = {
 dwv.io.FilesLoader = function ()
 {
     /**
-     * CLosure to self.
+     * Closure to self.
      * @private
      * @type Object
      */

@@ -16,7 +16,7 @@ dwv.io.urlContentTypes = {
 dwv.io.UrlsLoader = function ()
 {
     /**
-     * CLosure to self.
+     * Closure to self.
      * @private
      * @type Object
      */

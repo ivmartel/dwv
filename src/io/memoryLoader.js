@@ -9,7 +9,7 @@ dwv.io = dwv.io || {};
 dwv.io.MemoryLoader = function ()
 {
     /**
-     * CLosure to self.
+     * Closure to self.
      * @private
      * @type Object
      */
