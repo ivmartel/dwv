@@ -279,16 +279,20 @@ function getLastOfPath(object, path, Empty) {
     return key && key.indexOf('###') > -1 ? key.replace(/###/g, '.') : key;
   }
 
+  function canNotTraverseDeeper() {
+    return !object || typeof object === 'string';
+  }
+
   var stack = typeof path !== 'string' ? [].concat(path) : path.split('.');
   while (stack.length > 1) {
-    if (!object) return {};
+    if (canNotTraverseDeeper()) return {};
 
     var key = cleanKey(stack.shift());
     if (!object[key] && Empty) object[key] = new Empty();
     object = object[key];
   }
 
-  if (!object) return {};
+  if (canNotTraverseDeeper()) return {};
   return {
     obj: object,
     k: cleanKey(stack.shift())
@@ -752,7 +756,9 @@ var Translator = function (_EventEmitter) {
         var copy$$1 = resType === '[object Array]' ? [] : {}; // apply child translation on a copy
 
         for (var m in res) {
-          copy$$1[m] = this.translate('' + key + keySeparator + m, _extends({}, options, { joinArrays: false, ns: namespaces }));
+          if (res.hasOwnProperty(m)) {
+            copy$$1[m] = this.translate('' + key + keySeparator + m, _extends({}, options, { joinArrays: false, ns: namespaces }));
+          }
         }
         res = copy$$1;
       }
@@ -984,11 +990,11 @@ var LanguageUtil = function () {
     }
   };
 
-  LanguageUtil.prototype.isWhitelisted = function isWhitelisted(code, exactMatch) {
-    if (this.options.load === 'languageOnly' || this.options.nonExplicitWhitelist && !exactMatch) {
+  LanguageUtil.prototype.isWhitelisted = function isWhitelisted(code) {
+    if (this.options.load === 'languageOnly' || this.options.nonExplicitWhitelist) {
       code = this.getLanguagePartFromCode(code);
     }
-    return !this.whitelist || !this.whitelist.length || this.whitelist.indexOf(code) > -1 ? true : false;
+    return !this.whitelist || !this.whitelist.length || this.whitelist.indexOf(code) > -1;
   };
 
   LanguageUtil.prototype.getFallbackCodes = function getFallbackCodes(fallbacks, code) {
@@ -1014,10 +1020,8 @@ var LanguageUtil = function () {
 
     var codes = [];
     var addCode = function addCode(code) {
-      var exactMatch = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
       if (!code) return;
-      if (_this.isWhitelisted(code, exactMatch)) {
+      if (_this.isWhitelisted(code)) {
         codes.push(code);
       } else {
         _this.logger.warn('rejecting non-whitelisted language code: ' + code);
@@ -1025,8 +1029,8 @@ var LanguageUtil = function () {
     };
 
     if (typeof code === 'string' && code.indexOf('-') > -1) {
-      if (this.options.load !== 'languageOnly') addCode(this.formatLanguageCode(code), true);
-      if (this.options.load !== 'languageOnly' && this.options.load !== 'currentOnly') addCode(this.getScriptPartFromCode(code), true);
+      if (this.options.load !== 'languageOnly') addCode(this.formatLanguageCode(code));
+      if (this.options.load !== 'languageOnly' && this.options.load !== 'currentOnly') addCode(this.getScriptPartFromCode(code));
       if (this.options.load !== 'currentOnly') addCode(this.getLanguagePartFromCode(code));
     } else if (typeof code === 'string') {
       addCode(this.formatLanguageCode(code));
@@ -1166,7 +1170,7 @@ var PluralResolver = function () {
       var suffix = rule.numbers[idx];
 
       // special treatment for lngs only having singular and plural
-      if (rule.numbers.length === 2 && rule.numbers[0] === 1) {
+      if (this.options.simplifyPluralSuffix && rule.numbers.length === 2 && rule.numbers[0] === 1) {
         if (suffix === 2) {
           suffix = 'plural';
         } else if (suffix === 1) {
@@ -1697,6 +1701,7 @@ function get$1() {
     load: 'all', // | currentOnly | languageOnly
     preload: false, // array with preload languages
 
+    simplifyPluralSuffix: true,
     keySeparator: '.',
     nsSeparator: ':',
     pluralSeparator: '_',
@@ -1770,7 +1775,15 @@ var I18n = function (_EventEmitter) {
     _this.logger = baseLogger;
     _this.modules = { external: [] };
 
-    if (callback && !_this.isInitialized && !options.isClone) _this.init(options, callback);
+    if (callback && !_this.isInitialized && !options.isClone) {
+      var _ret;
+
+      // https://github.com/i18next/i18next/issues/879
+      if (!_this.options.initImmediate) return _ret = _this.init(options, callback), possibleConstructorReturn(_this, _ret);
+      setTimeout(function () {
+        _this.init(options, callback);
+      }, 0);
+    }
     return _this;
   }
 
@@ -1816,7 +1829,7 @@ var I18n = function (_EventEmitter) {
         s.cacheConnector.save();
       });
       s.languageUtils = lu;
-      s.pluralResolver = new PluralResolver(lu, { prepend: this.options.pluralSeparator, compatibilityJSON: this.options.compatibilityJSON });
+      s.pluralResolver = new PluralResolver(lu, { prepend: this.options.pluralSeparator, compatibilityJSON: this.options.compatibilityJSON, simplifyPluralSuffix: this.options.simplifyPluralSuffix });
       s.interpolator = new Interpolator(this.options);
 
       s.backendConnector = new Connector(createClassOnDemand(this.modules.backend), s.resourceStore, s, this.options);
@@ -1911,11 +1924,19 @@ var I18n = function (_EventEmitter) {
         });
       };
 
-      append(this.language);
+      if (!this.language) {
+        // at least load fallbacks in this case
+        var fallbacks = this.services.languageUtils.getFallbackCodes(this.options.fallbackLng);
+        fallbacks.forEach(function (l) {
+          return append(l);
+        });
+      } else {
+        append(this.language);
+      }
 
       if (this.options.preload) {
         this.options.preload.forEach(function (l) {
-          append(l);
+          return append(l);
         });
       }
 
