@@ -102,8 +102,9 @@ dwv.image.getViewFromDOMImage = function (image)
  * @param {Object} video The DOM Video.
  * @param {Object} callback The function to call once the data is loaded.
  * @param {Object} cbprogress The function to call to report progress.
+ * @param {Number} dataindex The data index.
  */
-dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress)
+dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, dataIndex)
 {
     // video size
     var width = video.videoWidth;
@@ -143,8 +144,12 @@ dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress)
     // draw the context and store it as a frame
     function storeFrame() {
         // send progress
-        cbprogress({type: event.type, lengthComputable: true,
-            loaded: frameIndex, total: numberOfFrames});
+        var evprog = {'type': event.type, 'lengthComputable': true,
+            'loaded': frameIndex, 'total': numberOfFrames};
+        if (typeof dataIndex !== "undefined") {
+            evprog.index = dataIndex;
+        }
+        cbprogress(evprog);
         // draw image
         ctx.drawImage(video, 0, 0);
         // context to image buffer
@@ -180,155 +185,4 @@ dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress)
 
     // trigger the first seeked
     video.currentTime = 0;
-};
-
-/**
- * Create a dwv.image.View from a DICOM buffer.
- * @constructor
- */
-dwv.image.DicomBufferToView = function ()
-{
-    // closure to self
-    var self = this;
-
-    /**
-     * The default character set (optional).
-     * @private
-     * @type String
-     */
-    var defaultCharacterSet;
-
-    /**
-     * Set the default character set.
-     * param {String} The character set.
-     */
-    this.setDefaultCharacterSet = function (characterSet) {
-        defaultCharacterSet = characterSet;
-    };
-
-    /**
-     * Pixel buffer decoder.
-     * Define only once to allow optional asynchronous mode.
-     * @private
-     * @type Object
-     */
-    var pixelDecoder = null;
-
-    /**
-     * Get data from an input buffer using a DICOM parser.
-     * @param {Array} buffer The input data buffer.
-     * @param {Object} callback The callback on the conversion.
-     */
-    this.convert = function (buffer, callback)
-    {
-        // DICOM parser
-        var dicomParser = new dwv.dicom.DicomParser();
-        dicomParser.setDefaultCharacterSet(defaultCharacterSet);
-        // parse the buffer
-        dicomParser.parse(buffer);
-
-        var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
-        var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
-        var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
-        var needDecompression = (algoName !== null);
-
-        // worker callback
-        var onDecodedFirstFrame = function (/*event*/) {
-            // create the image
-            var imageFactory = new dwv.image.ImageFactory();
-            var image = imageFactory.create( dicomParser.getDicomElements(), pixelBuffer );
-            // create the view
-            var viewFactory = new dwv.image.ViewFactory();
-            var view = viewFactory.create( dicomParser.getDicomElements(), image );
-            // return
-            callback({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
-        };
-
-        if ( needDecompression ) {
-            var bitsAllocated = dicomParser.getRawDicomElements().x00280100.value[0];
-            var pixelRepresentation = dicomParser.getRawDicomElements().x00280103.value[0];
-            var isSigned = (pixelRepresentation === 1);
-            var nFrames = pixelBuffer.length;
-
-            if (!pixelDecoder){
-                pixelDecoder = new dwv.image.PixelBufferDecoder(algoName);
-            }
-
-            // loadend event
-            pixelDecoder.ondecodeend = function () {
-                self.onloadend();
-            };
-
-            // send an onload event for mono frame
-            if ( nFrames === 1 ) {
-                pixelDecoder.ondecoded = function () {
-                    self.onload();
-                };
-            }
-
-            // decoder callback
-            var countDecodedFrames = 0;
-            var onDecodedFrame = function (frame) {
-                return function (event) {
-                    // send progress
-                    ++countDecodedFrames;
-                    var ev = {type: "read-progress", lengthComputable: true,
-                        loaded: (countDecodedFrames * 100 / nFrames), total: 100};
-                    self.onprogress(ev);
-                    // store data
-                    pixelBuffer[frame] = event.data[0];
-                    // create image for first frame
-                    if ( frame === 0 ) {
-                        onDecodedFirstFrame();
-                    }
-                };
-            };
-
-            // decompress synchronously the first frame to create the image
-            pixelDecoder.decode(pixelBuffer[0],
-                bitsAllocated, isSigned, onDecodedFrame(0), false);
-
-            // decompress the possible other frames
-            if ( nFrames !== 1 ) {
-                // decode (asynchronously if possible)
-                for (var f = 1; f < nFrames; ++f) {
-                    pixelDecoder.decode(pixelBuffer[f],
-                        bitsAllocated, isSigned, onDecodedFrame(f));
-                }
-            }
-        }
-        // no decompression
-        else {
-            // send progress
-            self.onprogress({type: "read-progress", lengthComputable: true,
-                loaded: 100, total: 100});
-            // create image
-            onDecodedFirstFrame();
-            // send load events
-            self.onload();
-            self.onloadend();
-        }
-    };
-};
-
-/**
- * Handle a load end event.
- */
-dwv.image.DicomBufferToView.prototype.onloadend = function ()
-{
-    // default does nothing.
-};
-/**
- * Handle a load event.
- */
-dwv.image.DicomBufferToView.prototype.onload = function ()
-{
-    // default does nothing.
-};
-/**
- * Handle a load progress event.
- */
-dwv.image.DicomBufferToView.prototype.onprogress = function ()
-{
-    // default does nothing.
 };

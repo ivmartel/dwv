@@ -226,7 +226,7 @@ dwv.tool.Scroll = function(app)
      * Initialise the tool.
      */
     this.init = function() {
-        if ( app.getNSlicesToLoad() === 1 && app.getImage().getNumberOfFrames() === 1 ) {
+        if ( app.isMonoSliceData() && app.getImage().getNumberOfFrames() === 1 ) {
             return false;
         }
         return true;

@@ -20,8 +20,8 @@ dwv.App = function ()
     var dataWidth = 0;
     // Image data height
     var dataHeight = 0;
-    // Number of slices to load
-    var nSlicesToLoad = 0;
+    // Is the data mono-slice?
+    var isMonoSliceData = 0;
 
     // Default character set
     var defaultCharacterSet;
@@ -107,10 +107,10 @@ dwv.App = function ()
      */
     this.getImageData = function () { return imageData; };
     /**
-     * Get the number of slices to load.
-     * @return {Number} The number of slices to load.
+     * Is the data mono-slice?
+     * @return {Boolean} True if the data is mono-slice.
      */
-    this.getNSlicesToLoad = function () { return nSlicesToLoad; };
+    this.isMonoSliceData = function () { return isMonoSliceData; };
 
     /**
      * Get the main scale.
@@ -371,7 +371,7 @@ dwv.App = function ()
         // clear objects
         image = null;
         view = null;
-        nSlicesToLoad = 0;
+        isMonoSliceData = false;
         // reset undo/redo
         if ( undoStack ) {
             undoStack = new dwv.tool.UndoStack(this);
@@ -449,34 +449,10 @@ dwv.App = function ()
      */
     function loadImageFiles(files)
     {
-        // clear variables
-        self.reset();
-        nSlicesToLoad = files.length;
         // create IO
-        var fileIO = new dwv.io.File();
-        fileIO.setDefaultCharacterSet(defaultCharacterSet);
-        fileIO.onload = function (data) {
-            if ( image ) {
-                view.append( data.view );
-                if ( drawController ) {
-                    drawController.appendDrawLayer(image.getNumberOfFrames());
-                }
-            }
-            postLoadInit(data);
-        };
-        fileIO.onerror = function (error) { handleError(error); };
-        fileIO.onloadend = function (/*event*/) {
-            if ( drawController ) {
-                drawController.activateDrawLayer(viewController);
-            }
-            fireEvent({type: "load-progress", lengthComputable: true,
-                loaded: 100, total: 100});
-            fireEvent({ 'type': 'load-end' });
-        };
-        fileIO.onprogress = onLoadProgress;
-        // main load (asynchronous)
-        fireEvent({ 'type': 'load-start' });
-        fileIO.load(files);
+        var fileIO = new dwv.io.FilesLoader();
+        // load data
+        loadImageData(files, fileIO);
     }
 
     /**
@@ -487,7 +463,7 @@ dwv.App = function ()
     function loadStateFile(file)
     {
         // create IO
-        var fileIO = new dwv.io.File();
+        var fileIO = new dwv.io.FilesLoader();
         fileIO.onload = function (data) {
             // load state
             var state = new dwv.State(self);
@@ -523,13 +499,39 @@ dwv.App = function ()
      */
     function loadImageUrls(urls, requestHeaders)
     {
+        // create IO
+        var urlIO = new dwv.io.UrlsLoader();
+        // create options
+        var options = {'requestHeaders': requestHeaders};
+        // load data
+        loadImageData(urls, urlIO, options);
+    }
+
+    /**
+     * Load a list of image URLs.
+     * @private
+     * @param {Array} data Array of data to load.
+     * @param {Object} loader The data loader.
+     * @param {Object} options Options passed to the final loader.
+     */
+    function loadImageData(data, loader, options)
+    {
         // clear variables
         self.reset();
-        nSlicesToLoad = urls.length;
-        // create IO
-        var urlIO = new dwv.io.Url();
-        urlIO.setDefaultCharacterSet(defaultCharacterSet);
-        urlIO.onload = function (data) {
+        // first data name
+        var firstName = "";
+        if (typeof data[0].name !== "undefined") {
+            firstName = data[0].name;
+        } else {
+            firstName = data[0];
+        }
+        // flag used by scroll to decide wether to activate or not
+        // TODO: supposing multi-slice for zip files, could not be...
+        isMonoSliceData = (data.length === 1 &&
+            firstName.split('.').pop().toLowerCase() !== "zip");
+        // set IO
+        loader.setDefaultCharacterSet(defaultCharacterSet);
+        loader.onload = function (data) {
             if ( image ) {
                 view.append( data.view );
                 if ( drawController ) {
@@ -538,8 +540,8 @@ dwv.App = function ()
             }
             postLoadInit(data);
         };
-        urlIO.onerror = function (error) { handleError(error); };
-        urlIO.onloadend = function (/*event*/) {
+        loader.onerror = function (error) { handleError(error); };
+        loader.onloadend = function (/*event*/) {
             if ( drawController ) {
                 drawController.activateDrawLayer(viewController);
             }
@@ -547,12 +549,11 @@ dwv.App = function ()
                 loaded: 100, total: 100});
             fireEvent({ 'type': 'load-end' });
         };
-        urlIO.onprogress = onLoadProgress;
+        loader.onprogress = onLoadProgress;
         // main load (asynchronous)
         fireEvent({ 'type': 'load-start' });
-        urlIO.load(urls, requestHeaders);
+        loader.load(data, options);
     }
-
     /**
      * Load a State url.
      * @private
