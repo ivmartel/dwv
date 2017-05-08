@@ -44,13 +44,13 @@ dwv.io.ZipLoader = function ()
     		zobjs[num].async("arrayBuffer").then(zipAsyncCallback);
     	}
     	else {
-            var memory = new dwv.io.Memory();
-            memory.onload = self.onload;
-            memory.onloadend = self.addLoaded;
-            memory.onerror = self.onerror;
-            memory.onprogress = self.onprogress;
+            var memoryIO = new dwv.io.MemoryLoader();
+            memoryIO.onload = self.onload;
+            memoryIO.onloadend = self.addLoaded;
+            memoryIO.onerror = self.onerror;
+            memoryIO.onprogress = self.onprogress;
 
-            memory.load(files);
+            memoryIO.load(files);
         }
     }
 

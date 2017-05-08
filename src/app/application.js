@@ -450,7 +450,7 @@ dwv.App = function ()
     function loadImageFiles(files)
     {
         // create IO
-        var fileIO = new dwv.io.File();
+        var fileIO = new dwv.io.FilesLoader();
         // load data
         loadImageData(files, fileIO);
     }
@@ -463,7 +463,7 @@ dwv.App = function ()
     function loadStateFile(file)
     {
         // create IO
-        var fileIO = new dwv.io.File();
+        var fileIO = new dwv.io.FilesLoader();
         fileIO.onload = function (data) {
             // load state
             var state = new dwv.State(self);
@@ -500,7 +500,7 @@ dwv.App = function ()
     function loadImageUrls(urls, requestHeaders)
     {
         // create IO
-        var urlIO = new dwv.io.Url();
+        var urlIO = new dwv.io.UrlsLoader();
         // create options
         var options = {'requestHeaders': requestHeaders};
         // load data
@@ -510,14 +510,25 @@ dwv.App = function ()
     /**
      * Load a list of image URLs.
      * @private
-     * @param {Array} urls The list of urls to load.
+     * @param {Array} data Array of data to load.
+     * @param {Object} loader The data loader.
      * @param {Object} options Options passed to the final loader.
      */
     function loadImageData(data, loader, options)
     {
         // clear variables
         self.reset();
-        isMonoSliceData = (data.length === 1);
+        // first data name
+        var firstName = "";
+        if (typeof data[0].name !== "undefined") {
+            firstName = data[0].name;
+        } else {
+            firstName = data[0];
+        }
+        // flag used by scroll to decide wether to activate or not
+        // TODO: supposing multi-slice for zip files, could not be...
+        isMonoSliceData = (data.length === 1 &&
+            firstName.split('.').pop().toLowerCase() !== "zip");
         // set IO
         loader.setDefaultCharacterSet(defaultCharacterSet);
         loader.onload = function (data) {
