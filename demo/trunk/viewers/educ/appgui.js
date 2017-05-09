@@ -21,7 +21,6 @@ dwv.gui.getWindowSize = function () {
 // Progress
 /* global NProgress */
 dwv.gui.displayProgress = function (percent) {
-    console.log(percent);
     NProgress.configure({ showSpinner: false });
     if( percent < 100 ) {
         NProgress.set(percent/100);
