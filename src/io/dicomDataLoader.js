@@ -118,7 +118,7 @@ dwv.io.DicomDataLoader.prototype.canLoadFile = function (file) {
     if (split.length !== 1) {
         ext = split.pop().toLowerCase();
     }
-    var hasExt = (ext.length === 3);
+    var hasExt = (ext.length !== 0);
     return !hasExt || (ext === "dcm");
 };
 
@@ -133,7 +133,7 @@ dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url) {
     if (split.length !== 1) {
         ext = split.pop().toLowerCase();
     }
-    var hasExt = (ext.length === 3);
+    var hasExt = (ext.length !== 0);
     return !hasExt || (ext === "dcm");
 };
 
