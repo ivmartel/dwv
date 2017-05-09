@@ -46,7 +46,7 @@ function startApp(caseNumber) {
         "fitToWindow": false,
         "gui": ["tool", "drawList"],
         "tools": ["Scroll", "ZoomAndPan", "WindowLevel", "Draw"],
-        "shapes": ["Line", "Protractor", "Rectangle", "Roi", "Ellipse"],
+        "shapes": ["Ruler", "Protractor", "Rectangle", "Roi", "Ellipse"],
         "isMobile": true
     });
     dwv.gui.appendResetHtml(myapp);

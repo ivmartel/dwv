@@ -19,7 +19,17 @@ dwv.gui.getWindowSize = function () {
     return { 'width': ($(window).width()), 'height': ($(window).height() - 147) };
 };
 // Progress
-dwv.gui.displayProgress = dwv.gui.base.displayProgress;
+/* global NProgress */
+dwv.gui.displayProgress = function (percent) {
+    console.log(percent);
+    NProgress.configure({ showSpinner: false });
+    if( percent < 100 ) {
+        NProgress.set(percent/100);
+    }
+    else if( percent >= 100 ) {
+        NProgress.done();
+    }
+};
 // get element
 dwv.gui.getElement = dwv.gui.base.getElement;
 // Focus
@@ -236,7 +246,7 @@ dwv.gui.WindowLevel = function (app)
 
         // create preset select
         var select = dwv.html.createHtmlSelect("presetSelect",
-            app.getViewController().getPresets(), "wl.presets", true);
+            app.getViewController().getWindowLevelPresetsNames(), "wl.presets", true);
         select.onchange = app.onChangeWindowLevelPreset;
         select.title = "Select w/l preset.";
         select.setAttribute("data-inline","true");
