@@ -464,14 +464,8 @@ dwv.App = function ()
     {
         // create IO
         var fileIO = new dwv.io.FilesLoader();
-        fileIO.onload = function (data) {
-            // load state
-            var state = new dwv.State(self);
-            state.fromJSON(data);
-        };
-        fileIO.onerror = function (error) { handleError(error); };
-        // main load (asynchronous)
-        fileIO.load([file]);
+        // load data
+        loadStateData([file], fileIO);
     }
 
     /**
@@ -508,7 +502,20 @@ dwv.App = function ()
     }
 
     /**
-     * Load a list of image URLs.
+     * Load a State url.
+     * @private
+     * @param {String} url The state url to load.
+     */
+    function loadStateUrl(url)
+    {
+        // create IO
+        var urlIO = new dwv.io.UrlsLoader();
+        // load data
+        loadStateData([url], urlIO);
+    }
+
+    /**
+     * Load a list of image data.
      * @private
      * @param {Array} data Array of data to load.
      * @param {Object} loader The data loader.
@@ -554,23 +561,24 @@ dwv.App = function ()
         fireEvent({ 'type': 'load-start' });
         loader.load(data, options);
     }
+
     /**
-     * Load a State url.
+     * Load a State data.
      * @private
-     * @param {String} url The state url to load.
+     * @param {Array} data Array of data to load.
+     * @param {Object} loader The data loader.
      */
-    function loadStateUrl(url)
+    function loadStateData(data, loader)
     {
-        // create IO
-        var urlIO = new dwv.io.Url();
-        urlIO.onload = function (data) {
+        // set IO
+        loader.onload = function (data) {
             // load state
             var state = new dwv.State(self);
             state.fromJSON(data);
         };
-        urlIO.onerror = function (error) { handleError(error); };
+        loader.onerror = function (error) { handleError(error); };
         // main load (asynchronous)
-        urlIO.load([url]);
+        loader.load(data);
     }
 
     /**
