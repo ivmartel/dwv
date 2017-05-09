@@ -478,7 +478,7 @@ dwv.App = function ()
         // has been checked for emptiness.
         var ext = urls[0].split('.').pop().toLowerCase();
         if ( ext === "json" ) {
-            loadStateUrl(urls[0]);
+            loadStateUrl(urls[0], requestHeaders);
         }
         else {
             loadImageUrls(urls, requestHeaders);
@@ -505,13 +505,16 @@ dwv.App = function ()
      * Load a State url.
      * @private
      * @param {String} url The state url to load.
+     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
      */
-    function loadStateUrl(url)
+    function loadStateUrl(url, requestHeaders)
     {
         // create IO
         var urlIO = new dwv.io.UrlsLoader();
+        // create options
+        var options = {'requestHeaders': requestHeaders};
         // load data
-        loadStateData([url], urlIO);
+        loadStateData([url], urlIO, options);
     }
 
     /**
@@ -567,8 +570,9 @@ dwv.App = function ()
      * @private
      * @param {Array} data Array of data to load.
      * @param {Object} loader The data loader.
+     * @param {Object} options Options passed to the final loader.
      */
-    function loadStateData(data, loader)
+    function loadStateData(data, loader, options)
     {
         // set IO
         loader.onload = function (data) {
@@ -578,7 +582,7 @@ dwv.App = function ()
         };
         loader.onerror = function (error) { handleError(error); };
         // main load (asynchronous)
-        loader.load(data);
+        loader.load(data, options);
     }
 
     /**
