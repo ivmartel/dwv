@@ -60,8 +60,9 @@ function startApp(caseNumber) {
             rootDir+"/case"+caseNumber+"/data-4.dcm",
             rootDir+"/case"+caseNumber+"/data-5.dcm"
         ]);
-    }
-    else {
+    } else if (caseNumber === 3) {
+        myapp.loadURLs([rootDir+"/case"+caseNumber+"/data.mp4"]);
+    } else {
         myapp.loadURLs([rootDir+"/case"+caseNumber+"/data.dcm"]);
     }
 
@@ -72,12 +73,14 @@ function startApp(caseNumber) {
     // listen to load-end
     //myapp.addEventListener("load-end", listener);
 
-    var listener = function (event) {
-        if (event.loaded === 100) {
-            myapp.loadURLs([rootDir+"/case"+caseNumber+"/state.json"]);
-        }
-    };
-    myapp.addEventListener("load-progress", listener);
+    if (caseNumber !== 3) {
+        var listener = function (event) {
+            if (event.loaded === 100) {
+                myapp.loadURLs([rootDir+"/case"+caseNumber+"/state.json"]);
+            }
+        };
+        myapp.addEventListener("load-progress", listener);
+    }
 
 }
 
