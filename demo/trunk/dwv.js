@@ -15388,7 +15388,10 @@ dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url) {
         ext = split.pop().toLowerCase();
     }
     var hasExt = (ext.length !== 0);
-    return !hasExt || (ext === "dcm");
+    // wado url
+    var isDicomContentType = (url.indexOf("contentType=application/dicom") !== -1);
+
+    return isDicomContentType || (ext === "dcm") || !hasExt;
 };
 
 /**
@@ -16075,8 +16078,14 @@ dwv.io.RawImageLoader.prototype.canLoadFile = function (file) {
  */
 dwv.io.RawImageLoader.prototype.canLoadUrl = function (url) {
     var ext = url.split('.').pop().toLowerCase();
-    return (ext === "jpeg") || (ext === "jpg") ||
+    var hasImageExt = (ext === "jpeg") || (ext === "jpg") ||
             (ext === "png") || (ext === "gif");
+    // wado url
+    var isImageContentType = (url.indexOf("contentType=image/jpeg") !== -1) ||
+        (url.indexOf("contentType=image/png") !== -1) ||
+        (url.indexOf("contentType=image/gif") !== -1);
+
+    return isImageContentType || hasImageExt;
 };
 
 /**
@@ -23780,7 +23789,7 @@ dwv.utils.decodeManifestQuery = function (query, callback)
 
     var request = new XMLHttpRequest();
     request.open('GET', decodeURIComponent(uri), true);
-    request.responseType = "xml";
+    request.responseType = "document";
     request.onload = onLoad;
     request.onerror = onError;
     request.send(null);
