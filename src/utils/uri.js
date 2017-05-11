@@ -193,7 +193,7 @@ dwv.utils.decodeManifestQuery = function (query, callback)
 
     var request = new XMLHttpRequest();
     request.open('GET', decodeURIComponent(uri), true);
-    request.responseType = "xml";
+    request.responseType = "document";
     request.onload = onLoad;
     request.onerror = onError;
     request.send(null);
