@@ -134,7 +134,10 @@ dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url) {
         ext = split.pop().toLowerCase();
     }
     var hasExt = (ext.length !== 0);
-    return !hasExt || (ext === "dcm");
+    // wado url
+    var isDicomContentType = (url.indexOf("contentType=application/dicom") !== -1);
+
+    return isDicomContentType || (ext === "dcm") || !hasExt;
 };
 
 /**

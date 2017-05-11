@@ -138,8 +138,14 @@ dwv.io.RawImageLoader.prototype.canLoadFile = function (file) {
  */
 dwv.io.RawImageLoader.prototype.canLoadUrl = function (url) {
     var ext = url.split('.').pop().toLowerCase();
-    return (ext === "jpeg") || (ext === "jpg") ||
+    var hasImageExt = (ext === "jpeg") || (ext === "jpg") ||
             (ext === "png") || (ext === "gif");
+    // wado url
+    var isImageContentType = (url.indexOf("contentType=image/jpeg") !== -1) ||
+        (url.indexOf("contentType=image/png") !== -1) ||
+        (url.indexOf("contentType=image/gif") !== -1);
+
+    return isImageContentType || hasImageExt;
 };
 
 /**
