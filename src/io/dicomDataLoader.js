@@ -133,7 +133,7 @@ dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url) {
     if (split.length !== 1) {
         ext = split.pop().toLowerCase();
     }
-    var hasExt = (ext.length !== 0);
+    var hasExt = (ext.length !== 0) && (ext.length < 5);
     // wado url
     var isDicomContentType = (url.indexOf("contentType=application/dicom") !== -1);
 
