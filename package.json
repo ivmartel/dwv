@@ -24,7 +24,7 @@
     "grunt-qunit-istanbul": "~1.0.0",
     "grunt-coveralls": "~1.0",
     "grunt-contrib-concat": "~1.0",
-    "grunt-contrib-uglify": "~2.3.0",
+    "grunt-contrib-uglify": "~3.0.0",
     "grunt-jsdoc": "~2.1",
     "ink-docstrap": "~1.3"
   },
