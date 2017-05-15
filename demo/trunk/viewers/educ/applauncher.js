@@ -73,14 +73,12 @@ function startApp(caseNumber) {
     // listen to load-end
     //myapp.addEventListener("load-end", listener);
 
-    if (caseNumber !== 3) {
-        var listener = function (event) {
-            if (event.loaded === 100) {
-                myapp.loadURLs([rootDir+"/case"+caseNumber+"/state.json"]);
-            }
-        };
-        myapp.addEventListener("load-progress", listener);
-    }
+    var listener = function (event) {
+        if (event.loaded === 100) {
+            myapp.loadURLs([rootDir+"/case"+caseNumber+"/state.json"]);
+        }
+    };
+    myapp.addEventListener("load-progress", listener);
 
 }
 
