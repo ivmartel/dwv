@@ -12415,7 +12415,7 @@ dwv.image.DicomBufferToView = function ()
                 return function (event) {
                     // send progress
                     ++countDecodedFrames;
-                    var ev = {'type': "read-progress", 'lengthComputable': true,
+                    var ev = {'type': "load-progress", 'lengthComputable': true,
                         'loaded': (countDecodedFrames * 100 / nFrames), 'total': 100};
                     if ( typeof dataIndex !== "undefined") {
                         ev.index = dataIndex;
@@ -12446,7 +12446,7 @@ dwv.image.DicomBufferToView = function ()
         // no decompression
         else {
             // send progress
-            var evnodec = {'type': 'read-progress', 'lengthComputable': true,
+            var evnodec = {'type': 'load-progress', 'lengthComputable': true,
                 'loaded': 100, 'total': 100};
             if ( typeof dataIndex !== "undefined") {
                 evnodec.index = dataIndex;
@@ -12626,7 +12626,7 @@ dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, dataIndex
     // draw the context and store it as a frame
     function storeFrame() {
         // send progress
-        var evprog = {'type': event.type, 'lengthComputable': true,
+        var evprog = {'type': 'load-progress', 'lengthComputable': true,
             'loaded': frameIndex, 'total': numberOfFrames};
         if (typeof dataIndex !== "undefined") {
             evprog.index = dataIndex;
@@ -12649,7 +12649,7 @@ dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, dataIndex
     }
 
     // handle seeked event
-    function onseeked() {
+    function onseeked(/*event*/) {
         // store
         storeFrame();
         // increment index
