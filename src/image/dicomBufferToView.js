@@ -92,7 +92,7 @@ dwv.image.DicomBufferToView = function ()
                 return function (event) {
                     // send progress
                     ++countDecodedFrames;
-                    var ev = {'type': "read-progress", 'lengthComputable': true,
+                    var ev = {'type': "load-progress", 'lengthComputable': true,
                         'loaded': (countDecodedFrames * 100 / nFrames), 'total': 100};
                     if ( typeof dataIndex !== "undefined") {
                         ev.index = dataIndex;
@@ -123,7 +123,7 @@ dwv.image.DicomBufferToView = function ()
         // no decompression
         else {
             // send progress
-            var evnodec = {'type': 'read-progress', 'lengthComputable': true,
+            var evnodec = {'type': 'load-progress', 'lengthComputable': true,
                 'loaded': 100, 'total': 100};
             if ( typeof dataIndex !== "undefined") {
                 evnodec.index = dataIndex;

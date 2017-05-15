@@ -144,7 +144,7 @@ dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, dataIndex
     // draw the context and store it as a frame
     function storeFrame() {
         // send progress
-        var evprog = {'type': event.type, 'lengthComputable': true,
+        var evprog = {'type': 'load-progress', 'lengthComputable': true,
             'loaded': frameIndex, 'total': numberOfFrames};
         if (typeof dataIndex !== "undefined") {
             evprog.index = dataIndex;
@@ -167,7 +167,7 @@ dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, dataIndex
     }
 
     // handle seeked event
-    function onseeked() {
+    function onseeked(/*event*/) {
         // store
         storeFrame();
         // increment index
