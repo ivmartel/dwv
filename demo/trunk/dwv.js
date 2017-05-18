@@ -14677,6 +14677,7 @@ dwv.image.View = function (image)
         var wlut = windowLuts[ rsi.toString() ];
         // special case for 'perslice' presets
         if (currentPresetName &&
+            typeof windowPresets[currentPresetName] !== "undefined" &&
             typeof windowPresets[currentPresetName].perslice !== "undefined" &&
             windowPresets[currentPresetName].perslice === true ) {
             // get the preset for this slice
@@ -14887,12 +14888,20 @@ dwv.image.View = function (image)
      * Set the view window/level.
      * @param {Number} center The window center.
      * @param {Number} width The window width.
+     * @param {String} name Associated preset name, defaults to 'manual'.
      * Warning: uses the latest set rescale LUT or the default linear one.
      */
-    this.setWindowLevel = function ( center, width )
+    this.setWindowLevel = function ( center, width, name )
     {
         // window width shall be >= 1 (see https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
         if ( width >= 1 ) {
+
+            if ( typeof name === "undefined" ) {
+                name = "manual";
+            }
+            // update current preset name
+            currentPresetName = name;
+
             var wl = new dwv.image.WindowLevel(center, width);
             var keys = Object.keys(windowLuts);
 
@@ -14929,14 +14938,13 @@ dwv.image.View = function (image)
         if (name === "minmax" && typeof preset.wl === "undefined") {
             preset.wl = this.getWindowLevelMinMax();
         }
-        // update member preset name
-        currentPresetName = name;
         // special 'perslice' case
         if (typeof preset.perslice !== "undefined" &&
             preset.perslice === true) {
             preset = { "wl": preset.wl[this.getCurrentPosition().k] };
         }
-        this.setWindowLevel( preset.wl.getCenter(), preset.wl.getWidth() );
+        // set w/l
+        this.setWindowLevel( preset.wl.getCenter(), preset.wl.getWidth(), name );
     };
 
     /**
@@ -15003,7 +15011,7 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
     // calculate center and width
     var wl = this.getWindowLevelMinMax();
     // set window level
-    this.setWindowLevel(wl.getCenter(), wl.getWidth());
+    this.setWindowLevel(wl.getCenter(), wl.getWidth(), "minmax");
 };
 
 /**
