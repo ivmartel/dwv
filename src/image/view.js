@@ -786,6 +786,10 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
         }
     }
 
+	// DICOM headres to be shown at each corder
+	image.headers = [];
+	image.headers[0] = dwv.gui.info.createHeaders(dicomElements, image);
+
     // min/max
     // Not filled yet since it is stil too costly to calculate min/max
     // for each slice... It will be filled at first use (see view.setWindowLevelPreset).
@@ -808,3 +812,4 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
 
     return view;
 };
+

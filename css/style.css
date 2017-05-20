@@ -12,8 +12,19 @@ body { font-family: Verdana, Arial, Helvetica, sans-serif; }
 .infotr { position: absolute; top: 0; right: 0; text-align: right; }
 .infobl { position: absolute; bottom: 0; left: 0; text-align: left; }
 .infobr { position: absolute; bottom: 0; right: 0; text-align: right; }
-.plot { position: absolute; width: 100px; height: 50px; bottom: 15px; }
+
+.headertl { position: absolute; top: 0; left: 0; text-align: left; color: #0ff; font-size: 80%; }
+.headertc { position: absolute; top: 0; left: 50%; right: 50%; text-align: center; color: #ff0; font-size: 120%; }
+.headertr { position: absolute; top: 0; right: 0; text-align: right; color: #0ff; font-size: 80%; }
+.headercl { position: absolute; bottom: 50%; left: 0; text-align: left; color: #ff0; font-size: 120%; }
+.headercr { position: absolute; bottom: 50%; right: 2px; text-align: right; color: #ff0; font-size: 120%; }
+.headerbl { position: absolute; bottom: 0; left: 0; text-align: left; color: #0ff; font-size: 80%; }
+.headerbc { position: absolute; bottom: 0; left: 50%; right: 50%; text-align: center; color: #ff0; font-size: 120%; }
+.headerbr { position: absolute; bottom: 0; right: 0; text-align: right; color: #0ff; font-size: 80%; }
+
+.plot { position: absolute; width: 100px; height: 50px; bottom: 15px; right: 0; }
 .infoLayer ul { margin: 0; padding: 2px; list-style-type: none; }
+.infoLayer li { margin-top: 0px; }
 .infoLayer canvas { margin: 0; padding: 2px; }
 
 /* Tag list */

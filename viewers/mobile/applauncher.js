@@ -82,3 +82,8 @@ dwv.i18nOnLoaded( function () {
     i18nLoaded = true;
     launchApp();
 });
+
+// load headers map info
+$.getJSON("../../resources/headers.json", function(data){
+	dwv.gui.info.headerMaps = data;
+});

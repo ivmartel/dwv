@@ -269,3 +269,263 @@ dwv.gui.info.Plot = function (div, app)
     };
 
 }; // class dwv.gui.info.Plot
+
+/**
+ * DICOM Header info layer.
+ * @constructor
+ * @param {Object} div The HTML element to add Header info to.
+ * @param {String} pos The string to specify the corner position. (tl,tc,tr,cl,cr,bl,bc,br)
+ */
+dwv.gui.info.Header = function ( div, pos, app )
+{
+    /**
+     * Create the header info div.
+     */
+    this.create = function ()
+    {
+    };
+
+    /**
+     * Update the header info div.
+     * @param {Object} event some change event
+     */
+    this.update = function (event)
+    {
+		// remove all <ul> elements from div
+		var ulname = "header" + pos + "-ul";
+		var elems = div.getElementsByClassName(ulname);
+		if (elems == null)
+			return;
+
+		if ( elems.length !== 0 ) {
+			while(elems.length > 0 ) {
+				dwv.html.removeNode(elems[0]);
+			}
+		}
+
+		var image = app.getImage();
+		if (image == null)
+			return;
+
+		// get headers string array of the current position
+		var posi = app.getViewController().getCurrentPosition();
+		var headers = image.headers[posi.k][pos];
+		if (headers == null)
+			return;
+
+		if (pos == "bc" || pos == "tc"){
+			div.textContent = headers[0];
+		}
+		else{
+			// create <ul> element
+			var ul = document.createElement("ul");
+			ul.className = ulname;
+
+			for (var n=0; headers[n]; n++){
+				var li;
+
+				switch(headers[n]){
+					// window level and width
+				case "window":
+					var win = app.getViewController().getWindowLevel();
+					li = document.createElement("li");
+					li.className = "header" + pos + "-li";
+					li.appendChild( document.createTextNode("WC=" + win.center) );
+					ul.appendChild(li);
+					
+					li = document.createElement("li");
+					li.className = pos + "-li";
+					li.appendChild( document.createTextNode("WW=" + win.width) );
+					ul.appendChild(li);
+					break;
+					// scale
+				case "zoom":
+					li = document.createElement("li");
+					li.className = pos + "-li";
+					var zoom = app.getImageLayer().getZoom();
+					li.appendChild( document.createTextNode( ("x" + zoom.x).substr(0,5) ) );
+					ul.appendChild(li);
+					break;
+				default:
+					li = document.createElement("li");
+					li.className = "header" + pos + "-li";
+					li.appendChild( document.createTextNode( headers[n]) );
+					ul.appendChild(li);
+					break;
+				}
+			}
+
+			// append <ul> element before color map
+			var cmap = div.getElementsByClassName("colour-map-info");
+			var plot = div.getElementsByClassName("plot");
+			if (cmap)
+				div.insertBefore(ul, cmap[0]);
+			else if (plot)
+				div.insertBefore(ul, plot[0]);
+			else
+				div.appendChild(ul);
+		}
+	}
+}; // class dwv.gui.info.Header
+
+/**
+ * Search DICOM dictionary entry
+ * @param {String} tag DICOM tag in xGGGGEEEE format.
+ * @return {Array} DICOM Dictionary entry
+ */
+function searchDictionary( tag )
+{
+	if (tag == null)
+		return null;
+
+	var group = "0" + tag.substr(0,5);
+	var elem  = "0x" + tag.substr(5,4);
+
+	var darray = dwv.dicom.dictionary[group];
+	if (darray == null)
+		return null;
+
+	return darray[elem];
+}
+
+/**
+ * Format DICOM date value to YYYY/MM/DD
+ * @param {String} value DICOM DA-type value
+ * @return {String} Formatted date value
+ * TODO: to be internationalized
+ */
+function formatDate( value )
+{
+	if (value == null || value.length < 8)
+		return "";
+
+	return value.substr(0,4) + "/" + value.substr(4,2) + "/" + value.substr(6,2);
+}
+
+/**
+ * Format DICOM time value to hh:mm:ss
+ * @param {String} value DICOM TM-type value
+ * @return {String} Formatted time value
+ * TODO: to be internationalized
+ */
+function formatTime( value )
+{
+	if (value == null || value.length < 6)
+		return "";
+
+	return value.substr(0,2) + ":" + value.substr(2,2) + ":" + value.substr(4,2);
+}
+
+/**
+ * Patient orientation in the reverse direction
+ */
+var rlabels = {
+	"L": "R",
+	"R": "L",
+	"A": "P",
+	"P": "A",
+	"H": "F",
+	"F": "H"
+};
+
+/**
+ * Get patient orientation label in the reverse direction
+ * @param {String} ori Patient Orientation value
+ * @return {String} Reverse Orientation Label
+ */
+function getReverseOrientation( ori )
+{
+	if (ori == null)
+		return "";
+
+	var rori = "";
+	for (var n=0; n<ori.length; n++){
+		var o = ori.substr(n,1);
+		var r = rlabels[o];
+		if (r)
+			rori += r;
+	}
+
+	return rori;
+}
+
+dwv.gui.info.headerMaps = {};
+
+/**
+ * Create header string array of the image in each corner
+ * @param {Object} dicomElements DICOM elements of the image
+ * @param {Object} image The image
+ * @aram  {String Array} Array of string to be shown in each corner
+ */
+dwv.gui.info.createHeaders = function (dicomElements, image)
+{
+	var headers = {};
+	var moda = dicomElements.getFromKey("x00080060");
+	if (moda == null){
+		return headers;
+	}
+
+	var maps = dwv.gui.info.headerMaps[moda];
+	if (maps == null){
+		maps = dwv.gui.info.headerMaps["*"];
+	}
+	if (maps == null)
+		return headers;
+
+	for (var n=0; maps[n]; n++){
+		var value = maps[n].value;
+		var tag = maps[n].tag;
+		var pos = maps[n].pos;
+		var app = maps[n].append;
+		var pre = maps[n].prefix;
+		var suf = maps[n].suffix;
+
+		if (value == null){
+			value = dicomElements.getFromKey(tag);
+			if (Array.isArray(value))
+				value = value[0];
+		}
+		if (value == null || value.length == 0){
+			continue;
+		}
+
+		var dict = searchDictionary(tag);
+		if (dict){
+			if (dict[0] == "DA"){
+				value = formatDate(value);
+			}
+			else if (dict[0] == "TM"){
+				value = formatTime(value);
+			}
+		}
+
+		if (suf != null){
+			value += suf;
+		}
+		if (pre != null){
+			value = pre + value;
+		}
+
+		if (headers[pos] == null){
+			headers[pos] = [];
+		}
+
+		if (app == "true"){
+			headers[pos][headers[pos].length-1] += value.trim();
+		}
+		else{
+			headers[pos].push(value.trim());
+		}
+	}
+
+	// (0020,0020) Patient Orientation
+	var	value = dicomElements.getFromKey("x00200020");
+	if (value){
+		headers["cr"] = [value[0].trim()];
+		headers["cl"] = [getReverseOrientation(value[0].trim())];
+		headers["bc"] = [value[1].trim()];
+		headers["tc"] = [getReverseOrientation(value[1].trim())];
+	}
+
+	return headers;
+}
