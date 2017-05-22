@@ -170,10 +170,11 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
                 // set reader callbacks
                 request.onload = loader.getUrlLoadHandler(url, i);
                 request.onerror = loader.getErrorHandler(url);
-                // read
+                // response type (default is 'text')
                 if (loader.loadUrlAs() === dwv.io.urlContentTypes.ArrayBuffer) {
                     request.responseType = "arraybuffer";
                 }
+                // read
                 request.send(null);
                 // next file
                 break;
