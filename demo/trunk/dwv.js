@@ -4,6 +4,7 @@
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define([
+            'modernizr',
             'i18next',
             'i18nextXHRBackend',
             'i18nextBrowserLanguageDetector',
@@ -20,6 +21,7 @@
         // MagicWand: no package -> deactivated
 
         module.exports = factory(
+            require('modernizr'),
             require('i18next'),
             require('i18next-xhr-backend'),
             require('i18next-browser-languagedetector'),
@@ -29,6 +31,7 @@
     } else {
         // Browser globals (root is window)
         root.dwv = factory(
+            root.Modernizr,
             root.i18next,
             root.i18nextXHRBackend,
             root.i18nextBrowserLanguageDetector,
@@ -37,6 +40,7 @@
         );
     }
 }(this, function (
+    Modernizr,
     i18next,
     i18nextXHRBackend,
     i18nextBrowserLanguageDetector,
@@ -16503,10 +16507,11 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
                 // set reader callbacks
                 request.onload = loader.getUrlLoadHandler(url, i);
                 request.onerror = loader.getErrorHandler(url);
-                // read
+                // response type (default is 'text')
                 if (loader.loadUrlAs() === dwv.io.urlContentTypes.ArrayBuffer) {
                     request.responseType = "arraybuffer";
                 }
+                // read
                 request.send(null);
                 // next file
                 break;
@@ -22941,9 +22946,12 @@ dwv.tool.ZoomAndPan.prototype.init = function() {
 var dwv = dwv || {};
 /** @namespace */
 dwv.browser = dwv.browser || {};
+// external
+var Modernizr = Modernizr || {};
 
 /**
  * Browser check for the FileAPI.
+ * Assume support for Safari5.
  */
 dwv.browser.hasFileApi = function()
 {
@@ -22958,7 +22966,7 @@ dwv.browser.hasFileApi = function()
         return true;
     }
     // regular test
-    return "FileReader" in window;
+    return Modernizr.filereader;
 };
 
 /**
@@ -22966,7 +22974,9 @@ dwv.browser.hasFileApi = function()
  */
 dwv.browser.hasXmlHttpRequest = function()
 {
-    return "XMLHttpRequest" in window && "withCredentials" in new XMLHttpRequest();
+    return Modernizr.xhrresponsetype &&
+        Modernizr.xhrresponsetypearraybuffer && Modernizr.xhrresponsetypetext &&
+        "XMLHttpRequest" in window && "withCredentials" in new XMLHttpRequest();
 };
 
 /**
@@ -22974,7 +22984,7 @@ dwv.browser.hasXmlHttpRequest = function()
  */
 dwv.browser.hasTypedArray = function()
 {
-    return "Uint8Array" in window && "Uint16Array" in window;
+    return Modernizr.dataview && Modernizr.typedarrays;
 };
 
 //only check at startup (since we propose a replacement)
@@ -23006,7 +23016,7 @@ dwv.browser._hasClampedArray = ("Uint8ClampedArray" in window);
 
 /**
  * Browser check for clamped array.
- * Missing in
+ * Missing in:
  * - Safari 5.1.7 for Windows
  * - PhantomJS 1.9.20 (on Travis).
  */
@@ -23017,18 +23027,11 @@ dwv.browser.hasClampedArray = function()
 
 /**
  * Browser check for input with type='color'.
- * Missing in IE 11.
+ * Missing in IE and Safari.
  */
 dwv.browser.hasInputColor = function()
 {
-    var caughtException = false;
-    var colorInput = document.createElement("input");
-    try {
-        colorInput.type = "color";
-    } catch (error) {
-        caughtException = true;
-    }
-    return !caughtException;
+    return Modernizr.inputtypes.color;
 };
 
 /**
