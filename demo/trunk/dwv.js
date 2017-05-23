@@ -22987,6 +22987,15 @@ dwv.browser.hasTypedArray = function()
     return Modernizr.dataview && Modernizr.typedarrays;
 };
 
+/**
+ * Browser check for input with type='color'.
+ * Missing in IE and Safari.
+ */
+dwv.browser.hasInputColor = function()
+{
+    return Modernizr.inputtypes.color;
+};
+
 //only check at startup (since we propose a replacement)
 dwv.browser._hasTypedArraySlice = (typeof Uint8Array.prototype.slice !== "undefined");
 
@@ -23026,21 +23035,14 @@ dwv.browser.hasClampedArray = function()
 };
 
 /**
- * Browser check for input with type='color'.
- * Missing in IE and Safari.
- */
-dwv.browser.hasInputColor = function()
-{
-    return Modernizr.inputtypes.color;
-};
-
-/**
  * Browser checks to see if it can run dwv. Throws an error if not.
  * Silently replaces basic functions.
- * @todo Maybe use {@link http://modernizr.com/}.
  */
 dwv.browser.check = function()
 {
+
+    // Required --------------
+
     var appnorun = "The application cannot be run.";
     var message = "";
     // Check for the File API support
@@ -23061,6 +23063,9 @@ dwv.browser.check = function()
         alert(message+appnorun);
         throw new Error(message);
     }
+
+    // Replaced if not present ------------
+
     // Check typed array slice
     if( !dwv.browser.hasTypedArraySlice() ) {
         // silent fail with warning
