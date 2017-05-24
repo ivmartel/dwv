@@ -185,12 +185,17 @@ function generate()
     var dicomElements = {};
     var dicomElement;
     var name;
+    var offset = 128 + 4; // preamble
     for ( var k = 0, len = keys.length; k < len; ++k )
     {
         // get the DICOM element definition from its name
         dicomElement = getDicomElement(keys[k]);
         // set its value
         setElementValue(dicomElement, tags[keys[k]]);
+        // set offsets
+        dicomElement.startOffset = offset;
+        offset += dicomElement.vl;
+        dicomElement.endOffset = offset;
         // create the tag group/element key
         name = dwv.dicom.getGroupElementKey(dicomElement.tag.group, dicomElement.tag.element);
         // store
@@ -221,7 +226,9 @@ function generate()
             'tag': { 'group': "0x7FE0", 'element': "0x0010" },
             'vr': "OW",
             'vl': pixVL,
-            'value': pixels
+            'value': pixels,
+            'startOffset': offset,
+            'endOffset': offset + pixVL
         };
 
     // create writer
