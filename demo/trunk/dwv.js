@@ -12930,6 +12930,16 @@ dwv.image.Size.prototype.isInBounds = function ( i, j, k ) {
 };
 
 /**
+ * Get a string representation of the Vector3D.
+ * @return {String} The vector as a string.
+ */
+dwv.image.Size.prototype.toString = function () {
+    return "(" + this.getNumberOfColumns() +
+        ", " + this.getNumberOfRows() +
+        ", " + this.getNumberOfSlices() + ")";
+};
+
+/**
  * 2D/3D Spacing class.
  * @constructor
  * @param {Number} columnSpacing The column spacing.
@@ -12966,6 +12976,17 @@ dwv.image.Spacing.prototype.equals = function (rhs) {
         this.getRowSpacing() === rhs.getRowSpacing() &&
         this.getSliceSpacing() === rhs.getSliceSpacing();
 };
+
+/**
+ * Get a string representation of the Vector3D.
+ * @return {String} The vector as a string.
+ */
+dwv.image.Spacing.prototype.toString = function () {
+    return "(" + this.getColumnSpacing() +
+        ", " + this.getRowSpacing() +
+        ", " + this.getSliceSpacing() + ")";
+};
+
 
 /**
  * 2D/3D Geometry class.
@@ -13880,10 +13901,16 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
  */
 dwv.image.Image.prototype.quantifyLine = function(line)
 {
+    var quant = {};
+    // length
     var spacing = this.getGeometry().getSpacing();
     var length = line.getWorldLength( spacing.getColumnSpacing(),
             spacing.getRowSpacing() );
-    return { "length": {"value": length, "unit": dwv.i18n("unit.mm")} };
+    if (length !== null) {
+        quant.length = {"value": length, "unit": dwv.i18n("unit.mm")};
+    }
+    // return
+    return quant;
 };
 
 /**
@@ -13893,9 +13920,15 @@ dwv.image.Image.prototype.quantifyLine = function(line)
  */
 dwv.image.Image.prototype.quantifyRect = function(rect)
 {
+    var quant = {};
+    // surface
     var spacing = this.getGeometry().getSpacing();
     var surface = rect.getWorldSurface( spacing.getColumnSpacing(),
             spacing.getRowSpacing());
+    if (surface !== null) {
+        quant.surface = {"value": surface/100, "unit": dwv.i18n("unit.cm2")};
+    }
+    // stats
     var subBuffer = [];
     var minJ = parseInt(rect.getBegin().getY(), 10);
     var maxJ = parseInt(rect.getEnd().getY(), 10);
@@ -13907,13 +13940,12 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
         }
     }
     var quantif = dwv.math.getStats( subBuffer );
-    return {
-        "surface": {"value": surface/100, "unit": dwv.i18n("unit.cm2")},
-        "min": {"value": quantif.min, "unit": ""},
-        "max": {"value": quantif.max, "unit": ""},
-        "mean": {"value": quantif.mean, "unit": ""},
-        "stdDev": {"value": quantif.stdDev, "unit": ""}
-    };
+    quant.min = {"value": quantif.min, "unit": ""};
+    quant.max = {"value": quantif.max, "unit": ""};
+    quant.mean = {"value": quantif.mean, "unit": ""};
+    quant.stdDev = {"value": quantif.stdDev, "unit": ""};
+    // return
+    return quant;
 };
 
 /**
@@ -13923,10 +13955,16 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
  */
 dwv.image.Image.prototype.quantifyEllipse = function(ellipse)
 {
+    var quant = {};
+    // surface
     var spacing = this.getGeometry().getSpacing();
     var surface = ellipse.getWorldSurface( spacing.getColumnSpacing(),
             spacing.getRowSpacing());
-    return { "surface": {"value": surface/100, "unit": dwv.i18n("unit.cm2")} };
+    if (surface !== null) {
+        quant.surface = {"value": surface/100, "unit": dwv.i18n("unit.cm2")};
+    }
+    // return
+    return quant;
 };
 
 /**
@@ -13957,8 +13995,8 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var size = new dwv.image.Size( columns, rows );
 
     // spacing
-    var rowSpacing = 1;
-    var columnSpacing = 1;
+    var rowSpacing = null;
+    var columnSpacing = null;
     // PixelSpacing
     var pixelSpacing = dicomElements.getFromKey("x00280030");
     // ImagerPixelSpacing
@@ -13972,7 +14010,7 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
         columnSpacing = parseFloat( imagerPixelSpacing[1] );
     }
     // image spacing
-    var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing);
+    var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing );
 
     // TransferSyntaxUID
     var transferSyntaxUID = dicomElements.getFromKey("x00020010");
@@ -17712,6 +17750,22 @@ var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
 /**
+ * Mulitply the three inputs if the last two are not null.
+ * @param {Number} a The first input.
+ * @param {Number} b The second input.
+ * @param {Number} c The third input.
+ * @return {Number} The multiplication of the three inputs or
+ *  null if one of the last two is null.
+ */
+function mulABC( a, b, c) {
+    var res = null;
+    if (b !== null && c !== null) {
+        res = a * b * c;
+    }
+    return res;
+}
+
+/**
  * Circle shape.
  * @constructor
  * @param {Object} centre A Point2D representing the centre of the circle.
@@ -17742,14 +17796,15 @@ dwv.math.Circle = function(centre, radius)
      */
     this.getSurface = function() { return surface; };
     /**
-     * Get the surface of the circle with a spacing.
+     * Get the surface of the circle according to a spacing.
      * @param {Number} spacingX The X spacing.
      * @param {Number} spacingY The Y spacing.
-     * @return {Number} The surface of the circle multiplied by the given spacing.
+     * @return {Number} The surface of the circle multiplied by the given
+     *  spacing or null for null spacings.
      */
     this.getWorldSurface = function(spacingX, spacingY)
     {
-        return surface * spacingX * spacingY;
+        return mulABC(surface, spacingX, spacingY);
     };
 }; // Circle class
 
@@ -17790,14 +17845,15 @@ dwv.math.Ellipse = function(centre, a, b)
      */
     this.getSurface = function() { return surface; };
     /**
-     * Get the surface of the ellipse with a spacing.
+     * Get the surface of the ellipse according to a spacing.
      * @param {Number} spacingX The X spacing.
      * @param {Number} spacingY The Y spacing.
-     * @return {Number} The surface of the ellipse multiplied by the given spacing.
+     * @return {Number} The surface of the ellipse multiplied by the given
+     *  spacing or null for null spacings.
      */
     this.getWorldSurface = function(spacingX, spacingY)
     {
-        return surface * spacingX * spacingY;
+        return mulABC(surface, spacingX, spacingY);
     };
 }; // Circle class
 
@@ -17854,16 +17910,21 @@ dwv.math.Line = function(begin, end)
      */
     this.getLength = function() { return length; };
     /**
-     * Get the length of the line with spacing.
+     * Get the length of the line according to a  spacing.
      * @param {Number} spacingX The X spacing.
      * @param {Number} spacingY The Y spacing.
-     * @return {Number} The length of the line with spacing.
+     * @return {Number} The length of the line with spacing
+     *  or null for null spacings.
      */
     this.getWorldLength = function(spacingX, spacingY)
     {
-        var dxs = dx * spacingX;
-        var dys = dy * spacingY;
-        return Math.sqrt( dxs * dxs + dys * dys );
+        var wlen = null;
+        if (spacingX !== null && spacingY !== null) {
+            var dxs = dx * spacingX;
+            var dys = dy * spacingY;
+            wlen = Math.sqrt( dxs * dxs + dys * dys );
+        }
+        return wlen;
     };
     /**
      * Get the mid point of the line.
@@ -18043,12 +18104,15 @@ dwv.math.Rectangle = function(begin, end)
      */
     this.getSurface = function() { return surface; };
     /**
-     * Get the surface of the rectangle with a spacing.
-     * @return {Number} The surface of the rectangle with a spacing.
+     * Get the surface of the circle according to a spacing.
+     * @param {Number} spacingX The X spacing.
+     * @param {Number} spacingY The Y spacing.
+     * @return {Number} The surface of the rectangle multiplied by the given
+     *  spacing or null for null spacings.
      */
     this.getWorldSurface = function(spacingX, spacingY)
     {
-        return surface * spacingX * spacingY;
+        return mulABC(surface, spacingX, spacingY);
     };
 }; // Rectangle class
 
