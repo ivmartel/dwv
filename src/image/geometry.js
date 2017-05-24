@@ -73,6 +73,16 @@ dwv.image.Size.prototype.isInBounds = function ( i, j, k ) {
 };
 
 /**
+ * Get a string representation of the Vector3D.
+ * @return {String} The vector as a string.
+ */
+dwv.image.Size.prototype.toString = function () {
+    return "(" + this.getNumberOfColumns() +
+        ", " + this.getNumberOfRows() +
+        ", " + this.getNumberOfSlices() + ")";
+};
+
+/**
  * 2D/3D Spacing class.
  * @constructor
  * @param {Number} columnSpacing The column spacing.
@@ -109,6 +119,17 @@ dwv.image.Spacing.prototype.equals = function (rhs) {
         this.getRowSpacing() === rhs.getRowSpacing() &&
         this.getSliceSpacing() === rhs.getSliceSpacing();
 };
+
+/**
+ * Get a string representation of the Vector3D.
+ * @return {String} The vector as a string.
+ */
+dwv.image.Spacing.prototype.toString = function () {
+    return "(" + this.getColumnSpacing() +
+        ", " + this.getRowSpacing() +
+        ", " + this.getSliceSpacing() + ")";
+};
+
 
 /**
  * 2D/3D Geometry class.
