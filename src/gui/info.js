@@ -197,12 +197,13 @@ dwv.gui.info.Overlay = function ( div, pos, app )
 		// get overlay string array of the current position
 		var posi = app.getViewController().getCurrentPosition();
 		var overlays = image.overlays[posi.k][pos];
-		if (!overlays)
+		if (!overlays){
 			return;
+		}
 
 		callLevel ++;
 
-		if (pos == "bc" || pos == "tc"){
+		if (pos === "bc" || pos === "tc"){
 			div.textContent = overlays[0];
 		}
 		else{
@@ -390,10 +391,10 @@ dwv.gui.info.createOverlays = function (dicomElements, image)
 
 		var dict = searchDictionary(tag);
 		if (dict){
-			if (dict[0] == "DA"){
+			if (dict[0] === "DA"){
 				value = formatDate(value);
 			}
-			else if (dict[0] == "TM"){
+			else if (dict[0] === "TM"){
 				value = formatTime(value);
 			}
 		}
