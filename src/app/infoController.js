@@ -10,14 +10,10 @@ dwv.InfoController = function (containerDivId)
 
     // Info layer plot gui
     var plotInfo = null;
-    // Info layer windowing gui
-    var windowingInfo = null;
-    // Info layer position gui
-    var positionInfo = null;
     // Info layer colour map gui
     var miniColourMap = null;
-	// Info layer headers
-	var headerInfos = [];
+	// Info layer overlay
+	var overlayInfos = [];
     // flag to know if the info layer is listening on the image.
     var isInfoLayerListening = false;
 
@@ -27,38 +23,26 @@ dwv.InfoController = function (containerDivId)
      */
     this.create = function (app)
     {
-        var infotr = getElement("infotr");
-        if (infotr) {
-            windowingInfo = new dwv.gui.info.Windowing(infotr);
-            windowingInfo.create();
-        }
-
-        var infotl = getElement("infotl");
-        if (infotl) {
-            positionInfo = new dwv.gui.info.Position(infotl);
-            positionInfo.create();
-        }
-
-        var infobr = getElement("infobr");
-        if (infobr) {
+        var infocm = getElement("infocm");
+        if (infocm) {
             miniColourMap = new dwv.gui.info.MiniColourMap(infobr, app);
             miniColourMap.create();
         }
 		
-		// create header info at each corner
+		// create overlay info at each corner
 		var pos_list = [
 			"tl", "tc", "tr",
 			"cl",       "cr",
 			"bl", "bc", "br" ];
 
-		var hnum = 0;
+		var num = 0;
 		for (var n=0; n<pos_list.length; n++){
 			var pos = pos_list[n];
-			var info = getElement("header" + pos);
+			var info = getElement("info" + pos);
 			if (info) {
-				headerInfos[hnum] = new dwv.gui.info.Header(info, pos, app);
-				headerInfos[hnum].create();
-				hnum++;
+				overlayInfos[num] = new dwv.gui.info.Overlay(info, pos, app);
+				overlayInfos[num].create();
+				num++;
 			}
 		}
 
@@ -101,9 +85,6 @@ dwv.InfoController = function (containerDivId)
      */
     function addListeners(app, view)
     {
-        if (windowingInfo) {
-            view.addEventListener("wl-change", windowingInfo.update);
-        }
         if (plotInfo) {
             view.addEventListener("wl-change", plotInfo.update);
         }
@@ -111,16 +92,12 @@ dwv.InfoController = function (containerDivId)
             view.addEventListener("wl-change", miniColourMap.update);
             view.addEventListener("colour-change", miniColourMap.update);
         }
-        if (positionInfo) {
-            view.addEventListener("position-change", positionInfo.update);
-            view.addEventListener("frame-change", positionInfo.update);
-        }
-		if (headerInfos.length > 0){
-			for (var n=0; n<headerInfos.length; n++){
-				app.addEventListener("zoom-change", headerInfos[n].update);
-				view.addEventListener("wl-change", headerInfos[n].update);
-				view.addEventListener("position-change", headerInfos[n].update);
-				view.addEventListener("frame-change", headerInfos[n].update);
+		if (overlayInfos.length > 0){
+			for (var n=0; n<overlayInfos.length; n++){
+				app.addEventListener("zoom-change", overlayInfos[n].update);
+				view.addEventListener("wl-change", overlayInfos[n].update);
+				view.addEventListener("position-change", overlayInfos[n].update);
+				view.addEventListener("frame-change", overlayInfos[n].update);
 			}
 		}
         // udpate listening flag
@@ -134,9 +111,6 @@ dwv.InfoController = function (containerDivId)
      */
     function removeListeners(app, view)
     {
-        if (windowingInfo) {
-            view.removeEventListener("wl-change", windowingInfo.update);
-        }
         if (plotInfo) {
             view.removeEventListener("wl-change", plotInfo.update);
         }
@@ -144,16 +118,12 @@ dwv.InfoController = function (containerDivId)
             view.removeEventListener("wl-change", miniColourMap.update);
             view.removeEventListener("colour-change", miniColourMap.update);
         }
-        if (positionInfo) {
-            view.removeEventListener("position-change", positionInfo.update);
-            view.removeEventListener("frame-change", positionInfo.update);
-        }
-		if (headerInfos.length > 0){
-			for (var n=0; n<headerInfos.length; n++){
-				app.removeEventListener("zoom-change", headerInfos[n].update);
-				view.removeEventListener("wl-change", headerInfos[n].update);
-				view.removeEventListener("position-change", headerInfos[n].update);
-				view.removeEventListener("frame-change", headerInfos[n].update);
+		if (overlayInfos.length > 0){
+			for (var n=0; n<overlayInfos.length; n++){
+				app.removeEventListener("zoom-change", overlayInfos[n].update);
+				view.removeEventListener("wl-change", overlayInfos[n].update);
+				view.removeEventListener("position-change", overlayInfos[n].update);
+				view.removeEventListener("frame-change", overlayInfos[n].update);
 			}
 		}
         // udpate listening flag

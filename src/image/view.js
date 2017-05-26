@@ -786,9 +786,9 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
         }
     }
 
-	// DICOM headres to be shown at each corder
-	image.headers = [];
-	image.headers[0] = dwv.gui.info.createHeaders(dicomElements, image);
+	// overlay strings to be shown at each corder
+	image.overlays = [];
+	image.overlays[0] = dwv.gui.info.createOverlays(dicomElements, image);
 
     // min/max
     // Not filled yet since it is stil too costly to calculate min/max

@@ -83,7 +83,7 @@ dwv.i18nOnLoaded( function () {
     launchApp();
 });
 
-// load headers map info
-$.getJSON("../../resources/headers.json", function(data){
-	dwv.gui.info.headerMaps = data;
+// load overlay map info
+$.getJSON("../../resources/overlays.json", function(data){
+	dwv.gui.info.overlayMaps = data;
 });

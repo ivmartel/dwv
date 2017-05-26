@@ -16,130 +16,6 @@ dwv.gui.base.plot = function (/*div, data, options*/)
 };
 
 /**
- * WindowLevel info layer.
- * @constructor
- * @param {Object} div The HTML element to add WindowLevel info to.
- */
-dwv.gui.info.Windowing = function ( div )
-{
-    /**
-     * Create the windowing info div.
-     */
-    this.create = function ()
-    {
-        // clean div
-        var elems = div.getElementsByClassName("wl-info");
-        if ( elems.length !== 0 ) {
-            dwv.html.removeNodes(elems);
-        }
-        // create windowing list
-        var ul = document.createElement("ul");
-        ul.className = "wl-info";
-        // window center list item
-        var liwc = document.createElement("li");
-        liwc.className = "window-center";
-        ul.appendChild(liwc);
-        // window width list item
-        var liww = document.createElement("li");
-        liww.className = "window-width";
-        ul.appendChild(liww);
-        // add list to div
-        div.appendChild(ul);
-    };
-
-    /**
-     * Update the windowing info div.
-     * @param {Object} event The windowing change event containing the new values as {wc,ww}.
-     * Warning: expects the windowing info div to exist (use after create).
-     */
-    this.update = function (event)
-    {
-        // window center list item
-        var liwc = div.getElementsByClassName("window-center")[0];
-        dwv.html.cleanNode(liwc);
-        liwc.appendChild( document.createTextNode(
-            dwv.i18n("tool.info.window_center", {value: Math.round(event.wc)}) ) );
-        // window width list item
-        var liww = div.getElementsByClassName("window-width")[0];
-        dwv.html.cleanNode(liww);
-        liww.appendChild( document.createTextNode(
-            dwv.i18n("tool.info.window_width", {value: Math.round(event.ww)}) ) );
-    };
-
-}; // class dwv.gui.info.Windowing
-
-/**
- * Position info layer.
- * @constructor
- * @param {Object} div The HTML element to add Position info to.
- */
-dwv.gui.info.Position = function ( div )
-{
-    /**
-     * Create the position info div.
-     */
-    this.create = function ()
-    {
-        // clean div
-        var elems = div.getElementsByClassName("pos-info");
-        if ( elems.length !== 0 ) {
-            dwv.html.removeNodes(elems);
-        }
-        // position list
-        var ul = document.createElement("ul");
-        ul.className = "pos-info";
-        // position
-        var lipos = document.createElement("li");
-        lipos.className = "position";
-        ul.appendChild(lipos);
-        // frame
-        var liframe = document.createElement("li");
-        liframe.className = "frame";
-        ul.appendChild(liframe);
-        // value
-        var livalue = document.createElement("li");
-        livalue.className = "value";
-        ul.appendChild(livalue);
-        // add list to div
-        div.appendChild(ul);
-    };
-
-    /**
-     * Update the position info div.
-     * @param {Object} event The position change event containing the new values as {i,j,k}
-     *  and optional 'value'.
-     * Warning: expects the position info div to exist (use after create).
-     */
-    this.update = function (event)
-    {
-        // position list item
-        if( typeof(event.i) !== "undefined" )
-        {
-            var lipos = div.getElementsByClassName("position")[0];
-            dwv.html.cleanNode(lipos);
-            lipos.appendChild(document.createTextNode(
-            dwv.i18n("tool.info.position", {value: event.i+", "+event.j+", "+event.k}) ) );
-        }
-        // frame list item
-        if( typeof(event.frame) !== "undefined" )
-        {
-            var liframe = div.getElementsByClassName("frame")[0];
-            dwv.html.cleanNode(liframe);
-            liframe.appendChild( document.createTextNode(
-                dwv.i18n("tool.info.frame", {value: event.frame}) ) );
-        }
-        // value list item
-        if( typeof(event.value) !== "undefined" )
-        {
-            var livalue = div.getElementsByClassName("value")[0];
-            dwv.html.cleanNode(livalue);
-            livalue.appendChild( document.createTextNode(
-                dwv.i18n("tool.info.value", {value: event.value}) ) );
-        }
-    };
-}; // class dwv.gui.info.Position
-
-/**
  * MiniColourMap info layer.
  * @constructor
  * @param {Object} div The HTML element to add colourMap info to.
@@ -271,31 +147,41 @@ dwv.gui.info.Plot = function (div, app)
 }; // class dwv.gui.info.Plot
 
 /**
- * DICOM Header info layer.
+ * DICOM Header overlay info layer.
  * @constructor
- * @param {Object} div The HTML element to add Header info to.
+ * @param {Object} div The HTML element to add Header overlay info to.
  * @param {String} pos The string to specify the corner position. (tl,tc,tr,cl,cr,bl,bc,br)
  */
-dwv.gui.info.Header = function ( div, pos, app )
+dwv.gui.info.Overlay = function ( div, pos, app )
 {
     /**
-     * Create the header info div.
+     * Variable for preventing the simultaneous calls
+     */
+	var callLevel = 0;
+
+    /**
+     * Create the overlay info div.
      */
     this.create = function ()
     {
     };
 
     /**
-     * Update the header info div.
+     * Update the overlay info div.
      * @param {Object} event some change event
      */
     this.update = function (event)
     {
-		// remove all <ul> elements from div
-		var ulname = "header" + pos + "-ul";
-		var elems = div.getElementsByClassName(ulname);
-		if (elems == null)
+		if (callLevel > 0){
 			return;
+		}
+
+		// remove all <ul> elements from div
+		var ulname = "info" + pos + "-ul";
+		var elems = div.getElementsByClassName(ulname);
+		if (!elems){
+			return;
+		}
 
 		if ( elems.length !== 0 ) {
 			while(elems.length > 0 ) {
@@ -304,52 +190,64 @@ dwv.gui.info.Header = function ( div, pos, app )
 		}
 
 		var image = app.getImage();
-		if (image == null)
+		if (!image){
+			return;
+		}
+
+		// get overlay string array of the current position
+		var posi = app.getViewController().getCurrentPosition();
+		var overlays = image.overlays[posi.k][pos];
+		if (!overlays)
 			return;
 
-		// get headers string array of the current position
-		var posi = app.getViewController().getCurrentPosition();
-		var headers = image.headers[posi.k][pos];
-		if (headers == null)
-			return;
+		callLevel ++;
 
 		if (pos == "bc" || pos == "tc"){
-			div.textContent = headers[0];
+			div.textContent = overlays[0];
 		}
 		else{
 			// create <ul> element
 			var ul = document.createElement("ul");
 			ul.className = ulname;
 
-			for (var n=0; headers[n]; n++){
+			var liname = "info" + pos + "-li";
+
+			for (var n=0; overlays[n]; n++){
 				var li;
 
-				switch(headers[n]){
+				switch(overlays[n]){
 					// window level and width
 				case "window":
-					var win = app.getViewController().getWindowLevel();
+					var win = null;
+					while(!win){
+						try{
+							win = app.getViewController().getWindowLevel();
+						} catch (error) {
+							// retry
+						}
+					}
 					li = document.createElement("li");
-					li.className = "header" + pos + "-li";
+					li.className = liname;
 					li.appendChild( document.createTextNode("WC=" + win.center) );
 					ul.appendChild(li);
 					
 					li = document.createElement("li");
-					li.className = pos + "-li";
+					li.className = liname;
 					li.appendChild( document.createTextNode("WW=" + win.width) );
 					ul.appendChild(li);
 					break;
 					// scale
 				case "zoom":
 					li = document.createElement("li");
-					li.className = pos + "-li";
+					li.className = liname;
 					var zoom = app.getImageLayer().getZoom();
 					li.appendChild( document.createTextNode( ("x" + zoom.x).substr(0,5) ) );
 					ul.appendChild(li);
 					break;
 				default:
 					li = document.createElement("li");
-					li.className = "header" + pos + "-li";
-					li.appendChild( document.createTextNode( headers[n]) );
+					li.className = liname;
+					li.appendChild( document.createTextNode( overlays[n]) );
 					ul.appendChild(li);
 					break;
 				}
@@ -358,15 +256,20 @@ dwv.gui.info.Header = function ( div, pos, app )
 			// append <ul> element before color map
 			var cmap = div.getElementsByClassName("colour-map-info");
 			var plot = div.getElementsByClassName("plot");
-			if (cmap)
+			if (cmap){
 				div.insertBefore(ul, cmap[0]);
-			else if (plot)
+			}
+			else if (plot){
 				div.insertBefore(ul, plot[0]);
-			else
+			}
+			else{
 				div.appendChild(ul);
+			}
 		}
-	}
-}; // class dwv.gui.info.Header
+
+		callLevel --;
+	};
+}; // class dwv.gui.info.Overlay
 
 /**
  * Search DICOM dictionary entry
@@ -375,15 +278,17 @@ dwv.gui.info.Header = function ( div, pos, app )
  */
 function searchDictionary( tag )
 {
-	if (tag == null)
+	if (!tag){
 		return null;
+	}
 
 	var group = "0" + tag.substr(0,5);
 	var elem  = "0x" + tag.substr(5,4);
 
 	var darray = dwv.dicom.dictionary[group];
-	if (darray == null)
+	if (!darray){
 		return null;
+	}
 
 	return darray[elem];
 }
@@ -396,8 +301,9 @@ function searchDictionary( tag )
  */
 function formatDate( value )
 {
-	if (value == null || value.length < 8)
+	if (!value || value.length < 8) {
 		return "";
+	}
 
 	return value.substr(0,4) + "/" + value.substr(4,2) + "/" + value.substr(6,2);
 }
@@ -410,8 +316,9 @@ function formatDate( value )
  */
 function formatTime( value )
 {
-	if (value == null || value.length < 6)
+	if (!value || value.length < 6){
 		return "";
+	}
 
 	return value.substr(0,2) + ":" + value.substr(2,2) + ":" + value.substr(4,2);
 }
@@ -435,8 +342,9 @@ var rlabels = {
  */
 function getReverseOrientation( ori )
 {
-	if (ori == null)
+	if (!ori){
 		return "";
+	}
 
 	var rori = "";
 	for (var n=0; n<ori.length; n++){
@@ -449,28 +357,26 @@ function getReverseOrientation( ori )
 	return rori;
 }
 
-dwv.gui.info.headerMaps = {};
+dwv.gui.info.overlayMaps = {};
 
 /**
- * Create header string array of the image in each corner
+ * Create overlay string array of the image in each corner
  * @param {Object} dicomElements DICOM elements of the image
  * @param {Object} image The image
- * @aram  {String Array} Array of string to be shown in each corner
+ * @return {String Array} Array of string to be shown in each corner
  */
-dwv.gui.info.createHeaders = function (dicomElements, image)
+dwv.gui.info.createOverlays = function (dicomElements, image)
 {
-	var headers = {};
+	var overlays = {};
 	var moda = dicomElements.getFromKey("x00080060");
-	if (moda == null){
-		return headers;
+	if (!moda){
+		return overlays;
 	}
 
-	var maps = dwv.gui.info.headerMaps[moda];
-	if (maps == null){
-		maps = dwv.gui.info.headerMaps["*"];
+	var maps = dwv.gui.info.overlayMaps[moda] || dwv.gui.info.overlayMaps['*'];
+	if (!maps){
+		return overlays;
 	}
-	if (maps == null)
-		return headers;
 
 	for (var n=0; maps[n]; n++){
 		var value = maps[n].value;
@@ -480,12 +386,14 @@ dwv.gui.info.createHeaders = function (dicomElements, image)
 		var pre = maps[n].prefix;
 		var suf = maps[n].suffix;
 
-		if (value == null){
+		if (!value){
 			value = dicomElements.getFromKey(tag);
-			if (Array.isArray(value))
+			if (Array.isArray(value)){
 				value = value[0];
+			}
 		}
-		if (value == null || value.length == 0){
+
+		if (!value || value.length === 0){
 			continue;
 		}
 
@@ -499,33 +407,33 @@ dwv.gui.info.createHeaders = function (dicomElements, image)
 			}
 		}
 
-		if (suf != null){
+		if (suf){
 			value += suf;
 		}
-		if (pre != null){
+		if (pre){
 			value = pre + value;
 		}
 
-		if (headers[pos] == null){
-			headers[pos] = [];
+		if (!overlays[pos]){
+			overlays[pos] = [];
 		}
 
 		if (app == "true"){
-			headers[pos][headers[pos].length-1] += value.trim();
+			overlays[pos][overlays[pos].length-1] += value.trim();
 		}
 		else{
-			headers[pos].push(value.trim());
+			overlays[pos].push(value.trim());
 		}
 	}
 
 	// (0020,0020) Patient Orientation
-	var	value = dicomElements.getFromKey("x00200020");
-	if (value){
-		headers["cr"] = [value[0].trim()];
-		headers["cl"] = [getReverseOrientation(value[0].trim())];
-		headers["bc"] = [value[1].trim()];
-		headers["tc"] = [getReverseOrientation(value[1].trim())];
+	var	valuePO = dicomElements.getFromKey("x00200020");
+	if (valuePO !== null){
+		overlays['cr'] = [valuePO[0].trim()];
+		overlays['cl'] = [getReverseOrientation(valuePO[0].trim())];
+		overlays['bc'] = [valuePO[1].trim()];
+		overlays['tc'] = [getReverseOrientation(valuePO[1].trim())];
 	}
 
-	return headers;
-}
+	return overlays;
+};

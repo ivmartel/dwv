@@ -370,8 +370,8 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
         // copy to class variables
         buffer[f] = newBuffer;
 
-		// insert header information of the slice to the image 
-		this.headers.splice(newSliceNb, 0, rhs.headers[0]);
+		// insert overlay information of the slice to the image 
+		this.overlays.splice(newSliceNb, 0, rhs.overlays[0]);
 
         // return the appended slice number
         return newSliceNb;
