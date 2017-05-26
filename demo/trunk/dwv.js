@@ -12364,9 +12364,9 @@ dwv.image.DicomBufferToView = function ()
     /**
      * Get data from an input buffer using a DICOM parser.
      * @param {Array} buffer The input data buffer.
-     * @param {Object} callback The callback on the conversion.
+     * @param {Number} dataIndex The data index.
      */
-    this.convert = function (buffer, callback, dataIndex)
+    this.convert = function (buffer, dataIndex)
     {
         // DICOM parser
         var dicomParser = new dwv.dicom.DicomParser();
@@ -12388,7 +12388,7 @@ dwv.image.DicomBufferToView = function ()
             var viewFactory = new dwv.image.ViewFactory();
             var view = viewFactory.create( dicomParser.getDicomElements(), image );
             // return
-            callback({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
+            self.onload({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
         };
 
         if ( needDecompression ) {
@@ -12409,7 +12409,7 @@ dwv.image.DicomBufferToView = function ()
             // send an onload event for mono frame
             if ( nFrames === 1 ) {
                 pixelDecoder.ondecoded = function () {
-                    self.onload();
+                    self.onloadend();
                 };
             }
 
@@ -12459,7 +12459,6 @@ dwv.image.DicomBufferToView = function ()
             // create image
             onDecodedFirstFrame();
             // send load events
-            self.onload();
             self.onloadend();
         }
     };
@@ -12588,9 +12587,10 @@ dwv.image.getViewFromDOMImage = function (image)
  * @param {Object} video The DOM Video.
  * @param {Object} callback The function to call once the data is loaded.
  * @param {Object} cbprogress The function to call to report progress.
+ * @param {Object} cbonloadend The function to call to report load end.
  * @param {Number} dataindex The data index.
  */
-dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, dataIndex)
+dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, cbonloadend, dataIndex)
 {
     // video size
     var width = video.videoWidth;
@@ -12664,6 +12664,7 @@ dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, dataIndex
         if (nextTime <= this.duration) {
             this.currentTime = nextTime;
         } else {
+            cbonloadend();
             // stop listening
             video.removeEventListener('seeked', onseeked);
         }
@@ -15346,11 +15347,12 @@ dwv.io.DicomDataLoader = function ()
             db2v.setDefaultCharacterSet(options.defaultCharacterSet);
         }
         // connect handlers
-        db2v.onload = self.addLoaded;
+        db2v.onload = self.onload;
+        db2v.onloadend = self.onloadend;
         db2v.onprogress = self.onprogress;
         // convert
         try {
-            db2v.convert( buffer, self.onload, index );
+            db2v.convert( buffer, index );
         } catch (error) {
             self.onerror(error);
         }
@@ -15468,10 +15470,10 @@ dwv.io.DicomDataLoader.prototype.loadUrlAs = function () {
  */
 dwv.io.DicomDataLoader.prototype.onload = function (/*event*/) {};
 /**
- * Handle an add loaded event.
+ * Handle an load end event.
  * Default does nothing.
  */
-dwv.io.DicomDataLoader.prototype.addLoaded = function () {};
+dwv.io.DicomDataLoader.prototype.onloadend = function () {};
 /**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'
@@ -15626,7 +15628,7 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
     for (var k = 0; k < loaders.length; ++k) {
         loader = loaders[k];
         loader.onload = self.onload;
-        loader.addLoaded = self.addLoaded;
+        loader.onloadend = self.addLoaded;
         loader.onerror = self.onerror;
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
@@ -15700,7 +15702,7 @@ dwv.io.JSONTextLoader = function ()
     this.load = function (text, origin, index) {
         try {
             self.onload( text );
-            //self.addLoaded();
+            self.onloadend();
         } catch (error) {
             self.onerror(error);
         }
@@ -15807,10 +15809,10 @@ dwv.io.JSONTextLoader.prototype.loadUrlAs = function () {
  */
 dwv.io.JSONTextLoader.prototype.onload = function (/*event*/) {};
 /**
- * Handle an add loaded event.
+ * Handle an load end event.
  * Default does nothing.
  */
-dwv.io.JSONTextLoader.prototype.addLoaded = function () {};
+dwv.io.JSONTextLoader.prototype.onloadend = function () {};
 /**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'
@@ -15956,7 +15958,7 @@ dwv.io.MemoryLoader.prototype.load = function (ioArray)
     for (var k = 0; k < loaders.length; ++k) {
         loader = loaders[k];
         loader.onload = self.onload;
-        loader.addLoaded = self.addLoaded;
+        loader.onloadend = self.addLoaded;
         loader.onerror = self.onerror;
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
@@ -16047,7 +16049,7 @@ dwv.io.RawImageLoader = function ()
         image.onload = function (/*event*/) {
             try {
                 self.onload( dwv.image.getViewFromDOMImage(this) );
-                self.addLoaded();
+                self.onloadend();
             } catch (error) {
                 self.onerror(error);
             }
@@ -16162,10 +16164,10 @@ dwv.io.RawImageLoader.prototype.loadUrlAs = function () {
  */
 dwv.io.RawImageLoader.prototype.onload = function (/*event*/) {};
 /**
- * Handle an add loaded event.
+ * Handle an load end event.
  * Default does nothing.
  */
-dwv.io.RawImageLoader.prototype.addLoaded = function () {};
+dwv.io.RawImageLoader.prototype.onloadend = function () {};
 /**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'
@@ -16241,8 +16243,8 @@ dwv.io.RawVideoLoader = function ()
         // onload handler
         video.onloadedmetadata = function (/*event*/) {
             try {
-                dwv.image.getViewFromDOMVideo(this, self.onload, self.onprogress, index);
-                self.addLoaded();
+                dwv.image.getViewFromDOMVideo(this,
+                    self.onload, self.onprogress, self.onloadend, index);
             } catch (error) {
                 self.onerror(error);
             }
@@ -16349,10 +16351,10 @@ dwv.io.RawVideoLoader.prototype.loadUrlAs = function () {
  */
 dwv.io.RawVideoLoader.prototype.onload = function (/*event*/) {};
 /**
- * Handle an add loaded event.
+ * Handle an load end event.
  * Default does nothing.
  */
-dwv.io.RawVideoLoader.prototype.addLoaded = function () {};
+dwv.io.RawVideoLoader.prototype.onloadend = function () {};
 /**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'
@@ -16507,7 +16509,7 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
     for (var k = 0; k < loaders.length; ++k) {
         loader = loaders[k];
         loader.onload = self.onload;
-        loader.addLoaded = self.addLoaded;
+        loader.onloadend = self.addLoaded;
         loader.onerror = self.onerror;
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
@@ -16612,7 +16614,7 @@ dwv.io.ZipLoader = function ()
     	else {
             var memoryIO = new dwv.io.MemoryLoader();
             memoryIO.onload = self.onload;
-            memoryIO.onloadend = self.addLoaded;
+            memoryIO.onloadend = self.onloadend;
             memoryIO.onerror = self.onerror;
             memoryIO.onprogress = self.onprogress;
 
@@ -16736,10 +16738,10 @@ dwv.io.ZipLoader.prototype.loadUrlAs = function () {
  */
 dwv.io.ZipLoader.prototype.onload = function (/*event*/) {};
 /**
- * Handle an add loaded event.
+ * Handle an load end event.
  * Default does nothing.
  */
-dwv.io.ZipLoader.prototype.addLoaded = function () {};
+dwv.io.ZipLoader.prototype.onloadend = function () {};
 /**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'
