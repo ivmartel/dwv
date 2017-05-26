@@ -1,0 +1,72 @@
+{
+	"CT":
+	 [
+		{"tag": "x00100020", "pos": "tl"},
+		{"tag": "x00100010", "pos": "tl"},
+		{"tag": "x00100040", "pos": "tl"},
+		{"tag": "x00100030", "pos": "tl"},
+
+		{"tag": "x00204000", "pos": "bl"},
+		{"tag": "x00201041", "pos": "bl"},
+		{"tag": "x00180050", "pos": "bl", "suffix": "msec"},
+		{"tag": "x00181100", "pos": "bl", "prefix": "FOV "},
+		{"tag": "x00180060", "pos": "bl", "suffix": "kV"},
+		{"tag": "x00181151", "pos": "bl", "suffix": "mA"},
+		{"tag": "x00181150", "pos": "bl", "suffix": "msec"},
+		{"tag": "x00181152", "pos": "bl", "suffix": "mAs"},
+		{"tag": "x00181120", "pos": "bl", "prefix": "Tilt "},
+		{"tag": "x00181210", "pos": "bl"},
+		{"tag": "x00185100", "pos": "bl"},
+
+		{"tag": "x00080020", "pos": "tr"},
+		{"tag": "x00080030", "pos": "tr"},
+		{"tag": "x00080060", "pos": "tr"},
+
+		{"tag": "x00200011", "pos": "bl"},
+		{"tag": "x00200012", "pos": "bl", "append": "true", "prefix": ":"},
+		{"tag": "x00200013", "pos": "bl", "append": "true", "prefix": ":"},
+
+		{"tag": "x00180010", "pos": "br"},
+		{"value": "window", "pos": "br"},
+		{"value": "zoom",   "pos": "br"}
+	],
+	"MR": 
+	[
+		{"tag": "x00100020", "pos": "tl"},
+		{"tag": "x00100010", "pos": "tl"},
+		{"tag": "x00100040", "pos": "tl"},
+		{"tag": "x00100030", "pos": "tl"},
+		
+		{"tag": "x00201041", "pos": "bl"},
+		{"tag": "x00200011", "pos": "bl"},
+		{"tag": "x00200012", "pos": "bl", "append": "true", "prefix": ":"},
+		{"tag": "x00200013", "pos": "bl", "append": "true", "prefix": ":"},
+
+		{"tag": "x00080020", "pos": "tr"},
+		{"tag": "x00080030", "pos": "tr"},
+		{"tag": "x00080060", "pos": "tr"},
+
+		{"tag": "x00281051", "pos": "bl", "prefix": "W"},
+		{"tag": "x00281050", "pos": "bl", "prefix": "C"},
+		{"value": "window", "pos": "br"},
+		{"value": "zoom",   "pos": "br"}
+	],
+	"*":
+	[
+		{"tag": "x00100020", "pos": "tl"},
+		{"tag": "x00100010", "pos": "tl"},
+		{"tag": "x00100040", "pos": "tl"},
+		{"tag": "x00100030", "pos": "tl"},
+
+		{"tag": "x00080020", "pos": "tr"},
+		{"tag": "x00080030", "pos": "tr"},
+		{"tag": "x00080060", "pos": "tr"},
+
+		{"tag": "x00200011", "pos": "bl"},
+		{"tag": "x00200012", "pos": "bl", "append": "true", "prefix": ":"},
+		{"tag": "x00200013", "pos": "bl", "append": "true", "prefix": ":"},
+		
+		{"value": "window", "pos": "br"},
+		{"value": "zoom",   "pos": "br"}
+	]
+}
