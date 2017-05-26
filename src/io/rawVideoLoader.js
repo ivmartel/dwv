@@ -53,8 +53,8 @@ dwv.io.RawVideoLoader = function ()
         // onload handler
         video.onloadedmetadata = function (/*event*/) {
             try {
-                dwv.image.getViewFromDOMVideo(this, self.onload, self.onprogress, index);
-                self.addLoaded();
+                dwv.image.getViewFromDOMVideo(this,
+                    self.onload, self.onprogress, self.onloadend, index);
             } catch (error) {
                 self.onerror(error);
             }
@@ -161,10 +161,10 @@ dwv.io.RawVideoLoader.prototype.loadUrlAs = function () {
  */
 dwv.io.RawVideoLoader.prototype.onload = function (/*event*/) {};
 /**
- * Handle an add loaded event.
+ * Handle an load end event.
  * Default does nothing.
  */
-dwv.io.RawVideoLoader.prototype.addLoaded = function () {};
+dwv.io.RawVideoLoader.prototype.onloadend = function () {};
 /**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'

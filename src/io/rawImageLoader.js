@@ -57,7 +57,7 @@ dwv.io.RawImageLoader = function ()
         image.onload = function (/*event*/) {
             try {
                 self.onload( dwv.image.getViewFromDOMImage(this) );
-                self.addLoaded();
+                self.onloadend();
             } catch (error) {
                 self.onerror(error);
             }
@@ -172,10 +172,10 @@ dwv.io.RawImageLoader.prototype.loadUrlAs = function () {
  */
 dwv.io.RawImageLoader.prototype.onload = function (/*event*/) {};
 /**
- * Handle an add loaded event.
+ * Handle an load end event.
  * Default does nothing.
  */
-dwv.io.RawImageLoader.prototype.addLoaded = function () {};
+dwv.io.RawImageLoader.prototype.onloadend = function () {};
 /**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'

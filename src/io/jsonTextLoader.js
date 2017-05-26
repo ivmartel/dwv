@@ -27,7 +27,7 @@ dwv.io.JSONTextLoader = function ()
     this.load = function (text, origin, index) {
         try {
             self.onload( text );
-            //self.addLoaded();
+            self.onloadend();
         } catch (error) {
             self.onerror(error);
         }
@@ -134,10 +134,10 @@ dwv.io.JSONTextLoader.prototype.loadUrlAs = function () {
  */
 dwv.io.JSONTextLoader.prototype.onload = function (/*event*/) {};
 /**
- * Handle an add loaded event.
+ * Handle an load end event.
  * Default does nothing.
  */
-dwv.io.JSONTextLoader.prototype.addLoaded = function () {};
+dwv.io.JSONTextLoader.prototype.onloadend = function () {};
 /**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'

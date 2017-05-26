@@ -48,7 +48,7 @@ dwv.io.ZipLoader = function ()
     	else {
             var memoryIO = new dwv.io.MemoryLoader();
             memoryIO.onload = self.onload;
-            memoryIO.onloadend = self.addLoaded;
+            memoryIO.onloadend = self.onloadend;
             memoryIO.onerror = self.onerror;
             memoryIO.onprogress = self.onprogress;
 
@@ -172,10 +172,10 @@ dwv.io.ZipLoader.prototype.loadUrlAs = function () {
  */
 dwv.io.ZipLoader.prototype.onload = function (/*event*/) {};
 /**
- * Handle an add loaded event.
+ * Handle an load end event.
  * Default does nothing.
  */
-dwv.io.ZipLoader.prototype.addLoaded = function () {};
+dwv.io.ZipLoader.prototype.onloadend = function () {};
 /**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'

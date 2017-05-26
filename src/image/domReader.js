@@ -102,9 +102,10 @@ dwv.image.getViewFromDOMImage = function (image)
  * @param {Object} video The DOM Video.
  * @param {Object} callback The function to call once the data is loaded.
  * @param {Object} cbprogress The function to call to report progress.
+ * @param {Object} cbonloadend The function to call to report load end.
  * @param {Number} dataindex The data index.
  */
-dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, dataIndex)
+dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, cbonloadend, dataIndex)
 {
     // video size
     var width = video.videoWidth;
@@ -178,6 +179,7 @@ dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, dataIndex
         if (nextTime <= this.duration) {
             this.currentTime = nextTime;
         } else {
+            cbonloadend();
             // stop listening
             video.removeEventListener('seeked', onseeked);
         }

@@ -37,9 +37,9 @@ dwv.image.DicomBufferToView = function ()
     /**
      * Get data from an input buffer using a DICOM parser.
      * @param {Array} buffer The input data buffer.
-     * @param {Object} callback The callback on the conversion.
+     * @param {Number} dataIndex The data index.
      */
-    this.convert = function (buffer, callback, dataIndex)
+    this.convert = function (buffer, dataIndex)
     {
         // DICOM parser
         var dicomParser = new dwv.dicom.DicomParser();
@@ -61,7 +61,7 @@ dwv.image.DicomBufferToView = function ()
             var viewFactory = new dwv.image.ViewFactory();
             var view = viewFactory.create( dicomParser.getDicomElements(), image );
             // return
-            callback({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
+            self.onload({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
         };
 
         if ( needDecompression ) {
@@ -82,7 +82,7 @@ dwv.image.DicomBufferToView = function ()
             // send an onload event for mono frame
             if ( nFrames === 1 ) {
                 pixelDecoder.ondecoded = function () {
-                    self.onload();
+                    self.onloadend();
                 };
             }
 
@@ -132,7 +132,6 @@ dwv.image.DicomBufferToView = function ()
             // create image
             onDecodedFirstFrame();
             // send load events
-            self.onload();
             self.onloadend();
         }
     };
