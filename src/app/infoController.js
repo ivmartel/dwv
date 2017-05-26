@@ -25,7 +25,7 @@ dwv.InfoController = function (containerDivId)
     {
         var infocm = getElement("infocm");
         if (infocm) {
-            miniColourMap = new dwv.gui.info.MiniColourMap(infobr, app);
+            miniColourMap = new dwv.gui.info.MiniColourMap(infocm, app);
             miniColourMap.create();
         }
 		

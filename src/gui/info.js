@@ -254,17 +254,7 @@ dwv.gui.info.Overlay = function ( div, pos, app )
 			}
 
 			// append <ul> element before color map
-			var cmap = div.getElementsByClassName("colour-map-info");
-			var plot = div.getElementsByClassName("plot");
-			if (cmap){
-				div.insertBefore(ul, cmap[0]);
-			}
-			else if (plot){
-				div.insertBefore(ul, plot[0]);
-			}
-			else{
-				div.appendChild(ul);
-			}
+			div.appendChild(ul);
 		}
 
 		callLevel --;
@@ -350,8 +340,9 @@ function getReverseOrientation( ori )
 	for (var n=0; n<ori.length; n++){
 		var o = ori.substr(n,1);
 		var r = rlabels[o];
-		if (r)
+		if (r){
 			rori += r;
+		}
 	}
 
 	return rori;
@@ -429,10 +420,10 @@ dwv.gui.info.createOverlays = function (dicomElements, image)
 	// (0020,0020) Patient Orientation
 	var	valuePO = dicomElements.getFromKey("x00200020");
 	if (valuePO !== null){
-		overlays['cr'] = [valuePO[0].trim()];
-		overlays['cl'] = [getReverseOrientation(valuePO[0].trim())];
-		overlays['bc'] = [valuePO[1].trim()];
-		overlays['tc'] = [getReverseOrientation(valuePO[1].trim())];
+		overlays.cr = [valuePO[0].trim()];
+		overlays.cl = [getReverseOrientation(valuePO[0].trim())];
+		overlays.bc = [valuePO[1].trim()];
+		overlays.tc = [getReverseOrientation(valuePO[1].trim())];
 	}
 
 	return overlays;
