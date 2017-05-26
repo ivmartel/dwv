@@ -67,19 +67,11 @@ function startApp(caseNumber) {
     }
 
     // load state after image
-    //var listener = function (/*event*/) {
-    //    myapp.loadURLs(["data/case1/state.json"]);
-    //};
-    // listen to load-end
-    //myapp.addEventListener("load-end", listener);
-
-    var listener = function (event) {
-        if (event.loaded === 100) {
-            myapp.loadURLs([rootDir+"/case"+caseNumber+"/state.json"]);
-        }
+    var listener = function (/*event*/) {
+        myapp.loadURLs([rootDir+"/case"+caseNumber+"/state.json"]);
     };
-    myapp.addEventListener("load-progress", listener);
-
+    // listen to load-end
+    myapp.addEventListener("load-end", listener);
 }
 
 // Image decoders (for web workers)
