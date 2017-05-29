@@ -378,9 +378,9 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
         buffer[f] = newBuffer;
 
 		// insert overlay information of the slice to the image 
-		this.overlays = this.overlays || [];
+		overlays = overlays || [];
 		rhs.overlays = rhs.overlays || [];
-		this.overlays.splice(newSliceNb, 0, rhs.overlays[0]);
+		overlays.splice(newSliceNb, 0, rhs.overlays[0]);
 
         // return the appended slice number
         return newSliceNb;
