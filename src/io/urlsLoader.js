@@ -160,6 +160,7 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
 
         // bind reader progress
         request.onprogress = mproghandler.getMonoProgressHandler(i, 0);
+        request.onloadend = mproghandler.getMonoOnLoadEndHandler(i, 0);
 
         // find a loader
         var foundLoader = false;
