@@ -357,7 +357,7 @@ dwv.gui.info.overlayMaps = {};
  * @param {Object} image The image
  * @return {String Array} Array of string to be shown in each corner
  */
-dwv.gui.info.createOverlays = function (dicomElements, /* image */)
+dwv.gui.info.createOverlays = function (dicomElements)
 {
 	var overlays = {};
 	var moda = dicomElements.getFromKey("x00080060");
