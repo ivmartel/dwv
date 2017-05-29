@@ -355,7 +355,7 @@ dwv.gui.info.overlayMaps = {};
  * Create overlay string array of the image in each corner
  * @param {Object} dicomElements DICOM elements of the image
  * @param {Object} image The image
- * @return {String Array} Array of string to be shown in each corner
+ * @return {Array} Array of string to be shown in each corner
  */
 dwv.gui.info.createOverlays = function (dicomElements)
 {
