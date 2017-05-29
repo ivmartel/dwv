@@ -16537,6 +16537,7 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
 
         // bind reader progress
         request.onprogress = mproghandler.getMonoProgressHandler(i, 0);
+        request.onloadend = mproghandler.getMonoOnLoadEndHandler(i, 0);
 
         // find a loader
         var foundLoader = false;
@@ -23406,6 +23407,19 @@ dwv.utils.MultiProgressHandler = function (callback)
             event.index = index;
             event.subindex = subindex;
             self.onprogress(event);
+        };
+    };
+
+    /**
+     * Create a mono loadend event handler: sends a 100% progress.
+     * @param {Number} index The index of the data.
+     * @param {Number} subindex The sub-index of the data.
+     */
+    this.getMonoOnLoadEndHandler = function (index, subindex) {
+        return function () {
+            self.onprogress({'type': 'load-progress', 'lengthComputable': true,
+                'loaded': 100, 'total': 100,
+                'index': index, 'subindex': subindex});
         };
     };
 
