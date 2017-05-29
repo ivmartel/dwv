@@ -170,7 +170,7 @@ dwv.gui.info.Overlay = function ( div, pos, app )
      * Update the overlay info div.
      * @param {Object} event some change event
      */
-    this.update = function (event)
+    this.update = function ( /* event */ )
     {
 		if (callLevel > 0){
 			return;
@@ -357,7 +357,7 @@ dwv.gui.info.overlayMaps = {};
  * @param {Object} image The image
  * @return {String Array} Array of string to be shown in each corner
  */
-dwv.gui.info.createOverlays = function (dicomElements, image)
+dwv.gui.info.createOverlays = function (dicomElements, /* image */)
 {
 	var overlays = {};
 	var moda = dicomElements.getFromKey("x00080060");
@@ -410,7 +410,7 @@ dwv.gui.info.createOverlays = function (dicomElements, image)
 			overlays[pos] = [];
 		}
 
-		if (app == "true"){
+		if (app === "true"){
 			overlays[pos][overlays[pos].length-1] += value.trim();
 		}
 		else{
