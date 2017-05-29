@@ -167,6 +167,13 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
      */
     var histogram = null;
 
+	/**
+	 * Overlay.
+     * @private
+     * @type Array
+     */
+	var overlays = [];
+  
     /**
      * Get the geometry of the image.
      * @return {Object} The size of the image.

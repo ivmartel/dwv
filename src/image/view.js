@@ -787,7 +787,7 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
     }
 
 	// overlay strings to be shown at each corder
-	image.overlays = [];
+	image.overlays = image.overlays || [];
 	image.overlays[0] = dwv.gui.info.createOverlays(dicomElements);
 
     // min/max
