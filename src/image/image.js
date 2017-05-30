@@ -173,7 +173,19 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
      * @type Array
      */
 	var overlays = [];
-  
+
+    /**
+     * Set the first overlay.
+     * @param {Array} over The first overlay.
+     */
+    this.setFirstOverlay = function (over) { overlays[0] = over; };
+
+    /**
+     * Get the overlays.
+     * @return {Array} The overlays array.
+     */
+    this.getOverlays = function () { return overlays; };
+
     /**
      * Get the geometry of the image.
      * @return {Object} The size of the image.
@@ -377,10 +389,8 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
         // copy to class variables
         buffer[f] = newBuffer;
 
-		// insert overlay information of the slice to the image 
-		overlays = overlays || [];
-		rhs.overlays = rhs.overlays || [];
-		overlays.splice(newSliceNb, 0, rhs.overlays[0]);
+		// insert overlay information of the slice to the image
+		overlays.splice(newSliceNb, 0, rhs.getOverlays()[0]);
 
         // return the appended slice number
         return newSliceNb;
@@ -976,6 +986,9 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
         meta.IsSigned = (pixelRepresentation === 1);
     }
     image.setMeta(meta);
+
+    // overlay
+    image.setFirstOverlay( dwv.gui.info.createOverlays(dicomElements) );
 
     return image;
 };

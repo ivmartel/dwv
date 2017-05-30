@@ -196,7 +196,7 @@ dwv.gui.info.Overlay = function ( div, pos, app )
 
 		// get overlay string array of the current position
 		var posi = app.getViewController().getCurrentPosition();
-		var overlays = image.overlays[posi.k][pos];
+		var overlays = image.getOverlays()[posi.k][pos];
 		if (!overlays){
 			return;
 		}
@@ -231,7 +231,7 @@ dwv.gui.info.Overlay = function ( div, pos, app )
 					li.className = liname;
 					li.appendChild( document.createTextNode("WC=" + win.center) );
 					ul.appendChild(li);
-					
+
 					li = document.createElement("li");
 					li.className = liname;
 					li.appendChild( document.createTextNode("WW=" + win.width) );
