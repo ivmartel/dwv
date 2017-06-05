@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>dwv Source: src/math/vector.js</title>
+	<title>dwv Class: Position</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -88,106 +88,419 @@
 <div class="row">
 
 	
-	<div class="col-md-12">
+	<div class="col-md-8">
 	
 		<div id="main">
 			
 
-		<h1 class="page-title">Source: src/math/vector.js</h1>
-    
+	<h1 class="page-title">Class: Position</h1>
 <section>
-    <article>
-        <pre
-            class="sunlight-highlight-javascript linenums">// namespaces
-var dwv = dwv || {};
-dwv.math = dwv.math || {};
 
-/**
- * Immutable 3D vector.
- * @constructor
- * @param {Number} x The X component of the vector.
- * @param {Number} y The Y component of the vector.
- * @param {Number} z The Z component of the vector.
- */
-dwv.math.Vector3D = function (x,y,z)
-{
-    /**
-     * Get the X component of the vector.
-     * @return {Number} The X component of the vector.
-     */
-    this.getX = function () { return x; };
-    /**
-     * Get the Y component of the vector.
-     * @return {Number} The Y component of the vector.
-     */
-    this.getY = function () { return y; };
-    /**
-     * Get the Z component of the vector.
-     * @return {Number} The Z component of the vector.
-     */
-    this.getZ = function () { return z; };
-}; // Vector3D class
+<header>
+    
+        <h2>
+        Position
+        </h2>
+        
+    
+</header>
 
-/**
- * Check for Vector3D equality.
- * @param {Object} rhs The other vector to compare to.
- * @return {Boolean} True if both vectors are equal.
- */
-dwv.math.Vector3D.prototype.equals = function (rhs) {
-    return rhs !== null &amp;&amp;
-        this.getX() === rhs.getX() &amp;&amp;
-        this.getY() === rhs.getY() &amp;&amp;
-        this.getZ() === rhs.getZ();
-};
 
-/**
- * Get a string representation of the Vector3D.
- * @return {String} The vector as a string.
- */
-dwv.math.Vector3D.prototype.toString = function () {
-    return "(" + this.getX() +
-        ", " + this.getY() +
-        ", " + this.getZ() + ")";
-};
+<article>
+    <div class="container-overview">
+    
+        
+<hr>
+<dt>
+    <h4 class="name" id="Position"><span class="type-signature"></span>new Position(div)</h4>
+    
+    
+</dt>
+<dd>
 
-/**
- * Get the norm of the vector.
-  * @return {Number} The norm.
- */
-dwv.math.Vector3D.prototype.norm = function () {
-    return Math.sqrt( (this.getX() * this.getX()) +
-        (this.getY() * this.getY()) +
-        (this.getZ() * this.getZ()) );
-};
+    
+    <div class="description">
+        Position info layer.
+    </div>
+    
 
-/**
- * Get the cross product with another Vector3D, ie the
- * vector that is perpendicular to both a and b.
- * If both vectors are parallel, the cross product is a zero vector.
- * @param {Object} vector3D The input vector.
-  * @return {Object} The result vector.
- */
-dwv.math.Vector3D.prototype.crossProduct = function (vector3D) {
-    return new dwv.math.Vector3D(
-        (this.getY() * vector3D.getZ()) - (vector3D.getY() * this.getZ()),
-        (this.getZ() * vector3D.getX()) - (vector3D.getZ() * this.getX()),
-        (this.getX() * vector3D.getY()) - (vector3D.getX() * this.getY()) );
-};
+    
 
-/**
- * Get the dot product with another Vector3D.
- * @param {Object} vector3D The input vector.
- * @return {Number} The dot product.
- */
-dwv.math.Vector3D.prototype.dotProduct = function (vector3D) {
-    return (this.getX() * vector3D.getX()) +
-        (this.getY() * vector3D.getY()) +
-        (this.getZ() * vector3D.getZ());
-};
-</pre>
-    </article>
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>div</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The HTML element to add Position info to.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_info.js.html">src/gui/info.js</a>,
+				 <a href="src_gui_info.js.html#sunlight-1-line-76">line 76</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+            
+<hr>
+<dt>
+    <h4 class="name" id="create"><span class="type-signature"></span>create()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Create the position info div.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_info.js.html">src/gui/info.js</a>,
+				 <a href="src_gui_info.js.html#sunlight-1-line-81">line 81</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="update"><span class="type-signature"></span>update(event)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Update the position info div.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The position change event containing the new values as {i,j,k}
+ and optional 'value'.
+Warning: expects the position info div to exist (use after create).</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_info.js.html">src/gui/info.js</a>,
+				 <a href="src_gui_info.js.html#sunlight-1-line-113">line 113</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+
+    
+</article>
+
 </section>
-
 
 
 
@@ -197,6 +510,10 @@ dwv.math.Vector3D.prototype.dotProduct = function (vector3D) {
 
 	<div class="clearfix"></div>
 
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
 	
 
 </div>
