@@ -331,7 +331,8 @@ dwv.html.removeNode = function (node) {
 };
 
 /**
- *
+ * Remove a list of HTML nodes and all their children.
+ * @param {Array} nodes The list of nodes to delete.
  */
 dwv.html.removeNodes = function (nodes) {
     for ( var i = 0; i < nodes.length; ++i ) {
