@@ -1353,12 +1353,7 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
                 row.name = "Unknown Tag & Data";
             }
             // value
-            if ( dicomElement.tag.name !== "x7FE00010" ) {
-                row.value = dicomElement.value;
-            }
-            else {
-                row.value = "...";
-            }
+            row.value = this.getElementValueAsString(dicomElement);
             // others
             row.group = dicomElement.tag.group;
             row.element = dicomElement.tag.element;
@@ -1405,6 +1400,37 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
         return result;
     };
 
+};
+
+/**
+ * Get a data element value as a string.
+ * @param {Object} dicomElement The DICOM element.
+ */
+dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function ( dicomElement )
+{
+    var str = "";
+    if ( dicomElement.tag.name === "x7FE00010" ) {
+        str = "...";
+    } else {
+        var maxLen = 64;
+        var valLen = dicomElement.value.length;
+        var len = valLen > maxLen ? maxLen : valLen;
+        for ( var j = 0; j < len; ++j ) {
+            if ( j !== 0 ) {
+                str += " \\ ";
+            }
+            if ( typeof dicomElement.value[j] === "string" ) {
+                str += dwv.dicom.cleanString(dicomElement.value[j]);
+            }
+            else {
+                str += dicomElement.value[j];
+            }
+        }
+        if (valLen > maxLen) {
+            str += "...";
+        }
+    }
+    return str;
 };
 
 /**
@@ -1526,17 +1552,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
         // default
         else {
             line += " [";
-            for ( var j = 0; j < dicomElement.value.length; ++j ) {
-                if ( j !== 0 ) {
-                    line += "\\";
-                }
-                if ( typeof dicomElement.value[j] === "string" ) {
-                    line += dwv.dicom.cleanString(dicomElement.value[j]);
-                }
-                else {
-                    line += dicomElement.value[j];
-                }
-            }
+            line += this.getElementValueAsString(dicomElement);
             line += "]";
         }
     }
