@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>dwv Class: ZoomAndPan</title>
+	<title>dwv Class: Windowing</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -93,15 +93,13 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: ZoomAndPan</h1>
+	<h1 class="page-title">Class: Windowing</h1>
 <section>
 
 <header>
     
         <h2>
-            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.gui.html">.gui</a><a href="dwv.gui.base.html">.base</a>.</span>
-        
-        ZoomAndPan
+        Windowing
         </h2>
         
     
@@ -114,7 +112,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="ZoomAndPan"><span class="type-signature"></span>new ZoomAndPan()</h4>
+    <h4 class="name" id="Windowing"><span class="type-signature"></span>new Windowing(div)</h4>
     
     
 </dt>
@@ -122,7 +120,7 @@
 
     
     <div class="description">
-        ZoomAndPan tool base gui.
+        WindowLevel info layer.
     </div>
     
 
@@ -131,6 +129,56 @@
     
 
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>div</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The HTML element to add WindowLevel info to.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
     
 
     
@@ -168,8 +216,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_gui_tools.js.html">src/gui/tools.js</a>,
-				 <a href="src_gui_tools.js.html#sunlight-1-line-361">line 361</a>
+				<a href="src_gui_info.js.html">src/gui/info.js</a>,
+				 <a href="src_gui_info.js.html#sunlight-1-line-23">line 23</a>
 			</li>
 		</ul>
 	</dd>
@@ -220,7 +268,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="display"><span class="type-signature"></span>display(bool)</h4>
+    <h4 class="name" id="create"><span class="type-signature"></span>create()</h4>
     
     
 </dt>
@@ -228,7 +276,95 @@
 
     
     <div class="description">
-        Display the tool HTML.
+        Create the windowing info div.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_info.js.html">src/gui/info.js</a>,
+				 <a href="src_gui_info.js.html#sunlight-1-line-28">line 28</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="update"><span class="type-signature"></span>update(event)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Update the windowing info div.
     </div>
     
 
@@ -263,13 +399,13 @@
 
         <tr>
             
-                <td class="name"><code>bool</code></td>
+                <td class="name"><code>event</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Boolean</span>
+<span class="param-type">Object</span>
 
 
 
@@ -280,7 +416,8 @@
 
             
 
-            <td class="description last">True to display, false to hide.</td>
+            <td class="description last">The windowing change event containing the new values as {wc,ww}.
+Warning: expects the windowing info div to exist (use after create).</td>
         </tr>
 
     
@@ -324,96 +461,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_gui_tools.js.html">src/gui/tools.js</a>,
-				 <a href="src_gui_tools.js.html#sunlight-1-line-397">line 397</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="setup"><span class="type-signature"></span>setup()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Setup the tool HTML.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_gui_tools.js.html">src/gui/tools.js</a>,
-				 <a href="src_gui_tools.js.html#sunlight-1-line-366">line 366</a>
+				<a href="src_gui_info.js.html">src/gui/info.js</a>,
+				 <a href="src_gui_info.js.html#sunlight-1-line-55">line 55</a>
 			</li>
 		</ul>
 	</dd>
