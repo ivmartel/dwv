@@ -173,32 +173,42 @@ dwv.gui.info.Overlay = function ( div, pos, app )
             return;
         }
 
-        if (pos === "bc" || pos === "tc"){
+        if (pos === "bc" || pos === "tc") {
             div.textContent = overlays[0];
-        }
-        else{
+        } else {
             // create <ul> element
             var ul = document.createElement("ul");
 
             for (var n=0; overlays[n]; n++){
                 var li;
-
                 if (overlays[n] === "window") {
-
+                    // center
                     li = document.createElement("li");
-                    li.className = "window-center";
+                    li.className = "info-" + pos + "-window-center";
                     ul.appendChild(li);
-
+                    // width
                     li = document.createElement("li");
-                    li.className = "window-width";
+                    li.className = "info-" + pos + "-window-width";
                     ul.appendChild(li);
-                }
-                else if (overlays[n] === "zoom") {
+                } else if (overlays[n] === "zoom") {
                     li = document.createElement("li");
-                    li.className = "zoom";
+                    li.className = "info-" + pos + "-zoom";
+                    ul.appendChild(li);
+                } else if (overlays[n] === "value") {
+                    li = document.createElement("li");
+                    li.className = "info-" + pos + "-value";
+                    ul.appendChild(li);
+                } else if (overlays[n] === "position") {
+                    li = document.createElement("li");
+                    li.className = "info-" + pos + "-position";
+                    ul.appendChild(li);
+                } else if (overlays[n] === "frame") {
+                    li = document.createElement("li");
+                    li.className = "info-" + pos + "-frame";
                     ul.appendChild(li);
                 } else {
                     li = document.createElement("li");
+                    li.className = "info-" + pos + "-" + n;
                     li.appendChild( document.createTextNode( overlays[n]) );
                     ul.appendChild(li);
                 }
@@ -229,34 +239,49 @@ dwv.gui.info.Overlay = function ( div, pos, app )
         var li;
         var n;
 
-        if (event.type === "wl-change") {
-            for (n=0; overlays[n]; n++){
-                if (overlays[n] === "window") {
+        for (n=0; overlays[n]; n++) {
+            if (overlays[n] === "window") {
+                if (event.type === "wl-change") {
                     var win = app.getViewController().getWindowLevel();
                     if (typeof win === "undefined") {
                         continue;
                     }
-
-                    li = div.getElementsByClassName("window-center")[0];
+                    // center
+                    li = div.getElementsByClassName("info-" + pos + "-window-center")[0];
                     dwv.html.cleanNode(li);
                     li.appendChild( document.createTextNode("WC=" + win.center) );
-
-                    li = div.getElementsByClassName("window-width")[0];
+                    // width
+                    li = div.getElementsByClassName("info-" + pos + "-window-width")[0];
                     dwv.html.cleanNode(li);
                     li.appendChild( document.createTextNode("WW=" + win.width) );
                 }
-            }
-        }
-
-        if (event.type === "zoom-change") {
-            for (n=0; overlays[n]; n++){
-                if (overlays[n] === "zoom") {
-                    li = div.getElementsByClassName("zoom")[0];
+            } else if (overlays[n] === "zoom") {
+                if (event.type === "zoom-change") {
+                    li = div.getElementsByClassName("info-" + pos + "-zoom")[0];
                     dwv.html.cleanNode(li);
                     var zoom = app.getImageLayer().getZoom();
                     li.appendChild( document.createTextNode( ("x" + zoom.x).substr(0,5) ) );
                 }
+            } else if (overlays[n] === "position") {
+                if (event.type === "position-change") {
+                    // TODO...
+                    //li = div.getElementsByClassName("info-" + pos + "-position")[0];
+                    //dwv.html.cleanNode(li);
+                }
+            } else if (overlays[n] === "frame") {
+                if (event.type === "frame-change") {
+                    // TODO...
+                    //li = div.getElementsByClassName("info-" + pos + "-frame")[0];
+                    //dwv.html.cleanNode(li);
+                }
+            } else {
+                if (event.type === "position-change") {
+                    li = div.getElementsByClassName("info-" + pos + "-" + n)[0];
+                    dwv.html.cleanNode(li);
+                    li.appendChild( document.createTextNode( overlays[n] ) );
+                }
             }
+
         }
 
     };
@@ -372,16 +397,34 @@ dwv.gui.info.createOverlays = function (dicomElements)
 
     for (var n=0; maps[n]; n++){
         var value = maps[n].value;
-        var tag = maps[n].tag;
+        var tags = maps[n].tags;
+        var format = maps[n].format;
         var pos = maps[n].pos;
-        var app = maps[n].append;
-        var pre = maps[n].prefix;
-        var suf = maps[n].suffix;
 
-        if (!value){
-            value = dicomElements.getFromKey(tag);
-            if (Array.isArray(value)){
-                value = value[0];
+        if (typeof tags !== "undefined" && tags.length !== 0) {
+            // get values
+            var values = [];
+            var tmp;
+            for ( var i = 0; i < tags.length; ++i ) {
+                tmp = dicomElements.getFromKey(tags[i]);
+                if (Array.isArray(tmp)){
+                    tmp = tmp[i];
+                }
+                values.push(tmp);
+            }
+            // format
+            if (typeof format !== "undefined") {
+                value = format;
+                for ( var j = 0; j < values.length; ++j ) {
+                    value = value.replace("{v"+j+"}", values[j]);
+                }
+            } else {
+                for ( var k = 0; k < values.length; ++k ) {
+                    if ( k !== 0 ) {
+                        value += ", ";
+                    }
+                    value = values[k];
+                }
             }
         }
 
@@ -389,33 +432,23 @@ dwv.gui.info.createOverlays = function (dicomElements)
             continue;
         }
 
-        var dict = searchDictionary(tag);
-        if (dict){
-            if (dict[0] === "DA"){
-                value = formatDate(value);
-            }
-            else if (dict[0] === "TM"){
-                value = formatTime(value);
+        if (typeof tags !== "undefined" && tags.length !== 0) {
+            var dict = searchDictionary(tags[0]);
+            if (dict){
+                if (dict[0] === "DA"){
+                    value = formatDate(value);
+                }
+                else if (dict[0] === "TM"){
+                    value = formatTime(value);
+                }
             }
         }
 
-        if (suf){
-            value += suf;
-        }
-        if (pre){
-            value = pre + value;
-        }
-
-        if (!overlays[pos]){
+        // add value to overlays
+        if (!overlays[pos]) {
             overlays[pos] = [];
         }
-
-        if (app === "true"){
-            overlays[pos][overlays[pos].length-1] += value.trim();
-        }
-        else{
-            overlays[pos].push(value.trim());
-        }
+        overlays[pos].push(value.trim());
     }
 
     // (0020,0020) Patient Orientation

@@ -1,71 +1,65 @@
 {
 	"CT":
-	 [
-		{"tag": "x00100020", "pos": "tl"},
-		{"tag": "x00100010", "pos": "tl"},
-		{"tag": "x00100040", "pos": "tl"},
-		{"tag": "x00100030", "pos": "tl"},
+	[
+		{"tags": ["x00100020"], "pos": "tl"},
+		{"tags": ["x00100010", "x00100040"], "pos": "tl", "format": "{v0} [{v1}]"},
+		{"tags": ["x00100030"], "pos": "tl"},
 
-		{"tag": "x00204000", "pos": "bl"},
-		{"tag": "x00201041", "pos": "bl"},
-		{"tag": "x00180050", "pos": "bl", "suffix": "msec"},
-		{"tag": "x00181100", "pos": "bl", "prefix": "FOV "},
-		{"tag": "x00180060", "pos": "bl", "suffix": "kV"},
-		{"tag": "x00181151", "pos": "bl", "suffix": "mA"},
-		{"tag": "x00181150", "pos": "bl", "suffix": "msec"},
-		{"tag": "x00181152", "pos": "bl", "suffix": "mAs"},
-		{"tag": "x00181120", "pos": "bl", "prefix": "Tilt "},
-		{"tag": "x00181210", "pos": "bl"},
-		{"tag": "x00185100", "pos": "bl"},
+		{"tags": ["x00204000"], "pos": "bl"},
+		{"tags": ["x00201041"], "pos": "bl"},
+		{"tags": ["x00180050"], "pos": "bl", "format": "{v0} msec"},
+		{"tags": ["x00181100"], "pos": "bl", "format": "FOV {v0}"},
+		{"tags": ["x00180060"], "pos": "bl", "format": "{v0} kV"},
+		{"tags": ["x00181151"], "pos": "bl", "format": "{v0} mA"},
+		{"tags": ["x00181150"], "pos": "bl", "format": "{v0} msec"},
+		{"tags": ["x00181152"], "pos": "bl", "format": "{v0} mAs"},
+		{"tags": ["x00181120"], "pos": "bl", "format": "Tilt {v0}"},
+		{"tags": ["x00181210"], "pos": "bl"},
+		{"tags": ["x00185100"], "pos": "bl"},
 
-		{"tag": "x00080020", "pos": "tr"},
-		{"tag": "x00080030", "pos": "tr"},
-		{"tag": "x00080060", "pos": "tr"},
+		{"tags": ["x00080020"], "pos": "tr"},
+		{"tags": ["x00080030"], "pos": "tr"},
+		{"tags": ["x00080060"], "pos": "tr"},
 
-		{"tag": "x00200011", "pos": "bl"},
-		{"tag": "x00200012", "pos": "bl", "append": "true", "prefix": ":"},
-		{"tag": "x00200013", "pos": "bl", "append": "true", "prefix": ":"},
+		{"tags": ["x00200011", "x00200012", "x00200013"], "pos": "bl", "format": "{v0}:{v1}:{v2}"},
 
-		{"tag": "x00180010", "pos": "br"},
+		{"tags": ["x00180010"], "pos": "br"},
+
 		{"value": "window", "pos": "br"},
 		{"value": "zoom",   "pos": "br"}
 	],
-	"MR": 
+	"MR":
 	[
-		{"tag": "x00100020", "pos": "tl"},
-		{"tag": "x00100010", "pos": "tl"},
-		{"tag": "x00100040", "pos": "tl"},
-		{"tag": "x00100030", "pos": "tl"},
-		
-		{"tag": "x00201041", "pos": "bl"},
-		{"tag": "x00200011", "pos": "bl"},
-		{"tag": "x00200012", "pos": "bl", "append": "true", "prefix": ":"},
-		{"tag": "x00200013", "pos": "bl", "append": "true", "prefix": ":"},
+		{"tags": ["x00100020"], "pos": "tl"},
+		{"tags": ["x00100010", "x00100040"], "pos": "tl", "format": "{v0} [{v1}]"},
+		{"tags": ["x00100030"], "pos": "tl"},
 
-		{"tag": "x00080020", "pos": "tr"},
-		{"tag": "x00080030", "pos": "tr"},
-		{"tag": "x00080060", "pos": "tr"},
+		{"tags": ["x00201041"], "pos": "bl"},
+		{"tags": ["x00200032"], "pos": "bl"},
+		{"tags": ["x00200011", "x00200012", "x00200013"], "pos": "bl", "format": "{v0}:{v1}:{v2}"},
 
-		{"tag": "x00281051", "pos": "bl", "prefix": "W"},
-		{"tag": "x00281050", "pos": "bl", "prefix": "C"},
+		{"tags": ["x00080020"], "pos": "tr"},
+		{"tags": ["x00080030"], "pos": "tr"},
+		{"tags": ["x00080060"], "pos": "tr"},
+
+		{"tags": ["x00281051"], "pos": "bl", "format": "W{v0}"},
+		{"tags": ["x00281050"], "pos": "bl", "format": "C{v0}"},
+
 		{"value": "window", "pos": "br"},
 		{"value": "zoom",   "pos": "br"}
 	],
 	"*":
 	[
-		{"tag": "x00100020", "pos": "tl"},
-		{"tag": "x00100010", "pos": "tl"},
-		{"tag": "x00100040", "pos": "tl"},
-		{"tag": "x00100030", "pos": "tl"},
+		{"tags": ["x00100020"], "pos": "tl"},
+		{"tags": ["x00100010", "x00100040"], "pos": "tl", "format": "{v0} [{v1}]"},
+		{"tags": ["x00100030"], "pos": "tl"},
 
-		{"tag": "x00080020", "pos": "tr"},
-		{"tag": "x00080030", "pos": "tr"},
-		{"tag": "x00080060", "pos": "tr"},
+		{"tags": ["x00080020"], "pos": "tr"},
+		{"tags": ["x00080030"], "pos": "tr"},
+		{"tags": ["x00080060"], "pos": "tr"},
 
-		{"tag": "x00200011", "pos": "bl"},
-		{"tag": "x00200012", "pos": "bl", "append": "true", "prefix": ":"},
-		{"tag": "x00200013", "pos": "bl", "append": "true", "prefix": ":"},
-		
+		{"tags": ["x00200011", "x00200012", "x00200013"], "pos": "bl", "format": "{v0}:{v1}:{v2}"},
+
 		{"value": "window", "pos": "br"},
 		{"value": "zoom",   "pos": "br"}
 	]
