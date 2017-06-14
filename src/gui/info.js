@@ -288,28 +288,6 @@ dwv.gui.info.Overlay = function ( div, pos, app )
 }; // class dwv.gui.info.Overlay
 
 /**
- * Search DICOM dictionary entry
- * @param {String} tag DICOM tag in xGGGGEEEE format.
- * @return {Array} DICOM Dictionary entry
- */
-function searchDictionary( tag )
-{
-    if (!tag){
-        return null;
-    }
-
-    var group = "0" + tag.substr(0,5);
-    var elem  = "0x" + tag.substr(5,4);
-
-    var darray = dwv.dicom.dictionary[group];
-    if (!darray){
-        return null;
-    }
-
-    return darray[elem];
-}
-
-/**
  * Patient orientation in the reverse direction
  */
 var rlabels = {
