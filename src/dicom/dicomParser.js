@@ -1303,6 +1303,15 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
     /**
     * Get a DICOM Element value from a group/element key.
     * @param {String} groupElementKey The key to retrieve.
+    * @return {Object} The DICOM element.
+    */
+    this.getDEFromKey = function ( groupElementKey ) {
+        return dicomElements[groupElementKey];
+    };
+
+    /**
+    * Get a DICOM Element value from a group/element key.
+    * @param {String} groupElementKey The key to retrieve.
     * @param {Boolean} asArray Get the value as an Array.
     * @return {Object} The DICOM element value.
     */
@@ -1405,32 +1414,92 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
 /**
  * Get a data element value as a string.
  * @param {Object} dicomElement The DICOM element.
+ * @return {String} A string representation of the DICOM element.
  */
 dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function ( dicomElement )
 {
     var str = "";
-    if ( dicomElement.tag.name === "x7FE00010" ) {
-        str = "...";
+
+    // check input
+    if ( typeof dicomElement === "undefined" || dicomElement === null ) {
+        return str;
+    }
+
+    // Polyfill for Number.isInteger.
+    var isInteger = Number.isInteger || function (value) {
+      return typeof value === 'number' &&
+        isFinite(value) &&
+        Math.floor(value) === value;
+    };
+
+    // TODO Support sequences.
+
+    if ( dicomElement.vr !== "SQ" &&
+        dicomElement.value.length === 1 && dicomElement.value[0] === "" ) {
+        str += "(no value available)";
+    } else if ( dicomElement.tag.group === '0x7FE0' &&
+        dicomElement.tag.element === '0x0010' &&
+        dicomElement.vl === 'u/l' ) {
+        str = "(PixelSequence)";
+    } else if ( dicomElement.vr === "DA") {
+        var daValue = dicomElement.value[0];
+        var daYear = parseInt( daValue.substr(0,4), 10 );
+        var daMonth = parseInt( daValue.substr(4,2), 10 ) - 1; // 0-11
+        var daDay = parseInt( daValue.substr(6,2), 10 );
+        var da = new Date(daYear, daMonth, daDay);
+        str = da.toLocaleDateString();
+    } else if ( dicomElement.vr === "TM") {
+        var tmValue = dicomElement.value[0];
+        var tmHour = tmValue.substr(0,2);
+        var tmMinute = tmValue.length >= 4 ? tmValue.substr(2,2) : "00";
+        var tmSeconds = tmValue.length >= 6 ? tmValue.substr(4,2) : "00";
+        str = tmHour + ':' + tmMinute + ':' + tmSeconds;
     } else {
-        var maxLen = 64;
-        var valLen = dicomElement.value.length;
-        var len = valLen > maxLen ? maxLen : valLen;
-        for ( var j = 0; j < len; ++j ) {
-            if ( j !== 0 ) {
-                str += " \\ ";
+        var isOtherVR = ( dicomElement.vr[0].toUpperCase() === "O" );
+        var isFloatNumberVR = ( dicomElement.vr === "FL" ||
+            dicomElement.vr === "FD" ||
+            dicomElement.vr === "DS");
+        var valueStr = "";
+        for ( var k = 0; k < dicomElement.value.length; ++k ) {
+            valueStr = "";
+            if ( k !== 0 ) {
+                valueStr += "\\";
             }
-            if ( typeof dicomElement.value[j] === "string" ) {
-                str += dwv.dicom.cleanString(dicomElement.value[j]);
+            if ( isFloatNumberVR && !isInteger( Number(dicomElement.value[k]) ) ) {
+                valueStr += Number(dicomElement.value[k]);//.toPrecision(8);
+            } else if ( isOtherVR ) {
+                var tmp = dicomElement.value[k].toString(16);
+                if ( dicomElement.vr === "OB" ) {
+                    tmp = "00".substr(0, 2 - tmp.length) + tmp;
+                }
+                else {
+                    tmp = "0000".substr(0, 4 - tmp.length) + tmp;
+                }
+                valueStr += tmp;
+            } else if ( typeof dicomElement.value[k] === "string" ) {
+                valueStr += dwv.dicom.cleanString(dicomElement.value[k]);
+            } else {
+                valueStr += dicomElement.value[k];
             }
-            else {
-                str += dicomElement.value[j];
+            // check length
+            if ( str.length + valueStr.length <= 65 ) {
+                str += valueStr;
+            } else {
+                str += "...";
+                break;
             }
-        }
-        if (valLen > maxLen) {
-            str += "...";
         }
     }
     return str;
+};
+
+/**
+ * Get a data element value as a string.
+ * @param {String} groupElementKey The key to retrieve.
+ */
+dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsStringFromKey = function ( groupElementKey )
+{
+    return this.getElementValueAsString( this.getDEFromKey(groupElementKey) );
 };
 
 /**
@@ -1493,50 +1562,6 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
         else if ( isPixSequence ) {
             line += " (PixelSequence #=" + deSize + ")";
         }
-        // 'O'ther array, limited display length
-        else if ( isOtherVR ||
-                dicomElement.vr === 'pi' ||
-                dicomElement.vr === "UL" ||
-                dicomElement.vr === "US" ||
-                dicomElement.vr === "SL" ||
-                dicomElement.vr === "SS" ||
-                dicomElement.vr === "FL" ||
-                dicomElement.vr === "FD" ||
-                dicomElement.vr === "AT" ) {
-            line += " ";
-            var valuesStr = "";
-            var valueStr = "";
-            for ( var k = 0; k < dicomElement.value.length; ++k ) {
-                valueStr = "";
-                if ( k !== 0 ) {
-                    valueStr += "\\";
-                }
-                if ( dicomElement.vr === "FL" ) {
-                    valueStr += Number(dicomElement.value[k].toPrecision(8));
-                }
-                else if ( isOtherVR ) {
-                    var tmp = dicomElement.value[k].toString(16);
-                    if ( dicomElement.vr === "OB" ) {
-                        tmp = "00".substr(0, 2 - tmp.length) + tmp;
-                    }
-                    else {
-                        tmp = "0000".substr(0, 4 - tmp.length) + tmp;
-                    }
-                    valueStr += tmp;
-                }
-                else {
-                    valueStr += dicomElement.value[k];
-                }
-                if ( valuesStr.length + valueStr.length <= 65 ) {
-                    valuesStr += valueStr;
-                }
-                else {
-                    valuesStr += "...";
-                    break;
-                }
-            }
-            line += valuesStr;
-        }
         else if ( dicomElement.vr === 'SQ' ) {
             line += " (Sequence with";
             if ( dicomElement.vl === "u/l" ) {
@@ -1548,6 +1573,19 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
             line += " length #=";
             line += dicomElement.value.length;
             line += ")";
+        }
+        // 'O'ther array, limited display length
+        else if ( isOtherVR ||
+                dicomElement.vr === 'pi' ||
+                dicomElement.vr === "UL" ||
+                dicomElement.vr === "US" ||
+                dicomElement.vr === "SL" ||
+                dicomElement.vr === "SS" ||
+                dicomElement.vr === "FL" ||
+                dicomElement.vr === "FD" ||
+                dicomElement.vr === "AT" ) {
+            line += " ";
+            line += this.getElementValueAsString(dicomElement);
         }
         // default
         else {

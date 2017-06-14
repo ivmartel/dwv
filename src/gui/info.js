@@ -310,36 +310,6 @@ function searchDictionary( tag )
 }
 
 /**
- * Format DICOM date value to YYYY/MM/DD
- * @param {String} value DICOM DA-type value
- * @return {String} Formatted date value
- * TODO: to be internationalized
- */
-function formatDate( value )
-{
-    if (!value || value.length < 8) {
-        return "";
-    }
-
-    return value.substr(0,4) + "/" + value.substr(4,2) + "/" + value.substr(6,2);
-}
-
-/**
- * Format DICOM time value to hh:mm:ss
- * @param {String} value DICOM TM-type value
- * @return {String} Formatted time value
- * TODO: to be internationalized
- */
-function formatTime( value )
-{
-    if (!value || value.length < 6){
-        return "";
-    }
-
-    return value.substr(0,2) + ":" + value.substr(2,2) + ":" + value.substr(4,2);
-}
-
-/**
  * Patient orientation in the reverse direction
  */
 var rlabels = {
@@ -404,13 +374,8 @@ dwv.gui.info.createOverlays = function (dicomElements)
         if (typeof tags !== "undefined" && tags.length !== 0) {
             // get values
             var values = [];
-            var tmp;
             for ( var i = 0; i < tags.length; ++i ) {
-                tmp = dicomElements.getFromKey(tags[i]);
-                if (Array.isArray(tmp)){
-                    tmp = tmp[i];
-                }
-                values.push(tmp);
+                values.push( dicomElements.getElementValueAsStringFromKey( tags[i] ) );
             }
             // format
             if (typeof format !== "undefined") {
@@ -430,18 +395,6 @@ dwv.gui.info.createOverlays = function (dicomElements)
 
         if (!value || value.length === 0){
             continue;
-        }
-
-        if (typeof tags !== "undefined" && tags.length !== 0) {
-            var dict = searchDictionary(tags[0]);
-            if (dict){
-                if (dict[0] === "DA"){
-                    value = formatDate(value);
-                }
-                else if (dict[0] === "TM"){
-                    value = formatTime(value);
-                }
-            }
         }
 
         // add value to overlays
