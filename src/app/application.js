@@ -1130,7 +1130,7 @@ dwv.App = function ()
         if( drawController ) {
             drawController.zoomStage(scale, scaleCenter);
         }
-
+        // fire event
         fireEvent({"type": "zoom-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
     }
 
@@ -1149,6 +1149,9 @@ dwv.App = function ()
                 var oy = - imageLayer.getOrigin().y / scale - translation.y;
                 drawController.translateStage(ox, oy);
             }
+            // fire event
+            fireEvent({"type": "zoom-change", "scale": scale,
+                "cx": imageLayer.getTrans().x, "cy": imageLayer.getTrans().y });
         }
     }
 
