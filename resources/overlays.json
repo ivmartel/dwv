@@ -25,8 +25,13 @@
 
 		{"tags": ["x00180010"], "pos": "br"},
 
-		{"value": "window", "pos": "br"},
-		{"value": "zoom",   "pos": "br"}
+		{"value": "window-center", "pos": "br", "format": "WC={v0}"},
+		{"value": "window-width", "pos": "br", "format": "WW={v0}"},
+		{"value": "zoom", "pos": "br", "format": "x{v0}"},
+		{"value": "offset", "pos": "br", "format": "Off={v0},{v1}"},
+		{"value": "position", "pos": "br", "format": "Pos={v0},{v1},{v2}"},
+		{"value": "frame", "pos": "br", "format": "Frame={v0}"},
+		{"value": "value", "pos": "br", "format": "Value={v0}"}
 	],
 	"MR":
 	[
@@ -45,8 +50,13 @@
 		{"tags": ["x00281051"], "pos": "bl", "format": "W{v0}"},
 		{"tags": ["x00281050"], "pos": "bl", "format": "C{v0}"},
 
-		{"value": "window", "pos": "br"},
-		{"value": "zoom",   "pos": "br"}
+		{"value": "window-center", "pos": "br", "format": "WC={v0}"},
+		{"value": "window-width", "pos": "br", "format": "WW={v0}"},
+		{"value": "zoom", "pos": "br", "format": "x{v0}"},
+		{"value": "offset", "pos": "br", "format": "Off={v0},{v1}"},
+		{"value": "position", "pos": "br", "format": "Pos={v0},{v1},{v2}"},
+		{"value": "frame", "pos": "br", "format": "Frame={v0}"},
+		{"value": "value", "pos": "br", "format": "Value={v0}"}
 	],
 	"*":
 	[
@@ -60,7 +70,12 @@
 
 		{"tags": ["x00200011", "x00200012", "x00200013"], "pos": "bl", "format": "{v0}:{v1}:{v2}"},
 
-		{"value": "window", "pos": "br"},
-		{"value": "zoom",   "pos": "br"}
+		{"value": "window-center", "pos": "br", "format": "WC={v0}"},
+		{"value": "window-width", "pos": "br", "format": "WW={v0}"},
+		{"value": "zoom", "pos": "br", "format": "x{v0}"},
+		{"value": "offset", "pos": "br", "format": "Off={v0},{v1}"},
+		{"value": "position", "pos": "br", "format": "Pos={v0},{v1},{v2}"},
+		{"value": "frame", "pos": "br", "format": "Frame={v0}"},
+		{"value": "value", "pos": "br", "format": "Value={v0}"}
 	]
 }
