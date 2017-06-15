@@ -5,15 +5,15 @@ dwv.dicom = dwv.dicom || {};
 
 /**
  * Clean string: trim and remove ending.
- * @param {String} string The string to clean.
+ * @param {String} inputStr The string to clean.
  * @return {String} The cleaned string.
  */
-dwv.dicom.cleanString = function (string)
+dwv.dicom.cleanString = function (inputStr)
 {
-    var res = string;
-    if ( string ) {
+    var res = inputStr;
+    if ( inputStr ) {
         // trim spaces
-        res = string.trim();
+        res = inputStr.trim();
         // get rid of ending zero-width space (u200B)
         if ( res[res.length-1] === String.fromCharCode("u200B") ) {
             res = res.substring(0, res.length-1);
@@ -1414,13 +1414,19 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
 /**
  * Get a data element value as a string.
  * @param {Object} dicomElement The DICOM element.
+ * @param {Boolean} pretty When set to true, returns a 'pretified' content.
  * @return {String} A string representation of the DICOM element.
  */
-dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function ( dicomElement )
+dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function ( dicomElement, pretty )
 {
     var str = "";
+    var strLenLimit = 65;
 
-    // check input
+    // dafault to pretty output
+    if ( typeof pretty === "undefined" ) {
+        pretty = true;
+    }
+    // check dicom element input
     if ( typeof dicomElement === "undefined" || dicomElement === null ) {
         return str;
     }
@@ -1441,14 +1447,14 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function ( di
         dicomElement.tag.element === '0x0010' &&
         dicomElement.vl === 'u/l' ) {
         str = "(PixelSequence)";
-    } else if ( dicomElement.vr === "DA") {
+    } else if ( dicomElement.vr === "DA" && pretty ) {
         var daValue = dicomElement.value[0];
         var daYear = parseInt( daValue.substr(0,4), 10 );
         var daMonth = parseInt( daValue.substr(4,2), 10 ) - 1; // 0-11
         var daDay = parseInt( daValue.substr(6,2), 10 );
         var da = new Date(daYear, daMonth, daDay);
         str = da.toLocaleDateString();
-    } else if ( dicomElement.vr === "TM") {
+    } else if ( dicomElement.vr === "TM"  && pretty ) {
         var tmValue = dicomElement.value[0];
         var tmHour = tmValue.substr(0,2);
         var tmMinute = tmValue.length >= 4 ? tmValue.substr(2,2) : "00";
@@ -1465,8 +1471,13 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function ( di
             if ( k !== 0 ) {
                 valueStr += "\\";
             }
-            if ( isFloatNumberVR && !isInteger( Number(dicomElement.value[k]) ) ) {
-                valueStr += Number(dicomElement.value[k]);//.toPrecision(8);
+            if ( isFloatNumberVR ) {
+                var num = Number( dwv.dicom.cleanString(dicomElement.value[k]) );
+                if ( !isInteger( num ) && pretty ) {
+                    valueStr += num.toPrecision(4);
+                } else {
+                    valueStr += num.toString();
+                }
             } else if ( isOtherVR ) {
                 var tmp = dicomElement.value[k].toString(16);
                 if ( dicomElement.vr === "OB" ) {
@@ -1482,7 +1493,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function ( di
                 valueStr += dicomElement.value[k];
             }
             // check length
-            if ( str.length + valueStr.length <= 65 ) {
+            if ( str.length + valueStr.length <= strLenLimit ) {
                 str += valueStr;
             } else {
                 str += "...";
@@ -1585,12 +1596,12 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
                 dicomElement.vr === "FD" ||
                 dicomElement.vr === "AT" ) {
             line += " ";
-            line += this.getElementValueAsString(dicomElement);
+            line += this.getElementValueAsString(dicomElement, false);
         }
         // default
         else {
             line += " [";
-            line += this.getElementValueAsString(dicomElement);
+            line += this.getElementValueAsString(dicomElement, false);
             line += "]";
         }
     }
