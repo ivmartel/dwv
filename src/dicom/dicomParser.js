@@ -1472,7 +1472,11 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function ( di
                 valueStr += "\\";
             }
             if ( isFloatNumberVR ) {
-                var num = Number( dwv.dicom.cleanString(dicomElement.value[k]) );
+                var val = dicomElement.value[k];
+                if (typeof val === "string") {
+                    val = dwv.dicom.cleanString(val);
+                }
+                var num = Number( val );
                 if ( !isInteger( num ) && pretty ) {
                     valueStr += num.toPrecision(4);
                 } else {
