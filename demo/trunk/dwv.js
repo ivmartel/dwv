@@ -1182,7 +1182,7 @@ dwv.App = function ()
         if( drawController ) {
             drawController.zoomStage(scale, scaleCenter);
         }
-
+        // fire event
         fireEvent({"type": "zoom-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
     }
 
@@ -1201,6 +1201,9 @@ dwv.App = function ()
                 var oy = - imageLayer.getOrigin().y / scale - translation.y;
                 drawController.translateStage(ox, oy);
             }
+            // fire event
+            fireEvent({"type": "zoom-change", "scale": scale,
+                "cx": imageLayer.getTrans().x, "cy": imageLayer.getTrans().y });
         }
     }
 
@@ -2585,15 +2588,15 @@ dwv.dicom = dwv.dicom || {};
 
 /**
  * Clean string: trim and remove ending.
- * @param {String} string The string to clean.
+ * @param {String} inputStr The string to clean.
  * @return {String} The cleaned string.
  */
-dwv.dicom.cleanString = function (string)
+dwv.dicom.cleanString = function (inputStr)
 {
-    var res = string;
-    if ( string ) {
+    var res = inputStr;
+    if ( inputStr ) {
         // trim spaces
-        res = string.trim();
+        res = inputStr.trim();
         // get rid of ending zero-width space (u200B)
         if ( res[res.length-1] === String.fromCharCode("u200B") ) {
             res = res.substring(0, res.length-1);
@@ -3994,13 +3997,19 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
 /**
  * Get a data element value as a string.
  * @param {Object} dicomElement The DICOM element.
+ * @param {Boolean} pretty When set to true, returns a 'pretified' content.
  * @return {String} A string representation of the DICOM element.
  */
-dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function ( dicomElement )
+dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function ( dicomElement, pretty )
 {
     var str = "";
+    var strLenLimit = 65;
 
-    // check input
+    // dafault to pretty output
+    if ( typeof pretty === "undefined" ) {
+        pretty = true;
+    }
+    // check dicom element input
     if ( typeof dicomElement === "undefined" || dicomElement === null ) {
         return str;
     }
@@ -4021,14 +4030,14 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function ( di
         dicomElement.tag.element === '0x0010' &&
         dicomElement.vl === 'u/l' ) {
         str = "(PixelSequence)";
-    } else if ( dicomElement.vr === "DA") {
+    } else if ( dicomElement.vr === "DA" && pretty ) {
         var daValue = dicomElement.value[0];
         var daYear = parseInt( daValue.substr(0,4), 10 );
         var daMonth = parseInt( daValue.substr(4,2), 10 ) - 1; // 0-11
         var daDay = parseInt( daValue.substr(6,2), 10 );
         var da = new Date(daYear, daMonth, daDay);
         str = da.toLocaleDateString();
-    } else if ( dicomElement.vr === "TM") {
+    } else if ( dicomElement.vr === "TM"  && pretty ) {
         var tmValue = dicomElement.value[0];
         var tmHour = tmValue.substr(0,2);
         var tmMinute = tmValue.length >= 4 ? tmValue.substr(2,2) : "00";
@@ -4045,8 +4054,17 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function ( di
             if ( k !== 0 ) {
                 valueStr += "\\";
             }
-            if ( isFloatNumberVR && !isInteger( Number(dicomElement.value[k]) ) ) {
-                valueStr += Number(dicomElement.value[k]);//.toPrecision(8);
+            if ( isFloatNumberVR ) {
+                var val = dicomElement.value[k];
+                if (typeof val === "string") {
+                    val = dwv.dicom.cleanString(val);
+                }
+                var num = Number( val );
+                if ( !isInteger( num ) && pretty ) {
+                    valueStr += num.toPrecision(4);
+                } else {
+                    valueStr += num.toString();
+                }
             } else if ( isOtherVR ) {
                 var tmp = dicomElement.value[k].toString(16);
                 if ( dicomElement.vr === "OB" ) {
@@ -4062,7 +4080,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function ( di
                 valueStr += dicomElement.value[k];
             }
             // check length
-            if ( str.length + valueStr.length <= 65 ) {
+            if ( str.length + valueStr.length <= strLenLimit ) {
                 str += valueStr;
             } else {
                 str += "...";
@@ -4165,12 +4183,12 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
                 dicomElement.vr === "FD" ||
                 dicomElement.vr === "AT" ) {
             line += " ";
-            line += this.getElementValueAsString(dicomElement);
+            line += this.getElementValueAsString(dicomElement, false);
         }
         // default
         else {
             line += " [";
-            line += this.getElementValueAsString(dicomElement);
+            line += this.getElementValueAsString(dicomElement, false);
             line += "]";
         }
     }
@@ -10812,35 +10830,38 @@ dwv.gui.info.Overlay = function ( div, pos, app )
 
             for (var n=0; overlays[n]; n++){
                 var li;
-                if (overlays[n] === "window") {
-                    // center
+                if (overlays[n].value === "window-center") {
                     li = document.createElement("li");
                     li.className = "info-" + pos + "-window-center";
                     ul.appendChild(li);
-                    // width
+                } else if (overlays[n].value === "window-width") {
                     li = document.createElement("li");
                     li.className = "info-" + pos + "-window-width";
                     ul.appendChild(li);
-                } else if (overlays[n] === "zoom") {
+                } else if (overlays[n].value === "zoom") {
                     li = document.createElement("li");
                     li.className = "info-" + pos + "-zoom";
                     ul.appendChild(li);
-                } else if (overlays[n] === "value") {
+                } else if (overlays[n].value === "offset") {
+                    li = document.createElement("li");
+                    li.className = "info-" + pos + "-offset";
+                    ul.appendChild(li);
+                } else if (overlays[n].value === "value") {
                     li = document.createElement("li");
                     li.className = "info-" + pos + "-value";
                     ul.appendChild(li);
-                } else if (overlays[n] === "position") {
+                } else if (overlays[n].value === "position") {
                     li = document.createElement("li");
                     li.className = "info-" + pos + "-position";
                     ul.appendChild(li);
-                } else if (overlays[n] === "frame") {
+                } else if (overlays[n].value === "frame") {
                     li = document.createElement("li");
                     li.className = "info-" + pos + "-frame";
                     ul.appendChild(li);
                 } else {
                     li = document.createElement("li");
                     li.className = "info-" + pos + "-" + n;
-                    li.appendChild( document.createTextNode( overlays[n]) );
+                    li.appendChild( document.createTextNode( overlays[n].value ) );
                     ul.appendChild(li);
                 }
             }
@@ -10871,45 +10892,63 @@ dwv.gui.info.Overlay = function ( div, pos, app )
         var n;
 
         for (n=0; overlays[n]; n++) {
-            if (overlays[n] === "window") {
+            if (overlays[n].value === "window-center") {
                 if (event.type === "wl-change") {
-                    var win = app.getViewController().getWindowLevel();
-                    if (typeof win === "undefined") {
-                        continue;
-                    }
-                    // center
                     li = div.getElementsByClassName("info-" + pos + "-window-center")[0];
                     dwv.html.cleanNode(li);
-                    li.appendChild( document.createTextNode("WC=" + win.center) );
-                    // width
+                    var wcStr = dwv.utils.replaceFlags2( overlays[n].format, [Math.round(event.wc)] );
+                    li.appendChild( document.createTextNode(wcStr) );
+                }
+            } else if (overlays[n].value === "window-width") {
+                if (event.type === "wl-change") {
                     li = div.getElementsByClassName("info-" + pos + "-window-width")[0];
                     dwv.html.cleanNode(li);
-                    li.appendChild( document.createTextNode("WW=" + win.width) );
+                    var wwStr = dwv.utils.replaceFlags2( overlays[n].format, [Math.round(event.ww)] );
+                    li.appendChild( document.createTextNode(wwStr) );
                 }
-            } else if (overlays[n] === "zoom") {
+            } else if (overlays[n].value === "zoom") {
                 if (event.type === "zoom-change") {
                     li = div.getElementsByClassName("info-" + pos + "-zoom")[0];
                     dwv.html.cleanNode(li);
-                    var zoom = app.getImageLayer().getZoom();
-                    li.appendChild( document.createTextNode( ("x" + zoom.x).substr(0,5) ) );
+                    var zoom = Number(event.scale).toPrecision(3);
+                    var zoomStr = dwv.utils.replaceFlags2( overlays[n].format, [zoom] );
+                    li.appendChild( document.createTextNode( zoomStr ) );
                 }
-            } else if (overlays[n] === "position") {
+            } else if (overlays[n].value === "offset") {
+                if (event.type === "zoom-change") {
+                    li = div.getElementsByClassName("info-" + pos + "-offset")[0];
+                    dwv.html.cleanNode(li);
+                    var offset = [ Number(event.cx).toPrecision(3),
+                        Number(event.cy).toPrecision(3)];
+                    var offStr = dwv.utils.replaceFlags2( overlays[n].format, offset );
+                    li.appendChild( document.createTextNode( offStr ) );
+                }
+            } else if (overlays[n].value === "value") {
                 if (event.type === "position-change") {
-                    // TODO...
-                    //li = div.getElementsByClassName("info-" + pos + "-position")[0];
-                    //dwv.html.cleanNode(li);
+                    li = div.getElementsByClassName("info-" + pos + "-value")[0];
+                    dwv.html.cleanNode(li);
+                    var valueStr = dwv.utils.replaceFlags2( overlays[n].format, [event.value] );
+                    li.appendChild( document.createTextNode( valueStr ) );
                 }
-            } else if (overlays[n] === "frame") {
+            } else if (overlays[n].value === "position") {
+                if (event.type === "position-change") {
+                    li = div.getElementsByClassName("info-" + pos + "-position")[0];
+                    dwv.html.cleanNode(li);
+                    var posStr = dwv.utils.replaceFlags2( overlays[n].format, [event.i, event.j, event.k] );
+                    li.appendChild( document.createTextNode( posStr ) );
+                }
+            } else if (overlays[n].value === "frame") {
                 if (event.type === "frame-change") {
-                    // TODO...
-                    //li = div.getElementsByClassName("info-" + pos + "-frame")[0];
-                    //dwv.html.cleanNode(li);
+                    li = div.getElementsByClassName("info-" + pos + "-frame")[0];
+                    dwv.html.cleanNode(li);
+                    var frameStr = dwv.utils.replaceFlags2( overlays[n].format, [event.frame] );
+                    li.appendChild( document.createTextNode( frameStr ) );
                 }
             } else {
                 if (event.type === "position-change") {
                     li = div.getElementsByClassName("info-" + pos + "-" + n)[0];
                     dwv.html.cleanNode(li);
-                    li.appendChild( document.createTextNode( overlays[n] ) );
+                    li.appendChild( document.createTextNode( overlays[n].value ) );
                 }
             }
 
@@ -10987,19 +11026,10 @@ dwv.gui.info.createOverlays = function (dicomElements)
                 values.push( dicomElements.getElementValueAsStringFromKey( tags[i] ) );
             }
             // format
-            if (typeof format !== "undefined") {
-                value = format;
-                for ( var j = 0; j < values.length; ++j ) {
-                    value = value.replace("{v"+j+"}", values[j]);
-                }
-            } else {
-                for ( var k = 0; k < values.length; ++k ) {
-                    if ( k !== 0 ) {
-                        value += ", ";
-                    }
-                    value = values[k];
-                }
+            if (typeof format === "undefined" || format === null) {
+                format = dwv.utils.createDefaultReplaceFormat( values );
             }
+            value = dwv.utils.replaceFlags2( format, values );
         }
 
         if (!value || value.length === 0){
@@ -11010,16 +11040,16 @@ dwv.gui.info.createOverlays = function (dicomElements)
         if (!overlays[pos]) {
             overlays[pos] = [];
         }
-        overlays[pos].push(value.trim());
+        overlays[pos].push({'value': value.trim(), 'format': format});
     }
 
     // (0020,0020) Patient Orientation
     var    valuePO = dicomElements.getFromKey("x00200020");
-    if (valuePO !== null){
-        overlays.cr = [valuePO[0].trim()];
-        overlays.cl = [getReverseOrientation(valuePO[0].trim())];
-        overlays.bc = [valuePO[1].trim()];
-        overlays.tc = [getReverseOrientation(valuePO[1].trim())];
+    if (typeof valuePO !== "undefined" && valuePO !== null && valuePO.length == 2){
+        overlays.cr = [{'value': valuePO[0].trim()}];
+        overlays.cl = [{'value': getReverseOrientation(valuePO[0].trim())}];
+        overlays.bc = [{'value': valuePO[1].trim()}];
+        overlays.tc = [{'value': getReverseOrientation(valuePO[1].trim())}];
     }
 
     return overlays;
@@ -11037,12 +11067,6 @@ dwv.html = dwv.html || {};
 dwv.html.Layer = function(canvas)
 {
     /**
-     * The associated HTMLCanvasElement.
-     * @private
-     * @type Object
-     */
-    //var canvas = null;
-    /**
      * A cache of the initial canvas.
      * @private
      * @type Object
@@ -11055,11 +11079,6 @@ dwv.html.Layer = function(canvas)
      */
     var context = null;
 
-    /**
-     * Get the layer name.
-     * @return {String} The layer name.
-     */
-    //this.getName = function() { return name; };
     /**
      * Get the layer canvas.
      * @return {Object} The layer canvas.
@@ -11097,7 +11116,7 @@ dwv.html.Layer = function(canvas)
         return origin;
     };
     /**
-     * The image zoom.
+     * The layer zoom.
      * @private
      * @type {Object}
      */
@@ -11110,7 +11129,19 @@ dwv.html.Layer = function(canvas)
         return zoom;
     };
 
+    /**
+     * The layer translation.
+     * @private
+     * @type {Object}
+     */
     var trans = {'x': 0, 'y': 0};
+    /**
+     * Get the layer translation.
+     * @return {Object} The layer translation as {'x','y'}.
+     */
+    this.getTrans = function () {
+        return trans;
+    };
 
     /**
      * Set the canvas width.
@@ -23647,7 +23678,7 @@ dwv.utils.replaceFlags = function (inputStr, values)
     for (var i = 0; i < keys.length; ++i) {
         var valueObj = values[keys[i]];
         if ( valueObj !== null && typeof valueObj !== "undefined" &&
-             valueObj.value !== null && typeof valueObj.value !== "undefined") {
+            valueObj.value !== null && typeof valueObj.value !== "undefined") {
             // value string
             var valueStr = valueObj.value.toPrecision(4);
             // add unit if available
@@ -23667,6 +23698,38 @@ dwv.utils.replaceFlags = function (inputStr, values)
         }
     }
     // return
+    return res;
+};
+
+/**
+ * Replace flags in a input string. Flags are keywords surrounded with curly
+ * braces.
+ * @param {String} inputStr The input string.
+ * @param {Array} values An array of strings.
+ * @example
+ *    var values = ["a", "b"];
+ *    var str = "The length is: {v0}. The size is: {v1}";
+ *    var res = dwv.utils.replaceFlags2(str, values); // "The length is: a. The size is: b"
+ * @return {String} The result string.
+ */
+dwv.utils.replaceFlags2 = function (inputStr, values)
+{
+    var res = inputStr;
+    for ( var j = 0; j < values.length; ++j ) {
+        res = res.replace("{v"+j+"}", values[j]);
+    }
+    return res;
+};
+
+dwv.utils.createDefaultReplaceFormat = function (values)
+{
+    var res = "";
+    for ( var j = 0; j < values.length; ++j ) {
+        if ( j !== 0 ) {
+            res += ", ";
+        }
+        res += "{v"+j+"}";
+    }
     return res;
 };
 
