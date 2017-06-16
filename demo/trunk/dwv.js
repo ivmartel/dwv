@@ -4,6 +4,7 @@
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define([
+            'modernizr',
             'i18next',
             'i18nextXHRBackend',
             'i18nextBrowserLanguageDetector',
@@ -20,6 +21,7 @@
         // MagicWand: no package -> deactivated
 
         module.exports = factory(
+            require('modernizr'),
             require('i18next'),
             require('i18next-xhr-backend'),
             require('i18next-browser-languagedetector'),
@@ -29,6 +31,7 @@
     } else {
         // Browser globals (root is window)
         root.dwv = factory(
+            root.Modernizr,
             root.i18next,
             root.i18nextXHRBackend,
             root.i18nextBrowserLanguageDetector,
@@ -37,6 +40,7 @@
         );
     }
 }(this, function (
+    Modernizr,
     i18next,
     i18nextXHRBackend,
     i18nextBrowserLanguageDetector,
@@ -445,8 +449,6 @@ dwv.App = function ()
         if ( drawController ) {
             drawController.resetStage(windowScale);
         }
-
-        fireEvent({"type": "zoom-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
     };
 
     /**
@@ -683,7 +685,7 @@ dwv.App = function ()
         var infoLayer = self.getElement("infoLayer");
         dwv.html.toggleDisplay(infoLayer);
         // toggle listeners
-        infoController.toggleListeners(self, view);
+        infoController.toggleViewListeners(view);
     };
 
     /**
@@ -1182,8 +1184,6 @@ dwv.App = function ()
         if( drawController ) {
             drawController.zoomStage(scale, scaleCenter);
         }
-        // fire event
-        fireEvent({"type": "zoom-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
     }
 
     /**
@@ -1201,9 +1201,6 @@ dwv.App = function ()
                 var oy = - imageLayer.getOrigin().y / scale - translation.y;
                 drawController.translateStage(ox, oy);
             }
-            // fire event
-            fireEvent({"type": "zoom-change", "scale": scale,
-                "cx": imageLayer.getTrans().x, "cy": imageLayer.getTrans().y });
         }
     }
 
@@ -1400,7 +1397,7 @@ dwv.App = function ()
         if ( infoLayer ) {
             infoController = new dwv.InfoController(containerDivId);
             infoController.create(self);
-            infoController.toggleListeners(self, view);
+            infoController.toggleViewListeners(view);
         }
 
         // init W/L display: triggers a wlchange event
@@ -1870,10 +1867,12 @@ dwv.InfoController = function (containerDivId)
 
     // Info layer plot gui
     var plotInfo = null;
+    // Info layer windowing gui
+    var windowingInfo = null;
+    // Info layer position gui
+    var positionInfo = null;
     // Info layer colour map gui
     var miniColourMap = null;
-	// Info layer overlay
-	var overlayInfos = [];
     // flag to know if the info layer is listening on the image.
     var isInfoLayerListening = false;
 
@@ -1883,28 +1882,23 @@ dwv.InfoController = function (containerDivId)
      */
     this.create = function (app)
     {
-        var infocm = getElement("infocm");
-        if (infocm) {
-            miniColourMap = new dwv.gui.info.MiniColourMap(infocm, app);
+        var infotr = getElement("infotr");
+        if (infotr) {
+            windowingInfo = new dwv.gui.info.Windowing(infotr);
+            windowingInfo.create();
+        }
+
+        var infotl = getElement("infotl");
+        if (infotl) {
+            positionInfo = new dwv.gui.info.Position(infotl);
+            positionInfo.create();
+        }
+
+        var infobr = getElement("infobr");
+        if (infobr) {
+            miniColourMap = new dwv.gui.info.MiniColourMap(infobr, app);
             miniColourMap.create();
         }
-		
-		// create overlay info at each corner
-		var pos_list = [
-			"tl", "tc", "tr",
-			"cl",       "cr",
-			"bl", "bc", "br" ];
-
-		var num = 0;
-		for (var n=0; n<pos_list.length; n++){
-			var pos = pos_list[n];
-			var info = getElement("info" + pos);
-			if (info) {
-				overlayInfos[num] = new dwv.gui.info.Overlay(info, pos, app);
-				overlayInfos[num].create();
-				num++;
-			}
-		}
 
         var plot = getElement("plot");
         if (plot) {
@@ -1914,17 +1908,16 @@ dwv.InfoController = function (containerDivId)
     };
 
     /**
-     * Toggle info listeners to the app and the view.
-     * @param {Object} app The app to listen or not to.
+     * Toggle info listeners to the view.
      * @param {Object} view The view to listen or not to.
      */
-    this.toggleListeners = function (app, view)
+    this.toggleViewListeners = function (view)
     {
         if (isInfoLayerListening) {
-            removeListeners(app, view);
+            removeViewListeners(view);
         }
         else {
-            addListeners(app, view);
+            addViewListeners(view);
         }
     };
 
@@ -1940,11 +1933,13 @@ dwv.InfoController = function (containerDivId)
 
     /**
      * Add info listeners to the view.
-     * @param {Object} app The app to listen to.
      * @param {Object} view The view to listen to.
      */
-    function addListeners(app, view)
+    function addViewListeners(view)
     {
+        if (windowingInfo) {
+            view.addEventListener("wl-change", windowingInfo.update);
+        }
         if (plotInfo) {
             view.addEventListener("wl-change", plotInfo.update);
         }
@@ -1952,25 +1947,23 @@ dwv.InfoController = function (containerDivId)
             view.addEventListener("wl-change", miniColourMap.update);
             view.addEventListener("colour-change", miniColourMap.update);
         }
-		if (overlayInfos.length > 0){
-			for (var n=0; n<overlayInfos.length; n++){
-				app.addEventListener("zoom-change", overlayInfos[n].update);
-				view.addEventListener("wl-change", overlayInfos[n].update);
-				view.addEventListener("position-change", overlayInfos[n].update);
-				view.addEventListener("frame-change", overlayInfos[n].update);
-			}
-		}
+        if (positionInfo) {
+            view.addEventListener("position-change", positionInfo.update);
+            view.addEventListener("frame-change", positionInfo.update);
+        }
         // udpate listening flag
         isInfoLayerListening = true;
     }
 
     /**
      * Remove info listeners to the view.
-     * @param {Object} app The app to stop listening to.
      * @param {Object} view The view to stop listening to.
      */
-    function removeListeners(app, view)
+    function removeViewListeners(view)
     {
+        if (windowingInfo) {
+            view.removeEventListener("wl-change", windowingInfo.update);
+        }
         if (plotInfo) {
             view.removeEventListener("wl-change", plotInfo.update);
         }
@@ -1978,14 +1971,10 @@ dwv.InfoController = function (containerDivId)
             view.removeEventListener("wl-change", miniColourMap.update);
             view.removeEventListener("colour-change", miniColourMap.update);
         }
-		if (overlayInfos.length > 0){
-			for (var n=0; n<overlayInfos.length; n++){
-				app.removeEventListener("zoom-change", overlayInfos[n].update);
-				view.removeEventListener("wl-change", overlayInfos[n].update);
-				view.removeEventListener("position-change", overlayInfos[n].update);
-				view.removeEventListener("frame-change", overlayInfos[n].update);
-			}
-		}
+        if (positionInfo) {
+            view.removeEventListener("position-change", positionInfo.update);
+            view.removeEventListener("frame-change", positionInfo.update);
+        }
         // udpate listening flag
         isInfoLayerListening = false;
     }
@@ -2588,15 +2577,15 @@ dwv.dicom = dwv.dicom || {};
 
 /**
  * Clean string: trim and remove ending.
- * @param {String} inputStr The string to clean.
+ * @param {String} string The string to clean.
  * @return {String} The cleaned string.
  */
-dwv.dicom.cleanString = function (inputStr)
+dwv.dicom.cleanString = function (string)
 {
-    var res = inputStr;
-    if ( inputStr ) {
+    var res = string;
+    if ( string ) {
         // trim spaces
-        res = inputStr.trim();
+        res = string.trim();
         // get rid of ending zero-width space (u200B)
         if ( res[res.length-1] === String.fromCharCode("u200B") ) {
             res = res.substring(0, res.length-1);
@@ -3886,15 +3875,6 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
     /**
     * Get a DICOM Element value from a group/element key.
     * @param {String} groupElementKey The key to retrieve.
-    * @return {Object} The DICOM element.
-    */
-    this.getDEFromKey = function ( groupElementKey ) {
-        return dicomElements[groupElementKey];
-    };
-
-    /**
-    * Get a DICOM Element value from a group/element key.
-    * @param {String} groupElementKey The key to retrieve.
     * @param {Boolean} asArray Get the value as an Array.
     * @return {Object} The DICOM element value.
     */
@@ -3945,7 +3925,12 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
                 row.name = "Unknown Tag & Data";
             }
             // value
-            row.value = this.getElementValueAsString(dicomElement);
+            if ( dicomElement.tag.name !== "x7FE00010" ) {
+                row.value = dicomElement.value;
+            }
+            else {
+                row.value = "...";
+            }
             // others
             row.group = dicomElement.tag.group;
             row.element = dicomElement.tag.element;
@@ -3992,112 +3977,6 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
         return result;
     };
 
-};
-
-/**
- * Get a data element value as a string.
- * @param {Object} dicomElement The DICOM element.
- * @param {Boolean} pretty When set to true, returns a 'pretified' content.
- * @return {String} A string representation of the DICOM element.
- */
-dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function ( dicomElement, pretty )
-{
-    var str = "";
-    var strLenLimit = 65;
-
-    // dafault to pretty output
-    if ( typeof pretty === "undefined" ) {
-        pretty = true;
-    }
-    // check dicom element input
-    if ( typeof dicomElement === "undefined" || dicomElement === null ) {
-        return str;
-    }
-
-    // Polyfill for Number.isInteger.
-    var isInteger = Number.isInteger || function (value) {
-      return typeof value === 'number' &&
-        isFinite(value) &&
-        Math.floor(value) === value;
-    };
-
-    // TODO Support sequences.
-
-    if ( dicomElement.vr !== "SQ" &&
-        dicomElement.value.length === 1 && dicomElement.value[0] === "" ) {
-        str += "(no value available)";
-    } else if ( dicomElement.tag.group === '0x7FE0' &&
-        dicomElement.tag.element === '0x0010' &&
-        dicomElement.vl === 'u/l' ) {
-        str = "(PixelSequence)";
-    } else if ( dicomElement.vr === "DA" && pretty ) {
-        var daValue = dicomElement.value[0];
-        var daYear = parseInt( daValue.substr(0,4), 10 );
-        var daMonth = parseInt( daValue.substr(4,2), 10 ) - 1; // 0-11
-        var daDay = parseInt( daValue.substr(6,2), 10 );
-        var da = new Date(daYear, daMonth, daDay);
-        str = da.toLocaleDateString();
-    } else if ( dicomElement.vr === "TM"  && pretty ) {
-        var tmValue = dicomElement.value[0];
-        var tmHour = tmValue.substr(0,2);
-        var tmMinute = tmValue.length >= 4 ? tmValue.substr(2,2) : "00";
-        var tmSeconds = tmValue.length >= 6 ? tmValue.substr(4,2) : "00";
-        str = tmHour + ':' + tmMinute + ':' + tmSeconds;
-    } else {
-        var isOtherVR = ( dicomElement.vr[0].toUpperCase() === "O" );
-        var isFloatNumberVR = ( dicomElement.vr === "FL" ||
-            dicomElement.vr === "FD" ||
-            dicomElement.vr === "DS");
-        var valueStr = "";
-        for ( var k = 0; k < dicomElement.value.length; ++k ) {
-            valueStr = "";
-            if ( k !== 0 ) {
-                valueStr += "\\";
-            }
-            if ( isFloatNumberVR ) {
-                var val = dicomElement.value[k];
-                if (typeof val === "string") {
-                    val = dwv.dicom.cleanString(val);
-                }
-                var num = Number( val );
-                if ( !isInteger( num ) && pretty ) {
-                    valueStr += num.toPrecision(4);
-                } else {
-                    valueStr += num.toString();
-                }
-            } else if ( isOtherVR ) {
-                var tmp = dicomElement.value[k].toString(16);
-                if ( dicomElement.vr === "OB" ) {
-                    tmp = "00".substr(0, 2 - tmp.length) + tmp;
-                }
-                else {
-                    tmp = "0000".substr(0, 4 - tmp.length) + tmp;
-                }
-                valueStr += tmp;
-            } else if ( typeof dicomElement.value[k] === "string" ) {
-                valueStr += dwv.dicom.cleanString(dicomElement.value[k]);
-            } else {
-                valueStr += dicomElement.value[k];
-            }
-            // check length
-            if ( str.length + valueStr.length <= strLenLimit ) {
-                str += valueStr;
-            } else {
-                str += "...";
-                break;
-            }
-        }
-    }
-    return str;
-};
-
-/**
- * Get a data element value as a string.
- * @param {String} groupElementKey The key to retrieve.
- */
-dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsStringFromKey = function ( groupElementKey )
-{
-    return this.getElementValueAsString( this.getDEFromKey(groupElementKey) );
 };
 
 /**
@@ -4160,6 +4039,50 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
         else if ( isPixSequence ) {
             line += " (PixelSequence #=" + deSize + ")";
         }
+        // 'O'ther array, limited display length
+        else if ( isOtherVR ||
+                dicomElement.vr === 'pi' ||
+                dicomElement.vr === "UL" ||
+                dicomElement.vr === "US" ||
+                dicomElement.vr === "SL" ||
+                dicomElement.vr === "SS" ||
+                dicomElement.vr === "FL" ||
+                dicomElement.vr === "FD" ||
+                dicomElement.vr === "AT" ) {
+            line += " ";
+            var valuesStr = "";
+            var valueStr = "";
+            for ( var k = 0; k < dicomElement.value.length; ++k ) {
+                valueStr = "";
+                if ( k !== 0 ) {
+                    valueStr += "\\";
+                }
+                if ( dicomElement.vr === "FL" ) {
+                    valueStr += Number(dicomElement.value[k].toPrecision(8));
+                }
+                else if ( isOtherVR ) {
+                    var tmp = dicomElement.value[k].toString(16);
+                    if ( dicomElement.vr === "OB" ) {
+                        tmp = "00".substr(0, 2 - tmp.length) + tmp;
+                    }
+                    else {
+                        tmp = "0000".substr(0, 4 - tmp.length) + tmp;
+                    }
+                    valueStr += tmp;
+                }
+                else {
+                    valueStr += dicomElement.value[k];
+                }
+                if ( valuesStr.length + valueStr.length <= 65 ) {
+                    valuesStr += valueStr;
+                }
+                else {
+                    valuesStr += "...";
+                    break;
+                }
+            }
+            line += valuesStr;
+        }
         else if ( dicomElement.vr === 'SQ' ) {
             line += " (Sequence with";
             if ( dicomElement.vl === "u/l" ) {
@@ -4172,23 +4095,20 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
             line += dicomElement.value.length;
             line += ")";
         }
-        // 'O'ther array, limited display length
-        else if ( isOtherVR ||
-                dicomElement.vr === 'pi' ||
-                dicomElement.vr === "UL" ||
-                dicomElement.vr === "US" ||
-                dicomElement.vr === "SL" ||
-                dicomElement.vr === "SS" ||
-                dicomElement.vr === "FL" ||
-                dicomElement.vr === "FD" ||
-                dicomElement.vr === "AT" ) {
-            line += " ";
-            line += this.getElementValueAsString(dicomElement, false);
-        }
         // default
         else {
             line += " [";
-            line += this.getElementValueAsString(dicomElement, false);
+            for ( var j = 0; j < dicomElement.value.length; ++j ) {
+                if ( j !== 0 ) {
+                    line += "\\";
+                }
+                if ( typeof dicomElement.value[j] === "string" ) {
+                    line += dwv.dicom.cleanString(dicomElement.value[j]);
+                }
+                else {
+                    line += dicomElement.value[j];
+                }
+            }
             line += "]";
         }
     }
@@ -10419,8 +10339,7 @@ dwv.html.removeNode = function (node) {
 };
 
 /**
- * Remove a list of HTML nodes and all their children.
- * @param {Array} nodes The list of nodes to delete.
+ *
  */
 dwv.html.removeNodes = function (nodes) {
     for ( var i = 0; i < nodes.length; ++i ) {
@@ -10665,6 +10584,130 @@ dwv.gui.base.plot = function (/*div, data, options*/)
 };
 
 /**
+ * WindowLevel info layer.
+ * @constructor
+ * @param {Object} div The HTML element to add WindowLevel info to.
+ */
+dwv.gui.info.Windowing = function ( div )
+{
+    /**
+     * Create the windowing info div.
+     */
+    this.create = function ()
+    {
+        // clean div
+        var elems = div.getElementsByClassName("wl-info");
+        if ( elems.length !== 0 ) {
+            dwv.html.removeNodes(elems);
+        }
+        // create windowing list
+        var ul = document.createElement("ul");
+        ul.className = "wl-info";
+        // window center list item
+        var liwc = document.createElement("li");
+        liwc.className = "window-center";
+        ul.appendChild(liwc);
+        // window width list item
+        var liww = document.createElement("li");
+        liww.className = "window-width";
+        ul.appendChild(liww);
+        // add list to div
+        div.appendChild(ul);
+    };
+
+    /**
+     * Update the windowing info div.
+     * @param {Object} event The windowing change event containing the new values as {wc,ww}.
+     * Warning: expects the windowing info div to exist (use after create).
+     */
+    this.update = function (event)
+    {
+        // window center list item
+        var liwc = div.getElementsByClassName("window-center")[0];
+        dwv.html.cleanNode(liwc);
+        liwc.appendChild( document.createTextNode(
+            dwv.i18n("tool.info.window_center", {value: Math.round(event.wc)}) ) );
+        // window width list item
+        var liww = div.getElementsByClassName("window-width")[0];
+        dwv.html.cleanNode(liww);
+        liww.appendChild( document.createTextNode(
+            dwv.i18n("tool.info.window_width", {value: Math.round(event.ww)}) ) );
+    };
+
+}; // class dwv.gui.info.Windowing
+
+/**
+ * Position info layer.
+ * @constructor
+ * @param {Object} div The HTML element to add Position info to.
+ */
+dwv.gui.info.Position = function ( div )
+{
+    /**
+     * Create the position info div.
+     */
+    this.create = function ()
+    {
+        // clean div
+        var elems = div.getElementsByClassName("pos-info");
+        if ( elems.length !== 0 ) {
+            dwv.html.removeNodes(elems);
+        }
+        // position list
+        var ul = document.createElement("ul");
+        ul.className = "pos-info";
+        // position
+        var lipos = document.createElement("li");
+        lipos.className = "position";
+        ul.appendChild(lipos);
+        // frame
+        var liframe = document.createElement("li");
+        liframe.className = "frame";
+        ul.appendChild(liframe);
+        // value
+        var livalue = document.createElement("li");
+        livalue.className = "value";
+        ul.appendChild(livalue);
+        // add list to div
+        div.appendChild(ul);
+    };
+
+    /**
+     * Update the position info div.
+     * @param {Object} event The position change event containing the new values as {i,j,k}
+     *  and optional 'value'.
+     * Warning: expects the position info div to exist (use after create).
+     */
+    this.update = function (event)
+    {
+        // position list item
+        if( typeof(event.i) !== "undefined" )
+        {
+            var lipos = div.getElementsByClassName("position")[0];
+            dwv.html.cleanNode(lipos);
+            lipos.appendChild(document.createTextNode(
+            dwv.i18n("tool.info.position", {value: event.i+", "+event.j+", "+event.k}) ) );
+        }
+        // frame list item
+        if( typeof(event.frame) !== "undefined" )
+        {
+            var liframe = div.getElementsByClassName("frame")[0];
+            dwv.html.cleanNode(liframe);
+            liframe.appendChild( document.createTextNode(
+                dwv.i18n("tool.info.frame", {value: event.frame}) ) );
+        }
+        // value list item
+        if( typeof(event.value) !== "undefined" )
+        {
+            var livalue = div.getElementsByClassName("value")[0];
+            dwv.html.cleanNode(livalue);
+            livalue.appendChild( document.createTextNode(
+                dwv.i18n("tool.info.value", {value: event.value}) ) );
+        }
+    };
+}; // class dwv.gui.info.Position
+
+/**
  * MiniColourMap info layer.
  * @constructor
  * @param {Object} div The HTML element to add colourMap info to.
@@ -10795,266 +10838,6 @@ dwv.gui.info.Plot = function (div, app)
 
 }; // class dwv.gui.info.Plot
 
-/**
- * DICOM Header overlay info layer.
- * @constructor
- * @param {Object} div The HTML element to add Header overlay info to.
- * @param {String} pos The string to specify the corner position. (tl,tc,tr,cl,cr,bl,bc,br)
- */
-dwv.gui.info.Overlay = function ( div, pos, app )
-{
-    /**
-     * Create the overlay info div.
-     */
-    this.create = function ()
-    {
-        // remove all <ul> elements from div
-        dwv.html.cleanNode(div);
-
-        // get overlay string array of the current position
-        var image = app.getImage();
-        if (!image){
-            return;
-        }
-        var posi = app.getViewController().getCurrentPosition();
-        var overlays = image.getOverlays()[posi.k][pos];
-        if (!overlays){
-            return;
-        }
-
-        if (pos === "bc" || pos === "tc") {
-            div.textContent = overlays[0];
-        } else {
-            // create <ul> element
-            var ul = document.createElement("ul");
-
-            for (var n=0; overlays[n]; n++){
-                var li;
-                if (overlays[n].value === "window-center") {
-                    li = document.createElement("li");
-                    li.className = "info-" + pos + "-window-center";
-                    ul.appendChild(li);
-                } else if (overlays[n].value === "window-width") {
-                    li = document.createElement("li");
-                    li.className = "info-" + pos + "-window-width";
-                    ul.appendChild(li);
-                } else if (overlays[n].value === "zoom") {
-                    li = document.createElement("li");
-                    li.className = "info-" + pos + "-zoom";
-                    ul.appendChild(li);
-                } else if (overlays[n].value === "offset") {
-                    li = document.createElement("li");
-                    li.className = "info-" + pos + "-offset";
-                    ul.appendChild(li);
-                } else if (overlays[n].value === "value") {
-                    li = document.createElement("li");
-                    li.className = "info-" + pos + "-value";
-                    ul.appendChild(li);
-                } else if (overlays[n].value === "position") {
-                    li = document.createElement("li");
-                    li.className = "info-" + pos + "-position";
-                    ul.appendChild(li);
-                } else if (overlays[n].value === "frame") {
-                    li = document.createElement("li");
-                    li.className = "info-" + pos + "-frame";
-                    ul.appendChild(li);
-                } else {
-                    li = document.createElement("li");
-                    li.className = "info-" + pos + "-" + n;
-                    li.appendChild( document.createTextNode( overlays[n].value ) );
-                    ul.appendChild(li);
-                }
-            }
-
-            // append <ul> element before color map
-            div.appendChild(ul);
-        }
-    };
-
-    /**
-     * Update the overlay info div.
-     * @param {Object} event A change event.
-     */
-    this.update = function ( event )
-    {
-        // get overlay string array of the current position
-        var image = app.getImage();
-        if (!image){
-            return;
-        }
-        var posi = app.getViewController().getCurrentPosition();
-        var overlays = image.getOverlays()[posi.k][pos];
-        if (!overlays){
-            return;
-        }
-
-        var li;
-        var n;
-
-        for (n=0; overlays[n]; n++) {
-            if (overlays[n].value === "window-center") {
-                if (event.type === "wl-change") {
-                    li = div.getElementsByClassName("info-" + pos + "-window-center")[0];
-                    dwv.html.cleanNode(li);
-                    var wcStr = dwv.utils.replaceFlags2( overlays[n].format, [Math.round(event.wc)] );
-                    li.appendChild( document.createTextNode(wcStr) );
-                }
-            } else if (overlays[n].value === "window-width") {
-                if (event.type === "wl-change") {
-                    li = div.getElementsByClassName("info-" + pos + "-window-width")[0];
-                    dwv.html.cleanNode(li);
-                    var wwStr = dwv.utils.replaceFlags2( overlays[n].format, [Math.round(event.ww)] );
-                    li.appendChild( document.createTextNode(wwStr) );
-                }
-            } else if (overlays[n].value === "zoom") {
-                if (event.type === "zoom-change") {
-                    li = div.getElementsByClassName("info-" + pos + "-zoom")[0];
-                    dwv.html.cleanNode(li);
-                    var zoom = Number(event.scale).toPrecision(3);
-                    var zoomStr = dwv.utils.replaceFlags2( overlays[n].format, [zoom] );
-                    li.appendChild( document.createTextNode( zoomStr ) );
-                }
-            } else if (overlays[n].value === "offset") {
-                if (event.type === "zoom-change") {
-                    li = div.getElementsByClassName("info-" + pos + "-offset")[0];
-                    dwv.html.cleanNode(li);
-                    var offset = [ Number(event.cx).toPrecision(3),
-                        Number(event.cy).toPrecision(3)];
-                    var offStr = dwv.utils.replaceFlags2( overlays[n].format, offset );
-                    li.appendChild( document.createTextNode( offStr ) );
-                }
-            } else if (overlays[n].value === "value") {
-                if (event.type === "position-change") {
-                    li = div.getElementsByClassName("info-" + pos + "-value")[0];
-                    dwv.html.cleanNode(li);
-                    var valueStr = dwv.utils.replaceFlags2( overlays[n].format, [event.value] );
-                    li.appendChild( document.createTextNode( valueStr ) );
-                }
-            } else if (overlays[n].value === "position") {
-                if (event.type === "position-change") {
-                    li = div.getElementsByClassName("info-" + pos + "-position")[0];
-                    dwv.html.cleanNode(li);
-                    var posStr = dwv.utils.replaceFlags2( overlays[n].format, [event.i, event.j, event.k] );
-                    li.appendChild( document.createTextNode( posStr ) );
-                }
-            } else if (overlays[n].value === "frame") {
-                if (event.type === "frame-change") {
-                    li = div.getElementsByClassName("info-" + pos + "-frame")[0];
-                    dwv.html.cleanNode(li);
-                    var frameStr = dwv.utils.replaceFlags2( overlays[n].format, [event.frame] );
-                    li.appendChild( document.createTextNode( frameStr ) );
-                }
-            } else {
-                if (event.type === "position-change") {
-                    li = div.getElementsByClassName("info-" + pos + "-" + n)[0];
-                    dwv.html.cleanNode(li);
-                    li.appendChild( document.createTextNode( overlays[n].value ) );
-                }
-            }
-
-        }
-
-    };
-}; // class dwv.gui.info.Overlay
-
-/**
- * Patient orientation in the reverse direction
- */
-var rlabels = {
-    "L": "R",
-    "R": "L",
-    "A": "P",
-    "P": "A",
-    "H": "F",
-    "F": "H"
-};
-
-/**
- * Get patient orientation label in the reverse direction
- * @param {String} ori Patient Orientation value
- * @return {String} Reverse Orientation Label
- */
-function getReverseOrientation( ori )
-{
-    if (!ori){
-        return "";
-    }
-
-    var rori = "";
-    for (var n=0; n<ori.length; n++){
-        var o = ori.substr(n,1);
-        var r = rlabels[o];
-        if (r){
-            rori += r;
-        }
-    }
-
-    return rori;
-}
-
-dwv.gui.info.overlayMaps = {};
-
-/**
- * Create overlay string array of the image in each corner
- * @param {Object} dicomElements DICOM elements of the image
- * @param {Object} image The image
- * @return {Array} Array of string to be shown in each corner
- */
-dwv.gui.info.createOverlays = function (dicomElements)
-{
-    var overlays = {};
-    var moda = dicomElements.getFromKey("x00080060");
-    if (!moda){
-        return overlays;
-    }
-
-    var maps = dwv.gui.info.overlayMaps[moda] || dwv.gui.info.overlayMaps['*'];
-    if (!maps){
-        return overlays;
-    }
-
-    for (var n=0; maps[n]; n++){
-        var value = maps[n].value;
-        var tags = maps[n].tags;
-        var format = maps[n].format;
-        var pos = maps[n].pos;
-
-        if (typeof tags !== "undefined" && tags.length !== 0) {
-            // get values
-            var values = [];
-            for ( var i = 0; i < tags.length; ++i ) {
-                values.push( dicomElements.getElementValueAsStringFromKey( tags[i] ) );
-            }
-            // format
-            if (typeof format === "undefined" || format === null) {
-                format = dwv.utils.createDefaultReplaceFormat( values );
-            }
-            value = dwv.utils.replaceFlags2( format, values );
-        }
-
-        if (!value || value.length === 0){
-            continue;
-        }
-
-        // add value to overlays
-        if (!overlays[pos]) {
-            overlays[pos] = [];
-        }
-        overlays[pos].push({'value': value.trim(), 'format': format});
-    }
-
-    // (0020,0020) Patient Orientation
-    var    valuePO = dicomElements.getFromKey("x00200020");
-    if (typeof valuePO !== "undefined" && valuePO !== null && valuePO.length == 2){
-        overlays.cr = [{'value': valuePO[0].trim()}];
-        overlays.cl = [{'value': getReverseOrientation(valuePO[0].trim())}];
-        overlays.bc = [{'value': valuePO[1].trim()}];
-        overlays.tc = [{'value': getReverseOrientation(valuePO[1].trim())}];
-    }
-
-    return overlays;
-};
-
 // namespaces
 var dwv = dwv || {};
 dwv.html = dwv.html || {};
@@ -11066,6 +10849,12 @@ dwv.html = dwv.html || {};
  */
 dwv.html.Layer = function(canvas)
 {
+    /**
+     * The associated HTMLCanvasElement.
+     * @private
+     * @type Object
+     */
+    //var canvas = null;
     /**
      * A cache of the initial canvas.
      * @private
@@ -11079,6 +10868,11 @@ dwv.html.Layer = function(canvas)
      */
     var context = null;
 
+    /**
+     * Get the layer name.
+     * @return {String} The layer name.
+     */
+    //this.getName = function() { return name; };
     /**
      * Get the layer canvas.
      * @return {Object} The layer canvas.
@@ -11116,7 +10910,7 @@ dwv.html.Layer = function(canvas)
         return origin;
     };
     /**
-     * The layer zoom.
+     * The image zoom.
      * @private
      * @type {Object}
      */
@@ -11129,19 +10923,7 @@ dwv.html.Layer = function(canvas)
         return zoom;
     };
 
-    /**
-     * The layer translation.
-     * @private
-     * @type {Object}
-     */
     var trans = {'x': 0, 'y': 0};
-    /**
-     * Get the layer translation.
-     * @return {Object} The layer translation as {'x','y'}.
-     */
-    this.getTrans = function () {
-        return trans;
-    };
 
     /**
      * Set the canvas width.
@@ -12582,9 +12364,9 @@ dwv.image.DicomBufferToView = function ()
     /**
      * Get data from an input buffer using a DICOM parser.
      * @param {Array} buffer The input data buffer.
-     * @param {Object} callback The callback on the conversion.
+     * @param {Number} dataIndex The data index.
      */
-    this.convert = function (buffer, callback, dataIndex)
+    this.convert = function (buffer, dataIndex)
     {
         // DICOM parser
         var dicomParser = new dwv.dicom.DicomParser();
@@ -12606,7 +12388,7 @@ dwv.image.DicomBufferToView = function ()
             var viewFactory = new dwv.image.ViewFactory();
             var view = viewFactory.create( dicomParser.getDicomElements(), image );
             // return
-            callback({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
+            self.onload({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
         };
 
         if ( needDecompression ) {
@@ -12627,7 +12409,7 @@ dwv.image.DicomBufferToView = function ()
             // send an onload event for mono frame
             if ( nFrames === 1 ) {
                 pixelDecoder.ondecoded = function () {
-                    self.onload();
+                    self.onloadend();
                 };
             }
 
@@ -12677,7 +12459,6 @@ dwv.image.DicomBufferToView = function ()
             // create image
             onDecodedFirstFrame();
             // send load events
-            self.onload();
             self.onloadend();
         }
     };
@@ -12806,9 +12587,10 @@ dwv.image.getViewFromDOMImage = function (image)
  * @param {Object} video The DOM Video.
  * @param {Object} callback The function to call once the data is loaded.
  * @param {Object} cbprogress The function to call to report progress.
+ * @param {Object} cbonloadend The function to call to report load end.
  * @param {Number} dataindex The data index.
  */
-dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, dataIndex)
+dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, cbonloadend, dataIndex)
 {
     // video size
     var width = video.videoWidth;
@@ -12882,6 +12664,7 @@ dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, dataIndex
         if (nextTime <= this.duration) {
             this.currentTime = nextTime;
         } else {
+            cbonloadend();
             // stop listening
             video.removeEventListener('seeked', onseeked);
         }
@@ -13148,6 +12931,16 @@ dwv.image.Size.prototype.isInBounds = function ( i, j, k ) {
 };
 
 /**
+ * Get a string representation of the Vector3D.
+ * @return {String} The vector as a string.
+ */
+dwv.image.Size.prototype.toString = function () {
+    return "(" + this.getNumberOfColumns() +
+        ", " + this.getNumberOfRows() +
+        ", " + this.getNumberOfSlices() + ")";
+};
+
+/**
  * 2D/3D Spacing class.
  * @constructor
  * @param {Number} columnSpacing The column spacing.
@@ -13184,6 +12977,17 @@ dwv.image.Spacing.prototype.equals = function (rhs) {
         this.getRowSpacing() === rhs.getRowSpacing() &&
         this.getSliceSpacing() === rhs.getSliceSpacing();
 };
+
+/**
+ * Get a string representation of the Vector3D.
+ * @return {String} The vector as a string.
+ */
+dwv.image.Spacing.prototype.toString = function () {
+    return "(" + this.getColumnSpacing() +
+        ", " + this.getRowSpacing() +
+        ", " + this.getSliceSpacing() + ")";
+};
+
 
 /**
  * 2D/3D Geometry class.
@@ -13497,25 +13301,6 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
      */
     var histogram = null;
 
-	/**
-	 * Overlay.
-     * @private
-     * @type Array
-     */
-	var overlays = [];
-
-    /**
-     * Set the first overlay.
-     * @param {Array} over The first overlay.
-     */
-    this.setFirstOverlay = function (over) { overlays[0] = over; };
-
-    /**
-     * Get the overlays.
-     * @return {Array} The overlays array.
-     */
-    this.getOverlays = function () { return overlays; };
-
     /**
      * Get the geometry of the image.
      * @return {Object} The size of the image.
@@ -13718,9 +13503,6 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
 
         // copy to class variables
         buffer[f] = newBuffer;
-
-		// insert overlay information of the slice to the image
-		overlays.splice(newSliceNb, 0, rhs.getOverlays()[0]);
 
         // return the appended slice number
         return newSliceNb;
@@ -14120,10 +13902,16 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
  */
 dwv.image.Image.prototype.quantifyLine = function(line)
 {
+    var quant = {};
+    // length
     var spacing = this.getGeometry().getSpacing();
     var length = line.getWorldLength( spacing.getColumnSpacing(),
             spacing.getRowSpacing() );
-    return { "length": {"value": length, "unit": dwv.i18n("unit.mm")} };
+    if (length !== null) {
+        quant.length = {"value": length, "unit": dwv.i18n("unit.mm")};
+    }
+    // return
+    return quant;
 };
 
 /**
@@ -14133,9 +13921,15 @@ dwv.image.Image.prototype.quantifyLine = function(line)
  */
 dwv.image.Image.prototype.quantifyRect = function(rect)
 {
+    var quant = {};
+    // surface
     var spacing = this.getGeometry().getSpacing();
     var surface = rect.getWorldSurface( spacing.getColumnSpacing(),
             spacing.getRowSpacing());
+    if (surface !== null) {
+        quant.surface = {"value": surface/100, "unit": dwv.i18n("unit.cm2")};
+    }
+    // stats
     var subBuffer = [];
     var minJ = parseInt(rect.getBegin().getY(), 10);
     var maxJ = parseInt(rect.getEnd().getY(), 10);
@@ -14147,13 +13941,12 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
         }
     }
     var quantif = dwv.math.getStats( subBuffer );
-    return {
-        "surface": {"value": surface/100, "unit": dwv.i18n("unit.cm2")},
-        "min": {"value": quantif.min, "unit": ""},
-        "max": {"value": quantif.max, "unit": ""},
-        "mean": {"value": quantif.mean, "unit": ""},
-        "stdDev": {"value": quantif.stdDev, "unit": ""}
-    };
+    quant.min = {"value": quantif.min, "unit": ""};
+    quant.max = {"value": quantif.max, "unit": ""};
+    quant.mean = {"value": quantif.mean, "unit": ""};
+    quant.stdDev = {"value": quantif.stdDev, "unit": ""};
+    // return
+    return quant;
 };
 
 /**
@@ -14163,10 +13956,16 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
  */
 dwv.image.Image.prototype.quantifyEllipse = function(ellipse)
 {
+    var quant = {};
+    // surface
     var spacing = this.getGeometry().getSpacing();
     var surface = ellipse.getWorldSurface( spacing.getColumnSpacing(),
             spacing.getRowSpacing());
-    return { "surface": {"value": surface/100, "unit": dwv.i18n("unit.cm2")} };
+    if (surface !== null) {
+        quant.surface = {"value": surface/100, "unit": dwv.i18n("unit.cm2")};
+    }
+    // return
+    return quant;
 };
 
 /**
@@ -14197,8 +13996,8 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var size = new dwv.image.Size( columns, rows );
 
     // spacing
-    var rowSpacing = 1;
-    var columnSpacing = 1;
+    var rowSpacing = null;
+    var columnSpacing = null;
     // PixelSpacing
     var pixelSpacing = dicomElements.getFromKey("x00280030");
     // ImagerPixelSpacing
@@ -14212,7 +14011,7 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
         columnSpacing = parseFloat( imagerPixelSpacing[1] );
     }
     // image spacing
-    var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing);
+    var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing );
 
     // TransferSyntaxUID
     var transferSyntaxUID = dicomElements.getFromKey("x00020010");
@@ -14316,9 +14115,6 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
         meta.IsSigned = (pixelRepresentation === 1);
     }
     image.setMeta(meta);
-
-    // overlay
-    image.setFirstOverlay( dwv.gui.info.createOverlays(dicomElements) );
 
     return image;
 };
@@ -15551,11 +15347,12 @@ dwv.io.DicomDataLoader = function ()
             db2v.setDefaultCharacterSet(options.defaultCharacterSet);
         }
         // connect handlers
-        db2v.onload = self.addLoaded;
+        db2v.onload = self.onload;
+        db2v.onloadend = self.onloadend;
         db2v.onprogress = self.onprogress;
         // convert
         try {
-            db2v.convert( buffer, self.onload, index );
+            db2v.convert( buffer, index );
         } catch (error) {
             self.onerror(error);
         }
@@ -15673,10 +15470,10 @@ dwv.io.DicomDataLoader.prototype.loadUrlAs = function () {
  */
 dwv.io.DicomDataLoader.prototype.onload = function (/*event*/) {};
 /**
- * Handle an add loaded event.
+ * Handle an load end event.
  * Default does nothing.
  */
-dwv.io.DicomDataLoader.prototype.addLoaded = function () {};
+dwv.io.DicomDataLoader.prototype.onloadend = function () {};
 /**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'
@@ -15831,7 +15628,7 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
     for (var k = 0; k < loaders.length; ++k) {
         loader = loaders[k];
         loader.onload = self.onload;
-        loader.addLoaded = self.addLoaded;
+        loader.onloadend = self.addLoaded;
         loader.onerror = self.onerror;
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
@@ -15905,7 +15702,7 @@ dwv.io.JSONTextLoader = function ()
     this.load = function (text, origin, index) {
         try {
             self.onload( text );
-            //self.addLoaded();
+            self.onloadend();
         } catch (error) {
             self.onerror(error);
         }
@@ -16012,10 +15809,10 @@ dwv.io.JSONTextLoader.prototype.loadUrlAs = function () {
  */
 dwv.io.JSONTextLoader.prototype.onload = function (/*event*/) {};
 /**
- * Handle an add loaded event.
+ * Handle an load end event.
  * Default does nothing.
  */
-dwv.io.JSONTextLoader.prototype.addLoaded = function () {};
+dwv.io.JSONTextLoader.prototype.onloadend = function () {};
 /**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'
@@ -16161,7 +15958,7 @@ dwv.io.MemoryLoader.prototype.load = function (ioArray)
     for (var k = 0; k < loaders.length; ++k) {
         loader = loaders[k];
         loader.onload = self.onload;
-        loader.addLoaded = self.addLoaded;
+        loader.onloadend = self.addLoaded;
         loader.onerror = self.onerror;
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
@@ -16252,7 +16049,7 @@ dwv.io.RawImageLoader = function ()
         image.onload = function (/*event*/) {
             try {
                 self.onload( dwv.image.getViewFromDOMImage(this) );
-                self.addLoaded();
+                self.onloadend();
             } catch (error) {
                 self.onerror(error);
             }
@@ -16367,10 +16164,10 @@ dwv.io.RawImageLoader.prototype.loadUrlAs = function () {
  */
 dwv.io.RawImageLoader.prototype.onload = function (/*event*/) {};
 /**
- * Handle an add loaded event.
+ * Handle an load end event.
  * Default does nothing.
  */
-dwv.io.RawImageLoader.prototype.addLoaded = function () {};
+dwv.io.RawImageLoader.prototype.onloadend = function () {};
 /**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'
@@ -16446,8 +16243,8 @@ dwv.io.RawVideoLoader = function ()
         // onload handler
         video.onloadedmetadata = function (/*event*/) {
             try {
-                dwv.image.getViewFromDOMVideo(this, self.onload, self.onprogress, index);
-                self.addLoaded();
+                dwv.image.getViewFromDOMVideo(this,
+                    self.onload, self.onprogress, self.onloadend, index);
             } catch (error) {
                 self.onerror(error);
             }
@@ -16554,10 +16351,10 @@ dwv.io.RawVideoLoader.prototype.loadUrlAs = function () {
  */
 dwv.io.RawVideoLoader.prototype.onload = function (/*event*/) {};
 /**
- * Handle an add loaded event.
+ * Handle an load end event.
  * Default does nothing.
  */
-dwv.io.RawVideoLoader.prototype.addLoaded = function () {};
+dwv.io.RawVideoLoader.prototype.onloadend = function () {};
 /**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'
@@ -16712,7 +16509,7 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
     for (var k = 0; k < loaders.length; ++k) {
         loader = loaders[k];
         loader.onload = self.onload;
-        loader.addLoaded = self.addLoaded;
+        loader.onloadend = self.addLoaded;
         loader.onerror = self.onerror;
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
@@ -16740,6 +16537,7 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
 
         // bind reader progress
         request.onprogress = mproghandler.getMonoProgressHandler(i, 0);
+        request.onloadend = mproghandler.getMonoOnLoadEndHandler(i, 0);
 
         // find a loader
         var foundLoader = false;
@@ -16750,10 +16548,11 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
                 // set reader callbacks
                 request.onload = loader.getUrlLoadHandler(url, i);
                 request.onerror = loader.getErrorHandler(url);
-                // read
+                // response type (default is 'text')
                 if (loader.loadUrlAs() === dwv.io.urlContentTypes.ArrayBuffer) {
                     request.responseType = "arraybuffer";
                 }
+                // read
                 request.send(null);
                 // next file
                 break;
@@ -16816,7 +16615,7 @@ dwv.io.ZipLoader = function ()
     	else {
             var memoryIO = new dwv.io.MemoryLoader();
             memoryIO.onload = self.onload;
-            memoryIO.onloadend = self.addLoaded;
+            memoryIO.onloadend = self.onloadend;
             memoryIO.onerror = self.onerror;
             memoryIO.onprogress = self.onprogress;
 
@@ -16940,10 +16739,10 @@ dwv.io.ZipLoader.prototype.loadUrlAs = function () {
  */
 dwv.io.ZipLoader.prototype.onload = function (/*event*/) {};
 /**
- * Handle an add loaded event.
+ * Handle an load end event.
  * Default does nothing.
  */
-dwv.io.ZipLoader.prototype.addLoaded = function () {};
+dwv.io.ZipLoader.prototype.onloadend = function () {};
 /**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'
@@ -17954,6 +17753,22 @@ var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
 /**
+ * Mulitply the three inputs if the last two are not null.
+ * @param {Number} a The first input.
+ * @param {Number} b The second input.
+ * @param {Number} c The third input.
+ * @return {Number} The multiplication of the three inputs or
+ *  null if one of the last two is null.
+ */
+function mulABC( a, b, c) {
+    var res = null;
+    if (b !== null && c !== null) {
+        res = a * b * c;
+    }
+    return res;
+}
+
+/**
  * Circle shape.
  * @constructor
  * @param {Object} centre A Point2D representing the centre of the circle.
@@ -17984,14 +17799,15 @@ dwv.math.Circle = function(centre, radius)
      */
     this.getSurface = function() { return surface; };
     /**
-     * Get the surface of the circle with a spacing.
+     * Get the surface of the circle according to a spacing.
      * @param {Number} spacingX The X spacing.
      * @param {Number} spacingY The Y spacing.
-     * @return {Number} The surface of the circle multiplied by the given spacing.
+     * @return {Number} The surface of the circle multiplied by the given
+     *  spacing or null for null spacings.
      */
     this.getWorldSurface = function(spacingX, spacingY)
     {
-        return surface * spacingX * spacingY;
+        return mulABC(surface, spacingX, spacingY);
     };
 }; // Circle class
 
@@ -18032,14 +17848,15 @@ dwv.math.Ellipse = function(centre, a, b)
      */
     this.getSurface = function() { return surface; };
     /**
-     * Get the surface of the ellipse with a spacing.
+     * Get the surface of the ellipse according to a spacing.
      * @param {Number} spacingX The X spacing.
      * @param {Number} spacingY The Y spacing.
-     * @return {Number} The surface of the ellipse multiplied by the given spacing.
+     * @return {Number} The surface of the ellipse multiplied by the given
+     *  spacing or null for null spacings.
      */
     this.getWorldSurface = function(spacingX, spacingY)
     {
-        return surface * spacingX * spacingY;
+        return mulABC(surface, spacingX, spacingY);
     };
 }; // Circle class
 
@@ -18096,16 +17913,21 @@ dwv.math.Line = function(begin, end)
      */
     this.getLength = function() { return length; };
     /**
-     * Get the length of the line with spacing.
+     * Get the length of the line according to a  spacing.
      * @param {Number} spacingX The X spacing.
      * @param {Number} spacingY The Y spacing.
-     * @return {Number} The length of the line with spacing.
+     * @return {Number} The length of the line with spacing
+     *  or null for null spacings.
      */
     this.getWorldLength = function(spacingX, spacingY)
     {
-        var dxs = dx * spacingX;
-        var dys = dy * spacingY;
-        return Math.sqrt( dxs * dxs + dys * dys );
+        var wlen = null;
+        if (spacingX !== null && spacingY !== null) {
+            var dxs = dx * spacingX;
+            var dys = dy * spacingY;
+            wlen = Math.sqrt( dxs * dxs + dys * dys );
+        }
+        return wlen;
     };
     /**
      * Get the mid point of the line.
@@ -18285,12 +18107,15 @@ dwv.math.Rectangle = function(begin, end)
      */
     this.getSurface = function() { return surface; };
     /**
-     * Get the surface of the rectangle with a spacing.
-     * @return {Number} The surface of the rectangle with a spacing.
+     * Get the surface of the circle according to a spacing.
+     * @param {Number} spacingX The X spacing.
+     * @param {Number} spacingY The Y spacing.
+     * @return {Number} The surface of the rectangle multiplied by the given
+     *  spacing or null for null spacings.
      */
     this.getWorldSurface = function(spacingX, spacingY)
     {
-        return surface * spacingX * spacingY;
+        return mulABC(surface, spacingX, spacingY);
     };
 }; // Rectangle class
 
@@ -23188,9 +23013,12 @@ dwv.tool.ZoomAndPan.prototype.init = function() {
 var dwv = dwv || {};
 /** @namespace */
 dwv.browser = dwv.browser || {};
+// external
+var Modernizr = Modernizr || {};
 
 /**
  * Browser check for the FileAPI.
+ * Assume support for Safari5.
  */
 dwv.browser.hasFileApi = function()
 {
@@ -23205,7 +23033,7 @@ dwv.browser.hasFileApi = function()
         return true;
     }
     // regular test
-    return "FileReader" in window;
+    return Modernizr.filereader;
 };
 
 /**
@@ -23213,7 +23041,9 @@ dwv.browser.hasFileApi = function()
  */
 dwv.browser.hasXmlHttpRequest = function()
 {
-    return "XMLHttpRequest" in window && "withCredentials" in new XMLHttpRequest();
+    return Modernizr.xhrresponsetype &&
+        Modernizr.xhrresponsetypearraybuffer && Modernizr.xhrresponsetypetext &&
+        "XMLHttpRequest" in window && "withCredentials" in new XMLHttpRequest();
 };
 
 /**
@@ -23221,7 +23051,16 @@ dwv.browser.hasXmlHttpRequest = function()
  */
 dwv.browser.hasTypedArray = function()
 {
-    return "Uint8Array" in window && "Uint16Array" in window;
+    return Modernizr.dataview && Modernizr.typedarrays;
+};
+
+/**
+ * Browser check for input with type='color'.
+ * Missing in IE and Safari.
+ */
+dwv.browser.hasInputColor = function()
+{
+    return Modernizr.inputtypes.color;
 };
 
 //only check at startup (since we propose a replacement)
@@ -23253,7 +23092,7 @@ dwv.browser._hasClampedArray = ("Uint8ClampedArray" in window);
 
 /**
  * Browser check for clamped array.
- * Missing in
+ * Missing in:
  * - Safari 5.1.7 for Windows
  * - PhantomJS 1.9.20 (on Travis).
  */
@@ -23263,28 +23102,14 @@ dwv.browser.hasClampedArray = function()
 };
 
 /**
- * Browser check for input with type='color'.
- * Missing in IE 11.
- */
-dwv.browser.hasInputColor = function()
-{
-    var caughtException = false;
-    var colorInput = document.createElement("input");
-    try {
-        colorInput.type = "color";
-    } catch (error) {
-        caughtException = true;
-    }
-    return !caughtException;
-};
-
-/**
  * Browser checks to see if it can run dwv. Throws an error if not.
  * Silently replaces basic functions.
- * @todo Maybe use {@link http://modernizr.com/}.
  */
 dwv.browser.check = function()
 {
+
+    // Required --------------
+
     var appnorun = "The application cannot be run.";
     var message = "";
     // Check for the File API support
@@ -23305,6 +23130,9 @@ dwv.browser.check = function()
         alert(message+appnorun);
         throw new Error(message);
     }
+
+    // Replaced if not present ------------
+
     // Check typed array slice
     if( !dwv.browser.hasTypedArraySlice() ) {
         // silent fail with warning
@@ -23583,6 +23411,19 @@ dwv.utils.MultiProgressHandler = function (callback)
     };
 
     /**
+     * Create a mono loadend event handler: sends a 100% progress.
+     * @param {Number} index The index of the data.
+     * @param {Number} subindex The sub-index of the data.
+     */
+    this.getMonoOnLoadEndHandler = function (index, subindex) {
+        return function () {
+            self.onprogress({'type': 'load-progress', 'lengthComputable': true,
+                'loaded': 100, 'total': 100,
+                'index': index, 'subindex': subindex});
+        };
+    };
+
+    /**
      * Create a mono progress event handler with an undefined index.
      * Warning: The caller handles the progress index.
      * @param {Number} subindex The sub-index of the data.
@@ -23678,7 +23519,7 @@ dwv.utils.replaceFlags = function (inputStr, values)
     for (var i = 0; i < keys.length; ++i) {
         var valueObj = values[keys[i]];
         if ( valueObj !== null && typeof valueObj !== "undefined" &&
-            valueObj.value !== null && typeof valueObj.value !== "undefined") {
+             valueObj.value !== null && typeof valueObj.value !== "undefined") {
             // value string
             var valueStr = valueObj.value.toPrecision(4);
             // add unit if available
@@ -23698,38 +23539,6 @@ dwv.utils.replaceFlags = function (inputStr, values)
         }
     }
     // return
-    return res;
-};
-
-/**
- * Replace flags in a input string. Flags are keywords surrounded with curly
- * braces.
- * @param {String} inputStr The input string.
- * @param {Array} values An array of strings.
- * @example
- *    var values = ["a", "b"];
- *    var str = "The length is: {v0}. The size is: {v1}";
- *    var res = dwv.utils.replaceFlags2(str, values); // "The length is: a. The size is: b"
- * @return {String} The result string.
- */
-dwv.utils.replaceFlags2 = function (inputStr, values)
-{
-    var res = inputStr;
-    for ( var j = 0; j < values.length; ++j ) {
-        res = res.replace("{v"+j+"}", values[j]);
-    }
-    return res;
-};
-
-dwv.utils.createDefaultReplaceFormat = function (values)
-{
-    var res = "";
-    for ( var j = 0; j < values.length; ++j ) {
-        if ( j !== 0 ) {
-            res += ", ";
-        }
-        res += "{v"+j+"}";
-    }
     return res;
 };
 

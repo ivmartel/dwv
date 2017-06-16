@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>dwv Source: tests/math/point.test.js</title>
+	<title>dwv Class: Position</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -88,166 +88,419 @@
 <div class="row">
 
 	
-	<div class="col-md-12">
+	<div class="col-md-8">
 	
 		<div id="main">
 			
 
-		<h1 class="page-title">Source: tests/math/point.test.js</h1>
-    
+	<h1 class="page-title">Class: Position</h1>
 <section>
-    <article>
-        <pre
-            class="sunlight-highlight-javascript linenums">/**
- * Tests for the 'math/point.js' file.
- */
-/** @module tests/math */
-// Do not warn if these variables were not defined before.
-/* global QUnit */
-QUnit.module("point");
 
-/**
- * Tests for {@link dwv.math.Point2D}.
- * @function module:tests/math~Point2D
- */
-QUnit.test("Test Point2D.", function (assert) {
-    var p0 = new dwv.math.Point2D(1,2);
-    // getX
-    assert.equal(p0.getX(), 1, "getX");
-    // getY
-    assert.equal(p0.getY(), 2, "getY");
-    // can't modify internal x
-    p0.x = 3;
-    assert.equal(p0.getX(), 1, "getX after .x");
-    // can't modify internal y
-    p0.y = 3;
-    assert.equal(p0.getY(), 2, "getY after .y");
-    // equals: true
-    var p1 = new dwv.math.Point2D(1,2);
-    assert.equal(p0.equals(p1), true, "equals true");
-    // equals: false
-    assert.equal(p0.equals(null), false, "null equals false");
-    var p2 = new dwv.math.Point2D(2,1);
-    assert.equal(p0.equals(p2), false, "equals false");
-    // to string
-    assert.equal(p0.toString(), "(1, 2)", "toString");
+<header>
+    
+        <h2>
+        Position
+        </h2>
+        
+    
+</header>
 
-    // distance
-    var p30 = new dwv.math.Point2D(1,3);
-    assert.equal(p0.getDistance(p30), 1, "getDistance #1");
-    var p31 = new dwv.math.Point2D(2,2);
-    assert.equal(p0.getDistance(p31), 1, "getDistance #2");
-    var p32 = new dwv.math.Point2D(2,1);
-    assert.equal(p0.getDistance(p32), Math.sqrt(2), "getDistance #3");
-    var p33 = new dwv.math.Point2D(0,1);
-    assert.equal(p0.getDistance(p33), Math.sqrt(2), "getDistance #4");
 
-});
+<article>
+    <div class="container-overview">
+    
+        
+<hr>
+<dt>
+    <h4 class="name" id="Position"><span class="type-signature"></span>new Position(div)</h4>
+    
+    
+</dt>
+<dd>
 
-/**
- * Tests for {@link dwv.math.FastPoint2D}.
- * @function module:tests/math~FastPoint2D
- */
-QUnit.test("Test FastPoint2D.", function (assert) {
-    var p0 = new dwv.math.FastPoint2D(1,2);
-    // x
-    assert.equal(p0.x, 1, "x");
-    // y
-    assert.equal(p0.y, 2, "y");
-    // can modify x
-    p0.x = 3;
-    assert.equal(p0.x, 3, "modified x");
-    // can modify y
-    p0.y = 4;
-    assert.equal(p0.y, 4, "modified y");
-    // equals: true
-    var p1 = new dwv.math.FastPoint2D(3,4);
-    assert.equal(p0.equals(p1), true, "equals true");
-    // equals: false
-    assert.equal(p0.equals(null), false, "null equals false");
-    var p2 = new dwv.math.FastPoint2D(4,3);
-    assert.equal(p0.equals(p2), false, "equals false");
-    // to string
-    assert.equal(p0.toString(), "(3, 4)", "toString");
-});
+    
+    <div class="description">
+        Position info layer.
+    </div>
+    
 
-/**
- * Tests for {@link dwv.math.Point3D}.
- * @function module:tests/math~Point3D
- */
-QUnit.test("Test Point3D.", function (assert) {
-    var p0 = new dwv.math.Point3D(1,2,3);
-    // getX
-    assert.equal(p0.getX(), 1, "getX");
-    // getY
-    assert.equal(p0.getY(), 2, "getY");
-    // getZ
-    assert.equal(p0.getZ(), 3, "getZ");
-    // can't modify internal x
-    p0.x = 3;
-    assert.equal(p0.getX(), 1, "getX after .x");
-    // can't modify internal y
-    p0.y = 3;
-    assert.equal(p0.getY(), 2, "getY after .y");
-    // can't modify internal z
-    p0.z = 3;
-    assert.equal(p0.getZ(), 3, "getZ after .z");
-    // equals: true
-    var p1 = new dwv.math.Point3D(1,2,3);
-    assert.equal(p0.equals(p1), true, "equals true");
-    // equals: false
-    assert.equal(p0.equals(null), false, "null equals false");
-    var p2 = new dwv.math.Point3D(3,2,1);
-    assert.equal(p0.equals(p2), false, "equals false");
-    // to string
-    assert.equal(p0.toString(), "(1, 2, 3)", "toString");
+    
 
-    // distance
-    var p30 = new dwv.math.Point3D(1,2,4);
-    assert.equal(p0.getDistance(p30), 1, "getDistance #1");
-    var p31= new dwv.math.Point3D(2,2,3);
-    assert.equal(p0.getDistance(p31), 1, "getDistance #2");
-    var p32 = new dwv.math.Point3D(2,1,3);
-    assert.equal(p0.getDistance(p32), Math.sqrt(2), "getDistance #3");
-    var p33 = new dwv.math.Point3D(0,1,3);
-    assert.equal(p0.getDistance(p33), Math.sqrt(2), "getDistance #4");
-});
+    
 
-/**
- * Tests for {@link dwv.math.Index3D}.
- * @function module:tests/math~Index3D
- */
-QUnit.test("Test Index3D.", function (assert) {
-    var i0 = new dwv.math.Index3D(1,2,3);
-    // getX
-    assert.equal(i0.getI(), 1, "getI");
-    // getY
-    assert.equal(i0.getJ(), 2, "getJ");
-    // getZ
-    assert.equal(i0.getK(), 3, "getK");
-    // can't modify internal i
-    i0.i = 3;
-    assert.equal(i0.getI(), 1, "getI after .i");
-    // can't modify internal j
-    i0.j = 3;
-    assert.equal(i0.getJ(), 2, "getJ after .j");
-    // can't modify internal k
-    i0.k = 3;
-    assert.equal(i0.getK(), 3, "getK after .k");
-    // equals: true
-    var i1 = new dwv.math.Index3D(1,2,3);
-    assert.equal(i0.equals(i1), true, "equals true");
-    // equals: false
-    assert.equal(i0.equals(null), false, "null equals false");
-    var i2 = new dwv.math.Index3D(3,2,1);
-    assert.equal(i0.equals(i2), false, "equals false");
-    // to string
-    assert.equal(i0.toString(), "(1, 2, 3)", "toString");
-});
-</pre>
-    </article>
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>div</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The HTML element to add Position info to.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_info.js.html">src/gui/info.js</a>,
+				 <a href="src_gui_info.js.html#sunlight-1-line-76">line 76</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+            
+<hr>
+<dt>
+    <h4 class="name" id="create"><span class="type-signature"></span>create()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Create the position info div.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_info.js.html">src/gui/info.js</a>,
+				 <a href="src_gui_info.js.html#sunlight-1-line-81">line 81</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="update"><span class="type-signature"></span>update(event)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Update the position info div.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The position change event containing the new values as {i,j,k}
+ and optional 'value'.
+Warning: expects the position info div to exist (use after create).</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_gui_info.js.html">src/gui/info.js</a>,
+				 <a href="src_gui_info.js.html#sunlight-1-line-113">line 113</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+
+    
+</article>
+
 </section>
-
 
 
 
@@ -257,6 +510,10 @@ QUnit.test("Test Index3D.", function (assert) {
 
 	<div class="clearfix"></div>
 
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
 	
 
 </div>
