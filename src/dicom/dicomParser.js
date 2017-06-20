@@ -425,6 +425,38 @@ dwv.dicom.splitGroupElementKey = function (key)
 };
 
 /**
+ * Get patient orientation label in the reverse direction.
+ * @param {String} ori Patient Orientation value.
+ * @return {String} Reverse Orientation Label.
+ */
+dwv.dicom.getReverseOrientation = function (ori)
+{
+    if (!ori) {
+        return null;
+    }
+    // reverse labels
+    var rlabels = {
+        "L": "R",
+        "R": "L",
+        "A": "P",
+        "P": "A",
+        "H": "F",
+        "F": "H"
+    };
+
+    var rori = "";
+    for (var n=0; n<ori.length; n++) {
+        var o = ori.substr(n,1);
+        var r = rlabels[o];
+        if (r){
+            rori += r;
+        }
+    }
+    // return
+    return rori;
+};
+
+/**
  * Tell if a given syntax is an implicit one (element with no VR).
  * @param {String} syntax The transfer syntax to test.
  * @return {Boolean} True if an implicit syntax.

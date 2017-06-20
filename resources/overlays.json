@@ -5,33 +5,25 @@
 		{"tags": ["x00100010", "x00100040"], "pos": "tl", "format": "{v0} [{v1}]"},
 		{"tags": ["x00100030"], "pos": "tl"},
 
-		{"tags": ["x00204000"], "pos": "bl"},
-		{"tags": ["x00201041"], "pos": "bl"},
-		{"tags": ["x00180050"], "pos": "bl", "format": "{v0} msec"},
-		{"tags": ["x00181100"], "pos": "bl", "format": "FOV {v0}"},
-		{"tags": ["x00180060"], "pos": "bl", "format": "{v0} kV"},
-		{"tags": ["x00181151"], "pos": "bl", "format": "{v0} mA"},
-		{"tags": ["x00181150"], "pos": "bl", "format": "{v0} msec"},
-		{"tags": ["x00181152"], "pos": "bl", "format": "{v0} mAs"},
-		{"tags": ["x00181120"], "pos": "bl", "format": "Tilt {v0}"},
-		{"tags": ["x00181210"], "pos": "bl"},
+		{"tags": ["x00200011", "x00200012", "x00200013"], "pos": "bl", "format": "{v0}:{v1}:{v2}"},
 		{"tags": ["x00185100"], "pos": "bl"},
+		{"tags": ["x00201041"], "pos": "bl", "format": "SL: {v0}"},
+		{"tags": ["x00180050"], "pos": "bl", "format": "ST: {v0}"},
+		{"tags": ["x00280010", "x00280011"], "pos": "bl", "format": "RES: {v0}x{v1}"},
+		{"tags": ["x00181100"], "pos": "bl", "format": "FOV: {v0}"},
+		{"tags": ["x00180060"], "pos": "bl", "format": "{v0} kV"},
 
-		{"tags": ["x00080020"], "pos": "tr"},
-		{"tags": ["x00080030"], "pos": "tr"},
+		{"tags": ["x00080080"], "pos": "tr"},
+		{"tags": ["x00080020", "x00080030"], "pos": "tr", "format": "{v0} {v1}"},
 		{"tags": ["x00080060"], "pos": "tr"},
 
-		{"tags": ["x00200011", "x00200012", "x00200013"], "pos": "bl", "format": "{v0}:{v1}:{v2}"},
-
-		{"tags": ["x00180010"], "pos": "br"},
-
-		{"value": "window-center", "pos": "br", "format": "WC={v0}"},
-		{"value": "window-width", "pos": "br", "format": "WW={v0}"},
-		{"value": "zoom", "pos": "br", "format": "x{v0}"},
-		{"value": "offset", "pos": "br", "format": "Off={v0},{v1}"},
-		{"value": "position", "pos": "br", "format": "Pos={v0},{v1},{v2}"},
-		{"value": "frame", "pos": "br", "format": "Frame={v0}"},
-		{"value": "value", "pos": "br", "format": "Value={v0}"}
+		{"value": "window-center", "pos": "br", "format": "WC: {v0}"},
+		{"value": "window-width", "pos": "br", "format": "WW: {v0}"},
+		{"value": "zoom", "pos": "br", "format": "Z: {v0}"},
+		{"value": "offset", "pos": "br", "format": "Off: {v0},{v1}"},
+		{"value": "position", "pos": "br", "format": "Pos: {v0},{v1},{v2}"},
+		{"value": "frame", "pos": "br", "format": "Frame: {v0}"},
+		{"value": "value", "pos": "br", "format": "Value: {v0}"}
 	],
 	"MR":
 	[
@@ -39,24 +31,47 @@
 		{"tags": ["x00100010", "x00100040"], "pos": "tl", "format": "{v0} [{v1}]"},
 		{"tags": ["x00100030"], "pos": "tl"},
 
-		{"tags": ["x00201041"], "pos": "bl"},
-		{"tags": ["x00200032"], "pos": "bl"},
 		{"tags": ["x00200011", "x00200012", "x00200013"], "pos": "bl", "format": "{v0}:{v1}:{v2}"},
+		{"tags": ["x00185100"], "pos": "bl"},
+		{"tags": ["x00201041"], "pos": "bl", "format": "SL: {v0}"},
+		{"tags": ["x00180050"], "pos": "bl", "format": "ST: {v0}"},
+		{"tags": ["x00280010", "x00280011"], "pos": "bl", "format": "RES: {v0}x{v1}"},
+		{"tags": ["x00181100"], "pos": "bl", "format": "FOV: {v0}"},
+		{"tags": ["x00180080", "x00180081"], "pos": "bl", "format": "TR/TE: {v0}/{v1} ms"},
 
-		{"tags": ["x00080020"], "pos": "tr"},
-		{"tags": ["x00080030"], "pos": "tr"},
+		{"tags": ["x00080080"], "pos": "tr"},
+		{"tags": ["x00080020", "x00080030"], "pos": "tr", "format": "{v0} {v1}"},
 		{"tags": ["x00080060"], "pos": "tr"},
 
-		{"tags": ["x00281051"], "pos": "bl", "format": "W{v0}"},
-		{"tags": ["x00281050"], "pos": "bl", "format": "C{v0}"},
+		{"value": "window-center", "pos": "br", "format": "WC: {v0}"},
+		{"value": "window-width", "pos": "br", "format": "WW: {v0}"},
+		{"value": "zoom", "pos": "br", "format": "Z: {v0}"},
+		{"value": "offset", "pos": "br", "format": "Off: {v0},{v1}"},
+		{"value": "position", "pos": "br", "format": "Pos: {v0},{v1},{v2}"},
+		{"value": "frame", "pos": "br", "format": "Frame: {v0}"},
+		{"value": "value", "pos": "br", "format": "Value: {v0}"}
+	],
+	"US":
+	[
+		{"tags": ["x00100020"], "pos": "tl"},
+		{"tags": ["x00100010", "x00100040"], "pos": "tl", "format": "{v0} [{v1}]"},
+		{"tags": ["x00100030"], "pos": "tl"},
 
-		{"value": "window-center", "pos": "br", "format": "WC={v0}"},
-		{"value": "window-width", "pos": "br", "format": "WW={v0}"},
-		{"value": "zoom", "pos": "br", "format": "x{v0}"},
-		{"value": "offset", "pos": "br", "format": "Off={v0},{v1}"},
-		{"value": "position", "pos": "br", "format": "Pos={v0},{v1},{v2}"},
-		{"value": "frame", "pos": "br", "format": "Frame={v0}"},
-		{"value": "value", "pos": "br", "format": "Value={v0}"}
+		{"tags": ["x00200011", "x00200012", "x00200013"], "pos": "bl", "format": "{v0}:{v1}:{v2}"},
+		{"tags": ["x00280010", "x00280011"], "pos": "bl", "format": "RES: {v0}x{v1}"},
+		{"tags": ["x00181100"], "pos": "bl", "format": "FOV: {v0}"},
+
+		{"tags": ["x00080080"], "pos": "tr"},
+		{"tags": ["x00080020", "x00080030"], "pos": "tr", "format": "{v0} {v1}"},
+		{"tags": ["x00080060"], "pos": "tr"},
+
+		{"value": "window-center", "pos": "br", "format": "WC: {v0}"},
+		{"value": "window-width", "pos": "br", "format": "WW: {v0}"},
+		{"value": "zoom", "pos": "br", "format": "Z: {v0}"},
+		{"value": "offset", "pos": "br", "format": "Off: {v0},{v1}"},
+		{"value": "position", "pos": "br", "format": "Pos: {v0},{v1},{v2}"},
+		{"value": "frame", "pos": "br", "format": "Frame: {v0}"},
+		{"value": "value", "pos": "br", "format": "Value: {v0}"}
 	],
 	"*":
 	[
@@ -64,18 +79,23 @@
 		{"tags": ["x00100010", "x00100040"], "pos": "tl", "format": "{v0} [{v1}]"},
 		{"tags": ["x00100030"], "pos": "tl"},
 
-		{"tags": ["x00080020"], "pos": "tr"},
-		{"tags": ["x00080030"], "pos": "tr"},
+		{"tags": ["x00200011", "x00200012", "x00200013"], "pos": "bl", "format": "{v0}:{v1}:{v2}"},
+		{"tags": ["x00185100"], "pos": "bl"},
+		{"tags": ["x00201041"], "pos": "bl", "format": "SL: {v0}"},
+		{"tags": ["x00180050"], "pos": "bl", "format": "ST: {v0}"},
+		{"tags": ["x00280010", "x00280011"], "pos": "bl", "format": "RES: {v0}x{v1}"},
+		{"tags": ["x00181100"], "pos": "bl", "format": "FOV: {v0}"},
+
+		{"tags": ["x00080080"], "pos": "tr"},
+		{"tags": ["x00080020", "x00080030"], "pos": "tr", "format": "{v0} {v1}"},
 		{"tags": ["x00080060"], "pos": "tr"},
 
-		{"tags": ["x00200011", "x00200012", "x00200013"], "pos": "bl", "format": "{v0}:{v1}:{v2}"},
-
-		{"value": "window-center", "pos": "br", "format": "WC={v0}"},
-		{"value": "window-width", "pos": "br", "format": "WW={v0}"},
-		{"value": "zoom", "pos": "br", "format": "x{v0}"},
-		{"value": "offset", "pos": "br", "format": "Off={v0},{v1}"},
-		{"value": "position", "pos": "br", "format": "Pos={v0},{v1},{v2}"},
-		{"value": "frame", "pos": "br", "format": "Frame={v0}"},
-		{"value": "value", "pos": "br", "format": "Value={v0}"}
+		{"value": "window-center", "pos": "br", "format": "WC: {v0}"},
+		{"value": "window-width", "pos": "br", "format": "WW: {v0}"},
+		{"value": "zoom", "pos": "br", "format": "Z: {v0}"},
+		{"value": "offset", "pos": "br", "format": "Off: {v0},{v1}"},
+		{"value": "position", "pos": "br", "format": "Pos: {v0},{v1},{v2}"},
+		{"value": "frame", "pos": "br", "format": "Frame: {v0}"},
+		{"value": "value", "pos": "br", "format": "Value: {v0}"}
 	]
 }
