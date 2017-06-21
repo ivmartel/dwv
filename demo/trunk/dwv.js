@@ -11007,8 +11007,6 @@ dwv.gui.info.Overlay = function ( div, pos, app )
     };
 }; // class dwv.gui.info.Overlay
 
-dwv.gui.info.overlayMaps = {};
-
 /**
  * Create overlay string array of the image in each corner
  * @param {Object} dicomElements DICOM elements of the image
@@ -11023,16 +11021,17 @@ dwv.gui.info.createOverlays = function (dicomElements)
         return overlays;
     }
 
-    var maps = dwv.gui.info.overlayMaps[modality] || dwv.gui.info.overlayMaps['*'];
-    if (!maps){
+    var omaps = dwv.gui.info.overlayMaps;
+    if (!omaps){
         return overlays;
     }
+    var omap = omaps[modality] || omaps['*'];
 
-    for (var n=0; maps[n]; n++){
-        var value = maps[n].value;
-        var tags = maps[n].tags;
-        var format = maps[n].format;
-        var pos = maps[n].pos;
+    for (var n=0; omap[n]; n++){
+        var value = omap[n].value;
+        var tags = omap[n].tags;
+        var format = omap[n].format;
+        var pos = omap[n].pos;
 
         if (typeof tags !== "undefined" && tags.length !== 0) {
             // get values
@@ -23391,6 +23390,9 @@ var i18nextBrowserLanguageDetector = i18nextBrowserLanguageDetector || {};
 // This is mainly a wrapper around the i18next object.
 // see its API: http://i18next.com/docs/api/
 
+// global locales path
+dwv.i18nLocalesPath = null;
+
 /**
  * Initialise i18n.
  * @param {String} language The language to translate to. Defaults to 'auto' and
@@ -23404,6 +23406,8 @@ dwv.i18nInitialise = function (language, localesPath)
 {
     var lng = (typeof language === "undefined") ? "auto" : language;
     var lpath = (typeof localesPath === "undefined") ? "../.." : localesPath;
+    // store as global
+    dwv.i18nLocalesPath = lpath;
     // i18n options: default 'en' language and
     //  only load language, not specialised (for ex en-GB)
     var options = {
@@ -23494,6 +23498,17 @@ dwv.i18nPage = function () {
             elements[i].innerHTML = dwv.i18n(elements[i].dataset.i18n);
         }
     }
+};
+
+/**
+ * Get the current locale resource path.
+ * Warning: to be used once i18next is initialised.
+ * @return {String} The path to the locale resource.
+ */
+dwv.i18nGetLocalePath = function (filename) {
+    // TODO check if the file exists...
+    return dwv.i18nLocalesPath +
+        "/locales/" + i18next.language.substr(0, 2) + "/" + filename;
 };
 
 // namespaces
