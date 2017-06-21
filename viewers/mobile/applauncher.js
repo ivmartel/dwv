@@ -79,11 +79,9 @@ $(document).ready( function() {
 });
 // i18n ready?
 dwv.i18nOnLoaded( function () {
-    i18nLoaded = true;
-    launchApp();
-});
-
-// load overlay map info
-$.getJSON("../../resources/overlays.json", function(data){
-	dwv.gui.info.overlayMaps = data;
+    // load overlay map info
+    $.getJSON(dwv.i18nGetLocalePath("overlays.json"), function(data){
+        i18nLoaded = true;
+        launchApp();
+    });
 });

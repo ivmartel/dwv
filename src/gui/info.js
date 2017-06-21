@@ -326,8 +326,6 @@ dwv.gui.info.Overlay = function ( div, pos, app )
     };
 }; // class dwv.gui.info.Overlay
 
-dwv.gui.info.overlayMaps = {};
-
 /**
  * Create overlay string array of the image in each corner
  * @param {Object} dicomElements DICOM elements of the image
@@ -342,16 +340,17 @@ dwv.gui.info.createOverlays = function (dicomElements)
         return overlays;
     }
 
-    var maps = dwv.gui.info.overlayMaps[modality] || dwv.gui.info.overlayMaps['*'];
-    if (!maps){
+    var omaps = dwv.gui.info.overlayMaps;
+    if (!omaps){
         return overlays;
     }
+    var omap = omaps[modality] || omaps['*'];
 
-    for (var n=0; maps[n]; n++){
-        var value = maps[n].value;
-        var tags = maps[n].tags;
-        var format = maps[n].format;
-        var pos = maps[n].pos;
+    for (var n=0; omap[n]; n++){
+        var value = omap[n].value;
+        var tags = omap[n].tags;
+        var format = omap[n].format;
+        var pos = omap[n].pos;
 
         if (typeof tags !== "undefined" && tags.length !== 0) {
             // get values
