@@ -81,6 +81,7 @@ $(document).ready( function() {
 dwv.i18nOnLoaded( function () {
     // load overlay map info
     $.getJSON(dwv.i18nGetLocalePath("overlays.json"), function(data){
+        dwv.gui.info.overlayMaps = data;
         i18nLoaded = true;
         launchApp();
     });
