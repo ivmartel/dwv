@@ -193,7 +193,8 @@ dwv.gui.info.Overlay = function ( div, pos, app )
             return;
         }
 
-        if (pos === "bc" || pos === "tc") {
+        if (pos === "bc" || pos === "tc" ||
+            pos === "cr" || pos === "cl") {
             div.textContent = overlays[0].value;
         } else {
             // create <ul> element
@@ -254,7 +255,8 @@ dwv.gui.info.Overlay = function ( div, pos, app )
             return;
         }
 
-        if (pos === "bc" || pos === "tc") {
+        if (pos === "bc" || pos === "tc" ||
+            pos === "cr" || pos === "cl") {
             div.textContent = overlays[0].value;
         } else {
             var li;
