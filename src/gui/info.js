@@ -324,14 +324,12 @@ dwv.gui.info.Overlay = function ( div, pos, app )
                 }
             }
         }
-
     };
 }; // class dwv.gui.info.Overlay
 
 /**
  * Create overlay string array of the image in each corner
  * @param {Object} dicomElements DICOM elements of the image
- * @param {Object} image The image
  * @return {Array} Array of string to be shown in each corner
  */
 dwv.gui.info.createOverlays = function (dicomElements)
@@ -387,6 +385,60 @@ dwv.gui.info.createOverlays = function (dicomElements)
         overlays.cl = [{'value': dwv.dicom.getReverseOrientation(po0)}];
         overlays.bc = [{'value': po1}];
         overlays.tc = [{'value': dwv.dicom.getReverseOrientation(po1)}];
+    }
+
+    return overlays;
+};
+
+/**
+ * Create overlay string array of the image in each corner
+ * @param {Object} dicomElements DICOM elements of the image
+ * @return {Array} Array of string to be shown in each corner
+ */
+dwv.gui.info.createOverlaysForDom = function (info)
+{
+    var overlays = {};
+    var omaps = dwv.gui.info.overlayMaps;
+    if (!omaps){
+        return overlays;
+    }
+    var omap = omaps.DOM;
+    if (!omap){
+        return overlays;
+    }
+
+    for (var n=0; omap[n]; n++){
+        var value = omap[n].value;
+        var tags = omap[n].tags;
+        var format = omap[n].format;
+        var pos = omap[n].pos;
+
+        if (typeof tags !== "undefined" && tags.length !== 0) {
+            // get values
+            var values = [];
+            for ( var i = 0; i < tags.length; ++i ) {
+                for ( var j = 0; j < info.length; ++j ) {
+                    if (tags[i] === info[j].name) {
+                        values.push( info[j].value );
+                    }
+                }
+            }
+            // format
+            if (typeof format === "undefined" || format === null) {
+                format = dwv.utils.createDefaultReplaceFormat( values );
+            }
+            value = dwv.utils.replaceFlags2( format, values );
+        }
+
+        if (!value || value.length === 0){
+            continue;
+        }
+
+        // add value to overlays
+        if (!overlays[pos]) {
+            overlays[pos] = [];
+        }
+        overlays[pos].push({'value': value.trim(), 'format': format});
     }
 
     return overlays;
