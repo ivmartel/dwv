@@ -4,6 +4,7 @@
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define([
+            'modernizr',
             'i18next',
             'i18nextXHRBackend',
             'i18nextBrowserLanguageDetector',
@@ -20,6 +21,7 @@
         // MagicWand: no package -> deactivated
 
         module.exports = factory(
+            require('modernizr'),
             require('i18next'),
             require('i18next-xhr-backend'),
             require('i18next-browser-languagedetector'),
@@ -29,6 +31,7 @@
     } else {
         // Browser globals (root is window)
         root.dwv = factory(
+            root.Modernizr,
             root.i18next,
             root.i18nextXHRBackend,
             root.i18nextBrowserLanguageDetector,
@@ -37,6 +40,7 @@
         );
     }
 }(this, function (
+    Modernizr,
     i18next,
     i18nextXHRBackend,
     i18nextBrowserLanguageDetector,
@@ -12652,9 +12656,9 @@ dwv.image.DicomBufferToView = function ()
     /**
      * Get data from an input buffer using a DICOM parser.
      * @param {Array} buffer The input data buffer.
-     * @param {Object} callback The callback on the conversion.
+     * @param {Number} dataIndex The data index.
      */
-    this.convert = function (buffer, callback, dataIndex)
+    this.convert = function (buffer, dataIndex)
     {
         // DICOM parser
         var dicomParser = new dwv.dicom.DicomParser();
@@ -12676,7 +12680,7 @@ dwv.image.DicomBufferToView = function ()
             var viewFactory = new dwv.image.ViewFactory();
             var view = viewFactory.create( dicomParser.getDicomElements(), image );
             // return
-            callback({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
+            self.onload({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
         };
 
         if ( needDecompression ) {
@@ -12697,7 +12701,7 @@ dwv.image.DicomBufferToView = function ()
             // send an onload event for mono frame
             if ( nFrames === 1 ) {
                 pixelDecoder.ondecoded = function () {
-                    self.onload();
+                    self.onloadend();
                 };
             }
 
@@ -12747,7 +12751,6 @@ dwv.image.DicomBufferToView = function ()
             // create image
             onDecodedFirstFrame();
             // send load events
-            self.onload();
             self.onloadend();
         }
     };
@@ -12879,9 +12882,10 @@ dwv.image.getViewFromDOMImage = function (image)
  * @param {Object} video The DOM Video.
  * @param {Object} callback The function to call once the data is loaded.
  * @param {Object} cbprogress The function to call to report progress.
+ * @param {Object} cbonloadend The function to call to report load end.
  * @param {Number} dataindex The data index.
  */
-dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, dataIndex)
+dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, cbonloadend, dataIndex)
 {
     // video size
     var width = video.videoWidth;
@@ -12955,6 +12959,7 @@ dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, dataIndex
         if (nextTime <= this.duration) {
             this.currentTime = nextTime;
         } else {
+            cbonloadend();
             // stop listening
             video.removeEventListener('seeked', onseeked);
         }
@@ -13221,6 +13226,16 @@ dwv.image.Size.prototype.isInBounds = function ( i, j, k ) {
 };
 
 /**
+ * Get a string representation of the Vector3D.
+ * @return {String} The vector as a string.
+ */
+dwv.image.Size.prototype.toString = function () {
+    return "(" + this.getNumberOfColumns() +
+        ", " + this.getNumberOfRows() +
+        ", " + this.getNumberOfSlices() + ")";
+};
+
+/**
  * 2D/3D Spacing class.
  * @constructor
  * @param {Number} columnSpacing The column spacing.
@@ -13257,6 +13272,17 @@ dwv.image.Spacing.prototype.equals = function (rhs) {
         this.getRowSpacing() === rhs.getRowSpacing() &&
         this.getSliceSpacing() === rhs.getSliceSpacing();
 };
+
+/**
+ * Get a string representation of the Vector3D.
+ * @return {String} The vector as a string.
+ */
+dwv.image.Spacing.prototype.toString = function () {
+    return "(" + this.getColumnSpacing() +
+        ", " + this.getRowSpacing() +
+        ", " + this.getSliceSpacing() + ")";
+};
+
 
 /**
  * 2D/3D Geometry class.
@@ -14193,10 +14219,16 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
  */
 dwv.image.Image.prototype.quantifyLine = function(line)
 {
+    var quant = {};
+    // length
     var spacing = this.getGeometry().getSpacing();
     var length = line.getWorldLength( spacing.getColumnSpacing(),
             spacing.getRowSpacing() );
-    return { "length": {"value": length, "unit": dwv.i18n("unit.mm")} };
+    if (length !== null) {
+        quant.length = {"value": length, "unit": dwv.i18n("unit.mm")};
+    }
+    // return
+    return quant;
 };
 
 /**
@@ -14206,9 +14238,15 @@ dwv.image.Image.prototype.quantifyLine = function(line)
  */
 dwv.image.Image.prototype.quantifyRect = function(rect)
 {
+    var quant = {};
+    // surface
     var spacing = this.getGeometry().getSpacing();
     var surface = rect.getWorldSurface( spacing.getColumnSpacing(),
             spacing.getRowSpacing());
+    if (surface !== null) {
+        quant.surface = {"value": surface/100, "unit": dwv.i18n("unit.cm2")};
+    }
+    // stats
     var subBuffer = [];
     var minJ = parseInt(rect.getBegin().getY(), 10);
     var maxJ = parseInt(rect.getEnd().getY(), 10);
@@ -14220,13 +14258,12 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
         }
     }
     var quantif = dwv.math.getStats( subBuffer );
-    return {
-        "surface": {"value": surface/100, "unit": dwv.i18n("unit.cm2")},
-        "min": {"value": quantif.min, "unit": ""},
-        "max": {"value": quantif.max, "unit": ""},
-        "mean": {"value": quantif.mean, "unit": ""},
-        "stdDev": {"value": quantif.stdDev, "unit": ""}
-    };
+    quant.min = {"value": quantif.min, "unit": ""};
+    quant.max = {"value": quantif.max, "unit": ""};
+    quant.mean = {"value": quantif.mean, "unit": ""};
+    quant.stdDev = {"value": quantif.stdDev, "unit": ""};
+    // return
+    return quant;
 };
 
 /**
@@ -14236,10 +14273,16 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
  */
 dwv.image.Image.prototype.quantifyEllipse = function(ellipse)
 {
+    var quant = {};
+    // surface
     var spacing = this.getGeometry().getSpacing();
     var surface = ellipse.getWorldSurface( spacing.getColumnSpacing(),
             spacing.getRowSpacing());
-    return { "surface": {"value": surface/100, "unit": dwv.i18n("unit.cm2")} };
+    if (surface !== null) {
+        quant.surface = {"value": surface/100, "unit": dwv.i18n("unit.cm2")};
+    }
+    // return
+    return quant;
 };
 
 /**
@@ -14270,8 +14313,8 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var size = new dwv.image.Size( columns, rows );
 
     // spacing
-    var rowSpacing = 1;
-    var columnSpacing = 1;
+    var rowSpacing = null;
+    var columnSpacing = null;
     // PixelSpacing
     var pixelSpacing = dicomElements.getFromKey("x00280030");
     // ImagerPixelSpacing
@@ -14285,7 +14328,7 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
         columnSpacing = parseFloat( imagerPixelSpacing[1] );
     }
     // image spacing
-    var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing);
+    var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing );
 
     // TransferSyntaxUID
     var transferSyntaxUID = dicomElements.getFromKey("x00020010");
@@ -15624,11 +15667,12 @@ dwv.io.DicomDataLoader = function ()
             db2v.setDefaultCharacterSet(options.defaultCharacterSet);
         }
         // connect handlers
-        db2v.onload = self.addLoaded;
+        db2v.onload = self.onload;
+        db2v.onloadend = self.onloadend;
         db2v.onprogress = self.onprogress;
         // convert
         try {
-            db2v.convert( buffer, self.onload, index );
+            db2v.convert( buffer, index );
         } catch (error) {
             self.onerror(error);
         }
@@ -15746,10 +15790,10 @@ dwv.io.DicomDataLoader.prototype.loadUrlAs = function () {
  */
 dwv.io.DicomDataLoader.prototype.onload = function (/*event*/) {};
 /**
- * Handle an add loaded event.
+ * Handle an load end event.
  * Default does nothing.
  */
-dwv.io.DicomDataLoader.prototype.addLoaded = function () {};
+dwv.io.DicomDataLoader.prototype.onloadend = function () {};
 /**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'
@@ -15904,7 +15948,7 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
     for (var k = 0; k < loaders.length; ++k) {
         loader = loaders[k];
         loader.onload = self.onload;
-        loader.addLoaded = self.addLoaded;
+        loader.onloadend = self.addLoaded;
         loader.onerror = self.onerror;
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
@@ -15978,7 +16022,7 @@ dwv.io.JSONTextLoader = function ()
     this.load = function (text, origin, index) {
         try {
             self.onload( text );
-            //self.addLoaded();
+            self.onloadend();
         } catch (error) {
             self.onerror(error);
         }
@@ -16085,10 +16129,10 @@ dwv.io.JSONTextLoader.prototype.loadUrlAs = function () {
  */
 dwv.io.JSONTextLoader.prototype.onload = function (/*event*/) {};
 /**
- * Handle an add loaded event.
+ * Handle an load end event.
  * Default does nothing.
  */
-dwv.io.JSONTextLoader.prototype.addLoaded = function () {};
+dwv.io.JSONTextLoader.prototype.onloadend = function () {};
 /**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'
@@ -16234,7 +16278,7 @@ dwv.io.MemoryLoader.prototype.load = function (ioArray)
     for (var k = 0; k < loaders.length; ++k) {
         loader = loaders[k];
         loader.onload = self.onload;
-        loader.addLoaded = self.addLoaded;
+        loader.onloadend = self.addLoaded;
         loader.onerror = self.onerror;
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
@@ -16325,7 +16369,7 @@ dwv.io.RawImageLoader = function ()
         image.onload = function (/*event*/) {
             try {
                 self.onload( dwv.image.getViewFromDOMImage(this) );
-                self.addLoaded();
+                self.onloadend();
             } catch (error) {
                 self.onerror(error);
             }
@@ -16440,10 +16484,10 @@ dwv.io.RawImageLoader.prototype.loadUrlAs = function () {
  */
 dwv.io.RawImageLoader.prototype.onload = function (/*event*/) {};
 /**
- * Handle an add loaded event.
+ * Handle an load end event.
  * Default does nothing.
  */
-dwv.io.RawImageLoader.prototype.addLoaded = function () {};
+dwv.io.RawImageLoader.prototype.onloadend = function () {};
 /**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'
@@ -16519,8 +16563,8 @@ dwv.io.RawVideoLoader = function ()
         // onload handler
         video.onloadedmetadata = function (/*event*/) {
             try {
-                dwv.image.getViewFromDOMVideo(this, self.onload, self.onprogress, index);
-                self.addLoaded();
+                dwv.image.getViewFromDOMVideo(this,
+                    self.onload, self.onprogress, self.onloadend, index);
             } catch (error) {
                 self.onerror(error);
             }
@@ -16627,10 +16671,10 @@ dwv.io.RawVideoLoader.prototype.loadUrlAs = function () {
  */
 dwv.io.RawVideoLoader.prototype.onload = function (/*event*/) {};
 /**
- * Handle an add loaded event.
+ * Handle an load end event.
  * Default does nothing.
  */
-dwv.io.RawVideoLoader.prototype.addLoaded = function () {};
+dwv.io.RawVideoLoader.prototype.onloadend = function () {};
 /**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'
@@ -16785,7 +16829,7 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
     for (var k = 0; k < loaders.length; ++k) {
         loader = loaders[k];
         loader.onload = self.onload;
-        loader.addLoaded = self.addLoaded;
+        loader.onloadend = self.addLoaded;
         loader.onerror = self.onerror;
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
@@ -16813,6 +16857,7 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
 
         // bind reader progress
         request.onprogress = mproghandler.getMonoProgressHandler(i, 0);
+        request.onloadend = mproghandler.getMonoOnLoadEndHandler(i, 0);
 
         // find a loader
         var foundLoader = false;
@@ -16823,10 +16868,11 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
                 // set reader callbacks
                 request.onload = loader.getUrlLoadHandler(url, i);
                 request.onerror = loader.getErrorHandler(url);
-                // read
+                // response type (default is 'text')
                 if (loader.loadUrlAs() === dwv.io.urlContentTypes.ArrayBuffer) {
                     request.responseType = "arraybuffer";
                 }
+                // read
                 request.send(null);
                 // next file
                 break;
@@ -16889,7 +16935,7 @@ dwv.io.ZipLoader = function ()
     	else {
             var memoryIO = new dwv.io.MemoryLoader();
             memoryIO.onload = self.onload;
-            memoryIO.onloadend = self.addLoaded;
+            memoryIO.onloadend = self.onloadend;
             memoryIO.onerror = self.onerror;
             memoryIO.onprogress = self.onprogress;
 
@@ -17013,10 +17059,10 @@ dwv.io.ZipLoader.prototype.loadUrlAs = function () {
  */
 dwv.io.ZipLoader.prototype.onload = function (/*event*/) {};
 /**
- * Handle an add loaded event.
+ * Handle an load end event.
  * Default does nothing.
  */
-dwv.io.ZipLoader.prototype.addLoaded = function () {};
+dwv.io.ZipLoader.prototype.onloadend = function () {};
 /**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'
@@ -18027,6 +18073,22 @@ var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
 /**
+ * Mulitply the three inputs if the last two are not null.
+ * @param {Number} a The first input.
+ * @param {Number} b The second input.
+ * @param {Number} c The third input.
+ * @return {Number} The multiplication of the three inputs or
+ *  null if one of the last two is null.
+ */
+function mulABC( a, b, c) {
+    var res = null;
+    if (b !== null && c !== null) {
+        res = a * b * c;
+    }
+    return res;
+}
+
+/**
  * Circle shape.
  * @constructor
  * @param {Object} centre A Point2D representing the centre of the circle.
@@ -18057,14 +18119,15 @@ dwv.math.Circle = function(centre, radius)
      */
     this.getSurface = function() { return surface; };
     /**
-     * Get the surface of the circle with a spacing.
+     * Get the surface of the circle according to a spacing.
      * @param {Number} spacingX The X spacing.
      * @param {Number} spacingY The Y spacing.
-     * @return {Number} The surface of the circle multiplied by the given spacing.
+     * @return {Number} The surface of the circle multiplied by the given
+     *  spacing or null for null spacings.
      */
     this.getWorldSurface = function(spacingX, spacingY)
     {
-        return surface * spacingX * spacingY;
+        return mulABC(surface, spacingX, spacingY);
     };
 }; // Circle class
 
@@ -18105,14 +18168,15 @@ dwv.math.Ellipse = function(centre, a, b)
      */
     this.getSurface = function() { return surface; };
     /**
-     * Get the surface of the ellipse with a spacing.
+     * Get the surface of the ellipse according to a spacing.
      * @param {Number} spacingX The X spacing.
      * @param {Number} spacingY The Y spacing.
-     * @return {Number} The surface of the ellipse multiplied by the given spacing.
+     * @return {Number} The surface of the ellipse multiplied by the given
+     *  spacing or null for null spacings.
      */
     this.getWorldSurface = function(spacingX, spacingY)
     {
-        return surface * spacingX * spacingY;
+        return mulABC(surface, spacingX, spacingY);
     };
 }; // Circle class
 
@@ -18169,16 +18233,21 @@ dwv.math.Line = function(begin, end)
      */
     this.getLength = function() { return length; };
     /**
-     * Get the length of the line with spacing.
+     * Get the length of the line according to a  spacing.
      * @param {Number} spacingX The X spacing.
      * @param {Number} spacingY The Y spacing.
-     * @return {Number} The length of the line with spacing.
+     * @return {Number} The length of the line with spacing
+     *  or null for null spacings.
      */
     this.getWorldLength = function(spacingX, spacingY)
     {
-        var dxs = dx * spacingX;
-        var dys = dy * spacingY;
-        return Math.sqrt( dxs * dxs + dys * dys );
+        var wlen = null;
+        if (spacingX !== null && spacingY !== null) {
+            var dxs = dx * spacingX;
+            var dys = dy * spacingY;
+            wlen = Math.sqrt( dxs * dxs + dys * dys );
+        }
+        return wlen;
     };
     /**
      * Get the mid point of the line.
@@ -18358,12 +18427,15 @@ dwv.math.Rectangle = function(begin, end)
      */
     this.getSurface = function() { return surface; };
     /**
-     * Get the surface of the rectangle with a spacing.
-     * @return {Number} The surface of the rectangle with a spacing.
+     * Get the surface of the circle according to a spacing.
+     * @param {Number} spacingX The X spacing.
+     * @param {Number} spacingY The Y spacing.
+     * @return {Number} The surface of the rectangle multiplied by the given
+     *  spacing or null for null spacings.
      */
     this.getWorldSurface = function(spacingX, spacingY)
     {
-        return surface * spacingX * spacingY;
+        return mulABC(surface, spacingX, spacingY);
     };
 }; // Rectangle class
 
@@ -23261,9 +23333,12 @@ dwv.tool.ZoomAndPan.prototype.init = function() {
 var dwv = dwv || {};
 /** @namespace */
 dwv.browser = dwv.browser || {};
+// external
+var Modernizr = Modernizr || {};
 
 /**
  * Browser check for the FileAPI.
+ * Assume support for Safari5.
  */
 dwv.browser.hasFileApi = function()
 {
@@ -23278,7 +23353,7 @@ dwv.browser.hasFileApi = function()
         return true;
     }
     // regular test
-    return "FileReader" in window;
+    return Modernizr.filereader;
 };
 
 /**
@@ -23286,7 +23361,9 @@ dwv.browser.hasFileApi = function()
  */
 dwv.browser.hasXmlHttpRequest = function()
 {
-    return "XMLHttpRequest" in window && "withCredentials" in new XMLHttpRequest();
+    return Modernizr.xhrresponsetype &&
+        Modernizr.xhrresponsetypearraybuffer && Modernizr.xhrresponsetypetext &&
+        "XMLHttpRequest" in window && "withCredentials" in new XMLHttpRequest();
 };
 
 /**
@@ -23294,7 +23371,16 @@ dwv.browser.hasXmlHttpRequest = function()
  */
 dwv.browser.hasTypedArray = function()
 {
-    return "Uint8Array" in window && "Uint16Array" in window;
+    return Modernizr.dataview && Modernizr.typedarrays;
+};
+
+/**
+ * Browser check for input with type='color'.
+ * Missing in IE and Safari.
+ */
+dwv.browser.hasInputColor = function()
+{
+    return Modernizr.inputtypes.color;
 };
 
 //only check at startup (since we propose a replacement)
@@ -23326,7 +23412,7 @@ dwv.browser._hasClampedArray = ("Uint8ClampedArray" in window);
 
 /**
  * Browser check for clamped array.
- * Missing in
+ * Missing in:
  * - Safari 5.1.7 for Windows
  * - PhantomJS 1.9.20 (on Travis).
  */
@@ -23336,28 +23422,14 @@ dwv.browser.hasClampedArray = function()
 };
 
 /**
- * Browser check for input with type='color'.
- * Missing in IE 11.
- */
-dwv.browser.hasInputColor = function()
-{
-    var caughtException = false;
-    var colorInput = document.createElement("input");
-    try {
-        colorInput.type = "color";
-    } catch (error) {
-        caughtException = true;
-    }
-    return !caughtException;
-};
-
-/**
  * Browser checks to see if it can run dwv. Throws an error if not.
  * Silently replaces basic functions.
- * @todo Maybe use {@link http://modernizr.com/}.
  */
 dwv.browser.check = function()
 {
+
+    // Required --------------
+
     var appnorun = "The application cannot be run.";
     var message = "";
     // Check for the File API support
@@ -23378,6 +23450,9 @@ dwv.browser.check = function()
         alert(message+appnorun);
         throw new Error(message);
     }
+
+    // Replaced if not present ------------
+
     // Check typed array slice
     if( !dwv.browser.hasTypedArraySlice() ) {
         // silent fail with warning
@@ -23679,6 +23754,19 @@ dwv.utils.MultiProgressHandler = function (callback)
             event.index = index;
             event.subindex = subindex;
             self.onprogress(event);
+        };
+    };
+
+    /**
+     * Create a mono loadend event handler: sends a 100% progress.
+     * @param {Number} index The index of the data.
+     * @param {Number} subindex The sub-index of the data.
+     */
+    this.getMonoOnLoadEndHandler = function (index, subindex) {
+        return function () {
+            self.onprogress({'type': 'load-progress', 'lengthComputable': true,
+                'loaded': 100, 'total': 100,
+                'index': index, 'subindex': subindex});
         };
     };
 

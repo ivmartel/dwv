@@ -54,7 +54,7 @@
 			<li class="dropdown">
 				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
 				<ul class="dropdown-menu inline">
-					<li><a href="global.html#webdriver">webdriver</a></li>
+					<li><a href="global.html#mulABC">mulABC</a></li><li><a href="global.html#webdriver">webdriver</a></li>
 				</ul>
 			</li>
 			
@@ -223,7 +223,7 @@ dwv.io.MemoryLoader.prototype.load = function (ioArray)
     for (var k = 0; k &lt; loaders.length; ++k) {
         loader = loaders[k];
         loader.onload = self.onload;
-        loader.addLoaded = self.addLoaded;
+        loader.onloadend = self.addLoaded;
         loader.onerror = self.onerror;
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
