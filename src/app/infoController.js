@@ -10,12 +10,10 @@ dwv.InfoController = function (containerDivId)
 
     // Info layer plot gui
     var plotInfo = null;
-    // Info layer windowing gui
-    var windowingInfo = null;
-    // Info layer position gui
-    var positionInfo = null;
     // Info layer colour map gui
     var miniColourMap = null;
+	// Info layer overlay
+	var overlayInfos = [];
     // flag to know if the info layer is listening on the image.
     var isInfoLayerListening = false;
 
@@ -25,23 +23,28 @@ dwv.InfoController = function (containerDivId)
      */
     this.create = function (app)
     {
-        var infotr = getElement("infotr");
-        if (infotr) {
-            windowingInfo = new dwv.gui.info.Windowing(infotr);
-            windowingInfo.create();
-        }
-
-        var infotl = getElement("infotl");
-        if (infotl) {
-            positionInfo = new dwv.gui.info.Position(infotl);
-            positionInfo.create();
-        }
-
-        var infobr = getElement("infobr");
-        if (infobr) {
-            miniColourMap = new dwv.gui.info.MiniColourMap(infobr, app);
+        var infocm = getElement("infocm");
+        if (infocm) {
+            miniColourMap = new dwv.gui.info.MiniColourMap(infocm, app);
             miniColourMap.create();
         }
+		
+		// create overlay info at each corner
+		var pos_list = [
+			"tl", "tc", "tr",
+			"cl",       "cr",
+			"bl", "bc", "br" ];
+
+		var num = 0;
+		for (var n=0; n<pos_list.length; n++){
+			var pos = pos_list[n];
+			var info = getElement("info" + pos);
+			if (info) {
+				overlayInfos[num] = new dwv.gui.info.Overlay(info, pos, app);
+				overlayInfos[num].create();
+				num++;
+			}
+		}
 
         var plot = getElement("plot");
         if (plot) {
@@ -51,16 +54,17 @@ dwv.InfoController = function (containerDivId)
     };
 
     /**
-     * Toggle info listeners to the view.
+     * Toggle info listeners to the app and the view.
+     * @param {Object} app The app to listen or not to.
      * @param {Object} view The view to listen or not to.
      */
-    this.toggleViewListeners = function (view)
+    this.toggleListeners = function (app, view)
     {
         if (isInfoLayerListening) {
-            removeViewListeners(view);
+            removeListeners(app, view);
         }
         else {
-            addViewListeners(view);
+            addListeners(app, view);
         }
     };
 
@@ -76,13 +80,11 @@ dwv.InfoController = function (containerDivId)
 
     /**
      * Add info listeners to the view.
+     * @param {Object} app The app to listen to.
      * @param {Object} view The view to listen to.
      */
-    function addViewListeners(view)
+    function addListeners(app, view)
     {
-        if (windowingInfo) {
-            view.addEventListener("wl-change", windowingInfo.update);
-        }
         if (plotInfo) {
             view.addEventListener("wl-change", plotInfo.update);
         }
@@ -90,23 +92,25 @@ dwv.InfoController = function (containerDivId)
             view.addEventListener("wl-change", miniColourMap.update);
             view.addEventListener("colour-change", miniColourMap.update);
         }
-        if (positionInfo) {
-            view.addEventListener("position-change", positionInfo.update);
-            view.addEventListener("frame-change", positionInfo.update);
-        }
+		if (overlayInfos.length > 0){
+			for (var n=0; n<overlayInfos.length; n++){
+				app.addEventListener("zoom-change", overlayInfos[n].update);
+				view.addEventListener("wl-change", overlayInfos[n].update);
+				view.addEventListener("position-change", overlayInfos[n].update);
+				view.addEventListener("frame-change", overlayInfos[n].update);
+			}
+		}
         // udpate listening flag
         isInfoLayerListening = true;
     }
 
     /**
      * Remove info listeners to the view.
+     * @param {Object} app The app to stop listening to.
      * @param {Object} view The view to stop listening to.
      */
-    function removeViewListeners(view)
+    function removeListeners(app, view)
     {
-        if (windowingInfo) {
-            view.removeEventListener("wl-change", windowingInfo.update);
-        }
         if (plotInfo) {
             view.removeEventListener("wl-change", plotInfo.update);
         }
@@ -114,10 +118,14 @@ dwv.InfoController = function (containerDivId)
             view.removeEventListener("wl-change", miniColourMap.update);
             view.removeEventListener("colour-change", miniColourMap.update);
         }
-        if (positionInfo) {
-            view.removeEventListener("position-change", positionInfo.update);
-            view.removeEventListener("frame-change", positionInfo.update);
-        }
+		if (overlayInfos.length > 0){
+			for (var n=0; n<overlayInfos.length; n++){
+				app.removeEventListener("zoom-change", overlayInfos[n].update);
+				view.removeEventListener("wl-change", overlayInfos[n].update);
+				view.removeEventListener("position-change", overlayInfos[n].update);
+				view.removeEventListener("frame-change", overlayInfos[n].update);
+			}
+		}
         // udpate listening flag
         isInfoLayerListening = false;
     }

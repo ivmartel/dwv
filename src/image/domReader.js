@@ -32,7 +32,7 @@ dwv.image.imageDataToBuffer = function (imageData) {
  */
 dwv.image.getDefaultView = function (
     width, height, sliceIndex,
-    imageBuffer, numberOfFrames) {
+    imageBuffer, numberOfFrames, info) {
     // image size
     var imageSize = new dwv.image.Size(width, height);
     // default spacing
@@ -48,6 +48,8 @@ dwv.image.getDefaultView = function (
     var meta = {};
     meta.BitsStored = 8;
     image.setMeta(meta);
+    // overlay
+    image.setFirstOverlay( dwv.gui.info.createOverlaysForDom(info) );
     // view
     var view = new dwv.image.View(image);
     // defaut preset
@@ -76,22 +78,23 @@ dwv.image.getViewFromDOMImage = function (image)
     // get the image data
     var imageData = ctx.getImageData(0, 0, width, height);
 
+    // image properties
+    var info = [];
+    if ( typeof image.origin === "string" ) {
+        info.push({ "name": "origin", "value": image.origin });
+    } else {
+        info.push({ "name": "fileName", "value": image.origin.name });
+        info.push({ "name": "fileType", "value": image.origin.type });
+        info.push({ "name": "fileLastModifiedDate", "value": image.origin.lastModifiedDate });
+    }
+    info.push({ "name": "imageWidth", "value": width });
+    info.push({ "name": "imageHeight", "value": height });
+
     // create view
     var sliceIndex = image.index ? image.index : 0;
     var imageBuffer = dwv.image.imageDataToBuffer(imageData);
     var view = dwv.image.getDefaultView(
-        width, height, sliceIndex, [imageBuffer]);
-
-    // image properties
-    var info = [];
-    if( image.file )
-    {
-        info.push({ "name": "fileName", "value": image.file.name });
-        info.push({ "name": "fileType", "value": image.file.type });
-        info.push({ "name": "fileLastModifiedDate", "value": image.file.lastModifiedDate });
-    }
-    info.push({ "name": "imageWidth", "value": width });
-    info.push({ "name": "imageHeight", "value": height });
+        width, height, sliceIndex, [imageBuffer], 1, info);
 
     // return
     return {"view": view, "info": info};
@@ -159,7 +162,7 @@ dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, cbonloade
         if (frameIndex === 0) {
             // create view
             view = dwv.image.getDefaultView(
-                width, height, 1, [imgBuffer], numberOfFrames);
+                width, height, 1, [imgBuffer], numberOfFrames, info);
             // call callback
             callback( {"view": view, "info": info } );
         } else {

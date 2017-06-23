@@ -10,12 +10,6 @@ dwv.html = dwv.html || {};
 dwv.html.Layer = function(canvas)
 {
     /**
-     * The associated HTMLCanvasElement.
-     * @private
-     * @type Object
-     */
-    //var canvas = null;
-    /**
      * A cache of the initial canvas.
      * @private
      * @type Object
@@ -28,11 +22,6 @@ dwv.html.Layer = function(canvas)
      */
     var context = null;
 
-    /**
-     * Get the layer name.
-     * @return {String} The layer name.
-     */
-    //this.getName = function() { return name; };
     /**
      * Get the layer canvas.
      * @return {Object} The layer canvas.
@@ -70,7 +59,7 @@ dwv.html.Layer = function(canvas)
         return origin;
     };
     /**
-     * The image zoom.
+     * The layer zoom.
      * @private
      * @type {Object}
      */
@@ -83,7 +72,19 @@ dwv.html.Layer = function(canvas)
         return zoom;
     };
 
+    /**
+     * The layer translation.
+     * @private
+     * @type {Object}
+     */
     var trans = {'x': 0, 'y': 0};
+    /**
+     * Get the layer translation.
+     * @return {Object} The layer translation as {'x','y'}.
+     */
+    this.getTrans = function () {
+        return trans;
+    };
 
     /**
      * Set the canvas width.

@@ -81,7 +81,7 @@ dwv.utils.replaceFlags = function (inputStr, values)
     for (var i = 0; i < keys.length; ++i) {
         var valueObj = values[keys[i]];
         if ( valueObj !== null && typeof valueObj !== "undefined" &&
-             valueObj.value !== null && typeof valueObj.value !== "undefined") {
+            valueObj.value !== null && typeof valueObj.value !== "undefined") {
             // value string
             var valueStr = valueObj.value.toPrecision(4);
             // add unit if available
@@ -101,5 +101,37 @@ dwv.utils.replaceFlags = function (inputStr, values)
         }
     }
     // return
+    return res;
+};
+
+/**
+ * Replace flags in a input string. Flags are keywords surrounded with curly
+ * braces.
+ * @param {String} inputStr The input string.
+ * @param {Array} values An array of strings.
+ * @example
+ *    var values = ["a", "b"];
+ *    var str = "The length is: {v0}. The size is: {v1}";
+ *    var res = dwv.utils.replaceFlags2(str, values); // "The length is: a. The size is: b"
+ * @return {String} The result string.
+ */
+dwv.utils.replaceFlags2 = function (inputStr, values)
+{
+    var res = inputStr;
+    for ( var j = 0; j < values.length; ++j ) {
+        res = res.replace("{v"+j+"}", values[j]);
+    }
+    return res;
+};
+
+dwv.utils.createDefaultReplaceFormat = function (values)
+{
+    var res = "";
+    for ( var j = 0; j < values.length; ++j ) {
+        if ( j !== 0 ) {
+            res += ", ";
+        }
+        res += "{v"+j+"}";
+    }
     return res;
 };
