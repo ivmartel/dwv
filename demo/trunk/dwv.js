@@ -11005,14 +11005,12 @@ dwv.gui.info.Overlay = function ( div, pos, app )
                 }
             }
         }
-
     };
 }; // class dwv.gui.info.Overlay
 
 /**
  * Create overlay string array of the image in each corner
  * @param {Object} dicomElements DICOM elements of the image
- * @param {Object} image The image
  * @return {Array} Array of string to be shown in each corner
  */
 dwv.gui.info.createOverlays = function (dicomElements)
@@ -11068,6 +11066,60 @@ dwv.gui.info.createOverlays = function (dicomElements)
         overlays.cl = [{'value': dwv.dicom.getReverseOrientation(po0)}];
         overlays.bc = [{'value': po1}];
         overlays.tc = [{'value': dwv.dicom.getReverseOrientation(po1)}];
+    }
+
+    return overlays;
+};
+
+/**
+ * Create overlay string array of the image in each corner
+ * @param {Object} dicomElements DICOM elements of the image
+ * @return {Array} Array of string to be shown in each corner
+ */
+dwv.gui.info.createOverlaysForDom = function (info)
+{
+    var overlays = {};
+    var omaps = dwv.gui.info.overlayMaps;
+    if (!omaps){
+        return overlays;
+    }
+    var omap = omaps.DOM;
+    if (!omap){
+        return overlays;
+    }
+
+    for (var n=0; omap[n]; n++){
+        var value = omap[n].value;
+        var tags = omap[n].tags;
+        var format = omap[n].format;
+        var pos = omap[n].pos;
+
+        if (typeof tags !== "undefined" && tags.length !== 0) {
+            // get values
+            var values = [];
+            for ( var i = 0; i < tags.length; ++i ) {
+                for ( var j = 0; j < info.length; ++j ) {
+                    if (tags[i] === info[j].name) {
+                        values.push( info[j].value );
+                    }
+                }
+            }
+            // format
+            if (typeof format === "undefined" || format === null) {
+                format = dwv.utils.createDefaultReplaceFormat( values );
+            }
+            value = dwv.utils.replaceFlags2( format, values );
+        }
+
+        if (!value || value.length === 0){
+            continue;
+        }
+
+        // add value to overlays
+        if (!overlays[pos]) {
+            overlays[pos] = [];
+        }
+        overlays[pos].push({'value': value.trim(), 'format': format});
     }
 
     return overlays;
@@ -12754,7 +12806,7 @@ dwv.image.imageDataToBuffer = function (imageData) {
  */
 dwv.image.getDefaultView = function (
     width, height, sliceIndex,
-    imageBuffer, numberOfFrames) {
+    imageBuffer, numberOfFrames, info) {
     // image size
     var imageSize = new dwv.image.Size(width, height);
     // default spacing
@@ -12770,6 +12822,8 @@ dwv.image.getDefaultView = function (
     var meta = {};
     meta.BitsStored = 8;
     image.setMeta(meta);
+    // overlay
+    image.setFirstOverlay( dwv.gui.info.createOverlaysForDom(info) );
     // view
     var view = new dwv.image.View(image);
     // defaut preset
@@ -12798,22 +12852,23 @@ dwv.image.getViewFromDOMImage = function (image)
     // get the image data
     var imageData = ctx.getImageData(0, 0, width, height);
 
+    // image properties
+    var info = [];
+    if ( typeof image.origin === "string" ) {
+        info.push({ "name": "origin", "value": image.origin });
+    } else {
+        info.push({ "name": "fileName", "value": image.origin.name });
+        info.push({ "name": "fileType", "value": image.origin.type });
+        info.push({ "name": "fileLastModifiedDate", "value": image.origin.lastModifiedDate });
+    }
+    info.push({ "name": "imageWidth", "value": width });
+    info.push({ "name": "imageHeight", "value": height });
+
     // create view
     var sliceIndex = image.index ? image.index : 0;
     var imageBuffer = dwv.image.imageDataToBuffer(imageData);
     var view = dwv.image.getDefaultView(
-        width, height, sliceIndex, [imageBuffer]);
-
-    // image properties
-    var info = [];
-    if( image.file )
-    {
-        info.push({ "name": "fileName", "value": image.file.name });
-        info.push({ "name": "fileType", "value": image.file.type });
-        info.push({ "name": "fileLastModifiedDate", "value": image.file.lastModifiedDate });
-    }
-    info.push({ "name": "imageWidth", "value": width });
-    info.push({ "name": "imageHeight", "value": height });
+        width, height, sliceIndex, [imageBuffer], 1, info);
 
     // return
     return {"view": view, "info": info};
@@ -12880,7 +12935,7 @@ dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, dataIndex
         if (frameIndex === 0) {
             // create view
             view = dwv.image.getDefaultView(
-                width, height, 1, [imgBuffer], numberOfFrames);
+                width, height, 1, [imgBuffer], numberOfFrames, info);
             // call callback
             callback( {"view": view, "info": info } );
         } else {
@@ -23508,9 +23563,20 @@ dwv.i18nPage = function () {
  * @return {String} The path to the locale resource.
  */
 dwv.i18nGetLocalePath = function (filename) {
-    // TODO check if the file exists...
+    var lng = i18next.language.substr(0, 2);
     return dwv.i18nLocalesPath +
-        "/locales/" + i18next.language.substr(0, 2) + "/" + filename;
+        "/locales/" + lng + "/" + filename;
+};
+
+/**
+ * Get the current locale resource path.
+ * Warning: to be used once i18next is initialised.
+ * @return {String} The path to the locale resource.
+ */
+dwv.i18nGetFallbackLocalePath = function (filename) {
+    var lng = i18next.languages[i18next.languages.length-1].substr(0, 2);
+    return dwv.i18nLocalesPath +
+        "/locales/" + lng + "/" + filename;
 };
 
 // namespaces
