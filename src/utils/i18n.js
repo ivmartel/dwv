@@ -124,7 +124,18 @@ dwv.i18nPage = function () {
  * @return {String} The path to the locale resource.
  */
 dwv.i18nGetLocalePath = function (filename) {
-    // TODO check if the file exists...
+    var lng = i18next.language.substr(0, 2);
     return dwv.i18nLocalesPath +
-        "/locales/" + i18next.language.substr(0, 2) + "/" + filename;
+        "/locales/" + lng + "/" + filename;
+};
+
+/**
+ * Get the current locale resource path.
+ * Warning: to be used once i18next is initialised.
+ * @return {String} The path to the locale resource.
+ */
+dwv.i18nGetFallbackLocalePath = function (filename) {
+    var lng = i18next.languages[i18next.languages.length-1].substr(0, 2);
+    return dwv.i18nLocalesPath +
+        "/locales/" + lng + "/" + filename;
 };
