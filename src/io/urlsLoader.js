@@ -132,7 +132,7 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
     for (var k = 0; k < loaders.length; ++k) {
         loader = loaders[k];
         loader.onload = self.onload;
-        loader.addLoaded = self.addLoaded;
+        loader.onloadend = self.addLoaded;
         loader.onerror = self.onerror;
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
@@ -160,6 +160,7 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
 
         // bind reader progress
         request.onprogress = mproghandler.getMonoProgressHandler(i, 0);
+        request.onloadend = mproghandler.getMonoOnLoadEndHandler(i, 0);
 
         // find a loader
         var foundLoader = false;
@@ -170,10 +171,11 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
                 // set reader callbacks
                 request.onload = loader.getUrlLoadHandler(url, i);
                 request.onerror = loader.getErrorHandler(url);
-                // read
+                // response type (default is 'text')
                 if (loader.loadUrlAs() === dwv.io.urlContentTypes.ArrayBuffer) {
                     request.responseType = "arraybuffer";
                 }
+                // read
                 request.send(null);
                 // next file
                 break;

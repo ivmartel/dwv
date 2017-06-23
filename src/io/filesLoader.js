@@ -132,7 +132,7 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
     for (var k = 0; k < loaders.length; ++k) {
         loader = loaders[k];
         loader.onload = self.onload;
-        loader.addLoaded = self.addLoaded;
+        loader.onloadend = self.addLoaded;
         loader.onerror = self.onerror;
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()

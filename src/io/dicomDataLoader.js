@@ -42,11 +42,12 @@ dwv.io.DicomDataLoader = function ()
             db2v.setDefaultCharacterSet(options.defaultCharacterSet);
         }
         // connect handlers
-        db2v.onload = self.addLoaded;
+        db2v.onload = self.onload;
+        db2v.onloadend = self.onloadend;
         db2v.onprogress = self.onprogress;
         // convert
         try {
-            db2v.convert( buffer, self.onload, index );
+            db2v.convert( buffer, index );
         } catch (error) {
             self.onerror(error);
         }
@@ -164,10 +165,10 @@ dwv.io.DicomDataLoader.prototype.loadUrlAs = function () {
  */
 dwv.io.DicomDataLoader.prototype.onload = function (/*event*/) {};
 /**
- * Handle an add loaded event.
+ * Handle an load end event.
  * Default does nothing.
  */
-dwv.io.DicomDataLoader.prototype.addLoaded = function () {};
+dwv.io.DicomDataLoader.prototype.onloadend = function () {};
 /**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'

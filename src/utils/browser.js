@@ -2,9 +2,12 @@
 var dwv = dwv || {};
 /** @namespace */
 dwv.browser = dwv.browser || {};
+// external
+var Modernizr = Modernizr || {};
 
 /**
  * Browser check for the FileAPI.
+ * Assume support for Safari5.
  */
 dwv.browser.hasFileApi = function()
 {
@@ -19,7 +22,7 @@ dwv.browser.hasFileApi = function()
         return true;
     }
     // regular test
-    return "FileReader" in window;
+    return Modernizr.filereader;
 };
 
 /**
@@ -27,7 +30,9 @@ dwv.browser.hasFileApi = function()
  */
 dwv.browser.hasXmlHttpRequest = function()
 {
-    return "XMLHttpRequest" in window && "withCredentials" in new XMLHttpRequest();
+    return Modernizr.xhrresponsetype &&
+        Modernizr.xhrresponsetypearraybuffer && Modernizr.xhrresponsetypetext &&
+        "XMLHttpRequest" in window && "withCredentials" in new XMLHttpRequest();
 };
 
 /**
@@ -35,7 +40,16 @@ dwv.browser.hasXmlHttpRequest = function()
  */
 dwv.browser.hasTypedArray = function()
 {
-    return "Uint8Array" in window && "Uint16Array" in window;
+    return Modernizr.dataview && Modernizr.typedarrays;
+};
+
+/**
+ * Browser check for input with type='color'.
+ * Missing in IE and Safari.
+ */
+dwv.browser.hasInputColor = function()
+{
+    return Modernizr.inputtypes.color;
 };
 
 //only check at startup (since we propose a replacement)
@@ -67,7 +81,7 @@ dwv.browser._hasClampedArray = ("Uint8ClampedArray" in window);
 
 /**
  * Browser check for clamped array.
- * Missing in
+ * Missing in:
  * - Safari 5.1.7 for Windows
  * - PhantomJS 1.9.20 (on Travis).
  */
@@ -77,28 +91,14 @@ dwv.browser.hasClampedArray = function()
 };
 
 /**
- * Browser check for input with type='color'.
- * Missing in IE 11.
- */
-dwv.browser.hasInputColor = function()
-{
-    var caughtException = false;
-    var colorInput = document.createElement("input");
-    try {
-        colorInput.type = "color";
-    } catch (error) {
-        caughtException = true;
-    }
-    return !caughtException;
-};
-
-/**
  * Browser checks to see if it can run dwv. Throws an error if not.
  * Silently replaces basic functions.
- * @todo Maybe use {@link http://modernizr.com/}.
  */
 dwv.browser.check = function()
 {
+
+    // Required --------------
+
     var appnorun = "The application cannot be run.";
     var message = "";
     // Check for the File API support
@@ -119,6 +119,9 @@ dwv.browser.check = function()
         alert(message+appnorun);
         throw new Error(message);
     }
+
+    // Replaced if not present ------------
+
     // Check typed array slice
     if( !dwv.browser.hasTypedArraySlice() ) {
         // silent fail with warning

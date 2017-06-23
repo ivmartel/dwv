@@ -4,6 +4,7 @@
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define([
+            'modernizr',
             'i18next',
             'i18nextXHRBackend',
             'i18nextBrowserLanguageDetector',
@@ -20,6 +21,7 @@
         // MagicWand: no package -> deactivated
 
         module.exports = factory(
+            require('modernizr'),
             require('i18next'),
             require('i18next-xhr-backend'),
             require('i18next-browser-languagedetector'),
@@ -29,6 +31,7 @@
     } else {
         // Browser globals (root is window)
         root.dwv = factory(
+            root.Modernizr,
             root.i18next,
             root.i18nextXHRBackend,
             root.i18nextBrowserLanguageDetector,
@@ -37,6 +40,7 @@
         );
     }
 }(this, function (
+    Modernizr,
     i18next,
     i18nextXHRBackend,
     i18nextBrowserLanguageDetector,

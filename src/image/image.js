@@ -790,10 +790,16 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
  */
 dwv.image.Image.prototype.quantifyLine = function(line)
 {
+    var quant = {};
+    // length
     var spacing = this.getGeometry().getSpacing();
     var length = line.getWorldLength( spacing.getColumnSpacing(),
             spacing.getRowSpacing() );
-    return { "length": {"value": length, "unit": dwv.i18n("unit.mm")} };
+    if (length !== null) {
+        quant.length = {"value": length, "unit": dwv.i18n("unit.mm")};
+    }
+    // return
+    return quant;
 };
 
 /**
@@ -803,9 +809,15 @@ dwv.image.Image.prototype.quantifyLine = function(line)
  */
 dwv.image.Image.prototype.quantifyRect = function(rect)
 {
+    var quant = {};
+    // surface
     var spacing = this.getGeometry().getSpacing();
     var surface = rect.getWorldSurface( spacing.getColumnSpacing(),
             spacing.getRowSpacing());
+    if (surface !== null) {
+        quant.surface = {"value": surface/100, "unit": dwv.i18n("unit.cm2")};
+    }
+    // stats
     var subBuffer = [];
     var minJ = parseInt(rect.getBegin().getY(), 10);
     var maxJ = parseInt(rect.getEnd().getY(), 10);
@@ -817,13 +829,12 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
         }
     }
     var quantif = dwv.math.getStats( subBuffer );
-    return {
-        "surface": {"value": surface/100, "unit": dwv.i18n("unit.cm2")},
-        "min": {"value": quantif.min, "unit": ""},
-        "max": {"value": quantif.max, "unit": ""},
-        "mean": {"value": quantif.mean, "unit": ""},
-        "stdDev": {"value": quantif.stdDev, "unit": ""}
-    };
+    quant.min = {"value": quantif.min, "unit": ""};
+    quant.max = {"value": quantif.max, "unit": ""};
+    quant.mean = {"value": quantif.mean, "unit": ""};
+    quant.stdDev = {"value": quantif.stdDev, "unit": ""};
+    // return
+    return quant;
 };
 
 /**
@@ -833,10 +844,16 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
  */
 dwv.image.Image.prototype.quantifyEllipse = function(ellipse)
 {
+    var quant = {};
+    // surface
     var spacing = this.getGeometry().getSpacing();
     var surface = ellipse.getWorldSurface( spacing.getColumnSpacing(),
             spacing.getRowSpacing());
-    return { "surface": {"value": surface/100, "unit": dwv.i18n("unit.cm2")} };
+    if (surface !== null) {
+        quant.surface = {"value": surface/100, "unit": dwv.i18n("unit.cm2")};
+    }
+    // return
+    return quant;
 };
 
 /**
@@ -867,8 +884,8 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var size = new dwv.image.Size( columns, rows );
 
     // spacing
-    var rowSpacing = 1;
-    var columnSpacing = 1;
+    var rowSpacing = null;
+    var columnSpacing = null;
     // PixelSpacing
     var pixelSpacing = dicomElements.getFromKey("x00280030");
     // ImagerPixelSpacing
@@ -882,7 +899,7 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
         columnSpacing = parseFloat( imagerPixelSpacing[1] );
     }
     // image spacing
-    var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing);
+    var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing );
 
     // TransferSyntaxUID
     var transferSyntaxUID = dicomElements.getFromKey("x00020010");
