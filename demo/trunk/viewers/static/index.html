@@ -16,8 +16,14 @@ body { background-color: #222; color: white; font-size: 80%; }
 .toolList ul { padding: 0; }
 .toolList li { list-style-type: none; }
 #pageMain { position: absolute; height: 92%; width: 99%; bottom: 5px; left: 5px; background-color: #333; }
-.infotl { color: #333; text-shadow: 0 1px 0 #fff; }
-.infotr { color: #333; text-shadow: 0 1px 0 #fff; }
+.infotl { text-shadow: 0 1px 0 #000; }
+.infotc { text-shadow: 0 1px 0 #000; }
+.infotr { text-shadow: 0 1px 0 #000; }
+.infocl { text-shadow: 0 1px 0 #000; }
+.infocr { text-shadow: 0 1px 0 #000; }
+.infobl { text-shadow: 0 1px 0 #000; }
+.infobc { text-shadow: 0 1px 0 #000; }
+.infobr { text-shadow: 0 1px 0 #000; }
 .dropBox { margin: 20px; }
 .ui-icon { zoom: 125%; }
 .tagsTable tr:nth-child(even) { background-color: #333; }
@@ -100,9 +106,14 @@ li button, li input { margin: 0; }
 <div class="drawDiv"></div>
 <div class="infoLayer">
 <div class="infotl"></div>
+<div class="infotc"></div>
 <div class="infotr"></div>
+<div class="infocl"></div>
+<div class="infocr"></div>
 <div class="infobl"></div>
-<div class="infobr"><div class="plot"></div></div>
+<div class="infobc"></div>
+<div class="infobr" style="bottom: 64px;"></div>
+<div class="plot"></div>
 </div><!-- /infoLayer -->
 </div><!-- /layerContainer -->
 </div><!-- /layerDialog -->

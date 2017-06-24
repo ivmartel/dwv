@@ -79,6 +79,16 @@ $(document).ready( function() {
 });
 // i18n ready?
 dwv.i18nOnLoaded( function () {
-    i18nLoaded = true;
-    launchApp();
+    // call next once the overlays are loaded
+    var onLoaded = function (data) {
+        dwv.gui.info.overlayMaps = data;
+        i18nLoaded = true;
+        launchApp();
+    };
+    // load overlay map info
+    $.getJSON( dwv.i18nGetLocalePath("overlays.json"), onLoaded )
+    .fail( function () {
+        console.log("Using fallback overlays.");
+        $.getJSON( dwv.i18nGetFallbackLocalePath("overlays.json"), onLoaded );
+    });
 });
