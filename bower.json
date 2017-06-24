@@ -12,9 +12,9 @@
   "main": "dist/dwv.js",
   "dependencies": {
     "modernizr": "~3.5.0",
-    "i18next": "~8.3.0",
+    "i18next": "~8.4.2",
     "i18next-xhr-backend": "~1.4.1",
-    "i18next-browser-languagedetector": "~1.0.1",
+    "i18next-browser-languagedetector": "~2.0.0",
     "konva": "~1.6.0"
   },
   "devDependencies": {
