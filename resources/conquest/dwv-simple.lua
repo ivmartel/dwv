@@ -95,7 +95,7 @@ print([[
 <script type="text/javascript" src="/dwv/ext/rii-mango/lossless-min.js"></script>
 
 <!-- Local -->
-<script type="text/javascript" src="/dwv/dwv-0.20.0-beta.min.js"></script>
+<script type="text/javascript" src="/dwv/dwv-0.20.0.min.js"></script>
 <!-- Launch the app -->
 <script type="text/javascript" src="/dwv/viewers/simple/appgui.js"></script>
 ]])
