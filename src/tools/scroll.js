@@ -117,6 +117,7 @@ dwv.tool.Scroll = function(app)
     this.touchstart = function(event){
         // long touch triggers the dblclick
         touchTimerID = setTimeout(self.dblclick, 500);
+        // call mouse equivalent
         self.mousedown(event);
     };
 
@@ -125,6 +126,12 @@ dwv.tool.Scroll = function(app)
      * @param {Object} event The touch move event.
      */
     this.touchmove = function(event){
+        // abort timer if move
+        if (touchTimerID !== null) {
+            clearTimeout(touchTimerID);
+            touchTimerID = null;
+        }
+        // call mouse equivalent
         self.mousemove(event);
     };
 
@@ -133,10 +140,12 @@ dwv.tool.Scroll = function(app)
      * @param {Object} event The touch end event.
      */
     this.touchend = function(event){
+        // abort timer
         if (touchTimerID !== null) {
             clearTimeout(touchTimerID);
             touchTimerID = null;
         }
+        // call mouse equivalent
         self.mouseup(event);
     };
 
