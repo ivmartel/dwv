@@ -359,7 +359,10 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
         var sliceSize = mul * size.getSliceSize();
 
         // create the new buffer
-        var newBuffer = new Int16Array(sliceSize * (size.getNumberOfSlices() + 1) );
+        var newBuffer = dwv.dicom.getTypedArray(
+            buffer[f].BYTES_PER_ELEMENT * 8,
+            meta.IsSigned ? 1 : 0,
+            sliceSize * (size.getNumberOfSlices() + 1) );
 
         // append slice at new position
         var newSliceNb = geometry.getSliceIndex( rhs.getGeometry().getOrigin() );
