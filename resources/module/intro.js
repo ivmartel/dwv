@@ -8,6 +8,7 @@
             'i18next',
             'i18nextXHRBackend',
             'i18nextBrowserLanguageDetector',
+            'jszip',
             'konva',
             ''
         ], factory);
@@ -25,6 +26,7 @@
             require('i18next'),
             require('i18next-xhr-backend'),
             require('i18next-browser-languagedetector'),
+            require('jszip'),
             null,
             null
         );
@@ -35,6 +37,7 @@
             root.i18next,
             root.i18nextXHRBackend,
             root.i18nextBrowserLanguageDetector,
+            root.JSZip,
             root.Konva,
             root.MagicWand
         );
@@ -44,6 +47,7 @@
     i18next,
     i18nextXHRBackend,
     i18nextBrowserLanguageDetector,
+    JSZip,
     Konva,
     MagicWand) {
 
