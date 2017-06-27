@@ -2,10 +2,10 @@ Third Party: i18next
 ====================
 
 * Web: http://i18next.com/
-* Version: [7.1.3](https://github.com/i18next/i18next/releases/tag/v7.1.3)
-* Date: 23/03/2017
-* Download: https://github.com/i18next/i18next/blob/v7.1.3/i18next.min.js
-* License: MIT (see https://github.com/i18next/i18next/blob/v7.1.3/LICENSE)
+* Version: [8.4.2](https://github.com/i18next/i18next/releases/tag/v8.4.2)
+* Date: 11/06/2017
+* Download: https://github.com/i18next/i18next/blob/v8.4.2/i18next.min.js
+* License: MIT (see https://github.com/i18next/i18next/blob/v8.4.2/LICENSE)
 * Description: internationalization framework.
 * Purpose for dwv: internationalization of GUI and messages.
 
@@ -22,9 +22,9 @@ i18next-xhr-backend
 i18next-browser-languageDetector
 --------------------------------
 * Web: https://github.com/i18next/i18next-browser-languageDetector
-* Version: [1.0.1](https://github.com/i18next/i18next-browser-languageDetector/releases/tag/v1.0.1)
-* Date: 17/10/2016
-* Download: https://github.com/i18next/i18next-browser-languageDetector/blob/v1.0.1/i18nextBrowserLanguageDetector.min.js
-* License: MIT (see https://github.com/i18next/i18next-browser-languageDetector/blob/v1.0.1/LICENSE)
+* Version: [2.0.0](https://github.com/i18next/i18next-browser-languageDetector/releases/tag/v2.0.0)
+* Date: 16/06/2017
+* Download: https://github.com/i18next/i18next-browser-languageDetector/blob/v2.0.0/i18nextBrowserLanguageDetector.min.js
+* License: MIT (see https://github.com/i18next/i18next-browser-languageDetector/blob/v2.0.0/LICENSE)
 * Description: language detector used in browser environment for i18next
 * Purpose for dwv: detect user language.

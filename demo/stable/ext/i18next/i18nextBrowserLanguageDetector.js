@@ -198,7 +198,8 @@
       lookupLocalStorage: 'i18nextLng',
 
       // cache user language
-      caches: ['localStorage']
+      caches: ['localStorage'],
+      excludeCacheFor: ['cimode']
       //cookieMinutes: 10,
       //cookieDomain: 'myDomain'
     };
@@ -268,6 +269,7 @@
 
         if (!caches) caches = this.options.caches;
         if (!caches) return;
+        if (this.options.excludeCacheFor && this.options.excludeCacheFor.indexOf(lng) > -1) return;
         caches.forEach(function (cacheName) {
           if (_this2.detectors[cacheName]) _this2.detectors[cacheName].cacheUserLanguage(lng, _this2.options);
         });

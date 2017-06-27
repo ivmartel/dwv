@@ -19,7 +19,19 @@
         "history": "历史记录",
         "image": "图像",
         "info": "信息",
-        "downloadState": "下载状态"
+        "downloadState": "下载状态",
+        "drawList": "Annotations",
+        "search": "Search",
+        "id": "ID",
+        "slice": "Slice",
+        "frame": "Frame",
+        "type": "Type",
+        "color": "Color",
+        "label": "Label",
+        "description": "Description",
+        "editMode": "Edit Mode",
+        "deleteDraws": "Delete All",
+        "visible": "Visible"
     },
     "colour": {
         "Yellow": {
@@ -77,15 +89,17 @@
         },
         "Scroll": {
             "name": "滚动条",
-            "brief": "滚动条工具可以切换不同影像切片。",
-            "mouse_drag": "单次竖直方向拖动鼠标切换当前影像切片。",
-            "touch_drag": "单次竖直方向滑动切换当前影像切片。"
+            "brief": "The scroll tool allows to scroll through slices/frames. ",
+            "double_click": "A double click launches a slice or frame play. A single click stops it.",
+            "tap_and_hold": "A tap and hold launches a slice or frame play. A single tap stops it.",
+            "mouse_drag": "Drag the mouse vertically to change the slice, horizontally to change the frame. Keyboard shortcuts: CTRL + up or down arrow to change slices, CTRL + left or right arrow to change frames.",
+            "touch_drag": "Drag your finger vertically to change the slice, horizontally to change the frame."
         },
         "Draw": {
             "name": "测量",
             "brief": "在图像上画不同的形状。可从下拉菜单中选择形状和颜色。创建测量后，通过选中可以进行编辑。会出现角度，允许特定形状编辑。拖动顶端红色十字可将对象删除，所有操作可撤销。",
-            "mouse_drag": "单鼠标拖动画图",
-            "touch_drag": "单触滑动画图"
+            "mouse_drag": "A single mouse drag draws the desired shape. For the protractor, click to start, draw the first ray to the vertex, wait half a second and draw the second ray.",
+            "touch_drag": "A single touch drag draws the desired shape. For the protractor, tap to start, draw the first ray to the vertex, wait half a second and draw the second ray."
         },
         "Filter": {
             "name": "滤波器",
@@ -113,6 +127,9 @@
         "Line": {
             "name": "直线"
         },
+        "Ruler": {
+            "name": "Ruler"
+        },
         "Protractor": {
             "name": "量角器"
         },
@@ -124,6 +141,12 @@
         },
         "Ellipse": {
             "name": "椭圆"
+        },
+        "Arrow": {
+            "name": "Arrow"
+        },
+        "FreeHand": {
+            "name": "Free hand"
         }
     },
     "io": {

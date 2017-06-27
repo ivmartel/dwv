@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<!-- <html manifest="cache.manifest"> -->
-<html>
+<html manifest="cache.manifest">
 
 <head>
 <title>DICOM Web Viewer</title>
@@ -16,8 +15,14 @@ body { background-color: #222; color: white; font-size: 80%; }
 .toolList ul { padding: 0; }
 .toolList li { list-style-type: none; }
 #pageMain { position: absolute; height: 92%; width: 99%; bottom: 5px; left: 5px; background-color: #333; }
-.infotl { color: #333; text-shadow: 0 1px 0 #fff; }
-.infotr { color: #333; text-shadow: 0 1px 0 #fff; }
+.infotl { text-shadow: 0 1px 0 #000; }
+.infotc { text-shadow: 0 1px 0 #000; }
+.infotr { text-shadow: 0 1px 0 #000; }
+.infocl { text-shadow: 0 1px 0 #000; }
+.infocr { text-shadow: 0 1px 0 #000; }
+.infobl { text-shadow: 0 1px 0 #000; }
+.infobc { text-shadow: 0 1px 0 #000; }
+.infobr { text-shadow: 0 1px 0 #000; }
 .dropBox { margin: 20px; }
 .ui-icon { zoom: 125%; }
 .tagsTable tr:nth-child(even) { background-color: #333; }
@@ -31,10 +36,11 @@ li button, li input { margin: 0; }
 .ui-widget-content { background-color: #222; background-image: url();}
 </style>
 <!-- Third party (dwv) -->
+<script type="text/javascript" src="../../ext/modernizr/modernizr.js"></script>
 <script type="text/javascript" src="../../ext/i18next/i18next.min.js"></script>
 <script type="text/javascript" src="../../ext/i18next/i18nextXHRBackend.min.js"></script>
 <script type="text/javascript" src="../../ext/i18next/i18nextBrowserLanguageDetector.min.js"></script>
-<script type="text/javascript" src="../../ext/konva/konva-1.5.0.min.js"></script>
+<script type="text/javascript" src="../../ext/konva/konva-1.6.0.min.js"></script>
 <script type="text/javascript" src="../../ext/magic-wand/magic-wand.js"></script>
 <!-- Third party (viewer) -->
 <script type="text/javascript" src="../../ext/jquery/jquery-2.1.4.min.js"></script>
@@ -47,7 +53,7 @@ li button, li input { margin: 0; }
 <script type="text/javascript" src="../../ext/pdfjs/jpg.js"></script>
 <script type="text/javascript" src="../../ext/rii-mango/lossless-min.js"></script>
 <!-- Local -->
-<script type="text/javascript" src="../../dwv-0.19.2.min.js"></script>
+<script type="text/javascript" src="../../dwv-0.20.0.min.js"></script>
 <!-- Launch the app -->
 <script type="text/javascript" src="appgui.js"></script>
 <script type="text/javascript" src="applauncher.js"></script>
@@ -99,9 +105,14 @@ li button, li input { margin: 0; }
 <div class="drawDiv"></div>
 <div class="infoLayer">
 <div class="infotl"></div>
+<div class="infotc"></div>
 <div class="infotr"></div>
+<div class="infocl"></div>
+<div class="infocr"></div>
 <div class="infobl"></div>
-<div class="infobr"><div class="plot"></div></div>
+<div class="infobc"></div>
+<div class="infobr" style="bottom: 64px;"></div>
+<div class="plot"></div>
 </div><!-- /infoLayer -->
 </div><!-- /layerContainer -->
 </div><!-- /layerDialog -->

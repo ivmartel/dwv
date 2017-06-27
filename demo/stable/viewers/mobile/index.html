@@ -16,6 +16,7 @@ body { margin: 10px; padding: 0; }
 .inline { display: inline-block !important; }
 </style>
 <link type="text/css" rel="stylesheet" href="../../ext/jquery-mobile/jquery.mobile-1.4.5.min.css" />
+<link type="text/css" rel="stylesheet" href="../../ext/nprogress/nprogress.css" />
 <style type="text/css" >
 .ui-popup .ui-controlgroup { background-color: #252525; }
 .colourLi > .ui-input-text { text-align: center; }
@@ -43,14 +44,16 @@ body { margin: 10px; padding: 0; }
 <link rel="apple-touch-icon" sizes="60x60" href="../../resources/icons/dwv-60.png" />
 <link rel="apple-touch-icon" sizes="128x128" href="../../resources/icons/dwv-128.png" />
 <!-- Third party (dwv) -->
+<script type="text/javascript" src="../../ext/modernizr/modernizr.js"></script>
 <script type="text/javascript" src="../../ext/i18next/i18next.min.js"></script>
 <script type="text/javascript" src="../../ext/i18next/i18nextXHRBackend.min.js"></script>
 <script type="text/javascript" src="../../ext/i18next/i18nextBrowserLanguageDetector.min.js"></script>
-<script type="text/javascript" src="../../ext/konva/konva-1.5.0.min.js"></script>
+<script type="text/javascript" src="../../ext/konva/konva-1.6.0.min.js"></script>
 <script type="text/javascript" src="../../ext/magic-wand/magic-wand.js"></script>
 <!-- Third party (viewer) -->
 <script type="text/javascript" src="../../ext/jquery/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" src="../../ext/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
+<script type="text/javascript" src="../../ext/nprogress/nprogress.js"></script>
 <script type="text/javascript" src="../../ext/flot/jquery.flot.min.js"></script>
 <!-- decoders -->
 <script type="text/javascript" src="../../ext/pdfjs/jpx.js"></script>
@@ -58,8 +61,9 @@ body { margin: 10px; padding: 0; }
 <script type="text/javascript" src="../../ext/pdfjs/arithmetic_decoder.js"></script>
 <script type="text/javascript" src="../../ext/pdfjs/jpg.js"></script>
 <script type="text/javascript" src="../../ext/rii-mango/lossless-min.js"></script>
+<script type="text/javascript" src="../../ext/jszip/jszip.min.js"></script>
 <!-- Local -->
-<script type="text/javascript" src="../../dwv-0.19.2.min.js"></script>
+<script type="text/javascript" src="../../dwv-0.20.0.min.js"></script>
 
 <!-- Google -->
 <script type="text/javascript" src="https://apis.google.com/js/client.js"></script>
@@ -124,10 +128,14 @@ body { margin: 10px; padding: 0; }
 <canvas class="imageLayer">Only for HTML5 compatible browsers...</canvas>
 <div class="drawDiv"></div>
 <div class="infoLayer">
-<div class="infotl"></div>
-<div class="infotr"></div>
-<div class="infobl"></div>
-<!-- <div class="infobr"><div class="plot"></div></div> -->
+<div class="infotl info"></div>
+<div class="infotc infoc"></div>
+<div class="infotr info"></div>
+<div class="infocl infoc"></div>
+<div class="infocr infoc"></div>
+<div class="infobl info"></div>
+<div class="infobc infoc"></div>
+<div class="infobr info"></div>
 </div><!-- /infoLayer -->
 </div><!-- /layerContainer -->
 

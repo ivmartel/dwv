@@ -1,8 +1,8 @@
 /*
- * Konva JavaScript Framework v1.5.0
+ * Konva JavaScript Framework v1.6.0
  * http://konvajs.github.io/
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: Mon Mar 20 2017
+ * Date: Fri Apr 21 2017
  *
  * Original work Copyright (C) 2011 - 2013 by Eric Rowell (KineticJS)
  * Modified work Copyright (C) 2014 - 2017 by Anton Lavrenov (Konva)
@@ -38,7 +38,7 @@
 
   var Konva = {
     // public
-    version: '1.5.0',
+    version: '1.6.0',
 
     // private
     stages: [],
@@ -2111,6 +2111,12 @@
       this.setAttr('shadowBlur', blur * ratio * Math.min(scaleX, scaleY));
       this.setAttr('shadowOffsetX', offset.x * scaleX);
       this.setAttr('shadowOffsetY', offset.y * scaleY);
+    },
+    _applyGlobalCompositeOperation: function(shape) {
+      var globalCompositeOperation = shape.getGlobalCompositeOperation();
+      if (globalCompositeOperation !== 'source-over') {
+        this.setAttr('globalCompositeOperation', globalCompositeOperation);
+      }
     }
   };
   Konva.Util.extend(Konva.SceneContext, Konva.Context);
@@ -8281,7 +8287,7 @@
       var stage = this.getStage(), bufferHitCanvas = stage.bufferHitCanvas, p;
 
       bufferHitCanvas.getContext().clear();
-      this.drawScene(bufferHitCanvas);
+      this.drawHit(bufferHitCanvas);
       p = bufferHitCanvas.context.getImageData(
         Math.round(point.x),
         Math.round(point.y),
@@ -8421,8 +8427,10 @@
         var ratio = bufferCanvas.pixelRatio;
         if (hasShadow && !canvas.hitCanvas) {
           context.save();
+
           context._applyShadow(this);
           context._applyOpacity(this);
+          context._applyGlobalCompositeOperation(this);
           context.drawImage(
             bufferCanvas._canvas,
             0,
@@ -8433,6 +8441,7 @@
           context.restore();
         } else {
           context._applyOpacity(this);
+          context._applyGlobalCompositeOperation(this);
           context.drawImage(
             bufferCanvas._canvas,
             0,
@@ -8459,8 +8468,10 @@
           // apply shadow
           if (!caching) {
             context._applyOpacity(this);
+            context._applyGlobalCompositeOperation(this);
           }
           context._applyShadow(this);
+
           drawFunc.call(this, context);
           context.restore();
           // if shape has stroke we need to redraw shape
@@ -8473,6 +8484,7 @@
           context.save();
           if (!caching) {
             context._applyOpacity(this);
+            context._applyGlobalCompositeOperation(this);
           }
           context._applyShadow(this);
           drawFunc.call(this, context);
@@ -8480,6 +8492,7 @@
         } else {
           if (!caching) {
             context._applyOpacity(this);
+            context._applyGlobalCompositeOperation(this);
           }
           drawFunc.call(this, context);
         }
@@ -8876,6 +8889,27 @@
     1,
     Konva.Validators.alphaComponent
   );
+
+  Konva.Factory.addGetterSetter(
+    Konva.Shape,
+    'globalCompositeOperation',
+    'source-over'
+  );
+
+  /**
+     * get/set globalCompositeOperation of a shape
+     * @name globalCompositeOperation
+     * @method
+     * @memberof Konva.Shape.prototype
+     * @param {Number} blur
+     * @returns {Number}
+     * @example
+     * // get shadow blur
+     * var globalCompositeOperation = shape.globalCompositeOperation();
+     *
+     * // set shadow blur
+     * shape.globalCompositeOperation('source-in');
+     */
 
   Konva.Factory.addGetterSetter(Konva.Shape, 'shadowBlur');
 
@@ -10402,7 +10436,7 @@
       this._mousewheel(evt);
     },
     _setPointerPosition: function(evt) {
-      var contentPosition = this._getContentPosition(), x = null, y = null;
+      var x = null, y = null;
       evt = evt ? evt : window.event;
 
       // touch events
@@ -10411,13 +10445,13 @@
         if (evt.touches.length > 0) {
           var touch = evt.touches[0];
           // get the information for finger #1
-          x = touch.clientX - contentPosition.left;
-          y = touch.clientY - contentPosition.top;
+          x = touch.offsetX;
+          y = touch.offsetY;
         }
       } else {
         // mouse events
-        x = evt.clientX - contentPosition.left;
-        y = evt.clientY - contentPosition.top;
+        x = evt.offsetX;
+        y = evt.offsetY;
       }
       if (x !== null && y !== null) {
         this.pointerPos = {
