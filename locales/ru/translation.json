@@ -19,7 +19,19 @@
         "history": "История",
         "image": "Изображение",
         "info": "Информация",
-        "downloadState": "Статус загрузки"
+        "downloadState": "Статус загрузки",
+        "drawList": "Annotations",
+        "search": "Search",
+        "id": "ID",
+        "slice": "Slice",
+        "frame": "Frame",
+        "type": "Type",
+        "color": "Color",
+        "label": "Label",
+        "description": "Description",
+        "editMode": "Edit Mode",
+        "deleteDraws": "Delete All",
+        "visible": "Visible"
     },
     "colour": {
         "Yellow": {
@@ -54,7 +66,7 @@
     },
     "help": {
         "intro": {
-	    "p0": "DWV (DICOM Web Viewer) бесплатный просмотр медицинских изображений без выходных данных (zero footprint). Он использует только JavaScript и технологии HTML5, а это означает, что она может работать на любой платформе, которая обеспечивает современный браузер (ноутбук, планшет, телефон и даже современные телевизоры). Он может загружать локальные или удаленные данные в формате DICOM (стандарт для данных медицинской визуализации, таких как МРТ, КТ, Echo, MAMMO, NM ...) и предоставляет стандартные инструменты для его манипуляции, такие как контрастность, масштабирование, перетаскивание, возможность рисовать области на верхней части изображения и визуализации фильтров, таких как порог и повышения резкости.",
+            "p0": "DWV (DICOM Web Viewer) бесплатный просмотр медицинских изображений без выходных данных (zero footprint). Он использует только JavaScript и технологии HTML5, а это означает, что она может работать на любой платформе, которая обеспечивает современный браузер (ноутбук, планшет, телефон и даже современные телевизоры). Он может загружать локальные или удаленные данные в формате DICOM (стандарт для данных медицинской визуализации, таких как МРТ, КТ, Echo, MAMMO, NM ...) и предоставляет стандартные инструменты для его манипуляции, такие как контрастность, масштабирование, перетаскивание, возможность рисовать области на верхней части изображения и визуализации фильтров, таких как порог и повышения резкости.",
             "p1": "Все DICOM тыги доступны в таблице поиска, нажмите 'тэги' or кнопку со значком сетки. Для отображения информации об изображении поверх изображения вы можете нажать на 'Информация' или кнопку с 'i'."
         },
         "tool_intro": "Каждый инструмент определяет возможные взаимодействия с пользователем. Вот доступные инструменты:"
@@ -65,7 +77,8 @@
             "brief": "Изменение контраста изображения.",
             "mouse_drag": "Одно перемещение мыши по горизонтали смещает окно, а по вертикали уровень.",
             "double_click": "Двойной клик перемещает ценр окна и уровня на значение интенсивности точки клика.",
-            "touch_drag": "Простое перетаскивание пальцем по горизонтали смещяет окно контрастности, по вертикали - уровень."        },
+            "touch_drag": "Простое перетаскивание пальцем по горизонтали смещяет окно контрастности, по вертикали - уровень."
+        },
         "ZoomAndPan": {
             "name": "Масштаб/Смещение",
             "brief": "Масштаб/Смещение позволяет увеличивать и смещать изображение.",
@@ -76,15 +89,17 @@
         },
         "Scroll": {
             "name": "Перелистование",
-            "brief": "Инструмент перелистывания позволяет перелистывать слои.",
-            "mouse_drag": "Перемещение мыши по вертикали сменяет текущий слой.",
-            "touch_drag": "Перемещение пальца по вертикали сменяет текущий слой."
+            "brief": "The scroll tool allows to scroll through slices/frames. ",
+            "double_click": "A double click launches a slice or frame play. A single click stops it.",
+            "tap_and_hold": "A tap and hold launches a slice or frame play. A single tap stops it.",
+            "mouse_drag": "Drag the mouse vertically to change the slice, horizontally to change the frame. Keyboard shortcuts: CTRL + up or down arrow to change slices, CTRL + left or right arrow to change frames.",
+            "touch_drag": "Drag your finger vertically to change the slice, horizontally to change the frame."
         },
         "Draw": {
             "name": "Рисовать",
             "brief": "Позволяет рисовать фигуры на изображении. Выбор фигуры и ее цвета из выподающего списка. После создания фигуры могут быть изменены при выборе их. Фиксация нарисованных фигур позволяет осуществить специальное редактирование. Перемещение фигуры вверх на красный крест удаляет ее. Все действия могут быть повторены.",
-            "mouse_drag": "Фигура рисуется простым перемещением мыши.",
-            "touch_drag": "Фигура рисуется простым смещением пальца."
+            "mouse_drag": "A single mouse drag draws the desired shape. For the protractor, click to start, draw the first ray to the vertex, wait half a second and draw the second ray.",
+            "touch_drag": "A single touch drag draws the desired shape. For the protractor, tap to start, draw the first ray to the vertex, wait half a second and draw the second ray."
         },
         "Filter": {
             "name": "Фильтр",
@@ -103,6 +118,7 @@
         "info": {
             "position": "Позиция = {{value}}",
             "value": "Зрачение = {{value}}",
+            "frame": "Frame = {{value}}",
             "window_center": "Центр_Окна = {{value}}",
             "window_width": "Ширина_Окна = {{value}}"
         }
@@ -110,6 +126,9 @@
     "shape": {
         "Line": {
             "name": "Линия"
+        },
+        "Ruler": {
+            "name": "Ruler"
         },
         "Protractor": {
             "name": "Транспортир"
@@ -122,6 +141,12 @@
         },
         "Ellipse": {
             "name": "Элипс"
+        },
+        "Arrow": {
+            "name": "Arrow"
+        },
+        "FreeHand": {
+            "name": "Free hand"
         }
     },
     "io": {

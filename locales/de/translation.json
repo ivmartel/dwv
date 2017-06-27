@@ -14,12 +14,24 @@
         "element": "Element",
         "vr": "VR",
         "vl": "VL",
-        "presets": "Presets",
+        "presets": "Voreinstellungen",
         "toolbox": "Werkzeugkasten",
-        "history": "Historie",
-        "image": "Image",
+        "history": "Geschichte",
+        "image": "Bild",
         "info": "Info",
-        "downloadState": "Herunterladen state"
+        "downloadState": "Zustand herunterladen",
+        "drawList": "Annotations",
+        "search": "Search",
+        "id": "ID",
+        "slice": "Slice",
+        "frame": "Frame",
+        "type": "Type",
+        "color": "Color",
+        "label": "Label",
+        "description": "Description",
+        "editMode": "Edit Mode",
+        "deleteDraws": "Delete All",
+        "visible": "Visible"
     },
     "colour": {
         "Yellow": {
@@ -49,7 +61,7 @@
     },
     "unit": {
         "mm": "mm",
-        "cm2": "cm2",
+        "cm2": "cm²",
         "degree": "\u00B0"
     },
     "help": {
@@ -77,15 +89,17 @@
         },
         "Scroll": {
             "name": "Scrollen",
-            "brief": "Das Scrollwerkzeug ermöglicht das Scrollen durch die Schnittbilder.",
-            "mouse_drag": "Vertikales Ziehen mit der Maus ändert das aktuelle Schnittbild.",
-            "touch_drag": "Vertikales Ziehen mit dem Finger ändert das aktuelle Schnittbild."
+            "brief": "The scroll tool allows to scroll through slices/frames. ",
+            "double_click": "A double click launches a slice or frame play. A single click stops it.",
+            "tap_and_hold": "A tap and hold launches a slice or frame play. A single tap stops it.",
+            "mouse_drag": "Drag the mouse vertically to change the slice, horizontally to change the frame. Keyboard shortcuts: CTRL + up or down arrow to change slices, CTRL + left or right arrow to change frames.",
+            "touch_drag": "Drag your finger vertically to change the slice, horizontally to change the frame."
         },
         "Draw": {
             "name": "Zeichnen",
             "brief": "Ermöglicht das Zeichnen von Formen in das Bild. Wählen Sie Form und Farbe aus den Drop-Down-Menüs. Die Formen können nach ihrer Erstellung ausgewählt werden. Das Verschieben der dann erscheinenden formspezifischen Ankerpunkte erlaubt eine nachträgliche Bearbeitung. Wird eine Form auf das rote Kreuz gezogen, wird sie gelöscht. Alle Aktionen können rückgängige gemacht werden.",
-            "mouse_drag": "Zeichnen Sie mit der Maus das gewünschte Objekt mit gedrückter Maustaste.",
-            "touch_drag": "Zeichnen Sie mit dem Finger das gewünschte Objekt."
+            "mouse_drag": "A single mouse drag draws the desired shape. For the protractor, click to start, draw the first ray to the vertex, wait half a second and draw the second ray.",
+            "touch_drag": "A single touch drag draws the desired shape. For the protractor, tap to start, draw the first ray to the vertex, wait half a second and draw the second ray."
         },
         "Filter": {
             "name": "Filter",
@@ -97,14 +111,15 @@
         },
         "Floodfill": {
             "name": "Floodfill",
-            "brief": "The Floodfill tool is a semi-automatic segmentation tool that contours pixel of similar values.",
-            "click": "Click on pixel to create a contour based on its intensity.",
-            "tap": "Touch a pixel to create a contour based on its intensity."
+            "brief": "Das Floodfill-Werkzeug ist ein halbautomatisches Segmentierungswerkzeug, das eine Kontur um Flächen benachbarter Pixel ähnlichen Grauwerts erzeugt.",
+            "click": "Klick auf Pixel erzeut eine Kontur auf Basis des Grauwerts.
+Click on pixel to create a contour based on its intensity.",
+            "tap": "Tippen auf Pixel erzeut eine Kontur auf Basis des Grauwerts."
         },
         "info": {
             "position": "Position = {{value}}",
             "value": "Grauwert = {{value}}",
-            "frame": "Frame = {{value}}",
+            "frame": "Bild = {{value}}",
             "window_center": "Fensterzentrum = {{value}}",
             "window_width": "Fensterbreite = {{value}}"
         }
@@ -112,6 +127,9 @@
     "shape": {
         "Line": {
             "name": "Linie"
+        },
+        "Ruler": {
+            "name": "Ruler"
         },
         "Protractor": {
             "name": "Winkelmesser"
@@ -124,6 +142,12 @@
         },
         "Ellipse": {
             "name": "Ellipse"
+        },
+        "Arrow": {
+            "name": "Arrow"
+        },
+        "FreeHand": {
+            "name": "Free hand"
         }
     },
     "io": {
