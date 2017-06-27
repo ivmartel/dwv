@@ -4,9 +4,11 @@
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define([
+            'modernizr',
             'i18next',
             'i18nextXHRBackend',
             'i18nextBrowserLanguageDetector',
+            'jszip',
             'konva',
             ''
         ], factory);
@@ -20,26 +22,32 @@
         // MagicWand: no package -> deactivated
 
         module.exports = factory(
+            require('modernizr'),
             require('i18next'),
             require('i18next-xhr-backend'),
             require('i18next-browser-languagedetector'),
+            require('jszip'),
             null,
             null
         );
     } else {
         // Browser globals (root is window)
         root.dwv = factory(
+            root.Modernizr,
             root.i18next,
             root.i18nextXHRBackend,
             root.i18nextBrowserLanguageDetector,
+            root.JSZip,
             root.Konva,
             root.MagicWand
         );
     }
 }(this, function (
+    Modernizr,
     i18next,
     i18nextXHRBackend,
     i18nextBrowserLanguageDetector,
+    JSZip,
     Konva,
     MagicWand) {
 
@@ -72,8 +80,8 @@ dwv.App = function ()
     var dataWidth = 0;
     // Image data height
     var dataHeight = 0;
-    // Number of slices to load
-    var nSlicesToLoad = 0;
+    // Is the data mono-slice?
+    var isMonoSliceData = 0;
 
     // Default character set
     var defaultCharacterSet;
@@ -129,7 +137,7 @@ dwv.App = function ()
      * Get the version of the application.
      * @return {String} The version of the application.
      */
-    this.getVersion = function () { return "v0.19.2"; };
+    this.getVersion = function () { return "v0.20.0"; };
 
     /**
      * Get the image.
@@ -159,10 +167,10 @@ dwv.App = function ()
      */
     this.getImageData = function () { return imageData; };
     /**
-     * Get the number of slices to load.
-     * @return {Number} The number of slices to load.
+     * Is the data mono-slice?
+     * @return {Boolean} True if the data is mono-slice.
      */
-    this.getNSlicesToLoad = function () { return nSlicesToLoad; };
+    this.isMonoSliceData = function () { return isMonoSliceData; };
 
     /**
      * Get the main scale.
@@ -423,7 +431,7 @@ dwv.App = function ()
         // clear objects
         image = null;
         view = null;
-        nSlicesToLoad = 0;
+        isMonoSliceData = false;
         // reset undo/redo
         if ( undoStack ) {
             undoStack = new dwv.tool.UndoStack(this);
@@ -445,6 +453,8 @@ dwv.App = function ()
         if ( drawController ) {
             drawController.resetStage(windowScale);
         }
+
+        fireEvent({"type": "zoom-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
     };
 
     /**
@@ -501,34 +511,10 @@ dwv.App = function ()
      */
     function loadImageFiles(files)
     {
-        // clear variables
-        self.reset();
-        nSlicesToLoad = files.length;
         // create IO
-        var fileIO = new dwv.io.File();
-        fileIO.setDefaultCharacterSet(defaultCharacterSet);
-        fileIO.onload = function (data) {
-            if ( image ) {
-                view.append( data.view );
-                if ( drawController ) {
-                    drawController.appendDrawLayer(image.getNumberOfFrames());
-                }
-            }
-            postLoadInit(data);
-        };
-        fileIO.onerror = function (error) { handleError(error); };
-        fileIO.onloadend = function (/*event*/) {
-            if ( drawController ) {
-                drawController.activateDrawLayer(viewController);
-            }
-            fireEvent({type: "load-progress", lengthComputable: true,
-                loaded: 100, total: 100});
-            fireEvent({ 'type': 'load-end' });
-        };
-        fileIO.onprogress = onLoadProgress;
-        // main load (asynchronous)
-        fireEvent({ 'type': 'load-start' });
-        fileIO.load(files);
+        var fileIO = new dwv.io.FilesLoader();
+        // load data
+        loadImageData(files, fileIO);
     }
 
     /**
@@ -539,15 +525,9 @@ dwv.App = function ()
     function loadStateFile(file)
     {
         // create IO
-        var fileIO = new dwv.io.File();
-        fileIO.onload = function (data) {
-            // load state
-            var state = new dwv.State(self);
-            state.fromJSON(data);
-        };
-        fileIO.onerror = function (error) { handleError(error); };
-        // main load (asynchronous)
-        fileIO.load([file]);
+        var fileIO = new dwv.io.FilesLoader();
+        // load data
+        loadStateData([file], fileIO);
     }
 
     /**
@@ -560,7 +540,7 @@ dwv.App = function ()
         // has been checked for emptiness.
         var ext = urls[0].split('.').pop().toLowerCase();
         if ( ext === "json" ) {
-            loadStateUrl(urls[0]);
+            loadStateUrl(urls[0], requestHeaders);
         }
         else {
             loadImageUrls(urls, requestHeaders);
@@ -575,13 +555,55 @@ dwv.App = function ()
      */
     function loadImageUrls(urls, requestHeaders)
     {
+        // create IO
+        var urlIO = new dwv.io.UrlsLoader();
+        // create options
+        var options = {'requestHeaders': requestHeaders};
+        // load data
+        loadImageData(urls, urlIO, options);
+    }
+
+    /**
+     * Load a State url.
+     * @private
+     * @param {String} url The state url to load.
+     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+     */
+    function loadStateUrl(url, requestHeaders)
+    {
+        // create IO
+        var urlIO = new dwv.io.UrlsLoader();
+        // create options
+        var options = {'requestHeaders': requestHeaders};
+        // load data
+        loadStateData([url], urlIO, options);
+    }
+
+    /**
+     * Load a list of image data.
+     * @private
+     * @param {Array} data Array of data to load.
+     * @param {Object} loader The data loader.
+     * @param {Object} options Options passed to the final loader.
+     */
+    function loadImageData(data, loader, options)
+    {
         // clear variables
         self.reset();
-        nSlicesToLoad = urls.length;
-        // create IO
-        var urlIO = new dwv.io.Url();
-        urlIO.setDefaultCharacterSet(defaultCharacterSet);
-        urlIO.onload = function (data) {
+        // first data name
+        var firstName = "";
+        if (typeof data[0].name !== "undefined") {
+            firstName = data[0].name;
+        } else {
+            firstName = data[0];
+        }
+        // flag used by scroll to decide wether to activate or not
+        // TODO: supposing multi-slice for zip files, could not be...
+        isMonoSliceData = (data.length === 1 &&
+            firstName.split('.').pop().toLowerCase() !== "zip");
+        // set IO
+        loader.setDefaultCharacterSet(defaultCharacterSet);
+        loader.onload = function (data) {
             if ( image ) {
                 view.append( data.view );
                 if ( drawController ) {
@@ -590,8 +612,8 @@ dwv.App = function ()
             }
             postLoadInit(data);
         };
-        urlIO.onerror = function (error) { handleError(error); };
-        urlIO.onloadend = function (/*event*/) {
+        loader.onerror = function (error) { handleError(error); };
+        loader.onloadend = function (/*event*/) {
             if ( drawController ) {
                 drawController.activateDrawLayer(viewController);
             }
@@ -599,29 +621,30 @@ dwv.App = function ()
                 loaded: 100, total: 100});
             fireEvent({ 'type': 'load-end' });
         };
-        urlIO.onprogress = onLoadProgress;
+        loader.onprogress = onLoadProgress;
         // main load (asynchronous)
         fireEvent({ 'type': 'load-start' });
-        urlIO.load(urls, requestHeaders);
+        loader.load(data, options);
     }
 
     /**
-     * Load a State url.
+     * Load a State data.
      * @private
-     * @param {String} url The state url to load.
+     * @param {Array} data Array of data to load.
+     * @param {Object} loader The data loader.
+     * @param {Object} options Options passed to the final loader.
      */
-    function loadStateUrl(url)
+    function loadStateData(data, loader, options)
     {
-        // create IO
-        var urlIO = new dwv.io.Url();
-        urlIO.onload = function (data) {
+        // set IO
+        loader.onload = function (data) {
             // load state
             var state = new dwv.State(self);
             state.fromJSON(data);
         };
-        urlIO.onerror = function (error) { handleError(error); };
+        loader.onerror = function (error) { handleError(error); };
         // main load (asynchronous)
-        urlIO.load([url]);
+        loader.load(data, options);
     }
 
     /**
@@ -668,7 +691,7 @@ dwv.App = function ()
         var infoLayer = self.getElement("infoLayer");
         dwv.html.toggleDisplay(infoLayer);
         // toggle listeners
-        infoController.toggleViewListeners(view);
+        infoController.toggleListeners(self, view);
     };
 
     /**
@@ -1167,6 +1190,8 @@ dwv.App = function ()
         if( drawController ) {
             drawController.zoomStage(scale, scaleCenter);
         }
+        // fire event
+        fireEvent({"type": "zoom-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
     }
 
     /**
@@ -1184,6 +1209,9 @@ dwv.App = function ()
                 var oy = - imageLayer.getOrigin().y / scale - translation.y;
                 drawController.translateStage(ox, oy);
             }
+            // fire event
+            fireEvent({"type": "zoom-change", "scale": scale,
+                "cx": imageLayer.getTrans().x, "cy": imageLayer.getTrans().y });
         }
     }
 
@@ -1380,7 +1408,7 @@ dwv.App = function ()
         if ( infoLayer ) {
             infoController = new dwv.InfoController(containerDivId);
             infoController.create(self);
-            infoController.toggleViewListeners(view);
+            infoController.toggleListeners(self, view);
         }
 
         // init W/L display: triggers a wlchange event
@@ -1850,12 +1878,10 @@ dwv.InfoController = function (containerDivId)
 
     // Info layer plot gui
     var plotInfo = null;
-    // Info layer windowing gui
-    var windowingInfo = null;
-    // Info layer position gui
-    var positionInfo = null;
     // Info layer colour map gui
     var miniColourMap = null;
+	// Info layer overlay
+	var overlayInfos = [];
     // flag to know if the info layer is listening on the image.
     var isInfoLayerListening = false;
 
@@ -1865,23 +1891,28 @@ dwv.InfoController = function (containerDivId)
      */
     this.create = function (app)
     {
-        var infotr = getElement("infotr");
-        if (infotr) {
-            windowingInfo = new dwv.gui.info.Windowing(infotr);
-            windowingInfo.create();
-        }
-
-        var infotl = getElement("infotl");
-        if (infotl) {
-            positionInfo = new dwv.gui.info.Position(infotl);
-            positionInfo.create();
-        }
-
-        var infobr = getElement("infobr");
-        if (infobr) {
-            miniColourMap = new dwv.gui.info.MiniColourMap(infobr, app);
+        var infocm = getElement("infocm");
+        if (infocm) {
+            miniColourMap = new dwv.gui.info.MiniColourMap(infocm, app);
             miniColourMap.create();
         }
+		
+		// create overlay info at each corner
+		var pos_list = [
+			"tl", "tc", "tr",
+			"cl",       "cr",
+			"bl", "bc", "br" ];
+
+		var num = 0;
+		for (var n=0; n<pos_list.length; n++){
+			var pos = pos_list[n];
+			var info = getElement("info" + pos);
+			if (info) {
+				overlayInfos[num] = new dwv.gui.info.Overlay(info, pos, app);
+				overlayInfos[num].create();
+				num++;
+			}
+		}
 
         var plot = getElement("plot");
         if (plot) {
@@ -1891,16 +1922,17 @@ dwv.InfoController = function (containerDivId)
     };
 
     /**
-     * Toggle info listeners to the view.
+     * Toggle info listeners to the app and the view.
+     * @param {Object} app The app to listen or not to.
      * @param {Object} view The view to listen or not to.
      */
-    this.toggleViewListeners = function (view)
+    this.toggleListeners = function (app, view)
     {
         if (isInfoLayerListening) {
-            removeViewListeners(view);
+            removeListeners(app, view);
         }
         else {
-            addViewListeners(view);
+            addListeners(app, view);
         }
     };
 
@@ -1916,13 +1948,11 @@ dwv.InfoController = function (containerDivId)
 
     /**
      * Add info listeners to the view.
+     * @param {Object} app The app to listen to.
      * @param {Object} view The view to listen to.
      */
-    function addViewListeners(view)
+    function addListeners(app, view)
     {
-        if (windowingInfo) {
-            view.addEventListener("wl-change", windowingInfo.update);
-        }
         if (plotInfo) {
             view.addEventListener("wl-change", plotInfo.update);
         }
@@ -1930,23 +1960,25 @@ dwv.InfoController = function (containerDivId)
             view.addEventListener("wl-change", miniColourMap.update);
             view.addEventListener("colour-change", miniColourMap.update);
         }
-        if (positionInfo) {
-            view.addEventListener("position-change", positionInfo.update);
-            view.addEventListener("frame-change", positionInfo.update);
-        }
+		if (overlayInfos.length > 0){
+			for (var n=0; n<overlayInfos.length; n++){
+				app.addEventListener("zoom-change", overlayInfos[n].update);
+				view.addEventListener("wl-change", overlayInfos[n].update);
+				view.addEventListener("position-change", overlayInfos[n].update);
+				view.addEventListener("frame-change", overlayInfos[n].update);
+			}
+		}
         // udpate listening flag
         isInfoLayerListening = true;
     }
 
     /**
      * Remove info listeners to the view.
+     * @param {Object} app The app to stop listening to.
      * @param {Object} view The view to stop listening to.
      */
-    function removeViewListeners(view)
+    function removeListeners(app, view)
     {
-        if (windowingInfo) {
-            view.removeEventListener("wl-change", windowingInfo.update);
-        }
         if (plotInfo) {
             view.removeEventListener("wl-change", plotInfo.update);
         }
@@ -1954,10 +1986,14 @@ dwv.InfoController = function (containerDivId)
             view.removeEventListener("wl-change", miniColourMap.update);
             view.removeEventListener("colour-change", miniColourMap.update);
         }
-        if (positionInfo) {
-            view.removeEventListener("position-change", positionInfo.update);
-            view.removeEventListener("frame-change", positionInfo.update);
-        }
+		if (overlayInfos.length > 0){
+			for (var n=0; n<overlayInfos.length; n++){
+				app.removeEventListener("zoom-change", overlayInfos[n].update);
+				view.removeEventListener("wl-change", overlayInfos[n].update);
+				view.removeEventListener("position-change", overlayInfos[n].update);
+				view.removeEventListener("frame-change", overlayInfos[n].update);
+			}
+		}
         // udpate listening flag
         isInfoLayerListening = false;
     }
@@ -2560,15 +2596,15 @@ dwv.dicom = dwv.dicom || {};
 
 /**
  * Clean string: trim and remove ending.
- * @param {String} string The string to clean.
+ * @param {String} inputStr The string to clean.
  * @return {String} The cleaned string.
  */
-dwv.dicom.cleanString = function (string)
+dwv.dicom.cleanString = function (inputStr)
 {
-    var res = string;
-    if ( string ) {
+    var res = inputStr;
+    if ( inputStr ) {
         // trim spaces
-        res = string.trim();
+        res = inputStr.trim();
         // get rid of ending zero-width space (u200B)
         if ( res[res.length-1] === String.fromCharCode("u200B") ) {
             res = res.substring(0, res.length-1);
@@ -2977,6 +3013,38 @@ dwv.dicom.getGroupElementKey = function (group, element)
 dwv.dicom.splitGroupElementKey = function (key)
 {
     return {'group': key.substr(1,4), 'element': key.substr(5,8) };
+};
+
+/**
+ * Get patient orientation label in the reverse direction.
+ * @param {String} ori Patient Orientation value.
+ * @return {String} Reverse Orientation Label.
+ */
+dwv.dicom.getReverseOrientation = function (ori)
+{
+    if (!ori) {
+        return null;
+    }
+    // reverse labels
+    var rlabels = {
+        "L": "R",
+        "R": "L",
+        "A": "P",
+        "P": "A",
+        "H": "F",
+        "F": "H"
+    };
+
+    var rori = "";
+    for (var n=0; n<ori.length; n++) {
+        var o = ori.substr(n,1);
+        var r = rlabels[o];
+        if (r){
+            rori += r;
+        }
+    }
+    // return
+    return rori;
 };
 
 /**
@@ -3858,6 +3926,15 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
     /**
     * Get a DICOM Element value from a group/element key.
     * @param {String} groupElementKey The key to retrieve.
+    * @return {Object} The DICOM element.
+    */
+    this.getDEFromKey = function ( groupElementKey ) {
+        return dicomElements[groupElementKey];
+    };
+
+    /**
+    * Get a DICOM Element value from a group/element key.
+    * @param {String} groupElementKey The key to retrieve.
     * @param {Boolean} asArray Get the value as an Array.
     * @return {Object} The DICOM element value.
     */
@@ -3908,12 +3985,7 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
                 row.name = "Unknown Tag & Data";
             }
             // value
-            if ( dicomElement.tag.name !== "x7FE00010" ) {
-                row.value = dicomElement.value;
-            }
-            else {
-                row.value = "...";
-            }
+            row.value = this.getElementValueAsString(dicomElement);
             // others
             row.group = dicomElement.tag.group;
             row.element = dicomElement.tag.element;
@@ -3960,6 +4032,112 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
         return result;
     };
 
+};
+
+/**
+ * Get a data element value as a string.
+ * @param {Object} dicomElement The DICOM element.
+ * @param {Boolean} pretty When set to true, returns a 'pretified' content.
+ * @return {String} A string representation of the DICOM element.
+ */
+dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function ( dicomElement, pretty )
+{
+    var str = "";
+    var strLenLimit = 65;
+
+    // dafault to pretty output
+    if ( typeof pretty === "undefined" ) {
+        pretty = true;
+    }
+    // check dicom element input
+    if ( typeof dicomElement === "undefined" || dicomElement === null ) {
+        return str;
+    }
+
+    // Polyfill for Number.isInteger.
+    var isInteger = Number.isInteger || function (value) {
+      return typeof value === 'number' &&
+        isFinite(value) &&
+        Math.floor(value) === value;
+    };
+
+    // TODO Support sequences.
+
+    if ( dicomElement.vr !== "SQ" &&
+        dicomElement.value.length === 1 && dicomElement.value[0] === "" ) {
+        str += "(no value available)";
+    } else if ( dicomElement.tag.group === '0x7FE0' &&
+        dicomElement.tag.element === '0x0010' &&
+        dicomElement.vl === 'u/l' ) {
+        str = "(PixelSequence)";
+    } else if ( dicomElement.vr === "DA" && pretty ) {
+        var daValue = dicomElement.value[0];
+        var daYear = parseInt( daValue.substr(0,4), 10 );
+        var daMonth = parseInt( daValue.substr(4,2), 10 ) - 1; // 0-11
+        var daDay = parseInt( daValue.substr(6,2), 10 );
+        var da = new Date(daYear, daMonth, daDay);
+        str = da.toLocaleDateString();
+    } else if ( dicomElement.vr === "TM"  && pretty ) {
+        var tmValue = dicomElement.value[0];
+        var tmHour = tmValue.substr(0,2);
+        var tmMinute = tmValue.length >= 4 ? tmValue.substr(2,2) : "00";
+        var tmSeconds = tmValue.length >= 6 ? tmValue.substr(4,2) : "00";
+        str = tmHour + ':' + tmMinute + ':' + tmSeconds;
+    } else {
+        var isOtherVR = ( dicomElement.vr[0].toUpperCase() === "O" );
+        var isFloatNumberVR = ( dicomElement.vr === "FL" ||
+            dicomElement.vr === "FD" ||
+            dicomElement.vr === "DS");
+        var valueStr = "";
+        for ( var k = 0; k < dicomElement.value.length; ++k ) {
+            valueStr = "";
+            if ( k !== 0 ) {
+                valueStr += "\\";
+            }
+            if ( isFloatNumberVR ) {
+                var val = dicomElement.value[k];
+                if (typeof val === "string") {
+                    val = dwv.dicom.cleanString(val);
+                }
+                var num = Number( val );
+                if ( !isInteger( num ) && pretty ) {
+                    valueStr += num.toPrecision(4);
+                } else {
+                    valueStr += num.toString();
+                }
+            } else if ( isOtherVR ) {
+                var tmp = dicomElement.value[k].toString(16);
+                if ( dicomElement.vr === "OB" ) {
+                    tmp = "00".substr(0, 2 - tmp.length) + tmp;
+                }
+                else {
+                    tmp = "0000".substr(0, 4 - tmp.length) + tmp;
+                }
+                valueStr += tmp;
+            } else if ( typeof dicomElement.value[k] === "string" ) {
+                valueStr += dwv.dicom.cleanString(dicomElement.value[k]);
+            } else {
+                valueStr += dicomElement.value[k];
+            }
+            // check length
+            if ( str.length + valueStr.length <= strLenLimit ) {
+                str += valueStr;
+            } else {
+                str += "...";
+                break;
+            }
+        }
+    }
+    return str;
+};
+
+/**
+ * Get a data element value as a string.
+ * @param {String} groupElementKey The key to retrieve.
+ */
+dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsStringFromKey = function ( groupElementKey )
+{
+    return this.getElementValueAsString( this.getDEFromKey(groupElementKey) );
 };
 
 /**
@@ -4022,50 +4200,6 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
         else if ( isPixSequence ) {
             line += " (PixelSequence #=" + deSize + ")";
         }
-        // 'O'ther array, limited display length
-        else if ( isOtherVR ||
-                dicomElement.vr === 'pi' ||
-                dicomElement.vr === "UL" ||
-                dicomElement.vr === "US" ||
-                dicomElement.vr === "SL" ||
-                dicomElement.vr === "SS" ||
-                dicomElement.vr === "FL" ||
-                dicomElement.vr === "FD" ||
-                dicomElement.vr === "AT" ) {
-            line += " ";
-            var valuesStr = "";
-            var valueStr = "";
-            for ( var k = 0; k < dicomElement.value.length; ++k ) {
-                valueStr = "";
-                if ( k !== 0 ) {
-                    valueStr += "\\";
-                }
-                if ( dicomElement.vr === "FL" ) {
-                    valueStr += Number(dicomElement.value[k].toPrecision(8));
-                }
-                else if ( isOtherVR ) {
-                    var tmp = dicomElement.value[k].toString(16);
-                    if ( dicomElement.vr === "OB" ) {
-                        tmp = "00".substr(0, 2 - tmp.length) + tmp;
-                    }
-                    else {
-                        tmp = "0000".substr(0, 4 - tmp.length) + tmp;
-                    }
-                    valueStr += tmp;
-                }
-                else {
-                    valueStr += dicomElement.value[k];
-                }
-                if ( valuesStr.length + valueStr.length <= 65 ) {
-                    valuesStr += valueStr;
-                }
-                else {
-                    valuesStr += "...";
-                    break;
-                }
-            }
-            line += valuesStr;
-        }
         else if ( dicomElement.vr === 'SQ' ) {
             line += " (Sequence with";
             if ( dicomElement.vl === "u/l" ) {
@@ -4078,20 +4212,23 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
             line += dicomElement.value.length;
             line += ")";
         }
+        // 'O'ther array, limited display length
+        else if ( isOtherVR ||
+                dicomElement.vr === 'pi' ||
+                dicomElement.vr === "UL" ||
+                dicomElement.vr === "US" ||
+                dicomElement.vr === "SL" ||
+                dicomElement.vr === "SS" ||
+                dicomElement.vr === "FL" ||
+                dicomElement.vr === "FD" ||
+                dicomElement.vr === "AT" ) {
+            line += " ";
+            line += this.getElementValueAsString(dicomElement, false);
+        }
         // default
         else {
             line += " [";
-            for ( var j = 0; j < dicomElement.value.length; ++j ) {
-                if ( j !== 0 ) {
-                    line += "\\";
-                }
-                if ( typeof dicomElement.value[j] === "string" ) {
-                    line += dwv.dicom.cleanString(dicomElement.value[j]);
-                }
-                else {
-                    line += dicomElement.value[j];
-                }
-            }
+            line += this.getElementValueAsString(dicomElement, false);
             line += "]";
         }
     }
@@ -10322,7 +10459,8 @@ dwv.html.removeNode = function (node) {
 };
 
 /**
- *
+ * Remove a list of HTML nodes and all their children.
+ * @param {Array} nodes The list of nodes to delete.
  */
 dwv.html.removeNodes = function (nodes) {
     for ( var i = 0; i < nodes.length; ++i ) {
@@ -10567,130 +10705,6 @@ dwv.gui.base.plot = function (/*div, data, options*/)
 };
 
 /**
- * WindowLevel info layer.
- * @constructor
- * @param {Object} div The HTML element to add WindowLevel info to.
- */
-dwv.gui.info.Windowing = function ( div )
-{
-    /**
-     * Create the windowing info div.
-     */
-    this.create = function ()
-    {
-        // clean div
-        var elems = div.getElementsByClassName("wl-info");
-        if ( elems.length !== 0 ) {
-            dwv.html.removeNodes(elems);
-        }
-        // create windowing list
-        var ul = document.createElement("ul");
-        ul.className = "wl-info";
-        // window center list item
-        var liwc = document.createElement("li");
-        liwc.className = "window-center";
-        ul.appendChild(liwc);
-        // window width list item
-        var liww = document.createElement("li");
-        liww.className = "window-width";
-        ul.appendChild(liww);
-        // add list to div
-        div.appendChild(ul);
-    };
-
-    /**
-     * Update the windowing info div.
-     * @param {Object} event The windowing change event containing the new values as {wc,ww}.
-     * Warning: expects the windowing info div to exist (use after create).
-     */
-    this.update = function (event)
-    {
-        // window center list item
-        var liwc = div.getElementsByClassName("window-center")[0];
-        dwv.html.cleanNode(liwc);
-        liwc.appendChild( document.createTextNode(
-            dwv.i18n("tool.info.window_center", {value: Math.round(event.wc)}) ) );
-        // window width list item
-        var liww = div.getElementsByClassName("window-width")[0];
-        dwv.html.cleanNode(liww);
-        liww.appendChild( document.createTextNode(
-            dwv.i18n("tool.info.window_width", {value: Math.round(event.ww)}) ) );
-    };
-
-}; // class dwv.gui.info.Windowing
-
-/**
- * Position info layer.
- * @constructor
- * @param {Object} div The HTML element to add Position info to.
- */
-dwv.gui.info.Position = function ( div )
-{
-    /**
-     * Create the position info div.
-     */
-    this.create = function ()
-    {
-        // clean div
-        var elems = div.getElementsByClassName("pos-info");
-        if ( elems.length !== 0 ) {
-            dwv.html.removeNodes(elems);
-        }
-        // position list
-        var ul = document.createElement("ul");
-        ul.className = "pos-info";
-        // position
-        var lipos = document.createElement("li");
-        lipos.className = "position";
-        ul.appendChild(lipos);
-        // frame
-        var liframe = document.createElement("li");
-        liframe.className = "frame";
-        ul.appendChild(liframe);
-        // value
-        var livalue = document.createElement("li");
-        livalue.className = "value";
-        ul.appendChild(livalue);
-        // add list to div
-        div.appendChild(ul);
-    };
-
-    /**
-     * Update the position info div.
-     * @param {Object} event The position change event containing the new values as {i,j,k}
-     *  and optional 'value'.
-     * Warning: expects the position info div to exist (use after create).
-     */
-    this.update = function (event)
-    {
-        // position list item
-        if( typeof(event.i) !== "undefined" )
-        {
-            var lipos = div.getElementsByClassName("position")[0];
-            dwv.html.cleanNode(lipos);
-            lipos.appendChild(document.createTextNode(
-            dwv.i18n("tool.info.position", {value: event.i+", "+event.j+", "+event.k}) ) );
-        }
-        // frame list item
-        if( typeof(event.frame) !== "undefined" )
-        {
-            var liframe = div.getElementsByClassName("frame")[0];
-            dwv.html.cleanNode(liframe);
-            liframe.appendChild( document.createTextNode(
-                dwv.i18n("tool.info.frame", {value: event.frame}) ) );
-        }
-        // value list item
-        if( typeof(event.value) !== "undefined" )
-        {
-            var livalue = div.getElementsByClassName("value")[0];
-            dwv.html.cleanNode(livalue);
-            livalue.appendChild( document.createTextNode(
-                dwv.i18n("tool.info.value", {value: event.value}) ) );
-        }
-    };
-}; // class dwv.gui.info.Position
-
-/**
  * MiniColourMap info layer.
  * @constructor
  * @param {Object} div The HTML element to add colourMap info to.
@@ -10821,6 +10835,304 @@ dwv.gui.info.Plot = function (div, app)
 
 }; // class dwv.gui.info.Plot
 
+/**
+ * DICOM Header overlay info layer.
+ * @constructor
+ * @param {Object} div The HTML element to add Header overlay info to.
+ * @param {String} pos The string to specify the corner position. (tl,tc,tr,cl,cr,bl,bc,br)
+ */
+dwv.gui.info.Overlay = function ( div, pos, app )
+{
+    // closure to self
+    var self = this;
+
+    /**
+     * Get the overlay array of the current position.
+     * @return {Array} The overlay information.
+     */
+    this.getOverlays = function ()
+    {
+        var image = app.getImage();
+        if (!image) {
+            return;
+        }
+        var allOverlays = image.getOverlays();
+        if (!allOverlays) {
+            return;
+        }
+        var position = app.getViewController().getCurrentPosition();
+        var sliceOverlays = allOverlays[position.k];
+        if (!sliceOverlays) {
+            return;
+        }
+        return sliceOverlays[pos];
+    };
+
+    /**
+     * Create the overlay info div.
+     */
+    this.create = function ()
+    {
+        // remove all <ul> elements from div
+        dwv.html.cleanNode(div);
+
+        // get overlay string array of the current position
+        var overlays = self.getOverlays();
+        if (!overlays) {
+            return;
+        }
+
+        if (pos === "bc" || pos === "tc" ||
+            pos === "cr" || pos === "cl") {
+            div.textContent = overlays[0].value;
+        } else {
+            // create <ul> element
+            var ul = document.createElement("ul");
+
+            for (var n=0; overlays[n]; n++){
+                var li;
+                if (overlays[n].value === "window-center") {
+                    li = document.createElement("li");
+                    li.className = "info-" + pos + "-window-center";
+                    ul.appendChild(li);
+                } else if (overlays[n].value === "window-width") {
+                    li = document.createElement("li");
+                    li.className = "info-" + pos + "-window-width";
+                    ul.appendChild(li);
+                } else if (overlays[n].value === "zoom") {
+                    li = document.createElement("li");
+                    li.className = "info-" + pos + "-zoom";
+                    ul.appendChild(li);
+                } else if (overlays[n].value === "offset") {
+                    li = document.createElement("li");
+                    li.className = "info-" + pos + "-offset";
+                    ul.appendChild(li);
+                } else if (overlays[n].value === "value") {
+                    li = document.createElement("li");
+                    li.className = "info-" + pos + "-value";
+                    ul.appendChild(li);
+                } else if (overlays[n].value === "position") {
+                    li = document.createElement("li");
+                    li.className = "info-" + pos + "-position";
+                    ul.appendChild(li);
+                } else if (overlays[n].value === "frame") {
+                    li = document.createElement("li");
+                    li.className = "info-" + pos + "-frame";
+                    ul.appendChild(li);
+                } else {
+                    li = document.createElement("li");
+                    li.className = "info-" + pos + "-" + n;
+                    li.appendChild( document.createTextNode( overlays[n].value ) );
+                    ul.appendChild(li);
+                }
+            }
+
+            // append <ul> element before color map
+            div.appendChild(ul);
+        }
+    };
+
+    /**
+     * Update the overlay info div.
+     * @param {Object} event A change event.
+     */
+    this.update = function ( event )
+    {
+        // get overlay string array of the current position
+        var overlays = self.getOverlays();
+        if (!overlays) {
+            return;
+        }
+
+        if (pos === "bc" || pos === "tc" ||
+            pos === "cr" || pos === "cl") {
+            div.textContent = overlays[0].value;
+        } else {
+            var li;
+            var n;
+
+            for (n=0; overlays[n]; n++) {
+                if (overlays[n].value === "window-center") {
+                    if (event.type === "wl-change") {
+                        li = div.getElementsByClassName("info-" + pos + "-window-center")[0];
+                        dwv.html.cleanNode(li);
+                        var wcStr = dwv.utils.replaceFlags2( overlays[n].format, [Math.round(event.wc)] );
+                        li.appendChild( document.createTextNode(wcStr) );
+                    }
+                } else if (overlays[n].value === "window-width") {
+                    if (event.type === "wl-change") {
+                        li = div.getElementsByClassName("info-" + pos + "-window-width")[0];
+                        dwv.html.cleanNode(li);
+                        var wwStr = dwv.utils.replaceFlags2( overlays[n].format, [Math.round(event.ww)] );
+                        li.appendChild( document.createTextNode(wwStr) );
+                    }
+                } else if (overlays[n].value === "zoom") {
+                    if (event.type === "zoom-change") {
+                        li = div.getElementsByClassName("info-" + pos + "-zoom")[0];
+                        dwv.html.cleanNode(li);
+                        var zoom = Number(event.scale).toPrecision(3);
+                        var zoomStr = dwv.utils.replaceFlags2( overlays[n].format, [zoom] );
+                        li.appendChild( document.createTextNode( zoomStr ) );
+                    }
+                } else if (overlays[n].value === "offset") {
+                    if (event.type === "zoom-change") {
+                        li = div.getElementsByClassName("info-" + pos + "-offset")[0];
+                        dwv.html.cleanNode(li);
+                        var offset = [ Number(event.cx).toPrecision(3),
+                            Number(event.cy).toPrecision(3)];
+                        var offStr = dwv.utils.replaceFlags2( overlays[n].format, offset );
+                        li.appendChild( document.createTextNode( offStr ) );
+                    }
+                } else if (overlays[n].value === "value") {
+                    if (event.type === "position-change") {
+                        li = div.getElementsByClassName("info-" + pos + "-value")[0];
+                        dwv.html.cleanNode(li);
+                        var valueStr = dwv.utils.replaceFlags2( overlays[n].format, [event.value] );
+                        li.appendChild( document.createTextNode( valueStr ) );
+                    }
+                } else if (overlays[n].value === "position") {
+                    if (event.type === "position-change") {
+                        li = div.getElementsByClassName("info-" + pos + "-position")[0];
+                        dwv.html.cleanNode(li);
+                        var posStr = dwv.utils.replaceFlags2( overlays[n].format, [event.i, event.j, event.k] );
+                        li.appendChild( document.createTextNode( posStr ) );
+                    }
+                } else if (overlays[n].value === "frame") {
+                    if (event.type === "frame-change") {
+                        li = div.getElementsByClassName("info-" + pos + "-frame")[0];
+                        dwv.html.cleanNode(li);
+                        var frameStr = dwv.utils.replaceFlags2( overlays[n].format, [event.frame] );
+                        li.appendChild( document.createTextNode( frameStr ) );
+                    }
+                } else {
+                    if (event.type === "position-change") {
+                        li = div.getElementsByClassName("info-" + pos + "-" + n)[0];
+                        dwv.html.cleanNode(li);
+                        li.appendChild( document.createTextNode( overlays[n].value ) );
+                    }
+                }
+            }
+        }
+    };
+}; // class dwv.gui.info.Overlay
+
+/**
+ * Create overlay string array of the image in each corner
+ * @param {Object} dicomElements DICOM elements of the image
+ * @return {Array} Array of string to be shown in each corner
+ */
+dwv.gui.info.createOverlays = function (dicomElements)
+{
+    var overlays = {};
+    var modality = dicomElements.getFromKey("x00080060");
+    if (!modality){
+        return overlays;
+    }
+
+    var omaps = dwv.gui.info.overlayMaps;
+    if (!omaps){
+        return overlays;
+    }
+    var omap = omaps[modality] || omaps['*'];
+
+    for (var n=0; omap[n]; n++){
+        var value = omap[n].value;
+        var tags = omap[n].tags;
+        var format = omap[n].format;
+        var pos = omap[n].pos;
+
+        if (typeof tags !== "undefined" && tags.length !== 0) {
+            // get values
+            var values = [];
+            for ( var i = 0; i < tags.length; ++i ) {
+                values.push( dicomElements.getElementValueAsStringFromKey( tags[i] ) );
+            }
+            // format
+            if (typeof format === "undefined" || format === null) {
+                format = dwv.utils.createDefaultReplaceFormat( values );
+            }
+            value = dwv.utils.replaceFlags2( format, values );
+        }
+
+        if (!value || value.length === 0){
+            continue;
+        }
+
+        // add value to overlays
+        if (!overlays[pos]) {
+            overlays[pos] = [];
+        }
+        overlays[pos].push({'value': value.trim(), 'format': format});
+    }
+
+    // (0020,0020) Patient Orientation
+    var valuePO = dicomElements.getFromKey("x00200020");
+    if (typeof valuePO !== "undefined" && valuePO !== null && valuePO.length == 2){
+        var po0 = dwv.dicom.cleanString(valuePO[0]);
+        var po1 = dwv.dicom.cleanString(valuePO[1]);
+        overlays.cr = [{'value': po0}];
+        overlays.cl = [{'value': dwv.dicom.getReverseOrientation(po0)}];
+        overlays.bc = [{'value': po1}];
+        overlays.tc = [{'value': dwv.dicom.getReverseOrientation(po1)}];
+    }
+
+    return overlays;
+};
+
+/**
+ * Create overlay string array of the image in each corner
+ * @param {Object} dicomElements DICOM elements of the image
+ * @return {Array} Array of string to be shown in each corner
+ */
+dwv.gui.info.createOverlaysForDom = function (info)
+{
+    var overlays = {};
+    var omaps = dwv.gui.info.overlayMaps;
+    if (!omaps){
+        return overlays;
+    }
+    var omap = omaps.DOM;
+    if (!omap){
+        return overlays;
+    }
+
+    for (var n=0; omap[n]; n++){
+        var value = omap[n].value;
+        var tags = omap[n].tags;
+        var format = omap[n].format;
+        var pos = omap[n].pos;
+
+        if (typeof tags !== "undefined" && tags.length !== 0) {
+            // get values
+            var values = [];
+            for ( var i = 0; i < tags.length; ++i ) {
+                for ( var j = 0; j < info.length; ++j ) {
+                    if (tags[i] === info[j].name) {
+                        values.push( info[j].value );
+                    }
+                }
+            }
+            // format
+            if (typeof format === "undefined" || format === null) {
+                format = dwv.utils.createDefaultReplaceFormat( values );
+            }
+            value = dwv.utils.replaceFlags2( format, values );
+        }
+
+        if (!value || value.length === 0){
+            continue;
+        }
+
+        // add value to overlays
+        if (!overlays[pos]) {
+            overlays[pos] = [];
+        }
+        overlays[pos].push({'value': value.trim(), 'format': format});
+    }
+
+    return overlays;
+};
+
 // namespaces
 var dwv = dwv || {};
 dwv.html = dwv.html || {};
@@ -10832,12 +11144,6 @@ dwv.html = dwv.html || {};
  */
 dwv.html.Layer = function(canvas)
 {
-    /**
-     * The associated HTMLCanvasElement.
-     * @private
-     * @type Object
-     */
-    //var canvas = null;
     /**
      * A cache of the initial canvas.
      * @private
@@ -10851,11 +11157,6 @@ dwv.html.Layer = function(canvas)
      */
     var context = null;
 
-    /**
-     * Get the layer name.
-     * @return {String} The layer name.
-     */
-    //this.getName = function() { return name; };
     /**
      * Get the layer canvas.
      * @return {Object} The layer canvas.
@@ -10893,7 +11194,7 @@ dwv.html.Layer = function(canvas)
         return origin;
     };
     /**
-     * The image zoom.
+     * The layer zoom.
      * @private
      * @type {Object}
      */
@@ -10906,7 +11207,19 @@ dwv.html.Layer = function(canvas)
         return zoom;
     };
 
+    /**
+     * The layer translation.
+     * @private
+     * @type {Object}
+     */
     var trans = {'x': 0, 'y': 0};
+    /**
+     * Get the layer translation.
+     * @return {Object} The layer translation as {'x','y'}.
+     */
+    this.getTrans = function () {
+        return trans;
+    };
 
     /**
      * Set the canvas width.
@@ -12311,6 +12624,358 @@ dwv.image.PixelBufferDecoder.prototype.ondecoded = function ()
 // namespaces
 var dwv = dwv || {};
 dwv.image = dwv.image || {};
+
+/**
+ * Create a dwv.image.View from a DICOM buffer.
+ * @constructor
+ */
+dwv.image.DicomBufferToView = function ()
+{
+    // closure to self
+    var self = this;
+
+    /**
+     * The default character set (optional).
+     * @private
+     * @type String
+     */
+    var defaultCharacterSet;
+
+    /**
+     * Set the default character set.
+     * param {String} The character set.
+     */
+    this.setDefaultCharacterSet = function (characterSet) {
+        defaultCharacterSet = characterSet;
+    };
+
+    /**
+     * Pixel buffer decoder.
+     * Define only once to allow optional asynchronous mode.
+     * @private
+     * @type Object
+     */
+    var pixelDecoder = null;
+
+    /**
+     * Get data from an input buffer using a DICOM parser.
+     * @param {Array} buffer The input data buffer.
+     * @param {Number} dataIndex The data index.
+     */
+    this.convert = function (buffer, dataIndex)
+    {
+        // DICOM parser
+        var dicomParser = new dwv.dicom.DicomParser();
+        dicomParser.setDefaultCharacterSet(defaultCharacterSet);
+        // parse the buffer
+        dicomParser.parse(buffer);
+
+        var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
+        var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
+        var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
+        var needDecompression = (algoName !== null);
+
+        // worker callback
+        var onDecodedFirstFrame = function (/*event*/) {
+            // create the image
+            var imageFactory = new dwv.image.ImageFactory();
+            var image = imageFactory.create( dicomParser.getDicomElements(), pixelBuffer );
+            // create the view
+            var viewFactory = new dwv.image.ViewFactory();
+            var view = viewFactory.create( dicomParser.getDicomElements(), image );
+            // return
+            self.onload({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
+        };
+
+        if ( needDecompression ) {
+            var bitsAllocated = dicomParser.getRawDicomElements().x00280100.value[0];
+            var pixelRepresentation = dicomParser.getRawDicomElements().x00280103.value[0];
+            var isSigned = (pixelRepresentation === 1);
+            var nFrames = pixelBuffer.length;
+
+            if (!pixelDecoder){
+                pixelDecoder = new dwv.image.PixelBufferDecoder(algoName);
+            }
+
+            // loadend event
+            pixelDecoder.ondecodeend = function () {
+                self.onloadend();
+            };
+
+            // send an onload event for mono frame
+            if ( nFrames === 1 ) {
+                pixelDecoder.ondecoded = function () {
+                    self.onloadend();
+                };
+            }
+
+            // decoder callback
+            var countDecodedFrames = 0;
+            var onDecodedFrame = function (frame) {
+                return function (event) {
+                    // send progress
+                    ++countDecodedFrames;
+                    var ev = {'type': "load-progress", 'lengthComputable': true,
+                        'loaded': (countDecodedFrames * 100 / nFrames), 'total': 100};
+                    if ( typeof dataIndex !== "undefined") {
+                        ev.index = dataIndex;
+                    }
+                    self.onprogress(ev);
+                    // store data
+                    pixelBuffer[frame] = event.data[0];
+                    // create image for first frame
+                    if ( frame === 0 ) {
+                        onDecodedFirstFrame();
+                    }
+                };
+            };
+
+            // decompress synchronously the first frame to create the image
+            pixelDecoder.decode(pixelBuffer[0],
+                bitsAllocated, isSigned, onDecodedFrame(0), false);
+
+            // decompress the possible other frames
+            if ( nFrames !== 1 ) {
+                // decode (asynchronously if possible)
+                for (var f = 1; f < nFrames; ++f) {
+                    pixelDecoder.decode(pixelBuffer[f],
+                        bitsAllocated, isSigned, onDecodedFrame(f));
+                }
+            }
+        }
+        // no decompression
+        else {
+            // send progress
+            var evnodec = {'type': 'load-progress', 'lengthComputable': true,
+                'loaded': 100, 'total': 100};
+            if ( typeof dataIndex !== "undefined") {
+                evnodec.index = dataIndex;
+            }
+            self.onprogress(evnodec);
+            // create image
+            onDecodedFirstFrame();
+            // send load events
+            self.onloadend();
+        }
+    };
+};
+
+/**
+ * Handle a load end event.
+ * @param {Object} event The load end event.
+ * Default does nothing.
+ */
+dwv.image.DicomBufferToView.prototype.onloadend = function (/*event*/) {};
+/**
+ * Handle a load event.
+ * @param {Object} event The load event.
+ * Default does nothing.
+ */
+dwv.image.DicomBufferToView.prototype.onload = function  (/*event*/) {};
+/**
+ * Handle a load progress event.
+ * @param {Object} event The progress event.
+ * Default does nothing.
+ */
+dwv.image.DicomBufferToView.prototype.onprogress = function  (/*event*/) {};
+
+// namespaces
+var dwv = dwv || {};
+dwv.image = dwv.image || {};
+
+/**
+ * Create a simple array buffer from an ImageData buffer.
+ * @param {Object} imageData The ImageData taken from a context.
+ * @return {Array} The image buffer.
+ */
+dwv.image.imageDataToBuffer = function (imageData) {
+    // remove alpha
+    // TODO support passing the full image data
+    var buffer = [];
+    var j = 0;
+    for( var i = 0; i < imageData.data.length; i+=4 ) {
+        buffer[j] = imageData.data[i];
+        buffer[j+1] = imageData.data[i+1];
+        buffer[j+2] = imageData.data[i+2];
+        j+=3;
+    }
+    return buffer;
+};
+
+/**
+ * Get data from an input context imageData.
+ * @param {Number} width The width of the coresponding image.
+ * @param {Number} height The height of the coresponding image.
+ * @param {Number} sliceIndex The slice index of the imageData.
+ * @param {Object} imageBuffer The image buffer.
+ * @param {Number} numberOfFrames The final number of frames.
+ * @return {Object} The corresponding view.
+ */
+dwv.image.getDefaultView = function (
+    width, height, sliceIndex,
+    imageBuffer, numberOfFrames, info) {
+    // image size
+    var imageSize = new dwv.image.Size(width, height);
+    // default spacing
+    // TODO: misleading...
+    var imageSpacing = new dwv.image.Spacing(1,1);
+    // default origin
+    var origin = new dwv.math.Point3D(0,0,sliceIndex);
+    // create image
+    var geometry = new dwv.image.Geometry(origin, imageSize, imageSpacing );
+    var image = new dwv.image.Image( geometry, imageBuffer, numberOfFrames );
+    image.setPhotometricInterpretation("RGB");
+    // meta information
+    var meta = {};
+    meta.BitsStored = 8;
+    image.setMeta(meta);
+    // overlay
+    image.setFirstOverlay( dwv.gui.info.createOverlaysForDom(info) );
+    // view
+    var view = new dwv.image.View(image);
+    // defaut preset
+    view.setWindowLevelMinMax();
+    // return
+    return view;
+};
+
+/**
+ * Get data from an input image using a canvas.
+ * @param {Object} image The DOM Image.
+ * @return {Mixed} The corresponding view and info.
+ */
+dwv.image.getViewFromDOMImage = function (image)
+{
+    // image size
+    var width = image.width;
+    var height = image.height;
+
+    // draw the image in the canvas in order to get its data
+    var canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(image, 0, 0);
+    // get the image data
+    var imageData = ctx.getImageData(0, 0, width, height);
+
+    // image properties
+    var info = [];
+    if ( typeof image.origin === "string" ) {
+        info.push({ "name": "origin", "value": image.origin });
+    } else {
+        info.push({ "name": "fileName", "value": image.origin.name });
+        info.push({ "name": "fileType", "value": image.origin.type });
+        info.push({ "name": "fileLastModifiedDate", "value": image.origin.lastModifiedDate });
+    }
+    info.push({ "name": "imageWidth", "value": width });
+    info.push({ "name": "imageHeight", "value": height });
+
+    // create view
+    var sliceIndex = image.index ? image.index : 0;
+    var imageBuffer = dwv.image.imageDataToBuffer(imageData);
+    var view = dwv.image.getDefaultView(
+        width, height, sliceIndex, [imageBuffer], 1, info);
+
+    // return
+    return {"view": view, "info": info};
+};
+
+/**
+ * Get data from an input image using a canvas.
+ * @param {Object} video The DOM Video.
+ * @param {Object} callback The function to call once the data is loaded.
+ * @param {Object} cbprogress The function to call to report progress.
+ * @param {Object} cbonloadend The function to call to report load end.
+ * @param {Number} dataindex The data index.
+ */
+dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, cbonloadend, dataIndex)
+{
+    // video size
+    var width = video.videoWidth;
+    var height = video.videoHeight;
+
+    // default frame rate...
+    var frameRate = 30;
+    // number of frames
+    var numberOfFrames = Math.floor(video.duration * frameRate);
+
+    // video properties
+    var info = [];
+    if( video.file )
+    {
+        info.push({ "name": "fileName", "value": video.file.name });
+        info.push({ "name": "fileType", "value": video.file.type });
+        info.push({ "name": "fileLastModifiedDate", "value": video.file.lastModifiedDate });
+    }
+    info.push({ "name": "imageWidth", "value": width });
+    info.push({ "name": "imageHeight", "value": height });
+    info.push({ "name": "numberOfFrames", "value": numberOfFrames });
+
+    // draw the image in the canvas in order to get its data
+    var canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    var ctx = canvas.getContext('2d');
+
+    // using seeked to loop through all video frames
+    video.addEventListener('seeked', onseeked, false);
+
+    // current frame index
+    var frameIndex = 0;
+    // video view
+    var view = null;
+
+    // draw the context and store it as a frame
+    function storeFrame() {
+        // send progress
+        var evprog = {'type': 'load-progress', 'lengthComputable': true,
+            'loaded': frameIndex, 'total': numberOfFrames};
+        if (typeof dataIndex !== "undefined") {
+            evprog.index = dataIndex;
+        }
+        cbprogress(evprog);
+        // draw image
+        ctx.drawImage(video, 0, 0);
+        // context to image buffer
+        var imgBuffer = dwv.image.imageDataToBuffer(
+            ctx.getImageData(0, 0, width, height) );
+        if (frameIndex === 0) {
+            // create view
+            view = dwv.image.getDefaultView(
+                width, height, 1, [imgBuffer], numberOfFrames, info);
+            // call callback
+            callback( {"view": view, "info": info } );
+        } else {
+            view.appendFrameBuffer(imgBuffer);
+        }
+    }
+
+    // handle seeked event
+    function onseeked(/*event*/) {
+        // store
+        storeFrame();
+        // increment index
+        ++frameIndex;
+        // set the next time
+        // (not using currentTime, it seems to get offseted)
+        var nextTime = frameIndex / frameRate;
+        if (nextTime <= this.duration) {
+            this.currentTime = nextTime;
+        } else {
+            cbonloadend();
+            // stop listening
+            video.removeEventListener('seeked', onseeked);
+        }
+    }
+
+    // trigger the first seeked
+    video.currentTime = 0;
+};
+
+// namespaces
+var dwv = dwv || {};
+dwv.image = dwv.image || {};
 /** @namespace */
 dwv.image.filter = dwv.image.filter || {};
 
@@ -12565,6 +13230,16 @@ dwv.image.Size.prototype.isInBounds = function ( i, j, k ) {
 };
 
 /**
+ * Get a string representation of the Vector3D.
+ * @return {String} The vector as a string.
+ */
+dwv.image.Size.prototype.toString = function () {
+    return "(" + this.getNumberOfColumns() +
+        ", " + this.getNumberOfRows() +
+        ", " + this.getNumberOfSlices() + ")";
+};
+
+/**
  * 2D/3D Spacing class.
  * @constructor
  * @param {Number} columnSpacing The column spacing.
@@ -12601,6 +13276,17 @@ dwv.image.Spacing.prototype.equals = function (rhs) {
         this.getRowSpacing() === rhs.getRowSpacing() &&
         this.getSliceSpacing() === rhs.getSliceSpacing();
 };
+
+/**
+ * Get a string representation of the Vector3D.
+ * @return {String} The vector as a string.
+ */
+dwv.image.Spacing.prototype.toString = function () {
+    return "(" + this.getColumnSpacing() +
+        ", " + this.getRowSpacing() +
+        ", " + this.getSliceSpacing() + ")";
+};
+
 
 /**
  * 2D/3D Geometry class.
@@ -12829,15 +13515,22 @@ dwv.image.RescaleSlopeAndIntercept.prototype.isID = function () {
  * @constructor
  * @param {Object} geometry The geometry of the image.
  * @param {Array} buffer The image data as an array of frame buffers.
+ * @param {Number} numberOfFrames The number of frames (optional, can be used
+     to anticipate the final number after appends).
  */
-dwv.image.Image = function(geometry, buffer)
+dwv.image.Image = function(geometry, buffer, numberOfFrames)
 {
+    // use buffer length in not specified
+    if (typeof numberOfFrames === "undefined") {
+        numberOfFrames = buffer.length;
+    }
+
     /**
      * Get the number of frames.
      * @returns {Number} The number of frames.
      */
     this.getNumberOfFrames = function () {
-        return buffer.length;
+        return numberOfFrames;
     };
 
     /**
@@ -12906,6 +13599,25 @@ dwv.image.Image = function(geometry, buffer)
      * @type Array
      */
     var histogram = null;
+
+	/**
+	 * Overlay.
+     * @private
+     * @type Array
+     */
+	var overlays = [];
+
+    /**
+     * Set the first overlay.
+     * @param {Array} over The first overlay.
+     */
+    this.setFirstOverlay = function (over) { overlays[0] = over; };
+
+    /**
+     * Get the overlays.
+     * @return {Array} The overlays array.
+     */
+    this.getOverlays = function () { return overlays; };
 
     /**
      * Get the geometry of the image.
@@ -13080,7 +13792,10 @@ dwv.image.Image = function(geometry, buffer)
         var sliceSize = mul * size.getSliceSize();
 
         // create the new buffer
-        var newBuffer = new Int16Array(sliceSize * (size.getNumberOfSlices() + 1) );
+        var newBuffer = dwv.dicom.getTypedArray(
+            buffer[f].BYTES_PER_ELEMENT * 8,
+            meta.IsSigned ? 1 : 0,
+            sliceSize * (size.getNumberOfSlices() + 1) );
 
         // append slice at new position
         var newSliceNb = geometry.getSliceIndex( rhs.getGeometry().getOrigin() );
@@ -13110,8 +13825,20 @@ dwv.image.Image = function(geometry, buffer)
         // copy to class variables
         buffer[f] = newBuffer;
 
+		// insert overlay information of the slice to the image
+		overlays.splice(newSliceNb, 0, rhs.getOverlays()[0]);
+
         // return the appended slice number
         return newSliceNb;
+    };
+
+    /**
+     * Append a frame buffer to the image.
+     * @param {Object} frameBuffer The frame buffer to append.
+     */
+    this.appendFrameBuffer = function (frameBuffer)
+    {
+        buffer.push(frameBuffer);
     };
 
     /**
@@ -13499,10 +14226,16 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
  */
 dwv.image.Image.prototype.quantifyLine = function(line)
 {
+    var quant = {};
+    // length
     var spacing = this.getGeometry().getSpacing();
     var length = line.getWorldLength( spacing.getColumnSpacing(),
             spacing.getRowSpacing() );
-    return { "length": {"value": length, "unit": dwv.i18n("unit.mm")} };
+    if (length !== null) {
+        quant.length = {"value": length, "unit": dwv.i18n("unit.mm")};
+    }
+    // return
+    return quant;
 };
 
 /**
@@ -13512,9 +14245,15 @@ dwv.image.Image.prototype.quantifyLine = function(line)
  */
 dwv.image.Image.prototype.quantifyRect = function(rect)
 {
+    var quant = {};
+    // surface
     var spacing = this.getGeometry().getSpacing();
     var surface = rect.getWorldSurface( spacing.getColumnSpacing(),
             spacing.getRowSpacing());
+    if (surface !== null) {
+        quant.surface = {"value": surface/100, "unit": dwv.i18n("unit.cm2")};
+    }
+    // stats
     var subBuffer = [];
     var minJ = parseInt(rect.getBegin().getY(), 10);
     var maxJ = parseInt(rect.getEnd().getY(), 10);
@@ -13526,13 +14265,12 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
         }
     }
     var quantif = dwv.math.getStats( subBuffer );
-    return {
-        "surface": {"value": surface/100, "unit": dwv.i18n("unit.cm2")},
-        "min": {"value": quantif.min, "unit": ""},
-        "max": {"value": quantif.max, "unit": ""},
-        "mean": {"value": quantif.mean, "unit": ""},
-        "stdDev": {"value": quantif.stdDev, "unit": ""}
-    };
+    quant.min = {"value": quantif.min, "unit": ""};
+    quant.max = {"value": quantif.max, "unit": ""};
+    quant.mean = {"value": quantif.mean, "unit": ""};
+    quant.stdDev = {"value": quantif.stdDev, "unit": ""};
+    // return
+    return quant;
 };
 
 /**
@@ -13542,10 +14280,16 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
  */
 dwv.image.Image.prototype.quantifyEllipse = function(ellipse)
 {
+    var quant = {};
+    // surface
     var spacing = this.getGeometry().getSpacing();
     var surface = ellipse.getWorldSurface( spacing.getColumnSpacing(),
             spacing.getRowSpacing());
-    return { "surface": {"value": surface/100, "unit": dwv.i18n("unit.cm2")} };
+    if (surface !== null) {
+        quant.surface = {"value": surface/100, "unit": dwv.i18n("unit.cm2")};
+    }
+    // return
+    return quant;
 };
 
 /**
@@ -13576,8 +14320,8 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var size = new dwv.image.Size( columns, rows );
 
     // spacing
-    var rowSpacing = 1;
-    var columnSpacing = 1;
+    var rowSpacing = null;
+    var columnSpacing = null;
     // PixelSpacing
     var pixelSpacing = dicomElements.getFromKey("x00280030");
     // ImagerPixelSpacing
@@ -13591,7 +14335,7 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
         columnSpacing = parseFloat( imagerPixelSpacing[1] );
     }
     // image spacing
-    var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing);
+    var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing );
 
     // TransferSyntaxUID
     var transferSyntaxUID = dicomElements.getFromKey("x00020010");
@@ -13695,6 +14439,9 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
         meta.IsSigned = (pixelRepresentation === 1);
     }
     image.setMeta(meta);
+
+    // overlay
+    image.setFirstOverlay( dwv.gui.info.createOverlays(dicomElements) );
 
     return image;
 };
@@ -14077,238 +14824,6 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
- * Get data from an input context imageData.
- * @param {Object} imageData The context imageData.
- * @param {Number} width The width of the coresponding image.
- * @param {Number} height The height of the coresponding image.
- * @param {Number} sliceIndex The slice index of the imageData.
- * @return {Object} The corresponding view.
- */
-dwv.image.getViewFromImageData = function (imageData, width, height, sliceIndex) {
-    // remove alpha
-    // TODO support passing the full image data
-    var buffer = [];
-    var j = 0;
-    for( var i = 0; i < imageData.data.length; i+=4 ) {
-        buffer[j] = imageData.data[i];
-        buffer[j+1] = imageData.data[i+1];
-        buffer[j+2] = imageData.data[i+2];
-        j+=3;
-    }
-    // create dwv Image
-    var imageSize = new dwv.image.Size(width, height);
-
-    // TODO: wrong info...
-    var imageSpacing = new dwv.image.Spacing(1,1);
-
-    var origin = new dwv.math.Point3D(0,0,sliceIndex);
-    var geometry = new dwv.image.Geometry(origin, imageSize, imageSpacing );
-    var image = new dwv.image.Image( geometry, [buffer] );
-    image.setPhotometricInterpretation("RGB");
-    // meta information
-    var meta = {};
-    meta.BitsStored = 8;
-    image.setMeta(meta);
-    // view
-    var view = new dwv.image.View(image);
-    // defaut preset
-    view.setWindowLevelMinMax();
-    // return
-    return view;
-};
-
-/**
- * Get data from an input image using a canvas.
- * @param {Object} image The DOM Image.
- * @return {Mixed} The corresponding view and info.
- */
-dwv.image.getViewFromDOMImage = function (image)
-{
-    var width = image.width;
-    var height = image.height;
-
-    // draw the image in the canvas in order to get its data
-    var canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    var ctx = canvas.getContext('2d');
-    ctx.drawImage(image, 0, 0);
-    // get the image data
-    var imageData = ctx.getImageData(0, 0, width, height);
-    // view
-    var sliceIndex = image.index ? image.index : 0;
-    var view = dwv.image.getViewFromImageData(
-        imageData, width, height, sliceIndex);
-    // properties
-    var info = {};
-    if( image.file )
-    {
-        info.fileName = { "value": image.file.name };
-        info.fileType = { "value": image.file.type };
-        info.fileLastModifiedDate = { "value": image.file.lastModifiedDate };
-    }
-    info.imageWidth = { "value": width };
-    info.imageHeight = { "value": height };
-    // return
-    return {"view": view, "info": info};
-};
-
-/**
- * Create a dwv.image.View from a DICOM buffer.
- * @constructor
- */
-dwv.image.DicomBufferToView = function ()
-{
-    // closure to self
-    var self = this;
-
-    /**
-     * The default character set (optional).
-     * @private
-     * @type String
-     */
-    var defaultCharacterSet;
-
-    /**
-     * Set the default character set.
-     * param {String} The character set.
-     */
-    this.setDefaultCharacterSet = function (characterSet) {
-        defaultCharacterSet = characterSet;
-    };
-
-    /**
-     * Pixel buffer decoder.
-     * Define only once to allow optional asynchronous mode.
-     * @private
-     * @type Object
-     */
-    var pixelDecoder = null;
-
-    /**
-     * Get data from an input buffer using a DICOM parser.
-     * @param {Array} buffer The input data buffer.
-     * @param {Object} callback The callback on the conversion.
-     */
-    this.convert = function (buffer, callback)
-    {
-        // DICOM parser
-        var dicomParser = new dwv.dicom.DicomParser();
-        dicomParser.setDefaultCharacterSet(defaultCharacterSet);
-        // parse the buffer
-        dicomParser.parse(buffer);
-
-        var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
-        var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
-        var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
-        var needDecompression = (algoName !== null);
-
-        // worker callback
-        var onDecodedFirstFrame = function (/*event*/) {
-            // create the image
-            var imageFactory = new dwv.image.ImageFactory();
-            var image = imageFactory.create( dicomParser.getDicomElements(), pixelBuffer );
-            // create the view
-            var viewFactory = new dwv.image.ViewFactory();
-            var view = viewFactory.create( dicomParser.getDicomElements(), image );
-            // return
-            callback({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
-        };
-
-        if ( needDecompression ) {
-            var bitsAllocated = dicomParser.getRawDicomElements().x00280100.value[0];
-            var pixelRepresentation = dicomParser.getRawDicomElements().x00280103.value[0];
-            var isSigned = (pixelRepresentation === 1);
-            var nFrames = pixelBuffer.length;
-
-            if (!pixelDecoder){
-                pixelDecoder = new dwv.image.PixelBufferDecoder(algoName);
-            }
-
-            // loadend event
-            pixelDecoder.ondecodeend = function () {
-                self.onloadend();
-            };
-
-            // send an onload event for mono frame
-            if ( nFrames === 1 ) {
-                pixelDecoder.ondecoded = function () {
-                    self.onload();
-                };
-            }
-
-            // decoder callback
-            var countDecodedFrames = 0;
-            var onDecodedFrame = function (frame) {
-                return function (event) {
-                    // send progress
-                    ++countDecodedFrames;
-                    var ev = {type: "read-progress", lengthComputable: true,
-                        loaded: (countDecodedFrames * 100 / nFrames), total: 100};
-                    self.onprogress(ev);
-                    // store data
-                    pixelBuffer[frame] = event.data[0];
-                    // create image for first frame
-                    if ( frame === 0 ) {
-                        onDecodedFirstFrame();
-                    }
-                };
-            };
-
-            // decompress synchronously the first frame to create the image
-            pixelDecoder.decode(pixelBuffer[0],
-                bitsAllocated, isSigned, onDecodedFrame(0), false);
-
-            // decompress the possible other frames
-            if ( nFrames !== 1 ) {
-                // decode (asynchronously if possible)
-                for (var f = 1; f < nFrames; ++f) {
-                    pixelDecoder.decode(pixelBuffer[f],
-                        bitsAllocated, isSigned, onDecodedFrame(f));
-                }
-            }
-        }
-        // no decompression
-        else {
-            // send progress
-            self.onprogress({type: "read-progress", lengthComputable: true,
-                loaded: 100, total: 100});
-            // create image
-            onDecodedFirstFrame();
-            // send load events
-            self.onload();
-            self.onloadend();
-        }
-    };
-};
-
-/**
- * Handle a load end event.
- */
-dwv.image.DicomBufferToView.prototype.onloadend = function ()
-{
-    // default does nothing.
-};
-/**
- * Handle a load event.
- */
-dwv.image.DicomBufferToView.prototype.onload = function ()
-{
-    // default does nothing.
-};
-/**
- * Handle a load progress event.
- */
-dwv.image.DicomBufferToView.prototype.onprogress = function ()
-{
-    // default does nothing.
-};
-
-// namespaces
-var dwv = dwv || {};
-dwv.image = dwv.image || {};
-
-/**
  * WindowLevel class.
  * References:
  * - DICOM [Window Center and Window Width]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2}
@@ -14532,6 +15047,7 @@ dwv.image.View = function (image)
         var wlut = windowLuts[ rsi.toString() ];
         // special case for 'perslice' presets
         if (currentPresetName &&
+            typeof windowPresets[currentPresetName] !== "undefined" &&
             typeof windowPresets[currentPresetName].perslice !== "undefined" &&
             windowPresets[currentPresetName].perslice === true ) {
             // get the preset for this slice
@@ -14730,15 +15246,32 @@ dwv.image.View = function (image)
     };
 
     /**
+     * Append a frame buffer to the included image.
+     * @param {Object} frameBuffer The frame buffer to append.
+     */
+    this.appendFrameBuffer = function (frameBuffer)
+    {
+        this.getImage().appendFrameBuffer(frameBuffer);
+    };
+
+    /**
      * Set the view window/level.
      * @param {Number} center The window center.
      * @param {Number} width The window width.
+     * @param {String} name Associated preset name, defaults to 'manual'.
      * Warning: uses the latest set rescale LUT or the default linear one.
      */
-    this.setWindowLevel = function ( center, width )
+    this.setWindowLevel = function ( center, width, name )
     {
         // window width shall be >= 1 (see https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
         if ( width >= 1 ) {
+
+            if ( typeof name === "undefined" ) {
+                name = "manual";
+            }
+            // update current preset name
+            currentPresetName = name;
+
             var wl = new dwv.image.WindowLevel(center, width);
             var keys = Object.keys(windowLuts);
 
@@ -14775,14 +15308,13 @@ dwv.image.View = function (image)
         if (name === "minmax" && typeof preset.wl === "undefined") {
             preset.wl = this.getWindowLevelMinMax();
         }
-        // update member preset name
-        currentPresetName = name;
         // special 'perslice' case
         if (typeof preset.perslice !== "undefined" &&
             preset.perslice === true) {
             preset = { "wl": preset.wl[this.getCurrentPosition().k] };
         }
-        this.setWindowLevel( preset.wl.getCenter(), preset.wl.getWidth() );
+        // set w/l
+        this.setWindowLevel( preset.wl.getCenter(), preset.wl.getWidth(), name );
     };
 
     /**
@@ -14849,7 +15381,7 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
     // calculate center and width
     var wl = this.getWindowLevelMinMax();
     // set window level
-    this.setWindowLevel(wl.getCenter(), wl.getWidth());
+    this.setWindowLevel(wl.getCenter(), wl.getWidth(), "minmax");
 };
 
 /**
@@ -15100,17 +15632,215 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
 
 // namespaces
 var dwv = dwv || {};
-/** @namespace */
 dwv.io = dwv.io || {};
 
 /**
- * File loader.
+ * DICOM data loader.
+ */
+dwv.io.DicomDataLoader = function ()
+{
+    // closure to self
+    var self = this;
+
+    /**
+     * Loader options.
+     * @private
+     * @type Object
+     */
+    var options = {};
+
+    /**
+     * Set the loader options.
+     * @param {Object} opt The input options.
+     */
+    this.setOptions = function (opt) {
+        options = opt;
+    };
+
+    /**
+     * DICOM buffer to dwv.image.View (asynchronous)
+     */
+    var db2v = new dwv.image.DicomBufferToView();
+
+    /**
+     * Load data.
+     * @param {Object} buffer The DICOM buffer.
+     * @param {String} origin The data origin.
+     * @param {Number} index The data index.
+     */
+    this.load = function (buffer, origin, index) {
+        // set character set
+        if (typeof options.defaultCharacterSet !== "undefined") {
+            db2v.setDefaultCharacterSet(options.defaultCharacterSet);
+        }
+        // connect handlers
+        db2v.onload = self.onload;
+        db2v.onloadend = self.onloadend;
+        db2v.onprogress = self.onprogress;
+        // convert
+        try {
+            db2v.convert( buffer, index );
+        } catch (error) {
+            self.onerror(error);
+        }
+    };
+
+    /**
+     * Get a file load handler.
+     * @param {Object} file The file to load.
+     * @param {Number} index The index 'id' of the file.
+     * @return {Function} A file load handler.
+     */
+    this.getFileLoadHandler = function (file, index) {
+        return function (event) {
+            self.load(event.target.result, file, index);
+        };
+    };
+
+    /**
+     * Get a url load handler.
+     * @param {String} url The url to load.
+     * @param {Number} index The index 'id' of the url.
+     * @return {Function} A url load handler.
+     */
+    this.getUrlLoadHandler = function (url, index) {
+        return function (/*event*/) {
+            // check response status
+            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
+            // status 200: "OK"; status 0: "debug"
+            if (this.status !== 200 && this.status !== 0) {
+                self.onerror({'name': "RequestError",
+                    'message': "Error status: " + this.status +
+                    " while loading '" + url + "' [DicomDataLoader]" });
+                return;
+            }
+            // load
+            self.load(this.response, url, index);
+        };
+    };
+
+    /**
+     * Get an error handler.
+     * @param {String} origin The file.name/url at the origin of the error.
+     * @return {Function} An error handler.
+     */
+    this.getErrorHandler = function (origin) {
+        return function (event) {
+            var message = "";
+            if (typeof event.getMessage !== "undefined") {
+                message = event.getMessage();
+            } else if (typeof this.status !== "undefined") {
+                message = "http status: " + this.status;
+            }
+            self.onerror( {'name': "RequestError",
+                'message': "An error occurred while reading '" + origin +
+                "' (" + message + ") [DicomDataLoader]" } );
+        };
+    };
+
+}; // class DicomDataLoader
+
+/**
+ * Check if the loader can load the provided file.
+ * @param {Object} file The file to check.
+ * @return True if the file can be loaded.
+ */
+dwv.io.DicomDataLoader.prototype.canLoadFile = function (file) {
+    var split = file.name.split('.');
+    var ext = "";
+    if (split.length !== 1) {
+        ext = split.pop().toLowerCase();
+    }
+    var hasExt = (ext.length !== 0);
+    return !hasExt || (ext === "dcm");
+};
+
+/**
+ * Check if the loader can load the provided url.
+ * @param {String} url The url to check.
+ * @return True if the url can be loaded.
+ */
+dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url) {
+    var split = url.split('.');
+    var ext = "";
+    if (split.length !== 1) {
+        ext = split.pop().toLowerCase();
+    }
+    var hasExt = (ext.length !== 0) && (ext.length < 5);
+    // wado url
+    var isDicomContentType = (url.indexOf("contentType=application/dicom") !== -1);
+
+    return isDicomContentType || (ext === "dcm") || !hasExt;
+};
+
+/**
+ * Get the file content type needed by the loader.
+ * @return One of the 'dwv.io.fileContentTypes'.
+ */
+dwv.io.DicomDataLoader.prototype.loadFileAs = function () {
+    return dwv.io.fileContentTypes.ArrayBuffer;
+};
+
+/**
+ * Get the url content type needed by the loader.
+ * @return One of the 'dwv.io.urlContentTypes'.
+ */
+dwv.io.DicomDataLoader.prototype.loadUrlAs = function () {
+    return dwv.io.urlContentTypes.ArrayBuffer;
+};
+
+/**
+ * Handle a load event.
+ * @param {Object} event The load event, 'event.target'
+ *  should be the loaded data.
+ * Default does nothing.
+ */
+dwv.io.DicomDataLoader.prototype.onload = function (/*event*/) {};
+/**
+ * Handle an load end event.
+ * Default does nothing.
+ */
+dwv.io.DicomDataLoader.prototype.onloadend = function () {};
+/**
+ * Handle an error event.
+ * @param {Object} event The error event, 'event.message'
+ *  should be the error message.
+ * Default does nothing.
+ */
+dwv.io.DicomDataLoader.prototype.onerror = function (/*event*/) {};
+/**
+ * Handle a progress event.
+ * @param {Object} event The progress event.
+ * Default does nothing.
+ */
+dwv.io.DicomDataLoader.prototype.onprogress = function (/*event*/) {};
+
+/**
+ * Add to Loader list.
+ */
+dwv.io.loaderList = dwv.io.loaderList || [];
+dwv.io.loaderList.push( "DicomDataLoader" );
+
+// namespaces
+var dwv = dwv || {};
+/** @namespace */
+dwv.io = dwv.io || {};
+
+// file content types
+dwv.io.fileContentTypes = {
+    'Text': 0,
+    'ArrayBuffer': 1,
+    'DataURL': 2
+};
+
+/**
+ * Files loader.
  * @constructor
  */
-dwv.io.File = function ()
+dwv.io.FilesLoader = function ()
 {
     /**
-     * CLosure to self.
+     * Closure to self.
      * @private
      * @type Object
      */
@@ -15128,24 +15858,6 @@ dwv.io.File = function ()
      * @type Number
      */
     var nLoaded = 0;
-    /**
-     * List of load progresses.
-     * @private
-     * @type Array
-     */
-    var loadProgresses = [];
-    /**
-     * List of decode progresses.
-     * @private
-     * @type Array
-     */
-    var decodeProgresses = [];
-    /**
-     * Flag to tell if the IO needs decoding.
-     * @private
-     * @type Boolean
-     */
-    var needDecoding = false;
 
     /**
      * The default character set (optional).
@@ -15171,23 +15883,11 @@ dwv.io.File = function ()
     };
 
     /**
-     * Set the need decodign flag
-     * @param {Boolean} flag True if the data needs decoding.
-     */
-    this.setNeedDecoding = function (flag) {
-        needDecoding = flag;
-    };
-
-    /**
      * Set the number of data to load.
      * @param {Number} n The number of data to load.
      */
     this.setNToLoad = function (n) {
         nToLoad = n;
-        for ( var i = 0; i < nToLoad; ++i ) {
-            loadProgresses[i] = 0;
-            decodeProgresses[i] = 0;
-        }
     };
 
     /**
@@ -15197,213 +15897,105 @@ dwv.io.File = function ()
     this.addLoaded = function () {
         nLoaded++;
         if ( nLoaded === nToLoad ) {
-            this.onloadend();
+            self.onloadend();
         }
     };
-
-    /**
-     * Handle a load progress.
-     * @param {Number} n The number of the loaded data.
-     * @param {Number} percent The percentage of data 'n' that has been loaded.
-     */
-    this.onLoadProgress = function (n, percent) {
-        loadProgresses[n] = percent;
-        self.onprogress({type: "load-progress", lengthComputable: true,
-            loaded: getGlobalPercent(), total: 100});
-    };
-
-    /**
-     * Handle a decode progress.
-     * @param {Object} event The progress event.
-     */
-    this.onDecodeProgress = function (event) {
-        // use the internal count as index
-        decodeProgresses[nLoaded] = event.loaded;
-        self.onprogress({type: "load-progress", lengthComputable: true,
-            loaded: getGlobalPercent(), total: 100});
-    };
-
-    /**
-     * Get the global load percent including the provided one.
-     * @return {Number} The accumulated percentage.
-     */
-    function getGlobalPercent() {
-        var sum = 0;
-        for ( var i = 0; i < loadProgresses.length; ++i ) {
-            sum += loadProgresses[i];
-            if ( needDecoding ) {
-                sum += decodeProgresses[i];
-            }
-        }
-        var percent = sum / nToLoad;
-        // half loading, half decoding
-        if ( needDecoding ) {
-            percent = percent / 2;
-        }
-        return percent;
-    }
 
 }; // class File
 
 /**
  * Handle a load event.
- * @param {Object} event The load event, event.target
+ * @param {Object} event The load event, 'event.target'
  *  should be the loaded data.
+ * Default does nothing.
  */
-dwv.io.File.prototype.onload = function (/*event*/)
-{
-    // default does nothing.
-};
+dwv.io.FilesLoader.prototype.onload = function (/*event*/) {};
 /**
  * Handle a load end event.
+ * Default does nothing.
  */
-dwv.io.File.prototype.onloadend = function ()
-{
-    // default does nothing.
-};
+dwv.io.FilesLoader.prototype.onloadend = function () {};
 /**
  * Handle a progress event.
+ * @param {Object} event The progress event.
+ * Default does nothing.
  */
-dwv.io.File.prototype.onprogress = function ()
-{
-    // default does nothing.
-};
+dwv.io.FilesLoader.prototype.onprogress = function (/*event*/) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event, event.message
+ * @param {Object} event The error event, 'event.message'
  *  should be the error message.
+ * Default does nothing.
  */
-dwv.io.File.prototype.onerror = function (/*event*/)
-{
-    // default does nothing.
-};
-
-/**
- * Create an error handler from a base one and locals.
- * @param {String} file The related file.
- * @param {String} text The text to insert in the message.
- * @param {Function} baseHandler The base handler.
- */
-dwv.io.File.createErrorHandler = function (file, text, baseHandler) {
-    return function (event) {
-        baseHandler( {'name': "RequestError",
-            'message': "An error occurred while reading the " + text + " file: " + file +
-            " ("+event.getMessage() + ")" } );
-    };
-};
-
-/**
- * Create a load progress event handler.
- * @param {Number} n The number of the loaded data.
- * @param {Function} loadProgressHandler A load progress percent handler.
- */
-dwv.io.File.createLoadProgressHandler = function (n, loadProgressHandler) {
-    return function (event) {
-        if( event.lengthComputable )
-        {
-            var percent = Math.round((event.loaded / event.total) * 100);
-            loadProgressHandler(n, percent);
-        }
-    };
-};
+dwv.io.FilesLoader.prototype.onerror = function (/*event*/) {};
 
 /**
  * Load a list of files.
  * @param {Array} ioArray The list of files to load.
  * @external FileReader
  */
-dwv.io.File.prototype.load = function (ioArray)
+dwv.io.FilesLoader.prototype.load = function (ioArray)
 {
     // closure to self for handlers
     var self = this;
     // set the number of data to load
     this.setNToLoad( ioArray.length );
 
-    // call the onload listener
-    var onLoadView = function (data)
-    {
-        self.onload(data);
-    };
+    var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
+    mproghandler.setNToLoad( ioArray.length );
 
-    // DICOM buffer to dwv.image.View (asynchronous)
-    var db2v = new dwv.image.DicomBufferToView();
-    db2v.setDefaultCharacterSet(this.getDefaultCharacterSet());
-    db2v.onload = function () {
-        self.addLoaded();
-    };
-    db2v.onprogress = function (event) {
-        self.onDecodeProgress(event);
-    };
-    // reader callback
-    var onLoadDicomBuffer = function (event)
-    {
-        self.setNeedDecoding(true);
-        try {
-            db2v.convert(event.target.result, onLoadView);
-        } catch (error) {
-            self.onerror(error);
-        }
-    };
+    // get loaders
+    var loaders = [];
+    for (var m = 0; m < dwv.io.loaderList.length; ++m) {
+        loaders.push( new dwv.io[dwv.io.loaderList[m]]() );
+    }
 
-    // DOM Image buffer to dwv.image.View
-    var onLoadDOMImageBuffer = function (/*event*/)
-    {
-        try {
-            onLoadView( dwv.image.getViewFromDOMImage(this) );
-        } catch (error) {
-            self.onerror(error);
-        }
-    };
-
-    // load text buffer
-    var onLoadTextBuffer = function (event)
-    {
-        try {
-            self.onload( event.target.result );
-        } catch(error) {
-            self.onerror(error);
-        }
-    };
-
-    // raw image to DOM Image
-    var onLoadRawImageBuffer = function (event)
-    {
-        var theImage = new Image();
-        theImage.src = event.target.result;
-        // storing values to pass them on
-        theImage.file = this.file;
-        theImage.index = this.index;
-        // triggered by ctx.drawImage
-        theImage.onload = onLoadDOMImageBuffer;
-    };
+    // set loaders callbacks
+    var loader = null;
+    for (var k = 0; k < loaders.length; ++k) {
+        loader = loaders[k];
+        loader.onload = self.onload;
+        loader.onloadend = self.addLoaded;
+        loader.onerror = self.onerror;
+        loader.setOptions({
+            'defaultCharacterSet': this.getDefaultCharacterSet()
+        });
+        loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
+    }
 
     // loop on I/O elements
     for (var i = 0; i < ioArray.length; ++i)
     {
         var file = ioArray[i];
         var reader = new FileReader();
-        reader.onprogress = dwv.io.File.createLoadProgressHandler(i, self.onLoadProgress);
-        if ( file.name.split('.').pop().toLowerCase() === "json" )
-        {
-            reader.onload = onLoadTextBuffer;
-            reader.onerror = dwv.io.File.createErrorHandler(file, "text", self.onerror);
-            reader.readAsText(file);
+
+        // bind reader progress
+        reader.onprogress = mproghandler.getMonoProgressHandler(i, 0);
+
+        // find a loader
+        var foundLoader = false;
+        for (var l = 0; l < loaders.length; ++l) {
+            loader = loaders[l];
+            if (loader.canLoadFile(file)) {
+                foundLoader = true;
+                // set reader callbacks
+                reader.onload = loader.getFileLoadHandler(file, i);
+                reader.onerror = loader.getErrorHandler(file.name);
+                // read
+                if (loader.loadFileAs() === dwv.io.fileContentTypes.Text) {
+                    reader.readAsText(file);
+                } else if (loader.loadFileAs() === dwv.io.fileContentTypes.DataURL) {
+                    reader.readAsDataURL(file);
+                } else if (loader.loadFileAs() === dwv.io.fileContentTypes.ArrayBuffer) {
+                    reader.readAsArrayBuffer(file);
+                }
+                // next file
+                break;
+            }
         }
-        else if ( file.type.match("image.*") )
-        {
-            // storing values to pass them on
-            reader.file = file;
-            reader.index = i;
-            // callbacks
-            reader.onload = onLoadRawImageBuffer;
-            reader.onerror = dwv.io.File.createErrorHandler(file, "image", self.onerror);
-            reader.readAsDataURL(file);
-        }
-        else
-        {
-            reader.onload = onLoadDicomBuffer;
-            reader.onerror = dwv.io.File.createErrorHandler(file, "DICOM", self.onerror);
-            reader.readAsArrayBuffer(file);
+        // TODO: throw?
+        if (!foundLoader) {
+            throw new Error("No loader found for file: "+file);
         }
     }
 };
@@ -15413,13 +16005,173 @@ var dwv = dwv || {};
 dwv.io = dwv.io || {};
 
 /**
- * Url loader.
+ * JSON text loader.
+ */
+dwv.io.JSONTextLoader = function ()
+{
+    // closure to self
+    var self = this;
+
+    /**
+     * Set the loader options.
+     * @param {Object} opt The input options.
+     */
+    this.setOptions = function () {
+        // does nothing
+    };
+
+    /**
+     * Load data.
+     * @param {Object} text The input text.
+     * @param {String} origin The data origin.
+     * @param {Number} index The data index.
+     */
+    this.load = function (text, origin, index) {
+        try {
+            self.onload( text );
+            self.onloadend();
+        } catch (error) {
+            self.onerror(error);
+        }
+        self.onprogress({'type': 'read-progress', 'lengthComputable': true,
+            'loaded': 100, 'total': 100, 'index': index});
+    };
+
+    /**
+     * Get a file load handler.
+     * @param {Object} file The file to load.
+     * @param {Number} index The index 'id' of the file.
+     * @return {Function} A file load handler.
+     */
+    this.getFileLoadHandler = function (file, index) {
+        return function (event) {
+            self.load(event.target.result, file, index);
+        };
+    };
+
+    /**
+     * Get a url load handler.
+     * @param {String} url The url to load.
+     * @param {Number} index The index 'id' of the url.
+     * @return {Function} A url load handler.
+     */
+    this.getUrlLoadHandler = function (url, index) {
+        return function (/*event*/) {
+            // check response status
+            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
+            // status 200: "OK"; status 0: "debug"
+            if (this.status !== 200 && this.status !== 0) {
+                self.onerror({'name': "RequestError",
+                    'message': "Error status: " + this.status +
+                    " while loading '" + url + "' [JSONTextLoader]" });
+                return;
+            }
+            // load
+            self.load(this.responseText, url, index);
+        };
+    };
+
+    /**
+     * Get an error handler.
+     * @param {String} origin The file.name/url at the origin of the error.
+     * @return {Function} An error handler.
+     */
+    this.getErrorHandler = function (origin) {
+        return function (event) {
+            var message = "";
+            if (typeof event.getMessage !== "undefined") {
+                message = event.getMessage();
+            } else if (typeof this.status !== "undefined") {
+                message = "http status: " + this.status;
+            }
+            self.onerror( {'name': "RequestError",
+                'message': "An error occurred while reading '" + origin +
+                "' (" + message + ") [JSONTextLoader]" } );
+        };
+    };
+
+}; // class JSONTextLoader
+
+/**
+ * Check if the loader can load the provided file.
+ * @param {Object} file The file to check.
+ * @return True if the file can be loaded.
+ */
+dwv.io.JSONTextLoader.prototype.canLoadFile = function (file) {
+    var ext = file.name.split('.').pop().toLowerCase();
+    return (ext === "json");
+};
+
+/**
+ * Check if the loader can load the provided url.
+ * @param {String} url The url to check.
+ * @return True if the url can be loaded.
+ */
+dwv.io.JSONTextLoader.prototype.canLoadUrl = function (url) {
+    var ext = url.split('.').pop().toLowerCase();
+    return (ext === "json");
+};
+
+/**
+ * Get the file content type needed by the loader.
+ * @return One of the 'dwv.io.fileContentTypes'.
+ */
+dwv.io.JSONTextLoader.prototype.loadFileAs = function () {
+    return dwv.io.fileContentTypes.Text;
+};
+
+/**
+ * Get the url content type needed by the loader.
+ * @return One of the 'dwv.io.urlContentTypes'.
+ */
+dwv.io.JSONTextLoader.prototype.loadUrlAs = function () {
+    return dwv.io.urlContentTypes.Text;
+};
+
+/**
+ * Handle a load event.
+ * @param {Object} event The load event, 'event.target'
+ *  should be the loaded data.
+ * Default does nothing.
+ */
+dwv.io.JSONTextLoader.prototype.onload = function (/*event*/) {};
+/**
+ * Handle an load end event.
+ * Default does nothing.
+ */
+dwv.io.JSONTextLoader.prototype.onloadend = function () {};
+/**
+ * Handle an error event.
+ * @param {Object} event The error event, 'event.message'
+ *  should be the error message.
+ * Default does nothing.
+ */
+dwv.io.JSONTextLoader.prototype.onerror = function (/*event*/) {};
+/**
+ * Handle a progress event.
+ * @param {Object} event The progress event.
+ * Default does nothing.
+ */
+dwv.io.JSONTextLoader.prototype.onprogress = function (/*event*/) {};
+
+/**
+ * Add to Loader list.
+ */
+dwv.io.loaderList = dwv.io.loaderList || [];
+dwv.io.loaderList.push( "JSONTextLoader" );
+
+// namespaces
+var dwv = dwv || {};
+dwv.io = dwv.io || {};
+
+/**
+ * Memory loader.
  * @constructor
  */
-dwv.io.Url = function ()
+dwv.io.MemoryLoader = function ()
 {
     /**
-     * CLosure to self.
+     * Closure to self.
      * @private
      * @type Object
      */
@@ -15437,24 +16189,6 @@ dwv.io.Url = function ()
      * @type Number
      */
     var nLoaded = 0;
-    /**
-     * List of load progresses.
-     * @private
-     * @type Array
-     */
-    var loadProgresses = [];
-    /**
-     * List of decode progresses.
-     * @private
-     * @type Array
-     */
-    var decodeProgresses = [];
-    /**
-     * Flag to tell if the IO needs decoding.
-     * @private
-     * @type Boolean
-     */
-    var needDecoding = false;
 
     /**
      * The default character set (optional).
@@ -15480,23 +16214,11 @@ dwv.io.Url = function ()
     };
 
     /**
-     * Set the need decodign flag
-     * @param {Boolean} flag True if the data needs decoding.
-     */
-    this.setNeedDecoding = function (flag) {
-        needDecoding = flag;
-    };
-
-    /**
      * Set the number of data to load.
      * @param {Number} n The number of data to load.
      */
     this.setNToLoad = function (n) {
         nToLoad = n;
-        for ( var i = 0; i < nToLoad; ++i ) {
-            loadProgresses[i] = 0;
-            decodeProgresses[i] = 0;
-        }
     };
 
     /**
@@ -15506,249 +16228,632 @@ dwv.io.Url = function ()
     this.addLoaded = function () {
         nLoaded++;
         if ( nLoaded === nToLoad ) {
-            this.onloadend();
+            self.onloadend();
         }
     };
 
-    /**
-     * Handle a load progress.
-     * @param {Number} n The number of the loaded data.
-     * @param {Number} percent The percentage of data 'n' that has been loaded.
-     */
-    this.onLoadProgress = function (n, percent) {
-        loadProgresses[n] = percent;
-        self.onprogress({type: "load-progress", lengthComputable: true,
-            loaded: getGlobalPercent(), total: 100});
-    };
-
-    /**
-     * Handle a decode progress.
-     * @param {Object} event The progress event.
-     */
-    this.onDecodeProgress = function (event) {
-        // use the internal count as index
-        decodeProgresses[nLoaded] = event.loaded;
-        self.onprogress({type: "load-progress", lengthComputable: true,
-            loaded: getGlobalPercent(), total: 100});
-    };
-
-    /**
-     * Get the global load percent including the provided one.
-     * @return {Number} The accumulated percentage.
-     */
-    function getGlobalPercent() {
-        var sum = 0;
-        for ( var i = 0; i < loadProgresses.length; ++i ) {
-            sum += loadProgresses[i];
-            if ( needDecoding ) {
-                sum += decodeProgresses[i];
-            }
-        }
-        var percent = sum / nToLoad;
-        // half loading, half decoding
-        if ( needDecoding ) {
-            percent = percent / 2;
-        }
-        return percent;
-    }
-
-}; // class Url
+}; // class Memory
 
 /**
  * Handle a load event.
- * @param {Object} event The load event, event.target
+ * @param {Object} event The load event, 'event.target'
  *  should be the loaded data.
+ * Default does nothing.
  */
-dwv.io.Url.prototype.onload = function (/*event*/)
-{
-    // default does nothing.
-};
+dwv.io.MemoryLoader.prototype.onload = function (/*event*/) {};
 /**
  * Handle a load end event.
+ * Default does nothing.
  */
-dwv.io.Url.prototype.onloadend = function ()
-{
-    // default does nothing.
-};
+dwv.io.MemoryLoader.prototype.onloadend = function () {};
 /**
  * Handle a progress event.
+ * @param {Object} event The progress event.
+ * Default does nothing.
  */
-dwv.io.Url.prototype.onprogress = function ()
-{
-    // default does nothing.
-};
+dwv.io.MemoryLoader.prototype.onprogress = function (/*event*/) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event, event.message
+ * @param {Object} event The error event, 'event.message'
  *  should be the error message.
+ * Default does nothing.
  */
-dwv.io.Url.prototype.onerror = function (/*event*/)
-{
-    // default does nothing.
-};
+dwv.io.MemoryLoader.prototype.onerror = function (/*event*/) {};
 
 /**
- * Create an error handler from a base one and locals.
- * @param {String} url The related url.
- * @param {String} text The text to insert in the message.
- * @param {Function} baseHandler The base handler.
+ * Load a list of buffers.
+ * @param {Array} ioArray The list of buffers to load.
  */
-dwv.io.Url.createErrorHandler = function (url, text, baseHandler) {
-    return function (/*event*/) {
-        baseHandler( {'name': "RequestError",
-            'message': "An error occurred while retrieving the " + text + " file (via http): " + url +
-            " (status: "+this.status + ")" } );
-    };
-};
-
-/**
- * Create a load progress event handler.
- * @param {Number} n The number of the loaded data.
- * @param {Function} loadProgressHandler A load progress percent handler.
- */
-dwv.io.Url.createLoadProgressHandler = function (n, loadProgressHandler) {
-    return function (event) {
-        if( event.lengthComputable )
-        {
-            var percent = Math.round((event.loaded / event.total) * 100);
-            loadProgressHandler(n, percent);
-        }
-    };
-};
-
-/**
- * Load a list of URLs.
- * @param {Array} ioArray The list of urls to load.
- * @param {Array} requestHeaders An array of {name, value} to use as request headers.
- * @external XMLHttpRequest
- */
-dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
+dwv.io.MemoryLoader.prototype.load = function (ioArray)
 {
     // closure to self for handlers
     var self = this;
     // set the number of data to load
     this.setNToLoad( ioArray.length );
 
-    // call the listeners
-    var onLoadView = function (data)
+    var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
+    mproghandler.setNToLoad( ioArray.length );
+
+    // get loaders
+    var loaders = [];
+    for (var m = 0; m < dwv.io.loaderList.length; ++m) {
+        loaders.push( new dwv.io[dwv.io.loaderList[m]]() );
+    }
+
+    // set loaders callbacks
+    var loader = null;
+    for (var k = 0; k < loaders.length; ++k) {
+        loader = loaders[k];
+        loader.onload = self.onload;
+        loader.onloadend = self.addLoaded;
+        loader.onerror = self.onerror;
+        loader.setOptions({
+            'defaultCharacterSet': this.getDefaultCharacterSet()
+        });
+        loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
+    }
+
+    // loop on I/O elements
+    for (var i = 0; i < ioArray.length; ++i)
     {
-        self.onload(data);
-    };
+        var iodata = ioArray[i];
 
-    // DICOM buffer to dwv.image.View (asynchronous)
-    var db2v = new dwv.image.DicomBufferToView();
-    db2v.setDefaultCharacterSet(this.getDefaultCharacterSet());
-    db2v.onload = function () {
-        self.addLoaded();
-    };
-    db2v.onprogress = function (event) {
-        self.onDecodeProgress(event);
-    };
-    // callback
-    var onLoadDicomBuffer = function (response)
-    {
-        self.setNeedDecoding(true);
-        try {
-            db2v.convert(response, onLoadView);
-        } catch (error) {
-            self.onerror(error);
-        }
-    };
-
-    // DOM Image buffer to dwv.image.View
-    var onLoadDOMImageBuffer = function (/*event*/)
-    {
-        try {
-            onLoadView( dwv.image.getViewFromDOMImage(this) );
-        } catch (error) {
-            self.onerror(error);
-        }
-    };
-
-    // load text buffer
-    var onLoadTextBuffer = function (/*event*/)
-    {
-        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
-        // status 200: "OK"; status 0: "debug"
-        if (this.status !== 200 && this.status !== 0) {
-            this.onerror();
-            return;
-        }
-
-        try {
-            self.onload( this.responseText );
-        } catch (error) {
-            self.onerror(error);
-        }
-    };
-
-    // load binary buffer
-    var onLoadBinaryBuffer = function (/*event*/)
-    {
-        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
-        // status 200: "OK"; status 0: "debug"
-        if (this.status !== 200 && this.status !== 0) {
-            this.onerror();
-            return;
-        }
-
-        // find the image type from its signature
-        var view = new DataView(this.response);
-        var isJpeg = view.getUint32(0) === 0xffd8ffe0;
-        var isPng = view.getUint32(0) === 0x89504e47;
-        var isGif = view.getUint32(0) === 0x47494638;
-
-        // check possible extension
-        // (responseURL is supported on major browsers but not IE...)
-        if ( !isJpeg && !isPng && !isGif && this.responseURL )
-        {
-            var ext = this.responseURL.split('.').pop().toLowerCase();
-            isJpeg = (ext === "jpg") || (ext === "jpeg");
-            isPng = (ext === "png");
-            isGif = (ext === "gif");
-        }
-
-        // non DICOM
-        if( isJpeg || isPng || isGif )
-        {
-            // image data as string
-            var bytes = new Uint8Array(this.response);
-            var imageDataStr = '';
-            for( var i = 0; i < bytes.byteLength; ++i ) {
-                imageDataStr += String.fromCharCode(bytes[i]);
+        // find a loader
+        var foundLoader = false;
+        for (var l = 0; l < loaders.length; ++l) {
+            loader = loaders[l];
+            if (loader.canLoadUrl(iodata.filename)) {
+                foundLoader = true;
+                // read
+                loader.load(iodata.data, iodata.filename, i);
+                // next file
+                break;
             }
-            // image type
-            var imageType = "unknown";
-            if(isJpeg) {
-                imageType = "jpeg";
-            }
-            else if(isPng) {
-                imageType = "png";
-            }
-            else if(isGif) {
-                imageType = "gif";
-            }
-            // temporary image object
-            var tmpImage = new Image();
-            tmpImage.src = "data:image/" + imageType + ";base64," + window.btoa(imageDataStr);
-            tmpImage.onload = onLoadDOMImageBuffer;
         }
-        else
-        {
-            onLoadDicomBuffer(this.response);
+        // TODO: throw?
+        if (!foundLoader) {
+            throw new Error("No loader found for file: "+iodata.filename);
+        }
+    }
+};
+
+// namespaces
+var dwv = dwv || {};
+dwv.io = dwv.io || {};
+
+/**
+ * Raw image loader.
+ */
+dwv.io.RawImageLoader = function ()
+{
+    // closure to self
+    var self = this;
+
+    /**
+     * Set the loader options.
+     * @param {Object} opt The input options.
+     */
+    this.setOptions = function () {
+        // does nothing
+    };
+
+    /**
+     * Create a Data URI from an HTTP request response.
+     * @param {Object} response The HTTP request response.
+     * @param {String} dataType The data type.
+     */
+    function createDataUri(response, dataType) {
+        // image data as string
+        var bytes = new Uint8Array(response);
+        var imageDataStr = '';
+        for( var i = 0; i < bytes.byteLength; ++i ) {
+            imageDataStr += String.fromCharCode(bytes[i]);
+        }
+        // image type
+        var imageType = dataType;
+        if (imageType === "jpg") {
+            imageType = "jpeg";
+        }
+        // create uri
+        var uri = "data:image/" + imageType + ";base64," + window.btoa(imageDataStr);
+        return uri;
+    }
+
+    /**
+     * Load data.
+     * @param {Object} dataUri The data URI.
+     * @param {String} origin The data origin.
+     * @param {Number} index The data index.
+     */
+    this.load = function ( dataUri, origin, index ) {
+        // create a DOM image
+        var image = new Image();
+        image.src = dataUri;
+        // storing values to pass them on
+        image.origin = origin;
+        image.index = index;
+        // triggered by ctx.drawImage
+        image.onload = function (/*event*/) {
+            try {
+                self.onload( dwv.image.getViewFromDOMImage(this) );
+                self.onloadend();
+            } catch (error) {
+                self.onerror(error);
+            }
+            self.onprogress({'type': 'read-progress', 'lengthComputable': true,
+                'loaded': 100, 'total': 100, 'index': index});
+        };
+    };
+
+    /**
+     * Get a file load handler.
+     * @param {Object} file The file to load.
+     * @param {Number} index The index 'id' of the file.
+     * @return {Function} A file load handler.
+     */
+    this.getFileLoadHandler = function (file, index) {
+        return function (event) {
+            self.load(event.target.result, file, index);
+        };
+    };
+
+    /**
+     * Get a url load handler.
+     * @param {String} url The url to load.
+     * @param {Number} index The index 'id' of the url.
+     * @return {Function} A url load handler.
+     */
+    this.getUrlLoadHandler = function (url, index) {
+        return function (/*event*/) {
+            // check response status
+            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
+            // status 200: "OK"; status 0: "debug"
+            if (this.status !== 200 && this.status !== 0) {
+                self.onerror({'name': "RequestError",
+                    'message': "Error status: " + this.status +
+                    " while loading '" + url + "' [RawImageLoader]" });
+                return;
+            }
+            // load
+            var ext = url.split('.').pop().toLowerCase();
+            self.load(createDataUri(this.response, ext), url, index);
+        };
+    };
+
+    /**
+     * Get an error handler.
+     * @param {String} origin The file.name/url at the origin of the error.
+     * @return {Function} An error handler.
+     */
+    this.getErrorHandler = function (origin) {
+        return function (event) {
+            var message = "";
+            if (typeof event.getMessage !== "undefined") {
+                message = event.getMessage();
+            } else if (typeof this.status !== "undefined") {
+                message = "http status: " + this.status;
+            }
+            self.onerror( {'name': "RequestError",
+                'message': "An error occurred while reading '" + origin +
+                "' (" + message + ") [RawImageLoader]" } );
+        };
+    };
+
+}; // class RawImageLoader
+
+/**
+ * Check if the loader can load the provided file.
+ * @param {Object} file The file to check.
+ * @return True if the file can be loaded.
+ */
+dwv.io.RawImageLoader.prototype.canLoadFile = function (file) {
+    return file.type.match("image.*");
+};
+
+/**
+ * Check if the loader can load the provided url.
+ * @param {String} url The url to check.
+ * @return True if the url can be loaded.
+ */
+dwv.io.RawImageLoader.prototype.canLoadUrl = function (url) {
+    var ext = url.split('.').pop().toLowerCase();
+    var hasImageExt = (ext === "jpeg") || (ext === "jpg") ||
+            (ext === "png") || (ext === "gif");
+    // wado url
+    var isImageContentType = (url.indexOf("contentType=image/jpeg") !== -1) ||
+        (url.indexOf("contentType=image/png") !== -1) ||
+        (url.indexOf("contentType=image/gif") !== -1);
+
+    return isImageContentType || hasImageExt;
+};
+
+/**
+ * Get the file content type needed by the loader.
+ * @return One of the 'dwv.io.fileContentTypes'.
+ */
+dwv.io.RawImageLoader.prototype.loadFileAs = function () {
+    return dwv.io.fileContentTypes.DataURL;
+};
+
+/**
+ * Get the url content type needed by the loader.
+ * @return One of the 'dwv.io.urlContentTypes'.
+ */
+dwv.io.RawImageLoader.prototype.loadUrlAs = function () {
+    return dwv.io.urlContentTypes.ArrayBuffer;
+};
+
+/**
+ * Handle a load event.
+ * @param {Object} event The load event, 'event.target'
+ *  should be the loaded data.
+ * Default does nothing.
+ */
+dwv.io.RawImageLoader.prototype.onload = function (/*event*/) {};
+/**
+ * Handle an load end event.
+ * Default does nothing.
+ */
+dwv.io.RawImageLoader.prototype.onloadend = function () {};
+/**
+ * Handle an error event.
+ * @param {Object} event The error event, 'event.message'
+ *  should be the error message.
+ * Default does nothing.
+ */
+dwv.io.RawImageLoader.prototype.onerror = function (/*event*/) {};
+/**
+ * Handle a progress event.
+ * @param {Object} event The progress event.
+ * Default does nothing.
+ */
+dwv.io.RawImageLoader.prototype.onprogress = function (/*event*/) {};
+
+/**
+ * Add to Loader list.
+ */
+dwv.io.loaderList = dwv.io.loaderList || [];
+dwv.io.loaderList.push( "RawImageLoader" );
+
+// namespaces
+var dwv = dwv || {};
+dwv.io = dwv.io || {};
+
+/**
+ * Raw video loader.
+ * url example (cors enabled):
+ *   https://raw.githubusercontent.com/clappr/clappr/master/test/fixtures/SampleVideo_360x240_1mb.mp4
+ */
+dwv.io.RawVideoLoader = function ()
+{
+    // closure to self
+    var self = this;
+
+    /**
+     * Set the loader options.
+     * @param {Object} opt The input options.
+     */
+    this.setOptions = function () {
+        // does nothing
+    };
+
+    /**
+     * Create a Data URI from an HTTP request response.
+     * @param {Object} response The HTTP request response.
+     * @param {String} dataType The data type.
+     */
+    function createDataUri(response, dataType) {
+        // image data as string
+        var bytes = new Uint8Array(response);
+        var videoDataStr = '';
+        for( var i = 0; i < bytes.byteLength; ++i ) {
+            videoDataStr += String.fromCharCode(bytes[i]);
+        }
+        // create uri
+        var uri = "data:video/" + dataType + ";base64," + window.btoa(videoDataStr);
+        return uri;
+    }
+
+    /**
+     * Internal Data URI load.
+     * @param {Object} dataUri The data URI.
+     * @param {String} origin The data origin.
+     * @param {Number} index The data index.
+     */
+    this.load = function ( dataUri, origin, index ) {
+        // create a DOM video
+        var video = document.createElement('video');
+        video.src = dataUri;
+        // storing values to pass them on
+        video.file = origin;
+        video.index = index;
+        // onload handler
+        video.onloadedmetadata = function (/*event*/) {
+            try {
+                dwv.image.getViewFromDOMVideo(this,
+                    self.onload, self.onprogress, self.onloadend, index);
+            } catch (error) {
+                self.onerror(error);
+            }
+        };
+    };
+
+    /**
+     * Get a file load handler.
+     * @param {Object} file The file to load.
+     * @param {Number} index The index 'id' of the file.
+     * @return {Function} A file load handler.
+     */
+    this.getFileLoadHandler = function (file, index) {
+        return function (event) {
+            self.load(event.target.result, file, index);
+        };
+    };
+
+    /**
+     * Get a url load handler.
+     * @param {String} url The url to load.
+     * @param {Number} index The index 'id' of the url.
+     * @return {Function} A url load handler.
+     */
+    this.getUrlLoadHandler = function (url, index) {
+        return function (/*event*/) {
+            // check response status
+            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
+            // status 200: "OK"; status 0: "debug"
+            if (this.status !== 200 && this.status !== 0) {
+                self.onerror({'name': "RequestError",
+                    'message': "Error status: " + this.status +
+                    " while loading '" + url + "' [RawVideoLoader]" });
+                return;
+            }
+            // load
+            var ext = url.split('.').pop().toLowerCase();
+            self.load(createDataUri(this.response, ext), url, index);
+        };
+    };
+
+    /**
+     * Get an error handler.
+     * @param {String} origin The file.name/url at the origin of the error.
+     * @return {Function} An error handler.
+     */
+    this.getErrorHandler = function (origin) {
+        return function (event) {
+            var message = "";
+            if (typeof event.getMessage !== "undefined") {
+                message = event.getMessage();
+            } else if (typeof this.status !== "undefined") {
+                message = "http status: " + this.status;
+            }
+            self.onerror( {'name': "RequestError",
+                'message': "An error occurred while reading '" + origin +
+                "' (" + message + ") [RawVideoLoader]" } );
+        };
+    };
+
+}; // class RawVideoLoader
+
+/**
+ * Check if the loader can load the provided file.
+ * @param {Object} file The file to check.
+ * @return True if the file can be loaded.
+ */
+dwv.io.RawVideoLoader.prototype.canLoadFile = function (file) {
+    return file.type.match("video.*");
+};
+
+/**
+ * Check if the loader can load the provided url.
+ * @param {String} url The url to check.
+ * @return True if the url can be loaded.
+ */
+dwv.io.RawVideoLoader.prototype.canLoadUrl = function (url) {
+    var ext = url.split('.').pop().toLowerCase();
+    return (ext === "mp4") || (ext === "ogg") ||
+            (ext === "webm");
+};
+
+/**
+ * Get the file content type needed by the loader.
+ * @return One of the 'dwv.io.fileContentTypes'.
+ */
+dwv.io.RawVideoLoader.prototype.loadFileAs = function () {
+    return dwv.io.fileContentTypes.DataURL;
+};
+
+/**
+ * Get the url content type needed by the loader.
+ * @return One of the 'dwv.io.urlContentTypes'.
+ */
+dwv.io.RawVideoLoader.prototype.loadUrlAs = function () {
+    return dwv.io.urlContentTypes.ArrayBuffer;
+};
+
+/**
+ * Handle a load event.
+ * @param {Object} event The load event, 'event.target'
+ *  should be the loaded data.
+ * Default does nothing.
+ */
+dwv.io.RawVideoLoader.prototype.onload = function (/*event*/) {};
+/**
+ * Handle an load end event.
+ * Default does nothing.
+ */
+dwv.io.RawVideoLoader.prototype.onloadend = function () {};
+/**
+ * Handle an error event.
+ * @param {Object} event The error event, 'event.message'
+ *  should be the error message.
+ * Default does nothing.
+ */
+dwv.io.RawVideoLoader.prototype.onerror = function (/*event*/) {};
+/**
+ * Handle a progress event.
+ * @param {Object} event The progress event.
+ * Default does nothing.
+ */
+dwv.io.RawVideoLoader.prototype.onprogress = function (/*event*/) {};
+
+/**
+ * Add to Loader list.
+ */
+dwv.io.loaderList = dwv.io.loaderList || [];
+dwv.io.loaderList.push( "RawVideoLoader" );
+
+// namespaces
+var dwv = dwv || {};
+dwv.io = dwv.io || {};
+
+// url content types
+dwv.io.urlContentTypes = {
+    'Text': 0,
+    'ArrayBuffer': 1,
+    'oups': 2
+};
+
+/**
+ * Urls loader.
+ * @constructor
+ */
+dwv.io.UrlsLoader = function ()
+{
+    /**
+     * Closure to self.
+     * @private
+     * @type Object
+     */
+    var self = this;
+
+    /**
+     * Number of data to load.
+     * @private
+     * @type Number
+     */
+    var nToLoad = 0;
+    /**
+     * Number of loaded data.
+     * @private
+     * @type Number
+     */
+    var nLoaded = 0;
+
+    /**
+     * The default character set (optional).
+     * @private
+     * @type String
+     */
+    var defaultCharacterSet;
+
+    /**
+     * Get the default character set.
+     * @return {String} The default character set.
+     */
+    this.getDefaultCharacterSet = function () {
+        return defaultCharacterSet;
+    };
+
+    /**
+     * Set the default character set.
+     * @param {String} characterSet The character set.
+     */
+    this.setDefaultCharacterSet = function (characterSet) {
+        defaultCharacterSet = characterSet;
+    };
+
+    /**
+     * Set the number of data to load.
+     * @param {Number} n The number of data to load.
+     */
+    this.setNToLoad = function (n) {
+        nToLoad = n;
+    };
+
+    /**
+     * Increment the number of loaded data
+     * and call onloadend if loaded all data.
+     */
+    this.addLoaded = function () {
+        nLoaded++;
+        if ( nLoaded === nToLoad ) {
+            self.onloadend();
         }
     };
+
+}; // class Url
+
+/**
+ * Handle a load event.
+ * @param {Object} event The load event, 'event.target'
+ *  should be the loaded data.
+ * Default does nothing.
+ */
+dwv.io.UrlsLoader.prototype.onload = function (/*event*/) {};
+/**
+ * Handle a load end event.
+ * Default does nothing.
+ */
+dwv.io.UrlsLoader.prototype.onloadend = function () {};
+/**
+ * Handle a progress event.
+ * @param {Object} event The progress event.
+ * Default does nothing.
+ */
+dwv.io.UrlsLoader.prototype.onprogress = function (/*event*/) {};
+/**
+ * Handle an error event.
+ * @param {Object} event The error event, 'event.message'
+ *  should be the error message.
+ * Default does nothing.
+ */
+dwv.io.UrlsLoader.prototype.onerror = function (/*event*/) {};
+
+/**
+ * Load a list of URLs.
+ * @param {Array} ioArray The list of urls to load.
+ * @param {Object} options Load options.
+ * @external XMLHttpRequest
+ */
+dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
+{
+    // closure to self for handlers
+    var self = this;
+    // set the number of data to load
+    this.setNToLoad( ioArray.length );
+
+    var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
+    mproghandler.setNToLoad( ioArray.length );
+
+    // get loaders
+    var loaders = [];
+    for (var m = 0; m < dwv.io.loaderList.length; ++m) {
+        loaders.push( new dwv.io[dwv.io.loaderList[m]]() );
+    }
+
+    // set loaders callbacks
+    var loader = null;
+    for (var k = 0; k < loaders.length; ++k) {
+        loader = loaders[k];
+        loader.onload = self.onload;
+        loader.onloadend = self.addLoaded;
+        loader.onerror = self.onerror;
+        loader.setOptions({
+            'defaultCharacterSet': this.getDefaultCharacterSet()
+        });
+        loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
+    }
 
     // loop on I/O elements
     for (var i = 0; i < ioArray.length; ++i)
     {
         var url = ioArray[i];
-        // read as text according to extension
-        var isText = ( url.split('.').pop().toLowerCase() === "json" );
-
         var request = new XMLHttpRequest();
         request.open('GET', url, true);
-        if ( typeof requestHeaders !== "undefined" ) {
+
+        // optional request headers
+        if ( typeof options.requestHeaders !== "undefined" ) {
+            var requestHeaders = options.requestHeaders;
             for (var j = 0; j < requestHeaders.length; ++j) {
                 if ( typeof requestHeaders[j].name !== "undefined" &&
                     typeof requestHeaders[j].value !== "undefined" ) {
@@ -15756,19 +16861,234 @@ dwv.io.Url.prototype.load = function (ioArray, requestHeaders)
                 }
             }
         }
-        if ( !isText ) {
-            request.responseType = "arraybuffer";
-            request.onload = onLoadBinaryBuffer;
-            request.onerror = dwv.io.Url.createErrorHandler(url, "binary", self.onerror);
+
+        // bind reader progress
+        request.onprogress = mproghandler.getMonoProgressHandler(i, 0);
+        request.onloadend = mproghandler.getMonoOnLoadEndHandler(i, 0);
+
+        // find a loader
+        var foundLoader = false;
+        for (var l = 0; l < loaders.length; ++l) {
+            loader = loaders[l];
+            if (loader.canLoadUrl(url)) {
+                foundLoader = true;
+                // set reader callbacks
+                request.onload = loader.getUrlLoadHandler(url, i);
+                request.onerror = loader.getErrorHandler(url);
+                // response type (default is 'text')
+                if (loader.loadUrlAs() === dwv.io.urlContentTypes.ArrayBuffer) {
+                    request.responseType = "arraybuffer";
+                }
+                // read
+                request.send(null);
+                // next file
+                break;
+            }
         }
-        else {
-            request.onload = onLoadTextBuffer;
-            request.onerror = dwv.io.Url.createErrorHandler(url, "text", self.onerror);
+        // TODO: throw?
+        if (!foundLoader) {
+            throw new Error("No loader found for url: "+url);
         }
-        request.onprogress = dwv.io.Url.createLoadProgressHandler(i, self.onLoadProgress);
-        request.send(null);
     }
 };
+
+// namespaces
+var dwv = dwv || {};
+dwv.io = dwv.io || {};
+// external
+var JSZip = JSZip || {};
+
+/**
+ * ZIP data loader.
+ */
+dwv.io.ZipLoader = function ()
+{
+    // closure to self
+    var self = this;
+
+    /**
+     * Loader options.
+     * @private
+     * @type Object
+     */
+    var options = {};
+
+    /**
+     * Set the loader options.
+     * @param {Object} opt The input options.
+     */
+    this.setOptions = function (opt) {
+        options = opt;
+    };
+
+    var filename = "";
+    var files = [];
+    var zobjs = null;
+
+    /**
+     * JSZip.async callback
+     * @param {ArrayBuffer} content unzipped file image
+     * @return {}
+     */
+    function zipAsyncCallback(content)
+    {
+    	files.push({"filename": filename, "data": content});
+
+    	if (files.length < zobjs.length){
+    		var num = files.length;
+    		filename = zobjs[num].name;
+    		zobjs[num].async("arrayBuffer").then(zipAsyncCallback);
+    	}
+    	else {
+            var memoryIO = new dwv.io.MemoryLoader();
+            memoryIO.onload = self.onload;
+            memoryIO.onloadend = self.onloadend;
+            memoryIO.onerror = self.onerror;
+            memoryIO.onprogress = self.onprogress;
+
+            memoryIO.load(files);
+        }
+    }
+
+    /**
+     * Load data.
+     * @param {Object} buffer The DICOM buffer.
+     * @param {String} origin The data origin.
+     * @param {Number} index The data index.
+     */
+    this.load = function (buffer/*, origin, index*/) {
+        JSZip.loadAsync(buffer).then( function(zip) {
+            files = [];
+        	zobjs = zip.file(/.*\.dcm/);
+            // recursively load zip files into the files array
+        	var num = files.length;
+        	filename = zobjs[num].name;
+        	zobjs[num].async("arrayBuffer").then(zipAsyncCallback);
+        });
+    };
+
+    /**
+     * Get a file load handler.
+     * @param {Object} file The file to load.
+     * @param {Number} index The index 'id' of the file.
+     * @return {Function} A file load handler.
+     */
+    this.getFileLoadHandler = function (file, index) {
+        return function (event) {
+            self.load(event.target.result, file, index);
+        };
+    };
+
+    /**
+     * Get a url load handler.
+     * @param {String} url The url to load.
+     * @param {Number} index The index 'id' of the url.
+     * @return {Function} A url load handler.
+     */
+    this.getUrlLoadHandler = function (url, index) {
+        return function (/*event*/) {
+            // check response status
+            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
+            // status 200: "OK"; status 0: "debug"
+            if (this.status !== 200 && this.status !== 0) {
+                self.onerror({'name': "RequestError",
+                    'message': "Error status: " + this.status +
+                    " while loading '" + url + "' [ZipLoader]" });
+                return;
+            }
+            // load
+            self.load(this.response, url, index);
+        };
+    };
+
+    /**
+     * Get an error handler.
+     * @param {String} origin The file.name/url at the origin of the error.
+     * @return {Function} An error handler.
+     */
+    this.getErrorHandler = function (origin) {
+        return function (event) {
+            var message = "";
+            if (typeof event.getMessage !== "undefined") {
+                message = event.getMessage();
+            } else if (typeof this.status !== "undefined") {
+                message = "http status: " + this.status;
+            }
+            self.onerror( {'name': "RequestError",
+                'message': "An error occurred while reading '" + origin +
+                "' (" + message + ") [ZipLoader]" } );
+        };
+    };
+
+}; // class DicomDataLoader
+
+/**
+ * Check if the loader can load the provided file.
+ * @param {Object} file The file to check.
+ * @return True if the file can be loaded.
+ */
+dwv.io.ZipLoader.prototype.canLoadFile = function (file) {
+    var ext = file.name.split('.').pop().toLowerCase();
+    return (ext === "zip");
+};
+
+/**
+ * Check if the loader can load the provided url.
+ * @param {String} url The url to check.
+ * @return True if the url can be loaded.
+ */
+dwv.io.ZipLoader.prototype.canLoadUrl = function (url) {
+    var ext = url.split('.').pop().toLowerCase();
+    return (ext === "zip");
+};
+
+/**
+ * Get the file content type needed by the loader.
+ * @return One of the 'dwv.io.fileContentTypes'.
+ */
+dwv.io.ZipLoader.prototype.loadFileAs = function () {
+    return dwv.io.fileContentTypes.ArrayBuffer;
+};
+
+/**
+ * Get the url content type needed by the loader.
+ * @return One of the 'dwv.io.urlContentTypes'.
+ */
+dwv.io.ZipLoader.prototype.loadUrlAs = function () {
+    return dwv.io.urlContentTypes.ArrayBuffer;
+};
+
+/**
+ * Handle a load event.
+ * @param {Object} event The load event, 'event.target'
+ *  should be the loaded data.
+ * Default does nothing.
+ */
+dwv.io.ZipLoader.prototype.onload = function (/*event*/) {};
+/**
+ * Handle an load end event.
+ * Default does nothing.
+ */
+dwv.io.ZipLoader.prototype.onloadend = function () {};
+/**
+ * Handle an error event.
+ * @param {Object} event The error event, 'event.message'
+ *  should be the error message.
+ * Default does nothing.
+ */
+dwv.io.ZipLoader.prototype.onerror = function (/*event*/) {};
+/**
+ * Handle a progress event.
+ * @param {Object} event The progress event.
+ * Default does nothing.
+ */
+dwv.io.ZipLoader.prototype.onprogress = function (/*event*/) {};
+
+/**
+ * Add to Loader list.
+ */
+dwv.io.loaderList = dwv.io.loaderList || [];
+dwv.io.loaderList.push( "ZipLoader" );
 
 // namespaces
 var dwv = dwv || {};
@@ -16760,6 +18080,22 @@ var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
 /**
+ * Mulitply the three inputs if the last two are not null.
+ * @param {Number} a The first input.
+ * @param {Number} b The second input.
+ * @param {Number} c The third input.
+ * @return {Number} The multiplication of the three inputs or
+ *  null if one of the last two is null.
+ */
+function mulABC( a, b, c) {
+    var res = null;
+    if (b !== null && c !== null) {
+        res = a * b * c;
+    }
+    return res;
+}
+
+/**
  * Circle shape.
  * @constructor
  * @param {Object} centre A Point2D representing the centre of the circle.
@@ -16790,14 +18126,15 @@ dwv.math.Circle = function(centre, radius)
      */
     this.getSurface = function() { return surface; };
     /**
-     * Get the surface of the circle with a spacing.
+     * Get the surface of the circle according to a spacing.
      * @param {Number} spacingX The X spacing.
      * @param {Number} spacingY The Y spacing.
-     * @return {Number} The surface of the circle multiplied by the given spacing.
+     * @return {Number} The surface of the circle multiplied by the given
+     *  spacing or null for null spacings.
      */
     this.getWorldSurface = function(spacingX, spacingY)
     {
-        return surface * spacingX * spacingY;
+        return mulABC(surface, spacingX, spacingY);
     };
 }; // Circle class
 
@@ -16838,14 +18175,15 @@ dwv.math.Ellipse = function(centre, a, b)
      */
     this.getSurface = function() { return surface; };
     /**
-     * Get the surface of the ellipse with a spacing.
+     * Get the surface of the ellipse according to a spacing.
      * @param {Number} spacingX The X spacing.
      * @param {Number} spacingY The Y spacing.
-     * @return {Number} The surface of the ellipse multiplied by the given spacing.
+     * @return {Number} The surface of the ellipse multiplied by the given
+     *  spacing or null for null spacings.
      */
     this.getWorldSurface = function(spacingX, spacingY)
     {
-        return surface * spacingX * spacingY;
+        return mulABC(surface, spacingX, spacingY);
     };
 }; // Circle class
 
@@ -16902,16 +18240,21 @@ dwv.math.Line = function(begin, end)
      */
     this.getLength = function() { return length; };
     /**
-     * Get the length of the line with spacing.
+     * Get the length of the line according to a  spacing.
      * @param {Number} spacingX The X spacing.
      * @param {Number} spacingY The Y spacing.
-     * @return {Number} The length of the line with spacing.
+     * @return {Number} The length of the line with spacing
+     *  or null for null spacings.
      */
     this.getWorldLength = function(spacingX, spacingY)
     {
-        var dxs = dx * spacingX;
-        var dys = dy * spacingY;
-        return Math.sqrt( dxs * dxs + dys * dys );
+        var wlen = null;
+        if (spacingX !== null && spacingY !== null) {
+            var dxs = dx * spacingX;
+            var dys = dy * spacingY;
+            wlen = Math.sqrt( dxs * dxs + dys * dys );
+        }
+        return wlen;
     };
     /**
      * Get the mid point of the line.
@@ -17091,12 +18434,15 @@ dwv.math.Rectangle = function(begin, end)
      */
     this.getSurface = function() { return surface; };
     /**
-     * Get the surface of the rectangle with a spacing.
-     * @return {Number} The surface of the rectangle with a spacing.
+     * Get the surface of the circle according to a spacing.
+     * @param {Number} spacingX The X spacing.
+     * @param {Number} spacingY The Y spacing.
+     * @return {Number} The surface of the rectangle multiplied by the given
+     *  spacing or null for null spacings.
      */
     this.getWorldSurface = function(spacingX, spacingY)
     {
-        return surface * spacingX * spacingY;
+        return mulABC(surface, spacingX, spacingY);
     };
 }; // Rectangle class
 
@@ -21158,6 +22504,7 @@ dwv.tool.Scroll = function(app)
     this.touchstart = function(event){
         // long touch triggers the dblclick
         touchTimerID = setTimeout(self.dblclick, 500);
+        // call mouse equivalent
         self.mousedown(event);
     };
 
@@ -21166,6 +22513,12 @@ dwv.tool.Scroll = function(app)
      * @param {Object} event The touch move event.
      */
     this.touchmove = function(event){
+        // abort timer if move
+        if (touchTimerID !== null) {
+            clearTimeout(touchTimerID);
+            touchTimerID = null;
+        }
+        // call mouse equivalent
         self.mousemove(event);
     };
 
@@ -21174,10 +22527,12 @@ dwv.tool.Scroll = function(app)
      * @param {Object} event The touch end event.
      */
     this.touchend = function(event){
+        // abort timer
         if (touchTimerID !== null) {
             clearTimeout(touchTimerID);
             touchTimerID = null;
         }
+        // call mouse equivalent
         self.mouseup(event);
     };
 
@@ -21267,7 +22622,7 @@ dwv.tool.Scroll = function(app)
      * Initialise the tool.
      */
     this.init = function() {
-        if ( app.getNSlicesToLoad() === 1 && app.getImage().getNumberOfFrames() === 1 ) {
+        if ( app.isMonoSliceData() && app.getImage().getNumberOfFrames() === 1 ) {
             return false;
         }
         return true;
@@ -21994,9 +23349,12 @@ dwv.tool.ZoomAndPan.prototype.init = function() {
 var dwv = dwv || {};
 /** @namespace */
 dwv.browser = dwv.browser || {};
+// external
+var Modernizr = Modernizr || {};
 
 /**
  * Browser check for the FileAPI.
+ * Assume support for Safari5.
  */
 dwv.browser.hasFileApi = function()
 {
@@ -22011,7 +23369,7 @@ dwv.browser.hasFileApi = function()
         return true;
     }
     // regular test
-    return "FileReader" in window;
+    return Modernizr.filereader;
 };
 
 /**
@@ -22019,7 +23377,9 @@ dwv.browser.hasFileApi = function()
  */
 dwv.browser.hasXmlHttpRequest = function()
 {
-    return "XMLHttpRequest" in window && "withCredentials" in new XMLHttpRequest();
+    return Modernizr.xhrresponsetype &&
+        Modernizr.xhrresponsetypearraybuffer && Modernizr.xhrresponsetypetext &&
+        "XMLHttpRequest" in window && "withCredentials" in new XMLHttpRequest();
 };
 
 /**
@@ -22027,7 +23387,16 @@ dwv.browser.hasXmlHttpRequest = function()
  */
 dwv.browser.hasTypedArray = function()
 {
-    return "Uint8Array" in window && "Uint16Array" in window;
+    return Modernizr.dataview && Modernizr.typedarrays;
+};
+
+/**
+ * Browser check for input with type='color'.
+ * Missing in IE and Safari.
+ */
+dwv.browser.hasInputColor = function()
+{
+    return Modernizr.inputtypes.color;
 };
 
 //only check at startup (since we propose a replacement)
@@ -22059,7 +23428,7 @@ dwv.browser._hasClampedArray = ("Uint8ClampedArray" in window);
 
 /**
  * Browser check for clamped array.
- * Missing in
+ * Missing in:
  * - Safari 5.1.7 for Windows
  * - PhantomJS 1.9.20 (on Travis).
  */
@@ -22069,28 +23438,14 @@ dwv.browser.hasClampedArray = function()
 };
 
 /**
- * Browser check for input with type='color'.
- * Missing in IE 11.
- */
-dwv.browser.hasInputColor = function()
-{
-    var caughtException = false;
-    var colorInput = document.createElement("input");
-    try {
-        colorInput.type = "color";
-    } catch (error) {
-        caughtException = true;
-    }
-    return !caughtException;
-};
-
-/**
  * Browser checks to see if it can run dwv. Throws an error if not.
  * Silently replaces basic functions.
- * @todo Maybe use {@link http://modernizr.com/}.
  */
 dwv.browser.check = function()
 {
+
+    // Required --------------
+
     var appnorun = "The application cannot be run.";
     var message = "";
     // Check for the File API support
@@ -22111,6 +23466,9 @@ dwv.browser.check = function()
         alert(message+appnorun);
         throw new Error(message);
     }
+
+    // Replaced if not present ------------
+
     // Check typed array slice
     if( !dwv.browser.hasTypedArraySlice() ) {
         // silent fail with warning
@@ -22180,6 +23538,9 @@ var i18nextBrowserLanguageDetector = i18nextBrowserLanguageDetector || {};
 // This is mainly a wrapper around the i18next object.
 // see its API: http://i18next.com/docs/api/
 
+// global locales path
+dwv.i18nLocalesPath = null;
+
 /**
  * Initialise i18n.
  * @param {String} language The language to translate to. Defaults to 'auto' and
@@ -22193,6 +23554,8 @@ dwv.i18nInitialise = function (language, localesPath)
 {
     var lng = (typeof language === "undefined") ? "auto" : language;
     var lpath = (typeof localesPath === "undefined") ? "../.." : localesPath;
+    // store as global
+    dwv.i18nLocalesPath = lpath;
     // i18n options: default 'en' language and
     //  only load language, not specialised (for ex en-GB)
     var options = {
@@ -22285,6 +23648,157 @@ dwv.i18nPage = function () {
     }
 };
 
+/**
+ * Get the current locale resource path.
+ * Warning: to be used once i18next is initialised.
+ * @return {String} The path to the locale resource.
+ */
+dwv.i18nGetLocalePath = function (filename) {
+    var lng = i18next.language.substr(0, 2);
+    return dwv.i18nLocalesPath +
+        "/locales/" + lng + "/" + filename;
+};
+
+/**
+ * Get the current locale resource path.
+ * Warning: to be used once i18next is initialised.
+ * @return {String} The path to the locale resource.
+ */
+dwv.i18nGetFallbackLocalePath = function (filename) {
+    var lng = i18next.languages[i18next.languages.length-1].substr(0, 2);
+    return dwv.i18nLocalesPath +
+        "/locales/" + lng + "/" + filename;
+};
+
+// namespaces
+var dwv = dwv || {};
+dwv.utils = dwv.utils || {};
+
+/**
+ * Multiple progresses handler.
+ * Stores a multi dimensional list of progresses to allow to
+ * calculate a global progress.
+ * @param {Function} callback The function to pass the global progress to.
+ */
+dwv.utils.MultiProgressHandler = function (callback)
+{
+    // closure to self
+    var self = this;
+
+    /**
+     * List of progresses.
+     * @private
+     * @type Array
+     */
+    var progresses = [];
+
+    /**
+     * Number of dimensions.
+     * @private
+     * @type Number
+     */
+    var numberOfDimensions = 2;
+
+    /**
+     * Set the number of dimensions.
+     * @param {Number} num The number.
+     */
+    this.setNumberOfDimensions = function (num) {
+        numberOfDimensions = num;
+    };
+
+    /**
+     * Set the number of data to load.
+     * @param {Number} n The number of data to load.
+     */
+    this.setNToLoad = function (n) {
+        for ( var i = 0; i < n; ++i ) {
+            progresses[i] = [];
+            for ( var j = 0; j < numberOfDimensions; ++j ) {
+                progresses[i][j] = 0;
+            }
+        }
+    };
+
+    /**
+     * Handle a load progress.
+     * @param {Object} event The progress event.
+     */
+    this.onprogress = function (event) {
+        // check event
+        if ( !event.lengthComputable ) {
+            return;
+        }
+        if ( typeof event.subindex === "undefined" ) {
+            return;
+        }
+        if ( typeof event.index === "undefined" ) {
+            return;
+        }
+        // calculate percent
+        var percent = (event.loaded * 100) / event.total;
+        // set percent for index
+        progresses[event.index][event.subindex] = percent;
+
+        // call callback
+        callback({'type': event.type, 'lengthComputable': true,
+            'loaded': getGlobalPercent(), 'total': 100});
+    };
+
+    /**
+     * Get the global load percent including the provided one.
+     * @return {Number} The accumulated percentage.
+     */
+    function getGlobalPercent() {
+        var sum = 0;
+        var lenprog = progresses.length;
+        for ( var i = 0; i < lenprog; ++i ) {
+            for ( var j = 0; j < numberOfDimensions; ++j ) {
+                sum += progresses[i][j];
+            }
+        }
+        return Math.round( sum / (lenprog * numberOfDimensions) );
+    }
+
+    /**
+     * Create a mono progress event handler.
+     * @param {Number} index The index of the data.
+     * @param {Number} subindex The sub-index of the data.
+     */
+    this.getMonoProgressHandler = function (index, subindex) {
+        return function (event) {
+            event.index = index;
+            event.subindex = subindex;
+            self.onprogress(event);
+        };
+    };
+
+    /**
+     * Create a mono loadend event handler: sends a 100% progress.
+     * @param {Number} index The index of the data.
+     * @param {Number} subindex The sub-index of the data.
+     */
+    this.getMonoOnLoadEndHandler = function (index, subindex) {
+        return function () {
+            self.onprogress({'type': 'load-progress', 'lengthComputable': true,
+                'loaded': 100, 'total': 100,
+                'index': index, 'subindex': subindex});
+        };
+    };
+
+    /**
+     * Create a mono progress event handler with an undefined index.
+     * Warning: The caller handles the progress index.
+     * @param {Number} subindex The sub-index of the data.
+     */
+    this.getUndefinedMonoProgressHandler = function (subindex) {
+        return function (event) {
+            event.subindex = subindex;
+            self.onprogress(event);
+        };
+    };
+};
+
 // namespaces
 var dwv = dwv || {};
 /** @namespace */
@@ -22368,7 +23882,7 @@ dwv.utils.replaceFlags = function (inputStr, values)
     for (var i = 0; i < keys.length; ++i) {
         var valueObj = values[keys[i]];
         if ( valueObj !== null && typeof valueObj !== "undefined" &&
-             valueObj.value !== null && typeof valueObj.value !== "undefined") {
+            valueObj.value !== null && typeof valueObj.value !== "undefined") {
             // value string
             var valueStr = valueObj.value.toPrecision(4);
             // add unit if available
@@ -22388,6 +23902,38 @@ dwv.utils.replaceFlags = function (inputStr, values)
         }
     }
     // return
+    return res;
+};
+
+/**
+ * Replace flags in a input string. Flags are keywords surrounded with curly
+ * braces.
+ * @param {String} inputStr The input string.
+ * @param {Array} values An array of strings.
+ * @example
+ *    var values = ["a", "b"];
+ *    var str = "The length is: {v0}. The size is: {v1}";
+ *    var res = dwv.utils.replaceFlags2(str, values); // "The length is: a. The size is: b"
+ * @return {String} The result string.
+ */
+dwv.utils.replaceFlags2 = function (inputStr, values)
+{
+    var res = inputStr;
+    for ( var j = 0; j < values.length; ++j ) {
+        res = res.replace("{v"+j+"}", values[j]);
+    }
+    return res;
+};
+
+dwv.utils.createDefaultReplaceFormat = function (values)
+{
+    var res = "";
+    for ( var j = 0; j < values.length; ++j ) {
+        if ( j !== 0 ) {
+            res += ", ";
+        }
+        res += "{v"+j+"}";
+    }
     return res;
 };
 
@@ -22734,7 +24280,7 @@ dwv.utils.decodeManifestQuery = function (query, callback)
 
     var request = new XMLHttpRequest();
     request.open('GET', decodeURIComponent(uri), true);
-    request.responseType = "xml";
+    request.responseType = "document";
     request.onload = onLoad;
     request.onerror = onError;
     request.send(null);
