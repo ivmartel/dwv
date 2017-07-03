@@ -113,15 +113,20 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         isLittleEndian = true;
     }
 
-    // Default text encoding
-    var utfLabel = "iso-8859-1";
+    // Default text decoder
+    var textDecoder = null;
+    if (typeof window.TextDecoder !== "undefined") {
+        textDecoder = new TextDecoder("iso-8859-1");
+    }
 
     /**
      * Set the utfLabel used to construct the TextDecoder.
      * @param {String} label The encoding label.
      */
     this.setUtfLabel = function (label) {
-        utfLabel = label;
+        if (typeof window.TextDecoder !== "undefined") {
+            textDecoder = new TextDecoder(label);
+        }
     };
 
     /**
@@ -379,11 +384,9 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      */
     function decodeString(buffer) {
         var result = "";
-        if (typeof window.TextDecoder !== "undefined") {
-            var td = new TextDecoder(utfLabel);
-            result = td.decode(buffer);
-        }
-        else {
+        if (textDecoder) {
+            result = textDecoder.decode(buffer);
+        } else {
             for ( var i = 0; i < buffer.length; ++i ) {
                 result += String.fromCharCode( buffer[ i ] );
             }
