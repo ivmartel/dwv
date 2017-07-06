@@ -114,7 +114,16 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
     }
 
     // Default text decoder
-    var textDecoder = null;
+    var defaultTextDecoder = {};
+    defaultTextDecoder.decode = function (buffer) {
+        var result = "";
+        for ( var i = 0, leni = buffer.length; i < leni; ++i ) {
+            result += String.fromCharCode( buffer[ i ] );
+        }
+        return result;
+    };
+    // Text decoder
+    var textDecoder = defaultTextDecoder;
     if (typeof window.TextDecoder !== "undefined") {
         textDecoder = new TextDecoder("iso-8859-1");
     }
@@ -380,21 +389,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
     };
 
     /**
-     * Decode an input string.
-     */
-    function decodeString(buffer) {
-        var result = "";
-        if (textDecoder) {
-            result = textDecoder.decode(buffer);
-        } else {
-            for ( var i = 0, leni = buffer.length; i < leni; ++i ) {
-                result += String.fromCharCode( buffer[ i ] );
-            }
-        }
-        return result;
-    }
-
-    /**
      * Read data as a string.
      * @param {Number} byteOffset The offset to start reading from.
      * @param {Number} nChars The number of characters to read.
@@ -402,8 +396,20 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      */
     this.readString = function (byteOffset, nChars) {
         var data = this.readUint8Array(byteOffset, nChars);
-        return decodeString(data);
+        return defaultTextDecoder.decode(data);
     };
+
+    /**
+     * Read data as a 'special' string, decoding it if the TextDecoder is available.
+     * @param {Number} byteOffset The offset to start reading from.
+     * @param {Number} nChars The number of characters to read.
+     * @return {String} The read data.
+     */
+    this.readSpecialString = function (byteOffset, nChars) {
+        var data = this.readUint8Array(byteOffset, nChars);
+        return textDecoder.decode(data);
+    };
+
 };
 
 /**
@@ -1141,7 +1147,12 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
     // raw
     else
     {
-        data = reader.readString( offset, vl);
+        if ( vr === "SH" || vr === "LO" || vr === "ST" ||
+            vr === "PN" || vr === "LT" || vr === "UT" ) {
+            data = reader.readSpecialString( offset, vl );
+        } else {
+            data = reader.readString( offset, vl );
+        }
         offset += vl;
         data = data.split("\\");
     }
