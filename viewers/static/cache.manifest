@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# v19 2017-06-25
+# v20 2017-07-08
 
 CACHE:
 
@@ -12,6 +12,9 @@ index.html
 applauncher.js
 appgui.js
 # images
+/dwv/demo/stable/resources/icons/dwv-16.png
+/dwv/demo/stable/resources/icons/dwv-60.png
+/dwv/demo/stable/resources/icons/dwv-128.png
 /dwv/demo/stable/resources/help/click.png
 /dwv/demo/stable/resources/help/double_click.png
 /dwv/demo/stable/resources/help/mouse_drag.png
