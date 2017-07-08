@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# v19 2017-06-25
+# v20 2017-07-08
 
 CACHE:
 
@@ -12,6 +12,9 @@ index.html
 applauncher.js
 appgui.js
 # images
+/dwv/demo/stable/resources/icons/dwv-16.png
+/dwv/demo/stable/resources/icons/dwv-60.png
+/dwv/demo/stable/resources/icons/dwv-128.png
 /dwv/demo/stable/resources/help/double_tap.png
 /dwv/demo/stable/resources/help/tap_and_hold.png
 /dwv/demo/stable/resources/help/tap.png
@@ -24,6 +27,12 @@ appgui.js
 /dwv/demo/stable/locales/fr/translation.json
 /dwv/demo/stable/locales/ru/translation.json
 /dwv/demo/stable/locales/zh/translation.json
+# overlays
+/dwv/demo/stable/locales/de/overlays.json
+/dwv/demo/stable/locales/en/overlays.json
+/dwv/demo/stable/locales/fr/overlays.json
+/dwv/demo/stable/locales/ru/overlays.json
+/dwv/demo/stable/locales/zh/overlays.json
 
 # third party
 
@@ -40,13 +49,21 @@ appgui.js
 /dwv/demo/stable/ext/jquery-mobile/images/icons-png/back-white.png
 /dwv/demo/stable/ext/jquery-mobile/images/icons-png/info-white.png
 /dwv/demo/stable/ext/jquery-mobile/images/icons-png/grid-black.png
-# js
-/dwv/demo/stable/ext/jquery/jquery-2.1.4.min.js
-/dwv/demo/stable/ext/jquery-mobile/jquery.mobile-1.4.5.min.js
-/dwv/demo/stable/ext/jquery-mobile/jquery.mobile-1.4.5.min.map
+# js: dwv
+/dwv/demo/stable/ext/modernizr/modernizr.js
 /dwv/demo/stable/ext/i18next/i18next.min.js
 /dwv/demo/stable/ext/i18next/i18nextXHRBackend.min.js
 /dwv/demo/stable/ext/i18next/i18nextBrowserLanguageDetector.min.js
+/dwv/demo/stable/ext/konva/konva-1.6.0.min.js
+/dwv/demo/stable/ext/magic-wand/magic-wand.js
+/dwv/demo/stable/ext/jszip/jszip.min.js
+# js: viewer
+/dwv/demo/stable/ext/jquery/jquery-2.1.4.min.js
+/dwv/demo/stable/ext/jquery-mobile/jquery.mobile-1.4.5.min.js
+/dwv/demo/stable/ext/jquery-mobile/jquery.mobile-1.4.5.min.map
+/dwv/demo/stable/ext/nprogress/nprogress.js
+/dwv/demo/stable/ext/flot/jquery.flot.min.js
+# js: decoders
 /dwv/demo/stable/ext/pdfjs/jpx.js
 /dwv/demo/stable/ext/pdfjs/arithmetic_decoder.js
 /dwv/demo/stable/ext/pdfjs/decode-jpeg2000.js
@@ -55,8 +72,6 @@ appgui.js
 /dwv/demo/stable/ext/pdfjs/decode-jpegbaseline.js
 /dwv/demo/stable/ext/rii-mango/lossless-min.js
 /dwv/demo/stable/ext/rii-mango/decode-jpegloss.js
-/dwv/demo/stable/ext/konva/konva-1.6.0.min.js
-/dwv/demo/stable/ext/magic-wand/magic-wand.js
 
 NETWORK:
 *
