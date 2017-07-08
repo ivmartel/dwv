@@ -137,7 +137,7 @@ dwv.App = function ()
      * Get the version of the application.
      * @return {String} The version of the application.
      */
-    this.getVersion = function () { return "v0.20.0"; };
+    this.getVersion = function () { return "v0.20.1"; };
 
     /**
      * Get the image.
@@ -2704,15 +2704,29 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         isLittleEndian = true;
     }
 
-    // Default text encoding
-    var utfLabel = "iso-8859-1";
+    // Default text decoder
+    var defaultTextDecoder = {};
+    defaultTextDecoder.decode = function (buffer) {
+        var result = "";
+        for ( var i = 0, leni = buffer.length; i < leni; ++i ) {
+            result += String.fromCharCode( buffer[ i ] );
+        }
+        return result;
+    };
+    // Text decoder
+    var textDecoder = defaultTextDecoder;
+    if (typeof window.TextDecoder !== "undefined") {
+        textDecoder = new TextDecoder("iso-8859-1");
+    }
 
     /**
      * Set the utfLabel used to construct the TextDecoder.
      * @param {String} label The encoding label.
      */
     this.setUtfLabel = function (label) {
-        utfLabel = label;
+        if (typeof window.TextDecoder !== "undefined") {
+            textDecoder = new TextDecoder(label);
+        }
     };
 
     /**
@@ -2966,23 +2980,6 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
     };
 
     /**
-     * Decode an input string.
-     */
-    function decodeString(buffer) {
-        var result = "";
-        if (typeof window.TextDecoder !== "undefined") {
-            var td = new TextDecoder(utfLabel);
-            result = td.decode(buffer);
-        }
-        else {
-            for ( var i = 0; i < buffer.length; ++i ) {
-                result += String.fromCharCode( buffer[ i ] );
-            }
-        }
-        return result;
-    }
-
-    /**
      * Read data as a string.
      * @param {Number} byteOffset The offset to start reading from.
      * @param {Number} nChars The number of characters to read.
@@ -2990,8 +2987,20 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
      */
     this.readString = function (byteOffset, nChars) {
         var data = this.readUint8Array(byteOffset, nChars);
-        return decodeString(data);
+        return defaultTextDecoder.decode(data);
     };
+
+    /**
+     * Read data as a 'special' string, decoding it if the TextDecoder is available.
+     * @param {Number} byteOffset The offset to start reading from.
+     * @param {Number} nChars The number of characters to read.
+     * @return {String} The read data.
+     */
+    this.readSpecialString = function (byteOffset, nChars) {
+        var data = this.readUint8Array(byteOffset, nChars);
+        return textDecoder.decode(data);
+    };
+
 };
 
 /**
@@ -3677,7 +3686,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
         var raw = reader.readUint16Array( offset, vl );
         offset += vl;
         data = [];
-        for ( var i = 0; i < raw.length; i+=2 ) {
+        for ( var i = 0, leni = raw.length; i < leni; i+=2 ) {
             var stri = raw[i].toString(16);
             var stri1 = raw[i+1].toString(16);
             var str = "(";
@@ -3729,7 +3738,12 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
     // raw
     else
     {
-        data = reader.readString( offset, vl);
+        if ( vr === "SH" || vr === "LO" || vr === "ST" ||
+            vr === "PN" || vr === "LT" || vr === "UT" ) {
+            data = reader.readSpecialString( offset, vl );
+        } else {
+            data = reader.readString( offset, vl );
+        }
         offset += vl;
         data = data.split("\\");
     }
@@ -3968,7 +3982,7 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
         var dicomElement = null;
         var dictElement = null;
         var row = null;
-        for ( var i = 0 ; i < keys.length; ++i ) {
+        for ( var i = 0, leni = keys.length; i < leni; ++i ) {
             dicomElement = dicomElements[keys[i]];
             row = {};
             // dictionnary entry (to get name)
@@ -4016,7 +4030,7 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
         }
         var dicomElement = null;
         var checkHeader = true;
-        for ( var i = 0 ; i < keys.length; ++i ) {
+        for ( var i = 0, leni = keys.length; i < leni; ++i ) {
             dicomElement = dicomElements[keys[i]];
             if ( checkHeader && dicomElement.tag.group !== "0x0002" ) {
                 result += "\n";
@@ -4089,7 +4103,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function ( di
             dicomElement.vr === "FD" ||
             dicomElement.vr === "DS");
         var valueStr = "";
-        for ( var k = 0; k < dicomElement.value.length; ++k ) {
+        for ( var k = 0, lenk = dicomElement.value.length; k < lenk; ++k ) {
             valueStr = "";
             if ( k !== 0 ) {
                 valueStr += "\\";
@@ -4263,7 +4277,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
     // continue for sequence
     if ( dicomElement.vr === 'SQ' ) {
         var item = null;
-        for ( var l = 0; l < dicomElement.value.length; ++l ) {
+        for ( var l = 0, lenl = dicomElement.value.length; l < lenl; ++l ) {
             item = dicomElement.value[l];
             var itemKeys = Object.keys(item);
             if ( itemKeys.length === 0 ) {
@@ -4286,7 +4300,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
             line += "\n";
             line += this.getElementAsString(itemElement, prefix + "  ");
 
-            for ( var m = 0; m < itemKeys.length; ++m ) {
+            for ( var m = 0, lenm = itemKeys.length; m < lenm; ++m ) {
                 if ( itemKeys[m] !== "xFFFEE000" ) {
                     line += "\n";
                     line += this.getElementAsString(item[itemKeys[m]], prefix + "    ");
@@ -4326,7 +4340,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomEl
     // pixel sequence
     else if ( isPixSequence ) {
         var pixItem = null;
-        for ( var n = 0; n < dicomElement.value.length; ++n ) {
+        for ( var n = 0, lenn = dicomElement.value.length; n < lenn; ++n ) {
             pixItem = dicomElement.value[n];
             line += "\n";
             pixItem.vr = 'pi';
@@ -4373,14 +4387,16 @@ dwv.dicom.DicomElementsWrapper.prototype.getFromName = function ( name )
    var keys0 = Object.keys(dict);
    var keys1 = null;
    var k0 = 0;
+   var lenk0 = 0;
    var k1 = 0;
+   var lenk1 = 0;
    // label for nested loop break
    outLabel:
    // search through dictionary
-   for ( k0 = 0; k0 < keys0.length; ++k0 ) {
+   for ( k0 = 0, lenk0 = keys0.length; k0 < lenk0; ++k0 ) {
        group = keys0[k0];
        keys1 = Object.keys( dict[group] );
-       for ( k1 = 0; k1 < keys1.length; ++k1 ) {
+       for ( k1 = 0, lenk1 = keys1.length; k1 < lenk1; ++k1 ) {
            element = keys1[k1];
            if ( dict[group][element][2] === name ) {
                break outLabel;
