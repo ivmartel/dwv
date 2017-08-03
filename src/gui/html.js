@@ -309,10 +309,11 @@ dwv.html.createHighlightNode = function (child) {
  */
 dwv.html.cleanNode = function (node) {
     // remove its children if node exists
-    if (node) {
-        while (node.hasChildNodes()) {
-            node.removeChild(node.firstChild);
-        }
+    if ( !node ) {
+        return;
+    }
+    while (node.hasChildNodes()) {
+        node.removeChild(node.firstChild);
     }
 };
 
