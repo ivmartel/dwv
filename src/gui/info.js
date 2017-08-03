@@ -268,14 +268,18 @@ dwv.gui.info.Overlay = function ( div, pos, app )
                         li = div.getElementsByClassName("info-" + pos + "-window-center")[0];
                         dwv.html.cleanNode(li);
                         var wcStr = dwv.utils.replaceFlags2( overlays[n].format, [Math.round(event.wc)] );
-                        li.appendChild( document.createTextNode(wcStr) );
+                        if (li) {
+                            li.appendChild( document.createTextNode(wcStr) );
+                        }
                     }
                 } else if (overlays[n].value === "window-width") {
                     if (event.type === "wl-change") {
                         li = div.getElementsByClassName("info-" + pos + "-window-width")[0];
                         dwv.html.cleanNode(li);
                         var wwStr = dwv.utils.replaceFlags2( overlays[n].format, [Math.round(event.ww)] );
-                        li.appendChild( document.createTextNode(wwStr) );
+                        if (li) {
+                            li.appendChild( document.createTextNode(wwStr) );
+                        }
                     }
                 } else if (overlays[n].value === "zoom") {
                     if (event.type === "zoom-change") {
@@ -283,7 +287,9 @@ dwv.gui.info.Overlay = function ( div, pos, app )
                         dwv.html.cleanNode(li);
                         var zoom = Number(event.scale).toPrecision(3);
                         var zoomStr = dwv.utils.replaceFlags2( overlays[n].format, [zoom] );
-                        li.appendChild( document.createTextNode( zoomStr ) );
+                        if (li) {
+                            li.appendChild( document.createTextNode( zoomStr ) );
+                        }
                     }
                 } else if (overlays[n].value === "offset") {
                     if (event.type === "zoom-change") {
@@ -292,34 +298,44 @@ dwv.gui.info.Overlay = function ( div, pos, app )
                         var offset = [ Number(event.cx).toPrecision(3),
                             Number(event.cy).toPrecision(3)];
                         var offStr = dwv.utils.replaceFlags2( overlays[n].format, offset );
-                        li.appendChild( document.createTextNode( offStr ) );
+                        if (li) {
+                            li.appendChild( document.createTextNode( offStr ) );
+                        }
                     }
                 } else if (overlays[n].value === "value") {
                     if (event.type === "position-change") {
                         li = div.getElementsByClassName("info-" + pos + "-value")[0];
                         dwv.html.cleanNode(li);
                         var valueStr = dwv.utils.replaceFlags2( overlays[n].format, [event.value] );
-                        li.appendChild( document.createTextNode( valueStr ) );
+                        if (li) {
+                            li.appendChild( document.createTextNode( valueStr ) );
+                        }
                     }
                 } else if (overlays[n].value === "position") {
                     if (event.type === "position-change") {
                         li = div.getElementsByClassName("info-" + pos + "-position")[0];
                         dwv.html.cleanNode(li);
                         var posStr = dwv.utils.replaceFlags2( overlays[n].format, [event.i, event.j, event.k] );
-                        li.appendChild( document.createTextNode( posStr ) );
+                        if (li) {
+                            li.appendChild( document.createTextNode( posStr ) );
+                        }
                     }
                 } else if (overlays[n].value === "frame") {
                     if (event.type === "frame-change") {
                         li = div.getElementsByClassName("info-" + pos + "-frame")[0];
                         dwv.html.cleanNode(li);
                         var frameStr = dwv.utils.replaceFlags2( overlays[n].format, [event.frame] );
-                        li.appendChild( document.createTextNode( frameStr ) );
+                        if (li) {
+                            li.appendChild( document.createTextNode( frameStr ) );
+                        }
                     }
                 } else {
                     if (event.type === "position-change") {
                         li = div.getElementsByClassName("info-" + pos + "-" + n)[0];
                         dwv.html.cleanNode(li);
-                        li.appendChild( document.createTextNode( overlays[n].value ) );
+                        if (li) {
+                            li.appendChild( document.createTextNode( overlays[n].value ) );
+                        }
                     }
                 }
             }
