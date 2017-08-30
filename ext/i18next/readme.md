@@ -2,10 +2,10 @@ Third Party: i18next
 ====================
 
 * Web: http://i18next.com/
-* Version: [8.4.2](https://github.com/i18next/i18next/releases/tag/v8.4.2)
-* Date: 11/06/2017
-* Download: https://github.com/i18next/i18next/blob/v8.4.2/i18next.min.js
-* License: MIT (see https://github.com/i18next/i18next/blob/v8.4.2/LICENSE)
+* Version: [9.0.0](https://github.com/i18next/i18next/releases/tag/v9.0.0)
+* Date: 25/08/2017
+* Download: https://github.com/i18next/i18next/blob/v9.0.0/i18next.min.js
+* License: MIT (see https://github.com/i18next/i18next/blob/v9.0.0/LICENSE)
 * Description: internationalization framework.
 * Purpose for dwv: internationalization of GUI and messages.
 
