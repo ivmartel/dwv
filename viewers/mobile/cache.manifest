@@ -54,7 +54,7 @@ appgui.js
 /dwv/demo/stable/ext/i18next/i18next.min.js
 /dwv/demo/stable/ext/i18next/i18nextXHRBackend.min.js
 /dwv/demo/stable/ext/i18next/i18nextBrowserLanguageDetector.min.js
-/dwv/demo/stable/ext/konva/konva-1.6.0.min.js
+/dwv/demo/stable/ext/konva/konva.min.js
 /dwv/demo/stable/ext/magic-wand/magic-wand.js
 /dwv/demo/stable/ext/jszip/jszip.min.js
 # js: viewer
