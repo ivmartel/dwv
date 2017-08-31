@@ -10,9 +10,10 @@ dwv.image = dwv.image || {};
 dwv.image.imageDataToBuffer = function (imageData) {
     // remove alpha
     // TODO support passing the full image data
-    var buffer = [];
+    var dataLen = imageData.data.length;
+    var buffer = new Uint8Array( (dataLen / 4) * 3);
     var j = 0;
-    for( var i = 0; i < imageData.data.length; i+=4 ) {
+    for( var i = 0; i < dataLen; i+=4 ) {
         buffer[j] = imageData.data[i];
         buffer[j+1] = imageData.data[i+1];
         buffer[j+2] = imageData.data[i+2];
