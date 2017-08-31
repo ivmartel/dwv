@@ -1,8 +1,8 @@
 /*
- * Konva JavaScript Framework v1.6.0
+ * Konva JavaScript Framework v1.6.8
  * http://konvajs.github.io/
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: Fri Apr 21 2017
+ * Date: Sat Aug 19 2017
  *
  * Original work Copyright (C) 2011 - 2013 by Eric Rowell (KineticJS)
  * Modified work Copyright (C) 2014 - 2017 by Anton Lavrenov (Konva)
@@ -38,7 +38,7 @@
 
   var Konva = {
     // public
-    version: '1.6.0',
+    version: '1.6.8',
 
     // private
     stages: [],
@@ -197,12 +197,11 @@
       var ua = userAgent.toLowerCase(),
         // jQuery UA regex
         match = /(chrome)[ \/]([\w.]+)/.exec(ua) ||
-          /(webkit)[ \/]([\w.]+)/.exec(ua) ||
-          /(opera)(?:.*version|)[ \/]([\w.]+)/.exec(ua) ||
-          /(msie) ([\w.]+)/.exec(ua) ||
-          ua.indexOf('compatible') < 0 &&
-            /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua) ||
-          [],
+        /(webkit)[ \/]([\w.]+)/.exec(ua) ||
+        /(opera)(?:.*version|)[ \/]([\w.]+)/.exec(ua) ||
+        /(msie) ([\w.]+)/.exec(ua) ||
+        (ua.indexOf('compatible') < 0 &&
+          /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua)) || [],
         // adding mobile flag as well
         mobile = !!userAgent.match(
           /Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile/i
@@ -228,7 +227,7 @@
         ? window
         : typeof WorkerGlobalScope !== 'undefined' ? self : {};
 
-  Konva.UA = Konva._parseUA(glob.navigator && glob.navigator.userAgent || '');
+  Konva.UA = Konva._parseUA((glob.navigator && glob.navigator.userAgent) || '');
 
   if (glob.Konva) {
     console.error(
@@ -249,14 +248,15 @@
       // only CommonJS-like enviroments that support module.exports,
       // like Node.
       var Canvas = require('canvas');
-      var jsdom = require('jsdom').jsdom;
+      var JSDOM = require('jsdom').JSDOM;
 
-      Konva.window = jsdom(
+      Konva.window = new JSDOM(
         '<!DOCTYPE html><html><head></head><body></body></html>'
-      ).defaultView;
+      ).window;
       Konva.document = Konva.window.document;
       Konva.window.Image = Canvas.Image;
       Konva._nodeCanvas = Canvas;
+      Konva.isNode = true;
     }
     module.exports = Konva;
     return;
@@ -445,8 +445,8 @@
       var s = Math.sin(rad);
       var m11 = this.m[0] * c + this.m[2] * s;
       var m12 = this.m[1] * c + this.m[3] * s;
-      var m21 = this.m[0] * (-s) + this.m[2] * c;
-      var m22 = this.m[1] * (-s) + this.m[3] * c;
+      var m21 = this.m[0] * -s + this.m[2] * c;
+      var m22 = this.m[1] * -s + this.m[3] * c;
       this.m[0] = m11;
       this.m[1] = m12;
       this.m[2] = m21;
@@ -518,8 +518,8 @@
     invert: function() {
       var d = 1 / (this.m[0] * this.m[3] - this.m[1] * this.m[2]);
       var m0 = this.m[3] * d;
-      var m1 = (-this.m[1]) * d;
-      var m2 = (-this.m[2]) * d;
+      var m1 = -this.m[1] * d;
+      var m2 = -this.m[2] * d;
       var m3 = this.m[0] * d;
       var m4 = d * (this.m[2] * this.m[5] - this.m[3] * this.m[4]);
       var m5 = d * (this.m[1] * this.m[4] - this.m[0] * this.m[5]);
@@ -809,12 +809,16 @@
         return false;
       }
       var firstChar = selector[0];
-      return firstChar === '#' ||
+      return (
+        firstChar === '#' ||
         firstChar === '.' ||
-        firstChar === firstChar.toUpperCase();
+        firstChar === firstChar.toUpperCase()
+      );
     },
     createCanvasElement: function() {
-      var canvas = Konva.document.createElement('canvas');
+      var canvas = Konva.isNode
+        ? new Konva._nodeCanvas()
+        : Konva.document.createElement('canvas');
       // on some environments canvas.style is readonly
       try {
         canvas.style = canvas.style || {};
@@ -825,7 +829,7 @@
       return typeof exports !== 'object';
     },
     _isInDocument: function(el) {
-      while (el = el.parentNode) {
+      while ((el = el.parentNode)) {
         if (el == Konva.document) {
           return true;
         }
@@ -896,8 +900,8 @@
       hex = hex.replace(HASH, EMPTY_STRING);
       var bigint = parseInt(hex, 16);
       return {
-        r: bigint >> 16 & 255,
-        g: bigint >> 8 & 255,
+        r: (bigint >> 16) & 255,
+        g: (bigint >> 8) & 255,
         b: bigint & 255
       };
     },
@@ -907,7 +911,7 @@
          * @memberof Konva.Util.prototype
          */
     getRandomColor: function() {
-      var randColor = (Math.random() * 0xffffff << 0).toString(16);
+      var randColor = ((Math.random() * 0xffffff) << 0).toString(16);
       while (randColor.length < 6) {
         randColor = ZERO + randColor;
       }
@@ -970,11 +974,13 @@
     // from https://github.com/component/color-parser
     colorToRGBA: function(str) {
       str = str || 'black';
-      return Konva.Util._namedColorToRBA(str) ||
+      return (
+        Konva.Util._namedColorToRBA(str) ||
         Konva.Util._hex3ColorToRGBA(str) ||
         Konva.Util._hex6ColorToRGBA(str) ||
         Konva.Util._rgbColorToRGBA(str) ||
-        Konva.Util._rgbaColorToRGBA(str);
+        Konva.Util._rgbaColorToRGBA(str)
+      );
     },
     // Parse named css color. Like "green"
     _namedColorToRBA: function(str) {
@@ -1287,7 +1293,8 @@
     context = canvas.getContext('2d'),
     _pixelRatio = (function() {
       var devicePixelRatio = Konva.window.devicePixelRatio || 1,
-        backingStoreRatio = context.webkitBackingStorePixelRatio ||
+        backingStoreRatio =
+          context.webkitBackingStorePixelRatio ||
           context.mozBackingStorePixelRatio ||
           context.msBackingStorePixelRatio ||
           context.oBackingStorePixelRatio ||
@@ -1626,9 +1633,8 @@
             str += DOUBLE_PAREN;
           } else {
             if (Konva.Util._isArray(args[0])) {
-              str += OPEN_PAREN_BRACKET +
-                args.join(COMMA) +
-                CLOSE_BRACKET_PAREN;
+              str +=
+                OPEN_PAREN_BRACKET + args.join(COMMA) + CLOSE_BRACKET_PAREN;
             } else {
               str += OPEN_PAREN + args.join(COMMA) + CLOSE_PAREN;
             }
@@ -1986,7 +1992,7 @@
         this.scale(fillPatternScale.x, fillPatternScale.y);
       }
       if (fillPatternOffset) {
-        this.translate((-1) * fillPatternOffset.x, (-1) * fillPatternOffset.y);
+        this.translate(-1 * fillPatternOffset.x, -1 * fillPatternOffset.y);
       }
 
       this.setAttr(
@@ -2065,8 +2071,8 @@
     _stroke: function(shape) {
       var dash = shape.dash(),
         // ignore strokeScaleEnabled for Text
-        strokeScaleEnabled = shape.getStrokeScaleEnabled() ||
-          shape instanceof Konva.Text;
+        strokeScaleEnabled =
+          shape.getStrokeScaleEnabled() || shape instanceof Konva.Text;
 
       if (shape.hasStroke()) {
         if (!strokeScaleEnabled) {
@@ -2108,7 +2114,10 @@
         scaleY = scale.y * ratio;
 
       this.setAttr('shadowColor', color);
-      this.setAttr('shadowBlur', blur * ratio * Math.min(scaleX, scaleY));
+      this.setAttr(
+        'shadowBlur',
+        blur * ratio * Math.min(Math.abs(scaleX), Math.abs(scaleY))
+      );
       this.setAttr('shadowOffsetX', offset.x * scaleX);
       this.setAttr('shadowOffsetY', offset.y * scaleY);
     },
@@ -2135,8 +2144,8 @@
     _stroke: function(shape) {
       if (shape.hasStroke() && shape.strokeHitEnabled()) {
         // ignore strokeScaleEnabled for Text
-        var strokeScaleEnabled = shape.getStrokeScaleEnabled() ||
-          shape instanceof Konva.Text;
+        var strokeScaleEnabled =
+          shape.getStrokeScaleEnabled() || shape instanceof Konva.Text;
         if (!strokeScaleEnabled) {
           this.save();
           this.setTransform(1, 0, 0, 1, 0, 0);
@@ -2259,7 +2268,8 @@
     },
     addDeprecatedGetterSetter: function(constructor, attr, def, validator) {
       var method = GET + Konva.Util._capitalize(attr);
-      var message = attr +
+      var message =
+        attr +
         ' property is deprecated and will be removed soon. Look at Konva change log for more information.';
       constructor.prototype[method] = function() {
         Konva.Util.error(message);
@@ -2504,7 +2514,10 @@
         */
     cache: function(config) {
       var conf = config || {},
-        rect = this.getClientRect(true),
+        rect = this.getClientRect({
+          skipTransform: true,
+          relativeTo: this.getParent()
+        }),
         width = conf.width || rect.width,
         height = conf.height || rect.height,
         pixelRatio = conf.pixelRatio,
@@ -2591,7 +2604,9 @@
          * The rectangle position is relative to parent container.
          * @method
          * @memberof Konva.Node.prototype
-         * @param {Boolean} [skipTransform] flag should we skip transformation to rectangle
+         * @param {Object} config
+         * @param {Boolean} [config.skipTransform] should we apply transform to node for calculating rect?
+         * @param {Object} [config.relativeTo] calculate client rect relative to one of the parents
          * @returns {Object} rect with {x, y, width, height} properties
          * @example
          * var rect = new Konva.Rect({
@@ -2606,7 +2621,7 @@
          * });
          *
          * // get client rect without think off transformations (position, rotation, scale, offset, etc)
-         * rect.getClientRect(true);
+         * rect.getClientRect({ skipTransform: true});
          * // returns {
          * //     x : -2,   // two pixels for stroke / 2
          * //     y : -2,
@@ -2623,7 +2638,7 @@
       // redefine in Container and Shape
       throw new Error('abstract "getClientRect" method call');
     },
-    _transformedRect: function(rect) {
+    _transformedRect: function(rect, top) {
       var points = [
         { x: rect.x, y: rect.y },
         { x: rect.x + rect.width, y: rect.y },
@@ -2631,7 +2646,7 @@
         { x: rect.x, y: rect.y + rect.height }
       ];
       var minX, minY, maxX, maxY;
-      var trans = this.getTransform();
+      var trans = this.getAbsoluteTransform(top);
       points.forEach(function(point) {
         var transformed = trans.point(point);
         if (minX === undefined) {
@@ -2653,6 +2668,7 @@
     _drawCachedSceneCanvas: function(context) {
       context.save();
       context._applyOpacity(this);
+      context._applyGlobalCompositeOperation(this);
       context.translate(this._cache.canvas.x, this._cache.canvas.y);
 
       var cacheCanvas = this._getCachedSceneCanvas();
@@ -3130,11 +3146,13 @@
          */
     shouldDrawHit: function(canvas) {
       var layer = this.getLayer();
-      return (canvas && canvas.isCache) ||
+      return (
+        (canvas && canvas.isCache) ||
         (layer &&
           layer.hitGraphEnabled() &&
           this.isListening() &&
-          this.isVisible());
+          this.isVisible())
+      );
     },
     /**
          * show node
@@ -3732,19 +3750,16 @@
       var at = new Konva.Transform(), transformsEnabled, trans;
 
       // start with stage and traverse downwards to self
-      this._eachAncestorReverse(
-        function(node) {
-          transformsEnabled = node.transformsEnabled();
-          trans = node.getTransform();
+      this._eachAncestorReverse(function(node) {
+        transformsEnabled = node.transformsEnabled();
+        trans = node.getTransform();
 
-          if (transformsEnabled === 'all') {
-            at.multiply(trans);
-          } else if (transformsEnabled === 'position') {
-            at.translate(node.x(), node.y());
-          }
-        },
-        top
-      );
+        if (transformsEnabled === 'all') {
+          at.multiply(trans);
+        } else if (transformsEnabled === 'position') {
+          at.translate(node.x(), node.y());
+        }
+      }, top);
       return at;
     },
     /**
@@ -3757,7 +3772,7 @@
     getAbsoluteScale: function(top) {
       // if using an argument, we can't cache the result.
       if (top) {
-        return this._getAbsoluteTransform(top);
+        return this._getAbsoluteScale(top);
       } else {
         // if no argument, we can cache the result
         return this._getCache(ABSOLUTE_SCALE, this._getAbsoluteScale);
@@ -3776,13 +3791,10 @@
       var scaleX = 1, scaleY = 1;
 
       // start with stage and traverse downwards to self
-      this._eachAncestorReverse(
-        function(node) {
-          scaleX *= node.scaleX();
-          scaleY *= node.scaleY();
-        },
-        top
-      );
+      this._eachAncestorReverse(function(node) {
+        scaleX *= node.scaleX();
+        scaleY *= node.scaleY();
+      }, top);
       return {
         x: scaleX,
         y: scaleY
@@ -3822,7 +3834,7 @@
         m.scale(scaleX, scaleY);
       }
       if (offsetX !== 0 || offsetY !== 0) {
-        m.translate((-1) * offsetX, (-1) * offsetY);
+        m.translate(-1 * offsetX, -1 * offsetY);
       }
 
       return m;
@@ -3905,7 +3917,7 @@
       context.save();
 
       if (x || y) {
-        context.translate((-1) * x, (-1) * y);
+        context.translate(-1 * x, -1 * y);
       }
 
       this.drawScene(canvas);
@@ -4226,8 +4238,8 @@
         this._fire(eventType, evt);
 
         // simulate event bubbling
-        var stopBubble = (eventType === MOUSEENTER ||
-          eventType === MOUSELEAVE) &&
+        var stopBubble =
+          (eventType === MOUSEENTER || eventType === MOUSELEAVE) &&
           (compareShape &&
             compareShape.isAncestorOf &&
             compareShape.isAncestorOf(this) &&
@@ -4376,6 +4388,26 @@
      * node.y(5);
      */
 
+  Konva.Factory.addGetterSetter(
+    Konva.Node,
+    'globalCompositeOperation',
+    'source-over'
+  );
+
+  /**
+     * get/set globalCompositeOperation of a shape
+     * @name globalCompositeOperation
+     * @method
+     * @memberof Konva.Node.prototype
+     * @param {Number} blur
+     * @returns {Number}
+     * @example
+     * // get shadow blur
+     * var globalCompositeOperation = shape.globalCompositeOperation();
+     *
+     * // set shadow blur
+     * shape.globalCompositeOperation('source-in');
+     */
   Konva.Factory.addGetterSetter(Konva.Node, 'opacity', 1);
 
   /**
@@ -5585,12 +5617,12 @@
       stackIn = stackStart;
       stackOut = stackEnd;
       for (x = 0; x < width; x++) {
-        pixels[yi + 3] = pa = a_sum * mul_sum >> shg_sum;
+        pixels[yi + 3] = pa = (a_sum * mul_sum) >> shg_sum;
         if (pa !== 0) {
           pa = 255 / pa;
-          pixels[yi] = (r_sum * mul_sum >> shg_sum) * pa;
-          pixels[yi + 1] = (g_sum * mul_sum >> shg_sum) * pa;
-          pixels[yi + 2] = (b_sum * mul_sum >> shg_sum) * pa;
+          pixels[yi] = ((r_sum * mul_sum) >> shg_sum) * pa;
+          pixels[yi + 1] = ((g_sum * mul_sum) >> shg_sum) * pa;
+          pixels[yi + 2] = ((b_sum * mul_sum) >> shg_sum) * pa;
         } else {
           pixels[yi] = pixels[yi + 1] = pixels[yi + 2] = 0;
         }
@@ -5605,7 +5637,7 @@
         b_out_sum -= stackIn.b;
         a_out_sum -= stackIn.a;
 
-        p = yw + ((p = x + radius + 1) < widthMinus1 ? p : widthMinus1) << 2;
+        p = (yw + ((p = x + radius + 1) < widthMinus1 ? p : widthMinus1)) << 2;
 
         r_in_sum += stackIn.r = pixels[p];
         g_in_sum += stackIn.g = pixels[p + 1];
@@ -5663,7 +5695,7 @@
       yp = width;
 
       for (i = 1; i <= radius; i++) {
-        yi = yp + x << 2;
+        yi = (yp + x) << 2;
 
         r_sum += (stack.r = pr = pixels[yi]) * (rbs = radiusPlus1 - i);
         g_sum += (stack.g = pg = pixels[yi + 1]) * rbs;
@@ -5687,12 +5719,12 @@
       stackOut = stackEnd;
       for (y = 0; y < height; y++) {
         p = yi << 2;
-        pixels[p + 3] = pa = a_sum * mul_sum >> shg_sum;
+        pixels[p + 3] = pa = (a_sum * mul_sum) >> shg_sum;
         if (pa > 0) {
           pa = 255 / pa;
-          pixels[p] = (r_sum * mul_sum >> shg_sum) * pa;
-          pixels[p + 1] = (g_sum * mul_sum >> shg_sum) * pa;
-          pixels[p + 2] = (b_sum * mul_sum >> shg_sum) * pa;
+          pixels[p] = ((r_sum * mul_sum) >> shg_sum) * pa;
+          pixels[p + 1] = ((g_sum * mul_sum) >> shg_sum) * pa;
+          pixels[p + 2] = ((b_sum * mul_sum) >> shg_sum) * pa;
         } else {
           pixels[p] = pixels[p + 1] = pixels[p + 2] = 0;
         }
@@ -5707,8 +5739,10 @@
         b_out_sum -= stackIn.b;
         a_out_sum -= stackIn.a;
 
-        p = x +
-          ((p = y + radiusPlus1) < heightMinus1 ? p : heightMinus1) * width <<
+        p =
+          (x +
+            ((p = y + radiusPlus1) < heightMinus1 ? p : heightMinus1) *
+              width) <<
           2;
 
         r_sum += r_in_sum += stackIn.r = pixels[p];
@@ -6019,8 +6053,8 @@
       brightness;
 
     for (i = 0; i < nPixels; i += 4) {
-      brightness = (0.34 * data[i] + 0.5 * data[i + 1] + 0.16 * data[i + 2]) /
-        255;
+      brightness =
+        (0.34 * data[i] + 0.5 * data[i + 1] + 0.16 * data[i + 2]) / 255;
       data[i] = brightness * red; // r
       data[i + 1] = brightness * green; // g
       data[i + 2] = brightness * blue; // b
@@ -7857,16 +7891,23 @@
     shouldDrawHit: function(canvas) {
       var layer = this.getLayer();
       var dd = Konva.DD;
-      var layerUnderDrag = dd &&
+      var layerUnderDrag =
+        dd &&
         Konva.isDragging() &&
         Konva.DD.anim.getLayers().indexOf(layer) !== -1;
-      return (canvas && canvas.isCache) ||
+      return (
+        (canvas && canvas.isCache) ||
         (layer &&
           layer.hitGraphEnabled() &&
           this.isVisible() &&
-          !layerUnderDrag);
+          !layerUnderDrag)
+      );
     },
-    getClientRect: function(skipTransform) {
+    getClientRect: function(attrs) {
+      attrs = attrs || {};
+      var skipTransform = attrs.skipTransform;
+      var relativeTo = attrs.relativeTo;
+
       var minX, minY, maxX, maxY;
       var selfRect = {
         x: 0,
@@ -7874,8 +7915,13 @@
         width: 0,
         height: 0
       };
+      var that = this;
       this.children.each(function(child) {
-        var rect = child.getClientRect();
+        // skip invisible children
+        if (!child.isVisible()) {
+          return;
+        }
+        var rect = child.getClientRect({ relativeTo: that });
 
         // skip invisible children (like empty groups)
         // or don't skip... hmmm...
@@ -7907,7 +7953,7 @@
       }
 
       if (!skipTransform) {
-        return this._transformedRect(selfRect);
+        return this._transformedRect(selfRect, relativeTo);
       }
       return selfRect;
     }
@@ -8226,12 +8272,14 @@
       return this._getCache(HAS_SHADOW, this._hasShadow);
     },
     _hasShadow: function() {
-      return this.getShadowEnabled() &&
+      return (
+        this.getShadowEnabled() &&
         (this.getShadowOpacity() !== 0 &&
           !!(this.getShadowColor() ||
             this.getShadowBlur() ||
             this.getShadowOffsetX() ||
-            this.getShadowOffsetY()));
+            this.getShadowOffsetY()))
+      );
     },
     getShadowRGBA: function() {
       return this._getCache(SHADOW_RGBA, this._getShadowRGBA);
@@ -8239,7 +8287,8 @@
     _getShadowRGBA: function() {
       if (this.hasShadow()) {
         var rgba = Konva.Util.colorToRGBA(this.shadowColor());
-        return 'rgba(' +
+        return (
+          'rgba(' +
           rgba.r +
           ',' +
           rgba.g +
@@ -8247,7 +8296,8 @@
           rgba.b +
           ',' +
           rgba.a * (this.getShadowOpacity() || 1) +
-          ')';
+          ')'
+        );
       }
     },
     /**
@@ -8303,18 +8353,20 @@
       return this;
     },
     _useBufferCanvas: function(caching) {
-      return (!caching &&
-        (this.perfectDrawEnabled() &&
-          this.getAbsoluteOpacity() !== 1 &&
-          this.hasFill() &&
-          this.hasStroke() &&
-          this.getStage())) ||
+      return (
+        (!caching &&
+          (this.perfectDrawEnabled() &&
+            this.getAbsoluteOpacity() !== 1 &&
+            this.hasFill() &&
+            this.hasStroke() &&
+            this.getStage())) ||
         (this.perfectDrawEnabled() &&
           this.hasShadow() &&
           this.getAbsoluteOpacity() !== 1 &&
           this.hasFill() &&
           this.hasStroke() &&
-          this.getStage());
+          this.getStage())
+      );
     },
     /**
          * return self rectangle (x, y, width, height) of shape.
@@ -8331,13 +8383,17 @@
     getSelfRect: function() {
       var size = this.getSize();
       return {
-        x: this._centroid ? Math.round((-size.width) / 2) : 0,
-        y: this._centroid ? Math.round((-size.height) / 2) : 0,
+        x: this._centroid ? Math.round(-size.width / 2) : 0,
+        y: this._centroid ? Math.round(-size.height / 2) : 0,
         width: size.width,
         height: size.height
       };
     },
-    getClientRect: function(skipTransform) {
+    getClientRect: function(attrs) {
+      attrs = attrs || {};
+      var skipTransform = attrs.skipTransform;
+      var relativeTo = attrs.relativeTo;
+
       var fillRect = this.getSelfRect();
 
       var strokeWidth = (this.hasStroke() && this.strokeWidth()) || 0;
@@ -8373,7 +8429,7 @@
           fillRect.y
       };
       if (!skipTransform) {
-        return this._transformedRect(rect);
+        return this._transformedRect(rect, relativeTo);
       }
       return rect;
     },
@@ -8889,27 +8945,6 @@
     1,
     Konva.Validators.alphaComponent
   );
-
-  Konva.Factory.addGetterSetter(
-    Konva.Shape,
-    'globalCompositeOperation',
-    'source-over'
-  );
-
-  /**
-     * get/set globalCompositeOperation of a shape
-     * @name globalCompositeOperation
-     * @method
-     * @memberof Konva.Shape.prototype
-     * @param {Number} blur
-     * @returns {Number}
-     * @example
-     * // get shadow blur
-     * var globalCompositeOperation = shape.globalCompositeOperation();
-     *
-     * // set shadow blur
-     * shape.globalCompositeOperation('source-in');
-     */
 
   Konva.Factory.addGetterSetter(Konva.Shape, 'shadowBlur');
 
@@ -9740,8 +9775,6 @@
     TAP = 'tap',
     DBL_TAP = 'dbltap',
     TOUCHMOVE = 'touchmove',
-    DOMMOUSESCROLL = 'DOMMouseScroll',
-    MOUSEWHEEL = 'mousewheel',
     WHEEL = 'wheel',
     CONTENT_MOUSEOUT = 'contentMouseout',
     CONTENT_MOUSEOVER = 'contentMouseover',
@@ -9773,8 +9806,6 @@
       TOUCHMOVE,
       TOUCHEND,
       MOUSEOVER,
-      DOMMOUSESCROLL,
-      MOUSEWHEEL,
       WHEEL,
       CONTEXTMENU
     ],
@@ -10006,7 +10037,7 @@
         layers = this.children;
 
       if (x || y) {
-        _context.translate((-1) * x, (-1) * y);
+        _context.translate(-1 * x, -1 * y);
       }
 
       layers.each(function(layer) {
@@ -10269,6 +10300,7 @@
         this._setPointerPosition(evt);
         var shape = this.getIntersection(this.getPointerPosition()),
           clickStartShape = this.clickStartShape,
+          clickEndShape = this.clickEndShape,
           fireDblClick = false,
           dd = Konva.DD;
 
@@ -10282,14 +10314,12 @@
           dd.justDragged = false;
         }
 
-        setTimeout(
-          function() {
-            Konva.inDblClickWindow = false;
-          },
-          Konva.dblClickWindow
-        );
+        setTimeout(function() {
+          Konva.inDblClickWindow = false;
+        }, Konva.dblClickWindow);
 
         if (shape && shape.isListening()) {
+          this.clickEndShape = shape;
           shape._fireAndBubble(MOUSEUP, { evt: evt });
 
           // detect if click or double click occurred
@@ -10300,7 +10330,11 @@
           ) {
             shape._fireAndBubble(CLICK, { evt: evt });
 
-            if (fireDblClick) {
+            if (
+              fireDblClick &&
+              clickEndShape &&
+              clickEndShape._id === shape._id
+            ) {
               shape._fireAndBubble(DBL_CLICK, { evt: evt });
             }
           }
@@ -10338,7 +10372,9 @@
 
         // only call preventDefault if the shape is listening for events
         if (
-          shape.isListening() && shape.preventDefault() && evt.preventDefault
+          shape.isListening() &&
+          shape.preventDefault() &&
+          evt.preventDefault
         ) {
           evt.preventDefault();
         }
@@ -10358,12 +10394,9 @@
         Konva.inDblClickWindow = true;
       }
 
-      setTimeout(
-        function() {
-          Konva.inDblClickWindow = false;
-        },
-        Konva.dblClickWindow
-      );
+      setTimeout(function() {
+        Konva.inDblClickWindow = false;
+      }, Konva.dblClickWindow);
 
       if (shape && shape.isListening()) {
         shape._fireAndBubble(TOUCHEND, { evt: evt });
@@ -10382,7 +10415,9 @@
         }
         // only call preventDefault if the shape is listening for events
         if (
-          shape.isListening() && shape.preventDefault() && evt.preventDefault
+          shape.isListening() &&
+          shape.preventDefault() &&
+          evt.preventDefault
         ) {
           evt.preventDefault();
         }
@@ -10407,7 +10442,9 @@
           shape._fireAndBubble(TOUCHMOVE, { evt: evt });
           // only call preventDefault if the shape is listening for events
           if (
-            shape.isListening() && shape.preventDefault() && evt.preventDefault
+            shape.isListening() &&
+            shape.preventDefault() &&
+            evt.preventDefault
           ) {
             evt.preventDefault();
           }
@@ -10420,10 +10457,7 @@
         }
       }
     },
-    _DOMMouseScroll: function(evt) {
-      this._mousewheel(evt);
-    },
-    _mousewheel: function(evt) {
+    _wheel: function(evt) {
       this._setPointerPosition(evt);
       var shape = this.getIntersection(this.getPointerPosition());
 
@@ -10432,11 +10466,8 @@
       }
       this._fire(CONTENT_WHEEL, { evt: evt });
     },
-    _wheel: function(evt) {
-      this._mousewheel(evt);
-    },
     _setPointerPosition: function(evt) {
-      var x = null, y = null;
+      var contentPosition = this._getContentPosition(), x = null, y = null;
       evt = evt ? evt : window.event;
 
       // touch events
@@ -10445,13 +10476,13 @@
         if (evt.touches.length > 0) {
           var touch = evt.touches[0];
           // get the information for finger #1
-          x = touch.offsetX;
-          y = touch.offsetY;
+          x = touch.clientX - contentPosition.left;
+          y = touch.clientY - contentPosition.top;
         }
       } else {
         // mouse events
-        x = evt.offsetX;
-        y = evt.offsetY;
+        x = evt.clientX - contentPosition.left;
+        y = evt.clientY - contentPosition.top;
       }
       if (x !== null && y !== null) {
         this.pointerPos = {
@@ -11273,12 +11304,14 @@
   }
 
   var RAF = (function() {
-    return Konva.global.requestAnimationFrame ||
+    return (
+      Konva.global.requestAnimationFrame ||
       Konva.global.webkitRequestAnimationFrame ||
       Konva.global.mozRequestAnimationFrame ||
       Konva.global.oRequestAnimationFrame ||
       Konva.global.msRequestAnimationFrame ||
-      FRAF;
+      FRAF
+    );
   })();
 
   function requestAnimFrame() {
@@ -11531,13 +11564,10 @@
     var that = this, Anim = Konva.Animation;
 
     if (!this.batchAnim) {
-      this.batchAnim = new Anim(
-        function() {
-          // stop animation after first tick
-          that.batchAnim.stop();
-        },
-        this
-      );
+      this.batchAnim = new Anim(function() {
+        // stop animation after first tick
+        that.batchAnim.stop();
+      }, this);
     }
 
     if (!this.batchAnim.isRunning()) {
@@ -11728,19 +11758,17 @@
     this.node = node;
     this._id = idCounter++;
 
-    var layers = node.getLayer() ||
+    var layers =
+      node.getLayer() ||
       (node instanceof Konva.Stage ? node.getLayers() : null);
     if (!layers) {
       Konva.Util.error(
         'Tween constructor have `node` that is not in a layer. Please add node into layer first.'
       );
     }
-    this.anim = new Konva.Animation(
-      function() {
-        that.tween.onEnterFrame();
-      },
-      layers
-    );
+    this.anim = new Konva.Animation(function() {
+      that.tween.onEnterFrame();
+    }, layers);
 
     this.tween = new Tween(
       key,
@@ -11877,7 +11905,8 @@
             newVal.push((start[n] || 0) + diff[n] * i);
           }
         } else if (colorAttrs.indexOf(key) !== -1) {
-          newVal = 'rgba(' +
+          newVal =
+            'rgba(' +
             Math.round(start.r + diff.r * i) +
             ',' +
             Math.round(start.g + diff.g * i) +
@@ -12105,9 +12134,11 @@
       } else {
         s = p / (2 * Math.PI) * Math.asin(c / a);
       }
-      return -(a *
-        Math.pow(2, 10 * (t -= 1)) *
-        Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
+      return (
+        -(a *
+          Math.pow(2, 10 * (t -= 1)) *
+          Math.sin((t * d - s) * (2 * Math.PI) / p)) + b
+      );
     },
     /**
         * elastic ease out
@@ -12132,11 +12163,11 @@
       } else {
         s = p / (2 * Math.PI) * Math.asin(c / a);
       }
-      return a *
-        Math.pow(2, (-10) * t) *
-        Math.sin((t * d - s) * (2 * Math.PI) / p) +
+      return (
+        a * Math.pow(2, -10 * t) * Math.sin((t * d - s) * (2 * Math.PI) / p) +
         c +
-        b;
+        b
+      );
     },
     /**
         * elastic ease in out
@@ -12162,18 +12193,22 @@
         s = p / (2 * Math.PI) * Math.asin(c / a);
       }
       if (t < 1) {
-        return (-0.5) *
-          (a *
-            Math.pow(2, 10 * (t -= 1)) *
-            Math.sin((t * d - s) * (2 * Math.PI) / p)) +
-          b;
+        return (
+          -0.5 *
+            (a *
+              Math.pow(2, 10 * (t -= 1)) *
+              Math.sin((t * d - s) * (2 * Math.PI) / p)) +
+          b
+        );
       }
-      return a *
-        Math.pow(2, (-10) * (t -= 1)) *
-        Math.sin((t * d - s) * (2 * Math.PI) / p) *
-        0.5 +
+      return (
+        a *
+          Math.pow(2, -10 * (t -= 1)) *
+          Math.sin((t * d - s) * (2 * Math.PI) / p) *
+          0.5 +
         c +
-        b;
+        b
+      );
     },
     /**
         * bounce ease out
@@ -12208,9 +12243,9 @@
       if (t < d / 2) {
         return Konva.Easings.BounceEaseIn(t * 2, 0, c, d) * 0.5 + b;
       } else {
-        return Konva.Easings.BounceEaseOut(t * 2 - d, 0, c, d) * 0.5 +
-          c * 0.5 +
-          b;
+        return (
+          Konva.Easings.BounceEaseOut(t * 2 - d, 0, c, d) * 0.5 + c * 0.5 + b
+        );
       }
     },
     /**
@@ -12227,7 +12262,7 @@
         * @memberof Konva.Easings
         */
     EaseOut: function(t, b, c, d) {
-      return (-c) * (t /= d) * (t - 2) + b;
+      return -c * (t /= d) * (t - 2) + b;
     },
     /**
         * ease in out
@@ -12238,7 +12273,7 @@
       if ((t /= d / 2) < 1) {
         return c / 2 * t * t + b;
       }
-      return (-c) / 2 * (--t * (t - 2) - 1) + b;
+      return -c / 2 * (--t * (t - 2) - 1) + b;
     },
     /**
         * strong ease in
@@ -13840,9 +13875,11 @@
       this.hitFunc(this._hitFunc);
     },
     _useBufferCanvas: function() {
-      return (this.hasShadow() || this.getAbsoluteOpacity() !== 1) &&
+      return (
+        (this.hasShadow() || this.getAbsoluteOpacity() !== 1) &&
         this.hasStroke() &&
-        this.getStage();
+        this.getStage()
+      );
     },
     _sceneFunc: function(context) {
       var width = this.getWidth(),
@@ -14354,8 +14391,8 @@
          * @returns {Number}
          */
     getHeight: function() {
-      var isAuto = this.attrs.height === AUTO ||
-        this.attrs.height === undefined;
+      var isAuto =
+        this.attrs.height === AUTO || this.attrs.height === undefined;
       return isAuto
         ? this.getTextHeight() * this.textArr.length * this.getLineHeight() +
             this.getPadding() * 2
@@ -14398,19 +14435,23 @@
       // removing font variant will solve
       // fix for: https://github.com/konvajs/konva/issues/94
       if (Konva.UA.isIE) {
-        return this.getFontStyle() +
+        return (
+          this.getFontStyle() +
           SPACE +
           this.getFontSize() +
           PX_SPACE +
-          this.getFontFamily();
+          this.getFontFamily()
+        );
       }
-      return this.getFontStyle() +
+      return (
+        this.getFontStyle() +
         SPACE +
         this.getFontVariant() +
         SPACE +
         this.getFontSize() +
         PX_SPACE +
-        this.getFontFamily();
+        this.getFontFamily()
+      );
     },
     _addTextLine: function(line) {
       if (this.align() === JUSTIFY) {
@@ -14422,8 +14463,10 @@
     _getTextWidth: function(text) {
       var latterSpacing = this.getLetterSpacing();
       var length = text.length;
-      return dummyContext.measureText(text).width +
-        (length ? latterSpacing * (length - 1) : 0);
+      return (
+        dummyContext.measureText(text).width +
+        (length ? latterSpacing * (length - 1) : 0)
+      );
     },
     _setTextData: function() {
       var lines = this.getText().split('\n'),
@@ -14461,7 +14504,7 @@
                          */
             var low = 0, high = line.length, match = '', matchWidth = 0;
             while (low < high) {
-              var mid = low + high >>> 1,
+              var mid = (low + high) >>> 1,
                 substr = line.slice(0, mid + 1),
                 substrWidth = this._getTextWidth(substr);
               if (substrWidth <= maxWidth) {
@@ -14481,10 +14524,9 @@
               // a fitting substring was found
               if (wrapAtWord) {
                 // try to find a space or dash where wrapping could be done
-                var wrapIndex = Math.max(
-                  match.lastIndexOf(SPACE),
-                  match.lastIndexOf(DASH)
-                ) + 1;
+                var wrapIndex =
+                  Math.max(match.lastIndexOf(SPACE), match.lastIndexOf(DASH)) +
+                  1;
                 if (wrapIndex > 0) {
                   // re-cut the substring found at the space/dash position
                   low = wrapIndex;
@@ -14751,6 +14793,7 @@
      * @param {Number} [config.tension] Higher values will result in a more curvy line.  A value of 0 will result in no interpolation.
      *   The default is 0
      * @param {Boolean} [config.closed] defines whether or not the line shape is closed, creating a polygon or blob
+     * @param {Boolean} [config.bezier] if no tension is provided but bezier=true, we draw the line as a bezier using the passed points
      * @param {String} [config.fill] fill color
      * @param {Image} [config.fillPatternImage] fill pattern image
      * @param {Number} [config.fillPatternX]
@@ -14842,7 +14885,7 @@
       this.className = 'Line';
 
       this.on(
-        'pointsChange.konva tensionChange.konva closedChange.konva',
+        'pointsChange.konva tensionChange.konva closedChange.konva bezierChange.konva',
         function() {
           this._clearCache('tensionPoints');
         }
@@ -14855,6 +14898,7 @@
         length = points.length,
         tension = this.getTension(),
         closed = this.getClosed(),
+        bezier = this.getBezier(),
         tp,
         len,
         n;
@@ -14893,6 +14937,20 @@
             tp[len - 1],
             points[length - 2],
             points[length - 1]
+          );
+        }
+      } else if (bezier) {
+        // no tension but bezier
+        n = 2;
+
+        while (n < length) {
+          context.bezierCurveTo(
+            points[n++],
+            points[n++],
+            points[n++],
+            points[n++],
+            points[n++],
+            points[n++]
           );
         }
       } else {
@@ -15019,6 +15077,23 @@
      * // open the shape
      * line.closed(false);
      */
+
+  Konva.Factory.addGetterSetter(Konva.Line, 'bezier', false);
+
+  /**
+    * get/set bezier flag.  The default is false
+    * @name bezier
+    * @method
+    * @memberof Konva.Line.prototype
+    * @param {Boolean} bezier
+    * @returns {Boolean}
+    * @example
+    * // get whether the line is a bezier
+    * var isBezier = line.bezier();
+    *
+    * // set whether the line is a bezier
+    * line.bezier(true);
+    */
 
   Konva.Factory.addGetterSetter(Konva.Line, 'tension', 0);
 
@@ -15273,17 +15348,16 @@
       context.fillShape(this);
     },
     _useBufferCanvas: function() {
-      return (this.hasShadow() || this.getAbsoluteOpacity() !== 1) &&
-        this.hasStroke();
+      return (
+        (this.hasShadow() || this.getAbsoluteOpacity() !== 1) &&
+        this.hasStroke()
+      );
     },
     _setInterval: function() {
       var that = this;
-      this.interval = setInterval(
-        function() {
-          that._updateIndex();
-        },
-        1000 / this.getFrameRate()
-      );
+      this.interval = setInterval(function() {
+        that._updateIndex();
+      }, 1000 / this.getFrameRate());
     },
     /**
          * start sprite animation
@@ -15922,7 +15996,6 @@
             cpy = p.shift();
             points.push(cpx, cpy);
             break;
-
           // Note: lineTo handlers need to be above this point
           case 'm':
             var dx = p.shift();
@@ -16273,8 +16346,8 @@
     // Derived from: http://www.w3.org/TR/SVG/implnote.html#ArcImplementationNotes
     var psi = psiDeg * (Math.PI / 180.0);
     var xp = Math.cos(psi) * (x1 - x2) / 2.0 + Math.sin(psi) * (y1 - y2) / 2.0;
-    var yp = (-1) * Math.sin(psi) * (x1 - x2) / 2.0 +
-      Math.cos(psi) * (y1 - y2) / 2.0;
+    var yp =
+      -1 * Math.sin(psi) * (x1 - x2) / 2.0 + Math.cos(psi) * (y1 - y2) / 2.0;
 
     var lambda = xp * xp / (rx * rx) + yp * yp / (ry * ry);
 
@@ -16296,7 +16369,7 @@
     }
 
     var cxp = f * rx * yp / ry;
-    var cyp = f * (-ry) * xp / rx;
+    var cyp = f * -ry * xp / rx;
 
     var cx = (x1 + x2) / 2.0 + Math.cos(psi) * cxp - Math.sin(psi) * cyp;
     var cy = (y1 + y2) / 2.0 + Math.sin(psi) * cxp + Math.cos(psi) * cyp;
@@ -16312,7 +16385,7 @@
     };
     var theta = vAngle([1, 0], [(xp - cxp) / rx, (yp - cyp) / ry]);
     var u = [(xp - cxp) / rx, (yp - cyp) / ry];
-    var v = [((-1) * xp - cxp) / rx, ((-1) * yp - cyp) / ry];
+    var v = [(-1 * xp - cxp) / rx, (-1 * yp - cyp) / ry];
     var dTheta = vAngle(u, v);
 
     if (vRatio(u, v) <= -1) {
@@ -16686,7 +16759,8 @@
 
         p1 = undefined;
         while (
-          Math.abs(glyphWidth - currLen) / glyphWidth > 0.01 && attempts < 25
+          Math.abs(glyphWidth - currLen) / glyphWidth > 0.01 &&
+          attempts < 25
         ) {
           attempts++;
           var cumulativePathLength = currLen;
@@ -16694,7 +16768,8 @@
             pathCmd = getNextPathSegment();
 
             if (
-              pathCmd && cumulativePathLength + pathCmd.pathLength < glyphWidth
+              pathCmd &&
+              cumulativePathLength + pathCmd.pathLength < glyphWidth
             ) {
               cumulativePathLength += pathCmd.pathLength;
               pathCmd = undefined;
@@ -16816,7 +16891,6 @@
                 pathCmd.points[3]
               );
               break;
-
           }
 
           if (p1 !== undefined) {
@@ -16911,7 +16985,8 @@
   };
 
   // map TextPath methods to Text
-  Konva.TextPath.prototype._getContextFont = Konva.Text.prototype._getContextFont;
+  Konva.TextPath.prototype._getContextFont =
+    Konva.Text.prototype._getContextFont;
 
   Konva.Util.extend(Konva.TextPath, Konva.Shape);
 
@@ -17165,7 +17240,7 @@
 
       for (n = 1; n < sides; n++) {
         x = radius * Math.sin(n * 2 * Math.PI / sides);
-        y = (-1) * radius * Math.cos(n * 2 * Math.PI / sides);
+        y = -1 * radius * Math.cos(n * 2 * Math.PI / sides);
         context.lineTo(x, y);
       }
       context.closePath();
@@ -17350,7 +17425,7 @@
       for (var n = 1; n < numPoints * 2; n++) {
         var radius = n % 2 === 0 ? outerRadius : innerRadius;
         var x = radius * Math.sin(n * Math.PI / numPoints);
-        var y = (-1) * radius * Math.cos(n * Math.PI / numPoints);
+        var y = -1 * radius * Math.cos(n * Math.PI / numPoints);
         context.lineTo(x, y);
       }
       context.closePath();
@@ -17592,7 +17667,7 @@
         switch (pointerDirection) {
           case UP:
             x = width / 2;
-            y = (-1) * pointerHeight;
+            y = -1 * pointerHeight;
             break;
           case RIGHT:
             x = width + pointerWidth;
@@ -17603,21 +17678,21 @@
             y = height + pointerHeight;
             break;
           case LEFT:
-            x = (-1) * pointerWidth;
+            x = -1 * pointerWidth;
             y = height / 2;
             break;
         }
 
         tag.setAttrs({
-          x: (-1) * x,
-          y: (-1) * y,
+          x: -1 * x,
+          y: -1 * y,
           width: width,
           height: height
         });
 
         text.setAttrs({
-          x: (-1) * x,
-          y: (-1) * y
+          x: -1 * x,
+          y: -1 * y
         });
       }
     }
@@ -17666,7 +17741,7 @@
 
       if (pointerDirection === UP) {
         context.lineTo((width - pointerWidth) / 2, 0);
-        context.lineTo(width / 2, (-1) * pointerHeight);
+        context.lineTo(width / 2, -1 * pointerHeight);
         context.lineTo((width + pointerWidth) / 2, 0);
       }
 
@@ -17726,7 +17801,7 @@
 
       if (pointerDirection === LEFT) {
         context.lineTo(0, (height + pointerHeight) / 2);
-        context.lineTo((-1) * pointerWidth, height / 2);
+        context.lineTo(-1 * pointerWidth, height / 2);
         context.lineTo(0, (height - pointerHeight) / 2);
       }
 
@@ -17968,7 +18043,7 @@
       ctx.rotate(radians);
       ctx.moveTo(0, 0);
       ctx.lineTo(-length, width / 2);
-      ctx.lineTo(-length, (-width) / 2);
+      ctx.lineTo(-length, -width / 2);
       ctx.closePath();
       ctx.restore();
 
@@ -17980,7 +18055,7 @@
         ctx.rotate((Math.atan2(-dy, -dx) + PI2) % PI2);
         ctx.moveTo(0, 0);
         ctx.lineTo(-length, width / 2);
-        ctx.lineTo(-length, (-width) / 2);
+        ctx.lineTo(-length, -width / 2);
         ctx.closePath();
         ctx.restore();
       }
