@@ -12,7 +12,22 @@
         {"tags": ["x00080020", "x00080030"], "pos": "tr", "format": "{v0} {v1}"},
         {"tags": ["x00080060"], "pos": "tr"},
 
-        {"value": "window-center", "pos": "br", "format": "窗位/窗宽: {v0}"},
+        {"value": "window-center", "pos": "br", "format": "窗位: {v0}"},
+        {"value": "window-width", "pos": "br", "format": "窗宽: {v0}"},
+        {"value": "zoom", "pos": "br", "format": "Z: {v0}"},
+        {"value": "offset", "pos": "br", "format": "Off: {v0},{v1}"},
+        {"value": "position", "pos": "br", "format": "位置: {v0},{v1},{v2}"},
+        {"value": "frame", "pos": "br", "format": "频谱: {v0}"},
+        {"value": "value", "pos": "br", "format": "值: {v0}"}
+    ],
+    "DOM": [
+        {"tags": ["fileName"], "pos": "tl"},
+
+        {"tags": ["fileType"], "pos": "tr"},
+
+        {"tags": ["imageWidth", "imageHeight"], "pos": "bl", "format": "RES: {v0}x{v1}"},
+
+        {"value": "window-center", "pos": "br", "format": "窗位: {v0}"},
         {"value": "window-width", "pos": "br", "format": "窗宽: {v0}"},
         {"value": "zoom", "pos": "br", "format": "Z: {v0}"},
         {"value": "offset", "pos": "br", "format": "Off: {v0},{v1}"},
@@ -36,7 +51,7 @@
         {"tags": ["x00080020", "x00080030"], "pos": "tr", "format": "{v0} {v1}"},
         {"tags": ["x00080060"], "pos": "tr"},
 
-        {"value": "window-center", "pos": "br", "format": "窗位/窗宽: {v0}"},
+        {"value": "window-center", "pos": "br", "format": "窗位: {v0}"},
         {"value": "window-width", "pos": "br", "format": "窗宽: {v0}"},
         {"value": "zoom", "pos": "br", "format": "Z: {v0}"},
         {"value": "offset", "pos": "br", "format": "Off: {v0},{v1}"},
