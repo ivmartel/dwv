@@ -101,12 +101,13 @@ print([[
 <script type="text/javascript" src="/dwv/ext/jquery/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/jquery-ui/jquery-ui-1.12.0.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/flot/jquery.flot.min.js"></script>
-<script type="text/javascript" src="/dwv/ext/pdfjs/jpx.js"></script>
-<script type="text/javascript" src="/dwv/ext/pdfjs/util.js"></script>
-<script type="text/javascript" src="/dwv/ext/pdfjs/arithmetic_decoder.js"></script>
-<script type="text/javascript" src="/dwv/ext/pdfjs/jpg.js"></script>
-<script type="text/javascript" src="/dwv/ext/rii-mango/lossless-min.js"></script>
 <script type="text/javascript" src="/dwv/ext/ext/konva/konva.min.js"></script>
+<!-- Decoders -->
+<script type="text/javascript" src="/dwv/decoders/pdfjs/jpx.js"></script>
+<script type="text/javascript" src="/dwv/decoders/pdfjs/util.js"></script>
+<script type="text/javascript" src="/dwv/decoders/pdfjs/arithmetic_decoder.js"></script>
+<script type="text/javascript" src="/dwv/decoders/pdfjs/jpg.js"></script>
+<script type="text/javascript" src="/dwv/decoders/rii-mango/lossless-min.js"></script>
 
 <!-- Local -->
 <script type="text/javascript" src="/dwv/dwv-0.21.0-beta.min.js"></script>
