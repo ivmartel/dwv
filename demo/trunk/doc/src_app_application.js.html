@@ -483,9 +483,14 @@ dwv.App = function ()
      * Reset the layout of the application.
      */
     this.resetLayout = function () {
+        var previousScale = scale;
+        var previousSC = scaleCenter;
+        var previousTrans = translation;
+        // reset values
         scale = windowScale;
         scaleCenter = {"x": 0, "y": 0};
         translation = {"x": 0, "y": 0};
+        // apply new values
         if ( imageLayer ) {
             imageLayer.resetLayout(windowScale);
             imageLayer.draw();
@@ -493,8 +498,14 @@ dwv.App = function ()
         if ( drawController ) {
             drawController.resetStage(windowScale);
         }
-
-        fireEvent({"type": "zoom-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
+        // fire events
+        if (previousScale != scale) {
+            fireEvent({"type": "zoom-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
+        }
+        if ( (previousSC.x !== scaleCenter.x || previousSC.y !== scaleCenter.y) ||
+             (previousTrans.x !== translation.x || previousTrans.y !== translation.y)) {
+            fireEvent({"type": "offset-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
+        }
     };
 
     /**
@@ -1250,7 +1261,7 @@ dwv.App = function ()
                 drawController.translateStage(ox, oy);
             }
             // fire event
-            fireEvent({"type": "zoom-change", "scale": scale,
+            fireEvent({"type": "offset-change", "scale": scale,
                 "cx": imageLayer.getTrans().x, "cy": imageLayer.getTrans().y });
         }
     }
@@ -1407,13 +1418,15 @@ dwv.App = function ()
                 dataWidth, dataHeight);
 
         // image listeners
-        view.addEventListener("wl-change", self.onWLChange);
+        view.addEventListener("wl-width-change", self.onWLChange);
+        view.addEventListener("wl-center-change", self.onWLChange);
         view.addEventListener("colour-change", self.onColourChange);
         view.addEventListener("slice-change", self.onSliceChange);
         view.addEventListener("frame-change", self.onFrameChange);
 
         // connect with local listeners
-        view.addEventListener("wl-change", fireEvent);
+        view.addEventListener("wl-width-change", fireEvent);
+        view.addEventListener("wl-center-change", fireEvent);
         view.addEventListener("colour-change", fireEvent);
         view.addEventListener("position-change", fireEvent);
         view.addEventListener("slice-change", fireEvent);

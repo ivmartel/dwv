@@ -364,7 +364,7 @@ dwv.gui.info.Overlay = function ( div, pos, app )
 
             for (n=0; overlays[n]; n++) {
                 if (overlays[n].value === "window-center") {
-                    if (event.type === "wl-change") {
+                    if (event.type === "wl-center-change") {
                         li = div.getElementsByClassName("info-" + pos + "-window-center")[0];
                         dwv.html.cleanNode(li);
                         var wcStr = dwv.utils.replaceFlags2( overlays[n].format, [Math.round(event.wc)] );
@@ -373,7 +373,7 @@ dwv.gui.info.Overlay = function ( div, pos, app )
                         }
                     }
                 } else if (overlays[n].value === "window-width") {
-                    if (event.type === "wl-change") {
+                    if (event.type === "wl-width-change") {
                         li = div.getElementsByClassName("info-" + pos + "-window-width")[0];
                         dwv.html.cleanNode(li);
                         var wwStr = dwv.utils.replaceFlags2( overlays[n].format, [Math.round(event.ww)] );

@@ -443,9 +443,14 @@ dwv.App = function ()
      * Reset the layout of the application.
      */
     this.resetLayout = function () {
+        var previousScale = scale;
+        var previousSC = scaleCenter;
+        var previousTrans = translation;
+        // reset values
         scale = windowScale;
         scaleCenter = {"x": 0, "y": 0};
         translation = {"x": 0, "y": 0};
+        // apply new values
         if ( imageLayer ) {
             imageLayer.resetLayout(windowScale);
             imageLayer.draw();
@@ -453,8 +458,14 @@ dwv.App = function ()
         if ( drawController ) {
             drawController.resetStage(windowScale);
         }
-
-        fireEvent({"type": "zoom-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
+        // fire events
+        if (previousScale != scale) {
+            fireEvent({"type": "zoom-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
+        }
+        if ( (previousSC.x !== scaleCenter.x || previousSC.y !== scaleCenter.y) ||
+             (previousTrans.x !== translation.x || previousTrans.y !== translation.y)) {
+            fireEvent({"type": "offset-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
+        }
     };
 
     /**
@@ -1210,7 +1221,7 @@ dwv.App = function ()
                 drawController.translateStage(ox, oy);
             }
             // fire event
-            fireEvent({"type": "zoom-change", "scale": scale,
+            fireEvent({"type": "offset-change", "scale": scale,
                 "cx": imageLayer.getTrans().x, "cy": imageLayer.getTrans().y });
         }
     }
@@ -1367,13 +1378,15 @@ dwv.App = function ()
                 dataWidth, dataHeight);
 
         // image listeners
-        view.addEventListener("wl-change", self.onWLChange);
+        view.addEventListener("wl-width-change", self.onWLChange);
+        view.addEventListener("wl-center-change", self.onWLChange);
         view.addEventListener("colour-change", self.onColourChange);
         view.addEventListener("slice-change", self.onSliceChange);
         view.addEventListener("frame-change", self.onFrameChange);
 
         // connect with local listeners
-        view.addEventListener("wl-change", fireEvent);
+        view.addEventListener("wl-width-change", fireEvent);
+        view.addEventListener("wl-center-change", fireEvent);
         view.addEventListener("colour-change", fireEvent);
         view.addEventListener("position-change", fireEvent);
         view.addEventListener("slice-change", fireEvent);
@@ -1896,7 +1909,7 @@ dwv.InfoController = function (containerDivId)
             miniColourMap = new dwv.gui.info.MiniColourMap(infocm, app);
             miniColourMap.create();
         }
-		
+
 		// create overlay info at each corner
 		var pos_list = [
 			"tl", "tc", "tr",
@@ -1954,16 +1967,19 @@ dwv.InfoController = function (containerDivId)
     function addListeners(app, view)
     {
         if (plotInfo) {
-            view.addEventListener("wl-change", plotInfo.update);
+            view.addEventListener("wl-width-change", plotInfo.update);
+            view.addEventListener("wl-center-change", plotInfo.update);
         }
         if (miniColourMap) {
-            view.addEventListener("wl-change", miniColourMap.update);
+            view.addEventListener("wl-width-change", miniColourMap.update);
+            view.addEventListener("wl-center-change", miniColourMap.update);
             view.addEventListener("colour-change", miniColourMap.update);
         }
 		if (overlayInfos.length > 0){
 			for (var n=0; n<overlayInfos.length; n++){
 				app.addEventListener("zoom-change", overlayInfos[n].update);
-				view.addEventListener("wl-change", overlayInfos[n].update);
+				view.addEventListener("wl-width-change", overlayInfos[n].update);
+                view.addEventListener("wl-center-change", overlayInfos[n].update);
 				view.addEventListener("position-change", overlayInfos[n].update);
 				view.addEventListener("frame-change", overlayInfos[n].update);
 			}
@@ -1980,16 +1996,19 @@ dwv.InfoController = function (containerDivId)
     function removeListeners(app, view)
     {
         if (plotInfo) {
-            view.removeEventListener("wl-change", plotInfo.update);
+            view.removeEventListener("wl-width-change", plotInfo.update);
+            view.removeEventListener("wl-center-change", plotInfo.update);
         }
         if (miniColourMap) {
-            view.removeEventListener("wl-change", miniColourMap.update);
+            view.removeEventListener("wl-width-change", miniColourMap.update);
+            view.removeEventListener("wl-center-change", miniColourMap.update);
             view.removeEventListener("colour-change", miniColourMap.update);
         }
 		if (overlayInfos.length > 0){
 			for (var n=0; n<overlayInfos.length; n++){
 				app.removeEventListener("zoom-change", overlayInfos[n].update);
-				view.removeEventListener("wl-change", overlayInfos[n].update);
+                view.removeEventListener("wl-width-change", overlayInfos[n].update);
+				view.removeEventListener("wl-center-change", overlayInfos[n].update);
 				view.removeEventListener("position-change", overlayInfos[n].update);
 				view.removeEventListener("frame-change", overlayInfos[n].update);
 			}
@@ -10972,7 +10991,7 @@ dwv.gui.info.Overlay = function ( div, pos, app )
 
             for (n=0; overlays[n]; n++) {
                 if (overlays[n].value === "window-center") {
-                    if (event.type === "wl-change") {
+                    if (event.type === "wl-center-change") {
                         li = div.getElementsByClassName("info-" + pos + "-window-center")[0];
                         dwv.html.cleanNode(li);
                         var wcStr = dwv.utils.replaceFlags2( overlays[n].format, [Math.round(event.wc)] );
@@ -10981,7 +11000,7 @@ dwv.gui.info.Overlay = function ( div, pos, app )
                         }
                     }
                 } else if (overlays[n].value === "window-width") {
-                    if (event.type === "wl-change") {
+                    if (event.type === "wl-width-change") {
                         li = div.getElementsByClassName("info-" + pos + "-window-width")[0];
                         dwv.html.cleanNode(li);
                         var wwStr = dwv.utils.replaceFlags2( overlays[n].format, [Math.round(event.ww)] );
@@ -15071,6 +15090,7 @@ dwv.image.View = function (image)
     /**
      * Get the window LUT of the image.
      * Warning: can be undefined in no window/level was set.
+     * @param {Object} rsi Optional image rsi, will take the one of the current slice otherwise.
      * @return {Window} The window LUT of the image.
      */
     this.getCurrentWindowLut = function (rsi) {
@@ -15081,6 +15101,7 @@ dwv.image.View = function (image)
         }
         // get the lut
         var wlut = windowLuts[ rsi.toString() ];
+
         // special case for 'perslice' presets
         if (currentPresetName &&
             typeof windowPresets[currentPresetName] !== "undefined" &&
@@ -15092,14 +15113,23 @@ dwv.image.View = function (image)
             if (!wlut.getWindowLevel().equals(wl)) {
                 // set slice window level
                 wlut.setWindowLevel(wl);
-                // update InfoController window/level by firing special event
-                this.fireEvent({"type": "wl-change",
-                    "wc": wl.getCenter(), "ww": wl.getWidth(),
-                    "skipGenerate": true});
+                // fire event
+                if ( wlut.getWindowLevel().getWidth() !== wl.getWidth() ) {
+                    this.fireEvent({"type": "wl-width-change",
+                        "wc": wl.getCenter(), "ww": wl.getWidth(),
+                        "skipGenerate": true});
+                } else {
+                    this.fireEvent({"type": "wl-center-change",
+                        "wc": wl.getCenter(), "ww": wl.getWidth(),
+                        "skipGenerate": true});
+                }
             }
         }
+
         // update in case of wl change
+        // TODO: should not be run in a getter...
         wlut.update();
+        
         // return
         return wlut;
     };
@@ -15302,6 +15332,17 @@ dwv.image.View = function (image)
         // window width shall be >= 1 (see https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
         if ( width >= 1 ) {
 
+            // get current window/level (before updating name)
+            var sliceNumber = this.getCurrentPosition().k;
+            var currentWl = null;
+            var rsi = image.getRescaleSlopeAndIntercept(sliceNumber);
+            if ( rsi && typeof rsi !== "undefined" ) {
+                var currentLut = windowLuts[ rsi.toString() ];
+                if ( currentLut && typeof currentLut !== "undefined") {
+                    currentWl = currentLut.getWindowLevel();
+                }
+            }
+
             if ( typeof name === "undefined" ) {
                 name = "manual";
             }
@@ -15327,7 +15368,16 @@ dwv.image.View = function (image)
             }
 
             // fire window level change event
-            this.fireEvent({"type": "wl-change", "wc": center, "ww": width });
+            if (currentWl && typeof currentWl !== "undefined") {
+                if (currentWl.getWidth() !== width) {
+                    this.fireEvent({"type": "wl-width-change", "wc": center, "ww": width });
+                } else if (currentWl.getCenter() !== center) {
+                    this.fireEvent({"type": "wl-center-change", "wc": center, "ww": width });
+                }
+            } else {
+                this.fireEvent({"type": "wl-width-change", "wc": center, "ww": width });
+                this.fireEvent({"type": "wl-center-change", "wc": center, "ww": width });
+            }
         }
     };
 
