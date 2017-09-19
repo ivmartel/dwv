@@ -28,7 +28,7 @@ dwv.InfoController = function (containerDivId)
             miniColourMap = new dwv.gui.info.MiniColourMap(infocm, app);
             miniColourMap.create();
         }
-		
+
 		// create overlay info at each corner
 		var pos_list = [
 			"tl", "tc", "tr",
@@ -86,16 +86,19 @@ dwv.InfoController = function (containerDivId)
     function addListeners(app, view)
     {
         if (plotInfo) {
-            view.addEventListener("wl-change", plotInfo.update);
+            view.addEventListener("wl-width-change", plotInfo.update);
+            view.addEventListener("wl-center-change", plotInfo.update);
         }
         if (miniColourMap) {
-            view.addEventListener("wl-change", miniColourMap.update);
+            view.addEventListener("wl-width-change", miniColourMap.update);
+            view.addEventListener("wl-center-change", miniColourMap.update);
             view.addEventListener("colour-change", miniColourMap.update);
         }
 		if (overlayInfos.length > 0){
 			for (var n=0; n<overlayInfos.length; n++){
 				app.addEventListener("zoom-change", overlayInfos[n].update);
-				view.addEventListener("wl-change", overlayInfos[n].update);
+				view.addEventListener("wl-width-change", overlayInfos[n].update);
+                view.addEventListener("wl-center-change", overlayInfos[n].update);
 				view.addEventListener("position-change", overlayInfos[n].update);
 				view.addEventListener("frame-change", overlayInfos[n].update);
 			}
@@ -112,16 +115,19 @@ dwv.InfoController = function (containerDivId)
     function removeListeners(app, view)
     {
         if (plotInfo) {
-            view.removeEventListener("wl-change", plotInfo.update);
+            view.removeEventListener("wl-width-change", plotInfo.update);
+            view.removeEventListener("wl-center-change", plotInfo.update);
         }
         if (miniColourMap) {
-            view.removeEventListener("wl-change", miniColourMap.update);
+            view.removeEventListener("wl-width-change", miniColourMap.update);
+            view.removeEventListener("wl-center-change", miniColourMap.update);
             view.removeEventListener("colour-change", miniColourMap.update);
         }
 		if (overlayInfos.length > 0){
 			for (var n=0; n<overlayInfos.length; n++){
 				app.removeEventListener("zoom-change", overlayInfos[n].update);
-				view.removeEventListener("wl-change", overlayInfos[n].update);
+                view.removeEventListener("wl-width-change", overlayInfos[n].update);
+				view.removeEventListener("wl-center-change", overlayInfos[n].update);
 				view.removeEventListener("position-change", overlayInfos[n].update);
 				view.removeEventListener("frame-change", overlayInfos[n].update);
 			}

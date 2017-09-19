@@ -214,6 +214,7 @@ dwv.image.View = function (image)
     /**
      * Get the window LUT of the image.
      * Warning: can be undefined in no window/level was set.
+     * @param {Object} rsi Optional image rsi, will take the one of the current slice otherwise.
      * @return {Window} The window LUT of the image.
      */
     this.getCurrentWindowLut = function (rsi) {
@@ -224,6 +225,7 @@ dwv.image.View = function (image)
         }
         // get the lut
         var wlut = windowLuts[ rsi.toString() ];
+
         // special case for 'perslice' presets
         if (currentPresetName &&
             typeof windowPresets[currentPresetName] !== "undefined" &&
@@ -235,14 +237,23 @@ dwv.image.View = function (image)
             if (!wlut.getWindowLevel().equals(wl)) {
                 // set slice window level
                 wlut.setWindowLevel(wl);
-                // update InfoController window/level by firing special event
-                this.fireEvent({"type": "wl-change",
-                    "wc": wl.getCenter(), "ww": wl.getWidth(),
-                    "skipGenerate": true});
+                // fire event
+                if ( wlut.getWindowLevel().getWidth() !== wl.getWidth() ) {
+                    this.fireEvent({"type": "wl-width-change",
+                        "wc": wl.getCenter(), "ww": wl.getWidth(),
+                        "skipGenerate": true});
+                } else {
+                    this.fireEvent({"type": "wl-center-change",
+                        "wc": wl.getCenter(), "ww": wl.getWidth(),
+                        "skipGenerate": true});
+                }
             }
         }
+
         // update in case of wl change
+        // TODO: should not be run in a getter...
         wlut.update();
+        
         // return
         return wlut;
     };
@@ -445,6 +456,17 @@ dwv.image.View = function (image)
         // window width shall be >= 1 (see https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
         if ( width >= 1 ) {
 
+            // get current window/level (before updating name)
+            var sliceNumber = this.getCurrentPosition().k;
+            var currentWl = null;
+            var rsi = image.getRescaleSlopeAndIntercept(sliceNumber);
+            if ( rsi && typeof rsi !== "undefined" ) {
+                var currentLut = windowLuts[ rsi.toString() ];
+                if ( currentLut && typeof currentLut !== "undefined") {
+                    currentWl = currentLut.getWindowLevel();
+                }
+            }
+
             if ( typeof name === "undefined" ) {
                 name = "manual";
             }
@@ -470,7 +492,16 @@ dwv.image.View = function (image)
             }
 
             // fire window level change event
-            this.fireEvent({"type": "wl-change", "wc": center, "ww": width });
+            if (currentWl && typeof currentWl !== "undefined") {
+                if (currentWl.getWidth() !== width) {
+                    this.fireEvent({"type": "wl-width-change", "wc": center, "ww": width });
+                } else if (currentWl.getCenter() !== center) {
+                    this.fireEvent({"type": "wl-center-change", "wc": center, "ww": width });
+                }
+            } else {
+                this.fireEvent({"type": "wl-width-change", "wc": center, "ww": width });
+                this.fireEvent({"type": "wl-center-change", "wc": center, "ww": width });
+            }
         }
     };
 
