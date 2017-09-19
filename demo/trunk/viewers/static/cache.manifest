@@ -61,14 +61,14 @@ appgui.js
 /dwv/demo/stable/ext/jquery-ui/jquery-ui-1.12.0.min.js
 /dwv/demo/stable/ext/flot/jquery.flot.min.js
 # js: decoders
-/dwv/demo/stable/ext/pdfjs/jpx.js
-/dwv/demo/stable/ext/pdfjs/arithmetic_decoder.js
-/dwv/demo/stable/ext/pdfjs/decode-jpeg2000.js
-/dwv/demo/stable/ext/pdfjs/util.js
-/dwv/demo/stable/ext/pdfjs/jpg.js
-/dwv/demo/stable/ext/pdfjs/decode-jpegbaseline.js
-/dwv/demo/stable/ext/rii-mango/lossless-min.js
-/dwv/demo/stable/ext/rii-mango/decode-jpegloss.js
+/dwv/demo/stable/decoders/pdfjs/jpx.js
+/dwv/demo/stable/decoders/pdfjs/arithmetic_decoder.js
+/dwv/demo/stable/decoders/pdfjs/decode-jpeg2000.js
+/dwv/demo/stable/decoders/pdfjs/util.js
+/dwv/demo/stable/decoders/pdfjs/jpg.js
+/dwv/demo/stable/decoders/pdfjs/decode-jpegbaseline.js
+/dwv/demo/stable/decoders/rii-mango/lossless-min.js
+/dwv/demo/stable/decoders/rii-mango/decode-jpegloss.js
 
 NETWORK:
 *
