@@ -235,14 +235,18 @@ dwv.image.View = function (image)
             var wl = windowPresets[currentPresetName].wl[sliceNumber];
             // apply it if different from previous
             if (!wlut.getWindowLevel().equals(wl)) {
+                // previous values
+                var previousWidth = wlut.getWindowLevel().getWidth();
+                var previousCenter = wlut.getWindowLevel().getCenter();
                 // set slice window level
                 wlut.setWindowLevel(wl);
                 // fire event
-                if ( wlut.getWindowLevel().getWidth() !== wl.getWidth() ) {
+                if ( previousWidth !== wl.getWidth() ) {
                     this.fireEvent({"type": "wl-width-change",
                         "wc": wl.getCenter(), "ww": wl.getWidth(),
                         "skipGenerate": true});
-                } else {
+                }
+                if ( previousCenter !== wl.getCenter() ) {
                     this.fireEvent({"type": "wl-center-change",
                         "wc": wl.getCenter(), "ww": wl.getWidth(),
                         "skipGenerate": true});
@@ -253,7 +257,7 @@ dwv.image.View = function (image)
         // update in case of wl change
         // TODO: should not be run in a getter...
         wlut.update();
-        
+
         // return
         return wlut;
     };
@@ -495,7 +499,8 @@ dwv.image.View = function (image)
             if (currentWl && typeof currentWl !== "undefined") {
                 if (currentWl.getWidth() !== width) {
                     this.fireEvent({"type": "wl-width-change", "wc": center, "ww": width });
-                } else if (currentWl.getCenter() !== center) {
+                }
+                if (currentWl.getCenter() !== center) {
                     this.fireEvent({"type": "wl-center-change", "wc": center, "ww": width });
                 }
             } else {
