@@ -1364,9 +1364,10 @@ dwv.App = function ()
             infoController.toggleListeners(self, view);
         }
 
-        // init W/L display: triggers a wlchange event
-        //   listened by the view and a general display.
+        // init W/L display
         self.initWLDisplay();
+        // generate first image
+        generateAndDrawImage();
     }
 
 };
