@@ -19,6 +19,7 @@ function startApp() {
             console.timeEnd("load-data");
         }
     };
+
     // before myapp.init since it does the url load
     myapp.addEventListener("load-start", listener);
     myapp.addEventListener("load-end", listener);
@@ -29,10 +30,16 @@ function startApp() {
     //myapp.addEventListener("draw-move", listener);
     //myapp.addEventListener("draw-change", listener);
     //myapp.addEventListener("draw-delete", listener);
-    //myapp.addEventListener("wl-change", listener);
+    //myapp.addEventListener("wl-width-change", listener);
+    //myapp.addEventListener("wl-center-change", listener);
     //myapp.addEventListener("colour-change", listener);
     //myapp.addEventListener("position-change", listener);
     //myapp.addEventListener("slice-change", listener);
+    //myapp.addEventListener("frame-change", listener);
+    //myapp.addEventListener("zoom-change", listener);
+    //myapp.addEventListener("offset-change", listener);
+    //myapp.addEventListener("filter-run", listener);
+    //myapp.addEventListener("filter-undo", listener);
 
     // initialise the application
     myapp.init({
