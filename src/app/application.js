@@ -224,6 +224,8 @@ dwv.App = function ()
                             }
                         }
                         toolList.Filter = new dwv.tool.Filter(filterList, this);
+                        toolList.Filter.addEventListener("filter-run", fireEvent);
+                        toolList.Filter.addEventListener("filter-undo", fireEvent);
                     }
                 }
                 else {

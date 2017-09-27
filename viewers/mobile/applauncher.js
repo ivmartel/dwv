@@ -38,6 +38,8 @@ function startApp() {
     //myapp.addEventListener("frame-change", listener);
     //myapp.addEventListener("zoom-change", listener);
     //myapp.addEventListener("offset-change", listener);
+    //myapp.addEventListener("filter-run", listener);
+    //myapp.addEventListener("filter-undo", listener);
 
     // initialise the application
     myapp.init({
