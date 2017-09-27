@@ -20645,10 +20645,20 @@ dwv.tool.Filter.prototype.hasFilter = function (name)
 dwv.tool.filter.Threshold = function ( app )
 {
     /**
+     * Associated filter.
+     * @type Object
+     */
+    var filter = new dwv.image.filter.Threshold();
+    /**
      * Filter GUI.
      * @type Object
      */
     var gui = new dwv.gui.Threshold(app);
+    /**
+     * Flag to know whether to reset the image or not.
+     * @type Boolean
+     */
+    var resetImage = true;
 
     /**
      * Setup the filter GUI.
@@ -20665,6 +20675,10 @@ dwv.tool.filter.Threshold = function ( app )
     this.display = function (bool)
     {
         gui.display(bool);
+        // reset the image when the tool is displayed
+        if ( bool ) {
+            resetImage = true;
+        }
     };
 
     /**
@@ -20681,9 +20695,13 @@ dwv.tool.filter.Threshold = function ( app )
      */
     this.run = function (args)
     {
-        var filter = new dwv.image.filter.Threshold();
         filter.setMin(args.min);
         filter.setMax(args.max);
+        // reset the image if asked
+        if ( resetImage ) {
+            filter.setOriginalImage(app.getImage());
+            resetImage = false;
+        }
         var command = new dwv.tool.RunFilterCommand(filter, app);
         command.execute();
         // save command in undo stack
@@ -20738,6 +20756,7 @@ dwv.tool.filter.Sharpen = function ( app )
     this.run = function(/*args*/)
     {
         var filter = new dwv.image.filter.Sharpen();
+        filter.setOriginalImage(app.getImage());
         var command = new dwv.tool.RunFilterCommand(filter, app);
         command.execute();
         // save command in undo stack
@@ -20791,6 +20810,7 @@ dwv.tool.filter.Sobel = function ( app )
     dwv.tool.filter.Sobel.prototype.run = function(/*args*/)
     {
         var filter = new dwv.image.filter.Sobel();
+        filter.setOriginalImage(app.getImage());
         var command = new dwv.tool.RunFilterCommand(filter, app);
         command.execute();
         // save command in undo stack
@@ -20818,7 +20838,6 @@ dwv.tool.RunFilterCommand = function (filter, app) {
      */
     this.execute = function ()
     {
-        filter.setOriginalImage(app.getImage());
         app.setImage(filter.update());
         app.render();
     };
