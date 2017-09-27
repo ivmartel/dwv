@@ -39,7 +39,7 @@ dwv.tool.Filter = function ( filterList, app )
     this.displayed = false;
 
     /**
-     * Setup the filter GUI.
+     * Setup the filter GUI. Called at app startup.
      */
     this.setup = function ()
     {
@@ -53,7 +53,7 @@ dwv.tool.Filter = function ( filterList, app )
     };
 
     /**
-     * Enable the filter.
+     * Display the tool.
      * @param {Boolean} bool Flag to enable or not.
      */
     this.display = function (bool)
@@ -67,7 +67,7 @@ dwv.tool.Filter = function ( filterList, app )
     };
 
     /**
-     * Initialise the filter.
+     * Initialise the filter. Called once the image is loaded.
      */
     this.init = function ()
     {
@@ -127,19 +127,19 @@ dwv.tool.Filter.prototype.getSelectedFilter = function ()
 dwv.tool.Filter.prototype.setSelectedFilter = function (name)
 {
     // check if we have it
-    if( !this.hasFilter(name) )
+    if ( !this.hasFilter(name) )
     {
         throw new Error("Unknown filter: '" + name + "'");
     }
     // hide last selected
-    if( this.displayed )
+    if ( this.displayed )
     {
         this.selectedFilter.display(false);
     }
     // enable new one
     this.selectedFilter = this.filterList[name];
     // display the selected filter
-    if( this.displayed )
+    if ( this.displayed )
     {
         this.selectedFilter.display(true);
     }
@@ -182,13 +182,13 @@ dwv.tool.filter.Threshold = function ( app )
      */
     var gui = new dwv.gui.Threshold(app);
     /**
-     * Flag to know whether to reset the image or not.
+     * Flag to know wether to reset the image or not.
      * @type Boolean
      */
     var resetImage = true;
 
     /**
-     * Setup the filter GUI.
+     * Setup the filter GUI. Called at app startup.
      */
     this.setup = function ()
     {
@@ -209,7 +209,7 @@ dwv.tool.filter.Threshold = function ( app )
     };
 
     /**
-     * Initialise the filter.
+     * Initialise the filter. Called once the image is loaded.
      */
     this.init = function ()
     {
@@ -252,7 +252,7 @@ dwv.tool.filter.Sharpen = function ( app )
     var gui = new dwv.gui.Sharpen(app);
 
     /**
-     * Setup the filter GUI.
+     * Setup the filter GUI. Called at app startup.
      */
     this.setup = function ()
     {
@@ -269,9 +269,9 @@ dwv.tool.filter.Sharpen = function ( app )
     };
 
     /**
-     * Initialise the filter.
+     * Initialise the filter. Called once the image is loaded.
      */
-    this.init = function()
+    this.init = function ()
     {
         // nothing to do...
     };
@@ -280,7 +280,7 @@ dwv.tool.filter.Sharpen = function ( app )
      * Run the filter.
      * @param {Mixed} args The filter arguments.
      */
-    this.run = function(/*args*/)
+    this.run = function (/*args*/)
     {
         var filter = new dwv.image.filter.Sharpen();
         filter.setOriginalImage(app.getImage());
@@ -306,7 +306,7 @@ dwv.tool.filter.Sobel = function ( app )
     var gui = new dwv.gui.Sobel(app);
 
     /**
-     * Setup the filter GUI.
+     * Setup the filter GUI. Called at app startup.
      */
     this.setup = function ()
     {
@@ -317,15 +317,15 @@ dwv.tool.filter.Sobel = function ( app )
      * Enable the filter.
      * @param {Boolean} bool Flag to enable or not.
      */
-    this.display = function(bool)
+    this.display = function (bool)
     {
         gui.display(bool);
     };
 
     /**
-     * Initialise the filter.
+     * Initialise the filter. Called once the image is loaded.
      */
-    this.init = function()
+    this.init = function ()
     {
         // nothing to do...
     };
@@ -334,7 +334,7 @@ dwv.tool.filter.Sobel = function ( app )
      * Run the filter.
      * @param {Mixed} args The filter arguments.
      */
-    dwv.tool.filter.Sobel.prototype.run = function(/*args*/)
+    dwv.tool.filter.Sobel.prototype.run = function (/*args*/)
     {
         var filter = new dwv.image.filter.Sobel();
         filter.setOriginalImage(app.getImage());
@@ -368,6 +368,7 @@ dwv.tool.RunFilterCommand = function (filter, app) {
         app.setImage(filter.update());
         app.render();
     };
+    
     /**
      * Undo the command.
      */
