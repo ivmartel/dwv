@@ -28,9 +28,9 @@ function startApp() {
 
 // Image decoders (for web workers)
 dwv.image.decoderScripts = {
-    "jpeg2000": "../../ext/pdfjs/decode-jpeg2000.js",
-    "jpeg-lossless": "../../ext/rii-mango/decode-jpegloss.js",
-    "jpeg-baseline": "../../ext/pdfjs/decode-jpegbaseline.js"
+    "jpeg2000": "../../decoders/pdfjs/decode-jpeg2000.js",
+    "jpeg-lossless": "../../decoders/rii-mango/decode-jpegloss.js",
+    "jpeg-baseline": "../../decoders/pdfjs/decode-jpegbaseline.js"
 };
 
 // check browser support
