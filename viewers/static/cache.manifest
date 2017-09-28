@@ -35,7 +35,7 @@ appgui.js
 # third party
 
 # css
-/dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/jquery-ui-1.12.0.min.css
+/dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/jquery-ui-1.12.1.min.css
 /dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-bg_glass_20_555555_1x400.png
 /dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-bg_glass_40_0078a3_1x400.png
 /dwv/demo/stable/ext/jquery-ui/themes/ui-darkness/images/ui-bg_glass_40_ffc73d_1x400.png
@@ -58,7 +58,7 @@ appgui.js
 /dwv/demo/stable/ext/jszip/jszip.min.js
 # js: viewer
 /dwv/demo/stable/ext/jquery/jquery-2.1.4.min.js
-/dwv/demo/stable/ext/jquery-ui/jquery-ui-1.12.0.min.js
+/dwv/demo/stable/ext/jquery-ui/jquery-ui-1.12.1.min.js
 /dwv/demo/stable/ext/flot/jquery.flot.min.js
 # js: decoders
 /dwv/demo/stable/decoders/pdfjs/jpx.js
