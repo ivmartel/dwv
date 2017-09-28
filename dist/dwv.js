@@ -137,7 +137,7 @@ dwv.App = function ()
      * Get the version of the application.
      * @return {String} The version of the application.
      */
-    this.getVersion = function () { return "v0.20.1"; };
+    this.getVersion = function () { return "v0.21.0"; };
 
     /**
      * Get the image.
@@ -284,6 +284,8 @@ dwv.App = function ()
                             }
                         }
                         toolList.Filter = new dwv.tool.Filter(filterList, this);
+                        toolList.Filter.addEventListener("filter-run", fireEvent);
+                        toolList.Filter.addEventListener("filter-undo", fireEvent);
                     }
                 }
                 else {
@@ -443,9 +445,14 @@ dwv.App = function ()
      * Reset the layout of the application.
      */
     this.resetLayout = function () {
+        var previousScale = scale;
+        var previousSC = scaleCenter;
+        var previousTrans = translation;
+        // reset values
         scale = windowScale;
         scaleCenter = {"x": 0, "y": 0};
         translation = {"x": 0, "y": 0};
+        // apply new values
         if ( imageLayer ) {
             imageLayer.resetLayout(windowScale);
             imageLayer.draw();
@@ -453,8 +460,14 @@ dwv.App = function ()
         if ( drawController ) {
             drawController.resetStage(windowScale);
         }
-
-        fireEvent({"type": "zoom-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
+        // fire events
+        if (previousScale != scale) {
+            fireEvent({"type": "zoom-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
+        }
+        if ( (previousSC.x !== scaleCenter.x || previousSC.y !== scaleCenter.y) ||
+             (previousTrans.x !== translation.x || previousTrans.y !== translation.y)) {
+            fireEvent({"type": "offset-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
+        }
     };
 
     /**
@@ -1210,7 +1223,7 @@ dwv.App = function ()
                 drawController.translateStage(ox, oy);
             }
             // fire event
-            fireEvent({"type": "zoom-change", "scale": scale,
+            fireEvent({"type": "offset-change", "scale": scale,
                 "cx": imageLayer.getTrans().x, "cy": imageLayer.getTrans().y });
         }
     }
@@ -1367,13 +1380,15 @@ dwv.App = function ()
                 dataWidth, dataHeight);
 
         // image listeners
-        view.addEventListener("wl-change", self.onWLChange);
+        view.addEventListener("wl-width-change", self.onWLChange);
+        view.addEventListener("wl-center-change", self.onWLChange);
         view.addEventListener("colour-change", self.onColourChange);
         view.addEventListener("slice-change", self.onSliceChange);
         view.addEventListener("frame-change", self.onFrameChange);
 
         // connect with local listeners
-        view.addEventListener("wl-change", fireEvent);
+        view.addEventListener("wl-width-change", fireEvent);
+        view.addEventListener("wl-center-change", fireEvent);
         view.addEventListener("colour-change", fireEvent);
         view.addEventListener("position-change", fireEvent);
         view.addEventListener("slice-change", fireEvent);
@@ -1411,9 +1426,10 @@ dwv.App = function ()
             infoController.toggleListeners(self, view);
         }
 
-        // init W/L display: triggers a wlchange event
-        //   listened by the view and a general display.
+        // init W/L display
         self.initWLDisplay();
+        // generate first image
+        generateAndDrawImage();
     }
 
 };
@@ -1896,7 +1912,7 @@ dwv.InfoController = function (containerDivId)
             miniColourMap = new dwv.gui.info.MiniColourMap(infocm, app);
             miniColourMap.create();
         }
-		
+
 		// create overlay info at each corner
 		var pos_list = [
 			"tl", "tc", "tr",
@@ -1954,16 +1970,19 @@ dwv.InfoController = function (containerDivId)
     function addListeners(app, view)
     {
         if (plotInfo) {
-            view.addEventListener("wl-change", plotInfo.update);
+            view.addEventListener("wl-width-change", plotInfo.update);
+            view.addEventListener("wl-center-change", plotInfo.update);
         }
         if (miniColourMap) {
-            view.addEventListener("wl-change", miniColourMap.update);
+            view.addEventListener("wl-width-change", miniColourMap.update);
+            view.addEventListener("wl-center-change", miniColourMap.update);
             view.addEventListener("colour-change", miniColourMap.update);
         }
 		if (overlayInfos.length > 0){
 			for (var n=0; n<overlayInfos.length; n++){
 				app.addEventListener("zoom-change", overlayInfos[n].update);
-				view.addEventListener("wl-change", overlayInfos[n].update);
+				view.addEventListener("wl-width-change", overlayInfos[n].update);
+                view.addEventListener("wl-center-change", overlayInfos[n].update);
 				view.addEventListener("position-change", overlayInfos[n].update);
 				view.addEventListener("frame-change", overlayInfos[n].update);
 			}
@@ -1980,16 +1999,19 @@ dwv.InfoController = function (containerDivId)
     function removeListeners(app, view)
     {
         if (plotInfo) {
-            view.removeEventListener("wl-change", plotInfo.update);
+            view.removeEventListener("wl-width-change", plotInfo.update);
+            view.removeEventListener("wl-center-change", plotInfo.update);
         }
         if (miniColourMap) {
-            view.removeEventListener("wl-change", miniColourMap.update);
+            view.removeEventListener("wl-width-change", miniColourMap.update);
+            view.removeEventListener("wl-center-change", miniColourMap.update);
             view.removeEventListener("colour-change", miniColourMap.update);
         }
 		if (overlayInfos.length > 0){
 			for (var n=0; n<overlayInfos.length; n++){
 				app.removeEventListener("zoom-change", overlayInfos[n].update);
-				view.removeEventListener("wl-change", overlayInfos[n].update);
+                view.removeEventListener("wl-width-change", overlayInfos[n].update);
+				view.removeEventListener("wl-center-change", overlayInfos[n].update);
 				view.removeEventListener("position-change", overlayInfos[n].update);
 				view.removeEventListener("frame-change", overlayInfos[n].update);
 			}
@@ -10452,7 +10474,10 @@ dwv.html.createHighlightNode = function (child) {
  * @param {Object} node The node to remove kids.
  */
 dwv.html.cleanNode = function (node) {
-    // remove its children
+    // remove its children if node exists
+    if ( !node ) {
+        return;
+    }
     while (node.hasChildNodes()) {
         node.removeChild(node.firstChild);
     }
@@ -10969,18 +10994,22 @@ dwv.gui.info.Overlay = function ( div, pos, app )
 
             for (n=0; overlays[n]; n++) {
                 if (overlays[n].value === "window-center") {
-                    if (event.type === "wl-change") {
+                    if (event.type === "wl-center-change") {
                         li = div.getElementsByClassName("info-" + pos + "-window-center")[0];
                         dwv.html.cleanNode(li);
                         var wcStr = dwv.utils.replaceFlags2( overlays[n].format, [Math.round(event.wc)] );
-                        li.appendChild( document.createTextNode(wcStr) );
+                        if (li) {
+                            li.appendChild( document.createTextNode(wcStr) );
+                        }
                     }
                 } else if (overlays[n].value === "window-width") {
-                    if (event.type === "wl-change") {
+                    if (event.type === "wl-width-change") {
                         li = div.getElementsByClassName("info-" + pos + "-window-width")[0];
                         dwv.html.cleanNode(li);
                         var wwStr = dwv.utils.replaceFlags2( overlays[n].format, [Math.round(event.ww)] );
-                        li.appendChild( document.createTextNode(wwStr) );
+                        if (li) {
+                            li.appendChild( document.createTextNode(wwStr) );
+                        }
                     }
                 } else if (overlays[n].value === "zoom") {
                     if (event.type === "zoom-change") {
@@ -10988,7 +11017,9 @@ dwv.gui.info.Overlay = function ( div, pos, app )
                         dwv.html.cleanNode(li);
                         var zoom = Number(event.scale).toPrecision(3);
                         var zoomStr = dwv.utils.replaceFlags2( overlays[n].format, [zoom] );
-                        li.appendChild( document.createTextNode( zoomStr ) );
+                        if (li) {
+                            li.appendChild( document.createTextNode( zoomStr ) );
+                        }
                     }
                 } else if (overlays[n].value === "offset") {
                     if (event.type === "zoom-change") {
@@ -10997,34 +11028,44 @@ dwv.gui.info.Overlay = function ( div, pos, app )
                         var offset = [ Number(event.cx).toPrecision(3),
                             Number(event.cy).toPrecision(3)];
                         var offStr = dwv.utils.replaceFlags2( overlays[n].format, offset );
-                        li.appendChild( document.createTextNode( offStr ) );
+                        if (li) {
+                            li.appendChild( document.createTextNode( offStr ) );
+                        }
                     }
                 } else if (overlays[n].value === "value") {
                     if (event.type === "position-change") {
                         li = div.getElementsByClassName("info-" + pos + "-value")[0];
                         dwv.html.cleanNode(li);
                         var valueStr = dwv.utils.replaceFlags2( overlays[n].format, [event.value] );
-                        li.appendChild( document.createTextNode( valueStr ) );
+                        if (li) {
+                            li.appendChild( document.createTextNode( valueStr ) );
+                        }
                     }
                 } else if (overlays[n].value === "position") {
                     if (event.type === "position-change") {
                         li = div.getElementsByClassName("info-" + pos + "-position")[0];
                         dwv.html.cleanNode(li);
                         var posStr = dwv.utils.replaceFlags2( overlays[n].format, [event.i, event.j, event.k] );
-                        li.appendChild( document.createTextNode( posStr ) );
+                        if (li) {
+                            li.appendChild( document.createTextNode( posStr ) );
+                        }
                     }
                 } else if (overlays[n].value === "frame") {
                     if (event.type === "frame-change") {
                         li = div.getElementsByClassName("info-" + pos + "-frame")[0];
                         dwv.html.cleanNode(li);
                         var frameStr = dwv.utils.replaceFlags2( overlays[n].format, [event.frame] );
-                        li.appendChild( document.createTextNode( frameStr ) );
+                        if (li) {
+                            li.appendChild( document.createTextNode( frameStr ) );
+                        }
                     }
                 } else {
                     if (event.type === "position-change") {
                         li = div.getElementsByClassName("info-" + pos + "-" + n)[0];
                         dwv.html.cleanNode(li);
-                        li.appendChild( document.createTextNode( overlays[n].value ) );
+                        if (li) {
+                            li.appendChild( document.createTextNode( overlays[n].value ) );
+                        }
                     }
                 }
             }
@@ -12807,9 +12848,10 @@ dwv.image = dwv.image || {};
 dwv.image.imageDataToBuffer = function (imageData) {
     // remove alpha
     // TODO support passing the full image data
-    var buffer = [];
+    var dataLen = imageData.data.length;
+    var buffer = new Uint8Array( (dataLen / 4) * 3);
     var j = 0;
-    for( var i = 0; i < imageData.data.length; i+=4 ) {
+    for( var i = 0; i < dataLen; i+=4 ) {
         buffer[j] = imageData.data[i];
         buffer[j+1] = imageData.data[i+1];
         buffer[j+2] = imageData.data[i+2];
@@ -15051,6 +15093,7 @@ dwv.image.View = function (image)
     /**
      * Get the window LUT of the image.
      * Warning: can be undefined in no window/level was set.
+     * @param {Object} rsi Optional image rsi, will take the one of the current slice otherwise.
      * @return {Window} The window LUT of the image.
      */
     this.getCurrentWindowLut = function (rsi) {
@@ -15061,6 +15104,7 @@ dwv.image.View = function (image)
         }
         // get the lut
         var wlut = windowLuts[ rsi.toString() ];
+
         // special case for 'perslice' presets
         if (currentPresetName &&
             typeof windowPresets[currentPresetName] !== "undefined" &&
@@ -15070,16 +15114,29 @@ dwv.image.View = function (image)
             var wl = windowPresets[currentPresetName].wl[sliceNumber];
             // apply it if different from previous
             if (!wlut.getWindowLevel().equals(wl)) {
+                // previous values
+                var previousWidth = wlut.getWindowLevel().getWidth();
+                var previousCenter = wlut.getWindowLevel().getCenter();
                 // set slice window level
                 wlut.setWindowLevel(wl);
-                // update InfoController window/level by firing special event
-                this.fireEvent({"type": "wl-change",
-                    "wc": wl.getCenter(), "ww": wl.getWidth(),
-                    "skipGenerate": true});
+                // fire event
+                if ( previousWidth !== wl.getWidth() ) {
+                    this.fireEvent({"type": "wl-width-change",
+                        "wc": wl.getCenter(), "ww": wl.getWidth(),
+                        "skipGenerate": true});
+                }
+                if ( previousCenter !== wl.getCenter() ) {
+                    this.fireEvent({"type": "wl-center-change",
+                        "wc": wl.getCenter(), "ww": wl.getWidth(),
+                        "skipGenerate": true});
+                }
             }
         }
+
         // update in case of wl change
+        // TODO: should not be run in a getter...
         wlut.update();
+
         // return
         return wlut;
     };
@@ -15282,6 +15339,17 @@ dwv.image.View = function (image)
         // window width shall be >= 1 (see https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
         if ( width >= 1 ) {
 
+            // get current window/level (before updating name)
+            var sliceNumber = this.getCurrentPosition().k;
+            var currentWl = null;
+            var rsi = image.getRescaleSlopeAndIntercept(sliceNumber);
+            if ( rsi && typeof rsi !== "undefined" ) {
+                var currentLut = windowLuts[ rsi.toString() ];
+                if ( currentLut && typeof currentLut !== "undefined") {
+                    currentWl = currentLut.getWindowLevel();
+                }
+            }
+
             if ( typeof name === "undefined" ) {
                 name = "manual";
             }
@@ -15307,7 +15375,17 @@ dwv.image.View = function (image)
             }
 
             // fire window level change event
-            this.fireEvent({"type": "wl-change", "wc": center, "ww": width });
+            if (currentWl && typeof currentWl !== "undefined") {
+                if (currentWl.getWidth() !== width) {
+                    this.fireEvent({"type": "wl-width-change", "wc": center, "ww": width });
+                }
+                if (currentWl.getCenter() !== center) {
+                    this.fireEvent({"type": "wl-center-change", "wc": center, "ww": width });
+                }
+            } else {
+                this.fireEvent({"type": "wl-width-change", "wc": center, "ww": width });
+                this.fireEvent({"type": "wl-center-change", "wc": center, "ww": width });
+            }
         }
     };
 
@@ -20434,9 +20512,14 @@ dwv.tool.Filter = function ( filterList, app )
      * @type Boolean
      */
     this.displayed = false;
+    /**
+     * Listener handler.
+     * @type Object
+     */
+    var listenerHandler = new dwv.utils.ListenerHandler();
 
     /**
-     * Setup the filter GUI.
+     * Setup the filter GUI. Called at app startup.
      */
     this.setup = function ()
     {
@@ -20445,12 +20528,14 @@ dwv.tool.Filter = function ( filterList, app )
             gui.setup(this.filterList);
             for( var key in this.filterList ){
                 this.filterList[key].setup();
+                this.filterList[key].addEventListener("filter-run", fireEvent);
+                this.filterList[key].addEventListener("filter-undo", fireEvent);
             }
         }
     };
 
     /**
-     * Enable the filter.
+     * Display the tool.
      * @param {Boolean} bool Flag to enable or not.
      */
     this.display = function (bool)
@@ -20464,7 +20549,7 @@ dwv.tool.Filter = function ( filterList, app )
     };
 
     /**
-     * Initialise the filter.
+     * Initialise the filter. Called once the image is loaded.
      */
     this.init = function ()
     {
@@ -20493,6 +20578,32 @@ dwv.tool.Filter = function ( filterList, app )
     {
         app.onKeydown(event);
     };
+
+    /**
+     * Add an event listener to this class.
+     * @param {String} type The event type.
+     * @param {Object} callback The method associated with the provided event type,
+     *    will be called with the fired event.
+     */
+    this.addEventListener = function (type, callback) {
+        listenerHandler.add(type, callback);
+    };
+    /**
+     * Remove an event listener from this class.
+     * @param {String} type The event type.
+     * @param {Object} callback The method associated with the provided event type.
+     */
+    this.removeEventListener = function (type, callback) {
+        listenerHandler.remove(type, callback);
+    };
+    /**
+     * Fire an event: call all associated listeners with the input event object.
+     * @param {Object} event The event to fire.
+     * @private
+     */
+    function fireEvent (event) {
+        listenerHandler.fireEvent(event);
+    }
 
 }; // class dwv.tool.Filter
 
@@ -20524,19 +20635,19 @@ dwv.tool.Filter.prototype.getSelectedFilter = function ()
 dwv.tool.Filter.prototype.setSelectedFilter = function (name)
 {
     // check if we have it
-    if( !this.hasFilter(name) )
+    if ( !this.hasFilter(name) )
     {
         throw new Error("Unknown filter: '" + name + "'");
     }
     // hide last selected
-    if( this.displayed )
+    if ( this.displayed )
     {
         this.selectedFilter.display(false);
     }
     // enable new one
     this.selectedFilter = this.filterList[name];
     // display the selected filter
-    if( this.displayed )
+    if ( this.displayed )
     {
         this.selectedFilter.display(true);
     }
@@ -20569,13 +20680,28 @@ dwv.tool.Filter.prototype.hasFilter = function (name)
 dwv.tool.filter.Threshold = function ( app )
 {
     /**
+     * Associated filter.
+     * @type Object
+     */
+    var filter = new dwv.image.filter.Threshold();
+    /**
      * Filter GUI.
      * @type Object
      */
     var gui = new dwv.gui.Threshold(app);
+    /**
+     * Flag to know wether to reset the image or not.
+     * @type Boolean
+     */
+    var resetImage = true;
+    /**
+     * Listener handler.
+     * @type Object
+     */
+    var listenerHandler = new dwv.utils.ListenerHandler();
 
     /**
-     * Setup the filter GUI.
+     * Setup the filter GUI. Called at app startup.
      */
     this.setup = function ()
     {
@@ -20589,10 +20715,14 @@ dwv.tool.filter.Threshold = function ( app )
     this.display = function (bool)
     {
         gui.display(bool);
+        // reset the image when the tool is displayed
+        if ( bool ) {
+            resetImage = true;
+        }
     };
 
     /**
-     * Initialise the filter.
+     * Initialise the filter. Called once the image is loaded.
      */
     this.init = function ()
     {
@@ -20605,14 +20735,46 @@ dwv.tool.filter.Threshold = function ( app )
      */
     this.run = function (args)
     {
-        var filter = new dwv.image.filter.Threshold();
         filter.setMin(args.min);
         filter.setMax(args.max);
+        // reset the image if asked
+        if ( resetImage ) {
+            filter.setOriginalImage(app.getImage());
+            resetImage = false;
+        }
         var command = new dwv.tool.RunFilterCommand(filter, app);
+        command.onExecute = fireEvent;
+        command.onUndo = fireEvent;
         command.execute();
         // save command in undo stack
         app.addToUndoStack(command);
     };
+
+    /**
+     * Add an event listener to this class.
+     * @param {String} type The event type.
+     * @param {Object} callback The method associated with the provided event type,
+     *    will be called with the fired event.
+     */
+    this.addEventListener = function (type, callback) {
+        listenerHandler.add(type, callback);
+    };
+    /**
+     * Remove an event listener from this class.
+     * @param {String} type The event type.
+     * @param {Object} callback The method associated with the provided event type.
+     */
+    this.removeEventListener = function (type, callback) {
+        listenerHandler.remove(type, callback);
+    };
+    /**
+     * Fire an event: call all associated listeners with the input event object.
+     * @param {Object} event The event to fire.
+     * @private
+     */
+    function fireEvent (event) {
+        listenerHandler.fireEvent(event);
+    }
 
 }; // class dwv.tool.filter.Threshold
 
@@ -20629,9 +20791,14 @@ dwv.tool.filter.Sharpen = function ( app )
      * @type Object
      */
     var gui = new dwv.gui.Sharpen(app);
+    /**
+     * Listener handler.
+     * @type Object
+     */
+    var listenerHandler = new dwv.utils.ListenerHandler();
 
     /**
-     * Setup the filter GUI.
+     * Setup the filter GUI. Called at app startup.
      */
     this.setup = function ()
     {
@@ -20648,9 +20815,9 @@ dwv.tool.filter.Sharpen = function ( app )
     };
 
     /**
-     * Initialise the filter.
+     * Initialise the filter. Called once the image is loaded.
      */
-    this.init = function()
+    this.init = function ()
     {
         // nothing to do...
     };
@@ -20659,14 +20826,43 @@ dwv.tool.filter.Sharpen = function ( app )
      * Run the filter.
      * @param {Mixed} args The filter arguments.
      */
-    this.run = function(/*args*/)
+    this.run = function (/*args*/)
     {
         var filter = new dwv.image.filter.Sharpen();
+        filter.setOriginalImage(app.getImage());
         var command = new dwv.tool.RunFilterCommand(filter, app);
+        command.onExecute = fireEvent;
+        command.onUndo = fireEvent;
         command.execute();
         // save command in undo stack
         app.addToUndoStack(command);
     };
+
+    /**
+     * Add an event listener to this class.
+     * @param {String} type The event type.
+     * @param {Object} callback The method associated with the provided event type,
+     *    will be called with the fired event.
+     */
+    this.addEventListener = function (type, callback) {
+        listenerHandler.add(type, callback);
+    };
+    /**
+     * Remove an event listener from this class.
+     * @param {String} type The event type.
+     * @param {Object} callback The method associated with the provided event type.
+     */
+    this.removeEventListener = function (type, callback) {
+        listenerHandler.remove(type, callback);
+    };
+    /**
+     * Fire an event: call all associated listeners with the input event object.
+     * @param {Object} event The event to fire.
+     * @private
+     */
+    function fireEvent (event) {
+        listenerHandler.fireEvent(event);
+    }
 
 }; // dwv.tool.filter.Sharpen
 
@@ -20682,9 +20878,14 @@ dwv.tool.filter.Sobel = function ( app )
      * @type Object
      */
     var gui = new dwv.gui.Sobel(app);
+    /**
+     * Listener handler.
+     * @type Object
+     */
+    var listenerHandler = new dwv.utils.ListenerHandler();
 
     /**
-     * Setup the filter GUI.
+     * Setup the filter GUI. Called at app startup.
      */
     this.setup = function ()
     {
@@ -20695,15 +20896,15 @@ dwv.tool.filter.Sobel = function ( app )
      * Enable the filter.
      * @param {Boolean} bool Flag to enable or not.
      */
-    this.display = function(bool)
+    this.display = function (bool)
     {
         gui.display(bool);
     };
 
     /**
-     * Initialise the filter.
+     * Initialise the filter. Called once the image is loaded.
      */
-    this.init = function()
+    this.init = function ()
     {
         // nothing to do...
     };
@@ -20712,14 +20913,43 @@ dwv.tool.filter.Sobel = function ( app )
      * Run the filter.
      * @param {Mixed} args The filter arguments.
      */
-    dwv.tool.filter.Sobel.prototype.run = function(/*args*/)
+    dwv.tool.filter.Sobel.prototype.run = function (/*args*/)
     {
         var filter = new dwv.image.filter.Sobel();
+        filter.setOriginalImage(app.getImage());
         var command = new dwv.tool.RunFilterCommand(filter, app);
+        command.onExecute = fireEvent;
+        command.onUndo = fireEvent;
         command.execute();
         // save command in undo stack
         app.addToUndoStack(command);
     };
+
+    /**
+     * Add an event listener to this class.
+     * @param {String} type The event type.
+     * @param {Object} callback The method associated with the provided event type,
+     *    will be called with the fired event.
+     */
+    this.addEventListener = function (type, callback) {
+        listenerHandler.add(type, callback);
+    };
+    /**
+     * Remove an event listener from this class.
+     * @param {String} type The event type.
+     * @param {Object} callback The method associated with the provided event type.
+     */
+    this.removeEventListener = function (type, callback) {
+        listenerHandler.remove(type, callback);
+    };
+    /**
+     * Fire an event: call all associated listeners with the input event object.
+     * @param {Object} event The event to fire.
+     * @private
+     */
+    function fireEvent (event) {
+        listenerHandler.fireEvent(event);
+    }
 
 }; // class dwv.tool.filter.Sobel
 
@@ -20742,19 +20972,44 @@ dwv.tool.RunFilterCommand = function (filter, app) {
      */
     this.execute = function ()
     {
-        filter.setOriginalImage(app.getImage());
+        // run filter and set app image
         app.setImage(filter.update());
+        // update display
         app.render();
+        // callback
+        this.onExecute({'type': 'filter-run', 'id': this.getName()});
     };
+
     /**
      * Undo the command.
      */
     this.undo = function () {
+        // reset the image
         app.setImage(filter.getOriginalImage());
+        // update display
         app.render();
+        // callback
+        this.onUndo({'type': 'filter-undo', 'id': this.getName()});
     };
 
 }; // RunFilterCommand class
+
+/**
+ * Handle an execute event.
+ * @param {Object} event The execute event with type and id.
+ */
+dwv.tool.RunFilterCommand.prototype.onExecute = function (/*event*/)
+{
+    // default does nothing.
+};
+/**
+ * Handle an undo event.
+ * @param {Object} event The undo event with type and id.
+ */
+dwv.tool.RunFilterCommand.prototype.onUndo = function (/*event*/)
+{
+    // default does nothing.
+};
 
 // namespaces
 var dwv = dwv || {};
@@ -23684,6 +23939,74 @@ dwv.i18nGetFallbackLocalePath = function (filename) {
     var lng = i18next.languages[i18next.languages.length-1].substr(0, 2);
     return dwv.i18nLocalesPath +
         "/locales/" + lng + "/" + filename;
+};
+
+// namespaces
+var dwv = dwv || {};
+dwv.utils = dwv.utils || {};
+
+/**
+  * ListenerHandler class: handles add/removing and firing listeners.
+  * @constructor
+ */
+dwv.utils.ListenerHandler = function ()
+{
+    /**
+     * listeners.
+     * @private
+     */
+    var listeners = {};
+
+    /**
+     * Add an event listener.
+     * @param {String} type The event type.
+     * @param {Object} callback The method associated with the provided event type,
+     *    will be called with the fired event.
+     */
+    this.add = function (type, callback)
+    {
+        // create array if not present
+        if ( typeof listeners[type] === "undefined" ) {
+            listeners[type] = [];
+        }
+        // add callback to listeners array
+        listeners[type].push(callback);
+    };
+
+    /**
+     * Remove an event listener.
+     * @param {String} type The event type.
+     * @param {Object} callback The method associated with the provided event type.
+     */
+    this.remove = function (type, callback)
+    {
+        // check if the type is present
+        if( typeof listeners[type] === "undefined" ) {
+            return;
+        }
+        // remove from listeners array
+        for ( var i = 0; i < listeners[type].length; ++i ) {
+            if ( listeners[type][i] === callback ) {
+                listeners[type].splice(i,1);
+            }
+        }
+    };
+
+    /**
+     * Fire an event: call all associated listeners with the input event object.
+     * @param {Object} event The event to fire.
+     */
+    this.fireEvent = function (event)
+    {
+        // check if they are listeners for the event type
+        if ( typeof listeners[event.type] === "undefined" ) {
+            return;
+        }
+        // fire events
+        for ( var i=0; i < listeners[event.type].length; ++i ) {
+            listeners[event.type][i](event);
+        }
+    };
 };
 
 // namespaces
