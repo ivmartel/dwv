@@ -9,14 +9,15 @@ importScripts('openJPEG-DynamicMemory-browser.js');
 self.addEventListener('message', function (event) {
 
     // decode DICOM buffer
+    // higly inspired from https://github.com/chafey/cornerstoneWADOImageLoader/blob/0.14.7/src/webWorker/decodeTask/decoders/decodeJPEG2000.js
 
     var bytesPerPixel = event.data.bitsAllocated / 8;
     var signed = event.data.isSigned;
     var data = event.data.buffer;
 
-    var dataPtr = openJPEG._malloc(data.length);
-
     var openJPEG = new OpenJPEG();
+
+    var dataPtr = openJPEG._malloc(data.length);
     openJPEG.writeArrayToMemory(data, dataPtr);
 
     // create param outpout
