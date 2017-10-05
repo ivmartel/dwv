@@ -81,28 +81,65 @@ print([[
 <title>DICOM Web Viewer</title>
 <meta charset="UTF-8">
 <link type="text/css" rel="stylesheet" href="/dwv/css/style.css">
+]])
+
+print([[
 <style type="text/css" >
 body { margin: 10px; padding: 0; }
 .layerContainer { margin: auto; text-align: center; }
 .imageLayer { left: 0px; }
 .dropBox { margin: 20px auto; }
+.inline { display: inline-block !important; }
+</style>
+<link type="text/css" rel="stylesheet" href="/dwv/ext/jquery-mobile/jquery.mobile-1.4.5.min.css" />
+<link type="text/css" rel="stylesheet" href="/dwv/ext/nprogress/nprogress.css" />
+<style type="text/css" >
+.ui-popup .ui-controlgroup { background-color: #252525; }
+.colourLi > .ui-input-text { text-align: center; }
+.colourLi > .ui-input-text input { min-height: 2em; width: 7em; display:inline-block }
+.lwColourLi > .ui-input-text { text-align: center; }
+.lwColourLi > .ui-input-text input { min-height: 2em; width: 7em; display:inline-block }
+.ffColourLi > .ui-input-text { text-align: center; }
+.ffColourLi > .ui-input-text input { min-height: 2em; width: 7em; display:inline-block }
+/* jquery-mobile strip not visible enough */
+.table-stripe tbody tr:nth-child(odd) td,
+.table-stripe tbody tr:nth-child(odd) th {
+  background-color: #eeeeee; /* non-RGBA fallback  */
+  background-color: rgba(0,0,0,0.1);
+}
 </style>
 <link type="text/css" rel="stylesheet" href="/dwv/ext/jquery-mobile/jquery.mobile-1.4.5.min.css">
 ]])
 
 print([[
-<!-- Third party -->
+<!-- Third party (dwv) -->
+<script type="text/javascript" src="/dwv/ext/modernizr/modernizr.js"></script>
+<script type="text/javascript" src="/dwv/ext/i18next/i18next.min.js"></script>
+<script type="text/javascript" src="/dwv/ext/i18next/i18nextXHRBackend.min.js"></script>
+<script type="text/javascript" src="/dwv/ext/i18next/i18nextBrowserLanguageDetector.min.js"></script>
+<script type="text/javascript" src="/dwv/ext/konva/konva.min.js"></script>
+<script type="text/javascript" src="/dwv/ext/magic-wand/magic-wand.js"></script>
+<script type="text/javascript" src="/dwv/ext/jszip/jszip.min.js"></script>
+]])
+
+print([[
+<!-- Third party (viewer) -->
 <script type="text/javascript" src="/dwv/ext/jquery/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
+<script type="text/javascript" src="/dwv/ext/nprogress/nprogress.js"></script>
 <script type="text/javascript" src="/dwv/ext/flot/jquery.flot.min.js"></script>
-<script type="text/javascript" src="/dwv/ext/ext/konva/konva.min.js"></script>
+]])
+
+print([[
 <!-- Decoders -->
 <script type="text/javascript" src="/dwv/decoders/pdfjs/jpx.js"></script>
 <script type="text/javascript" src="/dwv/decoders/pdfjs/util.js"></script>
 <script type="text/javascript" src="/dwv/decoders/pdfjs/arithmetic_decoder.js"></script>
 <script type="text/javascript" src="/dwv/decoders/pdfjs/jpg.js"></script>
 <script type="text/javascript" src="/dwv/decoders/rii-mango/lossless-min.js"></script>
+]])
 
+print([[
 <!-- Local -->
 <script type="text/javascript" src="/dwv/dwv-0.22.0-beta.min.js"></script>
 <!-- Launch the app -->
@@ -111,21 +148,22 @@ print([[
 
 print([[
 <script type="text/javascript">
-// check browser support
-dwv.browser.check();
-// launch when page is loaded
-$(document).ready( function()
-{
+// start app function
+function startApp() {
+    // translate page
+    dwv.i18nPage();
     // main application
     var myapp = new dwv.App();
     myapp.init({
         "containerDivId": "dwv",
         "fitToWindow": true,
-        "tools": ["Scroll", "Window/Level", "Zoom/Pan", "Draw", "Livewire", "Filter"],
+        "tools": ["Scroll", "WindowLevel", "ZoomAndPan", "Draw", "Livewire", "Filter", "Floodfill"],
         "filters": ["Threshold", "Sharpen", "Sobel"],
-        "shapes": ["Line", "Protractor", "Rectangle", "Roi", "Ellipse"],
-        "gui": ["tool", "load", "help", "undo", "version", "tags"],
-        "isMobile": true
+        "shapes": ["Arrow", "Ruler", "Protractor", "Rectangle", "Roi", "Ellipse", "FreeHand"],
+        "gui": ["tool", "load", "help", "undo", "version", "tags", "drawList"],
+        "loaders": ["File", "Url"],
+        "isMobile": true,
+        "skipLoadUrl": true
     });
     var size = dwv.gui.getWindowSize();
     $(".layerContainer").height(size.height);
@@ -142,8 +180,50 @@ print([[
 ]])
 -- load data
 print([[
-    if( inputUrls && inputUrls.length > 0 ) myapp.loadURL(inputUrls);
-}); // end $(document).ready
+    if( inputUrls && inputUrls.length > 0 ) myapp.loadURLs(inputUrls);
+}; // end startApp
+]])
+
+print([[
+// check browser support
+dwv.browser.check();
+// initialise i18n
+dwv.i18nInitialise("en","/dwv");
+]])
+
+print([[
+// status flags
+var domContentLoaded = false;
+var i18nLoaded = false;
+// launch when both DOM and i18n are ready
+function launchApp() {
+    if ( domContentLoaded && i18nLoaded ) {
+        startApp();
+    }
+}
+// DOM ready?
+$(document).ready( function() {
+    domContentLoaded = true;
+    launchApp();
+});
+// i18n ready?
+dwv.i18nOnLoaded( function () {
+    // call next once the overlays are loaded
+    var onLoaded = function (data) {
+        dwv.gui.info.overlayMaps = data;
+        i18nLoaded = true;
+        launchApp();
+    };
+    // load overlay map info
+    $.getJSON( dwv.i18nGetLocalePath("overlays.json"), onLoaded )
+    .fail( function () {
+        console.log("Using fallback overlays.");
+        $.getJSON( dwv.i18nGetFallbackLocalePath("overlays.json"), onLoaded );
+    });
+});
+]])
+
+print([[
 </script>
 ]])
 
@@ -159,7 +239,7 @@ print([[
 <div id="pageHeader" data-role="header">
 <h1>DWV <span class="dwv-version"></span></h1>
 <a href="#help_page" data-icon="carat-r" class="ui-btn-right"
-  data-transition="slide">Help</a>
+  data-transition="slide" data-i18n="basics.help">Help</a>
 </div><!-- /pageHeader -->
 
 <!-- DWV -->
@@ -172,10 +252,10 @@ print([[
 
 <!-- Open popup -->
 <div data-role="popup" id="popupOpen">
-<a href="#" data-rel="back" data-role="button"
-  data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+<a href="#" data-rel="back" data-role="button" data-icon="delete"
+  data-iconpos="notext" class="ui-btn-right" data-i18n="basics.close">Close</a>
 <div style="padding:10px 20px;">
-<h3>Open</h3>
+<h3 data-i18n="basics.open">Open</h3>
 <div id="dwv-loaderlist"></div>
 </div>
 </div><!-- /popup -->
@@ -186,10 +266,14 @@ print([[
 <canvas class="imageLayer">Only for HTML5 compatible browsers...</canvas>
 <div class="drawDiv"></div>
 <div class="infoLayer">
-<div class="infotl"></div>
-<div class="infotr"></div>
-<div class="infobl"></div>
-<div class="infobr"><div class="plot"></div></div>
+<div class="infotl info"></div>
+<div class="infotc infoc"></div>
+<div class="infotr info"></div>
+<div class="infocl infoc"></div>
+<div class="infocr infoc"></div>
+<div class="infobl info"></div>
+<div class="infobc infoc"></div>
+<div class="infobr info"></div>
 </div><!-- /infoLayer -->
 </div><!-- /layerContainer -->
 
@@ -211,9 +295,9 @@ print([[
 <div data-role="page" data-theme="b" id="tags_page">
 
 <div data-role="header">
-<a href="#main" data-icon="back"
-  data-transition="slide" data-direction="reverse">Back</a>
-<h1>DICOM Tags</h1>
+<a href="#main" data-icon="back" data-transition="slide"
+  data-direction="reverse" data-i18n="basics.back">Back</a>
+<h1 data-i18n="basics.dicomTags">DICOM Tags</h1>
 </div><!-- /header -->
 
 <div data-role="content">
@@ -223,17 +307,33 @@ print([[
 
 </div><!-- /page tags_page-->
 
+<!-- Draw list page -->
+<div data-role="page" data-theme="b" id="drawList_page">
+
+<div data-role="header">
+<a href="#main" data-icon="back" data-transition="slide"
+  data-direction="reverse" data-i18n="basics.back">Back</a>
+<h1 data-i18n="basics.drawList">Draw list</h1>
+</div><!-- /header -->
+
+<div data-role="content">
+<!-- DrawList -->
+<div id="dwv-drawList" title="Draw list"></div>
+</div><!-- /content -->
+
+</div><!-- /page draw-list_page-->
+
 <!-- Help page -->
 <div data-role="page" data-theme="b" id="help_page">
 
 <div data-role="header">
-<a href="#main" data-icon="back"
-  data-transition="slide" data-direction="reverse">Back</a>
-<h1>DWV Help</h1>
+<a href="#main" data-icon="back" data-transition="slide"
+  data-direction="reverse" data-i18n="basics.back">Back</a>
+<h1 data-i18n="basics.help">Help</h1>
 </div><!-- /header -->
 
 <div data-role="content">
-<!-- Tags -->
+<!-- Help -->
 <div id="dwv-help" title="Help"></div>
 </div><!-- /content -->
 

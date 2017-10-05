@@ -80,35 +80,65 @@ print([[
 <head>
 <title>DICOM Web Viewer</title>
 <meta charset="UTF-8">
+]])
+
+print([[
 <link type="text/css" rel="stylesheet" href="/dwv/css/style.css">
 <style type="text/css" >
-body { background-color: #222; color: white;
-  margin: 10px; padding: 0; font-size: 80%; }
+body { background-color: #222; color: white; font-size: 80%; }
 #pageHeader h1 { display: inline-block; margin: 0; color: #fff; }
 #pageHeader a { color: #ddf; }
 #pageHeader .toolbar { display: inline-block; float: right; }
-.toolbox li:first-child { list-style-type: none; padding-bottom: 10px; margin-left: -20px; }
+.toolList ul { padding: 0; }
+.toolList li { list-style-type: none; }
 #pageMain { position: absolute; height: 92%; width: 99%; bottom: 5px; left: 5px; background-color: #333; }
-.infotl { color: #333; text-shadow: 0 1px 0 #fff; }
-.infotr { color: #333; text-shadow: 0 1px 0 #fff; }
+.infotl { text-shadow: 0 1px 0 #000; }
+.infotc { text-shadow: 0 1px 0 #000; }
+.infotr { text-shadow: 0 1px 0 #000; }
+.infocl { text-shadow: 0 1px 0 #000; }
+.infocr { text-shadow: 0 1px 0 #000; }
+.infobl { text-shadow: 0 1px 0 #000; }
+.infobc { text-shadow: 0 1px 0 #000; }
+.infobr { text-shadow: 0 1px 0 #000; }
 .dropBox { margin: 20px; }
+.ui-icon { zoom: 125%; }
+.tagsTable tr:nth-child(even) { background-color: #333; }
+.drawList tr:nth-child(even) { background-color: #333; }
+button, input, li, table { margin-top: 0.2em; }
+li button, li input { margin: 0; }
+.history_list { width: 100%; }
 </style>
 <link type="text/css" rel="stylesheet" href="/dwv/ext/jquery-ui/themes/ui-darkness/jquery-ui-1.12.1.min.css">
 ]])
 
 print([[
-<!-- Third party -->
+<!-- Third party (dwv) -->
+<script type="text/javascript" src="/dwv/ext/modernizr/modernizr.js"></script>
+<script type="text/javascript" src="/dwv/ext/i18next/i18next.min.js"></script>
+<script type="text/javascript" src="/dwv/ext/i18next/i18nextXHRBackend.min.js"></script>
+<script type="text/javascript" src="/dwv/ext/i18next/i18nextBrowserLanguageDetector.min.js"></script>
+<script type="text/javascript" src="/dwv/ext/konva/konva.min.js"></script>
+<script type="text/javascript" src="/dwv/ext/magic-wand/magic-wand.js"></script>
+<script type="text/javascript" src="/dwv/ext/jszip/jszip.min.js"></script>
+]])
+
+print([[
+<!-- Third party (viewer) -->
 <script type="text/javascript" src="/dwv/ext/jquery/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/jquery-ui/jquery-ui-1.12.1.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/flot/jquery.flot.min.js"></script>
-<script type="text/javascript" src="/dwv/ext/ext/konva/konva.min.js"></script>
+]])
+
+print([[
 <!-- Decoders -->
 <script type="text/javascript" src="/dwv/decoders/pdfjs/jpx.js"></script>
 <script type="text/javascript" src="/dwv/decoders/pdfjs/util.js"></script>
 <script type="text/javascript" src="/dwv/decoders/pdfjs/arithmetic_decoder.js"></script>
 <script type="text/javascript" src="/dwv/decoders/pdfjs/jpg.js"></script>
 <script type="text/javascript" src="/dwv/decoders/rii-mango/lossless-min.js"></script>
+]])
 
+print([[
 <!-- Local -->
 <script type="text/javascript" src="/dwv/dwv-0.22.0-beta.min.js"></script>
 <!-- Launch the app -->
@@ -117,11 +147,8 @@ print([[
 
 print([[
 <script type="text/javascript">
-// check browser support
-dwv.browser.check();
-// launch when page is loaded
-$(document).ready( function()
-{
+// start app function
+function startApp() {
     // gui setup
     dwv.gui.setup();
     // main application
@@ -130,10 +157,11 @@ $(document).ready( function()
     myapp.init({
         "containerDivId": "dwv",
         "fitToWindow": true,
-        "tools": ["Scroll", "Window/Level", "Zoom/Pan", "Draw", "Livewire", "Filter"],
+        "gui": ["tool", "load", "help", "undo", "version", "tags", "drawList"],
+        "loaders": ["File", "Url"],
+        "tools": ["Scroll", "WindowLevel", "ZoomAndPan", "Draw", "Livewire", "Filter", "Floodfill"],
         "filters": ["Threshold", "Sharpen", "Sobel"],
-        "shapes": ["Line", "Protractor", "Rectangle", "Roi", "Ellipse"],
-        "gui": ["tool", "load", "help", "undo", "version", "tags"],
+        "shapes": ["Arrow", "Ruler", "Protractor", "Rectangle", "Roi", "Ellipse", "FreeHand"],
         "isMobile": false,
         "skipLoadUrl": true
     });
@@ -153,8 +181,50 @@ print([[
 ]])
 -- load data
 print([[
-    if( inputUrls && inputUrls.length > 0 ) myapp.loadURL(inputUrls);
-}); // end $(document).ready
+    if( inputUrls && inputUrls.length > 0 ) myapp.loadURLs(inputUrls);
+}; // end startApp
+]])
+
+print([[
+// check browser support
+dwv.browser.check();
+// initialise i18n
+dwv.i18nInitialise("en","/dwv");
+]])
+
+print([[
+// status flags
+var domContentLoaded = false;
+var i18nLoaded = false;
+// launch when both DOM and i18n are ready
+function launchApp() {
+    if ( domContentLoaded && i18nLoaded ) {
+        startApp();
+    }
+}
+// DOM ready?
+$(document).ready( function() {
+    domContentLoaded = true;
+    launchApp();
+});
+// i18n ready?
+dwv.i18nOnLoaded( function () {
+    // call next once the overlays are loaded
+    var onLoaded = function (data) {
+        dwv.gui.info.overlayMaps = data;
+        i18nLoaded = true;
+        launchApp();
+    };
+    // load overlay map info
+    $.getJSON( dwv.i18nGetLocalePath("overlays.json"), onLoaded )
+    .fail( function () {
+        console.log("Using fallback overlays.");
+        $.getJSON( dwv.i18nGetFallbackLocalePath("overlays.json"), onLoaded );
+    });
+});
+]])
+
+print([[
 </script>
 ]])
 
@@ -169,9 +239,7 @@ print([[
 <div id="pageHeader">
 
 <!-- Title -->
-<h1>DICOM Web Viewer
-(<a href="https://github.com/ivmartel/dwv">dwv</a>
-<span class="dwv-version"></span>)</h1>
+<h1>DWV <span class="dwv-version"></span></h1>
 
 <!-- Toolbar -->
 <div class="toolbar"></div>
@@ -183,7 +251,7 @@ print([[
 <!-- Open file -->
 <div class="openData" title="File">
 <div class="loaderlist"></div>
-<div class="progressbar"></div>
+<div id="progressbar"></div>
 </div>
 
 <!-- Toolbox -->
@@ -194,6 +262,9 @@ print([[
 
 <!-- Tags -->
 <div class="tags" title="Tags"></div>
+
+<!-- DrawList -->
+<div class="drawList" title="Draw list"></div>
 
 <!-- Help -->
 <div class="help" title="Help"></div>
@@ -206,9 +277,14 @@ print([[
 <div class="drawDiv"></div>
 <div class="infoLayer">
 <div class="infotl"></div>
+<div class="infotc"></div>
 <div class="infotr"></div>
+<div class="infocl"></div>
+<div class="infocr"></div>
 <div class="infobl"></div>
-<div class="infobr"><div class="plot"></div></div>
+<div class="infobc"></div>
+<div class="infobr" style="bottom: 64px;"></div>
+<div class="plot"></div>
 </div><!-- /infoLayer -->
 </div><!-- /layerContainer -->
 </div><!-- /layerDialog -->

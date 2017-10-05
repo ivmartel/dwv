@@ -85,16 +85,29 @@ print([[
 ]])
 
 print([[
-<!-- Third party -->
+<!-- Third party (dwv) -->
+<script type="text/javascript" src="/dwv/ext/modernizr/modernizr.js"></script>
+<script type="text/javascript" src="/dwv/ext/i18next/i18next.min.js"></script>
+<script type="text/javascript" src="/dwv/ext/i18next/i18nextXHRBackend.min.js"></script>
+<script type="text/javascript" src="/dwv/ext/i18next/i18nextBrowserLanguageDetector.min.js"></script>
+]])
+
+print([[
+<!-- Third party (viewer) -->
 <script type="text/javascript" src="/dwv/ext/jquery/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
+]])
+
+print([[
 <!-- Decoders -->
 <script type="text/javascript" src="/dwv/decoders/pdfjs/jpx.js"></script>
 <script type="text/javascript" src="/dwv/decoders/pdfjs/util.js"></script>
 <script type="text/javascript" src="/dwv/decoders/pdfjs/arithmetic_decoder.js"></script>
 <script type="text/javascript" src="/dwv/decoders/pdfjs/jpg.js"></script>
 <script type="text/javascript" src="/dwv/decoders/rii-mango/lossless-min.js"></script>
+]])
 
+print([[
 <!-- Local -->
 <script type="text/javascript" src="/dwv/dwv-0.22.0-beta.min.js"></script>
 <!-- Launch the app -->
@@ -103,18 +116,15 @@ print([[
 
 print([[
 <script type="text/javascript">
-// check browser support
-dwv.browser.check();
-// launch when page is loaded
-$(document).ready( function()
-{
+// start app function
+function startApp() {
     // main application
     var myapp = new dwv.App();
     // initialise the application
     myapp.init({
         "containerDivId": "dwv",
         "fitToWindow": true,
-        "tools": ["Scroll", "Zoom/Pan", "Window/Level"],
+        "tools": ["Scroll", "ZoomAndPan", "WindowLevel"],
         "gui": ["tool"],
         "isMobile": true,
         "skipLoadUrl": true
@@ -133,8 +143,40 @@ print([[
 ]])
 -- load data
 print([[
-    if( inputUrls && inputUrls.length > 0 ) myapp.loadURL(inputUrls);
-}); // end $(document).ready
+    if( inputUrls && inputUrls.length > 0 ) myapp.loadURLs(inputUrls);
+}; // end startApp
+]])
+
+print([[
+// check browser support
+dwv.browser.check();
+// initialise i18n
+dwv.i18nInitialise("en","/dwv");
+]])
+
+print([[
+// status flags
+var domContentLoaded = false;
+var i18nLoaded = false;
+// launch when both DOM and i18n are ready
+function launchApp() {
+    if ( domContentLoaded && i18nLoaded ) {
+        startApp();
+    }
+}
+// DOM ready?
+$(document).ready( function() {
+    domContentLoaded = true;
+    launchApp();
+});
+// i18n ready?
+dwv.i18nOnLoaded( function () {
+    i18nLoaded = true;
+    launchApp();
+});
+]])
+
+print([[
 </script>
 ]])
 
