@@ -4750,51 +4750,57 @@ dwv.dicom.DataWriter.prototype.writeDataElementItems = function (byteOffset, ite
  * @returns {Number} The new offset position.
  */
 dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset, value) {
-    // switch according to VR
-    if ( vr === "OB" || vr === "UN") {
+    // first check input type to know how to write
+    if (value instanceof Uint8Array) {
         byteOffset = this.writeUint8Array(byteOffset, value);
-    }
-    else if ( vr === "US") {
+    } else if (value instanceof Int8Array) {
+        byteOffset = this.writeInt8Array(byteOffset, value);
+    } else if (value instanceof Uint16Array) {
         byteOffset = this.writeUint16Array(byteOffset, value);
-    }
-    else if (vr === "OW") {
-        if (value.BYTES_PER_ELEMENT === 1) {
+    } else if (value instanceof Int16Array) {
+        byteOffset = this.writeInt16Array(byteOffset, value);
+    } else if (value instanceof Uint32Array) {
+        byteOffset = this.writeUint32Array(byteOffset, value);
+    } else if (value instanceof Int32Array) {
+        byteOffset = this.writeInt32Array(byteOffset, value);
+    } else {
+        // switch according to VR if input type is undefined
+        if ( vr === "UN" ) {
             byteOffset = this.writeUint8Array(byteOffset, value);
-        } else {
+        } else if ( vr === "OB" ) {
+            byteOffset = this.writeInt8Array(byteOffset, value);
+        } else if ( vr === "OW" ) {
+            byteOffset = this.writeInt16Array(byteOffset, value);
+        } else if ( vr === "OF" ) {
+            byteOffset = this.writeInt32Array(byteOffset, value);
+        } else if ( vr === "OD" ) {
+            byteOffset = this.writeInt64Array(byteOffset, value);
+        } else if ( vr === "US") {
             byteOffset = this.writeUint16Array(byteOffset, value);
+        } else if ( vr === "SS") {
+            byteOffset = this.writeInt16Array(byteOffset, value);
+        } else if ( vr === "UL") {
+            byteOffset = this.writeUint32Array(byteOffset, value);
+        } else if ( vr === "SL") {
+            byteOffset = this.writeInt32Array(byteOffset, value);
+        } else if ( vr === "FL") {
+            byteOffset = this.writeFloat32Array(byteOffset, value);
+        } else if ( vr === "FD") {
+            byteOffset = this.writeFloat64Array(byteOffset, value);
+        } else if ( vr === "SQ") {
+            byteOffset = this.writeDataElementItems(byteOffset, value);
+        } else if ( vr === "AT") {
+            var hexString = value + '';
+            var hexString1 = hexString.substring(1, 5);
+            var hexString2 = hexString.substring(6, 10);
+            var dec1 = parseInt(hexString1, 16);
+            var dec2 = parseInt(hexString2, 16);
+            value = new Uint16Array([dec1, dec2]);
+            byteOffset = this.writeUint16Array(byteOffset, value);
+        } else {
+            byteOffset = this.writeStringArray(byteOffset, value);
         }
     }
-    else if ( vr === "SS") {
-        byteOffset = this.writeInt16Array(byteOffset, value);
-    }
-    else if ( vr === "UL") {
-        byteOffset = this.writeUint32Array(byteOffset, value);
-    }
-    else if ( vr === "SL") {
-        byteOffset = this.writeInt32Array(byteOffset, value);
-    }
-    else if ( vr === "FL") {
-        byteOffset = this.writeFloat32Array(byteOffset, value);
-    }
-    else if ( vr === "FD") {
-        byteOffset = this.writeFloat64Array(byteOffset, value);
-    }
-    else if ( vr === "SQ") {
-        byteOffset = this.writeDataElementItems(byteOffset, value);
-    }
-    else if ( vr === "AT") {
-        var hexString = value + '';
-        var hexString1 = hexString.substring(1, 5);
-        var hexString2 = hexString.substring(6, 10);
-        var dec1 = parseInt(hexString1, 16);
-        var dec2 = parseInt(hexString2, 16);
-        value = new Uint16Array([dec1, dec2]);
-        byteOffset = this.writeUint16Array(byteOffset, value);
-    }
-    else {
-        byteOffset = this.writeStringArray(byteOffset, value);
-    }
-
     // return new offset
     return byteOffset;
 };
@@ -4861,17 +4867,18 @@ dwv.dicom.DataWriter.prototype.writePixelDataElementValue = function (vr, vl, by
  * Write a data element.
  * @param {Object} element The DICOM data element to write.
  * @param {Number} byteOffset The offset to start writing from.
+ * @param {Boolean} isImplicit Is the DICOM VR implicit?
  * @returns {Number} The new offset position.
  */
-dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset) {
+dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset, isImplicit) {
     var isTagWithVR = dwv.dicom.isTagWithVR(element.tag.group, element.tag.element);
-    var is32bitVLVR = dwv.dicom.is32bitVLVR(element.vr);
+    var is32bitVLVR = (isImplicit || !isTagWithVR) ? true : dwv.dicom.is32bitVLVR(element.vr);
     // group
     byteOffset = this.writeHex(byteOffset, element.tag.group);
     // element
     byteOffset = this.writeHex(byteOffset, element.tag.element);
     // VR
-    if ( isTagWithVR ) {
+    if ( isTagWithVR && !isImplicit ) {
         byteOffset = this.writeString(byteOffset, element.vr);
         // reserved 2 bytes for 32bit VL
         if ( is32bitVLVR ) {
@@ -4887,7 +4894,7 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset)
         vl = 0xffffffff;
     }
     // VL
-    if ( is32bitVLVR || !isTagWithVR ) {
+    if ( is32bitVLVR ) {
         byteOffset = this.writeUint32(byteOffset, vl);
     }
     else {
@@ -4931,7 +4938,8 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset)
  * @return {Boolean} True if a supported syntax.
  */
 dwv.dicom.isWriteSupportedTransferSyntax = function (syntax) {
-    return syntax === "1.2.840.10008.1.2.1"; // Explicit VR - Little Endian
+    return syntax === "1.2.840.10008.1.2" || // Implicit VR - Little Endian
+        syntax === "1.2.840.10008.1.2.1"; // Explicit VR - Little Endian
 };
 
 /**
@@ -5089,13 +5097,14 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
 
     // transfer syntax
     var syntax = dwv.dicom.cleanString(dicomElements.x00020010.value[0]);
+    var isImplicit = dwv.dicom.isImplicitTransferSyntax(syntax);
 
     // check support
     if (!dwv.dicom.isWriteSupportedTransferSyntax(syntax)) {
         throw new Error("Unsupported DICOM transfer syntax: '"+syntax+
             "' ("+dwv.dicom.getTransferSyntaxName(syntax)+")");
     }
-    
+
     // calculate buffer size and split elements (meta and non meta)
     var size = 128 + 4; // DICM
     var metaElements = [];
@@ -5105,9 +5114,17 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     for ( var i = 0, leni = keys.length; i < leni; ++i ) {
         element = this.getElementToWrite(dicomElements[keys[i]]);
         if ( element !== null ) {
+            // tag group name
+            groupName = dwv.dicom.TagGroups[element.tag.group.substr(1)]; // remove first 0
 
-            // size
-            size += dwv.dicom.getDataElementPrefixByteSize(element.vr);
+            // prefix
+            if ( groupName === 'Meta Element' || !isImplicit ) {
+                size += dwv.dicom.getDataElementPrefixByteSize(element.vr);
+            } else {
+                size += 8;
+            }
+
+            // value
             var realVl = element.endOffset - element.startOffset;
             size += parseInt(realVl, 10);
 
@@ -5116,8 +5133,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
                 size += dwv.dicom.getDataElementPrefixByteSize("NONE");
             }
 
-            // sort element
-            groupName = dwv.dicom.TagGroups[element.tag.group.substr(1)]; // remove first 0
+            // sort elements
             if ( groupName === 'Meta Element' ) {
                 metaElements.push(element);
             }
@@ -5135,11 +5151,11 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     offset = writer.writeString(offset, "DICM");
     // write meta
     for ( var j = 0, lenj = metaElements.length; j < lenj; ++j ) {
-        offset = writer.writeDataElement(metaElements[j], offset);
+        offset = writer.writeDataElement(metaElements[j], offset, false);
     }
     // write non meta
     for ( var k = 0, lenk = rawElements.length; k < lenk; ++k ) {
-        offset = writer.writeDataElement(rawElements[k], offset);
+        offset = writer.writeDataElement(rawElements[k], offset, isImplicit);
     }
 
     // return
