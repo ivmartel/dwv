@@ -413,6 +413,34 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
 };
 
 /**
+ * Get the group-element pair from a tag string name.
+ * @param {String} tagName The tag string name.
+ * @return {Object} group-element pair.
+ */
+dwv.dicom.getGroupElementFromName = function (tagName)
+{
+    var group = null;
+    var element = null;
+    var dict = dwv.dicom.dictionary;
+    var keys0 = Object.keys(dict);
+    var keys1 = null;
+    // label for nested loop break
+    outLabel:
+    // search through dictionary
+    for ( var k0 = 0, lenK0 = keys0.length; k0 < lenK0; ++k0 ) {
+        group = keys0[k0];
+        keys1 = Object.keys( dict[group] );
+        for ( var k1 = 0, lenK1 = keys1.length; k1 < lenK1; ++k1 ) {
+            element = keys1[k1];
+            if ( dict[group][element][2] === tagName ) {
+                break outLabel;
+            }
+        }
+    }
+    return { 'group': group, 'element': element };
+};
+
+/**
  * Get the group-element key used to store DICOM elements.
  * @param {Number} group The DICOM group.
  * @param {Number} element The DICOM element.
@@ -1790,32 +1818,11 @@ dwv.dicom.DicomElementsWrapper.prototype.getFromGroupElement = function (
  */
 dwv.dicom.DicomElementsWrapper.prototype.getFromName = function ( name )
 {
-   var group = null;
-   var element = null;
-   var dict = dwv.dicom.dictionary;
-   var keys0 = Object.keys(dict);
-   var keys1 = null;
-   var k0 = 0;
-   var lenk0 = 0;
-   var k1 = 0;
-   var lenk1 = 0;
-   // label for nested loop break
-   outLabel:
-   // search through dictionary
-   for ( k0 = 0, lenk0 = keys0.length; k0 < lenk0; ++k0 ) {
-       group = keys0[k0];
-       keys1 = Object.keys( dict[group] );
-       for ( k1 = 0, lenk1 = keys1.length; k1 < lenk1; ++k1 ) {
-           element = keys1[k1];
-           if ( dict[group][element][2] === name ) {
-               break outLabel;
-           }
-       }
-   }
    var dicomElement = null;
+   var tagGE = dwv.dicom.getGroupElementFromName(name);
    // check that we are not at the end of the dictionary
-   if ( k0 !== keys0.length && k1 !== keys1.length ) {
-       dicomElement = this.getFromKey(dwv.dicom.getGroupElementKey(group, element));
+   if ( tagGE.group !== null && tagGE.element !== null ) {
+       dicomElement = this.getFromKey(dwv.dicom.getGroupElementKey(tagGE.group, tagGE.element));
    }
    return dicomElement;
 };

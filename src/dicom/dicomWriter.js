@@ -726,3 +726,190 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     // return
     return buffer;
 };
+
+/**
+ * Get a DICOM element from its tag name (value set separatly).
+ * @param {String} tagName The string tag name.
+ * @return {Object} The DICOM element.
+ */
+dwv.dicom.getDicomElement = function (tagName)
+{
+   var tagGE = dwv.dicom.getGroupElementFromName(tagName);
+   var dict = dwv.dicom.dictionary;
+   // return element definition
+   return {
+     'tag': { 'group': tagGE.group, 'element': tagGE.element },
+     'vr': dict[tagGE.group][tagGE.element][0],
+     'vl': dict[tagGE.group][tagGE.element][1]
+   };
+};
+
+/**
+ * Set a DICOM element value according to its VR (Value Representation).
+ * @param {Object} element The DICOM element to set the value.
+ * @param {Object} value The value to set.
+ * @return {Number} The total element size.
+ */
+dwv.dicom.setElementValue = function (element, value) {
+    // byte size of the element
+    var size = 0;
+    // special sequence case
+    if ( element.vr === "SQ") {
+
+        // set the value
+        element.value = value;
+
+        if ( value !== null && value !== 0 ) {
+            var sqItems = [];
+            var name;
+
+            // explicit or implicit length
+            var explicitLength = true;
+            if ( typeof value.explicitLength !== "undefined" ) {
+                explicitLength = value.explicitLength;
+                delete value.explicitLength;
+            }
+
+            // items
+            var itemData;
+            var itemKeys = Object.keys(value);
+            for ( var i = 0, leni = itemKeys.length; i < leni; ++i )
+            {
+                var itemElements = {};
+                var subSize = 0;
+                itemData = value[itemKeys[i]];
+
+                // elements
+                var subElement;
+                var elemKeys = Object.keys(itemData);
+                for ( var j = 0, lenj = elemKeys.length; j < lenj; ++j )
+                {
+                    subElement = dwv.dicom.getDicomElement(elemKeys[j]);
+                    subSize += dwv.dicom.setElementValue(subElement, itemData[elemKeys[j]]);
+
+                    // add sequence delimitation size for sub sequences
+                    if (dwv.dicom.isImplicitLengthSequence(subElement)) {
+                        subSize += dwv.dicom.getDataElementPrefixByteSize("NONE");
+                    }
+
+                    name = dwv.dicom.getGroupElementKey(subElement.tag.group, subElement.tag.element);
+                    itemElements[name] = subElement;
+                }
+
+                // item (after elements to get the size)
+                var itemElement = {
+                         'tag': { 'group': "0xFFFE", 'element': "0xE000" },
+                         'vr': "NONE",
+                         'vl': (explicitLength ? subSize : 0xffffffff),
+                         'value': []
+                     };
+                name = dwv.dicom.getGroupElementKey(itemElement.tag.group, itemElement.tag.element);
+                itemElements[name] = itemElement;
+                subSize += dwv.dicom.getDataElementPrefixByteSize("NONE");
+
+                // item delimitation
+                if (!explicitLength) {
+                    var itemDelimElement = {
+                            'tag': { 'group': "0xFFFE", 'element': "0xE00D" },
+                            'vr': "NONE",
+                            'vl': 0,
+                            'value': []
+                        };
+                    name = dwv.dicom.getGroupElementKey(itemDelimElement.tag.group, itemDelimElement.tag.element);
+                    itemElements[name] = itemDelimElement;
+                    subSize += dwv.dicom.getDataElementPrefixByteSize("NONE");
+                }
+
+                size += subSize;
+                sqItems.push(itemElements);
+            }
+
+            element.value = sqItems;
+        }
+
+        element.vl = size;
+    }
+    else {
+        // set the value and calculate size
+        size = 0;
+        if (value instanceof Array) {
+            element.value = value;
+            for (var k = 0; k < value.length; ++k) {
+                // spearator
+                if (k !== 0) {
+                    size += 1;
+                }
+                // value
+                size += value[k].toString().length;
+            }
+        }
+        else {
+            element.value = [value];
+            if (typeof value !== "undefined" && typeof value.length !== "undefined") {
+                size = value.length;
+            }
+            else {
+                // numbers
+                size = 1;
+            }
+        }
+
+        // convert size to bytes
+        if ( element.vr === "US" || element.vr === "OW") {
+            size *= Uint16Array.BYTES_PER_ELEMENT;
+        }
+        else if ( element.vr === "SS") {
+            size *= Int16Array.BYTES_PER_ELEMENT;
+        }
+        else if ( element.vr === "UL") {
+            size *= Uint32Array.BYTES_PER_ELEMENT;
+        }
+        else if ( element.vr === "SL") {
+            size *= Int32Array.BYTES_PER_ELEMENT;
+        }
+        else if ( element.vr === "FL") {
+            size *= Float32Array.BYTES_PER_ELEMENT;
+        }
+        else if ( element.vr === "FD") {
+            size *= Float64Array.BYTES_PER_ELEMENT;
+        }
+        else {
+            size *= Uint8Array.BYTES_PER_ELEMENT;
+        }
+        element.vl = size;
+    }
+
+    // return the size plus the prefix byte size
+    return (size + dwv.dicom.getDataElementPrefixByteSize(element.vr));
+};
+
+/**
+ * Get the DICOM element from a DICOM tags object.
+ * @param {Object} tags The DICOM tags object.
+ * @return {Object} The DICOM elements and the end offset.
+ */
+dwv.dicom.getElementsFromJSONTags = function (tags) {
+    // convert JSON to DICOM element object
+    var keys = Object.keys(tags);
+    var dicomElements = {};
+    var dicomElement;
+    var name;
+    var offset = 128 + 4; // preamble
+    for ( var k = 0, len = keys.length; k < len; ++k )
+    {
+        // get the DICOM element definition from its name
+        dicomElement = dwv.dicom.getDicomElement(keys[k]);
+        // set its value
+        dwv.dicom.setElementValue(dicomElement, tags[keys[k]]);
+        // set offsets
+        dicomElement.startOffset = offset;
+        offset += dicomElement.vl;
+        dicomElement.endOffset = offset;
+        // create the tag group/element key
+        name = dwv.dicom.getGroupElementKey(dicomElement.tag.group, dicomElement.tag.element);
+        // store
+        dicomElements[name] = dicomElement;
+    }
+    // return
+    return {'elements': dicomElements, 'offset': offset };
+};
