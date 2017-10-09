@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>DICOM synthetic data</title>
+<meta charset="UTF-8">
+<script type="text/javascript" src="../../src/dicom/dicomParser.js"></script>
+<script type="text/javascript" src="../../src/dicom/dicomWriter.js"></script>
+<script type="text/javascript" src="../../src/dicom/dictionary.js"></script>
+
+<script type="text/javascript">
+
+// Create an object url from (JSON) tags.
+function getObjectUrlFromTags(tags) {
+    // convert JSON to DICOM element object
+    var res = dwv.dicom.getElementsFromJSONTags(tags);
+    var dicomElements = res.elements;
+    // pixels: small gradient square
+    dicomElements.x7FE00010 = dwv.dicom.generatePixelDataFromJSONTags(tags, res.offset);
+
+    // create DICOM buffer
+    var writer = new dwv.dicom.DicomWriter();
+    var dicomBuffer = null;
+    try {
+        dicomBuffer = writer.getBuffer(dicomElements);
+    } catch (error) {
+        console.error(error);
+        return;
+    }
+
+    // blob and then url
+    var blob = new Blob([dicomBuffer], {type: 'application/dicom'});
+    return URL.createObjectURL(blob);
+}
+
+// get the list of configs and display them with a download link
+var request = new XMLHttpRequest();
+var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
+var url = urlRoot + "/tests/dicom/synthetic-data.json";
+request.open('GET', url, true);
+request.onerror = function (event) {
+    console.error(event);
+};
+request.onload = function (/*event*/) {
+    var configs = JSON.parse(this.responseText);
+    var linkList = document.getElementById("linklist");
+    for (var i = 0; i < configs.length; ++i ) {
+        // download link
+        var link = document.createElement("a");
+        link.href = getObjectUrlFromTags(configs[i].tags);
+        var fileName = "dwv-generated-" + configs[i].name + ".dcm";
+        link.download = fileName
+        link.appendChild( document.createTextNode( fileName ) );
+        // list element
+        var li = document.createElement("li");
+        li.append(link)
+        li.appendChild( document.createTextNode( ": " + configs[i].description ) );
+        // append to list
+        linkList.append(li);
+    }
+};
+request.send(null);
+</script>
+</head>
+
+<body>
+
+<h1>DICOM synthetic data</h1>
+
+<ul id="linklist"></ul>
+
+</body>
+</html>

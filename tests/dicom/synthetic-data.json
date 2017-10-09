@@ -1,0 +1,40 @@
+[
+{
+    "name": "test0",
+    "description": "Simple Little Endian Explicit test data.",
+    "tags": 
+    {
+        "FileMetaInformationGroupLength": 28,
+        "TransferSyntaxUID": "1.2.840.10008.1.2.1",
+        "Modality": "MR",
+        "PatientName": "dwv-patient-name-0",
+        "PhotometricInterpretation": "MONOCHROME2",
+        "SamplesPerPixel": 1,
+        "PixelRepresentation": 0,
+        "Rows": 32,
+        "Columns": 32,
+        "BitsAllocated": 16,
+        "BitsStored": 12,
+        "HighBit": 11
+    }
+},
+{
+    "name": "test1",
+    "description": "Simple Little Endian Explicit test data with PixelRepresentation=1.",
+    "tags": 
+    {
+        "FileMetaInformationGroupLength": 28,
+        "TransferSyntaxUID": "1.2.840.10008.1.2.1",
+        "Modality": "MR",
+        "PatientName": "dwv-patient-name-1",
+        "PhotometricInterpretation": "MONOCHROME2",
+        "SamplesPerPixel": 1,
+        "PixelRepresentation": 1,
+        "Rows": 32,
+        "Columns": 32,
+        "BitsAllocated": 16,
+        "BitsStored": 12,
+        "HighBit": 11
+    }
+}
+]
