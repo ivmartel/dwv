@@ -124,7 +124,7 @@ QUnit.test("Test dicom read/write", function (assert) {
 
     // get the list of configs
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
+    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/343-dicom-write";
     var url = urlRoot + "/tests/dicom/synthetic-data.json";
     request.open('GET', url, true);
     request.onerror = function (event) {
