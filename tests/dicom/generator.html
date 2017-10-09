@@ -22,36 +22,8 @@ function generate()
     // convert JSON to DICOM element object
     var res = dwv.dicom.getElementsFromJSONTags(tags);
     var dicomElements = res.elements;
-    var offset = res.offset;
-
     // pixels: small gradient square
-    var numberOfRows = ( typeof tags.Rows === 'undefined' ) ? 64 : tags.Rows;
-    var numberOfColumns = ( typeof tags.Columns === 'undefined' ) ? 64 : tags.Columns;
-    var pixels = new Uint16Array(numberOfRows*numberOfColumns);
-    pixels.fill(100);
-    var widthI = numberOfColumns * 0.5;
-    var widthJ = numberOfRows * 0.5;
-    var maxNoBounds =  (numberOfColumns/2 + widthI/2) * (numberOfRows/2 + widthJ/2);
-    var max = 100;
-    for ( var j = 0; j < numberOfRows; ++j ) {
-        var jc = Math.abs( j - (numberOfRows/2) );
-        for ( var i = 0; i < numberOfColumns; ++i ) {
-            var ic = Math.abs( i - (numberOfColumns/2) );
-            if ( jc < widthJ/2 && ic < widthI/2) {
-                pixels[numberOfColumns*j + i] += (i * j) * max / maxNoBounds;
-            }
-        }
-    }
-    var pixVL = dwv.dicom.getDataElementPrefixByteSize("OW") +
-       (Uint16Array.BYTES_PER_ELEMENT * numberOfRows * numberOfColumns);
-    dicomElements.x7FE00010 = {
-            'tag': { 'group': "0x7FE0", 'element': "0x0010" },
-            'vr': "OW",
-            'vl': pixVL,
-            'value': pixels,
-            'startOffset': offset,
-            'endOffset': offset + pixVL
-        };
+    dicomElements.x7FE00010 = dwv.dicom.generatePixelDataFromJSONTags(tags, res.offset);
 
     // create writer
     var writer = new dwv.dicom.DicomWriter();

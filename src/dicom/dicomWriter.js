@@ -913,3 +913,62 @@ dwv.dicom.getElementsFromJSONTags = function (tags) {
     // return
     return {'elements': dicomElements, 'offset': offset };
 };
+
+/**
+ * Get the DICOM pixel data from a DICOM tags object.
+ * @param {Object} tags The DICOM tags object.
+ * @param {Object} startOffset The start offset of the pixel data.
+ * @return {Object} The DICOM pixel data element.
+ */
+dwv.dicom.generatePixelDataFromJSONTags = function (tags, startOffset) {
+
+    // check tags
+    if ( typeof tags.Rows === "undefined" ) {
+        throw new Error("Missing number of rows for pixel generation.");
+    } else if ( typeof tags.Columns === "undefined" ) {
+        throw new Error("Missing number of columns for pixel generation.");
+    } else if ( typeof tags.BitsAllocated === "undefined" ) {
+        throw new Error("Missing BitsAllocated for pixel generation.");
+    } else if ( typeof tags.PixelRepresentation === "undefined" ) {
+        throw new Error("Missing PixelRepresentation for pixel generation.");
+    }
+
+    // extract info from tags
+    var numberOfRows = tags.Rows;
+    var numberOfColumns = tags.Columns;
+    var bitsAllocated = tags.BitsAllocated;
+    var pixelRepresentation = tags.PixelRepresentation;
+
+    // create pixel array
+    var pixels = dwv.dicom.getTypedArray(bitsAllocated, pixelRepresentation,
+        numberOfRows * numberOfColumns);
+    pixels.fill(100);
+
+    // pixels: small gradient square
+    var widthI = numberOfColumns * 0.5;
+    var widthJ = numberOfRows * 0.5;
+    var maxNoBounds =  (numberOfColumns/2 + widthI/2) * (numberOfRows/2 + widthJ/2);
+    var max = 100;
+    for ( var j = 0; j < numberOfRows; ++j ) {
+        var jc = Math.abs( j - (numberOfRows/2) );
+        for ( var i = 0; i < numberOfColumns; ++i ) {
+            var ic = Math.abs( i - (numberOfColumns/2) );
+            if ( jc < widthJ/2 && ic < widthI/2) {
+                pixels[numberOfColumns*j + i] += (i * j) * max / maxNoBounds;
+            }
+        }
+    }
+
+    // create and return the DICOM element
+    var vr = "OW";
+    var pixVL = dwv.dicom.getDataElementPrefixByteSize(vr) +
+       (pixels.BYTES_PER_ELEMENT * numberOfRows * numberOfColumns);
+    return {
+            'tag': { 'group': "0x7FE0", 'element': "0x0010" },
+            'vr': vr,
+            'vl': pixVL,
+            'value': pixels,
+            'startOffset': startOffset,
+            'endOffset': startOffset + pixVL
+        };
+};
