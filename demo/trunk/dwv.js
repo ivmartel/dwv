@@ -5384,7 +5384,10 @@ dwv.dicom.generatePixelDataFromJSONTags = function (tags, startOffset) {
     // create pixel array
     var pixels = dwv.dicom.getTypedArray(bitsAllocated, pixelRepresentation,
         numberOfRows * numberOfColumns);
-    pixels.fill(100);
+    //pixels.fill(100); // not supported on phantom?
+    for ( var k = 0; k < numberOfRows*numberOfColumns; ++k ) {
+        pixels[k] = 100;
+    }
 
     // pixels: small gradient square
     var widthI = numberOfColumns * 0.5;
