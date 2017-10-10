@@ -1,13 +1,11 @@
 [
 {
-    "name": "test0",
-    "description": "Simple Little Endian Explicit test data.",
-    "tags": 
-    {
-        "FileMetaInformationGroupLength": 28,
+    "name": "test00",
+    "description": "Little Endian Explicit test data.",
+    "tags": {
         "TransferSyntaxUID": "1.2.840.10008.1.2.1",
         "Modality": "MR",
-        "PatientName": "dwv-patient-name-0",
+        "PatientName": "dwv-patient-name-00",
         "PhotometricInterpretation": "MONOCHROME2",
         "SamplesPerPixel": 1,
         "PixelRepresentation": 0,
@@ -19,17 +17,49 @@
     }
 },
 {
-    "name": "test1",
-    "description": "Simple Little Endian Explicit test data with PixelRepresentation=1.",
-    "tags": 
-    {
-        "FileMetaInformationGroupLength": 28,
+    "name": "test01",
+    "description": "Little Endian Explicit test data with PixelRepresentation=1.",
+    "tags": {
         "TransferSyntaxUID": "1.2.840.10008.1.2.1",
         "Modality": "MR",
-        "PatientName": "dwv-patient-name-1",
+        "PatientName": "dwv-patient-name-01",
         "PhotometricInterpretation": "MONOCHROME2",
         "SamplesPerPixel": 1,
         "PixelRepresentation": 1,
+        "Rows": 32,
+        "Columns": 32,
+        "BitsAllocated": 16,
+        "BitsStored": 12,
+        "HighBit": 11
+    }
+},
+{
+    "name": "test02",
+    "description": "Little Endian Explicit 8bits test data.",
+    "tags": {
+        "TransferSyntaxUID": "1.2.840.10008.1.2.1",
+        "Modality": "MR",
+        "PatientName": "dwv-patient-name-02",
+        "PhotometricInterpretation": "MONOCHROME2",
+        "SamplesPerPixel": 1,
+        "PixelRepresentation": 0,
+        "Rows": 32,
+        "Columns": 32,
+        "BitsAllocated": 8,
+        "BitsStored": 8,
+        "HighBit": 7
+    }
+},
+{
+    "name": "test10",
+    "description": "Little Endian Implicit test data.",
+    "tags": {
+        "TransferSyntaxUID": "1.2.840.10008.1.2",
+        "Modality": "MR",
+        "PatientName": "dwv-patient-name-10",
+        "PhotometricInterpretation": "MONOCHROME2",
+        "SamplesPerPixel": 1,
+        "PixelRepresentation": 0,
         "Rows": 32,
         "Columns": 32,
         "BitsAllocated": 16,

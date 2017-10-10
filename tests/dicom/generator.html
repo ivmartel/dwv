@@ -125,8 +125,8 @@ fieldset { background: whitesmoke; border: 1px solid grey; }
 
 <p>Simple DICOM data generator from json tags.
 Mainly used for generating test data, <b>use at your own risks!</b>
-
-Only tested with explicit data (transfer syntax: <code>1.2.840.10008.1.2.1</code>).
+<br>No need for a 'FileMetaInformationGroupLength', it is calculated automatically.
+<br>Only tested with explicit data (transfer syntax: <code>1.2.840.10008.1.2.1</code>).
 Values should not be <code>null</code>...
 <br>Sequences have an optional <code>explicitLength</code> boolean parameter to write them
 and all their elements with implicit or explicit length. Its default value is <code>true</code>.
@@ -143,7 +143,6 @@ be written with explicit zero length, a <code>0</code> value will mean implicit 
 
 <textarea id="tags" rows="25">
 {
-  "FileMetaInformationGroupLength": 28,
   "TransferSyntaxUID": "1.2.840.10008.1.2.1",
   "Modality": "MR",
   "PatientName": "dwv-patient-name",

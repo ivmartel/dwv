@@ -747,6 +747,8 @@ dwv.dicom.isTagWithVR = function (group, element) {
 
 /**
  * Get the number of bytes occupied by a data element prefix, i.e. without its value.
+ * @param {String} vr The Value Representation of the element.
+ * @param {Boolean} isImplicit Does the data use implicit VR?
  * WARNING: this is valid for tags with a VR, if not sure use the 'isTagWithVR' function first.
  * Reference:
  * - [Data Element explicit]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1},
@@ -762,8 +764,8 @@ dwv.dicom.isTagWithVR = function (group, element) {
  * | Tag | Len | Value |
  * | 4   | 4   | X     | -> item: 8 + X
  */
-dwv.dicom.getDataElementPrefixByteSize = function (vr) {
-    return dwv.dicom.is32bitVLVR(vr) ? 12 : 8;
+dwv.dicom.getDataElementPrefixByteSize = function (vr, isImplicit) {
+    return isImplicit ? 8 : dwv.dicom.is32bitVLVR(vr) ? 12 : 8;
 };
 
 /**
@@ -1219,7 +1221,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     }
 
     // 0x0002, 0x0000: FileMetaInformationGroupLength
-    var dataElement = this.readDataElement(metaReader, offset);
+    var dataElement = this.readDataElement(metaReader, offset, false);
     offset = dataElement.endOffset;
     // store the data element
     this.dicomElements[dataElement.tag.name] = dataElement;
