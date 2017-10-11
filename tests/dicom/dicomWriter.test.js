@@ -119,7 +119,7 @@ QUnit.test("Test patient anonymisation", function (assert) {
     request.send(null);
 });
 
-QUnit.test("Test dicom read/write", function (assert) {
+QUnit.test("Test synthetic dicom", function (assert) {
     var done = assert.async();
 
     // compare JSON tags to DICOM elements
@@ -182,9 +182,8 @@ QUnit.test("Test dicom read/write", function (assert) {
             dicomParser.parse(dicomBuffer);
             var elements = dicomParser.getDicomElements();
 
+            // compare contents
             compare(configs[i].tags, elements, configs[i].name);
-
-
         }
 
         // finish async test
