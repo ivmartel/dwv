@@ -122,6 +122,33 @@ QUnit.test("Test patient anonymisation", function (assert) {
 QUnit.test("Test dicom read/write", function (assert) {
     var done = assert.async();
 
+    // compare JSON tags to DICOM elements
+    var compare = function ( jsonTags, dicomElements, name ) {
+        var keys = Object.keys(jsonTags);
+        for ( var k = 0; k < keys.length; ++k ) {
+            var tag = keys[k];
+            var tagGE = dwv.dicom.getGroupElementFromName(tag);
+            var tagKey = dwv.dicom.getGroupElementKey(tagGE.group, tagGE.element);
+            var element = dicomElements.getDEFromKey(tagKey);
+            var value = dicomElements.getFromKey(tagKey, true);
+            if ( element.vr !== "SQ" ) {
+                assert.equal( value, jsonTags[tag],
+                    "(" + name + ") " + tag );
+            } else {
+                // supposing same order of subkeys and indices...
+                var subKeys = Object.keys(jsonTags[tag]);
+                var index = 0;
+                for ( var sk = 0; sk < subKeys.length; ++sk ) {
+                    if ( subKeys[sk] !== "explicitLength" ) {
+                        var wrap = new dwv.dicom.DicomElementsWrapper(value[index]);
+                        compare(jsonTags[tag][subKeys[sk]], wrap, name);
+                        ++index;
+                    }
+                }
+            }
+        }
+    };
+
     // get the list of configs
     var request = new XMLHttpRequest();
     var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/343-dicom-write";
@@ -155,13 +182,9 @@ QUnit.test("Test dicom read/write", function (assert) {
             dicomParser.parse(dicomBuffer);
             var elements = dicomParser.getDicomElements();
 
-            // compare JSON to parsed data
-            var keys = Object.keys(configs[i].tags);
-            for ( var k = 0; k < keys.length; ++k ) {
-                var tag = keys[k];
-                assert.equal( elements.getFromName(tag), configs[i].tags[tag],
-                    "(" + configs[i].name + ") " + tag );
-            }
+            compare(configs[i].tags, elements, configs[i].name);
+
+
         }
 
         // finish async test
