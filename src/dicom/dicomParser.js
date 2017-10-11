@@ -1820,11 +1820,11 @@ dwv.dicom.DicomElementsWrapper.prototype.getFromGroupElement = function (
  */
 dwv.dicom.DicomElementsWrapper.prototype.getFromName = function ( name )
 {
-   var dicomElement = null;
+   var value = null;
    var tagGE = dwv.dicom.getGroupElementFromName(name);
    // check that we are not at the end of the dictionary
    if ( tagGE.group !== null && tagGE.element !== null ) {
-       dicomElement = this.getFromKey(dwv.dicom.getGroupElementKey(tagGE.group, tagGE.element));
+       value = this.getFromKey(dwv.dicom.getGroupElementKey(tagGE.group, tagGE.element));
    }
-   return dicomElement;
+   return value;
 };
