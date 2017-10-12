@@ -282,6 +282,10 @@ dwv.dicom.DataWriter.prototype.writeDataElementItems = function (byteOffset, ite
         // write item
         var itemElement = item.xFFFEE000;
         itemElement.value = [];
+        var implicitLength = (itemElement.vl === "u/l");
+        if (implicitLength) {
+            itemElement.vl = 0xffffffff;
+        }
         byteOffset = this.writeDataElement(itemElement, byteOffset);
         // write rest
         for ( var m = 0; m < itemKeys.length; ++m ) {
@@ -290,7 +294,7 @@ dwv.dicom.DataWriter.prototype.writeDataElementItems = function (byteOffset, ite
             }
         }
         // item delimitation
-        if (itemElement.vl === "u/l") {
+        if (implicitLength) {
             var itemDelimElement = {
                 'tag': { group: "0xFFFE",
                     element: "0xE00D",
@@ -776,6 +780,7 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
 
         // set the value
         element.value = value;
+        element.vl = 0;
 
         if ( value !== null && value !== 0 ) {
             var sqItems = [];
@@ -812,13 +817,14 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
 
                     name = dwv.dicom.getGroupElementKey(subElement.tag.group, subElement.tag.element);
                     itemElements[name] = subElement;
+                    subSize += dwv.dicom.getDataElementPrefixByteSize(subElement.vr, isImplicit);
                 }
 
                 // item (after elements to get the size)
                 var itemElement = {
                          'tag': { 'group': "0xFFFE", 'element': "0xE000" },
                          'vr': "NONE",
-                         'vl': (explicitLength ? subSize : 0xffffffff),
+                         'vl': (explicitLength ? subSize : "u/l"),
                          'value': []
                      };
                 name = dwv.dicom.getGroupElementKey(itemElement.tag.group, itemElement.tag.element);
@@ -843,9 +849,12 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
             }
 
             element.value = sqItems;
+            if (explicitLength) {
+                element.vl = size;
+            } else {
+                element.vl = "u/l";
+            }
         }
-
-        element.vl = size;
     }
     else {
         // set the value and calculate size

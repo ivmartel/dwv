@@ -51,6 +51,62 @@
     }
 },
 {
+    "name": "test03",
+    "description": "Little Endian Explicit test data with one item sequence.",
+    "tags": {
+        "TransferSyntaxUID": "1.2.840.10008.1.2.1",
+        "Modality": "MR",
+        "PatientName": "dwv-patient-name-03",
+        "PhotometricInterpretation": "MONOCHROME2",
+        "SamplesPerPixel": 1,
+        "PixelRepresentation": 0,
+        "Rows": 32,
+        "Columns": 32,
+        "BitsAllocated": 16,
+        "BitsStored": 12,
+        "HighBit": 11,
+        "ReferencedImageSequence": {
+            "explicitLength": true,
+            "item0": {
+                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
+            },
+            "item1": {
+              "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+              "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
+            }
+        }
+    }
+},
+{
+    "name": "test04",
+    "description": "Little Endian Explicit test data with one item sequence.",
+    "tags": {
+        "TransferSyntaxUID": "1.2.840.10008.1.2.1",
+        "Modality": "MR",
+        "PatientName": "dwv-patient-name-04",
+        "PhotometricInterpretation": "MONOCHROME2",
+        "SamplesPerPixel": 1,
+        "PixelRepresentation": 0,
+        "Rows": 32,
+        "Columns": 32,
+        "BitsAllocated": 16,
+        "BitsStored": 12,
+        "HighBit": 11,
+        "ReferencedImageSequence": {
+            "explicitLength": false,
+            "item0": {
+                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
+            },
+            "item1": {
+              "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+              "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
+            }
+        }
+    }
+},
+{
     "name": "test10",
     "description": "Little Endian Implicit test data.",
     "tags": {
