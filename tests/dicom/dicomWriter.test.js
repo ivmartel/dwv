@@ -132,7 +132,7 @@ QUnit.test("Test synthetic dicom", function (assert) {
             var element = dicomElements.getDEFromKey(tagKey);
             var value = dicomElements.getFromKey(tagKey, true);
             if ( element.vr !== "SQ" ) {
-                assert.equal( value, jsonTags[tag],
+                assert.equal( value.toString(), jsonTags[tag],
                     "(" + name + ") " + tag );
             } else {
                 // supposing same order of subkeys and indices...
