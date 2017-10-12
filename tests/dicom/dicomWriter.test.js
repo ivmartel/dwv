@@ -189,7 +189,7 @@ QUnit.test("Test synthetic dicom", function (assert) {
 
             // compare contents
             var strs = toStringPair(configs[i].tags, elements);
-            assert.equal(strs[0], strs[1], configs[i].name)
+            assert.equal(strs[0], strs[1], configs[i].name);
         }
 
         // finish async test
