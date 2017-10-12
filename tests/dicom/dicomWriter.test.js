@@ -140,7 +140,7 @@ QUnit.test("Test synthetic dicom", function (assert) {
                 var index = 0;
                 for ( var sk = 0; sk < subKeys.length; ++sk ) {
                     if ( subKeys[sk] !== "explicitLength" ) {
-                        var wrap = new dwv.dicom.DicomElementsWrapper(value[index]);
+                        //var wrap = new dwv.dicom.DicomElementsWrapper(value[index]);
                         //compare(jsonTags[tag][subKeys[sk]], wrap, name);
                         ++index;
                     }
