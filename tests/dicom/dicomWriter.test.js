@@ -122,8 +122,10 @@ QUnit.test("Test patient anonymisation", function (assert) {
 QUnit.test("Test synthetic dicom", function (assert) {
     var done = assert.async();
 
-    // compare JSON tags to DICOM elements
-    var compare = function ( jsonTags, dicomElements, name ) {
+    // create string from JSON tags and DICOM elements
+    var toStringPair = function ( jsonTags, dicomElements, name ) {
+        var str0 = "";
+        var str1 = "";
         var keys = Object.keys(jsonTags);
         for ( var k = 0; k < keys.length; ++k ) {
             var tag = keys[k];
@@ -132,21 +134,24 @@ QUnit.test("Test synthetic dicom", function (assert) {
             var element = dicomElements.getDEFromKey(tagKey);
             var value = dicomElements.getFromKey(tagKey, true);
             if ( element.vr !== "SQ" ) {
-                assert.equal( value.toString(), jsonTags[tag],
-                    "(" + name + ") " + tag );
+                str0 += value.toString() + " ";
+                str1 += jsonTags[tag] + " ";
             } else {
                 // supposing same order of subkeys and indices...
                 var subKeys = Object.keys(jsonTags[tag]);
                 var index = 0;
                 for ( var sk = 0; sk < subKeys.length; ++sk ) {
                     if ( subKeys[sk] !== "explicitLength" ) {
-                        //var wrap = new dwv.dicom.DicomElementsWrapper(value[index]);
-                        //compare(jsonTags[tag][subKeys[sk]], wrap, name);
+                        var wrap = new dwv.dicom.DicomElementsWrapper(value[index]);
+                        var res = toStringPair(jsonTags[tag][subKeys[sk]], wrap, name);
+                        str0 += res[0];
+                        str1 += res[1];
                         ++index;
                     }
                 }
             }
         }
+        return [str0, str1];
     };
 
     // get the list of configs
@@ -183,7 +188,8 @@ QUnit.test("Test synthetic dicom", function (assert) {
             var elements = dicomParser.getDicomElements();
 
             // compare contents
-            compare(configs[i].tags, elements, configs[i].name);
+            var res = toStringPair(configs[i].tags, elements);
+            assert.equal(res[0], res[1], configs[i].name)
         }
 
         // finish async test
