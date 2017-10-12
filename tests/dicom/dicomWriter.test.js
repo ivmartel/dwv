@@ -188,8 +188,8 @@ QUnit.test("Test synthetic dicom", function (assert) {
             var elements = dicomParser.getDicomElements();
 
             // compare contents
-            var res = toStringPair(configs[i].tags, elements);
-            assert.equal(res[0], res[1], configs[i].name)
+            var strs = toStringPair(configs[i].tags, elements);
+            assert.equal(strs[0], strs[1], configs[i].name)
         }
 
         // finish async test
