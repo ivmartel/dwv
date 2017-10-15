@@ -122,10 +122,25 @@ QUnit.test("Test patient anonymisation", function (assert) {
 QUnit.test("Test synthetic dicom", function (assert) {
     var done = assert.async();
 
+    // TypedArray.toString can return '[object Uint8Array]' on old browsers
+    //  (such as in PhantomJs)
+    var toString = function ( obj ) {
+        var res = obj.toString();
+        if ( res.substr(0,7) === "[object" &&
+            res.substr((res.length - 6),6) === "Array]") {
+            res = "";
+            for ( var i = 0; i < obj.length; ++i ) {
+                res += obj[i];
+                if ( i !== obj.length - 1 ) {
+                    res += ",";
+                }
+            }
+        }
+        return res;
+    };
+
     // create string from JSON tags and DICOM elements
-    var toStringPair = function ( jsonTags, dicomElements, name ) {
-        var str0 = "";
-        var str1 = "";
+    var compare = function ( jsonTags, dicomElements, name ) {
         var keys = Object.keys(jsonTags);
         for ( var k = 0; k < keys.length; ++k ) {
             var tag = keys[k];
@@ -134,8 +149,7 @@ QUnit.test("Test synthetic dicom", function (assert) {
             var element = dicomElements.getDEFromKey(tagKey);
             var value = dicomElements.getFromKey(tagKey, true);
             if ( element.vr !== "SQ" ) {
-                str0 += value.toString() + " ";
-                str1 += jsonTags[tag] + " ";
+                assert.equal(toString(value), jsonTags[tag], name);
             } else {
                 // supposing same order of subkeys and indices...
                 var subKeys = Object.keys(jsonTags[tag]);
@@ -143,15 +157,12 @@ QUnit.test("Test synthetic dicom", function (assert) {
                 for ( var sk = 0; sk < subKeys.length; ++sk ) {
                     if ( subKeys[sk] !== "explicitLength" ) {
                         var wrap = new dwv.dicom.DicomElementsWrapper(value[index]);
-                        var res = toStringPair(jsonTags[tag][subKeys[sk]], wrap, name);
-                        str0 += res[0];
-                        str1 += res[1];
+                        compare(jsonTags[tag][subKeys[sk]], wrap, name);
                         ++index;
                     }
                 }
             }
         }
-        return [str0, str1];
     };
 
     // get the list of configs
@@ -188,8 +199,7 @@ QUnit.test("Test synthetic dicom", function (assert) {
             var elements = dicomParser.getDicomElements();
 
             // compare contents
-            var strs = toStringPair(configs[i].tags, elements);
-            assert.equal(strs[0], strs[1], configs[i].name);
+            compare(configs[i].tags, elements, configs[i].name);
         }
 
         // finish async test
