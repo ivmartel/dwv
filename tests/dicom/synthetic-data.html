@@ -32,17 +32,9 @@ function getObjectUrlFromTags(tags) {
     return URL.createObjectURL(blob);
 }
 
-// get the list of configs and display them with a download link
-var request = new XMLHttpRequest();
-var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
-var url = urlRoot + "/tests/dicom/synthetic-data.json";
-request.open('GET', url, true);
-request.onerror = function (event) {
-    console.error(event);
-};
-request.onload = function (/*event*/) {
-    var configs = JSON.parse(this.responseText);
-    var linkList = document.getElementById("linklist");
+// create list from configs
+var getConfigsHtmlList = function (configs) {
+    var ul = document.createElement("ul");
     for (var i = 0; i < configs.length; ++i ) {
         // download link
         var link = document.createElement("a");
@@ -55,10 +47,35 @@ request.onload = function (/*event*/) {
         li.append(link)
         li.appendChild( document.createTextNode( ": " + configs[i].description ) );
         // append to list
-        linkList.append(li);
+        ul.append(li);
     }
-};
-request.send(null);
+    return ul;
+}
+
+// get the list of configs and display them with a download link
+var getFileConfigsHtmlList = function (fileName) {
+    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
+    var url = urlRoot + "/tests/dicom/" + fileName + ".json";
+    var request = new XMLHttpRequest();
+    request.open('GET', url, true);
+    request.onerror = function (event) {
+        console.error(event);
+    };
+    request.onload = function (/*event*/) {
+        var content = document.getElementById("content");
+        var title = document.createElement("h2");
+        title.appendChild( document.createTextNode( fileName ) );
+        content.append(title);
+        var configs = JSON.parse(this.responseText);
+        content.append(getConfigsHtmlList(configs));
+    };
+    request.send(null);
+}
+
+// create lists
+getFileConfigsHtmlList("synthetic-data_explicit");
+getFileConfigsHtmlList("synthetic-data_implicit");
+
 </script>
 </head>
 
@@ -66,7 +83,7 @@ request.send(null);
 
 <h1>DICOM synthetic data</h1>
 
-<ul id="linklist"></ul>
+<div id="content"></div>
 
 </body>
 </html>

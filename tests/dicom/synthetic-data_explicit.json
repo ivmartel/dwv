@@ -52,7 +52,7 @@
 },
 {
     "name": "test03",
-    "description": "Little Endian Explicit test data with one item sequence.",
+    "description": "Little Endian Explicit test data with explicit length sequence.",
     "tags": {
         "TransferSyntaxUID": "1.2.840.10008.1.2.1",
         "Modality": "MR",
@@ -80,7 +80,7 @@
 },
 {
     "name": "test04",
-    "description": "Little Endian Explicit test data with one item sequence.",
+    "description": "Little Endian Explicit test data with implicit length sequence.",
     "tags": {
         "TransferSyntaxUID": "1.2.840.10008.1.2.1",
         "Modality": "MR",
@@ -104,23 +104,6 @@
               "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
             }
         }
-    }
-},
-{
-    "name": "test10",
-    "description": "Little Endian Implicit test data.",
-    "tags": {
-        "TransferSyntaxUID": "1.2.840.10008.1.2",
-        "Modality": "MR",
-        "PatientName": "dwv-patient-name-10",
-        "PhotometricInterpretation": "MONOCHROME2",
-        "SamplesPerPixel": 1,
-        "PixelRepresentation": 0,
-        "Rows": 32,
-        "Columns": 32,
-        "BitsAllocated": 16,
-        "BitsStored": 12,
-        "HighBit": 11
     }
 }
 ]

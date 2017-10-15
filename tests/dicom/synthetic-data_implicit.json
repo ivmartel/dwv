@@ -1,0 +1,19 @@
+[
+{
+    "name": "test10",
+    "description": "Little Endian Implicit test data.",
+    "tags": {
+        "TransferSyntaxUID": "1.2.840.10008.1.2",
+        "Modality": "MR",
+        "PatientName": "dwv-patient-name-10",
+        "PhotometricInterpretation": "MONOCHROME2",
+        "SamplesPerPixel": 1,
+        "PixelRepresentation": 0,
+        "Rows": 32,
+        "Columns": 32,
+        "BitsAllocated": 16,
+        "BitsStored": 12,
+        "HighBit": 11
+    }
+}
+]
