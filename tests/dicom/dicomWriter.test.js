@@ -206,7 +206,7 @@ dwv.utils.test.testConfig = function (config, assert) {
 
     // compare contents
     dwv.utils.test.compare(config.tags, elements, config.name, assert);
-}
+};
 
 QUnit.test("Test synthetic dicom explicit", function (assert) {
     var done = assert.async();
@@ -228,7 +228,6 @@ QUnit.test("Test synthetic dicom explicit", function (assert) {
         done();
     };
     request.send(null);
-
 });
 
 QUnit.test("Test synthetic dicom implicit", function (assert) {
@@ -251,5 +250,4 @@ QUnit.test("Test synthetic dicom implicit", function (assert) {
         done();
     };
     request.send(null);
-
 });
