@@ -15,5 +15,39 @@
         "BitsStored": 12,
         "HighBit": 11
     }
+},
+{
+    "name": "test11",
+    "description": "Little Endian Implicit test data with PixelRepresentation=1.",
+    "tags": {
+        "TransferSyntaxUID": "1.2.840.10008.1.2",
+        "Modality": "MR",
+        "PatientName": "dwv-patient-name-11",
+        "PhotometricInterpretation": "MONOCHROME2",
+        "SamplesPerPixel": 1,
+        "PixelRepresentation": 1,
+        "Rows": 32,
+        "Columns": 32,
+        "BitsAllocated": 16,
+        "BitsStored": 12,
+        "HighBit": 11
+    }
+},
+{
+    "name": "test12",
+    "description": "Little Endian Implicit 8bits test data.",
+    "tags": {
+        "TransferSyntaxUID": "1.2.840.10008.1.2",
+        "Modality": "MR",
+        "PatientName": "dwv-patient-name-12",
+        "PhotometricInterpretation": "MONOCHROME2",
+        "SamplesPerPixel": 1,
+        "PixelRepresentation": 0,
+        "Rows": 32,
+        "Columns": 32,
+        "BitsAllocated": 8,
+        "BitsStored": 8,
+        "HighBit": 7
+    }
 }
 ]
