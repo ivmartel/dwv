@@ -269,9 +269,10 @@ dwv.dicom.DataWriter.prototype.writeStringArray = function (byteOffset, array) {
  * Write a list of items.
  * @param {Number} byteOffset The offset to start writing from.
  * @param {Array} items The list of items to write.
+ * @param {Boolean} isImplicit Is the DICOM VR implicit?
  * @returns {Number} The new offset position.
  */
-dwv.dicom.DataWriter.prototype.writeDataElementItems = function (byteOffset, items) {
+dwv.dicom.DataWriter.prototype.writeDataElementItems = function (byteOffset, items, isImplicit) {
     var item = null;
     for ( var i = 0; i < items.length; ++i ) {
         item = items[i];
@@ -286,11 +287,11 @@ dwv.dicom.DataWriter.prototype.writeDataElementItems = function (byteOffset, ite
         if (implicitLength) {
             itemElement.vl = 0xffffffff;
         }
-        byteOffset = this.writeDataElement(itemElement, byteOffset);
+        byteOffset = this.writeDataElement(itemElement, byteOffset, isImplicit);
         // write rest
         for ( var m = 0; m < itemKeys.length; ++m ) {
             if ( itemKeys[m] !== "xFFFEE000" && itemKeys[m] !== "xFFFEE00D") {
-                byteOffset = this.writeDataElement(item[itemKeys[m]], byteOffset);
+                byteOffset = this.writeDataElement(item[itemKeys[m]], byteOffset, isImplicit);
             }
         }
         // item delimitation
@@ -303,7 +304,7 @@ dwv.dicom.DataWriter.prototype.writeDataElementItems = function (byteOffset, ite
                 'vl': 0,
                 'value': []
             };
-            byteOffset = this.writeDataElement(itemDelimElement, byteOffset);
+            byteOffset = this.writeDataElement(itemDelimElement, byteOffset, isImplicit);
         }
     }
 
@@ -316,9 +317,10 @@ dwv.dicom.DataWriter.prototype.writeDataElementItems = function (byteOffset, ite
  * @param {String} vr The data Value Representation (VR).
  * @param {Number} byteOffset The offset to start writing from.
  * @param {Array} value The array to write.
+ * @param {Boolean} isImplicit Is the DICOM VR implicit?
  * @returns {Number} The new offset position.
  */
-dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset, value) {
+dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset, value, isImplicit) {
     // first check input type to know how to write
     if (value instanceof Uint8Array) {
         byteOffset = this.writeUint8Array(byteOffset, value);
@@ -357,7 +359,7 @@ dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset,
         } else if ( vr === "FD") {
             byteOffset = this.writeFloat64Array(byteOffset, value);
         } else if ( vr === "SQ") {
-            byteOffset = this.writeDataElementItems(byteOffset, value);
+            byteOffset = this.writeDataElementItems(byteOffset, value, isImplicit);
         } else if ( vr === "AT") {
             var hexString = value + '';
             var hexString1 = hexString.substring(1, 5);
@@ -380,9 +382,10 @@ dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset,
  * @param {String} vl The data Value Length (VL).
  * @param {Number} byteOffset The offset to start writing from.
  * @param {Array} value The array to write.
+ * @param {Boolean} isImplicit Is the DICOM VR implicit?
  * @returns {Number} The new offset position.
  */
-dwv.dicom.DataWriter.prototype.writePixelDataElementValue = function (vr, vl, byteOffset, value) {
+dwv.dicom.DataWriter.prototype.writePixelDataElementValue = function (vr, vl, byteOffset, value, isImplicit) {
     // explicit length
     if (vl !== "u/l") {
         var finalValue = value[0];
@@ -391,7 +394,7 @@ dwv.dicom.DataWriter.prototype.writePixelDataElementValue = function (vr, vl, by
             finalValue = dwv.dicom.flattenArrayOfTypedArrays(value);
         }
         // write
-        byteOffset = this.writeDataElementValue(vr, byteOffset, finalValue);
+        byteOffset = this.writeDataElementValue(vr, byteOffset, finalValue, isImplicit);
     } else {
         // pixel data as sequence
         var item = {};
@@ -425,7 +428,7 @@ dwv.dicom.DataWriter.prototype.writePixelDataElementValue = function (vr, vl, by
             'value': []
         };
         // write
-        byteOffset = this.writeDataElementItems(byteOffset, [item]);
+        byteOffset = this.writeDataElementItems(byteOffset, [item], isImplicit);
     }
 
     // return new offset
@@ -478,9 +481,9 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset,
     }
     // write
     if (element.tag.name === "x7FE00010") {
-        byteOffset = this.writePixelDataElementValue(element.vr, element.vl, byteOffset, value);
+        byteOffset = this.writePixelDataElementValue(element.vr, element.vl, byteOffset, value, isImplicit);
     } else {
-        byteOffset = this.writeDataElementValue(element.vr, byteOffset, value);
+        byteOffset = this.writeDataElementValue(element.vr, byteOffset, value, isImplicit);
     }
 
     // sequence delimitation item for sequence with implicit length
@@ -493,7 +496,7 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset,
             'vl': 0,
             'value': []
         };
-        byteOffset = this.writeDataElement(seqDelimElement, byteOffset);
+        byteOffset = this.writeDataElement(seqDelimElement, byteOffset, isImplicit);
     }
 
     // return new offset
