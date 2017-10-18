@@ -776,16 +776,6 @@ dwv.dicom.getDicomElement = function (tagName)
  * @return {Number} The total element size.
  */
 dwv.dicom.setElementValue = function (element, value, isImplicit) {
-    // empty object check
-    function isEmpty(obj) {
-        for( var key in obj ) {
-            if( obj.hasOwnProperty(key) ) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     // byte size of the element
     var size = 0;
     // special sequence case
@@ -806,11 +796,6 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
                 delete value.explicitLength;
             }
 
-            // check if object is empty
-            if (isEmpty(value)) {
-                return size;
-            }
-            
             // items
             var itemData;
             var itemKeys = Object.keys(value);
@@ -819,6 +804,11 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
                 var itemElements = {};
                 var subSize = 0;
                 itemData = value[itemKeys[i]];
+                
+                // check data
+                if ( itemData === null || itemData === 0 ) {
+                    continue;
+                }
 
                 // elements
                 var subElement;
