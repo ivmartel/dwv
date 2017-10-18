@@ -5248,6 +5248,11 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
                 var itemElements = {};
                 var subSize = 0;
                 itemData = value[itemKeys[i]];
+                
+                // check data
+                if ( itemData === null || itemData === 0 ) {
+                    continue;
+                }
 
                 // elements
                 var subElement;
