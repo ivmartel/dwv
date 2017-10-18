@@ -796,6 +796,19 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
                 delete value.explicitLength;
             }
 
+            // check if object is empty
+            function isEmpty(obj) {
+                for( var key in obj ) {
+                    if( obj.hasOwnProperty(key) ) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            if (isEmpty(value)) {
+                return size;
+            }
+            
             // items
             var itemData;
             var itemKeys = Object.keys(value);
