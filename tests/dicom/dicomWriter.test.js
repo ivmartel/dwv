@@ -163,6 +163,10 @@ dwv.utils.test.compare = function ( jsonTags, dicomElements, name, comparator ) 
         if ( element.vr !== "SQ" ) {
             comparator.equal(dwv.utils.test.toString(value), jsonTags[tag], name + " - " + tag);
         } else {
+            // check content
+            if (jsonTags[tag] === null || jsonTags[tag] === 0) {
+                continue;
+            }
             // supposing same order of subkeys and indices...
             var subKeys = Object.keys(jsonTags[tag]);
             var index = 0;
