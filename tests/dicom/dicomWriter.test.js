@@ -153,6 +153,10 @@ dwv.utils.test.toString = function ( obj ) {
  * @param {Object} comaprator An object with an equal function (such as Qunit assert).
  */
 dwv.utils.test.compare = function ( jsonTags, dicomElements, name, comparator ) {
+    // check content
+    if (jsonTags === null || jsonTags === 0) {
+        return;
+    }
     var keys = Object.keys(jsonTags);
     for ( var k = 0; k < keys.length; ++k ) {
         var tag = keys[k];
