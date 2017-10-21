@@ -488,23 +488,23 @@ dwv.dicom.Tag.prototype.equals2 = function (rhs) {
 // Get the FileMetaInformationGroupLength Tag.
 dwv.dicom.getFileMetaInformationGroupLengthTag = function () {
     return new dwv.dicom.Tag("0x0002", "0x0000");
-}
+};
 // Get the Item Tag.
 dwv.dicom.getItemTag = function () {
     return new dwv.dicom.Tag("0xFFFE", "0xE000");
-}
+};
 // Get the ItemDelimitationItem Tag.
 dwv.dicom.getItemDelimitationItemTag = function () {
     return new dwv.dicom.Tag("0xFFFE", "0xE00D");
-}
+};
 // Get the SequenceDelimitationItem Tag.
 dwv.dicom.getSequenceDelimitationItemTag = function () {
     return new dwv.dicom.Tag("0xFFFE", "0xE0DD");
-}
+};
 // Get the PixelData Tag.
 dwv.dicom.getPixelDataTag = function () {
     return new dwv.dicom.Tag("0x7FE0", "0x0010");
-}
+};
 
 /**
  * Get the group-element key used to store DICOM elements.
