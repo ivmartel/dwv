@@ -503,17 +503,6 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset,
     return byteOffset;
 };
 
-
-/**
- * Tell if a given syntax is supported for writing.
- * @param {String} syntax The transfer syntax to test.
- * @return {Boolean} True if a supported syntax.
- */
-dwv.dicom.isWriteSupportedTransferSyntax = function (syntax) {
-    return syntax === "1.2.840.10008.1.2" || // Implicit VR - Little Endian
-        syntax === "1.2.840.10008.1.2.1"; // Explicit VR - Little Endian
-};
-
 /**
  * Is this element an implicit length sequence?
  * @param {Object} element The element to check.
@@ -670,12 +659,6 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     // transfer syntax
     var syntax = dwv.dicom.cleanString(dicomElements.x00020010.value[0]);
     var isImplicit = dwv.dicom.isImplicitTransferSyntax(syntax);
-
-    // check support
-    if (!dwv.dicom.isWriteSupportedTransferSyntax(syntax)) {
-        throw new Error("Unsupported DICOM transfer syntax: '"+syntax+
-            "' ("+dwv.dicom.getTransferSyntaxName(syntax)+")");
-    }
 
     // calculate buffer size and split elements (meta and non meta)
     var totalSize = 128 + 4; // DICM
