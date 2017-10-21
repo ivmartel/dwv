@@ -4925,15 +4925,6 @@ dwv.dicom.DataWriter.prototype.writePixelDataElementValue = function (vr, vl, by
                 'value': value[i]
             };
         }
-        // sequence delimitation item
-        item.end = {
-            'tag': { group: "0xFFFE",
-                element: "0xE0DD",
-                name: "xFFFEE0DD" },
-            'vr': "UN",
-            'vl': 0,
-            'value': []
-        };
         // write
         byteOffset = this.writeDataElementItems(byteOffset, [item], isImplicit);
     }
@@ -4994,7 +4985,8 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset,
     }
 
     // sequence delimitation item for sequence with implicit length
-    if ( dwv.dicom.isImplicitLengthSequence(element) ) {
+    if ( dwv.dicom.isImplicitLengthSequence(element) ||
+         dwv.dicom.isImplicitLengthPixels(element) ) {
         var seqDelimElement = {
             'tag': { group: "0xFFFE",
                 element: "0xE0DD",
@@ -5195,7 +5187,8 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
             localSize += parseInt(realVl, 10);
 
             // add size of sequence delimitation item
-            if ( dwv.dicom.isImplicitLengthSequence(element) ) {
+            if ( dwv.dicom.isImplicitLengthSequence(element) ||
+                 dwv.dicom.isImplicitLengthPixels(element) ) {
                 localSize += dwv.dicom.getDataElementPrefixByteSize("NONE", isImplicit);
             }
 
@@ -5295,7 +5288,7 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
                 var itemElements = {};
                 var subSize = 0;
                 itemData = value[itemKeys[i]];
-                
+
                 // check data
                 if ( itemData === null || itemData === 0 ) {
                     continue;
