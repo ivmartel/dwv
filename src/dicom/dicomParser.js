@@ -441,6 +441,72 @@ dwv.dicom.getGroupElementFromName = function (tagName)
 };
 
 /**
+ * Immutable tag.
+ * @constructor
+ * @param {String} group The tag group.
+ * @param {String} element The tag element.
+ */
+dwv.dicom.Tag = function (group, element)
+{
+    /**
+     * Get the tag group.
+     * @return {String} The tag group.
+     */
+    this.getGroup = function () { return group; };
+    /**
+     * Get the tag element.
+     * @return {String} The tag element.
+     */
+    this.getElement = function () { return element; };
+}; // Tag class
+
+/**
+ * Check for Tag equality.
+ * @param {Object} rhs The other tag to compare to.
+ * @return {Boolean} True if both tags are equal.
+ */
+dwv.dicom.Tag.prototype.equals = function (rhs) {
+    return rhs !== null &&
+        this.getGroup() === rhs.getGroup() &&
+        this.getElement() === rhs.getElement();
+};
+
+/**
+ * Check for Tag equality.
+ * @param {Object} rhs The other tag to compare to provided as a simple object.
+ * @return {Boolean} True if both tags are equal.
+ */
+dwv.dicom.Tag.prototype.equals2 = function (rhs) {
+    if (rhs === null || 
+        typeof rhs.group === "undefined" || 
+        typeof rhs.element === "undefined" ) {
+            return false;
+    }
+    return this.equals(new dwv.dicom.Tag(rhs.group, rhs.element));
+};
+
+// Get the FileMetaInformationGroupLength Tag.
+dwv.dicom.getFileMetaInformationGroupLengthTag = function () {
+    return new dwv.dicom.Tag("0x0002", "0x0000");
+}
+// Get the Item Tag.
+dwv.dicom.getItemTag = function () {
+    return new dwv.dicom.Tag("0xFFFE", "0xE000");
+}
+// Get the ItemDelimitationItem Tag.
+dwv.dicom.getItemDelimitationItemTag = function () {
+    return new dwv.dicom.Tag("0xFFFE", "0xE00D");
+}
+// Get the SequenceDelimitationItem Tag.
+dwv.dicom.getSequenceDelimitationItemTag = function () {
+    return new dwv.dicom.Tag("0xFFFE", "0xE0DD");
+}
+// Get the PixelData Tag.
+dwv.dicom.getPixelDataTag = function () {
+    return new dwv.dicom.Tag("0x7FE0", "0x0010");
+}
+
+/**
  * Get the group-element key used to store DICOM elements.
  * @param {Number} group The DICOM group.
  * @param {Number} element The DICOM element.

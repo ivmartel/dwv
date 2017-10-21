@@ -685,9 +685,10 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     var element;
     var groupName;
     var metaLength = 0;
+    var fmiglTag = dwv.dicom.getFileMetaInformationGroupLengthTag();
     for ( var i = 0, leni = keys.length; i < leni; ++i ) {
         element = this.getElementToWrite(dicomElements[keys[i]]);
-        if ( element !== null ) {
+        if ( element !== null && !fmiglTag.equals2(element.tag) ) {
             localSize = 0;
             // tag group name
             groupName = dwv.dicom.TagGroups[element.tag.group.substr(1)]; // remove first 0
