@@ -54,7 +54,7 @@ var getConfigsHtmlList = function (configs) {
 
 // get the list of configs and display them with a download link
 var getFileConfigsHtmlList = function (fileName) {
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
+    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/343-dicom-write";
     var url = urlRoot + "/tests/dicom/" + fileName + ".json";
     var request = new XMLHttpRequest();
     request.open('GET', url, true);
