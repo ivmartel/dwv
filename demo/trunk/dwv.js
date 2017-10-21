@@ -4868,13 +4868,15 @@ dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset,
         } else if ( vr === "SQ") {
             byteOffset = this.writeDataElementItems(byteOffset, value, isImplicit);
         } else if ( vr === "AT") {
-            var hexString = value + '';
-            var hexString1 = hexString.substring(1, 5);
-            var hexString2 = hexString.substring(6, 10);
-            var dec1 = parseInt(hexString1, 16);
-            var dec2 = parseInt(hexString2, 16);
-            value = new Uint16Array([dec1, dec2]);
-            byteOffset = this.writeUint16Array(byteOffset, value);
+            for ( var i = 0; i < value.length; ++i ) {
+                var hexString = value[i] + '';
+                var hexString1 = hexString.substring(1, 5);
+                var hexString2 = hexString.substring(6, 10);
+                var dec1 = parseInt(hexString1, 16);
+                var dec2 = parseInt(hexString2, 16);
+                var atValue = new Uint16Array([dec1, dec2]);
+                byteOffset = this.writeUint16Array(byteOffset, atValue);
+            }
         } else {
             byteOffset = this.writeStringArray(byteOffset, value);
         }
