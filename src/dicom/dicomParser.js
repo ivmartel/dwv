@@ -477,8 +477,8 @@ dwv.dicom.Tag.prototype.equals = function (rhs) {
  * @return {Boolean} True if both tags are equal.
  */
 dwv.dicom.Tag.prototype.equals2 = function (rhs) {
-    if (rhs === null || 
-        typeof rhs.group === "undefined" || 
+    if (rhs === null ||
+        typeof rhs.group === "undefined" ||
         typeof rhs.element === "undefined" ) {
             return false;
     }
@@ -1401,9 +1401,6 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
             var pixItems = this.dicomElements.x7FE00010.value;
             if (pixItems.length > 1 && pixItems.length > numberOfFrames ) {
 
-                var bitsAllocated = this.dicomElements.x00280100.value[0];
-                var pixelRepresentation = this.dicomElements.x00280103.value[0];
-
                 // concatenate pixel data items
                 // concat does not work on typed arrays
                 //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
@@ -1419,7 +1416,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
                         size += pixItems[index + i].length;
                     }
                     // create new buffer
-                    var newBuffer = dwv.dicom.getTypedArray(bitsAllocated, pixelRepresentation, size);
+                    var newBuffer = new pixItems[0].constructor(size);
                     // fill new buffer
                     var fragOffset = 0;
                     for (var j = 0; j < nItemPerFrame; ++j) {
