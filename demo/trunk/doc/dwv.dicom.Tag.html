@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>dwv Class: ChangeGroupCommand</title>
+	<title>dwv Class: Tag</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -93,15 +93,15 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: ChangeGroupCommand</h1>
+	<h1 class="page-title">Class: Tag</h1>
 <section>
 
 <header>
     
         <h2>
-            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.tool.html">.tool</a>.</span>
+            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.dicom.html">.dicom</a>.</span>
         
-        ChangeGroupCommand
+        Tag
         </h2>
         
     
@@ -114,7 +114,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="ChangeGroupCommand"><span class="type-signature"></span>new ChangeGroupCommand(name, func, startAnchor, endAnchor, layer, image)</h4>
+    <h4 class="name" id="Tag"><span class="type-signature"></span>new Tag(group, element)</h4>
     
     
 </dt>
@@ -122,7 +122,7 @@
 
     
     <div class="description">
-        Change group command.
+        Immutable tag.
     </div>
     
 
@@ -157,7 +157,7 @@
 
         <tr>
             
-                <td class="name"><code>name</code></td>
+                <td class="name"><code>group</code></td>
             
 
             <td class="type">
@@ -174,20 +174,20 @@
 
             
 
-            <td class="description last">The shape display name.</td>
+            <td class="description last">The tag group.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>func</code></td>
+                <td class="name"><code>element</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type">String</span>
 
 
 
@@ -198,103 +198,7 @@
 
             
 
-            <td class="description last">The change function.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>startAnchor</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The anchor that starts the change.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>endAnchor</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The anchor that ends the change.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>layer</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The layer where to change the group.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>image</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The associated image.</td>
+            <td class="description last">The tag element.</td>
         </tr>
 
     
@@ -338,8 +242,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_tools_drawCommands.js.html">src/tools/drawCommands.js</a>,
-				 <a href="src_tools_drawCommands.js.html#sunlight-1-line-171">line 171</a>
+				<a href="src_dicom_dicomParser.js.html">src/dicom/dicomParser.js</a>,
+				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-449">line 449</a>
 			</li>
 		</ul>
 	</dd>
@@ -390,7 +294,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="execute"><span class="type-signature"></span>execute()</h4>
+    <h4 class="name" id="equals"><span class="type-signature"></span>equals(rhs)</h4>
     
     
 </dt>
@@ -398,7 +302,7 @@
 
     
     <div class="description">
-        Execute the command.
+        Check for Tag equality.
     </div>
     
 
@@ -408,93 +312,55 @@
 
     
     
+        <h5>Parameters:</h5>
+        
 
-    
-<dl class="details">
-    
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
 
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_tools_drawCommands.js.html">src/tools/drawCommands.js</a>,
-				 <a href="src_tools_drawCommands.js.html#sunlight-1-line-182">line 182</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
+        <th>Type</th>
 
         
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
             
-<hr>
-<dt>
-    <h4 class="name" id="getName"><span class="type-signature"></span>getName()</h4>
-    
-    
-</dt>
-<dd>
+                <td class="name"><code>rhs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The other tag to compare to.</td>
+        </tr>
 
     
-    <div class="description">
-        Get the command name.
-    </div>
-    
+    </tbody>
+</table>
 
-    
-
-    
-
-    
     
 
     
@@ -532,8 +398,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_tools_drawCommands.js.html">src/tools/drawCommands.js</a>,
-				 <a href="src_tools_drawCommands.js.html#sunlight-1-line-177">line 177</a>
+				<a href="src_dicom_dicomParser.js.html">src/dicom/dicomParser.js</a>,
+				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-468">line 468</a>
 			</li>
 		</ul>
 	</dd>
@@ -562,7 +428,281 @@
     
             
 <div class="param-desc">
-    The command name.
+    True if both tags are equal.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="equals2"><span class="type-signature"></span>equals2(rhs)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Check for Tag equality.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>rhs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The other tag to compare to provided as a simple object.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_dicom_dicomParser.js.html">src/dicom/dicomParser.js</a>,
+				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-479">line 479</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    True if both tags are equal.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getElement"><span class="type-signature"></span>getElement()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get the tag element.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_dicom_dicomParser.js.html">src/dicom/dicomParser.js</a>,
+				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-460">line 460</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    The tag element.
 </div>
 
 
@@ -590,7 +730,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="onExecute"><span class="type-signature"></span>onExecute(event)</h4>
+    <h4 class="name" id="getGroup"><span class="type-signature"></span>getGroup()</h4>
     
     
 </dt>
@@ -598,283 +738,7 @@
 
     
     <div class="description">
-        Handle an execute event.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>event</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The execute event with type and id.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_tools_drawCommands.js.html">src/tools/drawCommands.js</a>,
-				 <a href="src_tools_drawCommands.js.html#sunlight-1-line-207">line 207</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="onUndo"><span class="type-signature"></span>onUndo(event)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Handle an undo event.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>event</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The undo event with type and id.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_tools_drawCommands.js.html">src/tools/drawCommands.js</a>,
-				 <a href="src_tools_drawCommands.js.html#sunlight-1-line-215">line 215</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="undo"><span class="type-signature"></span>undo()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Undo the command.
+        Get the tag group.
     </div>
     
 
@@ -920,8 +784,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_tools_drawCommands.js.html">src/tools/drawCommands.js</a>,
-				 <a href="src_tools_drawCommands.js.html#sunlight-1-line-193">line 193</a>
+				<a href="src_dicom_dicomParser.js.html">src/dicom/dicomParser.js</a>,
+				 <a href="src_dicom_dicomParser.js.html#sunlight-1-line-455">line 455</a>
 			</li>
 		</ul>
 	</dd>
@@ -946,6 +810,30 @@
     
 
     
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    The tag group.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">String</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
 
     
 </dd>
