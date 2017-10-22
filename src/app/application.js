@@ -761,6 +761,19 @@ dwv.App = function ()
     {
         drawController.updateDraw(drawDetails);
     };
+
+
+    /**
+     * Clone selected Draw to a new layer
+     * @param  {Number} inLayer Layer index to append the draw
+     * @param  {Boolean} restart Conditional to set initial layer as visible or not
+     */
+    this.getShapeEditor = function()
+    {
+        return self.getDrawer().getShapeEditor();
+    };
+
+
     /**
      * Delete all Draws from all layers.
     */
@@ -1083,6 +1096,23 @@ dwv.App = function ()
 
 
     // Private Methods -----------------------------------------------------------
+
+
+    /**
+     * Get Draw tool. Very useful to interact with selected drawings
+     * Needed to clone, delete, modify, etc selected draws
+     * @return {Object} Drawer tool.
+     */
+    this.getDrawer = function()
+    {
+        var Drawer =  self.getToolboxController().getToolList().Draw;
+        if(Drawer && typeof Drawer != "undefined"){
+            return Drawer;
+        }
+        else{
+            throw new Error("Draw tool must be available to use this feature.");
+        }
+    }
 
     /**
      * Fire an event: call all associated listeners.

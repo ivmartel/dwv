@@ -12,6 +12,7 @@ var Kinetic = Kinetic || {};
  */
 dwv.tool.Draw = function (app, shapeFactoryList)
 {
+    // console.log(shapeFactoryList)
     /**
      * Closure to self: to be used by event handlers.
      * @private
@@ -35,6 +36,11 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @type Object
      */
     this.shapeFactoryList = shapeFactoryList;
+
+    this.getShapeEditor = function(){
+        return shapeEditor;
+    };
+
     /**
      * Draw command.
      * @private
@@ -390,6 +396,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @param {Object} shape The shape to set on.
      */
     this.setShapeOn = function ( shape ) {
+        console.log(shape)
         // mouse over styling
         shape.on('mouseover', function () {
             document.body.style.cursor = 'pointer';
