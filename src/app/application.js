@@ -187,6 +187,22 @@ dwv.App = function ()
     };
 
     /**
+     * Get Draw tool. Very useful to interact with selected drawings
+     * Needed to clone, delete, modify, etc selected draws
+     * @return {Object} Drawer tool.
+     */
+    this.getDrawer = function()
+    {
+        var Drawer =  self.getToolboxController().getToolList().Draw;
+        if(Drawer && typeof Drawer != "undefined"){
+            return Drawer;
+        }
+        else{
+            throw new Error("Draw tool must be available to use this feature.");
+        }
+    }
+
+    /**
      * Initialise the HTML for the application.
      */
     this.init = function ( config ) {
@@ -762,6 +778,24 @@ dwv.App = function ()
         drawController.updateDraw(drawDetails);
     };
 
+    /**
+     * Clone selected Draw to a new layer
+     * @param  {Number} inLayer Layer index to append the draw
+     * @param  {Boolean} restart Conditional to set initial layer as visible or not
+     */
+    this.cloneDraw = function(inLayer, restart)
+    {
+        this.getDrawer().cloneDraw(inLayer, restart);
+    };
+    /**
+     * Clone selected Draw to a new layer
+     * @param  {Number} inLayer Layer index to append the draw
+     * @param  {Boolean} restart Conditional to set initial layer as visible or not
+     */
+    this.deleteDraw = function()
+    {
+        this.getDrawer().deleteDraw();
+    };
 
     /**
      * Clone selected Draw to a new layer
@@ -883,6 +917,10 @@ dwv.App = function ()
             {
                 undoStack.undo();
             }
+        }
+        if ( event.keyCode === 46 && self.getShapeEditor() && self.getShapeEditor().getShape()) // supr && shape selected
+        {
+            self.deleteDraw();
         }
     };
 
@@ -1096,23 +1134,6 @@ dwv.App = function ()
 
 
     // Private Methods -----------------------------------------------------------
-
-
-    /**
-     * Get Draw tool. Very useful to interact with selected drawings
-     * Needed to clone, delete, modify, etc selected draws
-     * @return {Object} Drawer tool.
-     */
-    this.getDrawer = function()
-    {
-        var Drawer =  self.getToolboxController().getToolList().Draw;
-        if(Drawer && typeof Drawer != "undefined"){
-            return Drawer;
-        }
-        else{
-            throw new Error("Draw tool must be available to use this feature.");
-        }
-    }
 
     /**
      * Fire an event: call all associated listeners.

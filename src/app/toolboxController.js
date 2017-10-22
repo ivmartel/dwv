@@ -238,11 +238,20 @@ dwv.ToolboxController = function ()
             if ( event.type !== "keydown" ) {
                 event.preventDefault();
             }
-            var func = toolbox.getSelectedTool()[event.type];
-            if ( func )
-            {
-                func(event);
+
+            var tool =toolbox.getSelectedTool();
+            if (tool){
+                var func = tool[event.type];
+                if ( func )
+                {
+                    func(event);
+                }
             }
+            // var func = toolbox.getSelectedTool()[event.type];
+            // if ( func )
+            // {
+            //     func(event);
+            // }
         }
     }
 

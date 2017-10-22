@@ -1686,3 +1686,32 @@ dwv.dicom.DicomElementsWrapper.prototype.getFromName = function ( name )
    }
    return dicomElement;
 };
+
+/**
+ * Remove dicom tags replacing characters by spaces
+ * @param {Array} buffer The input array buffer.
+ * @param {Array} ElementTags The tags to be removed.
+ * @param {boolean} If true, the function will return a blob else return Uint8Array.
+ * @return {Object} Blob or Uint8Array depending on last parameter.
+ */
+dwv.dicom.DicomParser.prototype.cleanTags = function(arraybuffer, tags, blob){
+    var elem = this.getRawDicomElements();
+    // Check if dicomElements is empty to force parse
+    if(Object.getOwnPropertyNames(elem).length === 0){
+        var parser = new dwv.dicom.DicomParser();
+        parser.parse(arraybuffer);
+        elem = parser.getRawDicomElements();
+    }
+    var array = new Uint8Array(arraybuffer);
+    for(var t=0, tl=tags.length; t<tl; t++){
+        var item = elem[tags[t]];
+        var endOffset = item ? item.endOffset : undefined;
+        if(typeof endOffset !== 'undefined'){
+            for(var i=endOffset-item.vl, il=endOffset; i<il; i++){
+                array[i] = 32;
+            }
+        }
+    }
+    if(blob){ return new Blob([array], {type: 'application/dicom'});}
+    return array;
+};// namespaces

@@ -85,6 +85,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     //  with those of the draw tool
     shapeEditor.setDrawEventCallback(fireEvent);
 
+    this.getShapeEditor = function(){
+        return shapeEditor;
+    };
+
     /**
      * Trash draw: a cross.
      * @private
@@ -284,6 +288,93 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      */
     this.keydown = function(event){
         app.onKeydown(event);
+    };
+
+    /**
+     * Clone selected Draw to a new layer
+     * @param  {Number} inLayer Layer index to append the draw
+     * @param  {Boolean} restart Conditional to set initial layer as visible or not
+     */
+    this.cloneDraw = function(inLayer, restart){
+        if(isNaN(inLayer)){
+            throw new Error("Layer index is needed. Shape will be append to this layer.");
+        }
+        if(inLayer < 0 || inLayer > app.getNSlicesToLoad()){
+            throw new Error("Layer is not available.");
+        }
+
+        var iShape = shapeEditor.getShape();
+        if(!iShape || typeof iShape === 'undefined'){
+            throw new Error("No shape selected.");
+        }
+
+        // Disable shape editor
+        shapeEditor.disable();
+        shapeEditor.setShape(null);
+        shapeEditor.setImage(null);
+
+        var view = app.getViewController();
+        var pos  = view.getCurrentPosition();
+        view.setCurrentPosition({i: pos.i, j: pos.j, k: inLayer});
+
+        var group = iShape.getParent();
+        // Get label to get custom elements textExpr and quant
+        var label = (group.getChildren()).filter(function(children){
+            return children.getClassName() === 'Label';
+        })[0];
+
+        var clone = group.clone();
+        clone.id( group.getId() );
+        // Override label to add custom elements textExpr and quant
+        for(var c=0, cl=clone.getChildren().length ; c<cl ; c++){
+            if(clone.children[c].getClassName() === 'Label'){
+                clone.children[c] = label;
+                break;
+            }
+        }
+
+        // Draw cloned shape
+        var command = new dwv.tool.DrawGroupCommand( clone,
+            dwv.tool.GetShapeDisplayName(iShape),
+            app.getCurrentDrawLayer()
+        );
+        command.onExecute = fireEvent;
+        command.onUndo = fireEvent;
+        // execute it
+        command.execute();
+        // save it in undo stack
+        app.addToUndoStack(command);
+
+        // return to initial slice
+        if(restart){
+            view.setCurrentPosition(pos);
+        }
+
+    };
+
+    /**
+     * Delete selected Draw.
+     * @param  {Object} shape contained by the group to delete.
+     */
+    this.deleteDraw = function(inshape){
+
+        var iShape = inshape || shapeEditor.getShape();
+        if(!iShape || typeof iShape === 'undefined'){
+            throw new Error("No shape selected.");
+        }
+
+        // Disable shape editor
+        shapeEditor.disable();
+        shapeEditor.setShape(null);
+        shapeEditor.setImage(null);
+
+        // delete command
+        var delcmd = new dwv.tool.DeleteGroupCommand(iShape.getParent(),
+            dwv.tool.GetShapeDisplayName(iShape), app.getCurrentDrawLayer());
+        delcmd.onExecute = fireEvent;
+        delcmd.onUndo = fireEvent;
+        delcmd.execute();
+        app.addToUndoStack(delcmd);
     };
 
     /**

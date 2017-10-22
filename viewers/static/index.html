@@ -165,5 +165,55 @@ li button, li input { margin: 0; }
 
 </div><!-- /dwv -->
 
+<div style="position: absolute; bottom: 0; right: 0">
+
+	<button onclick="remove()">Delete</button>
+	<div>
+		<input type="range" id="range">
+	</div>
+	<div>
+		<input type="text" id="input">
+		<button onclick="clone()">Apply</button>
+	</div>
+</div>
+<script>
+
+	window.loadend = function(viewer){
+
+		var $range = $('#range');
+
+		console.log(viewer)
+		var toolbox     = viewer.getToolboxController();
+        var toolList    = toolbox.getToolList();
+        var Floodfill   = toolList.Floodfill;
+        // var Drawer      = toolList.Draw
+
+        Floodfill.onThresholdChange = function(pos){
+			$range.val(pos);
+        }
+
+		$range.change(function(){
+			var shapeEditor = viewer.getShapeEditor();
+			shapeEditor.disable();
+			Floodfill.modifyThreshold(
+				shapeEditor.getShape().getParent(),
+				$range.val()
+			);
+		})
+
+		// function remove(){
+		window.remove = function(){
+			console.log(viewer)
+			viewer.deleteDraw();
+		}
+
+		window.clone = function(){
+			console.log(viewer)
+			viewer.cloneDraw($('#input').val(), false);
+		}
+
+	};
+
+</script>
 </body>
 </html>

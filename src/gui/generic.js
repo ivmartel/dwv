@@ -215,7 +215,7 @@ dwv.gui.base.DicomTags = function (app)
             console.warn("The processed table does not contain data.");
             return;
         }
-        
+
         // translate first row
         dwv.html.translateTableRow(table.rows.item(0));
 
