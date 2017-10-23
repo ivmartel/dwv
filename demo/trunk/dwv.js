@@ -4525,13 +4525,17 @@ dwv.dicom = dwv.dicom || {};
  *
  * @constructor
  * @param {Array} buffer The input array buffer.
+ * @param {Boolean} isLittleEndian Flag to tell if the data is little or big endian.
  */
-dwv.dicom.DataWriter = function (buffer)
+dwv.dicom.DataWriter = function (buffer, isLittleEndian)
 {
+    // Set endian flag if not defined.
+    if ( typeof isLittleEndian === 'undefined' ) {
+        isLittleEndian = true;
+    }
+
     // private DataView
     var view = new DataView(buffer);
-    // endianness flag
-    var isLittleEndian = true;
 
     /**
      * Write Uint8 data.
@@ -5160,6 +5164,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     // transfer syntax
     var syntax = dwv.dicom.cleanString(dicomElements.x00020010.value[0]);
     var isImplicit = dwv.dicom.isImplicitTransferSyntax(syntax);
+    var isBigEndian = dwv.dicom.isBigEndianTransferSyntax(syntax);
 
     // calculate buffer size and split elements (meta and non meta)
     var totalSize = 128 + 4; // DICM
@@ -5218,19 +5223,20 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
 
     // create buffer
     var buffer = new ArrayBuffer(totalSize);
-    var writer = new dwv.dicom.DataWriter(buffer);
+    var metaWriter = new dwv.dicom.DataWriter(buffer);
+    var dataWriter = new dwv.dicom.DataWriter(buffer, !isBigEndian);
     var offset = 128;
     // DICM
-    offset = writer.writeString(offset, "DICM");
+    offset = metaWriter.writeString(offset, "DICM");
     // FileMetaInformationGroupLength
-    offset = writer.writeDataElement(fmigl, offset, false);
+    offset = metaWriter.writeDataElement(fmigl, offset, false);
     // write meta
     for ( var j = 0, lenj = metaElements.length; j < lenj; ++j ) {
-        offset = writer.writeDataElement(metaElements[j], offset, false);
+        offset = metaWriter.writeDataElement(metaElements[j], offset, false);
     }
     // write non meta
     for ( var k = 0, lenk = rawElements.length; k < lenk; ++k ) {
-        offset = writer.writeDataElement(rawElements[k], offset, isImplicit);
+        offset = dataWriter.writeDataElement(rawElements[k], offset, isImplicit);
     }
 
     // return
