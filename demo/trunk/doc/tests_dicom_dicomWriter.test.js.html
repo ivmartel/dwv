@@ -359,6 +359,28 @@ QUnit.test("Test synthetic dicom implicit", function (assert) {
     };
     request.send(null);
 });
+
+QUnit.test("Test synthetic dicom explicit big endian", function (assert) {
+    var done = assert.async();
+
+    // get the list of configs
+    var request = new XMLHttpRequest();
+    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/343-dicom-write";
+    var url = urlRoot + "/tests/dicom/synthetic-data_explicit_big-endian.json";
+    request.open('GET', url, true);
+    request.onerror = function (event) {
+        console.error(event);
+    };
+    request.onload = function (/*event*/) {
+        var configs = JSON.parse(this.responseText);
+        for (var i = 0; i &lt; configs.length; ++i ) {
+            dwv.utils.test.testConfig(configs[i], assert);
+        }
+        // finish async test
+        done();
+    };
+    request.send(null);
+});
 </pre>
     </article>
 </section>
