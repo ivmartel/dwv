@@ -939,12 +939,70 @@ dwv.dicom.getElementsFromJSONTags = function (tags) {
 };
 
 /**
+ * BlendGenerator
+ * Generates a small gradient square.
+ * @param {Number} numberOfColumns The image number of columns.
+ * @param {Number} numberOfRows The image number of rows.
+ */
+var BlendGenerator = function (numberOfColumns, numberOfRows) {
+
+    var halfCols = numberOfColumns * 0.5;
+    var halfRows = numberOfRows * 0.5;
+    var maxNoBounds = (numberOfColumns/2 + halfCols/2) * (numberOfRows/2 + halfRows/2);
+    var max = 100;
+
+    /**
+     * Get a grey value.
+     * @param {Number} i The column index.
+     * @param {Number} j The row index.
+     * @return {Array} The grey value.
+     */
+    this.getGrey = function (i,j) {
+        var value = max;
+        var jc = Math.abs( j - halfRows );
+        var ic = Math.abs( i - halfCols );
+        if ( jc < halfRows/2 && ic < halfCols/2 ) {
+            value += (i * j) * (max / maxNoBounds);
+        }
+        return [value];
+    };
+
+    /**
+     * Get RGB values.
+     * @param {Number} i The column index.
+     * @param {Number} j The row index.
+     * @return {Array} The [R,G,B] values.
+     */
+    this.getRGB = function (i,j) {
+        var value = 0;
+        var jc = Math.abs( j - halfRows );
+        var ic = Math.abs( i - halfCols );
+        if ( jc < halfRows/2 && ic < halfCols/2 ) {
+            value += (i * j) * (max / maxNoBounds);
+        }
+        if (value > 255 ) {
+            value = 200;
+        }
+        return [value, value, value];
+    };
+};
+
+// List of pixel generators.
+dwv.dicom.pixelGenerators = {
+    'blend': BlendGenerator
+};
+
+/**
  * Get the DICOM pixel data from a DICOM tags object.
  * @param {Object} tags The DICOM tags object.
  * @param {Object} startOffset The start offset of the pixel data.
+ * @param {String} generatorName The name of a pixel generator.
  * @return {Object} The DICOM pixel data element.
  */
-dwv.dicom.generatePixelDataFromJSONTags = function (tags, startOffset) {
+dwv.dicom.generatePixelDataFromJSONTags = function (tags, startOffset, generatorName) {
+
+    // default generator
+    generatorName = "blend";
 
     // check tags
     if ( typeof tags.TransferSyntaxUID === "undefined" ) {
@@ -957,6 +1015,10 @@ dwv.dicom.generatePixelDataFromJSONTags = function (tags, startOffset) {
         throw new Error("Missing BitsAllocated for pixel generation.");
     } else if ( typeof tags.PixelRepresentation === "undefined" ) {
         throw new Error("Missing PixelRepresentation for pixel generation.");
+    } else if ( typeof tags.SamplesPerPixel === "undefined" ) {
+        throw new Error("Missing SamplesPerPixel for pixel generation.");
+    } else if ( typeof tags.PhotometricInterpretation === "undefined" ) {
+        throw new Error("Missing PhotometricInterpretation for pixel generation.");
     }
 
     // extract info from tags
@@ -965,26 +1027,66 @@ dwv.dicom.generatePixelDataFromJSONTags = function (tags, startOffset) {
     var numberOfColumns = tags.Columns;
     var bitsAllocated = tags.BitsAllocated;
     var pixelRepresentation = tags.PixelRepresentation;
+    var samplesPerPixel = tags.SamplesPerPixel;
+    var photometricInterpretation = tags.PhotometricInterpretation;
 
-    // create pixel array
-    var pixels = dwv.dicom.getTypedArray(bitsAllocated, pixelRepresentation,
-        numberOfRows * numberOfColumns);
-    //pixels.fill(100); // not supported on phantom?
-    for ( var k = 0; k < numberOfRows*numberOfColumns; ++k ) {
-        pixels[k] = 100;
+    var sliceLength = numberOfRows * numberOfColumns;
+    var dataLength = sliceLength * samplesPerPixel;
+
+    // check values
+    if (samplesPerPixel !== 1 && samplesPerPixel !== 3) {
+        throw new Error("Unsupported SamplesPerPixel for pixel generation: "+samplesPerPixel);
+    }
+    if ( (samplesPerPixel === 1 && !( photometricInterpretation === "MONOCHROME1" ||
+        photometricInterpretation === "MONOCHROME2" ) ) ||
+        ( samplesPerPixel === 3 && photometricInterpretation !== "RGB" ) ) {
+        throw new Error("Unsupported PhotometricInterpretation for pixel generation: " +
+            photometricInterpretation + " with SamplesPerPixel: " + samplesPerPixel);
     }
 
-    // pixels: small gradient square
-    var widthI = numberOfColumns * 0.5;
-    var widthJ = numberOfRows * 0.5;
-    var maxNoBounds =  (numberOfColumns/2 + widthI/2) * (numberOfRows/2 + widthJ/2);
-    var max = 100;
-    for ( var j = 0; j < numberOfRows; ++j ) {
-        var jc = Math.abs( j - (numberOfRows/2) );
-        for ( var i = 0; i < numberOfColumns; ++i ) {
-            var ic = Math.abs( i - (numberOfColumns/2) );
-            if ( jc < widthJ/2 && ic < widthI/2) {
-                pixels[numberOfColumns*j + i] += (i * j) * max / maxNoBounds;
+    var nSamples = 1;
+    var nColourPlanes = 1;
+    if ( samplesPerPixel === 3 ) {
+        var planarConfiguration = 0;
+        if ( typeof tags.PlanarConfiguration === "undefined" ) {
+            console.warn("SamplesPerPixel is 3 and there is no PhotometricInterpretation, using 0.");
+        } else {
+            planarConfiguration = tags.PlanarConfiguration;
+        }
+        if ( planarConfiguration !== 0 && planarConfiguration === 1 ) {
+            throw new Error("Unsupported PlanarConfiguration for pixel generation: "+planarConfiguration);
+        }
+        if ( planarConfiguration === 0 ) {
+            nSamples = 3;
+        } else {
+            nColourPlanes = 3;
+        }
+    }
+
+    // create pixel array
+    var pixels = dwv.dicom.getTypedArray(
+        bitsAllocated, pixelRepresentation, dataLength );
+
+    // pixels generator
+    var generator = new dwv.dicom.pixelGenerators[generatorName](numberOfColumns, numberOfRows);
+    var generate = generator.getGrey;
+    if (photometricInterpretation === "RGB") {
+        generate = generator.getRGB;
+    }
+
+    // main loop
+    var offset = 0;
+    for ( var c = 0; c < nColourPlanes; ++c ) {
+        for ( var j = 0; j < numberOfRows; ++j ) {
+            for ( var i = 0; i < numberOfColumns; ++i ) {
+                for ( var s = 0; s < nSamples; ++s ) {
+                    if ( nColourPlanes !== 1 ) {
+                        pixels[offset] = generate(i,j)[c];
+                    } else {
+                        pixels[offset] = generate(i,j)[s];
+                    }
+                    ++offset;
+                }
             }
         }
     }
@@ -992,7 +1094,7 @@ dwv.dicom.generatePixelDataFromJSONTags = function (tags, startOffset) {
     // create and return the DICOM element
     var vr = "OW";
     var pixVL = dwv.dicom.getDataElementPrefixByteSize(vr, isImplicit) +
-       (pixels.BYTES_PER_ELEMENT * numberOfRows * numberOfColumns);
+       (pixels.BYTES_PER_ELEMENT * dataLength);
     return {
             'tag': { 'group': "0x7FE0", 'element': "0x0010" },
             'vr': vr,
