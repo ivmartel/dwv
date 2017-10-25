@@ -668,9 +668,14 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     var groupName;
     var metaLength = 0;
     var fmiglTag = dwv.dicom.getFileMetaInformationGroupLengthTag();
+    var icUIDTag = new dwv.dicom.Tag("0x0002", "0x0012"); // ImplementationClassUID
+    var ivnTag = new dwv.dicom.Tag("0x0002", "0x0013"); // ImplementationVersionName
     for ( var i = 0, leni = keys.length; i < leni; ++i ) {
         element = this.getElementToWrite(dicomElements[keys[i]]);
-        if ( element !== null && !fmiglTag.equals2(element.tag) ) {
+        if ( element !== null &&
+             !fmiglTag.equals2(element.tag) &&
+             !icUIDTag.equals2(element.tag) &&
+             !ivnTag.equals2(element.tag) ) {
             localSize = 0;
             // tag group name
             groupName = dwv.dicom.TagGroups[element.tag.group.substr(1)]; // remove first 0
@@ -705,6 +710,21 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
             totalSize += localSize;
         }
     }
+
+    // ImplementationClassUID
+    var icUID = dwv.dicom.getDicomElement("ImplementationClassUID");
+    var icUIDSize = dwv.dicom.getDataElementPrefixByteSize(icUID.vr, isImplicit);
+    icUIDSize += dwv.dicom.setElementValue(icUID, "1.2.826.0.1.3680043.9.7278.1."+dwv.getVersion(), false);
+    metaElements.push(icUID);
+    metaLength += icUIDSize;
+    totalSize += icUIDSize;
+    // ImplementationVersionName
+    var ivn = dwv.dicom.getDicomElement("ImplementationVersionName");
+    var ivnSize = dwv.dicom.getDataElementPrefixByteSize(ivn.vr, isImplicit);
+    ivnSize += dwv.dicom.setElementValue(ivn, "DWV_"+dwv.getVersion(), false);
+    metaElements.push(ivn);
+    metaLength += ivnSize;
+    totalSize += ivnSize;
 
     // create the FileMetaInformationGroupLength element
     var fmigl = dwv.dicom.getDicomElement("FileMetaInformationGroupLength");
@@ -939,12 +959,13 @@ dwv.dicom.getElementsFromJSONTags = function (tags) {
 };
 
 /**
- * BlendGenerator
+ * GradSquarePixGenerator
  * Generates a small gradient square.
  * @param {Number} numberOfColumns The image number of columns.
  * @param {Number} numberOfRows The image number of rows.
+ * @constructor
  */
-var BlendGenerator = function (numberOfColumns, numberOfRows) {
+var GradSquarePixGenerator = function (numberOfColumns, numberOfRows) {
 
     var halfCols = numberOfColumns * 0.5;
     var halfRows = numberOfRows * 0.5;
@@ -983,26 +1004,28 @@ var BlendGenerator = function (numberOfColumns, numberOfRows) {
         if (value > 255 ) {
             value = 200;
         }
-        return [value, value, value];
+        return [0, value, value];
     };
 };
 
 // List of pixel generators.
 dwv.dicom.pixelGenerators = {
-    'blend': BlendGenerator
+    'gradSquare': GradSquarePixGenerator
 };
 
 /**
  * Get the DICOM pixel data from a DICOM tags object.
  * @param {Object} tags The DICOM tags object.
  * @param {Object} startOffset The start offset of the pixel data.
- * @param {String} generatorName The name of a pixel generator.
+ * @param {String} pixGeneratorName The name of a pixel generator.
  * @return {Object} The DICOM pixel data element.
  */
-dwv.dicom.generatePixelDataFromJSONTags = function (tags, startOffset, generatorName) {
+dwv.dicom.generatePixelDataFromJSONTags = function (tags, startOffset, pixGeneratorName) {
 
     // default generator
-    generatorName = "blend";
+    if ( typeof pixGeneratorName === "undefined" ) {
+        pixGeneratorName = "gradSquare";
+    }
 
     // check tags
     if ( typeof tags.TransferSyntaxUID === "undefined" ) {
@@ -1047,13 +1070,11 @@ dwv.dicom.generatePixelDataFromJSONTags = function (tags, startOffset, generator
     var nSamples = 1;
     var nColourPlanes = 1;
     if ( samplesPerPixel === 3 ) {
-        var planarConfiguration = 0;
         if ( typeof tags.PlanarConfiguration === "undefined" ) {
-            console.warn("SamplesPerPixel is 3 and there is no PhotometricInterpretation, using 0.");
-        } else {
-            planarConfiguration = tags.PlanarConfiguration;
+            throw new Error("Missing PlanarConfiguration for pixel generation.");
         }
-        if ( planarConfiguration !== 0 && planarConfiguration === 1 ) {
+        var planarConfiguration = tags.PlanarConfiguration;
+        if ( planarConfiguration !== 0 && planarConfiguration !== 1 ) {
             throw new Error("Unsupported PlanarConfiguration for pixel generation: "+planarConfiguration);
         }
         if ( planarConfiguration === 0 ) {
@@ -1068,7 +1089,10 @@ dwv.dicom.generatePixelDataFromJSONTags = function (tags, startOffset, generator
         bitsAllocated, pixelRepresentation, dataLength );
 
     // pixels generator
-    var generator = new dwv.dicom.pixelGenerators[generatorName](numberOfColumns, numberOfRows);
+    if (typeof dwv.dicom.pixelGenerators[pixGeneratorName] === "undefined" ) {
+        throw new Error("Unknown PixelData generator: "+pixGeneratorName);
+    }
+    var generator = new dwv.dicom.pixelGenerators[pixGeneratorName](numberOfColumns, numberOfRows);
     var generate = generator.getGrey;
     if (photometricInterpretation === "RGB") {
         generate = generator.getRGB;
@@ -1093,6 +1117,9 @@ dwv.dicom.generatePixelDataFromJSONTags = function (tags, startOffset, generator
 
     // create and return the DICOM element
     var vr = "OW";
+    if ( bitsAllocated === 8 ) {
+        vr = "OB";
+    }
     var pixVL = dwv.dicom.getDataElementPrefixByteSize(vr, isImplicit) +
        (pixels.BYTES_PER_ELEMENT * dataLength);
     return {

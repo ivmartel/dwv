@@ -19,11 +19,24 @@ function generate()
 
     // get tags from the textarea
     var tags = JSON.parse(document.getElementById('tags').value);
+    // optional pixel generator (cannot be propagated)
+    var pixelGenerator = "gradSquare";
+    if ( typeof tags.PixelData !== "undefined" ) {
+        pixelGenerator = tags.PixelData;
+        delete tags.PixelData;
+    }
     // convert JSON to DICOM element object
     var res = dwv.dicom.getElementsFromJSONTags(tags);
     var dicomElements = res.elements;
     // pixels: small gradient square
-    dicomElements.x7FE00010 = dwv.dicom.generatePixelDataFromJSONTags(tags, res.offset);
+    dicomElements.x7FE00010 = null;
+    try {
+        dicomElements.x7FE00010 = dwv.dicom.generatePixelDataFromJSONTags(
+            tags, res.offset, pixelGenerator);
+    } catch (error) {
+        console.error(error);
+        alert(error.message);
+    }
 
     // create writer
     var writer = new dwv.dicom.DicomWriter();
@@ -126,7 +139,6 @@ fieldset { background: whitesmoke; border: 1px solid grey; }
 <p>Simple DICOM data generator from json tags.
 Mainly used for generating test data, <b>use at your own risks!</b>
 <br>No need for a 'FileMetaInformationGroupLength', it is calculated automatically.
-<br>Only tested with explicit data (transfer syntax: <code>1.2.840.10008.1.2.1</code>).
 Values should not be <code>null</code>...
 <br>Sequences have an optional <code>explicitLength</code> boolean parameter to write them
 and all their elements with implicit or explicit length. Its default value is <code>true</code>.
@@ -148,6 +160,7 @@ be written with explicit zero length, a <code>0</code> value will mean implicit 
   "PatientName": "dwv-patient-name",
   "PhotometricInterpretation": "MONOCHROME2",
   "SamplesPerPixel": 1,
+  "PlanarConfiguration": 0,
   "PixelRepresentation": 0,
   "Rows": 32,
   "Columns": 32,
