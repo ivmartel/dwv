@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>dwv Class: RunFilterCommand</title>
+	<title>dwv Class: GradSquarePixGenerator</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -93,15 +93,13 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: RunFilterCommand</h1>
+	<h1 class="page-title">Class: GradSquarePixGenerator</h1>
 <section>
 
 <header>
     
         <h2>
-            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.tool.html">.tool</a>.</span>
-        
-        RunFilterCommand
+        GradSquarePixGenerator
         </h2>
         
     
@@ -114,7 +112,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="RunFilterCommand"><span class="type-signature"></span>new RunFilterCommand(filter, app)</h4>
+    <h4 class="name" id="GradSquarePixGenerator"><span class="type-signature"></span>new GradSquarePixGenerator(numberOfColumns, numberOfRows)</h4>
     
     
 </dt>
@@ -122,7 +120,8 @@
 
     
     <div class="description">
-        Run filter command.
+        GradSquarePixGenerator
+Generates a small gradient square.
     </div>
     
 
@@ -157,13 +156,13 @@
 
         <tr>
             
-                <td class="name"><code>filter</code></td>
+                <td class="name"><code>numberOfColumns</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type">Number</span>
 
 
 
@@ -174,20 +173,20 @@
 
             
 
-            <td class="description last">The filter to run.</td>
+            <td class="description last">The image number of columns.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>app</code></td>
+                <td class="name"><code>numberOfRows</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type">Number</span>
 
 
 
@@ -198,7 +197,7 @@
 
             
 
-            <td class="description last">The associated application.</td>
+            <td class="description last">The image number of rows.</td>
         </tr>
 
     
@@ -242,8 +241,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_tools_filter.js.html">src/tools/filter.js</a>,
-				 <a href="src_tools_filter.js.html#sunlight-1-line-487">line 487</a>
+				<a href="src_dicom_dicomWriter.js.html">src/dicom/dicomWriter.js</a>,
+				 <a href="src_dicom_dicomWriter.js.html#sunlight-1-line-968">line 968</a>
 			</li>
 		</ul>
 	</dd>
@@ -294,7 +293,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="execute"><span class="type-signature"></span>execute()</h4>
+    <h4 class="name" id="getGrey"><span class="type-signature"></span>getGrey(i, j)</h4>
     
     
 </dt>
@@ -302,7 +301,7 @@
 
     
     <div class="description">
-        Execute the command.
+        Get a grey value.
     </div>
     
 
@@ -312,93 +311,79 @@
 
     
     
+        <h5>Parameters:</h5>
+        
 
-    
-<dl class="details">
-    
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
 
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_tools_filter.js.html">src/tools/filter.js</a>,
-				 <a href="src_tools_filter.js.html#sunlight-1-line-498">line 498</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
+        <th>Type</th>
 
         
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
             
-<hr>
-<dt>
-    <h4 class="name" id="getName"><span class="type-signature"></span>getName()</h4>
-    
-    
-</dt>
-<dd>
+                <td class="name"><code>i</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The column index.</td>
+        </tr>
 
     
-    <div class="description">
-        Get the command name.
-    </div>
-    
+
+        <tr>
+            
+                <td class="name"><code>j</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The row index.</td>
+        </tr>
 
     
+    </tbody>
+</table>
 
-    
-
-    
     
 
     
@@ -436,8 +421,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_tools_filter.js.html">src/tools/filter.js</a>,
-				 <a href="src_tools_filter.js.html#sunlight-1-line-493">line 493</a>
+				<a href="src_dicom_dicomWriter.js.html">src/dicom/dicomWriter.js</a>,
+				 <a href="src_dicom_dicomWriter.js.html#sunlight-1-line-981">line 981</a>
 			</li>
 		</ul>
 	</dd>
@@ -466,7 +451,7 @@
     
             
 <div class="param-desc">
-    The command name.
+    The grey value.
 </div>
 
 
@@ -477,7 +462,7 @@
     </dt>
     <dd>
         
-<span class="param-type">String</span>
+<span class="param-type">Array</span>
 
 
 
@@ -494,7 +479,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="onExecute"><span class="type-signature"></span>onExecute(event)</h4>
+    <h4 class="name" id="getRGB"><span class="type-signature"></span>getRGB(i, j)</h4>
     
     
 </dt>
@@ -502,7 +487,7 @@
 
     
     <div class="description">
-        Handle an execute event.
+        Get RGB values.
     </div>
     
 
@@ -537,13 +522,13 @@
 
         <tr>
             
-                <td class="name"><code>event</code></td>
+                <td class="name"><code>i</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type">Number</span>
 
 
 
@@ -554,7 +539,31 @@
 
             
 
-            <td class="description last">The execute event with type and id.</td>
+            <td class="description last">The column index.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>j</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The row index.</td>
         </tr>
 
     
@@ -598,8 +607,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_tools_filter.js.html">src/tools/filter.js</a>,
-				 <a href="src_tools_filter.js.html#sunlight-1-line-526">line 526</a>
+				<a href="src_dicom_dicomWriter.js.html">src/dicom/dicomWriter.js</a>,
+				 <a href="src_dicom_dicomWriter.js.html#sunlight-1-line-997">line 997</a>
 			</li>
 		</ul>
 	</dd>
@@ -624,232 +633,30 @@
     
 
     
-
+    <h5>Returns:</h5>
     
-</dd>
+            
+<div class="param-desc">
+    The [R,G,B] values.
+</div>
 
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
         
-            
-<hr>
-<dt>
-    <h4 class="name" id="onUndo"><span class="type-signature"></span>onUndo(event)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Handle an undo event.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>event</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
+<span class="param-type">Array</span>
 
 
 
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The undo event with type and id.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_tools_filter.js.html">src/tools/filter.js</a>,
-				 <a href="src_tools_filter.js.html#sunlight-1-line-534">line 534</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
+    </dd>
 </dl>
 
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
         
-            
-<hr>
-<dt>
-    <h4 class="name" id="undo"><span class="type-signature"></span>undo()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Undo the command.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_tools_filter.js.html">src/tools/filter.js</a>,
-				 <a href="src_tools_filter.js.html#sunlight-1-line-511">line 511</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
 
     
 </dd>
