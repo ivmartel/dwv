@@ -35,13 +35,14 @@
 },
 {
     "name": "test22",
-    "description": "Big Endian Explicit 8bits test data.",
+    "description": "Big Endian Explicit 8bits RGB test data.",
     "tags": {
         "TransferSyntaxUID": "1.2.840.10008.1.2.2",
         "Modality": "MR",
         "PatientName": "dwv-patient-name-22",
-        "PhotometricInterpretation": "MONOCHROME2",
-        "SamplesPerPixel": 1,
+        "PhotometricInterpretation": "RGB",
+        "SamplesPerPixel": 3,
+        "PlanarConfiguration": 1,
         "PixelRepresentation": 0,
         "Rows": 32,
         "Columns": 32,

@@ -35,13 +35,14 @@
 },
 {
     "name": "test12",
-    "description": "Little Endian Implicit 8bits test data.",
+    "description": "Little Endian Implicit 8bits RGB test data.",
     "tags": {
         "TransferSyntaxUID": "1.2.840.10008.1.2",
         "Modality": "MR",
         "PatientName": "dwv-patient-name-12",
-        "PhotometricInterpretation": "MONOCHROME2",
-        "SamplesPerPixel": 1,
+        "PhotometricInterpretation": "RGB",
+        "SamplesPerPixel": 3,
+        "PlanarConfiguration": 1,
         "PixelRepresentation": 0,
         "Rows": 32,
         "Columns": 32,
