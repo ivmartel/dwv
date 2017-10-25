@@ -74,12 +74,6 @@ dwv.App = function ()
     var listeners = {};
 
     /**
-     * Get the version of the application.
-     * @return {String} The version of the application.
-     */
-    this.getVersion = function () { return "v0.22.0-beta"; };
-
-    /**
      * Get the image.
      * @return {Image} The associated image.
      */
@@ -292,7 +286,7 @@ dwv.App = function ()
             }
             // version number
             if ( config.gui.indexOf("version") !== -1 ) {
-                dwv.gui.appendVersionHtml(this.getVersion());
+                dwv.gui.appendVersionHtml(dwv.getVersion());
             }
             // help
             if ( config.gui.indexOf("help") !== -1 ) {
