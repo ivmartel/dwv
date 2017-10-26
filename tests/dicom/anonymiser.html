@@ -9,6 +9,8 @@
 <script type="text/javascript">
 // rules file
 var _rulesFile = null;
+// dicom file
+var _dicomFile = null;
 // DICOM elements
 var _dicomElements = null;
 // handle DICOM file load
@@ -45,7 +47,7 @@ function generate()
     // update generate button
     var element = document.getElementById("generate");
     element.href = URL.createObjectURL(blob);
-    element.download = "anonym.dcm";
+    element.download = "anonym-" + _dicomFile.name;
 }
 // save the rules as a JSON file
 function saveRules()
@@ -88,10 +90,10 @@ function onInputDICOMFile(event)
     if (event.target.files.length === 0) {
         return;
     }
-    var file = event.target.files[0];
+    _dicomFile = event.target.files[0];
     var reader = new FileReader();
     reader.onload = onLoadDICOMFile;
-    reader.readAsArrayBuffer(file);
+    reader.readAsArrayBuffer(_dicomFile);
 }
 // handle input rules file
 function onInputRulesFile(event)

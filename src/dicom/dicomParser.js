@@ -4,6 +4,12 @@ var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
 
 /**
+ * Get the version of the library.
+ * @return {String} The version of the library.
+ */
+dwv.getVersion = function () { return "0.22.0-beta"; };
+
+/**
  * Clean string: trim and remove ending.
  * @param {String} inputStr The string to clean.
  * @return {String} The cleaned string.
@@ -413,6 +419,100 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
 };
 
 /**
+ * Get the group-element pair from a tag string name.
+ * @param {String} tagName The tag string name.
+ * @return {Object} group-element pair.
+ */
+dwv.dicom.getGroupElementFromName = function (tagName)
+{
+    var group = null;
+    var element = null;
+    var dict = dwv.dicom.dictionary;
+    var keys0 = Object.keys(dict);
+    var keys1 = null;
+    // label for nested loop break
+    outLabel:
+    // search through dictionary
+    for ( var k0 = 0, lenK0 = keys0.length; k0 < lenK0; ++k0 ) {
+        group = keys0[k0];
+        keys1 = Object.keys( dict[group] );
+        for ( var k1 = 0, lenK1 = keys1.length; k1 < lenK1; ++k1 ) {
+            element = keys1[k1];
+            if ( dict[group][element][2] === tagName ) {
+                break outLabel;
+            }
+        }
+    }
+    return { 'group': group, 'element': element };
+};
+
+/**
+ * Immutable tag.
+ * @constructor
+ * @param {String} group The tag group.
+ * @param {String} element The tag element.
+ */
+dwv.dicom.Tag = function (group, element)
+{
+    /**
+     * Get the tag group.
+     * @return {String} The tag group.
+     */
+    this.getGroup = function () { return group; };
+    /**
+     * Get the tag element.
+     * @return {String} The tag element.
+     */
+    this.getElement = function () { return element; };
+}; // Tag class
+
+/**
+ * Check for Tag equality.
+ * @param {Object} rhs The other tag to compare to.
+ * @return {Boolean} True if both tags are equal.
+ */
+dwv.dicom.Tag.prototype.equals = function (rhs) {
+    return rhs !== null &&
+        this.getGroup() === rhs.getGroup() &&
+        this.getElement() === rhs.getElement();
+};
+
+/**
+ * Check for Tag equality.
+ * @param {Object} rhs The other tag to compare to provided as a simple object.
+ * @return {Boolean} True if both tags are equal.
+ */
+dwv.dicom.Tag.prototype.equals2 = function (rhs) {
+    if (rhs === null ||
+        typeof rhs.group === "undefined" ||
+        typeof rhs.element === "undefined" ) {
+            return false;
+    }
+    return this.equals(new dwv.dicom.Tag(rhs.group, rhs.element));
+};
+
+// Get the FileMetaInformationGroupLength Tag.
+dwv.dicom.getFileMetaInformationGroupLengthTag = function () {
+    return new dwv.dicom.Tag("0x0002", "0x0000");
+};
+// Get the Item Tag.
+dwv.dicom.getItemTag = function () {
+    return new dwv.dicom.Tag("0xFFFE", "0xE000");
+};
+// Get the ItemDelimitationItem Tag.
+dwv.dicom.getItemDelimitationItemTag = function () {
+    return new dwv.dicom.Tag("0xFFFE", "0xE00D");
+};
+// Get the SequenceDelimitationItem Tag.
+dwv.dicom.getSequenceDelimitationItemTag = function () {
+    return new dwv.dicom.Tag("0xFFFE", "0xE0DD");
+};
+// Get the PixelData Tag.
+dwv.dicom.getPixelDataTag = function () {
+    return new dwv.dicom.Tag("0x7FE0", "0x0010");
+};
+
+/**
  * Get the group-element key used to store DICOM elements.
  * @param {Number} group The DICOM group.
  * @param {Number} element The DICOM element.
@@ -719,6 +819,8 @@ dwv.dicom.isTagWithVR = function (group, element) {
 
 /**
  * Get the number of bytes occupied by a data element prefix, i.e. without its value.
+ * @param {String} vr The Value Representation of the element.
+ * @param {Boolean} isImplicit Does the data use implicit VR?
  * WARNING: this is valid for tags with a VR, if not sure use the 'isTagWithVR' function first.
  * Reference:
  * - [Data Element explicit]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_7.html#table_7.1-1},
@@ -734,8 +836,8 @@ dwv.dicom.isTagWithVR = function (group, element) {
  * | Tag | Len | Value |
  * | 4   | 4   | X     | -> item: 8 + X
  */
-dwv.dicom.getDataElementPrefixByteSize = function (vr) {
-    return dwv.dicom.is32bitVLVR(vr) ? 12 : 8;
+dwv.dicom.getDataElementPrefixByteSize = function (vr, isImplicit) {
+    return isImplicit ? 8 : dwv.dicom.is32bitVLVR(vr) ? 12 : 8;
 };
 
 /**
@@ -1191,7 +1293,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     }
 
     // 0x0002, 0x0000: FileMetaInformationGroupLength
-    var dataElement = this.readDataElement(metaReader, offset);
+    var dataElement = this.readDataElement(metaReader, offset, false);
     offset = dataElement.endOffset;
     // store the data element
     this.dicomElements[dataElement.tag.name] = dataElement;
@@ -1305,9 +1407,6 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
             var pixItems = this.dicomElements.x7FE00010.value;
             if (pixItems.length > 1 && pixItems.length > numberOfFrames ) {
 
-                var bitsAllocated = this.dicomElements.x00280100.value[0];
-                var pixelRepresentation = this.dicomElements.x00280103.value[0];
-
                 // concatenate pixel data items
                 // concat does not work on typed arrays
                 //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
@@ -1323,7 +1422,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
                         size += pixItems[index + i].length;
                     }
                     // create new buffer
-                    var newBuffer = dwv.dicom.getTypedArray(bitsAllocated, pixelRepresentation, size);
+                    var newBuffer = new pixItems[0].constructor(size);
                     // fill new buffer
                     var fragOffset = 0;
                     for (var j = 0; j < nItemPerFrame; ++j) {
@@ -1790,32 +1889,11 @@ dwv.dicom.DicomElementsWrapper.prototype.getFromGroupElement = function (
  */
 dwv.dicom.DicomElementsWrapper.prototype.getFromName = function ( name )
 {
-   var group = null;
-   var element = null;
-   var dict = dwv.dicom.dictionary;
-   var keys0 = Object.keys(dict);
-   var keys1 = null;
-   var k0 = 0;
-   var lenk0 = 0;
-   var k1 = 0;
-   var lenk1 = 0;
-   // label for nested loop break
-   outLabel:
-   // search through dictionary
-   for ( k0 = 0, lenk0 = keys0.length; k0 < lenk0; ++k0 ) {
-       group = keys0[k0];
-       keys1 = Object.keys( dict[group] );
-       for ( k1 = 0, lenk1 = keys1.length; k1 < lenk1; ++k1 ) {
-           element = keys1[k1];
-           if ( dict[group][element][2] === name ) {
-               break outLabel;
-           }
-       }
-   }
-   var dicomElement = null;
+   var value = null;
+   var tagGE = dwv.dicom.getGroupElementFromName(name);
    // check that we are not at the end of the dictionary
-   if ( k0 !== keys0.length && k1 !== keys1.length ) {
-       dicomElement = this.getFromKey(dwv.dicom.getGroupElementKey(group, element));
+   if ( tagGE.group !== null && tagGE.element !== null ) {
+       value = this.getFromKey(dwv.dicom.getGroupElementKey(tagGE.group, tagGE.element));
    }
-   return dicomElement;
+   return value;
 };
