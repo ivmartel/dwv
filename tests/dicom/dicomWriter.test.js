@@ -221,7 +221,7 @@ QUnit.test("Test synthetic dicom explicit", function (assert) {
 
     // get the list of configs
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/343-dicom-write";
+    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
     var url = urlRoot + "/tests/dicom/synthetic-data_explicit.json";
     request.open('GET', url, true);
     request.onerror = function (event) {
@@ -243,7 +243,7 @@ QUnit.test("Test synthetic dicom implicit", function (assert) {
 
     // get the list of configs
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/343-dicom-write";
+    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
     var url = urlRoot + "/tests/dicom/synthetic-data_implicit.json";
     request.open('GET', url, true);
     request.onerror = function (event) {
@@ -265,7 +265,7 @@ QUnit.test("Test synthetic dicom explicit big endian", function (assert) {
 
     // get the list of configs
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/343-dicom-write";
+    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
     var url = urlRoot + "/tests/dicom/synthetic-data_explicit_big-endian.json";
     request.open('GET', url, true);
     request.onerror = function (event) {
