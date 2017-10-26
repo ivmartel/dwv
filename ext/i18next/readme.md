@@ -12,10 +12,10 @@ Third Party: i18next
 i18next-xhr-backend
 -------------------
 * Web: https://github.com/i18next/i18next-xhr-backend
-* Version: [1.4.1](https://github.com/i18next/i18next-xhr-backend/releases/tag/v1.41)
-* Date: 22/03/2017
-* Download: https://github.com/i18next/i18next-xhr-backend/blob/v1.4.1/i18nextXHRBackend.min.js
-* License: MIT (see https://github.com/i18next/i18next-xhr-backend/blob/v1.4.1/LICENSE)
+* Version: [1.4.3](https://github.com/i18next/i18next-xhr-backend/releases/tag/v1.4.3)
+* Date: 10/09/2017
+* Download: https://github.com/i18next/i18next-xhr-backend/blob/v1.4.3/i18nextXHRBackend.min.js
+* License: MIT (see https://github.com/i18next/i18next-xhr-backend/blob/v1.4.3/LICENSE)
 * Description: backend layer for i18next using browsers xhr.
 * Purpose for dwv: load translation files.
 
