@@ -195,10 +195,10 @@ dwv.i18nInitialise("en","/dwv");
 print([[
 // status flags
 var domContentLoaded = false;
-var i18nLoaded = false;
+var i18nInitialised = false;
 // launch when both DOM and i18n are ready
 function launchApp() {
-    if ( domContentLoaded && i18nLoaded ) {
+    if ( domContentLoaded && i18nInitialised ) {
         startApp();
     }
 }
@@ -208,11 +208,11 @@ $(document).ready( function() {
     launchApp();
 });
 // i18n ready?
-dwv.i18nOnLoaded( function () {
+dwv.i18nOnInitialised( function () {
     // call next once the overlays are loaded
     var onLoaded = function (data) {
         dwv.gui.info.overlayMaps = data;
-        i18nLoaded = true;
+        i18nInitialised = true;
         launchApp();
     };
     // load overlay map info

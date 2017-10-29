@@ -157,10 +157,10 @@ dwv.i18nInitialise("en","/dwv");
 print([[
 // status flags
 var domContentLoaded = false;
-var i18nLoaded = false;
+var i18nInitialised = false;
 // launch when both DOM and i18n are ready
 function launchApp() {
-    if ( domContentLoaded && i18nLoaded ) {
+    if ( domContentLoaded && i18nInitialised ) {
         startApp();
     }
 }
@@ -170,8 +170,8 @@ $(document).ready( function() {
     launchApp();
 });
 // i18n ready?
-dwv.i18nOnLoaded( function () {
-    i18nLoaded = true;
+dwv.i18nOnInitialised( function () {
+    i18nInitialised = true;
     launchApp();
 });
 ]])
