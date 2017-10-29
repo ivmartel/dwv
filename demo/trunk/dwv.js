@@ -24341,21 +24341,21 @@ dwv.i18nInitialise = function (language, localesPath)
 };
 
 /**
- * Handle i18n load event.
- * @param {Object} callback The callback function to call when i18n is loaded.
- *  It can take one argument that will be replaced with the loaded languages.
+ * Handle i18n 'initialized' event.
+ * @param {Object} callback The callback function to call when i18n is initialised.
+ *  It can take one argument that will be replaced with the i18n options.
  * @external i18next
  */
-dwv.i18nOnLoaded = function (callback) {
-    i18next.on('loaded', callback);
+dwv.i18nOnInitialised = function (callback) {
+    i18next.on('initialized', callback);
 };
 
 /**
  * Stop handling i18n load event.
  * @external i18next
  */
-dwv.i18nOffLoaded = function () {
-    i18next.off('loaded');
+dwv.i18nOffInitialised = function () {
+    i18next.off('initialized');
 };
 
 /**
