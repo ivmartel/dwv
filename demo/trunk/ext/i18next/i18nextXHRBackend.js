@@ -57,7 +57,12 @@ function ajax(url, options, callback, data, cache) {
   }
 
   try {
-    var x = new (XMLHttpRequest || ActiveXObject)('MSXML2.XMLHTTP.3.0');
+    var x;
+    if (XMLHttpRequest) {
+      x = new XMLHttpRequest();
+    } else {
+      x = new ActiveXObject('MSXML2.XMLHTTP.3.0');
+    }
     x.open(data ? 'POST' : 'GET', url, 1);
     if (!options.crossDomain) {
       x.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -65,6 +70,9 @@ function ajax(url, options, callback, data, cache) {
     x.withCredentials = !!options.withCredentials;
     if (data) {
       x.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    }
+    if (x.overrideMimeType) {
+      x.overrideMimeType("application/json");
     }
     var h = options.customHeaders;
     if (h) {

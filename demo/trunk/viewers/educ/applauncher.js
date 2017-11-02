@@ -88,6 +88,6 @@ dwv.i18nInitialise();
 // launch when page is loaded
 $(document).ready( function()
 {
-    // and i18n is loaded
-    //dwv.i18nOnLoaded( startApp );
+    // and i18n is ready
+    //dwv.i18nOnInitialised( startApp );
 });
