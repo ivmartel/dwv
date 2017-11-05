@@ -24341,6 +24341,38 @@ dwv.i18nInitialise = function (language, localesPath)
 };
 
 /**
+ * Initialise i18n with recources as input.
+ * @param {String} language The language to translate to. Defaults to 'auto' and
+ *   gets the language from the browser.
+ * @param {Object} resources Languages provided as object.
+ * @external i18next
+ * @external i18nextBrowserLanguageDetector
+ */
+dwv.i18nInitialiseWithResources = function (language, resources)
+{
+    var lng = (typeof language === "undefined") ? "auto" : language;
+    // i18n options: default 'en' language and
+    //  only load language, not specialised (for ex en-GB)
+    var options = {
+        fallbackLng: "en",
+        load: "languageOnly",
+        resources: resources,
+        debug: true
+    };
+    // use browser language or the specified one
+    // init i18n: will be ready when the 'loaded' event is fired
+    if (lng === "auto") {
+        var i18n = i18next.use(i18nextBrowserLanguageDetector);
+        i18n.init(options);
+    }
+    else {
+        console.log("not auto");
+        options.lng = lng;
+        i18next.init(options);
+    }
+};
+
+/**
  * Handle i18n 'initialized' event.
  * @param {Object} callback The callback function to call when i18n is initialised.
  *  It can take one argument that will be replaced with the i18n options.
