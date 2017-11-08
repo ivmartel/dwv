@@ -22,9 +22,9 @@ i18next-xhr-backend
 i18next-browser-languageDetector
 --------------------------------
 * Web: https://github.com/i18next/i18next-browser-languageDetector
-* Version: [2.0.0](https://github.com/i18next/i18next-browser-languageDetector/releases/tag/v2.0.0)
-* Date: 16/06/2017
-* Download: https://github.com/i18next/i18next-browser-languageDetector/blob/v2.0.0/i18nextBrowserLanguageDetector.min.js
-* License: MIT (see https://github.com/i18next/i18next-browser-languageDetector/blob/v2.0.0/LICENSE)
+* Version: [2.1.0](https://github.com/i18next/i18next-browser-languageDetector/releases/tag/v2.1.0)
+* Date: 06/11/2017
+* Download: https://github.com/i18next/i18next-browser-languageDetector/blob/v2.1.0/i18nextBrowserLanguageDetector.min.js
+* License: MIT (see https://github.com/i18next/i18next-browser-languageDetector/blob/v2.1.0/LICENSE)
 * Description: language detector used in browser environment for i18next
 * Purpose for dwv: detect user language.

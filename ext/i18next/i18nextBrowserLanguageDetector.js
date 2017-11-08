@@ -4,34 +4,6 @@
   (global.i18nextBrowserLanguageDetector = factory());
 }(this, function () { 'use strict';
 
-  var babelHelpers = {};
-
-  babelHelpers.classCallCheck = function (instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  };
-
-  babelHelpers.createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-
-  babelHelpers;
-
   var arr = [];
   var each = arr.forEach;
   var slice = arr.slice;
@@ -190,6 +162,10 @@
     }
   };
 
+  var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
   function getDefaults() {
     return {
       order: ['querystring', 'cookie', 'localStorage', 'navigator', 'htmlTag'],
@@ -207,8 +183,9 @@
 
   var Browser = function () {
     function Browser(services) {
-      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-      babelHelpers.classCallCheck(this, Browser);
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+      _classCallCheck(this, Browser);
 
       this.type = 'languageDetector';
       this.detectors = {};
@@ -216,11 +193,11 @@
       this.init(services, options);
     }
 
-    babelHelpers.createClass(Browser, [{
+    _createClass(Browser, [{
       key: 'init',
       value: function init(services) {
-        var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-        var i18nOptions = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        var i18nOptions = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
         this.services = services;
         this.options = defaults(options, this.options || {}, getDefaults());
@@ -275,6 +252,7 @@
         });
       }
     }]);
+
     return Browser;
   }();
 
