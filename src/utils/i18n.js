@@ -62,8 +62,7 @@ dwv.i18nInitialiseWithResources = function (language, resources)
     var options = {
         fallbackLng: "en",
         load: "languageOnly",
-        resources: resources,
-        debug: true
+        resources: resources
     };
     // use browser language or the specified one
     // init i18n: will be ready when the 'loaded' event is fired
@@ -72,7 +71,6 @@ dwv.i18nInitialiseWithResources = function (language, resources)
         i18n.init(options);
     }
     else {
-        console.log("not auto");
         options.lng = lng;
         i18next.init(options);
     }
