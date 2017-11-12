@@ -595,6 +595,21 @@ dwv.App = function ()
     };
 
     /**
+     * Load a list of ArrayBuffers.
+     * @param {Array} data The list of ArrayBuffers to load
+     *   in the form of [{name: "", filename: "", data: data}].
+     */
+    this.loadImageObject = function (data)
+    {
+        // create IO
+        var memoryIO = new dwv.io.MemoryLoader();
+        // create options
+        var options = {};
+        // load data
+        loadImageData(data, memoryIO, options);
+    };
+
+    /**
      * Load a list of image URLs.
      * @private
      * @param {Array} urls The list of urls to load.
