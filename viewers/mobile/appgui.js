@@ -153,6 +153,11 @@ dwv.gui.FileLoad = dwv.gui.base.FileLoad;
 dwv.gui.FileLoad.prototype.onchange = function (/*event*/) {
     $("#popupOpen").popup("close");
 };
+// Folder loader
+dwv.gui.FolderLoad = dwv.gui.base.FolderLoad;
+dwv.gui.FolderLoad.prototype.onchange = function (/*event*/) {
+    $("#popupOpen").popup("close");
+};
 // Url loader
 dwv.gui.UrlLoad = dwv.gui.base.UrlLoad;
 dwv.gui.UrlLoad.prototype.onchange = function (/*event*/) {

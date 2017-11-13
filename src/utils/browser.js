@@ -52,6 +52,16 @@ dwv.browser.hasInputColor = function()
     return Modernizr.inputtypes.color;
 };
 
+/**
+ * Browser check for input with type='files' and webkitdirectory flag.
+ * Missing in IE and Safari.
+ */
+dwv.browser.hasInputDirectory = function()
+{
+    return Modernizr.fileinputdirectory;
+};
+
+
 //only check at startup (since we propose a replacement)
 dwv.browser._hasTypedArraySlice = (typeof Uint8Array.prototype.slice !== "undefined");
 

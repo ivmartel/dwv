@@ -10,7 +10,7 @@ function startApp() {
     // main application
     var myapp = new dwv.App();
     // initialise the application
-    myapp.init({
+    var options = {
         "containerDivId": "dwv",
         "fitToWindow": true,
         "gui": ["tool", "load", "help", "undo", "version", "tags", "drawList"],
@@ -19,7 +19,12 @@ function startApp() {
         "filters": ["Threshold", "Sharpen", "Sobel"],
         "shapes": ["Arrow", "Ruler", "Protractor", "Rectangle", "Roi", "Ellipse", "FreeHand"],
         "isMobile": false
-    });
+    };
+    if ( dwv.browser.hasInputDirectory() ) {
+        options.loaders.splice(1, 0, "Folder");
+    }
+    myapp.init(options);
+
 
     // help
     // TODO Seems accordion only works when at end...
