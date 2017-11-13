@@ -12217,6 +12217,69 @@ dwv.gui.base.FileLoad = function (app)
 }; // class dwv.gui.base.FileLoad
 
 /**
+ * FolderLoad base gui.
+ * @constructor
+ */
+dwv.gui.base.FolderLoad = function (app)
+{
+    // closure to self
+    var self = this;
+
+    /**
+     * Internal file input change handler.
+     * @param {Object} event The change event.
+     */
+    function onchangeinternal(event) {
+        if (typeof self.onchange === "function") {
+            self.onchange(event);
+        }
+        app.onChangeFiles(event);
+    }
+
+    /**
+     * Setup the file load HTML to the page.
+     */
+    this.setup = function()
+    {
+        // input
+        var fileLoadInput = document.createElement("input");
+        fileLoadInput.onchange = onchangeinternal;
+        fileLoadInput.type = "file";
+        fileLoadInput.multiple = true;
+        fileLoadInput.webkitdirectory  = true;
+        fileLoadInput.className = "imagefolder";
+        fileLoadInput.setAttribute("data-clear-btn","true");
+        fileLoadInput.setAttribute("data-mini","true");
+
+        // associated div
+        var folderLoadDiv = document.createElement("div");
+        folderLoadDiv.className = "imagefolderdiv";
+        folderLoadDiv.style.display = "none";
+        folderLoadDiv.appendChild(fileLoadInput);
+
+        // node
+        var node = app.getElement("loaderlist");
+        // append
+        node.appendChild(folderLoadDiv);
+        // refresh
+        dwv.gui.refreshElement(node);
+    };
+
+    /**
+     * Display the folder load HTML.
+     * @param {Boolean} bool True to display, false to hide.
+     */
+    this.display = function (bool)
+    {
+        // file div element
+        var node = app.getElement("loaderlist");
+        var folderdiv = node.getElementsByClassName("imagefolderdiv")[0];
+        folderdiv.style.display = bool ? "" : "none";
+    };
+
+}; // class dwv.gui.base.FileLoad
+
+/**
  * UrlLoad base gui.
  * @constructor
  */
@@ -24177,6 +24240,16 @@ dwv.browser.hasInputColor = function()
 {
     return Modernizr.inputtypes.color;
 };
+
+/**
+ * Browser check for input with type='files' and webkitdirectory flag.
+ * Missing in IE and Safari.
+ */
+dwv.browser.hasInputDirectory = function()
+{
+    return Modernizr.fileinputdirectory;
+};
+
 
 //only check at startup (since we propose a replacement)
 dwv.browser._hasTypedArraySlice = (typeof Uint8Array.prototype.slice !== "undefined");

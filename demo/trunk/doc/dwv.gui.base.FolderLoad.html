@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>dwv Class: Size</title>
+	<title>dwv Class: FolderLoad</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -93,15 +93,15 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: Size</h1>
+	<h1 class="page-title">Class: FolderLoad</h1>
 <section>
 
 <header>
     
         <h2>
-            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.image.html">.image</a>.</span>
+            <span class="ancestors"><a href="dwv.html">dwv</a><a href="dwv.gui.html">.gui</a><a href="dwv.gui.base.html">.base</a>.</span>
         
-        Size
+        FolderLoad
         </h2>
         
     
@@ -114,7 +114,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="Size"><span class="type-signature"></span>new Size(numberOfColumns, numberOfRows, numberOfSlices)</h4>
+    <h4 class="name" id="FolderLoad"><span class="type-signature"></span>new FolderLoad()</h4>
     
     
 </dt>
@@ -122,7 +122,7 @@
 
     
     <div class="description">
-        2D/3D Size class.
+        FolderLoad base gui.
     </div>
     
 
@@ -131,104 +131,6 @@
     
 
     
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>numberOfColumns</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The number of columns.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>numberOfRows</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The number of rows.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>numberOfSlices</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The number of slices.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
     
 
     
@@ -266,8 +168,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_image_geometry.js.html">src/image/geometry.js</a>,
-				 <a href="src_image_geometry.js.html#sunlight-1-line-12">line 12</a>
+				<a href="src_gui_loader.js.html">src/gui/loader.js</a>,
+				 <a href="src_gui_loader.js.html#sunlight-1-line-138">line 138</a>
 			</li>
 		</ul>
 	</dd>
@@ -318,7 +220,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="equals"><span class="type-signature"></span>equals(rhs)</h4>
+    <h4 class="name" id="display"><span class="type-signature"></span>display(bool)</h4>
     
     
 </dt>
@@ -326,7 +228,7 @@
 
     
     <div class="description">
-        Check for equality.
+        Display the folder load HTML.
     </div>
     
 
@@ -361,13 +263,13 @@
 
         <tr>
             
-                <td class="name"><code>rhs</code></td>
+                <td class="name"><code>bool</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Size</span>
+<span class="param-type">Boolean</span>
 
 
 
@@ -378,7 +280,7 @@
 
             
 
-            <td class="description last">The object to compare to.</td>
+            <td class="description last">True to display, false to hide.</td>
         </tr>
 
     
@@ -422,8 +324,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_image_geometry.js.html">src/image/geometry.js</a>,
-				 <a href="src_image_geometry.js.html#sunlight-1-line-52">line 52</a>
+				<a href="src_gui_loader.js.html">src/gui/loader.js</a>,
+				 <a href="src_gui_loader.js.html#sunlight-1-line-187">line 187</a>
 			</li>
 		</ul>
 	</dd>
@@ -448,30 +350,6 @@
     
 
     
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    True if both objects are equal.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Boolean</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
 
     
 </dd>
@@ -480,7 +358,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="getNumberOfColumns"><span class="type-signature"></span>getNumberOfColumns()</h4>
+    <h4 class="name" id="setup"><span class="type-signature"></span>setup()</h4>
     
     
 </dt>
@@ -488,7 +366,7 @@
 
     
     <div class="description">
-        Get the number of columns.
+        Setup the file load HTML to the page.
     </div>
     
 
@@ -534,8 +412,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_image_geometry.js.html">src/image/geometry.js</a>,
-				 <a href="src_image_geometry.js.html#sunlight-1-line-18">line 18</a>
+				<a href="src_gui_loader.js.html">src/gui/loader.js</a>,
+				 <a href="src_gui_loader.js.html#sunlight-1-line-157">line 157</a>
 			</li>
 		</ul>
 	</dd>
@@ -560,30 +438,6 @@
     
 
     
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    The number of columns.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Number</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
 
     
 </dd>
@@ -592,7 +446,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="getNumberOfRows"><span class="type-signature"></span>getNumberOfRows()</h4>
+    <h4 class="name" id="~onchangeinternal"><span class="type-signature">&lt;inner> </span>onchangeinternal(event)</h4>
     
     
 </dt>
@@ -600,455 +454,7 @@
 
     
     <div class="description">
-        Get the number of rows.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_geometry.js.html">src/image/geometry.js</a>,
-				 <a href="src_image_geometry.js.html#sunlight-1-line-23">line 23</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    The number of rows.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Number</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getNumberOfSlices"><span class="type-signature"></span>getNumberOfSlices()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get the number of slices.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_geometry.js.html">src/image/geometry.js</a>,
-				 <a href="src_image_geometry.js.html#sunlight-1-line-28">line 28</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    The number of slices.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Number</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getSliceSize"><span class="type-signature"></span>getSliceSize()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get the size of a slice.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_geometry.js.html">src/image/geometry.js</a>,
-				 <a href="src_image_geometry.js.html#sunlight-1-line-35">line 35</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    The size of a slice.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Number</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getTotalSize"><span class="type-signature"></span>getTotalSize()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get the total size.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_geometry.js.html">src/image/geometry.js</a>,
-				 <a href="src_image_geometry.js.html#sunlight-1-line-43">line 43</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    The total size.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Number</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="isInBounds"><span class="type-signature"></span>isInBounds(i, j, k)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Check that coordinates are within bounds.
+        Internal file input change handler.
     </div>
     
 
@@ -1083,13 +489,13 @@
 
         <tr>
             
-                <td class="name"><code>i</code></td>
+                <td class="name"><code>event</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">Object</span>
 
 
 
@@ -1100,55 +506,7 @@
 
             
 
-            <td class="description last">The column coordinate.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>j</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The row coordinate.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>k</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The slice coordinate.</td>
+            <td class="description last">The change event.</td>
         </tr>
 
     
@@ -1192,8 +550,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="src_image_geometry.js.html">src/image/geometry.js</a>,
-				 <a href="src_image_geometry.js.html#sunlight-1-line-66">line 66</a>
+				<a href="src_gui_loader.js.html">src/gui/loader.js</a>,
+				 <a href="src_gui_loader.js.html#sunlight-1-line-147">line 147</a>
 			</li>
 		</ul>
 	</dd>
@@ -1218,142 +576,6 @@
     
 
     
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    True if the given coordinates are within bounds.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Boolean</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="toString"><span class="type-signature"></span>toString()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get a string representation of the Vector3D.
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="src_image_geometry.js.html">src/image/geometry.js</a>,
-				 <a href="src_image_geometry.js.html#sunlight-1-line-79">line 79</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    The vector as a string.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">String</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
 
     
 </dd>
