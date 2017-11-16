@@ -97,9 +97,14 @@ function updateLinks()
     var links = document.getElementsByClassName('dwvlink');
     var tmp;
     var root = getDwvBaseUrl();
+    var url;
     for (var i = 0; i < links.length; ++i) {
+        url = root;
         tmp = links[i].href.split('?');
-        links[i].href = root+'?'+tmp[1];
+        if ( tmp.length === 2 ) {
+            url += '?'+tmp[1];
+        }
+        links[i].href = url;
     }
 }
 function getDwvBaseUrl()
@@ -124,7 +129,11 @@ function getDwvBaseUrl()
 }
 function getDwvUrl(uri)
 {
-    return getDwvBaseUrl() + "?input=" + encodeURIComponent(uri);
+    var url = getDwvBaseUrl();
+    if ( typeof uri !== "undefined" ) {
+        url += "?input=" + encodeURIComponent(uri);
+    }
+    return url;
 }
 function createAndPutHtml(data, id)
 {
@@ -166,6 +175,7 @@ function createAndPutHtml(data, id)
 window.onload = function() {
     createAndPutHtml(dataDicom, "uldatadicom");
     createAndPutHtml(dataImg, "uldataimg");
+    document.getElementById("empty-launch").href = getDwvUrl();
 }
 </script>
 </head>
@@ -200,7 +210,8 @@ image and imaging filters such as threshold and sharpening.</p>
 
 <p>Here are a few data example that are displayed as they could
 be on a web interface to a PACS system. Choose "DWV mobile" if you are using a phone or a tablet, 
-choose "DWV static" on a laptop or desktop. Then click on the list item 
+choose "DWV static" on a laptop or desktop. Click <a href="#" id="empty-launch" class="dwvlink">here</a> 
+for a direct launch of click on a list item 
 to launch DWV with the selected data.</p>
 
 <div>
