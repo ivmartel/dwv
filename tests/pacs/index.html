@@ -88,9 +88,14 @@ function setDwv(obj)
     // update page links
     var elements = document.getElementsByClassName('dwvlink');
     var tmp;
+    var url;
     for (var i = 0; i < elements.length; ++i) {
+        url = getDwvBaseUrl(obj.value)
         tmp = elements[i].href.split('?');
-        elements[i].href = getDwvBaseUrl(obj.value)+'?'+tmp[1];
+        if ( tmp.length === 2 ) {
+            url += '?'+tmp[1];
+        }
+        elements[i].href = url;
     }
 }
 function getDwvBaseUrl(flag)
@@ -115,7 +120,11 @@ function getDwvUrl(uri)
         var select = document.getElementById('select-dwv');
         flag = select.options[select.selectedIndex].value;
     }
-    return getDwvBaseUrl(flag)+"?input="+encodeURIComponent(uri);
+    var url = getDwvBaseUrl(flag);
+    if ( typeof uri !== "undefined" ) {
+        url += "?input="+encodeURIComponent(uri);
+    }
+    return url;
 }
 function createAndPutHtml(data, id)
 {
@@ -159,6 +168,7 @@ function createAndPutHtml(data, id)
 window.onload = function() {
     createAndPutHtml(dataDicom, "uldatadicom");
     createAndPutHtml(dataImg, "uldataimg");
+    document.getElementById("empty-launch").href = getDwvUrl();
 };
 </script>
 </head>
@@ -170,7 +180,8 @@ window.onload = function() {
 <h1>My (fake) PACS</h1>
 
 <p>These are a few data example that are displayed as they could
-be on a web interface to a PACS system. Click on the list item to launch DWV with the selected data.</p>
+be on a web interface to a PACS system. Click on the list item to launch DWV with the selected data.
+Direct link: <a href="#" id="empty-launch" class="dwvlink">launch</a>.</p>
 
 <div data-role="fieldcontain">
 <label for="select-dwv">Choose which DWV to launch:</label>
@@ -179,7 +190,7 @@ be on a web interface to a PACS system. Click on the list item to launch DWV wit
 <option value="dwvstatic">DWV Static</option>
 <option value="dwvsimple">DWV Simple</option>
 <option value="dwvsimplistic">DWV Simplistic</option>
-</select>
+</select> 
 </div>
 
 <ul class="listview" data-role="listview" data-inset="true" id="uldatadicom"></ul>
