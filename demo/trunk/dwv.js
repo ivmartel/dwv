@@ -23290,10 +23290,10 @@ dwv.tool.Scroll = function(app)
         if( yMove ) {
             // update GUI
             if( diffY > 0 ) {
-                app.getViewController().incrementSliceNb();
+                app.getViewController().decrementSliceNb();
             }
             else {
-                app.getViewController().decrementSliceNb();
+                app.getViewController().incrementSliceNb();
             }
         }
 
