@@ -24,11 +24,6 @@ dwv.image.decoderScripts = {
     "jpeg-baseline": "../../decoders/pdfjs/decode-jpegbaseline.js"
 };
 
-// check browser support
-dwv.browser.check();
-// initialise i18n
-dwv.i18nInitialise();
-
 // status flags
 var domContentLoaded = false;
 var i18nInitialised = false;
@@ -38,13 +33,19 @@ function launchApp() {
         startApp();
     }
 }
-// DOM ready?
-document.addEventListener("DOMContentLoaded", function (/*event*/) {
-    domContentLoaded = true;
-    launchApp();
-});
 // i18n ready?
 dwv.i18nOnInitialised( function () {
     i18nInitialised = true;
+    launchApp();
+});
+
+// check browser support
+dwv.browser.check();
+// initialise i18n
+dwv.i18nInitialise();
+
+// DOM ready?
+document.addEventListener("DOMContentLoaded", function (/*event*/) {
+    domContentLoaded = true;
     launchApp();
 });

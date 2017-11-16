@@ -107,6 +107,8 @@ dwv.gui.DrawList = dwv.gui.base.DrawList;
 dwv.gui.Loadbox = dwv.gui.base.Loadbox;
 // File loader
 dwv.gui.FileLoad = dwv.gui.base.FileLoad;
+// File loader
+dwv.gui.FolderLoad = dwv.gui.base.FolderLoad;
 // Url loader
 dwv.gui.UrlLoad =  dwv.gui.base.UrlLoad;
 
