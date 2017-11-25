@@ -49,8 +49,9 @@ dwv.io.ZipLoader = function ()
             var memoryIO = new dwv.io.MemoryLoader();
             memoryIO.onload = self.onload;
             memoryIO.onloadend = self.onloadend;
-            memoryIO.onerror = self.onerror;
             memoryIO.onprogress = self.onprogress;
+            memoryIO.onerror = self.onerror;
+            memoryIO.onabort = self.onabort;
 
             memoryIO.load(files);
         }
@@ -71,6 +72,13 @@ dwv.io.ZipLoader = function ()
         	filename = zobjs[num].name;
         	zobjs[num].async("arrayBuffer").then(zipAsyncCallback);
         });
+    };
+
+    /**
+     * Abort load: pass to listeners.
+     */
+    this.abort = function () {
+        self.onabort();
     };
 
     /**
@@ -177,6 +185,12 @@ dwv.io.ZipLoader.prototype.onload = function (/*event*/) {};
  */
 dwv.io.ZipLoader.prototype.onloadend = function () {};
 /**
+ * Handle a progress event.
+ * @param {Object} event The progress event.
+ * Default does nothing.
+ */
+dwv.io.ZipLoader.prototype.onprogress = function (/*event*/) {};
+/**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'
  *  should be the error message.
@@ -184,11 +198,10 @@ dwv.io.ZipLoader.prototype.onloadend = function () {};
  */
 dwv.io.ZipLoader.prototype.onerror = function (/*event*/) {};
 /**
- * Handle a progress event.
- * @param {Object} event The progress event.
+ * Handle an abort event.
  * Default does nothing.
  */
-dwv.io.ZipLoader.prototype.onprogress = function (/*event*/) {};
+dwv.io.ZipLoader.prototype.onabort = function () {};
 
 /**
  * Add to Loader list.

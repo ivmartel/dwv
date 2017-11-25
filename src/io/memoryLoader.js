@@ -16,6 +16,13 @@ dwv.io.MemoryLoader = function ()
     var self = this;
 
     /**
+     * Array of launched loaders used in abort.
+     * @private
+     * @type Array
+     */
+    var loaders = [];
+
+    /**
      * Number of data to load.
      * @private
      * @type Number
@@ -49,6 +56,32 @@ dwv.io.MemoryLoader = function ()
      */
     this.setDefaultCharacterSet = function (characterSet) {
         defaultCharacterSet = characterSet;
+    };
+
+    /**
+     * Store a launched loader.
+     * @param {Object} loader The launched loader.
+     */
+    this.storeLoader = function (loader) {
+        loaders.push(loader);
+    };
+
+    /**
+     * Clear the stored loaders.
+     */
+    this.clearStoredLoaders = function () {
+        loaders = [];
+    };
+
+    /**
+     * Abort a memory load.
+     */
+    this.abort = function () {
+        // abort loaders
+        for ( var i = 0; i < loaders.length; ++i ) {
+            loaders[i].abort();
+        }
+        this.clearStoredLoaders();
     };
 
     /**
@@ -97,6 +130,11 @@ dwv.io.MemoryLoader.prototype.onprogress = function (/*event*/) {};
  * Default does nothing.
  */
 dwv.io.MemoryLoader.prototype.onerror = function (/*event*/) {};
+/**
+ * Handle an abort event.
+ * Default does nothing.
+ */
+dwv.io.MemoryLoader.prototype.onabort = function () {};
 
 /**
  * Load a list of buffers.
@@ -142,6 +180,8 @@ dwv.io.MemoryLoader.prototype.load = function (ioArray)
             loader = loaders[l];
             if (loader.canLoadUrl(iodata.filename)) {
                 foundLoader = true;
+                // store loader
+                this.storeLoader(loader);
                 // read
                 loader.load(iodata.data, iodata.filename, i);
                 // next file

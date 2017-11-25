@@ -550,6 +550,16 @@ dwv.App = function ()
      */
     function loadImageData(data, loader, options)
     {
+        // allow to cancel
+        var previousOnKeyDown = window.onkeydown;
+        window.onkeydown = function (event) {
+            if (event.ctrlKey && event.keyCode === 88 ) // crtl-x
+            {
+                console.log("crtl-x pressed!");
+                loader.abort();
+            }
+        };
+
         // clear variables
         self.reset();
         // first data name
@@ -575,7 +585,9 @@ dwv.App = function ()
             postLoadInit(data);
         };
         loader.onerror = function (error) { handleError(error); };
+        loader.onabort = function () { handleAbort(); };
         loader.onloadend = function (/*event*/) {
+            window.onkeydown = previousOnKeyDown;
             if ( drawController ) {
                 drawController.activateDrawLayer(viewController);
             }
@@ -1243,6 +1255,18 @@ dwv.App = function ()
         if ( error.stack ) {
             console.error(error.stack);
         }
+        // stop progress
+        dwv.gui.displayProgress(100);
+    }
+
+    /**
+     * Handle an abort: display it to the user.
+     * @private
+     */
+    function handleAbort()
+    {
+        // log
+        console.warn("Abort called.");
         // stop progress
         dwv.gui.displayProgress(100);
     }

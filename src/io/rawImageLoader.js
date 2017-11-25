@@ -67,6 +67,13 @@ dwv.io.RawImageLoader = function ()
     };
 
     /**
+     * Abort load: pass to listeners.
+     */
+    this.abort = function () {
+        self.onabort();
+    };
+
+    /**
      * Get a file load handler.
      * @param {Object} file The file to load.
      * @param {Number} index The index 'id' of the file.
@@ -177,6 +184,12 @@ dwv.io.RawImageLoader.prototype.onload = function (/*event*/) {};
  */
 dwv.io.RawImageLoader.prototype.onloadend = function () {};
 /**
+ * Handle a progress event.
+ * @param {Object} event The progress event.
+ * Default does nothing.
+ */
+dwv.io.RawImageLoader.prototype.onprogress = function (/*event*/) {};
+/**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'
  *  should be the error message.
@@ -184,11 +197,10 @@ dwv.io.RawImageLoader.prototype.onloadend = function () {};
  */
 dwv.io.RawImageLoader.prototype.onerror = function (/*event*/) {};
 /**
- * Handle a progress event.
- * @param {Object} event The progress event.
+ * Handle an abort event.
  * Default does nothing.
  */
-dwv.io.RawImageLoader.prototype.onprogress = function (/*event*/) {};
+dwv.io.RawImageLoader.prototype.onabort = function () {};
 
 /**
  * Add to Loader list.

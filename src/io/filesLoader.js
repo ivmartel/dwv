@@ -24,6 +24,20 @@ dwv.io.FilesLoader = function ()
     var self = this;
 
     /**
+     * Array of launched readers used in abort.
+     * @private
+     * @type Array
+     */
+    var readers = [];
+
+    /**
+     * Array of launched loaders used in abort.
+     * @private
+     * @type Array
+     */
+    var loaders = [];
+
+    /**
      * Number of data to load.
      * @private
      * @type Number
@@ -57,6 +71,55 @@ dwv.io.FilesLoader = function ()
      */
     this.setDefaultCharacterSet = function (characterSet) {
         defaultCharacterSet = characterSet;
+    };
+
+    /**
+     * Store a launched reader.
+     * @param {Object} request The launched reader.
+     */
+    this.storeReader = function (reader) {
+        readers.push(reader);
+    };
+
+    /**
+     * Clear the stored readers.
+     */
+    this.clearStoredReaders = function () {
+        readers = [];
+    };
+
+    /**
+     * Store a launched loader.
+     * @param {Object} loader The launched loader.
+     */
+    this.storeLoader = function (loader) {
+        loaders.push(loader);
+    };
+
+    /**
+     * Clear the stored loaders.
+     */
+    this.clearStoredLoaders = function () {
+        loaders = [];
+    };
+
+    /**
+     * Abort a URLs load.
+     */
+    this.abort = function () {
+        // abort readers
+        for ( var i = 0; i < readers.length; ++i ) {
+            // 0: EMPTY, 1: LOADING, 2: DONE
+            if ( readers[i].readyState === 1 ) {
+                readers[i].abort();
+            }
+        }
+        this.clearStoredReaders();
+        // abort loaders
+        for ( var j = 0; j < loaders.length; ++i ) {
+            loaders[j].abort();
+        }
+        this.clearStoredLoaders();
     };
 
     /**
@@ -146,6 +209,9 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
         var file = ioArray[i];
         var reader = new FileReader();
 
+        // store reader
+        this.storeReader(reader);
+
         // bind reader progress
         reader.onprogress = mproghandler.getMonoProgressHandler(i, 0);
 
@@ -155,9 +221,12 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
             loader = loaders[l];
             if (loader.canLoadFile(file)) {
                 foundLoader = true;
+                // store loader
+                this.storeLoader(loader);
                 // set reader callbacks
                 reader.onload = loader.getFileLoadHandler(file, i);
                 reader.onerror = loader.getErrorHandler(file.name);
+                reader.onabort = self.onabort;
                 // read
                 if (loader.loadFileAs() === dwv.io.fileContentTypes.Text) {
                     reader.readAsText(file);
