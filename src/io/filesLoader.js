@@ -24,18 +24,18 @@ dwv.io.FilesLoader = function ()
     var self = this;
 
     /**
-     * Array of launched readers used in abort.
+     * Array of launched readers (used in abort).
      * @private
      * @type Array
      */
     var readers = [];
 
     /**
-     * Array of launched loaders used in abort.
+     * Launched loader (used in abort).
      * @private
-     * @type Array
+     * @type Object
      */
-    var loaders = [];
+    var runningLoader = [];
 
     /**
      * Number of data to load.
@@ -89,18 +89,18 @@ dwv.io.FilesLoader = function ()
     };
 
     /**
-     * Store a launched loader.
+     * Store the launched loader.
      * @param {Object} loader The launched loader.
      */
     this.storeLoader = function (loader) {
-        loaders.push(loader);
+        runningLoader = loader;
     };
 
     /**
-     * Clear the stored loaders.
+     * Clear the stored loader.
      */
-    this.clearStoredLoaders = function () {
-        loaders = [];
+    this.clearStoredLoader = function () {
+        runningLoader = null;
     };
 
     /**
@@ -115,11 +115,11 @@ dwv.io.FilesLoader = function ()
             }
         }
         this.clearStoredReaders();
-        // abort loaders
-        for ( var j = 0; j < loaders.length; ++i ) {
-            loaders[j].abort();
+        // abort loader
+        if ( runningLoader ) {
+            runningLoader.abort();
         }
-        this.clearStoredLoaders();
+        this.clearStoredLoader();
     };
 
     /**
@@ -176,6 +176,10 @@ dwv.io.FilesLoader.prototype.onerror = function (/*event*/) {};
  */
 dwv.io.FilesLoader.prototype.load = function (ioArray)
 {
+    // clear storage
+    this.clearStoredReaders();
+    this.clearStoredLoader();
+
     // closure to self for handlers
     var self = this;
     // set the number of data to load

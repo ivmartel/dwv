@@ -30,11 +30,11 @@ dwv.io.UrlsLoader = function ()
     var requests = [];
 
     /**
-     * Array of launched loaders used in abort.
+     * Launched loader used in abort.
      * @private
-     * @type Array
+     * @type Object
      */
-    var loaders = [];
+    var runningLoader = null;
 
     /**
      * Number of data to load.
@@ -92,14 +92,14 @@ dwv.io.UrlsLoader = function ()
      * @param {Object} loader The launched loader.
      */
     this.storeLoader = function (loader) {
-        loaders.push(loader);
+        runningLoader = loader;
     };
 
     /**
-     * Clear the stored loaders.
+     * Clear the stored loader.
      */
-    this.clearStoredLoaders = function () {
-        loaders = [];
+    this.clearStoredLoader = function () {
+        runningLoader = null;
     };
 
     /**
@@ -108,14 +108,17 @@ dwv.io.UrlsLoader = function ()
     this.abort = function () {
         // abort requests
         for ( var i = 0; i < requests.length; ++i ) {
-            requests[i].abort();
+            // 0: UNSENT, 1: OPENED, 2: HEADERS_RECEIVED (send()), 3: LOADING, 4: DONE
+            if ( requests[i].readyState === 2 || requests[i].readyState === 3 ) {
+                requests[i].abort();
+            }
         }
         this.clearStoredRequests();
-        // abort loaders
-        for ( var j = 0; j < loaders.length; ++i ) {
-            loaders[j].abort();
+        // abort loader
+        if ( runningLoader ) {
+            runningLoader.abort();
         }
-        this.clearStoredLoaders();
+        this.clearStoredLoader();
     };
 
     /**
@@ -180,7 +183,7 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
 {
     // clear storage
     this.clearStoredRequests();
-    this.clearStoredLoaders();
+    this.clearStoredLoader();
 
     // closure to self for handlers
     var self = this;
