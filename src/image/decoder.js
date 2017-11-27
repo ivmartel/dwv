@@ -72,12 +72,12 @@ dwv.image.SynchPixelBufferDecoder = function (algoName)
      * @param {Array} pixelBuffer The pixel buffer.
      * @param {Number} bitsAllocated The bits allocated per element in the buffer.
      * @param {Boolean} isSigned Is the data signed.
-     * @return {Array} The decoded pixel buffer.
+     * @param {Function} callback Callback function to handle decoded data.
      * @external jpeg
      * @external JpegImage
      * @external JpxImage
      */
-    this.decode = function (pixelBuffer, bitsAllocated, isSigned) {
+    this.decode = function (pixelBuffer, bitsAllocated, isSigned, callback) {
         var decoder = null;
         var decodedBuffer = null;
         if( algoName === "jpeg-lossless" ) {
@@ -127,8 +127,8 @@ dwv.image.SynchPixelBufferDecoder = function (algoName)
         // send events
         this.ondecoded();
         this.ondecodeend();
-        // return result as array
-        return [decodedBuffer];
+        // call callback with decoded buffer as array
+        callback({data: [decodedBuffer]});
     };
 };
 
@@ -155,20 +155,22 @@ dwv.image.SynchPixelBufferDecoder.prototype.ondecoded = function ()
  * If the 'dwv.image.decoderScripts' variable does not contain the desired algorythm,
  * the decoder will switch to the synchronous mode.
  */
-dwv.image.PixelBufferDecoder = function (algoName, asynch)
+dwv.image.PixelBufferDecoder = function (algoName)
 {
     /**
-     * Asynchronous decoder.
+     * Pixel decoder.
      * Defined only once.
      * @private
      * @type Object
      */
-    var asynchDecoder = null;
+    var pixelDecoder = null;
 
     // initialise the asynch decoder (if possible)
     if (typeof dwv.image.decoderScripts !== "undefined" &&
             typeof dwv.image.decoderScripts[algoName] !== "undefined") {
-        asynchDecoder = new dwv.image.AsynchPixelBufferDecoder(dwv.image.decoderScripts[algoName]);
+        pixelDecoder = new dwv.image.AsynchPixelBufferDecoder(dwv.image.decoderScripts[algoName]);
+    } else {
+        pixelDecoder = new dwv.image.SynchPixelBufferDecoder(algoName);
     }
 
     /**
@@ -177,31 +179,14 @@ dwv.image.PixelBufferDecoder = function (algoName, asynch)
      * @param {Number} bitsAllocated The bits allocated per element in the buffer.
      * @param {Boolean} isSigned Is the data signed.
      * @param {Object} callback The callback on the conversion.
-     * @param {Boolean} asynch Should the decoder run asynchronously, default to true.
      */
     this.decode = function (pixelBuffer, bitsAllocated, isSigned, callback)
     {
-        // default to asynch
-        asynch = (typeof asynch === 'undefined') ? true : asynch;
-
-        // run asynchronous if asked and we have scripts
-        if (asynch && asynchDecoder !== null) {
-            // (re)set event handler
-            asynchDecoder.ondecodeend = this.ondecodeend;
-            asynchDecoder.ondecoded = this.ondecoded;
-            // decode and call the callback
-            asynchDecoder.decode(pixelBuffer, bitsAllocated, isSigned, callback);
-        }
-        else {
-            // create the decoder
-            var synchDecoder = new dwv.image.SynchPixelBufferDecoder(algoName);
-            synchDecoder.ondecodeend = this.ondecodeend;
-            synchDecoder.ondecoded = this.ondecoded;
-            // decode
-            var decodedBuffer = synchDecoder.decode(pixelBuffer, bitsAllocated, isSigned);
-            // call the callback
-            callback({data: decodedBuffer});
-        }
+        // set event handler
+        pixelDecoder.ondecodeend = this.ondecodeend;
+        pixelDecoder.ondecoded = this.ondecoded;
+        // decode and call the callback
+        pixelDecoder.decode(pixelBuffer, bitsAllocated, isSigned, callback);
     };
 };
 
