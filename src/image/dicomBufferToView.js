@@ -135,6 +135,15 @@ dwv.image.DicomBufferToView = function ()
             self.onloadend();
         }
     };
+
+    /**
+     * Abort a conversion.
+     */
+    this.abort = function () {
+        if ( pixelDecoder ) {
+            pixelDecoder.abort();
+        }
+    };
 };
 
 /**

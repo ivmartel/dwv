@@ -43,6 +43,14 @@ dwv.image.AsynchPixelBufferDecoder = function (script)
         // add it the queue and run it
         pool.addWorkerTask(workerTask);
     };
+
+    /**
+     * Abort decoding.
+     */
+    this.abort = function () {
+        // abort the thread pool
+        pool.abort();
+    };
 };
 
 /**
@@ -130,6 +138,13 @@ dwv.image.SynchPixelBufferDecoder = function (algoName)
         // call callback with decoded buffer as array
         callback({data: [decodedBuffer]});
     };
+
+    /**
+     * Abort decoding.
+     */
+    this.abort = function () {
+        // nothing to do in the synchronous case.
+    };
 };
 
 /**
@@ -187,6 +202,15 @@ dwv.image.PixelBufferDecoder = function (algoName)
         pixelDecoder.ondecoded = this.ondecoded;
         // decode and call the callback
         pixelDecoder.decode(pixelBuffer, bitsAllocated, isSigned, callback);
+    };
+
+    /**
+     * Abort decoding.
+     */
+    this.abort = function ()
+    {
+        // decoder classes should define an abort
+        pixelDecoder.abort();
     };
 };
 

@@ -57,6 +57,7 @@ dwv.io.DicomDataLoader = function ()
      * Abort load: pass to listeners.
      */
     this.abort = function () {
+        db2v.abort();
         self.onabort();
     };
 
