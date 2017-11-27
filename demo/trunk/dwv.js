@@ -13096,6 +13096,14 @@ dwv.image.AsynchPixelBufferDecoder = function (script)
         // add it the queue and run it
         pool.addWorkerTask(workerTask);
     };
+
+    /**
+     * Abort decoding.
+     */
+    this.abort = function () {
+        // abort the thread pool
+        pool.abort();
+    };
 };
 
 /**
@@ -13183,6 +13191,13 @@ dwv.image.SynchPixelBufferDecoder = function (algoName)
         // call callback with decoded buffer as array
         callback({data: [decodedBuffer]});
     };
+
+    /**
+     * Abort decoding.
+     */
+    this.abort = function () {
+        // nothing to do in the synchronous case.
+    };
 };
 
 /**
@@ -13240,6 +13255,15 @@ dwv.image.PixelBufferDecoder = function (algoName)
         pixelDecoder.ondecoded = this.ondecoded;
         // decode and call the callback
         pixelDecoder.decode(pixelBuffer, bitsAllocated, isSigned, callback);
+    };
+
+    /**
+     * Abort decoding.
+     */
+    this.abort = function ()
+    {
+        // decoder classes should define an abort
+        pixelDecoder.abort();
     };
 };
 
@@ -13394,6 +13418,15 @@ dwv.image.DicomBufferToView = function ()
             onDecodedFirstFrame();
             // send load events
             self.onloadend();
+        }
+    };
+
+    /**
+     * Abort a conversion.
+     */
+    this.abort = function () {
+        if ( pixelDecoder ) {
+            pixelDecoder.abort();
         }
     };
 };
@@ -16364,6 +16397,7 @@ dwv.io.DicomDataLoader = function ()
      * Abort load: pass to listeners.
      */
     this.abort = function () {
+        db2v.abort();
         self.onabort();
     };
 
@@ -25165,8 +25199,11 @@ dwv.utils.ThreadPool = function (size) {
     var self = this;
     // task queue
     this.taskQueue = [];
-    // worker queue
+    // available worker queue
     this.workerQueue = [];
+    // list of running threads
+    var runningThreads = [];
+
     // pool size
     this.poolSize = size;
 
@@ -25190,10 +25227,26 @@ dwv.utils.ThreadPool = function (size) {
             // get the worker thread from the front of the queue
             var workerThread = self.workerQueue.shift();
             workerThread.run(workerTask);
+            runningThreads.push(workerThread);
         } else {
             // no free workers, add to queue
             self.taskQueue.push(workerTask);
         }
+    };
+
+    /**
+     * Abort all threads.
+     */
+    this.abort = function () {
+        // clear tasks
+        this.taskQueue = [];
+        // cancel running workers
+        for (var i = 0; i < runningThreads.length; ++i) {
+            runningThreads[i].stop();
+        }
+        runningThreads = [];
+        // re-init
+        this.init();
     };
 
     /**
@@ -25266,6 +25319,16 @@ dwv.utils.WorkerThread = function (parentPool) {
     };
 
     /**
+     * Stop a run and free the thread.
+     */
+    this.stop = function () {
+        // stop the worker
+        worker.terminate();
+        // tell the parent pool this thread is free
+        this.parentPool.freeWorkerThread(this);
+    };
+
+    /**
      * Handle once the task is done.
      * For now assume we only get a single callback from a worker
      * which also indicates the end of this worker.
@@ -25274,10 +25337,8 @@ dwv.utils.WorkerThread = function (parentPool) {
     function ontaskend(event) {
         // pass to original callback
         self.workerTask.callback(event);
-        // stop the worker
-        worker.terminate();
-        // tell the parent pool this thread is free
-        self.parentPool.freeWorkerThread(self);
+        // stop the worker and free the thread
+        self.stop();
     }
 
 };
