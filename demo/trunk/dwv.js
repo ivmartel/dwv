@@ -610,6 +610,16 @@ dwv.App = function ()
      */
     function loadImageData(data, loader, options)
     {
+        // allow to cancel
+        var previousOnKeyDown = window.onkeydown;
+        window.onkeydown = function (event) {
+            if (event.ctrlKey && event.keyCode === 88 ) // crtl-x
+            {
+                console.log("crtl-x pressed!");
+                loader.abort();
+            }
+        };
+
         // clear variables
         self.reset();
         // first data name
@@ -635,7 +645,9 @@ dwv.App = function ()
             postLoadInit(data);
         };
         loader.onerror = function (error) { handleError(error); };
+        loader.onabort = function () { handleAbort(); };
         loader.onloadend = function (/*event*/) {
+            window.onkeydown = previousOnKeyDown;
             if ( drawController ) {
                 drawController.activateDrawLayer(viewController);
             }
@@ -1303,6 +1315,18 @@ dwv.App = function ()
         if ( error.stack ) {
             console.error(error.stack);
         }
+        // stop progress
+        dwv.gui.displayProgress(100);
+    }
+
+    /**
+     * Handle an abort: display it to the user.
+     * @private
+     */
+    function handleAbort()
+    {
+        // log
+        console.warn("Abort called.");
         // stop progress
         dwv.gui.displayProgress(100);
     }
@@ -13101,12 +13125,12 @@ dwv.image.SynchPixelBufferDecoder = function (algoName)
      * @param {Array} pixelBuffer The pixel buffer.
      * @param {Number} bitsAllocated The bits allocated per element in the buffer.
      * @param {Boolean} isSigned Is the data signed.
-     * @return {Array} The decoded pixel buffer.
+     * @param {Function} callback Callback function to handle decoded data.
      * @external jpeg
      * @external JpegImage
      * @external JpxImage
      */
-    this.decode = function (pixelBuffer, bitsAllocated, isSigned) {
+    this.decode = function (pixelBuffer, bitsAllocated, isSigned, callback) {
         var decoder = null;
         var decodedBuffer = null;
         if( algoName === "jpeg-lossless" ) {
@@ -13156,8 +13180,8 @@ dwv.image.SynchPixelBufferDecoder = function (algoName)
         // send events
         this.ondecoded();
         this.ondecodeend();
-        // return result as array
-        return [decodedBuffer];
+        // call callback with decoded buffer as array
+        callback({data: [decodedBuffer]});
     };
 };
 
@@ -13184,20 +13208,22 @@ dwv.image.SynchPixelBufferDecoder.prototype.ondecoded = function ()
  * If the 'dwv.image.decoderScripts' variable does not contain the desired algorythm,
  * the decoder will switch to the synchronous mode.
  */
-dwv.image.PixelBufferDecoder = function (algoName, asynch)
+dwv.image.PixelBufferDecoder = function (algoName)
 {
     /**
-     * Asynchronous decoder.
+     * Pixel decoder.
      * Defined only once.
      * @private
      * @type Object
      */
-    var asynchDecoder = null;
+    var pixelDecoder = null;
 
     // initialise the asynch decoder (if possible)
     if (typeof dwv.image.decoderScripts !== "undefined" &&
             typeof dwv.image.decoderScripts[algoName] !== "undefined") {
-        asynchDecoder = new dwv.image.AsynchPixelBufferDecoder(dwv.image.decoderScripts[algoName]);
+        pixelDecoder = new dwv.image.AsynchPixelBufferDecoder(dwv.image.decoderScripts[algoName]);
+    } else {
+        pixelDecoder = new dwv.image.SynchPixelBufferDecoder(algoName);
     }
 
     /**
@@ -13206,31 +13232,14 @@ dwv.image.PixelBufferDecoder = function (algoName, asynch)
      * @param {Number} bitsAllocated The bits allocated per element in the buffer.
      * @param {Boolean} isSigned Is the data signed.
      * @param {Object} callback The callback on the conversion.
-     * @param {Boolean} asynch Should the decoder run asynchronously, default to true.
      */
     this.decode = function (pixelBuffer, bitsAllocated, isSigned, callback)
     {
-        // default to asynch
-        asynch = (typeof asynch === 'undefined') ? true : asynch;
-
-        // run asynchronous if asked and we have scripts
-        if (asynch && asynchDecoder !== null) {
-            // (re)set event handler
-            asynchDecoder.ondecodeend = this.ondecodeend;
-            asynchDecoder.ondecoded = this.ondecoded;
-            // decode and call the callback
-            asynchDecoder.decode(pixelBuffer, bitsAllocated, isSigned, callback);
-        }
-        else {
-            // create the decoder
-            var synchDecoder = new dwv.image.SynchPixelBufferDecoder(algoName);
-            synchDecoder.ondecodeend = this.ondecodeend;
-            synchDecoder.ondecoded = this.ondecoded;
-            // decode
-            var decodedBuffer = synchDecoder.decode(pixelBuffer, bitsAllocated, isSigned);
-            // call the callback
-            callback({data: decodedBuffer});
-        }
+        // set event handler
+        pixelDecoder.ondecodeend = this.ondecodeend;
+        pixelDecoder.ondecoded = this.ondecoded;
+        // decode and call the callback
+        pixelDecoder.decode(pixelBuffer, bitsAllocated, isSigned, callback);
     };
 };
 
@@ -16352,6 +16361,13 @@ dwv.io.DicomDataLoader = function ()
     };
 
     /**
+     * Abort load: pass to listeners.
+     */
+    this.abort = function () {
+        self.onabort();
+    };
+
+    /**
      * Get a file load handler.
      * @param {Object} file The file to load.
      * @param {Number} index The index 'id' of the file.
@@ -16468,6 +16484,12 @@ dwv.io.DicomDataLoader.prototype.onload = function (/*event*/) {};
  */
 dwv.io.DicomDataLoader.prototype.onloadend = function () {};
 /**
+ * Handle a progress event.
+ * @param {Object} event The progress event.
+ * Default does nothing.
+ */
+dwv.io.DicomDataLoader.prototype.onprogress = function (/*event*/) {};
+/**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'
  *  should be the error message.
@@ -16475,11 +16497,10 @@ dwv.io.DicomDataLoader.prototype.onloadend = function () {};
  */
 dwv.io.DicomDataLoader.prototype.onerror = function (/*event*/) {};
 /**
- * Handle a progress event.
- * @param {Object} event The progress event.
+ * Handle an abort event.
  * Default does nothing.
  */
-dwv.io.DicomDataLoader.prototype.onprogress = function (/*event*/) {};
+dwv.io.DicomDataLoader.prototype.onabort = function () {};
 
 /**
  * Add to Loader list.
@@ -16511,6 +16532,20 @@ dwv.io.FilesLoader = function ()
      * @type Object
      */
     var self = this;
+
+    /**
+     * Array of launched readers (used in abort).
+     * @private
+     * @type Array
+     */
+    var readers = [];
+
+    /**
+     * Launched loader (used in abort).
+     * @private
+     * @type Object
+     */
+    var runningLoader = [];
 
     /**
      * Number of data to load.
@@ -16546,6 +16581,55 @@ dwv.io.FilesLoader = function ()
      */
     this.setDefaultCharacterSet = function (characterSet) {
         defaultCharacterSet = characterSet;
+    };
+
+    /**
+     * Store a launched reader.
+     * @param {Object} request The launched reader.
+     */
+    this.storeReader = function (reader) {
+        readers.push(reader);
+    };
+
+    /**
+     * Clear the stored readers.
+     */
+    this.clearStoredReaders = function () {
+        readers = [];
+    };
+
+    /**
+     * Store the launched loader.
+     * @param {Object} loader The launched loader.
+     */
+    this.storeLoader = function (loader) {
+        runningLoader = loader;
+    };
+
+    /**
+     * Clear the stored loader.
+     */
+    this.clearStoredLoader = function () {
+        runningLoader = null;
+    };
+
+    /**
+     * Abort a URLs load.
+     */
+    this.abort = function () {
+        // abort readers
+        for ( var i = 0; i < readers.length; ++i ) {
+            // 0: EMPTY, 1: LOADING, 2: DONE
+            if ( readers[i].readyState === 1 ) {
+                readers[i].abort();
+            }
+        }
+        this.clearStoredReaders();
+        // abort loader
+        if ( runningLoader ) {
+            runningLoader.abort();
+        }
+        this.clearStoredLoader();
     };
 
     /**
@@ -16602,6 +16686,10 @@ dwv.io.FilesLoader.prototype.onerror = function (/*event*/) {};
  */
 dwv.io.FilesLoader.prototype.load = function (ioArray)
 {
+    // clear storage
+    this.clearStoredReaders();
+    this.clearStoredLoader();
+
     // closure to self for handlers
     var self = this;
     // set the number of data to load
@@ -16635,6 +16723,9 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
         var file = ioArray[i];
         var reader = new FileReader();
 
+        // store reader
+        this.storeReader(reader);
+
         // bind reader progress
         reader.onprogress = mproghandler.getMonoProgressHandler(i, 0);
 
@@ -16644,9 +16735,12 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
             loader = loaders[l];
             if (loader.canLoadFile(file)) {
                 foundLoader = true;
+                // store loader
+                this.storeLoader(loader);
                 // set reader callbacks
                 reader.onload = loader.getFileLoadHandler(file, i);
                 reader.onerror = loader.getErrorHandler(file.name);
+                reader.onabort = self.onabort;
                 // read
                 if (loader.loadFileAs() === dwv.io.fileContentTypes.Text) {
                     reader.readAsText(file);
@@ -16701,6 +16795,13 @@ dwv.io.JSONTextLoader = function ()
         }
         self.onprogress({'type': 'read-progress', 'lengthComputable': true,
             'loaded': 100, 'total': 100, 'index': index});
+    };
+
+    /**
+     * Abort load: pass to listeners.
+     */
+    this.abort = function () {
+        self.onabort();
     };
 
     /**
@@ -16807,6 +16908,12 @@ dwv.io.JSONTextLoader.prototype.onload = function (/*event*/) {};
  */
 dwv.io.JSONTextLoader.prototype.onloadend = function () {};
 /**
+ * Handle a progress event.
+ * @param {Object} event The progress event.
+ * Default does nothing.
+ */
+dwv.io.JSONTextLoader.prototype.onprogress = function (/*event*/) {};
+/**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'
  *  should be the error message.
@@ -16814,11 +16921,10 @@ dwv.io.JSONTextLoader.prototype.onloadend = function () {};
  */
 dwv.io.JSONTextLoader.prototype.onerror = function (/*event*/) {};
 /**
- * Handle a progress event.
- * @param {Object} event The progress event.
+ * Handle an abort event.
  * Default does nothing.
  */
-dwv.io.JSONTextLoader.prototype.onprogress = function (/*event*/) {};
+dwv.io.JSONTextLoader.prototype.onabort = function () {};
 
 /**
  * Add to Loader list.
@@ -16842,6 +16948,13 @@ dwv.io.MemoryLoader = function ()
      * @type Object
      */
     var self = this;
+
+    /**
+     * Array of launched loaders used in abort.
+     * @private
+     * @type Array
+     */
+    var loaders = [];
 
     /**
      * Number of data to load.
@@ -16877,6 +16990,32 @@ dwv.io.MemoryLoader = function ()
      */
     this.setDefaultCharacterSet = function (characterSet) {
         defaultCharacterSet = characterSet;
+    };
+
+    /**
+     * Store a launched loader.
+     * @param {Object} loader The launched loader.
+     */
+    this.storeLoader = function (loader) {
+        loaders.push(loader);
+    };
+
+    /**
+     * Clear the stored loaders.
+     */
+    this.clearStoredLoaders = function () {
+        loaders = [];
+    };
+
+    /**
+     * Abort a memory load.
+     */
+    this.abort = function () {
+        // abort loaders
+        for ( var i = 0; i < loaders.length; ++i ) {
+            loaders[i].abort();
+        }
+        this.clearStoredLoaders();
     };
 
     /**
@@ -16925,6 +17064,11 @@ dwv.io.MemoryLoader.prototype.onprogress = function (/*event*/) {};
  * Default does nothing.
  */
 dwv.io.MemoryLoader.prototype.onerror = function (/*event*/) {};
+/**
+ * Handle an abort event.
+ * Default does nothing.
+ */
+dwv.io.MemoryLoader.prototype.onabort = function () {};
 
 /**
  * Load a list of buffers.
@@ -16970,6 +17114,8 @@ dwv.io.MemoryLoader.prototype.load = function (ioArray)
             loader = loaders[l];
             if (loader.canLoadUrl(iodata.filename)) {
                 foundLoader = true;
+                // store loader
+                this.storeLoader(loader);
                 // read
                 loader.load(iodata.data, iodata.filename, i);
                 // next file
@@ -17049,6 +17195,13 @@ dwv.io.RawImageLoader = function ()
             self.onprogress({'type': 'read-progress', 'lengthComputable': true,
                 'loaded': 100, 'total': 100, 'index': index});
         };
+    };
+
+    /**
+     * Abort load: pass to listeners.
+     */
+    this.abort = function () {
+        self.onabort();
     };
 
     /**
@@ -17162,6 +17315,12 @@ dwv.io.RawImageLoader.prototype.onload = function (/*event*/) {};
  */
 dwv.io.RawImageLoader.prototype.onloadend = function () {};
 /**
+ * Handle a progress event.
+ * @param {Object} event The progress event.
+ * Default does nothing.
+ */
+dwv.io.RawImageLoader.prototype.onprogress = function (/*event*/) {};
+/**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'
  *  should be the error message.
@@ -17169,11 +17328,10 @@ dwv.io.RawImageLoader.prototype.onloadend = function () {};
  */
 dwv.io.RawImageLoader.prototype.onerror = function (/*event*/) {};
 /**
- * Handle a progress event.
- * @param {Object} event The progress event.
+ * Handle an abort event.
  * Default does nothing.
  */
-dwv.io.RawImageLoader.prototype.onprogress = function (/*event*/) {};
+dwv.io.RawImageLoader.prototype.onabort = function () {};
 
 /**
  * Add to Loader list.
@@ -17242,6 +17400,13 @@ dwv.io.RawVideoLoader = function ()
                 self.onerror(error);
             }
         };
+    };
+
+    /**
+     * Abort load: pass to listeners.
+     */
+    this.abort = function () {
+        self.onabort();
     };
 
     /**
@@ -17349,6 +17514,12 @@ dwv.io.RawVideoLoader.prototype.onload = function (/*event*/) {};
  */
 dwv.io.RawVideoLoader.prototype.onloadend = function () {};
 /**
+ * Handle a progress event.
+ * @param {Object} event The progress event.
+ * Default does nothing.
+ */
+dwv.io.RawVideoLoader.prototype.onprogress = function (/*event*/) {};
+/**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'
  *  should be the error message.
@@ -17356,11 +17527,10 @@ dwv.io.RawVideoLoader.prototype.onloadend = function () {};
  */
 dwv.io.RawVideoLoader.prototype.onerror = function (/*event*/) {};
 /**
- * Handle a progress event.
- * @param {Object} event The progress event.
+ * Handle an abort event.
  * Default does nothing.
  */
-dwv.io.RawVideoLoader.prototype.onprogress = function (/*event*/) {};
+dwv.io.RawVideoLoader.prototype.onabort = function () {};
 
 /**
  * Add to Loader list.
@@ -17391,6 +17561,20 @@ dwv.io.UrlsLoader = function ()
      * @type Object
      */
     var self = this;
+
+    /**
+     * Array of launched requests used in abort.
+     * @private
+     * @type Array
+     */
+    var requests = [];
+
+    /**
+     * Launched loader used in abort.
+     * @private
+     * @type Object
+     */
+    var runningLoader = null;
 
     /**
      * Number of data to load.
@@ -17426,6 +17610,55 @@ dwv.io.UrlsLoader = function ()
      */
     this.setDefaultCharacterSet = function (characterSet) {
         defaultCharacterSet = characterSet;
+    };
+
+    /**
+     * Store a launched request.
+     * @param {Object} request The launched request.
+     */
+    this.storeRequest = function (request) {
+        requests.push(request);
+    };
+
+    /**
+     * Clear the stored requests.
+     */
+    this.clearStoredRequests = function () {
+        requests = [];
+    };
+
+    /**
+     * Store a launched loader.
+     * @param {Object} loader The launched loader.
+     */
+    this.storeLoader = function (loader) {
+        runningLoader = loader;
+    };
+
+    /**
+     * Clear the stored loader.
+     */
+    this.clearStoredLoader = function () {
+        runningLoader = null;
+    };
+
+    /**
+     * Abort a URLs load.
+     */
+    this.abort = function () {
+        // abort requests
+        for ( var i = 0; i < requests.length; ++i ) {
+            // 0: UNSENT, 1: OPENED, 2: HEADERS_RECEIVED (send()), 3: LOADING, 4: DONE
+            if ( requests[i].readyState === 2 || requests[i].readyState === 3 ) {
+                requests[i].abort();
+            }
+        }
+        this.clearStoredRequests();
+        // abort loader
+        if ( runningLoader ) {
+            runningLoader.abort();
+        }
+        this.clearStoredLoader();
     };
 
     /**
@@ -17474,6 +17707,11 @@ dwv.io.UrlsLoader.prototype.onprogress = function (/*event*/) {};
  * Default does nothing.
  */
 dwv.io.UrlsLoader.prototype.onerror = function (/*event*/) {};
+/**
+ * Handle an abort event.
+ * Default does nothing.
+ */
+dwv.io.UrlsLoader.prototype.onabort = function () {};
 
 /**
  * Load a list of URLs.
@@ -17483,6 +17721,10 @@ dwv.io.UrlsLoader.prototype.onerror = function (/*event*/) {};
  */
 dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
 {
+    // clear storage
+    this.clearStoredRequests();
+    this.clearStoredLoader();
+
     // closure to self for handlers
     var self = this;
     // set the number of data to load
@@ -17504,6 +17746,7 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
         loader.onload = self.onload;
         loader.onloadend = self.addLoaded;
         loader.onerror = self.onerror;
+        loader.onabort = self.onabort;
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
         });
@@ -17516,6 +17759,9 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
         var url = ioArray[i];
         var request = new XMLHttpRequest();
         request.open('GET', url, true);
+
+        // store request
+        this.storeRequest(request);
 
         // optional request headers
         if ( typeof options.requestHeaders !== "undefined" ) {
@@ -17538,9 +17784,12 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
             loader = loaders[l];
             if (loader.canLoadUrl(url)) {
                 foundLoader = true;
+                // store loader
+                this.storeLoader(loader);
                 // set reader callbacks
                 request.onload = loader.getUrlLoadHandler(url, i);
                 request.onerror = loader.getErrorHandler(url);
+                request.onabort = self.onabort;
                 // response type (default is 'text')
                 if (loader.loadUrlAs() === dwv.io.urlContentTypes.ArrayBuffer) {
                     request.responseType = "arraybuffer";
@@ -17609,8 +17858,9 @@ dwv.io.ZipLoader = function ()
             var memoryIO = new dwv.io.MemoryLoader();
             memoryIO.onload = self.onload;
             memoryIO.onloadend = self.onloadend;
-            memoryIO.onerror = self.onerror;
             memoryIO.onprogress = self.onprogress;
+            memoryIO.onerror = self.onerror;
+            memoryIO.onabort = self.onabort;
 
             memoryIO.load(files);
         }
@@ -17631,6 +17881,13 @@ dwv.io.ZipLoader = function ()
         	filename = zobjs[num].name;
         	zobjs[num].async("arrayBuffer").then(zipAsyncCallback);
         });
+    };
+
+    /**
+     * Abort load: pass to listeners.
+     */
+    this.abort = function () {
+        self.onabort();
     };
 
     /**
@@ -17737,6 +17994,12 @@ dwv.io.ZipLoader.prototype.onload = function (/*event*/) {};
  */
 dwv.io.ZipLoader.prototype.onloadend = function () {};
 /**
+ * Handle a progress event.
+ * @param {Object} event The progress event.
+ * Default does nothing.
+ */
+dwv.io.ZipLoader.prototype.onprogress = function (/*event*/) {};
+/**
  * Handle an error event.
  * @param {Object} event The error event, 'event.message'
  *  should be the error message.
@@ -17744,11 +18007,10 @@ dwv.io.ZipLoader.prototype.onloadend = function () {};
  */
 dwv.io.ZipLoader.prototype.onerror = function (/*event*/) {};
 /**
- * Handle a progress event.
- * @param {Object} event The progress event.
+ * Handle an abort event.
  * Default does nothing.
  */
-dwv.io.ZipLoader.prototype.onprogress = function (/*event*/) {};
+dwv.io.ZipLoader.prototype.onabort = function () {};
 
 /**
  * Add to Loader list.
