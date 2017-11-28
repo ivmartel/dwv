@@ -585,7 +585,7 @@ dwv.App = function ()
             postLoadInit(data);
         };
         loader.onerror = function (error) { handleError(error); };
-        loader.onabort = function () { handleAbort(); };
+        loader.onabort = function (error) { handleAbort(error); };
         loader.onloadend = function (/*event*/) {
             window.onkeydown = previousOnKeyDown;
             if ( drawController ) {
@@ -1246,7 +1246,7 @@ dwv.App = function ()
     {
         // alert window
         if ( error.name && error.message) {
-            alert(error.name+": "+error.message+".");
+            alert(error.name+": "+error.message);
         }
         else {
             alert("Error: "+error+".");
@@ -1261,12 +1261,18 @@ dwv.App = function ()
 
     /**
      * Handle an abort: display it to the user.
+     * @param {Object} error The error to handle.
      * @private
      */
-    function handleAbort()
+    function handleAbort(error)
     {
         // log
-        console.warn("Abort called.");
+        if ( error.message ) {
+            console.warn(error.message);
+        }
+        else {
+            console.warn("Abort called.");
+        }
         // stop progress
         dwv.gui.displayProgress(100);
     }

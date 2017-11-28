@@ -115,7 +115,7 @@ dwv.io.UrlsLoader = function ()
         }
         this.clearStoredRequests();
         // abort loader
-        if ( runningLoader ) {
+        if ( runningLoader && runningLoader.isLoading() ) {
             runningLoader.abort();
         }
         this.clearStoredLoader();
@@ -162,16 +162,18 @@ dwv.io.UrlsLoader.prototype.onloadend = function () {};
 dwv.io.UrlsLoader.prototype.onprogress = function (/*event*/) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event, 'event.message'
- *  should be the error message.
+ * @param {Object} event The error event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
 dwv.io.UrlsLoader.prototype.onerror = function (/*event*/) {};
 /**
  * Handle an abort event.
+ * @param {Object} event The abort event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
-dwv.io.UrlsLoader.prototype.onabort = function () {};
+dwv.io.UrlsLoader.prototype.onabort = function (/*event*/) {};
 
 /**
  * Load a list of URLs.
@@ -213,6 +215,25 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
         loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
     }
 
+    // request onerror handler
+    var getRequestOnError = function (origin) {
+        return function (/*event*/) {
+            var message = "An error occurred while downloading '" + origin + "'";
+            if (typeof this.status !== "undefined") {
+                message += " (http status: " + this.status + ")";
+            }
+            message += ".";
+            self.onerror( {'name': "RequestError", 'message': message } );
+        };
+    };
+
+    // request onabort handler
+    var getRequestOnAbort = function (origin) {
+        return function () {
+            self.onabort( {'message': "Abort while downloading '" + origin + "'." } );
+        };
+    };
+
     // loop on I/O elements
     for (var i = 0; i < ioArray.length; ++i)
     {
@@ -248,8 +269,8 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
                 this.storeLoader(loader);
                 // set reader callbacks
                 request.onload = loader.getUrlLoadHandler(url, i);
-                request.onerror = loader.getErrorHandler(url);
-                request.onabort = self.onabort;
+                request.onerror = getRequestOnError(url);
+                request.onabort = getRequestOnAbort(url);
                 // response type (default is 'text')
                 if (loader.loadUrlAs() === dwv.io.urlContentTypes.ArrayBuffer) {
                     request.responseType = "arraybuffer";

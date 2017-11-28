@@ -16,11 +16,11 @@ dwv.io.MemoryLoader = function ()
     var self = this;
 
     /**
-     * Array of launched loaders used in abort.
+     * Launched loader (used in abort).
      * @private
-     * @type Array
+     * @type Object
      */
-    var loaders = [];
+    var runningLoader = null;
 
     /**
      * Number of data to load.
@@ -63,24 +63,22 @@ dwv.io.MemoryLoader = function ()
      * @param {Object} loader The launched loader.
      */
     this.storeLoader = function (loader) {
-        loaders.push(loader);
+        runningLoader = loader;
     };
 
     /**
-     * Clear the stored loaders.
+     * Clear the stored loader.
      */
-    this.clearStoredLoaders = function () {
-        loaders = [];
+    this.clearStoredLoader = function () {
+        runningLoader = null;
     };
 
     /**
      * Abort a memory load.
      */
     this.abort = function () {
-        // abort loaders
-        for ( var i = 0; i < loaders.length; ++i ) {
-            loaders[i].abort();
-        }
+        // abort loader
+        runningLoader.abort();
         this.clearStoredLoaders();
     };
 
@@ -125,16 +123,18 @@ dwv.io.MemoryLoader.prototype.onloadend = function () {};
 dwv.io.MemoryLoader.prototype.onprogress = function (/*event*/) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event, 'event.message'
- *  should be the error message.
+ * @param {Object} event The error event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
 dwv.io.MemoryLoader.prototype.onerror = function (/*event*/) {};
 /**
  * Handle an abort event.
+ * @param {Object} event The abort event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
-dwv.io.MemoryLoader.prototype.onabort = function () {};
+dwv.io.MemoryLoader.prototype.onabort = function (/*event*/) {};
 
 /**
  * Load a list of buffers.
@@ -142,6 +142,9 @@ dwv.io.MemoryLoader.prototype.onabort = function () {};
  */
 dwv.io.MemoryLoader.prototype.load = function (ioArray)
 {
+    // clear storage
+    this.clearStoredLoader();
+
     // closure to self for handlers
     var self = this;
     // set the number of data to load
@@ -163,6 +166,7 @@ dwv.io.MemoryLoader.prototype.load = function (ioArray)
         loader.onload = self.onload;
         loader.onloadend = self.addLoaded;
         loader.onerror = self.onerror;
+        loader.onabort = self.onabort;
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
         });

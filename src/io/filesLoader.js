@@ -163,11 +163,18 @@ dwv.io.FilesLoader.prototype.onloadend = function () {};
 dwv.io.FilesLoader.prototype.onprogress = function (/*event*/) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event, 'event.message'
- *  should be the error message.
+ * @param {Object} event The error event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
 dwv.io.FilesLoader.prototype.onerror = function (/*event*/) {};
+/**
+ * Handle an abort event.
+ * @param {Object} event The abort event with an
+ *  optional 'event.message'.
+ * Default does nothing.
+ */
+dwv.io.FilesLoader.prototype.onabort = function (/*event*/) {};
 
 /**
  * Load a list of files.
@@ -201,11 +208,31 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
         loader.onload = self.onload;
         loader.onloadend = self.addLoaded;
         loader.onerror = self.onerror;
+        loader.onabort = self.onabort;
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
         });
         loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
     }
+
+    // request onerror handler
+    var getReaderOnError = function (origin) {
+        return function (event) {
+            var message = "An error occurred while reading '" + origin + "'";
+            if (typeof event.getMessage !== "undefined") {
+                message += " (" + event.getMessage() + ")";
+            }
+            message += ".";
+            self.onerror( {'name': "FileReaderError", 'message': message } );
+        };
+    };
+
+    // request onabort handler
+    var getReaderOnAbort = function (origin) {
+        return function () {
+            self.onabort( {'message': "Abort while reading '" + origin + "'" } );
+        };
+    };
 
     // loop on I/O elements
     for (var i = 0; i < ioArray.length; ++i)
@@ -229,8 +256,8 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
                 this.storeLoader(loader);
                 // set reader callbacks
                 reader.onload = loader.getFileLoadHandler(file, i);
-                reader.onerror = loader.getErrorHandler(file.name);
-                reader.onabort = self.onabort;
+                reader.onerror = getReaderOnError(file.name);
+                reader.onabort = getReaderOnAbort(file.name);
                 // read
                 if (loader.loadFileAs() === dwv.io.fileContentTypes.Text) {
                     reader.readAsText(file);

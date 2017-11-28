@@ -20,11 +20,26 @@ dwv.io.ZipLoader = function ()
     var options = {};
 
     /**
+     * Loading flag.
+     * @private
+     * @type Boolean
+     */
+    var isLoading = false;
+
+    /**
      * Set the loader options.
      * @param {Object} opt The input options.
      */
     this.setOptions = function (opt) {
         options = opt;
+    };
+
+    /**
+     * Is the load ongoing?
+     * @return {Boolean} True if loading.
+     */
+    this.isLoading = function () {
+        return isLoading;
     };
 
     var filename = "";
@@ -48,7 +63,12 @@ dwv.io.ZipLoader = function ()
     	else {
             var memoryIO = new dwv.io.MemoryLoader();
             memoryIO.onload = self.onload;
-            memoryIO.onloadend = self.onloadend;
+            memoryIO.onloadend = function () {
+                // reset loading flag
+                isLoading = false;
+                // call listeners
+                self.onloadend();
+            };
             memoryIO.onprogress = self.onprogress;
             memoryIO.onerror = self.onerror;
             memoryIO.onabort = self.onabort;
@@ -64,6 +84,9 @@ dwv.io.ZipLoader = function ()
      * @param {Number} index The data index.
      */
     this.load = function (buffer/*, origin, index*/) {
+        // set loading flag
+        isLoading = true;
+
         JSZip.loadAsync(buffer).then( function(zip) {
             files = [];
         	zobjs = zip.file(/.*\.dcm/);
@@ -78,6 +101,9 @@ dwv.io.ZipLoader = function ()
      * Abort load: pass to listeners.
      */
     this.abort = function () {
+        // reset loading flag
+        isLoading = false;
+        // call listeners
         self.onabort();
     };
 
@@ -112,25 +138,6 @@ dwv.io.ZipLoader = function ()
             }
             // load
             self.load(this.response, url, index);
-        };
-    };
-
-    /**
-     * Get an error handler.
-     * @param {String} origin The file.name/url at the origin of the error.
-     * @return {Function} An error handler.
-     */
-    this.getErrorHandler = function (origin) {
-        return function (event) {
-            var message = "";
-            if (typeof event.getMessage !== "undefined") {
-                message = event.getMessage();
-            } else if (typeof this.status !== "undefined") {
-                message = "http status: " + this.status;
-            }
-            self.onerror( {'name': "RequestError",
-                'message': "An error occurred while reading '" + origin +
-                "' (" + message + ") [ZipLoader]" } );
         };
     };
 
@@ -192,16 +199,18 @@ dwv.io.ZipLoader.prototype.onloadend = function () {};
 dwv.io.ZipLoader.prototype.onprogress = function (/*event*/) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event, 'event.message'
- *  should be the error message.
+ * @param {Object} event The error event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
 dwv.io.ZipLoader.prototype.onerror = function (/*event*/) {};
 /**
  * Handle an abort event.
+ * @param {Object} event The abort event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
-dwv.io.ZipLoader.prototype.onabort = function () {};
+dwv.io.ZipLoader.prototype.onabort = function (/*event*/) {};
 
 /**
  * Add to Loader list.
