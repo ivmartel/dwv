@@ -6,25 +6,24 @@ dwv.utils = dwv.utils || {};
  * Thread Pool.
  * Highly inspired from {@link http://www.smartjava.org/content/html5-easily-parallelize-jobs-using-web-workers-and-threadpool}.
  * @constructor
- * @param {Number} size The size of the pool.
+ * @param {Number} poolSize The size of the pool.
  */
-dwv.utils.ThreadPool = function (size) {
-    // closure to self
-    var self = this;
+dwv.utils.ThreadPool = function (poolSize) {
+
     // task queue
-    this.taskQueue = [];
-    // worker queue
-    this.workerQueue = [];
-    // pool size
-    this.poolSize = size;
+    var taskQueue = [];
+    // lsit of available threads
+    var freeThreads = [];
+    // list of running threads (unsed in abort)
+    var runningThreads = [];
 
     /**
      * Initialise.
      */
     this.init = function () {
-        // create 'size' number of worker threads
-        for (var i = 0; i < size; ++i) {
-            self.workerQueue.push(new dwv.utils.WorkerThread(self));
+        // create 'poolSize' number of worker threads
+        for (var i = 0; i < poolSize; ++i) {
+            freeThreads.push(new dwv.utils.WorkerThread(this));
         }
     };
 
@@ -34,14 +33,32 @@ dwv.utils.ThreadPool = function (size) {
      * @return {Object} workerTask The task to add.
      */
     this.addWorkerTask = function (workerTask) {
-        if (self.workerQueue.length > 0) {
-            // get the worker thread from the front of the queue
-            var workerThread = self.workerQueue.shift();
+        if (freeThreads.length > 0) {
+            // get the first free worker thread
+            var workerThread = freeThreads.shift();
+            // run the input task
             workerThread.run(workerTask);
+            // add the thread to the runnning list
+            runningThreads.push(workerThread);
         } else {
-            // no free workers, add to queue
-            self.taskQueue.push(workerTask);
+            // no free thread, add task to queue
+            taskQueue.push(workerTask);
         }
+    };
+
+    /**
+     * Abort all threads.
+     */
+    this.abort = function () {
+        // clear tasks
+        taskQueue = [];
+        // cancel running workers
+        for (var i = 0; i < runningThreads.length; ++i) {
+            runningThreads[i].stop();
+        }
+        runningThreads = [];
+        // re-init
+        this.init();
     };
 
     /**
@@ -49,17 +66,26 @@ dwv.utils.ThreadPool = function (size) {
      * @param {Object} workerThread The thread to free.
      */
     this.freeWorkerThread = function (workerThread) {
-        self.onworkerend();
-        if (self.taskQueue.length > 0) {
-            // don't put back in queue, but execute next task
-            var workerTask = self.taskQueue.shift();
+        // send worker end
+        this.onworkerend();
+
+        if (taskQueue.length > 0) {
+            // get waiting task
+            var workerTask = taskQueue.shift();
+            // use input thread to run the waiting task
             workerThread.run(workerTask);
         } else {
-            // no task to run, add to queue
-            self.workerQueue.push(workerThread);
+            // no task to run, add to free list
+            freeThreads.push(workerThread);
+            // remove from running list
+            for ( var i = 0; i < runningThreads.length; ++i ) {
+                if ( runningThreads[i] === workerThread ) {
+                    runningThreads.splice(i, 1);
+                }
+            }
             // the work is done when the queue is back to its initial size
-            if ( self.workerQueue.length === size ) {
-                self.onpoolworkend();
+            if ( freeThreads.length === poolSize ) {
+                this.onpoolworkend();
             }
         }
     };
@@ -67,19 +93,14 @@ dwv.utils.ThreadPool = function (size) {
 
 /**
  * Handle a pool work end event.
+ * Default does nothing.
  */
-dwv.utils.ThreadPool.prototype.onpoolworkend = function ()
-{
-    // default does nothing.
-};
-
+dwv.utils.ThreadPool.prototype.onpoolworkend = function () {};
 /**
  * Handle a pool worker end event.
+ * Default does nothing.
  */
-dwv.utils.ThreadPool.prototype.onworkerend = function ()
-{
-    // default does nothing.
-};
+dwv.utils.ThreadPool.prototype.onworkerend = function () {};
 
 /**
  * Worker thread.
@@ -90,11 +111,10 @@ dwv.utils.ThreadPool.prototype.onworkerend = function ()
 dwv.utils.WorkerThread = function (parentPool) {
     // closure to self
     var self = this;
-    // parent pool
-    this.parentPool = parentPool;
-    // associated task
-    this.workerTask = {};
-    // associated web worker
+
+    // running task
+    var runningTask = {};
+    // worker used to run task
     var worker;
 
     /**
@@ -102,15 +122,25 @@ dwv.utils.WorkerThread = function (parentPool) {
      * @param {Object} workerTask The task to run.
      */
     this.run = function (workerTask) {
-        // closure to task
-        this.workerTask = workerTask;
+        // store task
+        runningTask = workerTask;
         // create a new web worker
-        if (this.workerTask.script !== null) {
-            worker = new Worker(workerTask.script);
+        if (runningTask.script !== null) {
+            worker = new Worker(runningTask.script);
             worker.addEventListener('message', ontaskend, false);
             // launch the worker
-            worker.postMessage(workerTask.startMessage);
+            worker.postMessage(runningTask.startMessage);
         }
+    };
+
+    /**
+     * Stop a run and free the thread.
+     */
+    this.stop = function () {
+        // stop the worker
+        worker.terminate();
+        // tell the parent pool this thread is free
+        parentPool.freeWorkerThread(this);
     };
 
     /**
@@ -121,11 +151,9 @@ dwv.utils.WorkerThread = function (parentPool) {
      */
     function ontaskend(event) {
         // pass to original callback
-        self.workerTask.callback(event);
-        // stop the worker
-        worker.terminate();
-        // tell the parent pool this thread is free
-        self.parentPool.freeWorkerThread(self);
+        runningTask.callback(event);
+        // stop the worker and free the thread
+        self.stop();
     }
 
 };
@@ -134,7 +162,7 @@ dwv.utils.WorkerThread = function (parentPool) {
  * Worker task.
  * @constructor
  * @param {String} script The worker script.
- * @param {Function} parentPool The worker callback.
+ * @param {Function} callback The worker callback.
  * @param {Object} message The data to pass to the worker.
  */
 dwv.utils.WorkerTask = function (script, callback, message) {

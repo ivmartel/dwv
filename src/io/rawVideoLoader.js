@@ -21,6 +21,14 @@ dwv.io.RawVideoLoader = function ()
     };
 
     /**
+     * Is the load ongoing? TODO...
+     * @return {Boolean} True if loading.
+     */
+    this.isLoading = function () {
+        return true;
+    };
+
+    /**
      * Create a Data URI from an HTTP request response.
      * @param {Object} response The HTTP request response.
      * @param {String} dataType The data type.
@@ -62,6 +70,13 @@ dwv.io.RawVideoLoader = function ()
     };
 
     /**
+     * Abort load. TODO...
+     */
+    this.abort = function () {
+        self.onabort();
+    };
+
+    /**
      * Get a file load handler.
      * @param {Object} file The file to load.
      * @param {Number} index The index 'id' of the file.
@@ -93,25 +108,6 @@ dwv.io.RawVideoLoader = function ()
             // load
             var ext = url.split('.').pop().toLowerCase();
             self.load(createDataUri(this.response, ext), url, index);
-        };
-    };
-
-    /**
-     * Get an error handler.
-     * @param {String} origin The file.name/url at the origin of the error.
-     * @return {Function} An error handler.
-     */
-    this.getErrorHandler = function (origin) {
-        return function (event) {
-            var message = "";
-            if (typeof event.getMessage !== "undefined") {
-                message = event.getMessage();
-            } else if (typeof this.status !== "undefined") {
-                message = "http status: " + this.status;
-            }
-            self.onerror( {'name': "RequestError",
-                'message': "An error occurred while reading '" + origin +
-                "' (" + message + ") [RawVideoLoader]" } );
         };
     };
 
@@ -166,18 +162,25 @@ dwv.io.RawVideoLoader.prototype.onload = function (/*event*/) {};
  */
 dwv.io.RawVideoLoader.prototype.onloadend = function () {};
 /**
- * Handle an error event.
- * @param {Object} event The error event, 'event.message'
- *  should be the error message.
- * Default does nothing.
- */
-dwv.io.RawVideoLoader.prototype.onerror = function (/*event*/) {};
-/**
  * Handle a progress event.
  * @param {Object} event The progress event.
  * Default does nothing.
  */
 dwv.io.RawVideoLoader.prototype.onprogress = function (/*event*/) {};
+/**
+ * Handle an error event.
+ * @param {Object} event The error event with an
+ *  optional 'event.message'.
+ * Default does nothing.
+ */
+dwv.io.RawVideoLoader.prototype.onerror = function (/*event*/) {};
+/**
+ * Handle an abort event.
+ * @param {Object} event The abort event with an
+ *  optional 'event.message'.
+ * Default does nothing.
+ */
+dwv.io.RawVideoLoader.prototype.onabort = function (/*event*/) {};
 
 /**
  * Add to Loader list.

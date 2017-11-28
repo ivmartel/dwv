@@ -23,6 +23,20 @@ dwv.io.UrlsLoader = function ()
     var self = this;
 
     /**
+     * Array of launched requests used in abort.
+     * @private
+     * @type Array
+     */
+    var requests = [];
+
+    /**
+     * Launched loader used in abort.
+     * @private
+     * @type Object
+     */
+    var runningLoader = null;
+
+    /**
      * Number of data to load.
      * @private
      * @type Number
@@ -56,6 +70,55 @@ dwv.io.UrlsLoader = function ()
      */
     this.setDefaultCharacterSet = function (characterSet) {
         defaultCharacterSet = characterSet;
+    };
+
+    /**
+     * Store a launched request.
+     * @param {Object} request The launched request.
+     */
+    this.storeRequest = function (request) {
+        requests.push(request);
+    };
+
+    /**
+     * Clear the stored requests.
+     */
+    this.clearStoredRequests = function () {
+        requests = [];
+    };
+
+    /**
+     * Store a launched loader.
+     * @param {Object} loader The launched loader.
+     */
+    this.storeLoader = function (loader) {
+        runningLoader = loader;
+    };
+
+    /**
+     * Clear the stored loader.
+     */
+    this.clearStoredLoader = function () {
+        runningLoader = null;
+    };
+
+    /**
+     * Abort a URLs load.
+     */
+    this.abort = function () {
+        // abort requests
+        for ( var i = 0; i < requests.length; ++i ) {
+            // 0: UNSENT, 1: OPENED, 2: HEADERS_RECEIVED (send()), 3: LOADING, 4: DONE
+            if ( requests[i].readyState === 2 || requests[i].readyState === 3 ) {
+                requests[i].abort();
+            }
+        }
+        this.clearStoredRequests();
+        // abort loader
+        if ( runningLoader && runningLoader.isLoading() ) {
+            runningLoader.abort();
+        }
+        this.clearStoredLoader();
     };
 
     /**
@@ -99,11 +162,18 @@ dwv.io.UrlsLoader.prototype.onloadend = function () {};
 dwv.io.UrlsLoader.prototype.onprogress = function (/*event*/) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event, 'event.message'
- *  should be the error message.
+ * @param {Object} event The error event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
 dwv.io.UrlsLoader.prototype.onerror = function (/*event*/) {};
+/**
+ * Handle an abort event.
+ * @param {Object} event The abort event with an
+ *  optional 'event.message'.
+ * Default does nothing.
+ */
+dwv.io.UrlsLoader.prototype.onabort = function (/*event*/) {};
 
 /**
  * Load a list of URLs.
@@ -113,6 +183,10 @@ dwv.io.UrlsLoader.prototype.onerror = function (/*event*/) {};
  */
 dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
 {
+    // clear storage
+    this.clearStoredRequests();
+    this.clearStoredLoader();
+
     // closure to self for handlers
     var self = this;
     // set the number of data to load
@@ -134,11 +208,31 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
         loader.onload = self.onload;
         loader.onloadend = self.addLoaded;
         loader.onerror = self.onerror;
+        loader.onabort = self.onabort;
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
         });
         loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
     }
+
+    // request onerror handler
+    var getRequestOnError = function (origin) {
+        return function (/*event*/) {
+            var message = "An error occurred while downloading '" + origin + "'";
+            if (typeof this.status !== "undefined") {
+                message += " (http status: " + this.status + ")";
+            }
+            message += ".";
+            self.onerror( {'name': "RequestError", 'message': message } );
+        };
+    };
+
+    // request onabort handler
+    var getRequestOnAbort = function (origin) {
+        return function () {
+            self.onabort( {'message': "Abort while downloading '" + origin + "'." } );
+        };
+    };
 
     // loop on I/O elements
     for (var i = 0; i < ioArray.length; ++i)
@@ -146,6 +240,9 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
         var url = ioArray[i];
         var request = new XMLHttpRequest();
         request.open('GET', url, true);
+
+        // store request
+        this.storeRequest(request);
 
         // optional request headers
         if ( typeof options.requestHeaders !== "undefined" ) {
@@ -168,9 +265,12 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
             loader = loaders[l];
             if (loader.canLoadUrl(url)) {
                 foundLoader = true;
+                // store loader
+                this.storeLoader(loader);
                 // set reader callbacks
                 request.onload = loader.getUrlLoadHandler(url, i);
-                request.onerror = loader.getErrorHandler(url);
+                request.onerror = getRequestOnError(url);
+                request.onabort = getRequestOnAbort(url);
                 // response type (default is 'text')
                 if (loader.loadUrlAs() === dwv.io.urlContentTypes.ArrayBuffer) {
                     request.responseType = "arraybuffer";

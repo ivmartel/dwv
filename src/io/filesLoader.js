@@ -24,6 +24,20 @@ dwv.io.FilesLoader = function ()
     var self = this;
 
     /**
+     * Array of launched readers (used in abort).
+     * @private
+     * @type Array
+     */
+    var readers = [];
+
+    /**
+     * Launched loader (used in abort).
+     * @private
+     * @type Object
+     */
+    var runningLoader = [];
+
+    /**
      * Number of data to load.
      * @private
      * @type Number
@@ -57,6 +71,55 @@ dwv.io.FilesLoader = function ()
      */
     this.setDefaultCharacterSet = function (characterSet) {
         defaultCharacterSet = characterSet;
+    };
+
+    /**
+     * Store a launched reader.
+     * @param {Object} request The launched reader.
+     */
+    this.storeReader = function (reader) {
+        readers.push(reader);
+    };
+
+    /**
+     * Clear the stored readers.
+     */
+    this.clearStoredReaders = function () {
+        readers = [];
+    };
+
+    /**
+     * Store the launched loader.
+     * @param {Object} loader The launched loader.
+     */
+    this.storeLoader = function (loader) {
+        runningLoader = loader;
+    };
+
+    /**
+     * Clear the stored loader.
+     */
+    this.clearStoredLoader = function () {
+        runningLoader = null;
+    };
+
+    /**
+     * Abort a URLs load.
+     */
+    this.abort = function () {
+        // abort readers
+        for ( var i = 0; i < readers.length; ++i ) {
+            // 0: EMPTY, 1: LOADING, 2: DONE
+            if ( readers[i].readyState === 1 ) {
+                readers[i].abort();
+            }
+        }
+        this.clearStoredReaders();
+        // abort loader
+        if ( runningLoader ) {
+            runningLoader.abort();
+        }
+        this.clearStoredLoader();
     };
 
     /**
@@ -100,11 +163,18 @@ dwv.io.FilesLoader.prototype.onloadend = function () {};
 dwv.io.FilesLoader.prototype.onprogress = function (/*event*/) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event, 'event.message'
- *  should be the error message.
+ * @param {Object} event The error event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
 dwv.io.FilesLoader.prototype.onerror = function (/*event*/) {};
+/**
+ * Handle an abort event.
+ * @param {Object} event The abort event with an
+ *  optional 'event.message'.
+ * Default does nothing.
+ */
+dwv.io.FilesLoader.prototype.onabort = function (/*event*/) {};
 
 /**
  * Load a list of files.
@@ -113,6 +183,10 @@ dwv.io.FilesLoader.prototype.onerror = function (/*event*/) {};
  */
 dwv.io.FilesLoader.prototype.load = function (ioArray)
 {
+    // clear storage
+    this.clearStoredReaders();
+    this.clearStoredLoader();
+
     // closure to self for handlers
     var self = this;
     // set the number of data to load
@@ -134,17 +208,40 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
         loader.onload = self.onload;
         loader.onloadend = self.addLoaded;
         loader.onerror = self.onerror;
+        loader.onabort = self.onabort;
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
         });
         loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
     }
 
+    // request onerror handler
+    var getReaderOnError = function (origin) {
+        return function (event) {
+            var message = "An error occurred while reading '" + origin + "'";
+            if (typeof event.getMessage !== "undefined") {
+                message += " (" + event.getMessage() + ")";
+            }
+            message += ".";
+            self.onerror( {'name': "FileReaderError", 'message': message } );
+        };
+    };
+
+    // request onabort handler
+    var getReaderOnAbort = function (origin) {
+        return function () {
+            self.onabort( {'message': "Abort while reading '" + origin + "'" } );
+        };
+    };
+
     // loop on I/O elements
     for (var i = 0; i < ioArray.length; ++i)
     {
         var file = ioArray[i];
         var reader = new FileReader();
+
+        // store reader
+        this.storeReader(reader);
 
         // bind reader progress
         reader.onprogress = mproghandler.getMonoProgressHandler(i, 0);
@@ -155,9 +252,12 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
             loader = loaders[l];
             if (loader.canLoadFile(file)) {
                 foundLoader = true;
+                // store loader
+                this.storeLoader(loader);
                 // set reader callbacks
                 reader.onload = loader.getFileLoadHandler(file, i);
-                reader.onerror = loader.getErrorHandler(file.name);
+                reader.onerror = getReaderOnError(file.name);
+                reader.onabort = getReaderOnAbort(file.name);
                 // read
                 if (loader.loadFileAs() === dwv.io.fileContentTypes.Text) {
                     reader.readAsText(file);

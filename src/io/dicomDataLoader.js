@@ -18,11 +18,26 @@ dwv.io.DicomDataLoader = function ()
     var options = {};
 
     /**
+     * Loading flag.
+     * @private
+     * @type Boolean
+     */
+    var isLoading = false;
+
+    /**
      * Set the loader options.
      * @param {Object} opt The input options.
      */
     this.setOptions = function (opt) {
         options = opt;
+    };
+
+    /**
+     * Is the load ongoing?
+     * @return {Boolean} True if loading.
+     */
+    this.isLoading = function () {
+        return isLoading;
     };
 
     /**
@@ -37,20 +52,41 @@ dwv.io.DicomDataLoader = function ()
      * @param {Number} index The data index.
      */
     this.load = function (buffer, origin, index) {
+        // set loading flag
+        isLoading = true;
         // set character set
         if (typeof options.defaultCharacterSet !== "undefined") {
             db2v.setDefaultCharacterSet(options.defaultCharacterSet);
         }
         // connect handlers
         db2v.onload = self.onload;
-        db2v.onloadend = self.onloadend;
+        db2v.onloadend = function () {
+            // reset loading flag
+            isLoading = false;
+            // call listeners
+            self.onloadend();
+        };
         db2v.onprogress = self.onprogress;
         // convert
         try {
             db2v.convert( buffer, index );
         } catch (error) {
+            // TODO: error will be for individual file, isLoading is global...
+            //isLoading = false;
             self.onerror(error);
         }
+    };
+
+    /**
+     * Abort load.
+     */
+    this.abort = function () {
+        // abort conversion
+        db2v.abort();
+        // reset loading flag
+        isLoading = false;
+        // call listeners
+        self.onabort({message: "Abort while loading DICOM data."});
     };
 
     /**
@@ -84,25 +120,6 @@ dwv.io.DicomDataLoader = function ()
             }
             // load
             self.load(this.response, url, index);
-        };
-    };
-
-    /**
-     * Get an error handler.
-     * @param {String} origin The file.name/url at the origin of the error.
-     * @return {Function} An error handler.
-     */
-    this.getErrorHandler = function (origin) {
-        return function (event) {
-            var message = "";
-            if (typeof event.getMessage !== "undefined") {
-                message = event.getMessage();
-            } else if (typeof this.status !== "undefined") {
-                message = "http status: " + this.status;
-            }
-            self.onerror( {'name': "RequestError",
-                'message': "An error occurred while reading '" + origin +
-                "' (" + message + ") [DicomDataLoader]" } );
         };
     };
 
@@ -170,18 +187,25 @@ dwv.io.DicomDataLoader.prototype.onload = function (/*event*/) {};
  */
 dwv.io.DicomDataLoader.prototype.onloadend = function () {};
 /**
- * Handle an error event.
- * @param {Object} event The error event, 'event.message'
- *  should be the error message.
- * Default does nothing.
- */
-dwv.io.DicomDataLoader.prototype.onerror = function (/*event*/) {};
-/**
  * Handle a progress event.
  * @param {Object} event The progress event.
  * Default does nothing.
  */
 dwv.io.DicomDataLoader.prototype.onprogress = function (/*event*/) {};
+/**
+ * Handle an error event.
+ * @param {Object} event The error event with an
+ *  optional 'event.message'.
+ * Default does nothing.
+ */
+dwv.io.DicomDataLoader.prototype.onerror = function (/*event*/) {};
+/**
+ * Handle an abort event.
+ * @param {Object} event The abort event with an
+ *  optional 'event.message'.
+ * Default does nothing.
+ */
+dwv.io.DicomDataLoader.prototype.onabort = function (/*event*/) {};
 
 /**
  * Add to Loader list.

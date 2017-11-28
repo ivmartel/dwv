@@ -550,6 +550,16 @@ dwv.App = function ()
      */
     function loadImageData(data, loader, options)
     {
+        // allow to cancel
+        var previousOnKeyDown = window.onkeydown;
+        window.onkeydown = function (event) {
+            if (event.ctrlKey && event.keyCode === 88 ) // crtl-x
+            {
+                console.log("crtl-x pressed!");
+                loader.abort();
+            }
+        };
+
         // clear variables
         self.reset();
         // first data name
@@ -575,7 +585,9 @@ dwv.App = function ()
             postLoadInit(data);
         };
         loader.onerror = function (error) { handleError(error); };
+        loader.onabort = function (error) { handleAbort(error); };
         loader.onloadend = function (/*event*/) {
+            window.onkeydown = previousOnKeyDown;
             if ( drawController ) {
                 drawController.activateDrawLayer(viewController);
             }
@@ -1234,7 +1246,7 @@ dwv.App = function ()
     {
         // alert window
         if ( error.name && error.message) {
-            alert(error.name+": "+error.message+".");
+            alert(error.name+": "+error.message);
         }
         else {
             alert("Error: "+error+".");
@@ -1242,6 +1254,24 @@ dwv.App = function ()
         // log
         if ( error.stack ) {
             console.error(error.stack);
+        }
+        // stop progress
+        dwv.gui.displayProgress(100);
+    }
+
+    /**
+     * Handle an abort: display it to the user.
+     * @param {Object} error The error to handle.
+     * @private
+     */
+    function handleAbort(error)
+    {
+        // log
+        if ( error.message ) {
+            console.warn(error.message);
+        }
+        else {
+            console.warn("Abort called.");
         }
         // stop progress
         dwv.gui.displayProgress(100);

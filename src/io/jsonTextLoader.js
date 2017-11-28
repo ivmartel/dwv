@@ -11,11 +11,26 @@ dwv.io.JSONTextLoader = function ()
     var self = this;
 
     /**
+     * Loading flag.
+     * @private
+     * @type Boolean
+     */
+    var isLoading = false;
+
+    /**
      * Set the loader options.
      * @param {Object} opt The input options.
      */
     this.setOptions = function () {
         // does nothing
+    };
+
+    /**
+     * Is the load ongoing?
+     * @return {Boolean} True if loading.
+     */
+    this.isLoading = function () {
+        return isLoading;
     };
 
     /**
@@ -25,14 +40,29 @@ dwv.io.JSONTextLoader = function ()
      * @param {Number} index The data index.
      */
     this.load = function (text, origin, index) {
+        // set loading flag
+        isLoading = true;
         try {
             self.onload( text );
+            // reset loading flag
+            isLoading = false;
+            // call listeners
             self.onloadend();
         } catch (error) {
             self.onerror(error);
         }
         self.onprogress({'type': 'read-progress', 'lengthComputable': true,
             'loaded': 100, 'total': 100, 'index': index});
+    };
+
+    /**
+     * Abort load: pass to listeners.
+     */
+    this.abort = function () {
+        // reset loading flag
+        isLoading = false;
+        // call listeners
+        self.onabort();
     };
 
     /**
@@ -66,25 +96,6 @@ dwv.io.JSONTextLoader = function ()
             }
             // load
             self.load(this.responseText, url, index);
-        };
-    };
-
-    /**
-     * Get an error handler.
-     * @param {String} origin The file.name/url at the origin of the error.
-     * @return {Function} An error handler.
-     */
-    this.getErrorHandler = function (origin) {
-        return function (event) {
-            var message = "";
-            if (typeof event.getMessage !== "undefined") {
-                message = event.getMessage();
-            } else if (typeof this.status !== "undefined") {
-                message = "http status: " + this.status;
-            }
-            self.onerror( {'name': "RequestError",
-                'message': "An error occurred while reading '" + origin +
-                "' (" + message + ") [JSONTextLoader]" } );
         };
     };
 
@@ -139,18 +150,25 @@ dwv.io.JSONTextLoader.prototype.onload = function (/*event*/) {};
  */
 dwv.io.JSONTextLoader.prototype.onloadend = function () {};
 /**
- * Handle an error event.
- * @param {Object} event The error event, 'event.message'
- *  should be the error message.
- * Default does nothing.
- */
-dwv.io.JSONTextLoader.prototype.onerror = function (/*event*/) {};
-/**
  * Handle a progress event.
  * @param {Object} event The progress event.
  * Default does nothing.
  */
 dwv.io.JSONTextLoader.prototype.onprogress = function (/*event*/) {};
+/**
+ * Handle an error event.
+ * @param {Object} event The error event with an
+ *  optional 'event.message'.
+ * Default does nothing.
+ */
+dwv.io.JSONTextLoader.prototype.onerror = function (/*event*/) {};
+/**
+ * Handle an abort event.
+ * @param {Object} event The abort event with an
+ *  optional 'event.message'.
+ * Default does nothing.
+ */
+dwv.io.JSONTextLoader.prototype.onabort = function (/*event*/) {};
 
 /**
  * Add to Loader list.
