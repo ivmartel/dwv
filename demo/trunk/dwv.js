@@ -645,7 +645,7 @@ dwv.App = function ()
             postLoadInit(data);
         };
         loader.onerror = function (error) { handleError(error); };
-        loader.onabort = function () { handleAbort(); };
+        loader.onabort = function (error) { handleAbort(error); };
         loader.onloadend = function (/*event*/) {
             window.onkeydown = previousOnKeyDown;
             if ( drawController ) {
@@ -1306,7 +1306,7 @@ dwv.App = function ()
     {
         // alert window
         if ( error.name && error.message) {
-            alert(error.name+": "+error.message+".");
+            alert(error.name+": "+error.message);
         }
         else {
             alert("Error: "+error+".");
@@ -1321,12 +1321,18 @@ dwv.App = function ()
 
     /**
      * Handle an abort: display it to the user.
+     * @param {Object} error The error to handle.
      * @private
      */
-    function handleAbort()
+    function handleAbort(error)
     {
         // log
-        console.warn("Abort called.");
+        if ( error.message ) {
+            console.warn(error.message);
+        }
+        else {
+            console.warn("Abort called.");
+        }
         // stop progress
         dwv.gui.displayProgress(100);
     }
@@ -16358,11 +16364,26 @@ dwv.io.DicomDataLoader = function ()
     var options = {};
 
     /**
+     * Loading flag.
+     * @private
+     * @type Boolean
+     */
+    var isLoading = false;
+
+    /**
      * Set the loader options.
      * @param {Object} opt The input options.
      */
     this.setOptions = function (opt) {
         options = opt;
+    };
+
+    /**
+     * Is the load ongoing?
+     * @return {Boolean} True if loading.
+     */
+    this.isLoading = function () {
+        return isLoading;
     };
 
     /**
@@ -16377,28 +16398,41 @@ dwv.io.DicomDataLoader = function ()
      * @param {Number} index The data index.
      */
     this.load = function (buffer, origin, index) {
+        // set loading flag
+        isLoading = true;
         // set character set
         if (typeof options.defaultCharacterSet !== "undefined") {
             db2v.setDefaultCharacterSet(options.defaultCharacterSet);
         }
         // connect handlers
         db2v.onload = self.onload;
-        db2v.onloadend = self.onloadend;
+        db2v.onloadend = function () {
+            // reset loading flag
+            isLoading = false;
+            // call listeners
+            self.onloadend();
+        };
         db2v.onprogress = self.onprogress;
         // convert
         try {
             db2v.convert( buffer, index );
         } catch (error) {
+            // TODO: error will be for individual file, isLoading is global...
+            //isLoading = false;
             self.onerror(error);
         }
     };
 
     /**
-     * Abort load: pass to listeners.
+     * Abort load.
      */
     this.abort = function () {
+        // abort conversion
         db2v.abort();
-        self.onabort();
+        // reset loading flag
+        isLoading = false;
+        // call listeners
+        self.onabort({message: "Abort while loading DICOM data."});
     };
 
     /**
@@ -16432,25 +16466,6 @@ dwv.io.DicomDataLoader = function ()
             }
             // load
             self.load(this.response, url, index);
-        };
-    };
-
-    /**
-     * Get an error handler.
-     * @param {String} origin The file.name/url at the origin of the error.
-     * @return {Function} An error handler.
-     */
-    this.getErrorHandler = function (origin) {
-        return function (event) {
-            var message = "";
-            if (typeof event.getMessage !== "undefined") {
-                message = event.getMessage();
-            } else if (typeof this.status !== "undefined") {
-                message = "http status: " + this.status;
-            }
-            self.onerror( {'name': "RequestError",
-                'message': "An error occurred while reading '" + origin +
-                "' (" + message + ") [DicomDataLoader]" } );
         };
     };
 
@@ -16525,16 +16540,18 @@ dwv.io.DicomDataLoader.prototype.onloadend = function () {};
 dwv.io.DicomDataLoader.prototype.onprogress = function (/*event*/) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event, 'event.message'
- *  should be the error message.
+ * @param {Object} event The error event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
 dwv.io.DicomDataLoader.prototype.onerror = function (/*event*/) {};
 /**
  * Handle an abort event.
+ * @param {Object} event The abort event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
-dwv.io.DicomDataLoader.prototype.onabort = function () {};
+dwv.io.DicomDataLoader.prototype.onabort = function (/*event*/) {};
 
 /**
  * Add to Loader list.
@@ -16707,11 +16724,18 @@ dwv.io.FilesLoader.prototype.onloadend = function () {};
 dwv.io.FilesLoader.prototype.onprogress = function (/*event*/) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event, 'event.message'
- *  should be the error message.
+ * @param {Object} event The error event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
 dwv.io.FilesLoader.prototype.onerror = function (/*event*/) {};
+/**
+ * Handle an abort event.
+ * @param {Object} event The abort event with an
+ *  optional 'event.message'.
+ * Default does nothing.
+ */
+dwv.io.FilesLoader.prototype.onabort = function (/*event*/) {};
 
 /**
  * Load a list of files.
@@ -16745,11 +16769,31 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
         loader.onload = self.onload;
         loader.onloadend = self.addLoaded;
         loader.onerror = self.onerror;
+        loader.onabort = self.onabort;
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
         });
         loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
     }
+
+    // request onerror handler
+    var getReaderOnError = function (origin) {
+        return function (event) {
+            var message = "An error occurred while reading '" + origin + "'";
+            if (typeof event.getMessage !== "undefined") {
+                message += " (" + event.getMessage() + ")";
+            }
+            message += ".";
+            self.onerror( {'name': "FileReaderError", 'message': message } );
+        };
+    };
+
+    // request onabort handler
+    var getReaderOnAbort = function (origin) {
+        return function () {
+            self.onabort( {'message': "Abort while reading '" + origin + "'" } );
+        };
+    };
 
     // loop on I/O elements
     for (var i = 0; i < ioArray.length; ++i)
@@ -16773,8 +16817,8 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
                 this.storeLoader(loader);
                 // set reader callbacks
                 reader.onload = loader.getFileLoadHandler(file, i);
-                reader.onerror = loader.getErrorHandler(file.name);
-                reader.onabort = self.onabort;
+                reader.onerror = getReaderOnError(file.name);
+                reader.onabort = getReaderOnAbort(file.name);
                 // read
                 if (loader.loadFileAs() === dwv.io.fileContentTypes.Text) {
                     reader.readAsText(file);
@@ -16807,11 +16851,26 @@ dwv.io.JSONTextLoader = function ()
     var self = this;
 
     /**
+     * Loading flag.
+     * @private
+     * @type Boolean
+     */
+    var isLoading = false;
+
+    /**
      * Set the loader options.
      * @param {Object} opt The input options.
      */
     this.setOptions = function () {
         // does nothing
+    };
+
+    /**
+     * Is the load ongoing?
+     * @return {Boolean} True if loading.
+     */
+    this.isLoading = function () {
+        return isLoading;
     };
 
     /**
@@ -16821,8 +16880,13 @@ dwv.io.JSONTextLoader = function ()
      * @param {Number} index The data index.
      */
     this.load = function (text, origin, index) {
+        // set loading flag
+        isLoading = true;
         try {
             self.onload( text );
+            // reset loading flag
+            isLoading = false;
+            // call listeners
             self.onloadend();
         } catch (error) {
             self.onerror(error);
@@ -16835,6 +16899,9 @@ dwv.io.JSONTextLoader = function ()
      * Abort load: pass to listeners.
      */
     this.abort = function () {
+        // reset loading flag
+        isLoading = false;
+        // call listeners
         self.onabort();
     };
 
@@ -16869,25 +16936,6 @@ dwv.io.JSONTextLoader = function ()
             }
             // load
             self.load(this.responseText, url, index);
-        };
-    };
-
-    /**
-     * Get an error handler.
-     * @param {String} origin The file.name/url at the origin of the error.
-     * @return {Function} An error handler.
-     */
-    this.getErrorHandler = function (origin) {
-        return function (event) {
-            var message = "";
-            if (typeof event.getMessage !== "undefined") {
-                message = event.getMessage();
-            } else if (typeof this.status !== "undefined") {
-                message = "http status: " + this.status;
-            }
-            self.onerror( {'name': "RequestError",
-                'message': "An error occurred while reading '" + origin +
-                "' (" + message + ") [JSONTextLoader]" } );
         };
     };
 
@@ -16949,16 +16997,18 @@ dwv.io.JSONTextLoader.prototype.onloadend = function () {};
 dwv.io.JSONTextLoader.prototype.onprogress = function (/*event*/) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event, 'event.message'
- *  should be the error message.
+ * @param {Object} event The error event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
 dwv.io.JSONTextLoader.prototype.onerror = function (/*event*/) {};
 /**
  * Handle an abort event.
+ * @param {Object} event The abort event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
-dwv.io.JSONTextLoader.prototype.onabort = function () {};
+dwv.io.JSONTextLoader.prototype.onabort = function (/*event*/) {};
 
 /**
  * Add to Loader list.
@@ -16984,11 +17034,11 @@ dwv.io.MemoryLoader = function ()
     var self = this;
 
     /**
-     * Array of launched loaders used in abort.
+     * Launched loader (used in abort).
      * @private
-     * @type Array
+     * @type Object
      */
-    var loaders = [];
+    var runningLoader = null;
 
     /**
      * Number of data to load.
@@ -17031,24 +17081,22 @@ dwv.io.MemoryLoader = function ()
      * @param {Object} loader The launched loader.
      */
     this.storeLoader = function (loader) {
-        loaders.push(loader);
+        runningLoader = loader;
     };
 
     /**
-     * Clear the stored loaders.
+     * Clear the stored loader.
      */
-    this.clearStoredLoaders = function () {
-        loaders = [];
+    this.clearStoredLoader = function () {
+        runningLoader = null;
     };
 
     /**
      * Abort a memory load.
      */
     this.abort = function () {
-        // abort loaders
-        for ( var i = 0; i < loaders.length; ++i ) {
-            loaders[i].abort();
-        }
+        // abort loader
+        runningLoader.abort();
         this.clearStoredLoaders();
     };
 
@@ -17093,16 +17141,18 @@ dwv.io.MemoryLoader.prototype.onloadend = function () {};
 dwv.io.MemoryLoader.prototype.onprogress = function (/*event*/) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event, 'event.message'
- *  should be the error message.
+ * @param {Object} event The error event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
 dwv.io.MemoryLoader.prototype.onerror = function (/*event*/) {};
 /**
  * Handle an abort event.
+ * @param {Object} event The abort event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
-dwv.io.MemoryLoader.prototype.onabort = function () {};
+dwv.io.MemoryLoader.prototype.onabort = function (/*event*/) {};
 
 /**
  * Load a list of buffers.
@@ -17110,6 +17160,9 @@ dwv.io.MemoryLoader.prototype.onabort = function () {};
  */
 dwv.io.MemoryLoader.prototype.load = function (ioArray)
 {
+    // clear storage
+    this.clearStoredLoader();
+
     // closure to self for handlers
     var self = this;
     // set the number of data to load
@@ -17131,6 +17184,7 @@ dwv.io.MemoryLoader.prototype.load = function (ioArray)
         loader.onload = self.onload;
         loader.onloadend = self.addLoaded;
         loader.onerror = self.onerror;
+        loader.onabort = self.onabort;
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
         });
@@ -17184,6 +17238,14 @@ dwv.io.RawImageLoader = function ()
     };
 
     /**
+     * Is the load ongoing? TODO...
+     * @return {Boolean} True if loading.
+     */
+    this.isLoading = function () {
+        return true;
+    };
+
+    /**
      * Create a Data URI from an HTTP request response.
      * @param {Object} response The HTTP request response.
      * @param {String} dataType The data type.
@@ -17232,7 +17294,7 @@ dwv.io.RawImageLoader = function ()
     };
 
     /**
-     * Abort load: pass to listeners.
+     * Abort load. TODO...
      */
     this.abort = function () {
         self.onabort();
@@ -17270,25 +17332,6 @@ dwv.io.RawImageLoader = function ()
             // load
             var ext = url.split('.').pop().toLowerCase();
             self.load(createDataUri(this.response, ext), url, index);
-        };
-    };
-
-    /**
-     * Get an error handler.
-     * @param {String} origin The file.name/url at the origin of the error.
-     * @return {Function} An error handler.
-     */
-    this.getErrorHandler = function (origin) {
-        return function (event) {
-            var message = "";
-            if (typeof event.getMessage !== "undefined") {
-                message = event.getMessage();
-            } else if (typeof this.status !== "undefined") {
-                message = "http status: " + this.status;
-            }
-            self.onerror( {'name': "RequestError",
-                'message': "An error occurred while reading '" + origin +
-                "' (" + message + ") [RawImageLoader]" } );
         };
     };
 
@@ -17356,16 +17399,18 @@ dwv.io.RawImageLoader.prototype.onloadend = function () {};
 dwv.io.RawImageLoader.prototype.onprogress = function (/*event*/) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event, 'event.message'
- *  should be the error message.
+ * @param {Object} event The error event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
 dwv.io.RawImageLoader.prototype.onerror = function (/*event*/) {};
 /**
  * Handle an abort event.
+ * @param {Object} event The abort event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
-dwv.io.RawImageLoader.prototype.onabort = function () {};
+dwv.io.RawImageLoader.prototype.onabort = function (/*event*/) {};
 
 /**
  * Add to Loader list.
@@ -17393,6 +17438,14 @@ dwv.io.RawVideoLoader = function ()
      */
     this.setOptions = function () {
         // does nothing
+    };
+
+    /**
+     * Is the load ongoing? TODO...
+     * @return {Boolean} True if loading.
+     */
+    this.isLoading = function () {
+        return true;
     };
 
     /**
@@ -17437,7 +17490,7 @@ dwv.io.RawVideoLoader = function ()
     };
 
     /**
-     * Abort load: pass to listeners.
+     * Abort load. TODO...
      */
     this.abort = function () {
         self.onabort();
@@ -17475,25 +17528,6 @@ dwv.io.RawVideoLoader = function ()
             // load
             var ext = url.split('.').pop().toLowerCase();
             self.load(createDataUri(this.response, ext), url, index);
-        };
-    };
-
-    /**
-     * Get an error handler.
-     * @param {String} origin The file.name/url at the origin of the error.
-     * @return {Function} An error handler.
-     */
-    this.getErrorHandler = function (origin) {
-        return function (event) {
-            var message = "";
-            if (typeof event.getMessage !== "undefined") {
-                message = event.getMessage();
-            } else if (typeof this.status !== "undefined") {
-                message = "http status: " + this.status;
-            }
-            self.onerror( {'name': "RequestError",
-                'message': "An error occurred while reading '" + origin +
-                "' (" + message + ") [RawVideoLoader]" } );
         };
     };
 
@@ -17555,16 +17589,18 @@ dwv.io.RawVideoLoader.prototype.onloadend = function () {};
 dwv.io.RawVideoLoader.prototype.onprogress = function (/*event*/) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event, 'event.message'
- *  should be the error message.
+ * @param {Object} event The error event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
 dwv.io.RawVideoLoader.prototype.onerror = function (/*event*/) {};
 /**
  * Handle an abort event.
+ * @param {Object} event The abort event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
-dwv.io.RawVideoLoader.prototype.onabort = function () {};
+dwv.io.RawVideoLoader.prototype.onabort = function (/*event*/) {};
 
 /**
  * Add to Loader list.
@@ -17689,7 +17725,7 @@ dwv.io.UrlsLoader = function ()
         }
         this.clearStoredRequests();
         // abort loader
-        if ( runningLoader ) {
+        if ( runningLoader && runningLoader.isLoading() ) {
             runningLoader.abort();
         }
         this.clearStoredLoader();
@@ -17736,16 +17772,18 @@ dwv.io.UrlsLoader.prototype.onloadend = function () {};
 dwv.io.UrlsLoader.prototype.onprogress = function (/*event*/) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event, 'event.message'
- *  should be the error message.
+ * @param {Object} event The error event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
 dwv.io.UrlsLoader.prototype.onerror = function (/*event*/) {};
 /**
  * Handle an abort event.
+ * @param {Object} event The abort event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
-dwv.io.UrlsLoader.prototype.onabort = function () {};
+dwv.io.UrlsLoader.prototype.onabort = function (/*event*/) {};
 
 /**
  * Load a list of URLs.
@@ -17787,6 +17825,25 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
         loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
     }
 
+    // request onerror handler
+    var getRequestOnError = function (origin) {
+        return function (/*event*/) {
+            var message = "An error occurred while downloading '" + origin + "'";
+            if (typeof this.status !== "undefined") {
+                message += " (http status: " + this.status + ")";
+            }
+            message += ".";
+            self.onerror( {'name': "RequestError", 'message': message } );
+        };
+    };
+
+    // request onabort handler
+    var getRequestOnAbort = function (origin) {
+        return function () {
+            self.onabort( {'message': "Abort while downloading '" + origin + "'." } );
+        };
+    };
+
     // loop on I/O elements
     for (var i = 0; i < ioArray.length; ++i)
     {
@@ -17822,8 +17879,8 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
                 this.storeLoader(loader);
                 // set reader callbacks
                 request.onload = loader.getUrlLoadHandler(url, i);
-                request.onerror = loader.getErrorHandler(url);
-                request.onabort = self.onabort;
+                request.onerror = getRequestOnError(url);
+                request.onabort = getRequestOnAbort(url);
                 // response type (default is 'text')
                 if (loader.loadUrlAs() === dwv.io.urlContentTypes.ArrayBuffer) {
                     request.responseType = "arraybuffer";
@@ -17863,11 +17920,26 @@ dwv.io.ZipLoader = function ()
     var options = {};
 
     /**
+     * Loading flag.
+     * @private
+     * @type Boolean
+     */
+    var isLoading = false;
+
+    /**
      * Set the loader options.
      * @param {Object} opt The input options.
      */
     this.setOptions = function (opt) {
         options = opt;
+    };
+
+    /**
+     * Is the load ongoing?
+     * @return {Boolean} True if loading.
+     */
+    this.isLoading = function () {
+        return isLoading;
     };
 
     var filename = "";
@@ -17891,7 +17963,12 @@ dwv.io.ZipLoader = function ()
     	else {
             var memoryIO = new dwv.io.MemoryLoader();
             memoryIO.onload = self.onload;
-            memoryIO.onloadend = self.onloadend;
+            memoryIO.onloadend = function () {
+                // reset loading flag
+                isLoading = false;
+                // call listeners
+                self.onloadend();
+            };
             memoryIO.onprogress = self.onprogress;
             memoryIO.onerror = self.onerror;
             memoryIO.onabort = self.onabort;
@@ -17907,6 +17984,9 @@ dwv.io.ZipLoader = function ()
      * @param {Number} index The data index.
      */
     this.load = function (buffer/*, origin, index*/) {
+        // set loading flag
+        isLoading = true;
+
         JSZip.loadAsync(buffer).then( function(zip) {
             files = [];
         	zobjs = zip.file(/.*\.dcm/);
@@ -17921,6 +18001,9 @@ dwv.io.ZipLoader = function ()
      * Abort load: pass to listeners.
      */
     this.abort = function () {
+        // reset loading flag
+        isLoading = false;
+        // call listeners
         self.onabort();
     };
 
@@ -17955,25 +18038,6 @@ dwv.io.ZipLoader = function ()
             }
             // load
             self.load(this.response, url, index);
-        };
-    };
-
-    /**
-     * Get an error handler.
-     * @param {String} origin The file.name/url at the origin of the error.
-     * @return {Function} An error handler.
-     */
-    this.getErrorHandler = function (origin) {
-        return function (event) {
-            var message = "";
-            if (typeof event.getMessage !== "undefined") {
-                message = event.getMessage();
-            } else if (typeof this.status !== "undefined") {
-                message = "http status: " + this.status;
-            }
-            self.onerror( {'name': "RequestError",
-                'message': "An error occurred while reading '" + origin +
-                "' (" + message + ") [ZipLoader]" } );
         };
     };
 
@@ -18035,16 +18099,18 @@ dwv.io.ZipLoader.prototype.onloadend = function () {};
 dwv.io.ZipLoader.prototype.onprogress = function (/*event*/) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event, 'event.message'
- *  should be the error message.
+ * @param {Object} event The error event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
 dwv.io.ZipLoader.prototype.onerror = function (/*event*/) {};
 /**
  * Handle an abort event.
+ * @param {Object} event The abort event with an
+ *  optional 'event.message'.
  * Default does nothing.
  */
-dwv.io.ZipLoader.prototype.onabort = function () {};
+dwv.io.ZipLoader.prototype.onabort = function (/*event*/) {};
 
 /**
  * Add to Loader list.
@@ -25192,28 +25258,24 @@ dwv.utils = dwv.utils || {};
  * Thread Pool.
  * Highly inspired from {@link http://www.smartjava.org/content/html5-easily-parallelize-jobs-using-web-workers-and-threadpool}.
  * @constructor
- * @param {Number} size The size of the pool.
+ * @param {Number} poolSize The size of the pool.
  */
-dwv.utils.ThreadPool = function (size) {
-    // closure to self
-    var self = this;
-    // task queue
-    this.taskQueue = [];
-    // available worker queue
-    this.workerQueue = [];
-    // list of running threads
-    var runningThreads = [];
+dwv.utils.ThreadPool = function (poolSize) {
 
-    // pool size
-    this.poolSize = size;
+    // task queue
+    var taskQueue = [];
+    // lsit of available threads
+    var freeThreads = [];
+    // list of running threads (unsed in abort)
+    var runningThreads = [];
 
     /**
      * Initialise.
      */
     this.init = function () {
-        // create 'size' number of worker threads
-        for (var i = 0; i < size; ++i) {
-            self.workerQueue.push(new dwv.utils.WorkerThread(self));
+        // create 'poolSize' number of worker threads
+        for (var i = 0; i < poolSize; ++i) {
+            freeThreads.push(new dwv.utils.WorkerThread(this));
         }
     };
 
@@ -25223,14 +25285,16 @@ dwv.utils.ThreadPool = function (size) {
      * @return {Object} workerTask The task to add.
      */
     this.addWorkerTask = function (workerTask) {
-        if (self.workerQueue.length > 0) {
-            // get the worker thread from the front of the queue
-            var workerThread = self.workerQueue.shift();
+        if (freeThreads.length > 0) {
+            // get the first free worker thread
+            var workerThread = freeThreads.shift();
+            // run the input task
             workerThread.run(workerTask);
+            // add the thread to the runnning list
             runningThreads.push(workerThread);
         } else {
-            // no free workers, add to queue
-            self.taskQueue.push(workerTask);
+            // no free thread, add task to queue
+            taskQueue.push(workerTask);
         }
     };
 
@@ -25239,7 +25303,7 @@ dwv.utils.ThreadPool = function (size) {
      */
     this.abort = function () {
         // clear tasks
-        this.taskQueue = [];
+        taskQueue = [];
         // cancel running workers
         for (var i = 0; i < runningThreads.length; ++i) {
             runningThreads[i].stop();
@@ -25254,17 +25318,26 @@ dwv.utils.ThreadPool = function (size) {
      * @param {Object} workerThread The thread to free.
      */
     this.freeWorkerThread = function (workerThread) {
-        self.onworkerend();
-        if (self.taskQueue.length > 0) {
-            // don't put back in queue, but execute next task
-            var workerTask = self.taskQueue.shift();
+        // send worker end
+        this.onworkerend();
+
+        if (taskQueue.length > 0) {
+            // get waiting task
+            var workerTask = taskQueue.shift();
+            // use input thread to run the waiting task
             workerThread.run(workerTask);
         } else {
-            // no task to run, add to queue
-            self.workerQueue.push(workerThread);
+            // no task to run, add to free list
+            freeThreads.push(workerThread);
+            // remove from running list
+            for ( var i = 0; i < runningThreads.length; ++i ) {
+                if ( runningThreads[i] === workerThread ) {
+                    runningThreads.splice(i, 1);
+                }
+            }
             // the work is done when the queue is back to its initial size
-            if ( self.workerQueue.length === size ) {
-                self.onpoolworkend();
+            if ( freeThreads.length === poolSize ) {
+                this.onpoolworkend();
             }
         }
     };
@@ -25272,19 +25345,14 @@ dwv.utils.ThreadPool = function (size) {
 
 /**
  * Handle a pool work end event.
+ * Default does nothing.
  */
-dwv.utils.ThreadPool.prototype.onpoolworkend = function ()
-{
-    // default does nothing.
-};
-
+dwv.utils.ThreadPool.prototype.onpoolworkend = function () {};
 /**
  * Handle a pool worker end event.
+ * Default does nothing.
  */
-dwv.utils.ThreadPool.prototype.onworkerend = function ()
-{
-    // default does nothing.
-};
+dwv.utils.ThreadPool.prototype.onworkerend = function () {};
 
 /**
  * Worker thread.
@@ -25295,11 +25363,10 @@ dwv.utils.ThreadPool.prototype.onworkerend = function ()
 dwv.utils.WorkerThread = function (parentPool) {
     // closure to self
     var self = this;
-    // parent pool
-    this.parentPool = parentPool;
-    // associated task
-    this.workerTask = {};
-    // associated web worker
+
+    // running task
+    var runningTask = {};
+    // worker used to run task
     var worker;
 
     /**
@@ -25307,14 +25374,14 @@ dwv.utils.WorkerThread = function (parentPool) {
      * @param {Object} workerTask The task to run.
      */
     this.run = function (workerTask) {
-        // closure to task
-        this.workerTask = workerTask;
+        // store task
+        runningTask = workerTask;
         // create a new web worker
-        if (this.workerTask.script !== null) {
-            worker = new Worker(workerTask.script);
+        if (runningTask.script !== null) {
+            worker = new Worker(runningTask.script);
             worker.addEventListener('message', ontaskend, false);
             // launch the worker
-            worker.postMessage(workerTask.startMessage);
+            worker.postMessage(runningTask.startMessage);
         }
     };
 
@@ -25325,7 +25392,7 @@ dwv.utils.WorkerThread = function (parentPool) {
         // stop the worker
         worker.terminate();
         // tell the parent pool this thread is free
-        this.parentPool.freeWorkerThread(this);
+        parentPool.freeWorkerThread(this);
     };
 
     /**
@@ -25336,7 +25403,7 @@ dwv.utils.WorkerThread = function (parentPool) {
      */
     function ontaskend(event) {
         // pass to original callback
-        self.workerTask.callback(event);
+        runningTask.callback(event);
         // stop the worker and free the thread
         self.stop();
     }
@@ -25347,7 +25414,7 @@ dwv.utils.WorkerThread = function (parentPool) {
  * Worker task.
  * @constructor
  * @param {String} script The worker script.
- * @param {Function} parentPool The worker callback.
+ * @param {Function} callback The worker callback.
  * @param {Object} message The data to pass to the worker.
  */
 dwv.utils.WorkerTask = function (script, callback, message) {
