@@ -141,7 +141,7 @@ print([[
 
 print([[
 <!-- Local -->
-<script type="text/javascript" src="/dwv/dwv-0.22.0-beta.min.js"></script>
+<script type="text/javascript" src="/dwv/dwv-0.22.0.min.js"></script>
 <!-- Launch the app -->
 <script type="text/javascript" src="/dwv/viewers/mobile/appgui.js"></script>
 ]])
