@@ -153,6 +153,9 @@
         "File": {
             "name": "Fichier"
         },
+        "Folder": {
+            "name": "Dossier"
+        },
         "Url": {
             "name": "Lien"
         },

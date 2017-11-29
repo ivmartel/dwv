@@ -42,7 +42,7 @@ function startApp() {
     //myapp.addEventListener("filter-undo", listener);
 
     // initialise the application
-    myapp.init({
+    var options = {
         "containerDivId": "dwv",
         "fitToWindow": true,
         "gui": ["tool", "load", "help", "undo", "version", "tags", "drawList"],
@@ -52,7 +52,11 @@ function startApp() {
         "shapes": ["Arrow", "Ruler", "Protractor", "Rectangle", "Roi", "Ellipse", "FreeHand"],
         "isMobile": true
         //"defaultCharacterSet": "chinese"
-    });
+    };
+    if ( dwv.browser.hasInputDirectory() ) {
+        options.loaders.splice(1, 0, "Folder");
+    }
+    myapp.init(options);
 
     var size = dwv.gui.getWindowSize();
     $(".layerContainer").height(size.height);
@@ -65,31 +69,21 @@ dwv.image.decoderScripts = {
     "jpeg-baseline": "../../decoders/pdfjs/decode-jpegbaseline.js"
 };
 
-// check browser support
-dwv.browser.check();
-// initialise i18n
-dwv.i18nInitialise();
-
 // status flags
 var domContentLoaded = false;
-var i18nLoaded = false;
+var i18nInitialised = false;
 // launch when both DOM and i18n are ready
 function launchApp() {
-    if ( domContentLoaded && i18nLoaded ) {
+    if ( domContentLoaded && i18nInitialised ) {
         startApp();
     }
 }
-// DOM ready?
-$(document).ready( function() {
-    domContentLoaded = true;
-    launchApp();
-});
 // i18n ready?
-dwv.i18nOnLoaded( function () {
+dwv.i18nOnInitialised( function () {
     // call next once the overlays are loaded
     var onLoaded = function (data) {
         dwv.gui.info.overlayMaps = data;
-        i18nLoaded = true;
+        i18nInitialised = true;
         launchApp();
     };
     // load overlay map info
@@ -98,4 +92,15 @@ dwv.i18nOnLoaded( function () {
         console.log("Using fallback overlays.");
         $.getJSON( dwv.i18nGetFallbackLocalePath("overlays.json"), onLoaded );
     });
+});
+
+// check browser support
+dwv.browser.check();
+// initialise i18n
+dwv.i18nInitialise();
+
+// DOM ready?
+$(document).ready( function() {
+    domContentLoaded = true;
+    launchApp();
 });
