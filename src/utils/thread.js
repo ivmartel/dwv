@@ -79,7 +79,7 @@ dwv.utils.ThreadPool = function (poolSize) {
             freeThreads.push(workerThread);
             // remove from running list
             for ( var i = 0; i < runningThreads.length; ++i ) {
-                if ( runningThreads[i] === workerThread ) {
+                if ( runningThreads[i].getId() === workerThread.getId() ) {
                     runningThreads.splice(i, 1);
                 }
             }
@@ -112,10 +112,21 @@ dwv.utils.WorkerThread = function (parentPool) {
     // closure to self
     var self = this;
 
+    // thread ID
+    var id = Math.random().toString(36).substring(2, 15);
+
     // running task
     var runningTask = {};
     // worker used to run task
     var worker;
+
+    /**
+     * Get the thread ID.
+     * @return {String} The thread ID (alphanumeric).
+     */
+    this.getId = function () {
+        return id;
+    };
 
     /**
      * Run a worker task
