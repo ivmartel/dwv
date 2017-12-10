@@ -19,3 +19,4 @@ ratings:
 exclude_paths:
 - dist/
 - ext/
+- decoders/
