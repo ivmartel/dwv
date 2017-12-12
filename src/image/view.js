@@ -294,6 +294,15 @@ dwv.image.View = function (image)
     this.setWindowPresets = function (presets) {
         windowPresets = presets;
     };
+
+    /**
+     * Set the default colour map.
+     * @param {Object} map The colour map.
+     */
+    this.setDefaultColourMap = function (map) {
+        colourMap = map;
+    };
+
     /**
      * Add window presets to the existing ones.
      * @param {Object} presets The window presets.
@@ -330,10 +339,6 @@ dwv.image.View = function (image)
      */
     this.setColourMap = function(map) {
         colourMap = map;
-        // TODO Better handle this...
-        if( this.getImage().getPhotometricInterpretation() === "MONOCHROME1") {
-            colourMap = dwv.image.lut.invPlain;
-        }
         this.fireEvent({"type": "colour-change",
            "wc": this.getCurrentWindowLut().getWindowLevel().getCenter(),
            "ww": this.getCurrentWindowLut().getWindowLevel().getWidth() });
@@ -793,6 +798,11 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
 {
     // view
     var view = new dwv.image.View(image);
+
+    // default color map
+    if( image.getPhotometricInterpretation() === "MONOCHROME1") {
+        view.setDefaultColourMap(dwv.image.lut.invPlain);
+    }
 
     // presets
     var windowPresets = {};
