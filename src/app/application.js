@@ -67,6 +67,9 @@ dwv.App = function ()
 
     // Loadbox
     var loadbox = null;
+    // Current loader
+    var currentLoader = null;
+
     // UndoStack
     var undoStack = null;
 
@@ -495,6 +498,17 @@ dwv.App = function ()
     };
 
     /**
+     * Abort the current load.
+     */
+    this.abortLoad = function ()
+    {
+        if ( currentLoader ) {
+            currentLoader.abort();
+            currentLoader = null;
+        }
+    };
+
+    /**
      * Load a list of ArrayBuffers.
      * @param {Array} data The list of ArrayBuffers to load
      *   in the form of [{name: "", filename: "", data: data}].
@@ -550,13 +564,16 @@ dwv.App = function ()
      */
     function loadImageData(data, loader, options)
     {
+        // store loader
+        currentLoader = loader;
+
         // allow to cancel
         var previousOnKeyDown = window.onkeydown;
         window.onkeydown = function (event) {
             if (event.ctrlKey && event.keyCode === 88 ) // crtl-x
             {
                 console.log("crtl-x pressed!");
-                loader.abort();
+                self.abortLoad();
             }
         };
 
@@ -594,6 +611,8 @@ dwv.App = function ()
             fireEvent({type: "load-progress", lengthComputable: true,
                 loaded: 100, total: 100});
             fireEvent({ 'type': 'load-end' });
+            // reset member
+            currentLoader = null;
         };
         loader.onprogress = onLoadProgress;
         // main load (asynchronous)
