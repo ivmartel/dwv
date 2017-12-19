@@ -19819,6 +19819,18 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
         strokeWidth: style.getScaledStrokeWidth(),
         name: "shape"
     });
+    // larger hitfunc
+    var linePerp0 = dwv.math.getPerpendicularLine( line, points[0], 10 );
+    var linePerp1 = dwv.math.getPerpendicularLine( line, points[1], 10 );
+    kshape.hitFunc( function (context) {
+        context.beginPath();
+        context.moveTo( linePerp0.getBegin().getX(), linePerp0.getBegin().getY() );
+        context.lineTo( linePerp0.getEnd().getX(), linePerp0.getEnd().getY() );
+        context.lineTo( linePerp1.getEnd().getX(), linePerp1.getEnd().getY() );
+        context.lineTo( linePerp1.getBegin().getX(), linePerp1.getBegin().getY() );
+        context.closePath();
+        context.fillStrokeShape(this);
+    });
     // triangle
     var beginTy = new dwv.math.Point2D(line.getBegin().getX(), line.getBegin().getY() - 10);
     var verticalLine = new dwv.math.Line(line.getBegin(), beginTy);
@@ -19917,6 +19929,20 @@ dwv.tool.UpdateArrow = function (anchor/*, image*/)
     var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
     var p2d1 = new dwv.math.Point2D(end.x(), end.y());
     var line = new dwv.math.Line(p2d0, p2d1);
+    // larger hitfunc
+    var p2b = new dwv.math.Point2D(bx, by);
+    var p2e = new dwv.math.Point2D(ex, ey);
+    var linePerp0 = dwv.math.getPerpendicularLine( line, p2b, 10 );
+    var linePerp1 = dwv.math.getPerpendicularLine( line, p2e, 10 );
+    kline.hitFunc( function (context) {
+        context.beginPath();
+        context.moveTo( linePerp0.getBegin().getX(), linePerp0.getBegin().getY() );
+        context.lineTo( linePerp0.getEnd().getX(), linePerp0.getEnd().getY() );
+        context.lineTo( linePerp1.getEnd().getX(), linePerp1.getEnd().getY() );
+        context.lineTo( linePerp1.getBegin().getX(), linePerp1.getBegin().getY() );
+        context.closePath();
+        context.fillStrokeShape(this);
+    });
     // udate triangle
     var beginTy = new dwv.math.Point2D(line.getBegin().getX(), line.getBegin().getY() - 10);
     var verticalLine = new dwv.math.Line(line.getBegin(), beginTy);
@@ -23026,6 +23052,15 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
     // text and decoration
     if ( points.length === 3 ) {
         var line1 = new dwv.math.Line(points[1], points[2]);
+        // larger hitfunc
+        kshape.hitFunc( function (context) {
+            context.beginPath();
+            context.moveTo( points[0].getX(), points[0].getY() );
+            context.lineTo( points[1].getX(), points[1].getY() );
+            context.lineTo( points[2].getX(), points[2].getY() );
+            context.closePath();
+            context.fillStrokeShape(this);
+        });
         // quantification
         var angle = dwv.math.getAngle(line0, line1);
         var inclination = line0.getInclination();
@@ -23134,6 +23169,15 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
     var ex = end.x() - kline.x();
     var ey = end.y() - kline.y();
     kline.points( [bx,by,mx,my,ex,ey] );
+    // larger hitfunc
+    kline.hitFunc( function (context) {
+        context.beginPath();
+        context.moveTo( bx, by );
+        context.lineTo( mx, my );
+        context.lineTo( ex, ey );
+        context.closePath();
+        context.fillStrokeShape(this);
+    });
     // update text
     var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
     var p2d1 = new dwv.math.Point2D(mid.x(), mid.y());
@@ -23513,6 +23557,17 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
         name: "shape-tick1"
     });
 
+    // larger hitfunc
+    kshape.hitFunc( function (context) {
+        context.beginPath();
+        context.moveTo( linePerp0.getBegin().getX(), linePerp0.getBegin().getY() );
+        context.lineTo( linePerp0.getEnd().getX(), linePerp0.getEnd().getY() );
+        context.lineTo( linePerp1.getEnd().getX(), linePerp1.getEnd().getY() );
+        context.lineTo( linePerp1.getBegin().getX(), linePerp1.getBegin().getY() );
+        context.closePath();
+        context.fillStrokeShape(this);
+    });
+
     // quantification
     var quant = image.quantifyLine( line );
     var ktext = new Konva.Text({
@@ -23610,6 +23665,16 @@ dwv.tool.UpdateRuler = function (anchor, image)
     var linePerp1 = dwv.math.getPerpendicularLine( line, p2e, 10 );
     ktick1.points( [linePerp1.getBegin().getX(), linePerp1.getBegin().getY(),
         linePerp1.getEnd().getX(), linePerp1.getEnd().getY()] );
+    // larger hitfunc
+    kline.hitFunc( function (context) {
+        context.beginPath();
+        context.moveTo( linePerp0.getBegin().getX(), linePerp0.getBegin().getY() );
+        context.lineTo( linePerp0.getEnd().getX(), linePerp0.getEnd().getY() );
+        context.lineTo( linePerp1.getEnd().getX(), linePerp1.getEnd().getY() );
+        context.lineTo( linePerp1.getBegin().getX(), linePerp1.getBegin().getY() );
+        context.closePath();
+        context.fillStrokeShape(this);
+    });
     // update text
     var quant = image.quantifyLine( line );
     var ktext = klabel.getText();

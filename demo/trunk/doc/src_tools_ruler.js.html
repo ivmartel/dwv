@@ -162,6 +162,17 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
         name: "shape-tick1"
     });
 
+    // larger hitfunc
+    kshape.hitFunc( function (context) {
+        context.beginPath();
+        context.moveTo( linePerp0.getBegin().getX(), linePerp0.getBegin().getY() );
+        context.lineTo( linePerp0.getEnd().getX(), linePerp0.getEnd().getY() );
+        context.lineTo( linePerp1.getEnd().getX(), linePerp1.getEnd().getY() );
+        context.lineTo( linePerp1.getBegin().getX(), linePerp1.getBegin().getY() );
+        context.closePath();
+        context.fillStrokeShape(this);
+    });
+
     // quantification
     var quant = image.quantifyLine( line );
     var ktext = new Konva.Text({
@@ -259,6 +270,16 @@ dwv.tool.UpdateRuler = function (anchor, image)
     var linePerp1 = dwv.math.getPerpendicularLine( line, p2e, 10 );
     ktick1.points( [linePerp1.getBegin().getX(), linePerp1.getBegin().getY(),
         linePerp1.getEnd().getX(), linePerp1.getEnd().getY()] );
+    // larger hitfunc
+    kline.hitFunc( function (context) {
+        context.beginPath();
+        context.moveTo( linePerp0.getBegin().getX(), linePerp0.getBegin().getY() );
+        context.lineTo( linePerp0.getEnd().getX(), linePerp0.getEnd().getY() );
+        context.lineTo( linePerp1.getEnd().getX(), linePerp1.getEnd().getY() );
+        context.lineTo( linePerp1.getBegin().getX(), linePerp1.getBegin().getY() );
+        context.closePath();
+        context.fillStrokeShape(this);
+    });
     // update text
     var quant = image.quantifyLine( line );
     var ktext = klabel.getText();
