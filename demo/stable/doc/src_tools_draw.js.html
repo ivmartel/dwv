@@ -511,11 +511,11 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         // store original colour
         var colour = null;
 
+        // save start position
+        dragStartPos = {'x': shape.x(), 'y': shape.y()};
+
         // drag start event handling
-        shape.on('dragstart', function (event) {
-            // save start position
-            var offset = dwv.html.getEventOffset( event.evt )[0];
-            dragStartPos = getRealPosition( offset );
+        shape.on('dragstart', function (/*event*/) {
             // colour
             colour = shape.stroke();
             // display trash
@@ -533,21 +533,21 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         });
         // drag move event handling
         shape.on('dragmove', function (event) {
-            var offset = dwv.html.getEventOffset( event.evt )[0];
-            var pos = getRealPosition( offset );
+            var pos = {'x': this.x(), 'y': this.y()};
             var translation;
             if ( dragLastPos ) {
                 translation = {'x': pos.x - dragLastPos.x,
                     'y': pos.y - dragLastPos.y};
-            }
-            else {
+            } else {
                 translation = {'x': pos.x - dragStartPos.x,
-                        'y': pos.y - dragStartPos.y};
+                    'y': pos.y - dragStartPos.y};
             }
             dragLastPos = pos;
             // highlight trash when on it
-            if ( Math.abs( pos.x - trash.x() ) &lt; 10 &amp;&amp;
-                    Math.abs( pos.y - trash.y() ) &lt; 10   ) {
+            var offset = dwv.html.getEventOffset( event.evt )[0];
+            var eventPos = getRealPosition( offset );
+            if ( Math.abs( eventPos.x - trash.x() ) &lt; 10 &amp;&amp;
+                    Math.abs( eventPos.y - trash.y() ) &lt; 10   ) {
                 trash.getChildren().each( function (tshape){ tshape.stroke('orange'); });
                 shape.stroke('red');
             }
@@ -557,12 +557,12 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             }
             // update group but not 'this' shape
             var group = this.getParent();
-            group.getChildren().each( function (shape) {
-                if ( shape == this ) {
+            group.getChildren().each( function (ashape) {
+                if ( ashape === shape ) {
                     return;
                 }
-                shape.x( shape.x() + translation.x );
-                shape.y( shape.y() + translation.y );
+                ashape.x( ashape.x() + translation.x );
+                ashape.y( ashape.y() + translation.y );
             });
             // reset anchors
             shapeEditor.resetAnchors();
@@ -570,21 +570,23 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             drawLayer.draw();
         });
         // drag end event handling
-        shape.on('dragend', function (/*event*/) {
-            var pos = dragLastPos;
+        shape.on('dragend', function (event) {
+            var pos = {'x': this.x(), 'y': this.y()};
             dragLastPos = null;
             // remove trash
             trash.remove();
             // delete case
-            if ( Math.abs( pos.x - trash.x() ) &lt; 10 &amp;&amp;
-                    Math.abs( pos.y - trash.y() ) &lt; 10   ) {
+            var offset = dwv.html.getEventOffset( event.evt )[0];
+            var eventPos = getRealPosition( offset );
+            if ( Math.abs( eventPos.x - trash.x() ) &lt; 10 &amp;&amp;
+                    Math.abs( eventPos.y - trash.y() ) &lt; 10   ) {
                 // compensate for the drag translation
-                var delTranslation = {'x': pos.x - dragStartPos.x,
-                        'y': pos.y - dragStartPos.y};
+                var delTranslation = {'x': eventPos.x - dragStartPos.x,
+                        'y': eventPos.y - dragStartPos.y};
                 var group = this.getParent();
-                group.getChildren().each( function (shape) {
-                    shape.x( shape.x() - delTranslation.x );
-                    shape.y( shape.y() - delTranslation.y );
+                group.getChildren().each( function (ashape) {
+                    ashape.x( ashape.x() - delTranslation.x );
+                    ashape.y( ashape.y() - delTranslation.y );
                 });
                 // disable editor
                 shapeEditor.disable();
@@ -611,6 +613,9 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                     mvcmd.onExecute = fireEvent;
                     mvcmd.onUndo = fireEvent;
                     app.addToUndoStack(mvcmd);
+
+                    // reset start position
+                    dragStartPos = {'x': this.x(), 'y': this.y()};
                     // the move is handled by Konva, trigger an event manually
                     fireEvent({'type': 'draw-move'});
                 }
@@ -817,7 +822,7 @@ dwv.tool.Draw.prototype.hasShape = function(name) {
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
 	
-		on Wednesday, November 29th 2017
+		on Tuesday, December 19th 2017
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>
