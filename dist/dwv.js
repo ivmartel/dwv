@@ -127,6 +127,9 @@ dwv.App = function ()
 
     // Loadbox
     var loadbox = null;
+    // Current loader
+    var currentLoader = null;
+
     // UndoStack
     var undoStack = null;
 
@@ -555,6 +558,17 @@ dwv.App = function ()
     };
 
     /**
+     * Abort the current load.
+     */
+    this.abortLoad = function ()
+    {
+        if ( currentLoader ) {
+            currentLoader.abort();
+            currentLoader = null;
+        }
+    };
+
+    /**
      * Load a list of ArrayBuffers.
      * @param {Array} data The list of ArrayBuffers to load
      *   in the form of [{name: "", filename: "", data: data}].
@@ -610,13 +624,16 @@ dwv.App = function ()
      */
     function loadImageData(data, loader, options)
     {
+        // store loader
+        currentLoader = loader;
+
         // allow to cancel
         var previousOnKeyDown = window.onkeydown;
         window.onkeydown = function (event) {
             if (event.ctrlKey && event.keyCode === 88 ) // crtl-x
             {
                 console.log("crtl-x pressed!");
-                loader.abort();
+                self.abortLoad();
             }
         };
 
@@ -654,6 +671,8 @@ dwv.App = function ()
             fireEvent({type: "load-progress", lengthComputable: true,
                 loaded: 100, total: 100});
             fireEvent({ 'type': 'load-end' });
+            // reset member
+            currentLoader = null;
         };
         loader.onprogress = onLoadProgress;
         // main load (asynchronous)
@@ -2659,7 +2678,7 @@ dwv.dicom = dwv.dicom || {};
  * Get the version of the library.
  * @return {String} The version of the library.
  */
-dwv.getVersion = function () { return "0.22.0"; };
+dwv.getVersion = function () { return "0.22.1"; };
 
 /**
  * Clean string: trim and remove ending.
@@ -15793,6 +15812,15 @@ dwv.image.View = function (image)
     this.setWindowPresets = function (presets) {
         windowPresets = presets;
     };
+
+    /**
+     * Set the default colour map.
+     * @param {Object} map The colour map.
+     */
+    this.setDefaultColourMap = function (map) {
+        colourMap = map;
+    };
+
     /**
      * Add window presets to the existing ones.
      * @param {Object} presets The window presets.
@@ -15829,10 +15857,6 @@ dwv.image.View = function (image)
      */
     this.setColourMap = function(map) {
         colourMap = map;
-        // TODO Better handle this...
-        if( this.getImage().getPhotometricInterpretation() === "MONOCHROME1") {
-            colourMap = dwv.image.lut.invPlain;
-        }
         this.fireEvent({"type": "colour-change",
            "wc": this.getCurrentWindowLut().getWindowLevel().getCenter(),
            "ww": this.getCurrentWindowLut().getWindowLevel().getWidth() });
@@ -16292,6 +16316,11 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
 {
     // view
     var view = new dwv.image.View(image);
+
+    // default color map
+    if( image.getPhotometricInterpretation() === "MONOCHROME1") {
+        view.setDefaultColourMap(dwv.image.lut.invPlain);
+    }
 
     // presets
     var windowPresets = {};
@@ -19790,6 +19819,18 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
         strokeWidth: style.getScaledStrokeWidth(),
         name: "shape"
     });
+    // larger hitfunc
+    var linePerp0 = dwv.math.getPerpendicularLine( line, points[0], 10 );
+    var linePerp1 = dwv.math.getPerpendicularLine( line, points[1], 10 );
+    kshape.hitFunc( function (context) {
+        context.beginPath();
+        context.moveTo( linePerp0.getBegin().getX(), linePerp0.getBegin().getY() );
+        context.lineTo( linePerp0.getEnd().getX(), linePerp0.getEnd().getY() );
+        context.lineTo( linePerp1.getEnd().getX(), linePerp1.getEnd().getY() );
+        context.lineTo( linePerp1.getBegin().getX(), linePerp1.getBegin().getY() );
+        context.closePath();
+        context.fillStrokeShape(this);
+    });
     // triangle
     var beginTy = new dwv.math.Point2D(line.getBegin().getX(), line.getBegin().getY() - 10);
     var verticalLine = new dwv.math.Line(line.getBegin(), beginTy);
@@ -19888,6 +19929,20 @@ dwv.tool.UpdateArrow = function (anchor/*, image*/)
     var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
     var p2d1 = new dwv.math.Point2D(end.x(), end.y());
     var line = new dwv.math.Line(p2d0, p2d1);
+    // larger hitfunc
+    var p2b = new dwv.math.Point2D(bx, by);
+    var p2e = new dwv.math.Point2D(ex, ey);
+    var linePerp0 = dwv.math.getPerpendicularLine( line, p2b, 10 );
+    var linePerp1 = dwv.math.getPerpendicularLine( line, p2e, 10 );
+    kline.hitFunc( function (context) {
+        context.beginPath();
+        context.moveTo( linePerp0.getBegin().getX(), linePerp0.getBegin().getY() );
+        context.lineTo( linePerp0.getEnd().getX(), linePerp0.getEnd().getY() );
+        context.lineTo( linePerp1.getEnd().getX(), linePerp1.getEnd().getY() );
+        context.lineTo( linePerp1.getBegin().getX(), linePerp1.getBegin().getY() );
+        context.closePath();
+        context.fillStrokeShape(this);
+    });
     // udate triangle
     var beginTy = new dwv.math.Point2D(line.getBegin().getX(), line.getBegin().getY() - 10);
     var verticalLine = new dwv.math.Line(line.getBegin(), beginTy);
@@ -20322,11 +20377,11 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         // store original colour
         var colour = null;
 
+        // save start position
+        dragStartPos = {'x': shape.x(), 'y': shape.y()};
+
         // drag start event handling
-        shape.on('dragstart', function (event) {
-            // save start position
-            var offset = dwv.html.getEventOffset( event.evt )[0];
-            dragStartPos = getRealPosition( offset );
+        shape.on('dragstart', function (/*event*/) {
             // colour
             colour = shape.stroke();
             // display trash
@@ -20344,21 +20399,21 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         });
         // drag move event handling
         shape.on('dragmove', function (event) {
-            var offset = dwv.html.getEventOffset( event.evt )[0];
-            var pos = getRealPosition( offset );
+            var pos = {'x': this.x(), 'y': this.y()};
             var translation;
             if ( dragLastPos ) {
                 translation = {'x': pos.x - dragLastPos.x,
                     'y': pos.y - dragLastPos.y};
-            }
-            else {
+            } else {
                 translation = {'x': pos.x - dragStartPos.x,
-                        'y': pos.y - dragStartPos.y};
+                    'y': pos.y - dragStartPos.y};
             }
             dragLastPos = pos;
             // highlight trash when on it
-            if ( Math.abs( pos.x - trash.x() ) < 10 &&
-                    Math.abs( pos.y - trash.y() ) < 10   ) {
+            var offset = dwv.html.getEventOffset( event.evt )[0];
+            var eventPos = getRealPosition( offset );
+            if ( Math.abs( eventPos.x - trash.x() ) < 10 &&
+                    Math.abs( eventPos.y - trash.y() ) < 10   ) {
                 trash.getChildren().each( function (tshape){ tshape.stroke('orange'); });
                 shape.stroke('red');
             }
@@ -20368,12 +20423,12 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             }
             // update group but not 'this' shape
             var group = this.getParent();
-            group.getChildren().each( function (shape) {
-                if ( shape == this ) {
+            group.getChildren().each( function (ashape) {
+                if ( ashape === shape ) {
                     return;
                 }
-                shape.x( shape.x() + translation.x );
-                shape.y( shape.y() + translation.y );
+                ashape.x( ashape.x() + translation.x );
+                ashape.y( ashape.y() + translation.y );
             });
             // reset anchors
             shapeEditor.resetAnchors();
@@ -20381,21 +20436,23 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             drawLayer.draw();
         });
         // drag end event handling
-        shape.on('dragend', function (/*event*/) {
-            var pos = dragLastPos;
+        shape.on('dragend', function (event) {
+            var pos = {'x': this.x(), 'y': this.y()};
             dragLastPos = null;
             // remove trash
             trash.remove();
             // delete case
-            if ( Math.abs( pos.x - trash.x() ) < 10 &&
-                    Math.abs( pos.y - trash.y() ) < 10   ) {
+            var offset = dwv.html.getEventOffset( event.evt )[0];
+            var eventPos = getRealPosition( offset );
+            if ( Math.abs( eventPos.x - trash.x() ) < 10 &&
+                    Math.abs( eventPos.y - trash.y() ) < 10   ) {
                 // compensate for the drag translation
-                var delTranslation = {'x': pos.x - dragStartPos.x,
-                        'y': pos.y - dragStartPos.y};
+                var delTranslation = {'x': eventPos.x - dragStartPos.x,
+                        'y': eventPos.y - dragStartPos.y};
                 var group = this.getParent();
-                group.getChildren().each( function (shape) {
-                    shape.x( shape.x() - delTranslation.x );
-                    shape.y( shape.y() - delTranslation.y );
+                group.getChildren().each( function (ashape) {
+                    ashape.x( ashape.x() - delTranslation.x );
+                    ashape.y( ashape.y() - delTranslation.y );
                 });
                 // disable editor
                 shapeEditor.disable();
@@ -20422,6 +20479,9 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                     mvcmd.onExecute = fireEvent;
                     mvcmd.onUndo = fireEvent;
                     app.addToUndoStack(mvcmd);
+
+                    // reset start position
+                    dragStartPos = {'x': this.x(), 'y': this.y()};
                     // the move is handled by Konva, trigger an event manually
                     fireEvent({'type': 'draw-move'});
                 }
@@ -22992,6 +23052,15 @@ dwv.tool.ProtractorFactory.prototype.create = function (points, style/*, image*/
     // text and decoration
     if ( points.length === 3 ) {
         var line1 = new dwv.math.Line(points[1], points[2]);
+        // larger hitfunc
+        kshape.hitFunc( function (context) {
+            context.beginPath();
+            context.moveTo( points[0].getX(), points[0].getY() );
+            context.lineTo( points[1].getX(), points[1].getY() );
+            context.lineTo( points[2].getX(), points[2].getY() );
+            context.closePath();
+            context.fillStrokeShape(this);
+        });
         // quantification
         var angle = dwv.math.getAngle(line0, line1);
         var inclination = line0.getInclination();
@@ -23100,6 +23169,15 @@ dwv.tool.UpdateProtractor = function (anchor/*, image*/)
     var ex = end.x() - kline.x();
     var ey = end.y() - kline.y();
     kline.points( [bx,by,mx,my,ex,ey] );
+    // larger hitfunc
+    kline.hitFunc( function (context) {
+        context.beginPath();
+        context.moveTo( bx, by );
+        context.lineTo( mx, my );
+        context.lineTo( ex, ey );
+        context.closePath();
+        context.fillStrokeShape(this);
+    });
     // update text
     var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
     var p2d1 = new dwv.math.Point2D(mid.x(), mid.y());
@@ -23479,6 +23557,17 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
         name: "shape-tick1"
     });
 
+    // larger hitfunc
+    kshape.hitFunc( function (context) {
+        context.beginPath();
+        context.moveTo( linePerp0.getBegin().getX(), linePerp0.getBegin().getY() );
+        context.lineTo( linePerp0.getEnd().getX(), linePerp0.getEnd().getY() );
+        context.lineTo( linePerp1.getEnd().getX(), linePerp1.getEnd().getY() );
+        context.lineTo( linePerp1.getBegin().getX(), linePerp1.getBegin().getY() );
+        context.closePath();
+        context.fillStrokeShape(this);
+    });
+
     // quantification
     var quant = image.quantifyLine( line );
     var ktext = new Konva.Text({
@@ -23576,6 +23665,16 @@ dwv.tool.UpdateRuler = function (anchor, image)
     var linePerp1 = dwv.math.getPerpendicularLine( line, p2e, 10 );
     ktick1.points( [linePerp1.getBegin().getX(), linePerp1.getBegin().getY(),
         linePerp1.getEnd().getX(), linePerp1.getEnd().getY()] );
+    // larger hitfunc
+    kline.hitFunc( function (context) {
+        context.beginPath();
+        context.moveTo( linePerp0.getBegin().getX(), linePerp0.getBegin().getY() );
+        context.lineTo( linePerp0.getEnd().getX(), linePerp0.getEnd().getY() );
+        context.lineTo( linePerp1.getEnd().getX(), linePerp1.getEnd().getY() );
+        context.lineTo( linePerp1.getBegin().getX(), linePerp1.getBegin().getY() );
+        context.closePath();
+        context.fillStrokeShape(this);
+    });
     // update text
     var quant = image.quantifyLine( line );
     var ktext = klabel.getText();
