@@ -20318,15 +20318,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     }
 
     /**
-     * Get the real position from an event.
-     */
-    function getRealPosition( index ) {
-        var stage = app.getDrawStage();
-        return { 'x': stage.offset().x + index.x / stage.scale().x,
-            'y': stage.offset().y + index.y / stage.scale().y };
-    }
-
-    /**
      * Set shape on properties.
      * @param {Object} shape The shape to set on.
      */
@@ -20351,11 +20342,11 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         // store original colour
         var colour = null;
 
+        // save start position
+        dragStartPos = {'x': shape.x(), 'y': shape.y()};
+
         // drag start event handling
-        shape.on('dragstart', function (event) {
-            // save start position
-            var offset = dwv.html.getEventOffset( event.evt )[0];
-            dragStartPos = getRealPosition( offset );
+        shape.on('dragstart', function (/*event*/) {
             // colour
             colour = shape.stroke();
             // display trash
@@ -20372,17 +20363,15 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             drawLayer.draw();
         });
         // drag move event handling
-        shape.on('dragmove', function (event) {
-            var offset = dwv.html.getEventOffset( event.evt )[0];
-            var pos = getRealPosition( offset );
+        shape.on('dragmove', function (/*event*/) {
+            var pos = {'x': this.x(), 'y': this.y()};
             var translation;
             if ( dragLastPos ) {
                 translation = {'x': pos.x - dragLastPos.x,
                     'y': pos.y - dragLastPos.y};
-            }
-            else {
+            } else {
                 translation = {'x': pos.x - dragStartPos.x,
-                        'y': pos.y - dragStartPos.y};
+                    'y': pos.y - dragStartPos.y};
             }
             dragLastPos = pos;
             // highlight trash when on it
@@ -20397,12 +20386,12 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             }
             // update group but not 'this' shape
             var group = this.getParent();
-            group.getChildren().each( function (shape) {
-                if ( shape == this ) {
+            group.getChildren().each( function (ashape) {
+                if ( ashape === shape ) {
                     return;
                 }
-                shape.x( shape.x() + translation.x );
-                shape.y( shape.y() + translation.y );
+                ashape.x( ashape.x() + translation.x );
+                ashape.y( ashape.y() + translation.y );
             });
             // reset anchors
             shapeEditor.resetAnchors();
@@ -20411,7 +20400,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         });
         // drag end event handling
         shape.on('dragend', function (/*event*/) {
-            var pos = dragLastPos;
+            var pos = {'x': this.x(), 'y': this.y()};
             dragLastPos = null;
             // remove trash
             trash.remove();
@@ -20451,6 +20440,9 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                     mvcmd.onExecute = fireEvent;
                     mvcmd.onUndo = fireEvent;
                     app.addToUndoStack(mvcmd);
+
+                    // reset start position
+                    dragStartPos = {'x': this.x(), 'y': this.y()};
                     // the move is handled by Konva, trigger an event manually
                     fireEvent({'type': 'draw-move'});
                 }
