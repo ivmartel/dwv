@@ -41,6 +41,18 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
         strokeWidth: style.getScaledStrokeWidth(),
         name: "shape"
     });
+    // larger hitfunc
+    var linePerp0 = dwv.math.getPerpendicularLine( line, points[0], 10 );
+    var linePerp1 = dwv.math.getPerpendicularLine( line, points[1], 10 );
+    kshape.hitFunc( function (context) {
+        context.beginPath();
+        context.moveTo( linePerp0.getBegin().getX(), linePerp0.getBegin().getY() );
+        context.lineTo( linePerp0.getEnd().getX(), linePerp0.getEnd().getY() );
+        context.lineTo( linePerp1.getEnd().getX(), linePerp1.getEnd().getY() );
+        context.lineTo( linePerp1.getBegin().getX(), linePerp1.getBegin().getY() );
+        context.closePath();
+        context.fillStrokeShape(this);
+    });
     // triangle
     var beginTy = new dwv.math.Point2D(line.getBegin().getX(), line.getBegin().getY() - 10);
     var verticalLine = new dwv.math.Line(line.getBegin(), beginTy);
@@ -139,6 +151,20 @@ dwv.tool.UpdateArrow = function (anchor/*, image*/)
     var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
     var p2d1 = new dwv.math.Point2D(end.x(), end.y());
     var line = new dwv.math.Line(p2d0, p2d1);
+    // larger hitfunc
+    var p2b = new dwv.math.Point2D(bx, by);
+    var p2e = new dwv.math.Point2D(ex, ey);
+    var linePerp0 = dwv.math.getPerpendicularLine( line, p2b, 10 );
+    var linePerp1 = dwv.math.getPerpendicularLine( line, p2e, 10 );
+    kline.hitFunc( function (context) {
+        context.beginPath();
+        context.moveTo( linePerp0.getBegin().getX(), linePerp0.getBegin().getY() );
+        context.lineTo( linePerp0.getEnd().getX(), linePerp0.getEnd().getY() );
+        context.lineTo( linePerp1.getEnd().getX(), linePerp1.getEnd().getY() );
+        context.lineTo( linePerp1.getBegin().getX(), linePerp1.getBegin().getY() );
+        context.closePath();
+        context.fillStrokeShape(this);
+    });
     // udate triangle
     var beginTy = new dwv.math.Point2D(line.getBegin().getX(), line.getBegin().getY() - 10);
     var verticalLine = new dwv.math.Line(line.getBegin(), beginTy);
