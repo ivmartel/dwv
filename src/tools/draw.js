@@ -378,6 +378,15 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     }
 
     /**
+     * Get the real position from an event.
+     */
+    function getRealPosition( index ) {
+        var stage = app.getDrawStage();
+        return { 'x': stage.offset().x + index.x / stage.scale().x,
+            'y': stage.offset().y + index.y / stage.scale().y };
+    }
+
+    /**
      * Set shape on properties.
      * @param {Object} shape The shape to set on.
      */
@@ -423,7 +432,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             drawLayer.draw();
         });
         // drag move event handling
-        shape.on('dragmove', function (/*event*/) {
+        shape.on('dragmove', function (event) {
             var pos = {'x': this.x(), 'y': this.y()};
             var translation;
             if ( dragLastPos ) {
@@ -435,8 +444,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             }
             dragLastPos = pos;
             // highlight trash when on it
-            if ( Math.abs( pos.x - trash.x() ) < 10 &&
-                    Math.abs( pos.y - trash.y() ) < 10   ) {
+            var offset = dwv.html.getEventOffset( event.evt )[0];
+            var eventPos = getRealPosition( offset );
+            if ( Math.abs( eventPos.x - trash.x() ) < 10 &&
+                    Math.abs( eventPos.y - trash.y() ) < 10   ) {
                 trash.getChildren().each( function (tshape){ tshape.stroke('orange'); });
                 shape.stroke('red');
             }
@@ -459,21 +470,23 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             drawLayer.draw();
         });
         // drag end event handling
-        shape.on('dragend', function (/*event*/) {
+        shape.on('dragend', function (event) {
             var pos = {'x': this.x(), 'y': this.y()};
             dragLastPos = null;
             // remove trash
             trash.remove();
             // delete case
-            if ( Math.abs( pos.x - trash.x() ) < 10 &&
-                    Math.abs( pos.y - trash.y() ) < 10   ) {
+            var offset = dwv.html.getEventOffset( event.evt )[0];
+            var eventPos = getRealPosition( offset );
+            if ( Math.abs( eventPos.x - trash.x() ) < 10 &&
+                    Math.abs( eventPos.y - trash.y() ) < 10   ) {
                 // compensate for the drag translation
-                var delTranslation = {'x': pos.x - dragStartPos.x,
-                        'y': pos.y - dragStartPos.y};
+                var delTranslation = {'x': eventPos.x - dragStartPos.x,
+                        'y': eventPos.y - dragStartPos.y};
                 var group = this.getParent();
-                group.getChildren().each( function (shape) {
-                    shape.x( shape.x() - delTranslation.x );
-                    shape.y( shape.y() - delTranslation.y );
+                group.getChildren().each( function (ashape) {
+                    ashape.x( ashape.x() - delTranslation.x );
+                    ashape.y( ashape.y() - delTranslation.y );
                 });
                 // disable editor
                 shapeEditor.disable();
