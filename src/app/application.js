@@ -596,7 +596,7 @@ dwv.App = function ()
             if ( image ) {
                 view.append( data.view );
                 if ( drawController ) {
-                    drawController.appendDrawLayer(image.getNumberOfFrames());
+                    //drawController.appendDrawLayer(image.getNumberOfFrames());
                 }
             }
             postLoadInit(data);
@@ -1394,7 +1394,7 @@ dwv.App = function ()
 
         // append draw layers (before initialising the toolbox)
         if ( drawController ) {
-            drawController.appendDrawLayer(image.getNumberOfFrames());
+            //drawController.appendDrawLayer(image.getNumberOfFrames());
         }
 
         // initialise the toolbox

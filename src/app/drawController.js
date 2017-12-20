@@ -17,6 +17,9 @@ dwv.DrawController = function (drawDiv)
     // Draw layers: 2 dimension array: [slice][frame]
     var drawLayers = [];
 
+    var drawLayer;
+
+
     // current slice position
     var currentSlice = 0;
     // current frame position
@@ -38,6 +41,13 @@ dwv.DrawController = function (drawDiv)
         // reset style
         // (avoids a not needed vertical scrollbar)
         drawStage.getContent().setAttribute("style", "");
+
+        drawLayer = new Konva.Layer({
+            'listening': false,
+            'hitGraphEnabled': false,
+            'visible': true
+        });
+        drawStage.add(drawLayer);
     };
 
     /**
@@ -46,7 +56,8 @@ dwv.DrawController = function (drawDiv)
      */
     this.getCurrentDrawLayer = function () {
         //return this.getDrawLayer(currentSlice, currentFrame);
-        return drawLayers[currentSlice][currentFrame];
+        //return drawLayers[currentSlice][currentFrame];
+        return drawLayer;
     };
 
     /**
@@ -54,6 +65,7 @@ dwv.DrawController = function (drawDiv)
      */
     this.reset = function () {
         drawLayers = [];
+        drawLayer = null;
     };
 
     /**
@@ -70,19 +82,39 @@ dwv.DrawController = function (drawDiv)
      */
     this.activateDrawLayer = function (viewController)
     {
-        // hide all draw layers
-        for ( var k = 0, lenk = drawLayers.length; k < lenk; ++k ) {
-            for ( var f = 0, lenf = drawLayers[k].length; f < lenf; ++f ) {
-                drawLayers[k][f].visible( false );
-            }
-        }
         // set current position
         currentSlice = viewController.getCurrentPosition().k;
         currentFrame = viewController.getCurrentFrame();
+
+        // hide all draw layers
+        /*for ( var k = 0, lenk = drawLayers.length; k < lenk; ++k ) {
+            for ( var f = 0, lenf = drawLayers[k].length; f < lenf; ++f ) {
+                drawLayers[k][f].visible( false );
+            }
+        }*/
+        var sliceGroups = drawLayer.getChildren( function (node) {
+            return node.name() === 'slice-group';
+        });
+
+        var shapeGroups;
+        var visible;
+        for ( var k = 0, lenk = sliceGroups.length; k < lenk; ++k ) {
+            if ( sliceGroups[k].id() !== "slice-"+currentSlice) {
+                visible = false;
+            } else {
+                visible = true;
+            }
+            shapeGroups = sliceGroups[k].getChildren();
+            for ( var s = 0, lens = shapeGroups.length; s < lens; ++s ) {
+                shapeGroups[s].visible(visible);
+            }
+        }
+
         // show current draw layer
-        var currentLayer = this.getCurrentDrawLayer();
-        currentLayer.visible( true );
-        currentLayer.draw();
+        //var currentLayer = this.getCurrentDrawLayer();
+        //currentLayer.visible( true );
+        //currentLayer.draw();
+        drawLayer.draw();
     };
 
     /**

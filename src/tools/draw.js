@@ -220,6 +220,24 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             var factory = new self.shapeFactoryList[self.shapeName]();
             var group = factory.create(points, self.style, app.getImage());
             group.id( dwv.math.guid() );
+
+            // get slice group
+            var sliceGroupId = "slice-"+app.getViewController().getCurrentPosition().k;
+            var sliceGroups = drawLayer.getChildren( function (node) {
+                return node.id() === sliceGroupId;
+            });
+            var sliceGroup = null;
+            if ( sliceGroups.length === 1 ) {
+                sliceGroup = sliceGroups[0];
+            } else if ( sliceGroups.length === 0 ) {
+                sliceGroup = new Konva.Group();
+                sliceGroup.name("slice-group");
+                sliceGroup.id(sliceGroupId);
+                sliceGroup.visible(true); // dont inherit
+            }
+            // add group to slice group
+            sliceGroup.add(group);
+
             // re-activate layer
             drawLayer.hitGraphEnabled(true);
             // draw shape command
@@ -324,9 +342,9 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      */
     function updateDrawLayer() {
         // deactivate the old draw layer
-        renderDrawLayer(false);
+        //renderDrawLayer(false);
         // get the current draw layer
-        drawLayer = app.getCurrentDrawLayer();
+        //drawLayer = app.getCurrentDrawLayer();
         // activate the new draw layer
         renderDrawLayer(true);
     }
@@ -336,17 +354,28 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @param {Boolean} visible Set the draw layer visible or not.
      */
     function renderDrawLayer(visible) {
+
         drawLayer.listening( visible );
         drawLayer.hitGraphEnabled( visible );
-        // get the list of shapes
-        var groups = drawLayer.getChildren();
+
+        // get the list of shapes of the slice
+        var sliceGroups = drawLayer.getChildren(function (node) {
+            return node.id() === 'slice-'+app.getViewController().getCurrentPosition().k;
+        });
+        var shapeGroups = [];
+        if ( sliceGroups.length === 1 ) {
+            shapeGroups = sliceGroups[0].getChildren();
+        } else if ( sliceGroups.length !== 0 ) {
+            console.warn("More than one slice group found: "+sliceGroups.length, sliceGroups);
+        }
+
         var shapes = [];
         var fshape = function (node) {
             return node.name() === 'shape';
         };
-        for ( var i = 0; i < groups.length; ++i ) {
+        for ( var i = 0; i < shapeGroups.length; ++i ) {
             // should only be one shape per group
-            shapes.push( groups[i].getChildren(fshape)[0] );
+            shapes.push( shapeGroups[i].getChildren(fshape)[0] );
         }
         // set shape display properties
         if ( visible ) {

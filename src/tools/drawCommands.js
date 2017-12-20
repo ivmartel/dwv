@@ -57,7 +57,12 @@ dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
      */
     this.execute = function () {
         // add the group to the layer
-        layer.add(group);
+        var parent = group.getParent();
+        if ( typeof parent === "undefined" ) {
+            layer.add(group);
+        } else {
+            layer.add(parent);
+        }
         // draw
         layer.draw();
         // callback

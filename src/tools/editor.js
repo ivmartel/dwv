@@ -246,7 +246,8 @@ dwv.tool.ShapeEditor = function (app)
             addAnchor(group, ellipseX-radius.x, ellipseY+radius.y, 'bottomLeft');
         }
         // add group to layer
-        shape.getLayer().add( group );
+        //shape.getLayer().add( group );
+        //shape.getParent().add( group );
     }
 
     /**
