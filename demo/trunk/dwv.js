@@ -656,7 +656,7 @@ dwv.App = function ()
             if ( image ) {
                 view.append( data.view );
                 if ( drawController ) {
-                    drawController.appendDrawLayer(image.getNumberOfFrames());
+                    //drawController.appendDrawLayer(image.getNumberOfFrames());
                 }
             }
             postLoadInit(data);
@@ -1454,7 +1454,7 @@ dwv.App = function ()
 
         // append draw layers (before initialising the toolbox)
         if ( drawController ) {
-            drawController.appendDrawLayer(image.getNumberOfFrames());
+            //drawController.appendDrawLayer(image.getNumberOfFrames());
         }
 
         // initialise the toolbox
@@ -1511,6 +1511,9 @@ dwv.DrawController = function (drawDiv)
     // Draw layers: 2 dimension array: [slice][frame]
     var drawLayers = [];
 
+    var drawLayer;
+
+
     // current slice position
     var currentSlice = 0;
     // current frame position
@@ -1532,6 +1535,13 @@ dwv.DrawController = function (drawDiv)
         // reset style
         // (avoids a not needed vertical scrollbar)
         drawStage.getContent().setAttribute("style", "");
+
+        drawLayer = new Konva.Layer({
+            'listening': false,
+            'hitGraphEnabled': false,
+            'visible': true
+        });
+        drawStage.add(drawLayer);
     };
 
     /**
@@ -1540,7 +1550,8 @@ dwv.DrawController = function (drawDiv)
      */
     this.getCurrentDrawLayer = function () {
         //return this.getDrawLayer(currentSlice, currentFrame);
-        return drawLayers[currentSlice][currentFrame];
+        //return drawLayers[currentSlice][currentFrame];
+        return drawLayer;
     };
 
     /**
@@ -1548,6 +1559,7 @@ dwv.DrawController = function (drawDiv)
      */
     this.reset = function () {
         drawLayers = [];
+        drawLayer = null;
     };
 
     /**
@@ -1564,19 +1576,39 @@ dwv.DrawController = function (drawDiv)
      */
     this.activateDrawLayer = function (viewController)
     {
-        // hide all draw layers
-        for ( var k = 0, lenk = drawLayers.length; k < lenk; ++k ) {
-            for ( var f = 0, lenf = drawLayers[k].length; f < lenf; ++f ) {
-                drawLayers[k][f].visible( false );
-            }
-        }
         // set current position
         currentSlice = viewController.getCurrentPosition().k;
         currentFrame = viewController.getCurrentFrame();
+
+        // hide all draw layers
+        /*for ( var k = 0, lenk = drawLayers.length; k < lenk; ++k ) {
+            for ( var f = 0, lenf = drawLayers[k].length; f < lenf; ++f ) {
+                drawLayers[k][f].visible( false );
+            }
+        }*/
+        var sliceGroups = drawLayer.getChildren( function (node) {
+            return node.name() === 'slice-group';
+        });
+
+        var shapeGroups;
+        var visible;
+        for ( var k = 0, lenk = sliceGroups.length; k < lenk; ++k ) {
+            if ( sliceGroups[k].id() !== "slice-"+currentSlice) {
+                visible = false;
+            } else {
+                visible = true;
+            }
+            shapeGroups = sliceGroups[k].getChildren();
+            for ( var s = 0, lens = shapeGroups.length; s < lens; ++s ) {
+                shapeGroups[s].visible(visible);
+            }
+        }
+
         // show current draw layer
-        var currentLayer = this.getCurrentDrawLayer();
-        currentLayer.visible( true );
-        currentLayer.draw();
+        //var currentLayer = this.getCurrentDrawLayer();
+        //currentLayer.visible( true );
+        //currentLayer.draw();
+        drawLayer.draw();
     };
 
     /**
@@ -20186,6 +20218,24 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             var factory = new self.shapeFactoryList[self.shapeName]();
             var group = factory.create(points, self.style, app.getImage());
             group.id( dwv.math.guid() );
+
+            // get slice group
+            var sliceGroupId = "slice-"+app.getViewController().getCurrentPosition().k;
+            var sliceGroups = drawLayer.getChildren( function (node) {
+                return node.id() === sliceGroupId;
+            });
+            var sliceGroup = null;
+            if ( sliceGroups.length === 1 ) {
+                sliceGroup = sliceGroups[0];
+            } else if ( sliceGroups.length === 0 ) {
+                sliceGroup = new Konva.Group();
+                sliceGroup.name("slice-group");
+                sliceGroup.id(sliceGroupId);
+                sliceGroup.visible(true); // dont inherit
+            }
+            // add group to slice group
+            sliceGroup.add(group);
+
             // re-activate layer
             drawLayer.hitGraphEnabled(true);
             // draw shape command
@@ -20290,9 +20340,9 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      */
     function updateDrawLayer() {
         // deactivate the old draw layer
-        renderDrawLayer(false);
+        //renderDrawLayer(false);
         // get the current draw layer
-        drawLayer = app.getCurrentDrawLayer();
+        //drawLayer = app.getCurrentDrawLayer();
         // activate the new draw layer
         renderDrawLayer(true);
     }
@@ -20302,17 +20352,28 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @param {Boolean} visible Set the draw layer visible or not.
      */
     function renderDrawLayer(visible) {
+
         drawLayer.listening( visible );
         drawLayer.hitGraphEnabled( visible );
-        // get the list of shapes
-        var groups = drawLayer.getChildren();
+
+        // get the list of shapes of the slice
+        var sliceGroups = drawLayer.getChildren(function (node) {
+            return node.id() === 'slice-'+app.getViewController().getCurrentPosition().k;
+        });
+        var shapeGroups = [];
+        if ( sliceGroups.length === 1 ) {
+            shapeGroups = sliceGroups[0].getChildren();
+        } else if ( sliceGroups.length !== 0 ) {
+            console.warn("More than one slice group found: "+sliceGroups.length, sliceGroups);
+        }
+
         var shapes = [];
         var fshape = function (node) {
             return node.name() === 'shape';
         };
-        for ( var i = 0; i < groups.length; ++i ) {
+        for ( var i = 0; i < shapeGroups.length; ++i ) {
             // should only be one shape per group
-            shapes.push( groups[i].getChildren(fshape)[0] );
+            shapes.push( shapeGroups[i].getChildren(fshape)[0] );
         }
         // set shape display properties
         if ( visible ) {
@@ -20707,7 +20768,12 @@ dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
      */
     this.execute = function () {
         // add the group to the layer
-        layer.add(group);
+        var parent = group.getParent();
+        if ( typeof parent === "undefined" ) {
+            layer.add(group);
+        } else {
+            layer.add(parent);
+        }
         // draw
         layer.draw();
         // callback
@@ -21170,7 +21236,8 @@ dwv.tool.ShapeEditor = function (app)
             addAnchor(group, ellipseX-radius.x, ellipseY+radius.y, 'bottomLeft');
         }
         // add group to layer
-        shape.getLayer().add( group );
+        //shape.getLayer().add( group );
+        //shape.getParent().add( group );
     }
 
     /**
