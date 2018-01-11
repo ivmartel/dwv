@@ -4,6 +4,44 @@ var dwv = dwv || {};
 var Konva = Konva || {};
 
 /**
+ * Get the draw group id for a given position.
+ * @return {Number} The group id.
+ */
+dwv.getDrawPositionGroupId = function (sliceNumber, frameNumber) {
+    return "slice-"+sliceNumber+"_frame-"+frameNumber;
+};
+
+dwv.getPositionFromGroupId = function (groupId) {
+    var sepIndex = groupId.indexOf("_");
+    if (sepIndex === -1) {
+        console.warn("Badly formed PositionGroupId: "+groupId);
+    }
+    return { 'sliceNumber': groupId.substring(6, sepIndex),
+        'frameNumber': groupId.substring(sepIndex + 7) };
+};
+
+/**
+ * Get the collection of shape groups for a given position id.
+ * @param {String} positionGroupId The position group id.
+ * @param {Object} drawLayer The Konva.Layer ot search.
+ * @return {Object} A Konva.Collection of shapes.
+ */
+dwv.getDrawShapeGroupsAtPosition = function (positionGroupId, drawLayer) {
+    var posGroups = drawLayer.getChildren( function (node) {
+        return node.id() === positionGroupId;
+    });
+    // if one group, use it
+    // if more than one group, send warning
+    var shapeGroups = [];
+    if ( posGroups.length === 1 ) {
+        shapeGroups = posGroups[0].getChildren();
+    } else if ( posGroups.length !== 0 ) {
+        console.warn("More than one position group found: "+posGroups.length, posGroups);
+    }
+    return shapeGroups;
+};
+
+/**
  * Draw controller.
  * @constructor
  * @param {Object} drawDiv The HTML div used to store the drawings.
@@ -92,22 +130,20 @@ dwv.DrawController = function (drawDiv)
                 drawLayers[k][f].visible( false );
             }
         }*/
-        var sliceGroups = drawLayer.getChildren( function (node) {
-            return node.name() === 'slice-group';
+        // get all position groups
+        var posGroups = drawLayer.getChildren( function (node) {
+            return node.name() === 'position-group';
         });
 
-        var shapeGroups;
         var visible;
-        for ( var k = 0, lenk = sliceGroups.length; k < lenk; ++k ) {
-            if ( sliceGroups[k].id() !== "slice-"+currentSlice) {
-                visible = false;
-            } else {
+        var posGroupId = dwv.getDrawPositionGroupId(currentSlice,currentFrame);
+        for ( var i = 0, leni = posGroups.length; i < leni; ++i ) {
+            visible = false;
+            if ( posGroups[i].id() === posGroupId ) {
                 visible = true;
             }
-            shapeGroups = sliceGroups[k].getChildren();
-            for ( var s = 0, lens = shapeGroups.length; s < lens; ++s ) {
-                shapeGroups[s].visible(visible);
-            }
+            // group members inherit the visible property
+            posGroups[i].visible(visible);
         }
 
         // show current draw layer
@@ -180,7 +216,7 @@ dwv.DrawController = function (drawDiv)
      * Append a new draw layer list to the list.
      * @param {Number} nLayers The size of the layers array to append to the current one.
      */
-    this.appendDrawLayer = function (nLayers) {
+    /*this.appendDrawLayer = function (nLayers) {
         // add a new dimension
         drawLayers.push([]);
         // fill it
@@ -195,7 +231,7 @@ dwv.DrawController = function (drawDiv)
             // add the layer to the stage
             drawStage.add(drawLayer);
         }
-    };
+    };*/
 
     /**
      * Get a list of drawing display details.
@@ -204,10 +240,14 @@ dwv.DrawController = function (drawDiv)
     this.getDrawDisplayDetails = function ()
     {
         var list = [];
-        for ( var k = 0, lenk = drawLayers.length; k < lenk; ++k ) {
-            for ( var f = 0, lenf = drawLayers[k].length; f < lenf; ++f ) {
-                var collec = drawLayers[k][f].getChildren();
-                for ( var i = 0, leni = collec.length; i < leni; ++i ) {
+        //for ( var k = 0, lenk = drawLayers.length; k < lenk; ++k ) {
+        //    for ( var f = 0, lenf = drawLayers[k].length; f < lenf; ++f ) {
+                //var collec = drawLayers[k][f].getChildren();
+                var groups = drawLayer.getChildren();
+                for ( var j = 0, lenj = groups.length; j < lenj; ++j ) {
+                    var position = dwv.getPositionFromGroupId(groups[j].id());
+                    var collec = groups[j].getChildren();
+                    for ( var i = 0, leni = collec.length; i < leni; ++i ) {
                     var shape = collec[i].getChildren( isNodeNameShape )[0];
                     var label = collec[i].getChildren( isNodeNameLabel )[0];
                     var text = label.getChildren()[0];
@@ -230,8 +270,8 @@ dwv.DrawController = function (drawDiv)
                     }
                     list.push( {
                         "id": collec[i].id(),
-                        "slice": k,
-                        "frame": f,
+                        "slice": position.sliceNumber,
+                        "frame": position.frameNumber,
                         "type": type,
                         "color": shape.stroke(),
                         "label": text.textExpr,
@@ -239,7 +279,7 @@ dwv.DrawController = function (drawDiv)
                     });
                 }
             }
-        }
+        //}
         // return
         return list;
     };
@@ -249,15 +289,16 @@ dwv.DrawController = function (drawDiv)
      */
     this.getDraws = function ()
     {
-        var drawGroups = [];
-        for ( var k = 0, lenk = drawLayers.length; k < lenk; ++k ) {
+        //var drawGroups = [];
+        var drawGroups = drawLayer.getChildren();
+        /*for ( var k = 0, lenk = drawLayers.length; k < lenk; ++k ) {
             drawGroups[k] = [];
             for ( var f = 0, lenf = drawLayers[k].length; f < lenf; ++f ) {
                 // getChildren always return, so drawings will have the good size
                 var groups = drawLayers[k][f].getChildren();
                 drawGroups[k].push(groups);
             }
-        }
+        }*/
         return drawGroups;
     };
 
@@ -273,7 +314,9 @@ dwv.DrawController = function (drawDiv)
             drawingsDetails[k] = [];
             for ( var f = 0, lenf = drawLayers[k].length; f < lenf; ++f ) {
                 // getChildren always return, so drawings will have the good size
-                var groups = drawLayers[k][f].getChildren();
+                //var groups = drawLayers[k][f].getChildren();
+                var posId = dwv.getDrawPositionGroupId(k,f);
+                var groups = dwv.getDrawShapeGroupsAtPosition(posId, drawLayer);
                 var details = [];
                 for ( var i = 0, leni = groups.length; i < leni; ++i ) {
                     // remove anchors
@@ -351,7 +394,7 @@ dwv.DrawController = function (drawDiv)
     this.updateDraw = function (drawDetails)
     {
         // get the group
-        var group = getDrawGroup(drawDetails.slice, drawDetails.frame, drawDetails.id);
+        var group = getDrawGroup(drawDetails.id);
         // shape
         var shapes = group.getChildren( isNodeNameShape );
         for (var i = 0; i < shapes.length; ++i ) {
@@ -385,7 +428,7 @@ dwv.DrawController = function (drawDiv)
      */
     this.isGroupVisible = function (drawDetails) {
         // get the group
-        var group = getDrawGroup(drawDetails.slice, drawDetails.frame, drawDetails.id);
+        var group = getDrawGroup(drawDetails.id);
         // get visibility
         return group.isVisible();
     };
@@ -396,7 +439,7 @@ dwv.DrawController = function (drawDiv)
      */
     this.toogleGroupVisibility = function (drawDetails) {
         // get the group
-        var group = getDrawGroup(drawDetails.slice, drawDetails.frame, drawDetails.id);
+        var group = getDrawGroup(drawDetails.id);
         // toggle visible
         group.visible(!group.isVisible());
 
@@ -430,24 +473,23 @@ dwv.DrawController = function (drawDiv)
 
     /**
      * Get a draw group.
-     * @param {Number} slice The slice position.
-     * @param {Number} frame The frame position.
      * @param {Number} id The group id.
      */
-    function getDrawGroup(slice, frame, id) {
-        var layer = drawLayers[slice][frame];
+    function getDrawGroup( id ) {
+        //var layer = drawLayers[slice][frame];
         //var collec = layer.getChildren()[drawDetails.id];
-        var collec = layer.getChildren( function (node) {
+        /*var collec = layer.getChildren( function (node) {
             return node.id() === id;
-        });
+        });*/
+        var collec = drawLayer.find("#"+id);
 
         var res = null;
         if (collec.length !== 0) {
             res = collec[0];
-        }
-        else {
-            console.warn("Could not find draw group for slice='" +
-                slice + "', frame='" + frame + "', id='" + id + "'.");
+        } else {
+            //console.warn("Could not find draw group for slice='" +
+            //    slice + "', frame='" + frame + "', id='" + id + "'.");
+            console.warn("Could not find draw group for id='" + id + "'.");
         }
         return res;
     }

@@ -7,6 +7,24 @@ var Konva = Konva || {};
 
 /**
  * Drawing tool.
+ *
+ * This tool is responsible for the draw layer group structure. The layout is:
+ *
+ * drawLayer
+ * |_ positionGroup: name="position-group", id="slice-#_frame-#""
+ *    |_ shapeGroup: name="{shape name}-group", id="#"
+ *       |_ shape: name="shape"
+ *       |_ label: name="label"
+ *       |_ extra: line tick, protractor arc...
+ *
+ * Discussion:
+ * - posGroup > shapeGroup
+ *    pro: slice/frame display: 1 loop
+ *    cons: multi-slice shape splitted in positionGroups
+ * - shapeGroup > posGroup
+ *    pros: more logical
+ *    cons: slice/frame display: 2 loops
+ *
  * @constructor
  * @param {Object} app The associated application.
  * @external Konva
@@ -206,6 +224,16 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     };
 
     /**
+     * Get the current position draw group id.
+     * @return {Number} The group id.
+     */
+    var getDrawCurrentPositionGroupId = function () {
+        var currentSlice = app.getViewController().getCurrentPosition().k;
+        var currentFrame = app.getViewController().getCurrentFrame();
+        return dwv.getDrawPositionGroupId(currentSlice, currentFrame);
+    };
+
+    /**
      * Handle mouse up event.
      * @param {Object} event The mouse up event.
      */
@@ -221,22 +249,24 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             var group = factory.create(points, self.style, app.getImage());
             group.id( dwv.math.guid() );
 
-            // get slice group
-            var sliceGroupId = "slice-"+app.getViewController().getCurrentPosition().k;
-            var sliceGroups = drawLayer.getChildren( function (node) {
-                return node.id() === sliceGroupId;
+            // get position groups
+            var posGroupId = getDrawCurrentPositionGroupId();
+            var posGroups = drawLayer.getChildren( function (node) {
+                return node.id() === posGroupId;
             });
-            var sliceGroup = null;
-            if ( sliceGroups.length === 1 ) {
-                sliceGroup = sliceGroups[0];
-            } else if ( sliceGroups.length === 0 ) {
-                sliceGroup = new Konva.Group();
-                sliceGroup.name("slice-group");
-                sliceGroup.id(sliceGroupId);
-                sliceGroup.visible(true); // dont inherit
+            // if one group, use it
+            // if no group, create one
+            var posGroup = null;
+            if ( posGroups.length === 1 ) {
+                posGroup = posGroups[0];
+            } else if ( posGroups.length === 0 ) {
+                posGroup = new Konva.Group();
+                posGroup.name("position-group");
+                posGroup.id(posGroupId);
+                posGroup.visible(true); // dont inherit
             }
             // add group to slice group
-            sliceGroup.add(group);
+            posGroup.add(group);
 
             // re-activate layer
             drawLayer.hitGraphEnabled(true);
@@ -358,16 +388,9 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         drawLayer.listening( visible );
         drawLayer.hitGraphEnabled( visible );
 
-        // get the list of shapes of the slice
-        var sliceGroups = drawLayer.getChildren(function (node) {
-            return node.id() === 'slice-'+app.getViewController().getCurrentPosition().k;
-        });
-        var shapeGroups = [];
-        if ( sliceGroups.length === 1 ) {
-            shapeGroups = sliceGroups[0].getChildren();
-        } else if ( sliceGroups.length !== 0 ) {
-            console.warn("More than one slice group found: "+sliceGroups.length, sliceGroups);
-        }
+        // get shape groups at the current position
+        var posGroupId = getDrawCurrentPositionGroupId();
+        var shapeGroups = dwv.getDrawShapeGroupsAtPosition(posGroupId, drawLayer);
 
         var shapes = [];
         var fshape = function (node) {
