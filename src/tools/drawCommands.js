@@ -231,6 +231,9 @@ dwv.tool.ChangeGroupCommand.prototype.onUndo = function (/*event*/)
  */
 dwv.tool.DeleteGroupCommand = function (group, name, layer)
 {
+    // group parent
+    var parent = group.getParent();
+
     /**
      * Get the command name.
      * @return {String} The command name.
@@ -240,7 +243,7 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
      * Execute the command.
      */
     this.execute = function () {
-        // remove the group from the parent layer
+        // remove the group from its parent
         group.remove();
         // draw
         layer.draw();
@@ -251,8 +254,8 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
      * Undo the command.
      */
     this.undo = function () {
-        // add the group to the layer
-        layer.add(group);
+        // add the group to its parent
+        parent.add(group);
         // draw
         layer.draw();
         // callback

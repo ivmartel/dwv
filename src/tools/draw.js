@@ -533,8 +533,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             if ( Math.abs( eventPos.x - trash.x() ) < 10 &&
                     Math.abs( eventPos.y - trash.y() ) < 10   ) {
                 // compensate for the drag translation
-                var delTranslation = {'x': eventPos.x - dragStartPos.x,
-                        'y': eventPos.y - dragStartPos.y};
+                var delTranslation = {'x': pos.x - dragStartPos.x,
+                        'y': pos.y - dragStartPos.y};
                 var group = this.getParent();
                 group.getChildren().each( function (ashape) {
                     ashape.x( ashape.x() - delTranslation.x );
