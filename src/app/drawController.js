@@ -505,29 +505,43 @@ dwv.DrawController = function (drawDiv)
         this.getCurrentDrawLayer().draw();
     };
 
+
+    /**
+     * Delete specific Draw from the stage.
+     * @param {Object} cmdCallback The DeleteCommand callback.
+     * @param {Object} exeCallback The callback to call once the DeleteCommand has been executed.
+     */
+    this.deleteDraw = function (shape, cmdCallback, exeCallback) {
+        var delcmd = new dwv.tool.DeleteGroupCommand(shape.getParent(),
+        dwv.tool.GetShapeDisplayName(shape), drawLayer);
+        delcmd.onExecute = cmdCallback;
+        delcmd.onUndo = cmdCallback;
+        delcmd.execute();
+        exeCallback(delcmd);
+    }
+
     /**
      * Delete all Draws from the stage.
      * @param {Object} cmdCallback The DeleteCommand callback.
      * @param {Object} exeCallback The callback to call once the DeleteCommand has been executed.
      */
     this.deleteDraws = function (cmdCallback, exeCallback) {
-        var delcmd, layer, groups;
-        for ( var k = 0, lenk = drawLayers.length; k < lenk; ++k ) {
-            for ( var f = 0, lenf = drawLayers[k].length; f < lenf; ++f ) {
-                layer = drawLayers[k][f];
-                groups = layer.getChildren();
-                while (groups.length) {
-                    var shape = groups[0].getChildren( isNodeNameShape )[0];
-                    delcmd = new dwv.tool.DeleteGroupCommand( groups[0],
-                        dwv.tool.GetShapeDisplayName(shape), layer);
-                    delcmd.onExecute = cmdCallback;
-                    delcmd.onUndo = cmdCallback;
-                    delcmd.execute();
-                    exeCallback(delcmd);
-                }
+        var groups, delcmd;
+        var layerGroups = drawLayer.getChildren();
+        // Iterate over groups of the layer
+        for ( var k = 0, lenk = layerGroups.length; k < lenk; ++k ) {
+            groups = layerGroups.getChildren();
+            while (groups.length) {
+                var shape = groups[0].getChildren( isNodeNameShape )[0];
+                delcmd = new dwv.tool.DeleteGroupCommand( groups[0],
+                    dwv.tool.GetShapeDisplayName(shape), drawLayer);
+                delcmd.onExecute = cmdCallback;
+                delcmd.onUndo = cmdCallback;
+                delcmd.execute();
+                exeCallback(delcmd);
             }
         }
-    };
+    }
 
     /**
      * Get a draw group.

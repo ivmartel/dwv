@@ -830,7 +830,13 @@ dwv.App = function ()
         drawController.updateDraw(drawDetails);
     };
     /**
-     * Delete all Draws from all layers.
+     * Delete specific Draw from.
+    */
+    this.deleteDraw = function (shape) {
+        drawController.deleteDraw(shape, fireEvent, this.addToUndoStack);
+    };
+    /**
+     * Delete all Draws from all groups.
     */
     this.deleteDraws = function () {
         drawController.deleteDraws(fireEvent, this.addToUndoStack);
