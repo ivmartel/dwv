@@ -17,6 +17,7 @@ body { margin: 10px; padding: 0; }
 .inline { display: inline-block !important; }
 </style>
 <link type="text/css" rel="stylesheet" href="../../ext/jquery-mobile/jquery.mobile-1.4.5.min.css" />
+<link type="text/css" rel="stylesheet" href="../../ext/nprogress/nprogress.css" />
 <style type="text/css" >
 .ui-popup .ui-controlgroup { background-color: #252525; }
 .colourLi > .ui-input-text { text-align: center; }
@@ -43,21 +44,25 @@ body { margin: 10px; padding: 0; }
 <link rel="apple-touch-icon" sizes="16x16" href="../../resources/icons/dwv-16.png" />
 <link rel="apple-touch-icon" sizes="60x60" href="../../resources/icons/dwv-60.png" />
 <link rel="apple-touch-icon" sizes="128x128" href="../../resources/icons/dwv-128.png" />
-<!-- Third party -->
-<script type="text/javascript" src="../../ext/jquery/jquery-2.1.4.min.js"></script>
-<script type="text/javascript" src="../../ext/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
-<script type="text/javascript" src="../../ext/flot/jquery.flot.min.js"></script>
-<script type="text/javascript" src="../../ext/kinetic/kinetic-v5.1.1-06.10.min.js"></script>
+<!-- Third party (dwv) -->
+<script type="text/javascript" src="../../ext/modernizr/modernizr.js"></script>
 <script type="text/javascript" src="../../ext/i18next/i18next.min.js"></script>
 <script type="text/javascript" src="../../ext/i18next/i18nextXHRBackend.min.js"></script>
 <script type="text/javascript" src="../../ext/i18next/i18nextBrowserLanguageDetector.min.js"></script>
+<script type="text/javascript" src="../../ext/konva/konva.min.js"></script>
 <script type="text/javascript" src="../../ext/magic-wand/magic-wand.js"></script>
+<script type="text/javascript" src="../../ext/jszip/jszip.min.js"></script>
+<!-- Third party (viewer) -->
+<script type="text/javascript" src="../../ext/jquery/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="../../ext/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
+<script type="text/javascript" src="../../ext/nprogress/nprogress.js"></script>
+<script type="text/javascript" src="../../ext/flot/jquery.flot.min.js"></script>
 <!-- decoders -->
-<script type="text/javascript" src="../../ext/pdfjs/jpx.js"></script>
-<script type="text/javascript" src="../../ext/pdfjs/util.js"></script>
-<script type="text/javascript" src="../../ext/pdfjs/arithmetic_decoder.js"></script>
-<script type="text/javascript" src="../../ext/pdfjs/jpg.js"></script>
-<script type="text/javascript" src="../../ext/rii-mango/lossless-min.js"></script>
+<script type="text/javascript" src="../../decoders/pdfjs/jpx.js"></script>
+<script type="text/javascript" src="../../decoders/pdfjs/util.js"></script>
+<script type="text/javascript" src="../../decoders/pdfjs/arithmetic_decoder.js"></script>
+<script type="text/javascript" src="../../decoders/pdfjs/jpg.js"></script>
+<script type="text/javascript" src="../../decoders/rii-mango/lossless-min.js"></script>
 <!-- Local -->
 <script type="text/javascript" src="../../src/app/application.js"></script>
 <script type="text/javascript" src="../../src/app/drawController.js"></script>
@@ -78,19 +83,28 @@ body { margin: 10px; padding: 0; }
 <script type="text/javascript" src="../../src/gui/tools.js"></script>
 <script type="text/javascript" src="../../src/gui/undo.js"></script>
 <script type="text/javascript" src="../../src/image/decoder.js"></script>
+<script type="text/javascript" src="../../src/image/dicomBufferToView.js"></script>
+<script type="text/javascript" src="../../src/image/domReader.js"></script>
 <script type="text/javascript" src="../../src/image/filter.js"></script>
 <script type="text/javascript" src="../../src/image/geometry.js"></script>
 <script type="text/javascript" src="../../src/image/image.js"></script>
 <script type="text/javascript" src="../../src/image/luts.js"></script>
 <script type="text/javascript" src="../../src/image/view.js"></script>
-<script type="text/javascript" src="../../src/image/reader.js"></script>
-<script type="text/javascript" src="../../src/io/file.js"></script>
-<script type="text/javascript" src="../../src/io/url.js"></script>
+<script type="text/javascript" src="../../src/io/filesLoader.js"></script>
+<script type="text/javascript" src="../../src/io/urlsLoader.js"></script>
+<script type="text/javascript" src="../../src/io/memoryLoader.js"></script>
+<script type="text/javascript" src="../../src/io/dicomDataLoader.js"></script>
+<script type="text/javascript" src="../../src/io/jsonTextLoader.js"></script>
+<script type="text/javascript" src="../../src/io/rawImageLoader.js"></script>
+<script type="text/javascript" src="../../src/io/rawVideoLoader.js"></script>
+<script type="text/javascript" src="../../src/io/zipLoader.js"></script>
+<script type="text/javascript" src="../../src/math/matrix.js"></script>
 <script type="text/javascript" src="../../src/math/bucketQueue.js"></script>
 <script type="text/javascript" src="../../src/math/point.js"></script>
 <script type="text/javascript" src="../../src/math/scissors.js"></script>
 <script type="text/javascript" src="../../src/math/shapes.js"></script>
 <script type="text/javascript" src="../../src/math/stats.js"></script>
+<script type="text/javascript" src="../../src/math/vector.js"></script>
 <script type="text/javascript" src="../../src/tools/arrow.js"></script>
 <script type="text/javascript" src="../../src/tools/draw.js"></script>
 <script type="text/javascript" src="../../src/tools/drawCommands.js"></script>
@@ -111,6 +125,8 @@ body { margin: 10px; padding: 0; }
 <script type="text/javascript" src="../../src/tools/zoomPan.js"></script>
 <script type="text/javascript" src="../../src/utils/browser.js" data-cover></script>
 <script type="text/javascript" src="../../src/utils/i18n.js"></script>
+<script type="text/javascript" src="../../src/utils/listen.js"></script>
+<script type="text/javascript" src="../../src/utils/progress.js"></script>
 <script type="text/javascript" src="../../src/utils/string.js"></script>
 <script type="text/javascript" src="../../src/utils/uri.js"></script>
 <script type="text/javascript" src="../../src/utils/thread.js"></script>
@@ -178,10 +194,14 @@ body { margin: 10px; padding: 0; }
 <canvas class="imageLayer">Only for HTML5 compatible browsers...</canvas>
 <div class="drawDiv"></div>
 <div class="infoLayer">
-<div class="infotl"></div>
-<div class="infotr"></div>
-<div class="infobl"></div>
-<!-- <div class="infobr"><div class="plot"></div></div> -->
+<div class="infotl info"></div>
+<div class="infotc infoc"></div>
+<div class="infotr info"></div>
+<div class="infocl infoc"></div>
+<div class="infocr infoc"></div>
+<div class="infobl info"></div>
+<div class="infobc infoc"></div>
+<div class="infobr info"></div>
 </div><!-- /infoLayer -->
 </div><!-- /layerContainer -->
 

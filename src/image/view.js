@@ -3,6 +3,154 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
+ * WindowLevel class.
+ * References:
+ * - DICOM [Window Center and Window Width]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2}
+ * Pseudo-code:
+ *  if (x <= c - 0.5 - (w-1)/2), then y = ymin
+ *  else if (x > c - 0.5 + (w-1)/2), then y = ymax,
+ *  else y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin) + ymin
+ */
+dwv.image.WindowLevel = function (center, width)
+{
+    // avoid zero width
+    if ( width === 0 ) {
+        throw new Error("A window level with a width of zero is not possible.");
+    }
+
+    /**
+     * Signed data offset.
+     * @private
+     * @type Number
+     */
+    var signedOffset = 0;
+    /**
+     * Output value minimum.
+     * @private
+     * @type Number
+     */
+    var ymin = 0;
+    /**
+     * Output value maximum.
+     * @private
+     * @type Number
+     */
+    var ymax = 255;
+
+    /**
+     * Input value minimum (calculated).
+     * @private
+     * @type Number
+     */
+    var xmin = null;
+    /**
+     * Input value maximum (calculated).
+     * @private
+     * @type Number
+     */
+    var xmax = null;
+    /**
+     * Window level equation slope (calculated).
+     * @private
+     * @type Number
+     */
+    var slope = null;
+    /**
+     * Window level equation intercept (calculated).
+     * @private
+     * @type Number
+     */
+    var inter = null;
+
+    /**
+     * Initialise members.
+     */
+    function init() {
+        var c = center + signedOffset;
+        // from the standard
+        xmin = c - 0.5 - ( (width-1) / 2 );
+        xmax = c - 0.5 + ( (width-1) / 2 );
+        // develop the equation:
+        // y = ( ( x - (c - 0.5) ) / (w-1) + 0.5 ) * (ymax - ymin) + ymin
+        // y = ( x / (w-1) ) * (ymax - ymin) + ( -(c - 0.5) / (w-1) + 0.5 ) * (ymax - ymin) + ymin
+        slope = (ymax - ymin) / (width-1);
+        inter = ( -(c - 0.5) / (width-1) + 0.5 ) * (ymax - ymin) + ymin;
+    }
+
+    // call init
+    init();
+
+    /**
+     * Get the window center.
+     * @return {Number} The window center.
+     */
+    this.getCenter = function () { return center; };
+    /**
+     * Get the window width.
+     * @return {Number} The window width.
+     */
+    this.getWidth = function () { return width; };
+
+    /**
+     * Set the output value range.
+     * @param {Number} min The output value minimum.
+     * @param {Number} max The output value maximum.
+     */
+    this.setRange = function (min, max) {
+        ymin = parseInt( min, 10 );
+        ymax = parseInt( max, 10 ) ;
+        // re-initialise
+        init();
+    };
+    /**
+     * Set the signed offset.
+     * @param {Number} The signed data offset, typically: slope * ( size / 2).
+     */
+    this.setSignedOffset = function (offset) {
+        signedOffset = offset;
+        // re-initialise
+        init();
+    };
+
+    /**
+     * Apply the window level on an input value.
+     * @param {Number} The value to rescale as an integer.
+     * @return {Number} The leveled value, in the
+     *  [ymin, ymax] range (default [0,255]).
+     */
+    this.apply = function (value)
+    {
+        if ( value <= xmin ) {
+            return ymin;
+        } else if ( value > xmax ) {
+            return ymax;
+        } else {
+            return parseInt( ((value * slope) + inter), 10);
+        }
+    };
+
+};
+
+/**
+ * Check for window level equality.
+ * @param {Object} rhs The other window level to compare to.
+ * @return {Boolean} True if both window level are equal.
+ */
+dwv.image.WindowLevel.prototype.equals = function (rhs) {
+    return rhs !== null &&
+        this.getCenter() === rhs.getCenter() &&
+        this.getWidth() === rhs.getWidth();
+};
+
+/**
+ * Get a string representation of the window level.
+ * @return {String} The window level as a string.
+ */
+dwv.image.WindowLevel.prototype.toString = function () {
+    return (this.getCenter() + ", " + this.getWidth());
+};
+
+/**
  * View class.
  * @constructor
  * @param {Image} image The associated image.
@@ -20,10 +168,19 @@ dwv.image.View = function (image)
 
     /**
      * Window presets.
+     * Minmax will be filled at first use (see view.setWindowLevelPreset).
      * @private
      * @type Object
      */
-    var windowPresets = null;
+    var windowPresets = { "minmax": {"name": "minmax"} };
+
+    /**
+     * Current window preset name.
+     * @private
+     * @type String
+     */
+    var currentPresetName = null;
+
     /**
      * colour map.
      * @private
@@ -43,9 +200,6 @@ dwv.image.View = function (image)
      */
     var currentFrame = null;
 
-    // closure to self
-    var self = this;
-
     /**
      * Get the associated image.
      * @return {Image} The associated image.
@@ -59,56 +213,119 @@ dwv.image.View = function (image)
 
     /**
      * Get the window LUT of the image.
+     * Warning: can be undefined in no window/level was set.
+     * @param {Object} rsi Optional image rsi, will take the one of the current slice otherwise.
      * @return {Window} The window LUT of the image.
      */
-    this.getWindowLut = function (rsi) {
+    this.getCurrentWindowLut = function (rsi) {
+        var sliceNumber = this.getCurrentPosition().k;
+        // use current rsi if not provided
         if ( typeof rsi === "undefined" ) {
-            var sliceNumber = this.getCurrentPosition().k;
             rsi = image.getRescaleSlopeAndIntercept(sliceNumber);
         }
-        return windowLuts[ rsi.toString() ];
+        // get the lut
+        var wlut = windowLuts[ rsi.toString() ];
+
+        // special case for 'perslice' presets
+        if (currentPresetName &&
+            typeof windowPresets[currentPresetName] !== "undefined" &&
+            typeof windowPresets[currentPresetName].perslice !== "undefined" &&
+            windowPresets[currentPresetName].perslice === true ) {
+            // get the preset for this slice
+            var wl = windowPresets[currentPresetName].wl[sliceNumber];
+            // apply it if different from previous
+            if (!wlut.getWindowLevel().equals(wl)) {
+                // previous values
+                var previousWidth = wlut.getWindowLevel().getWidth();
+                var previousCenter = wlut.getWindowLevel().getCenter();
+                // set slice window level
+                wlut.setWindowLevel(wl);
+                // fire event
+                if ( previousWidth !== wl.getWidth() ) {
+                    this.fireEvent({"type": "wl-width-change",
+                        "wc": wl.getCenter(), "ww": wl.getWidth(),
+                        "skipGenerate": true});
+                }
+                if ( previousCenter !== wl.getCenter() ) {
+                    this.fireEvent({"type": "wl-center-change",
+                        "wc": wl.getCenter(), "ww": wl.getWidth(),
+                        "skipGenerate": true});
+                }
+            }
+        }
+
+        // update in case of wl change
+        // TODO: should not be run in a getter...
+        wlut.update();
+
+        // return
+        return wlut;
     };
     /**
-     * Set the window LUT of the image.
+     * Add the window LUT to the list.
      * @param {Window} wlut The window LUT of the image.
      */
-    this.setWindowLut = function (wlut)
+    this.addWindowLut = function (wlut)
     {
         var rsi = wlut.getRescaleLut().getRSI();
         windowLuts[rsi.toString()] = wlut;
     };
 
     /**
-     * Initialise the view. Only called at construction.
-     * @private
-     */
-    function initialise()
-    {
-        // create the rescale lookup table
-        var rescaleLut = new dwv.image.lut.Rescale(
-            image.getRescaleSlopeAndIntercept(0) );
-        // initialise the rescale lookup table
-        rescaleLut.initialise(image.getMeta().BitsStored);
-        // create the window lookup table
-        var windowLut = new dwv.image.lut.Window(rescaleLut, image.getMeta().IsSigned);
-        self.setWindowLut(windowLut);
-    }
-
-    // default constructor
-    initialise();
-
-    /**
      * Get the window presets.
      * @return {Object} The window presets.
      */
-    this.getWindowPresets = function() { return windowPresets; };
+    this.getWindowPresets = function () {
+        return windowPresets;
+    };
+
+    /**
+     * Get the window presets names.
+     * @return {Object} The list of window presets names.
+     */
+    this.getWindowPresetsNames = function () {
+        return Object.keys(windowPresets);
+    };
+
     /**
      * Set the window presets.
      * @param {Object} presets The window presets.
      */
-    this.setWindowPresets = function(presets) {
+    this.setWindowPresets = function (presets) {
         windowPresets = presets;
-        this.setWindowLevel(presets[0].center, presets[0].width);
+    };
+
+    /**
+     * Set the default colour map.
+     * @param {Object} map The colour map.
+     */
+    this.setDefaultColourMap = function (map) {
+        colourMap = map;
+    };
+
+    /**
+     * Add window presets to the existing ones.
+     * @param {Object} presets The window presets.
+     * @param {Number} k The slice the preset belong to.
+     */
+    this.addWindowPresets = function (presets, k) {
+        var keys = Object.keys(presets);
+        var key = null;
+        for (var i = 0; i < keys.length; ++i) {
+            key = keys[i];
+            if (typeof windowPresets[key] !== "undefined") {
+                if (typeof windowPresets[key].perslice !== "undefined" &&
+                    windowPresets[key].perslice === true) {
+                    // use first new preset wl...
+                    windowPresets[key].wl.splice(k, 0, presets[key].wl[0]);
+                } else {
+                    windowPresets[key] = presets[key];
+                }
+            } else {
+                // add new
+                windowPresets[key] = presets[key];
+            }
+        }
     };
 
     /**
@@ -122,13 +339,9 @@ dwv.image.View = function (image)
      */
     this.setColourMap = function(map) {
         colourMap = map;
-        // TODO Better handle this...
-        if( this.getImage().getPhotometricInterpretation() === "MONOCHROME1") {
-            colourMap = dwv.image.lut.invPlain;
-        }
         this.fireEvent({"type": "colour-change",
-           "wc": this.getWindowLut().getCenter(),
-           "ww": this.getWindowLut().getWidth() });
+           "wc": this.getCurrentWindowLut().getWindowLevel().getCenter(),
+           "ww": this.getCurrentWindowLut().getWindowLevel().getWidth() });
     };
 
     /**
@@ -219,33 +432,118 @@ dwv.image.View = function (image)
     this.append = function( rhs )
     {
        // append images
-       var newSLiceNumber = this.getImage().appendSlice( rhs.getImage() );
+       var newSliceNumber = this.getImage().appendSlice( rhs.getImage() );
        // update position if a slice was appended before
-       if ( newSLiceNumber <= this.getCurrentPosition().k ) {
+       if ( newSliceNumber <= this.getCurrentPosition().k ) {
            this.setCurrentPosition(
              {"i": this.getCurrentPosition().i,
              "j": this.getCurrentPosition().j,
              "k": this.getCurrentPosition().k + 1}, true );
        }
-       // init to update self
-       this.setWindowLut(rhs.getWindowLut());
+       // add window presets
+       this.addWindowPresets( rhs.getWindowPresets(), newSliceNumber );
+    };
+
+    /**
+     * Append a frame buffer to the included image.
+     * @param {Object} frameBuffer The frame buffer to append.
+     */
+    this.appendFrameBuffer = function (frameBuffer)
+    {
+        this.getImage().appendFrameBuffer(frameBuffer);
     };
 
     /**
      * Set the view window/level.
      * @param {Number} center The window center.
      * @param {Number} width The window width.
+     * @param {String} name Associated preset name, defaults to 'manual'.
      * Warning: uses the latest set rescale LUT or the default linear one.
      */
-    this.setWindowLevel = function ( center, width )
+    this.setWindowLevel = function ( center, width, name )
     {
         // window width shall be >= 1 (see https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
         if ( width >= 1 ) {
-            for ( var key in windowLuts ) {
-                windowLuts[key].setCenterAndWidth(center, width);
+
+            // get current window/level (before updating name)
+            var sliceNumber = this.getCurrentPosition().k;
+            var currentWl = null;
+            var rsi = image.getRescaleSlopeAndIntercept(sliceNumber);
+            if ( rsi && typeof rsi !== "undefined" ) {
+                var currentLut = windowLuts[ rsi.toString() ];
+                if ( currentLut && typeof currentLut !== "undefined") {
+                    currentWl = currentLut.getWindowLevel();
+                }
             }
-            this.fireEvent({"type": "wl-change", "wc": center, "ww": width });
+
+            if ( typeof name === "undefined" ) {
+                name = "manual";
+            }
+            // update current preset name
+            currentPresetName = name;
+
+            var wl = new dwv.image.WindowLevel(center, width);
+            var keys = Object.keys(windowLuts);
+
+            // create the first lut if none exists
+            if (keys.length === 0) {
+                // create the rescale lookup table
+                var rescaleLut = new dwv.image.lut.Rescale(
+                    image.getRescaleSlopeAndIntercept(0), image.getMeta().BitsStored );
+                // create the window lookup table
+                var windowLut = new dwv.image.lut.Window(rescaleLut, image.getMeta().IsSigned);
+                this.addWindowLut(windowLut);
+            }
+
+            // set window level on luts
+            for ( var key in windowLuts ) {
+                windowLuts[key].setWindowLevel(wl);
+            }
+
+            // fire window level change event
+            if (currentWl && typeof currentWl !== "undefined") {
+                if (currentWl.getWidth() !== width) {
+                    this.fireEvent({"type": "wl-width-change", "wc": center, "ww": width });
+                }
+                if (currentWl.getCenter() !== center) {
+                    this.fireEvent({"type": "wl-center-change", "wc": center, "ww": width });
+                }
+            } else {
+                this.fireEvent({"type": "wl-width-change", "wc": center, "ww": width });
+                this.fireEvent({"type": "wl-center-change", "wc": center, "ww": width });
+            }
         }
+    };
+
+    /**
+     * Set the window level to the preset with the input name.
+     * @param {String} name The name of the preset to activate.
+     */
+    this.setWindowLevelPreset = function (name) {
+        var preset = this.getWindowPresets()[name];
+        if ( typeof preset === "undefined" ) {
+            throw new Error("Unknown window level preset: '" + name + "'");
+        }
+        // special min/max
+        if (name === "minmax" && typeof preset.wl === "undefined") {
+            preset.wl = this.getWindowLevelMinMax();
+        }
+        // special 'perslice' case
+        if (typeof preset.perslice !== "undefined" &&
+            preset.perslice === true) {
+            preset = { "wl": preset.wl[this.getCurrentPosition().k] };
+        }
+        // set w/l
+        this.setWindowLevel( preset.wl.getCenter(), preset.wl.getWidth(), name );
+    };
+
+    /**
+     * Set the window level to the preset with the input id.
+     * @param {Number} id The id of the preset to activate.
+     */
+    this.setWindowLevelPresetById = function (id) {
+        var keys = Object.keys(this.getWindowPresets());
+        this.setWindowLevelPreset( keys[id] );
     };
 
     /**
@@ -256,7 +554,7 @@ dwv.image.View = function (image)
     {
         var copy = new dwv.image.View(this.getImage());
         for ( var key in windowLuts ) {
-            copy.setWindowLut(windowLuts[key]);
+            copy.addWindowLut(windowLuts[key]);
         }
         copy.setListeners(this.getListeners());
         return copy;
@@ -281,31 +579,40 @@ dwv.image.View = function (image)
 };
 
 /**
+ * Get the image window/level that covers the full data range.
+ * Warning: uses the latest set rescale LUT or the default linear one.
+ */
+dwv.image.View.prototype.getWindowLevelMinMax = function ()
+{
+    var range = this.getImage().getRescaledDataRange();
+    var min = range.min;
+    var max = range.max;
+    var width = max - min;
+    var center = min + width/2;
+    return new dwv.image.WindowLevel(center, width);
+};
+
+/**
  * Set the image window/level to cover the full data range.
  * Warning: uses the latest set rescale LUT or the default linear one.
  */
 dwv.image.View.prototype.setWindowLevelMinMax = function()
 {
     // calculate center and width
-    var range = this.getImage().getRescaledDataRange();
-    var min = range.min;
-    var max = range.max;
-    var width = max - min;
-    var center = min + width/2;
+    var wl = this.getWindowLevelMinMax();
     // set window level
-    this.setWindowLevel(center,width);
+    this.setWindowLevel(wl.getCenter(), wl.getWidth(), "minmax");
 };
 
 /**
  * Generate display image data to be given to a canvas.
  * @param {Array} array The array to fill in.
- * @param {Number} sliceNumber The slice position.
  */
 dwv.image.View.prototype.generateImageData = function( array )
 {
+    var windowLut = this.getCurrentWindowLut();
+
     var image = this.getImage();
-    var windowLut = this.getWindowLut();
-    windowLut.update();
     var sliceSize = image.getGeometry().getSize().getSliceSize();
     var sliceOffset = sliceSize * this.getCurrentPosition().k;
     var frame = (this.getCurrentFrame()) ? this.getCurrentFrame() : 0;
@@ -491,36 +798,59 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
 {
     // view
     var view = new dwv.image.View(image);
+
+    // default color map
+    if( image.getPhotometricInterpretation() === "MONOCHROME1") {
+        view.setDefaultColourMap(dwv.image.lut.invPlain);
+    }
+
     // presets
-    var windowPresets = [];
-    // WindowCenter and WindowWidth
+    var windowPresets = {};
+
+    // DICOM presets
     var windowCenter = dicomElements.getFromKey("x00281050", true);
     var windowWidth = dicomElements.getFromKey("x00281051", true);
+    var windowCWExplanation = dicomElements.getFromKey("x00281055", true);
     if ( windowCenter && windowWidth ) {
         var name;
         for ( var j = 0; j < windowCenter.length; ++j) {
-            var width = parseFloat( windowWidth[j], 10 );
             var center = parseFloat( windowCenter[j], 10 );
-            if ( width ) {
-                name = "Default"+j;
-                var windowCenterWidthExplanation = dicomElements.getFromKey("x00281055");
-                if ( windowCenterWidthExplanation ) {
-                    name = windowCenterWidthExplanation[j];
+            var width = parseFloat( windowWidth[j], 10 );
+            if ( center && width ) {
+                name = "";
+                if ( windowCWExplanation ) {
+                    name = dwv.dicom.cleanString(windowCWExplanation[j]);
                 }
-                windowPresets.push({
-                    "center": center,
-                    "width": width,
-                    "name": name
-                });
+                if (name === "") {
+                    name = "Default"+j;
+                }
+                windowPresets[name] = {
+                    "wl": [new dwv.image.WindowLevel(center, width)],
+                    "name": name,
+                    "perslice": true};
             }
         }
     }
-    if ( windowPresets.length !== 0 ) {
-        view.setWindowPresets( windowPresets );
+
+    // min/max
+    // Not filled yet since it is stil too costly to calculate min/max
+    // for each slice... It will be filled at first use (see view.setWindowLevelPreset).
+    // Order is important, if no wl from DICOM, this will be the default.
+    windowPresets.minmax = { "name": "minmax" };
+
+    // optional modality presets
+    if ( typeof dwv.tool.defaultpresets !== "undefined" ) {
+        var modality = image.getMeta().Modality;
+        for( var key in dwv.tool.defaultpresets[modality] ) {
+            var preset = dwv.tool.defaultpresets[modality][key];
+            windowPresets[key] = {
+                "wl": new dwv.image.WindowLevel(preset.center, preset.width),
+                "name": key};
+        }
     }
-    else {
-        view.setWindowLevelMinMax();
-    }
+
+    // store
+    view.setWindowPresets( windowPresets );
 
     return view;
 };

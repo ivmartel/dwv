@@ -19,32 +19,33 @@ function startApp() {
 
 // Image decoders (for web workers)
 dwv.image.decoderScripts = {
-    "jpeg2000": "../../ext/pdfjs/decode-jpeg2000.js",
-    "jpeg-lossless": "../../ext/rii-mango/decode-jpegloss.js",
-    "jpeg-baseline": "../../ext/pdfjs/decode-jpegbaseline.js"
+    "jpeg2000": "../../decoders/pdfjs/decode-jpeg2000.js",
+    "jpeg-lossless": "../../decoders/rii-mango/decode-jpegloss.js",
+    "jpeg-baseline": "../../decoders/pdfjs/decode-jpegbaseline.js"
 };
+
+// status flags
+var domContentLoaded = false;
+var i18nInitialised = false;
+// launch when both DOM and i18n are ready
+function launchApp() {
+    if ( domContentLoaded && i18nInitialised ) {
+        startApp();
+    }
+}
+// i18n ready?
+dwv.i18nOnInitialised( function () {
+    i18nInitialised = true;
+    launchApp();
+});
 
 // check browser support
 dwv.browser.check();
 // initialise i18n
 dwv.i18nInitialise();
 
-// status flags
-var domContentLoaded = false;
-var i18nLoaded = false;
-// launch when both DOM and i18n are ready
-function launchApp() {
-    if ( domContentLoaded && i18nLoaded ) {
-        startApp();
-    }
-}
 // DOM ready?
 document.addEventListener("DOMContentLoaded", function (/*event*/) {
     domContentLoaded = true;
-    launchApp();
-});
-// i18n ready?
-dwv.i18nOnLoaded( function () {
-    i18nLoaded = true;
     launchApp();
 });

@@ -1,12 +1,13 @@
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-//external
-var Kinetic = Kinetic || {};
+// external
+var Konva = Konva || {};
 
 /**
  * Ellipse factory.
  * @constructor
+ * @external Konva
  */
 dwv.tool.EllipseFactory = function ()
 {
@@ -36,7 +37,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
     // physical shape
     var ellipse = new dwv.math.Ellipse(points[0], a, b);
     // draw shape
-    var kshape = new Kinetic.Ellipse({
+    var kshape = new Konva.Ellipse({
         x: ellipse.getCenter().getX(),
         y: ellipse.getCenter().getY(),
         radius: { x: ellipse.getA(), y: ellipse.getB() },
@@ -46,7 +47,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
     });
     // quantification
     var quant = image.quantifyEllipse( ellipse );
-    var ktext = new Kinetic.Text({
+    var ktext = new Konva.Text({
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
@@ -57,16 +58,16 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
     ktext.quant = quant;
     ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
     // label
-    var klabel = new Kinetic.Label({
+    var klabel = new Konva.Label({
         x: ellipse.getCenter().getX(),
         y: ellipse.getCenter().getY(),
         name: "label"
     });
     klabel.add(ktext);
-    klabel.add(new Kinetic.Tag());
+    klabel.add(new Konva.Tag());
 
     // return group
-    var group = new Kinetic.Group();
+    var group = new Konva.Group();
     group.name("ellipse-group");
     group.add(kshape);
     group.add(klabel);

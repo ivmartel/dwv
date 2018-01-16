@@ -1,5 +1,4 @@
 /.settings
-/node_modules
-/dist
-/build
-/unused
+build
+node_modules
+bower_components

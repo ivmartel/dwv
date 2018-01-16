@@ -1,0 +1,17 @@
+{
+  "minify": true,
+  "options": [
+    "setClasses"
+  ],
+  "feature-detects": [
+    "test/dataview-api",
+    "test/inputtypes",
+    "test/typed-arrays",
+    "test/file/api",
+    "test/forms/fileinputdirectory",
+    "test/network/xhr-responsetype-arraybuffer",
+    "test/network/xhr-responsetype-json",
+    "test/network/xhr-responsetype-text",
+    "test/network/xhr-responsetype"
+  ]
+}

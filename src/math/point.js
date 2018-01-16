@@ -24,7 +24,7 @@ dwv.math.Point2D = function (x,y)
 
 /**
  * Check for Point2D equality.
- * @param {Point2D} rhs The other Point2D to compare to.
+ * @param {Object} rhs The other point to compare to.
  * @return {Boolean} True if both points are equal.
  */
 dwv.math.Point2D.prototype.equals = function (rhs) {
@@ -35,10 +35,20 @@ dwv.math.Point2D.prototype.equals = function (rhs) {
 
 /**
  * Get a string representation of the Point2D.
- * @return {String} The Point2D as a string.
+ * @return {String} The point as a string.
  */
 dwv.math.Point2D.prototype.toString = function () {
     return "(" + this.getX() + ", " + this.getY() + ")";
+};
+
+/**
+ * Get the distance to another Point2D.
+ * @param {Object} point2D The input point.
+ */
+dwv.math.Point2D.prototype.getDistance = function (point2D) {
+    return Math.sqrt(
+        (this.getX() - point2D.getX()) * (this.getX() - point2D.getX()) +
+        (this.getY() - point2D.getY()) * (this.getY() - point2D.getY()) );
 };
 
 /**
@@ -55,7 +65,7 @@ dwv.math.FastPoint2D = function (x,y)
 
 /**
  * Check for FastPoint2D equality.
- * @param {FastPoint2D} other The other FastPoint2D to compare to.
+ * @param {Object} other The other point to compare to.
  * @return {Boolean} True if both points are equal.
  */
 dwv.math.FastPoint2D.prototype.equals = function (rhs) {
@@ -66,7 +76,7 @@ dwv.math.FastPoint2D.prototype.equals = function (rhs) {
 
 /**
  * Get a string representation of the FastPoint2D.
- * @return {String} The Point2D as a string.
+ * @return {String} The point as a string.
  */
 dwv.math.FastPoint2D.prototype.toString = function () {
     return "(" + this.x + ", " + this.y + ")";
@@ -100,7 +110,7 @@ dwv.math.Point3D = function (x,y,z)
 
 /**
  * Check for Point3D equality.
- * @param {Point3D} rhs The other Point3D to compare to.
+ * @param {Object} rhs The other point to compare to.
  * @return {Boolean} True if both points are equal.
  */
 dwv.math.Point3D.prototype.equals = function (rhs) {
@@ -112,12 +122,35 @@ dwv.math.Point3D.prototype.equals = function (rhs) {
 
 /**
  * Get a string representation of the Point3D.
- * @return {String} The Point3D as a string.
+ * @return {String} The point as a string.
  */
 dwv.math.Point3D.prototype.toString = function () {
     return "(" + this.getX() +
         ", " + this.getY() +
         ", " + this.getZ() + ")";
+};
+
+/**
+ * Get the distance to another Point3D.
+ * @param {Object} point3D The input point.
+ */
+dwv.math.Point3D.prototype.getDistance = function (point3D) {
+    return Math.sqrt(
+        (this.getX() - point3D.getX()) * (this.getX() - point3D.getX()) +
+        (this.getY() - point3D.getY()) * (this.getY() - point3D.getY()) +
+        (this.getZ() - point3D.getZ()) * (this.getZ() - point3D.getZ()) );
+};
+
+/**
+ * Get the difference to another Point3D.
+ * @param {Object} point3D The input point.
+ * @return {Object} The 3D vector from the input point to this one.
+ */
+dwv.math.Point3D.prototype.minus = function (point3D) {
+    return new dwv.math.Vector3D(
+        (this.getX() - point3D.getX()),
+        (this.getY() - point3D.getY()),
+        (this.getZ() - point3D.getZ()) );
 };
 
 /**
@@ -148,8 +181,8 @@ dwv.math.Index3D = function (i,j,k)
 
 /**
  * Check for Index3D equality.
- * @param {Index3D} rhs The other Index3D to compare to.
- * @return {Boolean} True if both points are equal.
+ * @param {Object} rhs The other index to compare to.
+ * @return {Boolean} True if both indices are equal.
  */
 dwv.math.Index3D.prototype.equals = function (rhs) {
     return rhs !== null &&

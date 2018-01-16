@@ -3,12 +3,31 @@ var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
 // external
-var Kinetic = Kinetic || {};
+var Konva = Konva || {};
 
 /**
  * Drawing tool.
+ *
+ * This tool is responsible for the draw layer group structure. The layout is:
+ *
+ * drawLayer
+ * |_ positionGroup: name="position-group", id="slice-#_frame-#""
+ *    |_ shapeGroup: name="{shape name}-group", id="#"
+ *       |_ shape: name="shape"
+ *       |_ label: name="label"
+ *       |_ extra: line tick, protractor arc...
+ *
+ * Discussion:
+ * - posGroup > shapeGroup
+ *    pro: slice/frame display: 1 loop
+ *    cons: multi-slice shape splitted in positionGroups
+ * - shapeGroup > posGroup
+ *    pros: more logical
+ *    cons: slice/frame display: 2 loops
+ *
  * @constructor
  * @param {Object} app The associated application.
+ * @external Konva
  */
 dwv.tool.Draw = function (app, shapeFactoryList)
 {
@@ -94,15 +113,15 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @private
      * @type Object
      */
-    var trash = new Kinetic.Group();
+    var trash = new Konva.Group();
 
     // first line of the cross
-    var trashLine1 = new Kinetic.Line({
+    var trashLine1 = new Konva.Line({
         points: [-10, -10, 10, 10 ],
         stroke: 'red'
     });
     // second line of the cross
-    var trashLine2 = new Kinetic.Line({
+    var trashLine2 = new Konva.Line({
         points: [10, -10, -10, 10 ],
         stroke: 'red'
     });
@@ -215,6 +234,16 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     };
 
     /**
+     * Get the current position draw group id.
+     * @return {Number} The group id.
+     */
+    var getDrawCurrentPositionGroupId = function () {
+        var currentSlice = app.getViewController().getCurrentPosition().k;
+        var currentFrame = app.getViewController().getCurrentFrame();
+        return dwv.getDrawPositionGroupId(currentSlice, currentFrame);
+    };
+
+    /**
      * Handle mouse up event.
      * @param {Object} event The mouse up event.
      */
@@ -229,6 +258,26 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             var factory = new self.shapeFactoryList[self.shapeName]();
             var group = factory.create(points, self.style, app.getImage());
             group.id( dwv.math.guid() );
+
+            // get position groups
+            var posGroupId = getDrawCurrentPositionGroupId();
+            var posGroups = drawLayer.getChildren( function (node) {
+                return node.id() === posGroupId;
+            });
+            // if one group, use it
+            // if no group, create one
+            var posGroup = null;
+            if ( posGroups.length === 1 ) {
+                posGroup = posGroups[0];
+            } else if ( posGroups.length === 0 ) {
+                posGroup = new Konva.Group();
+                posGroup.name("position-group");
+                posGroup.id(posGroupId);
+                posGroup.visible(true); // dont inherit
+            }
+            // add group to slice group
+            posGroup.add(group);
+
             // re-activate layer
             drawLayer.hitGraphEnabled(true);
             // draw shape command
@@ -420,9 +469,9 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      */
     function updateDrawLayer() {
         // deactivate the old draw layer
-        renderDrawLayer(false);
+        //renderDrawLayer(false);
         // get the current draw layer
-        drawLayer = app.getCurrentDrawLayer();
+        //drawLayer = app.getCurrentDrawLayer();
         // activate the new draw layer
         renderDrawLayer(true);
     }
@@ -432,17 +481,21 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @param {Boolean} visible Set the draw layer visible or not.
      */
     function renderDrawLayer(visible) {
+
         drawLayer.listening( visible );
         drawLayer.hitGraphEnabled( visible );
-        // get the list of shapes
-        var groups = drawLayer.getChildren();
+
+        // get shape groups at the current position
+        var posGroupId = getDrawCurrentPositionGroupId();
+        var shapeGroups = dwv.getDrawShapeGroupsAtPosition(posGroupId, drawLayer);
+
         var shapes = [];
         var fshape = function (node) {
             return node.name() === 'shape';
         };
-        for ( var i = 0; i < groups.length; ++i ) {
+        for ( var i = 0; i < shapeGroups.length; ++i ) {
             // should only be one shape per group
-            shapes.push( groups[i].getChildren(fshape)[0] );
+            shapes.push( shapeGroups[i].getChildren(fshape)[0] );
         }
         // set shape display properties
         if ( visible ) {
@@ -508,11 +561,11 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         // store original colour
         var colour = null;
 
+        // save start position
+        dragStartPos = {'x': shape.x(), 'y': shape.y()};
+
         // drag start event handling
-        shape.on('dragstart', function (event) {
-            // save start position
-            var offset = dwv.html.getEventOffset( event.evt )[0];
-            dragStartPos = getRealPosition( offset );
+        shape.on('dragstart', function (/*event*/) {
             // colour
             colour = shape.stroke();
             // display trash
@@ -530,21 +583,21 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         });
         // drag move event handling
         shape.on('dragmove', function (event) {
-            var offset = dwv.html.getEventOffset( event.evt )[0];
-            var pos = getRealPosition( offset );
+            var pos = {'x': this.x(), 'y': this.y()};
             var translation;
             if ( dragLastPos ) {
                 translation = {'x': pos.x - dragLastPos.x,
                     'y': pos.y - dragLastPos.y};
-            }
-            else {
+            } else {
                 translation = {'x': pos.x - dragStartPos.x,
-                        'y': pos.y - dragStartPos.y};
+                    'y': pos.y - dragStartPos.y};
             }
             dragLastPos = pos;
             // highlight trash when on it
-            if ( Math.abs( pos.x - trash.x() ) < 10 &&
-                    Math.abs( pos.y - trash.y() ) < 10   ) {
+            var offset = dwv.html.getEventOffset( event.evt )[0];
+            var eventPos = getRealPosition( offset );
+            if ( Math.abs( eventPos.x - trash.x() ) < 10 &&
+                    Math.abs( eventPos.y - trash.y() ) < 10   ) {
                 trash.getChildren().each( function (tshape){ tshape.stroke('orange'); });
                 shape.stroke('red');
             }
@@ -554,12 +607,12 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             }
             // update group but not 'this' shape
             var group = this.getParent();
-            group.getChildren().each( function (shape) {
-                if ( shape == this ) {
+            group.getChildren().each( function (ashape) {
+                if ( ashape === shape ) {
                     return;
                 }
-                shape.x( shape.x() + translation.x );
-                shape.y( shape.y() + translation.y );
+                ashape.x( ashape.x() + translation.x );
+                ashape.y( ashape.y() + translation.y );
             });
             // reset anchors
             shapeEditor.resetAnchors();
@@ -567,21 +620,23 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             drawLayer.draw();
         });
         // drag end event handling
-        shape.on('dragend', function (/*event*/) {
-            var pos = dragLastPos;
+        shape.on('dragend', function (event) {
+            var pos = {'x': this.x(), 'y': this.y()};
             dragLastPos = null;
             // remove trash
             trash.remove();
             // delete case
-            if ( Math.abs( pos.x - trash.x() ) < 10 &&
-                    Math.abs( pos.y - trash.y() ) < 10   ) {
+            var offset = dwv.html.getEventOffset( event.evt )[0];
+            var eventPos = getRealPosition( offset );
+            if ( Math.abs( eventPos.x - trash.x() ) < 10 &&
+                    Math.abs( eventPos.y - trash.y() ) < 10   ) {
                 // compensate for the drag translation
                 var delTranslation = {'x': pos.x - dragStartPos.x,
                         'y': pos.y - dragStartPos.y};
                 var group = this.getParent();
-                group.getChildren().each( function (shape) {
-                    shape.x( shape.x() - delTranslation.x );
-                    shape.y( shape.y() - delTranslation.y );
+                group.getChildren().each( function (ashape) {
+                    ashape.x( ashape.x() - delTranslation.x );
+                    ashape.y( ashape.y() - delTranslation.y );
                 });
                 // disable editor
                 shapeEditor.disable();
@@ -608,7 +663,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                     mvcmd.onExecute = fireEvent;
                     mvcmd.onUndo = fireEvent;
                     app.addToUndoStack(mvcmd);
-                    // the move is handled by kinetic, trigger an event manually
+
+                    // reset start position
+                    dragStartPos = {'x': this.x(), 'y': this.y()};
+                    // the move is handled by Konva, trigger an event manually
                     fireEvent({'type': 'draw-move'});
                 }
                 // reset anchors

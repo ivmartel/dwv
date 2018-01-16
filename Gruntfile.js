@@ -33,12 +33,9 @@ module.exports = function(grunt) {
             }
         },
         concat: {
-            options: {
-                separator: ';'
-            },
             dist: {
-                src: ['src/**/*.js'],
-                dest: 'dist/<%= pkg.name %>.js'
+                src: ['resources/module/intro.js', 'src/**/*.js', 'resources/module/outro.js'],
+                dest: 'build/dist/<%= pkg.name %>.js'
             }
         },
         uglify: {
@@ -47,17 +44,17 @@ module.exports = function(grunt) {
             },
             dist: {
                 files: {
-                    'dist/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
+                    'build/dist/<%= pkg.name %>-<%= pkg.version %>.min.js': ['<%= concat.dist.dest %>']
                 }
             }
         },
         jsdoc: {
             dist : {
-                src: ['src/**/*.js', 'tests/**/*.js', 'resources/readme-doc.md'],
+                src: ['src/**/*.js', 'tests/**/*.js', 'resources/doc/readme-doc.md'],
                 options: {
-                    destination: 'dist/doc',
+                    destination: 'build/doc',
                     template: 'node_modules/ink-docstrap/template',
-                    configure: 'resources/jsdoc.conf.json'
+                    configure: 'resources/doc/jsdoc.conf.json'
                 }
             }
         }

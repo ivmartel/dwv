@@ -60,10 +60,10 @@ dwv.tool.Scroll = function(app)
         if( yMove ) {
             // update GUI
             if( diffY > 0 ) {
-                app.getViewController().incrementSliceNb();
+                app.getViewController().decrementSliceNb();
             }
             else {
-                app.getViewController().decrementSliceNb();
+                app.getViewController().incrementSliceNb();
             }
         }
 
@@ -117,6 +117,7 @@ dwv.tool.Scroll = function(app)
     this.touchstart = function(event){
         // long touch triggers the dblclick
         touchTimerID = setTimeout(self.dblclick, 500);
+        // call mouse equivalent
         self.mousedown(event);
     };
 
@@ -125,6 +126,12 @@ dwv.tool.Scroll = function(app)
      * @param {Object} event The touch move event.
      */
     this.touchmove = function(event){
+        // abort timer if move
+        if (touchTimerID !== null) {
+            clearTimeout(touchTimerID);
+            touchTimerID = null;
+        }
+        // call mouse equivalent
         self.mousemove(event);
     };
 
@@ -133,10 +140,12 @@ dwv.tool.Scroll = function(app)
      * @param {Object} event The touch end event.
      */
     this.touchend = function(event){
+        // abort timer
         if (touchTimerID !== null) {
             clearTimeout(touchTimerID);
             touchTimerID = null;
         }
+        // call mouse equivalent
         self.mouseup(event);
     };
 
@@ -144,13 +153,12 @@ dwv.tool.Scroll = function(app)
      * Handle mouse scroll event (fired by Firefox).
      * @param {Object} event The mouse scroll event.
      */
-    this.DOMMouseScroll = function(event){
+    this.DOMMouseScroll = function (event) {
         // ev.detail on firefox is 3
-        if( event.detail < 0 ) {
-            app.getViewController().incrementSliceNb();
-        }
-        else {
-            app.getViewController().decrementSliceNb();
+        if ( event.detail < 0 ) {
+            mouseScroll(true);
+        } else {
+            mouseScroll(false);
         }
     };
 
@@ -158,15 +166,37 @@ dwv.tool.Scroll = function(app)
      * Handle mouse wheel event.
      * @param {Object} event The mouse wheel event.
      */
-    this.mousewheel = function(event){
+    this.mousewheel = function (event) {
         // ev.wheelDelta on chrome is 120
-        if( event.wheelDelta > 0 ) {
-            app.getViewController().incrementSliceNb();
-        }
-        else {
-            app.getViewController().decrementSliceNb();
+        if ( event.wheelDelta > 0 ) {
+            mouseScroll(true);
+        } else {
+            mouseScroll(false);
         }
     };
+
+    /**
+     * Mouse scroll action.
+     * @param {Boolean} up True to increment, false to decrement.
+     */
+    function mouseScroll (up) {
+        var hasSlices = (app.getImage().getGeometry().getSize().getNumberOfSlices() !== 1);
+        var hasFrames = (app.getImage().getNumberOfFrames() !== 1);
+        if ( up ) {
+            if (hasSlices) {
+                app.getViewController().incrementSliceNb();
+            } else if (hasFrames) {
+                app.getViewController().incrementFrameNb();
+            }
+        } else {
+            if (hasSlices) {
+                app.getViewController().decrementSliceNb();
+            } else if (hasFrames) {
+                app.getViewController().decrementFrameNb();
+            }
+        }
+    }
+
     /**
      * Handle key down event.
      * @param {Object} event The key down event.
@@ -205,7 +235,7 @@ dwv.tool.Scroll = function(app)
      * Initialise the tool.
      */
     this.init = function() {
-        if ( app.getNSlicesToLoad() === 1 && app.getImage().getNumberOfFrames() === 1 ) {
+        if ( app.isMonoSliceData() && app.getImage().getNumberOfFrames() === 1 ) {
             return false;
         }
         return true;

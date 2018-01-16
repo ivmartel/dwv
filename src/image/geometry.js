@@ -73,6 +73,16 @@ dwv.image.Size.prototype.isInBounds = function ( i, j, k ) {
 };
 
 /**
+ * Get a string representation of the Vector3D.
+ * @return {String} The vector as a string.
+ */
+dwv.image.Size.prototype.toString = function () {
+    return "(" + this.getNumberOfColumns() +
+        ", " + this.getNumberOfRows() +
+        ", " + this.getNumberOfSlices() + ")";
+};
+
+/**
  * 2D/3D Spacing class.
  * @constructor
  * @param {Number} columnSpacing The column spacing.
@@ -111,19 +121,35 @@ dwv.image.Spacing.prototype.equals = function (rhs) {
 };
 
 /**
+ * Get a string representation of the Vector3D.
+ * @return {String} The vector as a string.
+ */
+dwv.image.Spacing.prototype.toString = function () {
+    return "(" + this.getColumnSpacing() +
+        ", " + this.getRowSpacing() +
+        ", " + this.getSliceSpacing() + ")";
+};
+
+
+/**
  * 2D/3D Geometry class.
  * @constructor
- * @param {Object} origin The object origin.
+ * @param {Object} origin The object origin (a 3D point).
  * @param {Object} size The object size.
  * @param {Object} spacing The object spacing.
+ * @param {Object} orientation The object orientation (3*3 matrix, default to 3*3 identity).
  */
-dwv.image.Geometry = function ( origin, size, spacing )
+dwv.image.Geometry = function ( origin, size, spacing, orientation )
 {
-    // check input origin.
-    if( typeof(origin) === 'undefined' ) {
+    // check input origin
+    if( typeof origin === 'undefined' ) {
         origin = new dwv.math.Point3D(0,0,0);
     }
     var origins = [origin];
+    // check input orientation
+    if( typeof orientation === 'undefined' ) {
+        orientation = new dwv.math.getIdentityMat33();
+    }
 
     /**
      * Get the object first origin.
@@ -145,6 +171,11 @@ dwv.image.Geometry = function ( origin, size, spacing )
      * @return {Object} The object spacing.
      */
     this.getSpacing = function () { return spacing; };
+    /**
+     * Get the object orientation.
+     * @return {Object} The object orientation.
+     */
+    this.getOrientation = function () { return orientation; };
 
     /**
      * Get the slice position of a point in the current slice layout.
@@ -157,19 +188,22 @@ dwv.image.Geometry = function ( origin, size, spacing )
 
         // find the closest index
         var closestSliceIndex = 0;
-        var minDiff = Math.abs( origins[0].getZ() - point.getZ() );
-        var diff = 0;
+        var minDist = point.getDistance(origins[0]);
+        var dist = 0;
         for( var i = 0; i < origins.length; ++i )
         {
-            diff = Math.abs( origins[i].getZ() - point.getZ() );
-            if( diff < minDiff )
+            dist = point.getDistance(origins[i]);
+            if( dist < minDist )
             {
-                minDiff = diff;
+                minDist = dist;
                 closestSliceIndex = i;
             }
         }
-        diff = origins[closestSliceIndex].getZ() - point.getZ();
-        var sliceIndex = ( diff > 0 ) ? closestSliceIndex : closestSliceIndex + 1;
+        // we have the closest point, are we before or after
+        var normal = new dwv.math.Vector3D(
+            orientation.get(2,0), orientation.get(2,1), orientation.get(2,2));
+        var dotProd = normal.dotProduct( point.minus(origins[closestSliceIndex]) );
+        var sliceIndex = ( dotProd > 0 ) ? closestSliceIndex + 1 : closestSliceIndex;
         return sliceIndex;
     };
 

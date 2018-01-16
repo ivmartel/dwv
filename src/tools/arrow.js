@@ -1,12 +1,13 @@
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-//external
-var Kinetic = Kinetic || {};
+// external
+var Konva = Konva || {};
 
 /**
  * Arrow factory.
  * @constructor
+ * @external Konva
  */
 dwv.tool.ArrowFactory = function ()
 {
@@ -33,12 +34,24 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
     // physical shape
     var line = new dwv.math.Line(points[0], points[1]);
     // draw shape
-    var kshape = new Kinetic.Line({
+    var kshape = new Konva.Line({
         points: [line.getBegin().getX(), line.getBegin().getY(),
                  line.getEnd().getX(), line.getEnd().getY() ],
         stroke: style.getLineColour(),
         strokeWidth: style.getScaledStrokeWidth(),
         name: "shape"
+    });
+    // larger hitfunc
+    var linePerp0 = dwv.math.getPerpendicularLine( line, points[0], 10 );
+    var linePerp1 = dwv.math.getPerpendicularLine( line, points[1], 10 );
+    kshape.hitFunc( function (context) {
+        context.beginPath();
+        context.moveTo( linePerp0.getBegin().getX(), linePerp0.getBegin().getY() );
+        context.lineTo( linePerp0.getEnd().getX(), linePerp0.getEnd().getY() );
+        context.lineTo( linePerp1.getEnd().getX(), linePerp1.getEnd().getY() );
+        context.lineTo( linePerp1.getBegin().getX(), linePerp1.getBegin().getY() );
+        context.closePath();
+        context.fillStrokeShape(this);
     });
     // triangle
     var beginTy = new dwv.math.Point2D(line.getBegin().getX(), line.getBegin().getY() - 10);
@@ -46,7 +59,7 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
     var angle = dwv.math.getAngle(line, verticalLine);
     var angleRad = angle * Math.PI / 180;
     var radius = 5;
-    var kpoly = new Kinetic.RegularPolygon({
+    var kpoly = new Konva.RegularPolygon({
         x: line.getBegin().getX() + radius * Math.sin(angleRad),
         y: line.getBegin().getY() + radius * Math.cos(angleRad),
         sides: 3,
@@ -57,7 +70,7 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
         name: "shape-triangle"
     });
     // quantification
-    var ktext = new Kinetic.Text({
+    var ktext = new Konva.Text({
         fontSize: style.getScaledFontSize(),
         fontFamily: style.getFontFamily(),
         fill: style.getLineColour(),
@@ -70,16 +83,16 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
     // label
     var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
     var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
-    var klabel = new Kinetic.Label({
+    var klabel = new Konva.Label({
         x: line.getEnd().getX() + dX * 25,
         y: line.getEnd().getY() + dY * 15,
         name: "label"
     });
     klabel.add(ktext);
-    klabel.add(new Kinetic.Tag());
+    klabel.add(new Konva.Tag());
 
     // return group
-    var group = new Kinetic.Group();
+    var group = new Konva.Group();
     group.name("line-group");
     group.add(kshape);
     group.add(kpoly);
@@ -138,6 +151,20 @@ dwv.tool.UpdateArrow = function (anchor/*, image*/)
     var p2d0 = new dwv.math.Point2D(begin.x(), begin.y());
     var p2d1 = new dwv.math.Point2D(end.x(), end.y());
     var line = new dwv.math.Line(p2d0, p2d1);
+    // larger hitfunc
+    var p2b = new dwv.math.Point2D(bx, by);
+    var p2e = new dwv.math.Point2D(ex, ey);
+    var linePerp0 = dwv.math.getPerpendicularLine( line, p2b, 10 );
+    var linePerp1 = dwv.math.getPerpendicularLine( line, p2e, 10 );
+    kline.hitFunc( function (context) {
+        context.beginPath();
+        context.moveTo( linePerp0.getBegin().getX(), linePerp0.getBegin().getY() );
+        context.lineTo( linePerp0.getEnd().getX(), linePerp0.getEnd().getY() );
+        context.lineTo( linePerp1.getEnd().getX(), linePerp1.getEnd().getY() );
+        context.lineTo( linePerp1.getBegin().getX(), linePerp1.getBegin().getY() );
+        context.closePath();
+        context.fillStrokeShape(this);
+    });
     // udate triangle
     var beginTy = new dwv.math.Point2D(line.getBegin().getX(), line.getBegin().getY() - 10);
     var verticalLine = new dwv.math.Line(line.getBegin(), beginTy);

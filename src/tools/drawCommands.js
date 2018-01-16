@@ -2,18 +2,19 @@
 var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
-//external
-var Kinetic = Kinetic || {};
+// external
+var Konva = Konva || {};
 
 /**
- * Get the display name of the input Kinetic shape.
- * @param {Object} shape The Kinetic shape.
+ * Get the display name of the input shape.
+ * @param {Object} shape The Konva shape.
  * @return {String} The display name.
+ * @external Konva
  */
 dwv.tool.GetShapeDisplayName = function (shape)
 {
     var displayName = "shape";
-    if ( shape instanceof Kinetic.Line ) {
+    if ( shape instanceof Konva.Line ) {
         if ( shape.points().length === 4 ) {
             displayName = "line";
         }
@@ -24,10 +25,10 @@ dwv.tool.GetShapeDisplayName = function (shape)
             displayName = "roi";
         }
     }
-    else if ( shape instanceof Kinetic.Rect ) {
+    else if ( shape instanceof Konva.Rect ) {
         displayName = "rectangle";
     }
-    else if ( shape instanceof Kinetic.Ellipse ) {
+    else if ( shape instanceof Konva.Ellipse ) {
         displayName = "ellipse";
     }
     // return
@@ -56,7 +57,12 @@ dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
      */
     this.execute = function () {
         // add the group to the layer
-        layer.add(group);
+        var parent = group.getParent();
+        if ( typeof parent === "undefined" ) {
+            layer.add(group);
+        } else {
+            layer.add(parent);
+        }
         // draw
         layer.draw();
         // callback
@@ -225,6 +231,9 @@ dwv.tool.ChangeGroupCommand.prototype.onUndo = function (/*event*/)
  */
 dwv.tool.DeleteGroupCommand = function (group, name, layer)
 {
+    // group parent
+    var parent = group.getParent();
+
     /**
      * Get the command name.
      * @return {String} The command name.
@@ -234,7 +243,7 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
      * Execute the command.
      */
     this.execute = function () {
-        // remove the group from the parent layer
+        // remove the group from its parent
         group.remove();
         // draw
         layer.draw();
@@ -245,8 +254,8 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
      * Undo the command.
      */
     this.undo = function () {
-        // add the group to the layer
-        layer.add(group);
+        // add the group to its parent
+        parent.add(group);
         // draw
         layer.draw();
         // callback

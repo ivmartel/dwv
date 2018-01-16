@@ -165,6 +165,7 @@ dwv.utils.decodeKeyValueUri = function (uri, replaceMode)
 
 /**
  * Decode a manifest query.
+ * @external XMLHttpRequest
  * @param {Object} query The manifest query: {input, nslices},
  *   with input the input URI and nslices the number of slices.
  * @param {Function} The function to call with the decoded urls.
@@ -192,7 +193,7 @@ dwv.utils.decodeManifestQuery = function (query, callback)
 
     var request = new XMLHttpRequest();
     request.open('GET', decodeURIComponent(uri), true);
-    request.responseType = "xml";
+    request.responseType = "document";
     request.onload = onLoad;
     request.onerror = onError;
     request.send(null);

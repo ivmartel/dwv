@@ -8,15 +8,30 @@ dwv.image.lut = dwv.image.lut || {};
  * Rescale LUT class.
  * @constructor
  * @param {Object} rsi The rescale slope and intercept.
+ * @param {Number} bitsStored The number of bits used to store the data.
  */
-dwv.image.lut.Rescale = function (rsi)
+dwv.image.lut.Rescale = function (rsi, bitsStored)
 {
     /**
      * The internal array.
      * @private
      * @type Array
      */
-    var rescaleLut = null;
+    var lut = null;
+
+    /**
+     * Flag to know if the lut is ready or not.
+     * @private
+     * @type Boolean
+     */
+    var isReady = false;
+
+    /**
+     * The size of the LUT array.
+     * @private
+     * @type Number
+     */
+    var length = Math.pow(2, bitsStored);
 
     /**
      * Get the Rescale Slope and Intercept (RSI).
@@ -25,36 +40,51 @@ dwv.image.lut.Rescale = function (rsi)
     this.getRSI = function () { return rsi; };
 
     /**
-     * Initialise the LUT.
-     * @param {Number} bitsStored The number of bits used to store the data.
+     * Is the lut ready to use or not? If not, the user must
+     * call 'initialise'.
+     * @return {Boolean} True if the lut is ready to use.
      */
-    this.initialise = function (bitsStored)
+    this.isReady = function () { return isReady; };
+
+    /**
+     * Initialise the LUT.
+     */
+    this.initialise = function ()
     {
-        var size = Math.pow(2, bitsStored);
-        rescaleLut = new Float32Array(size);
-        for ( var i = 0; i < size; ++i ) {
-            rescaleLut[i] = rsi.apply(i);
+        // check if already initialised
+        if (isReady) {
+            return;
         }
+        // create lut and fill it
+        lut = new Float32Array(length);
+        for ( var i = 0; i < length; ++i ) {
+            lut[i] = rsi.apply(i);
+        }
+        // update ready flag
+        isReady = true;
     };
 
     /**
      * Get the length of the LUT array.
      * @return {Number} The length of the LUT array.
      */
-    this.getLength = function () { return rescaleLut.length; };
+    this.getLength = function () { return length; };
 
     /**
      * Get the value of the LUT at the given offset.
      * @return {Number} The value of the LUT at the given offset.
      */
-    this.getValue = function (offset) { return rescaleLut[offset]; };
+    this.getValue = function (offset)
+    {
+        return lut[ offset ];
+    };
 };
 
 /**
  * Window LUT class.
  * @constructor
- * @param {Number} rescaleLut_ The associated rescale LUT.
- * @param {Boolean} isSigned_ Flag to know if the data is signed.
+ * @param {Number} rescaleLut The associated rescale LUT.
+ * @param {Boolean} isSigned Flag to know if the data is signed or not.
  */
 dwv.image.lut.Window = function (rescaleLut, isSigned)
 {
@@ -63,60 +93,70 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
      * @private
      * @type Array
      */
-    var windowLut = new Uint8ClampedArray(rescaleLut.getLength());
+    var lut = null;
 
     /**
-     * The window center.
+     * The window level.
      * @private
-     * @type Number
+     * @type {Object}
      */
-    var center = null;
-    /**
-     * The window width.
-     * @private
-     * @type Number
-     */
-    var width = null;
+    var windowLevel = null;
 
     /**
-     * Flag to know if the lut needs update or not.
+     * Flag to know if the lut is ready or not.
      * @private
      * @type Boolean
      */
-    var needsUpdate = false;
+    var isReady = false;
 
     /**
-     * Get the window center.
-     * @return {Number} The window center.
+     * Shift for signed data.
+     * @private
+     * @type Number
      */
-    this.getCenter = function() { return center; };
+    var signedShift = 0;
+
     /**
-     * Get the window width.
-     * @return {Number} The window width.
+     * Get the window / level.
+     * @return {Object} The window / level.
      */
-    this.getWidth = function() { return width; };
+    this.getWindowLevel = function () { return windowLevel; };
     /**
      * Get the signed flag.
      * @return {Boolean} The signed flag.
      */
-    this.isSigned = function() { return isSigned; };
+    this.isSigned = function () { return isSigned; };
     /**
      * Get the rescale lut.
      * @return {Object} The rescale lut.
      */
-    this.getRescaleLut = function() { return rescaleLut; };
+    this.getRescaleLut = function () { return rescaleLut; };
+
+    /**
+     * Is the lut ready to use or not? If not, the user must
+     * call 'update'.
+     * @return {Boolean} True if the lut is ready to use.
+     */
+    this.isReady = function () { return isReady; };
 
     /**
      * Set the window center and width.
-     * @param {Number} inCenter The window center.
-     * @param {Number} inWidth The window width.
+     * @param {Object} wl The window level.
      */
-    this.setCenterAndWidth = function (inCenter, inWidth)
+    this.setWindowLevel = function (wl)
     {
         // store the window values
-        center = inCenter;
-        width = inWidth;
-        needsUpdate = true;
+        windowLevel = wl;
+        // possible signed shift
+        signedShift = 0;
+        windowLevel.setSignedOffset(0);
+        if ( isSigned ) {
+            var size = rescaleLut.getLength();
+            signedShift = size / 2;
+            windowLevel.setSignedOffset(rescaleLut.getRSI().getSlope() * signedShift);
+        }
+        // update ready flag
+        isReady = false;
     };
 
     /**
@@ -124,67 +164,45 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
      */
     this.update = function ()
     {
-        if ( !needsUpdate ) {
+        // check if we need to update
+        if ( isReady ) {
             return;
         }
-        // pre calculate loop values
-        var size = windowLut.length;
-        var center0 = center - 0.5;
-        if ( isSigned ) {
-            center0 += rescaleLut.getRSI().getSlope() * (size / 2);
+
+        // check rescale lut
+        if (!rescaleLut.isReady()) {
+            rescaleLut.initialise();
         }
-        var width0 = width - 1;
-        var dispval = 0;
-        if( !dwv.browser.hasClampedArray() )
+        // create window lut
+        var size = rescaleLut.getLength();
+        if (!lut) {
+            // use clamped array (polyfilled in browser.js)
+            lut = new Uint8ClampedArray(size);
+        }
+        // by default WindowLevel returns a value in the [0,255] range
+        // this is ok with regular Arrays and ClampedArray.
+        for ( var i = 0; i < size; ++i )
         {
-            var yMax = 255;
-            var yMin = 0;
-            for(var j=0; j<size; ++j)
-            {
-                // from the DICOM specification (https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
-                // y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin )+ ymin
-                dispval = ((rescaleLut.getValue(j) - center0 ) / width0 + 0.5) * 255;
-                dispval = parseInt(dispval, 10);
-                if ( dispval <= yMin ) {
-                    windowLut[j] = yMin;
-                }
-                else if ( dispval > yMax ) {
-                    windowLut[j] = yMax;
-                }
-                else {
-                    windowLut[j] = dispval;
-                }
-            }
+            lut[i] = windowLevel.apply( rescaleLut.getValue(i) );
         }
-        else
-        {
-            // when using Uint8ClampedArray, values are clamped between 0 and 255
-            // no need to check
-            for(var i=0; i<size; ++i)
-            {
-                // from the DICOM specification (https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
-                // y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin )+ ymin
-                dispval = ((rescaleLut.getValue(i) - center0 ) / width0 + 0.5) * 255;
-                windowLut[i]= parseInt(dispval, 10);
-            }
-        }
-        needsUpdate = false;
+
+        // update ready flag
+        isReady = true;
     };
 
     /**
      * Get the length of the LUT array.
      * @return {Number} The length of the LUT array.
      */
-    this.getLength = function() { return windowLut.length; };
+    this.getLength = function () { return lut.length; };
 
     /**
      * Get the value of the LUT at the given offset.
      * @return {Number} The value of the LUT at the given offset.
      */
-    this.getValue = function(offset)
+    this.getValue = function (offset)
     {
-        var shift = isSigned ? windowLut.length / 2 : 0;
-        return windowLut[offset+shift];
+        return lut[ offset + signedShift ];
     };
 };
 

@@ -12,5 +12,5 @@ env:
 
 # update gh-pages if all good
 after_success:
-  - chmod +x ./resources/update-gh-pages.sh
-  - ./resources/update-gh-pages.sh
+  - chmod +x ./resources/scripts/update-gh-pages.sh
+  - ./resources/scripts/update-gh-pages.sh

@@ -89,9 +89,9 @@
         },
         "Scroll": {
             "name": "Navigation",
-            "brief": "Permet de naviguer dans les coupes de l'image.",
-            "double_click": "Un double clic lance la lecture automatique des coupes ou frames. Un clic simple l'arrète.",
-            "tap_and_hold": "Rester appuyer une seconde pour lancer la lecture automatique des coupes ou frames. Un appui simple l'arrète.",
+            "brief": "Permet de naviguer dans les coupes/frames de l'image.",
+            "double_click": "Un double clic lance la lecture automatique des coupes ou frames. Un clic simple l’arrête.",
+            "tap_and_hold": "Appuyer une seconde pour lancer la lecture automatique des coupes ou frames. Un appui simple l’arrête.",
             "mouse_drag": "Appuyer et glisser la souris verticalement pour changer de coupe, horizontalement pour changer de frame. Raccourcis clavier: CTRL + flèche haut ou bas pour changer de coupe, CTRL + flèche gauche ou droite pour changer de frame.",
             "touch_drag": "Appuyer et glisser un doigt verticalement pour changer de coupe, horizontalement pour changer de frame."
         },
@@ -152,6 +152,9 @@
     "io": {
         "File": {
             "name": "Fichier"
+        },
+        "Folder": {
+            "name": "Dossier"
         },
         "Url": {
             "name": "Lien"

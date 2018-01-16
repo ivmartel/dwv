@@ -3,6 +3,22 @@ var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
 /**
+ * Mulitply the three inputs if the last two are not null.
+ * @param {Number} a The first input.
+ * @param {Number} b The second input.
+ * @param {Number} c The third input.
+ * @return {Number} The multiplication of the three inputs or
+ *  null if one of the last two is null.
+ */
+function mulABC( a, b, c) {
+    var res = null;
+    if (b !== null && c !== null) {
+        res = a * b * c;
+    }
+    return res;
+}
+
+/**
  * Circle shape.
  * @constructor
  * @param {Object} centre A Point2D representing the centre of the circle.
@@ -33,14 +49,15 @@ dwv.math.Circle = function(centre, radius)
      */
     this.getSurface = function() { return surface; };
     /**
-     * Get the surface of the circle with a spacing.
+     * Get the surface of the circle according to a spacing.
      * @param {Number} spacingX The X spacing.
      * @param {Number} spacingY The Y spacing.
-     * @return {Number} The surface of the circle multiplied by the given spacing.
+     * @return {Number} The surface of the circle multiplied by the given
+     *  spacing or null for null spacings.
      */
     this.getWorldSurface = function(spacingX, spacingY)
     {
-        return surface * spacingX * spacingY;
+        return mulABC(surface, spacingX, spacingY);
     };
 }; // Circle class
 
@@ -81,14 +98,15 @@ dwv.math.Ellipse = function(centre, a, b)
      */
     this.getSurface = function() { return surface; };
     /**
-     * Get the surface of the ellipse with a spacing.
+     * Get the surface of the ellipse according to a spacing.
      * @param {Number} spacingX The X spacing.
      * @param {Number} spacingY The Y spacing.
-     * @return {Number} The surface of the ellipse multiplied by the given spacing.
+     * @return {Number} The surface of the ellipse multiplied by the given
+     *  spacing or null for null spacings.
      */
     this.getWorldSurface = function(spacingX, spacingY)
     {
-        return surface * spacingX * spacingY;
+        return mulABC(surface, spacingX, spacingY);
     };
 }; // Circle class
 
@@ -145,16 +163,21 @@ dwv.math.Line = function(begin, end)
      */
     this.getLength = function() { return length; };
     /**
-     * Get the length of the line with spacing.
+     * Get the length of the line according to a  spacing.
      * @param {Number} spacingX The X spacing.
      * @param {Number} spacingY The Y spacing.
-     * @return {Number} The length of the line with spacing.
+     * @return {Number} The length of the line with spacing
+     *  or null for null spacings.
      */
     this.getWorldLength = function(spacingX, spacingY)
     {
-        var dxs = dx * spacingX;
-        var dys = dy * spacingY;
-        return Math.sqrt( dxs * dxs + dys * dys );
+        var wlen = null;
+        if (spacingX !== null && spacingY !== null) {
+            var dxs = dx * spacingX;
+            var dys = dy * spacingY;
+            wlen = Math.sqrt( dxs * dxs + dys * dys );
+        }
+        return wlen;
     };
     /**
      * Get the mid point of the line.
@@ -334,12 +357,15 @@ dwv.math.Rectangle = function(begin, end)
      */
     this.getSurface = function() { return surface; };
     /**
-     * Get the surface of the rectangle with a spacing.
-     * @return {Number} The surface of the rectangle with a spacing.
+     * Get the surface of the circle according to a spacing.
+     * @param {Number} spacingX The X spacing.
+     * @param {Number} spacingY The Y spacing.
+     * @return {Number} The surface of the rectangle multiplied by the given
+     *  spacing or null for null spacings.
      */
     this.getWorldSurface = function(spacingX, spacingY)
     {
-        return surface * spacingX * spacingY;
+        return mulABC(surface, spacingX, spacingY);
     };
 }; // Rectangle class
 

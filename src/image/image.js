@@ -82,15 +82,22 @@ dwv.image.RescaleSlopeAndIntercept.prototype.isID = function () {
  * @constructor
  * @param {Object} geometry The geometry of the image.
  * @param {Array} buffer The image data as an array of frame buffers.
+ * @param {Number} numberOfFrames The number of frames (optional, can be used
+     to anticipate the final number after appends).
  */
-dwv.image.Image = function(geometry, buffer)
+dwv.image.Image = function(geometry, buffer, numberOfFrames)
 {
+    // use buffer length in not specified
+    if (typeof numberOfFrames === "undefined") {
+        numberOfFrames = buffer.length;
+    }
+
     /**
      * Get the number of frames.
      * @returns {Number} The number of frames.
      */
     this.getNumberOfFrames = function () {
-        return buffer.length;
+        return numberOfFrames;
     };
 
     /**
@@ -159,6 +166,25 @@ dwv.image.Image = function(geometry, buffer)
      * @type Array
      */
     var histogram = null;
+
+	/**
+	 * Overlay.
+     * @private
+     * @type Array
+     */
+	var overlays = [];
+
+    /**
+     * Set the first overlay.
+     * @param {Array} over The first overlay.
+     */
+    this.setFirstOverlay = function (over) { overlays[0] = over; };
+
+    /**
+     * Get the overlays.
+     * @return {Array} The overlays array.
+     */
+    this.getOverlays = function () { return overlays; };
 
     /**
      * Variable to storage ImagePositionPatient tags.
@@ -346,7 +372,10 @@ dwv.image.Image = function(geometry, buffer)
         var sliceSize = mul * size.getSliceSize();
 
         // create the new buffer
-        var newBuffer = new Int16Array(sliceSize * (size.getNumberOfSlices() + 1) );
+        var newBuffer = dwv.dicom.getTypedArray(
+            buffer[f].BYTES_PER_ELEMENT * 8,
+            meta.IsSigned ? 1 : 0,
+            sliceSize * (size.getNumberOfSlices() + 1) );
 
         // append slice at new position
         var origin = rhs.getGeometry().getOrigin();
@@ -377,11 +406,20 @@ dwv.image.Image = function(geometry, buffer)
         // copy to class variables
         buffer[f] = newBuffer;
 
-        // Add item to sliceSort array on its correct position
-        sliceSort.splice(newSliceNb, 0, '' + origin.getX() + ',' + origin.getY() + ',' + origin.getZ());
+		// insert overlay information of the slice to the image
+		overlays.splice(newSliceNb, 0, rhs.getOverlays()[0]);
 
         // return the appended slice number
         return newSliceNb;
+    };
+
+    /**
+     * Append a frame buffer to the image.
+     * @param {Object} frameBuffer The frame buffer to append.
+     */
+    this.appendFrameBuffer = function (frameBuffer)
+    {
+        buffer.push(frameBuffer);
     };
 
     /**
@@ -769,10 +807,16 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
  */
 dwv.image.Image.prototype.quantifyLine = function(line)
 {
+    var quant = {};
+    // length
     var spacing = this.getGeometry().getSpacing();
     var length = line.getWorldLength( spacing.getColumnSpacing(),
             spacing.getRowSpacing() );
-    return { "length": {"value": length, "unit": dwv.i18n("unit.mm")} };
+    if (length !== null) {
+        quant.length = {"value": length, "unit": dwv.i18n("unit.mm")};
+    }
+    // return
+    return quant;
 };
 
 /**
@@ -782,9 +826,15 @@ dwv.image.Image.prototype.quantifyLine = function(line)
  */
 dwv.image.Image.prototype.quantifyRect = function(rect)
 {
+    var quant = {};
+    // surface
     var spacing = this.getGeometry().getSpacing();
     var surface = rect.getWorldSurface( spacing.getColumnSpacing(),
             spacing.getRowSpacing());
+    if (surface !== null) {
+        quant.surface = {"value": surface/100, "unit": dwv.i18n("unit.cm2")};
+    }
+    // stats
     var subBuffer = [];
     var minJ = parseInt(rect.getBegin().getY(), 10);
     var maxJ = parseInt(rect.getEnd().getY(), 10);
@@ -796,13 +846,12 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
         }
     }
     var quantif = dwv.math.getStats( subBuffer );
-    return {
-        "surface": {"value": surface/100, "unit": dwv.i18n("unit.cm2")},
-        "min": {"value": quantif.min, "unit": ""},
-        "max": {"value": quantif.max, "unit": ""},
-        "mean": {"value": quantif.mean, "unit": ""},
-        "stdDev": {"value": quantif.stdDev, "unit": ""}
-    };
+    quant.min = {"value": quantif.min, "unit": ""};
+    quant.max = {"value": quantif.max, "unit": ""};
+    quant.mean = {"value": quantif.mean, "unit": ""};
+    quant.stdDev = {"value": quantif.stdDev, "unit": ""};
+    // return
+    return quant;
 };
 
 /**
@@ -812,10 +861,16 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
  */
 dwv.image.Image.prototype.quantifyEllipse = function(ellipse)
 {
+    var quant = {};
+    // surface
     var spacing = this.getGeometry().getSpacing();
     var surface = ellipse.getWorldSurface( spacing.getColumnSpacing(),
             spacing.getRowSpacing());
-    return { "surface": {"value": surface/100, "unit": dwv.i18n("unit.cm2")} };
+    if (surface !== null) {
+        quant.surface = {"value": surface/100, "unit": dwv.i18n("unit.cm2")};
+    }
+    // return
+    return quant;
 };
 
 /**
@@ -846,8 +901,8 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var size = new dwv.image.Size( columns, rows );
 
     // spacing
-    var rowSpacing = 1;
-    var columnSpacing = 1;
+    var rowSpacing = null;
+    var columnSpacing = null;
     // PixelSpacing
     var pixelSpacing = dicomElements.getFromKey("x00280030");
     // ImagerPixelSpacing
@@ -861,7 +916,7 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
         columnSpacing = parseFloat( imagerPixelSpacing[1] );
     }
     // image spacing
-    var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing);
+    var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing );
 
     // TransferSyntaxUID
     var transferSyntaxUID = dicomElements.getFromKey("x00020010");
@@ -880,9 +935,26 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
             parseFloat( imagePositionPatient[2] ) ];
     }
 
+    // slice orientation
+    var imageOrientationPatient = dicomElements.getFromKey("x00200037");
+    var orientationMatrix;
+    if ( imageOrientationPatient ) {
+        var rowCosines = new dwv.math.Vector3D( parseFloat( imageOrientationPatient[0] ),
+            parseFloat( imageOrientationPatient[1] ),
+            parseFloat( imageOrientationPatient[2] ) );
+        var colCosines = new dwv.math.Vector3D( parseFloat( imageOrientationPatient[3] ),
+            parseFloat( imageOrientationPatient[4] ),
+            parseFloat( imageOrientationPatient[5] ) );
+        var normal = rowCosines.crossProduct(colCosines);
+        orientationMatrix = new dwv.math.Matrix33(
+            rowCosines.getX(), rowCosines.getY(), rowCosines.getZ(),
+            colCosines.getX(), colCosines.getY(), colCosines.getZ(),
+            normal.getX(), normal.getY(), normal.getZ() );
+    }
+
     // geometry
     var origin = new dwv.math.Point3D(slicePosition[0], slicePosition[1], slicePosition[2]);
-    var geometry = new dwv.image.Geometry( origin, size, spacing );
+    var geometry = new dwv.image.Geometry( origin, size, spacing, orientationMatrix );
 
     // image
     var image = new dwv.image.Image( geometry, pixelBuffer );
@@ -948,6 +1020,9 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
         meta.IsSigned = (pixelRepresentation === 1);
     }
     image.setMeta(meta);
+
+    // overlay
+    image.setFirstOverlay( dwv.gui.info.createOverlays(dicomElements) );
 
     return image;
 };

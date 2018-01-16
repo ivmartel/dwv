@@ -1,7 +1,5 @@
 /** @namespace */
 var dwv = dwv || {};
-// external
-var Kinetic = Kinetic || {};
 
 /**
  * Main application class.
@@ -22,8 +20,8 @@ dwv.App = function ()
     var dataWidth = 0;
     // Image data height
     var dataHeight = 0;
-    // Number of slices to load
-    var nSlicesToLoad = 0;
+    // Is the data mono-slice?
+    var isMonoSliceData = 0;
 
     // Default character set
     var defaultCharacterSet;
@@ -69,17 +67,14 @@ dwv.App = function ()
 
     // Loadbox
     var loadbox = null;
+    // Current loader
+    var currentLoader = null;
+
     // UndoStack
     var undoStack = null;
 
     // listeners
     var listeners = {};
-
-    /**
-     * Get the version of the application.
-     * @return {String} The version of the application.
-     */
-    this.getVersion = function () { return "v0.18.0-beta"; };
 
     /**
      * Get the image.
@@ -109,10 +104,10 @@ dwv.App = function ()
      */
     this.getImageData = function () { return imageData; };
     /**
-     * Get the number of slices to load.
-     * @return {Number} The number of slices to load.
+     * Is the data mono-slice?
+     * @return {Boolean} True if the data is mono-slice.
      */
-    this.getNSlicesToLoad = function () { return nSlicesToLoad; };
+    this.isMonoSliceData = function () { return isMonoSliceData; };
 
     /**
      * Get the main scale.
@@ -248,6 +243,8 @@ dwv.App = function ()
                             }
                         }
                         toolList.Filter = new dwv.tool.Filter(filterList, this);
+                        toolList.Filter.addEventListener("filter-run", fireEvent);
+                        toolList.Filter.addEventListener("filter-undo", fireEvent);
                     }
                 }
                 else {
@@ -314,7 +311,7 @@ dwv.App = function ()
             }
             // version number
             if ( config.gui.indexOf("version") !== -1 ) {
-                dwv.gui.appendVersionHtml(this.getVersion());
+                dwv.gui.appendVersionHtml(dwv.getVersion());
             }
             // help
             if ( config.gui.indexOf("help") !== -1 ) {
@@ -395,7 +392,7 @@ dwv.App = function ()
         // clear objects
         image = null;
         view = null;
-        nSlicesToLoad = 0;
+        isMonoSliceData = false;
         // reset undo/redo
         if ( undoStack ) {
             undoStack = new dwv.tool.UndoStack(this);
@@ -407,15 +404,28 @@ dwv.App = function ()
      * Reset the layout of the application.
      */
     this.resetLayout = function () {
+        var previousScale = scale;
+        var previousSC = scaleCenter;
+        var previousTrans = translation;
+        // reset values
         scale = windowScale;
         scaleCenter = {"x": 0, "y": 0};
         translation = {"x": 0, "y": 0};
+        // apply new values
         if ( imageLayer ) {
             imageLayer.resetLayout(windowScale);
             imageLayer.draw();
         }
         if ( drawController ) {
             drawController.resetStage(windowScale);
+        }
+        // fire events
+        if (previousScale != scale) {
+            fireEvent({"type": "zoom-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
+        }
+        if ( (previousSC.x !== scaleCenter.x || previousSC.y !== scaleCenter.y) ||
+             (previousTrans.x !== translation.x || previousTrans.y !== translation.y)) {
+            fireEvent({"type": "offset-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
         }
     };
 
@@ -473,32 +483,10 @@ dwv.App = function ()
      */
     function loadImageFiles(files)
     {
-        // clear variables
-        self.reset();
-        nSlicesToLoad = files.length;
         // create IO
-        var fileIO = new dwv.io.File();
-        fileIO.setDefaultCharacterSet(defaultCharacterSet);
-        fileIO.onload = function (data) {
-            if ( image ) {
-                view.append( data.view );
-                if ( drawController ) {
-                    drawController.appendDrawLayer(image.getNumberOfFrames());
-                }
-            }
-            postLoadInit(data);
-        };
-        fileIO.onerror = function (error) { handleError(error); };
-        fileIO.onloadend = function (/*event*/) {
-            if ( drawController ) {
-                drawController.activateDrawLayer(viewController);
-            }
-            fireEvent({ 'type': 'load-end' });
-        };
-        fileIO.onprogress = onLoadProgress;
-        // main load (asynchronous)
-        fireEvent({ 'type': 'load-start' });
-        fileIO.load(files);
+        var fileIO = new dwv.io.FilesLoader();
+        // load data
+        loadImageData(files, fileIO);
     }
 
     /**
@@ -509,15 +497,9 @@ dwv.App = function ()
     function loadStateFile(file)
     {
         // create IO
-        var fileIO = new dwv.io.File();
-        fileIO.onload = function (data) {
-            // load state
-            var state = new dwv.State(self);
-            state.fromJSON(data);
-        };
-        fileIO.onerror = function (error) { handleError(error); };
-        // main load (asynchronous)
-        fileIO.load([file]);
+        var fileIO = new dwv.io.FilesLoader();
+        // load data
+        loadStateData([file], fileIO);
     }
 
     /**
@@ -530,11 +512,37 @@ dwv.App = function ()
         // has been checked for emptiness.
         var ext = urls[0].split('.').pop().toLowerCase();
         if ( ext === "json" ) {
-            loadStateUrl(urls[0]);
+            loadStateUrl(urls[0], requestHeaders);
         }
         else {
             loadImageUrls(urls, requestHeaders);
         }
+    };
+
+    /**
+     * Abort the current load.
+     */
+    this.abortLoad = function ()
+    {
+        if ( currentLoader ) {
+            currentLoader.abort();
+            currentLoader = null;
+        }
+    };
+
+    /**
+     * Load a list of ArrayBuffers.
+     * @param {Array} data The list of ArrayBuffers to load
+     *   in the form of [{name: "", filename: "", data: data}].
+     */
+    this.loadImageObject = function (data)
+    {
+        // create IO
+        var memoryIO = new dwv.io.MemoryLoader();
+        // create options
+        var options = {};
+        // load data
+        loadImageData(data, memoryIO, options);
     };
 
     /**
@@ -545,51 +553,113 @@ dwv.App = function ()
      */
     function loadImageUrls(urls, requestHeaders)
     {
-        // clear variables
-        self.reset();
-        nSlicesToLoad = urls.length;
         // create IO
-        var urlIO = new dwv.io.Url();
-        urlIO.setDefaultCharacterSet(defaultCharacterSet);
-        urlIO.onload = function (data) {
-            if ( image ) {
-                view.append( data.view );
-                if ( drawController ) {
-                    drawController.appendDrawLayer(image.getNumberOfFrames());
-                }
-            }
-            postLoadInit(data);
-        };
-        urlIO.onerror = function (error) { handleError(error); };
-        urlIO.onloadend = function (/*event*/) {
-            if ( drawController ) {
-                drawController.activateDrawLayer(viewController);
-            }
-            fireEvent({ 'type': 'load-end' });
-        };
-        urlIO.onprogress = onLoadProgress;
-        // main load (asynchronous)
-        fireEvent({ 'type': 'load-start' });
-        urlIO.load(urls, requestHeaders);
+        var urlIO = new dwv.io.UrlsLoader();
+        // create options
+        var options = {'requestHeaders': requestHeaders};
+        // load data
+        loadImageData(urls, urlIO, options);
     }
 
     /**
      * Load a State url.
      * @private
      * @param {String} url The state url to load.
+     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
      */
-    function loadStateUrl(url)
+    function loadStateUrl(url, requestHeaders)
     {
         // create IO
-        var urlIO = new dwv.io.Url();
-        urlIO.onload = function (data) {
+        var urlIO = new dwv.io.UrlsLoader();
+        // create options
+        var options = {'requestHeaders': requestHeaders};
+        // load data
+        loadStateData([url], urlIO, options);
+    }
+
+    /**
+     * Load a list of image data.
+     * @private
+     * @param {Array} data Array of data to load.
+     * @param {Object} loader The data loader.
+     * @param {Object} options Options passed to the final loader.
+     */
+    function loadImageData(data, loader, options)
+    {
+        // store loader
+        currentLoader = loader;
+
+        // allow to cancel
+        var previousOnKeyDown = window.onkeydown;
+        window.onkeydown = function (event) {
+            if (event.ctrlKey && event.keyCode === 88 ) // crtl-x
+            {
+                console.log("crtl-x pressed!");
+                self.abortLoad();
+            }
+        };
+
+        // clear variables
+        self.reset();
+        // first data name
+        var firstName = "";
+        if (typeof data[0].name !== "undefined") {
+            firstName = data[0].name;
+        } else {
+            firstName = data[0];
+        }
+        // flag used by scroll to decide wether to activate or not
+        // TODO: supposing multi-slice for zip files, could not be...
+        isMonoSliceData = (data.length === 1 &&
+            firstName.split('.').pop().toLowerCase() !== "zip");
+        // set IO
+        loader.setDefaultCharacterSet(defaultCharacterSet);
+        loader.onload = function (data) {
+            if ( image ) {
+                view.append( data.view );
+                if ( drawController ) {
+                    //drawController.appendDrawLayer(image.getNumberOfFrames());
+                }
+            }
+            postLoadInit(data);
+        };
+        loader.onerror = function (error) { handleError(error); };
+        loader.onabort = function (error) { handleAbort(error); };
+        loader.onloadend = function (/*event*/) {
+            window.onkeydown = previousOnKeyDown;
+            if ( drawController ) {
+                drawController.activateDrawLayer(viewController);
+            }
+            fireEvent({type: "load-progress", lengthComputable: true,
+                loaded: 100, total: 100});
+            fireEvent({ 'type': 'load-end' });
+            // reset member
+            currentLoader = null;
+        };
+        loader.onprogress = onLoadProgress;
+        // main load (asynchronous)
+        fireEvent({ 'type': 'load-start' });
+        loader.load(data, options);
+    }
+
+    /**
+     * Load a State data.
+     * @private
+     * @param {Array} data Array of data to load.
+     * @param {Object} loader The data loader.
+     * @param {Object} options Options passed to the final loader.
+     */
+    function loadStateData(data, loader, options)
+    {
+        // set IO
+        loader.onload = function (data) {
             // load state
             var state = new dwv.State(self);
             state.fromJSON(data);
         };
-        urlIO.onerror = function (error) { handleError(error); };
+        loader.onerror = function (error) { handleError(error); };
         // main load (asynchronous)
-        urlIO.load([url]);
+        loader.load(data, options);
     }
 
     /**
@@ -636,7 +706,7 @@ dwv.App = function ()
         var infoLayer = self.getElement("infoLayer");
         dwv.html.toggleDisplay(infoLayer);
         // toggle listeners
-        infoController.toggleViewListeners(view);
+        infoController.toggleListeners(self, view);
     };
 
     /**
@@ -644,12 +714,8 @@ dwv.App = function ()
      */
     this.initWLDisplay = function ()
     {
-        // set window/level from first preset
-        var presets = viewController.getPresets();
-        var keys = Object.keys(presets);
-        viewController.setWindowLevel(
-            presets[keys[0]].center,
-            presets[keys[0]].width );
+        // set window/level to first preset
+        viewController.setWindowLevelPresetById(0);
         // default position
         viewController.setCurrentPosition2D(0,0);
         // default frame
@@ -837,9 +903,13 @@ dwv.App = function ()
      * Handle window/level change.
      * @param {Object} event The event fired when changing the window/level.
      */
-    this.onWLChange = function (/*event*/)
+    this.onWLChange = function (event)
     {
-        generateAndDrawImage();
+        // generate and draw if no skip flag
+        if (typeof event.skipGenerate === "undefined" ||
+            event.skipGenerate === false) {
+            generateAndDrawImage();
+        }
     };
 
     /**
@@ -1020,15 +1090,8 @@ dwv.App = function ()
      */
     this.onChangeWindowLevelPreset = function (/*event*/)
     {
-        var name = this.value;
-        var preset = viewController.getPresets()[name];
-        // check if we have it
-        if ( !preset ) {
-            throw new Error("Unknown window level preset: '" + name + "'");
-        }
-        // enable it
-        viewController.setWindowLevel(
-            preset.center, preset.width );
+        // value should be the name of the preset
+        viewController.setWindowLevelPreset( this.value );
     };
 
     /**
@@ -1177,6 +1240,8 @@ dwv.App = function ()
         if( drawController ) {
             drawController.zoomStage(scale, scaleCenter);
         }
+        // fire event
+        fireEvent({"type": "zoom-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
     }
 
     /**
@@ -1194,6 +1259,9 @@ dwv.App = function ()
                 var oy = - imageLayer.getOrigin().y / scale - translation.y;
                 drawController.translateStage(ox, oy);
             }
+            // fire event
+            fireEvent({"type": "offset-change", "scale": scale,
+                "cx": imageLayer.getTrans().x, "cy": imageLayer.getTrans().y });
         }
     }
 
@@ -1254,7 +1322,7 @@ dwv.App = function ()
     {
         // alert window
         if ( error.name && error.message) {
-            alert(error.name+": "+error.message+".");
+            alert(error.name+": "+error.message);
         }
         else {
             alert("Error: "+error+".");
@@ -1262,6 +1330,24 @@ dwv.App = function ()
         // log
         if ( error.stack ) {
             console.error(error.stack);
+        }
+        // stop progress
+        dwv.gui.displayProgress(100);
+    }
+
+    /**
+     * Handle an abort: display it to the user.
+     * @param {Object} error The error to handle.
+     * @private
+     */
+    function handleAbort(error)
+    {
+        // log
+        if ( error.message ) {
+            console.warn(error.message);
+        }
+        else {
+            console.warn("Abort called.");
         }
         // stop progress
         dwv.gui.displayProgress(100);
@@ -1277,7 +1363,7 @@ dwv.App = function ()
         fireEvent(event);
         if( event.lengthComputable )
         {
-            var percent = Math.round((event.loaded / event.total) * 100);
+            var percent = Math.ceil((event.loaded / event.total) * 100);
             dwv.gui.displayProgress(percent);
         }
     }
@@ -1329,6 +1415,7 @@ dwv.App = function ()
         // get the view from the loaded data
         view = data.view;
         viewController = new dwv.ViewController(view);
+
         // append the DICOM tags table
         if ( tagsGui ) {
             tagsGui.update(data.info);
@@ -1348,29 +1435,28 @@ dwv.App = function ()
                 dataWidth, dataHeight);
 
         // image listeners
-        view.addEventListener("wl-change", self.onWLChange);
+        view.addEventListener("wl-width-change", self.onWLChange);
+        view.addEventListener("wl-center-change", self.onWLChange);
         view.addEventListener("colour-change", self.onColourChange);
         view.addEventListener("slice-change", self.onSliceChange);
         view.addEventListener("frame-change", self.onFrameChange);
 
         // connect with local listeners
-        view.addEventListener("wl-change", fireEvent);
+        view.addEventListener("wl-width-change", fireEvent);
+        view.addEventListener("wl-center-change", fireEvent);
         view.addEventListener("colour-change", fireEvent);
         view.addEventListener("position-change", fireEvent);
         view.addEventListener("slice-change", fireEvent);
         view.addEventListener("frame-change", fireEvent);
 
-        // update presets with loaded image (used in w/l tool)
-        viewController.updatePresets(image, true);
+        // append draw layers (before initialising the toolbox)
+        if ( drawController ) {
+            //drawController.appendDrawLayer(image.getNumberOfFrames());
+        }
 
         // initialise the toolbox
         if ( toolboxController ) {
             toolboxController.initAndDisplay( imageLayer );
-        }
-
-        // append draw layers
-        if ( drawController ) {
-            drawController.appendDrawLayer(image.getNumberOfFrames());
         }
 
         // stop box listening to drag (after first drag)
@@ -1392,12 +1478,13 @@ dwv.App = function ()
         if ( infoLayer ) {
             infoController = new dwv.InfoController(containerDivId);
             infoController.create(self);
-            infoController.toggleViewListeners(view);
+            infoController.toggleListeners(self, view);
         }
 
-        // init W/L display: triggers a wlchange event
-        //   listened by the view and a general display.
+        // init W/L display
         self.initWLDisplay();
+        // generate first image
+        generateAndDrawImage();
     }
 
 };

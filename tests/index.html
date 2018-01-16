@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <title>DWV Tests</title>
-<link rel="stylesheet" href="../ext/qunit/qunit-2.0.1.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../ext/qunit/qunit-2.4.0.css" type="text/css" media="screen" />
 <style>
 .footer {
     font-family: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif;
@@ -15,8 +15,10 @@
 <body>
 <div id="qunit"></div>
 <div id="qunit-fixture"></div>
-<!-- Third party -->
-<script type="text/javascript" src="../ext/qunit/qunit-2.0.1.js"></script>
+<!-- Third party (test) -->
+<script type="text/javascript" src="../ext/qunit/qunit-2.4.0.js"></script>
+<!-- Third party (dwv) -->
+<script type="text/javascript" src="../ext/modernizr/modernizr.js"></script>
 <script type="text/javascript" src="../ext/i18next/i18next.min.js"></script>
 <script type="text/javascript" src="../ext/i18next/i18nextXHRBackend.min.js"></script>
 <script type="text/javascript" src="../ext/i18next/i18nextBrowserLanguageDetector.min.js"></script>
@@ -31,11 +33,12 @@
 <script type="text/javascript" src="../src/image/geometry.js" data-cover></script>
 <script type="text/javascript" src="../src/image/image.js" data-cover></script>
 <script type="text/javascript" src="../src/image/luts.js" data-cover></script>
-<script type="text/javascript" src="../src/image/reader.js" data-cover></script>
 <script type="text/javascript" src="../src/image/view.js" data-cover></script>
+<script type="text/javascript" src="../src/math/matrix.js" data-cover></script>
 <script type="text/javascript" src="../src/math/point.js" data-cover></script>
 <script type="text/javascript" src="../src/math/shapes.js" data-cover></script>
 <script type="text/javascript" src="../src/math/stats.js" data-cover></script>
+<script type="text/javascript" src="../src/math/vector.js" data-cover></script>
 <script type="text/javascript" src="../src/utils/browser.js" data-cover></script>
 <script type="text/javascript" src="../src/utils/i18n.js" data-cover></script>
 <script type="text/javascript" src="../src/utils/thread.js" data-cover></script>
@@ -46,9 +49,11 @@
 <script type="text/javascript" src="image/geometry.test.js"></script>
 <script type="text/javascript" src="image/image.test.js"></script>
 <script type="text/javascript" src="image/view.test.js"></script>
+<script type="text/javascript" src="math/matrix.test.js"></script>
 <script type="text/javascript" src="math/point.test.js"></script>
 <script type="text/javascript" src="math/shapes.test.js"></script>
 <script type="text/javascript" src="math/stats.test.js"></script>
+<script type="text/javascript" src="math/vector.test.js"></script>
 <script type="text/javascript" src="utils/i18n.test.js"></script>
 <script type="text/javascript" src="utils/string.test.js"></script>
 <script type="text/javascript" src="utils/thread.test.js"></script>
@@ -66,7 +71,10 @@ dwv.browser.check();
     <a href="./visual/index-jpeg.html">DICOM jpg</a>,
     <a href="./visual/index-jpeg2000.html">DICOM jpg2000</a></li>
 <li><a href="./pacs/index.html">Fake PACS</a></li>
-<li><a href="./image/index.html">Colour maps</a></li>
+<li>Image: <a href="./image/index.html">colour maps</a></li>
+<li>DICOM: <a href="./dicom/anonymiser.html">anonymiser</a>,
+    <a href="./dicom/generator.html">generator</a>,
+    <a href="./dicom/synthetic-data.html">synthetic-data</a></li>
 </ul>
 <br>&nbsp;
 </div>

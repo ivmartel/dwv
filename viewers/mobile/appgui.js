@@ -59,12 +59,16 @@ dwv.gui.getWindowSize = function () {
 // Prompt
 dwv.gui.prompt = dwv.gui.base.prompt;
 // Progress
+/* global NProgress */
 dwv.gui.displayProgress = function (percent) {
+    NProgress.configure({ showSpinner: false });
     if( percent < 100 ) {
-        $.mobile.loading("show", {text: percent+"%", textVisible: true, theme: "b"} );
+        //$.mobile.loading("show", {text: percent+"%", textVisible: true, theme: "b"} );
+        NProgress.set(percent/100);
     }
-    else if( percent === 100 ) {
-        $.mobile.loading("hide");
+    else if( percent >= 100 ) {
+        //$.mobile.loading("hide");
+        NProgress.done();
     }
 };
 // Focus
@@ -147,6 +151,11 @@ dwv.gui.Loadbox = dwv.gui.base.Loadbox;
 // File loader
 dwv.gui.FileLoad = dwv.gui.base.FileLoad;
 dwv.gui.FileLoad.prototype.onchange = function (/*event*/) {
+    $("#popupOpen").popup("close");
+};
+// Folder loader
+dwv.gui.FolderLoad = dwv.gui.base.FolderLoad;
+dwv.gui.FolderLoad.prototype.onchange = function (/*event*/) {
     $("#popupOpen").popup("close");
 };
 // Url loader

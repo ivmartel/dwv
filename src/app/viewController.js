@@ -9,16 +9,44 @@ dwv.ViewController = function ( view )
 {
     // closure to self
     var self = this;
-    // Window/level presets
-    var presets = null;
     // Slice/frame player ID (created by setInterval)
     var playerID = null;
 
     /**
-     * Get the window/level presets.
-     * @return {Object} The presets.
+     * Get the window/level presets names.
+     * @return {Array} The presets names.
      */
-    this.getPresets = function () { return presets; };
+    this.getWindowLevelPresetsNames = function ()
+    {
+        return view.getWindowPresetsNames();
+    };
+
+    /**
+     * Add window/level presets to the view.
+     * @return {Object} The list of presets.
+     */
+    this.addWindowLevelPresets = function (presets)
+    {
+        return view.addWindowPresets(presets);
+    };
+
+    /**
+     * Set the window level to the preset with the input name.
+     * @param {String} name The name of the preset to activate.
+     */
+    this.setWindowLevelPreset = function (name)
+    {
+        view.setWindowLevelPreset(name);
+    };
+
+    /**
+     * Set the window level to the preset with the input id.
+     * @param {Number} id The id of the preset to activate.
+     */
+    this.setWindowLevelPresetById = function (id)
+    {
+        view.setWindowLevelPresetById(id);
+    };
 
     /**
      * Check if the controller is playing.
@@ -187,8 +215,8 @@ dwv.ViewController = function ( view )
     this.getWindowLevel = function ()
     {
         return {
-            "width": view.getWindowLut().getWidth(),
-            "center": view.getWindowLut().getCenter()
+            "width": view.getCurrentWindowLut().getWindowLevel().getWidth(),
+            "center": view.getCurrentWindowLut().getWindowLevel().getCenter()
         };
     };
 
@@ -200,50 +228,6 @@ dwv.ViewController = function ( view )
     this.setWindowLevel = function (wc, ww)
     {
         view.setWindowLevel(wc,ww);
-    };
-
-    /**
-     * Update the window/level presets.
-     * @param {Object} image The associated image.
-     * @param {Boolean} full If true, shows all presets.
-     */
-    this.updatePresets = function (image)
-    {
-        // store the manual preset
-        var manual = null;
-        if ( presets ) {
-            manual = presets.manual;
-        }
-        // reinitialize the presets
-        presets = {};
-
-        // DICOM presets
-        var dicomPresets = view.getWindowPresets();
-        if ( dicomPresets ) {
-            for( var i = 0; i < dicomPresets.length; ++i ) {
-                presets[dicomPresets[i].name.toLowerCase()] = dicomPresets[i];
-            }
-        }
-
-        // Image presets
-
-        // min/max preset
-        var range = image.getRescaledDataRange();
-        var width = range.max - range.min;
-        var center = range.min + width/2;
-        presets.minmax = {"center": center, "width": width};
-        // optional modality presets
-        if ( typeof dwv.tool.defaultpresets !== "undefined" ) {
-            var modality = image.getMeta().Modality;
-            for( var key in dwv.tool.defaultpresets[modality] ) {
-                presets[key] = dwv.tool.defaultpresets[modality][key];
-            }
-        }
-
-        // Manual preset
-        if ( manual ){
-            presets.manual = manual;
-        }
     };
 
     /**

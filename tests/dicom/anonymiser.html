@@ -9,6 +9,8 @@
 <script type="text/javascript">
 // rules file
 var _rulesFile = null;
+// dicom file
+var _dicomFile = null;
 // DICOM elements
 var _dicomElements = null;
 // handle DICOM file load
@@ -33,15 +35,19 @@ function generate()
     // create writer with textarea rules
     var writer = new dwv.dicom.DicomWriter();
     writer.rules = JSON.parse(document.getElementById('rules').value);
+    var dicomBuffer = null;
+    try {
+        dicomBuffer = writer.getBuffer(_dicomElements);
+    } catch (error) {
+        console.error(error);
+        alert(error.message);
+    }
     // view as Blob to allow download
-    var blob = new Blob(
-            [writer.getBuffer(_dicomElements)],
-            {type: 'application/dicom'}
-        );
+    var blob = new Blob([dicomBuffer], {type: 'application/dicom'});
     // update generate button
     var element = document.getElementById("generate");
     element.href = URL.createObjectURL(blob);
-    element.download = "anonym.dcm";
+    element.download = "anonym-" + _dicomFile.name;
 }
 // save the rules as a JSON file
 function saveRules()
@@ -84,10 +90,10 @@ function onInputDICOMFile(event)
     if (event.target.files.length === 0) {
         return;
     }
-    var file = event.target.files[0];
+    _dicomFile = event.target.files[0];
     var reader = new FileReader();
     reader.onload = onLoadDICOMFile;
-    reader.readAsArrayBuffer(file);
+    reader.readAsArrayBuffer(_dicomFile);
 }
 // handle input rules file
 function onInputRulesFile(event)
@@ -104,7 +110,7 @@ function onInputRulesFile(event)
 }
 </script>
 <style>
-body { font-family: Arial; }
+body { font-family: Arial, Helvetica, sans-serif; }
 textarea { width: 99%; margin: 2px; }
 fieldset { background: whitesmoke; border: 1px solid grey; }
 .button {
@@ -133,7 +139,7 @@ fieldset { background: whitesmoke; border: 1px solid grey; }
 
 <body>
 
-<h1>DICOM Anonymiser</h1>
+<h1>DWV DICOM Anonymiser</h1>
 
 <p>Simple DICOM "anonymisation" tool. Available rules: <code>copy</code>,
 <code>remove</code>, <code>clear</code>, <code>replace(value)</code>.</p>
