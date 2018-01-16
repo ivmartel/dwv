@@ -2,9 +2,13 @@
   "name": "dwv",
   "version": "0.23.0-beta",
   "description": "DICOM Web Viewer.",
-  "keywords": [ "DICOM", "medical", "imaging" ],
+  "keywords": [
+    "DICOM",
+    "medical",
+    "imaging"
+  ],
   "license": "GPL-3.0",
-  "author" : "ivmartel <ivmartel@gmail.com>",
+  "author": "ivmartel <ivmartel@gmail.com>",
   "homepage": "https://ivmartel.github.io/dwv/",
   "repository": {
     "type": "git",
@@ -22,7 +26,9 @@
   "devDependencies": {
     "grunt": "~1.0.1",
     "grunt-cli": "~1.2",
+    "grunt-contrib-connect": "^1.0.2",
     "grunt-contrib-jshint": "~1.1.0",
+    "grunt-contrib-watch": "^1.0.0",
     "grunt-qunit-istanbul": "~1.0.0",
     "grunt-coveralls": "~1.0",
     "grunt-contrib-concat": "~1.0",
