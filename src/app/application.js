@@ -809,9 +809,17 @@ dwv.App = function ()
      * @param {Array} drawings An array of drawings.
      * @param {Array} drawingsDetails An array of drawings details.
      */
-    this.setDrawings = function (drawings, drawingsDetails)
+    this.setDrawings = function (version, drawings, drawingsDetails)
     {
-        drawController.setDrawings(drawings, drawingsDetails, fireEvent, this.addToUndoStack);
+        switch(String(version)){
+            case '0.1':
+            case '0.2':
+                drawController.setDrawings(drawings, drawingsDetails, fireEvent, this.addToUndoStack);
+                break;
+            case '0.3':
+                drawController.setDrawingsV03(drawings, drawingsDetails, fireEvent, this.addToUndoStack);
+                break;
+        }
     };
     /**
      * Update a drawing from its details.

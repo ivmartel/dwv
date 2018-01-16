@@ -289,16 +289,13 @@ dwv.DrawController = function (drawDiv)
      */
     this.getDraws = function ()
     {
-        //var drawGroups = [];
-        var drawGroups = drawLayer.getChildren();
-        /*for ( var k = 0, lenk = drawLayers.length; k < lenk; ++k ) {
-            drawGroups[k] = [];
-            for ( var f = 0, lenf = drawLayers[k].length; f < lenf; ++f ) {
-                // getChildren always return, so drawings will have the good size
-                var groups = drawLayers[k][f].getChildren();
-                drawGroups[k].push(groups);
-            }
-        }*/
+        var drawGroups = [];
+        // getChildren always return, so drawings will have the good size
+        var layerGroups = drawLayer.getChildren();
+        // iteration is needed to create correct array
+        for ( var f = 0, lenf = layerGroups.length; f < lenf; ++f ) {
+            drawGroups[f] = layerGroups[f];
+        }
         return drawGroups;
     };
 
@@ -309,36 +306,37 @@ dwv.DrawController = function (drawDiv)
      */
     this.getDrawStoreDetails = function ()
     {
-        var drawingsDetails = [];
-        for ( var k = 0, lenk = drawLayers.length; k < lenk; ++k ) {
-            drawingsDetails[k] = [];
-            for ( var f = 0, lenf = drawLayers[k].length; f < lenf; ++f ) {
-                // getChildren always return, so drawings will have the good size
-                //var groups = drawLayers[k][f].getChildren();
-                var posId = dwv.getDrawPositionGroupId(k,f);
-                var groups = dwv.getDrawShapeGroupsAtPosition(posId, drawLayer);
-                var details = [];
-                for ( var i = 0, leni = groups.length; i < leni; ++i ) {
-                    // remove anchors
-                    var anchors = groups[i].find(".anchor");
-                    for ( var a = 0; a < anchors.length; ++a ) {
-                        anchors[a].remove();
-                    }
-                    // get text
-                    var texts = groups[i].find(".text");
-                    if ( texts.length !== 1 ) {
-                        console.warn("There should not be more than one text per shape.");
-                    }
-                    // get details (non konva vars)
-                    details.push({
-                        "id": groups[i].id(),
-                        "textExpr": encodeURIComponent(texts[0].textExpr),
-                        "longText": encodeURIComponent(texts[0].longText),
-                        "quant": texts[0].quant
-                    });
+        var groups, groupId;
+        var layerGroups  = drawLayer.getChildren();
+        var drawingsDetails = {};
+        for ( var k = 0, lenk = layerGroups.length; k < lenk; ++k ) {
+
+            var details = [];
+            groups  = layerGroups[k].getChildren();
+            // Use id to identify each group
+            groupId = layerGroups[k].id();
+            details = [];
+
+            for ( var i = 0, leni = groups.length; i < leni; ++i ) {
+                // remove anchors
+                var anchors = groups[i].find(".anchor");
+                for ( var a = 0; a < anchors.length; ++a ) {
+                    anchors[a].remove();
                 }
-                drawingsDetails[k].push(details);
+                // get text
+                var texts = groups[i].find(".text");
+                if ( texts.length !== 1 ) {
+                    console.warn("There should not be more than one text per shape.");
+                }
+                // get details (non konva vars)
+                details.push({
+                    "id": groups[i].id(),
+                    "textExpr": encodeURIComponent(texts[0].textExpr),
+                    "longText": encodeURIComponent(texts[0].longText),
+                    "quant": texts[0].quant
+                });
             }
+            drawingsDetails[groupId] = details;
         }
         return drawingsDetails;
     };
@@ -386,6 +384,66 @@ dwv.DrawController = function (drawDiv)
             }
         }
     };
+
+    /**
+     * Set the drawings on the current stage for V03(groups version).
+     * @param {Array} drawings An array of drawings.
+     * @param {Array} drawingsDetails An array of drawings details.
+     * @param {Object} cmdCallback The DrawCommand callback.
+     * @param {Object} exeCallback The callback to call once the DrawCommand has been executed.
+     */
+    this.setDrawingsV03 = function (groupDrawings, groupDetails, cmdCallback, exeCallback)
+    {
+        // Iterate over groups of the layer
+        for ( var k = 0, lenk = groupDrawings.length; k < lenk; ++k ) {
+            var groupDrawing   = typeof groupDrawings[k] === 'string' ? JSON.parse(groupDrawings[k]) : groupDrawings[k];
+            var groupDrawingId = groupDrawing.attrs.id;
+
+            // Create group to append eack layer shape-group
+            var parentGroup    = new Konva.Group();
+            parentGroup.setAttrs(groupDrawing.attrs);
+
+            var groupShapes = typeof groupShapes === 'string' ? JSON.parse(groupDrawing.children) : groupDrawing.children;
+            // Iterate over each group(draw) of the groups of the layer
+            for( var g = 0, glen = groupShapes.length; g < glen; ++g){
+                // create the konva group
+                var group = Konva.Node.create(groupShapes[g]);
+                var shape = group.getChildren( isNodeNameShape )[0];
+                parentGroup.add(group);
+                // create the draw command
+                var cmd = new dwv.tool.DrawGroupCommand(
+                    group, shape.className,
+                    drawLayer );
+                // draw command callbacks
+                cmd.onExecute = cmdCallback;
+                cmd.onUndo = cmdCallback;
+
+                // Get the drawings detail of this group of the layer
+                var groupDetail = groupDetails[groupDrawingId];
+                if(typeof groupDetail === 'undefined') continue;
+
+                // Get the id of the draw
+                var groupShapeId = groupShapes[g].attrs.id;
+
+                for ( var m = 0, mlen = groupDetail.length; m < mlen; ++m ) {
+                    var details = groupDetail[m];
+                    if(details.id === groupShapeId){
+                        var label = group.getChildren( isNodeNameLabel )[0];
+                        var text = label.getText();
+                        // store details
+                        text.textExpr = details.textExpr;
+                        text.longText = details.longText;
+                        text.quant = details.quant;
+                        // reset text (it was not encoded)
+                        text.setText(dwv.utils.replaceFlags(text.textExpr, text.quant));
+                    }
+                }
+                // execute
+                cmd.execute();
+                exeCallback(cmd);
+            }
+        }
+    }
 
     /**
      * Update a drawing from its details.
