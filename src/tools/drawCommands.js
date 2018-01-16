@@ -47,6 +47,9 @@ dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
 {
     var isSilent = (typeof silent === "undefined") ? false : true;
 
+    // group parent
+    var parent = group.getParent();
+
     /**
      * Get the command name.
      * @return {String} The command name.
@@ -56,13 +59,10 @@ dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
      * Execute the command.
      */
     this.execute = function () {
-        // add the group to the layer
-        var parent = group.getParent();
-        if ( typeof parent === "undefined" ) {
-            layer.add(group);
-        } else {
-            layer.add(parent);
-        }
+        // add the group to the parent (in case of undo/redo)
+        parent.add(group);
+        // add parent to layer (if first draw)
+        layer.add(parent);
         // draw
         layer.draw();
         // callback
