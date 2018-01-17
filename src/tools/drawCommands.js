@@ -120,11 +120,8 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
      * Execute the command.
      */
     this.execute = function () {
-        // translate all children of group
-        group.getChildren().each( function (shape) {
-            shape.x( shape.x() + translation.x );
-            shape.y( shape.y() + translation.y );
-        });
+        // translate group
+        group.move(translation);
         // draw
         layer.draw();
         // callback
@@ -134,11 +131,9 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
      * Undo the command.
      */
     this.undo = function () {
-        // invert translate all children of group
-        group.getChildren().each( function (shape) {
-            shape.x( shape.x() - translation.x );
-            shape.y( shape.y() - translation.y );
-        });
+        // invert translate group
+        var minusTrans = { 'x': -translation.x, 'y': -translation.y};
+        group.move(minusTrans);
         // draw
         layer.draw();
         // callback
