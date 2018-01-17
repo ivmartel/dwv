@@ -289,12 +289,12 @@ dwv.DrawController = function (drawDiv)
      */
     this.getDraws = function ()
     {
-        var drawGroups = [];
-        // getChildren always return, so drawings will have the good size
+        var drawGroups = {};
         var layerGroups = drawLayer.getChildren();
-        // iteration is needed to create correct array
         for ( var f = 0, lenf = layerGroups.length; f < lenf; ++f ) {
-            drawGroups[f] = layerGroups[f];
+            if(layerGroups[f].hasChildren()){
+                drawGroups[layerGroups[f].id()] = layerGroups[f];
+            }
         }
         return drawGroups;
     };
@@ -310,6 +310,8 @@ dwv.DrawController = function (drawDiv)
         var layerGroups  = drawLayer.getChildren();
         var drawingsDetails = {};
         for ( var k = 0, lenk = layerGroups.length; k < lenk; ++k ) {
+            // Avoid iterations over empty groups
+            if(!layerGroups[k].hasChildren()){ continue }
 
             var details = [];
             groups  = layerGroups[k].getChildren();
@@ -395,15 +397,16 @@ dwv.DrawController = function (drawDiv)
     this.setDrawingsV03 = function (groupDrawings, groupDetails, cmdCallback, exeCallback)
     {
         // Iterate over groups of the layer
-        for ( var k = 0, lenk = groupDrawings.length; k < lenk; ++k ) {
-            var groupDrawing   = typeof groupDrawings[k] === 'string' ? JSON.parse(groupDrawings[k]) : groupDrawings[k];
-            var groupDrawingId = groupDrawing.attrs.id;
+        var groupLayersId = Object.keys(groupDrawings);
+        for ( var k = 0, lenk = groupLayersId.length; k < lenk; ++k ) {
+            var groupDrawingId = groupLayersId[k];
+            var groupDrawing   = typeof groupDrawings[groupDrawingId] === 'string' ? JSON.parse(groupDrawings[groupDrawingId]) : groupDrawings[groupDrawingId];
 
             // Create group to append eack layer shape-group
             var parentGroup    = new Konva.Group();
             parentGroup.setAttrs(groupDrawing.attrs);
 
-            var groupShapes = typeof groupShapes === 'string' ? JSON.parse(groupDrawing.children) : groupDrawing.children;
+            var groupShapes = typeof groupDrawing.children === 'string' ? JSON.parse(groupDrawing.children) : groupDrawing.children;
             // Iterate over each group(draw) of the groups of the layer
             for( var g = 0, glen = groupShapes.length; g < glen; ++g){
                 // create the konva group
