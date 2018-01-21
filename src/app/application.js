@@ -812,6 +812,7 @@ dwv.App = function ()
     this.setDrawings = function (drawings, drawingsDetails)
     {
         drawController.setDrawings(drawings, drawingsDetails, fireEvent, this.addToUndoStack);
+        drawController.activateDrawLayer(viewController);
     };
     /**
      * Update a drawing from its details.
