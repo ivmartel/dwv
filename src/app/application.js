@@ -134,12 +134,6 @@ dwv.App = function ()
     this.getTranslation = function () { return translation; };
 
     /**
-     * Get the toolbox controller.
-     * @return {Object} The toolbox controller.
-     */
-    this.getToolboxController = function () { return toolboxController; };
-
-    /**
      * Get the view controller.
      * @return {Object} The controller.
      */
@@ -180,22 +174,6 @@ dwv.App = function ()
             undoStack.add(cmd);
         }
     };
-
-    /**
-     * Get Draw tool. Very useful to interact with selected drawings
-     * Needed to clone, delete, modify, etc selected draws
-     * @return {Object} Drawer tool.
-     */
-    this.getDrawer = function()
-    {
-        var Drawer =  self.getToolboxController().getToolList().Draw;
-        if(Drawer && typeof Drawer != "undefined"){
-            return Drawer;
-        }
-        else{
-            throw new Error("Draw tool must be available to use this feature.");
-        }
-    }
 
     /**
      * Initialise the HTML for the application.
@@ -834,6 +812,7 @@ dwv.App = function ()
     this.setDrawings = function (drawings, drawingsDetails)
     {
         drawController.setDrawings(drawings, drawingsDetails, fireEvent, this.addToUndoStack);
+        drawController.activateDrawLayer(viewController);
     };
     /**
      * Update a drawing from its details.
@@ -843,37 +822,6 @@ dwv.App = function ()
     {
         drawController.updateDraw(drawDetails);
     };
-
-    /**
-     * Clone selected Draw to a new layer
-     * @param  {Number} inLayer Layer index to append the draw
-     * @param  {Boolean} restart Conditional to set initial layer as visible or not
-     */
-    this.cloneDraw = function(inLayer, restart)
-    {
-        this.getDrawer().cloneDraw(inLayer, restart);
-    };
-    /**
-     * Clone selected Draw to a new layer
-     * @param  {Number} inLayer Layer index to append the draw
-     * @param  {Boolean} restart Conditional to set initial layer as visible or not
-     */
-    this.deleteDraw = function()
-    {
-        this.getDrawer().deleteDraw();
-    };
-
-    /**
-     * Clone selected Draw to a new layer
-     * @param  {Number} inLayer Layer index to append the draw
-     * @param  {Boolean} restart Conditional to set initial layer as visible or not
-     */
-    this.getShapeEditor = function()
-    {
-        return self.getDrawer().getShapeEditor();
-    };
-
-
     /**
      * Delete all Draws from all layers.
     */
@@ -987,10 +935,6 @@ dwv.App = function ()
             {
                 undoStack.undo();
             }
-        }
-        if ( event.keyCode === 46 && self.getShapeEditor() && self.getShapeEditor().getShape()) // supr && shape selected
-        {
-            self.deleteDraw();
         }
     };
 

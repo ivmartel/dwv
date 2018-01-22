@@ -187,19 +187,6 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
     this.getOverlays = function () { return overlays; };
 
     /**
-     * Variable to storage ImagePositionPatient tags.
-     * @private
-     * @type Array
-     */
-    var sliceSort = [];
-
-    /**
-     * Get sorted array of all ImagePositionPatient tags
-     * @return {Array} ImagePositionPatient tags.
-     */
-    this.getSlideSort = function(){ return sliceSort; };
-
-    /**
      * Get the geometry of the image.
      * @return {Object} The size of the image.
      */
@@ -378,8 +365,7 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
             sliceSize * (size.getNumberOfSlices() + 1) );
 
         // append slice at new position
-        var origin = rhs.getGeometry().getOrigin();
-        var newSliceNb = geometry.getSliceIndex(origin);
+        var newSliceNb = geometry.getSliceIndex( rhs.getGeometry().getOrigin() );
         if( newSliceNb === 0 )
         {
             newBuffer.set(rhs.getFrame(f));

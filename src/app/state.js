@@ -19,7 +19,6 @@ dwv.State = function (app)
         // return a JSON string
         return JSON.stringify( {
             "version": "0.2",
-            "slices" : app.getImage().getSlideSort(),
             "window-center": app.getViewController().getWindowLevel().center,
             "window-width": app.getViewController().getWindowLevel().width,
             "position": app.getViewController().getCurrentPosition(),
