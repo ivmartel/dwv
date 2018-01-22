@@ -1,7 +1,6 @@
 /**
  * Application launcher.
  */
-// var myapp = {};
 
 // start app function
 function startApp() {
@@ -26,8 +25,6 @@ function startApp() {
     }
     myapp.init(options);
 
-
-    myapp.addEventListener('load-end', function(){ window.loadend(myapp); } );
 
     // help
     // TODO Seems accordion only works when at end...
