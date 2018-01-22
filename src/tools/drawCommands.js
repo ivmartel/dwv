@@ -48,7 +48,7 @@ dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
     var isSilent = (typeof silent === "undefined") ? false : true;
 
     // group parent
-    var parent = group.getParent();
+    var parent = layer.getChildren( function(node){ return node.isVisible(); });
 
     /**
      * Get the command name.
@@ -69,6 +69,7 @@ dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
         if (!isSilent) {
             this.onExecute({'type': 'draw-create', 'id': group.id()});
         }
+        // console.log('layer -> ', layer);
     };
     /**
      * Undo the command.

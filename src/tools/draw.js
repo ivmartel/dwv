@@ -247,25 +247,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             var factory = new self.shapeFactoryList[self.shapeName]();
             var group = factory.create(points, self.style, app.getImage());
             group.id( dwv.math.guid() );
-
-            // get position groups
-            var posGroupId = getDrawCurrentPositionGroupId();
-            var posGroups = drawLayer.getChildren( function (node) {
-                return node.id() === posGroupId;
-            });
-            // if one group, use it
-            // if no group, create one
-            var posGroup = null;
-            if ( posGroups.length === 1 ) {
-                posGroup = posGroups[0];
-            } else if ( posGroups.length === 0 ) {
-                posGroup = new Konva.Group();
-                posGroup.name("position-group");
-                posGroup.id(posGroupId);
-                posGroup.visible(true); // dont inherit
-            }
-            // add group to slice group
-            posGroup.add(group);
+            dwv.ensurePositionGroup(app);
 
             // re-activate layer
             drawLayer.hitGraphEnabled(true);
