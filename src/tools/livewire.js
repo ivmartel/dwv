@@ -134,11 +134,14 @@ dwv.tool.Livewire = function(app)
                 command.onExecute = fireEvent;
                 command.onUndo = fireEvent;
                 // debug
-                console.log("Done.");
+                console.log("Done click on initial.");
+                // draw
+                command.execute();
                 // save command in undo stack
                 app.addToUndoStack(command);
                 // set flag
                 self.started = false;
+                shapeGroup = null;
             }
             // anchor point
             else {
@@ -212,6 +215,7 @@ dwv.tool.Livewire = function(app)
         var factory = new dwv.tool.RoiFactory();
         shapeGroup = factory.create(currentPath.pointArray, self.style);
         shapeGroup.id( dwv.math.guid() );
+        dwv.ensurePositionGroup(app);
         // draw shape command
         command = new dwv.tool.DrawGroupCommand(shapeGroup, "livewire", app.getCurrentDrawLayer());
         // draw
@@ -240,11 +244,18 @@ dwv.tool.Livewire = function(app)
      * @param {Object} event The double click event.
      */
     this.dblclick = function(/*event*/){
-        console.log("dblclick");
+        // listen
+        command.onExecute = fireEvent;
+        command.onUndo = fireEvent;
+        // debug
+        console.log("Done dblclick.");
+        // draw
+        command.execute();
         // save command in undo stack
         app.addToUndoStack(command);
         // set flag
         self.started = false;
+        shapeGroup = null;
     };
 
     /**

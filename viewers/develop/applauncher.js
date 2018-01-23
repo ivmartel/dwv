@@ -25,6 +25,13 @@ function startApp() {
     }
     myapp.init(options);
 
+    myapp.addEventListener('load-end', function(){
+		window.removeDraw = function(){
+            var id = document.getElementById('removeId').value;
+            myapp.deleteDraw(id);
+		};
+     } );
+
     // help
     // TODO Seems accordion only works when at end...
     $("#accordion").accordion({ collapsible: "true", active: "false", heightStyle: "content" });

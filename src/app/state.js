@@ -18,7 +18,7 @@ dwv.State = function (app)
         var drawingsDetails = app.getDrawStoreDetails();
         // return a JSON string
         return JSON.stringify( {
-            "version": "0.2",
+            "version": "0.3",
             "window-center": app.getViewController().getWindowLevel().center,
             "window-width": app.getViewController().getWindowLevel().width,
             "position": app.getViewController().getCurrentPosition(),
@@ -36,40 +36,24 @@ dwv.State = function (app)
      */
     this.fromJSON = function (json) {
         var data = JSON.parse(json);
-        if (data.version === "0.1") {
-            readV01(data);
-        }
-        else if (data.version === "0.2") {
-            readV02(data);
-        }
-        else {
-            throw new Error("Unknown state file format version: '"+data.version+"'.");
+
+        // Images state
+        app.getViewController().setWindowLevel( data["window-center"], data["window-width"] );
+        app.getViewController().setCurrentPosition( data.position );
+        app.zoom( data.scale, data.scaleCenter.x, data.scaleCenter.y );
+        app.translate( data.translation.x, data.translation.y );
+
+        // Drawings state
+        switch(String(data.version)){
+            case '0.1':
+                app.setDrawings( data.version, data.drawings, null );
+                break;
+            case '0.2':
+            case '0.3':
+                app.setDrawings( data.version, data.drawings, data.drawingsDetails );
+                break;
+            default:
+                throw new Error("Unknown state file format version: '"+data.version+"'.");
         }
     };
-    /**
-     * Read an application state from an Object in v0.1 format.
-     * @param {Object} data The Object representation of the state.
-     */
-    function readV01(data) {
-        // display
-        app.getViewController().setWindowLevel( data["window-center"], data["window-width"] );
-        app.getViewController().setCurrentPosition( data.position );
-        app.zoom( data.scale, data.scaleCenter.x, data.scaleCenter.y );
-        app.translate( data.translation.x, data.translation.y );
-        // drawings
-        app.setDrawings( data.drawings, null );
-    }
-    /**
-     * Read an application state from an Object in v0.2 format.
-     * @param {Object} data The Object representation of the state.
-     */
-    function readV02(data) {
-        // display
-        app.getViewController().setWindowLevel( data["window-center"], data["window-width"] );
-        app.getViewController().setCurrentPosition( data.position );
-        app.zoom( data.scale, data.scaleCenter.x, data.scaleCenter.y );
-        app.translate( data.translation.x, data.translation.y );
-        // drawings
-        app.setDrawings( data.drawings, data.drawingsDetails );
-    }
 }; // State class

@@ -3,6 +3,28 @@ module.exports = function(grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        watch: {
+            options: {
+                livereload: true,
+            },
+            js: {
+                files: ['src/**/*.js', 'viewers/**/*.js'],
+            },
+            html: {
+                files: ['viewers/**/*.html'],
+            }
+        },
+        connect: {
+            server: {
+                options: {
+                    port: 9000,
+                    base: '.',
+                    path: '/viewers',
+                    livereload: true,
+                    open: true,
+                }
+            }
+        },
         jshint: {
             files: ['Gruntfile.js', 'src/**/*.js', 'viewers/**/*.js', 'tests/**/*.js'],
             options: {
@@ -67,6 +89,12 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-jsdoc');
 
+    grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-connect');
+
     // Task to run tests
     grunt.registerTask('publish', ['jshint', 'qunit', 'coveralls', 'concat', 'uglify', 'jsdoc']);
+
+    // Task to create develop environment (self server)
+    grunt.registerTask('dev', ['connect','watch']);
 };
