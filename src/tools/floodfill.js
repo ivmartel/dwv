@@ -301,6 +301,7 @@ dwv.tool.Floodfill = function(app)
         if (!imageInfo){ return console.error('No image found');}
 
         self.started = true;
+        dwv.ensurePositionGroup(app);
         initialpoint = getCoord(event);
         paintBorder(initialpoint, initialthreshold);
         self.onThresholdChange(initialthreshold);

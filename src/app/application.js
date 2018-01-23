@@ -144,6 +144,28 @@ dwv.App = function ()
      * @return {Object} The image layer.
      */
     this.getImageLayer = function () { return imageLayer; };
+
+    /**
+     * Get the current position-group or, optionally, the Id it should have.
+     * @param {Boolean} [returnID] If group does not exist, return the current groupId.
+     * @return {(Object|String)} The position-group or, optionally, the Id it should have.
+     */
+    this.getCurrentDrawGroup = function(returnID){
+        var currentSlice = this.getViewController().getCurrentPosition().k;
+        var currentFrame = this.getViewController().getCurrentFrame();
+        var currentGroupId = dwv.getDrawPositionGroupId(currentSlice, currentFrame);
+        var currentGroup = this.getCurrentDrawLayer().getChildren( function (node) {
+            return node.id() === currentGroupId;
+        });
+        if(currentGroup.length){
+            return currentGroup[0];
+        }
+        if(!currentGroup.length && returnID){
+            return dwv.getDrawPositionGroupId(currentSlice, currentFrame);
+        }
+        return false;
+    };
+
     /**
      * Get the current draw layer.
      * @return {Object} The draw layer.
@@ -151,6 +173,7 @@ dwv.App = function ()
     this.getCurrentDrawLayer = function () {
         return drawController.getCurrentDrawLayer();
     };
+
     /**
      * Get the draw stage.
      * @return {Object} The draw stage.
@@ -820,6 +843,8 @@ dwv.App = function ()
                 drawController.setDrawingsV03(drawings, drawingsDetails, fireEvent, this.addToUndoStack);
                 break;
         }
+        // drawController.setDrawings(drawings, drawingsDetails, fireEvent, this.addToUndoStack);
+        drawController.activateDrawLayer(viewController);
     };
     /**
      * Update a drawing from its details.
@@ -829,12 +854,15 @@ dwv.App = function ()
     {
         drawController.updateDraw(drawDetails);
     };
+<<<<<<< HEAD
     /**
      * Delete specific Draw from.
     */
     this.deleteDraw = function (shape) {
         drawController.deleteDraw(shape, fireEvent, this.addToUndoStack);
     };
+=======
+>>>>>>> fe0270b05a22d0a25ec335c3ef292b06142bb512
     /**
      * Delete all Draws from all groups.
     */
