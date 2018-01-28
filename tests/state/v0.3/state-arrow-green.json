@@ -1,0 +1,122 @@
+{
+  "version": "0.3",
+  "window-center": 441,
+  "window-width": 911,
+  "position": {
+    "i": 0,
+    "j": 0,
+    "k": 0
+  },
+  "scale": 1,
+  "scaleCenter": {
+    "x": 0,
+    "y": 0
+  },
+  "translation": {
+    "x": 0,
+    "y": 0
+  },
+  "drawings": {
+    "attrs": {
+      "width": 406,
+      "height": 406,
+      "listening": true,
+      "scaleX": 1.5859375,
+      "scaleY": 1.5859375
+    },
+    "className": "Stage",
+    "children": [
+      {
+        "attrs": {
+          "listening": true,
+          "visible": true
+        },
+        "className": "Layer",
+        "children": [
+          {
+            "attrs": {
+              "name": "position-group",
+              "id": "slice-0_frame-0",
+              "visible": true
+            },
+            "className": "Group",
+            "children": [
+              {
+                "attrs": {
+                  "name": "line-group",
+                  "visible": true,
+                  "id": "pf8zteo5r4",
+                  "draggable": true
+                },
+                "className": "Group",
+                "children": [
+                  {
+                    "attrs": {
+                      "points": [
+                        53,
+                        136,
+                        139,
+                        89
+                      ],
+                      "stroke": "#80ff80",
+                      "strokeWidth": 1.2610837438423645,
+                      "name": "shape"
+                    },
+                    "className": "Line"
+                  },
+                  {
+                    "attrs": {
+                      "x": 57.38752668614738,
+                      "y": 133.60216564826828,
+                      "sides": 3,
+                      "radius": 5,
+                      "rotation": -118.65711745655813,
+                      "fill": "#80ff80",
+                      "strokeWidth": 1.2610837438423645,
+                      "name": "shape-triangle"
+                    },
+                    "className": "RegularPolygon"
+                  },
+                  {
+                    "attrs": {
+                      "x": 114,
+                      "y": 74,
+                      "name": "label"
+                    },
+                    "className": "Label",
+                    "children": [
+                      {
+                        "attrs": {
+                          "fontSize": 7.566502463054187,
+                          "fontFamily": "Verdana",
+                          "fill": "#80ff80",
+                          "name": "text",
+                          "text": "Eye"
+                        },
+                        "className": "Text"
+                      },
+                      {
+                        "attrs": {
+                          "width": 13.69140625,
+                          "height": 7.566502463054187
+                        },
+                        "className": "Tag"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "drawingsDetails": {
+    "pf8zteo5r4": {
+      "textExpr": "Eye",
+      "longText": "",
+      "quant": null
+    }
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "version": "0.3",
+  "window-center": 441,
+  "window-width": 911,
+  "position": {
+    "i": 0,
+    "j": 0,
+    "k": 0
+  },
+  "scale": 1,
+  "scaleCenter": {
+    "x": 0,
+    "y": 0
+  },
+  "translation": {
+    "x": 0,
+    "y": 0
+  },
+  "drawings": {
+    "attrs": {
+      "width": 406,
+      "height": 406,
+      "listening": true,
+      "scaleX": 1.5859375,
+      "scaleY": 1.5859375
+    },
+    "className": "Stage",
+    "children": [
+      {
+        "attrs": {
+          "listening": true,
+          "visible": true
+        },
+        "className": "Layer",
+        "children": [
+          {
+            "attrs": {
+              "name": "position-group",
+              "id": "slice-0_frame-0",
+              "visible": true
+            },
+            "className": "Group",
+            "children": [
+              {
+                "attrs": {
+                  "name": "protractor-group",
+                  "visible": true,
+                  "id": "49g7kqi3p4u",
+                  "draggable": true
+                },
+                "className": "Group",
+                "children": [
+                  {
+                    "attrs": {
+                      "points": [
+                        33.12807881773399,
+                        164.93596059113304,
+                        81,
+                        145,
+                        93,
+                        198
+                      ],
+                      "stroke": "#ffff80",
+                      "strokeWidth": 1.2610837438423645,
+                      "name": "shape"
+                    },
+                    "className": "Line"
+                  },
+                  {
+                    "attrs": {
+                      "x": 72,
+                      "y": 147.5,
+                      "name": "label"
+                    },
+                    "className": "Label",
+                    "children": [
+                      {
+                        "attrs": {
+                          "fontSize": 7.566502463054187,
+                          "fontFamily": "Verdana",
+                          "fill": "#ffff80",
+                          "name": "text",
+                          "text": "80.15°"
+                        },
+                        "className": "Text"
+                      },
+                      {
+                        "attrs": {
+                          "width": 28.730148315429688,
+                          "height": 7.566502463054187
+                        },
+                        "className": "Tag"
+                      }
+                    ]
+                  },
+                  {
+                    "attrs": {
+                      "innerRadius": 17.112857451704066,
+                      "outerRadius": 17.112857451704066,
+                      "stroke": "#ffff80",
+                      "strokeWidth": 1.2610837438423645,
+                      "angle": 80.14855270325586,
+                      "rotation": -282.75753216087674,
+                      "x": 81,
+                      "y": 145,
+                      "name": "shape-arc"
+                    },
+                    "className": "Arc"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "drawingsDetails": {
+    "49g7kqi3p4u": {
+      "textExpr": "{angle}",
+      "longText": "",
+      "quant": {
+        "angle": {
+          "value": 80.14855270325586,
+          "unit": "°"
+        }
+      }
+    }
+  }
+}

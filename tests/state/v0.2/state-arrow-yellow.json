@@ -1,0 +1,103 @@
+{
+  "version": "0.2",
+  "window-center": 441,
+  "window-width": 911,
+  "position": {
+    "i": 0,
+    "j": 0,
+    "k": 0
+  },
+  "scale": 1,
+  "scaleCenter": {
+    "x": 0,
+    "y": 0
+  },
+  "translation": {
+    "x": 0,
+    "y": 0
+  },
+  "drawings": [
+    [
+      {
+        "0": {
+          "attrs": {
+            "name": "line-group",
+            "visible": true,
+            "id": "pf8zteo5r4"
+          },
+          "className": "Group",
+          "children": [
+            {
+              "attrs": {
+                "points": [
+                  53,
+                  136,
+                  139,
+                  89
+                ],
+                "stroke": "#ffff80",
+                "strokeWidth": 1.2610837438423645,
+                "name": "shape",
+                "draggable": true
+              },
+              "className": "Line"
+            },
+            {
+              "attrs": {
+                "x": 57.38752668614738,
+                "y": 133.60216564826828,
+                "sides": 3,
+                "radius": 5,
+                "rotation": -118.65711745655813,
+                "fill": "#ffff80",
+                "strokeWidth": 1.2610837438423645,
+                "name": "shape-triangle"
+              },
+              "className": "RegularPolygon"
+            },
+            {
+              "attrs": {
+                "x": 114,
+                "y": 74,
+                "name": "label"
+              },
+              "className": "Label",
+              "children": [
+                {
+                  "attrs": {
+                    "fontSize": 7.566502463054187,
+                    "fontFamily": "Verdana",
+                    "fill": "#ffff80",
+                    "name": "text",
+                    "text": "Eye"
+                  },
+                  "className": "Text"
+                },
+                {
+                  "attrs": {
+                    "width": 13.69140625,
+                    "height": 7.566502463054187
+                  },
+                  "className": "Tag"
+                }
+              ]
+            }
+          ]
+        },
+        "length": 1
+      }
+    ]
+  ],
+  "drawingsDetails": [
+    [
+      [
+        {
+          "id": "pf8zteo5r4",
+          "textExpr": "Coucou",
+          "longText": "",
+          "quant": null
+        }
+      ]
+    ]
+  ]
+}

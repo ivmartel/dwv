@@ -1,0 +1,128 @@
+{
+  "version": "0.3",
+  "window-center": 441,
+  "window-width": 911,
+  "position": {
+    "i": 0,
+    "j": 0,
+    "k": 0
+  },
+  "scale": 1,
+  "scaleCenter": {
+    "x": 0,
+    "y": 0
+  },
+  "translation": {
+    "x": 0,
+    "y": 0
+  },
+  "drawings": {
+    "attrs": {
+      "width": 406,
+      "height": 406,
+      "listening": true,
+      "scaleX": 1.5859375,
+      "scaleY": 1.5859375
+    },
+    "className": "Stage",
+    "children": [
+      {
+        "attrs": {
+          "listening": true,
+          "visible": true
+        },
+        "className": "Layer",
+        "children": [
+          {
+            "attrs": {
+              "name": "position-group",
+              "id": "slice-0_frame-0",
+              "visible": true
+            },
+            "className": "Group",
+            "children": [
+              {
+                "attrs": {
+                  "name": "rectangle-group",
+                  "visible": true,
+                  "id": "db0puu209qe",
+                  "draggable": true
+                },
+                "className": "Group",
+                "children": [
+                  {
+                    "attrs": {
+                      "x": 80,
+                      "y": 58,
+                      "width": 104,
+                      "height": 64,
+                      "stroke": "#ffff80",
+                      "strokeWidth": 1.2610837438423645,
+                      "name": "shape"
+                    },
+                    "className": "Rect"
+                  },
+                  {
+                    "attrs": {
+                      "x": 80,
+                      "y": 132,
+                      "name": "label"
+                    },
+                    "className": "Label",
+                    "children": [
+                      {
+                        "attrs": {
+                          "fontSize": 7.566502463054187,
+                          "fontFamily": "Verdana",
+                          "fill": "#ffff80",
+                          "name": "text",
+                          "text": "66.56cm2"
+                        },
+                        "className": "Text"
+                      },
+                      {
+                        "attrs": {
+                          "width": 40.73088073730469,
+                          "height": 7.566502463054187
+                        },
+                        "className": "Tag"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "drawingsDetails": {
+    "db0puu209qe": {
+      "textExpr": "{surface}",
+      "longText": "",
+      "quant": {
+        "surface": {
+          "value": 66.56,
+          "unit": "cm2"
+        },
+        "min": {
+          "value": 45,
+          "unit": ""
+        },
+        "max": {
+          "value": 602,
+          "unit": ""
+        },
+        "mean": {
+          "value": 393.77989783653845,
+          "unit": ""
+        },
+        "stdDev": {
+          "value": 91.9374530590746,
+          "unit": ""
+        }
+      }
+    }
+  }
+}
