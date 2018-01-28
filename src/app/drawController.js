@@ -301,8 +301,28 @@ dwv.DrawController = function (drawDiv)
      */
     this.setDrawings = function (drawings, drawingsDetails, cmdCallback, exeCallback)
     {
+        var oldw = drawStage.width();
+        var oldh = drawStage.height();
+        var oldx = drawStage.scaleX();
+        var oldy = drawStage.scaleY();
+
+        console.log(drawings);
+
         // regular Konva deserialize
         drawStage = Konva.Node.create(drawings, drawDiv);
+
+        // tmp node used to read v0.2 state
+        var node = document.getElementById("tmpStateDiv");
+        if ( node ) {
+            console.log("Update stage from V02 state.");
+            dwv.html.removeNode( node );
+
+            drawStage.width(oldw);
+            drawStage.height(oldh);
+            drawStage.scaleX(oldx);
+            drawStage.scaleY(oldy);
+        }
+
         // suppose only one layer
         drawLayer = drawStage.getLayers()[0];
 
