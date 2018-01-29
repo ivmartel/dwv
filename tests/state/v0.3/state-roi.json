@@ -18,99 +18,87 @@
   },
   "drawings": {
     "attrs": {
-      "width": 406,
-      "height": 406,
       "listening": true,
-      "scaleX": 1.5859375,
-      "scaleY": 1.5859375
+      "visible": true
     },
-    "className": "Stage",
+    "className": "Layer",
     "children": [
       {
         "attrs": {
-          "listening": true,
+          "name": "position-group",
+          "id": "slice-0_frame-0",
           "visible": true
         },
-        "className": "Layer",
+        "className": "Group",
         "children": [
           {
             "attrs": {
-              "name": "position-group",
-              "id": "slice-0_frame-0",
-              "visible": true
+              "name": "roi-group",
+              "visible": true,
+              "id": "4l24ofouhmf",
+              "draggable": true
             },
             "className": "Group",
             "children": [
               {
                 "attrs": {
-                  "name": "roi-group",
-                  "visible": true,
-                  "id": "4l24ofouhmf",
-                  "draggable": true
+                  "points": [
+                    126,
+                    40,
+                    58,
+                    80,
+                    60,
+                    116,
+                    92,
+                    128,
+                    93,
+                    143,
+                    93,
+                    151,
+                    94,
+                    151,
+                    114,
+                    150,
+                    128,
+                    150,
+                    214,
+                    135,
+                    183,
+                    56,
+                    182,
+                    56,
+                    182,
+                    56
+                  ],
+                  "stroke": "#ffff80",
+                  "strokeWidth": 1.2610837438423645,
+                  "name": "shape",
+                  "closed": true
                 },
-                "className": "Group",
+                "className": "Line"
+              },
+              {
+                "attrs": {
+                  "x": 126,
+                  "y": 50,
+                  "name": "label"
+                },
+                "className": "Label",
                 "children": [
                   {
                     "attrs": {
-                      "points": [
-                        126,
-                        40,
-                        58,
-                        80,
-                        60,
-                        116,
-                        92,
-                        128,
-                        93,
-                        143,
-                        93,
-                        151,
-                        94,
-                        151,
-                        114,
-                        150,
-                        128,
-                        150,
-                        214,
-                        135,
-                        183,
-                        56,
-                        182,
-                        56,
-                        182,
-                        56
-                      ],
-                      "stroke": "#ffff80",
-                      "strokeWidth": 1.2610837438423645,
-                      "name": "shape",
-                      "closed": true
+                      "fontSize": 7.566502463054187,
+                      "fontFamily": "Verdana",
+                      "fill": "#ffff80",
+                      "name": "text"
                     },
-                    "className": "Line"
+                    "className": "Text"
                   },
                   {
                     "attrs": {
-                      "x": 126,
-                      "y": 50,
-                      "name": "label"
+                      "height": 7.566502463054187
                     },
-                    "className": "Label",
-                    "children": [
-                      {
-                        "attrs": {
-                          "fontSize": 7.566502463054187,
-                          "fontFamily": "Verdana",
-                          "fill": "#ffff80",
-                          "name": "text"
-                        },
-                        "className": "Text"
-                      },
-                      {
-                        "attrs": {
-                          "height": 7.566502463054187
-                        },
-                        "className": "Tag"
-                      }
-                    ]
+                    "className": "Tag"
                   }
                 ]
               }

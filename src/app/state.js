@@ -1,5 +1,7 @@
 // namespaces
 var dwv = dwv || {};
+// external
+var Konva = Konva || {};
 
 /**
  * State class.
@@ -95,7 +97,7 @@ dwv.State = function (app)
 
 /**
  * Convert drawings from v0.2 to v0.3.
- * v0.2: one layer per slice
+ * v0.2: one layer per slice/frame
  * v0.3: one layer, one group per slice. setDrawing expects the full stage
  * @param {Array} drawings An array of drawings.
  */
@@ -107,18 +109,6 @@ dwv.v02Tov03Drawings = function (drawings)
     //drawLayer.getChildren().each(function(node){
     //    node.visible(false);
     //});
-
-    var container = document.createElement('div');
-    container.id = "tmpStateDiv";
-    document.body.appendChild(container);
-
-    var drawStage = new Konva.Stage({
-        'container': container,
-        'listening': false
-    });
-    // reset style
-    // (avoids a not needed vertical scrollbar)
-    drawStage.getContent().setAttribute("style", "");
 
     var drawLayer = new Konva.Layer({
         'listening': false,
@@ -153,9 +143,7 @@ dwv.v02Tov03Drawings = function (drawings)
         }
     }
 
-    drawStage.add(drawLayer);
-
-    return drawStage.toJSON();
+    return drawLayer.toJSON();
 };
 
 /**

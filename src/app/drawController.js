@@ -52,11 +52,8 @@ dwv.DrawController = function (drawDiv)
 
     // Draw stage
     var drawStage = null;
-    // Draw layers: 2 dimension array: [slice][frame]
-    var drawLayers = [];
-
+    // Draw layer
     var drawLayer;
-
 
     // current slice position
     var currentSlice = 0;
@@ -100,7 +97,6 @@ dwv.DrawController = function (drawDiv)
      * Reset: clear the layers array.
      */
     this.reset = function () {
-        drawLayers = [];
         drawLayer = null;
     };
 
@@ -250,7 +246,7 @@ dwv.DrawController = function (drawDiv)
      */
     this.getDraws = function ()
     {
-        return drawLayer.getStage();
+        return drawLayer;
     };
 
     /**
@@ -301,33 +297,11 @@ dwv.DrawController = function (drawDiv)
      */
     this.setDrawings = function (drawings, drawingsDetails, cmdCallback, exeCallback)
     {
-        var oldw = drawStage.width();
-        var oldh = drawStage.height();
-        var oldx = drawStage.scaleX();
-        var oldy = drawStage.scaleY();
-
-        console.log(drawings);
-
         // regular Konva deserialize
-        drawStage = Konva.Node.create(drawings, drawDiv);
-
-        // tmp node used to read v0.2 state
-        var node = document.getElementById("tmpStateDiv");
-        if ( node ) {
-            console.log("Update stage from V02 state.");
-            dwv.html.removeNode( node );
-
-            drawStage.width(oldw);
-            drawStage.height(oldh);
-            drawStage.scaleX(oldx);
-            drawStage.scaleY(oldy);
-        }
-
-        // suppose only one layer
-        drawLayer = drawStage.getLayers()[0];
+        var stateLayer = Konva.Node.create(drawings);
 
         // get all position groups
-        var posGroups = drawLayer.getChildren( isPositionNode );
+        var posGroups = stateLayer.getChildren( isPositionNode );
 
         var posKids;
         var group;
@@ -341,7 +315,6 @@ dwv.DrawController = function (drawDiv)
                 // create the draw command
                 var cmd = new dwv.tool.DrawGroupCommand(
                     group, shape.className,
-                    //drawLayers[k][f] );
                     drawLayer );
                 // draw command callbacks
                 cmd.onExecute = cmdCallback;
@@ -363,6 +336,9 @@ dwv.DrawController = function (drawDiv)
                 exeCallback(cmd);
             }
         }
+
+        // add kids to the main layer
+        stateLayer.getChildren().forEach( function (kid) { drawLayer.add( kid ); });
     };
 
     /**
@@ -431,21 +407,16 @@ dwv.DrawController = function (drawDiv)
      * @param {Object} exeCallback The callback to call once the DeleteCommand has been executed.
      */
     this.deleteDraws = function (cmdCallback, exeCallback) {
-        var delcmd, layer, groups;
-        for ( var k = 0, lenk = drawLayers.length; k < lenk; ++k ) {
-            for ( var f = 0, lenf = drawLayers[k].length; f < lenf; ++f ) {
-                layer = drawLayers[k][f];
-                groups = layer.getChildren();
-                while (groups.length) {
-                    var shape = groups[0].getChildren( isNodeNameShape )[0];
-                    delcmd = new dwv.tool.DeleteGroupCommand( groups[0],
-                        dwv.tool.GetShapeDisplayName(shape), layer);
-                    delcmd.onExecute = cmdCallback;
-                    delcmd.onUndo = cmdCallback;
-                    delcmd.execute();
-                    exeCallback(delcmd);
-                }
-            }
+        var delcmd;
+        var groups = drawLayer.getChildren();
+        while (groups.length) {
+            var shape = groups[0].getChildren( isNodeNameShape )[0];
+            delcmd = new dwv.tool.DeleteGroupCommand( groups[0],
+                dwv.tool.GetShapeDisplayName(shape), drawLayer);
+            delcmd.onExecute = cmdCallback;
+            delcmd.onUndo = cmdCallback;
+            delcmd.execute();
+            exeCallback(delcmd);
         }
     };
 

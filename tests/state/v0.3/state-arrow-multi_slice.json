@@ -18,391 +18,379 @@
   },
   "drawings": {
     "attrs": {
-      "width": 406,
-      "height": 406,
       "listening": true,
-      "scaleX": 1.5859375,
-      "scaleY": 1.5859375
+      "visible": true
     },
-    "className": "Stage",
+    "className": "Layer",
     "children": [
       {
         "attrs": {
-          "listening": true,
-          "visible": true
+          "name": "position-group",
+          "id": "slice-1_frame-0",
+          "visible": false
         },
-        "className": "Layer",
+        "className": "Group",
         "children": [
           {
             "attrs": {
-              "name": "position-group",
-              "id": "slice-1_frame-0",
-              "visible": false
+              "name": "line-group",
+              "visible": true,
+              "id": "4z0lwh3jaiu",
+              "draggable": true
             },
             "className": "Group",
             "children": [
               {
                 "attrs": {
-                  "name": "line-group",
-                  "visible": true,
-                  "id": "4z0lwh3jaiu",
-                  "draggable": true
+                  "points": [
+                    126,
+                    114,
+                    127.51231527093596,
+                    60.192118226600996
+                  ],
+                  "stroke": "#ffff80",
+                  "strokeWidth": 1.2610837438423645,
+                  "name": "shape"
                 },
-                "className": "Group",
+                "className": "Line"
+              },
+              {
+                "attrs": {
+                  "x": 126.14047368687271,
+                  "y": 109.00197367520974,
+                  "sides": 3,
+                  "radius": 5,
+                  "rotation": -178.3900782854968,
+                  "fill": "#ffff80",
+                  "strokeWidth": 1.2610837438423645,
+                  "name": "shape-triangle"
+                },
+                "className": "RegularPolygon"
+              },
+              {
+                "attrs": {
+                  "x": 102.51231527093596,
+                  "y": 45.192118226600996,
+                  "name": "label"
+                },
+                "className": "Label",
                 "children": [
                   {
                     "attrs": {
-                      "points": [
-                        126,
-                        114,
-                        127.51231527093596,
-                        60.192118226600996
-                      ],
-                      "stroke": "#ffff80",
-                      "strokeWidth": 1.2610837438423645,
-                      "name": "shape"
-                    },
-                    "className": "Line"
-                  },
-                  {
-                    "attrs": {
-                      "x": 126.14047368687271,
-                      "y": 109.00197367520974,
-                      "sides": 3,
-                      "radius": 5,
-                      "rotation": -178.3900782854968,
+                      "fontSize": 7.566502463054187,
+                      "fontFamily": "Verdana",
                       "fill": "#ffff80",
-                      "strokeWidth": 1.2610837438423645,
-                      "name": "shape-triangle"
+                      "name": "text",
+                      "text": "One"
                     },
-                    "className": "RegularPolygon"
+                    "className": "Text"
                   },
                   {
                     "attrs": {
-                      "x": 102.51231527093596,
-                      "y": 45.192118226600996,
-                      "name": "label"
+                      "width": 15.238113403320312,
+                      "height": 7.566502463054187
                     },
-                    "className": "Label",
-                    "children": [
-                      {
-                        "attrs": {
-                          "fontSize": 7.566502463054187,
-                          "fontFamily": "Verdana",
-                          "fill": "#ffff80",
-                          "name": "text",
-                          "text": "One"
-                        },
-                        "className": "Text"
-                      },
-                      {
-                        "attrs": {
-                          "width": 15.238113403320312,
-                          "height": 7.566502463054187
-                        },
-                        "className": "Tag"
-                      }
-                    ]
+                    "className": "Tag"
                   }
                 ]
               }
             ]
-          },
+          }
+        ]
+      },
+      {
+        "attrs": {
+          "name": "position-group",
+          "id": "slice-2_frame-0",
+          "visible": false
+        },
+        "className": "Group",
+        "children": [
           {
             "attrs": {
-              "name": "position-group",
-              "id": "slice-2_frame-0",
-              "visible": false
+              "name": "line-group",
+              "visible": true,
+              "id": "twjzphgb88",
+              "draggable": true
             },
             "className": "Group",
             "children": [
               {
                 "attrs": {
-                  "name": "line-group",
-                  "visible": true,
-                  "id": "twjzphgb88",
-                  "draggable": true
+                  "points": [
+                    129,
+                    107,
+                    178.29064039408868,
+                    105.2266009852217
+                  ],
+                  "stroke": "#ffff80",
+                  "strokeWidth": 1.2610837438423645,
+                  "name": "shape"
                 },
-                "className": "Group",
+                "className": "Line"
+              },
+              {
+                "attrs": {
+                  "x": 133.9967670228515,
+                  "y": 106.82022425262578,
+                  "sides": 3,
+                  "radius": 5,
+                  "rotation": -92.0605224439492,
+                  "fill": "#ffff80",
+                  "strokeWidth": 1.2610837438423645,
+                  "name": "shape-triangle"
+                },
+                "className": "RegularPolygon"
+              },
+              {
+                "attrs": {
+                  "x": 153.29064039408868,
+                  "y": 90.2266009852217,
+                  "name": "label"
+                },
+                "className": "Label",
                 "children": [
                   {
                     "attrs": {
-                      "points": [
-                        129,
-                        107,
-                        178.29064039408868,
-                        105.2266009852217
-                      ],
-                      "stroke": "#ffff80",
-                      "strokeWidth": 1.2610837438423645,
-                      "name": "shape"
-                    },
-                    "className": "Line"
-                  },
-                  {
-                    "attrs": {
-                      "x": 133.9967670228515,
-                      "y": 106.82022425262578,
-                      "sides": 3,
-                      "radius": 5,
-                      "rotation": -92.0605224439492,
+                      "fontSize": 7.566502463054187,
+                      "fontFamily": "Verdana",
                       "fill": "#ffff80",
-                      "strokeWidth": 1.2610837438423645,
-                      "name": "shape-triangle"
+                      "name": "text",
+                      "text": "Two"
                     },
-                    "className": "RegularPolygon"
+                    "className": "Text"
                   },
                   {
                     "attrs": {
-                      "x": 153.29064039408868,
-                      "y": 90.2266009852217,
-                      "name": "label"
+                      "width": 14.695465087890625,
+                      "height": 7.566502463054187
                     },
-                    "className": "Label",
-                    "children": [
-                      {
-                        "attrs": {
-                          "fontSize": 7.566502463054187,
-                          "fontFamily": "Verdana",
-                          "fill": "#ffff80",
-                          "name": "text",
-                          "text": "Two"
-                        },
-                        "className": "Text"
-                      },
-                      {
-                        "attrs": {
-                          "width": 14.695465087890625,
-                          "height": 7.566502463054187
-                        },
-                        "className": "Tag"
-                      }
-                    ]
+                    "className": "Tag"
                   }
                 ]
               }
             ]
-          },
+          }
+        ]
+      },
+      {
+        "attrs": {
+          "name": "position-group",
+          "id": "slice-3_frame-0",
+          "visible": false
+        },
+        "className": "Group",
+        "children": [
           {
             "attrs": {
-              "name": "position-group",
-              "id": "slice-3_frame-0",
-              "visible": false
+              "name": "line-group",
+              "visible": true,
+              "id": "kv58j1f6mxd",
+              "draggable": true
             },
             "className": "Group",
             "children": [
               {
                 "attrs": {
-                  "name": "line-group",
-                  "visible": true,
-                  "id": "kv58j1f6mxd",
-                  "draggable": true
+                  "points": [
+                    122,
+                    109,
+                    121,
+                    185
+                  ],
+                  "stroke": "#ffff80",
+                  "strokeWidth": 1.2610837438423645,
+                  "name": "shape"
                 },
-                "className": "Group",
+                "className": "Line"
+              },
+              {
+                "attrs": {
+                  "x": 121.93421622064857,
+                  "y": 113.9995672307085,
+                  "sides": 3,
+                  "radius": 5,
+                  "rotation": -359.2461516669292,
+                  "fill": "#ffff80",
+                  "strokeWidth": 1.2610837438423645,
+                  "name": "shape-triangle"
+                },
+                "className": "RegularPolygon"
+              },
+              {
+                "attrs": {
+                  "x": 121,
+                  "y": 192.5,
+                  "name": "label"
+                },
+                "className": "Label",
                 "children": [
                   {
                     "attrs": {
-                      "points": [
-                        122,
-                        109,
-                        121,
-                        185
-                      ],
-                      "stroke": "#ffff80",
-                      "strokeWidth": 1.2610837438423645,
-                      "name": "shape"
-                    },
-                    "className": "Line"
-                  },
-                  {
-                    "attrs": {
-                      "x": 121.93421622064857,
-                      "y": 113.9995672307085,
-                      "sides": 3,
-                      "radius": 5,
-                      "rotation": -359.2461516669292,
+                      "fontSize": 7.566502463054187,
+                      "fontFamily": "Verdana",
                       "fill": "#ffff80",
-                      "strokeWidth": 1.2610837438423645,
-                      "name": "shape-triangle"
+                      "name": "text",
+                      "text": "Three"
                     },
-                    "className": "RegularPolygon"
+                    "className": "Text"
                   },
                   {
                     "attrs": {
-                      "x": 121,
-                      "y": 192.5,
-                      "name": "label"
+                      "width": 21.675918579101562,
+                      "height": 7.566502463054187
                     },
-                    "className": "Label",
-                    "children": [
-                      {
-                        "attrs": {
-                          "fontSize": 7.566502463054187,
-                          "fontFamily": "Verdana",
-                          "fill": "#ffff80",
-                          "name": "text",
-                          "text": "Three"
-                        },
-                        "className": "Text"
-                      },
-                      {
-                        "attrs": {
-                          "width": 21.675918579101562,
-                          "height": 7.566502463054187
-                        },
-                        "className": "Tag"
-                      }
-                    ]
+                    "className": "Tag"
                   }
                 ]
               }
             ]
-          },
+          }
+        ]
+      },
+      {
+        "attrs": {
+          "name": "position-group",
+          "id": "slice-4_frame-0",
+          "visible": false
+        },
+        "className": "Group",
+        "children": [
           {
             "attrs": {
-              "name": "position-group",
-              "id": "slice-4_frame-0",
-              "visible": false
+              "name": "line-group",
+              "visible": true,
+              "id": "9y1qozgi3o4",
+              "draggable": true
             },
             "className": "Group",
             "children": [
               {
                 "attrs": {
-                  "name": "line-group",
-                  "visible": true,
-                  "id": "9y1qozgi3o4",
-                  "draggable": true
+                  "points": [
+                    127.20689655172414,
+                    109,
+                    63.51231527093598,
+                    110.26108374384236
+                  ],
+                  "stroke": "#ffff80",
+                  "strokeWidth": 1.2610837438423645,
+                  "name": "shape"
                 },
-                "className": "Group",
+                "className": "Line"
+              },
+              {
+                "attrs": {
+                  "x": 122.2078762565128,
+                  "y": 109.09897518913952,
+                  "sides": 3,
+                  "radius": 5,
+                  "rotation": -271.1342462055712,
+                  "fill": "#ffff80",
+                  "strokeWidth": 1.2610837438423645,
+                  "name": "shape-triangle"
+                },
+                "className": "RegularPolygon"
+              },
+              {
+                "attrs": {
+                  "x": 63.51231527093598,
+                  "y": 117.76108374384236,
+                  "name": "label"
+                },
+                "className": "Label",
                 "children": [
                   {
                     "attrs": {
-                      "points": [
-                        127.20689655172414,
-                        109,
-                        63.51231527093598,
-                        110.26108374384236
-                      ],
-                      "stroke": "#ffff80",
-                      "strokeWidth": 1.2610837438423645,
-                      "name": "shape"
-                    },
-                    "className": "Line"
-                  },
-                  {
-                    "attrs": {
-                      "x": 122.2078762565128,
-                      "y": 109.09897518913952,
-                      "sides": 3,
-                      "radius": 5,
-                      "rotation": -271.1342462055712,
+                      "fontSize": 7.566502463054187,
+                      "fontFamily": "Verdana",
                       "fill": "#ffff80",
-                      "strokeWidth": 1.2610837438423645,
-                      "name": "shape-triangle"
+                      "name": "text",
+                      "text": "Four"
                     },
-                    "className": "RegularPolygon"
+                    "className": "Text"
                   },
                   {
                     "attrs": {
-                      "x": 63.51231527093598,
-                      "y": 117.76108374384236,
-                      "name": "label"
+                      "width": 16.758956909179688,
+                      "height": 7.566502463054187
                     },
-                    "className": "Label",
-                    "children": [
-                      {
-                        "attrs": {
-                          "fontSize": 7.566502463054187,
-                          "fontFamily": "Verdana",
-                          "fill": "#ffff80",
-                          "name": "text",
-                          "text": "Four"
-                        },
-                        "className": "Text"
-                      },
-                      {
-                        "attrs": {
-                          "width": 16.758956909179688,
-                          "height": 7.566502463054187
-                        },
-                        "className": "Tag"
-                      }
-                    ]
+                    "className": "Tag"
                   }
                 ]
               }
             ]
-          },
+          }
+        ]
+      },
+      {
+        "attrs": {
+          "name": "position-group",
+          "id": "slice-5_frame-0",
+          "visible": true
+        },
+        "className": "Group",
+        "children": [
           {
             "attrs": {
-              "name": "position-group",
-              "id": "slice-5_frame-0",
-              "visible": true
+              "name": "line-group",
+              "visible": true,
+              "id": "o5pn2rjvbh8",
+              "draggable": true
             },
             "className": "Group",
             "children": [
               {
                 "attrs": {
-                  "name": "line-group",
-                  "visible": true,
-                  "id": "o5pn2rjvbh8",
-                  "draggable": true
+                  "points": [
+                    124.15270935960594,
+                    116.02955665024632,
+                    123.89162561576354,
+                    67.70935960591133
+                  ],
+                  "stroke": "#ffff80",
+                  "strokeWidth": 1.2610837438423645,
+                  "name": "shape"
                 },
-                "className": "Group",
+                "className": "Line"
+              },
+              {
+                "attrs": {
+                  "x": 124.12569374824876,
+                  "y": 111.0296296351047,
+                  "sides": 3,
+                  "radius": 5,
+                  "rotation": -180.30957760864635,
+                  "fill": "#ffff80",
+                  "strokeWidth": 1.2610837438423645,
+                  "name": "shape-triangle"
+                },
+                "className": "RegularPolygon"
+              },
+              {
+                "attrs": {
+                  "x": 123.89162561576354,
+                  "y": 52.70935960591133,
+                  "name": "label"
+                },
+                "className": "Label",
                 "children": [
                   {
                     "attrs": {
-                      "points": [
-                        124.15270935960594,
-                        116.02955665024632,
-                        123.89162561576354,
-                        67.70935960591133
-                      ],
-                      "stroke": "#ffff80",
-                      "strokeWidth": 1.2610837438423645,
-                      "name": "shape"
-                    },
-                    "className": "Line"
-                  },
-                  {
-                    "attrs": {
-                      "x": 124.12569374824876,
-                      "y": 111.0296296351047,
-                      "sides": 3,
-                      "radius": 5,
-                      "rotation": -180.30957760864635,
+                      "fontSize": 7.566502463054187,
+                      "fontFamily": "Verdana",
                       "fill": "#ffff80",
-                      "strokeWidth": 1.2610837438423645,
-                      "name": "shape-triangle"
+                      "name": "text",
+                      "text": "Five"
                     },
-                    "className": "RegularPolygon"
+                    "className": "Text"
                   },
                   {
                     "attrs": {
-                      "x": 123.89162561576354,
-                      "y": 52.70935960591133,
-                      "name": "label"
+                      "width": 15.33038330078125,
+                      "height": 7.566502463054187
                     },
-                    "className": "Label",
-                    "children": [
-                      {
-                        "attrs": {
-                          "fontSize": 7.566502463054187,
-                          "fontFamily": "Verdana",
-                          "fill": "#ffff80",
-                          "name": "text",
-                          "text": "Five"
-                        },
-                        "className": "Text"
-                      },
-                      {
-                        "attrs": {
-                          "width": 15.33038330078125,
-                          "height": 7.566502463054187
-                        },
-                        "className": "Tag"
-                      }
-                    ]
+                    "className": "Tag"
                   }
                 ]
               }

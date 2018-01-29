@@ -18,76 +18,64 @@
   },
   "drawings": {
     "attrs": {
-      "width": 406,
-      "height": 406,
       "listening": true,
-      "scaleX": 1.5859375,
-      "scaleY": 1.5859375
+      "visible": true
     },
-    "className": "Stage",
+    "className": "Layer",
     "children": [
       {
         "attrs": {
-          "listening": true,
+          "name": "position-group",
+          "id": "slice-0_frame-0",
           "visible": true
         },
-        "className": "Layer",
+        "className": "Group",
         "children": [
           {
             "attrs": {
-              "name": "position-group",
-              "id": "slice-0_frame-0",
-              "visible": true
+              "name": "rectangle-group",
+              "visible": true,
+              "id": "db0puu209qe",
+              "draggable": true
             },
             "className": "Group",
             "children": [
               {
                 "attrs": {
-                  "name": "rectangle-group",
-                  "visible": true,
-                  "id": "db0puu209qe",
-                  "draggable": true
+                  "x": 80,
+                  "y": 58,
+                  "width": 104,
+                  "height": 64,
+                  "stroke": "#ffff80",
+                  "strokeWidth": 1.2610837438423645,
+                  "name": "shape"
                 },
-                "className": "Group",
+                "className": "Rect"
+              },
+              {
+                "attrs": {
+                  "x": 80,
+                  "y": 132,
+                  "name": "label"
+                },
+                "className": "Label",
                 "children": [
                   {
                     "attrs": {
-                      "x": 80,
-                      "y": 58,
-                      "width": 104,
-                      "height": 64,
-                      "stroke": "#ffff80",
-                      "strokeWidth": 1.2610837438423645,
-                      "name": "shape"
+                      "fontSize": 7.566502463054187,
+                      "fontFamily": "Verdana",
+                      "fill": "#ffff80",
+                      "name": "text",
+                      "text": "66.56cm2"
                     },
-                    "className": "Rect"
+                    "className": "Text"
                   },
                   {
                     "attrs": {
-                      "x": 80,
-                      "y": 132,
-                      "name": "label"
+                      "width": 40.73088073730469,
+                      "height": 7.566502463054187
                     },
-                    "className": "Label",
-                    "children": [
-                      {
-                        "attrs": {
-                          "fontSize": 7.566502463054187,
-                          "fontFamily": "Verdana",
-                          "fill": "#ffff80",
-                          "name": "text",
-                          "text": "66.56cm2"
-                        },
-                        "className": "Text"
-                      },
-                      {
-                        "attrs": {
-                          "width": 40.73088073730469,
-                          "height": 7.566502463054187
-                        },
-                        "className": "Tag"
-                      }
-                    ]
+                    "className": "Tag"
                   }
                 ]
               }
