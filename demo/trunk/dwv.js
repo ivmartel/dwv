@@ -1547,11 +1547,8 @@ dwv.DrawController = function (drawDiv)
 
     // Draw stage
     var drawStage = null;
-    // Draw layers: 2 dimension array: [slice][frame]
-    var drawLayers = [];
-
+    // Draw layer
     var drawLayer;
-
 
     // current slice position
     var currentSlice = 0;
@@ -1595,7 +1592,6 @@ dwv.DrawController = function (drawDiv)
      * Reset: clear the layers array.
      */
     this.reset = function () {
-        drawLayers = [];
         drawLayer = null;
     };
 
@@ -1745,7 +1741,7 @@ dwv.DrawController = function (drawDiv)
      */
     this.getDraws = function ()
     {
-        return drawLayer.getStage();
+        return drawLayer;
     };
 
     /**
@@ -1797,12 +1793,10 @@ dwv.DrawController = function (drawDiv)
     this.setDrawings = function (drawings, drawingsDetails, cmdCallback, exeCallback)
     {
         // regular Konva deserialize
-        drawStage = Konva.Node.create(drawings, drawDiv);
-        // suppose only one layer
-        drawLayer = drawStage.getLayers()[0];
+        var stateLayer = Konva.Node.create(drawings);
 
         // get all position groups
-        var posGroups = drawLayer.getChildren( isPositionNode );
+        var posGroups = stateLayer.getChildren( isPositionNode );
 
         var posKids;
         var group;
@@ -1816,7 +1810,6 @@ dwv.DrawController = function (drawDiv)
                 // create the draw command
                 var cmd = new dwv.tool.DrawGroupCommand(
                     group, shape.className,
-                    //drawLayers[k][f] );
                     drawLayer );
                 // draw command callbacks
                 cmd.onExecute = cmdCallback;
@@ -1838,6 +1831,9 @@ dwv.DrawController = function (drawDiv)
                 exeCallback(cmd);
             }
         }
+
+        // add kids to the main layer
+        stateLayer.getChildren().forEach( function (kid) { drawLayer.add( kid ); });
     };
 
     /**
@@ -1906,21 +1902,16 @@ dwv.DrawController = function (drawDiv)
      * @param {Object} exeCallback The callback to call once the DeleteCommand has been executed.
      */
     this.deleteDraws = function (cmdCallback, exeCallback) {
-        var delcmd, layer, groups;
-        for ( var k = 0, lenk = drawLayers.length; k < lenk; ++k ) {
-            for ( var f = 0, lenf = drawLayers[k].length; f < lenf; ++f ) {
-                layer = drawLayers[k][f];
-                groups = layer.getChildren();
-                while (groups.length) {
-                    var shape = groups[0].getChildren( isNodeNameShape )[0];
-                    delcmd = new dwv.tool.DeleteGroupCommand( groups[0],
-                        dwv.tool.GetShapeDisplayName(shape), layer);
-                    delcmd.onExecute = cmdCallback;
-                    delcmd.onUndo = cmdCallback;
-                    delcmd.execute();
-                    exeCallback(delcmd);
-                }
-            }
+        var delcmd;
+        var groups = drawLayer.getChildren();
+        while (groups.length) {
+            var shape = groups[0].getChildren( isNodeNameShape )[0];
+            delcmd = new dwv.tool.DeleteGroupCommand( groups[0],
+                dwv.tool.GetShapeDisplayName(shape), drawLayer);
+            delcmd.onExecute = cmdCallback;
+            delcmd.onUndo = cmdCallback;
+            delcmd.execute();
+            exeCallback(delcmd);
         }
     };
 
@@ -2116,6 +2107,8 @@ dwv.InfoController = function (containerDivId)
 
 // namespaces
 var dwv = dwv || {};
+// external
+var Konva = Konva || {};
 
 /**
  * State class.
@@ -2134,14 +2127,14 @@ dwv.State = function (app)
         var drawingsDetails = app.getDrawStoreDetails();
         // return a JSON string
         return JSON.stringify( {
-            "version": "0.2",
+            "version": "0.3",
             "window-center": app.getViewController().getWindowLevel().center,
             "window-width": app.getViewController().getWindowLevel().width,
             "position": app.getViewController().getCurrentPosition(),
             "scale": app.getScale(),
             "scaleCenter": app.getScaleCenter(),
             "translation": app.getTranslation(),
-            "drawings": drawings,
+            "drawings": drawings.toObject(),
             // new in v0.2
             "drawingsDetails": drawingsDetails
         } );
@@ -2157,6 +2150,9 @@ dwv.State = function (app)
         }
         else if (data.version === "0.2") {
             readV02(data);
+        }
+        else if (data.version === "0.3") {
+            readV03(data);
         }
         else {
             throw new Error("Unknown state file format version: '"+data.version+"'.");
@@ -2180,6 +2176,22 @@ dwv.State = function (app)
      * @param {Object} data The Object representation of the state.
      */
     function readV02(data) {
+        console.log("readV02");
+        // display
+        app.getViewController().setWindowLevel( data["window-center"], data["window-width"] );
+        app.getViewController().setCurrentPosition( data.position );
+        app.zoom( data.scale, data.scaleCenter.x, data.scaleCenter.y );
+        app.translate( data.translation.x, data.translation.y );
+        // drawings
+        app.setDrawings(
+            dwv.v02Tov03Drawings( data.drawings ),
+            dwv.v02Tov03DrawingsDetails( data.drawingsDetails ) );
+    }
+    /**
+     * Read an application state from an Object in v0.3 format.
+     * @param {Object} data The Object representation of the state.
+     */
+    function readV03(data) {
         // display
         app.getViewController().setWindowLevel( data["window-center"], data["window-width"] );
         app.getViewController().setCurrentPosition( data.position );
@@ -2189,6 +2201,86 @@ dwv.State = function (app)
         app.setDrawings( data.drawings, data.drawingsDetails );
     }
 }; // State class
+
+/**
+ * Convert drawings from v0.2 to v0.3.
+ * v0.2: one layer per slice/frame
+ * v0.3: one layer, one group per slice. setDrawing expects the full stage
+ * @param {Array} drawings An array of drawings.
+ */
+dwv.v02Tov03Drawings = function (drawings)
+{
+    // Auxiliar variables
+    var group, groupShapes, parentGroup;
+    // Avoid errors when dropping multiple states
+    //drawLayer.getChildren().each(function(node){
+    //    node.visible(false);
+    //});
+
+    var drawLayer = new Konva.Layer({
+        'listening': false,
+        'hitGraphEnabled': false,
+        'visible': true
+    });
+
+    // Get the positions-groups data
+    var groupDrawings = typeof drawings === 'string' ? JSON.parse(drawings) : drawings;
+    // Iterate over each position-groups
+    for ( var k = 0, lenk = groupDrawings.length; k < lenk; ++k ) {
+        // Iterate over each frame
+        for( var f = 0, lenf = groupDrawings[k].length; f < lenf ; ++f ) {
+            // Create position-group set as visible and append it to drawLayer
+            parentGroup = new Konva.Group({
+                id: dwv.getDrawPositionGroupId(k,f),
+                name: "position-group",
+                visible: false
+            });
+
+            // Get all the shapes-groups in the position-group
+            groupShapes = groupDrawings[k][f];
+            // Iterate over shapes-group
+            for( var g = 0, leng = groupShapes.length; g < leng; ++g ) {
+                // create the konva group
+                group = Konva.Node.create(groupShapes[g]);
+                parentGroup.add(group);
+            }
+
+            drawLayer.add(parentGroup);
+
+        }
+    }
+
+    return drawLayer.toJSON();
+};
+
+/**
+ * Convert drawings from v0.2 to v0.3.
+ * v0.2: one layer per slice
+ * v0.3: one layer, one group per slice. setDrawing expects the full stage
+ * @param {Array} drawings An array of drawings.
+ */
+dwv.v02Tov03DrawingsDetails = function (details)
+{
+    var res = {};
+    // Get the positions-groups data
+    var groupDetails = typeof details === 'string' ? JSON.parse(details) : details;
+    // Iterate over each position-groups
+    for ( var k = 0, lenk = groupDetails.length; k < lenk; ++k ) {
+        // Iterate over each frame
+        for( var f = 0, lenf = groupDetails[k].length; f < lenf ; ++f ) {
+            // Iterate over shapes-group
+            for( var g = 0, leng = groupDetails[k][f].length; g < leng; ++g ) {
+                var group = groupDetails[k][f][g];
+                res[group.id] = {
+                    "textExpr": group.textExpr,
+                    "longText": group.longText,
+                    "quant": group.quant
+                };
+            }
+        }
+    }
+    return res;
+};
 
 // namespaces
 var dwv = dwv || {};
