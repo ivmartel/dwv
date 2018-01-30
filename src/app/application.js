@@ -632,8 +632,8 @@ dwv.App = function ()
         // set IO
         loader.onload = function (data) {
             // load state
-            var state = new dwv.State(self);
-            state.fromJSON(data);
+            var state = new dwv.State();
+            state.apply( self, state.fromJSON(data) );
         };
         loader.onerror = function (error) { handleError(error); };
         // main load (asynchronous)
@@ -1012,10 +1012,10 @@ dwv.App = function ()
      */
     this.onStateSave = function (/*event*/)
     {
-        var state = new dwv.State(self);
+        var state = new dwv.State();
         // add href to link (html5)
         var element = self.getElement("download-state");
-        element.href = "data:application/json," + state.toJSON();
+        element.href = "data:application/json," + state.toJSON(self);
     };
 
     /**

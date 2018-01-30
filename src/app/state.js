@@ -7,17 +7,14 @@ var Konva = Konva || {};
  * State class.
  * Saves: data url/path, display info.
  * @constructor
- * @param {Object} app The associated application.
  */
-dwv.State = function (app)
+dwv.State = function ()
 {
     /**
      * Save the application state as JSON.
+     * @param {Object} app The associated application.
      */
-    this.toJSON = function () {
-        // store each slice drawings group
-        var drawings = app.getDraws();
-        var drawingsDetails = app.getDrawStoreDetails();
+    this.toJSON = function (app) {
         // return a JSON string
         return JSON.stringify( {
             "version": "0.3",
@@ -27,9 +24,10 @@ dwv.State = function (app)
             "scale": app.getScale(),
             "scaleCenter": app.getScaleCenter(),
             "translation": app.getTranslation(),
-            "drawings": drawings.toObject(),
+            // new structure in v0.3
+            "drawings": app.getDraws().toObject(),
             // new in v0.2
-            "drawingsDetails": drawingsDetails
+            "drawingsDetails": app.getDrawStoreDetails()
         } );
     };
     /**
@@ -38,53 +36,24 @@ dwv.State = function (app)
      */
     this.fromJSON = function (json) {
         var data = JSON.parse(json);
-        if (data.version === "0.1") {
-            readV01(data);
+        var res = null;
+        if ( data.version === "0.1" ) {
+            res = readV01(data);
+        } else if ( data.version === "0.2" ) {
+            res = readV02(data);
+        } else if ( data.version === "0.3" ) {
+            res = readV03(data);
+        } else {
+            throw new Error("Unknown state file format version: '" + data.version + "'.");
         }
-        else if (data.version === "0.2") {
-            readV02(data);
-        }
-        else if (data.version === "0.3") {
-            readV03(data);
-        }
-        else {
-            throw new Error("Unknown state file format version: '"+data.version+"'.");
-        }
+        return res;
     };
     /**
-     * Read an application state from an Object in v0.1 format.
-     * @param {Object} data The Object representation of the state.
+     * Load an application state from JSON.
+     * @param {Object} app The app to apply the state to.
+     * @param {Object} data The state data.
      */
-    function readV01(data) {
-        // display
-        app.getViewController().setWindowLevel( data["window-center"], data["window-width"] );
-        app.getViewController().setCurrentPosition( data.position );
-        app.zoom( data.scale, data.scaleCenter.x, data.scaleCenter.y );
-        app.translate( data.translation.x, data.translation.y );
-        // drawings
-        app.setDrawings( data.drawings, null );
-    }
-    /**
-     * Read an application state from an Object in v0.2 format.
-     * @param {Object} data The Object representation of the state.
-     */
-    function readV02(data) {
-        console.log("readV02");
-        // display
-        app.getViewController().setWindowLevel( data["window-center"], data["window-width"] );
-        app.getViewController().setCurrentPosition( data.position );
-        app.zoom( data.scale, data.scaleCenter.x, data.scaleCenter.y );
-        app.translate( data.translation.x, data.translation.y );
-        // drawings
-        app.setDrawings(
-            dwv.v02Tov03Drawings( data.drawings ),
-            dwv.v02Tov03DrawingsDetails( data.drawingsDetails ) );
-    }
-    /**
-     * Read an application state from an Object in v0.3 format.
-     * @param {Object} data The Object representation of the state.
-     */
-    function readV03(data) {
+    this.apply = function (app, data) {
         // display
         app.getViewController().setWindowLevel( data["window-center"], data["window-width"] );
         app.getViewController().setCurrentPosition( data.position );
@@ -92,6 +61,32 @@ dwv.State = function (app)
         app.translate( data.translation.x, data.translation.y );
         // drawings
         app.setDrawings( data.drawings, data.drawingsDetails );
+    };
+    /**
+     * Read an application state from an Object in v0.1 format.
+     * @param {Object} data The Object representation of the state.
+     */
+    function readV01(data) {
+        // update drawings
+        data.drawingsDetails = null;
+        return data;
+    }
+    /**
+     * Read an application state from an Object in v0.2 format.
+     * @param {Object} data The Object representation of the state.
+     */
+    function readV02(data) {
+        // update drawings
+        data.drawings = dwv.v02Tov03Drawings( data.drawings );
+        data.drawingsDetails = dwv.v02Tov03DrawingsDetails( data.drawingsDetails );
+        return data;
+    }
+    /**
+     * Read an application state from an Object in v0.3 format.
+     * @param {Object} data The Object representation of the state.
+     */
+    function readV03(data) {
+        return data;
     }
 }; // State class
 
