@@ -117,16 +117,18 @@ dwv.utils.test.TestState = function ( version, type, assert ) {
 
     var request = new XMLHttpRequest();
     var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/442-less-canvas";
-    var url = urlRoot + "/tests/state/v" + version + "/state-" + type;
-    if ( type === "arrow" ) {
-        url += "-yellow";
-    }
-    url += ".json";
+    var url = urlRoot + "/tests/state/v" + version + "/state-" + type + ".json";
     request.open('GET', url, true);
     request.onerror = function (event) {
         console.log(event);
     };
     request.onload = function (/*event*/) {
+        // status 200: "OK"; status 0: "debug"
+        if ( this.status !== 200 &amp;&amp; this.status !== 0 ) {
+            assert.ok( false, "Error while loading test data." );
+            done();
+            return;
+        }
         // read state
         var state = new dwv.State();
         var jsonData = state.fromJSON( this.responseText );
@@ -147,7 +149,7 @@ dwv.utils.test.TestState = function ( version, type, assert ) {
 
 /**
  * Check state header.
- * @param {Object} jsonData The input data to ckeck.
+ * @param {Object} jsonData The input data to check.
  * @param {String} version The state version.
  * @param {Object} assert The qunit assert.
  */
@@ -167,7 +169,7 @@ dwv.utils.test.CheckStateHeader = function (jsonData, version, assert) {
 
 /**
  * Check drawings.
- * @param {Object} drawings The drawing object to ckeck
+ * @param {Object} drawings The drawing object to check
  * @param {Object} details The drawing details
  * @param {Object} assert The qunit assert.
  * @param {String} type The type of drawing.
