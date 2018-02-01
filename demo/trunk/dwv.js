@@ -2237,15 +2237,21 @@ dwv.v02Tov03Drawings = function (drawings)
             for( var g = 0, leng = groupShapes.length; g < leng; ++g ) {
                 // create the konva group
                 group = Konva.Node.create(groupShapes[g]);
+                // enforce draggable: only the shape was draggable in v0.2,
+                // now the whole group is.
+                group.draggable(true);
+                group.getChildren().forEach( function (gnode) {
+                    gnode.draggable(false);
+                });
+                // add to position group
                 parentGroup.add(group);
             }
-
+            // add to layer
             drawLayer.add(parentGroup);
-
         }
     }
 
-    return drawLayer.toJSON();
+    return drawLayer.toObject();
 };
 
 /**
