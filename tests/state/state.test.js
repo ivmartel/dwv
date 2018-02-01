@@ -54,6 +54,7 @@ dwv.utils.test.TestState = function ( version, type, assert ) {
 dwv.utils.test.CheckStateHeader = function (jsonData, version, assert) {
     // header data
     var headerData = {
+        "version": version,
         "window-center": 441,
         "window-width": 911,
         "position": { "i": 0, "j": 0, "k": 0 },
