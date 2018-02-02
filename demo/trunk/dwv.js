@@ -2116,16 +2116,17 @@ var Konva = Konva || {};
  *
  * History:
  * - v0.3 (dwv v0.23.0, ?/?)
- *   - new drawing structure, drawings are now the full layer object
+ *   - new drawing structure, drawings are now the full layer object and
+ *     using toObject to avoid saving a string representation
  *   - new details structure, simple array of objects referenced by draw ids
  * - v0.2 (dwv v0.17.0, 12/2016)
  *   - adds draw details: array [nslices][nframes] of detail objects
  * - v0.1 (dwv v0.15.0, 07/2016)
  *   - adds version
- *   - drawings: array [nslices][nframes] with all groups 
+ *   - drawings: array [nslices][nframes] with all groups
  * - initial release (dwv v0.10.0, 05/2015), no version number...
  *   - content: window-center, window-width, position, scale, scaleCenter, translation, drawings
- *   - drawings: array [nslices] with all groups 
+ *   - drawings: array [nslices] with all groups
  * @constructor
  */
 dwv.State = function ()
