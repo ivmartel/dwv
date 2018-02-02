@@ -195,6 +195,8 @@ dwv.utils.test.CheckDrawings = function (drawings, details, type, assert) {
         dwv.utils.test.CheckRoiDrawing( posGroupKid, details, assert );
     } else if ( type === "hand" ) {
         dwv.utils.test.CheckHandDrawing( posGroupKid, details, assert );
+    } else if ( type === "ellipse" ) {
+        dwv.utils.test.CheckEllipseDrawing( posGroupKid, details, assert );
     }
 };
 
@@ -248,7 +250,7 @@ dwv.utils.test.CheckArrowDrawing = function (posGroupKid, details, assert) {
  */
 dwv.utils.test.CheckRoiDrawing = function (posGroupKid, details, assert) {
     // check group name
-    assert.equal( posGroupKid.attrs.name, "roi-group", "Shape group is a line group.");
+    assert.equal( posGroupKid.attrs.name, "roi-group", "Shape group is a roi group.");
     assert.ok( posGroupKid.attrs.draggable,  "Shape group must be draggable.");
     assert.equal( posGroupKid.children.length, 2, "Shape group has 2 kids.");
     assert.equal( posGroupKid.attrs.id, "4l24ofouhmf", "Position group first level has the proper id.");
@@ -286,7 +288,7 @@ dwv.utils.test.CheckRoiDrawing = function (posGroupKid, details, assert) {
  */
 dwv.utils.test.CheckHandDrawing = function (posGroupKid, details, assert) {
     // check group name
-    assert.equal( posGroupKid.attrs.name, "freeHand-group", "Shape group is a line group.");
+    assert.equal( posGroupKid.attrs.name, "freeHand-group", "Shape group is a freeHand group.");
     assert.ok( posGroupKid.attrs.draggable,  "Shape group must be draggable.");
     assert.equal( posGroupKid.children.length, 2, "Shape group has 2 kids.");
     assert.equal( posGroupKid.attrs.id, "08m011yjp8je", "Position group first level has the proper id.");
@@ -317,6 +319,47 @@ dwv.utils.test.CheckHandDrawing = function (posGroupKid, details, assert) {
 };
 
 /**
+ * Check an ellipse drawing.
+ * @param {Object} posGroupKid The position group (only) kid.
+ * @param {Object} details The drawing details
+ * @param {Object} assert The qunit assert.
+ */
+dwv.utils.test.CheckEllipseDrawing = function (posGroupKid, details, assert) {
+    // check group name
+    assert.equal( posGroupKid.attrs.name, "ellipse-group", "Shape group is an ellipse group.");
+    assert.ok( posGroupKid.attrs.draggable,  "Shape group must be draggable.");
+    assert.equal( posGroupKid.children.length, 2, "Shape group has 2 kids.");
+    assert.equal( posGroupKid.attrs.id, "c6j16qt6vt6", "Position group first level has the proper id.");
+    assert.notEqual( typeof details.c6j16qt6vt6, "undefined", "Details should contain data for id.");
+
+    // real shape
+    var shapeGroupKid0 = posGroupKid.children[0];
+    assert.equal( shapeGroupKid0.className, "Ellipse", "Shape group first level is a line.");
+    assert.equal( shapeGroupKid0.attrs.name, "shape", "Shape group first level is a shape.");
+    assert.notOk( shapeGroupKid0.attrs.draggable,  "Shape group first level must not be draggable.");
+    assert.deepEqual( shapeGroupKid0.attrs.x, 90, "Line has the proper x.");
+    assert.deepEqual( shapeGroupKid0.attrs.y, 78, "Line has the proper y.");
+    assert.deepEqual( shapeGroupKid0.attrs.radiusX, 53, "Line has the proper radiusX.");
+    assert.deepEqual( shapeGroupKid0.attrs.radiusY, 32, "Line has the proper radiusY.");
+    assert.equal( shapeGroupKid0.attrs.stroke, "#ffff80", "Line has the proper colour.");
+    // label
+    var shapeGroupKid2 = posGroupKid.children[1];
+    assert.equal( shapeGroupKid2.className, "Label", "Shape group third level is a label.");
+    assert.notOk( shapeGroupKid2.attrs.draggable,  "Shape group third level must not be draggable.");
+    assert.equal( shapeGroupKid2.children.length, 2, "Label has 2 kids.");
+    var labelGroupKid0 = shapeGroupKid2.children[0];
+    assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
+    assert.equal( labelGroupKid0.attrs.text, "53.28cm2", "Text has the proper value.");
+    var labelGroupKid1 = shapeGroupKid2.children[1];
+    assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+
+    // details
+    var details0 = details.c6j16qt6vt6;
+    assert.equal( details0.textExpr, "{surface}", "Details textExpr has the proper value.");
+    assert.equal( details0.longText, "What a surface!", "Details longText has the proper value.");
+};
+
+/**
  * Tests for {@link dwv.State} v0.2 containing an arrow.
  * @function module:tests/state
  */
@@ -341,6 +384,14 @@ QUnit.test("Test read v0.2 state: hand.", function (assert) {
 });
 
 /**
+ * Tests for {@link dwv.State} v0.2 containing an ellipse.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.2 state: ellipse.", function (assert) {
+    dwv.utils.test.TestState( "0.2", "ellipse", assert );
+});
+
+/**
  * Tests for {@link dwv.State} v0.3 containing an arrow.
  * @function module:tests/state
  */
@@ -355,12 +406,21 @@ QUnit.test("Test read v0.3 state: arrow.", function (assert) {
 QUnit.test("Test read v0.3 state: roi.", function (assert) {
     dwv.utils.test.TestState( "0.3", "roi", assert );
 });
+
 /**
  * Tests for {@link dwv.State} v0.3 containing a hand draw.
  * @function module:tests/state
  */
 QUnit.test("Test read v0.3 state: hand.", function (assert) {
     dwv.utils.test.TestState( "0.3", "hand", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.3 containing an ellipse.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.3 state: ellipse.", function (assert) {
+    dwv.utils.test.TestState( "0.3", "ellipse", assert );
 });
 </pre>
     </article>
