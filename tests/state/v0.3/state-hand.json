@@ -240,7 +240,8 @@
                       "fontSize": 7.566502463054187,
                       "fontFamily": "Verdana",
                       "fill": "#ffff80",
-                      "name": "text"
+                      "name": "text",
+                      "text": "Brain"
                     },
                     "className": "Text"
                   },
@@ -260,8 +261,8 @@
   },
   "drawingsDetails": {
     "08m011yjp8je": {
-      "textExpr": "",
-      "longText": "",
+      "textExpr": "Brain",
+      "longText": "This is a roundy brain!",
       "quant": null
     }
   }

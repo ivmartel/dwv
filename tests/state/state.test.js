@@ -93,6 +93,8 @@ dwv.utils.test.CheckDrawings = function (drawings, details, type, assert) {
         dwv.utils.test.CheckArrowDrawing( posGroupKid, details, assert );
     } else if ( type === "roi" ) {
         dwv.utils.test.CheckRoiDrawing( posGroupKid, details, assert );
+    } else if ( type === "hand" ) {
+        dwv.utils.test.CheckHandDrawing( posGroupKid, details, assert );
     }
 };
 
@@ -177,6 +179,44 @@ dwv.utils.test.CheckRoiDrawing = function (posGroupKid, details, assert) {
 };
 
 /**
+ * Check a hand drawing.
+ * @param {Object} posGroupKid The position group (only) kid.
+ * @param {Object} details The drawing details
+ * @param {Object} assert The qunit assert.
+ */
+dwv.utils.test.CheckHandDrawing = function (posGroupKid, details, assert) {
+    // check group name
+    assert.equal( posGroupKid.attrs.name, "freeHand-group", "Shape group is a line group.");
+    assert.ok( posGroupKid.attrs.draggable,  "Shape group must be draggable.");
+    assert.equal( posGroupKid.children.length, 2, "Shape group has 2 kids.");
+    assert.equal( posGroupKid.attrs.id, "08m011yjp8je", "Position group first level has the proper id.");
+    assert.notEqual( typeof details["08m011yjp8je"], "undefined", "Details should contain data for id.");
+
+    // real shape
+    var shapeGroupKid0 = posGroupKid.children[0];
+    assert.equal( shapeGroupKid0.className, "Line", "Shape group first level is a line.");
+    assert.equal( shapeGroupKid0.attrs.name, "shape", "Shape group first level is a shape.");
+    assert.notOk( shapeGroupKid0.attrs.draggable,  "Shape group first level must not be draggable.");
+    assert.deepEqual( shapeGroupKid0.attrs.points, [93,50,92,50,71,58,71,59,68,63,68,64,54,80,54,81,53,83,52,85,51,87,50,92,47,98,47,100,55,117,56,118,86,122,89,126,90,128,90,129,88,131,87,133,86,134,85,138,85,139,85,141,87,143,87,144,87,145,88,147,92,150,97,152,112,154,113,153,136,143,174,136,178,135,191,136,192,136,194,138,196,139,197,141,199,141,200,141,207,140,208,139,211,136,213,134,213,133,213,129,213,126,213,122,210,90,209,87,206,80,205,79,204,78,201,73,199,71,197,70,187,63,184,61,182,59,180,58,174,54,172,52,170,51,168,50,167,49,155,42,154,42,151,42,136,40,134,40,133,40,128,41,126,41,124,41,117,44,116,44,114,44,107,47,102,49,100,49,97,49,93,50,92,50,92,50], "Line has the proper points.");
+    assert.equal( shapeGroupKid0.attrs.stroke, "#ffff80", "Line has the proper colour.");
+    // label
+    var shapeGroupKid1 = posGroupKid.children[1];
+    assert.equal( shapeGroupKid1.className, "Label", "Shape group third level is a label.");
+    assert.notOk( shapeGroupKid1.attrs.draggable,  "Shape group third level must not be draggable.");
+    assert.equal( shapeGroupKid1.children.length, 2, "Label has 2 kids.");
+    var labelGroupKid0 = shapeGroupKid1.children[0];
+    assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
+    assert.equal( labelGroupKid0.attrs.text, "Brain", "Text has the proper value.");
+    var labelGroupKid1 = shapeGroupKid1.children[1];
+    assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+
+    // details
+    var details0 = details["08m011yjp8je"];
+    assert.equal( details0.textExpr, "Brain", "Details textExpr has the proper value.");
+    assert.equal( details0.longText, "This is a roundy brain!", "Details longText has the proper value.");
+};
+
+/**
  * Tests for {@link dwv.State} v0.2 containing an arrow.
  * @function module:tests/state
  */
@@ -190,6 +230,14 @@ QUnit.test("Test read v0.2 state: arrow.", function (assert) {
  */
 QUnit.test("Test read v0.2 state: roi.", function (assert) {
     dwv.utils.test.TestState( "0.2", "roi", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.2 containing a hand draw.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.2 state: hand.", function (assert) {
+    dwv.utils.test.TestState( "0.2", "hand", assert );
 });
 
 /**
@@ -207,4 +255,10 @@ QUnit.test("Test read v0.3 state: arrow.", function (assert) {
 QUnit.test("Test read v0.3 state: roi.", function (assert) {
     dwv.utils.test.TestState( "0.3", "roi", assert );
 });
-
+/**
+ * Tests for {@link dwv.State} v0.3 containing a hand draw.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.3 state: hand.", function (assert) {
+    dwv.utils.test.TestState( "0.3", "hand", assert );
+});
