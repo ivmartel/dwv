@@ -88,7 +88,7 @@
   "drawingsDetails": {
     "c6j16qt6vt6": {
       "textExpr": "{surface}",
-      "longText": "",
+      "longText": "What a surface!",
       "quant": {
         "surface": {
           "value": 53.281411404882896,
