@@ -90,7 +90,8 @@
                       "fontSize": 7.566502463054187,
                       "fontFamily": "Verdana",
                       "fill": "#ffff80",
-                      "name": "text"
+                      "name": "text",
+                      "text": "Brain"
                     },
                     "className": "Text"
                   },
@@ -110,8 +111,8 @@
   },
   "drawingsDetails": {
     "4l24ofouhmf": {
-      "textExpr": "",
-      "longText": "",
+      "textExpr": "Brain",
+      "longText": "This is a squary brain!",
       "quant": null
     }
   }
