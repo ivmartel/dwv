@@ -97,6 +97,8 @@ dwv.utils.test.CheckDrawings = function (drawings, details, type, assert) {
         dwv.utils.test.CheckHandDrawing( posGroupKid, details, assert );
     } else if ( type === "ellipse" ) {
         dwv.utils.test.CheckEllipseDrawing( posGroupKid, details, assert );
+    } else if ( type === "protractor" ) {
+        dwv.utils.test.CheckProtractorDrawing( posGroupKid, details, assert );
     }
 };
 
@@ -234,7 +236,7 @@ dwv.utils.test.CheckEllipseDrawing = function (posGroupKid, details, assert) {
 
     // real shape
     var shapeGroupKid0 = posGroupKid.children[0];
-    assert.equal( shapeGroupKid0.className, "Ellipse", "Shape group first level is a line.");
+    assert.equal( shapeGroupKid0.className, "Ellipse", "Shape group first level is an ellipse.");
     assert.equal( shapeGroupKid0.attrs.name, "shape", "Shape group first level is a shape.");
     assert.notOk( shapeGroupKid0.attrs.draggable,  "Shape group first level must not be draggable.");
     assert.deepEqual( shapeGroupKid0.attrs.x, 90, "Line has the proper x.");
@@ -243,20 +245,62 @@ dwv.utils.test.CheckEllipseDrawing = function (posGroupKid, details, assert) {
     assert.deepEqual( shapeGroupKid0.attrs.radiusY, 32, "Line has the proper radiusY.");
     assert.equal( shapeGroupKid0.attrs.stroke, "#ffff80", "Line has the proper colour.");
     // label
-    var shapeGroupKid2 = posGroupKid.children[1];
-    assert.equal( shapeGroupKid2.className, "Label", "Shape group third level is a label.");
-    assert.notOk( shapeGroupKid2.attrs.draggable,  "Shape group third level must not be draggable.");
-    assert.equal( shapeGroupKid2.children.length, 2, "Label has 2 kids.");
-    var labelGroupKid0 = shapeGroupKid2.children[0];
+    var shapeGroupKid1 = posGroupKid.children[1];
+    assert.equal( shapeGroupKid1.className, "Label", "Shape group third level is a label.");
+    assert.notOk( shapeGroupKid1.attrs.draggable,  "Shape group third level must not be draggable.");
+    assert.equal( shapeGroupKid1.children.length, 2, "Label has 2 kids.");
+    var labelGroupKid0 = shapeGroupKid1.children[0];
     assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
     assert.equal( labelGroupKid0.attrs.text, "53.28cm2", "Text has the proper value.");
-    var labelGroupKid1 = shapeGroupKid2.children[1];
+    var labelGroupKid1 = shapeGroupKid1.children[1];
     assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
 
     // details
     var details0 = details.c6j16qt6vt6;
     assert.equal( details0.textExpr, "{surface}", "Details textExpr has the proper value.");
     assert.equal( details0.longText, "What a surface!", "Details longText has the proper value.");
+};
+
+/**
+ * Check a protractor drawing.
+ * @param {Object} posGroupKid The position group (only) kid.
+ * @param {Object} details The drawing details
+ * @param {Object} assert The qunit assert.
+ */
+dwv.utils.test.CheckProtractorDrawing = function (posGroupKid, details, assert) {
+    // check group name
+    assert.equal( posGroupKid.attrs.name, "protractor-group", "Shape group is an protractor group.");
+    assert.ok( posGroupKid.attrs.draggable,  "Shape group must be draggable.");
+    assert.equal( posGroupKid.children.length, 3, "Shape group has 3 kids.");
+    assert.equal( posGroupKid.attrs.id, "49g7kqi3p4u", "Position group first level has the proper id.");
+    assert.notEqual( typeof details["49g7kqi3p4u"], "undefined", "Details should contain data for id.");
+
+    // real shape
+    var shapeGroupKid0 = posGroupKid.children[0];
+    assert.equal( shapeGroupKid0.className, "Line", "Shape group first level is a line.");
+    assert.equal( shapeGroupKid0.attrs.name, "shape", "Shape group first level is a shape.");
+    assert.notOk( shapeGroupKid0.attrs.draggable,  "Shape group first level must not be draggable.");
+    assert.deepEqual( shapeGroupKid0.attrs.points, [33,164,81,145,93,198], "Line has the proper points.");
+    assert.equal( shapeGroupKid0.attrs.stroke, "#ffff80", "Line has the proper colour.");
+    // label
+    var shapeGroupKid1 = posGroupKid.children[1];
+    assert.equal( shapeGroupKid1.className, "Label", "Shape group third level is a label.");
+    assert.notOk( shapeGroupKid1.attrs.draggable,  "Shape group third level must not be draggable.");
+    assert.equal( shapeGroupKid1.children.length, 2, "Label has 2 kids.");
+    var labelGroupKid0 = shapeGroupKid1.children[0];
+    assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
+    assert.equal( labelGroupKid0.attrs.text, "80.15°", "Text has the proper value.");
+    var labelGroupKid1 = shapeGroupKid1.children[1];
+    assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+    // shape extra
+    var shapeGroupKid2 = posGroupKid.children[2];
+    assert.equal( shapeGroupKid2.className, "Arc", "Shape group second level is a polygon.");
+    assert.notOk( shapeGroupKid2.attrs.draggable,  "Shape group second level must not be draggable.");
+
+    // details
+    var details0 = details["49g7kqi3p4u"];
+    assert.equal( details0.textExpr, "{angle}", "Details textExpr has the proper value.");
+    assert.equal( details0.longText, "What an angle!", "Details longText has the proper value.");
 };
 
 /**
@@ -292,6 +336,14 @@ QUnit.test("Test read v0.2 state: ellipse.", function (assert) {
 });
 
 /**
+ * Tests for {@link dwv.State} v0.2 containing a protractor.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.2 state: protractor.", function (assert) {
+    dwv.utils.test.TestState( "0.2", "protractor", assert );
+});
+
+/**
  * Tests for {@link dwv.State} v0.3 containing an arrow.
  * @function module:tests/state
  */
@@ -321,4 +373,12 @@ QUnit.test("Test read v0.3 state: hand.", function (assert) {
  */
 QUnit.test("Test read v0.3 state: ellipse.", function (assert) {
     dwv.utils.test.TestState( "0.3", "ellipse", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.3 containing a protractor.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.3 state: protractor.", function (assert) {
+    dwv.utils.test.TestState( "0.3", "protractor", assert );
 });

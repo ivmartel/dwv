@@ -43,8 +43,8 @@
               {
                 "attrs": {
                   "points": [
-                    33.12807881773399,
-                    164.93596059113304,
+                    33,
+                    164,
                     81,
                     145,
                     93,
@@ -106,7 +106,7 @@
   "drawingsDetails": {
     "49g7kqi3p4u": {
       "textExpr": "{angle}",
-      "longText": "",
+      "longText": "What an angle!",
       "quant": {
         "angle": {
           "value": 80.14855270325586,
