@@ -133,7 +133,7 @@ dwv.utils.test.CheckArrowDrawing = function (posGroupKid, details, assert) {
     // details
     var details0 = details.pf8zteo5r4;
     assert.equal( details0.textExpr, "Eye", "Details textExpr has the proper value.");
-    assert.equal( details0.longText, "", "Details longText has the proper value.");
+    assert.equal( details0.longText, "This is an eye!", "Details longText has the proper value.");
 };
 
 /**
