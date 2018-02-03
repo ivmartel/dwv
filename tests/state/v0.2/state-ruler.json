@@ -7,7 +7,7 @@
     "j": 0,
     "k": 0
   },
-  "scale": 1.0000000000000004,
+  "scale": 1,
   "scaleCenter": {
     "x": 0,
     "y": 0
@@ -30,7 +30,7 @@
         {
           "id": "4gvkz8v6wzw",
           "textExpr": "{length}",
-          "longText": "",
+          "longText": "What a ruler!",
           "quant": {
             "length": {
               "value": 165.00303027520434,

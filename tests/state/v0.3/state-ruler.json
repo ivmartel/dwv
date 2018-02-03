@@ -35,7 +35,7 @@
             "attrs": {
               "name": "ruler-group",
               "visible": true,
-              "id": "xpz60ojflvs",
+              "id": "4gvkz8v6wzw",
               "draggable": true
             },
             "className": "Group",
@@ -116,9 +116,9 @@
     ]
   },
   "drawingsDetails": {
-    "xpz60ojflvs": {
+    "4gvkz8v6wzw": {
       "textExpr": "{length}",
-      "longText": "",
+      "longText": "What a ruler!",
       "quant": {
         "length": {
           "value": 165.00303027520434,

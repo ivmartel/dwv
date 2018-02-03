@@ -91,6 +91,8 @@ dwv.utils.test.CheckDrawings = function (drawings, details, type, assert) {
     // shape specific checks
     if ( type === "arrow" ) {
         dwv.utils.test.CheckArrowDrawing( posGroupKid, details, assert );
+    } else if ( type === "ruler" ) {
+        dwv.utils.test.CheckRulerDrawing( posGroupKid, details, assert );
     } else if ( type === "roi" ) {
         dwv.utils.test.CheckRoiDrawing( posGroupKid, details, assert );
     } else if ( type === "hand" ) {
@@ -144,6 +146,52 @@ dwv.utils.test.CheckArrowDrawing = function (posGroupKid, details, assert) {
     var details0 = details.pf8zteo5r4;
     assert.equal( details0.textExpr, "Eye", "Details textExpr has the proper value.");
     assert.equal( details0.longText, "This is an eye!", "Details longText has the proper value.");
+};
+
+/**
+ * Check a ruler drawing.
+ * @param {Object} posGroupKid The position group (only) kid.
+ * @param {Object} details The drawing details
+ * @param {Object} assert The qunit assert.
+ */
+dwv.utils.test.CheckRulerDrawing = function (posGroupKid, details, assert) {
+    // check group name
+    assert.equal( posGroupKid.attrs.name, "ruler-group", "Shape group is a ruler group.");
+    assert.ok( posGroupKid.attrs.draggable,  "Shape group must be draggable.");
+    assert.equal( posGroupKid.children.length, 4, "Shape group has 4 kids.");
+    assert.equal( posGroupKid.attrs.id, "4gvkz8v6wzw", "Position group first level has the proper id.");
+    assert.notEqual( typeof details["4gvkz8v6wzw"], "undefined", "Details should contain data for id.");
+
+    // real shape
+    var shapeGroupKid0 = posGroupKid.children[0];
+    assert.equal( shapeGroupKid0.className, "Line", "Shape group first level is a line.");
+    assert.equal( shapeGroupKid0.attrs.name, "shape", "Shape group first level is a shape.");
+    assert.notOk( shapeGroupKid0.attrs.draggable,  "Shape group first level must not be draggable.");
+    assert.deepEqual( shapeGroupKid0.attrs.points, [51,135,216,134], "Line has the proper points.");
+    assert.equal( shapeGroupKid0.attrs.stroke, "#ffff80", "Line has the proper colour.");
+    // shape extra
+    var shapeGroupKid1 = posGroupKid.children[1];
+    assert.equal( shapeGroupKid1.className, "Line", "Shape group second level is a polygon.");
+    assert.notOk( shapeGroupKid1.attrs.draggable, "Shape group second level must not be draggable.");
+    // shape extra
+    var shapeGroupKid2 = posGroupKid.children[2];
+    assert.equal( shapeGroupKid2.className, "Line", "Shape group third level is a polygon.");
+    assert.notOk( shapeGroupKid2.attrs.draggable, "Shape group third level must not be draggable.");
+    // label
+    var shapeGroupKid3 = posGroupKid.children[3];
+    assert.equal( shapeGroupKid3.className, "Label", "Shape group fourth level is a label.");
+    assert.notOk( shapeGroupKid3.attrs.draggable, "Shape group fourth level must not be draggable.");
+    assert.equal( shapeGroupKid3.children.length, 2, "Label has 2 kids.");
+    var labelGroupKid0 = shapeGroupKid3.children[0];
+    assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
+    assert.equal( labelGroupKid0.attrs.text, "165.0mm", "Text has the proper value.");
+    var labelGroupKid1 = shapeGroupKid3.children[1];
+    assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+
+    // details
+    var details0 = details["4gvkz8v6wzw"];
+    assert.equal( details0.textExpr, "{length}", "Details textExpr has the proper value.");
+    assert.equal( details0.longText, "What a ruler!", "Details longText has the proper value.");
 };
 
 /**
@@ -355,6 +403,14 @@ QUnit.test("Test read v0.2 state: arrow.", function (assert) {
 });
 
 /**
+ * Tests for {@link dwv.State} v0.2 containing a ruler.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.2 state: ruler.", function (assert) {
+    dwv.utils.test.TestState( "0.2", "ruler", assert );
+});
+
+/**
  * Tests for {@link dwv.State} v0.2 containing a roi.
  * @function module:tests/state
  */
@@ -400,6 +456,14 @@ QUnit.test("Test read v0.2 state: rectangle.", function (assert) {
  */
 QUnit.test("Test read v0.3 state: arrow.", function (assert) {
     dwv.utils.test.TestState( "0.3", "arrow", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.3 containing a ruler.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.3 state: ruler.", function (assert) {
+    dwv.utils.test.TestState( "0.3", "ruler", assert );
 });
 
 /**
