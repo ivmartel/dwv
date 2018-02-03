@@ -7,7 +7,7 @@
     "j": 0,
     "k": 0
   },
-  "scale": 1.0000000000000007,
+  "scale": 1,
   "scaleCenter": {
     "x": 0,
     "y": 0
@@ -30,7 +30,7 @@
         {
           "id": "db0puu209qe",
           "textExpr": "{surface}",
-          "longText": "",
+          "longText": "What a rectangle!",
           "quant": {
             "surface": {
               "value": 66.56,
