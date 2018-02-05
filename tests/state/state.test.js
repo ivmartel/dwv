@@ -8,7 +8,7 @@ QUnit.module("state");
 
 /**
  * Test a state file.
- * @param {String} version The state version.
+ * @param {String} version The state format version.
  * @param {String} type The type of drawing.
  * @param {Object} assert The qunit assert.
  */
@@ -34,7 +34,7 @@ dwv.utils.test.TestState = function ( version, type, assert ) {
         var jsonData = state.fromJSON( this.responseText );
         // check drawings values
         dwv.utils.test.CheckDrawings(
-            jsonData.drawings, jsonData.drawingsDetails, type, assert );
+            jsonData.drawings, jsonData.drawingsDetails, version, type, assert );
         // delete drawing to allow simple equal check
         delete jsonData.drawings;
         delete jsonData.drawingsDetails;
@@ -50,7 +50,7 @@ dwv.utils.test.TestState = function ( version, type, assert ) {
 /**
  * Check state header.
  * @param {Object} jsonData The input data to check.
- * @param {String} version The state version.
+ * @param {String} version The state format version.
  * @param {Object} assert The qunit assert.
  */
 dwv.utils.test.CheckStateHeader = function (jsonData, version, assert) {
@@ -71,10 +71,11 @@ dwv.utils.test.CheckStateHeader = function (jsonData, version, assert) {
  * Check drawings.
  * @param {Object} drawings The drawing object to check
  * @param {Object} details The drawing details
- * @param {Object} assert The qunit assert.
+ * @param {String} version The state format version.
  * @param {String} type The type of drawing.
+ * @param {Object} assert The qunit assert.
  */
-dwv.utils.test.CheckDrawings = function (drawings, details, type, assert) {
+dwv.utils.test.CheckDrawings = function (drawings, details, version, type, assert) {
     // first level: layer
     assert.equal( drawings.className, "Layer", "State drawings is a layer.");
     assert.equal( drawings.children.length, 1, "State drawings has one kid.");
@@ -90,19 +91,19 @@ dwv.utils.test.CheckDrawings = function (drawings, details, type, assert) {
 
     // shape specific checks
     if ( type === "arrow" ) {
-        dwv.utils.test.CheckArrowDrawing( posGroupKid, details, assert );
+        dwv.utils.test.CheckArrowDrawing( posGroupKid, details, version, assert );
     } else if ( type === "ruler" ) {
-        dwv.utils.test.CheckRulerDrawing( posGroupKid, details, assert );
+        dwv.utils.test.CheckRulerDrawing( posGroupKid, details, version, assert );
     } else if ( type === "roi" ) {
-        dwv.utils.test.CheckRoiDrawing( posGroupKid, details, assert );
+        dwv.utils.test.CheckRoiDrawing( posGroupKid, details, version, assert );
     } else if ( type === "hand" ) {
-        dwv.utils.test.CheckHandDrawing( posGroupKid, details, assert );
+        dwv.utils.test.CheckHandDrawing( posGroupKid, details, version, assert );
     } else if ( type === "ellipse" ) {
-        dwv.utils.test.CheckEllipseDrawing( posGroupKid, details, assert );
+        dwv.utils.test.CheckEllipseDrawing( posGroupKid, details, version, assert );
     } else if ( type === "protractor" ) {
-        dwv.utils.test.CheckProtractorDrawing( posGroupKid, details, assert );
+        dwv.utils.test.CheckProtractorDrawing( posGroupKid, details, version, assert );
     } else if ( type === "rectangle" ) {
-        dwv.utils.test.CheckRectangleDrawing( posGroupKid, details, assert );
+        dwv.utils.test.CheckRectangleDrawing( posGroupKid, details, version, assert );
     }
 };
 
@@ -110,9 +111,10 @@ dwv.utils.test.CheckDrawings = function (drawings, details, type, assert) {
  * Check an arrow drawing.
  * @param {Object} posGroupKid The position group (only) kid.
  * @param {Object} details The drawing details
+ * @param {String} version The state format version.
  * @param {Object} assert The qunit assert.
  */
-dwv.utils.test.CheckArrowDrawing = function (posGroupKid, details, assert) {
+dwv.utils.test.CheckArrowDrawing = function (posGroupKid, details, version, assert) {
     // check group name
     assert.equal( posGroupKid.attrs.name, "line-group", "Shape group is a line group.");
     assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
@@ -152,9 +154,10 @@ dwv.utils.test.CheckArrowDrawing = function (posGroupKid, details, assert) {
  * Check a ruler drawing.
  * @param {Object} posGroupKid The position group (only) kid.
  * @param {Object} details The drawing details
+ * @param {String} version The state format version.
  * @param {Object} assert The qunit assert.
  */
-dwv.utils.test.CheckRulerDrawing = function (posGroupKid, details, assert) {
+dwv.utils.test.CheckRulerDrawing = function (posGroupKid, details, version, assert) {
     // check group name
     assert.equal( posGroupKid.attrs.name, "ruler-group", "Shape group is a ruler group.");
     assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
@@ -198,9 +201,10 @@ dwv.utils.test.CheckRulerDrawing = function (posGroupKid, details, assert) {
  * Check a roi drawing.
  * @param {Object} posGroupKid The position group (only) kid.
  * @param {Object} details The drawing details
+ * @param {String} version The state format version.
  * @param {Object} assert The qunit assert.
  */
-dwv.utils.test.CheckRoiDrawing = function (posGroupKid, details, assert) {
+dwv.utils.test.CheckRoiDrawing = function (posGroupKid, details, version, assert) {
     // check group name
     assert.equal( posGroupKid.attrs.name, "roi-group", "Shape group is a roi group.");
     assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
@@ -214,7 +218,8 @@ dwv.utils.test.CheckRoiDrawing = function (posGroupKid, details, assert) {
     assert.equal( shapeGroupKid0.attrs.name, "shape", "Shape group first level is a shape.");
     assert.notOk( shapeGroupKid0.attrs.draggable, "Shape group first level must not be draggable.");
     assert.deepEqual( shapeGroupKid0.attrs.points, [126, 40, 58, 80, 60, 116, 92, 128, 93, 143, 93, 151, 94, 151, 114, 150, 128, 150, 214, 135, 183, 56, 182, 56, 182, 56], "Line has the proper points.");
-    assert.equal( shapeGroupKid0.attrs.stroke, "#ffff80", "Line has the proper colour.");
+    var colour = ( version === "0.1" ? "#ffff00" : "#ffff80" );
+    assert.equal( shapeGroupKid0.attrs.stroke, colour, "Line has the proper colour.");
     // label
     var shapeGroupKid1 = posGroupKid.children[1];
     assert.equal( shapeGroupKid1.className, "Label", "Shape group third level is a label.");
@@ -222,23 +227,28 @@ dwv.utils.test.CheckRoiDrawing = function (posGroupKid, details, assert) {
     assert.equal( shapeGroupKid1.children.length, 2, "Label has 2 kids.");
     var labelGroupKid0 = shapeGroupKid1.children[0];
     assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
-    assert.equal( labelGroupKid0.attrs.text, "Brain", "Text has the proper value.");
+    if ( version !== "0.1" ) {
+        assert.equal( labelGroupKid0.attrs.text, "Brain", "Text has the proper value.");
+    }
     var labelGroupKid1 = shapeGroupKid1.children[1];
     assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
 
     // details
-    var details0 = details["4l24ofouhmf"];
-    assert.equal( details0.textExpr, "Brain", "Details textExpr has the proper value.");
-    assert.equal( details0.longText, "This is a squary brain!", "Details longText has the proper value.");
+    if ( version !== "0.1" ) {
+        var details0 = details["4l24ofouhmf"];
+        assert.equal( details0.textExpr, "Brain", "Details textExpr has the proper value.");
+        assert.equal( details0.longText, "This is a squary brain!", "Details longText has the proper value.");
+    }
 };
 
 /**
  * Check a hand drawing.
  * @param {Object} posGroupKid The position group (only) kid.
  * @param {Object} details The drawing details
+ * @param {String} version The state format version.
  * @param {Object} assert The qunit assert.
  */
-dwv.utils.test.CheckHandDrawing = function (posGroupKid, details, assert) {
+dwv.utils.test.CheckHandDrawing = function (posGroupKid, details, version, assert) {
     // check group name
     assert.equal( posGroupKid.attrs.name, "freeHand-group", "Shape group is a freeHand group.");
     assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
@@ -274,9 +284,10 @@ dwv.utils.test.CheckHandDrawing = function (posGroupKid, details, assert) {
  * Check an ellipse drawing.
  * @param {Object} posGroupKid The position group (only) kid.
  * @param {Object} details The drawing details
+ * @param {String} version The state format version.
  * @param {Object} assert The qunit assert.
  */
-dwv.utils.test.CheckEllipseDrawing = function (posGroupKid, details, assert) {
+dwv.utils.test.CheckEllipseDrawing = function (posGroupKid, details, version, assert) {
     // check group name
     assert.equal( posGroupKid.attrs.name, "ellipse-group", "Shape group is an ellipse group.");
     assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
@@ -293,7 +304,8 @@ dwv.utils.test.CheckEllipseDrawing = function (posGroupKid, details, assert) {
     assert.deepEqual( shapeGroupKid0.attrs.y, 78, "Ellipse has the proper y.");
     assert.deepEqual( shapeGroupKid0.attrs.radiusX, 53, "Ellipse has the proper radiusX.");
     assert.deepEqual( shapeGroupKid0.attrs.radiusY, 32, "Ellipse has the proper radiusY.");
-    assert.equal( shapeGroupKid0.attrs.stroke, "#ffff80", "Ellipse has the proper colour.");
+    var colour = ( version === "0.1" ? "#ffff00" : "#ffff80" );
+    assert.equal( shapeGroupKid0.attrs.stroke, colour, "Ellipse has the proper colour.");
     // label
     var shapeGroupKid1 = posGroupKid.children[1];
     assert.equal( shapeGroupKid1.className, "Label", "Shape group third level is a label.");
@@ -306,18 +318,21 @@ dwv.utils.test.CheckEllipseDrawing = function (posGroupKid, details, assert) {
     assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
 
     // details
-    var details0 = details.c6j16qt6vt6;
-    assert.equal( details0.textExpr, "{surface}", "Details textExpr has the proper value.");
-    assert.equal( details0.longText, "What a surface!", "Details longText has the proper value.");
+    if ( version !== "0.1" ) {
+        var details0 = details.c6j16qt6vt6;
+        assert.equal( details0.textExpr, "{surface}", "Details textExpr has the proper value.");
+        assert.equal( details0.longText, "What a surface!", "Details longText has the proper value.");
+    }
 };
 
 /**
  * Check a protractor drawing.
  * @param {Object} posGroupKid The position group (only) kid.
  * @param {Object} details The drawing details
+ * @param {String} version The state format version.
  * @param {Object} assert The qunit assert.
  */
-dwv.utils.test.CheckProtractorDrawing = function (posGroupKid, details, assert) {
+dwv.utils.test.CheckProtractorDrawing = function (posGroupKid, details, version, assert) {
     // check group name
     assert.equal( posGroupKid.attrs.name, "protractor-group", "Shape group is an protractor group.");
     assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
@@ -331,7 +346,8 @@ dwv.utils.test.CheckProtractorDrawing = function (posGroupKid, details, assert) 
     assert.equal( shapeGroupKid0.attrs.name, "shape", "Shape group first level is a shape.");
     assert.notOk( shapeGroupKid0.attrs.draggable, "Shape group first level must not be draggable.");
     assert.deepEqual( shapeGroupKid0.attrs.points, [33,164,81,145,93,198], "Line has the proper points.");
-    assert.equal( shapeGroupKid0.attrs.stroke, "#ffff80", "Line has the proper colour.");
+    var colour = ( version === "0.1" ? "#ffff00" : "#ffff80" );
+    assert.equal( shapeGroupKid0.attrs.stroke, colour, "Line has the proper colour.");
     // label
     var shapeGroupKid1 = posGroupKid.children[1];
     assert.equal( shapeGroupKid1.className, "Label", "Shape group third level is a label.");
@@ -348,18 +364,21 @@ dwv.utils.test.CheckProtractorDrawing = function (posGroupKid, details, assert) 
     assert.notOk( shapeGroupKid2.attrs.draggable, "Shape group second level must not be draggable.");
 
     // details
-    var details0 = details["49g7kqi3p4u"];
-    assert.equal( details0.textExpr, "{angle}", "Details textExpr has the proper value.");
-    assert.equal( details0.longText, "What an angle!", "Details longText has the proper value.");
+    if ( version !== "0.1" ) {
+        var details0 = details["49g7kqi3p4u"];
+        assert.equal( details0.textExpr, "{angle}", "Details textExpr has the proper value.");
+        assert.equal( details0.longText, "What an angle!", "Details longText has the proper value.");
+    }
 };
 
 /**
  * Check a rectangle drawing.
  * @param {Object} posGroupKid The position group (only) kid.
  * @param {Object} details The drawing details
+ * @param {String} version The state format version.
  * @param {Object} assert The qunit assert.
  */
-dwv.utils.test.CheckRectangleDrawing = function (posGroupKid, details, assert) {
+dwv.utils.test.CheckRectangleDrawing = function (posGroupKid, details, version, assert) {
     // check group name
     assert.equal( posGroupKid.attrs.name, "rectangle-group", "Shape group is a rectangle group.");
     assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
@@ -376,7 +395,8 @@ dwv.utils.test.CheckRectangleDrawing = function (posGroupKid, details, assert) {
     assert.deepEqual( shapeGroupKid0.attrs.y, 58, "Rectangle has the proper y.");
     assert.deepEqual( shapeGroupKid0.attrs.width, 104, "Rectangle has the proper width.");
     assert.deepEqual( shapeGroupKid0.attrs.height, 64, "Rectangle has the proper height.");
-    assert.equal( shapeGroupKid0.attrs.stroke, "#ffff80", "Rectangle has the proper colour.");
+    var colour = ( version === "0.1" ? "#ffff00" : "#ffff80" );
+    assert.equal( shapeGroupKid0.attrs.stroke, colour, "Rectangle has the proper colour.");
     // label
     var shapeGroupKid1 = posGroupKid.children[1];
     assert.equal( shapeGroupKid1.className, "Label", "Shape group third level is a label.");
@@ -389,10 +409,52 @@ dwv.utils.test.CheckRectangleDrawing = function (posGroupKid, details, assert) {
     assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
 
     // details
-    var details0 = details.db0puu209qe;
-    assert.equal( details0.textExpr, "{surface}", "Details textExpr has the proper value.");
-    assert.equal( details0.longText, "What a rectangle!", "Details longText has the proper value.");
+    if ( version !== "0.1" ) {
+        var details0 = details.db0puu209qe;
+        assert.equal( details0.textExpr, "{surface}", "Details textExpr has the proper value.");
+        assert.equal( details0.longText, "What a rectangle!", "Details longText has the proper value.");
+    }
 };
+
+/**
+ * Tests for {@link dwv.State} v0.1 containing a line.
+ * @function module:tests/state
+ */
+/*QUnit.test("Test read v0.1 state: line.", function (assert) {
+    dwv.utils.test.TestState( "0.1", "line", assert );
+});*/
+
+/**
+ * Tests for {@link dwv.State} v0.1 containing a roi.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.1 state: roi.", function (assert) {
+    dwv.utils.test.TestState( "0.1", "roi", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.1 containing an ellipse.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.1 state: ellipse.", function (assert) {
+    dwv.utils.test.TestState( "0.1", "ellipse", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.1 containing a protractor.
+ * @function module:tests/state
+ */
+/*QUnit.test("Test read v0.1 state: protractor.", function (assert) {
+    dwv.utils.test.TestState( "0.1", "protractor", assert );
+});*/
+
+/**
+ * Tests for {@link dwv.State} v0.1 containing a rectangle.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.1 state: rectangle.", function (assert) {
+    dwv.utils.test.TestState( "0.1", "rectangle", assert );
+});
 
 /**
  * Tests for {@link dwv.State} v0.2 containing an arrow.
