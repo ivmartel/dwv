@@ -11,13 +11,48 @@ dwv.getDrawPositionGroupId = function (sliceNumber, frameNumber) {
     return "slice-"+sliceNumber+"_frame-"+frameNumber;
 };
 
+/**
+ * Get the current position-group. Create it if not exist.
+ * @param {Object} app DWV app
+ * @return {Object} The current position-group.
+ */
+dwv.ensurePositionGroup = function(app){
+    var currentGroup = app.getCurrentDrawGroup(true);
+    if (typeof currentGroup !== 'object') {
+        var newGroup = new Konva.Group({
+            id: currentGroup,
+            name: "position-group",
+            visible: true
+        });
+        app.getCurrentDrawLayer().add(newGroup);
+        app.getCurrentDrawLayer().getChildren().sort(function(a, b){
+            var aPos = dwv.getPositionFromGroupId(a.id());
+            var bPos = dwv.getPositionFromGroupId(b.id());
+            if(aPos.sliceNumber != bPos.sliceNumber){
+                return aPos.sliceNumber - bPos.sliceNumber;
+            }
+            return aPos.frameNumber - bPos.frameNumber;
+        });
+        return newGroup;
+    }
+    return currentGroup;
+};
+
+/**
+ * Get slice and the frame of a position-group.
+ * @param {String} groupId The position-group id.
+ * @return {Object} { 'sliceNumber': Number, 'frameNumber': Number }
+ */
+
 dwv.getPositionFromGroupId = function (groupId) {
     var sepIndex = groupId.indexOf("_");
     if (sepIndex === -1) {
         console.warn("Badly formed PositionGroupId: "+groupId);
     }
-    return { 'sliceNumber': groupId.substring(6, sepIndex),
-        'frameNumber': groupId.substring(sepIndex + 7) };
+    return {
+        'sliceNumber': Number(groupId.substring(6, sepIndex)),
+        'frameNumber': Number(groupId.substring(sepIndex + 7))
+    };
 };
 
 /**
@@ -52,8 +87,11 @@ dwv.DrawController = function (drawDiv)
 
     // Draw stage
     var drawStage = null;
-    // Draw layer
+    // Draw layers: 2 dimension array: [slice][frame]
+    var drawLayers = [];
+
     var drawLayer;
+
 
     // current slice position
     var currentSlice = 0;
@@ -86,17 +124,25 @@ dwv.DrawController = function (drawDiv)
     };
 
     /**
-     * Get the current draw layer.
+     * Get the draw layer.
      * @return {Object} The draw layer.
      */
-    this.getCurrentDrawLayer = function () {
+    this.getDrawLayer = function () {
         return drawLayer;
     };
+
+    /**
+     * Get the current draw layer.
+     * @return {Object} The draw layer.
+     * @deprecated There is only one layer so getDrawLayer is enought
+     */
+    this.getCurrentDrawLayer = this.getDrawLayer;
 
     /**
      * Reset: clear the layers array.
      */
     this.reset = function () {
+        drawLayers = [];
         drawLayer = null;
     };
 
@@ -227,6 +273,7 @@ dwv.DrawController = function (drawDiv)
                 if (type === "Rect") {
                     type = "Rectangle";
                 }
+
                 list.push( {
                     "id": collec[i].id(),
                     "slice": position.sliceNumber,
@@ -243,10 +290,12 @@ dwv.DrawController = function (drawDiv)
 
     /**
      * Get all the draws of the stage.
+     * @return {Object} A list of konva position-groups elements
+     * @todo Return list of draws
      */
     this.getDraws = function ()
     {
-        return drawLayer;
+        // return drawLayer;
     };
 
     /**
@@ -254,12 +303,13 @@ dwv.DrawController = function (drawDiv)
      * @return {Object} A list of draw details including id, text, quant...
      * TODO Unify with getDrawDisplayDetails?
      */
-    this.getDrawStoreDetails = function ()
+    this.getDrawStoreDetails = function (customLayer)
     {
         var drawingsDetails = {};
+        var layer = customLayer || drawLayer;
 
         // get all position groups
-        var posGroups = drawLayer.getChildren( isPositionNode );
+        var posGroups = layer.getChildren( isPositionNode );
 
         var posKids;
         var group;
@@ -277,10 +327,11 @@ dwv.DrawController = function (drawDiv)
                 if ( texts.length !== 1 ) {
                     console.warn("There should not be more than one text per shape.");
                 }
+
                 // get details (non konva vars)
                 drawingsDetails[ group.id() ] = {
-                    "textExpr": encodeURIComponent(texts[0].textExpr),
-                    "longText": encodeURIComponent(texts[0].longText),
+                    "textExpr": (texts[0].textExpr),
+                    "longText": (texts[0].longText),
                     "quant": texts[0].quant
                 };
             }
@@ -288,46 +339,71 @@ dwv.DrawController = function (drawDiv)
         return drawingsDetails;
     };
 
+
     /**
-     * Set the drawings on the current stage.
+     * Set the drawings on the current stage for V03(groups version).
      * @param {Array} drawings An array of drawings.
      * @param {Array} drawingsDetails An array of drawings details.
      * @param {Object} cmdCallback The DrawCommand callback.
      * @param {Object} exeCallback The callback to call once the DrawCommand has been executed.
      */
-    this.setDrawings = function (drawings, drawingsDetails, cmdCallback, exeCallback)
+    this.setDrawings = function (groupDrawings, groupDetails, cmdCallback, exeCallback)
     {
-        // regular Konva deserialize
-        var stateLayer = Konva.Node.create(drawings);
+        // Auxiliar variables
+        var group, shape, groupShapes, parentGroup, groupDrawing, groupDrawingId, groupDetail, label, text;
 
-        // get all position groups
-        var posGroups = stateLayer.getChildren( isPositionNode );
+        // Avoid errors when dropping multiple state.json
+        drawLayer.getChildren().each(function(node){
+            node.visible(false);
+        });
 
-        var posKids;
-        var group;
-        for ( var i = 0, leni = posGroups.length; i < leni; ++i ) {
-            posKids = posGroups[i].getChildren();
-            for ( var j = 0, lenj = posKids.length; j < lenj; ++j ) {
-                // shape group
-                group = posKids[j];
-                // shape
-                var shape = group.getChildren( isNodeNameShape )[0];
+        groupDrawings = (typeof groupDrawings === 'string' ? JSON.parse(groupDrawings) : groupDrawings).children;
+
+        // Iterate over each position-groups
+        for ( var k = 0, lenk = groupDrawings.length; k < lenk; ++k ) {
+
+            // Get the position-group data
+            groupDrawing = groupDrawings[k];
+            groupDrawingId = groupDrawings[k].attrs.id;
+
+            // Get or create position-group if it does not exist and append it to drawLayer
+            parentGroup = getDrawGroup(groupDrawingId);
+            if(!parentGroup){
+                parentGroup = new Konva.Group({
+                    id: groupDrawingId,
+                    name: "position-group",
+                    visible: false
+                });
+            }
+            drawLayer.add(parentGroup);
+
+            // Get all the shapes-groups in the position-group
+            groupShapes = typeof groupDrawing.children === 'string' ?
+            JSON.parse(groupDrawing.children) : groupDrawing.children;
+
+            // Iterate over shapes-group of the position-group
+            for( var g = 0, glen = groupShapes.length; g < glen; ++g){
+                // create the konva group
+                group = Konva.Node.create(groupShapes[g]);
+                shape = group.getChildren( isNodeNameShape )[0];
+                parentGroup.add(group);
+
                 // create the draw command
-                var cmd = new dwv.tool.DrawGroupCommand(
-                    group, shape.className,
-                    drawLayer );
+                var cmd = new dwv.tool.DrawGroupCommand( group, shape.className, drawLayer );
                 // draw command callbacks
                 cmd.onExecute = cmdCallback;
                 cmd.onUndo = cmdCallback;
-                // details
-                if (drawingsDetails) {
-                    var details = drawingsDetails[ group.id() ];
-                    var label = group.getChildren( isNodeNameLabel )[0];
-                    var text = label.getText();
+                // Add group detail if exist
+                if(groupDetails){
+                    // Get the drawings detail of this shapes group
+                    groupDetail = groupDetails[group.id()];
+                    label = group.getChildren( isNodeNameLabel )[0];
+
+                    text = label.getText();
                     // store details
-                    text.textExpr = details.textExpr;
-                    text.longText = details.longText;
-                    text.quant = details.quant;
+                    text.textExpr = groupDetail.textExpr;
+                    text.longText = groupDetail.longText;
+                    text.quant = groupDetail.quant;
                     // reset text (it was not encoded)
                     text.setText(dwv.utils.replaceFlags(text.textExpr, text.quant));
                 }
@@ -336,9 +412,7 @@ dwv.DrawController = function (drawDiv)
                 exeCallback(cmd);
             }
         }
-
-        // add kids to the main layer
-        stateLayer.getChildren().forEach( function (kid) { drawLayer.add( kid ); });
+        // console.log(drawLayer);
     };
 
     /**
@@ -384,7 +458,7 @@ dwv.DrawController = function (drawDiv)
         // get the group
         var group = getDrawGroup(drawDetails.id);
         // get visibility
-        return group.isVisible();
+        return (group ? group.isVisible() : false );
     };
 
     /**
@@ -407,16 +481,21 @@ dwv.DrawController = function (drawDiv)
      * @param {Object} exeCallback The callback to call once the DeleteCommand has been executed.
      */
     this.deleteDraws = function (cmdCallback, exeCallback) {
-        var delcmd;
-        var groups = drawLayer.getChildren();
-        while (groups.length) {
-            var shape = groups[0].getChildren( isNodeNameShape )[0];
-            delcmd = new dwv.tool.DeleteGroupCommand( groups[0],
-                dwv.tool.GetShapeDisplayName(shape), drawLayer);
-            delcmd.onExecute = cmdCallback;
-            delcmd.onUndo = cmdCallback;
-            delcmd.execute();
-            exeCallback(delcmd);
+        var delcmd, layer, groups;
+        for ( var k = 0, lenk = drawLayers.length; k < lenk; ++k ) {
+            for ( var f = 0, lenf = drawLayers[k].length; f < lenf; ++f ) {
+                layer = drawLayers[k][f];
+                groups = layer.getChildren();
+                while (groups.length) {
+                    var shape = groups[0].getChildren( isNodeNameShape )[0];
+                    delcmd = new dwv.tool.DeleteGroupCommand( groups[0],
+                        dwv.tool.GetShapeDisplayName(shape), layer);
+                    delcmd.onExecute = cmdCallback;
+                    delcmd.onUndo = cmdCallback;
+                    delcmd.execute();
+                    exeCallback(delcmd);
+                }
+            }
         }
     };
 
@@ -426,7 +505,6 @@ dwv.DrawController = function (drawDiv)
      */
     function getDrawGroup( id ) {
         var collec = drawLayer.find("#"+id);
-
         var res = null;
         if (collec.length !== 0) {
             res = collec[0];

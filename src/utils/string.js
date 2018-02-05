@@ -4,6 +4,26 @@ var dwv = dwv || {};
 dwv.utils = dwv.utils || {};
 
 /**
+ * Create a hexadecimal colour based on a string
+ * @param {String} string The string color (res, blue...).
+ * @return {String} The converted hexadecimal value.
+ */
+dwv.utils.stringToColor = function (string)
+{
+    var hash = 0;
+    var value;
+    for (var i = 0; i < string.length; i++) {
+      hash = string.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    var colour = '#';
+    for (var j = 0; j < 3; j++) {
+      value = (hash >> (j * 8)) & 0xFF;
+      colour += ('00' + value.toString(16)).substr(-2);
+    }
+    return colour;
+};
+
+/**
  * Capitalise the first letter of a string.
  * @param {String} string The string to capitalise the first letter.
  * @return {String} The new string.

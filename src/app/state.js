@@ -22,13 +22,12 @@ var Konva = Konva || {};
  *   - drawings: array [nslices] with all groups
  * @constructor
  */
-dwv.State = function ()
+dwv.State = function (app)
 {
     /**
      * Save the application state as JSON.
-     * @param {Object} app The associated application.
      */
-    this.toJSON = function (app) {
+    this.toJSON = function () {
         // return a JSON string
         return JSON.stringify( {
             "version": "0.3",
@@ -38,84 +37,58 @@ dwv.State = function ()
             "scale": app.getScale(),
             "scaleCenter": app.getScaleCenter(),
             "translation": app.getTranslation(),
-            "drawings": app.getDraws().toObject(),
+            "drawings": app.getDraws(),
+            // new in v0.2
             "drawingsDetails": app.getDrawStoreDetails()
-        } );
+        }, null, "\t");
     };
     /**
      * Load an application state from JSON.
      * @param {String} json The JSON representation of the state.
      */
     this.fromJSON = function (json) {
-        var data = JSON.parse(json);
-        var res = null;
-        if ( data.version === "0.1" ) {
-            res = readV01(data);
-        } else if ( data.version === "0.2" ) {
-            res = readV02(data);
-        } else if ( data.version === "0.3" ) {
-            res = readV03(data);
-        } else {
-            throw new Error("Unknown state file format version: '" + data.version + "'.");
-        }
-        return res;
-    };
-    /**
-     * Load an application state from JSON.
-     * @param {Object} app The app to apply the state to.
-     * @param {Object} data The state data.
-     */
-    this.apply = function (app, data) {
-        // display
+        var data = typeof json === 'string' ? JSON.parse(json) : json;
+
+        // Display
         app.getViewController().setWindowLevel( data["window-center"], data["window-width"] );
         app.getViewController().setCurrentPosition( data.position );
         app.zoom( data.scale, data.scaleCenter.x, data.scaleCenter.y );
         app.translate( data.translation.x, data.translation.y );
-        // drawings
-        app.setDrawings( data.drawings, data.drawingsDetails );
+
+        // Drawings
+        switch(data.version){
+            case "0.1":
+                var drawings = dwv.updateDrawingsV1ToV3(app, data.drawings);
+                app.setDrawings( drawings.toJSON(), app.getDrawStoreDetails(drawings));
+                break;
+            case "0.2":
+                app.setDrawings( dwv.updateDrawingsV2ToV3(data.drawings), dwv.updateDrawingsDetailsV2ToV3(data.drawingsDetails));
+                break;
+            case "0.3":
+                app.setDrawings( data.drawings, data.drawingsDetails );
+                break;
+            default :
+                throw new Error("Unknown state file format version: '"+data.version+"'.");
+        }
     };
-    /**
-     * Read an application state from an Object in v0.1 format.
-     * @param {Object} data The Object representation of the state.
-     */
-    function readV01(data) {
-        // update drawings
-        data.drawingsDetails = null;
-        return data;
-    }
-    /**
-     * Read an application state from an Object in v0.2 format.
-     * @param {Object} data The Object representation of the state.
-     */
-    function readV02(data) {
-        // update drawings
-        data.drawings = dwv.v02Tov03Drawings( data.drawings );
-        data.drawingsDetails = dwv.v02Tov03DrawingsDetails( data.drawingsDetails );
-        return data;
-    }
-    /**
-     * Read an application state from an Object in v0.3 format.
-     * @param {Object} data The Object representation of the state.
-     */
-    function readV03(data) {
-        return data;
-    }
+
 }; // State class
 
+
 /**
- * Convert drawings from v0.2 to v0.3.
- * v0.2: one layer per slice/frame
+ * Convert drawings from v0.1 to v0.3.
+ * v0.1: one layer per slice/frame
  * v0.3: one layer, one group per slice. setDrawing expects the full stage
  * @param {Array} drawings An array of drawings.
  */
-dwv.v02Tov03Drawings = function (drawings)
+dwv.updateDrawingsV1ToV3 = function (app, drawings)
 {
     // Auxiliar variables
     var group, groupShapes, parentGroup;
-    // Avoid errors when dropping multiple states
-    //drawLayer.getChildren().each(function(node){
-    //    node.visible(false);
-    //});
+    var name, id, mathPoints, points, newDraw, shape;
+
+    var image = app.getImage();
+    var style = app.getStyle();
 
     var drawLayer = new Konva.Layer({
         'listening': false,
@@ -129,6 +102,14 @@ dwv.v02Tov03Drawings = function (drawings)
     for ( var k = 0, lenk = groupDrawings.length; k < lenk; ++k ) {
         // Iterate over each frame
         for( var f = 0, lenf = groupDrawings[k].length; f < lenf ; ++f ) {
+
+            // Get all the shapes-groups in the position-group
+            groupShapes = groupDrawings[k][f];
+            // Avoid create empty groups
+            if(!groupShapes.length){
+                continue;
+            }
+
             // Create position-group set as visible and append it to drawLayer
             parentGroup = new Konva.Group({
                 id: dwv.getDrawPositionGroupId(k,f),
@@ -136,27 +117,135 @@ dwv.v02Tov03Drawings = function (drawings)
                 visible: false
             });
 
-            // Get all the shapes-groups in the position-group
-            groupShapes = groupDrawings[k][f];
             // Iterate over shapes-group
             for( var g = 0, leng = groupShapes.length; g < leng; ++g ) {
                 // create the konva group
                 group = Konva.Node.create(groupShapes[g]);
-                // enforce draggable: only the shape was draggable in v0.2,
-                // now the whole group is.
-                group.draggable(true);
-                group.getChildren().forEach( function (gnode) {
-                    gnode.draggable(false);
-                });
-                // add to position group
+                name = group.getAttr('name');
+                mathPoints = [];
+                console.log('id -> ', id);
+                shape = group.getChildren(function(node){
+                    return node.name() === "shape";
+                })[0];
+
+                var factory = null;
+
+                switch(name){
+                    case "line-group":
+                        points = shape.points();
+                        mathPoints = [
+                            new dwv.math.Point2D(points[0], points[1]),
+                            new dwv.math.Point2D(points[2], points[3])
+                        ];
+                        factory = new dwv.tool.RulerFactory();
+                        break;
+                    case "protractor-group":
+                        points = shape.points();
+                        mathPoints = [];
+                        for(var p = 0, plen = points.length; p<plen; p = p+2){
+                            mathPoints.push( new dwv.math.Point2D(points[p], points[p+1]) );
+                        }
+                        factory = new dwv.tool.ProtractorFactory();
+                        break;
+                    case "rectangle-group":
+                        points = {
+                            x: shape.x(),
+                            y: shape.y(),
+                            w: shape.width(),
+                            h: shape.height()
+                        };
+                        mathPoints = [
+                            new dwv.math.Point2D(points.x, points.y),
+                            new dwv.math.Point2D(points.x + points.w, points.y + points.h)
+                        ];
+                        factory = new dwv.tool.RectangleFactory();
+                        break;
+                    case "roi-group":
+                        points = shape.points();
+                        for(var r = 0, rlen = points.length; r<rlen; r = r+2){
+                            mathPoints.push( new dwv.math.Point2D(points[r], points[r+1]) );
+                        }
+                        factory = new dwv.tool.RoiFactory();
+                        break;
+                    case "ellipse-group":
+                        points = {
+                            x: shape.x(),
+                            y: shape.y(),
+                            w: shape.width(),
+                            h: shape.height()
+                        };
+                        mathPoints = [
+                            new dwv.math.Point2D(points.x, points.y),
+                            new dwv.math.Point2D(points.x + points.w, points.y + points.h)
+                        ];
+                        factory = new dwv.tool.EllipseFactory();
+                        break;
+                    default:
+                        console.error("Unknown shape name: '" + name + "'.");
+                }
+                if(factory){
+                    style.setLineColour(dwv.utils.stringToColor(shape.getAttr('stroke')));
+                    newDraw = factory.create(mathPoints, style, image);
+                    newDraw.id(group.getAttr('id'));
+                    parentGroup.add(newDraw);
+                }
+            }
+            drawLayer.add(parentGroup);
+        }
+    }
+    return drawLayer;
+};
+
+/**
+ * Convert drawings from v0.2 to v0.3.
+ * v0.2: one layer per slice/frame
+ * v0.3: one layer, one group per slice. setDrawing expects the full stage
+ * @param {Array} drawings An array of drawings.
+ */
+dwv.updateDrawingsV2ToV3 = function (drawings)
+{
+    // Auxiliar variables
+    var group, groupShapes, parentGroup;
+
+    var drawLayer = new Konva.Layer({
+        'listening': false,
+        'hitGraphEnabled': false,
+        'visible': true
+    });
+
+    // Get the positions-groups data
+    var groupDrawings = typeof drawings === 'string' ? JSON.parse(drawings) : drawings;
+    // Iterate over each position-groups
+    for ( var k = 0, lenk = groupDrawings.length; k < lenk; ++k ) {
+
+        // Iterate over each frame
+        for( var f = 0, lenf = groupDrawings[k].length; f < lenf ; ++f ) {
+
+            // Get all the shapes-groups in the position-group
+            groupShapes = groupDrawings[k][f];
+
+            // Avoid create empty groups
+            if(!groupShapes.length){
+                continue;
+            }
+
+            // Create position-group set as visible and append it to drawLayer
+            parentGroup = new Konva.Group({
+                id: dwv.getDrawPositionGroupId(k,f),
+                name: "position-group",
+                visible: false
+            });
+            // Iterate over shapes-group
+            for( var g = 0, leng = groupShapes.length; g < leng; ++g ) {
+                // create the konva group
+                group = Konva.Node.create(groupShapes[g]);
                 parentGroup.add(group);
             }
-            // add to layer
             drawLayer.add(parentGroup);
         }
     }
 
-    return drawLayer.toObject();
+    return drawLayer.toJSON();
 };
 
 /**
@@ -165,7 +254,7 @@ dwv.v02Tov03Drawings = function (drawings)
  * v0.3: one layer, one group per slice. setDrawing expects the full stage
  * @param {Array} drawings An array of drawings.
  */
-dwv.v02Tov03DrawingsDetails = function (details)
+dwv.updateDrawingsDetailsV2ToV3 = function (details)
 {
     var res = {};
     // Get the positions-groups data

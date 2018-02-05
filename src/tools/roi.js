@@ -108,9 +108,10 @@ dwv.tool.UpdateRoi = function (anchor /*, image*/)
     // update the roi point and compensate for possible drag
     // (the anchor id is the index of the point in the list)
     var points = kroi.points();
-    points[anchor.id()] = anchor.x() - kroi.x();
-    points[anchor.id()+1] = anchor.y() - kroi.y();
-    kroi.points( points );
+    points[anchor.id()] = parseInt(anchor.x() - kroi.x());
+    points[anchor.id()+1] = parseInt(anchor.y() - kroi.y());
+    // concat is mandatory for freehand tool, crazy but works!
+    kroi.points( points.concat() );
 
     // update text
     var ktext = klabel.getText();

@@ -144,6 +144,28 @@ dwv.App = function ()
      * @return {Object} The image layer.
      */
     this.getImageLayer = function () { return imageLayer; };
+
+    /**
+     * Get the current position-group or, optionally, the Id it should have.
+     * @param {Boolean} [returnID] If group does not exist, return the current groupId.
+     * @return {(Object|String)} The position-group or, optionally, the Id it should have.
+     */
+    this.getCurrentDrawGroup = function(returnID){
+        var currentSlice = this.getViewController().getCurrentPosition().k;
+        var currentFrame = this.getViewController().getCurrentFrame();
+        var currentGroupId = dwv.getDrawPositionGroupId(currentSlice, currentFrame);
+        var currentGroup = this.getCurrentDrawLayer().getChildren( function (node) {
+            return node.id() === currentGroupId;
+        });
+        if(currentGroup.length){
+            return currentGroup[0];
+        }
+        if(!currentGroup.length && returnID){
+            return dwv.getDrawPositionGroupId(currentSlice, currentFrame);
+        }
+        return false;
+    };
+
     /**
      * Get the current draw layer.
      * @return {Object} The draw layer.
@@ -151,6 +173,7 @@ dwv.App = function ()
     this.getCurrentDrawLayer = function () {
         return drawController.getCurrentDrawLayer();
     };
+
     /**
      * Get the draw stage.
      * @return {Object} The draw stage.
@@ -632,8 +655,8 @@ dwv.App = function ()
         // set IO
         loader.onload = function (data) {
             // load state
-            var state = new dwv.State();
-            state.apply( self, state.fromJSON(data) );
+            var state = new dwv.State(self);
+            state.fromJSON( data );
         };
         loader.onerror = function (error) { handleError(error); };
         // main load (asynchronous)
@@ -788,26 +811,28 @@ dwv.App = function ()
     {
         return drawController.getDrawDisplayDetails();
     };
+
     /**
      * Get the list of drawings.
      * @return {Object} The list of drawings.
      */
     this.getDraws = function ()
     {
-        return drawController.getDraws();
+        return drawController.getDrawLayer();
     };
+
     /**
      * Get a list of drawing store details.
      * @return {Object} A list of draw details including id, text, quant...
      */
-    this.getDrawStoreDetails = function ()
+    this.getDrawStoreDetails = function (customLayer)
     {
-        return drawController.getDrawStoreDetails();
+        return drawController.getDrawStoreDetails(customLayer);
     };
     /**
      * Set the drawings on the current stage.
-     * @param {Array} drawings An array of drawings.
-     * @param {Array} drawingsDetails An array of drawings details.
+     * @param {Array} drawings A list of drawings.
+     * @param {Array} drawingsDetails An list of drawings details.
      */
     this.setDrawings = function (drawings, drawingsDetails)
     {
@@ -1012,7 +1037,7 @@ dwv.App = function ()
      */
     this.onStateSave = function (/*event*/)
     {
-        var state = new dwv.State();
+        var state = new dwv.State(self);
         // add href to link (html5)
         var element = self.getElement("download-state");
         element.href = "data:application/json," + state.toJSON(self);
