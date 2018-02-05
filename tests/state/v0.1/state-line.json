@@ -1,0 +1,27 @@
+{
+  "version": "0.1",
+  "window-center": 441,
+  "window-width": 911,
+  "position": {
+    "i": 0,
+    "j": 0,
+    "k": 0
+  },
+  "scale": 1,
+  "scaleCenter": {
+    "x": 0,
+    "y": 0
+  },
+  "translation": {
+    "x": 0,
+    "y": 0
+  },
+  "drawings": [
+    [
+      {
+        "0": "{\"attrs\":{\"name\":\"line-group\",\"id\":\"4gvkz8v6wzw\"},\"className\":\"Group\",\"children\":[{\"attrs\":{\"points\":[51,135,216,134],\"stroke\":\"Yellow\",\"strokeWidth\":0.9789674952198852,\"name\":\"shape\",\"draggable\":true},\"className\":\"Line\"},{\"attrs\":{\"x\":184,\"y\":120,\"text\":\"165.0mm\",\"fontSize\":5.873804971319312,\"fontFamily\":\"Verdana\",\"fill\":\"Yellow\",\"name\":\"text\",\"width\":\"auto\",\"height\":\"auto\"},\"className\":\"Text\"}]}",
+        "length": 1
+      }
+    ]
+  ]
+}
