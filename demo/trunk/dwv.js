@@ -2118,7 +2118,7 @@ var Konva = Konva || {};
  * - v0.3 (dwv v0.23.0, ?/?)
  *   - new drawing structure, drawings are now the full layer object and
  *     using toObject to avoid saving a string representation
- *   - new details structure, simple array of objects referenced by draw ids
+ *   - new details structure: simple array of objects referenced by draw ids
  * - v0.2 (dwv v0.17.0, 12/2016)
  *   - adds draw details: array [nslices][nframes] of detail objects
  * - v0.1 (dwv v0.15.0, 07/2016)
@@ -2187,7 +2187,9 @@ dwv.State = function ()
      */
     function readV01(data) {
         // update drawings
-        data.drawingsDetails = null;
+        var v02DAndD = dwv.v01Tov02DrawingsAndDetails( data.drawings );
+        data.drawings = dwv.v02Tov03Drawings( v02DAndD.drawings ).toObject();
+        data.drawingsDetails = v02DAndD.drawingsDetails;
         return data;
     }
     /**
@@ -2196,7 +2198,7 @@ dwv.State = function ()
      */
     function readV02(data) {
         // update drawings
-        data.drawings = dwv.v02Tov03Drawings( data.drawings );
+        data.drawings = dwv.v02Tov03Drawings( data.drawings ).toObject();
         data.drawingsDetails = dwv.v02Tov03DrawingsDetails( data.drawingsDetails );
         return data;
     }
@@ -2207,6 +2209,7 @@ dwv.State = function ()
     function readV03(data) {
         return data;
     }
+
 }; // State class
 
 /**
@@ -2263,14 +2266,97 @@ dwv.v02Tov03Drawings = function (drawings)
         }
     }
 
-    return drawLayer.toObject();
+    return drawLayer;
 };
 
 /**
  * Convert drawings from v0.2 to v0.3.
- * v0.2: one layer per slice
- * v0.3: one layer, one group per slice. setDrawing expects the full stage
- * @param {Array} drawings An array of drawings.
+ * v0.1: text on its own
+ * v0.2: text as part of label
+ * @param {Array} inputDrawings An array of drawings.
+ */
+dwv.v01Tov02DrawingsAndDetails = function (inputDrawings)
+{
+    var newDrawings = [];
+    var drawingsDetails = {};
+
+    var drawGroups;
+    var drawGroup;
+    // loop over each slice
+    for ( var k = 0, lenk = inputDrawings.length; k < lenk; ++k ) {
+        // loop over each frame
+        newDrawings[k] = [];
+        for ( var f = 0, lenf = inputDrawings[k].length; f < lenf ; ++f ) {
+            // draw group
+            drawGroups = inputDrawings[k][f];
+            var newFrameDrawings = [];
+            // Iterate over shapes-group
+            for ( var g = 0, leng = drawGroups.length; g < leng; ++g ) {
+                // create konva group from input
+                drawGroup = Konva.Node.create( drawGroups[g] );
+                // label position
+                var pos = {'x': 0, 'y': 0};
+                // update shape colour
+                var kshape = drawGroup.getChildren( function (node) {
+                    return node.name() === 'shape';
+                })[0];
+                kshape.stroke( dwv.getColourHex(kshape.stroke()) );
+                // get its text
+                var ktexts = drawGroup.getChildren( function (node) {
+                    return node.name() === 'text';
+                });
+                // update text: move it into a label
+                var ktext = new Konva.Text({
+                    name: "text",
+                    text: ""
+                });
+                if ( ktexts.length === 1 ) {
+                    pos.x = ktexts[0].x();
+                    pos.y = ktexts[0].y();
+                    // remove it from the group
+                    ktexts[0].remove();
+                    // use it
+                    ktext = ktexts[0];
+                } else {
+                    // use shape position if no text
+                    if ( kshape.points().length !== 0 ) {
+                        pos = { 'x': kshape.points()[0],
+                            'y': kshape.points()[1] };
+                    }
+                }
+                // create new label with text and tag
+                var klabel = new Konva.Label({
+                    x: pos.x,
+                    y: pos.y,
+                    name: "label"
+                });
+                klabel.add( ktext );
+                klabel.add( new Konva.Tag() );
+                // add label to group
+                drawGroup.add( klabel );
+                // add group to list
+                newFrameDrawings.push( JSON.stringify(drawGroup.toObject()) );
+
+                // create details (v0.3 format)
+                drawingsDetails[ drawGroup.id() ] = {
+                    "textExpr": ktext.text(),
+                    "longText": "",
+                    "quant": null
+                };
+
+            }
+            newDrawings[k].push(newFrameDrawings);
+        }
+    }
+
+    return {'drawings': newDrawings, 'drawingsDetails': drawingsDetails};
+};
+
+/**
+ * Convert drawing details from v0.2 to v0.3.
+ * - v0.2: array [nslices][nframes] with all
+ * - v0.3: simple array of objects referenced by draw ids
+ * @param {Array} drawings An array of drawing details.
  */
 dwv.v02Tov03DrawingsDetails = function (details)
 {
@@ -2291,6 +2377,30 @@ dwv.v02Tov03DrawingsDetails = function (details)
                 };
             }
         }
+    }
+    return res;
+};
+
+/**
+ * Get the hex code of a string colour for a colour used in pre dwv v0.17.
+ * @param {String} name The name of a colour.
+ * @return {String} The hex representing the colour.
+ */
+dwv.getColourHex = function (name) {
+    // default colours used in dwv version < 0.17
+    var dict = {
+        "Yellow": "#ffff00",
+        "Red": "#ff0000",
+        "White": "#ffffff",
+        "Green": "#008000",
+        "Blue": "#0000ff",
+        "Lime": "#00ff00",
+        "Fuchsia": "#ff00ff",
+        "Black": "#000000"
+    };
+    var res = "#ffff00";
+    if ( typeof dict[name] !== "undefined" ) {
+        res = dict[name];
     }
     return res;
 };
