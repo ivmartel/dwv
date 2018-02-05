@@ -811,21 +811,23 @@ dwv.App = function ()
     {
         return drawController.getDrawDisplayDetails();
     };
+
     /**
      * Get the list of drawings.
      * @return {Object} The list of drawings.
      */
     this.getDraws = function ()
     {
-        return drawController.getDraws();
+        return drawController.getDrawLayer();
     };
+
     /**
      * Get a list of drawing store details.
      * @return {Object} A list of draw details including id, text, quant...
      */
-    this.getDrawStoreDetails = function ()
+    this.getDrawStoreDetails = function (customLayer)
     {
-        return drawController.getDrawStoreDetails();
+        return drawController.getDrawStoreDetails(customLayer);
     };
     /**
      * Set the drawings on the current stage.
