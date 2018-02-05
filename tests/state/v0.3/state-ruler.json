@@ -1,0 +1,130 @@
+{
+  "version": "0.3",
+  "window-center": 441,
+  "window-width": 911,
+  "position": {
+    "i": 0,
+    "j": 0,
+    "k": 0
+  },
+  "scale": 1,
+  "scaleCenter": {
+    "x": 0,
+    "y": 0
+  },
+  "translation": {
+    "x": 0,
+    "y": 0
+  },
+  "drawings": {
+    "attrs": {
+      "listening": true,
+      "visible": true
+    },
+    "className": "Layer",
+    "children": [
+      {
+        "attrs": {
+          "name": "position-group",
+          "id": "slice-0_frame-0",
+          "visible": true
+        },
+        "className": "Group",
+        "children": [
+          {
+            "attrs": {
+              "name": "ruler-group",
+              "visible": true,
+              "id": "4gvkz8v6wzw",
+              "draggable": true
+            },
+            "className": "Group",
+            "children": [
+              {
+                "attrs": {
+                  "points": [
+                    51,
+                    135,
+                    216,
+                    134
+                  ],
+                  "stroke": "#ffff80",
+                  "strokeWidth": 1.2610837438423645,
+                  "name": "shape"
+                },
+                "className": "Line"
+              },
+              {
+                "attrs": {
+                  "points": [
+                    50.96969752621112,
+                    130.00009182483518,
+                    51.03030247378888,
+                    139.99990817516482
+                  ],
+                  "stroke": "#ffff80",
+                  "strokeWidth": 1.2610837438423645,
+                  "name": "shape-tick0"
+                },
+                "className": "Line"
+              },
+              {
+                "attrs": {
+                  "points": [
+                    215.96969752621112,
+                    129.00009182483336,
+                    216.03030247378888,
+                    138.99990817516664
+                  ],
+                  "stroke": "#ffff80",
+                  "strokeWidth": 1.2610837438423645,
+                  "name": "shape-tick1"
+                },
+                "className": "Line"
+              },
+              {
+                "attrs": {
+                  "x": 191,
+                  "y": 119,
+                  "name": "label"
+                },
+                "className": "Label",
+                "children": [
+                  {
+                    "attrs": {
+                      "fontSize": 7.566502463054187,
+                      "fontFamily": "Verdana",
+                      "fill": "#ffff80",
+                      "name": "text",
+                      "text": "165.0mm"
+                    },
+                    "className": "Text"
+                  },
+                  {
+                    "attrs": {
+                      "width": 39.3392333984375,
+                      "height": 7.566502463054187
+                    },
+                    "className": "Tag"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "drawingsDetails": {
+    "4gvkz8v6wzw": {
+      "textExpr": "{length}",
+      "longText": "What a ruler!",
+      "quant": {
+        "length": {
+          "value": 165.00303027520434,
+          "unit": "mm"
+        }
+      }
+    }
+  }
+}
