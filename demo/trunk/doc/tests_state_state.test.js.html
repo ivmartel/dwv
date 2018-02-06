@@ -114,7 +114,7 @@ QUnit.module("state");
  */
 dwv.utils.test.TestState = function ( version, type, assert ) {
     var done = assert.async();
-
+    // test file request
     var request = new XMLHttpRequest();
     var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/442-less-canvas";
     var url = urlRoot + "/tests/state/v" + version + "/state-" + type + ".json";
@@ -215,34 +215,42 @@ dwv.utils.test.CheckDrawings = function (drawings, details, version, type, asser
  * @param {Object} assert The qunit assert.
  */
 dwv.utils.test.CheckArrowDrawing = function (posGroupKid, details, version, assert) {
-    // check group name
+    // check group
     assert.equal( posGroupKid.attrs.name, "line-group", "Shape group is a line group.");
     assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
-    assert.equal( posGroupKid.children.length, 3, "Shape group has 3 kids.");
     assert.equal( posGroupKid.attrs.id, "pf8zteo5r4", "Position group first level has the proper id.");
     assert.notEqual( typeof details.pf8zteo5r4, "undefined", "Details should contain data for id.");
 
-    // real shape
-    var shapeGroupKid0 = posGroupKid.children[0];
-    assert.equal( shapeGroupKid0.className, "Line", "Shape group first level is a line.");
-    assert.equal( shapeGroupKid0.attrs.name, "shape", "Shape group first level is a shape.");
-    assert.notOk( shapeGroupKid0.attrs.draggable, "Shape group first level must not be draggable.");
-    assert.deepEqual( shapeGroupKid0.attrs.points, [53, 136, 139, 89], "Line has the proper points.");
-    assert.equal( shapeGroupKid0.attrs.stroke, "#ffff80", "Line has the proper colour.");
-    // shape extra
-    var shapeGroupKid1 = posGroupKid.children[1];
-    assert.equal( shapeGroupKid1.className, "RegularPolygon", "Shape group second level is a polygon.");
-    assert.notOk( shapeGroupKid1.attrs.draggable, "Shape group second level must not be draggable.");
-    // label
-    var shapeGroupKid2 = posGroupKid.children[2];
-    assert.equal( shapeGroupKid2.className, "Label", "Shape group third level is a label.");
-    assert.notOk( shapeGroupKid2.attrs.draggable, "Shape group third level must not be draggable.");
-    assert.equal( shapeGroupKid2.children.length, 2, "Label has 2 kids.");
-    var labelGroupKid0 = shapeGroupKid2.children[0];
-    assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
-    assert.equal( labelGroupKid0.attrs.text, "Eye", "Text has the proper value.");
-    var labelGroupKid1 = shapeGroupKid2.children[1];
-    assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+    // kids
+    assert.equal( posGroupKid.children.length, 3, "Shape group has 3 kids.");
+    var hasShape = false;
+    var hasLabel = false;
+    var hasPoly = false;
+    for ( var i = 0; i &lt; posGroupKid.children.length; ++i ) {
+        var shapeGroupKid = posGroupKid.children[i];
+        if ( shapeGroupKid.attrs.name === "shape" ) {
+            hasShape = true;
+            assert.equal( shapeGroupKid.className, "Line", "Shape group 'shape' is a line.");
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'shape' must not be draggable.");
+            assert.deepEqual( shapeGroupKid.attrs.points, [53, 136, 139, 89], "Line has the proper points.");
+            assert.equal( shapeGroupKid.attrs.stroke, "#ffff80", "Line has the proper colour.");
+        } else if ( shapeGroupKid.className === "Label" ) {
+            hasLabel = true;
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'label' must not be draggable.");
+            assert.equal( shapeGroupKid.children.length, 2, "Label has 2 kids.");
+            var labelGroupKid0 = shapeGroupKid.children[0];
+            assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
+            assert.equal( labelGroupKid0.attrs.text, "Eye", "Text has the proper value.");
+            var labelGroupKid1 = shapeGroupKid.children[1];
+            assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+        } else if ( shapeGroupKid.className === "RegularPolygon" ) {
+            hasPoly = true;
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'extra' must not be draggable.");
+        }
+    }
+    assert.ok( hasShape, "Shape group contains a shape.");
+    assert.ok( hasLabel, "Shape group contains a label.");
+    assert.ok( hasPoly, "Shape group contains a polygon.");
 
     // details
     var details0 = details.pf8zteo5r4;
@@ -258,38 +266,48 @@ dwv.utils.test.CheckArrowDrawing = function (posGroupKid, details, version, asse
  * @param {Object} assert The qunit assert.
  */
 dwv.utils.test.CheckRulerDrawing = function (posGroupKid, details, version, assert) {
-    // check group name
+    // check group
     assert.equal( posGroupKid.attrs.name, "ruler-group", "Shape group is a ruler group.");
     assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
-    assert.equal( posGroupKid.children.length, 4, "Shape group has 4 kids.");
     assert.equal( posGroupKid.attrs.id, "4gvkz8v6wzw", "Position group first level has the proper id.");
     assert.notEqual( typeof details["4gvkz8v6wzw"], "undefined", "Details should contain data for id.");
 
-    // real shape
-    var shapeGroupKid0 = posGroupKid.children[0];
-    assert.equal( shapeGroupKid0.className, "Line", "Shape group first level is a line.");
-    assert.equal( shapeGroupKid0.attrs.name, "shape", "Shape group first level is a shape.");
-    assert.notOk( shapeGroupKid0.attrs.draggable, "Shape group first level must not be draggable.");
-    assert.deepEqual( shapeGroupKid0.attrs.points, [51,135,216,134], "Line has the proper points.");
-    assert.equal( shapeGroupKid0.attrs.stroke, "#ffff80", "Line has the proper colour.");
-    // shape extra
-    var shapeGroupKid1 = posGroupKid.children[1];
-    assert.equal( shapeGroupKid1.className, "Line", "Shape group second level is a polygon.");
-    assert.notOk( shapeGroupKid1.attrs.draggable, "Shape group second level must not be draggable.");
-    // shape extra
-    var shapeGroupKid2 = posGroupKid.children[2];
-    assert.equal( shapeGroupKid2.className, "Line", "Shape group third level is a polygon.");
-    assert.notOk( shapeGroupKid2.attrs.draggable, "Shape group third level must not be draggable.");
-    // label
-    var shapeGroupKid3 = posGroupKid.children[3];
-    assert.equal( shapeGroupKid3.className, "Label", "Shape group fourth level is a label.");
-    assert.notOk( shapeGroupKid3.attrs.draggable, "Shape group fourth level must not be draggable.");
-    assert.equal( shapeGroupKid3.children.length, 2, "Label has 2 kids.");
-    var labelGroupKid0 = shapeGroupKid3.children[0];
-    assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
-    assert.equal( labelGroupKid0.attrs.text, "165.0mm", "Text has the proper value.");
-    var labelGroupKid1 = shapeGroupKid3.children[1];
-    assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+    // kids
+    assert.equal( posGroupKid.children.length, 4, "Shape group has 4 kids.");
+    var hasShape = false;
+    var hasLabel = false;
+    var hasTick1 = false;
+    var hasTick2 = false;
+    for ( var i = 0; i &lt; posGroupKid.children.length; ++i ) {
+        var shapeGroupKid = posGroupKid.children[i];
+        if ( shapeGroupKid.attrs.name === "shape" ) {
+            hasShape = true;
+            assert.equal( shapeGroupKid.className, "Line", "Shape group 'shape' is a line.");
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'shape' must not be draggable.");
+            assert.deepEqual( shapeGroupKid.attrs.points, [51,135,216,134], "Line has the proper points.");
+            assert.equal( shapeGroupKid.attrs.stroke, "#ffff80", "Line has the proper colour.");
+        } else if ( shapeGroupKid.className === "Label" ) {
+            hasLabel = true;
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'label' must not be draggable.");
+            assert.equal( shapeGroupKid.children.length, 2, "Label has 2 kids.");
+            var labelGroupKid0 = shapeGroupKid.children[0];
+            assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
+            assert.equal( labelGroupKid0.attrs.text, "165.0mm", "Text has the proper value.");
+            var labelGroupKid1 = shapeGroupKid.children[1];
+            assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+        } else if ( shapeGroupKid.className === "Line" ) {
+            if ( hasTick1 ) {
+                hasTick2 = true;
+            } else {
+                hasTick1 = true;
+            }
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'extra' must not be draggable.");
+        }
+    }
+    assert.ok( hasShape, "Shape group contains a shape.");
+    assert.ok( hasLabel, "Shape group contains a label.");
+    assert.ok( hasTick1, "Shape group contains a tick1.");
+    assert.ok( hasTick2, "Shape group contains a tick2.");
 
     // details
     var details0 = details["4gvkz8v6wzw"];
@@ -305,33 +323,40 @@ dwv.utils.test.CheckRulerDrawing = function (posGroupKid, details, version, asse
  * @param {Object} assert The qunit assert.
  */
 dwv.utils.test.CheckRoiDrawing = function (posGroupKid, details, version, assert) {
-    // check group name
+    // check group
     assert.equal( posGroupKid.attrs.name, "roi-group", "Shape group is a roi group.");
     assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
-    assert.equal( posGroupKid.children.length, 2, "Shape group has 2 kids.");
     assert.equal( posGroupKid.attrs.id, "4l24ofouhmf", "Position group first level has the proper id.");
     assert.notEqual( typeof details["4l24ofouhmf"], "undefined", "Details should contain data for id.");
 
-    // real shape
-    var shapeGroupKid0 = posGroupKid.children[0];
-    assert.equal( shapeGroupKid0.className, "Line", "Shape group first level is a line.");
-    assert.equal( shapeGroupKid0.attrs.name, "shape", "Shape group first level is a shape.");
-    assert.notOk( shapeGroupKid0.attrs.draggable, "Shape group first level must not be draggable.");
-    assert.deepEqual( shapeGroupKid0.attrs.points, [126, 40, 58, 80, 60, 116, 92, 128, 93, 143, 93, 151, 94, 151, 114, 150, 128, 150, 214, 135, 183, 56, 182, 56, 182, 56], "Line has the proper points.");
-    var colour = ( version === "0.1" ? "#ffff00" : "#ffff80" );
-    assert.equal( shapeGroupKid0.attrs.stroke, colour, "Line has the proper colour.");
-    // label
-    var shapeGroupKid1 = posGroupKid.children[1];
-    assert.equal( shapeGroupKid1.className, "Label", "Shape group third level is a label.");
-    assert.notOk( shapeGroupKid1.attrs.draggable, "Shape group third level must not be draggable.");
-    assert.equal( shapeGroupKid1.children.length, 2, "Label has 2 kids.");
-    var labelGroupKid0 = shapeGroupKid1.children[0];
-    assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
-    if ( version !== "0.1" ) {
-        assert.equal( labelGroupKid0.attrs.text, "Brain", "Text has the proper value.");
+    // kids
+    assert.equal( posGroupKid.children.length, 2, "Shape group has 2 kids.");
+    var hasShape = false;
+    var hasLabel = false;
+    for ( var i = 0; i &lt; posGroupKid.children.length; ++i ) {
+        var shapeGroupKid = posGroupKid.children[i];
+        if ( shapeGroupKid.attrs.name === "shape" ) {
+            hasShape = true;
+            assert.equal( shapeGroupKid.className, "Line", "Shape group 'shape' is a line.");
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'shape' must not be draggable.");
+            assert.deepEqual( shapeGroupKid.attrs.points, [126, 40, 58, 80, 60, 116, 92, 128, 93, 143, 93, 151, 94, 151, 114, 150, 128, 150, 214, 135, 183, 56, 182, 56, 182, 56], "Line has the proper points.");
+            var colour = ( version === "0.1" ? "#ffff00" : "#ffff80" );
+            assert.equal( shapeGroupKid.attrs.stroke, colour, "Line has the proper colour.");
+        } else if ( shapeGroupKid.className === "Label" ) {
+            hasLabel = true;
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'label' must not be draggable.");
+            assert.equal( shapeGroupKid.children.length, 2, "Label has 2 kids.");
+            var labelGroupKid0 = shapeGroupKid.children[0];
+            assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
+            if ( version !== "0.1" ) {
+                assert.equal( labelGroupKid0.attrs.text, "Brain", "Text has the proper value.");
+            }
+            var labelGroupKid1 = shapeGroupKid.children[1];
+            assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+        }
     }
-    var labelGroupKid1 = shapeGroupKid1.children[1];
-    assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+    assert.ok( hasShape, "Shape group contains a shape.");
+    assert.ok( hasLabel, "Shape group contains a label.");
 
     // details
     if ( version !== "0.1" ) {
@@ -349,30 +374,37 @@ dwv.utils.test.CheckRoiDrawing = function (posGroupKid, details, version, assert
  * @param {Object} assert The qunit assert.
  */
 dwv.utils.test.CheckHandDrawing = function (posGroupKid, details, version, assert) {
-    // check group name
+    // check group
     assert.equal( posGroupKid.attrs.name, "freeHand-group", "Shape group is a freeHand group.");
     assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
-    assert.equal( posGroupKid.children.length, 2, "Shape group has 2 kids.");
     assert.equal( posGroupKid.attrs.id, "08m011yjp8je", "Position group first level has the proper id.");
     assert.notEqual( typeof details["08m011yjp8je"], "undefined", "Details should contain data for id.");
 
-    // real shape
-    var shapeGroupKid0 = posGroupKid.children[0];
-    assert.equal( shapeGroupKid0.className, "Line", "Shape group first level is a line.");
-    assert.equal( shapeGroupKid0.attrs.name, "shape", "Shape group first level is a shape.");
-    assert.notOk( shapeGroupKid0.attrs.draggable, "Shape group first level must not be draggable.");
-    assert.deepEqual( shapeGroupKid0.attrs.points, [93,50,92,50,71,58,71,59,68,63,68,64,54,80,54,81,53,83,52,85,51,87,50,92,47,98,47,100,55,117,56,118,86,122,89,126,90,128,90,129,88,131,87,133,86,134,85,138,85,139,85,141,87,143,87,144,87,145,88,147,92,150,97,152,112,154,113,153,136,143,174,136,178,135,191,136,192,136,194,138,196,139,197,141,199,141,200,141,207,140,208,139,211,136,213,134,213,133,213,129,213,126,213,122,210,90,209,87,206,80,205,79,204,78,201,73,199,71,197,70,187,63,184,61,182,59,180,58,174,54,172,52,170,51,168,50,167,49,155,42,154,42,151,42,136,40,134,40,133,40,128,41,126,41,124,41,117,44,116,44,114,44,107,47,102,49,100,49,97,49,93,50,92,50,92,50], "Line has the proper points.");
-    assert.equal( shapeGroupKid0.attrs.stroke, "#ffff80", "Line has the proper colour.");
-    // label
-    var shapeGroupKid1 = posGroupKid.children[1];
-    assert.equal( shapeGroupKid1.className, "Label", "Shape group third level is a label.");
-    assert.notOk( shapeGroupKid1.attrs.draggable, "Shape group third level must not be draggable.");
-    assert.equal( shapeGroupKid1.children.length, 2, "Label has 2 kids.");
-    var labelGroupKid0 = shapeGroupKid1.children[0];
-    assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
-    assert.equal( labelGroupKid0.attrs.text, "Brain", "Text has the proper value.");
-    var labelGroupKid1 = shapeGroupKid1.children[1];
-    assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+    // kids
+    assert.equal( posGroupKid.children.length, 2, "Shape group has 2 kids.");
+    var hasShape = false;
+    var hasLabel = false;
+    for ( var i = 0; i &lt; posGroupKid.children.length; ++i ) {
+        var shapeGroupKid = posGroupKid.children[i];
+        if ( shapeGroupKid.attrs.name === "shape" ) {
+            hasShape = true;
+            assert.equal( shapeGroupKid.className, "Line", "Shape group 'shape' is a line.");
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'shape' must not be draggable.");
+            assert.deepEqual( shapeGroupKid.attrs.points, [93,50,92,50,71,58,71,59,68,63,68,64,54,80,54,81,53,83,52,85,51,87,50,92,47,98,47,100,55,117,56,118,86,122,89,126,90,128,90,129,88,131,87,133,86,134,85,138,85,139,85,141,87,143,87,144,87,145,88,147,92,150,97,152,112,154,113,153,136,143,174,136,178,135,191,136,192,136,194,138,196,139,197,141,199,141,200,141,207,140,208,139,211,136,213,134,213,133,213,129,213,126,213,122,210,90,209,87,206,80,205,79,204,78,201,73,199,71,197,70,187,63,184,61,182,59,180,58,174,54,172,52,170,51,168,50,167,49,155,42,154,42,151,42,136,40,134,40,133,40,128,41,126,41,124,41,117,44,116,44,114,44,107,47,102,49,100,49,97,49,93,50,92,50,92,50], "Line has the proper points.");
+            assert.equal( shapeGroupKid.attrs.stroke, "#ffff80", "Line has the proper colour.");
+        } else if ( shapeGroupKid.className === "Label" ) {
+            hasLabel = true;
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'label' must not be draggable.");
+            assert.equal( shapeGroupKid.children.length, 2, "Label has 2 kids.");
+            var labelGroupKid0 = shapeGroupKid.children[0];
+            assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
+            assert.equal( labelGroupKid0.attrs.text, "Brain", "Text has the proper value.");
+            var labelGroupKid1 = shapeGroupKid.children[1];
+            assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+        }
+    }
+    assert.ok( hasShape, "Shape group contains a shape.");
+    assert.ok( hasLabel, "Shape group contains a label.");
 
     // details
     var details0 = details["08m011yjp8je"];
@@ -388,34 +420,41 @@ dwv.utils.test.CheckHandDrawing = function (posGroupKid, details, version, asser
  * @param {Object} assert The qunit assert.
  */
 dwv.utils.test.CheckEllipseDrawing = function (posGroupKid, details, version, assert) {
-    // check group name
+    // check group
     assert.equal( posGroupKid.attrs.name, "ellipse-group", "Shape group is an ellipse group.");
     assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
-    assert.equal( posGroupKid.children.length, 2, "Shape group has 2 kids.");
     assert.equal( posGroupKid.attrs.id, "c6j16qt6vt6", "Position group first level has the proper id.");
     assert.notEqual( typeof details.c6j16qt6vt6, "undefined", "Details should contain data for id.");
 
-    // real shape
-    var shapeGroupKid0 = posGroupKid.children[0];
-    assert.equal( shapeGroupKid0.className, "Ellipse", "Shape group first level is an ellipse.");
-    assert.equal( shapeGroupKid0.attrs.name, "shape", "Shape group first level is a shape.");
-    assert.notOk( shapeGroupKid0.attrs.draggable, "Shape group first level must not be draggable.");
-    assert.deepEqual( shapeGroupKid0.attrs.x, 90, "Ellipse has the proper x.");
-    assert.deepEqual( shapeGroupKid0.attrs.y, 78, "Ellipse has the proper y.");
-    assert.deepEqual( shapeGroupKid0.attrs.radiusX, 53, "Ellipse has the proper radiusX.");
-    assert.deepEqual( shapeGroupKid0.attrs.radiusY, 32, "Ellipse has the proper radiusY.");
-    var colour = ( version === "0.1" ? "#ffff00" : "#ffff80" );
-    assert.equal( shapeGroupKid0.attrs.stroke, colour, "Ellipse has the proper colour.");
-    // label
-    var shapeGroupKid1 = posGroupKid.children[1];
-    assert.equal( shapeGroupKid1.className, "Label", "Shape group third level is a label.");
-    assert.notOk( shapeGroupKid1.attrs.draggable, "Shape group third level must not be draggable.");
-    assert.equal( shapeGroupKid1.children.length, 2, "Label has 2 kids.");
-    var labelGroupKid0 = shapeGroupKid1.children[0];
-    assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
-    assert.equal( labelGroupKid0.attrs.text, "53.28cm2", "Text has the proper value.");
-    var labelGroupKid1 = shapeGroupKid1.children[1];
-    assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+    // kids
+    assert.equal( posGroupKid.children.length, 2, "Shape group has 2 kids.");
+    var hasShape = false;
+    var hasLabel = false;
+    for ( var i = 0; i &lt; posGroupKid.children.length; ++i ) {
+        var shapeGroupKid = posGroupKid.children[i];
+        if ( shapeGroupKid.attrs.name === "shape" ) {
+            hasShape = true;
+            assert.equal( shapeGroupKid.className, "Ellipse", "Shape group 'shape' is an ellipse.");
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'shape' must not be draggable.");
+            assert.deepEqual( shapeGroupKid.attrs.x, 90, "Ellipse has the proper x.");
+            assert.deepEqual( shapeGroupKid.attrs.y, 78, "Ellipse has the proper y.");
+            assert.deepEqual( shapeGroupKid.attrs.radiusX, 53, "Ellipse has the proper radiusX.");
+            assert.deepEqual( shapeGroupKid.attrs.radiusY, 32, "Ellipse has the proper radiusY.");
+            var colour = ( version === "0.1" ? "#ffff00" : "#ffff80" );
+            assert.equal( shapeGroupKid.attrs.stroke, colour, "Ellipse has the proper colour.");
+        } else if ( shapeGroupKid.className === "Label" ) {
+            hasLabel = true;
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'label' must not be draggable.");
+            assert.equal( shapeGroupKid.children.length, 2, "Label has 2 kids.");
+            var labelGroupKid0 = shapeGroupKid.children[0];
+            assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
+            assert.equal( labelGroupKid0.attrs.text, "53.28cm2", "Text has the proper value.");
+            var labelGroupKid1 = shapeGroupKid.children[1];
+            assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+        }
+    }
+    assert.ok( hasShape, "Shape group contains a shape.");
+    assert.ok( hasLabel, "Shape group contains a label.");
 
     // details
     if ( version !== "0.1" ) {
@@ -433,35 +472,43 @@ dwv.utils.test.CheckEllipseDrawing = function (posGroupKid, details, version, as
  * @param {Object} assert The qunit assert.
  */
 dwv.utils.test.CheckProtractorDrawing = function (posGroupKid, details, version, assert) {
-    // check group name
+    // check group
     assert.equal( posGroupKid.attrs.name, "protractor-group", "Shape group is an protractor group.");
     assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
-    assert.equal( posGroupKid.children.length, 3, "Shape group has 3 kids.");
     assert.equal( posGroupKid.attrs.id, "49g7kqi3p4u", "Position group first level has the proper id.");
     assert.notEqual( typeof details["49g7kqi3p4u"], "undefined", "Details should contain data for id.");
 
-    // real shape
-    var shapeGroupKid0 = posGroupKid.children[0];
-    assert.equal( shapeGroupKid0.className, "Line", "Shape group first level is a line.");
-    assert.equal( shapeGroupKid0.attrs.name, "shape", "Shape group first level is a shape.");
-    assert.notOk( shapeGroupKid0.attrs.draggable, "Shape group first level must not be draggable.");
-    assert.deepEqual( shapeGroupKid0.attrs.points, [33,164,81,145,93,198], "Line has the proper points.");
-    var colour = ( version === "0.1" ? "#ffff00" : "#ffff80" );
-    assert.equal( shapeGroupKid0.attrs.stroke, colour, "Line has the proper colour.");
-    // label
-    var shapeGroupKid1 = posGroupKid.children[1];
-    assert.equal( shapeGroupKid1.className, "Label", "Shape group third level is a label.");
-    assert.notOk( shapeGroupKid1.attrs.draggable, "Shape group third level must not be draggable.");
-    assert.equal( shapeGroupKid1.children.length, 2, "Label has 2 kids.");
-    var labelGroupKid0 = shapeGroupKid1.children[0];
-    assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
-    assert.equal( labelGroupKid0.attrs.text, "80.15°", "Text has the proper value.");
-    var labelGroupKid1 = shapeGroupKid1.children[1];
-    assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
-    // shape extra
-    var shapeGroupKid2 = posGroupKid.children[2];
-    assert.equal( shapeGroupKid2.className, "Arc", "Shape group second level is a polygon.");
-    assert.notOk( shapeGroupKid2.attrs.draggable, "Shape group second level must not be draggable.");
+    // kids
+    assert.equal( posGroupKid.children.length, 3, "Shape group has 3 kids.");
+    var hasShape = false;
+    var hasLabel = false;
+    var hasArc = false;
+    for ( var i = 0; i &lt; posGroupKid.children.length; ++i ) {
+        var shapeGroupKid = posGroupKid.children[i];
+        if ( shapeGroupKid.attrs.name === "shape" ) {
+            hasShape = true;
+            assert.equal( shapeGroupKid.className, "Line", "Shape group 'shape' is a line.");
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'shape' must not be draggable.");
+            assert.deepEqual( shapeGroupKid.attrs.points, [33,164,81,145,93,198], "Line has the proper points.");
+            var colour = ( version === "0.1" ? "#ffff00" : "#ffff80" );
+            assert.equal( shapeGroupKid.attrs.stroke, colour, "Line has the proper colour.");
+        } else if ( shapeGroupKid.className === "Label" ) {
+            hasLabel = true;
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'label' must not be draggable.");
+            assert.equal( shapeGroupKid.children.length, 2, "Label has 2 kids.");
+            var labelGroupKid0 = shapeGroupKid.children[0];
+            assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
+            assert.equal( labelGroupKid0.attrs.text, "80.15°", "Text has the proper value.");
+            var labelGroupKid1 = shapeGroupKid.children[1];
+            assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+        } else if ( shapeGroupKid.className === "Arc" ) {
+            hasArc = true;
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'extra' must not be draggable.");
+        }
+    }
+    assert.ok( hasShape, "Shape group contains a shape.");
+    assert.ok( hasLabel, "Shape group contains a label.");
+    assert.ok( hasArc, "Shape group contains an arc.");
 
     // details
     if ( version !== "0.1" ) {
@@ -479,34 +526,41 @@ dwv.utils.test.CheckProtractorDrawing = function (posGroupKid, details, version,
  * @param {Object} assert The qunit assert.
  */
 dwv.utils.test.CheckRectangleDrawing = function (posGroupKid, details, version, assert) {
-    // check group name
+    // check group
     assert.equal( posGroupKid.attrs.name, "rectangle-group", "Shape group is a rectangle group.");
     assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
-    assert.equal( posGroupKid.children.length, 2, "Shape group has 2 kids.");
     assert.equal( posGroupKid.attrs.id, "db0puu209qe", "Position group first level has the proper id.");
     assert.notEqual( typeof details.db0puu209qe, "undefined", "Details should contain data for id.");
 
-    // real shape
-    var shapeGroupKid0 = posGroupKid.children[0];
-    assert.equal( shapeGroupKid0.className, "Rect", "Shape group first level is a rectangle.");
-    assert.equal( shapeGroupKid0.attrs.name, "shape", "Shape group first level is a shape.");
-    assert.notOk( shapeGroupKid0.attrs.draggable, "Shape group first level must not be draggable.");
-    assert.deepEqual( shapeGroupKid0.attrs.x, 80, "Rectangle has the proper x.");
-    assert.deepEqual( shapeGroupKid0.attrs.y, 58, "Rectangle has the proper y.");
-    assert.deepEqual( shapeGroupKid0.attrs.width, 104, "Rectangle has the proper width.");
-    assert.deepEqual( shapeGroupKid0.attrs.height, 64, "Rectangle has the proper height.");
-    var colour = ( version === "0.1" ? "#ffff00" : "#ffff80" );
-    assert.equal( shapeGroupKid0.attrs.stroke, colour, "Rectangle has the proper colour.");
-    // label
-    var shapeGroupKid1 = posGroupKid.children[1];
-    assert.equal( shapeGroupKid1.className, "Label", "Shape group third level is a label.");
-    assert.notOk( shapeGroupKid1.attrs.draggable, "Shape group third level must not be draggable.");
-    assert.equal( shapeGroupKid1.children.length, 2, "Label has 2 kids.");
-    var labelGroupKid0 = shapeGroupKid1.children[0];
-    assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
-    assert.equal( labelGroupKid0.attrs.text, "66.56cm2", "Text has the proper value.");
-    var labelGroupKid1 = shapeGroupKid1.children[1];
-    assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+    // kids
+    assert.equal( posGroupKid.children.length, 2, "Shape group has 2 kids.");
+    var hasShape = false;
+    var hasLabel = false;
+    for ( var i = 0; i &lt; posGroupKid.children.length; ++i ) {
+        var shapeGroupKid = posGroupKid.children[i];
+        if ( shapeGroupKid.attrs.name === "shape" ) {
+            hasShape = true;
+            assert.equal( shapeGroupKid.className, "Rect", "Shape group 'shape' is a rectangle.");
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'shape' must not be draggable.");
+            assert.deepEqual( shapeGroupKid.attrs.x, 80, "Rectangle has the proper x.");
+            assert.deepEqual( shapeGroupKid.attrs.y, 58, "Rectangle has the proper y.");
+            assert.deepEqual( shapeGroupKid.attrs.width, 104, "Rectangle has the proper width.");
+            assert.deepEqual( shapeGroupKid.attrs.height, 64, "Rectangle has the proper height.");
+            var colour = ( version === "0.1" ? "#ffff00" : "#ffff80" );
+            assert.equal( shapeGroupKid.attrs.stroke, colour, "Rectangle has the proper colour.");
+        } else if ( shapeGroupKid.className === "Label" ) {
+            hasLabel = true;
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'label' must not be draggable.");
+            assert.equal( shapeGroupKid.children.length, 2, "Label has 2 kids.");
+            var labelGroupKid0 = shapeGroupKid.children[0];
+            assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
+            assert.equal( labelGroupKid0.attrs.text, "66.56cm2", "Text has the proper value.");
+            var labelGroupKid1 = shapeGroupKid.children[1];
+            assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+        }
+    }
+    assert.ok( hasShape, "Shape group contains a shape.");
+    assert.ok( hasLabel, "Shape group contains a label.");
 
     // details
     if ( version !== "0.1" ) {
@@ -520,8 +574,8 @@ dwv.utils.test.CheckRectangleDrawing = function (posGroupKid, details, version, 
  * Tests for {@link dwv.State} v0.1 containing a line.
  * @function module:tests/state
  */
-/*QUnit.test("Test read v0.1 state: line.", function (assert) {
-    dwv.utils.test.TestState( "0.1", "line", assert );
+/*QUnit.test("Test read v0.1 state: ruler.", function (assert) {
+    dwv.utils.test.TestState( "0.1", "ruler", assert );
 });*/
 
 /**
@@ -544,9 +598,9 @@ QUnit.test("Test read v0.1 state: ellipse.", function (assert) {
  * Tests for {@link dwv.State} v0.1 containing a protractor.
  * @function module:tests/state
  */
-/*QUnit.test("Test read v0.1 state: protractor.", function (assert) {
+QUnit.test("Test read v0.1 state: protractor.", function (assert) {
     dwv.utils.test.TestState( "0.1", "protractor", assert );
-});*/
+});
 
 /**
  * Tests for {@link dwv.State} v0.1 containing a rectangle.
@@ -708,7 +762,7 @@ QUnit.test("Test read v0.3 state: rectangle.", function (assert) {
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
 	
-		on Monday, February 5th 2018
+		on Tuesday, February 6th 2018
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>
