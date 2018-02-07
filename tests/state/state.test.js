@@ -78,32 +78,60 @@ dwv.utils.test.CheckStateHeader = function (jsonData, version, assert) {
 dwv.utils.test.CheckDrawings = function (drawings, details, version, type, assert) {
     // first level: layer
     assert.equal( drawings.className, "Layer", "State drawings is a layer.");
-    assert.equal( drawings.children.length, 1, "State drawings has one kid.");
-    // second level: position group
-    var layerKid = drawings.children[0];
-    assert.equal( layerKid.className, "Group", "Layer first level is a group.");
-    assert.equal( layerKid.attrs.name, "position-group", "Layer first level is a position group.");
-    assert.equal( layerKid.attrs.id, "slice-0_frame-0", "Position group has the proper id.");
-    assert.equal( layerKid.children.length, 1, "Position group has one kid.");
-    // third level: shape group
-    var posGroupKid = layerKid.children[0];
-    assert.equal( posGroupKid.className, "Group", "Position group first level is a group.");
 
-    // shape specific checks
-    if ( type === "arrow" ) {
-        dwv.utils.test.CheckArrowDrawing( posGroupKid, details, version, assert );
-    } else if ( type === "ruler" ) {
-        dwv.utils.test.CheckRulerDrawing( posGroupKid, details, version, assert );
-    } else if ( type === "roi" ) {
-        dwv.utils.test.CheckRoiDrawing( posGroupKid, details, version, assert );
-    } else if ( type === "hand" ) {
-        dwv.utils.test.CheckHandDrawing( posGroupKid, details, version, assert );
-    } else if ( type === "ellipse" ) {
-        dwv.utils.test.CheckEllipseDrawing( posGroupKid, details, version, assert );
-    } else if ( type === "protractor" ) {
-        dwv.utils.test.CheckProtractorDrawing( posGroupKid, details, version, assert );
-    } else if ( type === "rectangle" ) {
-        dwv.utils.test.CheckRectangleDrawing( posGroupKid, details, version, assert );
+    // second level: position groups
+    if ( drawings.children.length === 5 &&
+        ( type === "ruler_multi-slice" || type === "line_multi-slice" ) ) {
+        dwv.utils.test.CheckRulerDrawings( drawings.children, details, version, assert );
+    } else if ( drawings.children.length === 1 ) {
+
+        var layerKid = drawings.children[0];
+        assert.equal( layerKid.className, "Group", "Layer first level is a group.");
+        assert.equal( layerKid.attrs.name, "position-group", "Layer first level is a position group.");
+        assert.equal( layerKid.attrs.id, "slice-0_frame-0", "Position group has the proper id.");
+
+        // third level: shape group(s)
+        var posGroupKid = layerKid.children[0];
+        assert.equal( posGroupKid.className, "Group", "Position group first level is a group.");
+
+        // shape specific checks
+        if ( type === "arrow" ) {
+            dwv.utils.test.CheckArrowDrawing( posGroupKid, details, version, assert );
+        } else if ( type === "ruler" && version !== "0.1" ) {
+            var refRuler = {
+                'id': "4gvkz8v6wzw",
+                'points': [51,135,216,134],
+                'colour': "#ffff80",
+                'text': "165.0mm",
+                'textExpr': "{length}",
+                'longText': "What a ruler!"
+            };
+            dwv.utils.test.CheckRulerDrawing( posGroupKid, details, refRuler, assert );
+        } else if ( type === "line" && version === "0.1" ) {
+            var refLine = {
+                'id': "4gvkz8v6wzw",
+                'points': [51,135,216,134],
+                'colour': "#ffff00",
+                'text': "165.0mm",
+                'textExpr': "165.0mm",
+                'longText': ""
+            };
+            dwv.utils.test.CheckRulerDrawing( posGroupKid, details, refLine, assert );
+        } else if ( type === "roi" ) {
+            dwv.utils.test.CheckRoiDrawing( posGroupKid, details, version, assert );
+        } else if ( type === "hand" ) {
+            dwv.utils.test.CheckHandDrawing( posGroupKid, details, version, assert );
+        } else if ( type === "ellipse" ) {
+            dwv.utils.test.CheckEllipseDrawing( posGroupKid, details, version, assert );
+        } else if ( type === "protractor" ) {
+            dwv.utils.test.CheckProtractorDrawing( posGroupKid, details, version, assert );
+        } else if ( type === "rectangle" ) {
+            dwv.utils.test.CheckRectangleDrawing( posGroupKid, details, version, assert );
+        } else {
+            assert.ok( false, "Unknown draw type." );
+        }
+    } else {
+        assert.ok( false, "Not the expected number of position groups." );
     }
 };
 
@@ -162,15 +190,15 @@ dwv.utils.test.CheckArrowDrawing = function (posGroupKid, details, version, asse
  * Check a ruler drawing.
  * @param {Object} posGroupKid The position group (only) kid.
  * @param {Object} details The drawing details
- * @param {String} version The state format version.
+ * @param {String} ref The reference data to compare to.
  * @param {Object} assert The qunit assert.
  */
-dwv.utils.test.CheckRulerDrawing = function (posGroupKid, details, version, assert) {
+dwv.utils.test.CheckRulerDrawing = function (posGroupKid, details, ref, assert) {
     // check group
     assert.equal( posGroupKid.attrs.name, "ruler-group", "Shape group is a ruler group.");
     assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
-    assert.equal( posGroupKid.attrs.id, "4gvkz8v6wzw", "Position group first level has the proper id.");
-    assert.notEqual( typeof details["4gvkz8v6wzw"], "undefined", "Details should contain data for id.");
+    assert.equal( posGroupKid.attrs.id, ref.id, "Position group first level has the proper id.");
+    assert.notEqual( typeof details[ref.id], "undefined", "Details should contain data for id.");
 
     // kids
     assert.equal( posGroupKid.children.length, 4, "Shape group has 4 kids.");
@@ -184,15 +212,15 @@ dwv.utils.test.CheckRulerDrawing = function (posGroupKid, details, version, asse
             hasShape = true;
             assert.equal( shapeGroupKid.className, "Line", "Shape group 'shape' is a line.");
             assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'shape' must not be draggable.");
-            assert.deepEqual( shapeGroupKid.attrs.points, [51,135,216,134], "Line has the proper points.");
-            assert.equal( shapeGroupKid.attrs.stroke, "#ffff80", "Line has the proper colour.");
+            assert.deepEqual( shapeGroupKid.attrs.points, ref.points, "Line has the proper points.");
+            assert.equal( shapeGroupKid.attrs.stroke, ref.colour, "Line has the proper colour.");
         } else if ( shapeGroupKid.className === "Label" ) {
             hasLabel = true;
             assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'label' must not be draggable.");
             assert.equal( shapeGroupKid.children.length, 2, "Label has 2 kids.");
             var labelGroupKid0 = shapeGroupKid.children[0];
             assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
-            assert.equal( labelGroupKid0.attrs.text, "165.0mm", "Text has the proper value.");
+            assert.equal( labelGroupKid0.attrs.text, ref.text, "Text has the proper value.");
             var labelGroupKid1 = shapeGroupKid.children[1];
             assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
         } else if ( shapeGroupKid.className === "Line" ) {
@@ -210,9 +238,78 @@ dwv.utils.test.CheckRulerDrawing = function (posGroupKid, details, version, asse
     assert.ok( hasTick2, "Shape group contains a tick2.");
 
     // details
-    var details0 = details["4gvkz8v6wzw"];
-    assert.equal( details0.textExpr, "{length}", "Details textExpr has the proper value.");
-    assert.equal( details0.longText, "What a ruler!", "Details longText has the proper value.");
+    var details0 = details[ref.id];
+    assert.equal( details0.textExpr, ref.textExpr, "Details textExpr has the proper value.");
+    assert.equal( details0.longText, ref.longText, "Details longText has the proper value.");
+};
+
+/**
+ * Check a multi slice ruler drawing.
+ * @param {Object} layer The draw layer.
+ * @param {Object} details The drawing details
+ * @param {String} version The state format version.
+ * @param {Object} assert The qunit assert.
+ */
+dwv.utils.test.CheckRulerDrawings = function (layerKids, details, version, assert) {
+
+    var ndraws = 5;
+    assert.equal( layerKids.length, ndraws, "Layer has " + ndraws + " kids.");
+
+    var refRulers = [
+        {
+            'id': "onzlkbs8p",
+            'points': [120,110,120,60],
+            'colour': "#ffff00",
+            'text': "50.00mm",
+            'textExpr': ( version === "0.1" ? "50.00mm" : "{length}" ),
+            'longText': ( version === "0.1" ? "" : "First ruler." )
+        },
+        {
+            'id': "u9bvidgkjc9",
+            'points': [120,110,170,110],
+            'colour': "#ff0000",
+            'text': "50.00mm",
+            'textExpr': ( version === "0.1" ? "50.00mm" : "{length}" ),
+            'longText': ( version === "0.1" ? "" : "Second ruler." )
+        },
+        {
+            'id': "c9abkegq62j",
+            'points': [120,110,120,160],
+            'colour': "#ffffff",
+            'text': "50.00mm",
+            'textExpr': ( version === "0.1" ? "50.00mm" : "{length}" ),
+            'longText': ( version === "0.1" ? "" : "Third ruler." )
+        },
+        {
+            'id': "uiav43zjw1",
+            'points': [120,110,60,110],
+            'colour': "#00ff00",
+            'text': "50.00mm",
+            'textExpr': ( version === "0.1" ? "50.00mm" : "{length}" ),
+            'longText': ( version === "0.1" ? "" : "Fourth ruler." )
+        },
+        {
+            'id': "26ir11b9ugl",
+            'points': [120,110,120,60],
+            'colour': "#ff00ff",
+            'text': "50.00mm",
+            'textExpr': ( version === "0.1" ? "50.00mm" : "{length}" ),
+            'longText': ( version === "0.1" ? "" : "Fifth ruler." )
+        }
+    ];
+
+    for ( var i = 0; i < ndraws; ++i ) {
+        var layerKid = layerKids[i];
+        assert.equal( layerKid.className, "Group", "Layer first level is a group for slice " + i + ".");
+        assert.equal( layerKid.attrs.name, "position-group", "Layer first level is a position group.");
+        assert.equal( layerKid.attrs.id, "slice-" + (i+1) + "_frame-0", "Position group has the proper id.");
+
+        // third level: shape group(s)
+        var posGroupKid = layerKid.children[0];
+        assert.equal( posGroupKid.className, "Group", "Position group first level is a group.");
+
+        dwv.utils.test.CheckRulerDrawing( posGroupKid, details, refRulers[i], assert );
+    }
 };
 
 /**
@@ -474,9 +571,9 @@ dwv.utils.test.CheckRectangleDrawing = function (posGroupKid, details, version, 
  * Tests for {@link dwv.State} v0.1 containing a line.
  * @function module:tests/state
  */
-/*QUnit.test("Test read v0.1 state: ruler.", function (assert) {
-    dwv.utils.test.TestState( "0.1", "ruler", assert );
-});*/
+QUnit.test("Test read v0.1 state: line.", function (assert) {
+    dwv.utils.test.TestState( "0.1", "line", assert );
+});
 
 /**
  * Tests for {@link dwv.State} v0.1 containing a roi.
@@ -508,6 +605,14 @@ QUnit.test("Test read v0.1 state: protractor.", function (assert) {
  */
 QUnit.test("Test read v0.1 state: rectangle.", function (assert) {
     dwv.utils.test.TestState( "0.1", "rectangle", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.1 containing a multi slice ruler.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.1 state: line multi-slice.", function (assert) {
+    dwv.utils.test.TestState( "0.1", "line_multi-slice", assert );
 });
 
 /**
@@ -567,6 +672,14 @@ QUnit.test("Test read v0.2 state: rectangle.", function (assert) {
 });
 
 /**
+ * Tests for {@link dwv.State} v0.2 containing a multi slice ruler.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.2 state: ruler multi-slice.", function (assert) {
+    dwv.utils.test.TestState( "0.2", "ruler_multi-slice", assert );
+});
+
+/**
  * Tests for {@link dwv.State} v0.3 containing an arrow.
  * @function module:tests/state
  */
@@ -620,4 +733,12 @@ QUnit.test("Test read v0.3 state: protractor.", function (assert) {
  */
 QUnit.test("Test read v0.3 state: rectangle.", function (assert) {
     dwv.utils.test.TestState( "0.3", "rectangle", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.3 containing a multi slice ruler.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.3 state: ruler multi-slice.", function (assert) {
+    dwv.utils.test.TestState( "0.3", "ruler_multi-slice", assert );
 });

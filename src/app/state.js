@@ -132,30 +132,31 @@ dwv.v02Tov03Drawings = function (drawings)
     for ( var k = 0, lenk = groupDrawings.length; k < lenk; ++k ) {
         // Iterate over each frame
         for( var f = 0, lenf = groupDrawings[k].length; f < lenf ; ++f ) {
-            // Create position-group set as visible and append it to drawLayer
-            parentGroup = new Konva.Group({
-                id: dwv.getDrawPositionGroupId(k,f),
-                name: "position-group",
-                visible: false
-            });
-
-            // Get all the shapes-groups in the position-group
             groupShapes = groupDrawings[k][f];
-            // Iterate over shapes-group
-            for( var g = 0, leng = groupShapes.length; g < leng; ++g ) {
-                // create the konva group
-                group = Konva.Node.create(groupShapes[g]);
-                // enforce draggable: only the shape was draggable in v0.2,
-                // now the whole group is.
-                group.draggable(true);
-                group.getChildren().forEach( function (gnode) {
-                    gnode.draggable(false);
+            if ( groupShapes.length !== 0 ) {
+                // Create position-group set as visible and append it to drawLayer
+                parentGroup = new Konva.Group({
+                    id: dwv.getDrawPositionGroupId(k,f),
+                    name: "position-group",
+                    visible: false
                 });
-                // add to position group
-                parentGroup.add(group);
+
+                // Iterate over shapes-group
+                for( var g = 0, leng = groupShapes.length; g < leng; ++g ) {
+                    // create the konva group
+                    group = Konva.Node.create(groupShapes[g]);
+                    // enforce draggable: only the shape was draggable in v0.2,
+                    // now the whole group is.
+                    group.draggable(true);
+                    group.getChildren().forEach( function (gnode) {
+                        gnode.draggable(false);
+                    });
+                    // add to position group
+                    parentGroup.add(group);
+                }
+                // add to layer
+                drawLayer.add(parentGroup);
             }
-            // add to layer
-            drawLayer.add(parentGroup);
         }
     }
 
@@ -187,6 +188,8 @@ dwv.v01Tov02DrawingsAndDetails = function (inputDrawings)
             for ( var g = 0, leng = drawGroups.length; g < leng; ++g ) {
                 // create konva group from input
                 drawGroup = Konva.Node.create( drawGroups[g] );
+                // force visible (not set in state)
+                drawGroup.visible( true );
                 // label position
                 var pos = {'x': 0, 'y': 0};
                 // update shape colour
@@ -194,6 +197,24 @@ dwv.v01Tov02DrawingsAndDetails = function (inputDrawings)
                     return node.name() === 'shape';
                 })[0];
                 kshape.stroke( dwv.getColourHex(kshape.stroke()) );
+                // special line case
+                if ( drawGroup.name() === "line-group" ) {
+                    // update name
+                    drawGroup.name( "ruler-group" );
+                    // add ticks
+                    var ktick0 = new Konva.Line( {
+                        points: [ kshape.points()[0], kshape.points()[1],
+                            kshape.points()[0], kshape.points()[1] ],
+                        name: "shape-tick0"
+                    });
+                    drawGroup.add(ktick0);
+                    var ktick1 = new Konva.Line( {
+                        points: [ kshape.points()[2], kshape.points()[3],
+                            kshape.points()[2], kshape.points()[3] ],
+                        name: "shape-tick1"
+                    });
+                    drawGroup.add(ktick1);
+                }
                 // get its text
                 var ktexts = drawGroup.getChildren( function (node) {
                     return node.name() === 'text';
