@@ -348,7 +348,11 @@ dwv.DrawController = function (drawDiv)
     this.updateDraw = function (drawDetails)
     {
         // get the group
-        var group = getDrawGroup(drawDetails.id);
+        var group = drawLayer.findOne( "#"+drawDetails.id );
+        if ( typeof group === "undefined" ) {
+            console.warn("[updateDraw] Cannot find group with id: "+drawDetails.id);
+            return;
+        }
         // shape
         var shapes = group.getChildren( isNodeNameShape );
         for (var i = 0; i < shapes.length; ++i ) {
@@ -382,7 +386,11 @@ dwv.DrawController = function (drawDiv)
      */
     this.isGroupVisible = function (drawDetails) {
         // get the group
-        var group = getDrawGroup(drawDetails.id);
+        var group = drawLayer.findOne( "#"+drawDetails.id );
+        if ( typeof group === "undefined" ) {
+            console.warn("[isGroupVisible] Cannot find node with id: "+drawDetails.id);
+            return false;
+        }
         // get visibility
         return group.isVisible();
     };
@@ -393,7 +401,11 @@ dwv.DrawController = function (drawDiv)
      */
     this.toogleGroupVisibility = function (drawDetails) {
         // get the group
-        var group = getDrawGroup(drawDetails.id);
+        var group = drawLayer.findOne( "#"+drawDetails.id );
+        if ( typeof group === "undefined" ) {
+            console.warn("[toogleGroupVisibility] Cannot find node with id: "+drawDetails.id);
+            return false;
+        }
         // toggle visible
         group.visible(!group.isVisible());
 
@@ -419,22 +431,6 @@ dwv.DrawController = function (drawDiv)
             exeCallback(delcmd);
         }
     };
-
-    /**
-     * Get a draw group.
-     * @param {Number} id The group id.
-     */
-    function getDrawGroup( id ) {
-        var collec = drawLayer.find("#"+id);
-
-        var res = null;
-        if (collec.length !== 0) {
-            res = collec[0];
-        } else {
-            console.warn("Could not find draw group for id='" + id + "'.");
-        }
-        return res;
-    }
 
     /**
      * Is an input node's name 'shape'.
