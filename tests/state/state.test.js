@@ -113,7 +113,7 @@ dwv.utils.test.CheckDrawings = function (drawings, details, version, type, asser
                 'points': [51,135,216,134],
                 'colour': "#ffff00",
                 'text': "165.0mm",
-                'textExpr': "165.0mm",
+                'textExpr': "{length}",
                 'longText': ""
             };
             dwv.utils.test.CheckRulerDrawing( posGroupKid, details, refLine, assert );
@@ -261,7 +261,7 @@ dwv.utils.test.CheckRulerDrawings = function (layerKids, details, version, asser
             'points': [120,110,120,60],
             'colour': "#ffff00",
             'text': "50.00mm",
-            'textExpr': ( version === "0.1" ? "50.00mm" : "{length}" ),
+            'textExpr': "{length}",
             'longText': ( version === "0.1" ? "" : "First ruler." )
         },
         {
@@ -269,7 +269,7 @@ dwv.utils.test.CheckRulerDrawings = function (layerKids, details, version, asser
             'points': [120,110,170,110],
             'colour': "#ff0000",
             'text': "50.00mm",
-            'textExpr': ( version === "0.1" ? "50.00mm" : "{length}" ),
+            'textExpr': "{length}",
             'longText': ( version === "0.1" ? "" : "Second ruler." )
         },
         {
@@ -277,7 +277,7 @@ dwv.utils.test.CheckRulerDrawings = function (layerKids, details, version, asser
             'points': [120,110,120,160],
             'colour': "#ffffff",
             'text': "50.00mm",
-            'textExpr': ( version === "0.1" ? "50.00mm" : "{length}" ),
+            'textExpr': "{length}",
             'longText': ( version === "0.1" ? "" : "Third ruler." )
         },
         {
@@ -285,7 +285,7 @@ dwv.utils.test.CheckRulerDrawings = function (layerKids, details, version, asser
             'points': [120,110,60,110],
             'colour': "#00ff00",
             'text': "50.00mm",
-            'textExpr': ( version === "0.1" ? "50.00mm" : "{length}" ),
+            'textExpr': "{length}",
             'longText': ( version === "0.1" ? "" : "Fourth ruler." )
         },
         {
@@ -293,7 +293,7 @@ dwv.utils.test.CheckRulerDrawings = function (layerKids, details, version, asser
             'points': [120,110,120,60],
             'colour': "#ff00ff",
             'text': "50.00mm",
-            'textExpr': ( version === "0.1" ? "50.00mm" : "{length}" ),
+            'textExpr': "{length}",
             'longText': ( version === "0.1" ? "" : "Fifth ruler." )
         }
     ];
