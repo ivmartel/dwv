@@ -19,7 +19,7 @@
   "drawings": [
     [
       {
-        "0": "{\"attrs\":{\"name\":\"rectangle-group\",\"id\":\"db0puu209qe\"},\"className\":\"Group\",\"children\":[{\"attrs\":{\"x\":80,\"y\":58,\"width\":104,\"height\":64,\"stroke\":\"Yellow\",\"strokeWidth\":0.9789674952198852,\"name\":\"shape\",\"draggable\":true},\"className\":\"Rect\"},{\"attrs\":{\"x\":79,\"y\":177,\"text\":\"66.56cm2\",\"fontSize\":5.873804971319312,\"fontFamily\":\"Verdana\",\"fill\":\"Yellow\",\"name\":\"text\",\"width\":\"auto\",\"height\":\"auto\"},\"className\":\"Text\"}]}",
+        "0": "{\"attrs\":{\"name\":\"rectangle-group\",\"id\":\"db0puu209qe\"},\"className\":\"Group\",\"children\":[{\"attrs\":{\"x\":80,\"y\":58,\"width\":104,\"height\":64,\"stroke\":\"Yellow\",\"strokeWidth\":0.9789674952198852,\"name\":\"shape\",\"draggable\":true},\"className\":\"Rect\"},{\"attrs\":{\"x\":80,\"y\":132,\"text\":\"66.56cm2\",\"fontSize\":5.873804971319312,\"fontFamily\":\"Verdana\",\"fill\":\"Yellow\",\"name\":\"text\",\"width\":\"auto\",\"height\":\"auto\"},\"className\":\"Text\"}]}",
         "length": 1
       }
     ]

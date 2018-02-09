@@ -19,7 +19,7 @@
   "drawings": [
     [
       {
-        "0": "{\"attrs\":{\"name\":\"ellipse-group\",\"id\":\"c6j16qt6vt6\"},\"className\":\"Group\",\"children\":[{\"attrs\":{\"x\":90,\"y\":78,\"radiusX\":53,\"radiusY\":32,\"stroke\":\"Yellow\",\"strokeWidth\":0.9789674952198852,\"name\":\"shape\",\"draggable\":true},\"className\":\"Ellipse\"},{\"attrs\":{\"x\":59,\"y\":92,\"text\":\"53.28cm2\",\"fontSize\":5.873804971319312,\"fontFamily\":\"Verdana\",\"fill\":\"Yellow\",\"name\":\"text\",\"width\":\"auto\",\"height\":\"auto\"},\"className\":\"Text\"}]}",
+        "0": "{\"attrs\":{\"name\":\"ellipse-group\",\"id\":\"c6j16qt6vt6\"},\"className\":\"Group\",\"children\":[{\"attrs\":{\"x\":90,\"y\":78,\"radiusX\":53,\"radiusY\":32,\"stroke\":\"Yellow\",\"strokeWidth\":0.9789674952198852,\"name\":\"shape\",\"draggable\":true},\"className\":\"Ellipse\"},{\"attrs\":{\"x\":90,\"y\":78,\"text\":\"53.28cm2\",\"fontSize\":5.873804971319312,\"fontFamily\":\"Verdana\",\"fill\":\"Yellow\",\"name\":\"text\",\"width\":\"auto\",\"height\":\"auto\"},\"className\":\"Text\"}]}",
         "length": 1
       }
     ]
