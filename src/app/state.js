@@ -215,6 +215,13 @@ dwv.v01Tov02DrawingsAndDetails = function (inputDrawings)
                     });
                     drawGroup.add(ktick1);
                 }
+                // special protractor case: update arc name
+                var karcs = drawGroup.getChildren( function (node) {
+                    return node.name() === 'arc';
+                });
+                if ( karcs.length === 1 ) {
+                    karcs[0].name("shape-arc");
+                }
                 // get its text
                 var ktexts = drawGroup.getChildren( function (node) {
                     return node.name() === 'text';
@@ -252,10 +259,42 @@ dwv.v01Tov02DrawingsAndDetails = function (inputDrawings)
                 newFrameDrawings.push( JSON.stringify(drawGroup.toObject()) );
 
                 // create details (v0.3 format)
+                var textExpr = ktext.text();
+                var txtLen = textExpr.length;
+                var quant = null;
+                // adapt to text with flag
+                if ( drawGroup.name() === "ruler-group" ) {
+                    quant = {
+                        "length": {
+                            "value": parseFloat( textExpr.substr(0, txtLen-2) ),
+                            "unit": textExpr.substr(-2, 2)
+                        }
+                    };
+                    textExpr = "{length}";
+                } else if ( drawGroup.name() === "ellipse-group" ||
+                    drawGroup.name() === "rectangle-group" ) {
+                    quant = {
+                        "surface": {
+                            "value": parseFloat( textExpr.substr(0, txtLen-3) ),
+                            "unit": textExpr.substr(-3, 3)
+                        }
+                    };
+                    textExpr = "{surface}";
+                } else if ( drawGroup.name() === "protractor-group" ||
+                    drawGroup.name() === "rectangle-group" ) {
+                        quant = {
+                            "angle": {
+                                "value": parseFloat( textExpr.substr(0, txtLen-1) ),
+                                "unit": textExpr.substr(-1, 1)
+                            }
+                        };
+                        textExpr = "{angle}";
+                }
+                // set details
                 drawingsDetails[ drawGroup.id() ] = {
-                    "textExpr": ktext.text(),
+                    "textExpr": textExpr,
                     "longText": "",
-                    "quant": null
+                    "quant": quant
                 };
 
             }
