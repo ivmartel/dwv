@@ -1796,28 +1796,41 @@ dwv.DrawController = function (drawDiv)
         var stateLayer = Konva.Node.create(drawings);
 
         // get all position groups
-        var posGroups = stateLayer.getChildren( isPositionNode );
+        var statePosGroups = stateLayer.getChildren( isPositionNode );
 
-        var posKids;
-        var group;
-        for ( var i = 0, leni = posGroups.length; i < leni; ++i ) {
-            posKids = posGroups[i].getChildren();
-            for ( var j = 0, lenj = posKids.length; j < lenj; ++j ) {
+        for ( var i = 0, leni = statePosGroups.length; i < leni; ++i ) {
+            var statePosGroup = statePosGroups[i];
+
+            // Get or create position-group if it does not exist and append it to drawLayer
+            var posGroup = drawLayer.getChildren( isNodeWithId( statePosGroup.id() ) )[0];
+            if( typeof posGroup === "undefined" ) {
+                posGroup = new Konva.Group({
+                    'id': statePosGroup.id(),
+                    'name': "position-group",
+                    'visible': false
+                });
+                drawLayer.add(posGroup);
+            }
+
+            var statePosKids = statePosGroup.getChildren();
+            for ( var j = 0, lenj = statePosKids.length; j < lenj; ++j ) {
                 // shape group
-                group = posKids[j];
+                var stateGroup = statePosKids[j];
+                // add group to posGroup (switches its parent)
+                posGroup.add( stateGroup );
                 // shape
-                var shape = group.getChildren( isNodeNameShape )[0];
+                var shape = stateGroup.getChildren( isNodeNameShape )[0];
                 // create the draw command
                 var cmd = new dwv.tool.DrawGroupCommand(
-                    group, shape.className,
+                    stateGroup, shape.className,
                     drawLayer );
                 // draw command callbacks
                 cmd.onExecute = cmdCallback;
                 cmd.onUndo = cmdCallback;
                 // details
                 if (drawingsDetails) {
-                    var details = drawingsDetails[ group.id() ];
-                    var label = group.getChildren( isNodeNameLabel )[0];
+                    var details = drawingsDetails[ stateGroup.id() ];
+                    var label = stateGroup.getChildren( isNodeNameLabel )[0];
                     var text = label.getText();
                     // store details
                     text.textExpr = details.textExpr;
@@ -1831,9 +1844,6 @@ dwv.DrawController = function (drawDiv)
                 exeCallback(cmd);
             }
         }
-
-        // add kids to the main layer
-        stateLayer.getChildren().forEach( function (kid) { drawLayer.add( kid ); });
     };
 
     /**
@@ -1843,7 +1853,11 @@ dwv.DrawController = function (drawDiv)
     this.updateDraw = function (drawDetails)
     {
         // get the group
-        var group = getDrawGroup(drawDetails.id);
+        var group = drawLayer.findOne( "#"+drawDetails.id );
+        if ( typeof group === "undefined" ) {
+            console.warn("[updateDraw] Cannot find group with id: "+drawDetails.id);
+            return;
+        }
         // shape
         var shapes = group.getChildren( isNodeNameShape );
         for (var i = 0; i < shapes.length; ++i ) {
@@ -1877,7 +1891,11 @@ dwv.DrawController = function (drawDiv)
      */
     this.isGroupVisible = function (drawDetails) {
         // get the group
-        var group = getDrawGroup(drawDetails.id);
+        var group = drawLayer.findOne( "#"+drawDetails.id );
+        if ( typeof group === "undefined" ) {
+            console.warn("[isGroupVisible] Cannot find node with id: "+drawDetails.id);
+            return false;
+        }
         // get visibility
         return group.isVisible();
     };
@@ -1888,7 +1906,11 @@ dwv.DrawController = function (drawDiv)
      */
     this.toogleGroupVisibility = function (drawDetails) {
         // get the group
-        var group = getDrawGroup(drawDetails.id);
+        var group = drawLayer.findOne( "#"+drawDetails.id );
+        if ( typeof group === "undefined" ) {
+            console.warn("[toogleGroupVisibility] Cannot find node with id: "+drawDetails.id);
+            return false;
+        }
         // toggle visible
         group.visible(!group.isVisible());
 
@@ -1914,22 +1936,6 @@ dwv.DrawController = function (drawDiv)
             exeCallback(delcmd);
         }
     };
-
-    /**
-     * Get a draw group.
-     * @param {Number} id The group id.
-     */
-    function getDrawGroup( id ) {
-        var collec = drawLayer.find("#"+id);
-
-        var res = null;
-        if (collec.length !== 0) {
-            res = collec[0];
-        } else {
-            console.warn("Could not find draw group for id='" + id + "'.");
-        }
-        return res;
-    }
 
     /**
      * Is an input node's name 'shape'.
@@ -1962,6 +1968,19 @@ dwv.DrawController = function (drawDiv)
     function isPositionNode( node ) {
         return node.name() === 'position-group';
     }
+
+    /**
+     * Get a lambda to check a node's id.
+     * @param {String} id The id to check.
+     * @return A function to check a node's id.
+     */
+    function isNodeWithId( id ) {
+        return function (node) {
+            return node.id() === id;
+        };
+    }
+
+
 
 }; // class dwv.DrawController
 
