@@ -140,6 +140,12 @@ dwv.App = function ()
     this.getViewController = function () { return viewController; };
 
     /**
+     * Get the draw controller.
+     * @return {Object} The controller.
+     */
+    this.getDrawController = function () { return drawController; };
+
+    /**
      * Get the image layer.
      * @return {Object} The image layer.
      */

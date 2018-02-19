@@ -223,16 +223,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     };
 
     /**
-     * Get the current position draw group id.
-     * @return {Number} The group id.
-     */
-    var getDrawCurrentPositionGroupId = function () {
-        var currentSlice = app.getViewController().getCurrentPosition().k;
-        var currentFrame = app.getViewController().getCurrentFrame();
-        return dwv.getDrawPositionGroupId(currentSlice, currentFrame);
-    };
-
-    /**
      * Handle mouse up event.
      * @param {Object} event The mouse up event.
      */
@@ -248,23 +238,9 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             var group = factory.create(points, self.style, app.getImage());
             group.id( dwv.math.guid() );
 
-            // get position groups
-            var posGroupId = getDrawCurrentPositionGroupId();
-            var posGroups = drawLayer.getChildren( function (node) {
-                return node.id() === posGroupId;
-            });
-            // if one group, use it
-            // if no group, create one
-            var posGroup = null;
-            if ( posGroups.length === 1 ) {
-                posGroup = posGroups[0];
-            } else if ( posGroups.length === 0 ) {
-                posGroup = new Konva.Group();
-                posGroup.name("position-group");
-                posGroup.id(posGroupId);
-                posGroup.visible(true); // dont inherit
-            }
-            // add group to slice group
+            // get the position group
+            var posGroup = app.getDrawController().getCurrentPosGroup();
+            // add shape group to position group
             posGroup.add(group);
 
             // re-activate layer
@@ -381,7 +357,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         drawLayer.hitGraphEnabled( visible );
 
         // get shape groups at the current position
-        var posGroupId = getDrawCurrentPositionGroupId();
+        var posGroupId = app.getDrawController().getCurrentPosGroupId();
         var shapeGroups = dwv.getDrawShapeGroupsAtPosition(posGroupId, drawLayer);
 
         // set shape display properties

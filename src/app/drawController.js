@@ -11,6 +11,11 @@ dwv.getDrawPositionGroupId = function (sliceNumber, frameNumber) {
     return "slice-"+sliceNumber+"_frame-"+frameNumber;
 };
 
+/**
+ * Get the slice and frame position from a group id.
+ * @param {String} groupId The group id.
+ * @return {Object} The slice and frame number.
+ */
 dwv.getPositionFromGroupId = function (groupId) {
     var sepIndex = groupId.indexOf("_");
     if (sepIndex === -1) {
@@ -55,10 +60,42 @@ dwv.DrawController = function (drawDiv)
     // Draw layer
     var drawLayer;
 
-    // current slice position
-    var currentSlice = 0;
-    // current frame position
-    var currentFrame = 0;
+    // current position group id
+    var currentPosGroupId = null;
+
+    /**
+     * Get the current position group id.
+     * @return {String} The id.
+     */
+    this.getCurrentPosGroupId = function () {
+        return currentPosGroupId;
+    };
+
+    /**
+     * Get the current position group.
+     * @return {Object} The Konva.Group.
+     */
+    this.getCurrentPosGroup = function () {
+        // get position groups
+        var posGroups = drawLayer.getChildren( function (node) {
+            return node.id() === currentPosGroupId;
+        });
+        // if one group, use it
+        // if no group, create one
+        var posGroup = null;
+        if ( posGroups.length === 1 ) {
+            posGroup = posGroups[0];
+        } else if ( posGroups.length === 0 ) {
+            posGroup = new Konva.Group();
+            posGroup.name("position-group");
+            posGroup.id(currentPosGroupId);
+            posGroup.visible(true); // dont inherit
+        } else {
+            console.warn("Unexpected number of draw position groups.");
+        }
+        // return
+        return posGroup;
+    };
 
     /**
      * Create the controller: sets up the draw stage.
@@ -115,17 +152,18 @@ dwv.DrawController = function (drawDiv)
     this.activateDrawLayer = function (viewController)
     {
         // set current position
-        currentSlice = viewController.getCurrentPosition().k;
-        currentFrame = viewController.getCurrentFrame();
+        var currentSlice = viewController.getCurrentPosition().k;
+        var currentFrame = viewController.getCurrentFrame();
+        // get and store the position group id
+        currentPosGroupId = dwv.getDrawPositionGroupId(currentSlice,currentFrame);
 
         // get all position groups
         var posGroups = drawLayer.getChildren( isPositionNode );
-
+        // reset or set the visible property
         var visible;
-        var posGroupId = dwv.getDrawPositionGroupId(currentSlice,currentFrame);
         for ( var i = 0, leni = posGroups.length; i < leni; ++i ) {
             visible = false;
-            if ( posGroups[i].id() === posGroupId ) {
+            if ( posGroups[i].id() === currentPosGroupId ) {
                 visible = true;
             }
             // group members inherit the visible property
