@@ -1548,6 +1548,24 @@ dwv.getDrawShapeGroupsAtPosition = function (positionGroupId, drawLayer) {
 };
 
 /**
+ * Debug function to output the layer hierarchy as text.
+ * @param {Object} layer The Konva layer.
+ * @param {String} prefix A display prefix (used in recursion).
+ * @return {String} A text representation of the hierarchy.
+ */
+dwv.getHierarchyLog = function (layer, prefix) {
+    if ( typeof prefix === "undefined" ) {
+        prefix = "";
+    }
+    var kids = layer.getChildren();
+    var log = prefix + "|__ " + layer.name() + ": " + layer.id() + "\n";
+    for ( var i = 0; i < kids.length; ++i ) {
+        log += dwv.getHierarchyLog( kids[i], prefix + "    ");
+    }
+    return log;
+};
+
+/**
  * Draw controller.
  * @constructor
  * @param {Object} drawDiv The HTML div used to store the drawings.
@@ -1591,6 +1609,8 @@ dwv.DrawController = function (drawDiv)
             posGroup.name("position-group");
             posGroup.id(currentPosGroupId);
             posGroup.visible(true); // dont inherit
+            // add new group to layer
+            drawLayer.add(posGroup);
         } else {
             console.warn("Unexpected number of draw position groups.");
         }
@@ -20868,13 +20888,12 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         shape.on('dblclick', function () {
 
             // get the label object for this shape
-            var group = this.getParent();
-            var labels = group.find('Label');
+            var label = this.findOne('Label');
             // should just be one
-            if (labels.length !== 1) {
+            if ( typeof label === "undefined" ) {
                 throw new Error("Could not find the shape label.");
             }
-            var ktext = labels[0].getText();
+            var ktext = label.getText();
 
             // ask user for new label
             var labelText = dwv.gui.prompt("Shape label", ktext.textExpr);
@@ -21083,8 +21102,6 @@ dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
     this.execute = function () {
         // add the group to the parent (in case of undo/redo)
         parent.add(group);
-        // add parent to layer (if first draw)
-        layer.add(parent);
         // draw
         layer.draw();
         // callback
@@ -22588,6 +22605,12 @@ dwv.tool.Floodfill = function(app)
             var factory = new dwv.tool.RoiFactory();
             shapeGroup = factory.create(border, self.style);
             shapeGroup.id( dwv.math.guid() );
+
+            // get the position group
+            var posGroup = app.getDrawController().getCurrentPosGroup();
+            // add shape group to position group
+            posGroup.add(shapeGroup);
+
             // draw shape command
             command = new dwv.tool.DrawGroupCommand(shapeGroup, "floodfill", app.getCurrentDrawLayer());
             command.onExecute = fireEvent;
@@ -23202,6 +23225,12 @@ dwv.tool.Livewire = function(app)
         var factory = new dwv.tool.RoiFactory();
         shapeGroup = factory.create(currentPath.pointArray, self.style);
         shapeGroup.id( dwv.math.guid() );
+
+        // get the position group
+        var posGroup = app.getDrawController().getCurrentPosGroup();
+        // add shape group to position group
+        posGroup.add(shapeGroup);
+
         // draw shape command
         command = new dwv.tool.DrawGroupCommand(shapeGroup, "livewire", app.getCurrentDrawLayer());
         // draw
