@@ -47,6 +47,24 @@ dwv.getDrawShapeGroupsAtPosition = function (positionGroupId, drawLayer) {
 };
 
 /**
+ * Debug function to output the layer hierarchy as text.
+ * @param {Object} layer The Konva layer.
+ * @param {String} prefix A display prefix (used in recursion).
+ * @return {String} A text representation of the hierarchy.
+ */
+dwv.getHierarchyLog = function (layer, prefix) {
+    if ( typeof prefix === "undefined" ) {
+        prefix = "";
+    }
+    var kids = layer.getChildren();
+    var log = prefix + "|__ " + layer.name() + ": " + layer.id() + "\n";
+    for ( var i = 0; i < kids.length; ++i ) {
+        log += dwv.getHierarchyLog( kids[i], prefix + "    ");
+    }
+    return log;
+};
+
+/**
  * Draw controller.
  * @constructor
  * @param {Object} drawDiv The HTML div used to store the drawings.
