@@ -90,6 +90,8 @@ dwv.DrawController = function (drawDiv)
             posGroup.name("position-group");
             posGroup.id(currentPosGroupId);
             posGroup.visible(true); // dont inherit
+            // add new group to layer
+            drawLayer.add(posGroup);
         } else {
             console.warn("Unexpected number of draw position groups.");
         }

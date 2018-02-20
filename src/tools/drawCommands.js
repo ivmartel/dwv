@@ -61,8 +61,6 @@ dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
     this.execute = function () {
         // add the group to the parent (in case of undo/redo)
         parent.add(group);
-        // add parent to layer (if first draw)
-        layer.add(parent);
         // draw
         layer.draw();
         // callback
