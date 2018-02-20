@@ -199,6 +199,12 @@ dwv.tool.Floodfill = function(app)
             var factory = new dwv.tool.RoiFactory();
             shapeGroup = factory.create(border, self.style);
             shapeGroup.id( dwv.math.guid() );
+
+            // get the position group
+            var posGroup = app.getDrawController().getCurrentPosGroup();
+            // add shape group to position group
+            posGroup.add(shapeGroup);
+
             // draw shape command
             command = new dwv.tool.DrawGroupCommand(shapeGroup, "floodfill", app.getCurrentDrawLayer());
             command.onExecute = fireEvent;
