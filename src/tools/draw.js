@@ -530,13 +530,12 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         shape.on('dblclick', function () {
 
             // get the label object for this shape
-            var group = this.getParent();
-            var labels = group.find('Label');
+            var label = this.findOne('Label');
             // should just be one
-            if (labels.length !== 1) {
+            if ( typeof label === "undefined" ) {
                 throw new Error("Could not find the shape label.");
             }
-            var ktext = labels[0].getText();
+            var ktext = label.getText();
 
             // ask user for new label
             var labelText = dwv.gui.prompt("Shape label", ktext.textExpr);
