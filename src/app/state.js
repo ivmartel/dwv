@@ -38,7 +38,7 @@ dwv.State = function ()
             "scale": app.getScale(),
             "scaleCenter": app.getScaleCenter(),
             "translation": app.getTranslation(),
-            "drawings": app.getDraws().toObject(),
+            "drawings": app.getDrawController().getDrawLayer().toObject(),
             "drawingsDetails": app.getDrawStoreDetails()
         } );
     };
@@ -136,7 +136,7 @@ dwv.v02Tov03Drawings = function (drawings)
             if ( groupShapes.length !== 0 ) {
                 // Create position-group set as visible and append it to drawLayer
                 parentGroup = new Konva.Group({
-                    id: dwv.getDrawPositionGroupId(k,f),
+                    id: dwv.draw.getDrawPositionGroupId(k,f),
                     name: "position-group",
                     visible: false
                 });

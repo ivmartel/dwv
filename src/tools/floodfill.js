@@ -206,7 +206,8 @@ dwv.tool.Floodfill = function(app)
             posGroup.add(shapeGroup);
 
             // draw shape command
-            command = new dwv.tool.DrawGroupCommand(shapeGroup, "floodfill", app.getCurrentDrawLayer());
+            command = new dwv.tool.DrawGroupCommand(shapeGroup, "floodfill",
+                app.getDrawController().getDrawLayer());
             command.onExecute = fireEvent;
             command.onUndo = fireEvent;
             // // draw

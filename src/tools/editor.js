@@ -195,9 +195,7 @@ dwv.tool.ShapeEditor = function (app)
                 var p1y = points[3] + shape.y();
                 addAnchor(group, p0x, p0y, 'begin');
                 if ( points.length === 4 ) {
-                    var shapekids = group.getChildren( function ( node ) {
-                        return node.name().startsWith("shape-");
-                    });
+                    var shapekids = group.getChildren( dwv.draw.isNodeNameShapeExtra );
                     if (shapekids.length === 2) {
                         updateFunction = dwv.tool.UpdateRuler;
                     } else {

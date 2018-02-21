@@ -150,13 +150,7 @@ dwv.App = function ()
      * @return {Object} The image layer.
      */
     this.getImageLayer = function () { return imageLayer; };
-    /**
-     * Get the current draw layer.
-     * @return {Object} The draw layer.
-     */
-    this.getCurrentDrawLayer = function () {
-        return drawController.getCurrentDrawLayer();
-    };
+
     /**
      * Get the draw stage.
      * @return {Object} The draw stage.
@@ -794,14 +788,7 @@ dwv.App = function ()
     {
         return drawController.getDrawDisplayDetails();
     };
-    /**
-     * Get the list of drawings.
-     * @return {Object} The list of drawings.
-     */
-    this.getDraws = function ()
-    {
-        return drawController.getDraws();
-    };
+
     /**
      * Get a list of drawing store details.
      * @return {Object} A list of draw details including id, text, quant...
