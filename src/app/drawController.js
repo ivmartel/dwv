@@ -26,27 +26,6 @@ dwv.getPositionFromGroupId = function (groupId) {
 };
 
 /**
- * Get the collection of shape groups for a given position id.
- * @param {String} positionGroupId The position group id.
- * @param {Object} drawLayer The Konva.Layer ot search.
- * @return {Object} A Konva.Collection of shapes.
- */
-dwv.getDrawShapeGroupsAtPosition = function (positionGroupId, drawLayer) {
-    var posGroups = drawLayer.getChildren( function (node) {
-        return node.id() === positionGroupId;
-    });
-    // if one group, use it
-    // if more than one group, send warning
-    var shapeGroups = [];
-    if ( posGroups.length === 1 ) {
-        shapeGroups = posGroups[0].getChildren();
-    } else if ( posGroups.length !== 0 ) {
-        console.warn("More than one position group found: "+posGroups.length, posGroups);
-    }
-    return shapeGroups;
-};
-
-/**
  * Debug function to output the layer hierarchy as text.
  * @param {Object} layer The Konva layer.
  * @param {String} prefix A display prefix (used in recursion).

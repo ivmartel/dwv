@@ -357,8 +357,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         drawLayer.hitGraphEnabled( visible );
 
         // get shape groups at the current position
-        var posGroupId = app.getDrawController().getCurrentPosGroupId();
-        var shapeGroups = dwv.getDrawShapeGroupsAtPosition(posGroupId, drawLayer);
+        var shapeGroups = app.getDrawController().getCurrentPosGroup().getChildren();
 
         // set shape display properties
         if ( visible ) {
