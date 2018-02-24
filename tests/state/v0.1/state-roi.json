@@ -1,0 +1,27 @@
+{
+  "version": "0.1",
+  "window-center": 441,
+  "window-width": 911,
+  "position": {
+    "i": 0,
+    "j": 0,
+    "k": 0
+  },
+  "scale": 1,
+  "scaleCenter": {
+    "x": 0,
+    "y": 0
+  },
+  "translation": {
+    "x": 0,
+    "y": 0
+  },
+  "drawings": [
+    [
+      {
+        "0": "{\"attrs\":{\"name\":\"roi-group\",\"id\":\"4l24ofouhmf\"},\"className\":\"Group\",\"children\":[{\"attrs\":{\"points\":[126,40,58,80,60,116,92,128,93,143,93,151,94,151,114,150,128,150,214,135,183,56,182,56,182,56],\"stroke\":\"Yellow\",\"strokeWidth\":0.9789674952198852,\"name\":\"shape\",\"closed\":true,\"draggable\":true},\"className\":\"Line\"}]}",
+        "length": 1
+      }
+    ]
+  ]
+}

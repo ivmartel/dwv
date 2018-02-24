@@ -212,8 +212,15 @@ dwv.tool.Livewire = function(app)
         var factory = new dwv.tool.RoiFactory();
         shapeGroup = factory.create(currentPath.pointArray, self.style);
         shapeGroup.id( dwv.math.guid() );
+
+        // get the position group
+        var posGroup = app.getDrawController().getCurrentPosGroup();
+        // add shape group to position group
+        posGroup.add(shapeGroup);
+
         // draw shape command
-        command = new dwv.tool.DrawGroupCommand(shapeGroup, "livewire", app.getCurrentDrawLayer());
+        command = new dwv.tool.DrawGroupCommand(shapeGroup, "livewire",
+            app.getDrawController().getDrawLayer());
         // draw
         command.execute();
     };

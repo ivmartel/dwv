@@ -1,0 +1,27 @@
+{
+  "version": "0.1",
+  "window-center": 441,
+  "window-width": 911,
+  "position": {
+    "i": 0,
+    "j": 0,
+    "k": 0
+  },
+  "scale": 1,
+  "scaleCenter": {
+    "x": 0,
+    "y": 0
+  },
+  "translation": {
+    "x": 0,
+    "y": 0
+  },
+  "drawings": [
+    [
+      {
+        "0": "{\"attrs\":{\"name\":\"rectangle-group\",\"id\":\"db0puu209qe\"},\"className\":\"Group\",\"children\":[{\"attrs\":{\"x\":80,\"y\":58,\"width\":104,\"height\":64,\"stroke\":\"Yellow\",\"strokeWidth\":0.9789674952198852,\"name\":\"shape\",\"draggable\":true},\"className\":\"Rect\"},{\"attrs\":{\"x\":80,\"y\":132,\"text\":\"66.56cm2\",\"fontSize\":5.873804971319312,\"fontFamily\":\"Verdana\",\"fill\":\"Yellow\",\"name\":\"text\",\"width\":\"auto\",\"height\":\"auto\"},\"className\":\"Text\"}]}",
+        "length": 1
+      }
+    ]
+  ]
+}

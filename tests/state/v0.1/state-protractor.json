@@ -1,0 +1,27 @@
+{
+  "version": "0.1",
+  "window-center": 441,
+  "window-width": 911,
+  "position": {
+    "i": 0,
+    "j": 0,
+    "k": 0
+  },
+  "scale": 1,
+  "scaleCenter": {
+    "x": 0,
+    "y": 0
+  },
+  "translation": {
+    "x": 0,
+    "y": 0
+  },
+  "drawings": [
+    [
+      {
+        "0": "{\"attrs\":{\"name\":\"protractor-group\",\"id\":\"49g7kqi3p4u\"},\"className\":\"Group\",\"children\":[{\"attrs\":{\"points\":[33,164,81,145,93,198],\"stroke\":\"Yellow\",\"strokeWidth\":0.9789674952198852,\"name\":\"shape\",\"draggable\":true},\"className\":\"Line\"},{\"attrs\":{\"x\":72,\"y\":147.5,\"text\":\"80.15°\",\"fontSize\":5.873804971319312,\"fontFamily\":\"Verdana\",\"fill\":\"Yellow\",\"name\":\"text\",\"width\":\"auto\",\"height\":\"auto\"},\"className\":\"Text\"},{\"attrs\":{\"innerRadius\":17.112857451704066,\"outerRadius\":17.112857451704066,\"stroke\":\"Yellow\",\"strokeWidth\":0.9789674952198852,\"angle\":80.14855270325586,\"rotation\":-282.75753216087674,\"x\":81,\"y\":145,\"name\":\"arc\"},\"className\":\"Arc\"}]}",
+        "length": 1
+      }
+    ]
+  ]
+}

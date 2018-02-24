@@ -195,9 +195,7 @@ dwv.tool.ShapeEditor = function (app)
                 var p1y = points[3] + shape.y();
                 addAnchor(group, p0x, p0y, 'begin');
                 if ( points.length === 4 ) {
-                    var shapekids = group.getChildren( function ( node ) {
-                        return node.name().startsWith("shape-");
-                    });
+                    var shapekids = group.getChildren( dwv.draw.isNodeNameShapeExtra );
                     if (shapekids.length === 2) {
                         updateFunction = dwv.tool.UpdateRuler;
                     } else {
@@ -246,7 +244,8 @@ dwv.tool.ShapeEditor = function (app)
             addAnchor(group, ellipseX-radius.x, ellipseY+radius.y, 'bottomLeft');
         }
         // add group to layer
-        shape.getLayer().add( group );
+        //shape.getLayer().add( group );
+        //shape.getParent().add( group );
     }
 
     /**
@@ -315,11 +314,13 @@ dwv.tool.ShapeEditor = function (app)
         var shapeDisplayName = dwv.tool.GetShapeDisplayName(shape);
 
         // drag start listener
-        anchor.on('dragstart', function () {
+        anchor.on('dragstart.edit', function (evt) {
             startAnchor = getClone(this);
+            // prevent bubbling upwards
+            evt.cancelBubble = true;
         });
         // drag move listener
-        anchor.on('dragmove', function () {
+        anchor.on('dragmove.edit', function (evt) {
             if ( updateFunction ) {
                 updateFunction(this, image);
             }
@@ -329,9 +330,11 @@ dwv.tool.ShapeEditor = function (app)
             else {
                 console.warn("No layer to draw the anchor!");
             }
+            // prevent bubbling upwards
+            evt.cancelBubble = true;
         });
         // drag end listener
-        anchor.on('dragend', function () {
+        anchor.on('dragend.edit', function (evt) {
             var endAnchor = getClone(this);
             // store the change command
             var chgcmd = new dwv.tool.ChangeGroupCommand(
@@ -342,14 +345,16 @@ dwv.tool.ShapeEditor = function (app)
             app.addToUndoStack(chgcmd);
             // reset start anchor
             startAnchor = endAnchor;
+            // prevent bubbling upwards
+            evt.cancelBubble = true;
         });
         // mouse down listener
         anchor.on('mousedown touchstart', function () {
             this.moveToTop();
         });
         // mouse over styling
-        anchor.on('mouseover', function () {
-            document.body.style.cursor = 'pointer';
+        anchor.on('mouseover.edit', function () {
+            // style is handled by the group
             this.stroke('#ddd');
             if ( this.getLayer() ) {
                 this.getLayer().draw();
@@ -359,8 +364,8 @@ dwv.tool.ShapeEditor = function (app)
             }
         });
         // mouse out styling
-        anchor.on('mouseout', function () {
-            document.body.style.cursor = 'default';
+        anchor.on('mouseout.edit', function () {
+            // style is handled by the group
             this.stroke('#999');
             if ( this.getLayer() ) {
                 this.getLayer().draw();
@@ -376,11 +381,11 @@ dwv.tool.ShapeEditor = function (app)
      * @param {Object} anchor The anchor to set off.
      */
     function setAnchorOff( anchor ) {
-        anchor.off('dragstart');
-        anchor.off('dragmove');
-        anchor.off('dragend');
+        anchor.off('dragstart.edit');
+        anchor.off('dragmove.edit');
+        anchor.off('dragend.edit');
         anchor.off('mousedown touchstart');
-        anchor.off('mouseover');
-        anchor.off('mouseout');
+        anchor.off('mouseover.edit');
+        anchor.off('mouseout.edit');
     }
 };

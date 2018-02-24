@@ -140,17 +140,17 @@ dwv.App = function ()
     this.getViewController = function () { return viewController; };
 
     /**
+     * Get the draw controller.
+     * @return {Object} The controller.
+     */
+    this.getDrawController = function () { return drawController; };
+
+    /**
      * Get the image layer.
      * @return {Object} The image layer.
      */
     this.getImageLayer = function () { return imageLayer; };
-    /**
-     * Get the current draw layer.
-     * @return {Object} The draw layer.
-     */
-    this.getCurrentDrawLayer = function () {
-        return drawController.getCurrentDrawLayer();
-    };
+
     /**
      * Get the draw stage.
      * @return {Object} The draw stage.
@@ -596,7 +596,7 @@ dwv.App = function ()
             if ( image ) {
                 view.append( data.view );
                 if ( drawController ) {
-                    drawController.appendDrawLayer(image.getNumberOfFrames());
+                    //drawController.appendDrawLayer(image.getNumberOfFrames());
                 }
             }
             postLoadInit(data);
@@ -632,8 +632,8 @@ dwv.App = function ()
         // set IO
         loader.onload = function (data) {
             // load state
-            var state = new dwv.State(self);
-            state.fromJSON(data);
+            var state = new dwv.State();
+            state.apply( self, state.fromJSON(data) );
         };
         loader.onerror = function (error) { handleError(error); };
         // main load (asynchronous)
@@ -788,14 +788,7 @@ dwv.App = function ()
     {
         return drawController.getDrawDisplayDetails();
     };
-    /**
-     * Get the list of drawings.
-     * @return {Object} The list of drawings.
-     */
-    this.getDraws = function ()
-    {
-        return drawController.getDraws();
-    };
+
     /**
      * Get a list of drawing store details.
      * @return {Object} A list of draw details including id, text, quant...
@@ -812,6 +805,7 @@ dwv.App = function ()
     this.setDrawings = function (drawings, drawingsDetails)
     {
         drawController.setDrawings(drawings, drawingsDetails, fireEvent, this.addToUndoStack);
+        drawController.activateDrawLayer(viewController);
     };
     /**
      * Update a drawing from its details.
@@ -1011,10 +1005,10 @@ dwv.App = function ()
      */
     this.onStateSave = function (/*event*/)
     {
-        var state = new dwv.State(self);
+        var state = new dwv.State();
         // add href to link (html5)
         var element = self.getElement("download-state");
-        element.href = "data:application/json," + state.toJSON();
+        element.href = "data:application/json," + state.toJSON(self);
     };
 
     /**
@@ -1394,7 +1388,7 @@ dwv.App = function ()
 
         // append draw layers (before initialising the toolbox)
         if ( drawController ) {
-            drawController.appendDrawLayer(image.getNumberOfFrames());
+            //drawController.appendDrawLayer(image.getNumberOfFrames());
         }
 
         // initialise the toolbox

@@ -1,0 +1,100 @@
+{
+  "version": "0.3",
+  "window-center": 441,
+  "window-width": 911,
+  "position": {
+    "i": 0,
+    "j": 0,
+    "k": 0
+  },
+  "scale": 1,
+  "scaleCenter": {
+    "x": 0,
+    "y": 0
+  },
+  "translation": {
+    "x": 0,
+    "y": 0
+  },
+  "drawings": {
+    "attrs": {
+      "listening": true,
+      "visible": true
+    },
+    "className": "Layer",
+    "children": [
+      {
+        "attrs": {
+          "name": "position-group",
+          "id": "slice-0_frame-0",
+          "visible": true
+        },
+        "className": "Group",
+        "children": [
+          {
+            "attrs": {
+              "name": "ellipse-group",
+              "visible": true,
+              "id": "c6j16qt6vt6",
+              "draggable": true
+            },
+            "className": "Group",
+            "children": [
+              {
+                "attrs": {
+                  "x": 90,
+                  "y": 78,
+                  "radiusX": 53,
+                  "radiusY": 32,
+                  "stroke": "#ffff80",
+                  "strokeWidth": 1.2610837438423645,
+                  "name": "shape"
+                },
+                "className": "Ellipse"
+              },
+              {
+                "attrs": {
+                  "x": 90,
+                  "y": 78,
+                  "name": "label"
+                },
+                "className": "Label",
+                "children": [
+                  {
+                    "attrs": {
+                      "fontSize": 7.566502463054187,
+                      "fontFamily": "Verdana",
+                      "fill": "#ffff80",
+                      "name": "text",
+                      "text": "53.28cm2"
+                    },
+                    "className": "Text"
+                  },
+                  {
+                    "attrs": {
+                      "width": 40.73088073730469,
+                      "height": 7.566502463054187
+                    },
+                    "className": "Tag"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "drawingsDetails": {
+    "c6j16qt6vt6": {
+      "textExpr": "{surface}",
+      "longText": "What a surface!",
+      "quant": {
+        "surface": {
+          "value": 53.281411404882896,
+          "unit": "cm2"
+        }
+      }
+    }
+  }
+}

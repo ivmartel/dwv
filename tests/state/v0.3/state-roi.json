@@ -1,0 +1,119 @@
+{
+  "version": "0.3",
+  "window-center": 441,
+  "window-width": 911,
+  "position": {
+    "i": 0,
+    "j": 0,
+    "k": 0
+  },
+  "scale": 1,
+  "scaleCenter": {
+    "x": 0,
+    "y": 0
+  },
+  "translation": {
+    "x": 0,
+    "y": 0
+  },
+  "drawings": {
+    "attrs": {
+      "listening": true,
+      "visible": true
+    },
+    "className": "Layer",
+    "children": [
+      {
+        "attrs": {
+          "name": "position-group",
+          "id": "slice-0_frame-0",
+          "visible": true
+        },
+        "className": "Group",
+        "children": [
+          {
+            "attrs": {
+              "name": "roi-group",
+              "visible": true,
+              "id": "4l24ofouhmf",
+              "draggable": true
+            },
+            "className": "Group",
+            "children": [
+              {
+                "attrs": {
+                  "points": [
+                    126,
+                    40,
+                    58,
+                    80,
+                    60,
+                    116,
+                    92,
+                    128,
+                    93,
+                    143,
+                    93,
+                    151,
+                    94,
+                    151,
+                    114,
+                    150,
+                    128,
+                    150,
+                    214,
+                    135,
+                    183,
+                    56,
+                    182,
+                    56,
+                    182,
+                    56
+                  ],
+                  "stroke": "#ffff80",
+                  "strokeWidth": 1.2610837438423645,
+                  "name": "shape",
+                  "closed": true
+                },
+                "className": "Line"
+              },
+              {
+                "attrs": {
+                  "x": 126,
+                  "y": 50,
+                  "name": "label"
+                },
+                "className": "Label",
+                "children": [
+                  {
+                    "attrs": {
+                      "fontSize": 7.566502463054187,
+                      "fontFamily": "Verdana",
+                      "fill": "#ffff80",
+                      "name": "text",
+                      "text": "Brain"
+                    },
+                    "className": "Text"
+                  },
+                  {
+                    "attrs": {
+                      "height": 7.566502463054187
+                    },
+                    "className": "Tag"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "drawingsDetails": {
+    "4l24ofouhmf": {
+      "textExpr": "Brain",
+      "longText": "This is a squary brain!",
+      "quant": null
+    }
+  }
+}

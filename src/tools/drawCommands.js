@@ -47,6 +47,9 @@ dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
 {
     var isSilent = (typeof silent === "undefined") ? false : true;
 
+    // group parent
+    var parent = group.getParent();
+
     /**
      * Get the command name.
      * @return {String} The command name.
@@ -56,8 +59,8 @@ dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
      * Execute the command.
      */
     this.execute = function () {
-        // add the group to the layer
-        layer.add(group);
+        // add the group to the parent (in case of undo/redo)
+        parent.add(group);
         // draw
         layer.draw();
         // callback
@@ -115,11 +118,8 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
      * Execute the command.
      */
     this.execute = function () {
-        // translate all children of group
-        group.getChildren().each( function (shape) {
-            shape.x( shape.x() + translation.x );
-            shape.y( shape.y() + translation.y );
-        });
+        // translate group
+        group.move(translation);
         // draw
         layer.draw();
         // callback
@@ -129,11 +129,9 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
      * Undo the command.
      */
     this.undo = function () {
-        // invert translate all children of group
-        group.getChildren().each( function (shape) {
-            shape.x( shape.x() - translation.x );
-            shape.y( shape.y() - translation.y );
-        });
+        // invert translate group
+        var minusTrans = { 'x': -translation.x, 'y': -translation.y};
+        group.move(minusTrans);
         // draw
         layer.draw();
         // callback
@@ -226,6 +224,9 @@ dwv.tool.ChangeGroupCommand.prototype.onUndo = function (/*event*/)
  */
 dwv.tool.DeleteGroupCommand = function (group, name, layer)
 {
+    // group parent
+    var parent = group.getParent();
+
     /**
      * Get the command name.
      * @return {String} The command name.
@@ -235,7 +236,7 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
      * Execute the command.
      */
     this.execute = function () {
-        // remove the group from the parent layer
+        // remove the group from its parent
         group.remove();
         // draw
         layer.draw();
@@ -246,8 +247,8 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
      * Undo the command.
      */
     this.undo = function () {
-        // add the group to the layer
-        layer.add(group);
+        // add the group to its parent
+        parent.add(group);
         // draw
         layer.draw();
         // callback

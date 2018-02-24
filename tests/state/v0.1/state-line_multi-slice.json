@@ -1,0 +1,56 @@
+{
+  "version": "0.1",
+  "window-center": 441,
+  "window-width": 911,
+  "position": {
+    "i": 0,
+    "j": 0,
+    "k": 0
+  },
+  "scale": 1,
+  "scaleCenter": {
+    "x": 0,
+    "y": 0
+  },
+  "translation": {
+    "x": 0,
+    "y": 0
+  },
+  "drawings": [
+    [
+      {
+        "length": 0
+      }
+    ],
+    [
+      {
+        "0": "{\"attrs\":{\"name\":\"line-group\",\"id\":\"onzlkbs8p\"},\"className\":\"Group\",\"children\":[{\"attrs\":{\"points\":[120,110,120,60],\"stroke\":\"Yellow\",\"strokeWidth\":1.4755043227665705,\"name\":\"shape\",\"draggable\":true},\"className\":\"Line\"},{\"attrs\":{\"x\":120,\"y\":45,\"text\":\"50.00mm\",\"fontSize\":8.853025936599424,\"fontFamily\":\"Verdana\",\"fill\":\"Yellow\",\"name\":\"text\",\"width\":\"auto\",\"height\":\"auto\"},\"className\":\"Text\"}]}",
+        "length": 1
+      }
+    ],
+    [
+      {
+        "0": "{\"attrs\":{\"name\":\"line-group\",\"id\":\"u9bvidgkjc9\"},\"className\":\"Group\",\"children\":[{\"attrs\":{\"points\":[120,110,170,110],\"stroke\":\"Red\",\"strokeWidth\":1.4755043227665705,\"name\":\"shape\"},\"className\":\"Line\"},{\"attrs\":{\"x\":155,\"y\":90,\"text\":\"50.00mm\",\"fontSize\":8.853025936599424,\"fontFamily\":\"Verdana\",\"fill\":\"Red\",\"name\":\"text\",\"width\":\"auto\",\"height\":\"auto\"},\"className\":\"Text\"}]}",
+        "length": 1
+      }
+    ],
+    [
+      {
+        "0": "{\"attrs\":{\"name\":\"line-group\",\"id\":\"c9abkegq62j\"},\"className\":\"Group\",\"children\":[{\"attrs\":{\"points\":[120,110,120,160],\"stroke\":\"White\",\"strokeWidth\":1.4755043227665705,\"name\":\"shape\"},\"className\":\"Line\"},{\"attrs\":{\"x\":120,\"y\":170,\"text\":\"50.00mm\",\"fontSize\":8.853025936599424,\"fontFamily\":\"Verdana\",\"fill\":\"White\",\"name\":\"text\",\"width\":\"auto\",\"height\":\"auto\"},\"className\":\"Text\"}]}",
+        "length": 1
+      }
+    ],
+    [
+      {
+        "0": "{\"attrs\":{\"name\":\"line-group\",\"id\":\"uiav43zjw1\"},\"className\":\"Group\",\"children\":[{\"attrs\":{\"points\":[120,110,60,110],\"stroke\":\"Lime\",\"strokeWidth\":1.4755043227665705,\"name\":\"shape\"},\"className\":\"Line\"},{\"attrs\":{\"x\":60,\"y\":120,\"text\":\"50.00mm\",\"fontSize\":8.853025936599424,\"fontFamily\":\"Verdana\",\"fill\":\"Lime\",\"name\":\"text\",\"width\":\"auto\",\"height\":\"auto\"},\"className\":\"Text\"}]}",
+        "length": 1
+      }
+    ],
+    [
+      {
+        "0": "{\"attrs\":{\"name\":\"line-group\",\"id\":\"26ir11b9ugl\"},\"className\":\"Group\",\"children\":[{\"attrs\":{\"points\":[120,110,120,60],\"stroke\":\"Fuchsia\",\"strokeWidth\":1.4755043227665705,\"name\":\"shape\"},\"className\":\"Line\"},{\"attrs\":{\"x\":120,\"y\":45,\"text\":\"50.00mm\",\"fontSize\":8.853025936599424,\"fontFamily\":\"Verdana\",\"fill\":\"Fuchsia\",\"name\":\"text\",\"width\":\"auto\",\"height\":\"auto\"},\"className\":\"Text\"}]}",
+        "length": 1
+      }
+    ]
+  ]
+}
