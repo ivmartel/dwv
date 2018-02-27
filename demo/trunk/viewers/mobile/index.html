@@ -8,7 +8,7 @@
 <meta name="description" content="DICOM Web Viewer (DWV) mobile version">
 <meta name="keywords" content="DICOM,HTML5,JavaScript,medical,imaging,DWV">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-<link type="text/css" rel="stylesheet" href="../../css/style.css" />
+<link type="text/css" rel="stylesheet" href="css/style.css" />
 <style type="text/css" >
 body { margin: 10px; padding: 0; }
 .layerContainer { margin: auto; text-align: center; }
@@ -16,8 +16,8 @@ body { margin: 10px; padding: 0; }
 .dropBox { margin: 20px auto; }
 .inline { display: inline-block !important; }
 </style>
-<link type="text/css" rel="stylesheet" href="../../ext/jquery-mobile/jquery.mobile-1.4.5.min.css" />
-<link type="text/css" rel="stylesheet" href="../../ext/nprogress/nprogress.css" />
+<link type="text/css" rel="stylesheet" href="ext/jquery-mobile/jquery.mobile-1.4.5.min.css" />
+<link type="text/css" rel="stylesheet" href="ext/nprogress/nprogress.css" />
 <style type="text/css" >
 .ui-popup .ui-controlgroup { background-color: #252525; }
 .colourLi > .ui-input-text { text-align: center; }
@@ -35,50 +35,50 @@ body { margin: 10px; padding: 0; }
 </style>
 <!-- mobile web app -->
 <meta name="mobile-web-app-capable" content="yes" />
-<link rel="shortcut icon" sizes="16x16" href="../../resources/icons/dwv-16.png" />
-<link rel="shortcut icon" sizes="60x60" href="../../resources/icons/dwv-60.png" />
-<link rel="shortcut icon" sizes="128x128" href="../../resources/icons/dwv-128.png" />
+<link rel="shortcut icon" sizes="16x16" href="resources/icons/dwv-16.png" />
+<link rel="shortcut icon" sizes="60x60" href="resources/icons/dwv-60.png" />
+<link rel="shortcut icon" sizes="128x128" href="resources/icons/dwv-128.png" />
 <!-- apple specific -->
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-<link rel="apple-touch-icon" sizes="16x16" href="../../resources/icons/dwv-16.png" />
-<link rel="apple-touch-icon" sizes="60x60" href="../../resources/icons/dwv-60.png" />
-<link rel="apple-touch-icon" sizes="128x128" href="../../resources/icons/dwv-128.png" />
+<link rel="apple-touch-icon" sizes="16x16" href="resources/icons/dwv-16.png" />
+<link rel="apple-touch-icon" sizes="60x60" href="resources/icons/dwv-60.png" />
+<link rel="apple-touch-icon" sizes="128x128" href="resources/icons/dwv-128.png" />
 <!-- Third party (dwv) -->
-<script type="text/javascript" src="../../ext/modernizr/modernizr.js"></script>
-<script type="text/javascript" src="../../ext/i18next/i18next.min.js"></script>
-<script type="text/javascript" src="../../ext/i18next/i18nextXHRBackend.min.js"></script>
-<script type="text/javascript" src="../../ext/i18next/i18nextBrowserLanguageDetector.min.js"></script>
-<script type="text/javascript" src="../../ext/konva/konva.min.js"></script>
-<script type="text/javascript" src="../../ext/magic-wand/magic-wand.js"></script>
-<script type="text/javascript" src="../../ext/jszip/jszip.min.js"></script>
+<script type="text/javascript" src="ext/modernizr/modernizr.js"></script>
+<script type="text/javascript" src="ext/i18next/i18next.min.js"></script>
+<script type="text/javascript" src="ext/i18next/i18nextXHRBackend.min.js"></script>
+<script type="text/javascript" src="ext/i18next/i18nextBrowserLanguageDetector.min.js"></script>
+<script type="text/javascript" src="ext/konva/konva.min.js"></script>
+<script type="text/javascript" src="ext/magic-wand/magic-wand.js"></script>
+<script type="text/javascript" src="ext/jszip/jszip.min.js"></script>
 <!-- Third party (viewer) -->
-<script type="text/javascript" src="../../ext/jquery/jquery-2.1.4.min.js"></script>
-<script type="text/javascript" src="../../ext/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
-<script type="text/javascript" src="../../ext/nprogress/nprogress.js"></script>
-<script type="text/javascript" src="../../ext/flot/jquery.flot.min.js"></script>
+<script type="text/javascript" src="ext/jquery/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="ext/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
+<script type="text/javascript" src="ext/nprogress/nprogress.js"></script>
+<script type="text/javascript" src="ext/flot/jquery.flot.min.js"></script>
 <!-- decoders -->
-<script type="text/javascript" src="../../decoders/pdfjs/jpx.js"></script>
-<script type="text/javascript" src="../../decoders/pdfjs/util.js"></script>
-<script type="text/javascript" src="../../decoders/pdfjs/arithmetic_decoder.js"></script>
-<script type="text/javascript" src="../../decoders/pdfjs/jpg.js"></script>
-<script type="text/javascript" src="../../decoders/rii-mango/lossless-min.js"></script>
+<script type="text/javascript" src="decoders/pdfjs/jpx.js"></script>
+<script type="text/javascript" src="decoders/pdfjs/util.js"></script>
+<script type="text/javascript" src="decoders/pdfjs/arithmetic_decoder.js"></script>
+<script type="text/javascript" src="decoders/pdfjs/jpg.js"></script>
+<script type="text/javascript" src="decoders/rii-mango/lossless-min.js"></script>
 <!-- Local -->
-<script type="text/javascript" src="../../dwv-0.23.0-beta.min.js"></script>
+<script type="text/javascript" src="ext/dwv/dwv-0.23.0-beta.min.js"></script>
 
 <!-- Google -->
 <script type="text/javascript" src="https://apis.google.com/js/client.js"></script>
 <script type="text/javascript" src="https://apis.google.com/js/api.js"></script>
-<script type="text/javascript" src="google.js"></script>
+<script type="text/javascript" src="src/google.js"></script>
 
 <!-- Dropbox -->
 <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js"
     id="dropboxjs" data-app-key="96u3396jtx3bwr8"></script>
-<script type="text/javascript" src="dropbox.js"></script>
+<script type="text/javascript" src="src/dropbox.js"></script>
 
 <!-- Launch the app -->
-<script type="text/javascript" src="appgui.js"></script>
-<script type="text/javascript" src="applauncher.js"></script>
+<script type="text/javascript" src="src/appgui.js"></script>
+<script type="text/javascript" src="src/applauncher.js"></script>
 </head>
 
 <body>
