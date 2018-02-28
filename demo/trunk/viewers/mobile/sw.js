@@ -97,7 +97,7 @@ self.addEventListener('fetch', function (event) {
         caches.match(event.request).then( function (response) {
             // Cache hit - return response
             if (response) {
-                console.log('Return form cache', event.request.url);
+                //console.log('Return form cache', event.request.url);
                 return response;
             }
             return fetch(event.request);
