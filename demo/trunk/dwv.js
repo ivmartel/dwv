@@ -136,6 +136,9 @@ dwv.App = function ()
     // listeners
     var listeners = {};
 
+    // help resources path
+    var helpResourcesPath = "./";
+
     /**
      * Get the image.
      * @return {Image} The associated image.
@@ -224,6 +227,14 @@ dwv.App = function ()
      * @return {Object} The app style.
      */
     this.getStyle = function () { return style; };
+
+    /**
+     * Get the help resources path.
+     * @return {String} The path.
+     */
+    this.getHelpResourcesPath = function () {
+        return helpResourcesPath;
+    };
 
     /**
      * Add a command to the undo stack.
@@ -356,6 +367,10 @@ dwv.App = function ()
                 var isMobile = true;
                 if ( config.isMobile !== "undefined" ) {
                     isMobile = config.isMobile;
+                }
+                // help resources path
+                if ( typeof config.helpResourcesPath !== "undefined" ) {
+                    helpResourcesPath = config.helpResourcesPath;
                 }
                 dwv.gui.appendHelpHtml( toolboxController.getToolList(), isMobile, this );
             }
@@ -10995,10 +11010,6 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
 
     var toolHelpDiv = document.createElement("div");
 
-    // current location
-    var loc = window.location.pathname;
-    var dir = loc.substring(0, loc.lastIndexOf('/'));
-
     var tool = null;
     var tkeys = Object.keys(toolList);
     for ( var t=0; t < tkeys.length; ++t )
@@ -11021,7 +11032,7 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
                 var action = tool.getHelp()[actionType][keys[i]];
 
                 var img = document.createElement("img");
-                img.src = dir + "/../../resources/help/"+keys[i]+".png";
+                img.src = app.getHelpResourcesPath() + "/" + keys[i] + ".png";
                 img.style.float = "left";
                 img.style.margin = "0px 15px 15px 0px";
 
