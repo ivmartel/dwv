@@ -18,7 +18,8 @@ function startApp() {
         "tools": ["Scroll", "WindowLevel", "ZoomAndPan", "Draw", "Livewire", "Filter", "Floodfill"],
         "filters": ["Threshold", "Sharpen", "Sobel"],
         "shapes": ["Arrow", "Ruler", "Protractor", "Rectangle", "Roi", "Ellipse", "FreeHand"],
-        "isMobile": false
+        "isMobile": false,
+        "helpResourcesPath": "../../resources/help"
     };
     if ( dwv.browser.hasInputDirectory() ) {
         options.loaders.splice(1, 0, "Folder");

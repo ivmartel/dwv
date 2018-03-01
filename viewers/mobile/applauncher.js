@@ -50,7 +50,8 @@ function startApp() {
         "tools": ["Scroll", "WindowLevel", "ZoomAndPan", "Draw", "Livewire", "Filter", "Floodfill"],
         "filters": ["Threshold", "Sharpen", "Sobel"],
         "shapes": ["Arrow", "Ruler", "Protractor", "Rectangle", "Roi", "Ellipse", "FreeHand"],
-        "isMobile": true
+        "isMobile": true,
+        "helpResourcesPath": "../../resources/help"
         //"defaultCharacterSet": "chinese"
     };
     if ( dwv.browser.hasInputDirectory() ) {

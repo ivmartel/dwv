@@ -29,10 +29,6 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
 
     var toolHelpDiv = document.createElement("div");
 
-    // current location
-    var loc = window.location.pathname;
-    var dir = loc.substring(0, loc.lastIndexOf('/'));
-
     var tool = null;
     var tkeys = Object.keys(toolList);
     for ( var t=0; t < tkeys.length; ++t )
@@ -55,7 +51,7 @@ dwv.gui.base.appendHelpHtml = function(toolList, mobile, app)
                 var action = tool.getHelp()[actionType][keys[i]];
 
                 var img = document.createElement("img");
-                img.src = dir + "/../../resources/help/"+keys[i]+".png";
+                img.src = app.getHelpResourcesPath() + "/" + keys[i] + ".png";
                 img.style.float = "left";
                 img.style.margin = "0px 15px 15px 0px";
 

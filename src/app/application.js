@@ -76,6 +76,9 @@ dwv.App = function ()
     // listeners
     var listeners = {};
 
+    // help resources path
+    var helpResourcesPath = "./";
+
     /**
      * Get the image.
      * @return {Image} The associated image.
@@ -164,6 +167,14 @@ dwv.App = function ()
      * @return {Object} The app style.
      */
     this.getStyle = function () { return style; };
+
+    /**
+     * Get the help resources path.
+     * @return {String} The path.
+     */
+    this.getHelpResourcesPath = function () {
+        return helpResourcesPath;
+    };
 
     /**
      * Add a command to the undo stack.
@@ -296,6 +307,10 @@ dwv.App = function ()
                 var isMobile = true;
                 if ( config.isMobile !== "undefined" ) {
                     isMobile = config.isMobile;
+                }
+                // help resources path
+                if ( typeof config.helpResourcesPath !== "undefined" ) {
+                    helpResourcesPath = config.helpResourcesPath;
                 }
                 dwv.gui.appendHelpHtml( toolboxController.getToolList(), isMobile, this );
             }
