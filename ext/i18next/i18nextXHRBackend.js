@@ -96,7 +96,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function getDefaults() {
   return {
     loadPath: '/locales/{{lng}}/{{ns}}.json',
-    addPath: 'locales/add/{{lng}}/{{ns}}',
+    addPath: '/locales/add/{{lng}}/{{ns}}',
     allowMultiLoading: false,
     parse: JSON.parse,
     crossDomain: false,
