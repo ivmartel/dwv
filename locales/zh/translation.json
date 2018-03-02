@@ -6,7 +6,7 @@
         "back": "返回",
         "reset": "重置",
         "apply": "应用",
-        "name": "姓名",
+        "name": "名称",
         "value": "值",
         "dicomTags": "DICOM 标签",
         "columns": "列",
@@ -20,18 +20,18 @@
         "image": "图像",
         "info": "信息",
         "downloadState": "下载状态",
-        "drawList": "Annotations",
-        "search": "Search",
+        "drawList": "注释",
+        "search": "搜索",
         "id": "ID",
-        "slice": "Slice",
-        "frame": "Frame",
-        "type": "Type",
-        "color": "Color",
-        "label": "Label",
-        "description": "Description",
-        "editMode": "Edit Mode",
-        "deleteDraws": "Delete All",
-        "visible": "Visible"
+        "slice": "切片",
+        "frame": "帧",
+        "type": "类型",
+        "color": "颜色",
+        "label": "标签",
+        "description": "描述",
+        "editMode": "编辑模式",
+        "deleteDraws": "删除所有",
+        "visible": "可见"
     },
     "colour": {
         "Yellow": {
@@ -66,14 +66,14 @@
     },
     "help": {
         "intro": {
-            "p0": "DWV (DICOM Web Viewer) 是一个开源的医学影像浏览器。 它只使用了Javascript与html5的编程代码, 意味着它能在任何提供了浏览器的平台上都能运行 (笔记本电脑, 平板, 手机以及某些TV)。 它能加载当地的或者远程Dicom格式的文件 (the standard for medical imaging data such as MR, CT, Echo, Mammo, NM...) 并提供标准工具对其进行操作如对比、缩放、拖动,可能吸引区域的阈值、锐化图像和影像过滤器.",
+            "p0": "DWV (DICOM Web Viewer) 是一个开源的医学影像浏览器。 它只使用了JavaScript与html5的编程代码, 意味着它能在任何提供了浏览器的平台上都能运行 (笔记本电脑, 平板, 手机以及某些TV)。 它能加载当地的或者远程Dicom格式的文件 (the standard for medical imaging data such as MR, CT, Echo, Mammo, NM...) 并提供标准工具对其进行操作如对比、缩放、拖动,可能吸引区域的阈值、锐化图像和影像过滤器.",
             "p1": "所有的DICOM标签都能在这个表格中搜索到, 点击'tags'或者网格上的按钮。 你可以选择展示图像信息在一个小弹框中通过点击'info'按钮。"
         },
         "tool_intro": "每一个工具都定义了与用户交互的可能性。 以下是一些可用的工具:"
     },
     "tool": {
         "WindowLevel": {
-            "name": "窗位/窗宽。",
+            "name": "窗位/窗宽",
             "brief": "改变图像的窗位和窗宽。",
             "mouse_drag": "单鼠标按住拖动图像，沿水平方向改变窗宽，沿竖直方向改变窗位。",
             "double_click": "双击影像，可将该点作为窗位窗宽中心值。",
@@ -88,18 +88,18 @@
             "touch_drag": "单触拖动图像到想要的位置。"
         },
         "Scroll": {
-            "name": "滚动条",
-            "brief": "The scroll tool allows to scroll through slices/frames. ",
-            "double_click": "A double click launches a slice or frame play. A single click stops it.",
-            "tap_and_hold": "A tap and hold launches a slice or frame play. A single tap stops it.",
-            "mouse_drag": "Drag the mouse vertically to change the slice, horizontally to change the frame. Keyboard shortcuts: CTRL + up or down arrow to change slices, CTRL + left or right arrow to change frames.",
-            "touch_drag": "Drag your finger vertically to change the slice, horizontally to change the frame."
+            "name": "滑动浏览",
+            "brief": "使用滑动浏览模式，可以进行切片/图像帧的切换。",
+            "double_click": "双击切片图像开始自动切换模式，再次单击停止。自动切换模式下将逐帧切换显示切片。",
+            "tap_and_hold": "单击之后长按可开始自动切换模式，再次单击停止。自动切换模式下将逐帧切换显示切片。",
+            "mouse_drag": "使用鼠标在图像上进纵向滑动可切换切片，横向滑动则切换帧。同时按下键盘快捷键CTRL+或者下键可以切换切片，按CTRL+左或者右以切换帧。",
+            "touch_drag": "使用手指在图像上进行上下滑动可切换切片，左右滑动则切换帧。"
         },
         "Draw": {
-            "name": "测量",
+            "name": "绘制标注",
             "brief": "在图像上画不同的形状。可从下拉菜单中选择形状和颜色。创建测量后，通过选中可以进行编辑。会出现角度，允许特定形状编辑。拖动顶端红色十字可将对象删除，所有操作可撤销。",
-            "mouse_drag": "A single mouse drag draws the desired shape. For the protractor, click to start, draw the first ray to the vertex, wait half a second and draw the second ray.",
-            "touch_drag": "A single touch drag draws the desired shape. For the protractor, tap to start, draw the first ray to the vertex, wait half a second and draw the second ray."
+            "mouse_drag": "用鼠标在图像上滑动来绘制图形标注。在使用量角器时，点击图像开始绘制，将线拉到足够的位置，停顿半秒以后会自动开始绘制第二条线以测量角度。",
+            "touch_drag": "可以直接触控图片来绘制想要的图形。在使用量角器时，先点击图片拖拽到想要的距离，停顿半秒以后开始绘制弧形以测量角度。"
         },
         "Filter": {
             "name": "滤波器",
@@ -128,7 +128,7 @@
             "name": "直线"
         },
         "Ruler": {
-            "name": "Ruler"
+            "name": "测量尺"
         },
         "Protractor": {
             "name": "量角器"
@@ -137,16 +137,16 @@
             "name": "矩形"
         },
         "Roi": {
-            "name": "感兴趣的区域"
+            "name": "标靶"
         },
         "Ellipse": {
             "name": "椭圆"
         },
         "Arrow": {
-            "name": "Arrow"
+            "name": "箭头"
         },
         "FreeHand": {
-            "name": "Free hand"
+            "name": "手绘"
         }
     },
     "io": {
