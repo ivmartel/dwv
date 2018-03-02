@@ -105,8 +105,6 @@ function getDwvBaseUrl(flag)
         path += "/mobile";
     } else if( flag === "dwvstatic" ) {
         path += "/static";
-    } else if( flag === "dwvsimple" ) {
-        path += "/simple";
     }
     path += "/index.html";
     return path;
@@ -186,7 +184,6 @@ Direct link: <a href="#" id="empty-launch" class="dwvlink">launch</a>.</p>
 <select id="select-dwv" data-inline="true" data-mini="true" onClick="setDwv(this);">
 <option value="dwvmobile">DWV Mobile</option>
 <option value="dwvstatic">DWV Static</option>
-<option value="dwvsimple">DWV Simple</option>
 </select> 
 </div>
 
