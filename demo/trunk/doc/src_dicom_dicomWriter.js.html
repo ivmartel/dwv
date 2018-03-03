@@ -821,7 +821,12 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     // ImplementationVersionName
     var ivn = dwv.dicom.getDicomElement("ImplementationVersionName");
     var ivnSize = dwv.dicom.getDataElementPrefixByteSize(ivn.vr, isImplicit);
-    ivnSize += dwv.dicom.setElementValue(ivn, "DWV_"+dwv.getVersion(), false);
+    var ivnValue = "DWV_" + dwv.getVersion();
+    // odd IDs should be padded
+    if ( ivnValue.length % 2 === 1 ) {
+        ivnValue += '\0';
+    }
+    ivnSize += dwv.dicom.setElementValue(ivn, ivnValue, false);
     metaElements.push(ivn);
     metaLength += ivnSize;
     totalSize += ivnSize;
