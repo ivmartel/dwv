@@ -1,0 +1,29 @@
+{
+  "name": "dwv-mobile",
+  "version": "0.1.0-beta",
+  "description": "Mobile viewer using DWV.",
+  "keywords": [
+    "DICOM",
+    "medical",
+    "imaging"
+  ],
+  "license": "GPL-3.0",
+  "author": "ivmartel <ivmartel@gmail.com>",
+  "homepage": "https://ivmartel.github.io/dwv/",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ivmartel/dwv.git"
+  },
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "nprogress": "~0.2.0"
+  },
+  "devDependencies": {
+    "grunt": "~1.0.1",
+    "grunt-cli": "~1.2",
+    "grunt-contrib-jshint": "~1.1.0"
+  },
+  "scripts": {
+    "test": "grunt publish --verbose"
+  }
+}
