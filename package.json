@@ -19,6 +19,7 @@
     "konva": "~1.7.3"
   },
   "devDependencies": {
+    "qunit": "~2.5.1",
     "grunt": "~1.0.1",
     "grunt-cli": "~1.2",
     "grunt-contrib-jshint": "~1.1.0",
