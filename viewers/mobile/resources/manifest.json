@@ -1,0 +1,30 @@
+{
+  "name": "dwv-mobile",
+  "short_name": "dwv-mobile",
+  "description": "Mobile viewer using DWV.",
+  "start_url": "/dwv/demo/trunk/index.html",
+  "display": "standalone",
+  "background_color": "#3E4EB8",
+  "theme_color": "#2F3BA2",
+  "icons": [{
+      "src": "/dwv/demo/trunk/resources/icons/dwv-16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    }, {
+      "src": "/dwv/demo/trunk/resources/icons/dwv-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    }, {
+      "src": "/dwv/demo/trunk/resources/icons/dwv-64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    }, {
+      "src": "/dwv/demo/trunk/resources/icons/dwv-128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    }, {
+      "src": "/dwv/demo/trunk/resources/icons/dwv-256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    }]
+}
