@@ -3,7 +3,7 @@
 // https://developers.google.com/web/fundamentals/primers/service-workers/
 // chrome: chrome://inspect/#service-workers
 
-var CACHE_NAME = 'dwv-mobile-cache-v0';
+var CACHE_NAME = 'dwv-mobile-cache-v1';
 var urlsToCache = [
     './',
     // css
