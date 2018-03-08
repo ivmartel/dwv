@@ -20,6 +20,7 @@ var urlsToCache = [
     './resources/help/double_tap.png',
     './resources/help/tap_and_hold.png',
     './resources/help/tap.png',
+    './resources/help/touch_drag.png',
     './resources/help/twotouch_drag.png',
     './resources/help/twotouch_pinch.png',
     // translations
@@ -57,6 +58,7 @@ var urlsToCache = [
     './ext/jquery-mobile/images/icons-png/info-white.png',
     './ext/jquery-mobile/images/icons-png/grid-black.png',
     // js: dwv
+    './node_modules/dwv/dist/dwv.min.js',
     './node_modules/dwv/ext/modernizr/modernizr.js',
     './node_modules/i18next/i18next.min.js',
     './node_modules/i18next-xhr-backend/i18nextXHRBackend.min.js',
