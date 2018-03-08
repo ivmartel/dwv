@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# v24 2017-12-12
+# v25 2017-12-21
 
 CACHE:
 
@@ -8,7 +8,7 @@ index.html
 # css
 /dwv/demo/stable/css/style.css
 # js
-/dwv/demo/stable/dwv-0.22.1.min.js
+/dwv/demo/stable/dwv-0.23.0-beta.min.js
 applauncher.js
 appgui.js
 # images
@@ -22,23 +22,23 @@ appgui.js
 /dwv/demo/stable/resources/help/twotouch_drag.png
 /dwv/demo/stable/resources/help/twotouch_pinch.png
 # translations
-/dwv/demo/stable/locales/de/translation.json
-/dwv/demo/stable/locales/en/translation.json
-/dwv/demo/stable/locales/es/translation.json
-/dwv/demo/stable/locales/fr/translation.json
-/dwv/demo/stable/locales/it/translation.json
-/dwv/demo/stable/locales/jp/translation.json
-/dwv/demo/stable/locales/ru/translation.json
-/dwv/demo/stable/locales/zh/translation.json
+/dwv/demo/stable/node_modules/dwv/locales/de/translation.json
+/dwv/demo/stable/node_modules/dwv/locales/en/translation.json
+/dwv/demo/stable/node_modules/dwv/locales/es/translation.json
+/dwv/demo/stable/node_modules/dwv/locales/fr/translation.json
+/dwv/demo/stable/node_modules/dwv/locales/it/translation.json
+/dwv/demo/stable/node_modules/dwv/locales/jp/translation.json
+/dwv/demo/stable/node_modules/dwv/locales/ru/translation.json
+/dwv/demo/stable/node_modules/dwv/locales/zh/translation.json
 # overlays
-/dwv/demo/stable/locales/de/overlays.json
-/dwv/demo/stable/locales/en/overlays.json
-/dwv/demo/stable/locales/es/overlays.json
-/dwv/demo/stable/locales/fr/overlays.json
-/dwv/demo/stable/locales/it/overlays.json
-/dwv/demo/stable/locales/jp/overlays.json
-/dwv/demo/stable/locales/ru/overlays.json
-/dwv/demo/stable/locales/zh/overlays.json
+/dwv/demo/stable/node_modules/dwv/locales/de/overlays.json
+/dwv/demo/stable/node_modules/dwv/locales/en/overlays.json
+/dwv/demo/stable/node_modules/dwv/locales/es/overlays.json
+/dwv/demo/stable/node_modules/dwv/locales/fr/overlays.json
+/dwv/demo/stable/node_modules/dwv/locales/it/overlays.json
+/dwv/demo/stable/node_modules/dwv/locales/jp/overlays.json
+/dwv/demo/stable/node_modules/dwv/locales/ru/overlays.json
+/dwv/demo/stable/node_modules/dwv/locales/zh/overlays.json
 
 # third party
 
@@ -56,28 +56,29 @@ appgui.js
 /dwv/demo/stable/ext/jquery-mobile/images/icons-png/info-white.png
 /dwv/demo/stable/ext/jquery-mobile/images/icons-png/grid-black.png
 # js: dwv
-/dwv/demo/stable/ext/modernizr/modernizr.js
-/dwv/demo/stable/ext/i18next/i18next.min.js
-/dwv/demo/stable/ext/i18next/i18nextXHRBackend.min.js
-/dwv/demo/stable/ext/i18next/i18nextBrowserLanguageDetector.min.js
-/dwv/demo/stable/ext/konva/konva.min.js
-/dwv/demo/stable/ext/magic-wand/magic-wand.js
-/dwv/demo/stable/ext/jszip/jszip.min.js
+/dwv/demo/stable/node_modules/dwv/dist/dwv.min.js
+/dwv/demo/stable/node_modules/dwv/ext/modernizr/modernizr.js
+/dwv/demo/stable/node_modules/i18next/i18next.min.js
+/dwv/demo/stable/node_modules/i18next-xhr-backend/i18nextXHRBackend.min.js
+/dwv/demo/stable/node_modules/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.min.js
+/dwv/demo/stable/node_modules/jszip/dist/jszip.min.js
+/dwv/demo/stable/node_modules/konva/konva.min.js
+/dwv/demo/stable/node_modules/magic-wand-js/js/magic-wand-min.js
 # js: viewer
-/dwv/demo/stable/ext/jquery/jquery-2.1.4.min.js
+/dwv/demo/stable/node_modules/jquery/dist/jquery.min.js
 /dwv/demo/stable/ext/jquery-mobile/jquery.mobile-1.4.5.min.js
 /dwv/demo/stable/ext/jquery-mobile/jquery.mobile-1.4.5.min.map
-/dwv/demo/stable/ext/nprogress/nprogress.js
+/dwv/demo/stable/node_modules/nprogress/nprogress.js
 /dwv/demo/stable/ext/flot/jquery.flot.min.js
 # js: decoders
-/dwv/demo/stable/decoders/pdfjs/jpx.js
-/dwv/demo/stable/decoders/pdfjs/arithmetic_decoder.js
-/dwv/demo/stable/decoders/pdfjs/decode-jpeg2000.js
-/dwv/demo/stable/decoders/pdfjs/util.js
-/dwv/demo/stable/decoders/pdfjs/jpg.js
-/dwv/demo/stable/decoders/pdfjs/decode-jpegbaseline.js
-/dwv/demo/stable/decoders/rii-mango/lossless-min.js
-/dwv/demo/stable/decoders/rii-mango/decode-jpegloss.js
+/dwv/demo/stable/node_modules/dwv/decoders/pdfjs/jpx.js
+/dwv/demo/stable/node_modules/dwv/decoders/pdfjs/arithmetic_decoder.js
+/dwv/demo/stable/node_modules/dwv/decoders/pdfjs/decode-jpeg2000.js
+/dwv/demo/stable/node_modules/dwv/decoders/pdfjs/util.js
+/dwv/demo/stable/node_modules/dwv/decoders/pdfjs/jpg.js
+/dwv/demo/stable/node_modules/dwv/decoders/pdfjs/decode-jpegbaseline.js
+/dwv/demo/stable/node_modules/dwv/decoders/rii-mango/lossless-min.js
+/dwv/demo/stable/node_modules/dwv/decoders/rii-mango/decode-jpegloss.js
 
 NETWORK:
 *

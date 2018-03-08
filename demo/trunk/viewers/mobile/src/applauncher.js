@@ -50,7 +50,8 @@ function startApp() {
         "tools": ["Scroll", "WindowLevel", "ZoomAndPan", "Draw", "Livewire", "Filter", "Floodfill"],
         "filters": ["Threshold", "Sharpen", "Sobel"],
         "shapes": ["Arrow", "Ruler", "Protractor", "Rectangle", "Roi", "Ellipse", "FreeHand"],
-        "isMobile": true
+        "isMobile": true,
+        "helpResourcesPath": "resources/help"
         //"defaultCharacterSet": "chinese"
     };
     if ( dwv.browser.hasInputDirectory() ) {
@@ -64,9 +65,9 @@ function startApp() {
 
 // Image decoders (for web workers)
 dwv.image.decoderScripts = {
-    "jpeg2000": "../../decoders/pdfjs/decode-jpeg2000.js",
-    "jpeg-lossless": "../../decoders/rii-mango/decode-jpegloss.js",
-    "jpeg-baseline": "../../decoders/pdfjs/decode-jpegbaseline.js"
+    "jpeg2000": "node_modules/dwv/decoders/pdfjs/decode-jpeg2000.js",
+    "jpeg-lossless": "node_modules/dwv/decoders/rii-mango/decode-jpegloss.js",
+    "jpeg-baseline": "node_modules/dwv/decoders/pdfjs/decode-jpegbaseline.js"
 };
 
 // status flags
@@ -97,12 +98,12 @@ dwv.i18nOnInitialised( function () {
 // check browser support
 dwv.browser.check();
 // initialise i18n
-dwv.i18nInitialise();
+dwv.i18nInitialise("auto", "node_modules/dwv");
 
 // initialise service worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
-        navigator.serviceWorker.register('./sw.js').then(function (registration) {
+        navigator.serviceWorker.register('./service-worker.js').then(function (registration) {
             // Registration was successful
             console.log('ServiceWorker registration successful with scope: ', registration.scope);
         }, function (err) {

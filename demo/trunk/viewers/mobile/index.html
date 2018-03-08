@@ -8,7 +8,8 @@
 <meta name="description" content="DICOM Web Viewer (DWV) mobile version">
 <meta name="keywords" content="DICOM,HTML5,JavaScript,medical,imaging,DWV">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2F3BA2"/>
+<link rel="manifest" href="resources/manifest.json">
 <link type="text/css" rel="stylesheet" href="css/style.css" />
 <style type="text/css" >
 body { margin: 10px; padding: 0; }
@@ -18,7 +19,7 @@ body { margin: 10px; padding: 0; }
 .inline { display: inline-block !important; }
 </style>
 <link type="text/css" rel="stylesheet" href="ext/jquery-mobile/jquery.mobile-1.4.5.min.css" />
-<link type="text/css" rel="stylesheet" href="ext/nprogress/nprogress.css" />
+<link type="text/css" rel="stylesheet" href="node_modules/nprogress/nprogress.css" />
 <style type="text/css" >
 .ui-popup .ui-controlgroup { background-color: #252525; }
 .colourLi > .ui-input-text { text-align: center; }
@@ -37,35 +38,39 @@ body { margin: 10px; padding: 0; }
 <!-- mobile web app -->
 <meta name="mobile-web-app-capable" content="yes" />
 <link rel="shortcut icon" sizes="16x16" href="resources/icons/dwv-16.png" />
-<link rel="shortcut icon" sizes="60x60" href="resources/icons/dwv-60.png" />
+<link rel="shortcut icon" sizes="32x32" href="resources/icons/dwv-32.png" />
+<link rel="shortcut icon" sizes="64x64" href="resources/icons/dwv-64.png" />
 <link rel="shortcut icon" sizes="128x128" href="resources/icons/dwv-128.png" />
+<link rel="shortcut icon" sizes="256x256" href="resources/icons/dwv-256.png" />
 <!-- apple specific -->
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 <link rel="apple-touch-icon" sizes="16x16" href="resources/icons/dwv-16.png" />
-<link rel="apple-touch-icon" sizes="60x60" href="resources/icons/dwv-60.png" />
+<link rel="apple-touch-icon" sizes="32x32" href="resources/icons/dwv-32.png" />
+<link rel="apple-touch-icon" sizes="64x64" href="resources/icons/dwv-64.png" />
 <link rel="apple-touch-icon" sizes="128x128" href="resources/icons/dwv-128.png" />
+<link rel="apple-touch-icon" sizes="256x256" href="resources/icons/dwv-256.png" />
 <!-- Third party (dwv) -->
-<script type="text/javascript" src="ext/modernizr/modernizr.js"></script>
-<script type="text/javascript" src="ext/i18next/i18next.min.js"></script>
-<script type="text/javascript" src="ext/i18next/i18nextXHRBackend.min.js"></script>
-<script type="text/javascript" src="ext/i18next/i18nextBrowserLanguageDetector.min.js"></script>
-<script type="text/javascript" src="ext/konva/konva.min.js"></script>
-<script type="text/javascript" src="ext/magic-wand/magic-wand.js"></script>
-<script type="text/javascript" src="ext/jszip/jszip.min.js"></script>
+<script type="text/javascript" src="node_modules/dwv/ext/modernizr/modernizr.js"></script>
+<script type="text/javascript" src="node_modules/i18next/i18next.min.js"></script>
+<script type="text/javascript" src="node_modules/i18next-xhr-backend/i18nextXHRBackend.min.js"></script>
+<script type="text/javascript" src="node_modules/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.min.js"></script>
+<script type="text/javascript" src="node_modules/jszip/dist/jszip.min.js"></script>
+<script type="text/javascript" src="node_modules/konva/konva.min.js"></script>
+<script type="text/javascript" src="node_modules/magic-wand-js/js/magic-wand-min.js"></script>
 <!-- Third party (viewer) -->
-<script type="text/javascript" src="ext/jquery/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript" src="ext/jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
-<script type="text/javascript" src="ext/nprogress/nprogress.js"></script>
+<script type="text/javascript" src="node_modules/nprogress/nprogress.js"></script>
 <script type="text/javascript" src="ext/flot/jquery.flot.min.js"></script>
 <!-- decoders -->
-<script type="text/javascript" src="decoders/pdfjs/jpx.js"></script>
-<script type="text/javascript" src="decoders/pdfjs/util.js"></script>
-<script type="text/javascript" src="decoders/pdfjs/arithmetic_decoder.js"></script>
-<script type="text/javascript" src="decoders/pdfjs/jpg.js"></script>
-<script type="text/javascript" src="decoders/rii-mango/lossless-min.js"></script>
+<script type="text/javascript" src="node_modules/dwv/decoders/pdfjs/jpx.js"></script>
+<script type="text/javascript" src="node_modules/dwv/decoders/pdfjs/util.js"></script>
+<script type="text/javascript" src="node_modules/dwv/decoders/pdfjs/arithmetic_decoder.js"></script>
+<script type="text/javascript" src="node_modules/dwv/decoders/pdfjs/jpg.js"></script>
+<script type="text/javascript" src="node_modules/dwv/decoders/rii-mango/lossless-min.js"></script>
 <!-- Local -->
-<script type="text/javascript" src="ext/dwv/dwv-0.23.0-beta.min.js"></script>
+<script type="text/javascript" src="node_modules/dwv/dist/dwv.min.js"></script>
 
 <!-- Google -->
 <script type="text/javascript" src="https://apis.google.com/js/client.js"></script>
