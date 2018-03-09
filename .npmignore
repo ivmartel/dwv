@@ -1,0 +1,9 @@
+# ignore source folders
+/src
+/tests
+
+# ignore resources
+/resources
+
+# root files (will keep package, license and readme)
+/*.*

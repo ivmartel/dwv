@@ -1,4 +1,6 @@
-/.settings
-build
+# ignore downloaded dependencies
 node_modules
 bower_components
+
+# ignore test viewer
+/viewer
