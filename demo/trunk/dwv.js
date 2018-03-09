@@ -25212,6 +25212,13 @@ dwv.browser.check = function()
         // TODO Find better replacement!
         window.Float64Array = window.Float32Array;
     }
+
+    // check string startsWith
+    if ( !String.prototype.startsWith ) {
+        String.prototype.startsWith = function (search, pos) {
+            return this.substr(!pos || pos < 0 ? 0 : +pos, search.length) === search;
+        };
+    }
 };
 
 // namespaces
