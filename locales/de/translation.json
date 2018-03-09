@@ -20,18 +20,18 @@
         "image": "Bild",
         "info": "Info",
         "downloadState": "Zustand herunterladen",
-        "drawList": "Annotations",
-        "search": "Search",
+        "drawList": "Vermerke",
+        "search": "Suche",
         "id": "ID",
-        "slice": "Slice",
-        "frame": "Frame",
-        "type": "Type",
-        "color": "Color",
+        "slice": "Schnitt",
+        "frame": "Einzelbild",
+        "type": "Typ",
+        "color": "Farbe",
         "label": "Label",
-        "description": "Description",
-        "editMode": "Edit Mode",
-        "deleteDraws": "Delete All",
-        "visible": "Visible"
+        "description": "Beschreibung",
+        "editMode": "Bearbeitungsmodus",
+        "deleteDraws": "Alles löschen",
+        "visible": "Sichtbar"
     },
     "colour": {
         "Yellow": {
@@ -62,7 +62,7 @@
     "unit": {
         "mm": "mm",
         "cm2": "cm²",
-        "degree": "\u00B0"
+        "degree": "°"
     },
     "help": {
         "intro": {
@@ -90,10 +90,10 @@
         "Scroll": {
             "name": "Scrollen",
             "brief": "The scroll tool allows to scroll through slices/frames. ",
-            "double_click": "A double click launches a slice or frame play. A single click stops it.",
+            "double_click": "Doppelklick startet die Wiedergabe einer Schnitt- oder Bildsequenz. Einfacher Klick stoppt die Wiedergabe.",
             "tap_and_hold": "A tap and hold launches a slice or frame play. A single tap stops it.",
             "mouse_drag": "Drag the mouse vertically to change the slice, horizontally to change the frame. Keyboard shortcuts: CTRL + up or down arrow to change slices, CTRL + left or right arrow to change frames.",
-            "touch_drag": "Drag your finger vertically to change the slice, horizontally to change the frame."
+            "touch_drag": "Vertikales Ziehen ändert das Schnittbild, horizontales das zeitliche Einzelbild."
         },
         "Draw": {
             "name": "Zeichnen",
@@ -129,7 +129,7 @@ Click on pixel to create a contour based on its intensity.",
             "name": "Linie"
         },
         "Ruler": {
-            "name": "Ruler"
+            "name": "Lineal"
         },
         "Protractor": {
             "name": "Winkelmesser"
@@ -144,15 +144,18 @@ Click on pixel to create a contour based on its intensity.",
             "name": "Ellipse"
         },
         "Arrow": {
-            "name": "Arrow"
+            "name": "Pfeil"
         },
         "FreeHand": {
-            "name": "Free hand"
+            "name": "Freihand"
         }
     },
     "io": {
         "File": {
             "name": "Datei"
+        },
+        "Folder": {
+            "name": "Folder"
         },
         "Url": {
             "name": "URL"

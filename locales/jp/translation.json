@@ -153,6 +153,9 @@
         "File": {
             "name": "ファイル"
         },
+        "Folder": {
+            "name": "Folder"
+        },
         "Url": {
             "name": "URL"
         },
