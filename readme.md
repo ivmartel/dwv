@@ -15,7 +15,3 @@ DWV is not certified for diagnostic use. Released under GNU GPL license (see [li
 And for those who want to support the dwv development:
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=VQWYY8ZS75H3E&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
-
-
-## License
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fivmartel%2Fdwv.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fivmartel%2Fdwv?ref=badge_large)
