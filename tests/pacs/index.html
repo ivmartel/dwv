@@ -93,25 +93,20 @@ function setDwv(obj)
         elements[i].href = url;
     }
 }
-function getDwvBaseUrl(flag)
+function getDwvBaseUrl(root)
 {
-    var path = "../../viewers";
-    if( flag === "dwvmobile" ) {
-        path += "/mobile";
-    } else if( flag === "dwvstatic" ) {
-        path += "/static";
-    }
-    path += "/index.html";
-    return path;
+    return root + "/index.html";
 }
 function getDwvUrl(uri)
 {
-    var flag = "dwvmobile";
+    var root = null;
     if( document.getElementById('select-dwv') ) {
         var select = document.getElementById('select-dwv');
-        flag = select.options[select.selectedIndex].value;
+    console.log("got select!", select);
+        root = select.value;
+        console.log("root: ", root);
     }
-    var url = getDwvBaseUrl(flag);
+    var url = getDwvBaseUrl(root);
     if ( typeof uri !== "undefined" ) {
         url += "?input="+encodeURIComponent(uri);
     }
@@ -171,16 +166,15 @@ window.onload = function() {
 <h1>My (fake) PACS</h1>
 
 <p>These are a few data example that are displayed as they could
-be on a web interface to a PACS system. Click on the list item to launch DWV with the selected data.
-Direct link: <a href="#" id="empty-launch" class="dwvlink">launch</a>.</p>
+be on a web interface to a PACS system.</p>
 
 <div data-role="fieldcontain">
-<label for="select-dwv">Choose which DWV to launch:</label>
-<select id="select-dwv" data-inline="true" data-mini="true" onClick="setDwv(this);">
-<option value="dwvmobile">DWV Mobile</option>
-<option value="dwvstatic">DWV Static</option>
-</select> 
+<label for="select-dwv">Path to the viewer:</label>
+<input type="text" id="select-dwv" value="/viewer" onChange="setDwv(this);"/>
 </div>
+
+<p>Click <a href="#" id="empty-launch" class="dwvlink">here</a> for a direct launch
+or on a list item to launch the viewer with the selected data.</p>
 
 <ul class="listview" data-role="listview" data-inset="true" id="uldatadicom"></ul>
 
