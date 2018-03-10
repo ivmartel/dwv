@@ -112,8 +112,7 @@
         "Floodfill": {
             "name": "Floodfill",
             "brief": "Das Floodfill-Werkzeug ist ein halbautomatisches Segmentierungswerkzeug, das eine Kontur um Flächen benachbarter Pixel ähnlichen Grauwerts erzeugt.",
-            "click": "Klick auf Pixel erzeut eine Kontur auf Basis des Grauwerts.
-Click on pixel to create a contour based on its intensity.",
+            "click": "Klick auf Pixel erzeut eine Kontur auf Basis des Grauwerts. Click on pixel to create a contour based on its intensity.",
             "tap": "Tippen auf Pixel erzeut eine Kontur auf Basis des Grauwerts."
         },
         "info": {
