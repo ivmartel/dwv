@@ -27,16 +27,12 @@
   ],
   "ignore": [
     "**/.*",
-    "css",
-    "ext",
     "resources/conquest",
     "resources/doc",
     "resources/module",
     "resources/scripts",
     "src",
     "tests",
-    "viewers",
-    "eclipse.epf",
     "Gruntfile.js",
     "manifest.json",
     "package.json"

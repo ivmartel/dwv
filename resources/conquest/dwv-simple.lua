@@ -86,7 +86,6 @@ print([[
 
 print([[
 <!-- Third party (dwv) -->
-<script type="text/javascript" src="/dwv/ext/modernizr/modernizr.js"></script>
 <script type="text/javascript" src="/dwv/ext/i18next/i18next.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/i18next/i18nextXHRBackend.min.js"></script>
 <script type="text/javascript" src="/dwv/ext/i18next/i18nextBrowserLanguageDetector.min.js"></script>
