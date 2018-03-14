@@ -3,13 +3,15 @@
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
+
+        // magic-wand-js: not importable?
+
         define([
             'i18next',
-            'i18nextXHRBackend',
-            'i18nextBrowserLanguageDetector',
+            'i18next-xhr-backend',
+            'i18next-browser-languagedetector',
             'jszip',
-            'konva',
-            ''
+            'konva'
         ], factory);
     } else if (typeof module === 'object' && module.exports) {
         // Node. Does not work with strict CommonJS, but
@@ -17,8 +19,8 @@
         // like Node.
 
         // i18next-xhr-backend: requires XMlHttpRequest
-        // Konva: requires 'canvas' -> deactivated for now...
-        // MagicWand: no package -> deactivated
+        // Konva (requires 'canvas') and MagicWand are gui specific
+        // -> deactivated for now...
 
         module.exports = factory(
             require('i18next'),
