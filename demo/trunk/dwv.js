@@ -3,13 +3,15 @@
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
+
+        // magic-wand-js: not importable?
+
         define([
             'i18next',
-            'i18nextXHRBackend',
-            'i18nextBrowserLanguageDetector',
+            'i18next-xhr-backend',
+            'i18next-browser-languagedetector',
             'jszip',
-            'konva',
-            ''
+            'konva'
         ], factory);
     } else if (typeof module === 'object' && module.exports) {
         // Node. Does not work with strict CommonJS, but
@@ -17,8 +19,8 @@
         // like Node.
 
         // i18next-xhr-backend: requires XMlHttpRequest
-        // Konva: requires 'canvas' -> deactivated for now...
-        // MagicWand: no package -> deactivated
+        // Konva (requires 'canvas') and MagicWand are gui specific
+        // -> deactivated for now...
 
         module.exports = factory(
             require('i18next'),
@@ -10611,8 +10613,14 @@ dwv.gui.base.getElement = function (containerDivId, name)
 {
     // get by class in the container div
     var parent = document.getElementById(containerDivId);
+    if ( !parent ) {
+        return null;
+    }
     var elements = parent.getElementsByClassName(name);
-    // getting the last element since some libraries (ie jquery-mobile) creates
+    if ( elements.length === 0 ) {
+        return null;
+    }
+    // getting the last element since some libraries (ie jquery-mobile) create
     // span in front of regular tags (such as select)...
     var element = elements[elements.length-1];
     // if not found get by id with 'containerDivId-className'
@@ -10767,7 +10775,7 @@ dwv.gui.base.DicomTags = function (app)
             console.warn("The processed table does not contain data.");
             return;
         }
-        
+
         // translate first row
         dwv.html.translateTableRow(table.rows.item(0));
 
