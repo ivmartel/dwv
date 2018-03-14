@@ -59,8 +59,14 @@ dwv.gui.base.getElement = function (containerDivId, name)
 {
     // get by class in the container div
     var parent = document.getElementById(containerDivId);
+    if ( !parent ) {
+        return null;
+    }
     var elements = parent.getElementsByClassName(name);
-    // getting the last element since some libraries (ie jquery-mobile) creates
+    if ( elements.length === 0 ) {
+        return null;
+    }
+    // getting the last element since some libraries (ie jquery-mobile) create
     // span in front of regular tags (such as select)...
     var element = elements[elements.length-1];
     // if not found get by id with 'containerDivId-className'
@@ -215,7 +221,7 @@ dwv.gui.base.DicomTags = function (app)
             console.warn("The processed table does not contain data.");
             return;
         }
-        
+
         // translate first row
         dwv.html.translateTableRow(table.rows.item(0));
 
