@@ -63,9 +63,6 @@ dwv.gui.base.getElement = function (containerDivId, name)
         return null;
     }
     var elements = parent.getElementsByClassName(name);
-    if ( elements.length === 0 ) {
-        return null;
-    }
     // getting the last element since some libraries (ie jquery-mobile) create
     // span in front of regular tags (such as select)...
     var element = elements[elements.length-1];
