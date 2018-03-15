@@ -2167,7 +2167,7 @@ var Konva = Konva || {};
  * Saves: data url/path, display info.
  *
  * History:
- * - v0.3 (dwv v0.23.0, ?/?)
+ * - v0.3 (dwv v0.23.0, 03/2018)
  *   - new drawing structure, drawings are now the full layer object and
  *     using toObject to avoid saving a string representation
  *   - new details structure: simple array of objects referenced by draw ids
@@ -3039,7 +3039,7 @@ dwv.dicom = dwv.dicom || {};
  * Get the version of the library.
  * @return {String} The version of the library.
  */
-dwv.getVersion = function () { return "0.23.0"; };
+dwv.getVersion = function () { return "0.23.1-beta"; };
 
 /**
  * Clean string: trim and remove ending.
@@ -10617,9 +10617,6 @@ dwv.gui.base.getElement = function (containerDivId, name)
         return null;
     }
     var elements = parent.getElementsByClassName(name);
-    if ( elements.length === 0 ) {
-        return null;
-    }
     // getting the last element since some libraries (ie jquery-mobile) create
     // span in front of regular tags (such as select)...
     var element = elements[elements.length-1];
