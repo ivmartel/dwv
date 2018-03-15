@@ -2,8 +2,6 @@
 var dwv = dwv || {};
 /** @namespace */
 dwv.browser = dwv.browser || {};
-// external
-var Modernizr = Modernizr || {};
 
 /**
  * Browser check for the FileAPI.
@@ -22,7 +20,7 @@ dwv.browser.hasFileApi = function()
         return true;
     }
     // regular test
-    return Modernizr.filereader;
+    return dwv.Modernizr.filereader;
 };
 
 /**
@@ -30,8 +28,8 @@ dwv.browser.hasFileApi = function()
  */
 dwv.browser.hasXmlHttpRequest = function()
 {
-    return Modernizr.xhrresponsetype &&
-        Modernizr.xhrresponsetypearraybuffer && Modernizr.xhrresponsetypetext &&
+    return dwv.Modernizr.xhrresponsetype &&
+        dwv.Modernizr.xhrresponsetypearraybuffer && dwv.Modernizr.xhrresponsetypetext &&
         "XMLHttpRequest" in window && "withCredentials" in new XMLHttpRequest();
 };
 
@@ -40,7 +38,7 @@ dwv.browser.hasXmlHttpRequest = function()
  */
 dwv.browser.hasTypedArray = function()
 {
-    return Modernizr.dataview && Modernizr.typedarrays;
+    return dwv.Modernizr.dataview && dwv.Modernizr.typedarrays;
 };
 
 /**
@@ -49,7 +47,7 @@ dwv.browser.hasTypedArray = function()
  */
 dwv.browser.hasInputColor = function()
 {
-    return Modernizr.inputtypes.color;
+    return dwv.Modernizr.inputtypes.color;
 };
 
 /**
@@ -58,7 +56,7 @@ dwv.browser.hasInputColor = function()
  */
 dwv.browser.hasInputDirectory = function()
 {
-    return Modernizr.fileinputdirectory;
+    return dwv.Modernizr.fileinputdirectory;
 };
 
 

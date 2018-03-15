@@ -1,3 +1,6 @@
+// namespaces
+var dwv = dwv || {};
+
 /*!
  * modernizr v3.6.0
  * Build https://modernizr.com/download?-dataview-directory-filereader-inputtypes-typedarrays-xhrresponsetype-xhrresponsetypearraybuffer-xhrresponsetypejson-xhrresponsetypetext-dontmin
@@ -603,7 +606,8 @@ file selection dialog.
   }
 
   // Leak Modernizr namespace
-  window.Modernizr = Modernizr;
+  //window.Modernizr = Modernizr;
+  dwv.Modernizr = Modernizr;
 
 
 ;
