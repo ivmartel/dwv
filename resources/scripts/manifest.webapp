@@ -1,7 +1,7 @@
 {
   "name": "dwv",
   "description": "DICOM Web Viewer.",
-  "version": "0.23.1-beta",
+  "version": "0.23.1",
   "developer": {
     "name": "ivmartel",
     "url": "https://github.com/ivmartel"
@@ -12,8 +12,7 @@
   "icons": {
     "16": "/dwv/demo/stable/resources/icons/dwv-16.png",
     "32": "/dwv/demo/stable/resources/icons/dwv-32.png",
-    "60": "/dwv/demo/stable/resources/icons/dwv-60.png",
-    "90": "/dwv/demo/stable/resources/icons/dwv-90.png",
+    "64": "/dwv/demo/stable/resources/icons/dwv-64.png",
     "128": "/dwv/demo/stable/resources/icons/dwv-128.png"
   }
 }
