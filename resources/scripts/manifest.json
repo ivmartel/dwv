@@ -2,7 +2,7 @@
   "name": "dwv",
   "short_name": "dwv",
   "description": "DICOM Web Viewer: medical image viewer for *.dcm files.",
-  "version": "0.23.1",
+  "version": "0.23.2",
   "manifest_version": 2,
   "app": {
     "urls": [
