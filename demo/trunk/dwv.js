@@ -1024,13 +1024,13 @@ dwv.App = function ()
     };
 
     /**
-     * Handle loader change.
+     * Handle loader change. Will activate the loader using
+     * the value property of the 'event.currentTarget'.
      * @param {Object} event The change event.
      */
-    this.onChangeLoader = function (/*event*/)
+    this.onChangeLoader = function (event)
     {
-        // called from an HTML select, use its value
-        loadbox.displayLoader( this.value );
+        loadbox.displayLoader( event.currentTarget.value );
     };
 
     /**
@@ -1085,53 +1085,53 @@ dwv.App = function ()
     };
 
     /**
-     * Handle colour map change.
+     * Handle colour map change. Will activate the tool using
+     * the value property of the 'event.currentTarget'.
      * @param {Object} event The change event.
      */
-    this.onChangeColourMap = function (/*event*/)
+    this.onChangeColourMap = function (event)
     {
-        // called from an HTML select, use its value
-        viewController.setColourMapFromName(this.value);
+        viewController.setColourMapFromName( event.currentTarget.value );
     };
 
     /**
-     * Handle window/level preset change.
+     * Handle window/level preset change. Will activate the preset using
+     * the value property of the 'event.currentTarget'.
      * @param {Object} event The change event.
      */
-    this.onChangeWindowLevelPreset = function (/*event*/)
+    this.onChangeWindowLevelPreset = function (event)
     {
-        // value should be the name of the preset
-        viewController.setWindowLevelPreset( this.value );
+        viewController.setWindowLevelPreset( event.currentTarget.value );
     };
 
     /**
-     * Handle tool change.
+     * Handle tool change. Will activate the tool using
+     * the value property of the 'event.currentTarget'.
      * @param {Object} event The change event.
      */
-    this.onChangeTool = function (/*event*/)
+    this.onChangeTool = function (event)
     {
-        // called from an HTML select, use its value
-        toolboxController.setSelectedTool(this.value);
+        toolboxController.setSelectedTool( event.currentTarget.value );
     };
 
     /**
-     * Handle shape change.
+     * Handle shape change. Will activate the shape using
+     * the value property of the 'event.currentTarget'.
      * @param {Object} event The change event.
      */
-    this.onChangeShape = function (/*event*/)
+    this.onChangeShape = function (event)
     {
-        // called from an HTML select, use its value
-        toolboxController.setSelectedShape(this.value);
+        toolboxController.setSelectedShape( event.currentTarget.value );
     };
 
     /**
-     * Handle filter change.
+     * Handle filter change. Will activate the filter using
+     * the value property of the 'event.currentTarget'.
      * @param {Object} event The change event.
      */
-    this.onChangeFilter = function (/*event*/)
+    this.onChangeFilter = function (event)
     {
-        // called from an HTML select, use its value
-        toolboxController.setSelectedFilter(this.value);
+        toolboxController.setSelectedFilter( event.currentTarget.value );
     };
 
     /**
@@ -1144,13 +1144,14 @@ dwv.App = function ()
     };
 
     /**
-     * Handle line colour change.
+     * Handle line colour change. Will activate the colour using
+     * the value property of the 'event.currentTarget'.
      * @param {Object} event The change event.
      */
-    this.onChangeLineColour = function (/*event*/)
+    this.onChangeLineColour = function (event)
     {
         // called from an HTML select, use its value
-        toolboxController.setLineColour(this.value);
+        toolboxController.setLineColour( event.currentTarget.value );
     };
 
     /**
