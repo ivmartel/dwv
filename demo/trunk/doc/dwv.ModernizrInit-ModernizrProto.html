@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>dwv Source: src/image/dicomBufferToView.js</title>
+	<title>dwv Class: ModernizrProto</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -88,186 +88,137 @@
 <div class="row">
 
 	
-	<div class="col-md-12">
+	<div class="col-md-8">
 	
 		<div id="main">
 			
 
-		<h1 class="page-title">Source: src/image/dicomBufferToView.js</h1>
-    
+	<h1 class="page-title">Class: ModernizrProto</h1>
 <section>
-    <article>
-        <pre
-            class="sunlight-highlight-javascript linenums">// namespaces
-var dwv = dwv || {};
-dwv.image = dwv.image || {};
 
-/**
- * Create a dwv.image.View from a DICOM buffer.
- * @constructor
- */
-dwv.image.DicomBufferToView = function ()
-{
-    // closure to self
-    var self = this;
+<header>
+    
+        <h2>
+        ModernizrProto
+        </h2>
+        
+    
+</header>
 
-    /**
-     * The default character set (optional).
-     * @private
-     * @type String
-     */
-    var defaultCharacterSet;
 
-    /**
-     * Set the default character set.
-     * param {String} The character set.
-     */
-    this.setDefaultCharacterSet = function (characterSet) {
-        defaultCharacterSet = characterSet;
-    };
+<article>
+    <div class="container-overview">
+    
+        
+<hr>
+<dt>
+    <h4 class="name" id="ModernizrProto"><span class="type-signature"></span>new ModernizrProto()</h4>
+    
+    
+</dt>
+<dd>
 
-    /**
-     * Pixel buffer decoder.
-     * Define only once to allow optional asynchronous mode.
-     * @private
-     * @type Object
-     */
-    var pixelDecoder = null;
+    
+    <div class="description">
+        ModernizrProto is the constructor for Modernizr
+    </div>
+    
 
-    /**
-     * Get data from an input buffer using a DICOM parser.
-     * @param {Array} buffer The input data buffer.
-     * @param {Number} dataIndex The data index.
-     */
-    this.convert = function (buffer, dataIndex)
-    {
-        // DICOM parser
-        var dicomParser = new dwv.dicom.DicomParser();
-        dicomParser.setDefaultCharacterSet(defaultCharacterSet);
-        // parse the buffer
-        dicomParser.parse(buffer);
+    
 
-        var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
-        var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
-        var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
-        var needDecompression = (algoName !== null);
+    
 
-        // worker callback
-        var onDecodedFirstFrame = function (/*event*/) {
-            // create the image
-            var imageFactory = new dwv.image.ImageFactory();
-            var image = imageFactory.create( dicomParser.getDicomElements(), pixelBuffer );
-            // create the view
-            var viewFactory = new dwv.image.ViewFactory();
-            var view = viewFactory.create( dicomParser.getDicomElements(), image );
-            // return
-            self.onload({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
-        };
+    
+    
 
-        if ( needDecompression ) {
-            var bitsAllocated = dicomParser.getRawDicomElements().x00280100.value[0];
-            var pixelRepresentation = dicomParser.getRawDicomElements().x00280103.value[0];
-            var isSigned = (pixelRepresentation === 1);
-            var nFrames = pixelBuffer.length;
+    
+<dl class="details">
+    
 
-            if (!pixelDecoder){
-                pixelDecoder = new dwv.image.PixelBufferDecoder(algoName);
-            }
+	
 
-            // loadend event
-            pixelDecoder.ondecodeend = function () {
-                self.onloadend();
-            };
+	
 
-            // send an onload event for mono frame
-            if ( nFrames === 1 ) {
-                pixelDecoder.ondecoded = function () {
-                    self.onloadend();
-                };
-            }
+	
 
-            // decoder callback
-            var countDecodedFrames = 0;
-            var onDecodedFrame = function (frame) {
-                return function (event) {
-                    // send progress
-                    ++countDecodedFrames;
-                    var ev = {'type': "load-progress", 'lengthComputable': true,
-                        'loaded': (countDecodedFrames * 100 / nFrames), 'total': 100};
-                    if ( typeof dataIndex !== "undefined") {
-                        ev.index = dataIndex;
-                    }
-                    self.onprogress(ev);
-                    // store data
-                    pixelBuffer[frame] = event.data[0];
-                    // create image for first frame
-                    if ( frame === 0 ) {
-                        onDecodedFirstFrame();
-                    }
-                };
-            };
+    
 
-            // decompress synchronously the first frame to create the image
-            pixelDecoder.decode(pixelBuffer[0],
-                bitsAllocated, isSigned, onDecodedFrame(0), false);
+    
 
-            // decompress the possible other frames
-            if ( nFrames !== 1 ) {
-                // decode (asynchronously if possible)
-                for (var f = 1; f &lt; nFrames; ++f) {
-                    pixelDecoder.decode(pixelBuffer[f],
-                        bitsAllocated, isSigned, onDecodedFrame(f));
-                }
-            }
-        }
-        // no decompression
-        else {
-            // send progress
-            var evnodec = {'type': 'load-progress', 'lengthComputable': true,
-                'loaded': 100, 'total': 100};
-            if ( typeof dataIndex !== "undefined") {
-                evnodec.index = dataIndex;
-            }
-            self.onprogress(evnodec);
-            // create image
-            onDecodedFirstFrame();
-            // send load events
-            self.onloadend();
-        }
-    };
+    
 
-    /**
-     * Abort a conversion.
-     */
-    this.abort = function () {
-        if ( pixelDecoder ) {
-            pixelDecoder.abort();
-        }
-    };
-};
+    
 
-/**
- * Handle a load end event.
- * @param {Object} event The load end event.
- * Default does nothing.
- */
-dwv.image.DicomBufferToView.prototype.onloadend = function (/*event*/) {};
-/**
- * Handle a load event.
- * @param {Object} event The load event.
- * Default does nothing.
- */
-dwv.image.DicomBufferToView.prototype.onload = function  (/*event*/) {};
-/**
- * Handle a load progress event.
- * @param {Object} event The progress event.
- * Default does nothing.
- */
-dwv.image.DicomBufferToView.prototype.onprogress = function  (/*event*/) {};
-</pre>
-    </article>
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_utils_modernizr.js.html">src/utils/modernizr.js</a>,
+				 <a href="src_utils_modernizr.js.html#sunlight-1-line-41">line 41</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
 </section>
-
 
 
 
@@ -277,6 +228,10 @@ dwv.image.DicomBufferToView.prototype.onprogress = function  (/*event*/) {};
 
 	<div class="clearfix"></div>
 
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
 	
 
 </div>
