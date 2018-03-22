@@ -10,7 +10,8 @@ env:
   global:
     - secure: jWTxnnLGmoM+j3148tIF2SJMEyub2j9kmR15vEKVeP6BbUvNgWH9jTSwf6Ddv3qjbAb3D8p9nhYBOZgRub1stwjWCH+DS17AoKFeRVj4Q8Sf0XBHGzJbn0FkstilVmGv3Zr/FVmDSEm1xSSHanWCUQX0uH9r/XB8z7khp4pLryo=
 
-# update gh-pages if all good
 after_success:
-  - chmod +x ./resources/scripts/update-gh-pages.sh
-  - ./resources/scripts/update-gh-pages.sh
+# update gh-page only for master and not pull requests
+- if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+    chmod +x ./resources/scripts/update-gh-pages.sh; "./resources/scripts/update-gh-pages.sh";
+  else echo "Not deploying artifacts for $TRAVIS_BRANCH"; fi
