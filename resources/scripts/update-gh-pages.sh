@@ -6,11 +6,8 @@ echo -e "Starting to update gh-pages\n"
 
 # build deploy version (result in ./build/dist)
 yarn run build || exit 1
-# create doc
+# create doc (result in ./build/doc)
 yarn run doc
-
-# send coverage to coveralls
-grunt coveralls
 
 # go to home and setup git
 cd $HOME
