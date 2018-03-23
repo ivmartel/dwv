@@ -180,14 +180,7 @@ dwv.ViewController = function ( view )
              var nSlices = view.getImage().getGeometry().getSize().getNumberOfSlices();
              var nFrames = view.getImage().getNumberOfFrames();
              var recommendedDisplayFrameRate = view.getImage().getMeta().RecommendedDisplayFrameRate;
-             if ( !recommendedDisplayFrameRate ){
-
-                 // Default to 10 FPS if none is found in the meta
-                 recommendedDisplayFrameRate = 10;
-             }
-
-             // round milliseconds per frame to nearest whole number
-             var milliseconds = Math.round(recommendedDisplayFrameRate / 1000);
+             var milliseconds = view.getPlaybackMilliseconds(recommendedDisplayFrameRate);
 
              playerID = setInterval( function () {
                  if ( nSlices !== 1 ) {
