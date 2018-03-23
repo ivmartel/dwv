@@ -179,7 +179,7 @@ dwv.ViewController = function ( view )
          if ( playerID === null ) {
              var nSlices = view.getImage().getGeometry().getSize().getNumberOfSlices();
              var nFrames = view.getImage().getNumberOfFrames();
-             var recommendedDisplayFrameRate = view.get().getMeta().RecommendedDisplayFrameRate;
+             var recommendedDisplayFrameRate = view.getImage().getMeta().RecommendedDisplayFrameRate;
              if ( !recommendedDisplayFrameRate ){
 
                  // Default to 10 FPS if none is found in the meta
