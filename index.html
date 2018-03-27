@@ -114,15 +114,11 @@ function getDwvBaseUrl()
     var select = document.getElementById('select-dwv');
     var flag = select.options[select.selectedIndex].value;
 
-    var path = "demo";
+    // which viewer
+    var path = "https://ivmartel.github.io/" + flag + "/demo";
     // stable or trunk
     if( !useTrunk ) path += "/stable";
     else path += "/trunk";
-    // which viewer
-    if( flag === "dwv-mobile" ) path += "/viewers/mobile";
-    else if( flag === "dwv-static" ) path += "/viewers/static";
-    else if( flag === "dwv-simple" ) path += "/viewers/simple";
-    else if( flag === "dwv-simplistic" ) path += "/viewers/simplistic";
     // finish
     path += "/index.html";
     return path;
@@ -217,9 +213,8 @@ to launch DWV with the selected data.</p>
 <div>
 <label for="select-dwv">Choose which DWV to launch:</label>
 <select id="select-dwv" onChange="updateLinks();">
-<option value="dwv-mobile">DWV Mobile</option>
-<option value="dwv-static">DWV Static</option>
-<option value="dwv-simple">DWV Simple</option>
+<option value="dwv-jqmobile">DWV Mobile</option>
+<option value="dwv-jqui">DWV Static</option>
 <option value="dwv-simplistic">DWV Simplistic</option>
 </select>
 </div>
