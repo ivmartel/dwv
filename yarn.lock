@@ -2344,9 +2344,9 @@ qs@~6.5.1:
   version "6.5.1"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.1.tgz#349cdf6eef89ec45c12d7d5eb3fc0c870343a6d8"
 
-qunit@~2.5.1:
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/qunit/-/qunit-2.5.1.tgz#739b0ea9595bbf508b0600d5af04dcb2ba2a74e5"
+qunit@~2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/qunit/-/qunit-2.6.0.tgz#347b34686e2aa67a9f81f81d39f0771603ed628c"
   dependencies:
     chokidar "1.7.0"
     commander "2.12.2"
@@ -2354,7 +2354,6 @@ qunit@~2.5.1:
     findup-sync "2.0.0"
     js-reporters "1.2.1"
     resolve "1.5.0"
-    shelljs "^0.2.6"
     walk-sync "0.3.2"
 
 randomatic@^1.1.3:
@@ -2671,10 +2670,6 @@ set-value@^2.0.0:
 shelljs@0.3.x:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/shelljs/-/shelljs-0.3.0.tgz#3596e6307a781544f591f37da618360f31db57b1"
-
-shelljs@^0.2.6:
-  version "0.2.6"
-  resolved "https://registry.yarnpkg.com/shelljs/-/shelljs-0.2.6.tgz#90492d72ffcc8159976baba62fb0f6884f0c3378"
 
 signal-exit@^3.0.0:
   version "3.0.2"
