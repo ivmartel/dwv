@@ -79,7 +79,7 @@ QUnit.test("Test playback milliseconds.", function (assert) {
     var defaultMilliseconds = view0.getPlaybackMilliseconds(null);
 
     // default to 10 fps
-    assert.equal( defaultMilliseconds, 1000,  "check view getPlaybackMilliseconds" );
+    assert.equal( defaultMilliseconds, 100,  "check view getPlaybackMilliseconds" );
 });
 
 /**
