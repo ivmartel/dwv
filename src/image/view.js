@@ -212,6 +212,20 @@ dwv.image.View = function (image)
     this.setImage = function(inImage) { image = inImage; };
 
     /**
+     * Get the milliseconds per frame from frame rate.
+     * @return {Number} The milliseconds per frame.
+     */
+
+    this.getPlaybackMilliseconds = function(recommendedDisplayFrameRate) {
+        if ( !recommendedDisplayFrameRate ){
+            // Default to 10 FPS if none is found in the meta
+            recommendedDisplayFrameRate = 10;
+        }
+        // round milliseconds per frame to nearest whole number
+        return Math.round(1000 / recommendedDisplayFrameRate);
+    };
+
+    /**
      * Get the window LUT of the image.
      * Warning: can be undefined in no window/level was set.
      * @param {Object} rsi Optional image rsi, will take the one of the current slice otherwise.

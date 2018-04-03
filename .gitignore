@@ -1,9 +1,10 @@
-# ignore downloaded dependencies
+# dependencies
 node_modules
 bower_components
 
-# ignore build
+# build
 build
 
-# ignore test viewer
-/viewer
+# misc
+npm-debug.log
+yarn-error.log
