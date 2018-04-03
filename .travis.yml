@@ -15,10 +15,18 @@ before_install: yarn global add greenkeeper-lockfile@1
 before_script: greenkeeper-lockfile-update
 after_script: greenkeeper-lockfile-upload
 
+# main
+script:
+- yarn run build
+- yarn run test
+
 after_success:
 # send coverage to coveralls
 - grunt coveralls
-# update gh-page only for master and not pull requests
-- if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-    chmod +x ./resources/scripts/update-gh-pages.sh; "./resources/scripts/update-gh-pages.sh";
-  else echo "Not deploying artifacts for $TRAVIS_BRANCH"; fi
+# update gh-page only if not a pull request and if branch master or develop
+- if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+    if [ "$TRAVIS_BRANCH" == "master" ] || [ "$TRAVIS_BRANCH" == "develop" ]; then
+      chmod +x ./resources/scripts/update-gh-pages.sh
+      "./resources/scripts/update-gh-pages.sh"
+    else echo "Not deploying artifacts for branch $TRAVIS_BRANCH"; fi
+  else echo "Not deploying artifacts for pull request"; fi
