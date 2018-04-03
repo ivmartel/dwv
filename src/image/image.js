@@ -1005,6 +1005,13 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     if ( pixelRepresentation ) {
         meta.IsSigned = (pixelRepresentation === 1);
     }
+
+    // RecommendedDisplayFrameRate
+    var recommendedDisplayFrameRate = dicomElements.getFromKey("x00082144");
+    if ( recommendedDisplayFrameRate ) {
+        meta.RecommendedDisplayFrameRate = parseInt(recommendedDisplayFrameRate, 10);
+    }
+
     image.setMeta(meta);
 
     // overlay

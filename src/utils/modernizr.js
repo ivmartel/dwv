@@ -25,7 +25,8 @@ var dwv = dwv || {};
  * of control over the experience.
 */
 
-;(function(window, document, undefined){
+dwv.ModernizrInit = function (window, document, undefined) {
+//;(function(window, document, undefined){
   var tests = [];
 
 
@@ -612,4 +613,5 @@ file selection dialog.
 
 ;
 
-})(window, document);
+//})(window, document);
+};
