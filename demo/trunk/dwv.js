@@ -2946,6 +2946,8 @@ dwv.ViewController = function ( view )
          if ( playerID === null ) {
              var nSlices = view.getImage().getGeometry().getSize().getNumberOfSlices();
              var nFrames = view.getImage().getNumberOfFrames();
+             var recommendedDisplayFrameRate = view.getImage().getMeta().RecommendedDisplayFrameRate;
+             var milliseconds = view.getPlaybackMilliseconds(recommendedDisplayFrameRate);
 
              playerID = setInterval( function () {
                  if ( nSlices !== 1 ) {
@@ -2958,7 +2960,7 @@ dwv.ViewController = function ( view )
                      }
                  }
 
-             }, 300);
+             }, milliseconds);
          } else {
              this.stop();
          }
@@ -15501,6 +15503,13 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     if ( pixelRepresentation ) {
         meta.IsSigned = (pixelRepresentation === 1);
     }
+
+    // RecommendedDisplayFrameRate
+    var recommendedDisplayFrameRate = dicomElements.getFromKey("x00082144");
+    if ( recommendedDisplayFrameRate ) {
+        meta.RecommendedDisplayFrameRate = parseInt(recommendedDisplayFrameRate, 10);
+    }
+
     image.setMeta(meta);
 
     // overlay
@@ -16094,6 +16103,20 @@ dwv.image.View = function (image)
      * @param {Image} inImage The associated image.
      */
     this.setImage = function(inImage) { image = inImage; };
+
+    /**
+     * Get the milliseconds per frame from frame rate.
+     * @return {Number} The milliseconds per frame.
+     */
+
+    this.getPlaybackMilliseconds = function(recommendedDisplayFrameRate) {
+        if ( !recommendedDisplayFrameRate ){
+            // Default to 10 FPS if none is found in the meta
+            recommendedDisplayFrameRate = 10;
+        }
+        // round milliseconds per frame to nearest whole number
+        return Math.round(1000 / recommendedDisplayFrameRate);
+    };
 
     /**
      * Get the window LUT of the image.
