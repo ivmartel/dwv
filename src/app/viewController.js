@@ -179,6 +179,8 @@ dwv.ViewController = function ( view )
          if ( playerID === null ) {
              var nSlices = view.getImage().getGeometry().getSize().getNumberOfSlices();
              var nFrames = view.getImage().getNumberOfFrames();
+             var recommendedDisplayFrameRate = view.getImage().getMeta().RecommendedDisplayFrameRate;
+             var milliseconds = view.getPlaybackMilliseconds(recommendedDisplayFrameRate);
 
              playerID = setInterval( function () {
                  if ( nSlices !== 1 ) {
@@ -191,7 +193,7 @@ dwv.ViewController = function ( view )
                      }
                  }
 
-             }, 300);
+             }, milliseconds);
          } else {
              this.stop();
          }

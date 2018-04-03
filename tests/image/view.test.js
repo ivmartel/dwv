@@ -45,6 +45,44 @@ QUnit.test("Test listeners.", function (assert) {
 });
 
 /**
+ * Tests for {@link dwv.image.View} getImage meta.
+ * @function module:tests/image~getMeta
+ */
+QUnit.test("Test playback milliseconds.", function (assert) {
+    // create an image
+    var size0 = 4;
+    var imgSize0 = new dwv.image.Size(size0, size0, 1);
+    var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+    var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
+    var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
+    var buffer0 = [];
+    for (var i = 0; i < size0 * size0; ++i) {
+        buffer0[i] = i;
+    }
+    var image0 = new dwv.image.Image(imgGeometry0, [buffer0]);
+    image0.setMeta({RecommendedDisplayFrameRate: 20});
+
+    // create a view
+    var view0 = new dwv.image.View(image0);
+
+    // get frame rate from meta
+    var recommendedDisplayFrameRate = view0.getImage().getMeta().RecommendedDisplayFrameRate;
+
+    assert.equal( recommendedDisplayFrameRate, 20, "check image meta" );
+
+    // get milliseconds per frame from frame rate
+    var milliseconds = view0.getPlaybackMilliseconds(recommendedDisplayFrameRate);
+
+    assert.equal( milliseconds, 50, "check view getPlaybackMilliseconds" );
+
+    // get default milliseconds if no frame rate provided
+    var defaultMilliseconds = view0.getPlaybackMilliseconds(null);
+
+    // default to 10 fps
+    assert.equal( defaultMilliseconds, 100,  "check view getPlaybackMilliseconds" );
+});
+
+/**
  * Tests for {@link dwv.image.View} generateImageData MONO.
  * @function module:tests/image~generateImageDataMONO
  */
