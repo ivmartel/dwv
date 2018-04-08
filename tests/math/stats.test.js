@@ -6,6 +6,19 @@
 QUnit.module("stats");
 
 /**
+ * Tests for {@link dwv.math.Stats.equals}.
+ * @function module:tests/math~Stats:equals
+ */
+QUnit.test("Test Stats equals.", function (assert) {
+    var stats0 = new dwv.math.Stats(0,0,0,0);
+    assert.notOk(stats0.equals(null), "Stats should not be equal to null.");
+    var stats1 = new dwv.math.Stats(0,0,0,0);
+    assert.ok(stats0.equals(stats1), "Stats should be equal.");
+    var stats2 = new dwv.math.Stats(0,1,2,3);
+    assert.notOk(stats0.equals(stats2), "Stats should not be equal.");
+});
+
+/**
  * Tests for {@link dwv.math.getStats}.
  * @function module:tests/math~getStats
  */
