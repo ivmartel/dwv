@@ -6,10 +6,60 @@
 QUnit.module("image");
 
 /**
+ * Compare an image and a buffer.
+ * @param {Object} image The input image.
+ * @param {Object} size The size of the input buffer.
+ * @param {Array} buffer The input buffer.
+ * @param {Object} rsi The rescale slope of the input buffer.
+ * @return {Object} Statistics of the value and rescaled value differences.
+ */
+dwv.utils.test.CompareImageAndBuffer = function ( image, size, buffer, rsi ) {
+    var diffs = [];
+    var diffsRescaled = [];
+
+    // calculate differences
+    var index = 0;
+    for ( var k = 0; k < size.getNumberOfSlices(); ++k ) {
+        for ( var j = 0; j < size.getNumberOfRows(); ++j ) {
+            for ( var i = 0; i < size.getNumberOfColumns(); ++i ) {
+                var diff = Math.abs( image.getValue(i,j,k) - buffer[index] );
+                if ( diff !== 0 ) {
+                    diffs.push( diff );
+                }
+                var diffRescaled = Math.abs(
+                    image.getRescaledValue(i,j,k) - rsi.apply(buffer[index]) );
+                if ( diffRescaled !== 0 ) {
+                    diffsRescaled.push( diffRescaled );
+                }
+                ++index;
+            }
+        }
+    }
+
+    // calculate stats if necessary
+    var statsDiff = new dwv.math.Stats(0,0,0,0);
+    if ( diffs.length !== 0 ) {
+        statsDiff = dwv.math.getStats(diffs);
+    }
+    var statsDiffRescaled = new dwv.math.Stats(0,0,0,0);
+    if ( diffsRescaled.length !== 0 ) {
+        statsDiffRescaled = dwv.math.getStats(diffsRescaled);
+    }
+
+    // return stats
+    return {
+        'valuesStats': statsDiff,
+        'rescaledStats': statsDiffRescaled
+    };
+};
+
+/**
  * Tests for {@link dwv.image.Image} getValue.
  * @function module:tests/image~getvalue
  */
 QUnit.test("Test Image getValue.", function (assert) {
+    var zeroStats = new dwv.math.Stats(0,0,0,0);
+
     // create a simple image
     var size0 = 4;
     var imgSize0 = new dwv.image.Size(size0, size0, 1);
@@ -21,11 +71,14 @@ QUnit.test("Test Image getValue.", function (assert) {
         buffer0[i] = i;
     }
     var image0 = new dwv.image.Image(imgGeometry0, [buffer0]);
+    // test its geometry
+    assert.equal( image0.getGeometry(), imgGeometry0, "Image geometry" );
     // test its values
-    assert.equal( image0.getValue(0, 0, 0), 0, "Value at 0,0,0" );
-    assert.equal( image0.getValue(1, 0, 0), 1, "Value at 1,0,0" );
-    assert.equal( image0.getValue(1, 1, 0), 1*size0 + 1, "Value at 1,1,0" );
-    assert.equal( image0.getValue(3, 3, 0), 3*size0 + 3, "Value at 3,3,0" );
+    var rsi0 = new dwv.image.RescaleSlopeAndIntercept(1, 0);
+    var res0 = dwv.utils.test.CompareImageAndBuffer( image0, imgSize0, buffer0, rsi0 );
+    assert.propEqual( res0.valuesStats.asObject(), zeroStats.asObject(), "Values should be equal" );
+    assert.propEqual( res0.rescaledStats.asObject(), zeroStats.asObject(), "Rescaled values should be equal" );
+    // outside value
     assert.equal( isNaN(image0.getValue(4, 3, 0)), true, "Value outside is NaN" );
     // TODO: wrong, should not be accessed
     assert.equal( image0.getValue(5, 0, 0), 1*size0 + 1, "Value at 5,0,0" );
@@ -36,15 +89,12 @@ QUnit.test("Test Image getValue.", function (assert) {
     var intercept1 = 10;
     var rsi1 = new dwv.image.RescaleSlopeAndIntercept(slope1, intercept1);
     image1.setRescaleSlopeAndIntercept(rsi1);
+    // test its geometry
+    assert.equal( image1.getGeometry(), imgGeometry0, "Image geometry" );
     // test its values
-    assert.equal( image1.getValue(0, 0, 0), 0, "Value at 0,0,0" );
-    assert.equal( image1.getValue(1, 0, 0), 1, "Value at 1,0,0" );
-    assert.equal( image1.getValue(1, 1, 0), 1*size0 + 1, "Value at 1,1,0" );
-    assert.equal( image1.getValue(3, 3, 0), 3*size0 + 3, "Value at 3,3,0" );
-    assert.equal( image1.getRescaledValue(0, 0, 0), 0+intercept1, "Value at 0,0,0" );
-    assert.equal( image1.getRescaledValue(1, 0, 0), 1*slope1+intercept1, "Value at 1,0,0" );
-    assert.equal( image1.getRescaledValue(1, 1, 0), (1*size0 + 1)*slope1+intercept1, "Value at 1,1,0" );
-    assert.equal( image1.getRescaledValue(3, 3, 0), (3*size0 + 3)*slope1+intercept1, "Value at 3,3,0" );
+    var res1 = dwv.utils.test.CompareImageAndBuffer( image1, imgSize0, buffer0, rsi1 );
+    assert.propEqual( res1.valuesStats.asObject(), zeroStats.asObject(), "Values should be equal" );
+    assert.propEqual( res1.rescaledStats.asObject(), zeroStats.asObject(), "Rescaled values should be equal" );
 });
 
 /**
@@ -316,4 +366,49 @@ QUnit.test("Test Image compose.", function (assert) {
         }
     }
     assert.equal( testContent0, true, "compose addition" );
+});
+
+/**
+ * Tests for {@link dwv.image.ImageFactory}.
+ * @function module:tests/imageFactory
+ */
+QUnit.test("Test ImageFactory.", function (assert) {
+    var zeroStats = new dwv.math.Stats(0,0,0,0);
+
+    var size0 = 3;
+    var imgSize0 = new dwv.image.Size(size0, size0, 1);
+    var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+    var imgOrigin0 = new dwv.math.Point3D(0,0,0);
+    var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
+    var buffer0 = [];
+    for ( var i = 0; i < size0*size0; ++i ) {
+        buffer0[i] = i;
+    }
+    var rsi0 = new dwv.image.RescaleSlopeAndIntercept(1, 0);
+
+    var dicomElements0 = [];
+    // columns
+    dicomElements0.x00280011 = { 'value': imgSize0.getNumberOfColumns() };
+    // rows
+    dicomElements0.x00280010 = { 'value': imgSize0.getNumberOfRows() };
+    // spacing
+    dicomElements0.x00280030 = { 'value': [imgSpacing0.getRowSpacing(), imgSpacing0.getColumnSpacing()] };
+    // transfer syntax (explicit VR)
+    dicomElements0.x00020010 = { 'value': '1.2.840.10008.1.2.1' };
+
+    // wrap the dicom elements
+    var wrappedDicomElements0 = new dwv.dicom.DicomElementsWrapper(dicomElements0);
+    // create the image factory
+    var factory0 = new dwv.image.ImageFactory();
+    // create the image
+    var image0 = factory0.create( wrappedDicomElements0, [buffer0] );
+
+    // test its geometry
+    console.log(imgGeometry0.toString());
+    console.log(image0.getGeometry().toString());
+    assert.ok( image0.getGeometry().equals(imgGeometry0), "Image geometry" );
+    // test its values
+    var res0 = dwv.utils.test.CompareImageAndBuffer( image0, imgSize0, buffer0, rsi0 );
+    assert.propEqual( res0.valuesStats.asObject(), zeroStats.asObject(), "Values should be equal" );
+    assert.propEqual( res0.rescaledStats.asObject(), zeroStats.asObject(), "Rescaled values should be equal" );
 });
