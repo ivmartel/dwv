@@ -226,15 +226,25 @@ dwv.image.Geometry = function ( origin, size, spacing, orientation )
 };
 
 /**
+ * Get a string representation of the Vector3D.
+ * @return {String} The vector as a string.
+ */
+dwv.image.Geometry.prototype.toString = function () {
+    return "Origin: " + this.getOrigin() +
+        ", Size: " + this.getSize() +
+        ", Spacing: " + this.getSpacing();
+};
+
+/**
  * Check for equality.
  * @param {Geometry} rhs The object to compare to.
  * @return {Boolean} True if both objects are equal.
  */
 dwv.image.Geometry.prototype.equals = function (rhs) {
     return rhs !== null &&
-        this.getOrigin() === rhs.getOrigin() &&
-        this.getSize() === rhs.getSize() &&
-        this.getSpacing() === rhs.getSpacing();
+        this.getOrigin().equals( rhs.getOrigin() ) &&
+        this.getSize().equals( rhs.getSize() ) &&
+        this.getSpacing().equals( rhs.getSpacing() );
 };
 
 /**
