@@ -14448,15 +14448,25 @@ dwv.image.Geometry = function ( origin, size, spacing, orientation )
 };
 
 /**
+ * Get a string representation of the Vector3D.
+ * @return {String} The vector as a string.
+ */
+dwv.image.Geometry.prototype.toString = function () {
+    return "Origin: " + this.getOrigin() +
+        ", Size: " + this.getSize() +
+        ", Spacing: " + this.getSpacing();
+};
+
+/**
  * Check for equality.
  * @param {Geometry} rhs The object to compare to.
  * @return {Boolean} True if both objects are equal.
  */
 dwv.image.Geometry.prototype.equals = function (rhs) {
     return rhs !== null &&
-        this.getOrigin() === rhs.getOrigin() &&
-        this.getSize() === rhs.getSize() &&
-        this.getSpacing() === rhs.getSpacing();
+        this.getOrigin().equals( rhs.getOrigin() ) &&
+        this.getSize().equals( rhs.getSize() ) &&
+        this.getSpacing().equals( rhs.getSpacing() );
 };
 
 /**
@@ -15330,10 +15340,10 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
         }
     }
     var quantif = dwv.math.getStats( subBuffer );
-    quant.min = {"value": quantif.min, "unit": ""};
-    quant.max = {"value": quantif.max, "unit": ""};
-    quant.mean = {"value": quantif.mean, "unit": ""};
-    quant.stdDev = {"value": quantif.stdDev, "unit": ""};
+    quant.min = {"value": quantif.getMin(), "unit": ""};
+    quant.max = {"value": quantif.getMax(), "unit": ""};
+    quant.mean = {"value": quantif.getMean(), "unit": ""};
+    quant.stdDev = {"value": quantif.getStdDev(), "unit": ""};
     // return
     return quant;
 };
@@ -20033,6 +20043,70 @@ var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
 /**
+ * Basic statistics
+ * @constructor
+ * @param {Number} min The minimum value.
+ * @param {Number} max The maximum value.
+ * @param {Number} mean The mean value.
+ * @param {Number} stdDev The standard deviation.
+ */
+dwv.math.Stats = function ( min, max, mean, stdDev ) {
+    /**
+     * Get the minimum value.
+     * @return {Number} The minimum value.
+     */
+    this.getMin = function () {
+        return min;
+    };
+    /**
+     * Get the maximum value.
+     * @return {Number} The maximum value.
+     */
+    this.getMax = function () {
+        return max;
+    };
+    /**
+     * Get the mean value.
+     * @return {Number} The mean value.
+     */
+    this.getMean = function () {
+        return mean;
+    };
+    /**
+     * Get the standard deviation.
+     * @return {Number} The standard deviation.
+     */
+    this.getStdDev = function () {
+        return stdDev;
+    };
+};
+
+/**
+ * Check for Stats equality.
+ * @param {Object} rhs The other Stats object to compare to.
+ * @return {Boolean} True if both Stats object are equal.
+ */
+dwv.math.Stats.prototype.equals = function (rhs) {
+    return rhs !== null &&
+        this.getMin() === rhs.getMin() &&
+        this.getMax() === rhs.getMax() &&
+        this.getMean() === rhs.getMean() &&
+        this.getStdDev() === rhs.getStdDev();
+};
+
+/**
+ * Get the stats as an object
+ * @return {Object} An object representation of the stats.
+ */
+dwv.math.Stats.prototype.asObject = function () {
+    return { 'min': this.getMin(),
+        'max': this.getMax(),
+        'mean': this.getMean(),
+        'stdDev': this.getStdDev()
+    };
+};
+
+/**
  * Get the minimum, maximum, mean and standard deviation
  * of an array of values.
  * Note: could use {@link https://github.com/tmcw/simple-statistics}.
@@ -20065,7 +20139,7 @@ dwv.math.getStats = function (array)
     variance = sumSqr / array.length - mean * mean;
     stdDev = Math.sqrt(variance);
 
-    return { 'min': min, 'max': max, 'mean': mean, 'stdDev': stdDev };
+    return new dwv.math.Stats( min, max, mean, stdDev );
 };
 
 /**
