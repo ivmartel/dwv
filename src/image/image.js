@@ -832,10 +832,10 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
         }
     }
     var quantif = dwv.math.getStats( subBuffer );
-    quant.min = {"value": quantif.min, "unit": ""};
-    quant.max = {"value": quantif.max, "unit": ""};
-    quant.mean = {"value": quantif.mean, "unit": ""};
-    quant.stdDev = {"value": quantif.stdDev, "unit": ""};
+    quant.min = {"value": quantif.getMin(), "unit": ""};
+    quant.max = {"value": quantif.getMax(), "unit": ""};
+    quant.mean = {"value": quantif.getMean(), "unit": ""};
+    quant.stdDev = {"value": quantif.getStdDev(), "unit": ""};
     // return
     return quant;
 };

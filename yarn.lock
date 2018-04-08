@@ -1342,9 +1342,9 @@ i18next-xhr-backend@~1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/i18next-xhr-backend/-/i18next-xhr-backend-1.5.1.tgz#50282610780c6a696d880dfa7f4ac1d01e8c3ad5"
 
-i18next@~10.6.0:
-  version "10.6.0"
-  resolved "https://registry.yarnpkg.com/i18next/-/i18next-10.6.0.tgz#90ffd9f9bc617f34b9a12e037260f524445f7684"
+i18next@~11.0.0:
+  version "11.0.0"
+  resolved "https://registry.yarnpkg.com/i18next/-/i18next-11.0.0.tgz#3e3e2886652793d988d948ff82f07394e69136bc"
 
 iconv-lite@~0.4.13:
   version "0.4.19"
