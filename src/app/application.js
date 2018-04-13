@@ -198,7 +198,7 @@ dwv.App = function ()
             for ( var t = 0; t < config.tools.length; ++t ) {
                 var toolName = config.tools[t];
                 if ( toolName === "Draw" ) {
-                    if ( config.shapes !== 0 ) {
+                    if ( typeof config.shapes !== "undefined" && config.shapes.length !== 0 ) {
                         // setup the shape list
                         var shapeList = {};
                         for ( var s = 0; s < config.shapes.length; ++s ) {
@@ -216,10 +216,12 @@ dwv.App = function ()
                         toolList.Draw.addEventListener("draw-change", fireEvent);
                         toolList.Draw.addEventListener("draw-move", fireEvent);
                         toolList.Draw.addEventListener("draw-delete", fireEvent);
+                    } else {
+                        console.warn("Please provide a list of shapes in the application configuration to activate the Draw tool.");
                     }
                 }
                 else if ( toolName === "Filter" ) {
-                    if ( config.filters.length !== 0 ) {
+                    if ( typeof config.filters !== "undefined" && config.filters.length !== 0 ) {
                         // setup the filter list
                         var filterList = {};
                         for ( var f = 0; f < config.filters.length; ++f ) {
@@ -234,6 +236,8 @@ dwv.App = function ()
                         toolList.Filter = new dwv.tool.Filter(filterList, this);
                         toolList.Filter.addEventListener("filter-run", fireEvent);
                         toolList.Filter.addEventListener("filter-undo", fireEvent);
+                    } else {
+                        console.warn("Please provide a list of filters in the application configuration to activate the Filter tool.");
                     }
                 }
                 else {
