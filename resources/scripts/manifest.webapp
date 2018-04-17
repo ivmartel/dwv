@@ -1,7 +1,7 @@
 {
   "name": "dwv",
   "description": "DICOM Web Viewer.",
-  "version": "0.23.3",
+  "version": "0.23.4",
   "developer": {
     "name": "ivmartel",
     "url": "https://github.com/ivmartel"
