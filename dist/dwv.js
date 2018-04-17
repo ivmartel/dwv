@@ -19,15 +19,15 @@
         // like Node.
 
         // i18next-xhr-backend: requires XMlHttpRequest
-        // Konva (requires 'canvas') and MagicWand are gui specific
-        // -> deactivated for now...
+        // Konva: requires 'canvas'
+        // MagicWand: no module, deactivated for now...
 
         module.exports = factory(
             require('i18next'),
             require('i18next-xhr-backend'),
             require('i18next-browser-languagedetector'),
             require('jszip'),
-            null,
+            require('konva'),
             null
         );
     } else {
@@ -3040,7 +3040,7 @@ dwv.dicom = dwv.dicom || {};
  * Get the version of the library.
  * @return {String} The version of the library.
  */
-dwv.getVersion = function () { return "0.23.3"; };
+dwv.getVersion = function () { return "0.23.4"; };
 
 /**
  * Clean string: trim and remove ending.
