@@ -33,6 +33,9 @@ module.exports = function(grunt) {
             }
         },
         concat: {
+            options: {
+                banner: '/*! <%= pkg.name %> <%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n'
+            },
             dist: {
                 src: ['resources/module/intro.js', 'src/**/*.js', 'resources/module/outro.js'],
                 dest: 'build/dist/<%= pkg.name %>.js'
@@ -40,11 +43,11 @@ module.exports = function(grunt) {
         },
         uglify: {
             options: {
-                banner: '/*! <%= pkg.name %> <%= pkg.version %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
+                banner: '/*! <%= pkg.name %> <%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n'
             },
             dist: {
                 files: {
-                    'build/dist/<%= pkg.name %>-<%= pkg.version %>.min.js': ['<%= concat.dist.dest %>']
+                    'build/dist/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
                 }
             }
         },
