@@ -57,15 +57,40 @@ module.exports = function(grunt) {
                     configure: 'resources/doc/jsdoc.conf.json'
                 }
             }
+        },
+        copy: {
+            main: {
+                files: [
+                    {
+                        src: 'build/dist/<%= pkg.name %>.js',
+                        dest: '../dwv-jqmobile/node_modules/dwv/dist/<%= pkg.name %>.js'
+                    },
+                    {
+                        src: 'build/dist/<%= pkg.name %>.min.js',
+                        dest: '../dwv-jqmobile/node_modules/dwv/dist/<%= pkg.name %>.min.js'
+                    }
+                ]
+            }
+        },
+        watch: {
+            scripts: {
+                files: ['**/*.js', '!**/node_modules/**'],
+                tasks: ['concat', 'copy'],
+                options: {
+                    spawn: false
+                }
+            }
         }
     });
 
-    grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-qunit-istanbul');
-    grunt.loadNpmTasks('grunt-coveralls');
     grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-coveralls');
     grunt.loadNpmTasks('grunt-jsdoc');
+    grunt.loadNpmTasks('grunt-qunit-istanbul');
 
     // tasks
     grunt.registerTask('test', ['jshint', 'qunit']);

@@ -27,8 +27,10 @@
     "grunt": "~1.0.1",
     "grunt-cli": "~1.2",
     "grunt-contrib-concat": "~1.0",
+    "grunt-contrib-copy": "~1.0.0",
     "grunt-contrib-jshint": "~1.1.0",
     "grunt-contrib-uglify": "~3.3.0",
+    "grunt-contrib-watch": "~1.0.0",
     "grunt-coveralls": "~2.0.0",
     "grunt-jsdoc": "~2.2.0",
     "grunt-qunit-istanbul": "~1.0.0",
@@ -37,7 +39,7 @@
     "qunit": "~2.6.0"
   },
   "scripts": {
-    "start": "http-server",
+    "start": "grunt watch",
     "test": "grunt test --verbose",
     "build": "grunt build --verbose",
     "doc": "grunt doc --verbose"
