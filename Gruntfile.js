@@ -1,5 +1,6 @@
 /* global module */
 module.exports = function(grunt) {
+    var cpTarget = grunt.option('copy-target') || '../dwv-jqmobile';
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -66,11 +67,11 @@ module.exports = function(grunt) {
                 files: [
                     {
                         src: 'build/dist/<%= pkg.name %>.js',
-                        dest: '../dwv-jqmobile/node_modules/dwv/dist/<%= pkg.name %>.js'
+                        dest: cpTarget + '/node_modules/dwv/dist/<%= pkg.name %>.js'
                     },
                     {
-                        src: 'build/dist/<%= pkg.name %>.min.js',
-                        dest: '../dwv-jqmobile/node_modules/dwv/dist/<%= pkg.name %>.min.js'
+                        src: 'build/dist/<%= pkg.name %>.js',
+                        dest: cpTarget + '/node_modules/dwv/dist/<%= pkg.name %>.min.js'
                     }
                 ]
             }
