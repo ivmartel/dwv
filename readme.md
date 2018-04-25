@@ -15,3 +15,22 @@ DWV is not certified for diagnostic use. Released under GNU GPL-3.0 license (see
 And for those who want to support the dwv development:
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=VQWYY8ZS75H3E&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
+
+## Available Scripts
+
+``` bash
+# install dependencies
+yarn install
+
+# watch for changes and copy build (to be connected with a demo viewer)
+yarn run start
+
+# run unit tests
+yarn run test
+
+# create release files
+yarn run build
+
+# create documentation
+yarn run doc
+```
