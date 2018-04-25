@@ -404,8 +404,6 @@ QUnit.test("Test ImageFactory.", function (assert) {
     var image0 = factory0.create( wrappedDicomElements0, [buffer0] );
 
     // test its geometry
-    console.log(imgGeometry0.toString());
-    console.log(image0.getGeometry().toString());
     assert.ok( image0.getGeometry().equals(imgGeometry0), "Image geometry" );
     // test its values
     var res0 = dwv.utils.test.CompareImageAndBuffer( image0, imgSize0, buffer0, rsi0 );
