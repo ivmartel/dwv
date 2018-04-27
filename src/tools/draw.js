@@ -205,12 +205,16 @@ dwv.tool.Draw = function (app, shapeFactoryList)
                 Math.abs( event._y - lastPoint.getY() ) > 0 )
         {
             // clear last added point from the list (but not the first one)
-            if ( points.length != 1 ) {
-                points.pop();
+            // if it was marked as temporary
+            if ( points.length != 1 &&
+                typeof points[points.length-1].tmp !== "undefined" ) {
+                    points.pop();
             }
             // current point
             lastPoint = new dwv.math.Point2D(event._x, event._y);
-            // add current one to the list
+            // mark it as temporary
+            lastPoint.tmp = true;
+            // add it to the list
             points.push( lastPoint );
             // update points
             onNewPoints(points);
@@ -221,7 +225,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * Handle mouse up event.
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function (event) {
+    this.mouseup = function (/*event*/) {
         // exit if not started draw
         if ( !started ) {
             return;
@@ -239,12 +243,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // reset flag
             started = false;
         } else {
-            // no check, use the current point
-            lastPoint = new dwv.math.Point2D(event._x, event._y);
-            // add it to the list
-            points.push( lastPoint );
-            // update points
-            onNewPoints(points);
+            // remove temporary flag
+            if ( typeof points[points.length-1].tmp !== "undefined" ) {
+                delete points[points.length-1].tmp;
+            }
         }
     };
 
