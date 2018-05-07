@@ -77,16 +77,42 @@ module.exports = function(grunt) {
             }
         },
         watch: {
-            scripts: {
+            main: {
+                files: ['**/*.js', '!**/node_modules/**'],
+                tasks: ['jshint'],
+                options: {
+                    spawn: false,
+                    livereload: true
+                }
+            },
+            cmd: {
+                files: ['**/*.js', '!**/node_modules/**'],
+                tasks: ['test'],
+                options: {
+                    spawn: false
+                }
+            },
+            dev: {
                 files: ['**/*.js', '!**/node_modules/**'],
                 tasks: ['concat', 'copy'],
                 options: {
                     spawn: false
                 }
             }
-        }
+        },
+        connect: {
+            server: {
+                options: {
+                    port: 8080,
+                    hostname: 'localhost',
+                    open: 'http://localhost:8080/tests/index.html',
+                    livereload: true
+                }
+            }
+        },
     });
 
+    grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -98,6 +124,9 @@ module.exports = function(grunt) {
 
     // tasks
     grunt.registerTask('test', ['jshint', 'qunit']);
+    grunt.registerTask('start', ['connect', 'watch:main']);
+    grunt.registerTask('start-cmd', ['watch:cmd']);
+    grunt.registerTask('dev', ['watch:dev']);
     grunt.registerTask('build', ['concat', 'uglify']);
     grunt.registerTask('doc', ['jsdoc']);
 };

@@ -22,8 +22,14 @@ And for those who want to support the dwv development:
 # install dependencies
 yarn install
 
-# watch for changes and copy build (to be connected with a demo viewer)
+# serve with test hot reload at localhost:8080
 yarn run start
+
+# watch for changes and run command line tests
+yarn run start-cmd
+
+# watch for changes and copy build (to be connected with a demo viewer)
+yarn run dev
 
 # run unit tests
 yarn run test
