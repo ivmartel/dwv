@@ -54,6 +54,13 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @type Object
      */
     this.shapeFactoryList = shapeFactoryList;
+
+    /**
+     * Current shape factory.
+     * @type Object
+     */
+    var currentFactory = null;
+
     /**
      * Draw command.
      * @private
@@ -142,6 +149,11 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @param {Object} event The mouse down event.
      */
     this.mousedown = function(event){
+        // exit if a draw was started (handle at mouse move or up)
+        if ( started ) {
+            return;
+        }
+
         // determine if the click happened in an existing shape
         var stage = app.getDrawStage();
         var kshape = stage.getIntersection({
@@ -168,6 +180,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             shapeEditor.setImage(null);
             // start storing points
             started = true;
+            // set factory
+            currentFactory = new self.shapeFactoryList[self.shapeName]();
             // clear array
             points = [];
             // store point
@@ -181,42 +195,29 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @param {Object} event The mouse move event.
      */
     this.mousemove = function(event){
-        if (!started)
-        {
+        // exit if not started draw
+        if ( !started ) {
             return;
         }
+
+        // draw line to current pos
         if ( Math.abs( event._x - lastPoint.getX() ) > 0 ||
                 Math.abs( event._y - lastPoint.getY() ) > 0 )
         {
+            // clear last added point from the list (but not the first one)
+            // if it was marked as temporary
+            if ( points.length != 1 &&
+                typeof points[points.length-1].tmp !== "undefined" ) {
+                    points.pop();
+            }
             // current point
             lastPoint = new dwv.math.Point2D(event._x, event._y);
-            // clear last added point from the list (but not the first one)
-            if ( points.length != 1 ) {
-                points.pop();
-            }
-            // add current one to the list
+            // mark it as temporary
+            lastPoint.tmp = true;
+            // add it to the list
             points.push( lastPoint );
-            // allow for anchor points
-            var factory = new self.shapeFactoryList[self.shapeName]();
-            if( points.length < factory.getNPoints() ) {
-                clearTimeout(this.timer);
-                this.timer = setTimeout( function () {
-                    points.push( lastPoint );
-                }, factory.getTimeout() );
-            }
-            // remove previous draw
-            if ( tmpShapeGroup ) {
-                tmpShapeGroup.destroy();
-            }
-            // create shape group
-            tmpShapeGroup = factory.create(points, self.style, app.getImage());
-            // do not listen during creation
-            var shape = tmpShapeGroup.getChildren( dwv.draw.isNodeNameShape )[0];
-            shape.listening(false);
-            drawLayer.hitGraphEnabled(false);
-            // draw shape
-            drawLayer.add(tmpShapeGroup);
-            drawLayer.draw();
+            // update points
+            onNewPoints(points);
         }
     };
 
@@ -224,37 +225,48 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * Handle mouse up event.
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function (/*event*/){
-        if (started && points.length > 1 )
-        {
-            // reset shape group
-            if ( tmpShapeGroup ) {
-                tmpShapeGroup.destroy();
-            }
-            // create final shape
-            var factory = new self.shapeFactoryList[self.shapeName]();
-            var finalShapeGroup = factory.create(points, self.style, app.getImage());
-            finalShapeGroup.id( dwv.math.guid() );
-
-            // get the position group
-            var posGroup = app.getDrawController().getCurrentPosGroup();
-            // add shape group to position group
-            posGroup.add(finalShapeGroup);
-
-            // re-activate layer
-            drawLayer.hitGraphEnabled(true);
-            // draw shape command
-            command = new dwv.tool.DrawGroupCommand(finalShapeGroup, self.shapeName, drawLayer);
-            command.onExecute = fireEvent;
-            command.onUndo = fireEvent;
-            // execute it
-            command.execute();
-            // save it in undo stack
-            app.addToUndoStack(command);
-
-            // activate shape listeners
-            self.setShapeOn( finalShapeGroup );
+    this.mouseup = function (/*event*/) {
+        // exit if not started draw
+        if ( !started ) {
+            return;
         }
+        // exit if no points
+        if ( points.length === 0 ) {
+            console.warn("Draw mouseup but no points...");
+            return;
+        }
+
+        // do we have all the needed points
+        if ( points.length === currentFactory.getNPoints() ) {
+            // store points
+            onFinalPoints(points);
+            // reset flag
+            started = false;
+        } else {
+            // remove temporary flag
+            if ( typeof points[points.length-1].tmp !== "undefined" ) {
+                delete points[points.length-1].tmp;
+            }
+        }
+    };
+
+    /**
+     * Handle mouse up event.
+     * @param {Object} event The mouse up event.
+     */
+    this.dblclick = function (/*event*/){
+        // exit if not started draw
+        if ( !started ) {
+            return;
+        }
+        // exit if no points
+        if ( points.length === 0 ) {
+            console.warn("Draw dblclick but no points...");
+            return;
+        }
+
+        // store points
+        onFinalPoints(points);
         // reset flag
         started = false;
     };
@@ -280,7 +292,32 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @param {Object} event The touch move event.
      */
     this.touchmove = function(event){
-        self.mousemove(event);
+        // exit if not started draw
+        if ( !started ) {
+            return;
+        }
+
+        if ( Math.abs( event._x - lastPoint.getX() ) > 0 ||
+                Math.abs( event._y - lastPoint.getY() ) > 0 )
+        {
+            // clear last added point from the list (but not the first one)
+            if ( points.length != 1 ) {
+                points.pop();
+            }
+            // current point
+            lastPoint = new dwv.math.Point2D(event._x, event._y);
+            // add current one to the list
+            points.push( lastPoint );
+            // allow for anchor points
+            if( points.length < currentFactory.getNPoints() ) {
+                clearTimeout(this.timer);
+                this.timer = setTimeout( function () {
+                    points.push( lastPoint );
+                }, currentFactory.getTimeout() );
+            }
+            // update points
+            onNewPoints(points);
+        }
     };
 
     /**
@@ -288,7 +325,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @param {Object} event The touch end event.
      */
     this.touchend = function(event){
-        self.mouseup(event);
+        self.dblclick(event);
     };
 
     /**
@@ -298,6 +335,61 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     this.keydown = function(event){
         app.onKeydown(event);
     };
+
+    /**
+     * Update the current draw with new points.
+     * @param {Array} tmpPoints The array of new points.
+     */
+    function onNewPoints( tmpPoints )
+    {
+        // remove temporary shape draw
+        if ( tmpShapeGroup ) {
+            tmpShapeGroup.destroy();
+        }
+        // create shape group
+        tmpShapeGroup = currentFactory.create(tmpPoints, self.style, app.getImage());
+        // do not listen during creation
+        var shape = tmpShapeGroup.getChildren( dwv.draw.isNodeNameShape )[0];
+        shape.listening(false);
+        drawLayer.hitGraphEnabled(false);
+        // draw shape
+        drawLayer.add(tmpShapeGroup);
+        drawLayer.draw();
+    }
+
+    /**
+     * Create the final shape from a point list.
+     * @param {Array} finalPoints The array of points.
+     */
+    function onFinalPoints( finalPoints )
+    {
+        // reset temporary shape group
+        if ( tmpShapeGroup ) {
+            tmpShapeGroup.destroy();
+        }
+        // create final shape
+        var finalShapeGroup = currentFactory.create(finalPoints, self.style, app.getImage());
+        finalShapeGroup.id( dwv.math.guid() );
+
+        // get the position group
+        var posGroup = app.getDrawController().getCurrentPosGroup();
+        // add shape group to position group
+        posGroup.add(finalShapeGroup);
+
+        // re-activate layer
+        drawLayer.hitGraphEnabled(true);
+        // draw shape command
+        command = new dwv.tool.DrawGroupCommand(finalShapeGroup, self.shapeName, drawLayer);
+        command.onExecute = fireEvent;
+        command.onUndo = fireEvent;
+        // execute it
+        command.execute();
+        // save it in undo stack
+        app.addToUndoStack(command);
+
+        // activate shape listeners
+        self.setShapeOn( finalShapeGroup );
+    }
 
     /**
      * Setup the tool GUI.
