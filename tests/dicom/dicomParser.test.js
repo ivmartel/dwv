@@ -236,7 +236,6 @@ QUnit.test("Test DICOMDIR parsing.", function (assert) {
 
         // get the file list
         var list = dwv.dicom.getFileListFromDicomDir(this.response);
-        console.log(list);
 
         // check file list
         var nFilesSeries0Study0 = 23;
