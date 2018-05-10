@@ -1,4 +1,4 @@
-/*! dwv 0.24.0-beta 2018-05-09 19:50:56 */
+/*! dwv 0.24.0-beta 2018-05-10 22:01:31 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -26440,6 +26440,20 @@ dwv.utils.capitaliseFirstLetter = function (string)
         res = string.charAt(0).toUpperCase() + string.slice(1);
     }
     return res;
+};
+
+/**
+ * Check if a string ends with the input element.
+ * @param {String} str The input string.
+ * @param {String} end The searched ending.
+ * @return {Boolean} True if the input string ends with the seached ending.
+ */
+dwv.utils.endsWith = function (str, end) {
+    if ( typeof str === "undefined" || str === null ||
+        typeof end === "undefined" || end === null ) {
+        return false;
+    }
+    return str.substr( str.length - end.length ) === end;
 };
 
 /**
