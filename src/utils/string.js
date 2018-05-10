@@ -18,6 +18,20 @@ dwv.utils.capitaliseFirstLetter = function (string)
 };
 
 /**
+ * Check if a string ends with the input element.
+ * @param {String} str The input string.
+ * @param {String} end The searched ending.
+ * @return {Boolean} True if the input string ends with the seached ending.
+ */
+dwv.utils.endsWith = function (str, end) {
+    if ( typeof str === "undefined" || str === null ||
+        typeof end === "undefined" || end === null ) {
+        return false;
+    }
+    return str.substr( str.length - end.length ) === end;
+};
+
+/**
  * Split key/value string:
  *  key0=val00&key0=val01&key1=val10 returns
  *  { key0 : [val00, val01], key1 : val1 }
