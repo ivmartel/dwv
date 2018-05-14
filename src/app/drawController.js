@@ -313,7 +313,7 @@ dwv.DrawController = function (drawDiv)
                     "frame": position.frameNumber,
                     "type": type,
                     "color": shape.stroke(),
-                    "label": decodeURIComponent()(text.textExpr),
+                    "label": decodeURIComponent(text.textExpr),
                     "description": text.longText
                 });
             }
