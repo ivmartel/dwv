@@ -313,7 +313,7 @@ dwv.DrawController = function (drawDiv)
                     "frame": position.frameNumber,
                     "type": type,
                     "color": shape.stroke(),
-                    "label": text.textExpr,
+                    "label": decodeURIComponent()(text.textExpr),
                     "description": text.longText
                 });
             }
@@ -410,7 +410,7 @@ dwv.DrawController = function (drawDiv)
                     var label = stateGroup.getChildren( dwv.draw.isNodeNameLabel )[0];
                     var text = label.getText();
                     // store details
-                    text.textExpr = details.textExpr;
+                    text.textExpr = decodeURIComponent()(details.textExpr);
                     text.longText = details.longText;
                     text.quant = details.quant;
                     // reset text (it was not encoded)
