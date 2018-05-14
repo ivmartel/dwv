@@ -410,7 +410,7 @@ dwv.DrawController = function (drawDiv)
                     var label = stateGroup.getChildren( dwv.draw.isNodeNameLabel )[0];
                     var text = label.getText();
                     // store details
-                    text.textExpr = decodeURIComponent()(details.textExpr);
+                    text.textExpr = decodeURIComponent(details.textExpr);
                     text.longText = details.longText;
                     text.quant = details.quant;
                     // reset text (it was not encoded)
