@@ -1,4 +1,4 @@
-/*! dwv 0.24.0-beta 2018-05-29 21:52:09 */
+/*! dwv 0.24.0-beta 2018-06-04 22:46:03 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -107,6 +107,7 @@ dwv.App = function ()
     var infoController = null;
 
     // Dicom tags gui
+    var tags = null;
     var tagsGui = null;
 
     // Drawing list gui
@@ -868,6 +869,15 @@ dwv.App = function ()
     };
 
     /**
+     * Get the data tags.
+     * @return {Object} The list of DICOM tags.
+     */
+    this.getTags = function ()
+    {
+        return tags;
+    };
+
+    /**
      * Get a list of drawing store details.
      * @return {Object} A list of draw details including id, text, quant...
      */
@@ -1433,6 +1443,7 @@ dwv.App = function ()
         viewController = new dwv.ViewController(view);
 
         // append the DICOM tags table
+        tags = data.info;
         if ( tagsGui ) {
             tagsGui.update(data.info);
         }
