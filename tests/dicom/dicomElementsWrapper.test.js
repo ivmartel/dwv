@@ -103,6 +103,15 @@ QUnit.test("Test simple DICOM wrapping.", function (assert) {
         ];
 
         // test
+        var len = table.length;
+        assert.equal(len, teoTable.length, "dumpToTable length");
+
+        // special pixel data case: browsers have different toString
+        for ( var i = 0; i < len; ++i ) {
+            if ( table[i].name === "PixelData" && table[i].value === "[object Uint16Array]" ) {
+                table[i].value = "...";
+            }
+        }
         assert.deepEqual(table, teoTable, "dumpToTable content");
 
         // finish async test
