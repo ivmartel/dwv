@@ -106,6 +106,7 @@ dwv.App = function ()
     var infoController = null;
 
     // Dicom tags gui
+    var tags = null;
     var tagsGui = null;
 
     // Drawing list gui
@@ -863,6 +864,15 @@ dwv.App = function ()
     };
 
     /**
+     * Get the data tags.
+     * @return {Object} The list of DICOM tags.
+     */
+    this.getTags = function ()
+    {
+        return tags;
+    };
+
+    /**
      * Get a list of drawing store details.
      * @return {Object} A list of draw details including id, text, quant...
      */
@@ -1428,6 +1438,7 @@ dwv.App = function ()
         viewController = new dwv.ViewController(view);
 
         // append the DICOM tags table
+        tags = data.info;
         if ( tagsGui ) {
             tagsGui.update(data.info);
         }
@@ -3040,7 +3051,7 @@ dwv.dicom = dwv.dicom || {};
  * Get the version of the library.
  * @return {String} The version of the library.
  */
-dwv.getVersion = function () { return "0.23.4"; };
+dwv.getVersion = function () { return "0.23.5"; };
 
 /**
  * Clean string: trim and remove ending.
