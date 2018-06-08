@@ -58,7 +58,7 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
     var verticalLine = new dwv.math.Line(line.getBegin(), beginTy);
     var angle = dwv.math.getAngle(line, verticalLine);
     var angleRad = angle * Math.PI / 180;
-    var radius = 5;
+    var radius = 5 * style.getScaledStrokeWidth();
     var kpoly = new Konva.RegularPolygon({
         x: line.getBegin().getX() + radius * Math.sin(angleRad),
         y: line.getBegin().getY() + radius * Math.cos(angleRad),
