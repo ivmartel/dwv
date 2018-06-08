@@ -42,8 +42,10 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
         name: "shape"
     });
 
+    var tickLen = 10 * style.getScaledStrokeWidth();
+
     // tick begin
-    var linePerp0 = dwv.math.getPerpendicularLine( line, points[0], 10 );
+    var linePerp0 = dwv.math.getPerpendicularLine( line, points[0], tickLen );
     var ktick0 = new Konva.Line({
         points: [linePerp0.getBegin().getX(), linePerp0.getBegin().getY(),
                  linePerp0.getEnd().getX(), linePerp0.getEnd().getY() ],
@@ -53,7 +55,7 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
     });
 
     // tick end
-    var linePerp1 = dwv.math.getPerpendicularLine( line, points[1], 10 );
+    var linePerp1 = dwv.math.getPerpendicularLine( line, points[1], tickLen );
     var ktick1 = new Konva.Line({
         points: [linePerp1.getBegin().getX(), linePerp1.getBegin().getY(),
                  linePerp1.getEnd().getX(), linePerp1.getEnd().getY() ],
