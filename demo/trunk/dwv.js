@@ -1,4 +1,4 @@
-/*! dwv 0.24.0-beta 2018-06-07 21:59:52 */
+/*! dwv 0.24.0-beta 2018-06-08 21:35:21 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -1909,8 +1909,8 @@ dwv.DrawController = function (drawDiv)
 
             var statePosKids = statePosGroup.getChildren();
             for ( var j = 0, lenj = statePosKids.length; j < lenj; ++j ) {
-                // shape group
-                var stateGroup = statePosKids[j];
+                // shape group (use first one since it will be removed from the group when we change it)
+                var stateGroup = statePosKids[0];
                 // add group to posGroup (switches its parent)
                 posGroup.add( stateGroup );
                 // shape
