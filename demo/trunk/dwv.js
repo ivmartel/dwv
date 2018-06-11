@@ -1,4 +1,4 @@
-/*! dwv 0.24.0-beta 2018-06-08 21:40:25 */
+/*! dwv 0.24.0-beta 2018-06-11 19:21:45 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -20571,6 +20571,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         points: [10, -10, -10, 10 ],
         stroke: 'red'
     });
+    trash.width(20);
+    trash.height(20);
     trash.add(trashLine1);
     trash.add(trashLine2);
 
@@ -20973,8 +20975,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             var stage = app.getDrawStage();
             var scale = stage.scale();
             var invscale = {'x': 1/scale.x, 'y': 1/scale.y};
-            trash.x( stage.offset().x + ( 256 / scale.x ) );
-            trash.y( stage.offset().y + ( 20 / scale.y ) );
+            trash.x( stage.offset().x + ( stage.width() / (2 * scale.x) ) );
+            trash.y( stage.offset().y + ( stage.height() / (15 * scale.y) ) );
             trash.scale( invscale );
             drawLayer.add( trash );
             // deactivate anchors to avoid events on null shape
@@ -20987,8 +20989,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // highlight trash when on it
             var offset = dwv.html.getEventOffset( event.evt )[0];
             var eventPos = getRealPosition( offset );
-            if ( Math.abs( eventPos.x - trash.x() ) < 10 &&
-                    Math.abs( eventPos.y - trash.y() ) < 10   ) {
+            var trashHalfWidth = trash.width() * trash.scaleX() / 2;
+            var trashHalfHeight = trash.height() * trash.scaleY() / 2;
+            if ( Math.abs( eventPos.x - trash.x() ) < trashHalfWidth &&
+                    Math.abs( eventPos.y - trash.y() ) < trashHalfHeight   ) {
                 trash.getChildren().each( function (tshape){ tshape.stroke('orange'); });
                 // change the group shapes colour
                 shapeGroup.getChildren( dwv.draw.canNodeChangeColour ).forEach(
@@ -21011,8 +21015,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // delete case
             var offset = dwv.html.getEventOffset( event.evt )[0];
             var eventPos = getRealPosition( offset );
-            if ( Math.abs( eventPos.x - trash.x() ) < 10 &&
-                    Math.abs( eventPos.y - trash.y() ) < 10   ) {
+            var trashHalfWidth = trash.width() * trash.scaleX() / 2;
+            var trashHalfHeight = trash.height() * trash.scaleY() / 2;
+            if ( Math.abs( eventPos.x - trash.x() ) < trashHalfWidth &&
+                    Math.abs( eventPos.y - trash.y() ) < trashHalfHeight   ) {
                 // compensate for the drag translation
                 this.x( dragStartPos.x );
                 this.y( dragStartPos.y );
