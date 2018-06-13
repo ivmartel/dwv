@@ -1904,8 +1904,8 @@ dwv.DrawController = function (drawDiv)
 
             var statePosKids = statePosGroup.getChildren();
             for ( var j = 0, lenj = statePosKids.length; j < lenj; ++j ) {
-                // shape group
-                var stateGroup = statePosKids[j];
+                // shape group (use first one since it will be removed from the group when we change it)
+                var stateGroup = statePosKids[0];
                 // add group to posGroup (switches its parent)
                 posGroup.add( stateGroup );
                 // shape
@@ -3051,7 +3051,7 @@ dwv.dicom = dwv.dicom || {};
  * Get the version of the library.
  * @return {String} The version of the library.
  */
-dwv.getVersion = function () { return "0.23.5"; };
+dwv.getVersion = function () { return "0.23.6"; };
 
 /**
  * Clean string: trim and remove ending.
@@ -20213,7 +20213,7 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
     var verticalLine = new dwv.math.Line(line.getBegin(), beginTy);
     var angle = dwv.math.getAngle(line, verticalLine);
     var angleRad = angle * Math.PI / 180;
-    var radius = 5;
+    var radius = 5 * style.getScaledStrokeWidth();
     var kpoly = new Konva.RegularPolygon({
         x: line.getBegin().getX() + radius * Math.sin(angleRad),
         y: line.getBegin().getY() + radius * Math.cos(angleRad),
@@ -20458,6 +20458,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         points: [10, -10, -10, 10 ],
         stroke: 'red'
     });
+    trash.width(20);
+    trash.height(20);
     trash.add(trashLine1);
     trash.add(trashLine2);
 
@@ -20775,8 +20777,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             var stage = app.getDrawStage();
             var scale = stage.scale();
             var invscale = {'x': 1/scale.x, 'y': 1/scale.y};
-            trash.x( stage.offset().x + ( 256 / scale.x ) );
-            trash.y( stage.offset().y + ( 20 / scale.y ) );
+            trash.x( stage.offset().x + ( stage.width() / (2 * scale.x) ) );
+            trash.y( stage.offset().y + ( stage.height() / (15 * scale.y) ) );
             trash.scale( invscale );
             drawLayer.add( trash );
             // deactivate anchors to avoid events on null shape
@@ -20789,8 +20791,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // highlight trash when on it
             var offset = dwv.html.getEventOffset( event.evt )[0];
             var eventPos = getRealPosition( offset );
-            if ( Math.abs( eventPos.x - trash.x() ) < 10 &&
-                    Math.abs( eventPos.y - trash.y() ) < 10   ) {
+            var trashHalfWidth = trash.width() * trash.scaleX() / 2;
+            var trashHalfHeight = trash.height() * trash.scaleY() / 2;
+            if ( Math.abs( eventPos.x - trash.x() ) < trashHalfWidth &&
+                    Math.abs( eventPos.y - trash.y() ) < trashHalfHeight   ) {
                 trash.getChildren().each( function (tshape){ tshape.stroke('orange'); });
                 // change the group shapes colour
                 shapeGroup.getChildren( dwv.draw.canNodeChangeColour ).forEach(
@@ -20813,8 +20817,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // delete case
             var offset = dwv.html.getEventOffset( event.evt )[0];
             var eventPos = getRealPosition( offset );
-            if ( Math.abs( eventPos.x - trash.x() ) < 10 &&
-                    Math.abs( eventPos.y - trash.y() ) < 10   ) {
+            var trashHalfWidth = trash.width() * trash.scaleX() / 2;
+            var trashHalfHeight = trash.height() * trash.scaleY() / 2;
+            if ( Math.abs( eventPos.x - trash.x() ) < trashHalfWidth &&
+                    Math.abs( eventPos.y - trash.y() ) < trashHalfHeight   ) {
                 // compensate for the drag translation
                 this.x( dragStartPos.x );
                 this.y( dragStartPos.y );
@@ -21477,39 +21483,44 @@ dwv.tool.ShapeEditor = function (app)
         // add shape specific anchors to the shape group
         if ( shape instanceof Konva.Line ) {
             var points = shape.points();
-            if ( points.length === 4 || points.length === 6) {
-                // add shape offset
-                var p0x = points[0] + shape.x();
-                var p0y = points[1] + shape.y();
-                var p1x = points[2] + shape.x();
-                var p1y = points[3] + shape.y();
-                addAnchor(group, p0x, p0y, 'begin');
-                if ( points.length === 4 ) {
-                    var shapekids = group.getChildren( dwv.draw.isNodeNameShapeExtra );
-                    if (shapekids.length === 2) {
-                        updateFunction = dwv.tool.UpdateRuler;
-                    } else {
-                        updateFunction = dwv.tool.UpdateArrow;
+
+            var needsBeginEnd = group.name() === "line-group" ||
+                group.name() === "ruler-group" ||
+                group.name() === "protractor-group";
+            var needsMid = group.name() === "protractor-group";
+
+            var px = 0;
+            var py = 0;
+            var name = "";
+            for ( var i = 0; i < points.length; i=i+2 ) {
+                px = points[i] + shape.x();
+                py = points[i+1] + shape.y();
+                name = i;
+                if ( needsBeginEnd ) {
+                    if ( i === 0 ) {
+                        name = "begin";
+                    } else if ( i === points.length - 2 ) {
+                        name = "end";
                     }
-                    addAnchor(group, p1x, p1y, 'end');
                 }
-                else {
-                    updateFunction = dwv.tool.UpdateProtractor;
-                    addAnchor(group, p1x, p1y, 'mid');
-                    var p2x = points[4] + shape.x();
-                    var p2y = points[5] + shape.y();
-                    addAnchor(group, p2x, p2y, 'end');
+                if ( needsMid && i === 2 ) {
+                    name = "mid";
                 }
+                addAnchor(group, px, py, name);
             }
-            else {
+
+            if ( group.name() === "line-group" ) {
+                updateFunction = dwv.tool.UpdateArrow;
+            } else if ( group.name() === "ruler-group" ) {
+                updateFunction = dwv.tool.UpdateRuler;
+            } else if ( group.name() === "protractor-group" ) {
+                updateFunction = dwv.tool.UpdateProtractor;
+            } else if ( group.name() === "roi-group" ) {
                 updateFunction = dwv.tool.UpdateRoi;
-                var px = 0;
-                var py = 0;
-                for ( var i = 0; i < points.length; i=i+2 ) {
-                    px = points[i] + shape.x();
-                    py = points[i+1] + shape.y();
-                    addAnchor(group, px, py, i);
-                }
+            } else if ( group.name() === "freeHand-group" ) {
+                updateFunction = dwv.tool.UpdateFreeHand;
+            } else {
+                console.warn("Cannot update unknown line shape.");
             }
         }
         else if ( shape instanceof Konva.Rect ) {
@@ -21611,13 +21622,16 @@ dwv.tool.ShapeEditor = function (app)
         });
         // drag move listener
         anchor.on('dragmove.edit', function (evt) {
+            // update shape
             if ( updateFunction ) {
                 updateFunction(this, image);
+            } else {
+                console.warn("No update function!");
             }
+            // redraw
             if ( this.getLayer() ) {
                 this.getLayer().draw();
-            }
-            else {
+            } else {
                 console.warn("No layer to draw the anchor!");
             }
             // prevent bubbling upwards
@@ -22973,7 +22987,8 @@ dwv.tool.UpdateFreeHand = function (anchor /*, image*/)
     var points = kline.points();
     points[anchor.id()] = anchor.x() - kline.x();
     points[anchor.id()+1] = anchor.y() - kline.y();
-    kline.points( points );
+    // concat to make Konva think it is a new array
+    kline.points( points.concat() );
 
     // update text
     var ktext = klabel.getText();
@@ -23922,8 +23937,10 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
         name: "shape"
     });
 
+    var tickLen = 10 * style.getScaledStrokeWidth();
+
     // tick begin
-    var linePerp0 = dwv.math.getPerpendicularLine( line, points[0], 10 );
+    var linePerp0 = dwv.math.getPerpendicularLine( line, points[0], tickLen );
     var ktick0 = new Konva.Line({
         points: [linePerp0.getBegin().getX(), linePerp0.getBegin().getY(),
                  linePerp0.getEnd().getX(), linePerp0.getEnd().getY() ],
@@ -23933,7 +23950,7 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
     });
 
     // tick end
-    var linePerp1 = dwv.math.getPerpendicularLine( line, points[1], 10 );
+    var linePerp1 = dwv.math.getPerpendicularLine( line, points[1], tickLen );
     var ktick1 = new Konva.Line({
         points: [linePerp1.getBegin().getX(), linePerp1.getBegin().getY(),
                  linePerp1.getEnd().getX(), linePerp1.getEnd().getY() ],
