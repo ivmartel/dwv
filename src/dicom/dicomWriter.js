@@ -542,6 +542,11 @@ dwv.dicom.isImplicitLengthPixels = function (element) {
 dwv.dicom.flattenArrayOfTypedArrays = function(initialArray) {
     var initialArrayLength = initialArray.length;
     var arrayLength = initialArray[0].length;
+    // If this is not a array of arrays, just return the initial one:
+    if (arrayLength === undefined) {
+        return initialArray;
+    }
+
     var flattenendArrayLength = initialArrayLength * arrayLength;
 
     var flattenedArray = new initialArray[0].constructor(flattenendArrayLength);
