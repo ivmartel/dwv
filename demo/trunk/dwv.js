@@ -1,4 +1,4 @@
-/*! dwv 0.24.0-beta 2018-06-14 21:50:51 */
+/*! dwv 0.24.0-beta 2018-06-18 07:21:01 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -14866,6 +14866,9 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
         }
         if( size.getNumberOfRows() !== rhsSize.getNumberOfRows() ) {
             throw new Error("Cannot append a slice with different number of rows");
+        }
+        if( !geometry.getOrientation().equals( rhs.getGeometry().getOrientation() ) ) {
+            throw new Error("Cannot append a slice with different orientation");
         }
         if( photometricInterpretation !== rhs.getPhotometricInterpretation() ) {
             throw new Error("Cannot append a slice with different photometric interpretation");
