@@ -336,6 +336,21 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      */
     this.keydown = function(event){
         app.onKeydown(event);
+
+        // press delete key
+        if (event.keyCode === 46 && shapeEditor.isActive()) {
+            // get shape
+            var shapeGroup = shapeEditor.getShape().getParent();
+            var shapeDisplayName = dwv.tool.GetShapeDisplayName(
+                shapeGroup.getChildren( dwv.draw.isNodeNameShape )[0]);
+            // delete command
+            var delcmd = new dwv.tool.DeleteGroupCommand(shapeGroup,
+                shapeDisplayName, drawLayer);
+            delcmd.onExecute = fireEvent;
+            delcmd.onUndo = fireEvent;
+            delcmd.execute();
+            app.addToUndoStack(delcmd);
+        }
     };
 
     /**
