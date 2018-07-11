@@ -1,4 +1,4 @@
-/*! dwv 0.24.0-beta 2018-06-18 07:21:01 */
+/*! dwv 0.24.0-beta 2018-07-11 22:17:34 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -20788,6 +20788,21 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      */
     this.keydown = function(event){
         app.onKeydown(event);
+
+        // press delete key
+        if (event.keyCode === 46 && shapeEditor.isActive()) {
+            // get shape
+            var shapeGroup = shapeEditor.getShape().getParent();
+            var shapeDisplayName = dwv.tool.GetShapeDisplayName(
+                shapeGroup.getChildren( dwv.draw.isNodeNameShape )[0]);
+            // delete command
+            var delcmd = new dwv.tool.DeleteGroupCommand(shapeGroup,
+                shapeDisplayName, drawLayer);
+            delcmd.onExecute = fireEvent;
+            delcmd.onUndo = fireEvent;
+            delcmd.execute();
+            app.addToUndoStack(delcmd);
+        }
     };
 
     /**
