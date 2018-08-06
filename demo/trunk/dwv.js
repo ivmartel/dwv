@@ -1,4 +1,4 @@
-/*! dwv 0.24.0-beta 2018-08-06 22:32:54 */
+/*! dwv 0.24.0-beta 2018-08-06 22:36:12 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -5497,6 +5497,11 @@ dwv.dicom.isImplicitLengthPixels = function (element) {
 dwv.dicom.flattenArrayOfTypedArrays = function(initialArray) {
     var initialArrayLength = initialArray.length;
     var arrayLength = initialArray[0].length;
+    // If this is not a array of arrays, just return the initial one:
+    if (typeof arrayLength === "undefined") {
+        return initialArray;
+    }
+
     var flattenendArrayLength = initialArrayLength * arrayLength;
 
     var flattenedArray = new initialArray[0].constructor(flattenendArrayLength);
