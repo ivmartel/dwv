@@ -339,6 +339,9 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
         if( size.getNumberOfRows() !== rhsSize.getNumberOfRows() ) {
             throw new Error("Cannot append a slice with different number of rows");
         }
+        if( !geometry.getOrientation().equals( rhs.getGeometry().getOrientation() ) ) {
+            throw new Error("Cannot append a slice with different orientation");
+        }
         if( photometricInterpretation !== rhs.getPhotometricInterpretation() ) {
             throw new Error("Cannot append a slice with different photometric interpretation");
         }
