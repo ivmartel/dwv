@@ -216,7 +216,7 @@ QUnit.test("Test cleanString.", function (assert) {
 });
 
 /**
- * Tests for {@link dwv.dicom.DicomParser} using simple DICOM data.
+ * Tests for {@link dwv.dicom.DicomParser} using DICOMDIR data.
  * Using remote file for CI integration.
  * @function module:tests/dicom~dicomParser
  */

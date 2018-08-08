@@ -1,0 +1,43 @@
+{
+	"TransferSyntaxUID": "1.2.840.10008.1.2.1",
+	"Modality": "MR",
+	"PatientName": "dwv-patient-name-dd-00",
+	"PhotometricInterpretation": "MONOCHROME2",
+	"SamplesPerPixel": 1,
+	"PixelRepresentation": 0,
+	"Rows": 32,
+	"Columns": 32,
+	"BitsAllocated": 16,
+	"BitsStored": 12,
+	"HighBit": 11,
+	"ImplementationClassUID": "1.2.840.23856.34.90.3",
+	"SOPClassUID": "1.2.840.10008.1.3.10",
+	"SOPInstanceUID": "1.2.840.23856.36.45.3",
+	"DirectoryRecordSequence": {
+		"explicitLength": true,
+		"item0": {
+			"DirectoryRecordType": "STUDY",
+			"StudyInstanceUID": "1.2.840.4656.23.4568745"
+		},
+		"item1": {
+		  "DirectoryRecordType": "SERIES",
+		  "SeriesNumber": 1
+		},
+		"item2": {
+		  "DirectoryRecordType": "IMAGE",
+		  "ReferencedFileID": "bbmri-53323131.dcm"
+		},
+		"item3": {
+		  "DirectoryRecordType": "IMAGE",
+		  "ReferencedFileID": "bbmri-53323275.dcm"
+		},
+		"item4": {
+		  "DirectoryRecordType": "IMAGE",
+		  "ReferencedFileID": "bbmri-53323419.dcm"
+		},
+		"item5": {
+		  "DirectoryRecordType": "IMAGE",
+		  "ReferencedFileID": "bbmri-53323563.dcm"
+		}
+	}
+}
