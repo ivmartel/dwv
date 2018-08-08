@@ -9,18 +9,18 @@ QUnit.module("dicomParser");
 // WARNING about PhantomJS 1.9
 // ---------------------------
 // TypedArray implementation seems incomplete, at least different than observed
-// behavior in browsers... 
-// For a DICOM dataset, it was giving an: 
+// behavior in browsers...
+// For a DICOM dataset, it was giving an:
 // 'RangeError: ArrayBuffer length minus the byteOffset is not a multiple of the element size.'
-// Which seem to originate from reading the data of first tag 
+// Which seem to originate from reading the data of first tag
 // (FileMetaInformationGroupLength, Uint32 -> size=4)
 // at offset 140 of a file of size 3070. 3070-140=2930; 2930/4=732.5...
 //
 // Error which, according to specs, should be thrown when the size of the data
 // to read is not specified (see
 // https://www.khronos.org/registry/typedarray/specs/latest/#7). But it is specified...
-// 
-// So I updated the data to be of the correct size (in this case 3072)... 
+//
+// So I updated the data to be of the correct size (in this case 3072)...
 
 /**
  * Tests for {@link dwv.dicom.DicomParser} using simple DICOM data.
@@ -145,14 +145,14 @@ QUnit.test("Test sequence DICOM parsing.", function (assert) {
 
         // ReferringPhysicianIdentificationSequence: explicit empty item
         var seq12 = tags.getFromName("ReferringPhysicianIdentificationSequence");
-        assert.equal(seq12.xFFFEE000.value.length, 0, 
+        assert.equal(seq12.xFFFEE000.value.length, 0,
                 "ReferringPhysicianIdentificationSequence item length");
-        
+
         // ConsultingPhysicianIdentificationSequence: implicit empty item
         var seq13 = tags.getFromName("ConsultingPhysicianIdentificationSequence");
-        assert.equal(seq13.xFFFEE000.value.length, 0, 
+        assert.equal(seq13.xFFFEE000.value.length, 0,
             "ConsultingPhysicianIdentificationSequence item length");
-        
+
         // ReferencedStudySequence: explicit sequence of sequence
         var seq20 = tags.getFromName("ReferencedStudySequence");
         // just one element
@@ -213,4 +213,66 @@ QUnit.test("Test cleanString.", function (assert) {
     str = " El cielo azul " + special;
     refStr = "El cielo azul ";
     assert.equal(dwv.dicom.cleanString(str), refStr, "Clean regular with special 2");
+});
+
+/**
+ * Tests for {@link dwv.dicom.DicomParser} using DICOMDIR data.
+ * Using remote file for CI integration.
+ * @function module:tests/dicom~dicomParser
+ */
+QUnit.test("Test DICOMDIR parsing.", function (assert) {
+    var done = assert.async();
+
+    var request = new XMLHttpRequest();
+    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/425-dicomdir";
+    var url = urlRoot + "/tests/data/DICOMDIR";
+    request.open('GET', url, true);
+    request.responseType = "arraybuffer";
+    request.onerror = function (event) {
+        console.log(event);
+    };
+    request.onload = function (/*event*/) {
+        assert.ok((this.response.byteLength!==0), "Got a response.");
+
+        // get the file list
+        var list = dwv.dicom.getFileListFromDicomDir(this.response);
+
+        // check file list
+        var nFilesSeries0Study0 = 23;
+        var nFilesSeries1Study0 = 20;
+        var nFilesSeries0Study1 = 1;
+        assert.equal(list.length, 2, "Number of study");
+        assert.equal(list[0].length, 2, "Number of series in first study");
+        assert.equal(list[1].length, 1, "Number of series in second study");
+        assert.equal(list[0][0].length, nFilesSeries0Study0, "Study#0:Series#0 number of files");
+        assert.equal(list[0][1].length, nFilesSeries1Study0, "Study#0:Series#1 number of files");
+        assert.equal(list[1][0].length, nFilesSeries0Study1, "Study#1:Series#0 number of files");
+
+        // files
+        var files00 = [];
+        var iStart = 0;
+        var iEnd = nFilesSeries0Study0;
+        for ( var i = iStart; i < iEnd; ++i ) {
+            files00.push("IMAGES/IM" + i);
+        }
+        assert.deepEqual(list[0][0], files00, "Study#0:Series#0 file names");
+        var files01 = [];
+        iStart = iEnd;
+        iEnd += nFilesSeries1Study0;
+        for ( i = iStart; i < iEnd; ++i ) {
+            files01.push("IMAGES/IM" + i);
+        }
+        assert.deepEqual(list[0][0], files00, "Study#0:Series#1 file names");
+        var files10 = [];
+        iStart = iEnd;
+        iEnd += nFilesSeries0Study1;
+        for ( i = iStart; i < iEnd; ++i ) {
+            files10.push("IMAGES/IM" + i);
+        }
+        assert.deepEqual(list[0][0], files00, "Study#1:Series#0 file names");
+
+        // finish async test
+        done();
+    };
+    request.send(null);
 });

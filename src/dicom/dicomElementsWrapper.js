@@ -461,3 +461,67 @@ dwv.dicom.DicomElementsWrapper.prototype.getFromName = function ( name )
    }
    return value;
 };
+
+/**
+ * Get the file list from a DICOMDIR
+ * @param {Object} data The buffer data of the DICOMDIR
+ * @return {Array} The file list as an array ordered by STUDY > SERIES > IMAGES.
+ */
+dwv.dicom.getFileListFromDicomDir = function (data)
+{
+    // parse file
+    var parser = new dwv.dicom.DicomParser();
+    parser.parse(data);
+    var elements = parser.getRawDicomElements();
+
+    // Directory Record Sequence
+    if ( typeof elements.x00041220 === "undefined" ||
+        typeof elements.x00041220.value === "undefined" ) {
+        console.warn("No Directory Record Sequence found in DICOMDIR.");
+        return;
+    }
+    var dirSeq = elements.x00041220.value;
+
+    if ( dirSeq.length === 0 ) {
+        console.warn("The Directory Record Sequence of the DICOMDIR is empty.");
+        return;
+    }
+
+    var records = [];
+    var series = null;
+    var study = null;
+    for ( var i = 0; i < dirSeq.length; ++i ) {
+        // Directory Record Type
+        if ( typeof dirSeq[i].x00041430 === "undefined" ||
+            typeof dirSeq[i].x00041430.value === "undefined" ) {
+            continue;
+        }
+        var recType = dwv.dicom.cleanString(dirSeq[i].x00041430.value[0]);
+
+        // supposed to come in order...
+        if ( recType === "STUDY" ) {
+            study = [];
+            records.push(study);
+        } else if ( recType === "SERIES" ) {
+            series = [];
+            study.push(series);
+        } else if ( recType === "IMAGE" ) {
+            // Referenced File ID
+            if ( typeof dirSeq[i].x00041500 === "undefined" ||
+                typeof dirSeq[i].x00041500.value === "undefined" ) {
+                continue;
+            }
+            var refFileIds = dirSeq[i].x00041500.value;
+            // clean and join ids
+            var refFileId = "";
+            for ( var j = 0; j < refFileIds.length; ++j ) {
+                if ( j !== 0 ) {
+                    refFileId += '/';
+                }
+                refFileId += dwv.dicom.cleanString(refFileIds[j]);
+            }
+            series.push(refFileId);
+        }
+    }
+    return records;
+};

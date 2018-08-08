@@ -5,6 +5,11 @@ Generated data
 ----------------
 * dwv-test-simple: simple data with basic tags
 * dwv-test-sequence: trying to list all possible sequences...
+* DICOMDIR: generated locally using the 'dicomdir.json' file to allow for non standard files
+    (with extension, not upper case and in the same folder)...
+    Note: the generator does not produce proper DICOMDIRs even when respecting standard files names...
+    The official way to generate DICOMDIRs is to use [dcmmkdir](https://support.dcmtk.org/docs/dcmmkdir.html) from dcmtk.
+	  For ex you can run: 'dcmmkdir +r +I -Pgp IMAGES' on an 'IMAGES' folder containing the DICOM files.
 
 External sources
 -----------------

@@ -609,7 +609,8 @@ dwv.App = function ()
         // flag used by scroll to decide wether to activate or not
         // TODO: supposing multi-slice for zip files, could not be...
         isMonoSliceData = (data.length === 1 &&
-            firstName.split('.').pop().toLowerCase() !== "zip");
+            firstName.split('.').pop().toLowerCase() !== "zip" &&
+            !dwv.utils.endsWith(firstName, "DICOMDIR"));
         // set IO
         loader.setDefaultCharacterSet(defaultCharacterSet);
         loader.onload = function (data) {
