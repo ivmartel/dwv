@@ -224,7 +224,7 @@ QUnit.test("Test DICOMDIR parsing.", function (assert) {
     var done = assert.async();
 
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
+    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/develop";
     var url = urlRoot + "/tests/data/DICOMDIR";
     request.open('GET', url, true);
     request.responseType = "arraybuffer";
