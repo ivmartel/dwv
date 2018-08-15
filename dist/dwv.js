@@ -1,3 +1,4 @@
+/*! dwv 0.24.0-beta 2018-08-10 08:22:54 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -19,15 +20,15 @@
         // like Node.
 
         // i18next-xhr-backend: requires XMlHttpRequest
-        // Konva (requires 'canvas') and MagicWand are gui specific
-        // -> deactivated for now...
+        // Konva: requires 'canvas'
+        // MagicWand: no module, deactivated for now...
 
         module.exports = factory(
             require('i18next'),
             require('i18next-xhr-backend'),
             require('i18next-browser-languagedetector'),
             require('jszip'),
-            null,
+            require('konva'),
             null
         );
     } else {
@@ -106,6 +107,7 @@ dwv.App = function ()
     var infoController = null;
 
     // Dicom tags gui
+    var tags = null;
     var tagsGui = null;
 
     // Drawing list gui
@@ -256,7 +258,7 @@ dwv.App = function ()
             for ( var t = 0; t < config.tools.length; ++t ) {
                 var toolName = config.tools[t];
                 if ( toolName === "Draw" ) {
-                    if ( config.shapes !== 0 ) {
+                    if ( typeof config.shapes !== "undefined" && config.shapes.length !== 0 ) {
                         // setup the shape list
                         var shapeList = {};
                         for ( var s = 0; s < config.shapes.length; ++s ) {
@@ -274,10 +276,12 @@ dwv.App = function ()
                         toolList.Draw.addEventListener("draw-change", fireEvent);
                         toolList.Draw.addEventListener("draw-move", fireEvent);
                         toolList.Draw.addEventListener("draw-delete", fireEvent);
+                    } else {
+                        console.warn("Please provide a list of shapes in the application configuration to activate the Draw tool.");
                     }
                 }
                 else if ( toolName === "Filter" ) {
-                    if ( config.filters.length !== 0 ) {
+                    if ( typeof config.filters !== "undefined" && config.filters.length !== 0 ) {
                         // setup the filter list
                         var filterList = {};
                         for ( var f = 0; f < config.filters.length; ++f ) {
@@ -292,6 +296,8 @@ dwv.App = function ()
                         toolList.Filter = new dwv.tool.Filter(filterList, this);
                         toolList.Filter.addEventListener("filter-run", fireEvent);
                         toolList.Filter.addEventListener("filter-undo", fireEvent);
+                    } else {
+                        console.warn("Please provide a list of filters in the application configuration to activate the Filter tool.");
                     }
                 }
                 else {
@@ -662,7 +668,8 @@ dwv.App = function ()
         // flag used by scroll to decide wether to activate or not
         // TODO: supposing multi-slice for zip files, could not be...
         isMonoSliceData = (data.length === 1 &&
-            firstName.split('.').pop().toLowerCase() !== "zip");
+            firstName.split('.').pop().toLowerCase() !== "zip" &&
+            !dwv.utils.endsWith(firstName, "DICOMDIR"));
         // set IO
         loader.setDefaultCharacterSet(defaultCharacterSet);
         loader.onload = function (data) {
@@ -860,6 +867,15 @@ dwv.App = function ()
     this.getDrawDisplayDetails = function ()
     {
         return drawController.getDrawDisplayDetails();
+    };
+
+    /**
+     * Get the data tags.
+     * @return {Object} The list of DICOM tags.
+     */
+    this.getTags = function ()
+    {
+        return tags;
     };
 
     /**
@@ -1428,6 +1444,7 @@ dwv.App = function ()
         viewController = new dwv.ViewController(view);
 
         // append the DICOM tags table
+        tags = data.info;
         if ( tagsGui ) {
             tagsGui.update(data.info);
         }
@@ -1893,8 +1910,8 @@ dwv.DrawController = function (drawDiv)
 
             var statePosKids = statePosGroup.getChildren();
             for ( var j = 0, lenj = statePosKids.length; j < lenj; ++j ) {
-                // shape group
-                var stateGroup = statePosKids[j];
+                // shape group (use first one since it will be removed from the group when we change it)
+                var stateGroup = statePosKids[0];
                 // add group to posGroup (switches its parent)
                 posGroup.add( stateGroup );
                 // shape
@@ -2946,6 +2963,8 @@ dwv.ViewController = function ( view )
          if ( playerID === null ) {
              var nSlices = view.getImage().getGeometry().getSize().getNumberOfSlices();
              var nFrames = view.getImage().getNumberOfFrames();
+             var recommendedDisplayFrameRate = view.getImage().getMeta().RecommendedDisplayFrameRate;
+             var milliseconds = view.getPlaybackMilliseconds(recommendedDisplayFrameRate);
 
              playerID = setInterval( function () {
                  if ( nSlices !== 1 ) {
@@ -2958,7 +2977,7 @@ dwv.ViewController = function ( view )
                      }
                  }
 
-             }, 300);
+             }, milliseconds);
          } else {
              this.stop();
          }
@@ -3033,6 +3052,534 @@ dwv.ViewController = function ( view )
 
 // namespaces
 var dwv = dwv || {};
+dwv.dicom = dwv.dicom || {};
+
+/**
+ * DicomElements wrapper.
+ * @constructor
+ * @param {Array} dicomElements The elements to wrap.
+ */
+dwv.dicom.DicomElementsWrapper = function (dicomElements) {
+
+    /**
+    * Get a DICOM Element value from a group/element key.
+    * @param {String} groupElementKey The key to retrieve.
+    * @return {Object} The DICOM element.
+    */
+    this.getDEFromKey = function ( groupElementKey ) {
+        return dicomElements[groupElementKey];
+    };
+
+    /**
+    * Get a DICOM Element value from a group/element key.
+    * @param {String} groupElementKey The key to retrieve.
+    * @param {Boolean} asArray Get the value as an Array.
+    * @return {Object} The DICOM element value.
+    */
+    this.getFromKey = function ( groupElementKey, asArray ) {
+        // default
+        if ( typeof asArray === "undefined" ) {
+            asArray = false;
+        }
+        var value = null;
+        var dElement = dicomElements[groupElementKey];
+        if ( typeof dElement !== "undefined" ) {
+            // raw value if only one
+            if ( dElement.value.length === 1 && asArray === false) {
+                value = dElement.value[0];
+            }
+            else {
+                value = dElement.value;
+            }
+        }
+        return value;
+    };
+
+    /**
+     * Dump the DICOM tags to an array.
+     * @return {Array}
+     */
+    this.dumpToTable = function () {
+        var keys = Object.keys(dicomElements);
+        var dict = dwv.dicom.dictionary;
+        var table = [];
+        var dicomElement = null;
+        var dictElement = null;
+        var row = null;
+        for ( var i = 0, leni = keys.length; i < leni; ++i ) {
+            dicomElement = dicomElements[keys[i]];
+            row = {};
+            // dictionnary entry (to get name)
+            dictElement = null;
+            if ( typeof dict[dicomElement.tag.group] !== "undefined" &&
+                    typeof dict[dicomElement.tag.group][dicomElement.tag.element] !== "undefined") {
+                dictElement = dict[dicomElement.tag.group][dicomElement.tag.element];
+            }
+            // name
+            if ( dictElement !== null ) {
+                row.name = dictElement[2];
+            }
+            else {
+                row.name = "Unknown Tag & Data";
+            }
+            // value
+            row.value = this.getElementValueAsString(dicomElement);
+            // others
+            row.group = dicomElement.tag.group;
+            row.element = dicomElement.tag.element;
+            row.vr = dicomElement.vr;
+            row.vl = dicomElement.vl;
+
+            table.push( row );
+        }
+        return table;
+    };
+
+    /**
+     * Dump the DICOM tags to a string.
+     * @return {String} The dumped file.
+     */
+    this.dump = function () {
+        var keys = Object.keys(dicomElements);
+        var result = "\n";
+        result += "# Dicom-File-Format\n";
+        result += "\n";
+        result += "# Dicom-Meta-Information-Header\n";
+        result += "# Used TransferSyntax: ";
+        if ( dwv.dicom.isNativeLittleEndian() ) {
+            result += "Little Endian Explicit\n";
+        }
+        else {
+            result += "NOT Little Endian Explicit\n";
+        }
+        var dicomElement = null;
+        var checkHeader = true;
+        for ( var i = 0, leni = keys.length; i < leni; ++i ) {
+            dicomElement = dicomElements[keys[i]];
+            if ( checkHeader && dicomElement.tag.group !== "0x0002" ) {
+                result += "\n";
+                result += "# Dicom-Data-Set\n";
+                result += "# Used TransferSyntax: ";
+                var syntax = dwv.dicom.cleanString(dicomElements.x00020010.value[0]);
+                result += dwv.dicom.getTransferSyntaxName(syntax);
+                result += "\n";
+                checkHeader = false;
+            }
+            result += this.getElementAsString(dicomElement) + "\n";
+        }
+        return result;
+    };
+
+};
+
+/**
+ * Get a data element value as a string.
+ * @param {Object} dicomElement The DICOM element.
+ * @param {Boolean} pretty When set to true, returns a 'pretified' content.
+ * @return {String} A string representation of the DICOM element.
+ */
+dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function ( dicomElement, pretty )
+{
+    var str = "";
+    var strLenLimit = 65;
+
+    // dafault to pretty output
+    if ( typeof pretty === "undefined" ) {
+        pretty = true;
+    }
+    // check dicom element input
+    if ( typeof dicomElement === "undefined" || dicomElement === null ) {
+        return str;
+    }
+
+    // Polyfill for Number.isInteger.
+    var isInteger = Number.isInteger || function (value) {
+      return typeof value === 'number' &&
+        isFinite(value) &&
+        Math.floor(value) === value;
+    };
+
+    // TODO Support sequences.
+
+    if ( dicomElement.vr !== "SQ" &&
+        dicomElement.value.length === 1 && dicomElement.value[0] === "" ) {
+        str += "(no value available)";
+    } else if ( dicomElement.tag.group === '0x7FE0' &&
+        dicomElement.tag.element === '0x0010' &&
+        dicomElement.vl === 'u/l' ) {
+        str = "(PixelSequence)";
+    } else if ( dicomElement.vr === "DA" && pretty ) {
+        var daValue = dicomElement.value[0];
+        var daYear = parseInt( daValue.substr(0,4), 10 );
+        var daMonth = parseInt( daValue.substr(4,2), 10 ) - 1; // 0-11
+        var daDay = parseInt( daValue.substr(6,2), 10 );
+        var da = new Date(daYear, daMonth, daDay);
+        str = da.toLocaleDateString();
+    } else if ( dicomElement.vr === "TM"  && pretty ) {
+        var tmValue = dicomElement.value[0];
+        var tmHour = tmValue.substr(0,2);
+        var tmMinute = tmValue.length >= 4 ? tmValue.substr(2,2) : "00";
+        var tmSeconds = tmValue.length >= 6 ? tmValue.substr(4,2) : "00";
+        str = tmHour + ':' + tmMinute + ':' + tmSeconds;
+    } else {
+        var isOtherVR = ( dicomElement.vr[0].toUpperCase() === "O" );
+        var isFloatNumberVR = ( dicomElement.vr === "FL" ||
+            dicomElement.vr === "FD" ||
+            dicomElement.vr === "DS");
+        var valueStr = "";
+        for ( var k = 0, lenk = dicomElement.value.length; k < lenk; ++k ) {
+            valueStr = "";
+            if ( k !== 0 ) {
+                valueStr += "\\";
+            }
+            if ( isFloatNumberVR ) {
+                var val = dicomElement.value[k];
+                if (typeof val === "string") {
+                    val = dwv.dicom.cleanString(val);
+                }
+                var num = Number( val );
+                if ( !isInteger( num ) && pretty ) {
+                    valueStr += num.toPrecision(4);
+                } else {
+                    valueStr += num.toString();
+                }
+            } else if ( isOtherVR ) {
+                var tmp = dicomElement.value[k].toString(16);
+                if ( dicomElement.vr === "OB" ) {
+                    tmp = "00".substr(0, 2 - tmp.length) + tmp;
+                }
+                else {
+                    tmp = "0000".substr(0, 4 - tmp.length) + tmp;
+                }
+                valueStr += tmp;
+            } else if ( typeof dicomElement.value[k] === "string" ) {
+                valueStr += dwv.dicom.cleanString(dicomElement.value[k]);
+            } else {
+                valueStr += dicomElement.value[k];
+            }
+            // check length
+            if ( str.length + valueStr.length <= strLenLimit ) {
+                str += valueStr;
+            } else {
+                str += "...";
+                break;
+            }
+        }
+    }
+    return str;
+};
+
+/**
+ * Get a data element value as a string.
+ * @param {String} groupElementKey The key to retrieve.
+ */
+dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsStringFromKey = function ( groupElementKey )
+{
+    return this.getElementValueAsString( this.getDEFromKey(groupElementKey) );
+};
+
+/**
+ * Get a data element as a string.
+ * @param {Object} dicomElement The DICOM element.
+ * @param {String} prefix A string to prepend this one.
+ */
+dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomElement, prefix )
+{
+    // default prefix
+    prefix = prefix || "";
+
+    // get element from dictionary
+    var dict = dwv.dicom.dictionary;
+    var dictElement = null;
+    if ( typeof dict[dicomElement.tag.group] !== "undefined" &&
+            typeof dict[dicomElement.tag.group][dicomElement.tag.element] !== "undefined") {
+        dictElement = dict[dicomElement.tag.group][dicomElement.tag.element];
+    }
+
+    var deSize = dicomElement.value.length;
+    var isOtherVR = ( dicomElement.vr[0].toUpperCase() === "O" );
+
+    // no size for delimitations
+    if ( dicomElement.tag.group === "0xFFFE" && (
+            dicomElement.tag.element === "0xE00D" ||
+            dicomElement.tag.element === "0xE0DD" ) ) {
+        deSize = 0;
+    }
+    else if ( isOtherVR ) {
+        deSize = 1;
+    }
+
+    var isPixSequence = (dicomElement.tag.group === '0x7FE0' &&
+        dicomElement.tag.element === '0x0010' &&
+        dicomElement.vl === 'u/l');
+
+    var line = null;
+
+    // (group,element)
+    line = "(";
+    line += dicomElement.tag.group.substr(2,5).toLowerCase();
+    line += ",";
+    line += dicomElement.tag.element.substr(2,5).toLowerCase();
+    line += ") ";
+    // value representation
+    line += dicomElement.vr;
+    // value
+    if ( dicomElement.vr !== "SQ" && dicomElement.value.length === 1 && dicomElement.value[0] === "" ) {
+        line += " (no value available)";
+        deSize = 0;
+    }
+    else {
+        // simple number display
+        if ( dicomElement.vr === "na" ) {
+            line += " ";
+            line += dicomElement.value[0];
+        }
+        // pixel sequence
+        else if ( isPixSequence ) {
+            line += " (PixelSequence #=" + deSize + ")";
+        }
+        else if ( dicomElement.vr === 'SQ' ) {
+            line += " (Sequence with";
+            if ( dicomElement.vl === "u/l" ) {
+                line += " undefined";
+            }
+            else {
+                line += " explicit";
+            }
+            line += " length #=";
+            line += dicomElement.value.length;
+            line += ")";
+        }
+        // 'O'ther array, limited display length
+        else if ( isOtherVR ||
+                dicomElement.vr === 'pi' ||
+                dicomElement.vr === "UL" ||
+                dicomElement.vr === "US" ||
+                dicomElement.vr === "SL" ||
+                dicomElement.vr === "SS" ||
+                dicomElement.vr === "FL" ||
+                dicomElement.vr === "FD" ||
+                dicomElement.vr === "AT" ) {
+            line += " ";
+            line += this.getElementValueAsString(dicomElement, false);
+        }
+        // default
+        else {
+            line += " [";
+            line += this.getElementValueAsString(dicomElement, false);
+            line += "]";
+        }
+    }
+
+    // align #
+    var nSpaces = 55 - line.length;
+    if ( nSpaces > 0 ) {
+        for ( var s = 0; s < nSpaces; ++s ) {
+            line += " ";
+        }
+    }
+    line += " # ";
+    if ( dicomElement.vl < 100 ) {
+        line += " ";
+    }
+    if ( dicomElement.vl < 10 ) {
+        line += " ";
+    }
+    line += dicomElement.vl;
+    line += ", ";
+    line += deSize; //dictElement[1];
+    line += " ";
+    if ( dictElement !== null ) {
+        line += dictElement[2];
+    }
+    else {
+        line += "Unknown Tag & Data";
+    }
+
+    var message = null;
+
+    // continue for sequence
+    if ( dicomElement.vr === 'SQ' ) {
+        var item = null;
+        for ( var l = 0, lenl = dicomElement.value.length; l < lenl; ++l ) {
+            item = dicomElement.value[l];
+            var itemKeys = Object.keys(item);
+            if ( itemKeys.length === 0 ) {
+                continue;
+            }
+
+            // get the item element
+            var itemElement = item.xFFFEE000;
+            message = "(Item with";
+            if ( itemElement.vl === "u/l" ) {
+                message += " undefined";
+            }
+            else {
+                message += " explicit";
+            }
+            message += " length #="+(itemKeys.length - 1)+")";
+            itemElement.value = [message];
+            itemElement.vr = "na";
+
+            line += "\n";
+            line += this.getElementAsString(itemElement, prefix + "  ");
+
+            for ( var m = 0, lenm = itemKeys.length; m < lenm; ++m ) {
+                if ( itemKeys[m] !== "xFFFEE000" ) {
+                    line += "\n";
+                    line += this.getElementAsString(item[itemKeys[m]], prefix + "    ");
+                }
+            }
+
+            message = "(ItemDelimitationItem";
+            if ( itemElement.vl !== "u/l" ) {
+                message += " for re-encoding";
+            }
+            message += ")";
+            var itemDelimElement = {
+                    "tag": { "group": "0xFFFE", "element": "0xE00D" },
+                    "vr": "na",
+                    "vl": "0",
+                    "value": [message]
+                };
+            line += "\n";
+            line += this.getElementAsString(itemDelimElement, prefix + "  ");
+
+        }
+
+        message = "(SequenceDelimitationItem";
+        if ( dicomElement.vl !== "u/l" ) {
+            message += " for re-encod.";
+        }
+        message += ")";
+        var sqDelimElement = {
+                "tag": { "group": "0xFFFE", "element": "0xE0DD" },
+                "vr": "na",
+                "vl": "0",
+                "value": [message]
+            };
+        line += "\n";
+        line += this.getElementAsString(sqDelimElement, prefix);
+    }
+    // pixel sequence
+    else if ( isPixSequence ) {
+        var pixItem = null;
+        for ( var n = 0, lenn = dicomElement.value.length; n < lenn; ++n ) {
+            pixItem = dicomElement.value[n];
+            line += "\n";
+            pixItem.vr = 'pi';
+            line += this.getElementAsString(pixItem, prefix + "  ");
+        }
+
+        var pixDelimElement = {
+                "tag": { "group": "0xFFFE", "element": "0xE0DD" },
+                "vr": "na",
+                "vl": "0",
+                "value": ["(SequenceDelimitationItem)"]
+            };
+        line += "\n";
+        line += this.getElementAsString(pixDelimElement, prefix);
+    }
+
+    return prefix + line;
+};
+
+/**
+ * Get a DICOM Element value from a group and an element.
+ * @param {Number} group The group.
+ * @param {Number} element The element.
+ * @return {Object} The DICOM element value.
+ */
+dwv.dicom.DicomElementsWrapper.prototype.getFromGroupElement = function (
+    group, element )
+{
+   return this.getFromKey(
+       dwv.dicom.getGroupElementKey(group, element) );
+};
+
+/**
+ * Get a DICOM Element value from a tag name.
+ * Uses the DICOM dictionary.
+ * @param {String} name The tag name.
+ * @return {Object} The DICOM element value.
+ */
+dwv.dicom.DicomElementsWrapper.prototype.getFromName = function ( name )
+{
+   var value = null;
+   var tagGE = dwv.dicom.getGroupElementFromName(name);
+   // check that we are not at the end of the dictionary
+   if ( tagGE.group !== null && tagGE.element !== null ) {
+       value = this.getFromKey(dwv.dicom.getGroupElementKey(tagGE.group, tagGE.element));
+   }
+   return value;
+};
+
+/**
+ * Get the file list from a DICOMDIR
+ * @param {Object} data The buffer data of the DICOMDIR
+ * @return {Array} The file list as an array ordered by STUDY > SERIES > IMAGES.
+ */
+dwv.dicom.getFileListFromDicomDir = function (data)
+{
+    // parse file
+    var parser = new dwv.dicom.DicomParser();
+    parser.parse(data);
+    var elements = parser.getRawDicomElements();
+
+    // Directory Record Sequence
+    if ( typeof elements.x00041220 === "undefined" ||
+        typeof elements.x00041220.value === "undefined" ) {
+        console.warn("No Directory Record Sequence found in DICOMDIR.");
+        return;
+    }
+    var dirSeq = elements.x00041220.value;
+
+    if ( dirSeq.length === 0 ) {
+        console.warn("The Directory Record Sequence of the DICOMDIR is empty.");
+        return;
+    }
+
+    var records = [];
+    var series = null;
+    var study = null;
+    for ( var i = 0; i < dirSeq.length; ++i ) {
+        // Directory Record Type
+        if ( typeof dirSeq[i].x00041430 === "undefined" ||
+            typeof dirSeq[i].x00041430.value === "undefined" ) {
+            continue;
+        }
+        var recType = dwv.dicom.cleanString(dirSeq[i].x00041430.value[0]);
+
+        // supposed to come in order...
+        if ( recType === "STUDY" ) {
+            study = [];
+            records.push(study);
+        } else if ( recType === "SERIES" ) {
+            series = [];
+            study.push(series);
+        } else if ( recType === "IMAGE" ) {
+            // Referenced File ID
+            if ( typeof dirSeq[i].x00041500 === "undefined" ||
+                typeof dirSeq[i].x00041500.value === "undefined" ) {
+                continue;
+            }
+            var refFileIds = dirSeq[i].x00041500.value;
+            // clean and join ids
+            var refFileId = "";
+            for ( var j = 0; j < refFileIds.length; ++j ) {
+                if ( j !== 0 ) {
+                    refFileId += '/';
+                }
+                refFileId += dwv.dicom.cleanString(refFileIds[j]);
+            }
+            series.push(refFileId);
+        }
+    }
+    return records;
+};
+
+// namespaces
+var dwv = dwv || {};
 /** @namespace */
 dwv.dicom = dwv.dicom || {};
 
@@ -3040,7 +3587,7 @@ dwv.dicom = dwv.dicom || {};
  * Get the version of the library.
  * @return {String} The version of the library.
  */
-dwv.getVersion = function () { return "0.23.3"; };
+dwv.getVersion = function () { return "0.24.0-beta"; };
 
 /**
  * Clean string: trim and remove ending.
@@ -4471,466 +5018,6 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     }
 };
 
-/**
- * DicomElements wrapper.
- * @constructor
- * @param {Array} dicomElements The elements to wrap.
- */
-dwv.dicom.DicomElementsWrapper = function (dicomElements) {
-
-    /**
-    * Get a DICOM Element value from a group/element key.
-    * @param {String} groupElementKey The key to retrieve.
-    * @return {Object} The DICOM element.
-    */
-    this.getDEFromKey = function ( groupElementKey ) {
-        return dicomElements[groupElementKey];
-    };
-
-    /**
-    * Get a DICOM Element value from a group/element key.
-    * @param {String} groupElementKey The key to retrieve.
-    * @param {Boolean} asArray Get the value as an Array.
-    * @return {Object} The DICOM element value.
-    */
-    this.getFromKey = function ( groupElementKey, asArray ) {
-        // default
-        if ( typeof asArray === "undefined" ) {
-            asArray = false;
-        }
-        var value = null;
-        var dElement = dicomElements[groupElementKey];
-        if ( typeof dElement !== "undefined" ) {
-            // raw value if only one
-            if ( dElement.value.length === 1 && asArray === false) {
-                value = dElement.value[0];
-            }
-            else {
-                value = dElement.value;
-            }
-        }
-        return value;
-    };
-
-    /**
-     * Dump the DICOM tags to an array.
-     * @return {Array}
-     */
-    this.dumpToTable = function () {
-        var keys = Object.keys(dicomElements);
-        var dict = dwv.dicom.dictionary;
-        var table = [];
-        var dicomElement = null;
-        var dictElement = null;
-        var row = null;
-        for ( var i = 0, leni = keys.length; i < leni; ++i ) {
-            dicomElement = dicomElements[keys[i]];
-            row = {};
-            // dictionnary entry (to get name)
-            dictElement = null;
-            if ( typeof dict[dicomElement.tag.group] !== "undefined" &&
-                    typeof dict[dicomElement.tag.group][dicomElement.tag.element] !== "undefined") {
-                dictElement = dict[dicomElement.tag.group][dicomElement.tag.element];
-            }
-            // name
-            if ( dictElement !== null ) {
-                row.name = dictElement[2];
-            }
-            else {
-                row.name = "Unknown Tag & Data";
-            }
-            // value
-            row.value = this.getElementValueAsString(dicomElement);
-            // others
-            row.group = dicomElement.tag.group;
-            row.element = dicomElement.tag.element;
-            row.vr = dicomElement.vr;
-            row.vl = dicomElement.vl;
-
-            table.push( row );
-        }
-        return table;
-    };
-
-    /**
-     * Dump the DICOM tags to a string.
-     * @return {String} The dumped file.
-     */
-    this.dump = function () {
-        var keys = Object.keys(dicomElements);
-        var result = "\n";
-        result += "# Dicom-File-Format\n";
-        result += "\n";
-        result += "# Dicom-Meta-Information-Header\n";
-        result += "# Used TransferSyntax: ";
-        if ( dwv.dicom.isNativeLittleEndian() ) {
-            result += "Little Endian Explicit\n";
-        }
-        else {
-            result += "NOT Little Endian Explicit\n";
-        }
-        var dicomElement = null;
-        var checkHeader = true;
-        for ( var i = 0, leni = keys.length; i < leni; ++i ) {
-            dicomElement = dicomElements[keys[i]];
-            if ( checkHeader && dicomElement.tag.group !== "0x0002" ) {
-                result += "\n";
-                result += "# Dicom-Data-Set\n";
-                result += "# Used TransferSyntax: ";
-                var syntax = dwv.dicom.cleanString(dicomElements.x00020010.value[0]);
-                result += dwv.dicom.getTransferSyntaxName(syntax);
-                result += "\n";
-                checkHeader = false;
-            }
-            result += this.getElementAsString(dicomElement) + "\n";
-        }
-        return result;
-    };
-
-};
-
-/**
- * Get a data element value as a string.
- * @param {Object} dicomElement The DICOM element.
- * @param {Boolean} pretty When set to true, returns a 'pretified' content.
- * @return {String} A string representation of the DICOM element.
- */
-dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function ( dicomElement, pretty )
-{
-    var str = "";
-    var strLenLimit = 65;
-
-    // dafault to pretty output
-    if ( typeof pretty === "undefined" ) {
-        pretty = true;
-    }
-    // check dicom element input
-    if ( typeof dicomElement === "undefined" || dicomElement === null ) {
-        return str;
-    }
-
-    // Polyfill for Number.isInteger.
-    var isInteger = Number.isInteger || function (value) {
-      return typeof value === 'number' &&
-        isFinite(value) &&
-        Math.floor(value) === value;
-    };
-
-    // TODO Support sequences.
-
-    if ( dicomElement.vr !== "SQ" &&
-        dicomElement.value.length === 1 && dicomElement.value[0] === "" ) {
-        str += "(no value available)";
-    } else if ( dicomElement.tag.group === '0x7FE0' &&
-        dicomElement.tag.element === '0x0010' &&
-        dicomElement.vl === 'u/l' ) {
-        str = "(PixelSequence)";
-    } else if ( dicomElement.vr === "DA" && pretty ) {
-        var daValue = dicomElement.value[0];
-        var daYear = parseInt( daValue.substr(0,4), 10 );
-        var daMonth = parseInt( daValue.substr(4,2), 10 ) - 1; // 0-11
-        var daDay = parseInt( daValue.substr(6,2), 10 );
-        var da = new Date(daYear, daMonth, daDay);
-        str = da.toLocaleDateString();
-    } else if ( dicomElement.vr === "TM"  && pretty ) {
-        var tmValue = dicomElement.value[0];
-        var tmHour = tmValue.substr(0,2);
-        var tmMinute = tmValue.length >= 4 ? tmValue.substr(2,2) : "00";
-        var tmSeconds = tmValue.length >= 6 ? tmValue.substr(4,2) : "00";
-        str = tmHour + ':' + tmMinute + ':' + tmSeconds;
-    } else {
-        var isOtherVR = ( dicomElement.vr[0].toUpperCase() === "O" );
-        var isFloatNumberVR = ( dicomElement.vr === "FL" ||
-            dicomElement.vr === "FD" ||
-            dicomElement.vr === "DS");
-        var valueStr = "";
-        for ( var k = 0, lenk = dicomElement.value.length; k < lenk; ++k ) {
-            valueStr = "";
-            if ( k !== 0 ) {
-                valueStr += "\\";
-            }
-            if ( isFloatNumberVR ) {
-                var val = dicomElement.value[k];
-                if (typeof val === "string") {
-                    val = dwv.dicom.cleanString(val);
-                }
-                var num = Number( val );
-                if ( !isInteger( num ) && pretty ) {
-                    valueStr += num.toPrecision(4);
-                } else {
-                    valueStr += num.toString();
-                }
-            } else if ( isOtherVR ) {
-                var tmp = dicomElement.value[k].toString(16);
-                if ( dicomElement.vr === "OB" ) {
-                    tmp = "00".substr(0, 2 - tmp.length) + tmp;
-                }
-                else {
-                    tmp = "0000".substr(0, 4 - tmp.length) + tmp;
-                }
-                valueStr += tmp;
-            } else if ( typeof dicomElement.value[k] === "string" ) {
-                valueStr += dwv.dicom.cleanString(dicomElement.value[k]);
-            } else {
-                valueStr += dicomElement.value[k];
-            }
-            // check length
-            if ( str.length + valueStr.length <= strLenLimit ) {
-                str += valueStr;
-            } else {
-                str += "...";
-                break;
-            }
-        }
-    }
-    return str;
-};
-
-/**
- * Get a data element value as a string.
- * @param {String} groupElementKey The key to retrieve.
- */
-dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsStringFromKey = function ( groupElementKey )
-{
-    return this.getElementValueAsString( this.getDEFromKey(groupElementKey) );
-};
-
-/**
- * Get a data element as a string.
- * @param {Object} dicomElement The DICOM element.
- * @param {String} prefix A string to prepend this one.
- */
-dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function ( dicomElement, prefix )
-{
-    // default prefix
-    prefix = prefix || "";
-
-    // get element from dictionary
-    var dict = dwv.dicom.dictionary;
-    var dictElement = null;
-    if ( typeof dict[dicomElement.tag.group] !== "undefined" &&
-            typeof dict[dicomElement.tag.group][dicomElement.tag.element] !== "undefined") {
-        dictElement = dict[dicomElement.tag.group][dicomElement.tag.element];
-    }
-
-    var deSize = dicomElement.value.length;
-    var isOtherVR = ( dicomElement.vr[0].toUpperCase() === "O" );
-
-    // no size for delimitations
-    if ( dicomElement.tag.group === "0xFFFE" && (
-            dicomElement.tag.element === "0xE00D" ||
-            dicomElement.tag.element === "0xE0DD" ) ) {
-        deSize = 0;
-    }
-    else if ( isOtherVR ) {
-        deSize = 1;
-    }
-
-    var isPixSequence = (dicomElement.tag.group === '0x7FE0' &&
-        dicomElement.tag.element === '0x0010' &&
-        dicomElement.vl === 'u/l');
-
-    var line = null;
-
-    // (group,element)
-    line = "(";
-    line += dicomElement.tag.group.substr(2,5).toLowerCase();
-    line += ",";
-    line += dicomElement.tag.element.substr(2,5).toLowerCase();
-    line += ") ";
-    // value representation
-    line += dicomElement.vr;
-    // value
-    if ( dicomElement.vr !== "SQ" && dicomElement.value.length === 1 && dicomElement.value[0] === "" ) {
-        line += " (no value available)";
-        deSize = 0;
-    }
-    else {
-        // simple number display
-        if ( dicomElement.vr === "na" ) {
-            line += " ";
-            line += dicomElement.value[0];
-        }
-        // pixel sequence
-        else if ( isPixSequence ) {
-            line += " (PixelSequence #=" + deSize + ")";
-        }
-        else if ( dicomElement.vr === 'SQ' ) {
-            line += " (Sequence with";
-            if ( dicomElement.vl === "u/l" ) {
-                line += " undefined";
-            }
-            else {
-                line += " explicit";
-            }
-            line += " length #=";
-            line += dicomElement.value.length;
-            line += ")";
-        }
-        // 'O'ther array, limited display length
-        else if ( isOtherVR ||
-                dicomElement.vr === 'pi' ||
-                dicomElement.vr === "UL" ||
-                dicomElement.vr === "US" ||
-                dicomElement.vr === "SL" ||
-                dicomElement.vr === "SS" ||
-                dicomElement.vr === "FL" ||
-                dicomElement.vr === "FD" ||
-                dicomElement.vr === "AT" ) {
-            line += " ";
-            line += this.getElementValueAsString(dicomElement, false);
-        }
-        // default
-        else {
-            line += " [";
-            line += this.getElementValueAsString(dicomElement, false);
-            line += "]";
-        }
-    }
-
-    // align #
-    var nSpaces = 55 - line.length;
-    if ( nSpaces > 0 ) {
-        for ( var s = 0; s < nSpaces; ++s ) {
-            line += " ";
-        }
-    }
-    line += " # ";
-    if ( dicomElement.vl < 100 ) {
-        line += " ";
-    }
-    if ( dicomElement.vl < 10 ) {
-        line += " ";
-    }
-    line += dicomElement.vl;
-    line += ", ";
-    line += deSize; //dictElement[1];
-    line += " ";
-    if ( dictElement !== null ) {
-        line += dictElement[2];
-    }
-    else {
-        line += "Unknown Tag & Data";
-    }
-
-    var message = null;
-
-    // continue for sequence
-    if ( dicomElement.vr === 'SQ' ) {
-        var item = null;
-        for ( var l = 0, lenl = dicomElement.value.length; l < lenl; ++l ) {
-            item = dicomElement.value[l];
-            var itemKeys = Object.keys(item);
-            if ( itemKeys.length === 0 ) {
-                continue;
-            }
-
-            // get the item element
-            var itemElement = item.xFFFEE000;
-            message = "(Item with";
-            if ( itemElement.vl === "u/l" ) {
-                message += " undefined";
-            }
-            else {
-                message += " explicit";
-            }
-            message += " length #="+(itemKeys.length - 1)+")";
-            itemElement.value = [message];
-            itemElement.vr = "na";
-
-            line += "\n";
-            line += this.getElementAsString(itemElement, prefix + "  ");
-
-            for ( var m = 0, lenm = itemKeys.length; m < lenm; ++m ) {
-                if ( itemKeys[m] !== "xFFFEE000" ) {
-                    line += "\n";
-                    line += this.getElementAsString(item[itemKeys[m]], prefix + "    ");
-                }
-            }
-
-            message = "(ItemDelimitationItem";
-            if ( itemElement.vl !== "u/l" ) {
-                message += " for re-encoding";
-            }
-            message += ")";
-            var itemDelimElement = {
-                    "tag": { "group": "0xFFFE", "element": "0xE00D" },
-                    "vr": "na",
-                    "vl": "0",
-                    "value": [message]
-                };
-            line += "\n";
-            line += this.getElementAsString(itemDelimElement, prefix + "  ");
-
-        }
-
-        message = "(SequenceDelimitationItem";
-        if ( dicomElement.vl !== "u/l" ) {
-            message += " for re-encod.";
-        }
-        message += ")";
-        var sqDelimElement = {
-                "tag": { "group": "0xFFFE", "element": "0xE0DD" },
-                "vr": "na",
-                "vl": "0",
-                "value": [message]
-            };
-        line += "\n";
-        line += this.getElementAsString(sqDelimElement, prefix);
-    }
-    // pixel sequence
-    else if ( isPixSequence ) {
-        var pixItem = null;
-        for ( var n = 0, lenn = dicomElement.value.length; n < lenn; ++n ) {
-            pixItem = dicomElement.value[n];
-            line += "\n";
-            pixItem.vr = 'pi';
-            line += this.getElementAsString(pixItem, prefix + "  ");
-        }
-
-        var pixDelimElement = {
-                "tag": { "group": "0xFFFE", "element": "0xE0DD" },
-                "vr": "na",
-                "vl": "0",
-                "value": ["(SequenceDelimitationItem)"]
-            };
-        line += "\n";
-        line += this.getElementAsString(pixDelimElement, prefix);
-    }
-
-    return prefix + line;
-};
-
-/**
- * Get a DICOM Element value from a group and an element.
- * @param {Number} group The group.
- * @param {Number} element The element.
- * @return {Object} The DICOM element value.
- */
-dwv.dicom.DicomElementsWrapper.prototype.getFromGroupElement = function (
-    group, element )
-{
-   return this.getFromKey(
-       dwv.dicom.getGroupElementKey(group, element) );
-};
-
-/**
- * Get a DICOM Element value from a tag name.
- * Uses the DICOM dictionary.
- * @param {String} name The tag name.
- * @return {Object} The DICOM element value.
- */
-dwv.dicom.DicomElementsWrapper.prototype.getFromName = function ( name )
-{
-   var value = null;
-   var tagGE = dwv.dicom.getGroupElementFromName(name);
-   // check that we are not at the end of the dictionary
-   if ( tagGE.group !== null && tagGE.element !== null ) {
-       value = this.getFromKey(dwv.dicom.getGroupElementKey(tagGE.group, tagGE.element));
-   }
-   return value;
-};
-
 // namespaces
 var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
@@ -5475,6 +5562,11 @@ dwv.dicom.isImplicitLengthPixels = function (element) {
 dwv.dicom.flattenArrayOfTypedArrays = function(initialArray) {
     var initialArrayLength = initialArray.length;
     var arrayLength = initialArray[0].length;
+    // If this is not a array of arrays, just return the initial one:
+    if (typeof arrayLength === "undefined") {
+        return initialArray;
+    }
+
     var flattenendArrayLength = initialArrayLength * arrayLength;
 
     var flattenedArray = new initialArray[0].constructor(flattenendArrayLength);
@@ -14446,15 +14538,25 @@ dwv.image.Geometry = function ( origin, size, spacing, orientation )
 };
 
 /**
+ * Get a string representation of the Vector3D.
+ * @return {String} The vector as a string.
+ */
+dwv.image.Geometry.prototype.toString = function () {
+    return "Origin: " + this.getOrigin() +
+        ", Size: " + this.getSize() +
+        ", Spacing: " + this.getSpacing();
+};
+
+/**
  * Check for equality.
  * @param {Geometry} rhs The object to compare to.
  * @return {Boolean} True if both objects are equal.
  */
 dwv.image.Geometry.prototype.equals = function (rhs) {
     return rhs !== null &&
-        this.getOrigin() === rhs.getOrigin() &&
-        this.getSize() === rhs.getSize() &&
-        this.getSpacing() === rhs.getSpacing();
+        this.getOrigin().equals( rhs.getOrigin() ) &&
+        this.getSize().equals( rhs.getSize() ) &&
+        this.getSpacing().equals( rhs.getSpacing() );
 };
 
 /**
@@ -14834,6 +14936,9 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
         }
         if( size.getNumberOfRows() !== rhsSize.getNumberOfRows() ) {
             throw new Error("Cannot append a slice with different number of rows");
+        }
+        if( !geometry.getOrientation().equals( rhs.getGeometry().getOrientation() ) ) {
+            throw new Error("Cannot append a slice with different orientation");
         }
         if( photometricInterpretation !== rhs.getPhotometricInterpretation() ) {
             throw new Error("Cannot append a slice with different photometric interpretation");
@@ -15328,10 +15433,10 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
         }
     }
     var quantif = dwv.math.getStats( subBuffer );
-    quant.min = {"value": quantif.min, "unit": ""};
-    quant.max = {"value": quantif.max, "unit": ""};
-    quant.mean = {"value": quantif.mean, "unit": ""};
-    quant.stdDev = {"value": quantif.stdDev, "unit": ""};
+    quant.min = {"value": quantif.getMin(), "unit": ""};
+    quant.max = {"value": quantif.getMax(), "unit": ""};
+    quant.mean = {"value": quantif.getMean(), "unit": ""};
+    quant.stdDev = {"value": quantif.getStdDev(), "unit": ""};
     // return
     return quant;
 };
@@ -15501,6 +15606,13 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     if ( pixelRepresentation ) {
         meta.IsSigned = (pixelRepresentation === 1);
     }
+
+    // RecommendedDisplayFrameRate
+    var recommendedDisplayFrameRate = dicomElements.getFromKey("x00082144");
+    if ( recommendedDisplayFrameRate ) {
+        meta.RecommendedDisplayFrameRate = parseInt(recommendedDisplayFrameRate, 10);
+    }
+
     image.setMeta(meta);
 
     // overlay
@@ -16094,6 +16206,20 @@ dwv.image.View = function (image)
      * @param {Image} inImage The associated image.
      */
     this.setImage = function(inImage) { image = inImage; };
+
+    /**
+     * Get the milliseconds per frame from frame rate.
+     * @return {Number} The milliseconds per frame.
+     */
+
+    this.getPlaybackMilliseconds = function(recommendedDisplayFrameRate) {
+        if ( !recommendedDisplayFrameRate ){
+            // Default to 10 FPS if none is found in the meta
+            recommendedDisplayFrameRate = 10;
+        }
+        // round milliseconds per frame to nearest whole number
+        return Math.round(1000 / recommendedDisplayFrameRate);
+    };
 
     /**
      * Get the window LUT of the image.
@@ -17646,20 +17772,14 @@ dwv.io.RawImageLoader = function ()
      * @param {String} dataType The data type.
      */
     function createDataUri(response, dataType) {
-        // image data as string
-        var bytes = new Uint8Array(response);
-        var imageDataStr = '';
-        for( var i = 0; i < bytes.byteLength; ++i ) {
-            imageDataStr += String.fromCharCode(bytes[i]);
-        }
         // image type
         var imageType = dataType;
-        if (imageType === "jpg") {
+        if (!imageType || imageType === "jpg") {
             imageType = "jpeg";
         }
         // create uri
-        var uri = "data:image/" + imageType + ";base64," + window.btoa(imageDataStr);
-        return uri;
+        var file = new Blob([response], {type: 'image/' + imageType});
+        return window.URL.createObjectURL(file);
     }
 
     /**
@@ -17671,10 +17791,6 @@ dwv.io.RawImageLoader = function ()
     this.load = function ( dataUri, origin, index ) {
         // create a DOM image
         var image = new Image();
-        image.src = dataUri;
-        // storing values to pass them on
-        image.origin = origin;
-        image.index = index;
         // triggered by ctx.drawImage
         image.onload = function (/*event*/) {
             try {
@@ -17686,6 +17802,10 @@ dwv.io.RawImageLoader = function ()
             self.onprogress({'type': 'read-progress', 'lengthComputable': true,
                 'loaded': 100, 'total': 100, 'index': index});
         };
+        // storing values to pass them on
+        image.origin = origin;
+        image.index = index;
+        image.src = dataUri;
     };
 
     /**
@@ -18188,38 +18308,6 @@ dwv.io.UrlsLoader.prototype.onabort = function (/*event*/) {};
  */
 dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
 {
-    // clear storage
-    this.clearStoredRequests();
-    this.clearStoredLoader();
-
-    // closure to self for handlers
-    var self = this;
-    // set the number of data to load
-    this.setNToLoad( ioArray.length );
-
-    var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
-    mproghandler.setNToLoad( ioArray.length );
-
-    // get loaders
-    var loaders = [];
-    for (var m = 0; m < dwv.io.loaderList.length; ++m) {
-        loaders.push( new dwv.io[dwv.io.loaderList[m]]() );
-    }
-
-    // set loaders callbacks
-    var loader = null;
-    for (var k = 0; k < loaders.length; ++k) {
-        loader = loaders[k];
-        loader.onload = self.onload;
-        loader.onloadend = self.addLoaded;
-        loader.onerror = self.onerror;
-        loader.onabort = self.onabort;
-        loader.setOptions({
-            'defaultCharacterSet': this.getDefaultCharacterSet()
-        });
-        loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
-    }
-
     // request onerror handler
     var getRequestOnError = function (origin) {
         return function (/*event*/) {
@@ -18239,57 +18327,125 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
         };
     };
 
-    // loop on I/O elements
-    for (var i = 0; i < ioArray.length; ++i)
-    {
-        var url = ioArray[i];
-        var request = new XMLHttpRequest();
-        request.open('GET', url, true);
+    // clear storage
+    this.clearStoredRequests();
+    this.clearStoredLoader();
 
-        // store request
-        this.storeRequest(request);
+    // closure to self for handlers
+    var self = this;
 
-        // optional request headers
-        if ( typeof options.requestHeaders !== "undefined" ) {
-            var requestHeaders = options.requestHeaders;
-            for (var j = 0; j < requestHeaders.length; ++j) {
-                if ( typeof requestHeaders[j].name !== "undefined" &&
-                    typeof requestHeaders[j].value !== "undefined" ) {
-                    request.setRequestHeader(requestHeaders[j].name, requestHeaders[j].value);
+    // raw url load
+    var internalUrlsLoad = function (urlsArray) {
+        // set the number of data to load
+        self.setNToLoad( urlsArray.length );
+
+        var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
+        mproghandler.setNToLoad( urlsArray.length );
+
+        // get loaders
+        var loaders = [];
+        for (var m = 0; m < dwv.io.loaderList.length; ++m) {
+            loaders.push( new dwv.io[dwv.io.loaderList[m]]() );
+        }
+
+        // set loaders callbacks
+        var loader = null;
+        for (var k = 0; k < loaders.length; ++k) {
+            loader = loaders[k];
+            loader.onload = self.onload;
+            loader.onloadend = self.addLoaded;
+            loader.onerror = self.onerror;
+            loader.onabort = self.onabort;
+            loader.setOptions({
+                'defaultCharacterSet': self.getDefaultCharacterSet()
+            });
+            loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
+        }
+
+        // loop on I/O elements
+        for (var i = 0; i < urlsArray.length; ++i)
+        {
+            var url = urlsArray[i];
+            var request = new XMLHttpRequest();
+            request.open('GET', url, true);
+
+            // store request
+            self.storeRequest(request);
+
+            // optional request headers
+            if ( typeof options.requestHeaders !== "undefined" ) {
+                var requestHeaders = options.requestHeaders;
+                for (var j = 0; j < requestHeaders.length; ++j) {
+                    if ( typeof requestHeaders[j].name !== "undefined" &&
+                        typeof requestHeaders[j].value !== "undefined" ) {
+                        request.setRequestHeader(requestHeaders[j].name, requestHeaders[j].value);
+                    }
                 }
             }
-        }
 
-        // bind reader progress
-        request.onprogress = mproghandler.getMonoProgressHandler(i, 0);
-        request.onloadend = mproghandler.getMonoOnLoadEndHandler(i, 0);
+            // bind reader progress
+            request.onprogress = mproghandler.getMonoProgressHandler(i, 0);
+            request.onloadend = mproghandler.getMonoOnLoadEndHandler(i, 0);
 
-        // find a loader
-        var foundLoader = false;
-        for (var l = 0; l < loaders.length; ++l) {
-            loader = loaders[l];
-            if (loader.canLoadUrl(url)) {
-                foundLoader = true;
-                // store loader
-                this.storeLoader(loader);
-                // set reader callbacks
-                request.onload = loader.getUrlLoadHandler(url, i);
-                request.onerror = getRequestOnError(url);
-                request.onabort = getRequestOnAbort(url);
-                // response type (default is 'text')
-                if (loader.loadUrlAs() === dwv.io.urlContentTypes.ArrayBuffer) {
-                    request.responseType = "arraybuffer";
+            // find a loader
+            var foundLoader = false;
+            for (var l = 0; l < loaders.length; ++l) {
+                loader = loaders[l];
+                if (loader.canLoadUrl(url)) {
+                    foundLoader = true;
+                    // store loader
+                    self.storeLoader(loader);
+                    // set reader callbacks
+                    request.onload = loader.getUrlLoadHandler(url, i);
+                    request.onerror = getRequestOnError(url);
+                    request.onabort = getRequestOnAbort(url);
+                    // response type (default is 'text')
+                    if (loader.loadUrlAs() === dwv.io.urlContentTypes.ArrayBuffer) {
+                        request.responseType = "arraybuffer";
+                    }
+                    // read
+                    request.send(null);
+                    // next file
+                    break;
                 }
-                // read
-                request.send(null);
-                // next file
-                break;
+            }
+            // TODO: throw?
+            if (!foundLoader) {
+                throw new Error("No loader found for url: "+url);
             }
         }
-        // TODO: throw?
-        if (!foundLoader) {
-            throw new Error("No loader found for url: "+url);
-        }
+    };
+
+    // DICOMDIR load
+    var internalDicomDirLoad = function (dicomDirUrl) {
+        console.log("UrlsLoader: using a DICOMDIR.");
+        // read DICOMDIR
+        var dirRequest = new XMLHttpRequest();
+        dirRequest.open('GET', dicomDirUrl, true);
+        dirRequest.responseType = "arraybuffer";
+        dirRequest.onload = function (/*event*/) {
+            // get the file list
+            var list = dwv.dicom.getFileListFromDicomDir( this.response );
+            // use the first list
+            var urls = list[0][0];
+            // append root url
+            var rootUrl = dicomDirUrl.substr( 0, (dicomDirUrl.length - "DICOMDIR".length - 1 ) );
+            var fullUrls = [];
+            for ( var i = 0; i < urls.length; ++i ) {
+                fullUrls.push( rootUrl + "/" + urls[i]);
+            }
+            internalUrlsLoad(fullUrls);
+        };
+        dirRequest.onerror = getRequestOnError(dicomDirUrl);
+        dirRequest.onabort = getRequestOnAbort(dicomDirUrl);
+        dirRequest.send(null);
+    };
+
+    // check if DICOMDIR case
+    if ( ioArray.length === 1 && dwv.utils.endsWith(ioArray[0], "DICOMDIR") ) {
+        internalDicomDirLoad(ioArray[0]);
+    } else {
+        internalUrlsLoad(ioArray);
     }
 };
 
@@ -20010,6 +20166,70 @@ var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
 /**
+ * Basic statistics
+ * @constructor
+ * @param {Number} min The minimum value.
+ * @param {Number} max The maximum value.
+ * @param {Number} mean The mean value.
+ * @param {Number} stdDev The standard deviation.
+ */
+dwv.math.Stats = function ( min, max, mean, stdDev ) {
+    /**
+     * Get the minimum value.
+     * @return {Number} The minimum value.
+     */
+    this.getMin = function () {
+        return min;
+    };
+    /**
+     * Get the maximum value.
+     * @return {Number} The maximum value.
+     */
+    this.getMax = function () {
+        return max;
+    };
+    /**
+     * Get the mean value.
+     * @return {Number} The mean value.
+     */
+    this.getMean = function () {
+        return mean;
+    };
+    /**
+     * Get the standard deviation.
+     * @return {Number} The standard deviation.
+     */
+    this.getStdDev = function () {
+        return stdDev;
+    };
+};
+
+/**
+ * Check for Stats equality.
+ * @param {Object} rhs The other Stats object to compare to.
+ * @return {Boolean} True if both Stats object are equal.
+ */
+dwv.math.Stats.prototype.equals = function (rhs) {
+    return rhs !== null &&
+        this.getMin() === rhs.getMin() &&
+        this.getMax() === rhs.getMax() &&
+        this.getMean() === rhs.getMean() &&
+        this.getStdDev() === rhs.getStdDev();
+};
+
+/**
+ * Get the stats as an object
+ * @return {Object} An object representation of the stats.
+ */
+dwv.math.Stats.prototype.asObject = function () {
+    return { 'min': this.getMin(),
+        'max': this.getMax(),
+        'mean': this.getMean(),
+        'stdDev': this.getStdDev()
+    };
+};
+
+/**
  * Get the minimum, maximum, mean and standard deviation
  * of an array of values.
  * Note: could use {@link https://github.com/tmcw/simple-statistics}.
@@ -20042,7 +20262,7 @@ dwv.math.getStats = function (array)
     variance = sumSqr / array.length - mean * mean;
     stdDev = Math.sqrt(variance);
 
-    return { 'min': min, 'max': max, 'mean': mean, 'stdDev': stdDev };
+    return new dwv.math.Stats( min, max, mean, stdDev );
 };
 
 /**
@@ -20202,7 +20422,7 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
     var verticalLine = new dwv.math.Line(line.getBegin(), beginTy);
     var angle = dwv.math.getAngle(line, verticalLine);
     var angleRad = angle * Math.PI / 180;
-    var radius = 5;
+    var radius = 5 * style.getScaledStrokeWidth();
     var kpoly = new Konva.RegularPolygon({
         x: line.getBegin().getX() + radius * Math.sin(angleRad),
         y: line.getBegin().getY() + radius * Math.cos(angleRad),
@@ -20386,6 +20606,13 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @type Object
      */
     this.shapeFactoryList = shapeFactoryList;
+
+    /**
+     * Current shape factory.
+     * @type Object
+     */
+    var currentFactory = null;
+
     /**
      * Draw command.
      * @private
@@ -20447,6 +20674,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         points: [10, -10, -10, 10 ],
         stroke: 'red'
     });
+    trash.width(20);
+    trash.height(20);
     trash.add(trashLine1);
     trash.add(trashLine2);
 
@@ -20474,6 +20703,11 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @param {Object} event The mouse down event.
      */
     this.mousedown = function(event){
+        // exit if a draw was started (handle at mouse move or up)
+        if ( started ) {
+            return;
+        }
+
         // determine if the click happened in an existing shape
         var stage = app.getDrawStage();
         var kshape = stage.getIntersection({
@@ -20500,6 +20734,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             shapeEditor.setImage(null);
             // start storing points
             started = true;
+            // set factory
+            currentFactory = new self.shapeFactoryList[self.shapeName]();
             // clear array
             points = [];
             // store point
@@ -20513,42 +20749,29 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @param {Object} event The mouse move event.
      */
     this.mousemove = function(event){
-        if (!started)
-        {
+        // exit if not started draw
+        if ( !started ) {
             return;
         }
+
+        // draw line to current pos
         if ( Math.abs( event._x - lastPoint.getX() ) > 0 ||
                 Math.abs( event._y - lastPoint.getY() ) > 0 )
         {
+            // clear last added point from the list (but not the first one)
+            // if it was marked as temporary
+            if ( points.length != 1 &&
+                typeof points[points.length-1].tmp !== "undefined" ) {
+                    points.pop();
+            }
             // current point
             lastPoint = new dwv.math.Point2D(event._x, event._y);
-            // clear last added point from the list (but not the first one)
-            if ( points.length != 1 ) {
-                points.pop();
-            }
-            // add current one to the list
+            // mark it as temporary
+            lastPoint.tmp = true;
+            // add it to the list
             points.push( lastPoint );
-            // allow for anchor points
-            var factory = new self.shapeFactoryList[self.shapeName]();
-            if( points.length < factory.getNPoints() ) {
-                clearTimeout(this.timer);
-                this.timer = setTimeout( function () {
-                    points.push( lastPoint );
-                }, factory.getTimeout() );
-            }
-            // remove previous draw
-            if ( tmpShapeGroup ) {
-                tmpShapeGroup.destroy();
-            }
-            // create shape group
-            tmpShapeGroup = factory.create(points, self.style, app.getImage());
-            // do not listen during creation
-            var shape = tmpShapeGroup.getChildren( dwv.draw.isNodeNameShape )[0];
-            shape.listening(false);
-            drawLayer.hitGraphEnabled(false);
-            // draw shape
-            drawLayer.add(tmpShapeGroup);
-            drawLayer.draw();
+            // update points
+            onNewPoints(points);
         }
     };
 
@@ -20556,37 +20779,48 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * Handle mouse up event.
      * @param {Object} event The mouse up event.
      */
-    this.mouseup = function (/*event*/){
-        if (started && points.length > 1 )
-        {
-            // reset shape group
-            if ( tmpShapeGroup ) {
-                tmpShapeGroup.destroy();
-            }
-            // create final shape
-            var factory = new self.shapeFactoryList[self.shapeName]();
-            var finalShapeGroup = factory.create(points, self.style, app.getImage());
-            finalShapeGroup.id( dwv.math.guid() );
-
-            // get the position group
-            var posGroup = app.getDrawController().getCurrentPosGroup();
-            // add shape group to position group
-            posGroup.add(finalShapeGroup);
-
-            // re-activate layer
-            drawLayer.hitGraphEnabled(true);
-            // draw shape command
-            command = new dwv.tool.DrawGroupCommand(finalShapeGroup, self.shapeName, drawLayer);
-            command.onExecute = fireEvent;
-            command.onUndo = fireEvent;
-            // execute it
-            command.execute();
-            // save it in undo stack
-            app.addToUndoStack(command);
-
-            // activate shape listeners
-            self.setShapeOn( finalShapeGroup );
+    this.mouseup = function (/*event*/) {
+        // exit if not started draw
+        if ( !started ) {
+            return;
         }
+        // exit if no points
+        if ( points.length === 0 ) {
+            console.warn("Draw mouseup but no points...");
+            return;
+        }
+
+        // do we have all the needed points
+        if ( points.length === currentFactory.getNPoints() ) {
+            // store points
+            onFinalPoints(points);
+            // reset flag
+            started = false;
+        } else {
+            // remove temporary flag
+            if ( typeof points[points.length-1].tmp !== "undefined" ) {
+                delete points[points.length-1].tmp;
+            }
+        }
+    };
+
+    /**
+     * Handle mouse up event.
+     * @param {Object} event The mouse up event.
+     */
+    this.dblclick = function (/*event*/){
+        // exit if not started draw
+        if ( !started ) {
+            return;
+        }
+        // exit if no points
+        if ( points.length === 0 ) {
+            console.warn("Draw dblclick but no points...");
+            return;
+        }
+
+        // store points
+        onFinalPoints(points);
         // reset flag
         started = false;
     };
@@ -20612,7 +20846,32 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @param {Object} event The touch move event.
      */
     this.touchmove = function(event){
-        self.mousemove(event);
+        // exit if not started draw
+        if ( !started ) {
+            return;
+        }
+
+        if ( Math.abs( event._x - lastPoint.getX() ) > 0 ||
+                Math.abs( event._y - lastPoint.getY() ) > 0 )
+        {
+            // clear last added point from the list (but not the first one)
+            if ( points.length != 1 ) {
+                points.pop();
+            }
+            // current point
+            lastPoint = new dwv.math.Point2D(event._x, event._y);
+            // add current one to the list
+            points.push( lastPoint );
+            // allow for anchor points
+            if( points.length < currentFactory.getNPoints() ) {
+                clearTimeout(this.timer);
+                this.timer = setTimeout( function () {
+                    points.push( lastPoint );
+                }, currentFactory.getTimeout() );
+            }
+            // update points
+            onNewPoints(points);
+        }
     };
 
     /**
@@ -20620,7 +20879,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @param {Object} event The touch end event.
      */
     this.touchend = function(event){
-        self.mouseup(event);
+        self.dblclick(event);
     };
 
     /**
@@ -20629,7 +20888,77 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      */
     this.keydown = function(event){
         app.onKeydown(event);
+
+        // press delete key
+        if (event.keyCode === 46 && shapeEditor.isActive()) {
+            // get shape
+            var shapeGroup = shapeEditor.getShape().getParent();
+            var shapeDisplayName = dwv.tool.GetShapeDisplayName(
+                shapeGroup.getChildren( dwv.draw.isNodeNameShape )[0]);
+            // delete command
+            var delcmd = new dwv.tool.DeleteGroupCommand(shapeGroup,
+                shapeDisplayName, drawLayer);
+            delcmd.onExecute = fireEvent;
+            delcmd.onUndo = fireEvent;
+            delcmd.execute();
+            app.addToUndoStack(delcmd);
+        }
     };
+
+    /**
+     * Update the current draw with new points.
+     * @param {Array} tmpPoints The array of new points.
+     */
+    function onNewPoints( tmpPoints )
+    {
+        // remove temporary shape draw
+        if ( tmpShapeGroup ) {
+            tmpShapeGroup.destroy();
+        }
+        // create shape group
+        tmpShapeGroup = currentFactory.create(tmpPoints, self.style, app.getImage());
+        // do not listen during creation
+        var shape = tmpShapeGroup.getChildren( dwv.draw.isNodeNameShape )[0];
+        shape.listening(false);
+        drawLayer.hitGraphEnabled(false);
+        // draw shape
+        drawLayer.add(tmpShapeGroup);
+        drawLayer.draw();
+    }
+
+    /**
+     * Create the final shape from a point list.
+     * @param {Array} finalPoints The array of points.
+     */
+    function onFinalPoints( finalPoints )
+    {
+        // reset temporary shape group
+        if ( tmpShapeGroup ) {
+            tmpShapeGroup.destroy();
+        }
+        // create final shape
+        var finalShapeGroup = currentFactory.create(finalPoints, self.style, app.getImage());
+        finalShapeGroup.id( dwv.math.guid() );
+
+        // get the position group
+        var posGroup = app.getDrawController().getCurrentPosGroup();
+        // add shape group to position group
+        posGroup.add(finalShapeGroup);
+
+        // re-activate layer
+        drawLayer.hitGraphEnabled(true);
+        // draw shape command
+        command = new dwv.tool.DrawGroupCommand(finalShapeGroup, self.shapeName, drawLayer);
+        command.onExecute = fireEvent;
+        command.onUndo = fireEvent;
+        // execute it
+        command.execute();
+        // save it in undo stack
+        app.addToUndoStack(command);
+
+        // activate shape listeners
+        self.setShapeOn( finalShapeGroup );
+    }
 
     /**
      * Setup the tool GUI.
@@ -20764,8 +21093,8 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             var stage = app.getDrawStage();
             var scale = stage.scale();
             var invscale = {'x': 1/scale.x, 'y': 1/scale.y};
-            trash.x( stage.offset().x + ( 256 / scale.x ) );
-            trash.y( stage.offset().y + ( 20 / scale.y ) );
+            trash.x( stage.offset().x + ( stage.width() / (2 * scale.x) ) );
+            trash.y( stage.offset().y + ( stage.height() / (15 * scale.y) ) );
             trash.scale( invscale );
             drawLayer.add( trash );
             // deactivate anchors to avoid events on null shape
@@ -20778,8 +21107,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // highlight trash when on it
             var offset = dwv.html.getEventOffset( event.evt )[0];
             var eventPos = getRealPosition( offset );
-            if ( Math.abs( eventPos.x - trash.x() ) < 10 &&
-                    Math.abs( eventPos.y - trash.y() ) < 10   ) {
+            var trashHalfWidth = trash.width() * trash.scaleX() / 2;
+            var trashHalfHeight = trash.height() * trash.scaleY() / 2;
+            if ( Math.abs( eventPos.x - trash.x() ) < trashHalfWidth &&
+                    Math.abs( eventPos.y - trash.y() ) < trashHalfHeight   ) {
                 trash.getChildren().each( function (tshape){ tshape.stroke('orange'); });
                 // change the group shapes colour
                 shapeGroup.getChildren( dwv.draw.canNodeChangeColour ).forEach(
@@ -20802,8 +21133,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // delete case
             var offset = dwv.html.getEventOffset( event.evt )[0];
             var eventPos = getRealPosition( offset );
-            if ( Math.abs( eventPos.x - trash.x() ) < 10 &&
-                    Math.abs( eventPos.y - trash.y() ) < 10   ) {
+            var trashHalfWidth = trash.width() * trash.scaleX() / 2;
+            var trashHalfHeight = trash.height() * trash.scaleY() / 2;
+            if ( Math.abs( eventPos.x - trash.x() ) < trashHalfWidth &&
+                    Math.abs( eventPos.y - trash.y() ) < trashHalfHeight   ) {
                 // compensate for the drag translation
                 this.x( dragStartPos.x );
                 this.y( dragStartPos.y );
@@ -21466,39 +21799,44 @@ dwv.tool.ShapeEditor = function (app)
         // add shape specific anchors to the shape group
         if ( shape instanceof Konva.Line ) {
             var points = shape.points();
-            if ( points.length === 4 || points.length === 6) {
-                // add shape offset
-                var p0x = points[0] + shape.x();
-                var p0y = points[1] + shape.y();
-                var p1x = points[2] + shape.x();
-                var p1y = points[3] + shape.y();
-                addAnchor(group, p0x, p0y, 'begin');
-                if ( points.length === 4 ) {
-                    var shapekids = group.getChildren( dwv.draw.isNodeNameShapeExtra );
-                    if (shapekids.length === 2) {
-                        updateFunction = dwv.tool.UpdateRuler;
-                    } else {
-                        updateFunction = dwv.tool.UpdateArrow;
+
+            var needsBeginEnd = group.name() === "line-group" ||
+                group.name() === "ruler-group" ||
+                group.name() === "protractor-group";
+            var needsMid = group.name() === "protractor-group";
+
+            var px = 0;
+            var py = 0;
+            var name = "";
+            for ( var i = 0; i < points.length; i=i+2 ) {
+                px = points[i] + shape.x();
+                py = points[i+1] + shape.y();
+                name = i;
+                if ( needsBeginEnd ) {
+                    if ( i === 0 ) {
+                        name = "begin";
+                    } else if ( i === points.length - 2 ) {
+                        name = "end";
                     }
-                    addAnchor(group, p1x, p1y, 'end');
                 }
-                else {
-                    updateFunction = dwv.tool.UpdateProtractor;
-                    addAnchor(group, p1x, p1y, 'mid');
-                    var p2x = points[4] + shape.x();
-                    var p2y = points[5] + shape.y();
-                    addAnchor(group, p2x, p2y, 'end');
+                if ( needsMid && i === 2 ) {
+                    name = "mid";
                 }
+                addAnchor(group, px, py, name);
             }
-            else {
+
+            if ( group.name() === "line-group" ) {
+                updateFunction = dwv.tool.UpdateArrow;
+            } else if ( group.name() === "ruler-group" ) {
+                updateFunction = dwv.tool.UpdateRuler;
+            } else if ( group.name() === "protractor-group" ) {
+                updateFunction = dwv.tool.UpdateProtractor;
+            } else if ( group.name() === "roi-group" ) {
                 updateFunction = dwv.tool.UpdateRoi;
-                var px = 0;
-                var py = 0;
-                for ( var i = 0; i < points.length; i=i+2 ) {
-                    px = points[i] + shape.x();
-                    py = points[i+1] + shape.y();
-                    addAnchor(group, px, py, i);
-                }
+            } else if ( group.name() === "freeHand-group" ) {
+                updateFunction = dwv.tool.UpdateFreeHand;
+            } else {
+                console.warn("Cannot update unknown line shape.");
             }
         }
         else if ( shape instanceof Konva.Rect ) {
@@ -21600,13 +21938,16 @@ dwv.tool.ShapeEditor = function (app)
         });
         // drag move listener
         anchor.on('dragmove.edit', function (evt) {
+            // update shape
             if ( updateFunction ) {
                 updateFunction(this, image);
+            } else {
+                console.warn("No update function!");
             }
+            // redraw
             if ( this.getLayer() ) {
                 this.getLayer().draw();
-            }
-            else {
+            } else {
                 console.warn("No layer to draw the anchor!");
             }
             // prevent bubbling upwards
@@ -22962,7 +23303,8 @@ dwv.tool.UpdateFreeHand = function (anchor /*, image*/)
     var points = kline.points();
     points[anchor.id()] = anchor.x() - kline.x();
     points[anchor.id()+1] = anchor.y() - kline.y();
-    kline.points( points );
+    // concat to make Konva think it is a new array
+    kline.points( points.concat() );
 
     // update text
     var ktext = klabel.getText();
@@ -23911,8 +24253,10 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
         name: "shape"
     });
 
+    var tickLen = 10 * style.getScaledStrokeWidth();
+
     // tick begin
-    var linePerp0 = dwv.math.getPerpendicularLine( line, points[0], 10 );
+    var linePerp0 = dwv.math.getPerpendicularLine( line, points[0], tickLen );
     var ktick0 = new Konva.Line({
         points: [linePerp0.getBegin().getX(), linePerp0.getBegin().getY(),
                  linePerp0.getEnd().getX(), linePerp0.getEnd().getY() ],
@@ -23922,7 +24266,7 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
     });
 
     // tick end
-    var linePerp1 = dwv.math.getPerpendicularLine( line, points[1], 10 );
+    var linePerp1 = dwv.math.getPerpendicularLine( line, points[1], tickLen );
     var ktick1 = new Konva.Line({
         points: [linePerp1.getBegin().getX(), linePerp1.getBegin().getY(),
                  linePerp1.getEnd().getX(), linePerp1.getEnd().getY() ],
@@ -26242,6 +26586,20 @@ dwv.utils.capitaliseFirstLetter = function (string)
         res = string.charAt(0).toUpperCase() + string.slice(1);
     }
     return res;
+};
+
+/**
+ * Check if a string ends with the input element.
+ * @param {String} str The input string.
+ * @param {String} end The searched ending.
+ * @return {Boolean} True if the input string ends with the seached ending.
+ */
+dwv.utils.endsWith = function (str, end) {
+    if ( typeof str === "undefined" || str === null ||
+        typeof end === "undefined" || end === null ) {
+        return false;
+    }
+    return str.substr( str.length - end.length ) === end;
 };
 
 /**
