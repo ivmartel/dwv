@@ -1,4 +1,4 @@
-/*! dwv 0.24.0-beta 2018-08-10 08:22:54 */
+/*! dwv 0.24.0-beta 2018-08-15 16:18:01 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -16640,8 +16640,7 @@ dwv.image.View.prototype.generateImageData = function( array )
         var iMax = sliceOffset + sliceSize;
         for(var i=sliceOffset; i < iMax; ++i)
         {
-            pxValue = parseInt( windowLut.getValue(
-                    image.getValueAtOffset(i, frame) ), 10 );
+            pxValue = windowLut.getValue(image.getValueAtOffset(i, frame) );
             array.data[index] = colourMap.red[pxValue];
             array.data[index+1] = colourMap.green[pxValue];
             array.data[index+2] = colourMap.blue[pxValue];
@@ -16673,12 +16672,9 @@ dwv.image.View.prototype.generateImageData = function( array )
 
         for(var j=0; j < sliceSize; ++j)
         {
-            array.data[index] = parseInt( windowLut.getValue(
-                    image.getValueAtOffset(posR, frame) ), 10 );
-            array.data[index+1] = parseInt( windowLut.getValue(
-                    image.getValueAtOffset(posG, frame) ), 10 );
-            array.data[index+2] = parseInt( windowLut.getValue(
-                    image.getValueAtOffset(posB, frame) ), 10 );
+            array.data[index] = windowLut.getValue(image.getValueAtOffset(posR, frame) );
+            array.data[index+1] = windowLut.getValue(image.getValueAtOffset(posG, frame) );
+            array.data[index+2] = windowLut.getValue(image.getValueAtOffset(posB, frame) );
             array.data[index+3] = 0xff;
             index += 4;
 
@@ -16726,9 +16722,9 @@ dwv.image.View.prototype.generateImageData = function( array )
             g = y - 0.34414 * (cb - 128) - 0.71414 * (cr - 128);
             b = y + 1.772 * (cb - 128);
 
-            array.data[index] = parseInt( windowLut.getValue(r), 10 );
-            array.data[index+1] = parseInt( windowLut.getValue(g), 10 );
-            array.data[index+2] = parseInt( windowLut.getValue(b), 10 );
+            array.data[index] = windowLut.getValue(r);
+            array.data[index+1] = windowLut.getValue(g);
+            array.data[index+2] = windowLut.getValue(b);
             array.data[index+3] = 0xff;
             index += 4;
 
