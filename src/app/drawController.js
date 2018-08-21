@@ -313,7 +313,7 @@ dwv.DrawController = function (drawDiv)
                     "frame": position.frameNumber,
                     "type": type,
                     "color": shape.stroke(),
-                    "label": decodeURIComponent(text.textExpr),
+                    "label": text.textExpr,
                     "description": text.longText
                 });
             }
@@ -351,8 +351,8 @@ dwv.DrawController = function (drawDiv)
                 }
                 // get details (non konva vars)
                 drawingsDetails[ group.id() ] = {
-                    "textExpr": encodeURIComponent(texts[0].textExpr),
-                    "longText": encodeURIComponent(texts[0].longText),
+                    "textExpr": texts[0].textExpr,
+                    "longText": texts[0].longText,
                     "quant": texts[0].quant
                 };
             }
@@ -410,7 +410,7 @@ dwv.DrawController = function (drawDiv)
                     var label = stateGroup.getChildren( dwv.draw.isNodeNameLabel )[0];
                     var text = label.getText();
                     // store details
-                    text.textExpr = decodeURIComponent(details.textExpr);
+                    text.textExpr = details.textExpr;
                     text.longText = details.longText;
                     text.quant = details.quant;
                     // reset text (it was not encoded)
