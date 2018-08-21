@@ -1,4 +1,4 @@
-/*! dwv 0.24.0-beta 2018-08-15 16:18:01 */
+/*! dwv 0.24.0-beta 2018-08-21 09:41:24 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -16630,6 +16630,8 @@ dwv.image.View.prototype.generateImageData = function( array )
     var index = 0;
     var pxValue = 0;
     var stepPos = 0;
+    var frameBuffer;
+    var arrayBuffer;
 
     var photoInterpretation = image.getPhotometricInterpretation();
     switch (photoInterpretation)
@@ -16638,14 +16640,16 @@ dwv.image.View.prototype.generateImageData = function( array )
     case "MONOCHROME2":
         var colourMap = this.getColourMap();
         var iMax = sliceOffset + sliceSize;
+        frameBuffer = image.getFrame(frame);
+        arrayBuffer = new Uint32Array(array.data.buffer);
         for(var i=sliceOffset; i < iMax; ++i)
         {
-            pxValue = windowLut.getValue(image.getValueAtOffset(i, frame) );
-            array.data[index] = colourMap.red[pxValue];
-            array.data[index+1] = colourMap.green[pxValue];
-            array.data[index+2] = colourMap.blue[pxValue];
-            array.data[index+3] = 0xff;
-            index += 4;
+            pxValue = windowLut.getValue(frameBuffer[i]);
+            arrayBuffer[index] = 0xff000000 |
+                (colourMap.blue[pxValue] << 16) |
+                (colourMap.green[pxValue] << 8) |
+                colourMap.red[pxValue];
+            index += 1;
         }
         break;
 
@@ -16670,13 +16674,16 @@ dwv.image.View.prototype.generateImageData = function( array )
             stepPos = 1;
         }
 
+        frameBuffer = image.getFrame(frame);
+        arrayBuffer = new Uint32Array(array.data.buffer);
+
         for(var j=0; j < sliceSize; ++j)
         {
-            array.data[index] = windowLut.getValue(image.getValueAtOffset(posR, frame) );
-            array.data[index+1] = windowLut.getValue(image.getValueAtOffset(posG, frame) );
-            array.data[index+2] = windowLut.getValue(image.getValueAtOffset(posB, frame) );
-            array.data[index+3] = 0xff;
-            index += 4;
+            arrayBuffer[index] = 0xff000000 |
+                (windowLut.getValue(frameBuffer[posB]) << 16) |
+                (windowLut.getValue(frameBuffer[posG]) << 8) |
+                windowLut.getValue(frameBuffer[posR])  ;
+            index += 1;
 
             posR += stepPos;
             posG += stepPos;
@@ -16712,21 +16719,23 @@ dwv.image.View.prototype.generateImageData = function( array )
 
         var y, cb, cr;
         var r, g, b;
+        frameBuffer = image.getFrame(frame);
+        arrayBuffer = new Uint32Array(array.data.buffer);
         for (var k=0; k < sliceSize; ++k)
         {
-            y = image.getValueAtOffset(posY, frame);
-            cb = image.getValueAtOffset(posCB, frame);
-            cr = image.getValueAtOffset(posCR, frame);
+            y = frameBuffer[posY];
+            cb = frameBuffer[posCB];
+            cr = frameBuffer[posCR];
 
             r = y + 1.402 * (cr - 128);
             g = y - 0.34414 * (cb - 128) - 0.71414 * (cr - 128);
             b = y + 1.772 * (cb - 128);
 
-            array.data[index] = windowLut.getValue(r);
-            array.data[index+1] = windowLut.getValue(g);
-            array.data[index+2] = windowLut.getValue(b);
-            array.data[index+3] = 0xff;
-            index += 4;
+            arrayBuffer[index] = 0xff000000 |
+                (windowLut.getValue(b) << 16) |
+                (windowLut.getValue(g) << 8) |
+                windowLut.getValue(r)  ;
+            index += 1;
 
             posY += stepPos;
             posCB += stepPos;
