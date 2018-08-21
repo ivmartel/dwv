@@ -1,4 +1,4 @@
-/*! dwv 0.24.0-beta 2018-08-21 20:59:20 */
+/*! dwv 0.24.0-beta 2018-08-21 21:13:34 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -15629,6 +15629,7 @@ dwv.image.lut = dwv.image.lut || {};
 
 /**
  * Rescale LUT class.
+ * Typically converts from integer to float.
  * @constructor
  * @param {Object} rsi The rescale slope and intercept.
  * @param {Number} bitsStored The number of bits used to store the data.
@@ -15638,7 +15639,7 @@ dwv.image.lut.Rescale = function (rsi, bitsStored)
     /**
      * The internal array.
      * @private
-     * @type Array
+     * @type Float32Array
      */
     var lut = null;
 
@@ -15658,7 +15659,7 @@ dwv.image.lut.Rescale = function (rsi, bitsStored)
 
     /**
      * Get the Rescale Slope and Intercept (RSI).
-     * @return {Object} The rescale slope and intercept.
+     * @return {Object} The rescale slope and intercept object.
      */
     this.getRSI = function () { return rsi; };
 
@@ -15695,7 +15696,8 @@ dwv.image.lut.Rescale = function (rsi, bitsStored)
 
     /**
      * Get the value of the LUT at the given offset.
-     * @return {Number} The value of the LUT at the given offset.
+     * @param {Number} offset The input offset in [0,2^bitsStored] range.
+     * @return {Number} The float32 value of the LUT at the given offset.
      */
     this.getValue = function (offset)
     {
@@ -15705,6 +15707,7 @@ dwv.image.lut.Rescale = function (rsi, bitsStored)
 
 /**
  * Window LUT class.
+  * Typically converts from float to integer.
  * @constructor
  * @param {Number} rescaleLut The associated rescale LUT.
  * @param {Boolean} isSigned Flag to know if the data is signed or not.
@@ -15714,7 +15717,7 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
     /**
      * The internal array: Uint8ClampedArray clamps between 0 and 255.
      * @private
-     * @type Array
+     * @type Uint8ClampedArray
      */
     var lut = null;
 
@@ -15821,7 +15824,8 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
 
     /**
      * Get the value of the LUT at the given offset.
-     * @return {Number} The value of the LUT at the given offset.
+     * @param {Number} offset The input offset in [0,2^bitsStored] range.
+     * @return {Number} The integer value (default [0,255]) of the LUT at the given offset.
      */
     this.getValue = function (offset)
     {
@@ -16110,7 +16114,7 @@ dwv.image.WindowLevel = function (center, width)
 
     /**
      * Apply the window level on an input value.
-     * @param {Number} The value to rescale as an integer.
+     * @param {Number} value The value to rescale as an integer.
      * @return {Number} The leveled value, in the
      *  [ymin, ymax] range (default [0,255]).
      */
