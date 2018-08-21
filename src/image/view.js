@@ -114,7 +114,7 @@ dwv.image.WindowLevel = function (center, width)
 
     /**
      * Apply the window level on an input value.
-     * @param {Number} The value to rescale as an integer.
+     * @param {Number} value The value to rescale as an integer.
      * @return {Number} The leveled value, in the
      *  [ymin, ymax] range (default [0,255]).
      */
