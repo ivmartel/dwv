@@ -1,4 +1,4 @@
-/*! dwv 0.24.0-beta 2018-08-21 18:45:41 */
+/*! dwv 0.24.0-beta 2018-08-21 20:59:20 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -1097,7 +1097,7 @@ dwv.App = function ()
         var state = new dwv.State();
         // add href to link (html5)
         var element = self.getElement("download-state");
-        element.href = "data:application/json," + state.toJSON(self);
+        element.href = "data:application/json," + encodeURIComponent(state.toJSON(self));
     };
 
     /**
@@ -1832,7 +1832,7 @@ dwv.DrawController = function (drawDiv)
                     "frame": position.frameNumber,
                     "type": type,
                     "color": shape.stroke(),
-                    "label": decodeURIComponent(text.textExpr),
+                    "label": text.textExpr,
                     "description": text.longText
                 });
             }
@@ -1870,8 +1870,8 @@ dwv.DrawController = function (drawDiv)
                 }
                 // get details (non konva vars)
                 drawingsDetails[ group.id() ] = {
-                    "textExpr": encodeURIComponent(texts[0].textExpr),
-                    "longText": encodeURIComponent(texts[0].longText),
+                    "textExpr": texts[0].textExpr,
+                    "longText": texts[0].longText,
                     "quant": texts[0].quant
                 };
             }
@@ -1929,7 +1929,7 @@ dwv.DrawController = function (drawDiv)
                     var label = stateGroup.getChildren( dwv.draw.isNodeNameLabel )[0];
                     var text = label.getText();
                     // store details
-                    text.textExpr = decodeURIComponent(details.textExpr);
+                    text.textExpr = details.textExpr;
                     text.longText = details.longText;
                     text.quant = details.quant;
                     // reset text (it was not encoded)
