@@ -1,4 +1,4 @@
-/*! dwv 0.24.0-beta 2018-08-20 23:13:36 */
+/*! dwv 0.24.0-beta 2018-08-21 18:45:41 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -17768,20 +17768,14 @@ dwv.io.RawImageLoader = function ()
      * @param {String} dataType The data type.
      */
     function createDataUri(response, dataType) {
-        // image data as string
-        var bytes = new Uint8Array(response);
-        var imageDataStr = '';
-        for( var i = 0; i < bytes.byteLength; ++i ) {
-            imageDataStr += String.fromCharCode(bytes[i]);
-        }
         // image type
         var imageType = dataType;
-        if (imageType === "jpg") {
+        if (!imageType || imageType === "jpg") {
             imageType = "jpeg";
         }
         // create uri
-        var uri = "data:image/" + imageType + ";base64," + window.btoa(imageDataStr);
-        return uri;
+        var file = new Blob([response], {type: 'image/' + imageType});
+        return window.URL.createObjectURL(file);
     }
 
     /**
@@ -17793,10 +17787,6 @@ dwv.io.RawImageLoader = function ()
     this.load = function ( dataUri, origin, index ) {
         // create a DOM image
         var image = new Image();
-        image.src = dataUri;
-        // storing values to pass them on
-        image.origin = origin;
-        image.index = index;
         // triggered by ctx.drawImage
         image.onload = function (/*event*/) {
             try {
@@ -17808,6 +17798,10 @@ dwv.io.RawImageLoader = function ()
             self.onprogress({'type': 'read-progress', 'lengthComputable': true,
                 'loaded': 100, 'total': 100, 'index': index});
         };
+        // storing values to pass them on
+        image.origin = origin;
+        image.index = index;
+        image.src = dataUri;
     };
 
     /**
