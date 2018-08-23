@@ -1,4 +1,4 @@
-/*! dwv 0.24.0-beta 2018-08-21 21:13:34 */
+/*! dwv 0.24.0-beta 2018-08-23 21:01:21 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -1097,7 +1097,8 @@ dwv.App = function ()
         var state = new dwv.State();
         // add href to link (html5)
         var element = self.getElement("download-state");
-        element.href = "data:application/json," + encodeURIComponent(state.toJSON(self));
+        var blob = new Blob([state.toJSON(self)], {type: 'application/json'});
+        element.href = window.URL.createObjectURL(blob);
     };
 
     /**
