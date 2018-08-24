@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>dwv Source: tests/state/state.test.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.yeti.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">dwv</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="dwv.html">dwv</a></li><li><a href="dwv.browser.html">dwv.browser</a></li><li><a href="dwv.dicom.html">dwv.dicom</a></li><li><a href="dwv.gui.html">dwv.gui</a></li><li><a href="dwv.gui.base.html">dwv.gui.base</a></li><li><a href="dwv.gui.filter.html">dwv.gui.filter</a></li><li><a href="dwv.gui.filter.base.html">dwv.gui.filter.base</a></li><li><a href="dwv.html.html">dwv.html</a></li><li><a href="dwv.image.html">dwv.image</a></li><li><a href="dwv.image.filter.html">dwv.image.filter</a></li><li><a href="dwv.image.lut.html">dwv.image.lut</a></li><li><a href="dwv.io.html">dwv.io</a></li><li><a href="dwv.math.html">dwv.math</a></li><li><a href="dwv.tests.html">dwv.tests</a></li><li><a href="dwv.tool.html">dwv.tool</a></li><li><a href="dwv.tool.filter.html">dwv.tool.filter</a></li><li><a href="dwv.utils.html">dwv.utils</a></li><li><a href="dwv.utils.base.html">dwv.utils.base</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="module-tests_dicom.html">tests/dicom</a></li><li><a href="module-tests_html.html">tests/html</a></li><li><a href="module-tests_image.html">tests/image</a></li><li><a href="module-tests_math.html">tests/math</a></li><li><a href="module-tests_state.html">tests/state</a></li><li><a href="module-tests_utils.html">tests/utils</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="dwv.App.html">dwv.App</a></li><li><a href="dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li><li><a href="dwv.dicom.DataWriter.html">dwv.dicom.DataWriter</a></li><li><a href="dwv.dicom.DicomElementsWrapper.html">dwv.dicom.DicomElementsWrapper</a></li><li><a href="dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li><li><a href="dwv.dicom.DicomWriter.html">dwv.dicom.DicomWriter</a></li><li><a href="dwv.dicom.Tag.html">dwv.dicom.Tag</a></li><li><a href="dwv.gui.base.ColourTool.html">dwv.gui.base.ColourTool</a></li><li><a href="dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li><li><a href="dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li><li><a href="dwv.gui.base.DrawList.html">dwv.gui.base.DrawList</a></li><li><a href="dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li><li><a href="dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li><li><a href="dwv.gui.base.FolderLoad.html">dwv.gui.base.FolderLoad</a></li><li><a href="dwv.gui.base.Loadbox.html">dwv.gui.base.Loadbox</a></li><li><a href="dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li><li><a href="dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li><li><a href="dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li><li><a href="dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li><li><a href="dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li><li><a href="dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li><li><a href="dwv.gui.base.Undo.html">dwv.gui.base.Undo</a></li><li><a href="dwv.gui.base.UrlLoad.html">dwv.gui.base.UrlLoad</a></li><li><a href="dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li><li><a href="dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li><li><a href="dwv.gui.info.MiniColourMap.html">dwv.gui.info.MiniColourMap</a></li><li><a href="dwv.gui.info.Overlay.html">dwv.gui.info.Overlay</a></li><li><a href="dwv.gui.info.Plot.html">dwv.gui.info.Plot</a></li><li><a href="dwv.html.Layer.html">dwv.html.Layer</a></li><li><a href="dwv.html.Style.html">dwv.html.Style</a></li><li><a href="dwv.image.DicomBufferToView.html">dwv.image.DicomBufferToView</a></li><li><a href="dwv.image.filter.Sharpen.html">dwv.image.filter.Sharpen</a></li><li><a href="dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li><li><a href="dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li><li><a href="dwv.image.Geometry.html">dwv.image.Geometry</a></li><li><a href="dwv.image.Image.html">dwv.image.Image</a></li><li><a href="dwv.image.ImageFactory.html">dwv.image.ImageFactory</a></li><li><a href="dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li><li><a href="dwv.image.lut.Window.html">dwv.image.lut.Window</a></li><li><a href="dwv.image.PixelBufferDecoder.html">dwv.image.PixelBufferDecoder</a></li><li><a href="dwv.image.RescaleSlopeAndIntercept.html">dwv.image.RescaleSlopeAndIntercept</a></li><li><a href="dwv.image.Size.html">dwv.image.Size</a></li><li><a href="dwv.image.Spacing.html">dwv.image.Spacing</a></li><li><a href="dwv.image.View.html">dwv.image.View</a></li><li><a href="dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li><li><a href="dwv.InfoController.html">dwv.InfoController</a></li><li><a href="dwv.io.DicomDataLoader.html">dwv.io.DicomDataLoader</a></li><li><a href="dwv.io.FilesLoader.html">dwv.io.FilesLoader</a></li><li><a href="dwv.io.JSONTextLoader.html">dwv.io.JSONTextLoader</a></li><li><a href="dwv.io.MemoryLoader.html">dwv.io.MemoryLoader</a></li><li><a href="dwv.io.RawImageLoader.html">dwv.io.RawImageLoader</a></li><li><a href="dwv.io.RawVideoLoader.html">dwv.io.RawVideoLoader</a></li><li><a href="dwv.io.UrlsLoader.html">dwv.io.UrlsLoader</a></li><li><a href="dwv.io.ZipLoader.html">dwv.io.ZipLoader</a></li><li><a href="dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li><li><a href="dwv.math.Circle.html">dwv.math.Circle</a></li><li><a href="dwv.math.Ellipse.html">dwv.math.Ellipse</a></li><li><a href="dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li><li><a href="dwv.math.Index3D.html">dwv.math.Index3D</a></li><li><a href="dwv.math.Line.html">dwv.math.Line</a></li><li><a href="dwv.math.Matrix33.html">dwv.math.Matrix33</a></li><li><a href="dwv.math.Path.html">dwv.math.Path</a></li><li><a href="dwv.math.Point2D.html">dwv.math.Point2D</a></li><li><a href="dwv.math.Point3D.html">dwv.math.Point3D</a></li><li><a href="dwv.math.Rectangle.html">dwv.math.Rectangle</a></li><li><a href="dwv.math.ROI.html">dwv.math.ROI</a></li><li><a href="dwv.math.Scissors.html">dwv.math.Scissors</a></li><li><a href="dwv.math.Stats.html">dwv.math.Stats</a></li><li><a href="dwv.math.Vector3D.html">dwv.math.Vector3D</a></li><li><a href="dwv.ModernizrInit-ModernizrProto.html">dwv.ModernizrInit~ModernizrProto</a></li><li><a href="dwv.State.html">dwv.State</a></li><li><a href="dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li><li><a href="dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li><li><a href="dwv.tool.DrawGroupCommand.html">dwv.tool.DrawGroupCommand</a></li><li><a href="dwv.tool.Filter_.html">dwv.tool.Filter</a></li><li><a href="dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li><li><a href="dwv.tool.filter.Sobel.html">dwv.tool.filter.Sobel</a></li><li><a href="dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li><li><a href="dwv.tool.Livewire.html">dwv.tool.Livewire</a></li><li><a href="dwv.tool.MoveGroupCommand.html">dwv.tool.MoveGroupCommand</a></li><li><a href="dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li><li><a href="dwv.tool.Scroll.html">dwv.tool.Scroll</a></li><li><a href="dwv.tool.Toolbox.html">dwv.tool.Toolbox</a></li><li><a href="dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li><li><a href="dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li><li><a href="dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li><li><a href="dwv.ToolboxController.html">dwv.ToolboxController</a></li><li><a href="dwv.utils.ListenerHandler.html">dwv.utils.ListenerHandler</a></li><li><a href="dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li><li><a href="dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li><li><a href="dwv.ViewController.html">dwv.ViewController</a></li><li><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></li><li><a href="Worker.html">Worker</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="global.html#askModernizr">askModernizr</a></li><li><a href="global.html#mulABC">mulABC</a></li><li><a href="global.html#webdriver">webdriver</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="externals.list.html" class="dropdown-toggle" data-toggle="dropdown">Externals<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="external-FileReader.html">FileReader</a></li><li><a href="external-i18next.html">i18next</a></li><li><a href="external-i18nextBrowserLanguageDetector.html">i18nextBrowserLanguageDetector</a></li><li><a href="external-JpxImage.html">JpxImage</a></li><li><a href="external-Konva.html">Konva</a></li><li><a href="external-MagicWand.html">MagicWand</a></li><li><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+        
+            <div class="col-sm-3 col-md-3">
+                <form class="navbar-form" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: tests/state/state.test.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">/**
+ * Tests for the 'app/state.js' file.
+ */
+/** @module tests/state */
+// Do not warn if these variables were not defined before.
+/* global QUnit */
+QUnit.module("state");
+
+/**
+ * Test a state file.
+ * @param {String} version The state format version.
+ * @param {String} type The type of drawing.
+ * @param {Object} assert The qunit assert.
+ */
+dwv.utils.test.TestState = function ( version, type, assert ) {
+    var done = assert.async();
+    // test file request
+    var request = new XMLHttpRequest();
+    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
+    var url = urlRoot + "/tests/state/v" + version + "/state-" + type + ".json";
+    request.open('GET', url, true);
+    request.onerror = function (event) {
+        console.log(event);
+    };
+    request.onload = function (/*event*/) {
+        // status 200: "OK"; status 0: "debug"
+        if ( this.status !== 200 &amp;&amp; this.status !== 0 ) {
+            assert.ok( false, "Error while loading test data." );
+            done();
+            return;
+        }
+        // read state
+        var state = new dwv.State();
+        var jsonData = state.fromJSON( this.responseText );
+        // check drawings values
+        dwv.utils.test.CheckDrawings(
+            jsonData.drawings, jsonData.drawingsDetails, version, type, assert );
+        // delete drawing to allow simple equal check
+        delete jsonData.drawings;
+        delete jsonData.drawingsDetails;
+        // check values expect drawings
+        dwv.utils.test.CheckStateHeader( jsonData, version, assert );
+        // finish async test
+        done();
+    };
+    // send request
+    request.send(null);
+};
+
+/**
+ * Check state header.
+ * @param {Object} jsonData The input data to check.
+ * @param {String} version The state format version.
+ * @param {Object} assert The qunit assert.
+ */
+dwv.utils.test.CheckStateHeader = function (jsonData, version, assert) {
+    // header data
+    var headerData = {
+        "version": version,
+        "window-center": 441,
+        "window-width": 911,
+        "position": { "i": 0, "j": 0, "k": 0 },
+        "scale": 1,
+        "scaleCenter": { "x": 0, "y": 0 },
+        "translation": { "x": 0,  "y": 0 }
+    };
+    assert.deepEqual( jsonData, headerData );
+};
+
+/**
+ * Check drawings.
+ * @param {Object} drawings The drawing object to check
+ * @param {Object} details The drawing details
+ * @param {String} version The state format version.
+ * @param {String} type The type of drawing.
+ * @param {Object} assert The qunit assert.
+ */
+dwv.utils.test.CheckDrawings = function (drawings, details, version, type, assert) {
+    // first level: layer
+    assert.equal( drawings.className, "Layer", "State drawings is a layer.");
+
+    // second level: position groups
+    if ( drawings.children.length === 5 &amp;&amp;
+        ( type === "ruler_multi-slice" || type === "line_multi-slice" ) ) {
+        dwv.utils.test.CheckRulerDrawings( drawings.children, details, version, assert );
+    } else if ( drawings.children.length === 1 ) {
+
+        var layerKid = drawings.children[0];
+        assert.equal( layerKid.className, "Group", "Layer first level is a group.");
+        assert.equal( layerKid.attrs.name, "position-group", "Layer first level is a position group.");
+        assert.equal( layerKid.attrs.id, "slice-0_frame-0", "Position group has the proper id.");
+
+        // third level: shape group(s)
+        var posGroupKid = layerKid.children[0];
+        assert.equal( posGroupKid.className, "Group", "Position group first level is a group.");
+
+        // shape specific checks
+        if ( type === "arrow" ) {
+            dwv.utils.test.CheckArrowDrawing( posGroupKid, details, version, assert );
+        } else if ( type === "ruler" &amp;&amp; version !== "0.1" ) {
+            var refRuler = {
+                'id': "4gvkz8v6wzw",
+                'points': [51,135,216,134],
+                'colour': "#ffff80",
+                'text': "165.0mm",
+                'textExpr': "{length}",
+                'longText': "What a ruler!"
+            };
+            dwv.utils.test.CheckRulerDrawing( posGroupKid, details, refRuler, assert );
+        } else if ( type === "line" &amp;&amp; version === "0.1" ) {
+            var refLine = {
+                'id': "4gvkz8v6wzw",
+                'points': [51,135,216,134],
+                'colour': "#ffff00",
+                'text': "165.0mm",
+                'textExpr': "{length}",
+                'longText': ""
+            };
+            dwv.utils.test.CheckRulerDrawing( posGroupKid, details, refLine, assert );
+        } else if ( type === "roi" ) {
+            dwv.utils.test.CheckRoiDrawing( posGroupKid, details, version, assert );
+        } else if ( type === "hand" ) {
+            dwv.utils.test.CheckHandDrawing( posGroupKid, details, version, assert );
+        } else if ( type === "ellipse" ) {
+            dwv.utils.test.CheckEllipseDrawing( posGroupKid, details, version, assert );
+        } else if ( type === "protractor" ) {
+            dwv.utils.test.CheckProtractorDrawing( posGroupKid, details, version, assert );
+        } else if ( type === "rectangle" ) {
+            dwv.utils.test.CheckRectangleDrawing( posGroupKid, details, version, assert );
+        } else {
+            assert.ok( false, "Unknown draw type." );
+        }
+    } else {
+        assert.ok( false, "Not the expected number of position groups." );
+    }
+};
+
+/**
+ * Check an arrow drawing.
+ * @param {Object} posGroupKid The position group (only) kid.
+ * @param {Object} details The drawing details
+ * @param {String} version The state format version.
+ * @param {Object} assert The qunit assert.
+ */
+dwv.utils.test.CheckArrowDrawing = function (posGroupKid, details, version, assert) {
+    // check group
+    assert.equal( posGroupKid.attrs.name, "line-group", "Shape group is a line group.");
+    assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
+    assert.equal( posGroupKid.attrs.id, "pf8zteo5r4", "Position group first level has the proper id.");
+    assert.notEqual( typeof details.pf8zteo5r4, "undefined", "Details should contain data for id.");
+
+    // kids
+    assert.equal( posGroupKid.children.length, 3, "Shape group has 3 kids.");
+    var hasShape = false;
+    var hasLabel = false;
+    var hasPoly = false;
+    for ( var i = 0; i &lt; posGroupKid.children.length; ++i ) {
+        var shapeGroupKid = posGroupKid.children[i];
+        if ( shapeGroupKid.attrs.name === "shape" ) {
+            hasShape = true;
+            assert.equal( shapeGroupKid.className, "Line", "Shape group 'shape' is a line.");
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'shape' must not be draggable.");
+            assert.deepEqual( shapeGroupKid.attrs.points, [53, 136, 139, 89], "Line has the proper points.");
+            assert.equal( shapeGroupKid.attrs.stroke, "#ffff80", "Line has the proper colour.");
+        } else if ( shapeGroupKid.className === "Label" ) {
+            hasLabel = true;
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'label' must not be draggable.");
+            assert.equal( shapeGroupKid.children.length, 2, "Label has 2 kids.");
+            var labelGroupKid0 = shapeGroupKid.children[0];
+            assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
+            assert.equal( labelGroupKid0.attrs.text, "Eye", "Text has the proper value.");
+            var labelGroupKid1 = shapeGroupKid.children[1];
+            assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+        } else if ( shapeGroupKid.className === "RegularPolygon" ) {
+            hasPoly = true;
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'extra' must not be draggable.");
+        }
+    }
+    assert.ok( hasShape, "Shape group contains a shape.");
+    assert.ok( hasLabel, "Shape group contains a label.");
+    assert.ok( hasPoly, "Shape group contains a polygon.");
+
+    // details
+    var details0 = details.pf8zteo5r4;
+    assert.equal( details0.textExpr, "Eye", "Details textExpr has the proper value.");
+    assert.equal( details0.longText, "This is an eye!", "Details longText has the proper value.");
+};
+
+/**
+ * Check a ruler drawing.
+ * @param {Object} posGroupKid The position group (only) kid.
+ * @param {Object} details The drawing details
+ * @param {String} ref The reference data to compare to.
+ * @param {Object} assert The qunit assert.
+ */
+dwv.utils.test.CheckRulerDrawing = function (posGroupKid, details, ref, assert) {
+    // check group
+    assert.equal( posGroupKid.attrs.name, "ruler-group", "Shape group is a ruler group.");
+    assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
+    assert.equal( posGroupKid.attrs.id, ref.id, "Position group first level has the proper id.");
+    assert.notEqual( typeof details[ref.id], "undefined", "Details should contain data for id.");
+
+    // kids
+    assert.equal( posGroupKid.children.length, 4, "Shape group has 4 kids.");
+    var hasShape = false;
+    var hasLabel = false;
+    var hasTick1 = false;
+    var hasTick2 = false;
+    for ( var i = 0; i &lt; posGroupKid.children.length; ++i ) {
+        var shapeGroupKid = posGroupKid.children[i];
+        if ( shapeGroupKid.attrs.name === "shape" ) {
+            hasShape = true;
+            assert.equal( shapeGroupKid.className, "Line", "Shape group 'shape' is a line.");
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'shape' must not be draggable.");
+            assert.deepEqual( shapeGroupKid.attrs.points, ref.points, "Line has the proper points.");
+            assert.equal( shapeGroupKid.attrs.stroke, ref.colour, "Line has the proper colour.");
+        } else if ( shapeGroupKid.className === "Label" ) {
+            hasLabel = true;
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'label' must not be draggable.");
+            assert.equal( shapeGroupKid.children.length, 2, "Label has 2 kids.");
+            var labelGroupKid0 = shapeGroupKid.children[0];
+            assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
+            assert.equal( labelGroupKid0.attrs.text, ref.text, "Text has the proper value.");
+            var labelGroupKid1 = shapeGroupKid.children[1];
+            assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+        } else if ( shapeGroupKid.className === "Line" ) {
+            if ( hasTick1 ) {
+                hasTick2 = true;
+            } else {
+                hasTick1 = true;
+            }
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'extra' must not be draggable.");
+        }
+    }
+    assert.ok( hasShape, "Shape group contains a shape.");
+    assert.ok( hasLabel, "Shape group contains a label.");
+    assert.ok( hasTick1, "Shape group contains a tick1.");
+    assert.ok( hasTick2, "Shape group contains a tick2.");
+
+    // details
+    var details0 = details[ref.id];
+    assert.equal( details0.textExpr, ref.textExpr, "Details textExpr has the proper value.");
+    assert.equal( details0.longText, ref.longText, "Details longText has the proper value.");
+};
+
+/**
+ * Check a multi slice ruler drawing.
+ * @param {Object} layer The draw layer.
+ * @param {Object} details The drawing details
+ * @param {String} version The state format version.
+ * @param {Object} assert The qunit assert.
+ */
+dwv.utils.test.CheckRulerDrawings = function (layerKids, details, version, assert) {
+
+    var ndraws = 5;
+    assert.equal( layerKids.length, ndraws, "Layer has " + ndraws + " kids.");
+
+    var refRulers = [
+        {
+            'id': "onzlkbs8p",
+            'points': [120,110,120,60],
+            'colour': "#ffff00",
+            'text': "50.00mm",
+            'textExpr': "{length}",
+            'longText': ( version === "0.1" ? "" : "First ruler." )
+        },
+        {
+            'id': "u9bvidgkjc9",
+            'points': [120,110,170,110],
+            'colour': "#ff0000",
+            'text': "50.00mm",
+            'textExpr': "{length}",
+            'longText': ( version === "0.1" ? "" : "Second ruler." )
+        },
+        {
+            'id': "c9abkegq62j",
+            'points': [120,110,120,160],
+            'colour': "#ffffff",
+            'text': "50.00mm",
+            'textExpr': "{length}",
+            'longText': ( version === "0.1" ? "" : "Third ruler." )
+        },
+        {
+            'id': "uiav43zjw1",
+            'points': [120,110,60,110],
+            'colour': "#00ff00",
+            'text': "50.00mm",
+            'textExpr': "{length}",
+            'longText': ( version === "0.1" ? "" : "Fourth ruler." )
+        },
+        {
+            'id': "26ir11b9ugl",
+            'points': [120,110,120,60],
+            'colour': "#ff00ff",
+            'text': "50.00mm",
+            'textExpr': "{length}",
+            'longText': ( version === "0.1" ? "" : "Fifth ruler." )
+        }
+    ];
+
+    for ( var i = 0; i &lt; ndraws; ++i ) {
+        var layerKid = layerKids[i];
+        assert.equal( layerKid.className, "Group", "Layer first level is a group for slice " + i + ".");
+        assert.equal( layerKid.attrs.name, "position-group", "Layer first level is a position group.");
+        assert.equal( layerKid.attrs.id, "slice-" + (i+1) + "_frame-0", "Position group has the proper id.");
+
+        // third level: shape group(s)
+        var posGroupKid = layerKid.children[0];
+        assert.equal( posGroupKid.className, "Group", "Position group first level is a group.");
+
+        dwv.utils.test.CheckRulerDrawing( posGroupKid, details, refRulers[i], assert );
+    }
+};
+
+/**
+ * Check a roi drawing.
+ * @param {Object} posGroupKid The position group (only) kid.
+ * @param {Object} details The drawing details
+ * @param {String} version The state format version.
+ * @param {Object} assert The qunit assert.
+ */
+dwv.utils.test.CheckRoiDrawing = function (posGroupKid, details, version, assert) {
+    // check group
+    assert.equal( posGroupKid.attrs.name, "roi-group", "Shape group is a roi group.");
+    assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
+    assert.equal( posGroupKid.attrs.id, "4l24ofouhmf", "Position group first level has the proper id.");
+    assert.notEqual( typeof details["4l24ofouhmf"], "undefined", "Details should contain data for id.");
+
+    // kids
+    assert.equal( posGroupKid.children.length, 2, "Shape group has 2 kids.");
+    var hasShape = false;
+    var hasLabel = false;
+    for ( var i = 0; i &lt; posGroupKid.children.length; ++i ) {
+        var shapeGroupKid = posGroupKid.children[i];
+        if ( shapeGroupKid.attrs.name === "shape" ) {
+            hasShape = true;
+            assert.equal( shapeGroupKid.className, "Line", "Shape group 'shape' is a line.");
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'shape' must not be draggable.");
+            assert.deepEqual( shapeGroupKid.attrs.points, [126, 40, 58, 80, 60, 116, 92, 128, 93, 143, 93, 151, 94, 151, 114, 150, 128, 150, 214, 135, 183, 56, 182, 56, 182, 56], "Line has the proper points.");
+            var colour = ( version === "0.1" ? "#ffff00" : "#ffff80" );
+            assert.equal( shapeGroupKid.attrs.stroke, colour, "Line has the proper colour.");
+        } else if ( shapeGroupKid.className === "Label" ) {
+            hasLabel = true;
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'label' must not be draggable.");
+            assert.equal( shapeGroupKid.children.length, 2, "Label has 2 kids.");
+            var labelGroupKid0 = shapeGroupKid.children[0];
+            assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
+            if ( version !== "0.1" ) {
+                assert.equal( labelGroupKid0.attrs.text, "Brain", "Text has the proper value.");
+            }
+            var labelGroupKid1 = shapeGroupKid.children[1];
+            assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+        }
+    }
+    assert.ok( hasShape, "Shape group contains a shape.");
+    assert.ok( hasLabel, "Shape group contains a label.");
+
+    // details
+    if ( version !== "0.1" ) {
+        var details0 = details["4l24ofouhmf"];
+        assert.equal( details0.textExpr, "Brain", "Details textExpr has the proper value.");
+        assert.equal( details0.longText, "This is a squary brain!", "Details longText has the proper value.");
+    }
+};
+
+/**
+ * Check a hand drawing.
+ * @param {Object} posGroupKid The position group (only) kid.
+ * @param {Object} details The drawing details
+ * @param {String} version The state format version.
+ * @param {Object} assert The qunit assert.
+ */
+dwv.utils.test.CheckHandDrawing = function (posGroupKid, details, version, assert) {
+    // check group
+    assert.equal( posGroupKid.attrs.name, "freeHand-group", "Shape group is a freeHand group.");
+    assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
+    assert.equal( posGroupKid.attrs.id, "08m011yjp8je", "Position group first level has the proper id.");
+    assert.notEqual( typeof details["08m011yjp8je"], "undefined", "Details should contain data for id.");
+
+    // kids
+    assert.equal( posGroupKid.children.length, 2, "Shape group has 2 kids.");
+    var hasShape = false;
+    var hasLabel = false;
+    for ( var i = 0; i &lt; posGroupKid.children.length; ++i ) {
+        var shapeGroupKid = posGroupKid.children[i];
+        if ( shapeGroupKid.attrs.name === "shape" ) {
+            hasShape = true;
+            assert.equal( shapeGroupKid.className, "Line", "Shape group 'shape' is a line.");
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'shape' must not be draggable.");
+            assert.deepEqual( shapeGroupKid.attrs.points, [93,50,92,50,71,58,71,59,68,63,68,64,54,80,54,81,53,83,52,85,51,87,50,92,47,98,47,100,55,117,56,118,86,122,89,126,90,128,90,129,88,131,87,133,86,134,85,138,85,139,85,141,87,143,87,144,87,145,88,147,92,150,97,152,112,154,113,153,136,143,174,136,178,135,191,136,192,136,194,138,196,139,197,141,199,141,200,141,207,140,208,139,211,136,213,134,213,133,213,129,213,126,213,122,210,90,209,87,206,80,205,79,204,78,201,73,199,71,197,70,187,63,184,61,182,59,180,58,174,54,172,52,170,51,168,50,167,49,155,42,154,42,151,42,136,40,134,40,133,40,128,41,126,41,124,41,117,44,116,44,114,44,107,47,102,49,100,49,97,49,93,50,92,50,92,50], "Line has the proper points.");
+            assert.equal( shapeGroupKid.attrs.stroke, "#ffff80", "Line has the proper colour.");
+        } else if ( shapeGroupKid.className === "Label" ) {
+            hasLabel = true;
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'label' must not be draggable.");
+            assert.equal( shapeGroupKid.children.length, 2, "Label has 2 kids.");
+            var labelGroupKid0 = shapeGroupKid.children[0];
+            assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
+            assert.equal( labelGroupKid0.attrs.text, "Brain", "Text has the proper value.");
+            var labelGroupKid1 = shapeGroupKid.children[1];
+            assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+        }
+    }
+    assert.ok( hasShape, "Shape group contains a shape.");
+    assert.ok( hasLabel, "Shape group contains a label.");
+
+    // details
+    var details0 = details["08m011yjp8je"];
+    assert.equal( details0.textExpr, "Brain", "Details textExpr has the proper value.");
+    assert.equal( details0.longText, "This is a roundy brain!", "Details longText has the proper value.");
+};
+
+/**
+ * Check an ellipse drawing.
+ * @param {Object} posGroupKid The position group (only) kid.
+ * @param {Object} details The drawing details
+ * @param {String} version The state format version.
+ * @param {Object} assert The qunit assert.
+ */
+dwv.utils.test.CheckEllipseDrawing = function (posGroupKid, details, version, assert) {
+    // check group
+    assert.equal( posGroupKid.attrs.name, "ellipse-group", "Shape group is an ellipse group.");
+    assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
+    assert.equal( posGroupKid.attrs.id, "c6j16qt6vt6", "Position group first level has the proper id.");
+    assert.notEqual( typeof details.c6j16qt6vt6, "undefined", "Details should contain data for id.");
+
+    // kids
+    assert.equal( posGroupKid.children.length, 2, "Shape group has 2 kids.");
+    var hasShape = false;
+    var hasLabel = false;
+    for ( var i = 0; i &lt; posGroupKid.children.length; ++i ) {
+        var shapeGroupKid = posGroupKid.children[i];
+        if ( shapeGroupKid.attrs.name === "shape" ) {
+            hasShape = true;
+            assert.equal( shapeGroupKid.className, "Ellipse", "Shape group 'shape' is an ellipse.");
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'shape' must not be draggable.");
+            assert.deepEqual( shapeGroupKid.attrs.x, 90, "Ellipse has the proper x.");
+            assert.deepEqual( shapeGroupKid.attrs.y, 78, "Ellipse has the proper y.");
+            assert.deepEqual( shapeGroupKid.attrs.radiusX, 53, "Ellipse has the proper radiusX.");
+            assert.deepEqual( shapeGroupKid.attrs.radiusY, 32, "Ellipse has the proper radiusY.");
+            var colour = ( version === "0.1" ? "#ffff00" : "#ffff80" );
+            assert.equal( shapeGroupKid.attrs.stroke, colour, "Ellipse has the proper colour.");
+        } else if ( shapeGroupKid.className === "Label" ) {
+            hasLabel = true;
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'label' must not be draggable.");
+            assert.equal( shapeGroupKid.children.length, 2, "Label has 2 kids.");
+            var labelGroupKid0 = shapeGroupKid.children[0];
+            assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
+            assert.equal( labelGroupKid0.attrs.text, "53.28cm2", "Text has the proper value.");
+            var labelGroupKid1 = shapeGroupKid.children[1];
+            assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+        }
+    }
+    assert.ok( hasShape, "Shape group contains a shape.");
+    assert.ok( hasLabel, "Shape group contains a label.");
+
+    // details
+    if ( version !== "0.1" ) {
+        var details0 = details.c6j16qt6vt6;
+        assert.equal( details0.textExpr, "{surface}", "Details textExpr has the proper value.");
+        assert.equal( details0.longText, "What a surface!", "Details longText has the proper value.");
+    }
+};
+
+/**
+ * Check a protractor drawing.
+ * @param {Object} posGroupKid The position group (only) kid.
+ * @param {Object} details The drawing details
+ * @param {String} version The state format version.
+ * @param {Object} assert The qunit assert.
+ */
+dwv.utils.test.CheckProtractorDrawing = function (posGroupKid, details, version, assert) {
+    // check group
+    assert.equal( posGroupKid.attrs.name, "protractor-group", "Shape group is an protractor group.");
+    assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
+    assert.equal( posGroupKid.attrs.id, "49g7kqi3p4u", "Position group first level has the proper id.");
+    assert.notEqual( typeof details["49g7kqi3p4u"], "undefined", "Details should contain data for id.");
+
+    // kids
+    assert.equal( posGroupKid.children.length, 3, "Shape group has 3 kids.");
+    var hasShape = false;
+    var hasLabel = false;
+    var hasArc = false;
+    for ( var i = 0; i &lt; posGroupKid.children.length; ++i ) {
+        var shapeGroupKid = posGroupKid.children[i];
+        if ( shapeGroupKid.attrs.name === "shape" ) {
+            hasShape = true;
+            assert.equal( shapeGroupKid.className, "Line", "Shape group 'shape' is a line.");
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'shape' must not be draggable.");
+            assert.deepEqual( shapeGroupKid.attrs.points, [33,164,81,145,93,198], "Line has the proper points.");
+            var colour = ( version === "0.1" ? "#ffff00" : "#ffff80" );
+            assert.equal( shapeGroupKid.attrs.stroke, colour, "Line has the proper colour.");
+        } else if ( shapeGroupKid.className === "Label" ) {
+            hasLabel = true;
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'label' must not be draggable.");
+            assert.equal( shapeGroupKid.children.length, 2, "Label has 2 kids.");
+            var labelGroupKid0 = shapeGroupKid.children[0];
+            assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
+            assert.equal( labelGroupKid0.attrs.text, "80.15°", "Text has the proper value.");
+            var labelGroupKid1 = shapeGroupKid.children[1];
+            assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+        } else if ( shapeGroupKid.className === "Arc" ) {
+            hasArc = true;
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'extra' must not be draggable.");
+        }
+    }
+    assert.ok( hasShape, "Shape group contains a shape.");
+    assert.ok( hasLabel, "Shape group contains a label.");
+    assert.ok( hasArc, "Shape group contains an arc.");
+
+    // details
+    if ( version !== "0.1" ) {
+        var details0 = details["49g7kqi3p4u"];
+        assert.equal( details0.textExpr, "{angle}", "Details textExpr has the proper value.");
+        assert.equal( details0.longText, "What an angle!", "Details longText has the proper value.");
+    }
+};
+
+/**
+ * Check a rectangle drawing.
+ * @param {Object} posGroupKid The position group (only) kid.
+ * @param {Object} details The drawing details
+ * @param {String} version The state format version.
+ * @param {Object} assert The qunit assert.
+ */
+dwv.utils.test.CheckRectangleDrawing = function (posGroupKid, details, version, assert) {
+    // check group
+    assert.equal( posGroupKid.attrs.name, "rectangle-group", "Shape group is a rectangle group.");
+    assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
+    assert.equal( posGroupKid.attrs.id, "db0puu209qe", "Position group first level has the proper id.");
+    assert.notEqual( typeof details.db0puu209qe, "undefined", "Details should contain data for id.");
+
+    // kids
+    assert.equal( posGroupKid.children.length, 2, "Shape group has 2 kids.");
+    var hasShape = false;
+    var hasLabel = false;
+    for ( var i = 0; i &lt; posGroupKid.children.length; ++i ) {
+        var shapeGroupKid = posGroupKid.children[i];
+        if ( shapeGroupKid.attrs.name === "shape" ) {
+            hasShape = true;
+            assert.equal( shapeGroupKid.className, "Rect", "Shape group 'shape' is a rectangle.");
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'shape' must not be draggable.");
+            assert.deepEqual( shapeGroupKid.attrs.x, 80, "Rectangle has the proper x.");
+            assert.deepEqual( shapeGroupKid.attrs.y, 58, "Rectangle has the proper y.");
+            assert.deepEqual( shapeGroupKid.attrs.width, 104, "Rectangle has the proper width.");
+            assert.deepEqual( shapeGroupKid.attrs.height, 64, "Rectangle has the proper height.");
+            var colour = ( version === "0.1" ? "#ffff00" : "#ffff80" );
+            assert.equal( shapeGroupKid.attrs.stroke, colour, "Rectangle has the proper colour.");
+        } else if ( shapeGroupKid.className === "Label" ) {
+            hasLabel = true;
+            assert.notOk( shapeGroupKid.attrs.draggable, "Shape group 'label' must not be draggable.");
+            assert.equal( shapeGroupKid.children.length, 2, "Label has 2 kids.");
+            var labelGroupKid0 = shapeGroupKid.children[0];
+            assert.equal( labelGroupKid0.className, "Text", "Label group first level is a text.");
+            assert.equal( labelGroupKid0.attrs.text, "66.56cm2", "Text has the proper value.");
+            var labelGroupKid1 = shapeGroupKid.children[1];
+            assert.equal( labelGroupKid1.className, "Tag", "Label group second level is a tag.");
+        }
+    }
+    assert.ok( hasShape, "Shape group contains a shape.");
+    assert.ok( hasLabel, "Shape group contains a label.");
+
+    // details
+    if ( version !== "0.1" ) {
+        var details0 = details.db0puu209qe;
+        assert.equal( details0.textExpr, "{surface}", "Details textExpr has the proper value.");
+        assert.equal( details0.longText, "What a rectangle!", "Details longText has the proper value.");
+    }
+};
+
+/**
+ * Tests for {@link dwv.State} v0.1 containing a line.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.1 state: line.", function (assert) {
+    dwv.utils.test.TestState( "0.1", "line", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.1 containing a roi.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.1 state: roi.", function (assert) {
+    dwv.utils.test.TestState( "0.1", "roi", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.1 containing an ellipse.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.1 state: ellipse.", function (assert) {
+    dwv.utils.test.TestState( "0.1", "ellipse", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.1 containing a protractor.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.1 state: protractor.", function (assert) {
+    dwv.utils.test.TestState( "0.1", "protractor", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.1 containing a rectangle.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.1 state: rectangle.", function (assert) {
+    dwv.utils.test.TestState( "0.1", "rectangle", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.1 containing a multi slice ruler.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.1 state: line multi-slice.", function (assert) {
+    dwv.utils.test.TestState( "0.1", "line_multi-slice", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.2 containing an arrow.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.2 state: arrow.", function (assert) {
+    dwv.utils.test.TestState( "0.2", "arrow", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.2 containing a ruler.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.2 state: ruler.", function (assert) {
+    dwv.utils.test.TestState( "0.2", "ruler", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.2 containing a roi.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.2 state: roi.", function (assert) {
+    dwv.utils.test.TestState( "0.2", "roi", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.2 containing a hand draw.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.2 state: hand.", function (assert) {
+    dwv.utils.test.TestState( "0.2", "hand", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.2 containing an ellipse.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.2 state: ellipse.", function (assert) {
+    dwv.utils.test.TestState( "0.2", "ellipse", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.2 containing a protractor.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.2 state: protractor.", function (assert) {
+    dwv.utils.test.TestState( "0.2", "protractor", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.2 containing a rectangle.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.2 state: rectangle.", function (assert) {
+    dwv.utils.test.TestState( "0.2", "rectangle", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.2 containing a multi slice ruler.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.2 state: ruler multi-slice.", function (assert) {
+    dwv.utils.test.TestState( "0.2", "ruler_multi-slice", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.3 containing an arrow.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.3 state: arrow.", function (assert) {
+    dwv.utils.test.TestState( "0.3", "arrow", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.3 containing a ruler.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.3 state: ruler.", function (assert) {
+    dwv.utils.test.TestState( "0.3", "ruler", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.3 containing a roi.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.3 state: roi.", function (assert) {
+    dwv.utils.test.TestState( "0.3", "roi", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.3 containing a hand draw.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.3 state: hand.", function (assert) {
+    dwv.utils.test.TestState( "0.3", "hand", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.3 containing an ellipse.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.3 state: ellipse.", function (assert) {
+    dwv.utils.test.TestState( "0.3", "ellipse", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.3 containing a protractor.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.3 state: protractor.", function (assert) {
+    dwv.utils.test.TestState( "0.3", "protractor", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.3 containing a rectangle.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.3 state: rectangle.", function (assert) {
+    dwv.utils.test.TestState( "0.3", "rectangle", assert );
+});
+
+/**
+ * Tests for {@link dwv.State} v0.3 containing a multi slice ruler.
+ * @function module:tests/state
+ */
+QUnit.test("Test read v0.3 state: ruler multi-slice.", function (assert) {
+    dwv.utils.test.TestState( "0.3", "ruler_multi-slice", assert );
+});
+</pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+    <div class="modal fade" id="searchResults">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Search results</h4>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+
+
+<footer>
+
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
+	
+		on Friday, August 24th 2018
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+
+    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            SearcherDisplay.init();
+        });
+    </script>
+
+
+</body>
+</html>
