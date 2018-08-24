@@ -1,4 +1,4 @@
-/*! dwv 0.24.0-beta 2018-08-23 21:01:21 */
+/*! dwv 0.24.0-beta 2018-08-24 18:44:12 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -17010,6 +17010,9 @@ dwv.io.DicomDataLoader.prototype.canLoadFile = function (file) {
 
 /**
  * Check if the loader can load the provided url.
+ * True if:
+ *  - the url has a 'contentType' and it is 'application/dicom' (as in wado urls)
+ *  - the url has no 'contentType' and no extension or the extension is 'dcm'
  * @param {String} url The url to check.
  * @return True if the url can be loaded.
  */
@@ -17021,9 +17024,10 @@ dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url) {
     }
     var hasExt = (ext.length !== 0) && (ext.length < 5);
     // wado url
-    var isDicomContentType = (url.indexOf("contentType=application/dicom") !== -1);
+    var hasContentType = (url.indexOf("&contentType") !== -1);
+    var isDicomContentType = (url.indexOf("&contentType=application/dicom") !== -1);
 
-    return isDicomContentType || (ext === "dcm") || !hasExt;
+    return hasContentType ? isDicomContentType : !hasExt || (ext === "dcm");
 };
 
 /**
