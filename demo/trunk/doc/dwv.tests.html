@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>dwv Namespace: tests</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.yeti.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">dwv</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="dwv.html">dwv</a></li><li><a href="dwv.browser.html">dwv.browser</a></li><li><a href="dwv.dicom.html">dwv.dicom</a></li><li><a href="dwv.gui.html">dwv.gui</a></li><li><a href="dwv.gui.base.html">dwv.gui.base</a></li><li><a href="dwv.gui.filter.html">dwv.gui.filter</a></li><li><a href="dwv.gui.filter.base.html">dwv.gui.filter.base</a></li><li><a href="dwv.html.html">dwv.html</a></li><li><a href="dwv.image.html">dwv.image</a></li><li><a href="dwv.image.filter.html">dwv.image.filter</a></li><li><a href="dwv.image.lut.html">dwv.image.lut</a></li><li><a href="dwv.io.html">dwv.io</a></li><li><a href="dwv.math.html">dwv.math</a></li><li><a href="dwv.tests.html">dwv.tests</a></li><li><a href="dwv.tool.html">dwv.tool</a></li><li><a href="dwv.tool.filter_.html">dwv.tool.filter</a></li><li><a href="dwv.utils.html">dwv.utils</a></li><li><a href="dwv.utils.base.html">dwv.utils.base</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="module-tests_dicom.html">tests/dicom</a></li><li><a href="module-tests_html.html">tests/html</a></li><li><a href="module-tests_image.html">tests/image</a></li><li><a href="module-tests_math.html">tests/math</a></li><li><a href="module-tests_state.html">tests/state</a></li><li><a href="module-tests_utils.html">tests/utils</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="dwv.App.html">dwv.App</a></li><li><a href="dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li><li><a href="dwv.dicom.DataWriter.html">dwv.dicom.DataWriter</a></li><li><a href="dwv.dicom.DicomElementsWrapper.html">dwv.dicom.DicomElementsWrapper</a></li><li><a href="dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li><li><a href="dwv.dicom.DicomWriter.html">dwv.dicom.DicomWriter</a></li><li><a href="dwv.dicom.Tag.html">dwv.dicom.Tag</a></li><li><a href="dwv.gui.base.ColourTool.html">dwv.gui.base.ColourTool</a></li><li><a href="dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li><li><a href="dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li><li><a href="dwv.gui.base.DrawList.html">dwv.gui.base.DrawList</a></li><li><a href="dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li><li><a href="dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li><li><a href="dwv.gui.base.FolderLoad.html">dwv.gui.base.FolderLoad</a></li><li><a href="dwv.gui.base.Loadbox.html">dwv.gui.base.Loadbox</a></li><li><a href="dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li><li><a href="dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li><li><a href="dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li><li><a href="dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li><li><a href="dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li><li><a href="dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li><li><a href="dwv.gui.base.Undo.html">dwv.gui.base.Undo</a></li><li><a href="dwv.gui.base.UrlLoad.html">dwv.gui.base.UrlLoad</a></li><li><a href="dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li><li><a href="dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li><li><a href="dwv.gui.info.MiniColourMap.html">dwv.gui.info.MiniColourMap</a></li><li><a href="dwv.gui.info.Overlay.html">dwv.gui.info.Overlay</a></li><li><a href="dwv.gui.info.Plot.html">dwv.gui.info.Plot</a></li><li><a href="dwv.html.Layer.html">dwv.html.Layer</a></li><li><a href="dwv.html.Style.html">dwv.html.Style</a></li><li><a href="dwv.image.DicomBufferToView.html">dwv.image.DicomBufferToView</a></li><li><a href="dwv.image.filter.Sharpen.html">dwv.image.filter.Sharpen</a></li><li><a href="dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li><li><a href="dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li><li><a href="dwv.image.Geometry.html">dwv.image.Geometry</a></li><li><a href="dwv.image.Image.html">dwv.image.Image</a></li><li><a href="dwv.image.ImageFactory.html">dwv.image.ImageFactory</a></li><li><a href="dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li><li><a href="dwv.image.lut.Window.html">dwv.image.lut.Window</a></li><li><a href="dwv.image.PixelBufferDecoder.html">dwv.image.PixelBufferDecoder</a></li><li><a href="dwv.image.RescaleSlopeAndIntercept.html">dwv.image.RescaleSlopeAndIntercept</a></li><li><a href="dwv.image.Size.html">dwv.image.Size</a></li><li><a href="dwv.image.Spacing.html">dwv.image.Spacing</a></li><li><a href="dwv.image.View.html">dwv.image.View</a></li><li><a href="dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li><li><a href="dwv.InfoController.html">dwv.InfoController</a></li><li><a href="dwv.io.FilesLoader.html">dwv.io.FilesLoader</a></li><li><a href="dwv.io.MemoryLoader.html">dwv.io.MemoryLoader</a></li><li><a href="dwv.io.UrlsLoader.html">dwv.io.UrlsLoader</a></li><li><a href="dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li><li><a href="dwv.math.Circle.html">dwv.math.Circle</a></li><li><a href="dwv.math.Ellipse.html">dwv.math.Ellipse</a></li><li><a href="dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li><li><a href="dwv.math.Index3D.html">dwv.math.Index3D</a></li><li><a href="dwv.math.Line.html">dwv.math.Line</a></li><li><a href="dwv.math.Matrix33.html">dwv.math.Matrix33</a></li><li><a href="dwv.math.Path.html">dwv.math.Path</a></li><li><a href="dwv.math.Point2D.html">dwv.math.Point2D</a></li><li><a href="dwv.math.Point3D.html">dwv.math.Point3D</a></li><li><a href="dwv.math.Rectangle.html">dwv.math.Rectangle</a></li><li><a href="dwv.math.ROI.html">dwv.math.ROI</a></li><li><a href="dwv.math.Scissors.html">dwv.math.Scissors</a></li><li><a href="dwv.math.Vector3D.html">dwv.math.Vector3D</a></li><li><a href="dwv.ModernizrInit-ModernizrProto.html">dwv.ModernizrInit~ModernizrProto</a></li><li><a href="dwv.State.html">dwv.State</a></li><li><a href="dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li><li><a href="dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li><li><a href="dwv.tool.DrawGroupCommand.html">dwv.tool.DrawGroupCommand</a></li><li><a href="dwv.tool.Filter.html">dwv.tool.Filter</a></li><li><a href="dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li><li><a href="dwv.tool.filter.Sobel.html">dwv.tool.filter.Sobel</a></li><li><a href="dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li><li><a href="dwv.tool.Livewire.html">dwv.tool.Livewire</a></li><li><a href="dwv.tool.MoveGroupCommand.html">dwv.tool.MoveGroupCommand</a></li><li><a href="dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li><li><a href="dwv.tool.Scroll.html">dwv.tool.Scroll</a></li><li><a href="dwv.tool.Toolbox.html">dwv.tool.Toolbox</a></li><li><a href="dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li><li><a href="dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li><li><a href="dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li><li><a href="dwv.ToolboxController.html">dwv.ToolboxController</a></li><li><a href="dwv.utils.ListenerHandler.html">dwv.utils.ListenerHandler</a></li><li><a href="dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li><li><a href="dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li><li><a href="dwv.ViewController.html">dwv.ViewController</a></li><li><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></li><li><a href="Worker.html">Worker</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="global.html#askModernizr">askModernizr</a></li><li><a href="global.html#mulABC">mulABC</a></li><li><a href="global.html#webdriver">webdriver</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="externals.list.html" class="dropdown-toggle" data-toggle="dropdown">Externals<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="external-FileReader.html">FileReader</a></li><li><a href="external-i18next.html">i18next</a></li><li><a href="external-i18nextBrowserLanguageDetector.html">i18nextBrowserLanguageDetector</a></li><li><a href="external-JpxImage.html">JpxImage</a></li><li><a href="external-Konva.html">Konva</a></li><li><a href="external-MagicWand.html">MagicWand</a></li><li><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+        
+            <div class="col-sm-3 col-md-3">
+                <form class="navbar-form" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-8">
+	
+		<div id="main">
+			
+
+	<h1 class="page-title">Namespace: tests</h1>
+<section>
+
+<header>
+    
+        <h2>
+            <span class="ancestors"><a href="dwv.html">dwv</a>.</span>
+        
+        tests
+        </h2>
+        
+    
+</header>
+
+
+<article>
+    <div class="container-overview">
+    
+        
+
+        
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="tests_visual_sauce.js.html">tests/visual/sauce.js</a>,
+				 <a href="tests_visual_sauce.js.html#sunlight-1-line-4">line 4</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+            
+<hr>
+<dt>
+    <h4 class="name" id=".sauceTest"><span class="type-signature">&lt;static> </span>sauceTest(caps)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Launch a sauce GUI test.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>caps</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Desired capabilities for the webdriver. Minimum of
+  {'browserName', 'version', 'platform'}.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="tests_visual_sauce.js.html">tests/visual/sauce.js</a>,
+				 <a href="tests_visual_sauce.js.html#sunlight-1-line-52">line 52</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+	<dt class="tag-see method-doc-label method-doc-details-label">See:</dt>
+	<dd class="tag-see">
+		<ul>
+			<li><a href="https://wiki.saucelabs.com/display/DOCS/Platform+Configurator%0A%20%20for%20saucelabs%20possibilities.">https://wiki.saucelabs.com/display/DOCS/Platform+Configurator
+  for saucelabs possibilities.</a></li>
+			
+			<li><a href="http://seleniumhq.github.io/selenium/docs/api/javascript/index.html%0A%20%20for%20the%20webdriver%20API.">http://seleniumhq.github.io/selenium/docs/api/javascript/index.html
+  for the webdriver API.</a></li>
+			</ul>
+	</dd>
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
+	
+
+</div>
+</div>
+
+
+    <div class="modal fade" id="searchResults">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Search results</h4>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+
+
+<footer>
+
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
+	
+		on Friday, August 24th 2018
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+
+    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            SearcherDisplay.init();
+        });
+    </script>
+
+
+</body>
+</html>

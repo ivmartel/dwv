@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>dwv Source: src/math/shapes.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.yeti.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">dwv</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="dwv.html">dwv</a></li><li><a href="dwv.browser.html">dwv.browser</a></li><li><a href="dwv.dicom.html">dwv.dicom</a></li><li><a href="dwv.gui.html">dwv.gui</a></li><li><a href="dwv.gui.base.html">dwv.gui.base</a></li><li><a href="dwv.gui.filter.html">dwv.gui.filter</a></li><li><a href="dwv.gui.filter.base.html">dwv.gui.filter.base</a></li><li><a href="dwv.html.html">dwv.html</a></li><li><a href="dwv.image.html">dwv.image</a></li><li><a href="dwv.image.filter.html">dwv.image.filter</a></li><li><a href="dwv.image.lut.html">dwv.image.lut</a></li><li><a href="dwv.io.html">dwv.io</a></li><li><a href="dwv.math.html">dwv.math</a></li><li><a href="dwv.tests.html">dwv.tests</a></li><li><a href="dwv.tool.html">dwv.tool</a></li><li><a href="dwv.tool.filter_.html">dwv.tool.filter</a></li><li><a href="dwv.utils.html">dwv.utils</a></li><li><a href="dwv.utils.base.html">dwv.utils.base</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="module-tests_dicom.html">tests/dicom</a></li><li><a href="module-tests_html.html">tests/html</a></li><li><a href="module-tests_image.html">tests/image</a></li><li><a href="module-tests_math.html">tests/math</a></li><li><a href="module-tests_state.html">tests/state</a></li><li><a href="module-tests_utils.html">tests/utils</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="dwv.App.html">dwv.App</a></li><li><a href="dwv.dicom.DataReader.html">dwv.dicom.DataReader</a></li><li><a href="dwv.dicom.DataWriter.html">dwv.dicom.DataWriter</a></li><li><a href="dwv.dicom.DicomElementsWrapper.html">dwv.dicom.DicomElementsWrapper</a></li><li><a href="dwv.dicom.DicomParser.html">dwv.dicom.DicomParser</a></li><li><a href="dwv.dicom.DicomWriter.html">dwv.dicom.DicomWriter</a></li><li><a href="dwv.dicom.Tag.html">dwv.dicom.Tag</a></li><li><a href="dwv.gui.base.ColourTool.html">dwv.gui.base.ColourTool</a></li><li><a href="dwv.gui.base.DicomTags.html">dwv.gui.base.DicomTags</a></li><li><a href="dwv.gui.base.Draw.html">dwv.gui.base.Draw</a></li><li><a href="dwv.gui.base.DrawList.html">dwv.gui.base.DrawList</a></li><li><a href="dwv.gui.base.FileLoad.html">dwv.gui.base.FileLoad</a></li><li><a href="dwv.gui.base.Filter.html">dwv.gui.base.Filter</a></li><li><a href="dwv.gui.base.FolderLoad.html">dwv.gui.base.FolderLoad</a></li><li><a href="dwv.gui.base.Loadbox.html">dwv.gui.base.Loadbox</a></li><li><a href="dwv.gui.base.Scroll.html">dwv.gui.base.Scroll</a></li><li><a href="dwv.gui.base.Sharpen.html">dwv.gui.base.Sharpen</a></li><li><a href="dwv.gui.base.Slider.html">dwv.gui.base.Slider</a></li><li><a href="dwv.gui.base.Sobel.html">dwv.gui.base.Sobel</a></li><li><a href="dwv.gui.base.Threshold.html">dwv.gui.base.Threshold</a></li><li><a href="dwv.gui.base.Toolbox.html">dwv.gui.base.Toolbox</a></li><li><a href="dwv.gui.base.Undo.html">dwv.gui.base.Undo</a></li><li><a href="dwv.gui.base.UrlLoad.html">dwv.gui.base.UrlLoad</a></li><li><a href="dwv.gui.base.WindowLevel.html">dwv.gui.base.WindowLevel</a></li><li><a href="dwv.gui.base.ZoomAndPan.html">dwv.gui.base.ZoomAndPan</a></li><li><a href="dwv.gui.info.MiniColourMap.html">dwv.gui.info.MiniColourMap</a></li><li><a href="dwv.gui.info.Overlay.html">dwv.gui.info.Overlay</a></li><li><a href="dwv.gui.info.Plot.html">dwv.gui.info.Plot</a></li><li><a href="dwv.html.Layer.html">dwv.html.Layer</a></li><li><a href="dwv.html.Style.html">dwv.html.Style</a></li><li><a href="dwv.image.DicomBufferToView.html">dwv.image.DicomBufferToView</a></li><li><a href="dwv.image.filter.Sharpen.html">dwv.image.filter.Sharpen</a></li><li><a href="dwv.image.filter.Sobel.html">dwv.image.filter.Sobel</a></li><li><a href="dwv.image.filter.Threshold.html">dwv.image.filter.Threshold</a></li><li><a href="dwv.image.Geometry.html">dwv.image.Geometry</a></li><li><a href="dwv.image.Image.html">dwv.image.Image</a></li><li><a href="dwv.image.ImageFactory.html">dwv.image.ImageFactory</a></li><li><a href="dwv.image.lut.Rescale.html">dwv.image.lut.Rescale</a></li><li><a href="dwv.image.lut.Window.html">dwv.image.lut.Window</a></li><li><a href="dwv.image.PixelBufferDecoder.html">dwv.image.PixelBufferDecoder</a></li><li><a href="dwv.image.RescaleSlopeAndIntercept.html">dwv.image.RescaleSlopeAndIntercept</a></li><li><a href="dwv.image.Size.html">dwv.image.Size</a></li><li><a href="dwv.image.Spacing.html">dwv.image.Spacing</a></li><li><a href="dwv.image.View.html">dwv.image.View</a></li><li><a href="dwv.image.ViewFactory.html">dwv.image.ViewFactory</a></li><li><a href="dwv.InfoController.html">dwv.InfoController</a></li><li><a href="dwv.io.FilesLoader.html">dwv.io.FilesLoader</a></li><li><a href="dwv.io.MemoryLoader.html">dwv.io.MemoryLoader</a></li><li><a href="dwv.io.UrlsLoader.html">dwv.io.UrlsLoader</a></li><li><a href="dwv.math.BucketQueue.html">dwv.math.BucketQueue</a></li><li><a href="dwv.math.Circle.html">dwv.math.Circle</a></li><li><a href="dwv.math.Ellipse.html">dwv.math.Ellipse</a></li><li><a href="dwv.math.FastPoint2D.html">dwv.math.FastPoint2D</a></li><li><a href="dwv.math.Index3D.html">dwv.math.Index3D</a></li><li><a href="dwv.math.Line.html">dwv.math.Line</a></li><li><a href="dwv.math.Matrix33.html">dwv.math.Matrix33</a></li><li><a href="dwv.math.Path.html">dwv.math.Path</a></li><li><a href="dwv.math.Point2D.html">dwv.math.Point2D</a></li><li><a href="dwv.math.Point3D.html">dwv.math.Point3D</a></li><li><a href="dwv.math.Rectangle.html">dwv.math.Rectangle</a></li><li><a href="dwv.math.ROI.html">dwv.math.ROI</a></li><li><a href="dwv.math.Scissors.html">dwv.math.Scissors</a></li><li><a href="dwv.math.Vector3D.html">dwv.math.Vector3D</a></li><li><a href="dwv.ModernizrInit-ModernizrProto.html">dwv.ModernizrInit~ModernizrProto</a></li><li><a href="dwv.State.html">dwv.State</a></li><li><a href="dwv.tool.ChangeGroupCommand.html">dwv.tool.ChangeGroupCommand</a></li><li><a href="dwv.tool.DeleteGroupCommand.html">dwv.tool.DeleteGroupCommand</a></li><li><a href="dwv.tool.DrawGroupCommand.html">dwv.tool.DrawGroupCommand</a></li><li><a href="dwv.tool.Filter.html">dwv.tool.Filter</a></li><li><a href="dwv.tool.filter.Sharpen.html">dwv.tool.filter.Sharpen</a></li><li><a href="dwv.tool.filter.Sobel.html">dwv.tool.filter.Sobel</a></li><li><a href="dwv.tool.filter.Threshold.html">dwv.tool.filter.Threshold</a></li><li><a href="dwv.tool.Livewire.html">dwv.tool.Livewire</a></li><li><a href="dwv.tool.MoveGroupCommand.html">dwv.tool.MoveGroupCommand</a></li><li><a href="dwv.tool.RunFilterCommand.html">dwv.tool.RunFilterCommand</a></li><li><a href="dwv.tool.Scroll.html">dwv.tool.Scroll</a></li><li><a href="dwv.tool.Toolbox.html">dwv.tool.Toolbox</a></li><li><a href="dwv.tool.UndoStack.html">dwv.tool.UndoStack</a></li><li><a href="dwv.tool.WindowLevel.html">dwv.tool.WindowLevel</a></li><li><a href="dwv.tool.ZoomAndPan.html">dwv.tool.ZoomAndPan</a></li><li><a href="dwv.ToolboxController.html">dwv.ToolboxController</a></li><li><a href="dwv.utils.ListenerHandler.html">dwv.utils.ListenerHandler</a></li><li><a href="dwv.utils.ThreadPool.html">dwv.utils.ThreadPool</a></li><li><a href="dwv.utils.WorkerTask.html">dwv.utils.WorkerTask</a></li><li><a href="dwv.ViewController.html">dwv.ViewController</a></li><li><a href="GradSquarePixGenerator.html">GradSquarePixGenerator</a></li><li><a href="Worker.html">Worker</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="global.html#askModernizr">askModernizr</a></li><li><a href="global.html#mulABC">mulABC</a></li><li><a href="global.html#webdriver">webdriver</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="externals.list.html" class="dropdown-toggle" data-toggle="dropdown">Externals<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="external-FileReader.html">FileReader</a></li><li><a href="external-i18next.html">i18next</a></li><li><a href="external-i18nextBrowserLanguageDetector.html">i18nextBrowserLanguageDetector</a></li><li><a href="external-JpxImage.html">JpxImage</a></li><li><a href="external-Konva.html">Konva</a></li><li><a href="external-MagicWand.html">MagicWand</a></li><li><a href="external-XMLHttpRequest.html">XMLHttpRequest</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+        
+            <div class="col-sm-3 col-md-3">
+                <form class="navbar-form" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: src/math/shapes.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">// namespaces
+var dwv = dwv || {};
+dwv.math = dwv.math || {};
+
+/**
+ * Mulitply the three inputs if the last two are not null.
+ * @param {Number} a The first input.
+ * @param {Number} b The second input.
+ * @param {Number} c The third input.
+ * @return {Number} The multiplication of the three inputs or
+ *  null if one of the last two is null.
+ */
+function mulABC( a, b, c) {
+    var res = null;
+    if (b !== null &amp;&amp; c !== null) {
+        res = a * b * c;
+    }
+    return res;
+}
+
+/**
+ * Circle shape.
+ * @constructor
+ * @param {Object} centre A Point2D representing the centre of the circle.
+ * @param {Number} radius The radius of the circle.
+ */
+dwv.math.Circle = function(centre, radius)
+{
+    /**
+     * Circle surface.
+     * @private
+     * @type Number
+     */
+    var surface = Math.PI*radius*radius;
+
+    /**
+     * Get the centre (point) of the circle.
+     * @return {Object} The center (point) of the circle.
+     */
+    this.getCenter = function() { return centre; };
+    /**
+     * Get the radius of the circle.
+     * @return {Number} The radius of the circle.
+     */
+    this.getRadius = function() { return radius; };
+    /**
+     * Get the surface of the circle.
+     * @return {Number} The surface of the circle.
+     */
+    this.getSurface = function() { return surface; };
+    /**
+     * Get the surface of the circle according to a spacing.
+     * @param {Number} spacingX The X spacing.
+     * @param {Number} spacingY The Y spacing.
+     * @return {Number} The surface of the circle multiplied by the given
+     *  spacing or null for null spacings.
+     */
+    this.getWorldSurface = function(spacingX, spacingY)
+    {
+        return mulABC(surface, spacingX, spacingY);
+    };
+}; // Circle class
+
+/**
+ * Ellipse shape.
+ * @constructor
+ * @param {Object} centre A Point2D representing the centre of the ellipse.
+ * @param {Number} a The radius of the ellipse on the horizontal axe.
+ * @param {Number} b The radius of the ellipse on the vertical axe.
+ */
+dwv.math.Ellipse = function(centre, a, b)
+{
+    /**
+     * Circle surface.
+     * @private
+     * @type Number
+     */
+    var surface = Math.PI*a*b;
+
+    /**
+     * Get the centre (point) of the ellipse.
+     * @return {Object} The center (point) of the ellipse.
+     */
+    this.getCenter = function() { return centre; };
+    /**
+     * Get the radius of the ellipse on the horizontal axe.
+     * @return {Number} The radius of the ellipse on the horizontal axe.
+     */
+    this.getA = function() { return a; };
+    /**
+     * Get the radius of the ellipse on the vertical axe.
+     * @return {Number} The radius of the ellipse on the vertical axe.
+     */
+    this.getB = function() { return b; };
+    /**
+     * Get the surface of the ellipse.
+     * @return {Number} The surface of the ellipse.
+     */
+    this.getSurface = function() { return surface; };
+    /**
+     * Get the surface of the ellipse according to a spacing.
+     * @param {Number} spacingX The X spacing.
+     * @param {Number} spacingY The Y spacing.
+     * @return {Number} The surface of the ellipse multiplied by the given
+     *  spacing or null for null spacings.
+     */
+    this.getWorldSurface = function(spacingX, spacingY)
+    {
+        return mulABC(surface, spacingX, spacingY);
+    };
+}; // Circle class
+
+/**
+ * Line shape.
+ * @constructor
+ * @param {Object} begin A Point2D representing the beginning of the line.
+ * @param {Object} end A Point2D representing the end of the line.
+ */
+dwv.math.Line = function(begin, end)
+{
+    /**
+     * Line delta in the X direction.
+     * @private
+     * @type Number
+     */
+    var dx = end.getX() - begin.getX();
+    /**
+     * Line delta in the Y direction.
+     * @private
+     * @type Number
+     */
+    var dy = end.getY() - begin.getY();
+    /**
+     * Line length.
+     * @private
+     * @type Number
+     */
+    var length = Math.sqrt( dx * dx + dy * dy );
+
+    /**
+     * Get the begin point of the line.
+     * @return {Object} The beginning point of the line.
+     */
+    this.getBegin = function() { return begin; };
+    /**
+     * Get the end point of the line.
+     * @return {Object} The ending point of the line.
+     */
+    this.getEnd = function() { return end; };
+    /**
+     * Get the line delta in the X direction.
+     * @return {Number} The delta in the X direction.
+     */
+    this.getDeltaX = function() { return dx; };
+    /**
+     * Get the line delta in the Y direction.
+     * @return {Number} The delta in the Y direction.
+     */
+    this.getDeltaY = function() { return dy; };
+    /**
+     * Get the length of the line.
+     * @return {Number} The length of the line.
+     */
+    this.getLength = function() { return length; };
+    /**
+     * Get the length of the line according to a  spacing.
+     * @param {Number} spacingX The X spacing.
+     * @param {Number} spacingY The Y spacing.
+     * @return {Number} The length of the line with spacing
+     *  or null for null spacings.
+     */
+    this.getWorldLength = function(spacingX, spacingY)
+    {
+        var wlen = null;
+        if (spacingX !== null &amp;&amp; spacingY !== null) {
+            var dxs = dx * spacingX;
+            var dys = dy * spacingY;
+            wlen = Math.sqrt( dxs * dxs + dys * dys );
+        }
+        return wlen;
+    };
+    /**
+     * Get the mid point of the line.
+     * @return {Object} The mid point of the line.
+     */
+    this.getMidpoint = function()
+    {
+        return new dwv.math.Point2D(
+            parseInt( (begin.getX()+end.getX()) / 2, 10 ),
+            parseInt( (begin.getY()+end.getY()) / 2, 10 ) );
+    };
+    /**
+     * Get the slope of the line.
+     * @return {Number} The slope of the line.
+     */
+    this.getSlope = function()
+    {
+        return dy / dx;
+    };
+    /**
+     * Get the intercept of the line.
+     * @return {Number} The slope of the line.
+     */
+    this.getIntercept = function()
+    {
+        return (end.getX() * begin.getY() - begin.getX() * end.getY()) / dx;
+    };
+    /**
+     * Get the inclination of the line.
+     * @return {Number} The inclination of the line.
+     */
+    this.getInclination = function()
+    {
+        // tan(theta) = slope
+        var angle = Math.atan2( dy, dx ) * 180 / Math.PI;
+        // shift?
+        return 180 - angle;
+    };
+}; // Line class
+
+/**
+ * Get the angle between two lines.
+ * @param line0 The first line.
+ * @param line1 The second line.
+ */
+dwv.math.getAngle = function (line0, line1)
+{
+    var dx0 = line0.getDeltaX();
+    var dy0 = line0.getDeltaY();
+    var dx1 = line1.getDeltaX();
+    var dy1 = line1.getDeltaY();
+    // dot = ||a||*||b||*cos(theta)
+    var dot = dx0 * dx1 + dy0 * dy1;
+    // cross = ||a||*||b||*sin(theta)
+    var det = dx0 * dy1 - dy0 * dx1;
+    // tan = sin / cos
+    var angle = Math.atan2( det, dot ) * 180 / Math.PI;
+    // complementary angle
+    // shift?
+    return 360 - (180 - angle);
+};
+
+/**
+ * Get a perpendicular line to an input one.
+ * @param {Object} line The line to be perpendicular to.
+ * @param {Object} point The middle point of the perpendicular line.
+ * @param {Number} length The length of the perpendicular line.
+ */
+dwv.math.getPerpendicularLine = function (line, point, length)
+{
+    // begin point
+    var beginX = 0;
+    var beginY = 0;
+    // end point
+    var endX = 0;
+    var endY = 0;
+
+    // check slope:
+    // 0 -> horizontal
+    // Infinite -> vertical (a/Infinite = 0)
+    if ( line.getSlope() !== 0 ) {
+        // a0 * a1 = -1
+        var slope = -1 / line.getSlope();
+        // y0 = a1*x0 + b1 -> b1 = y0 - a1*x0
+        var intercept = point.getY() - slope * point.getX();
+
+        // 1. (x - x0)^2 + (y - y0)^2 = d^2
+        // 2. a = (y - y0) / (x - x0) -> y = a*(x - x0) + y0
+        // ->  (x - x0)^2 + m^2 * (x - x0)^2 = d^2
+        // -> x = x0 +- d / sqrt(1+m^2)
+
+        // length is the distance between begin and end,
+        // point is half way between both -> d = length / 2
+        var dx = length / ( 2 * Math.sqrt( 1 + slope * slope ) );
+
+        // begin point
+        beginX = point.getX() - dx;
+        beginY = slope * beginX + intercept;
+        // end point
+        endX = point.getX() + dx;
+        endY = slope * endX + intercept;
+    }
+    else {
+      // horizontal input line -> perpendicular is vertical!
+      // begin point
+      beginX = point.getX();
+      beginY = point.getY() - length / 2;
+      // end point
+      endX = point.getX();
+      endY = point.getY() + length / 2;
+    }
+    // perpendicalar line
+    return new dwv.math.Line(
+        new dwv.math.Point2D(beginX, beginY),
+        new dwv.math.Point2D(endX, endY) );
+};
+
+/**
+ * Rectangle shape.
+ * @constructor
+ * @param {Object} begin A Point2D representing the beginning of the rectangle.
+ * @param {Object} end A Point2D representing the end of the rectangle.
+ */
+dwv.math.Rectangle = function(begin, end)
+{
+    if ( end.getX() &lt; begin.getX() ) {
+        var tmpX = begin.getX();
+        begin = new dwv.math.Point2D( end.getX(), begin.getY() );
+        end = new dwv.math.Point2D( tmpX, end.getY() );
+    }
+    if ( end.getY() &lt; begin.getY() ) {
+        var tmpY = begin.getY();
+        begin = new dwv.math.Point2D( begin.getX(), end.getY() );
+        end = new dwv.math.Point2D( end.getX(), tmpY );
+    }
+
+    /**
+     * Rectangle surface.
+     * @private
+     * @type Number
+     */
+    var surface = Math.abs(end.getX() - begin.getX()) * Math.abs(end.getY() - begin.getY() );
+
+    /**
+     * Get the begin point of the rectangle.
+     * @return {Object} The begin point of the rectangle
+     */
+    this.getBegin = function() { return begin; };
+    /**
+     * Get the end point of the rectangle.
+     * @return {Object} The end point of the rectangle
+     */
+    this.getEnd = function() { return end; };
+    /**
+     * Get the real width of the rectangle.
+     * @return {Number} The real width of the rectangle.
+     */
+    this.getRealWidth = function() { return end.getX() - begin.getX(); };
+    /**
+     * Get the real height of the rectangle.
+     * @return {Number} The real height of the rectangle.
+     */
+    this.getRealHeight = function() { return end.getY() - begin.getY(); };
+    /**
+     * Get the width of the rectangle.
+     * @return {Number} The width of the rectangle.
+     */
+    this.getWidth = function() { return Math.abs(this.getRealWidth()); };
+    /**
+     * Get the height of the rectangle.
+     * @return {Number} The height of the rectangle.
+     */
+    this.getHeight = function() { return Math.abs(this.getRealHeight()); };
+    /**
+     * Get the surface of the rectangle.
+     * @return {Number} The surface of the rectangle.
+     */
+    this.getSurface = function() { return surface; };
+    /**
+     * Get the surface of the circle according to a spacing.
+     * @param {Number} spacingX The X spacing.
+     * @param {Number} spacingY The Y spacing.
+     * @return {Number} The surface of the rectangle multiplied by the given
+     *  spacing or null for null spacings.
+     */
+    this.getWorldSurface = function(spacingX, spacingY)
+    {
+        return mulABC(surface, spacingX, spacingY);
+    };
+}; // Rectangle class
+
+/**
+ * Region Of Interest shape.
+ * Note: should be a closed path.
+ * @constructor
+ */
+dwv.math.ROI = function()
+{
+    /**
+     * List of points.
+     * @private
+     * @type Array
+     */
+    var points = [];
+
+    /**
+     * Get a point of the list at a given index.
+     * @param {Number} index The index of the point to get (beware, no size check).
+     * @return {Object} The Point2D at the given index.
+     */
+    this.getPoint = function(index) { return points[index]; };
+    /**
+     * Get the length of the point list.
+     * @return {Number} The length of the point list.
+     */
+    this.getLength = function() { return points.length; };
+    /**
+     * Add a point to the ROI.
+     * @param {Object} point The Point2D to add.
+     */
+    this.addPoint = function(point) { points.push(point); };
+    /**
+     * Add points to the ROI.
+     * @param {Array} rhs The array of POints2D to add.
+     */
+    this.addPoints = function(rhs) { points=points.concat(rhs);};
+}; // ROI class
+
+/**
+ * Path shape.
+ * @constructor
+ * @param {Array} inputPointArray The list of Point2D that make the path (optional).
+ * @param {Array} inputControlPointIndexArray The list of control point of path,
+ *  as indexes (optional).
+ * Note: first and last point do not need to be equal.
+ */
+dwv.math.Path = function(inputPointArray, inputControlPointIndexArray)
+{
+    /**
+     * List of points.
+     * @type Array
+     */
+    this.pointArray = inputPointArray ? inputPointArray.slice() : [];
+    /**
+     * List of control points.
+     * @type Array
+     */
+    this.controlPointIndexArray = inputControlPointIndexArray ?
+        inputControlPointIndexArray.slice() : [];
+}; // Path class
+
+/**
+ * Get a point of the list.
+ * @param {Number} index The index of the point to get (beware, no size check).
+ * @return {Object} The Point2D at the given index.
+ */
+dwv.math.Path.prototype.getPoint = function(index) {
+    return this.pointArray[index];
+};
+
+/**
+ * Is the given point a control point.
+ * @param {Object} point The Point2D to check.
+ * @return {Boolean} True if a control point.
+ */
+dwv.math.Path.prototype.isControlPoint = function(point) {
+    var index = this.pointArray.indexOf(point);
+    if( index !== -1 ) {
+        return this.controlPointIndexArray.indexOf(index) !== -1;
+    }
+    else {
+        throw new Error("Error: isControlPoint called with not in list point.");
+    }
+};
+
+/**
+ * Get the length of the path.
+ * @return {Number} The length of the path.
+ */
+dwv.math.Path.prototype.getLength = function() {
+    return this.pointArray.length;
+};
+
+/**
+ * Add a point to the path.
+ * @param {Object} point The Point2D to add.
+ */
+dwv.math.Path.prototype.addPoint = function(point) {
+    this.pointArray.push(point);
+};
+
+/**
+ * Add a control point to the path.
+ * @param {Object} point The Point2D to make a control point.
+ */
+dwv.math.Path.prototype.addControlPoint = function(point) {
+    var index = this.pointArray.indexOf(point);
+    if( index !== -1 ) {
+        this.controlPointIndexArray.push(index);
+    }
+    else {
+        throw new Error("Error: addControlPoint called with no point in list point.");
+    }
+};
+
+/**
+ * Add points to the path.
+ * @param {Array} points The list of Point2D to add.
+ */
+dwv.math.Path.prototype.addPoints = function(newPointArray) {
+    this.pointArray = this.pointArray.concat(newPointArray);
+};
+
+/**
+ * Append a Path to this one.
+ * @param {Path} other The Path to append.
+ */
+dwv.math.Path.prototype.appenPath = function(other) {
+    var oldSize = this.pointArray.length;
+    this.pointArray = this.pointArray.concat(other.pointArray);
+    var indexArray = [];
+    for( var i=0; i &lt; other.controlPointIndexArray.length; ++i ) {
+        indexArray[i] = other.controlPointIndexArray[i] + oldSize;
+    }
+    this.controlPointIndexArray = this.controlPointIndexArray.concat(indexArray);
+};
+</pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+    <div class="modal fade" id="searchResults">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Search results</h4>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+
+
+<footer>
+
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
+	
+		on Friday, August 24th 2018
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+
+    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            SearcherDisplay.init();
+        });
+    </script>
+
+
+</body>
+</html>
