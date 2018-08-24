@@ -1,5 +1,6 @@
 /* global module */
 module.exports = function(grunt) {
+    var cpTarget = grunt.option('copy-target') || '../dwv-jqmobile';
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -33,6 +34,9 @@ module.exports = function(grunt) {
             }
         },
         concat: {
+            options: {
+                banner: '/*! <%= pkg.name %> <%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n'
+            },
             dist: {
                 src: ['resources/module/intro.js', 'src/**/*.js', 'resources/module/outro.js'],
                 dest: 'build/dist/<%= pkg.name %>.js'
@@ -40,11 +44,11 @@ module.exports = function(grunt) {
         },
         uglify: {
             options: {
-                banner: '/*! <%= pkg.name %> <%= pkg.version %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
+                banner: '/*! <%= pkg.name %> <%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n'
             },
             dist: {
                 files: {
-                    'build/dist/<%= pkg.name %>-<%= pkg.version %>.min.js': ['<%= concat.dist.dest %>']
+                    'build/dist/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
                 }
             }
         },
@@ -57,18 +61,72 @@ module.exports = function(grunt) {
                     configure: 'resources/doc/jsdoc.conf.json'
                 }
             }
-        }
+        },
+        copy: {
+            main: {
+                files: [
+                    {
+                        src: 'build/dist/<%= pkg.name %>.js',
+                        dest: cpTarget + '/node_modules/dwv/dist/<%= pkg.name %>.js'
+                    },
+                    {
+                        src: 'build/dist/<%= pkg.name %>.js',
+                        dest: cpTarget + '/node_modules/dwv/dist/<%= pkg.name %>.min.js'
+                    }
+                ]
+            }
+        },
+        watch: {
+            main: {
+                files: ['**/*.js', '!**/node_modules/**'],
+                tasks: ['jshint'],
+                options: {
+                    spawn: false,
+                    livereload: true
+                }
+            },
+            cmd: {
+                files: ['**/*.js', '!**/node_modules/**'],
+                tasks: ['test'],
+                options: {
+                    spawn: false
+                }
+            },
+            dev: {
+                files: ['**/*.js', '!**/node_modules/**'],
+                tasks: ['concat', 'copy'],
+                options: {
+                    spawn: false
+                }
+            }
+        },
+        connect: {
+            server: {
+                options: {
+                    port: 8080,
+                    hostname: 'localhost',
+                    open: 'http://localhost:8080/tests/index.html',
+                    livereload: true
+                }
+            }
+        },
     });
 
-    grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-qunit-istanbul');
-    grunt.loadNpmTasks('grunt-coveralls');
+    grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-coveralls');
     grunt.loadNpmTasks('grunt-jsdoc');
+    grunt.loadNpmTasks('grunt-qunit-istanbul');
 
     // tasks
     grunt.registerTask('test', ['jshint', 'qunit']);
+    grunt.registerTask('start', ['connect', 'watch:main']);
+    grunt.registerTask('start-cmd', ['watch:cmd']);
+    grunt.registerTask('dev', ['watch:dev']);
     grunt.registerTask('build', ['concat', 'uglify']);
     grunt.registerTask('doc', ['jsdoc']);
 };

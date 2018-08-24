@@ -4,6 +4,7 @@ dwv.io = dwv.io || {};
 
 /**
  * JSON text loader.
+ * @constructor
  */
 dwv.io.JSONTextLoader = function ()
 {

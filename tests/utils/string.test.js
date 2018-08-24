@@ -30,6 +30,36 @@ QUnit.test("Test CapitaliseFirstLetter.", function (assert) {
 });
 
 /**
+ * Tests for {@link dwv.utils.endsWith}.
+ * @function module:tests/utils~endsWith
+ */
+QUnit.test("Test EndsWith.", function (assert) {
+    // undefined
+    assert.equal(dwv.utils.endsWith(), false, "EndsWith undefined");
+    assert.equal(dwv.utils.endsWith("test"), false, "EndsWith end undefined");
+    // null
+    assert.equal(dwv.utils.endsWith(null), false, "EndsWith null");
+    assert.equal(dwv.utils.endsWith("test", null), false, "EndsWith end null");
+    // empty
+    assert.equal(dwv.utils.endsWith("", ""), true, "EndsWith empty");
+    assert.equal(dwv.utils.endsWith("test", ""), true, "EndsWith end empty");
+    // short
+    assert.equal(dwv.utils.endsWith("a", "a"), true, "EndsWith one letter");
+    assert.equal(dwv.utils.endsWith("a", "A"), false, "EndsWith one letter case sensitive");
+    // end bigger than input
+    assert.equal(dwv.utils.endsWith("a", "aba"), false, "EndsWith large end");
+    // space
+    assert.equal(dwv.utils.endsWith("test ", " "), true, "EndsWith end space");
+    assert.equal(dwv.utils.endsWith("test ", "a"), false, "EndsWith with space");
+    // regular
+    assert.equal(dwv.utils.endsWith("Winter is coming.", "."), true, "EndsWith test#0");
+    assert.equal(dwv.utils.endsWith("Winter is coming.", "coming."), true, "EndsWith test#1");
+    assert.equal(dwv.utils.endsWith("Winter is coming.", "ING."), false, "EndsWith test#2");
+    assert.equal(dwv.utils.endsWith("Winter is coming.", "is coming."), true, "EndsWith test#3");
+    assert.equal(dwv.utils.endsWith("Winter is coming.", "Winter is coming."), true, "EndsWith test#4");
+});
+
+/**
  * Tests for {@link dwv.utils.replaceFlags}.
  * @function module:tests/utils~ReplaceFlags
  */

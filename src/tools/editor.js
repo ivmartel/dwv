@@ -187,39 +187,44 @@ dwv.tool.ShapeEditor = function (app)
         // add shape specific anchors to the shape group
         if ( shape instanceof Konva.Line ) {
             var points = shape.points();
-            if ( points.length === 4 || points.length === 6) {
-                // add shape offset
-                var p0x = points[0] + shape.x();
-                var p0y = points[1] + shape.y();
-                var p1x = points[2] + shape.x();
-                var p1y = points[3] + shape.y();
-                addAnchor(group, p0x, p0y, 'begin');
-                if ( points.length === 4 ) {
-                    var shapekids = group.getChildren( dwv.draw.isNodeNameShapeExtra );
-                    if (shapekids.length === 2) {
-                        updateFunction = dwv.tool.UpdateRuler;
-                    } else {
-                        updateFunction = dwv.tool.UpdateArrow;
+
+            var needsBeginEnd = group.name() === "line-group" ||
+                group.name() === "ruler-group" ||
+                group.name() === "protractor-group";
+            var needsMid = group.name() === "protractor-group";
+
+            var px = 0;
+            var py = 0;
+            var name = "";
+            for ( var i = 0; i < points.length; i=i+2 ) {
+                px = points[i] + shape.x();
+                py = points[i+1] + shape.y();
+                name = i;
+                if ( needsBeginEnd ) {
+                    if ( i === 0 ) {
+                        name = "begin";
+                    } else if ( i === points.length - 2 ) {
+                        name = "end";
                     }
-                    addAnchor(group, p1x, p1y, 'end');
                 }
-                else {
-                    updateFunction = dwv.tool.UpdateProtractor;
-                    addAnchor(group, p1x, p1y, 'mid');
-                    var p2x = points[4] + shape.x();
-                    var p2y = points[5] + shape.y();
-                    addAnchor(group, p2x, p2y, 'end');
+                if ( needsMid && i === 2 ) {
+                    name = "mid";
                 }
+                addAnchor(group, px, py, name);
             }
-            else {
+
+            if ( group.name() === "line-group" ) {
+                updateFunction = dwv.tool.UpdateArrow;
+            } else if ( group.name() === "ruler-group" ) {
+                updateFunction = dwv.tool.UpdateRuler;
+            } else if ( group.name() === "protractor-group" ) {
+                updateFunction = dwv.tool.UpdateProtractor;
+            } else if ( group.name() === "roi-group" ) {
                 updateFunction = dwv.tool.UpdateRoi;
-                var px = 0;
-                var py = 0;
-                for ( var i = 0; i < points.length; i=i+2 ) {
-                    px = points[i] + shape.x();
-                    py = points[i+1] + shape.y();
-                    addAnchor(group, px, py, i);
-                }
+            } else if ( group.name() === "freeHand-group" ) {
+                updateFunction = dwv.tool.UpdateFreeHand;
+            } else {
+                console.warn("Cannot update unknown line shape.");
             }
         }
         else if ( shape instanceof Konva.Rect ) {
@@ -321,13 +326,16 @@ dwv.tool.ShapeEditor = function (app)
         });
         // drag move listener
         anchor.on('dragmove.edit', function (evt) {
+            // update shape
             if ( updateFunction ) {
                 updateFunction(this, image);
+            } else {
+                console.warn("No update function!");
             }
+            // redraw
             if ( this.getLayer() ) {
                 this.getLayer().draw();
-            }
-            else {
+            } else {
                 console.warn("No layer to draw the anchor!");
             }
             // prevent bubbling upwards

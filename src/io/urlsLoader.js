@@ -183,38 +183,6 @@ dwv.io.UrlsLoader.prototype.onabort = function (/*event*/) {};
  */
 dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
 {
-    // clear storage
-    this.clearStoredRequests();
-    this.clearStoredLoader();
-
-    // closure to self for handlers
-    var self = this;
-    // set the number of data to load
-    this.setNToLoad( ioArray.length );
-
-    var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
-    mproghandler.setNToLoad( ioArray.length );
-
-    // get loaders
-    var loaders = [];
-    for (var m = 0; m < dwv.io.loaderList.length; ++m) {
-        loaders.push( new dwv.io[dwv.io.loaderList[m]]() );
-    }
-
-    // set loaders callbacks
-    var loader = null;
-    for (var k = 0; k < loaders.length; ++k) {
-        loader = loaders[k];
-        loader.onload = self.onload;
-        loader.onloadend = self.addLoaded;
-        loader.onerror = self.onerror;
-        loader.onabort = self.onabort;
-        loader.setOptions({
-            'defaultCharacterSet': this.getDefaultCharacterSet()
-        });
-        loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
-    }
-
     // request onerror handler
     var getRequestOnError = function (origin) {
         return function (/*event*/) {
@@ -234,56 +202,124 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
         };
     };
 
-    // loop on I/O elements
-    for (var i = 0; i < ioArray.length; ++i)
-    {
-        var url = ioArray[i];
-        var request = new XMLHttpRequest();
-        request.open('GET', url, true);
+    // clear storage
+    this.clearStoredRequests();
+    this.clearStoredLoader();
 
-        // store request
-        this.storeRequest(request);
+    // closure to self for handlers
+    var self = this;
 
-        // optional request headers
-        if ( typeof options.requestHeaders !== "undefined" ) {
-            var requestHeaders = options.requestHeaders;
-            for (var j = 0; j < requestHeaders.length; ++j) {
-                if ( typeof requestHeaders[j].name !== "undefined" &&
-                    typeof requestHeaders[j].value !== "undefined" ) {
-                    request.setRequestHeader(requestHeaders[j].name, requestHeaders[j].value);
+    // raw url load
+    var internalUrlsLoad = function (urlsArray) {
+        // set the number of data to load
+        self.setNToLoad( urlsArray.length );
+
+        var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
+        mproghandler.setNToLoad( urlsArray.length );
+
+        // get loaders
+        var loaders = [];
+        for (var m = 0; m < dwv.io.loaderList.length; ++m) {
+            loaders.push( new dwv.io[dwv.io.loaderList[m]]() );
+        }
+
+        // set loaders callbacks
+        var loader = null;
+        for (var k = 0; k < loaders.length; ++k) {
+            loader = loaders[k];
+            loader.onload = self.onload;
+            loader.onloadend = self.addLoaded;
+            loader.onerror = self.onerror;
+            loader.onabort = self.onabort;
+            loader.setOptions({
+                'defaultCharacterSet': self.getDefaultCharacterSet()
+            });
+            loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
+        }
+
+        // loop on I/O elements
+        for (var i = 0; i < urlsArray.length; ++i)
+        {
+            var url = urlsArray[i];
+            var request = new XMLHttpRequest();
+            request.open('GET', url, true);
+
+            // store request
+            self.storeRequest(request);
+
+            // optional request headers
+            if ( typeof options.requestHeaders !== "undefined" ) {
+                var requestHeaders = options.requestHeaders;
+                for (var j = 0; j < requestHeaders.length; ++j) {
+                    if ( typeof requestHeaders[j].name !== "undefined" &&
+                        typeof requestHeaders[j].value !== "undefined" ) {
+                        request.setRequestHeader(requestHeaders[j].name, requestHeaders[j].value);
+                    }
                 }
             }
-        }
 
-        // bind reader progress
-        request.onprogress = mproghandler.getMonoProgressHandler(i, 0);
-        request.onloadend = mproghandler.getMonoOnLoadEndHandler(i, 0);
+            // bind reader progress
+            request.onprogress = mproghandler.getMonoProgressHandler(i, 0);
+            request.onloadend = mproghandler.getMonoOnLoadEndHandler(i, 0);
 
-        // find a loader
-        var foundLoader = false;
-        for (var l = 0; l < loaders.length; ++l) {
-            loader = loaders[l];
-            if (loader.canLoadUrl(url)) {
-                foundLoader = true;
-                // store loader
-                this.storeLoader(loader);
-                // set reader callbacks
-                request.onload = loader.getUrlLoadHandler(url, i);
-                request.onerror = getRequestOnError(url);
-                request.onabort = getRequestOnAbort(url);
-                // response type (default is 'text')
-                if (loader.loadUrlAs() === dwv.io.urlContentTypes.ArrayBuffer) {
-                    request.responseType = "arraybuffer";
+            // find a loader
+            var foundLoader = false;
+            for (var l = 0; l < loaders.length; ++l) {
+                loader = loaders[l];
+                if (loader.canLoadUrl(url)) {
+                    foundLoader = true;
+                    // store loader
+                    self.storeLoader(loader);
+                    // set reader callbacks
+                    request.onload = loader.getUrlLoadHandler(url, i);
+                    request.onerror = getRequestOnError(url);
+                    request.onabort = getRequestOnAbort(url);
+                    // response type (default is 'text')
+                    if (loader.loadUrlAs() === dwv.io.urlContentTypes.ArrayBuffer) {
+                        request.responseType = "arraybuffer";
+                    }
+                    // read
+                    request.send(null);
+                    // next file
+                    break;
                 }
-                // read
-                request.send(null);
-                // next file
-                break;
+            }
+            // TODO: throw?
+            if (!foundLoader) {
+                throw new Error("No loader found for url: "+url);
             }
         }
-        // TODO: throw?
-        if (!foundLoader) {
-            throw new Error("No loader found for url: "+url);
-        }
+    };
+
+    // DICOMDIR load
+    var internalDicomDirLoad = function (dicomDirUrl) {
+        console.log("UrlsLoader: using a DICOMDIR.");
+        // read DICOMDIR
+        var dirRequest = new XMLHttpRequest();
+        dirRequest.open('GET', dicomDirUrl, true);
+        dirRequest.responseType = "arraybuffer";
+        dirRequest.onload = function (/*event*/) {
+            // get the file list
+            var list = dwv.dicom.getFileListFromDicomDir( this.response );
+            // use the first list
+            var urls = list[0][0];
+            // append root url
+            var rootUrl = dicomDirUrl.substr( 0, (dicomDirUrl.length - "DICOMDIR".length - 1 ) );
+            var fullUrls = [];
+            for ( var i = 0; i < urls.length; ++i ) {
+                fullUrls.push( rootUrl + "/" + urls[i]);
+            }
+            internalUrlsLoad(fullUrls);
+        };
+        dirRequest.onerror = getRequestOnError(dicomDirUrl);
+        dirRequest.onabort = getRequestOnAbort(dicomDirUrl);
+        dirRequest.send(null);
+    };
+
+    // check if DICOMDIR case
+    if ( ioArray.length === 1 && dwv.utils.endsWith(ioArray[0], "DICOMDIR") ) {
+        internalDicomDirLoad(ioArray[0]);
+    } else {
+        internalUrlsLoad(ioArray);
     }
 };

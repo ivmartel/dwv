@@ -2,12 +2,19 @@
 #Script to push build results on the repository gh-pages branch.
 
 # we should be in /home/travis/build/ivmartel/dwv
-echo -e "Starting to update gh-pages\n"
+echo -e "Starting to update gh-pages...\n"
 
-# build deploy version (result in ./build/dist)
-yarn run build || exit 1
-# create doc (result in ./build/doc)
-yarn run doc
+demodir=""
+if [ "$TRAVIS_BRANCH" == "develop" ]; then
+  demodir="trunk"
+elif [ "$TRAVIS_BRANCH" == "master" ]; then
+  demodir="stable"
+  # create doc (result in ./build/doc)
+  yarn run doc
+else 
+  echo "Cannot update gh-pages for branch $TRAVIS_BRANCH"
+  exit 0
+fi
 
 # go to home and setup git
 cd $HOME
@@ -16,10 +23,13 @@ git config --global user.name "Travis"
 # using token, clone gh-pages branch
 git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/ivmartel/dwv.git gh-pages
 # clean up
-rm -Rf $HOME/gh-pages/demo/trunk/*
-# copy new build and doc
-cp -Rf $HOME/build/ivmartel/dwv/build/dist/* $HOME/gh-pages/demo/trunk
-cp -Rf $HOME/build/ivmartel/dwv/build/doc $HOME/gh-pages/demo/trunk
+rm -Rf $HOME/gh-pages/demo/$demodir/*
+# copy new build
+cp -Rf $HOME/build/ivmartel/dwv/build/dist/* $HOME/gh-pages/demo/$demodir
+# copy doc for master
+if [ "$TRAVIS_BRANCH" == "master" ]; then
+  cp -Rf $HOME/build/ivmartel/dwv/build/doc $HOME/gh-pages/demo/stable
+fi
 # move to root of repo
 cd $HOME/gh-pages
 # add, commit and push files
@@ -27,4 +37,4 @@ git add -Af .
 git commit -m "Travis build $TRAVIS_BUILD_NUMBER pushed to gh-pages"
 git push -fq origin gh-pages
 
-echo -e "Done updating.\n"
+echo -e "Done updating gh-pages.\n"

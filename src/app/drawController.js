@@ -351,8 +351,8 @@ dwv.DrawController = function (drawDiv)
                 }
                 // get details (non konva vars)
                 drawingsDetails[ group.id() ] = {
-                    "textExpr": encodeURIComponent(texts[0].textExpr),
-                    "longText": encodeURIComponent(texts[0].longText),
+                    "textExpr": texts[0].textExpr,
+                    "longText": texts[0].longText,
                     "quant": texts[0].quant
                 };
             }
@@ -391,8 +391,8 @@ dwv.DrawController = function (drawDiv)
 
             var statePosKids = statePosGroup.getChildren();
             for ( var j = 0, lenj = statePosKids.length; j < lenj; ++j ) {
-                // shape group
-                var stateGroup = statePosKids[j];
+                // shape group (use first one since it will be removed from the group when we change it)
+                var stateGroup = statePosKids[0];
                 // add group to posGroup (switches its parent)
                 posGroup.add( stateGroup );
                 // shape

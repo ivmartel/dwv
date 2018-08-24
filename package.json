@@ -1,6 +1,6 @@
 {
   "name": "dwv",
-  "version": "0.24.0-beta",
+  "version": "0.24.0",
   "description": "DICOM Web Viewer.",
   "keywords": [
     "DICOM",
@@ -16,19 +16,22 @@
   },
   "main": "dist/dwv.min.js",
   "dependencies": {
-    "i18next": "~10.6.0",
-    "i18next-browser-languagedetector": "~2.1.0",
+    "i18next": "~11.6.0",
+    "i18next-browser-languagedetector": "~2.2.0",
     "i18next-xhr-backend": "~1.5.1",
     "jszip": "~3.1.3",
-    "konva": "~2.0.0",
+    "konva": "~2.2.1",
     "magic-wand-js": "~1.0.0"
   },
   "devDependencies": {
     "grunt": "~1.0.1",
-    "grunt-cli": "~1.2",
+    "grunt-cli": "~1.3.1",
     "grunt-contrib-concat": "~1.0",
+    "grunt-contrib-connect": "~1.0.2",
+    "grunt-contrib-copy": "~1.0.0",
     "grunt-contrib-jshint": "~1.1.0",
-    "grunt-contrib-uglify": "~3.3.0",
+    "grunt-contrib-uglify": "~3.4.0",
+    "grunt-contrib-watch": "~1.1.0",
     "grunt-coveralls": "~2.0.0",
     "grunt-jsdoc": "~2.2.0",
     "grunt-qunit-istanbul": "~1.0.0",
@@ -37,8 +40,11 @@
     "qunit": "~2.6.0"
   },
   "scripts": {
-    "start": "http-server",
+    "start": "grunt start",
+    "start-cmd": "grunt start-cmd",
+    "dev": "grunt dev",
     "test": "grunt test --verbose",
+    "qunit": "grunt qunit --verbose",
     "build": "grunt build --verbose",
     "doc": "grunt doc --verbose"
   }

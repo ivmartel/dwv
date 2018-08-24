@@ -106,7 +106,8 @@ dwv.tool.UpdateFreeHand = function (anchor /*, image*/)
     var points = kline.points();
     points[anchor.id()] = anchor.x() - kline.x();
     points[anchor.id()+1] = anchor.y() - kline.y();
-    kline.points( points );
+    // concat to make Konva think it is a new array
+    kline.points( points.concat() );
 
     // update text
     var ktext = klabel.getText();

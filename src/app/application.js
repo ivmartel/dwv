@@ -48,6 +48,7 @@ dwv.App = function ()
     var infoController = null;
 
     // Dicom tags gui
+    var tags = null;
     var tagsGui = null;
 
     // Drawing list gui
@@ -198,7 +199,7 @@ dwv.App = function ()
             for ( var t = 0; t < config.tools.length; ++t ) {
                 var toolName = config.tools[t];
                 if ( toolName === "Draw" ) {
-                    if ( config.shapes !== 0 ) {
+                    if ( typeof config.shapes !== "undefined" && config.shapes.length !== 0 ) {
                         // setup the shape list
                         var shapeList = {};
                         for ( var s = 0; s < config.shapes.length; ++s ) {
@@ -216,10 +217,12 @@ dwv.App = function ()
                         toolList.Draw.addEventListener("draw-change", fireEvent);
                         toolList.Draw.addEventListener("draw-move", fireEvent);
                         toolList.Draw.addEventListener("draw-delete", fireEvent);
+                    } else {
+                        console.warn("Please provide a list of shapes in the application configuration to activate the Draw tool.");
                     }
                 }
                 else if ( toolName === "Filter" ) {
-                    if ( config.filters.length !== 0 ) {
+                    if ( typeof config.filters !== "undefined" && config.filters.length !== 0 ) {
                         // setup the filter list
                         var filterList = {};
                         for ( var f = 0; f < config.filters.length; ++f ) {
@@ -234,6 +237,8 @@ dwv.App = function ()
                         toolList.Filter = new dwv.tool.Filter(filterList, this);
                         toolList.Filter.addEventListener("filter-run", fireEvent);
                         toolList.Filter.addEventListener("filter-undo", fireEvent);
+                    } else {
+                        console.warn("Please provide a list of filters in the application configuration to activate the Filter tool.");
                     }
                 }
                 else {
@@ -604,7 +609,8 @@ dwv.App = function ()
         // flag used by scroll to decide wether to activate or not
         // TODO: supposing multi-slice for zip files, could not be...
         isMonoSliceData = (data.length === 1 &&
-            firstName.split('.').pop().toLowerCase() !== "zip");
+            firstName.split('.').pop().toLowerCase() !== "zip" &&
+            !dwv.utils.endsWith(firstName, "DICOMDIR"));
         // set IO
         loader.setDefaultCharacterSet(defaultCharacterSet);
         loader.onload = function (data) {
@@ -802,6 +808,15 @@ dwv.App = function ()
     this.getDrawDisplayDetails = function ()
     {
         return drawController.getDrawDisplayDetails();
+    };
+
+    /**
+     * Get the data tags.
+     * @return {Object} The list of DICOM tags.
+     */
+    this.getTags = function ()
+    {
+        return tags;
     };
 
     /**
@@ -1023,7 +1038,8 @@ dwv.App = function ()
         var state = new dwv.State();
         // add href to link (html5)
         var element = self.getElement("download-state");
-        element.href = "data:application/json," + state.toJSON(self);
+        var blob = new Blob([state.toJSON(self)], {type: 'application/json'});
+        element.href = window.URL.createObjectURL(blob);
     };
 
     /**
@@ -1370,6 +1386,7 @@ dwv.App = function ()
         viewController = new dwv.ViewController(view);
 
         // append the DICOM tags table
+        tags = data.info;
         if ( tagsGui ) {
             tagsGui.update(data.info);
         }

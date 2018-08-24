@@ -339,6 +339,9 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
         if( size.getNumberOfRows() !== rhsSize.getNumberOfRows() ) {
             throw new Error("Cannot append a slice with different number of rows");
         }
+        if( !geometry.getOrientation().equals( rhs.getGeometry().getOrientation() ) ) {
+            throw new Error("Cannot append a slice with different orientation");
+        }
         if( photometricInterpretation !== rhs.getPhotometricInterpretation() ) {
             throw new Error("Cannot append a slice with different photometric interpretation");
         }
@@ -832,10 +835,10 @@ dwv.image.Image.prototype.quantifyRect = function(rect)
         }
     }
     var quantif = dwv.math.getStats( subBuffer );
-    quant.min = {"value": quantif.min, "unit": ""};
-    quant.max = {"value": quantif.max, "unit": ""};
-    quant.mean = {"value": quantif.mean, "unit": ""};
-    quant.stdDev = {"value": quantif.stdDev, "unit": ""};
+    quant.min = {"value": quantif.getMin(), "unit": ""};
+    quant.max = {"value": quantif.getMax(), "unit": ""};
+    quant.mean = {"value": quantif.getMean(), "unit": ""};
+    quant.stdDev = {"value": quantif.getStdDev(), "unit": ""};
     // return
     return quant;
 };
