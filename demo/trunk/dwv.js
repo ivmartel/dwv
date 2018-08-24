@@ -1,4 +1,4 @@
-/*! dwv 0.24.0-beta 2018-08-24 18:44:12 */
+/*! dwv 0.24.0-beta 2018-08-24 18:46:04 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -16872,6 +16872,7 @@ dwv.io = dwv.io || {};
 
 /**
  * DICOM data loader.
+ * @constructor
  */
 dwv.io.DicomDataLoader = function ()
 {
@@ -17370,6 +17371,7 @@ dwv.io = dwv.io || {};
 
 /**
  * JSON text loader.
+ * @constructor
  */
 dwv.io.JSONTextLoader = function ()
 {
@@ -17749,6 +17751,7 @@ dwv.io = dwv.io || {};
 
 /**
  * Raw image loader.
+ * @constructor
  */
 dwv.io.RawImageLoader = function ()
 {
@@ -17946,6 +17949,7 @@ dwv.io = dwv.io || {};
  * Raw video loader.
  * url example (cors enabled):
  *   https://raw.githubusercontent.com/clappr/clappr/master/test/fixtures/SampleVideo_360x240_1mb.mp4
+ * @constructor
  */
 dwv.io.RawVideoLoader = function ()
 {
@@ -18462,6 +18466,7 @@ var JSZip = JSZip || {};
 
 /**
  * ZIP data loader.
+ * @constructor
  */
 dwv.io.ZipLoader = function ()
 {
