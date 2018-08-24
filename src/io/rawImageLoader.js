@@ -4,6 +4,7 @@ dwv.io = dwv.io || {};
 
 /**
  * Raw image loader.
+ * @constructor
  */
 dwv.io.RawImageLoader = function ()
 {

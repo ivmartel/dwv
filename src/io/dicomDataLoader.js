@@ -4,6 +4,7 @@ dwv.io = dwv.io || {};
 
 /**
  * DICOM data loader.
+ * @constructor
  */
 dwv.io.DicomDataLoader = function ()
 {
