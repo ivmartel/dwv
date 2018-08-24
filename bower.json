@@ -17,14 +17,14 @@
   },
   "main": "dist/dwv.js",
   "dependencies": {
-    "i18next": "~10.5.0",
+    "i18next": "~10.6.0",
+    "i18next-browser-languagedetector": "~2.2.0",
     "i18next-xhr-backend": "~1.5.1",
-    "i18next-browser-languagedetector": "~2.1.0",
     "jszip": "~3.1.3",
-    "konva": "~1.7.3"
+    "konva": "~2.2.1"
   },
   "devDependencies": {
-    "qunit": "~2.5.1"
+    "qunit": "~2.6.0"
   },
   "moduleType": [
     "amd",
