@@ -7,7 +7,8 @@ Try a [live demo](https://ivmartel.github.io/dwv/) and read a lot more informati
 
 All coding/implementation contributions and comments are welcome.
 
-DWV is not certified for diagnostic use. Released under GNU GPL-3.0 license (see [license.txt](license.txt)).
+DWV is not certified for diagnostic use.<sup>[1](#footnote1)</sup> 
+Released under GNU GPL-3.0 license (see [license.txt](license.txt)).
 
 [![Build Status](https://travis-ci.org/ivmartel/dwv.svg?branch=master)](https://travis-ci.org/ivmartel/dwv) [![Coverage Status](https://img.shields.io/coveralls/ivmartel/dwv.svg)](https://coveralls.io/r/ivmartel/dwv?branch=master) [![Code Climate](https://codeclimate.com/github/ivmartel/dwv.svg)](https://codeclimate.com/github/ivmartel/dwv) [![Dependency Status](https://david-dm.org/ivmartel/dwv.svg)](https://david-dm.org/ivmartel/dwv) [![npm](https://img.shields.io/npm/v/dwv.svg)](https://www.npmjs.com/package/dwv) [![Bower](https://img.shields.io/bower/v/dwv.svg)](https://libraries.io/bower/dwv)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fivmartel%2Fdwv.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fivmartel%2Fdwv?ref=badge_shield)
@@ -40,3 +41,5 @@ yarn run build
 # create documentation
 yarn run doc
 ```
+
+<a name="footnote1">1</a>: Certification refers to official medical software certification that are issued by the FDA or EU Notified Bodies. The sentence here serves as a reminder that the Dicom Web Viewer is not ceritifed, and comes with no warranties (and no possible liability of its authors) as stated in the [license](license.txt). To learn more about standards used in certification, see the [wikipedia Medical software](https://en.wikipedia.org/wiki/Medical_software) page. If you have additional questions, please [open an issue](https://www.github.com/ivmartel/dwv/issues).
