@@ -322,7 +322,7 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
      * @param {Image} The slice to append.
      * @return {Number} The number of the inserted slice.
      */
-    this.appendSlice = function (rhs, frame)
+    this.appendSlice = function (rhs, frame, numberOfImages)
     {
         // check input
         if( rhs === null ) {
@@ -361,39 +361,34 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
         }
         var sliceSize = mul * size.getSliceSize();
 
-        // create the new buffer
-        var newBuffer = dwv.dicom.getTypedArray(
-            buffer[f].BYTES_PER_ELEMENT * 8,
-            meta.IsSigned ? 1 : 0,
-            sliceSize * (size.getNumberOfSlices() + 1) );
+        // create the new buffer for all slices
+        if(buffer[f].length != sliceSize * numberOfImages){
+           var newBuffer = dwv.dicom.getTypedArray(
+                buffer[f].BYTES_PER_ELEMENT * 8,
+                meta.IsSigned ? 1 : 0,
+                sliceSize * numberOfImages );
+
+            newBuffer.set(buffer[f]);
+            buffer[f] = newBuffer;
+        }
 
         // append slice at new position
         var newSliceNb = geometry.getSliceIndex( rhs.getGeometry().getOrigin() );
-        if( newSliceNb === 0 )
+        if( newSliceNb === size.getNumberOfSlices() )
         {
-            newBuffer.set(rhs.getFrame(f));
-            newBuffer.set(buffer[f], sliceSize);
-        }
-        else if( newSliceNb === size.getNumberOfSlices() )
-        {
-            newBuffer.set(buffer[f]);
-            newBuffer.set(rhs.getFrame(f), size.getNumberOfSlices() * sliceSize);
+            buffer[f].set(rhs.getFrame(f), size.getNumberOfSlices() * sliceSize);
         }
         else
         {
             var offset = newSliceNb * sliceSize;
-            newBuffer.set(buffer[f].subarray(0, offset - 1));
-            newBuffer.set(rhs.getFrame(f), offset);
-            newBuffer.set(buffer[f].subarray(offset), offset + sliceSize);
+            buffer[f].set(buffer[f].subarray(offset, offset + (sliceSize * (size.getNumberOfSlices() - newSliceNb))), offset + sliceSize);
+            buffer[f].set(rhs.getFrame(f), offset);
         }
 
         // update geometry
         geometry.appendOrigin( rhs.getGeometry().getOrigin(), newSliceNb );
         // update rsi
         rsis.splice(newSliceNb, 0, rhs.getRescaleSlopeAndIntercept(0));
-
-        // copy to class variables
-        buffer[f] = newBuffer;
 
 		// insert overlay information of the slice to the image
 		overlays.splice(newSliceNb, 0, rhs.getOverlays()[0]);
