@@ -1,4 +1,4 @@
-/*! dwv 0.24.0-beta 2018-08-21 09:41:24 */
+/*! dwv 0.24.0-beta 2018-08-29 20:57:14 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -667,14 +667,15 @@ dwv.App = function ()
         }
         // flag used by scroll to decide wether to activate or not
         // TODO: supposing multi-slice for zip files, could not be...
-        isMonoSliceData = (data.length === 1 &&
+        var numberOfImages = data.length;
+        isMonoSliceData = (numberOfImages === 1 &&
             firstName.split('.').pop().toLowerCase() !== "zip" &&
             !dwv.utils.endsWith(firstName, "DICOMDIR"));
         // set IO
         loader.setDefaultCharacterSet(defaultCharacterSet);
         loader.onload = function (data) {
             if ( image ) {
-                view.append( data.view );
+                view.append( data.view, numberOfImages);
                 if ( drawController ) {
                     //drawController.appendDrawLayer(image.getNumberOfFrames());
                 }
@@ -14920,7 +14921,7 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
      * @param {Image} The slice to append.
      * @return {Number} The number of the inserted slice.
      */
-    this.appendSlice = function (rhs, frame)
+    this.appendSlice = function (rhs, frame, numberOfImages)
     {
         // check input
         if( rhs === null ) {
@@ -14959,39 +14960,34 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
         }
         var sliceSize = mul * size.getSliceSize();
 
-        // create the new buffer
-        var newBuffer = dwv.dicom.getTypedArray(
-            buffer[f].BYTES_PER_ELEMENT * 8,
-            meta.IsSigned ? 1 : 0,
-            sliceSize * (size.getNumberOfSlices() + 1) );
+        // create the new buffer for all slices
+        if(buffer[f].length != sliceSize * numberOfImages){
+           var newBuffer = dwv.dicom.getTypedArray(
+                buffer[f].BYTES_PER_ELEMENT * 8,
+                meta.IsSigned ? 1 : 0,
+                sliceSize * numberOfImages );
+
+            newBuffer.set(buffer[f]);
+            buffer[f] = newBuffer;
+        }
 
         // append slice at new position
         var newSliceNb = geometry.getSliceIndex( rhs.getGeometry().getOrigin() );
-        if( newSliceNb === 0 )
+        if( newSliceNb === size.getNumberOfSlices() )
         {
-            newBuffer.set(rhs.getFrame(f));
-            newBuffer.set(buffer[f], sliceSize);
-        }
-        else if( newSliceNb === size.getNumberOfSlices() )
-        {
-            newBuffer.set(buffer[f]);
-            newBuffer.set(rhs.getFrame(f), size.getNumberOfSlices() * sliceSize);
+            buffer[f].set(rhs.getFrame(f), size.getNumberOfSlices() * sliceSize);
         }
         else
         {
             var offset = newSliceNb * sliceSize;
-            newBuffer.set(buffer[f].subarray(0, offset - 1));
-            newBuffer.set(rhs.getFrame(f), offset);
-            newBuffer.set(buffer[f].subarray(offset), offset + sliceSize);
+            buffer[f].set(buffer[f].subarray(offset, offset + (sliceSize * (size.getNumberOfSlices() - newSliceNb))), offset + sliceSize);
+            buffer[f].set(rhs.getFrame(f), offset);
         }
 
         // update geometry
         geometry.appendOrigin( rhs.getGeometry().getOrigin(), newSliceNb );
         // update rsi
         rsis.splice(newSliceNb, 0, rhs.getRescaleSlopeAndIntercept(0));
-
-        // copy to class variables
-        buffer[f] = newBuffer;
 
 		// insert overlay information of the slice to the image
 		overlays.splice(newSliceNb, 0, rhs.getOverlays()[0]);
@@ -16439,10 +16435,10 @@ dwv.image.View = function (image)
      * Append another view to this one.
      * @param {Object} rhs The view to append.
      */
-    this.append = function( rhs )
+    this.append = function( rhs , numberOfImages)
     {
        // append images
-       var newSliceNumber = this.getImage().appendSlice( rhs.getImage() );
+       var newSliceNumber = this.getImage().appendSlice( rhs.getImage(), 0, numberOfImages );
        // update position if a slice was appended before
        if ( newSliceNumber <= this.getCurrentPosition().k ) {
            this.setCurrentPosition(
