@@ -443,10 +443,10 @@ dwv.image.View = function (image)
      * Append another view to this one.
      * @param {Object} rhs The view to append.
      */
-    this.append = function( rhs )
+    this.append = function( rhs , numberOfImages)
     {
        // append images
-       var newSliceNumber = this.getImage().appendSlice( rhs.getImage() );
+       var newSliceNumber = this.getImage().appendSlice( rhs.getImage(), 0, numberOfImages );
        // update position if a slice was appended before
        if ( newSliceNumber <= this.getCurrentPosition().k ) {
            this.setCurrentPosition(

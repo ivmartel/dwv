@@ -171,7 +171,7 @@ QUnit.test("Test Image append slice.", function (assert) {
     var sliceGeometry = new dwv.image.Geometry(sliceOrigin, sliceSize, imgSpacing);
     var slice0 = new dwv.image.Image(sliceGeometry, [sliceBuffer]);
     // append slice before
-    image0.appendSlice(slice0);
+    image0.appendSlice(slice0, 0, 4);
     // test its values
     assert.equal( image0.getValue(0, 0, 0), 2, "Value at 0,0,0 (append before)" );
     assert.equal( image0.getValue(3, 3, 0), 2, "Value at 3,3,0 (append before)" );
@@ -194,7 +194,7 @@ QUnit.test("Test Image append slice.", function (assert) {
     var sliceGeometry1 = new dwv.image.Geometry(sliceOrigin1, sliceSize, imgSpacing);
     var slice1 = new dwv.image.Image(sliceGeometry1, [sliceBuffer]);
     // append slice before
-    image1.appendSlice(slice1);
+    image1.appendSlice(slice1, 0, 4);
     // test its values
     assert.equal( image1.getValue(0, 0, 0), 0, "Value at 0,0,0 (append after)" );
     assert.equal( image1.getValue(3, 3, 0), 0, "Value at 3,3,0 (append after)" );
@@ -217,7 +217,7 @@ QUnit.test("Test Image append slice.", function (assert) {
     var sliceGeometry2 = new dwv.image.Geometry(sliceOrigin2, sliceSize, imgSpacing);
     var slice2 = new dwv.image.Image(sliceGeometry2, [sliceBuffer]);
     // append slice before
-    image2.appendSlice(slice2);
+    image2.appendSlice(slice2, 0, 4);
     // test its values
     assert.equal( image2.getValue(0, 0, 0), 0, "Value at 0,0,0 (append between)" );
     assert.equal( image2.getValue(3, 3, 0), 0, "Value at 3,3,0 (append between)" );
