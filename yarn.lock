@@ -1958,9 +1958,9 @@ klaw@~2.0.0:
   dependencies:
     graceful-fs "^4.1.9"
 
-konva@~2.2.1:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/konva/-/konva-2.2.1.tgz#ce9241f4eb418d30c62641e904f767e8c81093e7"
+konva@~2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/konva/-/konva-2.3.0.tgz#d6ff0f85838f4fb5da34d148b79eeb6c6e14ed9c"
 
 lazy-cache@^1.0.3:
   version "1.0.4"
