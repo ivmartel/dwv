@@ -137,7 +137,6 @@ QUnit.test("Test Image histogram.", function (assert) {
  */
 QUnit.test("Test Image append slice.", function (assert) {
     var size = 4;
-    var imgSize = new dwv.image.Size(size, size, 2);
     var imgSizeMinusOne = new dwv.image.Size(size, size, 1);
     var imgSpacing = new dwv.image.Spacing(1, 1, 1);
     var imgOrigin = new dwv.math.Point3D(0,0,0);
@@ -147,21 +146,21 @@ QUnit.test("Test Image append slice.", function (assert) {
     // slice to append
     var sliceSize = new dwv.image.Size(size, size, 1);
     var sliceBuffer = new Int16Array(sliceSize.getTotalSize());
-    for(var i=0; i<size*size; ++i) {
+    for(var i=0; i<sliceSize.getSliceSize(); ++i) {
         sliceBuffer[i] = 2;
     }
 
     // image buffer
-    var buffer = new Int16Array(imgSize.getTotalSize());
-    for(var j=0; j<size*size; ++j) {
-        buffer[j] = 0;
+    var buffer1 = new Int16Array(sliceSize.getSliceSize());
+    var buffer2 = new Int16Array(sliceSize.getSliceSize());
+    for(var j=0; j<sliceSize.getSliceSize(); ++j) {
+        buffer1[j] = 0;
+        buffer2[j] = 1;
     }
-    for(var k=size*size; k<2*size*size; ++k) {
-        buffer[k] = 1;
-    }
+    var buffer = [buffer1, buffer2];
 
     // image 0
-    var image0 = new dwv.image.Image(imgGeometry0, [buffer]);
+    var image0 = new dwv.image.Image(imgGeometry0, buffer);
     // append null
     assert.throws( function () {
             image0.appendSlice(null);
@@ -189,7 +188,8 @@ QUnit.test("Test Image append slice.", function (assert) {
     // image 1
     var imgGeometry1 = new dwv.image.Geometry(imgOrigin, imgSizeMinusOne, imgSpacing);
     imgGeometry1.appendOrigin(new dwv.math.Point3D(0,0,1), 1);
-    var image1 = new dwv.image.Image(imgGeometry1, [buffer]);
+    buffer = [buffer1, buffer2];
+    var image1 = new dwv.image.Image(imgGeometry1, buffer);
     var sliceOrigin1 = new dwv.math.Point3D(0,0,2);
     var sliceGeometry1 = new dwv.image.Geometry(sliceOrigin1, sliceSize, imgSpacing);
     var slice1 = new dwv.image.Image(sliceGeometry1, [sliceBuffer]);
@@ -212,7 +212,8 @@ QUnit.test("Test Image append slice.", function (assert) {
     // image 2
     var imgGeometry2 = new dwv.image.Geometry(imgOrigin, imgSizeMinusOne, imgSpacing);
     imgGeometry2.appendOrigin(new dwv.math.Point3D(0,0,1), 1);
-    var image2 = new dwv.image.Image(imgGeometry2, [buffer]);
+    buffer = [buffer1, buffer2];
+    var image2 = new dwv.image.Image(imgGeometry2, buffer);
     var sliceOrigin2 = new dwv.math.Point3D(0,0,0.4);
     var sliceGeometry2 = new dwv.image.Geometry(sliceOrigin2, sliceSize, imgSpacing);
     var slice2 = new dwv.image.Image(sliceGeometry2, [sliceBuffer]);
