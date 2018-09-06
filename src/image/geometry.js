@@ -248,6 +248,16 @@ dwv.image.Geometry.prototype.equals = function (rhs) {
 };
 
 /**
+ * Convert an index to an current slice offset in memory.
+ * @param {Object} index The index to convert.
+ */
+dwv.image.Geometry.prototype.indexToSliceOffset = function (index) {
+    var size = this.getSize();
+    return index.getI() +
+        index.getJ() * size.getNumberOfColumns();
+};
+
+/**
  * Convert an index to an offset in memory.
  * @param {Object} index The index to convert.
  */

@@ -443,10 +443,10 @@ dwv.image.View = function (image)
      * Append another view to this one.
      * @param {Object} rhs The view to append.
      */
-    this.append = function( rhs , numberOfImages)
+    this.append = function( rhs )
     {
        // append images
-       var newSliceNumber = this.getImage().appendSlice( rhs.getImage(), 0, numberOfImages );
+       var newSliceNumber = this.getImage().appendSlice( rhs.getImage() );
        // update position if a slice was appended before
        if ( newSliceNumber <= this.getCurrentPosition().k ) {
            this.setCurrentPosition(
@@ -628,8 +628,7 @@ dwv.image.View.prototype.generateImageData = function( array )
 
     var image = this.getImage();
     var sliceSize = image.getGeometry().getSize().getSliceSize();
-    var sliceOffset = sliceSize * this.getCurrentPosition().k;
-    var frame = (this.getCurrentFrame()) ? this.getCurrentFrame() : 0;
+    var frameOrSliceIndex = (this.getCurrentFrame()) ? this.getCurrentFrame() : this.getCurrentPosition().k;
 
     var index = 0;
     var pxValue = 0;
@@ -643,10 +642,9 @@ dwv.image.View.prototype.generateImageData = function( array )
     case "MONOCHROME1":
     case "MONOCHROME2":
         var colourMap = this.getColourMap();
-        var iMax = sliceOffset + sliceSize;
-        frameBuffer = image.getFrame(frame);
+        frameBuffer = image.getFrame(frameOrSliceIndex);
         arrayBuffer = new Uint32Array(array.data.buffer);
-        for(var i=sliceOffset; i < iMax; ++i)
+        for(var i=0; i < sliceSize; ++i)
         {
             pxValue = windowLut.getValue(frameBuffer[i]);
             arrayBuffer[index] = 0xff000000 |
@@ -658,27 +656,25 @@ dwv.image.View.prototype.generateImageData = function( array )
         break;
 
     case "RGB":
-        // 3 times bigger...
-        sliceOffset *= 3;
         // the planar configuration defines the memory layout
         var planarConfig = image.getPlanarConfiguration();
         if( planarConfig !== 0 && planarConfig !== 1 ) {
             throw new Error("Unsupported planar configuration: "+planarConfig);
         }
         // default: RGBRGBRGBRGB...
-        var posR = sliceOffset;
-        var posG = sliceOffset + 1;
-        var posB = sliceOffset + 2;
+        var posR = 0;
+        var posG = 1;
+        var posB = 2;
         stepPos = 3;
         // RRRR...GGGG...BBBB...
         if (planarConfig === 1) {
-            posR = sliceOffset;
-            posG = sliceOffset + sliceSize;
-            posB = sliceOffset + 2 * sliceSize;
+            posR = 0;
+            posG = sliceSize;
+            posB = 2 * sliceSize;
             stepPos = 1;
         }
 
-        frameBuffer = image.getFrame(frame);
+        frameBuffer = image.getFrame(frameOrSliceIndex);
         arrayBuffer = new Uint32Array(array.data.buffer);
 
         for(var j=0; j < sliceSize; ++j)
@@ -701,29 +697,27 @@ dwv.image.View.prototype.generateImageData = function( array )
         // reverse equation:
         // https://en.wikipedia.org/wiki/YCbCr#JPEG_conversion
 
-        // 3 times bigger...
-        sliceOffset *= 3;
         // the planar configuration defines the memory layout
         var planarConfigYBR = image.getPlanarConfiguration();
         if( planarConfigYBR !== 0 && planarConfigYBR !== 1 ) {
             throw new Error("Unsupported planar configuration: "+planarConfigYBR);
         }
         // default: YBRYBRYBR...
-        var posY = sliceOffset;
-        var posCB = sliceOffset + 1;
-        var posCR = sliceOffset + 2;
+        var posY = 0;
+        var posCB = 1;
+        var posCR = 2;
         stepPos = 3;
         // YYYY...BBBB...RRRR...
         if (planarConfigYBR === 1) {
-            posY = sliceOffset;
-            posCB = sliceOffset + sliceSize;
-            posCR = sliceOffset + 2 * sliceSize;
+            posY = 0;
+            posCB = sliceSize;
+            posCR = 2 * sliceSize;
             stepPos = 1;
         }
 
         var y, cb, cr;
         var r, g, b;
-        frameBuffer = image.getFrame(frame);
+        frameBuffer = image.getFrame(frameOrSliceIndex);
         arrayBuffer = new Uint32Array(array.data.buffer);
         for (var k=0; k < sliceSize; ++k)
         {

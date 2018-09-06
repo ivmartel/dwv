@@ -616,7 +616,7 @@ dwv.App = function ()
         loader.setDefaultCharacterSet(defaultCharacterSet);
         loader.onload = function (data) {
             if ( image ) {
-                view.append( data.view, numberOfImages);
+                view.append( data.view );
                 if ( drawController ) {
                     //drawController.appendDrawLayer(image.getNumberOfFrames());
                 }
