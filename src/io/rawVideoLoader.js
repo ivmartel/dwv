@@ -6,6 +6,7 @@ dwv.io = dwv.io || {};
  * Raw video loader.
  * url example (cors enabled):
  *   https://raw.githubusercontent.com/clappr/clappr/master/test/fixtures/SampleVideo_360x240_1mb.mp4
+ * @constructor
  */
 dwv.io.RawVideoLoader = function ()
 {
