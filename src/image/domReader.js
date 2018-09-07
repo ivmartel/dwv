@@ -5,7 +5,7 @@ dwv.image = dwv.image || {};
 /**
  * Create a simple array buffer from an ImageData buffer.
  * @param {Object} imageData The ImageData taken from a context.
- * @return {Array} The image buffer.
+ * @return {Array} The 2d image buffer.
  */
 dwv.image.imageDataToBuffer = function (imageData) {
     // remove alpha
@@ -19,7 +19,7 @@ dwv.image.imageDataToBuffer = function (imageData) {
         buffer[j+2] = imageData.data[i+2];
         j+=3;
     }
-    return buffer;
+    return [buffer];
 };
 
 /**

@@ -139,8 +139,8 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
      * @private
      * @type Number
      */
-    var numberOfComponents = buffer[0].length / (
-        geometry.getSize().getTotalSize() );
+    var numberOfComponents = buffer[0][0].length / (
+        geometry.getSize().getSliceSize() );
     /**
      * Meta information.
      * @private
@@ -203,7 +203,18 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
      * @todo dangerous...
      * @return {Array} The data buffer of the frame.
      */
-    this.getFrame = function (frame) { return buffer[frame]; };
+    this.getFrame = function (frame) {
+        if(buffer[frame]){
+            return buffer[frame][0];
+        }
+        return [];
+    };
+
+    /**
+     * Get the data buffer of the image.
+     * @return {Array} The data buffer of the slice.
+     */
+    this.getSlice = function (frame, slice) { return buffer[frame][slice]; };
 
     /**
      * Get the rescale slope and intercept.
@@ -287,8 +298,8 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
      * @param {Number} frame The desired frame.
      * @return {Number} The value at offset.
      */
-    this.getValueAtOffset = function (offset, frame) {
-        return buffer[frame][offset];
+    this.getValueAtOffset = function (offset, slice, frame) {
+        return buffer[frame][slice][offset];
     };
 
     /**
@@ -299,8 +310,11 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
     {
         // clone the image buffer
         var clonedBuffer = [];
-        for (var index = 0; index < buffer.length; ++index) {
-            clonedBuffer[index] = buffer[index].slice(0);
+        for (var frame = 0; frame < buffer.length; ++frame) {
+            clonedBuffer[frame] = [];
+            for (var slice = 0; slice < buffer[frame].length; ++slice) {
+                clonedBuffer[frame][slice] = buffer[frame][slice].slice(0);
+            }
         }
         // create the image copy
         var copy = new dwv.image.Image(this.getGeometry(), clonedBuffer);
@@ -320,9 +334,10 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
     /**
      * Append a slice to the image.
      * @param {Image} The slice to append.
+     * @param {Number} The current frame.
      * @return {Number} The number of the inserted slice.
      */
-    this.appendSlice = function (rhs)
+    this.appendSlice = function (rhs, frame)
     {
         // check input
         if( rhs === null ) {
@@ -360,10 +375,10 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
         {
             var slices = size.getNumberOfSlices();
             for(var i = slices; i > newSliceNb; i--){
-                buffer[i] = buffer[i-1];
+                buffer[frame][i] = buffer[frame][i-1];
             }
         }
-        buffer[newSliceNb] = rhs.getFrame(0);
+        buffer[frame][newSliceNb] = rhs.getFrame(0);
 
         // update geometry
         geometry.appendOrigin( rhs.getGeometry().getOrigin(), newSliceNb );
@@ -435,8 +450,8 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
 dwv.image.Image.prototype.getValue = function( i, j, k, f )
 {
     var index = new dwv.math.Index3D(i,j,k);
-    var frameOrSliceIndex = (f || index.getK());
-    return this.getValueAtOffset( this.getGeometry().indexToSliceOffset(index), frameOrSliceIndex );
+    var frameIndex = (f || 0);
+    return this.getValueAtOffset( this.getGeometry().indexToSliceOffset(index), index.getK(), frameIndex );
 };
 
 /**
@@ -468,12 +483,12 @@ dwv.image.Image.prototype.calculateDataRange = function ()
     var size = this.getGeometry().getSize();
     var sliceSize = size.getSliceSize();
     var slices = size.getNumberOfSlices();
-    var min = this.getValueAtOffset(0,0);
+    var min = this.getValueAtOffset(0,0,0);
     var max = min;
     var value = 0;
     for ( var sliceIndex = 0; sliceIndex < slices; ++sliceIndex ) {
         for (var sliceOffset = 0; sliceOffset < sliceSize; ++sliceOffset) {
-            value = this.getValueAtOffset(sliceOffset, sliceIndex);
+            value = this.getValueAtOffset(sliceOffset, sliceIndex, 0);
             if (value > max) {
                 max = value;
             }
@@ -667,50 +682,52 @@ dwv.image.Image.prototype.convolute2D = function(weights)
     var newValue = 0;
     var wOffFinal = [];
     // go through the destination image pixels
-    for (var frameOrSlice=0; frameOrSlice<newBuffer.length; frameOrSlice++) {
-        var pixelOffset = 0;
-        for (var c=0; c<ncomp; c++) {
+    for (var frameIndex=0; frameIndex<newBuffer.length; frameIndex++) {
+        for (var sliceIndex=0; sliceIndex<newBuffer[frameIndex].length; sliceIndex++) {
+            var pixelOffset = 0;
+            for (var c=0; c<ncomp; c++) {
             // special component offset
-            pixelOffset += c * componentOffset;
-            for (var j=0; j<nrows; j++) {
-                for (var i=0; i<ncols; i++) {
-                    wOffFinal = wOff;
-                    // special border cases
-                    if( i === 0 && j === 0 ) {
-                        wOffFinal = wOff00;
-                    }
-                    else if( i === 0 && j === (nrows-1)  ) {
-                        wOffFinal = wOff0n;
-                    }
-                    else if( i === (ncols-1) && j === 0 ) {
-                        wOffFinal = wOffn0;
-                    }
-                    else if( i === (ncols-1) && j === (nrows-1) ) {
-                        wOffFinal = wOffnn;
-                    }
-                    else if( i === 0 && j !== (nrows-1) && j !== 0 ) {
-                        wOffFinal = wOff0x;
-                    }
-                    else if( i === (ncols-1) && j !== (nrows-1) && j !== 0 ) {
-                        wOffFinal = wOffnx;
-                    }
-                    else if( i !== 0 && i !== (ncols-1) && j === 0 ) {
-                        wOffFinal = wOffx0;
-                    }
-                    else if( i !== 0 && i !== (ncols-1) && j === (nrows-1) ) {
-                        wOffFinal = wOffxn;
-                    }
+                pixelOffset += c * componentOffset;
+                for (var j=0; j<nrows; j++) {
+                    for (var i=0; i<ncols; i++) {
+                        wOffFinal = wOff;
+                        // special border cases
+                        if( i === 0 && j === 0 ) {
+                            wOffFinal = wOff00;
+                        }
+                        else if( i === 0 && j === (nrows-1)  ) {
+                            wOffFinal = wOff0n;
+                        }
+                        else if( i === (ncols-1) && j === 0 ) {
+                            wOffFinal = wOffn0;
+                        }
+                        else if( i === (ncols-1) && j === (nrows-1) ) {
+                            wOffFinal = wOffnn;
+                        }
+                        else if( i === 0 && j !== (nrows-1) && j !== 0 ) {
+                            wOffFinal = wOff0x;
+                        }
+                        else if( i === (ncols-1) && j !== (nrows-1) && j !== 0 ) {
+                            wOffFinal = wOffnx;
+                        }
+                        else if( i !== 0 && i !== (ncols-1) && j === 0 ) {
+                            wOffFinal = wOffx0;
+                       }
+                        else if( i !== 0 && i !== (ncols-1) && j === (nrows-1) ) {
+                            wOffFinal = wOffxn;
+                        }
 
-                    // calculate the weighed sum of the source image pixels that
-                    // fall under the convolution matrix
-                    newValue = 0;
-                    for( var wi=0; wi<9; ++wi )
-                    {
-                        newValue += this.getValueAtOffset(pixelOffset + wOffFinal[wi], frameOrSlice) * weights[wi];
+                        // calculate the weighed sum of the source image pixels that
+                        // fall under the convolution matrix
+                        newValue = 0;
+                        for( var wi=0; wi<9; ++wi )
+                        {
+                            newValue += this.getValueAtOffset(pixelOffset + wOffFinal[wi], sliceIndex, frameIndex) * weights[wi];
+                        }
+                        newBuffer[frameIndex][sliceIndex][pixelOffset] = newValue;
+                        // increment pixel offset
+                        pixelOffset += factor;
                     }
-                    newBuffer[frameOrSlice][pixelOffset] = newValue;
-                    // increment pixel offset
-                    pixelOffset += factor;
                 }
             }
         }
@@ -730,11 +747,14 @@ dwv.image.Image.prototype.transform = function(operator)
     var newImage = this.clone();
     var newBuffer = newImage.getBuffer();
 
-    for ( var frameOrSlice = 0; frameOrSlice < newBuffer.length; ++frameOrSlice )
+    for ( var frameIndex = 0; frameIndex < newBuffer.length; ++frameIndex )
     {
-        for( var offset = 0, leni = newBuffer[frameOrSlice].length; offset < leni; ++offset )
+        for ( var sliceIndex = 0; sliceIndex < newBuffer[frameIndex].length; ++sliceIndex )
         {
-            newBuffer[frameOrSlice][offset] = operator( newImage.getValueAtOffset(offset,frameOrSlice) );
+            for( var offset = 0, leni = newBuffer[frameIndex][sliceIndex].length; offset < leni; ++offset )
+            {
+                newBuffer[frameIndex][sliceIndex][offset] = operator( newImage.getValueAtOffset(offset,sliceIndex,frameIndex) );
+            }
         }
     }
     return newImage;
@@ -752,12 +772,16 @@ dwv.image.Image.prototype.compose = function(rhs, operator)
 {
     var newImage = this.clone();
     var newBuffer = newImage.getBuffer();
-    for ( var frameOrSlice = 0; frameOrSlice < newBuffer.length; ++frameOrSlice )
+
+    for ( var frameIndex = 0; frameIndex < newBuffer.length; ++frameIndex )
     {
-        for( var offset = 0, leni = newBuffer[frameOrSlice].length; offset < leni; ++offset )
+        for ( var sliceIndex = 0; sliceIndex < newBuffer[frameIndex].length; ++sliceIndex )
         {
-            // using the operator on the local buffer, i.e. the latest (not original) data
-            newBuffer[frameOrSlice][offset] = Math.floor( operator( this.getValueAtOffset(offset,frameOrSlice), rhs.getValueAtOffset(offset,frameOrSlice) ) );
+            for( var offset = 0, leni = newBuffer[frameIndex][sliceIndex].length; offset < leni; ++offset )
+            {
+                // using the operator on the local buffer, i.e. the latest (not original) data
+                newBuffer[frameIndex][sliceIndex][offset] = Math.floor( operator( this.getValueAtOffset(offset,sliceIndex,frameIndex), rhs.getValueAtOffset(offset,sliceIndex,frameIndex) ) );
+            }
         }
     }
     return newImage;

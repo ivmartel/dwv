@@ -446,7 +446,7 @@ dwv.image.View = function (image)
     this.append = function( rhs )
     {
        // append images
-       var newSliceNumber = this.getImage().appendSlice( rhs.getImage() );
+       var newSliceNumber = this.getImage().appendSlice( rhs.getImage(), 0 );
        // update position if a slice was appended before
        if ( newSliceNumber <= this.getCurrentPosition().k ) {
            this.setCurrentPosition(
@@ -628,12 +628,13 @@ dwv.image.View.prototype.generateImageData = function( array )
 
     var image = this.getImage();
     var sliceSize = image.getGeometry().getSize().getSliceSize();
-    var frameOrSliceIndex = (this.getCurrentFrame()) ? this.getCurrentFrame() : this.getCurrentPosition().k;
+    var sliceIndex = this.getCurrentPosition().k;
+    var frameIndex = (this.getCurrentFrame()) ? this.getCurrentFrame() : 0;
 
     var index = 0;
     var pxValue = 0;
     var stepPos = 0;
-    var frameBuffer;
+    var imageBuffer;
     var arrayBuffer;
 
     var photoInterpretation = image.getPhotometricInterpretation();
@@ -642,11 +643,11 @@ dwv.image.View.prototype.generateImageData = function( array )
     case "MONOCHROME1":
     case "MONOCHROME2":
         var colourMap = this.getColourMap();
-        frameBuffer = image.getFrame(frameOrSliceIndex);
+        imageBuffer = image.getSlice(frameIndex, sliceIndex);
         arrayBuffer = new Uint32Array(array.data.buffer);
         for(var i=0; i < sliceSize; ++i)
         {
-            pxValue = windowLut.getValue(frameBuffer[i]);
+            pxValue = windowLut.getValue(imageBuffer[i]);
             arrayBuffer[index] = 0xff000000 |
                 (colourMap.blue[pxValue] << 16) |
                 (colourMap.green[pxValue] << 8) |
@@ -674,15 +675,15 @@ dwv.image.View.prototype.generateImageData = function( array )
             stepPos = 1;
         }
 
-        frameBuffer = image.getFrame(frameOrSliceIndex);
+        imageBuffer = image.getSlice(frameIndex, sliceIndex);
         arrayBuffer = new Uint32Array(array.data.buffer);
 
         for(var j=0; j < sliceSize; ++j)
         {
             arrayBuffer[index] = 0xff000000 |
-                (windowLut.getValue(frameBuffer[posB]) << 16) |
-                (windowLut.getValue(frameBuffer[posG]) << 8) |
-                windowLut.getValue(frameBuffer[posR])  ;
+                (windowLut.getValue(imageBuffer[posB]) << 16) |
+                (windowLut.getValue(imageBuffer[posG]) << 8) |
+                windowLut.getValue(imageBuffer[posR])  ;
             index += 1;
 
             posR += stepPos;
@@ -717,13 +718,13 @@ dwv.image.View.prototype.generateImageData = function( array )
 
         var y, cb, cr;
         var r, g, b;
-        frameBuffer = image.getFrame(frameOrSliceIndex);
+        imageBuffer = image.getSlice(frameIndex, sliceIndex);
         arrayBuffer = new Uint32Array(array.data.buffer);
         for (var k=0; k < sliceSize; ++k)
         {
-            y = frameBuffer[posY];
-            cb = frameBuffer[posCB];
-            cr = frameBuffer[posCR];
+            y = imageBuffer[posY];
+            cb = imageBuffer[posCB];
+            cr = imageBuffer[posCR];
 
             r = y + 1.402 * (cr - 128);
             g = y - 0.34414 * (cb - 128) - 0.71414 * (cr - 128);
