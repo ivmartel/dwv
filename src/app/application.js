@@ -1038,7 +1038,8 @@ dwv.App = function ()
         var state = new dwv.State();
         // add href to link (html5)
         var element = self.getElement("download-state");
-        element.href = "data:application/json," + state.toJSON(self);
+        var blob = new Blob([state.toJSON(self)], {type: 'application/json'});
+        element.href = window.URL.createObjectURL(blob);
     };
 
     /**
