@@ -158,4 +158,4 @@ dwv.utils.createDefaultReplaceFormat = function (values)
  */
 dwv.utils.getRootPath = function (path) {
   return path.split('/').slice(0, -1).join('/');
-}
+};
