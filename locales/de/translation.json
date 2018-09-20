@@ -89,17 +89,17 @@
         },
         "Scroll": {
             "name": "Scrollen",
-            "brief": "The scroll tool allows to scroll through slices/frames. ",
+            "brief": "Mit dem Scroll-Werkzeug können Sie sich durch Schnittbilder/Einzelbilder bewegen.",
             "double_click": "Doppelklick startet die Wiedergabe einer Schnitt- oder Bildsequenz. Einfacher Klick stoppt die Wiedergabe.",
-            "tap_and_hold": "A tap and hold launches a slice or frame play. A single tap stops it.",
-            "mouse_drag": "Drag the mouse vertically to change the slice, horizontally to change the frame. Keyboard shortcuts: CTRL + up or down arrow to change slices, CTRL + left or right arrow to change frames.",
+            "tap_and_hold": "Berühren und Halten startet die Schnittbild- oder Einzelbildwiedergabe. Einfaches Berühren stoppt die Wiedergabe.",
+            "mouse_drag": "Vertikales Ziehen der Maus wechselt das Schnittbild, horizontales Ziehen das Einzelbild. Tastenkürzel: Strg + Pfeil nach oben oder unten um das Schnittbild zu wechseln, Strg + Pfeil nach links oder rechts um das Einzelbild zu wechseln.",
             "touch_drag": "Vertikales Ziehen ändert das Schnittbild, horizontales das zeitliche Einzelbild."
         },
         "Draw": {
             "name": "Zeichnen",
             "brief": "Ermöglicht das Zeichnen von Formen in das Bild. Wählen Sie Form und Farbe aus den Drop-Down-Menüs. Die Formen können nach ihrer Erstellung ausgewählt werden. Das Verschieben der dann erscheinenden formspezifischen Ankerpunkte erlaubt eine nachträgliche Bearbeitung. Wird eine Form auf das rote Kreuz gezogen, wird sie gelöscht. Alle Aktionen können rückgängige gemacht werden.",
-            "mouse_drag": "A single mouse drag draws the desired shape. For the protractor, click to start, draw the first ray to the vertex, wait half a second and draw the second ray.",
-            "touch_drag": "A single touch drag draws the desired shape. For the protractor, tap to start, draw the first ray to the vertex, wait half a second and draw the second ray."
+            "mouse_drag": "Ziehen mit der Maus zeichnet die gewünschte Form. Um das Zeichnen des Winkelmessers zu starten klicken Sie zuerst auf den gewünschten Startpunkt, zeichnen Sie den ersten Strahl bis zum Schnittpunkt, warten Sie eine halbe Sekunde und zeichnen Sie dann den zweiten Strahl.",
+            "touch_drag": "Zeichnen Sie die gewünschte Form durch Ziehen mit dem Finger. Um das Zeichnen des Winkelmessers zu starten berühren Sie zuerst den gewünschten Startpunkt, zeichnen Sie den ersten Strahl bis zum Schnittpunkt, warten Sie eine halbe Sekunde und zeichnen Sie dann den zweiten Strahl."
         },
         "Filter": {
             "name": "Filter",
@@ -112,7 +112,7 @@
         "Floodfill": {
             "name": "Floodfill",
             "brief": "Das Floodfill-Werkzeug ist ein halbautomatisches Segmentierungswerkzeug, das eine Kontur um Flächen benachbarter Pixel ähnlichen Grauwerts erzeugt.",
-            "click": "Klick auf Pixel erzeut eine Kontur auf Basis des Grauwerts. Click on pixel to create a contour based on its intensity.",
+            "click": "Klicken auf Pixel erzeut eine Kontur auf Basis des Grauwerts.",
             "tap": "Tippen auf Pixel erzeut eine Kontur auf Basis des Grauwerts."
         },
         "info": {
