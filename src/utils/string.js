@@ -149,3 +149,13 @@ dwv.utils.createDefaultReplaceFormat = function (values)
     }
     return res;
 };
+
+/**
+ * Get the root of an input path.
+ * @param {String} path The input path
+ * @return {String} The input path without its last part.
+ * @note Splits using `/` as separator.
+ */
+dwv.utils.getRootPath = function (path) {
+  return path.split('/').slice(0, -1).join('/');
+}
