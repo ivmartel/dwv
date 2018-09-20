@@ -1,4 +1,4 @@
-/*! dwv 0.25.0-beta 2018-09-20 22:10:54 */
+/*! dwv 0.25.0-beta 2018-09-20 22:15:46 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -16828,7 +16828,7 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
         for ( var j = 0; j < windowCenter.length; ++j) {
             var center = parseFloat( windowCenter[j], 10 );
             var width = parseFloat( windowWidth[j], 10 );
-            if ( center && width ) {
+            if ( center && width && width !== 0 ) {
                 name = "";
                 if ( windowCWExplanation ) {
                     name = dwv.dicom.cleanString(windowCWExplanation[j]);
@@ -16840,6 +16840,9 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
                     "wl": [new dwv.image.WindowLevel(center, width)],
                     "name": name,
                     "perslice": true};
+            }
+            if (width === 0) {
+                console.warn("Zero window width found in DICOM.");
             }
         }
     }
