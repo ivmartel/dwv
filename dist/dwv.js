@@ -1,4 +1,4 @@
-/*! dwv 0.24.1-beta 2018-09-06 11:01:42 */
+/*! dwv 0.24.2-beta 2018-09-25 08:36:14 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -13948,11 +13948,12 @@ dwv.image.imageDataToBuffer = function (imageData) {
     // TODO support passing the full image data
     var dataLen = imageData.data.length;
     var buffer = new Uint8Array( (dataLen / 4) * 3);
+    var data = imageData.data;
     var j = 0;
     for( var i = 0; i < dataLen; i+=4 ) {
-        buffer[j] = imageData.data[i];
-        buffer[j+1] = imageData.data[i+1];
-        buffer[j+2] = imageData.data[i+2];
+        buffer[j] = data[i];
+        buffer[j+1] = data[i+1];
+        buffer[j+2] = data[i+2];
         j+=3;
     }
     return buffer;
