@@ -1,4 +1,4 @@
-/*! dwv 0.24.0 2018-08-24 20:59:49 */
+/*! dwv 0.24.1 2018-09-25 21:49:24 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -669,7 +669,8 @@ dwv.App = function ()
         // TODO: supposing multi-slice for zip files, could not be...
         isMonoSliceData = (data.length === 1 &&
             firstName.split('.').pop().toLowerCase() !== "zip" &&
-            !dwv.utils.endsWith(firstName, "DICOMDIR"));
+            !dwv.utils.endsWith(firstName, "DICOMDIR") &&
+            !dwv.utils.endsWith(firstName, ".dcmdir") );
         // set IO
         loader.setDefaultCharacterSet(defaultCharacterSet);
         loader.onload = function (data) {
@@ -3588,7 +3589,7 @@ dwv.dicom = dwv.dicom || {};
  * Get the version of the library.
  * @return {String} The version of the library.
  */
-dwv.getVersion = function () { return "0.24.0"; };
+dwv.getVersion = function () { return "0.24.1"; };
 
 /**
  * Clean string: trim and remove ending.
@@ -16827,7 +16828,7 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
         for ( var j = 0; j < windowCenter.length; ++j) {
             var center = parseFloat( windowCenter[j], 10 );
             var width = parseFloat( windowWidth[j], 10 );
-            if ( center && width ) {
+            if ( center && width && width !== 0 ) {
                 name = "";
                 if ( windowCWExplanation ) {
                     name = dwv.dicom.cleanString(windowCWExplanation[j]);
@@ -16839,6 +16840,9 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
                     "wl": [new dwv.image.WindowLevel(center, width)],
                     "name": name,
                     "perslice": true};
+            }
+            if (width === 0) {
+                console.warn("Zero window width found in DICOM.");
             }
         }
     }
@@ -18438,7 +18442,7 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
             // use the first list
             var urls = list[0][0];
             // append root url
-            var rootUrl = dicomDirUrl.substr( 0, (dicomDirUrl.length - "DICOMDIR".length - 1 ) );
+            var rootUrl = dwv.utils.getRootPath(dicomDirUrl);
             var fullUrls = [];
             for ( var i = 0; i < urls.length; ++i ) {
                 fullUrls.push( rootUrl + "/" + urls[i]);
@@ -18451,7 +18455,9 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
     };
 
     // check if DICOMDIR case
-    if ( ioArray.length === 1 && dwv.utils.endsWith(ioArray[0], "DICOMDIR") ) {
+    if ( ioArray.length === 1 &&
+        (dwv.utils.endsWith(ioArray[0], "DICOMDIR") ||
+         dwv.utils.endsWith(ioArray[0], ".dcmdir") ) ) {
         internalDicomDirLoad(ioArray[0]);
     } else {
         internalUrlsLoad(ioArray);
@@ -26729,6 +26735,16 @@ dwv.utils.createDefaultReplaceFormat = function (values)
         res += "{v"+j+"}";
     }
     return res;
+};
+
+/**
+ * Get the root of an input path.
+ * @param {String} path The input path
+ * @return {String} The input path without its last part.
+ * @note Splits using `/` as separator.
+ */
+dwv.utils.getRootPath = function (path) {
+  return path.split('/').slice(0, -1).join('/');
 };
 
 // namespaces
