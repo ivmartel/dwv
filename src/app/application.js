@@ -610,7 +610,8 @@ dwv.App = function ()
         // TODO: supposing multi-slice for zip files, could not be...
         isMonoSliceData = (data.length === 1 &&
             firstName.split('.').pop().toLowerCase() !== "zip" &&
-            !dwv.utils.endsWith(firstName, "DICOMDIR"));
+            !dwv.utils.endsWith(firstName, "DICOMDIR") &&
+            !dwv.utils.endsWith(firstName, ".dcmdir") );
         // set IO
         loader.setDefaultCharacterSet(defaultCharacterSet);
         loader.onload = function (data) {
