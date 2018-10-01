@@ -602,6 +602,10 @@ dwv.image.View.prototype.getWindowLevelMinMax = function ()
     var min = range.min;
     var max = range.max;
     var width = max - min;
+    // full black / white images, defaults to 1.
+    if ( width < 1 ) {
+        width = 1;
+    }
     var center = min + width/2;
     return new dwv.image.WindowLevel(center, width);
 };
