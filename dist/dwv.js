@@ -1,4 +1,4 @@
-/*! dwv 0.24.1 2018-09-25 23:45:31 */
+/*! dwv 0.25.0 2018-10-02 22:43:04 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -89,8 +89,6 @@ dwv.App = function ()
     var containerDivId = null;
     // Display window scale
     var windowScale = 1;
-    // Fit display to window flag
-    var fitToWindow = false;
     // main scale
     var scale = 1;
     // zoom center
@@ -387,7 +385,7 @@ dwv.App = function ()
             box.addEventListener("dragleave", onDragLeave);
             box.addEventListener("drop", onDrop);
             // initial size
-            var size = dwv.gui.getWindowSize();
+            var size = this.getContainerSize();
             var dropBoxSize = 2 * size.height / 3;
             box.setAttribute("style","width:"+dropBoxSize+"px;height:"+dropBoxSize+"px");
         }
@@ -411,16 +409,22 @@ dwv.App = function ()
             console.log("Not loading url from address since skipLoadUrl is defined.");
         }
 
-        // align layers when the window is resized
-        if ( config.fitToWindow ) {
-            fitToWindow = true;
-            window.onresize = this.onResize;
-        }
+        // listen to window resize
+        window.onresize = this.onResize;
 
         // default character set
         if ( typeof config.defaultCharacterSet !== "undefined" ) {
             defaultCharacterSet = config.defaultCharacterSet;
         }
+    };
+
+    /**
+     * Get the size of the container div.
+     * @return {width, height} The width and height of the div.
+     */
+    this.getContainerSize = function () {
+      var div = document.getElementById(containerDivId);
+      return { 'width': div.offsetWidth, 'height': div.offsetHeight };
     };
 
     /**
@@ -1028,7 +1032,7 @@ dwv.App = function ()
      */
     this.onResize = function (/*event*/)
     {
-        self.fitToSize(dwv.gui.getWindowSize());
+        self.fitToSize(self.getContainerSize());
     };
 
     /**
@@ -1418,14 +1422,8 @@ dwv.App = function ()
             drawController.create(dataWidth, dataHeight);
         }
         // resize app
-        if ( fitToWindow ) {
-            self.fitToSize( dwv.gui.getWindowSize() );
-        }
-        else {
-            self.fitToSize( {
-                'width': self.getElement("layerContainer").offsetWidth,
-                'height': self.getElement("layerContainer").offsetHeight } );
-        }
+        self.fitToSize(self.getContainerSize());
+
         self.resetLayout();
     }
 
@@ -3589,7 +3587,7 @@ dwv.dicom = dwv.dicom || {};
  * Get the version of the library.
  * @return {String} The version of the library.
  */
-dwv.getVersion = function () { return "0.24.1"; };
+dwv.getVersion = function () { return "0.25.0"; };
 
 /**
  * Clean string: trim and remove ending.
@@ -10651,14 +10649,6 @@ dwv.gui.base.Sobel = function (app)
 var dwv = dwv || {};
 dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
-
-/**
- * Get the size of the image display window.
- */
-dwv.gui.base.getWindowSize = function ()
-{
-    return { 'width': window.innerWidth, 'height': window.innerHeight - 147 };
-};
 
 /**
  * Ask some text to the user.

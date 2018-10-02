@@ -7,7 +7,7 @@ dwv.dicom = dwv.dicom || {};
  * Get the version of the library.
  * @return {String} The version of the library.
  */
-dwv.getVersion = function () { return "0.25.0-beta"; };
+dwv.getVersion = function () { return "0.25.0"; };
 
 /**
  * Clean string: trim and remove ending.
