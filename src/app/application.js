@@ -364,9 +364,9 @@ dwv.App = function ()
      * @return {width, height} The width and height of the div.
      */
     this.getContainerSize = function () {
-      var cont = document.getElementById(containerDivId);
-      return { 'width': cont.offsetWidth, 'height': cont.offsetHeight };
-    }
+      var div = document.getElementById(containerDivId);
+      return { 'width': div.offsetWidth, 'height': div.offsetHeight };
+    };
 
     /**
      * Get a HTML element associated to the application.
