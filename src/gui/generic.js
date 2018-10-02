@@ -4,14 +4,6 @@ dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
- * Get the size of the image display window.
- */
-dwv.gui.base.getWindowSize = function ()
-{
-    return { 'width': window.innerWidth, 'height': window.innerHeight - 147 };
-};
-
-/**
  * Ask some text to the user.
  * @param {String} message Text to display to the user.
  * @param {String} defaultText Default value displayed in the text input field.
