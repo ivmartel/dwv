@@ -1,6 +1,6 @@
 {
   "name": "dwv",
-  "version": "0.26.0-beta",
+  "version": "0.25.1",
   "description": "DICOM Web Viewer.",
   "keywords": [
     "DICOM",
