@@ -1,4 +1,4 @@
-/*! dwv 0.26.0-beta 2018-10-02 20:51:18 */
+/*! dwv 0.26.0-beta 2018-10-04 21:04:16 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -385,7 +385,7 @@ dwv.App = function ()
             box.addEventListener("dragleave", onDragLeave);
             box.addEventListener("drop", onDrop);
             // initial size
-            var size = this.getContainerSize();
+            var size = this.getLayerContainerSize();
             var dropBoxSize = 2 * size.height / 3;
             box.setAttribute("style","width:"+dropBoxSize+"px;height:"+dropBoxSize+"px");
         }
@@ -419,12 +419,23 @@ dwv.App = function ()
     };
 
     /**
-     * Get the size of the container div.
+     * Get the size of the layer container div.
      * @return {width, height} The width and height of the div.
      */
-    this.getContainerSize = function () {
+    this.getLayerContainerSize = function () {
       var div = document.getElementById(containerDivId);
-      return { 'width': div.offsetWidth, 'height': div.offsetHeight };
+      // remove the height of other elements of the container div
+      var height = div.offsetHeight;
+      var kids = div.children;
+      for (var i = 0; i < kids.length; ++i) {
+        if (kids[i].className !== "layerContainer") {
+          var styles = window.getComputedStyle(kids[i]);
+          var margin = parseFloat(styles.getPropertyValue('margin-top'), 10) +
+               parseFloat(styles.getPropertyValue('margin-bottom'), 10);
+          height -= (kids[i].offsetHeight + margin);
+        }
+      }
+      return { 'width': div.offsetWidth, 'height': height };
     };
 
     /**
@@ -1032,7 +1043,7 @@ dwv.App = function ()
      */
     this.onResize = function (/*event*/)
     {
-        self.fitToSize(self.getContainerSize());
+        self.fitToSize(self.getLayerContainerSize());
     };
 
     /**
@@ -1422,7 +1433,7 @@ dwv.App = function ()
             drawController.create(dataWidth, dataHeight);
         }
         // resize app
-        self.fitToSize(self.getContainerSize());
+        self.fitToSize(self.getLayerContainerSize());
 
         self.resetLayout();
     }
