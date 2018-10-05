@@ -1289,14 +1289,8 @@ dwv.App = function ()
      */
     function handleError(error)
     {
-        // alert window
-        if ( error.name && error.message) {
-            alert(error.name+": "+error.message);
-        }
-        else {
-            alert("Error: "+error+".");
-        }
         // log
+        console.error(error);
         if ( error.stack ) {
             console.error(error.stack);
         }
