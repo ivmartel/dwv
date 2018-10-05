@@ -1,4 +1,4 @@
-/*! dwv 0.24.2-beta 2018-09-25 08:36:14 */
+/*! dwv 0.24.3-beta 2018-10-05 14:15:17 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -1348,14 +1348,8 @@ dwv.App = function ()
      */
     function handleError(error)
     {
-        // alert window
-        if ( error.name && error.message) {
-            alert(error.name+": "+error.message);
-        }
-        else {
-            alert("Error: "+error+".");
-        }
         // log
+        console.error(error);
         if ( error.stack ) {
             console.error(error.stack);
         }
@@ -16584,6 +16578,10 @@ dwv.image.View.prototype.getWindowLevelMinMax = function ()
     var min = range.min;
     var max = range.max;
     var width = max - min;
+    // full black / white images, defaults to 1.
+    if ( width < 1 ) {
+        width = 1;
+    }
     var center = min + width/2;
     return new dwv.image.WindowLevel(center, width);
 };
