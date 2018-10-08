@@ -1,4 +1,4 @@
-/*! dwv 0.26.0-beta 2018-10-04 21:14:06 */
+/*! dwv 0.26.0-beta 2018-10-08 21:40:11 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -423,7 +423,8 @@ dwv.App = function ()
      * @return {width, height} The width and height of the div.
      */
     this.getLayerContainerSize = function () {
-      var div = document.getElementById(containerDivId);
+      var ldiv = self.getElement("layerContainer");
+      var div = ldiv.parentNode;
       // remove the height of other elements of the container div
       var height = div.offsetHeight;
       var kids = div.children;
