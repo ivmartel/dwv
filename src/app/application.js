@@ -364,7 +364,8 @@ dwv.App = function ()
      * @return {width, height} The width and height of the div.
      */
     this.getLayerContainerSize = function () {
-      var div = document.getElementById(containerDivId);
+      var ldiv = self.getElement("layerContainer");
+      var div = ldiv.parentNode;
       // remove the height of other elements of the container div
       var height = div.offsetHeight;
       var kids = div.children;
