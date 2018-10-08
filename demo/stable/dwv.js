@@ -1,4 +1,4 @@
-/*! dwv 0.25.1 2018-10-04 21:12:27 */
+/*! dwv 0.25.2 2018-10-08 21:45:02 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -423,7 +423,8 @@ dwv.App = function ()
      * @return {width, height} The width and height of the div.
      */
     this.getLayerContainerSize = function () {
-      var div = document.getElementById(containerDivId);
+      var ldiv = self.getElement("layerContainer");
+      var div = ldiv.parentNode;
       // remove the height of other elements of the container div
       var height = div.offsetHeight;
       var kids = div.children;
@@ -3598,7 +3599,7 @@ dwv.dicom = dwv.dicom || {};
  * Get the version of the library.
  * @return {String} The version of the library.
  */
-dwv.getVersion = function () { return "0.25.1"; };
+dwv.getVersion = function () { return "0.25.2"; };
 
 /**
  * Clean string: trim and remove ending.
