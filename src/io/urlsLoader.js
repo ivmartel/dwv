@@ -109,7 +109,7 @@ dwv.io.UrlsLoader = function ()
         // abort requests
         for ( var i = 0; i < requests.length; ++i ) {
             // 0: UNSENT, 1: OPENED, 2: HEADERS_RECEIVED (send()), 3: LOADING, 4: DONE
-            if ( requests[i].readyState === 2 || requests[i].readyState === 3 ) {
+            if ( requests[i].readyState !== 4 ) {
                 requests[i].abort();
             }
         }

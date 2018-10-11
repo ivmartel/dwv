@@ -1311,7 +1311,7 @@ dwv.App = function ()
     function handleAbort(error)
     {
         // log
-        if ( error.message ) {
+        if ( error &&  error.message ) {
             console.warn(error.message);
         }
         else {
