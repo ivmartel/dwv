@@ -6,6 +6,7 @@ var JSZip = JSZip || {};
 
 /**
  * ZIP data loader.
+ * @constructor
  */
 dwv.io.ZipLoader = function ()
 {

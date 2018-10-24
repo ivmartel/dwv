@@ -351,8 +351,8 @@ dwv.DrawController = function (drawDiv)
                 }
                 // get details (non konva vars)
                 drawingsDetails[ group.id() ] = {
-                    "textExpr": encodeURIComponent(texts[0].textExpr),
-                    "longText": encodeURIComponent(texts[0].longText),
+                    "textExpr": texts[0].textExpr,
+                    "longText": texts[0].longText,
                     "quant": texts[0].quant
                 };
             }

@@ -30,8 +30,6 @@ dwv.App = function ()
     var containerDivId = null;
     // Display window scale
     var windowScale = 1;
-    // Fit display to window flag
-    var fitToWindow = false;
     // main scale
     var scale = 1;
     // zoom center
@@ -328,7 +326,7 @@ dwv.App = function ()
             box.addEventListener("dragleave", onDragLeave);
             box.addEventListener("drop", onDrop);
             // initial size
-            var size = dwv.gui.getWindowSize();
+            var size = this.getLayerContainerSize();
             var dropBoxSize = 2 * size.height / 3;
             box.setAttribute("style","width:"+dropBoxSize+"px;height:"+dropBoxSize+"px");
         }
@@ -352,16 +350,34 @@ dwv.App = function ()
             console.log("Not loading url from address since skipLoadUrl is defined.");
         }
 
-        // align layers when the window is resized
-        if ( config.fitToWindow ) {
-            fitToWindow = true;
-            window.onresize = this.onResize;
-        }
+        // listen to window resize
+        window.onresize = this.onResize;
 
         // default character set
         if ( typeof config.defaultCharacterSet !== "undefined" ) {
             defaultCharacterSet = config.defaultCharacterSet;
         }
+    };
+
+    /**
+     * Get the size of the layer container div.
+     * @return {width, height} The width and height of the div.
+     */
+    this.getLayerContainerSize = function () {
+      var ldiv = self.getElement("layerContainer");
+      var div = ldiv.parentNode;
+      // remove the height of other elements of the container div
+      var height = div.offsetHeight;
+      var kids = div.children;
+      for (var i = 0; i < kids.length; ++i) {
+        if (kids[i].className !== "layerContainer") {
+          var styles = window.getComputedStyle(kids[i]);
+          var margin = parseFloat(styles.getPropertyValue('margin-top'), 10) +
+               parseFloat(styles.getPropertyValue('margin-bottom'), 10);
+          height -= (kids[i].offsetHeight + margin);
+        }
+      }
+      return { 'width': div.offsetWidth, 'height': height };
     };
 
     /**
@@ -611,7 +627,8 @@ dwv.App = function ()
         var numberOfImages = data.length;
         isMonoSliceData = (numberOfImages === 1 &&
             firstName.split('.').pop().toLowerCase() !== "zip" &&
-            !dwv.utils.endsWith(firstName, "DICOMDIR"));
+            !dwv.utils.endsWith(firstName, "DICOMDIR") &&
+            !dwv.utils.endsWith(firstName, ".dcmdir") );
         // set IO
         loader.setDefaultCharacterSet(defaultCharacterSet);
         loader.onload = function (data) {
@@ -969,7 +986,7 @@ dwv.App = function ()
      */
     this.onResize = function (/*event*/)
     {
-        self.fitToSize(dwv.gui.getWindowSize());
+        self.fitToSize(self.getLayerContainerSize());
     };
 
     /**
@@ -1039,7 +1056,8 @@ dwv.App = function ()
         var state = new dwv.State();
         // add href to link (html5)
         var element = self.getElement("download-state");
-        element.href = "data:application/json," + state.toJSON(self);
+        var blob = new Blob([state.toJSON(self)], {type: 'application/json'});
+        element.href = window.URL.createObjectURL(blob);
     };
 
     /**
@@ -1352,14 +1370,8 @@ dwv.App = function ()
             drawController.create(dataWidth, dataHeight);
         }
         // resize app
-        if ( fitToWindow ) {
-            self.fitToSize( dwv.gui.getWindowSize() );
-        }
-        else {
-            self.fitToSize( {
-                'width': self.getElement("layerContainer").offsetWidth,
-                'height': self.getElement("layerContainer").offsetHeight } );
-        }
+        self.fitToSize(self.getLayerContainerSize());
+
         self.resetLayout();
     }
 

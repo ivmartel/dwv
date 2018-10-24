@@ -114,7 +114,7 @@ dwv.image.WindowLevel = function (center, width)
 
     /**
      * Apply the window level on an input value.
-     * @param {Number} The value to rescale as an integer.
+     * @param {Number} value The value to rescale as an integer.
      * @return {Number} The leveled value, in the
      *  [ymin, ymax] range (default [0,255]).
      */
@@ -833,7 +833,7 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
         for ( var j = 0; j < windowCenter.length; ++j) {
             var center = parseFloat( windowCenter[j], 10 );
             var width = parseFloat( windowWidth[j], 10 );
-            if ( center && width ) {
+            if ( center && width && width !== 0 ) {
                 name = "";
                 if ( windowCWExplanation ) {
                     name = dwv.dicom.cleanString(windowCWExplanation[j]);
@@ -845,6 +845,9 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
                     "wl": [new dwv.image.WindowLevel(center, width)],
                     "name": name,
                     "perslice": true};
+            }
+            if (width === 0) {
+                console.warn("Zero window width found in DICOM.");
             }
         }
     }
