@@ -755,12 +755,12 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     offset = metaWriter.writeDataElement(fmigl, offset, false);
     // write meta
     for ( var j = 0, lenj = metaElements.length; j < lenj; ++j ) {
-        checkUnkwownVR(metaElements[j]);
+        dwv.dicom.checkUnkwownVR(metaElements[j]);
         offset = metaWriter.writeDataElement(metaElements[j], offset, false);
     }
     // write non meta
     for ( var k = 0, lenk = rawElements.length; k < lenk; ++k ) {
-        checkUnkwownVR(rawElements[k]);
+        dwv.dicom.checkUnkwownVR(rawElements[k]);
         offset = dataWriter.writeDataElement(rawElements[k], offset, isImplicit);
     }
 
@@ -771,7 +771,8 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
 /**
  * Fix for broken DICOM elements: Replace "UN" with correct VR if the element exists in dictionary 
  */
-function checkUnkwownVR(element) {
+dwv.dicom.checkUnkwownVR = function (element)
+{
     var dict = dwv.dicom.dictionary;
     if (element.vr == "UN") {
         if ( typeof dict[element.tag.group] !== "undefined" && typeof dict[element.tag.group][element.tag.element] !== "undefined" ) {
