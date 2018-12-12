@@ -304,7 +304,7 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
             // use the first list
             var urls = list[0][0];
             // append root url
-            var rootUrl = dicomDirUrl.substr( 0, (dicomDirUrl.length - "DICOMDIR".length - 1 ) );
+            var rootUrl = dwv.utils.getRootPath(dicomDirUrl);
             var fullUrls = [];
             for ( var i = 0; i < urls.length; ++i ) {
                 fullUrls.push( rootUrl + "/" + urls[i]);
@@ -317,7 +317,9 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
     };
 
     // check if DICOMDIR case
-    if ( ioArray.length === 1 && dwv.utils.endsWith(ioArray[0], "DICOMDIR") ) {
+    if ( ioArray.length === 1 &&
+        (dwv.utils.endsWith(ioArray[0], "DICOMDIR") ||
+         dwv.utils.endsWith(ioArray[0], ".dcmdir") ) ) {
         internalDicomDirLoad(ioArray[0]);
     } else {
         internalUrlsLoad(ioArray);

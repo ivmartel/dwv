@@ -1,4 +1,4 @@
-/*! dwv 0.24.0 2018-08-24 22:42:55 */
+/*! dwv 0.25.2 2018-10-08 23:41:22 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -89,8 +89,6 @@ dwv.App = function ()
     var containerDivId = null;
     // Display window scale
     var windowScale = 1;
-    // Fit display to window flag
-    var fitToWindow = false;
     // main scale
     var scale = 1;
     // zoom center
@@ -387,7 +385,7 @@ dwv.App = function ()
             box.addEventListener("dragleave", onDragLeave);
             box.addEventListener("drop", onDrop);
             // initial size
-            var size = dwv.gui.getWindowSize();
+            var size = this.getLayerContainerSize();
             var dropBoxSize = 2 * size.height / 3;
             box.setAttribute("style","width:"+dropBoxSize+"px;height:"+dropBoxSize+"px");
         }
@@ -411,16 +409,34 @@ dwv.App = function ()
             console.log("Not loading url from address since skipLoadUrl is defined.");
         }
 
-        // align layers when the window is resized
-        if ( config.fitToWindow ) {
-            fitToWindow = true;
-            window.onresize = this.onResize;
-        }
+        // listen to window resize
+        window.onresize = this.onResize;
 
         // default character set
         if ( typeof config.defaultCharacterSet !== "undefined" ) {
             defaultCharacterSet = config.defaultCharacterSet;
         }
+    };
+
+    /**
+     * Get the size of the layer container div.
+     * @return {width, height} The width and height of the div.
+     */
+    this.getLayerContainerSize = function () {
+      var ldiv = self.getElement("layerContainer");
+      var div = ldiv.parentNode;
+      // remove the height of other elements of the container div
+      var height = div.offsetHeight;
+      var kids = div.children;
+      for (var i = 0; i < kids.length; ++i) {
+        if (kids[i].className !== "layerContainer") {
+          var styles = window.getComputedStyle(kids[i]);
+          var margin = parseFloat(styles.getPropertyValue('margin-top'), 10) +
+               parseFloat(styles.getPropertyValue('margin-bottom'), 10);
+          height -= (kids[i].offsetHeight + margin);
+        }
+      }
+      return { 'width': div.offsetWidth, 'height': height };
     };
 
     /**
@@ -669,7 +685,8 @@ dwv.App = function ()
         // TODO: supposing multi-slice for zip files, could not be...
         isMonoSliceData = (data.length === 1 &&
             firstName.split('.').pop().toLowerCase() !== "zip" &&
-            !dwv.utils.endsWith(firstName, "DICOMDIR"));
+            !dwv.utils.endsWith(firstName, "DICOMDIR") &&
+            !dwv.utils.endsWith(firstName, ".dcmdir") );
         // set IO
         loader.setDefaultCharacterSet(defaultCharacterSet);
         loader.onload = function (data) {
@@ -1027,7 +1044,7 @@ dwv.App = function ()
      */
     this.onResize = function (/*event*/)
     {
-        self.fitToSize(dwv.gui.getWindowSize());
+        self.fitToSize(self.getLayerContainerSize());
     };
 
     /**
@@ -1417,14 +1434,8 @@ dwv.App = function ()
             drawController.create(dataWidth, dataHeight);
         }
         // resize app
-        if ( fitToWindow ) {
-            self.fitToSize( dwv.gui.getWindowSize() );
-        }
-        else {
-            self.fitToSize( {
-                'width': self.getElement("layerContainer").offsetWidth,
-                'height': self.getElement("layerContainer").offsetHeight } );
-        }
+        self.fitToSize(self.getLayerContainerSize());
+
         self.resetLayout();
     }
 
@@ -3588,7 +3599,7 @@ dwv.dicom = dwv.dicom || {};
  * Get the version of the library.
  * @return {String} The version of the library.
  */
-dwv.getVersion = function () { return "0.24.0"; };
+dwv.getVersion = function () { return "0.25.2"; };
 
 /**
  * Clean string: trim and remove ending.
@@ -10652,14 +10663,6 @@ dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
- * Get the size of the image display window.
- */
-dwv.gui.base.getWindowSize = function ()
-{
-    return { 'width': window.innerWidth, 'height': window.innerHeight - 147 };
-};
-
-/**
  * Ask some text to the user.
  * @param {String} message Text to display to the user.
  * @param {String} defaultText Default value displayed in the text input field.
@@ -16827,7 +16830,7 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
         for ( var j = 0; j < windowCenter.length; ++j) {
             var center = parseFloat( windowCenter[j], 10 );
             var width = parseFloat( windowWidth[j], 10 );
-            if ( center && width ) {
+            if ( center && width && width !== 0 ) {
                 name = "";
                 if ( windowCWExplanation ) {
                     name = dwv.dicom.cleanString(windowCWExplanation[j]);
@@ -16839,6 +16842,9 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
                     "wl": [new dwv.image.WindowLevel(center, width)],
                     "name": name,
                     "perslice": true};
+            }
+            if (width === 0) {
+                console.warn("Zero window width found in DICOM.");
             }
         }
     }
@@ -18438,7 +18444,7 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
             // use the first list
             var urls = list[0][0];
             // append root url
-            var rootUrl = dicomDirUrl.substr( 0, (dicomDirUrl.length - "DICOMDIR".length - 1 ) );
+            var rootUrl = dwv.utils.getRootPath(dicomDirUrl);
             var fullUrls = [];
             for ( var i = 0; i < urls.length; ++i ) {
                 fullUrls.push( rootUrl + "/" + urls[i]);
@@ -18451,7 +18457,9 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
     };
 
     // check if DICOMDIR case
-    if ( ioArray.length === 1 && dwv.utils.endsWith(ioArray[0], "DICOMDIR") ) {
+    if ( ioArray.length === 1 &&
+        (dwv.utils.endsWith(ioArray[0], "DICOMDIR") ||
+         dwv.utils.endsWith(ioArray[0], ".dcmdir") ) ) {
         internalDicomDirLoad(ioArray[0]);
     } else {
         internalUrlsLoad(ioArray);
@@ -26729,6 +26737,16 @@ dwv.utils.createDefaultReplaceFormat = function (values)
         res += "{v"+j+"}";
     }
     return res;
+};
+
+/**
+ * Get the root of an input path.
+ * @param {String} path The input path
+ * @return {String} The input path without its last part.
+ * @note Splits using `/` as separator.
+ */
+dwv.utils.getRootPath = function (path) {
+  return path.split('/').slice(0, -1).join('/');
 };
 
 // namespaces
