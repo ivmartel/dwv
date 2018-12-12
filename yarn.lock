@@ -2769,14 +2769,9 @@ qs@~6.5.1:
   version "6.5.1"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.1.tgz#349cdf6eef89ec45c12d7d5eb3fc0c870343a6d8"
 
-querystring@0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/querystring/-/querystring-0.2.0.tgz#b209849203bb25df820da756e747005878521620"
-
-qunit@~2.7.1:
-  version "2.7.1"
-  resolved "https://registry.yarnpkg.com/qunit/-/qunit-2.7.1.tgz#ab93d322e46d8457d52fe4fa49d76da8cc476fec"
-  integrity sha512-ePeNs/CVL8coOWxnjxQAp9mCvRJybEQw3rwJe1TUClL+WrIcaZkLeW7VxHWtshn0L0ZtY0y80JqC7+po7330Ng==
+qunit@~2.8.0:
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/qunit/-/qunit-2.8.0.tgz#007474727cdba323c35f9526e21c0687f8ea04b3"
   dependencies:
     commander "2.12.2"
     exists-stat "1.0.0"
