@@ -19,7 +19,7 @@
     "i18next": "~12.1.0",
     "i18next-browser-languagedetector": "~2.2.4",
     "i18next-xhr-backend": "~1.5.1",
-    "jszip": "~3.1.3",
+    "jszip": "~3.1.5",
     "konva": "~2.5.1",
     "magic-wand-js": "~1.0.0"
   },
