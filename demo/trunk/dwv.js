@@ -1,4 +1,4 @@
-/*! dwv 0.26.0-beta 2018-12-13 22:38:15 */
+/*! dwv 0.26.0-beta 2018-12-13 22:43:05 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
