@@ -1,4 +1,4 @@
-/*! dwv 0.26.0-beta 2019-01-07 21:14:42 */
+/*! dwv 0.26.0-beta 2019-01-16 21:20:35 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -16606,6 +16606,11 @@ dwv.image.View.prototype.getWindowLevelMinMax = function ()
     var min = range.min;
     var max = range.max;
     var width = max - min;
+    // full black / white images, defaults to 1.
+    if ( width < 1 ) {
+        console.warn("Zero or negative width, defaulting to one.");
+        width = 1;
+    }
     var center = min + width/2;
     return new dwv.image.WindowLevel(center, width);
 };
