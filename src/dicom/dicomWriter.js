@@ -782,7 +782,7 @@ dwv.dicom.checkUnkwownVR = function (element)
             }
         }
     }
-}
+};
 
 /**
  * Get a DICOM element from its tag name (value set separatly).
