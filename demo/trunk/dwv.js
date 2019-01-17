@@ -1,4 +1,4 @@
-/*! dwv 0.26.0-beta 2019-01-16 21:20:35 */
+/*! dwv 0.26.0-beta 2019-01-17 22:55:58 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -5787,15 +5787,33 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     offset = metaWriter.writeDataElement(fmigl, offset, false);
     // write meta
     for ( var j = 0, lenj = metaElements.length; j < lenj; ++j ) {
+        dwv.dicom.checkUnkwownVR(metaElements[j]);
         offset = metaWriter.writeDataElement(metaElements[j], offset, false);
     }
     // write non meta
     for ( var k = 0, lenk = rawElements.length; k < lenk; ++k ) {
+        dwv.dicom.checkUnkwownVR(rawElements[k]);
         offset = dataWriter.writeDataElement(rawElements[k], offset, isImplicit);
     }
 
     // return
     return buffer;
+};
+
+/**
+ * Fix for broken DICOM elements: Replace "UN" with correct VR if the element exists in dictionary 
+ */
+dwv.dicom.checkUnkwownVR = function (element)
+{
+    var dict = dwv.dicom.dictionary;
+    if (element.vr == "UN") {
+        if ( typeof dict[element.tag.group] !== "undefined" && typeof dict[element.tag.group][element.tag.element] !== "undefined" ) {
+            if (element.vr != dict[element.tag.group][element.tag.element][0]) {
+                element.vr = dict[element.tag.group][element.tag.element][0];
+                console.log("Element " + element.tag.group + " " + element.tag.element +" VR changed from UN to " + element.vr);
+            }
+        }
+    }
 };
 
 /**
