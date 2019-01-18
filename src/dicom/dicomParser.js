@@ -1279,6 +1279,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
 {
     var offset = 0;
     var implicit = false;
+    var syntax = "";
     // default readers
     var metaReader = new dwv.dicom.DataReader(buffer);
     var dataReader = new dwv.dicom.DataReader(buffer);
@@ -1287,28 +1288,67 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     offset = 128;
     var magicword = metaReader.readString( offset, 4 );
     offset += 4 * Uint8Array.BYTES_PER_ELEMENT;
-    if(magicword !== "DICM")
+    if(magicword !== "DICM") // Check for Dicom file without metadata: attempt to detect transfer syntax
     {
-        throw new Error("Not a valid DICOM file (no magic DICM word found)");
+        offset = 0;
+        dataElement = this.readDataElement(dataReader, offset, implicit);  // read first element
+        if ((dataElement.tag.group != "0x0008") && (dataElement.tag.group != "0x0800")) {  // check character set
+            throw new Error("Not a valid DICOM file (no magic DICM word found and first element not in 0x0008 group)");
+        }
+        var vr0 = dataElement.vr.charCodeAt(0);
+        var vr1 = dataElement.vr.charCodeAt(0);
+        implicit = (vr0 >= 65 && vr0 <= 90 && vr1 >= 65 && vr1 <= 90) ? false : true;  // reasonable assumption: 2 uppercase characters = implicit
+        if (dataElement.tag.group == "0x0800") { // big endian
+            if (implicit) { // ImplicitVRBigEndian
+                throw new Error("Not a valid DICOM file (no magic DICM word found and implicit VR big endian detected)");
+            }
+            else { // ExplicitVRBigEndian
+                implicit = false;
+                syntax = "1.2.840.10008.1.2.2";
+            }
+
+        }
+        else { // little endian
+            if (implicit) { // ImplicitVRLittleEndian
+                implicit = true;
+                syntax = "1.2.840.10008.1.2";
+            }
+            else { // ExplicitVRLittleEndian
+                implicit = false;
+                syntax = "1.2.840.10008.1.2.1";
+            }
+        }
+        dataElement.tag.group = "0x0002";        
+        dataElement.tag.element = "0x0010";
+        dataElement.tag.name = "x00020010";
+        dataElement.tag.endOffset = 4;
+        dataElement.vr = "UI";
+        dataElement.value = [syntax + " "];     // Even length
+        dataElement.vl = dataElement.value[0].length;
+        dataElement.endOffset = dataElement.startOffset + dataElement.vl;
+        this.dicomElements[dataElement.tag.name] = dataElement;
+        offset = 0;
     }
+    else {  // metadata parsing
 
-    // 0x0002, 0x0000: FileMetaInformationGroupLength
-    var dataElement = this.readDataElement(metaReader, offset, false);
-    offset = dataElement.endOffset;
-    // store the data element
-    this.dicomElements[dataElement.tag.name] = dataElement;
-    // get meta length
-    var metaLength = parseInt(dataElement.value[0], 10);
-
-    // meta elements
-    var metaEnd = offset + metaLength;
-    while( offset < metaEnd )
-    {
-        // get the data element
-        dataElement = this.readDataElement(metaReader, offset, false);
+        // 0x0002, 0x0000: FileMetaInformationGroupLength
+        var dataElement = this.readDataElement(metaReader, offset, false);
         offset = dataElement.endOffset;
         // store the data element
         this.dicomElements[dataElement.tag.name] = dataElement;
+        // get meta length
+        var metaLength = parseInt(dataElement.value[0], 10);
+
+        // meta elements
+        var metaEnd = offset + metaLength;
+        while( offset < metaEnd )
+        {
+            // get the data element
+            dataElement = this.readDataElement(metaReader, offset, false);
+            offset = dataElement.endOffset;
+            // store the data element
+            this.dicomElements[dataElement.tag.name] = dataElement;
+        }
     }
 
     // check the TransferSyntaxUID (has to be there!)
@@ -1316,7 +1356,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     {
         throw new Error("Not a valid DICOM file (no TransferSyntaxUID found)");
     }
-    var syntax = dwv.dicom.cleanString(this.dicomElements.x00020010.value[0]);
+    syntax = dwv.dicom.cleanString(this.dicomElements.x00020010.value[0]);
 
     // check support
     if (!dwv.dicom.isReadSupportedTransferSyntax(syntax)) {
