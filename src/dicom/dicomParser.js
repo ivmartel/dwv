@@ -1280,6 +1280,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     var offset = 0;
     var implicit = false;
     var syntax = "";
+    var dataElement = null;
     // default readers
     var metaReader = new dwv.dicom.DataReader(buffer);
     var dataReader = new dwv.dicom.DataReader(buffer);
@@ -1332,7 +1333,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     else {  // metadata parsing
 
         // 0x0002, 0x0000: FileMetaInformationGroupLength
-        var dataElement = this.readDataElement(metaReader, offset, false);
+        dataElement = this.readDataElement(metaReader, offset, false);
         offset = dataElement.endOffset;
         // store the data element
         this.dicomElements[dataElement.tag.name] = dataElement;
