@@ -1,4 +1,4 @@
-/*! dwv 0.26.0-beta 2019-01-17 22:57:34 */
+/*! dwv 0.26.0-beta 2019-01-18 20:58:38 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -1388,10 +1388,9 @@ dwv.App = function ()
     function handleAbort(error)
     {
         // log
-        if ( error.message ) {
+        if ( error && error.message ) {
             console.warn(error.message);
-        }
-        else {
+        } else {
             console.warn("Abort called.");
         }
         // stop progress
@@ -17788,6 +17787,12 @@ dwv.io.RawImageLoader = function ()
     var self = this;
 
     /**
+     * if abort is triggered, all image.onload callbacks have to be cancelled
+     * @type {boolean}
+     */
+    var aborted = false;
+
+    /**
      * Set the loader options.
      * @param {Object} opt The input options.
      */
@@ -17826,12 +17831,15 @@ dwv.io.RawImageLoader = function ()
      * @param {Number} index The data index.
      */
     this.load = function ( dataUri, origin, index ) {
+        aborted = false;
         // create a DOM image
         var image = new Image();
         // triggered by ctx.drawImage
         image.onload = function (/*event*/) {
             try {
-                self.onload( dwv.image.getViewFromDOMImage(this) );
+                if(!aborted){
+                    self.onload( dwv.image.getViewFromDOMImage(this) );
+                }
                 self.onloadend();
             } catch (error) {
                 self.onerror(error);
@@ -17849,6 +17857,7 @@ dwv.io.RawImageLoader = function ()
      * Abort load. TODO...
      */
     this.abort = function () {
+        aborted = true;
         self.onabort();
     };
 
@@ -18272,7 +18281,7 @@ dwv.io.UrlsLoader = function ()
         // abort requests
         for ( var i = 0; i < requests.length; ++i ) {
             // 0: UNSENT, 1: OPENED, 2: HEADERS_RECEIVED (send()), 3: LOADING, 4: DONE
-            if ( requests[i].readyState === 2 || requests[i].readyState === 3 ) {
+            if ( requests[i].readyState !== 4 ) {
                 requests[i].abort();
             }
         }
