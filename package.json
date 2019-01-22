@@ -43,9 +43,9 @@
     "start": "grunt start",
     "start-cmd": "grunt start-cmd",
     "dev": "grunt dev",
-    "test": "grunt test --verbose",
-    "qunit": "grunt qunit --verbose",
-    "build": "grunt build --verbose",
-    "doc": "grunt doc --verbose"
+    "test": "grunt test",
+    "qunit": "grunt qunit",
+    "build": "grunt build",
+    "doc": "grunt doc"
   }
 }
