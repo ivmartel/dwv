@@ -78,35 +78,9 @@ var dataImg = [
     }
     ];
 
-function setDwv(obj)
-{
-    // update page links
-    var elements = document.getElementsByClassName('dwvlink');
-    var tmp;
-    var url;
-    for (var i = 0; i < elements.length; ++i) {
-        url = getDwvBaseUrl(obj.value)
-        tmp = elements[i].href.split('?');
-        if ( tmp.length === 2 ) {
-            url += '?'+tmp[1];
-        }
-        elements[i].href = url;
-    }
-}
-function getDwvBaseUrl(root)
-{
-    return root + "/index.html";
-}
 function getDwvUrl(uri)
 {
-    var root = null;
-    if( document.getElementById('select-dwv') ) {
-        var select = document.getElementById('select-dwv');
-    console.log("got select!", select);
-        root = select.value;
-        console.log("root: ", root);
-    }
-    var url = getDwvBaseUrl(root);
+    var url = 'viewer.html';
     if ( typeof uri !== "undefined" ) {
         url += "?input="+encodeURIComponent(uri);
     }
@@ -154,7 +128,6 @@ function createAndPutHtml(data, id)
 window.onload = function() {
     createAndPutHtml(dataDicom, "uldatadicom");
     createAndPutHtml(dataImg, "uldataimg");
-    document.getElementById("empty-launch").href = getDwvUrl();
 };
 </script>
 </head>
@@ -167,14 +140,6 @@ window.onload = function() {
 
 <p>These are a few data example that are displayed as they could
 be on a web interface to a PACS system.</p>
-
-<div data-role="fieldcontain">
-<label for="select-dwv">Path to the viewer:</label>
-<input type="text" id="select-dwv" value="/viewer" onChange="setDwv(this);"/>
-</div>
-
-<p>Click <a href="#" id="empty-launch" class="dwvlink">here</a> for a direct launch
-or on a list item to launch the viewer with the selected data.</p>
 
 <ul class="listview" data-role="listview" data-inset="true" id="uldatadicom"></ul>
 
