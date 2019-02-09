@@ -18,7 +18,7 @@
   "dependencies": {
     "i18next": "~12.1.0",
     "i18next-browser-languagedetector": "~2.2.4",
-    "i18next-xhr-backend": "~1.5.1",
+    "i18next-xhr-backend": "~2.0.0",
     "jszip": "~3.1.5",
     "konva": "~2.6.0",
     "magic-wand-js": "~1.0.0"
