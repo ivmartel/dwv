@@ -43,8 +43,8 @@
     "start": "grunt start",
     "start-cmd": "grunt start-cmd",
     "dev": "grunt dev",
+    "lint": "grunt lint",
     "test": "grunt test",
-    "qunit": "grunt qunit",
     "build": "grunt build",
     "doc": "grunt doc"
   }

@@ -123,7 +123,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-qunit-istanbul');
 
     // tasks
-    grunt.registerTask('test', ['jshint', 'qunit']);
+    grunt.registerTask('lint', ['jshint']);
+    grunt.registerTask('test', ['qunit']);
     grunt.registerTask('start', ['connect', 'watch:main']);
     grunt.registerTask('start-cmd', ['watch:cmd']);
     grunt.registerTask('dev', ['watch:dev']);

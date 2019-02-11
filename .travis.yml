@@ -17,8 +17,9 @@ after_script: greenkeeper-lockfile-upload
 
 # main
 script:
-- yarn run build
+- yarn run lint
 - yarn run test
+- yarn run build
 
 after_success:
 # send coverage to coveralls

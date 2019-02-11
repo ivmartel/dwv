@@ -31,6 +31,9 @@ yarn run start-cmd
 # watch for changes and copy build (to be connected with a demo viewer)
 yarn run dev
 
+# run linting
+yarn run lint
+
 # run unit tests
 yarn run test
 
