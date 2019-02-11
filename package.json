@@ -18,7 +18,7 @@
   "dependencies": {
     "i18next": "~12.1.0",
     "i18next-browser-languagedetector": "~3.0.0",
-    "i18next-xhr-backend": "~1.5.1",
+    "i18next-xhr-backend": "~2.0.0",
     "jszip": "~3.1.5",
     "konva": "~2.6.0",
     "magic-wand-js": "~1.0.0"
@@ -40,12 +40,11 @@
     "qunit": "~2.9.1"
   },
   "scripts": {
-    "start": "grunt start",
-    "start-cmd": "grunt start-cmd",
-    "dev": "grunt dev",
+    "lint": "grunt lint",
     "test": "grunt test",
-    "qunit": "grunt qunit",
+    "test-ci": "grunt test-ci",
     "build": "grunt build",
-    "doc": "grunt doc"
+    "doc": "grunt doc",
+	"dev": "grunt dev"
   }
 }
