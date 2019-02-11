@@ -40,12 +40,11 @@
     "qunit": "~2.9.1"
   },
   "scripts": {
-    "start": "grunt start",
-    "start-cmd": "grunt start-cmd",
-    "dev": "grunt dev",
     "lint": "grunt lint",
     "test": "grunt test",
+    "test-ci": "grunt test-ci",
     "build": "grunt build",
-    "doc": "grunt doc"
+    "doc": "grunt doc",
+	"dev": "grunt dev"
   }
 }

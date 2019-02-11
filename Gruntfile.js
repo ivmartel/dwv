@@ -77,7 +77,7 @@ module.exports = function(grunt) {
             }
         },
         watch: {
-            main: {
+            lint: {
                 files: ['**/*.js', '!**/node_modules/**'],
                 tasks: ['jshint'],
                 options: {
@@ -85,14 +85,7 @@ module.exports = function(grunt) {
                     livereload: true
                 }
             },
-            cmd: {
-                files: ['**/*.js', '!**/node_modules/**'],
-                tasks: ['test'],
-                options: {
-                    spawn: false
-                }
-            },
-            dev: {
+            build: {
                 files: ['**/*.js', '!**/node_modules/**'],
                 tasks: ['concat', 'copy'],
                 options: {
@@ -124,10 +117,9 @@ module.exports = function(grunt) {
 
     // tasks
     grunt.registerTask('lint', ['jshint']);
-    grunt.registerTask('test', ['qunit']);
-    grunt.registerTask('start', ['connect', 'watch:main']);
-    grunt.registerTask('start-cmd', ['watch:cmd']);
-    grunt.registerTask('dev', ['watch:dev']);
+    grunt.registerTask('test', ['connect', 'watch:lint']);
+    grunt.registerTask('test-ci', ['qunit']);
     grunt.registerTask('build', ['concat', 'uglify']);
     grunt.registerTask('doc', ['jsdoc']);
+    grunt.registerTask('dev', ['watch:build']);
 };

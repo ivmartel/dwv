@@ -22,19 +22,10 @@ And for those who want to support the dwv development:
 # install dependencies
 yarn install
 
-# serve with test hot reload at localhost:8080
-yarn run start
-
-# watch for changes and run command line tests
-yarn run start-cmd
-
-# watch for changes and copy build (to be connected with a demo viewer)
-yarn run dev
-
 # run linting
 yarn run lint
 
-# run unit tests
+# run unit tests with hot reload at localhost:8080
 yarn run test
 
 # create release files
@@ -42,6 +33,10 @@ yarn run build
 
 # create documentation
 yarn run doc
+
+# watch for changes and copy build (to be connected with a demo viewer)
+yarn run dev
+
 ```
 
 <a name="footnote1">1</a>: Certification refers to official medical software certification that are issued by the FDA or EU Notified Bodies. The sentence here serves as a reminder that the Dicom Web Viewer is not ceritifed, and comes with no warranties (and no possible liability of its authors) as stated in the [license](license.txt). To learn more about standards used in certification, see the [wikipedia Medical software](https://en.wikipedia.org/wiki/Medical_software) page. If you have additional questions, please [open an issue](https://www.github.com/ivmartel/dwv/issues).
