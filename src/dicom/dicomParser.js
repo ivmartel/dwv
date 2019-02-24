@@ -641,6 +641,16 @@ dwv.dicom.isJpeg2000TransferSyntax = function (syntax)
 };
 
 /**
+ * Tell if a given syntax is a RLE (Run-length encoding) one.
+ * @param {String} syntax The transfer syntax to test.
+ * @return {Boolean} True if a RLE syntax.
+ */
+dwv.dicom.isRleTransferSyntax = function (syntax)
+{
+    return syntax.match(/1.2.840.10008.1.2.5/) !== null;
+};
+
+/**
  * Tell if a given syntax needs decompression.
  * @param {String} syntax The transfer syntax to test.
  * @return {String} The name of the decompression algorithm.
@@ -657,6 +667,9 @@ dwv.dicom.getSyntaxDecompressionName = function (syntax)
     else if ( dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
         algo = "jpeg-lossless";
     }
+    else if ( dwv.dicom.isRleTransferSyntax(syntax) ) {
+        algo = "rle";
+    }
     return algo;
 };
 
@@ -672,14 +685,14 @@ dwv.dicom.isReadSupportedTransferSyntax = function (syntax) {
     // "1.2.840.10008.1.2.4.100": MPEG2 Image Compression
     // dwv.dicom.isJpegRetiredTransferSyntax(syntax): non supported JPEG
     // dwv.dicom.isJpeglsTransferSyntax(syntax): JPEG-LS
-    // "1.2.840.10008.1.2.5": RLE (lossless)
 
     return( syntax === "1.2.840.10008.1.2" || // Implicit VR - Little Endian
         syntax === "1.2.840.10008.1.2.1" || // Explicit VR - Little Endian
         syntax === "1.2.840.10008.1.2.2" || // Explicit VR - Big Endian
         dwv.dicom.isJpegBaselineTransferSyntax(syntax) || // JPEG baseline
         dwv.dicom.isJpegLosslessTransferSyntax(syntax) || // JPEG Lossless
-        dwv.dicom.isJpeg2000TransferSyntax(syntax) ); // JPEG 2000
+        dwv.dicom.isJpeg2000TransferSyntax(syntax) || // JPEG 2000
+        dwv.dicom.isRleTransferSyntax(syntax) ); // RLE
 };
 
 /**
@@ -747,7 +760,7 @@ dwv.dicom.getTransferSyntaxName = function (syntax)
         name = "MPEG2";
     }
     // RLE (lossless)
-    else if( syntax === "1.2.840.10008.1.2.5" ) {
+    else if( dwv.dicom.isRleTransferSyntax(syntax) ) {
         name = "RLE";
     }
     // return

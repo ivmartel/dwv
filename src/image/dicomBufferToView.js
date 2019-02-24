@@ -65,13 +65,27 @@ dwv.image.DicomBufferToView = function ()
         };
 
         if ( needDecompression ) {
+            // gather pixel buffer meta data
             var bitsAllocated = dicomParser.getRawDicomElements().x00280100.value[0];
             var pixelRepresentation = dicomParser.getRawDicomElements().x00280103.value[0];
-            var isSigned = (pixelRepresentation === 1);
             var pixelMeta = {
                 "bitsAllocated": bitsAllocated,
-                "isSigned": isSigned
+                "isSigned": (pixelRepresentation === 1)
             };
+            var columnsElement = dicomParser.getRawDicomElements().x00280011;
+            var rowsElement = dicomParser.getRawDicomElements().x00280010;
+            if (typeof columnsElement !== "undefined" && typeof rowsElement !== "undefined") {
+                pixelMeta.sliceSize = columnsElement.value[0] * rowsElement.value[0];
+            }
+            var samplesPerPixelElement = dicomParser.getRawDicomElements().x00280002;
+            if (typeof samplesPerPixelElement !== "undefined") {
+                pixelMeta.samplesPerPixel = samplesPerPixelElement.value[0];
+            }
+            var planarConfigurationElement = dicomParser.getRawDicomElements().x00280006;
+            if (typeof planarConfigurationElement !== "undefined") {
+                pixelMeta.planarConfigurationElement = planarConfigurationElement.value[0];
+            }
+
             var nFrames = pixelBuffer.length;
 
             if (!pixelDecoder){
