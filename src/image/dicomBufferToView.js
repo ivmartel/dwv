@@ -68,6 +68,10 @@ dwv.image.DicomBufferToView = function ()
             var bitsAllocated = dicomParser.getRawDicomElements().x00280100.value[0];
             var pixelRepresentation = dicomParser.getRawDicomElements().x00280103.value[0];
             var isSigned = (pixelRepresentation === 1);
+            var pixelMeta = {
+                "bitsAllocated": bitsAllocated,
+                "isSigned": isSigned
+            };
             var nFrames = pixelBuffer.length;
 
             if (!pixelDecoder){
@@ -109,14 +113,14 @@ dwv.image.DicomBufferToView = function ()
 
             // decompress synchronously the first frame to create the image
             pixelDecoder.decode(pixelBuffer[0],
-                bitsAllocated, isSigned, onDecodedFrame(0), false);
+                pixelMeta, onDecodedFrame(0), false);
 
             // decompress the possible other frames
             if ( nFrames !== 1 ) {
                 // decode (asynchronously if possible)
                 for (var f = 1; f < nFrames; ++f) {
                     pixelDecoder.decode(pixelBuffer[f],
-                        bitsAllocated, isSigned, onDecodedFrame(f));
+                        pixelMeta, onDecodedFrame(f));
                 }
             }
         }
