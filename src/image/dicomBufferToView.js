@@ -82,8 +82,8 @@ dwv.image.DicomBufferToView = function ()
                 pixelMeta.samplesPerPixel = samplesPerPixelElement.value[0];
             }
             var planarConfigurationElement = dicomParser.getRawDicomElements().x00280006;
-            if (typeof planarConfiguration !== "undefined") {
-                pixelMeta.planarConfigurationElement = planarConfigurationElement.value[0];
+            if (typeof planarConfigurationElement !== "undefined") {
+                pixelMeta.planarConfiguration = planarConfigurationElement.value[0];
             }
 
             var nFrames = pixelBuffer.length;
