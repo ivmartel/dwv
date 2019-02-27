@@ -107,16 +107,14 @@ dwv.image.SynchPixelBufferDecoder = function (algoName)
                     decodedBuffer = new Uint16Array(decoded.buffer);
                 }
             }
-        }
-        else if ( algoName === "jpeg-baseline" ) {
+        } else if ( algoName === "jpeg-baseline" ) {
             if ( !hasJpegBaselineDecoder ) {
                 throw new Error("No JPEG Baseline decoder provided");
             }
             decoder = new JpegImage();
             decoder.parse( pixelBuffer );
             decodedBuffer = decoder.getData(decoder.width,decoder.height);
-        }
-        else if( algoName === "jpeg2000" ) {
+        } else if( algoName === "jpeg2000" ) {
             if ( !hasJpeg2000Decoder ) {
                 throw new Error("No JPEG 2000 decoder provided");
             }
@@ -125,6 +123,17 @@ dwv.image.SynchPixelBufferDecoder = function (algoName)
             decoder.parse( pixelBuffer );
             // set the pixel buffer
             decodedBuffer = decoder.tiles[0].items;
+        } else if( algoName === "rle" ) {
+            // decode DICOM buffer
+            var decoder = new dwv.decoder.RleDecoder();
+            // set the pixel buffer
+            decodedBuffer = decoder.decode(
+                pixelBuffer,
+                pixelMeta.bitsAllocated,
+                pixelMeta.isSigned,
+                pixelMeta.sliceSize,
+                pixelMeta.samplesPerPixel,
+                pixelMeta.planarConfiguration );
         }
         // send events
         this.ondecoded();
