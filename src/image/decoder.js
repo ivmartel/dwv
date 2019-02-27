@@ -125,7 +125,7 @@ dwv.image.SynchPixelBufferDecoder = function (algoName)
             decodedBuffer = decoder.tiles[0].items;
         } else if( algoName === "rle" ) {
             // decode DICOM buffer
-            var decoder = new dwv.decoder.RleDecoder();
+            decoder = new dwv.decoder.RleDecoder();
             // set the pixel buffer
             decodedBuffer = decoder.decode(
                 pixelBuffer,
