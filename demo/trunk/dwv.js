@@ -1,4 +1,4 @@
-/*! dwv 0.26.0-beta 2019-03-05 22:29:29 */
+/*! dwv 0.26.0-beta 2019-03-10 00:03:03 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -4232,6 +4232,16 @@ dwv.dicom.isJpeg2000TransferSyntax = function (syntax)
 };
 
 /**
+ * Tell if a given syntax is a RLE (Run-length encoding) one.
+ * @param {String} syntax The transfer syntax to test.
+ * @return {Boolean} True if a RLE syntax.
+ */
+dwv.dicom.isRleTransferSyntax = function (syntax)
+{
+    return syntax.match(/1.2.840.10008.1.2.5/) !== null;
+};
+
+/**
  * Tell if a given syntax needs decompression.
  * @param {String} syntax The transfer syntax to test.
  * @return {String} The name of the decompression algorithm.
@@ -4248,6 +4258,9 @@ dwv.dicom.getSyntaxDecompressionName = function (syntax)
     else if ( dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
         algo = "jpeg-lossless";
     }
+    else if ( dwv.dicom.isRleTransferSyntax(syntax) ) {
+        algo = "rle";
+    }
     return algo;
 };
 
@@ -4263,14 +4276,14 @@ dwv.dicom.isReadSupportedTransferSyntax = function (syntax) {
     // "1.2.840.10008.1.2.4.100": MPEG2 Image Compression
     // dwv.dicom.isJpegRetiredTransferSyntax(syntax): non supported JPEG
     // dwv.dicom.isJpeglsTransferSyntax(syntax): JPEG-LS
-    // "1.2.840.10008.1.2.5": RLE (lossless)
 
     return( syntax === "1.2.840.10008.1.2" || // Implicit VR - Little Endian
         syntax === "1.2.840.10008.1.2.1" || // Explicit VR - Little Endian
         syntax === "1.2.840.10008.1.2.2" || // Explicit VR - Big Endian
         dwv.dicom.isJpegBaselineTransferSyntax(syntax) || // JPEG baseline
         dwv.dicom.isJpegLosslessTransferSyntax(syntax) || // JPEG Lossless
-        dwv.dicom.isJpeg2000TransferSyntax(syntax) ); // JPEG 2000
+        dwv.dicom.isJpeg2000TransferSyntax(syntax) || // JPEG 2000
+        dwv.dicom.isRleTransferSyntax(syntax) ); // RLE
 };
 
 /**
@@ -4338,7 +4351,7 @@ dwv.dicom.getTransferSyntaxName = function (syntax)
         name = "MPEG2";
     }
     // RLE (lossless)
-    else if( syntax === "1.2.840.10008.1.2.5" ) {
+    else if( dwv.dicom.isRleTransferSyntax(syntax) ) {
         name = "RLE";
     }
     // return
@@ -13584,19 +13597,17 @@ dwv.image.AsynchPixelBufferDecoder = function (script)
     /**
      * Decode a pixel buffer.
      * @param {Array} pixelBuffer The pixel buffer.
-     * @param {Number} bitsAllocated The bits allocated per element in the buffer.
-     * @param {Boolean} isSigned Is the data signed.
+     * @param {Object} pixelMeta The input meta data.
      * @param {Function} callback Callback function to handle decoded data.
      */
-    this.decode = function (pixelBuffer, bitsAllocated, isSigned, callback) {
+    this.decode = function (pixelBuffer, pixelMeta, callback) {
         // (re)set event handler
         pool.onpoolworkend = this.ondecodeend;
         pool.onworkerend = this.ondecoded;
         // create worker task
         var workerTask = new dwv.utils.WorkerTask(script, callback, {
             'buffer': pixelBuffer,
-            'bitsAllocated': bitsAllocated,
-            'isSigned': isSigned } );
+            'meta': pixelMeta } );
         // add it the queue and run it
         pool.addWorkerTask(workerTask);
     };
@@ -13635,14 +13646,13 @@ dwv.image.SynchPixelBufferDecoder = function (algoName)
     /**
      * Decode a pixel buffer.
      * @param {Array} pixelBuffer The pixel buffer.
-     * @param {Number} bitsAllocated The bits allocated per element in the buffer.
-     * @param {Boolean} isSigned Is the data signed.
+     * @param {Object} pixelMeta The input meta data.
      * @param {Function} callback Callback function to handle decoded data.
      * @external jpeg
      * @external JpegImage
      * @external JpxImage
      */
-    this.decode = function (pixelBuffer, bitsAllocated, isSigned, callback) {
+    this.decode = function (pixelBuffer, pixelMeta, callback) {
         var decoder = null;
         var decodedBuffer = null;
         if( algoName === "jpeg-lossless" ) {
@@ -13650,36 +13660,31 @@ dwv.image.SynchPixelBufferDecoder = function (algoName)
                 throw new Error("No JPEG Lossless decoder provided");
             }
             // bytes per element
-            var bpe = bitsAllocated / 8;
+            var bpe = pixelMeta.bitsAllocated / 8;
             var buf = new Uint8Array( pixelBuffer );
             decoder = new jpeg.lossless.Decoder();
             var decoded = decoder.decode(buf.buffer, 0, buf.buffer.byteLength, bpe);
-            if (bitsAllocated === 8) {
-                if (isSigned) {
+            if (pixelMeta.bitsAllocated === 8) {
+                if (pixelMeta.isSigned) {
                     decodedBuffer = new Int8Array(decoded.buffer);
-                }
-                else {
+                } else {
                     decodedBuffer = new Uint8Array(decoded.buffer);
                 }
-            }
-            else if (bitsAllocated === 16) {
-                if (isSigned) {
+            } else if (pixelMeta.bitsAllocated === 16) {
+                if (pixelMeta.isSigned) {
                     decodedBuffer = new Int16Array(decoded.buffer);
-                }
-                else {
+                } else {
                     decodedBuffer = new Uint16Array(decoded.buffer);
                 }
             }
-        }
-        else if ( algoName === "jpeg-baseline" ) {
+        } else if ( algoName === "jpeg-baseline" ) {
             if ( !hasJpegBaselineDecoder ) {
                 throw new Error("No JPEG Baseline decoder provided");
             }
             decoder = new JpegImage();
             decoder.parse( pixelBuffer );
             decodedBuffer = decoder.getData(decoder.width,decoder.height);
-        }
-        else if( algoName === "jpeg2000" ) {
+        } else if( algoName === "jpeg2000" ) {
             if ( !hasJpeg2000Decoder ) {
                 throw new Error("No JPEG 2000 decoder provided");
             }
@@ -13688,6 +13693,17 @@ dwv.image.SynchPixelBufferDecoder = function (algoName)
             decoder.parse( pixelBuffer );
             // set the pixel buffer
             decodedBuffer = decoder.tiles[0].items;
+        } else if( algoName === "rle" ) {
+            // decode DICOM buffer
+            decoder = new dwv.decoder.RleDecoder();
+            // set the pixel buffer
+            decodedBuffer = decoder.decode(
+                pixelBuffer,
+                pixelMeta.bitsAllocated,
+                pixelMeta.isSigned,
+                pixelMeta.sliceSize,
+                pixelMeta.samplesPerPixel,
+                pixelMeta.planarConfiguration );
         }
         // send events
         this.ondecoded();
@@ -13748,17 +13764,16 @@ dwv.image.PixelBufferDecoder = function (algoName)
     /**
      * Get data from an input buffer using a DICOM parser.
      * @param {Array} pixelBuffer The input data buffer.
-     * @param {Number} bitsAllocated The bits allocated per element in the buffer.
-     * @param {Boolean} isSigned Is the data signed.
+     * @param {Object} pixelMeta The input meta data.
      * @param {Object} callback The callback on the conversion.
      */
-    this.decode = function (pixelBuffer, bitsAllocated, isSigned, callback)
+    this.decode = function (pixelBuffer, pixelMeta, callback)
     {
         // set event handler
         pixelDecoder.ondecodeend = this.ondecodeend;
         pixelDecoder.ondecoded = this.ondecoded;
         // decode and call the callback
-        pixelDecoder.decode(pixelBuffer, bitsAllocated, isSigned, callback);
+        pixelDecoder.decode(pixelBuffer, pixelMeta, callback);
     };
 
     /**
@@ -13854,9 +13869,27 @@ dwv.image.DicomBufferToView = function ()
         };
 
         if ( needDecompression ) {
+            // gather pixel buffer meta data
             var bitsAllocated = dicomParser.getRawDicomElements().x00280100.value[0];
             var pixelRepresentation = dicomParser.getRawDicomElements().x00280103.value[0];
-            var isSigned = (pixelRepresentation === 1);
+            var pixelMeta = {
+                "bitsAllocated": bitsAllocated,
+                "isSigned": (pixelRepresentation === 1)
+            };
+            var columnsElement = dicomParser.getRawDicomElements().x00280011;
+            var rowsElement = dicomParser.getRawDicomElements().x00280010;
+            if (typeof columnsElement !== "undefined" && typeof rowsElement !== "undefined") {
+                pixelMeta.sliceSize = columnsElement.value[0] * rowsElement.value[0];
+            }
+            var samplesPerPixelElement = dicomParser.getRawDicomElements().x00280002;
+            if (typeof samplesPerPixelElement !== "undefined") {
+                pixelMeta.samplesPerPixel = samplesPerPixelElement.value[0];
+            }
+            var planarConfigurationElement = dicomParser.getRawDicomElements().x00280006;
+            if (typeof planarConfigurationElement !== "undefined") {
+                pixelMeta.planarConfiguration = planarConfigurationElement.value[0];
+            }
+
             var nFrames = pixelBuffer.length;
 
             if (!pixelDecoder){
@@ -13898,14 +13931,14 @@ dwv.image.DicomBufferToView = function ()
 
             // decompress synchronously the first frame to create the image
             pixelDecoder.decode(pixelBuffer[0],
-                bitsAllocated, isSigned, onDecodedFrame(0), false);
+                pixelMeta, onDecodedFrame(0), false);
 
             // decompress the possible other frames
             if ( nFrames !== 1 ) {
                 // decode (asynchronously if possible)
                 for (var f = 1; f < nFrames; ++f) {
                     pixelDecoder.decode(pixelBuffer[f],
-                        bitsAllocated, isSigned, onDecodedFrame(f));
+                        pixelMeta, onDecodedFrame(f));
                 }
             }
         }
