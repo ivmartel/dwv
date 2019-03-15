@@ -16,6 +16,30 @@ And for those who want to support the dwv development:
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=VQWYY8ZS75H3E&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
 
+## Steps to run the viewer from scratch
+
+Get the code:
+```sh
+git clone https://github.com/ivmartel/dwv.git
+```
+
+Move to its folder:
+```sh
+cd dwv
+```
+
+Install dependencies (using `yarn`, replace with `npm` if you prefer):
+```sh
+yarn install
+```
+
+Call the start script to launch the tests on a local server:
+```sh
+yarn run start
+```
+
+You can now open a browser at http://localhost:8080 and enjoy!
+
 ## Available Scripts
 
 ``` bash
