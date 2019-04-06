@@ -37,6 +37,10 @@ dwv.decoder.RleDecoder.prototype.decode = function ( buffer,
     var numberOfSegments = inputDataView.getInt32(0, true);
     // loop on segments
     var outputIndex = 0;
+    var outputIndexIncrement = 1;
+    if (planarConfiguration === 0) {
+        outputIndexIncrement = samplesPerPixel;
+    }
     var inputIndex = 0;
     for (var segment = 0; segment < numberOfSegments; ++segment) {
         // one segment per channel, interlace them if needed
@@ -64,7 +68,7 @@ dwv.decoder.RleDecoder.prototype.decode = function ( buffer,
                     outputArray[outputIndex * bpe] = inputArray[inputIndex];
                     // increment indexes
                     ++inputIndex;
-                    outputIndex += samplesPerPixel;
+                    outputIndex += outputIndexIncrement;
                 }
             } else if (count <= -1 && count >= -127) {
                 // output the next byte -count+1 times
@@ -74,7 +78,7 @@ dwv.decoder.RleDecoder.prototype.decode = function ( buffer,
                     // store
                     outputArray[outputIndex * bpe] = value;
                     // increment index
-                    outputIndex += samplesPerPixel;
+                    outputIndex += outputIndexIncrement;
                 }
             }
         }
