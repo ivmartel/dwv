@@ -1297,7 +1297,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
             throw new Error("Not a valid DICOM file (no magic DICM word found and first element not in 0x0008 group)");
         }
         var vr0 = dataElement.vr.charCodeAt(0);
-        var vr1 = dataElement.vr.charCodeAt(0);
+        var vr1 = dataElement.vr.charCodeAt(1);
         implicit = (vr0 >= 65 && vr0 <= 90 && vr1 >= 65 && vr1 <= 90) ? false : true;  // reasonable assumption: 2 uppercase characters = implicit
         if (dataElement.tag.group == "0x0800") { // big endian
             if (implicit) { // ImplicitVRBigEndian
