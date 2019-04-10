@@ -1,4 +1,4 @@
-/*! dwv 0.26.0-beta 2019-04-09 20:48:43 */
+/*! dwv 0.26.0-beta 2019-04-10 19:33:50 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -4893,49 +4893,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     offset = 128;
     var magicword = metaReader.readString( offset, 4 );
     offset += 4 * Uint8Array.BYTES_PER_ELEMENT;
-    if(magicword !== "DICM") // Check for Dicom file without metadata: attempt to detect transfer syntax
-    {
-        offset = 0;
-        dataElement = this.readDataElement(dataReader, offset, implicit);  // read first element
-        if ((dataElement.tag.group != "0x0008") && (dataElement.tag.group != "0x0800")) {  // check character set
-            throw new Error("Not a valid DICOM file (no magic DICM word found and first element not in 0x0008 group)");
-        }
-        var vr0 = dataElement.vr.charCodeAt(0);
-        var vr1 = dataElement.vr.charCodeAt(1);
-        implicit = (vr0 >= 65 && vr0 <= 90 && vr1 >= 65 && vr1 <= 90) ? false : true;  // reasonable assumption: 2 uppercase characters = implicit
-        if (dataElement.tag.group == "0x0800") { // big endian
-            if (implicit) { // ImplicitVRBigEndian
-                throw new Error("Not a valid DICOM file (no magic DICM word found and implicit VR big endian detected)");
-            }
-            else { // ExplicitVRBigEndian
-                implicit = false;
-                syntax = "1.2.840.10008.1.2.2";
-            }
-
-        }
-        else { // little endian
-            if (implicit) { // ImplicitVRLittleEndian
-                implicit = true;
-                syntax = "1.2.840.10008.1.2";
-            }
-            else { // ExplicitVRLittleEndian
-                implicit = false;
-                syntax = "1.2.840.10008.1.2.1";
-            }
-        }
-        dataElement.tag.group = "0x0002";        
-        dataElement.tag.element = "0x0010";
-        dataElement.tag.name = "x00020010";
-        dataElement.tag.endOffset = 4;
-        dataElement.vr = "UI";
-        dataElement.value = [syntax + " "];     // Even length
-        dataElement.vl = dataElement.value[0].length;
-        dataElement.endOffset = dataElement.startOffset + dataElement.vl;
-        this.dicomElements[dataElement.tag.name] = dataElement;
-        offset = 0;
-    }
-    else {  // metadata parsing
-
+    if (magicword === "DICM") {
         // 0x0002, 0x0000: FileMetaInformationGroupLength
         dataElement = this.readDataElement(metaReader, offset, false);
         offset = dataElement.endOffset;
@@ -4954,6 +4912,55 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
             // store the data element
             this.dicomElements[dataElement.tag.name] = dataElement;
         }
+    } else {
+        // no metadata: attempt to detect transfer syntax
+        // see https://github.com/ivmartel/dwv/issues/188
+        //   (Allow to load DICOM with no DICM preamble) for more details
+        var oEightGroupBigEndian = "0x0800";
+        var oEightGroupLittleEndian = "0x0008";
+        // read first element
+        dataElement = this.readDataElement(dataReader, 0, implicit);
+        // check that group is 0x0008
+        if ((dataElement.tag.group !== oEightGroupBigEndian) &&
+            (dataElement.tag.group !== oEightGroupLittleEndian)) {
+            throw new Error("Not a valid DICOM file (no magic DICM word found and first element not in 0x0008 group)");
+        }
+        // reasonable assumption: 2 uppercase characters => explicit vr
+        var vr0 = dataElement.vr.charCodeAt(0);
+        var vr1 = dataElement.vr.charCodeAt(1);
+        implicit = (vr0 >= 65 && vr0 <= 90 && vr1 >= 65 && vr1 <= 90) ? false : true;
+        // guess transfer syntax
+        if (dataElement.tag.group === oEightGroupLittleEndian) {
+            if (implicit) {
+                 // ImplicitVRLittleEndian
+                syntax = "1.2.840.10008.1.2";
+            } else {
+                // ExplicitVRLittleEndian
+                syntax = "1.2.840.10008.1.2.1";
+            }
+        } else {
+            if (implicit) {
+                // ImplicitVRBigEndian: impossible
+                throw new Error("Not a valid DICOM file (no magic DICM word found and implicit VR big endian detected)");
+            } else {
+                // ExplicitVRBigEndian
+                syntax = "1.2.840.10008.1.2.2";
+            }
+        }
+        // set transfer syntax data element
+        dataElement.tag.group = "0x0002";
+        dataElement.tag.element = "0x0010";
+        dataElement.tag.name = "x00020010";
+        dataElement.tag.endOffset = 4;
+        dataElement.vr = "UI";
+        dataElement.value = [syntax + " "]; // even length
+        dataElement.vl = dataElement.value[0].length;
+        dataElement.endOffset = dataElement.startOffset + dataElement.vl;
+        // store it
+        this.dicomElements[dataElement.tag.name] = dataElement;
+
+        // reset offset
+        offset = 0;
     }
 
     // check the TransferSyntaxUID (has to be there!)
