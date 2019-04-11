@@ -132,13 +132,10 @@ dwv.io.DicomDataLoader = function ()
  * @return True if the file can be loaded.
  */
 dwv.io.DicomDataLoader.prototype.canLoadFile = function (file) {
-    var split = file.name.split('.');
-    var ext = "";
-    if (split.length !== 1) {
-        ext = split.pop().toLowerCase();
-    }
-    var hasExt = (ext.length !== 0);
-    return !hasExt || (ext === "dcm");
+    var ext = dwv.utils.getFileExtension(file.name);
+    var hasNoExt = (ext === "");
+    var hasDcmExt = (ext === "dcm");
+    return hasNoExt || hasDcmExt;
 };
 
 /**
@@ -150,17 +147,16 @@ dwv.io.DicomDataLoader.prototype.canLoadFile = function (file) {
  * @return True if the url can be loaded.
  */
 dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url) {
-    var split = url.split('.');
-    var ext = "";
-    if (split.length !== 1) {
-        ext = split.pop().toLowerCase();
-    }
-    var hasExt = (ext.length !== 0) && (ext.length < 5);
-    // wado url
-    var hasContentType = (url.indexOf("&contentType") !== -1);
-    var isDicomContentType = (url.indexOf("&contentType=application/dicom") !== -1);
+    var urlObjext = dwv.utils.getUrlFromUri(url);
+    // extension
+    var ext = dwv.utils.getFileExtension(urlObjext.pathname);
+    var hasNoExt = (ext === "");
+    var hasDcmExt = (ext === "dcm");
+    // content type (for wado url)
+    var contentType = urlObjext.searchParams.get("contentType");
+    var hasDicomContentType = (contentType === "application/dicom");
 
-    return hasContentType ? isDicomContentType : !hasExt || (ext === "dcm");
+    return hasDicomContentType || hasNoExt || hasDcmExt;
 };
 
 /**

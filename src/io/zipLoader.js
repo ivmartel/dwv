@@ -150,7 +150,7 @@ dwv.io.ZipLoader = function ()
  * @return True if the file can be loaded.
  */
 dwv.io.ZipLoader.prototype.canLoadFile = function (file) {
-    var ext = file.name.split('.').pop().toLowerCase();
+    var ext = dwv.utils.getFileExtension(file.name);
     return (ext === "zip");
 };
 
@@ -160,7 +160,8 @@ dwv.io.ZipLoader.prototype.canLoadFile = function (file) {
  * @return True if the url can be loaded.
  */
 dwv.io.ZipLoader.prototype.canLoadUrl = function (url) {
-    var ext = url.split('.').pop().toLowerCase();
+    var urlObjext = dwv.utils.getUrlFromUri(url);
+    var ext = dwv.utils.getFileExtension(urlObjext.pathname);
     return (ext === "zip");
 };
 

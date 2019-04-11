@@ -99,3 +99,38 @@ QUnit.test("Test ReplaceFlags.", function (assert) {
     values = {};
     assert.equal(dwv.utils.replaceFlags(str, values), "a", "ReplaceFlags nothing to do no values");
 });
+
+/**
+ * Tests for {@link dwv.utils.getFileExtension}.
+ * @function module:tests/utils~getFileExtension
+ */
+QUnit.test("Test getFileExtension.", function (assert) {
+    // undefined
+    assert.equal(dwv.utils.getFileExtension(), null, "getFileExtension undefined");
+    // null
+    assert.equal(dwv.utils.getFileExtension(null), null, "getFileExtension null");
+    // empty
+    assert.equal(dwv.utils.getFileExtension(""), null, "getFileExtension empty");
+    // no extension
+    assert.equal(dwv.utils.getFileExtension("filename"), null, "getFileExtension no extension");
+    // test #00
+    var test00 = "image.png";
+    var res00 = "png";
+    assert.equal(dwv.utils.getFileExtension(test00), res00, "getFileExtension 00");
+    // test #01
+    var test01 = "IMAGE.PNG";
+    var res01 = "png";
+    assert.equal(dwv.utils.getFileExtension(test01), res01, "getFileExtension 01");
+    // test #02
+    var test02 = "image.10.png";
+    var res02 = "png";
+    assert.equal(dwv.utils.getFileExtension(test02), res02, "getFileExtension 02");
+    // test #10
+    var test10 = "/path/to/file/image.png";
+    var res10 = "png";
+    assert.equal(dwv.utils.getFileExtension(test10), res10, "getFileExtension 10");
+    // test #11
+    var test11 = "domain.org/path/to/file/image.png";
+    var res11 = "png";
+    assert.equal(dwv.utils.getFileExtension(test11), res11, "getFileExtension 11");
+});

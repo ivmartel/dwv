@@ -6,6 +6,75 @@
 QUnit.module("utils");
 
 /**
+ * Tests for {@link dwv.utils.getUrlFromUri}.
+ * @function module:tests/utils~getUrlFromUri
+ */
+QUnit.test("Test getUrlFromUri.", function (assert) {
+    // test #00: empty
+    var uri00 = 'http://domain.org';
+    var res00f = dwv.utils.getUrlFromUriFull(uri00);
+    var res00s = dwv.utils.getUrlFromUriSimple(uri00);
+    // pathname
+    assert.equal(res00f.pathname, '/', "pathname 00 full");
+    assert.equal(res00s.pathname, res00f.pathname, "pathname 00 simple");
+    // search param
+    assert.equal(res00f.searchParams.get('topic'), null, "search params 00 full");
+    assert.equal(res00s.searchParams.get('topic'),
+        res00f.searchParams.get('topic'), "search params 00 simple");
+
+    // test #01: simple
+    var uri01 = 'https://domain.org/dir/file';
+    var res01f = dwv.utils.getUrlFromUriFull(uri01);
+    var res01s = dwv.utils.getUrlFromUriSimple(uri01);
+    // pathname
+    assert.equal(res01f.pathname, '/dir/file', "pathname 01 full");
+    assert.equal(res01s.pathname, res01f.pathname, "pathname 01 simple");
+    // search param
+    assert.equal(res01f.searchParams.get('topic'), null, "search params 01 full");
+    assert.equal(res01s.searchParams.get('topic'),
+        res01f.searchParams.get('topic'), "search params 01 simple");
+
+    // test #02: wih file
+    var uri02 = 'https://domain.org/dir/image.jpg';
+    var res02f = dwv.utils.getUrlFromUriFull(uri02);
+    var res02s = dwv.utils.getUrlFromUriSimple(uri02);
+    // pathname
+    assert.equal(res02f.pathname, '/dir/image.jpg', "pathname 02 full");
+    assert.equal(res02s.pathname, res02f.pathname, "pathname 02 simple");
+    // search param
+    assert.equal(res02f.searchParams.get('topic'), null, "search params 02 full");
+    assert.equal(res02s.searchParams.get('topic'),
+        res02f.searchParams.get('topic'), "search params 02 simple");
+
+    // test #10: wih serach params
+    var uri10 = 'https://domain.org/dir/image.jpg?accesstoken=abc';
+    var res10f = dwv.utils.getUrlFromUriFull(uri10);
+    var res10s = dwv.utils.getUrlFromUriSimple(uri10);
+    // pathname
+    assert.equal(res10f.pathname, '/dir/image.jpg', "pathname 03 full");
+    assert.equal(res10s.pathname, res10f.pathname, "pathname 03 simple");
+    // search param
+    assert.equal(res10f.searchParams.get('accesstoken'), 'abc', "search params 03 full");
+    assert.equal(res10s.searchParams.get('accesstoken'),
+        res10f.searchParams.get('accesstoken'), "search params 03 simple");
+
+    // test #11: wih serach params
+    var uri11 = 'https://domain.org/dir/image.jpg?accesstoken=abc&topic=secure';
+    var res11f = dwv.utils.getUrlFromUriFull(uri11);
+    var res11s = dwv.utils.getUrlFromUriSimple(uri11);
+    // pathname
+    assert.equal(res11f.pathname, '/dir/image.jpg', "pathname 04 full");
+    assert.equal(res11s.pathname, res11f.pathname, "pathname 04 simple");
+    // search param
+    assert.equal(res11f.searchParams.get('accesstoken'), 'abc', "search params 04 full");
+    assert.equal(res11s.searchParams.get('accesstoken'),
+        res11f.searchParams.get('accesstoken'), "search params 04 simple");
+    assert.equal(res11f.searchParams.get('topic'), 'secure', "search params 04-2 full");
+    assert.equal(res11s.searchParams.get('topic'),
+        res11f.searchParams.get('topic'), "search params 04-2 simple");
+});
+
+/**
  * Tests for {@link dwv.utils.splitUri}.
  * @function module:tests/utils~splitUri
  */
