@@ -8,6 +8,7 @@ dwv.utils.base = dwv.utils.base || {};
  * Get an full object URL from a string uri.
  * @param {String} uri A string representing the url.
  * @returns {URL} A URL object.
+ * WARNING: platform support dependent, see https://caniuse.com/#feat=url
  */
 dwv.utils.getUrlFromUriFull = function (uri) {
     return new URL(uri);
@@ -16,7 +17,8 @@ dwv.utils.getUrlFromUriFull = function (uri) {
 /**
  * Get an simple object URL from a string uri.
  * @param {String} uri A string representing the url.
- * @returns {URL} A simple URL object (limited functionality).
+ * @returns {URL} A simple URL object that exposes 'pathname' and 'searchParams.get()'
+ * WARNING: limited functionality, simple nmock of the URL object.
  */
 dwv.utils.getUrlFromUriSimple = function (uri) {
     var url = {};
@@ -55,6 +57,8 @@ dwv.utils.getUrlFromUriSimple = function (uri) {
  * Get an object URL from a string uri.
  * @param {String} uri A string representing the url.
  * @returns {URL} A URL object (full or simple depending upon platform).
+ * WANRING: returns an official URL or a simple URL depending on platform,
+ *   see https://caniuse.com/#feat=url
  */
 dwv.utils.getUrlFromUri = function (uri) {
     var url = null;
