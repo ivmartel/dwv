@@ -515,7 +515,7 @@ dwv.DrawController = function (drawDiv)
             console.warn("Can't delete group with id:'" + groupId +
                 "', too many with the same id.");
         }
-    }
+    };
 
     /**
      * Delete a Draw from the stage.
@@ -532,7 +532,7 @@ dwv.DrawController = function (drawDiv)
         delcmd.onUndo = cmdCallback;
         delcmd.execute();
         exeCallback(delcmd);
-    }
+    };
 
     /**
      * Delete all Draws from the stage.
