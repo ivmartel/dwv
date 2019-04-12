@@ -1,4 +1,4 @@
-/*! dwv 0.26.0-beta 2019-04-10 19:33:50 */
+/*! dwv 0.26.0-beta 2019-04-12 22:45:25 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -17109,13 +17109,10 @@ dwv.io.DicomDataLoader = function ()
  * @return True if the file can be loaded.
  */
 dwv.io.DicomDataLoader.prototype.canLoadFile = function (file) {
-    var split = file.name.split('.');
-    var ext = "";
-    if (split.length !== 1) {
-        ext = split.pop().toLowerCase();
-    }
-    var hasExt = (ext.length !== 0);
-    return !hasExt || (ext === "dcm");
+    var ext = dwv.utils.getFileExtension(file.name);
+    var hasNoExt = (ext === "");
+    var hasDcmExt = (ext === "dcm");
+    return hasNoExt || hasDcmExt;
 };
 
 /**
@@ -17127,17 +17124,16 @@ dwv.io.DicomDataLoader.prototype.canLoadFile = function (file) {
  * @return True if the url can be loaded.
  */
 dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url) {
-    var split = url.split('.');
-    var ext = "";
-    if (split.length !== 1) {
-        ext = split.pop().toLowerCase();
-    }
-    var hasExt = (ext.length !== 0) && (ext.length < 5);
-    // wado url
-    var hasContentType = (url.indexOf("&contentType") !== -1);
-    var isDicomContentType = (url.indexOf("&contentType=application/dicom") !== -1);
+    var urlObjext = dwv.utils.getUrlFromUri(url);
+    // extension
+    var ext = dwv.utils.getFileExtension(urlObjext.pathname);
+    var hasNoExt = (ext === "");
+    var hasDcmExt = (ext === "dcm");
+    // content type (for wado url)
+    var contentType = urlObjext.searchParams.get("contentType");
+    var hasDicomContentType = (contentType === "application/dicom");
 
-    return hasContentType ? isDicomContentType : !hasExt || (ext === "dcm");
+    return hasDicomContentType || hasNoExt || hasDcmExt;
 };
 
 /**
@@ -17584,7 +17580,7 @@ dwv.io.JSONTextLoader = function ()
  * @return True if the file can be loaded.
  */
 dwv.io.JSONTextLoader.prototype.canLoadFile = function (file) {
-    var ext = file.name.split('.').pop().toLowerCase();
+    var ext = dwv.utils.getFileExtension(file.name);
     return (ext === "json");
 };
 
@@ -17594,7 +17590,8 @@ dwv.io.JSONTextLoader.prototype.canLoadFile = function (file) {
  * @return True if the url can be loaded.
  */
 dwv.io.JSONTextLoader.prototype.canLoadUrl = function (url) {
-    var ext = url.split('.').pop().toLowerCase();
+    var urlObjext = dwv.utils.getUrlFromUri(url);
+    var ext = dwv.utils.getFileExtension(urlObjext.pathname);
     return (ext === "json");
 };
 
@@ -17994,15 +17991,18 @@ dwv.io.RawImageLoader.prototype.canLoadFile = function (file) {
  * @return True if the url can be loaded.
  */
 dwv.io.RawImageLoader.prototype.canLoadUrl = function (url) {
-    var ext = url.split('.').pop().toLowerCase();
+    var urlObjext = dwv.utils.getUrlFromUri(url);
+    // extension
+    var ext = dwv.utils.getFileExtension(urlObjext.pathname);
     var hasImageExt = (ext === "jpeg") || (ext === "jpg") ||
             (ext === "png") || (ext === "gif");
-    // wado url
-    var isImageContentType = (url.indexOf("contentType=image/jpeg") !== -1) ||
-        (url.indexOf("contentType=image/png") !== -1) ||
-        (url.indexOf("contentType=image/gif") !== -1);
+    // content type (for wado url)
+    var contentType = urlObjext.searchParams.get("contentType");
+    var hasImageContentType = (contentType === "image/jpeg") ||
+        (contentType === "image/png") ||
+        (contentType === "image/gif");
 
-    return isImageContentType || hasImageExt;
+    return hasImageContentType || hasImageExt;
 };
 
 /**
@@ -18191,7 +18191,8 @@ dwv.io.RawVideoLoader.prototype.canLoadFile = function (file) {
  * @return True if the url can be loaded.
  */
 dwv.io.RawVideoLoader.prototype.canLoadUrl = function (url) {
-    var ext = url.split('.').pop().toLowerCase();
+    var urlObjext = dwv.utils.getUrlFromUri(url);
+    var ext = dwv.utils.getFileExtension(urlObjext.pathname);
     return (ext === "mp4") || (ext === "ogg") ||
             (ext === "webm");
 };
@@ -18731,7 +18732,7 @@ dwv.io.ZipLoader = function ()
  * @return True if the file can be loaded.
  */
 dwv.io.ZipLoader.prototype.canLoadFile = function (file) {
-    var ext = file.name.split('.').pop().toLowerCase();
+    var ext = dwv.utils.getFileExtension(file.name);
     return (ext === "zip");
 };
 
@@ -18741,7 +18742,8 @@ dwv.io.ZipLoader.prototype.canLoadFile = function (file) {
  * @return True if the url can be loaded.
  */
 dwv.io.ZipLoader.prototype.canLoadUrl = function (url) {
-    var ext = url.split('.').pop().toLowerCase();
+    var urlObjext = dwv.utils.getUrlFromUri(url);
+    var ext = dwv.utils.getFileExtension(urlObjext.pathname);
     return (ext === "zip");
 };
 
@@ -25507,7 +25509,7 @@ dwv.browser = dwv.browser || {};
  * Local function to ask Modernizr if a property is supported.
  * @parma {String} property The property to test.
  */
-function askModernizr( property ) {
+dwv.browser.askModernizr = function (property) {
     if ( typeof dwv.Modernizr === "undefined" ) {
         dwv.ModernizrInit(window, document);
     }
@@ -25517,7 +25519,7 @@ function askModernizr( property ) {
         prop = prop[props[i]];
     }
     return prop;
-}
+};
 
 /**
  * Browser check for the FileAPI.
@@ -25536,7 +25538,7 @@ dwv.browser.hasFileApi = function()
         return true;
     }
     // regular test
-    return askModernizr("filereader");
+    return dwv.browser.askModernizr("filereader");
 };
 
 /**
@@ -25544,9 +25546,9 @@ dwv.browser.hasFileApi = function()
  */
 dwv.browser.hasXmlHttpRequest = function()
 {
-    return askModernizr("xhrresponsetype") &&
-        askModernizr("xhrresponsetypearraybuffer") &&
-        askModernizr("xhrresponsetypetext") &&
+    return dwv.browser.askModernizr("xhrresponsetype") &&
+        dwv.browser.askModernizr("xhrresponsetypearraybuffer") &&
+        dwv.browser.askModernizr("xhrresponsetypetext") &&
         "XMLHttpRequest" in window && "withCredentials" in new XMLHttpRequest();
 };
 
@@ -25555,7 +25557,7 @@ dwv.browser.hasXmlHttpRequest = function()
  */
 dwv.browser.hasTypedArray = function()
 {
-    return askModernizr("dataview") && askModernizr("typedarrays");
+    return dwv.browser.askModernizr("dataview") && dwv.browser.askModernizr("typedarrays");
 };
 
 /**
@@ -25564,7 +25566,7 @@ dwv.browser.hasTypedArray = function()
  */
 dwv.browser.hasInputColor = function()
 {
-    return askModernizr("inputtypes.color");
+    return dwv.browser.askModernizr("inputtypes.color");
 };
 
 /**
@@ -25573,7 +25575,7 @@ dwv.browser.hasInputColor = function()
  */
 dwv.browser.hasInputDirectory = function()
 {
-    return askModernizr("fileinputdirectory");
+    return dwv.browser.askModernizr("fileinputdirectory");
 };
 
 
@@ -25958,7 +25960,7 @@ var dwv = dwv || {};
 
 /*!
  * modernizr v3.6.0
- * Build https://modernizr.com/download?-dataview-directory-filereader-inputtypes-typedarrays-xhrresponsetype-xhrresponsetypearraybuffer-xhrresponsetypejson-xhrresponsetypetext-dontmin
+ * Build https://modernizr.com/download?-dataview-directory-filereader-inputtypes-typedarrays-urlparser-urlsearchparams-xhrresponsetype-xhrresponsetypearraybuffer-xhrresponsetypejson-xhrresponsetypetext-dontmin
  *
  * Copyright (c)
  *  Faruk Ates
@@ -25981,7 +25983,7 @@ var dwv = dwv || {};
 */
 
 dwv.ModernizrInit = function (window, document, undefined) {
-//;(function(window, document, undefined){
+// ;(function(window, document, undefined){
   var tests = [];
 
 
@@ -26145,6 +26147,60 @@ Tests for XMLHttpRequest xhr.responseType.
     xhr.open('get', '/', true);
     return 'response' in xhr;
   }()));
+
+/*!
+{
+  "name": "URL parser",
+  "property": "urlparser",
+  "notes": [{
+    "name": "URL",
+    "href": "https://dvcs.w3.org/hg/url/raw-file/tip/Overview.html"
+  }],
+  "polyfills": ["urlparser"],
+  "authors": ["Ron Waldon (@jokeyrhyme)"],
+  "tags": ["url"]
+}
+!*/
+/* DOC
+Check if browser implements the URL constructor for parsing URLs.
+*/
+
+  Modernizr.addTest('urlparser', function() {
+    var url;
+    try {
+      // have to actually try use it, because Safari defines a dud constructor
+      url = new URL('http://modernizr.com/');
+      return url.href === 'http://modernizr.com/';
+    } catch (e) {
+      return false;
+    }
+  });
+
+/*!
+{
+  "authors": ["Cătălin Mariș"],
+  "name": "URLSearchParams API",
+  "notes": [
+    {
+      "name": "WHATWG specification",
+      "href": "https://url.spec.whatwg.org/#interface-urlsearchparams"
+    },
+    {
+      "name": "MDN documentation",
+      "href": "https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams"
+    }
+  ],
+  "property": "urlsearchparams",
+  "tags": ["querystring", "url"]
+}
+!*/
+
+/* DOC
+Detects support for an API that provides utility methods for working with the query string of a URL.
+*/
+
+
+  Modernizr.addTest('urlsearchparams', 'URLSearchParams' in window);
 
 
   var classes = [];
@@ -26562,13 +26618,13 @@ file selection dialog.
   }
 
   // Leak Modernizr namespace
-  //window.Modernizr = Modernizr;
+  // window.Modernizr = Modernizr;
   dwv.Modernizr = Modernizr;
 
 
 ;
 
-//})(window, document);
+// })(window, document);
 };
 
 // namespaces
@@ -26862,6 +26918,22 @@ dwv.utils.getRootPath = function (path) {
   return path.split('/').slice(0, -1).join('/');
 };
 
+/**
+ * Get a file extension
+ * @param {String} filePath The file path containing the file name.
+ * @returns {String} The lower case file extension or null for none.
+ */
+dwv.utils.getFileExtension = function (filePath) {
+    var ext = null;
+    if (typeof filePath !== 'undefined' && filePath) {
+        var pathSplit = filePath.split('.');
+        if (pathSplit.length !== 1) {
+            ext = pathSplit.pop().toLowerCase();
+        }
+    }
+    return ext;
+};
+
 // namespaces
 var dwv = dwv || {};
 dwv.utils = dwv.utils || {};
@@ -27054,6 +27126,73 @@ var dwv = dwv || {};
 dwv.utils = dwv.utils || {};
 /** @namespace */
 dwv.utils.base = dwv.utils.base || {};
+
+/**
+ * Get an full object URL from a string uri.
+ * @param {String} uri A string representing the url.
+ * @returns {URL} A URL object.
+ * WARNING: platform support dependent, see https://caniuse.com/#feat=url
+ */
+dwv.utils.getUrlFromUriFull = function (uri) {
+    return new URL(uri);
+};
+
+/**
+ * Get an simple object URL from a string uri.
+ * @param {String} uri A string representing the url.
+ * @returns {URL} A simple URL object that exposes 'pathname' and 'searchParams.get()'
+ * WARNING: limited functionality, simple nmock of the URL object.
+ */
+dwv.utils.getUrlFromUriSimple = function (uri) {
+    var url = {};
+    // simple implementation (mainly for IE)
+    // expecting only one '?'
+    var urlSplit = uri.split('?');
+    // pathname
+    var fullPath = urlSplit[0];
+    // remove host and domain
+    var fullPathSplit = fullPath.split('//');
+    var hostAndPath = fullPathSplit.pop();
+    var hostAndPathSplit = hostAndPath.split('/');
+    hostAndPathSplit.splice(0, 1);
+    url.pathname = '/' + hostAndPathSplit.join('/');
+    // search params
+    var searchSplit = [];
+    if (urlSplit.length === 2) {
+        var search = urlSplit[1];
+        searchSplit = search.split('&');
+    }
+    var searchParams = {};
+    for (var i = 0; i < searchSplit.length; ++i) {
+        var paramSplit = searchSplit[i].split('=');
+        searchParams[paramSplit[0]] = paramSplit[1];
+    }
+    url.searchParams = {
+        get: function (param) {
+            return searchParams[param];
+        }
+    };
+
+    return url;
+};
+
+/**
+ * Get an object URL from a string uri.
+ * @param {String} uri A string representing the url.
+ * @returns {URL} A URL object (full or simple depending upon platform).
+ * WANRING: returns an official URL or a simple URL depending on platform,
+ *   see https://caniuse.com/#feat=url
+ */
+dwv.utils.getUrlFromUri = function (uri) {
+    var url = null;
+    if (dwv.browser.askModernizr('urlparser') &&
+        dwv.browser.askModernizr('urlsearchparams')) {
+        url = dwv.utils.getUrlFromUriFull(uri);
+    } else {
+        url = dwv.utils.getUrlFromUriSimple(uri);
+    }
+    return url;
+};
 
 /**
  * Split an input URI:
