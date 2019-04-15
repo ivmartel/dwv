@@ -133,7 +133,7 @@ dwv.io.DicomDataLoader = function ()
  */
 dwv.io.DicomDataLoader.prototype.canLoadFile = function (file) {
     var ext = dwv.utils.getFileExtension(file.name);
-    var hasNoExt = (ext === "");
+    var hasNoExt = (ext === null);
     var hasDcmExt = (ext === "dcm");
     return hasNoExt || hasDcmExt;
 };
@@ -150,7 +150,7 @@ dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url) {
     var urlObjext = dwv.utils.getUrlFromUri(url);
     // extension
     var ext = dwv.utils.getFileExtension(urlObjext.pathname);
-    var hasNoExt = (ext === "");
+    var hasNoExt = (ext === null);
     var hasDcmExt = (ext === "dcm");
     // content type (for wado url)
     var contentType = urlObjext.searchParams.get("contentType");
