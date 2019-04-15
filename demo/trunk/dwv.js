@@ -1,4 +1,4 @@
-/*! dwv 0.26.0-beta 2019-04-12 22:59:13 */
+/*! dwv 0.26.0-beta 2019-04-15 21:54:57 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -17142,7 +17142,7 @@ dwv.io.DicomDataLoader = function ()
  */
 dwv.io.DicomDataLoader.prototype.canLoadFile = function (file) {
     var ext = dwv.utils.getFileExtension(file.name);
-    var hasNoExt = (ext === "");
+    var hasNoExt = (ext === null);
     var hasDcmExt = (ext === "dcm");
     return hasNoExt || hasDcmExt;
 };
@@ -17159,7 +17159,7 @@ dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url) {
     var urlObjext = dwv.utils.getUrlFromUri(url);
     // extension
     var ext = dwv.utils.getFileExtension(urlObjext.pathname);
-    var hasNoExt = (ext === "");
+    var hasNoExt = (ext === null);
     var hasDcmExt = (ext === "dcm");
     // content type (for wado url)
     var contentType = urlObjext.searchParams.get("contentType");
