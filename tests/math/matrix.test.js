@@ -31,12 +31,12 @@ QUnit.test("Test Matrix44.", function (assert) {
     assert.equal(m0.equals(m2), false, "equals false");
 
     // get
-    assert.equal(m2.get(0, 0), 1, "get(0,0)");
-    assert.equal(m2.get(0, 1), 2, "get(0,1)");
-    assert.equal(m2.get(0, 2), 3, "get(0,2)");
-    assert.equal(m2.get(1, 0), 4, "get(1,0)");
-    assert.equal(m2.get(1, 1), 5, "get(1,1)");
-    assert.equal(m2.get(1, 2), 6, "get(1,2)");
+    assert.equal(m2.get(0,0), 1, "get(0,0)");
+    assert.equal(m2.get(0,1), 2, "get(0,1)");
+    assert.equal(m2.get(0,2), 3, "get(0,2)");
+    assert.equal(m2.get(1,0), 4, "get(1,0)");
+    assert.equal(m2.get(1,1), 5, "get(1,1)");
+    assert.equal(m2.get(1,2), 6, "get(1,2)");
 
     // equals with precision
     assert.equal(m3.equals(m4, 0.01), true, "equals true");
