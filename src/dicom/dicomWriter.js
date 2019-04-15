@@ -3,6 +3,15 @@ var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
 
 /**
+ * Return true if the input number is even.
+ * @param {Number} number The number to check.
+ * @returns {Boolean} True is the number is even.
+ */
+function isEven(number) {
+    return number % 2 == 0
+};
+
+/**
  * Data writer.
  *
  * Example usage:
@@ -145,6 +154,22 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian)
         return byteOffset;
     };
 
+    /**
+     * Write string data with padding for non even length data.
+     * @param {Number} byteOffset The offset to start writing from.
+     * @param {Number} str The data to write.
+     * @returns {Number} The new offset position.
+     */
+    this.writeStringPadded = function (byteOffset, str) {
+        byteOffset = this.writeString(byteOffset, str);
+        if (!isEven(str.length)) {
+            // append space
+            view.setUint8(byteOffset, 32);
+            byteOffset += Uint8Array.BYTES_PER_ELEMENT;
+        }
+        return byteOffset;
+    };
+
 };
 
 /**
@@ -169,6 +194,22 @@ dwv.dicom.DataWriter.prototype.writeUint8Array = function (byteOffset, array) {
 dwv.dicom.DataWriter.prototype.writeInt8Array = function (byteOffset, array) {
     for ( var i = 0, len = array.length; i < len; ++i ) {
         byteOffset = this.writeInt8(byteOffset, array[i]);
+    }
+    return byteOffset;
+};
+
+/**
+ * Write Int8 array with padding for non even length data.
+ * @param {Number} byteOffset The offset to start writing from.
+ * @param {Array} array The array to write.
+ * @returns {Number} The new offset position.
+ */
+dwv.dicom.DataWriter.prototype.writeInt8ArrayPadded = function (byteOffset, array) {
+    var inputByteOffset = byteOffset;
+    byteOffset = this.writeInt8Array(byteOffset, array);
+    // append null if total length is not even
+    if (!isEven(byteOffset - inputByteOffset)) {
+        byteOffset = this.writeInt8(byteOffset, 0);
     }
     return byteOffset;
 };
@@ -270,6 +311,22 @@ dwv.dicom.DataWriter.prototype.writeStringArray = function (byteOffset, array) {
 };
 
 /**
+ * Write string array with padding for non even length data.
+ * @param {Number} byteOffset The offset to start writing from.
+ * @param {Array} array The array to write.
+ * @returns {Number} The new offset position.
+ */
+dwv.dicom.DataWriter.prototype.writeStringArrayPadded = function (byteOffset, array) {
+    var inputByteOffset = byteOffset;
+    byteOffset = this.writeStringArray(byteOffset, array);
+    // append space if total length is not even
+    if (!isEven(byteOffset - inputByteOffset)) {
+        byteOffset = this.writeString(byteOffset, ' ');
+    }
+    return byteOffset;
+};
+
+/**
  * Write a list of items.
  * @param {Number} byteOffset The offset to start writing from.
  * @param {Array} items The list of items to write.
@@ -343,7 +400,7 @@ dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset,
         if ( vr === "UN" ) {
             byteOffset = this.writeUint8Array(byteOffset, value);
         } else if ( vr === "OB" ) {
-            byteOffset = this.writeInt8Array(byteOffset, value);
+            byteOffset = this.writeInt8ArrayPadded(byteOffset, value);
         } else if ( vr === "OW" ) {
             byteOffset = this.writeInt16Array(byteOffset, value);
         } else if ( vr === "OF" ) {
@@ -374,8 +431,10 @@ dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset,
                 var atValue = new Uint16Array([dec1, dec2]);
                 byteOffset = this.writeUint16Array(byteOffset, atValue);
             }
-        } else {
+        } else if ( vr === "UI") {
             byteOffset = this.writeStringArray(byteOffset, value);
+        } else {
+            byteOffset = this.writeStringArrayPadded(byteOffset, value);
         }
     }
     // return new offset
@@ -769,7 +828,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
 };
 
 /**
- * Fix for broken DICOM elements: Replace "UN" with correct VR if the element exists in dictionary 
+ * Fix for broken DICOM elements: Replace "UN" with correct VR if the element exists in dictionary
  */
 dwv.dicom.checkUnkwownVR = function (element)
 {
