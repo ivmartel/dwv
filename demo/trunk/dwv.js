@@ -1,4 +1,4 @@
-/*! dwv 0.26.0-beta 2019-04-15 21:59:07 */
+/*! dwv 0.26.0-beta 2019-04-15 22:08:11 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -17836,6 +17836,7 @@ dwv.io.MemoryLoader.prototype.load = function (ioArray)
 
     var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
     mproghandler.setNToLoad( ioArray.length );
+    mproghandler.setNumberOfDimensions(1);
 
     // get loaders
     var loaders = [];
@@ -17854,7 +17855,7 @@ dwv.io.MemoryLoader.prototype.load = function (ioArray)
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
         });
-        loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
+        loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(0);
     }
 
     // loop on I/O elements
@@ -18664,16 +18665,26 @@ dwv.io.ZipLoader = function ()
     /**
      * JSZip.async callback
      * @param {ArrayBuffer} content unzipped file image
+     * @param {Number} index The data index.
      * @return {}
      */
-    function zipAsyncCallback(content)
+    function zipAsyncCallback(content, index)
     {
     	files.push({"filename": filename, "data": content});
 
-    	if (files.length < zobjs.length){
+        // sent un-ziped progress with the data index
+        // (max 50% to take into account the memory loading)
+        var unzipPercent = files.length * 50 / zobjs.length;
+        self.onprogress({'type': 'read-progress', 'lengthComputable': true,
+            'loaded': unzipPercent, 'total': 100, 'index': index});
+
+        // recursively call until we have all the files
+        if (files.length < zobjs.length){
     		var num = files.length;
     		filename = zobjs[num].name;
-    		zobjs[num].async("arrayBuffer").then(zipAsyncCallback);
+            zobjs[num].async("arrayBuffer").then( function (content) {
+                zipAsyncCallback(content, index);
+            });
     	}
     	else {
             var memoryIO = new dwv.io.MemoryLoader();
@@ -18684,7 +18695,13 @@ dwv.io.ZipLoader = function ()
                 // call listeners
                 self.onloadend();
             };
-            memoryIO.onprogress = self.onprogress;
+            memoryIO.onprogress = function (progress) {
+                // add 50% to take into account the un-zipping
+                progress.loaded = 50 + progress.loaded / 2;
+                // set data index
+                progress.index = index;
+                self.onprogress(progress);
+            };
             memoryIO.onerror = self.onerror;
             memoryIO.onabort = self.onabort;
 
@@ -18698,7 +18715,7 @@ dwv.io.ZipLoader = function ()
      * @param {String} origin The data origin.
      * @param {Number} index The data index.
      */
-    this.load = function (buffer/*, origin, index*/) {
+    this.load = function (buffer, origin, index) {
         // set loading flag
         isLoading = true;
 
@@ -18708,7 +18725,9 @@ dwv.io.ZipLoader = function ()
             // recursively load zip files into the files array
         	var num = files.length;
         	filename = zobjs[num].name;
-        	zobjs[num].async("arrayBuffer").then(zipAsyncCallback);
+            zobjs[num].async("arrayBuffer").then( function (content) {
+                zipAsyncCallback(content, index);
+            });
         });
     };
 
@@ -26678,6 +26697,10 @@ dwv.utils.MultiProgressHandler = function (callback)
      * List of progresses.
      * @private
      * @type Array
+     * First dimension is a list of item for which the progress is recorded,
+     *   for example file names.
+     * Second dimension is a list of possible progresses, for example
+     *   the progress of the download and the progress of the decoding.
      */
     var progresses = [];
 
