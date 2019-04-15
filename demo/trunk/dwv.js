@@ -1,4 +1,4 @@
-/*! dwv 0.26.0-beta 2019-04-15 22:08:11 */
+/*! dwv 0.26.0-beta 2019-04-15 22:24:33 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -18670,7 +18670,7 @@ dwv.io.ZipLoader = function ()
      */
     function zipAsyncCallback(content, index)
     {
-    	files.push({"filename": filename, "data": content});
+        files.push({"filename": filename, "data": content});
 
         // sent un-ziped progress with the data index
         // (max 50% to take into account the memory loading)
@@ -18679,14 +18679,13 @@ dwv.io.ZipLoader = function ()
             'loaded': unzipPercent, 'total': 100, 'index': index});
 
         // recursively call until we have all the files
-        if (files.length < zobjs.length){
-    		var num = files.length;
-    		filename = zobjs[num].name;
+        if (files.length < zobjs.length) {
+            var num = files.length;
+            filename = zobjs[num].name;
             zobjs[num].async("arrayBuffer").then( function (content) {
                 zipAsyncCallback(content, index);
             });
-    	}
-    	else {
+        } else {
             var memoryIO = new dwv.io.MemoryLoader();
             memoryIO.onload = self.onload;
             memoryIO.onloadend = function () {
@@ -18721,10 +18720,10 @@ dwv.io.ZipLoader = function ()
 
         JSZip.loadAsync(buffer).then( function(zip) {
             files = [];
-        	zobjs = zip.file(/.*\.dcm/);
+            zobjs = zip.file(/.*\.dcm/);
             // recursively load zip files into the files array
-        	var num = files.length;
-        	filename = zobjs[num].name;
+            var num = files.length;
+            filename = zobjs[num].name;
             zobjs[num].async("arrayBuffer").then( function (content) {
                 zipAsyncCallback(content, index);
             });
