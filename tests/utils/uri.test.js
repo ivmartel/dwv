@@ -35,7 +35,7 @@ QUnit.test("Test getUrlFromUri.", function (assert) {
     assert.equal(res01s.searchParams.get('topic'),
         res01f.searchParams.get('topic'), "search params 01 simple");
 
-    // test #02: wih file
+    // test #02: with file
     var uri02 = 'https://domain.org/dir/image.jpg';
     var res02f = dwv.utils.getUrlFromUri(uri02);
     var res02s = dwv.utils.getUrlFromUriSimple(uri02);
@@ -47,7 +47,19 @@ QUnit.test("Test getUrlFromUri.", function (assert) {
     assert.equal(res02s.searchParams.get('topic'),
         res02f.searchParams.get('topic'), "search params 02 simple");
 
-    // test #10: wih serach params
+    // test #03: relative
+    var uri03 = './dir/image.jpg';
+    var res03f = dwv.utils.getUrlFromUri(uri03);
+    var res03s = dwv.utils.getUrlFromUriSimple(uri03);
+    // pathname
+    assert.equal(res03f.pathname, '/dir/image.jpg', "pathname 03");
+    assert.equal(res03s.pathname, res03f.pathname, "pathname 03 simple");
+    // search param
+    assert.equal(res03f.searchParams.get('topic'), null, "search params 03");
+    assert.equal(res03s.searchParams.get('topic'),
+        res03f.searchParams.get('topic'), "search params 03 simple");
+
+    // test #10: wih search params
     var uri10 = 'https://domain.org/dir/image.jpg?accesstoken=abc';
     var res10f = dwv.utils.getUrlFromUri(uri10);
     var res10s = dwv.utils.getUrlFromUriSimple(uri10);
@@ -59,7 +71,7 @@ QUnit.test("Test getUrlFromUri.", function (assert) {
     assert.equal(res10s.searchParams.get('accesstoken'),
         res10f.searchParams.get('accesstoken'), "search params 03 simple");
 
-    // test #11: wih serach params
+    // test #11: wih search params
     var uri11 = 'https://domain.org/dir/image.jpg?accesstoken=abc&topic=secure';
     var res11f = dwv.utils.getUrlFromUri(uri11);
     var res11s = dwv.utils.getUrlFromUriSimple(uri11);

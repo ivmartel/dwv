@@ -11,7 +11,9 @@ dwv.utils.base = dwv.utils.base || {};
  * WARNING: platform support dependent, see https://caniuse.com/#feat=url
  */
 dwv.utils.getUrlFromUriFull = function (uri) {
-    return new URL(uri);
+    // add base to allow for relative urls
+    // (base is not used for absolute urls)
+    return new URL(uri, window.location.origin);
 };
 
 /**
