@@ -9,7 +9,7 @@ dwv.math = dwv.math || {};
 dwv.math.Matrix33 = function (
     m00, m01, m02,
     m10, m11, m12,
-    m20, m21, m22)
+    m20, m21, m22 )
 {
     // row-major order
     var mat = new Float32Array(9);
