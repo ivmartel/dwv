@@ -2,6 +2,11 @@
 var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
+// difference between 1 and the smallest floating point number greater than 1
+if (typeof Number.EPSILON === "undefined") {
+    Number.EPSILON = Math.pow(2, -52);
+}
+
 /**
  * Immutable 3x3 Matrix.
  * @constructor
@@ -30,14 +35,17 @@ dwv.math.Matrix33 = function (
 /**
  * Check for Matrix33 equality.
  * @param {Object} rhs The other matrix to compare to.
+ * @param {Number} p A numeric expression for the precision to use in check  (ex: 0.001). Defaults to Number.EPSILON if not provided.
  * @return {Boolean} True if both matrices are equal.
  */
-dwv.math.Matrix33.prototype.equals = function (rhs) {
-    return this.get(0,0) === rhs.get(0,0) && this.get(0,1) === rhs.get(0,1) &&
-        this.get(0,2) === rhs.get(0,2) && this.get(1,0) === rhs.get(1,0) &&
-        this.get(1,1) === rhs.get(1,1) && this.get(1,2) === rhs.get(1,2) &&
-        this.get(2,0) === rhs.get(2,0) && this.get(2,1) === rhs.get(2,1) &&
-        this.get(2,2) === rhs.get(2,2);
+dwv.math.Matrix33.prototype.equals = function (rhs, p) {
+    if (typeof p === "undefined") { p = Number.EPSILON; }
+
+    return Math.abs(this.get(0, 0) - rhs.get(0, 0)) < p && Math.abs(this.get(0, 1) - rhs.get(0, 1)) < p &&
+        Math.abs(this.get(0, 2) - rhs.get(0, 2)) < p && Math.abs(this.get(1, 0) - rhs.get(1, 0)) < p &&
+        Math.abs(this.get(1, 1) - rhs.get(1, 1)) < p && Math.abs(this.get(1, 2) - rhs.get(1, 2)) < p &&
+        Math.abs(this.get(2, 0) - rhs.get(2, 0)) < p && Math.abs(this.get(2, 1) - rhs.get(2, 1)) < p &&
+        Math.abs(this.get(2, 2) - rhs.get(2, 2)) < p;
 };
 
 /**

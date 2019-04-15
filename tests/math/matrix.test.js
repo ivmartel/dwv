@@ -16,7 +16,15 @@ QUnit.test("Test Matrix44.", function (assert) {
     var m2 = new dwv.math.Matrix33(
         1, 2, 3,
         4, 5, 6,
-        7, 8, 9 );
+        7, 8, 9);
+    var m3 = new dwv.math.Matrix33(
+        1.001, 2.001, 3.001,
+        4.001, 5.001, 6.001,
+        7.001, 8.001, 9.001);
+    var m4 = new dwv.math.Matrix33(
+        1.002, 2.002, 3.002,
+        4.002, 5.002, 6.002,
+        7.002, 8.002, 9.002);
 
     // equals
     assert.equal(m0.equals(m1), true, "equals true");
@@ -29,4 +37,10 @@ QUnit.test("Test Matrix44.", function (assert) {
     assert.equal(m2.get(1,0), 4, "get(1,0)");
     assert.equal(m2.get(1,1), 5, "get(1,1)");
     assert.equal(m2.get(1,2), 6, "get(1,2)");
+
+    // equals with precision
+    assert.equal(m3.equals(m4, 0.01), true, "equals true");
+    assert.equal(m3.equals(m4, 0.001), false, "equals false");
 });
+
+
