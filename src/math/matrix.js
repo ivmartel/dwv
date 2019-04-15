@@ -2,6 +2,11 @@
 var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
+// difference between 1 and the smallest floating point number greater than 1
+if (typeof Number.EPSILON === "undefined") {
+    Number.EPSILON = Math.pow(2, -52);
+}
+
 /**
  * Immutable 3x3 Matrix.
  * @constructor
@@ -34,7 +39,7 @@ dwv.math.Matrix33 = function (
  * @return {Boolean} True if both matrices are equal.
  */
 dwv.math.Matrix33.prototype.equals = function (rhs, p) {
-    if (p === undefined) { p = Number.EPSILON; }
+    if (typeof p === "undefined") { p = Number.EPSILON; }
 
     return Math.abs(this.get(0, 0) - rhs.get(0, 0)) < p && Math.abs(this.get(0, 1) - rhs.get(0, 1)) < p &&
         Math.abs(this.get(0, 2) - rhs.get(0, 2)) < p && Math.abs(this.get(1, 0) - rhs.get(1, 0)) < p &&
