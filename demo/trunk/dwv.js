@@ -1,4 +1,4 @@
-/*! dwv 0.26.0-beta 2019-04-15 21:54:57 */
+/*! dwv 0.26.0-beta 2019-04-15 21:59:07 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -27166,7 +27166,9 @@ dwv.utils.base = dwv.utils.base || {};
  * WARNING: platform support dependent, see https://caniuse.com/#feat=url
  */
 dwv.utils.getUrlFromUriFull = function (uri) {
-    return new URL(uri);
+    // add base to allow for relative urls
+    // (base is not used for absolute urls)
+    return new URL(uri, window.location.origin);
 };
 
 /**
