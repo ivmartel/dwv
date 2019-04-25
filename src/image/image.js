@@ -927,7 +927,7 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
             parseFloat( imagePositionPatient[2] ) ];
     } else if (instanceNumber) {
         // use instanceNumber as slice index if no imagePositionPatient was provided
-        console.warn("Using instanceNumber as imagePositionPatient.")
+        console.warn("Using instanceNumber as imagePositionPatient.");
         slicePosition[2] = parseInt(instanceNumber, 10);
     }
 
