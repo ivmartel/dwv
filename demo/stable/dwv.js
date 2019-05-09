@@ -1,4 +1,4 @@
-/*! dwv 0.25.2 2018-10-08 21:45:02 */
+/*! dwv 0.26.0 2019-05-09 22:26:57 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -1388,10 +1388,9 @@ dwv.App = function ()
     function handleAbort(error)
     {
         // log
-        if ( error.message ) {
+        if ( error && error.message ) {
             console.warn(error.message);
-        }
-        else {
+        } else {
             console.warn("Abort called.");
         }
         // stop progress
@@ -2027,21 +2026,53 @@ dwv.DrawController = function (drawDiv)
     };
 
     /**
+     * Delete a Draw from the stage.
+     * @param {Number} groupId The group id of the group to delete.
+     * @param {Object} cmdCallback The DeleteCommand callback.
+     * @param {Object} exeCallback The callback to call once the DeleteCommand has been executed.
+     */
+    this.deleteDrawGroupId = function (groupId, cmdCallback, exeCallback) {
+        var groups = drawLayer.getChildren();
+        var groupToDelete = groups.getChildren( function (node) {
+            return node.id() === groupId;
+        });
+        if ( groupToDelete.length === 1 ) {
+            this.deleteDrawGroup(groupToDelete[0], cmdCallback, exeCallback);
+        } else if ( groupToDelete.length === 0 ) {
+            console.warn("Can't delete group with id:'" + groupId +
+                "', cannot find it.");
+        } else {
+            console.warn("Can't delete group with id:'" + groupId +
+                "', too many with the same id.");
+        }
+    };
+
+    /**
+     * Delete a Draw from the stage.
+     * @param {Object} group The group to delete.
+     * @param {Object} cmdCallback The DeleteCommand callback.
+     * @param {Object} exeCallback The callback to call once the DeleteCommand has been executed.
+     */
+    this.deleteDrawGroup = function (group, cmdCallback, exeCallback) {
+        var shape = group.getChildren( dwv.draw.isNodeNameShape )[0];
+        var shapeDisplayName = dwv.tool.GetShapeDisplayName(shape);
+        var delcmd = new dwv.tool.DeleteGroupCommand(
+            group, shapeDisplayName, drawLayer);
+        delcmd.onExecute = cmdCallback;
+        delcmd.onUndo = cmdCallback;
+        delcmd.execute();
+        exeCallback(delcmd);
+    };
+
+    /**
      * Delete all Draws from the stage.
      * @param {Object} cmdCallback The DeleteCommand callback.
      * @param {Object} exeCallback The callback to call once the DeleteCommand has been executed.
      */
     this.deleteDraws = function (cmdCallback, exeCallback) {
-        var delcmd;
         var groups = drawLayer.getChildren();
         while (groups.length) {
-            var shape = groups[0].getChildren( dwv.draw.isNodeNameShape )[0];
-            delcmd = new dwv.tool.DeleteGroupCommand( groups[0],
-                dwv.tool.GetShapeDisplayName(shape), drawLayer);
-            delcmd.onExecute = cmdCallback;
-            delcmd.onUndo = cmdCallback;
-            delcmd.execute();
-            exeCallback(delcmd);
+            this.deleteDrawGroup(groups[0], cmdCallback, exeCallback);
         }
     };
 
@@ -3599,7 +3630,7 @@ dwv.dicom = dwv.dicom || {};
  * Get the version of the library.
  * @return {String} The version of the library.
  */
-dwv.getVersion = function () { return "0.25.2"; };
+dwv.getVersion = function () { return "0.26.0"; };
 
 /**
  * Clean string: trim and remove ending.
@@ -4233,6 +4264,16 @@ dwv.dicom.isJpeg2000TransferSyntax = function (syntax)
 };
 
 /**
+ * Tell if a given syntax is a RLE (Run-length encoding) one.
+ * @param {String} syntax The transfer syntax to test.
+ * @return {Boolean} True if a RLE syntax.
+ */
+dwv.dicom.isRleTransferSyntax = function (syntax)
+{
+    return syntax.match(/1.2.840.10008.1.2.5/) !== null;
+};
+
+/**
  * Tell if a given syntax needs decompression.
  * @param {String} syntax The transfer syntax to test.
  * @return {String} The name of the decompression algorithm.
@@ -4249,6 +4290,9 @@ dwv.dicom.getSyntaxDecompressionName = function (syntax)
     else if ( dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
         algo = "jpeg-lossless";
     }
+    else if ( dwv.dicom.isRleTransferSyntax(syntax) ) {
+        algo = "rle";
+    }
     return algo;
 };
 
@@ -4264,14 +4308,14 @@ dwv.dicom.isReadSupportedTransferSyntax = function (syntax) {
     // "1.2.840.10008.1.2.4.100": MPEG2 Image Compression
     // dwv.dicom.isJpegRetiredTransferSyntax(syntax): non supported JPEG
     // dwv.dicom.isJpeglsTransferSyntax(syntax): JPEG-LS
-    // "1.2.840.10008.1.2.5": RLE (lossless)
 
     return( syntax === "1.2.840.10008.1.2" || // Implicit VR - Little Endian
         syntax === "1.2.840.10008.1.2.1" || // Explicit VR - Little Endian
         syntax === "1.2.840.10008.1.2.2" || // Explicit VR - Big Endian
         dwv.dicom.isJpegBaselineTransferSyntax(syntax) || // JPEG baseline
         dwv.dicom.isJpegLosslessTransferSyntax(syntax) || // JPEG Lossless
-        dwv.dicom.isJpeg2000TransferSyntax(syntax) ); // JPEG 2000
+        dwv.dicom.isJpeg2000TransferSyntax(syntax) || // JPEG 2000
+        dwv.dicom.isRleTransferSyntax(syntax) ); // RLE
 };
 
 /**
@@ -4339,7 +4383,7 @@ dwv.dicom.getTransferSyntaxName = function (syntax)
         name = "MPEG2";
     }
     // RLE (lossless)
-    else if( syntax === "1.2.840.10008.1.2.5" ) {
+    else if( dwv.dicom.isRleTransferSyntax(syntax) ) {
         name = "RLE";
     }
     // return
@@ -4871,6 +4915,8 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
 {
     var offset = 0;
     var implicit = false;
+    var syntax = "";
+    var dataElement = null;
     // default readers
     var metaReader = new dwv.dicom.DataReader(buffer);
     var dataReader = new dwv.dicom.DataReader(buffer);
@@ -4879,28 +4925,74 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     offset = 128;
     var magicword = metaReader.readString( offset, 4 );
     offset += 4 * Uint8Array.BYTES_PER_ELEMENT;
-    if(magicword !== "DICM")
-    {
-        throw new Error("Not a valid DICOM file (no magic DICM word found)");
-    }
-
-    // 0x0002, 0x0000: FileMetaInformationGroupLength
-    var dataElement = this.readDataElement(metaReader, offset, false);
-    offset = dataElement.endOffset;
-    // store the data element
-    this.dicomElements[dataElement.tag.name] = dataElement;
-    // get meta length
-    var metaLength = parseInt(dataElement.value[0], 10);
-
-    // meta elements
-    var metaEnd = offset + metaLength;
-    while( offset < metaEnd )
-    {
-        // get the data element
+    if (magicword === "DICM") {
+        // 0x0002, 0x0000: FileMetaInformationGroupLength
         dataElement = this.readDataElement(metaReader, offset, false);
         offset = dataElement.endOffset;
         // store the data element
         this.dicomElements[dataElement.tag.name] = dataElement;
+        // get meta length
+        var metaLength = parseInt(dataElement.value[0], 10);
+
+        // meta elements
+        var metaEnd = offset + metaLength;
+        while( offset < metaEnd )
+        {
+            // get the data element
+            dataElement = this.readDataElement(metaReader, offset, false);
+            offset = dataElement.endOffset;
+            // store the data element
+            this.dicomElements[dataElement.tag.name] = dataElement;
+        }
+    } else {
+        // no metadata: attempt to detect transfer syntax
+        // see https://github.com/ivmartel/dwv/issues/188
+        //   (Allow to load DICOM with no DICM preamble) for more details
+        var oEightGroupBigEndian = "0x0800";
+        var oEightGroupLittleEndian = "0x0008";
+        // read first element
+        dataElement = this.readDataElement(dataReader, 0, implicit);
+        // check that group is 0x0008
+        if ((dataElement.tag.group !== oEightGroupBigEndian) &&
+            (dataElement.tag.group !== oEightGroupLittleEndian)) {
+            throw new Error("Not a valid DICOM file (no magic DICM word found and first element not in 0x0008 group)");
+        }
+        // reasonable assumption: 2 uppercase characters => explicit vr
+        var vr0 = dataElement.vr.charCodeAt(0);
+        var vr1 = dataElement.vr.charCodeAt(1);
+        implicit = (vr0 >= 65 && vr0 <= 90 && vr1 >= 65 && vr1 <= 90) ? false : true;
+        // guess transfer syntax
+        if (dataElement.tag.group === oEightGroupLittleEndian) {
+            if (implicit) {
+                 // ImplicitVRLittleEndian
+                syntax = "1.2.840.10008.1.2";
+            } else {
+                // ExplicitVRLittleEndian
+                syntax = "1.2.840.10008.1.2.1";
+            }
+        } else {
+            if (implicit) {
+                // ImplicitVRBigEndian: impossible
+                throw new Error("Not a valid DICOM file (no magic DICM word found and implicit VR big endian detected)");
+            } else {
+                // ExplicitVRBigEndian
+                syntax = "1.2.840.10008.1.2.2";
+            }
+        }
+        // set transfer syntax data element
+        dataElement.tag.group = "0x0002";
+        dataElement.tag.element = "0x0010";
+        dataElement.tag.name = "x00020010";
+        dataElement.tag.endOffset = 4;
+        dataElement.vr = "UI";
+        dataElement.value = [syntax + " "]; // even length
+        dataElement.vl = dataElement.value[0].length;
+        dataElement.endOffset = dataElement.startOffset + dataElement.vl;
+        // store it
+        this.dicomElements[dataElement.tag.name] = dataElement;
+
+        // reset offset
+        offset = 0;
     }
 
     // check the TransferSyntaxUID (has to be there!)
@@ -4908,7 +5000,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     {
         throw new Error("Not a valid DICOM file (no TransferSyntaxUID found)");
     }
-    var syntax = dwv.dicom.cleanString(this.dicomElements.x00020010.value[0]);
+    syntax = dwv.dicom.cleanString(this.dicomElements.x00020010.value[0]);
 
     // check support
     if (!dwv.dicom.isReadSupportedTransferSyntax(syntax)) {
@@ -5787,15 +5879,33 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     offset = metaWriter.writeDataElement(fmigl, offset, false);
     // write meta
     for ( var j = 0, lenj = metaElements.length; j < lenj; ++j ) {
+        dwv.dicom.checkUnkwownVR(metaElements[j]);
         offset = metaWriter.writeDataElement(metaElements[j], offset, false);
     }
     // write non meta
     for ( var k = 0, lenk = rawElements.length; k < lenk; ++k ) {
+        dwv.dicom.checkUnkwownVR(rawElements[k]);
         offset = dataWriter.writeDataElement(rawElements[k], offset, isImplicit);
     }
 
     // return
     return buffer;
+};
+
+/**
+ * Fix for broken DICOM elements: Replace "UN" with correct VR if the element exists in dictionary 
+ */
+dwv.dicom.checkUnkwownVR = function (element)
+{
+    var dict = dwv.dicom.dictionary;
+    if (element.vr == "UN") {
+        if ( typeof dict[element.tag.group] !== "undefined" && typeof dict[element.tag.group][element.tag.element] !== "undefined" ) {
+            if (element.vr != dict[element.tag.group][element.tag.element][0]) {
+                element.vr = dict[element.tag.group][element.tag.element][0];
+                console.log("Element " + element.tag.group + " " + element.tag.element +" VR changed from UN to " + element.vr);
+            }
+        }
+    }
 };
 
 /**
@@ -13567,19 +13677,17 @@ dwv.image.AsynchPixelBufferDecoder = function (script)
     /**
      * Decode a pixel buffer.
      * @param {Array} pixelBuffer The pixel buffer.
-     * @param {Number} bitsAllocated The bits allocated per element in the buffer.
-     * @param {Boolean} isSigned Is the data signed.
+     * @param {Object} pixelMeta The input meta data.
      * @param {Function} callback Callback function to handle decoded data.
      */
-    this.decode = function (pixelBuffer, bitsAllocated, isSigned, callback) {
+    this.decode = function (pixelBuffer, pixelMeta, callback) {
         // (re)set event handler
         pool.onpoolworkend = this.ondecodeend;
         pool.onworkerend = this.ondecoded;
         // create worker task
         var workerTask = new dwv.utils.WorkerTask(script, callback, {
             'buffer': pixelBuffer,
-            'bitsAllocated': bitsAllocated,
-            'isSigned': isSigned } );
+            'meta': pixelMeta } );
         // add it the queue and run it
         pool.addWorkerTask(workerTask);
     };
@@ -13618,14 +13726,13 @@ dwv.image.SynchPixelBufferDecoder = function (algoName)
     /**
      * Decode a pixel buffer.
      * @param {Array} pixelBuffer The pixel buffer.
-     * @param {Number} bitsAllocated The bits allocated per element in the buffer.
-     * @param {Boolean} isSigned Is the data signed.
+     * @param {Object} pixelMeta The input meta data.
      * @param {Function} callback Callback function to handle decoded data.
      * @external jpeg
      * @external JpegImage
      * @external JpxImage
      */
-    this.decode = function (pixelBuffer, bitsAllocated, isSigned, callback) {
+    this.decode = function (pixelBuffer, pixelMeta, callback) {
         var decoder = null;
         var decodedBuffer = null;
         if( algoName === "jpeg-lossless" ) {
@@ -13633,36 +13740,31 @@ dwv.image.SynchPixelBufferDecoder = function (algoName)
                 throw new Error("No JPEG Lossless decoder provided");
             }
             // bytes per element
-            var bpe = bitsAllocated / 8;
+            var bpe = pixelMeta.bitsAllocated / 8;
             var buf = new Uint8Array( pixelBuffer );
             decoder = new jpeg.lossless.Decoder();
             var decoded = decoder.decode(buf.buffer, 0, buf.buffer.byteLength, bpe);
-            if (bitsAllocated === 8) {
-                if (isSigned) {
+            if (pixelMeta.bitsAllocated === 8) {
+                if (pixelMeta.isSigned) {
                     decodedBuffer = new Int8Array(decoded.buffer);
-                }
-                else {
+                } else {
                     decodedBuffer = new Uint8Array(decoded.buffer);
                 }
-            }
-            else if (bitsAllocated === 16) {
-                if (isSigned) {
+            } else if (pixelMeta.bitsAllocated === 16) {
+                if (pixelMeta.isSigned) {
                     decodedBuffer = new Int16Array(decoded.buffer);
-                }
-                else {
+                } else {
                     decodedBuffer = new Uint16Array(decoded.buffer);
                 }
             }
-        }
-        else if ( algoName === "jpeg-baseline" ) {
+        } else if ( algoName === "jpeg-baseline" ) {
             if ( !hasJpegBaselineDecoder ) {
                 throw new Error("No JPEG Baseline decoder provided");
             }
             decoder = new JpegImage();
             decoder.parse( pixelBuffer );
             decodedBuffer = decoder.getData(decoder.width,decoder.height);
-        }
-        else if( algoName === "jpeg2000" ) {
+        } else if( algoName === "jpeg2000" ) {
             if ( !hasJpeg2000Decoder ) {
                 throw new Error("No JPEG 2000 decoder provided");
             }
@@ -13671,6 +13773,17 @@ dwv.image.SynchPixelBufferDecoder = function (algoName)
             decoder.parse( pixelBuffer );
             // set the pixel buffer
             decodedBuffer = decoder.tiles[0].items;
+        } else if( algoName === "rle" ) {
+            // decode DICOM buffer
+            decoder = new dwv.decoder.RleDecoder();
+            // set the pixel buffer
+            decodedBuffer = decoder.decode(
+                pixelBuffer,
+                pixelMeta.bitsAllocated,
+                pixelMeta.isSigned,
+                pixelMeta.sliceSize,
+                pixelMeta.samplesPerPixel,
+                pixelMeta.planarConfiguration );
         }
         // send events
         this.ondecoded();
@@ -13731,17 +13844,16 @@ dwv.image.PixelBufferDecoder = function (algoName)
     /**
      * Get data from an input buffer using a DICOM parser.
      * @param {Array} pixelBuffer The input data buffer.
-     * @param {Number} bitsAllocated The bits allocated per element in the buffer.
-     * @param {Boolean} isSigned Is the data signed.
+     * @param {Object} pixelMeta The input meta data.
      * @param {Object} callback The callback on the conversion.
      */
-    this.decode = function (pixelBuffer, bitsAllocated, isSigned, callback)
+    this.decode = function (pixelBuffer, pixelMeta, callback)
     {
         // set event handler
         pixelDecoder.ondecodeend = this.ondecodeend;
         pixelDecoder.ondecoded = this.ondecoded;
         // decode and call the callback
-        pixelDecoder.decode(pixelBuffer, bitsAllocated, isSigned, callback);
+        pixelDecoder.decode(pixelBuffer, pixelMeta, callback);
     };
 
     /**
@@ -13837,9 +13949,27 @@ dwv.image.DicomBufferToView = function ()
         };
 
         if ( needDecompression ) {
+            // gather pixel buffer meta data
             var bitsAllocated = dicomParser.getRawDicomElements().x00280100.value[0];
             var pixelRepresentation = dicomParser.getRawDicomElements().x00280103.value[0];
-            var isSigned = (pixelRepresentation === 1);
+            var pixelMeta = {
+                "bitsAllocated": bitsAllocated,
+                "isSigned": (pixelRepresentation === 1)
+            };
+            var columnsElement = dicomParser.getRawDicomElements().x00280011;
+            var rowsElement = dicomParser.getRawDicomElements().x00280010;
+            if (typeof columnsElement !== "undefined" && typeof rowsElement !== "undefined") {
+                pixelMeta.sliceSize = columnsElement.value[0] * rowsElement.value[0];
+            }
+            var samplesPerPixelElement = dicomParser.getRawDicomElements().x00280002;
+            if (typeof samplesPerPixelElement !== "undefined") {
+                pixelMeta.samplesPerPixel = samplesPerPixelElement.value[0];
+            }
+            var planarConfigurationElement = dicomParser.getRawDicomElements().x00280006;
+            if (typeof planarConfigurationElement !== "undefined") {
+                pixelMeta.planarConfiguration = planarConfigurationElement.value[0];
+            }
+
             var nFrames = pixelBuffer.length;
 
             if (!pixelDecoder){
@@ -13881,14 +14011,14 @@ dwv.image.DicomBufferToView = function ()
 
             // decompress synchronously the first frame to create the image
             pixelDecoder.decode(pixelBuffer[0],
-                bitsAllocated, isSigned, onDecodedFrame(0), false);
+                pixelMeta, onDecodedFrame(0), false);
 
             // decompress the possible other frames
             if ( nFrames !== 1 ) {
                 // decode (asynchronously if possible)
                 for (var f = 1; f < nFrames; ++f) {
                     pixelDecoder.decode(pixelBuffer[f],
-                        bitsAllocated, isSigned, onDecodedFrame(f));
+                        pixelMeta, onDecodedFrame(f));
                 }
             }
         }
@@ -14941,7 +15071,7 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
         if( size.getNumberOfRows() !== rhsSize.getNumberOfRows() ) {
             throw new Error("Cannot append a slice with different number of rows");
         }
-        if( !geometry.getOrientation().equals( rhs.getGeometry().getOrientation() ) ) {
+        if( !geometry.getOrientation().equals( rhs.getGeometry().getOrientation(), 0.0001 ) ) {
             throw new Error("Cannot append a slice with different orientation");
         }
         if( photometricInterpretation !== rhs.getPhotometricInterpretation() ) {
@@ -15516,14 +15646,21 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var jpegBase = dwv.dicom.isJpegBaselineTransferSyntax( syntax );
     var jpegLoss = dwv.dicom.isJpegLosslessTransferSyntax( syntax );
 
-    // slice position
-    var slicePosition = new Array(0,0,0);
     // ImagePositionPatient
     var imagePositionPatient = dicomElements.getFromKey("x00200032");
+    // InstanceNumber
+    var instanceNumber = dicomElements.getFromKey("x00200013");
+
+    // slice position
+    var slicePosition = new Array(0,0,0);
     if ( imagePositionPatient ) {
         slicePosition = [ parseFloat( imagePositionPatient[0] ),
             parseFloat( imagePositionPatient[1] ),
             parseFloat( imagePositionPatient[2] ) ];
+    } else if (instanceNumber) {
+        // use instanceNumber as slice index if no imagePositionPatient was provided
+        console.warn("Using instanceNumber as imagePositionPatient.");
+        slicePosition[2] = parseInt(instanceNumber, 10);
     }
 
     // slice orientation
@@ -16606,6 +16743,11 @@ dwv.image.View.prototype.getWindowLevelMinMax = function ()
     var min = range.min;
     var max = range.max;
     var width = max - min;
+    // full black / white images, defaults to 1.
+    if ( width < 1 ) {
+        console.warn("Zero or negative width, defaulting to one.");
+        width = 1;
+    }
     var center = min + width/2;
     return new dwv.image.WindowLevel(center, width);
 };
@@ -17006,13 +17148,10 @@ dwv.io.DicomDataLoader = function ()
  * @return True if the file can be loaded.
  */
 dwv.io.DicomDataLoader.prototype.canLoadFile = function (file) {
-    var split = file.name.split('.');
-    var ext = "";
-    if (split.length !== 1) {
-        ext = split.pop().toLowerCase();
-    }
-    var hasExt = (ext.length !== 0);
-    return !hasExt || (ext === "dcm");
+    var ext = dwv.utils.getFileExtension(file.name);
+    var hasNoExt = (ext === null);
+    var hasDcmExt = (ext === "dcm");
+    return hasNoExt || hasDcmExt;
 };
 
 /**
@@ -17024,17 +17163,16 @@ dwv.io.DicomDataLoader.prototype.canLoadFile = function (file) {
  * @return True if the url can be loaded.
  */
 dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url) {
-    var split = url.split('.');
-    var ext = "";
-    if (split.length !== 1) {
-        ext = split.pop().toLowerCase();
-    }
-    var hasExt = (ext.length !== 0) && (ext.length < 5);
-    // wado url
-    var hasContentType = (url.indexOf("&contentType") !== -1);
-    var isDicomContentType = (url.indexOf("&contentType=application/dicom") !== -1);
+    var urlObjext = dwv.utils.getUrlFromUri(url);
+    // extension
+    var ext = dwv.utils.getFileExtension(urlObjext.pathname);
+    var hasNoExt = (ext === null);
+    var hasDcmExt = (ext === "dcm");
+    // content type (for wado url)
+    var contentType = urlObjext.searchParams.get("contentType");
+    var hasDicomContentType = (contentType === "application/dicom");
 
-    return hasContentType ? isDicomContentType : !hasExt || (ext === "dcm");
+    return hasDicomContentType || hasNoExt || hasDcmExt;
 };
 
 /**
@@ -17481,7 +17619,7 @@ dwv.io.JSONTextLoader = function ()
  * @return True if the file can be loaded.
  */
 dwv.io.JSONTextLoader.prototype.canLoadFile = function (file) {
-    var ext = file.name.split('.').pop().toLowerCase();
+    var ext = dwv.utils.getFileExtension(file.name);
     return (ext === "json");
 };
 
@@ -17491,7 +17629,8 @@ dwv.io.JSONTextLoader.prototype.canLoadFile = function (file) {
  * @return True if the url can be loaded.
  */
 dwv.io.JSONTextLoader.prototype.canLoadUrl = function (url) {
-    var ext = url.split('.').pop().toLowerCase();
+    var urlObjext = dwv.utils.getUrlFromUri(url);
+    var ext = dwv.utils.getFileExtension(urlObjext.pathname);
     return (ext === "json");
 };
 
@@ -17704,6 +17843,7 @@ dwv.io.MemoryLoader.prototype.load = function (ioArray)
 
     var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
     mproghandler.setNToLoad( ioArray.length );
+    mproghandler.setNumberOfDimensions(1);
 
     // get loaders
     var loaders = [];
@@ -17722,7 +17862,7 @@ dwv.io.MemoryLoader.prototype.load = function (ioArray)
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
         });
-        loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
+        loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(0);
     }
 
     // loop on I/O elements
@@ -17765,6 +17905,12 @@ dwv.io.RawImageLoader = function ()
     var self = this;
 
     /**
+     * if abort is triggered, all image.onload callbacks have to be cancelled
+     * @type {boolean}
+     */
+    var aborted = false;
+
+    /**
      * Set the loader options.
      * @param {Object} opt The input options.
      */
@@ -17803,12 +17949,15 @@ dwv.io.RawImageLoader = function ()
      * @param {Number} index The data index.
      */
     this.load = function ( dataUri, origin, index ) {
+        aborted = false;
         // create a DOM image
         var image = new Image();
         // triggered by ctx.drawImage
         image.onload = function (/*event*/) {
             try {
-                self.onload( dwv.image.getViewFromDOMImage(this) );
+                if(!aborted){
+                    self.onload( dwv.image.getViewFromDOMImage(this) );
+                }
                 self.onloadend();
             } catch (error) {
                 self.onerror(error);
@@ -17826,6 +17975,7 @@ dwv.io.RawImageLoader = function ()
      * Abort load. TODO...
      */
     this.abort = function () {
+        aborted = true;
         self.onabort();
     };
 
@@ -17881,15 +18031,18 @@ dwv.io.RawImageLoader.prototype.canLoadFile = function (file) {
  * @return True if the url can be loaded.
  */
 dwv.io.RawImageLoader.prototype.canLoadUrl = function (url) {
-    var ext = url.split('.').pop().toLowerCase();
+    var urlObjext = dwv.utils.getUrlFromUri(url);
+    // extension
+    var ext = dwv.utils.getFileExtension(urlObjext.pathname);
     var hasImageExt = (ext === "jpeg") || (ext === "jpg") ||
             (ext === "png") || (ext === "gif");
-    // wado url
-    var isImageContentType = (url.indexOf("contentType=image/jpeg") !== -1) ||
-        (url.indexOf("contentType=image/png") !== -1) ||
-        (url.indexOf("contentType=image/gif") !== -1);
+    // content type (for wado url)
+    var contentType = urlObjext.searchParams.get("contentType");
+    var hasImageContentType = (contentType === "image/jpeg") ||
+        (contentType === "image/png") ||
+        (contentType === "image/gif");
 
-    return isImageContentType || hasImageExt;
+    return hasImageContentType || hasImageExt;
 };
 
 /**
@@ -18078,7 +18231,8 @@ dwv.io.RawVideoLoader.prototype.canLoadFile = function (file) {
  * @return True if the url can be loaded.
  */
 dwv.io.RawVideoLoader.prototype.canLoadUrl = function (url) {
-    var ext = url.split('.').pop().toLowerCase();
+    var urlObjext = dwv.utils.getUrlFromUri(url);
+    var ext = dwv.utils.getFileExtension(urlObjext.pathname);
     return (ext === "mp4") || (ext === "ogg") ||
             (ext === "webm");
 };
@@ -18249,7 +18403,7 @@ dwv.io.UrlsLoader = function ()
         // abort requests
         for ( var i = 0; i < requests.length; ++i ) {
             // 0: UNSENT, 1: OPENED, 2: HEADERS_RECEIVED (send()), 3: LOADING, 4: DONE
-            if ( requests[i].readyState === 2 || requests[i].readyState === 3 ) {
+            if ( requests[i].readyState !== 4 ) {
                 requests[i].abort();
             }
         }
@@ -18518,18 +18672,27 @@ dwv.io.ZipLoader = function ()
     /**
      * JSZip.async callback
      * @param {ArrayBuffer} content unzipped file image
+     * @param {Number} index The data index.
      * @return {}
      */
-    function zipAsyncCallback(content)
+    function zipAsyncCallback(content, index)
     {
-    	files.push({"filename": filename, "data": content});
+        files.push({"filename": filename, "data": content});
 
-    	if (files.length < zobjs.length){
-    		var num = files.length;
-    		filename = zobjs[num].name;
-    		zobjs[num].async("arrayBuffer").then(zipAsyncCallback);
-    	}
-    	else {
+        // sent un-ziped progress with the data index
+        // (max 50% to take into account the memory loading)
+        var unzipPercent = files.length * 50 / zobjs.length;
+        self.onprogress({'type': 'read-progress', 'lengthComputable': true,
+            'loaded': unzipPercent, 'total': 100, 'index': index});
+
+        // recursively call until we have all the files
+        if (files.length < zobjs.length) {
+            var num = files.length;
+            filename = zobjs[num].name;
+            zobjs[num].async("arrayBuffer").then( function (content) {
+                zipAsyncCallback(content, index);
+            });
+        } else {
             var memoryIO = new dwv.io.MemoryLoader();
             memoryIO.onload = self.onload;
             memoryIO.onloadend = function () {
@@ -18538,7 +18701,13 @@ dwv.io.ZipLoader = function ()
                 // call listeners
                 self.onloadend();
             };
-            memoryIO.onprogress = self.onprogress;
+            memoryIO.onprogress = function (progress) {
+                // add 50% to take into account the un-zipping
+                progress.loaded = 50 + progress.loaded / 2;
+                // set data index
+                progress.index = index;
+                self.onprogress(progress);
+            };
             memoryIO.onerror = self.onerror;
             memoryIO.onabort = self.onabort;
 
@@ -18552,17 +18721,19 @@ dwv.io.ZipLoader = function ()
      * @param {String} origin The data origin.
      * @param {Number} index The data index.
      */
-    this.load = function (buffer/*, origin, index*/) {
+    this.load = function (buffer, origin, index) {
         // set loading flag
         isLoading = true;
 
         JSZip.loadAsync(buffer).then( function(zip) {
             files = [];
-        	zobjs = zip.file(/.*\.dcm/);
+            zobjs = zip.file(/.*\.dcm/);
             // recursively load zip files into the files array
-        	var num = files.length;
-        	filename = zobjs[num].name;
-        	zobjs[num].async("arrayBuffer").then(zipAsyncCallback);
+            var num = files.length;
+            filename = zobjs[num].name;
+            zobjs[num].async("arrayBuffer").then( function (content) {
+                zipAsyncCallback(content, index);
+            });
         });
     };
 
@@ -18618,7 +18789,7 @@ dwv.io.ZipLoader = function ()
  * @return True if the file can be loaded.
  */
 dwv.io.ZipLoader.prototype.canLoadFile = function (file) {
-    var ext = file.name.split('.').pop().toLowerCase();
+    var ext = dwv.utils.getFileExtension(file.name);
     return (ext === "zip");
 };
 
@@ -18628,7 +18799,8 @@ dwv.io.ZipLoader.prototype.canLoadFile = function (file) {
  * @return True if the url can be loaded.
  */
 dwv.io.ZipLoader.prototype.canLoadUrl = function (url) {
-    var ext = url.split('.').pop().toLowerCase();
+    var urlObjext = dwv.utils.getUrlFromUri(url);
+    var ext = dwv.utils.getFileExtension(urlObjext.pathname);
     return (ext === "zip");
 };
 
@@ -18800,6 +18972,11 @@ dwv.math.BucketQueue.prototype.buildArray = function(newSize) {
 var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
+// difference between 1 and the smallest floating point number greater than 1
+if (typeof Number.EPSILON === "undefined") {
+    Number.EPSILON = Math.pow(2, -52);
+}
+
 /**
  * Immutable 3x3 Matrix.
  * @constructor
@@ -18828,14 +19005,17 @@ dwv.math.Matrix33 = function (
 /**
  * Check for Matrix33 equality.
  * @param {Object} rhs The other matrix to compare to.
+ * @param {Number} p A numeric expression for the precision to use in check  (ex: 0.001). Defaults to Number.EPSILON if not provided.
  * @return {Boolean} True if both matrices are equal.
  */
-dwv.math.Matrix33.prototype.equals = function (rhs) {
-    return this.get(0,0) === rhs.get(0,0) && this.get(0,1) === rhs.get(0,1) &&
-        this.get(0,2) === rhs.get(0,2) && this.get(1,0) === rhs.get(1,0) &&
-        this.get(1,1) === rhs.get(1,1) && this.get(1,2) === rhs.get(1,2) &&
-        this.get(2,0) === rhs.get(2,0) && this.get(2,1) === rhs.get(2,1) &&
-        this.get(2,2) === rhs.get(2,2);
+dwv.math.Matrix33.prototype.equals = function (rhs, p) {
+    if (typeof p === "undefined") { p = Number.EPSILON; }
+
+    return Math.abs(this.get(0, 0) - rhs.get(0, 0)) < p && Math.abs(this.get(0, 1) - rhs.get(0, 1)) < p &&
+        Math.abs(this.get(0, 2) - rhs.get(0, 2)) < p && Math.abs(this.get(1, 0) - rhs.get(1, 0)) < p &&
+        Math.abs(this.get(1, 1) - rhs.get(1, 1)) < p && Math.abs(this.get(1, 2) - rhs.get(1, 2)) < p &&
+        Math.abs(this.get(2, 0) - rhs.get(2, 0)) < p && Math.abs(this.get(2, 1) - rhs.get(2, 1)) < p &&
+        Math.abs(this.get(2, 2) - rhs.get(2, 2)) < p;
 };
 
 /**
@@ -25394,7 +25574,7 @@ dwv.browser = dwv.browser || {};
  * Local function to ask Modernizr if a property is supported.
  * @parma {String} property The property to test.
  */
-function askModernizr( property ) {
+dwv.browser.askModernizr = function (property) {
     if ( typeof dwv.Modernizr === "undefined" ) {
         dwv.ModernizrInit(window, document);
     }
@@ -25404,7 +25584,7 @@ function askModernizr( property ) {
         prop = prop[props[i]];
     }
     return prop;
-}
+};
 
 /**
  * Browser check for the FileAPI.
@@ -25423,7 +25603,7 @@ dwv.browser.hasFileApi = function()
         return true;
     }
     // regular test
-    return askModernizr("filereader");
+    return dwv.browser.askModernizr("filereader");
 };
 
 /**
@@ -25431,9 +25611,9 @@ dwv.browser.hasFileApi = function()
  */
 dwv.browser.hasXmlHttpRequest = function()
 {
-    return askModernizr("xhrresponsetype") &&
-        askModernizr("xhrresponsetypearraybuffer") &&
-        askModernizr("xhrresponsetypetext") &&
+    return dwv.browser.askModernizr("xhrresponsetype") &&
+        dwv.browser.askModernizr("xhrresponsetypearraybuffer") &&
+        dwv.browser.askModernizr("xhrresponsetypetext") &&
         "XMLHttpRequest" in window && "withCredentials" in new XMLHttpRequest();
 };
 
@@ -25442,7 +25622,7 @@ dwv.browser.hasXmlHttpRequest = function()
  */
 dwv.browser.hasTypedArray = function()
 {
-    return askModernizr("dataview") && askModernizr("typedarrays");
+    return dwv.browser.askModernizr("dataview") && dwv.browser.askModernizr("typedarrays");
 };
 
 /**
@@ -25451,7 +25631,7 @@ dwv.browser.hasTypedArray = function()
  */
 dwv.browser.hasInputColor = function()
 {
-    return askModernizr("inputtypes.color");
+    return dwv.browser.askModernizr("inputtypes.color");
 };
 
 /**
@@ -25460,7 +25640,7 @@ dwv.browser.hasInputColor = function()
  */
 dwv.browser.hasInputDirectory = function()
 {
-    return askModernizr("fileinputdirectory");
+    return dwv.browser.askModernizr("fileinputdirectory");
 };
 
 
@@ -25845,7 +26025,7 @@ var dwv = dwv || {};
 
 /*!
  * modernizr v3.6.0
- * Build https://modernizr.com/download?-dataview-directory-filereader-inputtypes-typedarrays-xhrresponsetype-xhrresponsetypearraybuffer-xhrresponsetypejson-xhrresponsetypetext-dontmin
+ * Build https://modernizr.com/download?-dataview-directory-filereader-inputtypes-typedarrays-urlparser-urlsearchparams-xhrresponsetype-xhrresponsetypearraybuffer-xhrresponsetypejson-xhrresponsetypetext-dontmin
  *
  * Copyright (c)
  *  Faruk Ates
@@ -25868,7 +26048,7 @@ var dwv = dwv || {};
 */
 
 dwv.ModernizrInit = function (window, document, undefined) {
-//;(function(window, document, undefined){
+// ;(function(window, document, undefined){
   var tests = [];
 
 
@@ -26032,6 +26212,60 @@ Tests for XMLHttpRequest xhr.responseType.
     xhr.open('get', '/', true);
     return 'response' in xhr;
   }()));
+
+/*!
+{
+  "name": "URL parser",
+  "property": "urlparser",
+  "notes": [{
+    "name": "URL",
+    "href": "https://dvcs.w3.org/hg/url/raw-file/tip/Overview.html"
+  }],
+  "polyfills": ["urlparser"],
+  "authors": ["Ron Waldon (@jokeyrhyme)"],
+  "tags": ["url"]
+}
+!*/
+/* DOC
+Check if browser implements the URL constructor for parsing URLs.
+*/
+
+  Modernizr.addTest('urlparser', function() {
+    var url;
+    try {
+      // have to actually try use it, because Safari defines a dud constructor
+      url = new URL('http://modernizr.com/');
+      return url.href === 'http://modernizr.com/';
+    } catch (e) {
+      return false;
+    }
+  });
+
+/*!
+{
+  "authors": ["Cătălin Mariș"],
+  "name": "URLSearchParams API",
+  "notes": [
+    {
+      "name": "WHATWG specification",
+      "href": "https://url.spec.whatwg.org/#interface-urlsearchparams"
+    },
+    {
+      "name": "MDN documentation",
+      "href": "https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams"
+    }
+  ],
+  "property": "urlsearchparams",
+  "tags": ["querystring", "url"]
+}
+!*/
+
+/* DOC
+Detects support for an API that provides utility methods for working with the query string of a URL.
+*/
+
+
+  Modernizr.addTest('urlsearchparams', 'URLSearchParams' in window);
 
 
   var classes = [];
@@ -26449,13 +26683,13 @@ file selection dialog.
   }
 
   // Leak Modernizr namespace
-  //window.Modernizr = Modernizr;
+  // window.Modernizr = Modernizr;
   dwv.Modernizr = Modernizr;
 
 
 ;
 
-//})(window, document);
+// })(window, document);
 };
 
 // namespaces
@@ -26477,6 +26711,10 @@ dwv.utils.MultiProgressHandler = function (callback)
      * List of progresses.
      * @private
      * @type Array
+     * First dimension is a list of item for which the progress is recorded,
+     *   for example file names.
+     * Second dimension is a list of possible progresses, for example
+     *   the progress of the download and the progress of the decoding.
      */
     var progresses = [];
 
@@ -26749,6 +26987,22 @@ dwv.utils.getRootPath = function (path) {
   return path.split('/').slice(0, -1).join('/');
 };
 
+/**
+ * Get a file extension
+ * @param {String} filePath The file path containing the file name.
+ * @returns {String} The lower case file extension or null for none.
+ */
+dwv.utils.getFileExtension = function (filePath) {
+    var ext = null;
+    if (typeof filePath !== 'undefined' && filePath) {
+        var pathSplit = filePath.split('.');
+        if (pathSplit.length !== 1) {
+            ext = pathSplit.pop().toLowerCase();
+        }
+    }
+    return ext;
+};
+
 // namespaces
 var dwv = dwv || {};
 dwv.utils = dwv.utils || {};
@@ -26941,6 +27195,75 @@ var dwv = dwv || {};
 dwv.utils = dwv.utils || {};
 /** @namespace */
 dwv.utils.base = dwv.utils.base || {};
+
+/**
+ * Get an full object URL from a string uri.
+ * @param {String} uri A string representing the url.
+ * @returns {URL} A URL object.
+ * WARNING: platform support dependent, see https://caniuse.com/#feat=url
+ */
+dwv.utils.getUrlFromUriFull = function (uri) {
+    // add base to allow for relative urls
+    // (base is not used for absolute urls)
+    return new URL(uri, window.location.origin);
+};
+
+/**
+ * Get an simple object URL from a string uri.
+ * @param {String} uri A string representing the url.
+ * @returns {URL} A simple URL object that exposes 'pathname' and 'searchParams.get()'
+ * WARNING: limited functionality, simple nmock of the URL object.
+ */
+dwv.utils.getUrlFromUriSimple = function (uri) {
+    var url = {};
+    // simple implementation (mainly for IE)
+    // expecting only one '?'
+    var urlSplit = uri.split('?');
+    // pathname
+    var fullPath = urlSplit[0];
+    // remove host and domain
+    var fullPathSplit = fullPath.split('//');
+    var hostAndPath = fullPathSplit.pop();
+    var hostAndPathSplit = hostAndPath.split('/');
+    hostAndPathSplit.splice(0, 1);
+    url.pathname = '/' + hostAndPathSplit.join('/');
+    // search params
+    var searchSplit = [];
+    if (urlSplit.length === 2) {
+        var search = urlSplit[1];
+        searchSplit = search.split('&');
+    }
+    var searchParams = {};
+    for (var i = 0; i < searchSplit.length; ++i) {
+        var paramSplit = searchSplit[i].split('=');
+        searchParams[paramSplit[0]] = paramSplit[1];
+    }
+    url.searchParams = {
+        get: function (param) {
+            return searchParams[param];
+        }
+    };
+
+    return url;
+};
+
+/**
+ * Get an object URL from a string uri.
+ * @param {String} uri A string representing the url.
+ * @returns {URL} A URL object (full or simple depending upon platform).
+ * WANRING: returns an official URL or a simple URL depending on platform,
+ *   see https://caniuse.com/#feat=url
+ */
+dwv.utils.getUrlFromUri = function (uri) {
+    var url = null;
+    if (dwv.browser.askModernizr('urlparser') &&
+        dwv.browser.askModernizr('urlsearchparams')) {
+        url = dwv.utils.getUrlFromUriFull(uri);
+    } else {
+        url = dwv.utils.getUrlFromUriSimple(uri);
+    }
+    return url;
+};
 
 /**
  * Split an input URI:

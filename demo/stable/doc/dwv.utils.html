@@ -54,7 +54,7 @@
 			<li class="dropdown">
 				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
 				<ul class="dropdown-menu inline">
-					<li><a href="global.html#askModernizr">askModernizr</a></li><li><a href="global.html#mulABC">mulABC</a></li><li><a href="global.html#webdriver">webdriver</a></li>
+					<li><a href="global.html#mulABC">mulABC</a></li><li><a href="global.html#webdriver">webdriver</a></li>
 				</ul>
 			</li>
 			
@@ -502,7 +502,7 @@ be an array of base + each key.
 		<ul class="dummy">
 			<li>
 				<a href="src_utils_uri.js.html">src/utils/uri.js</a>,
-				 <a href="src_utils_uri.js.html#sunlight-1-line-88">line 88</a>
+				 <a href="src_utils_uri.js.html#sunlight-1-line-157">line 157</a>
 			</li>
 		</ul>
 	</dd>
@@ -675,7 +675,7 @@ be an array of base + each key.
 		<ul class="dummy">
 			<li>
 				<a href="src_utils_uri.js.html">src/utils/uri.js</a>,
-				 <a href="src_utils_uri.js.html#sunlight-1-line-207">line 207</a>
+				 <a href="src_utils_uri.js.html#sunlight-1-line-276">line 276</a>
 			</li>
 		</ul>
 	</dd>
@@ -878,6 +878,168 @@ be an array of base + each key.
     <dd>
         
 <span class="param-type">Boolean</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".getFileExtension"><span class="type-signature">&lt;static> </span>getFileExtension(filePath)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get a file extension
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>filePath</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The file path containing the file name.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_utils_string.js.html">src/utils/string.js</a>,
+				 <a href="src_utils_string.js.html#sunlight-1-line-168">line 168</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    The lower case file extension or null for none.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">String</span>
 
 
 
@@ -1162,7 +1324,7 @@ The URI scheme is: 'base?query#fragment'
 		<ul class="dummy">
 			<li>
 				<a href="src_utils_uri.js.html">src/utils/uri.js</a>,
-				 <a href="src_utils_uri.js.html#sunlight-1-line-44">line 44</a>
+				 <a href="src_utils_uri.js.html#sunlight-1-line-113">line 113</a>
 			</li>
 		</ul>
 	</dd>
@@ -1203,6 +1365,496 @@ The URI scheme is: 'base?query#fragment'
     <dd>
         
 <span class="param-type">Object</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".getUrlFromUri"><span class="type-signature">&lt;static> </span>getUrlFromUri(uri)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get an object URL from a string uri.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>uri</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A string representing the url.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_utils_uri.js.html">src/utils/uri.js</a>,
+				 <a href="src_utils_uri.js.html#sunlight-1-line-65">line 65</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    A URL object (full or simple depending upon platform).
+WANRING: returns an official URL or a simple URL depending on platform,
+  see https://caniuse.com/#feat=url
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">URL</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".getUrlFromUriFull"><span class="type-signature">&lt;static> </span>getUrlFromUriFull(uri)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get an full object URL from a string uri.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>uri</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A string representing the url.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_utils_uri.js.html">src/utils/uri.js</a>,
+				 <a href="src_utils_uri.js.html#sunlight-1-line-13">line 13</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    A URL object.
+WARNING: platform support dependent, see https://caniuse.com/#feat=url
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">URL</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id=".getUrlFromUriSimple"><span class="type-signature">&lt;static> </span>getUrlFromUriSimple(uri)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get an simple object URL from a string uri.
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>uri</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A string representing the url.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="src_utils_uri.js.html">src/utils/uri.js</a>,
+				 <a href="src_utils_uri.js.html#sunlight-1-line-25">line 25</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    A simple URL object that exposes 'pathname' and 'searchParams.get()'
+WARNING: limited functionality, simple nmock of the URL object.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">URL</span>
 
 
 
@@ -2022,7 +2674,7 @@ Returns an empty object if the input string is not correct (null, empty...)
 		<ul class="dummy">
 			<li>
 				<a href="src_utils_uri.js.html">src/utils/uri.js</a>,
-				 <a href="src_utils_uri.js.html#sunlight-1-line-16">line 16</a>
+				 <a href="src_utils_uri.js.html#sunlight-1-line-85">line 85</a>
 			</li>
 		</ul>
 	</dd>
@@ -2123,9 +2775,9 @@ Returns an empty object if the input string is not correct (null, empty...)
 
 
 <span class="jsdoc-message">
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.1</a>
 	
-		on Monday, October 8th 2018
+		on Thursday, May 9th 2019
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>
