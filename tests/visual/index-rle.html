@@ -2,7 +2,7 @@
 <html>
 
 <head>
-<title>DWV DICOM Check</title>
+<title>DWV DICOM jpg Check</title>
 <meta charset="UTF-8">
 <meta name="description" content="DICOM Web Viewer (DWV) simple version">
 <meta name="keywords" content="DICOM,HTML5,JavaScript,medical,imaging,DWV">
@@ -19,8 +19,8 @@ body { font-family: Arial, Helvetica, sans-serif; }
 }
 .doc { float: left; margin: 5px; }
 .path {
-    border-bottom: 1px dashed #999;
-    text-decoration: none;
+  border-bottom: 1px dashed #999;
+  text-decoration: none;
 }
 .key {
     color: #999;
@@ -31,6 +31,8 @@ body { font-family: Arial, Helvetica, sans-serif; }
     background-color: #ccc;
 }
 </style>
+<!-- Third party (load) -->
+<script type="text/javascript" src="../../decoders/dwv/rle.js"></script>
 <!-- Local -->
 <script type="text/javascript" src="../../src/app/application.js"></script>
 <script type="text/javascript" src="../../src/app/viewController.js"></script>
@@ -40,8 +42,8 @@ body { font-family: Arial, Helvetica, sans-serif; }
 <script type="text/javascript" src="../../src/gui/filter.js"></script>
 <script type="text/javascript" src="../../src/gui/generic.js"></script>
 <script type="text/javascript" src="../../src/gui/help.js"></script>
-<script type="text/javascript" src="../../src/gui/info.js"></script>
 <script type="text/javascript" src="../../src/gui/html.js"></script>
+<script type="text/javascript" src="../../src/gui/info.js"></script>
 <script type="text/javascript" src="../../src/gui/layer.js"></script>
 <script type="text/javascript" src="../../src/gui/loader.js"></script>
 <script type="text/javascript" src="../../src/gui/style.js"></script>
@@ -82,54 +84,19 @@ body { font-family: Arial, Helvetica, sans-serif; }
 // launch when page is loaded
 document.addEventListener("DOMContentLoaded", function (/*event*/)
 {
-    dwv.addDataLine("dwv0", "osirix-toutatix-100", {
-        'origin': 'Osirix',
-        'path': 'TOUTATIX/Cardiac 1CTA_CORONARY_ARTERIES_TESTBOLUS (Adult)/Heart w-o 1.5  B25f  55% /IM-0001-0100.dcm',
-        't-syntax': '1.2.840.10008.1.2.1',
-        'modality': 'CT', 'photo': 'Monochrome2',
-        'bits': '16-12-11', 'pixel-vr': 'OW',
+    dwv.addDataLine("dwv0", "leadtools-flowers-8-mono2-rle", {
+        'origin': 'leadtools',
+        'path': 'leadtools-flowers-8-mono2-rle.dcm',
+        't-syntax': '1.2.840.10008.1.2.5 (rle)',
+        'modality': 'OT', 'photo': 'MONOCHROME2',
+        'bits': '8-8-7', 'pixel-vr': 'OW',
     });
-    dwv.addDataLine("dwv1", "osirix-goudurix", {
-        'origin': 'Osirix',
-        'path': 'GOUDURIX/Specials 1_CORONARY_CTA_COMBI_SMH/70 % 1.0  B30f/IM-0001-0100.dcm',
-        't-syntax': '1.2.840.10008.1.2',
-        'modality': 'CT', 'photo': 'Monochrome2',
-        'bits': '16-12-11', 'pixel-vr': 'OX',
-    });
-    dwv.addDataLine("dwv2", "dicompyler-ct.0", {
-        'origin': 'dicompyler',
-        'path': 'dicompyler/ct/ct.0.dcm',
-        't-syntax': '1.2.840.10008.1.2',
-        'modality': 'CT', 'photo': 'Monochrome2',
-        'bits': '16-16-15', 'pixel-vr': 'OX',
-    });
-    dwv.addDataLine("dwv3", "gdcm-CR-MONO1-10-chest", {
-        'origin': 'GDCM (+ DCIM prefix)',
-        'path': 'CR-MONO1-10-chest.dcm',
-        't-syntax': '1.2.840.10008.1.2.1',
-        'modality': 'CR', 'photo': 'Monochrome1',
-        'bits': '16-10-9', 'pixel-vr': 'OW',
-    });
-    dwv.addDataLine("dwv4", "gdcm-CT-MONO2-8-abdo", {
-        'origin': 'GDCM',
-        'path': 'CT-MONO2-8-abdo.dcm',
-        't-syntax': '1.2.840.10008.1.2',
-        'modality': 'CT', 'photo': 'Monochrome2',
-        'bits': '8-8-7', 'pixel-vr': 'OX',
-    });
-    dwv.addDataLine("dwv5", "gdcm-US-RGB-8-epicard", {
-        'origin': 'GDCM',
-        'path': 'US-RGB-8-epicard.dcm',
-        't-syntax': '1.2.840.10008.1.2.2',
-        'modality': 'US', 'photo': 'RGB (planar=1)',
-        'bits': '8-8-7', 'pixel-vr': 'OB',
-    });
-    dwv.addDataLine("dwv6", "gdcm-US-RGB-8-esopecho", {
-        'origin': 'GDCM',
-        'path': 'US-RGB-8-esopecho.dcm',
-        't-syntax': '1.2.840.10008.1.2.1',
-        'modality': 'US', 'photo': 'RGB (planar=0)',
-        'bits': '8-8-7', 'pixel-vr': 'OB',
+    dwv.addDataLine("dwv1", "leadtools-flowers-16-mono2-rle", {
+        'origin': 'leadtools',
+        'path': 'leadtools-flowers-16-mono2-rle.dcm',
+        't-syntax': '1.2.840.10008.1.2.5 (rle)',
+        'modality': 'OT', 'photo': 'MONOCHROME2',
+        'bits': '16-16-15', 'pixel-vr': 'OW',
     });
 });
 </script>
@@ -140,11 +107,10 @@ document.addEventListener("DOMContentLoaded", function (/*event*/)
 <div id="data-lines"></div>
 
 <div class="footer">
-<p><b>Missing data</b>: 8 bits with pixel VR OW</p>
+<p><b>Missing data</b>: RGB data, multi frame...</p>
 <p>Data sources:</p>
 <ul>
-<li>Osirix <a href="http://www.osirix-viewer.com/datasets/">datasets</a></li>
-<li>Gdcm: :pserver:xxx@cvs.creatis.insa-lyon.fr:2402/cvs/public</li>
+    <li>Leadtools datasets hosted at <a href="http://www.creatis.insa-lyon.fr/~jpr/PUBLIC/gdcm/gdcmSampleData/ColorDataSetLeadTool/">creatis</a></li>
 </ul>
 <p>The left image is created with DWV, the right one is a snapshot
 generated using <a href="https://www.synedra.com">Synedra</a> View Personnal.</p>

@@ -159,3 +159,19 @@ dwv.utils.createDefaultReplaceFormat = function (values)
 dwv.utils.getRootPath = function (path) {
   return path.split('/').slice(0, -1).join('/');
 };
+
+/**
+ * Get a file extension
+ * @param {String} filePath The file path containing the file name.
+ * @returns {String} The lower case file extension or null for none.
+ */
+dwv.utils.getFileExtension = function (filePath) {
+    var ext = null;
+    if (typeof filePath !== 'undefined' && filePath) {
+        var pathSplit = filePath.split('.');
+        if (pathSplit.length !== 1) {
+            ext = pathSplit.pop().toLowerCase();
+        }
+    }
+    return ext;
+};

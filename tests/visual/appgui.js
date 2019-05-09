@@ -14,7 +14,8 @@ dwv.tool.defaultpresets = {};
 dwv.image.decoderScripts = {
     "jpeg2000": "../../decoders/pdfjs/decode-jpeg2000.js",
     "jpeg-lossless": "../../decoders/rii-mango/decode-jpegloss.js",
-    "jpeg-baseline": "../../decoders/pdfjs/decode-jpegbaseline.js"
+    "jpeg-baseline": "../../decoders/pdfjs/decode-jpegbaseline.js",
+    "rle": "../../decoders/dwv/decode-rle.js"
 };
 
 // Window
@@ -35,6 +36,7 @@ dwv.addDataLine = function (id, fileroot, doc)
     // dwv container
     var dwvDiv = document.createElement("div");
     dwvDiv.id = id;
+    dwvDiv.className = 'dwv';
     var layConDiv = document.createElement("div");
     layConDiv.className = "layerContainer";
     var imgCanvas = document.createElement("canvas");

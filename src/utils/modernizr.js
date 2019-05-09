@@ -3,7 +3,7 @@ var dwv = dwv || {};
 
 /*!
  * modernizr v3.6.0
- * Build https://modernizr.com/download?-dataview-directory-filereader-inputtypes-typedarrays-xhrresponsetype-xhrresponsetypearraybuffer-xhrresponsetypejson-xhrresponsetypetext-dontmin
+ * Build https://modernizr.com/download?-dataview-directory-filereader-inputtypes-typedarrays-urlparser-urlsearchparams-xhrresponsetype-xhrresponsetypearraybuffer-xhrresponsetypejson-xhrresponsetypetext-dontmin
  *
  * Copyright (c)
  *  Faruk Ates
@@ -26,7 +26,7 @@ var dwv = dwv || {};
 */
 
 dwv.ModernizrInit = function (window, document, undefined) {
-//;(function(window, document, undefined){
+// ;(function(window, document, undefined){
   var tests = [];
 
 
@@ -190,6 +190,60 @@ Tests for XMLHttpRequest xhr.responseType.
     xhr.open('get', '/', true);
     return 'response' in xhr;
   }()));
+
+/*!
+{
+  "name": "URL parser",
+  "property": "urlparser",
+  "notes": [{
+    "name": "URL",
+    "href": "https://dvcs.w3.org/hg/url/raw-file/tip/Overview.html"
+  }],
+  "polyfills": ["urlparser"],
+  "authors": ["Ron Waldon (@jokeyrhyme)"],
+  "tags": ["url"]
+}
+!*/
+/* DOC
+Check if browser implements the URL constructor for parsing URLs.
+*/
+
+  Modernizr.addTest('urlparser', function() {
+    var url;
+    try {
+      // have to actually try use it, because Safari defines a dud constructor
+      url = new URL('http://modernizr.com/');
+      return url.href === 'http://modernizr.com/';
+    } catch (e) {
+      return false;
+    }
+  });
+
+/*!
+{
+  "authors": ["Cătălin Mariș"],
+  "name": "URLSearchParams API",
+  "notes": [
+    {
+      "name": "WHATWG specification",
+      "href": "https://url.spec.whatwg.org/#interface-urlsearchparams"
+    },
+    {
+      "name": "MDN documentation",
+      "href": "https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams"
+    }
+  ],
+  "property": "urlsearchparams",
+  "tags": ["querystring", "url"]
+}
+!*/
+
+/* DOC
+Detects support for an API that provides utility methods for working with the query string of a URL.
+*/
+
+
+  Modernizr.addTest('urlsearchparams', 'URLSearchParams' in window);
 
 
   var classes = [];
@@ -607,11 +661,11 @@ file selection dialog.
   }
 
   // Leak Modernizr namespace
-  //window.Modernizr = Modernizr;
+  // window.Modernizr = Modernizr;
   dwv.Modernizr = Modernizr;
 
 
 ;
 
-//})(window, document);
+// })(window, document);
 };

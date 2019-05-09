@@ -5,6 +5,75 @@ dwv.utils = dwv.utils || {};
 dwv.utils.base = dwv.utils.base || {};
 
 /**
+ * Get an full object URL from a string uri.
+ * @param {String} uri A string representing the url.
+ * @returns {URL} A URL object.
+ * WARNING: platform support dependent, see https://caniuse.com/#feat=url
+ */
+dwv.utils.getUrlFromUriFull = function (uri) {
+    // add base to allow for relative urls
+    // (base is not used for absolute urls)
+    return new URL(uri, window.location.origin);
+};
+
+/**
+ * Get an simple object URL from a string uri.
+ * @param {String} uri A string representing the url.
+ * @returns {URL} A simple URL object that exposes 'pathname' and 'searchParams.get()'
+ * WARNING: limited functionality, simple nmock of the URL object.
+ */
+dwv.utils.getUrlFromUriSimple = function (uri) {
+    var url = {};
+    // simple implementation (mainly for IE)
+    // expecting only one '?'
+    var urlSplit = uri.split('?');
+    // pathname
+    var fullPath = urlSplit[0];
+    // remove host and domain
+    var fullPathSplit = fullPath.split('//');
+    var hostAndPath = fullPathSplit.pop();
+    var hostAndPathSplit = hostAndPath.split('/');
+    hostAndPathSplit.splice(0, 1);
+    url.pathname = '/' + hostAndPathSplit.join('/');
+    // search params
+    var searchSplit = [];
+    if (urlSplit.length === 2) {
+        var search = urlSplit[1];
+        searchSplit = search.split('&');
+    }
+    var searchParams = {};
+    for (var i = 0; i < searchSplit.length; ++i) {
+        var paramSplit = searchSplit[i].split('=');
+        searchParams[paramSplit[0]] = paramSplit[1];
+    }
+    url.searchParams = {
+        get: function (param) {
+            return searchParams[param];
+        }
+    };
+
+    return url;
+};
+
+/**
+ * Get an object URL from a string uri.
+ * @param {String} uri A string representing the url.
+ * @returns {URL} A URL object (full or simple depending upon platform).
+ * WANRING: returns an official URL or a simple URL depending on platform,
+ *   see https://caniuse.com/#feat=url
+ */
+dwv.utils.getUrlFromUri = function (uri) {
+    var url = null;
+    if (dwv.browser.askModernizr('urlparser') &&
+        dwv.browser.askModernizr('urlsearchparams')) {
+        url = dwv.utils.getUrlFromUriFull(uri);
+    } else {
+        url = dwv.utils.getUrlFromUriSimple(uri);
+    }
+    return url;
+};
+
+/**
  * Split an input URI:
  *  'root?key0=val00&key0=val01&key1=val10' returns
  *  { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }

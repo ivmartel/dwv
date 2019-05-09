@@ -129,7 +129,8 @@ dwv.io.RawVideoLoader.prototype.canLoadFile = function (file) {
  * @return True if the url can be loaded.
  */
 dwv.io.RawVideoLoader.prototype.canLoadUrl = function (url) {
-    var ext = url.split('.').pop().toLowerCase();
+    var urlObjext = dwv.utils.getUrlFromUri(url);
+    var ext = dwv.utils.getFileExtension(urlObjext.pathname);
     return (ext === "mp4") || (ext === "ogg") ||
             (ext === "webm");
 };

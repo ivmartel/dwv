@@ -12,6 +12,12 @@ dwv.io.RawImageLoader = function ()
     var self = this;
 
     /**
+     * if abort is triggered, all image.onload callbacks have to be cancelled
+     * @type {boolean}
+     */
+    var aborted = false;
+
+    /**
      * Set the loader options.
      * @param {Object} opt The input options.
      */
@@ -50,12 +56,15 @@ dwv.io.RawImageLoader = function ()
      * @param {Number} index The data index.
      */
     this.load = function ( dataUri, origin, index ) {
+        aborted = false;
         // create a DOM image
         var image = new Image();
         // triggered by ctx.drawImage
         image.onload = function (/*event*/) {
             try {
-                self.onload( dwv.image.getViewFromDOMImage(this) );
+                if(!aborted){
+                    self.onload( dwv.image.getViewFromDOMImage(this) );
+                }
                 self.onloadend();
             } catch (error) {
                 self.onerror(error);
@@ -73,6 +82,7 @@ dwv.io.RawImageLoader = function ()
      * Abort load. TODO...
      */
     this.abort = function () {
+        aborted = true;
         self.onabort();
     };
 
@@ -128,15 +138,18 @@ dwv.io.RawImageLoader.prototype.canLoadFile = function (file) {
  * @return True if the url can be loaded.
  */
 dwv.io.RawImageLoader.prototype.canLoadUrl = function (url) {
-    var ext = url.split('.').pop().toLowerCase();
+    var urlObjext = dwv.utils.getUrlFromUri(url);
+    // extension
+    var ext = dwv.utils.getFileExtension(urlObjext.pathname);
     var hasImageExt = (ext === "jpeg") || (ext === "jpg") ||
             (ext === "png") || (ext === "gif");
-    // wado url
-    var isImageContentType = (url.indexOf("contentType=image/jpeg") !== -1) ||
-        (url.indexOf("contentType=image/png") !== -1) ||
-        (url.indexOf("contentType=image/gif") !== -1);
+    // content type (for wado url)
+    var contentType = urlObjext.searchParams.get("contentType");
+    var hasImageContentType = (contentType === "image/jpeg") ||
+        (contentType === "image/png") ||
+        (contentType === "image/gif");
 
-    return isImageContentType || hasImageExt;
+    return hasImageContentType || hasImageExt;
 };
 
 /**

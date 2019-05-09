@@ -339,7 +339,7 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
         if( size.getNumberOfRows() !== rhsSize.getNumberOfRows() ) {
             throw new Error("Cannot append a slice with different number of rows");
         }
-        if( !geometry.getOrientation().equals( rhs.getGeometry().getOrientation() ) ) {
+        if( !geometry.getOrientation().equals( rhs.getGeometry().getOrientation(), 0.0001 ) ) {
             throw new Error("Cannot append a slice with different orientation");
         }
         if( photometricInterpretation !== rhs.getPhotometricInterpretation() ) {
@@ -914,14 +914,21 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var jpegBase = dwv.dicom.isJpegBaselineTransferSyntax( syntax );
     var jpegLoss = dwv.dicom.isJpegLosslessTransferSyntax( syntax );
 
-    // slice position
-    var slicePosition = new Array(0,0,0);
     // ImagePositionPatient
     var imagePositionPatient = dicomElements.getFromKey("x00200032");
+    // InstanceNumber
+    var instanceNumber = dicomElements.getFromKey("x00200013");
+
+    // slice position
+    var slicePosition = new Array(0,0,0);
     if ( imagePositionPatient ) {
         slicePosition = [ parseFloat( imagePositionPatient[0] ),
             parseFloat( imagePositionPatient[1] ),
             parseFloat( imagePositionPatient[2] ) ];
+    } else if (instanceNumber) {
+        // use instanceNumber as slice index if no imagePositionPatient was provided
+        console.warn("Using instanceNumber as imagePositionPatient.");
+        slicePosition[2] = parseInt(instanceNumber, 10);
     }
 
     // slice orientation

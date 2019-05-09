@@ -7,7 +7,7 @@ dwv.dicom = dwv.dicom || {};
  * Get the version of the library.
  * @return {String} The version of the library.
  */
-dwv.getVersion = function () { return "0.25.2"; };
+dwv.getVersion = function () { return "0.26.0"; };
 
 /**
  * Clean string: trim and remove ending.
@@ -641,6 +641,16 @@ dwv.dicom.isJpeg2000TransferSyntax = function (syntax)
 };
 
 /**
+ * Tell if a given syntax is a RLE (Run-length encoding) one.
+ * @param {String} syntax The transfer syntax to test.
+ * @return {Boolean} True if a RLE syntax.
+ */
+dwv.dicom.isRleTransferSyntax = function (syntax)
+{
+    return syntax.match(/1.2.840.10008.1.2.5/) !== null;
+};
+
+/**
  * Tell if a given syntax needs decompression.
  * @param {String} syntax The transfer syntax to test.
  * @return {String} The name of the decompression algorithm.
@@ -657,6 +667,9 @@ dwv.dicom.getSyntaxDecompressionName = function (syntax)
     else if ( dwv.dicom.isJpegLosslessTransferSyntax(syntax) ) {
         algo = "jpeg-lossless";
     }
+    else if ( dwv.dicom.isRleTransferSyntax(syntax) ) {
+        algo = "rle";
+    }
     return algo;
 };
 
@@ -672,14 +685,14 @@ dwv.dicom.isReadSupportedTransferSyntax = function (syntax) {
     // "1.2.840.10008.1.2.4.100": MPEG2 Image Compression
     // dwv.dicom.isJpegRetiredTransferSyntax(syntax): non supported JPEG
     // dwv.dicom.isJpeglsTransferSyntax(syntax): JPEG-LS
-    // "1.2.840.10008.1.2.5": RLE (lossless)
 
     return( syntax === "1.2.840.10008.1.2" || // Implicit VR - Little Endian
         syntax === "1.2.840.10008.1.2.1" || // Explicit VR - Little Endian
         syntax === "1.2.840.10008.1.2.2" || // Explicit VR - Big Endian
         dwv.dicom.isJpegBaselineTransferSyntax(syntax) || // JPEG baseline
         dwv.dicom.isJpegLosslessTransferSyntax(syntax) || // JPEG Lossless
-        dwv.dicom.isJpeg2000TransferSyntax(syntax) ); // JPEG 2000
+        dwv.dicom.isJpeg2000TransferSyntax(syntax) || // JPEG 2000
+        dwv.dicom.isRleTransferSyntax(syntax) ); // RLE
 };
 
 /**
@@ -747,7 +760,7 @@ dwv.dicom.getTransferSyntaxName = function (syntax)
         name = "MPEG2";
     }
     // RLE (lossless)
-    else if( syntax === "1.2.840.10008.1.2.5" ) {
+    else if( dwv.dicom.isRleTransferSyntax(syntax) ) {
         name = "RLE";
     }
     // return
@@ -1279,6 +1292,8 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
 {
     var offset = 0;
     var implicit = false;
+    var syntax = "";
+    var dataElement = null;
     // default readers
     var metaReader = new dwv.dicom.DataReader(buffer);
     var dataReader = new dwv.dicom.DataReader(buffer);
@@ -1287,28 +1302,74 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     offset = 128;
     var magicword = metaReader.readString( offset, 4 );
     offset += 4 * Uint8Array.BYTES_PER_ELEMENT;
-    if(magicword !== "DICM")
-    {
-        throw new Error("Not a valid DICOM file (no magic DICM word found)");
-    }
-
-    // 0x0002, 0x0000: FileMetaInformationGroupLength
-    var dataElement = this.readDataElement(metaReader, offset, false);
-    offset = dataElement.endOffset;
-    // store the data element
-    this.dicomElements[dataElement.tag.name] = dataElement;
-    // get meta length
-    var metaLength = parseInt(dataElement.value[0], 10);
-
-    // meta elements
-    var metaEnd = offset + metaLength;
-    while( offset < metaEnd )
-    {
-        // get the data element
+    if (magicword === "DICM") {
+        // 0x0002, 0x0000: FileMetaInformationGroupLength
         dataElement = this.readDataElement(metaReader, offset, false);
         offset = dataElement.endOffset;
         // store the data element
         this.dicomElements[dataElement.tag.name] = dataElement;
+        // get meta length
+        var metaLength = parseInt(dataElement.value[0], 10);
+
+        // meta elements
+        var metaEnd = offset + metaLength;
+        while( offset < metaEnd )
+        {
+            // get the data element
+            dataElement = this.readDataElement(metaReader, offset, false);
+            offset = dataElement.endOffset;
+            // store the data element
+            this.dicomElements[dataElement.tag.name] = dataElement;
+        }
+    } else {
+        // no metadata: attempt to detect transfer syntax
+        // see https://github.com/ivmartel/dwv/issues/188
+        //   (Allow to load DICOM with no DICM preamble) for more details
+        var oEightGroupBigEndian = "0x0800";
+        var oEightGroupLittleEndian = "0x0008";
+        // read first element
+        dataElement = this.readDataElement(dataReader, 0, implicit);
+        // check that group is 0x0008
+        if ((dataElement.tag.group !== oEightGroupBigEndian) &&
+            (dataElement.tag.group !== oEightGroupLittleEndian)) {
+            throw new Error("Not a valid DICOM file (no magic DICM word found and first element not in 0x0008 group)");
+        }
+        // reasonable assumption: 2 uppercase characters => explicit vr
+        var vr0 = dataElement.vr.charCodeAt(0);
+        var vr1 = dataElement.vr.charCodeAt(1);
+        implicit = (vr0 >= 65 && vr0 <= 90 && vr1 >= 65 && vr1 <= 90) ? false : true;
+        // guess transfer syntax
+        if (dataElement.tag.group === oEightGroupLittleEndian) {
+            if (implicit) {
+                 // ImplicitVRLittleEndian
+                syntax = "1.2.840.10008.1.2";
+            } else {
+                // ExplicitVRLittleEndian
+                syntax = "1.2.840.10008.1.2.1";
+            }
+        } else {
+            if (implicit) {
+                // ImplicitVRBigEndian: impossible
+                throw new Error("Not a valid DICOM file (no magic DICM word found and implicit VR big endian detected)");
+            } else {
+                // ExplicitVRBigEndian
+                syntax = "1.2.840.10008.1.2.2";
+            }
+        }
+        // set transfer syntax data element
+        dataElement.tag.group = "0x0002";
+        dataElement.tag.element = "0x0010";
+        dataElement.tag.name = "x00020010";
+        dataElement.tag.endOffset = 4;
+        dataElement.vr = "UI";
+        dataElement.value = [syntax + " "]; // even length
+        dataElement.vl = dataElement.value[0].length;
+        dataElement.endOffset = dataElement.startOffset + dataElement.vl;
+        // store it
+        this.dicomElements[dataElement.tag.name] = dataElement;
+
+        // reset offset
+        offset = 0;
     }
 
     // check the TransferSyntaxUID (has to be there!)
@@ -1316,7 +1377,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
     {
         throw new Error("Not a valid DICOM file (no TransferSyntaxUID found)");
     }
-    var syntax = dwv.dicom.cleanString(this.dicomElements.x00020010.value[0]);
+    syntax = dwv.dicom.cleanString(this.dicomElements.x00020010.value[0]);
 
     // check support
     if (!dwv.dicom.isReadSupportedTransferSyntax(syntax)) {

@@ -50,18 +50,27 @@ dwv.io.ZipLoader = function ()
     /**
      * JSZip.async callback
      * @param {ArrayBuffer} content unzipped file image
+     * @param {Number} index The data index.
      * @return {}
      */
-    function zipAsyncCallback(content)
+    function zipAsyncCallback(content, index)
     {
-    	files.push({"filename": filename, "data": content});
+        files.push({"filename": filename, "data": content});
 
-    	if (files.length < zobjs.length){
-    		var num = files.length;
-    		filename = zobjs[num].name;
-    		zobjs[num].async("arrayBuffer").then(zipAsyncCallback);
-    	}
-    	else {
+        // sent un-ziped progress with the data index
+        // (max 50% to take into account the memory loading)
+        var unzipPercent = files.length * 50 / zobjs.length;
+        self.onprogress({'type': 'read-progress', 'lengthComputable': true,
+            'loaded': unzipPercent, 'total': 100, 'index': index});
+
+        // recursively call until we have all the files
+        if (files.length < zobjs.length) {
+            var num = files.length;
+            filename = zobjs[num].name;
+            zobjs[num].async("arrayBuffer").then( function (content) {
+                zipAsyncCallback(content, index);
+            });
+        } else {
             var memoryIO = new dwv.io.MemoryLoader();
             memoryIO.onload = self.onload;
             memoryIO.onloadend = function () {
@@ -70,7 +79,13 @@ dwv.io.ZipLoader = function ()
                 // call listeners
                 self.onloadend();
             };
-            memoryIO.onprogress = self.onprogress;
+            memoryIO.onprogress = function (progress) {
+                // add 50% to take into account the un-zipping
+                progress.loaded = 50 + progress.loaded / 2;
+                // set data index
+                progress.index = index;
+                self.onprogress(progress);
+            };
             memoryIO.onerror = self.onerror;
             memoryIO.onabort = self.onabort;
 
@@ -84,17 +99,19 @@ dwv.io.ZipLoader = function ()
      * @param {String} origin The data origin.
      * @param {Number} index The data index.
      */
-    this.load = function (buffer/*, origin, index*/) {
+    this.load = function (buffer, origin, index) {
         // set loading flag
         isLoading = true;
 
         JSZip.loadAsync(buffer).then( function(zip) {
             files = [];
-        	zobjs = zip.file(/.*\.dcm/);
+            zobjs = zip.file(/.*\.dcm/);
             // recursively load zip files into the files array
-        	var num = files.length;
-        	filename = zobjs[num].name;
-        	zobjs[num].async("arrayBuffer").then(zipAsyncCallback);
+            var num = files.length;
+            filename = zobjs[num].name;
+            zobjs[num].async("arrayBuffer").then( function (content) {
+                zipAsyncCallback(content, index);
+            });
         });
     };
 
@@ -150,7 +167,7 @@ dwv.io.ZipLoader = function ()
  * @return True if the file can be loaded.
  */
 dwv.io.ZipLoader.prototype.canLoadFile = function (file) {
-    var ext = file.name.split('.').pop().toLowerCase();
+    var ext = dwv.utils.getFileExtension(file.name);
     return (ext === "zip");
 };
 
@@ -160,7 +177,8 @@ dwv.io.ZipLoader.prototype.canLoadFile = function (file) {
  * @return True if the url can be loaded.
  */
 dwv.io.ZipLoader.prototype.canLoadUrl = function (url) {
-    var ext = url.split('.').pop().toLowerCase();
+    var urlObjext = dwv.utils.getUrlFromUri(url);
+    var ext = dwv.utils.getFileExtension(urlObjext.pathname);
     return (ext === "zip");
 };
 
