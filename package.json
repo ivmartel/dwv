@@ -45,6 +45,6 @@
     "test-ci": "grunt test-ci",
     "build": "grunt build",
     "doc": "grunt doc",
-	"dev": "grunt dev"
+    "dev": "grunt dev"
   }
 }
