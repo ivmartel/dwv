@@ -9,7 +9,7 @@ DWV (DICOM Web Viewer) is an open source zero footprint medical image viewer lib
 Try a [live demo](https://ivmartel.github.io/dwv/) and read a lot more information on the [wiki](https://github.com/ivmartel/dwv/wiki) (such as [Dicom-Support](https://github.com/ivmartel/dwv/wiki/Dicom-Support) or [Pacs-Support](https://github.com/ivmartel/dwv/wiki/Pacs-Support)). You can also check out the [example viewers](https://github.com/ivmartel/dwv/wiki/Examples#viewers-and-integrations) based on dwv.
 
  - All coding/implementation contributions and comments are welcome.
- - DWV is not certified for diagnostic use.<sup>[1](#footnote1)</sup> 
+ - DWV is not certified for diagnostic use.<sup>[1](#footnote1)</sup>
  - Released under GNU GPL-3.0 license (see [license.txt](license.txt)).
 
 And for those who want to support the dwv development:
@@ -33,9 +33,9 @@ Install dependencies (using `yarn`, replace with `npm` if you prefer):
 yarn install
 ```
 
-Call the start script to launch the tests on a local server:
+Call the test script to launch the tests on a local server:
 ```sh
-yarn run start
+yarn run test
 ```
 
 You can now open a browser at http://localhost:8080 and enjoy!
