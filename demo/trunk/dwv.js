@@ -1,4 +1,4 @@
-/*! dwv 0.27.0-beta 2019-06-03 20:52:52 */
+/*! dwv 0.27.0-beta 2019-06-25 19:58:20 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -3253,10 +3253,19 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function ( di
         str = "(PixelSequence)";
     } else if ( dicomElement.vr === "DA" && pretty ) {
         var daValue = dicomElement.value[0];
-        var daYear = parseInt( daValue.substr(0,4), 10 );
-        var daMonth = parseInt( daValue.substr(4,2), 10 ) - 1; // 0-11
-        var daDay = parseInt( daValue.substr(6,2), 10 );
-        var da = new Date(daYear, daMonth, daDay);
+        // Two possible date formats:
+        // - standard 'YYYYMMDD'
+        // - non-standard 'YYYY.MM.DD' (previous ACR-NEMA)
+        var monthBeginIndex = 4;
+        var dayBeginIndex = 6;
+        if (daValue.length !== 8) {
+            monthBeginIndex = 5;
+            dayBeginIndex = 8;
+        }
+        var da = new Date(
+            parseInt(daValue.substr(0, 4), 10),
+            parseInt(daValue.substr(monthBeginIndex, 2), 10) - 1, // 0-11 range
+            parseInt(daValue.substr(dayBeginIndex, 2), 10));
         str = da.toLocaleDateString();
     } else if ( dicomElement.vr === "TM"  && pretty ) {
         var tmValue = dicomElement.value[0];
