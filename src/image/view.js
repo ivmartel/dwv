@@ -658,6 +658,20 @@ dwv.image.View.prototype.generateImageData = function( array )
         }
         break;
 
+    case "PALETTE COLOR":
+        var colourMap = this.getColourMap();
+        var iMax = sliceOffset + sliceSize;
+        for(var i=sliceOffset; i < iMax; ++i)
+        {
+            pxValue = image.getValueAtOffset(i, frame);
+            array.data[index] = colourMap.red[pxValue];
+            array.data[index+1] = colourMap.green[pxValue];
+            array.data[index+2] = colourMap.blue[pxValue];
+            array.data[index+3] = 0xff;
+            index += 4;
+        }
+        break;
+
     case "RGB":
         // 3 times bigger...
         sliceOffset *= 3;
@@ -815,8 +829,13 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
     var view = new dwv.image.View(image);
 
     // default color map
-    if( image.getPhotometricInterpretation() === "MONOCHROME1") {
+    if (image.getPhotometricInterpretation() === "MONOCHROME1") {
         view.setDefaultColourMap(dwv.image.lut.invPlain);
+    } else if (image.getPhotometricInterpretation() === "PALETTE COLOR") {
+        var paletteLut = image.getMeta().paletteLut;
+        if (typeof(paletteLut) !== "undefined") {
+            view.setDefaultColourMap(paletteLut);
+        }
     }
 
     // presets

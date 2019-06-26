@@ -1160,7 +1160,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
     }
     else if ( vr === "OW" )
     {
-        data = reader.readInt16Array( offset, vl );
+        data = reader.readUint16Array( offset, vl );
         offset += vl;
     }
     else if ( vr === "OF" )

@@ -963,6 +963,11 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
         	(photo !== "MONOCHROME1" && photo !== "MONOCHROME2") ) {
             photo = "RGB";
         }
+        // check samples per pixels
+        var samplesPerPixel = parseInt(dicomElements.getFromKey("x00280002"), 10);
+        if (photo === "RGB" && samplesPerPixel === 1) {
+            photo = "PALETTE COLOR";
+        }
         image.setPhotometricInterpretation( photo );
     }
     // PlanarConfiguration
@@ -1014,6 +1019,33 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     meta.IsSigned = false;
     if ( pixelRepresentation ) {
         meta.IsSigned = (pixelRepresentation === 1);
+    }
+
+    // PALETTE COLOR luts
+    if (image.getPhotometricInterpretation() === "PALETTE COLOR") {
+        var redLut = dicomElements.getFromKey("x00281201");
+        var greenLut = dicomElements.getFromKey("x00281202");
+        var blueLut = dicomElements.getFromKey("x00281203");
+        // check descriptor
+        console.log('lut len', redLut.length);
+        var descriptor = dicomElements.getFromKey("x00281101");
+        console.log('descriptor', descriptor);
+        if (typeof descriptor !== "undefined" &&
+            descriptor.length === 3 &&
+            descriptor[2] === 16 ) {
+            var shift8 = function (value) {
+                return value >> 8;
+            };
+            redLut = redLut.map(shift8);
+            greenLut = greenLut.map(shift8);
+            blueLut = blueLut.map(shift8);
+        }
+        // set the palette
+        meta.paletteLut = {
+            "red": redLut,
+            "green": greenLut,
+            "blue": blueLut
+        };
     }
 
     // RecommendedDisplayFrameRate
