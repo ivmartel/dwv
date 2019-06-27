@@ -1026,10 +1026,8 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
         var redLut = dicomElements.getFromKey("x00281201");
         var greenLut = dicomElements.getFromKey("x00281202");
         var blueLut = dicomElements.getFromKey("x00281203");
-        // check descriptor
-        console.log('lut len', redLut.length);
+        // check red palette descriptor (should all be equal)
         var descriptor = dicomElements.getFromKey("x00281101");
-        console.log('descriptor', descriptor);
         if (typeof descriptor !== "undefined" &&
             descriptor.length === 3 &&
             descriptor[2] === 16 ) {

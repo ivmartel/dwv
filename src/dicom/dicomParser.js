@@ -1204,6 +1204,21 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
         data = reader.readFloat64Array( offset, vl );
         offset += vl;
     }
+    else if( vr === "xs")
+    {
+        // PixelRepresentation 0->unsigned, 1->signed
+        var pixelRepresentation = 0;
+        if (typeof this.dicomElements.x00280103 !== 'undefined ) {
+            pixelRepresentation = this.dicomElements.x00280103.value[0];
+        }
+        // read
+        if (pixelRepresentation === 0) {
+            data = reader.readUint16Array(offset, vl);
+        } else {
+            data = reader.readInt16Array(offset, vl);
+        }
+        offset += vl;
+    }
     // attribute
     else if( vr === "AT")
     {

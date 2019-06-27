@@ -639,13 +639,14 @@ dwv.image.View.prototype.generateImageData = function( array )
     var index = 0;
     var pxValue = 0;
     var stepPos = 0;
+    var colourMap = null;
 
     var photoInterpretation = image.getPhotometricInterpretation();
     switch (photoInterpretation)
     {
     case "MONOCHROME1":
     case "MONOCHROME2":
-        var colourMap = this.getColourMap();
+        colourMap = this.getColourMap();
         var iMax = sliceOffset + sliceSize;
         for(var i=sliceOffset; i < iMax; ++i)
         {
@@ -659,11 +660,11 @@ dwv.image.View.prototype.generateImageData = function( array )
         break;
 
     case "PALETTE COLOR":
-        var colourMap = this.getColourMap();
-        var iMax = sliceOffset + sliceSize;
-        for(var i=sliceOffset; i < iMax; ++i)
+        colourMap = this.getColourMap();
+        var lMax = sliceOffset + sliceSize;
+        for (var l = sliceOffset; l < lMax; ++l)
         {
-            pxValue = image.getValueAtOffset(i, frame);
+            pxValue = image.getValueAtOffset(l, frame);
             array.data[index] = colourMap.red[pxValue];
             array.data[index+1] = colourMap.green[pxValue];
             array.data[index+2] = colourMap.blue[pxValue];
