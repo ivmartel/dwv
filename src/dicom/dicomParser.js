@@ -1116,6 +1116,8 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
         var pixelRepresentation = 0;
         if ( typeof this.dicomElements.x00280103 !== 'undefined' ) {
             pixelRepresentation = this.dicomElements.x00280103.value[0];
+        } else {
+            console.warn("Reading DICOM pixel data with default pixelRepresentation.");
         }
         // read
         if ( bitsAllocated === 8 ) {
@@ -1207,12 +1209,14 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
     else if( vr === "xs")
     {
         // PixelRepresentation 0->unsigned, 1->signed
-        var pixelRepresentation = 0;
-        if (typeof this.dicomElements.x00280103 !== 'undefined ) {
-            pixelRepresentation = this.dicomElements.x00280103.value[0];
+        var pixelRep = 0;
+        if (typeof this.dicomElements.x00280103 !== 'undefined' ) {
+            pixelRep = this.dicomElements.x00280103.value[0];
+        } else {
+            console.warn("Reading DICOM pixel data with default pixelRepresentation.");
         }
         // read
-        if (pixelRepresentation === 0) {
+        if (pixelRep === 0) {
             data = reader.readUint16Array(offset, vl);
         } else {
             data = reader.readInt16Array(offset, vl);
