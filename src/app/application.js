@@ -142,6 +142,12 @@ dwv.App = function ()
     this.getViewController = function () { return viewController; };
 
     /**
+     * Get the toolbox controller.
+     * @return {Object} The controller.
+     */
+    this.getToolboxController = function () { return toolboxController; };
+
+    /**
      * Get the draw controller.
      * @return {Object} The controller.
      */
