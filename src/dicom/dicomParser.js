@@ -1157,7 +1157,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
     // others
     else if ( vr === "OB" )
     {
-        data = reader.readInt8Array( offset, vl );
+        data = reader.readUint8Array( offset, vl );
         offset += vl;
     }
     else if ( vr === "OW" )
@@ -1167,12 +1167,12 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
     }
     else if ( vr === "OF" )
     {
-        data = reader.readInt32Array( offset, vl );
+        data = reader.readUint32Array( offset, vl );
         offset += vl;
     }
     else if ( vr === "OD" )
     {
-        data = reader.readInt64Array( offset, vl );
+        data = reader.readUint64Array( offset, vl );
         offset += vl;
     }
     // numbers
