@@ -665,13 +665,12 @@ dwv.image.View.prototype.generateImageData = function( array )
 
         var to8 = function (value) {
             return value >> 8;
-        }
+        };
 
         if (image.getMeta().BitsStored === 16) {
             console.log("Scaling 16bits data to 8bits.");
         }
 
-        var count = 0;
         for (var l = sliceOffset; l < lMax; ++l)
         {
             pxValue = image.getValueAtOffset(l, frame);
