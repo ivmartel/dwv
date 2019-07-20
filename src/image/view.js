@@ -662,12 +662,31 @@ dwv.image.View.prototype.generateImageData = function( array )
     case "PALETTE COLOR":
         colourMap = this.getColourMap();
         var lMax = sliceOffset + sliceSize;
+
+        var to8 = function (value) {
+            return value >> 8;
+        }
+
+        if (image.getMeta().BitsStored === 16) {
+            console.log("Scaling 16bits data to 8bits.");
+        }
+
+        var count = 0;
         for (var l = sliceOffset; l < lMax; ++l)
         {
             pxValue = image.getValueAtOffset(l, frame);
-            array.data[index] = colourMap.red[pxValue];
-            array.data[index+1] = colourMap.green[pxValue];
-            array.data[index+2] = colourMap.blue[pxValue];
+
+            // TODO check pxValue fits in lut
+
+            if (image.getMeta().BitsStored === 16) {
+                array.data[index] = to8(colourMap.red[pxValue]);
+                array.data[index+1] = to8(colourMap.green[pxValue]);
+                array.data[index+2] = to8(colourMap.blue[pxValue]);
+            } else {
+                array.data[index] = colourMap.red[pxValue];
+                array.data[index+1] = colourMap.green[pxValue];
+                array.data[index+2] = colourMap.blue[pxValue];
+            }
             array.data[index+3] = 0xff;
             index += 4;
         }
