@@ -245,7 +245,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         else {
             data = new Uint16Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
-                data[i] = view.getInt16( (byteOffset +
+                data[i] = view.getUint16( (byteOffset +
                     Uint16Array.BYTES_PER_ELEMENT * i),
                     isLittleEndian);
             }
