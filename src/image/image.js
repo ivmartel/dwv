@@ -963,6 +963,11 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
         	(photo !== "MONOCHROME1" && photo !== "MONOCHROME2") ) {
             photo = "RGB";
         }
+        // check samples per pixels
+        var samplesPerPixel = parseInt(dicomElements.getFromKey("x00280002"), 10);
+        if (photo === "RGB" && samplesPerPixel === 1) {
+            photo = "PALETTE COLOR";
+        }
         image.setPhotometricInterpretation( photo );
     }
     // PlanarConfiguration
@@ -1014,6 +1019,73 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     meta.IsSigned = false;
     if ( pixelRepresentation ) {
         meta.IsSigned = (pixelRepresentation === 1);
+    }
+
+    // PALETTE COLOR luts
+    if (image.getPhotometricInterpretation() === "PALETTE COLOR") {
+        var redLut = dicomElements.getFromKey("x00281201");
+        var greenLut = dicomElements.getFromKey("x00281202");
+        var blueLut = dicomElements.getFromKey("x00281203");
+        // check red palette descriptor (should all be equal)
+        var descriptor = dicomElements.getFromKey("x00281101");
+        if (typeof descriptor !== "undefined" &&
+            descriptor.length === 3 ) {
+            if (descriptor[2] === 16) {
+                var doScale = false;
+                // (C.7.6.3.1.5 Palette Color Lookup Table Descriptor)
+                // Some implementations have encoded 8 bit entries with 16 bits
+                // allocated, padding the high bits;
+                var descSize = descriptor[0];
+                // (C.7.6.3.1.5 Palette Color Lookup Table Descriptor)
+                // The first Palette Color Lookup Table Descriptor value is the
+                // number of entries in the lookup table. When the number of table
+                // entries is equal to 216 then this value shall be 0.
+                if (descSize === 0) {
+                    descSize = 65536;
+                }
+                // red palette VL
+                var redLutDE = dicomElements.getDEFromKey("x00281201");
+                var vlSize = redLutDE.vl;
+                // check double size
+                if (vlSize !== 2 * descSize) {
+                    doScale = true;
+                    console.log('16bits lut but size is not double. desc: ', descSize, " vl: ", vlSize);
+                }
+                // (C.7.6.3.1.6 Palette Color Lookup Table Data)
+                // Palette color values must always be scaled across the full
+                // range of available intensities
+                var bitsAllocated = parseInt(dicomElements.getFromKey("x00280100"), 10);
+                if (bitsAllocated === 8) {
+                    doScale = true;
+                    console.log('Scaling 16bits color lut since bits allocated is 8.');
+                }
+
+                if (doScale) {
+                    var scaleTo8 = function (value) {
+                        return value >> 8;
+                    };
+
+                    redLut = redLut.map(scaleTo8);
+                    greenLut = greenLut.map(scaleTo8);
+                    blueLut = blueLut.map(scaleTo8);
+                }
+            } else if (descriptor[2] === 8) {
+                // lut with vr=OW was read as Uint16, convert it to Uint8
+                console.log('Scaling 16bits color lut since the lut descriptor is 8.');
+                var clone = redLut.slice(0);
+                redLut = new Uint8Array(clone.buffer);
+                clone = greenLut.slice(0);
+                greenLut = new Uint8Array(clone.buffer);
+                clone = blueLut.slice(0);
+                blueLut = new Uint8Array(clone.buffer);
+            }
+        }
+        // set the palette
+        meta.paletteLut = {
+            "red": redLut,
+            "green": greenLut,
+            "blue": blueLut
+        };
     }
 
     // RecommendedDisplayFrameRate

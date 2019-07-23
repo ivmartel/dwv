@@ -639,13 +639,14 @@ dwv.image.View.prototype.generateImageData = function( array )
     var index = 0;
     var pxValue = 0;
     var stepPos = 0;
+    var colourMap = null;
 
     var photoInterpretation = image.getPhotometricInterpretation();
     switch (photoInterpretation)
     {
     case "MONOCHROME1":
     case "MONOCHROME2":
-        var colourMap = this.getColourMap();
+        colourMap = this.getColourMap();
         var iMax = sliceOffset + sliceSize;
         for(var i=sliceOffset; i < iMax; ++i)
         {
@@ -653,6 +654,38 @@ dwv.image.View.prototype.generateImageData = function( array )
             array.data[index] = colourMap.red[pxValue];
             array.data[index+1] = colourMap.green[pxValue];
             array.data[index+2] = colourMap.blue[pxValue];
+            array.data[index+3] = 0xff;
+            index += 4;
+        }
+        break;
+
+    case "PALETTE COLOR":
+        colourMap = this.getColourMap();
+        var lMax = sliceOffset + sliceSize;
+
+        var to8 = function (value) {
+            return value >> 8;
+        };
+
+        if (image.getMeta().BitsStored === 16) {
+            console.log("Scaling 16bits data to 8bits.");
+        }
+
+        for (var l = sliceOffset; l < lMax; ++l)
+        {
+            pxValue = image.getValueAtOffset(l, frame);
+
+            // TODO check pxValue fits in lut
+
+            if (image.getMeta().BitsStored === 16) {
+                array.data[index] = to8(colourMap.red[pxValue]);
+                array.data[index+1] = to8(colourMap.green[pxValue]);
+                array.data[index+2] = to8(colourMap.blue[pxValue]);
+            } else {
+                array.data[index] = colourMap.red[pxValue];
+                array.data[index+1] = colourMap.green[pxValue];
+                array.data[index+2] = colourMap.blue[pxValue];
+            }
             array.data[index+3] = 0xff;
             index += 4;
         }
@@ -815,8 +848,13 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
     var view = new dwv.image.View(image);
 
     // default color map
-    if( image.getPhotometricInterpretation() === "MONOCHROME1") {
+    if (image.getPhotometricInterpretation() === "MONOCHROME1") {
         view.setDefaultColourMap(dwv.image.lut.invPlain);
+    } else if (image.getPhotometricInterpretation() === "PALETTE COLOR") {
+        var paletteLut = image.getMeta().paletteLut;
+        if (typeof(paletteLut) !== "undefined") {
+            view.setDefaultColourMap(paletteLut);
+        }
     }
 
     // presets
