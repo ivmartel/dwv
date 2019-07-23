@@ -1,4 +1,4 @@
-/*! dwv 0.27.0-beta 2019-07-22 21:53:47 */
+/*! dwv 0.27.0-beta 2019-07-23 21:11:28 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -3877,7 +3877,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian)
         else {
             data = new Uint16Array(arraySize);
             for ( var i = 0; i < arraySize; ++i ) {
-                data[i] = view.getInt16( (byteOffset +
+                data[i] = view.getUint16( (byteOffset +
                     Uint16Array.BYTES_PER_ELEMENT * i),
                     isLittleEndian);
             }
@@ -4748,6 +4748,8 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
         var pixelRepresentation = 0;
         if ( typeof this.dicomElements.x00280103 !== 'undefined' ) {
             pixelRepresentation = this.dicomElements.x00280103.value[0];
+        } else {
+            console.warn("Reading DICOM pixel data with default pixelRepresentation.");
         }
         // read
         if ( bitsAllocated === 8 ) {
@@ -4787,22 +4789,22 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
     // others
     else if ( vr === "OB" )
     {
-        data = reader.readInt8Array( offset, vl );
+        data = reader.readUint8Array( offset, vl );
         offset += vl;
     }
     else if ( vr === "OW" )
     {
-        data = reader.readInt16Array( offset, vl );
+        data = reader.readUint16Array( offset, vl );
         offset += vl;
     }
     else if ( vr === "OF" )
     {
-        data = reader.readInt32Array( offset, vl );
+        data = reader.readUint32Array( offset, vl );
         offset += vl;
     }
     else if ( vr === "OD" )
     {
-        data = reader.readInt64Array( offset, vl );
+        data = reader.readUint64Array( offset, vl );
         offset += vl;
     }
     // numbers
@@ -4834,6 +4836,23 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
     else if( vr === "FD")
     {
         data = reader.readFloat64Array( offset, vl );
+        offset += vl;
+    }
+    else if( vr === "xs")
+    {
+        // PixelRepresentation 0->unsigned, 1->signed
+        var pixelRep = 0;
+        if (typeof this.dicomElements.x00280103 !== 'undefined' ) {
+            pixelRep = this.dicomElements.x00280103.value[0];
+        } else {
+            console.warn("Reading DICOM pixel data with default pixelRepresentation.");
+        }
+        // read
+        if (pixelRep === 0) {
+            data = reader.readUint16Array(offset, vl);
+        } else {
+            data = reader.readInt16Array(offset, vl);
+        }
         offset += vl;
     }
     // attribute
@@ -15704,6 +15723,11 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
         	(photo !== "MONOCHROME1" && photo !== "MONOCHROME2") ) {
             photo = "RGB";
         }
+        // check samples per pixels
+        var samplesPerPixel = parseInt(dicomElements.getFromKey("x00280002"), 10);
+        if (photo === "RGB" && samplesPerPixel === 1) {
+            photo = "PALETTE COLOR";
+        }
         image.setPhotometricInterpretation( photo );
     }
     // PlanarConfiguration
@@ -15755,6 +15779,73 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     meta.IsSigned = false;
     if ( pixelRepresentation ) {
         meta.IsSigned = (pixelRepresentation === 1);
+    }
+
+    // PALETTE COLOR luts
+    if (image.getPhotometricInterpretation() === "PALETTE COLOR") {
+        var redLut = dicomElements.getFromKey("x00281201");
+        var greenLut = dicomElements.getFromKey("x00281202");
+        var blueLut = dicomElements.getFromKey("x00281203");
+        // check red palette descriptor (should all be equal)
+        var descriptor = dicomElements.getFromKey("x00281101");
+        if (typeof descriptor !== "undefined" &&
+            descriptor.length === 3 ) {
+            if (descriptor[2] === 16) {
+                var doScale = false;
+                // (C.7.6.3.1.5 Palette Color Lookup Table Descriptor)
+                // Some implementations have encoded 8 bit entries with 16 bits
+                // allocated, padding the high bits;
+                var descSize = descriptor[0];
+                // (C.7.6.3.1.5 Palette Color Lookup Table Descriptor)
+                // The first Palette Color Lookup Table Descriptor value is the
+                // number of entries in the lookup table. When the number of table
+                // entries is equal to 216 then this value shall be 0.
+                if (descSize === 0) {
+                    descSize = 65536;
+                }
+                // red palette VL
+                var redLutDE = dicomElements.getDEFromKey("x00281201");
+                var vlSize = redLutDE.vl;
+                // check double size
+                if (vlSize !== 2 * descSize) {
+                    doScale = true;
+                    console.log('16bits lut but size is not double. desc: ', descSize, " vl: ", vlSize);
+                }
+                // (C.7.6.3.1.6 Palette Color Lookup Table Data)
+                // Palette color values must always be scaled across the full
+                // range of available intensities
+                var bitsAllocated = parseInt(dicomElements.getFromKey("x00280100"), 10);
+                if (bitsAllocated === 8) {
+                    doScale = true;
+                    console.log('Scaling 16bits color lut since bits allocated is 8.');
+                }
+
+                if (doScale) {
+                    var scaleTo8 = function (value) {
+                        return value >> 8;
+                    };
+
+                    redLut = redLut.map(scaleTo8);
+                    greenLut = greenLut.map(scaleTo8);
+                    blueLut = blueLut.map(scaleTo8);
+                }
+            } else if (descriptor[2] === 8) {
+                // lut with vr=OW was read as Uint16, convert it to Uint8
+                console.log('Scaling 16bits color lut since the lut descriptor is 8.');
+                var clone = redLut.slice(0);
+                redLut = new Uint8Array(clone.buffer);
+                clone = greenLut.slice(0);
+                greenLut = new Uint8Array(clone.buffer);
+                clone = blueLut.slice(0);
+                blueLut = new Uint8Array(clone.buffer);
+            }
+        }
+        // set the palette
+        meta.paletteLut = {
+            "red": redLut,
+            "green": greenLut,
+            "blue": blueLut
+        };
     }
 
     // RecommendedDisplayFrameRate
@@ -16789,13 +16880,14 @@ dwv.image.View.prototype.generateImageData = function( array )
     var index = 0;
     var pxValue = 0;
     var stepPos = 0;
+    var colourMap = null;
 
     var photoInterpretation = image.getPhotometricInterpretation();
     switch (photoInterpretation)
     {
     case "MONOCHROME1":
     case "MONOCHROME2":
-        var colourMap = this.getColourMap();
+        colourMap = this.getColourMap();
         var iMax = sliceOffset + sliceSize;
         for(var i=sliceOffset; i < iMax; ++i)
         {
@@ -16803,6 +16895,38 @@ dwv.image.View.prototype.generateImageData = function( array )
             array.data[index] = colourMap.red[pxValue];
             array.data[index+1] = colourMap.green[pxValue];
             array.data[index+2] = colourMap.blue[pxValue];
+            array.data[index+3] = 0xff;
+            index += 4;
+        }
+        break;
+
+    case "PALETTE COLOR":
+        colourMap = this.getColourMap();
+        var lMax = sliceOffset + sliceSize;
+
+        var to8 = function (value) {
+            return value >> 8;
+        };
+
+        if (image.getMeta().BitsStored === 16) {
+            console.log("Scaling 16bits data to 8bits.");
+        }
+
+        for (var l = sliceOffset; l < lMax; ++l)
+        {
+            pxValue = image.getValueAtOffset(l, frame);
+
+            // TODO check pxValue fits in lut
+
+            if (image.getMeta().BitsStored === 16) {
+                array.data[index] = to8(colourMap.red[pxValue]);
+                array.data[index+1] = to8(colourMap.green[pxValue]);
+                array.data[index+2] = to8(colourMap.blue[pxValue]);
+            } else {
+                array.data[index] = colourMap.red[pxValue];
+                array.data[index+1] = colourMap.green[pxValue];
+                array.data[index+2] = colourMap.blue[pxValue];
+            }
             array.data[index+3] = 0xff;
             index += 4;
         }
@@ -16965,8 +17089,13 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
     var view = new dwv.image.View(image);
 
     // default color map
-    if( image.getPhotometricInterpretation() === "MONOCHROME1") {
+    if (image.getPhotometricInterpretation() === "MONOCHROME1") {
         view.setDefaultColourMap(dwv.image.lut.invPlain);
+    } else if (image.getPhotometricInterpretation() === "PALETTE COLOR") {
+        var paletteLut = image.getMeta().paletteLut;
+        if (typeof(paletteLut) !== "undefined") {
+            view.setDefaultColourMap(paletteLut);
+        }
     }
 
     // presets
