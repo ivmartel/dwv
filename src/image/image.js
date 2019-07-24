@@ -356,7 +356,7 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
 
         // calculate slice size
         var mul = 1;
-        if( photometricInterpretation === "RGB" || photometricInterpretation === "YBR_FULL_422") {
+        if( photometricInterpretation === "RGB" || photometricInterpretation === "YBR_FULL") {
             mul = 3;
         }
         var sliceSize = mul * size.getSliceSize();

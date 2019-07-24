@@ -726,7 +726,7 @@ dwv.image.View.prototype.generateImageData = function( array )
         }
         break;
 
-    case "YBR_FULL_422":
+    case "YBR_FULL":
         // theory:
         // http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.7.html#sect_C.7.6.3.1.2
         // reverse equation:
@@ -764,9 +764,9 @@ dwv.image.View.prototype.generateImageData = function( array )
             g = y - 0.34414 * (cb - 128) - 0.71414 * (cr - 128);
             b = y + 1.772 * (cb - 128);
 
-            array.data[index] = windowLut.getValue(r);
-            array.data[index+1] = windowLut.getValue(g);
-            array.data[index+2] = windowLut.getValue(b);
+            array.data[index] = r;
+            array.data[index+1] = g;
+            array.data[index+2] = b;
             array.data[index+3] = 0xff;
             index += 4;
 
