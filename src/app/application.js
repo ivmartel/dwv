@@ -107,9 +107,31 @@ dwv.App = function ()
     this.getImageData = function () { return imageData; };
     /**
      * Is the data mono-slice?
-     * @return {Boolean} True if the data is mono-slice.
+     * @return {Boolean} True if the data only contains one slice.
      */
     this.isMonoSliceData = function () { return isMonoSliceData; };
+    /**
+     * Is the data mono-frame?
+     * @return {Boolean} True if the data only contains one frame.
+     */
+    this.isMonoFrameData = function () {
+        return this.getImage().getNumberOfFrames() === 1;
+    };
+    /**
+     * Can the data be scrolled?
+     * @return {Boolean} True if the data has more than one slice or frame.
+     */
+    this.canScroll = function () {
+        return !this.isMonoSliceData() || !this.isMonoFrameData();
+    }
+
+    /**
+     * Can window and level be applied to the data?
+     * @return {Boolean} True if the data is monochrome.
+     */
+    this.canWindowLevel = function () {
+        return this.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null;
+    }
 
     /**
      * Get the main scale.
@@ -199,18 +221,18 @@ dwv.App = function ()
                 if ( toolName === "Draw" ) {
                     if ( typeof config.shapes !== "undefined" && config.shapes.length !== 0 ) {
                         // setup the shape list
-                        var shapeList = {};
+                        var shapeFactoryList = {};
                         for ( var s = 0; s < config.shapes.length; ++s ) {
                             var shapeName = config.shapes[s];
                             var shapeFactoryClass = shapeName+"Factory";
                             if (typeof dwv.tool[shapeFactoryClass] !== "undefined") {
-                                shapeList[shapeName] = dwv.tool[shapeFactoryClass];
+                                shapeFactoryList[shapeName] = dwv.tool[shapeFactoryClass];
                             }
                             else {
                                 console.warn("Could not initialise unknown shape: "+shapeName);
                             }
                         }
-                        toolList.Draw = new dwv.tool.Draw(this, shapeList);
+                        toolList.Draw = new dwv.tool.Draw(this, shapeFactoryList);
                         toolList.Draw.addEventListener("draw-create", fireEvent);
                         toolList.Draw.addEventListener("draw-change", fireEvent);
                         toolList.Draw.addEventListener("draw-move", fireEvent);
@@ -253,15 +275,10 @@ dwv.App = function ()
                     }
                 }
             }
-            toolboxController = new dwv.ToolboxController();
-            toolboxController.create(toolList, this);
+            toolboxController = new dwv.ToolboxController(toolList);
         }
         // gui
         if ( config.gui ) {
-            // tools
-            if ( config.gui.indexOf("tool") !== -1 && toolboxController) {
-                toolboxController.setup();
-            }
             // load
             if ( config.gui.indexOf("load") !== -1 ) {
                 var loaderList = {};
@@ -395,10 +412,6 @@ dwv.App = function ()
      */
     this.reset = function ()
     {
-        // clear tools
-        if ( toolboxController ) {
-            toolboxController.reset();
-        }
         // clear draw
         if ( drawController ) {
             drawController.reset();
@@ -720,6 +733,7 @@ dwv.App = function ()
     {
         // toggle html
         var infoLayer = self.getElement("infoLayer");
+        // TODO remove
         dwv.html.toggleDisplay(infoLayer);
         // toggle listeners
         infoController.toggleListeners(self, view);
@@ -1177,6 +1191,7 @@ dwv.App = function ()
         var select = self.getElement("presetSelect");
         if (select) {
             select.selectedIndex = 0;
+            // TODO remove
             dwv.gui.refreshElement(select);
         }
     };
@@ -1397,6 +1412,7 @@ dwv.App = function ()
 
         // append the DICOM tags table
         tags = data.info;
+        // TODO remove
         if ( tagsGui ) {
             tagsGui.update(data.info);
         }
@@ -1424,6 +1440,7 @@ dwv.App = function ()
         // connect with local listeners
         view.addEventListener("wl-width-change", fireEvent);
         view.addEventListener("wl-center-change", fireEvent);
+        view.addEventListener("wl-preset-add", fireEvent);
         view.addEventListener("colour-change", fireEvent);
         view.addEventListener("position-change", fireEvent);
         view.addEventListener("slice-change", fireEvent);
@@ -1436,7 +1453,7 @@ dwv.App = function ()
 
         // initialise the toolbox
         if ( toolboxController ) {
-            toolboxController.initAndDisplay( imageLayer );
+            toolboxController.init( imageLayer );
         }
 
         // stop box listening to drag (after first drag)
@@ -1445,6 +1462,7 @@ dwv.App = function ()
             box.removeEventListener("dragover", onDragOver);
             box.removeEventListener("dragleave", onDragLeave);
             box.removeEventListener("drop", onDrop);
+            // TODO remove
             dwv.html.removeNode(box);
             // switch listening to layerContainer
             var div = self.getElement("layerContainer");

@@ -67,11 +67,6 @@ dwv.tool.Floodfill = function(app)
      */
     this.started = false;
     /**
-     * Livewire GUI.
-     * @type Object
-     */
-    var gui = null;
-    /**
      * Draw command.
      * @private
      * @type Object
@@ -383,41 +378,23 @@ dwv.tool.Floodfill = function(app)
     };
 
     /**
-     * Setup the tool GUI.
+     * Activate the tool.
+     * @param {Boolean} bool The flag to activate or not.
      */
-    this.setup = function ()
-    {
-        gui = new dwv.gui.ColourTool(app, "ff");
-        gui.setup();
-    };
-
-    /**
-     * Enable the tool.
-     * @param {Boolean} bool The flag to enable or not.
-     */
-    this.display = function(bool){
-        if ( gui ) {
-            gui.display(bool);
+    this.activate = function (bool) {
+        if (bool) {
+            // init with the app window scale
+            this.style.setScale(app.getWindowScale());
+            // set the default to the first in the list
+            this.setLineColour(this.style.getLineColour());
         }
-        // TODO why twice?
-        this.init();
     };
 
     /**
      * Initialise the tool.
      */
-    this.init = function()
-    {
-        if ( gui ) {
-            // init with the app window scale
-            this.style.setScale(app.getWindowScale());
-            // set the default to the first in the list
-            this.setLineColour(this.style.getLineColour());
-            // init html
-            gui.initialise();
-        }
-
-        return true;
+    this.init = function() {
+        // does nothing
     };
 
     /**

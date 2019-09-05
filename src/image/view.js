@@ -338,6 +338,8 @@ dwv.image.View = function (image)
             } else {
                 // add new
                 windowPresets[key] = presets[key];
+                // fire event
+                this.fireEvent({"type": "wl-preset-add", "name": key });
             }
         }
     };

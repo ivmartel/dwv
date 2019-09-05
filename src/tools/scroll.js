@@ -16,11 +16,6 @@ dwv.tool.Scroll = function(app)
      */
     var self = this;
     /**
-     * Scroll GUI.
-     * @type Object
-     */
-    var gui = null;
-    /**
      * Interaction start flag.
      * @type Boolean
      */
@@ -58,7 +53,7 @@ dwv.tool.Scroll = function(app)
         var yMove = (Math.abs(diffY) > 15);
         // do not trigger for small moves
         if( yMove ) {
-            // update GUI
+            // update view controller
             if( diffY > 0 ) {
                 app.getViewController().decrementSliceNb();
             }
@@ -72,7 +67,7 @@ dwv.tool.Scroll = function(app)
         var xMove = (Math.abs(diffX) > 15);
         // do not trigger for small moves
         if( xMove ) {
-            // update GUI
+            // update view controller
             if( diffX > 0 ) {
                 app.getViewController().incrementFrameNb();
             }
@@ -213,32 +208,18 @@ dwv.tool.Scroll = function(app)
      };
 
     /**
-     * Setup the tool GUI.
+     * Activate the tool.
+     * @param {Boolean} bool The flag to activate or not.
      */
-    this.setup = function ()
-    {
-        gui = new dwv.gui.Scroll(app);
-        gui.setup();
-    };
-
-    /**
-     * Enable the tool.
-     * @param {Boolean} bool The flag to enable or not.
-     */
-    this.display = function(bool){
-        if ( gui ) {
-            gui.display(bool);
-        }
+    this.activate = function (bool) {
+        // does nothing
     };
 
     /**
      * Initialise the tool.
      */
     this.init = function() {
-        if ( app.isMonoSliceData() && app.getImage().getNumberOfFrames() === 1 ) {
-            return false;
-        }
-        return true;
+        // does nothing
     };
 
 }; // Scroll class

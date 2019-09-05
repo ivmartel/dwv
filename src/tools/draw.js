@@ -38,11 +38,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      */
     var self = this;
     /**
-     * Draw GUI.
-     * @type Object
-     */
-    var gui = null;
-    /**
      * Interaction start flag.
      * @private
      * @type Boolean
@@ -155,6 +150,9 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         if ( started ) {
             return;
         }
+
+        // update scale
+        self.style.setScale(app.getWindowScale());
 
         // determine if the click happened in an existing shape
         var stage = app.getDrawStage();
@@ -409,22 +407,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     }
 
     /**
-     * Setup the tool GUI.
+     * Activate the tool.
+     * @param {Boolean} flag The flag to activate or not.
      */
-    this.setup = function ()
-    {
-        gui = new dwv.gui.Draw(app);
-        gui.setup(this.shapeFactoryList);
-    };
-
-    /**
-     * Enable the tool.
-     * @param {Boolean} flag The flag to enable or not.
-     */
-    this.display = function ( flag ){
-        if ( gui ) {
-            gui.display( flag );
-        }
+    this.activate = function ( flag ) {
         // reset shape display properties
         shapeEditor.disable();
         shapeEditor.setShape(null);
@@ -439,6 +425,11 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         if (flag) {
             app.addEventListener("slice-change", updateDrawLayer);
             app.addEventListener("frame-change", updateDrawLayer);
+
+            // init with the app window scale
+            this.style.setScale(app.getWindowScale());
+            // same for colour
+            this.setLineColour(this.style.getLineColour());
         }
         else {
             app.removeEventListener("slice-change", updateDrawLayer);
@@ -640,6 +631,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             var ktext = label.getText();
 
             // ask user for new label
+            // TODO remove
             var labelText = dwv.gui.prompt("Shape label", ktext.textExpr);
 
             // if press cancel do nothing
@@ -665,23 +657,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * Initialise the tool.
      */
     this.init = function() {
-        // set the default to the first in the list
-        var shapeName = 0;
-        for( var key in this.shapeFactoryList ){
-            shapeName = key;
-            break;
-        }
-        this.setShapeName(shapeName);
-        // init gui
-        if ( gui ) {
-            // init with the app window scale
-            this.style.setScale(app.getWindowScale());
-            // same for colour
-            this.setLineColour(this.style.getLineColour());
-            // init html
-            gui.initialise();
-        }
-        return true;
+        // does nothing
     };
 
     /**

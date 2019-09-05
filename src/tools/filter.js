@@ -13,11 +13,6 @@ dwv.tool.filter = dwv.tool.filter || {};
 dwv.tool.Filter = function ( filterList, app )
 {
     /**
-     * Filter GUI.
-     * @type Object
-     */
-    var gui = null;
-    /**
      * Filter list
      * @type Object
      */
@@ -28,71 +23,36 @@ dwv.tool.Filter = function ( filterList, app )
      */
     this.selectedFilter = 0;
     /**
-     * Default filter name.
-     * @type String
-     */
-    this.defaultFilterName = 0;
-    /**
-     * Display Flag.
-     * @type Boolean
-     */
-    this.displayed = false;
-    /**
      * Listener handler.
      * @type Object
      */
     var listenerHandler = new dwv.utils.ListenerHandler();
 
     /**
-     * Setup the filter GUI. Called at app startup.
+     * Activate the tool.
+     * @param {Boolean} bool Flag to activate or not.
      */
-    this.setup = function ()
-    {
-        if ( Object.keys(this.filterList).length !== 0 ) {
-            gui = new dwv.gui.Filter(app);
-            gui.setup(this.filterList);
-            for( var key in this.filterList ){
-                this.filterList[key].setup();
+    this.activate = function (bool) {
+        // setup event listening
+        for (var key in this.filterList) {
+            if (bool) {
                 this.filterList[key].addEventListener("filter-run", fireEvent);
                 this.filterList[key].addEventListener("filter-undo", fireEvent);
+            } else {
+                this.filterList[key].removeEventListener("filter-run", fireEvent);
+                this.filterList[key].removeEventListener("filter-undo", fireEvent);
             }
         }
     };
 
     /**
-     * Display the tool.
-     * @param {Boolean} bool Flag to enable or not.
-     */
-    this.display = function (bool)
-    {
-        if ( gui ) {
-            gui.display(bool);
-        }
-        this.displayed = bool;
-        // display the selected filter
-        this.selectedFilter.display(bool);
-    };
-
-    /**
      * Initialise the filter. Called once the image is loaded.
      */
-    this.init = function ()
-    {
-        // set the default to the first in the list
-        for( var key in this.filterList ){
-            this.defaultFilterName = key;
-            break;
-        }
-        this.setSelectedFilter(this.defaultFilterName);
-        // init all filters
-        for( key in this.filterList ) {
+    this.init = function () {
+        // setup event listening
+        for (var key in this.filterList) {
             this.filterList[key].init();
         }
-        // init html
-        if ( gui ) {
-            gui.initialise();
-        }
-        return true;
     };
 
     /**
@@ -160,22 +120,17 @@ dwv.tool.Filter.prototype.getSelectedFilter = function ()
 dwv.tool.Filter.prototype.setSelectedFilter = function (name)
 {
     // check if we have it
-    if ( !this.hasFilter(name) )
-    {
+    if ( !this.hasFilter(name) ) {
         throw new Error("Unknown filter: '" + name + "'");
     }
-    // hide last selected
-    if ( this.displayed )
-    {
-        this.selectedFilter.display(false);
+    // de-activate last selected
+    if (this.selectedFilter) {
+        this.selectedFilter.activate(false);
     }
     // enable new one
     this.selectedFilter = this.filterList[name];
-    // display the selected filter
-    if ( this.displayed )
-    {
-        this.selectedFilter.display(true);
-    }
+    // activate the selected filter
+    this.selectedFilter.activate(true);
 };
 
 /**
@@ -210,11 +165,6 @@ dwv.tool.filter.Threshold = function ( app )
      */
     var filter = new dwv.image.filter.Threshold();
     /**
-     * Filter GUI.
-     * @type Object
-     */
-    var gui = new dwv.gui.Threshold(app);
-    /**
      * Flag to know wether to reset the image or not.
      * @type Boolean
      */
@@ -226,21 +176,11 @@ dwv.tool.filter.Threshold = function ( app )
     var listenerHandler = new dwv.utils.ListenerHandler();
 
     /**
-     * Setup the filter GUI. Called at app startup.
+     * Activate the filter.
+     * @param {Boolean} bool Flag to activate or not.
      */
-    this.setup = function ()
-    {
-        gui.setup();
-    };
-
-    /**
-     * Display the filter.
-     * @param {Boolean} bool Flag to display or not.
-     */
-    this.display = function (bool)
-    {
-        gui.display(bool);
-        // reset the image when the tool is displayed
+    this.activate = function (bool) {
+        // reset the image when the tool is activated
         if ( bool ) {
             resetImage = true;
         }
@@ -249,9 +189,8 @@ dwv.tool.filter.Threshold = function ( app )
     /**
      * Initialise the filter. Called once the image is loaded.
      */
-    this.init = function ()
-    {
-        gui.initialise();
+    this.init = function () {
+        // does nothing
     };
 
     /**
@@ -312,39 +251,24 @@ dwv.tool.filter.Threshold = function ( app )
 dwv.tool.filter.Sharpen = function ( app )
 {
     /**
-     * Filter GUI.
-     * @type Object
-     */
-    var gui = new dwv.gui.Sharpen(app);
-    /**
      * Listener handler.
      * @type Object
      */
     var listenerHandler = new dwv.utils.ListenerHandler();
 
     /**
-     * Setup the filter GUI. Called at app startup.
+     * Activate the filter.
+     * @param {Boolean} bool Flag to activate or not.
      */
-    this.setup = function ()
-    {
-        gui.setup();
-    };
-
-    /**
-     * Display the filter.
-     * @param {Boolean} bool Flag to enable or not.
-     */
-    this.display = function (bool)
-    {
-        gui.display(bool);
+    this.activate = function (bool) {
+        // does nothing
     };
 
     /**
      * Initialise the filter. Called once the image is loaded.
      */
-    this.init = function ()
-    {
-        // nothing to do...
+    this.init = function () {
+        // does nothing
     };
 
     /**
@@ -399,39 +323,24 @@ dwv.tool.filter.Sharpen = function ( app )
 dwv.tool.filter.Sobel = function ( app )
 {
     /**
-     * Filter GUI.
-     * @type Object
-     */
-    var gui = new dwv.gui.Sobel(app);
-    /**
      * Listener handler.
      * @type Object
      */
     var listenerHandler = new dwv.utils.ListenerHandler();
 
     /**
-     * Setup the filter GUI. Called at app startup.
+     * Activate the filter.
+     * @param {Boolean} bool Flag to activate or not.
      */
-    this.setup = function ()
-    {
-        gui.setup();
-    };
-
-    /**
-     * Enable the filter.
-     * @param {Boolean} bool Flag to enable or not.
-     */
-    this.display = function (bool)
-    {
-        gui.display(bool);
+    this.activate = function (bool) {
+        // does nothing
     };
 
     /**
      * Initialise the filter. Called once the image is loaded.
      */
-    this.init = function ()
-    {
-        // nothing to do...
+    this.init = function () {
+        // does nothing
     };
 
     /**
