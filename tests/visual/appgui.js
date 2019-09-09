@@ -22,8 +22,6 @@ dwv.image.decoderScripts = {
 dwv.gui.getWindowSize = dwv.gui.base.getWindowSize;
 // get element
 dwv.gui.getElement = dwv.gui.base.getElement;
-// Progress
-dwv.gui.displayProgress = function (/*percent*/) {};
 
 // check browser support
 dwv.browser.check();

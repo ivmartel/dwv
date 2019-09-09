@@ -15,15 +15,6 @@ dwv.gui.base.prompt = function (message, defaultText)
 };
 
 /**
- * Display a progress value.
- * @param {Number} percent The progress percentage.
- */
-dwv.gui.base.displayProgress = function (/*percent*/)
-{
-    // default does nothing...
-};
-
-/**
  * Get a HTML element associated to a container div.
  * @param {Number} containerDivId The id of the container div.
  * @param {String} name The name or id to find.
@@ -55,7 +46,7 @@ dwv.gui.base.getElement = function (containerDivId, name)
 dwv.gui.base.setSelected = function (/*element, value*/)
 {
     // base does nothing...
-}
+};
 
  /**
  * Refresh a HTML element. Mainly for jquery-mobile.
@@ -64,4 +55,33 @@ dwv.gui.base.setSelected = function (/*element, value*/)
 dwv.gui.base.refreshElement = function (/*element*/)
 {
     // base does nothing...
+};
+
+/**
+* Create an overlay element.
+* @param {Object} parent The parent of the overlay element.
+* @param {String} className The css class name of the overlay element.
+* @param {String} value The value to use in the overlay.
+*/
+dwv.gui.base.createOverlayElement = function (parent, className, value)
+{
+    var li = document.createElement("li");
+    li.className = className;
+    li.appendChild( document.createTextNode( value ) );
+    parent.appendChild(li);
+};
+
+/**
+* Update an overlay element.
+* @param {Object} parent The parent of the overlay element.
+* @param {String} className The css class name of the overlay element.
+* @param {String} value The new value to use in the overlay.
+*/
+dwv.gui.base.updateOverlayElement = function (parent, className, value)
+{
+    li = div.getElementsByClassName(className)[0];
+    if (li) {
+        dwv.html.cleanNode(li);
+        li.appendChild( document.createTextNode(value) );
+    }
 };

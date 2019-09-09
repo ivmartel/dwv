@@ -260,7 +260,7 @@ dwv.tool.filter.Sharpen = function ( app )
      * Activate the filter.
      * @param {Boolean} bool Flag to activate or not.
      */
-    this.activate = function (bool) {
+    this.activate = function (/*bool*/) {
         // does nothing
     };
 
@@ -332,7 +332,7 @@ dwv.tool.filter.Sobel = function ( app )
      * Activate the filter.
      * @param {Boolean} bool Flag to activate or not.
      */
-    this.activate = function (bool) {
+    this.activate = function (/*bool*/) {
         // does nothing
     };
 

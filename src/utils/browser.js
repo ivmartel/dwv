@@ -129,19 +129,16 @@ dwv.browser.check = function()
     // Check for the File API support
     if( !dwv.browser.hasFileApi() ) {
         message = "The File APIs are not supported in this browser. ";
-        alert(message+appnorun);
         throw new Error(message);
     }
     // Check for XMLHttpRequest
     if( !dwv.browser.hasXmlHttpRequest() ) {
         message = "The XMLHttpRequest is not supported in this browser. ";
-        alert(message+appnorun);
         throw new Error(message);
     }
     // Check typed array
     if( !dwv.browser.hasTypedArray() ) {
         message = "The Typed arrays are not supported in this browser. ";
-        alert(message+appnorun);
         throw new Error(message);
     }
 

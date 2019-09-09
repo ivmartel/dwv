@@ -197,7 +197,7 @@ dwv.tool.ZoomAndPan = function(app)
      * Activate the tool.
      * @param {Boolean} bool The flag to activate or not.
      */
-    this.activate = function (bool) {
+    this.activate = function (/*bool*/) {
         // does nothing
     };
 

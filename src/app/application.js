@@ -45,12 +45,8 @@ dwv.App = function ()
     // Info layer controller
     var infoController = null;
 
-    // Dicom tags gui
+    // Dicom tags
     var tags = null;
-    var tagsGui = null;
-
-    // Drawing list gui
-    var drawListGui = null;
 
     // Image layer
     var imageLayer = null;
@@ -74,9 +70,6 @@ dwv.App = function ()
 
     // listeners
     var listeners = {};
-
-    // help resources path
-    var helpResourcesPath = "./";
 
     /**
      * Get the image.
@@ -123,7 +116,7 @@ dwv.App = function ()
      */
     this.canScroll = function () {
         return !this.isMonoSliceData() || !this.isMonoFrameData();
-    }
+    };
 
     /**
      * Can window and level be applied to the data?
@@ -131,7 +124,7 @@ dwv.App = function ()
      */
     this.canWindowLevel = function () {
         return this.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null;
-    }
+    };
 
     /**
      * Get the main scale.
@@ -164,6 +157,12 @@ dwv.App = function ()
     this.getViewController = function () { return viewController; };
 
     /**
+     * Get the toolbox controller.
+     * @return {Object} The controller.
+     */
+    this.getToolboxController = function () { return toolboxController; };
+
+    /**
      * Get the draw controller.
      * @return {Object} The controller.
      */
@@ -188,14 +187,6 @@ dwv.App = function ()
      * @return {Object} The app style.
      */
     this.getStyle = function () { return style; };
-
-    /**
-     * Get the help resources path.
-     * @return {String} The path.
-     */
-    this.getHelpResourcesPath = function () {
-        return helpResourcesPath;
-    };
 
     /**
      * Add a command to the undo stack.
@@ -306,46 +297,6 @@ dwv.App = function ()
                 undoStack = new dwv.tool.UndoStack(this);
                 undoStack.setup();
             }
-            // DICOM Tags
-            if ( config.gui.indexOf("tags") !== -1 ) {
-                tagsGui = new dwv.gui.DicomTags(this);
-            }
-            // Draw list
-            if ( config.gui.indexOf("drawList") !== -1 ) {
-                drawListGui = new dwv.gui.DrawList(this);
-                // update list on draw events
-                this.addEventListener("draw-create", drawListGui.update);
-                this.addEventListener("draw-change", drawListGui.update);
-                this.addEventListener("draw-delete", drawListGui.update);
-            }
-            // version number
-            if ( config.gui.indexOf("version") !== -1 ) {
-                dwv.gui.appendVersionHtml(dwv.getVersion());
-            }
-            // help
-            if ( config.gui.indexOf("help") !== -1 ) {
-                var isMobile = true;
-                if ( config.isMobile !== "undefined" ) {
-                    isMobile = config.isMobile;
-                }
-                // help resources path
-                if ( typeof config.helpResourcesPath !== "undefined" ) {
-                    helpResourcesPath = config.helpResourcesPath;
-                }
-                dwv.gui.appendHelpHtml( toolboxController.getToolList(), isMobile, this );
-            }
-        }
-
-        // listen to drag&drop
-        var box = this.getElement("dropBox");
-        if ( box ) {
-            box.addEventListener("dragover", onDragOver);
-            box.addEventListener("dragleave", onDragLeave);
-            box.addEventListener("drop", onDrop);
-            // initial size
-            var size = this.getLayerContainerSize();
-            var dropBoxSize = 2 * size.height / 3;
-            box.setAttribute("style","width:"+dropBoxSize+"px;height:"+dropBoxSize+"px");
         }
 
         // possible load from URL
@@ -652,8 +603,8 @@ dwv.App = function ()
             }
             postLoadInit(data);
         };
-        loader.onerror = function (error) { handleError(error); };
-        loader.onabort = function (error) { handleAbort(error); };
+        loader.onerror = function (error) { handleLoadError(error); };
+        loader.onabort = function (error) { handleLoadAbort(error); };
         loader.onloadend = function (/*event*/) {
             window.onkeydown = previousOnKeyDown;
             if ( drawController ) {
@@ -665,7 +616,7 @@ dwv.App = function ()
             // reset member
             currentLoader = null;
         };
-        loader.onprogress = onLoadProgress;
+        loader.onprogress = fireEvent;
         // main load (asynchronous)
         fireEvent({ 'type': 'load-start' });
         loader.load(data, options);
@@ -686,7 +637,7 @@ dwv.App = function ()
             var state = new dwv.State();
             state.apply( self, state.fromJSON(data) );
         };
-        loader.onerror = function (error) { handleError(error); };
+        loader.onerror = function (error) { handleLoadError(error); };
         // main load (asynchronous)
         loader.load(data, options);
     }
@@ -1267,73 +1218,23 @@ dwv.App = function ()
     }
 
     /**
-     * Handle a drag over.
-     * @private
-     * @param {Object} event The event to handle.
-     */
-    function onDragOver(event)
-    {
-        // prevent default handling
-        event.stopPropagation();
-        event.preventDefault();
-        // update box
-        var box = self.getElement("dropBox");
-        if ( box ) {
-            box.className = 'dropBox hover';
-        }
-    }
-
-    /**
-     * Handle a drag leave.
-     * @private
-     * @param {Object} event The event to handle.
-     */
-    function onDragLeave(event)
-    {
-        // prevent default handling
-        event.stopPropagation();
-        event.preventDefault();
-        // update box
-        var box = self.getElement("dropBox hover");
-        if ( box ) {
-            box.className = 'dropBox';
-        }
-    }
-
-    /**
-     * Handle a drop event.
-     * @private
-     * @param {Object} event The event to handle.
-     */
-    function onDrop(event)
-    {
-        // prevent default handling
-        event.stopPropagation();
-        event.preventDefault();
-        // load files
-        self.loadFiles(event.dataTransfer.files);
-    }
-
-    /**
      * Handle an error: display it to the user.
      * @private
      * @param {Object} error The error to handle.
      */
-    function handleError(error)
+    function handleLoadError(error)
     {
-        // alert window
-        if ( error.name && error.message) {
-            alert(error.name+": "+error.message);
-        }
-        else {
-            alert("Error: "+error+".");
-        }
         // log
-        if ( error.stack ) {
-            console.error(error.stack);
+        console.error(error);
+        // event message
+        var displayMessage = "";
+        if ( error.name && error.message) {
+            displayMessage = error.name + ": " + error.message;
+        } else {
+            displayMessage = "Error: " + error + ".";
         }
-        // stop progress
-        dwv.gui.displayProgress(100);
+        // fire error event
+        fireEvent({"type": "load-error", "message": displayMessage});
     }
 
     /**
@@ -1341,31 +1242,19 @@ dwv.App = function ()
      * @param {Object} error The error to handle.
      * @private
      */
-    function handleAbort(error)
+    function handleLoadAbort(error)
     {
         // log
+        console.warn(error);
+        // event message
+        var displayMessage = "";
         if ( error && error.message ) {
-            console.warn(error.message);
+            displayMessage = error.message;
         } else {
-            console.warn("Abort called.");
+            displayMessage = "Abort called.";
         }
-        // stop progress
-        dwv.gui.displayProgress(100);
-    }
-
-    /**
-     * Handle a load progress.
-     * @private
-     * @param {Object} event The event to handle.
-     */
-    function onLoadProgress(event)
-    {
-        fireEvent(event);
-        if( event.lengthComputable )
-        {
-            var percent = Math.ceil((event.loaded / event.total) * 100);
-            dwv.gui.displayProgress(percent);
-        }
+        // fire error event
+        fireEvent({"type": "load-abort", "message": displayMessage});
     }
 
     /**
@@ -1410,12 +1299,9 @@ dwv.App = function ()
         view = data.view;
         viewController = new dwv.ViewController(view);
 
-        // append the DICOM tags table
+        // store the DICOM tags
         tags = data.info;
-        // TODO remove
-        if ( tagsGui ) {
-            tagsGui.update(data.info);
-        }
+
         // store image
         originalImage = view.getImage();
         image = originalImage;
@@ -1454,21 +1340,6 @@ dwv.App = function ()
         // initialise the toolbox
         if ( toolboxController ) {
             toolboxController.init( imageLayer );
-        }
-
-        // stop box listening to drag (after first drag)
-        var box = self.getElement("dropBox");
-        if ( box ) {
-            box.removeEventListener("dragover", onDragOver);
-            box.removeEventListener("dragleave", onDragLeave);
-            box.removeEventListener("drop", onDrop);
-            // TODO remove
-            dwv.html.removeNode(box);
-            // switch listening to layerContainer
-            var div = self.getElement("layerContainer");
-            div.addEventListener("dragover", onDragOver);
-            div.addEventListener("dragleave", onDragLeave);
-            div.addEventListener("drop", onDrop);
         }
 
         // info layer
