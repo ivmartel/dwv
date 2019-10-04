@@ -1296,10 +1296,10 @@ https-browserify@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/https-browserify/-/https-browserify-0.0.1.tgz#3f91365cabe60b77ed0ebba24b454e3e09d95a82"
 
-i18next-browser-languagedetector@~3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/i18next-browser-languagedetector/-/i18next-browser-languagedetector-3.0.0.tgz#bdcce9e3f40162cdefc7db469a972c34f224250b"
-  integrity sha512-WI+XaZ94+WDp7HhIVykTwZUQsyCqpNDGWTIKG4PAeekZ4UVeMX6sN4gQj+Ad5g5PPwwENiynbW8x9TFFStoYPg==
+i18next-browser-languagedetector@~3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/i18next-browser-languagedetector/-/i18next-browser-languagedetector-3.1.0.tgz#f28e7482ef22e67bf20cc189c86d55d7a7dfcacf"
+  integrity sha512-sIEI3NA+hB1dvhQi4QaDsYo0NaYFM7qgU30rNFCqU+jXvLaMiOhLy5p23/xq9usi/Fv+U2v4Q9wEYNYUIju25A==
 
 i18next-xhr-backend@~2.0.0:
   version "2.0.0"
