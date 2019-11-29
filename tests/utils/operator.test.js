@@ -30,7 +30,7 @@ QUnit.test("Test merge objects.", function (assert) {
     var fbad03 = function () {
         dwv.utils.mergeObjects(obj001, obj003, "id", "value");
     };
-    assert.throws(fbad02, "merge with same id value");
+    assert.throws(fbad03, "merge with same id value");
 
     // test #00: simple
     var ref00 = {

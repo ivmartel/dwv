@@ -12,7 +12,7 @@ dwv.utils = dwv.utils || {};
 dwv.utils.isObject = function (unknown) {
     var type = typeof unknown;
     return type === 'function' || type === 'object' && !!unknown;
-}
+};
 
 /**
  * Merge two similar objects.
@@ -83,7 +83,9 @@ dwv.utils.mergeObjects = function (obj1, obj2, idKey, valueKey) {
     }
 
     // loop through object1
-    for (var key1 of Object.keys(obj1)) {
+    var keys1 = Object.keys(obj1);
+    for ( var i = 0, leni = keys1.length; i < leni; ++i ) {
+        var key1 = keys1[i];
         if (key1 !== idKey) {
             var value1 = obj1[key1];
             // default result
@@ -108,14 +110,14 @@ dwv.utils.mergeObjects = function (obj1, obj2, idKey, valueKey) {
                         // copy it with the index list
                         if (!dwv.utils.isObject(subValue1)) {
                             value[valueKey] = {};
-                            for (var i = 0; i < id1.length; i++) {
-                                value[valueKey][id1[i]] = subValue1;
+                            for (var j = 0; j < id1.length; j++) {
+                                value[valueKey][id1[j]] = subValue1;
                             }
                         }
                         value[valueKey][id2] = subValue2;
                     } else {
                         // create merge object
-                        newValue = {};
+                        var newValue = {};
                         newValue[id1] = subValue1;
                         newValue[id2] = subValue2;
                         value[valueKey] = newValue;
