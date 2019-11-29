@@ -67,9 +67,11 @@ dwv.utils.mergeObjects = function (obj1, obj2, idKey, valueKey) {
     // for merged object, id1 is an array
     if (mergedObj1) {
         // check if array does not include id2
-        if (id1.includes(id2)) {
-            throw new Error("The first object already contains id2: " +
-                id2 + ", id1: " + id1);
+        for ( var k = 0; k < id1.length; ++k ) {
+            if (id1[k] === id2) {
+                throw new Error("The first object already contains id2: " +
+                    id2 + ", id1: " + id1);
+            }
         }
         res[idKey] = obj1[idKey];
         res[idKey][valueKey].push(id2);
