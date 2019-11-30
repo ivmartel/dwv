@@ -1,4 +1,4 @@
-/*! dwv 0.27.0-beta 2019-11-29 23:08:30 */
+/*! dwv 0.27.0-beta 2019-11-30 00:15:20 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -1445,6 +1445,22 @@ dwv.App = function ()
      */
     function postLoadInit(data)
     {
+        // append the DICOM tags table
+        var dataInfo = new dwv.dicom.DicomElementsWrapper(data.info);
+        var dataInfoObj = dataInfo.dumpToObject();
+        if (tags) {
+            tags = dwv.utils.mergeObjects(
+                tags,
+                dataInfoObj,
+                "InstanceNumber",
+                "value");
+        } else {
+            tags = dataInfoObj;
+        }
+        if ( tagsGui ) {
+            tagsGui.update(dwv.dicom.objectToArray(tags));
+        }
+
         // only initialise the first time
         if ( view ) {
             return;
@@ -1454,11 +1470,6 @@ dwv.App = function ()
         view = data.view;
         viewController = new dwv.ViewController(view);
 
-        // append the DICOM tags table
-        tags = data.info;
-        if ( tagsGui ) {
-            tagsGui.update(data.info);
-        }
         // store image
         originalImage = view.getImage();
         image = originalImage;
@@ -3098,6 +3109,27 @@ var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
 
 /**
+ * Dump the DICOM tags to an array.
+ * @input {Object} obj A dicom tag object: {tagname: {tagKey0: tagValue0, ...}, ...}
+ * @return {Array} An array in the form [{name: tagname, tagKey0: tagValue0}, ...]
+ */
+dwv.dicom.objectToArray = function (obj) {
+    var array = [];
+    var keys = Object.keys(obj);
+    for (var i = 0; i < keys.length; ++i ) {
+        var key = keys[i];
+        var row = {name: key};
+        var innerKeys = Object.keys(obj[key]);
+        for (var j = 0; j < innerKeys.length; ++j ) {
+            var innerKey = innerKeys[j];
+            row[innerKey] = obj[key][innerKey];
+        }
+        array.push(row);
+    }
+    return array;
+};
+
+/**
  * DicomElements wrapper.
  * @constructor
  * @param {Array} dicomElements The elements to wrap.
@@ -3142,10 +3174,10 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
      * Dump the DICOM tags to an array.
      * @return {Array}
      */
-    this.dumpToTable = function () {
+    this.dumpToObject = function () {
         var keys = Object.keys(dicomElements);
         var dict = dwv.dicom.dictionary;
-        var table = [];
+        var obj = {};
         var dicomElement = null;
         var dictElement = null;
         var row = null;
@@ -3159,11 +3191,9 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
                 dictElement = dict[dicomElement.tag.group][dicomElement.tag.element];
             }
             // name
+            var name = "Unknown Tag & Data";
             if ( dictElement !== null ) {
-                row.name = dictElement[2];
-            }
-            else {
-                row.name = "Unknown Tag & Data";
+                name = dictElement[2];
             }
             // value
             row.value = this.getElementValueAsString(dicomElement);
@@ -3173,9 +3203,9 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
             row.vr = dicomElement.vr;
             row.vl = dicomElement.vl;
 
-            table.push( row );
+            obj[name] = row;
         }
-        return table;
+        return obj;
     };
 
     /**
@@ -11345,6 +11375,16 @@ dwv.html.appendCell = function (row, content)
             content[10] = "...";
         }
         str = Array.prototype.join.call( content, ', ' );
+    } else if (dwv.utils.isObject(content)) {
+        str = "";
+        var keys = Object.keys(content);
+        for (var i = 0; i < keys.length; ++i ) {
+            var key = keys[i];
+            if (str.length !== 0) {
+                str += ", ";
+            }
+            str += key + ": " + content[key];
+        }
     }
     // append
     cell.appendChild(document.createTextNode(str));
@@ -13973,7 +14013,7 @@ dwv.image.DicomBufferToView = function ()
             var viewFactory = new dwv.image.ViewFactory();
             var view = viewFactory.create( dicomParser.getDicomElements(), image );
             // return
-            self.onload({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
+            self.onload({"view": view, "info": dicomParser.getRawDicomElements()});
         };
 
         if ( needDecompression ) {
