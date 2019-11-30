@@ -32,7 +32,7 @@ QUnit.test("Test simple DICOM wrapping.", function (assert) {
         // wrapped tags
         var tags = dicomParser.getDicomElements();
         // dump to table
-        var table = tags.dumpToTable();
+        var table = dwv.dicom.objectToArray(tags.dumpToObject());
 
         // regression table
         var teoTable = [

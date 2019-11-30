@@ -1386,6 +1386,22 @@ dwv.App = function ()
      */
     function postLoadInit(data)
     {
+        // append the DICOM tags table
+        var dataInfo = new dwv.dicom.DicomElementsWrapper(data.info);
+        var dataInfoObj = dataInfo.dumpToObject();
+        if (tags) {
+            tags = dwv.utils.mergeObjects(
+                tags,
+                dataInfoObj,
+                "InstanceNumber",
+                "value");
+        } else {
+            tags = dataInfoObj;
+        }
+        if ( tagsGui ) {
+            tagsGui.update(dwv.dicom.objectToArray(tags));
+        }
+
         // only initialise the first time
         if ( view ) {
             return;
@@ -1395,11 +1411,6 @@ dwv.App = function ()
         view = data.view;
         viewController = new dwv.ViewController(view);
 
-        // append the DICOM tags table
-        tags = data.info;
-        if ( tagsGui ) {
-            tagsGui.update(data.info);
-        }
         // store image
         originalImage = view.getImage();
         image = originalImage;

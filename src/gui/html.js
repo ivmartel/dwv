@@ -22,6 +22,16 @@ dwv.html.appendCell = function (row, content)
             content[10] = "...";
         }
         str = Array.prototype.join.call( content, ', ' );
+    } else if (dwv.utils.isObject(content)) {
+        str = "";
+        var keys = Object.keys(content);
+        for (var i = 0; i < keys.length; ++i ) {
+            var key = keys[i];
+            if (str.length !== 0) {
+                str += ", ";
+            }
+            str += key + ": " + content[key];
+        }
     }
     // append
     cell.appendChild(document.createTextNode(str));
