@@ -79,7 +79,7 @@ dwv.gui.base.createOverlayElement = function (parent, className, value)
 */
 dwv.gui.base.updateOverlayElement = function (parent, className, value)
 {
-    li = div.getElementsByClassName(className)[0];
+    var li = document.getElementsByClassName(className)[0];
     if (li) {
         dwv.html.cleanNode(li);
         li.appendChild( document.createTextNode(value) );

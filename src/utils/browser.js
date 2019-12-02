@@ -124,7 +124,6 @@ dwv.browser.check = function()
 
     // Required --------------
 
-    var appnorun = "The application cannot be run.";
     var message = "";
     // Check for the File API support
     if( !dwv.browser.hasFileApi() ) {

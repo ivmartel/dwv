@@ -24,7 +24,7 @@ dwv.gui.DropboxLoader = function (app)
             var dropBoxSize = 2 * size.height / 3;
             box.setAttribute("style","width:"+dropBoxSize+"px;height:"+dropBoxSize+"px");
         }
-    }
+    };
 
     /**
      * Switch listening from the box to the layer container.
@@ -45,7 +45,7 @@ dwv.gui.DropboxLoader = function (app)
             layerDiv.addEventListener("dragleave", onDragLeave);
             layerDiv.addEventListener("drop", onDrop);
         }
-    }
+    };
 
     /**
      * Handle a drag over.
