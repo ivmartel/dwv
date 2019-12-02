@@ -1290,6 +1290,19 @@ dwv.App = function ()
      */
     function postLoadInit(data)
     {
+        // store the DICOM tags
+        var dataInfo = new dwv.dicom.DicomElementsWrapper(data.info);
+        var dataInfoObj = dataInfo.dumpToObject();
+        if (tags) {
+            tags = dwv.utils.mergeObjects(
+                tags,
+                dataInfoObj,
+                "InstanceNumber",
+                "value");
+        } else {
+            tags = dataInfoObj;
+        }
+
         // only initialise the first time
         if ( view ) {
             return;
@@ -1298,9 +1311,6 @@ dwv.App = function ()
         // get the view from the loaded data
         view = data.view;
         viewController = new dwv.ViewController(view);
-
-        // store the DICOM tags
-        tags = data.info;
 
         // store image
         originalImage = view.getImage();

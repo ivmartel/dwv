@@ -113,7 +113,7 @@ QUnit.test("Test sequence DICOM parsing.", function (assert) {
         assert.ok((Object.keys(rawTags).length!==0), "Got raw tags.");
         // wrapped tags
         var tags = dicomParser.getDicomElements();
-        assert.ok((tags.dumpToTable().length!==0), "Got wrapped tags.");
+        assert.ok((tags.dumpToObject().length!==0), "Got wrapped tags.");
 
         // ReferencedImageSequence: explicit sequence
         var seq00 = tags.getFromName("ReferencedImageSequence");

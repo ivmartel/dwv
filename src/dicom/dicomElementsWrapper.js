@@ -47,10 +47,10 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
      * Dump the DICOM tags to an array.
      * @return {Array}
      */
-    this.dumpToTable = function () {
+    this.dumpToObject = function () {
         var keys = Object.keys(dicomElements);
         var dict = dwv.dicom.dictionary;
-        var table = [];
+        var obj = {};
         var dicomElement = null;
         var dictElement = null;
         var row = null;
@@ -64,11 +64,9 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
                 dictElement = dict[dicomElement.tag.group][dicomElement.tag.element];
             }
             // name
+            var name = "Unknown Tag & Data";
             if ( dictElement !== null ) {
-                row.name = dictElement[2];
-            }
-            else {
-                row.name = "Unknown Tag & Data";
+                name = dictElement[2];
             }
             // value
             row.value = this.getElementValueAsString(dicomElement);
@@ -78,9 +76,9 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
             row.vr = dicomElement.vr;
             row.vl = dicomElement.vl;
 
-            table.push( row );
+            obj[name] = row;
         }
-        return table;
+        return obj;
     };
 
     /**
