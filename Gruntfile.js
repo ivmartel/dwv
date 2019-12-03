@@ -1,5 +1,7 @@
 /* global module */
 module.exports = function(grunt) {
+    // copy target for dev deploy
+    // call: yarn run dev --copy-target=../dwv-jqui
     var cpTarget = grunt.option('copy-target') || '../dwv-jqmobile';
     // Project configuration.
     grunt.initConfig({
