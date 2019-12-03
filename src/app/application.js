@@ -370,6 +370,7 @@ dwv.App = function ()
         // clear objects
         image = null;
         view = null;
+        tags = null;
         isMonoSliceData = false;
         // reset undo/redo
         if ( undoStack ) {
