@@ -270,28 +270,6 @@ dwv.App = function ()
         }
         // gui
         if ( config.gui ) {
-            // load
-            if ( config.gui.indexOf("load") !== -1 ) {
-                var loaderList = {};
-                for ( var l = 0; l < config.loaders.length; ++l ) {
-                    var loaderName = config.loaders[l];
-                    var loaderClass = loaderName + "Load";
-                    // default: find the loader in the dwv.gui namespace
-                    if (typeof dwv.gui[loaderClass] !== "undefined") {
-                        loaderList[loaderName] = new dwv.gui[loaderClass](this);
-                    }
-                    else {
-                        console.warn("Could not initialise unknown loader: "+loaderName);
-                    }
-                }
-                loadbox = new dwv.gui.Loadbox(this, loaderList);
-                loadbox.setup();
-                var loaderKeys = Object.keys(loaderList);
-                for ( var lk = 0; lk < loaderKeys.length; ++lk ) {
-                    loaderList[loaderKeys[lk]].setup();
-                }
-                loadbox.displayLoader(loaderKeys[0]);
-            }
             // undo
             if ( config.gui.indexOf("undo") !== -1 ) {
                 undoStack = new dwv.tool.UndoStack(this);
@@ -961,24 +939,6 @@ dwv.App = function ()
     this.onZoomReset = function (/*event*/)
     {
         self.resetLayout();
-    };
-
-    /**
-     * Handle loader change. Will activate the loader using
-     * the value property of the 'event.currentTarget'.
-     * @param {Object} event The change event.
-     */
-    this.onChangeLoader = function (event)
-    {
-        loadbox.displayLoader( event.currentTarget.value );
-    };
-
-    /**
-     * Reset the load box to its original state.
-     */
-    this.resetLoadbox = function ()
-    {
-        loadbox.reset();
     };
 
     /**
