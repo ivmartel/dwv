@@ -60,8 +60,6 @@ dwv.App = function ()
     // Toolbox controller
     var toolboxController = null;
 
-    // Loadbox
-    var loadbox = null;
     // Current loader
     var currentLoader = null;
 
@@ -203,6 +201,11 @@ dwv.App = function ()
      */
     this.init = function ( config ) {
         containerDivId = config.containerDivId;
+        // undo stack
+        undoStack = new dwv.tool.UndoStack(this);
+        undoStack.addEventListener("undo-add", fireEvent);
+        undoStack.addEventListener("undo", fireEvent);
+        undoStack.addEventListener("redo", fireEvent);
         // tools
         if ( config.tools && config.tools.length !== 0 ) {
             // setup the tool list
@@ -268,21 +271,13 @@ dwv.App = function ()
             }
             toolboxController = new dwv.ToolboxController(toolList);
         }
-        // gui
-        if ( config.gui ) {
-            // undo
-            if ( config.gui.indexOf("undo") !== -1 ) {
-                undoStack = new dwv.tool.UndoStack(this);
-                undoStack.setup();
-            }
-        }
 
         // possible load from URL
         if ( typeof config.skipLoadUrl === "undefined" ) {
             var query = dwv.utils.getUriQuery(window.location.href);
             // check query
             if ( query && typeof query.input !== "undefined" ) {
-                dwv.utils.decodeQuery(query, this.onInputURLs);
+                dwv.utils.decodeQuery(query, this.loadURLs);
                 // optional display state
                 if ( typeof query.state !== "undefined" ) {
                     var onLoadEnd = function (/*event*/) {
@@ -353,7 +348,9 @@ dwv.App = function ()
         // reset undo/redo
         if ( undoStack ) {
             undoStack = new dwv.tool.UndoStack(this);
-            undoStack.initialise();
+            undoStack.addEventListener("undo-add", fireEvent);
+            undoStack.addEventListener("undo", fireEvent);
+            undoStack.addEventListener("redo", fireEvent);
         }
     };
 
@@ -939,37 +936,6 @@ dwv.App = function ()
     this.onZoomReset = function (/*event*/)
     {
         self.resetLayout();
-    };
-
-    /**
-     * Handle change url event.
-     * @param {Object} event The event fired when changing the url field.
-     */
-    this.onChangeURL = function (event)
-    {
-        self.loadURLs([event.target.value]);
-    };
-
-    /**
-     * Handle input urls.
-     * @param {Array} urls The list of input urls.
-     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
-     */
-    this.onInputURLs = function (urls, requestHeaders)
-    {
-        self.loadURLs(urls, requestHeaders);
-    };
-
-    /**
-     * Handle change files event.
-     * @param {Object} event The event fired when changing the file field.
-     */
-    this.onChangeFiles = function (event)
-    {
-        var files = event.target.files;
-        if ( files.length !== 0 ) {
-            self.loadFiles(files);
-        }
     };
 
     /**
