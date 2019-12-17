@@ -10,31 +10,16 @@ dwv.gui.info = dwv.gui.info || {};
  * @param {Object} div The HTML element to add Header overlay info to.
  * @param {String} pos The string to specify the corner position. (tl,tc,tr,cl,cr,bl,bc,br)
  */
-dwv.gui.info.Overlay = function ( div, pos, app )
+dwv.gui.info.Overlay = function ( div, pos )
 {
-    // closure to self
-    var self = this;
+    var overlayData = null;
 
     /**
-     * Get the overlay array of the current position.
-     * @return {Array} The overlay information.
+     * Set the overlay data.
+     * @param {Object} data The overlay data for all positions.
      */
-    this.getOverlays = function ()
-    {
-        var image = app.getImage();
-        if (!image) {
-            return;
-        }
-        var allOverlays = image.getOverlays();
-        if (!allOverlays) {
-            return;
-        }
-        var position = app.getViewController().getCurrentPosition();
-        var sliceOverlays = allOverlays[position.k];
-        if (!sliceOverlays) {
-            return;
-        }
-        return sliceOverlays[pos];
+    this.setOverlayData = function (data) {
+        overlayData = data[pos];
     };
 
     /**
@@ -45,53 +30,53 @@ dwv.gui.info.Overlay = function ( div, pos, app )
         // remove all <ul> elements from div
         dwv.html.cleanNode(div);
 
-        // get overlay string array of the current position
-        var overlays = self.getOverlays();
-        if (!overlays) {
+        if (!overlayData) {
             return;
         }
 
         if (pos === "bc" || pos === "tc" ||
             pos === "cr" || pos === "cl") {
-            div.textContent = overlays[0].value;
+            div.textContent = overlayData[0].value;
         } else {
             // create <ul> element
             var ul = document.createElement("ul");
 
-            for (var n=0; overlays[n]; n++){
-                var li;
-                if (overlays[n].value === "window-center") {
+            var li;
+            var value;
+            for (var n=0; n < overlayData.length; ++n) {
+                value = overlayData[n].value;
+                if (value === "window-center") {
                     li = document.createElement("li");
                     li.className = "info-" + pos + "-window-center";
                     ul.appendChild(li);
-                } else if (overlays[n].value === "window-width") {
+                } else if (value === "window-width") {
                     li = document.createElement("li");
                     li.className = "info-" + pos + "-window-width";
                     ul.appendChild(li);
-                } else if (overlays[n].value === "zoom") {
+                } else if (value === "zoom") {
                     li = document.createElement("li");
                     li.className = "info-" + pos + "-zoom";
                     ul.appendChild(li);
-                } else if (overlays[n].value === "offset") {
+                } else if (value === "offset") {
                     li = document.createElement("li");
                     li.className = "info-" + pos + "-offset";
                     ul.appendChild(li);
-                } else if (overlays[n].value === "value") {
+                } else if (value === "value") {
                     li = document.createElement("li");
                     li.className = "info-" + pos + "-value";
                     ul.appendChild(li);
-                } else if (overlays[n].value === "position") {
+                } else if (value === "position") {
                     li = document.createElement("li");
                     li.className = "info-" + pos + "-position";
                     ul.appendChild(li);
-                } else if (overlays[n].value === "frame") {
+                } else if (value === "frame") {
                     li = document.createElement("li");
                     li.className = "info-" + pos + "-frame";
                     ul.appendChild(li);
                 } else {
                     li = document.createElement("li");
                     li.className = "info-" + pos + "-" + n;
-                    li.appendChild( document.createTextNode( overlays[n].value ) );
+                    li.appendChild( document.createTextNode( value ) );
                     ul.appendChild(li);
                 }
             }
@@ -107,82 +92,82 @@ dwv.gui.info.Overlay = function ( div, pos, app )
      */
     this.update = function ( event )
     {
-        // get overlay string array of the current position
-        var overlays = self.getOverlays();
-        if (!overlays) {
+        if (!overlayData) {
             return;
         }
 
         if (pos === "bc" || pos === "tc" ||
             pos === "cr" || pos === "cl") {
-            div.textContent = overlays[0].value;
+            div.textContent = overlayData[0].value;
         } else {
             var li;
-            var n;
-
-            for (n=0; overlays[n]; n++) {
-                if (overlays[n].value === "window-center") {
+            var value;
+            var format;
+            for (var n=0; n < overlayData.length; ++n) {
+                value = overlayData[n].value;
+                format = overlayData[n].format;
+                if (value === "window-center") {
                     if (event.type === "wl-center-change") {
                         li = div.getElementsByClassName("info-" + pos + "-window-center")[0];
                         dwv.html.cleanNode(li);
-                        var wcStr = dwv.utils.replaceFlags2( overlays[n].format, [Math.round(event.wc)] );
+                        var wcStr = dwv.utils.replaceFlags2( format, [Math.round(event.wc)] );
                         if (li) {
                             li.appendChild( document.createTextNode(wcStr) );
                         }
                     }
-                } else if (overlays[n].value === "window-width") {
+                } else if (value === "window-width") {
                     if (event.type === "wl-width-change") {
                         li = div.getElementsByClassName("info-" + pos + "-window-width")[0];
                         dwv.html.cleanNode(li);
-                        var wwStr = dwv.utils.replaceFlags2( overlays[n].format, [Math.round(event.ww)] );
+                        var wwStr = dwv.utils.replaceFlags2( format, [Math.round(event.ww)] );
                         if (li) {
                             li.appendChild( document.createTextNode(wwStr) );
                         }
                     }
-                } else if (overlays[n].value === "zoom") {
+                } else if (value === "zoom") {
                     if (event.type === "zoom-change") {
                         li = div.getElementsByClassName("info-" + pos + "-zoom")[0];
                         dwv.html.cleanNode(li);
                         var zoom = Number(event.scale).toPrecision(3);
-                        var zoomStr = dwv.utils.replaceFlags2( overlays[n].format, [zoom] );
+                        var zoomStr = dwv.utils.replaceFlags2( format, [zoom] );
                         if (li) {
                             li.appendChild( document.createTextNode( zoomStr ) );
                         }
                     }
-                } else if (overlays[n].value === "offset") {
+                } else if (value === "offset") {
                     if (event.type === "zoom-change") {
                         li = div.getElementsByClassName("info-" + pos + "-offset")[0];
                         dwv.html.cleanNode(li);
                         var offset = [ Number(event.cx).toPrecision(3),
                             Number(event.cy).toPrecision(3)];
-                        var offStr = dwv.utils.replaceFlags2( overlays[n].format, offset );
+                        var offStr = dwv.utils.replaceFlags2( format, offset );
                         if (li) {
                             li.appendChild( document.createTextNode( offStr ) );
                         }
                     }
-                } else if (overlays[n].value === "value") {
+                } else if (value === "value") {
                     if (event.type === "position-change") {
                         li = div.getElementsByClassName("info-" + pos + "-value")[0];
                         dwv.html.cleanNode(li);
-                        var valueStr = dwv.utils.replaceFlags2( overlays[n].format, [event.value] );
+                        var valueStr = dwv.utils.replaceFlags2( format, [event.value] );
                         if (li) {
                             li.appendChild( document.createTextNode( valueStr ) );
                         }
                     }
-                } else if (overlays[n].value === "position") {
+                } else if (value === "position") {
                     if (event.type === "position-change") {
                         li = div.getElementsByClassName("info-" + pos + "-position")[0];
                         dwv.html.cleanNode(li);
-                        var posStr = dwv.utils.replaceFlags2( overlays[n].format, [event.i, event.j, event.k] );
+                        var posStr = dwv.utils.replaceFlags2( format, [event.i, event.j, event.k] );
                         if (li) {
                             li.appendChild( document.createTextNode( posStr ) );
                         }
                     }
-                } else if (overlays[n].value === "frame") {
+                } else if (value === "frame") {
                     if (event.type === "frame-change") {
                         li = div.getElementsByClassName("info-" + pos + "-frame")[0];
                         dwv.html.cleanNode(li);
-                        var frameStr = dwv.utils.replaceFlags2( overlays[n].format, [event.frame] );
+                        var frameStr = dwv.utils.replaceFlags2( format, [event.frame] );
                         if (li) {
                             li.appendChild( document.createTextNode( frameStr ) );
                         }
@@ -192,7 +177,7 @@ dwv.gui.info.Overlay = function ( div, pos, app )
                         li = div.getElementsByClassName("info-" + pos + "-" + n)[0];
                         dwv.html.cleanNode(li);
                         if (li) {
-                            li.appendChild( document.createTextNode( overlays[n].value ) );
+                            li.appendChild( document.createTextNode( value ) );
                         }
                     }
                 }
@@ -206,7 +191,7 @@ dwv.gui.info.Overlay = function ( div, pos, app )
  * @param {Object} dicomElements DICOM elements of the image
  * @return {Array} Array of string to be shown in each corner
  */
-dwv.gui.info.createOverlays = function (dicomElements)
+dwv.gui.info.createOverlayData = function (dicomElements)
 {
     var overlays = {};
     var modality = dicomElements.getFromKey("x00080060");
@@ -269,7 +254,7 @@ dwv.gui.info.createOverlays = function (dicomElements)
  * @param {Object} dicomElements DICOM elements of the image
  * @return {Array} Array of string to be shown in each corner
  */
-dwv.gui.info.createOverlaysForDom = function (info)
+dwv.gui.info.createOverlayDataForDom = function (info)
 {
     var overlays = {};
     var omaps = dwv.gui.info.overlayMaps;

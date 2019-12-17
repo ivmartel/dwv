@@ -49,8 +49,6 @@ dwv.image.getDefaultView = function (
     var meta = {};
     meta.BitsStored = 8;
     image.setMeta(meta);
-    // overlay
-    image.setFirstOverlay( dwv.gui.info.createOverlaysForDom(info) );
     // view
     var view = new dwv.image.View(image);
     // defaut preset

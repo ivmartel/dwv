@@ -42,9 +42,6 @@ dwv.App = function ()
     // View controller
     var viewController = null;
 
-    // Info layer controller
-    var infoController = null;
-
     // Dicom tags
     var tags = null;
 
@@ -571,6 +568,7 @@ dwv.App = function ()
         // set IO
         loader.setDefaultCharacterSet(defaultCharacterSet);
         loader.onload = function (data) {
+            fireEvent({'type': 'load-slice', 'data': data.info});
             if ( image ) {
                 view.append( data.view );
                 if ( drawController ) {
@@ -651,19 +649,6 @@ dwv.App = function ()
         if ( drawController ) {
             drawController.resizeStage(newWidth, newHeight, scale);
         }
-    };
-
-    /**
-     * Toggle the display of the information layer.
-     */
-    this.toggleInfoLayerDisplay = function ()
-    {
-        // toggle html
-        var infoLayer = self.getElement("infoLayer");
-        // TODO remove
-        dwv.html.toggleDisplay(infoLayer);
-        // toggle listeners
-        infoController.toggleListeners(self, view);
     };
 
     /**
@@ -1049,15 +1034,6 @@ dwv.App = function ()
     };
 
     /**
-     * Handle toggle of info layer.
-     * @param {Object} event The associated event.
-     */
-    this.onToggleInfoLayer = function (/*event*/)
-    {
-        self.toggleInfoLayerDisplay();
-    };
-
-    /**
      * Handle display reset.
      * @param {Object} event The change event.
      */
@@ -1277,14 +1253,6 @@ dwv.App = function ()
         // initialise the toolbox
         if ( toolboxController ) {
             toolboxController.init( imageLayer );
-        }
-
-        // info layer
-        var infoLayer = self.getElement("infoLayer");
-        if ( infoLayer ) {
-            infoController = new dwv.InfoController(containerDivId);
-            infoController.create(self);
-            infoController.toggleListeners(self, view);
         }
 
         // init W/L display

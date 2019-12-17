@@ -85,7 +85,7 @@ dwv.image.RescaleSlopeAndIntercept.prototype.isID = function () {
  * @param {Number} numberOfFrames The number of frames (optional, can be used
      to anticipate the final number after appends).
  */
-dwv.image.Image = function(geometry, buffer, numberOfFrames)
+dwv.image.Image = function(geometry, buffer, numberOfFrames, sopInstanceUids)
 {
     // use buffer length in not specified
     if (typeof numberOfFrames === "undefined") {
@@ -167,24 +167,13 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
      */
     var histogram = null;
 
-	/**
-	 * Overlay.
-     * @private
-     * @type Array
-     */
-	var overlays = [];
-
     /**
-     * Set the first overlay.
-     * @param {Array} over The first overlay.
+     * Get the sop instance UIDs indexed by slice number.
+     * @return {Array} The UIDs array.
      */
-    this.setFirstOverlay = function (over) { overlays[0] = over; };
-
-    /**
-     * Get the overlays.
-     * @return {Array} The overlays array.
-     */
-    this.getOverlays = function () { return overlays; };
+    this.getSopInstanceUids = function () {
+        return sopInstanceUids;
+    };
 
     /**
      * Get the geometry of the image.
@@ -395,8 +384,8 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
         // copy to class variables
         buffer[f] = newBuffer;
 
-		// insert overlay information of the slice to the image
-		overlays.splice(newSliceNb, 0, rhs.getOverlays()[0]);
+        // insert sop instance UIDs
+        sopInstanceUids.splice(newSliceNb, 0, rhs.getSopInstanceUids()[0]);
 
         // return the appended slice number
         return newSliceNb;
@@ -952,8 +941,11 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var origin = new dwv.math.Point3D(slicePosition[0], slicePosition[1], slicePosition[2]);
     var geometry = new dwv.image.Geometry( origin, size, spacing, orientationMatrix );
 
+    // sop instance UID
+    var sopInstanceUid = dicomElements.getFromKey("x00080018");
+
     // image
-    var image = new dwv.image.Image( geometry, pixelBuffer );
+    var image = new dwv.image.Image( geometry, pixelBuffer, 1, [sopInstanceUid] );
     // PhotometricInterpretation
     var photometricInterpretation = dicomElements.getFromKey("x00280004");
     if ( photometricInterpretation ) {
@@ -1094,10 +1086,8 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
         meta.RecommendedDisplayFrameRate = parseInt(recommendedDisplayFrameRate, 10);
     }
 
+    // store the meta data
     image.setMeta(meta);
-
-    // overlay
-    image.setFirstOverlay( dwv.gui.info.createOverlays(dicomElements) );
 
     return image;
 };

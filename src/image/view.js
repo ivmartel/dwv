@@ -391,7 +391,8 @@ dwv.image.View = function (image)
         {
             this.fireEvent({"type": "position-change",
                 "i": pos.i, "j": pos.j, "k": pos.k,
-                "value": image.getRescaledValue(pos.i,pos.j,pos.k, this.getCurrentFrame())});
+                "value": image.getRescaledValue(pos.i,pos.j,pos.k, this.getCurrentFrame())
+            });
         }
         else
         {
@@ -401,9 +402,15 @@ dwv.image.View = function (image)
 
         // fire a slice change event (used to trigger redraw)
         if ( !silent ) {
-          if( oldPosition.k !== currentPosition.k ) {
-              this.fireEvent({"type": "slice-change"});
-          }
+            if ( oldPosition.k !== currentPosition.k ) {
+                this.fireEvent({
+                    "type": "slice-change",
+                    "value": currentPosition.k,
+                    "data": {
+                        "sopInstanceUid": image.getSopInstanceUids()[currentPosition.k]
+                    }
+                });
+            }
         }
 
         // all good
