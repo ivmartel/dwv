@@ -6,7 +6,7 @@ dwv.tool = dwv.tool || {};
  * UndoStack class.
  * @constructor
  */
-dwv.tool.UndoStack = function (eventCallback)
+dwv.tool.UndoStack = function ()
 {
     /**
      * Array of commands.

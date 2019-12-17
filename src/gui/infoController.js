@@ -82,7 +82,7 @@ dwv.gui.info.Controller = function (app, containerDivId)
         for (var i = 0; i < overlayGuis.length; ++i) {
             overlayGuis[i].setOverlayData(overlayData[sopInstanceUid]);
         }
-    }
+    };
 
     /**
      * Toggle info listeners.
@@ -92,8 +92,9 @@ dwv.gui.info.Controller = function (app, containerDivId)
             return;
         }
 
+        var n;
         if (isInfoLayerListening) {
-            for (var n = 0; n < overlayGuis.length; ++n) {
+            for (n = 0; n < overlayGuis.length; ++n) {
                 app.removeEventListener("zoom-change", overlayGuis[n].update);
                 app.removeEventListener("wl-width-change", overlayGuis[n].update);
                 app.removeEventListener("wl-center-change", overlayGuis[n].update);
@@ -101,7 +102,7 @@ dwv.gui.info.Controller = function (app, containerDivId)
                 app.removeEventListener("frame-change", overlayGuis[n].update);
             }
         } else {
-            for (var n = 0; n < overlayGuis.length; ++n) {
+            for (n = 0; n < overlayGuis.length; ++n) {
                 app.addEventListener("zoom-change", overlayGuis[n].update);
                 app.addEventListener("wl-width-change", overlayGuis[n].update);
                 app.addEventListener("wl-center-change", overlayGuis[n].update);
@@ -122,7 +123,7 @@ dwv.gui.info.Controller = function (app, containerDivId)
         dwv.html.toggleDisplay(infoLayer);
         // toggle listeners
         this.toggleListeners();
-    }
+    };
 
     /**
      * Get a HTML element associated to the application.

@@ -199,7 +199,7 @@ dwv.App = function ()
     this.init = function ( config ) {
         containerDivId = config.containerDivId;
         // undo stack
-        undoStack = new dwv.tool.UndoStack(this);
+        undoStack = new dwv.tool.UndoStack();
         undoStack.addEventListener("undo-add", fireEvent);
         undoStack.addEventListener("undo", fireEvent);
         undoStack.addEventListener("redo", fireEvent);
@@ -344,7 +344,7 @@ dwv.App = function ()
         isMonoSliceData = false;
         // reset undo/redo
         if ( undoStack ) {
-            undoStack = new dwv.tool.UndoStack(this);
+            undoStack = new dwv.tool.UndoStack();
             undoStack.addEventListener("undo-add", fireEvent);
             undoStack.addEventListener("undo", fireEvent);
             undoStack.addEventListener("redo", fireEvent);
