@@ -1,11 +1,15 @@
 // namespaces
 var dwv = dwv || {};
+dwv.gui = dwv.gui || {};
+dwv.gui.info = dwv.gui.info || {};
 
 /**
- * Info controller.
+ * DICOM Header overlay info controller.
  * @constructor
+ * @param {Object} app The assciated app.
+ * @param {String} containerDivId The id of the container div.
  */
-dwv.InfoController = function (app, containerDivId)
+dwv.gui.info.Controller = function (app, containerDivId)
 {
     // closure to self
     var self = this;
@@ -128,4 +132,4 @@ dwv.InfoController = function (app, containerDivId)
     function getElement(name) {
         return dwv.gui.getElement(containerDivId, name);
     }
-}; // class dwv.InfoController
+}; // class dwv.gui.info.Controller

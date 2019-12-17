@@ -1,7 +1,6 @@
 // namespaces
 var dwv = dwv || {};
 dwv.gui = dwv.gui || {};
-dwv.gui.base = dwv.gui.base || {};
 dwv.gui.info = dwv.gui.info || {};
 
 /**

@@ -1,7 +1,6 @@
 <!-- app -->
 <script type="text/javascript" src="../src/app/application.js"></script>
 <script type="text/javascript" src="../src/app/drawController.js"></script>
-<script type="text/javascript" src="../src/app/infoController.js"></script>
 <script type="text/javascript" src="../src/app/state.js"></script>
 <script type="text/javascript" src="../src/app/toolboxController.js"></script>
 <script type="text/javascript" src="../src/app/viewController.js"></script>
@@ -13,7 +12,8 @@
 <script type="text/javascript" src="../src/gui/generic.js"></script>
 <script type="text/javascript" src="../src/gui/help.js"></script>
 <script type="text/javascript" src="../src/gui/html.js"></script>
-<script type="text/javascript" src="../src/gui/info.js"></script>
+<script type="text/javascript" src="../src/gui/infoController.js"></script>
+<script type="text/javascript" src="../src/gui/infoOverlay.js"></script>
 <script type="text/javascript" src="../src/gui/layer.js"></script>
 <script type="text/javascript" src="../src/gui/loader.js"></script>
 <script type="text/javascript" src="../src/gui/style.js"></script>
