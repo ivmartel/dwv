@@ -39,49 +39,9 @@ dwv.gui.base.getElement = function (containerDivId, name)
  };
 
  /**
- * Set the selected item of a HTML select.
- * @param {String} element The HTML select element.
- * @param {String} value The value of the option to mark as selected.
- */
-dwv.gui.base.setSelected = function (/*element, value*/)
-{
-    // base does nothing...
-};
-
- /**
  * Refresh a HTML element. Mainly for jquery-mobile.
  * @param {String} element The HTML element to refresh.
  */
-dwv.gui.base.refreshElement = function (/*element*/)
-{
+dwv.gui.base.refreshElement = function (/*element*/) {
     // base does nothing...
-};
-
-/**
-* Create an overlay element.
-* @param {Object} parent The parent of the overlay element.
-* @param {String} className The css class name of the overlay element.
-* @param {String} value The value to use in the overlay.
-*/
-dwv.gui.base.createOverlayElement = function (parent, className, value)
-{
-    var li = document.createElement("li");
-    li.className = className;
-    li.appendChild( document.createTextNode( value ) );
-    parent.appendChild(li);
-};
-
-/**
-* Update an overlay element.
-* @param {Object} parent The parent of the overlay element.
-* @param {String} className The css class name of the overlay element.
-* @param {String} value The new value to use in the overlay.
-*/
-dwv.gui.base.updateOverlayElement = function (parent, className, value)
-{
-    var li = document.getElementsByClassName(className)[0];
-    if (li) {
-        dwv.html.cleanNode(li);
-        li.appendChild( document.createTextNode(value) );
-    }
 };

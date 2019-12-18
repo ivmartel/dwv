@@ -269,25 +269,6 @@ dwv.App = function ()
             toolboxController = new dwv.ToolboxController(toolList);
         }
 
-        // possible load from URL
-        if ( typeof config.skipLoadUrl === "undefined" ) {
-            var query = dwv.utils.getUriQuery(window.location.href);
-            // check query
-            if ( query && typeof query.input !== "undefined" ) {
-                dwv.utils.decodeQuery(query, this.loadURLs);
-                // optional display state
-                if ( typeof query.state !== "undefined" ) {
-                    var onLoadEnd = function (/*event*/) {
-                        loadStateUrl(query.state);
-                    };
-                    this.addEventListener( "load-end", onLoadEnd );
-                }
-            }
-        }
-        else{
-            console.log("Not loading url from address since skipLoadUrl is defined.");
-        }
-
         // listen to window resize
         window.onresize = this.onResize;
 

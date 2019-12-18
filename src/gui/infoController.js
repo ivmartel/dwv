@@ -115,17 +115,6 @@ dwv.gui.info.Controller = function (app, containerDivId)
     };
 
     /**
-     * Toggle info listeners and layer.
-     */
-    this.toggle = function () {
-        // toggle layer
-        var infoLayer = app.getElement("infoLayer");
-        dwv.html.toggleDisplay(infoLayer);
-        // toggle listeners
-        this.toggleListeners();
-    };
-
-    /**
      * Get a HTML element associated to the application.
      * @param name The name or id to find.
      * @return The found element or null.
