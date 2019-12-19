@@ -85,8 +85,8 @@ dwv.gui.info.Controller = function (app, containerDivId)
         // create overlay guis if not done
         // TODO The first gui is maybe not the one disaplyed...
         if (!guisCreated) {
-            for (var i = 0; i < overlayGuis.length; ++i) {
-                overlayGuis[i].create();
+            for (var j = 0; j < overlayGuis.length; ++j) {
+                overlayGuis[j].create();
             }
             guisCreated = true;
         }
