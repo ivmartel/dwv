@@ -18,6 +18,8 @@ dwv.gui.info.Controller = function (app, containerDivId)
     var overlayGuis = [];
     // flag to tell if guis have been created
     var guisCreated = false;
+    // flag to tell if data was all laoded
+    var loadEnd = false;
 
     // overlay data
     var overlayData = {};
@@ -27,7 +29,6 @@ dwv.gui.info.Controller = function (app, containerDivId)
 
     /**
      * Create the different info elements.
-     * TODO Get rid of the app input arg...
      */
     this.init = function ()
     {
@@ -56,20 +57,47 @@ dwv.gui.info.Controller = function (app, containerDivId)
      * @param {Object} event The slice-load event.
      */
     this.onLoadSlice = function (event) {
+        // reset
+        if (loadEnd) {
+            overlayData = [];
+            guisCreated = false;
+            loadEnd = false;
+        }
         // create and store overlay data
-        var dicomElements = event.data;
-        var sopInstanceUid = dicomElements.x00080018.value[0];
-        overlayData[sopInstanceUid] = dwv.gui.info.createOverlayData(
-            new dwv.dicom.DicomElementsWrapper(dicomElements));
+        var data = event.data;
+        var dataUid = 0;
+        if (typeof data.x00080018 !== "undefined") {
+            // DICOM data case: use the SOP instance UID as id
+            dataUid = data.x00080018.value[0];
+            overlayData[dataUid] = dwv.gui.info.createOverlayData(
+                new dwv.dicom.DicomElementsWrapper(data));
+        } else {
+            // image file case
+            dataUid = data[5].value;
+            overlayData[dataUid] =
+                dwv.gui.info.createOverlayDataForDom(data);
+        }
+
+        for (var i = 0; i < overlayGuis.length; ++i) {
+            overlayGuis[i].setOverlayData(overlayData[dataUid]);
+        }
 
         // create overlay guis if not done
+        // TODO The first gui is maybe not the one disaplyed...
         if (!guisCreated) {
             for (var i = 0; i < overlayGuis.length; ++i) {
-                overlayGuis[i].setOverlayData(overlayData[sopInstanceUid]);
                 overlayGuis[i].create();
             }
             guisCreated = true;
         }
+    };
+
+    /**
+     * Handle a load end event.
+     * @param {Object} event The load-end event.
+     */
+    this.onLoadEnd = function (/*event*/) {
+        loadEnd = true;
     };
 
     /**
@@ -78,9 +106,9 @@ dwv.gui.info.Controller = function (app, containerDivId)
      */
     this.onSliceChange = function (event) {
         // change the overlay data to the one of the new slice
-        var sopInstanceUid = event.data.sopInstanceUid;
+        var dataUid = event.data.imageUid;
         for (var i = 0; i < overlayGuis.length; ++i) {
-            overlayGuis[i].setOverlayData(overlayData[sopInstanceUid]);
+            overlayGuis[i].setOverlayData(overlayData[dataUid]);
         }
     };
 

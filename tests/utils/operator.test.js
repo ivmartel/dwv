@@ -6,6 +6,48 @@
 QUnit.module("utils");
 
 /**
+ * Tests for {@link dwv.utils.isObject}.
+ * @function module:tests/utils~isObject
+ssss */
+QUnit.test("Test isObject.", function (assert) {
+    var obj01 = {name: "dwv", type: "app"};
+    assert.equal(dwv.utils.isObject(obj01), true, "test with object");
+
+    var obj02 = ["one", "two", "three"];
+    assert.equal(dwv.utils.isObject(obj02), true, "test with array");
+
+    var obj03 = 1;
+    assert.equal(dwv.utils.isObject(obj03), false, "test with number");
+
+    var obj04 = null;
+    assert.equal(dwv.utils.isObject(obj04), false, "test with null");
+
+    var obj05 = true;
+    assert.equal(dwv.utils.isObject(obj05), false, "test with bool");
+});
+
+/**
+ * Tests for {@link dwv.utils.isArray}.
+ * @function module:tests/utils~isArray
+ssss */
+QUnit.test("Test isArray.", function (assert) {
+    var obj01 = {name: "dwv", type: "app"};
+    assert.equal(dwv.utils.isArray(obj01), false, "test with object");
+
+    var obj02 = ["one", "two", "three"];
+    assert.equal(dwv.utils.isArray(obj02), true, "test with array");
+
+    var obj03 = 1;
+    assert.equal(dwv.utils.isArray(obj03), false, "test with number");
+
+    var obj04 = null;
+    assert.equal(dwv.utils.isArray(obj04), false, "test with null");
+
+    var obj05 = true;
+    assert.equal(dwv.utils.isArray(obj05), false, "test with bool");
+});
+
+/**
  * Tests for {@link dwv.utils.mergeObjects}.
  * @function module:tests/utils~mergeObjects
 ssss */

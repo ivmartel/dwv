@@ -42,8 +42,8 @@ dwv.App = function ()
     // View controller
     var viewController = null;
 
-    // Dicom tags
-    var tags = null;
+    // meta data
+    var metaData = null;
 
     // Image layer
     var imageLayer = null;
@@ -321,7 +321,7 @@ dwv.App = function ()
         // clear objects
         image = null;
         view = null;
-        tags = null;
+        metaData = null;
         isMonoSliceData = false;
         // reset undo/redo
         if ( undoStack ) {
@@ -735,12 +735,12 @@ dwv.App = function ()
     };
 
     /**
-     * Get the data tags.
-     * @return {Object} The list of DICOM tags.
+     * Get the meta data.
+     * @return {Object} The list of meta data.
      */
-    this.getTags = function ()
+    this.getMetaData = function ()
     {
-        return tags;
+        return metaData;
     };
 
     /**
@@ -1174,17 +1174,24 @@ dwv.App = function ()
      */
     function postLoadInit(data)
     {
-        // store the DICOM tags
-        var dataInfo = new dwv.dicom.DicomElementsWrapper(data.info);
-        var dataInfoObj = dataInfo.dumpToObject();
-        if (tags) {
-            tags = dwv.utils.mergeObjects(
-                tags,
-                dataInfoObj,
-                "InstanceNumber",
-                "value");
+        // store the meta data
+        if (dwv.utils.isArray(data.info)) {
+            // image file case
+            // TODO merge?
+            metaData = data.info;
         } else {
-            tags = dataInfoObj;
+            // DICOM data case
+            var dataInfo = new dwv.dicom.DicomElementsWrapper(data.info);
+            var dataInfoObj = dataInfo.dumpToObject();
+            if (metaData) {
+                metaData = dwv.utils.mergeObjects(
+                    metaData,
+                    dataInfoObj,
+                    "InstanceNumber",
+                    "value");
+            } else {
+                metaData = dataInfoObj;
+            }
         }
 
         // only initialise the first time

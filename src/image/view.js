@@ -407,7 +407,7 @@ dwv.image.View = function (image)
                     "type": "slice-change",
                     "value": currentPosition.k,
                     "data": {
-                        "sopInstanceUid": image.getSopInstanceUids()[currentPosition.k]
+                        "imageUid": image.getImageUids()[currentPosition.k]
                     }
                 });
             }

@@ -84,8 +84,9 @@ dwv.image.RescaleSlopeAndIntercept.prototype.isID = function () {
  * @param {Array} buffer The image data as an array of frame buffers.
  * @param {Number} numberOfFrames The number of frames (optional, can be used
      to anticipate the final number after appends).
+ * @param {Array} imageUids An array of Uids indexed to slice number.
  */
-dwv.image.Image = function(geometry, buffer, numberOfFrames, sopInstanceUids)
+dwv.image.Image = function(geometry, buffer, numberOfFrames, imageUids)
 {
     // use buffer length in not specified
     if (typeof numberOfFrames === "undefined") {
@@ -168,11 +169,11 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames, sopInstanceUids)
     var histogram = null;
 
     /**
-     * Get the sop instance UIDs indexed by slice number.
+     * Get the image UIDs indexed by slice number.
      * @return {Array} The UIDs array.
      */
-    this.getSopInstanceUids = function () {
-        return sopInstanceUids;
+    this.getImageUids = function () {
+        return imageUids;
     };
 
     /**
@@ -385,7 +386,7 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames, sopInstanceUids)
         buffer[f] = newBuffer;
 
         // insert sop instance UIDs
-        sopInstanceUids.splice(newSliceNb, 0, rhs.getSopInstanceUids()[0]);
+        imageUids.splice(newSliceNb, 0, rhs.getImageUids()[0]);
 
         // return the appended slice number
         return newSliceNb;
