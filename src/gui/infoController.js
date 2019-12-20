@@ -47,7 +47,7 @@ dwv.gui.info.Controller = function (app, containerDivId)
         }
 
         // listen to update data
-        app.addEventListener("slice-change", self.onSliceChange);
+        app.addEventListener("slice-change", onSliceChange);
         // first toggle: set to listening
         this.toggleListeners();
     };
@@ -104,7 +104,7 @@ dwv.gui.info.Controller = function (app, containerDivId)
      * Handle a changed slice event.
      * @param {Object} event The slice-change event.
      */
-    this.onSliceChange = function (event) {
+    function onSliceChange(event) {
         // change the overlay data to the one of the new slice
         var dataUid = event.data.imageUid;
         for (var i = 0; i < overlayGuis.length; ++i) {

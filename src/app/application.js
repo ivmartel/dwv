@@ -798,7 +798,7 @@ dwv.App = function ()
      * Handle window/level change.
      * @param {Object} event The event fired when changing the window/level.
      */
-    this.onWLChange = function (event)
+    function onWLChange(event)
     {
         // generate and draw if no skip flag
         if (typeof event.skipGenerate === "undefined" ||
@@ -811,7 +811,7 @@ dwv.App = function ()
      * Handle colour map change.
      * @param {Object} event The event fired when changing the colour map.
      */
-    this.onColourChange = function (/*event*/)
+    function onColourChange(/*event*/)
     {
         generateAndDrawImage();
     };
@@ -820,7 +820,7 @@ dwv.App = function ()
      * Handle frame change.
      * @param {Object} event The event fired when changing the frame.
      */
-    this.onFrameChange = function (/*event*/)
+    function onFrameChange(/*event*/)
     {
         generateAndDrawImage();
         if ( drawController ) {
@@ -832,7 +832,7 @@ dwv.App = function ()
      * Handle slice change.
      * @param {Object} event The event fired when changing the slice.
      */
-    this.onSliceChange = function (/*event*/)
+    function onSliceChange(/*event*/)
     {
         generateAndDrawImage();
         if ( drawController ) {
@@ -1218,11 +1218,11 @@ dwv.App = function ()
                 dataWidth, dataHeight);
 
         // image listeners
-        view.addEventListener("wl-width-change", self.onWLChange);
-        view.addEventListener("wl-center-change", self.onWLChange);
-        view.addEventListener("colour-change", self.onColourChange);
-        view.addEventListener("slice-change", self.onSliceChange);
-        view.addEventListener("frame-change", self.onFrameChange);
+        view.addEventListener("wl-width-change", onWLChange);
+        view.addEventListener("wl-center-change", onWLChange);
+        view.addEventListener("colour-change", onColourChange);
+        view.addEventListener("slice-change", onSliceChange);
+        view.addEventListener("frame-change", onFrameChange);
 
         // connect with local listeners
         view.addEventListener("wl-width-change", fireEvent);
