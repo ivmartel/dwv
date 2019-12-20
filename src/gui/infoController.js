@@ -11,9 +11,6 @@ dwv.gui.info = dwv.gui.info || {};
  */
 dwv.gui.info.Controller = function (app, containerDivId)
 {
-    // closure to self
-    var self = this;
-
     // Info layer overlay guis
     var overlayGuis = [];
     // flag to tell if guis have been created
@@ -110,7 +107,7 @@ dwv.gui.info.Controller = function (app, containerDivId)
         for (var i = 0; i < overlayGuis.length; ++i) {
             overlayGuis[i].setOverlayData(overlayData[dataUid]);
         }
-    };
+    }
 
     /**
      * Toggle info listeners.

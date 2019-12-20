@@ -805,7 +805,7 @@ dwv.App = function ()
             event.skipGenerate === false) {
             generateAndDrawImage();
         }
-    };
+    }
 
     /**
      * Handle colour map change.
@@ -814,7 +814,7 @@ dwv.App = function ()
     function onColourChange(/*event*/)
     {
         generateAndDrawImage();
-    };
+    }
 
     /**
      * Handle frame change.
@@ -826,7 +826,7 @@ dwv.App = function ()
         if ( drawController ) {
             drawController.activateDrawLayer(viewController);
         }
-    };
+    }
 
     /**
      * Handle slice change.
@@ -838,7 +838,7 @@ dwv.App = function ()
         if ( drawController ) {
             drawController.activateDrawLayer(viewController);
         }
-    };
+    }
 
     /**
      * Handle key down event.
