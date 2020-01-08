@@ -792,6 +792,16 @@ dwv.App = function ()
         drawController.toogleGroupVisibility(drawDetails);
     };
 
+    /**
+     * Get the JSON state of the app.
+     * @return {Object} The state of the app as a JSON object.
+     */
+    this.getState = function ()
+    {
+        var state = new dwv.State();
+        return state.toJSON(self);
+    };
+
     // Handler Methods -----------------------------------------------------------
 
     /**
@@ -905,19 +915,6 @@ dwv.App = function ()
     };
 
     /**
-     * Handle state save event.
-     * @param {Object} event The event fired when changing the state save field.
-     */
-    this.onStateSave = function (/*event*/)
-    {
-        var state = new dwv.State();
-        // add href to link (html5)
-        var element = self.getElement("download-state");
-        var blob = new Blob([state.toJSON(self)], {type: 'application/json'});
-        element.href = window.URL.createObjectURL(blob);
-    };
-
-    /**
      * Handle colour map change. Will activate the tool using
      * the value property of the 'event.currentTarget'.
      * @param {Object} event The change event.
@@ -1016,19 +1013,13 @@ dwv.App = function ()
 
     /**
      * Handle display reset.
+     * Reset of gui elements is the responsibility of the client.
      * @param {Object} event The change event.
      */
     this.onDisplayReset = function (/*event*/)
     {
         self.resetLayout();
         self.initWLDisplay();
-        // update preset select
-        var select = self.getElement("presetSelect");
-        if (select) {
-            select.selectedIndex = 0;
-            // TODO remove
-            dwv.gui.refreshElement(select);
-        }
     };
 
 

@@ -37,11 +37,3 @@ dwv.gui.base.getElement = function (containerDivId, name)
     }
     return element;
  };
-
- /**
- * Refresh a HTML element. Mainly for jquery-mobile.
- * @param {String} element The HTML element to refresh.
- */
-dwv.gui.base.refreshElement = function (/*element*/) {
-    // base does nothing...
-};
