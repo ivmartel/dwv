@@ -851,6 +851,15 @@ dwv.App = function ()
     }
 
     /**
+     * Handle resize.
+     * Fit the display to the window. To be called once the image is loaded.
+     * @param {Object} event The change event.
+     */
+    function onResize (/*event*/) {
+        self.fitToSize(self.getLayerContainerSize());
+    };
+
+    /**
      * Handle key down event.
      * - CRTL-Z: undo
      * - CRTL-Y: redo
@@ -895,131 +904,98 @@ dwv.App = function ()
         }
     };
 
+    // Internal mebers shortcuts-----------------------------------------------
+
     /**
-     * Handle resize.
-     * Fit the display to the window. To be called once the image is loaded.
-     * @param {Object} event The change event.
+     * Reset the display
      */
-    this.onResize = function (/*event*/)
-    {
-        self.fitToSize(self.getLayerContainerSize());
+    this.resetDisplay = function () {
+        self.resetLayout();
+        self.initWLDisplay();
     };
 
     /**
-     * Handle zoom reset.
-     * @param {Object} event The change event.
+     * Reset the app zoom.s
      */
-    this.onZoomReset = function (/*event*/)
-    {
+    this.resetZoom = function () {
         self.resetLayout();
     };
 
     /**
-     * Handle colour map change. Will activate the tool using
-     * the value property of the 'event.currentTarget'.
-     * @param {Object} event The change event.
+     * Set the colour map.
+     * @param {String} colourMap The colour map name.
      */
-    this.onChangeColourMap = function (event)
-    {
-        viewController.setColourMapFromName( event.currentTarget.value );
+    this.setColourMap = function (colourMap) {
+        viewController.setColourMapFromName(colourMap);
     };
 
     /**
-     * Handle window/level preset change. Will activate the preset using
-     * the value property of the 'event.currentTarget'.
-     * @param {Object} event The change event.
+     * Set the window/level preset.
+     * @param {String} event The window/level preset.
      */
-    this.onChangeWindowLevelPreset = function (event)
-    {
-        viewController.setWindowLevelPreset( event.currentTarget.value );
+    this.setWindowLevelPreset = function (preset) {
+        viewController.setWindowLevelPreset(preset);
     };
 
     /**
-     * Handle tool change. Will activate the tool using
-     * the value property of the 'event.currentTarget'.
-     * @param {Object} event The change event.
+     * Set the tool
+     * @param {String} tool The tool.
      */
-    this.onChangeTool = function (event)
-    {
-        toolboxController.setSelectedTool( event.currentTarget.value );
+    this.setTool = function (tool) {
+        toolboxController.setSelectedTool(tool);
     };
 
     /**
-     * Handle shape change. Will activate the shape using
-     * the value property of the 'event.currentTarget'.
-     * @param {Object} event The change event.
+     * Set the draw shape.
+     * @param {String} shape The draw shape.
      */
-    this.onChangeShape = function (event)
-    {
-        toolboxController.setSelectedShape( event.currentTarget.value );
+    this.setDrawShape = function (shape) {
+        toolboxController.setSelectedShape(shape);
     };
 
     /**
-     * Handle filter change. Will activate the filter using
-     * the value property of the 'event.currentTarget'.
-     * @param {Object} event The change event.
+     * Set the image filter
+     * @param {String} filter The image filter.
      */
-    this.onChangeFilter = function (event)
-    {
-        toolboxController.setSelectedFilter( event.currentTarget.value );
+    this.setImageFilter = function (filter) {
+        toolboxController.setSelectedFilter(filter);
     };
 
     /**
-     * Handle filter run.
-     * @param {Object} event The run event.
+     * Run the selected image filter.
      */
-    this.onRunFilter = function (/*event*/)
-    {
+    this.runImageFilter = function () {
         toolboxController.runSelectedFilter();
     };
 
     /**
-     * Handle line colour change. Will activate the colour using
-     * the value property of the 'event.currentTarget'.
-     * @param {Object} event The change event.
+     * Set the draw line colour.
+     * @param {String} colour The line colour.
      */
-    this.onChangeLineColour = function (event)
-    {
-        // called from an HTML select, use its value
-        toolboxController.setLineColour( event.currentTarget.value );
+    this.setDrawLineColour = function (colour) {
+        toolboxController.setLineColour(colour);
     };
 
     /**
-     * Handle min/max slider change.
-     * @param {Object} range The new range of the data.
+     * Set the filter min/max.
+     * @param {Object} range The new range of the data: {min:a, max:b}.
      */
-    this.onChangeMinMax = function (range)
-    {
+    this.setFilterMinMax = function (range) {
         toolboxController.setRange(range);
     };
 
     /**
-     * Handle undo.
-     * @param {Object} event The associated event.
+     * Undo the last action
      */
-    this.onUndo = function (/*event*/)
-    {
+    this.undo = function () {
         undoStack.undo();
     };
 
     /**
-     * Handle redo.
-     * @param {Object} event The associated event.
+     * Redo the last action
      */
-    this.onRedo = function (/*event*/)
-    {
+    this.redo = function () {
         undoStack.redo();
-    };
-
-    /**
-     * Handle display reset.
-     * Reset of gui elements is the responsibility of the client.
-     * @param {Object} event The change event.
-     */
-    this.onDisplayReset = function (/*event*/)
-    {
-        self.resetLayout();
-        self.initWLDisplay();
     };
 
 
