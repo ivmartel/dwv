@@ -270,7 +270,7 @@ dwv.App = function ()
         }
 
         // listen to window resize
-        window.onresize = this.onResize;
+        window.onresize = onResize;
 
         // default character set
         if ( typeof config.defaultCharacterSet !== "undefined" ) {
@@ -857,7 +857,7 @@ dwv.App = function ()
      */
     function onResize (/*event*/) {
         self.fitToSize(self.getLayerContainerSize());
-    };
+    }
 
     /**
      * Handle key down event.
