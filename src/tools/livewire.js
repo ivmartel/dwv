@@ -355,11 +355,11 @@ dwv.tool.Livewire = function(app)
  * Help for this tool.
  * @return {Object} The help content.
  */
-dwv.tool.Livewire.prototype.getHelp = function()
+dwv.tool.Livewire.prototype.getHelpKeys = function()
 {
     return {
-        "title": dwv.i18n("tool.Livewire.name"),
-        "brief": dwv.i18n("tool.Livewire.brief")
+        "title": "tool.Livewire.name",
+        "brief": "tool.Livewire.brief"
     };
 };
 

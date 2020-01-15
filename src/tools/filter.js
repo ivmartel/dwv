@@ -96,11 +96,11 @@ dwv.tool.Filter = function ( filterList, app )
  * Help for this tool.
  * @return {Object} The help content.
  */
-dwv.tool.Filter.prototype.getHelp = function ()
+dwv.tool.Filter.prototype.getHelpKeys = function ()
 {
     return {
-        "title": dwv.i18n("tool.Filter.name"),
-        "brief": dwv.i18n("tool.Filter.brief")
+        "title": "tool.Filter.name",
+        "brief": "tool.Filter.brief"
     };
 };
 

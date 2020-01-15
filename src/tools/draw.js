@@ -723,16 +723,16 @@ dwv.tool.Draw = function (app, shapeFactoryList)
  * Help for this tool.
  * @return {Object} The help content.
  */
-dwv.tool.Draw.prototype.getHelp = function()
+dwv.tool.Draw.prototype.getHelpKeys = function()
 {
     return {
-        "title": dwv.i18n("tool.Draw.name"),
-        "brief": dwv.i18n("tool.Draw.brief"),
+        "title": "tool.Draw.name",
+        "brief": "tool.Draw.brief",
         "mouse": {
-            "mouse_drag": dwv.i18n("tool.Draw.mouse_drag")
+            "mouse_drag": "tool.Draw.mouse_drag"
         },
         "touch": {
-            "touch_drag": dwv.i18n("tool.Draw.touch_drag")
+            "touch_drag": "tool.Draw.touch_drag"
         }
     };
 };

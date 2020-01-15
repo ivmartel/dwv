@@ -440,16 +440,16 @@ dwv.tool.Floodfill = function(app)
  * Help for this tool.
  * @return {Object} The help content.
  */
-dwv.tool.Floodfill.prototype.getHelp = function()
+dwv.tool.Floodfill.prototype.getHelpKeys = function()
 {
     return {
-        'title': dwv.i18n("tool.Floodfill.name"),
-        'brief': dwv.i18n("tool.Floodfill.brief"),
+        'title': "tool.Floodfill.name",
+        'brief': "tool.Floodfill.brief",
         "mouse": {
-            "click": dwv.i18n("tool.Floodfill.click")
+            "click": "tool.Floodfill.click"
         },
         "touch": {
-            "tap": dwv.i18n("tool.Floodfill.tap")
+            "tap": "tool.Floodfill.tap"
         }
     };
 };

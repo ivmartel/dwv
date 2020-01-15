@@ -228,18 +228,18 @@ dwv.tool.Scroll = function(app)
  * Help for this tool.
  * @return {Object} The help content.
  */
-dwv.tool.Scroll.prototype.getHelp = function()
+dwv.tool.Scroll.prototype.getHelpKeys = function()
 {
     return {
-        "title": dwv.i18n("tool.Scroll.name"),
-        "brief": dwv.i18n("tool.Scroll.brief"),
+        "title": "tool.Scroll.name",
+        "brief": "tool.Scroll.brief",
         "mouse": {
-            "mouse_drag": dwv.i18n("tool.Scroll.mouse_drag"),
-            "double_click": dwv.i18n("tool.Scroll.double_click")
+            "mouse_drag": "tool.Scroll.mouse_drag",
+            "double_click": "tool.Scroll.double_click"
         },
         "touch": {
-            'touch_drag': dwv.i18n("tool.Scroll.touch_drag"),
-            'tap_and_hold': dwv.i18n("tool.Scroll.tap_and_hold")
+            'touch_drag': "tool.Scroll.touch_drag",
+            'tap_and_hold': "tool.Scroll.tap_and_hold"
         }
     };
 };
