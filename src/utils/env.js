@@ -1,13 +1,13 @@
 // namespaces
 var dwv = dwv || {};
 /** @namespace */
-dwv.browser = dwv.browser || {};
+dwv.env = dwv.env || {};
 
 /**
  * Local function to ask Modernizr if a property is supported.
  * @parma {String} property The property to test.
  */
-dwv.browser.askModernizr = function (property) {
+dwv.env.askModernizr = function (property) {
     if ( typeof dwv.Modernizr === "undefined" ) {
         dwv.ModernizrInit(window, document);
     }
@@ -23,7 +23,7 @@ dwv.browser.askModernizr = function (property) {
  * Browser check for the FileAPI.
  * Assume support for Safari5.
  */
-dwv.browser.hasFileApi = function()
+dwv.env.hasFileApi = function()
 {
     // regular test does not work on Safari 5
     var isSafari5 = (navigator.appVersion.indexOf("Safari") !== -1) &&
@@ -36,73 +36,73 @@ dwv.browser.hasFileApi = function()
         return true;
     }
     // regular test
-    return dwv.browser.askModernizr("filereader");
+    return dwv.env.askModernizr("filereader");
 };
 
 /**
  * Browser check for the XMLHttpRequest.
  */
-dwv.browser.hasXmlHttpRequest = function()
+dwv.env.hasXmlHttpRequest = function()
 {
-    return dwv.browser.askModernizr("xhrresponsetype") &&
-        dwv.browser.askModernizr("xhrresponsetypearraybuffer") &&
-        dwv.browser.askModernizr("xhrresponsetypetext") &&
+    return dwv.env.askModernizr("xhrresponsetype") &&
+        dwv.env.askModernizr("xhrresponsetypearraybuffer") &&
+        dwv.env.askModernizr("xhrresponsetypetext") &&
         "XMLHttpRequest" in window && "withCredentials" in new XMLHttpRequest();
 };
 
 /**
  * Browser check for typed array.
  */
-dwv.browser.hasTypedArray = function()
+dwv.env.hasTypedArray = function()
 {
-    return dwv.browser.askModernizr("dataview") && dwv.browser.askModernizr("typedarrays");
+    return dwv.env.askModernizr("dataview") && dwv.env.askModernizr("typedarrays");
 };
 
 /**
  * Browser check for input with type='color'.
  * Missing in IE and Safari.
  */
-dwv.browser.hasInputColor = function()
+dwv.env.hasInputColor = function()
 {
-    return dwv.browser.askModernizr("inputtypes.color");
+    return dwv.env.askModernizr("inputtypes.color");
 };
 
 /**
  * Browser check for input with type='files' and webkitdirectory flag.
  * Missing in IE and Safari.
  */
-dwv.browser.hasInputDirectory = function()
+dwv.env.hasInputDirectory = function()
 {
-    return dwv.browser.askModernizr("fileinputdirectory");
+    return dwv.env.askModernizr("fileinputdirectory");
 };
 
 
 //only check at startup (since we propose a replacement)
-dwv.browser._hasTypedArraySlice = (typeof Uint8Array.prototype.slice !== "undefined");
+dwv.env._hasTypedArraySlice = (typeof Uint8Array.prototype.slice !== "undefined");
 
 /**
  * Browser check for typed array slice method.
  * Missing in Internet Explorer 11.
  */
-dwv.browser.hasTypedArraySlice = function()
+dwv.env.hasTypedArraySlice = function()
 {
-    return dwv.browser._hasTypedArraySlice;
+    return dwv.env._hasTypedArraySlice;
 };
 
 // only check at startup (since we propose a replacement)
-dwv.browser._hasFloat64Array = ("Float64Array" in window);
+dwv.env._hasFloat64Array = ("Float64Array" in window);
 
 /**
  * Browser check for Float64Array array.
  * Missing in PhantomJS 1.9.20 (on Travis).
  */
-dwv.browser.hasFloat64Array = function()
+dwv.env.hasFloat64Array = function()
 {
-    return dwv.browser._hasFloat64Array;
+    return dwv.env._hasFloat64Array;
 };
 
 //only check at startup (since we propose a replacement)
-dwv.browser._hasClampedArray = ("Uint8ClampedArray" in window);
+dwv.env._hasClampedArray = ("Uint8ClampedArray" in window);
 
 /**
  * Browser check for clamped array.
@@ -110,33 +110,33 @@ dwv.browser._hasClampedArray = ("Uint8ClampedArray" in window);
  * - Safari 5.1.7 for Windows
  * - PhantomJS 1.9.20 (on Travis).
  */
-dwv.browser.hasClampedArray = function()
+dwv.env.hasClampedArray = function()
 {
-    return dwv.browser._hasClampedArray;
+    return dwv.env._hasClampedArray;
 };
 
 /**
  * Browser checks to see if it can run dwv. Throws an error if not.
  * Silently replaces basic functions.
  */
-dwv.browser.check = function()
+dwv.env.check = function()
 {
 
     // Required --------------
 
     var message = "";
     // Check for the File API support
-    if( !dwv.browser.hasFileApi() ) {
+    if( !dwv.env.hasFileApi() ) {
         message = "The File APIs are not supported in this browser. ";
         throw new Error(message);
     }
     // Check for XMLHttpRequest
-    if( !dwv.browser.hasXmlHttpRequest() ) {
+    if( !dwv.env.hasXmlHttpRequest() ) {
         message = "The XMLHttpRequest is not supported in this browser. ";
         throw new Error(message);
     }
     // Check typed array
-    if( !dwv.browser.hasTypedArray() ) {
+    if( !dwv.env.hasTypedArray() ) {
         message = "The Typed arrays are not supported in this browser. ";
         throw new Error(message);
     }
@@ -144,7 +144,7 @@ dwv.browser.check = function()
     // Replaced if not present ------------
 
     // Check typed array slice
-    if( !dwv.browser.hasTypedArraySlice() ) {
+    if( !dwv.env.hasTypedArraySlice() ) {
         // silent fail with warning
         console.warn("The TypedArray.slice method is not supported in this browser. This may impair performance. ");
         // basic Uint16Array implementation
@@ -185,7 +185,7 @@ dwv.browser.check = function()
         };
     }
     // check clamped array
-    if( !dwv.browser.hasClampedArray() ) {
+    if( !dwv.env.hasClampedArray() ) {
         // silent fail with warning
         console.warn("The Uint8ClampedArray is not supported in this browser. This may impair performance. ");
         // Use Uint8Array instead... Not good
@@ -193,7 +193,7 @@ dwv.browser.check = function()
         window.Uint8ClampedArray = window.Uint8Array;
     }
     // check Float64 array
-    if( !dwv.browser.hasFloat64Array() ) {
+    if( !dwv.env.hasFloat64Array() ) {
         // silent fail with warning
         console.warn("The Float64Array is not supported in this browser. This may impair performance. ");
         // Use Float32Array instead... Not good

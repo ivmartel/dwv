@@ -194,7 +194,7 @@ dwv.App = function ()
     };
 
     /**
-     * Initialise the HTML for the application.
+     * Initialise the application.
      */
     this.init = function ( config ) {
         containerDivId = config.containerDivId;

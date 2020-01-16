@@ -18,13 +18,11 @@ dwv.image.decoderScripts = {
     "rle": "../../decoders/dwv/decode-rle.js"
 };
 
-// Window
-dwv.gui.getWindowSize = dwv.gui.base.getWindowSize;
 // get element
 dwv.gui.getElement = dwv.gui.base.getElement;
 
-// check browser support
-dwv.browser.check();
+// check environment support
+dwv.env.check();
 
 // test data line
 dwv.addDataLine = function (id, fileroot, doc)

@@ -64,8 +64,8 @@ dwv.utils.getUrlFromUriSimple = function (uri) {
  */
 dwv.utils.getUrlFromUri = function (uri) {
     var url = null;
-    if (dwv.browser.askModernizr('urlparser') &&
-        dwv.browser.askModernizr('urlsearchparams')) {
+    if (dwv.env.askModernizr('urlparser') &&
+        dwv.env.askModernizr('urlsearchparams')) {
         url = dwv.utils.getUrlFromUriFull(uri);
     } else {
         url = dwv.utils.getUrlFromUriSimple(uri);
