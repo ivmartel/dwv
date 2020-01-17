@@ -7,16 +7,15 @@ dwv.tool.filter = dwv.tool.filter || {};
 /**
  * Filter tool.
  * @constructor
- * @param {Array} filterList The list of filter objects.
  * @param {Object} app The associated app.
  */
-dwv.tool.Filter = function ( filterList, app )
+dwv.tool.Filter = function ( app )
 {
     /**
      * Filter list
      * @type Object
      */
-    this.filterList = filterList;
+    this.filterList = null;
     /**
      * Selected filter.
      * @type Object
@@ -42,6 +41,18 @@ dwv.tool.Filter = function ( filterList, app )
                 this.filterList[key].removeEventListener("filter-run", fireEvent);
                 this.filterList[key].removeEventListener("filter-undo", fireEvent);
             }
+        }
+    };
+
+    /**
+     * Set the tool options.
+     * @param {Object} options The list of filter names amd classes.
+     */
+    this.setOptions = function (options) {
+        this.filterList = {};
+        // try to instanciate filters from the options
+        for (var key in options) {
+            this.filterList[key] = new options[key](app);
         }
     };
 

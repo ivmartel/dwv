@@ -207,65 +207,54 @@ dwv.App = function ()
         if ( config.tools && config.tools.length !== 0 ) {
             // setup the tool list
             var toolList = {};
-            for ( var t = 0; t < config.tools.length; ++t ) {
-                var toolName = config.tools[t];
-                if ( toolName === "Draw" ) {
-                    if ( typeof config.shapes !== "undefined" && config.shapes.length !== 0 ) {
-                        // setup the shape list
-                        var shapeFactoryList = {};
-                        for ( var s = 0; s < config.shapes.length; ++s ) {
-                            var shapeName = config.shapes[s];
-                            var shapeFactoryClass = shapeName+"Factory";
-                            if (typeof dwv.tool[shapeFactoryClass] !== "undefined") {
-                                shapeFactoryList[shapeName] = dwv.tool[shapeFactoryClass];
-                            }
-                            else {
-                                console.warn("Could not initialise unknown shape: "+shapeName);
-                            }
-                        }
-                        toolList.Draw = new dwv.tool.Draw(this, shapeFactoryList);
-                        toolList.Draw.addEventListener("draw-create", fireEvent);
-                        toolList.Draw.addEventListener("draw-change", fireEvent);
-                        toolList.Draw.addEventListener("draw-move", fireEvent);
-                        toolList.Draw.addEventListener("draw-delete", fireEvent);
-                    } else {
-                        console.warn("Please provide a list of shapes in the application configuration to activate the Draw tool.");
-                    }
-                }
-                else if ( toolName === "Filter" ) {
-                    if ( typeof config.filters !== "undefined" && config.filters.length !== 0 ) {
-                        // setup the filter list
-                        var filterList = {};
-                        for ( var f = 0; f < config.filters.length; ++f ) {
-                            var filterName = config.filters[f];
-                            if (typeof dwv.tool.filter[filterName] !== "undefined") {
-                                filterList[filterName] = new dwv.tool.filter[filterName](this);
-                            }
-                            else {
-                                console.warn("Could not initialise unknown filter: "+filterName);
+            var keys = Object.keys(config.tools);
+            for ( var t = 0; t < keys.length; ++t ) {
+                var toolName = keys[t];
+                var toolParams = config.tools[toolName];
+                // find the tool in the dwv.tool namespace
+                if (typeof dwv.tool[toolName] !== "undefined") {
+                    // create tool instance
+                    toolList[toolName] = new dwv.tool[toolName](this);
+                    // register listeners
+                    if (typeof toolList[toolName].addEventListener !== "undefined") {
+                        if (typeof toolParams.events !== "undefined") {
+                            for (var j = 0; j < toolParams.events.length; ++j) {
+                                var eventName = toolParams.events[j];
+                                toolList[toolName].addEventListener(eventName, fireEvent);
                             }
                         }
-                        toolList.Filter = new dwv.tool.Filter(filterList, this);
-                        toolList.Filter.addEventListener("filter-run", fireEvent);
-                        toolList.Filter.addEventListener("filter-undo", fireEvent);
-                    } else {
-                        console.warn("Please provide a list of filters in the application configuration to activate the Filter tool.");
                     }
-                }
-                else {
-                    // default: find the tool in the dwv.tool namespace
-                    var toolClass = toolName;
-                    if (typeof dwv.tool[toolClass] !== "undefined") {
-                        toolList[toolClass] = new dwv.tool[toolClass](this);
-                        if (typeof toolList[toolClass].addEventListener !== "undefined") {
-                            toolList[toolClass].addEventListener(fireEvent);
+                    // tool options
+                    if (typeof toolParams.options !== "undefined") {
+                        var type = "raw";
+                        if (typeof toolParams.type !== "undefined") {
+                            type = toolParams.type;
                         }
+                        var options = toolParams.options;
+                        if (type === "instance" ||
+                            type === "factory") {
+                            options = {};
+                            for (var i = 0; i < toolParams.options.length; ++i) {
+                                var optionName = toolParams.options[i];
+                                var optionClassName = optionName;
+                                if (type === "factory") {
+                                    optionClassName += "Factory";
+                                }
+                                var toolNamespace = toolName.charAt(0).toLowerCase() + toolName.slice(1);
+                                if (typeof dwv.tool[toolNamespace][optionClassName] !== "undefined") {
+                                    options[optionName] = dwv.tool[toolNamespace][optionClassName];
+                                } else {
+                                    console.warn("Could not find option class for: " + optionName);
+                                }
+                            }
+                        }
+                        toolList[toolName].setOptions(options);
                     }
-                    else {
-                        console.warn("Could not initialise unknown tool: "+toolName);
-                    }
+                } else {
+                    console.warn("Could not initialise unknown tool: " + toolName);
                 }
             }
+            // add tools to the controller
             toolboxController = new dwv.ToolboxController(toolList);
         }
 

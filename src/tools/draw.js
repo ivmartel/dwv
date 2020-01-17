@@ -29,7 +29,7 @@ var Konva = Konva || {};
  * @param {Object} app The associated application.
  * @external Konva
  */
-dwv.tool.Draw = function (app, shapeFactoryList)
+dwv.tool.Draw = function (app)
 {
     /**
      * Closure to self: to be used by event handlers.
@@ -48,7 +48,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * Shape factory list
      * @type Object
      */
-    this.shapeFactoryList = shapeFactoryList;
+    this.shapeFactoryList = null;
 
     /**
      * Current shape factory.
@@ -651,6 +651,15 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             // draw
             drawLayer.draw();
         });
+    };
+
+    /**
+     * Set the tool options.
+     * @param {Object} options The list of shape names amd classes.
+     */
+    this.setOptions = function (options) {
+        // save the options as the shape factory list
+        this.shapeFactoryList = options;
     };
 
     /**

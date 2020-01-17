@@ -67,10 +67,10 @@ dwv.tool.Livewire = function(app)
     var tolerance = 5;
 
     /**
-     * Event listeners.
-     * @private
+     * Listener handler.
+     * @type Object
      */
-    var listeners = [];
+    var listenerHandler = new dwv.utils.ListenerHandler();
 
     /**
      * Clear the parent points list.
@@ -204,7 +204,7 @@ dwv.tool.Livewire = function(app)
             shapeGroup.destroy();
         }
         // create shape
-        var factory = new dwv.tool.RoiFactory();
+        var factory = new dwv.tool.draw.RoiFactory();
         shapeGroup = factory.create(currentPath.pointArray, self.style);
         shapeGroup.id( dwv.math.guid() );
 
@@ -313,40 +313,29 @@ dwv.tool.Livewire = function(app)
     };
 
     /**
-     * Add an event listener on the app.
-     * @param {Object} listener The method associated with the provided event type.
+     * Add an event listener to this class.
+     * @param {String} type The event type.
+     * @param {Object} callback The method associated with the provided event type,
+     *    will be called with the fired event.
      */
-    this.addEventListener = function (listener)
-    {
-        listeners.push(listener);
+    this.addEventListener = function (type, callback) {
+        listenerHandler.add(type, callback);
     };
-
     /**
-     * Remove an event listener from the app.
-     * @param {Object} listener The method associated with the provided event type.
+     * Remove an event listener from this class.
+     * @param {String} type The event type.
+     * @param {Object} callback The method associated with the provided event type.
      */
-    this.removeEventListener = function (listener)
-    {
-        for ( var i = 0; i < listeners.length; ++i )
-        {
-            if ( listeners[i] === listener ) {
-                listeners.splice(i,1);
-            }
-        }
+    this.removeEventListener = function (type, callback) {
+        listenerHandler.remove(type, callback);
     };
-
-    // Private Methods -----------------------------------------------------------
-
     /**
-     * Fire an event: call all associated listeners.
+     * Fire an event: call all associated listeners with the input event object.
      * @param {Object} event The event to fire.
+     * @private
      */
-    function fireEvent (event)
-    {
-        for ( var i=0; i < listeners.length; ++i )
-        {
-            listeners[i](event);
-        }
+    function fireEvent (event) {
+        listenerHandler.fireEvent(event);
     }
 
 }; // Livewire class
