@@ -6,13 +6,8 @@ dwv.tool = dwv.tool || {};
  * UndoStack class.
  * @constructor
  */
-dwv.tool.UndoStack = function (app)
+dwv.tool.UndoStack = function ()
 {
-    /**
-     * Undo GUI.
-     * @type Object
-     */
-    var gui = new dwv.gui.Undo(app);
     /**
      * Array of commands.
      * @private
@@ -34,6 +29,12 @@ dwv.tool.UndoStack = function (app)
     var curCmdIndex = 0;
 
     /**
+     * Listener handler.
+     * @type Object
+     */
+    var listenerHandler = new dwv.utils.ListenerHandler();
+
+    /**
      * Add a command to the stack.
      * @param {Object} cmd The command to add.
      */
@@ -43,11 +44,10 @@ dwv.tool.UndoStack = function (app)
         stack = stack.slice(0,curCmdIndex);
         // store command
         stack.push(cmd);
-        //stack[curCmdIndex] = cmd;
         // increment index
         ++curCmdIndex;
-        // add command to display history
-        gui.addCommandToUndoHtml(cmd.getName());
+        // fire undo add event
+        fireEvent({type: "undo-add", command: cmd.getName()});
     };
 
     /**
@@ -62,8 +62,8 @@ dwv.tool.UndoStack = function (app)
             --curCmdIndex;
             // undo last command
             stack[curCmdIndex].undo();
-            // disable last in display history
-            gui.enableInUndoHtml(false);
+            // fire add event
+            fireEvent({type: "undo", command: stack[curCmdIndex].getName()});
         }
     };
 
@@ -76,27 +76,37 @@ dwv.tool.UndoStack = function (app)
         {
             // run last command
             stack[curCmdIndex].execute();
+            // fire add event
+            fireEvent({type: "redo", command: stack[curCmdIndex].getName()});
             // increment command index
             ++curCmdIndex;
-            // enable next in display history
-            gui.enableInUndoHtml(true);
         }
     };
 
     /**
-     * Setup the tool GUI.
+     * Add an event listener to this class.
+     * @param {String} type The event type.
+     * @param {Object} callback The method associated with the provided event type,
+     *    will be called with the fired event.
      */
-    this.setup = function ()
-    {
-        gui.setup();
+    this.addEventListener = function (type, callback) {
+        listenerHandler.add(type, callback);
     };
-
     /**
-     * Initialise the tool GUI.
+     * Remove an event listener from this class.
+     * @param {String} type The event type.
+     * @param {Object} callback The method associated with the provided event type.
      */
-    this.initialise = function ()
-    {
-        gui.initialise();
+    this.removeEventListener = function (type, callback) {
+        listenerHandler.remove(type, callback);
     };
+    /**
+     * Fire an event: call all associated listeners with the input event object.
+     * @param {Object} event The event to fire.
+     * @private
+     */
+    function fireEvent (event) {
+        listenerHandler.fireEvent(event);
+    }
 
 }; // UndoStack class

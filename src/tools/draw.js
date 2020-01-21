@@ -29,7 +29,7 @@ var Konva = Konva || {};
  * @param {Object} app The associated application.
  * @external Konva
  */
-dwv.tool.Draw = function (app, shapeFactoryList)
+dwv.tool.Draw = function (app)
 {
     /**
      * Closure to self: to be used by event handlers.
@@ -37,11 +37,6 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * @type WindowLevel
      */
     var self = this;
-    /**
-     * Draw GUI.
-     * @type Object
-     */
-    var gui = null;
     /**
      * Interaction start flag.
      * @private
@@ -53,7 +48,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
      * Shape factory list
      * @type Object
      */
-    this.shapeFactoryList = shapeFactoryList;
+    this.shapeFactoryList = null;
 
     /**
      * Current shape factory.
@@ -155,6 +150,9 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         if ( started ) {
             return;
         }
+
+        // update scale
+        self.style.setScale(app.getWindowScale());
 
         // determine if the click happened in an existing shape
         var stage = app.getDrawStage();
@@ -409,22 +407,10 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     }
 
     /**
-     * Setup the tool GUI.
+     * Activate the tool.
+     * @param {Boolean} flag The flag to activate or not.
      */
-    this.setup = function ()
-    {
-        gui = new dwv.gui.Draw(app);
-        gui.setup(this.shapeFactoryList);
-    };
-
-    /**
-     * Enable the tool.
-     * @param {Boolean} flag The flag to enable or not.
-     */
-    this.display = function ( flag ){
-        if ( gui ) {
-            gui.display( flag );
-        }
+    this.activate = function ( flag ) {
         // reset shape display properties
         shapeEditor.disable();
         shapeEditor.setShape(null);
@@ -439,6 +425,11 @@ dwv.tool.Draw = function (app, shapeFactoryList)
         if (flag) {
             app.addEventListener("slice-change", updateDrawLayer);
             app.addEventListener("frame-change", updateDrawLayer);
+
+            // init with the app window scale
+            this.style.setScale(app.getWindowScale());
+            // same for colour
+            this.setLineColour(this.style.getLineColour());
         }
         else {
             app.removeEventListener("slice-change", updateDrawLayer);
@@ -640,6 +631,7 @@ dwv.tool.Draw = function (app, shapeFactoryList)
             var ktext = label.getText();
 
             // ask user for new label
+            // TODO remove
             var labelText = dwv.gui.prompt("Shape label", ktext.textExpr);
 
             // if press cancel do nothing
@@ -662,26 +654,19 @@ dwv.tool.Draw = function (app, shapeFactoryList)
     };
 
     /**
+     * Set the tool options.
+     * @param {Object} options The list of shape names amd classes.
+     */
+    this.setOptions = function (options) {
+        // save the options as the shape factory list
+        this.shapeFactoryList = options;
+    };
+
+    /**
      * Initialise the tool.
      */
     this.init = function() {
-        // set the default to the first in the list
-        var shapeName = 0;
-        for( var key in this.shapeFactoryList ){
-            shapeName = key;
-            break;
-        }
-        this.setShapeName(shapeName);
-        // init gui
-        if ( gui ) {
-            // init with the app window scale
-            this.style.setScale(app.getWindowScale());
-            // same for colour
-            this.setLineColour(this.style.getLineColour());
-            // init html
-            gui.initialise();
-        }
-        return true;
+        // does nothing
     };
 
     /**
@@ -747,16 +732,16 @@ dwv.tool.Draw = function (app, shapeFactoryList)
  * Help for this tool.
  * @return {Object} The help content.
  */
-dwv.tool.Draw.prototype.getHelp = function()
+dwv.tool.Draw.prototype.getHelpKeys = function()
 {
     return {
-        "title": dwv.i18n("tool.Draw.name"),
-        "brief": dwv.i18n("tool.Draw.brief"),
+        "title": "tool.Draw.name",
+        "brief": "tool.Draw.brief",
         "mouse": {
-            "mouse_drag": dwv.i18n("tool.Draw.mouse_drag")
+            "mouse_drag": "tool.Draw.mouse_drag"
         },
         "touch": {
-            "touch_drag": dwv.i18n("tool.Draw.touch_drag")
+            "touch_drag": "tool.Draw.touch_drag"
         }
     };
 };

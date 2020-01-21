@@ -1,6 +1,8 @@
 // namespaces
 var dwv = dwv || {};
+/** @namespace */
 dwv.tool = dwv.tool || {};
+dwv.tool.draw = dwv.tool.draw || {};
 // external
 var Konva = Konva || {};
 
@@ -9,7 +11,7 @@ var Konva = Konva || {};
  * @constructor
  * @external Konva
  */
-dwv.tool.FreeHandFactory = function ()
+dwv.tool.draw.FreeHandFactory = function ()
 {
     /**
      * Get the number of points needed to build the shape.
@@ -29,7 +31,7 @@ dwv.tool.FreeHandFactory = function ()
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
  */
-dwv.tool.FreeHandFactory.prototype.create = function (points, style /*, image*/)
+dwv.tool.draw.FreeHandFactory.prototype.create = function (points, style /*, image*/)
 {
     // points stored the Konvajs way
     var arr = [];
@@ -82,7 +84,7 @@ dwv.tool.FreeHandFactory.prototype.create = function (points, style /*, image*/)
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
  */
-dwv.tool.UpdateFreeHand = function (anchor /*, image*/)
+dwv.tool.draw.UpdateFreeHand = function (anchor /*, image*/)
 {
     // parent group
     var group = anchor.getParent();

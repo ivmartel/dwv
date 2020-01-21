@@ -4,15 +4,46 @@ var dwv = dwv || {};
 dwv.utils = dwv.utils || {};
 
 /**
- * Check if the input is an object.
+ * Check if the input is a generic object, including arrays.
  * @param {Unknown} unknown The input to check.
  * @return {Boolean} True if the input is an object.
- * ref: https://github.com/jashkenas/underscore/blob/master/underscore.js#L1319-L1323
+ * ref: https://github.com/jashkenas/underscore/blob/1.9.1/underscore.js#L1319-L1323
  */
 dwv.utils.isObject = function (unknown) {
     var type = typeof unknown;
     return type === 'function' || type === 'object' && !!unknown;
 };
+
+/**
+ * Check if the input is an array.
+ * @param {Unknown} unknown The input to check.
+ * @return {Boolean} True if the input is an array.
+ * ref: https://github.com/jashkenas/underscore/blob/1.9.1/underscore.js#L1313-L1317
+ */
+dwv.utils.isArray = function (unknown) {
+    return Array.isArray(unknown);
+};
+
+/**
+ * Dump an object to an array.
+ * @input {Object} obj The input object as: {key0: {}, key1: {}}
+ * @return {Array} The corresponding array: [{name: key0, {}}, {name: key1, {}}]
+ */
+ dwv.utils.objectToArray = function (obj) {
+     var array = [];
+     var keys = Object.keys(obj);
+     for (var i = 0; i < keys.length; ++i ) {
+         var key = keys[i];
+         var row = {name: key};
+         var innerKeys = Object.keys(obj[key]);
+         for (var j = 0; j < innerKeys.length; ++j ) {
+             var innerKey = innerKeys[j];
+             row[innerKey] = obj[key][innerKey];
+         }
+         array.push(row);
+     }
+     return array;
+ };
 
 /**
  * Merge two similar objects.

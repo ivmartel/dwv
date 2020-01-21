@@ -29,11 +29,13 @@ dwv.image.imageDataToBuffer = function (imageData) {
  * @param {Number} sliceIndex The slice index of the imageData.
  * @param {Object} imageBuffer The image buffer.
  * @param {Number} numberOfFrames The final number of frames.
+ * @param {String} imageUid The image UID.
  * @return {Object} The corresponding view.
  */
 dwv.image.getDefaultView = function (
     width, height, sliceIndex,
-    imageBuffer, numberOfFrames, info) {
+    imageBuffer, numberOfFrames,
+    imageUid) {
     // image size
     var imageSize = new dwv.image.Size(width, height);
     // default spacing
@@ -43,14 +45,12 @@ dwv.image.getDefaultView = function (
     var origin = new dwv.math.Point3D(0,0,sliceIndex);
     // create image
     var geometry = new dwv.image.Geometry(origin, imageSize, imageSpacing );
-    var image = new dwv.image.Image( geometry, imageBuffer, numberOfFrames );
+    var image = new dwv.image.Image( geometry, imageBuffer, numberOfFrames, [imageUid] );
     image.setPhotometricInterpretation("RGB");
     // meta information
     var meta = {};
     meta.BitsStored = 8;
     image.setMeta(meta);
-    // overlay
-    image.setFirstOverlay( dwv.gui.info.createOverlaysForDom(info) );
     // view
     var view = new dwv.image.View(image);
     // defaut preset
@@ -91,11 +91,13 @@ dwv.image.getViewFromDOMImage = function (image)
     info.push({ "name": "imageWidth", "value": width });
     info.push({ "name": "imageHeight", "value": height });
 
-    // create view
     var sliceIndex = image.index ? image.index : 0;
+    info.push({ "name": "imageUid", "value": sliceIndex });
+
+    // create view
     var imageBuffer = dwv.image.imageDataToBuffer(imageData);
     var view = dwv.image.getDefaultView(
-        width, height, sliceIndex, [imageBuffer], 1, info);
+        width, height, sliceIndex, [imageBuffer], 1, sliceIndex);
 
     // return
     return {"view": view, "info": info};
@@ -163,7 +165,7 @@ dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, cbonloade
         if (frameIndex === 0) {
             // create view
             view = dwv.image.getDefaultView(
-                width, height, 1, [imgBuffer], numberOfFrames, info);
+                width, height, 1, [imgBuffer], numberOfFrames, dataIndex);
             // call callback
             callback( {"view": view, "info": info } );
         } else {

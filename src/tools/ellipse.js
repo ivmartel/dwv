@@ -1,6 +1,8 @@
 // namespaces
 var dwv = dwv || {};
+/** @namespace */
 dwv.tool = dwv.tool || {};
+dwv.tool.draw = dwv.tool.draw || {};
 // external
 var Konva = Konva || {};
 
@@ -9,7 +11,7 @@ var Konva = Konva || {};
  * @constructor
  * @external Konva
  */
-dwv.tool.EllipseFactory = function ()
+dwv.tool.draw.EllipseFactory = function ()
 {
     /**
      * Get the number of points needed to build the shape.
@@ -29,7 +31,7 @@ dwv.tool.EllipseFactory = function ()
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
  */
-dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
+dwv.tool.draw.EllipseFactory.prototype.create = function (points, style, image)
 {
     // calculate radius
     var a = Math.abs(points[0].getX() - points[1].getX());
@@ -80,7 +82,7 @@ dwv.tool.EllipseFactory.prototype.create = function (points, style, image)
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
  */
-dwv.tool.UpdateEllipse = function (anchor, image)
+dwv.tool.draw.UpdateEllipse = function (anchor, image)
 {
     // parent group
     var group = anchor.getParent();

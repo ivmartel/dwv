@@ -3,27 +3,6 @@ var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
 
 /**
- * Dump the DICOM tags to an array.
- * @input {Object} obj A dicom tag object: {tagname: {tagKey0: tagValue0, ...}, ...}
- * @return {Array} An array in the form [{name: tagname, tagKey0: tagValue0}, ...]
- */
-dwv.dicom.objectToArray = function (obj) {
-    var array = [];
-    var keys = Object.keys(obj);
-    for (var i = 0; i < keys.length; ++i ) {
-        var key = keys[i];
-        var row = {name: key};
-        var innerKeys = Object.keys(obj[key]);
-        for (var j = 0; j < innerKeys.length; ++j ) {
-            var innerKey = innerKeys[j];
-            row[innerKey] = obj[key][innerKey];
-        }
-        array.push(row);
-    }
-    return array;
-};
-
-/**
  * DicomElements wrapper.
  * @constructor
  * @param {Array} dicomElements The elements to wrap.

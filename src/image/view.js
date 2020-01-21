@@ -338,6 +338,8 @@ dwv.image.View = function (image)
             } else {
                 // add new
                 windowPresets[key] = presets[key];
+                // fire event
+                this.fireEvent({"type": "wl-preset-add", "name": key });
             }
         }
     };
@@ -389,7 +391,8 @@ dwv.image.View = function (image)
         {
             this.fireEvent({"type": "position-change",
                 "i": pos.i, "j": pos.j, "k": pos.k,
-                "value": image.getRescaledValue(pos.i,pos.j,pos.k, this.getCurrentFrame())});
+                "value": image.getRescaledValue(pos.i,pos.j,pos.k, this.getCurrentFrame())
+            });
         }
         else
         {
@@ -399,9 +402,15 @@ dwv.image.View = function (image)
 
         // fire a slice change event (used to trigger redraw)
         if ( !silent ) {
-          if( oldPosition.k !== currentPosition.k ) {
-              this.fireEvent({"type": "slice-change"});
-          }
+            if ( oldPosition.k !== currentPosition.k ) {
+                this.fireEvent({
+                    "type": "slice-change",
+                    "value": currentPosition.k,
+                    "data": {
+                        "imageUid": image.getImageUids()[currentPosition.k]
+                    }
+                });
+            }
         }
 
         // all good
