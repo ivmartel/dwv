@@ -946,7 +946,8 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var sopInstanceUid = dicomElements.getFromKey("x00080018");
 
     // image
-    var image = new dwv.image.Image( geometry, pixelBuffer, 1, [sopInstanceUid] );
+    var image = new dwv.image.Image(
+        geometry, pixelBuffer, pixelBuffer.length, [sopInstanceUid] );
     // PhotometricInterpretation
     var photometricInterpretation = dicomElements.getFromKey("x00280004");
     if ( photometricInterpretation ) {
