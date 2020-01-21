@@ -7,9 +7,6 @@
  * - Choose 'Convert to JPEG'.
  */
 
-// Default window level presets.
-dwv.tool.defaultpresets = {};
-
 // Image decoders (for web workers)
 dwv.image.decoderScripts = {
     "jpeg2000": "../../decoders/pdfjs/decode-jpeg2000.js",
