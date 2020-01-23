@@ -20,11 +20,6 @@ dwv.App = function ()
     var dataWidth = 0;
     // Image data height
     var dataHeight = 0;
-    // Is the data mono-slice?
-    var isMonoSliceData = 0;
-
-    // Default character set
-    var defaultCharacterSet;
 
     // Container div id
     var containerDivId = null;
@@ -57,8 +52,8 @@ dwv.App = function ()
     // Toolbox controller
     var toolboxController = null;
 
-    // Current loader
-    var currentLoader = null;
+    // load controller
+    var loadController = null;
 
     // UndoStack
     var undoStack = null;
@@ -97,7 +92,9 @@ dwv.App = function ()
      * Is the data mono-slice?
      * @return {Boolean} True if the data only contains one slice.
      */
-    this.isMonoSliceData = function () { return isMonoSliceData; };
+    this.isMonoSliceData = function () {
+         return loadController.isMonoSliceData();
+    };
     /**
      * Is the data mono-frame?
      * @return {Boolean} True if the data only contains one frame.
@@ -258,13 +255,21 @@ dwv.App = function ()
             toolboxController = new dwv.ToolboxController(toolList);
         }
 
+        // create load controller
+        loadController = new dwv.LoadController(config.defaultCharacterSet);
+        loadController.onload = onload;
+        loadController.onloadend = onloadend;
+        loadController.onLoadImageDataSetup = onLoadImageDataSetup;
+        loadController.onLoadStateData = onLoadStateData;
+        loadController.addEventListener("load-start", fireEvent);
+        loadController.addEventListener("load-slice", fireEvent);
+        loadController.addEventListener("load-progress", fireEvent);
+        loadController.addEventListener("load-end", fireEvent);
+        loadController.addEventListener("load-error", fireEvent);
+        loadController.addEventListener("load-abort", fireEvent);
+
         // listen to window resize
         window.onresize = onResize;
-
-        // default character set
-        if ( typeof config.defaultCharacterSet !== "undefined" ) {
-            defaultCharacterSet = config.defaultCharacterSet;
-        }
     };
 
     /**
@@ -311,7 +316,6 @@ dwv.App = function ()
         image = null;
         view = null;
         metaData = null;
-        isMonoSliceData = false;
         // reset undo/redo
         if ( undoStack ) {
             undoStack = new dwv.tool.UndoStack();
@@ -381,74 +385,23 @@ dwv.App = function ()
         }
     };
 
+    // load API [begin] -------------------------------------------------------
+
     /**
      * Load a list of files. Can be image files or a state file.
      * @param {Array} files The list of files to load.
      */
-    this.loadFiles = function (files)
-    {
-        // has been checked for emptiness.
-        var ext = files[0].name.split('.').pop().toLowerCase();
-        if ( ext === "json" ) {
-            loadStateFile(files[0]);
-        }
-        else {
-            loadImageFiles(files);
-        }
+    this.loadFiles = function (files) {
+        loadController.loadFiles(files);
     };
-
-    /**
-     * Load a list of image files.
-     * @private
-     * @param {Array} files The list of image files to load.
-     */
-    function loadImageFiles(files)
-    {
-        // create IO
-        var fileIO = new dwv.io.FilesLoader();
-        // load data
-        loadImageData(files, fileIO);
-    }
-
-    /**
-     * Load a State file.
-     * @private
-     * @param {String} file The state file to load.
-     */
-    function loadStateFile(file)
-    {
-        // create IO
-        var fileIO = new dwv.io.FilesLoader();
-        // load data
-        loadStateData([file], fileIO);
-    }
 
     /**
      * Load a list of URLs. Can be image files or a state file.
      * @param {Array} urls The list of urls to load.
      * @param {Array} requestHeaders An array of {name, value} to use as request headers.
      */
-    this.loadURLs = function (urls, requestHeaders)
-    {
-        // has been checked for emptiness.
-        var ext = urls[0].split('.').pop().toLowerCase();
-        if ( ext === "json" ) {
-            loadStateUrl(urls[0], requestHeaders);
-        }
-        else {
-            loadImageUrls(urls, requestHeaders);
-        }
-    };
-
-    /**
-     * Abort the current load.
-     */
-    this.abortLoad = function ()
-    {
-        if ( currentLoader ) {
-            currentLoader.abort();
-            currentLoader = null;
-        }
+    this.loadURLs = function (urls, requestHeaders) {
+        loadController.loadURLs(urls, requestHeaders);
     };
 
     /**
@@ -456,135 +409,18 @@ dwv.App = function ()
      * @param {Array} data The list of ArrayBuffers to load
      *   in the form of [{name: "", filename: "", data: data}].
      */
-    this.loadImageObject = function (data)
-    {
-        // create IO
-        var memoryIO = new dwv.io.MemoryLoader();
-        // create options
-        var options = {};
-        // load data
-        loadImageData(data, memoryIO, options);
+    this.loadImageObject = function (data) {
+        loadController.loadImageObject(data);
     };
 
     /**
-     * Load a list of image URLs.
-     * @private
-     * @param {Array} urls The list of urls to load.
-     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+     * Abort the current load.
      */
-    function loadImageUrls(urls, requestHeaders)
-    {
-        // create IO
-        var urlIO = new dwv.io.UrlsLoader();
-        // create options
-        var options = {'requestHeaders': requestHeaders};
-        // load data
-        loadImageData(urls, urlIO, options);
-    }
+    this.abortLoad = function () {
+        loadController.abortLoad();
+    };
 
-    /**
-     * Load a State url.
-     * @private
-     * @param {String} url The state url to load.
-     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
-     */
-    function loadStateUrl(url, requestHeaders)
-    {
-        // create IO
-        var urlIO = new dwv.io.UrlsLoader();
-        // create options
-        var options = {'requestHeaders': requestHeaders};
-        // load data
-        loadStateData([url], urlIO, options);
-    }
-
-    /**
-     * Load a list of image data.
-     * @private
-     * @param {Array} data Array of data to load.
-     * @param {Object} loader The data loader.
-     * @param {Object} options Options passed to the final loader.
-     */
-    function loadImageData(data, loader, options)
-    {
-        // store loader
-        currentLoader = loader;
-
-        // allow to cancel
-        var previousOnKeyDown = window.onkeydown;
-        window.onkeydown = function (event) {
-            if (event.ctrlKey && event.keyCode === 88 ) // crtl-x
-            {
-                console.log("crtl-x pressed!");
-                self.abortLoad();
-            }
-        };
-
-        // clear variables
-        self.reset();
-        // first data name
-        var firstName = "";
-        if (typeof data[0].name !== "undefined") {
-            firstName = data[0].name;
-        } else {
-            firstName = data[0];
-        }
-        // flag used by scroll to decide wether to activate or not
-        // TODO: supposing multi-slice for zip files, could not be...
-        isMonoSliceData = (data.length === 1 &&
-            firstName.split('.').pop().toLowerCase() !== "zip" &&
-            !dwv.utils.endsWith(firstName, "DICOMDIR") &&
-            !dwv.utils.endsWith(firstName, ".dcmdir") );
-        // set IO
-        loader.setDefaultCharacterSet(defaultCharacterSet);
-        loader.onload = function (data) {
-            fireEvent({'type': 'load-slice', 'data': data.info});
-            if ( image ) {
-                view.append( data.view );
-                if ( drawController ) {
-                    //drawController.appendDrawLayer(image.getNumberOfFrames());
-                }
-            }
-            postLoadInit(data);
-        };
-        loader.onerror = function (error) { handleLoadError(error); };
-        loader.onabort = function (error) { handleLoadAbort(error); };
-        loader.onloadend = function (/*event*/) {
-            window.onkeydown = previousOnKeyDown;
-            if ( drawController ) {
-                drawController.activateDrawLayer(viewController);
-            }
-            fireEvent({type: "load-progress", lengthComputable: true,
-                loaded: 100, total: 100});
-            fireEvent({ 'type': 'load-end' });
-            // reset member
-            currentLoader = null;
-        };
-        loader.onprogress = fireEvent;
-        // main load (asynchronous)
-        fireEvent({ 'type': 'load-start' });
-        loader.load(data, options);
-    }
-
-    /**
-     * Load a State data.
-     * @private
-     * @param {Array} data Array of data to load.
-     * @param {Object} loader The data loader.
-     * @param {Object} options Options passed to the final loader.
-     */
-    function loadStateData(data, loader, options)
-    {
-        // set IO
-        loader.onload = function (data) {
-            // load state
-            var state = new dwv.State();
-            state.apply( self, state.fromJSON(data) );
-        };
-        loader.onerror = function (error) { handleLoadError(error); };
-        // main load (asynchronous)
-        loader.load(data, options);
-    }
+    // load API [end] ---------------------------------------------------------
 
     /**
      * Fit the display to the given size. To be called once the image is loaded.
@@ -1058,46 +894,6 @@ dwv.App = function ()
     }
 
     /**
-     * Handle an error: display it to the user.
-     * @private
-     * @param {Object} error The error to handle.
-     */
-    function handleLoadError(error)
-    {
-        // log
-        console.error(error);
-        // event message
-        var displayMessage = "";
-        if ( error.name && error.message) {
-            displayMessage = error.name + ": " + error.message;
-        } else {
-            displayMessage = "Error: " + error + ".";
-        }
-        // fire error event
-        fireEvent({"type": "load-error", "message": displayMessage});
-    }
-
-    /**
-     * Handle an abort: display it to the user.
-     * @param {Object} error The error to handle.
-     * @private
-     */
-    function handleLoadAbort(error)
-    {
-        // log
-        console.warn(error);
-        // event message
-        var displayMessage = "";
-        if ( error && error.message ) {
-            displayMessage = error.message;
-        } else {
-            displayMessage = "Abort called.";
-        }
-        // fire error event
-        fireEvent({"type": "load-abort", "message": displayMessage});
-    }
-
-    /**
      * Create the application layers.
      * @private
      * @param {Number} dataWidth The width of the input data.
@@ -1121,6 +917,42 @@ dwv.App = function ()
         self.fitToSize(self.getLayerContainerSize());
 
         self.resetLayout();
+    }
+
+    /**
+     * Image data onload callback.
+     * @param {Object} data The loaded data.
+     */
+    function onload(data) {
+        if ( image ) {
+            view.append( data.view );
+        }
+        postLoadInit(data);
+    }
+
+    /**
+     * Image data onloadend callback.
+     */
+    function onloadend() {
+        if ( drawController ) {
+            drawController.activateDrawLayer(viewController);
+        }
+    }
+
+    /**
+     * Image data load setup callback.
+     */
+    function onLoadImageDataSetup() {
+        self.reset();
+    }
+
+    /**
+     * State data onload callback.
+     * @param {Object} data The state data.
+     */
+    function onLoadStateData(data) {
+        var state = new dwv.State();
+        state.apply( self, state.fromJSON(data) );
     }
 
     /**
