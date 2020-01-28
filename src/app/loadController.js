@@ -295,7 +295,8 @@ dwv.LoadController = function (defaultCharacterSet)
         // fire error event
         fireEvent({
             type: "load-error",
-            message: displayMessage
+            message: displayMessage,
+            error: error
         });
     }
 
@@ -317,7 +318,8 @@ dwv.LoadController = function (defaultCharacterSet)
         // fire error event
         fireEvent({
             type: "load-abort",
-            message: displayMessage
+            message: displayMessage,
+            error: error
         });
     }
 
