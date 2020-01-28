@@ -134,8 +134,8 @@ dwv.LoadController = function (defaultCharacterSet)
 
     /**
      * Load a list of image files.
-     * @private
      * @param {Array} files The list of image files to load.
+     * @private
      */
     function loadImageFiles(files) {
         // create IO
@@ -146,9 +146,9 @@ dwv.LoadController = function (defaultCharacterSet)
 
     /**
      * Load a list of image URLs.
-     * @private
      * @param {Array} urls The list of urls to load.
      * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+     * @private
      */
     function loadImageUrls(urls, requestHeaders) {
         // create IO
@@ -161,8 +161,8 @@ dwv.LoadController = function (defaultCharacterSet)
 
     /**
      * Load a State file.
-     * @private
      * @param {String} file The state file to load.
+     * @private
      */
     function loadStateFile(file) {
         // create IO
@@ -173,9 +173,9 @@ dwv.LoadController = function (defaultCharacterSet)
 
     /**
      * Load a State url.
-     * @private
      * @param {String} url The state url to load.
      * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+     * @private
      */
     function loadStateUrl(url, requestHeaders) {
         // create IO
@@ -188,10 +188,10 @@ dwv.LoadController = function (defaultCharacterSet)
 
     /**
      * Load a list of image data.
-     * @private
      * @param {Array} data Array of data to load.
      * @param {Object} loader The data loader.
      * @param {Object} options Options passed to the final loader.
+     * @private
      */
     function loadImageData(data, loader, options) {
         // store loader to allow abort
@@ -269,10 +269,10 @@ dwv.LoadController = function (defaultCharacterSet)
 
     /**
      * Load a State data.
-     * @private
      * @param {Array} data Array of data to load.
      * @param {Object} loader The data loader.
      * @param {Object} options Options passed to the final loader.
+     * @private
      */
     function loadStateData(data, loader, options) {
         // set IO
@@ -286,8 +286,8 @@ dwv.LoadController = function (defaultCharacterSet)
 
     /**
      * Handle an error: display it to the user.
-     * @private
      * @param {Object} error The error to handle.
+     * @private
      */
     function handleLoadError(error) {
         // log

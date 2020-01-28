@@ -182,8 +182,8 @@ dwv.ToolboxController = function (toolList)
     /**
      * Mou(se) and (T)ouch event handler. This function just determines the mouse/touch
      * position relative to the canvas element. It then passes it to the current tool.
-     * @private
      * @param {Object} event The event to handle.
+     * @private
      */
     function onMouch(event)
     {

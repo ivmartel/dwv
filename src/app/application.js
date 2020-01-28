@@ -633,6 +633,7 @@ dwv.App = function ()
     /**
      * Handle window/level change.
      * @param {Object} event The event fired when changing the window/level.
+     * @private
      */
     function onWLChange(event)
     {
@@ -646,6 +647,7 @@ dwv.App = function ()
     /**
      * Handle colour map change.
      * @param {Object} event The event fired when changing the colour map.
+     * @private
      */
     function onColourChange(/*event*/)
     {
@@ -655,6 +657,7 @@ dwv.App = function ()
     /**
      * Handle frame change.
      * @param {Object} event The event fired when changing the frame.
+     * @private
      */
     function onFrameChange(/*event*/)
     {
@@ -667,6 +670,7 @@ dwv.App = function ()
     /**
      * Handle slice change.
      * @param {Object} event The event fired when changing the slice.
+     * @private
      */
     function onSliceChange(/*event*/)
     {
@@ -680,6 +684,7 @@ dwv.App = function ()
      * Handle resize.
      * Fit the display to the window. To be called once the image is loaded.
      * @param {Object} event The change event.
+     * @private
      */
     function onResize (/*event*/) {
         self.fitToSize(self.getLayerContainerSize());
@@ -830,6 +835,7 @@ dwv.App = function ()
     /**
      * Fire an event: call all associated listeners.
      * @param {Object} event The event to fire.
+     * @private
      */
     function fireEvent (event)
     {
@@ -844,6 +850,7 @@ dwv.App = function ()
 
     /**
      * Generate the image data and draw it.
+     * @private
      */
     function generateAndDrawImage()
     {
@@ -857,6 +864,7 @@ dwv.App = function ()
 
     /**
      * Apply the stored zoom to the layers.
+     * @private
      */
     function zoomLayers()
     {
@@ -875,6 +883,7 @@ dwv.App = function ()
 
     /**
      * Apply the stored translation to the layers.
+     * @private
      */
     function translateLayers()
     {
@@ -896,9 +905,9 @@ dwv.App = function ()
 
     /**
      * Create the application layers.
-     * @private
      * @param {Number} dataWidth The width of the input data.
      * @param {Number} dataHeight The height of the input data.
+     * @private
      */
     function createLayers(dataWidth, dataHeight)
     {
@@ -923,6 +932,7 @@ dwv.App = function ()
     /**
      * Image data onload callback.
      * @param {Object} data The loaded data.
+     * @private
      */
     function onload(data) {
         if ( image ) {
@@ -933,6 +943,7 @@ dwv.App = function ()
 
     /**
      * Image data onloadend callback.
+     * @private
      */
     function onloadend() {
         if ( drawController ) {
@@ -942,6 +953,7 @@ dwv.App = function ()
 
     /**
      * Image data load setup callback.
+     * @private
      */
     function onLoadImageDataSetup() {
         self.reset();
@@ -950,6 +962,7 @@ dwv.App = function ()
     /**
      * State data onload callback.
      * @param {Object} data The state data.
+     * @private
      */
     function onLoadStateData(data) {
         var state = new dwv.State();
@@ -958,8 +971,8 @@ dwv.App = function ()
 
     /**
      * Post load application initialisation. To be called once the DICOM has been parsed.
-     * @private
      * @param {Object} data The data to display.
+     * @private
      */
     function postLoadInit(data)
     {
