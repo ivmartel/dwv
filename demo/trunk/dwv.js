@@ -1,4 +1,4 @@
-/*! dwv 0.27.0-beta 2020-01-23 22:42:16 */
+/*! dwv 0.27.0-beta 2020-01-28 00:14:31 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -333,7 +333,7 @@ dwv.App = function ()
 
     /**
      * Get the size of the layer container div.
-     * @return {width, height} The width and height of the div.
+     * @return {Object} The width and height of the div.
      */
     this.getLayerContainerSize = function () {
       var ldiv = self.getElement("layerContainer");
@@ -1101,7 +1101,11 @@ dwv.App = function ()
 // namespaces
 var dwv = dwv || {};
 dwv.draw = dwv.draw || {};
-// external
+/**
+ * The Konva namespace.
+ * @external Konva
+ * @see https://konvajs.org/
+ */
 var Konva = Konva || {};
 
 /**
@@ -1199,7 +1203,6 @@ dwv.draw.getHierarchyLog = function (layer, prefix) {
  * Draw controller.
  * @constructor
  * @param {Object} drawDiv The HTML div used to store the drawings.
- * @external Konva
  */
 dwv.DrawController = function (drawDiv)
 {
@@ -10933,14 +10936,31 @@ dwv.image = dwv.image || {};
 
 // JPEG Baseline
 var hasJpegBaselineDecoder = (typeof JpegImage !== "undefined");
+/**
+ * The JPEG baseline decoder.
+ * @external JpegImage
+ * @see https://github.com/mozilla/pdf.js/blob/master/src/core/jpg.js
+ */
 var JpegImage = JpegImage || {};
+
 // JPEG Lossless
 var hasJpegLosslessDecoder = (typeof jpeg !== "undefined") &&
     (typeof jpeg.lossless !== "undefined");
+/**
+ * The JPEG decoder namespace.
+ * @external jpeg
+ * @see https://github.com/rii-mango/JPEGLosslessDecoderJS
+ */
 var jpeg = jpeg || {};
 jpeg.lossless = jpeg.lossless || {};
+
 // JPEG 2000
 var hasJpeg2000Decoder = (typeof JpxImage !== "undefined");
+/**
+ * The JPEG 2000 decoder.
+ * @external JpxImage
+ * @see https://github.com/jpambrun/jpx-medical/blob/master/jpx.js
+ */
 var JpxImage = JpxImage || {};
 
 /**
@@ -14803,7 +14823,6 @@ dwv.io.FilesLoader.prototype.onabort = function (/*event*/) {};
 /**
  * Load a list of files.
  * @param {Array} ioArray The list of files to load.
- * @external FileReader
  */
 dwv.io.FilesLoader.prototype.load = function (ioArray)
 {
@@ -14862,6 +14881,11 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
     for (var i = 0; i < ioArray.length; ++i)
     {
         var file = ioArray[i];
+        /**
+         * The file reader.
+         * @external FileReader
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/FileReader
+         */
         var reader = new FileReader();
 
         // store reader
@@ -15865,7 +15889,6 @@ dwv.io.UrlsLoader.prototype.onabort = function (/*event*/) {};
  * Load a list of URLs.
  * @param {Array} ioArray The list of urls to load.
  * @param {Object} options Load options.
- * @external XMLHttpRequest
  */
 dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
 {
@@ -15927,6 +15950,11 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
         for (var i = 0; i < urlsArray.length; ++i)
         {
             var url = urlsArray[i];
+            /**
+             * The http request.
+             * @external XMLHttpRequest
+             * @see https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+             */
             var request = new XMLHttpRequest();
             request.open('GET', url, true);
 
@@ -17957,13 +17985,16 @@ var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
 dwv.tool.draw = dwv.tool.draw || {};
-// external
+/**
+ * The Konva namespace.
+ * @external Konva
+ * @see https://konvajs.org/
+ */
 var Konva = Konva || {};
 
 /**
  * Arrow factory.
  * @constructor
- * @external Konva
  */
 dwv.tool.draw.ArrowFactory = function ()
 {
@@ -18146,7 +18177,11 @@ dwv.tool.draw.UpdateArrow = function (anchor/*, image*/)
 var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
-// external
+/**
+ * The Konva namespace.
+ * @external Konva
+ * @see https://konvajs.org/
+ */
 var Konva = Konva || {};
 
 /**
@@ -18171,7 +18206,6 @@ var Konva = Konva || {};
  *
  * @constructor
  * @param {Object} app The associated application.
- * @external Konva
  */
 dwv.tool.Draw = function (app)
 {
@@ -18916,14 +18950,17 @@ dwv.tool.Draw.prototype.hasShape = function(name) {
 var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
-// external
+/**
+ * The Konva namespace.
+ * @external Konva
+ * @see https://konvajs.org/
+ */
 var Konva = Konva || {};
 
 /**
  * Get the display name of the input shape.
  * @param {Object} shape The Konva shape.
  * @return {String} The display name.
- * @external Konva
  */
 dwv.tool.GetShapeDisplayName = function (shape)
 {
@@ -19190,13 +19227,16 @@ dwv.tool.DeleteGroupCommand.prototype.onUndo = function (/*event*/)
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// external
+/**
+ * The Konva namespace.
+ * @external Konva
+ * @see https://konvajs.org/
+ */
 var Konva = Konva || {};
 
 /**
  * Shape editor.
  * @constructor
- * @external Konva
  */
 dwv.tool.ShapeEditor = function (app)
 {
@@ -19592,13 +19632,16 @@ var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
 dwv.tool.draw = dwv.tool.draw || {};
-// external
+/**
+ * The Konva namespace.
+ * @external Konva
+ * @see https://konvajs.org/
+ */
 var Konva = Konva || {};
 
 /**
  * Ellipse factory.
  * @constructor
- * @external Konva
  */
 dwv.tool.draw.EllipseFactory = function ()
 {
@@ -20208,15 +20251,17 @@ dwv.tool.RunFilterCommand.prototype.onUndo = function (/*event*/)
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// external
+/**
+ * The magic wand namespace.
+ * @external MagicWand
+ * @see https://github.com/Tamersoul/magic-wand-js
+ */
 var MagicWand = MagicWand || {};
 
 /**
  * Floodfill painting tool.
  * @constructor
  * @param {Object} app The associated application.
- * @external MagicWand
- * @see {@link  https://github.com/Tamersoul/magic-wand-js}
  */
 dwv.tool.Floodfill = function(app)
 {
@@ -20665,13 +20710,16 @@ var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
 dwv.tool.draw = dwv.tool.draw || {};
-// external
+/**
+ * The Konva namespace.
+ * @external Konva
+ * @see https://konvajs.org/
+ */
 var Konva = Konva || {};
 
 /**
  * FreeHand factory.
  * @constructor
- * @external Konva
  */
 dwv.tool.draw.FreeHandFactory = function ()
 {
@@ -21151,13 +21199,16 @@ var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
 dwv.tool.draw = dwv.tool.draw || {};
-// external
+/**
+ * The Konva namespace.
+ * @external Konva
+ * @see https://konvajs.org/
+ */
 var Konva = Konva || {};
 
 /**
  * Protractor factory.
  * @constructor
- * @external Konva
  */
 dwv.tool.draw.ProtractorFactory = function ()
 {
@@ -21369,13 +21420,16 @@ var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
 dwv.tool.draw = dwv.tool.draw || {};
-// external
+/**
+ * The Konva namespace.
+ * @external Konva
+ * @see https://konvajs.org/
+ */
 var Konva = Konva || {};
 
 /**
  * Rectangle factory.
  * @constructor
- * @external Konva
  */
 dwv.tool.draw.RectangleFactory = function ()
 {
@@ -21528,13 +21582,16 @@ var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
 dwv.tool.draw = dwv.tool.draw || {};
-// external
+/**
+ * The Konva namespace.
+ * @external Konva
+ * @see https://konvajs.org/
+ */
 var Konva = Konva || {};
 
 /**
  * ROI factory.
  * @constructor
- * @external Konva
  */
 dwv.tool.draw.RoiFactory = function ()
 {
@@ -21654,13 +21711,16 @@ var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
 dwv.tool.draw = dwv.tool.draw || {};
-// external
+/**
+ * The Konva namespace.
+ * @external Konva
+ * @see https://konvajs.org/
+ */
 var Konva = Konva || {};
 
 /**
  * Ruler factory.
  * @constructor
- * @external Konva
  */
 dwv.tool.draw.RulerFactory = function ()
 {
@@ -22818,9 +22878,23 @@ dwv.env.check = function()
 
 // namespaces
 var dwv = dwv || {};
-// external
+/**
+ * The i18next namespace.
+ * @external i18next
+ * @see https://www.i18next.com
+ */
 var i18next = i18next || {};
+/**
+ * The i18nextXHRBackend namespace.
+ * @external i18nextXHRBackend
+ * @see https://github.com/i18next/i18next-xhr-backend
+ */
 var i18nextXHRBackend = i18nextXHRBackend || {};
+/**
+ * The i18nextBrowserLanguageDetector namespace.
+ * @external i18nextBrowserLanguageDetector
+ * @see https://github.com/i18next/i18next-browser-languageDetector
+ */
 var i18nextBrowserLanguageDetector = i18nextBrowserLanguageDetector || {};
 
 // This is mainly a wrapper around the i18next object.
@@ -22834,9 +22908,6 @@ dwv.i18nLocalesPath = null;
  * @param {String} language The language to translate to. Defaults to 'auto' and
  *   gets the language from the browser.
  * @param {String} localesPath Path to the locales directory.
- * @external i18next
- * @external i18nextXHRBackend
- * @external i18nextBrowserLanguageDetector
  */
 dwv.i18nInitialise = function (language, localesPath)
 {
@@ -22869,8 +22940,6 @@ dwv.i18nInitialise = function (language, localesPath)
  * @param {String} language The language to translate to. Defaults to 'auto' and
  *   gets the language from the browser.
  * @param {Object} resources Languages provided as object.
- * @external i18next
- * @external i18nextBrowserLanguageDetector
  */
 dwv.i18nInitialiseWithResources = function (language, resources)
 {
@@ -22898,7 +22967,6 @@ dwv.i18nInitialiseWithResources = function (language, resources)
  * Handle i18n 'initialized' event.
  * @param {Object} callback The callback function to call when i18n is initialised.
  *  It can take one argument that will be replaced with the i18n options.
- * @external i18next
  */
 dwv.i18nOnInitialised = function (callback) {
     i18next.on('initialized', callback);
@@ -22906,7 +22974,6 @@ dwv.i18nOnInitialised = function (callback) {
 
 /**
  * Stop handling i18n load event.
- * @external i18next
  */
 dwv.i18nOffInitialised = function () {
     i18next.off('initialized');
@@ -22916,7 +22983,6 @@ dwv.i18nOffInitialised = function () {
  * Handle i18n failed load event.
  * @param {Object} callback The callback function to call when i18n is loaded.
  *  It can take three arguments: lng, ns and msg.
- * @external i18next
  */
 dwv.i18nOnFailedLoad = function (callback) {
     i18next.on('failedLoading', callback);
@@ -22924,7 +22990,6 @@ dwv.i18nOnFailedLoad = function (callback) {
 
 /**
  * Stop handling i18n failed load event.
- * @external i18next
  */
 dwv.i18nOffFailedLoad = function () {
     i18next.off('failedLoading');
@@ -22934,7 +22999,6 @@ dwv.i18nOffFailedLoad = function () {
  * Get the translated text.
  * @param {String} key The key to the text entry.
  * @param {Object} options The translation options such as plural, context...
- * @external i18next
  */
 dwv.i18n = function (key, options) {
     return i18next.t(key, options);
@@ -22944,7 +23008,6 @@ dwv.i18n = function (key, options) {
  * Check the existence of a translation.
  * @param {String} key The key to the text entry.
  * @param {Object} options The translation options such as plural, context...
- * @external i18next
  */
 dwv.i18nExists = function (key, options) {
     return i18next.exists(key, options);
@@ -23913,12 +23976,12 @@ dwv.utils.MultiProgressHandler = function (callback)
 
     /**
      * List of progresses.
-     * @private
-     * @type Array
      * First dimension is a list of item for which the progress is recorded,
      *   for example file names.
      * Second dimension is a list of possible progresses, for example
      *   the progress of the download and the progress of the decoding.
+     * @private
+     * @type Array
      */
     var progresses = [];
 
