@@ -226,6 +226,13 @@ dwv.LoadController = function (defaultCharacterSet)
 
         // set IO
         loader.setDefaultCharacterSet(defaultCharacterSet);
+        loader.onloaditemstart = function (event) {
+            fireEvent({
+                type: 'load-item-start',
+                item: event.item,
+                loader: event.loader
+            });
+        };
         loader.onload = function (data) {
             fireEvent({
                 type: 'load-slice',

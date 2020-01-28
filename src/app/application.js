@@ -262,6 +262,7 @@ dwv.App = function ()
         loadController.onLoadImageDataSetup = onLoadImageDataSetup;
         loadController.onLoadStateData = onLoadStateData;
         loadController.addEventListener("load-start", fireEvent);
+        loadController.addEventListener("load-item-start", fireEvent);
         loadController.addEventListener("load-slice", fireEvent);
         loadController.addEventListener("load-progress", fireEvent);
         loadController.addEventListener("load-end", fireEvent);

@@ -144,6 +144,13 @@ dwv.io.FilesLoader = function ()
 }; // class File
 
 /**
+ * Handle a load item start event.
+ * @param {Object} event The load event, 'event.target'
+ *  should be the loaded data.
+ * Default does nothing.
+ */
+dwv.io.FilesLoader.prototype.onloaditemstart = function (/*event*/) {};
+/**
  * Handle a load event.
  * @param {Object} event The load event, 'event.target'
  *  should be the loaded data.
@@ -256,6 +263,11 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
             loader = loaders[l];
             if (loader.canLoadFile(file)) {
                 foundLoader = true;
+                //
+                this.onloaditemstart({
+                    item: file,
+                    loader: loader
+                });
                 // store loader
                 this.storeLoader(loader);
                 // set reader callbacks
