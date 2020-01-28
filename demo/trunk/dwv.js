@@ -1,4 +1,4 @@
-/*! dwv 0.27.0-beta 2020-01-28 20:37:40 */
+/*! dwv 0.27.0-beta 2020-01-28 20:46:06 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -692,6 +692,7 @@ dwv.App = function ()
     /**
      * Handle window/level change.
      * @param {Object} event The event fired when changing the window/level.
+     * @private
      */
     function onWLChange(event)
     {
@@ -705,6 +706,7 @@ dwv.App = function ()
     /**
      * Handle colour map change.
      * @param {Object} event The event fired when changing the colour map.
+     * @private
      */
     function onColourChange(/*event*/)
     {
@@ -714,6 +716,7 @@ dwv.App = function ()
     /**
      * Handle frame change.
      * @param {Object} event The event fired when changing the frame.
+     * @private
      */
     function onFrameChange(/*event*/)
     {
@@ -726,6 +729,7 @@ dwv.App = function ()
     /**
      * Handle slice change.
      * @param {Object} event The event fired when changing the slice.
+     * @private
      */
     function onSliceChange(/*event*/)
     {
@@ -739,6 +743,7 @@ dwv.App = function ()
      * Handle resize.
      * Fit the display to the window. To be called once the image is loaded.
      * @param {Object} event The change event.
+     * @private
      */
     function onResize (/*event*/) {
         self.fitToSize(self.getLayerContainerSize());
@@ -889,6 +894,7 @@ dwv.App = function ()
     /**
      * Fire an event: call all associated listeners.
      * @param {Object} event The event to fire.
+     * @private
      */
     function fireEvent (event)
     {
@@ -903,6 +909,7 @@ dwv.App = function ()
 
     /**
      * Generate the image data and draw it.
+     * @private
      */
     function generateAndDrawImage()
     {
@@ -916,6 +923,7 @@ dwv.App = function ()
 
     /**
      * Apply the stored zoom to the layers.
+     * @private
      */
     function zoomLayers()
     {
@@ -934,6 +942,7 @@ dwv.App = function ()
 
     /**
      * Apply the stored translation to the layers.
+     * @private
      */
     function translateLayers()
     {
@@ -955,9 +964,9 @@ dwv.App = function ()
 
     /**
      * Create the application layers.
-     * @private
      * @param {Number} dataWidth The width of the input data.
      * @param {Number} dataHeight The height of the input data.
+     * @private
      */
     function createLayers(dataWidth, dataHeight)
     {
@@ -982,6 +991,7 @@ dwv.App = function ()
     /**
      * Image data onload callback.
      * @param {Object} data The loaded data.
+     * @private
      */
     function onload(data) {
         if ( image ) {
@@ -992,6 +1002,7 @@ dwv.App = function ()
 
     /**
      * Image data onloadend callback.
+     * @private
      */
     function onloadend() {
         if ( drawController ) {
@@ -1001,6 +1012,7 @@ dwv.App = function ()
 
     /**
      * Image data load setup callback.
+     * @private
      */
     function onLoadImageDataSetup() {
         self.reset();
@@ -1009,6 +1021,7 @@ dwv.App = function ()
     /**
      * State data onload callback.
      * @param {Object} data The state data.
+     * @private
      */
     function onLoadStateData(data) {
         var state = new dwv.State();
@@ -1017,8 +1030,8 @@ dwv.App = function ()
 
     /**
      * Post load application initialisation. To be called once the DICOM has been parsed.
-     * @private
      * @param {Object} data The data to display.
+     * @private
      */
     function postLoadInit(data)
     {
@@ -1788,8 +1801,8 @@ dwv.LoadController = function (defaultCharacterSet)
 
     /**
      * Load a list of image files.
-     * @private
      * @param {Array} files The list of image files to load.
+     * @private
      */
     function loadImageFiles(files) {
         // create IO
@@ -1800,9 +1813,9 @@ dwv.LoadController = function (defaultCharacterSet)
 
     /**
      * Load a list of image URLs.
-     * @private
      * @param {Array} urls The list of urls to load.
      * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+     * @private
      */
     function loadImageUrls(urls, requestHeaders) {
         // create IO
@@ -1815,8 +1828,8 @@ dwv.LoadController = function (defaultCharacterSet)
 
     /**
      * Load a State file.
-     * @private
      * @param {String} file The state file to load.
+     * @private
      */
     function loadStateFile(file) {
         // create IO
@@ -1827,9 +1840,9 @@ dwv.LoadController = function (defaultCharacterSet)
 
     /**
      * Load a State url.
-     * @private
      * @param {String} url The state url to load.
      * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+     * @private
      */
     function loadStateUrl(url, requestHeaders) {
         // create IO
@@ -1842,10 +1855,10 @@ dwv.LoadController = function (defaultCharacterSet)
 
     /**
      * Load a list of image data.
-     * @private
      * @param {Array} data Array of data to load.
      * @param {Object} loader The data loader.
      * @param {Object} options Options passed to the final loader.
+     * @private
      */
     function loadImageData(data, loader, options) {
         // store loader to allow abort
@@ -1923,10 +1936,10 @@ dwv.LoadController = function (defaultCharacterSet)
 
     /**
      * Load a State data.
-     * @private
      * @param {Array} data Array of data to load.
      * @param {Object} loader The data loader.
      * @param {Object} options Options passed to the final loader.
+     * @private
      */
     function loadStateData(data, loader, options) {
         // set IO
@@ -1940,8 +1953,8 @@ dwv.LoadController = function (defaultCharacterSet)
 
     /**
      * Handle an error: display it to the user.
-     * @private
      * @param {Object} error The error to handle.
+     * @private
      */
     function handleLoadError(error) {
         // log
@@ -2073,6 +2086,7 @@ dwv.State = function ()
     /**
      * Read an application state from an Object in v0.1 format.
      * @param {Object} data The Object representation of the state.
+     * @private
      */
     function readV01(data) {
         // update drawings
@@ -2084,6 +2098,7 @@ dwv.State = function ()
     /**
      * Read an application state from an Object in v0.2 format.
      * @param {Object} data The Object representation of the state.
+     * @private
      */
     function readV02(data) {
         // update drawings
@@ -2094,6 +2109,7 @@ dwv.State = function ()
     /**
      * Read an application state from an Object in v0.3 format.
      * @param {Object} data The Object representation of the state.
+     * @private
      */
     function readV03(data) {
         return data;
@@ -2538,8 +2554,8 @@ dwv.ToolboxController = function (toolList)
     /**
      * Mou(se) and (T)ouch event handler. This function just determines the mouse/touch
      * position relative to the canvas element. It then passes it to the current tool.
-     * @private
      * @param {Object} event The event to handle.
+     * @private
      */
     function onMouch(event)
     {
