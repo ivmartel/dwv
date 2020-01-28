@@ -179,7 +179,6 @@ dwv.io.FilesLoader.prototype.onabort = function (/*event*/) {};
 /**
  * Load a list of files.
  * @param {Array} ioArray The list of files to load.
- * @external FileReader
  */
 dwv.io.FilesLoader.prototype.load = function (ioArray)
 {
@@ -238,6 +237,11 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
     for (var i = 0; i < ioArray.length; ++i)
     {
         var file = ioArray[i];
+        /**
+         * The file reader.
+         * @external FileReader
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/FileReader
+         */
         var reader = new FileReader();
 
         // store reader

@@ -3,13 +3,16 @@ var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
 dwv.tool.draw = dwv.tool.draw || {};
-// external
+/**
+ * The Konva namespace.
+ * @external Konva
+ * @see https://konvajs.org/
+ */
 var Konva = Konva || {};
 
 /**
  * Ellipse factory.
  * @constructor
- * @external Konva
  */
 dwv.tool.draw.EllipseFactory = function ()
 {

@@ -4,14 +4,31 @@ dwv.image = dwv.image || {};
 
 // JPEG Baseline
 var hasJpegBaselineDecoder = (typeof JpegImage !== "undefined");
+/**
+ * The JPEG baseline decoder.
+ * @external JpegImage
+ * @see https://github.com/mozilla/pdf.js/blob/master/src/core/jpg.js
+ */
 var JpegImage = JpegImage || {};
+
 // JPEG Lossless
 var hasJpegLosslessDecoder = (typeof jpeg !== "undefined") &&
     (typeof jpeg.lossless !== "undefined");
+/**
+ * The JPEG decoder namespace.
+ * @external jpeg
+ * @see https://github.com/rii-mango/JPEGLosslessDecoderJS
+ */
 var jpeg = jpeg || {};
 jpeg.lossless = jpeg.lossless || {};
+
 // JPEG 2000
 var hasJpeg2000Decoder = (typeof JpxImage !== "undefined");
+/**
+ * The JPEG 2000 decoder.
+ * @external JpxImage
+ * @see https://github.com/jpambrun/jpx-medical/blob/master/jpx.js
+ */
 var JpxImage = JpxImage || {};
 
 /**

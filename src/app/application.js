@@ -274,7 +274,7 @@ dwv.App = function ()
 
     /**
      * Get the size of the layer container div.
-     * @return {width, height} The width and height of the div.
+     * @return {Object} The width and height of the div.
      */
     this.getLayerContainerSize = function () {
       var ldiv = self.getElement("layerContainer");

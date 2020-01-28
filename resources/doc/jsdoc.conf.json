@@ -1,18 +1,12 @@
-{ 
-    "templates": {
-        "systemName"            : "dwv",
-        "footer"                : "",
-        "copyright"             : "",
-        "includeDate"           : true,
-        "navType"               : "inline",
-        "theme"                 : "yeti",
-        "linenums"              : true,
-        "collapseSymbols"       : false,
-        "inverseNav"            : true,
-        "outputSourceFiles"     : true,
-        "outputSourcePath"      : true,
-        "dateFormat"            : "dddd, MMMM Do YYYY",
-        "syntaxTheme"           : "default",
-        "sort"                  : true
+{
+    "docdash": {
+        "search": true,
+        "collapse": true,
+        "private": false,
+        "sectionOrder": [
+          "Namespaces",
+          "Classes",
+          "Externals"
+        ]
     }
 }

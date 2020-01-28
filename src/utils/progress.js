@@ -15,12 +15,12 @@ dwv.utils.MultiProgressHandler = function (callback)
 
     /**
      * List of progresses.
-     * @private
-     * @type Array
      * First dimension is a list of item for which the progress is recorded,
      *   for example file names.
      * Second dimension is a list of possible progresses, for example
      *   the progress of the download and the progress of the decoding.
+     * @private
+     * @type Array
      */
     var progresses = [];
 

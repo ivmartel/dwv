@@ -2,7 +2,11 @@
 var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
-// external
+/**
+ * The Konva namespace.
+ * @external Konva
+ * @see https://konvajs.org/
+ */
 var Konva = Konva || {};
 
 /**
@@ -27,7 +31,6 @@ var Konva = Konva || {};
  *
  * @constructor
  * @param {Object} app The associated application.
- * @external Konva
  */
 dwv.tool.Draw = function (app)
 {

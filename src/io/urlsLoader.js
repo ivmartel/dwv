@@ -179,7 +179,6 @@ dwv.io.UrlsLoader.prototype.onabort = function (/*event*/) {};
  * Load a list of URLs.
  * @param {Array} ioArray The list of urls to load.
  * @param {Object} options Load options.
- * @external XMLHttpRequest
  */
 dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
 {
@@ -241,6 +240,11 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
         for (var i = 0; i < urlsArray.length; ++i)
         {
             var url = urlsArray[i];
+            /**
+             * The http request.
+             * @external XMLHttpRequest
+             * @see https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+             */
             var request = new XMLHttpRequest();
             request.open('GET', url, true);
 
