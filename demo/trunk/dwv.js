@@ -1,4 +1,4 @@
-/*! dwv 0.27.0-beta 2020-01-28 00:14:31 */
+/*! dwv 0.27.0-beta 2020-01-28 20:36:53 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -1948,7 +1948,8 @@ dwv.LoadController = function (defaultCharacterSet)
         // fire error event
         fireEvent({
             type: "load-error",
-            message: displayMessage
+            message: displayMessage,
+            error: error
         });
     }
 
@@ -1970,7 +1971,8 @@ dwv.LoadController = function (defaultCharacterSet)
         // fire error event
         fireEvent({
             type: "load-abort",
-            message: displayMessage
+            message: displayMessage,
+            error: error
         });
     }
 
