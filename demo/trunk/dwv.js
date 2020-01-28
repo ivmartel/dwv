@@ -1,4 +1,4 @@
-/*! dwv 0.27.0-beta 2020-01-28 20:36:53 */
+/*! dwv 0.27.0-beta 2020-01-28 20:37:40 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -321,6 +321,7 @@ dwv.App = function ()
         loadController.onLoadImageDataSetup = onLoadImageDataSetup;
         loadController.onLoadStateData = onLoadStateData;
         loadController.addEventListener("load-start", fireEvent);
+        loadController.addEventListener("load-item-start", fireEvent);
         loadController.addEventListener("load-slice", fireEvent);
         loadController.addEventListener("load-progress", fireEvent);
         loadController.addEventListener("load-end", fireEvent);
@@ -1879,6 +1880,13 @@ dwv.LoadController = function (defaultCharacterSet)
 
         // set IO
         loader.setDefaultCharacterSet(defaultCharacterSet);
+        loader.onloaditemstart = function (event) {
+            fireEvent({
+                type: 'load-item-start',
+                item: event.item,
+                loader: event.loader
+            });
+        };
         loader.onload = function (data) {
             fireEvent({
                 type: 'load-slice',
@@ -14790,6 +14798,13 @@ dwv.io.FilesLoader = function ()
 }; // class File
 
 /**
+ * Handle a load item start event.
+ * @param {Object} event The load event, 'event.target'
+ *  should be the loaded data.
+ * Default does nothing.
+ */
+dwv.io.FilesLoader.prototype.onloaditemstart = function (/*event*/) {};
+/**
  * Handle a load event.
  * @param {Object} event The load event, 'event.target'
  *  should be the loaded data.
@@ -14902,6 +14917,11 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
             loader = loaders[l];
             if (loader.canLoadFile(file)) {
                 foundLoader = true;
+                //
+                this.onloaditemstart({
+                    item: file,
+                    loader: loader
+                });
                 // store loader
                 this.storeLoader(loader);
                 // set reader callbacks
