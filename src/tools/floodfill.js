@@ -118,6 +118,7 @@ dwv.tool.Floodfill = function(app)
     /**
      * Listener handler.
      * @type Object
+     * @private
      */
     var listenerHandler = new dwv.utils.ListenerHandler();
 
@@ -140,6 +141,7 @@ dwv.tool.Floodfill = function(app)
     /**
      * Get (x, y) coordinates referenced to the canvas
      * @param {Object} event The original event.
+     * @private
      */
     var getCoord = function(event){
         return { x: event._x, y: event._y };

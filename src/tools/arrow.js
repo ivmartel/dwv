@@ -2,6 +2,7 @@
 var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
+/** @namespace */
 dwv.tool.draw = dwv.tool.draw || {};
 /**
  * The Konva namespace.

@@ -33,6 +33,7 @@ var JpxImage = JpxImage || {};
 
 /**
  * Asynchronous pixel buffer decoder.
+ * @constructor
  * @param {String} script The path to the decoder script to be used by the web worker.
  */
 dwv.image.AsynchPixelBufferDecoder = function (script)
@@ -86,6 +87,7 @@ dwv.image.AsynchPixelBufferDecoder.prototype.ondecoded = function ()
 
 /**
  * Synchronous pixel buffer decoder.
+ * @constructor
  * @param {String} algoName The decompression algorithm name.
  */
 dwv.image.SynchPixelBufferDecoder = function (algoName)

@@ -14,6 +14,7 @@ dwv.io.RawImageLoader = function ()
     /**
      * if abort is triggered, all image.onload callbacks have to be cancelled
      * @type {boolean}
+     * @private
      */
     var aborted = false;
 

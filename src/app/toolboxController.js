@@ -8,12 +8,16 @@ var dwv = dwv || {};
  */
 dwv.ToolboxController = function (toolList)
 {
-    // point converter function
+    /**
+     * Point converter function
+     * @private
+     */
     var displayToIndexConverter = null;
 
     /**
      * Selected tool.
      * @type Object
+     * @private
      */
     var selectedTool = null;
 

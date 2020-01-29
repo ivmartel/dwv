@@ -1,6 +1,5 @@
 // namespaces
 var dwv = dwv || {};
-/** @namespace */
 dwv.tool = dwv.tool || {};
 /**
  * The Konva namespace.
@@ -56,6 +55,7 @@ dwv.tool.Draw = function (app)
     /**
      * Current shape factory.
      * @type Object
+     * @private
      */
     var currentFactory = null;
 
@@ -495,6 +495,7 @@ dwv.tool.Draw = function (app)
 
     /**
      * Get the real position from an event.
+     * @private
      */
     function getRealPosition( index ) {
         var stage = app.getDrawStage();
@@ -717,6 +718,7 @@ dwv.tool.Draw = function (app)
     /**
      * Fire an event: call all associated listeners.
      * @param {Object} event The event to fire.
+     * @private
      */
     function fireEvent (event)
     {

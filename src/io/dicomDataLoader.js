@@ -43,6 +43,7 @@ dwv.io.DicomDataLoader = function ()
 
     /**
      * DICOM buffer to dwv.image.View (asynchronous)
+     * @private
      */
     var db2v = new dwv.image.DicomBufferToView();
 

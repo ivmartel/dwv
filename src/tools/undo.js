@@ -31,6 +31,7 @@ dwv.tool.UndoStack = function ()
     /**
      * Listener handler.
      * @type Object
+     * @private
      */
     var listenerHandler = new dwv.utils.ListenerHandler();
 

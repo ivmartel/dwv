@@ -33,6 +33,7 @@ dwv.io.RawVideoLoader = function ()
      * Create a Data URI from an HTTP request response.
      * @param {Object} response The HTTP request response.
      * @param {String} dataType The data type.
+     * @private
      */
     function createDataUri(response, dataType) {
         // image data as string

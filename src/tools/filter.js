@@ -24,6 +24,7 @@ dwv.tool.Filter = function ( app )
     /**
      * Listener handler.
      * @type Object
+     * @private
      */
     var listenerHandler = new dwv.utils.ListenerHandler();
 
@@ -173,16 +174,19 @@ dwv.tool.filter.Threshold = function ( app )
     /**
      * Associated filter.
      * @type Object
+     * @private
      */
     var filter = new dwv.image.filter.Threshold();
     /**
      * Flag to know wether to reset the image or not.
      * @type Boolean
+     * @private
      */
     var resetImage = true;
     /**
      * Listener handler.
      * @type Object
+     * @private
      */
     var listenerHandler = new dwv.utils.ListenerHandler();
 
@@ -264,6 +268,7 @@ dwv.tool.filter.Sharpen = function ( app )
     /**
      * Listener handler.
      * @type Object
+     * @private
      */
     var listenerHandler = new dwv.utils.ListenerHandler();
 
@@ -336,6 +341,7 @@ dwv.tool.filter.Sobel = function ( app )
     /**
      * Listener handler.
      * @type Object
+     * @private
      */
     var listenerHandler = new dwv.utils.ListenerHandler();
 

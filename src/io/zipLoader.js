@@ -52,6 +52,7 @@ dwv.io.ZipLoader = function ()
      * @param {ArrayBuffer} content unzipped file image
      * @param {Number} index The data index.
      * @return {}
+     * @private
      */
     function zipAsyncCallback(content, index)
     {

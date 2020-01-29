@@ -1,6 +1,5 @@
 // namespaces
 var dwv = dwv || {};
-/** @namespace */
 dwv.tool = dwv.tool || {};
 dwv.tool.draw = dwv.tool.draw || {};
 /**

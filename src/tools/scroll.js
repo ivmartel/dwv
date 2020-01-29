@@ -173,6 +173,7 @@ dwv.tool.Scroll = function(app)
     /**
      * Mouse scroll action.
      * @param {Boolean} up True to increment, false to decrement.
+     * @private
      */
     function mouseScroll (up) {
         var hasSlices = (app.getImage().getGeometry().getSize().getNumberOfSlices() !== 1);

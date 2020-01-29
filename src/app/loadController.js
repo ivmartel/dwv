@@ -18,6 +18,7 @@ dwv.LoadController = function (defaultCharacterSet)
     /**
      * Listener handler.
      * @type Object
+     * @private
      */
     var listenerHandler = new dwv.utils.ListenerHandler();
 

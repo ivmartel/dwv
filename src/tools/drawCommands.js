@@ -1,6 +1,5 @@
 // namespaces
 var dwv = dwv || {};
-/** @namespace */
 dwv.tool = dwv.tool || {};
 /**
  * The Konva namespace.

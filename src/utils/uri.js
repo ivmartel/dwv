@@ -1,8 +1,6 @@
 // namespaces
 var dwv = dwv || {};
 dwv.utils = dwv.utils || {};
-/** @namespace */
-dwv.utils.base = dwv.utils.base || {};
 
 /**
  * Get an full object URL from a string uri.
