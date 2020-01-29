@@ -10,7 +10,7 @@ dwv.math = dwv.math || {};
  * @return {Number} The multiplication of the three inputs or
  *  null if one of the last two is null.
  */
-function mulABC( a, b, c) {
+dwv.math.mulABC = function ( a, b, c) {
     var res = null;
     if (b !== null && c !== null) {
         res = a * b * c;
@@ -57,7 +57,7 @@ dwv.math.Circle = function(centre, radius)
      */
     this.getWorldSurface = function(spacingX, spacingY)
     {
-        return mulABC(surface, spacingX, spacingY);
+        return dwv.math.mulABC(surface, spacingX, spacingY);
     };
 }; // Circle class
 
@@ -106,7 +106,7 @@ dwv.math.Ellipse = function(centre, a, b)
      */
     this.getWorldSurface = function(spacingX, spacingY)
     {
-        return mulABC(surface, spacingX, spacingY);
+        return dwv.math.mulABC(surface, spacingX, spacingY);
     };
 }; // Circle class
 
@@ -365,7 +365,7 @@ dwv.math.Rectangle = function(begin, end)
      */
     this.getWorldSurface = function(spacingX, spacingY)
     {
-        return mulABC(surface, spacingX, spacingY);
+        return dwv.math.mulABC(surface, spacingX, spacingY);
     };
 }; // Rectangle class
 
