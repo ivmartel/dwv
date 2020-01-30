@@ -1,7 +1,6 @@
 /**
  * Tests for the 'dicom/dicomElementsWrapper.js' file.
  */
-/** @module tests/dicom */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module("dicomElementsWrapper");

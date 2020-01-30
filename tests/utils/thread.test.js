@@ -1,14 +1,13 @@
 /**
  * Tests for the 'utils/thread' file.
  */
-/** @module tests/utils */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module("thread");
 
 /**
  * Tests for {@link dwv.utils.ThreadPool}.
- * @function module:tests/utils~ThreadPool
+ * @function module:tests/utils~threadPool
  */
 QUnit.test("Test ThreadPool.", function (assert) {
 

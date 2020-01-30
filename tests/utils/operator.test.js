@@ -8,7 +8,7 @@ QUnit.module("utils");
 /**
  * Tests for {@link dwv.utils.isObject}.
  * @function module:tests/utils~isObject
-ssss */
+ */
 QUnit.test("Test isObject.", function (assert) {
     var obj01 = {name: "dwv", type: "app"};
     assert.equal(dwv.utils.isObject(obj01), true, "test with object");
@@ -29,7 +29,7 @@ QUnit.test("Test isObject.", function (assert) {
 /**
  * Tests for {@link dwv.utils.isArray}.
  * @function module:tests/utils~isArray
-ssss */
+ */
 QUnit.test("Test isArray.", function (assert) {
     var obj01 = {name: "dwv", type: "app"};
     assert.equal(dwv.utils.isArray(obj01), false, "test with object");
@@ -50,7 +50,7 @@ QUnit.test("Test isArray.", function (assert) {
 /**
  * Tests for {@link dwv.utils.mergeObjects}.
  * @function module:tests/utils~mergeObjects
-ssss */
+ */
 QUnit.test("Test merge objects.", function (assert) {
     var obj001 = {id: {value: 0}, a: {value: 1}, b: {value: 1}};
     var obj002 = {id: {value: 1}, a: {value: 1}, b: {value: 2}};
