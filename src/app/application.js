@@ -391,6 +391,13 @@ dwv.App = function ()
     /**
      * Load a list of files. Can be image files or a state file.
      * @param {Array} files The list of files to load.
+     * @fires dwv.LoadController#load-start
+     * @fires dwv.LoadController#load-item-start
+     * @fires dwv.LoadController#load-slice
+     * @fires dwv.LoadController#load-progress
+     * @fires dwv.LoadController#load-end
+     * @fires dwv.LoadController#load-error
+     * @fires dwv.LoadController#load-abort
      */
     this.loadFiles = function (files) {
         loadController.loadFiles(files);
@@ -400,6 +407,13 @@ dwv.App = function ()
      * Load a list of URLs. Can be image files or a state file.
      * @param {Array} urls The list of urls to load.
      * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+     * @fires dwv.LoadController#load-start
+     * @fires dwv.LoadController#load-item-start
+     * @fires dwv.LoadController#load-slice
+     * @fires dwv.LoadController#load-progress
+     * @fires dwv.LoadController#load-end
+     * @fires dwv.LoadController#load-error
+     * @fires dwv.LoadController#load-abort
      */
     this.loadURLs = function (urls, requestHeaders) {
         loadController.loadURLs(urls, requestHeaders);
@@ -409,6 +423,13 @@ dwv.App = function ()
      * Load a list of ArrayBuffers.
      * @param {Array} data The list of ArrayBuffers to load
      *   in the form of [{name: "", filename: "", data: data}].
+     * @fires dwv.LoadController#load-start
+     * @fires dwv.LoadController#load-item-start
+     * @fires dwv.LoadController#load-slice
+     * @fires dwv.LoadController#load-progress
+     * @fires dwv.LoadController#load-end
+     * @fires dwv.LoadController#load-error
+     * @fires dwv.LoadController#load-abort
      */
     this.loadImageObject = function (data) {
         loadController.loadImageObject(data);

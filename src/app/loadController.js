@@ -25,6 +25,13 @@ dwv.LoadController = function (defaultCharacterSet)
     /**
      * Load a list of files. Can be image files or a state file.
      * @param {Array} files The list of files to load.
+     * @fires dwv.LoadController#load-start
+     * @fires dwv.LoadController#load-item-start
+     * @fires dwv.LoadController#load-slice
+     * @fires dwv.LoadController#load-progress
+     * @fires dwv.LoadController#load-end
+     * @fires dwv.LoadController#load-error
+     * @fires dwv.LoadController#load-abort
      */
     this.loadFiles = function (files) {
         // has been checked for emptiness.
@@ -40,6 +47,13 @@ dwv.LoadController = function (defaultCharacterSet)
      * Load a list of URLs. Can be image files or a state file.
      * @param {Array} urls The list of urls to load.
      * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+     * @fires dwv.LoadController#load-start
+     * @fires dwv.LoadController#load-item-start
+     * @fires dwv.LoadController#load-slice
+     * @fires dwv.LoadController#load-progress
+     * @fires dwv.LoadController#load-end
+     * @fires dwv.LoadController#load-error
+     * @fires dwv.LoadController#load-abort
      */
     this.loadURLs = function (urls, requestHeaders) {
         // has been checked for emptiness.
@@ -55,6 +69,13 @@ dwv.LoadController = function (defaultCharacterSet)
      * Load a list of ArrayBuffers.
      * @param {Array} data The list of ArrayBuffers to load
      *   in the form of [{name: "", filename: "", data: data}].
+     * @fires dwv.LoadController#load-start
+     * @fires dwv.LoadController#load-item-start
+     * @fires dwv.LoadController#load-slice
+     * @fires dwv.LoadController#load-progress
+     * @fires dwv.LoadController#load-end
+     * @fires dwv.LoadController#load-error
+     * @fires dwv.LoadController#load-abort
      */
     this.loadImageObject = function (data) {
         // create IO
@@ -228,6 +249,13 @@ dwv.LoadController = function (defaultCharacterSet)
         // set IO
         loader.setDefaultCharacterSet(defaultCharacterSet);
         loader.onloaditemstart = function (event) {
+          /**
+           * Item start loading event.
+           * @event dwv.LoadController#load-item-start
+           * @type {Object}
+           * @property {Object} item The item that is about to load.
+           * @property {Object} loader The associated loader.
+           */
             fireEvent({
                 type: 'load-item-start',
                 item: event.item,
@@ -235,6 +263,11 @@ dwv.LoadController = function (defaultCharacterSet)
             });
         };
         loader.onload = function (data) {
+            /**
+             * Load slice event.
+             * @event dwv.LoadController#load-slice
+             * @type {Object}
+             */
             fireEvent({
                 type: 'load-slice',
                 data: data.info
@@ -246,12 +279,25 @@ dwv.LoadController = function (defaultCharacterSet)
         loader.onabort = handleLoadAbort;
         loader.onloadend = function (/*event*/) {
             window.onkeydown = previousOnKeyDown;
+            /**
+             * Load progress event.
+             * @event dwv.LoadController#load-progress
+             * @type {Object}
+             * @property {bool} lengthComputable Trustable progress?
+             * @property {number} loaded The loaded percentage.
+             * @property {number} total The total percentage.
+             */
             fireEvent({
                 type: "load-progress",
                 lengthComputable: true,
                 loaded: 100,
                 total: 100
             });
+            /**
+             * Main load end event.
+             * @event dwv.LoadController#load-end
+             * @type {Object}
+             */
             fireEvent({
                 type: 'load-end'
             });
@@ -261,10 +307,15 @@ dwv.LoadController = function (defaultCharacterSet)
             self.onloadend();
         };
         loader.onprogress = fireEvent;
-        // main load (asynchronous)
+        /**
+         * Main load start event.
+         * @event dwv.LoadController#load-start
+         * @type {Object}
+         */
         fireEvent({
             type: 'load-start'
         });
+        // launch main load
         loader.load(data, options);
     }
 
@@ -300,7 +351,13 @@ dwv.LoadController = function (defaultCharacterSet)
         } else {
             displayMessage = "Error: " + error + ".";
         }
-        // fire error event
+        /**
+         * Load error event.
+         * @event dwv.LoadController#load-error
+         * @type {Object}
+         * @property {string} message The error message.
+         * @property {Object} error The error object.
+         */
         fireEvent({
             type: "load-error",
             message: displayMessage,
@@ -323,7 +380,13 @@ dwv.LoadController = function (defaultCharacterSet)
         } else {
             displayMessage = "Abort called.";
         }
-        // fire error event
+        /**
+         * Load abort event.
+         * @event dwv.LoadController#load-abort
+         * @type {Object}
+         * @property {string} message The error message.
+         * @property {Object} error The error object.
+         */
         fireEvent({
             type: "load-abort",
             message: displayMessage,

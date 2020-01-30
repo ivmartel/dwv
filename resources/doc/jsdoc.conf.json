@@ -5,8 +5,18 @@
         "private": false,
         "sectionOrder": [
           "Namespaces",
+          "Events",
           "Classes",
-          "Externals"
-        ]
+          "Externals",
+          "Modules"
+        ],
+        "menu": {
+            "Project Website": {
+                "href":"https://github.com/ivmartel/dwv",
+                "target":"_blank",
+                "class":"menu-item",
+                "id":"website_link"
+            }
+        }
     }
 }
