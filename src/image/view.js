@@ -4,12 +4,18 @@ dwv.image = dwv.image || {};
 
 /**
  * WindowLevel class.
- * References:
- * - DICOM [Window Center and Window Width]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2}
- * Pseudo-code:
+ * <br>Pseudo-code:
+ * <pre>
  *  if (x <= c - 0.5 - (w-1)/2), then y = ymin
  *  else if (x > c - 0.5 + (w-1)/2), then y = ymax,
  *  else y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin) + ymin
+ * </pre>
+ *
+ * @param {Number} center The window center.
+ * @param {Number} width The window width.
+ * @constructor
+ * @see DICOM doc for [Window Center and Window Width]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2}
+ *
  */
 dwv.image.WindowLevel = function (center, width)
 {

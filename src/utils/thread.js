@@ -103,8 +103,13 @@ dwv.utils.ThreadPool.prototype.onpoolworkend = function () {};
 dwv.utils.ThreadPool.prototype.onworkerend = function () {};
 
 /**
- * Worker thread.
+ * Worker background task.
  * @external Worker
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Worker
+ */
+
+/**
+ * Worker thread.
  * @constructor
  * @param {Object} parentPool The parent pool.
  */
