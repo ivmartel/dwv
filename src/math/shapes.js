@@ -16,7 +16,7 @@ dwv.math.mulABC = function ( a, b, c) {
         res = a * b * c;
     }
     return res;
-}
+};
 
 /**
  * Circle shape.
