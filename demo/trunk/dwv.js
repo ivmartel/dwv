@@ -1,4 +1,4 @@
-/*! dwv 0.27.0-beta 2020-01-28 20:46:06 */
+/*! dwv 0.27.0-beta 2020-01-30 22:27:40 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -1685,6 +1685,7 @@ dwv.LoadController = function (defaultCharacterSet)
     /**
      * Listener handler.
      * @type Object
+     * @private
      */
     var listenerHandler = new dwv.utils.ListenerHandler();
 
@@ -2380,12 +2381,16 @@ var dwv = dwv || {};
  */
 dwv.ToolboxController = function (toolList)
 {
-    // point converter function
+    /**
+     * Point converter function
+     * @private
+     */
     var displayToIndexConverter = null;
 
     /**
      * Selected tool.
      * @type Object
+     * @private
      */
     var selectedTool = null;
 
@@ -10991,6 +10996,7 @@ var JpxImage = JpxImage || {};
 
 /**
  * Asynchronous pixel buffer decoder.
+ * @constructor
  * @param {String} script The path to the decoder script to be used by the web worker.
  */
 dwv.image.AsynchPixelBufferDecoder = function (script)
@@ -11044,6 +11050,7 @@ dwv.image.AsynchPixelBufferDecoder.prototype.ondecoded = function ()
 
 /**
  * Synchronous pixel buffer decoder.
+ * @constructor
  * @param {String} algoName The decompression algorithm name.
  */
 dwv.image.SynchPixelBufferDecoder = function (algoName)
@@ -14497,6 +14504,7 @@ dwv.io.DicomDataLoader = function ()
 
     /**
      * DICOM buffer to dwv.image.View (asynchronous)
+     * @private
      */
     var db2v = new dwv.image.DicomBufferToView();
 
@@ -15361,6 +15369,7 @@ dwv.io.RawImageLoader = function ()
     /**
      * if abort is triggered, all image.onload callbacks have to be cancelled
      * @type {boolean}
+     * @private
      */
     var aborted = false;
 
@@ -15589,6 +15598,7 @@ dwv.io.RawVideoLoader = function ()
      * Create a Data URI from an HTTP request response.
      * @param {Object} response The HTTP request response.
      * @param {String} dataType The data type.
+     * @private
      */
     function createDataUri(response, dataType) {
         // image data as string
@@ -16132,6 +16142,7 @@ dwv.io.ZipLoader = function ()
      * @param {ArrayBuffer} content unzipped file image
      * @param {Number} index The data index.
      * @return {}
+     * @private
      */
     function zipAsyncCallback(content, index)
     {
@@ -17322,13 +17333,13 @@ dwv.math = dwv.math || {};
  * @return {Number} The multiplication of the three inputs or
  *  null if one of the last two is null.
  */
-function mulABC( a, b, c) {
+dwv.math.mulABC = function ( a, b, c) {
     var res = null;
     if (b !== null && c !== null) {
         res = a * b * c;
     }
     return res;
-}
+};
 
 /**
  * Circle shape.
@@ -17369,7 +17380,7 @@ dwv.math.Circle = function(centre, radius)
      */
     this.getWorldSurface = function(spacingX, spacingY)
     {
-        return mulABC(surface, spacingX, spacingY);
+        return dwv.math.mulABC(surface, spacingX, spacingY);
     };
 }; // Circle class
 
@@ -17418,7 +17429,7 @@ dwv.math.Ellipse = function(centre, a, b)
      */
     this.getWorldSurface = function(spacingX, spacingY)
     {
-        return mulABC(surface, spacingX, spacingY);
+        return dwv.math.mulABC(surface, spacingX, spacingY);
     };
 }; // Circle class
 
@@ -17677,7 +17688,7 @@ dwv.math.Rectangle = function(begin, end)
      */
     this.getWorldSurface = function(spacingX, spacingY)
     {
-        return mulABC(surface, spacingX, spacingY);
+        return dwv.math.mulABC(surface, spacingX, spacingY);
     };
 }; // Rectangle class
 
@@ -18022,6 +18033,7 @@ dwv.math.Vector3D.prototype.dotProduct = function (vector3D) {
 var dwv = dwv || {};
 /** @namespace */
 dwv.tool = dwv.tool || {};
+/** @namespace */
 dwv.tool.draw = dwv.tool.draw || {};
 /**
  * The Konva namespace.
@@ -18213,7 +18225,6 @@ dwv.tool.draw.UpdateArrow = function (anchor/*, image*/)
 
 // namespaces
 var dwv = dwv || {};
-/** @namespace */
 dwv.tool = dwv.tool || {};
 /**
  * The Konva namespace.
@@ -18269,6 +18280,7 @@ dwv.tool.Draw = function (app)
     /**
      * Current shape factory.
      * @type Object
+     * @private
      */
     var currentFactory = null;
 
@@ -18708,6 +18720,7 @@ dwv.tool.Draw = function (app)
 
     /**
      * Get the real position from an event.
+     * @private
      */
     function getRealPosition( index ) {
         var stage = app.getDrawStage();
@@ -18930,6 +18943,7 @@ dwv.tool.Draw = function (app)
     /**
      * Fire an event: call all associated listeners.
      * @param {Object} event The event to fire.
+     * @private
      */
     function fireEvent (event)
     {
@@ -18986,7 +19000,6 @@ dwv.tool.Draw.prototype.hasShape = function(name) {
 
 // namespaces
 var dwv = dwv || {};
-/** @namespace */
 dwv.tool = dwv.tool || {};
 /**
  * The Konva namespace.
@@ -19395,6 +19408,7 @@ dwv.tool.ShapeEditor = function (app)
     /**
      * Apply a function on all anchors.
      * @param {Object} func A f(shape) function.
+     * @private
      */
     function applyFuncToAnchors( func ) {
         if ( shape && shape.getParent() ) {
@@ -19406,6 +19420,7 @@ dwv.tool.ShapeEditor = function (app)
     /**
      * Set anchors visibility.
      * @param {Boolean} flag The visible flag.
+     * @private
      */
     function setAnchorsVisible( flag ) {
         applyFuncToAnchors( function (anchor) {
@@ -19434,6 +19449,7 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Remove anchors.
+     * @private
      */
     function removeAnchors() {
         applyFuncToAnchors( function (anchor) {
@@ -19443,6 +19459,7 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Add the shape anchors.
+     * @private
      */
     function addAnchors() {
         // exit if no shape or no layer
@@ -19526,6 +19543,7 @@ dwv.tool.ShapeEditor = function (app)
      * @param {Number} x The X position of the anchor.
      * @param {Number} y The Y position of the anchor.
      * @param {Number} id The id of the anchor.
+     * @private
      */
     function addAnchor(group, x, y, id) {
         // anchor shape
@@ -19551,6 +19569,7 @@ dwv.tool.ShapeEditor = function (app)
     /**
      * Get a simple clone of the input anchor.
      * @param {Object} anchor The anchor to clone.
+     * @private
      */
     function getClone( anchor ) {
         // create closure to properties
@@ -19578,6 +19597,7 @@ dwv.tool.ShapeEditor = function (app)
     /**
      * Set the anchor on listeners.
      * @param {Object} anchor The anchor to set on.
+     * @private
      */
     function setAnchorOn( anchor ) {
         var startAnchor = null;
@@ -19654,6 +19674,7 @@ dwv.tool.ShapeEditor = function (app)
     /**
      * Set the anchor off listeners.
      * @param {Object} anchor The anchor to set off.
+     * @private
      */
     function setAnchorOff( anchor ) {
         anchor.off('dragstart.edit');
@@ -19667,7 +19688,6 @@ dwv.tool.ShapeEditor = function (app)
 
 // namespaces
 var dwv = dwv || {};
-/** @namespace */
 dwv.tool = dwv.tool || {};
 dwv.tool.draw = dwv.tool.draw || {};
 /**
@@ -19854,6 +19874,7 @@ dwv.tool.Filter = function ( app )
     /**
      * Listener handler.
      * @type Object
+     * @private
      */
     var listenerHandler = new dwv.utils.ListenerHandler();
 
@@ -20003,16 +20024,19 @@ dwv.tool.filter.Threshold = function ( app )
     /**
      * Associated filter.
      * @type Object
+     * @private
      */
     var filter = new dwv.image.filter.Threshold();
     /**
      * Flag to know wether to reset the image or not.
      * @type Boolean
+     * @private
      */
     var resetImage = true;
     /**
      * Listener handler.
      * @type Object
+     * @private
      */
     var listenerHandler = new dwv.utils.ListenerHandler();
 
@@ -20094,6 +20118,7 @@ dwv.tool.filter.Sharpen = function ( app )
     /**
      * Listener handler.
      * @type Object
+     * @private
      */
     var listenerHandler = new dwv.utils.ListenerHandler();
 
@@ -20166,6 +20191,7 @@ dwv.tool.filter.Sobel = function ( app )
     /**
      * Listener handler.
      * @type Object
+     * @private
      */
     var listenerHandler = new dwv.utils.ListenerHandler();
 
@@ -20406,6 +20432,7 @@ dwv.tool.Floodfill = function(app)
     /**
      * Listener handler.
      * @type Object
+     * @private
      */
     var listenerHandler = new dwv.utils.ListenerHandler();
 
@@ -20428,6 +20455,7 @@ dwv.tool.Floodfill = function(app)
     /**
      * Get (x, y) coordinates referenced to the canvas
      * @param {Object} event The original event.
+     * @private
      */
     var getCoord = function(event){
         return { x: event._x, y: event._y };
@@ -20745,7 +20773,6 @@ dwv.tool.Floodfill.prototype.setLineColour = function(colour)
 
 // namespaces
 var dwv = dwv || {};
-/** @namespace */
 dwv.tool = dwv.tool || {};
 dwv.tool.draw = dwv.tool.draw || {};
 /**
@@ -20939,6 +20966,7 @@ dwv.tool.Livewire = function(app)
     /**
      * Listener handler.
      * @type Object
+     * @private
      */
     var listenerHandler = new dwv.utils.ListenerHandler();
 
@@ -21234,7 +21262,6 @@ dwv.tool.Livewire.prototype.setLineColour = function(colour)
 
 // namespaces
 var dwv = dwv || {};
-/** @namespace */
 dwv.tool = dwv.tool || {};
 dwv.tool.draw = dwv.tool.draw || {};
 /**
@@ -21455,7 +21482,6 @@ dwv.tool.draw.UpdateProtractor = function (anchor/*, image*/)
 
 // namespaces
 var dwv = dwv || {};
-/** @namespace */
 dwv.tool = dwv.tool || {};
 dwv.tool.draw = dwv.tool.draw || {};
 /**
@@ -21617,7 +21643,6 @@ dwv.tool.draw.UpdateRect = function (anchor, image)
 
 // namespaces
 var dwv = dwv || {};
-/** @namespace */
 dwv.tool = dwv.tool || {};
 dwv.tool.draw = dwv.tool.draw || {};
 /**
@@ -21746,7 +21771,6 @@ dwv.tool.draw.UpdateRoi = function (anchor /*, image*/)
 
 // namespaces
 var dwv = dwv || {};
-/** @namespace */
 dwv.tool = dwv.tool || {};
 dwv.tool.draw = dwv.tool.draw || {};
 /**
@@ -22122,6 +22146,7 @@ dwv.tool.Scroll = function(app)
     /**
      * Mouse scroll action.
      * @param {Boolean} up True to increment, false to decrement.
+     * @private
      */
     function mouseScroll (up) {
         var hasSlices = (app.getImage().getGeometry().getSize().getNumberOfSlices() !== 1);
@@ -22226,6 +22251,7 @@ dwv.tool.UndoStack = function ()
     /**
      * Listener handler.
      * @type Object
+     * @private
      */
     var listenerHandler = new dwv.utils.ListenerHandler();
 
@@ -23091,6 +23117,7 @@ dwv.i18nGetFallbackLocalePath = function (filename) {
 
 // namespaces
 var dwv = dwv || {};
+/** @namespace */
 dwv.utils = dwv.utils || {};
 
 /**
@@ -23831,7 +23858,6 @@ file selection dialog.
 
 // namespaces
 var dwv = dwv || {};
-/** @namespace */
 dwv.utils = dwv.utils || {};
 
 /**
@@ -24132,7 +24158,6 @@ dwv.utils.MultiProgressHandler = function (callback)
 
 // namespaces
 var dwv = dwv || {};
-/** @namespace */
 dwv.utils = dwv.utils || {};
 
 /**
@@ -24498,8 +24523,6 @@ dwv.utils.WorkerTask = function (script, callback, message) {
 // namespaces
 var dwv = dwv || {};
 dwv.utils = dwv.utils || {};
-/** @namespace */
-dwv.utils.base = dwv.utils.base || {};
 
 /**
  * Get an full object URL from a string uri.
