@@ -1,4 +1,4 @@
-/*! dwv 0.27.0-beta 2020-01-30 23:15:14 */
+/*! dwv 0.27.0-beta 2020-01-31 22:43:47 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -241,7 +241,8 @@ dwv.App = function ()
 
     /**
      * Add a command to the undo stack.
-     * @param {Object} The command to add.
+     * @param {Object} cmd The command to add.
+     * @fires dwv.tool.UndoStack#undo-add
      */
     this.addToUndoStack = function (cmd) {
         if ( undoStack !== null ) {
@@ -387,6 +388,8 @@ dwv.App = function ()
 
     /**
      * Reset the layout of the application.
+     * @fires dwv.App#zoom-change
+     * @fires dwv.App#offset-change
      */
     this.resetLayout = function () {
         var previousScale = scale;
@@ -406,11 +409,21 @@ dwv.App = function ()
         }
         // fire events
         if (previousScale != scale) {
-            fireEvent({"type": "zoom-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
+            fireEvent({
+                "type": "zoom-change",
+                "scale": scale,
+                "cx": scaleCenter.x,
+                "cy": scaleCenter.y
+            });
         }
         if ( (previousSC.x !== scaleCenter.x || previousSC.y !== scaleCenter.y) ||
              (previousTrans.x !== translation.x || previousTrans.y !== translation.y)) {
-            fireEvent({"type": "offset-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
+            fireEvent({
+                "type": "offset-change",
+                "scale": scale,
+                "cx": scaleCenter.x,
+                "cy": scaleCenter.y
+            });
         }
     };
 
@@ -780,6 +793,8 @@ dwv.App = function ()
      * - CRTL-ARROW_DOWN: previous slice
      * Default behavior. Usually used in tools.
      * @param {Object} event The key down event.
+     * @fires dwv.tool.UndoStack#undo
+     * @fires dwv.tool.UndoStack#redo
      */
     this.onKeydown = function (event)
     {
@@ -897,6 +912,7 @@ dwv.App = function ()
 
     /**
      * Undo the last action
+     * @fires dwv.tool.UndoStack#undo
      */
     this.undo = function () {
         undoStack.undo();
@@ -904,6 +920,7 @@ dwv.App = function ()
 
     /**
      * Redo the last action
+     * @fires dwv.tool.UndoStack#redo
      */
     this.redo = function () {
         undoStack.redo();
@@ -945,6 +962,7 @@ dwv.App = function ()
     /**
      * Apply the stored zoom to the layers.
      * @private
+     * @fires dwv.App#zoom-change
      */
     function zoomLayers()
     {
@@ -958,12 +976,26 @@ dwv.App = function ()
             drawController.zoomStage(scale, scaleCenter);
         }
         // fire event
-        fireEvent({"type": "zoom-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
+        /**
+         * Zoom change event.
+         * @event dwv.App#zoom-change
+         * @type {Object}
+         * @property {number} scale The new scale value.
+         * @property {number} cx The new rotaion center X position.
+         * @property {number} cx The new rotaion center Y position.
+         */
+        fireEvent({
+            "type": "zoom-change",
+            "scale": scale,
+            "cx": scaleCenter.x,
+            "cy": scaleCenter.y
+        });
     }
 
     /**
      * Apply the stored translation to the layers.
      * @private
+     * @fires dwv.App#offset-change
      */
     function translateLayers()
     {
@@ -978,8 +1010,20 @@ dwv.App = function ()
                 drawController.translateStage(ox, oy);
             }
             // fire event
-            fireEvent({"type": "offset-change", "scale": scale,
-                "cx": imageLayer.getTrans().x, "cy": imageLayer.getTrans().y });
+            /**
+             * Offset change event.
+             * @event dwv.App#offset-change
+             * @type {Object}
+             * @property {number} scale The new scale value.
+             * @property {number} cx The new rotaion center X position.
+             * @property {number} cx The new rotaion center Y position.
+             */
+            fireEvent({
+                "type": "offset-change",
+                "scale": scale,
+                "cx": imageLayer.getTrans().x,
+                "cy": imageLayer.getTrans().y
+            });
         }
     }
 
@@ -13859,6 +13903,8 @@ dwv.image.View = function (image)
      * Warning: can be undefined in no window/level was set.
      * @param {Object} rsi Optional image rsi, will take the one of the current slice otherwise.
      * @return {Window} The window LUT of the image.
+     * @fires dwv.image.View#wl-width-change
+     * @fires dwv.image.View#wl-center-change
      */
     this.getCurrentWindowLut = function (rsi) {
         var sliceNumber = this.getCurrentPosition().k;
@@ -13885,14 +13931,20 @@ dwv.image.View = function (image)
                 wlut.setWindowLevel(wl);
                 // fire event
                 if ( previousWidth !== wl.getWidth() ) {
-                    this.fireEvent({"type": "wl-width-change",
-                        "wc": wl.getCenter(), "ww": wl.getWidth(),
-                        "skipGenerate": true});
+                    this.fireEvent({
+                        "type": "wl-width-change",
+                        "wc": wl.getCenter(),
+                        "ww": wl.getWidth(),
+                        "skipGenerate": true
+                    });
                 }
                 if ( previousCenter !== wl.getCenter() ) {
-                    this.fireEvent({"type": "wl-center-change",
-                        "wc": wl.getCenter(), "ww": wl.getWidth(),
-                        "skipGenerate": true});
+                    this.fireEvent({
+                        "type": "wl-center-change",
+                        "wc": wl.getCenter(),
+                        "ww": wl.getWidth(),
+                        "skipGenerate": true
+                    });
                 }
             }
         }
@@ -13968,7 +14020,16 @@ dwv.image.View = function (image)
                 // add new
                 windowPresets[key] = presets[key];
                 // fire event
-                this.fireEvent({"type": "wl-preset-add", "name": key });
+                /**
+                 * Window/level add preset event.
+                 * @event dwv.image.View#wl-preset-add
+                 * @type {Object}
+                 * @property {string} name The name of the preset.
+                 */
+                this.fireEvent({
+                    "type": "wl-preset-add",
+                    "name": key
+                });
             }
         }
     };
@@ -13981,12 +14042,22 @@ dwv.image.View = function (image)
     /**
      * Set the colour map of the image.
      * @param {Object} map The colour map of the image.
+     * @fires dwv.image.View#color-change
      */
     this.setColourMap = function(map) {
         colourMap = map;
-        this.fireEvent({"type": "colour-change",
-           "wc": this.getCurrentWindowLut().getWindowLevel().getCenter(),
-           "ww": this.getCurrentWindowLut().getWindowLevel().getWidth() });
+        /**
+         * Color change event.
+         * @event dwv.image.View#color-change
+         * @type {Object}
+         * @property {number} wc The new window center value.
+         * @property {number} ww The new window wdth value.
+         */
+        this.fireEvent({
+            "type": "colour-change",
+            "wc": this.getCurrentWindowLut().getWindowLevel().getCenter(),
+            "ww": this.getCurrentWindowLut().getWindowLevel().getWidth()
+        });
     };
 
     /**
@@ -14002,6 +14073,8 @@ dwv.image.View = function (image)
      * @param {Object} pos The current position.
      * @param {Boolean} silent If true, does not fire a slice-change event.
      * @return {Boolean} False if not in bounds
+     * @fires dwv.image.View#slice-change
+     * @fires dwv.image.View#position-change
      */
     this.setCurrentPosition = function(pos, silent) {
         // default silent flag to false
@@ -14018,20 +14091,43 @@ dwv.image.View = function (image)
         // fire a 'position-change' event
         if( image.getPhotometricInterpretation().match(/MONOCHROME/) !== null )
         {
-            this.fireEvent({"type": "position-change",
-                "i": pos.i, "j": pos.j, "k": pos.k,
+            /**
+             * Position change event.
+             * @event dwv.image.View#position-change
+             * @type {Object}
+             * @property {number} i The new column position
+             * @property {number} j The new row position
+             * @property {number} k The new slice position
+             * @property {Object} value The image value at the new position.
+             */
+            this.fireEvent({
+                "type": "position-change",
+                "i": pos.i,
+                "j": pos.j,
+                "k": pos.k,
                 "value": image.getRescaledValue(pos.i,pos.j,pos.k, this.getCurrentFrame())
             });
         }
         else
         {
-            this.fireEvent({"type": "position-change",
-                "i": pos.i, "j": pos.j, "k": pos.k});
+            this.fireEvent({
+                "type": "position-change",
+                "i": pos.i,
+                "j": pos.j,
+                "k": pos.k
+            });
         }
 
         // fire a slice change event (used to trigger redraw)
         if ( !silent ) {
             if ( oldPosition.k !== currentPosition.k ) {
+                /**
+                 * Slice change event.
+                 * @event dwv.image.View#slice-change
+                 * @type {Object}
+                 * @property {number} value The new slice number
+                 * @property {Object} data Associated event data: the imageUid.
+                 */
                 this.fireEvent({
                     "type": "slice-change",
                     "value": currentPosition.k,
@@ -14058,6 +14154,7 @@ dwv.image.View = function (image)
      * Set the current frame number.
      * @param {Number} The current frame number.
      * @return {Boolean} False if not in bounds
+     * @fires dwv.image.View#frame-change
      */
     this.setCurrentFrame = function (frame) {
         // check if possible
@@ -14069,7 +14166,16 @@ dwv.image.View = function (image)
         currentFrame = frame;
         // fire event
         if( oldFrame !== currentFrame && image.getNumberOfFrames() !== 1 ) {
-            this.fireEvent({"type": "frame-change", "frame": currentFrame});
+            /**
+             * Frame change event.
+             * @event dwv.image.View#frame-change
+             * @type {Object}
+             * @property {number} frame The new frame number
+             */
+            this.fireEvent({
+                "type": "frame-change",
+                "frame": currentFrame
+            });
             // silent set current position to update info text
             this.setCurrentPosition(this.getCurrentPosition(),true);
         }
@@ -14111,6 +14217,8 @@ dwv.image.View = function (image)
      * @param {Number} width The window width.
      * @param {String} name Associated preset name, defaults to 'manual'.
      * Warning: uses the latest set rescale LUT or the default linear one.
+     * @fires dwv.image.View#wl-width-change
+     * @fires dwv.image.View#wl-center-change
      */
     this.setWindowLevel = function ( center, width, name )
     {
@@ -14155,14 +14263,46 @@ dwv.image.View = function (image)
             // fire window level change event
             if (currentWl && typeof currentWl !== "undefined") {
                 if (currentWl.getWidth() !== width) {
-                    this.fireEvent({"type": "wl-width-change", "wc": center, "ww": width });
+                    /**
+                     * Window/level width change event.
+                     * @event dwv.image.View#wl-width-change
+                     * @type {Object}
+                     * @property {number} wc The new window center value.
+                     * @property {number} ww The new window wdth value.
+                     * @property {boolean} skipGenerate Flag to skip view generation.
+                     */
+                    this.fireEvent({
+                        "type": "wl-width-change",
+                        "wc": center,
+                        "ww": width
+                     });
                 }
                 if (currentWl.getCenter() !== center) {
-                    this.fireEvent({"type": "wl-center-change", "wc": center, "ww": width });
+                    /**
+                     * Window/level center change event.
+                     * @event dwv.image.View#wl-center-change
+                     * @type {Object}
+                     * @property {number} wc The new window center value.
+                     * @property {number} ww The new window wdth value.
+                     * @property {boolean} skipGenerate Flag to skip view generation.
+                     */
+                    this.fireEvent({
+                        "type": "wl-center-change",
+                        "wc": center,
+                        "ww": width
+                    });
                 }
             } else {
-                this.fireEvent({"type": "wl-width-change", "wc": center, "ww": width });
-                this.fireEvent({"type": "wl-center-change", "wc": center, "ww": width });
+                this.fireEvent({
+                    "type": "wl-width-change",
+                    "wc": center,
+                    "ww": width
+                });
+                this.fireEvent({
+                    "type": "wl-center-change",
+                    "wc": center,
+                    "ww": width
+                });
             }
         }
     };
@@ -18927,7 +19067,10 @@ dwv.tool.Draw = function (app)
                     app.addToUndoStack(mvcmd);
 
                     // the move is handled by Konva, trigger an event manually
-                    fireEvent({'type': 'draw-move'});
+                    fireEvent({
+                        'type': 'draw-move',
+                        'id': this.id()
+                    });
                 }
                 // reset anchors
                 shapeEditor.setAnchorsActive(true);
@@ -18965,7 +19108,9 @@ dwv.tool.Draw = function (app)
             ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
 
             // trigger event
-            fireEvent({'type': 'draw-change'});
+            fireEvent({
+                'type': 'draw-change'
+            });
 
             // draw
             drawLayer.draw();
@@ -19149,6 +19294,7 @@ dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
     this.getName = function () { return "Draw-"+name; };
     /**
      * Execute the command.
+     * @fires dwv.tool.DrawGroupCommand#draw-create
      */
     this.execute = function () {
         // add the group to the parent (in case of undo/redo)
@@ -19157,11 +19303,21 @@ dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
         layer.draw();
         // callback
         if (!isSilent) {
-            this.onExecute({'type': 'draw-create', 'id': group.id()});
+            /**
+             * Draw create event.
+             * @event dwv.tool.DrawGroupCommand#draw-create
+             * @type {Object}
+             * @property {number} id The id of the create draw.
+             */
+            this.onExecute({
+                'type': 'draw-create',
+                'id': group.id()
+            });
         }
     };
     /**
      * Undo the command.
+     * @fires dwv.tool.DeleteGroupCommand#draw-delete
      */
     this.undo = function () {
         // remove the group from the parent layer
@@ -19169,7 +19325,10 @@ dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
         // draw
         layer.draw();
         // callback
-        this.onUndo({'type': 'draw-delete', 'id': group.id()});
+        this.onUndo({
+            'type': 'draw-delete',
+            'id': group.id()
+        });
     };
 }; // DrawGroupCommand class
 
@@ -19177,16 +19336,14 @@ dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
  * Handle an execute event.
  * @param {Object} event The execute event with type and id.
  */
-dwv.tool.DrawGroupCommand.prototype.onExecute = function (/*event*/)
-{
+dwv.tool.DrawGroupCommand.prototype.onExecute = function (/*event*/) {
     // default does nothing.
 };
 /**
  * Handle an undo event.
  * @param {Object} event The undo event with type and id.
  */
-dwv.tool.DrawGroupCommand.prototype.onUndo = function (/*event*/)
-{
+dwv.tool.DrawGroupCommand.prototype.onUndo = function (/*event*/) {
     // default does nothing.
 };
 
@@ -19208,6 +19365,7 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
 
     /**
      * Execute the command.
+     * @fires dwv.tool.MoveGroupCommand#draw-move
      */
     this.execute = function () {
         // translate group
@@ -19215,10 +19373,20 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
         // draw
         layer.draw();
         // callback
-        this.onExecute({'type': 'draw-move', 'id': group.id()});
+        /**
+         * Draw move event.
+         * @event dwv.tool.MoveGroupCommand#draw-move
+         * @type {Object}
+         * @property {number} id The id of the create draw.
+         */
+        this.onExecute({
+            'type': 'draw-move',
+            'id': group.id()
+        });
     };
     /**
      * Undo the command.
+     * @fires dwv.tool.MoveGroupCommand#draw-move
      */
     this.undo = function () {
         // invert translate group
@@ -19227,7 +19395,10 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
         // draw
         layer.draw();
         // callback
-        this.onUndo({'type': 'draw-move', 'id': group.id()});
+        this.onUndo({
+            'type': 'draw-move',
+            'id': group.id()
+        });
     };
 }; // MoveGroupCommand class
 
@@ -19235,16 +19406,14 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
  * Handle an execute event.
  * @param {Object} event The execute event with type and id.
  */
-dwv.tool.MoveGroupCommand.prototype.onExecute = function (/*event*/)
-{
+dwv.tool.MoveGroupCommand.prototype.onExecute = function (/*event*/) {
     // default does nothing.
 };
 /**
  * Handle an undo event.
  * @param {Object} event The undo event with type and id.
  */
-dwv.tool.MoveGroupCommand.prototype.onUndo = function (/*event*/)
-{
+dwv.tool.MoveGroupCommand.prototype.onUndo = function (/*event*/) {
     // default does nothing.
 };
 
@@ -19268,6 +19437,7 @@ dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, laye
 
     /**
      * Execute the command.
+     * @fires dwv.tool.ChangeGroupCommand#draw-change
      */
     this.execute = function () {
         // change shape
@@ -19275,10 +19445,18 @@ dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, laye
         // draw
         layer.draw();
         // callback
-        this.onExecute({'type': 'draw-change'});
+        /**
+         * Draw change event.
+         * @event dwv.tool.ChangeGroupCommand#draw-change
+         * @type {Object}
+         */
+        this.onExecute({
+            'type': 'draw-change'
+        });
     };
     /**
      * Undo the command.
+     * @fires dwv.tool.ChangeGroupCommand#draw-change
      */
     this.undo = function () {
         // invert change shape
@@ -19286,7 +19464,9 @@ dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, laye
         // draw
         layer.draw();
         // callback
-        this.onUndo({'type': 'draw-change'});
+        this.onUndo({
+            'type': 'draw-change'
+        });
     };
 }; // ChangeGroupCommand class
 
@@ -19294,16 +19474,14 @@ dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, laye
  * Handle an execute event.
  * @param {Object} event The execute event with type and id.
  */
-dwv.tool.ChangeGroupCommand.prototype.onExecute = function (/*event*/)
-{
+dwv.tool.ChangeGroupCommand.prototype.onExecute = function (/*event*/) {
     // default does nothing.
 };
 /**
  * Handle an undo event.
  * @param {Object} event The undo event with type and id.
  */
-dwv.tool.ChangeGroupCommand.prototype.onUndo = function (/*event*/)
-{
+dwv.tool.ChangeGroupCommand.prototype.onUndo = function (/*event*/) {
     // default does nothing.
 };
 
@@ -19326,6 +19504,7 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
     this.getName = function () { return "Delete-"+name; };
     /**
      * Execute the command.
+     * @fires dwv.tool.DeleteGroupCommand#draw-delete
      */
     this.execute = function () {
         // remove the group from its parent
@@ -19333,10 +19512,20 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onExecute({'type': 'draw-delete', 'id': group.id()});
+        /**
+         * Draw delete event.
+         * @event dwv.tool.DeleteGroupCommand#draw-delete
+         * @type {Object}
+         * @property {number} id The id of the create draw.
+         */
+        this.onExecute({
+            'type': 'draw-delete',
+            'id': group.id()
+        });
     };
     /**
      * Undo the command.
+     * @fires dwv.tool.DrawGroupCommand#draw-create
      */
     this.undo = function () {
         // add the group to its parent
@@ -19344,7 +19533,10 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onUndo({'type': 'draw-create', 'id': group.id()});
+        this.onUndo({
+            'type': 'draw-create',
+            'id': group.id()
+        });
     };
 }; // DeleteGroupCommand class
 
@@ -19352,16 +19544,14 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
  * Handle an execute event.
  * @param {Object} event The execute event with type and id.
  */
-dwv.tool.DeleteGroupCommand.prototype.onExecute = function (/*event*/)
-{
+dwv.tool.DeleteGroupCommand.prototype.onExecute = function (/*event*/) {
     // default does nothing.
 };
 /**
  * Handle an undo event.
  * @param {Object} event The undo event with type and id.
  */
-dwv.tool.DeleteGroupCommand.prototype.onUndo = function (/*event*/)
-{
+dwv.tool.DeleteGroupCommand.prototype.onUndo = function (/*event*/) {
     // default does nothing.
 };
 
@@ -22348,47 +22538,69 @@ dwv.tool.UndoStack = function ()
     /**
      * Add a command to the stack.
      * @param {Object} cmd The command to add.
+     * @fires dwv.tool.UndoStack#undo-add
      */
-    this.add = function(cmd)
-    {
+    this.add = function (cmd) {
         // clear commands after current index
         stack = stack.slice(0,curCmdIndex);
         // store command
         stack.push(cmd);
         // increment index
         ++curCmdIndex;
-        // fire undo add event
-        fireEvent({type: "undo-add", command: cmd.getName()});
+        /**
+         * Command add to undo stack event.
+         * @event dwv.tool.UndoStack#undo-add
+         * @type {Object}
+         * @property {string} command The name of the command added to the undo stack.
+         */
+        fireEvent({
+            type: "undo-add",
+            command: cmd.getName()
+        });
     };
 
     /**
      * Undo the last command.
+     * @fires dwv.tool.UndoStack#undo
      */
-    this.undo = function()
-    {
+    this.undo = function () {
         // a bit inefficient...
-        if( curCmdIndex > 0 )
-        {
+        if( curCmdIndex > 0 ) {
             // decrement command index
             --curCmdIndex;
             // undo last command
             stack[curCmdIndex].undo();
-            // fire add event
-            fireEvent({type: "undo", command: stack[curCmdIndex].getName()});
+            /**
+             * Command undo event.
+             * @event dwv.tool.UndoStack#undo
+             * @type {Object}
+             * @property {string} command The name of the undone command.
+             */
+            fireEvent({
+                type: "undo",
+                command: stack[curCmdIndex].getName()
+            });
         }
     };
 
     /**
      * Redo the last command.
+     * @fires dwv.tool.UndoStack#redo
      */
-    this.redo = function()
-    {
-        if( curCmdIndex < stack.length )
-        {
+    this.redo = function () {
+        if( curCmdIndex < stack.length ) {
             // run last command
             stack[curCmdIndex].execute();
-            // fire add event
-            fireEvent({type: "redo", command: stack[curCmdIndex].getName()});
+            /**
+             * Command redo event.
+             * @event dwv.tool.UndoStack#redo
+             * @type {Object}
+             * @property {string} command The name of the redone command.
+             */
+            fireEvent({
+                type: "redo",
+                command: stack[curCmdIndex].getName()
+            });
             // increment command index
             ++curCmdIndex;
         }
