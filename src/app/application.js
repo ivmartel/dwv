@@ -182,7 +182,8 @@ dwv.App = function ()
 
     /**
      * Add a command to the undo stack.
-     * @param {Object} The command to add.
+     * @param {Object} cmd The command to add.
+     * @fires dwv.tool.UndoStack#undo-add
      */
     this.addToUndoStack = function (cmd) {
         if ( undoStack !== null ) {
@@ -328,6 +329,8 @@ dwv.App = function ()
 
     /**
      * Reset the layout of the application.
+     * @fires dwv.App#zoom-change
+     * @fires dwv.App#offset-change
      */
     this.resetLayout = function () {
         var previousScale = scale;
@@ -347,11 +350,21 @@ dwv.App = function ()
         }
         // fire events
         if (previousScale != scale) {
-            fireEvent({"type": "zoom-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
+            fireEvent({
+                "type": "zoom-change",
+                "scale": scale,
+                "cx": scaleCenter.x,
+                "cy": scaleCenter.y
+            });
         }
         if ( (previousSC.x !== scaleCenter.x || previousSC.y !== scaleCenter.y) ||
              (previousTrans.x !== translation.x || previousTrans.y !== translation.y)) {
-            fireEvent({"type": "offset-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
+            fireEvent({
+                "type": "offset-change",
+                "scale": scale,
+                "cx": scaleCenter.x,
+                "cy": scaleCenter.y
+            });
         }
     };
 
@@ -721,6 +734,8 @@ dwv.App = function ()
      * - CRTL-ARROW_DOWN: previous slice
      * Default behavior. Usually used in tools.
      * @param {Object} event The key down event.
+     * @fires dwv.tool.UndoStack#undo
+     * @fires dwv.tool.UndoStack#redo
      */
     this.onKeydown = function (event)
     {
@@ -838,6 +853,7 @@ dwv.App = function ()
 
     /**
      * Undo the last action
+     * @fires dwv.tool.UndoStack#undo
      */
     this.undo = function () {
         undoStack.undo();
@@ -845,6 +861,7 @@ dwv.App = function ()
 
     /**
      * Redo the last action
+     * @fires dwv.tool.UndoStack#redo
      */
     this.redo = function () {
         undoStack.redo();
@@ -886,6 +903,7 @@ dwv.App = function ()
     /**
      * Apply the stored zoom to the layers.
      * @private
+     * @fires dwv.App#zoom-change
      */
     function zoomLayers()
     {
@@ -899,12 +917,26 @@ dwv.App = function ()
             drawController.zoomStage(scale, scaleCenter);
         }
         // fire event
-        fireEvent({"type": "zoom-change", "scale": scale, "cx": scaleCenter.x, "cy": scaleCenter.y });
+        /**
+         * Zoom change event.
+         * @event dwv.App#zoom-change
+         * @type {Object}
+         * @property {number} scale The new scale value.
+         * @property {number} cx The new rotaion center X position.
+         * @property {number} cx The new rotaion center Y position.
+         */
+        fireEvent({
+            "type": "zoom-change",
+            "scale": scale,
+            "cx": scaleCenter.x,
+            "cy": scaleCenter.y
+        });
     }
 
     /**
      * Apply the stored translation to the layers.
      * @private
+     * @fires dwv.App#offset-change
      */
     function translateLayers()
     {
@@ -919,8 +951,20 @@ dwv.App = function ()
                 drawController.translateStage(ox, oy);
             }
             // fire event
-            fireEvent({"type": "offset-change", "scale": scale,
-                "cx": imageLayer.getTrans().x, "cy": imageLayer.getTrans().y });
+            /**
+             * Offset change event.
+             * @event dwv.App#offset-change
+             * @type {Object}
+             * @property {number} scale The new scale value.
+             * @property {number} cx The new rotaion center X position.
+             * @property {number} cx The new rotaion center Y position.
+             */
+            fireEvent({
+                "type": "offset-change",
+                "scale": scale,
+                "cx": imageLayer.getTrans().x,
+                "cy": imageLayer.getTrans().y
+            });
         }
     }
 

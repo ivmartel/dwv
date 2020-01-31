@@ -59,6 +59,7 @@ dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
     this.getName = function () { return "Draw-"+name; };
     /**
      * Execute the command.
+     * @fires dwv.tool.DrawGroupCommand#draw-create
      */
     this.execute = function () {
         // add the group to the parent (in case of undo/redo)
@@ -67,11 +68,21 @@ dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
         layer.draw();
         // callback
         if (!isSilent) {
-            this.onExecute({'type': 'draw-create', 'id': group.id()});
+            /**
+             * Draw create event.
+             * @event dwv.tool.DrawGroupCommand#draw-create
+             * @type {Object}
+             * @property {number} id The id of the create draw.
+             */
+            this.onExecute({
+                'type': 'draw-create',
+                'id': group.id()
+            });
         }
     };
     /**
      * Undo the command.
+     * @fires dwv.tool.DeleteGroupCommand#draw-delete
      */
     this.undo = function () {
         // remove the group from the parent layer
@@ -79,7 +90,10 @@ dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
         // draw
         layer.draw();
         // callback
-        this.onUndo({'type': 'draw-delete', 'id': group.id()});
+        this.onUndo({
+            'type': 'draw-delete',
+            'id': group.id()
+        });
     };
 }; // DrawGroupCommand class
 
@@ -87,16 +101,14 @@ dwv.tool.DrawGroupCommand = function (group, name, layer, silent)
  * Handle an execute event.
  * @param {Object} event The execute event with type and id.
  */
-dwv.tool.DrawGroupCommand.prototype.onExecute = function (/*event*/)
-{
+dwv.tool.DrawGroupCommand.prototype.onExecute = function (/*event*/) {
     // default does nothing.
 };
 /**
  * Handle an undo event.
  * @param {Object} event The undo event with type and id.
  */
-dwv.tool.DrawGroupCommand.prototype.onUndo = function (/*event*/)
-{
+dwv.tool.DrawGroupCommand.prototype.onUndo = function (/*event*/) {
     // default does nothing.
 };
 
@@ -118,6 +130,7 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
 
     /**
      * Execute the command.
+     * @fires dwv.tool.MoveGroupCommand#draw-move
      */
     this.execute = function () {
         // translate group
@@ -125,10 +138,20 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
         // draw
         layer.draw();
         // callback
-        this.onExecute({'type': 'draw-move', 'id': group.id()});
+        /**
+         * Draw move event.
+         * @event dwv.tool.MoveGroupCommand#draw-move
+         * @type {Object}
+         * @property {number} id The id of the create draw.
+         */
+        this.onExecute({
+            'type': 'draw-move',
+            'id': group.id()
+        });
     };
     /**
      * Undo the command.
+     * @fires dwv.tool.MoveGroupCommand#draw-move
      */
     this.undo = function () {
         // invert translate group
@@ -137,7 +160,10 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
         // draw
         layer.draw();
         // callback
-        this.onUndo({'type': 'draw-move', 'id': group.id()});
+        this.onUndo({
+            'type': 'draw-move',
+            'id': group.id()
+        });
     };
 }; // MoveGroupCommand class
 
@@ -145,16 +171,14 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer)
  * Handle an execute event.
  * @param {Object} event The execute event with type and id.
  */
-dwv.tool.MoveGroupCommand.prototype.onExecute = function (/*event*/)
-{
+dwv.tool.MoveGroupCommand.prototype.onExecute = function (/*event*/) {
     // default does nothing.
 };
 /**
  * Handle an undo event.
  * @param {Object} event The undo event with type and id.
  */
-dwv.tool.MoveGroupCommand.prototype.onUndo = function (/*event*/)
-{
+dwv.tool.MoveGroupCommand.prototype.onUndo = function (/*event*/) {
     // default does nothing.
 };
 
@@ -178,6 +202,7 @@ dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, laye
 
     /**
      * Execute the command.
+     * @fires dwv.tool.ChangeGroupCommand#draw-change
      */
     this.execute = function () {
         // change shape
@@ -185,10 +210,18 @@ dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, laye
         // draw
         layer.draw();
         // callback
-        this.onExecute({'type': 'draw-change'});
+        /**
+         * Draw change event.
+         * @event dwv.tool.ChangeGroupCommand#draw-change
+         * @type {Object}
+         */
+        this.onExecute({
+            'type': 'draw-change'
+        });
     };
     /**
      * Undo the command.
+     * @fires dwv.tool.ChangeGroupCommand#draw-change
      */
     this.undo = function () {
         // invert change shape
@@ -196,7 +229,9 @@ dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, laye
         // draw
         layer.draw();
         // callback
-        this.onUndo({'type': 'draw-change'});
+        this.onUndo({
+            'type': 'draw-change'
+        });
     };
 }; // ChangeGroupCommand class
 
@@ -204,16 +239,14 @@ dwv.tool.ChangeGroupCommand = function (name, func, startAnchor, endAnchor, laye
  * Handle an execute event.
  * @param {Object} event The execute event with type and id.
  */
-dwv.tool.ChangeGroupCommand.prototype.onExecute = function (/*event*/)
-{
+dwv.tool.ChangeGroupCommand.prototype.onExecute = function (/*event*/) {
     // default does nothing.
 };
 /**
  * Handle an undo event.
  * @param {Object} event The undo event with type and id.
  */
-dwv.tool.ChangeGroupCommand.prototype.onUndo = function (/*event*/)
-{
+dwv.tool.ChangeGroupCommand.prototype.onUndo = function (/*event*/) {
     // default does nothing.
 };
 
@@ -236,6 +269,7 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
     this.getName = function () { return "Delete-"+name; };
     /**
      * Execute the command.
+     * @fires dwv.tool.DeleteGroupCommand#draw-delete
      */
     this.execute = function () {
         // remove the group from its parent
@@ -243,10 +277,20 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onExecute({'type': 'draw-delete', 'id': group.id()});
+        /**
+         * Draw delete event.
+         * @event dwv.tool.DeleteGroupCommand#draw-delete
+         * @type {Object}
+         * @property {number} id The id of the create draw.
+         */
+        this.onExecute({
+            'type': 'draw-delete',
+            'id': group.id()
+        });
     };
     /**
      * Undo the command.
+     * @fires dwv.tool.DrawGroupCommand#draw-create
      */
     this.undo = function () {
         // add the group to its parent
@@ -254,7 +298,10 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
         // draw
         layer.draw();
         // callback
-        this.onUndo({'type': 'draw-create', 'id': group.id()});
+        this.onUndo({
+            'type': 'draw-create',
+            'id': group.id()
+        });
     };
 }; // DeleteGroupCommand class
 
@@ -262,15 +309,13 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer)
  * Handle an execute event.
  * @param {Object} event The execute event with type and id.
  */
-dwv.tool.DeleteGroupCommand.prototype.onExecute = function (/*event*/)
-{
+dwv.tool.DeleteGroupCommand.prototype.onExecute = function (/*event*/) {
     // default does nothing.
 };
 /**
  * Handle an undo event.
  * @param {Object} event The undo event with type and id.
  */
-dwv.tool.DeleteGroupCommand.prototype.onUndo = function (/*event*/)
-{
+dwv.tool.DeleteGroupCommand.prototype.onUndo = function (/*event*/) {
     // default does nothing.
 };

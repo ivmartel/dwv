@@ -38,47 +38,69 @@ dwv.tool.UndoStack = function ()
     /**
      * Add a command to the stack.
      * @param {Object} cmd The command to add.
+     * @fires dwv.tool.UndoStack#undo-add
      */
-    this.add = function(cmd)
-    {
+    this.add = function (cmd) {
         // clear commands after current index
         stack = stack.slice(0,curCmdIndex);
         // store command
         stack.push(cmd);
         // increment index
         ++curCmdIndex;
-        // fire undo add event
-        fireEvent({type: "undo-add", command: cmd.getName()});
+        /**
+         * Command add to undo stack event.
+         * @event dwv.tool.UndoStack#undo-add
+         * @type {Object}
+         * @property {string} command The name of the command added to the undo stack.
+         */
+        fireEvent({
+            type: "undo-add",
+            command: cmd.getName()
+        });
     };
 
     /**
      * Undo the last command.
+     * @fires dwv.tool.UndoStack#undo
      */
-    this.undo = function()
-    {
+    this.undo = function () {
         // a bit inefficient...
-        if( curCmdIndex > 0 )
-        {
+        if( curCmdIndex > 0 ) {
             // decrement command index
             --curCmdIndex;
             // undo last command
             stack[curCmdIndex].undo();
-            // fire add event
-            fireEvent({type: "undo", command: stack[curCmdIndex].getName()});
+            /**
+             * Command undo event.
+             * @event dwv.tool.UndoStack#undo
+             * @type {Object}
+             * @property {string} command The name of the undone command.
+             */
+            fireEvent({
+                type: "undo",
+                command: stack[curCmdIndex].getName()
+            });
         }
     };
 
     /**
      * Redo the last command.
+     * @fires dwv.tool.UndoStack#redo
      */
-    this.redo = function()
-    {
-        if( curCmdIndex < stack.length )
-        {
+    this.redo = function () {
+        if( curCmdIndex < stack.length ) {
             // run last command
             stack[curCmdIndex].execute();
-            // fire add event
-            fireEvent({type: "redo", command: stack[curCmdIndex].getName()});
+            /**
+             * Command redo event.
+             * @event dwv.tool.UndoStack#redo
+             * @type {Object}
+             * @property {string} command The name of the redone command.
+             */
+            fireEvent({
+                type: "redo",
+                command: stack[curCmdIndex].getName()
+            });
             // increment command index
             ++curCmdIndex;
         }

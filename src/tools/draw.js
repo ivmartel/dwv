@@ -612,7 +612,10 @@ dwv.tool.Draw = function (app)
                     app.addToUndoStack(mvcmd);
 
                     // the move is handled by Konva, trigger an event manually
-                    fireEvent({'type': 'draw-move'});
+                    fireEvent({
+                        'type': 'draw-move',
+                        'id': this.id()
+                    });
                 }
                 // reset anchors
                 shapeEditor.setAnchorsActive(true);
@@ -650,7 +653,9 @@ dwv.tool.Draw = function (app)
             ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
 
             // trigger event
-            fireEvent({'type': 'draw-change'});
+            fireEvent({
+                'type': 'draw-change'
+            });
 
             // draw
             drawLayer.draw();
