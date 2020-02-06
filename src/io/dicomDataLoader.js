@@ -66,7 +66,7 @@ dwv.io.DicomDataLoader = function ()
             // reset loading flag
             isLoading = false;
             // call listeners
-            self.onloadend();
+            self.onloadend({type: "loadend"});
         };
         db2v.onprogress = self.onprogress;
         // convert
@@ -76,6 +76,7 @@ dwv.io.DicomDataLoader = function ()
             // TODO: error will be for individual file, isLoading is global...
             //isLoading = false;
             self.onerror(error);
+            self.onloadend();
         }
     };
 

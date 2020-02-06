@@ -100,7 +100,8 @@ dwv.App = function ()
      * @return {Boolean} True if the data only contains one frame.
      */
     this.isMonoFrameData = function () {
-        return this.getImage().getNumberOfFrames() === 1;
+        return (this.getImage() && typeof this.getImage() !== "undefined" &&
+            this.getImage().getNumberOfFrames() === 1);
     };
     /**
      * Can the data be scrolled?
@@ -258,17 +259,13 @@ dwv.App = function ()
 
         // create load controller
         loadController = new dwv.LoadController(config.defaultCharacterSet);
+        loadController.onloadstart = onloadstart;
+        loadController.onprogress = onprogress;
+        loadController.onloaditem = onloaditem;
         loadController.onload = onload;
         loadController.onloadend = onloadend;
-        loadController.onLoadImageDataSetup = onLoadImageDataSetup;
-        loadController.onLoadStateData = onLoadStateData;
-        loadController.addEventListener("load-start", fireEvent);
-        loadController.addEventListener("load-item-start", fireEvent);
-        loadController.addEventListener("load-slice", fireEvent);
-        loadController.addEventListener("load-progress", fireEvent);
-        loadController.addEventListener("load-end", fireEvent);
-        loadController.addEventListener("load-error", fireEvent);
-        loadController.addEventListener("load-abort", fireEvent);
+        loadController.onerror = onerror;
+        loadController.onabort = onabort;
 
         // listen to window resize
         window.onresize = onResize;
@@ -452,7 +449,7 @@ dwv.App = function ()
      * Abort the current load.
      */
     this.abortLoad = function () {
-        loadController.abortLoad();
+        loadController.abort();
     };
 
     // load API [end] ---------------------------------------------------------
@@ -995,43 +992,136 @@ dwv.App = function ()
     }
 
     /**
-     * Image data onload callback.
+     * Data load start callback.
+     * @param {ProgressEvent} event The load start event.
+     * @private
+     */
+    function onloadstart(event) {
+        if (event.loadtype === "image") {
+            self.reset();
+        }
+
+        /**
+         * Main load start event.
+         * @event dwv.LoadController#load-start
+         * @type {Object}
+         * @property {Object} event The original event.
+         */
+        fireEvent(event);
+    }
+
+    /**
+     * Data load error callback.
+     * @param {ProgressEvent} event The error event.
+     * @private
+     */
+    function onprogress(event) {
+        fireEvent(event);
+    }
+
+    /**
+     * Data load callback.
      * @param {Object} data The loaded data.
      * @private
      */
-    function onload(data) {
-        if ( image ) {
-            view.append( data.view );
+    function onloaditem(event) {
+        if (typeof event.data === "undefined") {
+            console.error("Missing data.");
         }
-        postLoadInit(data);
+        if (typeof event.loadtype === "undefined") {
+            console.error("Missing load type.");
+        }
+        if (event.loadtype === "image") {
+            if ( image ) {
+                view.append( event.data.view );
+            }
+            postLoadInit(event.data);
+        } else if (event.loadtype === "state") {
+            var state = new dwv.State();
+            state.apply( self, state.fromJSON(event.data) );
+        }
+
+        /**
+         * Load slice event.
+         * @event dwv.LoadController#load-slice
+         * @type {Object}
+         * @property {Object} event The original event.
+         */
+         console.log("app onloaditem", event);
+        fireEvent({
+            type: "load-item",
+            loadtype: event.loadtype,
+            data: event.data.info,
+            source: event.source
+        });
     }
 
     /**
-     * Image data onloadend callback.
+     * Data load callback.
+     * @param {Object} data The loaded data.
      * @private
      */
-    function onloadend() {
+    function onload(event) {
         if ( drawController ) {
             drawController.activateDrawLayer(viewController);
         }
+
+        /**
+         * Load slice event.
+         * @event dwv.LoadController#load-slice
+         * @type {Object}
+         * @property {Object} event The original event.
+         */
+        event.type = "load";
+        fireEvent(event);
     }
 
     /**
-     * Image data load setup callback.
+     * Data load end callback.
+     * @param {ProgressEvent} event The load end event.
      * @private
      */
-    function onLoadImageDataSetup() {
-        self.reset();
+    function onloadend(event) {
+        /**
+         * Main load end event.
+         * @event dwv.LoadController#load-end
+         * @type {Object}
+         * @property {Object} event The original event.
+         */
+        event.type = "load-end";
+        fireEvent(event);
     }
 
     /**
-     * State data onload callback.
-     * @param {Object} data The state data.
+     * Data load error callback.
+     * @param {ProgressEvent} event The error event.
      * @private
      */
-    function onLoadStateData(data) {
-        var state = new dwv.State();
-        state.apply( self, state.fromJSON(data) );
+    function onerror(event) {
+        /**
+         * Load error event.
+         * @event dwv.LoadController#load-error
+         * @type {Object}
+         * @property {Object} event The original event.
+         */
+        event.type = "load-error";
+        fireEvent(event);
+    }
+
+    /**
+     * Data load abort callback.
+     * @param {ProgressEvent} event The abort event.
+     * @private
+     */
+    function onabort(event) {
+        /**
+         * Load abort event.
+         * @event dwv.LoadController#load-abort
+         * @type {Object}
+         * @property {Object} event The original event.
+         */
+        event.type = "load-abort";
+        fireEvent(event);
     }
 
     /**
