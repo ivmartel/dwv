@@ -85,18 +85,16 @@ dwv.io.JSONTextLoader = function ()
      * @return {Function} A url load handler.
      */
     this.getUrlLoadHandler = function (url, index) {
-        return function (/*event*/) {
+        return function (event) {
             // check response status
             // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
             // status 200: "OK"; status 0: "debug"
-            if (this.status !== 200 && this.status !== 0) {
-                self.onerror({'name': "RequestError",
-                    'message': "Error status: " + this.status +
-                    " while loading '" + url + "' [JSONTextLoader]" });
-                return;
+            var status = event.target.status;
+            if (status !== 200 && status !== 0) {
+                self.onerror({target: event.target});
+            } else {
+                self.load(event.target.response, url, index);
             }
-            // load
-            self.load(this.responseText, url, index);
         };
     };
 
