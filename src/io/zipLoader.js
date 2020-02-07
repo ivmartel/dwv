@@ -61,8 +61,13 @@ dwv.io.ZipLoader = function ()
         // sent un-ziped progress with the data index
         // (max 50% to take into account the memory loading)
         var unzipPercent = files.length * 50 / zobjs.length;
-        self.onprogress({'type': 'read-progress', 'lengthComputable': true,
-            'loaded': unzipPercent, 'total': 100, 'index': index});
+        self.onprogress({
+            'type': 'load-progress',
+            'lengthComputable': true,
+            'loaded': unzipPercent,
+            'total': 100,
+            'index': index
+        });
 
         // recursively call until we have all the files
         if (files.length < zobjs.length) {
@@ -73,13 +78,7 @@ dwv.io.ZipLoader = function ()
             });
         } else {
             var memoryIO = new dwv.io.MemoryLoader();
-            memoryIO.onload = self.onload;
-            memoryIO.onloadend = function () {
-                // reset loading flag
-                isLoading = false;
-                // call listeners
-                self.onloadend();
-            };
+            // memoryIO.onloadstart: nothing to do
             memoryIO.onprogress = function (progress) {
                 // add 50% to take into account the un-zipping
                 progress.loaded = 50 + progress.loaded / 2;
@@ -87,9 +86,16 @@ dwv.io.ZipLoader = function ()
                 progress.index = index;
                 self.onprogress(progress);
             };
+            memoryIO.onload = self.onload;
+            memoryIO.onloadend = function (event) {
+                // reset loading flag
+                isLoading = false;
+                // call listeners
+                self.onloadend(event);
+            };
             memoryIO.onerror = self.onerror;
             memoryIO.onabort = self.onabort;
-
+            // launch
             memoryIO.load(files);
         }
     }
@@ -101,6 +107,8 @@ dwv.io.ZipLoader = function ()
      * @param {Number} index The data index.
      */
     this.load = function (buffer, origin, index) {
+        // send start event
+        this.onloadstart({type: "load-start"});
         // set loading flag
         isLoading = true;
 
@@ -123,7 +131,7 @@ dwv.io.ZipLoader = function ()
         // reset loading flag
         isLoading = false;
         // call listeners
-        self.onabort();
+        self.onabort({type: "load-abort"});
     };
 
     /**
@@ -200,34 +208,40 @@ dwv.io.ZipLoader.prototype.loadUrlAs = function () {
 };
 
 /**
- * Handle a load event.
- * @param {Object} event The load event, 'event.target'
- *  should be the loaded data.
+ * Handle a load start event.
+ * @param {Object} event The load start event.
  * Default does nothing.
  */
-dwv.io.ZipLoader.prototype.onload = function (/*event*/) {};
+dwv.io.ZipLoader.prototype.onloadstart = function (/*event*/) {};
 /**
- * Handle an load end event.
- * Default does nothing.
- */
-dwv.io.ZipLoader.prototype.onloadend = function () {};
-/**
- * Handle a progress event.
+ * Handle a load progress event.
  * @param {Object} event The progress event.
  * Default does nothing.
  */
 dwv.io.ZipLoader.prototype.onprogress = function (/*event*/) {};
 /**
+ * Handle a load event.
+ * @param {Object} event The load event fired
+ *   when a file has been loaded successfully.
+ * Default does nothing.
+ */
+dwv.io.ZipLoader.prototype.onload = function (/*event*/) {};
+/**
+ * Handle an load end event.
+ * @param {Object} event The load end event fired
+ *  when a file load has completed, successfully or not.
+ * Default does nothing.
+ */
+dwv.io.ZipLoader.prototype.onloadend = function (/*event*/) {};
+/**
  * Handle an error event.
- * @param {Object} event The error event with an
- *  optional 'event.message'.
+ * @param {Object} event The error event.
  * Default does nothing.
  */
 dwv.io.ZipLoader.prototype.onerror = function (/*event*/) {};
 /**
  * Handle an abort event.
- * @param {Object} event The abort event with an
- *  optional 'event.message'.
+ * @param {Object} event The abort event.
  * Default does nothing.
  */
 dwv.io.ZipLoader.prototype.onabort = function (/*event*/) {};
