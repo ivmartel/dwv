@@ -5,8 +5,7 @@ dwv.io = dwv.io || {};
 // url content types
 dwv.io.urlContentTypes = {
     'Text': 0,
-    'ArrayBuffer': 1,
-    'oups': 2
+    'ArrayBuffer': 1
 };
 
 /**
@@ -23,14 +22,14 @@ dwv.io.UrlsLoader = function ()
     var self = this;
 
     /**
-     * Array of launched requests used in abort.
+     * Array of launched requests (used in abort).
      * @private
      * @type Array
      */
     var requests = [];
 
     /**
-     * Launched loader used in abort.
+     * Launched loader (used in abort).
      * @private
      * @type Object
      */
@@ -47,7 +46,13 @@ dwv.io.UrlsLoader = function ()
      * @private
      * @type Number
      */
-    var nLoaded = 0;
+    var nLoad = 0;
+    /**
+     * Number of load end events.
+     * @private
+     * @type Number
+     */
+    var nLoadend = 0;
 
     /**
      * The default character set (optional).
@@ -88,7 +93,7 @@ dwv.io.UrlsLoader = function ()
     };
 
     /**
-     * Store a launched loader.
+     * Store the launched loader.
      * @param {Object} loader The launched loader.
      */
     this.storeLoader = function (loader) {
@@ -115,7 +120,7 @@ dwv.io.UrlsLoader = function ()
         }
         this.clearStoredRequests();
         // abort loader
-        if ( runningLoader && runningLoader.isLoading() ) {
+        if (runningLoader && runningLoader.isLoading()) {
             runningLoader.abort();
         }
         this.clearStoredLoader();
@@ -127,53 +132,45 @@ dwv.io.UrlsLoader = function ()
      */
     this.setNToLoad = function (n) {
         nToLoad = n;
+        // reset counters
+        nLoad = 0;
+        nLoadend = 0;
     };
 
     /**
      * Increment the number of loaded data
-     * and call onloadend if loaded all data.
+     *   and call onload if loaded all data.
      */
-    this.addLoaded = function () {
-        nLoaded++;
-        if ( nLoaded === nToLoad ) {
-            self.onloadend();
+    this.addLoad = function (data) {
+        self.onloaditem({
+            type: "load-item",
+            data: data,
+            source: data.source
+        });
+        nLoad++;
+        // call onload when all is loaded
+        if ( nLoad === nToLoad ) {
+            self.onload({
+                type: "load"
+            });
         }
     };
 
-}; // class Url
+    /**
+     * Increment the counter of load end events
+     * and run callbacks.
+     */
+    this.addLoadend = function (event) {
+        nLoadend++;
+        // call onloadend when all is run
+        if ( nLoadend === nToLoad ) {
+            self.onloadend({
+                type: "load-end"
+            });
+        }
+    };
 
-/**
- * Handle a load event.
- * @param {Object} event The load event, 'event.target'
- *  should be the loaded data.
- * Default does nothing.
- */
-dwv.io.UrlsLoader.prototype.onload = function (/*event*/) {};
-/**
- * Handle a load end event.
- * Default does nothing.
- */
-dwv.io.UrlsLoader.prototype.onloadend = function () {};
-/**
- * Handle a progress event.
- * @param {Object} event The progress event.
- * Default does nothing.
- */
-dwv.io.UrlsLoader.prototype.onprogress = function (/*event*/) {};
-/**
- * Handle an error event.
- * @param {Object} event The error event with an
- *  optional 'event.message'.
- * Default does nothing.
- */
-dwv.io.UrlsLoader.prototype.onerror = function (/*event*/) {};
-/**
- * Handle an abort event.
- * @param {Object} event The abort event with an
- *  optional 'event.message'.
- * Default does nothing.
- */
-dwv.io.UrlsLoader.prototype.onabort = function (/*event*/) {};
+}; // class UrlsLoader
 
 /**
  * Load a list of URLs.
@@ -182,24 +179,17 @@ dwv.io.UrlsLoader.prototype.onabort = function (/*event*/) {};
  */
 dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
 {
-    // request onerror handler
-    var getRequestOnError = function (origin) {
-        return function (/*event*/) {
-            var message = "An error occurred while downloading '" + origin + "'";
-            if (typeof this.status !== "undefined") {
-                message += " (http status: " + this.status + ")";
-            }
-            message += ".";
-            self.onerror( {'name': "RequestError", 'message': message } );
-        };
-    };
+    this.onloadstart({
+        type: "load-start",
+        source: ioArray
+    });
 
-    // request onabort handler
-    var getRequestOnAbort = function (origin) {
-        return function () {
-            self.onabort( {'message': "Abort while downloading '" + origin + "'." } );
-        };
-    };
+    var augmentCallbackEvent = function (callback, source) {
+        return function (event) {
+            event.source = source;
+            callback(event);
+        }
+    }
 
     // clear storage
     this.clearStoredRequests();
@@ -216,7 +206,7 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
         var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
         mproghandler.setNToLoad( urlsArray.length );
 
-        // get loaders
+        // create loaders
         var loaders = [];
         for (var m = 0; m < dwv.io.loaderList.length; ++m) {
             loaders.push( new dwv.io[dwv.io.loaderList[m]]() );
@@ -226,10 +216,6 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
         var loader = null;
         for (var k = 0; k < loaders.length; ++k) {
             loader = loaders[k];
-            loader.onload = self.onload;
-            loader.onloadend = self.addLoaded;
-            loader.onerror = self.onerror;
-            loader.onabort = self.onabort;
             loader.setOptions({
                 'defaultCharacterSet': self.getDefaultCharacterSet()
             });
@@ -272,17 +258,26 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
                 loader = loaders[l];
                 if (loader.canLoadUrl(url)) {
                     foundLoader = true;
+
+                    loader.onload = augmentCallbackEvent(self.addLoad, url);
+                    loader.onloadend = augmentCallbackEvent(self.addLoadend, url);
+                    loader.onerror = augmentCallbackEvent(self.onerror, url);
+                    loader.onabort = augmentCallbackEvent(self.onabort, url);
+
                     // store loader
                     self.storeLoader(loader);
-                    // set reader callbacks
+
+                    // set request callbacks
+                    // request.onloadstart: nothing to do
                     request.onload = loader.getUrlLoadHandler(url, i);
-                    request.onerror = getRequestOnError(url);
-                    request.onabort = getRequestOnAbort(url);
+                    // request.onloadend: nothing to do
+                    request.onerror = augmentCallbackEvent(self.onerror, url);
+                    request.onabort = augmentCallbackEvent(self.onabort, url);
                     // response type (default is 'text')
                     if (loader.loadUrlAs() === dwv.io.urlContentTypes.ArrayBuffer) {
                         request.responseType = "arraybuffer";
                     }
-                    // read
+                    // send request
                     request.send(null);
                     // next file
                     break;
@@ -315,8 +310,9 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
             }
             internalUrlsLoad(fullUrls);
         };
-        dirRequest.onerror = getRequestOnError(dicomDirUrl);
-        dirRequest.onabort = getRequestOnAbort(dicomDirUrl);
+        dirRequest.onerror = augmentCallbackEvent(self.onerror, dicomDirUrl);
+        dirRequest.onabort = augmentCallbackEvent(self.onabort, dicomDirUrl);
+        // send request
         dirRequest.send(null);
     };
 
@@ -329,3 +325,49 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
         internalUrlsLoad(ioArray);
     }
 };
+
+/**
+ * Handle a load start event.
+ * @param {Object} event The load start event.
+ * Default does nothing.
+ */
+dwv.io.UrlsLoader.prototype.onloadstart = function (/*event*/) {};
+/**
+ * Handle a load progress event.
+ * @param {Object} event The progress event.
+ * Default does nothing.
+ */
+dwv.io.UrlsLoader.prototype.onprogress = function (/*event*/) {};
+/**
+ * Handle a load item event.
+ * @param {Object} event The load event fired
+ *   when a file has been loaded successfully.
+ * Default does nothing.
+ */
+dwv.io.UrlsLoader.prototype.onloaditem = function (/*event*/) {};
+/**
+ * Handle a load event.
+ * @param {Object} event The load event fired
+ *   when a file has been loaded successfully.
+ * Default does nothing.
+ */
+dwv.io.UrlsLoader.prototype.onload = function (/*event*/) {};
+/**
+ * Handle a load end event.
+ * @param {Object} event The load event, 'event.target'
+ *  should be the loaded data.
+ * Default does nothing.
+ */
+dwv.io.UrlsLoader.prototype.onloadend = function (/*event*/) {};
+/**
+ * Handle an error event.
+ * @param {Object} event The error event.
+ * Default does nothing.
+ */
+dwv.io.UrlsLoader.prototype.onerror = function (/*event*/) {};
+/**
+ * Handle an abort event.
+ * @param {Object} event The abort event.
+ * Default does nothing.
+ */
+dwv.io.UrlsLoader.prototype.onabort = function (/*event*/) {};

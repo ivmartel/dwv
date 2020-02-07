@@ -35,7 +35,7 @@ dwv.io.FilesLoader = function ()
      * @private
      * @type Object
      */
-    var runningLoader = [];
+    var runningLoader = null;
 
     /**
      * Number of data to load.
@@ -122,7 +122,7 @@ dwv.io.FilesLoader = function ()
         }
         this.clearStoredReaders();
         // abort loader
-        if ( runningLoader ) {
+        if (runningLoader && runningLoader.isLoading()) {
             runningLoader.abort();
         }
         this.clearStoredLoader();
@@ -134,11 +134,14 @@ dwv.io.FilesLoader = function ()
      */
     this.setNToLoad = function (n) {
         nToLoad = n;
+        // reset counters
+        nLoad = 0;
+        nLoadend = 0;
     };
 
     /**
      * Increment the number of loaded data
-     * and run callbacks.
+     *   and call onload if loaded all data.
      */
     this.addLoad = function (data) {
         self.onloaditem({
@@ -149,7 +152,9 @@ dwv.io.FilesLoader = function ()
         nLoad++;
         // call onload when all is loaded
         if ( nLoad === nToLoad ) {
-            self.onload({type: "load"});
+            self.onload({
+                type: "load"
+            });
         }
     };
 
@@ -161,52 +166,13 @@ dwv.io.FilesLoader = function ()
         nLoadend++;
         // call onloadend when all is run
         if ( nLoadend === nToLoad ) {
-            self.onloadend({type: "load-end"});
+            self.onloadend({
+                type: "load-end"
+            });
         }
     };
 
-}; // class File
-
-dwv.io.FilesLoader.prototype.onloadstart = function (/*event*/) {};
-/**
- * Handle a load item start event.
- * @param {Object} event The load event, 'event.target'
- *  should be the loaded data.
- * Default does nothing.
- */
-dwv.io.FilesLoader.prototype.onloaditem = function (/*event*/) {};
-/**
- * Handle a load event.
- * @param {Object} event The load event, 'event.target'
- *  should be the loaded data.
- * Default does nothing.
- */
-dwv.io.FilesLoader.prototype.onload = function (/*event*/) {};
-/**
- * Handle a load end event.
- * Default does nothing.
- */
-dwv.io.FilesLoader.prototype.onloadend = function () {};
-/**
- * Handle a progress event.
- * @param {Object} event The progress event.
- * Default does nothing.
- */
-dwv.io.FilesLoader.prototype.onprogress = function (/*event*/) {};
-/**
- * Handle an error event.
- * @param {Object} event The error event with an
- *  optional 'event.message'.
- * Default does nothing.
- */
-dwv.io.FilesLoader.prototype.onerror = function (/*event*/) {};
-/**
- * Handle an abort event.
- * @param {Object} event The abort event with an
- *  optional 'event.message'.
- * Default does nothing.
- */
-dwv.io.FilesLoader.prototype.onabort = function (/*event*/) {};
+}; // class FileLoader
 
 /**
  * Load a list of files.
@@ -225,15 +191,14 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
 
     // closure to self for handlers
     var self = this;
+
     // set the number of data to load
     this.setNToLoad( ioArray.length );
-    nLoad = 0;
-    nLoadend = 0;
 
     var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
     mproghandler.setNToLoad( ioArray.length );
 
-    // get loaders
+    // create loaders
     var loaders = [];
     for (var m = 0; m < dwv.io.loaderList.length; ++m) {
         loaders.push( new dwv.io[dwv.io.loaderList[m]]() );
@@ -243,11 +208,6 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
     var loader = null;
     for (var k = 0; k < loaders.length; ++k) {
         loader = loaders[k];
-        //loader.onloadstart = self.onloadstart;
-        /*loader.onload = self.addLoad;
-        loader.onloadend = self.addLoadend;
-        loader.onerror = self.onerror;
-        loader.onabort = self.onabort;*/
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
         });
@@ -290,21 +250,13 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
                 loader.onerror = augmentCallbackEvent(self.onerror, file);
                 loader.onabort = augmentCallbackEvent(self.onabort, file);
 
-                //
-                //this.onloaditemstart({
-                //    item: file,
-                //    loader: loader
-                //});
                 // store loader
                 this.storeLoader(loader);
+
                 // set reader callbacks
-                reader.onloadstart = function (event) {
-                    //console.log("reader.onloadstart", event);
-                }
+                // reader.onloadstart: nothing to do
                 reader.onload = loader.getFileLoadHandler(file, i);
-                reader.onloadend = function (event) {
-                    //console.log("reader.onloadend", event);
-                }
+                // reader.onloadend: nothing to do
                 reader.onerror = augmentCallbackEvent(self.onerror, file);
                 reader.onabort = augmentCallbackEvent(self.onabort, file);
                 // read
@@ -324,4 +276,50 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
             throw new Error("No loader found for file: "+file);
         }
     }
-};
+}; // class FilesLoader
+
+/**
+ * Handle a load start event.
+ * @param {Object} event The load start event.
+ * Default does nothing.
+ */
+dwv.io.FilesLoader.prototype.onloadstart = function (/*event*/) {};
+/**
+ * Handle a load progress event.
+ * @param {Object} event The progress event.
+ * Default does nothing.
+ */
+dwv.io.FilesLoader.prototype.onprogress = function (/*event*/) {};
+/**
+ * Handle a load item event.
+ * @param {Object} event The load event fired
+ *   when a file has been loaded successfully.
+ * Default does nothing.
+ */
+dwv.io.FilesLoader.prototype.onloaditem = function (/*event*/) {};
+/**
+ * Handle a load event.
+ * @param {Object} event The load event fired
+ *   when a file has been loaded successfully.
+ * Default does nothing.
+ */
+dwv.io.FilesLoader.prototype.onload = function (/*event*/) {};
+/**
+ * Handle a load end event.
+ * @param {Object} event The load event, 'event.target'
+ *  should be the loaded data.
+ * Default does nothing.
+ */
+dwv.io.FilesLoader.prototype.onloadend = function (/*event*/) {};
+/**
+ * Handle an error event.
+ * @param {Object} event The error event.
+ * Default does nothing.
+ */
+dwv.io.FilesLoader.prototype.onerror = function (/*event*/) {};
+/**
+ * Handle an abort event.
+ * @param {Object} event The abort event.
+ * Default does nothing.
+ */
+dwv.io.FilesLoader.prototype.onabort = function (/*event*/) {};
