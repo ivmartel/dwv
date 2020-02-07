@@ -993,7 +993,7 @@ dwv.App = function ()
 
     /**
      * Data load start callback.
-     * @param {ProgressEvent} event The load start event.
+     * @param {Object} event The load start event.
      * @private
      */
     function onloadstart(event) {
@@ -1012,7 +1012,7 @@ dwv.App = function ()
 
     /**
      * Data load error callback.
-     * @param {ProgressEvent} event The error event.
+     * @param {Object} event The error event.
      * @private
      */
     function onprogress(event) {
@@ -1047,18 +1047,17 @@ dwv.App = function ()
          * @type {Object}
          * @property {Object} event The original event.
          */
-         console.log("app onloaditem", event);
         fireEvent({
             type: "load-item",
-            loadtype: event.loadtype,
             data: event.data.info,
-            source: event.source
+            source: event.source,
+            loadtype: event.loadtype
         });
     }
 
     /**
      * Data load callback.
-     * @param {Object} data The loaded data.
+     * @param {Object} event The load event.
      * @private
      */
     function onload(event) {
@@ -1078,7 +1077,7 @@ dwv.App = function ()
 
     /**
      * Data load end callback.
-     * @param {ProgressEvent} event The load end event.
+     * @param {Object} event The load end event.
      * @private
      */
     function onloadend(event) {
@@ -1094,7 +1093,7 @@ dwv.App = function ()
 
     /**
      * Data load error callback.
-     * @param {ProgressEvent} event The error event.
+     * @param {Object} event The error event.
      * @private
      */
     function onerror(event) {
@@ -1110,7 +1109,7 @@ dwv.App = function ()
 
     /**
      * Data load abort callback.
-     * @param {ProgressEvent} event The abort event.
+     * @param {Object} event The abort event.
      * @private
      */
     function onabort(event) {
