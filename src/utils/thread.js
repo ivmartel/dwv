@@ -56,7 +56,7 @@ dwv.utils.ThreadPool = function (poolSize) {
      */
     this.abort = function () {
         // stop all threads
-        this.stop();
+        stop();
         // callback
         this.onabort({type: "work-abort"});
         this.onworkend({type: "work-end"});
@@ -95,7 +95,7 @@ dwv.utils.ThreadPool = function (poolSize) {
      */
     this.handleWorkerError = function (event) {
         // stop all threads
-        this.stop();
+        stop();
         // callback
         this.onerror(event);
         this.onworkend({type: "work-end"});
@@ -220,7 +220,7 @@ dwv.utils.WorkerThread = function (parentPool) {
      */
     function onmessage(event) {
         // pass to task
-        runningTask.callback(event)
+        runningTask.callback(event);
         // stop the worker and free the thread
         self.stop();
     }

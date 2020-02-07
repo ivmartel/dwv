@@ -162,7 +162,7 @@ dwv.io.FilesLoader = function ()
      * Increment the counter of load end events
      * and run callbacks.
      */
-    this.addLoadend = function (event) {
+    this.addLoadend = function (/*event*/) {
         nLoadend++;
         // call onloadend when all is run
         if ( nLoadend === nToLoad ) {
@@ -218,8 +218,8 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
         return function (event) {
             event.source = source;
             callback(event);
-        }
-    }
+        };
+    };
 
     // loop on I/O elements
     for (var i = 0; i < ioArray.length; ++i)

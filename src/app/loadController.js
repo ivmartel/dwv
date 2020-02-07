@@ -173,7 +173,7 @@ dwv.LoadController = function (defaultCharacterSet)
             currentLoader = loader;
             // callback
             augmentCallbackEvent(self.onloadstart, loadtype)(event);
-        }
+        };
         loader.onprogress = augmentCallbackEvent(self.onprogress, loadtype);
         loader.onloaditem = augmentCallbackEvent(self.onloaditem, loadtype);
         loader.onload = augmentCallbackEvent(self.onload, loadtype);

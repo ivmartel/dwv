@@ -160,7 +160,7 @@ dwv.io.UrlsLoader = function ()
      * Increment the counter of load end events
      * and run callbacks.
      */
-    this.addLoadend = function (event) {
+    this.addLoadend = function (/*event*/) {
         nLoadend++;
         // call onloadend when all is run
         if ( nLoadend === nToLoad ) {
@@ -188,8 +188,8 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
         return function (event) {
             event.source = source;
             callback(event);
-        }
-    }
+        };
+    };
 
     // clear storage
     this.clearStoredRequests();

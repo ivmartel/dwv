@@ -122,7 +122,7 @@ dwv.io.MemoryLoader = function ()
      * Increment the counter of load end events
      * and run callbacks.
      */
-    this.addLoadend = function (event) {
+    this.addLoadend = function (/*event*/) {
         nLoadend++;
         // call onloadend when all is run
         if ( nLoadend === nToLoad ) {
