@@ -69,55 +69,6 @@ dwv.LoadController = function (defaultCharacterSet)
     };
 
     /**
-     * load start event callback.
-     * @param {Object} event The load start event.
-     */
-    this.onloadstart = function (/*event*/) {
-        // default does nothing.
-    };
-
-    /**
-     * Progress event callback.
-     * @param {Object} event The progress event.
-     */
-    this.onprogress = function (/*event*/) {
-        // default does nothing.
-    };
-
-    /**
-     * Load callback.
-     * @param {Object} event The load event.
-     */
-    this.onload = function (/*event*/) {
-        // default does nothing.
-    };
-
-    /**
-     * Load end callback.
-     * @param {Object} event The load end event.
-     */
-    this.onloadend = function (/*event*/) {
-        // default does nothing.
-    };
-
-    /**
-     * Error callback.
-     * @param {Object} event The error event.
-     */
-    this.onerror = function (/*event*/) {
-        // default does nothing.
-    };
-
-    /**
-     * Abort callback.
-     * @param {Object} event The abort event.
-     */
-    this.onabort = function (/*event*/) {
-        // default does nothing.
-    };
-
-
-    /**
      * Is the data mono-slice?
      * @return {Boolean} True if the data only contains one slice.
      */
@@ -223,7 +174,7 @@ dwv.LoadController = function (defaultCharacterSet)
             // callback
             augmentCallbackEvent(self.onloadstart, loadtype)(event);
         }
-        loader.onprogress = self.onprogress;
+        loader.onprogress = augmentCallbackEvent(self.onprogress, loadtype);
         loader.onloaditem = augmentCallbackEvent(self.onloaditem, loadtype);
         loader.onload = augmentCallbackEvent(self.onload, loadtype);
         loader.onloadend = function (event) {
@@ -233,8 +184,8 @@ dwv.LoadController = function (defaultCharacterSet)
             // callback
             augmentCallbackEvent(self.onloadend, loadtype)(event);
         };
-        loader.onerror = self.onerror;
-        loader.onabort = self.onabort;
+        loader.onerror = augmentCallbackEvent(self.onerror, loadtype);
+        loader.onabort = augmentCallbackEvent(self.onabort, loadtype);
         // launch load
         loader.load(data, options);
     }
@@ -273,4 +224,43 @@ dwv.LoadController = function (defaultCharacterSet)
         };
     }
 
-};
+}; // class LoadController
+
+/**
+ * Handle a load start event.
+ * @param {Object} event The load start event.
+ * Default does nothing.
+ */
+dwv.LoadController.prototype.onloadstart = function (/*event*/) {};
+/**
+ * Handle a load progress event.
+ * @param {Object} event The progress event.
+ * Default does nothing.
+ */
+dwv.LoadController.prototype.onprogress = function (/*event*/) {};
+/**
+ * Handle a load event.
+ * @param {Object} event The load event fired
+ *   when a file has been loaded successfully.
+ * Default does nothing.
+ */
+dwv.LoadController.prototype.onload = function (/*event*/) {};
+/**
+ * Handle a load end event.
+ * @param {Object} event The load end event fired
+ *  when a file load has completed, successfully or not.
+ * Default does nothing.
+ */
+dwv.LoadController.prototype.onloadend = function (/*event*/) {};
+/**
+ * Handle an error event.
+ * @param {Object} event The error event.
+ * Default does nothing.
+ */
+dwv.LoadController.prototype.onerror = function (/*event*/) {};
+/**
+ * Handle an abort event.
+ * @param {Object} event The abort event.
+ * Default does nothing.
+ */
+dwv.LoadController.prototype.onabort = function (/*event*/) {};
