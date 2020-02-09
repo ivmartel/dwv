@@ -52,11 +52,11 @@ dwv.io.RawImageLoader = function ()
 
     /**
      * Load data.
-     * @param {Object} dataUri The data URI.
+     * @param {Object} buffer The read data.
      * @param {String} origin The data origin.
      * @param {Number} index The data index.
      */
-    this.load = function ( dataUri, origin, index ) {
+    this.load = function ( buffer, origin, index ) {
         aborted = false;
         // create a DOM image
         var image = new Image();
@@ -76,7 +76,13 @@ dwv.io.RawImageLoader = function ()
         // storing values to pass them on
         image.origin = origin;
         image.index = index;
-        image.src = dataUri;
+        if (typeof origin === "string") {
+            // url case
+            var ext = origin.split('.').pop().toLowerCase();
+            image.src = createDataUri(buffer, ext);
+        } else {
+            image.src = buffer;
+        }
     };
 
     /**

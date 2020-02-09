@@ -49,14 +49,20 @@ dwv.io.RawVideoLoader = function ()
 
     /**
      * Internal Data URI load.
-     * @param {Object} dataUri The data URI.
+     * @param {Object} buffer The read data.
      * @param {String} origin The data origin.
      * @param {Number} index The data index.
      */
-    this.load = function ( dataUri, origin, index ) {
+    this.load = function ( buffer, origin, index ) {
         // create a DOM video
         var video = document.createElement('video');
-        video.src = dataUri;
+        if (typeof origin === "string") {
+            // url case
+            var ext = origin.split('.').pop().toLowerCase();
+            video.src = createDataUri(buffer, ext);
+        } else {
+            video.src = buffer;
+        }
         // storing values to pass them on
         video.file = origin;
         video.index = index;
