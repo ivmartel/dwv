@@ -87,39 +87,6 @@ dwv.io.RawImageLoader = function ()
         self.onabort();
     };
 
-    /**
-     * Get a file load handler.
-     * @param {Object} file The file to load.
-     * @param {Number} index The index 'id' of the file.
-     * @return {Function} A file load handler.
-     */
-    this.getFileLoadHandler = function (file, index) {
-        return function (event) {
-            self.load(event.target.result, file, index);
-        };
-    };
-
-    /**
-     * Get a url load handler.
-     * @param {String} url The url to load.
-     * @param {Number} index The index 'id' of the url.
-     * @return {Function} A url load handler.
-     */
-    this.getUrlLoadHandler = function (url, index) {
-        return function (event) {
-            // check response status
-            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
-            // status 200: "OK"; status 0: "debug"
-            var status = event.target.status;
-            if (status !== 200 && status !== 0) {
-                self.onerror({target: event.target});
-            } else {
-              var ext = url.split('.').pop().toLowerCase();
-              self.load(createDataUri(event.target.response, ext), url, index);
-            }
-        };
-    };
-
 }; // class RawImageLoader
 
 /**

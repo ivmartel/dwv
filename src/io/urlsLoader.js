@@ -191,6 +191,21 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
         };
     };
 
+    var getLoadHandler = function (loader, url, i) {
+        return function (event) {
+            // check response status
+            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
+            // status 200: "OK"; status 0: "debug"
+            var status = event.target.status;
+            if (status !== 200 && status !== 0) {
+                self.onerror({source: url});
+                self.onloadend({source: url});
+            } else {
+                loader.load(event.target.response, url, i);
+            }
+        };
+    };
+
     // clear storage
     this.clearStoredRequests();
     this.clearStoredLoader();
@@ -269,7 +284,7 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
 
                     // set request callbacks
                     // request.onloadstart: nothing to do
-                    request.onload = loader.getUrlLoadHandler(url, i);
+                    request.onload = getLoadHandler(loader, url, i);
                     // request.onloadend: nothing to do
                     request.onerror = augmentCallbackEvent(self.onerror, url);
                     request.onabort = augmentCallbackEvent(self.onabort, url);

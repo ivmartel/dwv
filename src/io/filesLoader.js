@@ -221,6 +221,12 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
         };
     };
 
+    var getLoadHandler = function (loader, file, i) {
+        return function (event) {
+            loader.load(event.target.result, file, i);
+        };
+    };
+
     // loop on I/O elements
     for (var i = 0; i < ioArray.length; ++i)
     {
@@ -255,7 +261,7 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
 
                 // set reader callbacks
                 // reader.onloadstart: nothing to do
-                reader.onload = loader.getFileLoadHandler(file, i);
+                reader.onload = getLoadHandler(loader, file, i);
                 // reader.onloadend: nothing to do
                 reader.onerror = augmentCallbackEvent(self.onerror, file);
                 reader.onabort = augmentCallbackEvent(self.onabort, file);
