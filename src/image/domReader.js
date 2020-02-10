@@ -62,7 +62,7 @@ dwv.image.getDefaultView = function (
 /**
  * Get data from an input image using a canvas.
  * @param {Object} image The DOM Image.
- * @return {Mixed} The corresponding view and info.
+ * @return {Object} A load data event.
  */
 dwv.image.getViewFromDOMImage = function (image)
 {
@@ -100,7 +100,12 @@ dwv.image.getViewFromDOMImage = function (image)
         width, height, sliceIndex, [imageBuffer], 1, sliceIndex);
 
     // return
-    return {"view": view, "info": info};
+    return {
+      "data": {
+        "view": view,
+        "info": info
+      }
+    };
 };
 
 /**
@@ -167,7 +172,12 @@ dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, cbonloade
             view = dwv.image.getDefaultView(
                 width, height, 1, [imgBuffer], numberOfFrames, dataIndex);
             // call callback
-            callback( {"view": view, "info": info } );
+            callback({
+              "data": {
+                "view": view,
+                "info": info
+              }
+            });
         } else {
             view.appendFrameBuffer(imgBuffer);
         }

@@ -139,13 +139,13 @@ dwv.io.UrlsLoader = function ()
 
     /**
     * Launch a load item event and call addLoad.
-     * @param {Object} data The load data.
+     * @param {Object} event The load data event.
      */
-    this.addLoadItem = function (data) {
+    this.addLoadItem = function (event) {
         self.onloaditem({
             type: "load-item",
-            data: data,
-            source: data.source
+            data: event.data,
+            source: event.source
         });
         self.addLoad();
     };
@@ -153,9 +153,9 @@ dwv.io.UrlsLoader = function ()
     /**
      * Increment the number of loaded data
      *   and call onload if loaded all data.
-     * @param {Object} data The load data.
+     * @param {Object} event The load data event.
      */
-    this.addLoad = function (/*data*/) {
+    this.addLoad = function (/*event*/) {
         nLoad++;
         // call onload when all is loaded
         if ( nLoad === nToLoad ) {

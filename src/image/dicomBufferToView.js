@@ -67,7 +67,12 @@ dwv.image.DicomBufferToView = function ()
             var viewFactory = new dwv.image.ViewFactory();
             var view = viewFactory.create( dicomParser.getDicomElements(), image );
             // return
-            self.onload({"view": view, "info": dicomParser.getRawDicomElements()});
+            self.onload({
+              "data": {
+                "view": view,
+                "info": dicomParser.getRawDicomElements()
+              }
+            });
         };
 
         if ( needDecompression ) {

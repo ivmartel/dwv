@@ -102,12 +102,13 @@ dwv.io.MemoryLoader = function ()
     /**
      * Increment the number of loaded data
      *   and call onload if loaded all data.
+     * @param {Object} event The load data event.
      */
-    this.addLoad = function (data) {
+    this.addLoad = function (event) {
         self.onloaditem({
             type: "load-item",
-            data: data,
-            source: data.source
+            data: event.data,
+            source: event.source
         });
         nLoad++;
         // call onload when all is loaded
