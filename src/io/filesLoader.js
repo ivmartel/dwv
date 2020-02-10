@@ -157,7 +157,7 @@ dwv.io.FilesLoader = function ()
      *   and call onload if loaded all data.
      * @param {Object} data The load data.
      */
-    this.addLoad = function (data) {
+    this.addLoad = function (/*data*/) {
         nLoad++;
         // call onload when all is loaded
         if ( nLoad === nToLoad ) {
