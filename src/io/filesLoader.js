@@ -140,15 +140,24 @@ dwv.io.FilesLoader = function ()
     };
 
     /**
-     * Increment the number of loaded data
-     *   and call onload if loaded all data.
+     * Launch a load item event and call addLoad.
+     * @param {Object} data The load data.
      */
-    this.addLoad = function (data) {
+    this.addLoadItem = function (data) {
         self.onloaditem({
             type: "load-item",
             data: data,
             source: data.source
         });
+        self.addLoad();
+    };
+
+    /**
+     * Increment the number of loaded data
+     *   and call onload if loaded all data.
+     * @param {Object} data The load data.
+     */
+    this.addLoad = function (data) {
         nLoad++;
         // call onload when all is loaded
         if ( nLoad === nToLoad ) {
@@ -160,14 +169,16 @@ dwv.io.FilesLoader = function ()
 
     /**
      * Increment the counter of load end events
-     * and run callbacks.
+     * and run callbacks when all done, erroneus or not.
+     * @param {Object} event The load end event.
      */
-    this.addLoadend = function (/*event*/) {
+    this.addLoadend = function (event) {
         nLoadend++;
         // call onloadend when all is run
         if ( nLoadend === nToLoad ) {
             self.onloadend({
-                type: "load-end"
+                type: "load-end",
+                source: event.source
             });
         }
     };
@@ -251,8 +262,16 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
             if (loader.canLoadFile(file)) {
                 foundLoader = true;
 
-                loader.onload = augmentCallbackEvent(self.addLoad, file);
-                loader.onloadend = augmentCallbackEvent(self.addLoadend, file);
+                // set loader callbacks
+                // loader.onloadstart: nothing to do
+                if (typeof loader.onloaditem === "undefined") {
+                    // handle load-item locally
+                    loader.onload = augmentCallbackEvent(self.addLoadItem, file);
+                } else {
+                    loader.onloaditem = self.onloaditem;
+                    loader.onload = augmentCallbackEvent(self.addLoad, file);
+                }
+                loader.onloadend = augmentCallbackEvent(self.addLoadend, ioArray);
                 loader.onerror = augmentCallbackEvent(self.onerror, file);
                 loader.onabort = augmentCallbackEvent(self.onabort, file);
 
@@ -298,8 +317,8 @@ dwv.io.FilesLoader.prototype.onloadstart = function (/*event*/) {};
 dwv.io.FilesLoader.prototype.onprogress = function (/*event*/) {};
 /**
  * Handle a load item event.
- * @param {Object} event The load event fired
- *   when a file has been loaded successfully.
+ * @param {Object} event The load item event fired
+ *   when a file item has been loaded successfully.
  * Default does nothing.
  */
 dwv.io.FilesLoader.prototype.onloaditem = function (/*event*/) {};

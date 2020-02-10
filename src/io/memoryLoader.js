@@ -120,14 +120,16 @@ dwv.io.MemoryLoader = function ()
 
     /**
      * Increment the counter of load end events
-     * and run callbacks.
+     * and run callbacks when all done, erroneus or not.
+     * @param {Object} event The load end event.
      */
-    this.addLoadend = function (/*event*/) {
+    this.addLoadend = function (event) {
         nLoadend++;
         // call onloadend when all is run
         if ( nLoadend === nToLoad ) {
             self.onloadend({
-                type: "load-end"
+                type: "load-end",
+                source: event.source
             });
         }
     };
@@ -162,16 +164,18 @@ dwv.io.MemoryLoader.prototype.load = function (ioArray)
     var loader = null;
     for (var k = 0; k < loaders.length; ++k) {
         loader = loaders[k];
-        loader.onloadstart = self.onloadstart;
-        loader.onload = self.onload; // TODO addLoad?
-        loader.onloadend = self.addLoadend;
-        loader.onerror = self.onerror;
-        loader.onabort = self.onabort;
         loader.setOptions({
             'defaultCharacterSet': this.getDefaultCharacterSet()
         });
         loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(0);
     }
+
+    var augmentCallbackEvent = function (callback, source) {
+        return function (event) {
+            event.source = source;
+            callback(event);
+        };
+    };
 
     // loop on I/O elements
     for (var i = 0; i < ioArray.length; ++i)
@@ -184,6 +188,12 @@ dwv.io.MemoryLoader.prototype.load = function (ioArray)
             loader = loaders[l];
             if (loader.canLoadFile(iodata.filename)) {
                 foundLoader = true;
+                // set loaded callbacks
+                // loader.onloadstart: nothing to do
+                loader.onload = augmentCallbackEvent(self.addLoad, iodata.filename);
+                loader.onloadend = augmentCallbackEvent(self.addLoadend, ioArray);
+                loader.onerror = augmentCallbackEvent(self.onerror, iodata.filename);
+                loader.onabort = augmentCallbackEvent(self.onabort, iodata.filename);
                 // store loader
                 this.storeLoader(loader);
                 // read
@@ -213,8 +223,8 @@ dwv.io.MemoryLoader.prototype.onloadstart = function (/*event*/) {};
 dwv.io.MemoryLoader.prototype.onprogress = function (/*event*/) {};
 /**
  * Handle a load item event.
- * @param {Object} event The load event fired
- *   when a file has been loaded successfully.
+ * @param {Object} event The load item event fired
+ *   when a file item has been loaded successfully.
  * Default does nothing.
  */
 dwv.io.MemoryLoader.prototype.onloaditem = function (/*event*/) {};

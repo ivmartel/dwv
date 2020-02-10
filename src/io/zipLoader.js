@@ -86,6 +86,7 @@ dwv.io.ZipLoader = function ()
                 progress.index = index;
                 self.onprogress(progress);
             };
+            memoryIO.onloaditem = self.onloaditem;
             memoryIO.onload = self.onload;
             memoryIO.onloadend = function (event) {
                 // reset loading flag
@@ -185,6 +186,13 @@ dwv.io.ZipLoader.prototype.onloadstart = function (/*event*/) {};
  * Default does nothing.
  */
 dwv.io.ZipLoader.prototype.onprogress = function (/*event*/) {};
+/**
+ * Handle a load item event.
+ * @param {Object} event The load item event fired
+ *   when a file item has been loaded successfully.
+ * Default does nothing.
+ */
+dwv.io.ZipLoader.prototype.onloaditem = function (/*event*/) {};
 /**
  * Handle a load event.
  * @param {Object} event The load event fired
