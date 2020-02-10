@@ -66,9 +66,10 @@ dwv.io.RawImageLoader = function ()
                 if(!aborted){
                     self.onload( dwv.image.getViewFromDOMImage(this) );
                 }
-                self.onloadend();
+                self.onloadend({type: "load-end"});
             } catch (error) {
                 self.onerror(error);
+                self.onloadend({type: "load-end"});
             }
             self.onprogress({'type': 'read-progress', 'lengthComputable': true,
                 'loaded': 100, 'total': 100, 'index': index});
@@ -90,7 +91,8 @@ dwv.io.RawImageLoader = function ()
      */
     this.abort = function () {
         aborted = true;
-        self.onabort();
+        self.onabort({type: "load-abort"});
+        self.onloadend({type: "load-end"});
     };
 
 }; // class RawImageLoader
@@ -141,17 +143,11 @@ dwv.io.RawImageLoader.prototype.loadUrlAs = function () {
 };
 
 /**
- * Handle a load event.
- * @param {Object} event The load event, 'event.target'
- *  should be the loaded data.
+ * Handle a load start event.
+ * @param {Object} event The load start event.
  * Default does nothing.
  */
-dwv.io.RawImageLoader.prototype.onload = function (/*event*/) {};
-/**
- * Handle an load end event.
- * Default does nothing.
- */
-dwv.io.RawImageLoader.prototype.onloadend = function () {};
+dwv.io.RawImageLoader.prototype.onloadstart = function (/*event*/) {};
 /**
  * Handle a progress event.
  * @param {Object} event The progress event.
@@ -159,16 +155,28 @@ dwv.io.RawImageLoader.prototype.onloadend = function () {};
  */
 dwv.io.RawImageLoader.prototype.onprogress = function (/*event*/) {};
 /**
+ * Handle a load event.
+ * @param {Object} event The load event fired
+ *   when a file has been loaded successfully.
+ * Default does nothing.
+ */
+dwv.io.RawImageLoader.prototype.onload = function (/*event*/) {};
+/**
+ * Handle an load end event.
+ * @param {Object} event The load end event fired
+ *  when a file load has completed, successfully or not.
+ * Default does nothing.
+ */
+dwv.io.RawImageLoader.prototype.onloadend = function (/*event*/) {};
+/**
  * Handle an error event.
- * @param {Object} event The error event with an
- *  optional 'event.message'.
+ * @param {Object} event The error event.
  * Default does nothing.
  */
 dwv.io.RawImageLoader.prototype.onerror = function (/*event*/) {};
 /**
  * Handle an abort event.
- * @param {Object} event The abort event with an
- *  optional 'event.message'.
+ * @param {Object} event The abort event.
  * Default does nothing.
  */
 dwv.io.RawImageLoader.prototype.onabort = function (/*event*/) {};

@@ -73,6 +73,7 @@ dwv.io.RawVideoLoader = function ()
                     self.onload, self.onprogress, self.onloadend, index);
             } catch (error) {
                 self.onerror(error);
+                self.onloadend({type: "load-end"});
             }
         };
     };
@@ -81,7 +82,8 @@ dwv.io.RawVideoLoader = function ()
      * Abort load. TODO...
      */
     this.abort = function () {
-        self.onabort();
+        self.onabort({type: "load-abort"});
+        self.onloadend({type: "load-end"});
     };
 
 }; // class RawVideoLoader
@@ -124,17 +126,11 @@ dwv.io.RawVideoLoader.prototype.loadUrlAs = function () {
 };
 
 /**
- * Handle a load event.
- * @param {Object} event The load event, 'event.target'
- *  should be the loaded data.
+ * Handle a load start event.
+ * @param {Object} event The load start event.
  * Default does nothing.
  */
-dwv.io.RawVideoLoader.prototype.onload = function (/*event*/) {};
-/**
- * Handle an load end event.
- * Default does nothing.
- */
-dwv.io.RawVideoLoader.prototype.onloadend = function () {};
+dwv.io.RawVideoLoader.prototype.onloadstart = function (/*event*/) {};
 /**
  * Handle a progress event.
  * @param {Object} event The progress event.
@@ -142,16 +138,28 @@ dwv.io.RawVideoLoader.prototype.onloadend = function () {};
  */
 dwv.io.RawVideoLoader.prototype.onprogress = function (/*event*/) {};
 /**
+ * Handle a load event.
+ * @param {Object} event The load event fired
+ *   when a file has been loaded successfully.
+ * Default does nothing.
+ */
+dwv.io.RawVideoLoader.prototype.onload = function (/*event*/) {};
+/**
+ * Handle an load end event.
+ * @param {Object} event The load end event fired
+ *  when a file load has completed, successfully or not.
+ * Default does nothing.
+ */
+dwv.io.RawVideoLoader.prototype.onloadend = function () {};
+/**
  * Handle an error event.
- * @param {Object} event The error event with an
- *  optional 'event.message'.
+ * @param {Object} event The error event.
  * Default does nothing.
  */
 dwv.io.RawVideoLoader.prototype.onerror = function (/*event*/) {};
 /**
  * Handle an abort event.
- * @param {Object} event The abort event with an
- *  optional 'event.message'.
+ * @param {Object} event The abort event.
  * Default does nothing.
  */
 dwv.io.RawVideoLoader.prototype.onabort = function (/*event*/) {};
