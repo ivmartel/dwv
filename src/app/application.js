@@ -1025,20 +1025,25 @@ dwv.App = function ()
      * @private
      */
     function onloaditem(event) {
+        // check event
         if (typeof event.data === "undefined") {
             console.error("Missing data.");
         }
         if (typeof event.loadtype === "undefined") {
             console.error("Missing load type.");
         }
+
+        var metaData = null;
         if (event.loadtype === "image") {
             if ( image ) {
                 view.append( event.data.view );
             }
             postLoadInit(event.data);
+            metaData = event.data.info;
         } else if (event.loadtype === "state") {
             var state = new dwv.State();
             state.apply( self, state.fromJSON(event.data) );
+            metaData = "state";
         }
 
         /**
@@ -1049,7 +1054,7 @@ dwv.App = function ()
          */
         fireEvent({
             type: "load-item",
-            data: event.data.info,
+            data: metaData,
             source: event.source,
             loadtype: event.loadtype
         });
