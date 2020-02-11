@@ -401,13 +401,12 @@ dwv.App = function ()
     /**
      * Load a list of files. Can be image files or a state file.
      * @param {Array} files The list of files to load.
-     * @fires dwv.LoadController#load-start
-     * @fires dwv.LoadController#load-item-start
-     * @fires dwv.LoadController#load-slice
-     * @fires dwv.LoadController#load-progress
-     * @fires dwv.LoadController#load-end
-     * @fires dwv.LoadController#load-error
-     * @fires dwv.LoadController#load-abort
+     * @fires dwv.App#load-start
+     * @fires dwv.App#load-progress
+     * @fires dwv.App#load-item
+     * @fires dwv.App#load-end
+     * @fires dwv.App#load-error
+     * @fires dwv.App#load-abort
      */
     this.loadFiles = function (files) {
         loadController.loadFiles(files);
@@ -417,13 +416,12 @@ dwv.App = function ()
      * Load a list of URLs. Can be image files or a state file.
      * @param {Array} urls The list of urls to load.
      * @param {Array} requestHeaders An array of {name, value} to use as request headers.
-     * @fires dwv.LoadController#load-start
-     * @fires dwv.LoadController#load-item-start
-     * @fires dwv.LoadController#load-slice
-     * @fires dwv.LoadController#load-progress
-     * @fires dwv.LoadController#load-end
-     * @fires dwv.LoadController#load-error
-     * @fires dwv.LoadController#load-abort
+     * @fires dwv.App#load-start
+     * @fires dwv.App#load-progress
+     * @fires dwv.App#load-item
+     * @fires dwv.App#load-end
+     * @fires dwv.App#load-error
+     * @fires dwv.App#load-abort
      */
     this.loadURLs = function (urls, requestHeaders) {
         loadController.loadURLs(urls, requestHeaders);
@@ -433,13 +431,12 @@ dwv.App = function ()
      * Load a list of ArrayBuffers.
      * @param {Array} data The list of ArrayBuffers to load
      *   in the form of [{name: "", filename: "", data: data}].
-     * @fires dwv.LoadController#load-start
-     * @fires dwv.LoadController#load-item-start
-     * @fires dwv.LoadController#load-slice
-     * @fires dwv.LoadController#load-progress
-     * @fires dwv.LoadController#load-end
-     * @fires dwv.LoadController#load-error
-     * @fires dwv.LoadController#load-abort
+     * @fires dwv.App#load-start
+     * @fires dwv.App#load-progress
+     * @fires dwv.App#load-item
+     * @fires dwv.App#load-end
+     * @fires dwv.App#load-error
+     * @fires dwv.App#load-abort
      */
     this.loadImageObject = function (data) {
         loadController.loadImageObject(data);
@@ -1002,10 +999,13 @@ dwv.App = function ()
         }
 
         /**
-         * Main load start event.
-         * @event dwv.LoadController#load-start
+         * Load start event.
+         * @event dwv.App#load-start
          * @type {Object}
-         * @property {Object} event The original event.
+         * @property {string} type The event type: load-start.
+         * @property {string} loadType The load type: image or state.
+         * @property {Mixed} source The load source: string for an url,
+         *   File for file.
          */
         event.type = "load-start";
         fireEvent(event);
@@ -1048,10 +1048,14 @@ dwv.App = function ()
         }
 
         /**
-         * Load slice event.
-         * @event dwv.LoadController#load-slice
+         * Load item event: fired when a load item is successfull.
+         * @event dwv.App#load-item
          * @type {Object}
-         * @property {Object} event The original event.
+         * @property {string} type The event type: load-item.
+         * @property {string} loadType The load type: image or state.
+         * @property {Mixed} source The load source: string for an url,
+         *   File for file.
+         * @property {Object} data The loaded meta data.
          */
         fireEvent({
             type: "load-item",
@@ -1072,10 +1076,11 @@ dwv.App = function ()
         }
 
         /**
-         * Load slice event.
-         * @event dwv.LoadController#load-slice
+         * Load event: fired when a load finishes successfully.
+         * @event dwv.App#load
          * @type {Object}
-         * @property {Object} event The original event.
+         * @property {string} type The event type: load.
+         * @property {string} loadType The load type: image or state.
          */
         event.type = "load";
         fireEvent(event);
@@ -1088,10 +1093,14 @@ dwv.App = function ()
      */
     function onloadend(event) {
         /**
-         * Main load end event.
-         * @event dwv.LoadController#load-end
+         * Main load end event: fired when the load finishes,
+         *   successfully or not.
+         * @event dwv.App#load-end
          * @type {Object}
-         * @property {Object} event The original event.
+         * @property {string} type The event type: load-end.
+         * @property {string} loadType The load type: image or state.
+         * @property {Mixed} source The load source: string for an url,
+         *   File for file.
          */
         event.type = "load-end";
         fireEvent(event);
@@ -1105,9 +1114,14 @@ dwv.App = function ()
     function onerror(event) {
         /**
          * Load error event.
-         * @event dwv.LoadController#load-error
+         * @event dwv.App#load-error
          * @type {Object}
-         * @property {Object} event The original event.
+         * @property {string} type The event type: load-error.
+         * @property {string} loadType The load type: image or state.
+         * @property {Mixed} source The load source: string for an url,
+         *   File for file.
+         * @property {Object} error The error.
+         * @property {Object} target The event target.
          */
         event.type = "load-error";
         fireEvent(event);
@@ -1121,9 +1135,12 @@ dwv.App = function ()
     function onabort(event) {
         /**
          * Load abort event.
-         * @event dwv.LoadController#load-abort
+         * @event dwv.App#load-abort
          * @type {Object}
-         * @property {Object} event The original event.
+         * @property {string} type The event type: load-abort.
+         * @property {string} loadType The load type: image or state.
+         * @property {Mixed} source The load source: string for an url,
+         *   File for file.
          */
         event.type = "load-abort";
         fireEvent(event);
