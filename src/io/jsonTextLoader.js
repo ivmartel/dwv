@@ -106,34 +106,40 @@ dwv.io.JSONTextLoader.prototype.loadUrlAs = function () {
 };
 
 /**
+ * Handle a load start event.
+ * @param {Object} event The load start event.
+ * Default does nothing.
+ */
+dwv.io.JSONTextLoader.prototype.onloadstart = function (/*event*/) {};
+/**
+ * Handle a progress event.
+ * @param {Object} event The load progress event.
+ * Default does nothing.
+ */
+dwv.io.JSONTextLoader.prototype.onprogress = function (/*event*/) {};
+/**
  * Handle a load event.
- * @param {Object} event The load event, 'event.target'
- *  should be the loaded data.
+ * @param {Object} event The load event fired
+ *   when a file has been loaded successfully.
  * Default does nothing.
  */
 dwv.io.JSONTextLoader.prototype.onload = function (/*event*/) {};
 /**
  * Handle an load end event.
+ * @param {Object} event The load end event fired
+ *  when a file load has completed, successfully or not.
  * Default does nothing.
  */
-dwv.io.JSONTextLoader.prototype.onloadend = function () {};
-/**
- * Handle a progress event.
- * @param {Object} event The progress event.
- * Default does nothing.
- */
-dwv.io.JSONTextLoader.prototype.onprogress = function (/*event*/) {};
+dwv.io.JSONTextLoader.prototype.onloadend = function (/*event*/) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event with an
- *  optional 'event.message'.
+ * @param {Object} event The error event.
  * Default does nothing.
  */
 dwv.io.JSONTextLoader.prototype.onerror = function (/*event*/) {};
 /**
  * Handle an abort event.
- * @param {Object} event The abort event with an
- *  optional 'event.message'.
+ * @param {Object} event The abort event.
  * Default does nothing.
  */
 dwv.io.JSONTextLoader.prototype.onabort = function (/*event*/) {};

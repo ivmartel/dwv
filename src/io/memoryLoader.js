@@ -217,7 +217,7 @@ dwv.io.MemoryLoader.prototype.load = function (ioArray)
  */
 dwv.io.MemoryLoader.prototype.onloadstart = function (/*event*/) {};
 /**
- * Handle a progress event.
+ * Handle a load progress event.
  * @param {Object} event The progress event.
  * Default does nothing.
  */

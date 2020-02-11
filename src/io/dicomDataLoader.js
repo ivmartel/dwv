@@ -145,7 +145,7 @@ dwv.io.DicomDataLoader.prototype.loadUrlAs = function () {
 dwv.io.DicomDataLoader.prototype.onloadstart = function (/*event*/) {};
 /**
  * Handle a progress event.
- * @param {Object} event The progress event.
+ * @param {Object} event The load progress event.
  * Default does nothing.
  */
 dwv.io.DicomDataLoader.prototype.onprogress = function (/*event*/) {};

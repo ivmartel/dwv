@@ -388,8 +388,8 @@ dwv.io.UrlsLoader.prototype.onloaditem = function (/*event*/) {};
 dwv.io.UrlsLoader.prototype.onload = function (/*event*/) {};
 /**
  * Handle a load end event.
- * @param {Object} event The load event, 'event.target'
- *  should be the loaded data.
+ * @param {Object} event The load end event fired
+ *  when a file load has completed, successfully or not.
  * Default does nothing.
  */
 dwv.io.UrlsLoader.prototype.onloadend = function (/*event*/) {};
