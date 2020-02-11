@@ -48,8 +48,8 @@ dwv.image.DicomBufferToView = function ()
         try {
           dicomParser.parse(buffer);
         } catch(error) {
-          self.onerror(error);
-          self.onloadend({type: "load-end"});
+          self.onerror({error: error});
+          self.onloadend({});
           return;
         }
 
@@ -62,17 +62,21 @@ dwv.image.DicomBufferToView = function ()
         var onDecodedFirstFrame = function (/*event*/) {
             // create the image
             var imageFactory = new dwv.image.ImageFactory();
-            var image = imageFactory.create( dicomParser.getDicomElements(), pixelBuffer );
-            // create the view
             var viewFactory = new dwv.image.ViewFactory();
-            var view = viewFactory.create( dicomParser.getDicomElements(), image );
-            // return
-            self.onload({
-              "data": {
-                "view": view,
-                "info": dicomParser.getRawDicomElements()
-              }
-            });
+            try {
+                var image = imageFactory.create( dicomParser.getDicomElements(), pixelBuffer );
+                var view = viewFactory.create( dicomParser.getDicomElements(), image );
+                // return
+                self.onload({
+                  "data": {
+                    "view": view,
+                    "info": dicomParser.getRawDicomElements()
+                  }
+                });
+            } catch (error) {
+                self.onerror({error: error});
+                self.onloadend({});
+            }
         };
 
         if ( needDecompression ) {
@@ -167,7 +171,7 @@ dwv.image.DicomBufferToView = function ()
             // create image
             onDecodedFirstFrame();
             // send load events
-            self.onloadend({type: "load-end"});
+            self.onloadend({});
         }
     };
 

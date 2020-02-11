@@ -66,13 +66,18 @@ dwv.io.RawImageLoader = function ()
                 if(!aborted){
                     self.onload( dwv.image.getViewFromDOMImage(this) );
                 }
-                self.onloadend({type: "load-end"});
+                self.onloadend({});
             } catch (error) {
                 self.onerror(error);
-                self.onloadend({type: "load-end"});
+                self.onloadend({});
             }
-            self.onprogress({'type': 'read-progress', 'lengthComputable': true,
-                'loaded': 100, 'total': 100, 'index': index});
+            self.onprogress({
+                'type': 'read-progress',
+                'lengthComputable': true,
+                'loaded': 100,
+                'total': 100,
+                'index': index
+            });
         };
         // storing values to pass them on
         image.origin = origin;
@@ -91,8 +96,8 @@ dwv.io.RawImageLoader = function ()
      */
     this.abort = function () {
         aborted = true;
-        self.onabort({type: "load-abort"});
-        self.onloadend({type: "load-end"});
+        self.onabort({});
+        self.onloadend({});
     };
 
 }; // class RawImageLoader

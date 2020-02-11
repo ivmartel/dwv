@@ -143,7 +143,6 @@ dwv.io.UrlsLoader = function ()
      */
     this.addLoadItem = function (event) {
         self.onloaditem({
-            type: "load-item",
             data: event.data,
             source: event.source
         });
@@ -159,9 +158,7 @@ dwv.io.UrlsLoader = function ()
         nLoad++;
         // call onload when all is loaded
         if ( nLoad === nToLoad ) {
-            self.onload({
-                type: "load"
-            });
+            self.onload({});
         }
     };
 
@@ -175,7 +172,6 @@ dwv.io.UrlsLoader = function ()
         // call onloadend when all is run
         if ( nLoadend === nToLoad ) {
             self.onloadend({
-                type: "load-end",
                 source: event.source
             });
         }
@@ -191,7 +187,6 @@ dwv.io.UrlsLoader = function ()
 dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
 {
     this.onloadstart({
-        type: "load-start",
         source: ioArray
     });
 
@@ -209,7 +204,13 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
             // status 200: "OK"; status 0: "debug"
             var status = event.target.status;
             if (status !== 200 && status !== 0) {
-                self.onerror({source: url});
+                self.onerror({
+                    source: url,
+                    error: "GET " + event.target.responseURL +
+                        " " + event.target.status +
+                        " (" + event.target.statusText + ")",
+                    target: event.target
+                });
                 self.onloadend({source: url});
             } else {
                 loader.load(event.target.response, url, i);

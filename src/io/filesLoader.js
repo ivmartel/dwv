@@ -145,7 +145,6 @@ dwv.io.FilesLoader = function ()
      */
     this.addLoadItem = function (event) {
         self.onloaditem({
-            type: "load-item",
             data: event.data,
             source: event.source
         });
@@ -161,9 +160,7 @@ dwv.io.FilesLoader = function ()
         nLoad++;
         // call onload when all is loaded
         if ( nLoad === nToLoad ) {
-            self.onload({
-                type: "load"
-            });
+            self.onload({});
         }
     };
 
@@ -177,7 +174,6 @@ dwv.io.FilesLoader = function ()
         // call onloadend when all is run
         if ( nLoadend === nToLoad ) {
             self.onloadend({
-                type: "load-end",
                 source: event.source
             });
         }
@@ -192,7 +188,6 @@ dwv.io.FilesLoader = function ()
 dwv.io.FilesLoader.prototype.load = function (ioArray)
 {
     this.onloadstart({
-        type: "load-start",
         source: ioArray
     });
 

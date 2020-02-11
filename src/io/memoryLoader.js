@@ -106,16 +106,13 @@ dwv.io.MemoryLoader = function ()
      */
     this.addLoad = function (event) {
         self.onloaditem({
-            type: "load-item",
             data: event.data,
             source: event.source
         });
         nLoad++;
         // call onload when all is loaded
         if ( nLoad === nToLoad ) {
-            self.onload({
-                type: "load"
-            });
+            self.onload({});
         }
     };
 
@@ -129,7 +126,6 @@ dwv.io.MemoryLoader = function ()
         // call onloadend when all is run
         if ( nLoadend === nToLoad ) {
             self.onloadend({
-                type: "load-end",
                 source: event.source
             });
         }
@@ -143,11 +139,16 @@ dwv.io.MemoryLoader = function ()
  */
 dwv.io.MemoryLoader.prototype.load = function (ioArray)
 {
+    this.onloadstart({
+        source: ioArray
+    });
+
     // clear storage
     this.clearStoredLoader();
 
     // closure to self for handlers
     var self = this;
+
     // set the number of data to load
     this.setNToLoad( ioArray.length );
 
@@ -155,7 +156,7 @@ dwv.io.MemoryLoader.prototype.load = function (ioArray)
     mproghandler.setNToLoad( ioArray.length );
     mproghandler.setNumberOfDimensions(1);
 
-    // get loaders
+    // create loaders
     var loaders = [];
     for (var m = 0; m < dwv.io.loaderList.length; ++m) {
         loaders.push( new dwv.io[dwv.io.loaderList[m]]() );

@@ -73,7 +73,7 @@ dwv.io.RawVideoLoader = function ()
                     self.onload, self.onprogress, self.onloadend, index);
             } catch (error) {
                 self.onerror(error);
-                self.onloadend({type: "load-end"});
+                self.onloadend({});
             }
         };
     };
@@ -82,8 +82,8 @@ dwv.io.RawVideoLoader = function ()
      * Abort load. TODO...
      */
     this.abort = function () {
-        self.onabort({type: "load-abort"});
-        self.onloadend({type: "load-end"});
+        self.onabort({});
+        self.onloadend({});
     };
 
 }; // class RawVideoLoader

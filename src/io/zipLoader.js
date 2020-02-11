@@ -109,7 +109,7 @@ dwv.io.ZipLoader = function ()
      */
     this.load = function (buffer, origin, index) {
         // send start event
-        this.onloadstart({type: "load-start"});
+        this.onloadstart({});
         // set loading flag
         isLoading = true;
 
@@ -132,7 +132,8 @@ dwv.io.ZipLoader = function ()
         // reset loading flag
         isLoading = false;
         // call listeners
-        self.onabort({type: "load-abort"});
+        self.onabort({});
+        self.onloadend({});
     };
 
 }; // class DicomDataLoader

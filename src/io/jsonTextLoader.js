@@ -44,16 +44,23 @@ dwv.io.JSONTextLoader = function ()
         // set loading flag
         isLoading = true;
         try {
-            self.onload( text );
-            // reset loading flag
-            isLoading = false;
-            // call listeners
-            self.onloadend();
+            self.onload({
+                data: text
+            });
         } catch (error) {
             self.onerror(error);
+        } finally {
+            // reset loading flag
+            isLoading = false;
+            self.onloadend({});
         }
-        self.onprogress({'type': 'read-progress', 'lengthComputable': true,
-            'loaded': 100, 'total': 100, 'index': index});
+        self.onprogress({
+            'type': 'read-progress',
+            'lengthComputable': true,
+            'loaded': 100,
+            'total': 100,
+            'index': index
+        });
     };
 
     /**
@@ -63,7 +70,8 @@ dwv.io.JSONTextLoader = function ()
         // reset loading flag
         isLoading = false;
         // call listeners
-        self.onabort();
+        self.onabort({});
+        self.onloadend({});
     };
 
 }; // class JSONTextLoader

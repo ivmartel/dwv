@@ -1007,6 +1007,7 @@ dwv.App = function ()
          * @type {Object}
          * @property {Object} event The original event.
          */
+        event.type = "load-start";
         fireEvent(event);
     }
 
