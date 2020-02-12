@@ -100,7 +100,8 @@ dwv.App = function ()
      * @return {Boolean} True if the data only contains one frame.
      */
     this.isMonoFrameData = function () {
-        return this.getImage().getNumberOfFrames() === 1;
+        return (this.getImage() && typeof this.getImage() !== "undefined" &&
+            this.getImage().getNumberOfFrames() === 1);
     };
     /**
      * Can the data be scrolled?
@@ -258,17 +259,13 @@ dwv.App = function ()
 
         // create load controller
         loadController = new dwv.LoadController(config.defaultCharacterSet);
+        loadController.onloadstart = onloadstart;
+        loadController.onprogress = onprogress;
+        loadController.onloaditem = onloaditem;
         loadController.onload = onload;
         loadController.onloadend = onloadend;
-        loadController.onLoadImageDataSetup = onLoadImageDataSetup;
-        loadController.onLoadStateData = onLoadStateData;
-        loadController.addEventListener("load-start", fireEvent);
-        loadController.addEventListener("load-item-start", fireEvent);
-        loadController.addEventListener("load-slice", fireEvent);
-        loadController.addEventListener("load-progress", fireEvent);
-        loadController.addEventListener("load-end", fireEvent);
-        loadController.addEventListener("load-error", fireEvent);
-        loadController.addEventListener("load-abort", fireEvent);
+        loadController.onerror = onerror;
+        loadController.onabort = onabort;
 
         // listen to window resize
         window.onresize = onResize;
@@ -404,13 +401,12 @@ dwv.App = function ()
     /**
      * Load a list of files. Can be image files or a state file.
      * @param {Array} files The list of files to load.
-     * @fires dwv.LoadController#load-start
-     * @fires dwv.LoadController#load-item-start
-     * @fires dwv.LoadController#load-slice
-     * @fires dwv.LoadController#load-progress
-     * @fires dwv.LoadController#load-end
-     * @fires dwv.LoadController#load-error
-     * @fires dwv.LoadController#load-abort
+     * @fires dwv.App#load-start
+     * @fires dwv.App#load-progress
+     * @fires dwv.App#load-item
+     * @fires dwv.App#load-end
+     * @fires dwv.App#load-error
+     * @fires dwv.App#load-abort
      */
     this.loadFiles = function (files) {
         loadController.loadFiles(files);
@@ -420,13 +416,12 @@ dwv.App = function ()
      * Load a list of URLs. Can be image files or a state file.
      * @param {Array} urls The list of urls to load.
      * @param {Array} requestHeaders An array of {name, value} to use as request headers.
-     * @fires dwv.LoadController#load-start
-     * @fires dwv.LoadController#load-item-start
-     * @fires dwv.LoadController#load-slice
-     * @fires dwv.LoadController#load-progress
-     * @fires dwv.LoadController#load-end
-     * @fires dwv.LoadController#load-error
-     * @fires dwv.LoadController#load-abort
+     * @fires dwv.App#load-start
+     * @fires dwv.App#load-progress
+     * @fires dwv.App#load-item
+     * @fires dwv.App#load-end
+     * @fires dwv.App#load-error
+     * @fires dwv.App#load-abort
      */
     this.loadURLs = function (urls, requestHeaders) {
         loadController.loadURLs(urls, requestHeaders);
@@ -436,13 +431,12 @@ dwv.App = function ()
      * Load a list of ArrayBuffers.
      * @param {Array} data The list of ArrayBuffers to load
      *   in the form of [{name: "", filename: "", data: data}].
-     * @fires dwv.LoadController#load-start
-     * @fires dwv.LoadController#load-item-start
-     * @fires dwv.LoadController#load-slice
-     * @fires dwv.LoadController#load-progress
-     * @fires dwv.LoadController#load-end
-     * @fires dwv.LoadController#load-error
-     * @fires dwv.LoadController#load-abort
+     * @fires dwv.App#load-start
+     * @fires dwv.App#load-progress
+     * @fires dwv.App#load-item
+     * @fires dwv.App#load-end
+     * @fires dwv.App#load-error
+     * @fires dwv.App#load-abort
      */
     this.loadImageObject = function (data) {
         loadController.loadImageObject(data);
@@ -452,7 +446,7 @@ dwv.App = function ()
      * Abort the current load.
      */
     this.abortLoad = function () {
-        loadController.abortLoad();
+        loadController.abort();
     };
 
     // load API [end] ---------------------------------------------------------
@@ -995,43 +989,173 @@ dwv.App = function ()
     }
 
     /**
-     * Image data onload callback.
-     * @param {Object} data The loaded data.
+     * Data load start callback.
+     * @param {Object} event The load start event.
      * @private
      */
-    function onload(data) {
-        if ( image ) {
-            view.append( data.view );
+    function onloadstart(event) {
+        if (event.loadtype === "image") {
+            self.reset();
         }
-        postLoadInit(data);
+
+        /**
+         * Load start event.
+         * @event dwv.App#load-start
+         * @type {Object}
+         * @property {string} type The event type: load-start.
+         * @property {string} loadType The load type: image or state.
+         * @property {Mixed} source The load source: string for an url,
+         *   File for a file.
+         */
+        event.type = "load-start";
+        fireEvent(event);
     }
 
     /**
-     * Image data onloadend callback.
+     * Data load progress callback.
+     * @param {Object} event The progress event.
      * @private
      */
-    function onloadend() {
+    function onprogress(event) {
+        /**
+         * Load progress event.
+         * @event dwv.App#load-progress
+         * @type {Object}
+         * @property {string} type The event type: load-progress.
+         * @property {string} loadType The load type: image or state.
+         * @property {Mixed} source The load source: string for an url,
+         *   File for a file.
+         * @property {number} load The loaded percentage.
+         * @property {number} total The total percentage.
+         */
+        event.type = "load-progress";
+        fireEvent(event);
+    }
+
+    /**
+     * Data load callback.
+     * @param {Object} event The load event.
+     * @private
+     */
+    function onloaditem(event) {
+        // check event
+        if (typeof event.data === "undefined") {
+            console.error("Missing data.");
+        }
+        if (typeof event.loadtype === "undefined") {
+            console.error("Missing load type.");
+        }
+
+        var eventMetaData = null;
+        if (event.loadtype === "image") {
+            if ( image ) {
+                view.append( event.data.view );
+            }
+            postLoadInit(event.data);
+            eventMetaData = event.data.info;
+        } else if (event.loadtype === "state") {
+            var state = new dwv.State();
+            state.apply( self, state.fromJSON(event.data) );
+            eventMetaData = "state";
+        }
+
+        /**
+         * Load item event: fired when a load item is successfull.
+         * @event dwv.App#load-item
+         * @type {Object}
+         * @property {string} type The event type: load-item.
+         * @property {string} loadType The load type: image or state.
+         * @property {Mixed} source The load source: string for an url,
+         *   File for a file.
+         * @property {Object} data The loaded meta data.
+         */
+        fireEvent({
+            type: "load-item",
+            data: eventMetaData,
+            source: event.source,
+            loadtype: event.loadtype
+        });
+    }
+
+    /**
+     * Data load callback.
+     * @param {Object} event The load event.
+     * @private
+     */
+    function onload(event) {
         if ( drawController ) {
             drawController.activateDrawLayer(viewController);
         }
+
+        /**
+         * Load event: fired when a load finishes successfully.
+         * @event dwv.App#load
+         * @type {Object}
+         * @property {string} type The event type: load.
+         * @property {string} loadType The load type: image or state.
+         */
+        event.type = "load";
+        fireEvent(event);
     }
 
     /**
-     * Image data load setup callback.
+     * Data load end callback.
+     * @param {Object} event The load end event.
      * @private
      */
-    function onLoadImageDataSetup() {
-        self.reset();
+    function onloadend(event) {
+        /**
+         * Main load end event: fired when the load finishes,
+         *   successfully or not.
+         * @event dwv.App#load-end
+         * @type {Object}
+         * @property {string} type The event type: load-end.
+         * @property {string} loadType The load type: image or state.
+         * @property {Mixed} source The load source: string for an url,
+         *   File for a file.
+         */
+        event.type = "load-end";
+        fireEvent(event);
     }
 
     /**
-     * State data onload callback.
-     * @param {Object} data The state data.
+     * Data load error callback.
+     * @param {Object} event The error event.
      * @private
      */
-    function onLoadStateData(data) {
-        var state = new dwv.State();
-        state.apply( self, state.fromJSON(data) );
+    function onerror(event) {
+        /**
+         * Load error event.
+         * @event dwv.App#load-error
+         * @type {Object}
+         * @property {string} type The event type: load-error.
+         * @property {string} loadType The load type: image or state.
+         * @property {Mixed} source The load source: string for an url,
+         *   File for a file.
+         * @property {Object} error The error.
+         * @property {Object} target The event target.
+         */
+        event.type = "load-error";
+        fireEvent(event);
+    }
+
+    /**
+     * Data load abort callback.
+     * @param {Object} event The abort event.
+     * @private
+     */
+    function onabort(event) {
+        /**
+         * Load abort event.
+         * @event dwv.App#load-abort
+         * @type {Object}
+         * @property {string} type The event type: load-abort.
+         * @property {string} loadType The load type: image or state.
+         * @property {Mixed} source The load source: string for an url,
+         *   File for a file.
+         */
+        event.type = "load-abort";
+        fireEvent(event);
     }
 
     /**
@@ -1100,20 +1224,15 @@ dwv.App = function ()
         view.addEventListener("slice-change", fireEvent);
         view.addEventListener("frame-change", fireEvent);
 
-        // append draw layers (before initialising the toolbox)
-        if ( drawController ) {
-            //drawController.appendDrawLayer(image.getNumberOfFrames());
-        }
+        // init W/L display
+        self.initWLDisplay();
+        // generate first image
+        generateAndDrawImage();
 
         // initialise the toolbox
         if ( toolboxController ) {
             toolboxController.init( imageLayer );
         }
-
-        // init W/L display
-        self.initWLDisplay();
-        // generate first image
-        generateAndDrawImage();
     }
 
 };

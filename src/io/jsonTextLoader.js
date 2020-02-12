@@ -44,16 +44,22 @@ dwv.io.JSONTextLoader = function ()
         // set loading flag
         isLoading = true;
         try {
-            self.onload( text );
-            // reset loading flag
-            isLoading = false;
-            // call listeners
-            self.onloadend();
+            self.onload({
+                data: text
+            });
         } catch (error) {
             self.onerror(error);
+        } finally {
+            // reset loading flag
+            isLoading = false;
+            self.onloadend({});
         }
-        self.onprogress({'type': 'read-progress', 'lengthComputable': true,
-            'loaded': 100, 'total': 100, 'index': index});
+        self.onprogress({
+            'lengthComputable': true,
+            'loaded': 100,
+            'total': 100,
+            'index': index
+        });
     };
 
     /**
@@ -63,41 +69,8 @@ dwv.io.JSONTextLoader = function ()
         // reset loading flag
         isLoading = false;
         // call listeners
-        self.onabort();
-    };
-
-    /**
-     * Get a file load handler.
-     * @param {Object} file The file to load.
-     * @param {Number} index The index 'id' of the file.
-     * @return {Function} A file load handler.
-     */
-    this.getFileLoadHandler = function (file, index) {
-        return function (event) {
-            self.load(event.target.result, file, index);
-        };
-    };
-
-    /**
-     * Get a url load handler.
-     * @param {String} url The url to load.
-     * @param {Number} index The index 'id' of the url.
-     * @return {Function} A url load handler.
-     */
-    this.getUrlLoadHandler = function (url, index) {
-        return function (/*event*/) {
-            // check response status
-            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
-            // status 200: "OK"; status 0: "debug"
-            if (this.status !== 200 && this.status !== 0) {
-                self.onerror({'name': "RequestError",
-                    'message': "Error status: " + this.status +
-                    " while loading '" + url + "' [JSONTextLoader]" });
-                return;
-            }
-            // load
-            self.load(this.responseText, url, index);
-        };
+        self.onabort({});
+        self.onloadend({});
     };
 
 }; // class JSONTextLoader
@@ -140,34 +113,40 @@ dwv.io.JSONTextLoader.prototype.loadUrlAs = function () {
 };
 
 /**
+ * Handle a load start event.
+ * @param {Object} event The load start event.
+ * Default does nothing.
+ */
+dwv.io.JSONTextLoader.prototype.onloadstart = function (/*event*/) {};
+/**
+ * Handle a progress event.
+ * @param {Object} event The load progress event.
+ * Default does nothing.
+ */
+dwv.io.JSONTextLoader.prototype.onprogress = function (/*event*/) {};
+/**
  * Handle a load event.
- * @param {Object} event The load event, 'event.target'
- *  should be the loaded data.
+ * @param {Object} event The load event fired
+ *   when a file has been loaded successfully.
  * Default does nothing.
  */
 dwv.io.JSONTextLoader.prototype.onload = function (/*event*/) {};
 /**
  * Handle an load end event.
+ * @param {Object} event The load end event fired
+ *  when a file load has completed, successfully or not.
  * Default does nothing.
  */
-dwv.io.JSONTextLoader.prototype.onloadend = function () {};
-/**
- * Handle a progress event.
- * @param {Object} event The progress event.
- * Default does nothing.
- */
-dwv.io.JSONTextLoader.prototype.onprogress = function (/*event*/) {};
+dwv.io.JSONTextLoader.prototype.onloadend = function (/*event*/) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event with an
- *  optional 'event.message'.
+ * @param {Object} event The error event.
  * Default does nothing.
  */
 dwv.io.JSONTextLoader.prototype.onerror = function (/*event*/) {};
 /**
  * Handle an abort event.
- * @param {Object} event The abort event with an
- *  optional 'event.message'.
+ * @param {Object} event The abort event.
  * Default does nothing.
  */
 dwv.io.JSONTextLoader.prototype.onabort = function (/*event*/) {};
