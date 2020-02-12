@@ -1005,15 +1005,15 @@ dwv.App = function ()
          * @property {string} type The event type: load-start.
          * @property {string} loadType The load type: image or state.
          * @property {Mixed} source The load source: string for an url,
-         *   File for file.
+         *   File for a file.
          */
         event.type = "load-start";
         fireEvent(event);
     }
 
     /**
-     * Data load error callback.
-     * @param {Object} event The error event.
+     * Data load progress callback.
+     * @param {Object} event The progress event.
      * @private
      */
     function onprogress(event) {
@@ -1024,8 +1024,8 @@ dwv.App = function ()
          * @property {string} type The event type: load-progress.
          * @property {string} loadType The load type: image or state.
          * @property {Mixed} source The load source: string for an url,
-         *   File for file.
-         * @property {number} load The loaded persentage.
+         *   File for a file.
+         * @property {number} load The loaded percentage.
          * @property {number} total The total percentage.
          */
         event.type = "load-progress";
@@ -1034,7 +1034,7 @@ dwv.App = function ()
 
     /**
      * Data load callback.
-     * @param {Object} data The loaded data.
+     * @param {Object} event The load event.
      * @private
      */
     function onloaditem(event) {
@@ -1046,17 +1046,17 @@ dwv.App = function ()
             console.error("Missing load type.");
         }
 
-        var metaData = null;
+        var eventMetaData = null;
         if (event.loadtype === "image") {
             if ( image ) {
                 view.append( event.data.view );
             }
             postLoadInit(event.data);
-            metaData = event.data.info;
+            eventMetaData = event.data.info;
         } else if (event.loadtype === "state") {
             var state = new dwv.State();
             state.apply( self, state.fromJSON(event.data) );
-            metaData = "state";
+            eventMetaData = "state";
         }
 
         /**
@@ -1066,12 +1066,12 @@ dwv.App = function ()
          * @property {string} type The event type: load-item.
          * @property {string} loadType The load type: image or state.
          * @property {Mixed} source The load source: string for an url,
-         *   File for file.
+         *   File for a file.
          * @property {Object} data The loaded meta data.
          */
         fireEvent({
             type: "load-item",
-            data: metaData,
+            data: eventMetaData,
             source: event.source,
             loadtype: event.loadtype
         });
@@ -1112,7 +1112,7 @@ dwv.App = function ()
          * @property {string} type The event type: load-end.
          * @property {string} loadType The load type: image or state.
          * @property {Mixed} source The load source: string for an url,
-         *   File for file.
+         *   File for a file.
          */
         event.type = "load-end";
         fireEvent(event);
@@ -1131,7 +1131,7 @@ dwv.App = function ()
          * @property {string} type The event type: load-error.
          * @property {string} loadType The load type: image or state.
          * @property {Mixed} source The load source: string for an url,
-         *   File for file.
+         *   File for a file.
          * @property {Object} error The error.
          * @property {Object} target The event target.
          */
@@ -1152,7 +1152,7 @@ dwv.App = function ()
          * @property {string} type The event type: load-abort.
          * @property {string} loadType The load type: image or state.
          * @property {Mixed} source The load source: string for an url,
-         *   File for file.
+         *   File for a file.
          */
         event.type = "load-abort";
         fireEvent(event);
