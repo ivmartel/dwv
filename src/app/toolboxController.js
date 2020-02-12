@@ -191,6 +191,11 @@ dwv.ToolboxController = function (toolList)
      */
     function onMouch(event)
     {
+        // make sure we have a tool
+        if (!selectedTool) {
+            return;
+        }
+
         // flag not to get confused between touch and mouse
         var handled = false;
         // Store the event position relative to the image canvas

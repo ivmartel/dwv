@@ -1224,20 +1224,15 @@ dwv.App = function ()
         view.addEventListener("slice-change", fireEvent);
         view.addEventListener("frame-change", fireEvent);
 
-        // append draw layers (before initialising the toolbox)
-        if ( drawController ) {
-            //drawController.appendDrawLayer(image.getNumberOfFrames());
-        }
+        // init W/L display
+        self.initWLDisplay();
+        // generate first image
+        generateAndDrawImage();
 
         // initialise the toolbox
         if ( toolboxController ) {
             toolboxController.init( imageLayer );
         }
-
-        // init W/L display
-        self.initWLDisplay();
-        // generate first image
-        generateAndDrawImage();
     }
 
 };
