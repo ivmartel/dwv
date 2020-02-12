@@ -53,7 +53,7 @@ dwv.io.RawVideoLoader = function ()
      * @param {String} origin The data origin.
      * @param {Number} index The data index.
      */
-    this.load = function ( buffer, origin, index ) {
+    this.load = function (buffer, origin, index) {
         // create a DOM video
         var video = document.createElement('video');
         if (typeof origin === "string") {

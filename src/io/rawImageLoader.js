@@ -56,7 +56,7 @@ dwv.io.RawImageLoader = function ()
      * @param {String} origin The data origin.
      * @param {Number} index The data index.
      */
-    this.load = function ( buffer, origin, index ) {
+    this.load = function (buffer, origin, index) {
         aborted = false;
         // create a DOM image
         var image = new Image();
