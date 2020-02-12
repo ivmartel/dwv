@@ -1,7 +1,11 @@
 // namespaces
 var dwv = dwv || {};
 dwv.io = dwv.io || {};
-// external
+/**
+ * The zip library.
+ * @external JSZip
+ * @see https://github.com/Stuk/jszip
+ */
 var JSZip = JSZip || {};
 
 /**
