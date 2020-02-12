@@ -144,10 +144,7 @@ dwv.io.FilesLoader = function ()
      * @param {Object} event The load event data.
      */
     this.addLoadItem = function (event) {
-        self.onloaditem({
-            data: event.data,
-            source: event.source
-        });
+        self.onloaditem(event);
         self.addLoad();
     };
 
@@ -158,7 +155,9 @@ dwv.io.FilesLoader = function ()
      */
     this.addLoad = function (/*event*/) {
         nLoad++;
-        // call onload when all is loaded
+        // call self.onload when all is loaded
+        // (can't use the input event since it is not the
+        //   general load)
         if ( nLoad === nToLoad ) {
             self.onload({});
         }
@@ -166,12 +165,14 @@ dwv.io.FilesLoader = function ()
 
     /**
      * Increment the counter of load end events
-     * and run callbacks when all done, erroneus or not.
+     *   and run callbacks when all done, erroneus or not.
      * @param {Object} event The load end event.
      */
     this.addLoadend = function (event) {
         nLoadend++;
-        // call onloadend when all is run
+        // call self.onloadend when all is run
+        // (can't use the input event since it is not the
+        //   general load end)
         if ( nLoadend === nToLoad ) {
             self.onloadend({
                 source: event.source
@@ -210,16 +211,6 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
         loaders.push( new dwv.io[dwv.io.loaderList[m]]() );
     }
 
-    // set loaders callbacks
-    var loader = null;
-    for (var k = 0; k < loaders.length; ++k) {
-        loader = loaders[k];
-        loader.setOptions({
-            'defaultCharacterSet': this.getDefaultCharacterSet()
-        });
-        loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
-    }
-
     var augmentCallbackEvent = function (callback, source) {
         return function (event) {
             event.source = source;
@@ -248,17 +239,22 @@ dwv.io.FilesLoader.prototype.load = function (ioArray)
         this.storeReader(reader);
 
         // bind reader progress
-        reader.onprogress = mproghandler.getMonoProgressHandler(i, 0);
+        reader.onprogress = mproghandler.getMonoProgressHandler(i, 0, file);
 
         // find a loader
+        var loader = null;
         var foundLoader = false;
         for (var l = 0; l < loaders.length; ++l) {
             loader = loaders[l];
             if (loader.canLoadFile(file)) {
                 foundLoader = true;
 
+                loader.setOptions({
+                    'defaultCharacterSet': this.getDefaultCharacterSet()
+                });
                 // set loader callbacks
                 // loader.onloadstart: nothing to do
+                loader.onprogress = mproghandler.getMonoProgressHandler(i, 1, file);
                 if (typeof loader.onloaditem === "undefined") {
                     // handle load-item locally
                     loader.onload = augmentCallbackEvent(self.addLoadItem, file);

@@ -142,10 +142,7 @@ dwv.io.UrlsLoader = function ()
      * @param {Object} event The load data event.
      */
     this.addLoadItem = function (event) {
-        self.onloaditem({
-            data: event.data,
-            source: event.source
-        });
+        self.onloaditem(event);
         self.addLoad();
     };
 
@@ -156,7 +153,9 @@ dwv.io.UrlsLoader = function ()
      */
     this.addLoad = function (/*event*/) {
         nLoad++;
-        // call onload when all is loaded
+        // call self.onload when all is loaded
+        // (can't use the input event since it is not the
+        //   general load)
         if ( nLoad === nToLoad ) {
             self.onload({});
         }
@@ -164,12 +163,14 @@ dwv.io.UrlsLoader = function ()
 
     /**
      * Increment the counter of load end events
-     * and run callbacks when all done, erroneus or not.
+     *   and run callbacks when all done, erroneus or not.
      * @param {Object} event The load end event.
      */
     this.addLoadend = function (event) {
         nLoadend++;
-        // call onloadend when all is run
+        // call self.onloadend when all is run
+        // (can't use the input event since it is not the
+        //   general load end)
         if ( nLoadend === nToLoad ) {
             self.onloadend({
                 source: event.source
@@ -239,16 +240,6 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
             loaders.push( new dwv.io[dwv.io.loaderList[m]]() );
         }
 
-        // set loaders callbacks
-        var loader = null;
-        for (var k = 0; k < loaders.length; ++k) {
-            loader = loaders[k];
-            loader.setOptions({
-                'defaultCharacterSet': self.getDefaultCharacterSet()
-            });
-            loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
-        }
-
         // loop on I/O elements
         for (var i = 0; i < urlsArray.length; ++i)
         {
@@ -276,18 +267,22 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
             }
 
             // bind reader progress
-            request.onprogress = mproghandler.getMonoProgressHandler(i, 0);
-            request.onloadend = mproghandler.getMonoOnLoadEndHandler(i, 0);
+            request.onprogress = mproghandler.getMonoProgressHandler(i, 0, url);
 
             // find a loader
+            var loader = null;
             var foundLoader = false;
             for (var l = 0; l < loaders.length; ++l) {
                 loader = loaders[l];
                 if (loader.canLoadUrl(url)) {
                     foundLoader = true;
 
+                    loader.setOptions({
+                        'defaultCharacterSet': self.getDefaultCharacterSet()
+                    });
                     // set loader callacks
                     // loader.onloadstart: nothing to do
+                    loader.onprogress = mproghandler.getMonoProgressHandler(i, 1, url);
                     if (typeof loader.onloaditem === "undefined") {
                         // handle load-item locally
                         loader.onload = augmentCallbackEvent(self.addLoadItem, url);

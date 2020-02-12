@@ -105,12 +105,11 @@ dwv.io.MemoryLoader = function ()
      * @param {Object} event The load data event.
      */
     this.addLoad = function (event) {
-        self.onloaditem({
-            data: event.data,
-            source: event.source
-        });
+        self.onloaditem(event);
         nLoad++;
-        // call onload when all is loaded
+        // call self.onload when all is loaded
+        // (can't use the input event since it is not the
+        //   general load)
         if ( nLoad === nToLoad ) {
             self.onload({});
         }
@@ -118,12 +117,14 @@ dwv.io.MemoryLoader = function ()
 
     /**
      * Increment the counter of load end events
-     * and run callbacks when all done, erroneus or not.
+     *   and run callbacks when all done, erroneus or not.
      * @param {Object} event The load end event.
      */
     this.addLoadend = function (event) {
         nLoadend++;
-        // call onloadend when all is run
+        // call self.onloadend when all is run
+        // (can't use the input event since it is not the
+        //   general load end)
         if ( nLoadend === nToLoad ) {
             self.onloadend({
                 source: event.source
@@ -162,16 +163,6 @@ dwv.io.MemoryLoader.prototype.load = function (ioArray)
         loaders.push( new dwv.io[dwv.io.loaderList[m]]() );
     }
 
-    // set loaders callbacks
-    var loader = null;
-    for (var k = 0; k < loaders.length; ++k) {
-        loader = loaders[k];
-        loader.setOptions({
-            'defaultCharacterSet': this.getDefaultCharacterSet()
-        });
-        loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(0);
-    }
-
     var augmentCallbackEvent = function (callback, source) {
         return function (event) {
             event.source = source;
@@ -185,13 +176,18 @@ dwv.io.MemoryLoader.prototype.load = function (ioArray)
         var iodata = ioArray[i];
 
         // find a loader
+        var loader = null;
         var foundLoader = false;
         for (var l = 0; l < loaders.length; ++l) {
             loader = loaders[l];
             if (loader.canLoadFile(iodata.filename)) {
                 foundLoader = true;
+                loader.setOptions({
+                    'defaultCharacterSet': this.getDefaultCharacterSet()
+                });
                 // set loaded callbacks
                 // loader.onloadstart: nothing to do
+                loader.onprogress = mproghandler.getMonoProgressHandler(i, 0, iodata.filename);
                 loader.onload = augmentCallbackEvent(self.addLoad, iodata.filename);
                 loader.onloadend = augmentCallbackEvent(self.addLoadend, ioArray);
                 loader.onerror = augmentCallbackEvent(self.onerror, iodata.filename);
