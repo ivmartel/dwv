@@ -62,7 +62,6 @@ dwv.io.ZipLoader = function ()
         // (max 50% to take into account the memory loading)
         var unzipPercent = files.length * 50 / zobjs.length;
         self.onprogress({
-            'type': 'load-progress',
             'lengthComputable': true,
             'loaded': unzipPercent,
             'total': 100,

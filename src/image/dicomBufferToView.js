@@ -124,7 +124,6 @@ dwv.image.DicomBufferToView = function ()
                     // send progress
                     ++countDecodedFrames;
                     var ev = {
-                        'type': "load-progress",
                         'lengthComputable': true,
                         'loaded': (countDecodedFrames * 100 / nFrames),
                         'total': 100
@@ -159,7 +158,6 @@ dwv.image.DicomBufferToView = function ()
         else {
             // send progress
             var evnodec = {
-                'type': 'load-progress',
                 'lengthComputable': true,
                 'loaded': 100,
                 'total': 100

@@ -156,8 +156,11 @@ dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, cbonloade
     // draw the context and store it as a frame
     function storeFrame() {
         // send progress
-        var evprog = {'type': 'load-progress', 'lengthComputable': true,
-            'loaded': frameIndex, 'total': numberOfFrames};
+        var evprog = {
+            'lengthComputable': true,
+            'loaded': frameIndex,
+            'total': numberOfFrames
+        };
         if (typeof dataIndex !== "undefined") {
             evprog.index = dataIndex;
         }

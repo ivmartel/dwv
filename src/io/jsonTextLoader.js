@@ -55,7 +55,6 @@ dwv.io.JSONTextLoader = function ()
             self.onloadend({});
         }
         self.onprogress({
-            'type': 'read-progress',
             'lengthComputable': true,
             'loaded': 100,
             'total': 100,

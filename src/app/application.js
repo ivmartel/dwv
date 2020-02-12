@@ -1017,6 +1017,18 @@ dwv.App = function ()
      * @private
      */
     function onprogress(event) {
+        /**
+         * Load progress event.
+         * @event dwv.App#load-progress
+         * @type {Object}
+         * @property {string} type The event type: load-progress.
+         * @property {string} loadType The load type: image or state.
+         * @property {Mixed} source The load source: string for an url,
+         *   File for file.
+         * @property {number} load The loaded persentage.
+         * @property {number} total The total percentage.
+         */
+        event.type = "load-progress";
         fireEvent(event);
     }
 
