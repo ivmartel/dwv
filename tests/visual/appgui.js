@@ -48,11 +48,11 @@ dwv.addDataLine = function (id, fileroot, doc)
     app.init(config);
     // display loading time
     var listener = function (event) {
+        var timerLabel = "load-data["+fileroot+"]";
         if (event.type === "load-start") {
-            console.time("load-data::"+fileroot);
-        }
-        else {
-            console.timeEnd("load-data::"+fileroot);
+            console.time(timerLabel);
+        } else if (event.type === "load-end") {
+            console.timeEnd(timerLabel);
         }
     };
     app.addEventListener("load-start", listener);
