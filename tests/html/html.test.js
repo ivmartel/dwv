@@ -10,7 +10,10 @@ QUnit.module("html");
  * Tests for {@link dwv.html.toTable}.
  * @function module:tests/html~toTable
  */
-QUnit.test("Test array to html function.", function (assert) {
+
+// TODO move to gui project
+
+/*QUnit.test("Test array to html function.", function (assert) {
     // 1D array
     var array0 = [0, 1, 2, 3];
     var table0 = dwv.html.toTable(array0);
@@ -39,4 +42,4 @@ QUnit.test("Test array to html function.", function (assert) {
     var table3 = dwv.html.toTable(obj);
     var table3_ref = "<table><thead><tr><th></th><th>a</th><th>b</th></tr></thead><tbody><tr><td>first</td><td>0</td><td>1</td></tr><tr><td>second</td><td>hello</td><td>undefined</td></tr></tbody></table>";
     assert.equal(table3.outerHTML, table3_ref, "Object");
-});
+});*/

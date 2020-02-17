@@ -33,21 +33,15 @@ body { font-family: Arial, Helvetica, sans-serif; }
 </style>
 <!-- Local -->
 <script type="text/javascript" src="../../src/app/application.js"></script>
+<script type="text/javascript" src="../../src/app/loadController.js"></script>
 <script type="text/javascript" src="../../src/app/viewController.js"></script>
 <script type="text/javascript" src="../../src/app/toolboxController.js"></script>
 <script type="text/javascript" src="../../src/dicom/dicomElementsWrapper.js"></script>
 <script type="text/javascript" src="../../src/dicom/dicomParser.js"></script>
 <script type="text/javascript" src="../../src/dicom/dictionary.js"></script>
-<script type="text/javascript" src="../../src/gui/filter.js"></script>
 <script type="text/javascript" src="../../src/gui/generic.js"></script>
-<script type="text/javascript" src="../../src/gui/help.js"></script>
-<script type="text/javascript" src="../../src/gui/info.js"></script>
-<script type="text/javascript" src="../../src/gui/html.js"></script>
 <script type="text/javascript" src="../../src/gui/layer.js"></script>
-<script type="text/javascript" src="../../src/gui/loader.js"></script>
 <script type="text/javascript" src="../../src/gui/style.js"></script>
-<script type="text/javascript" src="../../src/gui/tools.js"></script>
-<script type="text/javascript" src="../../src/gui/undo.js"></script>
 <script type="text/javascript" src="../../src/image/decoder.js"></script>
 <script type="text/javascript" src="../../src/image/dicomBufferToView.js"></script>
 <script type="text/javascript" src="../../src/image/domReader.js"></script>
@@ -66,22 +60,20 @@ body { font-family: Arial, Helvetica, sans-serif; }
 <script type="text/javascript" src="../../src/math/shapes.js"></script>
 <script type="text/javascript" src="../../src/math/stats.js"></script>
 <script type="text/javascript" src="../../src/math/vector.js"></script>
-<script type="text/javascript" src="../../src/tools/toolbox.js"></script>
 <script type="text/javascript" src="../../src/tools/undo.js"></script>
 <script type="text/javascript" src="../../src/tools/scroll.js"></script>
-<script type="text/javascript" src="../../src/tools/windowLevel.js"></script>
-<script type="text/javascript" src="../../src/utils/browser.js"></script>
+<script type="text/javascript" src="../../src/utils/env.js"></script>
+<script type="text/javascript" src="../../src/utils/listen.js"></script>
+<script type="text/javascript" src="../../src/utils/modernizr.js"></script>
+<script type="text/javascript" src="../../src/utils/operator.js"></script>
 <script type="text/javascript" src="../../src/utils/progress.js"></script>
 <script type="text/javascript" src="../../src/utils/string.js"></script>
-<script type="text/javascript" src="../../src/utils/uri.js"></script>
-<script type="text/javascript" src="../../src/utils/modernizr.js"></script>
 <script type="text/javascript" src="../../src/utils/thread.js"></script>
+<script type="text/javascript" src="../../src/utils/uri.js"></script>
 
 <!-- Local -->
 <script>
 
-// Default window level presets.
-dwv.tool.defaultpresets = {};
 // Image decoders (for web workers)
 dwv.image.decoderScripts = {
     "jpeg2000": "../../decoders/pdfjs/decode-jpeg2000.js",
@@ -89,20 +81,21 @@ dwv.image.decoderScripts = {
     "jpeg-baseline": "../../decoders/pdfjs/decode-jpegbaseline.js",
     "rle": "../../decoders/dwv/decode-rle.js"
 };
-// decode query
-dwv.utils.decodeQuery = dwv.utils.base.decodeQuery;
 // get element
 dwv.gui.getElement = dwv.gui.base.getElement;
-// Progress
-dwv.gui.displayProgress = function (/*percent*/) {};
 
 // dwv application
 var config = {
     "containerDivId": "dwv",
-    "tools": ["Scroll", "WindowLevel"]
+    "tools": {
+        "Scroll": {}
+    }
 };
 var app = new dwv.App();
 app.init(config);
+app.setTool("Scroll");
+// load from location
+dwv.utils.loadFromUri(window.location.href, app);
 
 </script>
 

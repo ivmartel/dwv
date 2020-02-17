@@ -33,6 +33,7 @@ dwv.io.RawVideoLoader = function ()
      * Create a Data URI from an HTTP request response.
      * @param {Object} response The HTTP request response.
      * @param {String} dataType The data type.
+     * @private
      */
     function createDataUri(response, dataType) {
         // image data as string
@@ -48,14 +49,20 @@ dwv.io.RawVideoLoader = function ()
 
     /**
      * Internal Data URI load.
-     * @param {Object} dataUri The data URI.
+     * @param {Object} buffer The read data.
      * @param {String} origin The data origin.
      * @param {Number} index The data index.
      */
-    this.load = function ( dataUri, origin, index ) {
+    this.load = function (buffer, origin, index) {
         // create a DOM video
         var video = document.createElement('video');
-        video.src = dataUri;
+        if (typeof origin === "string") {
+            // url case
+            var ext = origin.split('.').pop().toLowerCase();
+            video.src = createDataUri(buffer, ext);
+        } else {
+            video.src = buffer;
+        }
         // storing values to pass them on
         video.file = origin;
         video.index = index;
@@ -66,6 +73,7 @@ dwv.io.RawVideoLoader = function ()
                     self.onload, self.onprogress, self.onloadend, index);
             } catch (error) {
                 self.onerror(error);
+                self.onloadend({});
             }
         };
     };
@@ -74,42 +82,8 @@ dwv.io.RawVideoLoader = function ()
      * Abort load. TODO...
      */
     this.abort = function () {
-        self.onabort();
-    };
-
-    /**
-     * Get a file load handler.
-     * @param {Object} file The file to load.
-     * @param {Number} index The index 'id' of the file.
-     * @return {Function} A file load handler.
-     */
-    this.getFileLoadHandler = function (file, index) {
-        return function (event) {
-            self.load(event.target.result, file, index);
-        };
-    };
-
-    /**
-     * Get a url load handler.
-     * @param {String} url The url to load.
-     * @param {Number} index The index 'id' of the url.
-     * @return {Function} A url load handler.
-     */
-    this.getUrlLoadHandler = function (url, index) {
-        return function (/*event*/) {
-            // check response status
-            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
-            // status 200: "OK"; status 0: "debug"
-            if (this.status !== 200 && this.status !== 0) {
-                self.onerror({'name': "RequestError",
-                    'message': "Error status: " + this.status +
-                    " while loading '" + url + "' [RawVideoLoader]" });
-                return;
-            }
-            // load
-            var ext = url.split('.').pop().toLowerCase();
-            self.load(createDataUri(this.response, ext), url, index);
-        };
+        self.onabort({});
+        self.onloadend({});
     };
 
 }; // class RawVideoLoader
@@ -152,17 +126,11 @@ dwv.io.RawVideoLoader.prototype.loadUrlAs = function () {
 };
 
 /**
- * Handle a load event.
- * @param {Object} event The load event, 'event.target'
- *  should be the loaded data.
+ * Handle a load start event.
+ * @param {Object} event The load start event.
  * Default does nothing.
  */
-dwv.io.RawVideoLoader.prototype.onload = function (/*event*/) {};
-/**
- * Handle an load end event.
- * Default does nothing.
- */
-dwv.io.RawVideoLoader.prototype.onloadend = function () {};
+dwv.io.RawVideoLoader.prototype.onloadstart = function (/*event*/) {};
 /**
  * Handle a progress event.
  * @param {Object} event The progress event.
@@ -170,16 +138,28 @@ dwv.io.RawVideoLoader.prototype.onloadend = function () {};
  */
 dwv.io.RawVideoLoader.prototype.onprogress = function (/*event*/) {};
 /**
+ * Handle a load event.
+ * @param {Object} event The load event fired
+ *   when a file has been loaded successfully.
+ * Default does nothing.
+ */
+dwv.io.RawVideoLoader.prototype.onload = function (/*event*/) {};
+/**
+ * Handle an load end event.
+ * @param {Object} event The load end event fired
+ *  when a file load has completed, successfully or not.
+ * Default does nothing.
+ */
+dwv.io.RawVideoLoader.prototype.onloadend = function () {};
+/**
  * Handle an error event.
- * @param {Object} event The error event with an
- *  optional 'event.message'.
+ * @param {Object} event The error event.
  * Default does nothing.
  */
 dwv.io.RawVideoLoader.prototype.onerror = function (/*event*/) {};
 /**
  * Handle an abort event.
- * @param {Object} event The abort event with an
- *  optional 'event.message'.
+ * @param {Object} event The abort event.
  * Default does nothing.
  */
 dwv.io.RawVideoLoader.prototype.onabort = function (/*event*/) {};

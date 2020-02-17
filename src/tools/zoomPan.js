@@ -16,11 +16,6 @@ dwv.tool.ZoomAndPan = function(app)
      */
     var self = this;
     /**
-     * ZoomAndPan GUI.
-     * @type Object
-     */
-    var gui = null;
-    /**
      * Interaction start flag.
      * @type Boolean
      */
@@ -96,7 +91,7 @@ dwv.tool.ZoomAndPan = function(app)
             if( Math.abs(diffY) < 15 ) {
                 return;
             }
-            // update GUI
+            // update view controller
             if( diffY > 0 ) {
                 app.getViewController().incrementSliceNb();
             }
@@ -199,22 +194,11 @@ dwv.tool.ZoomAndPan = function(app)
     };
 
     /**
-     * Setup the tool GUI.
+     * Activate the tool.
+     * @param {Boolean} bool The flag to activate or not.
      */
-    this.setup = function ()
-    {
-        gui = new dwv.gui.ZoomAndPan(app);
-        gui.setup();
-    };
-
-    /**
-     * Enable the tool.
-     * @param {Boolean} bool The flag to enable or not.
-     */
-    this.display = function(bool){
-        if ( gui ) {
-            gui.display(bool);
-        }
+    this.activate = function (/*bool*/) {
+        // does nothing
     };
 
 }; // ZoomAndPan class
@@ -223,18 +207,18 @@ dwv.tool.ZoomAndPan = function(app)
  * Help for this tool.
  * @return {Object} The help content.
  */
-dwv.tool.ZoomAndPan.prototype.getHelp = function()
+dwv.tool.ZoomAndPan.prototype.getHelpKeys = function()
 {
     return {
-        "title": dwv.i18n("tool.ZoomAndPan.name"),
-        "brief": dwv.i18n("tool.ZoomAndPan.brief"),
+        "title": "tool.ZoomAndPan.name",
+        "brief": "tool.ZoomAndPan.brief",
         "mouse": {
-            "mouse_wheel": dwv.i18n("tool.ZoomAndPan.mouse_wheel"),
-            "mouse_drag": dwv.i18n("tool.ZoomAndPan.mouse_drag")
+            "mouse_wheel": "tool.ZoomAndPan.mouse_wheel",
+            "mouse_drag": "tool.ZoomAndPan.mouse_drag"
         },
         "touch": {
-            'twotouch_pinch': dwv.i18n("tool.ZoomAndPan.twotouch_pinch"),
-            'touch_drag': dwv.i18n("tool.ZoomAndPan.touch_drag")
+            'twotouch_pinch': "tool.ZoomAndPan.twotouch_pinch",
+            'touch_drag': "tool.ZoomAndPan.touch_drag"
         }
     };
 };
@@ -243,5 +227,5 @@ dwv.tool.ZoomAndPan.prototype.getHelp = function()
  * Initialise the tool.
  */
 dwv.tool.ZoomAndPan.prototype.init = function() {
-    return true;
+    // does nothing
 };

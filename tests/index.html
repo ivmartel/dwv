@@ -31,8 +31,6 @@
 <script type="text/javascript" src="../src/dicom/dicomParser.js" data-cover></script>
 <script type="text/javascript" src="../src/dicom/dicomWriter.js" data-cover></script>
 <script type="text/javascript" src="../src/dicom/dictionary.js" data-cover></script>
-<script type="text/javascript" src="../src/gui/html.js" data-cover></script>
-<script type="text/javascript" src="../src/gui/info.js" data-cover></script>
 <script type="text/javascript" src="../src/image/filter.js" data-cover></script>
 <script type="text/javascript" src="../src/image/geometry.js" data-cover></script>
 <script type="text/javascript" src="../src/image/image.js" data-cover></script>
@@ -43,9 +41,11 @@
 <script type="text/javascript" src="../src/math/shapes.js" data-cover></script>
 <script type="text/javascript" src="../src/math/stats.js" data-cover></script>
 <script type="text/javascript" src="../src/math/vector.js" data-cover></script>
-<script type="text/javascript" src="../src/utils/browser.js" data-cover></script>
+<script type="text/javascript" src="../src/utils/env.js" data-cover></script>
 <script type="text/javascript" src="../src/utils/modernizr.js"></script>
+<script type="text/javascript" src="../src/utils/operator.js"></script>
 <script type="text/javascript" src="../src/utils/i18n.js" data-cover></script>
+<script type="text/javascript" src="../src/utils/operator.js" data-cover></script>
 <script type="text/javascript" src="../src/utils/thread.js" data-cover></script>
 <!-- Tests -->
 <script type="text/javascript" src="dicom/dicomParser.test.js"></script>
@@ -63,12 +63,13 @@
 <script type="text/javascript" src="state/state.test.js"></script>
 <script type="text/javascript" src="utils/i18n.test.js"></script>
 <script type="text/javascript" src="utils/string.test.js"></script>
+<script type="text/javascript" src="utils/operator.test.js"></script>
 <script type="text/javascript" src="utils/thread.test.js"></script>
 <script type="text/javascript" src="utils/uri.test.js"></script>
 
 <script type="text/javascript">
-// check browser support (and provide missing functions)
-dwv.browser.check();
+// check environment support (and provide missing functions)
+dwv.env.check();
 </script>
 
 <div class="footer">

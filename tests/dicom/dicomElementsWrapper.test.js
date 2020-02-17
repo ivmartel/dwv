@@ -1,7 +1,6 @@
 /**
  * Tests for the 'dicom/dicomElementsWrapper.js' file.
  */
-/** @module tests/dicom */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module("dicomElementsWrapper");
@@ -32,7 +31,7 @@ QUnit.test("Test simple DICOM wrapping.", function (assert) {
         // wrapped tags
         var tags = dicomParser.getDicomElements();
         // dump to table
-        var table = tags.dumpToTable();
+        var table = dwv.utils.objectToArray(tags.dumpToObject());
 
         // regression table
         var teoTable = [

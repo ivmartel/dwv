@@ -7,8 +7,8 @@ QUnit.module("utils");
 
 /**
  * Tests for {@link dwv.utils.getUrlFromUri}.
- * @function module:tests/utils~getUrlFromUri
  * Test the multiplatform version and the simple one.
+ * @function module:tests/utils~getUrlFromUri
  */
 QUnit.test("Test getUrlFromUri.", function (assert) {
     // test #00: empty

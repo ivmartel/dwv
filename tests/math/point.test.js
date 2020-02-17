@@ -1,7 +1,6 @@
 /**
  * Tests for the 'math/point.js' file.
  */
-/** @module tests/math */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module("point");

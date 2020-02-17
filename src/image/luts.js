@@ -179,7 +179,7 @@ dwv.image.lut.Window = function (rescaleLut, isSigned)
         // create window lut
         var size = rescaleLut.getLength();
         if (!lut) {
-            // use clamped array (polyfilled in browser.js)
+            // use clamped array (polyfilled in env.js)
             lut = new Uint8ClampedArray(size);
         }
         // by default WindowLevel returns a value in the [0,255] range

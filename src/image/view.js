@@ -4,12 +4,18 @@ dwv.image = dwv.image || {};
 
 /**
  * WindowLevel class.
- * References:
- * - DICOM [Window Center and Window Width]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2}
- * Pseudo-code:
+ * <br>Pseudo-code:
+ * <pre>
  *  if (x <= c - 0.5 - (w-1)/2), then y = ymin
  *  else if (x > c - 0.5 + (w-1)/2), then y = ymax,
  *  else y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin) + ymin
+ * </pre>
+ *
+ * @param {Number} center The window center.
+ * @param {Number} width The window width.
+ * @constructor
+ * @see DICOM doc for [Window Center and Window Width]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2}
+ *
  */
 dwv.image.WindowLevel = function (center, width)
 {
@@ -230,6 +236,8 @@ dwv.image.View = function (image)
      * Warning: can be undefined in no window/level was set.
      * @param {Object} rsi Optional image rsi, will take the one of the current slice otherwise.
      * @return {Window} The window LUT of the image.
+     * @fires dwv.image.View#wl-width-change
+     * @fires dwv.image.View#wl-center-change
      */
     this.getCurrentWindowLut = function (rsi) {
         var sliceNumber = this.getCurrentPosition().k;
@@ -256,14 +264,20 @@ dwv.image.View = function (image)
                 wlut.setWindowLevel(wl);
                 // fire event
                 if ( previousWidth !== wl.getWidth() ) {
-                    this.fireEvent({"type": "wl-width-change",
-                        "wc": wl.getCenter(), "ww": wl.getWidth(),
-                        "skipGenerate": true});
+                    this.fireEvent({
+                        "type": "wl-width-change",
+                        "wc": wl.getCenter(),
+                        "ww": wl.getWidth(),
+                        "skipGenerate": true
+                    });
                 }
                 if ( previousCenter !== wl.getCenter() ) {
-                    this.fireEvent({"type": "wl-center-change",
-                        "wc": wl.getCenter(), "ww": wl.getWidth(),
-                        "skipGenerate": true});
+                    this.fireEvent({
+                        "type": "wl-center-change",
+                        "wc": wl.getCenter(),
+                        "ww": wl.getWidth(),
+                        "skipGenerate": true
+                    });
                 }
             }
         }
@@ -338,6 +352,17 @@ dwv.image.View = function (image)
             } else {
                 // add new
                 windowPresets[key] = presets[key];
+                // fire event
+                /**
+                 * Window/level add preset event.
+                 * @event dwv.image.View#wl-preset-add
+                 * @type {Object}
+                 * @property {string} name The name of the preset.
+                 */
+                this.fireEvent({
+                    "type": "wl-preset-add",
+                    "name": key
+                });
             }
         }
     };
@@ -350,12 +375,22 @@ dwv.image.View = function (image)
     /**
      * Set the colour map of the image.
      * @param {Object} map The colour map of the image.
+     * @fires dwv.image.View#color-change
      */
     this.setColourMap = function(map) {
         colourMap = map;
-        this.fireEvent({"type": "colour-change",
-           "wc": this.getCurrentWindowLut().getWindowLevel().getCenter(),
-           "ww": this.getCurrentWindowLut().getWindowLevel().getWidth() });
+        /**
+         * Color change event.
+         * @event dwv.image.View#color-change
+         * @type {Object}
+         * @property {number} wc The new window center value.
+         * @property {number} ww The new window wdth value.
+         */
+        this.fireEvent({
+            "type": "colour-change",
+            "wc": this.getCurrentWindowLut().getWindowLevel().getCenter(),
+            "ww": this.getCurrentWindowLut().getWindowLevel().getWidth()
+        });
     };
 
     /**
@@ -371,6 +406,8 @@ dwv.image.View = function (image)
      * @param {Object} pos The current position.
      * @param {Boolean} silent If true, does not fire a slice-change event.
      * @return {Boolean} False if not in bounds
+     * @fires dwv.image.View#slice-change
+     * @fires dwv.image.View#position-change
      */
     this.setCurrentPosition = function(pos, silent) {
         // default silent flag to false
@@ -387,21 +424,51 @@ dwv.image.View = function (image)
         // fire a 'position-change' event
         if( image.getPhotometricInterpretation().match(/MONOCHROME/) !== null )
         {
-            this.fireEvent({"type": "position-change",
-                "i": pos.i, "j": pos.j, "k": pos.k,
-                "value": image.getRescaledValue(pos.i,pos.j,pos.k, this.getCurrentFrame())});
+            /**
+             * Position change event.
+             * @event dwv.image.View#position-change
+             * @type {Object}
+             * @property {number} i The new column position
+             * @property {number} j The new row position
+             * @property {number} k The new slice position
+             * @property {Object} value The image value at the new position.
+             */
+            this.fireEvent({
+                "type": "position-change",
+                "i": pos.i,
+                "j": pos.j,
+                "k": pos.k,
+                "value": image.getRescaledValue(pos.i,pos.j,pos.k, this.getCurrentFrame())
+            });
         }
         else
         {
-            this.fireEvent({"type": "position-change",
-                "i": pos.i, "j": pos.j, "k": pos.k});
+            this.fireEvent({
+                "type": "position-change",
+                "i": pos.i,
+                "j": pos.j,
+                "k": pos.k
+            });
         }
 
         // fire a slice change event (used to trigger redraw)
         if ( !silent ) {
-          if( oldPosition.k !== currentPosition.k ) {
-              this.fireEvent({"type": "slice-change"});
-          }
+            if ( oldPosition.k !== currentPosition.k ) {
+                /**
+                 * Slice change event.
+                 * @event dwv.image.View#slice-change
+                 * @type {Object}
+                 * @property {number} value The new slice number
+                 * @property {Object} data Associated event data: the imageUid.
+                 */
+                this.fireEvent({
+                    "type": "slice-change",
+                    "value": currentPosition.k,
+                    "data": {
+                        "imageUid": image.getImageUids()[currentPosition.k]
+                    }
+                });
+            }
         }
 
         // all good
@@ -420,6 +487,7 @@ dwv.image.View = function (image)
      * Set the current frame number.
      * @param {Number} The current frame number.
      * @return {Boolean} False if not in bounds
+     * @fires dwv.image.View#frame-change
      */
     this.setCurrentFrame = function (frame) {
         // check if possible
@@ -431,7 +499,16 @@ dwv.image.View = function (image)
         currentFrame = frame;
         // fire event
         if( oldFrame !== currentFrame && image.getNumberOfFrames() !== 1 ) {
-            this.fireEvent({"type": "frame-change", "frame": currentFrame});
+            /**
+             * Frame change event.
+             * @event dwv.image.View#frame-change
+             * @type {Object}
+             * @property {number} frame The new frame number
+             */
+            this.fireEvent({
+                "type": "frame-change",
+                "frame": currentFrame
+            });
             // silent set current position to update info text
             this.setCurrentPosition(this.getCurrentPosition(),true);
         }
@@ -473,6 +550,8 @@ dwv.image.View = function (image)
      * @param {Number} width The window width.
      * @param {String} name Associated preset name, defaults to 'manual'.
      * Warning: uses the latest set rescale LUT or the default linear one.
+     * @fires dwv.image.View#wl-width-change
+     * @fires dwv.image.View#wl-center-change
      */
     this.setWindowLevel = function ( center, width, name )
     {
@@ -517,14 +596,46 @@ dwv.image.View = function (image)
             // fire window level change event
             if (currentWl && typeof currentWl !== "undefined") {
                 if (currentWl.getWidth() !== width) {
-                    this.fireEvent({"type": "wl-width-change", "wc": center, "ww": width });
+                    /**
+                     * Window/level width change event.
+                     * @event dwv.image.View#wl-width-change
+                     * @type {Object}
+                     * @property {number} wc The new window center value.
+                     * @property {number} ww The new window wdth value.
+                     * @property {boolean} skipGenerate Flag to skip view generation.
+                     */
+                    this.fireEvent({
+                        "type": "wl-width-change",
+                        "wc": center,
+                        "ww": width
+                     });
                 }
                 if (currentWl.getCenter() !== center) {
-                    this.fireEvent({"type": "wl-center-change", "wc": center, "ww": width });
+                    /**
+                     * Window/level center change event.
+                     * @event dwv.image.View#wl-center-change
+                     * @type {Object}
+                     * @property {number} wc The new window center value.
+                     * @property {number} ww The new window wdth value.
+                     * @property {boolean} skipGenerate Flag to skip view generation.
+                     */
+                    this.fireEvent({
+                        "type": "wl-center-change",
+                        "wc": center,
+                        "ww": width
+                    });
                 }
             } else {
-                this.fireEvent({"type": "wl-width-change", "wc": center, "ww": width });
-                this.fireEvent({"type": "wl-center-change", "wc": center, "ww": width });
+                this.fireEvent({
+                    "type": "wl-width-change",
+                    "wc": center,
+                    "ww": width
+                });
+                this.fireEvent({
+                    "type": "wl-center-change",
+                    "wc": center,
+                    "ww": width
+                });
             }
         }
     };

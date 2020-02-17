@@ -7,9 +7,6 @@
  * - Choose 'Convert to JPEG'.
  */
 
-// Default window level presets.
-dwv.tool.defaultpresets = {};
-
 // Image decoders (for web workers)
 dwv.image.decoderScripts = {
     "jpeg2000": "../../decoders/pdfjs/decode-jpeg2000.js",
@@ -18,15 +15,11 @@ dwv.image.decoderScripts = {
     "rle": "../../decoders/dwv/decode-rle.js"
 };
 
-// Window
-dwv.gui.getWindowSize = dwv.gui.base.getWindowSize;
 // get element
 dwv.gui.getElement = dwv.gui.base.getElement;
-// Progress
-dwv.gui.displayProgress = function (/*percent*/) {};
 
-// check browser support
-dwv.browser.check();
+// check environment support
+dwv.env.check();
 
 // test data line
 dwv.addDataLine = function (id, fileroot, doc)
@@ -55,11 +48,11 @@ dwv.addDataLine = function (id, fileroot, doc)
     app.init(config);
     // display loading time
     var listener = function (event) {
+        var timerLabel = "load-data["+fileroot+"]";
         if (event.type === "load-start") {
-            console.time("load-data::"+fileroot);
-        }
-        else {
-            console.timeEnd("load-data::"+fileroot);
+            console.time(timerLabel);
+        } else if (event.type === "load-end") {
+            console.timeEnd(timerLabel);
         }
     };
     app.addEventListener("load-start", listener);
