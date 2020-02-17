@@ -14,6 +14,7 @@ dwv.io.RawImageLoader = function ()
     /**
      * if abort is triggered, all image.onload callbacks have to be cancelled
      * @type {boolean}
+     * @private
      */
     var aborted = false;
 
@@ -51,11 +52,11 @@ dwv.io.RawImageLoader = function ()
 
     /**
      * Load data.
-     * @param {Object} dataUri The data URI.
+     * @param {Object} buffer The read data.
      * @param {String} origin The data origin.
      * @param {Number} index The data index.
      */
-    this.load = function ( dataUri, origin, index ) {
+    this.load = function (buffer, origin, index) {
         aborted = false;
         // create a DOM image
         var image = new Image();
@@ -65,17 +66,28 @@ dwv.io.RawImageLoader = function ()
                 if(!aborted){
                     self.onload( dwv.image.getViewFromDOMImage(this) );
                 }
-                self.onloadend();
+                self.onloadend({});
             } catch (error) {
                 self.onerror(error);
+                self.onloadend({});
             }
-            self.onprogress({'type': 'read-progress', 'lengthComputable': true,
-                'loaded': 100, 'total': 100, 'index': index});
+            self.onprogress({
+                'lengthComputable': true,
+                'loaded': 100,
+                'total': 100,
+                'index': index
+            });
         };
         // storing values to pass them on
         image.origin = origin;
         image.index = index;
-        image.src = dataUri;
+        if (typeof origin === "string") {
+            // url case
+            var ext = origin.split('.').pop().toLowerCase();
+            image.src = createDataUri(buffer, ext);
+        } else {
+            image.src = buffer;
+        }
     };
 
     /**
@@ -83,42 +95,8 @@ dwv.io.RawImageLoader = function ()
      */
     this.abort = function () {
         aborted = true;
-        self.onabort();
-    };
-
-    /**
-     * Get a file load handler.
-     * @param {Object} file The file to load.
-     * @param {Number} index The index 'id' of the file.
-     * @return {Function} A file load handler.
-     */
-    this.getFileLoadHandler = function (file, index) {
-        return function (event) {
-            self.load(event.target.result, file, index);
-        };
-    };
-
-    /**
-     * Get a url load handler.
-     * @param {String} url The url to load.
-     * @param {Number} index The index 'id' of the url.
-     * @return {Function} A url load handler.
-     */
-    this.getUrlLoadHandler = function (url, index) {
-        return function (/*event*/) {
-            // check response status
-            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
-            // status 200: "OK"; status 0: "debug"
-            if (this.status !== 200 && this.status !== 0) {
-                self.onerror({'name': "RequestError",
-                    'message': "Error status: " + this.status +
-                    " while loading '" + url + "' [RawImageLoader]" });
-                return;
-            }
-            // load
-            var ext = url.split('.').pop().toLowerCase();
-            self.load(createDataUri(this.response, ext), url, index);
-        };
+        self.onabort({});
+        self.onloadend({});
     };
 
 }; // class RawImageLoader
@@ -169,17 +147,11 @@ dwv.io.RawImageLoader.prototype.loadUrlAs = function () {
 };
 
 /**
- * Handle a load event.
- * @param {Object} event The load event, 'event.target'
- *  should be the loaded data.
+ * Handle a load start event.
+ * @param {Object} event The load start event.
  * Default does nothing.
  */
-dwv.io.RawImageLoader.prototype.onload = function (/*event*/) {};
-/**
- * Handle an load end event.
- * Default does nothing.
- */
-dwv.io.RawImageLoader.prototype.onloadend = function () {};
+dwv.io.RawImageLoader.prototype.onloadstart = function (/*event*/) {};
 /**
  * Handle a progress event.
  * @param {Object} event The progress event.
@@ -187,16 +159,28 @@ dwv.io.RawImageLoader.prototype.onloadend = function () {};
  */
 dwv.io.RawImageLoader.prototype.onprogress = function (/*event*/) {};
 /**
+ * Handle a load event.
+ * @param {Object} event The load event fired
+ *   when a file has been loaded successfully.
+ * Default does nothing.
+ */
+dwv.io.RawImageLoader.prototype.onload = function (/*event*/) {};
+/**
+ * Handle an load end event.
+ * @param {Object} event The load end event fired
+ *  when a file load has completed, successfully or not.
+ * Default does nothing.
+ */
+dwv.io.RawImageLoader.prototype.onloadend = function (/*event*/) {};
+/**
  * Handle an error event.
- * @param {Object} event The error event with an
- *  optional 'event.message'.
+ * @param {Object} event The error event.
  * Default does nothing.
  */
 dwv.io.RawImageLoader.prototype.onerror = function (/*event*/) {};
 /**
  * Handle an abort event.
- * @param {Object} event The abort event with an
- *  optional 'event.message'.
+ * @param {Object} event The abort event.
  * Default does nothing.
  */
 dwv.io.RawImageLoader.prototype.onabort = function (/*event*/) {};

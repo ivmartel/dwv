@@ -1,19 +1,18 @@
+// namespace
+var dwv = dwv || {};
+dwv.test = dwv.test || {};
+
 /**
  * Tests for the 'dicom/dicomWriter.js' file.
  */
-/** @module tests/dicom */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module("dicomWriter");
 
-var dwv = dwv || {};
-dwv.utils = dwv.utils || {};
-dwv.utils.test = dwv.utils.test || {};
-
 /**
  * Tests for {@link dwv.dicom.DicomWriter} using simple DICOM data.
  * Using remote file for CI integration.
- * @function module:tests/dicom~dicomWriter
+ * @function module:tests/dicom~dicomWriterSimpleDicom
  */
 QUnit.test("Test multiframe writer support.", function (assert) {
     var done = assert.async();
@@ -61,6 +60,11 @@ QUnit.test("Test multiframe writer support.", function (assert) {
     request.send(null);
 });
 
+/**
+ * Tests for {@link dwv.dicom.DicomWriter} anomnymisation.
+ * Using remote file for CI integration.
+ * @function module:tests/dicom~dicomWriterAnonymise
+ */
 QUnit.test("Test patient anonymisation", function (assert) {
     var done = assert.async();
 
@@ -130,7 +134,7 @@ QUnit.test("Test patient anonymisation", function (assert) {
  * @param {Object} obj The input object
  * @return {String} The string.
  */
-dwv.utils.test.toString = function ( obj ) {
+dwv.test.toString = function ( obj ) {
     var res = obj.toString();
     if ( res.substr(0,7) === "[object" &&
         res.substr((res.length - 6),6) === "Array]") {
@@ -152,7 +156,7 @@ dwv.utils.test.toString = function ( obj ) {
  * @param {String} name The name of the test.
  * @param {Object} comaprator An object with an equal function (such as Qunit assert).
  */
-dwv.utils.test.compare = function ( jsonTags, dicomElements, name, comparator ) {
+dwv.test.compare = function ( jsonTags, dicomElements, name, comparator ) {
     // check content
     if (jsonTags === null || jsonTags === 0) {
         return;
@@ -165,7 +169,7 @@ dwv.utils.test.compare = function ( jsonTags, dicomElements, name, comparator ) 
         var element = dicomElements.getDEFromKey(tagKey);
         var value = dicomElements.getFromKey(tagKey, true);
         if ( element.vr !== "SQ" ) {
-            comparator.equal(dwv.utils.test.toString(value), jsonTags[tag], name + " - " + tag);
+            comparator.equal(dwv.test.toString(value), jsonTags[tag], name + " - " + tag);
         } else {
             // check content
             if (jsonTags[tag] === null || jsonTags[tag] === 0) {
@@ -177,7 +181,7 @@ dwv.utils.test.compare = function ( jsonTags, dicomElements, name, comparator ) 
             for ( var sk = 0; sk < subKeys.length; ++sk ) {
                 if ( subKeys[sk] !== "explicitLength" ) {
                     var wrap = new dwv.dicom.DicomElementsWrapper(value[index]);
-                    dwv.utils.test.compare(jsonTags[tag][subKeys[sk]], wrap, name, comparator);
+                    dwv.test.compare(jsonTags[tag][subKeys[sk]], wrap, name, comparator);
                     ++index;
                 }
             }
@@ -186,11 +190,11 @@ dwv.utils.test.compare = function ( jsonTags, dicomElements, name, comparator ) 
 };
 
 /**
- * Test a JSON config.
+ * Test a JSON config: write a DICOM file and read it back.
  * @param {Object} config A JSON config representing DICOM tags.
  * @param {Object} assert A Qunit assert.
  */
-dwv.utils.test.testConfig = function (config, assert) {
+dwv.test.testWriteReadDataFromConfig = function (config, assert) {
     // convert JSON to DICOM element object
     var res = dwv.dicom.getElementsFromJSONTags(config.tags);
     var dicomElements = res.elements;
@@ -213,9 +217,14 @@ dwv.utils.test.testConfig = function (config, assert) {
     var elements = dicomParser.getDicomElements();
 
     // compare contents
-    dwv.utils.test.compare(config.tags, elements, config.name, assert);
+    dwv.test.compare(config.tags, elements, config.name, assert);
 };
 
+/**
+ * Tests write/read DICOM data from config file: explicit encoding.
+ * Using remote file for CI integration.
+ * @function module:tests/dicom~dicomExplicitWriteReadFromConfig
+ */
 QUnit.test("Test synthetic dicom explicit", function (assert) {
     var done = assert.async();
 
@@ -230,7 +239,7 @@ QUnit.test("Test synthetic dicom explicit", function (assert) {
     request.onload = function (/*event*/) {
         var configs = JSON.parse(this.responseText);
         for (var i = 0; i < configs.length; ++i ) {
-            dwv.utils.test.testConfig(configs[i], assert);
+            dwv.test.testWriteReadDataFromConfig(configs[i], assert);
         }
         // finish async test
         done();
@@ -238,6 +247,11 @@ QUnit.test("Test synthetic dicom explicit", function (assert) {
     request.send(null);
 });
 
+/**
+ * Tests write/read DICOM data from config file: implicit encoding.
+ * Using remote file for CI integration.
+ * @function module:tests/dicom~dicomImplicitWriteReadFromConfig
+ */
 QUnit.test("Test synthetic dicom implicit", function (assert) {
     var done = assert.async();
 
@@ -252,7 +266,7 @@ QUnit.test("Test synthetic dicom implicit", function (assert) {
     request.onload = function (/*event*/) {
         var configs = JSON.parse(this.responseText);
         for (var i = 0; i < configs.length; ++i ) {
-            dwv.utils.test.testConfig(configs[i], assert);
+            dwv.test.testWriteReadDataFromConfig(configs[i], assert);
         }
         // finish async test
         done();
@@ -260,6 +274,11 @@ QUnit.test("Test synthetic dicom implicit", function (assert) {
     request.send(null);
 });
 
+/**
+ * Tests write/read DICOM data from config file: explicit big endian encoding.
+ * Using remote file for CI integration.
+ * @function module:tests/dicom~dicomExplicitBigEndianWriteReadFromConfig
+ */
 QUnit.test("Test synthetic dicom explicit big endian", function (assert) {
     var done = assert.async();
 
@@ -274,7 +293,7 @@ QUnit.test("Test synthetic dicom explicit big endian", function (assert) {
     request.onload = function (/*event*/) {
         var configs = JSON.parse(this.responseText);
         for (var i = 0; i < configs.length; ++i ) {
-            dwv.utils.test.testConfig(configs[i], assert);
+            dwv.test.testWriteReadDataFromConfig(configs[i], assert);
         }
         // finish async test
         done();

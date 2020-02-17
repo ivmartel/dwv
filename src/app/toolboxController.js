@@ -3,46 +3,31 @@ var dwv = dwv || {};
 
 /**
  * Toolbox controller.
+ * @param {Array} toolList The list of tool objects.
  * @constructor
  */
-dwv.ToolboxController = function ()
+dwv.ToolboxController = function (toolList)
 {
-    // internal toolbox
-    var toolbox = null;
-    // point converter function
+    /**
+     * Point converter function
+     * @private
+     */
     var displayToIndexConverter = null;
 
     /**
-     * Create the internal toolbox.
-     * @param {Array} toolList The list of tools instances.
-     * @param {Object} app The associated app.
+     * Selected tool.
+     * @type Object
+     * @private
      */
-    this.create = function (toolList, app) {
-        toolbox = new dwv.tool.Toolbox(toolList, app);
-    };
+    var selectedTool = null;
 
     /**
-     * Setup the internal toolbox.
+     * Initialise.
      */
-    this.setup = function () {
-        toolbox.setup();
-    };
-
-    /**
-     * Reset the internal toolbox.
-     */
-    this.reset = function () {
-        toolbox.reset();
-    };
-
-    /**
-     * Initialise and display the internal toolbox.
-     */
-    this.initAndDisplay = function (layer) {
-        // initialise
-        toolbox.init();
-        // display
-        toolbox.display(true);
+    this.init = function (layer) {
+        for( var key in toolList ) {
+            toolList[key].init();
+        }
         // TODO Would prefer to have this done in the addLayerListeners
         displayToIndexConverter = layer.displayToIndex;
         // add layer listeners
@@ -53,9 +38,27 @@ dwv.ToolboxController = function ()
 
     /**
      * Get the tool list.
+     * @return {Array} The list of tool objects.
      */
     this.getToolList = function () {
-        return toolbox.getToolList();
+        return toolList;
+    };
+
+    /**
+     * Check if a tool is in the tool list.
+     * @param {String} name The name to check.
+     * @return {String} The tool list element for the given name.
+     */
+    this.hasTool = function (name) {
+        return this.getToolList()[name];
+    };
+
+    /**
+     * Get the selected tool.
+     * @return {Object} The selected tool.
+     */
+    this.getSelectedTool = function () {
+        return selectedTool;
     };
 
     /**
@@ -64,7 +67,7 @@ dwv.ToolboxController = function ()
      */
     this.getSelectedToolEventHandler = function (eventType)
     {
-        return toolbox.getSelectedTool()[eventType];
+        return this.getSelectedTool()[eventType];
     };
 
     /**
@@ -73,7 +76,18 @@ dwv.ToolboxController = function ()
      */
     this.setSelectedTool = function (name)
     {
-        toolbox.setSelectedTool(name);
+        // check if we have it
+        if (!this.hasTool(name)) {
+            throw new Error("Unknown tool: '" + name + "'");
+        }
+        // de-activate previous
+        if (selectedTool) {
+            selectedTool.activate(false);
+        }
+        // set internal var
+        selectedTool = toolList[name];
+        // activate new tool
+        selectedTool.activate(true);
     };
 
     /**
@@ -82,7 +96,7 @@ dwv.ToolboxController = function ()
      */
     this.setSelectedShape = function (name)
     {
-        toolbox.getSelectedTool().setShapeName(name);
+        this.getSelectedTool().setShapeName(name);
     };
 
     /**
@@ -91,7 +105,7 @@ dwv.ToolboxController = function ()
      */
     this.setSelectedFilter = function (name)
     {
-        toolbox.getSelectedTool().setSelectedFilter(name);
+        this.getSelectedTool().setSelectedFilter(name);
     };
 
     /**
@@ -99,7 +113,7 @@ dwv.ToolboxController = function ()
      */
     this.runSelectedFilter = function ()
     {
-        toolbox.getSelectedTool().getSelectedFilter().run();
+        this.getSelectedTool().getSelectedFilter().run();
     };
 
     /**
@@ -108,7 +122,7 @@ dwv.ToolboxController = function ()
      */
     this.setLineColour = function (colour)
     {
-        toolbox.getSelectedTool().setLineColour(colour);
+        this.getSelectedTool().setLineColour(colour);
     };
 
     /**
@@ -119,9 +133,9 @@ dwv.ToolboxController = function ()
     {
         // seems like jquery is checking if the method exists before it
         // is used...
-        if ( toolbox && toolbox.getSelectedTool() &&
-                toolbox.getSelectedTool().getSelectedFilter() ) {
-            toolbox.getSelectedTool().getSelectedFilter().run(range);
+        if ( this.getSelectedTool() &&
+                this.getSelectedTool().getSelectedFilter() ) {
+            this.getSelectedTool().getSelectedFilter().run(range);
         }
     };
 
@@ -172,11 +186,16 @@ dwv.ToolboxController = function ()
     /**
      * Mou(se) and (T)ouch event handler. This function just determines the mouse/touch
      * position relative to the canvas element. It then passes it to the current tool.
-     * @private
      * @param {Object} event The event to handle.
+     * @private
      */
     function onMouch(event)
     {
+        // make sure we have a tool
+        if (!selectedTool) {
+            return;
+        }
+
         // flag not to get confused between touch and mouse
         var handled = false;
         // Store the event position relative to the image canvas
@@ -235,7 +254,7 @@ dwv.ToolboxController = function ()
             if ( event.type !== "keydown" ) {
                 event.preventDefault();
             }
-            var func = toolbox.getSelectedTool()[event.type];
+            var func = selectedTool[event.type];
             if ( func )
             {
                 func(event);

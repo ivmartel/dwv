@@ -1,13 +1,16 @@
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// external
+/**
+ * The Konva namespace.
+ * @external Konva
+ * @see https://konvajs.org/
+ */
 var Konva = Konva || {};
 
 /**
  * Shape editor.
  * @constructor
- * @external Konva
  */
 dwv.tool.ShapeEditor = function (app)
 {
@@ -128,6 +131,7 @@ dwv.tool.ShapeEditor = function (app)
     /**
      * Apply a function on all anchors.
      * @param {Object} func A f(shape) function.
+     * @private
      */
     function applyFuncToAnchors( func ) {
         if ( shape && shape.getParent() ) {
@@ -139,6 +143,7 @@ dwv.tool.ShapeEditor = function (app)
     /**
      * Set anchors visibility.
      * @param {Boolean} flag The visible flag.
+     * @private
      */
     function setAnchorsVisible( flag ) {
         applyFuncToAnchors( function (anchor) {
@@ -167,6 +172,7 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Remove anchors.
+     * @private
      */
     function removeAnchors() {
         applyFuncToAnchors( function (anchor) {
@@ -176,6 +182,7 @@ dwv.tool.ShapeEditor = function (app)
 
     /**
      * Add the shape anchors.
+     * @private
      */
     function addAnchors() {
         // exit if no shape or no layer
@@ -214,21 +221,21 @@ dwv.tool.ShapeEditor = function (app)
             }
 
             if ( group.name() === "line-group" ) {
-                updateFunction = dwv.tool.UpdateArrow;
+                updateFunction = dwv.tool.draw.UpdateArrow;
             } else if ( group.name() === "ruler-group" ) {
-                updateFunction = dwv.tool.UpdateRuler;
+                updateFunction = dwv.tool.draw.UpdateRuler;
             } else if ( group.name() === "protractor-group" ) {
-                updateFunction = dwv.tool.UpdateProtractor;
+                updateFunction = dwv.tool.draw.UpdateProtractor;
             } else if ( group.name() === "roi-group" ) {
-                updateFunction = dwv.tool.UpdateRoi;
+                updateFunction = dwv.tool.draw.UpdateRoi;
             } else if ( group.name() === "freeHand-group" ) {
-                updateFunction = dwv.tool.UpdateFreeHand;
+                updateFunction = dwv.tool.draw.UpdateFreeHand;
             } else {
                 console.warn("Cannot update unknown line shape.");
             }
         }
         else if ( shape instanceof Konva.Rect ) {
-            updateFunction = dwv.tool.UpdateRect;
+            updateFunction = dwv.tool.draw.UpdateRect;
             var rectX = shape.x();
             var rectY = shape.y();
             var rectWidth = shape.width();
@@ -239,7 +246,7 @@ dwv.tool.ShapeEditor = function (app)
             addAnchor(group, rectX, rectY+rectHeight, 'bottomLeft');
         }
         else if ( shape instanceof Konva.Ellipse ) {
-            updateFunction = dwv.tool.UpdateEllipse;
+            updateFunction = dwv.tool.draw.UpdateEllipse;
             var ellipseX = shape.x();
             var ellipseY = shape.y();
             var radius = shape.radius();
@@ -259,6 +266,7 @@ dwv.tool.ShapeEditor = function (app)
      * @param {Number} x The X position of the anchor.
      * @param {Number} y The Y position of the anchor.
      * @param {Number} id The id of the anchor.
+     * @private
      */
     function addAnchor(group, x, y, id) {
         // anchor shape
@@ -284,6 +292,7 @@ dwv.tool.ShapeEditor = function (app)
     /**
      * Get a simple clone of the input anchor.
      * @param {Object} anchor The anchor to clone.
+     * @private
      */
     function getClone( anchor ) {
         // create closure to properties
@@ -311,6 +320,7 @@ dwv.tool.ShapeEditor = function (app)
     /**
      * Set the anchor on listeners.
      * @param {Object} anchor The anchor to set on.
+     * @private
      */
     function setAnchorOn( anchor ) {
         var startAnchor = null;
@@ -387,6 +397,7 @@ dwv.tool.ShapeEditor = function (app)
     /**
      * Set the anchor off listeners.
      * @param {Object} anchor The anchor to set off.
+     * @private
      */
     function setAnchorOff( anchor ) {
         anchor.off('dragstart.edit');

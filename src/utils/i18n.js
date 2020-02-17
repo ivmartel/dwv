@@ -1,8 +1,22 @@
 // namespaces
 var dwv = dwv || {};
-// external
+/**
+ * The i18next namespace.
+ * @external i18next
+ * @see https://www.i18next.com
+ */
 var i18next = i18next || {};
+/**
+ * The i18nextXHRBackend namespace.
+ * @external i18nextXHRBackend
+ * @see https://github.com/i18next/i18next-xhr-backend
+ */
 var i18nextXHRBackend = i18nextXHRBackend || {};
+/**
+ * The i18nextBrowserLanguageDetector namespace.
+ * @external i18nextBrowserLanguageDetector
+ * @see https://github.com/i18next/i18next-browser-languageDetector
+ */
 var i18nextBrowserLanguageDetector = i18nextBrowserLanguageDetector || {};
 
 // This is mainly a wrapper around the i18next object.
@@ -16,9 +30,6 @@ dwv.i18nLocalesPath = null;
  * @param {String} language The language to translate to. Defaults to 'auto' and
  *   gets the language from the browser.
  * @param {String} localesPath Path to the locales directory.
- * @external i18next
- * @external i18nextXHRBackend
- * @external i18nextBrowserLanguageDetector
  */
 dwv.i18nInitialise = function (language, localesPath)
 {
@@ -51,8 +62,6 @@ dwv.i18nInitialise = function (language, localesPath)
  * @param {String} language The language to translate to. Defaults to 'auto' and
  *   gets the language from the browser.
  * @param {Object} resources Languages provided as object.
- * @external i18next
- * @external i18nextBrowserLanguageDetector
  */
 dwv.i18nInitialiseWithResources = function (language, resources)
 {
@@ -80,7 +89,6 @@ dwv.i18nInitialiseWithResources = function (language, resources)
  * Handle i18n 'initialized' event.
  * @param {Object} callback The callback function to call when i18n is initialised.
  *  It can take one argument that will be replaced with the i18n options.
- * @external i18next
  */
 dwv.i18nOnInitialised = function (callback) {
     i18next.on('initialized', callback);
@@ -88,7 +96,6 @@ dwv.i18nOnInitialised = function (callback) {
 
 /**
  * Stop handling i18n load event.
- * @external i18next
  */
 dwv.i18nOffInitialised = function () {
     i18next.off('initialized');
@@ -98,7 +105,6 @@ dwv.i18nOffInitialised = function () {
  * Handle i18n failed load event.
  * @param {Object} callback The callback function to call when i18n is loaded.
  *  It can take three arguments: lng, ns and msg.
- * @external i18next
  */
 dwv.i18nOnFailedLoad = function (callback) {
     i18next.on('failedLoading', callback);
@@ -106,7 +112,6 @@ dwv.i18nOnFailedLoad = function (callback) {
 
 /**
  * Stop handling i18n failed load event.
- * @external i18next
  */
 dwv.i18nOffFailedLoad = function () {
     i18next.off('failedLoading');
@@ -116,7 +121,6 @@ dwv.i18nOffFailedLoad = function () {
  * Get the translated text.
  * @param {String} key The key to the text entry.
  * @param {Object} options The translation options such as plural, context...
- * @external i18next
  */
 dwv.i18n = function (key, options) {
     return i18next.t(key, options);
@@ -126,7 +130,6 @@ dwv.i18n = function (key, options) {
  * Check the existence of a translation.
  * @param {String} key The key to the text entry.
  * @param {Object} options The translation options such as plural, context...
- * @external i18next
  */
 dwv.i18nExists = function (key, options) {
     return i18next.exists(key, options);

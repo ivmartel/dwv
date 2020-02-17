@@ -43,6 +43,7 @@ dwv.io.DicomDataLoader = function ()
 
     /**
      * DICOM buffer to dwv.image.View (asynchronous)
+     * @private
      */
     var db2v = new dwv.image.DicomBufferToView();
 
@@ -60,68 +61,29 @@ dwv.io.DicomDataLoader = function ()
             db2v.setDefaultCharacterSet(options.defaultCharacterSet);
         }
         // connect handlers
+        db2v.onloadstart = self.onloadstart;
+        db2v.onprogress = self.onprogress;
         db2v.onload = self.onload;
-        db2v.onloadend = function () {
+        db2v.onloadend = function (event) {
             // reset loading flag
             isLoading = false;
             // call listeners
-            self.onloadend();
+            self.onloadend(event);
         };
-        db2v.onprogress = self.onprogress;
+        db2v.onerror = self.onerror;
+        db2v.onabort = self.onabort;
         // convert
-        try {
-            db2v.convert( buffer, index );
-        } catch (error) {
-            // TODO: error will be for individual file, isLoading is global...
-            //isLoading = false;
-            self.onerror(error);
-        }
+        db2v.convert( buffer, index );
     };
 
     /**
      * Abort load.
      */
     this.abort = function () {
-        // abort conversion
-        db2v.abort();
         // reset loading flag
         isLoading = false;
-        // call listeners
-        self.onabort({message: "Abort while loading DICOM data."});
-    };
-
-    /**
-     * Get a file load handler.
-     * @param {Object} file The file to load.
-     * @param {Number} index The index 'id' of the file.
-     * @return {Function} A file load handler.
-     */
-    this.getFileLoadHandler = function (file, index) {
-        return function (event) {
-            self.load(event.target.result, file, index);
-        };
-    };
-
-    /**
-     * Get a url load handler.
-     * @param {String} url The url to load.
-     * @param {Number} index The index 'id' of the url.
-     * @return {Function} A url load handler.
-     */
-    this.getUrlLoadHandler = function (url, index) {
-        return function (/*event*/) {
-            // check response status
-            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
-            // status 200: "OK"; status 0: "debug"
-            if (this.status !== 200 && this.status !== 0) {
-                self.onerror({'name': "RequestError",
-                    'message': "Error status: " + this.status +
-                    " while loading '" + url + "' [DicomDataLoader]" });
-                return;
-            }
-            // load
-            self.load(this.response, url, index);
-        };
+        // abort conversion, will trigger db2v.onabort
+        db2v.abort();
     };
 
 }; // class DicomDataLoader
@@ -176,34 +138,40 @@ dwv.io.DicomDataLoader.prototype.loadUrlAs = function () {
 };
 
 /**
+ * Handle a load start event.
+ * @param {Object} event The load start event.
+ * Default does nothing.
+ */
+dwv.io.DicomDataLoader.prototype.onloadstart = function (/*event*/) {};
+/**
+ * Handle a progress event.
+ * @param {Object} event The load progress event.
+ * Default does nothing.
+ */
+dwv.io.DicomDataLoader.prototype.onprogress = function (/*event*/) {};
+/**
  * Handle a load event.
- * @param {Object} event The load event, 'event.target'
- *  should be the loaded data.
+ * @param {Object} event The load event fired
+ *   when a file has been loaded successfully.
  * Default does nothing.
  */
 dwv.io.DicomDataLoader.prototype.onload = function (/*event*/) {};
 /**
  * Handle an load end event.
+ * @param {Object} event The load end event fired
+ *  when a file load has completed, successfully or not.
  * Default does nothing.
  */
-dwv.io.DicomDataLoader.prototype.onloadend = function () {};
-/**
- * Handle a progress event.
- * @param {Object} event The progress event.
- * Default does nothing.
- */
-dwv.io.DicomDataLoader.prototype.onprogress = function (/*event*/) {};
+dwv.io.DicomDataLoader.prototype.onloadend = function (/*event*/) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event with an
- *  optional 'event.message'.
+ * @param {Object} event The error event.
  * Default does nothing.
  */
 dwv.io.DicomDataLoader.prototype.onerror = function (/*event*/) {};
 /**
  * Handle an abort event.
- * @param {Object} event The abort event with an
- *  optional 'event.message'.
+ * @param {Object} event The abort event.
  * Default does nothing.
  */
 dwv.io.DicomDataLoader.prototype.onabort = function (/*event*/) {};

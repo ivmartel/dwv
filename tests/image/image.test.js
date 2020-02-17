@@ -1,3 +1,7 @@
+// namespace
+var dwv = dwv || {};
+dwv.test = dwv.test || {};
+
 /**
  * Tests for the 'image/image.js' file.
  */
@@ -13,7 +17,7 @@ QUnit.module("image");
  * @param {Object} rsi The rescale slope of the input buffer.
  * @return {Object} Statistics of the value and rescaled value differences.
  */
-dwv.utils.test.CompareImageAndBuffer = function ( image, size, buffer, rsi ) {
+dwv.test.compareImageAndBuffer = function ( image, size, buffer, rsi ) {
     var diffs = [];
     var diffsRescaled = [];
 
@@ -75,7 +79,7 @@ QUnit.test("Test Image getValue.", function (assert) {
     assert.equal( image0.getGeometry(), imgGeometry0, "Image geometry" );
     // test its values
     var rsi0 = new dwv.image.RescaleSlopeAndIntercept(1, 0);
-    var res0 = dwv.utils.test.CompareImageAndBuffer( image0, imgSize0, buffer0, rsi0 );
+    var res0 = dwv.test.compareImageAndBuffer( image0, imgSize0, buffer0, rsi0 );
     assert.propEqual( res0.valuesStats.asObject(), zeroStats.asObject(), "Values should be equal" );
     assert.propEqual( res0.rescaledStats.asObject(), zeroStats.asObject(), "Rescaled values should be equal" );
     // outside value
@@ -92,7 +96,7 @@ QUnit.test("Test Image getValue.", function (assert) {
     // test its geometry
     assert.equal( image1.getGeometry(), imgGeometry0, "Image geometry" );
     // test its values
-    var res1 = dwv.utils.test.CompareImageAndBuffer( image1, imgSize0, buffer0, rsi1 );
+    var res1 = dwv.test.compareImageAndBuffer( image1, imgSize0, buffer0, rsi1 );
     assert.propEqual( res1.valuesStats.asObject(), zeroStats.asObject(), "Values should be equal" );
     assert.propEqual( res1.rescaledStats.asObject(), zeroStats.asObject(), "Rescaled values should be equal" );
 });
@@ -161,7 +165,7 @@ QUnit.test("Test Image append slice.", function (assert) {
     }
 
     // image 0
-    var image0 = new dwv.image.Image(imgGeometry0, [buffer]);
+    var image0 = new dwv.image.Image(imgGeometry0, [buffer], 1, ["0"]);
     // append null
     assert.throws( function () {
             image0.appendSlice(null);
@@ -169,7 +173,7 @@ QUnit.test("Test Image append slice.", function (assert) {
     // real slice
     var sliceOrigin = new dwv.math.Point3D(0,0,-1);
     var sliceGeometry = new dwv.image.Geometry(sliceOrigin, sliceSize, imgSpacing);
-    var slice0 = new dwv.image.Image(sliceGeometry, [sliceBuffer]);
+    var slice0 = new dwv.image.Image(sliceGeometry, [sliceBuffer], 1, ["1"]);
     // append slice before
     image0.appendSlice(slice0);
     // test its values
@@ -189,10 +193,10 @@ QUnit.test("Test Image append slice.", function (assert) {
     // image 1
     var imgGeometry1 = new dwv.image.Geometry(imgOrigin, imgSizeMinusOne, imgSpacing);
     imgGeometry1.appendOrigin(new dwv.math.Point3D(0,0,1), 1);
-    var image1 = new dwv.image.Image(imgGeometry1, [buffer]);
+    var image1 = new dwv.image.Image(imgGeometry1, [buffer], 1, ["0"]);
     var sliceOrigin1 = new dwv.math.Point3D(0,0,2);
     var sliceGeometry1 = new dwv.image.Geometry(sliceOrigin1, sliceSize, imgSpacing);
-    var slice1 = new dwv.image.Image(sliceGeometry1, [sliceBuffer]);
+    var slice1 = new dwv.image.Image(sliceGeometry1, [sliceBuffer], 1, ["0"]);
     // append slice before
     image1.appendSlice(slice1);
     // test its values
@@ -212,10 +216,10 @@ QUnit.test("Test Image append slice.", function (assert) {
     // image 2
     var imgGeometry2 = new dwv.image.Geometry(imgOrigin, imgSizeMinusOne, imgSpacing);
     imgGeometry2.appendOrigin(new dwv.math.Point3D(0,0,1), 1);
-    var image2 = new dwv.image.Image(imgGeometry2, [buffer]);
+    var image2 = new dwv.image.Image(imgGeometry2, [buffer], 1, ["0"]);
     var sliceOrigin2 = new dwv.math.Point3D(0,0,0.4);
     var sliceGeometry2 = new dwv.image.Geometry(sliceOrigin2, sliceSize, imgSpacing);
-    var slice2 = new dwv.image.Image(sliceGeometry2, [sliceBuffer]);
+    var slice2 = new dwv.image.Image(sliceGeometry2, [sliceBuffer], 1, ["0"]);
     // append slice before
     image2.appendSlice(slice2);
     // test its values
@@ -370,7 +374,7 @@ QUnit.test("Test Image compose.", function (assert) {
 
 /**
  * Tests for {@link dwv.image.ImageFactory}.
- * @function module:tests/imageFactory
+ * @function module:tests/image~ImageFactory
  */
 QUnit.test("Test ImageFactory.", function (assert) {
     var zeroStats = new dwv.math.Stats(0,0,0,0);
@@ -406,7 +410,7 @@ QUnit.test("Test ImageFactory.", function (assert) {
     // test its geometry
     assert.ok( image0.getGeometry().equals(imgGeometry0), "Image geometry" );
     // test its values
-    var res0 = dwv.utils.test.CompareImageAndBuffer( image0, imgSize0, buffer0, rsi0 );
+    var res0 = dwv.test.compareImageAndBuffer( image0, imgSize0, buffer0, rsi0 );
     assert.propEqual( res0.valuesStats.asObject(), zeroStats.asObject(), "Values should be equal" );
     assert.propEqual( res0.rescaledStats.asObject(), zeroStats.asObject(), "Rescaled values should be equal" );
 });

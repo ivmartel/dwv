@@ -1466,19 +1466,32 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
 
             // calculate the slice size
             var pixData = this.dicomElements.x7FE00010.value;
-            var columns = this.dicomElements.x00280011.value[0];
-            var rows = this.dicomElements.x00280010.value[0];
-            var samplesPerPixel = this.dicomElements.x00280002.value[0];
-            var sliceSize = columns * rows * samplesPerPixel;
-            // slice data in an array of frames
-            var newPixData = [];
-            var frameOffset = 0;
-            for (var g = 0; g < numberOfFrames; ++g) {
-                newPixData[g] = pixData.slice(frameOffset, frameOffset+sliceSize);
-                frameOffset += sliceSize;
+            if (pixData.length !== 0) {
+                if (typeof this.dicomElements.x00280010 === "undefined") {
+                    throw new Error("Missing image number of rows.");
+                }
+                if (typeof this.dicomElements.x00280011 === "undefined") {
+                    throw new Error("Missing image number of columns.");
+                }
+                if (typeof this.dicomElements.x00280002 === "undefined") {
+                    throw new Error("Missing image samples per pixel.");
+                }
+                var columns = this.dicomElements.x00280011.value[0];
+                var rows = this.dicomElements.x00280010.value[0];
+                var samplesPerPixel = this.dicomElements.x00280002.value[0];
+                var sliceSize = columns * rows * samplesPerPixel;
+                // slice data in an array of frames
+                var newPixData = [];
+                var frameOffset = 0;
+                for (var g = 0; g < numberOfFrames; ++g) {
+                    newPixData[g] = pixData.slice(frameOffset, frameOffset+sliceSize);
+                    frameOffset += sliceSize;
+                }
+                // store as pixel data
+                this.dicomElements.x7FE00010.value = newPixData;
+            } else {
+                console.debug("Empty pixel data.");
             }
-            // store as pixel data
-            this.dicomElements.x7FE00010.value = newPixData;
         }
         else {
             // handle fragmented pixel buffer

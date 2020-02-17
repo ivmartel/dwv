@@ -15,12 +15,12 @@ dwv.utils.MultiProgressHandler = function (callback)
 
     /**
      * List of progresses.
-     * @private
-     * @type Array
      * First dimension is a list of item for which the progress is recorded,
      *   for example file names.
      * Second dimension is a list of possible progresses, for example
      *   the progress of the download and the progress of the decoding.
+     * @private
+     * @type Array
      */
     var progresses = [];
 
@@ -73,8 +73,8 @@ dwv.utils.MultiProgressHandler = function (callback)
         progresses[event.index][event.subindex] = percent;
 
         // call callback
-        callback({'type': event.type, 'lengthComputable': true,
-            'loaded': getGlobalPercent(), 'total': 100});
+        event.loaded = getGlobalPercent();
+        callback(event);
     };
 
     /**
@@ -96,25 +96,14 @@ dwv.utils.MultiProgressHandler = function (callback)
      * Create a mono progress event handler.
      * @param {Number} index The index of the data.
      * @param {Number} subindex The sub-index of the data.
+     * @param {Mixed} source The progress source.
      */
-    this.getMonoProgressHandler = function (index, subindex) {
+    this.getMonoProgressHandler = function (index, subindex, source) {
         return function (event) {
             event.index = index;
             event.subindex = subindex;
+            event.source = source;
             self.onprogress(event);
-        };
-    };
-
-    /**
-     * Create a mono loadend event handler: sends a 100% progress.
-     * @param {Number} index The index of the data.
-     * @param {Number} subindex The sub-index of the data.
-     */
-    this.getMonoOnLoadEndHandler = function (index, subindex) {
-        return function () {
-            self.onprogress({'type': 'load-progress', 'lengthComputable': true,
-                'loaded': 100, 'total': 100,
-                'index': index, 'subindex': subindex});
         };
     };
 
@@ -122,10 +111,12 @@ dwv.utils.MultiProgressHandler = function (callback)
      * Create a mono progress event handler with an undefined index.
      * Warning: The caller handles the progress index.
      * @param {Number} subindex The sub-index of the data.
+     * @param {Mixed} source The progress source.
      */
-    this.getUndefinedMonoProgressHandler = function (subindex) {
+    this.getUndefinedMonoProgressHandler = function (subindex, source) {
         return function (event) {
             event.subindex = subindex;
+            event.source = source;
             self.onprogress(event);
         };
     };

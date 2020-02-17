@@ -1,7 +1,11 @@
 // namespaces
 var dwv = dwv || {};
 dwv.draw = dwv.draw || {};
-// external
+/**
+ * The Konva namespace.
+ * @external Konva
+ * @see https://konvajs.org/
+ */
 var Konva = Konva || {};
 
 /**
@@ -99,7 +103,6 @@ dwv.draw.getHierarchyLog = function (layer, prefix) {
  * Draw controller.
  * @constructor
  * @param {Object} drawDiv The HTML div used to store the drawings.
- * @external Konva
  */
 dwv.DrawController = function (drawDiv)
 {

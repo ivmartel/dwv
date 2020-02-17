@@ -28,7 +28,7 @@ Move to its folder:
 cd dwv
 ```
 
-Install dependencies (using `yarn`, replace with `npm` if you prefer):
+Install dependencies:
 ```sh
 yarn install
 ```
@@ -62,5 +62,10 @@ yarn run doc
 yarn run dev
 
 ```
+Using `yarn` as the main package manager. Best to use it to install since
+the lock file (that contains the exact dependency tree) is a yarn file.
+All scripts also work with `npm`.
+
+## Notes
 
 <a name="footnote1">1</a>: Certification refers to official medical software certification that are issued by the FDA or EU Notified Bodies. The sentence here serves as a reminder that the Dicom Web Viewer is not ceritifed, and comes with no warranties (and no possible liability of its authors) as stated in the [license](license.txt). To learn more about standards used in certification, see the [wikipedia Medical software](https://en.wikipedia.org/wiki/Medical_software) page. If you have additional questions, please [open an issue](https://www.github.com/ivmartel/dwv/issues).

@@ -1,15 +1,19 @@
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// external
+dwv.tool.draw = dwv.tool.draw || {};
+/**
+ * The Konva namespace.
+ * @external Konva
+ * @see https://konvajs.org/
+ */
 var Konva = Konva || {};
 
 /**
  * Rectangle factory.
  * @constructor
- * @external Konva
  */
-dwv.tool.RectangleFactory = function ()
+dwv.tool.draw.RectangleFactory = function ()
 {
     /**
      * Get the number of points needed to build the shape.
@@ -29,7 +33,7 @@ dwv.tool.RectangleFactory = function ()
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
  */
-dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
+dwv.tool.draw.RectangleFactory.prototype.create = function (points, style, image)
 {
     // physical shape
     var rectangle = new dwv.math.Rectangle(points[0], points[1]);
@@ -79,7 +83,7 @@ dwv.tool.RectangleFactory.prototype.create = function (points, style, image)
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
  */
-dwv.tool.UpdateRect = function (anchor, image)
+dwv.tool.draw.UpdateRect = function (anchor, image)
 {
     // parent group
     var group = anchor.getParent();
