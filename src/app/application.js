@@ -1129,14 +1129,14 @@ dwv.App = function ()
          * Load error event.
          * @event dwv.App#load-error
          * @type {Object}
-         * @property {string} type The event type: load-error.
+         * @property {string} type The event type: error.
          * @property {string} loadType The load type: image or state.
          * @property {Mixed} source The load source: string for an url,
          *   File for a file.
          * @property {Object} error The error.
          * @property {Object} target The event target.
          */
-        event.type = "load-error";
+        event.type = "error";
         fireEvent(event);
     }
 
@@ -1150,12 +1150,12 @@ dwv.App = function ()
          * Load abort event.
          * @event dwv.App#load-abort
          * @type {Object}
-         * @property {string} type The event type: load-abort.
+         * @property {string} type The event type: abort.
          * @property {string} loadType The load type: image or state.
          * @property {Mixed} source The load source: string for an url,
          *   File for a file.
          */
-        event.type = "load-abort";
+        event.type = "abort";
         fireEvent(event);
     }
 
