@@ -714,7 +714,7 @@ dwv.App = function ()
      */
     this.onResize = function (/*event*/) {
         self.fitToSize(self.getLayerContainerSize());
-    }
+    };
 
     /**
      * Key down callback. Meant to be used in tools.
@@ -730,7 +730,7 @@ dwv.App = function ()
          * @property {string} context The tool where the event originated.
          */
         fireEvent(event);
-    }
+    };
 
     /**
      * Key down event handler example.
