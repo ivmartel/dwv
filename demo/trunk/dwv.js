@@ -1,4 +1,4 @@
-/*! dwv 0.27.0-beta 2020-02-18 22:12:34 */
+/*! dwv 0.27.0-beta 2020-02-18 22:55:05 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -325,9 +325,6 @@ dwv.App = function ()
         loadController.onloadend = onloadend;
         loadController.onerror = onerror;
         loadController.onabort = onabort;
-
-        // listen to window resize
-        window.onresize = onResize;
     };
 
     /**
@@ -768,57 +765,61 @@ dwv.App = function ()
     }
 
     /**
-     * Handle resize.
-     * Fit the display to the window. To be called once the image is loaded.
+     * Handle resize: fit the display to the window.
+     * To be called once the image is loaded.
+     * Can be connected to a window 'resize' event.
      * @param {Object} event The change event.
      * @private
      */
-    function onResize (/*event*/) {
+    this.onResize = function (/*event*/) {
         self.fitToSize(self.getLayerContainerSize());
-    }
+    };
 
     /**
-     * Handle key down event.
+     * Key down callback. Meant to be used in tools.
+     * @param {Object} event The key down event.
+     * @fires dwv.App#keydown
+     */
+    this.onKeydown = function (event) {
+        /**
+         * Key down event.
+         * @event dwv.App#keydown
+         * @type {KeyboardEvent}
+         * @property {string} type The event type: keydown.
+         * @property {string} context The tool where the event originated.
+         */
+        fireEvent(event);
+    };
+
+    /**
+     * Key down event handler example.
      * - CRTL-Z: undo
      * - CRTL-Y: redo
      * - CRTL-ARROW_LEFT: next frame
      * - CRTL-ARROW_UP: next slice
      * - CRTL-ARROW_RIGHT: previous frame
      * - CRTL-ARROW_DOWN: previous slice
-     * Default behavior. Usually used in tools.
      * @param {Object} event The key down event.
      * @fires dwv.tool.UndoStack#undo
      * @fires dwv.tool.UndoStack#redo
      */
-    this.onKeydown = function (event)
-    {
+    this.defaultOnKeydown = function (event) {
         if (event.ctrlKey) {
-            if ( event.keyCode === 37 ) // crtl-arrow-left
-            {
+            if ( event.keyCode === 37 ) { // crtl-arrow-left
                 event.preventDefault();
                 self.getViewController().decrementFrameNb();
-            }
-            else if ( event.keyCode === 38 ) // crtl-arrow-up
-            {
+            } else if ( event.keyCode === 38 ) { // crtl-arrow-up
                 event.preventDefault();
                 self.getViewController().incrementSliceNb();
-            }
-            else if ( event.keyCode === 39 ) // crtl-arrow-right
-            {
+            } else if ( event.keyCode === 39 ) { // crtl-arrow-right
                 event.preventDefault();
                 self.getViewController().incrementFrameNb();
-            }
-            else if ( event.keyCode === 40 ) // crtl-arrow-down
-            {
+            } else if ( event.keyCode === 40 ) { // crtl-arrow-down
                 event.preventDefault();
                 self.getViewController().decrementSliceNb();
-            }
-            else if ( event.keyCode === 89 ) // crtl-y
-            {
+            } else if ( event.keyCode === 89 ) { // crtl-y
                 undoStack.redo();
-            }
-            else if ( event.keyCode === 90 ) // crtl-z
-            {
+            } else if ( event.keyCode === 90 ) { // crtl-z
                 undoStack.undo();
             }
         }
@@ -1187,14 +1188,14 @@ dwv.App = function ()
          * Load error event.
          * @event dwv.App#load-error
          * @type {Object}
-         * @property {string} type The event type: load-error.
+         * @property {string} type The event type: error.
          * @property {string} loadType The load type: image or state.
          * @property {Mixed} source The load source: string for an url,
          *   File for a file.
          * @property {Object} error The error.
          * @property {Object} target The event target.
          */
-        event.type = "load-error";
+        event.type = "error";
         fireEvent(event);
     }
 
@@ -1208,12 +1209,12 @@ dwv.App = function ()
          * Load abort event.
          * @event dwv.App#load-abort
          * @type {Object}
-         * @property {string} type The event type: load-abort.
+         * @property {string} type The event type: abort.
          * @property {string} loadType The load type: image or state.
          * @property {Mixed} source The load source: string for an url,
          *   File for a file.
          */
-        event.type = "load-abort";
+        event.type = "abort";
         fireEvent(event);
     }
 
@@ -1991,16 +1992,6 @@ dwv.LoadController = function (defaultCharacterSet)
      * @private
      */
     function loadImageData(data, loader, options) {
-
-        // allow to cancel
-        var previousOnKeyDown = window.onkeydown;
-        window.onkeydown = function (event) {
-            if (event.ctrlKey && event.keyCode === 88 ) { // crtl-x
-                console.log("crtl-x pressed!");
-                self.abort();
-            }
-        };
-
         // first data name
         var firstName = "";
         if (typeof data[0].name !== "undefined") {
@@ -2029,7 +2020,6 @@ dwv.LoadController = function (defaultCharacterSet)
         loader.onloaditem = augmentCallbackEvent(self.onloaditem, loadtype);
         loader.onload = augmentCallbackEvent(self.onload, loadtype);
         loader.onloadend = function (event) {
-            window.onkeydown = previousOnKeyDown;
             // reset current loader
             currentLoader = null;
             // callback
@@ -18984,6 +18974,7 @@ dwv.tool.Draw = function (app)
      * @param {Object} event The key down event.
      */
     this.keydown = function(event){
+        event.context = "dwv.tool.Draw";
         app.onKeydown(event);
 
         // press delete key
@@ -20394,8 +20385,8 @@ dwv.tool.Filter = function ( app )
      * Handle keydown event.
      * @param {Object} event The keydown event.
      */
-    this.keydown = function (event)
-    {
+    this.keydown = function (event) {
+        event.context = "dwv.tool.Filter";
         app.onKeydown(event);
     };
 
@@ -21164,7 +21155,8 @@ dwv.tool.Floodfill = function(app)
      * Handle key down event.
      * @param {Object} event The key down event.
      */
-    this.keydown = function(event){
+    this.keydown = function (event) {
+        event.context = "dwv.tool.Floodfill";
         app.onKeydown(event);
     };
 
@@ -21651,7 +21643,8 @@ dwv.tool.Livewire = function(app)
      * Handle key down event.
      * @param {Object} event The key down event.
      */
-    this.keydown = function(event){
+    this.keydown = function (event) {
+        event.context = "dwv.tool.Livewire";
         app.onKeydown(event);
     };
 
@@ -22643,7 +22636,8 @@ dwv.tool.Scroll = function(app)
      * Handle key down event.
      * @param {Object} event The key down event.
      */
-    this.keydown = function(event){
+    this.keydown = function (event) {
+        event.context = "dwv.tool.Scroll";
         app.onKeydown(event);
     };
     /**
@@ -22951,8 +22945,8 @@ dwv.tool.WindowLevel = function(app)
      * Handle key down event.
      * @param {Object} event The key down event.
      */
-    this.keydown = function(event){
-        // let the app handle it
+    this.keydown = function (event) {
+        event.context = "dwv.tool.WindowLevel";
         app.onKeydown(event);
     };
 
@@ -23183,7 +23177,8 @@ dwv.tool.ZoomAndPan = function(app)
      * Handle key down event.
      * @param {Object} event The key down event.
      */
-    this.keydown = function(event){
+    this.keydown = function (event) {
+        event.context = "dwv.tool.ZoomAndPan";
         app.onKeydown(event);
     };
 
