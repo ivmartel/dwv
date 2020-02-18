@@ -1,4 +1,4 @@
-/*! dwv 0.27.0-beta 2020-02-17 21:23:58 */
+/*! dwv 0.27.0-beta 2020-02-18 22:12:34 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -5003,7 +5003,8 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
 
         var numberOfFrames = 1;
         if (typeof this.dicomElements.x00280008 !== "undefined") {
-            numberOfFrames = this.dicomElements.x00280008.value[0];
+            numberOfFrames = dwv.dicom.cleanString(
+                this.dicomElements.x00280008.value[0]);
         }
 
         if (this.dicomElements.x7FE00010.vl !== "u/l") {
