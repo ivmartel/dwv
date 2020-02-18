@@ -71,8 +71,8 @@ dwv.tool.Filter = function ( app )
      * Handle keydown event.
      * @param {Object} event The keydown event.
      */
-    this.keydown = function (event)
-    {
+    this.keydown = function (event) {
+        event.context = "dwv.tool.Filter";
         app.onKeydown(event);
     };
 

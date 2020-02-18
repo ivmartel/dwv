@@ -281,7 +281,8 @@ dwv.tool.Livewire = function(app)
      * Handle key down event.
      * @param {Object} event The key down event.
      */
-    this.keydown = function(event){
+    this.keydown = function (event) {
+        event.context = "dwv.tool.Livewire";
         app.onKeydown(event);
     };
 

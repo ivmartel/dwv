@@ -336,6 +336,7 @@ dwv.tool.Draw = function (app)
      * @param {Object} event The key down event.
      */
     this.keydown = function(event){
+        event.context = "dwv.tool.Draw";
         app.onKeydown(event);
 
         // press delete key

@@ -717,47 +717,50 @@ dwv.App = function ()
     }
 
     /**
-     * Handle key down event.
+     * Key down callback. Meant to be used in tools.
+     * @param {Object} event The key down event.
+     * @fires dwv.App#keydown
+     */
+    this.onKeydown = function (event) {
+        /**
+         * Key down event.
+         * @event dwv.App#keydown
+         * @type {KeyboardEvent}
+         * @property {string} type The event type: keydown.
+         * @property {string} context The tool where the event originated.
+         */
+        fireEvent(event);
+    }
+
+    /**
+     * Key down event handler example.
      * - CRTL-Z: undo
      * - CRTL-Y: redo
      * - CRTL-ARROW_LEFT: next frame
      * - CRTL-ARROW_UP: next slice
      * - CRTL-ARROW_RIGHT: previous frame
      * - CRTL-ARROW_DOWN: previous slice
-     * Default behavior. Usually used in tools.
      * @param {Object} event The key down event.
      * @fires dwv.tool.UndoStack#undo
      * @fires dwv.tool.UndoStack#redo
      */
-    this.onKeydown = function (event)
-    {
+    this.defaultOnKeydown = function (event) {
         if (event.ctrlKey) {
-            if ( event.keyCode === 37 ) // crtl-arrow-left
-            {
+            if ( event.keyCode === 37 ) { // crtl-arrow-left
                 event.preventDefault();
                 self.getViewController().decrementFrameNb();
-            }
-            else if ( event.keyCode === 38 ) // crtl-arrow-up
-            {
+            } else if ( event.keyCode === 38 ) { // crtl-arrow-up
                 event.preventDefault();
                 self.getViewController().incrementSliceNb();
-            }
-            else if ( event.keyCode === 39 ) // crtl-arrow-right
-            {
+            } else if ( event.keyCode === 39 ) { // crtl-arrow-right
                 event.preventDefault();
                 self.getViewController().incrementFrameNb();
-            }
-            else if ( event.keyCode === 40 ) // crtl-arrow-down
-            {
+            } else if ( event.keyCode === 40 ) { // crtl-arrow-down
                 event.preventDefault();
                 self.getViewController().decrementSliceNb();
-            }
-            else if ( event.keyCode === 89 ) // crtl-y
-            {
+            } else if ( event.keyCode === 89 ) { // crtl-y
                 undoStack.redo();
-            }
-            else if ( event.keyCode === 90 ) // crtl-z
-            {
+            } else if ( event.keyCode === 90 ) { // crtl-z
                 undoStack.undo();
             }
         }

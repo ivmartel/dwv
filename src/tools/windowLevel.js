@@ -122,8 +122,8 @@ dwv.tool.WindowLevel = function(app)
      * Handle key down event.
      * @param {Object} event The key down event.
      */
-    this.keydown = function(event){
-        // let the app handle it
+    this.keydown = function (event) {
+        event.context = "dwv.tool.WindowLevel";
         app.onKeydown(event);
     };
 

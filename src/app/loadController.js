@@ -140,16 +140,6 @@ dwv.LoadController = function (defaultCharacterSet)
      * @private
      */
     function loadImageData(data, loader, options) {
-
-        // allow to cancel
-        var previousOnKeyDown = window.onkeydown;
-        window.onkeydown = function (event) {
-            if (event.ctrlKey && event.keyCode === 88 ) { // crtl-x
-                console.log("crtl-x pressed!");
-                self.abort();
-            }
-        };
-
         // first data name
         var firstName = "";
         if (typeof data[0].name !== "undefined") {
@@ -178,7 +168,6 @@ dwv.LoadController = function (defaultCharacterSet)
         loader.onloaditem = augmentCallbackEvent(self.onloaditem, loadtype);
         loader.onload = augmentCallbackEvent(self.onload, loadtype);
         loader.onloadend = function (event) {
-            window.onkeydown = previousOnKeyDown;
             // reset current loader
             currentLoader = null;
             // callback
