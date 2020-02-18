@@ -1453,7 +1453,8 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
 
         var numberOfFrames = 1;
         if (typeof this.dicomElements.x00280008 !== "undefined") {
-            numberOfFrames = this.dicomElements.x00280008.value[0];
+            numberOfFrames = dwv.dicom.cleanString(
+                this.dicomElements.x00280008.value[0]);
         }
 
         if (this.dicomElements.x7FE00010.vl !== "u/l") {
