@@ -266,9 +266,6 @@ dwv.App = function ()
         loadController.onloadend = onloadend;
         loadController.onerror = onerror;
         loadController.onabort = onabort;
-
-        // listen to window resize
-        window.onresize = onResize;
     };
 
     /**
@@ -709,12 +706,13 @@ dwv.App = function ()
     }
 
     /**
-     * Handle resize.
-     * Fit the display to the window. To be called once the image is loaded.
+     * Handle resize: fit the display to the window.
+     * To be called once the image is loaded.
+     * Can be connected to a window 'resize' event.
      * @param {Object} event The change event.
      * @private
      */
-    function onResize (/*event*/) {
+    this.onResize = function (/*event*/) {
         self.fitToSize(self.getLayerContainerSize());
     }
 
