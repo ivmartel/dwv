@@ -54,6 +54,7 @@ dwv.utils.MultiProgressHandler = function (callback)
 
     /**
      * Handle a load progress.
+     * Call the member callback with a global event.
      * @param {Object} event The progress event.
      */
     this.onprogress = function (event) {
@@ -72,24 +73,53 @@ dwv.utils.MultiProgressHandler = function (callback)
         // set percent for index
         progresses[event.index][event.subindex] = percent;
 
-        // call callback
-        event.loaded = getGlobalPercent();
-        callback(event);
+        // item progress
+        var item = null;
+        if (typeof event.item !== "undefined") {
+            item = event.item;
+        } else {
+            item = {
+                loaded: getItemProgress(event.index),
+                total: 100,
+                source: event.source
+            };
+        }
+
+        // call callback with a global event
+        callback({
+            lengthComputable: true,
+            loaded: getGlobalPercent(),
+            total: 100,
+            item: item
+        });
     };
+
+    /**
+     * Get the item load percent.
+     * @param {Number} index The index of the item.
+     * @return {Number} The load percentage.
+     * @private
+     */
+    function getItemProgress(index) {
+        var sum = 0;
+        for ( var j = 0; j < numberOfDimensions; ++j ) {
+            sum += progresses[index][j];
+        }
+        return sum / numberOfDimensions;
+    }
 
     /**
      * Get the global load percent including the provided one.
      * @return {Number} The accumulated percentage.
+     * @private
      */
     function getGlobalPercent() {
         var sum = 0;
         var lenprog = progresses.length;
         for ( var i = 0; i < lenprog; ++i ) {
-            for ( var j = 0; j < numberOfDimensions; ++j ) {
-                sum += progresses[i][j];
-            }
+            sum += getItemProgress(i);
         }
-        return Math.round( sum / (lenprog * numberOfDimensions) );
+        return Math.round( sum / lenprog );
     }
 
     /**
