@@ -128,11 +128,10 @@ dwv.utils.MultiProgressHandler = function (callback)
      * @param {Number} subindex The sub-index of the data.
      * @param {Mixed} source The progress source.
      */
-    this.getMonoProgressHandler = function (index, subindex, source) {
+    this.getMonoProgressHandler = function (index, subindex) {
         return function (event) {
             event.index = index;
             event.subindex = subindex;
-            event.source = source;
             self.onprogress(event);
         };
     };
@@ -143,10 +142,9 @@ dwv.utils.MultiProgressHandler = function (callback)
      * @param {Number} subindex The sub-index of the data.
      * @param {Mixed} source The progress source.
      */
-    this.getUndefinedMonoProgressHandler = function (subindex, source) {
+    this.getUndefinedMonoProgressHandler = function (subindex) {
         return function (event) {
             event.subindex = subindex;
-            event.source = source;
             self.onprogress(event);
         };
     };

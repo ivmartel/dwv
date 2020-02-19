@@ -43,23 +43,34 @@ dwv.io.JSONTextLoader = function ()
     this.load = function (text, origin, index) {
         // set loading flag
         isLoading = true;
+        self.onloadstart({
+            source: origin
+        });
+
         try {
+            self.onprogress({
+                lengthComputable: true,
+                loaded: 100,
+                total: 100,
+                index: index,
+                source: origin
+            });
             self.onload({
-                data: text
+                data: text,
+                source: origin
             });
         } catch (error) {
-            self.onerror(error);
+            self.onerror({
+                error: error,
+                source: origin
+            });
         } finally {
             // reset loading flag
             isLoading = false;
-            self.onloadend({});
+            self.onloadend({
+                source: origin
+            });
         }
-        self.onprogress({
-            'lengthComputable': true,
-            'loaded': 100,
-            'total': 100,
-            'index': index
-        });
     };
 
     /**

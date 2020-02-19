@@ -24,31 +24,33 @@ dwv.io.FilesLoader = function ()
     var self = this;
 
     /**
-     * Array of launched readers (used in abort).
+     * Input data.
+     * @private
+     * @type Array
+     */
+    var inputData = null;
+
+    /**
+     * Array of launched file readers.
      * @private
      * @type Array
      */
     var readers = [];
 
     /**
-     * Launched loader (used in abort).
+     * Data loader.
      * @private
      * @type Object
      */
     var runningLoader = null;
 
     /**
-     * Number of data to load.
-     * @private
-     * @type Number
-     */
-    var nToLoad = 0;
-    /**
      * Number of loaded data.
      * @private
      * @type Number
      */
     var nLoad = 0;
+
     /**
      * Number of load end events.
      * @private
@@ -80,37 +82,221 @@ dwv.io.FilesLoader = function ()
     };
 
     /**
-     * Store a launched reader.
-     * @param {Object} request The launched reader.
+     * Store the current input.
+     * @param {Object} data The input data.
+     * @private
      */
-    this.storeReader = function (reader) {
+    function storeInputData(data) {
+        inputData = data;
+        // reset counters
+        nLoad = 0;
+        nLoadend = 0;
+        // clear storage
+        clearStoredReaders();
+        clearStoredLoader();
+    }
+
+    /**
+     * Store a launched reader.
+     * @param {Object} reader The launched reader.
+     * @private
+     */
+    function storeReader(reader) {
         readers.push(reader);
-    };
+    }
 
     /**
      * Clear the stored readers.
+     * @private
      */
-    this.clearStoredReaders = function () {
+    function clearStoredReaders() {
         readers = [];
-    };
+    }
 
     /**
      * Store the launched loader.
      * @param {Object} loader The launched loader.
+     * @private
      */
-    this.storeLoader = function (loader) {
+    function storeLoader(loader) {
         runningLoader = loader;
-    };
+    }
 
     /**
      * Clear the stored loader.
+     * @private
      */
-    this.clearStoredLoader = function () {
+    function clearStoredLoader() {
         runningLoader = null;
+    }
+
+    /**
+     * Launch a load item event and call addLoad.
+     * @param {Object} event The load data event.
+     * @private
+     */
+    function addLoadItem(event) {
+        self.onloaditem(event);
+        addLoad();
+    }
+
+    /**
+     * Increment the number of loaded data
+     *   and call onload if loaded all data.
+     * @param {Object} event The load data event.
+     * @private
+     */
+    function addLoad(/*event*/) {
+        nLoad++;
+        // call self.onload when all is loaded
+        // (not using the input event since it is not the
+        //   general load)
+        if (nLoad === inputData.length) {
+            self.onload({
+                source: inputData
+            });
+        }
+    }
+
+    /**
+     * Increment the counter of load end events
+     *   and run callbacks when all done, erroneus or not.
+     * @param {Object} event The load end event.
+     * @private
+     */
+    function addLoadend(/*event*/) {
+        nLoadend++;
+        // call self.onloadend when all is run
+        // (not using the input event since it is not the
+        //   general load end)
+        if (nLoadend === inputData.length) {
+            self.onloadend({
+                source: inputData
+            });
+        }
+    }
+
+    /**
+     * Augment a callback event with a srouce.
+     * @param {Object} callback The callback to augment its event.
+     * @param {Object} source The source to add to the event.
+     * @private
+     */
+    function augmentCallbackEvent(callback, source) {
+        return function (event) {
+            event.source = source;
+            callback(event);
+        };
+    }
+
+    /**
+     * Load a list of files.
+     * @param {Array} data The list of files to load.
+     */
+    this.load = function (data)
+    {
+        // check input
+        if (typeof data === "undefined" || data.length === 0) {
+            return;
+        }
+        storeInputData(data);
+
+        // send start event
+        this.onloadstart({
+            source: data
+        });
+
+        // create prgress handler
+        var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
+        mproghandler.setNToLoad(data.length);
+
+        // create loaders
+        var loaders = [];
+        for (var m = 0; m < dwv.io.loaderList.length; ++m) {
+            loaders.push(new dwv.io[dwv.io.loaderList[m]]());
+        }
+
+        // find an appropriate loader
+        var dataElement = data[0];
+        var loader = null;
+        var foundLoader = false;
+        for (var l = 0; l < loaders.length; ++l) {
+            loader = loaders[l];
+            if (loader.canLoadFile(dataElement)) {
+                foundLoader = true;
+                // load options
+                loader.setOptions({
+                    'defaultCharacterSet': this.getDefaultCharacterSet()
+                });
+                // set loader callbacks
+                // loader.onloadstart: nothing to do
+                loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
+                if (typeof loader.onloaditem === "undefined") {
+                    // handle load-item locally
+                    loader.onload = addLoadItem;
+                } else {
+                    loader.onloaditem = self.onloaditem;
+                    loader.onload = addLoad;
+                }
+                loader.onloadend = addLoadend;
+                loader.onerror = self.onerror;
+                loader.onabort = self.onabort;
+
+                // store loader
+                storeLoader(loader);
+                // exit
+                break;
+            }
+        }
+        if (!foundLoader) {
+            throw new Error("No loader found for file: "+dataElement);
+        }
+
+        var getLoadHandler = function (loader, dataElement, i) {
+            return function (event) {
+                loader.load(event.target.result, dataElement, i);
+            };
+        };
+
+        // loop on I/O elements
+        for (var i = 0; i < data.length; ++i) {
+            dataElement = data[i];
+
+            // check loader
+            if (!loader.canLoadFile(dataElement)) {
+                throw new Error("Input file of different type: "+dataElement);
+            }
+
+            /**
+             * The file reader.
+             * @external FileReader
+             * @see https://developer.mozilla.org/en-US/docs/Web/API/FileReader
+             */
+            var reader = new FileReader();
+            // store reader
+            storeReader(reader);
+
+            // set reader callbacks
+            // reader.onloadstart: nothing to do
+            reader.onprogress = augmentCallbackEvent(
+                mproghandler.getMonoProgressHandler(i, 0), dataElement);
+            reader.onload = getLoadHandler(loader, dataElement, i);
+            // reader.onloadend: nothing to do
+            reader.onerror = augmentCallbackEvent(self.onerror, dataElement);
+            reader.onabort = augmentCallbackEvent(self.onabort, dataElement);
+            // read
+            if (loader.loadFileAs() === dwv.io.fileContentTypes.Text) {
+                reader.readAsText(dataElement);
+            } else if (loader.loadFileAs() === dwv.io.fileContentTypes.DataURL) {
+                reader.readAsDataURL(dataElement);
+            } else if (loader.loadFileAs() === dwv.io.fileContentTypes.ArrayBuffer) {
+                reader.readAsArrayBuffer(dataElement);
+            }
+        }
     };
 
     /**
-     * Abort a URLs load.
+     * Abort a load.
      */
     this.abort = function () {
         // abort readers
@@ -120,178 +306,16 @@ dwv.io.FilesLoader = function ()
                 readers[i].abort();
             }
         }
-        this.clearStoredReaders();
         // abort loader
         if (runningLoader && runningLoader.isLoading()) {
             runningLoader.abort();
         }
-        this.clearStoredLoader();
+        // send load end
+        this.onloadend({
+            source: inputData
+        });
     };
 
-    /**
-     * Set the number of data to load.
-     * @param {Number} n The number of data to load.
-     */
-    this.setNToLoad = function (n) {
-        nToLoad = n;
-        // reset counters
-        nLoad = 0;
-        nLoadend = 0;
-    };
-
-    /**
-     * Launch a load item event and call addLoad.
-     * @param {Object} event The load event data.
-     */
-    this.addLoadItem = function (event) {
-        self.onloaditem(event);
-        self.addLoad();
-    };
-
-    /**
-     * Increment the number of loaded data
-     *   and call onload if loaded all data.
-     * @param {Object} event The load data event.
-     */
-    this.addLoad = function (/*event*/) {
-        nLoad++;
-        // call self.onload when all is loaded
-        // (can't use the input event since it is not the
-        //   general load)
-        if ( nLoad === nToLoad ) {
-            self.onload({});
-        }
-    };
-
-    /**
-     * Increment the counter of load end events
-     *   and run callbacks when all done, erroneus or not.
-     * @param {Object} event The load end event.
-     */
-    this.addLoadend = function (event) {
-        nLoadend++;
-        // call self.onloadend when all is run
-        // (can't use the input event since it is not the
-        //   general load end)
-        if ( nLoadend === nToLoad ) {
-            self.onloadend({
-                source: event.source
-            });
-        }
-    };
-
-}; // class FileLoader
-
-/**
- * Load a list of files.
- * @param {Array} ioArray The list of files to load.
- */
-dwv.io.FilesLoader.prototype.load = function (ioArray)
-{
-    this.onloadstart({
-        source: ioArray
-    });
-
-    // clear storage
-    this.clearStoredReaders();
-    this.clearStoredLoader();
-
-    // closure to self for handlers
-    var self = this;
-
-    // set the number of data to load
-    this.setNToLoad( ioArray.length );
-
-    var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
-    mproghandler.setNToLoad( ioArray.length );
-
-    // create loaders
-    var loaders = [];
-    for (var m = 0; m < dwv.io.loaderList.length; ++m) {
-        loaders.push( new dwv.io[dwv.io.loaderList[m]]() );
-    }
-
-    var augmentCallbackEvent = function (callback, source) {
-        return function (event) {
-            event.source = source;
-            callback(event);
-        };
-    };
-
-    var getLoadHandler = function (loader, file, i) {
-        return function (event) {
-            loader.load(event.target.result, file, i);
-        };
-    };
-
-    // loop on I/O elements
-    for (var i = 0; i < ioArray.length; ++i)
-    {
-        var file = ioArray[i];
-        /**
-         * The file reader.
-         * @external FileReader
-         * @see https://developer.mozilla.org/en-US/docs/Web/API/FileReader
-         */
-        var reader = new FileReader();
-
-        // store reader
-        this.storeReader(reader);
-
-        // bind reader progress
-        reader.onprogress = mproghandler.getMonoProgressHandler(i, 0, file);
-
-        // find a loader
-        var loader = null;
-        var foundLoader = false;
-        for (var l = 0; l < loaders.length; ++l) {
-            loader = loaders[l];
-            if (loader.canLoadFile(file)) {
-                foundLoader = true;
-
-                loader.setOptions({
-                    'defaultCharacterSet': this.getDefaultCharacterSet()
-                });
-                // set loader callbacks
-                // loader.onloadstart: nothing to do
-                loader.onprogress = mproghandler.getMonoProgressHandler(i, 1, file);
-                if (typeof loader.onloaditem === "undefined") {
-                    // handle load-item locally
-                    loader.onload = augmentCallbackEvent(self.addLoadItem, file);
-                } else {
-                    loader.onloaditem = self.onloaditem;
-                    loader.onload = augmentCallbackEvent(self.addLoad, file);
-                }
-                loader.onloadend = augmentCallbackEvent(self.addLoadend, ioArray);
-                loader.onerror = augmentCallbackEvent(self.onerror, file);
-                loader.onabort = augmentCallbackEvent(self.onabort, file);
-
-                // store loader
-                this.storeLoader(loader);
-
-                // set reader callbacks
-                // reader.onloadstart: nothing to do
-                reader.onload = getLoadHandler(loader, file, i);
-                // reader.onloadend: nothing to do
-                reader.onerror = augmentCallbackEvent(self.onerror, file);
-                reader.onabort = augmentCallbackEvent(self.onabort, file);
-                // read
-                if (loader.loadFileAs() === dwv.io.fileContentTypes.Text) {
-                    reader.readAsText(file);
-                } else if (loader.loadFileAs() === dwv.io.fileContentTypes.DataURL) {
-                    reader.readAsDataURL(file);
-                } else if (loader.loadFileAs() === dwv.io.fileContentTypes.ArrayBuffer) {
-                    reader.readAsArrayBuffer(file);
-                }
-                // next file
-                break;
-            }
-        }
-        // TODO: throw?
-        if (!foundLoader) {
-            throw new Error("No loader found for file: "+file);
-        }
-    }
 }; // class FilesLoader
 
 /**

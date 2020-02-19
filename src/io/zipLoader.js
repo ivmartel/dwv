@@ -55,21 +55,25 @@ dwv.io.ZipLoader = function ()
      * JSZip.async callback
      * @param {ArrayBuffer} content unzipped file image
      * @param {Number} index The data index.
-     * @return {}
      * @private
      */
-    function zipAsyncCallback(content, index)
+    function zipAsyncCallback(content, origin, index)
     {
         files.push({"filename": filename, "data": content});
 
         // sent un-ziped progress with the data index
         // (max 50% to take into account the memory loading)
-        var unzipPercent = files.length * 50 / zobjs.length;
+        var unzipPercent = files.length * 100 / zobjs.length;
         self.onprogress({
-            'lengthComputable': true,
-            'loaded': unzipPercent,
-            'total': 100,
-            'index': index
+            lengthComputable: true,
+            loaded: (unzipPercent / 2),
+            total: 100,
+            index: index,
+            item: {
+                loaded: unzipPercent,
+                total: 100,
+                source: origin
+            }
         });
 
         // recursively call until we have all the files
@@ -77,7 +81,7 @@ dwv.io.ZipLoader = function ()
             var num = files.length;
             filename = zobjs[num].name;
             zobjs[num].async("arrayBuffer").then( function (content) {
-                zipAsyncCallback(content, index);
+                zipAsyncCallback(content, origin, index);
             });
         } else {
             var memoryIO = new dwv.io.MemoryLoader();
@@ -112,7 +116,9 @@ dwv.io.ZipLoader = function ()
      */
     this.load = function (buffer, origin, index) {
         // send start event
-        this.onloadstart({});
+        this.onloadstart({
+            source: origin
+        });
         // set loading flag
         isLoading = true;
 
@@ -123,7 +129,7 @@ dwv.io.ZipLoader = function ()
             var num = files.length;
             filename = zobjs[num].name;
             zobjs[num].async("arrayBuffer").then( function (content) {
-                zipAsyncCallback(content, index);
+                zipAsyncCallback(content, origin, index);
             });
         });
     };

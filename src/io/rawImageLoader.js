@@ -38,6 +38,7 @@ dwv.io.RawImageLoader = function ()
      * Create a Data URI from an HTTP request response.
      * @param {Object} response The HTTP request response.
      * @param {String} dataType The data type.
+     * @private
      */
     function createDataUri(response, dataType) {
         // image type
@@ -63,19 +64,27 @@ dwv.io.RawImageLoader = function ()
         // triggered by ctx.drawImage
         image.onload = function (/*event*/) {
             try {
-                if(!aborted){
-                    self.onload( dwv.image.getViewFromDOMImage(this) );
+                if (!aborted) {
+                    self.onload(dwv.image.getViewFromDOMImage(this, origin));
                 }
-                self.onloadend({});
+                self.onloadend({
+                    source: origin
+                });
             } catch (error) {
-                self.onerror(error);
-                self.onloadend({});
+                self.onerror({
+                    error: error,
+                    source: origin
+                });
+                self.onloadend({
+                    source: origin
+                });
             }
             self.onprogress({
-                'lengthComputable': true,
-                'loaded': 100,
-                'total': 100,
-                'index': index
+                lengthComputable: true,
+                loaded: 100,
+                total: 100,
+                index: index,
+                souce: origin
             });
         };
         // storing values to pass them on
@@ -91,7 +100,7 @@ dwv.io.RawImageLoader = function ()
     };
 
     /**
-     * Abort load. TODO...
+     * Abort load.
      */
     this.abort = function () {
         aborted = true;

@@ -70,16 +70,22 @@ dwv.io.RawVideoLoader = function ()
         video.onloadedmetadata = function (/*event*/) {
             try {
                 dwv.image.getViewFromDOMVideo(this,
-                    self.onload, self.onprogress, self.onloadend, index);
+                    self.onload, self.onprogress, self.onloadend,
+                    index, origin);
             } catch (error) {
-                self.onerror(error);
-                self.onloadend({});
+                self.onerror({
+                    error: error,
+                    source: origin
+                });
+                self.onloadend({
+                    source: origin
+                });
             }
         };
     };
 
     /**
-     * Abort load. TODO...
+     * Abort load.
      */
     this.abort = function () {
         self.onabort({});

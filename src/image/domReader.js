@@ -62,9 +62,10 @@ dwv.image.getDefaultView = function (
 /**
  * Get data from an input image using a canvas.
  * @param {Object} image The DOM Image.
+ * @param {Object} origin The data origin.
  * @return {Object} A load data event.
  */
-dwv.image.getViewFromDOMImage = function (image)
+dwv.image.getViewFromDOMImage = function (image, origin)
 {
     // image size
     var width = image.width;
@@ -101,22 +102,26 @@ dwv.image.getViewFromDOMImage = function (image)
 
     // return
     return {
-      "data": {
-        "view": view,
-        "info": info
-      }
+      data: {
+        view: view,
+        info: info
+      },
+      source: origin
     };
 };
 
 /**
  * Get data from an input image using a canvas.
  * @param {Object} video The DOM Video.
- * @param {Object} callback The function to call once the data is loaded.
- * @param {Object} cbprogress The function to call to report progress.
- * @param {Object} cbonloadend The function to call to report load end.
+ * @param {Object} onload The function to call once the data is loaded.
+ * @param {Object} onprogress The function to call to report progress.
+ * @param {Object} onloadend The function to call to report load end.
  * @param {Number} dataindex The data index.
+ * @param {Object} origin The data origin.
  */
-dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, cbonloadend, dataIndex)
+dwv.image.getViewFromDOMVideo = function (
+    video, onload, onprogress, onloadend,
+    dataIndex, origin)
 {
     // video size
     var width = video.videoWidth;
@@ -156,15 +161,13 @@ dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, cbonloade
     // draw the context and store it as a frame
     function storeFrame() {
         // send progress
-        var evprog = {
-            'lengthComputable': true,
-            'loaded': frameIndex,
-            'total': numberOfFrames
-        };
-        if (typeof dataIndex !== "undefined") {
-            evprog.index = dataIndex;
-        }
-        cbprogress(evprog);
+        onprogress({
+            lengthComputable: true,
+            loaded: frameIndex,
+            total: numberOfFrames,
+            index: dataIndex,
+            source: origin
+        });
         // draw image
         ctx.drawImage(video, 0, 0);
         // context to image buffer
@@ -175,11 +178,12 @@ dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, cbonloade
             view = dwv.image.getDefaultView(
                 width, height, 1, [imgBuffer], numberOfFrames, dataIndex);
             // call callback
-            callback({
-              "data": {
-                "view": view,
-                "info": info
-              }
+            onload({
+              data: {
+                view: view,
+                info: info
+              },
+              source: origin
             });
         } else {
             view.appendFrameBuffer(imgBuffer);
@@ -198,7 +202,9 @@ dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, cbonloade
         if (nextTime <= this.duration) {
             this.currentTime = nextTime;
         } else {
-            cbonloadend();
+            onloadend({
+                source: origin
+            });
             // stop listening
             video.removeEventListener('seeked', onseeked);
         }

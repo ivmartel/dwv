@@ -16,24 +16,26 @@ dwv.io.MemoryLoader = function ()
     var self = this;
 
     /**
-     * Launched loader (used in abort).
+     * Input data.
+     * @private
+     * @type Array
+     */
+    var inputData = null;
+
+    /**
+     * Data loader.
      * @private
      * @type Object
      */
     var runningLoader = null;
 
     /**
-     * Number of data to load.
-     * @private
-     * @type Number
-     */
-    var nToLoad = 0;
-    /**
      * Number of loaded data.
      * @private
      * @type Number
      */
     var nLoad = 0;
+
     /**
      * Number of load end events.
      * @private
@@ -65,147 +67,167 @@ dwv.io.MemoryLoader = function ()
     };
 
     /**
-     * Store a launched loader.
-     * @param {Object} loader The launched loader.
+     * Store the current input.
+     * @param {Object} data The input data.
+     * @private
      */
-    this.storeLoader = function (loader) {
-        runningLoader = loader;
-    };
-
-    /**
-     * Clear the stored loader.
-     */
-    this.clearStoredLoader = function () {
-        runningLoader = null;
-    };
-
-    /**
-     * Abort a memory load.
-     */
-    this.abort = function () {
-        // abort loader
-        runningLoader.abort();
-        this.clearStoredLoaders();
-    };
-
-    /**
-     * Set the number of data to load.
-     * @param {Number} n The number of data to load.
-     */
-    this.setNToLoad = function (n) {
-        nToLoad = n;
+    function storeInputData(data) {
+        inputData = data;
         // reset counters
         nLoad = 0;
         nLoadend = 0;
-    };
+        // clear storage
+        clearStoredLoader();
+    }
+
+    /**
+     * Store the launched loader.
+     * @param {Object} loader The launched loader.
+     * @private
+     */
+    function storeLoader(loader) {
+        runningLoader = loader;
+    }
+
+    /**
+     * Clear the stored loader.
+     * @private
+     */
+    function clearStoredLoader() {
+        runningLoader = null;
+    }
+
+    /**
+     * Launch a load item event and call addLoad.
+     * @param {Object} event The load data event.
+     * @private
+     */
+    function addLoadItem(event) {
+        self.onloaditem(event);
+        addLoad();
+    }
 
     /**
      * Increment the number of loaded data
      *   and call onload if loaded all data.
      * @param {Object} event The load data event.
+     * @private
      */
-    this.addLoad = function (event) {
-        self.onloaditem(event);
+    function addLoad(/*event*/) {
         nLoad++;
         // call self.onload when all is loaded
-        // (can't use the input event since it is not the
+        // (not using the input event since it is not the
         //   general load)
-        if ( nLoad === nToLoad ) {
-            self.onload({});
+        if (nLoad === inputData.length) {
+            self.onload({
+                source: inputData
+            });
         }
-    };
+    }
 
     /**
      * Increment the counter of load end events
      *   and run callbacks when all done, erroneus or not.
      * @param {Object} event The load end event.
+     * @private
      */
-    this.addLoadend = function (event) {
+    function addLoadend(/*event*/) {
         nLoadend++;
         // call self.onloadend when all is run
-        // (can't use the input event since it is not the
+        // (not using the input event since it is not the
         //   general load end)
-        if ( nLoadend === nToLoad ) {
+        if (nLoadend === inputData.length) {
             self.onloadend({
-                source: event.source
+                source: inputData
             });
         }
-    };
-
-}; // class MemoryLoader
-
-/**
- * Load a list of buffers.
- * @param {Array} ioArray The list of buffers to load.
- */
-dwv.io.MemoryLoader.prototype.load = function (ioArray)
-{
-    this.onloadstart({
-        source: ioArray
-    });
-
-    // clear storage
-    this.clearStoredLoader();
-
-    // closure to self for handlers
-    var self = this;
-
-    // set the number of data to load
-    this.setNToLoad( ioArray.length );
-
-    var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
-    mproghandler.setNToLoad( ioArray.length );
-    mproghandler.setNumberOfDimensions(1);
-
-    // create loaders
-    var loaders = [];
-    for (var m = 0; m < dwv.io.loaderList.length; ++m) {
-        loaders.push( new dwv.io[dwv.io.loaderList[m]]() );
     }
 
-    var augmentCallbackEvent = function (callback, source) {
-        return function (event) {
-            event.source = source;
-            callback(event);
-        };
-    };
-
-    // loop on I/O elements
-    for (var i = 0; i < ioArray.length; ++i)
+    /**
+     * Load a list of buffers.
+     * @param {Array} data The list of buffers to load.
+     */
+    this.load = function (data)
     {
-        var iodata = ioArray[i];
+        // check input
+        if (typeof data === "undefined" || data.length === 0) {
+            return;
+        }
+        storeInputData(data);
 
-        // find a loader
+        // send start event
+        this.onloadstart({
+            source: data
+        });
+
+        // create prgress handler
+        var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
+        mproghandler.setNToLoad(data.length);
+        mproghandler.setNumberOfDimensions(1);
+
+        // create loaders
+        var loaders = [];
+        for (var m = 0; m < dwv.io.loaderList.length; ++m) {
+            loaders.push(new dwv.io[dwv.io.loaderList[m]]());
+        }
+
+        // find an appropriate loader
+        var dataElement = data[0];
         var loader = null;
         var foundLoader = false;
         for (var l = 0; l < loaders.length; ++l) {
             loader = loaders[l];
-            if (loader.canLoadFile(iodata.filename)) {
+            if (loader.canLoadFile({name: dataElement.filename})) {
                 foundLoader = true;
+                // load options
                 loader.setOptions({
                     'defaultCharacterSet': this.getDefaultCharacterSet()
                 });
-                // set loaded callbacks
+                // set loader callbacks
                 // loader.onloadstart: nothing to do
-                loader.onprogress = mproghandler.getMonoProgressHandler(i, 0, iodata.filename);
-                loader.onload = augmentCallbackEvent(self.addLoad, iodata.filename);
-                loader.onloadend = augmentCallbackEvent(self.addLoadend, ioArray);
-                loader.onerror = augmentCallbackEvent(self.onerror, iodata.filename);
-                loader.onabort = augmentCallbackEvent(self.onabort, iodata.filename);
+                loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(0);
+                loader.onload = addLoadItem;
+                loader.onloadend = addLoadend;
+                loader.onerror = self.onerror;
+                loader.onabort = self.onabort;
+
                 // store loader
-                this.storeLoader(loader);
-                // read
-                loader.load(iodata.data, iodata.filename, i);
-                // next file
+                storeLoader(loader);
+                // exit
                 break;
             }
         }
-        // TODO: throw?
         if (!foundLoader) {
-            throw new Error("No loader found for file: "+iodata.filename);
+            throw new Error("No loader found for data: "+dataElement.filename);
         }
-    }
-}; // class Memory
+
+        // loop on I/O elements
+        for (var i = 0; i < data.length; ++i) {
+            dataElement = data[i];
+            // check loader
+            if (!loader.canLoadFile({name: dataElement.filename})) {
+                throw new Error("Input data of different type: "+dataElement.filename);
+            }
+            // read
+            loader.load(dataElement.data, dataElement.filename, i);
+        }
+    };
+
+    /**
+     * Abort a load.
+     */
+    this.abort = function () {
+        // abort loader
+        if (runningLoader && runningLoader.isLoading()) {
+            runningLoader.abort();
+        }
+        // send load end
+        self.onloadend({
+            source: inputData
+        });
+    };
+
+}; // class MemoryLoader
 
 /**
  * Handle a load start event.

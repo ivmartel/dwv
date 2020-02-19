@@ -54,26 +54,30 @@ dwv.io.DicomDataLoader = function ()
      * @param {Number} index The data index.
      */
     this.load = function (buffer, origin, index) {
+        // setup db2v ony once
+        if (!isLoading) {
+            // set character set
+            if (typeof options.defaultCharacterSet !== "undefined") {
+                db2v.setDefaultCharacterSet(options.defaultCharacterSet);
+            }
+            // connect handlers
+            db2v.onloadstart = self.onloadstart;
+            db2v.onprogress = self.onprogress;
+            db2v.onload = self.onload;
+            db2v.onloadend = function (event) {
+                // reset loading flag
+                isLoading = false;
+                // call listeners
+                self.onloadend(event);
+            };
+            db2v.onerror = self.onerror;
+            db2v.onabort = self.onabort;
+        }
+
         // set loading flag
         isLoading = true;
-        // set character set
-        if (typeof options.defaultCharacterSet !== "undefined") {
-            db2v.setDefaultCharacterSet(options.defaultCharacterSet);
-        }
-        // connect handlers
-        db2v.onloadstart = self.onloadstart;
-        db2v.onprogress = self.onprogress;
-        db2v.onload = self.onload;
-        db2v.onloadend = function (event) {
-            // reset loading flag
-            isLoading = false;
-            // call listeners
-            self.onloadend(event);
-        };
-        db2v.onerror = self.onerror;
-        db2v.onabort = self.onabort;
         // convert
-        db2v.convert( buffer, index );
+        db2v.convert(buffer, origin, index);
     };
 
     /**
