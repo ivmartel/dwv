@@ -1,4 +1,4 @@
-/*! dwv 0.27.0-beta 2020-02-18 22:55:05 */
+/*! dwv 0.27.0-beta 2020-02-19 20:08:54 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -11439,9 +11439,10 @@ dwv.image.DicomBufferToView = function ()
     /**
      * Get data from an input buffer using a DICOM parser.
      * @param {Array} buffer The input data buffer.
+     * @param {String} origin The data origin.
      * @param {Number} dataIndex The data index.
      */
-    this.convert = function (buffer, dataIndex)
+    this.convert = function (buffer, origin, dataIndex)
     {
         // DICOM parser
         var dicomParser = new dwv.dicom.DicomParser();
@@ -11449,9 +11450,14 @@ dwv.image.DicomBufferToView = function ()
         // parse the buffer
         try {
           dicomParser.parse(buffer);
-        } catch(error) {
-          self.onerror({error: error});
-          self.onloadend({});
+        } catch (error) {
+          self.onerror({
+              error: error,
+              source: origin
+          });
+          self.onloadend({
+              source: origin
+          });
           return;
         }
 
@@ -11468,16 +11474,22 @@ dwv.image.DicomBufferToView = function ()
             try {
                 var image = imageFactory.create( dicomParser.getDicomElements(), pixelBuffer );
                 var view = viewFactory.create( dicomParser.getDicomElements(), image );
-                // return
+                // call onload
                 self.onload({
                   "data": {
                     "view": view,
                     "info": dicomParser.getRawDicomElements()
-                  }
+                    },
+                    source: origin
                 });
             } catch (error) {
-                self.onerror({error: error});
-                self.onloadend({});
+                self.onerror({
+                    error: error,
+                    source: origin
+                });
+                self.onloadend({
+                    source: origin
+                });
             }
         };
 
@@ -11523,17 +11535,15 @@ dwv.image.DicomBufferToView = function ()
             var countDecodedFrames = 0;
             var onDecodedFrame = function (frame) {
                 return function (event) {
-                    // send progress
                     ++countDecodedFrames;
-                    var ev = {
-                        'lengthComputable': true,
-                        'loaded': (countDecodedFrames * 100 / nFrames),
-                        'total': 100
-                    };
-                    if ( typeof dataIndex !== "undefined") {
-                        ev.index = dataIndex;
-                    }
-                    self.onprogress(ev);
+                    // send progress
+                    self.onprogress({
+                        lengthComputable: true,
+                        loaded: (countDecodedFrames * 100 / nFrames),
+                        total: 100,
+                        index: dataIndex,
+                        source: origin
+                    });
                     // store data
                     pixelBuffer[frame] = event.data[0];
                     // create image for first frame
@@ -11559,19 +11569,19 @@ dwv.image.DicomBufferToView = function ()
         // no decompression
         else {
             // send progress
-            var evnodec = {
-                'lengthComputable': true,
-                'loaded': 100,
-                'total': 100
-            };
-            if ( typeof dataIndex !== "undefined") {
-                evnodec.index = dataIndex;
-            }
-            self.onprogress(evnodec);
+            self.onprogress({
+                lengthComputable: true,
+                loaded: 100,
+                total: 100,
+                index: dataIndex,
+                source: origin
+            });
             // create image
             onDecodedFirstFrame();
             // send load events
-            self.onloadend({});
+            self.onloadend({
+                source: origin
+            });
         }
     };
 
@@ -11689,9 +11699,10 @@ dwv.image.getDefaultView = function (
 /**
  * Get data from an input image using a canvas.
  * @param {Object} image The DOM Image.
+ * @param {Object} origin The data origin.
  * @return {Object} A load data event.
  */
-dwv.image.getViewFromDOMImage = function (image)
+dwv.image.getViewFromDOMImage = function (image, origin)
 {
     // image size
     var width = image.width;
@@ -11728,22 +11739,26 @@ dwv.image.getViewFromDOMImage = function (image)
 
     // return
     return {
-      "data": {
-        "view": view,
-        "info": info
-      }
+      data: {
+        view: view,
+        info: info
+      },
+      source: origin
     };
 };
 
 /**
  * Get data from an input image using a canvas.
  * @param {Object} video The DOM Video.
- * @param {Object} callback The function to call once the data is loaded.
- * @param {Object} cbprogress The function to call to report progress.
- * @param {Object} cbonloadend The function to call to report load end.
+ * @param {Object} onload The function to call once the data is loaded.
+ * @param {Object} onprogress The function to call to report progress.
+ * @param {Object} onloadend The function to call to report load end.
  * @param {Number} dataindex The data index.
+ * @param {Object} origin The data origin.
  */
-dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, cbonloadend, dataIndex)
+dwv.image.getViewFromDOMVideo = function (
+    video, onload, onprogress, onloadend,
+    dataIndex, origin)
 {
     // video size
     var width = video.videoWidth;
@@ -11783,15 +11798,13 @@ dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, cbonloade
     // draw the context and store it as a frame
     function storeFrame() {
         // send progress
-        var evprog = {
-            'lengthComputable': true,
-            'loaded': frameIndex,
-            'total': numberOfFrames
-        };
-        if (typeof dataIndex !== "undefined") {
-            evprog.index = dataIndex;
-        }
-        cbprogress(evprog);
+        onprogress({
+            lengthComputable: true,
+            loaded: frameIndex,
+            total: numberOfFrames,
+            index: dataIndex,
+            source: origin
+        });
         // draw image
         ctx.drawImage(video, 0, 0);
         // context to image buffer
@@ -11802,11 +11815,12 @@ dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, cbonloade
             view = dwv.image.getDefaultView(
                 width, height, 1, [imgBuffer], numberOfFrames, dataIndex);
             // call callback
-            callback({
-              "data": {
-                "view": view,
-                "info": info
-              }
+            onload({
+              data: {
+                view: view,
+                info: info
+              },
+              source: origin
             });
         } else {
             view.appendFrameBuffer(imgBuffer);
@@ -11825,7 +11839,9 @@ dwv.image.getViewFromDOMVideo = function (video, callback, cbprogress, cbonloade
         if (nextTime <= this.duration) {
             this.currentTime = nextTime;
         } else {
-            cbonloadend();
+            onloadend({
+                source: origin
+            });
             // stop listening
             video.removeEventListener('seeked', onseeked);
         }
@@ -14856,26 +14872,30 @@ dwv.io.DicomDataLoader = function ()
      * @param {Number} index The data index.
      */
     this.load = function (buffer, origin, index) {
+        // setup db2v ony once
+        if (!isLoading) {
+            // set character set
+            if (typeof options.defaultCharacterSet !== "undefined") {
+                db2v.setDefaultCharacterSet(options.defaultCharacterSet);
+            }
+            // connect handlers
+            db2v.onloadstart = self.onloadstart;
+            db2v.onprogress = self.onprogress;
+            db2v.onload = self.onload;
+            db2v.onloadend = function (event) {
+                // reset loading flag
+                isLoading = false;
+                // call listeners
+                self.onloadend(event);
+            };
+            db2v.onerror = self.onerror;
+            db2v.onabort = self.onabort;
+        }
+
         // set loading flag
         isLoading = true;
-        // set character set
-        if (typeof options.defaultCharacterSet !== "undefined") {
-            db2v.setDefaultCharacterSet(options.defaultCharacterSet);
-        }
-        // connect handlers
-        db2v.onloadstart = self.onloadstart;
-        db2v.onprogress = self.onprogress;
-        db2v.onload = self.onload;
-        db2v.onloadend = function (event) {
-            // reset loading flag
-            isLoading = false;
-            // call listeners
-            self.onloadend(event);
-        };
-        db2v.onerror = self.onerror;
-        db2v.onabort = self.onabort;
         // convert
-        db2v.convert( buffer, index );
+        db2v.convert(buffer, origin, index);
     };
 
     /**
@@ -15010,31 +15030,33 @@ dwv.io.FilesLoader = function ()
     var self = this;
 
     /**
-     * Array of launched readers (used in abort).
+     * Input data.
+     * @private
+     * @type Array
+     */
+    var inputData = null;
+
+    /**
+     * Array of launched file readers.
      * @private
      * @type Array
      */
     var readers = [];
 
     /**
-     * Launched loader (used in abort).
+     * Data loader.
      * @private
      * @type Object
      */
     var runningLoader = null;
 
     /**
-     * Number of data to load.
-     * @private
-     * @type Number
-     */
-    var nToLoad = 0;
-    /**
      * Number of loaded data.
      * @private
      * @type Number
      */
     var nLoad = 0;
+
     /**
      * Number of load end events.
      * @private
@@ -15066,37 +15088,221 @@ dwv.io.FilesLoader = function ()
     };
 
     /**
-     * Store a launched reader.
-     * @param {Object} request The launched reader.
+     * Store the current input.
+     * @param {Object} data The input data.
+     * @private
      */
-    this.storeReader = function (reader) {
+    function storeInputData(data) {
+        inputData = data;
+        // reset counters
+        nLoad = 0;
+        nLoadend = 0;
+        // clear storage
+        clearStoredReaders();
+        clearStoredLoader();
+    }
+
+    /**
+     * Store a launched reader.
+     * @param {Object} reader The launched reader.
+     * @private
+     */
+    function storeReader(reader) {
         readers.push(reader);
-    };
+    }
 
     /**
      * Clear the stored readers.
+     * @private
      */
-    this.clearStoredReaders = function () {
+    function clearStoredReaders() {
         readers = [];
-    };
+    }
 
     /**
      * Store the launched loader.
      * @param {Object} loader The launched loader.
+     * @private
      */
-    this.storeLoader = function (loader) {
+    function storeLoader(loader) {
         runningLoader = loader;
-    };
+    }
 
     /**
      * Clear the stored loader.
+     * @private
      */
-    this.clearStoredLoader = function () {
+    function clearStoredLoader() {
         runningLoader = null;
+    }
+
+    /**
+     * Launch a load item event and call addLoad.
+     * @param {Object} event The load data event.
+     * @private
+     */
+    function addLoadItem(event) {
+        self.onloaditem(event);
+        addLoad();
+    }
+
+    /**
+     * Increment the number of loaded data
+     *   and call onload if loaded all data.
+     * @param {Object} event The load data event.
+     * @private
+     */
+    function addLoad(/*event*/) {
+        nLoad++;
+        // call self.onload when all is loaded
+        // (not using the input event since it is not the
+        //   general load)
+        if (nLoad === inputData.length) {
+            self.onload({
+                source: inputData
+            });
+        }
+    }
+
+    /**
+     * Increment the counter of load end events
+     *   and run callbacks when all done, erroneus or not.
+     * @param {Object} event The load end event.
+     * @private
+     */
+    function addLoadend(/*event*/) {
+        nLoadend++;
+        // call self.onloadend when all is run
+        // (not using the input event since it is not the
+        //   general load end)
+        if (nLoadend === inputData.length) {
+            self.onloadend({
+                source: inputData
+            });
+        }
+    }
+
+    /**
+     * Augment a callback event with a srouce.
+     * @param {Object} callback The callback to augment its event.
+     * @param {Object} source The source to add to the event.
+     * @private
+     */
+    function augmentCallbackEvent(callback, source) {
+        return function (event) {
+            event.source = source;
+            callback(event);
+        };
+    }
+
+    /**
+     * Load a list of files.
+     * @param {Array} data The list of files to load.
+     */
+    this.load = function (data)
+    {
+        // check input
+        if (typeof data === "undefined" || data.length === 0) {
+            return;
+        }
+        storeInputData(data);
+
+        // send start event
+        this.onloadstart({
+            source: data
+        });
+
+        // create prgress handler
+        var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
+        mproghandler.setNToLoad(data.length);
+
+        // create loaders
+        var loaders = [];
+        for (var m = 0; m < dwv.io.loaderList.length; ++m) {
+            loaders.push(new dwv.io[dwv.io.loaderList[m]]());
+        }
+
+        // find an appropriate loader
+        var dataElement = data[0];
+        var loader = null;
+        var foundLoader = false;
+        for (var l = 0; l < loaders.length; ++l) {
+            loader = loaders[l];
+            if (loader.canLoadFile(dataElement)) {
+                foundLoader = true;
+                // load options
+                loader.setOptions({
+                    'defaultCharacterSet': this.getDefaultCharacterSet()
+                });
+                // set loader callbacks
+                // loader.onloadstart: nothing to do
+                loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
+                if (typeof loader.onloaditem === "undefined") {
+                    // handle load-item locally
+                    loader.onload = addLoadItem;
+                } else {
+                    loader.onloaditem = self.onloaditem;
+                    loader.onload = addLoad;
+                }
+                loader.onloadend = addLoadend;
+                loader.onerror = self.onerror;
+                loader.onabort = self.onabort;
+
+                // store loader
+                storeLoader(loader);
+                // exit
+                break;
+            }
+        }
+        if (!foundLoader) {
+            throw new Error("No loader found for file: "+dataElement);
+        }
+
+        var getLoadHandler = function (loader, dataElement, i) {
+            return function (event) {
+                loader.load(event.target.result, dataElement, i);
+            };
+        };
+
+        // loop on I/O elements
+        for (var i = 0; i < data.length; ++i) {
+            dataElement = data[i];
+
+            // check loader
+            if (!loader.canLoadFile(dataElement)) {
+                throw new Error("Input file of different type: "+dataElement);
+            }
+
+            /**
+             * The file reader.
+             * @external FileReader
+             * @see https://developer.mozilla.org/en-US/docs/Web/API/FileReader
+             */
+            var reader = new FileReader();
+            // store reader
+            storeReader(reader);
+
+            // set reader callbacks
+            // reader.onloadstart: nothing to do
+            reader.onprogress = augmentCallbackEvent(
+                mproghandler.getMonoProgressHandler(i, 0), dataElement);
+            reader.onload = getLoadHandler(loader, dataElement, i);
+            // reader.onloadend: nothing to do
+            reader.onerror = augmentCallbackEvent(self.onerror, dataElement);
+            reader.onabort = augmentCallbackEvent(self.onabort, dataElement);
+            // read
+            if (loader.loadFileAs() === dwv.io.fileContentTypes.Text) {
+                reader.readAsText(dataElement);
+            } else if (loader.loadFileAs() === dwv.io.fileContentTypes.DataURL) {
+                reader.readAsDataURL(dataElement);
+            } else if (loader.loadFileAs() === dwv.io.fileContentTypes.ArrayBuffer) {
+                reader.readAsArrayBuffer(dataElement);
+            }
+        }
     };
 
     /**
-     * Abort a URLs load.
+     * Abort a load.
      */
     this.abort = function () {
         // abort readers
@@ -15106,178 +15312,16 @@ dwv.io.FilesLoader = function ()
                 readers[i].abort();
             }
         }
-        this.clearStoredReaders();
         // abort loader
         if (runningLoader && runningLoader.isLoading()) {
             runningLoader.abort();
         }
-        this.clearStoredLoader();
+        // send load end
+        this.onloadend({
+            source: inputData
+        });
     };
 
-    /**
-     * Set the number of data to load.
-     * @param {Number} n The number of data to load.
-     */
-    this.setNToLoad = function (n) {
-        nToLoad = n;
-        // reset counters
-        nLoad = 0;
-        nLoadend = 0;
-    };
-
-    /**
-     * Launch a load item event and call addLoad.
-     * @param {Object} event The load event data.
-     */
-    this.addLoadItem = function (event) {
-        self.onloaditem(event);
-        self.addLoad();
-    };
-
-    /**
-     * Increment the number of loaded data
-     *   and call onload if loaded all data.
-     * @param {Object} event The load data event.
-     */
-    this.addLoad = function (/*event*/) {
-        nLoad++;
-        // call self.onload when all is loaded
-        // (can't use the input event since it is not the
-        //   general load)
-        if ( nLoad === nToLoad ) {
-            self.onload({});
-        }
-    };
-
-    /**
-     * Increment the counter of load end events
-     *   and run callbacks when all done, erroneus or not.
-     * @param {Object} event The load end event.
-     */
-    this.addLoadend = function (event) {
-        nLoadend++;
-        // call self.onloadend when all is run
-        // (can't use the input event since it is not the
-        //   general load end)
-        if ( nLoadend === nToLoad ) {
-            self.onloadend({
-                source: event.source
-            });
-        }
-    };
-
-}; // class FileLoader
-
-/**
- * Load a list of files.
- * @param {Array} ioArray The list of files to load.
- */
-dwv.io.FilesLoader.prototype.load = function (ioArray)
-{
-    this.onloadstart({
-        source: ioArray
-    });
-
-    // clear storage
-    this.clearStoredReaders();
-    this.clearStoredLoader();
-
-    // closure to self for handlers
-    var self = this;
-
-    // set the number of data to load
-    this.setNToLoad( ioArray.length );
-
-    var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
-    mproghandler.setNToLoad( ioArray.length );
-
-    // create loaders
-    var loaders = [];
-    for (var m = 0; m < dwv.io.loaderList.length; ++m) {
-        loaders.push( new dwv.io[dwv.io.loaderList[m]]() );
-    }
-
-    var augmentCallbackEvent = function (callback, source) {
-        return function (event) {
-            event.source = source;
-            callback(event);
-        };
-    };
-
-    var getLoadHandler = function (loader, file, i) {
-        return function (event) {
-            loader.load(event.target.result, file, i);
-        };
-    };
-
-    // loop on I/O elements
-    for (var i = 0; i < ioArray.length; ++i)
-    {
-        var file = ioArray[i];
-        /**
-         * The file reader.
-         * @external FileReader
-         * @see https://developer.mozilla.org/en-US/docs/Web/API/FileReader
-         */
-        var reader = new FileReader();
-
-        // store reader
-        this.storeReader(reader);
-
-        // bind reader progress
-        reader.onprogress = mproghandler.getMonoProgressHandler(i, 0, file);
-
-        // find a loader
-        var loader = null;
-        var foundLoader = false;
-        for (var l = 0; l < loaders.length; ++l) {
-            loader = loaders[l];
-            if (loader.canLoadFile(file)) {
-                foundLoader = true;
-
-                loader.setOptions({
-                    'defaultCharacterSet': this.getDefaultCharacterSet()
-                });
-                // set loader callbacks
-                // loader.onloadstart: nothing to do
-                loader.onprogress = mproghandler.getMonoProgressHandler(i, 1, file);
-                if (typeof loader.onloaditem === "undefined") {
-                    // handle load-item locally
-                    loader.onload = augmentCallbackEvent(self.addLoadItem, file);
-                } else {
-                    loader.onloaditem = self.onloaditem;
-                    loader.onload = augmentCallbackEvent(self.addLoad, file);
-                }
-                loader.onloadend = augmentCallbackEvent(self.addLoadend, ioArray);
-                loader.onerror = augmentCallbackEvent(self.onerror, file);
-                loader.onabort = augmentCallbackEvent(self.onabort, file);
-
-                // store loader
-                this.storeLoader(loader);
-
-                // set reader callbacks
-                // reader.onloadstart: nothing to do
-                reader.onload = getLoadHandler(loader, file, i);
-                // reader.onloadend: nothing to do
-                reader.onerror = augmentCallbackEvent(self.onerror, file);
-                reader.onabort = augmentCallbackEvent(self.onabort, file);
-                // read
-                if (loader.loadFileAs() === dwv.io.fileContentTypes.Text) {
-                    reader.readAsText(file);
-                } else if (loader.loadFileAs() === dwv.io.fileContentTypes.DataURL) {
-                    reader.readAsDataURL(file);
-                } else if (loader.loadFileAs() === dwv.io.fileContentTypes.ArrayBuffer) {
-                    reader.readAsArrayBuffer(file);
-                }
-                // next file
-                break;
-            }
-        }
-        // TODO: throw?
-        if (!foundLoader) {
-            throw new Error("No loader found for file: "+file);
-        }
-    }
 }; // class FilesLoader
 
 /**
@@ -15371,23 +15415,34 @@ dwv.io.JSONTextLoader = function ()
     this.load = function (text, origin, index) {
         // set loading flag
         isLoading = true;
+        self.onloadstart({
+            source: origin
+        });
+
         try {
+            self.onprogress({
+                lengthComputable: true,
+                loaded: 100,
+                total: 100,
+                index: index,
+                source: origin
+            });
             self.onload({
-                data: text
+                data: text,
+                source: origin
             });
         } catch (error) {
-            self.onerror(error);
+            self.onerror({
+                error: error,
+                source: origin
+            });
         } finally {
             // reset loading flag
             isLoading = false;
-            self.onloadend({});
+            self.onloadend({
+                source: origin
+            });
         }
-        self.onprogress({
-            'lengthComputable': true,
-            'loaded': 100,
-            'total': 100,
-            'index': index
-        });
     };
 
     /**
@@ -15503,24 +15558,26 @@ dwv.io.MemoryLoader = function ()
     var self = this;
 
     /**
-     * Launched loader (used in abort).
+     * Input data.
+     * @private
+     * @type Array
+     */
+    var inputData = null;
+
+    /**
+     * Data loader.
      * @private
      * @type Object
      */
     var runningLoader = null;
 
     /**
-     * Number of data to load.
-     * @private
-     * @type Number
-     */
-    var nToLoad = 0;
-    /**
      * Number of loaded data.
      * @private
      * @type Number
      */
     var nLoad = 0;
+
     /**
      * Number of load end events.
      * @private
@@ -15552,147 +15609,167 @@ dwv.io.MemoryLoader = function ()
     };
 
     /**
-     * Store a launched loader.
-     * @param {Object} loader The launched loader.
+     * Store the current input.
+     * @param {Object} data The input data.
+     * @private
      */
-    this.storeLoader = function (loader) {
-        runningLoader = loader;
-    };
-
-    /**
-     * Clear the stored loader.
-     */
-    this.clearStoredLoader = function () {
-        runningLoader = null;
-    };
-
-    /**
-     * Abort a memory load.
-     */
-    this.abort = function () {
-        // abort loader
-        runningLoader.abort();
-        this.clearStoredLoaders();
-    };
-
-    /**
-     * Set the number of data to load.
-     * @param {Number} n The number of data to load.
-     */
-    this.setNToLoad = function (n) {
-        nToLoad = n;
+    function storeInputData(data) {
+        inputData = data;
         // reset counters
         nLoad = 0;
         nLoadend = 0;
-    };
+        // clear storage
+        clearStoredLoader();
+    }
+
+    /**
+     * Store the launched loader.
+     * @param {Object} loader The launched loader.
+     * @private
+     */
+    function storeLoader(loader) {
+        runningLoader = loader;
+    }
+
+    /**
+     * Clear the stored loader.
+     * @private
+     */
+    function clearStoredLoader() {
+        runningLoader = null;
+    }
+
+    /**
+     * Launch a load item event and call addLoad.
+     * @param {Object} event The load data event.
+     * @private
+     */
+    function addLoadItem(event) {
+        self.onloaditem(event);
+        addLoad();
+    }
 
     /**
      * Increment the number of loaded data
      *   and call onload if loaded all data.
      * @param {Object} event The load data event.
+     * @private
      */
-    this.addLoad = function (event) {
-        self.onloaditem(event);
+    function addLoad(/*event*/) {
         nLoad++;
         // call self.onload when all is loaded
-        // (can't use the input event since it is not the
+        // (not using the input event since it is not the
         //   general load)
-        if ( nLoad === nToLoad ) {
-            self.onload({});
+        if (nLoad === inputData.length) {
+            self.onload({
+                source: inputData
+            });
         }
-    };
+    }
 
     /**
      * Increment the counter of load end events
      *   and run callbacks when all done, erroneus or not.
      * @param {Object} event The load end event.
+     * @private
      */
-    this.addLoadend = function (event) {
+    function addLoadend(/*event*/) {
         nLoadend++;
         // call self.onloadend when all is run
-        // (can't use the input event since it is not the
+        // (not using the input event since it is not the
         //   general load end)
-        if ( nLoadend === nToLoad ) {
+        if (nLoadend === inputData.length) {
             self.onloadend({
-                source: event.source
+                source: inputData
             });
         }
-    };
-
-}; // class MemoryLoader
-
-/**
- * Load a list of buffers.
- * @param {Array} ioArray The list of buffers to load.
- */
-dwv.io.MemoryLoader.prototype.load = function (ioArray)
-{
-    this.onloadstart({
-        source: ioArray
-    });
-
-    // clear storage
-    this.clearStoredLoader();
-
-    // closure to self for handlers
-    var self = this;
-
-    // set the number of data to load
-    this.setNToLoad( ioArray.length );
-
-    var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
-    mproghandler.setNToLoad( ioArray.length );
-    mproghandler.setNumberOfDimensions(1);
-
-    // create loaders
-    var loaders = [];
-    for (var m = 0; m < dwv.io.loaderList.length; ++m) {
-        loaders.push( new dwv.io[dwv.io.loaderList[m]]() );
     }
 
-    var augmentCallbackEvent = function (callback, source) {
-        return function (event) {
-            event.source = source;
-            callback(event);
-        };
-    };
-
-    // loop on I/O elements
-    for (var i = 0; i < ioArray.length; ++i)
+    /**
+     * Load a list of buffers.
+     * @param {Array} data The list of buffers to load.
+     */
+    this.load = function (data)
     {
-        var iodata = ioArray[i];
+        // check input
+        if (typeof data === "undefined" || data.length === 0) {
+            return;
+        }
+        storeInputData(data);
 
-        // find a loader
+        // send start event
+        this.onloadstart({
+            source: data
+        });
+
+        // create prgress handler
+        var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
+        mproghandler.setNToLoad(data.length);
+        mproghandler.setNumberOfDimensions(1);
+
+        // create loaders
+        var loaders = [];
+        for (var m = 0; m < dwv.io.loaderList.length; ++m) {
+            loaders.push(new dwv.io[dwv.io.loaderList[m]]());
+        }
+
+        // find an appropriate loader
+        var dataElement = data[0];
         var loader = null;
         var foundLoader = false;
         for (var l = 0; l < loaders.length; ++l) {
             loader = loaders[l];
-            if (loader.canLoadFile(iodata.filename)) {
+            if (loader.canLoadFile({name: dataElement.filename})) {
                 foundLoader = true;
+                // load options
                 loader.setOptions({
                     'defaultCharacterSet': this.getDefaultCharacterSet()
                 });
-                // set loaded callbacks
+                // set loader callbacks
                 // loader.onloadstart: nothing to do
-                loader.onprogress = mproghandler.getMonoProgressHandler(i, 0, iodata.filename);
-                loader.onload = augmentCallbackEvent(self.addLoad, iodata.filename);
-                loader.onloadend = augmentCallbackEvent(self.addLoadend, ioArray);
-                loader.onerror = augmentCallbackEvent(self.onerror, iodata.filename);
-                loader.onabort = augmentCallbackEvent(self.onabort, iodata.filename);
+                loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(0);
+                loader.onload = addLoadItem;
+                loader.onloadend = addLoadend;
+                loader.onerror = self.onerror;
+                loader.onabort = self.onabort;
+
                 // store loader
-                this.storeLoader(loader);
-                // read
-                loader.load(iodata.data, iodata.filename, i);
-                // next file
+                storeLoader(loader);
+                // exit
                 break;
             }
         }
-        // TODO: throw?
         if (!foundLoader) {
-            throw new Error("No loader found for file: "+iodata.filename);
+            throw new Error("No loader found for data: "+dataElement.filename);
         }
-    }
-}; // class Memory
+
+        // loop on I/O elements
+        for (var i = 0; i < data.length; ++i) {
+            dataElement = data[i];
+            // check loader
+            if (!loader.canLoadFile({name: dataElement.filename})) {
+                throw new Error("Input data of different type: "+dataElement.filename);
+            }
+            // read
+            loader.load(dataElement.data, dataElement.filename, i);
+        }
+    };
+
+    /**
+     * Abort a load.
+     */
+    this.abort = function () {
+        // abort loader
+        if (runningLoader && runningLoader.isLoading()) {
+            runningLoader.abort();
+        }
+        // send load end
+        self.onloadend({
+            source: inputData
+        });
+    };
+
+}; // class MemoryLoader
 
 /**
  * Handle a load start event.
@@ -15780,6 +15857,7 @@ dwv.io.RawImageLoader = function ()
      * Create a Data URI from an HTTP request response.
      * @param {Object} response The HTTP request response.
      * @param {String} dataType The data type.
+     * @private
      */
     function createDataUri(response, dataType) {
         // image type
@@ -15805,19 +15883,27 @@ dwv.io.RawImageLoader = function ()
         // triggered by ctx.drawImage
         image.onload = function (/*event*/) {
             try {
-                if(!aborted){
-                    self.onload( dwv.image.getViewFromDOMImage(this) );
+                if (!aborted) {
+                    self.onload(dwv.image.getViewFromDOMImage(this, origin));
                 }
-                self.onloadend({});
+                self.onloadend({
+                    source: origin
+                });
             } catch (error) {
-                self.onerror(error);
-                self.onloadend({});
+                self.onerror({
+                    error: error,
+                    source: origin
+                });
+                self.onloadend({
+                    source: origin
+                });
             }
             self.onprogress({
-                'lengthComputable': true,
-                'loaded': 100,
-                'total': 100,
-                'index': index
+                lengthComputable: true,
+                loaded: 100,
+                total: 100,
+                index: index,
+                souce: origin
             });
         };
         // storing values to pass them on
@@ -15833,7 +15919,7 @@ dwv.io.RawImageLoader = function ()
     };
 
     /**
-     * Abort load. TODO...
+     * Abort load.
      */
     this.abort = function () {
         aborted = true;
@@ -16005,16 +16091,22 @@ dwv.io.RawVideoLoader = function ()
         video.onloadedmetadata = function (/*event*/) {
             try {
                 dwv.image.getViewFromDOMVideo(this,
-                    self.onload, self.onprogress, self.onloadend, index);
+                    self.onload, self.onprogress, self.onloadend,
+                    index, origin);
             } catch (error) {
-                self.onerror(error);
-                self.onloadend({});
+                self.onerror({
+                    error: error,
+                    source: origin
+                });
+                self.onloadend({
+                    source: origin
+                });
             }
         };
     };
 
     /**
-     * Abort load. TODO...
+     * Abort load.
      */
     this.abort = function () {
         self.onabort({});
@@ -16129,31 +16221,33 @@ dwv.io.UrlsLoader = function ()
     var self = this;
 
     /**
-     * Array of launched requests (used in abort).
+     * Input data.
+     * @private
+     * @type Array
+     */
+    var inputData = null;
+
+    /**
+     * Array of launched requests.
      * @private
      * @type Array
      */
     var requests = [];
 
     /**
-     * Launched loader (used in abort).
+     * Data loader.
      * @private
      * @type Object
      */
     var runningLoader = null;
 
     /**
-     * Number of data to load.
-     * @private
-     * @type Number
-     */
-    var nToLoad = 0;
-    /**
      * Number of loaded data.
      * @private
      * @type Number
      */
     var nLoad = 0;
+
     /**
      * Number of load end events.
      * @private
@@ -16185,182 +16279,234 @@ dwv.io.UrlsLoader = function ()
     };
 
     /**
+     * Store the current input.
+     * @param {Object} data The input data.
+     * @private
+     */
+    function storeInputData(data) {
+        inputData = data;
+        // reset counters
+        nLoad = 0;
+        nLoadend = 0;
+        // clear storage
+        clearStoredRequests();
+        clearStoredLoader();
+    }
+
+    /**
      * Store a launched request.
      * @param {Object} request The launched request.
+     * @private
      */
-    this.storeRequest = function (request) {
+    function storeRequest(request) {
         requests.push(request);
-    };
+    }
 
     /**
      * Clear the stored requests.
+     * @private
      */
-    this.clearStoredRequests = function () {
+    function clearStoredRequests() {
         requests = [];
-    };
+    }
 
     /**
      * Store the launched loader.
      * @param {Object} loader The launched loader.
+     * @private
      */
-    this.storeLoader = function (loader) {
+    function storeLoader(loader) {
         runningLoader = loader;
-    };
+    }
 
     /**
      * Clear the stored loader.
+     * @private
      */
-    this.clearStoredLoader = function () {
+    function clearStoredLoader() {
         runningLoader = null;
-    };
+    }
 
     /**
-     * Abort a URLs load.
-     */
-    this.abort = function () {
-        // abort requests
-        for ( var i = 0; i < requests.length; ++i ) {
-            // 0: UNSENT, 1: OPENED, 2: HEADERS_RECEIVED (send()), 3: LOADING, 4: DONE
-            if ( requests[i].readyState !== 4 ) {
-                requests[i].abort();
-            }
-        }
-        this.clearStoredRequests();
-        // abort loader
-        if (runningLoader && runningLoader.isLoading()) {
-            runningLoader.abort();
-        }
-        this.clearStoredLoader();
-    };
-
-    /**
-     * Set the number of data to load.
-     * @param {Number} n The number of data to load.
-     */
-    this.setNToLoad = function (n) {
-        nToLoad = n;
-        // reset counters
-        nLoad = 0;
-        nLoadend = 0;
-    };
-
-    /**
-    * Launch a load item event and call addLoad.
+     * Launch a load item event and call addLoad.
      * @param {Object} event The load data event.
+     * @private
      */
-    this.addLoadItem = function (event) {
+    function addLoadItem(event) {
         self.onloaditem(event);
-        self.addLoad();
-    };
+        addLoad();
+    }
 
     /**
      * Increment the number of loaded data
      *   and call onload if loaded all data.
      * @param {Object} event The load data event.
+     * @private
      */
-    this.addLoad = function (/*event*/) {
+    function addLoad(/*event*/) {
         nLoad++;
         // call self.onload when all is loaded
-        // (can't use the input event since it is not the
+        // (not using the input event since it is not the
         //   general load)
-        if ( nLoad === nToLoad ) {
-            self.onload({});
+        if (nLoad === inputData.length) {
+            self.onload({
+                source: inputData
+            });
         }
-    };
+    }
 
     /**
      * Increment the counter of load end events
      *   and run callbacks when all done, erroneus or not.
      * @param {Object} event The load end event.
+     * @private
      */
-    this.addLoadend = function (event) {
+    function addLoadend(/*event*/) {
         nLoadend++;
         // call self.onloadend when all is run
-        // (can't use the input event since it is not the
+        // (not using the input event since it is not the
         //   general load end)
-        if ( nLoadend === nToLoad ) {
+        if (nLoadend === inputData.length) {
             self.onloadend({
-                source: event.source
+                source: inputData
             });
         }
-    };
+    }
 
-}; // class UrlsLoader
-
-/**
- * Load a list of URLs.
- * @param {Array} ioArray The list of urls to load.
- * @param {Object} options Load options.
- */
-dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
-{
-    this.onloadstart({
-        source: ioArray
-    });
-
-    var augmentCallbackEvent = function (callback, source) {
+    /**
+     * Augment a callback event with a srouce.
+     * @param {Object} callback The callback to augment its event.
+     * @param {Object} source The source to add to the event.
+     * @private
+     */
+    function augmentCallbackEvent(callback, source) {
         return function (event) {
             event.source = source;
             callback(event);
         };
+    }
+
+    /**
+     * Load a list of URLs or a DICOMDIR.
+     * @param {Array} data The list of urls to load.
+     * @param {Object} options Load options.
+     */
+    this.load = function (data, options)
+    {
+        // check if DICOMDIR case
+        if ( data.length === 1 &&
+            (dwv.utils.endsWith(data[0], "DICOMDIR") ||
+             dwv.utils.endsWith(data[0], ".dcmdir") ) ) {
+            loadDicomDir(data[0], options);
+        } else {
+            loadUrls(data, options);
+        }
     };
 
-    var getLoadHandler = function (loader, url, i) {
-        return function (event) {
-            // check response status
-            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
-            // status 200: "OK"; status 0: "debug"
-            var status = event.target.status;
-            if (status !== 200 && status !== 0) {
-                self.onerror({
-                    source: url,
-                    error: "GET " + event.target.responseURL +
-                        " " + event.target.status +
-                        " (" + event.target.statusText + ")",
-                    target: event.target
-                });
-                self.onloadend({source: url});
-            } else {
-                loader.load(event.target.response, url, i);
-            }
-        };
-    };
+    /**
+     * Load a list of urls.
+     * @param {Array} data The list of urls to load.
+     * @param {Object} options Load options.
+     * @private
+     */
+    function loadUrls(data, options) {
+        // check input
+        if (typeof data === "undefined" || data.length === 0) {
+            return;
+        }
+        storeInputData(data);
 
-    // clear storage
-    this.clearStoredRequests();
-    this.clearStoredLoader();
+        // send start event
+        self.onloadstart({
+            source: data
+        });
 
-    // closure to self for handlers
-    var self = this;
-
-    // raw url load
-    var internalUrlsLoad = function (urlsArray) {
-        // set the number of data to load
-        self.setNToLoad( urlsArray.length );
-
+        // create prgress handler
         var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
-        mproghandler.setNToLoad( urlsArray.length );
+        mproghandler.setNToLoad(data.length);
 
         // create loaders
         var loaders = [];
         for (var m = 0; m < dwv.io.loaderList.length; ++m) {
-            loaders.push( new dwv.io[dwv.io.loaderList[m]]() );
+            loaders.push(new dwv.io[dwv.io.loaderList[m]]());
         }
 
+        // find an appropriate loader
+        var dataElement = data[0];
+        var loader = null;
+        var foundLoader = false;
+        for (var l = 0; l < loaders.length; ++l) {
+            loader = loaders[l];
+            if (loader.canLoadUrl(dataElement)) {
+                foundLoader = true;
+                // load options
+                loader.setOptions({
+                    'defaultCharacterSet': self.getDefaultCharacterSet()
+                });
+                // set loader callbacks
+                // loader.onloadstart: nothing to do
+                loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
+                if (typeof loader.onloaditem === "undefined") {
+                    // handle load-item locally
+                    loader.onload = addLoadItem;
+                } else {
+                    loader.onloaditem = self.onloaditem;
+                    loader.onload = addLoad;
+                }
+                loader.onloadend = addLoadend;
+                loader.onerror = self.onerror;
+                loader.onabort = self.onabort;
+
+                // store loader
+                storeLoader(loader);
+                // exit
+                break;
+            }
+        }
+        if (!foundLoader) {
+            throw new Error("No loader found for url: "+dataElement);
+        }
+
+        var getLoadHandler = function (loader, dataElement, i) {
+            return function (event) {
+                // check response status
+                // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
+                // status 200: "OK"; status 0: "debug"
+                var status = event.target.status;
+                if (status !== 200 && status !== 0) {
+                    self.onerror({
+                        source: dataElement,
+                        error: "GET " + event.target.responseURL +
+                            " " + event.target.status +
+                            " (" + event.target.statusText + ")",
+                        target: event.target
+                    });
+                    self.onloadend({
+                        source: dataElement
+                    });
+                } else {
+                    loader.load(event.target.response, dataElement, i);
+                }
+            };
+        };
+
         // loop on I/O elements
-        for (var i = 0; i < urlsArray.length; ++i)
-        {
-            var url = urlsArray[i];
+        for (var i = 0; i < data.length; ++i) {
+            dataElement = data[i];
+
+            // check loader
+            if (!loader.canLoadUrl(dataElement)) {
+                throw new Error("Input url of different type: "+dataElement);
+            }
             /**
              * The http request.
              * @external XMLHttpRequest
              * @see https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
              */
             var request = new XMLHttpRequest();
-            request.open('GET', url, true);
-
+            request.open('GET', dataElement, true);
             // store request
-            self.storeRequest(request);
+            storeRequest(request);
 
             // optional request headers
             if ( typeof options.requestHeaders !== "undefined" ) {
@@ -16373,95 +16519,76 @@ dwv.io.UrlsLoader.prototype.load = function (ioArray, options)
                 }
             }
 
-            // bind reader progress
-            request.onprogress = mproghandler.getMonoProgressHandler(i, 0, url);
-
-            // find a loader
-            var loader = null;
-            var foundLoader = false;
-            for (var l = 0; l < loaders.length; ++l) {
-                loader = loaders[l];
-                if (loader.canLoadUrl(url)) {
-                    foundLoader = true;
-
-                    loader.setOptions({
-                        'defaultCharacterSet': self.getDefaultCharacterSet()
-                    });
-                    // set loader callacks
-                    // loader.onloadstart: nothing to do
-                    loader.onprogress = mproghandler.getMonoProgressHandler(i, 1, url);
-                    if (typeof loader.onloaditem === "undefined") {
-                        // handle load-item locally
-                        loader.onload = augmentCallbackEvent(self.addLoadItem, url);
-                    } else {
-                        loader.onloaditem = self.onloaditem;
-                        loader.onload = augmentCallbackEvent(self.addLoad, url);
-                    }
-                    loader.onloadend = augmentCallbackEvent(self.addLoadend, ioArray);
-                    loader.onerror = augmentCallbackEvent(self.onerror, url);
-                    loader.onabort = augmentCallbackEvent(self.onabort, url);
-
-                    // store loader
-                    self.storeLoader(loader);
-
-                    // set request callbacks
-                    // request.onloadstart: nothing to do
-                    request.onload = getLoadHandler(loader, url, i);
-                    // request.onloadend: nothing to do
-                    request.onerror = augmentCallbackEvent(self.onerror, url);
-                    request.onabort = augmentCallbackEvent(self.onabort, url);
-                    // response type (default is 'text')
-                    if (loader.loadUrlAs() === dwv.io.urlContentTypes.ArrayBuffer) {
-                        request.responseType = "arraybuffer";
-                    }
-                    // send request
-                    request.send(null);
-                    // next file
-                    break;
-                }
+            // set request callbacks
+            // request.onloadstart: nothing to do
+            request.onprogress = augmentCallbackEvent(
+                mproghandler.getMonoProgressHandler(i, 0), dataElement);
+            request.onload = getLoadHandler(loader, dataElement, i);
+            // request.onloadend: nothing to do
+            request.onerror = augmentCallbackEvent(self.onerror, dataElement);
+            request.onabort = augmentCallbackEvent(self.onabort, dataElement);
+            // response type (default is 'text')
+            if (loader.loadUrlAs() === dwv.io.urlContentTypes.ArrayBuffer) {
+                request.responseType = "arraybuffer";
             }
-            // TODO: throw?
-            if (!foundLoader) {
-                throw new Error("No loader found for url: "+url);
-            }
+            // send request
+            request.send(null);
         }
-    };
+    }
 
-    // DICOMDIR load
-    var internalDicomDirLoad = function (dicomDirUrl) {
-        console.log("UrlsLoader: using a DICOMDIR.");
+    /**
+     * Load a DICOMDIR.
+     * @param {string} dicomDirUrl The DICOMDIR url.
+     * @param {Object} options Load options.
+     * @private
+     */
+    function loadDicomDir(dicomDirUrl, options) {
         // read DICOMDIR
-        var dirRequest = new XMLHttpRequest();
-        dirRequest.open('GET', dicomDirUrl, true);
-        dirRequest.responseType = "arraybuffer";
-        dirRequest.onload = function (/*event*/) {
+        var request = new XMLHttpRequest();
+        request.open('GET', dicomDirUrl, true);
+        request.responseType = "arraybuffer";
+        request.onload = function (event) {
             // get the file list
-            var list = dwv.dicom.getFileListFromDicomDir( this.response );
+            var list = dwv.dicom.getFileListFromDicomDir(event.target.response);
             // use the first list
             var urls = list[0][0];
             // append root url
             var rootUrl = dwv.utils.getRootPath(dicomDirUrl);
             var fullUrls = [];
-            for ( var i = 0; i < urls.length; ++i ) {
-                fullUrls.push( rootUrl + "/" + urls[i]);
+            for (var i = 0; i < urls.length; ++i) {
+                fullUrls.push(rootUrl + "/" + urls[i]);
             }
-            internalUrlsLoad(fullUrls);
+            // load urls
+            loadUrls(fullUrls, options);
         };
-        dirRequest.onerror = augmentCallbackEvent(self.onerror, dicomDirUrl);
-        dirRequest.onabort = augmentCallbackEvent(self.onabort, dicomDirUrl);
+        request.onerror = augmentCallbackEvent(self.onerror, dicomDirUrl);
+        request.onabort = augmentCallbackEvent(self.onabort, dicomDirUrl);
         // send request
-        dirRequest.send(null);
+        request.send(null);
+    }
+
+    /**
+     * Abort a load.
+     */
+    this.abort = function () {
+        // abort requests
+        for ( var i = 0; i < requests.length; ++i ) {
+            // 0: UNSENT, 1: OPENED, 2: HEADERS_RECEIVED (send()), 3: LOADING, 4: DONE
+            if ( requests[i].readyState !== 4 ) {
+                requests[i].abort();
+            }
+        }
+        // abort loader
+        if (runningLoader && runningLoader.isLoading()) {
+            runningLoader.abort();
+        }
+        // send load end
+        this.onloadend({
+            source: inputData
+        });
     };
 
-    // check if DICOMDIR case
-    if ( ioArray.length === 1 &&
-        (dwv.utils.endsWith(ioArray[0], "DICOMDIR") ||
-         dwv.utils.endsWith(ioArray[0], ".dcmdir") ) ) {
-        internalDicomDirLoad(ioArray[0]);
-    } else {
-        internalUrlsLoad(ioArray);
-    }
-};
+}; // class UrlsLoader
 
 /**
  * Handle a load start event.
@@ -16566,21 +16693,25 @@ dwv.io.ZipLoader = function ()
      * JSZip.async callback
      * @param {ArrayBuffer} content unzipped file image
      * @param {Number} index The data index.
-     * @return {}
      * @private
      */
-    function zipAsyncCallback(content, index)
+    function zipAsyncCallback(content, origin, index)
     {
         files.push({"filename": filename, "data": content});
 
         // sent un-ziped progress with the data index
         // (max 50% to take into account the memory loading)
-        var unzipPercent = files.length * 50 / zobjs.length;
+        var unzipPercent = files.length * 100 / zobjs.length;
         self.onprogress({
-            'lengthComputable': true,
-            'loaded': unzipPercent,
-            'total': 100,
-            'index': index
+            lengthComputable: true,
+            loaded: (unzipPercent / 2),
+            total: 100,
+            index: index,
+            item: {
+                loaded: unzipPercent,
+                total: 100,
+                source: origin
+            }
         });
 
         // recursively call until we have all the files
@@ -16588,7 +16719,7 @@ dwv.io.ZipLoader = function ()
             var num = files.length;
             filename = zobjs[num].name;
             zobjs[num].async("arrayBuffer").then( function (content) {
-                zipAsyncCallback(content, index);
+                zipAsyncCallback(content, origin, index);
             });
         } else {
             var memoryIO = new dwv.io.MemoryLoader();
@@ -16623,7 +16754,9 @@ dwv.io.ZipLoader = function ()
      */
     this.load = function (buffer, origin, index) {
         // send start event
-        this.onloadstart({});
+        this.onloadstart({
+            source: origin
+        });
         // set loading flag
         isLoading = true;
 
@@ -16634,7 +16767,7 @@ dwv.io.ZipLoader = function ()
             var num = files.length;
             filename = zobjs[num].name;
             zobjs[num].async("arrayBuffer").then( function (content) {
-                zipAsyncCallback(content, index);
+                zipAsyncCallback(content, origin, index);
             });
         });
     };
@@ -24569,6 +24702,7 @@ dwv.utils.MultiProgressHandler = function (callback)
 
     /**
      * Handle a load progress.
+     * Call the member callback with a global event.
      * @param {Object} event The progress event.
      */
     this.onprogress = function (event) {
@@ -24587,24 +24721,53 @@ dwv.utils.MultiProgressHandler = function (callback)
         // set percent for index
         progresses[event.index][event.subindex] = percent;
 
-        // call callback
-        event.loaded = getGlobalPercent();
-        callback(event);
+        // item progress
+        var item = null;
+        if (typeof event.item !== "undefined") {
+            item = event.item;
+        } else {
+            item = {
+                loaded: getItemProgress(event.index),
+                total: 100,
+                source: event.source
+            };
+        }
+
+        // call callback with a global event
+        callback({
+            lengthComputable: true,
+            loaded: getGlobalPercent(),
+            total: 100,
+            item: item
+        });
     };
+
+    /**
+     * Get the item load percent.
+     * @param {Number} index The index of the item.
+     * @return {Number} The load percentage.
+     * @private
+     */
+    function getItemProgress(index) {
+        var sum = 0;
+        for ( var j = 0; j < numberOfDimensions; ++j ) {
+            sum += progresses[index][j];
+        }
+        return sum / numberOfDimensions;
+    }
 
     /**
      * Get the global load percent including the provided one.
      * @return {Number} The accumulated percentage.
+     * @private
      */
     function getGlobalPercent() {
         var sum = 0;
         var lenprog = progresses.length;
         for ( var i = 0; i < lenprog; ++i ) {
-            for ( var j = 0; j < numberOfDimensions; ++j ) {
-                sum += progresses[i][j];
-            }
+            sum += getItemProgress(i);
         }
-        return Math.round( sum / (lenprog * numberOfDimensions) );
+        return Math.round( sum / lenprog );
     }
 
     /**
@@ -24613,11 +24776,10 @@ dwv.utils.MultiProgressHandler = function (callback)
      * @param {Number} subindex The sub-index of the data.
      * @param {Mixed} source The progress source.
      */
-    this.getMonoProgressHandler = function (index, subindex, source) {
+    this.getMonoProgressHandler = function (index, subindex) {
         return function (event) {
             event.index = index;
             event.subindex = subindex;
-            event.source = source;
             self.onprogress(event);
         };
     };
@@ -24628,10 +24790,9 @@ dwv.utils.MultiProgressHandler = function (callback)
      * @param {Number} subindex The sub-index of the data.
      * @param {Mixed} source The progress source.
      */
-    this.getUndefinedMonoProgressHandler = function (subindex, source) {
+    this.getUndefinedMonoProgressHandler = function (subindex) {
         return function (event) {
             event.subindex = subindex;
-            event.source = source;
             self.onprogress(event);
         };
     };
@@ -24825,7 +24986,8 @@ dwv.utils = dwv.utils || {};
  * @param {Number} poolSize The size of the pool.
  */
 dwv.utils.ThreadPool = function (poolSize) {
-
+    // closure to self
+    var self = this;
     // task queue
     var taskQueue = [];
     // lsit of available threads
@@ -24913,7 +25075,7 @@ dwv.utils.ThreadPool = function (poolSize) {
         // stop all threads
         stop();
         // callback
-        this.onerror(event);
+        this.onerror({error: event});
         this.onworkend({type: "work-end"});
     };
 
@@ -24932,7 +25094,7 @@ dwv.utils.ThreadPool = function (poolSize) {
         }
         runningThreads = [];
         // re-init
-        this.init();
+        self.init();
     }
 
 };
