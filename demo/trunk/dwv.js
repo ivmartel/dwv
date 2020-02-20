@@ -1,4 +1,4 @@
-/*! dwv 0.27.0-beta 2020-02-20 21:35:57 */
+/*! dwv 0.27.0-beta 2020-02-20 22:59:27 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -472,6 +472,7 @@ dwv.App = function ()
      * Load a list of URLs. Can be image files or a state file.
      * @param {Array} urls The list of urls to load.
      * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+     * @param {boolean} withCredentials Credentials flag to pass to the request.
      * @fires dwv.App#load-start
      * @fires dwv.App#load-progress
      * @fires dwv.App#load-item
@@ -479,8 +480,8 @@ dwv.App = function ()
      * @fires dwv.App#load-error
      * @fires dwv.App#load-abort
      */
-    this.loadURLs = function (urls, requestHeaders) {
-        loadController.loadURLs(urls, requestHeaders);
+    this.loadURLs = function (urls, requestHeaders, withCredentials) {
+        loadController.loadURLs(urls, requestHeaders, withCredentials);
     };
 
     /**
@@ -1885,14 +1886,15 @@ dwv.LoadController = function (defaultCharacterSet)
      * Load a list of URLs. Can be image files or a state file.
      * @param {Array} urls The list of urls to load.
      * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+     * @param {boolean} withCredentials Credentials flag to pass to the request.
      */
-    this.loadURLs = function (urls, requestHeaders) {
+    this.loadURLs = function (urls, requestHeaders, withCredentials) {
         // has been checked for emptiness.
         var ext = urls[0].split('.').pop().toLowerCase();
         if ( ext === "json" ) {
-            loadStateUrl(urls[0], requestHeaders);
+            loadStateUrl(urls[0], requestHeaders, withCredentials);
         } else {
-            loadImageUrls(urls, requestHeaders);
+            loadImageUrls(urls, requestHeaders, withCredentials);
         }
     };
 
@@ -1946,13 +1948,17 @@ dwv.LoadController = function (defaultCharacterSet)
      * Load a list of image URLs.
      * @param {Array} urls The list of urls to load.
      * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+     * @param {boolean} withCredentials Credentials flag to pass to the request.
      * @private
      */
-    function loadImageUrls(urls, requestHeaders) {
+    function loadImageUrls(urls, requestHeaders, withCredentials) {
         // create IO
         var urlIO = new dwv.io.UrlsLoader();
         // create options
-        var options = {'requestHeaders': requestHeaders};
+        var options = {
+          'requestHeaders': requestHeaders,
+          'withCredentials': withCredentials
+        };
         // load data
         loadImageData(urls, urlIO, options);
     }
@@ -1973,13 +1979,17 @@ dwv.LoadController = function (defaultCharacterSet)
      * Load a State url.
      * @param {String} url The state url to load.
      * @param {Array} requestHeaders An array of {name, value} to use as request headers.
+     * @param {boolean} withCredentials Credentials flag to pass to the request.
      * @private
      */
-    function loadStateUrl(url, requestHeaders) {
+    function loadStateUrl(url, requestHeaders, withCredentials) {
         // create IO
         var urlIO = new dwv.io.UrlsLoader();
         // create options
-        var options = {'requestHeaders': requestHeaders};
+        var options = {
+          'requestHeaders': requestHeaders,
+          'withCredentials': withCredentials
+        };
         // load data
         loadStateData([url], urlIO, options);
     }
@@ -16526,6 +16536,10 @@ dwv.io.UrlsLoader = function ()
                         request.setRequestHeader(requestHeaders[j].name, requestHeaders[j].value);
                     }
                 }
+            }
+            // optional withCredentials
+            if (typeof options.withCredentials !== "undefined") {
+                request.withCredentials = options.withCredentials;
             }
 
             // set request callbacks
