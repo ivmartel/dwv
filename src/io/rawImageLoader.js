@@ -65,27 +65,25 @@ dwv.io.RawImageLoader = function ()
         image.onload = function (/*event*/) {
             try {
                 if (!aborted) {
+                    self.onprogress({
+                        lengthComputable: true,
+                        loaded: 100,
+                        total: 100,
+                        index: index,
+                        source: origin
+                    });
                     self.onload(dwv.image.getViewFromDOMImage(this, origin));
                 }
-                self.onloadend({
-                    source: origin
-                });
             } catch (error) {
                 self.onerror({
                     error: error,
                     source: origin
                 });
+            } finally {
                 self.onloadend({
                     source: origin
                 });
             }
-            self.onprogress({
-                lengthComputable: true,
-                loaded: 100,
-                total: 100,
-                index: index,
-                souce: origin
-            });
         };
         // storing values to pass them on
         image.origin = origin;

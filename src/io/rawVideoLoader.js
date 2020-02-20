@@ -70,7 +70,8 @@ dwv.io.RawVideoLoader = function ()
         video.onloadedmetadata = function (/*event*/) {
             try {
                 dwv.image.getViewFromDOMVideo(this,
-                    self.onload, self.onprogress, self.onloadend,
+                    self.onloaditem, self.onload,
+                    self.onprogress, self.onloadend,
                     index, origin);
             } catch (error) {
                 self.onerror({
@@ -143,6 +144,13 @@ dwv.io.RawVideoLoader.prototype.onloadstart = function (/*event*/) {};
  * Default does nothing.
  */
 dwv.io.RawVideoLoader.prototype.onprogress = function (/*event*/) {};
+/**
+ * Handle a load item event.
+ * @param {Object} event The load item event fired
+ *   when a file item has been loaded successfully.
+ * Default does nothing.
+ */
+dwv.io.RawVideoLoader.prototype.onloaditem = function (/*event*/) {};
 /**
  * Handle a load event.
  * @param {Object} event The load event fired

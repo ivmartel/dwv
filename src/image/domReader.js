@@ -120,7 +120,7 @@ dwv.image.getViewFromDOMImage = function (image, origin)
  * @param {Object} origin The data origin.
  */
 dwv.image.getViewFromDOMVideo = function (
-    video, onload, onprogress, onloadend,
+    video, onloaditem, onload, onprogress, onloadend,
     dataIndex, origin)
 {
     // video size
@@ -178,7 +178,7 @@ dwv.image.getViewFromDOMVideo = function (
             view = dwv.image.getDefaultView(
                 width, height, 1, [imgBuffer], numberOfFrames, dataIndex);
             // call callback
-            onload({
+            onloaditem({
               data: {
                 view: view,
                 info: info
@@ -202,6 +202,9 @@ dwv.image.getViewFromDOMVideo = function (
         if (nextTime <= this.duration) {
             this.currentTime = nextTime;
         } else {
+            onload({
+                source: origin
+            });
             onloadend({
                 source: origin
             });
