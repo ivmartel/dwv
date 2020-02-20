@@ -1,4 +1,4 @@
-/*! dwv 0.27.0-beta 2020-02-19 20:08:54 */
+/*! dwv 0.27.0-beta 2020-02-20 21:35:57 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -11757,7 +11757,7 @@ dwv.image.getViewFromDOMImage = function (image, origin)
  * @param {Object} origin The data origin.
  */
 dwv.image.getViewFromDOMVideo = function (
-    video, onload, onprogress, onloadend,
+    video, onloaditem, onload, onprogress, onloadend,
     dataIndex, origin)
 {
     // video size
@@ -11815,7 +11815,7 @@ dwv.image.getViewFromDOMVideo = function (
             view = dwv.image.getDefaultView(
                 width, height, 1, [imgBuffer], numberOfFrames, dataIndex);
             // call callback
-            onload({
+            onloaditem({
               data: {
                 view: view,
                 info: info
@@ -11839,6 +11839,9 @@ dwv.image.getViewFromDOMVideo = function (
         if (nextTime <= this.duration) {
             this.currentTime = nextTime;
         } else {
+            onload({
+                source: origin
+            });
             onloadend({
                 source: origin
             });
@@ -15884,27 +15887,25 @@ dwv.io.RawImageLoader = function ()
         image.onload = function (/*event*/) {
             try {
                 if (!aborted) {
+                    self.onprogress({
+                        lengthComputable: true,
+                        loaded: 100,
+                        total: 100,
+                        index: index,
+                        source: origin
+                    });
                     self.onload(dwv.image.getViewFromDOMImage(this, origin));
                 }
-                self.onloadend({
-                    source: origin
-                });
             } catch (error) {
                 self.onerror({
                     error: error,
                     source: origin
                 });
+            } finally {
                 self.onloadend({
                     source: origin
                 });
             }
-            self.onprogress({
-                lengthComputable: true,
-                loaded: 100,
-                total: 100,
-                index: index,
-                souce: origin
-            });
         };
         // storing values to pass them on
         image.origin = origin;
@@ -16091,7 +16092,8 @@ dwv.io.RawVideoLoader = function ()
         video.onloadedmetadata = function (/*event*/) {
             try {
                 dwv.image.getViewFromDOMVideo(this,
-                    self.onload, self.onprogress, self.onloadend,
+                    self.onloaditem, self.onload,
+                    self.onprogress, self.onloadend,
                     index, origin);
             } catch (error) {
                 self.onerror({
@@ -16164,6 +16166,13 @@ dwv.io.RawVideoLoader.prototype.onloadstart = function (/*event*/) {};
  * Default does nothing.
  */
 dwv.io.RawVideoLoader.prototype.onprogress = function (/*event*/) {};
+/**
+ * Handle a load item event.
+ * @param {Object} event The load item event fired
+ *   when a file item has been loaded successfully.
+ * Default does nothing.
+ */
+dwv.io.RawVideoLoader.prototype.onloaditem = function (/*event*/) {};
 /**
  * Handle a load event.
  * @param {Object} event The load event fired
