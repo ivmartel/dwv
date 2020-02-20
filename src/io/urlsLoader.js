@@ -319,6 +319,10 @@ dwv.io.UrlsLoader = function ()
                     }
                 }
             }
+            // optional withCredentials
+            if (typeof options.withCredentials !== "undefined") {
+                request.withCredentials = options.withCredentials;
+            }
 
             // set request callbacks
             // request.onloadstart: nothing to do
