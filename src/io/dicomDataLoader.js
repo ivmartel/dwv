@@ -63,6 +63,7 @@ dwv.io.DicomDataLoader = function ()
             // connect handlers
             db2v.onloadstart = self.onloadstart;
             db2v.onprogress = self.onprogress;
+            db2v.onloaditem = self.onloaditem;
             db2v.onload = self.onload;
             db2v.onloadend = function (event) {
                 // reset loading flag
@@ -153,6 +154,13 @@ dwv.io.DicomDataLoader.prototype.onloadstart = function (/*event*/) {};
  * Default does nothing.
  */
 dwv.io.DicomDataLoader.prototype.onprogress = function (/*event*/) {};
+/**
+ * Handle a load item event.
+ * @param {Object} event The load item event fired
+ *   when a file item has been loaded successfully.
+ * Default does nothing.
+ */
+dwv.io.DicomDataLoader.prototype.onloaditem = function (/*event*/) {};
 /**
  * Handle a load event.
  * @param {Object} event The load event fired
