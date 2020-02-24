@@ -1047,10 +1047,10 @@ dwv.App = function ()
     function onloaditem(event) {
         // check event
         if (typeof event.data === "undefined") {
-            console.error("Missing data.");
+            console.error("Missing loaditem event data", event);
         }
         if (typeof event.loadtype === "undefined") {
-            console.error("Missing load type.");
+            console.error("Missing loaditem event load type", event);
         }
 
         var eventMetaData = null;
