@@ -1,4 +1,4 @@
-/*! dwv 0.27.0-beta 2020-02-21 23:25:31 */
+/*! dwv 0.27.0-beta 2020-02-24 22:57:24 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -1106,10 +1106,10 @@ dwv.App = function ()
     function onloaditem(event) {
         // check event
         if (typeof event.data === "undefined") {
-            console.error("Missing data.");
+            console.error("Missing loaditem event data", event);
         }
         if (typeof event.loadtype === "undefined") {
-            console.error("Missing load type.");
+            console.error("Missing loaditem event load type", event);
         }
 
         var eventMetaData = null;
@@ -15786,7 +15786,13 @@ dwv.io.MemoryLoader = function ()
                 // set loader callbacks
                 // loader.onloadstart: nothing to do
                 loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(0);
-                loader.onload = addLoadItem;
+                if (typeof loader.onloaditem === "undefined") {
+                    // handle load-item locally
+                    loader.onload = addLoadItem;
+                } else {
+                    loader.onloaditem = self.onloaditem;
+                    loader.onload = addLoad;
+                }
                 loader.onloadend = addLoadend;
                 loader.onerror = self.onerror;
                 loader.onabort = self.onabort;
@@ -15822,7 +15828,7 @@ dwv.io.MemoryLoader = function ()
             runningLoader.abort();
         }
         // send load end
-        self.onloadend({
+        this.onloadend({
             source: inputData
         });
     };
