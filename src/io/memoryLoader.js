@@ -186,7 +186,13 @@ dwv.io.MemoryLoader = function ()
                 // set loader callbacks
                 // loader.onloadstart: nothing to do
                 loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(0);
-                loader.onload = addLoadItem;
+                if (typeof loader.onloaditem === "undefined") {
+                    // handle load-item locally
+                    loader.onload = addLoadItem;
+                } else {
+                    loader.onloaditem = self.onloaditem;
+                    loader.onload = addLoad;
+                }
                 loader.onloadend = addLoadend;
                 loader.onerror = self.onerror;
                 loader.onabort = self.onabort;
@@ -222,7 +228,7 @@ dwv.io.MemoryLoader = function ()
             runningLoader.abort();
         }
         // send load end
-        self.onloadend({
+        this.onloadend({
             source: inputData
         });
     };
