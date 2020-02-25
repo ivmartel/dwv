@@ -9,8 +9,6 @@ dwv.utils = dwv.utils || {};
  * @param {Number} poolSize The size of the pool.
  */
 dwv.utils.ThreadPool = function (poolSize) {
-    // closure to self
-    var self = this;
     // task queue
     var taskQueue = [];
     // lsit of available threads
@@ -91,7 +89,7 @@ dwv.utils.ThreadPool = function (poolSize) {
      */
     this.handleWorkerError = function (event) {
         // stop all threads
-        self.stop();
+        stop();
         // callback
         this.onerror({error: event});
         this.onworkend({type: "work-end"});
@@ -111,11 +109,9 @@ dwv.utils.ThreadPool = function (poolSize) {
             runningThreads[i].stop();
         }
         runningThreads = [];
-        // re-init
-        self.init();
     }
 
-};
+}; // ThreadPool
 
 /**
  * Handle a work start event.
