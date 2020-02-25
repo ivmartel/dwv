@@ -1,4 +1,4 @@
-/*! dwv 0.27.0-beta 2020-02-25 22:55:12 */
+/*! dwv 0.27.0-beta 2020-02-25 23:03:43 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -25060,8 +25060,6 @@ dwv.utils = dwv.utils || {};
  * @param {Number} poolSize The size of the pool.
  */
 dwv.utils.ThreadPool = function (poolSize) {
-    // closure to self
-    var self = this;
     // task queue
     var taskQueue = [];
     // lsit of available threads
@@ -25142,7 +25140,7 @@ dwv.utils.ThreadPool = function (poolSize) {
      */
     this.handleWorkerError = function (event) {
         // stop all threads
-        self.stop();
+        stop();
         // callback
         this.onerror({error: event});
         this.onworkend({type: "work-end"});
@@ -25162,11 +25160,9 @@ dwv.utils.ThreadPool = function (poolSize) {
             runningThreads[i].stop();
         }
         runningThreads = [];
-        // re-init
-        self.init();
     }
 
-};
+}; // ThreadPool
 
 /**
  * Handle a work start event.
