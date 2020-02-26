@@ -238,7 +238,7 @@ dwv.io.FilesLoader = function ()
                     loader.onloaditem = self.onloaditem;
                     loader.onload = addLoad;
                 }
-                loader.onloadend = addLoadend;
+                // loader.onloadend: let the reader handle it
                 loader.onerror = self.onerror;
                 loader.onabort = self.onabort;
 
@@ -281,7 +281,7 @@ dwv.io.FilesLoader = function ()
             reader.onprogress = augmentCallbackEvent(
                 mproghandler.getMonoProgressHandler(i, 0), dataElement);
             reader.onload = getLoadHandler(loader, dataElement, i);
-            // reader.onloadend: nothing to do
+            reader.onloadend = addLoadend;
             reader.onerror = augmentCallbackEvent(self.onerror, dataElement);
             reader.onabort = augmentCallbackEvent(self.onabort, dataElement);
             // read

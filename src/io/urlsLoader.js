@@ -254,7 +254,7 @@ dwv.io.UrlsLoader = function ()
                     loader.onloaditem = self.onloaditem;
                     loader.onload = addLoad;
                 }
-                loader.onloadend = addLoadend;
+                // loader.onloadend: let the request handle it
                 loader.onerror = self.onerror;
                 loader.onabort = self.onabort;
 
@@ -281,9 +281,6 @@ dwv.io.UrlsLoader = function ()
                             " " + event.target.status +
                             " (" + event.target.statusText + ")",
                         target: event.target
-                    });
-                    self.onloadend({
-                        source: dataElement
                     });
                 } else {
                     loader.load(event.target.response, dataElement, i);
@@ -329,7 +326,7 @@ dwv.io.UrlsLoader = function ()
             request.onprogress = augmentCallbackEvent(
                 mproghandler.getMonoProgressHandler(i, 0), dataElement);
             request.onload = getLoadHandler(loader, dataElement, i);
-            // request.onloadend: nothing to do
+            request.onloadend = addLoadend;
             request.onerror = augmentCallbackEvent(self.onerror, dataElement);
             request.onabort = augmentCallbackEvent(self.onabort, dataElement);
             // response type (default is 'text')
@@ -352,6 +349,7 @@ dwv.io.UrlsLoader = function ()
         var request = new XMLHttpRequest();
         request.open('GET', dicomDirUrl, true);
         request.responseType = "arraybuffer";
+        // request.onloadstart: nothing to do
         request.onload = function (event) {
             // get the file list
             var list = dwv.dicom.getFileListFromDicomDir(event.target.response);
@@ -366,8 +364,15 @@ dwv.io.UrlsLoader = function ()
             // load urls
             loadUrls(fullUrls, options);
         };
-        request.onerror = augmentCallbackEvent(self.onerror, dicomDirUrl);
-        request.onabort = augmentCallbackEvent(self.onabort, dicomDirUrl);
+        request.onerror = function (event) {
+            augmentCallbackEvent(self.onerror, dicomDirUrl)(event);
+            self.onloadend();
+        };
+        request.onabort = function (event) {
+            augmentCallbackEvent(self.onabort, dicomDirUrl)(event);
+            self.onloadend();
+        };
+        // request.onloadend: nothing to do
         // send request
         request.send(null);
     }
