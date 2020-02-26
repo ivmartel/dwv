@@ -1,4 +1,4 @@
-/*! dwv 0.27.0-beta 2020-02-25 23:03:43 */
+/*! dwv 0.27.0-beta 2020-02-26 22:25:47 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -15302,7 +15302,7 @@ dwv.io.FilesLoader = function ()
                     loader.onloaditem = self.onloaditem;
                     loader.onload = addLoad;
                 }
-                loader.onloadend = addLoadend;
+                // loader.onloadend: let the reader handle it
                 loader.onerror = self.onerror;
                 loader.onabort = self.onabort;
 
@@ -15345,7 +15345,7 @@ dwv.io.FilesLoader = function ()
             reader.onprogress = augmentCallbackEvent(
                 mproghandler.getMonoProgressHandler(i, 0), dataElement);
             reader.onload = getLoadHandler(loader, dataElement, i);
-            // reader.onloadend: nothing to do
+            reader.onloadend = addLoadend;
             reader.onerror = augmentCallbackEvent(self.onerror, dataElement);
             reader.onabort = augmentCallbackEvent(self.onabort, dataElement);
             // read
@@ -16523,7 +16523,7 @@ dwv.io.UrlsLoader = function ()
                     loader.onloaditem = self.onloaditem;
                     loader.onload = addLoad;
                 }
-                loader.onloadend = addLoadend;
+                // loader.onloadend: let the request handle it
                 loader.onerror = self.onerror;
                 loader.onabort = self.onabort;
 
@@ -16550,9 +16550,6 @@ dwv.io.UrlsLoader = function ()
                             " " + event.target.status +
                             " (" + event.target.statusText + ")",
                         target: event.target
-                    });
-                    self.onloadend({
-                        source: dataElement
                     });
                 } else {
                     loader.load(event.target.response, dataElement, i);
@@ -16598,7 +16595,7 @@ dwv.io.UrlsLoader = function ()
             request.onprogress = augmentCallbackEvent(
                 mproghandler.getMonoProgressHandler(i, 0), dataElement);
             request.onload = getLoadHandler(loader, dataElement, i);
-            // request.onloadend: nothing to do
+            request.onloadend = addLoadend;
             request.onerror = augmentCallbackEvent(self.onerror, dataElement);
             request.onabort = augmentCallbackEvent(self.onabort, dataElement);
             // response type (default is 'text')
@@ -16621,6 +16618,7 @@ dwv.io.UrlsLoader = function ()
         var request = new XMLHttpRequest();
         request.open('GET', dicomDirUrl, true);
         request.responseType = "arraybuffer";
+        // request.onloadstart: nothing to do
         request.onload = function (event) {
             // get the file list
             var list = dwv.dicom.getFileListFromDicomDir(event.target.response);
@@ -16635,8 +16633,15 @@ dwv.io.UrlsLoader = function ()
             // load urls
             loadUrls(fullUrls, options);
         };
-        request.onerror = augmentCallbackEvent(self.onerror, dicomDirUrl);
-        request.onabort = augmentCallbackEvent(self.onabort, dicomDirUrl);
+        request.onerror = function (event) {
+            augmentCallbackEvent(self.onerror, dicomDirUrl)(event);
+            self.onloadend();
+        };
+        request.onabort = function (event) {
+            augmentCallbackEvent(self.onabort, dicomDirUrl)(event);
+            self.onloadend();
+        };
+        // request.onloadend: nothing to do
         // send request
         request.send(null);
     }
