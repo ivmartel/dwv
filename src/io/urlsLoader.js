@@ -167,7 +167,8 @@ dwv.io.UrlsLoader = function ()
         // call self.onloadend when all is run
         // (not using the input event since it is not the
         //   general load end)
-        if (nLoadend === inputData.length) {
+        // x2 to count for request + load
+        if (nLoadend === 2 * inputData.length) {
             self.onloadend({
                 source: inputData
             });
@@ -254,7 +255,7 @@ dwv.io.UrlsLoader = function ()
                     loader.onloaditem = self.onloaditem;
                     loader.onload = addLoad;
                 }
-                // loader.onloadend: let the request handle it
+                loader.onloadend = addLoadend;
                 loader.onerror = self.onerror;
                 loader.onabort = self.onabort;
 
@@ -282,6 +283,7 @@ dwv.io.UrlsLoader = function ()
                             " (" + event.target.statusText + ")",
                         target: event.target
                     });
+                    addLoadend();
                 } else {
                     loader.load(event.target.response, dataElement, i);
                 }
@@ -392,10 +394,6 @@ dwv.io.UrlsLoader = function ()
         if (runningLoader && runningLoader.isLoading()) {
             runningLoader.abort();
         }
-        // send load end
-        this.onloadend({
-            source: inputData
-        });
     };
 
 }; // class UrlsLoader

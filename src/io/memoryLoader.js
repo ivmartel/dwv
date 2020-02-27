@@ -227,10 +227,6 @@ dwv.io.MemoryLoader = function ()
         if (runningLoader && runningLoader.isLoading()) {
             runningLoader.abort();
         }
-        // send load end
-        this.onloadend({
-            source: inputData
-        });
     };
 
 }; // class MemoryLoader

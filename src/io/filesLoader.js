@@ -169,7 +169,8 @@ dwv.io.FilesLoader = function ()
         // call self.onloadend when all is run
         // (not using the input event since it is not the
         //   general load end)
-        if (nLoadend === inputData.length) {
+        // x2 to count for reader + load
+        if (nLoadend === 2 * inputData.length) {
             self.onloadend({
                 source: inputData
             });
@@ -238,7 +239,7 @@ dwv.io.FilesLoader = function ()
                     loader.onloaditem = self.onloaditem;
                     loader.onload = addLoad;
                 }
-                // loader.onloadend: let the reader handle it
+                loader.onloadend = addLoadend;
                 loader.onerror = self.onerror;
                 loader.onabort = self.onabort;
 
@@ -310,10 +311,6 @@ dwv.io.FilesLoader = function ()
         if (runningLoader && runningLoader.isLoading()) {
             runningLoader.abort();
         }
-        // send load end
-        this.onloadend({
-            source: inputData
-        });
     };
 
 }; // class FilesLoader
