@@ -1,4 +1,4 @@
-/*! dwv 0.27.0-beta 2020-02-26 22:25:47 */
+/*! dwv 0.27.0-beta 2020-02-27 22:56:09 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -15233,7 +15233,8 @@ dwv.io.FilesLoader = function ()
         // call self.onloadend when all is run
         // (not using the input event since it is not the
         //   general load end)
-        if (nLoadend === inputData.length) {
+        // x2 to count for reader + load
+        if (nLoadend === 2 * inputData.length) {
             self.onloadend({
                 source: inputData
             });
@@ -15302,7 +15303,7 @@ dwv.io.FilesLoader = function ()
                     loader.onloaditem = self.onloaditem;
                     loader.onload = addLoad;
                 }
-                // loader.onloadend: let the reader handle it
+                loader.onloadend = addLoadend;
                 loader.onerror = self.onerror;
                 loader.onabort = self.onabort;
 
@@ -15374,10 +15375,6 @@ dwv.io.FilesLoader = function ()
         if (runningLoader && runningLoader.isLoading()) {
             runningLoader.abort();
         }
-        // send load end
-        this.onloadend({
-            source: inputData
-        });
     };
 
 }; // class FilesLoader
@@ -15827,10 +15824,6 @@ dwv.io.MemoryLoader = function ()
         if (runningLoader && runningLoader.isLoading()) {
             runningLoader.abort();
         }
-        // send load end
-        this.onloadend({
-            source: inputData
-        });
     };
 
 }; // class MemoryLoader
@@ -16436,7 +16429,8 @@ dwv.io.UrlsLoader = function ()
         // call self.onloadend when all is run
         // (not using the input event since it is not the
         //   general load end)
-        if (nLoadend === inputData.length) {
+        // x2 to count for request + load
+        if (nLoadend === 2 * inputData.length) {
             self.onloadend({
                 source: inputData
             });
@@ -16523,7 +16517,7 @@ dwv.io.UrlsLoader = function ()
                     loader.onloaditem = self.onloaditem;
                     loader.onload = addLoad;
                 }
-                // loader.onloadend: let the request handle it
+                loader.onloadend = addLoadend;
                 loader.onerror = self.onerror;
                 loader.onabort = self.onabort;
 
@@ -16551,6 +16545,7 @@ dwv.io.UrlsLoader = function ()
                             " (" + event.target.statusText + ")",
                         target: event.target
                     });
+                    addLoadend();
                 } else {
                     loader.load(event.target.response, dataElement, i);
                 }
@@ -16661,10 +16656,6 @@ dwv.io.UrlsLoader = function ()
         if (runningLoader && runningLoader.isLoading()) {
             runningLoader.abort();
         }
-        // send load end
-        this.onloadend({
-            source: inputData
-        });
     };
 
 }; // class UrlsLoader
