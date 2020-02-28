@@ -195,6 +195,11 @@ dwv.io.UrlsLoader = function ()
      */
     this.load = function (data, options)
     {
+        // send start event
+        self.onloadstart({
+            source: data
+        });
+
         // check if DICOMDIR case
         if ( data.length === 1 &&
             (dwv.utils.endsWith(data[0], "DICOMDIR") ||
@@ -217,11 +222,6 @@ dwv.io.UrlsLoader = function ()
             return;
         }
         storeInputData(data);
-
-        // send start event
-        self.onloadstart({
-            source: data
-        });
 
         // create prgress handler
         var mproghandler = new dwv.utils.MultiProgressHandler(self.onprogress);
@@ -353,6 +353,19 @@ dwv.io.UrlsLoader = function ()
         request.responseType = "arraybuffer";
         // request.onloadstart: nothing to do
         request.onload = function (event) {
+            // check status
+            var status = event.target.status;
+            if (status !== 200 && status !== 0) {
+                self.onerror({
+                    source: dicomDirUrl,
+                    error: "GET " + event.target.responseURL +
+                        " " + event.target.status +
+                        " (" + event.target.statusText + ")",
+                    target: event.target
+                });
+                self.onloadend({});
+                return;
+            }
             // get the file list
             var list = dwv.dicom.getFileListFromDicomDir(event.target.response);
             // use the first list
@@ -368,11 +381,11 @@ dwv.io.UrlsLoader = function ()
         };
         request.onerror = function (event) {
             augmentCallbackEvent(self.onerror, dicomDirUrl)(event);
-            self.onloadend();
+            self.onloadend({});
         };
         request.onabort = function (event) {
             augmentCallbackEvent(self.onabort, dicomDirUrl)(event);
-            self.onloadend();
+            self.onloadend({});
         };
         // request.onloadend: nothing to do
         // send request
