@@ -1,4 +1,4 @@
-/*! dwv 0.27.0-beta 2020-02-28 20:58:10 */
+/*! dwv 0.27.0-beta 2020-03-03 22:32:41 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -5015,7 +5015,8 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
 
             // calculate the slice size
             var pixData = this.dicomElements.x7FE00010.value;
-            if (pixData.length !== 0) {
+            if (pixData && typeof pixData !== "undefined" &&
+                pixData.length !== 0) {
                 if (typeof this.dicomElements.x00280010 === "undefined") {
                     throw new Error("Missing image number of rows.");
                 }
@@ -14850,7 +14851,8 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
     windowPresets.minmax = { "name": "minmax" };
 
     // optional modality presets
-    if ( typeof dwv.tool.defaultpresets !== "undefined" ) {
+    if ( typeof dwv.tool !== "undefined" &&
+        typeof dwv.tool.defaultpresets !== "undefined" ) {
         var modality = image.getMeta().Modality;
         for( var key in dwv.tool.defaultpresets[modality] ) {
             var preset = dwv.tool.defaultpresets[modality][key];
@@ -16570,19 +16572,21 @@ dwv.io.UrlsLoader = function ()
             // store request
             storeRequest(request);
 
-            // optional request headers
-            if ( typeof options.requestHeaders !== "undefined" ) {
-                var requestHeaders = options.requestHeaders;
-                for (var j = 0; j < requestHeaders.length; ++j) {
-                    if ( typeof requestHeaders[j].name !== "undefined" &&
-                        typeof requestHeaders[j].value !== "undefined" ) {
-                        request.setRequestHeader(requestHeaders[j].name, requestHeaders[j].value);
+            if ( typeof options !== "undefined" ) {
+                // optional request headers
+                if ( typeof options.requestHeaders !== "undefined" ) {
+                    var requestHeaders = options.requestHeaders;
+                    for (var j = 0; j < requestHeaders.length; ++j) {
+                        if ( typeof requestHeaders[j].name !== "undefined" &&
+                            typeof requestHeaders[j].value !== "undefined" ) {
+                            request.setRequestHeader(requestHeaders[j].name, requestHeaders[j].value);
+                        }
                     }
                 }
-            }
-            // optional withCredentials
-            if (typeof options.withCredentials !== "undefined") {
-                request.withCredentials = options.withCredentials;
+                // optional withCredentials
+                if (typeof options.withCredentials !== "undefined") {
+                    request.withCredentials = options.withCredentials;
+                }
             }
 
             // set request callbacks
