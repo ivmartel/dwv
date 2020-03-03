@@ -25,7 +25,7 @@ dwv.image.decoderScripts = {
  * @param {array} data The data to load as a string array.
  * @param {number} nDataOk The theoretical number of data with no error.
  */
-dwv.test.checkLoad(assert, id, data, nDataOk) {
+dwv.test.checkLoad = function (assert, id, data, nDataOk) {
     var done = assert.async();
 
     var prefix = "[" + id + "] ";
@@ -116,7 +116,7 @@ dwv.test.checkLoad(assert, id, data, nDataOk) {
         // finish async test
         done();
     };
-    loader.onerror = function (event) {
+    loader.onerror = function (/*event*/) {
         errorDates.push(new Date());
     };
     loader.onabort = function (/*event*/) {
@@ -124,7 +124,7 @@ dwv.test.checkLoad(assert, id, data, nDataOk) {
     };
     // launch load
     loader.load(data);
-}
+};
 
 /**
  * Tests for {@link dwv.io.UrlsLoader} events with single frame data.
