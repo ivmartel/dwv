@@ -1006,7 +1006,8 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image)
     windowPresets.minmax = { "name": "minmax" };
 
     // optional modality presets
-    if ( typeof dwv.tool.defaultpresets !== "undefined" ) {
+    if ( typeof dwv.tool !== "undefined" &&
+        typeof dwv.tool.defaultpresets !== "undefined" ) {
         var modality = image.getMeta().Modality;
         for( var key in dwv.tool.defaultpresets[modality] ) {
             var preset = dwv.tool.defaultpresets[modality][key];

@@ -308,19 +308,21 @@ dwv.io.UrlsLoader = function ()
             // store request
             storeRequest(request);
 
-            // optional request headers
-            if ( typeof options.requestHeaders !== "undefined" ) {
-                var requestHeaders = options.requestHeaders;
-                for (var j = 0; j < requestHeaders.length; ++j) {
-                    if ( typeof requestHeaders[j].name !== "undefined" &&
-                        typeof requestHeaders[j].value !== "undefined" ) {
-                        request.setRequestHeader(requestHeaders[j].name, requestHeaders[j].value);
+            if ( typeof options !== "undefined" ) {
+                // optional request headers
+                if ( typeof options.requestHeaders !== "undefined" ) {
+                    var requestHeaders = options.requestHeaders;
+                    for (var j = 0; j < requestHeaders.length; ++j) {
+                        if ( typeof requestHeaders[j].name !== "undefined" &&
+                            typeof requestHeaders[j].value !== "undefined" ) {
+                            request.setRequestHeader(requestHeaders[j].name, requestHeaders[j].value);
+                        }
                     }
                 }
-            }
-            // optional withCredentials
-            if (typeof options.withCredentials !== "undefined") {
-                request.withCredentials = options.withCredentials;
+                // optional withCredentials
+                if (typeof options.withCredentials !== "undefined") {
+                    request.withCredentials = options.withCredentials;
+                }
             }
 
             // set request callbacks

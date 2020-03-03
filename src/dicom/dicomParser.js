@@ -1467,7 +1467,8 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
 
             // calculate the slice size
             var pixData = this.dicomElements.x7FE00010.value;
-            if (pixData.length !== 0) {
+            if (pixData && typeof pixData !== "undefined" &&
+                pixData.length !== 0) {
                 if (typeof this.dicomElements.x00280010 === "undefined") {
                     throw new Error("Missing image number of rows.");
                 }
