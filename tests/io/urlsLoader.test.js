@@ -23,13 +23,14 @@ dwv.image.decoderScripts = {
  * @param {Object} assert The Qunit assert object.
  * @param {string} id An id for the test.
  * @param {array} data The data to load as a string array.
+ * @param {number} nData The theoretical number of data.
  * @param {number} nDataOk The theoretical number of data with no error.
  */
-dwv.test.checkLoad = function (assert, id, data, nDataOk) {
+dwv.test.checkLoad = function (assert, id, data, nData, nDataOk) {
     var done = assert.async();
 
     var prefix = "[" + id + "] ";
-    var nDataError = data.length - nDataOk;
+    var nDataError = nData - nDataOk;
 
     // checks
     var loadStartDates = [];
@@ -58,60 +59,76 @@ dwv.test.checkLoad = function (assert, id, data, nDataOk) {
     loader.onloadend = function (/*event*/) {
         var loadEndDate = new Date();
         assert.notOk(gotLoadEnd,
-          prefix + "Received first load end");
+            prefix + "Received first load end.");
         gotLoadEnd = true;
+
         // check number of events
         assert.equal(loadStartDates.length, 1,
-          prefix + "Received one load start.");
-        assert.ok(progressDates.length > 1,
-          prefix + "Received more than one progress.");
+            prefix + "Received one load start.");
+        if (nDataOk !== 0) {
+            assert.ok(progressDates.length > 0,
+                prefix + "Received at least one progress.");
+        }
         assert.equal(loadItemDates.length, nDataOk,
-          prefix + "Received " + nDataOk + " load item.");
+            prefix + "Received " + nDataOk + " load item.");
         var nLoad = nDataError === 0 ? 1 : 0;
         assert.equal(loadDates.length, nLoad,
-          prefix + "Received " + nLoad + " load.");
+            prefix + "Received " + nLoad + " load.");
         assert.equal(errorDates.length, nDataError,
-          prefix + "Received " + nDataError + " error(s).");
+            prefix + "Received " + nDataError + " error(s).");
         assert.equal(abortDates.length, 0,
-          prefix + "Received 0 abort(s).");
-        // check sequence
+            prefix + "Received 0 abort(s).");
+
+        // check start/end sequence
         var loadStartDate = loadStartDates[0];
         assert.ok(loadStartDate < loadEndDate,
-          prefix + "Received start before load end.");
-        for (var i = 0; i < progressDates.length; ++i) {
-            assert.ok(loadStartDate <= progressDates[i],
-              prefix + "Received start before progress #" + i + ".");
-            assert.ok(loadEndDate >= progressDates[i],
-              prefix + "Received end after progress #" + i + ".");
+            prefix + "Received start before load end.");
+
+        var firstProgressDate = null;
+        var lastProgressDate = null;
+        var firstLoadItemDate = null;
+        var lastLoadItemDate = null;
+
+        if (nDataOk !== 0) {
+            // check progress sequence
+            progressDates.sort();
+            firstProgressDate = progressDates[0];
+            lastProgressDate = progressDates[progressDates.length - 1];
+            assert.ok(loadStartDate <= firstProgressDate,
+                prefix + "Received start before first progress.");
+            assert.ok(loadEndDate >= lastProgressDate,
+                prefix + "Received end after last progress.");
+
+            // check load item sequence
+            loadItemDates.sort();
+            firstLoadItemDate = loadItemDates[0];
+            lastLoadItemDate = loadItemDates[loadItemDates.length - 1];
+            assert.ok(loadStartDate <= firstLoadItemDate,
+                prefix + "Received start before first load item.");
+            assert.ok(loadEndDate >= lastLoadItemDate,
+                prefix + "Received end after last load item.");
         }
-        for (var j = 0; j < loadItemDates.length; ++j) {
-            assert.ok(loadStartDate <= loadItemDates[j],
-              prefix + "Received start before load item #" + j + ".");
-            assert.ok(loadEndDate >= loadItemDates[j],
-              prefix + "Received end after load item #" + j + ".");
-        }
-        // check load or error event
+
+        // check load or error event sequence
         if (nDataError === 0) {
+            // load is sent if no error happened
             var loadDate = loadDates[0];
-            for (var k = 0; k < progressDates.length; ++k) {
-                assert.ok(loadDate >= progressDates[k],
-                  prefix + "Received load after progress #" + k + ".");
-            }
-            for (var l = 0; l < loadItemDates.length; ++l) {
-                assert.ok(loadDate >= loadItemDates[l],
-                  prefix + "Received load after load item #" + l + ".");
-            }
-            assert.ok(loadStartDate < loadDate,
-              prefix + "Received start before load.");
+            assert.ok(loadStartDate <= loadDate,
+                prefix + "Received start before load.");
+            assert.ok(loadDate >= lastProgressDate,
+                prefix + "Received load after last progress.");
+            assert.ok(loadDate >= lastLoadItemDate,
+                prefix + "Received load after last load item.");
             assert.ok(loadEndDate >= loadDate,
-              prefix + "Received end after load.");
+                prefix + "Received end after load.");
         } else {
-            for (var m = 0; m < errorDates.length; ++m) {
-                assert.ok(loadStartDate < errorDates[m],
-                  prefix + "Received start before error #" + m + ".");
-                assert.ok(loadEndDate >= errorDates[m],
-                  prefix + "Received end after error #" + m + ".");
-            }
+            errorDates.sort();
+            var firstErrorDate = errorDates[0];
+            var lastErrorDate = errorDates[errorDates.length - 1];
+            assert.ok(loadStartDate <= firstErrorDate,
+                prefix + "Received start before first error.");
+            assert.ok(loadEndDate >= lastErrorDate,
+                prefix + "Received end after last error.");
         }
         // finish async test
         done();
@@ -138,24 +155,27 @@ QUnit.test("Test UrlsLoader events for single frame.", function (assert) {
         urlRoot + "/tests/data/bbmri-53323131.dcm",
         urlRoot + "/tests/data/bbmri-53323275.dcm",
     ];
-    var nDataOk0 = 2;
-    dwv.test.checkLoad(assert, "0", data0, nDataOk0);
+    var nData0 = data0.length;
+    var nDataOk0 = nData0;
+    dwv.test.checkLoad(assert, "0", data0, nData0, nDataOk0);
 
     // #1: 2 not found (404) dicom
     var data1 = [
         urlRoot + "/a.dcm",
         urlRoot + "/b.dcm",
     ];
+    var nData1 = data1.length;
     var nDataOk1 = 0;
-    dwv.test.checkLoad(assert, "1", data1, nDataOk1);
+    dwv.test.checkLoad(assert, "1", data1, nData1, nDataOk1);
 
     // #2: 2 dicom, 1 not found (404, error in XHR request)
     var data2 = [
         urlRoot + "/tests/data/bbmri-53323131.dcm",
         urlRoot + "/b.dcm",
     ];
+    var nData2 = data2.length;
     var nDataOk2 = 1;
-    dwv.test.checkLoad(assert, "2", data2, nDataOk2);
+    dwv.test.checkLoad(assert, "2", data2, nData2, nDataOk2);
 
     // #3: 2 dicom, 1 bad (no rows, error in loader)
     var urlRoot2 = "https://raw.githubusercontent.com/ivmartel/dwv/develop";
@@ -163,8 +183,9 @@ QUnit.test("Test UrlsLoader events for single frame.", function (assert) {
         urlRoot + "/tests/data/dwv-test-simple.dcm",
         urlRoot2 + "/tests/data/dwv-test_no-number-rows.dcm",
     ];
+    var nData3 = data3.length;
     var nDataOk3 = 1;
-    dwv.test.checkLoad(assert, "3", data3, nDataOk3);
+    dwv.test.checkLoad(assert, "3", data3, nData3, nDataOk3);
 });
 
 /**
@@ -178,8 +199,9 @@ QUnit.test("Test UrlsLoader events for multi frame.", function (assert) {
     var data0 = [
         urlRoot + "/tests/data/multiframe-test1.dcm",
     ];
-    var nDataOk0 = 1;
-    dwv.test.checkLoad(assert, "0", data0, nDataOk0);
+    var nData0 = data0.length;
+    var nDataOk0 = nData0;
+    dwv.test.checkLoad(assert, "0", data0, nData0, nDataOk0);
 
     // #1: encoded multi frame
     // TODO seems to cause problems to phantomjs...
@@ -187,8 +209,66 @@ QUnit.test("Test UrlsLoader events for multi frame.", function (assert) {
     var data1 = [
         urlRoot2 + "/tests/data/multiframe-jpegloss-ge.dcm",
     ];
-    var nDataOk1 = 1;
-    dwv.test.checkLoad(assert, "1", data1, nDataOk1);*/
+    var nData1 = data1.length;
+    var nDataOk1 = nData1;
+    dwv.test.checkLoad(assert, "1", data1, nData1, nDataOk1);*/
 });
 
-// TODO: zip, DICOMDIR
+/**
+ * Tests for {@link dwv.io.UrlsLoader} events with zipped data.
+ * @function module:tests/io~UrlsLoader2
+ */
+QUnit.test("Test UrlsLoader events for zipped data.", function (assert) {
+    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
+
+    // #0: simple zip
+    var data0 = [
+        "/tests/data/bbmri.zip",
+    ];
+    var nData0 = 2;
+    var nDataOk0 = 2;
+    dwv.test.checkLoad(assert, "0", data0, nData0, nDataOk0);
+
+    // #1: bad link to zip
+    var data1 = [
+        "/tests/data/a.zip",
+    ];
+    var nData1 = 1;
+    var nDataOk1 = 0;
+    dwv.test.checkLoad(assert, "1", data1, nData1, nDataOk1);
+
+    // #2: zip with erroneus data
+    var data2 = [
+        "/tests/data/dwv-test_bad.zip",
+    ];
+    var nData2 = 2;
+    var nDataOk2 = 1;
+    dwv.test.checkLoad(assert, "2", data2, nData2, nDataOk2);
+});
+
+/**
+ * Tests for {@link dwv.io.UrlsLoader} events with DCMDIR data.
+ * @function module:tests/io~UrlsLoader3
+ */
+QUnit.test("Test UrlsLoader events for DCMDIR data.", function (assert) {
+    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
+
+    // #0: simple DCMDIR
+    var data0 = [
+        urlRoot + "/tests/data/bbmri.dcmdir",
+    ];
+    var nData0 = 4;
+    var nDataOk0 = 4;
+    dwv.test.checkLoad(assert, "0", data0, nData0, nDataOk0);
+
+    // #1: bad link to DCMDIR
+    var data1 = [
+        urlRoot + "/tests/data/a.dcmdir",
+    ];
+    var nData1 = 1;
+    var nDataOk1 = 0;
+    dwv.test.checkLoad(assert, "1", data1, nData1, nDataOk1);
+
+    // #2: DCMDIR with bad links -> TODO
+    // #3: DCMDIR with erroneus data -> TODO
+});
