@@ -219,11 +219,11 @@ QUnit.test("Test UrlsLoader events for multi frame.", function (assert) {
  * @function module:tests/io~UrlsLoader2
  */
 QUnit.test("Test UrlsLoader events for zipped data.", function (assert) {
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
+    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/develop";
 
     // #0: simple zip
     var data0 = [
-        "/tests/data/bbmri.zip",
+        urlRoot + "/tests/data/bbmri.zip",
     ];
     var nData0 = 2;
     var nDataOk0 = 2;
@@ -231,7 +231,7 @@ QUnit.test("Test UrlsLoader events for zipped data.", function (assert) {
 
     // #1: bad link to zip
     var data1 = [
-        "/tests/data/a.zip",
+        urlRoot + "/tests/data/a.zip",
     ];
     var nData1 = 1;
     var nDataOk1 = 0;
@@ -239,7 +239,7 @@ QUnit.test("Test UrlsLoader events for zipped data.", function (assert) {
 
     // #2: zip with erroneus data
     var data2 = [
-        "/tests/data/dwv-test_bad.zip",
+        urlRoot + "/tests/data/dwv-test_bad.zip",
     ];
     var nData2 = 2;
     var nDataOk2 = 1;
