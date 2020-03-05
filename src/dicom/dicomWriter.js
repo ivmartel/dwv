@@ -7,8 +7,8 @@ dwv.dicom = dwv.dicom || {};
  * @param {Number} number The number to check.
  * @returns {Boolean} True is the number is even.
  */
-function isEven(number) {
-    return number % 2 == 0
+dwv.dicom.isEven = function (number) {
+    return number % 2 == 0;
 };
 
 /**
@@ -153,23 +153,6 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian)
         }
         return byteOffset;
     };
-
-    /**
-     * Write string data with padding for non even length data.
-     * @param {Number} byteOffset The offset to start writing from.
-     * @param {Number} str The data to write.
-     * @returns {Number} The new offset position.
-     */
-    this.writeStringPadded = function (byteOffset, str) {
-        byteOffset = this.writeString(byteOffset, str);
-        if (!isEven(str.length)) {
-            // append space
-            view.setUint8(byteOffset, 32);
-            byteOffset += Uint8Array.BYTES_PER_ELEMENT;
-        }
-        return byteOffset;
-    };
-
 };
 
 /**
@@ -208,7 +191,7 @@ dwv.dicom.DataWriter.prototype.writeInt8ArrayPadded = function (byteOffset, arra
     var inputByteOffset = byteOffset;
     byteOffset = this.writeInt8Array(byteOffset, array);
     // append null if total length is not even
-    if (!isEven(byteOffset - inputByteOffset)) {
+    if (!dwv.dicom.isEven(byteOffset - inputByteOffset)) {
         byteOffset = this.writeInt8(byteOffset, 0);
     }
     return byteOffset;
@@ -314,14 +297,20 @@ dwv.dicom.DataWriter.prototype.writeStringArray = function (byteOffset, array) {
  * Write string array with padding for non even length data.
  * @param {Number} byteOffset The offset to start writing from.
  * @param {Array} array The array to write.
+ * @param {string} padType The padding type: default to space,
+ *   'space' for space, 'null' for null.
  * @returns {Number} The new offset position.
  */
-dwv.dicom.DataWriter.prototype.writeStringArrayPadded = function (byteOffset, array) {
+dwv.dicom.DataWriter.prototype.writeStringArrayPadded = function (byteOffset, array, padType) {
     var inputByteOffset = byteOffset;
     byteOffset = this.writeStringArray(byteOffset, array);
     // append space if total length is not even
-    if (!isEven(byteOffset - inputByteOffset)) {
-        byteOffset = this.writeString(byteOffset, ' ');
+    if (!dwv.dicom.isEven(byteOffset - inputByteOffset)) {
+        if (typeof padType === "undefined" || padType === "space") {
+            byteOffset = this.writeString(byteOffset, ' ');
+        } else if (padType === "null") {
+            byteOffset = this.writeInt8(byteOffset, 0);
+        }
     }
     return byteOffset;
 };
@@ -432,7 +421,7 @@ dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset,
                 byteOffset = this.writeUint16Array(byteOffset, atValue);
             }
         } else if ( vr === "UI") {
-            byteOffset = this.writeStringArray(byteOffset, value);
+            byteOffset = this.writeStringArrayPadded(byteOffset, value, "null");
         } else {
             byteOffset = this.writeStringArrayPadded(byteOffset, value);
         }
