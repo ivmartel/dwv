@@ -269,24 +269,27 @@ dwv.App = function ()
     };
 
     /**
-     * Get the size of the layer container div.
-     * @return {Object} The width and height of the div.
+     * Get the size available for the layer container div.
+     * @return {Object} The available width and height: {width:X; height:Y}.
      */
     this.getLayerContainerSize = function () {
       var ldiv = self.getElement("layerContainer");
-      var div = ldiv.parentNode;
+      var parent = ldiv.parentNode;
+      // offsetHeight: height of an element, including vertical padding and borders
+      // ref: https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetHeight
+      var height = parent.offsetHeight;
       // remove the height of other elements of the container div
-      var height = div.offsetHeight;
-      var kids = div.children;
+      var kids = parent.children;
       for (var i = 0; i < kids.length; ++i) {
         if (kids[i].className !== "layerContainer") {
           var styles = window.getComputedStyle(kids[i]);
+          // offsetHeight does not include margin
           var margin = parseFloat(styles.getPropertyValue('margin-top'), 10) +
                parseFloat(styles.getPropertyValue('margin-bottom'), 10);
           height -= (kids[i].offsetHeight + margin);
         }
       }
-      return { 'width': div.offsetWidth, 'height': height };
+      return {'width': parent.offsetWidth, 'height': height};
     };
 
     /**
