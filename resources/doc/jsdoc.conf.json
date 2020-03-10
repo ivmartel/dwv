@@ -1,18 +1,22 @@
-{ 
-    "templates": {
-        "systemName"            : "dwv",
-        "footer"                : "",
-        "copyright"             : "",
-        "includeDate"           : true,
-        "navType"               : "inline",
-        "theme"                 : "yeti",
-        "linenums"              : true,
-        "collapseSymbols"       : false,
-        "inverseNav"            : true,
-        "outputSourceFiles"     : true,
-        "outputSourcePath"      : true,
-        "dateFormat"            : "dddd, MMMM Do YYYY",
-        "syntaxTheme"           : "default",
-        "sort"                  : true
+{
+    "docdash": {
+        "search": true,
+        "collapse": true,
+        "private": false,
+        "sectionOrder": [
+          "Namespaces",
+          "Events",
+          "Classes",
+          "Externals",
+          "Modules"
+        ],
+        "menu": {
+            "Project Website": {
+                "href":"https://github.com/ivmartel/dwv",
+                "target":"_blank",
+                "class":"menu-item",
+                "id":"website_link"
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 // namespaces
 var dwv = dwv || {};
+/** @namespace */
 dwv.utils = dwv.utils || {};
 
 /**

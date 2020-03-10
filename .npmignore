@@ -5,5 +5,8 @@
 # ignore resources
 /resources
 
+# ignore build
+/build
+
 # root files (will keep package, license and readme)
 /*.*

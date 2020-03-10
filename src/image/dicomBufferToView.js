@@ -37,31 +37,64 @@ dwv.image.DicomBufferToView = function ()
     /**
      * Get data from an input buffer using a DICOM parser.
      * @param {Array} buffer The input data buffer.
+     * @param {String} origin The data origin.
      * @param {Number} dataIndex The data index.
      */
-    this.convert = function (buffer, dataIndex)
+    this.convert = function (buffer, origin, dataIndex)
     {
+        self.onloadstart({
+            source: origin
+        });
+
         // DICOM parser
         var dicomParser = new dwv.dicom.DicomParser();
         dicomParser.setDefaultCharacterSet(defaultCharacterSet);
         // parse the buffer
-        dicomParser.parse(buffer);
+        try {
+          dicomParser.parse(buffer);
+        } catch (error) {
+          self.onerror({
+              error: error,
+              source: origin
+          });
+          self.onloadend({
+              source: origin
+          });
+          return;
+        }
 
         var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
         var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
         var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
         var needDecompression = (algoName !== null);
 
-        // worker callback
-        var onDecodedFirstFrame = function (/*event*/) {
+        // generate the image and view
+        var generateImageAndView = function (/*event*/) {
             // create the image
             var imageFactory = new dwv.image.ImageFactory();
-            var image = imageFactory.create( dicomParser.getDicomElements(), pixelBuffer );
-            // create the view
             var viewFactory = new dwv.image.ViewFactory();
-            var view = viewFactory.create( dicomParser.getDicomElements(), image );
-            // return
-            self.onload({"view": view, "info": dicomParser.getDicomElements().dumpToTable()});
+            try {
+                var image = imageFactory.create(
+                    dicomParser.getDicomElements(), pixelBuffer);
+                var view = viewFactory.create(
+                    dicomParser.getDicomElements(), image);
+                // call onload
+                self.onloaditem({
+                  "data": {
+                    "view": view,
+                    "info": dicomParser.getRawDicomElements()
+                    },
+                    source: origin
+                });
+            } catch (error) {
+                self.onerror({
+                    error: error,
+                    source: origin
+                });
+                self.onloadend({
+                    source: origin
+                });
+            }
         };
 
         if ( needDecompression ) {
@@ -86,71 +119,68 @@ dwv.image.DicomBufferToView = function ()
                 pixelMeta.planarConfiguration = planarConfigurationElement.value[0];
             }
 
-            var nFrames = pixelBuffer.length;
-
-            if (!pixelDecoder){
-                pixelDecoder = new dwv.image.PixelBufferDecoder(algoName);
-            }
-
-            // loadend event
-            pixelDecoder.ondecodeend = function () {
-                self.onloadend();
-            };
-
-            // send an onload event for mono frame
-            if ( nFrames === 1 ) {
-                pixelDecoder.ondecoded = function () {
-                    self.onloadend();
-                };
-            }
+            // number of frames
+            var numberOfFrames = pixelBuffer.length;
 
             // decoder callback
             var countDecodedFrames = 0;
-            var onDecodedFrame = function (frame) {
-                return function (event) {
-                    // send progress
-                    ++countDecodedFrames;
-                    var ev = {'type': "load-progress", 'lengthComputable': true,
-                        'loaded': (countDecodedFrames * 100 / nFrames), 'total': 100};
-                    if ( typeof dataIndex !== "undefined") {
-                        ev.index = dataIndex;
-                    }
-                    self.onprogress(ev);
-                    // store data
-                    pixelBuffer[frame] = event.data[0];
-                    // create image for first frame
-                    if ( frame === 0 ) {
-                        onDecodedFirstFrame();
-                    }
-                };
+            var onDecodedFrame = function (event) {
+                ++countDecodedFrames;
+                // send progress
+                self.onprogress({
+                    lengthComputable: true,
+                    loaded: (countDecodedFrames * 100 / numberOfFrames),
+                    total: 100,
+                    index: dataIndex,
+                    source: origin
+                });
+                // store data
+                var frameNb = event.index;
+                pixelBuffer[frameNb] = event.data[0];
+                // create image for the first frame
+                // (the viewer displays the first element of the buffer)
+                if (frameNb === 0) {
+                    generateImageAndView();
+                }
             };
 
-            // decompress synchronously the first frame to create the image
-            pixelDecoder.decode(pixelBuffer[0],
-                pixelMeta, onDecodedFrame(0), false);
+            // setup the decoder if not done already
+            if (!pixelDecoder){
+                pixelDecoder = new dwv.image.PixelBufferDecoder(
+                    algoName, numberOfFrames);
+                // callbacks
+                // pixelDecoder.ondecodestart: nothing to do
+                pixelDecoder.ondecodeditem = onDecodedFrame;
+                pixelDecoder.ondecoded = self.onload;
+                pixelDecoder.ondecodeend = self.onloadend;
+                pixelDecoder.onerror = self.onerror;
+                pixelDecoder.onabort = self.onabort;
+            }
 
-            // decompress the possible other frames
-            if ( nFrames !== 1 ) {
-                // decode (asynchronously if possible)
-                for (var f = 1; f < nFrames; ++f) {
-                    pixelDecoder.decode(pixelBuffer[f],
-                        pixelMeta, onDecodedFrame(f));
-                }
+            // launch decode
+            for (var f = 0; f < numberOfFrames; ++f) {
+                pixelDecoder.decode(pixelBuffer[f], pixelMeta, f);
             }
         }
         // no decompression
         else {
             // send progress
-            var evnodec = {'type': 'load-progress', 'lengthComputable': true,
-                'loaded': 100, 'total': 100};
-            if ( typeof dataIndex !== "undefined") {
-                evnodec.index = dataIndex;
-            }
-            self.onprogress(evnodec);
-            // create image
-            onDecodedFirstFrame();
+            self.onprogress({
+                lengthComputable: true,
+                loaded: 100,
+                total: 100,
+                index: dataIndex,
+                source: origin
+            });
+            // generate image
+            generateImageAndView();
             // send load events
-            self.onloadend();
+            self.onload({
+                source: origin
+            });
+            self.onloadend({
+                source: origin
+            });
         }
     };
 
@@ -158,6 +188,7 @@ dwv.image.DicomBufferToView = function ()
      * Abort a conversion.
      */
     this.abort = function () {
+        // abort decoding, will trigger pixelDecoder.onabort
         if ( pixelDecoder ) {
             pixelDecoder.abort();
         }
@@ -165,20 +196,40 @@ dwv.image.DicomBufferToView = function ()
 };
 
 /**
- * Handle a load end event.
- * @param {Object} event The load end event.
+ * Handle a load start event.
+ * @param {Object} event The load start event.
  * Default does nothing.
  */
-dwv.image.DicomBufferToView.prototype.onloadend = function (/*event*/) {};
-/**
- * Handle a load event.
- * @param {Object} event The load event.
- * Default does nothing.
- */
-dwv.image.DicomBufferToView.prototype.onload = function  (/*event*/) {};
+dwv.image.DicomBufferToView.prototype.onloadstart = function (/*event*/) {};
 /**
  * Handle a load progress event.
  * @param {Object} event The progress event.
  * Default does nothing.
  */
 dwv.image.DicomBufferToView.prototype.onprogress = function  (/*event*/) {};
+/**
+ * Handle a load event.
+ * @param {Object} event The load event fired
+ *   when a file has been loaded successfully.
+ * Default does nothing.
+ */
+dwv.image.DicomBufferToView.prototype.onload = function  (/*event*/) {};
+/**
+ * Handle a load end event.
+ * @param {Object} event The load end event fired
+ *  when a file load has completed, successfully or not.
+ * Default does nothing.
+ */
+dwv.image.DicomBufferToView.prototype.onloadend = function (/*event*/) {};
+/**
+ * Handle an error event.
+ * @param {Object} event The error event.
+ * Default does nothing.
+ */
+dwv.image.DicomBufferToView.prototype.onerror = function (/*event*/) {};
+/**
+ * Handle an abort event.
+ * @param {Object} event The abort event.
+ * Default does nothing.
+ */
+dwv.image.DicomBufferToView.prototype.onabort = function (/*event*/) {};

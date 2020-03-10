@@ -1,14 +1,13 @@
 /**
  * Tests for the 'utils/string' file.
  */
-/** @module tests/utils */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module("string");
 
 /**
  * Tests for {@link dwv.utils.capitaliseFirstLetter}.
- * @function module:tests/utils~CapitaliseFirstLetter
+ * @function module:tests/utils~capitaliseFirstLetter
  */
 QUnit.test("Test CapitaliseFirstLetter.", function (assert) {
     // undefined
@@ -61,7 +60,7 @@ QUnit.test("Test EndsWith.", function (assert) {
 
 /**
  * Tests for {@link dwv.utils.replaceFlags}.
- * @function module:tests/utils~ReplaceFlags
+ * @function module:tests/utils~replaceFlags
  */
 QUnit.test("Test ReplaceFlags.", function (assert) {
     // empty/null

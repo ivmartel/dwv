@@ -77,6 +77,7 @@ dwv.State = function ()
     /**
      * Read an application state from an Object in v0.1 format.
      * @param {Object} data The Object representation of the state.
+     * @private
      */
     function readV01(data) {
         // update drawings
@@ -88,6 +89,7 @@ dwv.State = function ()
     /**
      * Read an application state from an Object in v0.2 format.
      * @param {Object} data The Object representation of the state.
+     * @private
      */
     function readV02(data) {
         // update drawings
@@ -98,6 +100,7 @@ dwv.State = function ()
     /**
      * Read an application state from an Object in v0.3 format.
      * @param {Object} data The Object representation of the state.
+     * @private
      */
     function readV03(data) {
         return data;

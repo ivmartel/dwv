@@ -1,15 +1,21 @@
 // namespaces
 var dwv = dwv || {};
+/** @namespace */
 dwv.tool = dwv.tool || {};
-// external
+/** @namespace */
+dwv.tool.draw = dwv.tool.draw || {};
+/**
+ * The Konva namespace.
+ * @external Konva
+ * @see https://konvajs.org/
+ */
 var Konva = Konva || {};
 
 /**
  * Arrow factory.
  * @constructor
- * @external Konva
  */
-dwv.tool.ArrowFactory = function ()
+dwv.tool.draw.ArrowFactory = function ()
 {
     /**
      * Get the number of points needed to build the shape.
@@ -29,7 +35,7 @@ dwv.tool.ArrowFactory = function ()
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
  */
-dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
+dwv.tool.draw.ArrowFactory.prototype.create = function (points, style/*, image*/)
 {
     // physical shape
     var line = new dwv.math.Line(points[0], points[1]);
@@ -106,7 +112,7 @@ dwv.tool.ArrowFactory.prototype.create = function (points, style/*, image*/)
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
  */
-dwv.tool.UpdateArrow = function (anchor/*, image*/)
+dwv.tool.draw.UpdateArrow = function (anchor/*, image*/)
 {
     // parent group
     var group = anchor.getParent();

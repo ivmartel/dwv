@@ -1,15 +1,17 @@
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// external
+/**
+ * The magic wand namespace.
+ * @external MagicWand
+ * @see https://github.com/Tamersoul/magic-wand-js
+ */
 var MagicWand = MagicWand || {};
 
 /**
  * Floodfill painting tool.
  * @constructor
  * @param {Object} app The associated application.
- * @external MagicWand
- * @see {@link  https://github.com/Tamersoul/magic-wand-js}
  */
 dwv.tool.Floodfill = function(app)
 {
@@ -67,11 +69,6 @@ dwv.tool.Floodfill = function(app)
      */
     this.started = false;
     /**
-     * Livewire GUI.
-     * @type Object
-     */
-    var gui = null;
-    /**
      * Draw command.
      * @private
      * @type Object
@@ -119,10 +116,11 @@ dwv.tool.Floodfill = function(app)
     this.style = new dwv.html.Style();
 
     /**
-     * Event listeners.
+     * Listener handler.
+     * @type Object
      * @private
      */
-    var listeners = [];
+    var listenerHandler = new dwv.utils.ListenerHandler();
 
     /**
      * Set extend option for painting border on all slices.
@@ -143,6 +141,7 @@ dwv.tool.Floodfill = function(app)
     /**
      * Get (x, y) coordinates referenced to the canvas
      * @param {Object} event The original event.
+     * @private
      */
     var getCoord = function(event){
         return { x: event._x, y: event._y };
@@ -196,7 +195,7 @@ dwv.tool.Floodfill = function(app)
         border = calcBorder(point, threshold);
         // Paint the border
         if(border){
-            var factory = new dwv.tool.RoiFactory();
+            var factory = new dwv.tool.draw.RoiFactory();
             shapeGroup = factory.create(border, self.style);
             shapeGroup.id( dwv.math.guid() );
 
@@ -378,83 +377,55 @@ dwv.tool.Floodfill = function(app)
      * Handle key down event.
      * @param {Object} event The key down event.
      */
-    this.keydown = function(event){
+    this.keydown = function (event) {
+        event.context = "dwv.tool.Floodfill";
         app.onKeydown(event);
     };
 
     /**
-     * Setup the tool GUI.
+     * Activate the tool.
+     * @param {Boolean} bool The flag to activate or not.
      */
-    this.setup = function ()
-    {
-        gui = new dwv.gui.ColourTool(app, "ff");
-        gui.setup();
-    };
-
-    /**
-     * Enable the tool.
-     * @param {Boolean} bool The flag to enable or not.
-     */
-    this.display = function(bool){
-        if ( gui ) {
-            gui.display(bool);
+    this.activate = function (bool) {
+        if (bool) {
+            // init with the app window scale
+            this.style.setScale(app.getWindowScale());
+            // set the default to the first in the list
+            this.setLineColour(this.style.getLineColour());
         }
-        // TODO why twice?
-        this.init();
     };
 
     /**
      * Initialise the tool.
      */
-    this.init = function()
-    {
-        if ( gui ) {
-            // init with the app window scale
-            this.style.setScale(app.getWindowScale());
-            // set the default to the first in the list
-            this.setLineColour(this.style.getLineColour());
-            // init html
-            gui.initialise();
-        }
-
-        return true;
+    this.init = function() {
+        // does nothing
     };
 
     /**
-     * Add an event listener on the app.
-     * @param {Object} listener The method associated with the provided event type.
+     * Add an event listener to this class.
+     * @param {String} type The event type.
+     * @param {Object} callback The method associated with the provided event type,
+     *    will be called with the fired event.
      */
-    this.addEventListener = function (listener)
-    {
-        listeners.push(listener);
+    this.addEventListener = function (type, callback) {
+        listenerHandler.add(type, callback);
     };
-
     /**
-     * Remove an event listener from the app.
-     * @param {Object} listener The method associated with the provided event type.
+     * Remove an event listener from this class.
+     * @param {String} type The event type.
+     * @param {Object} callback The method associated with the provided event type.
      */
-    this.removeEventListener = function (listener)
-    {
-        for ( var i = 0; i < listeners.length; ++i )
-        {
-            if ( listeners[i] === listener ) {
-                listeners.splice(i,1);
-            }
-        }
+    this.removeEventListener = function (type, callback) {
+        listenerHandler.remove(type, callback);
     };
-
-    // Private Methods -----------------------------------------------------------
-
     /**
-     * Fire an event: call all associated listeners.
+     * Fire an event: call all associated listeners with the input event object.
      * @param {Object} event The event to fire.
+     * @private
      */
-    function fireEvent (event)
-    {
-        for ( var i=0; i < listeners.length; ++i )
-        {
-            listeners[i](event);
-        }
+    function fireEvent (event) {
+        listenerHandler.fireEvent(event);
     }
 
 }; // Floodfill class
@@ -463,16 +434,16 @@ dwv.tool.Floodfill = function(app)
  * Help for this tool.
  * @return {Object} The help content.
  */
-dwv.tool.Floodfill.prototype.getHelp = function()
+dwv.tool.Floodfill.prototype.getHelpKeys = function()
 {
     return {
-        'title': dwv.i18n("tool.Floodfill.name"),
-        'brief': dwv.i18n("tool.Floodfill.brief"),
+        'title': "tool.Floodfill.name",
+        'brief': "tool.Floodfill.brief",
         "mouse": {
-            "click": dwv.i18n("tool.Floodfill.click")
+            "click": "tool.Floodfill.click"
         },
         "touch": {
-            "tap": dwv.i18n("tool.Floodfill.tap")
+            "tap": "tool.Floodfill.tap"
         }
     };
 };

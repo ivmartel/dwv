@@ -1,5 +1,7 @@
 /* global module */
 module.exports = function(grunt) {
+    // copy target for dev deploy
+    // call: yarn run dev --copy-target=../dwv-jqui
     var cpTarget = grunt.option('copy-target') || '../dwv-jqmobile';
     // Project configuration.
     grunt.initConfig({
@@ -57,7 +59,7 @@ module.exports = function(grunt) {
                 src: ['src/**/*.js', 'tests/**/*.js', 'resources/doc/readme-doc.md'],
                 options: {
                     destination: 'build/doc',
-                    template: 'node_modules/ink-docstrap/template',
+                    template: 'node_modules/docdash',
                     configure: 'resources/doc/jsdoc.conf.json'
                 }
             }

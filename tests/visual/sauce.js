@@ -1,34 +1,31 @@
-// namespaces
-var dwv = dwv || {};
-/** @namespace */
-dwv.tests = dwv.tests || {};
-
 /* global require */
 var process = process || {};
 
-/**
- * Saucelabs script.
- * Has to be launched from the root dir with grunt: `grunt sauce`
- * If it is the first time, install all dependencies by running:
- *  `npm install` (from the root dir, will install locally).
- *
- * Results are published publicly at: https://saucelabs.com/u/ivmartel
- *
- * Removed to solve dependencies... TODO Find another way?
- * Gruntfile:
-grunt.initConfig({
-    execute: {
-        sauce_full: {
-            options: {
-                args: ['full']
-            },
-            src: ['tests/visual/sauce.js']
-        }
-    }
-});
-grunt.loadNpmTasks('grunt-execute');
-grunt.registerTask('sauce', ['execute:sauce_full']);
- */
+// namespace
+var dwv = dwv || {};
+dwv.test = dwv.test || {};
+
+// Saucelabs script.
+// Has to be launched from the root dir with grunt: `grunt sauce`
+// If it is the first time, install all dependencies by running:
+//  `npm install` (from the root dir, will install locally).
+//
+// Results are published publicly at: https://saucelabs.com/u/ivmartel
+//
+// Removed to solve dependencies... TODO Find another way?
+// Gruntfile:
+// grunt.initConfig({
+//     execute: {
+//         sauce_full: {
+//             options: {
+//                 args: ['full']
+//             },
+//             src: ['tests/visual/sauce.js']
+//         }
+//     }
+// });
+// grunt.loadNpmTasks('grunt-execute');
+// grunt.registerTask('sauce', ['execute:sauce_full']);
 
 // selenium webdriver
 var webdriver = require('../../node_modules/selenium-webdriver');
@@ -49,7 +46,7 @@ var saucelabs = new SauceLabs({
  * @param {Object} caps Desired capabilities for the webdriver. Minimum of
  *   {'browserName', 'version', 'platform'}.
  */
-dwv.tests.sauceTest = function (caps) {
+dwv.test.sauceTest = function (caps) {
     var driver = new webdriver.Builder().
       withCapabilities({
         'browserName': caps.browserName,
@@ -117,63 +114,63 @@ dwv.tests.sauceTest = function (caps) {
     });
 };
 
-dwv.tests.sauceFirefox = function () {
+dwv.test.sauceFirefox = function () {
     var caps = {
         browserName: 'Firefox',
         version: '44.0',
         platform: 'Linux'
     };
-    dwv.tests.sauceTest(caps);
+    dwv.test.sauceTest(caps);
 };
-dwv.tests.sauceChrome = function () {
+dwv.test.sauceChrome = function () {
     var caps = {
         browserName: 'Chrome',
         version: '48.0',
         platform: 'Windows 10'
     };
-    dwv.tests.sauceTest(caps);
+    dwv.test.sauceTest(caps);
 };
-dwv.tests.sauceSafari = function () {
+dwv.test.sauceSafari = function () {
     var caps = {
         browserName: 'Safari',
         version: '9.0',
         platform: 'OS X 10.11'
     };
-    dwv.tests.sauceTest(caps);
+    dwv.test.sauceTest(caps);
 };
-dwv.tests.sauceIE = function () {
+dwv.test.sauceIE = function () {
     var caps = {
         browserName: 'MicrosoftEdge',
         version: '20.10240',
         platform: 'Windows 10'
     };
-    dwv.tests.sauceTest(caps);
+    dwv.test.sauceTest(caps);
 
     var caps2 = {
         browserName: 'Internet Explorer',
         version: '11.0',
         platform: 'Windows 10'
     };
-    dwv.tests.sauceTest(caps2);
+    dwv.test.sauceTest(caps2);
 };
 
-dwv.tests.sauceAndroid = function () {
+dwv.test.sauceAndroid = function () {
     var caps = {
         browserName: 'Android',
         version: '5.1',
         platform: 'Linux'
     };
-    dwv.tests.sauceTest(caps);
+    dwv.test.sauceTest(caps);
 };
 
 // main launcher
 if (process.argv.length === 3 && process.argv[2] === "full") {
-    dwv.tests.sauceFirefox();
+    dwv.test.sauceFirefox();
 
-    //dwv.tests.sauceChrome();
+    //dwv.test.sauceChrome();
 
     // no mouse actions in safari...
-    //dwv.tests.sauceSafari();
+    //dwv.test.sauceSafari();
 
-    //dwv.tests.sauceIE();
+    //dwv.test.sauceIE();
 }
