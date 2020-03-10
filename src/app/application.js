@@ -54,6 +54,8 @@ dwv.App = function ()
 
     // load controller
     var loadController = null;
+    // first loaded item flag
+    var firstLoadedItem = true;
 
     // UndoStack
     var undoStack = null;
@@ -315,6 +317,7 @@ dwv.App = function ()
         image = null;
         view = null;
         metaData = null;
+        firstLoadedItem = true;
         // reset undo/redo
         if ( undoStack ) {
             undoStack = new dwv.tool.UndoStack();
@@ -905,6 +908,17 @@ dwv.App = function ()
     }
 
     /**
+     * First generate the image data and draw it.
+     * @private
+     */
+    function firstGenerateAndDrawImage() {
+        // init W/L display
+        self.initWLDisplay();
+        // generate first image
+        generateAndDrawImage();
+    }
+
+    /**
      * Apply the stored zoom to the layers.
      * @private
      * @fires dwv.App#zoom-change
@@ -1058,10 +1072,12 @@ dwv.App = function ()
 
         var eventMetaData = null;
         if (event.loadtype === "image") {
-            if ( image ) {
-                view.append( event.data.view );
+            if (firstLoadedItem) {
+                postLoadInit(event.data.view);
+            } else {
+                view.append(event.data.view);
             }
-            postLoadInit(event.data);
+            updateMetaData(event.data.info);
             eventMetaData = event.data.info;
         } else if (event.loadtype === "state") {
             var state = new dwv.State();
@@ -1085,6 +1101,14 @@ dwv.App = function ()
             source: event.source,
             loadtype: event.loadtype
         });
+
+        // first generate will trigger view events,
+        // call it after fireEvent to allow clients to
+        // react to them with the first item data.
+        if (event.loadtype === "image" && firstLoadedItem) {
+            firstLoadedItem = false;
+            firstGenerateAndDrawImage();
+        }
     }
 
     /**
@@ -1169,39 +1193,42 @@ dwv.App = function ()
     }
 
     /**
-     * Post load application initialisation. To be called once the DICOM has been parsed.
-     * @param {Object} data The data to display.
+     * Update the stored meta data.
+     * @param {*} newMetaData The new meta data.
      * @private
      */
-    function postLoadInit(data)
-    {
+    function updateMetaData(newMetaData) {
         // store the meta data
-        if (dwv.utils.isArray(data.info)) {
+        if (dwv.utils.isArray(newMetaData)) {
             // image file case
             // TODO merge?
-            metaData = data.info;
+            metaData = newMetaData;
         } else {
             // DICOM data case
-            var dataInfo = new dwv.dicom.DicomElementsWrapper(data.info);
-            var dataInfoObj = dataInfo.dumpToObject();
+            var newDcmMetaData = new dwv.dicom.DicomElementsWrapper(newMetaData);
+            var newDcmMetaDataoObj = newDcmMetaData.dumpToObject();
             if (metaData) {
                 metaData = dwv.utils.mergeObjects(
                     metaData,
-                    dataInfoObj,
+                    newDcmMetaDataoObj,
                     "InstanceNumber",
                     "value");
             } else {
-                metaData = dataInfoObj;
+                metaData = newDcmMetaDataoObj;
             }
         }
+    }
 
-        // only initialise the first time
-        if ( view ) {
-            return;
-        }
-
+    /**
+     * Post load application initialisation.
+     * To be called once the DICOM has been parsed.
+     * @param {Object} createdView The view to display.
+     * @private
+     */
+    function postLoadInit(createdView)
+    {
         // get the view from the loaded data
-        view = data.view;
+        view = createdView;
         viewController = new dwv.ViewController(view);
 
         // store image
@@ -1233,11 +1260,6 @@ dwv.App = function ()
         view.addEventListener("position-change", fireEvent);
         view.addEventListener("slice-change", fireEvent);
         view.addEventListener("frame-change", fireEvent);
-
-        // init W/L display
-        self.initWLDisplay();
-        // generate first image
-        generateAndDrawImage();
 
         // initialise the toolbox
         if ( toolboxController ) {
