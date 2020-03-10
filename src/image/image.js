@@ -943,7 +943,8 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var geometry = new dwv.image.Geometry( origin, size, spacing, orientationMatrix );
 
     // sop instance UID
-    var sopInstanceUid = dicomElements.getFromKey("x00080018");
+    var sopInstanceUid = dwv.dicom.cleanString(
+        dicomElements.getFromKey("x00080018"));
 
     // image
     var image = new dwv.image.Image(
