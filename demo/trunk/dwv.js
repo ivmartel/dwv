@@ -1,4 +1,4 @@
-/*! dwv 0.27.0-beta 2020-03-10 22:54:34 */
+/*! dwv 0.28.0-beta 2020-03-10 23:20:04 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -3580,7 +3580,7 @@ dwv.dicom = dwv.dicom || {};
  * Get the version of the library.
  * @return {String} The version of the library.
  */
-dwv.getVersion = function () { return "0.27.0-beta"; };
+dwv.getVersion = function () { return "0.28.0-beta"; };
 
 /**
  * Clean string: trim and remove ending.
