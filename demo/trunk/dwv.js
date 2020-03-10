@@ -1,4 +1,4 @@
-/*! dwv 0.27.0-beta 2020-03-10 21:45:44 */
+/*! dwv 0.27.0-beta 2020-03-10 21:56:19 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -13318,7 +13318,8 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     var geometry = new dwv.image.Geometry( origin, size, spacing, orientationMatrix );
 
     // sop instance UID
-    var sopInstanceUid = dicomElements.getFromKey("x00080018");
+    var sopInstanceUid = dwv.dicom.cleanString(
+        dicomElements.getFromKey("x00080018"));
 
     // image
     var image = new dwv.image.Image(
