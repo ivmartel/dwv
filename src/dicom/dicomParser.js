@@ -1337,6 +1337,11 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer)
             // get the data element
             dataElement = this.readDataElement(metaReader, offset, false);
             offset = dataElement.endOffset;
+
+            // If Transfer Syntax Tag(or other tag) already exist, Do not override.
+            if (this.dicomElements[dataElement.tag.name]) {
+                continue;
+            }
             // store the data element
             this.dicomElements[dataElement.tag.name] = dataElement;
         }
