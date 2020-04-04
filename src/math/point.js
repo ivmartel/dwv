@@ -14,7 +14,7 @@ dwv.math.Point2D = function (x,y)
      * Get the X position of the point.
      * @return {Number} The X position of the point.
      */
-    this.getX = function () { return x+1; };
+    this.getX = function () { return x; };
     /**
      * Get the Y position of the point.
      * @return {Number} The Y position of the point.
