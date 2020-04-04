@@ -28,6 +28,7 @@ QUnit.module("dicomParser");
  * @function module:tests/dicom~dicomParserSimpleDicom
  */
 QUnit.test("Test simple DICOM parsing.", function (assert) {
+    assert.timeout(10000);
     var done = assert.async();
 
     var request = new XMLHttpRequest();
