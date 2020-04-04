@@ -11,6 +11,7 @@ QUnit.module("dicomElementsWrapper");
  * @function module:tests/dicom~dicomElementsWrapper
  */
 QUnit.test("Test simple DICOM wrapping.", function (assert) {
+    assert.timeout(10000);
     var done = assert.async();
 
     var request = new XMLHttpRequest();
