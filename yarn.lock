@@ -1306,10 +1306,10 @@ grunt-lib-phantomjs-istanbul@~1.0.0:
     semver "^4.3.0"
     temporary "^0.0.8"
 
-grunt-qunit-istanbul@~1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/grunt-qunit-istanbul/-/grunt-qunit-istanbul-1.0.0.tgz#9233b17303bf154c47f34267db33fd1b95af6d79"
-  integrity sha1-kjOxcwO/FUxH80Jn2zP9G5WvbXk=
+grunt-qunit-istanbul@~1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/grunt-qunit-istanbul/-/grunt-qunit-istanbul-1.1.0.tgz#2f775e0bf271e733dfb1f98d9f8b623f221123ef"
+  integrity sha512-aaBahIhz24gk0n7CV6hC64+imwbW1omy/9OiSnRoNs0mkAoLSBbMbgtCXIixijRad2Fj3TyO2uozvpvGji68xQ==
   dependencies:
     grunt-lib-phantomjs-istanbul "~1.0.0"
     istanbul "~0.4.5"
