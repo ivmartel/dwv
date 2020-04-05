@@ -3,6 +3,11 @@ module.exports = function(grunt) {
     // copy target for dev deploy
     // call: yarn run dev --copy-target=../dwv-jqui
     var cpTarget = grunt.option('copy-target') || '../dwv-jqmobile';
+    // karma ci test coverage
+    var karmaCiReporters = ['progress'];
+    if (grunt.option('coverage')) {
+        karmaCiReporters.push('coverage');
+    }
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -16,10 +21,11 @@ module.exports = function(grunt) {
             unit: {
                 configFile: 'karma.conf.js',
             },
-            continuous: {
+            ci: {
                 configFile: 'karma.conf.js',
                 browsers: ['ChromeHeadless'],
-                singleRun: true,
+                reporters: karmaCiReporters,
+                singleRun: true
             }
         },
         coveralls: {
@@ -105,7 +111,7 @@ module.exports = function(grunt) {
     // tasks
     grunt.registerTask('lint', ['jshint']);
     grunt.registerTask('test', ['karma:unit']);
-    grunt.registerTask('test-ci', ['karma:continuous']);
+    grunt.registerTask('test-ci', ['karma:ci']);
     grunt.registerTask('build', ['concat', 'uglify']);
     grunt.registerTask('doc', ['jsdoc']);
     grunt.registerTask('dev', ['watch:build']);

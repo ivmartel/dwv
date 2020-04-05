@@ -43,7 +43,7 @@ module.exports = function (config) {
         { type: 'text-summary' }
       ]
     },
-    reporters: ['progress', 'coverage'],
+    reporters: ['progress'],
     logLevel: config.LOG_INFO,
     browsers: ['Chrome'],
     restartOnFileChange: true
