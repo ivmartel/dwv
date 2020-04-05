@@ -24,8 +24,7 @@ dwv.test.testState = function ( version, type, assert ) {
     var done = assert.async();
     // test file request
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
-    var url = urlRoot + "/tests/state/v" + version + "/state-" + type + ".json";
+    var url = "/tests/state/v" + version + "/state-" + type + ".json";
     request.open('GET', url, true);
     request.onerror = function (event) {
         console.log(event);

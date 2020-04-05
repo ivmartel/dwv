@@ -18,8 +18,7 @@ QUnit.test("Test multiframe writer support.", function (assert) {
     var done = assert.async();
 
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
-    var url = urlRoot + "/tests/data/multiframe-test1.dcm";
+    var url = "/tests/data/multiframe-test1.dcm";
     request.open('GET', url, true);
     request.responseType = "arraybuffer";
     request.onerror = function (event) {
@@ -69,8 +68,7 @@ QUnit.test("Test patient anonymisation", function (assert) {
     var done = assert.async();
 
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
-    var url = urlRoot + "/tests/data/dwv-test-anonymise.dcm";
+    var url = "/tests/data/dwv-test-anonymise.dcm";
     request.open('GET', url, true);
     request.responseType = "arraybuffer";
     request.onerror = function (event) {
@@ -230,8 +228,7 @@ QUnit.test("Test synthetic dicom explicit", function (assert) {
 
     // get the list of configs
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
-    var url = urlRoot + "/tests/dicom/synthetic-data_explicit.json";
+    var url = "/tests/dicom/synthetic-data_explicit.json";
     request.open('GET', url, true);
     request.onerror = function (event) {
         console.error(event);
@@ -257,8 +254,7 @@ QUnit.test("Test synthetic dicom implicit", function (assert) {
 
     // get the list of configs
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
-    var url = urlRoot + "/tests/dicom/synthetic-data_implicit.json";
+    var url = "/tests/dicom/synthetic-data_implicit.json";
     request.open('GET', url, true);
     request.onerror = function (event) {
         console.error(event);
@@ -284,8 +280,7 @@ QUnit.test("Test synthetic dicom explicit big endian", function (assert) {
 
     // get the list of configs
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
-    var url = urlRoot + "/tests/dicom/synthetic-data_explicit_big-endian.json";
+    var url = "/tests/dicom/synthetic-data_explicit_big-endian.json";
     request.open('GET', url, true);
     request.onerror = function (event) {
         console.error(event);

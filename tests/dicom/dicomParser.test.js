@@ -28,12 +28,10 @@ QUnit.module("dicomParser");
  * @function module:tests/dicom~dicomParserSimpleDicom
  */
 QUnit.test("Test simple DICOM parsing.", function (assert) {
-    assert.timeout(10000);
     var done = assert.async();
 
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
-    var url = urlRoot + "/tests/data/dwv-test-simple.dcm";
+    var url = "/tests/data/dwv-test-simple.dcm";
     request.open('GET', url, true);
     request.responseType = "arraybuffer";
     request.onerror = function (event) {
@@ -99,8 +97,7 @@ QUnit.test("Test sequence DICOM parsing.", function (assert) {
     var done = assert.async();
 
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
-    var url = urlRoot + "/tests/data/dwv-test-sequence.dcm";
+    var url = "/tests/data/dwv-test-sequence.dcm";
     request.open('GET', url, true);
     request.responseType = "arraybuffer";
     request.onload = function (/*event*/) {
@@ -225,8 +222,7 @@ QUnit.test("Test DICOMDIR parsing.", function (assert) {
     var done = assert.async();
 
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
-    var url = urlRoot + "/tests/data/DICOMDIR";
+    var url = "/tests/data/DICOMDIR";
     request.open('GET', url, true);
     request.responseType = "arraybuffer";
     request.onerror = function (event) {

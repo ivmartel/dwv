@@ -11,12 +11,10 @@ QUnit.module("dicomElementsWrapper");
  * @function module:tests/dicom~dicomElementsWrapper
  */
 QUnit.test("Test simple DICOM wrapping.", function (assert) {
-    assert.timeout(10000);
     var done = assert.async();
 
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
-    var url = urlRoot + "/tests/data/dwv-test-simple.dcm";
+    var url = "/tests/data/dwv-test-simple.dcm";
     request.open('GET', url, true);
     request.responseType = "arraybuffer";
     request.onerror = function (event) {

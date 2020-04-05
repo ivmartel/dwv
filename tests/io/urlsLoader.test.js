@@ -148,12 +148,10 @@ dwv.test.checkLoad = function (assert, id, data, nData, nDataOk) {
  * @function module:tests/io~UrlsLoader0
  */
 QUnit.test("Test UrlsLoader events for single frame.", function (assert) {
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
-
     // #0: 2 good dicom
     var data0 = [
-        urlRoot + "/tests/data/bbmri-53323131.dcm",
-        urlRoot + "/tests/data/bbmri-53323275.dcm",
+        "/tests/data/bbmri-53323131.dcm",
+        "/tests/data/bbmri-53323275.dcm",
     ];
     var nData0 = data0.length;
     var nDataOk0 = nData0;
@@ -161,8 +159,8 @@ QUnit.test("Test UrlsLoader events for single frame.", function (assert) {
 
     // #1: 2 not found (404) dicom
     var data1 = [
-        urlRoot + "/a.dcm",
-        urlRoot + "/b.dcm",
+        "/a.dcm",
+        "/b.dcm",
     ];
     var nData1 = data1.length;
     var nDataOk1 = 0;
@@ -170,18 +168,17 @@ QUnit.test("Test UrlsLoader events for single frame.", function (assert) {
 
     // #2: 2 dicom, 1 not found (404, error in XHR request)
     var data2 = [
-        urlRoot + "/tests/data/bbmri-53323131.dcm",
-        urlRoot + "/b.dcm",
+        "/tests/data/bbmri-53323131.dcm",
+        "/b.dcm",
     ];
     var nData2 = data2.length;
     var nDataOk2 = 1;
     dwv.test.checkLoad(assert, "2", data2, nData2, nDataOk2);
 
     // #3: 2 dicom, 1 bad (no rows, error in loader)
-    var urlRoot2 = "https://raw.githubusercontent.com/ivmartel/dwv/develop";
     var data3 = [
-        urlRoot + "/tests/data/dwv-test-simple.dcm",
-        urlRoot2 + "/tests/data/dwv-test_no-number-rows.dcm",
+        "/tests/data/dwv-test-simple.dcm",
+        "/tests/data/dwv-test_no-number-rows.dcm",
     ];
     var nData3 = data3.length;
     var nDataOk3 = 1;
@@ -193,11 +190,9 @@ QUnit.test("Test UrlsLoader events for single frame.", function (assert) {
  * @function module:tests/io~UrlsLoader1
  */
 QUnit.test("Test UrlsLoader events for multi frame.", function (assert) {
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
-
     // #0: simple multi frame
     var data0 = [
-        urlRoot + "/tests/data/multiframe-test1.dcm",
+        "/tests/data/multiframe-test1.dcm",
     ];
     var nData0 = data0.length;
     var nDataOk0 = nData0;
@@ -205,9 +200,8 @@ QUnit.test("Test UrlsLoader events for multi frame.", function (assert) {
 
     // #1: encoded multi frame
     // TODO seems to cause problems to phantomjs...
-    /*var urlRoot2 = "https://raw.githubusercontent.com/ivmartel/dwv/develop";
-    var data1 = [
-        urlRoot2 + "/tests/data/multiframe-jpegloss-ge.dcm",
+    /*var data1 = [
+        "/tests/data/multiframe-jpegloss-ge.dcm",
     ];
     var nData1 = data1.length;
     var nDataOk1 = nData1;
@@ -219,11 +213,9 @@ QUnit.test("Test UrlsLoader events for multi frame.", function (assert) {
  * @function module:tests/io~UrlsLoader2
  */
 QUnit.test("Test UrlsLoader events for zipped data.", function (assert) {
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/develop";
-
     // #0: simple zip
     var data0 = [
-        urlRoot + "/tests/data/bbmri.zip",
+        "/tests/data/bbmri.zip",
     ];
     var nData0 = 2;
     var nDataOk0 = 2;
@@ -231,7 +223,7 @@ QUnit.test("Test UrlsLoader events for zipped data.", function (assert) {
 
     // #1: bad link to zip
     var data1 = [
-        urlRoot + "/tests/data/a.zip",
+        "/tests/data/a.zip",
     ];
     var nData1 = 1;
     var nDataOk1 = 0;
@@ -239,7 +231,7 @@ QUnit.test("Test UrlsLoader events for zipped data.", function (assert) {
 
     // #2: zip with erroneus data
     var data2 = [
-        urlRoot + "/tests/data/dwv-test_bad.zip",
+        "/tests/data/dwv-test_bad.zip",
     ];
     var nData2 = 2;
     var nDataOk2 = 1;
@@ -251,11 +243,9 @@ QUnit.test("Test UrlsLoader events for zipped data.", function (assert) {
  * @function module:tests/io~UrlsLoader3
  */
 QUnit.test("Test UrlsLoader events for DCMDIR data.", function (assert) {
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
-
     // #0: simple DCMDIR
     var data0 = [
-        urlRoot + "/tests/data/bbmri.dcmdir",
+        "/tests/data/bbmri.dcmdir",
     ];
     var nData0 = 4;
     var nDataOk0 = 4;
@@ -263,7 +253,7 @@ QUnit.test("Test UrlsLoader events for DCMDIR data.", function (assert) {
 
     // #1: bad link to DCMDIR
     var data1 = [
-        urlRoot + "/tests/data/a.dcmdir",
+        "/tests/data/a.dcmdir",
     ];
     var nData1 = 1;
     var nDataOk1 = 0;
