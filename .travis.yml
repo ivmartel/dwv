@@ -10,11 +10,6 @@ env:
   global:
     - secure: jWTxnnLGmoM+j3148tIF2SJMEyub2j9kmR15vEKVeP6BbUvNgWH9jTSwf6Ddv3qjbAb3D8p9nhYBOZgRub1stwjWCH+DS17AoKFeRVj4Q8Sf0XBHGzJbn0FkstilVmGv3Zr/FVmDSEm1xSSHanWCUQX0uH9r/XB8z7khp4pLryo=
 
-# greenkeeper lock file
-before_install: yarn global add greenkeeper-lockfile@1
-before_script: greenkeeper-lockfile-update
-after_script: greenkeeper-lockfile-upload
-
 # main
 script:
 - yarn run lint
