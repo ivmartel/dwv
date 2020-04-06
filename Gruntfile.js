@@ -3,6 +3,11 @@ module.exports = function(grunt) {
     // copy target for dev deploy
     // call: yarn run dev --copy-target=../dwv-jqui
     var cpTarget = grunt.option('copy-target') || '../dwv-jqmobile';
+    // karma ci test coverage
+    var karmaCiReporters = ['progress'];
+    if (grunt.option('coverage')) {
+        karmaCiReporters.push('coverage');
+    }
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -12,18 +17,15 @@ module.exports = function(grunt) {
                 jshintrc: '.jshintrc'
             }
         },
-        qunit: {
-            all: ['tests/index.html'],
-            options: {
-                '--web-security': 'no',
-                coverage: {
-                    disposeCollector: true,
-                    src: [ "src/**/*.js" ],
-                    instrumentedFiles: "/tmp/ivmartel/dwv",
-                    htmlReport: "build/report/coverage",
-                    lcovReport: "build/report/lcov",
-                    linesThresholdPct: 0
-                }
+        karma: {
+            unit: {
+                configFile: 'karma.conf.js',
+            },
+            ci: {
+                configFile: 'karma.conf.js',
+                browsers: ['ChromeHeadless'],
+                reporters: karmaCiReporters,
+                singleRun: true
             }
         },
         coveralls: {
@@ -32,7 +34,7 @@ module.exports = function(grunt) {
                 force: true
             },
             main_target: {
-                src: "build/report/lcov/lcov.info"
+                src: "build/coverage/dwv/report-lcovonly.txt"
             }
         },
         concat: {
@@ -95,19 +97,8 @@ module.exports = function(grunt) {
                 }
             }
         },
-        connect: {
-            server: {
-                options: {
-                    port: 8080,
-                    hostname: 'localhost',
-                    open: 'http://localhost:8080/tests/index.html',
-                    livereload: true
-                }
-            }
-        },
     });
 
-    grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -115,12 +106,12 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-coveralls');
     grunt.loadNpmTasks('grunt-jsdoc');
-    grunt.loadNpmTasks('grunt-qunit-istanbul');
+    grunt.loadNpmTasks('grunt-karma');
 
     // tasks
     grunt.registerTask('lint', ['jshint']);
-    grunt.registerTask('test', ['connect', 'watch:lint']);
-    grunt.registerTask('test-ci', ['qunit']);
+    grunt.registerTask('test', ['karma:unit']);
+    grunt.registerTask('test-ci', ['karma:ci']);
     grunt.registerTask('build', ['concat', 'uglify']);
     grunt.registerTask('doc', ['jsdoc']);
     grunt.registerTask('dev', ['watch:build']);
