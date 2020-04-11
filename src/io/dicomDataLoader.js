@@ -121,9 +121,11 @@ dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url) {
     var hasDcmExt = (ext === "dcm");
     // content type (for wado url)
     var contentType = urlObjext.searchParams.get("contentType");
+    var hasContentType = contentType !== null &&
+        typeof contentType !== "undefined";
     var hasDicomContentType = (contentType === "application/dicom");
 
-    return hasDicomContentType || hasNoExt || hasDcmExt;
+    return hasContentType ? hasDicomContentType : (hasNoExt || hasDcmExt);
 };
 
 /**

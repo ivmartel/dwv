@@ -130,11 +130,13 @@ dwv.io.RawImageLoader.prototype.canLoadUrl = function (url) {
             (ext === "png") || (ext === "gif");
     // content type (for wado url)
     var contentType = urlObjext.searchParams.get("contentType");
+    var hasContentType = contentType !== null &&
+        typeof contentType !== "undefined";
     var hasImageContentType = (contentType === "image/jpeg") ||
         (contentType === "image/png") ||
         (contentType === "image/gif");
 
-    return hasImageContentType || hasImageExt;
+    return hasContentType ? hasImageContentType : hasImageExt;
 };
 
 /**
