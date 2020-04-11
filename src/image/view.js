@@ -427,10 +427,10 @@ dwv.image.View = function (image)
             // create the first lut if none exists
             if (keys.length === 0) {
                 // create the rescale lookup table
-                var rescaleLut = new dwv.image.lut.Rescale(
+                var rescaleLut = new dwv.image.RescaleLut(
                     image.getRescaleSlopeAndIntercept(0), image.getMeta().BitsStored );
                 // create the window lookup table
-                var windowLut = new dwv.image.lut.Window(rescaleLut, image.getMeta().IsSigned);
+                var windowLut = new dwv.image.WindowLut(rescaleLut, image.getMeta().IsSigned);
                 this.addWindowLut(windowLut);
             }
 
