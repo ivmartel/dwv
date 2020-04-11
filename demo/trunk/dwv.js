@@ -1,4 +1,4 @@
-/*! dwv 0.28.0-beta 2020-04-11 22:37:51 */
+/*! dwv 0.28.0-beta 2020-04-11 23:03:42 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -13433,98 +13433,144 @@ dwv.image = dwv.image || {};
 dwv.image.lut = dwv.image.lut || {};
 
 /**
-* Lookup tables for image colour display.
-*/
+ * Lookup tables for image colour display.
+ */
 
 dwv.image.lut.range_max = 256;
 
-dwv.image.lut.buildLut = function(func)
-{
+/**
+ * Build a LUT of size range_max.
+ * @param {Function} func The i to lut function.
+ */
+dwv.image.lut.buildLut = function (func) {
     var lut = [];
-    for( var i=0; i<dwv.image.lut.range_max; ++i ) {
+    for (var i = 0; i < dwv.image.lut.range_max; ++i) {
         lut.push(func(i));
     }
     return lut;
 };
 
-dwv.image.lut.max = function(/*i*/)
-{
-    return dwv.image.lut.range_max-1;
+/**
+ * Max function: returns range_max minus one.
+ * @param {number} i The input index.
+ * @returns {number} The lut value.
+ */
+dwv.image.lut.max = function (/*i*/) {
+    return dwv.image.lut.range_max - 1;
 };
 
-dwv.image.lut.maxFirstThird = function(i)
-{
-    if( i < dwv.image.lut.range_max/3 ) {
-        return dwv.image.lut.range_max-1;
+/**
+ * Returns range_max minus one for the first third of i, otherwise 0.
+ * @param {number} i The input index.
+ * @returns {number} The lut value.
+ */
+dwv.image.lut.maxFirstThird = function (i) {
+    if (i < dwv.image.lut.range_max / 3) {
+        return dwv.image.lut.range_max - 1;
     }
     return 0;
 };
 
-dwv.image.lut.maxSecondThird = function(i)
-{
-    var third = dwv.image.lut.range_max/3;
-    if( i >= third && i < 2*third ) {
-        return dwv.image.lut.range_max-1;
+/**
+ * Returns range_max minus one from one third to two thirds of i, otherwise 0.
+ * @param {number} i The input index.
+ * @returns {number} The lut value.
+ */
+dwv.image.lut.maxSecondThird = function (i) {
+    var third = dwv.image.lut.range_max / 3;
+    if (i >= third && i < 2 * third) {
+        return dwv.image.lut.range_max - 1;
     }
     return 0;
 };
 
-dwv.image.lut.maxThirdThird = function(i)
-{
-    if( i >= 2*dwv.image.lut.range_max/3 ) {
-        return dwv.image.lut.range_max-1;
+/**
+ * Returns range_max minus one from one third to two thirds of i, otherwise 0.
+ * @param {number} i The input index.
+ * @returns {number} The lut value.
+ */
+dwv.image.lut.maxThirdThird = function (i) {
+    if( i >= 2 * dwv.image.lut.range_max / 3 ) {
+        return dwv.image.lut.range_max - 1;
     }
     return 0;
 };
 
-dwv.image.lut.toMaxFirstThird = function(i)
-{
+/**
+ * Ramp to range_max minus one on the first third values.
+ * @param {number} i The input index.
+ * @returns {number} The lut value.
+ */
+dwv.image.lut.toMaxFirstThird = function (i) {
     var val = i * 3;
-    if( val > dwv.image.lut.range_max-1 ) {
-        return dwv.image.lut.range_max-1;
+    if (val > dwv.image.lut.range_max - 1) {
+        return dwv.image.lut.range_max - 1;
     }
     return val;
 };
 
-dwv.image.lut.toMaxSecondThird = function(i)
-{
-    var third = dwv.image.lut.range_max/3;
+/**
+ * Ramp to range_max minus one on the second third values.
+ *  otherwise return 0 for the first third and
+ *  range_max minus one for the last third.
+ * @param {number} i The input index.
+ * @returns {number} The lut value.
+ */
+dwv.image.lut.toMaxSecondThird = function (i) {
+    var third = dwv.image.lut.range_max / 3;
     var val = 0;
-    if( i >= third ) {
-        val = (i-third) * 3;
-        if( val > dwv.image.lut.range_max-1 ) {
-            return dwv.image.lut.range_max-1;
+    if (i >= third) {
+        val = (i - third) * 3;
+        if (val > dwv.image.lut.range_max - 1) {
+            return dwv.image.lut.range_max - 1;
         }
     }
     return val;
 };
 
-dwv.image.lut.toMaxThirdThird = function(i)
-{
-    var third = dwv.image.lut.range_max/3;
+/**
+ * Ramp to range_max minus one on the last third values.
+ *  otherwise return 0.
+ * @param {number} i The input index.
+ * @returns {number} The lut value.
+ */
+dwv.image.lut.toMaxThirdThird = function (i) {
+    var third = dwv.image.lut.range_max / 3;
     var val = 0;
-    if( i >= 2*third ) {
-        val = (i-2*third) * 3;
-        if( val > dwv.image.lut.range_max-1 ) {
-            return dwv.image.lut.range_max-1;
+    if (i >= 2 * third) {
+        val = (i - 2 * third) * 3;
+        if (val > dwv.image.lut.range_max - 1) {
+            return dwv.image.lut.range_max - 1;
         }
     }
     return val;
 };
 
-dwv.image.lut.zero = function(/*i*/)
-{
+/**
+ * Returns zero.
+ * @param {number} i The input index.
+ * @returns {number} The lut value.
+ */
+dwv.image.lut.zero = function (/*i*/) {
     return 0;
 };
 
-dwv.image.lut.id = function(i)
-{
+/**
+ * Identity, returns i.
+ * @param {number} i The input index.
+ * @returns {number} The lut value.
+ */
+dwv.image.lut.id = function (i) {
     return i;
 };
 
-dwv.image.lut.invId = function(i)
-{
-    return (dwv.image.lut.range_max-1)-i;
+/**
+ * Returns range_max minus one minus i.
+ * @param {number} i The input index.
+ * @returns {number} The lut value.
+ */
+dwv.image.lut.invId = function (i) {
+    return (dwv.image.lut.range_max - 1) - i;
 };
 
 // plain
