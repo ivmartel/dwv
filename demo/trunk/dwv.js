@@ -1,4 +1,4 @@
-/*! dwv 0.28.0-beta 2020-04-06 22:01:13 */
+/*! dwv 0.28.0-beta 2020-04-11 21:51:19 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -15017,9 +15017,11 @@ dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url) {
     var hasDcmExt = (ext === "dcm");
     // content type (for wado url)
     var contentType = urlObjext.searchParams.get("contentType");
+    var hasContentType = contentType !== null &&
+        typeof contentType !== "undefined";
     var hasDicomContentType = (contentType === "application/dicom");
 
-    return hasDicomContentType || hasNoExt || hasDcmExt;
+    return hasContentType ? hasDicomContentType : (hasNoExt || hasDcmExt);
 };
 
 /**
@@ -16034,11 +16036,13 @@ dwv.io.RawImageLoader.prototype.canLoadUrl = function (url) {
             (ext === "png") || (ext === "gif");
     // content type (for wado url)
     var contentType = urlObjext.searchParams.get("contentType");
+    var hasContentType = contentType !== null &&
+        typeof contentType !== "undefined";
     var hasImageContentType = (contentType === "image/jpeg") ||
         (contentType === "image/png") ||
         (contentType === "image/gif");
 
-    return hasImageContentType || hasImageExt;
+    return hasContentType ? hasImageContentType : hasImageExt;
 };
 
 /**
