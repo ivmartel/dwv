@@ -3,86 +3,19 @@
 
 <head>
 <meta charset="UTF-8">
-<title>DWV Tests</title>
-<link rel="stylesheet" href="../node_modules/qunit/qunit/qunit.css" type="text/css" media="screen" />
+<title>DWV Tests extra</title>
 <style>
-.footer {
-    font-family: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif;
-    }
+body { font-family: Arial, Helvetica, sans-serif; }
 </style>
 </head>
 
 <body>
-<div id="qunit"></div>
-<div id="qunit-fixture"></div>
-<!-- Third party (test) -->
-<script type="text/javascript" src="../node_modules/qunit/qunit/qunit.js"></script>
-<!-- Third party (dwv) -->
-<script type="text/javascript" src="../node_modules/i18next/i18next.min.js"></script>
-<script type="text/javascript" src="../node_modules/i18next-xhr-backend/i18nextXHRBackend.min.js"></script>
-<script type="text/javascript" src="../node_modules/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.min.js"></script>
-<script type="text/javascript" src="../node_modules/konva/konva.min.js"></script>
-<script type="text/javascript" src="../node_modules/jszip/dist/jszip.min.js"></script>
-<!-- Source -->
-<script type="text/javascript" src="../src/app/drawController.js" data-cover></script>
-<script type="text/javascript" src="../src/app/state.js" data-cover></script>
-<script type="text/javascript" src="../src/utils/string.js" data-cover></script>
-<script type="text/javascript" src="../src/utils/uri.js" data-cover></script>
-<script type="text/javascript" src="../src/dicom/dicomElementsWrapper.js" data-cover></script>
-<script type="text/javascript" src="../src/dicom/dicomParser.js" data-cover></script>
-<script type="text/javascript" src="../src/dicom/dicomWriter.js" data-cover></script>
-<script type="text/javascript" src="../src/dicom/dictionary.js" data-cover></script>
-<script type="text/javascript" src="../src/image/decoder.js" data-cover></script>
-<script type="text/javascript" src="../src/image/filter.js" data-cover></script>
-<script type="text/javascript" src="../src/image/dicomBufferToView.js" data-cover></script>
-<script type="text/javascript" src="../src/image/geometry.js" data-cover></script>
-<script type="text/javascript" src="../src/image/image.js" data-cover></script>
-<script type="text/javascript" src="../src/image/luts.js" data-cover></script>
-<script type="text/javascript" src="../src/image/view.js" data-cover></script>
-<script type="text/javascript" src="../src/io/urlsLoader.js" data-cover></script>
-<script type="text/javascript" src="../src/io/dicomDataLoader.js" data-cover></script>
-<script type="text/javascript" src="../src/io/memoryLoader.js" data-cover></script>
-<script type="text/javascript" src="../src/io/zipLoader.js" data-cover></script>
-<script type="text/javascript" src="../src/math/matrix.js" data-cover></script>
-<script type="text/javascript" src="../src/math/point.js" data-cover></script>
-<script type="text/javascript" src="../src/math/shapes.js" data-cover></script>
-<script type="text/javascript" src="../src/math/stats.js" data-cover></script>
-<script type="text/javascript" src="../src/math/vector.js" data-cover></script>
-<script type="text/javascript" src="../src/utils/env.js" data-cover></script>
-<script type="text/javascript" src="../src/utils/modernizr.js"></script>
-<script type="text/javascript" src="../src/utils/operator.js"></script>
-<script type="text/javascript" src="../src/utils/i18n.js" data-cover></script>
-<script type="text/javascript" src="../src/utils/operator.js" data-cover></script>
-<script type="text/javascript" src="../src/utils/progress.js" data-cover></script>
-<script type="text/javascript" src="../src/utils/thread.js" data-cover></script>
-<!-- Tests -->
-<script type="text/javascript" src="dicom/dicomParser.test.js"></script>
-<script type="text/javascript" src="dicom/dicomWriter.test.js"></script>
-<script type="text/javascript" src="dicom/dicomElementsWrapper.test.js"></script>
-<script type="text/javascript" src="html/html.test.js"></script>
-<script type="text/javascript" src="image/geometry.test.js"></script>
-<script type="text/javascript" src="image/image.test.js"></script>
-<script type="text/javascript" src="image/view.test.js"></script>
-<script type="text/javascript" src="io/urlsLoader.test.js"></script>
-<script type="text/javascript" src="math/matrix.test.js"></script>
-<script type="text/javascript" src="math/point.test.js"></script>
-<script type="text/javascript" src="math/shapes.test.js"></script>
-<script type="text/javascript" src="math/stats.test.js"></script>
-<script type="text/javascript" src="math/vector.test.js"></script>
-<script type="text/javascript" src="state/state.test.js"></script>
-<script type="text/javascript" src="utils/i18n.test.js"></script>
-<script type="text/javascript" src="utils/string.test.js"></script>
-<script type="text/javascript" src="utils/operator.test.js"></script>
-<script type="text/javascript" src="utils/thread.test.js"></script>
-<script type="text/javascript" src="utils/uri.test.js"></script>
 
-<script type="text/javascript">
-// check environment support (and provide missing functions)
-dwv.env.check();
-</script>
+<!-- under Karma, access this page at 'base/tests/index.html' -->
 
-<div class="footer">
-<p>See also:</p>
+<h1>DWV extra test content</h1>
+
+<p>Here are some extra web pages used to evaluate the dwv functionalities:</p>
 <ul>
 <li>Visual tests: <a href="./visual/index.html">DICOM</a>,
     <a href="./visual/index-jpeg.html">DICOM jpg</a>,
@@ -94,8 +27,6 @@ dwv.env.check();
     <a href="./dicom/generator.html">generator</a>,
     <a href="./dicom/synthetic-data.html">synthetic-data</a></li>
 </ul>
-<br>&nbsp;
-</div>
 
 </body>
 
