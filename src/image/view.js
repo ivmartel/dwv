@@ -584,153 +584,47 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
  * Generate display image data to be given to a canvas.
  * @param {Array} array The array to fill in.
  */
-dwv.image.View.prototype.generateImageData = function( array )
-{
-    var windowLut = this.getCurrentWindowLut();
-
-    var image = this.getImage();
-    var sliceSize = image.getGeometry().getSize().getSliceSize();
-    var sliceOffset = sliceSize * this.getCurrentPosition().k;
+dwv.image.View.prototype.generateImageData = function (array) {
     var frame = (this.getCurrentFrame()) ? this.getCurrentFrame() : 0;
-
-    var index = 0;
-    var pxValue = 0;
-    var stepPos = 0;
-    var colourMap = null;
-
+    var image = this.getImage();
     var photoInterpretation = image.getPhotometricInterpretation();
     switch (photoInterpretation)
     {
     case "MONOCHROME1":
     case "MONOCHROME2":
-        colourMap = this.getColourMap();
-        var iMax = sliceOffset + sliceSize;
-        for(var i=sliceOffset; i < iMax; ++i)
-        {
-            pxValue = windowLut.getValue(image.getValueAtOffset(i, frame) );
-            array.data[index] = colourMap.red[pxValue];
-            array.data[index+1] = colourMap.green[pxValue];
-            array.data[index+2] = colourMap.blue[pxValue];
-            array.data[index+3] = 0xff;
-            index += 4;
-        }
+        dwv.image.generateImageDataMonochrome(
+            array,
+            image,
+            this.getCurrentPosition(),
+            frame,
+            this.getCurrentWindowLut(),
+            this.getColourMap());
         break;
 
     case "PALETTE COLOR":
-        colourMap = this.getColourMap();
-        var lMax = sliceOffset + sliceSize;
-
-        var to8 = function (value) {
-            return value >> 8;
-        };
-
-        if (image.getMeta().BitsStored === 16) {
-            console.log("Scaling 16bits data to 8bits.");
-        }
-
-        for (var l = sliceOffset; l < lMax; ++l)
-        {
-            pxValue = image.getValueAtOffset(l, frame);
-
-            // TODO check pxValue fits in lut
-
-            if (image.getMeta().BitsStored === 16) {
-                array.data[index] = to8(colourMap.red[pxValue]);
-                array.data[index+1] = to8(colourMap.green[pxValue]);
-                array.data[index+2] = to8(colourMap.blue[pxValue]);
-            } else {
-                array.data[index] = colourMap.red[pxValue];
-                array.data[index+1] = colourMap.green[pxValue];
-                array.data[index+2] = colourMap.blue[pxValue];
-            }
-            array.data[index+3] = 0xff;
-            index += 4;
-        }
+        dwv.image.generateImageDataPaletteColor(
+            array,
+            image,
+            this.getCurrentPosition(),
+            frame,
+            this.getColourMap());
         break;
 
     case "RGB":
-        // 3 times bigger...
-        sliceOffset *= 3;
-        // the planar configuration defines the memory layout
-        var planarConfig = image.getPlanarConfiguration();
-        if( planarConfig !== 0 && planarConfig !== 1 ) {
-            throw new Error("Unsupported planar configuration: "+planarConfig);
-        }
-        // default: RGBRGBRGBRGB...
-        var posR = sliceOffset;
-        var posG = sliceOffset + 1;
-        var posB = sliceOffset + 2;
-        stepPos = 3;
-        // RRRR...GGGG...BBBB...
-        if (planarConfig === 1) {
-            posR = sliceOffset;
-            posG = sliceOffset + sliceSize;
-            posB = sliceOffset + 2 * sliceSize;
-            stepPos = 1;
-        }
-
-        for(var j=0; j < sliceSize; ++j)
-        {
-            array.data[index] = windowLut.getValue(image.getValueAtOffset(posR, frame) );
-            array.data[index+1] = windowLut.getValue(image.getValueAtOffset(posG, frame) );
-            array.data[index+2] = windowLut.getValue(image.getValueAtOffset(posB, frame) );
-            array.data[index+3] = 0xff;
-            index += 4;
-
-            posR += stepPos;
-            posG += stepPos;
-            posB += stepPos;
-        }
+        dwv.image.generateImageDataRgb(
+            array,
+            image,
+            this.getCurrentPosition(),
+            frame,
+            this.getCurrentWindowLut());
         break;
 
     case "YBR_FULL":
-        // theory:
-        // http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.7.html#sect_C.7.6.3.1.2
-        // reverse equation:
-        // https://en.wikipedia.org/wiki/YCbCr#JPEG_conversion
-
-        // 3 times bigger...
-        sliceOffset *= 3;
-        // the planar configuration defines the memory layout
-        var planarConfigYBR = image.getPlanarConfiguration();
-        if( planarConfigYBR !== 0 && planarConfigYBR !== 1 ) {
-            throw new Error("Unsupported planar configuration: "+planarConfigYBR);
-        }
-        // default: YBRYBRYBR...
-        var posY = sliceOffset;
-        var posCB = sliceOffset + 1;
-        var posCR = sliceOffset + 2;
-        stepPos = 3;
-        // YYYY...BBBB...RRRR...
-        if (planarConfigYBR === 1) {
-            posY = sliceOffset;
-            posCB = sliceOffset + sliceSize;
-            posCR = sliceOffset + 2 * sliceSize;
-            stepPos = 1;
-        }
-
-        var y, cb, cr;
-        var r, g, b;
-        for (var k=0; k < sliceSize; ++k)
-        {
-            y = image.getValueAtOffset(posY, frame);
-            cb = image.getValueAtOffset(posCB, frame);
-            cr = image.getValueAtOffset(posCR, frame);
-
-            r = y + 1.402 * (cr - 128);
-            g = y - 0.34414 * (cb - 128) - 0.71414 * (cr - 128);
-            b = y + 1.772 * (cb - 128);
-
-            array.data[index] = r;
-            array.data[index+1] = g;
-            array.data[index+2] = b;
-            array.data[index+3] = 0xff;
-            index += 4;
-
-            posY += stepPos;
-            posCB += stepPos;
-            posCR += stepPos;
-        }
+        dwv.image.generateImageYbrFull(
+            array,
+            image,
+            this.getCurrentPosition(),
+            frame);
         break;
 
     default:
