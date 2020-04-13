@@ -157,7 +157,7 @@ QUnit.test("Test generate data RGB.", function (assert) {
     view0.generateImageData(imageData);
     // check data content
     var theoData0 = [ 0, 0, 0, 255, 85, 85, 85, 255,
-                      171, 171, 171, 255, 255, 255, 255, 255 ];
+                      170, 170, 170, 255, 255, 255, 255, 255 ];
     var testContent0 = true;
     for ( i = 0; i < size0*size0*4; ++i) {
         if ( theoData0[i] !== imageData.data[i] ) {
