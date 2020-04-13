@@ -20,6 +20,11 @@ module.exports = function(grunt) {
         karma: {
             unit: {
                 configFile: 'karma.conf.js',
+                client: {
+                    qunit: {
+                        filter: grunt.option('filter')
+                    }
+                }
             },
             ci: {
                 configFile: 'karma.conf.js',
