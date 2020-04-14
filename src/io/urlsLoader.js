@@ -27,6 +27,17 @@ dwv.io.UrlsLoader = function ()
      * @type Array
      */
     var inputData = null;
+    
+
+    /**
+     * Array holding url objects.
+     */
+    var finalUrlArray = [];
+
+    /**
+     * Number of request to send in queue at a time.
+     */
+    var requestsInProcess = 5;
 
     /**
      * Array of launched requests.
@@ -269,30 +280,51 @@ dwv.io.UrlsLoader = function ()
             throw new Error("No loader found for url: "+dataElement);
         }
 
-        var getLoadHandler = function (loader, dataElement, i) {
-            return function (event) {
-                // check response status
-                // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
-                // status 200: "OK"; status 0: "debug"
-                var status = event.target.status;
-                if (status !== 200 && status !== 0) {
-                    self.onerror({
-                        source: dataElement,
-                        error: "GET " + event.target.responseURL +
-                            " " + event.target.status +
-                            " (" + event.target.statusText + ")",
-                        target: event.target
-                    });
-                    addLoadend();
-                } else {
-                    loader.load(event.target.response, dataElement, i);
-                }
-            };
-        };
+        
 
-        // loop on I/O elements
-        for (var i = 0; i < data.length; ++i) {
-            dataElement = data[i];
+        finalUrlArray = [];
+
+        // loop and form objects for urls array to keep track of requests.
+        for (var n = 0; n < data.length; ++n) {
+            finalUrlArray.push({ urlId: n, url: data[n], urlLoaded: false, urlResponded: false});
+        }
+
+        var queueRequest = requestsInProcess >= data.length ? data.length : requestsInProcess;
+
+        for (var p = 0; p < queueRequest; ++p) 
+        {
+            if(finalUrlArray[p] && !finalUrlArray[p].urlLoaded) {
+                finalUrlArray[p].urlLoaded = true;
+                queueLoad(finalUrlArray[p], mproghandler, loader, self, options);
+            }
+        }
+    }
+
+    /**
+     * Trigger next request in queue after ongoing request is completed.
+     */
+    function triggerNextReq(mproghandler, loader, self, options) {
+        if(finalUrlArray && finalUrlArray.length > 0) {
+            for (var i = 0; i < 1; ++i) 
+            {
+                if (!finalUrlArray[i].urlLoaded) {
+                    finalUrlArray[i].urlLoaded = true;
+                    queueLoad(finalUrlArray[i], mproghandler, loader, self, options);
+                }
+            }
+        }
+    }
+
+    /**
+     * Function to queue request.
+     * @param {*} urlObj : url Object.
+     * @param {*} mproghandler 
+     * @param {*} loader 
+     * @param {*} self 
+     * @param {*} options 
+     */
+    function queueLoad(urlObj, mproghandler, loader, self, options) {
+        var dataElement = urlObj.url;
 
             // check loader
             if (!loader.canLoadUrl(dataElement)) {
@@ -328,19 +360,48 @@ dwv.io.UrlsLoader = function ()
             // set request callbacks
             // request.onloadstart: nothing to do
             request.onprogress = augmentCallbackEvent(
-                mproghandler.getMonoProgressHandler(i, 0), dataElement);
-            request.onload = getLoadHandler(loader, dataElement, i);
+                mproghandler.getMonoProgressHandler(urlObj.urlId, 0), dataElement);
+            request.onload = getLoadHandler(loader, dataElement, urlObj.urlId);
             request.onloadend = addLoadend;
             request.onerror = augmentCallbackEvent(self.onerror, dataElement);
             request.onabort = augmentCallbackEvent(self.onabort, dataElement);
+
+            request.onloadend = function () {
+                urlObj.urlResponded = true;
+                if (finalUrlArray && finalUrlArray.length) {
+                    finalUrlArray = finalUrlArray.filter(function(data) { return data.urlLoaded && !data.urlResponded;});
+                    triggerNextReq(mproghandler, loader, self, options);
+                }
+            };
+
             // response type (default is 'text')
             if (loader.loadUrlAs() === dwv.io.urlContentTypes.ArrayBuffer) {
                 request.responseType = "arraybuffer";
             }
             // send request
             request.send(null);
-        }
     }
+
+    var getLoadHandler = function (loader, dataElement, i) {
+        return function (event) {
+            // check response status
+            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Response_codes
+            // status 200: "OK"; status 0: "debug"
+            var status = event.target.status;
+            if (status !== 200 && status !== 0) {
+                self.onerror({
+                    source: dataElement,
+                    error: "GET " + event.target.responseURL +
+                        " " + event.target.status +
+                        " (" + event.target.statusText + ")",
+                    target: event.target
+                });
+                addLoadend();
+            } else {
+                loader.load(event.target.response, dataElement, i);
+            }
+        };
+    };
 
     /**
      * Load a DICOMDIR.
