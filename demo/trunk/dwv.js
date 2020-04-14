@@ -1,4 +1,4 @@
-/*! dwv 0.28.0-beta 2020-04-14 22:36:42 */
+/*! dwv 0.28.0-beta 2020-04-14 22:43:02 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -12801,6 +12801,31 @@ dwv.image.Image.prototype.getRescaledValue = function( i, j, k, f )
 };
 
 /**
+ * Get a slice index iterator.
+ * @param {number} sliceIndex The index of the slice.
+ * @returns {Object} The slice iterator.
+ */
+dwv.image.Image.prototype.getSliceIterator = function (sliceIndex) {
+    var sliceSize = this.getGeometry().getSize().getSliceSize();
+    var start = sliceIndex * sliceSize;
+
+    var range = null;
+    if (this.getNumberOfComponents() === 1) {
+        range = dwv.image.range(start, start + sliceSize);
+    } else if (this.getNumberOfComponents() === 3) {
+        // 3 times bigger...
+        start *= 3;
+        sliceSize *= 3;
+        var isPlanar = this.getPlanarConfiguration() === 1;
+        range = dwv.image.range3d(start, start + sliceSize, 1, isPlanar);
+    } else {
+        throw new Error("Unsupported number of components: " + this.getNumberOfComponents());
+    }
+
+    return range;
+};
+
+/**
  * Calculate the data range of the image.
  * WARNING: for speed reasons, only calculated on the first frame...
  * @return {Object} The range {min, max}.
@@ -13424,6 +13449,94 @@ dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
     image.setMeta(meta);
 
     return image;
+};
+
+// namespaces
+var dwv = dwv || {};
+dwv.image = dwv.image || {};
+
+/**
+ * Get an iterator for a given range for a one component data.
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
+ * @param {number} start The start of the range (included).
+ * @param {number} end The end of the range (excluded).
+ * @param {number} increment The increment between indicies (default=1).
+ * @returns {Object} An iterator folowing the iterator and iterable protocol.
+ */
+dwv.image.range = function (start, end, increment) {
+    if (typeof increment === "undefined") {
+        increment = 1;
+    }
+    var nextIndex = start;
+    // result
+    return {
+        next: function() {
+            if (nextIndex < end) {
+                var result = {
+                    value: nextIndex,
+                    done: false
+                };
+                nextIndex += increment;
+                return result;
+            }
+            return {
+                done: true,
+                value: end
+            };
+        }
+    };
+};
+
+/**
+* Get an iterator for a given range for a 3 components data.
+* @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
+* @param {number} start The start of the range (included).
+* @param {number} end The end of the range (excluded).
+* @param {number} increment The increment between indicies (default=1).
+* @param {boolean} isPlanar A flag to know if the data is planar (RRRR...GGGG...BBBB...)
+*   or not (RGBRGBRGBRGB...), defaults to false.
+* @returns {Object} A 3 components iterator folowing the iterator and iterable protocol,
+*   with extra 'value1' and 'value2' for the second and third component.
+* @note (end - start) needs to be a multiple of 3...
+ */
+dwv.image.range3d = function (start, end, increment, isPlanar) {
+    if (typeof increment === "undefined") {
+        increment = 1;
+    }
+    if (typeof isPlanar === "undefined") {
+        isPlanar = false;
+    }
+    var nextIndex = start;
+    var componentIncrement = 1;
+    if (isPlanar) {
+        componentIncrement = (end - start) / 3;
+    } else {
+        increment *= 3;
+    }
+    var nextIndex1 = nextIndex + componentIncrement;
+    var nextIndex2 = nextIndex + 2 * componentIncrement;
+
+    // result
+    return {
+        next: function() {
+            if (nextIndex < end) {
+                var result = {
+                    value: nextIndex,
+                    value1: nextIndex1,
+                    value2: nextIndex2,
+                    done: false
+                };
+                nextIndex += increment;
+                nextIndex1 += increment;
+                nextIndex2 += increment;
+                return result;
+            }
+            return {
+                done: true,
+                value: end
+            };
+        }
+    };
 };
 
 // namespaces
@@ -14582,21 +14695,22 @@ dwv.image.generateImageDataMonochrome = function (
     array, image, position, frame,
     windowLut, colourMap) {
 
-    var sliceSize = image.getGeometry().getSize().getSliceSize();
-    var startOffset = sliceSize * position.k;
+    var sliceRange = image.getSliceIterator(position.k);
 
     var index = 0;
     var pxValue = 0;
-    var iMax = startOffset + sliceSize;
-    for (var i = startOffset; i < iMax; ++i) {
+    var ival = sliceRange.next();
+    while (!ival.done) {
         // pixel value
-        pxValue = windowLut.getValue(image.getValueAtOffset(i, frame));
-        // store
+        pxValue = windowLut.getValue(image.getValueAtOffset(ival.value, frame));
+        // store data
         array.data[index] = colourMap.red[pxValue];
         array.data[index + 1] = colourMap.green[pxValue];
         array.data[index + 2] = colourMap.blue[pxValue];
         array.data[index + 3] = 0xff;
+        // increment
         index += 4;
+        ival = sliceRange.next();
     }
 };
 
@@ -14616,8 +14730,7 @@ dwv.image.generateImageDataPaletteColor = function (
     array, image, position, frame,
     colourMap) {
 
-    var sliceSize = image.getGeometry().getSize().getSliceSize();
-    var startOffset = sliceSize * position.k;
+    var sliceRange = image.getSliceIterator(position.k);
 
     var to8 = function (value) {
         return value >> 8;
@@ -14629,11 +14742,11 @@ dwv.image.generateImageDataPaletteColor = function (
 
     var index = 0;
     var pxValue = 0;
-    var iMax = startOffset + sliceSize;
-    for (var i = startOffset; i < iMax; ++i) {
+    var ival = sliceRange.next();
+    while (!ival.done) {
         // pixel value
-        pxValue = image.getValueAtOffset(i, frame);
-        // store
+        pxValue = image.getValueAtOffset(ival.value, frame);
+        // store data
         // TODO check pxValue fits in lut
         if (image.getMeta().BitsStored === 16) {
             array.data[index] = to8(colourMap.red[pxValue]);
@@ -14645,7 +14758,9 @@ dwv.image.generateImageDataPaletteColor = function (
             array.data[index + 2] = colourMap.blue[pxValue];
         }
         array.data[index + 3] = 0xff;
+        // increment
         index += 4;
+        ival = sliceRange.next();
     }
 };
 
@@ -14663,41 +14778,19 @@ dwv.image = dwv.image || {};
 dwv.image.generateImageDataRgb = function (
     array, image, position, frame) {
 
-    var sliceSize = image.getGeometry().getSize().getSliceSize();
-    var startOffset = sliceSize * position.k;
-
-    // 3 times bigger...
-    startOffset *= 3;
-
-    // the planar configuration defines the memory layout
-    var planarConfig = image.getPlanarConfiguration();
-    if (planarConfig !== 0 && planarConfig !== 1) {
-        throw new Error("Unsupported planar configuration: " + planarConfig);
-    }
-    // default: RGBRGBRGBRGB...
-    var posR = startOffset;
-    var posG = startOffset + 1;
-    var posB = startOffset + 2;
-    var stepPos = 3;
-    // RRRR...GGGG...BBBB...
-    if (planarConfig === 1) {
-        posR = startOffset;
-        posG = startOffset + sliceSize;
-        posB = startOffset + 2 * sliceSize;
-        stepPos = 1;
-    }
+    var sliceRange = image.getSliceIterator(position.k);
 
     var index = 0;
-    for (var i = 0; i < sliceSize; ++i) {
-        array.data[index] = image.getValueAtOffset(posR, frame);
-        array.data[index + 1] = image.getValueAtOffset(posG, frame);
-        array.data[index + 2] = image.getValueAtOffset(posB, frame);
+    var ival = sliceRange.next();
+    while (!ival.done) {
+        // store data
+        array.data[index] = image.getValueAtOffset(ival.value, frame);
+        array.data[index + 1] = image.getValueAtOffset(ival.value1, frame);
+        array.data[index + 2] = image.getValueAtOffset(ival.value2, frame);
         array.data[index + 3] = 0xff;
+        // increment
         index += 4;
-
-        posR += stepPos;
-        posG += stepPos;
-        posB += stepPos;
+        ival = sliceRange.next();
     }
 };
 
@@ -14715,38 +14808,18 @@ dwv.image = dwv.image || {};
 dwv.image.generateImageDataYbrFull = function (
     array, image, position, frame) {
 
-    var sliceSize = image.getGeometry().getSize().getSliceSize();
-    var startOffset = sliceSize * position.k;
-
-    // 3 times bigger...
-    startOffset *= 3;
-
-    // the planar configuration defines the memory layout
-    var planarConfig = image.getPlanarConfiguration();
-    if (planarConfig !== 0 && planarConfig !== 1) {
-        throw new Error("Unsupported planar configuration: " + planarConfig);
-    }
-    // default: YBRYBRYBR...
-    var posY = startOffset;
-    var posCB = startOffset + 1;
-    var posCR = startOffset + 2;
-    var stepPos = 3;
-    // YYYY...BBBB...RRRR...
-    if (planarConfig === 1) {
-        posY = startOffset;
-        posCB = startOffset + sliceSize;
-        posCR = startOffset + 2 * sliceSize;
-        stepPos = 1;
-    }
+    var sliceRange = image.getSliceIterator(position.k);
 
     var index = 0;
     var y, cb, cr;
     var r, g, b;
-    for (var i = 0; i < sliceSize; ++i) {
-        y = image.getValueAtOffset(posY, frame);
-        cb = image.getValueAtOffset(posCB, frame);
-        cr = image.getValueAtOffset(posCR, frame);
-
+    var ival = sliceRange.next();
+    while (!ival.done) {
+        // pixel values
+        y = image.getValueAtOffset(ival.value, frame);
+        cb = image.getValueAtOffset(ival.value1, frame);
+        cr = image.getValueAtOffset(ival.value2, frame);
+        // convert to rgb
         // theory:
         // http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.7.html#sect_C.7.6.3.1.2
         // reverse equation:
@@ -14754,16 +14827,14 @@ dwv.image.generateImageDataYbrFull = function (
         r = y + 1.402 * (cr - 128);
         g = y - 0.34414 * (cb - 128) - 0.71414 * (cr - 128);
         b = y + 1.772 * (cb - 128);
-
+        // store data
         array.data[index] = r;
         array.data[index + 1] = g;
         array.data[index + 2] = b;
         array.data[index + 3] = 0xff;
+        // increment
         index += 4;
-
-        posY += stepPos;
-        posCB += stepPos;
-        posCR += stepPos;
+        ival = sliceRange.next();
     }
 };
 
