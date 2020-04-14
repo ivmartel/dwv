@@ -12,38 +12,18 @@ dwv.image = dwv.image || {};
 dwv.image.generateImageDataYbrFull = function (
     array, image, position, frame) {
 
-    var sliceSize = image.getGeometry().getSize().getSliceSize();
-    var startOffset = sliceSize * position.k;
-
-    // 3 times bigger...
-    startOffset *= 3;
-
-    // the planar configuration defines the memory layout
-    var planarConfig = image.getPlanarConfiguration();
-    if (planarConfig !== 0 && planarConfig !== 1) {
-        throw new Error("Unsupported planar configuration: " + planarConfig);
-    }
-    // default: YBRYBRYBR...
-    var posY = startOffset;
-    var posCB = startOffset + 1;
-    var posCR = startOffset + 2;
-    var stepPos = 3;
-    // YYYY...BBBB...RRRR...
-    if (planarConfig === 1) {
-        posY = startOffset;
-        posCB = startOffset + sliceSize;
-        posCR = startOffset + 2 * sliceSize;
-        stepPos = 1;
-    }
+    var sliceRange = image.getSliceIterator(position.k);
 
     var index = 0;
     var y, cb, cr;
     var r, g, b;
-    for (var i = 0; i < sliceSize; ++i) {
-        y = image.getValueAtOffset(posY, frame);
-        cb = image.getValueAtOffset(posCB, frame);
-        cr = image.getValueAtOffset(posCR, frame);
-
+    var ival = sliceRange.next();
+    while (!ival.done) {
+        // pixel values
+        y = image.getValueAtOffset(ival.value, frame);
+        cb = image.getValueAtOffset(ival.value1, frame);
+        cr = image.getValueAtOffset(ival.value2, frame);
+        // convert to rgb
         // theory:
         // http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.7.html#sect_C.7.6.3.1.2
         // reverse equation:
@@ -51,15 +31,13 @@ dwv.image.generateImageDataYbrFull = function (
         r = y + 1.402 * (cr - 128);
         g = y - 0.34414 * (cb - 128) - 0.71414 * (cr - 128);
         b = y + 1.772 * (cb - 128);
-
+        // store data
         array.data[index] = r;
         array.data[index + 1] = g;
         array.data[index + 2] = b;
         array.data[index + 3] = 0xff;
+        // increment
         index += 4;
-
-        posY += stepPos;
-        posCB += stepPos;
-        posCR += stepPos;
+        ival = sliceRange.next();
     }
 };

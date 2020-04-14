@@ -404,6 +404,31 @@ dwv.image.Image.prototype.getRescaledValue = function( i, j, k, f )
 };
 
 /**
+ * Get a slice index iterator.
+ * @param {number} sliceIndex The index of the slice.
+ * @returns {Object} The slice iterator.
+ */
+dwv.image.Image.prototype.getSliceIterator = function (sliceIndex) {
+    var sliceSize = this.getGeometry().getSize().getSliceSize();
+    var start = sliceIndex * sliceSize;
+
+    var range = null;
+    if (this.getNumberOfComponents() === 1) {
+        range = dwv.image.range(start, start + sliceSize);
+    } else if (this.getNumberOfComponents() === 3) {
+        // 3 times bigger...
+        start *= 3;
+        sliceSize *= 3;
+        var isPlanar = this.getPlanarConfiguration() === 1;
+        range = dwv.image.range3d(start, start + sliceSize, 1, isPlanar);
+    } else {
+        throw new Error("Unsupported number of components: " + this.getNumberOfComponents());
+    }
+
+    return range;
+};
+
+/**
  * Calculate the data range of the image.
  * WARNING: for speed reasons, only calculated on the first frame...
  * @return {Object} The range {min, max}.

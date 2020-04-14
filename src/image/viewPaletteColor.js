@@ -14,8 +14,7 @@ dwv.image.generateImageDataPaletteColor = function (
     array, image, position, frame,
     colourMap) {
 
-    var sliceSize = image.getGeometry().getSize().getSliceSize();
-    var startOffset = sliceSize * position.k;
+    var sliceRange = image.getSliceIterator(position.k);
 
     var to8 = function (value) {
         return value >> 8;
@@ -27,11 +26,11 @@ dwv.image.generateImageDataPaletteColor = function (
 
     var index = 0;
     var pxValue = 0;
-    var iMax = startOffset + sliceSize;
-    for (var i = startOffset; i < iMax; ++i) {
+    var ival = sliceRange.next();
+    while (!ival.done) {
         // pixel value
-        pxValue = image.getValueAtOffset(i, frame);
-        // store
+        pxValue = image.getValueAtOffset(ival.value, frame);
+        // store data
         // TODO check pxValue fits in lut
         if (image.getMeta().BitsStored === 16) {
             array.data[index] = to8(colourMap.red[pxValue]);
@@ -43,6 +42,8 @@ dwv.image.generateImageDataPaletteColor = function (
             array.data[index + 2] = colourMap.blue[pxValue];
         }
         array.data[index + 3] = 0xff;
+        // increment
         index += 4;
+        ival = sliceRange.next();
     }
 };
