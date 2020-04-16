@@ -575,12 +575,9 @@ dwv.tool.Draw = function (app)
             // remove trash
             trash.remove();
             // delete case
-            var offset = dwv.html.getEventOffset( event.evt )[0];
-            var eventPos = getRealPosition( offset );
-            var trashHalfWidth = trash.width() * trash.scaleX() / 2;
-            var trashHalfHeight = trash.height() * trash.scaleY() / 2;
-            if ( Math.abs( eventPos.x - trash.x() ) < trashHalfWidth &&
-                    Math.abs( eventPos.y - trash.y() ) < trashHalfHeight   ) {
+            // the color of stroke is red, it means can delete it
+            var stroke = shapeGroup.getChildren( dwv.draw.canNodeChangeColour )[0].attrs.stroke;
+            if (  stroke == 'red' ) {
                 // compensate for the drag translation
                 this.x( dragStartPos.x );
                 this.y( dragStartPos.y );
