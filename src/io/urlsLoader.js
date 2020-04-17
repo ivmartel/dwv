@@ -46,6 +46,8 @@ dwv.io.UrlsLoader = function ()
      */
     var requests = [];
 
+    var flagRequest = true;
+
     /**
      * Data loader.
      * @private
@@ -81,6 +83,21 @@ dwv.io.UrlsLoader = function ()
     this.getDefaultCharacterSet = function () {
         return defaultCharacterSet;
     };
+
+    /**
+     * Get the request status.
+     * @return {Boolean} The request status.
+     */
+    function getRequestStatus() {
+        return flagRequest;
+    }
+
+    /**
+     * Set the request status.
+     */
+    function setRequestStatus(status) {
+        flagRequest = status;
+    }
 
     /**
      * Set the default character set.
@@ -293,7 +310,7 @@ dwv.io.UrlsLoader = function ()
 
         for (var p = 0; p < queueRequest; ++p) 
         {
-            if(finalUrlArray[p] && !finalUrlArray[p].urlLoaded) {
+            if(finalUrlArray[p] && !finalUrlArray[p].urlLoaded && getRequestStatus()) {
                 finalUrlArray[p].urlLoaded = true;
                 queueLoad(finalUrlArray[p], mproghandler, loader, self, options);
             }
@@ -307,7 +324,7 @@ dwv.io.UrlsLoader = function ()
         if(finalUrlArray && finalUrlArray.length > 0) {
             for (var i = 0; i < 1; ++i) 
             {
-                if (!finalUrlArray[i].urlLoaded) {
+                if (!finalUrlArray[i].urlLoaded && getRequestStatus()) {
                     finalUrlArray[i].urlLoaded = true;
                     queueLoad(finalUrlArray[i], mproghandler, loader, self, options);
                 }
@@ -460,6 +477,7 @@ dwv.io.UrlsLoader = function ()
      */
     this.abort = function () {
         // abort requests
+        setRequestStatus(false);
         for ( var i = 0; i < requests.length; ++i ) {
             // 0: UNSENT, 1: OPENED, 2: HEADERS_RECEIVED (send()), 3: LOADING, 4: DONE
             if ( requests[i].readyState !== 4 ) {
