@@ -682,6 +682,15 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
              !icUIDTag.equals2(element.tag) &&
              !ivnTag.equals2(element.tag) ) {
             localSize = 0;
+
+            // XB7 2020-04-17
+            // Check if UN can be converted to correct VR.
+            // This check is now done here, rather than at the end of this function, 
+            // because it must be done BEFORE calculating totalSize,
+            // otherwise there may be extra null bytes at the end of the file 
+            // (dcmdump may crash because of these bytes)
+            checkUnknownVR(element);
+
             // tag group name
             groupName = dwv.dicom.TagGroups[element.tag.group.substr(1)]; // remove first 0
 
@@ -755,12 +764,10 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     offset = metaWriter.writeDataElement(fmigl, offset, false);
     // write meta
     for ( var j = 0, lenj = metaElements.length; j < lenj; ++j ) {
-        dwv.dicom.checkUnkwownVR(metaElements[j]);
         offset = metaWriter.writeDataElement(metaElements[j], offset, false);
     }
     // write non meta
     for ( var k = 0, lenk = rawElements.length; k < lenk; ++k ) {
-        dwv.dicom.checkUnkwownVR(rawElements[k]);
         offset = dataWriter.writeDataElement(rawElements[k], offset, isImplicit);
     }
 
@@ -771,7 +778,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
 /**
  * Fix for broken DICOM elements: Replace "UN" with correct VR if the element exists in dictionary 
  */
-dwv.dicom.checkUnkwownVR = function (element)
+dwv.dicom.checkUnknownVR = function (element)
 {
     var dict = dwv.dicom.dictionary;
     if (element.vr == "UN") {
