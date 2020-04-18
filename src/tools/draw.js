@@ -570,7 +570,7 @@ dwv.tool.Draw = function (app)
             drawLayer.draw();
         });
         // drag end event handling
-        shapeGroup.on('dragend.draw', function (event) {
+        shapeGroup.on('dragend.draw', function () {
             var pos = {'x': this.x(), 'y': this.y()};
             // remove trash
             trash.remove();
