@@ -301,6 +301,14 @@ dwv.io.UrlsLoader = function ()
 
         // store last run request index
         var lastRunRequestIndex = 0;
+        var requestOnLoadEnd = function() {
+            addLoadend();
+            // launch next in queue
+            if (lastRunRequestIndex < requests.length - 1 && !aborting) {
+                ++lastRunRequestIndex;
+                requests[lastRunRequestIndex].send(null);
+            }
+        };
 
         // loop on I/O elements
         for (var i = 0; i < data.length; ++i) {
@@ -341,14 +349,7 @@ dwv.io.UrlsLoader = function ()
             request.onprogress = augmentCallbackEvent(
                 mproghandler.getMonoProgressHandler(i, 0), dataElement);
             request.onload = getLoadHandler(loader, dataElement, i);
-            request.onloadend = function() {
-                addLoadend();
-                // launch next in queue
-                if (lastRunRequestIndex < requests.length - 1 && !aborting) {
-                    ++lastRunRequestIndex;
-                    requests[lastRunRequestIndex].send(null);
-                }
-            };
+            request.onloadend = requestOnLoadEnd;
             request.onerror = augmentCallbackEvent(self.onerror, dataElement);
             request.onabort = augmentCallbackEvent(self.onabort, dataElement);
             // response type (default is 'text')
@@ -368,9 +369,9 @@ dwv.io.UrlsLoader = function ()
                 batchSize = Math.min(options.batchSize, requests.length);
             }
         }
-        for (var j = 0; j < batchSize; ++j) {
+        for (var r = 0; r < batchSize; ++r) {
             if (!aborting) {
-                lastRunRequestIndex = j;
+                lastRunRequestIndex = r;
                 requests[lastRunRequestIndex].send(null);
             }
         }
