@@ -222,7 +222,10 @@ dwv.io.UrlsLoader = function ()
     /**
      * Load a list of urls.
      * @param {Array} data The list of urls to load.
-     * @param {Object} options Load options.
+     * @param {Object} options The options object, can contain:
+     *  - requestHeaders: an array of {name, value} to use as request headers
+     *  - withCredentials: boolean xhr.withCredentials flag to pass to the request
+     *  - batchSize: the size of the request url batch
      * @private
      */
     function loadUrls(data, options) {
@@ -339,6 +342,7 @@ dwv.io.UrlsLoader = function ()
                     }
                 }
                 // optional withCredentials
+                // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
                 if (typeof options.withCredentials !== "undefined") {
                     request.withCredentials = options.withCredentials;
                 }
