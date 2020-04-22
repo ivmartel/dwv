@@ -418,8 +418,10 @@ dwv.App = function ()
     /**
      * Load a list of URLs. Can be image files or a state file.
      * @param {Array} urls The list of urls to load.
-     * @param {Array} requestHeaders An array of {name, value} to use as request headers.
-     * @param {boolean} withCredentials Credentials flag to pass to the request.
+     * @param {Object} options The options object, can contain:
+     *  - requestHeaders: an array of {name, value} to use as request headers
+     *  - withCredentials: boolean xhr.withCredentials flag to pass to the request
+     *  - batchSize: the size of the request url batch
      * @fires dwv.App#load-start
      * @fires dwv.App#load-progress
      * @fires dwv.App#load-item
@@ -427,12 +429,7 @@ dwv.App = function ()
      * @fires dwv.App#load-error
      * @fires dwv.App#load-abort
      */
-    this.loadURLs = function (urls, requestHeaders, withCredentials) {
-        // load options
-        var options = {
-          'requestHeaders': requestHeaders,
-          'withCredentials': withCredentials
-        };
+    this.loadURLs = function (urls, options) {
         loadController.loadURLs(urls, options);
     };
 
