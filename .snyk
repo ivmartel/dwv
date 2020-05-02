@@ -1,0 +1,48 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.14.1
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  SNYK-JS-LODASH-567746:
+    - grunt-contrib-watch > lodash:
+        patched: '2020-05-02T00:35:43.663Z'
+    - grunt-karma > lodash:
+        patched: '2020-05-02T00:35:43.663Z'
+    - karma > lodash:
+        patched: '2020-05-02T00:35:43.663Z'
+    - grunt > grunt-legacy-log > lodash:
+        patched: '2020-05-02T00:35:43.663Z'
+    - grunt > grunt-legacy-util > lodash:
+        patched: '2020-05-02T00:35:43.663Z'
+    - grunt-contrib-jshint > jshint > lodash:
+        patched: '2020-05-02T00:35:43.663Z'
+    - grunt-contrib-watch > async > lodash:
+        patched: '2020-05-02T00:35:43.663Z'
+    - grunt > grunt-legacy-log > grunt-legacy-log-utils > lodash:
+        patched: '2020-05-02T00:35:43.663Z'
+    - http-server > portfinder > async > lodash:
+        patched: '2020-05-02T00:35:43.663Z'
+    - grunt-contrib-watch > gaze > globule > lodash:
+        patched: '2020-05-02T00:35:43.663Z'
+    - grunt-jsdoc > jsdoc > catharsis > lodash:
+        patched: '2020-05-02T00:35:43.663Z'
+    - grunt-jsdoc > jsdoc > requizzle > lodash:
+        patched: '2020-05-02T00:35:43.663Z'
+    - karma > log4js > streamroller > lodash:
+        patched: '2020-05-02T00:35:43.663Z'
+    - karma-coverage > istanbul-lib-instrument > @babel/core > lodash:
+        patched: '2020-05-02T00:35:43.663Z'
+    - karma > log4js > streamroller > async > lodash:
+        patched: '2020-05-02T00:35:43.663Z'
+    - karma-coverage > istanbul-lib-instrument > @babel/core > @babel/helper-module-transforms > lodash:
+        patched: '2020-05-02T00:35:43.663Z'
+    - karma-coverage > istanbul-lib-instrument > @babel/core > @babel/helpers > @babel/traverse > lodash:
+        patched: '2020-05-02T00:35:43.663Z'
+    - karma-coverage > istanbul-lib-instrument > @babel/core > @babel/helper-module-transforms > @babel/helper-replace-supers > @babel/traverse > lodash:
+        patched: '2020-05-02T00:35:43.663Z'
+    - karma-coverage > istanbul-lib-instrument > @babel/core > @babel/helper-module-transforms > @babel/helper-replace-supers > @babel/traverse > @babel/generator > lodash:
+        patched: '2020-05-02T00:35:43.663Z'
+    - karma-coverage > istanbul-lib-instrument > @babel/core > @babel/helper-module-transforms > @babel/helper-replace-supers > @babel/traverse > @babel/helper-function-name > @babel/types > lodash:
+        patched: '2020-05-02T00:35:43.663Z'
+    - karma-coverage > istanbul-lib-instrument > @babel/core > @babel/helper-module-transforms > @babel/helper-replace-supers > @babel/traverse > @babel/helper-function-name > @babel/template > @babel/types > lodash:
+        patched: '2020-05-02T00:35:43.663Z'
