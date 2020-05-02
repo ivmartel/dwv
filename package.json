@@ -21,7 +21,8 @@
     "i18next-xhr-backend": "~3.2.2",
     "jszip": "~3.3.0",
     "konva": "~4.2.2",
-    "magic-wand-js": "~1.0.0"
+    "magic-wand-js": "~1.0.0",
+    "snyk": "^1.316.2"
   },
   "devDependencies": {
     "docdash": "~1.2.0",
@@ -48,6 +49,9 @@
     "test-ci": "grunt test-ci",
     "build": "grunt build",
     "doc": "grunt doc",
-    "dev": "grunt dev"
-  }
+    "dev": "grunt dev",
+    "snyk-protect": "snyk protect",
+    "prepare": "yarn run snyk-protect"
+  },
+  "snyk": true
 }
