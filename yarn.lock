@@ -2187,10 +2187,10 @@ karma-coverage@^2.0.2:
     istanbul-reports "^3.0.0"
     minimatch "^3.0.4"
 
-karma-qunit@~4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/karma-qunit/-/karma-qunit-4.0.0.tgz#de7a2daa4fc021db5a0293f9acc8af8f8493f925"
-  integrity sha512-sGuMyTMbiA2zq/aV43uduwf58mMiMDiG6YH3dvaarQnwFLmyRD1i8356TndX8lFeVSOtykowtBtpcdGxyuezTA==
+karma-qunit@~4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/karma-qunit/-/karma-qunit-4.1.1.tgz#b097e90bf8ed1e65688ac6903f8ade239ff82d76"
+  integrity sha512-sl4rSTGK1fXWyXdNu8ySQvsf77OuJ1gQg9gbHIj0V05h4FvcNogpirO7R4ijU4L7ioXk8WupvSJZHE7QI9B7uQ==
 
 karma@~4.4.1:
   version "4.4.1"
