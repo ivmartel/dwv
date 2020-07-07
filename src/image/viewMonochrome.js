@@ -13,23 +13,25 @@ dwv.image = dwv.image || {};
  */
 dwv.image.generateImageDataMonochrome = function (
     array, image, position, frame,
-    windowLut, colourMap) {
+    windowLut, colourMap , frameIndex) {
 
     var sliceRange = image.getSliceIterator(position.k);
+    var imageBuffer = image.getSlice(frameIndex, position.k);
+    var arrayBuffer = new Uint32Array(array.data.buffer);
 
     var index = 0;
     var pxValue = 0;
     var ival = sliceRange.next();
     while (!ival.done) {
         // pixel value
-        pxValue = windowLut.getValue(image.getValueAtOffset(ival.value, frame));
+        pxValue = windowLut.getValue(imageBuffer[index]);
         // store data
-        array.data[index] = colourMap.red[pxValue];
-        array.data[index + 1] = colourMap.green[pxValue];
-        array.data[index + 2] = colourMap.blue[pxValue];
-        array.data[index + 3] = 0xff;
+        arrayBuffer[index] = 0xff000000 |
+            (colourMap.blue[pxValue] << 16) |
+            (colourMap.green[pxValue] << 8) |
+            colourMap.red[pxValue];
         // increment
-        index += 4;
+        index += 1;
         ival = sliceRange.next();
     }
 };

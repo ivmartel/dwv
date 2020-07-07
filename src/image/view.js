@@ -369,7 +369,7 @@ dwv.image.View = function (image)
     this.append = function( rhs )
     {
        // append images
-       var newSliceNumber = this.getImage().appendSlice( rhs.getImage() );
+       var newSliceNumber = this.getImage().appendSlice( rhs.getImage(), 0 );
        // update position if a slice was appended before
        if ( newSliceNumber <= this.getCurrentPosition().k ) {
            this.setCurrentPosition(
@@ -587,6 +587,9 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
 dwv.image.View.prototype.generateImageData = function (array) {
     var frame = (this.getCurrentFrame()) ? this.getCurrentFrame() : 0;
     var image = this.getImage();
+    var frameIndex = (this.getCurrentFrame()) ? this.getCurrentFrame() : 0;
+
+        
     var photoInterpretation = image.getPhotometricInterpretation();
     switch (photoInterpretation)
     {
@@ -598,7 +601,8 @@ dwv.image.View.prototype.generateImageData = function (array) {
             this.getCurrentPosition(),
             frame,
             this.getCurrentWindowLut(),
-            this.getColourMap());
+            this.getColourMap(),
+            frameIndex);
         break;
 
     case "PALETTE COLOR":
@@ -616,11 +620,12 @@ dwv.image.View.prototype.generateImageData = function (array) {
             image,
             this.getCurrentPosition(),
             frame,
-            this.getCurrentWindowLut());
+            this.getCurrentWindowLut(),
+            frameIndex);
         break;
 
     case "YBR_FULL":
-        dwv.image.generateImageYbrFull(
+        dwv.image.generateImageDataYbrFull(
             array,
             image,
             this.getCurrentPosition(),

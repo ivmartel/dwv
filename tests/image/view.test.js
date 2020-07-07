@@ -20,7 +20,7 @@ QUnit.test("Test listeners.", function (assert) {
     for(var i=0; i<size0*size0; ++i) {
         buffer0[i] = i;
     }
-    var image0 = new dwv.image.Image(imgGeometry0, [buffer0]);
+    var image0 = new dwv.image.Image(imgGeometry0, [[buffer0]]);
     image0.setMeta( { BitsStored: 8 } );
     // create a view
     var view0 = new dwv.image.View(image0);
@@ -59,7 +59,7 @@ QUnit.test("Test playback milliseconds.", function (assert) {
     for (var i = 0; i < size0 * size0; ++i) {
         buffer0[i] = i;
     }
-    var image0 = new dwv.image.Image(imgGeometry0, [buffer0]);
+    var image0 = new dwv.image.Image(imgGeometry0, [[buffer0]]);
     image0.setMeta({RecommendedDisplayFrameRate: 20});
 
     // create a view
@@ -97,7 +97,7 @@ QUnit.test("Test generate data MONO.", function (assert) {
     for ( var i = 0; i < size0 * size0; ++i ) {
         buffer0[i] = i;
     }
-    var image0 = new dwv.image.Image(imgGeometry0, [buffer0]);
+    var image0 = new dwv.image.Image(imgGeometry0, [[buffer0]]);
     image0.setMeta( { 'BitsStored': 8 } );
     // create a view
     var view0 = new dwv.image.View(image0);
@@ -143,7 +143,7 @@ QUnit.test("Test generate data RGB.", function (assert) {
         buffer0[index+2] = value;
         index += 3;
     }
-    var image0 = new dwv.image.Image(imgGeometry0, [buffer0]);
+    var image0 = new dwv.image.Image(imgGeometry0, [[buffer0]]);
     image0.setPhotometricInterpretation('RGB');
     image0.setMeta( { 'BitsStored': 8 } );
     // create a view
@@ -178,8 +178,88 @@ QUnit.test("Test generate data RGB.", function (assert) {
         buffer1[index+3] = 255;
         index += 4;
     }
-    var image1 = new dwv.image.Image(imgGeometry0, [buffer1]);
+    var image1 = new dwv.image.Image(imgGeometry0, [[buffer1]]);
     image1.setPhotometricInterpretation('RGB');
+    image1.setPlanarConfiguration(1);
+    image1.setMeta( { 'BitsStored': 8 } );
+    // create a view
+    var view1 = new dwv.image.View(image1);
+
+    // default window level
+    view1.setWindowLevel(127, 255);
+    // call generate data
+    view1.generateImageData(imageData);
+    // check data content
+    var testContent1 = true;
+    for ( i = 0; i < size0*size0*4; ++i) {
+        if ( theoData0[i] !== imageData.data[i] ) {
+            console.log(theoData0[i], imageData.data[i]);
+            testContent1 = false;
+            break;
+        }
+    }
+    assert.equal( testContent1, true, "check image data planar" );
+});
+
+/**
+ * Tests for {@link dwv.image.View} generateImageData YBR_FULL.
+ * @function module:tests/image~generateImageDataYbrFull
+ */
+QUnit.test("Test generate data YBR_FULL.", function (assert) {
+    // create an image
+    var size0 = 2;
+    var imgSize0 = new dwv.image.Size(size0, size0, 1);
+    var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+    var imgOrigin0 = new dwv.math.Point3D(0,0,0);
+    var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
+    var buffer0 = [];
+    var index = 0;
+    var value = 0;
+    // 0, 85, 170, 255
+    for ( var i = 0; i < size0 * size0; ++i ) {
+        value = i * 255 / ((size0 * size0) - 1);
+        buffer0[index] = value;
+        buffer0[index+1] = value;
+        buffer0[index+2] = value;
+        index += 3;
+    }
+    var image0 = new dwv.image.Image(imgGeometry0, [[buffer0]]);
+    image0.setPhotometricInterpretation('YBR_FULL');
+    image0.setMeta( { 'BitsStored': 8 } );
+    // create a view
+    var view0 = new dwv.image.View(image0);
+    // create the image data
+    var imageData = {'width': size0, 'height': size0, 'data': new Uint8ClampedArray(size0*size0*4) };
+
+    // default window level
+    view0.setWindowLevel(127, 255);
+    // call generate data
+    view0.generateImageData(imageData);
+    // check data content
+    var theoData0 = [ 0, 0, 0, 255, 85, 85, 85, 255,
+        170, 170, 170, 255, 255, 255, 255, 255 ];
+    var testContent0 = true;
+    for ( i = 0; i < size0*size0*4; ++i) {
+        if ( theoData0[i] !== imageData.data[i] ) {
+            console.log(theoData0[i], imageData.data[i]);
+            testContent0 = false;
+            break;
+        }
+    }
+    assert.equal( testContent0, true, "check image data non planar" );
+
+    var buffer1 = [];
+    index = 0;
+    // 0, 85, 170, 255
+    for ( i = 0; i < 3; ++i ) {
+        buffer1[index] = 0;
+        buffer1[index+1] = 85;
+        buffer1[index+2] = 170;
+        buffer1[index+3] = 255;
+        index += 4;
+    }
+    var image1 = new dwv.image.Image(imgGeometry0, [[buffer1]]);
+    image1.setPhotometricInterpretation('YBR_FULL');
     image1.setPlanarConfiguration(1);
     image1.setMeta( { 'BitsStored': 8 } );
     // create a view
@@ -216,7 +296,7 @@ QUnit.test("Test generate data timing.", function (assert) {
     for(var i=0; i<size0*size0; ++i) {
         buffer0[i] = i;
     }
-    var image0 = new dwv.image.Image(imgGeometry0, [buffer0]);
+    var image0 = new dwv.image.Image(imgGeometry0, [[buffer0]]);
     image0.setMeta( { BitsStored: 8 } );
     // create a view
     var view0 = new dwv.image.View(image0);
