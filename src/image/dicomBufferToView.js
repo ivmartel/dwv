@@ -63,12 +63,7 @@ dwv.image.DicomBufferToView = function ()
           return;
         }
 
-        var tmpBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
-        var pixelBuffer = [];
-        for(var frameIndex = 0; frameIndex < tmpBuffer.length; ++frameIndex){
-           pixelBuffer[frameIndex] = [];
-           pixelBuffer[frameIndex][0] = tmpBuffer[frameIndex];
-        }
+        var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
         var syntax = dwv.dicom.cleanString(dicomParser.getRawDicomElements().x00020010.value[0]);
         var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
         var needDecompression = (algoName !== null);
@@ -141,7 +136,7 @@ dwv.image.DicomBufferToView = function ()
                 });
                 // store data
                 var frameNb = event.index;
-                pixelBuffer[frameNb][0] = event.data[0];
+                pixelBuffer[frameNb] = event.data[0];
                 // create image for the first frame
                 // (the viewer displays the first element of the buffer)
                 if (frameNb === 0) {
@@ -164,7 +159,7 @@ dwv.image.DicomBufferToView = function ()
 
             // launch decode
             for (var f = 0; f < numberOfFrames; ++f) {
-                pixelDecoder.decode(pixelBuffer[f][0], pixelMeta, f);
+                pixelDecoder.decode(pixelBuffer[f], pixelMeta, f);
             }
         }
         // no decompression
