@@ -70,8 +70,8 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames, imageUids)
      * @private
      * @type Number
      */
-    var numberOfComponents = buffer[0][0].length / (
-        geometry.getSize().getSliceSize() );
+    var numberOfComponents = buffer[0].length / (
+        geometry.getSize().getTotalSize() );
     /**
      * Meta information.
      * @private
@@ -123,12 +123,7 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames, imageUids)
      * @todo dangerous...
      * @return {Array} The data buffer of the frame.
      */
-    this.getFrame = function (frame) {
-        if(buffer[frame]){
-            return buffer[frame][0];
-        }
-        return [];
-    };
+    this.getFrame = function (frame) { return buffer[frame]; };
 
     /**
      * Get the data buffer of the image.
