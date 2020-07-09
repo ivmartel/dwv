@@ -11,8 +11,7 @@ dwv.image = dwv.image || {};
  * @param {Object} colourMap The colour map.
  */
 dwv.image.generateImageDataPaletteColor = function (
-    array, image, position, frame,
-    colourMap) {
+    array, image, position, frame, colourMap) {
 
     var sliceRange = image.getSliceIterator(position.k);
 

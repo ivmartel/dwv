@@ -587,9 +587,7 @@ dwv.image.View.prototype.setWindowLevelMinMax = function()
 dwv.image.View.prototype.generateImageData = function (array) {
     var frame = (this.getCurrentFrame()) ? this.getCurrentFrame() : 0;
     var image = this.getImage();
-    var frameIndex = (this.getCurrentFrame()) ? this.getCurrentFrame() : 0;
 
-        
     var photoInterpretation = image.getPhotometricInterpretation();
     switch (photoInterpretation)
     {
@@ -601,8 +599,7 @@ dwv.image.View.prototype.generateImageData = function (array) {
             this.getCurrentPosition(),
             frame,
             this.getCurrentWindowLut(),
-            this.getColourMap(),
-            frameIndex);
+            this.getColourMap());
         break;
 
     case "PALETTE COLOR":
@@ -620,8 +617,7 @@ dwv.image.View.prototype.generateImageData = function (array) {
             image,
             this.getCurrentPosition(),
             frame,
-            this.getCurrentWindowLut(),
-            frameIndex);
+            this.getCurrentWindowLut());
         break;
 
     case "YBR_FULL":

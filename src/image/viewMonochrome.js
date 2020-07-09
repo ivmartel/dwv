@@ -13,10 +13,10 @@ dwv.image = dwv.image || {};
  */
 dwv.image.generateImageDataMonochrome = function (
     array, image, position, frame,
-    windowLut, colourMap , frameIndex) {
+    windowLut, colourMap ) {
 
     var sliceRange = image.getSliceIterator(position.k);
-    var imageBuffer = image.getSlice(frameIndex, position.k);
+    var imageBuffer = image.getSlice(frame, position.k);
     var arrayBuffer = new Uint32Array(array.data.buffer);
 
     var index = 0;
