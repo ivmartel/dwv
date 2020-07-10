@@ -13,7 +13,7 @@ dwv.image.generateImageDataRgb = function (
     array, image, position, frame) {
 
     var sliceRange = image.getSliceIterator(position.k);
-    var frameOrSliceIndex = (this.getCurrentFrame()) ? this.getCurrentFrame() : this.getCurrentPosition().k;
+    var frameOrSliceIndex = (frame) ? frame : position.k;
     var frameBuffer = image.getFrame(frameOrSliceIndex);
     var arrayBuffer = new Uint32Array(array.data.buffer);
 

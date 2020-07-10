@@ -244,6 +244,6 @@ QUnit.test("Test generate data timing.", function (assert) {
     view0.generateImageData(imageData);
     // time taken
     var time1 = (new Date()).getMilliseconds() - start1;
-    // check time taken
+    // check time image0
     assert.ok( time1 < 90, "Second generateImageData: "+time1+"ms.");
 });

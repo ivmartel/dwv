@@ -16,7 +16,7 @@ dwv.image.generateImageDataMonochrome = function (
     windowLut, colourMap) {
 
     var sliceRange = image.getSliceIterator(position.k);
-    var frameOrSliceIndex = (this.getCurrentFrame()) ? this.getCurrentFrame() : this.getCurrentPosition().k;
+    var frameOrSliceIndex = (frame) ? frame : position.k;
     var frameBuffer = image.getFrame(frameOrSliceIndex);
     var arrayBuffer = new Uint32Array(array.data.buffer);
 
