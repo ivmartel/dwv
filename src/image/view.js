@@ -369,7 +369,7 @@ dwv.image.View = function (image)
     this.append = function( rhs )
     {
        // append images
-       var newSliceNumber = this.getImage().appendSlice( rhs.getImage(), 0 );
+       var newSliceNumber = this.getImage().appendSlice( rhs.getImage() );
        // update position if a slice was appended before
        if ( newSliceNumber <= this.getCurrentPosition().k ) {
            this.setCurrentPosition(

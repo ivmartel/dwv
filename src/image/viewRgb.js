@@ -10,10 +10,11 @@ dwv.image = dwv.image || {};
  * @param {number} frame The frame number at witch to generate the view.
  */
 dwv.image.generateImageDataRgb = function (
-    array, image, position, frame, windowLut) {
+    array, image, position, frame) {
 
     var sliceRange = image.getSliceIterator(position.k);
-    var imageBuffer = image.getSlice(frame, position.k);
+    var frameOrSliceIndex = (this.getCurrentFrame()) ? this.getCurrentFrame() : this.getCurrentPosition().k;
+    var frameBuffer = image.getFrame(frameOrSliceIndex);
     var arrayBuffer = new Uint32Array(array.data.buffer);
 
     var index = 0;
@@ -21,9 +22,9 @@ dwv.image.generateImageDataRgb = function (
     while (!ival.done) {
         // store data
         arrayBuffer[index] = 0xff000000 |
-            (imageBuffer[ival.value2] << 16) |
-            (imageBuffer[ival.value1] << 8) |
-            imageBuffer[ival.value] ;
+            (frameBuffer[ival.value2] << 16) |
+            (frameBuffer[ival.value1] << 8) |
+            frameBuffer[ival.value] ;
 
         // increment
         index += 1;

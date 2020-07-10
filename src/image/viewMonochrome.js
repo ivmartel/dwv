@@ -13,10 +13,11 @@ dwv.image = dwv.image || {};
  */
 dwv.image.generateImageDataMonochrome = function (
     array, image, position, frame,
-    windowLut, colourMap ) {
+    windowLut, colourMap) {
 
     var sliceRange = image.getSliceIterator(position.k);
-    var imageBuffer = image.getSlice(frame, position.k);
+    var frameOrSliceIndex = (this.getCurrentFrame()) ? this.getCurrentFrame() : this.getCurrentPosition().k;
+    var frameBuffer = image.getFrame(frameOrSliceIndex);
     var arrayBuffer = new Uint32Array(array.data.buffer);
 
     var index = 0;
@@ -24,7 +25,7 @@ dwv.image.generateImageDataMonochrome = function (
     var ival = sliceRange.next();
     while (!ival.done) {
         // pixel value
-        pxValue = windowLut.getValue(imageBuffer[index]);
+        pxValue = windowLut.getValue(frameBuffer[index]);
         // store data
         arrayBuffer[index] = 0xff000000 |
             (colourMap.blue[pxValue] << 16) |
