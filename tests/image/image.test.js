@@ -261,7 +261,7 @@ QUnit.test("Test Image convolute2D.", function (assert) {
     var resImage0 = image0.convolute2D( weights0 );
     var testContent0 = true;
     for ( i = 0; i < size0*size0; ++i) {
-        if ( image0.getValueAtOffset(i,0,0) !== resImage0.getValueAtOffset(i,0,0) ) {
+        if ( image0.getValueAtOffset(i,0) !== resImage0.getValueAtOffset(i,0) ) {
             testContent0 = false;
             break;
         }
@@ -273,7 +273,7 @@ QUnit.test("Test Image convolute2D.", function (assert) {
     var theoResImage1 = [ 12, 18, 24, 30, 36, 42, 48, 54, 60 ];
     var testContent1 = true;
     for ( i = 0; i < size0*size0; ++i ) {
-        if ( theoResImage1[i] !== resImage1.getValueAtOffset(i,0,0) ) {
+        if ( theoResImage1[i] !== resImage1.getValueAtOffset(i,0) ) {
             testContent1 = false;
             break;
         }
@@ -311,7 +311,7 @@ QUnit.test("Test Image transform.", function (assert) {
     var theoResImage0 = [ 0, 0, 0, 3, 4, 5, 0, 0, 0 ];
     var testContent0 = true;
     for ( i = 0; i < size0*size0; ++i) {
-        if ( theoResImage0[i] !== resImage0.getValueAtOffset(i,0,0) ) {
+        if ( theoResImage0[i] !== resImage0.getValueAtOffset(i,0) ) {
             testContent0 = false;
             break;
         }
@@ -329,7 +329,7 @@ QUnit.test("Test Image transform.", function (assert) {
     var theoResImage1 = [ 0, 2, 4, 6, 8, 10, 12, 14, 16 ];
     var testContent1 = true;
     for ( i = 0; i < size0*size0; ++i) {
-        if ( theoResImage1[i] !== resImage1.getValueAtOffset(i,0,0) ) {
+        if ( theoResImage1[i] !== resImage1.getValueAtOffset(i,0) ) {
             testContent1 = false;
             break;
         }
@@ -367,7 +367,7 @@ QUnit.test("Test Image compose.", function (assert) {
     var theoResImage0 = [ 0, 2, 4, 6, 8, 10, 12, 14, 16 ];
     var testContent0 = true;
     for ( i = 0; i < size0*size0; ++i) {
-        if ( theoResImage0[i] !== resImage0.getValueAtOffset(i,0,0) ) {
+        if ( theoResImage0[i] !== resImage0.getValueAtOffset(i,0) ) {
             testContent0 = false;
             break;
         }
