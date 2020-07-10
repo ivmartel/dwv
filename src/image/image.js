@@ -126,12 +126,6 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames, imageUids)
     this.getFrame = function (frame) { return buffer[frame]; };
 
     /**
-     * Get the data buffer of the image.
-     * @return {Array} The data buffer of the slice.
-     */
-    this.getSlice = function (frame, slice) { return buffer[frame][slice]; };
-
-    /**
      * Get the rescale slope and intercept.
      * @param {Number} k The slice index.
      * @return {Object} The rescale slope and intercept.
