@@ -411,14 +411,13 @@ dwv.image.Image.prototype.getSliceIterator = function (sliceIndex) {
  */
 dwv.image.Image.prototype.calculateDataRange = function ()
 {
-    var size = this.getGeometry().getSize();
+    var size = this.getGeometry().getSize().getTotalSize();
     var sliceSize = 1;
-    var slices = size.getNumberOfSlices();
     var min = this.getValueAtOffset(0,0);
     var max = min;
     var value = 0;
-    for ( var sliceIndex = 0; sliceIndex < slices; ++sliceIndex ) {
-        for (var sliceOffset = 0; sliceOffset < sliceSize; ++sliceOffset) {
+    for ( var sliceIndex = 0; sliceIndex < sliceSize; ++sliceIndex ) {
+        for (var sliceOffset = 0; sliceOffset < size; ++sliceOffset) {
             value = this.getValueAtOffset(sliceOffset, sliceIndex);
             if (value > max) {
                 max = value;
