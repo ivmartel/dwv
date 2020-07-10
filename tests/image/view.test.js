@@ -113,6 +113,7 @@ QUnit.test("Test generate data MONO.", function (assert) {
                       255, 255, 255, 255, 255, 255, 255, 255 ];
     var testContent0 = true;
     for ( i = 0; i < size0*size0*4; ++i) {
+        console.log(theoData0[i] + ' ' + imageData.data[i]);
         if ( theoData0[i] !== imageData.data[i] ) {
             testContent0 = false;
             break;
@@ -244,6 +245,6 @@ QUnit.test("Test generate data timing.", function (assert) {
     view0.generateImageData(imageData);
     // time taken
     var time1 = (new Date()).getMilliseconds() - start1;
-    // check time image0
+    // check time taken
     assert.ok( time1 < 90, "Second generateImageData: "+time1+"ms.");
 });
