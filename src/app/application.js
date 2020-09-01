@@ -283,7 +283,7 @@ dwv.App = function ()
       // remove the height of other elements of the container div
       var kids = parent.children;
       for (var i = 0; i < kids.length; ++i) {
-        if (kids[i].className !== "layerContainer") {
+        if (!kids[i].classList.contains("layerContainer")) {
           var styles = window.getComputedStyle(kids[i]);
           // offsetHeight does not include margin
           var margin = parseFloat(styles.getPropertyValue('margin-top'), 10) +
