@@ -1,4 +1,4 @@
-/*! dwv 0.28.0-beta 2020-05-09 23:17:34 */
+/*! dwv 0.28.0-beta 2020-09-01 15:09:11 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -342,7 +342,7 @@ dwv.App = function ()
       // remove the height of other elements of the container div
       var kids = parent.children;
       for (var i = 0; i < kids.length; ++i) {
-        if (kids[i].className !== "layerContainer") {
+        if (!kids[i].classList.contains("layerContainer")) {
           var styles = window.getComputedStyle(kids[i]);
           // offsetHeight does not include margin
           var margin = parseFloat(styles.getPropertyValue('margin-top'), 10) +
