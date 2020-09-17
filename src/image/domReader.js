@@ -83,6 +83,8 @@ dwv.image.getViewFromDOMImage = function (image, origin)
     // image properties
     var info = [];
     if ( typeof image.origin === "string" ) {
+        info.push({ "name": "fileName", "value": "" });
+        info.push({ "name": "fileType", "value": "" });
         info.push({ "name": "origin", "value": image.origin });
     } else {
         info.push({ "name": "fileName", "value": image.origin.name });
