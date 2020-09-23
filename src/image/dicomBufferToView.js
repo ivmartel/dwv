@@ -144,18 +144,17 @@ dwv.image.DicomBufferToView = function ()
                 }
             };
 
-            // setup the decoder if not done already
-            if (!pixelDecoder){
-                pixelDecoder = new dwv.image.PixelBufferDecoder(
-                    algoName, numberOfFrames);
-                // callbacks
-                // pixelDecoder.ondecodestart: nothing to do
-                pixelDecoder.ondecodeditem = onDecodedFrame;
-                pixelDecoder.ondecoded = self.onload;
-                pixelDecoder.ondecodeend = self.onloadend;
-                pixelDecoder.onerror = self.onerror;
-                pixelDecoder.onabort = self.onabort;
-            }
+            // setup the decoder (one decoder per convert)
+            // TODO check if it is ok to create a worker pool per file...
+            pixelDecoder = new dwv.image.PixelBufferDecoder(
+                algoName, numberOfFrames);
+            // callbacks
+            // pixelDecoder.ondecodestart: nothing to do
+            pixelDecoder.ondecodeditem = onDecodedFrame;
+            pixelDecoder.ondecoded = self.onload;
+            pixelDecoder.ondecodeend = self.onloadend;
+            pixelDecoder.onerror = self.onerror;
+            pixelDecoder.onabort = self.onabort;
 
             // launch decode
             for (var f = 0; f < numberOfFrames; ++f) {
