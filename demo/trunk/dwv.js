@@ -1,4 +1,4 @@
-/*! dwv 0.28.0-beta 2020-09-01 15:09:11 */
+/*! dwv 0.28.0-beta 2020-09-23 22:16:43 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -11618,18 +11618,17 @@ dwv.image.DicomBufferToView = function ()
                 }
             };
 
-            // setup the decoder if not done already
-            if (!pixelDecoder){
-                pixelDecoder = new dwv.image.PixelBufferDecoder(
-                    algoName, numberOfFrames);
-                // callbacks
-                // pixelDecoder.ondecodestart: nothing to do
-                pixelDecoder.ondecodeditem = onDecodedFrame;
-                pixelDecoder.ondecoded = self.onload;
-                pixelDecoder.ondecodeend = self.onloadend;
-                pixelDecoder.onerror = self.onerror;
-                pixelDecoder.onabort = self.onabort;
-            }
+            // setup the decoder (one decoder per convert)
+            // TODO check if it is ok to create a worker pool per file...
+            pixelDecoder = new dwv.image.PixelBufferDecoder(
+                algoName, numberOfFrames);
+            // callbacks
+            // pixelDecoder.ondecodestart: nothing to do
+            pixelDecoder.ondecodeditem = onDecodedFrame;
+            pixelDecoder.ondecoded = self.onload;
+            pixelDecoder.ondecodeend = self.onloadend;
+            pixelDecoder.onerror = self.onerror;
+            pixelDecoder.onabort = self.onabort;
 
             // launch decode
             for (var f = 0; f < numberOfFrames; ++f) {
@@ -12462,12 +12461,22 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames, imageUids)
      * @type Number
      */
     var planarConfiguration = 0;
+
+    /**
+     * Check if the input element is not null.
+     * @param {Object} element The element to test.
+     * @returns True if the input is not null.
+     */
+    var isNotNull = function (element) {
+        return element !== null;
+    };
+
     /**
      * Number of components.
      * @private
      * @type Number
      */
-    var numberOfComponents = buffer[0].length / (
+    var numberOfComponents = buffer.find(isNotNull).length / (
         geometry.getSize().getTotalSize() );
     /**
      * Meta information.
@@ -16034,7 +16043,7 @@ dwv.io.MemoryLoader = function ()
         var foundLoader = false;
         for (var l = 0; l < loaders.length; ++l) {
             loader = loaders[l];
-            if (loader.canLoadFile({name: dataElement.filename})) {
+            if (loader.canLoadUrl(dataElement.filename)) {
                 foundLoader = true;
                 // load options
                 loader.setOptions({
@@ -23900,6 +23909,54 @@ dwv.env.check = function()
         // Use Float32Array instead... Not good
         // TODO Find better replacement!
         window.Float64Array = window.Float32Array;
+    }
+
+    // array Find
+    // https://tc39.github.io/ecma262/#sec-array.prototype.find
+    if (!Array.prototype.find) {
+        Object.defineProperty(Array.prototype, 'find', {
+            value: function(predicate) {
+                // 1. Let O be ? ToObject(this value).
+                if (this == null) {
+                    throw new TypeError('"this" is null or not defined');
+                }
+
+                var o = Object(this);
+
+                // 2. Let len be ? ToLength(? Get(O, "length")).
+                var len = o.length >>> 0;
+
+                // 3. If IsCallable(predicate) is false, throw a TypeError exception.
+                if (typeof predicate !== 'function') {
+                    throw new TypeError('predicate must be a function');
+                }
+
+                // 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
+                var thisArg = arguments[1];
+
+                // 5. Let k be 0.
+                var k = 0;
+
+                // 6. Repeat, while k < len
+                while (k < len) {
+                    // a. Let Pk be ! ToString(k).
+                    // b. Let kValue be ? Get(O, Pk).
+                    // c. Let testResult be ToBoolean(? Call(predicate, T, « kValue, k, O »)).
+                    // d. If testResult is true, return kValue.
+                    var kValue = o[k];
+                    if (predicate.call(thisArg, kValue, k, o)) {
+                        return kValue;
+                    }
+                    // e. Increase k by 1.
+                    k++;
+                }
+
+                // 7. Return undefined.
+                return undefined;
+            },
+            configurable: true,
+            writable: true
+        });
     }
 
     // check string startsWith
