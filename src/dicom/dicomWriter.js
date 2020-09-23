@@ -419,7 +419,7 @@ dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset,
         if ( vr === "UN" ) {
             byteOffset = this.writeUint8Array(byteOffset, value);
         } else if ( vr === "OB" ) {
-            byteOffset = this.writeInt8ArrayPadded(byteOffset, value);
+            byteOffset = this.writeInt8Array(byteOffset, value);
         } else if ( vr === "OW" ) {
             byteOffset = this.writeInt16Array(byteOffset, value);
         } else if ( vr === "OF" ) {
@@ -450,10 +450,8 @@ dwv.dicom.DataWriter.prototype.writeDataElementValue = function (vr, byteOffset,
                 var atValue = new Uint16Array([dec1, dec2]);
                 byteOffset = this.writeUint16Array(byteOffset, atValue);
             }
-        } else if ( vr === "UI") {
-            byteOffset = this.writeStringArrayPadded(byteOffset, value, "null");
         } else {
-            byteOffset = this.writeStringArrayPadded(byteOffset, value);
+            byteOffset = this.writeStringArray(byteOffset, value);
         }
     }
     // return new offset
