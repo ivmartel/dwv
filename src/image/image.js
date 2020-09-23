@@ -65,12 +65,22 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames, imageUids)
      * @type Number
      */
     var planarConfiguration = 0;
+
+    /**
+     * Check if the input element is not null.
+     * @param {Object} element The element to test.
+     * @returns True if the input is not null.
+     */
+    var isNotNull = function (element) {
+        return element !== null;
+    };
+
     /**
      * Number of components.
      * @private
      * @type Number
      */
-    var numberOfComponents = buffer[0].length / (
+    var numberOfComponents = buffer.find(isNotNull).length / (
         geometry.getSize().getTotalSize() );
     /**
      * Meta information.
