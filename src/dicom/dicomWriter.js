@@ -12,6 +12,73 @@ dwv.dicom.isEven = function (number) {
 };
 
 /**
+ * Is the input VR a non string VR.
+ * @param {String} vr The element VR.
+ * @retuns True if the VR is a non string one.
+ */
+dwv.dicom.isNonStringVr = function (vr) {
+    return  vr === "UN" || vr === "OB" || vr === "OW" ||
+        vr === "OF" || vr === "OD" || vr === "US" || vr === "SS" ||
+        vr === "UL" || vr === "SL" || vr === "FL" || vr === "FD" ||
+        vr === "SQ" || vr === "AT";
+};
+
+/**
+ * Is the input VR a string VR.
+ * @param {String} vr The element VR.
+ * @retuns True if the VR is a string one.
+ */
+dwv.dicom.isStringVr = function (vr) {
+    return !dwv.dicom.isNonStringVr(vr);
+};
+
+/**
+ * Is the input VR a VR that could need padding.
+ * @param {String} vr The element VR.
+ * @retuns True if the VR needs padding.
+ */
+dwv.dicom.isVrToPad = function (vr) {
+    return dwv.dicom.isStringVr(vr) || vr === "OB";
+};
+
+/**
+ * Get the VR specific padding value.
+ * @param {String} vr The element VR.
+ * @returns The value used to pad.
+ */
+dwv.dicom.getVrPad = function (vr) {
+    var pad = 0;
+    if (dwv.dicom.isStringVr(vr)) {
+        if (vr === "UI"){
+            pad = "\0";
+        } else {
+            pad = " ";
+        }
+    }
+    return pad;
+};
+
+/**
+ * Pad an input value according to its VR.
+ * see http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html
+ * @param {Object} element The DICOM element to get the VR from.
+ * @param {Object} value The value to pad.
+ / @returns The padded value.
+ */
+dwv.dicom.padElementValue = function (element, value) {
+    if (typeof value !== "undefined" && typeof value.length !== "undefined") {
+        if (dwv.dicom.isVrToPad(element.vr) && !dwv.dicom.isEven(value.length)) {
+            if (value instanceof Array) {
+                value[value.length - 1] += dwv.dicom.getVrPad(element.vr);
+            } else {
+                value += dwv.dicom.getVrPad(element.vr);
+            }
+        }
+    }
+    return value;
+};
+
+/**
  * Data writer.
  *
  * Example usage:
@@ -153,6 +220,7 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian)
         }
         return byteOffset;
     };
+
 };
 
 /**
@@ -177,22 +245,6 @@ dwv.dicom.DataWriter.prototype.writeUint8Array = function (byteOffset, array) {
 dwv.dicom.DataWriter.prototype.writeInt8Array = function (byteOffset, array) {
     for ( var i = 0, len = array.length; i < len; ++i ) {
         byteOffset = this.writeInt8(byteOffset, array[i]);
-    }
-    return byteOffset;
-};
-
-/**
- * Write Int8 array with padding for non even length data.
- * @param {Number} byteOffset The offset to start writing from.
- * @param {Array} array The array to write.
- * @returns {Number} The new offset position.
- */
-dwv.dicom.DataWriter.prototype.writeInt8ArrayPadded = function (byteOffset, array) {
-    var inputByteOffset = byteOffset;
-    byteOffset = this.writeInt8Array(byteOffset, array);
-    // append null if total length is not even
-    if (!dwv.dicom.isEven(byteOffset - inputByteOffset)) {
-        byteOffset = this.writeInt8(byteOffset, 0);
     }
     return byteOffset;
 };
@@ -289,28 +341,6 @@ dwv.dicom.DataWriter.prototype.writeStringArray = function (byteOffset, array) {
         }
         // value
         byteOffset = this.writeString(byteOffset, array[i].toString());
-    }
-    return byteOffset;
-};
-
-/**
- * Write string array with padding for non even length data.
- * @param {Number} byteOffset The offset to start writing from.
- * @param {Array} array The array to write.
- * @param {string} padType The padding type: default to space,
- *   'space' for space, 'null' for null.
- * @returns {Number} The new offset position.
- */
-dwv.dicom.DataWriter.prototype.writeStringArrayPadded = function (byteOffset, array, padType) {
-    var inputByteOffset = byteOffset;
-    byteOffset = this.writeStringArray(byteOffset, array);
-    // append space if total length is not even
-    if (!dwv.dicom.isEven(byteOffset - inputByteOffset)) {
-        if (typeof padType === "undefined" || padType === "space") {
-            byteOffset = this.writeString(byteOffset, ' ');
-        } else if (padType === "null") {
-            byteOffset = this.writeInt8(byteOffset, 0);
-        }
     }
     return byteOffset;
 };
@@ -623,10 +653,10 @@ dwv.dicom.DicomWriter = function () {
             return item;
         },
         'replace': function (item, value) {
-            item.value[0] = value;
-            item.vl = value.length;
-            item.endOffset = item.startOffset + value.length;
-            return item;
+            var paddedValue = dwv.dicom.padElementValue(item, value);
+            item.value[0] = paddedValue;
+            item.vl = paddedValue.length;
+            item.endOffset = item.startOffset + paddedValue.length;
         }
     };
 
@@ -775,10 +805,6 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     var ivn = dwv.dicom.getDicomElement("ImplementationVersionName");
     var ivnSize = dwv.dicom.getDataElementPrefixByteSize(ivn.vr, isImplicit);
     var ivnValue = "DWV_" + dwv.getVersion();
-    // odd IDs should be padded
-    if ( ivnValue.length % 2 === 1 ) {
-        ivnValue += '\0';
-    }
     ivnSize += dwv.dicom.setElementValue(ivn, ivnValue, false);
     metaElements.push(ivn);
     metaLength += ivnSize;
@@ -948,21 +974,22 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
     else {
         // set the value and calculate size
         size = 0;
+        var paddedValue = dwv.dicom.padElementValue(element, value);
         if (value instanceof Array) {
-            element.value = value;
-            for (var k = 0; k < value.length; ++k) {
+            element.value = paddedValue;
+            for (var k = 0; k < paddedValue.length; ++k) {
                 // spearator
                 if (k !== 0) {
                     size += 1;
                 }
                 // value
-                size += value[k].toString().length;
+                size += paddedValue[k].toString().length;
             }
         }
         else {
-            element.value = [value];
-            if (typeof value !== "undefined" && typeof value.length !== "undefined") {
-                size = value.length;
+            element.value = [paddedValue];
+            if (typeof paddedValue !== "undefined" && typeof paddedValue.length !== "undefined") {
+                size = paddedValue.length;
             }
             else {
                 // numbers
