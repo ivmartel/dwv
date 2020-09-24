@@ -655,6 +655,7 @@ dwv.dicom.DicomWriter = function () {
             item.value[0] = paddedValue;
             item.vl = paddedValue.length;
             item.endOffset = item.startOffset + paddedValue.length;
+            return item;
         }
     };
 
