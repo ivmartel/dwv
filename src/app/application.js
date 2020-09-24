@@ -1049,7 +1049,7 @@ dwv.App = function ()
          * @property {string} loadType The load type: image or state.
          * @property {Mixed} source The load source: string for an url,
          *   File for a file.
-         * @property {number} load The loaded percentage.
+         * @property {number} loaded The loaded percentage.
          * @property {number} total The total percentage.
          */
         event.type = "load-progress";
