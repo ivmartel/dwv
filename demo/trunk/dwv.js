@@ -1,4 +1,4 @@
-/*! dwv 0.28.0-beta 2020-09-24 21:37:57 */
+/*! dwv 0.28.0-beta 2020-09-24 22:00:46 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -1108,7 +1108,7 @@ dwv.App = function ()
          * @property {string} loadType The load type: image or state.
          * @property {Mixed} source The load source: string for an url,
          *   File for a file.
-         * @property {number} load The loaded percentage.
+         * @property {number} loaded The loaded percentage.
          * @property {number} total The total percentage.
          */
         event.type = "load-progress";
