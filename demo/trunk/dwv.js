@@ -1,4 +1,4 @@
-/*! dwv 0.28.0-beta 2020-09-24 22:00:46 */
+/*! dwv 0.28.0-beta 2020-09-24 22:02:15 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -14540,7 +14540,7 @@ dwv.image.View.prototype.generateImageData = function (array) {
         break;
 
     case "YBR_FULL":
-        dwv.image.generateImageYbrFull(
+        dwv.image.generateImageDataYbrFull(
             array,
             image,
             this.getCurrentPosition(),
