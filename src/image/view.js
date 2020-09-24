@@ -620,7 +620,7 @@ dwv.image.View.prototype.generateImageData = function (array) {
         break;
 
     case "YBR_FULL":
-        dwv.image.generateImageYbrFull(
+        dwv.image.generateImageDataYbrFull(
             array,
             image,
             this.getCurrentPosition(),
