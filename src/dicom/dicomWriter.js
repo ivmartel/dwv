@@ -1153,7 +1153,8 @@ dwv.dicom.generatePixelDataFromJSONTags = function (tags, startOffset, pixGenera
     var bitsAllocated = tags.BitsAllocated;
     var pixelRepresentation = tags.PixelRepresentation;
     var samplesPerPixel = tags.SamplesPerPixel;
-    var photometricInterpretation = tags.PhotometricInterpretation;
+    // trim in case config contains padding
+    var photometricInterpretation = tags.PhotometricInterpretation.trim();
 
     var sliceLength = numberOfRows * numberOfColumns;
     var dataLength = sliceLength * samplesPerPixel;
