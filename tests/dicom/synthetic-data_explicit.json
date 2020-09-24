@@ -3,7 +3,7 @@
     "name": "test00",
     "description": "Little Endian Explicit test data.",
     "tags": {
-        "TransferSyntaxUID": "1.2.840.10008.1.2.1\\0",
+        "TransferSyntaxUID": "1.2.840.10008.1.2.1",
         "Modality": "MR",
         "PatientName": "dwv-patient-name00",
         "PhotometricInterpretation": "MONOCHROME2 ",
