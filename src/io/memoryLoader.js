@@ -177,7 +177,7 @@ dwv.io.MemoryLoader = function ()
         var foundLoader = false;
         for (var l = 0; l < loaders.length; ++l) {
             loader = loaders[l];
-            if (loader.canLoadFile({name: dataElement.filename})) {
+            if (loader.canLoadUrl(dataElement.filename)) {
                 foundLoader = true;
                 // load options
                 loader.setOptions({
