@@ -3,10 +3,10 @@
     "name": "test10",
     "description": "Little Endian Implicit test data.",
     "tags": {
-        "TransferSyntaxUID": "1.2.840.10008.1.2",
+        "TransferSyntaxUID": "1.2.840.10008.1.2\0",
         "Modality": "MR",
-        "PatientName": "dwv-patient-name-10",
-        "PhotometricInterpretation": "MONOCHROME2",
+        "PatientName": "dwv-patient-name10",
+        "PhotometricInterpretation": "MONOCHROME2 ",
         "SamplesPerPixel": 1,
         "PixelRepresentation": 0,
         "Rows": 32,
@@ -20,10 +20,10 @@
     "name": "test11",
     "description": "Little Endian Implicit test data with PixelRepresentation=1.",
     "tags": {
-        "TransferSyntaxUID": "1.2.840.10008.1.2",
+        "TransferSyntaxUID": "1.2.840.10008.1.2\0",
         "Modality": "MR",
-        "PatientName": "dwv-patient-name-11",
-        "PhotometricInterpretation": "MONOCHROME2",
+        "PatientName": "dwv-patient-name11",
+        "PhotometricInterpretation": "MONOCHROME2 ",
         "SamplesPerPixel": 1,
         "PixelRepresentation": 1,
         "Rows": 32,
@@ -37,10 +37,10 @@
     "name": "test12",
     "description": "Little Endian Implicit 8bits RGB test data.",
     "tags": {
-        "TransferSyntaxUID": "1.2.840.10008.1.2",
+        "TransferSyntaxUID": "1.2.840.10008.1.2\0",
         "Modality": "MR",
-        "PatientName": "dwv-patient-name-12",
-        "PhotometricInterpretation": "RGB",
+        "PatientName": "dwv-patient-name12",
+        "PhotometricInterpretation": "RGB ",
         "SamplesPerPixel": 3,
         "PlanarConfiguration": 1,
         "PixelRepresentation": 0,
@@ -55,10 +55,10 @@
     "name": "test13",
     "description": "Little Endian Implicit test data with explicit length sequence.",
     "tags": {
-        "TransferSyntaxUID": "1.2.840.10008.1.2",
+        "TransferSyntaxUID": "1.2.840.10008.1.2\0",
         "Modality": "MR",
-        "PatientName": "dwv-patient-name-13",
-        "PhotometricInterpretation": "MONOCHROME2",
+        "PatientName": "dwv-patient-name13",
+        "PhotometricInterpretation": "MONOCHROME2 ",
         "SamplesPerPixel": 1,
         "PixelRepresentation": 0,
         "Rows": 32,
@@ -69,11 +69,11 @@
         "ReferencedImageSequence": {
             "explicitLength": true,
             "item0": {
-                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4\0",
                 "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
             },
             "item1": {
-              "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+              "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4\0",
               "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
             }
         }
@@ -83,10 +83,10 @@
     "name": "test14",
     "description": "Little Endian Implicit test data with implicit length sequence.",
     "tags": {
-        "TransferSyntaxUID": "1.2.840.10008.1.2.1",
+        "TransferSyntaxUID": "1.2.840.10008.1.2.1\0",
         "Modality": "MR",
-        "PatientName": "dwv-patient-name-14",
-        "PhotometricInterpretation": "MONOCHROME2",
+        "PatientName": "dwv-patient-name14",
+        "PhotometricInterpretation": "MONOCHROME2 ",
         "SamplesPerPixel": 1,
         "PixelRepresentation": 0,
         "Rows": 32,
@@ -97,11 +97,11 @@
         "ReferencedImageSequence": {
             "explicitLength": false,
             "item0": {
-                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4\0",
                 "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
             },
             "item1": {
-              "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+              "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4\0",
               "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
             }
         }
@@ -111,10 +111,10 @@
     "name": "test15",
     "description": "Little Endian Explicit test data with massive sequence.",
     "tags": {
-        "TransferSyntaxUID": "1.2.840.10008.1.2.1",
+        "TransferSyntaxUID": "1.2.840.10008.1.2.1\0",
         "Modality": "MR",
-        "PatientName": "dwv-patient-name-15",
-        "PhotometricInterpretation": "MONOCHROME2",
+        "PatientName": "dwv-patient-name15",
+        "PhotometricInterpretation": "MONOCHROME2 ",
         "SamplesPerPixel": 1,
         "PixelRepresentation": 0,
         "Rows": 32,
@@ -125,11 +125,11 @@
         "ReferencedImageSequence": {
             "explicitLength": true,
             "item0": {
-                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4\0",
                 "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
             },
             "item1": {
-                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4\0",
                 "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
             },
             "item2": {}
@@ -137,11 +137,11 @@
         "SourceImageSequence": {
             "explicitLength": false,
             "item0": {
-                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4\0",
                 "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511672669154094"
             },
             "item1": {
-                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4",
+                "ReferencedSOPClassUID": "1.2.840.10008.5.1.4.1.1.4\0",
                 "ReferencedSOPInstanceUID": "1.3.12.2.1107.5.2.32.35162.2012021515511286933854090"
             },
             "item2": 0
