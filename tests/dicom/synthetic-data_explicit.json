@@ -20,7 +20,7 @@
     "name": "test01",
     "description": "Little Endian Explicit test data with PixelRepresentation=1.",
     "tags": {
-        "TransferSyntaxUID": "1.2.840.10008.1.2.1\\0",
+        "TransferSyntaxUID": "1.2.840.10008.1.2.1\u0000",
         "Modality": "MR",
         "PatientName": "dwv-patient-name01",
         "PhotometricInterpretation": "MONOCHROME2 ",
