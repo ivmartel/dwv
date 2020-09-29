@@ -25,14 +25,13 @@ QUnit.module("dicomParser");
 /**
  * Tests for {@link dwv.dicom.DicomParser} using simple DICOM data.
  * Using remote file for CI integration.
- * @function module:tests/dicom~dicomParser
+ * @function module:tests/dicom~dicomParserSimpleDicom
  */
 QUnit.test("Test simple DICOM parsing.", function (assert) {
     var done = assert.async();
 
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
-    var url = urlRoot + "/tests/data/dwv-test-simple.dcm";
+    var url = "/tests/data/dwv-test-simple.dcm";
     request.open('GET', url, true);
     request.responseType = "arraybuffer";
     request.onerror = function (event) {
@@ -92,14 +91,13 @@ QUnit.test("Test simple DICOM parsing.", function (assert) {
 /**
  * Tests for {@link dwv.dicom.DicomParser} using sequence test DICOM data.
  * Using remote file for CI integration.
- * @function module:tests/dicom~dicomParser
+ * @function module:tests/dicom~dicomParserSequenceDicom
  */
 QUnit.test("Test sequence DICOM parsing.", function (assert) {
     var done = assert.async();
 
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
-    var url = urlRoot + "/tests/data/dwv-test-sequence.dcm";
+    var url = "/tests/data/dwv-test-sequence.dcm";
     request.open('GET', url, true);
     request.responseType = "arraybuffer";
     request.onload = function (/*event*/) {
@@ -113,7 +111,7 @@ QUnit.test("Test sequence DICOM parsing.", function (assert) {
         assert.ok((Object.keys(rawTags).length!==0), "Got raw tags.");
         // wrapped tags
         var tags = dicomParser.getDicomElements();
-        assert.ok((tags.dumpToTable().length!==0), "Got wrapped tags.");
+        assert.ok((tags.dumpToObject().length!==0), "Got wrapped tags.");
 
         // ReferencedImageSequence: explicit sequence
         var seq00 = tags.getFromName("ReferencedImageSequence");
@@ -218,14 +216,13 @@ QUnit.test("Test cleanString.", function (assert) {
 /**
  * Tests for {@link dwv.dicom.DicomParser} using DICOMDIR data.
  * Using remote file for CI integration.
- * @function module:tests/dicom~dicomParser
+ * @function module:tests/dicom~dicomParserDicomDir
  */
 QUnit.test("Test DICOMDIR parsing.", function (assert) {
     var done = assert.async();
 
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
-    var url = urlRoot + "/tests/data/DICOMDIR";
+    var url = "/tests/data/DICOMDIR";
     request.open('GET', url, true);
     request.responseType = "arraybuffer";
     request.onerror = function (event) {

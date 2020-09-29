@@ -157,10 +157,11 @@ QUnit.test("Test generate data RGB.", function (assert) {
     view0.generateImageData(imageData);
     // check data content
     var theoData0 = [ 0, 0, 0, 255, 85, 85, 85, 255,
-                      171, 171, 171, 255, 255, 255, 255, 255 ];
+                      170, 170, 170, 255, 255, 255, 255, 255 ];
     var testContent0 = true;
     for ( i = 0; i < size0*size0*4; ++i) {
         if ( theoData0[i] !== imageData.data[i] ) {
+            console.log(theoData0[i], imageData.data[i]);
             testContent0 = false;
             break;
         }
@@ -170,7 +171,7 @@ QUnit.test("Test generate data RGB.", function (assert) {
     var buffer1 = [];
     index = 0;
     // 0, 85, 170, 255
-    for ( i = 0; i < size0 * size0; ++i ) {
+    for ( i = 0; i < 3; ++i ) {
         buffer1[index] = 0;
         buffer1[index+1] = 85;
         buffer1[index+2] = 170;
@@ -192,6 +193,7 @@ QUnit.test("Test generate data RGB.", function (assert) {
     var testContent1 = true;
     for ( i = 0; i < size0*size0*4; ++i) {
         if ( theoData0[i] !== imageData.data[i] ) {
+            console.log(theoData0[i], imageData.data[i]);
             testContent1 = false;
             break;
         }

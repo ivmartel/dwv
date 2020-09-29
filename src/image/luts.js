@@ -5,304 +5,144 @@ dwv.image = dwv.image || {};
 dwv.image.lut = dwv.image.lut || {};
 
 /**
- * Rescale LUT class.
- * Typically converts from integer to float.
- * @constructor
- * @param {Object} rsi The rescale slope and intercept.
- * @param {Number} bitsStored The number of bits used to store the data.
+ * Lookup tables for image colour display.
  */
-dwv.image.lut.Rescale = function (rsi, bitsStored)
-{
-    /**
-     * The internal array.
-     * @private
-     * @type Float32Array
-     */
-    var lut = null;
-
-    /**
-     * Flag to know if the lut is ready or not.
-     * @private
-     * @type Boolean
-     */
-    var isReady = false;
-
-    /**
-     * The size of the LUT array.
-     * @private
-     * @type Number
-     */
-    var length = Math.pow(2, bitsStored);
-
-    /**
-     * Get the Rescale Slope and Intercept (RSI).
-     * @return {Object} The rescale slope and intercept object.
-     */
-    this.getRSI = function () { return rsi; };
-
-    /**
-     * Is the lut ready to use or not? If not, the user must
-     * call 'initialise'.
-     * @return {Boolean} True if the lut is ready to use.
-     */
-    this.isReady = function () { return isReady; };
-
-    /**
-     * Initialise the LUT.
-     */
-    this.initialise = function ()
-    {
-        // check if already initialised
-        if (isReady) {
-            return;
-        }
-        // create lut and fill it
-        lut = new Float32Array(length);
-        for ( var i = 0; i < length; ++i ) {
-            lut[i] = rsi.apply(i);
-        }
-        // update ready flag
-        isReady = true;
-    };
-
-    /**
-     * Get the length of the LUT array.
-     * @return {Number} The length of the LUT array.
-     */
-    this.getLength = function () { return length; };
-
-    /**
-     * Get the value of the LUT at the given offset.
-     * @param {Number} offset The input offset in [0,2^bitsStored] range.
-     * @return {Number} The float32 value of the LUT at the given offset.
-     */
-    this.getValue = function (offset)
-    {
-        return lut[ offset ];
-    };
-};
-
-/**
- * Window LUT class.
-  * Typically converts from float to integer.
- * @constructor
- * @param {Number} rescaleLut The associated rescale LUT.
- * @param {Boolean} isSigned Flag to know if the data is signed or not.
- */
-dwv.image.lut.Window = function (rescaleLut, isSigned)
-{
-    /**
-     * The internal array: Uint8ClampedArray clamps between 0 and 255.
-     * @private
-     * @type Uint8ClampedArray
-     */
-    var lut = null;
-
-    /**
-     * The window level.
-     * @private
-     * @type {Object}
-     */
-    var windowLevel = null;
-
-    /**
-     * Flag to know if the lut is ready or not.
-     * @private
-     * @type Boolean
-     */
-    var isReady = false;
-
-    /**
-     * Shift for signed data.
-     * @private
-     * @type Number
-     */
-    var signedShift = 0;
-
-    /**
-     * Get the window / level.
-     * @return {Object} The window / level.
-     */
-    this.getWindowLevel = function () { return windowLevel; };
-    /**
-     * Get the signed flag.
-     * @return {Boolean} The signed flag.
-     */
-    this.isSigned = function () { return isSigned; };
-    /**
-     * Get the rescale lut.
-     * @return {Object} The rescale lut.
-     */
-    this.getRescaleLut = function () { return rescaleLut; };
-
-    /**
-     * Is the lut ready to use or not? If not, the user must
-     * call 'update'.
-     * @return {Boolean} True if the lut is ready to use.
-     */
-    this.isReady = function () { return isReady; };
-
-    /**
-     * Set the window center and width.
-     * @param {Object} wl The window level.
-     */
-    this.setWindowLevel = function (wl)
-    {
-        // store the window values
-        windowLevel = wl;
-        // possible signed shift
-        signedShift = 0;
-        windowLevel.setSignedOffset(0);
-        if ( isSigned ) {
-            var size = rescaleLut.getLength();
-            signedShift = size / 2;
-            windowLevel.setSignedOffset(rescaleLut.getRSI().getSlope() * signedShift);
-        }
-        // update ready flag
-        isReady = false;
-    };
-
-    /**
-     * Update the lut if needed..
-     */
-    this.update = function ()
-    {
-        // check if we need to update
-        if ( isReady ) {
-            return;
-        }
-
-        // check rescale lut
-        if (!rescaleLut.isReady()) {
-            rescaleLut.initialise();
-        }
-        // create window lut
-        var size = rescaleLut.getLength();
-        if (!lut) {
-            // use clamped array (polyfilled in browser.js)
-            lut = new Uint8ClampedArray(size);
-        }
-        // by default WindowLevel returns a value in the [0,255] range
-        // this is ok with regular Arrays and ClampedArray.
-        for ( var i = 0; i < size; ++i )
-        {
-            lut[i] = windowLevel.apply( rescaleLut.getValue(i) );
-        }
-
-        // update ready flag
-        isReady = true;
-    };
-
-    /**
-     * Get the length of the LUT array.
-     * @return {Number} The length of the LUT array.
-     */
-    this.getLength = function () { return lut.length; };
-
-    /**
-     * Get the value of the LUT at the given offset.
-     * @param {Number} offset The input offset in [0,2^bitsStored] range.
-     * @return {Number} The integer value (default [0,255]) of the LUT at the given offset.
-     */
-    this.getValue = function (offset)
-    {
-        return lut[ offset + signedShift ];
-    };
-};
-
-/**
-* Lookup tables for image colour display.
-*/
 
 dwv.image.lut.range_max = 256;
 
-dwv.image.lut.buildLut = function(func)
-{
+/**
+ * Build a LUT of size range_max.
+ * @param {Function} func The i to lut function.
+ */
+dwv.image.lut.buildLut = function (func) {
     var lut = [];
-    for( var i=0; i<dwv.image.lut.range_max; ++i ) {
+    for (var i = 0; i < dwv.image.lut.range_max; ++i) {
         lut.push(func(i));
     }
     return lut;
 };
 
-dwv.image.lut.max = function(/*i*/)
-{
-    return dwv.image.lut.range_max-1;
+/**
+ * Max function: returns range_max minus one.
+ * @param {number} i The input index.
+ * @returns {number} The lut value.
+ */
+dwv.image.lut.max = function (/*i*/) {
+    return dwv.image.lut.range_max - 1;
 };
 
-dwv.image.lut.maxFirstThird = function(i)
-{
-    if( i < dwv.image.lut.range_max/3 ) {
-        return dwv.image.lut.range_max-1;
+/**
+ * Returns range_max minus one for the first third of i, otherwise 0.
+ * @param {number} i The input index.
+ * @returns {number} The lut value.
+ */
+dwv.image.lut.maxFirstThird = function (i) {
+    if (i < dwv.image.lut.range_max / 3) {
+        return dwv.image.lut.range_max - 1;
     }
     return 0;
 };
 
-dwv.image.lut.maxSecondThird = function(i)
-{
-    var third = dwv.image.lut.range_max/3;
-    if( i >= third && i < 2*third ) {
-        return dwv.image.lut.range_max-1;
+/**
+ * Returns range_max minus one from one third to two thirds of i, otherwise 0.
+ * @param {number} i The input index.
+ * @returns {number} The lut value.
+ */
+dwv.image.lut.maxSecondThird = function (i) {
+    var third = dwv.image.lut.range_max / 3;
+    if (i >= third && i < 2 * third) {
+        return dwv.image.lut.range_max - 1;
     }
     return 0;
 };
 
-dwv.image.lut.maxThirdThird = function(i)
-{
-    if( i >= 2*dwv.image.lut.range_max/3 ) {
-        return dwv.image.lut.range_max-1;
+/**
+ * Returns range_max minus one from one third to two thirds of i, otherwise 0.
+ * @param {number} i The input index.
+ * @returns {number} The lut value.
+ */
+dwv.image.lut.maxThirdThird = function (i) {
+    if( i >= 2 * dwv.image.lut.range_max / 3 ) {
+        return dwv.image.lut.range_max - 1;
     }
     return 0;
 };
 
-dwv.image.lut.toMaxFirstThird = function(i)
-{
+/**
+ * Ramp to range_max minus one on the first third values.
+ * @param {number} i The input index.
+ * @returns {number} The lut value.
+ */
+dwv.image.lut.toMaxFirstThird = function (i) {
     var val = i * 3;
-    if( val > dwv.image.lut.range_max-1 ) {
-        return dwv.image.lut.range_max-1;
+    if (val > dwv.image.lut.range_max - 1) {
+        return dwv.image.lut.range_max - 1;
     }
     return val;
 };
 
-dwv.image.lut.toMaxSecondThird = function(i)
-{
-    var third = dwv.image.lut.range_max/3;
+/**
+ * Ramp to range_max minus one on the second third values.
+ *  otherwise return 0 for the first third and
+ *  range_max minus one for the last third.
+ * @param {number} i The input index.
+ * @returns {number} The lut value.
+ */
+dwv.image.lut.toMaxSecondThird = function (i) {
+    var third = dwv.image.lut.range_max / 3;
     var val = 0;
-    if( i >= third ) {
-        val = (i-third) * 3;
-        if( val > dwv.image.lut.range_max-1 ) {
-            return dwv.image.lut.range_max-1;
+    if (i >= third) {
+        val = (i - third) * 3;
+        if (val > dwv.image.lut.range_max - 1) {
+            return dwv.image.lut.range_max - 1;
         }
     }
     return val;
 };
 
-dwv.image.lut.toMaxThirdThird = function(i)
-{
-    var third = dwv.image.lut.range_max/3;
+/**
+ * Ramp to range_max minus one on the last third values.
+ *  otherwise return 0.
+ * @param {number} i The input index.
+ * @returns {number} The lut value.
+ */
+dwv.image.lut.toMaxThirdThird = function (i) {
+    var third = dwv.image.lut.range_max / 3;
     var val = 0;
-    if( i >= 2*third ) {
-        val = (i-2*third) * 3;
-        if( val > dwv.image.lut.range_max-1 ) {
-            return dwv.image.lut.range_max-1;
+    if (i >= 2 * third) {
+        val = (i - 2 * third) * 3;
+        if (val > dwv.image.lut.range_max - 1) {
+            return dwv.image.lut.range_max - 1;
         }
     }
     return val;
 };
 
-dwv.image.lut.zero = function(/*i*/)
-{
+/**
+ * Returns zero.
+ * @param {number} i The input index.
+ * @returns {number} The lut value.
+ */
+dwv.image.lut.zero = function (/*i*/) {
     return 0;
 };
 
-dwv.image.lut.id = function(i)
-{
+/**
+ * Identity, returns i.
+ * @param {number} i The input index.
+ * @returns {number} The lut value.
+ */
+dwv.image.lut.id = function (i) {
     return i;
 };
 
-dwv.image.lut.invId = function(i)
-{
-    return (dwv.image.lut.range_max-1)-i;
+/**
+ * Returns range_max minus one minus i.
+ * @param {number} i The input index.
+ * @returns {number} The lut value.
+ */
+dwv.image.lut.invId = function (i) {
+    return (dwv.image.lut.range_max - 1) - i;
 };
 
 // plain

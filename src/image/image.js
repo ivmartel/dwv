@@ -4,76 +4,6 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
- * Rescale Slope and Intercept
- * @constructor
- * @param slope
- * @param intercept
- */
-dwv.image.RescaleSlopeAndIntercept = function (slope, intercept)
-{
-    /*// Check the rescale slope.
-    if(typeof(slope) === 'undefined') {
-        slope = 1;
-    }
-    // Check the rescale intercept.
-    if(typeof(intercept) === 'undefined') {
-        intercept = 0;
-    }*/
-
-    /**
-     * Get the slope of the RSI.
-     * @return {Number} The slope of the RSI.
-     */
-    this.getSlope = function ()
-    {
-        return slope;
-    };
-    /**
-     * Get the intercept of the RSI.
-     * @return {Number} The intercept of the RSI.
-     */
-    this.getIntercept = function ()
-    {
-        return intercept;
-    };
-    /**
-     * Apply the RSI on an input value.
-     * @return {Number} The value to rescale.
-     */
-    this.apply = function (value)
-    {
-        return value * slope + intercept;
-    };
-};
-
-/**
- * Check for RSI equality.
- * @param {Object} rhs The other RSI to compare to.
- * @return {Boolean} True if both RSI are equal.
- */
-dwv.image.RescaleSlopeAndIntercept.prototype.equals = function (rhs) {
-    return rhs !== null &&
-        this.getSlope() === rhs.getSlope() &&
-        this.getIntercept() === rhs.getIntercept();
-};
-
-/**
- * Get a string representation of the RSI.
- * @return {String} The RSI as a string.
- */
-dwv.image.RescaleSlopeAndIntercept.prototype.toString = function () {
-    return (this.getSlope() + ", " + this.getIntercept());
-};
-
-/**
- * Is this RSI an ID RSI.
- * @return {Boolean} True if the RSI has a slope of 1 and no intercept.
- */
-dwv.image.RescaleSlopeAndIntercept.prototype.isID = function () {
-    return (this.getSlope() === 1 && this.getIntercept() === 0);
-};
-
-/**
  * Image class.
  * Usable once created, optional are:
  * - rescale slope and intercept (default 1:0),
@@ -84,8 +14,9 @@ dwv.image.RescaleSlopeAndIntercept.prototype.isID = function () {
  * @param {Array} buffer The image data as an array of frame buffers.
  * @param {Number} numberOfFrames The number of frames (optional, can be used
      to anticipate the final number after appends).
+ * @param {Array} imageUids An array of Uids indexed to slice number.
  */
-dwv.image.Image = function(geometry, buffer, numberOfFrames)
+dwv.image.Image = function(geometry, buffer, numberOfFrames, imageUids)
 {
     // use buffer length in not specified
     if (typeof numberOfFrames === "undefined") {
@@ -134,12 +65,22 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
      * @type Number
      */
     var planarConfiguration = 0;
+
+    /**
+     * Check if the input element is not null.
+     * @param {Object} element The element to test.
+     * @returns True if the input is not null.
+     */
+    var isNotNull = function (element) {
+        return element !== null;
+    };
+
     /**
      * Number of components.
      * @private
      * @type Number
      */
-    var numberOfComponents = buffer[0].length / (
+    var numberOfComponents = buffer.find(isNotNull).length / (
         geometry.getSize().getTotalSize() );
     /**
      * Meta information.
@@ -167,24 +108,13 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
      */
     var histogram = null;
 
-	/**
-	 * Overlay.
-     * @private
-     * @type Array
-     */
-	var overlays = [];
-
     /**
-     * Set the first overlay.
-     * @param {Array} over The first overlay.
+     * Get the image UIDs indexed by slice number.
+     * @return {Array} The UIDs array.
      */
-    this.setFirstOverlay = function (over) { overlays[0] = over; };
-
-    /**
-     * Get the overlays.
-     * @return {Array} The overlays array.
-     */
-    this.getOverlays = function () { return overlays; };
+    this.getImageUids = function () {
+        return imageUids;
+    };
 
     /**
      * Get the geometry of the image.
@@ -339,7 +269,7 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
         if( size.getNumberOfRows() !== rhsSize.getNumberOfRows() ) {
             throw new Error("Cannot append a slice with different number of rows");
         }
-        if( !geometry.getOrientation().equals( rhs.getGeometry().getOrientation() ) ) {
+        if( !geometry.getOrientation().equals( rhs.getGeometry().getOrientation(), 0.0001 ) ) {
             throw new Error("Cannot append a slice with different orientation");
         }
         if( photometricInterpretation !== rhs.getPhotometricInterpretation() ) {
@@ -356,7 +286,7 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
 
         // calculate slice size
         var mul = 1;
-        if( photometricInterpretation === "RGB" || photometricInterpretation === "YBR_FULL_422") {
+        if( photometricInterpretation === "RGB" || photometricInterpretation === "YBR_FULL") {
             mul = 3;
         }
         var sliceSize = mul * size.getSliceSize();
@@ -395,8 +325,8 @@ dwv.image.Image = function(geometry, buffer, numberOfFrames)
         // copy to class variables
         buffer[f] = newBuffer;
 
-		// insert overlay information of the slice to the image
-		overlays.splice(newSliceNb, 0, rhs.getOverlays()[0]);
+        // insert sop instance UIDs
+        imageUids.splice(newSliceNb, 0, rhs.getImageUids()[0]);
 
         // return the appended slice number
         return newSliceNb;
@@ -481,6 +411,31 @@ dwv.image.Image.prototype.getRescaledValue = function( i, j, k, f )
         val = this.getRescaleSlopeAndIntercept(k).apply(val);
     }
     return val;
+};
+
+/**
+ * Get a slice index iterator.
+ * @param {number} sliceIndex The index of the slice.
+ * @returns {Object} The slice iterator.
+ */
+dwv.image.Image.prototype.getSliceIterator = function (sliceIndex) {
+    var sliceSize = this.getGeometry().getSize().getSliceSize();
+    var start = sliceIndex * sliceSize;
+
+    var range = null;
+    if (this.getNumberOfComponents() === 1) {
+        range = dwv.image.range(start, start + sliceSize);
+    } else if (this.getNumberOfComponents() === 3) {
+        // 3 times bigger...
+        start *= 3;
+        sliceSize *= 3;
+        var isPlanar = this.getPlanarConfiguration() === 1;
+        range = dwv.image.range3d(start, start + sliceSize, 1, isPlanar);
+    } else {
+        throw new Error("Unsupported number of components: " + this.getNumberOfComponents());
+    }
+
+    return range;
 };
 
 /**
@@ -860,165 +815,4 @@ dwv.image.Image.prototype.quantifyEllipse = function(ellipse)
     }
     // return
     return quant;
-};
-
-/**
- * {@link dwv.image.Image} factory.
- * @constructor
- */
-dwv.image.ImageFactory = function () {};
-
-/**
- * Get an {@link dwv.image.Image} object from the read DICOM file.
- * @param {Object} dicomElements The DICOM tags.
- * @param {Array} pixelBuffer The pixel buffer.
- * @return {View} A new Image.
- */
-dwv.image.ImageFactory.prototype.create = function (dicomElements, pixelBuffer)
-{
-    // columns
-    var columns = dicomElements.getFromKey("x00280011");
-    if ( !columns ) {
-        throw new Error("Missing or empty DICOM image number of columns");
-    }
-    // rows
-    var rows = dicomElements.getFromKey("x00280010");
-    if ( !rows ) {
-        throw new Error("Missing or empty DICOM image number of rows");
-    }
-    // image size
-    var size = new dwv.image.Size( columns, rows );
-
-    // spacing
-    var rowSpacing = null;
-    var columnSpacing = null;
-    // PixelSpacing
-    var pixelSpacing = dicomElements.getFromKey("x00280030");
-    // ImagerPixelSpacing
-    var imagerPixelSpacing = dicomElements.getFromKey("x00181164");
-    if ( pixelSpacing && pixelSpacing[0] && pixelSpacing[1] ) {
-        rowSpacing = parseFloat( pixelSpacing[0] );
-        columnSpacing = parseFloat( pixelSpacing[1] );
-    }
-    else if ( imagerPixelSpacing && imagerPixelSpacing[0] && imagerPixelSpacing[1] ) {
-        rowSpacing = parseFloat( imagerPixelSpacing[0] );
-        columnSpacing = parseFloat( imagerPixelSpacing[1] );
-    }
-    // image spacing
-    var spacing = new dwv.image.Spacing( columnSpacing, rowSpacing );
-
-    // TransferSyntaxUID
-    var transferSyntaxUID = dicomElements.getFromKey("x00020010");
-    var syntax = dwv.dicom.cleanString( transferSyntaxUID );
-    var jpeg2000 = dwv.dicom.isJpeg2000TransferSyntax( syntax );
-    var jpegBase = dwv.dicom.isJpegBaselineTransferSyntax( syntax );
-    var jpegLoss = dwv.dicom.isJpegLosslessTransferSyntax( syntax );
-
-    // slice position
-    var slicePosition = new Array(0,0,0);
-    // ImagePositionPatient
-    var imagePositionPatient = dicomElements.getFromKey("x00200032");
-    if ( imagePositionPatient ) {
-        slicePosition = [ parseFloat( imagePositionPatient[0] ),
-            parseFloat( imagePositionPatient[1] ),
-            parseFloat( imagePositionPatient[2] ) ];
-    }
-
-    // slice orientation
-    var imageOrientationPatient = dicomElements.getFromKey("x00200037");
-    var orientationMatrix;
-    if ( imageOrientationPatient ) {
-        var rowCosines = new dwv.math.Vector3D( parseFloat( imageOrientationPatient[0] ),
-            parseFloat( imageOrientationPatient[1] ),
-            parseFloat( imageOrientationPatient[2] ) );
-        var colCosines = new dwv.math.Vector3D( parseFloat( imageOrientationPatient[3] ),
-            parseFloat( imageOrientationPatient[4] ),
-            parseFloat( imageOrientationPatient[5] ) );
-        var normal = rowCosines.crossProduct(colCosines);
-        orientationMatrix = new dwv.math.Matrix33(
-            rowCosines.getX(), rowCosines.getY(), rowCosines.getZ(),
-            colCosines.getX(), colCosines.getY(), colCosines.getZ(),
-            normal.getX(), normal.getY(), normal.getZ() );
-    }
-
-    // geometry
-    var origin = new dwv.math.Point3D(slicePosition[0], slicePosition[1], slicePosition[2]);
-    var geometry = new dwv.image.Geometry( origin, size, spacing, orientationMatrix );
-
-    // image
-    var image = new dwv.image.Image( geometry, pixelBuffer );
-    // PhotometricInterpretation
-    var photometricInterpretation = dicomElements.getFromKey("x00280004");
-    if ( photometricInterpretation ) {
-        var photo = dwv.dicom.cleanString(photometricInterpretation).toUpperCase();
-        // jpeg decoders output RGB data
-        if ( (jpeg2000 || jpegBase || jpegLoss) &&
-        	(photo !== "MONOCHROME1" && photo !== "MONOCHROME2") ) {
-            photo = "RGB";
-        }
-        image.setPhotometricInterpretation( photo );
-    }
-    // PlanarConfiguration
-    var planarConfiguration = dicomElements.getFromKey("x00280006");
-    if ( planarConfiguration ) {
-        image.setPlanarConfiguration( planarConfiguration );
-    }
-
-    // rescale slope and intercept
-    var slope = 1;
-    // RescaleSlope
-    var rescaleSlope = dicomElements.getFromKey("x00281053");
-    if ( rescaleSlope ) {
-        slope = parseFloat(rescaleSlope);
-    }
-    var intercept = 0;
-    // RescaleIntercept
-    var rescaleIntercept = dicomElements.getFromKey("x00281052");
-    if ( rescaleIntercept ) {
-        intercept = parseFloat(rescaleIntercept);
-    }
-    var rsi = new dwv.image.RescaleSlopeAndIntercept(slope, intercept);
-    image.setRescaleSlopeAndIntercept( rsi );
-
-    // meta information
-    var meta = {};
-    // Modality
-    var modality = dicomElements.getFromKey("x00080060");
-    if ( modality ) {
-        meta.Modality = modality;
-    }
-    // StudyInstanceUID
-    var studyInstanceUID = dicomElements.getFromKey("x0020000D");
-    if ( studyInstanceUID ) {
-        meta.StudyInstanceUID = studyInstanceUID;
-    }
-    // SeriesInstanceUID
-    var seriesInstanceUID = dicomElements.getFromKey("x0020000E");
-    if ( seriesInstanceUID ) {
-        meta.SeriesInstanceUID = seriesInstanceUID;
-    }
-    // BitsStored
-    var bitsStored = dicomElements.getFromKey("x00280101");
-    if ( bitsStored ) {
-        meta.BitsStored = parseInt(bitsStored, 10);
-    }
-    // PixelRepresentation -> is signed
-    var pixelRepresentation = dicomElements.getFromKey("x00280103");
-    meta.IsSigned = false;
-    if ( pixelRepresentation ) {
-        meta.IsSigned = (pixelRepresentation === 1);
-    }
-
-    // RecommendedDisplayFrameRate
-    var recommendedDisplayFrameRate = dicomElements.getFromKey("x00082144");
-    if ( recommendedDisplayFrameRate ) {
-        meta.RecommendedDisplayFrameRate = parseInt(recommendedDisplayFrameRate, 10);
-    }
-
-    image.setMeta(meta);
-
-    // overlay
-    image.setFirstOverlay( dwv.gui.info.createOverlays(dicomElements) );
-
-    return image;
 };

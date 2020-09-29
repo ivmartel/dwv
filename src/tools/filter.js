@@ -7,100 +7,72 @@ dwv.tool.filter = dwv.tool.filter || {};
 /**
  * Filter tool.
  * @constructor
- * @param {Array} filterList The list of filter objects.
  * @param {Object} app The associated app.
  */
-dwv.tool.Filter = function ( filterList, app )
+dwv.tool.Filter = function ( app )
 {
-    /**
-     * Filter GUI.
-     * @type Object
-     */
-    var gui = null;
     /**
      * Filter list
      * @type Object
      */
-    this.filterList = filterList;
+    this.filterList = null;
     /**
      * Selected filter.
      * @type Object
      */
     this.selectedFilter = 0;
     /**
-     * Default filter name.
-     * @type String
-     */
-    this.defaultFilterName = 0;
-    /**
-     * Display Flag.
-     * @type Boolean
-     */
-    this.displayed = false;
-    /**
      * Listener handler.
      * @type Object
+     * @private
      */
     var listenerHandler = new dwv.utils.ListenerHandler();
 
     /**
-     * Setup the filter GUI. Called at app startup.
+     * Activate the tool.
+     * @param {Boolean} bool Flag to activate or not.
      */
-    this.setup = function ()
-    {
-        if ( Object.keys(this.filterList).length !== 0 ) {
-            gui = new dwv.gui.Filter(app);
-            gui.setup(this.filterList);
-            for( var key in this.filterList ){
-                this.filterList[key].setup();
+    this.activate = function (bool) {
+        // setup event listening
+        for (var key in this.filterList) {
+            if (bool) {
                 this.filterList[key].addEventListener("filter-run", fireEvent);
                 this.filterList[key].addEventListener("filter-undo", fireEvent);
+            } else {
+                this.filterList[key].removeEventListener("filter-run", fireEvent);
+                this.filterList[key].removeEventListener("filter-undo", fireEvent);
             }
         }
     };
 
     /**
-     * Display the tool.
-     * @param {Boolean} bool Flag to enable or not.
+     * Set the tool options.
+     * @param {Object} options The list of filter names amd classes.
      */
-    this.display = function (bool)
-    {
-        if ( gui ) {
-            gui.display(bool);
+    this.setOptions = function (options) {
+        this.filterList = {};
+        // try to instanciate filters from the options
+        for (var key in options) {
+            this.filterList[key] = new options[key](app);
         }
-        this.displayed = bool;
-        // display the selected filter
-        this.selectedFilter.display(bool);
     };
 
     /**
      * Initialise the filter. Called once the image is loaded.
      */
-    this.init = function ()
-    {
-        // set the default to the first in the list
-        for( var key in this.filterList ){
-            this.defaultFilterName = key;
-            break;
-        }
-        this.setSelectedFilter(this.defaultFilterName);
-        // init all filters
-        for( key in this.filterList ) {
+    this.init = function () {
+        // setup event listening
+        for (var key in this.filterList) {
             this.filterList[key].init();
         }
-        // init html
-        if ( gui ) {
-            gui.initialise();
-        }
-        return true;
     };
 
     /**
      * Handle keydown event.
      * @param {Object} event The keydown event.
      */
-    this.keydown = function (event)
-    {
+    this.keydown = function (event) {
+        event.context = "dwv.tool.Filter";
         app.onKeydown(event);
     };
 
@@ -136,11 +108,11 @@ dwv.tool.Filter = function ( filterList, app )
  * Help for this tool.
  * @return {Object} The help content.
  */
-dwv.tool.Filter.prototype.getHelp = function ()
+dwv.tool.Filter.prototype.getHelpKeys = function ()
 {
     return {
-        "title": dwv.i18n("tool.Filter.name"),
-        "brief": dwv.i18n("tool.Filter.brief")
+        "title": "tool.Filter.name",
+        "brief": "tool.Filter.brief"
     };
 };
 
@@ -160,22 +132,17 @@ dwv.tool.Filter.prototype.getSelectedFilter = function ()
 dwv.tool.Filter.prototype.setSelectedFilter = function (name)
 {
     // check if we have it
-    if ( !this.hasFilter(name) )
-    {
+    if ( !this.hasFilter(name) ) {
         throw new Error("Unknown filter: '" + name + "'");
     }
-    // hide last selected
-    if ( this.displayed )
-    {
-        this.selectedFilter.display(false);
+    // de-activate last selected
+    if (this.selectedFilter) {
+        this.selectedFilter.activate(false);
     }
     // enable new one
     this.selectedFilter = this.filterList[name];
-    // display the selected filter
-    if ( this.displayed )
-    {
-        this.selectedFilter.display(true);
-    }
+    // activate the selected filter
+    this.selectedFilter.activate(true);
 };
 
 /**
@@ -207,40 +174,28 @@ dwv.tool.filter.Threshold = function ( app )
     /**
      * Associated filter.
      * @type Object
+     * @private
      */
     var filter = new dwv.image.filter.Threshold();
     /**
-     * Filter GUI.
-     * @type Object
-     */
-    var gui = new dwv.gui.Threshold(app);
-    /**
      * Flag to know wether to reset the image or not.
      * @type Boolean
+     * @private
      */
     var resetImage = true;
     /**
      * Listener handler.
      * @type Object
+     * @private
      */
     var listenerHandler = new dwv.utils.ListenerHandler();
 
     /**
-     * Setup the filter GUI. Called at app startup.
+     * Activate the filter.
+     * @param {Boolean} bool Flag to activate or not.
      */
-    this.setup = function ()
-    {
-        gui.setup();
-    };
-
-    /**
-     * Display the filter.
-     * @param {Boolean} bool Flag to display or not.
-     */
-    this.display = function (bool)
-    {
-        gui.display(bool);
-        // reset the image when the tool is displayed
+    this.activate = function (bool) {
+        // reset the image when the tool is activated
         if ( bool ) {
             resetImage = true;
         }
@@ -249,9 +204,8 @@ dwv.tool.filter.Threshold = function ( app )
     /**
      * Initialise the filter. Called once the image is loaded.
      */
-    this.init = function ()
-    {
-        gui.initialise();
+    this.init = function () {
+        // does nothing
     };
 
     /**
@@ -312,39 +266,25 @@ dwv.tool.filter.Threshold = function ( app )
 dwv.tool.filter.Sharpen = function ( app )
 {
     /**
-     * Filter GUI.
-     * @type Object
-     */
-    var gui = new dwv.gui.Sharpen(app);
-    /**
      * Listener handler.
      * @type Object
+     * @private
      */
     var listenerHandler = new dwv.utils.ListenerHandler();
 
     /**
-     * Setup the filter GUI. Called at app startup.
+     * Activate the filter.
+     * @param {Boolean} bool Flag to activate or not.
      */
-    this.setup = function ()
-    {
-        gui.setup();
-    };
-
-    /**
-     * Display the filter.
-     * @param {Boolean} bool Flag to enable or not.
-     */
-    this.display = function (bool)
-    {
-        gui.display(bool);
+    this.activate = function (/*bool*/) {
+        // does nothing
     };
 
     /**
      * Initialise the filter. Called once the image is loaded.
      */
-    this.init = function ()
-    {
-        // nothing to do...
+    this.init = function () {
+        // does nothing
     };
 
     /**
@@ -399,39 +339,25 @@ dwv.tool.filter.Sharpen = function ( app )
 dwv.tool.filter.Sobel = function ( app )
 {
     /**
-     * Filter GUI.
-     * @type Object
-     */
-    var gui = new dwv.gui.Sobel(app);
-    /**
      * Listener handler.
      * @type Object
+     * @private
      */
     var listenerHandler = new dwv.utils.ListenerHandler();
 
     /**
-     * Setup the filter GUI. Called at app startup.
+     * Activate the filter.
+     * @param {Boolean} bool Flag to activate or not.
      */
-    this.setup = function ()
-    {
-        gui.setup();
-    };
-
-    /**
-     * Enable the filter.
-     * @param {Boolean} bool Flag to enable or not.
-     */
-    this.display = function (bool)
-    {
-        gui.display(bool);
+    this.activate = function (/*bool*/) {
+        // does nothing
     };
 
     /**
      * Initialise the filter. Called once the image is loaded.
      */
-    this.init = function ()
-    {
-        // nothing to do...
+    this.init = function () {
+        // does nothing
     };
 
     /**

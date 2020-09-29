@@ -1,15 +1,19 @@
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
-// external
+dwv.tool.draw = dwv.tool.draw || {};
+/**
+ * The Konva namespace.
+ * @external Konva
+ * @see https://konvajs.org/
+ */
 var Konva = Konva || {};
 
 /**
  * Ruler factory.
  * @constructor
- * @external Konva
  */
-dwv.tool.RulerFactory = function ()
+dwv.tool.draw.RulerFactory = function ()
 {
     /**
      * Get the number of points needed to build the shape.
@@ -29,7 +33,7 @@ dwv.tool.RulerFactory = function ()
  * @param {Object} style The drawing style.
  * @param {Object} image The associated image.
  */
-dwv.tool.RulerFactory.prototype.create = function (points, style, image)
+dwv.tool.draw.RulerFactory.prototype.create = function (points, style, image)
 {
     // physical shape
     var line = new dwv.math.Line(points[0], points[1]);
@@ -114,7 +118,7 @@ dwv.tool.RulerFactory.prototype.create = function (points, style, image)
  * @param {Object} anchor The active anchor.
  * @param {Object} image The associated image.
  */
-dwv.tool.UpdateRuler = function (anchor, image)
+dwv.tool.draw.UpdateRuler = function (anchor, image)
 {
     // parent group
     var group = anchor.getParent();

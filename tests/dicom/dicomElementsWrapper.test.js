@@ -1,7 +1,6 @@
 /**
  * Tests for the 'dicom/dicomElementsWrapper.js' file.
  */
-/** @module tests/dicom */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
 QUnit.module("dicomElementsWrapper");
@@ -15,8 +14,7 @@ QUnit.test("Test simple DICOM wrapping.", function (assert) {
     var done = assert.async();
 
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
-    var url = urlRoot + "/tests/data/dwv-test-simple.dcm";
+    var url = "/tests/data/dwv-test-simple.dcm";
     request.open('GET', url, true);
     request.responseType = "arraybuffer";
     request.onerror = function (event) {
@@ -32,7 +30,7 @@ QUnit.test("Test simple DICOM wrapping.", function (assert) {
         // wrapped tags
         var tags = dicomParser.getDicomElements();
         // dump to table
-        var table = tags.dumpToTable();
+        var table = dwv.utils.objectToArray(tags.dumpToObject());
 
         // regression table
         var teoTable = [

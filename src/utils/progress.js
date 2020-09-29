@@ -15,12 +15,12 @@ dwv.utils.MultiProgressHandler = function (callback)
 
     /**
      * List of progresses.
-     * @private
-     * @type Array
      * First dimension is a list of item for which the progress is recorded,
      *   for example file names.
      * Second dimension is a list of possible progresses, for example
      *   the progress of the download and the progress of the decoding.
+     * @private
+     * @type Array
      */
     var progresses = [];
 
@@ -54,6 +54,7 @@ dwv.utils.MultiProgressHandler = function (callback)
 
     /**
      * Handle a load progress.
+     * Call the member callback with a global event.
      * @param {Object} event The progress event.
      */
     this.onprogress = function (event) {
@@ -72,30 +73,60 @@ dwv.utils.MultiProgressHandler = function (callback)
         // set percent for index
         progresses[event.index][event.subindex] = percent;
 
-        // call callback
-        callback({'type': event.type, 'lengthComputable': true,
-            'loaded': getGlobalPercent(), 'total': 100});
+        // item progress
+        var item = null;
+        if (typeof event.item !== "undefined") {
+            item = event.item;
+        } else {
+            item = {
+                loaded: getItemProgress(event.index),
+                total: 100,
+                source: event.source
+            };
+        }
+
+        // call callback with a global event
+        callback({
+            lengthComputable: true,
+            loaded: getGlobalPercent(),
+            total: 100,
+            item: item
+        });
     };
+
+    /**
+     * Get the item load percent.
+     * @param {Number} index The index of the item.
+     * @return {Number} The load percentage.
+     * @private
+     */
+    function getItemProgress(index) {
+        var sum = 0;
+        for ( var j = 0; j < numberOfDimensions; ++j ) {
+            sum += progresses[index][j];
+        }
+        return sum / numberOfDimensions;
+    }
 
     /**
      * Get the global load percent including the provided one.
      * @return {Number} The accumulated percentage.
+     * @private
      */
     function getGlobalPercent() {
         var sum = 0;
         var lenprog = progresses.length;
         for ( var i = 0; i < lenprog; ++i ) {
-            for ( var j = 0; j < numberOfDimensions; ++j ) {
-                sum += progresses[i][j];
-            }
+            sum += getItemProgress(i);
         }
-        return Math.round( sum / (lenprog * numberOfDimensions) );
+        return Math.round( sum / lenprog );
     }
 
     /**
      * Create a mono progress event handler.
      * @param {Number} index The index of the data.
      * @param {Number} subindex The sub-index of the data.
+     * @param {Mixed} source The progress source.
      */
     this.getMonoProgressHandler = function (index, subindex) {
         return function (event) {
@@ -106,22 +137,10 @@ dwv.utils.MultiProgressHandler = function (callback)
     };
 
     /**
-     * Create a mono loadend event handler: sends a 100% progress.
-     * @param {Number} index The index of the data.
-     * @param {Number} subindex The sub-index of the data.
-     */
-    this.getMonoOnLoadEndHandler = function (index, subindex) {
-        return function () {
-            self.onprogress({'type': 'load-progress', 'lengthComputable': true,
-                'loaded': 100, 'total': 100,
-                'index': index, 'subindex': subindex});
-        };
-    };
-
-    /**
      * Create a mono progress event handler with an undefined index.
      * Warning: The caller handles the progress index.
      * @param {Number} subindex The sub-index of the data.
+     * @param {Mixed} source The progress source.
      */
     this.getUndefinedMonoProgressHandler = function (subindex) {
         return function (event) {

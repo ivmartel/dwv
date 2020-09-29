@@ -1,8 +1,6 @@
 // namespaces
 var dwv = dwv || {};
 dwv.utils = dwv.utils || {};
-/** @namespace */
-dwv.utils.base = dwv.utils.base || {};
 
 /**
  * Get an full object URL from a string uri.
@@ -64,8 +62,8 @@ dwv.utils.getUrlFromUriSimple = function (uri) {
  */
 dwv.utils.getUrlFromUri = function (uri) {
     var url = null;
-    if (dwv.browser.askModernizr('urlparser') &&
-        dwv.browser.askModernizr('urlsearchparams')) {
+    if (dwv.env.askModernizr('urlparser') &&
+        dwv.env.askModernizr('urlsearchparams')) {
         url = dwv.utils.getUrlFromUriFull(uri);
     } else {
         url = dwv.utils.getUrlFromUriSimple(uri);
@@ -131,7 +129,7 @@ dwv.utils.getUriQuery = function (uri)
  *  @param {String} query The query part to the input URI.
  *  @param {Function} callback The function to call with the decoded file urls.
  */
-dwv.utils.base.decodeQuery = function (query, callback)
+dwv.utils.decodeQuery = function (query, callback)
 {
     // manifest
     if ( query.type && query.type === "manifest" ) {
@@ -314,4 +312,35 @@ dwv.utils.decodeManifest = function (manifest, nslices)
     }
     // return
     return result;
+};
+
+/**
+ * Load from an input uri
+ * @param {String} uri The input uri, for example: 'window.location.href'.
+ * @param {Object} app The associated app that handles the load.
+ */
+dwv.utils.loadFromUri = function (uri, app) {
+    var query = dwv.utils.getUriQuery(uri);
+    // check query
+    if ( query && typeof query.input !== "undefined" ) {
+        dwv.utils.loadFromQuery(query, app);
+    }
+    // no else to allow for empty uris
+};
+
+/**
+ * Load from an input query
+ * @param {Object} query A query derived from an uri.
+ * @param {Object} app The associated app that handles the load.
+ */
+dwv.utils.loadFromQuery = function (query, app) {
+    // load base
+    dwv.utils.decodeQuery(query, app.loadURLs);
+    // optional display state
+    if ( typeof query.state !== "undefined" ) {
+        var onLoadEnd = function (/*event*/) {
+            app.loadURLs(query.state);
+        };
+        app.addEventListener("load-end", onLoadEnd);
+    }
 };

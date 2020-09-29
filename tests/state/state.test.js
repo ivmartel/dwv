@@ -1,3 +1,11 @@
+// namespaces
+var dwv = dwv || {};
+/**
+ * Just used for tests.
+ * @namespace
+ */
+dwv.test = dwv.test || {};
+
 /**
  * Tests for the 'app/state.js' file.
  */
@@ -12,12 +20,11 @@ QUnit.module("state");
  * @param {String} type The type of drawing.
  * @param {Object} assert The qunit assert.
  */
-dwv.utils.test.TestState = function ( version, type, assert ) {
+dwv.test.testState = function ( version, type, assert ) {
     var done = assert.async();
     // test file request
     var request = new XMLHttpRequest();
-    var urlRoot = "https://raw.githubusercontent.com/ivmartel/dwv/master";
-    var url = urlRoot + "/tests/state/v" + version + "/state-" + type + ".json";
+    var url = "/tests/state/v" + version + "/state-" + type + ".json";
     request.open('GET', url, true);
     request.onerror = function (event) {
         console.log(event);
@@ -33,13 +40,13 @@ dwv.utils.test.TestState = function ( version, type, assert ) {
         var state = new dwv.State();
         var jsonData = state.fromJSON( this.responseText );
         // check drawings values
-        dwv.utils.test.CheckDrawings(
+        dwv.test.checkDrawings(
             jsonData.drawings, jsonData.drawingsDetails, version, type, assert );
         // delete drawing to allow simple equal check
         delete jsonData.drawings;
         delete jsonData.drawingsDetails;
         // check values expect drawings
-        dwv.utils.test.CheckStateHeader( jsonData, version, assert );
+        dwv.test.checkStateHeader( jsonData, version, assert );
         // finish async test
         done();
     };
@@ -53,7 +60,7 @@ dwv.utils.test.TestState = function ( version, type, assert ) {
  * @param {String} version The state format version.
  * @param {Object} assert The qunit assert.
  */
-dwv.utils.test.CheckStateHeader = function (jsonData, version, assert) {
+dwv.test.checkStateHeader = function (jsonData, version, assert) {
     // header data
     var headerData = {
         "version": version,
@@ -75,14 +82,14 @@ dwv.utils.test.CheckStateHeader = function (jsonData, version, assert) {
  * @param {String} type The type of drawing.
  * @param {Object} assert The qunit assert.
  */
-dwv.utils.test.CheckDrawings = function (drawings, details, version, type, assert) {
+dwv.test.checkDrawings = function (drawings, details, version, type, assert) {
     // first level: layer
     assert.equal( drawings.className, "Layer", "State drawings is a layer.");
 
     // second level: position groups
     if ( drawings.children.length === 5 &&
         ( type === "ruler_multi-slice" || type === "line_multi-slice" ) ) {
-        dwv.utils.test.CheckRulerDrawings( drawings.children, details, version, assert );
+        dwv.test.checkRulerDrawings( drawings.children, details, version, assert );
     } else if ( drawings.children.length === 1 ) {
 
         var layerKid = drawings.children[0];
@@ -96,7 +103,7 @@ dwv.utils.test.CheckDrawings = function (drawings, details, version, type, asser
 
         // shape specific checks
         if ( type === "arrow" ) {
-            dwv.utils.test.CheckArrowDrawing( posGroupKid, details, version, assert );
+            dwv.test.checkArrowDrawing( posGroupKid, details, version, assert );
         } else if ( type === "ruler" && version !== "0.1" ) {
             var refRuler = {
                 'id': "4gvkz8v6wzw",
@@ -106,7 +113,7 @@ dwv.utils.test.CheckDrawings = function (drawings, details, version, type, asser
                 'textExpr': "{length}",
                 'longText': "What a ruler!"
             };
-            dwv.utils.test.CheckRulerDrawing( posGroupKid, details, refRuler, assert );
+            dwv.test.checkRulerDrawing( posGroupKid, details, refRuler, assert );
         } else if ( type === "line" && version === "0.1" ) {
             var refLine = {
                 'id': "4gvkz8v6wzw",
@@ -116,17 +123,17 @@ dwv.utils.test.CheckDrawings = function (drawings, details, version, type, asser
                 'textExpr': "{length}",
                 'longText': ""
             };
-            dwv.utils.test.CheckRulerDrawing( posGroupKid, details, refLine, assert );
+            dwv.test.checkRulerDrawing( posGroupKid, details, refLine, assert );
         } else if ( type === "roi" ) {
-            dwv.utils.test.CheckRoiDrawing( posGroupKid, details, version, assert );
+            dwv.test.checkRoiDrawing( posGroupKid, details, version, assert );
         } else if ( type === "hand" ) {
-            dwv.utils.test.CheckHandDrawing( posGroupKid, details, version, assert );
+            dwv.test.checkHandDrawing( posGroupKid, details, version, assert );
         } else if ( type === "ellipse" ) {
-            dwv.utils.test.CheckEllipseDrawing( posGroupKid, details, version, assert );
+            dwv.test.checkEllipseDrawing( posGroupKid, details, version, assert );
         } else if ( type === "protractor" ) {
-            dwv.utils.test.CheckProtractorDrawing( posGroupKid, details, version, assert );
+            dwv.test.checkProtractorDrawing( posGroupKid, details, version, assert );
         } else if ( type === "rectangle" ) {
-            dwv.utils.test.CheckRectangleDrawing( posGroupKid, details, version, assert );
+            dwv.test.checkRectangleDrawing( posGroupKid, details, version, assert );
         } else {
             assert.ok( false, "Unknown draw type." );
         }
@@ -142,7 +149,7 @@ dwv.utils.test.CheckDrawings = function (drawings, details, version, type, asser
  * @param {String} version The state format version.
  * @param {Object} assert The qunit assert.
  */
-dwv.utils.test.CheckArrowDrawing = function (posGroupKid, details, version, assert) {
+dwv.test.checkArrowDrawing = function (posGroupKid, details, version, assert) {
     // check group
     assert.equal( posGroupKid.attrs.name, "line-group", "Shape group is a line group.");
     assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
@@ -193,7 +200,7 @@ dwv.utils.test.CheckArrowDrawing = function (posGroupKid, details, version, asse
  * @param {String} ref The reference data to compare to.
  * @param {Object} assert The qunit assert.
  */
-dwv.utils.test.CheckRulerDrawing = function (posGroupKid, details, ref, assert) {
+dwv.test.checkRulerDrawing = function (posGroupKid, details, ref, assert) {
     // check group
     assert.equal( posGroupKid.attrs.name, "ruler-group", "Shape group is a ruler group.");
     assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
@@ -250,7 +257,7 @@ dwv.utils.test.CheckRulerDrawing = function (posGroupKid, details, ref, assert) 
  * @param {String} version The state format version.
  * @param {Object} assert The qunit assert.
  */
-dwv.utils.test.CheckRulerDrawings = function (layerKids, details, version, assert) {
+dwv.test.checkRulerDrawings = function (layerKids, details, version, assert) {
 
     var ndraws = 5;
     assert.equal( layerKids.length, ndraws, "Layer has " + ndraws + " kids.");
@@ -308,7 +315,7 @@ dwv.utils.test.CheckRulerDrawings = function (layerKids, details, version, asser
         var posGroupKid = layerKid.children[0];
         assert.equal( posGroupKid.className, "Group", "Position group first level is a group.");
 
-        dwv.utils.test.CheckRulerDrawing( posGroupKid, details, refRulers[i], assert );
+        dwv.test.checkRulerDrawing( posGroupKid, details, refRulers[i], assert );
     }
 };
 
@@ -319,7 +326,7 @@ dwv.utils.test.CheckRulerDrawings = function (layerKids, details, version, asser
  * @param {String} version The state format version.
  * @param {Object} assert The qunit assert.
  */
-dwv.utils.test.CheckRoiDrawing = function (posGroupKid, details, version, assert) {
+dwv.test.checkRoiDrawing = function (posGroupKid, details, version, assert) {
     // check group
     assert.equal( posGroupKid.attrs.name, "roi-group", "Shape group is a roi group.");
     assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
@@ -370,7 +377,7 @@ dwv.utils.test.CheckRoiDrawing = function (posGroupKid, details, version, assert
  * @param {String} version The state format version.
  * @param {Object} assert The qunit assert.
  */
-dwv.utils.test.CheckHandDrawing = function (posGroupKid, details, version, assert) {
+dwv.test.checkHandDrawing = function (posGroupKid, details, version, assert) {
     // check group
     assert.equal( posGroupKid.attrs.name, "freeHand-group", "Shape group is a freeHand group.");
     assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
@@ -416,7 +423,7 @@ dwv.utils.test.CheckHandDrawing = function (posGroupKid, details, version, asser
  * @param {String} version The state format version.
  * @param {Object} assert The qunit assert.
  */
-dwv.utils.test.CheckEllipseDrawing = function (posGroupKid, details, version, assert) {
+dwv.test.checkEllipseDrawing = function (posGroupKid, details, version, assert) {
     // check group
     assert.equal( posGroupKid.attrs.name, "ellipse-group", "Shape group is an ellipse group.");
     assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
@@ -468,7 +475,7 @@ dwv.utils.test.CheckEllipseDrawing = function (posGroupKid, details, version, as
  * @param {String} version The state format version.
  * @param {Object} assert The qunit assert.
  */
-dwv.utils.test.CheckProtractorDrawing = function (posGroupKid, details, version, assert) {
+dwv.test.checkProtractorDrawing = function (posGroupKid, details, version, assert) {
     // check group
     assert.equal( posGroupKid.attrs.name, "protractor-group", "Shape group is an protractor group.");
     assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
@@ -522,7 +529,7 @@ dwv.utils.test.CheckProtractorDrawing = function (posGroupKid, details, version,
  * @param {String} version The state format version.
  * @param {Object} assert The qunit assert.
  */
-dwv.utils.test.CheckRectangleDrawing = function (posGroupKid, details, version, assert) {
+dwv.test.checkRectangleDrawing = function (posGroupKid, details, version, assert) {
     // check group
     assert.equal( posGroupKid.attrs.name, "rectangle-group", "Shape group is a rectangle group.");
     assert.ok( posGroupKid.attrs.draggable, "Shape group must be draggable.");
@@ -569,176 +576,176 @@ dwv.utils.test.CheckRectangleDrawing = function (posGroupKid, details, version, 
 
 /**
  * Tests for {@link dwv.State} v0.1 containing a line.
- * @function module:tests/state
+ * @function module:tests/state~testV01Line
  */
 QUnit.test("Test read v0.1 state: line.", function (assert) {
-    dwv.utils.test.TestState( "0.1", "line", assert );
+    dwv.test.testState( "0.1", "line", assert );
 });
 
 /**
  * Tests for {@link dwv.State} v0.1 containing a roi.
- * @function module:tests/state
+ * @function module:tests/state~testV01Roi
  */
 QUnit.test("Test read v0.1 state: roi.", function (assert) {
-    dwv.utils.test.TestState( "0.1", "roi", assert );
+    dwv.test.testState( "0.1", "roi", assert );
 });
 
 /**
  * Tests for {@link dwv.State} v0.1 containing an ellipse.
- * @function module:tests/state
+ * @function module:tests/state~testV01Ellipse
  */
 QUnit.test("Test read v0.1 state: ellipse.", function (assert) {
-    dwv.utils.test.TestState( "0.1", "ellipse", assert );
+    dwv.test.testState( "0.1", "ellipse", assert );
 });
 
 /**
  * Tests for {@link dwv.State} v0.1 containing a protractor.
- * @function module:tests/state
+ * @function module:tests/state~testV01Protractor
  */
 QUnit.test("Test read v0.1 state: protractor.", function (assert) {
-    dwv.utils.test.TestState( "0.1", "protractor", assert );
+    dwv.test.testState( "0.1", "protractor", assert );
 });
 
 /**
  * Tests for {@link dwv.State} v0.1 containing a rectangle.
- * @function module:tests/state
+ * @function module:tests/state~testV01Rectangle
  */
 QUnit.test("Test read v0.1 state: rectangle.", function (assert) {
-    dwv.utils.test.TestState( "0.1", "rectangle", assert );
+    dwv.test.testState( "0.1", "rectangle", assert );
 });
 
 /**
  * Tests for {@link dwv.State} v0.1 containing a multi slice ruler.
- * @function module:tests/state
+ * @function module:tests/state~testV01MultiSliceRuler
  */
 QUnit.test("Test read v0.1 state: line multi-slice.", function (assert) {
-    dwv.utils.test.TestState( "0.1", "line_multi-slice", assert );
+    dwv.test.testState( "0.1", "line_multi-slice", assert );
 });
 
 /**
  * Tests for {@link dwv.State} v0.2 containing an arrow.
- * @function module:tests/state
+ * @function module:tests/state~testV02Arrow
  */
 QUnit.test("Test read v0.2 state: arrow.", function (assert) {
-    dwv.utils.test.TestState( "0.2", "arrow", assert );
+    dwv.test.testState( "0.2", "arrow", assert );
 });
 
 /**
  * Tests for {@link dwv.State} v0.2 containing a ruler.
- * @function module:tests/state
+ * @function module:tests/state~testV02Ruler
  */
 QUnit.test("Test read v0.2 state: ruler.", function (assert) {
-    dwv.utils.test.TestState( "0.2", "ruler", assert );
+    dwv.test.testState( "0.2", "ruler", assert );
 });
 
 /**
  * Tests for {@link dwv.State} v0.2 containing a roi.
- * @function module:tests/state
+ * @function module:tests/state~testV02Roi
  */
 QUnit.test("Test read v0.2 state: roi.", function (assert) {
-    dwv.utils.test.TestState( "0.2", "roi", assert );
+    dwv.test.testState( "0.2", "roi", assert );
 });
 
 /**
  * Tests for {@link dwv.State} v0.2 containing a hand draw.
- * @function module:tests/state
+ * @function module:tests/state~testV02Hand
  */
 QUnit.test("Test read v0.2 state: hand.", function (assert) {
-    dwv.utils.test.TestState( "0.2", "hand", assert );
+    dwv.test.testState( "0.2", "hand", assert );
 });
 
 /**
  * Tests for {@link dwv.State} v0.2 containing an ellipse.
- * @function module:tests/state
+ * @function module:tests/state~testV02Ellipses
  */
 QUnit.test("Test read v0.2 state: ellipse.", function (assert) {
-    dwv.utils.test.TestState( "0.2", "ellipse", assert );
+    dwv.test.testState( "0.2", "ellipse", assert );
 });
 
 /**
  * Tests for {@link dwv.State} v0.2 containing a protractor.
- * @function module:tests/state
+ * @function module:tests/state~testV02Protractor
  */
 QUnit.test("Test read v0.2 state: protractor.", function (assert) {
-    dwv.utils.test.TestState( "0.2", "protractor", assert );
+    dwv.test.testState( "0.2", "protractor", assert );
 });
 
 /**
  * Tests for {@link dwv.State} v0.2 containing a rectangle.
- * @function module:tests/state
+ * @function module:tests/state~testV02Rectangle
  */
 QUnit.test("Test read v0.2 state: rectangle.", function (assert) {
-    dwv.utils.test.TestState( "0.2", "rectangle", assert );
+    dwv.test.testState( "0.2", "rectangle", assert );
 });
 
 /**
  * Tests for {@link dwv.State} v0.2 containing a multi slice ruler.
- * @function module:tests/state
+ * @function module:tests/state~testV02MultiSliceRuler
  */
 QUnit.test("Test read v0.2 state: ruler multi-slice.", function (assert) {
-    dwv.utils.test.TestState( "0.2", "ruler_multi-slice", assert );
+    dwv.test.testState( "0.2", "ruler_multi-slice", assert );
 });
 
 /**
  * Tests for {@link dwv.State} v0.3 containing an arrow.
- * @function module:tests/state
+ * @function module:tests/state~testV03Arrow
  */
 QUnit.test("Test read v0.3 state: arrow.", function (assert) {
-    dwv.utils.test.TestState( "0.3", "arrow", assert );
+    dwv.test.testState( "0.3", "arrow", assert );
 });
 
 /**
  * Tests for {@link dwv.State} v0.3 containing a ruler.
- * @function module:tests/state
+ * @function module:tests/state~testV03Ruler
  */
 QUnit.test("Test read v0.3 state: ruler.", function (assert) {
-    dwv.utils.test.TestState( "0.3", "ruler", assert );
+    dwv.test.testState( "0.3", "ruler", assert );
 });
 
 /**
  * Tests for {@link dwv.State} v0.3 containing a roi.
- * @function module:tests/state
+ * @function module:tests/state~testV03Roi
  */
 QUnit.test("Test read v0.3 state: roi.", function (assert) {
-    dwv.utils.test.TestState( "0.3", "roi", assert );
+    dwv.test.testState( "0.3", "roi", assert );
 });
 
 /**
  * Tests for {@link dwv.State} v0.3 containing a hand draw.
- * @function module:tests/state
+ * @function module:tests/state~testV03Hand
  */
 QUnit.test("Test read v0.3 state: hand.", function (assert) {
-    dwv.utils.test.TestState( "0.3", "hand", assert );
+    dwv.test.testState( "0.3", "hand", assert );
 });
 
 /**
  * Tests for {@link dwv.State} v0.3 containing an ellipse.
- * @function module:tests/state
+ * @function module:tests/state~testV03Ellipse
  */
 QUnit.test("Test read v0.3 state: ellipse.", function (assert) {
-    dwv.utils.test.TestState( "0.3", "ellipse", assert );
+    dwv.test.testState( "0.3", "ellipse", assert );
 });
 
 /**
  * Tests for {@link dwv.State} v0.3 containing a protractor.
- * @function module:tests/state
+ * @function module:tests/state~testV03Protractor
  */
 QUnit.test("Test read v0.3 state: protractor.", function (assert) {
-    dwv.utils.test.TestState( "0.3", "protractor", assert );
+    dwv.test.testState( "0.3", "protractor", assert );
 });
 
 /**
  * Tests for {@link dwv.State} v0.3 containing a rectangle.
- * @function module:tests/state
+ * @function module:tests/state~testV03Rectangle
  */
 QUnit.test("Test read v0.3 state: rectangle.", function (assert) {
-    dwv.utils.test.TestState( "0.3", "rectangle", assert );
+    dwv.test.testState( "0.3", "rectangle", assert );
 });
 
 /**
  * Tests for {@link dwv.State} v0.3 containing a multi slice ruler.
- * @function module:tests/state
+ * @function module:tests/state~testV03MultiSliceRuler
  */
 QUnit.test("Test read v0.3 state: ruler multi-slice.", function (assert) {
-    dwv.utils.test.TestState( "0.3", "ruler_multi-slice", assert );
+    dwv.test.testState( "0.3", "ruler_multi-slice", assert );
 });

@@ -47,10 +47,10 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
      * Dump the DICOM tags to an array.
      * @return {Array}
      */
-    this.dumpToTable = function () {
+    this.dumpToObject = function () {
         var keys = Object.keys(dicomElements);
         var dict = dwv.dicom.dictionary;
-        var table = [];
+        var obj = {};
         var dicomElement = null;
         var dictElement = null;
         var row = null;
@@ -64,11 +64,9 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
                 dictElement = dict[dicomElement.tag.group][dicomElement.tag.element];
             }
             // name
+            var name = "Unknown Tag & Data";
             if ( dictElement !== null ) {
-                row.name = dictElement[2];
-            }
-            else {
-                row.name = "Unknown Tag & Data";
+                name = dictElement[2];
             }
             // value
             row.value = this.getElementValueAsString(dicomElement);
@@ -78,9 +76,9 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
             row.vr = dicomElement.vr;
             row.vl = dicomElement.vl;
 
-            table.push( row );
+            obj[name] = row;
         }
-        return table;
+        return obj;
     };
 
     /**
@@ -158,10 +156,19 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function ( di
         str = "(PixelSequence)";
     } else if ( dicomElement.vr === "DA" && pretty ) {
         var daValue = dicomElement.value[0];
-        var daYear = parseInt( daValue.substr(0,4), 10 );
-        var daMonth = parseInt( daValue.substr(4,2), 10 ) - 1; // 0-11
-        var daDay = parseInt( daValue.substr(6,2), 10 );
-        var da = new Date(daYear, daMonth, daDay);
+        // Two possible date formats:
+        // - standard 'YYYYMMDD'
+        // - non-standard 'YYYY.MM.DD' (previous ACR-NEMA)
+        var monthBeginIndex = 4;
+        var dayBeginIndex = 6;
+        if (daValue.length !== 8) {
+            monthBeginIndex = 5;
+            dayBeginIndex = 8;
+        }
+        var da = new Date(
+            parseInt(daValue.substr(0, 4), 10),
+            parseInt(daValue.substr(monthBeginIndex, 2), 10) - 1, // 0-11 range
+            parseInt(daValue.substr(dayBeginIndex, 2), 10));
         str = da.toLocaleDateString();
     } else if ( dicomElement.vr === "TM"  && pretty ) {
         var tmValue = dicomElement.value[0];

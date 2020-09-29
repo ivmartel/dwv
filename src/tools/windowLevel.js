@@ -16,11 +16,6 @@ dwv.tool.WindowLevel = function(app)
      */
     var self = this;
     /**
-     * WindowLevel GUI.
-     * @type Object
-     */
-    var gui = null;
-    /**
      * Interaction start flag.
      * @type Boolean
      */
@@ -36,7 +31,7 @@ dwv.tool.WindowLevel = function(app)
         // store initial position
         self.x0 = event._x;
         self.y0 = event._y;
-        // update GUI
+        // update view controller
         app.getViewController().setCurrentPosition2D(event._x, event._y);
     };
 
@@ -61,14 +56,6 @@ dwv.tool.WindowLevel = function(app)
             "wl": new dwv.image.WindowLevel(windowCenter, windowWidth),
             "name": "manual"} } );
         app.getViewController().setWindowLevelPreset("manual");
-
-        // update gui
-        if ( gui ) {
-            // initialise to add the manual preset
-            gui.initialise();
-            // set selected preset
-            dwv.gui.setSelected(app.getElement("presetSelect"), "manual");
-        }
 
         // store position
         self.x0 = event._x;
@@ -124,7 +111,7 @@ dwv.tool.WindowLevel = function(app)
      * @param {Object} event The double click event.
      */
     this.dblclick = function(event){
-        // update GUI
+        // update view controller
         app.getViewController().setWindowLevel(
             parseInt(app.getImage().getRescaledValue(
                 event._x, event._y, app.getViewController().getCurrentPosition().k), 10),
@@ -135,63 +122,43 @@ dwv.tool.WindowLevel = function(app)
      * Handle key down event.
      * @param {Object} event The key down event.
      */
-    this.keydown = function(event){
-        // let the app handle it
+    this.keydown = function (event) {
+        event.context = "dwv.tool.WindowLevel";
         app.onKeydown(event);
     };
 
     /**
-     * Setup the tool GUI.
+     * Activate the tool.
+     * @param {Boolean} bool The flag to activate or not.
      */
-    this.setup = function ()
-    {
-        gui = new dwv.gui.WindowLevel(app);
-        gui.setup();
-    };
-
-    /**
-     * Display the tool.
-     * @param {Boolean} bool The flag to display or not.
-     */
-    this.display = function (bool)
-    {
-        if ( gui )
-        {
-            if( app.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null ) {
-                gui.display(bool);
-            }
-            else {
-                gui.display(false);
-            }
-        }
+    this.activate = function (/*bool*/) {
+        // does nothing
     };
 
     /**
      * Initialise the tool.
      */
     this.init = function() {
-        if ( gui ) {
-            gui.initialise();
-        }
-        return true;
+        // does nothing
     };
+
 }; // WindowLevel class
 
 /**
  * Help for this tool.
  * @return {Object} The help content.
  */
-dwv.tool.WindowLevel.prototype.getHelp = function()
+dwv.tool.WindowLevel.prototype.getHelpKeys = function()
 {
     return {
-        "title": dwv.i18n("tool.WindowLevel.name"),
-        "brief": dwv.i18n("tool.WindowLevel.brief"),
+        "title": "tool.WindowLevel.name",
+        "brief": "tool.WindowLevel.brief",
         "mouse": {
-            "mouse_drag": dwv.i18n("tool.WindowLevel.mouse_drag"),
-            "double_click": dwv.i18n("tool.WindowLevel.double_click")
+            "mouse_drag": "tool.WindowLevel.mouse_drag",
+            "double_click": "tool.WindowLevel.double_click"
         },
         "touch": {
-            "touch_drag": dwv.i18n("tool.WindowLevel.touch_drag")
+            "touch_drag": "tool.WindowLevel.touch_drag"
         }
     };
 };
