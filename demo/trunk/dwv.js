@@ -1,4 +1,4 @@
-/*! dwv 0.28.0-beta 2020-09-29 21:15:56 */
+/*! dwv 0.28.0-beta 2020-09-29 21:32:34 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -5108,6 +5108,82 @@ var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
 
 /**
+ * Return true if the input number is even.
+ * @param {Number} number The number to check.
+ * @returns {Boolean} True is the number is even.
+ */
+dwv.dicom.isEven = function (number) {
+    return number % 2 == 0;
+};
+
+/**
+ * Is the input VR a non string VR.
+ * @param {String} vr The element VR.
+ * @retuns True if the VR is a non string one.
+ */
+dwv.dicom.isNonStringVr = function (vr) {
+    return  vr === "UN" || vr === "OB" || vr === "OW" ||
+        vr === "OF" || vr === "OD" || vr === "US" || vr === "SS" ||
+        vr === "UL" || vr === "SL" || vr === "FL" || vr === "FD" ||
+        vr === "SQ" || vr === "AT";
+};
+
+/**
+ * Is the input VR a string VR.
+ * @param {String} vr The element VR.
+ * @retuns True if the VR is a string one.
+ */
+dwv.dicom.isStringVr = function (vr) {
+    return !dwv.dicom.isNonStringVr(vr);
+};
+
+/**
+ * Is the input VR a VR that could need padding.
+ * @param {String} vr The element VR.
+ * @retuns True if the VR needs padding.
+ */
+dwv.dicom.isVrToPad = function (vr) {
+    return dwv.dicom.isStringVr(vr) || vr === "OB";
+};
+
+/**
+ * Get the VR specific padding value.
+ * @param {String} vr The element VR.
+ * @returns The value used to pad.
+ */
+dwv.dicom.getVrPad = function (vr) {
+    var pad = 0;
+    if (dwv.dicom.isStringVr(vr)) {
+        if (vr === "UI"){
+            pad = "\0";
+        } else {
+            pad = " ";
+        }
+    }
+    return pad;
+};
+
+/**
+ * Pad an input value according to its VR.
+ * see http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html
+ * @param {Object} element The DICOM element to get the VR from.
+ * @param {Object} value The value to pad.
+ / @returns The padded value.
+ */
+dwv.dicom.padElementValue = function (element, value) {
+    if (typeof value !== "undefined" && typeof value.length !== "undefined") {
+        if (dwv.dicom.isVrToPad(element.vr) && !dwv.dicom.isEven(value.length)) {
+            if (value instanceof Array) {
+                value[value.length - 1] += dwv.dicom.getVrPad(element.vr);
+            } else {
+                value += dwv.dicom.getVrPad(element.vr);
+            }
+        }
+    }
+    return value;
+};
+
+/**
  * Data writer.
  *
  * Example usage:
@@ -5680,9 +5756,10 @@ dwv.dicom.DicomWriter = function () {
             return item;
         },
         'replace': function (item, value) {
-            item.value[0] = value;
-            item.vl = value.length;
-            item.endOffset = item.startOffset + value.length;
+            var paddedValue = dwv.dicom.padElementValue(item, value);
+            item.value[0] = paddedValue;
+            item.vl = paddedValue.length;
+            item.endOffset = item.startOffset + paddedValue.length;
             return item;
         }
     };
@@ -5832,10 +5909,6 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     var ivn = dwv.dicom.getDicomElement("ImplementationVersionName");
     var ivnSize = dwv.dicom.getDataElementPrefixByteSize(ivn.vr, isImplicit);
     var ivnValue = "DWV_" + dwv.getVersion();
-    // odd IDs should be padded
-    if ( ivnValue.length % 2 === 1 ) {
-        ivnValue += '\0';
-    }
     ivnSize += dwv.dicom.setElementValue(ivn, ivnValue, false);
     metaElements.push(ivn);
     metaLength += ivnSize;
@@ -5874,7 +5947,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
 };
 
 /**
- * Fix for broken DICOM elements: Replace "UN" with correct VR if the element exists in dictionary 
+ * Fix for broken DICOM elements: Replace "UN" with correct VR if the element exists in dictionary
  */
 dwv.dicom.checkUnkwownVR = function (element)
 {
@@ -6005,21 +6078,22 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
     else {
         // set the value and calculate size
         size = 0;
+        var paddedValue = dwv.dicom.padElementValue(element, value);
         if (value instanceof Array) {
-            element.value = value;
-            for (var k = 0; k < value.length; ++k) {
+            element.value = paddedValue;
+            for (var k = 0; k < paddedValue.length; ++k) {
                 // spearator
                 if (k !== 0) {
                     size += 1;
                 }
                 // value
-                size += value[k].toString().length;
+                size += paddedValue[k].toString().length;
             }
         }
         else {
-            element.value = [value];
-            if (typeof value !== "undefined" && typeof value.length !== "undefined") {
-                size = value.length;
+            element.value = [paddedValue];
+            if (typeof paddedValue !== "undefined" && typeof paddedValue.length !== "undefined") {
+                size = paddedValue.length;
             }
             else {
                 // numbers
@@ -6184,7 +6258,8 @@ dwv.dicom.generatePixelDataFromJSONTags = function (tags, startOffset, pixGenera
     var bitsAllocated = tags.BitsAllocated;
     var pixelRepresentation = tags.PixelRepresentation;
     var samplesPerPixel = tags.SamplesPerPixel;
-    var photometricInterpretation = tags.PhotometricInterpretation;
+    // trim in case config contains padding
+    var photometricInterpretation = tags.PhotometricInterpretation.trim();
 
     var sliceLength = numberOfRows * numberOfColumns;
     var dataLength = sliceLength * samplesPerPixel;
