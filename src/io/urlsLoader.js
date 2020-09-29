@@ -57,6 +57,13 @@ dwv.io.UrlsLoader = function ()
     var nLoadend = 0;
 
     /**
+     * Flag to know if the load is aborting.
+     * @private
+     * @type Boolean
+     */
+    var aborting;
+
+    /**
      * The default character set (optional).
      * @private
      * @type String
@@ -89,6 +96,8 @@ dwv.io.UrlsLoader = function ()
         // reset counters
         nLoad = 0;
         nLoadend = 0;
+        // reset flag
+        aborting = false;
         // clear storage
         clearStoredRequests();
         clearStoredLoader();
@@ -213,7 +222,10 @@ dwv.io.UrlsLoader = function ()
     /**
      * Load a list of urls.
      * @param {Array} data The list of urls to load.
-     * @param {Object} options Load options.
+     * @param {Object} options The options object, can contain:
+     *  - requestHeaders: an array of {name, value} to use as request headers
+     *  - withCredentials: boolean xhr.withCredentials flag to pass to the request
+     *  - batchSize: the size of the request url batch
      * @private
      */
     function loadUrls(data, options) {
@@ -290,6 +302,17 @@ dwv.io.UrlsLoader = function ()
             };
         };
 
+        // store last run request index
+        var lastRunRequestIndex = 0;
+        var requestOnLoadEnd = function() {
+            addLoadend();
+            // launch next in queue
+            if (lastRunRequestIndex < requests.length - 1 && !aborting) {
+                ++lastRunRequestIndex;
+                requests[lastRunRequestIndex].send(null);
+            }
+        };
+
         // loop on I/O elements
         for (var i = 0; i < data.length; ++i) {
             dataElement = data[i];
@@ -305,9 +328,8 @@ dwv.io.UrlsLoader = function ()
              */
             var request = new XMLHttpRequest();
             request.open('GET', dataElement, true);
-            // store request
-            storeRequest(request);
 
+            // request options
             if ( typeof options !== "undefined" ) {
                 // optional request headers
                 if ( typeof options.requestHeaders !== "undefined" ) {
@@ -320,6 +342,7 @@ dwv.io.UrlsLoader = function ()
                     }
                 }
                 // optional withCredentials
+                // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
                 if (typeof options.withCredentials !== "undefined") {
                     request.withCredentials = options.withCredentials;
                 }
@@ -330,15 +353,31 @@ dwv.io.UrlsLoader = function ()
             request.onprogress = augmentCallbackEvent(
                 mproghandler.getMonoProgressHandler(i, 0), dataElement);
             request.onload = getLoadHandler(loader, dataElement, i);
-            request.onloadend = addLoadend;
+            request.onloadend = requestOnLoadEnd;
             request.onerror = augmentCallbackEvent(self.onerror, dataElement);
             request.onabort = augmentCallbackEvent(self.onabort, dataElement);
             // response type (default is 'text')
             if (loader.loadUrlAs() === dwv.io.urlContentTypes.ArrayBuffer) {
                 request.responseType = "arraybuffer";
             }
-            // send request
-            request.send(null);
+
+            // store request
+            storeRequest(request);
+        }
+
+        // launch requests in batch
+        var batchSize = requests.length;
+        if ( typeof options !== "undefined" ) {
+            // optional request batch size
+            if ( typeof options.batchSize !== "undefined" && batchSize !== 0) {
+                batchSize = Math.min(options.batchSize, requests.length);
+            }
+        }
+        for (var r = 0; r < batchSize; ++r) {
+            if (!aborting) {
+                lastRunRequestIndex = r;
+                requests[lastRunRequestIndex].send(null);
+            }
         }
     }
 
@@ -398,7 +437,8 @@ dwv.io.UrlsLoader = function ()
      * Abort a load.
      */
     this.abort = function () {
-        // abort requests
+        aborting = true;
+        // abort non finished requests
         for ( var i = 0; i < requests.length; ++i ) {
             // 0: UNSENT, 1: OPENED, 2: HEADERS_RECEIVED (send()), 3: LOADING, 4: DONE
             if ( requests[i].readyState !== 4 ) {
