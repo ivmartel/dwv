@@ -2221,10 +2221,10 @@ lru-cache@4.1.x:
     pseudomap "^1.0.2"
     yallist "^2.1.2"
 
-magic-wand-js@~1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/magic-wand-js/-/magic-wand-js-1.0.0.tgz#fe3bb6f7392ab1dd3aab231dfc1e010ad65a0061"
-  integrity sha1-/ju29zkqsd06qyMd/B4BCtZaAGE=
+magic-wand-tool@~1.1.7:
+  version "1.1.7"
+  resolved "https://registry.yarnpkg.com/magic-wand-tool/-/magic-wand-tool-1.1.7.tgz#c1d49c5f26307bec06eb8c6ac51e03fff5b9d61b"
+  integrity sha512-S4rHzCs/bAp7nhQGKeg+McWuqrdyZKpnu8Ahd8AU7NzuLTm/Hh8tkpv1tW91Kmm59foIrXzip1d+P9NDoyxrZA==
 
 make-dir@^3.0.0:
   version "3.1.0"
