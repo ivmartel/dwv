@@ -4,6 +4,7 @@
         "collapse": true,
         "private": false,
         "sectionOrder": [
+          "Tutorials",
           "Namespaces",
           "Events",
           "Classes",
@@ -18,5 +19,10 @@
                 "id":"website_link"
             }
         }
+    },
+    "plugins": ["node_modules/jsdoc/plugins/markdown"],
+    "markdown": {
+      "idInHeadings": true
     }
+
 }

@@ -67,7 +67,8 @@ module.exports = function(grunt) {
                 options: {
                     destination: 'build/doc',
                     template: 'node_modules/docdash',
-                    configure: 'resources/doc/jsdoc.conf.json'
+                    configure: 'resources/doc/jsdoc.conf.json',
+                    tutorials: 'resources/doc/tutorials'
                 }
             }
         },

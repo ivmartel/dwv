@@ -4,6 +4,7 @@ var dwv = dwv || {};
 /**
  * Main application class.
  * @constructor
+ * @tutorial examples
  */
 dwv.App = function ()
 {
