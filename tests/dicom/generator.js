@@ -213,7 +213,7 @@ dwv.test.onInputImageFiles = function (event)
 };
 
 // last minute
-document.addEventListener('DOMContentLoaded', function (/*event*/) {
+dwv.test.onDOMContentLoadedGenerator = function (/*event*/) {
   var tags = JSON.parse(document.getElementById('tags').value);
   if (tags) {
     // set study date
@@ -227,4 +227,4 @@ document.addEventListener('DOMContentLoaded', function (/*event*/) {
     // write back
     document.getElementById('tags').value = JSON.stringify(tags, null, 2);
   }
-});
+};
