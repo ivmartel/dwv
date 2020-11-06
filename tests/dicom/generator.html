@@ -58,9 +58,9 @@ be written with explicit zero length, a <code>0</code> value will mean implicit 
 
 <fieldset>
 <label for="intagsfile">JSON DICOM tags file: </label>
-<input id="intagsfile" type="file" name="file" onchange="onInputTagsFile(event);">
-<a href="#" id="jsonlint" class="button" onclick="launchJSONlint();">JSONLint</a>
-<a href="#" id="save" class="button" onclick="saveTags();">Save Tags</a>
+<input id="intagsfile" type="file" name="file" onchange="dwv.test.onInputTagsFile(event);">
+<a href="#" id="jsonlint" class="button" onclick="dwv.test.launchJSONlint();">JSONLint</a>
+<a href="#" id="save" class="button" onclick="dwv.test.onSaveTags();">Save Tags</a>
 </fieldset>
 
 <textarea id="tags" rows="25">
@@ -86,8 +86,8 @@ be written with explicit zero length, a <code>0</code> value will mean implicit 
 <label for="numberofslices">Number of slices: </label>
 <input type="number" id="numberofslices" value="1"/>
 <label for="inImgfile">Image file(s): </label>
-<input id="inImgfile" type="file" multiple="true" name="file" onchange="onInputImageFiles(event);">
-<a href="#" id="generate" class="button" onclick="generate();">Generate</a>
+<input id="inImgfile" type="file" multiple="true" name="file" onchange="dwv.test.onInputImageFiles(event);">
+<a href="#" id="generate" class="button" onclick="dwv.test.onGenerate();">Generate</a>
 </fieldset>
 </form>
 

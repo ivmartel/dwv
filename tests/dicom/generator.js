@@ -1,3 +1,6 @@
+var dwv = dwv || {};
+dwv.test = dwv.test || {};
+var JSZip = JSZip || {};
 // tags file
 var _tagsFile = null;
 var _images = null;
@@ -14,7 +17,7 @@ function getPixelGeneratorName() {
 }
 
 // generate DICOM data
-function generate() {
+dwv.test.onGenerate = function () {
     if (_generating) {
       return;
     }
@@ -56,13 +59,13 @@ function generate() {
         _generating = false;
         // revoke url to not download it twice
         setTimeout(function () {
-          URL.revokeObjectURL(element.href)
-        }, 2E3) // 2s
+          URL.revokeObjectURL(element.href);
+        }, 2E3); // 2s
     }, function (error) {
         console.error(error);
         alert(error.message);
     });
-}
+};
 
 function generateSlice(pixelGeneratorName, sliceNumber) {
     var numberOfSlices = document.getElementById('numberofslices').value;
@@ -91,7 +94,7 @@ function generateSlice(pixelGeneratorName, sliceNumber) {
 }
 
 // save the tags as a JSON file
-function saveTags()
+dwv.test.onSaveTags = function ()
 {
     // check validity
     if (!isValidTags()) {
@@ -105,7 +108,7 @@ function saveTags()
     var element = document.getElementById("save");
     element.download = (_tagsFile === null ? "tags.json" : _tagsFile.name);
     element.href = URL.createObjectURL(blob);
-}
+};
 
 // is the JSON valid?
 function isValidTags()
@@ -122,15 +125,15 @@ function isValidTags()
 }
 
 // open JSONLint to check the tags
-function launchJSONlint()
+dwv.test.launchJSONlint = function ()
 {
     var text = document.getElementById('tags').value;
     var link = "http://jsonlint.com/?json=" + encodeURIComponent(text);
     window.open(link);
-}
+};
 
 // handle input tags file
-function onInputTagsFile(event)
+dwv.test.onInputTagsFile = function (event)
 {
     if (event.target.files.length === 0) {
         return;
@@ -141,10 +144,10 @@ function onInputTagsFile(event)
         document.getElementById('tags').value = event.target.result;
     };
     reader.readAsText(_tagsFile);
-}
+};
 
 // handle input image file
-function onInputImageFiles(event)
+dwv.test.onInputImageFiles = function (event)
 {
     if (event.target.files.length === 0) {
         return;
@@ -154,9 +157,9 @@ function onInputImageFiles(event)
     // update number of slices field
     document.getElementById('numberofslices').value = files.length;
 
-    var checkTags = function (tags, image) {
+    var checkTags = function (/*tags, image*/) {
       return false;
-    }
+    };
     var pixGeneratorName = getPixelGeneratorName();
     if (typeof dwv.dicom.pixelGenerators[pixGeneratorName] !== 'undefined') {
       checkTags = dwv.dicom.pixelGenerators[pixGeneratorName].checkTags;
@@ -181,21 +184,21 @@ function onInputImageFiles(event)
           if (this.width !== _images[0].width) {
             message = "Image width mismatch between input files: " +
               this.width + " != " + _images[0].width;
-            console.error(message)
+            console.error(message);
             alert(message);
             return;
           }
           if (this.height !== _images[0].height) {
             message = "Image height mismatch between input files: " +
               this.height + " != " + _images[0].height;
-            console.error(message)
+            console.error(message);
             alert(message);
             return;
           }
         }
         // save image
         _images.push(this);
-      }
+      };
       // set src (triggers load)
       image.src = event.target.result;
     }
@@ -207,7 +210,7 @@ function onInputImageFiles(event)
       reader.onload = onReaderLoad;
       reader.readAsDataURL(file);
     }
-}
+};
 
 // last minute
 document.addEventListener('DOMContentLoaded', function (/*event*/) {

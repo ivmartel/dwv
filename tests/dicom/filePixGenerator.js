@@ -7,8 +7,6 @@ var FilePixGenerator = function (options) {
 
   var numberOfColumns = options.numberOfColumns;
   var numberOfRows = options.numberOfRows;
-  var numberOfSamples = options.numberOfSamples;
-  var numberOfColourPlanes = options.numberOfColourPlanes;
   var isRGB = options.photometricInterpretation === "RGB";
 
   this.setImages = function (imgs) {
@@ -17,10 +15,10 @@ var FilePixGenerator = function (options) {
     for (var i = 0; i < imgs.length; ++i) {
       img = imgs[i];
       if (img.width !== numberOfColumns) {
-        throw Error('Image width mismatch: ' + img.width + '!=' + numberOfColumns)
+        throw Error('Image width mismatch: ' + img.width + '!=' + numberOfColumns);
       }
       if (img.height !== numberOfRows) {
-        throw Error('Image height mismatch: ' + img.height + '!=' + numberOfRows)
+        throw Error('Image height mismatch: ' + img.height + '!=' + numberOfRows);
       }
     }
     // store
@@ -43,8 +41,8 @@ var FilePixGenerator = function (options) {
       pixelBuffer[j] = imageData[i];
       j += 1;
       if (isRGB) {
-        buffer[j+1] = imageData[i+1];
-        buffer[j+2] = imageData[i+2];
+        pixelBuffer[j+1] = imageData[i+1];
+        pixelBuffer[j+2] = imageData[i+2];
         j+=2;
       }
     }
@@ -74,5 +72,5 @@ function checkTags(tags, image) {
 dwv.dicom.pixelGenerators = dwv.dicom.pixelGenerators || {};
 dwv.dicom.pixelGenerators.file = {
   generator: FilePixGenerator,
-  checkTags
+  checkTags: checkTags
 };

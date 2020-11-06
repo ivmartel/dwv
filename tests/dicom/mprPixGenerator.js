@@ -9,8 +9,6 @@
 
   var numberOfColumns = options.numberOfColumns;
   var numberOfRows = options.numberOfRows;
-  var numberOfSamples = options.numberOfSamples;
-  var numberOfColourPlanes = options.numberOfColourPlanes;
   var isRGB = options.photometricInterpretation === "RGB";
 
   if (isRGB) {
@@ -28,7 +26,7 @@
   this.setNumberOfSlices = function (num) {
     numberOfSlices = num;
     halfNSlices = num * 0.5;
-  }
+  };
 
   this.setImages = function (imgs) {
     // check sizes
@@ -36,10 +34,10 @@
     for (var i = 0; i < imgs.length; ++i) {
       img = imgs[i];
       if (img.width !== halfNCols) {
-        throw Error('Image width mismatch: ' + img.width + '!=' + halfNCols)
+        throw Error('Image width mismatch: ' + img.width + '!=' + halfNCols);
       }
       if (img.height !== halfNRows) {
-        throw Error('Image height mismatch: ' + img.height + '!=' + halfNRows)
+        throw Error('Image height mismatch: ' + img.height + '!=' + halfNRows);
       }
     }
     // store
@@ -91,7 +89,7 @@
     return i + j * halfNCols;
   }
 
-  function getFunc(name, i, j, k) {
+  function getFunc(name, i, j/*, k*/) {
     var imgIdx = 0;
     if (name === 'axial') {
       imgIdx = 0;
@@ -127,5 +125,5 @@ function checkTags(tags, image) {
 dwv.dicom.pixelGenerators = dwv.dicom.pixelGenerators || {};
 dwv.dicom.pixelGenerators.mpr = {
   generator: MPRPixGenerator,
-  checkTags
+  checkTags: checkTags
 };

@@ -122,10 +122,14 @@ dwv.dicom.generatePixelDataFromJSONTags = function (
     if (typeof dwv.dicom.pixelGenerators[pixGeneratorName] === "undefined" ) {
         throw new Error("Unknown PixelData generator: "+pixGeneratorName);
     }
-    var generatorClass = dwv.dicom.pixelGenerators[pixGeneratorName].generator;
-    var generator = new generatorClass(
-      {numberOfColumns, numberOfRows, numberOfSamples, numberOfColourPlanes, photometricInterpretation}
-    );
+    var GeneratorClass = dwv.dicom.pixelGenerators[pixGeneratorName].generator;
+    var generator = new GeneratorClass({
+      numberOfColumns: numberOfColumns,
+      numberOfRows: numberOfRows,
+      numberOfSamples: numberOfSamples,
+      numberOfColourPlanes: numberOfColourPlanes,
+      photometricInterpretation: photometricInterpretation
+    });
     if (typeof generator.setImages !== "undefined") {
       generator.setImages(images);
     }
@@ -167,4 +171,4 @@ dwv.dicom.getImageDataData = function (image) {
   var imageData = ctx.getImageData(0, 0, image.width, image.height);
   // data.data
   return imageData.data;
-}
+};
