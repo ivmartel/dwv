@@ -87,7 +87,7 @@ QUnit.test("Test patient anonymisation", function (assert) {
         		'default': {action: 'copy', value: null },
         		'x00100010' : {action: 'replace', value: patientsNameAnonymised }, // tag
         	    'PatientID': {action: 'replace', value: patientsIdAnonymised}, // tag name 'x00100020'
-        	    'Patient' : {action: 'remove', value: null }, // group name 'x0010'
+        	    'Patient' : {action: 'remove', value: null } // group name 'x0010'
         };
 
         var patientsName = 'dwv-patient-test';
@@ -193,6 +193,19 @@ dwv.test.compare = function ( jsonTags, dicomElements, name, comparator ) {
  * @param {Object} assert A Qunit assert.
  */
 dwv.test.testWriteReadDataFromConfig = function (config, assert) {
+    // add private tags to dict if present
+    var useUnVrForPrivateSq = false;
+    if (typeof config.privateDictionary !== 'undefined') {
+      var keys = Object.keys(config.privateDictionary);
+      for (var i = 0; i < keys.length; ++i) {
+        var group = keys[i];
+        var tags = config.privateDictionary[group];
+        dwv.dicom.dictionary[group] = tags;
+      }
+      if (typeof config.useUnVrForPrivateSq !== 'undefined') {
+        useUnVrForPrivateSq = config.useUnVrForPrivateSq;
+      }
+    }
     // convert JSON to DICOM element object
     var res = dwv.dicom.getElementsFromJSONTags(config.tags);
     var dicomElements = res.elements;
@@ -201,6 +214,7 @@ dwv.test.testWriteReadDataFromConfig = function (config, assert) {
 
     // create DICOM buffer
     var writer = new dwv.dicom.DicomWriter();
+    writer.useUnVrForPrivateSq = useUnVrForPrivateSq;
     var dicomBuffer = null;
     try {
         dicomBuffer = writer.getBuffer(dicomElements);

@@ -106,6 +106,9 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian)
     // private DataView
     var view = new DataView(buffer);
 
+    // flag to use VR=UN for private sequences, default to false
+    this.useUnVrForPrivateSq = false;
+
     /**
      * Write Uint8 data.
      * @param {Number} byteOffset The offset to start writing from.
@@ -523,8 +526,13 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (element, byteOffset,
     // element
     byteOffset = this.writeHex(byteOffset, element.tag.element);
     // VR
+    var vr = element.vr;
+    if (this.useUnVrForPrivateSq && dwv.dicom.isPrivateGroup(element.tag.group) && vr === 'SQ') {
+      console.warn('Using VR=UN for private sequence.');
+      vr = 'UN';
+    }
     if ( isTagWithVR && !isImplicit ) {
-        byteOffset = this.writeString(byteOffset, element.vr);
+        byteOffset = this.writeString(byteOffset, vr);
         // reserved 2 bytes for 32bit VL
         if ( is32bitVLVR ) {
             byteOffset += 2;
@@ -615,7 +623,7 @@ dwv.dicom.isImplicitLengthPixels = function (element) {
  * @param {Array} array of typed arrays
  * @returns {Object} a typed array containing all values
  */
-dwv.dicom.flattenArrayOfTypedArrays = function(initialArray) {
+dwv.dicom.flattenArrayOfTypedArrays = function (initialArray) {
     var initialArrayLength = initialArray.length;
     var arrayLength = initialArray[0].length;
     // If this is not a array of arrays, just return the initial one:
@@ -639,6 +647,9 @@ dwv.dicom.flattenArrayOfTypedArrays = function(initialArray) {
  * @constructor
  */
 dwv.dicom.DicomWriter = function () {
+
+    // flag to use VR=UN for private sequences, default to false
+    this.useUnVrForPrivateSq = false;
 
     // possible tag actions
     var actions = {
@@ -831,6 +842,8 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
         dwv.dicom.checkUnkwownVR(metaElements[j]);
         offset = metaWriter.writeDataElement(metaElements[j], offset, false);
     }
+    // pass flag to writer
+    dataWriter.useUnVrForPrivateSq = this.useUnVrForPrivateSq;
     // write non meta
     for ( var k = 0, lenk = rawElements.length; k < lenk; ++k ) {
         dwv.dicom.checkUnkwownVR(rawElements[k]);

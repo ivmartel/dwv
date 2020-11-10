@@ -189,5 +189,71 @@
             }
         }
     }
+},
+{
+    "name": "test06",
+    "description": "Little Endian Explicit test data with private tags.",
+    "tags": {
+        "TransferSyntaxUID": "1.2.840.10008.1.2.1\u0000",
+        "Modality": "MR",
+        "PatientName": "dwv-patient-name00",
+        "PhotometricInterpretation": "MONOCHROME2 ",
+        "SamplesPerPixel": 1,
+        "PixelRepresentation": 0,
+        "Rows": 32,
+        "Columns": 32,
+        "BitsAllocated": 16,
+        "BitsStored": 12,
+        "HighBit": 11,
+        "PrivateNumber": 42,
+        "PrivateSequence": {
+            "explicitLength": false,
+            "item0": {
+                "Rows": 64,
+                "PrivateNumber": 1701
+            }
+        }
+    },
+    "privateDictionary": {
+        "0x0011": {
+            "0x0000": ["UL", "1", "GenericGroupLength"],
+            "0x0001": ["US", "1", "PrivateNumber"],
+            "0x0002": ["SQ", "1", "PrivateSequence"]
+        }
+    },
+    "useUnVrForPrivateSq": false
+},
+{
+    "name": "test07",
+    "description": "Little Endian Explicit test data with private tags.",
+    "tags": {
+        "TransferSyntaxUID": "1.2.840.10008.1.2.1\u0000",
+        "Modality": "MR",
+        "PatientName": "dwv-patient-name00",
+        "PhotometricInterpretation": "MONOCHROME2 ",
+        "SamplesPerPixel": 1,
+        "PixelRepresentation": 0,
+        "Rows": 32,
+        "Columns": 32,
+        "BitsAllocated": 16,
+        "BitsStored": 12,
+        "HighBit": 11,
+        "PrivateNumber": 42,
+        "PrivateSequence": {
+            "explicitLength": false,
+            "item0": {
+                "Rows": 64,
+                "PrivateNumber": 1701
+            }
+        }
+    },
+    "privateDictionary": {
+        "0x0011": {
+            "0x0000": ["UL", "1", "GenericGroupLength"],
+            "0x0001": ["US", "1", "PrivateNumber"],
+            "0x0002": ["SQ", "1", "PrivateSequence"]
+        }
+    },
+    "useUnVrForPrivateSq": true
 }
 ]
