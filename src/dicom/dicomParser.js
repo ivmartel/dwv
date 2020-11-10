@@ -29,6 +29,17 @@ dwv.dicom.cleanString = function (inputStr)
 };
 
 /**
+ * Is the tag group a private tag group ?
+ * see: http://dicom.nema.org/medical/dicom/2015a/output/html/part05.html#sect_7.8
+ * @param {String} group The group string as '0x####'
+ * @returns True if the tag group is private, ie if its group is an odd number.
+ */
+dwv.dicom.isPrivateGroup = function (group) {
+    var groupNumber = parseInt(group.substr(2,6), 10);
+    return (groupNumber % 2) === 1;
+};
+
+/**
  * Is the Native endianness Little Endian.
  * @type Boolean
  */
@@ -1083,6 +1094,12 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (reader, offset, impl
     if( vl === 0xffffffff ) {
         vlString = "u/l";
         vl = 0;
+    }
+
+    // treat private tag with unknown VR and zero VL as a sequence
+    if (dwv.dicom.isPrivateGroup(tag.group) && vr === 'UN' && vl === 0) {
+        console.warn('Treating private tag with VR=UN and VL=0 as sequence.');
+        vr = 'SQ';
     }
 
     var startOffset = offset;
