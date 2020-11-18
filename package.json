@@ -17,7 +17,7 @@
   "main": "dist/dwv.min.js",
   "dependencies": {
     "i18next": "~19.8.3",
-    "i18next-browser-languagedetector": "~4.3.1",
+    "i18next-browser-languagedetector": "~6.0.1",
     "i18next-xhr-backend": "~3.2.2",
     "jszip": "~3.5.0",
     "konva": "~4.2.2",
