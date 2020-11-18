@@ -644,10 +644,10 @@ combined-stream@^1.0.6, combined-stream@~1.0.6:
   dependencies:
     delayed-stream "~1.0.0"
 
-commander@6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-6.0.0.tgz#2b270da94f8fb9014455312f829a1129dbf8887e"
-  integrity sha512-s7EA+hDtTYNhuXkTlhqew4txMZVdszBmKWSPEMxGr8ru8JXR7bLUFIAtPhcSuFdJQ0ILMxnJi8GkQL0yvDy/YA==
+commander@6.2.0:
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-6.2.0.tgz#b990bfb8ac030aedc6d11bc04d1488ffef56db75"
+  integrity sha512-zP4jEKbe8SHzKJYQmq8Y9gYjtO/POJLgIdKgV7B9qNmABVFVc+ctqSX6iXh4mCpJfRBOabiZ2YKPg8ciDw6C+Q==
 
 component-bind@1.0.0:
   version "1.0.0"
@@ -2403,10 +2403,10 @@ negotiator@0.6.2:
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.2.tgz#feacf7ccf525a77ae9634436a64883ffeca346fb"
   integrity sha512-hZXc7K2e+PgeI1eDBe/10Ard4ekbfrrqG8Ep+8Jmf4JID2bNg7NvCPOZN+kfF574pFQI7mum2AUqDidoKqcTOw==
 
-node-watch@0.6.4:
-  version "0.6.4"
-  resolved "https://registry.yarnpkg.com/node-watch/-/node-watch-0.6.4.tgz#50e564046eb7be15151c25f9c5aac4b5f495c291"
-  integrity sha512-cI6CHzivIFESe8djiK3Wh90CtWQBxLwMem8x8S+2GSvCvFgoMuOKVlfJtQ/2v3Afg3wOnHl/+tXotEs8z5vOrg==
+node-watch@0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/node-watch/-/node-watch-0.7.0.tgz#033c0c04239d9348f3402b6b6f9c1e689a7edbe1"
+  integrity sha512-OOBiglke5SlRQT5WYfwXTmYqTfXjcTNBHpalyHLtLxDpQYVpVRkJqabcch1kmwJsjV/J4OZuzEafeb4soqtFZA==
 
 nopt@~3.0.6:
   version "3.0.6"
@@ -2675,14 +2675,14 @@ qs@~6.5.2:
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.2.tgz#cb3ae806e8740444584ef154ce8ee98d403f3e36"
   integrity sha512-N5ZAX4/LxJmF+7wN74pUD6qAh9/wnvdQcjq9TZjevvXzSUo7bfmw91saqMjzGS2xq91/odN2dW/WOl7qQHNDGA==
 
-qunit@~2.11.2:
-  version "2.11.2"
-  resolved "https://registry.yarnpkg.com/qunit/-/qunit-2.11.2.tgz#ff68b57672053824a670620e7bd341e47561c542"
-  integrity sha512-lvvKQYK2YFU+L7lTXnTD8+qE49cNs2sK2gr1j8KV4Bj+s1eDrdmwaZf5a8pEcW+rB1cEtCH0ZeQ0Z9K76OQjGA==
+qunit@~2.12.0:
+  version "2.12.0"
+  resolved "https://registry.yarnpkg.com/qunit/-/qunit-2.12.0.tgz#db0980e48658073ee26f12918bf8afd5be2ce532"
+  integrity sha512-Lu3tbKziVzXTfseoEtTiiSAbSPB6SGU4Emc2uo8n+fbsXuRCLzfqPwJfAVJwKu9NdukX1V/L0qWf2UvmPX+QeA==
   dependencies:
-    commander "6.0.0"
+    commander "6.2.0"
     js-reporters "1.2.3"
-    node-watch "0.6.4"
+    node-watch "0.7.0"
     tiny-glob "0.2.6"
 
 range-parser@^1.2.0:
