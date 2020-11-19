@@ -35,7 +35,8 @@ module.exports = function (config) {
         'src/**/*.js',
         // test
         'tests/**/*.test.js',
-        'tests/utils/worker.js'
+        'tests/utils/worker.js',
+        'tests/dicom/*.js'
     ],
     proxies: {
       "/locales/": "/base/locales/",
