@@ -1,4 +1,4 @@
-/*! dwv 0.28.0-beta 2020-11-18 23:19:33 */
+/*! dwv 0.28.0-beta 2020-11-19 17:33:16 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -5104,12 +5104,43 @@ var dwv = dwv || {};
 dwv.dicom = dwv.dicom || {};
 
 /**
+ * Get the dwv UID prefix.
+ * Issued by Medical Connections Ltd (www.medicalconnections.co.uk)
+ *   on 25/10/2017.
+ */
+dwv.dicom.getDwvUIDPrefix = function () {
+    return '1.2.826.0.1.3680043.9.7278.1.';
+};
+
+/**
+ * Get a UID for a DICOM tag.
+ * @see http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_9.html
+ * @see http://dicomiseasy.blogspot.com/2011/12/chapter-4-dicom-objects-in-chapter-3.html
+ * @see https://stackoverflow.com/questions/46304306/how-to-generate-unique-dicom-uid
+ */
+dwv.dicom.getUID = function (tagName) {
+  var uid = dwv.dicom.getDwvUIDPrefix();
+  if (tagName === 'ImplementationClassUID') {
+    uid += dwv.getVersion();
+  } else if (tagName === 'SOPInstanceUID') {
+    for (var i = 0; i < tagName.length; ++i) {
+      uid += tagName.charCodeAt(i);
+    }
+    // add date (only numbers)
+    uid += '.' + (new Date()).toISOString().replace(/\D/g, '');
+  } else {
+    throw new Error('Don\'t know how to generate a UID for the tag ' + tagName);
+  }
+  return uid;
+};
+
+/**
  * Return true if the input number is even.
  * @param {Number} number The number to check.
  * @returns {Boolean} True is the number is even.
  */
 dwv.dicom.isEven = function (number) {
-    return number % 2 == 0;
+    return number % 2 === 0;
 };
 
 /**
@@ -5716,7 +5747,7 @@ dwv.dicom.isImplicitLengthPixels = function (element) {
  * @param {Array} array of typed arrays
  * @returns {Object} a typed array containing all values
  */
-dwv.dicom.flattenArrayOfTypedArrays = function(initialArray) {
+dwv.dicom.flattenArrayOfTypedArrays = function (initialArray) {
     var initialArrayLength = initialArray.length;
     var arrayLength = initialArray[0].length;
     // If this is not a array of arrays, just return the initial one:
@@ -5897,7 +5928,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     // ImplementationClassUID
     var icUID = dwv.dicom.getDicomElement("ImplementationClassUID");
     var icUIDSize = dwv.dicom.getDataElementPrefixByteSize(icUID.vr, isImplicit);
-    icUIDSize += dwv.dicom.setElementValue(icUID, "1.2.826.0.1.3680043.9.7278.1."+dwv.getVersion(), false);
+    icUIDSize += dwv.dicom.setElementValue(icUID, dwv.dicom.getUID("ImplementationClassUID"), false);
     metaElements.push(icUID);
     metaLength += icUIDSize;
     totalSize += icUIDSize;
@@ -5948,9 +5979,9 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
 dwv.dicom.checkUnkwownVR = function (element)
 {
     var dict = dwv.dicom.dictionary;
-    if (element.vr == "UN") {
+    if (element.vr === "UN") {
         if ( typeof dict[element.tag.group] !== "undefined" && typeof dict[element.tag.group][element.tag.element] !== "undefined" ) {
-            if (element.vr != dict[element.tag.group][element.tag.element][0]) {
+            if (element.vr !== dict[element.tag.group][element.tag.element][0]) {
                 element.vr = dict[element.tag.group][element.tag.element][0];
                 console.log("Element " + element.tag.group + " " + element.tag.element +" VR changed from UN to " + element.vr);
             }
@@ -6124,216 +6155,6 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
 
     // return the size of that data
     return size;
-};
-
-/**
- * Get the DICOM element from a DICOM tags object.
- * @param {Object} tags The DICOM tags object.
- * @return {Object} The DICOM elements and the end offset.
- */
-dwv.dicom.getElementsFromJSONTags = function (tags) {
-    // transfer syntax
-    var isImplicit = dwv.dicom.isImplicitTransferSyntax(tags.TransferSyntaxUID);
-    // convert JSON to DICOM element object
-    var keys = Object.keys(tags);
-    var dicomElements = {};
-    var dicomElement;
-    var name;
-    var offset = 128 + 4; // preamble
-    var size;
-    for ( var k = 0, len = keys.length; k < len; ++k )
-    {
-        // get the DICOM element definition from its name
-        dicomElement = dwv.dicom.getDicomElement(keys[k]);
-        // set its value
-        size = dwv.dicom.setElementValue(dicomElement, tags[keys[k]], isImplicit);
-        // set offsets
-        offset += dwv.dicom.getDataElementPrefixByteSize(dicomElement.vr, isImplicit);
-        dicomElement.startOffset = offset;
-        offset += size;
-        dicomElement.endOffset = offset;
-        // create the tag group/element key
-        name = dwv.dicom.getGroupElementKey(dicomElement.tag.group, dicomElement.tag.element);
-        // store
-        dicomElements[name] = dicomElement;
-    }
-    // return
-    return {'elements': dicomElements, 'offset': offset };
-};
-
-/**
- * GradSquarePixGenerator
- * Generates a small gradient square.
- * @param {Number} numberOfColumns The image number of columns.
- * @param {Number} numberOfRows The image number of rows.
- * @constructor
- */
-var GradSquarePixGenerator = function (numberOfColumns, numberOfRows) {
-
-    var halfCols = numberOfColumns * 0.5;
-    var halfRows = numberOfRows * 0.5;
-    var maxNoBounds = (numberOfColumns/2 + halfCols/2) * (numberOfRows/2 + halfRows/2);
-    var max = 100;
-
-    /**
-     * Get a grey value.
-     * @param {Number} i The column index.
-     * @param {Number} j The row index.
-     * @return {Array} The grey value.
-     */
-    this.getGrey = function (i,j) {
-        var value = max;
-        var jc = Math.abs( j - halfRows );
-        var ic = Math.abs( i - halfCols );
-        if ( jc < halfRows/2 && ic < halfCols/2 ) {
-            value += (i * j) * (max / maxNoBounds);
-        }
-        return [value];
-    };
-
-    /**
-     * Get RGB values.
-     * @param {Number} i The column index.
-     * @param {Number} j The row index.
-     * @return {Array} The [R,G,B] values.
-     */
-    this.getRGB = function (i,j) {
-        var value = 0;
-        var jc = Math.abs( j - halfRows );
-        var ic = Math.abs( i - halfCols );
-        if ( jc < halfRows/2 && ic < halfCols/2 ) {
-            value += (i * j) * (max / maxNoBounds);
-        }
-        if (value > 255 ) {
-            value = 200;
-        }
-        return [0, value, value];
-    };
-};
-
-// List of pixel generators.
-dwv.dicom.pixelGenerators = {
-    'gradSquare': GradSquarePixGenerator
-};
-
-/**
- * Get the DICOM pixel data from a DICOM tags object.
- * @param {Object} tags The DICOM tags object.
- * @param {Object} startOffset The start offset of the pixel data.
- * @param {String} pixGeneratorName The name of a pixel generator.
- * @return {Object} The DICOM pixel data element.
- */
-dwv.dicom.generatePixelDataFromJSONTags = function (tags, startOffset, pixGeneratorName) {
-
-    // default generator
-    if ( typeof pixGeneratorName === "undefined" ) {
-        pixGeneratorName = "gradSquare";
-    }
-
-    // check tags
-    if ( typeof tags.TransferSyntaxUID === "undefined" ) {
-        throw new Error("Missing transfer syntax for pixel generation.");
-    } else if ( typeof tags.Rows === "undefined" ) {
-        throw new Error("Missing number of rows for pixel generation.");
-    } else if ( typeof tags.Columns === "undefined" ) {
-        throw new Error("Missing number of columns for pixel generation.");
-    } else if ( typeof tags.BitsAllocated === "undefined" ) {
-        throw new Error("Missing BitsAllocated for pixel generation.");
-    } else if ( typeof tags.PixelRepresentation === "undefined" ) {
-        throw new Error("Missing PixelRepresentation for pixel generation.");
-    } else if ( typeof tags.SamplesPerPixel === "undefined" ) {
-        throw new Error("Missing SamplesPerPixel for pixel generation.");
-    } else if ( typeof tags.PhotometricInterpretation === "undefined" ) {
-        throw new Error("Missing PhotometricInterpretation for pixel generation.");
-    }
-
-    // extract info from tags
-    var isImplicit = dwv.dicom.isImplicitTransferSyntax(tags.TransferSyntaxUID);
-    var numberOfRows = tags.Rows;
-    var numberOfColumns = tags.Columns;
-    var bitsAllocated = tags.BitsAllocated;
-    var pixelRepresentation = tags.PixelRepresentation;
-    var samplesPerPixel = tags.SamplesPerPixel;
-    // trim in case config contains padding
-    var photometricInterpretation = tags.PhotometricInterpretation.trim();
-
-    var sliceLength = numberOfRows * numberOfColumns;
-    var dataLength = sliceLength * samplesPerPixel;
-
-    // check values
-    if (samplesPerPixel !== 1 && samplesPerPixel !== 3) {
-        throw new Error("Unsupported SamplesPerPixel for pixel generation: "+samplesPerPixel);
-    }
-    if ( (samplesPerPixel === 1 && !( photometricInterpretation === "MONOCHROME1" ||
-        photometricInterpretation === "MONOCHROME2" ) ) ||
-        ( samplesPerPixel === 3 && photometricInterpretation !== "RGB" ) ) {
-        throw new Error("Unsupported PhotometricInterpretation for pixel generation: " +
-            photometricInterpretation + " with SamplesPerPixel: " + samplesPerPixel);
-    }
-
-    var nSamples = 1;
-    var nColourPlanes = 1;
-    if ( samplesPerPixel === 3 ) {
-        if ( typeof tags.PlanarConfiguration === "undefined" ) {
-            throw new Error("Missing PlanarConfiguration for pixel generation.");
-        }
-        var planarConfiguration = tags.PlanarConfiguration;
-        if ( planarConfiguration !== 0 && planarConfiguration !== 1 ) {
-            throw new Error("Unsupported PlanarConfiguration for pixel generation: "+planarConfiguration);
-        }
-        if ( planarConfiguration === 0 ) {
-            nSamples = 3;
-        } else {
-            nColourPlanes = 3;
-        }
-    }
-
-    // create pixel array
-    var pixels = dwv.dicom.getTypedArray(
-        bitsAllocated, pixelRepresentation, dataLength );
-
-    // pixels generator
-    if (typeof dwv.dicom.pixelGenerators[pixGeneratorName] === "undefined" ) {
-        throw new Error("Unknown PixelData generator: "+pixGeneratorName);
-    }
-    var generator = new dwv.dicom.pixelGenerators[pixGeneratorName](numberOfColumns, numberOfRows);
-    var generate = generator.getGrey;
-    if (photometricInterpretation === "RGB") {
-        generate = generator.getRGB;
-    }
-
-    // main loop
-    var offset = 0;
-    for ( var c = 0; c < nColourPlanes; ++c ) {
-        for ( var j = 0; j < numberOfRows; ++j ) {
-            for ( var i = 0; i < numberOfColumns; ++i ) {
-                for ( var s = 0; s < nSamples; ++s ) {
-                    if ( nColourPlanes !== 1 ) {
-                        pixels[offset] = generate(i,j)[c];
-                    } else {
-                        pixels[offset] = generate(i,j)[s];
-                    }
-                    ++offset;
-                }
-            }
-        }
-    }
-
-    // create and return the DICOM element
-    var vr = "OW";
-    if ( bitsAllocated === 8 ) {
-        vr = "OB";
-    }
-    var pixVL = dwv.dicom.getDataElementPrefixByteSize(vr, isImplicit) +
-       (pixels.BYTES_PER_ELEMENT * dataLength);
-    return {
-            'tag': { 'group': "0x7FE0", 'element': "0x0010" },
-            'vr': vr,
-            'vl': pixVL,
-            'value': pixels,
-            'startOffset': startOffset,
-            'endOffset': startOffset + pixVL
-        };
 };
 
 // namespaces
