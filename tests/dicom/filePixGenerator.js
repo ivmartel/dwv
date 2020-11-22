@@ -7,7 +7,7 @@ var FilePixGenerator = function (options) {
 
   var numberOfColumns = options.numberOfColumns;
   var numberOfRows = options.numberOfRows;
-  var isRGB = options.photometricInterpretation === "RGB";
+  var isRGB = options.photometricInterpretation === 'RGB';
 
   this.setImages = function (imgs) {
     // check sizes
@@ -15,10 +15,12 @@ var FilePixGenerator = function (options) {
     for (var i = 0; i < imgs.length; ++i) {
       img = imgs[i];
       if (img.width !== numberOfColumns) {
-        throw Error('Image width mismatch: ' + img.width + '!=' + numberOfColumns);
+        throw Error('Image width mismatch: ' +
+          img.width + '!=' + numberOfColumns);
       }
       if (img.height !== numberOfRows) {
-        throw Error('Image height mismatch: ' + img.height + '!=' + numberOfRows);
+        throw Error('Image height mismatch: ' +
+          img.height + '!=' + numberOfRows);
       }
     }
     // store
@@ -37,13 +39,13 @@ var FilePixGenerator = function (options) {
     // extract fist component for the pixelBuffer
     var dataLen = imageData.length;
     var j = 0;
-    for( var i = 0; i < dataLen; i+=4 ) {
+    for (var i = 0; i < dataLen; i += 4) {
       pixelBuffer[j] = imageData[i];
       j += 1;
       if (isRGB) {
-        pixelBuffer[j+1] = imageData[i+1];
-        pixelBuffer[j+2] = imageData[i+2];
-        j+=2;
+        pixelBuffer[j + 1] = imageData[i + 1];
+        pixelBuffer[j + 2] = imageData[i + 2];
+        j += 2;
       }
     }
   };

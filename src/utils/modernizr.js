@@ -1,3 +1,4 @@
+/*eslint-disable */
 // namespaces
 var dwv = dwv || {};
 

@@ -9,23 +9,28 @@ dwv.math = dwv.math || {};
  * @param {Number} y The Y component of the vector.
  * @param {Number} z The Z component of the vector.
  */
-dwv.math.Vector3D = function (x,y,z)
-{
-    /**
+dwv.math.Vector3D = function (x, y, z) {
+  /**
      * Get the X component of the vector.
      * @return {Number} The X component of the vector.
      */
-    this.getX = function () { return x; };
-    /**
+  this.getX = function () {
+    return x;
+  };
+  /**
      * Get the Y component of the vector.
      * @return {Number} The Y component of the vector.
      */
-    this.getY = function () { return y; };
-    /**
+  this.getY = function () {
+    return y;
+  };
+  /**
      * Get the Z component of the vector.
      * @return {Number} The Z component of the vector.
      */
-    this.getZ = function () { return z; };
+  this.getZ = function () {
+    return z;
+  };
 }; // Vector3D class
 
 /**
@@ -34,7 +39,7 @@ dwv.math.Vector3D = function (x,y,z)
  * @return {Boolean} True if both vectors are equal.
  */
 dwv.math.Vector3D.prototype.equals = function (rhs) {
-    return rhs !== null &&
+  return rhs !== null &&
         this.getX() === rhs.getX() &&
         this.getY() === rhs.getY() &&
         this.getZ() === rhs.getZ();
@@ -45,9 +50,9 @@ dwv.math.Vector3D.prototype.equals = function (rhs) {
  * @return {String} The vector as a string.
  */
 dwv.math.Vector3D.prototype.toString = function () {
-    return "(" + this.getX() +
-        ", " + this.getY() +
-        ", " + this.getZ() + ")";
+  return '(' + this.getX() +
+        ', ' + this.getY() +
+        ', ' + this.getZ() + ')';
 };
 
 /**
@@ -55,9 +60,9 @@ dwv.math.Vector3D.prototype.toString = function () {
   * @return {Number} The norm.
  */
 dwv.math.Vector3D.prototype.norm = function () {
-    return Math.sqrt( (this.getX() * this.getX()) +
+  return Math.sqrt((this.getX() * this.getX()) +
         (this.getY() * this.getY()) +
-        (this.getZ() * this.getZ()) );
+        (this.getZ() * this.getZ()));
 };
 
 /**
@@ -68,10 +73,10 @@ dwv.math.Vector3D.prototype.norm = function () {
   * @return {Object} The result vector.
  */
 dwv.math.Vector3D.prototype.crossProduct = function (vector3D) {
-    return new dwv.math.Vector3D(
-        (this.getY() * vector3D.getZ()) - (vector3D.getY() * this.getZ()),
-        (this.getZ() * vector3D.getX()) - (vector3D.getZ() * this.getX()),
-        (this.getX() * vector3D.getY()) - (vector3D.getX() * this.getY()) );
+  return new dwv.math.Vector3D(
+    (this.getY() * vector3D.getZ()) - (vector3D.getY() * this.getZ()),
+    (this.getZ() * vector3D.getX()) - (vector3D.getZ() * this.getX()),
+    (this.getX() * vector3D.getY()) - (vector3D.getX() * this.getY()));
 };
 
 /**
@@ -80,7 +85,7 @@ dwv.math.Vector3D.prototype.crossProduct = function (vector3D) {
  * @return {Number} The dot product.
  */
 dwv.math.Vector3D.prototype.dotProduct = function (vector3D) {
-    return (this.getX() * vector3D.getX()) +
+  return (this.getX() * vector3D.getX()) +
         (this.getY() * vector3D.getY()) +
         (this.getZ() * vector3D.getZ());
 };

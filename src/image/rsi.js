@@ -8,9 +8,8 @@ dwv.image = dwv.image || {};
  * @param {Number} slope The slope of the RSI.
  * @param {Number} intercept The intercept of the RSI.
  */
-dwv.image.RescaleSlopeAndIntercept = function (slope, intercept)
-{
-    /*// Check the rescale slope.
+dwv.image.RescaleSlopeAndIntercept = function (slope, intercept) {
+  /*// Check the rescale slope.
     if(typeof(slope) === 'undefined') {
         slope = 1;
     }
@@ -19,29 +18,29 @@ dwv.image.RescaleSlopeAndIntercept = function (slope, intercept)
         intercept = 0;
     }*/
 
-    /**
+  /**
      * Get the slope of the RSI.
      * @return {Number} The slope of the RSI.
      */
-    this.getSlope = function () {
-        return slope;
-    };
+  this.getSlope = function () {
+    return slope;
+  };
 
-    /**
+  /**
      * Get the intercept of the RSI.
      * @return {Number} The intercept of the RSI.
      */
-    this.getIntercept = function () {
-        return intercept;
-    };
+  this.getIntercept = function () {
+    return intercept;
+  };
 
-    /**
+  /**
      * Apply the RSI on an input value.
      * @return {Number} The value to rescale.
      */
-    this.apply = function (value) {
-        return value * slope + intercept;
-    };
+  this.apply = function (value) {
+    return value * slope + intercept;
+  };
 };
 
 /**
@@ -50,7 +49,7 @@ dwv.image.RescaleSlopeAndIntercept = function (slope, intercept)
  * @return {Boolean} True if both RSI are equal.
  */
 dwv.image.RescaleSlopeAndIntercept.prototype.equals = function (rhs) {
-    return rhs !== null &&
+  return rhs !== null &&
         this.getSlope() === rhs.getSlope() &&
         this.getIntercept() === rhs.getIntercept();
 };
@@ -60,7 +59,7 @@ dwv.image.RescaleSlopeAndIntercept.prototype.equals = function (rhs) {
  * @return {String} The RSI as a string.
  */
 dwv.image.RescaleSlopeAndIntercept.prototype.toString = function () {
-    return (this.getSlope() + ", " + this.getIntercept());
+  return (this.getSlope() + ', ' + this.getIntercept());
 };
 
 /**
@@ -68,5 +67,5 @@ dwv.image.RescaleSlopeAndIntercept.prototype.toString = function () {
  * @return {Boolean} True if the RSI has a slope of 1 and no intercept.
  */
 dwv.image.RescaleSlopeAndIntercept.prototype.isID = function () {
-    return (this.getSlope() === 1 && this.getIntercept() === 0);
+  return (this.getSlope() === 1 && this.getIntercept() === 0);
 };

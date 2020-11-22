@@ -3,13 +3,13 @@
  * Generates pixel data from file with an input per orientation.
  * @constructor
  */
- var MPRPixGenerator = function (options) {
+var MPRPixGenerator = function (options) {
 
   var self = this;
 
   var numberOfColumns = options.numberOfColumns;
   var numberOfRows = options.numberOfRows;
-  var isRGB = options.photometricInterpretation === "RGB";
+  var isRGB = options.photometricInterpretation === 'RGB';
 
   if (isRGB) {
     throw new Error('The MPRPixGenerator does not support RGB data.');
@@ -68,7 +68,8 @@
       offset = halfNCols;
       for (var j1 = 0; j1 < numberOfRows; ++j1) {
         for (var i1 = 0; i1 < halfNCols; ++i1) {
-          pixelBuffer[offset] = getFunc('coronal', i1, (halfNSlices - sliceNumber), j1);
+          pixelBuffer[offset] = getFunc(
+            'coronal', i1, (halfNSlices - sliceNumber), j1);
           ++offset;
         }
         offset += halfNCols;
@@ -78,7 +79,8 @@
       offset = numberOfColumns * halfNRows;
       for (var j2 = 0; j2 < halfNRows; ++j2) {
         for (var i2 = 0; i2 < numberOfColumns; ++i2) {
-          pixelBuffer[offset] = getFunc('sagittal', j2, (numberOfSlices - sliceNumber), i2);
+          pixelBuffer[offset] = getFunc(
+            'sagittal', j2, (numberOfSlices - sliceNumber), i2);
           ++offset;
         }
       }

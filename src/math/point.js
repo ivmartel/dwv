@@ -8,18 +8,21 @@ dwv.math = dwv.math || {};
  * @param {Number} x The X coordinate for the point.
  * @param {Number} y The Y coordinate for the point.
  */
-dwv.math.Point2D = function (x,y)
-{
-    /**
+dwv.math.Point2D = function (x, y) {
+  /**
      * Get the X position of the point.
      * @return {Number} The X position of the point.
      */
-    this.getX = function () { return x; };
-    /**
+  this.getX = function () {
+    return x;
+  };
+  /**
      * Get the Y position of the point.
      * @return {Number} The Y position of the point.
      */
-    this.getY = function () { return y; };
+  this.getY = function () {
+    return y;
+  };
 }; // Point2D class
 
 /**
@@ -28,7 +31,7 @@ dwv.math.Point2D = function (x,y)
  * @return {Boolean} True if both points are equal.
  */
 dwv.math.Point2D.prototype.equals = function (rhs) {
-    return rhs !== null &&
+  return rhs !== null &&
         this.getX() === rhs.getX() &&
         this.getY() === rhs.getY();
 };
@@ -38,7 +41,7 @@ dwv.math.Point2D.prototype.equals = function (rhs) {
  * @return {String} The point as a string.
  */
 dwv.math.Point2D.prototype.toString = function () {
-    return "(" + this.getX() + ", " + this.getY() + ")";
+  return '(' + this.getX() + ', ' + this.getY() + ')';
 };
 
 /**
@@ -46,9 +49,9 @@ dwv.math.Point2D.prototype.toString = function () {
  * @param {Object} point2D The input point.
  */
 dwv.math.Point2D.prototype.getDistance = function (point2D) {
-    return Math.sqrt(
-        (this.getX() - point2D.getX()) * (this.getX() - point2D.getX()) +
-        (this.getY() - point2D.getY()) * (this.getY() - point2D.getY()) );
+  return Math.sqrt(
+    (this.getX() - point2D.getX()) * (this.getX() - point2D.getX()) +
+        (this.getY() - point2D.getY()) * (this.getY() - point2D.getY()));
 };
 
 /**
@@ -57,10 +60,9 @@ dwv.math.Point2D.prototype.getDistance = function (point2D) {
  * @param {Number} x The X coordinate for the point.
  * @param {Number} y The Y coordinate for the point.
  */
-dwv.math.FastPoint2D = function (x,y)
-{
-    this.x = x;
-    this.y = y;
+dwv.math.FastPoint2D = function (x, y) {
+  this.x = x;
+  this.y = y;
 }; // FastPoint2D class
 
 /**
@@ -69,7 +71,7 @@ dwv.math.FastPoint2D = function (x,y)
  * @return {Boolean} True if both points are equal.
  */
 dwv.math.FastPoint2D.prototype.equals = function (rhs) {
-    return rhs !== null &&
+  return rhs !== null &&
         this.x === rhs.x &&
         this.y === rhs.y;
 };
@@ -79,7 +81,7 @@ dwv.math.FastPoint2D.prototype.equals = function (rhs) {
  * @return {String} The point as a string.
  */
 dwv.math.FastPoint2D.prototype.toString = function () {
-    return "(" + this.x + ", " + this.y + ")";
+  return '(' + this.x + ', ' + this.y + ')';
 };
 
 /**
@@ -89,23 +91,28 @@ dwv.math.FastPoint2D.prototype.toString = function () {
  * @param {Number} y The Y coordinate for the point.
  * @param {Number} z The Z coordinate for the point.
  */
-dwv.math.Point3D = function (x,y,z)
-{
-    /**
+dwv.math.Point3D = function (x, y, z) {
+  /**
      * Get the X position of the point.
      * @return {Number} The X position of the point.
      */
-    this.getX = function () { return x; };
-    /**
+  this.getX = function () {
+    return x;
+  };
+  /**
      * Get the Y position of the point.
      * @return {Number} The Y position of the point.
      */
-    this.getY = function () { return y; };
-    /**
+  this.getY = function () {
+    return y;
+  };
+  /**
      * Get the Z position of the point.
      * @return {Number} The Z position of the point.
      */
-    this.getZ = function () { return z; };
+  this.getZ = function () {
+    return z;
+  };
 }; // Point3D class
 
 /**
@@ -114,7 +121,7 @@ dwv.math.Point3D = function (x,y,z)
  * @return {Boolean} True if both points are equal.
  */
 dwv.math.Point3D.prototype.equals = function (rhs) {
-    return rhs !== null &&
+  return rhs !== null &&
         this.getX() === rhs.getX() &&
         this.getY() === rhs.getY() &&
         this.getZ() === rhs.getZ();
@@ -125,9 +132,9 @@ dwv.math.Point3D.prototype.equals = function (rhs) {
  * @return {String} The point as a string.
  */
 dwv.math.Point3D.prototype.toString = function () {
-    return "(" + this.getX() +
-        ", " + this.getY() +
-        ", " + this.getZ() + ")";
+  return '(' + this.getX() +
+        ', ' + this.getY() +
+        ', ' + this.getZ() + ')';
 };
 
 /**
@@ -135,10 +142,10 @@ dwv.math.Point3D.prototype.toString = function () {
  * @param {Object} point3D The input point.
  */
 dwv.math.Point3D.prototype.getDistance = function (point3D) {
-    return Math.sqrt(
-        (this.getX() - point3D.getX()) * (this.getX() - point3D.getX()) +
+  return Math.sqrt(
+    (this.getX() - point3D.getX()) * (this.getX() - point3D.getX()) +
         (this.getY() - point3D.getY()) * (this.getY() - point3D.getY()) +
-        (this.getZ() - point3D.getZ()) * (this.getZ() - point3D.getZ()) );
+        (this.getZ() - point3D.getZ()) * (this.getZ() - point3D.getZ()));
 };
 
 /**
@@ -147,10 +154,10 @@ dwv.math.Point3D.prototype.getDistance = function (point3D) {
  * @return {Object} The 3D vector from the input point to this one.
  */
 dwv.math.Point3D.prototype.minus = function (point3D) {
-    return new dwv.math.Vector3D(
-        (this.getX() - point3D.getX()),
-        (this.getY() - point3D.getY()),
-        (this.getZ() - point3D.getZ()) );
+  return new dwv.math.Vector3D(
+    (this.getX() - point3D.getX()),
+    (this.getY() - point3D.getY()),
+    (this.getZ() - point3D.getZ()));
 };
 
 /**
@@ -160,23 +167,28 @@ dwv.math.Point3D.prototype.minus = function (point3D) {
  * @param {Number} j The row index.
  * @param {Number} k The slice index.
  */
-dwv.math.Index3D = function (i,j,k)
-{
-    /**
+dwv.math.Index3D = function (i, j, k) {
+  /**
      * Get the column index.
      * @return {Number} The column index.
      */
-    this.getI = function () { return i; };
-    /**
+  this.getI = function () {
+    return i;
+  };
+  /**
      * Get the row index.
      * @return {Number} The row index.
      */
-    this.getJ = function () { return j; };
-    /**
+  this.getJ = function () {
+    return j;
+  };
+  /**
      * Get the slice index.
      * @return {Number} The slice index.
      */
-    this.getK = function () { return k; };
+  this.getK = function () {
+    return k;
+  };
 }; // Index3D class
 
 /**
@@ -185,7 +197,7 @@ dwv.math.Index3D = function (i,j,k)
  * @return {Boolean} True if both indices are equal.
  */
 dwv.math.Index3D.prototype.equals = function (rhs) {
-    return rhs !== null &&
+  return rhs !== null &&
         this.getI() === rhs.getI() &&
         this.getJ() === rhs.getJ() &&
         this.getK() === rhs.getK();
@@ -196,7 +208,7 @@ dwv.math.Index3D.prototype.equals = function (rhs) {
  * @return {String} The Index3D as a string.
  */
 dwv.math.Index3D.prototype.toString = function () {
-    return "(" + this.getI() +
-        ", " + this.getJ() +
-        ", " + this.getK() + ")";
+  return '(' + this.getI() +
+        ', ' + this.getJ() +
+        ', ' + this.getK() + ')';
 };

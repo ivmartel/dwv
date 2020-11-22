@@ -6,83 +6,82 @@ dwv.io = dwv.io || {};
  * JSON text loader.
  * @constructor
  */
-dwv.io.JSONTextLoader = function ()
-{
-    // closure to self
-    var self = this;
+dwv.io.JSONTextLoader = function () {
+  // closure to self
+  var self = this;
 
-    /**
+  /**
      * Loading flag.
      * @private
      * @type Boolean
      */
-    var isLoading = false;
+  var isLoading = false;
 
-    /**
+  /**
      * Set the loader options.
      * @param {Object} opt The input options.
      */
-    this.setOptions = function () {
-        // does nothing
-    };
+  this.setOptions = function (/*opt*/) {
+    // does nothing
+  };
 
-    /**
+  /**
      * Is the load ongoing?
      * @return {Boolean} True if loading.
      */
-    this.isLoading = function () {
-        return isLoading;
-    };
+  this.isLoading = function () {
+    return isLoading;
+  };
 
-    /**
+  /**
      * Load data.
      * @param {Object} text The input text.
      * @param {String} origin The data origin.
      * @param {Number} index The data index.
      */
-    this.load = function (text, origin, index) {
-        // set loading flag
-        isLoading = true;
-        self.onloadstart({
-            source: origin
-        });
+  this.load = function (text, origin, index) {
+    // set loading flag
+    isLoading = true;
+    self.onloadstart({
+      source: origin
+    });
 
-        try {
-            self.onprogress({
-                lengthComputable: true,
-                loaded: 100,
-                total: 100,
-                index: index,
-                source: origin
-            });
-            self.onload({
-                data: text,
-                source: origin
-            });
-        } catch (error) {
-            self.onerror({
-                error: error,
-                source: origin
-            });
-        } finally {
-            // reset loading flag
-            isLoading = false;
-            self.onloadend({
-                source: origin
-            });
-        }
-    };
+    try {
+      self.onprogress({
+        lengthComputable: true,
+        loaded: 100,
+        total: 100,
+        index: index,
+        source: origin
+      });
+      self.onload({
+        data: text,
+        source: origin
+      });
+    } catch (error) {
+      self.onerror({
+        error: error,
+        source: origin
+      });
+    } finally {
+      // reset loading flag
+      isLoading = false;
+      self.onloadend({
+        source: origin
+      });
+    }
+  };
 
-    /**
+  /**
      * Abort load: pass to listeners.
      */
-    this.abort = function () {
-        // reset loading flag
-        isLoading = false;
-        // call listeners
-        self.onabort({});
-        self.onloadend({});
-    };
+  this.abort = function () {
+    // reset loading flag
+    isLoading = false;
+    // call listeners
+    self.onabort({});
+    self.onloadend({});
+  };
 
 }; // class JSONTextLoader
 
@@ -92,8 +91,8 @@ dwv.io.JSONTextLoader = function ()
  * @return True if the file can be loaded.
  */
 dwv.io.JSONTextLoader.prototype.canLoadFile = function (file) {
-    var ext = dwv.utils.getFileExtension(file.name);
-    return (ext === "json");
+  var ext = dwv.utils.getFileExtension(file.name);
+  return (ext === 'json');
 };
 
 /**
@@ -102,9 +101,9 @@ dwv.io.JSONTextLoader.prototype.canLoadFile = function (file) {
  * @return True if the url can be loaded.
  */
 dwv.io.JSONTextLoader.prototype.canLoadUrl = function (url) {
-    var urlObjext = dwv.utils.getUrlFromUri(url);
-    var ext = dwv.utils.getFileExtension(urlObjext.pathname);
-    return (ext === "json");
+  var urlObjext = dwv.utils.getUrlFromUri(url);
+  var ext = dwv.utils.getFileExtension(urlObjext.pathname);
+  return (ext === 'json');
 };
 
 /**
@@ -112,7 +111,7 @@ dwv.io.JSONTextLoader.prototype.canLoadUrl = function (url) {
  * @return One of the 'dwv.io.fileContentTypes'.
  */
 dwv.io.JSONTextLoader.prototype.loadFileAs = function () {
-    return dwv.io.fileContentTypes.Text;
+  return dwv.io.fileContentTypes.Text;
 };
 
 /**
@@ -120,7 +119,7 @@ dwv.io.JSONTextLoader.prototype.loadFileAs = function () {
  * @return One of the 'dwv.io.urlContentTypes'.
  */
 dwv.io.JSONTextLoader.prototype.loadUrlAs = function () {
-    return dwv.io.urlContentTypes.Text;
+  return dwv.io.urlContentTypes.Text;
 };
 
 /**
@@ -166,4 +165,4 @@ dwv.io.JSONTextLoader.prototype.onabort = function (/*event*/) {};
  * Add to Loader list.
  */
 dwv.io.loaderList = dwv.io.loaderList || [];
-dwv.io.loaderList.push( "JSONTextLoader" );
+dwv.io.loaderList.push('JSONTextLoader');

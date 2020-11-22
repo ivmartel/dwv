@@ -9,23 +9,28 @@ dwv.image = dwv.image || {};
  * @param {Number} numberOfRows The number of rows.
  * @param {Number} numberOfSlices The number of slices.
 */
-dwv.image.Size = function ( numberOfColumns, numberOfRows, numberOfSlices )
-{
-    /**
+dwv.image.Size = function (numberOfColumns, numberOfRows, numberOfSlices) {
+  /**
      * Get the number of columns.
      * @return {Number} The number of columns.
      */
-    this.getNumberOfColumns = function () { return numberOfColumns; };
-    /**
+  this.getNumberOfColumns = function () {
+    return numberOfColumns;
+  };
+  /**
      * Get the number of rows.
      * @return {Number} The number of rows.
      */
-    this.getNumberOfRows = function () { return numberOfRows; };
-    /**
+  this.getNumberOfRows = function () {
+    return numberOfRows;
+  };
+  /**
      * Get the number of slices.
      * @return {Number} The number of slices.
      */
-    this.getNumberOfSlices = function () { return (numberOfSlices || 1.0); };
+  this.getNumberOfSlices = function () {
+    return (numberOfSlices || 1.0);
+  };
 };
 
 /**
@@ -33,7 +38,7 @@ dwv.image.Size = function ( numberOfColumns, numberOfRows, numberOfSlices )
  * @return {Number} The size of a slice.
  */
 dwv.image.Size.prototype.getSliceSize = function () {
-    return this.getNumberOfColumns() * this.getNumberOfRows();
+  return this.getNumberOfColumns() * this.getNumberOfRows();
 };
 
 /**
@@ -41,7 +46,7 @@ dwv.image.Size.prototype.getSliceSize = function () {
  * @return {Number} The total size.
  */
 dwv.image.Size.prototype.getTotalSize = function () {
-    return this.getSliceSize() * this.getNumberOfSlices();
+  return this.getSliceSize() * this.getNumberOfSlices();
 };
 
 /**
@@ -50,7 +55,7 @@ dwv.image.Size.prototype.getTotalSize = function () {
  * @return {Boolean} True if both objects are equal.
  */
 dwv.image.Size.prototype.equals = function (rhs) {
-    return rhs !== null &&
+  return rhs !== null &&
         this.getNumberOfColumns() === rhs.getNumberOfColumns() &&
         this.getNumberOfRows() === rhs.getNumberOfRows() &&
         this.getNumberOfSlices() === rhs.getNumberOfSlices();
@@ -63,13 +68,13 @@ dwv.image.Size.prototype.equals = function (rhs) {
  * @param {Number} k The slice coordinate.
  * @return {Boolean} True if the given coordinates are within bounds.
  */
-dwv.image.Size.prototype.isInBounds = function ( i, j, k ) {
-    if( i < 0 || i > this.getNumberOfColumns() - 1 ||
+dwv.image.Size.prototype.isInBounds = function (i, j, k) {
+  if (i < 0 || i > this.getNumberOfColumns() - 1 ||
         j < 0 || j > this.getNumberOfRows() - 1 ||
-        k < 0 || k > this.getNumberOfSlices() - 1 ) {
-        return false;
-    }
-    return true;
+        k < 0 || k > this.getNumberOfSlices() - 1) {
+    return false;
+  }
+  return true;
 };
 
 /**
@@ -77,9 +82,9 @@ dwv.image.Size.prototype.isInBounds = function ( i, j, k ) {
  * @return {String} The vector as a string.
  */
 dwv.image.Size.prototype.toString = function () {
-    return "(" + this.getNumberOfColumns() +
-        ", " + this.getNumberOfRows() +
-        ", " + this.getNumberOfSlices() + ")";
+  return '(' + this.getNumberOfColumns() +
+        ', ' + this.getNumberOfRows() +
+        ', ' + this.getNumberOfSlices() + ')';
 };
 
 /**
@@ -89,23 +94,28 @@ dwv.image.Size.prototype.toString = function () {
  * @param {Number} rowSpacing The row spacing.
  * @param {Number} sliceSpacing The slice spacing.
  */
-dwv.image.Spacing = function ( columnSpacing, rowSpacing, sliceSpacing )
-{
-    /**
+dwv.image.Spacing = function (columnSpacing, rowSpacing, sliceSpacing) {
+  /**
      * Get the column spacing.
      * @return {Number} The column spacing.
      */
-    this.getColumnSpacing = function () { return columnSpacing; };
-    /**
+  this.getColumnSpacing = function () {
+    return columnSpacing;
+  };
+  /**
      * Get the row spacing.
      * @return {Number} The row spacing.
      */
-    this.getRowSpacing = function () { return rowSpacing; };
-    /**
+  this.getRowSpacing = function () {
+    return rowSpacing;
+  };
+  /**
      * Get the slice spacing.
      * @return {Number} The slice spacing.
      */
-    this.getSliceSpacing = function () { return (sliceSpacing || 1.0); };
+  this.getSliceSpacing = function () {
+    return (sliceSpacing || 1.0);
+  };
 };
 
 /**
@@ -114,7 +124,7 @@ dwv.image.Spacing = function ( columnSpacing, rowSpacing, sliceSpacing )
  * @return {Boolean} True if both objects are equal.
  */
 dwv.image.Spacing.prototype.equals = function (rhs) {
-    return rhs !== null &&
+  return rhs !== null &&
         this.getColumnSpacing() === rhs.getColumnSpacing() &&
         this.getRowSpacing() === rhs.getRowSpacing() &&
         this.getSliceSpacing() === rhs.getSliceSpacing();
@@ -125,9 +135,9 @@ dwv.image.Spacing.prototype.equals = function (rhs) {
  * @return {String} The vector as a string.
  */
 dwv.image.Spacing.prototype.toString = function () {
-    return "(" + this.getColumnSpacing() +
-        ", " + this.getRowSpacing() +
-        ", " + this.getSliceSpacing() + ")";
+  return '(' + this.getColumnSpacing() +
+        ', ' + this.getRowSpacing() +
+        ', ' + this.getSliceSpacing() + ')';
 };
 
 
@@ -137,91 +147,97 @@ dwv.image.Spacing.prototype.toString = function () {
  * @param {Object} origin The object origin (a 3D point).
  * @param {Object} size The object size.
  * @param {Object} spacing The object spacing.
- * @param {Object} orientation The object orientation (3*3 matrix, default to 3*3 identity).
+ * @param {Object} orientation The object orientation (3*3 matrix,
+ *   default to 3*3 identity).
  */
-dwv.image.Geometry = function ( origin, size, spacing, orientation )
-{
-    // check input origin
-    if( typeof origin === 'undefined' ) {
-        origin = new dwv.math.Point3D(0,0,0);
-    }
-    var origins = [origin];
-    // check input orientation
-    if( typeof orientation === 'undefined' ) {
-        orientation = new dwv.math.getIdentityMat33();
-    }
+dwv.image.Geometry = function (origin, size, spacing, orientation) {
+  // check input origin
+  if (typeof origin === 'undefined') {
+    origin = new dwv.math.Point3D(0, 0, 0);
+  }
+  var origins = [origin];
+  // check input orientation
+  if (typeof orientation === 'undefined') {
+    orientation = new dwv.math.getIdentityMat33();
+  }
 
-    /**
+  /**
      * Get the object first origin.
      * @return {Object} The object first origin.
      */
-    this.getOrigin = function () { return origin; };
-    /**
+  this.getOrigin = function () {
+    return origin;
+  };
+  /**
      * Get the object origins.
      * @return {Array} The object origins.
      */
-    this.getOrigins = function () { return origins; };
-    /**
+  this.getOrigins = function () {
+    return origins;
+  };
+  /**
      * Get the object size.
      * @return {Object} The object size.
      */
-    this.getSize = function () { return size; };
-    /**
+  this.getSize = function () {
+    return size;
+  };
+  /**
      * Get the object spacing.
      * @return {Object} The object spacing.
      */
-    this.getSpacing = function () { return spacing; };
-    /**
+  this.getSpacing = function () {
+    return spacing;
+  };
+  /**
      * Get the object orientation.
      * @return {Object} The object orientation.
      */
-    this.getOrientation = function () { return orientation; };
+  this.getOrientation = function () {
+    return orientation;
+  };
 
-    /**
+  /**
      * Get the slice position of a point in the current slice layout.
      * @param {Object} point The point to evaluate.
      */
-    this.getSliceIndex = function (point)
-    {
-        // cannot use this.worldToIndex(point).getK() since
-        // we cannot guaranty consecutive slices...
+  this.getSliceIndex = function (point) {
+    // cannot use this.worldToIndex(point).getK() since
+    // we cannot guaranty consecutive slices...
 
-        // find the closest index
-        var closestSliceIndex = 0;
-        var minDist = point.getDistance(origins[0]);
-        var dist = 0;
-        for( var i = 0; i < origins.length; ++i )
-        {
-            dist = point.getDistance(origins[i]);
-            if( dist < minDist )
-            {
-                minDist = dist;
-                closestSliceIndex = i;
-            }
-        }
-        // we have the closest point, are we before or after
-        var normal = new dwv.math.Vector3D(
-            orientation.get(2,0), orientation.get(2,1), orientation.get(2,2));
-        var dotProd = normal.dotProduct( point.minus(origins[closestSliceIndex]) );
-        var sliceIndex = ( dotProd > 0 ) ? closestSliceIndex + 1 : closestSliceIndex;
-        return sliceIndex;
-    };
+    // find the closest index
+    var closestSliceIndex = 0;
+    var minDist = point.getDistance(origins[0]);
+    var dist = 0;
+    for (var i = 0; i < origins.length; ++i) {
+      dist = point.getDistance(origins[i]);
+      if (dist < minDist) {
+        minDist = dist;
+        closestSliceIndex = i;
+      }
+    }
+    // we have the closest point, are we before or after
+    var normal = new dwv.math.Vector3D(
+      orientation.get(2, 0), orientation.get(2, 1), orientation.get(2, 2));
+    var dotProd = normal.dotProduct(point.minus(origins[closestSliceIndex]));
+    var sliceIndex = (dotProd > 0) ? closestSliceIndex + 1 : closestSliceIndex;
+    return sliceIndex;
+  };
 
-    /**
+  /**
      * Append an origin to the geometry.
      * @param {Object} origin The origin to append.
      * @param {Number} index The index at which to append.
      */
-    this.appendOrigin = function (origin, index)
-    {
-        // add in origin array
-        origins.splice(index, 0, origin);
-        // increment slice number
-        size = new dwv.image.Size(
-            size.getNumberOfColumns(),
-            size.getNumberOfRows(),
-            size.getNumberOfSlices() + 1);
-    };
+  this.appendOrigin = function (origin, index) {
+    // add in origin array
+    origins.splice(index, 0, origin);
+    // increment slice number
+    size = new dwv.image.Size(
+      size.getNumberOfColumns(),
+      size.getNumberOfRows(),
+      size.getNumberOfSlices() + 1);
+  };
 
 };
 
@@ -230,9 +246,9 @@ dwv.image.Geometry = function ( origin, size, spacing, orientation )
  * @return {String} The vector as a string.
  */
 dwv.image.Geometry.prototype.toString = function () {
-    return "Origin: " + this.getOrigin() +
-        ", Size: " + this.getSize() +
-        ", Spacing: " + this.getSpacing();
+  return 'Origin: ' + this.getOrigin() +
+        ', Size: ' + this.getSize() +
+        ', Spacing: ' + this.getSpacing();
 };
 
 /**
@@ -241,10 +257,10 @@ dwv.image.Geometry.prototype.toString = function () {
  * @return {Boolean} True if both objects are equal.
  */
 dwv.image.Geometry.prototype.equals = function (rhs) {
-    return rhs !== null &&
-        this.getOrigin().equals( rhs.getOrigin() ) &&
-        this.getSize().equals( rhs.getSize() ) &&
-        this.getSpacing().equals( rhs.getSpacing() );
+  return rhs !== null &&
+        this.getOrigin().equals(rhs.getOrigin()) &&
+        this.getSize().equals(rhs.getSize()) &&
+        this.getSpacing().equals(rhs.getSpacing());
 };
 
 /**
@@ -252,8 +268,8 @@ dwv.image.Geometry.prototype.equals = function (rhs) {
  * @param {Object} index The index to convert.
  */
 dwv.image.Geometry.prototype.indexToOffset = function (index) {
-    var size = this.getSize();
-    return index.getI() +
+  var size = this.getSize();
+  return index.getI() +
        index.getJ() * size.getNumberOfColumns() +
        index.getK() * size.getSliceSize();
 };
@@ -263,12 +279,12 @@ dwv.image.Geometry.prototype.indexToOffset = function (index) {
  * @param {Object} index The index to convert.
  */
 dwv.image.Geometry.prototype.indexToWorld = function (index) {
-    var origin = this.getOrigin();
-    var spacing = this.getSpacing();
-    return new dwv.math.Point3D(
-        origin.getX() + index.getI() * spacing.getColumnSpacing(),
-        origin.getY() + index.getJ() * spacing.getRowSpacing(),
-        origin.getZ() + index.getK() * spacing.getSliceSpacing() );
+  var origin = this.getOrigin();
+  var spacing = this.getSpacing();
+  return new dwv.math.Point3D(
+    origin.getX() + index.getI() * spacing.getColumnSpacing(),
+    origin.getY() + index.getJ() * spacing.getRowSpacing(),
+    origin.getZ() + index.getK() * spacing.getSliceSpacing());
 };
 
 /**
@@ -276,10 +292,10 @@ dwv.image.Geometry.prototype.indexToWorld = function (index) {
  * @param {Object} THe point to convert.
  */
 dwv.image.Geometry.prototype.worldToIndex = function (point) {
-    var origin = this.getOrigin();
-    var spacing = this.getSpacing();
-    return new dwv.math.Point3D(
-        point.getX() / spacing.getColumnSpacing() - origin.getX(),
-        point.getY() / spacing.getRowSpacing() - origin.getY(),
-        point.getZ() / spacing.getSliceSpacing() - origin.getZ() );
+  var origin = this.getOrigin();
+  var spacing = this.getSpacing();
+  return new dwv.math.Point3D(
+    point.getX() / spacing.getColumnSpacing() - origin.getX(),
+    point.getY() / spacing.getRowSpacing() - origin.getY(),
+    point.getZ() / spacing.getSliceSpacing() - origin.getZ());
 };
