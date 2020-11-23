@@ -2149,10 +2149,10 @@ klaw@^3.0.0:
   dependencies:
     graceful-fs "^4.1.9"
 
-konva@~4.2.2:
-  version "4.2.2"
-  resolved "https://registry.yarnpkg.com/konva/-/konva-4.2.2.tgz#0f1799dbe0275bb8218a03549ce931e9006a696d"
-  integrity sha512-5vq/rKy35/gdMLipjcxgFz/LhJ/S8Ct/e1XntQmH1MSwN4rMP97Oera2PzxDh3DZPsrV6TETTKHNb1G7Jb6Z5A==
+konva@~7.1.9:
+  version "7.1.9"
+  resolved "https://registry.yarnpkg.com/konva/-/konva-7.1.9.tgz#626e4fbd3338e6109a34340972b97e735adcb8af"
+  integrity sha512-/1Hc7uO4eFqS+Qj4cJvXv18XeSJPxlYeqEEiZGmCMurh8Q+jyDGD5qu1uqhnFtTlkTD2M5IPgr6d0sgGGpdS4Q==
 
 lcov-parse@^1.0.0:
   version "1.0.0"
