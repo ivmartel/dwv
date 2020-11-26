@@ -8,6 +8,7 @@ QUnit.module('matrix');
 
 /**
  * Tests for {@link dwv.math.Matrix33}.
+ *
  * @function module:tests/math~Matrix33
  */
 QUnit.test('Test Matrix44.', function (assert) {

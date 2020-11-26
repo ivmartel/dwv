@@ -6,31 +6,36 @@ dwv.tool.filter = dwv.tool.filter || {};
 
 /**
  * Filter tool.
- * @constructor
- * @param {Object} app The associated app.
+ *
+ * @class
+ * @param {object} app The associated app.
  */
 dwv.tool.Filter = function (app) {
   /**
-     * Filter list
-     * @type Object
-     */
+   * Filter list
+   *
+   * @type {object}
+   */
   this.filterList = null;
   /**
-     * Selected filter.
-     * @type Object
-     */
+   * Selected filter.
+   *
+   * @type {object}
+   */
   this.selectedFilter = 0;
   /**
-     * Listener handler.
-     * @type Object
-     * @private
-     */
+   * Listener handler.
+   *
+   * @type {object}
+   * @private
+   */
   var listenerHandler = new dwv.utils.ListenerHandler();
 
   /**
-     * Activate the tool.
-     * @param {Boolean} bool Flag to activate or not.
-     */
+   * Activate the tool.
+   *
+   * @param {boolean} bool Flag to activate or not.
+   */
   this.activate = function (bool) {
     // setup event listening
     for (var key in this.filterList) {
@@ -45,9 +50,10 @@ dwv.tool.Filter = function (app) {
   };
 
   /**
-     * Set the tool options.
-     * @param {Object} options The list of filter names amd classes.
-     */
+   * Set the tool options.
+   *
+   * @param {object} options The list of filter names amd classes.
+   */
   this.setOptions = function (options) {
     this.filterList = {};
     // try to instanciate filters from the options
@@ -57,8 +63,8 @@ dwv.tool.Filter = function (app) {
   };
 
   /**
-     * Initialise the filter. Called once the image is loaded.
-     */
+   * Initialise the filter. Called once the image is loaded.
+   */
   this.init = function () {
     // setup event listening
     for (var key in this.filterList) {
@@ -67,9 +73,10 @@ dwv.tool.Filter = function (app) {
   };
 
   /**
-     * Handle keydown event.
-     * @param {Object} event The keydown event.
-     */
+   * Handle keydown event.
+   *
+   * @param {object} event The keydown event.
+   */
   this.keydown = function (event) {
     event.context = 'dwv.tool.Filter';
     app.onKeydown(event);
@@ -77,8 +84,9 @@ dwv.tool.Filter = function (app) {
 
   /**
    * Add an event listener to this class.
-   * @param {String} type The event type.
-   * @param {Object} callback The method associated with the provided
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
    *   event type, will be called with the fired event.
    */
   this.addEventListener = function (type, callback) {
@@ -86,18 +94,20 @@ dwv.tool.Filter = function (app) {
   };
   /**
    * Remove an event listener from this class.
-   * @param {String} type The event type.
-   * @param {Object} callback The method associated with the provided
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
    *   event type.
    */
   this.removeEventListener = function (type, callback) {
     listenerHandler.remove(type, callback);
   };
   /**
-     * Fire an event: call all associated listeners with the input event object.
-     * @param {Object} event The event to fire.
-     * @private
-     */
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
+   * @private
+   */
   function fireEvent(event) {
     listenerHandler.fireEvent(event);
   }
@@ -106,7 +116,8 @@ dwv.tool.Filter = function (app) {
 
 /**
  * Help for this tool.
- * @return {Object} The help content.
+ *
+ * @returns {object} The help content.
  */
 dwv.tool.Filter.prototype.getHelpKeys = function () {
   return {
@@ -117,7 +128,8 @@ dwv.tool.Filter.prototype.getHelpKeys = function () {
 
 /**
  * Get the selected filter.
- * @return {Object} The selected filter.
+ *
+ * @returns {object} The selected filter.
  */
 dwv.tool.Filter.prototype.getSelectedFilter = function () {
   return this.selectedFilter;
@@ -125,7 +137,8 @@ dwv.tool.Filter.prototype.getSelectedFilter = function () {
 
 /**
  * Set the selected filter.
- * @return {String} The name of the filter to select.
+ *
+ * @param {string} name The name of the filter to select.
  */
 dwv.tool.Filter.prototype.setSelectedFilter = function (name) {
   // check if we have it
@@ -144,7 +157,8 @@ dwv.tool.Filter.prototype.setSelectedFilter = function (name) {
 
 /**
  * Get the list of filters.
- * @return {Array} The list of filter objects.
+ *
+ * @returns {Array} The list of filter objects.
  */
 dwv.tool.Filter.prototype.getFilterList = function () {
   return this.filterList;
@@ -152,8 +166,9 @@ dwv.tool.Filter.prototype.getFilterList = function () {
 
 /**
  * Check if a filter is in the filter list.
- * @param {String} name The name to check.
- * @return {String} The filter list element for the given name.
+ *
+ * @param {string} name The name to check.
+ * @returns {string} The filter list element for the given name.
  */
 dwv.tool.Filter.prototype.hasFilter = function (name) {
   return this.filterList[name];
@@ -161,33 +176,38 @@ dwv.tool.Filter.prototype.hasFilter = function (name) {
 
 /**
  * Threshold filter tool.
- * @constructor
- * @param {Object} app The associated application.
+ *
+ * @class
+ * @param {object} app The associated application.
  */
 dwv.tool.filter.Threshold = function (app) {
   /**
-     * Associated filter.
-     * @type Object
-     * @private
-     */
+   * Associated filter.
+   *
+   * @type {object}
+   * @private
+   */
   var filter = new dwv.image.filter.Threshold();
   /**
-     * Flag to know wether to reset the image or not.
-     * @type Boolean
-     * @private
-     */
+   * Flag to know wether to reset the image or not.
+   *
+   * @type {boolean}
+   * @private
+   */
   var resetImage = true;
   /**
-     * Listener handler.
-     * @type Object
-     * @private
-     */
+   * Listener handler.
+   *
+   * @type {object}
+   * @private
+   */
   var listenerHandler = new dwv.utils.ListenerHandler();
 
   /**
-     * Activate the filter.
-     * @param {Boolean} bool Flag to activate or not.
-     */
+   * Activate the filter.
+   *
+   * @param {boolean} bool Flag to activate or not.
+   */
   this.activate = function (bool) {
     // reset the image when the tool is activated
     if (bool) {
@@ -196,16 +216,17 @@ dwv.tool.filter.Threshold = function (app) {
   };
 
   /**
-     * Initialise the filter. Called once the image is loaded.
-     */
+   * Initialise the filter. Called once the image is loaded.
+   */
   this.init = function () {
     // does nothing
   };
 
   /**
-     * Run the filter.
-     * @param {Mixed} args The filter arguments.
-     */
+   * Run the filter.
+   *
+   * @param {*} args The filter arguments.
+   */
   this.run = function (args) {
     filter.setMin(args.min);
     filter.setMax(args.max);
@@ -223,28 +244,31 @@ dwv.tool.filter.Threshold = function (app) {
   };
 
   /**
-     * Add an event listener to this class.
-     * @param {String} type The event type.
-     * @param {Object} callback The method associated with the provided
-     *  event type, will be called with the fired event.
-     */
+   * Add an event listener to this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *  event type, will be called with the fired event.
+   */
   this.addEventListener = function (type, callback) {
     listenerHandler.add(type, callback);
   };
   /**
-     * Remove an event listener from this class.
-     * @param {String} type The event type.
-     * @param {Object} callback The method associated with the provided
-     *   event type.
-     */
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type.
+   */
   this.removeEventListener = function (type, callback) {
     listenerHandler.remove(type, callback);
   };
   /**
-     * Fire an event: call all associated listeners with the input event object.
-     * @param {Object} event The event to fire.
-     * @private
-     */
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
+   * @private
+   */
   function fireEvent(event) {
     listenerHandler.fireEvent(event);
   }
@@ -254,37 +278,41 @@ dwv.tool.filter.Threshold = function (app) {
 
 /**
  * Sharpen filter tool.
- * @constructor
- * @param {Object} app The associated application.
+ *
+ * @class
+ * @param {object} app The associated application.
  */
 dwv.tool.filter.Sharpen = function (app) {
   /**
-     * Listener handler.
-     * @type Object
-     * @private
-     */
+   * Listener handler.
+   *
+   * @type {object}
+   * @private
+   */
   var listenerHandler = new dwv.utils.ListenerHandler();
 
   /**
-     * Activate the filter.
-     * @param {Boolean} bool Flag to activate or not.
-     */
-  this.activate = function (/*bool*/) {
+   * Activate the filter.
+   *
+   * @param {boolean} _bool Flag to activate or not.
+   */
+  this.activate = function (_bool) {
     // does nothing
   };
 
   /**
-     * Initialise the filter. Called once the image is loaded.
-     */
+   * Initialise the filter. Called once the image is loaded.
+   */
   this.init = function () {
     // does nothing
   };
 
   /**
-     * Run the filter.
-     * @param {Mixed} args The filter arguments.
-     */
-  this.run = function (/*args*/) {
+   * Run the filter.
+   *
+   * @param {*} _args The filter arguments.
+   */
+  this.run = function (_args) {
     var filter = new dwv.image.filter.Sharpen();
     filter.setOriginalImage(app.getImage());
     var command = new dwv.tool.RunFilterCommand(filter, app);
@@ -296,28 +324,31 @@ dwv.tool.filter.Sharpen = function (app) {
   };
 
   /**
-     * Add an event listener to this class.
-     * @param {String} type The event type.
-     * @param {Object} callback The method associated with the provided
-     *    event type, will be called with the fired event.
-     */
+   * Add an event listener to this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *    event type, will be called with the fired event.
+   */
   this.addEventListener = function (type, callback) {
     listenerHandler.add(type, callback);
   };
   /**
-     * Remove an event listener from this class.
-     * @param {String} type The event type.
-     * @param {Object} callback The method associated with the provided
-     *   event type.
-     */
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type.
+   */
   this.removeEventListener = function (type, callback) {
     listenerHandler.remove(type, callback);
   };
   /**
-     * Fire an event: call all associated listeners with the input event object.
-     * @param {Object} event The event to fire.
-     * @private
-     */
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
+   * @private
+   */
   function fireEvent(event) {
     listenerHandler.fireEvent(event);
   }
@@ -326,37 +357,41 @@ dwv.tool.filter.Sharpen = function (app) {
 
 /**
  * Sobel filter tool.
- * @constructor
- * @param {Object} app The associated application.
+ *
+ * @class
+ * @param {object} app The associated application.
  */
 dwv.tool.filter.Sobel = function (app) {
   /**
-     * Listener handler.
-     * @type Object
-     * @private
-     */
+   * Listener handler.
+   *
+   * @type {object}
+   * @private
+   */
   var listenerHandler = new dwv.utils.ListenerHandler();
 
   /**
-     * Activate the filter.
-     * @param {Boolean} bool Flag to activate or not.
-     */
-  this.activate = function (/*bool*/) {
+   * Activate the filter.
+   *
+   * @param {boolean} _bool Flag to activate or not.
+   */
+  this.activate = function (_bool) {
     // does nothing
   };
 
   /**
-     * Initialise the filter. Called once the image is loaded.
-     */
+   * Initialise the filter. Called once the image is loaded.
+   */
   this.init = function () {
     // does nothing
   };
 
   /**
-     * Run the filter.
-     * @param {Mixed} args The filter arguments.
-     */
-  dwv.tool.filter.Sobel.prototype.run = function (/*args*/) {
+   * Run the filter.
+   *
+   * @param {*} _args The filter arguments.
+   */
+  dwv.tool.filter.Sobel.prototype.run = function (_args) {
     var filter = new dwv.image.filter.Sobel();
     filter.setOriginalImage(app.getImage());
     var command = new dwv.tool.RunFilterCommand(filter, app);
@@ -368,28 +403,31 @@ dwv.tool.filter.Sobel = function (app) {
   };
 
   /**
-     * Add an event listener to this class.
-     * @param {String} type The event type.
-     * @param {Object} callback The method associated with the provided
-     *  event type, will be called with the fired event.
-     */
+   * Add an event listener to this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *  event type, will be called with the fired event.
+   */
   this.addEventListener = function (type, callback) {
     listenerHandler.add(type, callback);
   };
   /**
-     * Remove an event listener from this class.
-     * @param {String} type The event type.
-     * @param {Object} callback The method associated with the provided
-     *   event type.
-     */
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type.
+   */
   this.removeEventListener = function (type, callback) {
     listenerHandler.remove(type, callback);
   };
   /**
-     * Fire an event: call all associated listeners with the input event object.
-     * @param {Object} event The event to fire.
-     * @private
-     */
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
+   * @private
+   */
   function fireEvent(event) {
     listenerHandler.fireEvent(event);
   }
@@ -398,23 +436,25 @@ dwv.tool.filter.Sobel = function (app) {
 
 /**
  * Run filter command.
- * @constructor
- * @param {Object} filter The filter to run.
- * @param {Object} app The associated application.
+ *
+ * @class
+ * @param {object} filter The filter to run.
+ * @param {object} app The associated application.
  */
 dwv.tool.RunFilterCommand = function (filter, app) {
 
   /**
-     * Get the command name.
-     * @return {String} The command name.
-     */
+   * Get the command name.
+   *
+   * @returns {string} The command name.
+   */
   this.getName = function () {
     return 'Filter-' + filter.getName();
   };
 
   /**
-     * Execute the command.
-     */
+   * Execute the command.
+   */
   this.execute = function () {
     // run filter and set app image
     app.setImage(filter.update());
@@ -425,8 +465,8 @@ dwv.tool.RunFilterCommand = function (filter, app) {
   };
 
   /**
-     * Undo the command.
-     */
+   * Undo the command.
+   */
   this.undo = function () {
     // reset the image
     app.setImage(filter.getOriginalImage());
@@ -440,15 +480,17 @@ dwv.tool.RunFilterCommand = function (filter, app) {
 
 /**
  * Handle an execute event.
- * @param {Object} event The execute event with type and id.
+ *
+ * @param {object} _event The execute event with type and id.
  */
-dwv.tool.RunFilterCommand.prototype.onExecute = function (/*event*/) {
+dwv.tool.RunFilterCommand.prototype.onExecute = function (_event) {
   // default does nothing.
 };
 /**
  * Handle an undo event.
- * @param {Object} event The undo event with type and id.
+ *
+ * @param {object} _event The undo event with type and id.
  */
-dwv.tool.RunFilterCommand.prototype.onUndo = function (/*event*/) {
+dwv.tool.RunFilterCommand.prototype.onUndo = function (_event) {
   // default does nothing.
 };

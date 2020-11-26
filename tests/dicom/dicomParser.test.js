@@ -26,6 +26,7 @@ QUnit.module('dicomParser');
 /**
  * Tests for {@link dwv.dicom.DicomParser} using simple DICOM data.
  * Using remote file for CI integration.
+ *
  * @function module:tests/dicom~dicomParserSimpleDicom
  */
 QUnit.test('Test simple DICOM parsing.', function (assert) {
@@ -94,6 +95,7 @@ QUnit.test('Test simple DICOM parsing.', function (assert) {
 /**
  * Tests for {@link dwv.dicom.DicomParser} using sequence test DICOM data.
  * Using remote file for CI integration.
+ *
  * @function module:tests/dicom~dicomParserSequenceDicom
  */
 QUnit.test('Test sequence DICOM parsing.', function (assert) {
@@ -188,6 +190,7 @@ QUnit.test('Test sequence DICOM parsing.', function (assert) {
 
 /**
  * Tests for {@link dwv.dicom.cleanString}.
+ *
  * @function module:tests/dicom~cleanString
  */
 QUnit.test('Test cleanString.', function (assert) {
@@ -221,6 +224,7 @@ QUnit.test('Test cleanString.', function (assert) {
 /**
  * Tests for {@link dwv.dicom.DicomParser} using DICOMDIR data.
  * Using remote file for CI integration.
+ *
  * @function module:tests/dicom~dicomParserDicomDir
  */
 QUnit.test('Test DICOMDIR parsing.', function (assert) {

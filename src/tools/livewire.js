@@ -4,78 +4,90 @@ dwv.tool = dwv.tool || {};
 
 /**
  * Livewire painting tool.
- * @constructor
- * @param {Object} app The associated application.
+ *
+ * @class
+ * @param {object} app The associated application.
  */
 dwv.tool.Livewire = function (app) {
   /**
-     * Closure to self: to be used by event handlers.
-     * @private
-     * @type WindowLevel
-     */
+   * Closure to self: to be used by event handlers.
+   *
+   * @private
+   * @type {dwv.tool.Livewire}
+   */
   var self = this;
   /**
-     * Interaction start flag.
-     * @type Boolean
-     */
+   * Interaction start flag.
+   *
+   * @type {boolean}
+   */
   this.started = false;
 
   /**
-     * Draw command.
-     * @private
-     * @type Object
-     */
+   * Draw command.
+   *
+   * @private
+   * @type {object}
+   */
   var command = null;
   /**
-     * Current shape group.
-     * @private
-     * @type Object
-     */
+   * Current shape group.
+   *
+   * @private
+   * @type {object}
+   */
   var shapeGroup = null;
   /**
-     * Drawing style.
-     * @type Style
-     */
+   * Drawing style.
+   *
+   * @type {dwv.html.Style}
+   */
   this.style = new dwv.html.Style();
   // init with the app window scale
   this.style.setScale(app.getWindowScale());
 
   /**
-     * Path storage. Paths are stored in reverse order.
-     * @private
-     * @type Path
-     */
+   * Path storage. Paths are stored in reverse order.
+   *
+   * @private
+   * @type {dwv.math.Path}
+   */
   var path = new dwv.math.Path();
   /**
-     * Current path storage. Paths are stored in reverse order.
-     * @private
-     * @type Path
-     */
+   * Current path storage. Paths are stored in reverse order.
+   *
+   * @private
+   * @type {dwv.math.Path}
+   */
   var currentPath = new dwv.math.Path();
   /**
-     * List of parent points.
-     * @private
-     * @type Array
-     */
+   * List of parent points.
+   *
+   * @private
+   * @type {Array}
+   */
   var parentPoints = [];
   /**
-     * Tolerance.
-     * @private
-     * @type Number
-     */
+   * Tolerance.
+   *
+   * @private
+   * @type {number}
+   */
   var tolerance = 5;
 
   /**
-     * Listener handler.
-     * @type Object
-     * @private
-     */
+   * Listener handler.
+   *
+   * @type {object}
+   * @private
+   */
   var listenerHandler = new dwv.utils.ListenerHandler();
 
   /**
-     * Clear the parent points list.
-     * @private
-     */
+   * Clear the parent points list.
+   *
+   * @private
+   */
   function clearParentPoints() {
     var nrows = app.getImage().getGeometry().getSize().getNumberOfRows();
     for (var i = 0; i < nrows; ++i) {
@@ -84,25 +96,28 @@ dwv.tool.Livewire = function (app) {
   }
 
   /**
-     * Clear the stored paths.
-     * @private
-     */
+   * Clear the stored paths.
+   *
+   * @private
+   */
   function clearPaths() {
     path = new dwv.math.Path();
     currentPath = new dwv.math.Path();
   }
 
   /**
-     * Scissor representation.
-     * @private
-     * @type Scissors
-     */
+   * Scissor representation.
+   *
+   * @private
+   * @type {dwv.math.Scissors}
+   */
   var scissors = new dwv.math.Scissors();
 
   /**
-     * Handle mouse down event.
-     * @param {Object} event The mouse down event.
-     */
+   * Handle mouse down event.
+   *
+   * @param {object} event The mouse down event.
+   */
   this.mousedown = function (event) {
     // first time
     if (!self.started) {
@@ -146,9 +161,10 @@ dwv.tool.Livewire = function (app) {
   };
 
   /**
-     * Handle mouse move event.
-     * @param {Object} event The mouse move event.
-     */
+   * Handle mouse move event.
+   *
+   * @param {object} event The mouse move event.
+   */
   this.mousemove = function (event) {
     if (!self.started) {
       return;
@@ -215,27 +231,30 @@ dwv.tool.Livewire = function (app) {
   };
 
   /**
-     * Handle mouse up event.
-     * @param {Object} event The mouse up event.
-     */
-  this.mouseup = function (/*event*/) {
+   * Handle mouse up event.
+   *
+   * @param {object} _event The mouse up event.
+   */
+  this.mouseup = function (_event) {
     // nothing to do
   };
 
   /**
-     * Handle mouse out event.
-     * @param {Object} event The mouse out event.
-     */
+   * Handle mouse out event.
+   *
+   * @param {object} event The mouse out event.
+   */
   this.mouseout = function (event) {
     // treat as mouse up
     self.mouseup(event);
   };
 
   /**
-     * Handle double click event.
-     * @param {Object} event The double click event.
-     */
-  this.dblclick = function (/*event*/) {
+   * Handle double click event.
+   *
+   * @param {object} _event The double click event.
+   */
+  this.dblclick = function (_event) {
     console.log('dblclick');
     // save command in undo stack
     app.addToUndoStack(command);
@@ -244,45 +263,50 @@ dwv.tool.Livewire = function (app) {
   };
 
   /**
-     * Handle touch start event.
-     * @param {Object} event The touch start event.
-     */
+   * Handle touch start event.
+   *
+   * @param {object} event The touch start event.
+   */
   this.touchstart = function (event) {
     // treat as mouse down
     self.mousedown(event);
   };
 
   /**
-     * Handle touch move event.
-     * @param {Object} event The touch move event.
-     */
+   * Handle touch move event.
+   *
+   * @param {object} event The touch move event.
+   */
   this.touchmove = function (event) {
     // treat as mouse move
     self.mousemove(event);
   };
 
   /**
-     * Handle touch end event.
-     * @param {Object} event The touch end event.
-     */
+   * Handle touch end event.
+   *
+   * @param {object} event The touch end event.
+   */
   this.touchend = function (event) {
     // treat as mouse up
     self.mouseup(event);
   };
 
   /**
-     * Handle key down event.
-     * @param {Object} event The key down event.
-     */
+   * Handle key down event.
+   *
+   * @param {object} event The key down event.
+   */
   this.keydown = function (event) {
     event.context = 'dwv.tool.Livewire';
     app.onKeydown(event);
   };
 
   /**
-     * Activate the tool.
-     * @param {Boolean} bool The flag to activate or not.
-     */
+   * Activate the tool.
+   *
+   * @param {boolean} bool The flag to activate or not.
+   */
   this.activate = function (bool) {
     // start scissors if displayed
     if (bool) {
@@ -301,35 +325,38 @@ dwv.tool.Livewire = function (app) {
   };
 
   /**
-     * Initialise the tool.
-     */
+   * Initialise the tool.
+   */
   this.init = function () {
     // does nothing
   };
 
   /**
-     * Add an event listener to this class.
-     * @param {String} type The event type.
-     * @param {Object} callback The method associated with the provided
-     *    event type, will be called with the fired event.
-     */
+   * Add an event listener to this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *    event type, will be called with the fired event.
+   */
   this.addEventListener = function (type, callback) {
     listenerHandler.add(type, callback);
   };
   /**
-     * Remove an event listener from this class.
-     * @param {String} type The event type.
-     * @param {Object} callback The method associated with the provided
-     *   event type.
-     */
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type.
+   */
   this.removeEventListener = function (type, callback) {
     listenerHandler.remove(type, callback);
   };
   /**
-     * Fire an event: call all associated listeners with the input event object.
-     * @param {Object} event The event to fire.
-     * @private
-     */
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
+   * @private
+   */
   function fireEvent(event) {
     listenerHandler.fireEvent(event);
   }
@@ -338,7 +365,8 @@ dwv.tool.Livewire = function (app) {
 
 /**
  * Help for this tool.
- * @return {Object} The help content.
+ *
+ * @returns {object} The help content.
  */
 dwv.tool.Livewire.prototype.getHelpKeys = function () {
   return {
@@ -349,7 +377,8 @@ dwv.tool.Livewire.prototype.getHelpKeys = function () {
 
 /**
  * Set the line colour of the drawing.
- * @param {String} colour The colour to set.
+ *
+ * @param {string} colour The colour to set.
  */
 dwv.tool.Livewire.prototype.setLineColour = function (colour) {
   // set style var

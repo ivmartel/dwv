@@ -12,6 +12,7 @@ QUnit.module('dicomWriter');
 /**
  * Tests for {@link dwv.dicom.DicomWriter} using simple DICOM data.
  * Using remote file for CI integration.
+ *
  * @function module:tests/dicom~dicomWriterSimpleDicom
  */
 QUnit.test('Test multiframe writer support.', function (assert) {
@@ -68,6 +69,7 @@ QUnit.test('Test multiframe writer support.', function (assert) {
 /**
  * Tests for {@link dwv.dicom.DicomWriter} anomnymisation.
  * Using remote file for CI integration.
+ *
  * @function module:tests/dicom~dicomWriterAnonymise
  */
 QUnit.test('Test patient anonymisation', function (assert) {
@@ -150,8 +152,9 @@ QUnit.test('Test patient anonymisation', function (assert) {
  * Get a string representation of an object.
  * TypedArray.toString can return '[object Uint8Array]' on old browsers
  * (such as in PhantomJs).
- * @param {Object} obj The input object
- * @return {String} The string.
+ *
+ * @param {object} obj The input object
+ * @returns {string} The string.
  */
 dwv.test.toString = function (obj) {
   var res = obj.toString();
@@ -170,10 +173,11 @@ dwv.test.toString = function (obj) {
 
 /**
  * Compare JSON tags and DICOM elements
- * @param {Object} jsonTags The JSON tags.
- * @param {Object} dicomElements The DICOM elements
- * @param {String} name The name of the test.
- * @param {Object} comaprator An object with an equal function (such as
+ *
+ * @param {object} jsonTags The JSON tags.
+ * @param {object} dicomElements The DICOM elements
+ * @param {string} name The name of the test.
+ * @param {object} comparator An object with an equal function (such as
  *   Qunit assert).
  */
 dwv.test.compare = function (jsonTags, dicomElements, name, comparator) {
@@ -214,8 +218,9 @@ dwv.test.compare = function (jsonTags, dicomElements, name, comparator) {
 
 /**
  * Test a JSON config: write a DICOM file and read it back.
- * @param {Object} config A JSON config representing DICOM tags.
- * @param {Object} assert A Qunit assert.
+ *
+ * @param {object} config A JSON config representing DICOM tags.
+ * @param {object} assert A Qunit assert.
  */
 dwv.test.testWriteReadDataFromConfig = function (config, assert) {
   // convert JSON to DICOM element object
@@ -247,6 +252,7 @@ dwv.test.testWriteReadDataFromConfig = function (config, assert) {
 /**
  * Tests write/read DICOM data from config file: explicit encoding.
  * Using remote file for CI integration.
+ *
  * @function module:tests/dicom~dicomExplicitWriteReadFromConfig
  */
 QUnit.test('Test synthetic dicom explicit', function (assert) {
@@ -273,6 +279,7 @@ QUnit.test('Test synthetic dicom explicit', function (assert) {
 /**
  * Tests write/read DICOM data from config file: implicit encoding.
  * Using remote file for CI integration.
+ *
  * @function module:tests/dicom~dicomImplicitWriteReadFromConfig
  */
 QUnit.test('Test synthetic dicom implicit', function (assert) {
@@ -299,6 +306,7 @@ QUnit.test('Test synthetic dicom implicit', function (assert) {
 /**
  * Tests write/read DICOM data from config file: explicit big endian encoding.
  * Using remote file for CI integration.
+ *
  * @function module:tests/dicom~dicomExplicitBigEndianWriteReadFromConfig
  */
 QUnit.test('Test synthetic dicom explicit big endian', function (assert) {

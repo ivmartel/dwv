@@ -8,6 +8,7 @@ QUnit.module('html');
 
 /**
  * Tests for {@link dwv.html.toTable}.
+ *
  * @function module:tests/html~toTable
  */
 

@@ -11,11 +11,12 @@ QUnit.module('image');
 
 /**
  * Compare an image and a buffer.
- * @param {Object} image The input image.
- * @param {Object} size The size of the input buffer.
+ *
+ * @param {object} image The input image.
+ * @param {object} size The size of the input buffer.
  * @param {Array} buffer The input buffer.
- * @param {Object} rsi The rescale slope of the input buffer.
- * @return {Object} Statistics of the value and rescaled value differences.
+ * @param {object} rsi The rescale slope of the input buffer.
+ * @returns {object} Statistics of the value and rescaled value differences.
  */
 dwv.test.compareImageAndBuffer = function (image, size, buffer, rsi) {
   var diffs = [];
@@ -59,6 +60,7 @@ dwv.test.compareImageAndBuffer = function (image, size, buffer, rsi) {
 
 /**
  * Tests for {@link dwv.image.Image} getValue.
+ *
  * @function module:tests/image~getvalue
  */
 QUnit.test('Test Image getValue.', function (assert) {
@@ -115,6 +117,7 @@ QUnit.test('Test Image getValue.', function (assert) {
 
 /**
  * Tests for {@link dwv.image.Image} histogram.
+ *
  * @function module:tests/image~histogram
  */
 QUnit.test('Test Image histogram.', function (assert) {
@@ -149,6 +152,7 @@ QUnit.test('Test Image histogram.', function (assert) {
 
 /**
  * Tests for {@link dwv.image.Image} append.
+ *
  * @function module:tests/image~append
  */
 QUnit.test('Test Image append slice.', function (assert) {
@@ -266,6 +270,7 @@ QUnit.test('Test Image append slice.', function (assert) {
 
 /**
  * Tests for {@link dwv.image.Image} convolute2D.
+ *
  * @function module:tests/image~convolute2D
  */
 QUnit.test('Test Image convolute2D.', function (assert) {
@@ -307,6 +312,7 @@ QUnit.test('Test Image convolute2D.', function (assert) {
 
 /**
  * Tests for {@link dwv.image.Image} transform.
+ *
  * @function module:tests/image~transform
  */
 QUnit.test('Test Image transform.', function (assert) {
@@ -362,6 +368,7 @@ QUnit.test('Test Image transform.', function (assert) {
 
 /**
  * Tests for {@link dwv.image.Image} compose.
+ *
  * @function module:tests/image~compose
  */
 QUnit.test('Test Image compose.', function (assert) {
@@ -400,6 +407,7 @@ QUnit.test('Test Image compose.', function (assert) {
 
 /**
  * Tests for {@link dwv.image.ImageFactory}.
+ *
  * @function module:tests/image~ImageFactory
  */
 QUnit.test('Test ImageFactory.', function (assert) {

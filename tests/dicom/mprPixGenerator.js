@@ -1,7 +1,9 @@
 /**
  * MPRPixGenerator
  * Generates pixel data from file with an input per orientation.
- * @constructor
+ *
+ * @param {object} options The generator options.
+ * @class
  */
 var MPRPixGenerator = function (options) {
 
@@ -87,10 +89,21 @@ var MPRPixGenerator = function (options) {
     }
   };
 
+  /**
+   * @param {number} i The column index.
+   * @param {number} j The row index.
+   * @returns {number} The offset for the given position.
+   */
   function getOffset(i, j) {
     return i + j * halfNCols;
   }
 
+  /**
+   * @param {string} name The image orientation
+   * @param {number} i The column index.
+   * @param {number} j The row index.
+   * @returns {number} The value at the given position.
+   */
   function getFunc(name, i, j/*, k*/) {
     var imgIdx = 0;
     if (name === 'axial') {
@@ -106,8 +119,16 @@ var MPRPixGenerator = function (options) {
 
 /**
  * Check tags are coherent with image size.
+ *
+ * @param {object} tags The tags to check.
+ * @param {object} image The associated image.
+ * @returns {boolean} True if the tags are ok.
  */
 function checkTags(tags, image) {
+  /**
+   * @param {number} value The value to check.
+   * @returns {number} The expected value.
+   */
   function getExpectedSize(value) {
     return 2 * value;
   }

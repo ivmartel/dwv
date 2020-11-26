@@ -7,8 +7,9 @@ dwv.dicom.pixelGenerators = dwv.dicom.pixelGenerators || {};
 
 /**
  * Get the DICOM element from a DICOM tags object.
- * @param {Object} tags The DICOM tags object.
- * @return {Object} The DICOM elements and the end offset.
+ *
+ * @param {object} tags The DICOM tags object.
+ * @returns {object} The DICOM elements and the end offset.
  */
 dwv.dicom.getElementsFromJSONTags = function (tags) {
   // transfer syntax
@@ -43,11 +44,14 @@ dwv.dicom.getElementsFromJSONTags = function (tags) {
 
 /**
  * Get the DICOM pixel data from a DICOM tags object.
- * @param {Object} tags The DICOM tags object.
- * @param {Object} startOffset The start offset of the pixel data.
- * @param {String} pixGeneratorName The name of a pixel generator.
- * @param {Number} sliceNumber The slice number.
- * @return {Object} The DICOM pixel data element.
+ *
+ * @param {object} tags The DICOM tags object.
+ * @param {object} startOffset The start offset of the pixel data.
+ * @param {string} pixGeneratorName The name of a pixel generator.
+ * @param {number} sliceNumber The slice number.
+ * @param {Array} images The images to pass to the generator.
+ * @param {number} numberOfSlices The result number of slices.
+ * @returns {object} The DICOM pixel data element.
  */
 dwv.dicom.generatePixelDataFromJSONTags = function (
   tags, startOffset, pixGeneratorName, sliceNumber, images, numberOfSlices) {
@@ -163,8 +167,9 @@ dwv.dicom.generatePixelDataFromJSONTags = function (
 
 /**
  * Extract the image data from an image.
+ *
  * @param {Image} image The image to get the data from.
- * @return The image data buffer.
+ * @returns {object} The image data buffer.
  */
 dwv.dicom.getImageDataData = function (image) {
   // draw the image in the canvas in order to get its data

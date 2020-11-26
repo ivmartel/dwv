@@ -8,6 +8,7 @@ QUnit.module('geometry');
 
 /**
  * Tests for {@link dwv.image.Size}.
+ *
  * @function module:tests/image~size
  */
 QUnit.test('Test Size.', function (assert) {
@@ -37,6 +38,7 @@ QUnit.test('Test Size.', function (assert) {
 
 /**
  * Tests for {@link dwv.image.Spacing}.
+ *
  * @function module:tests/image~spacing
  */
 QUnit.test('Test Spacing.', function (assert) {

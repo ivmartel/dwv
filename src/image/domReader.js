@@ -4,8 +4,9 @@ dwv.image = dwv.image || {};
 
 /**
  * Create a simple array buffer from an ImageData buffer.
- * @param {Object} imageData The ImageData taken from a context.
- * @return {Array} The image buffer.
+ *
+ * @param {object} imageData The ImageData taken from a context.
+ * @returns {Array} The image buffer.
  */
 dwv.image.imageDataToBuffer = function (imageData) {
   // remove alpha
@@ -24,13 +25,14 @@ dwv.image.imageDataToBuffer = function (imageData) {
 
 /**
  * Get data from an input context imageData.
- * @param {Number} width The width of the coresponding image.
- * @param {Number} height The height of the coresponding image.
- * @param {Number} sliceIndex The slice index of the imageData.
- * @param {Object} imageBuffer The image buffer.
- * @param {Number} numberOfFrames The final number of frames.
- * @param {String} imageUid The image UID.
- * @return {Object} The corresponding view.
+ *
+ * @param {number} width The width of the coresponding image.
+ * @param {number} height The height of the coresponding image.
+ * @param {number} sliceIndex The slice index of the imageData.
+ * @param {object} imageBuffer The image buffer.
+ * @param {number} numberOfFrames The final number of frames.
+ * @param {string} imageUid The image UID.
+ * @returns {object} The corresponding view.
  */
 dwv.image.getDefaultView = function (
   width, height, sliceIndex,
@@ -62,9 +64,10 @@ dwv.image.getDefaultView = function (
 
 /**
  * Get data from an input image using a canvas.
- * @param {Object} image The DOM Image.
- * @param {Object} origin The data origin.
- * @return {Object} A load data event.
+ *
+ * @param {object} image The DOM Image.
+ * @param {object} origin The data origin.
+ * @returns {object} A load data event.
  */
 dwv.image.getViewFromDOMImage = function (image, origin) {
   // image size
@@ -114,12 +117,14 @@ dwv.image.getViewFromDOMImage = function (image, origin) {
 
 /**
  * Get data from an input image using a canvas.
- * @param {Object} video The DOM Video.
- * @param {Object} onload The function to call once the data is loaded.
- * @param {Object} onprogress The function to call to report progress.
- * @param {Object} onloadend The function to call to report load end.
- * @param {Number} dataindex The data index.
- * @param {Object} origin The data origin.
+ *
+ * @param {object} video The DOM Video.
+ * @param {Function} onloaditem On load callback.
+ * @param {object} onload The function to call once the data is loaded.
+ * @param {object} onprogress The function to call to report progress.
+ * @param {object} onloadend The function to call to report load end.
+ * @param {number} dataIndex The data index.
+ * @param {object} origin The data origin.
  */
 dwv.image.getViewFromDOMVideo = function (
   video, onloaditem, onload, onprogress, onloadend,
@@ -160,7 +165,9 @@ dwv.image.getViewFromDOMVideo = function (
   // video view
   var view = null;
 
-  // draw the context and store it as a frame
+  /**
+   * Draw the context and store it as a frame
+   */
   function storeFrame() {
     // send progress
     onprogress({
@@ -192,7 +199,9 @@ dwv.image.getViewFromDOMVideo = function (
     }
   }
 
-  // handle seeked event
+  /**
+   * Handle seeked event
+   */
   function onseeked(/*event*/) {
     // store
     storeFrame();

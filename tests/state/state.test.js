@@ -2,6 +2,7 @@
 var dwv = dwv || {};
 /**
  * Just used for tests.
+ *
  * @namespace
  */
 dwv.test = dwv.test || {};
@@ -16,9 +17,10 @@ QUnit.module('state');
 
 /**
  * Test a state file.
- * @param {String} version The state format version.
- * @param {String} type The type of drawing.
- * @param {Object} assert The qunit assert.
+ *
+ * @param {string} version The state format version.
+ * @param {string} type The type of drawing.
+ * @param {object} assert The qunit assert.
  */
 dwv.test.testState = function (version, type, assert) {
   var done = assert.async();
@@ -56,9 +58,10 @@ dwv.test.testState = function (version, type, assert) {
 
 /**
  * Check state header.
- * @param {Object} jsonData The input data to check.
- * @param {String} version The state format version.
- * @param {Object} assert The qunit assert.
+ *
+ * @param {object} jsonData The input data to check.
+ * @param {string} version The state format version.
+ * @param {object} assert The qunit assert.
  */
 dwv.test.checkStateHeader = function (jsonData, version, assert) {
   // header data
@@ -76,11 +79,12 @@ dwv.test.checkStateHeader = function (jsonData, version, assert) {
 
 /**
  * Check drawings.
- * @param {Object} drawings The drawing object to check
- * @param {Object} details The drawing details
- * @param {String} version The state format version.
- * @param {String} type The type of drawing.
- * @param {Object} assert The qunit assert.
+ *
+ * @param {object} drawings The drawing object to check
+ * @param {object} details The drawing details
+ * @param {string} version The state format version.
+ * @param {string} type The type of drawing.
+ * @param {object} assert The qunit assert.
  */
 dwv.test.checkDrawings = function (drawings, details, version, type, assert) {
   // first level: layer
@@ -153,10 +157,11 @@ dwv.test.checkDrawings = function (drawings, details, version, type, assert) {
 
 /**
  * Check an arrow drawing.
- * @param {Object} posGroupKid The position group (only) kid.
- * @param {Object} details The drawing details
- * @param {String} version The state format version.
- * @param {Object} assert The qunit assert.
+ *
+ * @param {object} posGroupKid The position group (only) kid.
+ * @param {object} details The drawing details
+ * @param {string} version The state format version.
+ * @param {object} assert The qunit assert.
  */
 dwv.test.checkArrowDrawing = function (posGroupKid, details, version, assert) {
   // check group
@@ -239,10 +244,11 @@ dwv.test.checkArrowDrawing = function (posGroupKid, details, version, assert) {
 
 /**
  * Check a ruler drawing.
- * @param {Object} posGroupKid The position group (only) kid.
- * @param {Object} details The drawing details
- * @param {String} ref The reference data to compare to.
- * @param {Object} assert The qunit assert.
+ *
+ * @param {object} posGroupKid The position group (only) kid.
+ * @param {object} details The drawing details
+ * @param {string} ref The reference data to compare to.
+ * @param {object} assert The qunit assert.
  */
 dwv.test.checkRulerDrawing = function (posGroupKid, details, ref, assert) {
   // check group
@@ -333,10 +339,11 @@ dwv.test.checkRulerDrawing = function (posGroupKid, details, ref, assert) {
 
 /**
  * Check a multi slice ruler drawing.
- * @param {Object} layer The draw layer.
- * @param {Object} details The drawing details
- * @param {String} version The state format version.
- * @param {Object} assert The qunit assert.
+ *
+ * @param {object} layerKids The draw layer.
+ * @param {object} details The drawing details
+ * @param {string} version The state format version.
+ * @param {object} assert The qunit assert.
  */
 dwv.test.checkRulerDrawings = function (layerKids, details, version, assert) {
 
@@ -414,10 +421,11 @@ dwv.test.checkRulerDrawings = function (layerKids, details, version, assert) {
 
 /**
  * Check a roi drawing.
- * @param {Object} posGroupKid The position group (only) kid.
- * @param {Object} details The drawing details
- * @param {String} version The state format version.
- * @param {Object} assert The qunit assert.
+ *
+ * @param {object} posGroupKid The position group (only) kid.
+ * @param {object} details The drawing details
+ * @param {string} version The state format version.
+ * @param {object} assert The qunit assert.
  */
 dwv.test.checkRoiDrawing = function (posGroupKid, details, version, assert) {
   // check group
@@ -508,10 +516,11 @@ dwv.test.checkRoiDrawing = function (posGroupKid, details, version, assert) {
 
 /**
  * Check a hand drawing.
- * @param {Object} posGroupKid The position group (only) kid.
- * @param {Object} details The drawing details
- * @param {String} version The state format version.
- * @param {Object} assert The qunit assert.
+ *
+ * @param {object} posGroupKid The position group (only) kid.
+ * @param {object} details The drawing details
+ * @param {string} version The state format version.
+ * @param {object} assert The qunit assert.
  */
 dwv.test.checkHandDrawing = function (posGroupKid, details, version, assert) {
   // check group
@@ -606,10 +615,11 @@ dwv.test.checkHandDrawing = function (posGroupKid, details, version, assert) {
 
 /**
  * Check an ellipse drawing.
- * @param {Object} posGroupKid The position group (only) kid.
- * @param {Object} details The drawing details
- * @param {String} version The state format version.
- * @param {Object} assert The qunit assert.
+ *
+ * @param {object} posGroupKid The position group (only) kid.
+ * @param {object} details The drawing details
+ * @param {string} version The state format version.
+ * @param {object} assert The qunit assert.
  */
 dwv.test.checkEllipseDrawing = function (
   posGroupKid, details, version, assert) {
@@ -699,10 +709,11 @@ dwv.test.checkEllipseDrawing = function (
 
 /**
  * Check a protractor drawing.
- * @param {Object} posGroupKid The position group (only) kid.
- * @param {Object} details The drawing details
- * @param {String} version The state format version.
- * @param {Object} assert The qunit assert.
+ *
+ * @param {object} posGroupKid The position group (only) kid.
+ * @param {object} details The drawing details
+ * @param {string} version The state format version.
+ * @param {object} assert The qunit assert.
  */
 dwv.test.checkProtractorDrawing = function (
   posGroupKid, details, version, assert) {
@@ -793,10 +804,11 @@ dwv.test.checkProtractorDrawing = function (
 
 /**
  * Check a rectangle drawing.
- * @param {Object} posGroupKid The position group (only) kid.
- * @param {Object} details The drawing details
- * @param {String} version The state format version.
- * @param {Object} assert The qunit assert.
+ *
+ * @param {object} posGroupKid The position group (only) kid.
+ * @param {object} details The drawing details
+ * @param {string} version The state format version.
+ * @param {object} assert The qunit assert.
  */
 dwv.test.checkRectangleDrawing = function (
   posGroupKid, details, version, assert) {
@@ -892,6 +904,7 @@ dwv.test.checkRectangleDrawing = function (
 
 /**
  * Tests for {@link dwv.State} v0.1 containing a line.
+ *
  * @function module:tests/state~testV01Line
  */
 QUnit.test('Test read v0.1 state: line.', function (assert) {
@@ -900,6 +913,7 @@ QUnit.test('Test read v0.1 state: line.', function (assert) {
 
 /**
  * Tests for {@link dwv.State} v0.1 containing a roi.
+ *
  * @function module:tests/state~testV01Roi
  */
 QUnit.test('Test read v0.1 state: roi.', function (assert) {
@@ -908,6 +922,7 @@ QUnit.test('Test read v0.1 state: roi.', function (assert) {
 
 /**
  * Tests for {@link dwv.State} v0.1 containing an ellipse.
+ *
  * @function module:tests/state~testV01Ellipse
  */
 QUnit.test('Test read v0.1 state: ellipse.', function (assert) {
@@ -916,6 +931,7 @@ QUnit.test('Test read v0.1 state: ellipse.', function (assert) {
 
 /**
  * Tests for {@link dwv.State} v0.1 containing a protractor.
+ *
  * @function module:tests/state~testV01Protractor
  */
 QUnit.test('Test read v0.1 state: protractor.', function (assert) {
@@ -924,6 +940,7 @@ QUnit.test('Test read v0.1 state: protractor.', function (assert) {
 
 /**
  * Tests for {@link dwv.State} v0.1 containing a rectangle.
+ *
  * @function module:tests/state~testV01Rectangle
  */
 QUnit.test('Test read v0.1 state: rectangle.', function (assert) {
@@ -932,6 +949,7 @@ QUnit.test('Test read v0.1 state: rectangle.', function (assert) {
 
 /**
  * Tests for {@link dwv.State} v0.1 containing a multi slice ruler.
+ *
  * @function module:tests/state~testV01MultiSliceRuler
  */
 QUnit.test('Test read v0.1 state: line multi-slice.', function (assert) {
@@ -940,6 +958,7 @@ QUnit.test('Test read v0.1 state: line multi-slice.', function (assert) {
 
 /**
  * Tests for {@link dwv.State} v0.2 containing an arrow.
+ *
  * @function module:tests/state~testV02Arrow
  */
 QUnit.test('Test read v0.2 state: arrow.', function (assert) {
@@ -948,6 +967,7 @@ QUnit.test('Test read v0.2 state: arrow.', function (assert) {
 
 /**
  * Tests for {@link dwv.State} v0.2 containing a ruler.
+ *
  * @function module:tests/state~testV02Ruler
  */
 QUnit.test('Test read v0.2 state: ruler.', function (assert) {
@@ -956,6 +976,7 @@ QUnit.test('Test read v0.2 state: ruler.', function (assert) {
 
 /**
  * Tests for {@link dwv.State} v0.2 containing a roi.
+ *
  * @function module:tests/state~testV02Roi
  */
 QUnit.test('Test read v0.2 state: roi.', function (assert) {
@@ -964,6 +985,7 @@ QUnit.test('Test read v0.2 state: roi.', function (assert) {
 
 /**
  * Tests for {@link dwv.State} v0.2 containing a hand draw.
+ *
  * @function module:tests/state~testV02Hand
  */
 QUnit.test('Test read v0.2 state: hand.', function (assert) {
@@ -972,6 +994,7 @@ QUnit.test('Test read v0.2 state: hand.', function (assert) {
 
 /**
  * Tests for {@link dwv.State} v0.2 containing an ellipse.
+ *
  * @function module:tests/state~testV02Ellipses
  */
 QUnit.test('Test read v0.2 state: ellipse.', function (assert) {
@@ -980,6 +1003,7 @@ QUnit.test('Test read v0.2 state: ellipse.', function (assert) {
 
 /**
  * Tests for {@link dwv.State} v0.2 containing a protractor.
+ *
  * @function module:tests/state~testV02Protractor
  */
 QUnit.test('Test read v0.2 state: protractor.', function (assert) {
@@ -988,6 +1012,7 @@ QUnit.test('Test read v0.2 state: protractor.', function (assert) {
 
 /**
  * Tests for {@link dwv.State} v0.2 containing a rectangle.
+ *
  * @function module:tests/state~testV02Rectangle
  */
 QUnit.test('Test read v0.2 state: rectangle.', function (assert) {
@@ -996,6 +1021,7 @@ QUnit.test('Test read v0.2 state: rectangle.', function (assert) {
 
 /**
  * Tests for {@link dwv.State} v0.2 containing a multi slice ruler.
+ *
  * @function module:tests/state~testV02MultiSliceRuler
  */
 QUnit.test('Test read v0.2 state: ruler multi-slice.', function (assert) {
@@ -1004,6 +1030,7 @@ QUnit.test('Test read v0.2 state: ruler multi-slice.', function (assert) {
 
 /**
  * Tests for {@link dwv.State} v0.3 containing an arrow.
+ *
  * @function module:tests/state~testV03Arrow
  */
 QUnit.test('Test read v0.3 state: arrow.', function (assert) {
@@ -1012,6 +1039,7 @@ QUnit.test('Test read v0.3 state: arrow.', function (assert) {
 
 /**
  * Tests for {@link dwv.State} v0.3 containing a ruler.
+ *
  * @function module:tests/state~testV03Ruler
  */
 QUnit.test('Test read v0.3 state: ruler.', function (assert) {
@@ -1020,6 +1048,7 @@ QUnit.test('Test read v0.3 state: ruler.', function (assert) {
 
 /**
  * Tests for {@link dwv.State} v0.3 containing a roi.
+ *
  * @function module:tests/state~testV03Roi
  */
 QUnit.test('Test read v0.3 state: roi.', function (assert) {
@@ -1028,6 +1057,7 @@ QUnit.test('Test read v0.3 state: roi.', function (assert) {
 
 /**
  * Tests for {@link dwv.State} v0.3 containing a hand draw.
+ *
  * @function module:tests/state~testV03Hand
  */
 QUnit.test('Test read v0.3 state: hand.', function (assert) {
@@ -1036,6 +1066,7 @@ QUnit.test('Test read v0.3 state: hand.', function (assert) {
 
 /**
  * Tests for {@link dwv.State} v0.3 containing an ellipse.
+ *
  * @function module:tests/state~testV03Ellipse
  */
 QUnit.test('Test read v0.3 state: ellipse.', function (assert) {
@@ -1044,6 +1075,7 @@ QUnit.test('Test read v0.3 state: ellipse.', function (assert) {
 
 /**
  * Tests for {@link dwv.State} v0.3 containing a protractor.
+ *
  * @function module:tests/state~testV03Protractor
  */
 QUnit.test('Test read v0.3 state: protractor.', function (assert) {
@@ -1052,6 +1084,7 @@ QUnit.test('Test read v0.3 state: protractor.', function (assert) {
 
 /**
  * Tests for {@link dwv.State} v0.3 containing a rectangle.
+ *
  * @function module:tests/state~testV03Rectangle
  */
 QUnit.test('Test read v0.3 state: rectangle.', function (assert) {
@@ -1060,6 +1093,7 @@ QUnit.test('Test read v0.3 state: rectangle.', function (assert) {
 
 /**
  * Tests for {@link dwv.State} v0.3 containing a multi slice ruler.
+ *
  * @function module:tests/state~testV03MultiSliceRuler
  */
 QUnit.test('Test read v0.3 state: ruler multi-slice.', function (assert) {

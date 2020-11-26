@@ -4,41 +4,46 @@ dwv.image = dwv.image || {};
 
 /**
  * Create a dwv.image.View from a DICOM buffer.
- * @constructor
+ *
+ * @class
  */
 dwv.image.DicomBufferToView = function () {
   // closure to self
   var self = this;
 
   /**
-     * The default character set (optional).
-     * @private
-     * @type String
-     */
+   * The default character set (optional).
+   *
+   * @private
+   * @type {string}
+   */
   var defaultCharacterSet;
 
   /**
-     * Set the default character set.
-     * param {String} The character set.
-     */
+   * Set the default character set.
+   *
+   * @param {string} characterSet The character set.
+   */
   this.setDefaultCharacterSet = function (characterSet) {
     defaultCharacterSet = characterSet;
   };
 
   /**
-     * Pixel buffer decoder.
-     * Define only once to allow optional asynchronous mode.
-     * @private
-     * @type Object
-     */
+   * Pixel buffer decoder.
+   * Define only once to allow optional asynchronous mode.
+   *
+   * @private
+   * @type {object}
+   */
   var pixelDecoder = null;
 
   /**
-     * Get data from an input buffer using a DICOM parser.
-     * @param {Array} buffer The input data buffer.
-     * @param {String} origin The data origin.
-     * @param {Number} dataIndex The data index.
-     */
+   * Get data from an input buffer using a DICOM parser.
+   *
+   * @param {Array} buffer The input data buffer.
+   * @param {string} origin The data origin.
+   * @param {number} dataIndex The data index.
+   */
   this.convert = function (buffer, origin, dataIndex) {
     self.onloadstart({
       source: origin
@@ -185,8 +190,8 @@ dwv.image.DicomBufferToView = function () {
   };
 
   /**
-     * Abort a conversion.
-     */
+   * Abort a conversion.
+   */
   this.abort = function () {
     // abort decoding, will trigger pixelDecoder.onabort
     if (pixelDecoder) {
@@ -197,39 +202,45 @@ dwv.image.DicomBufferToView = function () {
 
 /**
  * Handle a load start event.
- * @param {Object} event The load start event.
  * Default does nothing.
+ *
+ * @param {object} _event The load start event.
  */
-dwv.image.DicomBufferToView.prototype.onloadstart = function (/*event*/) {};
+dwv.image.DicomBufferToView.prototype.onloadstart = function (_event) {};
 /**
  * Handle a load progress event.
- * @param {Object} event The progress event.
  * Default does nothing.
+ *
+ * @param {object} _event The progress event.
  */
-dwv.image.DicomBufferToView.prototype.onprogress = function (/*event*/) {};
+dwv.image.DicomBufferToView.prototype.onprogress = function (_event) {};
 /**
  * Handle a load event.
- * @param {Object} event The load event fired
- *   when a file has been loaded successfully.
  * Default does nothing.
+ *
+ * @param {object} _event The load event fired
+ *   when a file has been loaded successfully.
  */
-dwv.image.DicomBufferToView.prototype.onload = function (/*event*/) {};
+dwv.image.DicomBufferToView.prototype.onload = function (_event) {};
 /**
  * Handle a load end event.
- * @param {Object} event The load end event fired
- *  when a file load has completed, successfully or not.
  * Default does nothing.
+ *
+ * @param {object} _event The load end event fired
+ *  when a file load has completed, successfully or not.
  */
-dwv.image.DicomBufferToView.prototype.onloadend = function (/*event*/) {};
+dwv.image.DicomBufferToView.prototype.onloadend = function (_event) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event.
  * Default does nothing.
+ *
+ * @param {object} _event The error event.
  */
-dwv.image.DicomBufferToView.prototype.onerror = function (/*event*/) {};
+dwv.image.DicomBufferToView.prototype.onerror = function (_event) {};
 /**
  * Handle an abort event.
- * @param {Object} event The abort event.
  * Default does nothing.
+ *
+ * @param {object} _event The abort event.
  */
-dwv.image.DicomBufferToView.prototype.onabort = function (/*event*/) {};
+dwv.image.DicomBufferToView.prototype.onabort = function (_event) {};

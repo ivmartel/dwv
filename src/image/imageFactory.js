@@ -4,15 +4,17 @@ dwv.image = dwv.image || {};
 
 /**
  * {@link dwv.image.Image} factory.
- * @constructor
+ *
+ * @class
  */
 dwv.image.ImageFactory = function () {};
 
 /**
  * Get an {@link dwv.image.Image} object from the read DICOM file.
- * @param {Object} dicomElements The DICOM tags.
+ *
+ * @param {object} dicomElements The DICOM tags.
  * @param {Array} pixelBuffer The pixel buffer.
- * @return {View} A new Image.
+ * @returns {dwv.image.Image} A new Image.
  */
 dwv.image.ImageFactory.prototype.create = function (
   dicomElements, pixelBuffer) {

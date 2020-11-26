@@ -4,12 +4,13 @@ dwv.image = dwv.image || {};
 
 /**
  * Generate image data for 'MONOCHROME*' photometric interpretation.
+ *
  * @param {Array} array The array to store the outut data
- * @param {Object} image The image to generate the view from.
- * @param {Object} position The position at witch to generate the view.
+ * @param {object} image The image to generate the view from.
+ * @param {object} position The position at witch to generate the view.
  * @param {number} frame The frame number at witch to generate the view.
- * @param {Object} windowLut The window/level LUT.
- * @param {Object} colourMap The colour map.
+ * @param {object} windowLut The window/level LUT.
+ * @param {object} colourMap The colour map.
  */
 dwv.image.generateImageDataMonochrome = function (
   array, image, position, frame,

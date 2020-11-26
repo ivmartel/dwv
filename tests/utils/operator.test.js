@@ -7,6 +7,7 @@ QUnit.module('utils');
 
 /**
  * Tests for {@link dwv.utils.isObject}.
+ *
  * @function module:tests/utils~isObject
  */
 QUnit.test('Test isObject.', function (assert) {
@@ -28,6 +29,7 @@ QUnit.test('Test isObject.', function (assert) {
 
 /**
  * Tests for {@link dwv.utils.isArray}.
+ *
  * @function module:tests/utils~isArray
  */
 QUnit.test('Test isArray.', function (assert) {
@@ -49,6 +51,7 @@ QUnit.test('Test isArray.', function (assert) {
 
 /**
  * Tests for {@link dwv.utils.mergeObjects}.
+ *
  * @function module:tests/utils~mergeObjects
  */
 QUnit.test('Test merge objects.', function (assert) {

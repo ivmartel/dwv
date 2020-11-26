@@ -9,10 +9,11 @@ dwv.image = dwv.image || {};
  * - rescale slope and intercept (default 1:0),
  * - photometric interpretation (default MONOCHROME2),
  * - planar configuration (default RGBRGB...).
- * @constructor
- * @param {Object} geometry The geometry of the image.
+ *
+ * @class
+ * @param {object} geometry The geometry of the image.
  * @param {Array} buffer The image data as an array of frame buffers.
- * @param {Number} numberOfFrames The number of frames (optional, can be used
+ * @param {number} numberOfFrames The number of frames (optional, can be used
      to anticipate the final number after appends).
  * @param {Array} imageUids An array of Uids indexed to slice number.
  */
@@ -23,18 +24,20 @@ dwv.image.Image = function (geometry, buffer, numberOfFrames, imageUids) {
   }
 
   /**
-     * Get the number of frames.
-     * @returns {Number} The number of frames.
-     */
+   * Get the number of frames.
+   *
+   * @returns {number} The number of frames.
+   */
   this.getNumberOfFrames = function () {
     return numberOfFrames;
   };
 
   /**
-     * Rescale slope and intercept.
-     * @private
-     * @type Number
-     */
+   * Rescale slope and intercept.
+   *
+   * @private
+   * @type {number}
+   */
   var rsis = [];
   // initialise RSIs
   for (var s = 0, nslices = geometry.getSize().getNumberOfSlices();
@@ -42,119 +45,136 @@ dwv.image.Image = function (geometry, buffer, numberOfFrames, imageUids) {
     rsis.push(new dwv.image.RescaleSlopeAndIntercept(1, 0));
   }
   /**
-     * Flag to know if the RSIs are all identity (1,0).
-     * @private
-     * @type Boolean
-     */
+   * Flag to know if the RSIs are all identity (1,0).
+   *
+   * @private
+   * @type {boolean}
+   */
   var isIdentityRSI = true;
   /**
-     * Flag to know if the RSIs are all equals.
-     * @private
-     * @type Boolean
-     */
+   * Flag to know if the RSIs are all equals.
+   *
+   * @private
+   * @type {boolean}
+   */
   var isConstantRSI = true;
   /**
    * Photometric interpretation (MONOCHROME, RGB...).
+   *
    * @private
-   * @type String
+   * @type {string}
    */
   var photometricInterpretation = 'MONOCHROME2';
   /**
    * Planar configuration for RGB data (0:RGBRGBRGBRGB... or
    *   1:RRR...GGG...BBB...).
+   *
    * @private
-   * @type Number
+   * @type {number}
    */
   var planarConfiguration = 0;
 
   /**
-     * Check if the input element is not null.
-     * @param {Object} element The element to test.
-     * @returns True if the input is not null.
-     */
+   * Check if the input element is not null.
+   *
+   * @param {object} element The element to test.
+   * @returns {boolean} True if the input is not null.
+   */
   var isNotNull = function (element) {
     return element !== null;
   };
 
   /**
-     * Number of components.
-     * @private
-     * @type Number
-     */
+   * Number of components.
+   *
+   * @private
+   * @type {number}
+   */
   var numberOfComponents = buffer.find(isNotNull).length / (
     geometry.getSize().getTotalSize());
     /**
      * Meta information.
+     *
      * @private
-     * @type Object
+     * @type {object}
      */
   var meta = {};
 
   /**
-     * Data range.
-     * @private
-     * @type Object
-     */
+   * Data range.
+   *
+   * @private
+   * @type {object}
+   */
   var dataRange = null;
   /**
-     * Rescaled data range.
-     * @private
-     * @type Object
-     */
+   * Rescaled data range.
+   *
+   * @private
+   * @type {object}
+   */
   var rescaledDataRange = null;
   /**
-     * Histogram.
-     * @private
-     * @type Array
-     */
+   * Histogram.
+   *
+   * @private
+   * @type {Array}
+   */
   var histogram = null;
 
   /**
-     * Get the image UIDs indexed by slice number.
-     * @return {Array} The UIDs array.
-     */
+   * Get the image UIDs indexed by slice number.
+   *
+   * @returns {Array} The UIDs array.
+   */
   this.getImageUids = function () {
     return imageUids;
   };
 
   /**
-     * Get the geometry of the image.
-     * @return {Object} The size of the image.
-     */
+   * Get the geometry of the image.
+   *
+   * @returns {object} The size of the image.
+   */
   this.getGeometry = function () {
     return geometry;
   };
 
   /**
-     * Get the data buffer of the image.
-     * @todo dangerous...
-     * @return {Array} The data buffer of the image.
-     */
+   * Get the data buffer of the image.
+   *
+   * @todo dangerous...
+   * @returns {Array} The data buffer of the image.
+   */
   this.getBuffer = function () {
     return buffer;
   };
   /**
-     * Get the data buffer of the image.
-     * @todo dangerous...
-     * @return {Array} The data buffer of the frame.
-     */
+   * Get the data buffer of the image.
+   *
+   * @param {number} frame The frame number.
+   * @todo dangerous...
+   * @returns {Array} The data buffer of the frame.
+   */
   this.getFrame = function (frame) {
     return buffer[frame];
   };
 
   /**
-     * Get the rescale slope and intercept.
-     * @param {Number} k The slice index.
-     * @return {Object} The rescale slope and intercept.
-     */
+   * Get the rescale slope and intercept.
+   *
+   * @param {number} k The slice index.
+   * @returns {object} The rescale slope and intercept.
+   */
   this.getRescaleSlopeAndIntercept = function (k) {
     return rsis[k];
   };
   /**
-     * Set the rescale slope and intercept.
-     * @param {Array} inRsi The input rescale slope and intercept.
-     * @param {Number} k The slice index (optional).
-     */
+   * Set the rescale slope and intercept.
+   *
+   * @param {Array} inRsi The input rescale slope and intercept.
+   * @param {number} k The slice index (optional).
+   */
   this.setRescaleSlopeAndIntercept = function (inRsi, k) {
     if (typeof k === 'undefined') {
       k = 0;
@@ -174,84 +194,95 @@ dwv.image.Image = function (geometry, buffer, numberOfFrames, imageUids) {
     }
   };
   /**
-     * Are all the RSIs identity (1,0).
-     * @return {Boolean} True if they are.
-     */
+   * Are all the RSIs identity (1,0).
+   *
+   * @returns {boolean} True if they are.
+   */
   this.isIdentityRSI = function () {
     return isIdentityRSI;
   };
   /**
-     * Are all the RSIs equal.
-     * @return {Boolean} True if they are.
-     */
+   * Are all the RSIs equal.
+   *
+   * @returns {boolean} True if they are.
+   */
   this.isConstantRSI = function () {
     return isConstantRSI;
   };
   /**
-     * Get the photometricInterpretation of the image.
-     * @return {String} The photometricInterpretation of the image.
-     */
+   * Get the photometricInterpretation of the image.
+   *
+   * @returns {string} The photometricInterpretation of the image.
+   */
   this.getPhotometricInterpretation = function () {
     return photometricInterpretation;
   };
   /**
-     * Set the photometricInterpretation of the image.
-     * @pqrqm {String} interp The photometricInterpretation of the image.
-     */
+   * Set the photometricInterpretation of the image.
+   *
+   * @param {string} interp The photometricInterpretation of the image.
+   */
   this.setPhotometricInterpretation = function (interp) {
     photometricInterpretation = interp;
   };
   /**
-     * Get the planarConfiguration of the image.
-     * @return {Number} The planarConfiguration of the image.
-     */
+   * Get the planarConfiguration of the image.
+   *
+   * @returns {number} The planarConfiguration of the image.
+   */
   this.getPlanarConfiguration = function () {
     return planarConfiguration;
   };
   /**
-     * Set the planarConfiguration of the image.
-     * @param {Number} config The planarConfiguration of the image.
-     */
+   * Set the planarConfiguration of the image.
+   *
+   * @param {number} config The planarConfiguration of the image.
+   */
   this.setPlanarConfiguration = function (config) {
     planarConfiguration = config;
   };
   /**
-     * Get the numberOfComponents of the image.
-     * @return {Number} The numberOfComponents of the image.
-     */
+   * Get the numberOfComponents of the image.
+   *
+   * @returns {number} The numberOfComponents of the image.
+   */
   this.getNumberOfComponents = function () {
     return numberOfComponents;
   };
 
   /**
-     * Get the meta information of the image.
-     * @return {Object} The meta information of the image.
-     */
+   * Get the meta information of the image.
+   *
+   * @returns {object} The meta information of the image.
+   */
   this.getMeta = function () {
     return meta;
   };
   /**
-     * Set the meta information of the image.
-     * @param {Object} rhs The meta information of the image.
-     */
+   * Set the meta information of the image.
+   *
+   * @param {object} rhs The meta information of the image.
+   */
   this.setMeta = function (rhs) {
     meta = rhs;
   };
 
   /**
-     * Get value at offset. Warning: No size check...
-     * @param {Number} offset The desired offset.
-     * @param {Number} frame The desired frame.
-     * @return {Number} The value at offset.
-     */
+   * Get value at offset. Warning: No size check...
+   *
+   * @param {number} offset The desired offset.
+   * @param {number} frame The desired frame.
+   * @returns {number} The value at offset.
+   */
   this.getValueAtOffset = function (offset, frame) {
     return buffer[frame][offset];
   };
 
   /**
-     * Clone the image.
-     * @return {Image} A clone of this image.
-     */
+   * Clone the image.
+   *
+   * @returns {Image} A clone of this image.
+   */
   this.clone = function () {
     // clone the image buffer
     var clonedBuffer = [];
@@ -274,10 +305,12 @@ dwv.image.Image = function (geometry, buffer, numberOfFrames, imageUids) {
   };
 
   /**
-     * Append a slice to the image.
-     * @param {Image} The slice to append.
-     * @return {Number} The number of the inserted slice.
-     */
+   * Append a slice to the image.
+   *
+   * @param {Image} rhs The slice to append.
+   * @param {number} frame The frame where to append.
+   * @returns {number} The number of the inserted slice.
+   */
   this.appendSlice = function (rhs, frame) {
     // check input
     if (rhs === null) {
@@ -356,17 +389,19 @@ dwv.image.Image = function (geometry, buffer, numberOfFrames, imageUids) {
   };
 
   /**
-     * Append a frame buffer to the image.
-     * @param {Object} frameBuffer The frame buffer to append.
-     */
+   * Append a frame buffer to the image.
+   *
+   * @param {object} frameBuffer The frame buffer to append.
+   */
   this.appendFrameBuffer = function (frameBuffer) {
     buffer.push(frameBuffer);
   };
 
   /**
-     * Get the data range.
-     * @return {Object} The data range.
-     */
+   * Get the data range.
+   *
+   * @returns {object} The data range.
+   */
   this.getDataRange = function () {
     if (!dataRange) {
       dataRange = this.calculateDataRange();
@@ -375,9 +410,10 @@ dwv.image.Image = function (geometry, buffer, numberOfFrames, imageUids) {
   };
 
   /**
-     * Get the rescaled data range.
-     * @return {Object} The rescaled data range.
-     */
+   * Get the rescaled data range.
+   *
+   * @returns {object} The rescaled data range.
+   */
   this.getRescaledDataRange = function () {
     if (!rescaledDataRange) {
       rescaledDataRange = this.calculateRescaledDataRange();
@@ -386,9 +422,10 @@ dwv.image.Image = function (geometry, buffer, numberOfFrames, imageUids) {
   };
 
   /**
-     * Get the histogram.
-     * @return {Array} The histogram.
-     */
+   * Get the histogram.
+   *
+   * @returns {Array} The histogram.
+   */
   this.getHistogram = function () {
     if (!histogram) {
       var res = this.calculateHistogram();
@@ -402,11 +439,12 @@ dwv.image.Image = function (geometry, buffer, numberOfFrames, imageUids) {
 
 /**
  * Get the value of the image at a specific coordinate.
- * @param {Number} i The X index.
- * @param {Number} j The Y index.
- * @param {Number} k The Z index.
- * @param {Number} f The frame number.
- * @return {Number} The value at the desired position.
+ *
+ * @param {number} i The X index.
+ * @param {number} j The Y index.
+ * @param {number} k The Z index.
+ * @param {number} f The frame number.
+ * @returns {number} The value at the desired position.
  * Warning: No size check...
  */
 dwv.image.Image.prototype.getValue = function (i, j, k, f) {
@@ -417,11 +455,12 @@ dwv.image.Image.prototype.getValue = function (i, j, k, f) {
 
 /**
  * Get the rescaled value of the image at a specific coordinate.
- * @param {Number} i The X index.
- * @param {Number} j The Y index.
- * @param {Number} k The Z index.
- * @param {Number} f The frame number.
- * @return {Number} The rescaled value at the desired position.
+ *
+ * @param {number} i The X index.
+ * @param {number} j The Y index.
+ * @param {number} k The Z index.
+ * @param {number} f The frame number.
+ * @returns {number} The rescaled value at the desired position.
  * Warning: No size check...
  */
 dwv.image.Image.prototype.getRescaledValue = function (i, j, k, f) {
@@ -435,8 +474,9 @@ dwv.image.Image.prototype.getRescaledValue = function (i, j, k, f) {
 
 /**
  * Get a slice index iterator.
+ *
  * @param {number} sliceIndex The index of the slice.
- * @returns {Object} The slice iterator.
+ * @returns {object} The slice iterator.
  */
 dwv.image.Image.prototype.getSliceIterator = function (sliceIndex) {
   var sliceSize = this.getGeometry().getSize().getSliceSize();
@@ -462,7 +502,8 @@ dwv.image.Image.prototype.getSliceIterator = function (sliceIndex) {
 /**
  * Calculate the data range of the image.
  * WARNING: for speed reasons, only calculated on the first frame...
- * @return {Object} The range {min, max}.
+ *
+ * @returns {object} The range {min, max}.
  */
 dwv.image.Image.prototype.calculateDataRange = function () {
   var size = this.getGeometry().getSize().getTotalSize();
@@ -488,7 +529,8 @@ dwv.image.Image.prototype.calculateDataRange = function () {
 /**
  * Calculate the rescaled data range of the image.
  * WARNING: for speed reasons, only calculated on the first frame...
- * @return {Object} The range {min, max}.
+ *
+ * @returns {object} The range {min, max}.
  */
 dwv.image.Image.prototype.calculateRescaledDataRange = function () {
   if (this.isIdentityRSI()) {
@@ -529,7 +571,8 @@ dwv.image.Image.prototype.calculateRescaledDataRange = function () {
 
 /**
  * Calculate the histogram of the image.
- * @return {Object} The histogram, data range and rescaled data range.
+ *
+ * @returns {object} The histogram, data range and rescaled data range.
  */
 dwv.image.Image.prototype.calculateHistogram = function () {
   var size = this.getGeometry().getSize();
@@ -579,8 +622,9 @@ dwv.image.Image.prototype.calculateHistogram = function () {
 
 /**
  * Convolute the image with a given 2D kernel.
+ *
  * @param {Array} weights The weights of the 2D kernel as a 3x3 matrix.
- * @return {Image} The convoluted image.
+ * @returns {Image} The convoluted image.
  * Note: Uses the raw buffer values.
  */
 dwv.image.Image.prototype.convolute2D = function (weights) {
@@ -732,8 +776,9 @@ dwv.image.Image.prototype.convolute2D = function (weights) {
 /**
  * Transform an image using a specific operator.
  * WARNING: no size check!
+ *
  * @param {Function} operator The operator to use when transforming.
- * @return {Image} The transformed image.
+ * @returns {Image} The transformed image.
  * Note: Uses the raw buffer values.
  */
 dwv.image.Image.prototype.transform = function (operator) {
@@ -750,9 +795,10 @@ dwv.image.Image.prototype.transform = function (operator) {
 /**
  * Compose this image with another one and using a specific operator.
  * WARNING: no size check!
+ *
  * @param {Image} rhs The image to compose with.
  * @param {Function} operator The operator to use when composing.
- * @return {Image} The composed image.
+ * @returns {Image} The composed image.
  * Note: Uses the raw buffer values.
  */
 dwv.image.Image.prototype.compose = function (rhs, operator) {
@@ -772,8 +818,9 @@ dwv.image.Image.prototype.compose = function (rhs, operator) {
 
 /**
  * Quantify a line according to image information.
- * @param {Object} line The line to quantify.
- * @return {Object} A quantification object.
+ *
+ * @param {object} line The line to quantify.
+ * @returns {object} A quantification object.
  */
 dwv.image.Image.prototype.quantifyLine = function (line) {
   var quant = {};
@@ -790,8 +837,9 @@ dwv.image.Image.prototype.quantifyLine = function (line) {
 
 /**
  * Quantify a rectangle according to image information.
- * @param {Object} rect The rectangle to quantify.
- * @return {Object} A quantification object.
+ *
+ * @param {object} rect The rectangle to quantify.
+ * @returns {object} A quantification object.
  */
 dwv.image.Image.prototype.quantifyRect = function (rect) {
   var quant = {};
@@ -824,8 +872,9 @@ dwv.image.Image.prototype.quantifyRect = function (rect) {
 
 /**
  * Quantify an ellipse according to image information.
- * @param {Object} ellipse The ellipse to quantify.
- * @return {Object} A quantification object.
+ *
+ * @param {object} ellipse The ellipse to quantify.
+ * @returns {object} A quantification object.
  */
 dwv.image.Image.prototype.quantifyEllipse = function (ellipse) {
   var quant = {};

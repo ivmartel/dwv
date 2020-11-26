@@ -4,72 +4,82 @@ dwv.image = dwv.image || {};
 
 /**
  * View class.
- * @constructor
+ *
+ * @class
  * @param {Image} image The associated image.
  * Need to set the window lookup table once created
  * (either directly or with helper methods).
  */
 dwv.image.View = function (image) {
   /**
-     * Window lookup tables, indexed per Rescale Slope and Intercept (RSI).
-     * @private
-     * @type Window
-     */
+   * Window lookup tables, indexed per Rescale Slope and Intercept (RSI).
+   *
+   * @private
+   * @type {Window}
+   */
   var windowLuts = {};
 
   /**
-     * Window presets.
-     * Minmax will be filled at first use (see view.setWindowLevelPreset).
-     * @private
-     * @type Object
-     */
+   * Window presets.
+   * Minmax will be filled at first use (see view.setWindowLevelPreset).
+   *
+   * @private
+   * @type {object}
+   */
   var windowPresets = {'minmax': {'name': 'minmax'}};
 
   /**
-     * Current window preset name.
-     * @private
-     * @type String
-     */
+   * Current window preset name.
+   *
+   * @private
+   * @type {string}
+   */
   var currentPresetName = null;
 
   /**
-     * colour map.
-     * @private
-     * @type Object
-     */
+   * colour map.
+   *
+   * @private
+   * @type {object}
+   */
   var colourMap = dwv.image.lut.plain;
   /**
-     * Current position.
-     * @private
-     * @type Object
-     */
+   * Current position.
+   *
+   * @private
+   * @type {object}
+   */
   var currentPosition = {'i': 0, 'j': 0, 'k': 0};
   /**
-     * Current frame. Zero based.
-     * @private
-     * @type Number
-     */
+   * Current frame. Zero based.
+   *
+   * @private
+   * @type {number}
+   */
   var currentFrame = null;
 
   /**
-     * Get the associated image.
-     * @return {Image} The associated image.
-     */
+   * Get the associated image.
+   *
+   * @returns {Image} The associated image.
+   */
   this.getImage = function () {
     return image;
   };
   /**
-     * Set the associated image.
-     * @param {Image} inImage The associated image.
-     */
+   * Set the associated image.
+   *
+   * @param {Image} inImage The associated image.
+   */
   this.setImage = function (inImage) {
     image = inImage;
   };
 
   /**
-     * Get the milliseconds per frame from frame rate.
-     * @return {Number} The milliseconds per frame.
-     */
+   * Get the milliseconds per frame from frame rate.
+   *
+   * @returns {number} The milliseconds per frame.
+   */
 
   this.getPlaybackMilliseconds = function (recommendedDisplayFrameRate) {
     if (!recommendedDisplayFrameRate) {
@@ -81,14 +91,15 @@ dwv.image.View = function (image) {
   };
 
   /**
-     * Get the window LUT of the image.
-     * Warning: can be undefined in no window/level was set.
-     * @param {Object} rsi Optional image rsi, will take the one of the
-     *   current slice otherwise.
-     * @return {Window} The window LUT of the image.
-     * @fires dwv.image.View#wl-width-change
-     * @fires dwv.image.View#wl-center-change
-     */
+   * Get the window LUT of the image.
+   * Warning: can be undefined in no window/level was set.
+   *
+   * @param {object} rsi Optional image rsi, will take the one of the
+   *   current slice otherwise.
+   * @returns {Window} The window LUT of the image.
+   * @fires dwv.image.View#wlwidthchange
+   * @fires dwv.image.View#wlcenterchange
+   */
   this.getCurrentWindowLut = function (rsi) {
     var sliceNumber = this.getCurrentPosition().k;
     // use current rsi if not provided
@@ -140,51 +151,57 @@ dwv.image.View = function (image) {
     return wlut;
   };
   /**
-     * Add the window LUT to the list.
-     * @param {Window} wlut The window LUT of the image.
-     */
+   * Add the window LUT to the list.
+   *
+   * @param {Window} wlut The window LUT of the image.
+   */
   this.addWindowLut = function (wlut) {
     var rsi = wlut.getRescaleLut().getRSI();
     windowLuts[rsi.toString()] = wlut;
   };
 
   /**
-     * Get the window presets.
-     * @return {Object} The window presets.
-     */
+   * Get the window presets.
+   *
+   * @returns {object} The window presets.
+   */
   this.getWindowPresets = function () {
     return windowPresets;
   };
 
   /**
-     * Get the window presets names.
-     * @return {Object} The list of window presets names.
-     */
+   * Get the window presets names.
+   *
+   * @returns {object} The list of window presets names.
+   */
   this.getWindowPresetsNames = function () {
     return Object.keys(windowPresets);
   };
 
   /**
-     * Set the window presets.
-     * @param {Object} presets The window presets.
-     */
+   * Set the window presets.
+   *
+   * @param {object} presets The window presets.
+   */
   this.setWindowPresets = function (presets) {
     windowPresets = presets;
   };
 
   /**
-     * Set the default colour map.
-     * @param {Object} map The colour map.
-     */
+   * Set the default colour map.
+   *
+   * @param {object} map The colour map.
+   */
   this.setDefaultColourMap = function (map) {
     colourMap = map;
   };
 
   /**
-     * Add window presets to the existing ones.
-     * @param {Object} presets The window presets.
-     * @param {Number} k The slice the preset belong to.
-     */
+   * Add window presets to the existing ones.
+   *
+   * @param {object} presets The window presets.
+   * @param {number} k The slice the preset belong to.
+   */
   this.addWindowPresets = function (presets, k) {
     var keys = Object.keys(presets);
     var key = null;
@@ -203,11 +220,12 @@ dwv.image.View = function (image) {
         windowPresets[key] = presets[key];
         // fire event
         /**
-                 * Window/level add preset event.
-                 * @event dwv.image.View#wl-preset-add
-                 * @type {Object}
-                 * @property {string} name The name of the preset.
-                 */
+         * Window/level add preset event.
+         *
+         * @event dwv.image.View#wlpresetadd
+         * @type {object}
+         * @property {string} name The name of the preset.
+         */
         this.fireEvent({
           'type': 'wl-preset-add',
           'name': key
@@ -217,26 +235,29 @@ dwv.image.View = function (image) {
   };
 
   /**
-     * Get the colour map of the image.
-     * @return {Object} The colour map of the image.
-     */
+   * Get the colour map of the image.
+   *
+   * @returns {object} The colour map of the image.
+   */
   this.getColourMap = function () {
     return colourMap;
   };
   /**
-     * Set the colour map of the image.
-     * @param {Object} map The colour map of the image.
-     * @fires dwv.image.View#color-change
-     */
+   * Set the colour map of the image.
+   *
+   * @param {object} map The colour map of the image.
+   * @fires dwv.image.View#colorchange
+   */
   this.setColourMap = function (map) {
     colourMap = map;
     /**
-         * Color change event.
-         * @event dwv.image.View#color-change
-         * @type {Object}
-         * @property {number} wc The new window center value.
-         * @property {number} ww The new window wdth value.
-         */
+     * Color change event.
+     *
+     * @event dwv.image.View#colorchange
+     * @type {object}
+     * @property {number} wc The new window center value.
+     * @property {number} ww The new window wdth value.
+     */
     this.fireEvent({
       'type': 'colour-change',
       'wc': this.getCurrentWindowLut().getWindowLevel().getCenter(),
@@ -245,9 +266,10 @@ dwv.image.View = function (image) {
   };
 
   /**
-     * Get the current position.
-     * @return {Object} The current position.
-     */
+   * Get the current position.
+   *
+   * @returns {object} The current position.
+   */
   this.getCurrentPosition = function () {
     // return a clone to avoid reference problems
     return {
@@ -257,13 +279,14 @@ dwv.image.View = function (image) {
     };
   };
   /**
-     * Set the current position.
-     * @param {Object} pos The current position.
-     * @param {Boolean} silent If true, does not fire a slice-change event.
-     * @return {Boolean} False if not in bounds
-     * @fires dwv.image.View#slice-change
-     * @fires dwv.image.View#position-change
-     */
+   * Set the current position.
+   *
+   * @param {object} pos The current position.
+   * @param {boolean} silent If true, does not fire a slice-change event.
+   * @returns {boolean} False if not in bounds
+   * @fires dwv.image.View#slicechange
+   * @fires dwv.image.View#positionchange
+   */
   this.setCurrentPosition = function (pos, silent) {
     // default silent flag to false
     if (typeof silent === 'undefined') {
@@ -279,14 +302,15 @@ dwv.image.View = function (image) {
     // fire a 'position-change' event
     if (image.getPhotometricInterpretation().match(/MONOCHROME/) !== null) {
       /**
-             * Position change event.
-             * @event dwv.image.View#position-change
-             * @type {Object}
-             * @property {number} i The new column position
-             * @property {number} j The new row position
-             * @property {number} k The new slice position
-             * @property {Object} value The image value at the new position.
-             */
+       * Position change event.
+       *
+       * @event dwv.image.View#positionchange
+       * @type {object}
+       * @property {number} i The new column position
+       * @property {number} j The new row position
+       * @property {number} k The new slice position
+       * @property {object} value The image value at the new position.
+       */
       this.fireEvent({
         'type': 'position-change',
         'i': pos.i,
@@ -308,12 +332,13 @@ dwv.image.View = function (image) {
     if (!silent) {
       if (oldPosition.k !== currentPosition.k) {
         /**
-                 * Slice change event.
-                 * @event dwv.image.View#slice-change
-                 * @type {Object}
-                 * @property {number} value The new slice number
-                 * @property {Object} data Associated event data: the imageUid.
-                 */
+         * Slice change event.
+         *
+         * @event dwv.image.View#slicechange
+         * @type {object}
+         * @property {number} value The new slice number
+         * @property {object} data Associated event data: the imageUid.
+         */
         this.fireEvent({
           'type': 'slice-change',
           'value': currentPosition.k,
@@ -329,19 +354,21 @@ dwv.image.View = function (image) {
   };
 
   /**
-     * Get the current frame number.
-     * @return {Number} The current frame number.
-     */
+   * Get the current frame number.
+   *
+   * @returns {number} The current frame number.
+   */
   this.getCurrentFrame = function () {
     return currentFrame;
   };
 
   /**
-     * Set the current frame number.
-     * @param {Number} The current frame number.
-     * @return {Boolean} False if not in bounds
-     * @fires dwv.image.View#frame-change
-     */
+   * Set the current frame number.
+   *
+   * @param {number} frame The current frame number.
+   * @returns {boolean} False if not in bounds
+   * @fires dwv.image.View#framechange
+   */
   this.setCurrentFrame = function (frame) {
     // check if possible
     if (frame < 0 || frame >= image.getNumberOfFrames()) {
@@ -353,11 +380,12 @@ dwv.image.View = function (image) {
     // fire event
     if (oldFrame !== currentFrame && image.getNumberOfFrames() !== 1) {
       /**
-             * Frame change event.
-             * @event dwv.image.View#frame-change
-             * @type {Object}
-             * @property {number} frame The new frame number
-             */
+       * Frame change event.
+       *
+       * @event dwv.image.View#framechange
+       * @type {object}
+       * @property {number} frame The new frame number
+       */
       this.fireEvent({
         'type': 'frame-change',
         'frame': currentFrame
@@ -370,9 +398,10 @@ dwv.image.View = function (image) {
   };
 
   /**
-     * Append another view to this one.
-     * @param {Object} rhs The view to append.
-     */
+   * Append another view to this one.
+   *
+   * @param {object} rhs The view to append.
+   */
   this.append = function (rhs) {
     // append images
     var newSliceNumber = this.getImage().appendSlice(rhs.getImage());
@@ -388,22 +417,24 @@ dwv.image.View = function (image) {
   };
 
   /**
-     * Append a frame buffer to the included image.
-     * @param {Object} frameBuffer The frame buffer to append.
-     */
+   * Append a frame buffer to the included image.
+   *
+   * @param {object} frameBuffer The frame buffer to append.
+   */
   this.appendFrameBuffer = function (frameBuffer) {
     this.getImage().appendFrameBuffer(frameBuffer);
   };
 
   /**
-     * Set the view window/level.
-     * @param {Number} center The window center.
-     * @param {Number} width The window width.
-     * @param {String} name Associated preset name, defaults to 'manual'.
-     * Warning: uses the latest set rescale LUT or the default linear one.
-     * @fires dwv.image.View#wl-width-change
-     * @fires dwv.image.View#wl-center-change
-     */
+   * Set the view window/level.
+   *
+   * @param {number} center The window center.
+   * @param {number} width The window width.
+   * @param {string} name Associated preset name, defaults to 'manual'.
+   * Warning: uses the latest set rescale LUT or the default linear one.
+   * @fires dwv.image.View#wlwidthchange
+   * @fires dwv.image.View#wlcenterchange
+   */
   this.setWindowLevel = function (center, width, name) {
     // window width shall be >= 1 (see https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
     if (width >= 1) {
@@ -449,8 +480,9 @@ dwv.image.View = function (image) {
         if (currentWl.getWidth() !== width) {
           /**
            * Window/level width change event.
-           * @event dwv.image.View#wl-width-change
-           * @type {Object}
+           *
+           * @event dwv.image.View#wlwidthchange
+           * @type {object}
            * @property {number} wc The new window center value.
            * @property {number} ww The new window wdth value.
            * @property {boolean} skipGenerate Flag to skip view generation.
@@ -464,8 +496,9 @@ dwv.image.View = function (image) {
         if (currentWl.getCenter() !== center) {
           /**
            * Window/level center change event.
-           * @event dwv.image.View#wl-center-change
-           * @type {Object}
+           *
+           * @event dwv.image.View#wlcenterchange
+           * @type {object}
            * @property {number} wc The new window center value.
            * @property {number} ww The new window wdth value.
            * @property {boolean} skipGenerate Flag to skip view generation.
@@ -492,9 +525,10 @@ dwv.image.View = function (image) {
   };
 
   /**
-     * Set the window level to the preset with the input name.
-     * @param {String} name The name of the preset to activate.
-     */
+   * Set the window level to the preset with the input name.
+   *
+   * @param {string} name The name of the preset to activate.
+   */
   this.setWindowLevelPreset = function (name) {
     var preset = this.getWindowPresets()[name];
     if (typeof preset === 'undefined') {
@@ -514,18 +548,20 @@ dwv.image.View = function (image) {
   };
 
   /**
-     * Set the window level to the preset with the input id.
-     * @param {Number} id The id of the preset to activate.
-     */
+   * Set the window level to the preset with the input id.
+   *
+   * @param {number} id The id of the preset to activate.
+   */
   this.setWindowLevelPresetById = function (id) {
     var keys = Object.keys(this.getWindowPresets());
     this.setWindowLevelPreset(keys[id]);
   };
 
   /**
-     * Clone the image using all meta data and the original data buffer.
-     * @return {View} A full copy of this {dwv.image.View}.
-     */
+   * Clone the image using all meta data and the original data buffer.
+   *
+   * @returns {dwv.image.View} A full copy of this {dwv.image.View}.
+   */
   this.clone = function () {
     var copy = new dwv.image.View(this.getImage());
     for (var key in windowLuts) {
@@ -536,22 +572,25 @@ dwv.image.View = function (image) {
   };
 
   /**
-     * View listeners
-     * @private
-     * @type Object
-     */
+   * View listeners
+   *
+   * @private
+   * @type {object}
+   */
   var listeners = {};
   /**
-     * Get the view listeners.
-     * @return {Object} The view listeners.
-     */
+   * Get the view listeners.
+   *
+   * @returns {object} The view listeners.
+   */
   this.getListeners = function () {
     return listeners;
   };
   /**
-     * Set the view listeners.
-     * @param {Object} list The view listeners.
-     */
+   * Set the view listeners.
+   *
+   * @param {object} list The view listeners.
+   */
   this.setListeners = function (list) {
     listeners = list;
   };
@@ -560,6 +599,8 @@ dwv.image.View = function (image) {
 /**
  * Get the image window/level that covers the full data range.
  * Warning: uses the latest set rescale LUT or the default linear one.
+ *
+ * @returns {object} A min/max window level.
  */
 dwv.image.View.prototype.getWindowLevelMinMax = function () {
   var range = this.getImage().getRescaledDataRange();
@@ -588,6 +629,7 @@ dwv.image.View.prototype.setWindowLevelMinMax = function () {
 
 /**
  * Generate display image data to be given to a canvas.
+ *
  * @param {Array} array The array to fill in.
  */
 dwv.image.View.prototype.generateImageData = function (array) {
@@ -640,8 +682,9 @@ dwv.image.View.prototype.generateImageData = function (array) {
 
 /**
  * Add an event listener on the view.
- * @param {String} type The event type.
- * @param {Object} listener The method associated with the provided event type.
+ *
+ * @param {string} type The event type.
+ * @param {object} listener The method associated with the provided event type.
  */
 dwv.image.View.prototype.addEventListener = function (type, listener) {
   var listeners = this.getListeners();
@@ -653,8 +696,9 @@ dwv.image.View.prototype.addEventListener = function (type, listener) {
 
 /**
  * Remove an event listener on the view.
- * @param {String} type The event type.
- * @param {Object} listener The method associated with the provided event type.
+ *
+ * @param {string} type The event type.
+ * @param {object} listener The method associated with the provided event type.
  */
 dwv.image.View.prototype.removeEventListener = function (type, listener) {
   var listeners = this.getListeners();
@@ -670,7 +714,8 @@ dwv.image.View.prototype.removeEventListener = function (type, listener) {
 
 /**
  * Fire an event: call all associated listeners.
- * @param {Object} event The event to fire.
+ *
+ * @param {object} event The event to fire.
  */
 dwv.image.View.prototype.fireEvent = function (event) {
   var listeners = this.getListeners();

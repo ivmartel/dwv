@@ -5,52 +5,58 @@ dwv.image = dwv.image || {};
 /**
  * Rescale LUT class.
  * Typically converts from integer to float.
- * @constructor
- * @param {Object} rsi The rescale slope and intercept.
- * @param {Number} bitsStored The number of bits used to store the data.
+ *
+ * @class
+ * @param {object} rsi The rescale slope and intercept.
+ * @param {number} bitsStored The number of bits used to store the data.
  */
 dwv.image.RescaleLut = function (rsi, bitsStored) {
   /**
-     * The internal array.
-     * @private
-     * @type Float32Array
-     */
+   * The internal array.
+   *
+   * @private
+   * @type {Float32Array}
+   */
   var lut = null;
 
   /**
-     * Flag to know if the lut is ready or not.
-     * @private
-     * @type Boolean
-     */
+   * Flag to know if the lut is ready or not.
+   *
+   * @private
+   * @type {boolean}
+   */
   var isReady = false;
 
   /**
-     * The size of the LUT array.
-     * @private
-     * @type Number
-     */
+   * The size of the LUT array.
+   *
+   * @private
+   * @type {number}
+   */
   var length = Math.pow(2, bitsStored);
 
   /**
-     * Get the Rescale Slope and Intercept (RSI).
-     * @return {Object} The rescale slope and intercept object.
-     */
+   * Get the Rescale Slope and Intercept (RSI).
+   *
+   * @returns {object} The rescale slope and intercept object.
+   */
   this.getRSI = function () {
     return rsi;
   };
 
   /**
-     * Is the lut ready to use or not? If not, the user must
-     * call 'initialise'.
-     * @return {Boolean} True if the lut is ready to use.
-     */
+   * Is the lut ready to use or not? If not, the user must
+   * call 'initialise'.
+   *
+   * @returns {boolean} True if the lut is ready to use.
+   */
   this.isReady = function () {
     return isReady;
   };
 
   /**
-     * Initialise the LUT.
-     */
+   * Initialise the LUT.
+   */
   this.initialise = function () {
     // check if already initialised
     if (isReady) {
@@ -66,18 +72,20 @@ dwv.image.RescaleLut = function (rsi, bitsStored) {
   };
 
   /**
-     * Get the length of the LUT array.
-     * @return {Number} The length of the LUT array.
-     */
+   * Get the length of the LUT array.
+   *
+   * @returns {number} The length of the LUT array.
+   */
   this.getLength = function () {
     return length;
   };
 
   /**
-     * Get the value of the LUT at the given offset.
-     * @param {Number} offset The input offset in [0,2^bitsStored] range.
-     * @return {Number} The float32 value of the LUT at the given offset.
-     */
+   * Get the value of the LUT at the given offset.
+   *
+   * @param {number} offset The input offset in [0,2^bitsStored] range.
+   * @returns {number} The float32 value of the LUT at the given offset.
+   */
   this.getValue = function (offset) {
     return lut[offset];
   };

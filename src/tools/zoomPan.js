@@ -4,26 +4,30 @@ dwv.tool = dwv.tool || {};
 
 /**
  * ZoomAndPan class.
- * @constructor
- * @param {Object} app The associated application.
+ *
+ * @class
+ * @param {object} app The associated application.
  */
 dwv.tool.ZoomAndPan = function (app) {
   /**
-     * Closure to self: to be used by event handlers.
-     * @private
-     * @type Object
-     */
+   * Closure to self: to be used by event handlers.
+   *
+   * @private
+   * @type {object}
+   */
   var self = this;
   /**
-     * Interaction start flag.
-     * @type Boolean
-     */
+   * Interaction start flag.
+   *
+   * @type {boolean}
+   */
   this.started = false;
 
   /**
-     * Handle mouse down event.
-     * @param {Object} event The mouse down event.
-     */
+   * Handle mouse down event.
+   *
+   * @param {object} event The mouse down event.
+   */
   this.mousedown = function (event) {
     self.started = true;
     // first position
@@ -32,9 +36,10 @@ dwv.tool.ZoomAndPan = function (app) {
   };
 
   /**
-     * Handle two touch down event.
-     * @param {Object} event The touch down event.
-     */
+   * Handle two touch down event.
+   *
+   * @param {object} event The touch down event.
+   */
   this.twotouchdown = function (event) {
     self.started = true;
     // store first point
@@ -48,9 +53,10 @@ dwv.tool.ZoomAndPan = function (app) {
   };
 
   /**
-     * Handle mouse move event.
-     * @param {Object} event The mouse move event.
-     */
+   * Handle mouse move event.
+   *
+   * @param {object} event The mouse move event.
+   */
   this.mousemove = function (event) {
     if (!self.started) {
       return;
@@ -67,9 +73,10 @@ dwv.tool.ZoomAndPan = function (app) {
   };
 
   /**
-     * Handle two touch move event.
-     * @param {Object} event The touch move event.
-     */
+   * Handle two touch move event.
+   *
+   * @param {object} event The touch move event.
+   */
   this.twotouchmove = function (event) {
     if (!self.started) {
       return;
@@ -103,10 +110,11 @@ dwv.tool.ZoomAndPan = function (app) {
   };
 
   /**
-     * Handle mouse up event.
-     * @param {Object} event The mouse up event.
-     */
-  this.mouseup = function (/*event*/) {
+   * Handle mouse up event.
+   *
+   * @param {object} _event The mouse up event.
+   */
+  this.mouseup = function (_event) {
     if (self.started) {
       // stop recording
       self.started = false;
@@ -114,17 +122,19 @@ dwv.tool.ZoomAndPan = function (app) {
   };
 
   /**
-     * Handle mouse out event.
-     * @param {Object} event The mouse out event.
-     */
+   * Handle mouse out event.
+   *
+   * @param {object} event The mouse out event.
+   */
   this.mouseout = function (event) {
     self.mouseup(event);
   };
 
   /**
-     * Handle touch start event.
-     * @param {Object} event The touch start event.
-     */
+   * Handle touch start event.
+   *
+   * @param {object} event The touch start event.
+   */
   this.touchstart = function (event) {
     var touches = event.targetTouches;
     if (touches.length === 1) {
@@ -135,9 +145,10 @@ dwv.tool.ZoomAndPan = function (app) {
   };
 
   /**
-     * Handle touch move event.
-     * @param {Object} event The touch move event.
-     */
+   * Handle touch move event.
+   *
+   * @param {object} event The touch move event.
+   */
   this.touchmove = function (event) {
     var touches = event.targetTouches;
     if (touches.length === 1) {
@@ -148,17 +159,19 @@ dwv.tool.ZoomAndPan = function (app) {
   };
 
   /**
-     * Handle touch end event.
-     * @param {Object} event The touch end event.
-     */
+   * Handle touch end event.
+   *
+   * @param {object} event The touch end event.
+   */
   this.touchend = function (event) {
     self.mouseup(event);
   };
 
   /**
-     * Handle mouse scroll event (fired by Firefox).
-     * @param {Object} event The mouse scroll event.
-     */
+   * Handle mouse scroll event (fired by Firefox).
+   *
+   * @param {object} event The mouse scroll event.
+   */
   this.DOMMouseScroll = function (event) {
     // ev.detail on firefox is 3
     var step = -event.detail / 30;
@@ -166,9 +179,10 @@ dwv.tool.ZoomAndPan = function (app) {
   };
 
   /**
-     * Handle mouse wheel event.
-     * @param {Object} event The mouse wheel event.
-     */
+   * Handle mouse wheel event.
+   *
+   * @param {object} event The mouse wheel event.
+   */
   this.mousewheel = function (event) {
     // ev.wheelDelta on chrome is 120
     var step = event.wheelDelta / 1200;
@@ -176,19 +190,21 @@ dwv.tool.ZoomAndPan = function (app) {
   };
 
   /**
-     * Handle key down event.
-     * @param {Object} event The key down event.
-     */
+   * Handle key down event.
+   *
+   * @param {object} event The key down event.
+   */
   this.keydown = function (event) {
     event.context = 'dwv.tool.ZoomAndPan';
     app.onKeydown(event);
   };
 
   /**
-     * Activate the tool.
-     * @param {Boolean} bool The flag to activate or not.
-     */
-  this.activate = function (/*bool*/) {
+   * Activate the tool.
+   *
+   * @param {boolean} _bool The flag to activate or not.
+   */
+  this.activate = function (_bool) {
     // does nothing
   };
 
@@ -196,7 +212,8 @@ dwv.tool.ZoomAndPan = function (app) {
 
 /**
  * Help for this tool.
- * @return {Object} The help content.
+ *
+ * @returns {object} The help content.
  */
 dwv.tool.ZoomAndPan.prototype.getHelpKeys = function () {
   return {

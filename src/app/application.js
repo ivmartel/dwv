@@ -3,7 +3,8 @@ var dwv = dwv || {};
 
 /**
  * Main application class.
- * @constructor
+ *
+ * @class
  */
 dwv.App = function () {
   // Local object
@@ -63,150 +64,168 @@ dwv.App = function () {
   var listeners = {};
 
   /**
-     * Get the image.
-     * @return {Image} The associated image.
-     */
+   * Get the image.
+   *
+   * @returns {Image} The associated image.
+   */
   this.getImage = function () {
     return image;
   };
   /**
-     * Set the view.
-     * @param {Image} img The associated image.
-     */
+   * Set the view.
+   *
+   * @param {Image} img The associated image.
+   */
   this.setImage = function (img) {
     image = img;
     view.setImage(img);
   };
   /**
-     * Restore the original image.
-     */
+   * Restore the original image.
+   */
   this.restoreOriginalImage = function () {
     image = originalImage;
     view.setImage(originalImage);
   };
   /**
-     * Get the image data array.
-     * @return {Array} The image data array.
-     */
+   * Get the image data array.
+   *
+   * @returns {Array} The image data array.
+   */
   this.getImageData = function () {
     return imageData;
   };
   /**
-     * Is the data mono-slice?
-     * @return {Boolean} True if the data only contains one slice.
-     */
+   * Is the data mono-slice?
+   *
+   * @returns {boolean} True if the data only contains one slice.
+   */
   this.isMonoSliceData = function () {
     return loadController.isMonoSliceData();
   };
   /**
-     * Is the data mono-frame?
-     * @return {Boolean} True if the data only contains one frame.
-     */
+   * Is the data mono-frame?
+   *
+   * @returns {boolean} True if the data only contains one frame.
+   */
   this.isMonoFrameData = function () {
     return (this.getImage() && typeof this.getImage() !== 'undefined' &&
             this.getImage().getNumberOfFrames() === 1);
   };
   /**
-     * Can the data be scrolled?
-     * @return {Boolean} True if the data has more than one slice or frame.
-     */
+   * Can the data be scrolled?
+   *
+   * @returns {boolean} True if the data has more than one slice or frame.
+   */
   this.canScroll = function () {
     return !this.isMonoSliceData() || !this.isMonoFrameData();
   };
 
   /**
-     * Can window and level be applied to the data?
-     * @return {Boolean} True if the data is monochrome.
-     */
+   * Can window and level be applied to the data?
+   *
+   * @returns {boolean} True if the data is monochrome.
+   */
   this.canWindowLevel = function () {
     return this.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null;
   };
 
   /**
-     * Get the main scale.
-     * @return {Number} The main scale.
-     */
+   * Get the main scale.
+   *
+   * @returns {number} The main scale.
+   */
   this.getScale = function () {
     return scale / windowScale;
   };
 
   /**
-     * Get the window scale.
-     * @return {Number} The window scale.
-     */
+   * Get the window scale.
+   *
+   * @returns {number} The window scale.
+   */
   this.getWindowScale = function () {
     return windowScale;
   };
 
   /**
-     * Get the scale center.
-     * @return {Object} The coordinates of the scale center.
-     */
+   * Get the scale center.
+   *
+   * @returns {object} The coordinates of the scale center.
+   */
   this.getScaleCenter = function () {
     return scaleCenter;
   };
 
   /**
-     * Get the translation.
-     * @return {Object} The translation.
-     */
+   * Get the translation.
+   *
+   * @returns {object} The translation.
+   */
   this.getTranslation = function () {
     return translation;
   };
 
   /**
-     * Get the view controller.
-     * @return {Object} The controller.
-     */
+   * Get the view controller.
+   *
+   * @returns {object} The controller.
+   */
   this.getViewController = function () {
     return viewController;
   };
 
   /**
-     * Get the toolbox controller.
-     * @return {Object} The controller.
-     */
+   * Get the toolbox controller.
+   *
+   * @returns {object} The controller.
+   */
   this.getToolboxController = function () {
     return toolboxController;
   };
 
   /**
-     * Get the draw controller.
-     * @return {Object} The controller.
-     */
+   * Get the draw controller.
+   *
+   * @returns {object} The controller.
+   */
   this.getDrawController = function () {
     return drawController;
   };
 
   /**
-     * Get the image layer.
-     * @return {Object} The image layer.
-     */
+   * Get the image layer.
+   *
+   * @returns {object} The image layer.
+   */
   this.getImageLayer = function () {
     return imageLayer;
   };
 
   /**
-     * Get the draw stage.
-     * @return {Object} The draw stage.
-     */
+   * Get the draw stage.
+   *
+   * @returns {object} The draw stage.
+   */
   this.getDrawStage = function () {
     return drawController.getDrawStage();
   };
 
   /**
-     * Get the app style.
-     * @return {Object} The app style.
-     */
+   * Get the app style.
+   *
+   * @returns {object} The app style.
+   */
   this.getStyle = function () {
     return style;
   };
 
   /**
-     * Add a command to the undo stack.
-     * @param {Object} cmd The command to add.
-     * @fires dwv.tool.UndoStack#undo-add
-     */
+   * Add a command to the undo stack.
+   *
+   * @param {object} cmd The command to add.
+   * @fires dwv.tool.UndoStack#undoadd
+   */
   this.addToUndoStack = function (cmd) {
     if (undoStack !== null) {
       undoStack.add(cmd);
@@ -214,8 +233,10 @@ dwv.App = function () {
   };
 
   /**
-     * Initialise the application.
-     */
+   * Initialise the application.
+   *
+   * @param {object} config The application configuration.
+   */
   this.init = function (config) {
     containerDivId = config.containerDivId;
     // undo stack
@@ -294,9 +315,10 @@ dwv.App = function () {
   };
 
   /**
-     * Get the size available for the layer container div.
-     * @return {Object} The available width and height: {width:X; height:Y}.
-     */
+   * Get the size available for the layer container div.
+   *
+   * @returns {object} The available width and height: {width:X; height:Y}.
+   */
   this.getLayerContainerSize = function () {
     var ldiv = self.getElement('layerContainer');
     var parent = ldiv.parentNode;
@@ -319,17 +341,18 @@ dwv.App = function () {
   };
 
   /**
-     * Get a HTML element associated to the application.
-     * @param name The name or id to find.
-     * @return The found element or null.
-     */
+   * Get a HTML element associated to the application.
+   *
+   * @param {string} name The name or id to find.
+   * @returns {object} The found element or null.
+   */
   this.getElement = function (name) {
     return dwv.gui.getElement(containerDivId, name);
   };
 
   /**
-     * Reset the application.
-     */
+   * Reset the application.
+   */
   this.reset = function () {
     // clear draw
     if (drawController) {
@@ -350,10 +373,11 @@ dwv.App = function () {
   };
 
   /**
-     * Reset the layout of the application.
-     * @fires dwv.App#zoom-change
-     * @fires dwv.App#offset-change
-     */
+   * Reset the layout of the application.
+   *
+   * @fires dwv.App#zoomchange
+   * @fires dwv.App#offsetchange
+   */
   this.resetLayout = function () {
     var previousScale = scale;
     var previousSC = scaleCenter;
@@ -391,10 +415,12 @@ dwv.App = function () {
     }
   };
 
+
   /**
    * Add an event listener on the app.
-   * @param {String} type The event type.
-   * @param {Object} listener The method associated with the provided
+   *
+   * @param {string} type The event type.
+   * @param {object} listener The method associated with the provided
    *   event type.
    */
   this.addEventListener = function (type, listener) {
@@ -405,11 +431,12 @@ dwv.App = function () {
   };
 
   /**
-     * Remove an event listener from the app.
-     * @param {String} type The event type.
-     * @param {Object} listener The method associated with the provided
-     *   event type.
-     */
+   * Remove an event listener from the app.
+   *
+   * @param {string} type The event type.
+   * @param {object} listener The method associated with the provided
+   *   event type.
+   */
   this.removeEventListener = function (type, listener) {
     if (typeof listeners[type] === 'undefined') {
       return;
@@ -424,55 +451,58 @@ dwv.App = function () {
   // load API [begin] -------------------------------------------------------
 
   /**
-     * Load a list of files. Can be image files or a state file.
-     * @param {Array} files The list of files to load.
-     * @fires dwv.App#load-start
-     * @fires dwv.App#load-progress
-     * @fires dwv.App#load-item
-     * @fires dwv.App#load-end
-     * @fires dwv.App#load-error
-     * @fires dwv.App#load-abort
-     */
+   * Load a list of files. Can be image files or a state file.
+   *
+   * @param {Array} files The list of files to load.
+   * @fires dwv.App#loadstart
+   * @fires dwv.App#loadprogress
+   * @fires dwv.App#loaditem
+   * @fires dwv.App#loadend
+   * @fires dwv.App#error
+   * @fires dwv.App#abort
+   */
   this.loadFiles = function (files) {
     loadController.loadFiles(files);
   };
 
   /**
    * Load a list of URLs. Can be image files or a state file.
+   *
    * @param {Array} urls The list of urls to load.
-   * @param {Object} options The options object, can contain:
+   * @param {object} options The options object, can contain:
    *  - requestHeaders: an array of {name, value} to use as request headers
    *  - withCredentials: boolean xhr.withCredentials flag to pass to the request
    *  - batchSize: the size of the request url batch
-   * @fires dwv.App#load-start
-   * @fires dwv.App#load-progress
-   * @fires dwv.App#load-item
-   * @fires dwv.App#load-end
-   * @fires dwv.App#load-error
-   * @fires dwv.App#load-abort
+   * @fires dwv.App#loadstart
+   * @fires dwv.App#loadprogress
+   * @fires dwv.App#loaditem
+   * @fires dwv.App#loadend
+   * @fires dwv.App#error
+   * @fires dwv.App#abort
    */
   this.loadURLs = function (urls, options) {
     loadController.loadURLs(urls, options);
   };
 
   /**
-     * Load a list of ArrayBuffers.
-     * @param {Array} data The list of ArrayBuffers to load
-     *   in the form of [{name: "", filename: "", data: data}].
-     * @fires dwv.App#load-start
-     * @fires dwv.App#load-progress
-     * @fires dwv.App#load-item
-     * @fires dwv.App#load-end
-     * @fires dwv.App#load-error
-     * @fires dwv.App#load-abort
-     */
+   * Load a list of ArrayBuffers.
+   *
+   * @param {Array} data The list of ArrayBuffers to load
+   *   in the form of [{name: "", filename: "", data: data}].
+   * @fires dwv.App#loadstart
+   * @fires dwv.App#loadprogress
+   * @fires dwv.App#loaditem
+   * @fires dwv.App#loadend
+   * @fires dwv.App#error
+   * @fires dwv.App#abort
+   */
   this.loadImageObject = function (data) {
     loadController.loadImageObject(data);
   };
 
   /**
-     * Abort the current load.
-     */
+   * Abort the current load.
+   */
   this.abortLoad = function () {
     loadController.abort();
   };
@@ -480,8 +510,10 @@ dwv.App = function () {
   // load API [end] ---------------------------------------------------------
 
   /**
-     * Fit the display to the given size. To be called once the image is loaded.
-     */
+   * Fit the display to the given size. To be called once the image is loaded.
+   *
+   * @param {object} size A size as `{width,height}`.
+   */
   this.fitToSize = function (size) {
     // previous width
     var oldWidth = parseInt(windowScale * dataWidth, 10);
@@ -518,8 +550,8 @@ dwv.App = function () {
   };
 
   /**
-     * Init the Window/Level display
-     */
+   * Init the Window/Level display
+   */
   this.initWLDisplay = function () {
     // set window/level to first preset
     viewController.setWindowLevelPresetById(0);
@@ -530,34 +562,37 @@ dwv.App = function () {
   };
 
   /**
-     * Add canvas mouse and touch listeners.
-     * @param {Object} canvas The canvas to listen to.
-     */
+   * Add canvas mouse and touch listeners.
+   *
+   * @param {object} layer The canvas layer to listen to.
+   */
   this.addToolCanvasListeners = function (layer) {
     toolboxController.addCanvasListeners(layer);
   };
 
   /**
-     * Remove layer mouse and touch listeners.
-     * @param {Object} canvas The canvas to stop listening to.
-     */
+   * Remove layer mouse and touch listeners.
+   *
+   * @param {object} layer The canvas to stop listening to.
+   */
   this.removeToolCanvasListeners = function (layer) {
     toolboxController.removeCanvasListeners(layer);
   };
 
   /**
-     * Render the current image.
-     */
+   * Render the current image.
+   */
   this.render = function () {
     generateAndDrawImage();
   };
 
   /**
-     * Zoom to the layers.
-     * @param {Number} zoom The zoom to apply.
-     * @param {Number} cx The zoom center X coordinate.
-     * @param {Number} cy The zoom center Y coordinate.
-     */
+   * Zoom to the layers.
+   *
+   * @param {number} zoom The zoom to apply.
+   * @param {number} cx The zoom center X coordinate.
+   * @param {number} cy The zoom center Y coordinate.
+   */
   this.zoom = function (zoom, cx, cy) {
     scale = zoom * windowScale;
     if (scale <= 0.1) {
@@ -568,11 +603,12 @@ dwv.App = function () {
   };
 
   /**
-     * Add a step to the layers zoom.
-     * @param {Number} step The zoom step increment. A good step is of 0.1.
-     * @param {Number} cx The zoom center X coordinate.
-     * @param {Number} cy The zoom center Y coordinate.
-     */
+   * Add a step to the layers zoom.
+   *
+   * @param {number} step The zoom step increment. A good step is of 0.1.
+   * @param {number} cx The zoom center X coordinate.
+   * @param {number} cy The zoom center Y coordinate.
+   */
   this.stepZoom = function (step, cx, cy) {
     scale += step;
     if (scale <= 0.1) {
@@ -583,20 +619,22 @@ dwv.App = function () {
   };
 
   /**
-     * Apply a translation to the layers.
-     * @param {Number} tx The translation along X.
-     * @param {Number} ty The translation along Y.
-     */
+   * Apply a translation to the layers.
+   *
+   * @param {number} tx The translation along X.
+   * @param {number} ty The translation along Y.
+   */
   this.translate = function (tx, ty) {
     translation = {'x': tx, 'y': ty};
     translateLayers();
   };
 
   /**
-     * Add a translation to the layers.
-     * @param {Number} tx The step translation along X.
-     * @param {Number} ty The step translation along Y.
-     */
+   * Add a translation to the layers.
+   *
+   * @param {number} tx The step translation along X.
+   * @param {number} ty The step translation along Y.
+   */
   this.stepTranslate = function (tx, ty) {
     var txx = translation.x + tx / scale;
     var tyy = translation.y + ty / scale;
@@ -605,70 +643,79 @@ dwv.App = function () {
   };
 
   /**
-     * Get the list of drawing display details.
-     * @return {Object} The list of draw details including id, slice, frame...
-     */
+   * Get the list of drawing display details.
+   *
+   * @returns {object} The list of draw details including id, slice, frame...
+   */
   this.getDrawDisplayDetails = function () {
     return drawController.getDrawDisplayDetails();
   };
 
   /**
-     * Get the meta data.
-     * @return {Object} The list of meta data.
-     */
+   * Get the meta data.
+   *
+   * @returns {object} The list of meta data.
+   */
   this.getMetaData = function () {
     return metaData;
   };
 
   /**
-     * Get a list of drawing store details.
-     * @return {Object} A list of draw details including id, text, quant...
-     */
+   * Get a list of drawing store details.
+   *
+   * @returns {object} A list of draw details including id, text, quant...
+   */
   this.getDrawStoreDetails = function () {
     return drawController.getDrawStoreDetails();
   };
   /**
-     * Set the drawings on the current stage.
-     * @param {Array} drawings An array of drawings.
-     * @param {Array} drawingsDetails An array of drawings details.
-     */
+   * Set the drawings on the current stage.
+   *
+   * @param {Array} drawings An array of drawings.
+   * @param {Array} drawingsDetails An array of drawings details.
+   */
   this.setDrawings = function (drawings, drawingsDetails) {
     drawController.setDrawings(
       drawings, drawingsDetails, fireEvent, this.addToUndoStack);
     drawController.activateDrawLayer(viewController);
   };
   /**
-     * Update a drawing from its details.
-     * @param {Object} drawDetails Details of the drawing to update.
-     */
+   * Update a drawing from its details.
+   *
+   * @param {object} drawDetails Details of the drawing to update.
+   */
   this.updateDraw = function (drawDetails) {
     drawController.updateDraw(drawDetails);
   };
   /**
-     * Delete all Draws from all layers.
-    */
+   * Delete all Draws from all layers.
+   */
   this.deleteDraws = function () {
     drawController.deleteDraws(fireEvent, this.addToUndoStack);
   };
   /**
-     * Check the visibility of a given group.
-     * @param {Object} drawDetails Details of the drawing to check.
-     */
+   * Check the visibility of a given group.
+   *
+   * @param {object} drawDetails Details of the drawing to check.
+   * @returns {boolean} True if the group is visible.
+   */
   this.isGroupVisible = function (drawDetails) {
     return drawController.isGroupVisible(drawDetails);
   };
   /**
-     * Toggle group visibility.
-     * @param {Object} drawDetails Details of the drawing to update.
-     */
+   * Toggle group visibility.
+   *
+   * @param {object} drawDetails Details of the drawing to update.
+   */
   this.toogleGroupVisibility = function (drawDetails) {
     drawController.toogleGroupVisibility(drawDetails);
   };
 
   /**
-     * Get the JSON state of the app.
-     * @return {Object} The state of the app as a JSON object.
-     */
+   * Get the JSON state of the app.
+   *
+   * @returns {object} The state of the app as a JSON object.
+   */
   this.getState = function () {
     var state = new dwv.State();
     return state.toJSON(self);
@@ -677,10 +724,11 @@ dwv.App = function () {
   // Handler Methods -----------------------------------------------------------
 
   /**
-     * Handle window/level change.
-     * @param {Object} event The event fired when changing the window/level.
-     * @private
-     */
+   * Handle window/level change.
+   *
+   * @param {object} event The event fired when changing the window/level.
+   * @private
+   */
   function onWLChange(event) {
     // generate and draw if no skip flag
     if (typeof event.skipGenerate === 'undefined' ||
@@ -690,32 +738,22 @@ dwv.App = function () {
   }
 
   /**
-     * Handle colour map change.
-     * @param {Object} event The event fired when changing the colour map.
-     * @private
-     */
-  function onColourChange(/*event*/) {
+   * Handle colour map change.
+   *
+   * @param {object} _event The event fired when changing the colour map.
+   * @private
+   */
+  function onColourChange(_event) {
     generateAndDrawImage();
   }
 
   /**
-     * Handle frame change.
-     * @param {Object} event The event fired when changing the frame.
-     * @private
-     */
-  function onFrameChange(/*event*/) {
-    generateAndDrawImage();
-    if (drawController) {
-      drawController.activateDrawLayer(viewController);
-    }
-  }
-
-  /**
-     * Handle slice change.
-     * @param {Object} event The event fired when changing the slice.
-     * @private
-     */
-  function onSliceChange(/*event*/) {
+   * Handle frame change.
+   *
+   * @param {object} _event The event fired when changing the frame.
+   * @private
+   */
+  function onFrameChange(_event) {
     generateAndDrawImage();
     if (drawController) {
       drawController.activateDrawLayer(viewController);
@@ -723,44 +761,61 @@ dwv.App = function () {
   }
 
   /**
-     * Handle resize: fit the display to the window.
-     * To be called once the image is loaded.
-     * Can be connected to a window 'resize' event.
-     * @param {Object} event The change event.
-     * @private
-     */
-  this.onResize = function (/*event*/) {
+   * Handle slice change.
+   *
+   * @param {object} _event The event fired when changing the slice.
+   * @private
+   */
+  function onSliceChange(_event) {
+    generateAndDrawImage();
+    if (drawController) {
+      drawController.activateDrawLayer(viewController);
+    }
+  }
+
+  /**
+   * Handle resize: fit the display to the window.
+   * To be called once the image is loaded.
+   * Can be connected to a window 'resize' event.
+   *
+   * @param {object} _event The change event.
+   * @private
+   */
+  this.onResize = function (_event) {
     self.fitToSize(self.getLayerContainerSize());
   };
 
   /**
-     * Key down callback. Meant to be used in tools.
-     * @param {Object} event The key down event.
-     * @fires dwv.App#keydown
-     */
+   * Key down callback. Meant to be used in tools.
+   *
+   * @param {object} event The key down event.
+   * @fires dwv.App#keydown
+   */
   this.onKeydown = function (event) {
     /**
-         * Key down event.
-         * @event dwv.App#keydown
-         * @type {KeyboardEvent}
-         * @property {string} type The event type: keydown.
-         * @property {string} context The tool where the event originated.
-         */
+     * Key down event.
+     *
+     * @event dwv.App#keydown
+     * @type {KeyboardEvent}
+     * @property {string} type The event type: keydown.
+     * @property {string} context The tool where the event originated.
+     */
     fireEvent(event);
   };
 
   /**
-     * Key down event handler example.
-     * - CRTL-Z: undo
-     * - CRTL-Y: redo
-     * - CRTL-ARROW_LEFT: next frame
-     * - CRTL-ARROW_UP: next slice
-     * - CRTL-ARROW_RIGHT: previous frame
-     * - CRTL-ARROW_DOWN: previous slice
-     * @param {Object} event The key down event.
-     * @fires dwv.tool.UndoStack#undo
-     * @fires dwv.tool.UndoStack#redo
-     */
+   * Key down event handler example.
+   * - CRTL-Z: undo
+   * - CRTL-Y: redo
+   * - CRTL-ARROW_LEFT: next frame
+   * - CRTL-ARROW_UP: next slice
+   * - CRTL-ARROW_RIGHT: previous frame
+   * - CRTL-ARROW_DOWN: previous slice
+   *
+   * @param {object} event The key down event.
+   * @fires dwv.tool.UndoStack#undo
+   * @fires dwv.tool.UndoStack#redo
+   */
   this.defaultOnKeydown = function (event) {
     if (event.ctrlKey) {
       if (event.keyCode === 37) { // crtl-arrow-left
@@ -786,95 +841,104 @@ dwv.App = function () {
   // Internal mebers shortcuts-----------------------------------------------
 
   /**
-     * Reset the display
-     */
+   * Reset the display
+   */
   this.resetDisplay = function () {
     self.resetLayout();
     self.initWLDisplay();
   };
 
   /**
-     * Reset the app zoom.s
-     */
+   * Reset the app zoom.s
+   */
   this.resetZoom = function () {
     self.resetLayout();
   };
 
   /**
-     * Set the colour map.
-     * @param {String} colourMap The colour map name.
-     */
+   * Set the colour map.
+   *
+   * @param {string} colourMap The colour map name.
+   */
   this.setColourMap = function (colourMap) {
     viewController.setColourMapFromName(colourMap);
   };
 
   /**
-     * Set the window/level preset.
-     * @param {String} event The window/level preset.
-     */
+   * Set the window/level preset.
+   *
+   * @param {object} preset The window/level preset.
+   */
   this.setWindowLevelPreset = function (preset) {
     viewController.setWindowLevelPreset(preset);
   };
 
   /**
-     * Set the tool
-     * @param {String} tool The tool.
-     */
+   * Set the tool
+   *
+   * @param {string} tool The tool.
+   */
   this.setTool = function (tool) {
     toolboxController.setSelectedTool(tool);
   };
 
   /**
-     * Set the draw shape.
-     * @param {String} shape The draw shape.
-     */
+   * Set the draw shape.
+   *
+   * @param {string} shape The draw shape.
+   */
   this.setDrawShape = function (shape) {
     toolboxController.setSelectedShape(shape);
   };
 
   /**
-     * Set the image filter
-     * @param {String} filter The image filter.
-     */
+   * Set the image filter
+   *
+   * @param {string} filter The image filter.
+   */
   this.setImageFilter = function (filter) {
     toolboxController.setSelectedFilter(filter);
   };
 
   /**
-     * Run the selected image filter.
-     */
+   * Run the selected image filter.
+   */
   this.runImageFilter = function () {
     toolboxController.runSelectedFilter();
   };
 
   /**
-     * Set the draw line colour.
-     * @param {String} colour The line colour.
-     */
+   * Set the draw line colour.
+   *
+   * @param {string} colour The line colour.
+   */
   this.setDrawLineColour = function (colour) {
     toolboxController.setLineColour(colour);
   };
 
   /**
-     * Set the filter min/max.
-     * @param {Object} range The new range of the data: {min:a, max:b}.
-     */
+   * Set the filter min/max.
+   *
+   * @param {object} range The new range of the data: {min:a, max:b}.
+   */
   this.setFilterMinMax = function (range) {
     toolboxController.setRange(range);
   };
 
   /**
-     * Undo the last action
-     * @fires dwv.tool.UndoStack#undo
-     */
+   * Undo the last action
+   *
+   * @fires dwv.tool.UndoStack#undo
+   */
   this.undo = function () {
     undoStack.undo();
   };
 
   /**
-     * Redo the last action
-     * @fires dwv.tool.UndoStack#redo
-     */
+   * Redo the last action
+   *
+   * @fires dwv.tool.UndoStack#redo
+   */
   this.redo = function () {
     undoStack.redo();
   };
@@ -883,10 +947,11 @@ dwv.App = function () {
   // Private Methods -----------------------------------------------------------
 
   /**
-     * Fire an event: call all associated listeners.
-     * @param {Object} event The event to fire.
-     * @private
-     */
+   * Fire an event: call all associated listeners.
+   *
+   * @param {object} event The event to fire.
+   * @private
+   */
   function fireEvent(event) {
     if (typeof listeners[event.type] === 'undefined') {
       return;
@@ -897,9 +962,10 @@ dwv.App = function () {
   }
 
   /**
-     * Generate the image data and draw it.
-     * @private
-     */
+   * Generate the image data and draw it.
+   *
+   * @private
+   */
   function generateAndDrawImage() {
     // generate image data from DICOM
     view.generateImageData(imageData);
@@ -910,9 +976,10 @@ dwv.App = function () {
   }
 
   /**
-     * First generate the image data and draw it.
-     * @private
-     */
+   * First generate the image data and draw it.
+   *
+   * @private
+   */
   function firstGenerateAndDrawImage() {
     // init W/L display
     self.initWLDisplay();
@@ -921,10 +988,11 @@ dwv.App = function () {
   }
 
   /**
-     * Apply the stored zoom to the layers.
-     * @private
-     * @fires dwv.App#zoom-change
-     */
+   * Apply the stored zoom to the layers.
+   *
+   * @private
+   * @fires dwv.App#zoomchange
+   */
   function zoomLayers() {
     // image layer
     if (imageLayer) {
@@ -937,13 +1005,14 @@ dwv.App = function () {
     }
     // fire event
     /**
-         * Zoom change event.
-         * @event dwv.App#zoom-change
-         * @type {Object}
-         * @property {number} scale The new scale value.
-         * @property {number} cx The new rotaion center X position.
-         * @property {number} cx The new rotaion center Y position.
-         */
+     * Zoom change event.
+     *
+     * @event dwv.App#zoomchange
+     * @type {object}
+     * @property {number} scale The new scale value.
+     * @property {number} cx The new rotaion center X position.
+     * @property {number} cy The new rotaion center Y position.
+     */
     fireEvent({
       'type': 'zoom-change',
       'scale': scale,
@@ -953,10 +1022,11 @@ dwv.App = function () {
   }
 
   /**
-     * Apply the stored translation to the layers.
-     * @private
-     * @fires dwv.App#offset-change
-     */
+   * Apply the stored translation to the layers.
+   *
+   * @private
+   * @fires dwv.App#offsetchange
+   */
   function translateLayers() {
     // image layer
     if (imageLayer) {
@@ -970,13 +1040,14 @@ dwv.App = function () {
       }
       // fire event
       /**
-             * Offset change event.
-             * @event dwv.App#offset-change
-             * @type {Object}
-             * @property {number} scale The new scale value.
-             * @property {number} cx The new rotaion center X position.
-             * @property {number} cx The new rotaion center Y position.
-             */
+       * Offset change event.
+       *
+       * @event dwv.App#offsetchange
+       * @type {object}
+       * @property {number} scale The new scale value.
+       * @property {number} cx The new rotaion center X position.
+       * @property {number} cy The new rotaion center Y position.
+       */
       fireEvent({
         'type': 'offset-change',
         'scale': scale,
@@ -987,11 +1058,12 @@ dwv.App = function () {
   }
 
   /**
-     * Create the application layers.
-     * @param {Number} dataWidth The width of the input data.
-     * @param {Number} dataHeight The height of the input data.
-     * @private
-     */
+   * Create the application layers.
+   *
+   * @param {number} dataWidth The width of the input data.
+   * @param {number} dataHeight The height of the input data.
+   * @private
+   */
   function createLayers(dataWidth, dataHeight) {
     // image layer
     var canImgLay = self.getElement('imageLayer');
@@ -1012,54 +1084,59 @@ dwv.App = function () {
   }
 
   /**
-     * Data load start callback.
-     * @param {Object} event The load start event.
-     * @private
-     */
+   * Data load start callback.
+   *
+   * @param {object} event The load start event.
+   * @private
+   */
   function onloadstart(event) {
     if (event.loadtype === 'image') {
       self.reset();
     }
 
     /**
-         * Load start event.
-         * @event dwv.App#load-start
-         * @type {Object}
-         * @property {string} type The event type: load-start.
-         * @property {string} loadType The load type: image or state.
-         * @property {Mixed} source The load source: string for an url,
-         *   File for a file.
-         */
+     * Load start event.
+     *
+     * @event dwv.App#loadstart
+     * @type {object}
+     * @property {string} type The event type: load-start.
+     * @property {string} loadType The load type: image or state.
+     * @property {*} source The load source: string for an url,
+     *   File for a file.
+     */
     event.type = 'load-start';
     fireEvent(event);
   }
 
   /**
-     * Data load progress callback.
-     * @param {Object} event The progress event.
-     * @private
-     */
+   * Data load progress callback.
+   *
+   * @param {object} event The progress event.
+   * @private
+   */
   function onprogress(event) {
     /**
-         * Load progress event.
-         * @event dwv.App#load-progress
-         * @type {Object}
-         * @property {string} type The event type: load-progress.
-         * @property {string} loadType The load type: image or state.
-         * @property {Mixed} source The load source: string for an url,
-         *   File for a file.
-         * @property {number} loaded The loaded percentage.
-         * @property {number} total The total percentage.
-         */
+     * Load progress event.
+     *
+     * @event dwv.App#loadprogress
+     * @type {object}
+     * @property {string} type The event type: load-progress.
+     * @property {string} loadType The load type: image or state.
+     * @property {*} source The load source: string for an url,
+     *   File for a file.
+     * @property {number} loaded The loaded percentage.
+     * @property {number} total The total percentage.
+     */
     event.type = 'load-progress';
     fireEvent(event);
   }
 
   /**
-     * Data load callback.
-     * @param {Object} event The load event.
-     * @private
-     */
+   * Data load callback.
+   *
+   * @param {object} event The load event.
+   * @private
+   */
   function onloaditem(event) {
     // check event
     if (typeof event.data === 'undefined') {
@@ -1085,15 +1162,16 @@ dwv.App = function () {
     }
 
     /**
-         * Load item event: fired when a load item is successfull.
-         * @event dwv.App#load-item
-         * @type {Object}
-         * @property {string} type The event type: load-item.
-         * @property {string} loadType The load type: image or state.
-         * @property {Mixed} source The load source: string for an url,
-         *   File for a file.
-         * @property {Object} data The loaded meta data.
-         */
+     * Load item event: fired when a load item is successfull.
+     *
+     * @event dwv.App#loaditem
+     * @type {object}
+     * @property {string} type The event type: load-item.
+     * @property {string} loadType The load type: image or state.
+     * @property {*} source The load source: string for an url,
+     *   File for a file.
+     * @property {object} data The loaded meta data.
+     */
     fireEvent({
       type: 'load-item',
       data: eventMetaData,
@@ -1111,91 +1189,100 @@ dwv.App = function () {
   }
 
   /**
-     * Data load callback.
-     * @param {Object} event The load event.
-     * @private
-     */
+   * Data load callback.
+   *
+   * @param {object} event The load event.
+   * @private
+   */
   function onload(event) {
     if (drawController) {
       drawController.activateDrawLayer(viewController);
     }
 
     /**
-         * Load event: fired when a load finishes successfully.
-         * @event dwv.App#load
-         * @type {Object}
-         * @property {string} type The event type: load.
-         * @property {string} loadType The load type: image or state.
-         */
+     * Load event: fired when a load finishes successfully.
+     *
+     * @event dwv.App#load
+     * @type {object}
+     * @property {string} type The event type: load.
+     * @property {string} loadType The load type: image or state.
+     */
     event.type = 'load';
     fireEvent(event);
   }
 
   /**
-     * Data load end callback.
-     * @param {Object} event The load end event.
-     * @private
-     */
+   * Data load end callback.
+   *
+   * @param {object} event The load end event.
+   * @private
+   */
   function onloadend(event) {
     /**
-         * Main load end event: fired when the load finishes,
-         *   successfully or not.
-         * @event dwv.App#load-end
-         * @type {Object}
-         * @property {string} type The event type: load-end.
-         * @property {string} loadType The load type: image or state.
-         * @property {Mixed} source The load source: string for an url,
-         *   File for a file.
-         */
+     * Main load end event: fired when the load finishes,
+     *   successfully or not.
+     *
+     * @event dwv.App#loadend
+     * @type {object}
+     * @property {string} type The event type: load-end.
+     * @property {string} loadType The load type: image or state.
+     * @property {*} source The load source: string for an url,
+     *   File for a file.
+     */
     event.type = 'load-end';
     fireEvent(event);
   }
 
   /**
-     * Data load error callback.
-     * @param {Object} event The error event.
-     * @private
-     */
+   * Data load error callback.
+   *
+   * @param {object} event The error event.
+   * @private
+   */
   function onerror(event) {
     /**
-         * Load error event.
-         * @event dwv.App#load-error
-         * @type {Object}
-         * @property {string} type The event type: error.
-         * @property {string} loadType The load type: image or state.
-         * @property {Mixed} source The load source: string for an url,
-         *   File for a file.
-         * @property {Object} error The error.
-         * @property {Object} target The event target.
-         */
+     * Load error event.
+     *
+     * @event dwv.App#error
+     * @type {object}
+     * @property {string} type The event type: error.
+     * @property {string} loadType The load type: image or state.
+     * @property {*} source The load source: string for an url,
+     *   File for a file.
+     * @property {object} error The error.
+     * @property {object} target The event target.
+     */
     event.type = 'error';
     fireEvent(event);
   }
 
   /**
-     * Data load abort callback.
-     * @param {Object} event The abort event.
-     * @private
-     */
+   * Data load abort callback.
+   *
+   * @param {object} event The abort event.
+   * @private
+   */
   function onabort(event) {
     /**
-         * Load abort event.
-         * @event dwv.App#load-abort
-         * @type {Object}
-         * @property {string} type The event type: abort.
-         * @property {string} loadType The load type: image or state.
-         * @property {Mixed} source The load source: string for an url,
-         *   File for a file.
-         */
+     * Load abort event.
+     *
+     * @event dwv.App#abort
+     * @type {object}
+     * @property {string} type The event type: abort.
+     * @property {string} loadType The load type: image or state.
+     * @property {*} source The load source: string for an url,
+     *   File for a file.
+     */
     event.type = 'abort';
     fireEvent(event);
   }
 
   /**
-     * Update the stored meta data.
-     * @param {*} newMetaData The new meta data.
-     * @private
-     */
+   * Update the stored meta data.
+   *
+   * @param {*} newMetaData The new meta data.
+   * @private
+   */
   function updateMetaData(newMetaData) {
     // store the meta data
     if (dwv.utils.isArray(newMetaData)) {
@@ -1219,11 +1306,12 @@ dwv.App = function () {
   }
 
   /**
-     * Post load application initialisation.
-     * To be called once the DICOM has been parsed.
-     * @param {Object} createdView The view to display.
-     * @private
-     */
+   * Post load application initialisation.
+   * To be called once the DICOM has been parsed.
+   *
+   * @param {object} createdView The view to display.
+   * @private
+   */
   function postLoadInit(createdView) {
     // get the view from the loaded data
     view = createdView;

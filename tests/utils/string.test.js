@@ -7,6 +7,7 @@ QUnit.module('string');
 
 /**
  * Tests for {@link dwv.utils.capitaliseFirstLetter}.
+ *
  * @function module:tests/utils~capitaliseFirstLetter
  */
 QUnit.test('Test CapitaliseFirstLetter.', function (assert) {
@@ -37,6 +38,7 @@ QUnit.test('Test CapitaliseFirstLetter.', function (assert) {
 
 /**
  * Tests for {@link dwv.utils.endsWith}.
+ *
  * @function module:tests/utils~endsWith
  */
 QUnit.test('Test EndsWith.', function (assert) {
@@ -79,6 +81,7 @@ QUnit.test('Test EndsWith.', function (assert) {
 
 /**
  * Tests for {@link dwv.utils.replaceFlags}.
+ *
  * @function module:tests/utils~replaceFlags
  */
 QUnit.test('Test ReplaceFlags.', function (assert) {
@@ -132,6 +135,7 @@ QUnit.test('Test ReplaceFlags.', function (assert) {
 
 /**
  * Tests for {@link dwv.utils.getFileExtension}.
+ *
  * @function module:tests/utils~getFileExtension
  */
 QUnit.test('Test getFileExtension.', function (assert) {

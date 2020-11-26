@@ -4,57 +4,65 @@ dwv.image = dwv.image || {};
 
 /**
  * Window LUT class.
-  * Typically converts from float to integer.
- * @constructor
- * @param {Number} rescaleLut The associated rescale LUT.
- * @param {Boolean} isSigned Flag to know if the data is signed or not.
+ * Typically converts from float to integer.
+ *
+ * @class
+ * @param {number} rescaleLut The associated rescale LUT.
+ * @param {boolean} isSigned Flag to know if the data is signed or not.
  */
 dwv.image.WindowLut = function (rescaleLut, isSigned) {
   /**
    * The internal array: Uint8ClampedArray clamps between 0 and 255.
+   *
    * @private
-   * @type Uint8ClampedArray
+   * @type {Uint8ClampedArray}
    */
   var lut = null;
 
   /**
    * The window level.
+   *
    * @private
-   * @type {Object}
+   * @type {object}
    */
   var windowLevel = null;
 
   /**
    * Flag to know if the lut is ready or not.
+   *
    * @private
-   * @type Boolean
+   * @type {boolean}
    */
   var isReady = false;
 
   /**
    * Shift for signed data.
+   *
    * @private
-   * @type Number
+   * @type {number}
    */
   var signedShift = 0;
 
   /**
    * Get the window / level.
-   * @return {Object} The window / level.
+   *
+   * @returns {object} The window / level.
    */
   this.getWindowLevel = function () {
     return windowLevel;
   };
   /**
    * Get the signed flag.
-   * @return {Boolean} The signed flag.
+   *
+   * @returns {boolean} The signed flag.
    */
   this.isSigned = function () {
     return isSigned;
   };
   /**
    * Get the rescale lut.
-   * @return {Object} The rescale lut.
+   *
+   * @returns {object} The rescale lut.
    */
   this.getRescaleLut = function () {
     return rescaleLut;
@@ -63,7 +71,8 @@ dwv.image.WindowLut = function (rescaleLut, isSigned) {
   /**
    * Is the lut ready to use or not? If not, the user must
    * call 'update'.
-   * @return {Boolean} True if the lut is ready to use.
+   *
+   * @returns {boolean} True if the lut is ready to use.
    */
   this.isReady = function () {
     return isReady;
@@ -71,7 +80,8 @@ dwv.image.WindowLut = function (rescaleLut, isSigned) {
 
   /**
    * Set the window center and width.
-   * @param {Object} wl The window level.
+   *
+   * @param {object} wl The window level.
    */
   this.setWindowLevel = function (wl) {
     // store the window values
@@ -119,7 +129,8 @@ dwv.image.WindowLut = function (rescaleLut, isSigned) {
 
   /**
    * Get the length of the LUT array.
-   * @return {Number} The length of the LUT array.
+   *
+   * @returns {number} The length of the LUT array.
    */
   this.getLength = function () {
     return lut.length;
@@ -127,8 +138,9 @@ dwv.image.WindowLut = function (rescaleLut, isSigned) {
 
   /**
    * Get the value of the LUT at the given offset.
-   * @param {Number} offset The input offset in [0,2^bitsStored] range.
-   * @return {Number} The integer value (default [0,255]) of the LUT
+   *
+   * @param {number} offset The input offset in [0,2^bitsStored] range.
+   * @returns {number} The integer value (default [0,255]) of the LUT
    *   at the given offset.
    */
   this.getValue = function (offset) {

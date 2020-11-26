@@ -1,7 +1,9 @@
 /**
  * FilePixGenerator
  * Generates pixel data from file(s).
- * @constructor
+ *
+ * @param {object} options The generator options.
+ * @class
  */
 var FilePixGenerator = function (options) {
 
@@ -53,8 +55,16 @@ var FilePixGenerator = function (options) {
 
 /**
  * Check tags are coherent with image size.
+ *
+ * @param {object} tags The tags to check.
+ * @param {object} image The associated image.
+ * @returns {boolean} True if the tags are ok.
  */
 function checkTags(tags, image) {
+  /**
+   * @param {number} value The value to check.
+   * @returns {number} The expected value.
+   */
   function getExpectedSize(value) {
     return value;
   }

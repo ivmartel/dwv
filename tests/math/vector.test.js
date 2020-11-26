@@ -7,6 +7,7 @@ QUnit.module('vector');
 
 /**
  * Tests for {@link dwv.math.Vector3D}.
+ *
  * @function module:tests/math~Vector3D
  */
 QUnit.test('Test Vector3D.', function (assert) {
@@ -58,6 +59,7 @@ QUnit.test('Test Vector3D.', function (assert) {
 
 /**
  * Tests for {@link dwv.math.Vector3D}.
+ *
  * @function module:tests/math~Vector3D
  */
 QUnit.test('Test Vector3D crossProduct.', function (assert) {
@@ -114,6 +116,7 @@ QUnit.test('Test Vector3D crossProduct.', function (assert) {
 
 /**
  * Tests for {@link dwv.math.Vector3D}.
+ *
  * @function module:tests/math~Vector3D
  */
 QUnit.test('Test Vector3D dotProduct.', function (assert) {

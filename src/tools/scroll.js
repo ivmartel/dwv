@@ -4,28 +4,32 @@ dwv.tool = dwv.tool || {};
 
 /**
  * Scroll class.
- * @constructor
- * @param {Object} app The associated application.
+ *
+ * @class
+ * @param {object} app The associated application.
  */
 dwv.tool.Scroll = function (app) {
   /**
-     * Closure to self: to be used by event handlers.
-     * @private
-     * @type WindowLevel
-     */
+   * Closure to self: to be used by event handlers.
+   *
+   * @private
+   * @type {dwv.tool.Scroll}
+   */
   var self = this;
   /**
-     * Interaction start flag.
-     * @type Boolean
-     */
+   * Interaction start flag.
+   *
+   * @type {boolean}
+   */
   this.started = false;
   // touch timer ID (created by setTimeout)
   var touchTimerID = null;
 
   /**
-     * Handle mouse down event.
-     * @param {Object} event The mouse down event.
-     */
+   * Handle mouse down event.
+   *
+   * @param {object} event The mouse down event.
+   */
   this.mousedown = function (event) {
     // stop viewer if playing
     if (app.getViewController().isPlaying()) {
@@ -39,9 +43,10 @@ dwv.tool.Scroll = function (app) {
   };
 
   /**
-     * Handle mouse move event.
-     * @param {Object} event The mouse move event.
-     */
+   * Handle mouse move event.
+   *
+   * @param {object} event The mouse move event.
+   */
   this.mousemove = function (event) {
     if (!self.started) {
       return;
@@ -83,10 +88,11 @@ dwv.tool.Scroll = function (app) {
   };
 
   /**
-     * Handle mouse up event.
-     * @param {Object} event The mouse up event.
-     */
-  this.mouseup = function (/*event*/) {
+   * Handle mouse up event.
+   *
+   * @param {object} _event The mouse up event.
+   */
+  this.mouseup = function (_event) {
     if (self.started) {
       // stop recording
       self.started = false;
@@ -94,17 +100,19 @@ dwv.tool.Scroll = function (app) {
   };
 
   /**
-     * Handle mouse out event.
-     * @param {Object} event The mouse out event.
-     */
+   * Handle mouse out event.
+   *
+   * @param {object} event The mouse out event.
+   */
   this.mouseout = function (event) {
     self.mouseup(event);
   };
 
   /**
-     * Handle touch start event.
-     * @param {Object} event The touch start event.
-     */
+   * Handle touch start event.
+   *
+   * @param {object} event The touch start event.
+   */
   this.touchstart = function (event) {
     // long touch triggers the dblclick
     touchTimerID = setTimeout(self.dblclick, 500);
@@ -113,9 +121,10 @@ dwv.tool.Scroll = function (app) {
   };
 
   /**
-     * Handle touch move event.
-     * @param {Object} event The touch move event.
-     */
+   * Handle touch move event.
+   *
+   * @param {object} event The touch move event.
+   */
   this.touchmove = function (event) {
     // abort timer if move
     if (touchTimerID !== null) {
@@ -127,9 +136,10 @@ dwv.tool.Scroll = function (app) {
   };
 
   /**
-     * Handle touch end event.
-     * @param {Object} event The touch end event.
-     */
+   * Handle touch end event.
+   *
+   * @param {object} event The touch end event.
+   */
   this.touchend = function (event) {
     // abort timer
     if (touchTimerID !== null) {
@@ -141,9 +151,10 @@ dwv.tool.Scroll = function (app) {
   };
 
   /**
-     * Handle mouse scroll event (fired by Firefox).
-     * @param {Object} event The mouse scroll event.
-     */
+   * Handle mouse scroll event (fired by Firefox).
+   *
+   * @param {object} event The mouse scroll event.
+   */
   this.DOMMouseScroll = function (event) {
     // ev.detail on firefox is 3
     if (event.detail < 0) {
@@ -154,9 +165,10 @@ dwv.tool.Scroll = function (app) {
   };
 
   /**
-     * Handle mouse wheel event.
-     * @param {Object} event The mouse wheel event.
-     */
+   * Handle mouse wheel event.
+   *
+   * @param {object} event The mouse wheel event.
+   */
   this.mousewheel = function (event) {
     // ev.wheelDelta on chrome is 120
     if (event.wheelDelta > 0) {
@@ -167,10 +179,11 @@ dwv.tool.Scroll = function (app) {
   };
 
   /**
-     * Mouse scroll action.
-     * @param {Boolean} up True to increment, false to decrement.
-     * @private
-     */
+   * Mouse scroll action.
+   *
+   * @param {boolean} up True to increment, false to decrement.
+   * @private
+   */
   function mouseScroll(up) {
     var hasSlices =
       (app.getImage().getGeometry().getSize().getNumberOfSlices() !== 1);
@@ -191,32 +204,35 @@ dwv.tool.Scroll = function (app) {
   }
 
   /**
-     * Handle key down event.
-     * @param {Object} event The key down event.
-     */
+   * Handle key down event.
+   *
+   * @param {object} event The key down event.
+   */
   this.keydown = function (event) {
     event.context = 'dwv.tool.Scroll';
     app.onKeydown(event);
   };
   /**
-     * Handle double click.
-     * @param {Object} event The key down event.
-     */
-  this.dblclick = function (/*event*/) {
+   * Handle double click.
+   *
+   * @param {object} _event The key down event.
+   */
+  this.dblclick = function (_event) {
     app.getViewController().play();
   };
 
   /**
-     * Activate the tool.
-     * @param {Boolean} bool The flag to activate or not.
-     */
-  this.activate = function (/*bool*/) {
+   * Activate the tool.
+   *
+   * @param {boolean} _bool The flag to activate or not.
+   */
+  this.activate = function (_bool) {
     // does nothing
   };
 
   /**
-     * Initialise the tool.
-     */
+   * Initialise the tool.
+   */
   this.init = function () {
     // does nothing
   };
@@ -225,7 +241,8 @@ dwv.tool.Scroll = function (app) {
 
 /**
  * Help for this tool.
- * @return {Object} The help content.
+ *
+ * @returns {object} The help content.
  */
 dwv.tool.Scroll.prototype.getHelpKeys = function () {
   return {

@@ -4,8 +4,9 @@ dwv.utils = dwv.utils || {};
 
 /**
  * Capitalise the first letter of a string.
- * @param {String} string The string to capitalise the first letter.
- * @return {String} The new string.
+ *
+ * @param {string} string The string to capitalise the first letter.
+ * @returns {string} The new string.
  */
 dwv.utils.capitaliseFirstLetter = function (string) {
   var res = string;
@@ -17,9 +18,10 @@ dwv.utils.capitaliseFirstLetter = function (string) {
 
 /**
  * Check if a string ends with the input element.
- * @param {String} str The input string.
- * @param {String} end The searched ending.
- * @return {Boolean} True if the input string ends with the seached ending.
+ *
+ * @param {string} str The input string.
+ * @param {string} end The searched ending.
+ * @returns {boolean} True if the input string ends with the seached ending.
  */
 dwv.utils.endsWith = function (str, end) {
   if (typeof str === 'undefined' || str === null ||
@@ -33,8 +35,9 @@ dwv.utils.endsWith = function (str, end) {
  * Split key/value string:
  *  key0=val00&key0=val01&key1=val10 returns
  *  { key0 : [val00, val01], key1 : val1 }
- * @param {String} inputStr The string to split.
- * @return {Object} The split string.
+ *
+ * @param {string} inputStr The string to split.
+ * @returns {object} The split string.
  */
 dwv.utils.splitKeyValueString = function (inputStr) {
   // result
@@ -63,13 +66,14 @@ dwv.utils.splitKeyValueString = function (inputStr) {
 /**
  * Replace flags in a input string. Flags are keywords surrounded with curly
  * braces.
- * @param {String} inputStr The input string.
- * @param {Object} values A object of {value, unit}.
+ *
+ * @param {string} inputStr The input string.
+ * @param {object} values A object of {value, unit}.
  * @example
  *    var values = {"length": { "value": 33, "unit": "cm" } };
  *    var str = "The length is: {length}.";
  *    var res = dwv.utils.replaceFlags(str, values); // "The length is: 33 cm."
- * @return {String} The result string.
+ * @returns {string} The result string.
  */
 dwv.utils.replaceFlags = function (inputStr, values) {
   var res = '';
@@ -113,14 +117,15 @@ dwv.utils.replaceFlags = function (inputStr, values) {
 /**
  * Replace flags in a input string. Flags are keywords surrounded with curly
  * braces.
- * @param {String} inputStr The input string.
+ *
+ * @param {string} inputStr The input string.
  * @param {Array} values An array of strings.
  * @example
  *    var values = ["a", "b"];
  *    var str = "The length is: {v0}. The size is: {v1}";
  *    var res = dwv.utils.replaceFlags2(str, values);
  *    // "The length is: a. The size is: b"
- * @return {String} The result string.
+ * @returns {string} The result string.
  */
 dwv.utils.replaceFlags2 = function (inputStr, values) {
   var res = inputStr;
@@ -143,9 +148,10 @@ dwv.utils.createDefaultReplaceFormat = function (values) {
 
 /**
  * Get the root of an input path.
- * @param {String} path The input path
- * @return {String} The input path without its last part.
- * @note Splits using `/` as separator.
+ * Splits using `/` as separator.
+ *
+ * @param {string} path The input path
+ * @returns {string} The input path without its last part.
  */
 dwv.utils.getRootPath = function (path) {
   return path.split('/').slice(0, -1).join('/');
@@ -153,8 +159,9 @@ dwv.utils.getRootPath = function (path) {
 
 /**
  * Get a file extension
- * @param {String} filePath The file path containing the file name.
- * @returns {String} The lower case file extension or null for none.
+ *
+ * @param {string} filePath The file path containing the file name.
+ * @returns {string} The lower case file extension or null for none.
  */
 dwv.utils.getFileExtension = function (filePath) {
   var ext = null;

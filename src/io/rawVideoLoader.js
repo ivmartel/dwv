@@ -6,34 +6,39 @@ dwv.io = dwv.io || {};
  * Raw video loader.
  * url example (cors enabled):
  *   https://raw.githubusercontent.com/clappr/clappr/master/test/fixtures/SampleVideo_360x240_1mb.mp4
- * @constructor
+ *
+ * @class
  */
 dwv.io.RawVideoLoader = function () {
   // closure to self
   var self = this;
 
   /**
-     * Set the loader options.
-     * @param {Object} opt The input options.
-     */
-  this.setOptions = function () {
+   * Set the loader options.
+   *
+   * @param {object} _opt The input options.
+   */
+  this.setOptions = function (_opt) {
     // does nothing
   };
 
   /**
-     * Is the load ongoing? TODO...
-     * @return {Boolean} True if loading.
-     */
+   * Is the load ongoing? TODO...
+   *
+   * @returns {boolean} True if loading.
+   */
   this.isLoading = function () {
     return true;
   };
 
   /**
-     * Create a Data URI from an HTTP request response.
-     * @param {Object} response The HTTP request response.
-     * @param {String} dataType The data type.
-     * @private
-     */
+   * Create a Data URI from an HTTP request response.
+   *
+   * @param {object} response The HTTP request response.
+   * @param {string} dataType The data type.
+   * @returns {string} The data URI.
+   * @private
+   */
   function createDataUri(response, dataType) {
     // image data as string
     var bytes = new Uint8Array(response);
@@ -47,11 +52,12 @@ dwv.io.RawVideoLoader = function () {
   }
 
   /**
-     * Internal Data URI load.
-     * @param {Object} buffer The read data.
-     * @param {String} origin The data origin.
-     * @param {Number} index The data index.
-     */
+   * Internal Data URI load.
+   *
+   * @param {object} buffer The read data.
+   * @param {string} origin The data origin.
+   * @param {number} index The data index.
+   */
   this.load = function (buffer, origin, index) {
     // create a DOM video
     var video = document.createElement('video');
@@ -85,8 +91,8 @@ dwv.io.RawVideoLoader = function () {
   };
 
   /**
-     * Abort load.
-     */
+   * Abort load.
+   */
   this.abort = function () {
     self.onabort({});
     self.onloadend({});
@@ -96,8 +102,9 @@ dwv.io.RawVideoLoader = function () {
 
 /**
  * Check if the loader can load the provided file.
- * @param {Object} file The file to check.
- * @return True if the file can be loaded.
+ *
+ * @param {object} file The file to check.
+ * @returns {boolean} True if the file can be loaded.
  */
 dwv.io.RawVideoLoader.prototype.canLoadFile = function (file) {
   return file.type.match('video.*');
@@ -105,8 +112,9 @@ dwv.io.RawVideoLoader.prototype.canLoadFile = function (file) {
 
 /**
  * Check if the loader can load the provided url.
- * @param {String} url The url to check.
- * @return True if the url can be loaded.
+ *
+ * @param {string} url The url to check.
+ * @returns {boolean} True if the url can be loaded.
  */
 dwv.io.RawVideoLoader.prototype.canLoadUrl = function (url) {
   var urlObjext = dwv.utils.getUrlFromUri(url);
@@ -117,7 +125,8 @@ dwv.io.RawVideoLoader.prototype.canLoadUrl = function (url) {
 
 /**
  * Get the file content type needed by the loader.
- * @return One of the 'dwv.io.fileContentTypes'.
+ *
+ * @returns {number} One of the 'dwv.io.fileContentTypes'.
  */
 dwv.io.RawVideoLoader.prototype.loadFileAs = function () {
   return dwv.io.fileContentTypes.DataURL;
@@ -125,7 +134,8 @@ dwv.io.RawVideoLoader.prototype.loadFileAs = function () {
 
 /**
  * Get the url content type needed by the loader.
- * @return One of the 'dwv.io.urlContentTypes'.
+ *
+ * @returns {number} One of the 'dwv.io.urlContentTypes'.
  */
 dwv.io.RawVideoLoader.prototype.loadUrlAs = function () {
   return dwv.io.urlContentTypes.ArrayBuffer;
@@ -133,49 +143,56 @@ dwv.io.RawVideoLoader.prototype.loadUrlAs = function () {
 
 /**
  * Handle a load start event.
- * @param {Object} event The load start event.
  * Default does nothing.
+ *
+ * @param {object} _event The load start event.
  */
-dwv.io.RawVideoLoader.prototype.onloadstart = function (/*event*/) {};
+dwv.io.RawVideoLoader.prototype.onloadstart = function (_event) {};
 /**
  * Handle a progress event.
- * @param {Object} event The progress event.
  * Default does nothing.
+ *
+ * @param {object} _event The progress event.
  */
-dwv.io.RawVideoLoader.prototype.onprogress = function (/*event*/) {};
+dwv.io.RawVideoLoader.prototype.onprogress = function (_event) {};
 /**
  * Handle a load item event.
- * @param {Object} event The load item event fired
- *   when a file item has been loaded successfully.
  * Default does nothing.
+ *
+ * @param {object} _event The load item event fired
+ * when a file item has been loaded successfully.
  */
-dwv.io.RawVideoLoader.prototype.onloaditem = function (/*event*/) {};
+dwv.io.RawVideoLoader.prototype.onloaditem = function (_event) {};
 /**
  * Handle a load event.
- * @param {Object} event The load event fired
- *   when a file has been loaded successfully.
  * Default does nothing.
+ *
+ * @param {object} _event The load event fired
+ * when a file has been loaded successfully.
  */
-dwv.io.RawVideoLoader.prototype.onload = function (/*event*/) {};
+dwv.io.RawVideoLoader.prototype.onload = function (_event) {};
 /**
  * Handle an load end event.
- * @param {Object} event The load end event fired
- *  when a file load has completed, successfully or not.
  * Default does nothing.
+ *
+ * @param {object} _event The load end event fired
+ *  when a file load has completed, successfully or not.
  */
-dwv.io.RawVideoLoader.prototype.onloadend = function () {};
+dwv.io.RawVideoLoader.prototype.onloadend = function (_event) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event.
  * Default does nothing.
+ *
+ * @param {object} _event The error event.
  */
-dwv.io.RawVideoLoader.prototype.onerror = function (/*event*/) {};
+dwv.io.RawVideoLoader.prototype.onerror = function (_event) {};
 /**
  * Handle an abort event.
- * @param {Object} event The abort event.
  * Default does nothing.
+ *
+ * @param {object} _event The abort event.
  */
-dwv.io.RawVideoLoader.prototype.onabort = function (/*event*/) {};
+dwv.io.RawVideoLoader.prototype.onabort = function (_event) {};
 
 /**
  * Add to Loader list.

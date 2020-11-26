@@ -8,6 +8,7 @@ QUnit.module('image');
 
 /**
  * Tests for {@link dwv.image.range}.
+ *
  * @function module:tests/image~range
  */
 QUnit.test('Test iterator.', function (assert) {
@@ -41,6 +42,7 @@ QUnit.test('Test iterator.', function (assert) {
 
 /**
  * Tests for {@link dwv.image.range3d}.
+ *
  * @function module:tests/image~range3d
  */
 QUnit.test('Test 3 components iterator.', function (assert) {

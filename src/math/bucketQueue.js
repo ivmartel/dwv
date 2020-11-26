@@ -12,9 +12,9 @@ dwv.math = dwv.math || {};
  * If the most recent point had a cost of c, any points added should have a cost
  * c' in the range c <= c' <= c + (capacity - 1).
  *
- * @constructor
- * @input bits
- * @input cost_functor
+ * @class
+ * @param {number} bits Number of bits.
+ * @param {Function} cost_functor The cost functor.
  */
 dwv.math.BucketQueue = function (bits, cost_functor) {
   this.bucketCount = 1 << bits; // # of buckets = 2^bits

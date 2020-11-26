@@ -6,6 +6,9 @@ var _tagsFile = null;
 var _images = null;
 var _generating = false;
 
+/**
+ * @returns {string} The name of the selected pixel generator.
+ */
 function getPixelGeneratorName() {
   var tags = JSON.parse(document.getElementById('tags').value);
   // optional pixel generator (cannot be propagated)
@@ -67,6 +70,11 @@ dwv.test.onGenerate = function () {
   });
 };
 
+/**
+ * @param {string} pixelGeneratorName The name of the pixel generator.
+ * @param {number} sliceNumber The slice to generate.
+ * @returns {Blob} A blob with the slice DICOM data.
+ */
 function generateSlice(pixelGeneratorName, sliceNumber) {
   var numberOfSlices = document.getElementById('numberofslices').value;
 
@@ -109,7 +117,11 @@ dwv.test.onSaveTags = function () {
   element.href = URL.createObjectURL(blob);
 };
 
-// is the JSON valid?
+/**
+ * Is the JSON valid?
+ *
+ * @returns {boolean} True if the tags are a valid JSON.
+ */
 function isValidTags() {
   try {
     JSON.parse(document.getElementById('tags').value);
@@ -159,6 +171,11 @@ dwv.test.onInputImageFiles = function (event) {
     checkTags = dwv.dicom.pixelGenerators[pixGeneratorName].checkTags;
   }
 
+  /**
+   * Handle a reader load event.
+   *
+   * @param {object} event The reader load event.
+   */
   function onReaderLoad(event) {
     var image = new Image();
     image.origin = file.name;

@@ -6,6 +6,8 @@ dwv.dicom = dwv.dicom || {};
  * Get the dwv UID prefix.
  * Issued by Medical Connections Ltd (www.medicalconnections.co.uk)
  *   on 25/10/2017.
+ *
+ * @returns {string} The dwv UID prefix.
  */
 dwv.dicom.getDwvUIDPrefix = function () {
   return '1.2.826.0.1.3680043.9.7278.1.';
@@ -13,9 +15,13 @@ dwv.dicom.getDwvUIDPrefix = function () {
 
 /**
  * Get a UID for a DICOM tag.
+ *
  * @see http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_9.html
  * @see http://dicomiseasy.blogspot.com/2011/12/chapter-4-dicom-objects-in-chapter-3.html
  * @see https://stackoverflow.com/questions/46304306/how-to-generate-unique-dicom-uid
+ *
+ * @param {string} tagName The input tag.
+ * @returns {string} The corresponding UID.
  */
 dwv.dicom.getUID = function (tagName) {
   var uid = dwv.dicom.getDwvUIDPrefix();
@@ -35,8 +41,9 @@ dwv.dicom.getUID = function (tagName) {
 
 /**
  * Return true if the input number is even.
- * @param {Number} number The number to check.
- * @returns {Boolean} True is the number is even.
+ *
+ * @param {number} number The number to check.
+ * @returns {boolean} True is the number is even.
  */
 dwv.dicom.isEven = function (number) {
   return number % 2 === 0;
@@ -44,8 +51,9 @@ dwv.dicom.isEven = function (number) {
 
 /**
  * Is the input VR a non string VR.
- * @param {String} vr The element VR.
- * @retuns True if the VR is a non string one.
+ *
+ * @param {string} vr The element VR.
+ * @returns {boolean} True if the VR is a non string one.
  */
 dwv.dicom.isNonStringVr = function (vr) {
   return vr === 'UN' || vr === 'OB' || vr === 'OW' ||
@@ -56,8 +64,9 @@ dwv.dicom.isNonStringVr = function (vr) {
 
 /**
  * Is the input VR a string VR.
- * @param {String} vr The element VR.
- * @retuns True if the VR is a string one.
+ *
+ * @param {string} vr The element VR.
+ * @returns {boolean} True if the VR is a string one.
  */
 dwv.dicom.isStringVr = function (vr) {
   return !dwv.dicom.isNonStringVr(vr);
@@ -65,8 +74,9 @@ dwv.dicom.isStringVr = function (vr) {
 
 /**
  * Is the input VR a VR that could need padding.
- * @param {String} vr The element VR.
- * @retuns True if the VR needs padding.
+ *
+ * @param {string} vr The element VR.
+ * @returns {boolean} True if the VR needs padding.
  */
 dwv.dicom.isVrToPad = function (vr) {
   return dwv.dicom.isStringVr(vr) || vr === 'OB';
@@ -74,8 +84,9 @@ dwv.dicom.isVrToPad = function (vr) {
 
 /**
  * Get the VR specific padding value.
- * @param {String} vr The element VR.
- * @returns The value used to pad.
+ *
+ * @param {string} vr The element VR.
+ * @returns {boolean} The value used to pad.
  */
 dwv.dicom.getVrPad = function (vr) {
   var pad = 0;
@@ -92,9 +103,10 @@ dwv.dicom.getVrPad = function (vr) {
 /**
  * Pad an input value according to its VR.
  * see http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html
- * @param {Object} element The DICOM element to get the VR from.
- * @param {Object} value The value to pad.
- / @returns The padded value.
+ *
+ * @param {object} element The DICOM element to get the VR from.
+ * @param {object} value The value to pad.
+ * @returns {string} The padded value.
  */
 dwv.dicom.padElementValue = function (element, value) {
   if (typeof value !== 'undefined' && typeof value.length !== 'undefined') {
@@ -123,9 +135,9 @@ dwv.dicom.padElementValue = function (element, value) {
  *   element.href = URL.createObjectURL(blob);
  *   element.download = "anonym.dcm";
  *
- * @constructor
+ * @class
  * @param {Array} buffer The input array buffer.
- * @param {Boolean} isLittleEndian Flag to tell if the data is
+ * @param {boolean} isLittleEndian Flag to tell if the data is
  *   little or big endian.
  */
 dwv.dicom.DataWriter = function (buffer, isLittleEndian) {
@@ -138,99 +150,108 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian) {
   var view = new DataView(buffer);
 
   /**
-     * Write Uint8 data.
-     * @param {Number} byteOffset The offset to start writing from.
-     * @param {Number} value The data to write.
-     * @returns {Number} The new offset position.
-     */
+   * Write Uint8 data.
+   *
+   * @param {number} byteOffset The offset to start writing from.
+   * @param {number} value The data to write.
+   * @returns {number} The new offset position.
+   */
   this.writeUint8 = function (byteOffset, value) {
     view.setUint8(byteOffset, value);
     return byteOffset + Uint8Array.BYTES_PER_ELEMENT;
   };
 
   /**
-     * Write Int8 data.
-     * @param {Number} byteOffset The offset to start writing from.
-     * @param {Number} value The data to write.
-     * @returns {Number} The new offset position.
-     */
+   * Write Int8 data.
+   *
+   * @param {number} byteOffset The offset to start writing from.
+   * @param {number} value The data to write.
+   * @returns {number} The new offset position.
+   */
   this.writeInt8 = function (byteOffset, value) {
     view.setInt8(byteOffset, value);
     return byteOffset + Int8Array.BYTES_PER_ELEMENT;
   };
 
   /**
-     * Write Uint16 data.
-     * @param {Number} byteOffset The offset to start writing from.
-     * @param {Number} value The data to write.
-     * @returns {Number} The new offset position.
-     */
+   * Write Uint16 data.
+   *
+   * @param {number} byteOffset The offset to start writing from.
+   * @param {number} value The data to write.
+   * @returns {number} The new offset position.
+   */
   this.writeUint16 = function (byteOffset, value) {
     view.setUint16(byteOffset, value, isLittleEndian);
     return byteOffset + Uint16Array.BYTES_PER_ELEMENT;
   };
 
   /**
-     * Write Int16 data.
-     * @param {Number} byteOffset The offset to start writing from.
-     * @param {Number} value The data to write.
-     * @returns {Number} The new offset position.
-     */
+   * Write Int16 data.
+   *
+   * @param {number} byteOffset The offset to start writing from.
+   * @param {number} value The data to write.
+   * @returns {number} The new offset position.
+   */
   this.writeInt16 = function (byteOffset, value) {
     view.setInt16(byteOffset, value, isLittleEndian);
     return byteOffset + Int16Array.BYTES_PER_ELEMENT;
   };
 
   /**
-     * Write Uint32 data.
-     * @param {Number} byteOffset The offset to start writing from.
-     * @param {Number} value The data to write.
-     * @returns {Number} The new offset position.
-     */
+   * Write Uint32 data.
+   *
+   * @param {number} byteOffset The offset to start writing from.
+   * @param {number} value The data to write.
+   * @returns {number} The new offset position.
+   */
   this.writeUint32 = function (byteOffset, value) {
     view.setUint32(byteOffset, value, isLittleEndian);
     return byteOffset + Uint32Array.BYTES_PER_ELEMENT;
   };
 
   /**
-     * Write Int32 data.
-     * @param {Number} byteOffset The offset to start writing from.
-     * @param {Number} value The data to write.
-     * @returns {Number} The new offset position.
-     */
+   * Write Int32 data.
+   *
+   * @param {number} byteOffset The offset to start writing from.
+   * @param {number} value The data to write.
+   * @returns {number} The new offset position.
+   */
   this.writeInt32 = function (byteOffset, value) {
     view.setInt32(byteOffset, value, isLittleEndian);
     return byteOffset + Int32Array.BYTES_PER_ELEMENT;
   };
 
   /**
-     * Write Float32 data.
-     * @param {Number} byteOffset The offset to start writing from.
-     * @param {Number} value The data to write.
-     * @returns {Number} The new offset position.
-     */
+   * Write Float32 data.
+   *
+   * @param {number} byteOffset The offset to start writing from.
+   * @param {number} value The data to write.
+   * @returns {number} The new offset position.
+   */
   this.writeFloat32 = function (byteOffset, value) {
     view.setFloat32(byteOffset, value, isLittleEndian);
     return byteOffset + Float32Array.BYTES_PER_ELEMENT;
   };
 
   /**
-     * Write Float64 data.
-     * @param {Number} byteOffset The offset to start writing from.
-     * @param {Number} value The data to write.
-     * @returns {Number} The new offset position.
-     */
+   * Write Float64 data.
+   *
+   * @param {number} byteOffset The offset to start writing from.
+   * @param {number} value The data to write.
+   * @returns {number} The new offset position.
+   */
   this.writeFloat64 = function (byteOffset, value) {
     view.setFloat64(byteOffset, value, isLittleEndian);
     return byteOffset + Float64Array.BYTES_PER_ELEMENT;
   };
 
   /**
-     * Write string data as hexadecimal.
-     * @param {Number} byteOffset The offset to start writing from.
-     * @param {Number} str The padded hexadecimal string to write ('0x####').
-     * @returns {Number} The new offset position.
-     */
+   * Write string data as hexadecimal.
+   *
+   * @param {number} byteOffset The offset to start writing from.
+   * @param {number} str The padded hexadecimal string to write ('0x####').
+   * @returns {number} The new offset position.
+   */
   this.writeHex = function (byteOffset, str) {
     // remove first two chars and parse
     var value = parseInt(str.substr(2), 16);
@@ -239,11 +260,12 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian) {
   };
 
   /**
-     * Write string data.
-     * @param {Number} byteOffset The offset to start writing from.
-     * @param {Number} str The data to write.
-     * @returns {Number} The new offset position.
-     */
+   * Write string data.
+   *
+   * @param {number} byteOffset The offset to start writing from.
+   * @param {number} str The data to write.
+   * @returns {number} The new offset position.
+   */
   this.writeString = function (byteOffset, str) {
     for (var i = 0, len = str.length; i < len; ++i) {
       view.setUint8(byteOffset, str.charCodeAt(i));
@@ -256,9 +278,10 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian) {
 
 /**
  * Write Uint8 array.
- * @param {Number} byteOffset The offset to start writing from.
+ *
+ * @param {number} byteOffset The offset to start writing from.
  * @param {Array} array The array to write.
- * @returns {Number} The new offset position.
+ * @returns {number} The new offset position.
  */
 dwv.dicom.DataWriter.prototype.writeUint8Array = function (byteOffset, array) {
   for (var i = 0, len = array.length; i < len; ++i) {
@@ -269,9 +292,10 @@ dwv.dicom.DataWriter.prototype.writeUint8Array = function (byteOffset, array) {
 
 /**
  * Write Int8 array.
- * @param {Number} byteOffset The offset to start writing from.
+ *
+ * @param {number} byteOffset The offset to start writing from.
  * @param {Array} array The array to write.
- * @returns {Number} The new offset position.
+ * @returns {number} The new offset position.
  */
 dwv.dicom.DataWriter.prototype.writeInt8Array = function (byteOffset, array) {
   for (var i = 0, len = array.length; i < len; ++i) {
@@ -282,9 +306,10 @@ dwv.dicom.DataWriter.prototype.writeInt8Array = function (byteOffset, array) {
 
 /**
  * Write Uint16 array.
- * @param {Number} byteOffset The offset to start writing from.
+ *
+ * @param {number} byteOffset The offset to start writing from.
  * @param {Array} array The array to write.
- * @returns {Number} The new offset position.
+ * @returns {number} The new offset position.
  */
 dwv.dicom.DataWriter.prototype.writeUint16Array = function (byteOffset, array) {
   for (var i = 0, len = array.length; i < len; ++i) {
@@ -295,9 +320,10 @@ dwv.dicom.DataWriter.prototype.writeUint16Array = function (byteOffset, array) {
 
 /**
  * Write Int16 array.
- * @param {Number} byteOffset The offset to start writing from.
+ *
+ * @param {number} byteOffset The offset to start writing from.
  * @param {Array} array The array to write.
- * @returns {Number} The new offset position.
+ * @returns {number} The new offset position.
  */
 dwv.dicom.DataWriter.prototype.writeInt16Array = function (byteOffset, array) {
   for (var i = 0, len = array.length; i < len; ++i) {
@@ -308,9 +334,10 @@ dwv.dicom.DataWriter.prototype.writeInt16Array = function (byteOffset, array) {
 
 /**
  * Write Uint32 array.
- * @param {Number} byteOffset The offset to start writing from.
+ *
+ * @param {number} byteOffset The offset to start writing from.
  * @param {Array} array The array to write.
- * @returns {Number} The new offset position.
+ * @returns {number} The new offset position.
  */
 dwv.dicom.DataWriter.prototype.writeUint32Array = function (byteOffset, array) {
   for (var i = 0, len = array.length; i < len; ++i) {
@@ -321,9 +348,10 @@ dwv.dicom.DataWriter.prototype.writeUint32Array = function (byteOffset, array) {
 
 /**
  * Write Int32 array.
- * @param {Number} byteOffset The offset to start writing from.
+ *
+ * @param {number} byteOffset The offset to start writing from.
  * @param {Array} array The array to write.
- * @returns {Number} The new offset position.
+ * @returns {number} The new offset position.
  */
 dwv.dicom.DataWriter.prototype.writeInt32Array = function (byteOffset, array) {
   for (var i = 0, len = array.length; i < len; ++i) {
@@ -334,9 +362,10 @@ dwv.dicom.DataWriter.prototype.writeInt32Array = function (byteOffset, array) {
 
 /**
  * Write Float32 array.
- * @param {Number} byteOffset The offset to start writing from.
+ *
+ * @param {number} byteOffset The offset to start writing from.
  * @param {Array} array The array to write.
- * @returns {Number} The new offset position.
+ * @returns {number} The new offset position.
  */
 dwv.dicom.DataWriter.prototype.writeFloat32Array = function (
   byteOffset, array) {
@@ -348,9 +377,10 @@ dwv.dicom.DataWriter.prototype.writeFloat32Array = function (
 
 /**
  * Write Float64 array.
- * @param {Number} byteOffset The offset to start writing from.
+ *
+ * @param {number} byteOffset The offset to start writing from.
  * @param {Array} array The array to write.
- * @returns {Number} The new offset position.
+ * @returns {number} The new offset position.
  */
 dwv.dicom.DataWriter.prototype.writeFloat64Array = function (
   byteOffset, array) {
@@ -362,9 +392,10 @@ dwv.dicom.DataWriter.prototype.writeFloat64Array = function (
 
 /**
  * Write string array.
- * @param {Number} byteOffset The offset to start writing from.
+ *
+ * @param {number} byteOffset The offset to start writing from.
  * @param {Array} array The array to write.
- * @returns {Number} The new offset position.
+ * @returns {number} The new offset position.
  */
 dwv.dicom.DataWriter.prototype.writeStringArray = function (byteOffset, array) {
   for (var i = 0, len = array.length; i < len; ++i) {
@@ -380,10 +411,11 @@ dwv.dicom.DataWriter.prototype.writeStringArray = function (byteOffset, array) {
 
 /**
  * Write a list of items.
- * @param {Number} byteOffset The offset to start writing from.
+ *
+ * @param {number} byteOffset The offset to start writing from.
  * @param {Array} items The list of items to write.
- * @param {Boolean} isImplicit Is the DICOM VR implicit?
- * @returns {Number} The new offset position.
+ * @param {boolean} isImplicit Is the DICOM VR implicit?
+ * @returns {number} The new offset position.
  */
 dwv.dicom.DataWriter.prototype.writeDataElementItems = function (
   byteOffset, items, isImplicit) {
@@ -430,11 +462,12 @@ dwv.dicom.DataWriter.prototype.writeDataElementItems = function (
 
 /**
  * Write data with a specific Value Representation (VR).
- * @param {String} vr The data Value Representation (VR).
- * @param {Number} byteOffset The offset to start writing from.
+ *
+ * @param {string} vr The data Value Representation (VR).
+ * @param {number} byteOffset The offset to start writing from.
  * @param {Array} value The array to write.
- * @param {Boolean} isImplicit Is the DICOM VR implicit?
- * @returns {Number} The new offset position.
+ * @param {boolean} isImplicit Is the DICOM VR implicit?
+ * @returns {number} The new offset position.
  */
 dwv.dicom.DataWriter.prototype.writeDataElementValue = function (
   vr, byteOffset, value, isImplicit) {
@@ -497,12 +530,13 @@ dwv.dicom.DataWriter.prototype.writeDataElementValue = function (
 
 /**
  * Write a pixel data element.
- * @param {String} vr The data Value Representation (VR).
- * @param {String} vl The data Value Length (VL).
- * @param {Number} byteOffset The offset to start writing from.
+ *
+ * @param {string} vr The data Value Representation (VR).
+ * @param {string} vl The data Value Length (VL).
+ * @param {number} byteOffset The offset to start writing from.
  * @param {Array} value The array to write.
- * @param {Boolean} isImplicit Is the DICOM VR implicit?
- * @returns {Number} The new offset position.
+ * @param {boolean} isImplicit Is the DICOM VR implicit?
+ * @returns {number} The new offset position.
  */
 dwv.dicom.DataWriter.prototype.writePixelDataElementValue = function (
   vr, vl, byteOffset, value, isImplicit) {
@@ -549,10 +583,11 @@ dwv.dicom.DataWriter.prototype.writePixelDataElementValue = function (
 
 /**
  * Write a data element.
- * @param {Object} element The DICOM data element to write.
- * @param {Number} byteOffset The offset to start writing from.
- * @param {Boolean} isImplicit Is the DICOM VR implicit?
- * @returns {Number} The new offset position.
+ *
+ * @param {object} element The DICOM data element to write.
+ * @param {number} byteOffset The offset to start writing from.
+ * @param {boolean} isImplicit Is the DICOM VR implicit?
+ * @returns {number} The new offset position.
  */
 dwv.dicom.DataWriter.prototype.writeDataElement = function (
   element, byteOffset, isImplicit) {
@@ -622,8 +657,9 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (
 
 /**
  * Is this element an implicit length sequence?
- * @param {Object} element The element to check.
- * @returns {Boolean} True if it is.
+ *
+ * @param {object} element The element to check.
+ * @returns {boolean} True if it is.
  */
 dwv.dicom.isImplicitLengthSequence = function (element) {
   // sequence with no length
@@ -633,8 +669,9 @@ dwv.dicom.isImplicitLengthSequence = function (element) {
 
 /**
  * Is this element an implicit length item?
- * @param {Object} element The element to check.
- * @returns {Boolean} True if it is.
+ *
+ * @param {object} element The element to check.
+ * @returns {boolean} True if it is.
  */
 dwv.dicom.isImplicitLengthItem = function (element) {
   // item with no length
@@ -644,8 +681,9 @@ dwv.dicom.isImplicitLengthItem = function (element) {
 
 /**
  * Is this element an implicit length pixel data?
- * @param {Object} element The element to check.
- * @returns {Boolean} True if it is.
+ *
+ * @param {object} element The element to check.
+ * @returns {boolean} True if it is.
  */
 dwv.dicom.isImplicitLengthPixels = function (element) {
   // pixel data with no length
@@ -655,8 +693,9 @@ dwv.dicom.isImplicitLengthPixels = function (element) {
 
 /**
  * Helper method to flatten an array of typed arrays to 2D typed array
- * @param {Array} array of typed arrays
- * @returns {Object} a typed array containing all values
+ *
+ * @param {Array} initialArray array of typed arrays
+ * @returns {object} a typed array containing all values
  */
 dwv.dicom.flattenArrayOfTypedArrays = function (initialArray) {
   var initialArrayLength = initialArray.length;
@@ -679,7 +718,8 @@ dwv.dicom.flattenArrayOfTypedArrays = function (initialArray) {
 
 /**
  * DICOM writer.
- * @constructor
+ *
+ * @class
  */
 dwv.dicom.DicomWriter = function () {
 
@@ -712,19 +752,19 @@ dwv.dicom.DicomWriter = function () {
   };
 
   /**
-     * Public (modifiable) rules.
-     * Set of objects as:
-     *   name : { action: 'actionName', value: 'optionalValue }
-     * The names are either 'default', tagName or groupName.
-     * Each DICOM element will be checked to see if a rule is applicable.
-     * First checked by tagName and then by groupName,
-     * if nothing is found the default rule is applied.
-     */
+   * Public (modifiable) rules.
+   * Set of objects as:
+   *   name : { action: 'actionName', value: 'optionalValue }
+   * The names are either 'default', tagName or groupName.
+   * Each DICOM element will be checked to see if a rule is applicable.
+   * First checked by tagName and then by groupName,
+   * if nothing is found the default rule is applied.
+   */
   this.rules = defaultRules;
 
   /**
-     * Example anonymisation rules.
-     */
+   * Example anonymisation rules.
+   */
   this.anonymisationRules = {
     'default': {action: 'remove', value: null},
     'PatientName': {action: 'replace', value: 'Anonymized'}, // tag
@@ -736,11 +776,12 @@ dwv.dicom.DicomWriter = function () {
   };
 
   /**
-     * Get the element to write according to the class rules.
-     * Priority order: tagName, groupName, default.
-     * @param {Object} element The element to check
-     * @return {Object} The element to write, can be null.
-     */
+   * Get the element to write according to the class rules.
+   * Priority order: tagName, groupName, default.
+   *
+   * @param {object} element The element to check
+   * @returns {object} The element to write, can be null.
+   */
   this.getElementToWrite = function (element) {
     // get group and tag string name
     var tagName = null;
@@ -774,6 +815,7 @@ dwv.dicom.DicomWriter = function () {
 
 /**
  * Get the ArrayBuffer corresponding to input DICOM elements.
+ *
  * @param {Array} dicomElements The wrapped elements to write.
  * @returns {ArrayBuffer} The elements as a buffer.
  */
@@ -891,7 +933,9 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
 
 /**
  * Fix for broken DICOM elements: Replace "UN" with correct VR if the
- *   element exists in dictionary
+ * element exists in dictionary
+ *
+ * @param {object} element The DICOM element.
  */
 dwv.dicom.checkUnkwownVR = function (element) {
   var dict = dwv.dicom.dictionary;
@@ -910,8 +954,9 @@ dwv.dicom.checkUnkwownVR = function (element) {
 
 /**
  * Get a DICOM element from its tag name (value set separatly).
- * @param {String} tagName The string tag name.
- * @return {Object} The DICOM element.
+ *
+ * @param {string} tagName The string tag name.
+ * @returns {object} The DICOM element.
  */
 dwv.dicom.getDicomElement = function (tagName) {
   var tagGE = dwv.dicom.getGroupElementFromName(tagName);
@@ -926,10 +971,11 @@ dwv.dicom.getDicomElement = function (tagName) {
 
 /**
  * Set a DICOM element value according to its VR (Value Representation).
- * @param {Object} element The DICOM element to set the value.
- * @param {Object} value The value to set.
- * @param {Boolean} isImplicit Does the data use implicit VR?
- * @return {Number} The total element size.
+ *
+ * @param {object} element The DICOM element to set the value.
+ * @param {object} value The value to set.
+ * @param {boolean} isImplicit Does the data use implicit VR?
+ * @returns {number} The total element size.
  */
 dwv.dicom.setElementValue = function (element, value, isImplicit) {
   // byte size of the element

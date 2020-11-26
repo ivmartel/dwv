@@ -7,6 +7,7 @@ QUnit.module('shapes');
 
 /**
  * Tests for {@link dwv.math.Circle}.
+ *
  * @function module:tests/math~Circle
  */
 QUnit.test('Test Circle.', function (assert) {
@@ -24,6 +25,7 @@ QUnit.test('Test Circle.', function (assert) {
 
 /**
  * Tests for {@link dwv.math.Ellipse}.
+ *
  * @function module:tests/math~Ellipse
  */
 QUnit.test('Test Ellipse.', function (assert) {
@@ -43,6 +45,7 @@ QUnit.test('Test Ellipse.', function (assert) {
 
 /**
  * Tests for {@link dwv.math.Line}.
+ *
  * @function module:tests/math~Line
  */
 QUnit.test('Test Line.', function (assert) {
@@ -136,6 +139,7 @@ QUnit.test('Test Line.', function (assert) {
 
 /**
  * Tests for {@link dwv.math.Rectangle}.
+ *
  * @function module:tests/math~Rectangle
  */
 QUnit.test('Test Rectangle.', function (assert) {
@@ -162,6 +166,7 @@ QUnit.test('Test Rectangle.', function (assert) {
 
 /**
  * Tests for {@link dwv.math.ROI}.
+ *
  * @function module:tests/math~ROI
  */
 QUnit.test('Test ROI.', function (assert) {
@@ -184,6 +189,7 @@ QUnit.test('Test ROI.', function (assert) {
 
 /**
  * Tests for {@link dwv.math.Path}.
+ *
  * @function module:tests/math~Path
  */
 QUnit.test('Test Path.', function (assert) {

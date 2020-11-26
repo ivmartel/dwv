@@ -7,7 +7,8 @@ QUnit.module('stats');
 
 /**
  * Tests for {@link dwv.math.Stats.equals}.
- * @function module:tests/math~Stats:equals
+ *
+ * @function module:tests/math~Stats~equals
  */
 QUnit.test('Test Stats equals.', function (assert) {
   var stats0 = new dwv.math.Stats(0, 0, 0, 0);
@@ -20,6 +21,7 @@ QUnit.test('Test Stats equals.', function (assert) {
 
 /**
  * Tests for {@link dwv.math.getStats}.
+ *
  * @function module:tests/math~getStats
  */
 QUnit.test('Test getStats.', function (assert) {
@@ -48,6 +50,7 @@ QUnit.test('Test getStats.', function (assert) {
 
 /**
  * Tests for {@link dwv.math.guid}.
+ *
  * @function module:tests/math~guid
  */
 QUnit.test('Test GUID.', function (assert) {

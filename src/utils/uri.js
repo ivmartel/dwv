@@ -4,7 +4,8 @@ dwv.utils = dwv.utils || {};
 
 /**
  * Get an full object URL from a string uri.
- * @param {String} uri A string representing the url.
+ *
+ * @param {string} uri A string representing the url.
  * @returns {URL} A URL object.
  * WARNING: platform support dependent, see https://caniuse.com/#feat=url
  */
@@ -16,7 +17,8 @@ dwv.utils.getUrlFromUriFull = function (uri) {
 
 /**
  * Get an simple object URL from a string uri.
- * @param {String} uri A string representing the url.
+ *
+ * @param {string} uri A string representing the url.
  * @returns {URL} A simple URL object that exposes 'pathname' and
  *   'searchParams.get()'
  * WARNING: limited functionality, simple nmock of the URL object.
@@ -56,7 +58,8 @@ dwv.utils.getUrlFromUriSimple = function (uri) {
 
 /**
  * Get an object URL from a string uri.
- * @param {String} uri A string representing the url.
+ *
+ * @param {string} uri A string representing the url.
  * @returns {URL} A URL object (full or simple depending upon platform).
  * WANRING: returns an official URL or a simple URL depending on platform,
  *   see https://caniuse.com/#feat=url
@@ -74,12 +77,13 @@ dwv.utils.getUrlFromUri = function (uri) {
 
 /**
  * Split an input URI:
- *  'root?key0=val00&key0=val01&key1=val10' returns
- *  { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }
+ * 'root?key0=val00&key0=val01&key1=val10' returns
+ * { base : root, query : [ key0 : [val00, val01], key1 : val1 ] }
  * Returns an empty object if the input string is not correct (null, empty...)
- *  or if it is not a query string (no question mark).
- * @param {String} inputStr The string to split.
- * @return {Object} The split string.
+ * or if it is not a query string (no question mark).
+ *
+ * @param {string} uri The string to split.
+ * @returns {object} The split string.
  */
 dwv.utils.splitUri = function (uri) {
   // result
@@ -105,8 +109,9 @@ dwv.utils.splitUri = function (uri) {
 /**
  * Get the query part, split into an array, of an input URI.
  * The URI scheme is: 'base?query#fragment'
- * @param {String } uri The input URI.
- * @return {Object} The query part, split into an array, of the input URI.
+ *
+ * @param {string} uri The input URI.
+ * @returns {object} The query part, split into an array, of the input URI.
  */
 dwv.utils.getUriQuery = function (uri) {
   // split
@@ -125,7 +130,8 @@ dwv.utils.getUriQuery = function (uri) {
  *   [dwv root]?input=encodeURIComponent('[manifest file]')&type=manifest
  * or encoded URI with base and key value/pairs:
  *   [dwv root]?input=encodeURIComponent([root]?key0=value0&key1=value1)
- *  @param {String} query The query part to the input URI.
+ *
+ *  @param {string} query The query part to the input URI.
  *  @param {Function} callback The function to call with the decoded file urls.
  */
 dwv.utils.decodeQuery = function (query, callback) {
@@ -141,13 +147,14 @@ dwv.utils.decodeQuery = function (query, callback) {
 /**
  * Decode a Key/Value pair URI. If a key is repeated, the result
  * be an array of base + each key.
- * @param {String} uri The URI to decode.
- * @param {String} replaceMode The key replace more.
+ *
+ * @param {string} uri The URI to decode.
+ * @param {string} replaceMode The key replace more.
  *   replaceMode can be:
  *   - key (default): keep the key
  *   - other than key: do not use the key
  *   'file' is a special case where the '?' of the query is not kept.
- * @return The list of input file urls.
+ * @returns {Array} The list of input file urls.
  */
 dwv.utils.decodeKeyValueUri = function (uri, replaceMode) {
   var result = [];
@@ -218,10 +225,11 @@ dwv.utils.decodeKeyValueUri = function (uri, replaceMode) {
 
 /**
  * Decode a manifest query.
+ *
  * @external XMLHttpRequest
- * @param {Object} query The manifest query: {input, nslices},
- *   with input the input URI and nslices the number of slices.
- * @param {Function} The function to call with the decoded urls.
+ * @param {object} query The manifest query: {input, nslices},
+ * with input the input URI and nslices the number of slices.
+ * @param {Function} callback The function to call with the decoded urls.
  */
 dwv.utils.decodeManifestQuery = function (query, callback) {
   var uri = '';
@@ -251,8 +259,10 @@ dwv.utils.decodeManifestQuery = function (query, callback) {
 
 /**
  * Decode an XML manifest.
- * @param {Object} manifest The manifest to decode.
- * @param {Number} nslices The number of slices to load.
+ *
+ * @param {object} manifest The manifest to decode.
+ * @param {number} nslices The number of slices to load.
+ * @returns {Array} The decoded manifest.
  */
 dwv.utils.decodeManifest = function (manifest, nslices) {
   var result = [];
@@ -298,8 +308,9 @@ dwv.utils.decodeManifest = function (manifest, nslices) {
 
 /**
  * Load from an input uri
- * @param {String} uri The input uri, for example: 'window.location.href'.
- * @param {Object} app The associated app that handles the load.
+ *
+ * @param {string} uri The input uri, for example: 'window.location.href'.
+ * @param {object} app The associated app that handles the load.
  */
 dwv.utils.loadFromUri = function (uri, app) {
   var query = dwv.utils.getUriQuery(uri);
@@ -312,8 +323,9 @@ dwv.utils.loadFromUri = function (uri, app) {
 
 /**
  * Load from an input query
- * @param {Object} query A query derived from an uri.
- * @param {Object} app The associated app that handles the load.
+ *
+ * @param {object} query A query derived from an uri.
+ * @param {object} app The associated app that handles the load.
  */
 dwv.utils.loadFromQuery = function (query, app) {
   // load base

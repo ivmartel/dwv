@@ -21,13 +21,16 @@ var Konva = Konva || {};
  *   - content: window-center, window-width, position, scale,
  *       scaleCenter, translation, drawings
  *   - drawings: array [nslices] with all groups
- * @constructor
+ *
+ * @class
  */
 dwv.State = function () {
   /**
-     * Save the application state as JSON.
-     * @param {Object} app The associated application.
-     */
+   * Save the application state as JSON.
+   *
+   * @param {object} app The associated application.
+   * @returns {string} The state as a JSON string.
+   */
   this.toJSON = function (app) {
     // return a JSON string
     return JSON.stringify({
@@ -43,9 +46,11 @@ dwv.State = function () {
     });
   };
   /**
-     * Load an application state from JSON.
-     * @param {String} json The JSON representation of the state.
-     */
+   * Load an application state from JSON.
+   *
+   * @param {string} json The JSON representation of the state.
+   * @returns {object} The state object.
+   */
   this.fromJSON = function (json) {
     var data = JSON.parse(json);
     var res = null;
@@ -62,10 +67,11 @@ dwv.State = function () {
     return res;
   };
   /**
-     * Load an application state from JSON.
-     * @param {Object} app The app to apply the state to.
-     * @param {Object} data The state data.
-     */
+   * Load an application state from JSON.
+   *
+   * @param {object} app The app to apply the state to.
+   * @param {object} data The state data.
+   */
   this.apply = function (app, data) {
     // display
     app.getViewController().setWindowLevel(
@@ -77,10 +83,12 @@ dwv.State = function () {
     app.setDrawings(data.drawings, data.drawingsDetails);
   };
   /**
-     * Read an application state from an Object in v0.1 format.
-     * @param {Object} data The Object representation of the state.
-     * @private
-     */
+   * Read an application state from an Object in v0.1 format.
+   *
+   * @param {object} data The Object representation of the state.
+   * @returns {object} The state object.
+   * @private
+   */
   function readV01(data) {
     // update drawings
     var v02DAndD = dwv.v01Tov02DrawingsAndDetails(data.drawings);
@@ -89,10 +97,12 @@ dwv.State = function () {
     return data;
   }
   /**
-     * Read an application state from an Object in v0.2 format.
-     * @param {Object} data The Object representation of the state.
-     * @private
-     */
+   * Read an application state from an Object in v0.2 format.
+   *
+   * @param {object} data The Object representation of the state.
+   * @returns {object} The state object.
+   * @private
+   */
   function readV02(data) {
     // update drawings
     data.drawings = dwv.v02Tov03Drawings(data.drawings).toObject();
@@ -100,10 +110,12 @@ dwv.State = function () {
     return data;
   }
   /**
-     * Read an application state from an Object in v0.3 format.
-     * @param {Object} data The Object representation of the state.
-     * @private
-     */
+   * Read an application state from an Object in v0.3 format.
+   *
+   * @param {object} data The Object representation of the state.
+   * @returns {object} The state object.
+   * @private
+   */
   function readV03(data) {
     return data;
   }
@@ -114,7 +126,9 @@ dwv.State = function () {
  * Convert drawings from v0.2 to v0.3.
  * v0.2: one layer per slice/frame
  * v0.3: one layer, one group per slice. setDrawing expects the full stage
+ *
  * @param {Array} drawings An array of drawings.
+ * @returns {object} The layer with the converted drawings.
  */
 dwv.v02Tov03Drawings = function (drawings) {
   // Auxiliar variables
@@ -172,7 +186,9 @@ dwv.v02Tov03Drawings = function (drawings) {
  * Convert drawings from v0.2 to v0.3.
  * v0.1: text on its own
  * v0.2: text as part of label
+ *
  * @param {Array} inputDrawings An array of drawings.
+ * @returns {object} The converted drawings.
  */
 dwv.v01Tov02DrawingsAndDetails = function (inputDrawings) {
   var newDrawings = [];
@@ -317,7 +333,9 @@ dwv.v01Tov02DrawingsAndDetails = function (inputDrawings) {
  * Convert drawing details from v0.2 to v0.3.
  * - v0.2: array [nslices][nframes] with all
  * - v0.3: simple array of objects referenced by draw ids
- * @param {Array} drawings An array of drawing details.
+ *
+ * @param {Array} details An array of drawing details.
+ * @returns {object} The converted drawings.
  */
 dwv.v02Tov03DrawingsDetails = function (details) {
   var res = {};
@@ -344,8 +362,9 @@ dwv.v02Tov03DrawingsDetails = function (details) {
 
 /**
  * Get the hex code of a string colour for a colour used in pre dwv v0.17.
- * @param {String} name The name of a colour.
- * @return {String} The hex representing the colour.
+ *
+ * @param {string} name The name of a colour.
+ * @returns {string} The hex representing the colour.
  */
 dwv.getColourHex = function (name) {
   // default colours used in dwv version < 0.17

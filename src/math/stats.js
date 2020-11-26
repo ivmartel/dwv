@@ -4,38 +4,43 @@ dwv.math = dwv.math || {};
 
 /**
  * Basic statistics
- * @constructor
- * @param {Number} min The minimum value.
- * @param {Number} max The maximum value.
- * @param {Number} mean The mean value.
- * @param {Number} stdDev The standard deviation.
+ *
+ * @class
+ * @param {number} min The minimum value.
+ * @param {number} max The maximum value.
+ * @param {number} mean The mean value.
+ * @param {number} stdDev The standard deviation.
  */
 dwv.math.Stats = function (min, max, mean, stdDev) {
   /**
-     * Get the minimum value.
-     * @return {Number} The minimum value.
-     */
+   * Get the minimum value.
+   *
+   * @returns {number} The minimum value.
+   */
   this.getMin = function () {
     return min;
   };
   /**
-     * Get the maximum value.
-     * @return {Number} The maximum value.
-     */
+   * Get the maximum value.
+   *
+   * @returns {number} The maximum value.
+   */
   this.getMax = function () {
     return max;
   };
   /**
-     * Get the mean value.
-     * @return {Number} The mean value.
-     */
+   * Get the mean value.
+   *
+   * @returns {number} The mean value.
+   */
   this.getMean = function () {
     return mean;
   };
   /**
-     * Get the standard deviation.
-     * @return {Number} The standard deviation.
-     */
+   * Get the standard deviation.
+   *
+   * @returns {number} The standard deviation.
+   */
   this.getStdDev = function () {
     return stdDev;
   };
@@ -43,8 +48,9 @@ dwv.math.Stats = function (min, max, mean, stdDev) {
 
 /**
  * Check for Stats equality.
- * @param {Object} rhs The other Stats object to compare to.
- * @return {Boolean} True if both Stats object are equal.
+ *
+ * @param {object} rhs The other Stats object to compare to.
+ * @returns {boolean} True if both Stats object are equal.
  */
 dwv.math.Stats.prototype.equals = function (rhs) {
   return rhs !== null &&
@@ -56,7 +62,8 @@ dwv.math.Stats.prototype.equals = function (rhs) {
 
 /**
  * Get the stats as an object
- * @return {Object} An object representation of the stats.
+ *
+ * @returns {object} An object representation of the stats.
  */
 dwv.math.Stats.prototype.asObject = function () {
   return {'min': this.getMin(),
@@ -69,6 +76,9 @@ dwv.math.Stats.prototype.asObject = function () {
  * Get the minimum, maximum, mean and standard deviation
  * of an array of values.
  * Note: could use {@link https://github.com/tmcw/simple-statistics}.
+ *
+ * @param {Array} array The array of values to extract stats from.
+ * @returns {dwv.math.Stats} A stats object.
  */
 dwv.math.getStats = function (array) {
   var min = array[0];
@@ -103,6 +113,8 @@ dwv.math.getStats = function (array) {
  * Unique ID generator.
  * See {@link http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript}
  * and this {@link http://stackoverflow.com/a/13403498 answer}.
+ *
+ * @returns {string} A unique ID.
  */
 dwv.math.guid = function () {
   return Math.random().toString(36).substring(2, 15);

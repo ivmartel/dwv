@@ -4,72 +4,82 @@ dwv.io = dwv.io || {};
 
 /**
  * Memory loader.
- * @constructor
+ *
+ * @class
  */
 dwv.io.MemoryLoader = function () {
   /**
-     * Closure to self.
-     * @private
-     * @type Object
-     */
+   * Closure to self.
+   *
+   * @private
+   * @type {object}
+   */
   var self = this;
 
   /**
-     * Input data.
-     * @private
-     * @type Array
-     */
+   * Input data.
+   *
+   * @private
+   * @type {Array}
+   */
   var inputData = null;
 
   /**
-     * Data loader.
-     * @private
-     * @type Object
-     */
+   * Data loader.
+   *
+   * @private
+   * @type {object}
+   */
   var runningLoader = null;
 
   /**
-     * Number of loaded data.
-     * @private
-     * @type Number
-     */
+   * Number of loaded data.
+   *
+   * @private
+   * @type {number}
+   */
   var nLoad = 0;
 
   /**
-     * Number of load end events.
-     * @private
-     * @type Number
-     */
+   * Number of load end events.
+   *
+   * @private
+   * @type {number}
+   */
   var nLoadend = 0;
 
   /**
-     * The default character set (optional).
-     * @private
-     * @type String
-     */
+   * The default character set (optional).
+   *
+   * @private
+   * @type {string}
+   */
   var defaultCharacterSet;
 
   /**
-     * Get the default character set.
-     * @return {String} The default character set.
-     */
+   * Get the default character set.
+   *
+   * @returns {string} The default character set.
+   */
   this.getDefaultCharacterSet = function () {
     return defaultCharacterSet;
   };
 
   /**
-     * Set the default character set.
-     * @param {String} characterSet The character set.
-     */
+   * Set the default character set.
+   *
+   * @param {string} characterSet The character set.
+   */
   this.setDefaultCharacterSet = function (characterSet) {
     defaultCharacterSet = characterSet;
   };
 
   /**
-     * Store the current input.
-     * @param {Object} data The input data.
-     * @private
-     */
+   * Store the current input.
+   *
+   * @param {object} data The input data.
+   * @private
+   */
   function storeInputData(data) {
     inputData = data;
     // reset counters
@@ -80,39 +90,43 @@ dwv.io.MemoryLoader = function () {
   }
 
   /**
-     * Store the launched loader.
-     * @param {Object} loader The launched loader.
-     * @private
-     */
+   * Store the launched loader.
+   *
+   * @param {object} loader The launched loader.
+   * @private
+   */
   function storeLoader(loader) {
     runningLoader = loader;
   }
 
   /**
-     * Clear the stored loader.
-     * @private
-     */
+   * Clear the stored loader.
+   *
+   * @private
+   */
   function clearStoredLoader() {
     runningLoader = null;
   }
 
   /**
-     * Launch a load item event and call addLoad.
-     * @param {Object} event The load data event.
-     * @private
-     */
+   * Launch a load item event and call addLoad.
+   *
+   * @param {object} event The load data event.
+   * @private
+   */
   function addLoadItem(event) {
     self.onloaditem(event);
     addLoad();
   }
 
   /**
-     * Increment the number of loaded data
-     *   and call onload if loaded all data.
-     * @param {Object} event The load data event.
-     * @private
-     */
-  function addLoad(/*event*/) {
+   * Increment the number of loaded data
+   *   and call onload if loaded all data.
+   *
+   * @param {object} _event The load data event.
+   * @private
+   */
+  function addLoad(_event) {
     nLoad++;
     // call self.onload when all is loaded
     // (not using the input event since it is not the
@@ -125,12 +139,13 @@ dwv.io.MemoryLoader = function () {
   }
 
   /**
-     * Increment the counter of load end events
-     *   and run callbacks when all done, erroneus or not.
-     * @param {Object} event The load end event.
-     * @private
-     */
-  function addLoadend(/*event*/) {
+   * Increment the counter of load end events
+   *   and run callbacks when all done, erroneus or not.
+   *
+   * @param {object} _event The load end event.
+   * @private
+   */
+  function addLoadend(_event) {
     nLoadend++;
     // call self.onloadend when all is run
     // (not using the input event since it is not the
@@ -143,9 +158,10 @@ dwv.io.MemoryLoader = function () {
   }
 
   /**
-     * Load a list of buffers.
-     * @param {Array} data The list of buffers to load.
-     */
+   * Load a list of buffers.
+   *
+   * @param {Array} data The list of buffers to load.
+   */
   this.load = function (data) {
     // check input
     if (typeof data === 'undefined' || data.length === 0) {
@@ -219,8 +235,8 @@ dwv.io.MemoryLoader = function () {
   };
 
   /**
-     * Abort a load.
-     */
+   * Abort a load.
+   */
   this.abort = function () {
     // abort loader
     if (runningLoader && runningLoader.isLoading()) {
@@ -232,46 +248,53 @@ dwv.io.MemoryLoader = function () {
 
 /**
  * Handle a load start event.
- * @param {Object} event The load start event.
  * Default does nothing.
+ *
+ * @param {object} _event The load start event.
  */
-dwv.io.MemoryLoader.prototype.onloadstart = function (/*event*/) {};
+dwv.io.MemoryLoader.prototype.onloadstart = function (_event) {};
 /**
  * Handle a load progress event.
- * @param {Object} event The progress event.
  * Default does nothing.
+ *
+ * @param {object} _event The progress event.
  */
-dwv.io.MemoryLoader.prototype.onprogress = function (/*event*/) {};
+dwv.io.MemoryLoader.prototype.onprogress = function (_event) {};
 /**
  * Handle a load item event.
- * @param {Object} event The load item event fired
- *   when a file item has been loaded successfully.
  * Default does nothing.
+ *
+ * @param {object} _event The load item event fired
+ *   when a file item has been loaded successfully.
  */
-dwv.io.MemoryLoader.prototype.onloaditem = function (/*event*/) {};
+dwv.io.MemoryLoader.prototype.onloaditem = function (_event) {};
 /**
  * Handle a load event.
- * @param {Object} event The load event fired
- *   when a file has been loaded successfully.
  * Default does nothing.
+ *
+ * @param {object} _event The load event fired
+ *   when a file has been loaded successfully.
  */
-dwv.io.MemoryLoader.prototype.onload = function (/*event*/) {};
+dwv.io.MemoryLoader.prototype.onload = function (_event) {};
 /**
  * Handle a load end event.
- * @param {Object} event The load end event fired
- *  when a file load has completed, successfully or not.
  * Default does nothing.
+ *
+ * @param {object} _event The load end event fired
+ *  when a file load has completed, successfully or not.
  */
-dwv.io.MemoryLoader.prototype.onloadend = function (/*event*/) {};
+dwv.io.MemoryLoader.prototype.onloadend = function (_event) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event.
  * Default does nothing.
+ *
+ * @param {object} _event The error event.
  */
-dwv.io.MemoryLoader.prototype.onerror = function (/*event*/) {};
+dwv.io.MemoryLoader.prototype.onerror = function (_event) {};
 /**
  * Handle an abort event.
- * @param {Object} event The abort event.
  * Default does nothing.
+ *
+ * @param {object} _event The abort event.
  */
-dwv.io.MemoryLoader.prototype.onabort = function (/*event*/) {};
+dwv.io.MemoryLoader.prototype.onabort = function (_event) {};

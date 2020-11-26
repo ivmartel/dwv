@@ -12,7 +12,9 @@ dwv.image.lut.range_max = 256;
 
 /**
  * Build a LUT of size range_max.
+ *
  * @param {Function} func The i to lut function.
+ * @returns {Array} THe LUT.
  */
 dwv.image.lut.buildLut = function (func) {
   var lut = [];
@@ -24,15 +26,17 @@ dwv.image.lut.buildLut = function (func) {
 
 /**
  * Max function: returns range_max minus one.
- * @param {number} i The input index.
+ *
+ * @param {number} _i The input index.
  * @returns {number} The lut value.
  */
-dwv.image.lut.max = function (/*i*/) {
+dwv.image.lut.max = function (_i) {
   return dwv.image.lut.range_max - 1;
 };
 
 /**
  * Returns range_max minus one for the first third of i, otherwise 0.
+ *
  * @param {number} i The input index.
  * @returns {number} The lut value.
  */
@@ -45,6 +49,7 @@ dwv.image.lut.maxFirstThird = function (i) {
 
 /**
  * Returns range_max minus one from one third to two thirds of i, otherwise 0.
+ *
  * @param {number} i The input index.
  * @returns {number} The lut value.
  */
@@ -58,6 +63,7 @@ dwv.image.lut.maxSecondThird = function (i) {
 
 /**
  * Returns range_max minus one from one third to two thirds of i, otherwise 0.
+ *
  * @param {number} i The input index.
  * @returns {number} The lut value.
  */
@@ -70,6 +76,7 @@ dwv.image.lut.maxThirdThird = function (i) {
 
 /**
  * Ramp to range_max minus one on the first third values.
+ *
  * @param {number} i The input index.
  * @returns {number} The lut value.
  */
@@ -85,6 +92,7 @@ dwv.image.lut.toMaxFirstThird = function (i) {
  * Ramp to range_max minus one on the second third values.
  *  otherwise return 0 for the first third and
  *  range_max minus one for the last third.
+ *
  * @param {number} i The input index.
  * @returns {number} The lut value.
  */
@@ -103,6 +111,7 @@ dwv.image.lut.toMaxSecondThird = function (i) {
 /**
  * Ramp to range_max minus one on the last third values.
  *  otherwise return 0.
+ *
  * @param {number} i The input index.
  * @returns {number} The lut value.
  */
@@ -120,15 +129,17 @@ dwv.image.lut.toMaxThirdThird = function (i) {
 
 /**
  * Returns zero.
- * @param {number} i The input index.
+ *
+ * @param {number} _i The input index.
  * @returns {number} The lut value.
  */
-dwv.image.lut.zero = function (/*i*/) {
+dwv.image.lut.zero = function (_i) {
   return 0;
 };
 
 /**
  * Identity, returns i.
+ *
  * @param {number} i The input index.
  * @returns {number} The lut value.
  */
@@ -138,6 +149,7 @@ dwv.image.lut.id = function (i) {
 
 /**
  * Returns range_max minus one minus i.
+ *
  * @param {number} i The input index.
  * @returns {number} The lut value.
  */

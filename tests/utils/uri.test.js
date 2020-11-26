@@ -8,6 +8,7 @@ QUnit.module('utils');
 /**
  * Tests for {@link dwv.utils.getUrlFromUri}.
  * Test the multiplatform version and the simple one.
+ *
  * @function module:tests/utils~getUrlFromUri
  */
 QUnit.test('Test getUrlFromUri.', function (assert) {
@@ -93,6 +94,7 @@ QUnit.test('Test getUrlFromUri.', function (assert) {
 
 /**
  * Tests for {@link dwv.utils.splitUri}.
+ *
  * @function module:tests/utils~splitUri
  */
 QUnit.test('Test splitUri.', function (assert) {
@@ -151,6 +153,7 @@ QUnit.test('Test splitUri.', function (assert) {
 
 /**
  * Tests for {@link dwv.utils.getUriQuery}.
+ *
  * @function module:tests/utils~getUriQuery
  */
 QUnit.test('Test get URI query.', function (assert) {
@@ -305,6 +308,7 @@ QUnit.test('Test get URI query.', function (assert) {
 
 /**
  * Tests for {@link dwv.utils.decodeManifest}.
+ *
  * @function module:tests/utils~decodeManifest
  */
 QUnit.test('Test decode Manifest.', function (assert) {

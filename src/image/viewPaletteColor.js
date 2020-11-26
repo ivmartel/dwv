@@ -4,11 +4,12 @@ dwv.image = dwv.image || {};
 
 /**
  * Generate image data for 'PALETTE COLOR' photometric interpretation.
+ *
  * @param {Array} array The array to store the outut data
- * @param {Object} image The image to generate the view from.
- * @param {Object} position The position at witch to generate the view.
+ * @param {object} image The image to generate the view from.
+ * @param {object} position The position at witch to generate the view.
  * @param {number} frame The frame number at witch to generate the view.
- * @param {Object} colourMap The colour map.
+ * @param {object} colourMap The colour map.
  */
 dwv.image.generateImageDataPaletteColor = function (
   array, image, position, frame,

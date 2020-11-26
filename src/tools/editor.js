@@ -3,6 +3,7 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 /**
  * The Konva namespace.
+ *
  * @external Konva
  * @see https://konvajs.org/
  */
@@ -10,44 +11,52 @@ var Konva = Konva || {};
 
 /**
  * Shape editor.
- * @constructor
+ *
+ * @param {object} app The associated application.
+ * @class
  */
 dwv.tool.ShapeEditor = function (app) {
   /**
-     * Edited shape.
-     * @private
-     * @type Object
-     */
+   * Edited shape.
+   *
+   * @private
+   * @type {object}
+   */
   var shape = null;
   /**
-     * Edited image. Used for quantification update.
-     * @private
-     * @type Object
-     */
+   * Edited image. Used for quantification update.
+   *
+   * @private
+   * @type {object}
+   */
   var image = null;
   /**
-     * Active flag.
-     * @private
-     * @type Boolean
-     */
+   * Active flag.
+   *
+   * @private
+   * @type {boolean}
+   */
   var isActive = false;
   /**
-     * Update function used by anchors to update the shape.
-     * @private
-     * @type Function
-     */
+   * Update function used by anchors to update the shape.
+   *
+   * @private
+   * @type {Function}
+   */
   var updateFunction = null;
   /**
-     * Draw event callback.
-     * @private
-     * @type Function
-     */
+   * Draw event callback.
+   *
+   * @private
+   * @type {Function}
+   */
   var drawEventCallback = null;
 
   /**
-     * Set the shape to edit.
-     * @param {Object} inshape The shape to edit.
-     */
+   * Set the shape to edit.
+   *
+   * @param {object} inshape The shape to edit.
+   */
   this.setShape = function (inshape) {
     shape = inshape;
     // reset anchors
@@ -58,40 +67,44 @@ dwv.tool.ShapeEditor = function (app) {
   };
 
   /**
-     * Set the associated image.
-     * @param {Object} img The associated image.
-     */
+   * Set the associated image.
+   *
+   * @param {object} img The associated image.
+   */
   this.setImage = function (img) {
     image = img;
   };
 
   /**
-     * Get the edited shape.
-     * @return {Object} The edited shape.
-     */
+   * Get the edited shape.
+   *
+   * @returns {object} The edited shape.
+   */
   this.getShape = function () {
     return shape;
   };
 
   /**
-     * Get the active flag.
-     * @return {Boolean} The active flag.
-     */
+   * Get the active flag.
+   *
+   * @returns {boolean} The active flag.
+   */
   this.isActive = function () {
     return isActive;
   };
 
   /**
-     * Set the draw event callback.
-     * @param {Object} callback The callback.
-     */
+   * Set the draw event callback.
+   *
+   * @param {object} callback The callback.
+   */
   this.setDrawEventCallback = function (callback) {
     drawEventCallback = callback;
   };
 
   /**
-     * Enable the editor. Redraws the layer.
-     */
+   * Enable the editor. Redraws the layer.
+   */
   this.enable = function () {
     isActive = true;
     if (shape) {
@@ -103,8 +116,8 @@ dwv.tool.ShapeEditor = function (app) {
   };
 
   /**
-     * Disable the editor. Redraws the layer.
-     */
+   * Disable the editor. Redraws the layer.
+   */
   this.disable = function () {
     isActive = false;
     if (shape) {
@@ -116,8 +129,8 @@ dwv.tool.ShapeEditor = function (app) {
   };
 
   /**
-     * Reset the anchors.
-     */
+   * Reset the anchors.
+   */
   this.resetAnchors = function () {
     // remove previous controls
     removeAnchors();
@@ -128,10 +141,11 @@ dwv.tool.ShapeEditor = function (app) {
   };
 
   /**
-     * Apply a function on all anchors.
-     * @param {Object} func A f(shape) function.
-     * @private
-     */
+   * Apply a function on all anchors.
+   *
+   * @param {object} func A f(shape) function.
+   * @private
+   */
   function applyFuncToAnchors(func) {
     if (shape && shape.getParent()) {
       var anchors = shape.getParent().find('.anchor');
@@ -140,10 +154,11 @@ dwv.tool.ShapeEditor = function (app) {
   }
 
   /**
-     * Set anchors visibility.
-     * @param {Boolean} flag The visible flag.
-     * @private
-     */
+   * Set anchors visibility.
+   *
+   * @param {boolean} flag The visible flag.
+   * @private
+   */
   function setAnchorsVisible(flag) {
     applyFuncToAnchors(function (anchor) {
       anchor.visible(flag);
@@ -151,9 +166,10 @@ dwv.tool.ShapeEditor = function (app) {
   }
 
   /**
-     * Set anchors active.
-     * @param {Boolean} flag The active (on/off) flag.
-     */
+   * Set anchors active.
+   *
+   * @param {boolean} flag The active (on/off) flag.
+   */
   this.setAnchorsActive = function (flag) {
     var func = null;
     if (flag) {
@@ -169,9 +185,10 @@ dwv.tool.ShapeEditor = function (app) {
   };
 
   /**
-     * Remove anchors.
-     * @private
-     */
+   * Remove anchors.
+   *
+   * @private
+   */
   function removeAnchors() {
     applyFuncToAnchors(function (anchor) {
       anchor.remove();
@@ -179,9 +196,10 @@ dwv.tool.ShapeEditor = function (app) {
   }
 
   /**
-     * Add the shape anchors.
-     * @private
-     */
+   * Add the shape anchors.
+   *
+   * @private
+   */
   function addAnchors() {
     // exit if no shape or no layer
     if (!shape || !shape.getLayer()) {
@@ -257,13 +275,14 @@ dwv.tool.ShapeEditor = function (app) {
   }
 
   /**
-     * Create shape editor controls, i.e. the anchors.
-     * @param {Object} group The group associated with this anchor.
-     * @param {Number} x The X position of the anchor.
-     * @param {Number} y The Y position of the anchor.
-     * @param {Number} id The id of the anchor.
-     * @private
-     */
+   * Create shape editor controls, i.e. the anchors.
+   *
+   * @param {object} group The group associated with this anchor.
+   * @param {number} x The X position of the anchor.
+   * @param {number} y The Y position of the anchor.
+   * @param {number} id The id of the anchor.
+   * @private
+   */
   function addAnchor(group, x, y, id) {
     // anchor shape
     var anchor = new Konva.Circle({
@@ -286,10 +305,12 @@ dwv.tool.ShapeEditor = function (app) {
   }
 
   /**
-     * Get a simple clone of the input anchor.
-     * @param {Object} anchor The anchor to clone.
-     * @private
-     */
+   * Get a simple clone of the input anchor.
+   *
+   * @param {object} anchor The anchor to clone.
+   * @returns {object} A clone of the input anchor.
+   * @private
+   */
   function getClone(anchor) {
     // create closure to properties
     var parent = anchor.getParent();
@@ -314,10 +335,11 @@ dwv.tool.ShapeEditor = function (app) {
   }
 
   /**
-     * Set the anchor on listeners.
-     * @param {Object} anchor The anchor to set on.
-     * @private
-     */
+   * Set the anchor on listeners.
+   *
+   * @param {object} anchor The anchor to set on.
+   * @private
+   */
   function setAnchorOn(anchor) {
     var startAnchor = null;
 
@@ -395,10 +417,11 @@ dwv.tool.ShapeEditor = function (app) {
   }
 
   /**
-     * Set the anchor off listeners.
-     * @param {Object} anchor The anchor to set off.
-     * @private
-     */
+   * Set the anchor off listeners.
+   *
+   * @param {object} anchor The anchor to set off.
+   * @private
+   */
   function setAnchorOff(anchor) {
     anchor.off('dragstart.edit');
     anchor.off('dragmove.edit');

@@ -3,25 +3,30 @@ var dwv = dwv || {};
 
 /**
  * Toolbox controller.
+ *
  * @param {Array} toolList The list of tool objects.
- * @constructor
+ * @class
  */
 dwv.ToolboxController = function (toolList) {
   /**
    * Point converter function
+   *
    * @private
    */
   var displayToIndexConverter = null;
 
   /**
    * Selected tool.
-   * @type Object
+   *
+   * @type {object}
    * @private
    */
   var selectedTool = null;
 
   /**
    * Initialise.
+   *
+   * @param {object} layer The associated layer.
    */
   this.init = function (layer) {
     for (var key in toolList) {
@@ -37,7 +42,8 @@ dwv.ToolboxController = function (toolList) {
 
   /**
    * Get the tool list.
-   * @return {Array} The list of tool objects.
+   *
+   * @returns {Array} The list of tool objects.
    */
   this.getToolList = function () {
     return toolList;
@@ -45,8 +51,9 @@ dwv.ToolboxController = function (toolList) {
 
   /**
    * Check if a tool is in the tool list.
-   * @param {String} name The name to check.
-   * @return {String} The tool list element for the given name.
+   *
+   * @param {string} name The name to check.
+   * @returns {string} The tool list element for the given name.
    */
   this.hasTool = function (name) {
     return this.getToolList()[name];
@@ -54,7 +61,8 @@ dwv.ToolboxController = function (toolList) {
 
   /**
    * Get the selected tool.
-   * @return {Object} The selected tool.
+   *
+   * @returns {object} The selected tool.
    */
   this.getSelectedTool = function () {
     return selectedTool;
@@ -62,8 +70,10 @@ dwv.ToolboxController = function (toolList) {
 
   /**
    * Get the selected tool event handler.
-   * @param {String} eventType The event type, for example
+   *
+   * @param {string} eventType The event type, for example
    *   mousedown, touchstart...
+   * @returns {Function} The event handler.
    */
   this.getSelectedToolEventHandler = function (eventType) {
     return this.getSelectedTool()[eventType];
@@ -71,7 +81,8 @@ dwv.ToolboxController = function (toolList) {
 
   /**
    * Set the selected tool.
-   * @param {String} name The name of the tool.
+   *
+   * @param {string} name The name of the tool.
    */
   this.setSelectedTool = function (name) {
     // check if we have it
@@ -90,7 +101,8 @@ dwv.ToolboxController = function (toolList) {
 
   /**
    * Set the selected shape.
-   * @param {String} name The name of the shape.
+   *
+   * @param {string} name The name of the shape.
    */
   this.setSelectedShape = function (name) {
     this.getSelectedTool().setShapeName(name);
@@ -98,7 +110,8 @@ dwv.ToolboxController = function (toolList) {
 
   /**
    * Set the selected filter.
-   * @param {String} name The name of the filter.
+   *
+   * @param {string} name The name of the filter.
    */
   this.setSelectedFilter = function (name) {
     this.getSelectedTool().setSelectedFilter(name);
@@ -113,7 +126,8 @@ dwv.ToolboxController = function (toolList) {
 
   /**
    * Set the tool line colour.
-   * @param {String} colour The colour.
+   *
+   * @param {string} colour The colour.
    */
   this.setLineColour = function (colour) {
     this.getSelectedTool().setLineColour(colour);
@@ -121,7 +135,8 @@ dwv.ToolboxController = function (toolList) {
 
   /**
    * Set the tool range.
-   * @param {Object} range The new range of the data.
+   *
+   * @param {object} range The new range of the data.
    */
   this.setRange = function (range) {
     // seems like jquery is checking if the method exists before it
@@ -134,7 +149,8 @@ dwv.ToolboxController = function (toolList) {
 
   /**
    * Add canvas mouse and touch listeners.
-   * @param {Object} canvas The canvas to listen to.
+   *
+   * @param {object} canvas The canvas to listen to.
    */
   this.addCanvasListeners = function (canvas) {
     // allow pointer events
@@ -155,7 +171,8 @@ dwv.ToolboxController = function (toolList) {
 
   /**
    * Remove canvas mouse and touch listeners.
-   * @param {Object} canvas The canvas to stop listening to.
+   *
+   * @param {object} canvas The canvas to stop listening to.
    */
   this.removeCanvasListeners = function (canvas) {
     // disable pointer events
@@ -178,7 +195,8 @@ dwv.ToolboxController = function (toolList) {
    * Mou(se) and (T)ouch event handler. This function just determines
    * the mouse/touch position relative to the canvas element.
    * It then passes it to the current tool.
-   * @param {Object} event The event to handle.
+   *
+   * @param {object} event The event to handle.
    * @private
    */
   function onMouch(event) {

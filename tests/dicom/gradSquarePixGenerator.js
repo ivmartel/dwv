@@ -1,7 +1,9 @@
 /**
  * GradSquarePixGenerator
  * Generates pixel data as a small gradient square.
- * @constructor
+ *
+ * @param {object} options The generator options.
+ * @class
  */
 var GradSquarePixGenerator = function (options) {
 
@@ -44,9 +46,10 @@ var GradSquarePixGenerator = function (options) {
 
   /**
    * Get a grey value.
-   * @param {Number} i The column index.
-   * @param {Number} j The row index.
-   * @return {Array} The grey value.
+   *
+   * @param {number} i The column index.
+   * @param {number} j The row index.
+   * @returns {Array} The grey value.
    */
   function getGrey(i, j) {
     var value = background;
@@ -60,9 +63,10 @@ var GradSquarePixGenerator = function (options) {
 
   /**
    * Get RGB values.
-   * @param {Number} i The column index.
-   * @param {Number} j The row index.
-   * @return {Array} The [R,G,B] values.
+   *
+   * @param {number} i The column index.
+   * @param {number} j The row index.
+   * @returns {Array} The [R,G,B] values.
    */
   function getRGB(i, j) {
     var value = 0;

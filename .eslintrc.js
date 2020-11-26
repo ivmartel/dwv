@@ -8,7 +8,13 @@ module.exports = {
   globals: {
     dwv: 'readonly'
   },
-  extends: 'eslint:recommended',
+  plugins: [
+    'jsdoc'
+  ],
+  extends: [
+    'eslint:recommended',
+    'plugin:jsdoc/recommended'
+  ],
   rules: {
     // require triple equal
     // https://eslint.org/docs/rules/eqeqeq
@@ -16,6 +22,10 @@ module.exports = {
     // force semi colon
     // https://eslint.org/docs/rules/semi
     semi: ['error'],
+
+    // allow for some unused args
+    // https://eslint.org/docs/rules/no-unused-vars
+    'no-unused-vars': ['error', {'argsIgnorePattern': '^_'}],
 
     // formatting rules
 

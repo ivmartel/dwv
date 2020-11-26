@@ -5,9 +5,10 @@ dwv.gui.base = dwv.gui.base || {};
 
 /**
  * Ask some text to the user.
- * @param {String} message Text to display to the user.
- * @param {String} defaultText Default value displayed in the text input field.
- * @return {String} Text entered by the user.
+ *
+ * @param {string} message Text to display to the user.
+ * @param {string} defaultText Default value displayed in the text input field.
+ * @returns {string} Text entered by the user.
  */
 dwv.gui.base.prompt = function (message, defaultText) {
   return prompt(message, defaultText);
@@ -15,9 +16,10 @@ dwv.gui.base.prompt = function (message, defaultText) {
 
 /**
  * Get a HTML element associated to a container div.
- * @param {Number} containerDivId The id of the container div.
- * @param {String} name The name or id to find.
- * @return {Object} The found element or null.
+ *
+ * @param {number} containerDivId The id of the container div.
+ * @param {string} name The name or id to find.
+ * @returns {object} The found element or null.
  */
 dwv.gui.base.getElement = function (containerDivId, name) {
   // get by class in the container div

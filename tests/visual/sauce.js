@@ -37,12 +37,13 @@ var saucelabs = new SauceLabs({
 
 /**
  * Launch a sauce GUI test.
+ *
  * @see https://wiki.saucelabs.com/display/DOCS/Platform+Configurator
  *   for saucelabs possibilities.
  * @see http://seleniumhq.github.io/selenium/docs/api/javascript/index.html
  *   for the webdriver API.
  *
- * @param {Object} caps Desired capabilities for the webdriver. Minimum of
+ * @param {object} caps Desired capabilities for the webdriver. Minimum of
  *   {'browserName', 'version', 'platform'}.
  */
 dwv.test.sauceTest = function (caps) {

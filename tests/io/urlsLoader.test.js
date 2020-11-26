@@ -20,9 +20,10 @@ dwv.image.decoderScripts = {
 
 /**
  * Check the events of urls load
- * @param {Object} assert The Qunit assert object.
+ *
+ * @param {object} assert The Qunit assert object.
  * @param {string} id An id for the test.
- * @param {array} data The data to load as a string array.
+ * @param {Array} data The data to load as a string array.
  * @param {number} nData The theoretical number of data.
  * @param {number} nDataOk The theoretical number of data with no error.
  */
@@ -145,6 +146,7 @@ dwv.test.checkLoad = function (assert, id, data, nData, nDataOk) {
 
 /**
  * Tests for {@link dwv.io.UrlsLoader} events with single frame data.
+ *
  * @function module:tests/io~UrlsLoader0
  */
 QUnit.test('Test UrlsLoader events for single frame.', function (assert) {
@@ -187,6 +189,7 @@ QUnit.test('Test UrlsLoader events for single frame.', function (assert) {
 
 /**
  * Tests for {@link dwv.io.UrlsLoader} events with multi frame data.
+ *
  * @function module:tests/io~UrlsLoader1
  */
 QUnit.test('Test UrlsLoader events for multi frame.', function (assert) {
@@ -210,6 +213,7 @@ QUnit.test('Test UrlsLoader events for multi frame.', function (assert) {
 
 /**
  * Tests for {@link dwv.io.UrlsLoader} events with zipped data.
+ *
  * @function module:tests/io~UrlsLoader2
  */
 QUnit.test('Test UrlsLoader events for zipped data.', function (assert) {
@@ -240,6 +244,7 @@ QUnit.test('Test UrlsLoader events for zipped data.', function (assert) {
 
 /**
  * Tests for {@link dwv.io.UrlsLoader} events with DCMDIR data.
+ *
  * @function module:tests/io~UrlsLoader3
  */
 QUnit.test('Test UrlsLoader events for DCMDIR data.', function (assert) {

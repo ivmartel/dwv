@@ -9,7 +9,17 @@ if (typeof Number.EPSILON === 'undefined') {
 
 /**
  * Immutable 3x3 Matrix.
- * @constructor
+ *
+ * @param {number} m00 m[0][0]
+ * @param {number} m01 m[0][1]
+ * @param {number} m02 m[0][2]
+ * @param {number} m10 m[1][0]
+ * @param {number} m11 m[1][1]
+ * @param {number} m12 m[1][2]
+ * @param {number} m20 m[2][0]
+ * @param {number} m21 m[2][1]
+ * @param {number} m22 m[2][2]
+ * @class
  */
 dwv.math.Matrix33 = function (
   m00, m01, m02,
@@ -22,10 +32,12 @@ dwv.math.Matrix33 = function (
   mat[6] = m20; mat[7] = m21; mat[8] = m22;
 
   /**
-     * Get a value of the matrix.
-     * @param {Number} row The row at wich to get the value.
-     * @param {Number} col The column at wich to get the value.
-     */
+   * Get a value of the matrix.
+   *
+   * @param {number} row The row at wich to get the value.
+   * @param {number} col The column at wich to get the value.
+   * @returns {number} The value at the position.
+   */
   this.get = function (row, col) {
     return mat[row * 3 + col];
   };
@@ -33,10 +45,11 @@ dwv.math.Matrix33 = function (
 
 /**
  * Check for Matrix33 equality.
- * @param {Object} rhs The other matrix to compare to.
- * @param {Number} p A numeric expression for the precision to use in check
+ *
+ * @param {object} rhs The other matrix to compare to.
+ * @param {number} p A numeric expression for the precision to use in check
  *   (ex: 0.001). Defaults to Number.EPSILON if not provided.
- * @return {Boolean} True if both matrices are equal.
+ * @returns {boolean} True if both matrices are equal.
  */
 dwv.math.Matrix33.prototype.equals = function (rhs, p) {
   if (typeof p === 'undefined') {
@@ -56,7 +69,8 @@ dwv.math.Matrix33.prototype.equals = function (rhs, p) {
 
 /**
  * Get a string representation of the Matrix33.
- * @return {String} The matrix as a string.
+ *
+ * @returns {string} The matrix as a string.
  */
 dwv.math.Matrix33.prototype.toString = function () {
   return '[' + this.get(0, 0) + ', ' + this.get(0, 1) + ', ' + this.get(0, 2) +
@@ -67,8 +81,9 @@ dwv.math.Matrix33.prototype.toString = function () {
 
 /**
  * Multiply this matrix by a 3D vector.
- * @param {Object} vector3D The input 3D vector
- * @return {Object} The result 3D vector
+ *
+ * @param {object} vector3D The input 3D vector
+ * @returns {object} The result 3D vector
  */
 dwv.math.Matrix33.multiplyVector3D = function (vector3D) {
   // cache matrix values
@@ -88,7 +103,8 @@ dwv.math.Matrix33.multiplyVector3D = function (vector3D) {
 
 /**
  * Create a 3x3 identity matrix.
- * @return {Object} The identity matrix.
+ *
+ * @returns {object} The identity matrix.
  */
 dwv.math.getIdentityMat33 = function () {
   return new dwv.math.Matrix33(

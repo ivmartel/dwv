@@ -3,6 +3,7 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 /**
  * The Konva namespace.
+ *
  * @external Konva
  * @see https://konvajs.org/
  */
@@ -28,74 +29,84 @@ var Konva = Konva || {};
  *    pros: more logical
  *    cons: slice/frame display: 2 loops
  *
- * @constructor
- * @param {Object} app The associated application.
+ * @class
+ * @param {object} app The associated application.
  */
 dwv.tool.Draw = function (app) {
   /**
-     * Closure to self: to be used by event handlers.
-     * @private
-     * @type WindowLevel
-     */
+   * Closure to self: to be used by event handlers.
+   *
+   * @private
+   * @type {dwv.tool.Draw }
+   */
   var self = this;
   /**
-     * Interaction start flag.
-     * @private
-     * @type Boolean
-     */
+   * Interaction start flag.
+   *
+   * @private
+   * @type {boolean}
+   */
   var started = false;
 
   /**
-     * Shape factory list
-     * @type Object
-     */
+   * Shape factory list
+   *
+   * @type {object}
+   */
   this.shapeFactoryList = null;
 
   /**
-     * Current shape factory.
-     * @type Object
-     * @private
-     */
+   * Current shape factory.
+   *
+   * @type {object}
+   * @private
+   */
   var currentFactory = null;
 
   /**
-     * Draw command.
-     * @private
-     * @type Object
-     */
+   * Draw command.
+   *
+   * @private
+   * @type {object}
+   */
   var command = null;
   /**
-     * Current shape group.
-     * @private
-     * @type Object
-     */
+   * Current shape group.
+   *
+   * @private
+   * @type {object}
+   */
   var tmpShapeGroup = null;
 
   /**
-     * Shape name.
-     * @type String
-     */
+   * Shape name.
+   *
+   * @type {string}
+   */
   this.shapeName = 0;
 
   /**
-     * List of points.
-     * @private
-     * @type Array
-     */
+   * List of points.
+   *
+   * @private
+   * @type {Array}
+   */
   var points = [];
 
   /**
-     * Last selected point.
-     * @private
-     * @type Object
-     */
+   * Last selected point.
+   *
+   * @private
+   * @type {object}
+   */
   var lastPoint = null;
 
   /**
-     * Shape editor.
-     * @private
-     * @type Object
-     */
+   * Shape editor.
+   *
+   * @private
+   * @type {object}
+   */
   var shapeEditor = new dwv.tool.ShapeEditor(app);
 
   // associate the event listeners of the editor
@@ -103,10 +114,11 @@ dwv.tool.Draw = function (app) {
   shapeEditor.setDrawEventCallback(fireEvent);
 
   /**
-     * Trash draw: a cross.
-     * @private
-     * @type Object
-     */
+   * Trash draw: a cross.
+   *
+   * @private
+   * @type {object}
+   */
   var trash = new Konva.Group();
 
   // first line of the cross
@@ -125,28 +137,32 @@ dwv.tool.Draw = function (app) {
   trash.add(trashLine2);
 
   /**
-     * Drawing style.
-     * @type Style
-     */
+   * Drawing style.
+   *
+   * @type {dwv.html.Style}
+   */
   this.style = new dwv.html.Style();
 
   /**
-     * Event listeners.
-     * @private
-     */
+   * Event listeners.
+   *
+   * @private
+   */
   var listeners = {};
 
   /**
-     * The associated draw layer.
-     * @private
-     * @type Object
-     */
+   * The associated draw layer.
+   *
+   * @private
+   * @type {object}
+   */
   var drawLayer = null;
 
   /**
-     * Handle mouse down event.
-     * @param {Object} event The mouse down event.
-     */
+   * Handle mouse down event.
+   *
+   * @param {object} event The mouse down event.
+   */
   this.mousedown = function (event) {
     // exit if a draw was started (handle at mouse move or up)
     if (started) {
@@ -192,9 +208,10 @@ dwv.tool.Draw = function (app) {
   };
 
   /**
-     * Handle mouse move event.
-     * @param {Object} event The mouse move event.
-     */
+   * Handle mouse move event.
+   *
+   * @param {object} event The mouse move event.
+   */
   this.mousemove = function (event) {
     // exit if not started draw
     if (!started) {
@@ -222,10 +239,11 @@ dwv.tool.Draw = function (app) {
   };
 
   /**
-     * Handle mouse up event.
-     * @param {Object} event The mouse up event.
-     */
-  this.mouseup = function (/*event*/) {
+   * Handle mouse up event.
+   *
+   * @param {object} _event The mouse up event.
+   */
+  this.mouseup = function (_event) {
     // exit if not started draw
     if (!started) {
       return;
@@ -251,10 +269,11 @@ dwv.tool.Draw = function (app) {
   };
 
   /**
-     * Handle mouse up event.
-     * @param {Object} event The mouse up event.
-     */
-  this.dblclick = function (/*event*/) {
+   * Handle double click event.
+   *
+   * @param {object} _event The mouse up event.
+   */
+  this.dblclick = function (_event) {
     // exit if not started draw
     if (!started) {
       return;
@@ -272,25 +291,28 @@ dwv.tool.Draw = function (app) {
   };
 
   /**
-     * Handle mouse out event.
-     * @param {Object} event The mouse out event.
-     */
+   * Handle mouse out event.
+   *
+   * @param {object} event The mouse out event.
+   */
   this.mouseout = function (event) {
     self.mouseup(event);
   };
 
   /**
-     * Handle touch start event.
-     * @param {Object} event The touch start event.
-     */
+   * Handle touch start event.
+   *
+   * @param {object} event The touch start event.
+   */
   this.touchstart = function (event) {
     self.mousedown(event);
   };
 
   /**
-     * Handle touch move event.
-     * @param {Object} event The touch move event.
-     */
+   * Handle touch move event.
+   *
+   * @param {object} event The touch move event.
+   */
   this.touchmove = function (event) {
     // exit if not started draw
     if (!started) {
@@ -320,17 +342,19 @@ dwv.tool.Draw = function (app) {
   };
 
   /**
-     * Handle touch end event.
-     * @param {Object} event The touch end event.
-     */
+   * Handle touch end event.
+   *
+   * @param {object} event The touch end event.
+   */
   this.touchend = function (event) {
     self.dblclick(event);
   };
 
   /**
-     * Handle key down event.
-     * @param {Object} event The key down event.
-     */
+   * Handle key down event.
+   *
+   * @param {object} event The key down event.
+   */
   this.keydown = function (event) {
     event.context = 'dwv.tool.Draw';
     app.onKeydown(event);
@@ -352,9 +376,10 @@ dwv.tool.Draw = function (app) {
   };
 
   /**
-     * Update the current draw with new points.
-     * @param {Array} tmpPoints The array of new points.
-     */
+   * Update the current draw with new points.
+   *
+   * @param {Array} tmpPoints The array of new points.
+   */
   function onNewPoints(tmpPoints) {
     // remove temporary shape draw
     if (tmpShapeGroup) {
@@ -373,9 +398,10 @@ dwv.tool.Draw = function (app) {
   }
 
   /**
-     * Create the final shape from a point list.
-     * @param {Array} finalPoints The array of points.
-     */
+   * Create the final shape from a point list.
+   *
+   * @param {Array} finalPoints The array of points.
+   */
   function onFinalPoints(finalPoints) {
     // reset temporary shape group
     if (tmpShapeGroup) {
@@ -408,9 +434,10 @@ dwv.tool.Draw = function (app) {
   }
 
   /**
-     * Activate the tool.
-     * @param {Boolean} flag The flag to activate or not.
-     */
+   * Activate the tool.
+   *
+   * @param {boolean} flag The flag to activate or not.
+   */
   this.activate = function (flag) {
     // reset shape display properties
     shapeEditor.disable();
@@ -438,17 +465,18 @@ dwv.tool.Draw = function (app) {
   };
 
   /**
-     * Update the draw layer.
-     */
+   * Update the draw layer.
+   */
   function updateDrawLayer() {
     // activate the draw layer
     renderDrawLayer(true);
   }
 
   /**
-     * Render (or not) the draw layer.
-     * @param {Boolean} visible Set the draw layer visible or not.
-     */
+   * Render (or not) the draw layer.
+   *
+   * @param {boolean} visible Set the draw layer visible or not.
+   */
   function renderDrawLayer(visible) {
 
     drawLayer.listening(visible);
@@ -479,9 +507,10 @@ dwv.tool.Draw = function (app) {
   }
 
   /**
-     * Set shape group off properties.
-     * @param {Object} shapeGroup The shape group to set off.
-     */
+   * Set shape group off properties.
+   *
+   * @param {object} shapeGroup The shape group to set off.
+   */
   function setShapeOff(shapeGroup) {
     // mouse styling
     shapeGroup.off('mouseover');
@@ -495,9 +524,12 @@ dwv.tool.Draw = function (app) {
   }
 
   /**
-     * Get the real position from an event.
-     * @private
-     */
+   * Get the real position from an event.
+   *
+   * @param {object} index The input index.
+   * @returns {object} The reasl position in the image.
+   * @private
+   */
   function getRealPosition(index) {
     var stage = app.getDrawStage();
     return {'x': stage.offset().x + index.x / stage.scale().x,
@@ -505,9 +537,10 @@ dwv.tool.Draw = function (app) {
   }
 
   /**
-     * Set shape group on properties.
-     * @param {Object} shapeGroup The shape group to set on.
-     */
+   * Set shape group on properties.
+   *
+   * @param {object} shapeGroup The shape group to set on.
+   */
   this.setShapeOn = function (shapeGroup) {
     // mouse over styling
     shapeGroup.on('mouseover', function () {
@@ -671,25 +704,27 @@ dwv.tool.Draw = function (app) {
   };
 
   /**
-     * Set the tool options.
-     * @param {Object} options The list of shape names amd classes.
-     */
+   * Set the tool options.
+   *
+   * @param {object} options The list of shape names amd classes.
+   */
   this.setOptions = function (options) {
     // save the options as the shape factory list
     this.shapeFactoryList = options;
   };
 
   /**
-     * Initialise the tool.
-     */
+   * Initialise the tool.
+   */
   this.init = function () {
     // does nothing
   };
 
   /**
    * Add an event listener on the app.
-   * @param {String} type The event type.
-   * @param {Object} listener The method associated with the provided
+   *
+   * @param {string} type The event type.
+   * @param {object} listener The method associated with the provided
    *   event type.
    */
   this.addEventListener = function (type, listener) {
@@ -700,11 +735,12 @@ dwv.tool.Draw = function (app) {
   };
 
   /**
-     * Remove an event listener from the app.
-     * @param {String} type The event type.
-     * @param {Object} listener The method associated with the provided
-     *   event type.
-     */
+   * Remove an event listener from the app.
+   *
+   * @param {string} type The event type.
+   * @param {object} listener The method associated with the provided
+   *   event type.
+   */
   this.removeEventListener = function (type, listener) {
     if (typeof listeners[type] === 'undefined') {
       return;
@@ -717,9 +753,10 @@ dwv.tool.Draw = function (app) {
   };
 
   /**
-     * Set the line colour of the drawing.
-     * @param {String} colour The colour to set.
-     */
+   * Set the line colour of the drawing.
+   *
+   * @param {string} colour The colour to set.
+   */
   this.setLineColour = function (colour) {
     this.style.setLineColour(colour);
   };
@@ -727,10 +764,11 @@ dwv.tool.Draw = function (app) {
   // Private Methods -----------------------------------------------------------
 
   /**
-     * Fire an event: call all associated listeners.
-     * @param {Object} event The event to fire.
-     * @private
-     */
+   * Fire an event: call all associated listeners.
+   *
+   * @param {object} event The event to fire.
+   * @private
+   */
   function fireEvent(event) {
     if (typeof listeners[event.type] === 'undefined') {
       return;
@@ -744,7 +782,8 @@ dwv.tool.Draw = function (app) {
 
 /**
  * Help for this tool.
- * @return {Object} The help content.
+ *
+ * @returns {object} The help content.
  */
 dwv.tool.Draw.prototype.getHelpKeys = function () {
   return {
@@ -761,7 +800,8 @@ dwv.tool.Draw.prototype.getHelpKeys = function () {
 
 /**
  * Set the shape name of the drawing.
- * @param {String} name The name of the shape.
+ *
+ * @param {string} name The name of the shape.
  */
 dwv.tool.Draw.prototype.setShapeName = function (name) {
   // check if we have it
@@ -773,7 +813,9 @@ dwv.tool.Draw.prototype.setShapeName = function (name) {
 
 /**
  * Check if the shape is in the shape list.
- * @param {String} name The name of the shape.
+ *
+ * @param {string} name The name of the shape.
+ * @returns {boolean} True if there is a factory for the shape.
  */
 dwv.tool.Draw.prototype.hasShape = function (name) {
   return this.shapeFactoryList[name];

@@ -4,41 +4,46 @@ dwv.io = dwv.io || {};
 
 /**
  * JSON text loader.
- * @constructor
+ *
+ * @class
  */
 dwv.io.JSONTextLoader = function () {
   // closure to self
   var self = this;
 
   /**
-     * Loading flag.
-     * @private
-     * @type Boolean
-     */
+   * Loading flag.
+   *
+   * @private
+   * @type {boolean}
+   */
   var isLoading = false;
 
   /**
-     * Set the loader options.
-     * @param {Object} opt The input options.
-     */
-  this.setOptions = function (/*opt*/) {
+   * Set the loader options.
+   *
+   * @param {object} _opt The input options.
+   */
+  this.setOptions = function (_opt) {
     // does nothing
   };
 
   /**
-     * Is the load ongoing?
-     * @return {Boolean} True if loading.
-     */
+   * Is the load ongoing?
+   *
+   * @returns {boolean} True if loading.
+   */
   this.isLoading = function () {
     return isLoading;
   };
 
   /**
-     * Load data.
-     * @param {Object} text The input text.
-     * @param {String} origin The data origin.
-     * @param {Number} index The data index.
-     */
+   * Load data.
+   *
+   * @param {object} text The input text.
+   * @param {string} origin The data origin.
+   * @param {number} index The data index.
+   */
   this.load = function (text, origin, index) {
     // set loading flag
     isLoading = true;
@@ -73,8 +78,8 @@ dwv.io.JSONTextLoader = function () {
   };
 
   /**
-     * Abort load: pass to listeners.
-     */
+   * Abort load: pass to listeners.
+   */
   this.abort = function () {
     // reset loading flag
     isLoading = false;
@@ -87,8 +92,9 @@ dwv.io.JSONTextLoader = function () {
 
 /**
  * Check if the loader can load the provided file.
- * @param {Object} file The file to check.
- * @return True if the file can be loaded.
+ *
+ * @param {object} file The file to check.
+ * @returns {boolean} True if the file can be loaded.
  */
 dwv.io.JSONTextLoader.prototype.canLoadFile = function (file) {
   var ext = dwv.utils.getFileExtension(file.name);
@@ -97,8 +103,9 @@ dwv.io.JSONTextLoader.prototype.canLoadFile = function (file) {
 
 /**
  * Check if the loader can load the provided url.
- * @param {String} url The url to check.
- * @return True if the url can be loaded.
+ *
+ * @param {string} url The url to check.
+ * @returns {boolean} True if the url can be loaded.
  */
 dwv.io.JSONTextLoader.prototype.canLoadUrl = function (url) {
   var urlObjext = dwv.utils.getUrlFromUri(url);
@@ -108,7 +115,8 @@ dwv.io.JSONTextLoader.prototype.canLoadUrl = function (url) {
 
 /**
  * Get the file content type needed by the loader.
- * @return One of the 'dwv.io.fileContentTypes'.
+ *
+ * @returns {number} One of the 'dwv.io.fileContentTypes'.
  */
 dwv.io.JSONTextLoader.prototype.loadFileAs = function () {
   return dwv.io.fileContentTypes.Text;
@@ -116,7 +124,8 @@ dwv.io.JSONTextLoader.prototype.loadFileAs = function () {
 
 /**
  * Get the url content type needed by the loader.
- * @return One of the 'dwv.io.urlContentTypes'.
+ *
+ * @returns {number} One of the 'dwv.io.urlContentTypes'.
  */
 dwv.io.JSONTextLoader.prototype.loadUrlAs = function () {
   return dwv.io.urlContentTypes.Text;
@@ -124,42 +133,48 @@ dwv.io.JSONTextLoader.prototype.loadUrlAs = function () {
 
 /**
  * Handle a load start event.
- * @param {Object} event The load start event.
  * Default does nothing.
+ *
+ * @param {object} _event The load start event.
  */
-dwv.io.JSONTextLoader.prototype.onloadstart = function (/*event*/) {};
+dwv.io.JSONTextLoader.prototype.onloadstart = function (_event) {};
 /**
  * Handle a progress event.
- * @param {Object} event The load progress event.
  * Default does nothing.
+ *
+ * @param {object} _event The load progress event.
  */
-dwv.io.JSONTextLoader.prototype.onprogress = function (/*event*/) {};
+dwv.io.JSONTextLoader.prototype.onprogress = function (_event) {};
 /**
  * Handle a load event.
- * @param {Object} event The load event fired
- *   when a file has been loaded successfully.
  * Default does nothing.
+ *
+ * @param {object} _event The load event fired
+ *   when a file has been loaded successfully.
  */
-dwv.io.JSONTextLoader.prototype.onload = function (/*event*/) {};
+dwv.io.JSONTextLoader.prototype.onload = function (_event) {};
 /**
  * Handle an load end event.
- * @param {Object} event The load end event fired
- *  when a file load has completed, successfully or not.
  * Default does nothing.
+ *
+ * @param {object} _event The load end event fired
+ *  when a file load has completed, successfully or not.
  */
-dwv.io.JSONTextLoader.prototype.onloadend = function (/*event*/) {};
+dwv.io.JSONTextLoader.prototype.onloadend = function (_event) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event.
  * Default does nothing.
+ *
+ * @param {object} _event The error event.
  */
-dwv.io.JSONTextLoader.prototype.onerror = function (/*event*/) {};
+dwv.io.JSONTextLoader.prototype.onerror = function (_event) {};
 /**
  * Handle an abort event.
- * @param {Object} event The abort event.
  * Default does nothing.
+ *
+ * @param {object} _event The abort event.
  */
-dwv.io.JSONTextLoader.prototype.onabort = function (/*event*/) {};
+dwv.io.JSONTextLoader.prototype.onabort = function (_event) {};
 
 /**
  * Add to Loader list.

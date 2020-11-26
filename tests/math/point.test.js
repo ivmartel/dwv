@@ -7,6 +7,7 @@ QUnit.module('point');
 
 /**
  * Tests for {@link dwv.math.Point2D}.
+ *
  * @function module:tests/math~Point2D
  */
 QUnit.test('Test Point2D.', function (assert) {
@@ -45,6 +46,7 @@ QUnit.test('Test Point2D.', function (assert) {
 
 /**
  * Tests for {@link dwv.math.FastPoint2D}.
+ *
  * @function module:tests/math~FastPoint2D
  */
 QUnit.test('Test FastPoint2D.', function (assert) {
@@ -72,6 +74,7 @@ QUnit.test('Test FastPoint2D.', function (assert) {
 
 /**
  * Tests for {@link dwv.math.Point3D}.
+ *
  * @function module:tests/math~Point3D
  */
 QUnit.test('Test Point3D.', function (assert) {
@@ -114,6 +117,7 @@ QUnit.test('Test Point3D.', function (assert) {
 
 /**
  * Tests for {@link dwv.math.Index3D}.
+ *
  * @function module:tests/math~Index3D
  */
 QUnit.test('Test Index3D.', function (assert) {

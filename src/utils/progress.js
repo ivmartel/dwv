@@ -6,6 +6,7 @@ dwv.utils = dwv.utils || {};
  * Multiple progresses handler.
  * Stores a multi dimensional list of progresses to allow to
  * calculate a global progress.
+ *
  * @param {Function} callback The function to pass the global progress to.
  */
 dwv.utils.MultiProgressHandler = function (callback) {
@@ -13,35 +14,39 @@ dwv.utils.MultiProgressHandler = function (callback) {
   var self = this;
 
   /**
-     * List of progresses.
-     * First dimension is a list of item for which the progress is recorded,
-     *   for example file names.
-     * Second dimension is a list of possible progresses, for example
-     *   the progress of the download and the progress of the decoding.
-     * @private
-     * @type Array
-     */
+   * List of progresses.
+   * First dimension is a list of item for which the progress is recorded,
+   *   for example file names.
+   * Second dimension is a list of possible progresses, for example
+   *   the progress of the download and the progress of the decoding.
+   *
+   * @private
+   * @type {Array}
+   */
   var progresses = [];
 
   /**
-     * Number of dimensions.
-     * @private
-     * @type Number
-     */
+   * Number of dimensions.
+   *
+   * @private
+   * @type {number}
+   */
   var numberOfDimensions = 2;
 
   /**
-     * Set the number of dimensions.
-     * @param {Number} num The number.
-     */
+   * Set the number of dimensions.
+   *
+   * @param {number} num The number.
+   */
   this.setNumberOfDimensions = function (num) {
     numberOfDimensions = num;
   };
 
   /**
-     * Set the number of data to load.
-     * @param {Number} n The number of data to load.
-     */
+   * Set the number of data to load.
+   *
+   * @param {number} n The number of data to load.
+   */
   this.setNToLoad = function (n) {
     for (var i = 0; i < n; ++i) {
       progresses[i] = [];
@@ -52,10 +57,11 @@ dwv.utils.MultiProgressHandler = function (callback) {
   };
 
   /**
-     * Handle a load progress.
-     * Call the member callback with a global event.
-     * @param {Object} event The progress event.
-     */
+   * Handle a load progress.
+   * Call the member callback with a global event.
+   *
+   * @param {object} event The progress event.
+   */
   this.onprogress = function (event) {
     // check event
     if (!event.lengthComputable) {
@@ -94,11 +100,12 @@ dwv.utils.MultiProgressHandler = function (callback) {
   };
 
   /**
-     * Get the item load percent.
-     * @param {Number} index The index of the item.
-     * @return {Number} The load percentage.
-     * @private
-     */
+   * Get the item load percent.
+   *
+   * @param {number} index The index of the item.
+   * @returns {number} The load percentage.
+   * @private
+   */
   function getItemProgress(index) {
     var sum = 0;
     for (var j = 0; j < numberOfDimensions; ++j) {
@@ -108,10 +115,11 @@ dwv.utils.MultiProgressHandler = function (callback) {
   }
 
   /**
-     * Get the global load percent including the provided one.
-     * @return {Number} The accumulated percentage.
-     * @private
-     */
+   * Get the global load percent including the provided one.
+   *
+   * @returns {number} The accumulated percentage.
+   * @private
+   */
   function getGlobalPercent() {
     var sum = 0;
     var lenprog = progresses.length;
@@ -122,11 +130,12 @@ dwv.utils.MultiProgressHandler = function (callback) {
   }
 
   /**
-     * Create a mono progress event handler.
-     * @param {Number} index The index of the data.
-     * @param {Number} subindex The sub-index of the data.
-     * @param {Mixed} source The progress source.
-     */
+   * Create a mono progress event handler.
+   *
+   * @param {number} index The index of the data.
+   * @param {number} subindex The sub-index of the data.
+   * @returns {Function} A progress handler function.
+   */
   this.getMonoProgressHandler = function (index, subindex) {
     return function (event) {
       event.index = index;
@@ -136,11 +145,12 @@ dwv.utils.MultiProgressHandler = function (callback) {
   };
 
   /**
-     * Create a mono progress event handler with an undefined index.
-     * Warning: The caller handles the progress index.
-     * @param {Number} subindex The sub-index of the data.
-     * @param {Mixed} source The progress source.
-     */
+   * Create a mono progress event handler with an undefined index.
+   * Warning: The caller handles the progress index.
+   *
+   * @param {number} subindex The sub-index of the data.
+   * @returns {Function} A progress handler function.
+   */
   this.getUndefinedMonoProgressHandler = function (subindex) {
     return function (event) {
       event.subindex = subindex;

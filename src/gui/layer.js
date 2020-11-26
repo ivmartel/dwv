@@ -4,115 +4,131 @@ dwv.html = dwv.html || {};
 
 /**
  * Window layer.
- * @constructor
- * @param {String} name The name of the layer.
+ *
+ * @class
+ * @param {object} canvas The associated canvas.
  */
 dwv.html.Layer = function (canvas) {
   /**
-     * A cache of the initial canvas.
-     * @private
-     * @type Object
-     */
+   * A cache of the initial canvas.
+   *
+   * @private
+   * @type {object}
+   */
   var cacheCanvas = null;
   /**
-     * The associated CanvasRenderingContext2D.
-     * @private
-     * @type Object
-     */
+   * The associated CanvasRenderingContext2D.
+   *
+   * @private
+   * @type {object}
+   */
   var context = null;
 
   /**
-     * Get the layer canvas.
-     * @return {Object} The layer canvas.
-     */
+   * Get the layer canvas.
+   *
+   * @returns {object} The layer canvas.
+   */
   this.getCanvas = function () {
     return canvas;
   };
   /**
-     * Get the layer context.
-     * @return {Object} The layer context.
-     */
+   * Get the layer context.
+   *
+   * @returns {object} The layer context.
+   */
   this.getContext = function () {
     return context;
   };
   /**
-     * Get the layer offset on page.
-     * @return {Number} The layer offset on page.
-     */
+   * Get the layer offset on page.
+   *
+   * @returns {number} The layer offset on page.
+   */
   this.getOffset = function () {
     return canvas.offset();
   };
 
   /**
-     * The image data array.
-     * @private
-     * @type Array
-     */
+   * The image data array.
+   *
+   * @private
+   * @type {Array}
+   */
   var imageData = null;
 
   /**
-     * The layer origin.
-     * @private
-     * @type {Object}
-     */
+   * The layer origin.
+   *
+   * @private
+   * @type {object}
+   */
   var origin = {'x': 0, 'y': 0};
   /**
-     * Get the layer origin.
-     * @return {Object} The layer origin as {'x','y'}.
-     */
+   * Get the layer origin.
+   *
+   * @returns {object} The layer origin as {'x','y'}.
+   */
   this.getOrigin = function () {
     return origin;
   };
   /**
-     * The layer zoom.
-     * @private
-     * @type {Object}
-     */
+   * The layer zoom.
+   *
+   * @private
+   * @type {object}
+   */
   var zoom = {'x': 1, 'y': 1};
   /**
-     * Get the layer zoom.
-     * @return {Object} The layer zoom as {'x','y'}.
-     */
+   * Get the layer zoom.
+   *
+   * @returns {object} The layer zoom as {'x','y'}.
+   */
   this.getZoom = function () {
     return zoom;
   };
 
   /**
-     * The layer translation.
-     * @private
-     * @type {Object}
-     */
+   * The layer translation.
+   *
+   * @private
+   * @type {object}
+   */
   var trans = {'x': 0, 'y': 0};
   /**
-     * Get the layer translation.
-     * @return {Object} The layer translation as {'x','y'}.
-     */
+   * Get the layer translation.
+   *
+   * @returns {object} The layer translation as {'x','y'}.
+   */
   this.getTrans = function () {
     return trans;
   };
 
   /**
-     * Set the canvas width.
-     * @param {Number} width The new width.
-     */
+   * Set the canvas width.
+   *
+   * @param {number} width The new width.
+   */
   this.setWidth = function (width) {
     canvas.width = width;
   };
   /**
-     * Set the canvas height.
-     * @param {Number} height The new height.
-     */
+   * Set the canvas height.
+   *
+   * @param {number} height The new height.
+   */
   this.setHeight = function (height) {
     canvas.height = height;
   };
 
   /**
-     * Set the layer zoom.
-     * @param {Number} newZoomX The zoom in the X direction.
-     * @param {Number} newZoomY The zoom in the Y direction.
-     * @param {Number} centerX The zoom center in the X direction.
-     * @param {Number} centerY The zoom center in the Y direction.
-     */
+   * Set the layer zoom.
+   *
+   * @param {number} newZoomX The zoom in the X direction.
+   * @param {number} newZoomY The zoom in the Y direction.
+   * @param {number} centerX The zoom center in the X direction.
+   * @param {number} centerY The zoom center in the Y direction.
+   */
   this.zoom = function (newZoomX, newZoomY, centerX, centerY) {
     // The zoom is the ratio between the differences from the center
     // to the origins:
@@ -131,20 +147,22 @@ dwv.html.Layer = function (canvas) {
   };
 
   /**
-     * Set the layer translation.
-     * Translation is according to the last one.
-     * @param {Number} tx The translation in the X direction.
-     * @param {Number} ty The translation in the Y direction.
-     */
+   * Set the layer translation.
+   * Translation is according to the last one.
+   *
+   * @param {number} tx The translation in the X direction.
+   * @param {number} ty The translation in the Y direction.
+   */
   this.translate = function (tx, ty) {
     trans.x = tx;
     trans.y = ty;
   };
 
   /**
-     * Set the image data array.
-     * @param {Array} data The data array.
-     */
+   * Set the image data array.
+   *
+   * @param {Array} data The data array.
+   */
   this.setImageData = function (data) {
     imageData = data;
     // update the cached canvas
@@ -152,8 +170,10 @@ dwv.html.Layer = function (canvas) {
   };
 
   /**
-     * Reset the layout.
-     */
+   * Reset the layout.
+   *
+   * @param {number} izoom The input zoom.
+   */
   this.resetLayout = function (izoom) {
     origin.x = 0;
     origin.y = 0;
@@ -164,17 +184,20 @@ dwv.html.Layer = function (canvas) {
   };
 
   /**
-     * Transform a display position to an index.
-     */
+   * Transform a display position to an index.
+   *
+   * @param {dwv.Math.Point2D} point2D The point to convert.
+   * @returns {object} The equivalent index.
+   */
   this.displayToIndex = function (point2D) {
     return {'x': ((point2D.x - origin.x) / zoom.x) - trans.x,
       'y': ((point2D.y - origin.y) / zoom.y) - trans.y};
   };
 
   /**
-     * Draw the content (imageData) of the layer.
-     * The imageData variable needs to be set
-     */
+   * Draw the content (imageData) of the layer.
+   * The imageData variable needs to be set
+   */
   this.draw = function () {
     // clear the context: reset the transform first
     // store the current transformation matrix
@@ -198,10 +221,11 @@ dwv.html.Layer = function (canvas) {
   };
 
   /**
-     * Initialise the layer: set the canvas and context
-     * @input {Number} inputWidth The width of the canvas.
-     * @input {Number} inputHeight The height of the canvas.
-     */
+   * Initialise the layer: set the canvas and context
+   *
+   * @param {number} inputWidth The width of the canvas.
+   * @param {number} inputHeight The height of the canvas.
+   */
   this.initialise = function (inputWidth, inputHeight) {
     // find the canvas element
     //canvas = document.getElementById(name);
@@ -234,15 +258,15 @@ dwv.html.Layer = function (canvas) {
   };
 
   /**
-     * Fill the full context with the current style.
-     */
+   * Fill the full context with the current style.
+   */
   this.fillContext = function () {
     context.fillRect(0, 0, canvas.width, canvas.height);
   };
 
   /**
-     * Clear the context and reset the image data.
-     */
+   * Clear the context and reset the image data.
+   */
   this.clear = function () {
     context.clearRect(0, 0, canvas.width, canvas.height);
     imageData = context.getImageData(0, 0, canvas.width, canvas.height);
@@ -250,9 +274,11 @@ dwv.html.Layer = function (canvas) {
   };
 
   /**
-     * Merge two layers.
-     * @input {Layer} layerToMerge The layer to merge. It will also be emptied.
-     */
+   * Merge two layers.
+   *
+   * @param {dwv.html.Layer} layerToMerge The layer to merge.
+   *   It will also be emptied.
+   */
   this.merge = function (layerToMerge) {
     // basic resampling of the merge data to put it at zoom 1:1
     var mergeImageData = layerToMerge.getContext().getImageData(
@@ -286,18 +312,20 @@ dwv.html.Layer = function (canvas) {
   };
 
   /**
-     * Set the line colour for the layer.
-     * @input {String} colour The line colour.
-     */
+   * Set the line colour for the layer.
+   *
+   * @param {string} colour The line colour.
+   */
   this.setLineColour = function (colour) {
     context.fillStyle = colour;
     context.strokeStyle = colour;
   };
 
   /**
-     * Display the layer.
-     * @input {Boolean} val Whether to display the layer or not.
-     */
+   * Display the layer.
+   *
+   * @param {boolean} val Whether to display the layer or not.
+   */
   this.setStyleDisplay = function (val) {
     if (val === true) {
       canvas.style.display = '';
@@ -307,9 +335,10 @@ dwv.html.Layer = function (canvas) {
   };
 
   /**
-     * Check if the layer is visible.
-     * @return {Boolean} True if the layer is visible.
-     */
+   * Check if the layer is visible.
+   *
+   * @returns {boolean} True if the layer is visible.
+   */
   this.isVisible = function () {
     if (canvas.style.display === 'none') {
       return false;
@@ -319,9 +348,10 @@ dwv.html.Layer = function (canvas) {
   };
 
   /**
-     * Align on another layer.
-     * @param {Layer} rhs The layer to align on.
-     */
+   * Align on another layer.
+   *
+   * @param {dwv.html.Layer} rhs The layer to align on.
+   */
   this.align = function (rhs) {
     canvas.style.top = rhs.getCanvas().offsetTop;
     canvas.style.left = rhs.getCanvas().offsetLeft;
@@ -330,8 +360,9 @@ dwv.html.Layer = function (canvas) {
 
 /**
  * Get the offset of an input event.
- * @param {Object} event The event to get the offset from.
- * @return {Array} The array of offsets.
+ *
+ * @param {object} event The event to get the offset from.
+ * @returns {Array} The array of offsets.
  */
 dwv.html.getEventOffset = function (event) {
   var positions = [];

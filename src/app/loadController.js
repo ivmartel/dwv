@@ -3,8 +3,9 @@ var dwv = dwv || {};
 
 /**
  * Load controller.
- * @param {String} defaultCharacterSet The default character set.
- * @constructor
+ *
+ * @param {string} defaultCharacterSet The default character set.
+ * @class
  */
 dwv.LoadController = function (defaultCharacterSet) {
   // closure to self
@@ -16,6 +17,7 @@ dwv.LoadController = function (defaultCharacterSet) {
 
   /**
    * Load a list of files. Can be image files or a state file.
+   *
    * @param {Array} files The list of files to load.
    */
   this.loadFiles = function (files) {
@@ -30,8 +32,9 @@ dwv.LoadController = function (defaultCharacterSet) {
 
   /**
    * Load a list of URLs. Can be image files or a state file.
+   *
    * @param {Array} urls The list of urls to load.
-   * @param {Object} options The load options:
+   * @param {object} options The load options:
    * - requestHeaders: an array of {name, value} to use as request headers.
    * - withCredentials: credentials flag to pass to the request.
    */
@@ -47,6 +50,7 @@ dwv.LoadController = function (defaultCharacterSet) {
 
   /**
    * Load a list of ArrayBuffers.
+   *
    * @param {Array} data The list of ArrayBuffers to load
    *   in the form of [{name: "", filename: "", data: data}].
    */
@@ -71,7 +75,8 @@ dwv.LoadController = function (defaultCharacterSet) {
 
   /**
    * Is the data mono-slice?
-   * @return {Boolean} True if the data only contains one slice.
+   *
+   * @returns {boolean} True if the data only contains one slice.
    */
   this.isMonoSliceData = function () {
     return isMonoSliceData;
@@ -81,6 +86,7 @@ dwv.LoadController = function (defaultCharacterSet) {
 
   /**
    * Load a list of image files.
+   *
    * @param {Array} files The list of image files to load.
    * @private
    */
@@ -93,8 +99,9 @@ dwv.LoadController = function (defaultCharacterSet) {
 
   /**
    * Load a list of image URLs.
+   *
    * @param {Array} urls The list of urls to load.
-   * @param {Object} options The load options:
+   * @param {object} options The load options:
    * - requestHeaders: an array of {name, value} to use as request headers.
    * - withCredentials: credentials flag to pass to the request.
    * @private
@@ -107,10 +114,11 @@ dwv.LoadController = function (defaultCharacterSet) {
   }
 
   /**
-     * Load a State file.
-     * @param {String} file The state file to load.
-     * @private
-     */
+   * Load a State file.
+   *
+   * @param {string} file The state file to load.
+   * @private
+   */
   function loadStateFile(file) {
     // create IO
     var fileIO = new dwv.io.FilesLoader();
@@ -120,8 +128,9 @@ dwv.LoadController = function (defaultCharacterSet) {
 
   /**
    * Load a State url.
-   * @param {String} url The state url to load.
-   * @param {Object} options The load options:
+   *
+   * @param {string} url The state url to load.
+   * @param {object} options The load options:
    * - requestHeaders: an array of {name, value} to use as request headers.
    * - withCredentials: credentials flag to pass to the request.
    * @private
@@ -135,9 +144,10 @@ dwv.LoadController = function (defaultCharacterSet) {
 
   /**
    * Load a list of image data.
+   *
    * @param {Array} data Array of data to load.
-   * @param {Object} loader The data loader.
-   * @param {Object} options Options passed to the final loader.
+   * @param {object} loader The data loader.
+   * @param {object} options Options passed to the final loader.
    * @private
    */
   function loadImageData(data, loader, options) {
@@ -182,9 +192,10 @@ dwv.LoadController = function (defaultCharacterSet) {
 
   /**
    * Load a State data.
+   *
    * @param {Array} data Array of data to load.
-   * @param {Object} loader The data loader.
-   * @param {Object} options Options passed to the final loader.
+   * @param {object} loader The data loader.
+   * @param {object} options Options passed to the final loader.
    * @private
    */
   function loadStateData(data, loader, options) {
@@ -204,9 +215,10 @@ dwv.LoadController = function (defaultCharacterSet) {
   /**
    * Augment a callback event: adds loadtype to the event
    *  passed to a callback.
-   * @param {Object} callback The callback to update.
+   *
+   * @param {object} callback The callback to update.
    * @param {string} loadtype The loadtype property to add to the event.
-   * @returns {Object} A function representing the modified callback.
+   * @returns {object} A function representing the modified callback.
    */
   function augmentCallbackEvent(callback, loadtype) {
     return function (event) {
@@ -219,39 +231,45 @@ dwv.LoadController = function (defaultCharacterSet) {
 
 /**
  * Handle a load start event.
- * @param {Object} event The load start event.
  * Default does nothing.
+ *
+ * @param {object} _event The load start event.
  */
-dwv.LoadController.prototype.onloadstart = function (/*event*/) {};
+dwv.LoadController.prototype.onloadstart = function (_event) {};
 /**
  * Handle a load progress event.
- * @param {Object} event The progress event.
  * Default does nothing.
+ *
+ * @param {object} _event The progress event.
  */
-dwv.LoadController.prototype.onprogress = function (/*event*/) {};
+dwv.LoadController.prototype.onprogress = function (_event) {};
 /**
  * Handle a load event.
- * @param {Object} event The load event fired
- *   when a file has been loaded successfully.
  * Default does nothing.
+ *
+ * @param {object} _event The load event fired
+ *   when a file has been loaded successfully.
  */
-dwv.LoadController.prototype.onload = function (/*event*/) {};
+dwv.LoadController.prototype.onload = function (_event) {};
 /**
  * Handle a load end event.
- * @param {Object} event The load end event fired
- *  when a file load has completed, successfully or not.
  * Default does nothing.
+ *
+ * @param {object} _event The load end event fired
+ *  when a file load has completed, successfully or not.
  */
-dwv.LoadController.prototype.onloadend = function (/*event*/) {};
+dwv.LoadController.prototype.onloadend = function (_event) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event.
  * Default does nothing.
+ *
+ * @param {object} _event The error event.
  */
-dwv.LoadController.prototype.onerror = function (/*event*/) {};
+dwv.LoadController.prototype.onerror = function (_event) {};
 /**
  * Handle an abort event.
- * @param {Object} event The abort event.
  * Default does nothing.
+ *
+ * @param {object} _event The abort event.
  */
-dwv.LoadController.prototype.onabort = function (/*event*/) {};
+dwv.LoadController.prototype.onabort = function (_event) {};

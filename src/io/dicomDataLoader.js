@@ -4,54 +4,61 @@ dwv.io = dwv.io || {};
 
 /**
  * DICOM data loader.
- * @constructor
+ *
+ * @class
  */
 dwv.io.DicomDataLoader = function () {
   // closure to self
   var self = this;
 
   /**
-     * Loader options.
-     * @private
-     * @type Object
-     */
+   * Loader options.
+   *
+   * @private
+   * @type {object}
+   */
   var options = {};
 
   /**
-     * Loading flag.
-     * @private
-     * @type Boolean
-     */
+   * Loading flag.
+   *
+   * @private
+   * @type {boolean}
+   */
   var isLoading = false;
 
   /**
-     * Set the loader options.
-     * @param {Object} opt The input options.
-     */
+   * Set the loader options.
+   *
+   * @param {object} opt The input options.
+   */
   this.setOptions = function (opt) {
     options = opt;
   };
 
   /**
-     * Is the load ongoing?
-     * @return {Boolean} True if loading.
-     */
+   * Is the load ongoing?
+   *
+   * @returns {boolean} True if loading.
+   */
   this.isLoading = function () {
     return isLoading;
   };
 
   /**
-     * DICOM buffer to dwv.image.View (asynchronous)
-     * @private
-     */
+   * DICOM buffer to dwv.image.View (asynchronous)
+   *
+   * @private
+   */
   var db2v = new dwv.image.DicomBufferToView();
 
   /**
-     * Load data.
-     * @param {Object} buffer The DICOM buffer.
-     * @param {String} origin The data origin.
-     * @param {Number} index The data index.
-     */
+   * Load data.
+   *
+   * @param {object} buffer The DICOM buffer.
+   * @param {string} origin The data origin.
+   * @param {number} index The data index.
+   */
   this.load = function (buffer, origin, index) {
     // setup db2v ony once
     if (!isLoading) {
@@ -81,8 +88,8 @@ dwv.io.DicomDataLoader = function () {
   };
 
   /**
-     * Abort load.
-     */
+   * Abort load.
+   */
   this.abort = function () {
     // reset loading flag
     isLoading = false;
@@ -94,8 +101,9 @@ dwv.io.DicomDataLoader = function () {
 
 /**
  * Check if the loader can load the provided file.
- * @param {Object} file The file to check.
- * @return True if the file can be loaded.
+ *
+ * @param {object} file The file to check.
+ * @returns {boolean} True if the file can be loaded.
  */
 dwv.io.DicomDataLoader.prototype.canLoadFile = function (file) {
   var ext = dwv.utils.getFileExtension(file.name);
@@ -110,8 +118,9 @@ dwv.io.DicomDataLoader.prototype.canLoadFile = function (file) {
  *  - the url has a 'contentType' and it is 'application/dicom'
  *    (as in wado urls)
  *  - the url has no 'contentType' and no extension or the extension is 'dcm'
- * @param {String} url The url to check.
- * @return True if the url can be loaded.
+ *
+ * @param {string} url The url to check.
+ * @returns {boolean} True if the url can be loaded.
  */
 dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url) {
   var urlObjext = dwv.utils.getUrlFromUri(url);
@@ -130,7 +139,8 @@ dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url) {
 
 /**
  * Get the file content type needed by the loader.
- * @return One of the 'dwv.io.fileContentTypes'.
+ *
+ * @returns {number} One of the 'dwv.io.fileContentTypes'.
  */
 dwv.io.DicomDataLoader.prototype.loadFileAs = function () {
   return dwv.io.fileContentTypes.ArrayBuffer;
@@ -138,7 +148,8 @@ dwv.io.DicomDataLoader.prototype.loadFileAs = function () {
 
 /**
  * Get the url content type needed by the loader.
- * @return One of the 'dwv.io.urlContentTypes'.
+ *
+ * @returns {number} One of the 'dwv.io.urlContentTypes'.
  */
 dwv.io.DicomDataLoader.prototype.loadUrlAs = function () {
   return dwv.io.urlContentTypes.ArrayBuffer;
@@ -146,49 +157,56 @@ dwv.io.DicomDataLoader.prototype.loadUrlAs = function () {
 
 /**
  * Handle a load start event.
- * @param {Object} event The load start event.
  * Default does nothing.
+ *
+ * @param {object} _event The load start event.
  */
-dwv.io.DicomDataLoader.prototype.onloadstart = function (/*event*/) {};
+dwv.io.DicomDataLoader.prototype.onloadstart = function (_event) {};
 /**
  * Handle a progress event.
- * @param {Object} event The load progress event.
  * Default does nothing.
+ *
+ * @param {object} _event The load progress event.
  */
-dwv.io.DicomDataLoader.prototype.onprogress = function (/*event*/) {};
+dwv.io.DicomDataLoader.prototype.onprogress = function (_event) {};
 /**
  * Handle a load item event.
- * @param {Object} event The load item event fired
- *   when a file item has been loaded successfully.
  * Default does nothing.
+ *
+ * @param {object} _event The load item event fired
+ *   when a file item has been loaded successfully.
  */
-dwv.io.DicomDataLoader.prototype.onloaditem = function (/*event*/) {};
+dwv.io.DicomDataLoader.prototype.onloaditem = function (_event) {};
 /**
  * Handle a load event.
- * @param {Object} event The load event fired
- *   when a file has been loaded successfully.
  * Default does nothing.
+ *
+ * @param {object} _event The load event fired
+ *   when a file has been loaded successfully.
  */
-dwv.io.DicomDataLoader.prototype.onload = function (/*event*/) {};
+dwv.io.DicomDataLoader.prototype.onload = function (_event) {};
 /**
  * Handle an load end event.
- * @param {Object} event The load end event fired
- *  when a file load has completed, successfully or not.
  * Default does nothing.
+ *
+ * @param {object} _event The load end event fired
+ *  when a file load has completed, successfully or not.
  */
-dwv.io.DicomDataLoader.prototype.onloadend = function (/*event*/) {};
+dwv.io.DicomDataLoader.prototype.onloadend = function (_event) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event.
  * Default does nothing.
+ *
+ * @param {object} _event The error event.
  */
-dwv.io.DicomDataLoader.prototype.onerror = function (/*event*/) {};
+dwv.io.DicomDataLoader.prototype.onerror = function (_event) {};
 /**
  * Handle an abort event.
- * @param {Object} event The abort event.
  * Default does nothing.
+ *
+ * @param {object} _event The abort event.
  */
-dwv.io.DicomDataLoader.prototype.onabort = function (/*event*/) {};
+dwv.io.DicomDataLoader.prototype.onabort = function (_event) {};
 
 /**
  * Add to Loader list.

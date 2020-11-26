@@ -3,7 +3,9 @@ var dwv = dwv || {};
 
 /**
  * View controller.
- * @constructor
+ *
+ * @param {dwv.image.View} view The associated view.
+ * @class
  */
 dwv.ViewController = function (view) {
   // closure to self
@@ -12,68 +14,77 @@ dwv.ViewController = function (view) {
   var playerID = null;
 
   /**
-     * Get the window/level presets names.
-     * @return {Array} The presets names.
-     */
+   * Get the window/level presets names.
+   *
+   * @returns {Array} The presets names.
+   */
   this.getWindowLevelPresetsNames = function () {
     return view.getWindowPresetsNames();
   };
 
   /**
-     * Add window/level presets to the view.
-     * @return {Object} The list of presets.
-     */
+   * Add window/level presets to the view.
+   *
+   * @param {object} presets A preset object.
+   * @returns {object} The list of presets.
+   */
   this.addWindowLevelPresets = function (presets) {
     return view.addWindowPresets(presets);
   };
 
   /**
-     * Set the window level to the preset with the input name.
-     * @param {String} name The name of the preset to activate.
-     */
+   * Set the window level to the preset with the input name.
+   *
+   * @param {string} name The name of the preset to activate.
+   */
   this.setWindowLevelPreset = function (name) {
     view.setWindowLevelPreset(name);
   };
 
   /**
-     * Set the window level to the preset with the input id.
-     * @param {Number} id The id of the preset to activate.
-     */
+   * Set the window level to the preset with the input id.
+   *
+   * @param {number} id The id of the preset to activate.
+   */
   this.setWindowLevelPresetById = function (id) {
     view.setWindowLevelPresetById(id);
   };
 
   /**
-     * Check if the controller is playing.
-     * @return {Boolean} True is the controler is playing slices/frames.
-     */
+   * Check if the controller is playing.
+   *
+   * @returns {boolean} True is the controler is playing slices/frames.
+   */
   this.isPlaying = function () {
     return (playerID !== null);
   };
 
   /**
-     * Get the current position.
-     * @return {Object} The position.
-      */
+   * Get the current position.
+   *
+   * @returns {object} The position.
+   */
   this.getCurrentPosition = function () {
     return view.getCurrentPosition();
   };
 
   /**
-     * Set the current position.
-     * @param {Object} pos The position.
-     * @return {Boolean} False if not in bounds.
-      */
+   * Set the current position.
+   *
+   * @param {object} pos The position.
+   * @returns {boolean} False if not in bounds.
+   */
   this.setCurrentPosition = function (pos) {
     return view.setCurrentPosition(pos);
   };
 
   /**
-     * Set the current 2D (i,j) position.
-     * @param {Number} i The column index.
-     * @param {Number} j The row index.
-     * @return {Boolean} False if not in bounds.
-      */
+   * Set the current 2D (i,j) position.
+   *
+   * @param {number} i The column index.
+   * @param {number} j The row index.
+   * @returns {boolean} False if not in bounds.
+   */
   this.setCurrentPosition2D = function (i, j) {
     return view.setCurrentPosition({
       'i': i,
@@ -83,10 +94,11 @@ dwv.ViewController = function (view) {
   };
 
   /**
-     * Set the current slice position.
-     * @param {Number} k The slice index.
-     * @return {Boolean} False if not in bounds.
-      */
+   * Set the current slice position.
+   *
+   * @param {number} k The slice index.
+   * @returns {boolean} False if not in bounds.
+   */
   this.setCurrentSlice = function (k) {
     return view.setCurrentPosition({
       'i': view.getCurrentPosition().i,
@@ -96,59 +108,66 @@ dwv.ViewController = function (view) {
   };
 
   /**
-     * Increment the current slice number.
-     * @return {Boolean} False if not in bounds.
-     */
+   * Increment the current slice number.
+   *
+   * @returns {boolean} False if not in bounds.
+   */
   this.incrementSliceNb = function () {
     return self.setCurrentSlice(view.getCurrentPosition().k + 1);
   };
 
   /**
-     * Decrement the current slice number.
-     * @return {Boolean} False if not in bounds.
-     */
+   * Decrement the current slice number.
+   *
+   * @returns {boolean} False if not in bounds.
+   */
   this.decrementSliceNb = function () {
     return self.setCurrentSlice(view.getCurrentPosition().k - 1);
   };
 
   /**
-     * Get the current frame.
-     * @return {Number} The frame number.
-      */
+   * Get the current frame.
+   *
+   * @returns {number} The frame number.
+   */
   this.getCurrentFrame = function () {
     return view.getCurrentFrame();
   };
 
   /**
-     * Set the current frame.
-     * @param {Number} number The frame number.
-     * @return {Boolean} False if not in bounds.
-      */
+   * Set the current frame.
+   *
+   * @param {number} number The frame number.
+   * @returns {boolean} False if not in bounds.
+   */
   this.setCurrentFrame = function (number) {
     return view.setCurrentFrame(number);
   };
 
   /**
-     * Increment the current frame.
-     * @return {Boolean} False if not in bounds.
-     */
+   * Increment the current frame.
+   *
+   * @returns {boolean} False if not in bounds.
+   */
   this.incrementFrameNb = function () {
     return view.setCurrentFrame(view.getCurrentFrame() + 1);
   };
 
   /**
-     * Decrement the current frame.
-     * @return {Boolean} False if not in bounds.
-     */
+   * Decrement the current frame.
+   *
+   * @returns {boolean} False if not in bounds.
+   */
   this.decrementFrameNb = function () {
     return view.setCurrentFrame(view.getCurrentFrame() - 1);
   };
 
   /**
-     * Go to first slice .
-     * @return {Boolean} False if not in bounds.
-     * @deprecated Use the setCurrentSlice function.
-     */
+   * Go to first slice .
+   *
+   * @returns {boolean} False if not in bounds.
+   * @deprecated Use the setCurrentSlice function.
+   */
   this.goFirstSlice = function () {
     return view.setCurrentPosition({
       'i': view.getCurrentPosition().i,
@@ -158,8 +177,8 @@ dwv.ViewController = function (view) {
   };
 
   /**
-     *
-     */
+   *
+   */
   this.play = function () {
     if (playerID === null) {
       var nSlices = view.getImage().getGeometry().getSize().getNumberOfSlices();
@@ -187,8 +206,8 @@ dwv.ViewController = function (view) {
   };
 
   /**
-      *
-      */
+   *
+   */
   this.stop = function () {
     if (playerID !== null) {
       clearInterval(playerID);
@@ -197,9 +216,10 @@ dwv.ViewController = function (view) {
   };
 
   /**
-     * Get the window/level.
-     * @return {Object} The window center and width.
-     */
+   * Get the window/level.
+   *
+   * @returns {object} The window center and width.
+   */
   this.getWindowLevel = function () {
     return {
       'width': view.getCurrentWindowLut().getWindowLevel().getWidth(),
@@ -208,34 +228,38 @@ dwv.ViewController = function (view) {
   };
 
   /**
-     * Set the window/level.
-     * @param {Number} wc The window center.
-     * @param {Number} ww The window width.
-     */
+   * Set the window/level.
+   *
+   * @param {number} wc The window center.
+   * @param {number} ww The window width.
+   */
   this.setWindowLevel = function (wc, ww) {
     view.setWindowLevel(wc, ww);
   };
 
   /**
-     * Get the colour map.
-     * @return {Object} The colour map.
-     */
+   * Get the colour map.
+   *
+   * @returns {object} The colour map.
+   */
   this.getColourMap = function () {
     return view.getColourMap();
   };
 
   /**
-     * Set the colour map.
-     * @param {Object} colourMap The colour map.
-     */
+   * Set the colour map.
+   *
+   * @param {object} colourMap The colour map.
+   */
   this.setColourMap = function (colourMap) {
     view.setColourMap(colourMap);
   };
 
   /**
-     * Set the colour map from a name.
-     * @param {String} name The name of the colour map to set.
-     */
+   * Set the colour map from a name.
+   *
+   * @param {string} name The name of the colour map to set.
+   */
   this.setColourMapFromName = function (name) {
     // check if we have it
     if (!dwv.tool.colourMaps[name]) {

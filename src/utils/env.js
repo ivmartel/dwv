@@ -5,7 +5,9 @@ dwv.env = dwv.env || {};
 
 /**
  * Local function to ask Modernizr if a property is supported.
- * @parma {String} property The property to test.
+ *
+ * @param {string} property The property to test.
+ * @returns {boolean} True if the env supports the input feature.
  */
 dwv.env.askModernizr = function (property) {
   if (typeof dwv.Modernizr === 'undefined') {
@@ -22,6 +24,8 @@ dwv.env.askModernizr = function (property) {
 /**
  * Browser check for the FileAPI.
  * Assume support for Safari5.
+ *
+ * @returns {boolean} True if the env supports the feature.
  */
 dwv.env.hasFileApi = function () {
   // regular test does not work on Safari 5
@@ -39,6 +43,8 @@ dwv.env.hasFileApi = function () {
 
 /**
  * Browser check for the XMLHttpRequest.
+ *
+ * @returns {boolean} True if the env supports the feature.
  */
 dwv.env.hasXmlHttpRequest = function () {
   return dwv.env.askModernizr('xhrresponsetype') &&
@@ -49,6 +55,8 @@ dwv.env.hasXmlHttpRequest = function () {
 
 /**
  * Browser check for typed array.
+ *
+ * @returns {boolean} True if the env supports the feature.
  */
 dwv.env.hasTypedArray = function () {
   return dwv.env.askModernizr('dataview') &&
@@ -58,6 +66,8 @@ dwv.env.hasTypedArray = function () {
 /**
  * Browser check for input with type='color'.
  * Missing in IE and Safari.
+ *
+ * @returns {boolean} True if the env supports the feature.
  */
 dwv.env.hasInputColor = function () {
   return dwv.env.askModernizr('inputtypes.color');
@@ -66,6 +76,8 @@ dwv.env.hasInputColor = function () {
 /**
  * Browser check for input with type='files' and webkitdirectory flag.
  * Missing in IE and Safari.
+ *
+ * @returns {boolean} True if the env supports the feature.
  */
 dwv.env.hasInputDirectory = function () {
   return dwv.env.askModernizr('fileinputdirectory');
@@ -79,6 +91,8 @@ dwv.env._hasTypedArraySlice =
 /**
  * Browser check for typed array slice method.
  * Missing in Internet Explorer 11.
+ *
+ * @returns {boolean} True if the env supports the feature.
  */
 dwv.env.hasTypedArraySlice = function () {
   return dwv.env._hasTypedArraySlice;
@@ -90,6 +104,8 @@ dwv.env._hasFloat64Array = ('Float64Array' in window);
 /**
  * Browser check for Float64Array array.
  * Missing in PhantomJS 1.9.20 (on Travis).
+ *
+ * @returns {boolean} True if the env supports the feature.
  */
 dwv.env.hasFloat64Array = function () {
   return dwv.env._hasFloat64Array;
@@ -103,6 +119,8 @@ dwv.env._hasClampedArray = ('Uint8ClampedArray' in window);
  * Missing in:
  * - Safari 5.1.7 for Windows
  * - PhantomJS 1.9.20 (on Travis).
+ *
+ * @returns {boolean} True if the env supports the feature.
  */
 dwv.env.hasClampedArray = function () {
   return dwv.env._hasClampedArray;

@@ -7,6 +7,7 @@ QUnit.module('view');
 
 /**
  * Tests for {@link dwv.image.View} listeners.
+ *
  * @function module:tests/image~listeners
  */
 QUnit.test('Test listeners.', function (assert) {
@@ -46,6 +47,7 @@ QUnit.test('Test listeners.', function (assert) {
 
 /**
  * Tests for {@link dwv.image.View} getImage meta.
+ *
  * @function module:tests/image~getMeta
  */
 QUnit.test('Test playback milliseconds.', function (assert) {
@@ -85,6 +87,7 @@ QUnit.test('Test playback milliseconds.', function (assert) {
 
 /**
  * Tests for {@link dwv.image.View} generateImageData MONO.
+ *
  * @function module:tests/image~generateImageDataMONO
  */
 QUnit.test('Test generate data MONO.', function (assert) {
@@ -142,6 +145,7 @@ QUnit.test('Test generate data MONO.', function (assert) {
 
 /**
  * Tests for {@link dwv.image.View} generateImageData RGB.
+ *
  * @function module:tests/image~generateImageDataRGB
  */
 QUnit.test('Test generate data RGB.', function (assert) {
@@ -240,6 +244,7 @@ QUnit.test('Test generate data RGB.', function (assert) {
 
 /**
  * Tests for {@link dwv.image.View} generateImageData timing.
+ *
  * @function module:tests/image~generateImageDataTiming
  */
 QUnit.test('Test generate data timing.', function (assert) {

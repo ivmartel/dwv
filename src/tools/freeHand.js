@@ -4,6 +4,7 @@ dwv.tool = dwv.tool || {};
 dwv.tool.draw = dwv.tool.draw || {};
 /**
  * The Konva namespace.
+ *
  * @external Konva
  * @see https://konvajs.org/
  */
@@ -11,20 +12,23 @@ var Konva = Konva || {};
 
 /**
  * FreeHand factory.
- * @constructor
+ *
+ * @class
  */
 dwv.tool.draw.FreeHandFactory = function () {
   /**
-     * Get the number of points needed to build the shape.
-     * @return {Number} The number of points.
-     */
+   * Get the number of points needed to build the shape.
+   *
+   * @returns {number} The number of points.
+   */
   this.getNPoints = function () {
     return 1000;
   };
   /**
-     * Get the timeout between point storage.
-     * @return {Number} The timeout in milliseconds.
-     */
+   * Get the timeout between point storage.
+   *
+   * @returns {number} The timeout in milliseconds.
+   */
   this.getTimeout = function () {
     return 25;
   };
@@ -32,12 +36,14 @@ dwv.tool.draw.FreeHandFactory = function () {
 
 /**
  * Create a roi shape to be displayed.
+ *
  * @param {Array} points The points from which to extract the line.
- * @param {Object} style The drawing style.
- * @param {Object} image The associated image.
+ * @param {object} style The drawing style.
+ * @param {object} _image The associated image.
+ * @returns {object} The Konva group.
  */
 dwv.tool.draw.FreeHandFactory.prototype.create = function (
-  points, style /*, image*/) {
+  points, style, _image) {
   // points stored the Konvajs way
   var arr = [];
   for (var i = 0; i < points.length; ++i) {
@@ -85,10 +91,11 @@ dwv.tool.draw.FreeHandFactory.prototype.create = function (
 
 /**
  * Update a FreeHand shape.
- * @param {Object} anchor The active anchor.
- * @param {Object} image The associated image.
+ *
+ * @param {object} anchor The active anchor.
+ * @param {object} _image The associated image.
  */
-dwv.tool.draw.UpdateFreeHand = function (anchor /*, image*/) {
+dwv.tool.draw.UpdateFreeHand = function (anchor, _image) {
   // parent group
   var group = anchor.getParent();
   // associated shape

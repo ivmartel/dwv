@@ -7,6 +7,7 @@ QUnit.module('thread');
 
 /**
  * Tests for {@link dwv.utils.ThreadPool}.
+ *
  * @function module:tests/utils~threadPool
  */
 QUnit.test('Test ThreadPool.', function (assert) {

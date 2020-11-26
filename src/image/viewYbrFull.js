@@ -4,9 +4,10 @@ dwv.image = dwv.image || {};
 
 /**
  * Generate image data for 'YBR_FULL' photometric interpretation.
+ *
  * @param {Array} array The array to store the outut data
- * @param {Object} image The image to generate the view from.
- * @param {Object} position The position at witch to generate the view.
+ * @param {object} image The image to generate the view from.
+ * @param {object} position The position at witch to generate the view.
  * @param {number} frame The frame number at witch to generate the view.
  */
 dwv.image.generateImageDataYbrFull = function (

@@ -4,26 +4,29 @@ dwv.dicom = dwv.dicom || {};
 
 /**
  * DicomElements wrapper.
- * @constructor
+ *
+ * @class
  * @param {Array} dicomElements The elements to wrap.
  */
 dwv.dicom.DicomElementsWrapper = function (dicomElements) {
 
   /**
-    * Get a DICOM Element value from a group/element key.
-    * @param {String} groupElementKey The key to retrieve.
-    * @return {Object} The DICOM element.
-    */
+   * Get a DICOM Element value from a group/element key.
+   *
+   * @param {string} groupElementKey The key to retrieve.
+   * @returns {object} The DICOM element.
+   */
   this.getDEFromKey = function (groupElementKey) {
     return dicomElements[groupElementKey];
   };
 
   /**
-    * Get a DICOM Element value from a group/element key.
-    * @param {String} groupElementKey The key to retrieve.
-    * @param {Boolean} asArray Get the value as an Array.
-    * @return {Object} The DICOM element value.
-    */
+   * Get a DICOM Element value from a group/element key.
+   *
+   * @param {string} groupElementKey The key to retrieve.
+   * @param {boolean} asArray Get the value as an Array.
+   * @returns {object} The DICOM element value.
+   */
   this.getFromKey = function (groupElementKey, asArray) {
     // default
     if (typeof asArray === 'undefined') {
@@ -43,9 +46,10 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
   };
 
   /**
-     * Dump the DICOM tags to an array.
-     * @return {Array}
-     */
+   * Dump the DICOM tags to an array.
+   *
+   * @returns {object} The DICOM tags as an object.
+   */
   this.dumpToObject = function () {
     var keys = Object.keys(dicomElements);
     var dict = dwv.dicom.dictionary;
@@ -82,9 +86,10 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
   };
 
   /**
-     * Dump the DICOM tags to a string.
-     * @return {String} The dumped file.
-     */
+   * Dump the DICOM tags to a string.
+   *
+   * @returns {string} The dumped file.
+   */
   this.dump = function () {
     var keys = Object.keys(dicomElements);
     var result = '\n';
@@ -119,9 +124,10 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
 
 /**
  * Get a data element value as a string.
- * @param {Object} dicomElement The DICOM element.
- * @param {Boolean} pretty When set to true, returns a 'pretified' content.
- * @return {String} A string representation of the DICOM element.
+ *
+ * @param {object} dicomElement The DICOM element.
+ * @param {boolean} pretty When set to true, returns a 'pretified' content.
+ * @returns {string} A string representation of the DICOM element.
  */
 dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function (
   dicomElement, pretty) {
@@ -224,7 +230,9 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function (
 
 /**
  * Get a data element value as a string.
- * @param {String} groupElementKey The key to retrieve.
+ *
+ * @param {string} groupElementKey The key to retrieve.
+ * @returns {string} The element as a string.
  */
 dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsStringFromKey =
 function (groupElementKey) {
@@ -233,8 +241,10 @@ function (groupElementKey) {
 
 /**
  * Get a data element as a string.
- * @param {Object} dicomElement The DICOM element.
- * @param {String} prefix A string to prepend this one.
+ *
+ * @param {object} dicomElement The DICOM element.
+ * @param {string} prefix A string to prepend this one.
+ * @returns {string} The element as a string.
  */
 dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
   dicomElement, prefix) {
@@ -432,9 +442,10 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
 
 /**
  * Get a DICOM Element value from a group and an element.
- * @param {Number} group The group.
- * @param {Number} element The element.
- * @return {Object} The DICOM element value.
+ *
+ * @param {number} group The group.
+ * @param {number} element The element.
+ * @returns {object} The DICOM element value.
  */
 dwv.dicom.DicomElementsWrapper.prototype.getFromGroupElement = function (
   group, element) {
@@ -445,8 +456,9 @@ dwv.dicom.DicomElementsWrapper.prototype.getFromGroupElement = function (
 /**
  * Get a DICOM Element value from a tag name.
  * Uses the DICOM dictionary.
- * @param {String} name The tag name.
- * @return {Object} The DICOM element value.
+ *
+ * @param {string} name The tag name.
+ * @returns {object} The DICOM element value.
  */
 dwv.dicom.DicomElementsWrapper.prototype.getFromName = function (name) {
   var value = null;
@@ -462,8 +474,10 @@ dwv.dicom.DicomElementsWrapper.prototype.getFromName = function (name) {
 
 /**
  * Get the file list from a DICOMDIR
- * @param {Object} data The buffer data of the DICOMDIR
- * @return {Array} The file list as an array ordered by STUDY > SERIES > IMAGES.
+ *
+ * @param {object} data The buffer data of the DICOMDIR
+ * @returns {Array} The file list as an array ordered by
+ *   STUDY > SERIES > IMAGES.
  */
 dwv.dicom.getFileListFromDicomDir = function (data) {
   // parse file

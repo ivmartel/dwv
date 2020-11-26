@@ -4,8 +4,9 @@ dwv.utils = dwv.utils || {};
 
 /**
  * Check if the input is a generic object, including arrays.
- * @param {Unknown} unknown The input to check.
- * @return {Boolean} True if the input is an object.
+ *
+ * @param {*} unknown The input to check.
+ * @returns {boolean} True if the input is an object.
  * ref: https://github.com/jashkenas/underscore/blob/1.9.1/underscore.js#L1319-L1323
  */
 dwv.utils.isObject = function (unknown) {
@@ -15,8 +16,9 @@ dwv.utils.isObject = function (unknown) {
 
 /**
  * Check if the input is an array.
- * @param {Unknown} unknown The input to check.
- * @return {Boolean} True if the input is an array.
+ *
+ * @param {*} unknown The input to check.
+ * @returns {boolean} True if the input is an array.
  * ref: https://github.com/jashkenas/underscore/blob/1.9.1/underscore.js#L1313-L1317
  */
 dwv.utils.isArray = function (unknown) {
@@ -25,8 +27,10 @@ dwv.utils.isArray = function (unknown) {
 
 /**
  * Dump an object to an array.
- * @input {Object} obj The input object as: {key0: {}, key1: {}}
- * @return {Array} The corresponding array: [{name: key0, {}}, {name: key1, {}}]
+ *
+ * @param {object} obj The input object as: {key0: {}, key1: {}}
+ * @returns {Array} The corresponding array:
+ *   [{name: key0, {}}, {name: key1, {}}]
  */
 dwv.utils.objectToArray = function (obj) {
   var array = [];
@@ -52,11 +56,12 @@ dwv.utils.objectToArray = function (obj) {
  * { idKey: {valueKey: [0,1,2], merged: true},
  *   key0: {valueKey: {0: "abc", 1: "def", 2: "ghi"},
  *   key1: {valueKey: {0: 33, 1: 44, 2: 55}} }
- * @param {Object} obj1 The first object, can be the result of a previous merge.
- * @param {Object} obj2 The second object.
- * @param {String} idKey The key to use as index for duplicate values.
- * @param {String} valueKey The key to use to access object values.
- * @return {Object} The merged object.
+ *
+ * @param {object} obj1 The first object, can be the result of a previous merge.
+ * @param {object} obj2 The second object.
+ * @param {string} idKey The key to use as index for duplicate values.
+ * @param {string} valueKey The key to use to access object values.
+ * @returns {object} The merged object.
  */
 dwv.utils.mergeObjects = function (obj1, obj2, idKey, valueKey) {
   var res = {};

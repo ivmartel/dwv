@@ -8,6 +8,10 @@ QUnit.module('i18n');
 
 /**
  * Initialise i18n and check it.
+ *
+ * @param {string} language The test language.
+ * @param {Array} keys The language keys.
+ * @param {Function} assert The QUnit assert.
  */
 function checkLanguage(language, keys, assert) {
   var done = assert.async();
@@ -43,6 +47,7 @@ function checkLanguage(language, keys, assert) {
 
 /**
  * Tests for {@link dwv.i18n} with en language.
+ *
  * @function module:tests/utils~i18nEn
  */
 QUnit.test('Test i18n en.', function (assert) {
@@ -52,6 +57,7 @@ QUnit.test('Test i18n en.', function (assert) {
 
 /**
  * Tests for {@link dwv.i18n} with fr language.
+ *
  * @function module:tests/utils~i18nFr
  */
 QUnit.test('Test i18n fr.', function (assert) {

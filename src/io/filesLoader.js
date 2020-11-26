@@ -12,79 +12,90 @@ dwv.io.fileContentTypes = {
 
 /**
  * Files loader.
- * @constructor
+ *
+ * @class
  */
 dwv.io.FilesLoader = function () {
   /**
-     * Closure to self.
-     * @private
-     * @type Object
-     */
+   * Closure to self.
+   *
+   * @private
+   * @type {object}
+   */
   var self = this;
 
   /**
-     * Input data.
-     * @private
-     * @type Array
-     */
+   * Input data.
+   *
+   * @private
+   * @type {Array}
+   */
   var inputData = null;
 
   /**
-     * Array of launched file readers.
-     * @private
-     * @type Array
-     */
+   * Array of launched file readers.
+   *
+   * @private
+   * @type {Array}
+   */
   var readers = [];
 
   /**
-     * Data loader.
-     * @private
-     * @type Object
-     */
+   * Data loader.
+   *
+   * @private
+   * @type {object}
+   */
   var runningLoader = null;
 
   /**
-     * Number of loaded data.
-     * @private
-     * @type Number
-     */
+   * Number of loaded data.
+   *
+   * @private
+   * @type {number}
+   */
   var nLoad = 0;
 
   /**
-     * Number of load end events.
-     * @private
-     * @type Number
-     */
+   * Number of load end events.
+   *
+   * @private
+   * @type {number}
+   */
   var nLoadend = 0;
 
   /**
-     * The default character set (optional).
-     * @private
-     * @type String
-     */
+   * The default character set (optional).
+   *
+   * @private
+   * @type {string}
+   */
   var defaultCharacterSet;
 
   /**
-     * Get the default character set.
-     * @return {String} The default character set.
-     */
+   * Get the default character set.
+   *
+   * @returns {string} The default character set.
+   */
   this.getDefaultCharacterSet = function () {
     return defaultCharacterSet;
   };
 
   /**
-     * Set the default character set.
-     * @param {String} characterSet The character set.
-     */
+   * Set the default character set.
+   *
+   * @param {string} characterSet The character set.
+   */
   this.setDefaultCharacterSet = function (characterSet) {
     defaultCharacterSet = characterSet;
   };
 
   /**
-     * Store the current input.
-     * @param {Object} data The input data.
-     * @private
-     */
+   * Store the current input.
+   *
+   * @param {object} data The input data.
+   * @private
+   */
   function storeInputData(data) {
     inputData = data;
     // reset counters
@@ -96,56 +107,62 @@ dwv.io.FilesLoader = function () {
   }
 
   /**
-     * Store a launched reader.
-     * @param {Object} reader The launched reader.
-     * @private
-     */
+   * Store a launched reader.
+   *
+   * @param {object} reader The launched reader.
+   * @private
+   */
   function storeReader(reader) {
     readers.push(reader);
   }
 
   /**
-     * Clear the stored readers.
-     * @private
-     */
+   * Clear the stored readers.
+   *
+   * @private
+   */
   function clearStoredReaders() {
     readers = [];
   }
 
   /**
-     * Store the launched loader.
-     * @param {Object} loader The launched loader.
-     * @private
-     */
+   * Store the launched loader.
+   *
+   * @param {object} loader The launched loader.
+   * @private
+   */
   function storeLoader(loader) {
     runningLoader = loader;
   }
 
   /**
-     * Clear the stored loader.
-     * @private
-     */
+   * Clear the stored loader.
+   *
+   * @private
+   */
   function clearStoredLoader() {
     runningLoader = null;
   }
 
   /**
-     * Launch a load item event and call addLoad.
-     * @param {Object} event The load data event.
-     * @private
-     */
+   * Launch a load item event and call addLoad.
+   *
+   * @param {object} event The load data event.
+   * @private
+   */
   function addLoadItem(event) {
     self.onloaditem(event);
     addLoad();
   }
 
   /**
-     * Increment the number of loaded data
-     *   and call onload if loaded all data.
-     * @param {Object} event The load data event.
-     * @private
-     */
-  function addLoad(/*event*/) {
+   * Increment the number of loaded data
+   *   and call onload if loaded all data.
+   *
+   * @param {object} _event The load data event.
+   * @private
+   */
+  function addLoad(_event) {
     nLoad++;
     // call self.onload when all is loaded
     // (not using the input event since it is not the
@@ -158,12 +175,13 @@ dwv.io.FilesLoader = function () {
   }
 
   /**
-     * Increment the counter of load end events
-     *   and run callbacks when all done, erroneus or not.
-     * @param {Object} event The load end event.
-     * @private
-     */
-  function addLoadend(/*event*/) {
+   * Increment the counter of load end events
+   *   and run callbacks when all done, erroneus or not.
+   *
+   * @param {object} _event The load end event.
+   * @private
+   */
+  function addLoadend(_event) {
     nLoadend++;
     // call self.onloadend when all is run
     // (not using the input event since it is not the
@@ -177,11 +195,13 @@ dwv.io.FilesLoader = function () {
   }
 
   /**
-     * Augment a callback event with a srouce.
-     * @param {Object} callback The callback to augment its event.
-     * @param {Object} source The source to add to the event.
-     * @private
-     */
+   * Augment a callback event with a srouce.
+   *
+   * @param {object} callback The callback to augment its event.
+   * @param {object} source The source to add to the event.
+   * @returns {Function} The augmented callback.
+   * @private
+   */
   function augmentCallbackEvent(callback, source) {
     return function (event) {
       event.source = source;
@@ -190,9 +210,10 @@ dwv.io.FilesLoader = function () {
   }
 
   /**
-     * Load a list of files.
-     * @param {Array} data The list of files to load.
-     */
+   * Load a list of files.
+   *
+   * @param {Array} data The list of files to load.
+   */
   this.load = function (data) {
     // check input
     if (typeof data === 'undefined' || data.length === 0) {
@@ -267,10 +288,11 @@ dwv.io.FilesLoader = function () {
       }
 
       /**
-             * The file reader.
-             * @external FileReader
-             * @see https://developer.mozilla.org/en-US/docs/Web/API/FileReader
-             */
+       * The file reader.
+       *
+       * @external FileReader
+       * @see https://developer.mozilla.org/en-US/docs/Web/API/FileReader
+       */
       var reader = new FileReader();
       // store reader
       storeReader(reader);
@@ -295,8 +317,8 @@ dwv.io.FilesLoader = function () {
   };
 
   /**
-     * Abort a load.
-     */
+   * Abort a load.
+   */
   this.abort = function () {
     // abort readers
     for (var i = 0; i < readers.length; ++i) {
@@ -315,46 +337,53 @@ dwv.io.FilesLoader = function () {
 
 /**
  * Handle a load start event.
- * @param {Object} event The load start event.
  * Default does nothing.
+ *
+ * @param {object} _event The load start event.
  */
-dwv.io.FilesLoader.prototype.onloadstart = function (/*event*/) {};
+dwv.io.FilesLoader.prototype.onloadstart = function (_event) {};
 /**
  * Handle a load progress event.
- * @param {Object} event The progress event.
  * Default does nothing.
+ *
+ * @param {object} _event The progress event.
  */
-dwv.io.FilesLoader.prototype.onprogress = function (/*event*/) {};
+dwv.io.FilesLoader.prototype.onprogress = function (_event) {};
 /**
  * Handle a load item event.
- * @param {Object} event The load item event fired
- *   when a file item has been loaded successfully.
  * Default does nothing.
+ *
+ * @param {object} _event The load item event fired
+ *   when a file item has been loaded successfully.
  */
-dwv.io.FilesLoader.prototype.onloaditem = function (/*event*/) {};
+dwv.io.FilesLoader.prototype.onloaditem = function (_event) {};
 /**
  * Handle a load event.
- * @param {Object} event The load event fired
- *   when a file has been loaded successfully.
  * Default does nothing.
+ *
+ * @param {object} _event The load event fired
+ *   when a file has been loaded successfully.
  */
-dwv.io.FilesLoader.prototype.onload = function (/*event*/) {};
+dwv.io.FilesLoader.prototype.onload = function (_event) {};
 /**
  * Handle a load end event.
- * @param {Object} event The load end event fired
- *  when a file load has completed, successfully or not.
  * Default does nothing.
+ *
+ * @param {object} _event The load end event fired
+ *  when a file load has completed, successfully or not.
  */
-dwv.io.FilesLoader.prototype.onloadend = function (/*event*/) {};
+dwv.io.FilesLoader.prototype.onloadend = function (_event) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event.
  * Default does nothing.
+ *
+ * @param {object} _event The error event.
  */
-dwv.io.FilesLoader.prototype.onerror = function (/*event*/) {};
+dwv.io.FilesLoader.prototype.onerror = function (_event) {};
 /**
  * Handle an abort event.
- * @param {Object} event The abort event.
  * Default does nothing.
+ *
+ * @param {object} _event The abort event.
  */
-dwv.io.FilesLoader.prototype.onabort = function (/*event*/) {};
+dwv.io.FilesLoader.prototype.onabort = function (_event) {};

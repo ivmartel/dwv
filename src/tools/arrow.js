@@ -6,6 +6,7 @@ dwv.tool = dwv.tool || {};
 dwv.tool.draw = dwv.tool.draw || {};
 /**
  * The Konva namespace.
+ *
  * @external Konva
  * @see https://konvajs.org/
  */
@@ -13,20 +14,23 @@ var Konva = Konva || {};
 
 /**
  * Arrow factory.
- * @constructor
+ *
+ * @class
  */
 dwv.tool.draw.ArrowFactory = function () {
   /**
-     * Get the number of points needed to build the shape.
-     * @return {Number} The number of points.
-     */
+   * Get the number of points needed to build the shape.
+   *
+   * @returns {number} The number of points.
+   */
   this.getNPoints = function () {
     return 2;
   };
   /**
-     * Get the timeout between point storage.
-     * @return {Number} The timeout in milliseconds.
-     */
+   * Get the timeout between point storage.
+   *
+   * @returns {number} The timeout in milliseconds.
+   */
   this.getTimeout = function () {
     return 0;
   };
@@ -34,12 +38,14 @@ dwv.tool.draw.ArrowFactory = function () {
 
 /**
  * Create an arrow shape to be displayed.
+ *
  * @param {Array} points The points from which to extract the line.
- * @param {Object} style The drawing style.
- * @param {Object} image The associated image.
+ * @param {object} style The drawing style.
+ * @param {object} _image The associated image.
+ * @returns {object} The Konva object.
  */
 dwv.tool.draw.ArrowFactory.prototype.create = function (
-  points, style/*, image*/) {
+  points, style, _image) {
   // physical shape
   var line = new dwv.math.Line(points[0], points[1]);
   // draw shape
@@ -116,10 +122,11 @@ dwv.tool.draw.ArrowFactory.prototype.create = function (
 
 /**
  * Update an arrow shape.
- * @param {Object} anchor The active anchor.
- * @param {Object} image The associated image.
+ *
+ * @param {object} anchor The active anchor.
+ * @param {object} _image The associated image.
  */
-dwv.tool.draw.UpdateArrow = function (anchor/*, image*/) {
+dwv.tool.draw.UpdateArrow = function (anchor, _image) {
   // parent group
   var group = anchor.getParent();
   // associated shape

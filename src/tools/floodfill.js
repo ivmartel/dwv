@@ -3,6 +3,7 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 /**
  * The magic wand namespace.
+ *
  * @external MagicWand
  * @see https://github.com/Tamersoul/magic-wand-js
  */
@@ -10,128 +11,149 @@ var MagicWand = MagicWand || {};
 
 /**
  * Floodfill painting tool.
- * @constructor
- * @param {Object} app The associated application.
+ *
+ * @class
+ * @param {object} app The associated application.
  */
 dwv.tool.Floodfill = function (app) {
   /**
-     * Original variables from external library. Used as in the lib example.
-     * @private
-     * @type Number
-     */
+   * Original variables from external library. Used as in the lib example.
+   *
+   * @private
+   * @type {number}
+   */
   var blurRadius = 5;
   /**
-     * Original variables from external library. Used as in the lib example.
-     * @private
-     * @type Number
-     */
+   * Original variables from external library. Used as in the lib example.
+   *
+   * @private
+   * @type {number}
+   */
   var simplifyTolerant = 0;
   /**
-     * Original variables from external library. Used as in the lib example.
-     * @private
-     * @type Number
-     */
+   * Original variables from external library. Used as in the lib example.
+   *
+   * @private
+   * @type {number}
+   */
   var simplifyCount = 2000;
   /**
-     * Canvas info
-     * @private
-     * @type Object
-     */
+   * Canvas info
+   *
+   * @private
+   * @type {object}
+   */
   var imageInfo = null;
   /**
-     * Object created by MagicWand lib containing border points
-     * @private
-     * @type Object
-     */
+   * Object created by MagicWand lib containing border points
+   *
+   * @private
+   * @type {object}
+   */
   var mask = null;
   /**
-     * threshold default tolerance of the tool border
-     * @private
-     * @type Number
-     */
+   * threshold default tolerance of the tool border
+   *
+   * @private
+   * @type {number}
+   */
   var initialthreshold = 10;
   /**
-     * threshold tolerance of the tool border
-     * @private
-     * @type Number
-     */
+   * threshold tolerance of the tool border
+   *
+   * @private
+   * @type {number}
+   */
   var currentthreshold = null;
   /**
-     * Closure to self: to be used by event handlers.
-     * @private
-     * @type WindowLevel
-     */
+   * Closure to self: to be used by event handlers.
+   *
+   * @private
+   * @type {dwv.tool.Floodfill}
+   */
   var self = this;
   /**
-     * Interaction start flag.
-     * @type Boolean
-     */
+   * Interaction start flag.
+   *
+   * @type {boolean}
+   */
   this.started = false;
   /**
-     * Draw command.
-     * @private
-     * @type Object
-     */
+   * Draw command.
+   *
+   * @private
+   * @type {object}
+   */
   var command = null;
   /**
-     * Current shape group.
-     * @private
-     * @type Object
-     */
+   * Current shape group.
+   *
+   * @private
+   * @type {object}
+   */
   var shapeGroup = null;
   /**
-     * Coordinates of the fist mousedown event.
-     * @private
-     * @type Object
-     */
+   * Coordinates of the fist mousedown event.
+   *
+   * @private
+   * @type {object}
+   */
   var initialpoint;
   /**
-     * Floodfill border.
-     * @private
-     * @type Object
-     */
+   * Floodfill border.
+   *
+   * @private
+   * @type {object}
+   */
   var border = null;
   /**
-     * List of parent points.
-     * @private
-     * @type Array
-     */
+   * List of parent points.
+   *
+   * @private
+   * @type {Array}
+   */
   var parentPoints = [];
   /**
-     * Assistant variable to paint border on all slices.
-     * @private
-     * @type Boolean
-     */
+   * Assistant variable to paint border on all slices.
+   *
+   * @private
+   * @type {boolean}
+   */
   var extender = false;
   /**
-     * Timeout for painting on mousemove.
-     * @private
-     */
+   * Timeout for painting on mousemove.
+   *
+   * @private
+   */
   var painterTimeout;
   /**
-     * Drawing style.
-     * @type Style
-     */
+   * Drawing style.
+   *
+   * @type {dwv.html.Style}
+   */
   this.style = new dwv.html.Style();
 
   /**
-     * Listener handler.
-     * @type Object
-     * @private
-     */
+   * Listener handler.
+   *
+   * @type {object}
+   * @private
+   */
   var listenerHandler = new dwv.utils.ListenerHandler();
 
   /**
-     * Set extend option for painting border on all slices.
-     * @param {Boolean} The option to set
-     */
-  this.setExtend = function (Bool) {
-    extender = Bool;
+   * Set extend option for painting border on all slices.
+   *
+   * @param {boolean} bool The option to set
+   */
+  this.setExtend = function (bool) {
+    extender = bool;
   };
 
   /**
    * Get extend option for painting border on all slices.
-   * @return {Boolean} The actual value of of the variable to use Floodfill
+   *
+   * @returns {boolean} The actual value of of the variable to use Floodfill
    *   on museup.
    */
   this.getExtend = function () {
@@ -139,20 +161,25 @@ dwv.tool.Floodfill = function (app) {
   };
 
   /**
-     * Get (x, y) coordinates referenced to the canvas
-     * @param {Object} event The original event.
-     * @private
-     */
+   * Get (x, y) coordinates referenced to the canvas
+   *
+   * @param {object} event The original event.
+   * @returns {object} The coordinates as a {x,y}.
+   * @private
+   */
   var getCoord = function (event) {
     return {x: event._x, y: event._y};
   };
 
   /**
-     * Calculate border.
-     * @private
-     * @param {Object} Start point.
-     * @param {Number} Threshold tolerance.
-     */
+   * Calculate border.
+   *
+   * @private
+   * @param {object} points The input points.
+   * @param {number} threshold The threshold of the floodfill.
+   * @param {boolean} simple Return first points or a list.
+   * @returns {Array} The parent points.
+   */
   var calcBorder = function (points, threshold, simple) {
 
     parentPoints = [];
@@ -187,11 +214,13 @@ dwv.tool.Floodfill = function (app) {
   };
 
   /**
-     * Paint Floodfill.
-     * @private
-     * @param {Object} Start point.
-     * @param {Number} Threshold tolerance.
-     */
+   * Paint Floodfill.
+   *
+   * @private
+   * @param {object} point The start point.
+   * @param {number} threshold The border threshold.
+   * @returns {boolean} False if no border.
+   */
   var paintBorder = function (point, threshold) {
     // Calculate the border
     border = calcBorder(point, threshold);
@@ -223,8 +252,11 @@ dwv.tool.Floodfill = function (app) {
   };
 
   /**
-     * Create Floodfill in all the prev and next slices while border is found
-     */
+   * Create Floodfill in all the prev and next slices while border is found
+   *
+   * @param {number} ini The first slice to extend to.
+   * @param {number} end The last slice to extend to.
+   */
   this.extend = function (ini, end) {
     //avoid errors
     if (!initialpoint) {
@@ -261,9 +293,11 @@ dwv.tool.Floodfill = function (app) {
   };
 
   /**
-     * Modify tolerance threshold and redraw ROI.
-     * @param {Number} New threshold.
-     */
+   * Modify tolerance threshold and redraw ROI.
+   *
+   * @param {number} modifyThreshold The new threshold.
+   * @param {shape} shape The shape to update.
+   */
   this.modifyThreshold = function (modifyThreshold, shape) {
 
     if (!shape && shapeGroup) {
@@ -293,17 +327,20 @@ dwv.tool.Floodfill = function (app) {
   };
 
   /**
-     * Event fired when threshold change
-     * @param {Number} Current threshold
-     */
-  this.onThresholdChange = function (/*value*/) {
+   * Event fired when threshold change
+   *
+   * @param {number} _value Current threshold
+   */
+  this.onThresholdChange = function (_value) {
     // Defaults do nothing
   };
 
   /**
-     * Handle mouse down event.
-     * @param {Object} event The mouse down event.
-     */
+   * Handle mouse down event.
+   *
+   * @param {object} event The mouse down event.
+   * @returns {*} Not sure...
+   */
   this.mousedown = function (event) {
     imageInfo = app.getImageData();
     if (!imageInfo) {
@@ -317,9 +354,10 @@ dwv.tool.Floodfill = function (app) {
   };
 
   /**
-     * Handle mouse move event.
-     * @param {Object} event The mouse move event.
-     */
+   * Handle mouse move event.
+   *
+   * @param {object} event The mouse move event.
+   */
   this.mousemove = function (event) {
     if (!self.started) {
       return;
@@ -334,10 +372,11 @@ dwv.tool.Floodfill = function (app) {
   };
 
   /**
-     * Handle mouse up event.
-     * @param {Object} event The mouse up event.
-     */
-  this.mouseup = function (/*event*/) {
+   * Handle mouse up event.
+   *
+   * @param {object} _event The mouse up event.
+   */
+  this.mouseup = function (_event) {
     self.started = false;
     if (extender) {
       self.extend();
@@ -345,53 +384,59 @@ dwv.tool.Floodfill = function (app) {
   };
 
   /**
-     * Handle mouse out event.
-     * @param {Object} event The mouse out event.
-     */
-  this.mouseout = function (/*event*/) {
-    self.mouseup(/*event*/);
+   * Handle mouse out event.
+   *
+   * @param {object} event The mouse out event.
+   */
+  this.mouseout = function (event) {
+    self.mouseup(event);
   };
 
   /**
-     * Handle touch start event.
-     * @param {Object} event The touch start event.
-     */
+   * Handle touch start event.
+   *
+   * @param {object} event The touch start event.
+   */
   this.touchstart = function (event) {
     // treat as mouse down
     self.mousedown(event);
   };
 
   /**
-     * Handle touch move event.
-     * @param {Object} event The touch move event.
-     */
+   * Handle touch move event.
+   *
+   * @param {object} event The touch move event.
+   */
   this.touchmove = function (event) {
     // treat as mouse move
     self.mousemove(event);
   };
 
   /**
-     * Handle touch end event.
-     * @param {Object} event The touch end event.
-     */
-  this.touchend = function (/*event*/) {
+   * Handle touch end event.
+   *
+   * @param {object} event The touch end event.
+   */
+  this.touchend = function (event) {
     // treat as mouse up
-    self.mouseup(/*event*/);
+    self.mouseup(event);
   };
 
   /**
-     * Handle key down event.
-     * @param {Object} event The key down event.
-     */
+   * Handle key down event.
+   *
+   * @param {object} event The key down event.
+   */
   this.keydown = function (event) {
     event.context = 'dwv.tool.Floodfill';
     app.onKeydown(event);
   };
 
   /**
-     * Activate the tool.
-     * @param {Boolean} bool The flag to activate or not.
-     */
+   * Activate the tool.
+   *
+   * @param {boolean} bool The flag to activate or not.
+   */
   this.activate = function (bool) {
     if (bool) {
       // init with the app window scale
@@ -402,35 +447,38 @@ dwv.tool.Floodfill = function (app) {
   };
 
   /**
-     * Initialise the tool.
-     */
+   * Initialise the tool.
+   */
   this.init = function () {
     // does nothing
   };
 
   /**
-     * Add an event listener to this class.
-     * @param {String} type The event type.
-     * @param {Object} callback The method associated with the provided
-     *   event type, will be called with the fired event.
-     */
+   * Add an event listener to this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type, will be called with the fired event.
+   */
   this.addEventListener = function (type, callback) {
     listenerHandler.add(type, callback);
   };
   /**
-     * Remove an event listener from this class.
-     * @param {String} type The event type.
-     * @param {Object} callback The method associated with the provided
-     *   event type.
-     */
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type.
+   */
   this.removeEventListener = function (type, callback) {
     listenerHandler.remove(type, callback);
   };
   /**
-     * Fire an event: call all associated listeners with the input event object.
-     * @param {Object} event The event to fire.
-     * @private
-     */
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
+   * @private
+   */
   function fireEvent(event) {
     listenerHandler.fireEvent(event);
   }
@@ -439,7 +487,8 @@ dwv.tool.Floodfill = function (app) {
 
 /**
  * Help for this tool.
- * @return {Object} The help content.
+ *
+ * @returns {object} The help content.
  */
 dwv.tool.Floodfill.prototype.getHelpKeys = function () {
   return {
@@ -456,7 +505,8 @@ dwv.tool.Floodfill.prototype.getHelpKeys = function () {
 
 /**
  * Set the line colour of the drawing.
- * @param {String} colour The colour to set.
+ *
+ * @param {string} colour The colour to set.
  */
 dwv.tool.Floodfill.prototype.setLineColour = function (colour) {
   // set style var

@@ -3,6 +3,7 @@ var dwv = dwv || {};
 dwv.draw = dwv.draw || {};
 /**
  * The Konva namespace.
+ *
  * @external Konva
  * @see https://konvajs.org/
  */
@@ -10,7 +11,10 @@ var Konva = Konva || {};
 
 /**
  * Get the draw group id for a given position.
- * @return {Number} The group id.
+ *
+ * @param {number} sliceNumber The slice number.
+ * @param {number} frameNumber The frame number.
+ * @returns {number} The group id.
  */
 dwv.draw.getDrawPositionGroupId = function (sliceNumber, frameNumber) {
   return 'slice-' + sliceNumber + '_frame-' + frameNumber;
@@ -18,8 +22,9 @@ dwv.draw.getDrawPositionGroupId = function (sliceNumber, frameNumber) {
 
 /**
  * Get the slice and frame position from a group id.
- * @param {String} groupId The group id.
- * @return {Object} The slice and frame number.
+ *
+ * @param {string} groupId The group id.
+ * @returns {object} The slice and frame number.
  */
 dwv.draw.getPositionFromGroupId = function (groupId) {
   var sepIndex = groupId.indexOf('_');
@@ -32,7 +37,9 @@ dwv.draw.getPositionFromGroupId = function (groupId) {
 
 /**
  * Is an input node's name 'shape'.
- * @param {Object} node A Konva node.
+ *
+ * @param {object} node A Konva node.
+ * @returns {boolean} True if the node's name is 'shape'.
  */
 dwv.draw.isNodeNameShape = function (node) {
   return node.name() === 'shape';
@@ -40,7 +47,9 @@ dwv.draw.isNodeNameShape = function (node) {
 
 /**
  * Is a node an extra shape associated with a main one.
- * @param {Object} node A Konva node.
+ *
+ * @param {object} node A Konva node.
+ * @returns {boolean} True if the node's name starts with 'shape-'.
  */
 dwv.draw.isNodeNameShapeExtra = function (node) {
   return node.name().startsWith('shape-');
@@ -48,7 +57,9 @@ dwv.draw.isNodeNameShapeExtra = function (node) {
 
 /**
  * Is an input node's name 'label'.
- * @param {Object} node A Konva node.
+ *
+ * @param {object} node A Konva node.
+ * @returns {boolean} True if the node's name is 'label'.
  */
 dwv.draw.isNodeNameLabel = function (node) {
   return node.name() === 'label';
@@ -56,7 +67,9 @@ dwv.draw.isNodeNameLabel = function (node) {
 
 /**
  * Is an input node a position node.
- * @param {Object} node A Konva node.
+ *
+ * @param {object} node A Konva node.
+ * @returns {boolean} True if the node's name is 'position-group'.
  */
 dwv.draw.isPositionNode = function (node) {
   return node.name() === 'position-group';
@@ -64,8 +77,9 @@ dwv.draw.isPositionNode = function (node) {
 
 /**
  * Get a lambda to check a node's id.
- * @param {String} id The id to check.
- * @return A function to check a node's id.
+ *
+ * @param {string} id The id to check.
+ * @returns {Function} A function to check a node's id.
  */
 dwv.draw.isNodeWithId = function (id) {
   return function (node) {
@@ -75,17 +89,20 @@ dwv.draw.isNodeWithId = function (id) {
 
 /**
  * Is the input node a node that has the 'stroke' method.
- * @param {Object} node A Konva node.
-*/
+ *
+ * @param {object} node A Konva node.
+ * @returns {boolean} True if the node's name is 'anchor' and 'label'.
+ */
 dwv.draw.canNodeChangeColour = function (node) {
   return node.name() !== 'anchor' && node.name() !== 'label';
 };
 
 /**
  * Debug function to output the layer hierarchy as text.
- * @param {Object} layer The Konva layer.
- * @param {String} prefix A display prefix (used in recursion).
- * @return {String} A text representation of the hierarchy.
+ *
+ * @param {object} layer The Konva layer.
+ * @param {string} prefix A display prefix (used in recursion).
+ * @returns {string} A text representation of the hierarchy.
  */
 dwv.draw.getHierarchyLog = function (layer, prefix) {
   if (typeof prefix === 'undefined') {
@@ -101,8 +118,9 @@ dwv.draw.getHierarchyLog = function (layer, prefix) {
 
 /**
  * Draw controller.
- * @constructor
- * @param {Object} drawDiv The HTML div used to store the drawings.
+ *
+ * @class
+ * @param {object} drawDiv The HTML div used to store the drawings.
  */
 dwv.DrawController = function (drawDiv) {
   // Draw stage
@@ -114,7 +132,8 @@ dwv.DrawController = function (drawDiv) {
 
   /**
    * Get the current position group.
-   * @return {Object} The Konva.Group.
+   *
+   * @returns {object} The Konva.Group.
    */
   this.getCurrentPosGroup = function () {
     // get position groups
@@ -142,8 +161,9 @@ dwv.DrawController = function (drawDiv) {
 
   /**
    * Create the controller: sets up the draw stage.
-   * @param {Number} width The width of the stage.
-   * @param {Number} height The height of the stage.
+   *
+   * @param {number} width The width of the stage.
+   * @param {number} height The height of the stage.
    */
   this.create = function (width, height) {
     // create stage
@@ -168,7 +188,8 @@ dwv.DrawController = function (drawDiv) {
 
   /**
    * Get the draw layer.
-   * @return {Object} The draw layer.
+   *
+   * @returns {object} The draw layer.
    */
   this.getDrawLayer = function () {
     return drawLayer;
@@ -183,7 +204,8 @@ dwv.DrawController = function (drawDiv) {
 
   /**
    * Get the draw stage.
-   * @return {Object} The draw layer.
+   *
+   * @returns {object} The draw layer.
    */
   this.getDrawStage = function () {
     return drawStage;
@@ -191,7 +213,8 @@ dwv.DrawController = function (drawDiv) {
 
   /**
    * Activate the current draw layer.
-   * @param {Object} viewController The associated view controller.
+   *
+   * @param {object} viewController The associated view controller.
    */
   this.activateDrawLayer = function (viewController) {
     // set current position
@@ -220,7 +243,8 @@ dwv.DrawController = function (drawDiv) {
 
   /**
    * Reset the stage with a new window scale.
-   * @param {Number} windowScale The window scale.
+   *
+   * @param {number} windowScale The window scale.
    */
   this.resetStage = function (windowScale) {
     drawStage.offset({'x': 0, 'y': 0});
@@ -230,9 +254,10 @@ dwv.DrawController = function (drawDiv) {
 
   /**
    * Resize the current stage.
-   * @param {Number} width the stage width.
-   * @param {Number} height the stage height.
-   * @param {Number} scale the stage scale.
+   *
+   * @param {number} width the stage width.
+   * @param {number} height the stage height.
+   * @param {number} scale the stage scale.
    */
   this.resizeStage = function (width, height, scale) {
     // resize div
@@ -247,8 +272,9 @@ dwv.DrawController = function (drawDiv) {
 
   /**
    * Zoom the stage.
-   * @param {Number} scale The scale factor.
-   * @param {Object} scaleCenter The scale center point.
+   *
+   * @param {number} scale The scale factor.
+   * @param {object} scaleCenter The scale center point.
    */
   this.zoomStage = function (scale, scaleCenter) {
     // zoom
@@ -270,8 +296,9 @@ dwv.DrawController = function (drawDiv) {
 
   /**
    * Translate the stage.
-   * @param {Number} tx The X translation.
-   * @param {Number} ty The Y translation.
+   *
+   * @param {number} tx The X translation.
+   * @param {number} ty The Y translation.
    */
   this.translateStage = function (tx, ty) {
     drawStage.offset({'x': tx, 'y': ty});
@@ -280,7 +307,8 @@ dwv.DrawController = function (drawDiv) {
 
   /**
    * Get a list of drawing display details.
-   * @return {Object} A list of draw details including id, slice, frame...
+   *
+   * @returns {object} A list of draw details including id, slice, frame...
    */
   this.getDrawDisplayDetails = function () {
     var list = [];
@@ -325,7 +353,8 @@ dwv.DrawController = function (drawDiv) {
 
   /**
    * Get a list of drawing store details.
-   * @return {Object} A list of draw details including id, text, quant...
+   *
+   * @returns {object} A list of draw details including id, text, quant...
    * TODO Unify with getDrawDisplayDetails?
    */
   this.getDrawStoreDetails = function () {
@@ -363,10 +392,11 @@ dwv.DrawController = function (drawDiv) {
 
   /**
    * Set the drawings on the current stage.
+   *
    * @param {Array} drawings An array of drawings.
    * @param {Array} drawingsDetails An array of drawings details.
-   * @param {Object} cmdCallback The DrawCommand callback.
-   * @param {Object} exeCallback The callback to call once the
+   * @param {object} cmdCallback The DrawCommand callback.
+   * @param {object} exeCallback The callback to call once the
    *   DrawCommand has been executed.
    */
   this.setDrawings = function (
@@ -430,7 +460,8 @@ dwv.DrawController = function (drawDiv) {
 
   /**
    * Update a drawing from its details.
-   * @param {Object} drawDetails Details of the drawing to update.
+   *
+   * @param {object} drawDetails Details of the drawing to update.
    */
   this.updateDraw = function (drawDetails) {
     // get the group
@@ -467,7 +498,9 @@ dwv.DrawController = function (drawDiv) {
 
   /**
    * Check the visibility of a given group.
-   * @param {Object} drawDetails Details of the group to check.
+   *
+   * @param {object} drawDetails Details of the group to check.
+   * @returns {boolean} True if the group is visible.
    */
   this.isGroupVisible = function (drawDetails) {
     // get the group
@@ -483,7 +516,9 @@ dwv.DrawController = function (drawDiv) {
 
   /**
    * Toggle the visibility of a given group.
-   * @param {Object} drawDetails Details of the group to update.
+   *
+   * @param {object} drawDetails Details of the group to update.
+   * @returns {boolean} False if the group cannot be found.
    */
   this.toogleGroupVisibility = function (drawDetails) {
     // get the group
@@ -502,9 +537,10 @@ dwv.DrawController = function (drawDiv) {
 
   /**
    * Delete a Draw from the stage.
-   * @param {Number} groupId The group id of the group to delete.
-   * @param {Object} cmdCallback The DeleteCommand callback.
-   * @param {Object} exeCallback The callback to call once the
+   *
+   * @param {number} groupId The group id of the group to delete.
+   * @param {object} cmdCallback The DeleteCommand callback.
+   * @param {object} exeCallback The callback to call once the
    *   DeleteCommand has been executed.
    */
   this.deleteDrawGroupId = function (groupId, cmdCallback, exeCallback) {
@@ -525,9 +561,10 @@ dwv.DrawController = function (drawDiv) {
 
   /**
    * Delete a Draw from the stage.
-   * @param {Object} group The group to delete.
-   * @param {Object} cmdCallback The DeleteCommand callback.
-   * @param {Object} exeCallback The callback to call once the
+   *
+   * @param {object} group The group to delete.
+   * @param {object} cmdCallback The DeleteCommand callback.
+   * @param {object} exeCallback The callback to call once the
    *  DeleteCommand has been executed.
    */
   this.deleteDrawGroup = function (group, cmdCallback, exeCallback) {
@@ -543,8 +580,9 @@ dwv.DrawController = function (drawDiv) {
 
   /**
    * Delete all Draws from the stage.
-   * @param {Object} cmdCallback The DeleteCommand callback.
-   * @param {Object} exeCallback The callback to call once the
+   *
+   * @param {object} cmdCallback The DeleteCommand callback.
+   * @param {object} exeCallback The callback to call once the
    *  DeleteCommand has been executed.
    */
   this.deleteDraws = function (cmdCallback, exeCallback) {

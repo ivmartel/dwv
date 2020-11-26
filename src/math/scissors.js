@@ -6,7 +6,10 @@ dwv.math = dwv.math || {};
 var __twothirdpi = (2 / (3 * Math.PI));
 
 /**
- *
+ * @param {Array} data The input data.
+ * @param {number} width The width of the output.
+ * @param {number} height The height of the output.
+ * @returns {Array} A greyscale object
  */
 dwv.math.computeGreyscale = function (data, width, height) {
   // Returns 2D augmented array containing greyscale data
@@ -64,7 +67,8 @@ dwv.math.computeGreyscale = function (data, width, height) {
 };
 
 /**
- *
+ * @param {object} greyscale The input greyscale-
+ * @returns {object} A gradient object
  */
 dwv.math.computeGradient = function (greyscale) {
   // Returns a 2D array of gradient magnitude values for greyscale. The values
@@ -104,7 +108,8 @@ dwv.math.computeGradient = function (greyscale) {
 };
 
 /**
- *
+ * @param {object} greyscale The input greyscale.
+ * @returns {object} A laplace object.
  */
 dwv.math.computeLaplace = function (greyscale) {
   // Returns a 2D array of Laplacian of Gaussian values
@@ -290,7 +295,8 @@ dwv.math.gaussianBlur = function (buffer, out) {
  * {@link http://www.sciencedirect.com/science/article/B6WG4-45JB8WN-9/2/6fe59d8089fd1892c2bfb82283065579}
  *
  * Highly inspired from {@link http://code.google.com/p/livewire-javascript/}
- * @constructor
+ *
+ * @class
  */
 dwv.math.Scissors = function () {
   this.width = -1;

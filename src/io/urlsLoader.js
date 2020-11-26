@@ -10,86 +10,98 @@ dwv.io.urlContentTypes = {
 
 /**
  * Urls loader.
- * @constructor
+ *
+ * @class
  */
 dwv.io.UrlsLoader = function () {
   /**
-     * Closure to self.
-     * @private
-     * @type Object
-     */
+   * Closure to self.
+   *
+   * @private
+   * @type {object}
+   */
   var self = this;
 
   /**
-     * Input data.
-     * @private
-     * @type Array
-     */
+   * Input data.
+   *
+   * @private
+   * @type {Array}
+   */
   var inputData = null;
 
   /**
-     * Array of launched requests.
-     * @private
-     * @type Array
-     */
+   * Array of launched requests.
+   *
+   * @private
+   * @type {Array}
+   */
   var requests = [];
 
   /**
-     * Data loader.
-     * @private
-     * @type Object
-     */
+   * Data loader.
+   *
+   * @private
+   * @type {object}
+   */
   var runningLoader = null;
 
   /**
-     * Number of loaded data.
-     * @private
-     * @type Number
-     */
+   * Number of loaded data.
+   *
+   * @private
+   * @type {number}
+   */
   var nLoad = 0;
 
   /**
-     * Number of load end events.
-     * @private
-     * @type Number
-     */
+   * Number of load end events.
+   *
+   * @private
+   * @type {number}
+   */
   var nLoadend = 0;
 
   /**
-     * Flag to know if the load is aborting.
-     * @private
-     * @type Boolean
-     */
+   * Flag to know if the load is aborting.
+   *
+   * @private
+   * @type {boolean}
+   */
   var aborting;
 
   /**
-     * The default character set (optional).
-     * @private
-     * @type String
-     */
+   * The default character set (optional).
+   *
+   * @private
+   * @type {string}
+   */
   var defaultCharacterSet;
 
   /**
-     * Get the default character set.
-     * @return {String} The default character set.
-     */
+   * Get the default character set.
+   *
+   * @returns {string} The default character set.
+   */
   this.getDefaultCharacterSet = function () {
     return defaultCharacterSet;
   };
 
   /**
-     * Set the default character set.
-     * @param {String} characterSet The character set.
-     */
+   * Set the default character set.
+   *
+   * @param {string} characterSet The character set.
+   */
   this.setDefaultCharacterSet = function (characterSet) {
     defaultCharacterSet = characterSet;
   };
 
   /**
-     * Store the current input.
-     * @param {Object} data The input data.
-     * @private
-     */
+   * Store the current input.
+   *
+   * @param {object} data The input data.
+   * @private
+   */
   function storeInputData(data) {
     inputData = data;
     // reset counters
@@ -103,56 +115,62 @@ dwv.io.UrlsLoader = function () {
   }
 
   /**
-     * Store a launched request.
-     * @param {Object} request The launched request.
-     * @private
-     */
+   * Store a launched request.
+   *
+   * @param {object} request The launched request.
+   * @private
+   */
   function storeRequest(request) {
     requests.push(request);
   }
 
   /**
-     * Clear the stored requests.
-     * @private
-     */
+   * Clear the stored requests.
+   *
+   * @private
+   */
   function clearStoredRequests() {
     requests = [];
   }
 
   /**
-     * Store the launched loader.
-     * @param {Object} loader The launched loader.
-     * @private
-     */
+   * Store the launched loader.
+   *
+   * @param {object} loader The launched loader.
+   * @private
+   */
   function storeLoader(loader) {
     runningLoader = loader;
   }
 
   /**
-     * Clear the stored loader.
-     * @private
-     */
+   * Clear the stored loader.
+   *
+   * @private
+   */
   function clearStoredLoader() {
     runningLoader = null;
   }
 
   /**
-     * Launch a load item event and call addLoad.
-     * @param {Object} event The load data event.
-     * @private
-     */
+   * Launch a load item event and call addLoad.
+   *
+   * @param {object} event The load data event.
+   * @private
+   */
   function addLoadItem(event) {
     self.onloaditem(event);
     addLoad();
   }
 
   /**
-     * Increment the number of loaded data
-     *   and call onload if loaded all data.
-     * @param {Object} event The load data event.
-     * @private
-     */
-  function addLoad(/*event*/) {
+   * Increment the number of loaded data
+   *   and call onload if loaded all data.
+   *
+   * @param {object} _event The load data event.
+   * @private
+   */
+  function addLoad(_event) {
     nLoad++;
     // call self.onload when all is loaded
     // (not using the input event since it is not the
@@ -165,12 +183,13 @@ dwv.io.UrlsLoader = function () {
   }
 
   /**
-     * Increment the counter of load end events
-     *   and run callbacks when all done, erroneus or not.
-     * @param {Object} event The load end event.
-     * @private
-     */
-  function addLoadend(/*event*/) {
+   * Increment the counter of load end events
+   *   and run callbacks when all done, erroneus or not.
+   *
+   * @param {object} _event The load end event.
+   * @private
+   */
+  function addLoadend(_event) {
     nLoadend++;
     // call self.onloadend when all is run
     // (not using the input event since it is not the
@@ -184,11 +203,13 @@ dwv.io.UrlsLoader = function () {
   }
 
   /**
-     * Augment a callback event with a srouce.
-     * @param {Object} callback The callback to augment its event.
-     * @param {Object} source The source to add to the event.
-     * @private
-     */
+   * Augment a callback event with a srouce.
+   *
+   * @param {object} callback The callback to augment its event.
+   * @param {object} source The source to add to the event.
+   * @returns {Function} The augmented callback.
+   * @private
+   */
   function augmentCallbackEvent(callback, source) {
     return function (event) {
       event.source = source;
@@ -197,10 +218,11 @@ dwv.io.UrlsLoader = function () {
   }
 
   /**
-     * Load a list of URLs or a DICOMDIR.
-     * @param {Array} data The list of urls to load.
-     * @param {Object} options Load options.
-     */
+   * Load a list of URLs or a DICOMDIR.
+   *
+   * @param {Array} data The list of urls to load.
+   * @param {object} options Load options.
+   */
   this.load = function (data, options) {
     // send start event
     self.onloadstart({
@@ -218,15 +240,16 @@ dwv.io.UrlsLoader = function () {
   };
 
   /**
-     * Load a list of urls.
-     * @param {Array} data The list of urls to load.
-     * @param {Object} options The options object, can contain:
-     *  - requestHeaders: an array of {name, value} to use as request headers
-     *  - withCredentials: boolean xhr.withCredentials flag to pass
-     *    to the request
-     *  - batchSize: the size of the request url batch
-     * @private
-     */
+   * Load a list of urls.
+   *
+   * @param {Array} data The list of urls to load.
+   * @param {object} options The options object, can contain:
+   *  - requestHeaders: an array of {name, value} to use as request headers
+   *  - withCredentials: boolean xhr.withCredentials flag to pass
+   *    to the request
+   *  - batchSize: the size of the request url batch
+   * @private
+   */
   function loadUrls(data, options) {
     // check input
     if (typeof data === 'undefined' || data.length === 0) {
@@ -321,10 +344,11 @@ dwv.io.UrlsLoader = function () {
         throw new Error('Input url of different type: ' + dataElement);
       }
       /**
-             * The http request.
-             * @external XMLHttpRequest
-             * @see https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
-             */
+       * The http request.
+       *
+       * @external XMLHttpRequest
+       * @see https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+       */
       var request = new XMLHttpRequest();
       request.open('GET', dataElement, true);
 
@@ -382,11 +406,12 @@ dwv.io.UrlsLoader = function () {
   }
 
   /**
-     * Load a DICOMDIR.
-     * @param {string} dicomDirUrl The DICOMDIR url.
-     * @param {Object} options Load options.
-     * @private
-     */
+   * Load a DICOMDIR.
+   *
+   * @param {string} dicomDirUrl The DICOMDIR url.
+   * @param {object} options Load options.
+   * @private
+   */
   function loadDicomDir(dicomDirUrl, options) {
     // read DICOMDIR
     var request = new XMLHttpRequest();
@@ -434,8 +459,8 @@ dwv.io.UrlsLoader = function () {
   }
 
   /**
-     * Abort a load.
-     */
+   * Abort a load.
+   */
   this.abort = function () {
     aborting = true;
     // abort non finished requests
@@ -455,46 +480,53 @@ dwv.io.UrlsLoader = function () {
 
 /**
  * Handle a load start event.
- * @param {Object} event The load start event.
  * Default does nothing.
+ *
+ * @param {object} _event The load start event.
  */
-dwv.io.UrlsLoader.prototype.onloadstart = function (/*event*/) {};
+dwv.io.UrlsLoader.prototype.onloadstart = function (_event) {};
 /**
  * Handle a load progress event.
- * @param {Object} event The progress event.
  * Default does nothing.
+ *
+ * @param {object} _event The progress event.
  */
-dwv.io.UrlsLoader.prototype.onprogress = function (/*event*/) {};
+dwv.io.UrlsLoader.prototype.onprogress = function (_event) {};
 /**
  * Handle a load item event.
- * @param {Object} event The load item event fired
- *   when a file item has been loaded successfully.
  * Default does nothing.
+ *
+ * @param {object} _event The load item event fired
+ *   when a file item has been loaded successfully.
  */
-dwv.io.UrlsLoader.prototype.onloaditem = function (/*event*/) {};
+dwv.io.UrlsLoader.prototype.onloaditem = function (_event) {};
 /**
  * Handle a load event.
- * @param {Object} event The load event fired
- *   when a file has been loaded successfully.
  * Default does nothing.
+ *
+ * @param {object} _event The load event fired
+ *   when a file has been loaded successfully.
  */
-dwv.io.UrlsLoader.prototype.onload = function (/*event*/) {};
+dwv.io.UrlsLoader.prototype.onload = function (_event) {};
 /**
  * Handle a load end event.
- * @param {Object} event The load end event fired
- *  when a file load has completed, successfully or not.
  * Default does nothing.
+ *
+ * @param {object} _event The load end event fired
+ *  when a file load has completed, successfully or not.
  */
-dwv.io.UrlsLoader.prototype.onloadend = function (/*event*/) {};
+dwv.io.UrlsLoader.prototype.onloadend = function (_event) {};
 /**
  * Handle an error event.
- * @param {Object} event The error event.
  * Default does nothing.
+ *
+ * @param {object} _event The error event.
  */
-dwv.io.UrlsLoader.prototype.onerror = function (/*event*/) {};
+dwv.io.UrlsLoader.prototype.onerror = function (_event) {};
 /**
  * Handle an abort event.
- * @param {Object} event The abort event.
  * Default does nothing.
+ *
+ * @param {object} _event The abort event.
  */
-dwv.io.UrlsLoader.prototype.onabort = function (/*event*/) {};
+dwv.io.UrlsLoader.prototype.onabort = function (_event) {};

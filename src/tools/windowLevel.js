@@ -4,26 +4,30 @@ dwv.tool = dwv.tool || {};
 
 /**
  * WindowLevel tool: handle window/level related events.
- * @constructor
- * @param {Object} app The associated application.
+ *
+ * @class
+ * @param {object} app The associated application.
  */
 dwv.tool.WindowLevel = function (app) {
   /**
-     * Closure to self: to be used by event handlers.
-     * @private
-     * @type WindowLevel
-     */
+   * Closure to self: to be used by event handlers.
+   *
+   * @private
+   * @type {dwv.tool.WindowLevel}
+   */
   var self = this;
   /**
-     * Interaction start flag.
-     * @type Boolean
-     */
+   * Interaction start flag.
+   *
+   * @type {boolean}
+   */
   this.started = false;
 
   /**
-     * Handle mouse down event.
-     * @param {Object} event The mouse down event.
-     */
+   * Handle mouse down event.
+   *
+   * @param {object} event The mouse down event.
+   */
   this.mousedown = function (event) {
     // set start flag
     self.started = true;
@@ -35,9 +39,10 @@ dwv.tool.WindowLevel = function (app) {
   };
 
   /**
-     * Handle mouse move event.
-     * @param {Object} event The mouse move event.
-     */
+   * Handle mouse move event.
+   *
+   * @param {object} event The mouse move event.
+   */
   this.mousemove = function (event) {
     // check start flag
     if (!self.started) {
@@ -67,10 +72,11 @@ dwv.tool.WindowLevel = function (app) {
   };
 
   /**
-     * Handle mouse up event.
-     * @param {Object} event The mouse up event.
-     */
-  this.mouseup = function (/*event*/) {
+   * Handle mouse up event.
+   *
+   * @param {object} _event The mouse up event.
+   */
+  this.mouseup = function (_event) {
     // set start flag
     if (self.started) {
       self.started = false;
@@ -78,42 +84,47 @@ dwv.tool.WindowLevel = function (app) {
   };
 
   /**
-     * Handle mouse out event.
-     * @param {Object} event The mouse out event.
-     */
+   * Handle mouse out event.
+   *
+   * @param {object} event The mouse out event.
+   */
   this.mouseout = function (event) {
     // treat as mouse up
     self.mouseup(event);
   };
 
   /**
-     * Handle touch start event.
-     * @param {Object} event The touch start event.
-     */
+   * Handle touch start event.
+   *
+   * @param {object} event The touch start event.
+   */
   this.touchstart = function (event) {
     self.mousedown(event);
   };
 
   /**
-     * Handle touch move event.
-     * @param {Object} event The touch move event.
-     */
+   * Handle touch move event.
+   *
+   * @param {object} event The touch move event.
+   */
   this.touchmove = function (event) {
     self.mousemove(event);
   };
 
   /**
-     * Handle touch end event.
-     * @param {Object} event The touch end event.
-     */
+   * Handle touch end event.
+   *
+   * @param {object} event The touch end event.
+   */
   this.touchend = function (event) {
     self.mouseup(event);
   };
 
   /**
-     * Handle double click event.
-     * @param {Object} event The double click event.
-     */
+   * Handle double click event.
+   *
+   * @param {object} event The double click event.
+   */
   this.dblclick = function (event) {
     // update view controller
     app.getViewController().setWindowLevel(
@@ -126,25 +137,27 @@ dwv.tool.WindowLevel = function (app) {
   };
 
   /**
-     * Handle key down event.
-     * @param {Object} event The key down event.
-     */
+   * Handle key down event.
+   *
+   * @param {object} event The key down event.
+   */
   this.keydown = function (event) {
     event.context = 'dwv.tool.WindowLevel';
     app.onKeydown(event);
   };
 
   /**
-     * Activate the tool.
-     * @param {Boolean} bool The flag to activate or not.
-     */
-  this.activate = function (/*bool*/) {
+   * Activate the tool.
+   *
+   * @param {boolean} _bool The flag to activate or not.
+   */
+  this.activate = function (_bool) {
     // does nothing
   };
 
   /**
-     * Initialise the tool.
-     */
+   * Initialise the tool.
+   */
   this.init = function () {
     // does nothing
   };
@@ -153,7 +166,8 @@ dwv.tool.WindowLevel = function (app) {
 
 /**
  * Help for this tool.
- * @return {Object} The help content.
+ *
+ * @returns {object} The help content.
  */
 dwv.tool.WindowLevel.prototype.getHelpKeys = function () {
   return {

@@ -8,6 +8,7 @@ QUnit.module('dicomElementsWrapper');
 /**
  * Tests for {@link dwv.dicom.DicomElementsWrapper} using simple DICOM data.
  * Using remote file for CI integration.
+ *
  * @function module:tests/dicom~dicomElementsWrapper
  */
 QUnit.test('Test simple DICOM wrapping.', function (assert) {
