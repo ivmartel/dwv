@@ -943,6 +943,16 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
   for (var j = 0, lenj = metaElements.length; j < lenj; ++j) {
     offset = metaWriter.writeDataElement(metaElements[j], offset, false);
   }
+
+  // check meta position
+  var preambleSize = 128 + 4;
+  var metaOffset = preambleSize + fmiglSize + metaLength;
+  if (offset !== metaOffset) {
+    console.warn('Bad size calculation... meta offset: ', offset,
+      ', calculated size:', metaOffset,
+      '(diff:', offset - metaOffset, ')');
+  }
+
   // pass flag to writer
   dataWriter.useUnVrForPrivateSq = this.useUnVrForPrivateSq;
   // write non meta
@@ -950,6 +960,12 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     offset = dataWriter.writeDataElement(rawElements[k], offset, isImplicit);
   }
 
+  // check final position
+  if (offset !== totalSize) {
+    console.warn('Bad size calculation... final offset: ', offset,
+      ', calculated size:', totalSize,
+      '(diff:', offset - totalSize, ')');
+  }
   // return
   return buffer;
 };
@@ -987,8 +1003,7 @@ dwv.dicom.getDicomElement = function (tagName) {
   // return element definition
   return {
     'tag': {'group': tagGE.group, 'element': tagGE.element},
-    'vr': dict[tagGE.group][tagGE.element][0],
-    'vl': dict[tagGE.group][tagGE.element][1]
+    'vr': dict[tagGE.group][tagGE.element][0]
   };
 };
 
