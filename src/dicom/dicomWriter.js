@@ -150,6 +150,7 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian) {
   var view = new DataView(buffer);
 
   // flag to use VR=UN for private sequences, default to false
+  // (mainly used in tests)
   this.useUnVrForPrivateSq = false;
 
   /**
@@ -735,6 +736,7 @@ dwv.dicom.flattenArrayOfTypedArrays = function (initialArray) {
 dwv.dicom.DicomWriter = function () {
 
   // flag to use VR=UN for private sequences, default to false
+  // (mainly used in tests)
   this.useUnVrForPrivateSq = false;
 
   // possible tag actions
