@@ -1,4 +1,4 @@
-/*! dwv 0.28.0-beta 2020-11-27 14:18:50 */
+/*! dwv 0.28.0-beta 2020-11-27 14:28:26 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -6149,6 +6149,14 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
        !icUIDTag.equals2(element.tag) &&
        !ivnTag.equals2(element.tag)) {
       localSize = 0;
+
+      // XB7 2020-04-17
+      // Check if UN can be converted to correct VR.
+      // This check must be done BEFORE calculating totalSize,
+      // otherwise there may be extra null bytes at the end of the file
+      // (dcmdump may crash because of these bytes)
+      dwv.dicom.checkUnknownVR(element);
+
       // tag group name (remove first 0)
       groupName = dwv.dicom.TagGroups[element.tag.group.substr(1)];
 
@@ -6219,14 +6227,12 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
   offset = metaWriter.writeDataElement(fmigl, offset, false);
   // write meta
   for (var j = 0, lenj = metaElements.length; j < lenj; ++j) {
-    dwv.dicom.checkUnkwownVR(metaElements[j]);
     offset = metaWriter.writeDataElement(metaElements[j], offset, false);
   }
   // pass flag to writer
   dataWriter.useUnVrForPrivateSq = this.useUnVrForPrivateSq;
   // write non meta
   for (var k = 0, lenk = rawElements.length; k < lenk; ++k) {
-    dwv.dicom.checkUnkwownVR(rawElements[k]);
     offset = dataWriter.writeDataElement(rawElements[k], offset, isImplicit);
   }
 
@@ -6240,7 +6246,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
  *
  * @param {object} element The DICOM element.
  */
-dwv.dicom.checkUnkwownVR = function (element) {
+dwv.dicom.checkUnknownVR = function (element) {
   var dict = dwv.dicom.dictionary;
   if (element.vr === 'UN') {
     if (typeof dict[element.tag.group] !== 'undefined' &&
