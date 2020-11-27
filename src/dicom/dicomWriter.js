@@ -887,9 +887,8 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
       var realVl = element.endOffset - element.startOffset;
       localSize += parseInt(realVl, 10);
 
-      // add size of sequence delimitation item
-      if (dwv.dicom.isImplicitLengthSequence(element) ||
-        dwv.dicom.isImplicitLengthPixels(element)) {
+      // add size of pixel sequence delimitation items
+      if (dwv.dicom.isImplicitLengthPixels(element)) {
         localSize += dwv.dicom.getDataElementPrefixByteSize('NONE', isImplicit);
       }
 
@@ -1043,12 +1042,6 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
           subSize += dwv.dicom.setElementValue(
             subElement, itemData[elemKeys[j]]);
 
-          // add sequence delimitation size for sub sequences
-          if (dwv.dicom.isImplicitLengthSequence(subElement)) {
-            subSize += dwv.dicom.getDataElementPrefixByteSize(
-              'NONE', isImplicit);
-          }
-
           name = dwv.dicom.getGroupElementKey(
             subElement.tag.group, subElement.tag.element);
           itemElements[name] = subElement;
@@ -1084,6 +1077,11 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
 
         size += subSize;
         sqItems.push(itemElements);
+      }
+
+      // add sequence delimitation size
+      if (!explicitLength) {
+        size += dwv.dicom.getDataElementPrefixByteSize('NONE', isImplicit);
       }
 
       element.value = sqItems;

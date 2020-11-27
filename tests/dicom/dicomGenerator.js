@@ -79,7 +79,6 @@ dwv.dicom.generatePixelDataFromJSONTags = function (
   }
 
   // extract info from tags
-  var isImplicit = dwv.dicom.isImplicitTransferSyntax(tags.TransferSyntaxUID);
   var numberOfRows = tags.Rows;
   var numberOfColumns = tags.Columns;
   var bitsAllocated = tags.BitsAllocated;
@@ -153,8 +152,7 @@ dwv.dicom.generatePixelDataFromJSONTags = function (
   if (bitsAllocated === 8) {
     vr = 'OB';
   }
-  var pixVL = dwv.dicom.getDataElementPrefixByteSize(vr, isImplicit) +
-       (pixels.BYTES_PER_ELEMENT * dataLength);
+  var pixVL = pixels.BYTES_PER_ELEMENT * dataLength;
   return {
     'tag': {'group': '0x7FE0', 'element': '0x0010'},
     'vr': vr,
