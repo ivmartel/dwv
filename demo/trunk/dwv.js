@@ -1,4 +1,4 @@
-/*! dwv 0.28.0-beta 2020-11-27 13:26:39 */
+/*! dwv 0.28.0-beta 2020-11-27 13:37:42 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -5168,7 +5168,11 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
     // increment offset
     offset = dataElement.endOffset;
     // store the data element
-    this.dicomElements[dataElement.tag.name] = dataElement;
+    if (typeof this.dicomElements[dataElement.tag.name] === 'undefined') {
+      this.dicomElements[dataElement.tag.name] = dataElement;
+    } else {
+      console.warn('Not saving duplicate tag: ' + dataElement.tag.name);
+    }
   }
 
   // safety check...
