@@ -149,6 +149,10 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian) {
   // private DataView
   var view = new DataView(buffer);
 
+  // flag to use VR=UN for private sequences, default to false
+  // (mainly used in tests)
+  this.useUnVrForPrivateSq = false;
+
   /**
    * Write Uint8 data.
    *
@@ -600,8 +604,16 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (
   // element
   byteOffset = this.writeHex(byteOffset, element.tag.element);
   // VR
+  var vr = element.vr;
+  // use VR=UN for private sequence
+  if (this.useUnVrForPrivateSq &&
+    dwv.dicom.isPrivateGroup(element.tag.group) &&
+    vr === 'SQ') {
+    console.warn('Write element using VR=UN for private sequence.');
+    vr = 'UN';
+  }
   if (isTagWithVR && !isImplicit) {
-    byteOffset = this.writeString(byteOffset, element.vr);
+    byteOffset = this.writeString(byteOffset, vr);
     // reserved 2 bytes for 32bit VL
     if (is32bitVLVR) {
       byteOffset += 2;
@@ -722,6 +734,10 @@ dwv.dicom.flattenArrayOfTypedArrays = function (initialArray) {
  * @class
  */
 dwv.dicom.DicomWriter = function () {
+
+  // flag to use VR=UN for private sequences, default to false
+  // (mainly used in tests)
+  this.useUnVrForPrivateSq = false;
 
   // possible tag actions
   var actions = {
@@ -921,6 +937,8 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     dwv.dicom.checkUnkwownVR(metaElements[j]);
     offset = metaWriter.writeDataElement(metaElements[j], offset, false);
   }
+  // pass flag to writer
+  dataWriter.useUnVrForPrivateSq = this.useUnVrForPrivateSq;
   // write non meta
   for (var k = 0, lenk = rawElements.length; k < lenk; ++k) {
     dwv.dicom.checkUnkwownVR(rawElements[k]);
