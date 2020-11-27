@@ -115,13 +115,22 @@ QUnit.test('Test patient anonymisation', function (assert) {
     // raw tags
     var rawTags = dicomParser.getRawDicomElements();
     // check values
-    assert.equal(rawTags.x00100010.value[0], patientsName, 'patientsName');
-    assert.equal(rawTags.x00100020.value[0], patientID, 'patientID');
     assert.equal(
-      rawTags.x00100030.value[0],
+      rawTags.x00100010.value[0].trim(),
+      patientsName,
+      'patientsName');
+    assert.equal(
+      rawTags.x00100020.value[0].trim(),
+      patientID,
+      'patientID');
+    assert.equal(
+      rawTags.x00100030.value[0].trim(),
       patientsBirthDate,
       'patientsBirthDate');
-    assert.equal(rawTags.x00100040.value[0], patientsSex, 'patientsSex');
+    assert.equal(
+      rawTags.x00100040.value[0].trim(),
+      patientsSex,
+      'patientsSex');
 
     var dicomWriter = new dwv.dicom.DicomWriter();
     dicomWriter.rules = rules;
@@ -138,7 +147,10 @@ QUnit.test('Test patient anonymisation', function (assert) {
       rawTags.x00100010.value[0],
       patientsNameAnonymised,
       'patientName');
-    assert.equal(rawTags.x00100020.value[0], patientsIdAnonymised, 'patientID');
+    assert.equal(
+      rawTags.x00100020.value[0],
+      patientsIdAnonymised,
+      'patientID');
     assert.notOk(rawTags.x00100030, 'patientsBirthDate');
     assert.notOk(rawTags.x00100040, 'patientsSex');
 
