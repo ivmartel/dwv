@@ -1417,7 +1417,11 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
     // increment offset
     offset = dataElement.endOffset;
     // store the data element
-    this.dicomElements[dataElement.tag.name] = dataElement;
+    if (typeof this.dicomElements[dataElement.tag.name] === 'undefined') {
+      this.dicomElements[dataElement.tag.name] = dataElement;
+    } else {
+      console.warn('Not saving duplicate tag: ' + dataElement.tag.name);
+    }
   }
 
   // safety check...
