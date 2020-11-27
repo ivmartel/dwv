@@ -430,13 +430,14 @@ dwv.dicom.DataWriter.prototype.writeDataElementItems = function (
     if (itemKeys.length === 0) {
       continue;
     }
-    // write item
-    var itemElement = item.xFFFEE000;
-    itemElement.value = [];
-    var implicitLength = (itemElement.vl === 'u/l');
-    if (implicitLength) {
-      itemElement.vl = 0xffffffff;
-    }
+    // item element (create new to not modify original)
+    var implicitLength = item.xFFFEE000.vl === 'u/l';
+    var itemElement = {
+      tag: item.xFFFEE000.tag,
+      vr: item.xFFFEE000.vr,
+      vl: implicitLength ? 0xffffffff : item.xFFFEE000.vl,
+      value: []
+    };
     byteOffset = this.writeDataElement(itemElement, byteOffset, isImplicit);
     // write rest
     for (var m = 0; m < itemKeys.length; ++m) {
