@@ -1,4 +1,4 @@
-/*! dwv 0.28.0-beta 2020-11-27 13:37:42 */
+/*! dwv 0.28.0-beta 2020-11-27 14:18:50 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -3783,6 +3783,19 @@ dwv.dicom.cleanString = function (inputStr) {
 };
 
 /**
+ * Is the tag group a private tag group ?
+ * see: http://dicom.nema.org/medical/dicom/2015a/output/html/part05.html#sect_7.8
+ *
+ * @param {string} group The group string as '0x####'
+ * @returns {boolean} True if the tag group is private,
+ *   ie if its group is an odd number.
+ */
+dwv.dicom.isPrivateGroup = function (group) {
+  var groupNumber = parseInt(group.substr(2, 6), 10);
+  return (groupNumber % 2) === 1;
+};
+
+/**
  * Is the Native endianness Little Endian.
  *
  * @type {boolean}
@@ -4842,6 +4855,11 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
     vl = 0;
   }
 
+  // treat private tag with unknown VR and zero VL as a sequence (see #799)
+  if (dwv.dicom.isPrivateGroup(tag.group) && vr === 'UN' && vl === 0) {
+    vr = 'SQ';
+  }
+
   var startOffset = offset;
 
   // data
@@ -5416,6 +5434,10 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian) {
   // private DataView
   var view = new DataView(buffer);
 
+  // flag to use VR=UN for private sequences, default to false
+  // (mainly used in tests)
+  this.useUnVrForPrivateSq = false;
+
   /**
    * Write Uint8 data.
    *
@@ -5867,8 +5889,16 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (
   // element
   byteOffset = this.writeHex(byteOffset, element.tag.element);
   // VR
+  var vr = element.vr;
+  // use VR=UN for private sequence
+  if (this.useUnVrForPrivateSq &&
+    dwv.dicom.isPrivateGroup(element.tag.group) &&
+    vr === 'SQ') {
+    console.warn('Write element using VR=UN for private sequence.');
+    vr = 'UN';
+  }
   if (isTagWithVR && !isImplicit) {
-    byteOffset = this.writeString(byteOffset, element.vr);
+    byteOffset = this.writeString(byteOffset, vr);
     // reserved 2 bytes for 32bit VL
     if (is32bitVLVR) {
       byteOffset += 2;
@@ -5989,6 +6019,10 @@ dwv.dicom.flattenArrayOfTypedArrays = function (initialArray) {
  * @class
  */
 dwv.dicom.DicomWriter = function () {
+
+  // flag to use VR=UN for private sequences, default to false
+  // (mainly used in tests)
+  this.useUnVrForPrivateSq = false;
 
   // possible tag actions
   var actions = {
@@ -6188,6 +6222,8 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     dwv.dicom.checkUnkwownVR(metaElements[j]);
     offset = metaWriter.writeDataElement(metaElements[j], offset, false);
   }
+  // pass flag to writer
+  dataWriter.useUnVrForPrivateSq = this.useUnVrForPrivateSq;
   // write non meta
   for (var k = 0, lenk = rawElements.length; k < lenk; ++k) {
     dwv.dicom.checkUnkwownVR(rawElements[k]);
