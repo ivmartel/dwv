@@ -1,4 +1,4 @@
-/*! dwv 0.28.0-beta 2020-11-27 14:28:26 */
+/*! dwv 0.28.0-beta 2020-11-29 10:44:50 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -5715,13 +5715,14 @@ dwv.dicom.DataWriter.prototype.writeDataElementItems = function (
     if (itemKeys.length === 0) {
       continue;
     }
-    // write item
-    var itemElement = item.xFFFEE000;
-    itemElement.value = [];
-    var implicitLength = (itemElement.vl === 'u/l');
-    if (implicitLength) {
-      itemElement.vl = 0xffffffff;
-    }
+    // item element (create new to not modify original)
+    var implicitLength = item.xFFFEE000.vl === 'u/l';
+    var itemElement = {
+      tag: item.xFFFEE000.tag,
+      vr: item.xFFFEE000.vr,
+      vl: implicitLength ? 0xffffffff : item.xFFFEE000.vl,
+      value: []
+    };
     byteOffset = this.writeDataElement(itemElement, byteOffset, isImplicit);
     // write rest
     for (var m = 0; m < itemKeys.length; ++m) {
@@ -6172,9 +6173,8 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
       var realVl = element.endOffset - element.startOffset;
       localSize += parseInt(realVl, 10);
 
-      // add size of sequence delimitation item
-      if (dwv.dicom.isImplicitLengthSequence(element) ||
-        dwv.dicom.isImplicitLengthPixels(element)) {
+      // add size of pixel sequence delimitation items
+      if (dwv.dicom.isImplicitLengthPixels(element)) {
         localSize += dwv.dicom.getDataElementPrefixByteSize('NONE', isImplicit);
       }
 
@@ -6229,6 +6229,16 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
   for (var j = 0, lenj = metaElements.length; j < lenj; ++j) {
     offset = metaWriter.writeDataElement(metaElements[j], offset, false);
   }
+
+  // check meta position
+  var preambleSize = 128 + 4;
+  var metaOffset = preambleSize + fmiglSize + metaLength;
+  if (offset !== metaOffset) {
+    console.warn('Bad size calculation... meta offset: ', offset,
+      ', calculated size:', metaOffset,
+      '(diff:', offset - metaOffset, ')');
+  }
+
   // pass flag to writer
   dataWriter.useUnVrForPrivateSq = this.useUnVrForPrivateSq;
   // write non meta
@@ -6236,6 +6246,12 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
     offset = dataWriter.writeDataElement(rawElements[k], offset, isImplicit);
   }
 
+  // check final position
+  if (offset !== totalSize) {
+    console.warn('Bad size calculation... final offset: ', offset,
+      ', calculated size:', totalSize,
+      '(diff:', offset - totalSize, ')');
+  }
   // return
   return buffer;
 };
@@ -6273,8 +6289,7 @@ dwv.dicom.getDicomElement = function (tagName) {
   // return element definition
   return {
     'tag': {'group': tagGE.group, 'element': tagGE.element},
-    'vr': dict[tagGE.group][tagGE.element][0],
-    'vl': dict[tagGE.group][tagGE.element][1]
+    'vr': dict[tagGE.group][tagGE.element][0]
   };
 };
 
@@ -6328,12 +6343,6 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
           subSize += dwv.dicom.setElementValue(
             subElement, itemData[elemKeys[j]]);
 
-          // add sequence delimitation size for sub sequences
-          if (dwv.dicom.isImplicitLengthSequence(subElement)) {
-            subSize += dwv.dicom.getDataElementPrefixByteSize(
-              'NONE', isImplicit);
-          }
-
           name = dwv.dicom.getGroupElementKey(
             subElement.tag.group, subElement.tag.element);
           itemElements[name] = subElement;
@@ -6369,6 +6378,11 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
 
         size += subSize;
         sqItems.push(itemElements);
+      }
+
+      // add sequence delimitation size
+      if (!explicitLength) {
+        size += dwv.dicom.getDataElementPrefixByteSize('NONE', isImplicit);
       }
 
       element.value = sqItems;
