@@ -247,7 +247,8 @@ dwv.test.testWriteReadDataFromConfig = function (config, assert) {
     if (typeof config.useUnVrForPrivateSq !== 'undefined') {
       useUnVrForPrivateSq = config.useUnVrForPrivateSq;
     }
-  } // convert JSON to DICOM element object
+  }
+  // convert JSON to DICOM element object
   var res = dwv.dicom.getElementsFromJSONTags(config.tags);
   var dicomElements = res.elements;
   // pixels: small gradient square
