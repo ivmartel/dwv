@@ -4,39 +4,57 @@ dwv.test = dwv.test || {};
 /**
  * Create an object url from (JSON) tags.
  *
- * @param {object} tags The DICOM tags as JSON.
+ * @param {object} config The data configuration.
  * @returns {string} The object URL.
  */
-function getObjectUrlFromTags(tags) {
+function getObjectUrlFromTags(config) {
+  // add private tags to dict if present
+  var useUnVrForPrivateSq = false;
+  if (typeof config.privateDictionary !== 'undefined') {
+    var keys = Object.keys(config.privateDictionary);
+    for (var i = 0; i < keys.length; ++i) {
+      var group = keys[i];
+      var tags = config.privateDictionary[group];
+      dwv.dicom.dictionary[group] = tags;
+    }
+    if (typeof config.useUnVrForPrivateSq !== 'undefined') {
+      useUnVrForPrivateSq = config.useUnVrForPrivateSq;
+    }
+  }
   // convert JSON to DICOM element object
-  var res = dwv.dicom.getElementsFromJSONTags(tags);
+  var res = dwv.dicom.getElementsFromJSONTags(config.tags);
   var dicomElements = res.elements;
   // pixels: small gradient square
   dicomElements.x7FE00010 =
-    dwv.dicom.generatePixelDataFromJSONTags(tags, res.offset);
+    dwv.dicom.generatePixelDataFromJSONTags(config.tags, res.offset);
 
   // create DICOM buffer
   var writer = new dwv.dicom.DicomWriter();
-  var dicomBuffer = null;
-  try {
-    dicomBuffer = writer.getBuffer(dicomElements);
-  } catch (error) {
-    console.error(error);
-    return;
-  }
+  writer.useUnVrForPrivateSq = useUnVrForPrivateSq;
+  var dicomBuffer = writer.getBuffer(dicomElements);
 
   // blob and then url
   var blob = new Blob([dicomBuffer], {type: 'application/dicom'});
   return URL.createObjectURL(blob);
 }
 
-// create list from configs
-var getConfigsHtmlList = function (configs) {
+/**
+ * Create list from configs
+ *
+ * @param {Array} configs An array of data cofiguration.
+ * @returns {object} The html list element.
+ */
+function getConfigsHtmlList(configs) {
   var ul = document.createElement('ul');
   for (var i = 0; i < configs.length; ++i) {
     // download link
     var link = document.createElement('a');
-    link.href = getObjectUrlFromTags(configs[i].tags);
+    try {
+      link.href = getObjectUrlFromTags(configs[i]);
+    } catch (error) {
+      console.log('data:', configs[i].name);
+      console.error(error);
+    }
     var fileName = 'dwv-generated-' + configs[i].name + '.dcm';
     link.download = fileName;
     link.appendChild(document.createTextNode(fileName));
@@ -48,7 +66,7 @@ var getConfigsHtmlList = function (configs) {
     ul.append(li);
   }
   return ul;
-};
+}
 
 /**
  * Get the list of configs and display them with a download link.
@@ -56,8 +74,7 @@ var getConfigsHtmlList = function (configs) {
  * @param {string} fileName The input file name.
  */
 function getFileConfigsHtmlList(fileName) {
-  var urlRoot = 'https://raw.githubusercontent.com/ivmartel/dwv/master';
-  var url = urlRoot + '/tests/dicom/' + fileName + '.json';
+  var url = '/tests/dicom/' + fileName + '.json';
   var request = new XMLHttpRequest();
   request.open('GET', url, true);
   request.onerror = function (event) {

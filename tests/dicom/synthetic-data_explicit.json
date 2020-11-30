@@ -225,7 +225,7 @@
 },
 {
     "name": "test07",
-    "description": "Little Endian Explicit test data with private tags.",
+    "description": "Little Endian Explicit test data with private tags and VR=UN for private SQ.",
     "tags": {
         "TransferSyntaxUID": "1.2.840.10008.1.2.1\u0000",
         "Modality": "MR",

@@ -191,7 +191,7 @@
     }
 },
 {
-    "name": "test16",
+    "name": "test26",
     "description": "Little Endian Implicit test data with private tags.",
     "tags": {
         "TransferSyntaxUID": "1.2.840.10008.1.2.2\u0000",
@@ -224,8 +224,8 @@
     "useUnVrForPrivateSq": false
 },
 {
-    "name": "test16",
-    "description": "Little Endian Implicit test data with private tags.",
+    "name": "test27",
+    "description": "Little Endian Implicit test data with private tags and VR=UN for private SQ.",
     "tags": {
         "TransferSyntaxUID": "1.2.840.10008.1.2.2\u0000",
         "Modality": "MR",
