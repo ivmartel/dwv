@@ -42,7 +42,7 @@
     "karma-chrome-launcher": "~3.1.0",
     "karma-coverage": "^2.0.2",
     "karma-qunit": "~4.1.1",
-    "qunit": "~2.12.0"
+    "qunit": "~2.13.0"
   },
   "scripts": {
     "lint": "grunt lint",
