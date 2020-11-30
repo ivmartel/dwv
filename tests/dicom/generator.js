@@ -1,6 +1,7 @@
 var dwv = dwv || {};
 dwv.test = dwv.test || {};
 var JSZip = JSZip || {};
+
 // tags file
 var _tagsFile = null;
 var _images = null;
@@ -19,7 +20,9 @@ function getPixelGeneratorName() {
   return pixelGeneratorName;
 }
 
-// generate DICOM data
+/**
+ * Generate DICOM data
+ */
 dwv.test.onGenerate = function () {
   if (_generating) {
     return;
@@ -71,6 +74,7 @@ dwv.test.onGenerate = function () {
 };
 
 /**
+ *
  * @param {string} pixelGeneratorName The name of the pixel generator.
  * @param {number} sliceNumber The slice to generate.
  * @returns {Blob} A blob with the slice DICOM data.
@@ -101,7 +105,9 @@ function generateSlice(pixelGeneratorName, sliceNumber) {
   return blob;
 }
 
-// save the tags as a JSON file
+/**
+ * Save the tags as a JSON file.
+ */
 dwv.test.onSaveTags = function () {
   // check validity
   if (!isValidTags()) {
@@ -133,14 +139,20 @@ function isValidTags() {
   return true;
 }
 
-// open JSONLint to check the tags
+/**
+ * Open JSONLint to check the tags.
+ */
 dwv.test.launchJSONlint = function () {
   var text = document.getElementById('tags').value;
   var link = 'http://jsonlint.com/?json=' + encodeURIComponent(text);
   window.open(link);
 };
 
-// handle input tags file
+/**
+ * Handle input tags file.
+ *
+ * @param {object} event The input field event.
+ */
 dwv.test.onInputTagsFile = function (event) {
   if (event.target.files.length === 0) {
     return;
@@ -153,7 +165,11 @@ dwv.test.onInputTagsFile = function (event) {
   reader.readAsText(_tagsFile);
 };
 
-// handle input image file
+/**
+ * Handle input image file
+ *
+ * @param {object} event The input field event.
+ */
 dwv.test.onInputImageFiles = function (event) {
   if (event.target.files.length === 0) {
     return;
@@ -223,7 +239,9 @@ dwv.test.onInputImageFiles = function (event) {
   }
 };
 
-// last minute
+/**
+ * Last minute.
+ */
 dwv.test.onDOMContentLoadedGenerator = function (/*event*/) {
   var tags = JSON.parse(document.getElementById('tags').value);
   if (tags) {

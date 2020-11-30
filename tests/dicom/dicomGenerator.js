@@ -56,9 +56,15 @@ dwv.dicom.getElementsFromJSONTags = function (tags) {
 dwv.dicom.generatePixelDataFromJSONTags = function (
   tags, startOffset, pixGeneratorName, sliceNumber, images, numberOfSlices) {
 
-  // default generator
+  // default
   if (typeof pixGeneratorName === 'undefined') {
     pixGeneratorName = 'gradSquare';
+  }
+  if (typeof sliceNumber === 'undefined') {
+    sliceNumber = 0;
+  }
+  if (typeof numberOfSlices === 'undefined') {
+    numberOfSlices = 1;
   }
 
   // check tags
