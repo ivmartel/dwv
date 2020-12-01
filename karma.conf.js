@@ -35,14 +35,15 @@ module.exports = function (config) {
       // extra served content
       {pattern: 'tests/**/*.html', included: false},
       {pattern: 'tests/visual/appgui.js', included: false},
+      {pattern: 'tests/pacs/*.js', included: false},
       {pattern: 'decoders/**/*.js', included: false},
+      {pattern: 'tests/utils/worker.js', included: false},
       {pattern: 'tests/visual/images/*.jpg', included: false},
       {pattern: 'tests/pacs/images/*.png', included: false},
       // src
       'src/**/*.js',
       // test
       'tests/**/*.test.js',
-      'tests/utils/worker.js',
       'tests/dicom/*.js'
     ],
     proxies: {
@@ -72,7 +73,15 @@ module.exports = function (config) {
     },
     reporters: ['progress'],
     logLevel: config.LOG_INFO,
-    browsers: ['Chrome'],
+    customLaunchers: {
+      ChromeWithTestsPage: {
+        base: 'Chrome',
+        flags: [
+          'http://localhost:9876/base/tests/index.html'
+        ]
+      }
+    },
+    browsers: ['ChromeWithTestsPage'],
     restartOnFileChange: true
   });
 };

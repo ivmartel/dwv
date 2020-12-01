@@ -83,31 +83,9 @@ body { font-family: Arial, Helvetica, sans-serif; }
 <script type="text/javascript" src="../../src/utils/uri.js"></script>
 
 <!-- Local -->
-<script>
-
-// Image decoders (for web workers)
-dwv.image.decoderScripts = {
-    "jpeg2000": "../../decoders/pdfjs/decode-jpeg2000.js",
-    "jpeg-lossless": "../../decoders/rii-mango/decode-jpegloss.js",
-    "jpeg-baseline": "../../decoders/pdfjs/decode-jpegbaseline.js",
-    "rle": "../../decoders/dwv/decode-rle.js"
-};
-// get element
-dwv.gui.getElement = dwv.gui.base.getElement;
-
-// dwv application
-var config = {
-    "containerDivId": "dwv",
-    "tools": {
-        "Scroll": {}
-    }
-};
-var app = new dwv.App();
-app.init(config);
-app.setTool("Scroll");
-// load from location
-dwv.utils.loadFromUri(window.location.href, app);
-
+<script type="text/javascript" src="./viewer.js"></script>
+<script type="text/javascript">
+dwv.test.viewerSetup();
 </script>
 
 </head>
@@ -118,7 +96,7 @@ dwv.utils.loadFromUri(window.location.href, app);
 <div id="dwv">
   <!-- Layer Container -->
   <div class="layerContainer">
-  <canvas class="imageLayer">Only for HTML5 compatible browsers...</canvas>
+    <canvas class="imageLayer">Only for HTML5 compatible browsers...</canvas>
   </div><!-- /layerContainer -->
 </div><!-- /dwv -->
 
