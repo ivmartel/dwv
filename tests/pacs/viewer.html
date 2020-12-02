@@ -8,27 +8,17 @@
 <meta name="keywords" content="DICOM,HTML5,JavaScript,medical,imaging,DWV">
 <!-- Style -->
 <style type="text/css">
-body { font-family: Arial, Helvetica, sans-serif; }
-.snapshot {
-    float: left; margin: 5px;
-    max-width: 200px; max-height: 200px;
+body {
+  font-family: Arial, Helvetica, sans-serif;
 }
-.dwv {
-    float: left; margin: 5px;
-    width: 200px; height: 200px;
+.input {
+  margin-bottom: 10px;
+  padding: 5px;
+  background-color: gainsboro;
 }
-.doc { float: left; margin: 5px; }
-.path {
-    border-bottom: 1px dashed #999;
-    text-decoration: none;
-}
-.key {
-    color: #999;
-}
-.separator { clear: both; }
-.footer {
-    margin-top: 15px; padding: 5px;
-    background-color: #ccc;
+#fileinput {
+  width: 80%;
+  border: 1px dotted gray;
 }
 </style>
 <!-- Local -->
@@ -62,6 +52,7 @@ body { font-family: Arial, Helvetica, sans-serif; }
 <script type="text/javascript" src="../../src/image/windowLevel.js"></script>
 <script type="text/javascript" src="../../src/image/windowLut.js"></script>
 <script type="text/javascript" src="../../src/io/urlsLoader.js"></script>
+<script type="text/javascript" src="../../src/io/filesLoader.js"></script>
 <script type="text/javascript" src="../../src/io/dicomDataLoader.js"></script>
 <script type="text/javascript" src="../../src/io/rawImageLoader.js"></script>
 <script type="text/javascript" src="../../src/math/bucketQueue.js"></script>
@@ -73,6 +64,7 @@ body { font-family: Arial, Helvetica, sans-serif; }
 <script type="text/javascript" src="../../src/math/vector.js"></script>
 <script type="text/javascript" src="../../src/tools/undo.js"></script>
 <script type="text/javascript" src="../../src/tools/scroll.js"></script>
+<script type="text/javascript" src="../../src/tools/windowLevel.js"></script>
 <script type="text/javascript" src="../../src/utils/env.js"></script>
 <script type="text/javascript" src="../../src/utils/listen.js"></script>
 <script type="text/javascript" src="../../src/utils/modernizr.js"></script>
@@ -86,11 +78,18 @@ body { font-family: Arial, Helvetica, sans-serif; }
 <script type="text/javascript" src="./viewer.js"></script>
 <script type="text/javascript">
 dwv.test.viewerSetup();
+// last minute
+document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedViewer);
 </script>
 
 </head>
 
 <body>
+
+<div class="input">
+<label for="fileinput">Input:</label>
+<input type="file" id="fileinput" multiple>
+</div>
 
 <!-- DWV -->
 <div id="dwv">
