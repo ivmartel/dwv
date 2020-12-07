@@ -3,112 +3,12 @@
 <head>
 <title>DICOM Anonymiser</title>
 <meta charset="UTF-8">
+<!-- dwv -->
 <script type="text/javascript" src="../../src/dicom/dicomParser.js"></script>
 <script type="text/javascript" src="../../src/dicom/dicomWriter.js"></script>
 <script type="text/javascript" src="../../src/dicom/dictionary.js"></script>
-<script type="text/javascript">
-// rules file
-var _rulesFile = null;
-// dicom file
-var _dicomFile = null;
-// DICOM elements
-var _dicomElements = null;
-// handle DICOM file load
-function onLoadDICOMFile(event)
-{
-    // parse DICOM
-    var parser = new dwv.dicom.DicomParser();
-    parser.parse(event.target.result);
-    // store elements
-    _dicomElements = parser.getRawDicomElements();
-    // activate generate button
-    var element = document.getElementById("generate");
-    element.className = "button button-active";
-}
-// generate DICOM data
-function generate()
-{
-    // check validity
-    if (!isValidRules()) {
-        return;
-    }
-    // create writer with textarea rules
-    var writer = new dwv.dicom.DicomWriter();
-    writer.rules = JSON.parse(document.getElementById('rules').value);
-    var dicomBuffer = null;
-    try {
-        dicomBuffer = writer.getBuffer(_dicomElements);
-    } catch (error) {
-        console.error(error);
-        alert(error.message);
-    }
-    // view as Blob to allow download
-    var blob = new Blob([dicomBuffer], {type: 'application/dicom'});
-    // update generate button
-    var element = document.getElementById("generate");
-    element.href = URL.createObjectURL(blob);
-    element.download = "anonym-" + _dicomFile.name;
-}
-// save the rules as a JSON file
-function saveRules()
-{
-    // check validity
-    if (!isValidRules()) {
-        return;
-    }
-    // get text from the textarea
-    var text = document.getElementById('rules').value;
-    // view as Blob to allow download
-    var blob = new Blob([text], {type:"text/plain"});
-    // update save button
-    var element = document.getElementById("save");
-    element.download = (_rulesFile === null ? "rules.json" : _rulesFile.name);
-    element.href = URL.createObjectURL(blob);
-}
-// is the JSON valid?
-function isValidRules()
-{
-    try {
-        JSON.parse(document.getElementById('rules').value);
-    }
-    catch (error) {
-        alert("The JSON is not valid, please check it with JSONLint.");
-        return false;
-    }
-    return true;
-}
-// open JSONLint to check the rules
-function launchJSONLint()
-{
-    var text = document.getElementById('rules').value;
-    var link = "http://jsonlint.com/?json=" + encodeURIComponent(text);
-    window.open(link);
-}
-// handle input DICOM file
-function onInputDICOMFile(event)
-{
-    if (event.target.files.length === 0) {
-        return;
-    }
-    _dicomFile = event.target.files[0];
-    var reader = new FileReader();
-    reader.onload = onLoadDICOMFile;
-    reader.readAsArrayBuffer(_dicomFile);
-}
-// handle input rules file
-function onInputRulesFile(event)
-{
-    if (event.target.files.length === 0) {
-        return;
-    }
-    _rulesFile = event.target.files[0];
-    var reader = new FileReader();
-    reader.onload = function (event) {
-        document.getElementById('rules').value = event.target.result;
-    };
-    reader.readAsText(_rulesFile);
-}
-</script>
+<!-- own -->
+<script type="text/javascript"src="./anonymiser.js"></script>
 <style>
 body { font-family: Arial, Helvetica, sans-serif; }
 textarea { width: 99%; margin: 2px; }
@@ -148,10 +48,10 @@ fieldset { background: whitesmoke; border: 1px solid grey; }
 
 <fieldset>
 <label for="infile">DICOM file: </label>
-<input id="infile" type="file" name="file" onchange="onInputDICOMFile(event);">
+<input id="infile" type="file" name="file" onchange="dwv.test.onInputDICOMFile(event);">
 <br>&nbsp;
 <br><label for="inrulesfile">JSON rules file: </label>
-<input id="inrulesfile" type="file" name="file" onchange="onInputRulesFile(event);">
+<input id="inrulesfile" type="file" name="file" onchange="dwv.test.onInputRulesFile(event);">
 </fieldset>
 
 <textarea id="rules" rows="25">
@@ -181,9 +81,9 @@ fieldset { background: whitesmoke; border: 1px solid grey; }
 </textarea>
 
 <fieldset>
-<a href="#" id="jsonlint" class="button" onclick="launchJSONLint();">JSONLint</a>
-<a href="#" id="save" class="button" onclick="saveRules();">Save Rules</a>
-<a href="#" id="generate" class="button button-disabled" onclick="generate();">Generate</a>
+<a href="#" id="jsonlint" class="button" onclick="dwv.test.launchJSONLint();">JSONLint</a>
+<a href="#" id="save" class="button" onclick="dwv.test.saveRules();">Save Rules</a>
+<a href="#" id="generate" class="button button-disabled" onclick="dwv.test.generate();">Generate</a>
 </fieldset>
 </form>
 

@@ -3,7 +3,7 @@
 
 <head>
 <meta charset="UTF-8">
-<title>DWV Tests extra</title>
+<title>DWV Tests</title>
 <style>
 body { font-family: Arial, Helvetica, sans-serif; }
 </style>
@@ -13,19 +13,27 @@ body { font-family: Arial, Helvetica, sans-serif; }
 
 <!-- under Karma, access this page at 'base/tests/index.html' -->
 
-<h1>DWV extra test content</h1>
+<h1>DWV Tests</h1>
 
-<p>Here are some extra web pages used to evaluate the dwv functionalities:</p>
+<p>
+  If you arrived here via <code>yarn run test</code>, there should be another tab
+  opened with the test summary.
+</p>
+
+<p>
+  Here are some extra web pages used to evaluate the dwv functionalities:
+</p>
 <ul>
-<li>Visual tests: <a href="./visual/index.html">DICOM</a>,
+  <li><a href="./pacs/index.html">Fake PACS</a> (demo page),
+    uses a simplistic <a href="./pacs/viewer.html">viewer</a></li>
+  <li>Visual snapshot compare: <a href="./visual/index.html">DICOM</a>,
     <a href="./visual/index-jpeg.html">DICOM jpg</a>,
     <a href="./visual/index-jpeg2000.html">DICOM jpg2000</a>,
     <a href="./visual/index-rle.html">DICOM rle</a></li>
-<li><a href="./pacs/index.html">Fake PACS</a></li>
-<li>Image: <a href="./image/index.html">colour maps</a></li>
-<li>DICOM: <a href="./dicom/anonymiser.html">anonymiser</a>,
+  <li>DICOM: <a href="./dicom/anonymiser.html">anonymiser</a>,
     <a href="./dicom/generator.html">generator</a>,
     <a href="./dicom/synthetic-data.html">synthetic-data</a></li>
+  <li>Image: <a href="./image/index.html">colour maps</a></li>
 </ul>
 
 </body>
