@@ -1,16 +1,17 @@
-The dwv is a DICOM Web Viewer. Here is an intent at listing User Stories or Requirements Specification.
+The dwv is a DICOM Web Viewer library. Here is an intent at listing User Stories or Requirements Specification. The _user_ is a user of the library, typically a client in which dwv is integrated. 
 
-# I/O
+## I/O
+
 Definitions:
 * _DICOM data_: a single or multiple DICOM files.
 * _Image data_: a single or multiple image files in JPG or PNG format.
 * _File_: represents file data typically obtained from the underlying file system. It is provided via an HTML input field with the 'file' type or via drag and drop. See the HTML5 [FileAPI](https://www.w3.org/TR/FileAPI/) for more details.
 * _Url_: the data is accessed via a url which resolves to data published on the same server as the application or on one that allows Cross-Origin Resource Sharing (CORS). 
 
-#### DWV-URS-IO-001: Load DICOM file(s)
+#### DWV-URS-IO-001 Load DICOM file(s)
 The user can load DICOM data provided as one or multiple HTML File(s).
 
-#### DWV-URS-IO-002: Load Image file(s)
+#### DWV-URS-IO-002 Load Image file(s)
 The user can load image data provided as one or multiple HTML File(s).
 
 #### DWV-URS-IO-003 Load DICOM url(s)
@@ -59,27 +60,28 @@ The manifest structure is the one used by the Weasis PACS connector of dcm4chee 
 
 Only the first series of the first study of the first patient will be loaded.
 
-# UI
-#### DWV-URS-UI-001 Web Application
-The application is a web application, a browser without any extensions must be sufficient to run the application. Supported browsers are listed in the [Platform-support](https://github.com/ivmartel/dwv/wiki/Platform-support) wiki page.
+## UI
+
+#### DWV-URS-UI-001 Integration in web application
+The library can be integrated in a web application, a browser without any extensions must be sufficient to run the application.
 
 #### DWV-URS-UI-002 Display
-The user can view the image data in an optimised way according to the browser window properties. 
+The user can generate a view of the image data in an optimised way according to external window properties. 
 
 #### DWV-URS-UI-003 Interaction
-The user can control the application with a computer mouse or with a finger on touch enabled devices. 
+The user can interact with content with a computer mouse or with a finger on touch enabled devices. 
 
 #### DWV-URS-UI-004 Overlay information
-The user can view the current window and level, the zoom level, the X and Y coordinates and the pixel intensity overlayed on the image.
+The user can generate an overlay to view the current window and level, the zoom level, the X and Y coordinates and the pixel intensity.
 
 #### DWV-URS-UI-005 Histogram
-The user can view the histogram of the image data.
+The user can generate the histogram of the image data.
 
 #### DWV-URS-UI-006 DICOM information
-The user can choose to view a table of the full DICOM information except the pixel data.
+The user can generate a table of the full DICOM information except the pixel data.
 
 #### DWV-URS-UI-007 Window/Level
-The user can change the window/level of the displayed data.  The window/level values must be displayed to the user. The default interaction are:
+The user can change the window/level of the displayed data. The window/level values must be displayed to the user. The default interaction are:
  * `left click drag up/down` or `one touch drag up/down` changes the window,
  * `left click drag left/right` or `one touch drag up/down` changes the level,
  * `double left click` or `double touch` centre's the window/level on the clicked intensity,

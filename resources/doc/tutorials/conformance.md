@@ -2,6 +2,9 @@ This page details which parts of DICOM the DWV supports and also plans to suppor
 
 Main reference: [DICOM/2013](http://dicom.nema.org/dicom/2013/output/chtml/part01/PS3.1.html). The dictionary was generated using [part06/chapter_6](http://dicom.nema.org/dicom/2013/output/chtml/part06/chapter_6.html).
 
+## Validity
+All DICOM files should start with the DICOM prefix `DICM` (see [DICOM File Meta Information](http://dicom.nema.org/dicom/2013/output/chtml/part10/chapter_7.html#sect_7.1)). If not, it is not a valid DICOM. Since v0.26 ([#188](https://github.com/ivmartel/dwv/issues/188)), the parser will attempt to parse data without the prefix but there are no guaranty of results!
+
 ## Transfer syntax
 See the [definition](http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_10.html) and the UID [list](http://dicom.nema.org/dicom/2013/output/chtml/part06/chapter_A.html#table_A-1).
 
@@ -71,34 +74,8 @@ File data storage, either one frame per file or multiple:
  * with code extensions: &#x274C;
 
 ## Radiotherapy
-
 The Part PS 3.3 of the DICOM Standard specifies the set of Information Object Definitions (IODs) which provide an abstract definition of real-world objects applicable to communication of digital medical information. The Attributes of an IOD describe the properties of a Real-World Object Instance. Related Attributes are grouped into [Modules](http://dicom.nema.org/dicom/2013/output/chtml/part03/chapter_C.html) which represent a higher level of semantics documented in the Module Specifications found in Annex C of the DICOM Standard. Source: [leadtools](http://www.leadtools.com/sdk/medical/dicom-spec.htm).
 
 This list are the modules of interest:
  * [Radiotherapy module](http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.8.html#sect_C.8.8) -> &#x274C;
  * [Waveform module](http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.10.html#sect_C.10.9) -> &#x274C;
-
-## Test data
-
- * [NEMA WG04](ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04): official jpeg, jpegls and jpeg2000 encoded example data,
- * David Clunies' [images](http://www.dclunie.com/images/)
- * [datasets](http://www.osirix-viewer.com/datasets/): jpeg2000 encoded data (from [Osirix](http://www.osirix-viewer.com)),
- * [gdcmData](http://sourceforge.net/p/gdcm/gdcmdata): all kind of data (from [GDCM](http://sourceforge.net/projects/gdcm/)),
- * [nanodicom](https://github.com/nanodocumet/Nanodicom): see the 'samples' folder of this php DICOM toolkit,
- * [babymri](http://x.babymri.org/?53320924&.dcm): demo data from the Research Study for Infants (no need to disable web security)
- * [sample-dicom-images](http://www.aycan.de/lp/sample-dicom-images.html): link list from [AYCAN](http://www.aycan.de) (PACS company),
- * [1996 RSNA test data](http://erl.wustl.edu/research/dicom/imageindex.html): the Washington University in St. Louis,
- * [NBIA](https://imaging.nci.nih.gov/): NIH National Biomedical Imaging Archive,
- * [testdata.zip](http://code.google.com/p/dicompyler/downloads/detail?name=testdata.zip&can=2&q=): DICOM RT data (from [dicompyler](http://code.google.com/p/dicompyler/)),
- * [imgdisplay_testcases.zip](ftp://dicom.offis.de/pub/dicom/offis/software/mesa_cpi/release_2004/imgdisplay_testcases.zip): display test data (from [Offis](http://dicom.offis.de/)),
- * [medical data files](http://www.mve.info/Download/): Medical Volume Explorer ([MVE](http://www.mve.info)),
- * [samples](http://www.santec.lu/project/optimage/samples): phantom data from the Tudor research centre (Luxembourg),
- * [fruits](http://insideinsides.blogspot.com): Magnetic Resonance Imaging of Foods, retrieved some data some time ago, not sure it is still available
-
-## Links
-
- * DICOM is easy: [[http://dicomiseasy.blogspot.com.es/]]
- * David Clunie: [[http://www.dclunie.com/medical-image-faq/html/]]
- * Leadtools: [[http://www.leadtools.com/sdk/medical/dicom-spec.htm]]
- * Lookup: [[http://dicomlookup.com]] and [[http://www.dicomtags.com]] and [[http://dicom.innolitics.com]]
- * GDCM: [[http://www.creatis.insa-lyon.fr/software/public/Gdcm/ConformanceSummary.html]] and [presentation](http://2011.rmll.info/IMG/pdf/gdcm.pdf)

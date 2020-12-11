@@ -1,6 +1,6 @@
-This page details some PACS in which DWV was integrated, this via the Web Access to Dicom Object (WADO) protocol (see [[Dicom Support]]). By integrated, I mean that the PACS would handle the searching and once the data is found would allow the user to launch the viewer. 
+This page details some integrations of dwv. PACS integrations will use Web Access to Dicom Object (WADO) protocol (see [conformance](./tutorial-conformance.html#wado)). By integrated, I mean that the PACS would handle the searching and once the data is found would allow the user to launch the viewer. 
 
-Quick summary: [Conquest](#conquest) :heavy_check_mark:, [dcm4chee](#dcm4chee) :heavy_check_mark:, [Orthanc](#orthanc) :heavy_check_mark:, [ClearCanvas](#clearcanvas) :x:.
+Quick summary: [Conquest](#conquest) &#x2705;, [dcm4chee](#dcm4chee) &#x2705;, [Orthanc](#orthanc) &#x2705;, [ClearCanvas](#clearcanvas) &#x274C;, [Google](#google) &#x2705;, [WordPress](#wordpress) &#x2705;
 
 ## Conquest 
 [Conquest](http://ingenium.home.xs4all.nl/dicom.html): _"a full featured DICOM server based on the public domain UCDMC DICOM code"_ ([entry](http://www.idoimaging.com/program/183) on idoimaging). License: Public Domain (see [medfloss](http://www.medfloss.org/node/93)).
@@ -36,3 +36,12 @@ Operational since dwv `v0.8.0beta` and issue [#110](https://github.com/ivmartel/
 [ClearCanvas](http://www.clearcanvas.ca): _"...dedicated to making medical imaging and informatics accessible to all by offering both free open source solutions as well as easy-to-use, affordable clinical solutions approved by regulatory agencies worldwide."_ ([entry](http://www.idoimaging.com/program/357) on idoimaging). The code is available on [github](https://github.com/ClearCanvas/ClearCanvas). License: GPL (see [license](https://github.com/ClearCanvas/ClearCanvas/blob/master/LICENSE.TXT)).
 
 In very slow progress: see issue [#22](https://github.com/ivmartel/dwv/issues/22).
+
+## Google
+Available via the [dwv-jqmobile](https://github.com/ivmartel/dwv-jqmobile) project.
+
+* Google [Drive web](http://drive.google.com/): right click on a DICOM file and choose `Open with`. DWV should appear in the `Suggested apps`, if not, choose `Connect more apps`, search for 'dwv' and connect it (see [managing drive apps](https://support.google.com/drive/answer/2523073) for details)
+* Google Chrome store: [dwv app](https://chrome.google.com/webstore/detail/dwv/elkmgopbfeoimigdmekflnapemieceja) (see the [chrome apps help](https://support.google.com/chrome/answer/3060053) for details)
+
+## WordPress
+See [dicom-support](https://wordpress.org/plugins/dicom-support/) plugin and a [demo](https://tyarcaouen.synology.me/wordpress/dwvblog/).

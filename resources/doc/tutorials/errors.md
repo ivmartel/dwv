@@ -6,7 +6,7 @@ Message: `Not a valid DICOM file (no magic DICM word found)`
 
 Context: Loading a DICOM file.
 
-All DICOM files should start with the DICOM prefix `DICM` (see [DICOM File Meta Information](http://dicom.nema.org/dicom/2013/output/chtml/part10/chapter_7.html#sect_7.1)). If not, it is not a valid DICOM. 
+All DICOM files should start with the DICOM prefix `DICM` (see [tutorial-conformance.html#validity](./tutorial-conformance.html#validity) for some exceptions and more details). 
 
 To fix the data you can use tolerant conversion tools such as [gdcm](http://gdcm.sourceforge.net/wiki/index.php/Main_Page). Convert the data to raw with `gdcmconv --raw -i {in-dcm_file_path} -o {out-dcm_file_path}`.
 
@@ -22,7 +22,7 @@ The debug window of your browser should give you more info of the reason why the
 
 One possible reason for permission denial can be related to [Same origin policy](http://en.wikipedia.org/wiki/Same-origin_policy). It forbids pages on different domains to access each others' data. Check your browser log for: 'Cross-Origin Request Blocked' in Firefox or 'No Access-Control-Allow-Origin' in Chrome. DWV should be hosted on the same server as the data or you need to enable Cross-Origin Resource Sharing (CORS), see [enable-cors.org](http://enable-cors.org/) for details.
 
-The same happens when accessing local file(s) from the dwv url. For development purposes, check this page: [How-to-run-things-locally](https://threejs.org/docs/#manual/introduction/How-to-run-things-locally) on the three.js wiki. I recommend using a local web server such as node's [http-server](https://www.npmjs.com/package/http-server).
+The same happens when accessing local file(s) from the dwv url. Best to serve files via karma and `yarn run test`.
 
 ## XMLHttpRequest cannot load file (non DICOM)
 
