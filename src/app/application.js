@@ -5,6 +5,7 @@ var dwv = dwv || {};
  * Main application class.
  *
  * @class
+ * @tutorial examples
  */
 dwv.App = function () {
   // Local object

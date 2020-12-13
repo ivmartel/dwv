@@ -19,9 +19,9 @@ script:
 after_success:
 # send coverage to coveralls
 - grunt coveralls
-# update gh-page only if not a pull request and if branch master or develop
+# update gh-page only if not a pull request and if branch master
 - if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-    if [ "$TRAVIS_BRANCH" == "master" ] || [ "$TRAVIS_BRANCH" == "develop" ]; then
+    if [ "$TRAVIS_BRANCH" == "master" ]; then
       chmod +x ./resources/scripts/update-gh-pages.sh; "./resources/scripts/update-gh-pages.sh";
     else echo "Not deploying artifacts for branch $TRAVIS_BRANCH"; fi
   else echo "Not deploying artifacts for pull request"; fi
