@@ -50,7 +50,7 @@
     "test": "grunt test",
     "test-ci": "grunt test-ci",
     "build": "grunt build",
-    "doc": "jsdoc -c resources/doc/jsdoc.conf.js",
+    "doc": "jsdoc -c resources/doc/jsdoc.conf.json",
     "dev": "grunt dev",
     "gren": "gren"
   }
