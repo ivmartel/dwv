@@ -16,7 +16,8 @@ git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/ivmartel/dwv.
 # clean up
 rm -Rf $HOME/gh-pages/doc/stable/*
 # copy doc
-cp -Rf $HOME/build/ivmartel/dwv/build/doc $HOME/gh-pages/doc/stable
+cp -Rf $HOME/build/ivmartel/dwv/build/doc/dwv/* $HOME/gh-pages/doc/
+cp -Rf $HOME/build/ivmartel/dwv/build/doc/dwv/* $HOME/gh-pages/doc/stable
 # move to root of repo
 cd $HOME/gh-pages
 # add, commit and push files

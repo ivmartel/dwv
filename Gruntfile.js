@@ -72,17 +72,6 @@ module.exports = function (grunt) {
         }
       }
     },
-    jsdoc: {
-      dist: {
-        src: ['src/**/*.js', 'tests/**/*.js', 'resources/doc/readme-doc.md'],
-        options: {
-          destination: 'build/doc',
-          template: 'node_modules/docdash',
-          configure: 'resources/doc/jsdoc.conf.json',
-          tutorials: 'resources/doc/tutorials'
-        }
-      }
-    },
     copy: {
       main: {
         files: [
@@ -122,7 +111,6 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-coveralls');
   grunt.loadNpmTasks('grunt-eslint');
-  grunt.loadNpmTasks('grunt-jsdoc');
   grunt.loadNpmTasks('grunt-karma');
 
   // tasks
@@ -130,6 +118,5 @@ module.exports = function (grunt) {
   grunt.registerTask('test', ['karma:unit']);
   grunt.registerTask('test-ci', ['karma:ci']);
   grunt.registerTask('build', ['concat', 'uglify']);
-  grunt.registerTask('doc', ['jsdoc']);
   grunt.registerTask('dev', ['watch:build']);
 };

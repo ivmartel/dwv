@@ -23,6 +23,19 @@
     "plugins": ["node_modules/jsdoc/plugins/markdown"],
     "markdown": {
       "idInHeadings": true
+    },
+    "source": {
+      "include": [
+        "src",
+        "tests"
+      ]
+    },
+    "opts": {
+      "recurse": true,
+      "readme": "resources/doc/readme-doc.md",
+      "destination": "build/doc",
+      "template": "node_modules/docdash",
+      "tutorials": "resources/doc/tutorials",
+      "package": "package.json"
     }
-
 }

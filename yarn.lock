@@ -1195,7 +1195,7 @@ cross-spawn@^5.0.1:
     shebang-command "^1.2.0"
     which "^1.2.9"
 
-cross-spawn@^7.0.1, cross-spawn@^7.0.2:
+cross-spawn@^7.0.2:
   version "7.0.3"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-7.0.3.tgz#f73a85b9d5d41d045551c177e2882d4ac85728a6"
   integrity sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==
@@ -2498,14 +2498,6 @@ grunt-eslint@~23.0.0:
     chalk "^4.0.0"
     eslint "^7.0.0"
 
-grunt-jsdoc@~2.4.0:
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/grunt-jsdoc/-/grunt-jsdoc-2.4.1.tgz#2ba3eb98a058af82d74623ebd0f5bcac38991813"
-  integrity sha512-S0zxU0wDewRu7z+vijEItOWe/UttxWVmvz0qz2ZVcAYR2GpXjsiski2CAVN0b18t2qeVLdmxZkJaEWCOsKzcAw==
-  dependencies:
-    cross-spawn "^7.0.1"
-    jsdoc "^3.6.3"
-
 grunt-karma@~4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/grunt-karma/-/grunt-karma-4.0.0.tgz#faaeaff37ee71ebd75313da4cec1268500d51190"
@@ -3322,7 +3314,7 @@ jsbn@~0.1.0:
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
   integrity sha1-peZUwuWi3rXyAdls77yoDA7y9RM=
 
-jsdoc@^3.6.3:
+jsdoc@3.6.6:
   version "3.6.6"
   resolved "https://registry.yarnpkg.com/jsdoc/-/jsdoc-3.6.6.tgz#9fe162bbdb13ee7988bf74352b5147565bcfd8e1"
   integrity sha512-znR99e1BHeyEkSvgDDpX0sTiTu+8aQyDl9DawrkOGZTTW8hv0deIFXx87114zJ7gRaDZKVQD/4tr1ifmJp9xhQ==
