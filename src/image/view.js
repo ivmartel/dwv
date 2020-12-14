@@ -649,45 +649,52 @@ dwv.image.View.prototype.setWindowLevelMinMax = function () {
  * @param {Array} array The array to fill in.
  */
 dwv.image.View.prototype.generateImageData = function (array) {
-  var frame = (this.getCurrentFrame()) ? this.getCurrentFrame() : 0;
+  var frame = this.getCurrentFrame() ? this.getCurrentFrame() : 0;
   var image = this.getImage();
+  var position = this.getCurrentPosition();
+  var iterator = image.getSliceIterator(position.k);
+  var dataAccessor = function (offset) {
+    return image.getValueAtOffset(offset, frame);
+  };
+
   var photoInterpretation = image.getPhotometricInterpretation();
   switch (photoInterpretation) {
   case 'MONOCHROME1':
   case 'MONOCHROME2':
     dwv.image.generateImageDataMonochrome(
       array,
-      image,
-      this.getCurrentPosition(),
-      frame,
+      iterator,
+      dataAccessor,
       this.getCurrentWindowLut(),
-      this.getColourMap());
+      this.getColourMap()
+    );
     break;
 
   case 'PALETTE COLOR':
     dwv.image.generateImageDataPaletteColor(
       array,
-      image,
-      this.getCurrentPosition(),
-      frame,
-      this.getColourMap());
+      iterator,
+      dataAccessor,
+      this.getColourMap(),
+      image.getMeta().BitsStored === 16
+    );
     break;
 
   case 'RGB':
     dwv.image.generateImageDataRgb(
       array,
-      image,
-      this.getCurrentPosition(),
-      frame,
-      this.getCurrentWindowLut());
+      iterator,
+      dataAccessor,
+      this.getCurrentWindowLut()
+    );
     break;
 
   case 'YBR_FULL':
     dwv.image.generateImageDataYbrFull(
       array,
-      image,
-      this.getCurrentPosition(),
-      frame);
+      iterator,
+      dataAccessor
+    );
     break;
 
   default:

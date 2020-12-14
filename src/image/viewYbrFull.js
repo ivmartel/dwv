@@ -6,24 +6,22 @@ dwv.image = dwv.image || {};
  * Generate image data for 'YBR_FULL' photometric interpretation.
  *
  * @param {Array} array The array to store the outut data
- * @param {object} image The image to generate the view from.
- * @param {object} position The position at witch to generate the view.
- * @param {number} frame The frame number at witch to generate the view.
+ * @param {object} iterator Position iterator.
+ * @param {Function} dataAccessor Function to access data.
  */
 dwv.image.generateImageDataYbrFull = function (
-  array, image, position, frame) {
-
-  var sliceRange = image.getSliceIterator(position.k);
-
+  array,
+  iterator,
+  dataAccessor) {
   var index = 0;
   var y, cb, cr;
   var r, g, b;
-  var ival = sliceRange.next();
+  var ival = iterator.next();
   while (!ival.done) {
     // pixel values
-    y = image.getValueAtOffset(ival.value, frame);
-    cb = image.getValueAtOffset(ival.value1, frame);
-    cr = image.getValueAtOffset(ival.value2, frame);
+    y = dataAccessor(ival.value);
+    cb = dataAccessor(ival.value1);
+    cr = dataAccessor(ival.value2);
     // convert to rgb
     // theory:
     // http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.7.html#sect_C.7.6.3.1.2
@@ -39,6 +37,6 @@ dwv.image.generateImageDataYbrFull = function (
     array.data[index + 3] = 0xff;
     // increment
     index += 4;
-    ival = sliceRange.next();
+    ival = iterator.next();
   }
 };

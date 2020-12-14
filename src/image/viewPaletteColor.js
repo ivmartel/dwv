@@ -6,34 +6,35 @@ dwv.image = dwv.image || {};
  * Generate image data for 'PALETTE COLOR' photometric interpretation.
  *
  * @param {Array} array The array to store the outut data
- * @param {object} image The image to generate the view from.
- * @param {object} position The position at witch to generate the view.
- * @param {number} frame The frame number at witch to generate the view.
+ * @param {object} iterator Position iterator.
+ * @param {Function} dataAccessor Function to access data.
  * @param {object} colourMap The colour map.
+ * @param {boolean} is16BitsStored Flag to know if the data is 16bits.
  */
 dwv.image.generateImageDataPaletteColor = function (
-  array, image, position, frame,
-  colourMap) {
-
-  var sliceRange = image.getSliceIterator(position.k);
-
+  array,
+  iterator,
+  dataAccessor,
+  colourMap,
+  is16BitsStored) {
+  // right shift 8
   var to8 = function (value) {
     return value >> 8;
   };
 
-  if (image.getMeta().BitsStored === 16) {
+  if (is16BitsStored) {
     console.log('Scaling 16bits data to 8bits.');
   }
 
   var index = 0;
   var pxValue = 0;
-  var ival = sliceRange.next();
+  var ival = iterator.next();
   while (!ival.done) {
     // pixel value
-    pxValue = image.getValueAtOffset(ival.value, frame);
+    pxValue = dataAccessor(ival.value);
     // store data
     // TODO check pxValue fits in lut
-    if (image.getMeta().BitsStored === 16) {
+    if (is16BitsStored) {
       array.data[index] = to8(colourMap.red[pxValue]);
       array.data[index + 1] = to8(colourMap.green[pxValue]);
       array.data[index + 2] = to8(colourMap.blue[pxValue]);
@@ -45,6 +46,6 @@ dwv.image.generateImageDataPaletteColor = function (
     array.data[index + 3] = 0xff;
     // increment
     index += 4;
-    ival = sliceRange.next();
+    ival = iterator.next();
   }
 };
