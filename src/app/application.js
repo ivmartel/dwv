@@ -398,6 +398,7 @@ dwv.App = function () {
     if (previousScale !== scale) {
       fireEvent({
         'type': 'zoom-change',
+        'value': [scale],
         'scale': scale,
         'cx': scaleCenter.x,
         'cy': scaleCenter.y
@@ -408,6 +409,7 @@ dwv.App = function () {
     ) {
       fireEvent({
         'type': 'offset-change',
+        'value': [scaleCenter.x, scaleCenter.y],
         'scale': scale,
         'cx': scaleCenter.x,
         'cy': scaleCenter.y
@@ -1009,15 +1011,28 @@ dwv.App = function () {
      *
      * @event dwv.App#zoomchange
      * @type {object}
+     * @property {Array} value The changed value.
      * @property {number} scale The new scale value.
      * @property {number} cx The new rotaion center X position.
      * @property {number} cy The new rotaion center Y position.
      */
     fireEvent({
       'type': 'zoom-change',
+      'value': [scale],
       'scale': scale,
       'cx': scaleCenter.x,
       'cy': scaleCenter.y
+    });
+    /**
+     * Offset change event.
+     *
+     * @event dwv.App#offsetchange
+     * @type {object}
+     * @property {Array} value The changed value.
+     */
+    fireEvent({
+      type: 'offset-change',
+      value: [scaleCenter.x, scaleCenter.y]
     });
   }
 
@@ -1042,14 +1057,16 @@ dwv.App = function () {
       /**
        * Offset change event.
        *
-       * @event dwv.App#offsetchange
+       * @event dwv.App#translatechange
        * @type {object}
+       * @property {Array} value The changed value.
        * @property {number} scale The new scale value.
        * @property {number} cx The new rotaion center X position.
        * @property {number} cy The new rotaion center Y position.
        */
       fireEvent({
-        'type': 'offset-change',
+        'type': 'translate-change',
+        'value': [imageLayer.getTrans().x, imageLayer.getTrans().y],
         'scale': scale,
         'cx': imageLayer.getTrans().x,
         'cy': imageLayer.getTrans().y
