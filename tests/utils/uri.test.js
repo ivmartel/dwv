@@ -114,39 +114,39 @@ QUnit.test('Test splitUri.', function (assert) {
   // test10
   var test10 = 'root?key0';
   var res10 = dwv.utils.splitUri(test10);
-  var ref10 = {'base': 'root', 'query': {}};
+  var ref10 = {base: 'root', query: {}};
   assert.equal(JSON.stringify(res10), JSON.stringify(ref10), 'Split test10');
   // test11
   var test11 = 'root?key0=val00';
   var res11 = dwv.utils.splitUri(test11);
-  var ref11 = {'base': 'root', 'query': {'key0': 'val00'}};
+  var ref11 = {base: 'root', query: {key0: 'val00'}};
   assert.equal(JSON.stringify(res11), JSON.stringify(ref11), 'Split test11');
 
   // test20
   var test20 = 'root?key0=val00&key1';
   var res20 = dwv.utils.splitUri(test20);
-  var ref20 = {'base': 'root', 'query': {'key0': 'val00'}};
+  var ref20 = {base: 'root', query: {key0: 'val00'}};
   assert.equal(JSON.stringify(res20), JSON.stringify(ref20), 'Split test20');
   // test21
   var test21 = 'root?key0=val00&key1=val10';
   var res21 = dwv.utils.splitUri(test21);
-  var ref21 = {'base': 'root', 'query': {'key0': 'val00', 'key1': 'val10'}};
+  var ref21 = {base: 'root', query: {key0: 'val00', key1: 'val10'}};
   assert.equal(JSON.stringify(res21), JSON.stringify(ref21), 'Split test21');
 
   // test30
   var test30 = 'root?key0=val00&key0&key1=val10';
   var res30 = dwv.utils.splitUri(test30);
   var ref30 = {
-    'base': 'root',
-    'query': {'key0': ['val00', null], 'key1': 'val10'}
+    base: 'root',
+    query: {key0: ['val00', null], key1: 'val10'}
   };
   assert.equal(JSON.stringify(res30), JSON.stringify(ref30), 'Split test30');
   // test31
   var test31 = 'root?key0=val00&key0=val01&key1=val10';
   var res31 = dwv.utils.splitUri(test31);
   var ref31 = {
-    'base': 'root',
-    'query': {'key0': ['val00', 'val01'], 'key1': 'val10'}
+    base: 'root',
+    query: {key0: ['val00', 'val01'], key1: 'val10'}
   };
   assert.equal(JSON.stringify(res31), JSON.stringify(ref31), 'Split test31');
 });

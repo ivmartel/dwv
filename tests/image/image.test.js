@@ -53,8 +53,8 @@ dwv.test.compareImageAndBuffer = function (image, size, buffer, rsi) {
 
   // return stats
   return {
-    'valuesStats': statsDiff,
-    'rescaledStats': statsDiffRescaled
+    valuesStats: statsDiff,
+    rescaledStats: statsDiffRescaled
   };
 };
 
@@ -426,15 +426,15 @@ QUnit.test('Test ImageFactory.', function (assert) {
 
   var dicomElements0 = [];
   // columns
-  dicomElements0.x00280011 = {'value': imgSize0.getNumberOfColumns()};
+  dicomElements0.x00280011 = {value: imgSize0.getNumberOfColumns()};
   // rows
-  dicomElements0.x00280010 = {'value': imgSize0.getNumberOfRows()};
+  dicomElements0.x00280010 = {value: imgSize0.getNumberOfRows()};
   // spacing
   dicomElements0.x00280030 = {
-    'value': [imgSpacing0.getRowSpacing(), imgSpacing0.getColumnSpacing()]
+    value: [imgSpacing0.getRowSpacing(), imgSpacing0.getColumnSpacing()]
   };
   // transfer syntax (explicit VR)
-  dicomElements0.x00020010 = {'value': '1.2.840.10008.1.2.1'};
+  dicomElements0.x00020010 = {value: '1.2.840.10008.1.2.1'};
 
   // wrap the dicom elements
   var wrappedDicomElements0 =

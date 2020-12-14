@@ -26,7 +26,7 @@ dwv.image.View = function (image) {
    * @private
    * @type {object}
    */
-  var windowPresets = {'minmax': {'name': 'minmax'}};
+  var windowPresets = {minmax: {name: 'minmax'}};
 
   /**
    * Current window preset name.
@@ -49,7 +49,7 @@ dwv.image.View = function (image) {
    * @private
    * @type {object}
    */
-  var currentPosition = {'i': 0, 'j': 0, 'k': 0};
+  var currentPosition = {i: 0, j: 0, k: 0};
   /**
    * Current frame. Zero based.
    *
@@ -126,20 +126,20 @@ dwv.image.View = function (image) {
         // fire event
         if (previousWidth !== wl.getWidth()) {
           this.fireEvent({
-            'type': 'wl-width-change',
-            'value': [wl.getWidth()],
-            'wc': wl.getCenter(),
-            'ww': wl.getWidth(),
-            'skipGenerate': true
+            type: 'wl-width-change',
+            value: [wl.getWidth()],
+            wc: wl.getCenter(),
+            ww: wl.getWidth(),
+            skipGenerate: true
           });
         }
         if (previousCenter !== wl.getCenter()) {
           this.fireEvent({
-            'type': 'wl-center-change',
-            'value': [wl.getCenter()],
-            'wc': wl.getCenter(),
-            'ww': wl.getWidth(),
-            'skipGenerate': true
+            type: 'wl-center-change',
+            value: [wl.getCenter()],
+            wc: wl.getCenter(),
+            ww: wl.getWidth(),
+            skipGenerate: true
           });
         }
       }
@@ -229,8 +229,8 @@ dwv.image.View = function (image) {
          * @property {string} name The name of the preset.
          */
         this.fireEvent({
-          'type': 'wl-preset-add',
-          'name': key
+          type: 'wl-preset-add',
+          name: key
         });
       }
     }
@@ -262,9 +262,9 @@ dwv.image.View = function (image) {
      * @property {number} ww The new window wdth value.
      */
     this.fireEvent({
-      'type': 'colour-change',
-      'wc': this.getCurrentWindowLut().getWindowLevel().getCenter(),
-      'ww': this.getCurrentWindowLut().getWindowLevel().getWidth()
+      type: 'colour-change',
+      wc: this.getCurrentWindowLut().getWindowLevel().getCenter(),
+      ww: this.getCurrentWindowLut().getWindowLevel().getWidth()
     });
   };
 
@@ -276,9 +276,9 @@ dwv.image.View = function (image) {
   this.getCurrentPosition = function () {
     // return a clone to avoid reference problems
     return {
-      'i': currentPosition.i,
-      'j': currentPosition.j,
-      'k': currentPosition.k
+      i: currentPosition.i,
+      j: currentPosition.j,
+      k: currentPosition.k
     };
   };
   /**
@@ -318,20 +318,20 @@ dwv.image.View = function (image) {
        * @property {object} pixelValue The image value at the new position.
        */
       this.fireEvent({
-        'type': 'position-change',
-        'value': [pos.i, pos.j, pos.k, pixValue],
-        'i': pos.i,
-        'j': pos.j,
-        'k': pos.k,
-        'pixelValue': pixValue
+        type: 'position-change',
+        value: [pos.i, pos.j, pos.k, pixValue],
+        i: pos.i,
+        j: pos.j,
+        k: pos.k,
+        pixelValue: pixValue
       });
     } else {
       this.fireEvent({
-        'type': 'position-change',
-        'value': [pos.i, pos.j, pos.k],
-        'i': pos.i,
-        'j': pos.j,
-        'k': pos.k
+        type: 'position-change',
+        value: [pos.i, pos.j, pos.k],
+        i: pos.i,
+        j: pos.j,
+        k: pos.k
       });
     }
 
@@ -347,10 +347,10 @@ dwv.image.View = function (image) {
          * @property {object} data Associated event data: the imageUid.
          */
         this.fireEvent({
-          'type': 'slice-change',
-          'value': [currentPosition.k],
-          'data': {
-            'imageUid': image.getImageUids()[currentPosition.k]
+          type: 'slice-change',
+          value: [currentPosition.k],
+          data: {
+            imageUid: image.getImageUids()[currentPosition.k]
           }
         });
       }
@@ -395,9 +395,9 @@ dwv.image.View = function (image) {
        * @property {number} frame The new frame number
        */
       this.fireEvent({
-        'type': 'frame-change',
-        'value': [currentFrame],
-        'frame': currentFrame
+        type: 'frame-change',
+        value: [currentFrame],
+        frame: currentFrame
       });
       // silent set current position to update info text
       this.setCurrentPosition(this.getCurrentPosition(), true);
@@ -416,10 +416,11 @@ dwv.image.View = function (image) {
     var newSliceNumber = this.getImage().appendSlice(rhs.getImage());
     // update position if a slice was appended before
     if (newSliceNumber <= this.getCurrentPosition().k) {
-      this.setCurrentPosition(
-        {'i': this.getCurrentPosition().i,
-          'j': this.getCurrentPosition().j,
-          'k': this.getCurrentPosition().k + 1}, true);
+      this.setCurrentPosition({
+        i: this.getCurrentPosition().i,
+        j: this.getCurrentPosition().j,
+        k: this.getCurrentPosition().k + 1
+      }, true);
     }
     // add window presets
     this.addWindowPresets(rhs.getWindowPresets(), newSliceNumber);
@@ -498,10 +499,10 @@ dwv.image.View = function (image) {
            * @property {boolean} skipGenerate Flag to skip view generation.
            */
           this.fireEvent({
-            'type': 'wl-width-change',
-            'value': [width],
-            'wc': center,
-            'ww': width
+            type: 'wl-width-change',
+            value: [width],
+            wc: center,
+            ww: width
           });
         }
         if (currentWl.getCenter() !== center) {
@@ -516,24 +517,24 @@ dwv.image.View = function (image) {
            * @property {boolean} skipGenerate Flag to skip view generation.
            */
           this.fireEvent({
-            'type': 'wl-center-change',
-            'value': [center],
-            'wc': center,
-            'ww': width
+            type: 'wl-center-change',
+            value: [center],
+            wc: center,
+            ww: width
           });
         }
       } else {
         this.fireEvent({
-          'type': 'wl-width-change',
-          'value': [width],
-          'wc': center,
-          'ww': width
+          type: 'wl-width-change',
+          value: [width],
+          wc: center,
+          ww: width
         });
         this.fireEvent({
-          'type': 'wl-center-change',
-          'value': [center],
-          'wc': center,
-          'ww': width
+          type: 'wl-center-change',
+          value: [center],
+          wc: center,
+          ww: width
         });
       }
     }
@@ -556,7 +557,7 @@ dwv.image.View = function (image) {
     // special 'perslice' case
     if (typeof preset.perslice !== 'undefined' &&
             preset.perslice === true) {
-      preset = {'wl': preset.wl[this.getCurrentPosition().k]};
+      preset = {wl: preset.wl[this.getCurrentPosition().k]};
     }
     // set w/l
     this.setWindowLevel(preset.wl.getCenter(), preset.wl.getWidth(), name);

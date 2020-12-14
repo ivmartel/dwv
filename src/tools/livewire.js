@@ -370,8 +370,8 @@ dwv.tool.Livewire = function (app) {
  */
 dwv.tool.Livewire.prototype.getHelpKeys = function () {
   return {
-    'title': 'tool.Livewire.name',
-    'brief': 'tool.Livewire.brief'
+    title: 'tool.Livewire.name',
+    brief: 'tool.Livewire.brief'
   };
 };
 

@@ -129,7 +129,10 @@ dwv.tool.draw.UpdateRoi = function (anchor, _image) {
   ktext.quant = null;
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
   // update position
-  var textPos = {'x': points[0] + kroi.x(), 'y': points[1] + kroi.y() + 10};
+  var textPos = {
+    x: points[0] + kroi.x(),
+    y: points[1] + kroi.y() + 10
+  };
   klabel.position(textPos);
 
 };

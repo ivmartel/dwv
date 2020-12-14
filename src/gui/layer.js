@@ -63,7 +63,7 @@ dwv.html.Layer = function (canvas) {
    * @private
    * @type {object}
    */
-  var origin = {'x': 0, 'y': 0};
+  var origin = {x: 0, y: 0};
   /**
    * Get the layer origin.
    *
@@ -78,7 +78,7 @@ dwv.html.Layer = function (canvas) {
    * @private
    * @type {object}
    */
-  var zoom = {'x': 1, 'y': 1};
+  var zoom = {x: 1, y: 1};
   /**
    * Get the layer zoom.
    *
@@ -94,7 +94,7 @@ dwv.html.Layer = function (canvas) {
    * @private
    * @type {object}
    */
-  var trans = {'x': 0, 'y': 0};
+  var trans = {x: 0, y: 0};
   /**
    * Get the layer translation.
    *
@@ -190,8 +190,8 @@ dwv.html.Layer = function (canvas) {
    * @returns {object} The equivalent index.
    */
   this.displayToIndex = function (point2D) {
-    return {'x': ((point2D.x - origin.x) / zoom.x) - trans.x,
-      'y': ((point2D.y - origin.y) / zoom.y) - trans.y};
+    return {x: ((point2D.x - origin.x) / zoom.x) - trans.x,
+      y: ((point2D.y - origin.y) / zoom.y) - trans.y};
   };
 
   /**
@@ -388,13 +388,13 @@ dwv.html.getEventOffset = function (event) {
       touch = event.targetTouches[i];
       ex = touch.pageX - offsetLeft;
       ey = touch.pageY - offsetTop;
-      positions.push({'x': ex, 'y': ey});
+      positions.push({x: ex, y: ey});
     }
   } else {
     // layerX is used by Firefox
     ex = event.offsetX === undefined ? event.layerX : event.offsetX;
     ey = event.offsetY === undefined ? event.layerY : event.offsetY;
-    positions.push({'x': ex, 'y': ey});
+    positions.push({x: ex, y: ey});
   }
   return positions;
 };

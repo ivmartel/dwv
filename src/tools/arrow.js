@@ -201,7 +201,9 @@ dwv.tool.draw.UpdateArrow = function (anchor, _image) {
   // update position
   var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
   var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
-  var textPos = {'x': line.getEnd().getX() + dX * 25,
-    'y': line.getEnd().getY() + dY * 15};
+  var textPos = {
+    x: line.getEnd().getX() + dX * 25,
+    y: line.getEnd().getY() + dY * 15
+  };
   klabel.position(textPos);
 };

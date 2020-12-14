@@ -50,9 +50,11 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image) {
         if (name === '') {
           name = 'Default' + j;
         }
-        windowPresets[name] = {'wl': [new dwv.image.WindowLevel(center, width)],
-          'name': name,
-          'perslice': true};
+        windowPresets[name] = {
+          wl: [new dwv.image.WindowLevel(center, width)],
+          name: name,
+          perslice: true
+        };
       }
       if (width === 0) {
         console.warn('Zero window width found in DICOM.');
@@ -65,7 +67,7 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image) {
   // for each slice... It will be filled at first use
   // (see view.setWindowLevelPreset).
   // Order is important, if no wl from DICOM, this will be the default.
-  windowPresets.minmax = {'name': 'minmax'};
+  windowPresets.minmax = {name: 'minmax'};
 
   // optional modality presets
   if (typeof dwv.tool !== 'undefined' &&
@@ -74,8 +76,8 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image) {
     for (var key in dwv.tool.defaultpresets[modality]) {
       var preset = dwv.tool.defaultpresets[modality][key];
       windowPresets[key] = {
-        'wl': new dwv.image.WindowLevel(preset.center, preset.width),
-        'name': key
+        wl: new dwv.image.WindowLevel(preset.center, preset.width),
+        name: key
       };
     }
   }

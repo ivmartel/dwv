@@ -126,6 +126,6 @@ dwv.tool.draw.UpdateFreeHand = function (anchor, _image) {
   ktext.quant = null;
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
   // update position
-  var textPos = {'x': points[0] + kline.x(), 'y': points[1] + kline.y() + 10};
+  var textPos = {x: points[0] + kline.x(), y: points[1] + kline.y() + 10};
   klabel.position(textPos);
 };

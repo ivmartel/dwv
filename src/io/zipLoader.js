@@ -57,7 +57,7 @@ dwv.io.ZipLoader = function () {
    * @private
    */
   function zipAsyncCallback(content, origin, index) {
-    files.push({'filename': filename, 'data': content});
+    files.push({filename: filename, data: content});
 
     // sent un-ziped progress with the data index
     // (max 50% to take into account the memory loading)

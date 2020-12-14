@@ -492,13 +492,13 @@ dwv.tool.Floodfill = function (app) {
  */
 dwv.tool.Floodfill.prototype.getHelpKeys = function () {
   return {
-    'title': 'tool.Floodfill.name',
-    'brief': 'tool.Floodfill.brief',
-    'mouse': {
-      'click': 'tool.Floodfill.click'
+    title: 'tool.Floodfill.name',
+    brief: 'tool.Floodfill.brief',
+    mouse: {
+      click: 'tool.Floodfill.click'
     },
-    'touch': {
-      'tap': 'tool.Floodfill.tap'
+    touch: {
+      tap: 'tool.Floodfill.tap'
     }
   };
 };

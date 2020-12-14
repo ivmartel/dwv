@@ -102,14 +102,14 @@ QUnit.test('Test generate data MONO.', function (assert) {
     buffer0[i] = i;
   }
   var image0 = new dwv.image.Image(imgGeometry0, [buffer0]);
-  image0.setMeta({'BitsStored': 8});
+  image0.setMeta({BitsStored: 8});
   // create a view
   var view0 = new dwv.image.View(image0);
   // create the image data
   var imageData = {
-    'width': size0,
-    'height': size0,
-    'data': new Uint8ClampedArray(size0 * size0 * 4)
+    width: size0,
+    height: size0,
+    data: new Uint8ClampedArray(size0 * size0 * 4)
   };
 
   // default window level
@@ -168,14 +168,14 @@ QUnit.test('Test generate data RGB.', function (assert) {
   }
   var image0 = new dwv.image.Image(imgGeometry0, [buffer0]);
   image0.setPhotometricInterpretation('RGB');
-  image0.setMeta({'BitsStored': 8});
+  image0.setMeta({BitsStored: 8});
   // create a view
   var view0 = new dwv.image.View(image0);
   // create the image data
   var imageData = {
-    'width': size0,
-    'height': size0,
-    'data': new Uint8ClampedArray(size0 * size0 * 4)
+    width: size0,
+    height: size0,
+    data: new Uint8ClampedArray(size0 * size0 * 4)
   };
 
   // default window level
@@ -222,7 +222,7 @@ QUnit.test('Test generate data RGB.', function (assert) {
   var image1 = new dwv.image.Image(imgGeometry0, [buffer1]);
   image1.setPhotometricInterpretation('RGB');
   image1.setPlanarConfiguration(1);
-  image1.setMeta({'BitsStored': 8});
+  image1.setMeta({BitsStored: 8});
   // create a view
   var view1 = new dwv.image.View(image1);
 
@@ -264,9 +264,9 @@ QUnit.test('Test generate data timing.', function (assert) {
   var view0 = new dwv.image.View(image0);
   // create the image data
   var imageData = {
-    'width': size0,
-    'height': size0,
-    'data': new Uint8Array(size0 * size0 * 4)
+    width: size0,
+    height: size0,
+    data: new Uint8Array(size0 * size0 * 4)
   };
 
   // default window level

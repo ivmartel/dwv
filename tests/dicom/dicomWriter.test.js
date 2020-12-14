@@ -93,16 +93,16 @@ QUnit.test('Test patient anonymisation', function (assert) {
     var patientsIdAnonymised = 'anonymise-id';
     // rules with different levels: full tag, tag name and group name
     var rules = {
-      'default': {
+      default: {
         action: 'copy', value: null
       },
-      'x00100010': {
+      x00100010: {
         action: 'replace', value: patientsNameAnonymised
       },
-      'PatientID': {
+      PatientID: {
         action: 'replace', value: patientsIdAnonymised
       },
-      'Patient': {
+      Patient: {
         action: 'remove', value: null
       }
     };

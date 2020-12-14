@@ -532,8 +532,10 @@ dwv.tool.Draw = function (app) {
    */
   function getRealPosition(index) {
     var stage = app.getDrawStage();
-    return {'x': stage.offset().x + index.x / stage.scale().x,
-      'y': stage.offset().y + index.y / stage.scale().y};
+    return {
+      x: stage.offset().x + index.x / stage.scale().x,
+      y: stage.offset().y + index.y / stage.scale().y
+    };
   }
 
   /**
@@ -554,7 +556,7 @@ dwv.tool.Draw = function (app) {
     // make it draggable
     shapeGroup.draggable(true);
     // cache drag start position
-    var dragStartPos = {'x': shapeGroup.x(), 'y': shapeGroup.y()};
+    var dragStartPos = {x: shapeGroup.x(), y: shapeGroup.y()};
 
     // command name based on shape type
     var shapeDisplayName = dwv.tool.GetShapeDisplayName(
@@ -569,7 +571,7 @@ dwv.tool.Draw = function (app) {
       // display trash
       var stage = app.getDrawStage();
       var scale = stage.scale();
-      var invscale = {'x': 1 / scale.x, 'y': 1 / scale.y};
+      var invscale = {x: 1 / scale.x, y: 1 / scale.y};
       trash.x(stage.offset().x + (stage.width() / (2 * scale.x)));
       trash.y(stage.offset().y + (stage.height() / (15 * scale.y)));
       trash.scale(invscale);
@@ -611,7 +613,7 @@ dwv.tool.Draw = function (app) {
     });
     // drag end event handling
     shapeGroup.on('dragend.draw', function (event) {
-      var pos = {'x': this.x(), 'y': this.y()};
+      var pos = {x: this.x(), y: this.y()};
       // remove trash
       trash.remove();
       // delete case
@@ -644,8 +646,8 @@ dwv.tool.Draw = function (app) {
         app.addToUndoStack(delcmd);
       } else {
         // save drag move
-        var translation = {'x': pos.x - dragStartPos.x,
-          'y': pos.y - dragStartPos.y};
+        var translation = {x: pos.x - dragStartPos.x,
+          y: pos.y - dragStartPos.y};
         if (translation.x !== 0 || translation.y !== 0) {
           var mvcmd = new dwv.tool.MoveGroupCommand(this,
             shapeDisplayName, translation, drawLayer);
@@ -655,8 +657,8 @@ dwv.tool.Draw = function (app) {
 
           // the move is handled by Konva, trigger an event manually
           fireEvent({
-            'type': 'draw-move',
-            'id': this.id()
+            type: 'draw-move',
+            id: this.id()
           });
         }
         // reset anchors
@@ -666,7 +668,7 @@ dwv.tool.Draw = function (app) {
       // draw
       drawLayer.draw();
       // reset start position
-      dragStartPos = {'x': this.x(), 'y': this.y()};
+      dragStartPos = {x: this.x(), y: this.y()};
     });
     // double click handling: update label
     shapeGroup.on('dblclick', function () {
@@ -695,7 +697,7 @@ dwv.tool.Draw = function (app) {
 
       // trigger event
       fireEvent({
-        'type': 'draw-change'
+        type: 'draw-change'
       });
 
       // draw
@@ -787,13 +789,13 @@ dwv.tool.Draw = function (app) {
  */
 dwv.tool.Draw.prototype.getHelpKeys = function () {
   return {
-    'title': 'tool.Draw.name',
-    'brief': 'tool.Draw.brief',
-    'mouse': {
-      'mouse_drag': 'tool.Draw.mouse_drag'
+    title: 'tool.Draw.name',
+    brief: 'tool.Draw.brief',
+    mouse: {
+      mouse_drag: 'tool.Draw.mouse_drag'
     },
-    'touch': {
-      'touch_drag': 'tool.Draw.touch_drag'
+    touch: {
+      touch_drag: 'tool.Draw.touch_drag'
     }
   };
 };

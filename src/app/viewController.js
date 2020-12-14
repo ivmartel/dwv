@@ -87,9 +87,9 @@ dwv.ViewController = function (view) {
    */
   this.setCurrentPosition2D = function (i, j) {
     return view.setCurrentPosition({
-      'i': i,
-      'j': j,
-      'k': view.getCurrentPosition().k
+      i: i,
+      j: j,
+      k: view.getCurrentPosition().k
     });
   };
 
@@ -101,9 +101,9 @@ dwv.ViewController = function (view) {
    */
   this.setCurrentSlice = function (k) {
     return view.setCurrentPosition({
-      'i': view.getCurrentPosition().i,
-      'j': view.getCurrentPosition().j,
-      'k': k
+      i: view.getCurrentPosition().i,
+      j: view.getCurrentPosition().j,
+      k: k
     });
   };
 
@@ -170,9 +170,9 @@ dwv.ViewController = function (view) {
    */
   this.goFirstSlice = function () {
     return view.setCurrentPosition({
-      'i': view.getCurrentPosition().i,
-      'j': view.getCurrentPosition().j,
-      'k': 0
+      i: view.getCurrentPosition().i,
+      j: view.getCurrentPosition().j,
+      k: 0
     });
   };
 
@@ -222,8 +222,8 @@ dwv.ViewController = function (view) {
    */
   this.getWindowLevel = function () {
     return {
-      'width': view.getCurrentWindowLut().getWindowLevel().getWidth(),
-      'center': view.getCurrentWindowLut().getWindowLevel().getCenter()
+      width: view.getCurrentWindowLut().getWindowLevel().getWidth(),
+      center: view.getCurrentWindowLut().getWindowLevel().getCenter()
     };
   };
 

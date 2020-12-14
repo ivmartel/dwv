@@ -66,10 +66,12 @@ dwv.math.Stats.prototype.equals = function (rhs) {
  * @returns {object} An object representation of the stats.
  */
 dwv.math.Stats.prototype.asObject = function () {
-  return {'min': this.getMin(),
-    'max': this.getMax(),
-    'mean': this.getMean(),
-    'stdDev': this.getStdDev()};
+  return {
+    min: this.getMin(),
+    max: this.getMax(),
+    mean: this.getMean(),
+    stdDev: this.getStdDev()
+  };
 };
 
 /**

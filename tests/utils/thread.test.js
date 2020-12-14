@@ -48,7 +48,7 @@ QUnit.test('Test ThreadPool.', function (assert) {
   for (var i = 0; i < nTestWorkers; ++i) {
     // create worker task
     var workerTask = new dwv.utils.WorkerTask(
-      '/tests/utils/worker.js', {'input': 'papageno'}, i);
+      '/tests/utils/worker.js', {input: 'papageno'}, i);
     // add it the queue and run it
     pool.addWorkerTask(workerTask);
   }

@@ -84,9 +84,9 @@ dwv.image.DicomBufferToView = function () {
           dicomParser.getDicomElements(), image);
         // call onload
         self.onloaditem({
-          'data': {
-            'view': view,
-            'info': dicomParser.getRawDicomElements()
+          data: {
+            view: view,
+            info: dicomParser.getRawDicomElements()
           },
           source: origin
         });
@@ -107,8 +107,8 @@ dwv.image.DicomBufferToView = function () {
       var pixelRepresentation =
         dicomParser.getRawDicomElements().x00280103.value[0];
       var pixelMeta = {
-        'bitsAllocated': bitsAllocated,
-        'isSigned': (pixelRepresentation === 1)
+        bitsAllocated: bitsAllocated,
+        isSigned: (pixelRepresentation === 1)
       };
       var columnsElement = dicomParser.getRawDicomElements().x00280011;
       var rowsElement = dicomParser.getRawDicomElements().x00280010;

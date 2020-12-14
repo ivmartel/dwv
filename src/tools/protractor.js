@@ -84,7 +84,12 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
     }
 
     // quantification
-    var quant = {'angle': {'value': angle, 'unit': dwv.i18n('unit.degree')}};
+    var quant = {
+      angle: {
+        value: angle,
+        unit: dwv.i18n('unit.degree')
+      }
+    };
     var ktext = new Konva.Text({
       fontSize: style.getScaledFontSize(),
       fontFamily: style.getFontFamily(),
@@ -206,14 +211,14 @@ dwv.tool.draw.UpdateProtractor = function (anchor, _image) {
   }
 
   // update text
-  var quant = {'angle': {'value': angle, 'unit': dwv.i18n('unit.degree')}};
+  var quant = {angle: {value: angle, unit: dwv.i18n('unit.degree')}};
   var ktext = klabel.getText();
   ktext.quant = quant;
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
   // update position
   var midX = (line0.getMidpoint().getX() + line1.getMidpoint().getX()) / 2;
   var midY = (line0.getMidpoint().getY() + line1.getMidpoint().getY()) / 2;
-  var textPos = {'x': midX, 'y': midY - 15};
+  var textPos = {x: midX, y: midY - 15};
   klabel.position(textPos);
 
   // arc
@@ -222,6 +227,6 @@ dwv.tool.draw.UpdateProtractor = function (anchor, _image) {
   karc.outerRadius(radius);
   karc.angle(angle);
   karc.rotation(-inclination);
-  var arcPos = {'x': mid.x(), 'y': mid.y()};
+  var arcPos = {x: mid.x(), y: mid.y()};
   karc.position(arcPos);
 };

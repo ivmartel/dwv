@@ -449,12 +449,14 @@ dwv.dicom.DataWriter.prototype.writeDataElementItems = function (
     // item delimitation
     if (implicitLength) {
       var itemDelimElement = {
-        'tag': {group: '0xFFFE',
+        tag: {
+          group: '0xFFFE',
           element: '0xE00D',
-          name: 'ItemDelimitationItem'},
-        'vr': 'NONE',
-        'vl': 0,
-        'value': []
+          name: 'ItemDelimitationItem'
+        },
+        vr: 'NONE',
+        vl: 0,
+        value: []
       };
       byteOffset = this.writeDataElement(
         itemDelimElement, byteOffset, isImplicit);
@@ -560,22 +562,26 @@ dwv.dicom.DataWriter.prototype.writePixelDataElementValue = function (
     var item = {};
     // first item: basic offset table
     item.xFFFEE000 = {
-      'tag': {group: '0xFFFE',
+      tag: {
+        group: '0xFFFE',
         element: '0xE000',
-        name: 'xFFFEE000'},
-      'vr': 'UN',
-      'vl': 0,
-      'value': []
+        name: 'xFFFEE000'
+      },
+      vr: 'UN',
+      vl: 0,
+      value: []
     };
     // data
     for (var i = 0; i < value.length; ++i) {
       item[i] = {
-        'tag': {group: '0xFFFE',
+        tag: {
+          group: '0xFFFE',
           element: '0xE000',
-          name: 'xFFFEE000'},
-        'vr': vr,
-        'vl': value[i].length,
-        'value': value[i]
+          name: 'xFFFEE000'
+        },
+        vr: vr,
+        vl: value[i].length,
+        value: value[i]
       };
     }
     // write
@@ -654,12 +660,14 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (
   if (dwv.dicom.isImplicitLengthSequence(element) ||
          dwv.dicom.isImplicitLengthPixels(element)) {
     var seqDelimElement = {
-      'tag': {group: '0xFFFE',
+      tag: {
+        group: '0xFFFE',
         element: '0xE0DD',
-        name: 'SequenceDelimitationItem'},
-      'vr': 'NONE',
-      'vl': 0,
-      'value': []
+        name: 'SequenceDelimitationItem'
+      },
+      vr: 'NONE',
+      vl: 0,
+      value: []
     };
     byteOffset = this.writeDataElement(seqDelimElement, byteOffset, isImplicit);
   }
@@ -742,19 +750,19 @@ dwv.dicom.DicomWriter = function () {
 
   // possible tag actions
   var actions = {
-    'copy': function (item) {
+    copy: function (item) {
       return item;
     },
-    'remove': function () {
+    remove: function () {
       return null;
     },
-    'clear': function (item) {
+    clear: function (item) {
       item.value[0] = '';
       item.vl = 0;
       item.endOffset = item.startOffset;
       return item;
     },
-    'replace': function (item, value) {
+    replace: function (item, value) {
       var paddedValue = dwv.dicom.padElementValue(item, value);
       item.value[0] = paddedValue;
       item.vl = paddedValue.length;
@@ -765,7 +773,7 @@ dwv.dicom.DicomWriter = function () {
 
   // default rules: just copy
   var defaultRules = {
-    'default': {action: 'copy', value: null}
+    default: {action: 'copy', value: null}
   };
 
   /**
@@ -783,12 +791,12 @@ dwv.dicom.DicomWriter = function () {
    * Example anonymisation rules.
    */
   this.anonymisationRules = {
-    'default': {action: 'remove', value: null},
-    'PatientName': {action: 'replace', value: 'Anonymized'}, // tag
+    default: {action: 'remove', value: null},
+    PatientName: {action: 'replace', value: 'Anonymized'}, // tag
     'Meta Element': {action: 'copy', value: null}, // group 'x0002'
-    'Acquisition': {action: 'copy', value: null}, // group 'x0018'
+    Acquisition: {action: 'copy', value: null}, // group 'x0018'
     'Image Presentation': {action: 'copy', value: null}, // group 'x0028'
-    'Procedure': {action: 'copy', value: null}, // group 'x0040'
+    Procedure: {action: 'copy', value: null}, // group 'x0040'
     'Pixel Data': {action: 'copy', value: null} // group 'x7fe0'
   };
 
@@ -1003,8 +1011,8 @@ dwv.dicom.getDicomElement = function (tagName) {
   var dict = dwv.dicom.dictionary;
   // return element definition
   return {
-    'tag': {'group': tagGE.group, 'element': tagGE.element},
-    'vr': dict[tagGE.group][tagGE.element][0]
+    tag: {group: tagGE.group, element: tagGE.element},
+    vr: dict[tagGE.group][tagGE.element][0]
   };
 };
 
@@ -1067,10 +1075,10 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
 
         // item (after elements to get the size)
         var itemElement = {
-          'tag': {'group': '0xFFFE', 'element': '0xE000'},
-          'vr': 'NONE',
-          'vl': (explicitLength ? subSize : 'u/l'),
-          'value': []
+          tag: {group: '0xFFFE', element: '0xE000'},
+          vr: 'NONE',
+          vl: (explicitLength ? subSize : 'u/l'),
+          value: []
         };
         name = dwv.dicom.getGroupElementKey(
           itemElement.tag.group, itemElement.tag.element);
@@ -1080,10 +1088,10 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
         // item delimitation
         if (!explicitLength) {
           var itemDelimElement = {
-            'tag': {'group': '0xFFFE', 'element': '0xE00D'},
-            'vr': 'NONE',
-            'vl': 0,
-            'value': []
+            tag: {group: '0xFFFE', element: '0xE00D'},
+            vr: 'NONE',
+            vl: 0,
+            value: []
           };
           name = dwv.dicom.getGroupElementKey(
             itemDelimElement.tag.group, itemDelimElement.tag.element);

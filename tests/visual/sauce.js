@@ -49,11 +49,11 @@ var saucelabs = new SauceLabs({
 dwv.test.sauceTest = function (caps) {
   var driver = new webdriver.Builder().
     withCapabilities({
-      'browserName': caps.browserName,
-      'version': caps.version,
-      'platform': caps.platform,
-      'username': saucelabs.options.username,
-      'accessKey': saucelabs.options.password
+      browserName: caps.browserName,
+      version: caps.version,
+      platform: caps.platform,
+      username: saucelabs.options.username,
+      accessKey: saucelabs.options.password
     }).
     usingServer('http://' + saucelabs.options.username + ':' + saucelabs.options.password +
                   '@ondemand.saucelabs.com:80/wd/hub').

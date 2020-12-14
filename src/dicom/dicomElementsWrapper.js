@@ -394,10 +394,10 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
       }
       message += ')';
       var itemDelimElement = {
-        'tag': {'group': '0xFFFE', 'element': '0xE00D'},
-        'vr': 'na',
-        'vl': '0',
-        'value': [message]
+        tag: {group: '0xFFFE', element: '0xE00D'},
+        vr: 'na',
+        vl: '0',
+        value: [message]
       };
       line += '\n';
       line += this.getElementAsString(itemDelimElement, prefix + '  ');
@@ -410,10 +410,10 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
     }
     message += ')';
     var sqDelimElement = {
-      'tag': {'group': '0xFFFE', 'element': '0xE0DD'},
-      'vr': 'na',
-      'vl': '0',
-      'value': [message]
+      tag: {group: '0xFFFE', element: '0xE0DD'},
+      vr: 'na',
+      vl: '0',
+      value: [message]
     };
     line += '\n';
     line += this.getElementAsString(sqDelimElement, prefix);
@@ -428,10 +428,10 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
     }
 
     var pixDelimElement = {
-      'tag': {'group': '0xFFFE', 'element': '0xE0DD'},
-      'vr': 'na',
-      'vl': '0',
-      'value': ['(SequenceDelimitationItem)']
+      tag: {group: '0xFFFE', element: '0xE0DD'},
+      vr: 'na',
+      vl: '0',
+      value: ['(SequenceDelimitationItem)']
     };
     line += '\n';
     line += this.getElementAsString(pixDelimElement, prefix);

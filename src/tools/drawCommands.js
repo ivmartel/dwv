@@ -77,8 +77,8 @@ dwv.tool.DrawGroupCommand = function (group, name, layer, silent) {
        * @property {number} id The id of the create draw.
        */
       this.onExecute({
-        'type': 'draw-create',
-        'id': group.id()
+        type: 'draw-create',
+        id: group.id()
       });
     }
   };
@@ -94,8 +94,8 @@ dwv.tool.DrawGroupCommand = function (group, name, layer, silent) {
     layer.draw();
     // callback
     this.onUndo({
-      'type': 'draw-delete',
-      'id': group.id()
+      type: 'draw-delete',
+      id: group.id()
     });
   };
 }; // DrawGroupCommand class
@@ -155,8 +155,8 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer) {
      * @property {number} id The id of the create draw.
      */
     this.onExecute({
-      'type': 'draw-move',
-      'id': group.id()
+      type: 'draw-move',
+      id: group.id()
     });
   };
   /**
@@ -166,14 +166,14 @@ dwv.tool.MoveGroupCommand = function (group, name, translation, layer) {
    */
   this.undo = function () {
     // invert translate group
-    var minusTrans = {'x': -translation.x, 'y': -translation.y};
+    var minusTrans = {x: -translation.x, y: -translation.y};
     group.move(minusTrans);
     // draw
     layer.draw();
     // callback
     this.onUndo({
-      'type': 'draw-move',
-      'id': group.id()
+      type: 'draw-move',
+      id: group.id()
     });
   };
 }; // MoveGroupCommand class
@@ -235,7 +235,7 @@ dwv.tool.ChangeGroupCommand = function (
      * @type {object}
      */
     this.onExecute({
-      'type': 'draw-change'
+      type: 'draw-change'
     });
   };
   /**
@@ -250,7 +250,7 @@ dwv.tool.ChangeGroupCommand = function (
     layer.draw();
     // callback
     this.onUndo({
-      'type': 'draw-change'
+      type: 'draw-change'
     });
   };
 }; // ChangeGroupCommand class
@@ -311,8 +311,8 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer) {
      * @property {number} id The id of the create draw.
      */
     this.onExecute({
-      'type': 'draw-delete',
-      'id': group.id()
+      type: 'draw-delete',
+      id: group.id()
     });
   };
   /**
@@ -327,8 +327,8 @@ dwv.tool.DeleteGroupCommand = function (group, name, layer) {
     layer.draw();
     // callback
     this.onUndo({
-      'type': 'draw-create',
-      'id': group.id()
+      type: 'draw-create',
+      id: group.id()
     });
   };
 }; // DeleteGroupCommand class

@@ -151,9 +151,9 @@ dwv.tool.draw.UpdateEllipse = function (anchor, image) {
   // update shape
   var radiusX = (topRight.x() - topLeft.x()) / 2;
   var radiusY = (bottomRight.y() - topRight.y()) / 2;
-  var center = {'x': topLeft.x() + radiusX, 'y': topRight.y() + radiusY};
+  var center = {x: topLeft.x() + radiusX, y: topRight.y() + radiusY};
   kellipse.position(center);
-  var radiusAbs = {'x': Math.abs(radiusX), 'y': Math.abs(radiusY)};
+  var radiusAbs = {x: Math.abs(radiusX), y: Math.abs(radiusY)};
   if (radiusAbs) {
     kellipse.radius(radiusAbs);
   }
@@ -165,6 +165,6 @@ dwv.tool.draw.UpdateEllipse = function (anchor, image) {
   ktext.quant = quant;
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
   // update position
-  var textPos = {'x': center.x, 'y': center.y};
+  var textPos = {x: center.x, y: center.y};
   klabel.position(textPos);
 };

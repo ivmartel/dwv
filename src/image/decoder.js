@@ -66,8 +66,8 @@ dwv.image.AsynchPixelBufferDecoder = function (script, _numberOfData) {
     var workerTask = new dwv.utils.WorkerTask(
       script,
       {
-        'buffer': pixelBuffer,
-        'meta': pixelMeta
+        buffer: pixelBuffer,
+        meta: pixelMeta
       },
       index
     );

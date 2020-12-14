@@ -246,15 +246,15 @@ dwv.tool.Scroll = function (app) {
  */
 dwv.tool.Scroll.prototype.getHelpKeys = function () {
   return {
-    'title': 'tool.Scroll.name',
-    'brief': 'tool.Scroll.brief',
-    'mouse': {
-      'mouse_drag': 'tool.Scroll.mouse_drag',
-      'double_click': 'tool.Scroll.double_click'
+    title: 'tool.Scroll.name',
+    brief: 'tool.Scroll.brief',
+    mouse: {
+      mouse_drag: 'tool.Scroll.mouse_drag',
+      double_click: 'tool.Scroll.double_click'
     },
-    'touch': {
-      'touch_drag': 'tool.Scroll.touch_drag',
-      'tap_and_hold': 'tool.Scroll.tap_and_hold'
+    touch: {
+      touch_drag: 'tool.Scroll.touch_drag',
+      tap_and_hold: 'tool.Scroll.tap_and_hold'
     }
   };
 };

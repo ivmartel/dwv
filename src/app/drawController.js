@@ -31,8 +31,10 @@ dwv.draw.getPositionFromGroupId = function (groupId) {
   if (sepIndex === -1) {
     console.warn('Badly formed PositionGroupId: ' + groupId);
   }
-  return {'sliceNumber': groupId.substring(6, sepIndex),
-    'frameNumber': groupId.substring(sepIndex + 7)};
+  return {
+    sliceNumber: groupId.substring(6, sepIndex),
+    frameNumber: groupId.substring(sepIndex + 7)
+  };
 };
 
 /**
@@ -168,10 +170,10 @@ dwv.DrawController = function (drawDiv) {
   this.create = function (width, height) {
     // create stage
     drawStage = new Konva.Stage({
-      'container': drawDiv,
-      'width': width,
-      'height': height,
-      'listening': false
+      container: drawDiv,
+      width: width,
+      height: height,
+      listening: false
     });
     // reset style
     // (avoids a not needed vertical scrollbar)
@@ -179,9 +181,9 @@ dwv.DrawController = function (drawDiv) {
 
     // create layer
     drawLayer = new Konva.Layer({
-      'listening': false,
-      'hitGraphEnabled': false,
-      'visible': true
+      listening: false,
+      hitGraphEnabled: false,
+      visible: true
     });
     drawStage.add(drawLayer);
   };
@@ -247,8 +249,8 @@ dwv.DrawController = function (drawDiv) {
    * @param {number} windowScale The window scale.
    */
   this.resetStage = function (windowScale) {
-    drawStage.offset({'x': 0, 'y': 0});
-    drawStage.scale({'x': windowScale, 'y': windowScale});
+    drawStage.offset({x: 0, y: 0});
+    drawStage.scale({x: windowScale, y: windowScale});
     drawStage.draw();
   };
 
@@ -266,7 +268,7 @@ dwv.DrawController = function (drawDiv) {
     // resize stage
     drawStage.setWidth(width);
     drawStage.setHeight(height);
-    drawStage.scale({'x': scale, 'y': scale});
+    drawStage.scale({x: scale, y: scale});
     drawStage.draw();
   };
 
@@ -278,7 +280,7 @@ dwv.DrawController = function (drawDiv) {
    */
   this.zoomStage = function (scale, scaleCenter) {
     // zoom
-    var newScale = {'x': scale, 'y': scale};
+    var newScale = {x: scale, y: scale};
     // offset
     // TODO different from the imageLayer offset?
     var oldScale = drawStage.scale();
@@ -287,7 +289,7 @@ dwv.DrawController = function (drawDiv) {
             oldOffset.x - (scaleCenter.x / newScale.x);
     var newOffsetY = (scaleCenter.y / oldScale.y) +
             oldOffset.y - (scaleCenter.y / newScale.y);
-    var newOffset = {'x': newOffsetX, 'y': newOffsetY};
+    var newOffset = {x: newOffsetX, y: newOffsetY};
     // store
     drawStage.offset(newOffset);
     drawStage.scale(newScale);
@@ -301,7 +303,7 @@ dwv.DrawController = function (drawDiv) {
    * @param {number} ty The Y translation.
    */
   this.translateStage = function (tx, ty) {
-    drawStage.offset({'x': tx, 'y': ty});
+    drawStage.offset({x: tx, y: ty});
     drawStage.draw();
   };
 
@@ -338,13 +340,13 @@ dwv.DrawController = function (drawDiv) {
           type = 'Rectangle';
         }
         list.push({
-          'id': collec[i].id(),
-          'slice': position.sliceNumber,
-          'frame': position.frameNumber,
-          'type': type,
-          'color': shape.stroke(),
-          'label': text.textExpr,
-          'description': text.longText
+          id: collec[i].id(),
+          slice: position.sliceNumber,
+          frame: position.frameNumber,
+          type: type,
+          color: shape.stroke(),
+          label: text.textExpr,
+          description: text.longText
         });
       }
     }
@@ -381,9 +383,9 @@ dwv.DrawController = function (drawDiv) {
         }
         // get details (non konva vars)
         drawingsDetails[group.id()] = {
-          'textExpr': texts[0].textExpr,
-          'longText': texts[0].longText,
-          'quant': texts[0].quant
+          textExpr: texts[0].textExpr,
+          longText: texts[0].longText,
+          quant: texts[0].quant
         };
       }
     }
@@ -416,9 +418,9 @@ dwv.DrawController = function (drawDiv) {
         dwv.draw.isNodeWithId(statePosGroup.id()))[0];
       if (typeof posGroup === 'undefined') {
         posGroup = new Konva.Group({
-          'id': statePosGroup.id(),
-          'name': 'position-group',
-          'visible': false
+          id: statePosGroup.id(),
+          name: 'position-group',
+          visible: false
         });
         drawLayer.add(posGroup);
       }

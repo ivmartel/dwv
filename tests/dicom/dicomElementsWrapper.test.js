@@ -36,132 +36,132 @@ QUnit.test('Test simple DICOM wrapping.', function (assert) {
     // regression table
     var teoTable = [
       {
-        'name': 'FileMetaInformationGroupLength',
-        'value': '27',
-        'group': '0x0002',
-        'element': '0x0000',
-        'vr': 'UL',
-        'vl': 4
+        name: 'FileMetaInformationGroupLength',
+        value: '27',
+        group: '0x0002',
+        element: '0x0000',
+        vr: 'UL',
+        vl: 4
       },
       {
-        'name': 'TransferSyntaxUID',
-        'value': '1.2.840.10008.1.2.1',
-        'group': '0x0002',
-        'element': '0x0010',
-        'vr': 'UI',
-        'vl': 19
+        name: 'TransferSyntaxUID',
+        value: '1.2.840.10008.1.2.1',
+        group: '0x0002',
+        element: '0x0010',
+        vr: 'UI',
+        vl: 19
       },
       {
-        'name': 'Modality',
-        'value': 'MR',
-        'group': '0x0008',
-        'element': '0x0060',
-        'vr': 'CS',
-        'vl': 2
+        name: 'Modality',
+        value: 'MR',
+        group: '0x0008',
+        element: '0x0060',
+        vr: 'CS',
+        vl: 2
       },
       {
-        'name': 'PatientName',
-        'value': 'dwv-patient-name',
-        'group': '0x0010',
-        'element': '0x0010',
-        'vr': 'PN',
-        'vl': 16
+        name: 'PatientName',
+        value: 'dwv-patient-name',
+        group: '0x0010',
+        element: '0x0010',
+        vr: 'PN',
+        vl: 16
       },
       {
-        'name': 'PerformingPhysicianName',
-        'value': '(no value available)',
-        'group': '0x0008',
-        'element': '0x1050',
-        'vr': 'PN',
-        'vl': 0
+        name: 'PerformingPhysicianName',
+        value: '(no value available)',
+        group: '0x0008',
+        element: '0x1050',
+        vr: 'PN',
+        vl: 0
       },
       {
-        'name': 'dBdt',
-        'value': '0',
-        'group': '0x0018',
-        'element': '0x1318',
-        'vr': 'DS',
-        'vl': 1
+        name: 'dBdt',
+        value: '0',
+        group: '0x0018',
+        element: '0x1318',
+        vr: 'DS',
+        vl: 1
       },
       {
-        'name': 'PhotometricInterpretation',
-        'value': 'MONOCHROME2',
-        'group': '0x0028',
-        'element': '0x0004',
-        'vr': 'CS',
-        'vl': 11
+        name: 'PhotometricInterpretation',
+        value: 'MONOCHROME2',
+        group: '0x0028',
+        element: '0x0004',
+        vr: 'CS',
+        vl: 11
       },
       {
-        'name': 'SamplesPerPixel',
-        'value': '1',
-        'group': '0x0028',
-        'element': '0x0002',
-        'vr': 'US',
-        'vl': 2
+        name: 'SamplesPerPixel',
+        value: '1',
+        group: '0x0028',
+        element: '0x0002',
+        vr: 'US',
+        vl: 2
       },
       {
-        'name': 'PixelRepresentation',
-        'value': '0',
-        'group': '0x0028',
-        'element': '0x0103',
-        'vr': 'US',
-        'vl': 2
+        name: 'PixelRepresentation',
+        value: '0',
+        group: '0x0028',
+        element: '0x0103',
+        vr: 'US',
+        vl: 2
       },
       {
-        'name': 'Rows',
-        'value': '32',
-        'group': '0x0028',
-        'element': '0x0010',
-        'vr': 'US',
-        'vl': 2
+        name: 'Rows',
+        value: '32',
+        group: '0x0028',
+        element: '0x0010',
+        vr: 'US',
+        vl: 2
       },
       {
-        'name': 'Columns',
-        'value': '32',
-        'group': '0x0028',
-        'element': '0x0011',
-        'vr': 'US',
-        'vl': 2
+        name: 'Columns',
+        value: '32',
+        group: '0x0028',
+        element: '0x0011',
+        vr: 'US',
+        vl: 2
       },
       {
-        'name': 'BitsAllocated',
-        'value': '16',
-        'group': '0x0028',
-        'element': '0x0100',
-        'vr': 'US',
-        'vl': 2
+        name: 'BitsAllocated',
+        value: '16',
+        group: '0x0028',
+        element: '0x0100',
+        vr: 'US',
+        vl: 2
       },
       {
-        'name': 'BitsStored',
-        'value': '12',
-        'group': '0x0028',
-        'element': '0x0101',
-        'vr': 'US',
-        'vl': 2
+        name: 'BitsStored',
+        value: '12',
+        group: '0x0028',
+        element: '0x0101',
+        vr: 'US',
+        vl: 2
       },
       {
-        'name': 'HighBit',
-        'value': '11',
-        'group': '0x0028',
-        'element': '0x0102',
-        'vr': 'US',
-        'vl': 2
+        name: 'HighBit',
+        value: '11',
+        group: '0x0028',
+        element: '0x0102',
+        vr: 'US',
+        vl: 2
       },
       {
-        'name': 'ReferencedImageSequence',
-        'value': '[object Object]',
-        'group': '0x0008',
-        'element': '0x1140',
-        'vr': 'SQ',
-        'vl': 101
+        name: 'ReferencedImageSequence',
+        value: '[object Object]',
+        group: '0x0008',
+        element: '0x1140',
+        vr: 'SQ',
+        vl: 101
       },
       {
-        'name': 'PixelData',
-        'value': '...',
-        'group': '0x7FE0',
-        'element': '0x0010',
-        'vr': 'OW',
-        'vl': 2060
+        name: 'PixelData',
+        value: '...',
+        group: '0x7FE0',
+        element: '0x0010',
+        vr: 'OW',
+        vl: 2060
       }
     ];
 

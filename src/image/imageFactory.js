@@ -235,9 +235,9 @@ dwv.image.ImageFactory.prototype.create = function (
     }
     // set the palette
     meta.paletteLut = {
-      'red': redLut,
-      'green': greenLut,
-      'blue': blueLut
+      red: redLut,
+      green: greenLut,
+      blue: blueLut
     };
   }
 

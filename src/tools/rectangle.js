@@ -152,7 +152,7 @@ dwv.tool.draw.UpdateRect = function (anchor, image) {
   var width = topRight.x() - topLeft.x();
   var height = bottomLeft.y() - topLeft.y();
   if (width && height) {
-    krect.size({'width': width, 'height': height});
+    krect.size({width: width, height: height});
   }
   // new rect
   var p2d0 = new dwv.math.Point2D(topLeft.x(), topLeft.y());
@@ -164,6 +164,9 @@ dwv.tool.draw.UpdateRect = function (anchor, image) {
   ktext.quant = quant;
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
   // update position
-  var textPos = {'x': rect.getBegin().getX(), 'y': rect.getEnd().getY() + 10};
+  var textPos = {
+    x: rect.getBegin().getX(),
+    y: rect.getEnd().getY() + 10
+  };
   klabel.position(textPos);
 };

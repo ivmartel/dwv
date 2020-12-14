@@ -459,7 +459,7 @@ dwv.dicom.getGroupElementFromName = function (tagName) {
       }
     }
   }
-  return {'group': group, 'element': element};
+  return {group: group, element: element};
 };
 
 /**
@@ -554,7 +554,7 @@ dwv.dicom.getGroupElementKey = function (group, element) {
  * @returns {object} The DICOM group and element.
  */
 dwv.dicom.splitGroupElementKey = function (key) {
-  return {'group': key.substr(1, 4), 'element': key.substr(5, 8)};
+  return {group: key.substr(1, 4), element: key.substr(5, 8)};
 };
 
 /**
@@ -569,12 +569,12 @@ dwv.dicom.getReverseOrientation = function (ori) {
   }
   // reverse labels
   var rlabels = {
-    'L': 'R',
-    'R': 'L',
-    'A': 'P',
-    'P': 'A',
-    'H': 'F',
-    'F': 'H'
+    L: 'R',
+    R: 'L',
+    A: 'P',
+    P: 'A',
+    H: 'F',
+    F: 'H'
   };
 
   var rori = '';
@@ -945,10 +945,12 @@ dwv.dicom.DicomParser.prototype.readTag = function (reader, offset) {
   // name
   var name = dwv.dicom.getGroupElementKey(group, element);
   // return
-  return {'group': group,
-    'element': element,
-    'name': name,
-    'endOffset': offset};
+  return {
+    group: group,
+    element: element,
+    name: name,
+    endOffset: offset
+  };
 };
 
 /**
@@ -1005,9 +1007,11 @@ dwv.dicom.DicomParser.prototype.readItemDataElement = function (
     }
   }
 
-  return {'data': itemData,
-    'endOffset': offset,
-    'isSeqDelim': false};
+  return {
+    data: itemData,
+    endOffset: offset,
+    isSeqDelim: false
+  };
 };
 
 /**
@@ -1039,9 +1043,11 @@ dwv.dicom.DicomParser.prototype.readPixelItemDataElement = function (
     }
   }
 
-  return {'data': itemData,
-    'endOffset': offset,
-    'offsetTableVl': offsetTableVl};
+  return {
+    data: itemData,
+    endOffset: offset,
+    offsetTableVl: offsetTableVl
+  };
 };
 
 /**
@@ -1285,12 +1291,12 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
 
   // return
   return {
-    'tag': tag,
-    'vr': vr,
-    'vl': vlString,
-    'value': data,
-    'startOffset': startOffset,
-    'endOffset': offset
+    tag: tag,
+    vr: vr,
+    vl: vlString,
+    value: data,
+    startOffset: startOffset,
+    endOffset: offset
   };
 };
 

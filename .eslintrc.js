@@ -25,7 +25,7 @@ module.exports = {
 
     // allow for some unused args
     // https://eslint.org/docs/rules/no-unused-vars
-    'no-unused-vars': ['error', {'argsIgnorePattern': '^_'}],
+    'no-unused-vars': ['error', {argsIgnorePattern: '^_'}],
 
     // formatting rules
 
@@ -40,11 +40,11 @@ module.exports = {
     'space-before-function-paren': ['error', {named: 'never'}],
     // newline at object curly
     // https://eslint.org/docs/rules/object-curly-newline
-    'object-curly-newline': ['error', {'consistent': true}],
+    'object-curly-newline': ['error', {consistent: true}],
     // newline at object properties
     // https://eslint.org/docs/rules/object-property-newline
     'object-property-newline': [
-      'error', {'allowAllPropertiesOnSameLine': true}
+      'error', {allowAllPropertiesOnSameLine: true}
     ],
     // newline at array brackets
     // https://eslint.org/docs/rules/array-bracket-newline
@@ -61,7 +61,7 @@ module.exports = {
     // give error for long lines (default: 80)
     // https://eslint.org/docs/rules/max-len
     'max-len': ['error',
-      {'ignoreRegExpLiterals': true, 'ignoreUrls': true}],
+      {ignoreRegExpLiterals: true, ignoreUrls: true}],
     // spaces in parenthesis (default: never)
     // https://eslint.org/docs/rules/space-in-parens
     'space-in-parens': 'error',
@@ -110,6 +110,9 @@ module.exports = {
     'no-multiple-empty-lines': 'error',
     // linebreak after operator
     // https://eslint.org/docs/rules/operator-linebreak
-    'operator-linebreak': 'error'
+    'operator-linebreak': 'error',
+    // quotes around object property names
+    // https://eslint.org/docs/rules/quote-props
+    'quote-props': ['error', 'as-needed']
   }
 };

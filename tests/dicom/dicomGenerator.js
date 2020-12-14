@@ -39,7 +39,7 @@ dwv.dicom.getElementsFromJSONTags = function (tags) {
     dicomElements[name] = dicomElement;
   }
   // return
-  return {'elements': dicomElements, 'offset': offset};
+  return {elements: dicomElements, offset: offset};
 };
 
 /**
@@ -160,12 +160,12 @@ dwv.dicom.generatePixelDataFromJSONTags = function (
   }
   var pixVL = pixels.BYTES_PER_ELEMENT * dataLength;
   return {
-    'tag': {'group': '0x7FE0', 'element': '0x0010'},
-    'vr': vr,
-    'vl': pixVL,
-    'value': pixels,
-    'startOffset': startOffset,
-    'endOffset': startOffset + pixVL
+    tag: {group: '0x7FE0', element: '0x0010'},
+    vr: vr,
+    vl: pixVL,
+    value: pixels,
+    startOffset: startOffset,
+    endOffset: startOffset + pixVL
   };
 };
 

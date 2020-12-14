@@ -523,7 +523,7 @@ dwv.image.Image.prototype.calculateDataRange = function () {
     }
   }
   // return
-  return {'min': min, 'max': max};
+  return {min: min, max: max};
 };
 
 /**
@@ -540,8 +540,8 @@ dwv.image.Image.prototype.calculateRescaledDataRange = function () {
     var resmin = this.getRescaleSlopeAndIntercept(0).apply(range.min);
     var resmax = this.getRescaleSlopeAndIntercept(0).apply(range.max);
     return {
-      'min': ((resmin < resmax) ? resmin : resmax),
-      'max': ((resmin > resmax) ? resmin : resmax)
+      min: ((resmin < resmax) ? resmin : resmax),
+      max: ((resmin > resmax) ? resmin : resmax)
     };
   } else {
     var size = this.getGeometry().getSize();
@@ -565,7 +565,7 @@ dwv.image.Image.prototype.calculateRescaledDataRange = function () {
       }
     }
     // return
-    return {'min': rmin, 'max': rmax};
+    return {min: rmin, max: rmax};
   }
 };
 
@@ -607,17 +607,19 @@ dwv.image.Image.prototype.calculateHistogram = function () {
     }
   }
   // set data range
-  var dataRange = {'min': min, 'max': max};
-  var rescaledDataRange = {'min': rmin, 'max': rmax};
+  var dataRange = {min: min, max: max};
+  var rescaledDataRange = {min: rmin, max: rmax};
   // generate data for plotting
   var histogram = [];
   for (var b = rmin; b <= rmax; ++b) {
     histogram.push([b, (histo[b] || 0)]);
   }
   // return
-  return {'dataRange': dataRange,
-    'rescaledDataRange': rescaledDataRange,
-    'histogram': histogram};
+  return {
+    dataRange: dataRange,
+    rescaledDataRange: rescaledDataRange,
+    histogram: histogram
+  };
 };
 
 /**
@@ -829,7 +831,7 @@ dwv.image.Image.prototype.quantifyLine = function (line) {
   var length = line.getWorldLength(spacing.getColumnSpacing(),
     spacing.getRowSpacing());
   if (length !== null) {
-    quant.length = {'value': length, 'unit': dwv.i18n('unit.mm')};
+    quant.length = {value: length, unit: dwv.i18n('unit.mm')};
   }
   // return
   return quant;
@@ -848,7 +850,7 @@ dwv.image.Image.prototype.quantifyRect = function (rect) {
   var surface = rect.getWorldSurface(spacing.getColumnSpacing(),
     spacing.getRowSpacing());
   if (surface !== null) {
-    quant.surface = {'value': surface / 100, 'unit': dwv.i18n('unit.cm2')};
+    quant.surface = {value: surface / 100, unit: dwv.i18n('unit.cm2')};
   }
   // stats
   var subBuffer = [];
@@ -862,10 +864,10 @@ dwv.image.Image.prototype.quantifyRect = function (rect) {
     }
   }
   var quantif = dwv.math.getStats(subBuffer);
-  quant.min = {'value': quantif.getMin(), 'unit': ''};
-  quant.max = {'value': quantif.getMax(), 'unit': ''};
-  quant.mean = {'value': quantif.getMean(), 'unit': ''};
-  quant.stdDev = {'value': quantif.getStdDev(), 'unit': ''};
+  quant.min = {value: quantif.getMin(), unit: ''};
+  quant.max = {value: quantif.getMax(), unit: ''};
+  quant.mean = {value: quantif.getMean(), unit: ''};
+  quant.stdDev = {value: quantif.getStdDev(), unit: ''};
   // return
   return quant;
 };
@@ -883,7 +885,7 @@ dwv.image.Image.prototype.quantifyEllipse = function (ellipse) {
   var surface = ellipse.getWorldSurface(spacing.getColumnSpacing(),
     spacing.getRowSpacing());
   if (surface !== null) {
-    quant.surface = {'value': surface / 100, 'unit': dwv.i18n('unit.cm2')};
+    quant.surface = {value: surface / 100, unit: dwv.i18n('unit.cm2')};
   }
   // return
   return quant;

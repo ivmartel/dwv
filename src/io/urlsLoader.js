@@ -4,8 +4,8 @@ dwv.io = dwv.io || {};
 
 // url content types
 dwv.io.urlContentTypes = {
-  'Text': 0,
-  'ArrayBuffer': 1
+  Text: 0,
+  ArrayBuffer: 1
 };
 
 /**
@@ -277,7 +277,7 @@ dwv.io.UrlsLoader = function () {
         foundLoader = true;
         // load options
         loader.setOptions({
-          'defaultCharacterSet': self.getDefaultCharacterSet()
+          defaultCharacterSet: self.getDefaultCharacterSet()
         });
         // set loader callbacks
         // loader.onloadstart: nothing to do

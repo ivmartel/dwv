@@ -34,15 +34,15 @@ dwv.State = function () {
   this.toJSON = function (app) {
     // return a JSON string
     return JSON.stringify({
-      'version': '0.3',
+      version: '0.3',
       'window-center': app.getViewController().getWindowLevel().center,
       'window-width': app.getViewController().getWindowLevel().width,
-      'position': app.getViewController().getCurrentPosition(),
-      'scale': app.getScale(),
-      'scaleCenter': app.getScaleCenter(),
-      'translation': app.getTranslation(),
-      'drawings': app.getDrawController().getDrawLayer().toObject(),
-      'drawingsDetails': app.getDrawStoreDetails()
+      position: app.getViewController().getCurrentPosition(),
+      scale: app.getScale(),
+      scaleCenter: app.getScaleCenter(),
+      translation: app.getTranslation(),
+      drawings: app.getDrawController().getDrawLayer().toObject(),
+      drawingsDetails: app.getDrawStoreDetails()
     });
   };
   /**
@@ -139,9 +139,9 @@ dwv.v02Tov03Drawings = function (drawings) {
   //});
 
   var drawLayer = new Konva.Layer({
-    'listening': false,
-    'hitGraphEnabled': false,
-    'visible': true
+    listening: false,
+    hitGraphEnabled: false,
+    visible: true
   });
 
   // Get the positions-groups data
@@ -211,7 +211,7 @@ dwv.v01Tov02DrawingsAndDetails = function (inputDrawings) {
         // force visible (not set in state)
         drawGroup.visible(true);
         // label position
-        var pos = {'x': 0, 'y': 0};
+        var pos = {x: 0, y: 0};
         // update shape colour
         var kshape = drawGroup.getChildren(function (node) {
           return node.name() === 'shape';
@@ -265,8 +265,8 @@ dwv.v01Tov02DrawingsAndDetails = function (inputDrawings) {
         } else {
           // use shape position if no text
           if (kshape.points().length !== 0) {
-            pos = {'x': kshape.points()[0],
-              'y': kshape.points()[1]};
+            pos = {x: kshape.points()[0],
+              y: kshape.points()[1]};
           }
         }
         // create new label with text and tag
@@ -289,36 +289,36 @@ dwv.v01Tov02DrawingsAndDetails = function (inputDrawings) {
         // adapt to text with flag
         if (drawGroup.name() === 'ruler-group') {
           quant = {
-            'length': {
-              'value': parseFloat(textExpr.substr(0, txtLen - 2)),
-              'unit': textExpr.substr(-2, 2)
+            length: {
+              value: parseFloat(textExpr.substr(0, txtLen - 2)),
+              unit: textExpr.substr(-2, 2)
             }
           };
           textExpr = '{length}';
         } else if (drawGroup.name() === 'ellipse-group' ||
                     drawGroup.name() === 'rectangle-group') {
           quant = {
-            'surface': {
-              'value': parseFloat(textExpr.substr(0, txtLen - 3)),
-              'unit': textExpr.substr(-3, 3)
+            surface: {
+              value: parseFloat(textExpr.substr(0, txtLen - 3)),
+              unit: textExpr.substr(-3, 3)
             }
           };
           textExpr = '{surface}';
         } else if (drawGroup.name() === 'protractor-group' ||
                     drawGroup.name() === 'rectangle-group') {
           quant = {
-            'angle': {
-              'value': parseFloat(textExpr.substr(0, txtLen - 1)),
-              'unit': textExpr.substr(-1, 1)
+            angle: {
+              value: parseFloat(textExpr.substr(0, txtLen - 1)),
+              unit: textExpr.substr(-1, 1)
             }
           };
           textExpr = '{angle}';
         }
         // set details
         drawingsDetails[drawGroup.id()] = {
-          'textExpr': textExpr,
-          'longText': '',
-          'quant': quant
+          textExpr: textExpr,
+          longText: '',
+          quant: quant
         };
 
       }
@@ -326,7 +326,7 @@ dwv.v01Tov02DrawingsAndDetails = function (inputDrawings) {
     }
   }
 
-  return {'drawings': newDrawings, 'drawingsDetails': drawingsDetails};
+  return {drawings: newDrawings, drawingsDetails: drawingsDetails};
 };
 
 /**
@@ -350,9 +350,9 @@ dwv.v02Tov03DrawingsDetails = function (details) {
       for (var g = 0, leng = groupDetails[k][f].length; g < leng; ++g) {
         var group = groupDetails[k][f][g];
         res[group.id] = {
-          'textExpr': group.textExpr,
-          'longText': group.longText,
-          'quant': group.quant
+          textExpr: group.textExpr,
+          longText: group.longText,
+          quant: group.quant
         };
       }
     }
@@ -369,14 +369,14 @@ dwv.v02Tov03DrawingsDetails = function (details) {
 dwv.getColourHex = function (name) {
   // default colours used in dwv version < 0.17
   var dict = {
-    'Yellow': '#ffff00',
-    'Red': '#ff0000',
-    'White': '#ffffff',
-    'Green': '#008000',
-    'Blue': '#0000ff',
-    'Lime': '#00ff00',
-    'Fuchsia': '#ff00ff',
-    'Black': '#000000'
+    Yellow: '#ffff00',
+    Red: '#ff0000',
+    White: '#ffffff',
+    Green: '#008000',
+    Blue: '#0000ff',
+    Lime: '#00ff00',
+    Fuchsia: '#ff00ff',
+    Black: '#000000'
   };
   var res = '#ffff00';
   if (typeof dict[name] !== 'undefined') {

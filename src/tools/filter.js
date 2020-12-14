@@ -121,8 +121,8 @@ dwv.tool.Filter = function (app) {
  */
 dwv.tool.Filter.prototype.getHelpKeys = function () {
   return {
-    'title': 'tool.Filter.name',
-    'brief': 'tool.Filter.brief'
+    title: 'tool.Filter.name',
+    brief: 'tool.Filter.brief'
   };
 };
 
@@ -461,7 +461,7 @@ dwv.tool.RunFilterCommand = function (filter, app) {
     // update display
     app.render();
     // callback
-    this.onExecute({'type': 'filter-run', 'id': this.getName()});
+    this.onExecute({type: 'filter-run', id: this.getName()});
   };
 
   /**
@@ -473,7 +473,7 @@ dwv.tool.RunFilterCommand = function (filter, app) {
     // update display
     app.render();
     // callback
-    this.onUndo({'type': 'filter-undo', 'id': this.getName()});
+    this.onUndo({type: 'filter-undo', id: this.getName()});
   };
 
 }; // RunFilterCommand class

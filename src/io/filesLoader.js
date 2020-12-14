@@ -5,9 +5,9 @@ dwv.io = dwv.io || {};
 
 // file content types
 dwv.io.fileContentTypes = {
-  'Text': 0,
-  'ArrayBuffer': 1,
-  'DataURL': 2
+  Text: 0,
+  ArrayBuffer: 1,
+  DataURL: 2
 };
 
 /**
@@ -246,7 +246,7 @@ dwv.io.FilesLoader = function () {
         foundLoader = true;
         // load options
         loader.setOptions({
-          'defaultCharacterSet': this.getDefaultCharacterSet()
+          defaultCharacterSet: this.getDefaultCharacterSet()
         });
         // set loader callbacks
         // loader.onloadstart: nothing to do

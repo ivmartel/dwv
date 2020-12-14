@@ -66,13 +66,13 @@ dwv.test.testState = function (version, type, assert) {
 dwv.test.checkStateHeader = function (jsonData, version, assert) {
   // header data
   var headerData = {
-    'version': version,
+    version: version,
     'window-center': 441,
     'window-width': 911,
-    'position': {'i': 0, 'j': 0, 'k': 0},
-    'scale': 1,
-    'scaleCenter': {'x': 0, 'y': 0},
-    'translation': {'x': 0, 'y': 0}
+    position: {i: 0, j: 0, k: 0},
+    scale: 1,
+    scaleCenter: {x: 0, y: 0},
+    translation: {x: 0, y: 0}
   };
   assert.deepEqual(jsonData, headerData);
 };
@@ -119,22 +119,22 @@ dwv.test.checkDrawings = function (drawings, details, version, type, assert) {
       dwv.test.checkArrowDrawing(posGroupKid, details, version, assert);
     } else if (type === 'ruler' && version !== '0.1') {
       var refRuler = {
-        'id': '4gvkz8v6wzw',
-        'points': [51, 135, 216, 134],
-        'colour': '#ffff80',
-        'text': '165.0mm',
-        'textExpr': '{length}',
-        'longText': 'What a ruler!'
+        id: '4gvkz8v6wzw',
+        points: [51, 135, 216, 134],
+        colour: '#ffff80',
+        text: '165.0mm',
+        textExpr: '{length}',
+        longText: 'What a ruler!'
       };
       dwv.test.checkRulerDrawing(posGroupKid, details, refRuler, assert);
     } else if (type === 'line' && version === '0.1') {
       var refLine = {
-        'id': '4gvkz8v6wzw',
-        'points': [51, 135, 216, 134],
-        'colour': '#ffff00',
-        'text': '165.0mm',
-        'textExpr': '{length}',
-        'longText': ''
+        id: '4gvkz8v6wzw',
+        points: [51, 135, 216, 134],
+        colour: '#ffff00',
+        text: '165.0mm',
+        textExpr: '{length}',
+        longText: ''
       };
       dwv.test.checkRulerDrawing(posGroupKid, details, refLine, assert);
     } else if (type === 'roi') {
@@ -352,44 +352,44 @@ dwv.test.checkRulerDrawings = function (layerKids, details, version, assert) {
 
   var refRulers = [
     {
-      'id': 'onzlkbs8p',
-      'points': [120, 110, 120, 60],
-      'colour': '#ffff00',
-      'text': '50.00mm',
-      'textExpr': '{length}',
-      'longText': (version === '0.1' ? '' : 'First ruler.')
+      id: 'onzlkbs8p',
+      points: [120, 110, 120, 60],
+      colour: '#ffff00',
+      text: '50.00mm',
+      textExpr: '{length}',
+      longText: (version === '0.1' ? '' : 'First ruler.')
     },
     {
-      'id': 'u9bvidgkjc9',
-      'points': [120, 110, 170, 110],
-      'colour': '#ff0000',
-      'text': '50.00mm',
-      'textExpr': '{length}',
-      'longText': (version === '0.1' ? '' : 'Second ruler.')
+      id: 'u9bvidgkjc9',
+      points: [120, 110, 170, 110],
+      colour: '#ff0000',
+      text: '50.00mm',
+      textExpr: '{length}',
+      longText: (version === '0.1' ? '' : 'Second ruler.')
     },
     {
-      'id': 'c9abkegq62j',
-      'points': [120, 110, 120, 160],
-      'colour': '#ffffff',
-      'text': '50.00mm',
-      'textExpr': '{length}',
-      'longText': (version === '0.1' ? '' : 'Third ruler.')
+      id: 'c9abkegq62j',
+      points: [120, 110, 120, 160],
+      colour: '#ffffff',
+      text: '50.00mm',
+      textExpr: '{length}',
+      longText: (version === '0.1' ? '' : 'Third ruler.')
     },
     {
-      'id': 'uiav43zjw1',
-      'points': [120, 110, 60, 110],
-      'colour': '#00ff00',
-      'text': '50.00mm',
-      'textExpr': '{length}',
-      'longText': (version === '0.1' ? '' : 'Fourth ruler.')
+      id: 'uiav43zjw1',
+      points: [120, 110, 60, 110],
+      colour: '#00ff00',
+      text: '50.00mm',
+      textExpr: '{length}',
+      longText: (version === '0.1' ? '' : 'Fourth ruler.')
     },
     {
-      'id': '26ir11b9ugl',
-      'points': [120, 110, 120, 60],
-      'colour': '#ff00ff',
-      'text': '50.00mm',
-      'textExpr': '{length}',
-      'longText': (version === '0.1' ? '' : 'Fifth ruler.')
+      id: '26ir11b9ugl',
+      points: [120, 110, 120, 60],
+      colour: '#ff00ff',
+      text: '50.00mm',
+      textExpr: '{length}',
+      longText: (version === '0.1' ? '' : 'Fifth ruler.')
     }
   ];
 

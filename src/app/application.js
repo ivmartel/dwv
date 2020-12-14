@@ -29,9 +29,9 @@ dwv.App = function () {
   // main scale
   var scale = 1;
   // zoom center
-  var scaleCenter = {'x': 0, 'y': 0};
+  var scaleCenter = {x: 0, y: 0};
   // translation
-  var translation = {'x': 0, 'y': 0};
+  var translation = {x: 0, y: 0};
 
   // View
   var view = null;
@@ -338,7 +338,7 @@ dwv.App = function () {
         height -= (kids[i].offsetHeight + margin);
       }
     }
-    return {'width': parent.offsetWidth, 'height': height};
+    return {width: parent.offsetWidth, height: height};
   };
 
   /**
@@ -385,8 +385,8 @@ dwv.App = function () {
     var previousTrans = translation;
     // reset values
     scale = windowScale;
-    scaleCenter = {'x': 0, 'y': 0};
-    translation = {'x': 0, 'y': 0};
+    scaleCenter = {x: 0, y: 0};
+    translation = {x: 0, y: 0};
     // apply new values
     if (imageLayer) {
       imageLayer.resetLayout(windowScale);
@@ -398,22 +398,22 @@ dwv.App = function () {
     // fire events
     if (previousScale !== scale) {
       fireEvent({
-        'type': 'zoom-change',
-        'value': [scale],
-        'scale': scale,
-        'cx': scaleCenter.x,
-        'cy': scaleCenter.y
+        type: 'zoom-change',
+        value: [scale],
+        scale: scale,
+        cx: scaleCenter.x,
+        cy: scaleCenter.y
       });
     }
     if ((previousSC.x !== scaleCenter.x || previousSC.y !== scaleCenter.y) ||
       (previousTrans.x !== translation.x || previousTrans.y !== translation.y)
     ) {
       fireEvent({
-        'type': 'offset-change',
-        'value': [scaleCenter.x, scaleCenter.y],
-        'scale': scale,
-        'cx': scaleCenter.x,
-        'cy': scaleCenter.y
+        type: 'offset-change',
+        value: [scaleCenter.x, scaleCenter.y],
+        scale: scale,
+        cx: scaleCenter.x,
+        cy: scaleCenter.y
       });
     }
   };
@@ -601,7 +601,7 @@ dwv.App = function () {
     if (scale <= 0.1) {
       scale = 0.1;
     }
-    scaleCenter = {'x': cx, 'y': cy};
+    scaleCenter = {x: cx, y: cy};
     zoomLayers();
   };
 
@@ -617,7 +617,7 @@ dwv.App = function () {
     if (scale <= 0.1) {
       scale = 0.1;
     }
-    scaleCenter = {'x': cx, 'y': cy};
+    scaleCenter = {x: cx, y: cy};
     zoomLayers();
   };
 
@@ -628,7 +628,7 @@ dwv.App = function () {
    * @param {number} ty The translation along Y.
    */
   this.translate = function (tx, ty) {
-    translation = {'x': tx, 'y': ty};
+    translation = {x: tx, y: ty};
     translateLayers();
   };
 
@@ -641,7 +641,7 @@ dwv.App = function () {
   this.stepTranslate = function (tx, ty) {
     var txx = translation.x + tx / scale;
     var tyy = translation.y + ty / scale;
-    translation = {'x': txx, 'y': tyy};
+    translation = {x: txx, y: tyy};
     translateLayers();
   };
 
@@ -1018,11 +1018,11 @@ dwv.App = function () {
      * @property {number} cy The new rotaion center Y position.
      */
     fireEvent({
-      'type': 'zoom-change',
-      'value': [scale],
-      'scale': scale,
-      'cx': scaleCenter.x,
-      'cy': scaleCenter.y
+      type: 'zoom-change',
+      value: [scale],
+      scale: scale,
+      cx: scaleCenter.x,
+      cy: scaleCenter.y
     });
     /**
      * Offset change event.
@@ -1066,11 +1066,11 @@ dwv.App = function () {
        * @property {number} cy The new rotaion center Y position.
        */
       fireEvent({
-        'type': 'translate-change',
-        'value': [imageLayer.getTrans().x, imageLayer.getTrans().y],
-        'scale': scale,
-        'cx': imageLayer.getTrans().x,
-        'cy': imageLayer.getTrans().y
+        type: 'translate-change',
+        value: [imageLayer.getTrans().x, imageLayer.getTrans().y],
+        scale: scale,
+        cx: imageLayer.getTrans().x,
+        cy: imageLayer.getTrans().y
       });
     }
   }

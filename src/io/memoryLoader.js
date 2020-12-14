@@ -195,7 +195,7 @@ dwv.io.MemoryLoader = function () {
         foundLoader = true;
         // load options
         loader.setOptions({
-          'defaultCharacterSet': this.getDefaultCharacterSet()
+          defaultCharacterSet: this.getDefaultCharacterSet()
         });
         // set loader callbacks
         // loader.onloadstart: nothing to do

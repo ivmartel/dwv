@@ -59,9 +59,9 @@ dwv.tool.WindowLevel = function (app) {
 
     // add the manual preset to the view
     app.getViewController().addWindowLevelPresets({
-      'manual': {
-        'wl': new dwv.image.WindowLevel(windowCenter, windowWidth),
-        'name': 'manual'
+      manual: {
+        wl: new dwv.image.WindowLevel(windowCenter, windowWidth),
+        name: 'manual'
       }
     });
     app.getViewController().setWindowLevelPreset('manual');
@@ -171,14 +171,14 @@ dwv.tool.WindowLevel = function (app) {
  */
 dwv.tool.WindowLevel.prototype.getHelpKeys = function () {
   return {
-    'title': 'tool.WindowLevel.name',
-    'brief': 'tool.WindowLevel.brief',
-    'mouse': {
-      'mouse_drag': 'tool.WindowLevel.mouse_drag',
-      'double_click': 'tool.WindowLevel.double_click'
+    title: 'tool.WindowLevel.name',
+    brief: 'tool.WindowLevel.brief',
+    mouse: {
+      mouse_drag: 'tool.WindowLevel.mouse_drag',
+      double_click: 'tool.WindowLevel.double_click'
     },
-    'touch': {
-      'touch_drag': 'tool.WindowLevel.touch_drag'
+    touch: {
+      touch_drag: 'tool.WindowLevel.touch_drag'
     }
   };
 };
