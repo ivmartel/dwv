@@ -127,6 +127,7 @@ dwv.image.View = function (image) {
         if (previousWidth !== wl.getWidth()) {
           this.fireEvent({
             'type': 'wl-width-change',
+            'value': [wl.getWidth()],
             'wc': wl.getCenter(),
             'ww': wl.getWidth(),
             'skipGenerate': true
@@ -135,6 +136,7 @@ dwv.image.View = function (image) {
         if (previousCenter !== wl.getCenter()) {
           this.fireEvent({
             'type': 'wl-center-change',
+            'value': [wl.getCenter()],
             'wc': wl.getCenter(),
             'ww': wl.getWidth(),
             'skipGenerate': true
@@ -255,6 +257,7 @@ dwv.image.View = function (image) {
      *
      * @event dwv.image.View#colorchange
      * @type {object}
+     * @property {Array} value The changed value.
      * @property {number} wc The new window center value.
      * @property {number} ww The new window wdth value.
      */
@@ -301,27 +304,31 @@ dwv.image.View = function (image) {
 
     // fire a 'position-change' event
     if (image.getPhotometricInterpretation().match(/MONOCHROME/) !== null) {
+      var pixValue = image.getRescaledValue(
+        pos.i, pos.j, pos.k, this.getCurrentFrame());
       /**
        * Position change event.
        *
        * @event dwv.image.View#positionchange
        * @type {object}
+       * @property {Array} value The changed value.
        * @property {number} i The new column position
        * @property {number} j The new row position
        * @property {number} k The new slice position
-       * @property {object} value The image value at the new position.
+       * @property {object} pixelValue The image value at the new position.
        */
       this.fireEvent({
         'type': 'position-change',
+        'value': [pos.i, pos.j, pos.k, pixValue],
         'i': pos.i,
         'j': pos.j,
         'k': pos.k,
-        'value': image.getRescaledValue(
-          pos.i, pos.j, pos.k, this.getCurrentFrame())
+        'pixelValue': pixValue
       });
     } else {
       this.fireEvent({
         'type': 'position-change',
+        'value': [pos.i, pos.j, pos.k],
         'i': pos.i,
         'j': pos.j,
         'k': pos.k
@@ -336,12 +343,12 @@ dwv.image.View = function (image) {
          *
          * @event dwv.image.View#slicechange
          * @type {object}
-         * @property {number} value The new slice number
+         * @property {Array} value The changed value.
          * @property {object} data Associated event data: the imageUid.
          */
         this.fireEvent({
           'type': 'slice-change',
-          'value': currentPosition.k,
+          'value': [currentPosition.k],
           'data': {
             'imageUid': image.getImageUids()[currentPosition.k]
           }
@@ -384,10 +391,12 @@ dwv.image.View = function (image) {
        *
        * @event dwv.image.View#framechange
        * @type {object}
+       * @property {Array} value The changed value.
        * @property {number} frame The new frame number
        */
       this.fireEvent({
         'type': 'frame-change',
+        'value': [currentFrame],
         'frame': currentFrame
       });
       // silent set current position to update info text
@@ -483,12 +492,14 @@ dwv.image.View = function (image) {
            *
            * @event dwv.image.View#wlwidthchange
            * @type {object}
+           * @property {Array} value The changed value.
            * @property {number} wc The new window center value.
            * @property {number} ww The new window wdth value.
            * @property {boolean} skipGenerate Flag to skip view generation.
            */
           this.fireEvent({
             'type': 'wl-width-change',
+            'value': [width],
             'wc': center,
             'ww': width
           });
@@ -499,12 +510,14 @@ dwv.image.View = function (image) {
            *
            * @event dwv.image.View#wlcenterchange
            * @type {object}
+           * @property {Array} value The changed value.
            * @property {number} wc The new window center value.
            * @property {number} ww The new window wdth value.
            * @property {boolean} skipGenerate Flag to skip view generation.
            */
           this.fireEvent({
             'type': 'wl-center-change',
+            'value': [center],
             'wc': center,
             'ww': width
           });
@@ -512,11 +525,13 @@ dwv.image.View = function (image) {
       } else {
         this.fireEvent({
           'type': 'wl-width-change',
+          'value': [width],
           'wc': center,
           'ww': width
         });
         this.fireEvent({
           'type': 'wl-center-change',
+          'value': [center],
           'wc': center,
           'ww': width
         });
