@@ -37,6 +37,14 @@ dwv.image.View = function (image) {
   var currentPresetName = null;
 
   /**
+   * Current window level.
+   *
+   * @private
+   * @type {object}
+   */
+  var currentWl = null;
+
+  /**
    * colour map.
    *
    * @private
@@ -102,52 +110,71 @@ dwv.image.View = function (image) {
    */
   this.getCurrentWindowLut = function (rsi) {
     var sliceNumber = this.getCurrentPosition().k;
+
+    // get the current window level
+    var wl = null;
+    // special case for 'perslice' presets
+    if (currentPresetName &&
+      typeof windowPresets[currentPresetName] !== 'undefined' &&
+      typeof windowPresets[currentPresetName].perslice !== 'undefined' &&
+      windowPresets[currentPresetName].perslice === true) {
+      // get the preset for this slice
+      wl = windowPresets[currentPresetName].wl[sliceNumber];
+    }
+    // regular case
+    if (!wl) {
+      // if no current, use first id
+      if (!currentWl) {
+        this.setWindowLevelPresetById(0);
+      }
+      wl = currentWl;
+    }
+
     // use current rsi if not provided
     if (typeof rsi === 'undefined') {
       rsi = image.getRescaleSlopeAndIntercept(sliceNumber);
     }
-    // get the lut
-    var wlut = windowLuts[rsi.toString()];
 
-    // special case for 'perslice' presets
-    if (currentPresetName &&
-            typeof windowPresets[currentPresetName] !== 'undefined' &&
-            typeof windowPresets[currentPresetName].perslice !== 'undefined' &&
-            windowPresets[currentPresetName].perslice === true) {
-      // get the preset for this slice
-      var wl = windowPresets[currentPresetName].wl[sliceNumber];
-      // apply it if different from previous
-      if (!wlut.getWindowLevel().equals(wl)) {
-        // previous values
-        var previousWidth = wlut.getWindowLevel().getWidth();
-        var previousCenter = wlut.getWindowLevel().getCenter();
-        // set slice window level
-        wlut.setWindowLevel(wl);
-        // fire event
-        if (previousWidth !== wl.getWidth()) {
-          this.fireEvent({
-            type: 'wl-width-change',
-            value: [wl.getWidth()],
-            wc: wl.getCenter(),
-            ww: wl.getWidth(),
-            skipGenerate: true
-          });
-        }
-        if (previousCenter !== wl.getCenter()) {
-          this.fireEvent({
-            type: 'wl-center-change',
-            value: [wl.getCenter()],
-            wc: wl.getCenter(),
-            ww: wl.getWidth(),
-            skipGenerate: true
-          });
-        }
-      }
+    // get the window lut
+    var wlut = windowLuts[rsi.toString()];
+    if (typeof wlut === 'undefined') {
+      // create the rescale lookup table
+      var rescaleLut = new dwv.image.RescaleLut(
+        image.getRescaleSlopeAndIntercept(0), image.getMeta().BitsStored);
+      // create the window lookup table
+      var windowLut = new dwv.image.WindowLut(
+        rescaleLut, image.getMeta().IsSigned);
+      // store
+      this.addWindowLut(windowLut);
+      wlut = windowLut;
     }
 
-    // update in case of wl change
-    // TODO: should not be run in a getter...
-    wlut.update();
+    // update lut window level if not present or different from previous
+    var lutWl = wlut.getWindowLevel();
+    if (!lutWl || !lutWl.equals(wl)) {
+      // set lut window level
+      wlut.setWindowLevel(wl);
+      wlut.update();
+      // fire change event
+      if (!lutWl || lutWl.getWidth() !== wl.getWidth()) {
+        this.fireEvent({
+          type: 'wl-width-change',
+          value: [wl.getWidth()],
+          wc: wl.getCenter(),
+          ww: wl.getWidth(),
+          skipGenerate: true
+        });
+      }
+      if (!lutWl || lutWl.getCenter() !== wl.getCenter()) {
+        this.fireEvent({
+          type: 'wl-center-change',
+          value: [wl.getCenter()],
+          wc: wl.getCenter(),
+          ww: wl.getWidth(),
+          skipGenerate: true
+        });
+      }
+    }
 
     // return
     return wlut;
@@ -447,89 +474,53 @@ dwv.image.View = function (image) {
    */
   this.setWindowLevel = function (center, width, name) {
     // window width shall be >= 1 (see https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
-    if (width >= 1) {
+    if (width < 1) {
+      return;
+    }
 
-      // get current window/level (before updating name)
-      var sliceNumber = this.getCurrentPosition().k;
-      var currentWl = null;
-      var rsi = image.getRescaleSlopeAndIntercept(sliceNumber);
-      if (rsi && typeof rsi !== 'undefined') {
-        var currentLut = windowLuts[rsi.toString()];
-        if (currentLut && typeof currentLut !== 'undefined') {
-          currentWl = currentLut.getWindowLevel();
-        }
-      }
+    // default name
+    if (typeof name === 'undefined') {
+      name = 'manual';
+    }
 
-      if (typeof name === 'undefined') {
-        name = 'manual';
-      }
-      // update current preset name
-      currentPresetName = name;
+    // new window level
+    var newWl = new dwv.image.WindowLevel(center, width);
 
-      var wl = new dwv.image.WindowLevel(center, width);
-      var keys = Object.keys(windowLuts);
-
-      // create the first lut if none exists
-      if (keys.length === 0) {
-        // create the rescale lookup table
-        var rescaleLut = new dwv.image.RescaleLut(
-          image.getRescaleSlopeAndIntercept(0), image.getMeta().BitsStored);
-        // create the window lookup table
-        var windowLut = new dwv.image.WindowLut(
-          rescaleLut, image.getMeta().IsSigned);
-        this.addWindowLut(windowLut);
-      }
-
-      // set window level on luts
-      for (var key in windowLuts) {
-        windowLuts[key].setWindowLevel(wl);
-      }
-
-      // fire window level change event
-      if (currentWl && typeof currentWl !== 'undefined') {
-        if (currentWl.getWidth() !== width) {
-          /**
-           * Window/level width change event.
-           *
-           * @event dwv.image.View#wlwidthchange
-           * @type {object}
-           * @property {Array} value The changed value.
-           * @property {number} wc The new window center value.
-           * @property {number} ww The new window wdth value.
-           * @property {boolean} skipGenerate Flag to skip view generation.
-           */
-          this.fireEvent({
-            type: 'wl-width-change',
-            value: [width],
-            wc: center,
-            ww: width
-          });
-        }
-        if (currentWl.getCenter() !== center) {
-          /**
-           * Window/level center change event.
-           *
-           * @event dwv.image.View#wlcenterchange
-           * @type {object}
-           * @property {Array} value The changed value.
-           * @property {number} wc The new window center value.
-           * @property {number} ww The new window wdth value.
-           * @property {boolean} skipGenerate Flag to skip view generation.
-           */
-          this.fireEvent({
-            type: 'wl-center-change',
-            value: [center],
-            wc: center,
-            ww: width
-          });
-        }
-      } else {
+    // compare to previous if present
+    if (currentWl && typeof currentWl !== 'undefined') {
+      if (currentWl.getWidth() !== width) {
+        currentWl = newWl;
+        currentPresetName = name;
+        /**
+         * Window/level width change event.
+         *
+         * @event dwv.image.View#wlwidthchange
+         * @type {object}
+         * @property {Array} value The changed value.
+         * @property {number} wc The new window center value.
+         * @property {number} ww The new window wdth value.
+         * @property {boolean} skipGenerate Flag to skip view generation.
+         */
         this.fireEvent({
           type: 'wl-width-change',
           value: [width],
           wc: center,
           ww: width
         });
+      }
+      if (currentWl.getCenter() !== center) {
+        currentWl = newWl;
+        currentPresetName = name;
+        /**
+         * Window/level center change event.
+         *
+         * @event dwv.image.View#wlcenterchange
+         * @type {object}
+         * @property {Array} value The changed value.
+         * @property {number} wc The new window center value.
+         * @property {number} ww The new window wdth value.
+         * @property {boolean} skipGenerate Flag to skip view generation.
+         */
         this.fireEvent({
           type: 'wl-center-change',
           value: [center],
@@ -537,6 +528,22 @@ dwv.image.View = function (image) {
           ww: width
         });
       }
+    } else {
+      currentWl = newWl;
+      currentPresetName = name;
+
+      this.fireEvent({
+        type: 'wl-width-change',
+        value: [width],
+        wc: center,
+        ww: width
+      });
+      this.fireEvent({
+        type: 'wl-center-change',
+        value: [center],
+        wc: center,
+        ww: width
+      });
     }
   };
 
