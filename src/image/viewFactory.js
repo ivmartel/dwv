@@ -30,45 +30,18 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image) {
     }
   }
 
-  // presets
+  // window level presets
   var windowPresets = {};
-
-  // DICOM presets
-  var windowCenter = dicomElements.getFromKey('x00281050', true);
-  var windowWidth = dicomElements.getFromKey('x00281051', true);
-  var windowCWExplanation = dicomElements.getFromKey('x00281055', true);
-  if (windowCenter && windowWidth) {
-    var name;
-    for (var j = 0; j < windowCenter.length; ++j) {
-      var center = parseFloat(windowCenter[j], 10);
-      var width = parseFloat(windowWidth[j], 10);
-      if (center && width && width !== 0) {
-        name = '';
-        if (windowCWExplanation) {
-          name = dwv.dicom.cleanString(windowCWExplanation[j]);
-        }
-        if (name === '') {
-          name = 'Default' + j;
-        }
-        windowPresets[name] = {
-          wl: [new dwv.image.WindowLevel(center, width)],
-          name: name,
-          perslice: true
-        };
-      }
-      if (width === 0) {
-        console.warn('Zero window width found in DICOM.');
-      }
-    }
+  // image presets
+  if (typeof image.getMeta().windowPresets !== 'undefined') {
+    windowPresets = image.getMeta().windowPresets;
   }
-
   // min/max
   // Not filled yet since it is stil too costly to calculate min/max
   // for each slice... It will be filled at first use
   // (see view.setWindowLevelPreset).
   // Order is important, if no wl from DICOM, this will be the default.
   windowPresets.minmax = {name: 'minmax'};
-
   // optional modality presets
   if (typeof dwv.tool !== 'undefined' &&
     typeof dwv.tool.defaultpresets !== 'undefined') {

@@ -37,6 +37,8 @@ dwv.App = function () {
   var view = null;
   // View controller
   var viewController = null;
+  // flag to create view on first load
+  var viewOnFirstLoadItem = true;
 
   // meta data
   var metaData = null;
@@ -55,8 +57,6 @@ dwv.App = function () {
 
   // load controller
   var loadController = null;
-  // first loaded item flag
-  var firstLoadedItem = true;
 
   // UndoStack
   var undoStack = null;
@@ -313,6 +313,11 @@ dwv.App = function () {
     loadController.onloadend = onloadend;
     loadController.onerror = onerror;
     loadController.onabort = onabort;
+
+    // flag to view on first load
+    if (typeof config.viewOnFirstLoadItem !== 'undefined') {
+      viewOnFirstLoadItem = config.viewOnFirstLoadItem;
+    }
   };
 
   /**
@@ -363,7 +368,6 @@ dwv.App = function () {
     image = null;
     view = null;
     metaData = null;
-    firstLoadedItem = true;
     // reset undo/redo
     if (undoStack) {
       undoStack = new dwv.tool.UndoStack();
@@ -735,7 +739,7 @@ dwv.App = function () {
   function onWLChange(event) {
     // generate and draw if no skip flag
     if (typeof event.skipGenerate === 'undefined' ||
-            event.skipGenerate === false) {
+      event.skipGenerate === false) {
       generateAndDrawImage();
     }
   }
@@ -753,13 +757,17 @@ dwv.App = function () {
   /**
    * Handle frame change.
    *
-   * @param {object} _event The event fired when changing the frame.
+   * @param {object} event The event fired when changing the frame.
    * @private
    */
-  function onFrameChange(_event) {
-    generateAndDrawImage();
-    if (drawController) {
-      drawController.activateDrawLayer(viewController);
+  function onFrameChange(event) {
+    // generate and draw if no skip flag
+    if (typeof event.skipGenerate === 'undefined' ||
+      event.skipGenerate === false) {
+      generateAndDrawImage();
+      if (drawController) {
+        drawController.activateDrawLayer(viewController);
+      }
     }
   }
 
@@ -970,24 +978,20 @@ dwv.App = function () {
    * @private
    */
   function generateAndDrawImage() {
+    fireEvent({type: 'render-start'});
+
+    // create view if first tiem
+    if (!view) {
+      initialiseView();
+    }
     // generate image data from DICOM
     view.generateImageData(imageData);
     // set the image data of the layer
     imageLayer.setImageData(imageData);
     // draw the image
     imageLayer.draw();
-  }
 
-  /**
-   * First generate the image data and draw it.
-   *
-   * @private
-   */
-  function firstGenerateAndDrawImage() {
-    // init W/L display
-    self.initWLDisplay();
-    // generate first image
-    generateAndDrawImage();
+    fireEvent({type: 'render-end'});
   }
 
   /**
@@ -1164,12 +1168,20 @@ dwv.App = function () {
       console.error('Missing loaditem event load type', event);
     }
 
+    // first load flag
+    var isFirstLoad = image === null;
+    // number returned by image.appendSlice
+    var sliceNb = null;
+
     var eventMetaData = null;
     if (event.loadtype === 'image') {
-      if (firstLoadedItem) {
-        postLoadInit(event.data.view);
+      if (isFirstLoad) {
+        // save image
+        originalImage = event.data.image;
+        image = originalImage;
       } else {
-        view.append(event.data.view);
+        // append slice
+        sliceNb = image.appendSlice(event.data.image);
       }
       updateMetaData(event.data.info);
       eventMetaData = event.data.info;
@@ -1197,12 +1209,20 @@ dwv.App = function () {
       loadtype: event.loadtype
     });
 
-    // first generate will trigger view events,
-    // call it after fireEvent to allow clients to
-    // react to them with the first item data.
-    if (event.loadtype === 'image' && firstLoadedItem) {
-      firstLoadedItem = false;
-      firstGenerateAndDrawImage();
+    // render if asked
+    if (event.loadtype === 'image' && viewOnFirstLoadItem) {
+      if (isFirstLoad) {
+        self.render();
+      } else {
+        // update slice number if new slice was inserted before
+        if (sliceNb <= view.getCurrentPosition().k) {
+          view.setCurrentPosition({
+            i: view.getCurrentPosition().i,
+            j: view.getCurrentPosition().j,
+            k: view.getCurrentPosition().k + 1
+          }, true);
+        }
+      }
     }
   }
 
@@ -1324,20 +1344,25 @@ dwv.App = function () {
   }
 
   /**
-   * Post load application initialisation.
-   * To be called once the DICOM has been parsed.
+   * Create the image view.
+   * To be called once the DICOM data has been loaded.
    *
-   * @param {object} createdView The view to display.
    * @private
    */
-  function postLoadInit(createdView) {
-    // get the view from the loaded data
-    view = createdView;
-    viewController = new dwv.ViewController(view);
+  function initialiseView() {
 
-    // store image
-    originalImage = view.getImage();
-    image = originalImage;
+    if (!image) {
+      throw new Error('No image to create the view for.');
+    }
+
+    // create view
+    var viewFactory = new dwv.image.ViewFactory();
+    view = viewFactory.create(
+      new dwv.dicom.DicomElementsWrapper(metaData),
+      image);
+
+    // create view controller
+    viewController = new dwv.ViewController(view);
 
     // layout
     var size = image.getGeometry().getSize();

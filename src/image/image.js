@@ -337,6 +337,9 @@ dwv.image.Image = function (geometry, buffer, numberOfFrames, imageUids) {
     }
     // all meta should be equal
     for (var key in meta) {
+      if (key === 'windowPresets') {
+        continue;
+      }
       if (meta[key] !== rhs.getMeta()[key]) {
         throw new Error('Cannot append a slice with different ' + key);
       }
@@ -383,6 +386,30 @@ dwv.image.Image = function (geometry, buffer, numberOfFrames, imageUids) {
 
     // insert sop instance UIDs
     imageUids.splice(newSliceNb, 0, rhs.getImageUids()[0]);
+
+    // update window presets
+    if (typeof meta.windowPresets !== 'undefined') {
+      var windowPresets = meta.windowPresets;
+      var rhsPresets = rhs.getMeta().windowPresets;
+      var keys = Object.keys(rhsPresets);
+      var pkey = null;
+      for (var i = 0; i < keys.length; ++i) {
+        pkey = keys[i];
+        if (typeof windowPresets[pkey] !== 'undefined') {
+          if (typeof windowPresets[pkey].perslice !== 'undefined' &&
+            windowPresets[pkey].perslice === true) {
+            // use first new preset wl...
+            windowPresets[pkey].wl.splice(
+              newSliceNb, 0, rhsPresets[pkey].wl[0]);
+          } else {
+            windowPresets[pkey] = rhsPresets[pkey];
+          }
+        } else {
+          // update
+          windowPresets[pkey] = rhsPresets[pkey];
+        }
+      }
+    }
 
     // return the appended slice number
     return newSliceNb;

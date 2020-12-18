@@ -57,7 +57,7 @@ dwv.image.View = function (image) {
    * @private
    * @type {object}
    */
-  var currentPosition = {i: 0, j: 0, k: 0};
+  var currentPosition = null;
   /**
    * Current frame. Zero based.
    *
@@ -84,11 +84,20 @@ dwv.image.View = function (image) {
   };
 
   /**
+   * Set initial position.
+   */
+  this.setInitialPosition = function () {
+    var silent = true;
+    this.setCurrentPosition({i: 0, j: 0, k: 0}, silent);
+    this.setCurrentFrame(0, silent);
+  };
+
+  /**
    * Get the milliseconds per frame from frame rate.
    *
+   * @param {number} recommendedDisplayFrameRate Recommended Display Frame Rate.
    * @returns {number} The milliseconds per frame.
    */
-
   this.getPlaybackMilliseconds = function (recommendedDisplayFrameRate) {
     if (!recommendedDisplayFrameRate) {
       // Default to 10 FPS if none is found in the meta
@@ -109,7 +118,15 @@ dwv.image.View = function (image) {
    * @fires dwv.image.View#wlcenterchange
    */
   this.getCurrentWindowLut = function (rsi) {
+    // check position (also sets frame)
+    if (!this.getCurrentPosition()) {
+      this.setInitialPosition();
+    }
     var sliceNumber = this.getCurrentPosition().k;
+    // use current rsi if not provided
+    if (typeof rsi === 'undefined') {
+      rsi = image.getRescaleSlopeAndIntercept(sliceNumber);
+    }
 
     // get the current window level
     var wl = null;
@@ -125,14 +142,9 @@ dwv.image.View = function (image) {
     if (!wl) {
       // if no current, use first id
       if (!currentWl) {
-        this.setWindowLevelPresetById(0);
+        this.setWindowLevelPresetById(0, true);
       }
       wl = currentWl;
-    }
-
-    // use current rsi if not provided
-    if (typeof rsi === 'undefined') {
-      rsi = image.getRescaleSlopeAndIntercept(sliceNumber);
     }
 
     // get the window lut
@@ -151,7 +163,7 @@ dwv.image.View = function (image) {
 
     // update lut window level if not present or different from previous
     var lutWl = wlut.getWindowLevel();
-    if (!lutWl || !lutWl.equals(wl)) {
+    if (!wl.equals(lutWl)) {
       // set lut window level
       wlut.setWindowLevel(wl);
       wlut.update();
@@ -302,11 +314,11 @@ dwv.image.View = function (image) {
    */
   this.getCurrentPosition = function () {
     // return a clone to avoid reference problems
-    return {
+    return currentPosition ? {
       i: currentPosition.i,
       j: currentPosition.j,
       k: currentPosition.k
-    };
+    } : null;
   };
   /**
    * Set the current position.
@@ -318,53 +330,66 @@ dwv.image.View = function (image) {
    * @fires dwv.image.View#positionchange
    */
   this.setCurrentPosition = function (pos, silent) {
-    // default silent flag to false
+    // check input
     if (typeof silent === 'undefined') {
       silent = false;
     }
+
     // check if possible
     if (!image.getGeometry().getSize().isInBounds(pos.i, pos.j, pos.k)) {
       return false;
     }
-    var oldPosition = currentPosition;
-    currentPosition = pos;
+    // check if new
+    var equalPos = function (pos1, pos2) {
+      return pos2 !== null &&
+        pos1.i === pos2.i &&
+        pos1.j === pos2.j &&
+        pos1.k === pos2.k;
+    };
+    var isNew = !equalPos(pos, currentPosition);
 
-    // fire a 'position-change' event
-    if (image.getPhotometricInterpretation().match(/MONOCHROME/) !== null) {
-      var pixValue = image.getRescaledValue(
-        pos.i, pos.j, pos.k, this.getCurrentFrame());
-      /**
-       * Position change event.
-       *
-       * @event dwv.image.View#positionchange
-       * @type {object}
-       * @property {Array} value The changed value.
-       * @property {number} i The new column position
-       * @property {number} j The new row position
-       * @property {number} k The new slice position
-       * @property {object} pixelValue The image value at the new position.
-       */
-      this.fireEvent({
-        type: 'position-change',
-        value: [pos.i, pos.j, pos.k, pixValue],
-        i: pos.i,
-        j: pos.j,
-        k: pos.k,
-        pixelValue: pixValue
-      });
-    } else {
-      this.fireEvent({
-        type: 'position-change',
-        value: [pos.i, pos.j, pos.k],
-        i: pos.i,
-        j: pos.j,
-        k: pos.k
-      });
-    }
+    if (isNew) {
+      var isNewSlice = currentPosition
+        ? pos.k !== currentPosition.k : true;
+      // assign
+      currentPosition = pos;
 
-    // fire a slice change event (used to trigger redraw)
-    if (!silent) {
-      if (oldPosition.k !== currentPosition.k) {
+      // fire a 'position-change' event
+      if (image.getPhotometricInterpretation().match(/MONOCHROME/) !== null) {
+        var pixValue = image.getRescaledValue(
+          pos.i, pos.j, pos.k, this.getCurrentFrame());
+        /**
+         * Position change event.
+         *
+         * @event dwv.image.View#positionchange
+         * @type {object}
+         * @property {Array} value The changed value.
+         * @property {number} i The new column position
+         * @property {number} j The new row position
+         * @property {number} k The new slice position
+         * @property {object} pixelValue The image value at the new position,
+         *   (can be undefined).
+         */
+        this.fireEvent({
+          type: 'position-change',
+          value: [pos.i, pos.j, pos.k, pixValue],
+          i: pos.i,
+          j: pos.j,
+          k: pos.k,
+          pixelValue: pixValue
+        });
+      } else {
+        this.fireEvent({
+          type: 'position-change',
+          value: [pos.i, pos.j, pos.k],
+          i: pos.i,
+          j: pos.j,
+          k: pos.k
+        });
+      }
+
+      // fire a slice change event (used to trigger redraw)
+      if (!silent && isNewSlice) {
         /**
          * Slice change event.
          *
@@ -400,34 +425,44 @@ dwv.image.View = function (image) {
    * Set the current frame number.
    *
    * @param {number} frame The current frame number.
+   * @param {boolean} silent Flag to launch events with skipGenerate.
    * @returns {boolean} False if not in bounds
    * @fires dwv.image.View#framechange
    */
-  this.setCurrentFrame = function (frame) {
+  this.setCurrentFrame = function (frame, silent) {
+    // check input
+    if (typeof silent === 'undefined') {
+      silent = false;
+    }
+
     // check if possible
     if (frame < 0 || frame >= image.getNumberOfFrames()) {
       return false;
     }
-    // assign
-    var oldFrame = currentFrame;
-    currentFrame = frame;
-    // fire event
-    if (oldFrame !== currentFrame && image.getNumberOfFrames() !== 1) {
-      /**
-       * Frame change event.
-       *
-       * @event dwv.image.View#framechange
-       * @type {object}
-       * @property {Array} value The changed value.
-       * @property {number} frame The new frame number
-       */
-      this.fireEvent({
-        type: 'frame-change',
-        value: [currentFrame],
-        frame: currentFrame
-      });
-      // silent set current position to update info text
-      this.setCurrentPosition(this.getCurrentPosition(), true);
+    // check if new
+    var isNew = currentFrame !== frame;
+
+    if (isNew) {
+      // assign
+      currentFrame = frame;
+      // fire event for multi frame data
+      if (image.getNumberOfFrames() !== 1) {
+        /**
+         * Frame change event.
+         *
+         * @event dwv.image.View#framechange
+         * @type {object}
+         * @property {Array} value The changed value.
+         * @property {number} frame The new frame number
+         * @property {boolean} skipGenerate Flag to skip view generation.
+         */
+        this.fireEvent({
+          type: 'frame-change',
+          value: [currentFrame],
+          frame: currentFrame,
+          skipGenerate: silent
+        });
+      }
     }
     // all good
     return true;
@@ -438,7 +473,7 @@ dwv.image.View = function (image) {
    *
    * @param {object} rhs The view to append.
    */
-  this.append = function (rhs) {
+  /*this.append = function (rhs) {
     // append images
     var newSliceNumber = this.getImage().appendSlice(rhs.getImage());
     // update position if a slice was appended before
@@ -451,17 +486,17 @@ dwv.image.View = function (image) {
     }
     // add window presets
     this.addWindowPresets(rhs.getWindowPresets(), newSliceNumber);
-  };
+  };*/
 
   /**
    * Append a frame buffer to the included image.
    *
    * @param {object} frameBuffer The frame buffer to append.
    */
-  this.appendFrameBuffer = function (frameBuffer) {
+  /*this.appendFrameBuffer = function (frameBuffer) {
     this.getImage().appendFrameBuffer(frameBuffer);
   };
-
+*/
   /**
    * Set the view window/level.
    *
@@ -469,28 +504,39 @@ dwv.image.View = function (image) {
    * @param {number} width The window width.
    * @param {string} name Associated preset name, defaults to 'manual'.
    * Warning: uses the latest set rescale LUT or the default linear one.
+   * @param {boolean} silent Flag to launch events with skipGenerate.
    * @fires dwv.image.View#wlwidthchange
    * @fires dwv.image.View#wlcenterchange
    */
-  this.setWindowLevel = function (center, width, name) {
+  this.setWindowLevel = function (center, width, name, silent) {
     // window width shall be >= 1 (see https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
     if (width < 1) {
       return;
     }
 
-    // default name
+    // check input
     if (typeof name === 'undefined') {
       name = 'manual';
+    }
+    if (typeof silent === 'undefined') {
+      silent = false;
     }
 
     // new window level
     var newWl = new dwv.image.WindowLevel(center, width);
 
+    // check if new
+    var isNew = !newWl.equals(currentWl);
+
     // compare to previous if present
-    if (currentWl && typeof currentWl !== 'undefined') {
-      if (currentWl.getWidth() !== width) {
-        currentWl = newWl;
-        currentPresetName = name;
+    if (isNew) {
+      var isNewWidth = currentWl ? currentWl.getWidth() !== width : true;
+      var isNewCenter = currentWl ? currentWl.getCenter() !== center : true;
+      // assign
+      currentWl = newWl;
+      currentPresetName = name;
+
+      if (isNewWidth) {
         /**
          * Window/level width change event.
          *
@@ -505,12 +551,12 @@ dwv.image.View = function (image) {
           type: 'wl-width-change',
           value: [width],
           wc: center,
-          ww: width
+          ww: width,
+          skipGenerate: silent
         });
       }
-      if (currentWl.getCenter() !== center) {
-        currentWl = newWl;
-        currentPresetName = name;
+
+      if (isNewCenter) {
         /**
          * Window/level center change event.
          *
@@ -525,25 +571,10 @@ dwv.image.View = function (image) {
           type: 'wl-center-change',
           value: [center],
           wc: center,
-          ww: width
+          ww: width,
+          skipGenerate: silent
         });
       }
-    } else {
-      currentWl = newWl;
-      currentPresetName = name;
-
-      this.fireEvent({
-        type: 'wl-width-change',
-        value: [width],
-        wc: center,
-        ww: width
-      });
-      this.fireEvent({
-        type: 'wl-center-change',
-        value: [center],
-        wc: center,
-        ww: width
-      });
     }
   };
 
@@ -551,8 +582,9 @@ dwv.image.View = function (image) {
    * Set the window level to the preset with the input name.
    *
    * @param {string} name The name of the preset to activate.
+   * @param {boolean} silent Flag to launch events with skipGenerate.
    */
-  this.setWindowLevelPreset = function (name) {
+  this.setWindowLevelPreset = function (name, silent) {
     var preset = this.getWindowPresets()[name];
     if (typeof preset === 'undefined') {
       throw new Error('Unknown window level preset: \'' + name + '\'');
@@ -563,21 +595,23 @@ dwv.image.View = function (image) {
     }
     // special 'perslice' case
     if (typeof preset.perslice !== 'undefined' &&
-            preset.perslice === true) {
+      preset.perslice === true) {
       preset = {wl: preset.wl[this.getCurrentPosition().k]};
     }
     // set w/l
-    this.setWindowLevel(preset.wl.getCenter(), preset.wl.getWidth(), name);
+    this.setWindowLevel(
+      preset.wl.getCenter(), preset.wl.getWidth(), name, silent);
   };
 
   /**
    * Set the window level to the preset with the input id.
    *
    * @param {number} id The id of the preset to activate.
+   * @param {boolean} silent Flag to launch events with skipGenerate.
    */
-  this.setWindowLevelPresetById = function (id) {
+  this.setWindowLevelPresetById = function (id, silent) {
     var keys = Object.keys(this.getWindowPresets());
-    this.setWindowLevelPreset(keys[id]);
+    this.setWindowLevelPreset(keys[id], silent);
   };
 
   /**
@@ -656,9 +690,13 @@ dwv.image.View.prototype.setWindowLevelMinMax = function () {
  * @param {Array} array The array to fill in.
  */
 dwv.image.View.prototype.generateImageData = function (array) {
-  var frame = this.getCurrentFrame() ? this.getCurrentFrame() : 0;
-  var image = this.getImage();
+  // check position (also sets frame)
+  if (!this.getCurrentPosition()) {
+    this.setInitialPosition();
+  }
   var position = this.getCurrentPosition();
+  var frame = this.getCurrentFrame();
+  var image = this.getImage();
   var iterator = image.getSliceIterator(position.k);
   var dataAccessor = function (offset) {
     return image.getValueAtOffset(offset, frame);
