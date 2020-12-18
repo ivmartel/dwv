@@ -33,9 +33,20 @@ dwv.test.viewerSetup = function () {
   _app.addEventListener('error', function (event) {
     console.error('load error', event);
   });
+  _app.addEventListener('load-start', function () {
+    console.time('load-data');
+  });
   _app.addEventListener('load-end', function () {
+    console.timeEnd('load-data');
     console.log(_app.getMetaData());
   });
+  _app.addEventListener('render-start', function () {
+    console.time('render-data');
+  });
+  _app.addEventListener('render-end', function () {
+    console.timeEnd('render-data');
+  });
+
   _app.addEventListener('keydown', function (event) {
     _app.defaultOnKeydown(event);
     if (event.keyCode === 83) { // s
