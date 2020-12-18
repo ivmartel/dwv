@@ -469,35 +469,6 @@ dwv.image.View = function (image) {
   };
 
   /**
-   * Append another view to this one.
-   *
-   * @param {object} rhs The view to append.
-   */
-  /*this.append = function (rhs) {
-    // append images
-    var newSliceNumber = this.getImage().appendSlice(rhs.getImage());
-    // update position if a slice was appended before
-    if (newSliceNumber <= this.getCurrentPosition().k) {
-      this.setCurrentPosition({
-        i: this.getCurrentPosition().i,
-        j: this.getCurrentPosition().j,
-        k: this.getCurrentPosition().k + 1
-      }, true);
-    }
-    // add window presets
-    this.addWindowPresets(rhs.getWindowPresets(), newSliceNumber);
-  };*/
-
-  /**
-   * Append a frame buffer to the included image.
-   *
-   * @param {object} frameBuffer The frame buffer to append.
-   */
-  /*this.appendFrameBuffer = function (frameBuffer) {
-    this.getImage().appendFrameBuffer(frameBuffer);
-  };
-*/
-  /**
    * Set the view window/level.
    *
    * @param {number} center The window center.
