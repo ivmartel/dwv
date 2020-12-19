@@ -23,7 +23,7 @@ module.exports = function (config) {
           'i18nextBrowserLanguageDetector.min.js',
         watched: false
       },
-      {pattern: 'node_modules/jszip/dist/jszip.js', watched: false},
+      {pattern: 'node_modules/jszip/dist/jszip.min.js', watched: false},
       // test data
       {pattern: 'locales/**/translation.json', included: false, type: 'js'},
       {pattern: 'tests/data/*.dcm', included: false},
@@ -35,6 +35,7 @@ module.exports = function (config) {
       // extra served content
       {pattern: 'tests/**/*.html', included: false},
       {pattern: 'tests/visual/appgui.js', included: false},
+      {pattern: 'tests/dicom/pages/*.js', included: false},
       {pattern: 'tests/pacs/*.js', included: false},
       {pattern: 'decoders/**/*.js', included: false},
       {pattern: 'tests/utils/worker.js', included: false},
