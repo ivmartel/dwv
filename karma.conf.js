@@ -36,6 +36,7 @@ module.exports = function (config) {
       {pattern: 'tests/**/*.html', included: false},
       {pattern: 'tests/visual/appgui.js', included: false},
       {pattern: 'tests/dicom/pages/*.js', included: false},
+      {pattern: 'tests/image/pages/*.js', included: false},
       {pattern: 'tests/pacs/*.js', included: false},
       {pattern: 'decoders/**/*.js', included: false},
       {pattern: 'tests/utils/worker.js', included: false},
