@@ -7,14 +7,12 @@ dwv.image = dwv.image || {};
  *
  * @param {Array} array The array to store the outut data
  * @param {object} iterator Position iterator.
- * @param {Function} dataAccessor Function to access data.
  * @param {object} windowLut The window/level LUT.
  * @param {object} colourMap The colour map.
  */
 dwv.image.generateImageDataMonochrome = function (
   array,
   iterator,
-  dataAccessor,
   windowLut,
   colourMap) {
   var index = 0;
@@ -22,7 +20,7 @@ dwv.image.generateImageDataMonochrome = function (
   var ival = iterator.next();
   while (!ival.done) {
     // pixel value
-    pxValue = windowLut.getValue(dataAccessor(ival.value));
+    pxValue = windowLut.getValue(ival.value);
     // store data
     array.data[index] = colourMap.red[pxValue];
     array.data[index + 1] = colourMap.green[pxValue];

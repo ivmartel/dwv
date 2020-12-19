@@ -502,22 +502,29 @@ dwv.image.Image.prototype.getRescaledValue = function (i, j, k, f) {
 /**
  * Get a slice index iterator.
  *
- * @param {number} sliceIndex The index of the slice.
+ * @param {number} slice The index of the slice.
+ * @param {number} frame The frame index.
  * @returns {object} The slice iterator.
  */
-dwv.image.Image.prototype.getSliceIterator = function (sliceIndex) {
+dwv.image.Image.prototype.getSliceIterator = function (slice, frame) {
   var sliceSize = this.getGeometry().getSize().getSliceSize();
-  var start = sliceIndex * sliceSize;
+  var start = slice * sliceSize;
+
+  var image = this;
+  var dataAccessor = function (offset) {
+    return image.getValueAtOffset(offset, frame);
+  };
 
   var range = null;
   if (this.getNumberOfComponents() === 1) {
-    range = dwv.image.range(start, start + sliceSize);
+    range = dwv.image.range(dataAccessor, start, start + sliceSize);
   } else if (this.getNumberOfComponents() === 3) {
     // 3 times bigger...
     start *= 3;
     sliceSize *= 3;
     var isPlanar = this.getPlanarConfiguration() === 1;
-    range = dwv.image.range3d(start, start + sliceSize, 1, isPlanar);
+    range = dwv.image.range3d(
+      dataAccessor, start, start + sliceSize, 1, isPlanar);
   } else {
     throw new Error('Unsupported number of components: ' +
       this.getNumberOfComponents());

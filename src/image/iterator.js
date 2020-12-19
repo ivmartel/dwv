@@ -6,12 +6,13 @@ dwv.image = dwv.image || {};
  * Get an iterator for a given range for a one component data.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
+ * @param {Function} dataAccessor Function to access data.
  * @param {number} start The start of the range (included).
  * @param {number} end The end of the range (excluded).
  * @param {number} increment The increment between indicies (default=1).
  * @returns {object} An iterator folowing the iterator and iterable protocol.
  */
-dwv.image.range = function (start, end, increment) {
+dwv.image.range = function (dataAccessor, start, end, increment) {
   if (typeof increment === 'undefined') {
     increment = 1;
   }
@@ -21,7 +22,7 @@ dwv.image.range = function (start, end, increment) {
     next: function () {
       if (nextIndex < end) {
         var result = {
-          value: nextIndex,
+          value: dataAccessor(nextIndex),
           done: false
         };
         nextIndex += increment;
@@ -29,7 +30,7 @@ dwv.image.range = function (start, end, increment) {
       }
       return {
         done: true,
-        value: end
+        index: end
       };
     }
   };
@@ -39,6 +40,7 @@ dwv.image.range = function (start, end, increment) {
  * Get an iterator for a given range for a 3 components data.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
+ * @param {Function} dataAccessor Function to access data.
  * @param {number} start The start of the range (included).
  * @param {number} end The end of the range (excluded).
  *   (end - start) needs to be a multiple of 3...
@@ -49,7 +51,7 @@ dwv.image.range = function (start, end, increment) {
  *   protocol, with extra 'value1' and 'value2' for the second and
  *   third component.
  */
-dwv.image.range3d = function (start, end, increment, isPlanar) {
+dwv.image.range3d = function (dataAccessor, start, end, increment, isPlanar) {
   if (typeof increment === 'undefined') {
     increment = 1;
   }
@@ -71,9 +73,11 @@ dwv.image.range3d = function (start, end, increment, isPlanar) {
     next: function () {
       if (nextIndex < end) {
         var result = {
-          value: nextIndex,
-          value1: nextIndex1,
-          value2: nextIndex2,
+          value: [
+            dataAccessor(nextIndex),
+            dataAccessor(nextIndex1),
+            dataAccessor(nextIndex2)
+          ],
           done: false
         };
         nextIndex += increment;
@@ -83,7 +87,7 @@ dwv.image.range3d = function (start, end, increment, isPlanar) {
       }
       return {
         done: true,
-        value: end
+        index: [end]
       };
     }
   };

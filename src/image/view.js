@@ -668,10 +668,7 @@ dwv.image.View.prototype.generateImageData = function (array) {
   var position = this.getCurrentPosition();
   var frame = this.getCurrentFrame();
   var image = this.getImage();
-  var iterator = image.getSliceIterator(position.k);
-  var dataAccessor = function (offset) {
-    return image.getValueAtOffset(offset, frame);
-  };
+  var iterator = image.getSliceIterator(position.k, frame);
 
   var photoInterpretation = image.getPhotometricInterpretation();
   switch (photoInterpretation) {
@@ -680,7 +677,6 @@ dwv.image.View.prototype.generateImageData = function (array) {
     dwv.image.generateImageDataMonochrome(
       array,
       iterator,
-      dataAccessor,
       this.getCurrentWindowLut(),
       this.getColourMap()
     );
@@ -690,7 +686,6 @@ dwv.image.View.prototype.generateImageData = function (array) {
     dwv.image.generateImageDataPaletteColor(
       array,
       iterator,
-      dataAccessor,
       this.getColourMap(),
       image.getMeta().BitsStored === 16
     );
@@ -700,7 +695,6 @@ dwv.image.View.prototype.generateImageData = function (array) {
     dwv.image.generateImageDataRgb(
       array,
       iterator,
-      dataAccessor,
       this.getCurrentWindowLut()
     );
     break;
@@ -708,8 +702,7 @@ dwv.image.View.prototype.generateImageData = function (array) {
   case 'YBR_FULL':
     dwv.image.generateImageDataYbrFull(
       array,
-      iterator,
-      dataAccessor
+      iterator
     );
     break;
 

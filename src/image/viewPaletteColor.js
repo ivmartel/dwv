@@ -7,14 +7,12 @@ dwv.image = dwv.image || {};
  *
  * @param {Array} array The array to store the outut data
  * @param {object} iterator Position iterator.
- * @param {Function} dataAccessor Function to access data.
  * @param {object} colourMap The colour map.
  * @param {boolean} is16BitsStored Flag to know if the data is 16bits.
  */
 dwv.image.generateImageDataPaletteColor = function (
   array,
   iterator,
-  dataAccessor,
   colourMap,
   is16BitsStored) {
   // right shift 8
@@ -31,7 +29,7 @@ dwv.image.generateImageDataPaletteColor = function (
   var ival = iterator.next();
   while (!ival.done) {
     // pixel value
-    pxValue = dataAccessor(ival.value);
+    pxValue = ival.value;
     // store data
     // TODO check pxValue fits in lut
     if (is16BitsStored) {

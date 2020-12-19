@@ -7,21 +7,19 @@ dwv.image = dwv.image || {};
  *
  * @param {Array} array The array to store the outut data
  * @param {object} iterator Position iterator.
- * @param {Function} dataAccessor Function to access data.
  */
 dwv.image.generateImageDataYbrFull = function (
   array,
-  iterator,
-  dataAccessor) {
+  iterator) {
   var index = 0;
   var y, cb, cr;
   var r, g, b;
   var ival = iterator.next();
   while (!ival.done) {
     // pixel values
-    y = dataAccessor(ival.value);
-    cb = dataAccessor(ival.value1);
-    cr = dataAccessor(ival.value2);
+    y = ival.value[0];
+    cb = ival.value[1];
+    cr = ival.value[2];
     // convert to rgb
     // theory:
     // http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.7.html#sect_C.7.6.3.1.2
