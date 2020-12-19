@@ -24,7 +24,7 @@ dwv.image.imageDataToBuffer = function (imageData) {
 };
 
 /**
- * Get data from an input context imageData.
+ * Get an image from an input context imageData.
  *
  * @param {number} width The width of the coresponding image.
  * @param {number} height The height of the coresponding image.
@@ -34,7 +34,7 @@ dwv.image.imageDataToBuffer = function (imageData) {
  * @param {string} imageUid The image UID.
  * @returns {object} The corresponding view.
  */
-dwv.image.getDefaultView = function (
+dwv.image.getDefaultImage = function (
   width, height, sliceIndex,
   imageBuffer, numberOfFrames,
   imageUid) {
@@ -54,61 +54,57 @@ dwv.image.getDefaultView = function (
   var meta = {};
   meta.BitsStored = 8;
   image.setMeta(meta);
-  // view
-  var view = new dwv.image.View(image);
-  // defaut preset
-  view.setWindowLevelMinMax();
   // return
-  return view;
+  return image;
 };
 
 /**
  * Get data from an input image using a canvas.
  *
- * @param {object} image The DOM Image.
+ * @param {object} domImage The DOM Image.
  * @param {object} origin The data origin.
  * @returns {object} A load data event.
  */
-dwv.image.getViewFromDOMImage = function (image, origin) {
+dwv.image.getViewFromDOMImage = function (domImage, origin) {
   // image size
-  var width = image.width;
-  var height = image.height;
+  var width = domImage.width;
+  var height = domImage.height;
 
   // draw the image in the canvas in order to get its data
   var canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
   var ctx = canvas.getContext('2d');
-  ctx.drawImage(image, 0, 0);
+  ctx.drawImage(domImage, 0, 0);
   // get the image data
   var imageData = ctx.getImageData(0, 0, width, height);
 
   // image properties
   var info = [];
-  if (typeof image.origin === 'string') {
-    info.push({name: 'origin', value: image.origin});
+  if (typeof domImage.origin === 'string') {
+    info.push({name: 'origin', value: domImage.origin});
   } else {
-    info.push({name: 'fileName', value: image.origin.name});
-    info.push({name: 'fileType', value: image.origin.type});
+    info.push({name: 'fileName', value: domImage.origin.name});
+    info.push({name: 'fileType', value: domImage.origin.type});
     info.push({
-      name: 'fileLastModifiedDate', value: image.origin.lastModifiedDate
+      name: 'fileLastModifiedDate', value: domImage.origin.lastModifiedDate
     });
   }
   info.push({name: 'imageWidth', value: width});
   info.push({name: 'imageHeight', value: height});
 
-  var sliceIndex = image.index ? image.index : 0;
+  var sliceIndex = domImage.index ? domImage.index : 0;
   info.push({name: 'imageUid', value: sliceIndex});
 
   // create view
   var imageBuffer = dwv.image.imageDataToBuffer(imageData);
-  var view = dwv.image.getDefaultView(
+  var image = dwv.image.getDefaultImage(
     width, height, sliceIndex, [imageBuffer], 1, sliceIndex);
 
   // return
   return {
     data: {
-      view: view,
+      image: image,
       info: info
     },
     source: origin
@@ -162,8 +158,8 @@ dwv.image.getViewFromDOMVideo = function (
 
   // current frame index
   var frameIndex = 0;
-  // video view
-  var view = null;
+  // video image
+  var image = null;
 
   /**
    * Draw the context and store it as a frame
@@ -184,18 +180,18 @@ dwv.image.getViewFromDOMVideo = function (
       ctx.getImageData(0, 0, width, height));
     if (frameIndex === 0) {
       // create view
-      view = dwv.image.getDefaultView(
+      image = dwv.image.getDefaultImage(
         width, height, 1, [imgBuffer], numberOfFrames, dataIndex);
       // call callback
       onloaditem({
         data: {
-          view: view,
+          image: image,
           info: info
         },
         source: origin
       });
     } else {
-      view.appendFrameBuffer(imgBuffer);
+      image.appendFrameBuffer(imgBuffer);
     }
   }
 

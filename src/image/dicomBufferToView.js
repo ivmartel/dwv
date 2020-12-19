@@ -72,20 +72,17 @@ dwv.image.DicomBufferToView = function () {
     var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
     var needDecompression = (algoName !== null);
 
-    // generate the image and view
-    var generateImageAndView = function (/*event*/) {
+    // generate the image
+    var generateImage = function (/*event*/) {
       // create the image
       var imageFactory = new dwv.image.ImageFactory();
-      var viewFactory = new dwv.image.ViewFactory();
       try {
         var image = imageFactory.create(
           dicomParser.getDicomElements(), pixelBuffer);
-        var view = viewFactory.create(
-          dicomParser.getDicomElements(), image);
         // call onload
         self.onloaditem({
           data: {
-            view: view,
+            image: image,
             info: dicomParser.getRawDicomElements()
           },
           source: origin
@@ -145,9 +142,8 @@ dwv.image.DicomBufferToView = function () {
         var frameNb = event.index;
         pixelBuffer[frameNb] = event.data[0];
         // create image for the first frame
-        // (the viewer displays the first element of the buffer)
         if (frameNb === 0) {
-          generateImageAndView();
+          generateImage();
         }
       };
 
@@ -178,7 +174,7 @@ dwv.image.DicomBufferToView = function () {
         source: origin
       });
       // generate image
-      generateImageAndView();
+      generateImage();
       // send load events
       self.onload({
         source: origin

@@ -173,6 +173,37 @@ dwv.image.ImageFactory.prototype.create = function (
     meta.IsSigned = (pixelRepresentation === 1);
   }
 
+  // window level presets
+  var windowPresets = {};
+  var windowCenter = dicomElements.getFromKey('x00281050', true);
+  var windowWidth = dicomElements.getFromKey('x00281051', true);
+  var windowCWExplanation = dicomElements.getFromKey('x00281055', true);
+  if (windowCenter && windowWidth) {
+    var name;
+    for (var j = 0; j < windowCenter.length; ++j) {
+      var center = parseFloat(windowCenter[j], 10);
+      var width = parseFloat(windowWidth[j], 10);
+      if (center && width && width !== 0) {
+        name = '';
+        if (windowCWExplanation) {
+          name = dwv.dicom.cleanString(windowCWExplanation[j]);
+        }
+        if (name === '') {
+          name = 'Default' + j;
+        }
+        windowPresets[name] = {
+          wl: [new dwv.image.WindowLevel(center, width)],
+          name: name,
+          perslice: true
+        };
+      }
+      if (width === 0) {
+        console.warn('Zero window width found in DICOM.');
+      }
+    }
+  }
+  meta.windowPresets = windowPresets;
+
   // PALETTE COLOR luts
   if (image.getPhotometricInterpretation() === 'PALETTE COLOR') {
     var redLut = dicomElements.getFromKey('x00281201');
