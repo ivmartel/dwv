@@ -1,0 +1,93 @@
+body {
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+pre {
+  white-space: pre-wrap;
+  background: #efefef;
+}
+
+input[type="file"] {
+  background: #efefef;
+}
+
+/* Result table */
+table {
+  border-spacing: 0px; margin: 0.5em;
+}
+td {
+  padding: 0.5em; border: 1px solid #aaa;
+}
+thead {
+  font-weight: bolder;
+  background: #eee;
+}
+tfoot {
+  background: #eee;
+}
+
+.header-row {
+  font-weight: bolder;
+  background: #eee;
+}
+.green {
+  color: green;
+}
+.red {
+  color: red;
+}
+
+/* Input data */
+legend {
+  font-size: 80%;
+}
+#input ul {
+  margin: 0;
+  padding-inline-start: 0.75em;
+}
+#input li {
+  margin: 5px;
+}
+#dropbox { height: 20px; width: 400px;
+  border: 2px dashed #999; padding-left: 0.2em;
+ }
+#dropbox.hover { border: 2px dashed orange; }
+#text p { margin: 0; text-align: center; }
+
+/* Bench */
+#bench-button {
+  float: left; margin-right: 0.5em;
+}
+#bench-status {
+  background: #eee; padding: 0.4em;
+  font-family: Courier, sans-serif;
+  font-size: 12px;
+}
+#bench-results {
+  clear: both;
+}
+.stats {
+  font-size: 12px;
+}
+
+/* Diff */
+.diff-mean { background: #eee; font-weight: bold; }
+
+/* All */
+#button {
+  float: left; margin-right: 0.5em;
+}
+#status {
+  background: #eee; padding: 0.4em;
+  font-family: Courier, sans-serif;
+  font-size: 12px;
+}
+#results {
+  clear: both;
+}
+#results p {
+  font-size: 12px;
+}
+#results pre {
+  background: #fff;
+}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>iframe-dwv</title>
+<meta charset="UTF-8">
+</head>
+
+<script src="../../../build/dist/dwv.min.js"></script>
+
+<script type="text/javascript">
+// Parse a DICOM buffer.
+parse = function (buffer) {
+  // setup the dicom parser
+  var dwvParser = new dwv.dicom.DicomParser();
+  // parse the buffer
+  dwvParser.parse(buffer);
+};
+// Parse a DICOM buffer and return the memory.
+parse2 = function (buffer) {
+  // setup the dicom parser
+  var dwvParser = new dwv.dicom.DicomParser();
+  // parse the buffer
+  dwvParser.parse(buffer);
+  // return the memory state
+  return performance.memory;
+};
+
+// Parse a DICOM buffer and dump its content.
+dump = function (buffer) {
+  // setup the dicom parser
+  var dwvParser = new dwv.dicom.DicomParser();
+  // parse the buffer
+  dwvParser.parse(buffer);
+  // return dump
+  return dwvParser.getDicomElements().dump();
+};
+</script>
+
+</html>
