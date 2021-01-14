@@ -121,52 +121,65 @@ dwv.utils.mergeObjects = function (obj1, obj2, idKey, valueKey) {
     res[idKey] = {value: [id1, id2], merged: true};
   }
 
-  // loop through object1
+  // get keys
   var keys1 = Object.keys(obj1);
-  for (var i = 0, leni = keys1.length; i < leni; ++i) {
-    var key1 = keys1[i];
-    if (key1 !== idKey) {
-      var value1 = obj1[key1];
-      // default result
-      var value = value1;
-      if (!Object.prototype.hasOwnProperty.call(value1, valueKey)) {
-        throw new Error('Value not found in first object while merging: ' +
-                    valueKey + ', value: ' + value1);
-      }
-      var subValue1 = value1[valueKey];
-      if (Object.prototype.hasOwnProperty.call(obj2, key1)) {
-        var value2 = obj2[key1];
-        if (!Object.prototype.hasOwnProperty.call(value2, valueKey)) {
-          throw new Error('Value not found in second object while merging: ' +
-                        valueKey + ', value: ' + value2);
+  // keys2 without duplicates of keys1
+  var keys2 = Object.keys(obj2).filter(function (item) {
+    return keys1.indexOf(item) < 0;
+  });
+  var keys = keys1.concat(keys2);
+
+  // loop through keys
+  for (var i = 0, leni = keys.length; i < leni; ++i) {
+    var key = keys[i];
+    if (key !== idKey) {
+      // first
+      var subValue1 = null;
+      if (Object.prototype.hasOwnProperty.call(obj1, key)) {
+        var value1 = obj1[key];
+        if (Object.prototype.hasOwnProperty.call(value1, valueKey)) {
+          subValue1 = value1[valueKey];
         }
-        var subValue2 = value2[valueKey];
-        // create merge object if different values
-        if (subValue2 !== subValue1) {
-          // add to merged object or create new
-          if (mergedObj1) {
+      }
+      // second
+      var subValue2 = null;
+      if (Object.prototype.hasOwnProperty.call(obj2, key)) {
+        var value2 = obj2[key];
+        if (Object.prototype.hasOwnProperty.call(value2, valueKey)) {
+          subValue2 = value2[valueKey];
+        }
+      }
+      // result value
+      var value;
+      // create merge object if different values
+      if (subValue2 !== subValue1) {
+        value = {};
+        // add to merged object or create new
+        if (mergedObj1) {
+          if (dwv.utils.isObject(subValue1)) {
+            value[valueKey] = subValue1;
+          } else {
             // merged object with repeated value
             // copy it with the index list
-            if (!dwv.utils.isObject(subValue1)) {
-              value[valueKey] = {};
-              for (var j = 0; j < id1.length; j++) {
-                value[valueKey][id1[j]] = subValue1;
-              }
+            value[valueKey] = {};
+            for (var j = 0; j < id1.length; j++) {
+              value[valueKey][id1[j]] = subValue1;
             }
-            value[valueKey][id2] = subValue2;
-          } else {
-            // create merge object
-            var newValue = {};
-            newValue[id1] = subValue1;
-            newValue[id2] = subValue2;
-            value[valueKey] = newValue;
           }
+          // add obj2 value
+          value[valueKey][id2] = subValue2;
+        } else {
+          // create merge object
+          var newValue = {};
+          newValue[id1] = subValue1;
+          newValue[id2] = subValue2;
+          value[valueKey] = newValue;
         }
       } else {
-        throw new Error('Cannot find key1 in second object while merging.');
+        value = value1;
       }
       // store value in result object
-      res[key1] = value;
+      res[key] = value;
     }
   }
   return res;
