@@ -17,6 +17,8 @@ dwv.image.decoderScripts = {
 
 // get element
 dwv.gui.getElement = dwv.gui.base.getElement;
+// set logger (optional)
+dwv.logger = dwv.utils.logger.console;
 
 // check environment support
 dwv.env.check();

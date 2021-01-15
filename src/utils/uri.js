@@ -243,7 +243,7 @@ dwv.utils.decodeManifestQuery = function (query, callback) {
 
   // handle error
   var onError = function (/*event*/) {
-    console.warn('RequestError while receiving manifest: ' + this.status);
+    dwv.logger.warn('RequestError while receiving manifest: ' + this.status);
   };
 
   // handle load
@@ -275,18 +275,18 @@ dwv.utils.decodeManifest = function (manifest, nslices) {
   // patient list
   var patientList = manifest.getElementsByTagName('Patient');
   if (patientList.length > 1) {
-    console.warn('More than one patient, loading first one.');
+    dwv.logger.warn('More than one patient, loading first one.');
   }
   // study list
   var studyList = patientList[0].getElementsByTagName('Study');
   if (studyList.length > 1) {
-    console.warn('More than one study, loading first one.');
+    dwv.logger.warn('More than one study, loading first one.');
   }
   var studyUID = studyList[0].getAttribute('StudyInstanceUID');
   // series list
   var seriesList = studyList[0].getElementsByTagName('Series');
   if (seriesList.length > 1) {
-    console.warn('More than one series, loading first one.');
+    dwv.logger.warn('More than one series, loading first one.');
   }
   var seriesUID = seriesList[0].getAttribute('SeriesInstanceUID');
   // instance list

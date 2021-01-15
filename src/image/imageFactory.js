@@ -70,7 +70,7 @@ dwv.image.ImageFactory.prototype.create = function (
       parseFloat(imagePositionPatient[2])];
   } else if (instanceNumber) {
     // use instanceNumber as slice index if no imagePositionPatient was provided
-    console.warn('Using instanceNumber as imagePositionPatient.');
+    dwv.logger.warn('Using instanceNumber as imagePositionPatient.');
     slicePosition[2] = parseInt(instanceNumber, 10);
   }
 
@@ -198,7 +198,7 @@ dwv.image.ImageFactory.prototype.create = function (
         };
       }
       if (width === 0) {
-        console.warn('Zero window width found in DICOM.');
+        dwv.logger.warn('Zero window width found in DICOM.');
       }
     }
   }
@@ -232,8 +232,8 @@ dwv.image.ImageFactory.prototype.create = function (
         // check double size
         if (vlSize !== 2 * descSize) {
           doScale = true;
-          console.log('16bits lut but size is not double. desc: ',
-            descSize, ' vl: ', vlSize);
+          dwv.logger.info('16bits lut but size is not double. desc: ' +
+            descSize + ' vl: ' + vlSize);
         }
         // (C.7.6.3.1.6 Palette Color Lookup Table Data)
         // Palette color values must always be scaled across the full
@@ -241,7 +241,8 @@ dwv.image.ImageFactory.prototype.create = function (
         var bitsAllocated = parseInt(dicomElements.getFromKey('x00280100'), 10);
         if (bitsAllocated === 8) {
           doScale = true;
-          console.log('Scaling 16bits color lut since bits allocated is 8.');
+          dwv.logger.info(
+            'Scaling 16bits color lut since bits allocated is 8.');
         }
 
         if (doScale) {
@@ -255,7 +256,8 @@ dwv.image.ImageFactory.prototype.create = function (
         }
       } else if (descriptor[2] === 8) {
         // lut with vr=OW was read as Uint16, convert it to Uint8
-        console.log('Scaling 16bits color lut since the lut descriptor is 8.');
+        dwv.logger.info(
+          'Scaling 16bits color lut since the lut descriptor is 8.');
         var clone = redLut.slice(0);
         redLut = new Uint8Array(clone.buffer);
         clone = greenLut.slice(0);

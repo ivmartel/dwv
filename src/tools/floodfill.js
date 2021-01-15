@@ -339,12 +339,12 @@ dwv.tool.Floodfill = function (app) {
    * Handle mouse down event.
    *
    * @param {object} event The mouse down event.
-   * @returns {*} Not sure...
    */
   this.mousedown = function (event) {
     imageInfo = app.getImageData();
     if (!imageInfo) {
-      return console.error('No image found');
+      dwv.logger.error('No image found');
+      return;
     }
 
     self.started = true;
