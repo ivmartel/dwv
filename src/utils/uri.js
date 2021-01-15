@@ -188,9 +188,11 @@ dwv.utils.decodeKeyValueUri = function (uri, replaceMode) {
       var repeatList = inputQueryPairs.query[repeatKey];
       // build base uri
       var baseUrl = inputQueryPairs.base;
-      // do not add '?' when the repeatKey is 'file'
+      // add '?' when:
+      // - base is not empty
+      // - the repeatKey is not 'file'
       // root/path/to/?file=0.jpg&file=1.jpg
-      if (repeatKey !== 'file') {
+      if (baseUrl !== '' && repeatKey !== 'file') {
         baseUrl += '?';
       }
       var gotOneArg = false;

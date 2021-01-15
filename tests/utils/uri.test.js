@@ -149,6 +149,17 @@ QUnit.test('Test splitUri.', function (assert) {
     query: {key0: ['val00', 'val01'], key1: 'val10'}
   };
   assert.equal(JSON.stringify(res31), JSON.stringify(ref31), 'Split test31');
+
+  // test40: no root
+  var test40 = '?key0=val00&key0&key1=val10';
+  var res40 = dwv.utils.splitUri(test40);
+  var ref40 = {
+    base: '',
+    query: {key0: ['val00', null], key1: 'val10'}
+  };
+  assert.equal(JSON.stringify(res40), JSON.stringify(ref40),
+    'Split test40: no root');
+
 });
 
 /**
@@ -265,6 +276,17 @@ QUnit.test('Test get URI query.', function (assert) {
   assert.equal(
     res23.toString(), theo23.toString(), 'Multiple key uri with plenty args');
 
+  // simple test: no root
+  var root24 = 'file:///test.html?input=';
+  var uri24 = '?a=0&a=1&a=2';
+  var full24 = root24 + encodeURIComponent(uri24) + '&dwvReplaceMode=void';
+  params = dwv.utils.getUriQuery(full24);
+  var res24 = dwv.utils.decodeKeyValueUri(params.input, params.dwvReplaceMode);
+  var theo24 = ['0', '1', '2'];
+  assert.equal(
+    res24.toString(), theo24.toString(),
+    'Multiple key uri and no root');
+
   // real world multiple URI
 
   // wado (called 'anonymised')
@@ -273,8 +295,10 @@ QUnit.test('Test get URI query.', function (assert) {
   var full30 = root30 + encodeURIComponent(uri30);
   params = dwv.utils.getUriQuery(full30);
   var res30 = dwv.utils.decodeKeyValueUri(params.input, params.dwvReplaceMode);
-  var theo30 = ['http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=1.3.6.1.4.1.19291.2.1.1.2675258517533100002&seriesUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.88493&objectUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.96207',
-    'http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=1.3.6.1.4.1.19291.2.1.1.2675258517533100002&seriesUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.88493&objectUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749216.165708'];
+  var theo30 = [
+    'http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=1.3.6.1.4.1.19291.2.1.1.2675258517533100002&seriesUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.88493&objectUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.96207',
+    'http://dicom.vital-it.ch:8089/wado?requestType=WADO&contentType=application/dicom&studyUID=1.3.6.1.4.1.19291.2.1.1.2675258517533100002&seriesUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749034.88493&objectUID=1.2.392.200036.9116.2.6.1.48.1215564802.1245749216.165708'
+  ];
   assert.equal(res30.toString(), theo30.toString(), 'Multiple Wado url');
 
   // babymri: test for replaceMode
@@ -283,9 +307,28 @@ QUnit.test('Test get URI query.', function (assert) {
   var full31 = root31 + encodeURIComponent(uri31) + '&dwvReplaceMode=void';
   params = dwv.utils.getUriQuery(full31);
   var res31 = dwv.utils.decodeKeyValueUri(params.input, params.dwvReplaceMode);
-  var theo31 = ['http://x.babymri.org/?53320924', 'http://x.babymri.org/?53320925', 'http://x.babymri.org/?53320926'];
+  var theo31 = [
+    'http://x.babymri.org/?53320924',
+    'http://x.babymri.org/?53320925',
+    'http://x.babymri.org/?53320926'
+  ];
   assert.equal(
     res31.toString(), theo31.toString(), 'Multiple baby mri (replaceMode)');
+
+  // babymri: test for replaceMode and no root
+  var root32 = 'http://ivmartel.github.io/dwv/demo/static/index.html?input=';
+  var uri32 = '?key=http://x.babymri.org/?53320924&key=http://x.babymri.org/?53320925&key=http://x.babymri.org/?53320926';
+  var full32 = root32 + encodeURIComponent(uri32) + '&dwvReplaceMode=void';
+  params = dwv.utils.getUriQuery(full32);
+  var res32 = dwv.utils.decodeKeyValueUri(params.input, params.dwvReplaceMode);
+  var theo32 = [
+    'http://x.babymri.org/?53320924',
+    'http://x.babymri.org/?53320925',
+    'http://x.babymri.org/?53320926'
+  ];
+  assert.equal(
+    res32.toString(), theo32.toString(),
+    'Multiple baby mri with no root (replaceMode)');
 
   // github: not supported
 
