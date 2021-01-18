@@ -5,6 +5,11 @@ dwv.utils = dwv.utils || {};
 dwv.utils.logger = dwv.utils.logger || {};
 dwv.utils.logger.console = dwv.utils.logger.console || {};
 
+/**
+ * The dwv code uses `dwv.logger.[trace, debug, info...]` to log text at
+ * different levels.
+ */
+
 // available log levels
 dwv.utils.logger.levels = {
   TRACE: 0,
