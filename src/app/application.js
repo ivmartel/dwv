@@ -8,6 +8,11 @@ var dwv = dwv || {};
  * @tutorial examples
  */
 dwv.App = function () {
+  // check logger
+  if (typeof dwv.logger === 'undefined') {
+    dwv.logger = dwv.utils.logger.console;
+  }
+
   // Local object
   var self = this;
 
@@ -289,7 +294,7 @@ dwv.App = function () {
                   options[optionName] =
                     dwv.tool[toolNamespace][optionClassName];
                 } else {
-                  console.warn('Could not find option class for: ' +
+                  dwv.logger.warn('Could not find option class for: ' +
                     optionName);
                 }
               }
@@ -297,7 +302,7 @@ dwv.App = function () {
             toolList[toolName].setOptions(options);
           }
         } else {
-          console.warn('Could not initialise unknown tool: ' + toolName);
+          dwv.logger.warn('Could not initialise unknown tool: ' + toolName);
         }
       }
       // add tools to the controller
@@ -1162,10 +1167,10 @@ dwv.App = function () {
   function onloaditem(event) {
     // check event
     if (typeof event.data === 'undefined') {
-      console.error('Missing loaditem event data', event);
+      dwv.logger.error('Missing loaditem event data ' + event);
     }
     if (typeof event.loadtype === 'undefined') {
-      console.error('Missing loaditem event load type', event);
+      dwv.logger.error('Missing loaditem event load type ' + event);
     }
 
     // first load flag

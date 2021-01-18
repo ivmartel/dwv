@@ -616,7 +616,7 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (
   if (this.useUnVrForPrivateSq &&
     dwv.dicom.isPrivateGroup(element.tag.group) &&
     vr === 'SQ') {
-    console.warn('Write element using VR=UN for private sequence.');
+    dwv.logger.warn('Write element using VR=UN for private sequence.');
     vr = 'UN';
   }
   if (isTagWithVR && !isImplicit) {
@@ -957,8 +957,8 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
   var preambleSize = 128 + 4;
   var metaOffset = preambleSize + fmiglSize + metaLength;
   if (offset !== metaOffset) {
-    console.warn('Bad size calculation... meta offset: ', offset,
-      ', calculated size:', metaOffset,
+    dwv.logger.warn('Bad size calculation... meta offset: ' + offset +
+      ', calculated size:' + metaOffset +
       '(diff:', offset - metaOffset, ')');
   }
 
@@ -971,8 +971,8 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
 
   // check final position
   if (offset !== totalSize) {
-    console.warn('Bad size calculation... final offset: ', offset,
-      ', calculated size:', totalSize,
+    dwv.logger.warn('Bad size calculation... final offset: ' + offset +
+      ', calculated size:' + totalSize +
       '(diff:', offset - totalSize, ')');
   }
   // return
@@ -992,7 +992,7 @@ dwv.dicom.checkUnknownVR = function (element) {
       typeof dict[element.tag.group][element.tag.element] !== 'undefined') {
       if (element.vr !== dict[element.tag.group][element.tag.element][0]) {
         element.vr = dict[element.tag.group][element.tag.element][0];
-        console.log('Element ' + element.tag.group +
+        dwv.logger.info('Element ' + element.tag.group +
           ' ' + element.tag.element +
           ' VR changed from UN to ' + element.vr);
       }

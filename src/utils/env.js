@@ -34,7 +34,7 @@ dwv.env.hasFileApi = function () {
         ((navigator.appVersion.indexOf('5.0.') !== -1) ||
           (navigator.appVersion.indexOf('5.1.') !== -1));
   if (isSafari5) {
-    console.warn('Assuming FileAPI support for Safari5...');
+    dwv.logger.warn('Assuming FileAPI support for Safari5...');
     return true;
   }
   // regular test
@@ -156,7 +156,7 @@ dwv.env.check = function () {
   // Check typed array slice
   if (!dwv.env.hasTypedArraySlice()) {
     // silent fail with warning
-    console.warn(
+    dwv.logger.warn(
       'The TypedArray.slice method is not supported in this browser.' +
       ' This may impair performance. ');
     // basic Uint16Array implementation
@@ -199,7 +199,7 @@ dwv.env.check = function () {
   // check clamped array
   if (!dwv.env.hasClampedArray()) {
     // silent fail with warning
-    console.warn(
+    dwv.logger.warn(
       'The Uint8ClampedArray is not supported in this browser.' +
       ' This may impair performance. ');
     // Use Uint8Array instead... Not good
@@ -209,7 +209,7 @@ dwv.env.check = function () {
   // check Float64 array
   if (!dwv.env.hasFloat64Array()) {
     // silent fail with warning
-    console.warn(
+    dwv.logger.warn(
       'The Float64Array is not supported in this browser.' +
       ' This may impair performance. ');
     // Use Float32Array instead... Not good

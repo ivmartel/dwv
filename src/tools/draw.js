@@ -250,7 +250,7 @@ dwv.tool.Draw = function (app) {
     }
     // exit if no points
     if (points.length === 0) {
-      console.warn('Draw mouseup but no points...');
+      dwv.logger.warn('Draw mouseup but no points...');
       return;
     }
 
@@ -280,7 +280,7 @@ dwv.tool.Draw = function (app) {
     }
     // exit if no points
     if (points.length === 0) {
-      console.warn('Draw dblclick but no points...');
+      dwv.logger.warn('Draw dblclick but no points...');
       return;
     }
 

@@ -29,7 +29,7 @@ dwv.draw.getDrawPositionGroupId = function (sliceNumber, frameNumber) {
 dwv.draw.getPositionFromGroupId = function (groupId) {
   var sepIndex = groupId.indexOf('_');
   if (sepIndex === -1) {
-    console.warn('Badly formed PositionGroupId: ' + groupId);
+    dwv.logger.warn('Badly formed PositionGroupId: ' + groupId);
   }
   return {
     sliceNumber: groupId.substring(6, sepIndex),
@@ -155,7 +155,7 @@ dwv.DrawController = function (drawDiv) {
       // add new group to layer
       drawLayer.add(posGroup);
     } else {
-      console.warn('Unexpected number of draw position groups.');
+      dwv.logger.warn('Unexpected number of draw position groups.');
     }
     // return
     return posGroup;
@@ -379,7 +379,7 @@ dwv.DrawController = function (drawDiv) {
         // get text
         var texts = group.find('.text');
         if (texts.length !== 1) {
-          console.warn('There should not be more than one text per shape.');
+          dwv.logger.warn('There should not be more than one text per shape.');
         }
         // get details (non konva vars)
         drawingsDetails[group.id()] = {
@@ -469,7 +469,9 @@ dwv.DrawController = function (drawDiv) {
     // get the group
     var group = drawLayer.findOne('#' + drawDetails.id);
     if (typeof group === 'undefined') {
-      console.warn('[updateDraw] Cannot find group with id: ' + drawDetails.id);
+      dwv.logger.warn(
+        '[updateDraw] Cannot find group with id: ' + drawDetails.id
+      );
       return;
     }
     // shape
@@ -508,8 +510,9 @@ dwv.DrawController = function (drawDiv) {
     // get the group
     var group = drawLayer.findOne('#' + drawDetails.id);
     if (typeof group === 'undefined') {
-      console.warn('[isGroupVisible] Cannot find node with id: ' +
-        drawDetails.id);
+      dwv.logger.warn(
+        '[isGroupVisible] Cannot find node with id: ' + drawDetails.id
+      );
       return false;
     }
     // get visibility
@@ -526,8 +529,9 @@ dwv.DrawController = function (drawDiv) {
     // get the group
     var group = drawLayer.findOne('#' + drawDetails.id);
     if (typeof group === 'undefined') {
-      console.warn('[toogleGroupVisibility] Cannot find node with id: ' +
-        drawDetails.id);
+      dwv.logger.warn(
+        '[toogleGroupVisibility] Cannot find node with id: ' + drawDetails.id
+      );
       return false;
     }
     // toggle visible
@@ -553,11 +557,11 @@ dwv.DrawController = function (drawDiv) {
     if (groupToDelete.length === 1) {
       this.deleteDrawGroup(groupToDelete[0], cmdCallback, exeCallback);
     } else if (groupToDelete.length === 0) {
-      console.warn('Can\'t delete group with id:\'' + groupId +
-                '\', cannot find it.');
+      dwv.logger.warn('Can\'t delete group with id:\'' + groupId +
+        '\', cannot find it.');
     } else {
-      console.warn('Can\'t delete group with id:\'' + groupId +
-                '\', too many with the same id.');
+      dwv.logger.warn('Can\'t delete group with id:\'' + groupId +
+        '\', too many with the same id.');
     }
   };
 
