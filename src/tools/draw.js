@@ -451,16 +451,16 @@ dwv.tool.Draw = function (app) {
     renderDrawLayer(flag);
     // listen to app change to update the draw layer
     if (flag) {
-      app.addEventListener('slice-change', updateDrawLayer);
-      app.addEventListener('frame-change', updateDrawLayer);
+      app.addEventListener('slicechange', updateDrawLayer);
+      app.addEventListener('framechange', updateDrawLayer);
 
       // init with the app window scale
       this.style.setScale(app.getWindowScale());
       // same for colour
       this.setLineColour(this.style.getLineColour());
     } else {
-      app.removeEventListener('slice-change', updateDrawLayer);
-      app.removeEventListener('frame-change', updateDrawLayer);
+      app.removeEventListener('slicechange', updateDrawLayer);
+      app.removeEventListener('framechange', updateDrawLayer);
     }
   };
 
@@ -657,7 +657,7 @@ dwv.tool.Draw = function (app) {
 
           // the move is handled by Konva, trigger an event manually
           fireEvent({
-            type: 'draw-move',
+            type: 'drawmove',
             id: this.id()
           });
         }
@@ -697,7 +697,7 @@ dwv.tool.Draw = function (app) {
 
       // trigger event
       fireEvent({
-        type: 'draw-change'
+        type: 'drawchange'
       });
 
       // draw

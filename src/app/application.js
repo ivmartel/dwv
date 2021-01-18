@@ -247,7 +247,7 @@ dwv.App = function () {
     containerDivId = config.containerDivId;
     // undo stack
     undoStack = new dwv.tool.UndoStack();
-    undoStack.addEventListener('undo-add', fireEvent);
+    undoStack.addEventListener('undoadd', fireEvent);
     undoStack.addEventListener('undo', fireEvent);
     undoStack.addEventListener('redo', fireEvent);
     // tools
@@ -376,7 +376,7 @@ dwv.App = function () {
     // reset undo/redo
     if (undoStack) {
       undoStack = new dwv.tool.UndoStack();
-      undoStack.addEventListener('undo-add', fireEvent);
+      undoStack.addEventListener('undoadd', fireEvent);
       undoStack.addEventListener('undo', fireEvent);
       undoStack.addEventListener('redo', fireEvent);
     }
@@ -407,7 +407,7 @@ dwv.App = function () {
     // fire events
     if (previousScale !== scale) {
       fireEvent({
-        type: 'zoom-change',
+        type: 'zoomchange',
         value: [scale],
         scale: scale,
         cx: scaleCenter.x,
@@ -418,7 +418,7 @@ dwv.App = function () {
       (previousTrans.x !== translation.x || previousTrans.y !== translation.y)
     ) {
       fireEvent({
-        type: 'offset-change',
+        type: 'offsetchange',
         value: [scaleCenter.x, scaleCenter.y],
         scale: scale,
         cx: scaleCenter.x,
@@ -981,9 +981,19 @@ dwv.App = function () {
    * Generate the image data and draw it.
    *
    * @private
+   * @fires dwv.Appk#renderstart
+   * @fires dwv.App#renderend
    */
   function generateAndDrawImage() {
-    fireEvent({type: 'render-start'});
+    /**
+     * Render start event.
+     *
+     * @event dwv.App#renderstart
+     * @type {object}
+     * @property {string} type The event type.
+     */
+    var event = {type: 'renderstart'};
+    fireEvent(event);
 
     // create view if first tiem
     if (!view) {
@@ -996,7 +1006,15 @@ dwv.App = function () {
     // draw the image
     imageLayer.draw();
 
-    fireEvent({type: 'render-end'});
+    /**
+     * Render end event.
+     *
+     * @event dwv.App#renderend
+     * @type {object}
+     * @property {string} type The event type.
+     */
+    event = {type: 'renderend'};
+    fireEvent(event);
   }
 
   /**
@@ -1027,7 +1045,7 @@ dwv.App = function () {
      * @property {number} cy The new rotaion center Y position.
      */
     fireEvent({
-      type: 'zoom-change',
+      type: 'zoomchange',
       value: [scale],
       scale: scale,
       cx: scaleCenter.x,
@@ -1041,7 +1059,7 @@ dwv.App = function () {
      * @property {Array} value The changed value.
      */
     fireEvent({
-      type: 'offset-change',
+      type: 'offsetchange',
       value: [scaleCenter.x, scaleCenter.y]
     });
   }
@@ -1075,7 +1093,7 @@ dwv.App = function () {
        * @property {number} cy The new rotaion center Y position.
        */
       fireEvent({
-        type: 'translate-change',
+        type: 'translatechange',
         value: [imageLayer.getTrans().x, imageLayer.getTrans().y],
         scale: scale,
         cx: imageLayer.getTrans().x,
@@ -1126,12 +1144,12 @@ dwv.App = function () {
      *
      * @event dwv.App#loadstart
      * @type {object}
-     * @property {string} type The event type: load-start.
+     * @property {string} type The event type: loadstart.
      * @property {string} loadType The load type: image or state.
      * @property {*} source The load source: string for an url,
      *   File for a file.
      */
-    event.type = 'load-start';
+    event.type = 'loadstart';
     fireEvent(event);
   }
 
@@ -1147,14 +1165,14 @@ dwv.App = function () {
      *
      * @event dwv.App#loadprogress
      * @type {object}
-     * @property {string} type The event type: load-progress.
+     * @property {string} type The event type: loadprogress.
      * @property {string} loadType The load type: image or state.
      * @property {*} source The load source: string for an url,
      *   File for a file.
      * @property {number} loaded The loaded percentage.
      * @property {number} total The total percentage.
      */
-    event.type = 'load-progress';
+    event.type = 'loadprogress';
     fireEvent(event);
   }
 
@@ -1201,14 +1219,14 @@ dwv.App = function () {
      *
      * @event dwv.App#loaditem
      * @type {object}
-     * @property {string} type The event type: load-item.
+     * @property {string} type The event type: loaditem.
      * @property {string} loadType The load type: image or state.
      * @property {*} source The load source: string for an url,
      *   File for a file.
      * @property {object} data The loaded meta data.
      */
     fireEvent({
-      type: 'load-item',
+      type: 'loaditem',
       data: eventMetaData,
       source: event.source,
       loadtype: event.loadtype
@@ -1267,12 +1285,12 @@ dwv.App = function () {
      *
      * @event dwv.App#loadend
      * @type {object}
-     * @property {string} type The event type: load-end.
+     * @property {string} type The event type: loadend.
      * @property {string} loadType The load type: image or state.
      * @property {*} source The load source: string for an url,
      *   File for a file.
      */
-    event.type = 'load-end';
+    event.type = 'loadend';
     fireEvent(event);
   }
 
@@ -1380,20 +1398,20 @@ dwv.App = function () {
       dataWidth, dataHeight);
 
     // image listeners
-    view.addEventListener('wl-width-change', onWLChange);
-    view.addEventListener('wl-center-change', onWLChange);
+    view.addEventListener('wlwidthchange', onWLChange);
+    view.addEventListener('wlcenterchange', onWLChange);
     view.addEventListener('colour-change', onColourChange);
-    view.addEventListener('slice-change', onSliceChange);
-    view.addEventListener('frame-change', onFrameChange);
+    view.addEventListener('slicechange', onSliceChange);
+    view.addEventListener('framechange', onFrameChange);
 
     // connect with local listeners
-    view.addEventListener('wl-width-change', fireEvent);
-    view.addEventListener('wl-center-change', fireEvent);
-    view.addEventListener('wl-preset-add', fireEvent);
+    view.addEventListener('wlwidthchange', fireEvent);
+    view.addEventListener('wlcenterchange', fireEvent);
+    view.addEventListener('wlpresetadd', fireEvent);
     view.addEventListener('colour-change', fireEvent);
-    view.addEventListener('position-change', fireEvent);
-    view.addEventListener('slice-change', fireEvent);
-    view.addEventListener('frame-change', fireEvent);
+    view.addEventListener('positionchange', fireEvent);
+    view.addEventListener('slicechange', fireEvent);
+    view.addEventListener('framechange', fireEvent);
 
     // initialise the toolbox
     if (toolboxController) {

@@ -337,6 +337,6 @@ dwv.utils.loadFromQuery = function (query, app) {
     var onLoadEnd = function (/*event*/) {
       app.loadURLs(query.state);
     };
-    app.addEventListener('load-end', onLoadEnd);
+    app.addEventListener('loadend', onLoadEnd);
   }
 };

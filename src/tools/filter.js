@@ -40,10 +40,10 @@ dwv.tool.Filter = function (app) {
     // setup event listening
     for (var key in this.filterList) {
       if (bool) {
-        this.filterList[key].addEventListener('filter-run', fireEvent);
+        this.filterList[key].addEventListener('filterrun', fireEvent);
         this.filterList[key].addEventListener('filter-undo', fireEvent);
       } else {
-        this.filterList[key].removeEventListener('filter-run', fireEvent);
+        this.filterList[key].removeEventListener('filterrun', fireEvent);
         this.filterList[key].removeEventListener('filter-undo', fireEvent);
       }
     }
@@ -454,26 +454,53 @@ dwv.tool.RunFilterCommand = function (filter, app) {
 
   /**
    * Execute the command.
+   *
+   * @fires dwv.tool.RunFilterCommand#filterrun
    */
   this.execute = function () {
     // run filter and set app image
     app.setImage(filter.update());
     // update display
     app.render();
+    /**
+     * Filter run event.
+     *
+     * @event dwv.tool.RunFilterCommand#filterrun
+     * @type {object}
+     * @property {string} type The event type: filterrun.
+     * @property {number} id The id of the run command.
+     */
+    var event = {
+      type: 'filterrun',
+      id: this.getName()
+    };
     // callback
-    this.onExecute({type: 'filter-run', id: this.getName()});
+    this.onExecute(event);
   };
 
   /**
    * Undo the command.
+   *
+   * @fires dwv.tool.RunFilterCommand#filterundo
    */
   this.undo = function () {
     // reset the image
     app.setImage(filter.getOriginalImage());
     // update display
     app.render();
-    // callback
-    this.onUndo({type: 'filter-undo', id: this.getName()});
+    /**
+     * Filter undo event.
+     *
+     * @event dwv.tool.RunFilterCommand#filterundo
+     * @type {object}
+     * @property {string} type The event type: filterundo.
+     * @property {number} id The id of the undone run command.
+     */
+    var event = {
+      type: 'filterundo',
+      id: this.getName()
+    }; // callback
+    this.onUndo(event);
   };
 
 }; // RunFilterCommand class

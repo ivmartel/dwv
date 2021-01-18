@@ -201,7 +201,7 @@ dwv.io.MemoryLoader = function () {
         // loader.onloadstart: nothing to do
         loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(0);
         if (typeof loader.onloaditem === 'undefined') {
-          // handle load-item locally
+          // handle loaditem locally
           loader.onload = addLoadItem;
         } else {
           loader.onloaditem = self.onloaditem;
