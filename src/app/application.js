@@ -1167,10 +1167,10 @@ dwv.App = function () {
   function onloaditem(event) {
     // check event
     if (typeof event.data === 'undefined') {
-      dwv.logger.error('Missing loaditem event data' + event);
+      dwv.logger.error('Missing loaditem event data ' + event);
     }
     if (typeof event.loadtype === 'undefined') {
-      dwv.logger.error('Missing loaditem event load type' + event);
+      dwv.logger.error('Missing loaditem event load type ' + event);
     }
 
     // first load flag
