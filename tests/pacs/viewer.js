@@ -33,17 +33,17 @@ dwv.test.viewerSetup = function () {
   _app.addEventListener('error', function (event) {
     console.error('load error', event);
   });
-  _app.addEventListener('load-start', function () {
+  _app.addEventListener('loadstart', function () {
     console.time('load-data');
   });
-  _app.addEventListener('load-end', function () {
+  _app.addEventListener('loadend', function () {
     console.timeEnd('load-data');
     console.log(_app.getMetaData());
   });
-  _app.addEventListener('render-start', function () {
+  _app.addEventListener('renderstart', function () {
     console.time('render-data');
   });
-  _app.addEventListener('render-end', function () {
+  _app.addEventListener('renderend', function () {
     console.timeEnd('render-data');
   });
 
