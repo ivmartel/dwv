@@ -145,7 +145,7 @@ dwv.tool.draw.UpdateEllipse = function (anchor, image) {
     topLeft.x(anchor.x());
     break;
   default :
-    console.error('Unhandled anchor id: ' + anchor.id());
+    dwv.logger.error('Unhandled anchor id: ' + anchor.id());
     break;
   }
   // update shape

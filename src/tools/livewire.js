@@ -144,7 +144,7 @@ dwv.tool.Livewire = function (app) {
         command.onExecute = fireEvent;
         command.onUndo = fireEvent;
         // debug
-        console.log('Done.');
+        dwv.logger.debug('Done.');
         // save command in undo stack
         app.addToUndoStack(command);
         // set flag
@@ -176,7 +176,7 @@ dwv.tool.Livewire = function (app) {
     var results = 0;
     var stop = false;
     while (!parentPoints[p.y][p.x] && !stop) {
-      console.log('Getting ready...');
+      dwv.logger.debug('Getting ready...');
       results = scissors.doWork();
 
       if (results.length === 0) {
@@ -190,7 +190,7 @@ dwv.tool.Livewire = function (app) {
         }
       }
     }
-    console.log('Ready!');
+    dwv.logger.debug('Ready!');
 
     // get the path
     currentPath = new dwv.math.Path();
@@ -255,7 +255,7 @@ dwv.tool.Livewire = function (app) {
    * @param {object} _event The double click event.
    */
   this.dblclick = function (_event) {
-    console.log('dblclick');
+    dwv.logger.debug('dblclick');
     // save command in undo stack
     app.addToUndoStack(command);
     // set flag

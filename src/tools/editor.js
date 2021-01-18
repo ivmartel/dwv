@@ -247,7 +247,7 @@ dwv.tool.ShapeEditor = function (app) {
       } else if (group.name() === 'freeHand-group') {
         updateFunction = dwv.tool.draw.UpdateFreeHand;
       } else {
-        console.warn('Cannot update unknown line shape.');
+        dwv.logger.warn('Cannot update unknown line shape.');
       }
     } else if (shape instanceof Konva.Rect) {
       updateFunction = dwv.tool.draw.UpdateRect;
@@ -358,13 +358,13 @@ dwv.tool.ShapeEditor = function (app) {
       if (updateFunction) {
         updateFunction(this, image);
       } else {
-        console.warn('No update function!');
+        dwv.logger.warn('No update function!');
       }
       // redraw
       if (this.getLayer()) {
         this.getLayer().draw();
       } else {
-        console.warn('No layer to draw the anchor!');
+        dwv.logger.warn('No layer to draw the anchor!');
       }
       // prevent bubbling upwards
       evt.cancelBubble = true;
@@ -401,7 +401,7 @@ dwv.tool.ShapeEditor = function (app) {
       if (this.getLayer()) {
         this.getLayer().draw();
       } else {
-        console.warn('No layer to draw the anchor!');
+        dwv.logger.warn('No layer to draw the anchor!');
       }
     });
     // mouse out styling
@@ -411,7 +411,7 @@ dwv.tool.ShapeEditor = function (app) {
       if (this.getLayer()) {
         this.getLayer().draw();
       } else {
-        console.warn('No layer to draw the anchor!');
+        dwv.logger.warn('No layer to draw the anchor!');
       }
     });
   }
