@@ -976,9 +976,19 @@ dwv.App = function () {
    * Generate the image data and draw it.
    *
    * @private
+   * @fires dwv.Appk#renderstart
+   * @fires dwv.App#renderend
    */
   function generateAndDrawImage() {
-    fireEvent({type: 'render-start'});
+    /**
+     * Render start event.
+     *
+     * @event dwv.App#renderstart
+     * @type {object}
+     * @property {string} type The event type.
+     */
+    var event = {type: 'renderstart'};
+    fireEvent(event);
 
     // create view if first tiem
     if (!view) {
@@ -991,7 +1001,15 @@ dwv.App = function () {
     // draw the image
     imageLayer.draw();
 
-    fireEvent({type: 'render-end'});
+    /**
+     * Render end event.
+     *
+     * @event dwv.App#renderend
+     * @type {object}
+     * @property {string} type The event type.
+     */
+    event = {type: 'renderend'};
+    fireEvent(event);
   }
 
   /**
