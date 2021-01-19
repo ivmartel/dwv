@@ -356,8 +356,11 @@ dwv.tool.Draw = function (app) {
    * @param {object} event The key down event.
    */
   this.keydown = function (event) {
-    event.context = 'dwv.tool.Draw';
-    app.onKeydown(event);
+    // call app handler if we are not in the middle of a draw
+    if (!started) {
+      event.context = 'dwv.tool.Draw';
+      app.onKeydown(event);
+    }
 
     // press delete key
     if (event.keyCode === 46 && shapeEditor.isActive()) {
