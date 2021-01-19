@@ -373,6 +373,19 @@ dwv.tool.Draw = function (app) {
       delcmd.execute();
       app.addToUndoStack(delcmd);
     }
+
+    // escape key: exit shape creation
+    if (event.keyCode === 27) {
+      // reset temporary shape group
+      if (tmpShapeGroup) {
+        tmpShapeGroup.destroy();
+      }
+      // reset flag and points
+      started = false;
+      points = [];
+      // redraw
+      drawLayer.draw();
+    }
   };
 
   /**
