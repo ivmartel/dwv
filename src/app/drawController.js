@@ -182,7 +182,6 @@ dwv.DrawController = function (drawDiv) {
     // create layer
     drawLayer = new Konva.Layer({
       listening: false,
-      hitGraphEnabled: false,
       visible: true
     });
     drawStage.add(drawLayer);

@@ -391,7 +391,7 @@ dwv.tool.Draw = function (app) {
     // do not listen during creation
     var shape = tmpShapeGroup.getChildren(dwv.draw.isNodeNameShape)[0];
     shape.listening(false);
-    drawLayer.hitGraphEnabled(false);
+    drawLayer.listening(false);
     // draw shape
     drawLayer.add(tmpShapeGroup);
     drawLayer.draw();
@@ -418,7 +418,7 @@ dwv.tool.Draw = function (app) {
     posGroup.add(finalShapeGroup);
 
     // re-activate layer
-    drawLayer.hitGraphEnabled(true);
+    drawLayer.listening(true);
     // draw shape command
     command = new dwv.tool.DrawGroupCommand(
       finalShapeGroup, self.shapeName, drawLayer);
@@ -480,7 +480,6 @@ dwv.tool.Draw = function (app) {
   function renderDrawLayer(visible) {
 
     drawLayer.listening(visible);
-    drawLayer.hitGraphEnabled(visible);
 
     // get shape groups at the current position
     var shapeGroups =
