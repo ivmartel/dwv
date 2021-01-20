@@ -55,7 +55,8 @@ dwv.tool.draw.ArrowFactory.prototype.create = function (
       line.getEnd().getX(),
       line.getEnd().getY()],
     stroke: style.getLineColour(),
-    strokeWidth: style.getScaledStrokeWidth(),
+    strokeWidth: style.getStrokeWidth(),
+    strokeScaleEnabled: false,
     name: 'shape'
   });
     // larger hitfunc
@@ -85,7 +86,8 @@ dwv.tool.draw.ArrowFactory.prototype.create = function (
     radius: radius,
     rotation: -angle,
     fill: style.getLineColour(),
-    strokeWidth: style.getScaledStrokeWidth(),
+    strokeWidth: style.getStrokeWidth(),
+    strokeScaleEnabled: false,
     name: 'shape-triangle'
   });
     // quantification

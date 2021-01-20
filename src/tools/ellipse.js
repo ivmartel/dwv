@@ -55,10 +55,11 @@ dwv.tool.draw.EllipseFactory.prototype.create = function (
     y: ellipse.getCenter().getY(),
     radius: {x: ellipse.getA(), y: ellipse.getB()},
     stroke: style.getLineColour(),
-    strokeWidth: style.getScaledStrokeWidth(),
+    strokeWidth: style.getStrokeWidth(),
+    strokeScaleEnabled: false,
     name: 'shape'
   });
-    // quantification
+  // quantification
   var quant = image.quantifyEllipse(ellipse);
   var ktext = new Konva.Text({
     fontSize: style.getScaledFontSize(),

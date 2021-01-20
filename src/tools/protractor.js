@@ -56,7 +56,8 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
   var kshape = new Konva.Line({
     points: pointsArray,
     stroke: style.getLineColour(),
-    strokeWidth: style.getScaledStrokeWidth(),
+    strokeWidth: style.getStrokeWidth(),
+    strokeScaleEnabled: false,
     name: 'shape'
   });
   var group = new Konva.Group();
@@ -118,7 +119,8 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
       innerRadius: radius,
       outerRadius: radius,
       stroke: style.getLineColour(),
-      strokeWidth: style.getScaledStrokeWidth(),
+      strokeWidth: style.getStrokeWidth(),
+      strokeScaleEnabled: false,
       angle: angle,
       rotation: -inclination,
       x: points[1].getX(),
