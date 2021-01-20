@@ -436,7 +436,7 @@ dwv.DrawController = function (drawDiv) {
         // create the draw command
         var cmd = new dwv.tool.DrawGroupCommand(
           stateGroup, shape.className,
-          drawLayer);
+          drawLayer, true);
         // draw command callbacks
         cmd.onExecute = cmdCallback;
         cmd.onUndo = cmdCallback;
