@@ -138,4 +138,61 @@ QUnit.test('Test merge objects.', function (assert) {
     JSON.stringify(res03),
     JSON.stringify(ref03),
     'merge objects 03');
+
+  // test #10: missing key in first object
+  var obj101 = {id: {value: 0}, a: {value: 1}};
+  var obj102 = {id: {value: 1}, a: {value: 2}, b: {value: 1}};
+  var ref10 = {
+    id: {value: [0, 1], merged: true},
+    a: {value: {0: 1, 1: 2}},
+    b: {value: {0: null, 1: 1}}
+  };
+  var res10 = dwv.utils.mergeObjects(obj101, obj102, 'id', 'value');
+  assert.equal(
+    JSON.stringify(res10),
+    JSON.stringify(ref10),
+    'merge objects 10');
+
+  // test #10: missing key in second object
+  var obj111 = {id: {value: 0}, a: {value: 1}, b: {value: 1}};
+  var obj112 = {id: {value: 1}, a: {value: 2}};
+  var ref11 = {
+    id: {value: [0, 1], merged: true},
+    a: {value: {0: 1, 1: 2}},
+    b: {value: {0: 1, 1: null}}
+  };
+  var res11 = dwv.utils.mergeObjects(obj111, obj112, 'id', 'value');
+  assert.equal(
+    JSON.stringify(res11),
+    JSON.stringify(ref11),
+    'merge objects 11');
+
+  // test #12: missing value in first object
+  var obj121 = {id: {value: 0}, a: {value: 1}, b: {}};
+  var obj122 = {id: {value: 1}, a: {value: 2}, b: {value: 1}};
+  var ref12 = {
+    id: {value: [0, 1], merged: true},
+    a: {value: {0: 1, 1: 2}},
+    b: {value: {0: null, 1: 1}}
+  };
+  var res12 = dwv.utils.mergeObjects(obj121, obj122, 'id', 'value');
+  assert.equal(
+    JSON.stringify(res12),
+    JSON.stringify(ref12),
+    'merge objects 12');
+
+  // test #13: missing value in second object
+  var obj131 = {id: {value: 0}, a: {value: 1}, b: {value: 1}};
+  var obj132 = {id: {value: 1}, a: {value: 2}, b: {}};
+  var ref13 = {
+    id: {value: [0, 1], merged: true},
+    a: {value: {0: 1, 1: 2}},
+    b: {value: {0: 1, 1: null}}
+  };
+  var res13 = dwv.utils.mergeObjects(obj131, obj132, 'id', 'value');
+  assert.equal(
+    JSON.stringify(res13),
+    JSON.stringify(ref13),
+    'merge objects 13');
+
 });

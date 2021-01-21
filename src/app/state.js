@@ -140,7 +140,6 @@ dwv.v02Tov03Drawings = function (drawings) {
 
   var drawLayer = new Konva.Layer({
     listening: false,
-    hitGraphEnabled: false,
     visible: true
   });
 

@@ -488,13 +488,13 @@ dwv.dicom.getFileListFromDicomDir = function (data) {
   // Directory Record Sequence
   if (typeof elements.x00041220 === 'undefined' ||
         typeof elements.x00041220.value === 'undefined') {
-    console.warn('No Directory Record Sequence found in DICOMDIR.');
+    dwv.logger.warn('No Directory Record Sequence found in DICOMDIR.');
     return;
   }
   var dirSeq = elements.x00041220.value;
 
   if (dirSeq.length === 0) {
-    console.warn('The Directory Record Sequence of the DICOMDIR is empty.');
+    dwv.logger.warn('The Directory Record Sequence of the DICOMDIR is empty.');
     return;
   }
 

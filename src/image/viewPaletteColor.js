@@ -21,7 +21,7 @@ dwv.image.generateImageDataPaletteColor = function (
   };
 
   if (is16BitsStored) {
-    console.log('Scaling 16bits data to 8bits.');
+    dwv.logger.info('Scaling 16bits data to 8bits.');
   }
 
   var index = 0;

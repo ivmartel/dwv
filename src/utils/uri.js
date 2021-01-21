@@ -188,9 +188,11 @@ dwv.utils.decodeKeyValueUri = function (uri, replaceMode) {
       var repeatList = inputQueryPairs.query[repeatKey];
       // build base uri
       var baseUrl = inputQueryPairs.base;
-      // do not add '?' when the repeatKey is 'file'
+      // add '?' when:
+      // - base is not empty
+      // - the repeatKey is not 'file'
       // root/path/to/?file=0.jpg&file=1.jpg
-      if (repeatKey !== 'file') {
+      if (baseUrl !== '' && repeatKey !== 'file') {
         baseUrl += '?';
       }
       var gotOneArg = false;
@@ -241,7 +243,7 @@ dwv.utils.decodeManifestQuery = function (query, callback) {
 
   // handle error
   var onError = function (/*event*/) {
-    console.warn('RequestError while receiving manifest: ' + this.status);
+    dwv.logger.warn('RequestError while receiving manifest: ' + this.status);
   };
 
   // handle load
@@ -273,18 +275,18 @@ dwv.utils.decodeManifest = function (manifest, nslices) {
   // patient list
   var patientList = manifest.getElementsByTagName('Patient');
   if (patientList.length > 1) {
-    console.warn('More than one patient, loading first one.');
+    dwv.logger.warn('More than one patient, loading first one.');
   }
   // study list
   var studyList = patientList[0].getElementsByTagName('Study');
   if (studyList.length > 1) {
-    console.warn('More than one study, loading first one.');
+    dwv.logger.warn('More than one study, loading first one.');
   }
   var studyUID = studyList[0].getAttribute('StudyInstanceUID');
   // series list
   var seriesList = studyList[0].getElementsByTagName('Series');
   if (seriesList.length > 1) {
-    console.warn('More than one series, loading first one.');
+    dwv.logger.warn('More than one series, loading first one.');
   }
   var seriesUID = seriesList[0].getAttribute('SeriesInstanceUID');
   // instance list
@@ -335,6 +337,6 @@ dwv.utils.loadFromQuery = function (query, app) {
     var onLoadEnd = function (/*event*/) {
       app.loadURLs(query.state);
     };
-    app.addEventListener('load-end', onLoadEnd);
+    app.addEventListener('loadend', onLoadEnd);
   }
 };

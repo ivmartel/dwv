@@ -55,10 +55,11 @@ dwv.tool.draw.EllipseFactory.prototype.create = function (
     y: ellipse.getCenter().getY(),
     radius: {x: ellipse.getA(), y: ellipse.getB()},
     stroke: style.getLineColour(),
-    strokeWidth: style.getScaledStrokeWidth(),
+    strokeWidth: style.getStrokeWidth(),
+    strokeScaleEnabled: false,
     name: 'shape'
   });
-    // quantification
+  // quantification
   var quant = image.quantifyEllipse(ellipse);
   var ktext = new Konva.Text({
     fontSize: style.getScaledFontSize(),
@@ -145,7 +146,7 @@ dwv.tool.draw.UpdateEllipse = function (anchor, image) {
     topLeft.x(anchor.x());
     break;
   default :
-    console.error('Unhandled anchor id: ' + anchor.id());
+    dwv.logger.error('Unhandled anchor id: ' + anchor.id());
     break;
   }
   // update shape

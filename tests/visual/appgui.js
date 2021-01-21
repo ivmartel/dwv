@@ -17,6 +17,8 @@ dwv.image.decoderScripts = {
 
 // get element
 dwv.gui.getElement = dwv.gui.base.getElement;
+// set logger (optional)
+dwv.logger = dwv.utils.logger.console;
 
 // check environment support
 dwv.env.check();
@@ -48,14 +50,14 @@ dwv.addDataLine = function (id, fileroot, doc) {
   // display loading time
   var listener = function (event) {
     var timerLabel = 'load-data[' + fileroot + ']';
-    if (event.type === 'load-start') {
+    if (event.type === 'loadstart') {
       console.time(timerLabel);
-    } else if (event.type === 'load-end') {
+    } else if (event.type === 'loadend') {
       console.timeEnd(timerLabel);
     }
   };
-  app.addEventListener('load-start', listener);
-  app.addEventListener('load-end', listener);
+  app.addEventListener('loadstart', listener);
+  app.addEventListener('loadend', listener);
   // load data
   app.loadURLs([url]);
 

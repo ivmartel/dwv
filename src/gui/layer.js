@@ -217,6 +217,10 @@ dwv.html.Layer = function (canvas) {
     context.setTransform(zoom.x, 0, 0, zoom.y,
       origin.x + (trans.x * zoom.x),
       origin.y + (trans.y * zoom.y));
+
+    // disable smoothing (set just before draw, could be reset by resize)
+    context.imageSmoothingEnabled = false;
+    // draw image
     context.drawImage(cacheCanvas, 0, 0);
   };
 

@@ -52,7 +52,8 @@ dwv.tool.draw.RulerFactory.prototype.create = function (points, style, image) {
       line.getEnd().getX(),
       line.getEnd().getY()],
     stroke: style.getLineColour(),
-    strokeWidth: style.getScaledStrokeWidth(),
+    strokeWidth: style.getStrokeWidth(),
+    strokeScaleEnabled: false,
     name: 'shape'
   });
 
@@ -66,7 +67,8 @@ dwv.tool.draw.RulerFactory.prototype.create = function (points, style, image) {
       linePerp0.getEnd().getX(),
       linePerp0.getEnd().getY()],
     stroke: style.getLineColour(),
-    strokeWidth: style.getScaledStrokeWidth(),
+    strokeWidth: style.getStrokeWidth(),
+    strokeScaleEnabled: false,
     name: 'shape-tick0'
   });
 
@@ -78,7 +80,8 @@ dwv.tool.draw.RulerFactory.prototype.create = function (points, style, image) {
       linePerp1.getEnd().getX(),
       linePerp1.getEnd().getY()],
     stroke: style.getLineColour(),
-    strokeWidth: style.getScaledStrokeWidth(),
+    strokeWidth: style.getStrokeWidth(),
+    strokeScaleEnabled: false,
     name: 'shape-tick1'
   });
 

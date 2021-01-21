@@ -170,7 +170,7 @@ dwv.image.View = function (image) {
       // fire change event
       if (!lutWl || lutWl.getWidth() !== wl.getWidth()) {
         this.fireEvent({
-          type: 'wl-width-change',
+          type: 'wlwidthchange',
           value: [wl.getWidth()],
           wc: wl.getCenter(),
           ww: wl.getWidth(),
@@ -179,7 +179,7 @@ dwv.image.View = function (image) {
       }
       if (!lutWl || lutWl.getCenter() !== wl.getCenter()) {
         this.fireEvent({
-          type: 'wl-center-change',
+          type: 'wlcenterchange',
           value: [wl.getCenter()],
           wc: wl.getCenter(),
           ww: wl.getWidth(),
@@ -268,7 +268,7 @@ dwv.image.View = function (image) {
          * @property {string} name The name of the preset.
          */
         this.fireEvent({
-          type: 'wl-preset-add',
+          type: 'wlpresetadd',
           name: key
         });
       }
@@ -301,7 +301,7 @@ dwv.image.View = function (image) {
      * @property {number} ww The new window wdth value.
      */
     this.fireEvent({
-      type: 'colour-change',
+      type: 'colorchange',
       wc: this.getCurrentWindowLut().getWindowLevel().getCenter(),
       ww: this.getCurrentWindowLut().getWindowLevel().getWidth()
     });
@@ -324,7 +324,7 @@ dwv.image.View = function (image) {
    * Set the current position.
    *
    * @param {object} pos The current position.
-   * @param {boolean} silent If true, does not fire a slice-change event.
+   * @param {boolean} silent If true, does not fire a slicechange event.
    * @returns {boolean} False if not in bounds
    * @fires dwv.image.View#slicechange
    * @fires dwv.image.View#positionchange
@@ -354,7 +354,7 @@ dwv.image.View = function (image) {
       // assign
       currentPosition = pos;
 
-      // fire a 'position-change' event
+      // fire a 'positionchange' event
       if (image.getPhotometricInterpretation().match(/MONOCHROME/) !== null) {
         var pixValue = image.getRescaledValue(
           pos.i, pos.j, pos.k, this.getCurrentFrame());
@@ -371,7 +371,7 @@ dwv.image.View = function (image) {
          *   (can be undefined).
          */
         this.fireEvent({
-          type: 'position-change',
+          type: 'positionchange',
           value: [pos.i, pos.j, pos.k, pixValue],
           i: pos.i,
           j: pos.j,
@@ -380,7 +380,7 @@ dwv.image.View = function (image) {
         });
       } else {
         this.fireEvent({
-          type: 'position-change',
+          type: 'positionchange',
           value: [pos.i, pos.j, pos.k],
           i: pos.i,
           j: pos.j,
@@ -399,7 +399,7 @@ dwv.image.View = function (image) {
          * @property {object} data Associated event data: the imageUid.
          */
         this.fireEvent({
-          type: 'slice-change',
+          type: 'slicechange',
           value: [currentPosition.k],
           data: {
             imageUid: image.getImageUids()[currentPosition.k]
@@ -457,7 +457,7 @@ dwv.image.View = function (image) {
          * @property {boolean} skipGenerate Flag to skip view generation.
          */
         this.fireEvent({
-          type: 'frame-change',
+          type: 'framechange',
           value: [currentFrame],
           frame: currentFrame,
           skipGenerate: silent
@@ -519,7 +519,7 @@ dwv.image.View = function (image) {
          * @property {boolean} skipGenerate Flag to skip view generation.
          */
         this.fireEvent({
-          type: 'wl-width-change',
+          type: 'wlwidthchange',
           value: [width],
           wc: center,
           ww: width,
@@ -539,7 +539,7 @@ dwv.image.View = function (image) {
          * @property {boolean} skipGenerate Flag to skip view generation.
          */
         this.fireEvent({
-          type: 'wl-center-change',
+          type: 'wlcenterchange',
           value: [center],
           wc: center,
           ww: width,
@@ -637,7 +637,7 @@ dwv.image.View.prototype.getWindowLevelMinMax = function () {
   var width = max - min;
   // full black / white images, defaults to 1.
   if (width < 1) {
-    console.warn('Zero or negative width, defaulting to one.');
+    dwv.logger.warn('Zero or negative width, defaulting to one.');
     width = 1;
   }
   var center = min + width / 2;

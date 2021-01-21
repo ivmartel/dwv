@@ -252,7 +252,7 @@ dwv.io.FilesLoader = function () {
         // loader.onloadstart: nothing to do
         loader.onprogress = mproghandler.getUndefinedMonoProgressHandler(1);
         if (typeof loader.onloaditem === 'undefined') {
-          // handle load-item locally
+          // handle loaditem locally
           loader.onload = addLoadItem;
         } else {
           loader.onloaditem = self.onloaditem;

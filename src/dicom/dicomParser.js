@@ -876,6 +876,11 @@ dwv.dicom.getDataElementPrefixByteSize = function (vr, isImplicit) {
  * @class
  */
 dwv.dicom.DicomParser = function () {
+  // check logger
+  if (typeof dwv.logger === 'undefined') {
+    dwv.logger = dwv.utils.logger.console;
+  }
+
   /**
    * The list of DICOM elements.
    *
@@ -1133,18 +1138,18 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
     if (typeof this.dicomElements.x00280100 !== 'undefined') {
       bitsAllocated = this.dicomElements.x00280100.value[0];
     } else {
-      console.warn('Reading DICOM pixel data with default bitsAllocated.');
+      dwv.logger.warn('Reading DICOM pixel data with default bitsAllocated.');
     }
     if (bitsAllocated === 8 && vr === 'OW') {
-      console.warn(
+      dwv.logger.warn(
         'Reading DICOM pixel data with vr=OW' +
-          'and bitsAllocated=8 (should be 16).'
+        ' and bitsAllocated=8 (should be 16).'
       );
     }
     if (bitsAllocated === 16 && vr === 'OB') {
-      console.warn(
+      dwv.logger.warn(
         'Reading DICOM pixel data with vr=OB' +
-          'and bitsAllocated=16 (should be 8).'
+        ' and bitsAllocated=16 (should be 8).'
       );
     }
     // PixelRepresentation 0->unsigned, 1->signed
@@ -1152,7 +1157,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
     if (typeof this.dicomElements.x00280103 !== 'undefined') {
       pixelRepresentation = this.dicomElements.x00280103.value[0];
     } else {
-      console.warn(
+      dwv.logger.warn(
         'Reading DICOM pixel data with default pixelRepresentation.'
       );
     }
@@ -1219,7 +1224,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
     if (typeof this.dicomElements.x00280103 !== 'undefined') {
       pixelRep = this.dicomElements.x00280103.value[0];
     } else {
-      console.warn(
+      dwv.logger.warn(
         'Reading DICOM pixel data with default pixelRepresentation.');
     }
     // read
@@ -1433,7 +1438,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
         charSetTerm = dwv.dicom.cleanString(dataElement.value[0]);
       } else {
         charSetTerm = dwv.dicom.cleanString(dataElement.value[1]);
-        console.warn('Unsupported character set with code extensions: \'' +
+        dwv.logger.warn('Unsupported character set with code extensions: \'' +
           charSetTerm + '\'.');
       }
       dataReader.setUtfLabel(dwv.dicom.getUtfLabel(charSetTerm));
@@ -1444,14 +1449,14 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
     if (typeof this.dicomElements[dataElement.tag.name] === 'undefined') {
       this.dicomElements[dataElement.tag.name] = dataElement;
     } else {
-      console.warn('Not saving duplicate tag: ' + dataElement.tag.name);
+      dwv.logger.warn('Not saving duplicate tag: ' + dataElement.tag.name);
     }
   }
 
   // safety check...
   if (buffer.byteLength !== offset) {
-    console.warn('Did not reach the end of the buffer: ' +
-            offset + ' != ' + buffer.byteLength);
+    dwv.logger.warn('Did not reach the end of the buffer: ' +
+      offset + ' != ' + buffer.byteLength);
   }
 
   // pixel buffer
@@ -1468,7 +1473,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
       if (dwv.dicom.isJpeg2000TransferSyntax(syntax) ||
                 dwv.dicom.isJpegBaselineTransferSyntax(syntax) ||
                 dwv.dicom.isJpegLosslessTransferSyntax(syntax)) {
-        console.warn('Compressed but no items...');
+        dwv.logger.warn('Compressed but no items...');
       }
 
       // calculate the slice size
@@ -1498,7 +1503,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
         // store as pixel data
         this.dicomElements.x7FE00010.value = newPixData;
       } else {
-        console.debug('Empty pixel data.');
+        dwv.logger.info('Empty pixel data.');
       }
     } else {
       // handle fragmented pixel buffer

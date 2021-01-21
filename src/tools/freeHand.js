@@ -54,7 +54,8 @@ dwv.tool.draw.FreeHandFactory.prototype.create = function (
   var kshape = new Konva.Line({
     points: arr,
     stroke: style.getLineColour(),
-    strokeWidth: style.getScaledStrokeWidth(),
+    strokeWidth: style.getStrokeWidth(),
+    strokeScaleEnabled: false,
     name: 'shape',
     tension: 0.5
   });

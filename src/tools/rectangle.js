@@ -53,10 +53,11 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
     width: rectangle.getWidth(),
     height: rectangle.getHeight(),
     stroke: style.getLineColour(),
-    strokeWidth: style.getScaledStrokeWidth(),
+    strokeWidth: style.getStrokeWidth(),
+    strokeScaleEnabled: false,
     name: 'shape'
   });
-    // quantification
+  // quantification
   var quant = image.quantifyRect(rectangle);
   var ktext = new Konva.Text({
     fontSize: style.getScaledFontSize(),
@@ -144,7 +145,7 @@ dwv.tool.draw.UpdateRect = function (anchor, image) {
     topLeft.x(anchor.x());
     break;
   default :
-    console.error('Unhandled anchor id: ' + anchor.id());
+    dwv.logger.error('Unhandled anchor id: ' + anchor.id());
     break;
   }
   // update shape

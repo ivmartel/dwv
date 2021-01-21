@@ -63,7 +63,7 @@ dwv.tool.UndoStack = function () {
      *   undo stack.
      */
     fireEvent({
-      type: 'undo-add',
+      type: 'undoadd',
       command: cmd.getName()
     });
   };

@@ -250,7 +250,7 @@ dwv.tool.Draw = function (app) {
     }
     // exit if no points
     if (points.length === 0) {
-      console.warn('Draw mouseup but no points...');
+      dwv.logger.warn('Draw mouseup but no points...');
       return;
     }
 
@@ -280,7 +280,7 @@ dwv.tool.Draw = function (app) {
     }
     // exit if no points
     if (points.length === 0) {
-      console.warn('Draw dblclick but no points...');
+      dwv.logger.warn('Draw dblclick but no points...');
       return;
     }
 
@@ -356,8 +356,11 @@ dwv.tool.Draw = function (app) {
    * @param {object} event The key down event.
    */
   this.keydown = function (event) {
-    event.context = 'dwv.tool.Draw';
-    app.onKeydown(event);
+    // call app handler if we are not in the middle of a draw
+    if (!started) {
+      event.context = 'dwv.tool.Draw';
+      app.onKeydown(event);
+    }
 
     // press delete key
     if (event.keyCode === 46 && shapeEditor.isActive()) {
@@ -372,6 +375,19 @@ dwv.tool.Draw = function (app) {
       delcmd.onUndo = fireEvent;
       delcmd.execute();
       app.addToUndoStack(delcmd);
+    }
+
+    // escape key: exit shape creation
+    if (event.keyCode === 27) {
+      // reset temporary shape group
+      if (tmpShapeGroup) {
+        tmpShapeGroup.destroy();
+      }
+      // reset flag and points
+      started = false;
+      points = [];
+      // redraw
+      drawLayer.draw();
     }
   };
 
@@ -391,7 +407,7 @@ dwv.tool.Draw = function (app) {
     // do not listen during creation
     var shape = tmpShapeGroup.getChildren(dwv.draw.isNodeNameShape)[0];
     shape.listening(false);
-    drawLayer.hitGraphEnabled(false);
+    drawLayer.listening(false);
     // draw shape
     drawLayer.add(tmpShapeGroup);
     drawLayer.draw();
@@ -418,7 +434,7 @@ dwv.tool.Draw = function (app) {
     posGroup.add(finalShapeGroup);
 
     // re-activate layer
-    drawLayer.hitGraphEnabled(true);
+    drawLayer.listening(true);
     // draw shape command
     command = new dwv.tool.DrawGroupCommand(
       finalShapeGroup, self.shapeName, drawLayer);
@@ -451,16 +467,16 @@ dwv.tool.Draw = function (app) {
     renderDrawLayer(flag);
     // listen to app change to update the draw layer
     if (flag) {
-      app.addEventListener('slice-change', updateDrawLayer);
-      app.addEventListener('frame-change', updateDrawLayer);
+      app.addEventListener('slicechange', updateDrawLayer);
+      app.addEventListener('framechange', updateDrawLayer);
 
       // init with the app window scale
       this.style.setScale(app.getWindowScale());
       // same for colour
       this.setLineColour(this.style.getLineColour());
     } else {
-      app.removeEventListener('slice-change', updateDrawLayer);
-      app.removeEventListener('frame-change', updateDrawLayer);
+      app.removeEventListener('slicechange', updateDrawLayer);
+      app.removeEventListener('framechange', updateDrawLayer);
     }
   };
 
@@ -480,7 +496,6 @@ dwv.tool.Draw = function (app) {
   function renderDrawLayer(visible) {
 
     drawLayer.listening(visible);
-    drawLayer.hitGraphEnabled(visible);
 
     // get shape groups at the current position
     var shapeGroups =
@@ -657,7 +672,7 @@ dwv.tool.Draw = function (app) {
 
           // the move is handled by Konva, trigger an event manually
           fireEvent({
-            type: 'draw-move',
+            type: 'drawmove',
             id: this.id()
           });
         }
@@ -697,7 +712,7 @@ dwv.tool.Draw = function (app) {
 
       // trigger event
       fireEvent({
-        type: 'draw-change'
+        type: 'drawchange'
       });
 
       // draw
