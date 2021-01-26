@@ -94,6 +94,14 @@ QUnit.test('Test Image getValue.', function (assert) {
   assert.equal(isNaN(image0.getValue(4, 3, 0)), true, 'Value outside is NaN');
   // TODO: wrong, should not be accessed
   assert.equal(image0.getValue(5, 0, 0), 1 * size0 + 1, 'Value at 5,0,0');
+  // check range
+  var theoRange0 = {min: 0, max: (size0 * size0) - 1};
+  var imgRange00 = image0.getDataRange();
+  assert.equal(imgRange00.max, theoRange0.max, 'Range max');
+  assert.equal(imgRange00.min, theoRange0.min, 'Range min');
+  var imgRange01 = image0.getRescaledDataRange();
+  assert.equal(imgRange01.max, theoRange0.max, 'Rescaled range max');
+  assert.equal(imgRange01.min, theoRange0.min, 'Rescaled range min');
 
   // image with rescale
   var image1 = new dwv.image.Image(imgGeometry0, [buffer0]);
@@ -113,6 +121,17 @@ QUnit.test('Test Image getValue.', function (assert) {
     res1.rescaledStats.asObject(),
     zeroStats.asObject(),
     'Rescaled values should be equal');
+  // check range
+  var imgRange10 = image0.getDataRange();
+  assert.equal(imgRange10.max, theoRange0.max, 'Range max');
+  assert.equal(imgRange10.min, theoRange0.min, 'Range min');
+  var theoRange1 = {
+    min: theoRange0.min * slope1 + intercept1,
+    max: theoRange0.max * slope1 + intercept1
+  };
+  var imgRange11 = image1.getRescaledDataRange();
+  assert.equal(imgRange11.max, theoRange1.max, 'Rescaled range max');
+  assert.equal(imgRange11.min, theoRange1.min, 'Rescaled range min');
 });
 
 /**
