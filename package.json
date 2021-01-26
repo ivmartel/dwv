@@ -24,6 +24,7 @@
     "magic-wand-tool": "~1.1.7"
   },
   "devDependencies": {
+    "benchmark": "~2.1.4",
     "docdash": "~1.2.0",
     "eslint": "~7.18.0",
     "eslint-plugin-jsdoc": "~31.3.2",

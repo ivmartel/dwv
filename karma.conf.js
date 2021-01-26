@@ -24,6 +24,9 @@ module.exports = function (config) {
         watched: false
       },
       {pattern: 'node_modules/jszip/dist/jszip.min.js', watched: false},
+      // benchmark
+      {pattern: 'node_modules/lodash/lodash.min.js', watched: false},
+      {pattern: 'node_modules/benchmark/benchmark.js', watched: false},
       // test data
       {pattern: 'locales/**/translation.json', included: false, type: 'js'},
       {pattern: 'tests/data/*.dcm', included: false},
@@ -38,10 +41,13 @@ module.exports = function (config) {
       {pattern: 'tests/dicom/pages/*.js', included: false},
       {pattern: 'tests/image/pages/*.js', included: false},
       {pattern: 'tests/pacs/*.js', included: false},
+      {pattern: 'tests/bench/*.js', included: false},
       {pattern: 'decoders/**/*.js', included: false},
       {pattern: 'tests/utils/worker.js', included: false},
       {pattern: 'tests/visual/images/*.jpg', included: false},
       {pattern: 'tests/pacs/images/*.png', included: false},
+      {pattern: 'dist/*.js', included: false},
+      {pattern: 'build/dist/*.js', included: false},
       // src
       'src/**/*.js',
       // test

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>DICOM Parser Benchmark</title>
+<meta charset="UTF-8">
+<style>
+pre {
+  white-space: pre-wrap;
+  background: #efefef;
+}
+thead, tfoot {
+  background: #eee;
+}
+thead {
+  font-weight: bolder;
+}
+.positive {
+  color: green;
+}
+.negative {
+  color: red;
+}
+</style>
+<!-- Third party -->
+<script src="../../node_modules/lodash/lodash.min.js"></script>
+<script src="../../node_modules/benchmark/benchmark.js"></script>
+<!-- local -->
+<script src="./listen.js"></script>
+<script src="./dataRunner.js"></script>
+<script src="./benchFunctionRunner.js"></script>
+<script src="./gui.js"></script>
+<script src="./bench.js"></script>
+
+<!-- iframes -->
+<iframe src="./parsers/dwv-previous.html" id="iframe-dwv-previous" style="display:none"></iframe>
+<iframe src="./parsers/dwv-current.html" id="iframe-dwv-current" style="display:none"></iframe>
+</head>
+
+<body>
+
+  <h2>Speed benchmark</h2>
+
+  <p>The table values are: Operations per seconds &plusmn; Root Mean Error (RME)
+    (as output by the
+    <a href="https://github.com/bestiejs/benchmark.js" target="_parent">benchmark.js</a> library)
+    and the difference in percentage to the first column.
+    The more ops/sec, the better, but with a low RME... </p>
+
+  <div id="env"><span id="browser"></span></div>
+
+  <div id="input">
+    <fieldset>
+      <legend>Input</legend>
+      <ul>
+        <li id="data"></li>
+        <li><input type="file" multiple="true" onchange="dcmb.onChangeInput(files)"></li>
+    </fieldset>
+  </div>
+
+  <div id="parsers">
+    <fieldset>
+      <legend>Parsers</legend>
+    </fieldset>
+  </div>
+
+  <div id="toolbar">
+    <p>
+    <button id="button" onclick="dcmb.onLaunchButton()">Launch</button>
+    Status: <span id="status">ready</span>
+    </p>
+  </div>
+
+  <div id="results"></div>
+
+</body>
+
+</html>
