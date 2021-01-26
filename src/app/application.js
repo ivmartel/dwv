@@ -1400,7 +1400,7 @@ dwv.App = function () {
     // image listeners
     view.addEventListener('wlwidthchange', onWLChange);
     view.addEventListener('wlcenterchange', onWLChange);
-    view.addEventListener('colour-change', onColourChange);
+    view.addEventListener('colourchange', onColourChange);
     view.addEventListener('slicechange', onSliceChange);
     view.addEventListener('framechange', onFrameChange);
 
@@ -1408,7 +1408,7 @@ dwv.App = function () {
     view.addEventListener('wlwidthchange', fireEvent);
     view.addEventListener('wlcenterchange', fireEvent);
     view.addEventListener('wlpresetadd', fireEvent);
-    view.addEventListener('colour-change', fireEvent);
+    view.addEventListener('colourchange', fireEvent);
     view.addEventListener('positionchange', fireEvent);
     view.addEventListener('slicechange', fireEvent);
     view.addEventListener('framechange', fireEvent);

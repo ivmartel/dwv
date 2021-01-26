@@ -287,21 +287,21 @@ dwv.image.View = function (image) {
    * Set the colour map of the image.
    *
    * @param {object} map The colour map of the image.
-   * @fires dwv.image.View#colorchange
+   * @fires dwv.image.View#colourchange
    */
   this.setColourMap = function (map) {
     colourMap = map;
     /**
      * Color change event.
      *
-     * @event dwv.image.View#colorchange
+     * @event dwv.image.View#colourchange
      * @type {object}
      * @property {Array} value The changed value.
      * @property {number} wc The new window center value.
      * @property {number} ww The new window wdth value.
      */
     this.fireEvent({
-      type: 'colorchange',
+      type: 'colourchange',
       wc: this.getCurrentWindowLut().getWindowLevel().getCenter(),
       ww: this.getCurrentWindowLut().getWindowLevel().getWidth()
     });
