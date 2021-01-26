@@ -363,20 +363,18 @@ dwv.html.Layer = function (canvas) {
 }; // Layer class
 
 /**
- * Get the offset of an input event.
+ * Get the positions (without the parent offset) of a list of touch events.
  *
- * @param {object} event The event to get the offset from.
- * @returns {Array} The array of offsets.
+ * @param {Array} touches The list of touch events.
+ * @returns {Array} The list of positions of the touch events.
  */
-dwv.html.getEventOffset = function (event) {
-  var positions = [];
-  var ex = 0;
-  var ey = 0;
-  if (event.targetTouches) {
-    // get the touch offset from all its parents
-    var offsetLeft = 0;
-    var offsetTop = 0;
-    var offsetParent = event.targetTouches[0].target.offsetParent;
+dwv.html.getTouchesPositions = function (touches) {
+  // get the touch offset from all its parents
+  var offsetLeft = 0;
+  var offsetTop = 0;
+  if (touches.length !== 0 &&
+    typeof touches[0].target !== 'undefined') {
+    var offsetParent = touches[0].target.offsetParent;
     while (offsetParent) {
       if (!isNaN(offsetParent.offsetLeft)) {
         offsetLeft += offsetParent.offsetLeft;
@@ -386,18 +384,40 @@ dwv.html.getEventOffset = function (event) {
       }
       offsetParent = offsetParent.offsetParent;
     }
-    // set its position
-    var touch = null;
-    for (var i = 0; i < event.targetTouches.length; ++i) {
-      touch = event.targetTouches[i];
-      ex = touch.pageX - offsetLeft;
-      ey = touch.pageY - offsetTop;
-      positions.push({x: ex, y: ey});
-    }
+  } else {
+    dwv.logger.debug('No touch target offset parent.');
+  }
+  // set its position
+  var positions = [];
+  for (var i = 0; i < touches.length; ++i) {
+    positions.push({
+      x: touches[i].pageX - offsetLeft,
+      y: touches[i].pageY - offsetTop
+    });
+  }
+  return positions;
+};
+
+/**
+ * Get the offset of an input event.
+ *
+ * @param {object} event The event to get the offset from.
+ * @returns {Array} The array of offsets.
+ */
+dwv.html.getEventOffset = function (event) {
+  var positions = [];
+  if (typeof event.targetTouches !== 'undefined' &&
+    event.targetTouches.length !== 0) {
+    // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/targetTouches
+    positions = dwv.html.getTouchesPositions(event.targetTouches);
+  } else if (typeof event.changedTouches !== 'undefined' &&
+      event.changedTouches.length !== 0) {
+    // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/changedTouches
+    positions = dwv.html.getTouchesPositions(event.changedTouches);
   } else {
     // layerX is used by Firefox
-    ex = event.offsetX === undefined ? event.layerX : event.offsetX;
-    ey = event.offsetY === undefined ? event.layerY : event.offsetY;
+    var ex = event.offsetX === undefined ? event.layerX : event.offsetX;
+    var ey = event.offsetY === undefined ? event.layerY : event.offsetY;
     positions.push({x: ex, y: ey});
   }
   return positions;
