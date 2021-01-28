@@ -35,7 +35,7 @@ For the application behaviour, check these tools:
  1. Check module integration
  1. Update translations
  1. Create release:
-    1. Create the release branch: `git checkout -b v1.2 develop`
+    1. Create the release branch: `git checkout -b v1.2`
     1. Update version numbers: [dicomParser.js](https://github.com/ivmartel/dwv/blob/master/src/dicom/dicomParser.js),
     [package.json](https://github.com/ivmartel/dwv/blob/master/package.json)
     1. Update changelog
