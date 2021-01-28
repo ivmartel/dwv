@@ -1,5 +1,43 @@
 # Changelog
 
+## [v0.28.0](https://github.com/ivmartel/dwv/releases/tag/v0.28.0) - 28/01/2021
+
+### Breaking
+
+- Remove hyphen from event types [#808](https://github.com/ivmartel/dwv/issues/808)
+
+### Added
+
+- Do not use smoothing for image display [#850](https://github.com/ivmartel/dwv/issues/850)
+- Add a shortcut to exit draw creation [#849](https://github.com/ivmartel/dwv/issues/849)
+- Handle no root case in decodeKeyValueUri [#843](https://github.com/ivmartel/dwv/issues/843)
+- Add load benchmark to tests [#840](https://github.com/ivmartel/dwv/issues/840)
+- Relax checks for meta data merge [#828](https://github.com/ivmartel/dwv/issues/828)
+- Make first render optional [#826](https://github.com/ivmartel/dwv/issues/826)
+- Use event name in overlays.json files [#824](https://github.com/ivmartel/dwv/issues/824)
+- Send event data in the 'value' property [#813](https://github.com/ivmartel/dwv/issues/813)
+- Private sequences with undefined length and explicit VR=UN [#799](https://github.com/ivmartel/dwv/issues/799)
+- Add pixel generator from file [#795](https://github.com/ivmartel/dwv/issues/795)
+- Move wiki pages to doc [#789](https://github.com/ivmartel/dwv/issues/789)
+- Enforce code styling [#782](https://github.com/ivmartel/dwv/issues/782)
+- Use a logger class [#781](https://github.com/ivmartel/dwv/issues/781)
+- Use image iterators to generate view [#749](https://github.com/ivmartel/dwv/issues/749)
+- Stop using PhantomJS [#719](https://github.com/ivmartel/dwv/issues/719)
+
+### Fixed
+
+- Wrong data size calculation for DicomWriter [#809](https://github.com/ivmartel/dwv/issues/809)
+- Node deprecation [#614](https://github.com/ivmartel/dwv/issues/614)
+- Cannot delete a draw when the cross overlaps with overlays [#552](https://github.com/ivmartel/dwv/issues/552)
+
+### Dependencies
+
+- Update Konva to v7 [#853](https://github.com/ivmartel/dwv/issues/853)
+- Update magic-wand [#788](https://github.com/ivmartel/dwv/issues/788)
+- Update i18next to v19 [#727](https://github.com/ivmartel/dwv/issues/727)
+
+---
+
 ## [v0.27.1](https://github.com/ivmartel/dwv/releases/tag/v0.27.1) - 24/09/2020
 
 ### Added
