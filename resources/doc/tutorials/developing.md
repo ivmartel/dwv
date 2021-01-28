@@ -52,6 +52,7 @@ For the application behaviour, check these tools:
     1. Delete release branch: `git branch -d v1.2`
  1. Check fiddles (links on the [examples](./tutorial-examples.html) wiki page)
  1. Create release from [github releases](https://github.com/ivmartel/dwv/releases) (creates the tag)
+ 1. Create doc from tag: `yarn run doc` (used later) and copy to `gh-pages` branch
  1. Publish npm package: `npm publish` in the main directory on the `master` branch
  1. Create snapshots
  1. Update dependent plugins: wordpress [dicom-support](https://wordpress.org/plugins/dicom-support/), [dwv-orthanc-plugin](https://github.com/ivmartel/dwv-orthanc-plugin), [dwv-dcm4chee-web](https://github.com/ivmartel/dwv-dcm4chee-web)
