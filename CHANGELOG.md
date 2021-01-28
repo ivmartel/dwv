@@ -1,6 +1,12 @@
 # Changelog
 
-## [v0.27.1] - 24/09/2020
+## [v0.27.1](https://github.com/ivmartel/dwv/releases/tag/v0.27.1) - 24/09/2020
+
+### Added
+
+- Merge #767 into v0.27.1 [#773](https://github.com/ivmartel/dwv/issues/773)
+- Use image iterators to generate view [#749](https://github.com/ivmartel/dwv/issues/749)
+- Stop using PhantomJS [#719](https://github.com/ivmartel/dwv/issues/719)
 
 ### Fixed
 
@@ -9,12 +15,6 @@
 - Null first buffer element at image contruction [#712](https://github.com/ivmartel/dwv/issues/712)
 - Node deprecation [#614](https://github.com/ivmartel/dwv/issues/614)
 
-### Added
-
-- Merge #767 into v0.27.1 [#773](https://github.com/ivmartel/dwv/issues/773)
-- Use image iterators to generate view [#749](https://github.com/ivmartel/dwv/issues/749)
-- Stop using PhantomJS [#719](https://github.com/ivmartel/dwv/issues/719)
-
 ### Dependencies
 
 - Update i18next to v19 [#727](https://github.com/ivmartel/dwv/issues/727)
@@ -22,12 +22,7 @@
 
 ---
 
-## [v0.27.0] - 11/03/2020
-
-### Fixed
-
-- window.onResize is a memory leak and does not allow multiple dwv app instances at once [#705](https://github.com/ivmartel/dwv/issues/705)
-- RLE decompression fails on 16bits data [#670](https://github.com/ivmartel/dwv/issues/670)
+## [v0.27.0](https://github.com/ivmartel/dwv/releases/tag/v0.27.0) - 11/03/2020
 
 ### Added
 
@@ -37,13 +32,14 @@
 - Add support for PALETTE COLOR photometric interpretation [#664](https://github.com/ivmartel/dwv/issues/664)
 - Add support for YBR photometric interpretation [#63](https://github.com/ivmartel/dwv/issues/63)
 
----
-
-## [v0.26.0] - 12/05/2019
-
 ### Fixed
 
-- Unable to abort RawImageLoader requests [#583](https://github.com/ivmartel/dwv/issues/583)
+- window.onResize is a memory leak and does not allow multiple dwv app instances at once [#705](https://github.com/ivmartel/dwv/issues/705)
+- RLE decompression fails on 16bits data [#670](https://github.com/ivmartel/dwv/issues/670)
+
+---
+
+## [v0.26.0](https://github.com/ivmartel/dwv/releases/tag/v0.26.0) - 12/05/2019
 
 ### Added
 
@@ -55,6 +51,10 @@
 - Check memory usage for second image load [#397](https://github.com/ivmartel/dwv/issues/397)
 - Allow to load DICOM with no DICM preamble [#188](https://github.com/ivmartel/dwv/issues/188)
 
+### Fixed
+
+- Unable to abort RawImageLoader requests [#583](https://github.com/ivmartel/dwv/issues/583)
+
 ### Dependencies
 
 - An in-range update of grunt-jsdoc is breaking the build 🚨 [#651](https://github.com/ivmartel/dwv/issues/651)
@@ -64,7 +64,7 @@
 
 ---
 
-## [v0.25.2] - 08/10/2018
+## [v0.25.2](https://github.com/ivmartel/dwv/releases/tag/v0.25.2) - 08/10/2018
 
 ### Added
 
@@ -72,7 +72,7 @@
 
 ---
 
-## [v0.25.1] - 04/10/2018
+## [v0.25.1](https://github.com/ivmartel/dwv/releases/tag/v0.25.1) - 04/10/2018
 
 ### Added
 
@@ -80,15 +80,15 @@
 
 ---
 
-## [v0.25.0] - 02/10/2018
+## [v0.25.0](https://github.com/ivmartel/dwv/releases/tag/v0.25.0) - 02/10/2018
 
-### Added
+### Breaking
 
 - Use container size as reference [#579](https://github.com/ivmartel/dwv/issues/579)
 
 ---
 
-## [v0.24.1] - 25/09/2018
+## [v0.24.1](https://github.com/ivmartel/dwv/releases/tag/v0.24.1) - 25/09/2018
 
 ### Added
 
@@ -97,13 +97,7 @@
 
 ---
 
-## [v0.24.0] - 24/08/2018
-
-### Fixed
-
-- Wado non dicom does not get loaded [#553](https://github.com/ivmartel/dwv/issues/553)
-- Cant load state in Microsoft Edge [#551](https://github.com/ivmartel/dwv/issues/551)
-- Check for same image orientation when appending slices [#466](https://github.com/ivmartel/dwv/issues/466)
+## [v0.24.0](https://github.com/ivmartel/dwv/releases/tag/v0.24.0) - 24/08/2018
 
 ### Added
 
@@ -112,36 +106,42 @@
 - Add tests for the dwv.image.ImageFactory [#479](https://github.com/ivmartel/dwv/issues/479)
 - Add support for DICOMDIR [#425](https://github.com/ivmartel/dwv/issues/425)
 
----
-
-## [v0.23.6] - 13/06/2018
-
 ### Fixed
 
-- Cannot load state with multiple drawings [#515](https://github.com/ivmartel/dwv/issues/515)
-- Freehand anchors do not stick [#505](https://github.com/ivmartel/dwv/issues/505)
+- Wado non dicom does not get loaded [#553](https://github.com/ivmartel/dwv/issues/553)
+- Cant load state in Microsoft Edge [#551](https://github.com/ivmartel/dwv/issues/551)
+- Check for same image orientation when appending slices [#466](https://github.com/ivmartel/dwv/issues/466)
+
+---
+
+## [v0.23.6](https://github.com/ivmartel/dwv/releases/tag/v0.23.6) - 13/06/2018
 
 ### Added
 
 - Better placement of the delete draw arrow [#517](https://github.com/ivmartel/dwv/issues/517)
 - Adapt shape extras to scale [#516](https://github.com/ivmartel/dwv/issues/516)
 
----
-
-## [v0.23.5] - 07/06/2018
-
 ### Fixed
 
-- Fix module.exports [#491](https://github.com/ivmartel/dwv/issues/491)
+- Cannot load state with multiple drawings [#515](https://github.com/ivmartel/dwv/issues/515)
+- Freehand anchors do not stick [#505](https://github.com/ivmartel/dwv/issues/505)
+
+---
+
+## [v0.23.5](https://github.com/ivmartel/dwv/releases/tag/v0.23.5) - 07/06/2018
 
 ### Added
 
 - Add public access to the DICOM tags [#498](https://github.com/ivmartel/dwv/issues/498)
 - Change draw interaction for mouse events [#492](https://github.com/ivmartel/dwv/issues/492)
 
+### Fixed
+
+- Fix module.exports [#491](https://github.com/ivmartel/dwv/issues/491)
+
 ---
 
-## [v0.23.4] - 18/04/2018
+## [v0.23.4](https://github.com/ivmartel/dwv/releases/tag/v0.23.4) - 18/04/2018
 
 ### Added
 
@@ -149,7 +149,7 @@
 
 ---
 
-## [v0.23.3] - 25/03/2018
+## [v0.23.3](https://github.com/ivmartel/dwv/releases/tag/v0.23.3) - 25/03/2018
 
 ### Fixed
 
@@ -157,7 +157,7 @@
 
 ---
 
-## [v0.23.2] - 19/03/2018
+## [v0.23.2](https://github.com/ivmartel/dwv/releases/tag/v0.23.2) - 19/03/2018
 
 ### Added
 
@@ -165,24 +165,20 @@
 
 ---
 
-## [v0.23.1] - 18/03/2018
-
-### Fixed
-
-- Fix AMD module wrapping [#468](https://github.com/ivmartel/dwv/issues/468)
+## [v0.23.1](https://github.com/ivmartel/dwv/releases/tag/v0.23.1) - 18/03/2018
 
 ### Added
 
 - Include modernizr as part of the code [#467](https://github.com/ivmartel/dwv/issues/467)
 - Add Romanian language [#465](https://github.com/ivmartel/dwv/issues/465)
 
----
-
-## [v0.23.0] - 11/03/2018
-
 ### Fixed
 
-- IE11: Object doesn't support property or method 'startsWith' [#441](https://github.com/ivmartel/dwv/issues/441)
+- Fix AMD module wrapping [#468](https://github.com/ivmartel/dwv/issues/468)
+
+---
+
+## [v0.23.0](https://github.com/ivmartel/dwv/releases/tag/v0.23.0) - 11/03/2018
 
 ### Added
 
@@ -191,9 +187,17 @@
 - Reduce Konva layer/canvas usage [#442](https://github.com/ivmartel/dwv/issues/442)
 - Consider using ServiceWorker for offline support [#213](https://github.com/ivmartel/dwv/issues/213)
 
+### Fixed
+
+- IE11: Object doesn't support property or method 'startsWith' [#441](https://github.com/ivmartel/dwv/issues/441)
+
 ---
 
-## [v0.22.1] - 19/12/2017
+## [v0.22.1](https://github.com/ivmartel/dwv/releases/tag/v0.22.1) - 19/12/2017
+
+### Added
+
+- Cannot append a slice with different number of columns [#433](https://github.com/ivmartel/dwv/issues/433)
 
 ### Fixed
 
@@ -201,17 +205,9 @@
 - Floating shape when dragging [#439](https://github.com/ivmartel/dwv/issues/439)
 - MONOCHROME1 photometric interpretation does not display correctly [#435](https://github.com/ivmartel/dwv/issues/435)
 
-### Added
-
-- Cannot append a slice with different number of columns [#433](https://github.com/ivmartel/dwv/issues/433)
-
 ---
 
-## [v0.22.0] - 30/11/2017
-
-### Fixed
-
-- Listen for init and not loaded before using i18next [#418](https://github.com/ivmartel/dwv/issues/418)
+## [v0.22.0](https://github.com/ivmartel/dwv/releases/tag/v0.22.0) - 30/11/2017
 
 ### Added
 
@@ -222,17 +218,17 @@
 - Update conquest lua scripts [#406](https://github.com/ivmartel/dwv/issues/406)
 - DicomWriter transfer syntax limit [#343](https://github.com/ivmartel/dwv/issues/343)
 
+### Fixed
+
+- Listen for init and not loaded before using i18next [#418](https://github.com/ivmartel/dwv/issues/418)
+
 ### Dependencies
 
 - An in-range update of i18next is breaking the build 🚨 [#417](https://github.com/ivmartel/dwv/issues/417)
 
 ---
 
-## [v0.21.0] - 28/09/2017
-
-### Fixed
-
-- The .min version uses " ext/rii-mango/decode-jpeg loss.js" but doesn't exist in this version /ext folder [#383](https://github.com/ivmartel/dwv/issues/383)
+## [v0.21.0](https://github.com/ivmartel/dwv/releases/tag/v0.21.0) - 28/09/2017
 
 ### Added
 
@@ -241,13 +237,17 @@
 - More precise window/level and zoom change events [#395](https://github.com/ivmartel/dwv/issues/395)
 - Update JPEGLosslessDecoderJS to the latest version [#394](https://github.com/ivmartel/dwv/issues/394)
 
+### Fixed
+
+- The .min version uses " ext/rii-mango/decode-jpeg loss.js" but doesn't exist in this version /ext folder [#383](https://github.com/ivmartel/dwv/issues/383)
+
 ### Dependencies
 
 - An in-range update of konva is breaking the build 🚨 [#380](https://github.com/ivmartel/dwv/issues/380)
 
 ---
 
-## [v0.20.1] - 09/07/2017
+## [v0.20.1](https://github.com/ivmartel/dwv/releases/tag/v0.20.1) - 09/07/2017
 
 ### Added
 
@@ -256,14 +256,7 @@
 
 ---
 
-## [v0.20.0] - 28/06/2017
-
-### Fixed
-
-- Touch scroll triggers slice play [#361](https://github.com/ivmartel/dwv/issues/361)
-- Keep TypedArray type in image append [#360](https://github.com/ivmartel/dwv/issues/360)
-- Dicom writer error: Offset is outside the bounds [#335](https://github.com/ivmartel/dwv/issues/335)
-- Input color not available on Safari [#330](https://github.com/ivmartel/dwv/issues/330)
+## [v0.20.0](https://github.com/ivmartel/dwv/releases/tag/v0.20.0) - 28/06/2017
 
 ### Added
 
@@ -272,9 +265,16 @@
 - Import data from video file [#328](https://github.com/ivmartel/dwv/issues/328)
 - Do not show mesures when no pixel spacing is set [#302](https://github.com/ivmartel/dwv/issues/302)
 
+### Fixed
+
+- Touch scroll triggers slice play [#361](https://github.com/ivmartel/dwv/issues/361)
+- Keep TypedArray type in image append [#360](https://github.com/ivmartel/dwv/issues/360)
+- Dicom writer error: Offset is outside the bounds [#335](https://github.com/ivmartel/dwv/issues/335)
+- Input color not available on Safari [#330](https://github.com/ivmartel/dwv/issues/330)
+
 ---
 
-## [v0.19.2] - 19/04/2017
+## [v0.19.2](https://github.com/ivmartel/dwv/releases/tag/v0.19.2) - 19/04/2017
 
 ### Fixed
 
@@ -282,7 +282,7 @@
 
 ---
 
-## [v0.19.1] - 13/04/2017
+## [v0.19.1](https://github.com/ivmartel/dwv/releases/tag/v0.19.1) - 13/04/2017
 
 ### Added
 
@@ -290,7 +290,7 @@
 
 ---
 
-## [v0.19.0] - 12/04/2017
+## [v0.19.0](https://github.com/ivmartel/dwv/releases/tag/v0.19.0) - 12/04/2017
 
 ### Added
 
@@ -298,11 +298,7 @@
 
 ---
 
-## [v0.18.0] - 29/03/2017
-
-### Fixed
-
-- HTTP 403 error when accessing Googe Drive data [#215](https://github.com/ivmartel/dwv/issues/215)
+## [v0.18.0](https://github.com/ivmartel/dwv/releases/tag/v0.18.0) - 29/03/2017
 
 ### Added
 
@@ -311,14 +307,13 @@
 - Allow for mouse wheel frame navigation [#310](https://github.com/ivmartel/dwv/issues/310)
 - Update CI PhantomJs to 2.1 [#287](https://github.com/ivmartel/dwv/issues/287)
 
----
-
-## [v0.17.0] - 23/12/2016
-
 ### Fixed
 
-- Spaces are lost when in state content [#277](https://github.com/ivmartel/dwv/issues/277)
-- Image not Opening (page crashes) [#236](https://github.com/ivmartel/dwv/issues/236)
+- HTTP 403 error when accessing Googe Drive data [#215](https://github.com/ivmartel/dwv/issues/215)
+
+---
+
+## [v0.17.0](https://github.com/ivmartel/dwv/releases/tag/v0.17.0) - 23/12/2016
 
 ### Added
 
@@ -332,16 +327,14 @@
 - Avoid race condition in applaunchers [#265](https://github.com/ivmartel/dwv/issues/265)
 - Show list of drawings [#5](https://github.com/ivmartel/dwv/issues/5)
 
----
-
-## [v0.16.1] - 03/10/2016
-
 ### Fixed
 
-- Use correct Chinese language code [#272](https://github.com/ivmartel/dwv/issues/272)
-- Ellipse surface goes negative [#271](https://github.com/ivmartel/dwv/issues/271)
-- PixelData parse error. PixelData VR=OB,TransferSyntax=1.2.840.10008.1.2.1 [#270](https://github.com/ivmartel/dwv/issues/270)
-- Uncaught unknown JPEG marker ffff [#262](https://github.com/ivmartel/dwv/issues/262)
+- Spaces are lost when in state content [#277](https://github.com/ivmartel/dwv/issues/277)
+- Image not Opening (page crashes) [#236](https://github.com/ivmartel/dwv/issues/236)
+
+---
+
+## [v0.16.1](https://github.com/ivmartel/dwv/releases/tag/v0.16.1) - 03/10/2016
 
 ### Added
 
@@ -353,9 +346,16 @@
 - Updated jquery-ui to 1.12.0 [#263](https://github.com/ivmartel/dwv/issues/263)
 - Add annotation tool [#64](https://github.com/ivmartel/dwv/issues/64)
 
+### Fixed
+
+- Use correct Chinese language code [#272](https://github.com/ivmartel/dwv/issues/272)
+- Ellipse surface goes negative [#271](https://github.com/ivmartel/dwv/issues/271)
+- PixelData parse error. PixelData VR=OB,TransferSyntax=1.2.840.10008.1.2.1 [#270](https://github.com/ivmartel/dwv/issues/270)
+- Uncaught unknown JPEG marker ffff [#262](https://github.com/ivmartel/dwv/issues/262)
+
 ---
 
-## [v0.16.0] - 23/08/2016
+## [v0.16.0](https://github.com/ivmartel/dwv/releases/tag/v0.16.0) - 23/08/2016
 
 ### Added
 
@@ -364,12 +364,7 @@
 
 ---
 
-## [v0.15.0] - 21/07/2016
-
-### Fixed
-
-- Fix empty sequence tag support [#238](https://github.com/ivmartel/dwv/issues/238)
-- Cannot draw on multislice data [#230](https://github.com/ivmartel/dwv/issues/230)
+## [v0.15.0](https://github.com/ivmartel/dwv/releases/tag/v0.15.0) - 21/07/2016
 
 ### Added
 
@@ -382,16 +377,14 @@
 - Multi-language support [#220](https://github.com/ivmartel/dwv/issues/220)
 - Add support for multi frame data [#132](https://github.com/ivmartel/dwv/issues/132)
 
----
-
-## [v0.14.0] - 09/03/2016
-
 ### Fixed
 
-- Fix id generator [#201](https://github.com/ivmartel/dwv/issues/201)
-- Fix slice order glitch [#200](https://github.com/ivmartel/dwv/issues/200)
-- group.id argument for draw listener  [#198](https://github.com/ivmartel/dwv/issues/198)
-- Uncaught TypeError: Cannot read property 'add' of null [#197](https://github.com/ivmartel/dwv/issues/197)
+- Fix empty sequence tag support [#238](https://github.com/ivmartel/dwv/issues/238)
+- Cannot draw on multislice data [#230](https://github.com/ivmartel/dwv/issues/230)
+
+---
+
+## [v0.14.0](https://github.com/ivmartel/dwv/releases/tag/v0.14.0) - 09/03/2016
 
 ### Added
 
@@ -408,22 +401,33 @@
 - src/gui/loader.js - fix class name [#190](https://github.com/ivmartel/dwv/issues/190)
 - Input urls via HTTP Post [#130](https://github.com/ivmartel/dwv/issues/130)
 
----
-
-## [v0.13.0] - 20/11/2015
-
 ### Fixed
 
-- Fix flicking progress [#186](https://github.com/ivmartel/dwv/issues/186)
+- Fix id generator [#201](https://github.com/ivmartel/dwv/issues/201)
+- Fix slice order glitch [#200](https://github.com/ivmartel/dwv/issues/200)
+- group.id argument for draw listener  [#198](https://github.com/ivmartel/dwv/issues/198)
+- Uncaught TypeError: Cannot read property 'add' of null [#197](https://github.com/ivmartel/dwv/issues/197)
+
+---
+
+## [v0.13.0](https://github.com/ivmartel/dwv/releases/tag/v0.13.0) - 20/11/2015
 
 ### Added
 
 - Add a slice change event [#185](https://github.com/ivmartel/dwv/issues/185)
 - Allow for relative uri for manifest file link [#184](https://github.com/ivmartel/dwv/issues/184)
 
+### Fixed
+
+- Fix flicking progress [#186](https://github.com/ivmartel/dwv/issues/186)
+
 ---
 
-## [v0.12.0] - 20/10/2015
+## [v0.12.0](https://github.com/ivmartel/dwv/releases/tag/v0.12.0) - 20/10/2015
+
+### Added
+
+- Access GUI component per app  [#177](https://github.com/ivmartel/dwv/issues/177)
 
 ### Fixed
 
@@ -431,13 +435,9 @@
 - Error parsing image - nested sequences? [#180](https://github.com/ivmartel/dwv/issues/180)
 - setCurrentPosition using getCurrentPosition does not work [#178](https://github.com/ivmartel/dwv/issues/178)
 
-### Added
-
-- Access GUI component per app  [#177](https://github.com/ivmartel/dwv/issues/177)
-
 ---
 
-## [v0.11.1] - 30/09/2015
+## [v0.11.1](https://github.com/ivmartel/dwv/releases/tag/v0.11.1) - 30/09/2015
 
 ### Added
 
@@ -446,11 +446,7 @@
 
 ---
 
-## [v0.11.0] - 18/09/2015
-
-### Fixed
-
-- data.info.dumpToTable is not a function [#167](https://github.com/ivmartel/dwv/issues/167)
+## [v0.11.0](https://github.com/ivmartel/dwv/releases/tag/v0.11.0) - 18/09/2015
 
 ### Added
 
@@ -461,9 +457,13 @@
 - Slips in documentation [#158](https://github.com/ivmartel/dwv/issues/158)
 - Add support for JPEG transfer syntax [#61](https://github.com/ivmartel/dwv/issues/61)
 
+### Fixed
+
+- data.info.dumpToTable is not a function [#167](https://github.com/ivmartel/dwv/issues/167)
+
 ---
 
-## [v0.10.1] - 26/06/2015
+## [v0.10.1](https://github.com/ivmartel/dwv/releases/tag/v0.10.1) - 26/06/2015
 
 ### Added
 
@@ -472,14 +472,7 @@
 
 ---
 
-## [v0.10.0] - 27/05/2015
-
-### Fixed
-
-- URL with hash part is not parsed correctly [#146](https://github.com/ivmartel/dwv/issues/146)
-- Fix drawing text [#145](https://github.com/ivmartel/dwv/issues/145)
-- Line Endings in src/image/geometry.js [#137](https://github.com/ivmartel/dwv/issues/137)
-- version 9 zoom flip the image after extra zoom [#134](https://github.com/ivmartel/dwv/issues/134)
+## [v0.10.0](https://github.com/ivmartel/dwv/releases/tag/v0.10.0) - 27/05/2015
 
 ### Added
 
@@ -492,14 +485,16 @@
 - Save application state [#136](https://github.com/ivmartel/dwv/issues/136)
 - Review pdf.js jpeg2000 support [#131](https://github.com/ivmartel/dwv/issues/131)
 
----
-
-## [v0.9.0] - 06/03/2015
-
 ### Fixed
 
-- Cannot load data from manifest file [#127](https://github.com/ivmartel/dwv/issues/127)
-- Fix OW value representation for 8bit PixelData [#123](https://github.com/ivmartel/dwv/issues/123)
+- URL with hash part is not parsed correctly [#146](https://github.com/ivmartel/dwv/issues/146)
+- Fix drawing text [#145](https://github.com/ivmartel/dwv/issues/145)
+- Line Endings in src/image/geometry.js [#137](https://github.com/ivmartel/dwv/issues/137)
+- version 9 zoom flip the image after extra zoom [#134](https://github.com/ivmartel/dwv/issues/134)
+
+---
+
+## [v0.9.0](https://github.com/ivmartel/dwv/releases/tag/v0.9.0) - 06/03/2015
 
 ### Added
 
@@ -508,15 +503,14 @@
 - Add support for per slice rescale slope and intercept [#80](https://github.com/ivmartel/dwv/issues/80)
 - Add tool to measure angles [#8](https://github.com/ivmartel/dwv/issues/8)
 
----
-
-## [v0.8.0] - 24/11/2014
-
 ### Fixed
 
-- Window Width value is going -ve on window/level [#114](https://github.com/ivmartel/dwv/issues/114)
-- RGB data missing center in simple viewer [#109](https://github.com/ivmartel/dwv/issues/109)
-- Wrong display for signed data with rescale slope different than one [#108](https://github.com/ivmartel/dwv/issues/108)
+- Cannot load data from manifest file [#127](https://github.com/ivmartel/dwv/issues/127)
+- Fix OW value representation for 8bit PixelData [#123](https://github.com/ivmartel/dwv/issues/123)
+
+---
+
+## [v0.8.0](https://github.com/ivmartel/dwv/releases/tag/v0.8.0) - 24/11/2014
 
 ### Added
 
@@ -525,13 +519,15 @@
 - Use url key as a keyword [#111](https://github.com/ivmartel/dwv/issues/111)
 - Integrate with Orthanc [#110](https://github.com/ivmartel/dwv/issues/110)
 
----
-
-## [v0.7.1] - 18/09/2014
-
 ### Fixed
 
-- Fix OX value representation for PixelData [#107](https://github.com/ivmartel/dwv/issues/107)
+- Window Width value is going -ve on window/level [#114](https://github.com/ivmartel/dwv/issues/114)
+- RGB data missing center in simple viewer [#109](https://github.com/ivmartel/dwv/issues/109)
+- Wrong display for signed data with rescale slope different than one [#108](https://github.com/ivmartel/dwv/issues/108)
+
+---
+
+## [v0.7.1](https://github.com/ivmartel/dwv/releases/tag/v0.7.1) - 18/09/2014
 
 ### Added
 
@@ -540,14 +536,13 @@
 - Restore quantification on drawn shapes [#100](https://github.com/ivmartel/dwv/issues/100)
 - Add 3D to drawings [#66](https://github.com/ivmartel/dwv/issues/66)
 
----
-
-## [v0.7.0] - 28/06/2014
-
 ### Fixed
 
-- Incorrect display of signed data in Internet Explorer [#95](https://github.com/ivmartel/dwv/issues/95)
-- Measurments do not adapt to zoom [#27](https://github.com/ivmartel/dwv/issues/27)
+- Fix OX value representation for PixelData [#107](https://github.com/ivmartel/dwv/issues/107)
+
+---
+
+## [v0.7.0](https://github.com/ivmartel/dwv/releases/tag/v0.7.0) - 28/06/2014
 
 ### Added
 
@@ -556,13 +551,14 @@
 - Allow to move/modify drawings [#6](https://github.com/ivmartel/dwv/issues/6)
 - integration dcm4chee [#1](https://github.com/ivmartel/dwv/issues/1)
 
----
-
-## [v0.6.0] - 24/02/2014
-
 ### Fixed
 
-- Window/level preset for abdomen is inverted [#81](https://github.com/ivmartel/dwv/issues/81)
+- Incorrect display of signed data in Internet Explorer [#95](https://github.com/ivmartel/dwv/issues/95)
+- Measurments do not adapt to zoom [#27](https://github.com/ivmartel/dwv/issues/27)
+
+---
+
+## [v0.6.0](https://github.com/ivmartel/dwv/releases/tag/v0.6.0) - 24/02/2014
 
 ### Added
 
@@ -576,21 +572,25 @@
 - Move static version to a demo folder [#71](https://github.com/ivmartel/dwv/issues/71)
 - Manual window/level saving [#65](https://github.com/ivmartel/dwv/issues/65)
 
----
-
-## [v0.5.1] - 10/01/2014
-
 ### Fixed
 
-- Local data loading progress does not disappear [#69](https://github.com/ivmartel/dwv/issues/69)
+- Window/level preset for abdomen is inverted [#81](https://github.com/ivmartel/dwv/issues/81)
+
+---
+
+## [v0.5.1](https://github.com/ivmartel/dwv/releases/tag/v0.5.1) - 10/01/2014
 
 ### Added
 
 - Update to jquery mobile 1.4 [#70](https://github.com/ivmartel/dwv/issues/70)
 
+### Fixed
+
+- Local data loading progress does not disappear [#69](https://github.com/ivmartel/dwv/issues/69)
+
 ---
 
-## [v0.5.0] - 18/12/2013
+## [v0.5.0](https://github.com/ivmartel/dwv/releases/tag/v0.5.0) - 18/12/2013
 
 ### Added
 
@@ -604,7 +604,7 @@
 
 ---
 
-## [v0.4.1] - 26/09/2013
+## [v0.4.1](https://github.com/ivmartel/dwv/releases/tag/v0.4.1) - 26/09/2013
 
 ### Added
 
@@ -612,15 +612,7 @@
 
 ---
 
-## [v0.4.0] - 24/09/2013
-
-### Fixed
-
-- Conquest interfacing broken [#46](https://github.com/ivmartel/dwv/issues/46)
-- Can't load another image without refreshing [#43](https://github.com/ivmartel/dwv/issues/43)
-- The response of windowlevel is very slow [#34](https://github.com/ivmartel/dwv/issues/34)
-- Two touch zoom goes only one way in one go [#33](https://github.com/ivmartel/dwv/issues/33)
-- <!DOCTYPE html> messes up display [#18](https://github.com/ivmartel/dwv/issues/18)
+## [v0.4.0](https://github.com/ivmartel/dwv/releases/tag/v0.4.0) - 24/09/2013
 
 ### Added
 
@@ -636,14 +628,17 @@
 - Use the bits* DICOM tags [#30](https://github.com/ivmartel/dwv/issues/30)
 - Load multiple local slices [#3](https://github.com/ivmartel/dwv/issues/3)
 
----
-
-## [v0.3.0] - 07/05/2013
-
 ### Fixed
 
-- Missing information in meta tags [#23](https://github.com/ivmartel/dwv/issues/23)
-- Read number in scientific notation [#17](https://github.com/ivmartel/dwv/issues/17)
+- Conquest interfacing broken [#46](https://github.com/ivmartel/dwv/issues/46)
+- Can't load another image without refreshing [#43](https://github.com/ivmartel/dwv/issues/43)
+- The response of windowlevel is very slow [#34](https://github.com/ivmartel/dwv/issues/34)
+- Two touch zoom goes only one way in one go [#33](https://github.com/ivmartel/dwv/issues/33)
+- <!DOCTYPE html> messes up display [#18](https://github.com/ivmartel/dwv/issues/18)
+
+---
+
+## [v0.3.0](https://github.com/ivmartel/dwv/releases/tag/v0.3.0) - 07/05/2013
 
 ### Added
 
@@ -659,22 +654,27 @@
 - Check DICOM data support [#10](https://github.com/ivmartel/dwv/issues/10)
 - Add zoom/pan tool [#2](https://github.com/ivmartel/dwv/issues/2)
 
+### Fixed
+
+- Missing information in meta tags [#23](https://github.com/ivmartel/dwv/issues/23)
+- Read number in scientific notation [#17](https://github.com/ivmartel/dwv/issues/17)
+
 ---
 
-## [v0.2.0] - 05/11/2012
+## [v0.2.0](https://github.com/ivmartel/dwv/releases/tag/v0.2.0) - 05/11/2012
+
+### Added
+
+- Mobile interface [#13](https://github.com/ivmartel/dwv/issues/13)
 
 ### Fixed
 
 - Can't show some images on second load [#12](https://github.com/ivmartel/dwv/issues/12)
 - Can't show big size image [#11](https://github.com/ivmartel/dwv/issues/11)
 
-### Added
-
-- Mobile interface [#13](https://github.com/ivmartel/dwv/issues/13)
-
 ---
 
-## [v0.1.0] - 02/04/2012
+## [v0.1.0](https://github.com/ivmartel/dwv/releases/tag/v0.1.0) - 02/04/2012
 
 ### Added
 
