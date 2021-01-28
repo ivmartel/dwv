@@ -33,12 +33,12 @@ For the application behaviour, check these tools:
  1. Check DICOM [conformance](./tutorial-conformance.html) by loading the test [data](https://github.com/ivmartel/dwv/tree/master/data)
  1. Check [integrations](./tutorial-integrations.html) by launching dwv in some
  1. Check module integration
- 1. Check fiddles (links on the [[API]] wiki page)
  1. Update translations
  1. Create release:
     1. Create the release branch: `git checkout -b v1.2 develop`
     1. Update version numbers: [dicomParser.js](https://github.com/ivmartel/dwv/blob/master/src/dicom/dicomParser.js),
     [package.json](https://github.com/ivmartel/dwv/blob/master/package.json)
+    1. Update changelog
     1. Create release: `yarn run build`
     1. Copy release into the `dist` folder
     1. Commit: `git commit -a -m "Bumped version number to v1.2"`
@@ -50,7 +50,7 @@ For the application behaviour, check these tools:
     1. Commit: `git commit -a -m "Bumped version number to v1.3-beta"`
     1. Push: `git push origin develop`
     1. Delete release branch: `git branch -d v1.2`
- 1. Update changelog
+ 1. Check fiddles (links on the [examples](./tutorial-examples.html) wiki page)
  1. Create release from [github releases](https://github.com/ivmartel/dwv/releases) (creates the tag)
  1. Publish npm package: `npm publish` in the main directory on the `master` branch
  1. Create snapshots
