@@ -24,9 +24,12 @@
 
 ## [v0.27.0](https://github.com/ivmartel/dwv/releases/tag/v0.27.0) - 11/03/2020
 
-### Added
+### Breaking
 
 - Refactor data load events and handlers [#701](https://github.com/ivmartel/dwv/issues/701)
+
+### Added
+
 - Get merged tags for multislice data [#690](https://github.com/ivmartel/dwv/issues/690)
 - Remove gui specific code [#679](https://github.com/ivmartel/dwv/issues/679)
 - Add support for PALETTE COLOR photometric interpretation [#664](https://github.com/ivmartel/dwv/issues/664)
