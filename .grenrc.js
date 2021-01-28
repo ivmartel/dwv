@@ -1,13 +1,14 @@
 module.exports = {
-    "dataSource": "issues",
+    "dataSource": "milestones",
     "ignore-issues-with": ["duplicate", "invalid", "question", "wontfix"],
     "groupBy": {
-      "Fixed": ["bug"],
+      "Breaking": ["breaking"],
       "Added": ["enhancement"],
+      "Fixed": ["bug"],
       "Dependencies": ["dependencies"]
     },
     "template": {
-      release: "## [{{release}}] - {{date}}\n{{body}}",
+      release: "## [{{release}}](https://github.com/ivmartel/dwv/releases/tag/{{release}}) - {{date}}\n{{body}}",
       group: "\n### {{heading}}\n",
       issue: "- {{name}} [{{text}}]({{url}})",
     }
