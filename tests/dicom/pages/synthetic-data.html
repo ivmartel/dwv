@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>DICOM synthetic data</title>
+<meta charset="UTF-8">
+<style>
+body { font-family: Arial, Helvetica, sans-serif; }
+</style>
+<!-- dwv -->
+<script type="text/javascript" src="../../../src/utils/logger.js"></script>
+<script type="text/javascript" src="../../../src/dicom/dicomParser.js"></script>
+<script type="text/javascript" src="../../../src/dicom/dicomWriter.js"></script>
+<script type="text/javascript" src="../../../src/dicom/dictionary.js"></script>
+<!-- local -->
+<script type="text/javascript" src="../dicomGenerator.js"></script>
+<script type="text/javascript" src="../gradSquarePixGenerator.js"></script>
+<!-- own -->
+<script type="text/javascript" src="./synthetic-data.js"></script>
+<script type="text/javascript">
+// last minute
+document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedSynthData);
+</script>
+</head>
+
+<body>
+
+<h1>DWV DICOM synthetic data</h1>
+
+<div id="content"></div>
+
+</body>
+</html>

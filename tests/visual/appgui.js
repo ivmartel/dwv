@@ -9,102 +9,101 @@
 
 // Image decoders (for web workers)
 dwv.image.decoderScripts = {
-    "jpeg2000": "../../decoders/pdfjs/decode-jpeg2000.js",
-    "jpeg-lossless": "../../decoders/rii-mango/decode-jpegloss.js",
-    "jpeg-baseline": "../../decoders/pdfjs/decode-jpegbaseline.js",
-    "rle": "../../decoders/dwv/decode-rle.js"
+  jpeg2000: '../../decoders/pdfjs/decode-jpeg2000.js',
+  'jpeg-lossless': '../../decoders/rii-mango/decode-jpegloss.js',
+  'jpeg-baseline': '../../decoders/pdfjs/decode-jpegbaseline.js',
+  rle: '../../decoders/dwv/decode-rle.js'
 };
 
 // get element
 dwv.gui.getElement = dwv.gui.base.getElement;
+// set logger (optional)
+dwv.logger = dwv.utils.logger.console;
 
 // check environment support
 dwv.env.check();
 
 // test data line
-dwv.addDataLine = function (id, fileroot, doc)
-{
-    var mainDiv = document.getElementById("data-lines");
+dwv.addDataLine = function (id, fileroot, doc) {
+  var mainDiv = document.getElementById('data-lines');
 
-    // dwv container
-    var dwvDiv = document.createElement("div");
-    dwvDiv.id = id;
-    dwvDiv.className = 'dwv';
-    var layConDiv = document.createElement("div");
-    layConDiv.className = "layerContainer";
-    var imgCanvas = document.createElement("canvas");
-    imgCanvas.className = "imageLayer";
-    layConDiv.appendChild(imgCanvas);
-    dwvDiv.appendChild(layConDiv);
-    mainDiv.appendChild(dwvDiv);
+  // dwv container
+  var dwvDiv = document.createElement('div');
+  dwvDiv.id = id;
+  dwvDiv.className = 'dwv';
+  var layConDiv = document.createElement('div');
+  layConDiv.className = 'layerContainer';
+  var imgCanvas = document.createElement('canvas');
+  imgCanvas.className = 'imageLayer';
+  layConDiv.appendChild(imgCanvas);
+  dwvDiv.appendChild(layConDiv);
+  mainDiv.appendChild(dwvDiv);
 
-    // dwv application
-    var config = {
-        "containerDivId": id,
-        "skipLoadUrl": true
-    };
-    var url = "../data/" + fileroot + ".dcm";
-    var app = new dwv.App();
-    app.init(config);
-    // display loading time
-    var listener = function (event) {
-        var timerLabel = "load-data["+fileroot+"]";
-        if (event.type === "load-start") {
-            console.time(timerLabel);
-        } else if (event.type === "load-end") {
-            console.timeEnd(timerLabel);
-        }
-    };
-    app.addEventListener("load-start", listener);
-    app.addEventListener("load-end", listener);
-    // load data
-    app.loadURLs([url]);
-
-    // image
-    var image = document.createElement("img");
-    image.src = "./images/" + fileroot + ".jpg";
-    image.setAttribute("class", "snapshot");
-    mainDiv.appendChild(image);
-
-    // doc
-    var docDiv = document.createElement("div");
-    docDiv.setAttribute("class", "doc");
-    var docUl = document.createElement("ul");
-    var keys = Object.keys(doc);
-    for ( var i = 0; i < keys.length; ++i ) {
-        var li = document.createElement("li");
-        var spanKey = document.createElement("span");
-        spanKey.setAttribute("class", "key");
-        spanKey.appendChild( document.createTextNode(keys[i]) );
-        var spanValue = document.createElement("span");
-        spanValue.setAttribute("class", "value");
-        spanValue.appendChild( document.createTextNode(doc[keys[i]]) );
-        if ( keys[i] === "origin" ) {
-
-            var spanOrig = document.createElement("span");
-            spanOrig.setAttribute("class", "path");
-            spanOrig.setAttribute("title", doc.path);
-            spanOrig.appendChild( document.createTextNode(doc[keys[i]]) );
-            li.appendChild( spanKey );
-            li.appendChild( document.createTextNode( ": " ) );
-            li.appendChild( spanOrig );
-            docUl.appendChild(li);
-        }
-        else if ( keys[i] === "path" ) {
-            // nothing to do
-        }
-        else {
-            li.appendChild( spanKey );
-            li.appendChild( document.createTextNode( ": " ) );
-            li.appendChild( spanValue );
-            docUl.appendChild(li);
-        }
+  // dwv application
+  var config = {
+    containerDivId: id,
+    skipLoadUrl: true
+  };
+  var url = '../data/' + fileroot + '.dcm';
+  var app = new dwv.App();
+  app.init(config);
+  // display loading time
+  var listener = function (event) {
+    var timerLabel = 'load-data[' + fileroot + ']';
+    if (event.type === 'loadstart') {
+      console.time(timerLabel);
+    } else if (event.type === 'loadend') {
+      console.timeEnd(timerLabel);
     }
-    docDiv.appendChild(docUl);
-    mainDiv.appendChild(docDiv);
+  };
+  app.addEventListener('loadstart', listener);
+  app.addEventListener('loadend', listener);
+  // load data
+  app.loadURLs([url]);
 
-    // separator
-    var sepDiv = document.createElement("div");
-    sepDiv.setAttribute("class", "separator");
-    mainDiv.appendChild(sepDiv);
+  // image
+  var image = document.createElement('img');
+  image.src = './images/' + fileroot + '.jpg';
+  image.setAttribute('class', 'snapshot');
+  mainDiv.appendChild(image);
+
+  // doc
+  var docDiv = document.createElement('div');
+  docDiv.setAttribute('class', 'doc');
+  var docUl = document.createElement('ul');
+  var keys = Object.keys(doc);
+  for (var i = 0; i < keys.length; ++i) {
+    var li = document.createElement('li');
+    var spanKey = document.createElement('span');
+    spanKey.setAttribute('class', 'key');
+    spanKey.appendChild(document.createTextNode(keys[i]));
+    var spanValue = document.createElement('span');
+    spanValue.setAttribute('class', 'value');
+    spanValue.appendChild(document.createTextNode(doc[keys[i]]));
+    if (keys[i] === 'origin') {
+
+      var spanOrig = document.createElement('span');
+      spanOrig.setAttribute('class', 'path');
+      spanOrig.setAttribute('title', doc.path);
+      spanOrig.appendChild(document.createTextNode(doc[keys[i]]));
+      li.appendChild(spanKey);
+      li.appendChild(document.createTextNode(': '));
+      li.appendChild(spanOrig);
+      docUl.appendChild(li);
+    } else if (keys[i] === 'path') {
+      // nothing to do
+    } else {
+      li.appendChild(spanKey);
+      li.appendChild(document.createTextNode(': '));
+      li.appendChild(spanValue);
+      docUl.appendChild(li);
+    }
+  }
+  docDiv.appendChild(docUl);
+  mainDiv.appendChild(docDiv);
+
+  // separator
+  var sepDiv = document.createElement('div');
+  sepDiv.setAttribute('class', 'separator');
+  mainDiv.appendChild(sepDiv);
 };

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>DICOM Generator</title>
+<meta charset="UTF-8">
+<!-- third party -->
+<script type="text/javascript" src="../../../node_modules/jszip/dist/jszip.min.js"></script>
+<!-- dwv -->
+<script type="text/javascript" src="../../../src/utils/logger.js"></script>
+<script type="text/javascript" src="../../../src/dicom/dicomParser.js"></script>
+<script type="text/javascript" src="../../../src/dicom/dicomWriter.js"></script>
+<script type="text/javascript" src="../../../src/dicom/dictionary.js"></script>
+<!-- local -->
+<script type="text/javascript" src="../dicomGenerator.js"></script>
+<script type="text/javascript" src="../gradSquarePixGenerator.js"></script>
+<script type="text/javascript" src="../filePixGenerator.js"></script>
+<script type="text/javascript" src="../mprPixGenerator.js"></script>
+<!-- own -->
+<script type="text/javascript" src="./generator.js"></script>
+<script type="text/javascript">
+// last minute
+document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedGenerator);
+</script>
+<style>
+body { font-family: Arial, Helvetica, sans-serif; }
+textarea { width: 99%; margin: 2px; }
+fieldset { background: whitesmoke; border: 1px solid grey; }
+.button {
+    padding: 3px 7px 3px 7px;
+    text-align: center;
+    border-radius: 3px;
+    border: 1px solid grey;
+    text-decoration: none;
+    font: 80% sans-serif;
+    color: black;
+    background: #E3E3E3;
+}
+.button-active {
+    color: black;
+    background: #E3E3E3;
+}
+.button-disabled {
+    color: grey;
+    background: #F3F3F3;
+}
+.button:hover {
+    border: 1px solid black;
+}
+</style>
+</head>
+
+<body>
+
+<h1>DWV DICOM Generator</h1>
+
+<p>Simple DICOM data generator from json tags.
+Mainly used for generating test data, <b>use at your own risks!</b>
+<br>No need for a 'FileMetaInformationGroupLength', it is calculated automatically.
+Values should not be <code>null</code>...
+<br>Sequences have an optional <code>explicitLength</code> boolean parameter to write them
+and all their elements with implicit or explicit length. Its default value is <code>true</code>.
+Set as <code>{}</code>, a sequence will
+be written with explicit zero length, a <code>0</code> value will mean implicit length.
+</p>
+
+<form name="genform">
+
+<fieldset>
+<label for="intagsfile">JSON DICOM tags file: </label>
+<input id="intagsfile" type="file" name="file" onchange="dwv.test.onInputTagsFile(event);">
+<a href="#" id="jsonlint" class="button" onclick="dwv.test.launchJSONlint();">JSONLint</a>
+<a href="#" id="save" class="button" onclick="dwv.test.onSaveTags();">Save Tags</a>
+</fieldset>
+
+<textarea id="tags" rows="25">
+{
+  "TransferSyntaxUID": "1.2.840.10008.1.2.1",
+  "Modality": "MR",
+  "PatientName": "dwv-patient-name",
+  "PhotometricInterpretation": "MONOCHROME2",
+  "SamplesPerPixel": 1,
+  "PlanarConfiguration": 0,
+  "PixelRepresentation": 0,
+  "Rows": 32,
+  "Columns": 32,
+  "ImageOrientationPatient": [1, 0, 0, 0, 1, 0],
+  "PixelSpacing": [1,1],
+  "BitsAllocated": 16,
+  "BitsStored": 12,
+  "HighBit": 11
+}
+</textarea>
+
+<fieldset>
+<label for="numberofslices">Number of slices: </label>
+<input type="number" id="numberofslices" value="1"/>
+<label for="inImgfile">Image file(s): </label>
+<input id="inImgfile" type="file" multiple="true" name="file" onchange="dwv.test.onInputImageFiles(event);">
+<a href="#" id="generate" class="button" onclick="dwv.test.onGenerate();">Generate</a>
+</fieldset>
+</form>
+
+</body>
+</html>

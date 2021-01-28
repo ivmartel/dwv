@@ -12,13 +12,13 @@
         {"tags": ["x00080020", "x00080030"], "pos": "tr", "format": "{v0} {v1}"},
         {"tags": ["x00080060"], "pos": "tr"},
 
-        {"value": "window-center", "pos": "br", "format": "WC: {v0}"},
-        {"value": "window-width", "pos": "br", "format": "WW: {v0}"},
-        {"value": "zoom", "pos": "br", "format": "Z: {v0}"},
-        {"value": "offset", "pos": "br", "format": "Off: {v0},{v1}"},
-        {"value": "position", "pos": "br", "format": "Pos: {v0},{v1},{v2}"},
-        {"value": "frame", "pos": "br", "format": "Frame: {v0}"},
-        {"value": "value", "pos": "br", "format": "Valore: {v0}"}
+        {"value": "wlcenterchange", "pos": "br", "format": "WC: {v0}"},
+        {"value": "wlwidthchange", "pos": "br", "format": "WW: {v0}"},
+        {"value": "zoomchange", "pos": "br", "format": "Z: {v0}", "precision": "3"},
+        {"value": "offsetchange", "pos": "br", "format": "Off: {v0},{v1}", "precision": "round"},
+        {"value": "positionchange", "pos": "br", "format": "Pos: {v0},{v1},{v2}"},
+        {"value": "framechange", "pos": "br", "format": "Frame: {v0}"},
+        {"value": "positionchange", "pos": "br", "format": "Valore: {v3}"}
     ],
     "DOM": [
         {"tags": ["fileName"], "pos": "tl"},
@@ -27,13 +27,13 @@
 
         {"tags": ["imageWidth", "imageHeight"], "pos": "bl", "format": "RES: {v0}x{v1}"},
 
-        {"value": "window-center", "pos": "br", "format": "WC: {v0}"},
-        {"value": "window-width", "pos": "br", "format": "WW: {v0}"},
-        {"value": "zoom", "pos": "br", "format": "Z: {v0}"},
-        {"value": "offset", "pos": "br", "format": "Off: {v0},{v1}"},
-        {"value": "position", "pos": "br", "format": "Pos: {v0},{v1},{v2}"},
-        {"value": "frame", "pos": "br", "format": "Frame: {v0}"},
-        {"value": "value", "pos": "br", "format": "Valore: {v0}"}
+        {"value": "wlcenterchange", "pos": "br", "format": "WC: {v0}"},
+        {"value": "wlwidthchange", "pos": "br", "format": "WW: {v0}"},
+        {"value": "zoomchange", "pos": "br", "format": "Z: {v0}", "precision": "3"},
+        {"value": "offsetchange", "pos": "br", "format": "Off: {v0},{v1}", "precision": "round"},
+        {"value": "positionchange", "pos": "br", "format": "Pos: {v0},{v1},{v2}"},
+        {"value": "framechange", "pos": "br", "format": "Frame: {v0}"},
+        {"value": "positionchange", "pos": "br", "format": "Valore: {v3}"}
     ],
     "*": [
         {"tags": ["x00100020"], "pos": "tl"},
@@ -51,12 +51,12 @@
         {"tags": ["x00080020", "x00080030"], "pos": "tr", "format": "{v0} {v1}"},
         {"tags": ["x00080060"], "pos": "tr"},
 
-        {"value": "window-center", "pos": "br", "format": "WC: {v0}"},
-        {"value": "window-width", "pos": "br", "format": "WW: {v0}"},
-        {"value": "zoom", "pos": "br", "format": "Z: {v0}"},
-        {"value": "offset", "pos": "br", "format": "Off: {v0},{v1}"},
-        {"value": "position", "pos": "br", "format": "Pos: {v0},{v1},{v2}"},
-        {"value": "frame", "pos": "br", "format": "Frame: {v0}"},
-        {"value": "value", "pos": "br", "format": "Valore: {v0}"}
+        {"value": "wlcenterchange", "pos": "br", "format": "WC: {v0}"},
+        {"value": "wlwidthchange", "pos": "br", "format": "WW: {v0}"},
+        {"value": "zoomchange", "pos": "br", "format": "Z: {v0}", "precision": "3"},
+        {"value": "offsetchange", "pos": "br", "format": "Off: {v0},{v1}", "precision": "round"},
+        {"value": "positionchange", "pos": "br", "format": "Pos: {v0},{v1},{v2}"},
+        {"value": "framechange", "pos": "br", "format": "Frame: {v0}"},
+        {"value": "positionchange", "pos": "br", "format": "Valore: {v3}"}
     ]
 }

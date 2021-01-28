@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>DICOM Anonymiser</title>
+<meta charset="UTF-8">
+<!-- dwv -->
+<script type="text/javascript" src="../../../src/utils/logger.js"></script>
+<script type="text/javascript" src="../../../src/dicom/dicomParser.js"></script>
+<script type="text/javascript" src="../../../src/dicom/dicomWriter.js"></script>
+<script type="text/javascript" src="../../../src/dicom/dictionary.js"></script>
+<!-- own -->
+<script type="text/javascript"src="./anonymiser.js"></script>
+<style>
+body { font-family: Arial, Helvetica, sans-serif; }
+textarea { width: 99%; margin: 2px; }
+fieldset { background: whitesmoke; border: 1px solid grey; }
+.button {
+    padding: 3px 7px 3px 7px;
+    text-align: center;
+    border-radius: 3px;
+    border: 1px solid grey;
+    text-decoration: none;
+    font: 80% sans-serif;
+    color: black;
+    background: #E3E3E3;
+}
+.button-active {
+    color: black;
+    background: #E3E3E3;
+}
+.button-disabled {
+    color: grey;
+    background: #F3F3F3;
+}
+.button:hover {
+    border: 1px solid black;
+}
+</style>
+</head>
+
+<body>
+
+<h1>DWV DICOM Anonymiser</h1>
+
+<p>Simple DICOM "anonymisation" tool. Available rules: <code>copy</code>,
+<code>remove</code>, <code>clear</code>, <code>replace(value)</code>.</p>
+
+<form name="genform">
+
+<fieldset>
+<label for="infile">DICOM file: </label>
+<input id="infile" type="file" name="file" onchange="dwv.test.onInputDICOMFile(event);">
+<br>&nbsp;
+<br><label for="inrulesfile">JSON rules file: </label>
+<input id="inrulesfile" type="file" name="file" onchange="dwv.test.onInputRulesFile(event);">
+</fieldset>
+
+<textarea id="rules" rows="25">
+{
+  "default": {
+    "action": "remove", "value": null
+  },
+  "PatientName": {
+    "action": "replace", "value": "Anonymised"
+  },
+  "Meta Element": {
+    "action": "copy", "value": null
+  },
+  "Acquisition": {
+    "action": "copy", "value": null
+  },
+  "Image Presentation": {
+    "action": "copy", "value": null
+  },
+  "Procedure": {
+    "action": "copy", "value": null
+  },
+  "Pixel Data": {
+    "action": "copy", "value": null
+  }
+}
+</textarea>
+
+<fieldset>
+<a href="#" id="jsonlint" class="button" onclick="dwv.test.launchJSONLint();">JSONLint</a>
+<a href="#" id="save" class="button" onclick="dwv.test.saveRules();">Save Rules</a>
+<a href="#" id="generate" class="button button-disabled" onclick="dwv.test.generate();">Generate</a>
+</fieldset>
+</form>
+
+</body>
+</html>
