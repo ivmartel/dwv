@@ -2330,10 +2330,10 @@ github-api@^3.3.0:
     js-base64 "^2.1.9"
     utf8 "^2.1.1"
 
-github-release-notes@0.17.2:
-  version "0.17.2"
-  resolved "https://registry.yarnpkg.com/github-release-notes/-/github-release-notes-0.17.2.tgz#e5be1d59ad8a914d41ef93034847adc3dc813c00"
-  integrity sha512-K9ZQWt+kbZ+grgOfWeSdq5hp8AR7k+GMQ980G5o7mtCgP0ygF/F9c1xVejG8jqqeRgEwkwYjY+Ql/czq6TmrIg==
+github-release-notes@0.17.3:
+  version "0.17.3"
+  resolved "https://registry.yarnpkg.com/github-release-notes/-/github-release-notes-0.17.3.tgz#c18663f6726f2b9441c378e111d8e9e8ad5930c7"
+  integrity sha512-MBCw3Nz7iWAtaDSPknUnNP6qg3r989J62OwrqHsokwuMNK5q2gX6989WIi06x5YpGYlF3vldW+jxBFqC3fbqPw==
   dependencies:
     babel-runtime "^6.26.0"
     base-64 "^0.1.0"
