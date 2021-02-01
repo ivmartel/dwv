@@ -35,24 +35,12 @@ For the application behaviour, check these tools:
  1. Check module integration
  1. Update translations
  1. Create release:
-    1. Create the release branch: `git checkout -b v1.2`
-    1. Update version numbers: [dicomParser.js](https://github.com/ivmartel/dwv/blob/master/src/dicom/dicomParser.js),
-    [package.json](https://github.com/ivmartel/dwv/blob/master/package.json)
-    1. Update changelog
-    1. Create release: `yarn run build`
-    1. Copy release into the `dist` folder
-    1. Commit: `git commit -a -m "Bumped version number to v1.2"`
-    1. Checkout master: `git checkout master`
-    1. Merge release into master: `git merge --no-ff v1.2`
-    1. Push master: `git push origin master`
-    1. Integrate changes in develop: `git checkout develop` and `git merge --no-ff v1.2`
-    1. Update version numbers to beta
-    1. Commit: `git commit -a -m "Bumped version number to v1.3-beta"`
-    1. Push: `git push origin develop`
-    1. Delete release branch: `git branch -d v1.2`
+    1. run the `resources/scripts/prep-release` script with the release and previous version
+    1. review changes
+    1. run the `resources/scripts/finish-release` script with the release and next version
  1. Check fiddles (links on the [examples](./tutorial-examples.html) wiki page)
  1. Create release from [github releases](https://github.com/ivmartel/dwv/releases) (creates the tag)
- 1. Create doc from tag: `yarn run doc` (used later) and copy to `gh-pages` branch
+ 1. Travis should have created the doc for the release, check it out on the `gh-pages` branch
  1. Publish npm package: `npm publish` in the main directory on the `master` branch
  1. Create snapshots
  1. Update dependent plugins: wordpress [dicom-support](https://wordpress.org/plugins/dicom-support/), [dwv-orthanc-plugin](https://github.com/ivmartel/dwv-orthanc-plugin), [dwv-dcm4chee-web](https://github.com/ivmartel/dwv-dcm4chee-web)
