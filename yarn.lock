@@ -1282,17 +1282,10 @@ debug@^3.1.0, debug@^3.1.1:
   dependencies:
     ms "^2.1.1"
 
-debug@^4.0.1, debug@^4.3.1:
+debug@^4.0.1, debug@^4.1.0, debug@^4.1.1, debug@^4.3.1:
   version "4.3.1"
   resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.1.tgz#f0d229c505e0c6d8c49ac553d1b13dc183f6b2ee"
   integrity sha512-doEwdvm4PCeK4K3RQN2ZC2BYUBaxwLARCqZmMjtF8a51J2Rb0xpVloFRnCODwqjpwnAoao4pelN8l3RJdv3gRQ==
-  dependencies:
-    ms "2.1.2"
-
-debug@^4.1.0, debug@^4.1.1:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/debug/-/debug-4.2.0.tgz#7f150f93920e94c58f5574c2fd01a3110effe7f1"
-  integrity sha512-IX2ncY78vDTjZMFUdmsvIRFY2Cf4FnD0wRs+nQwJU8Lu99/tPFdb0VybiiMTPe3I6rQmwsqQqRBvxU+bZ/I8sg==
   dependencies:
     ms "2.1.2"
 
@@ -1670,10 +1663,10 @@ escape-string-regexp@^2.0.0:
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-2.0.0.tgz#a30304e99daa32e23b2fd20f51babd07cffca344"
   integrity sha512-UpzcLCXolUWcNu5HtVMHYdXJjArjsF9C0aNnquZYY4uW/Vu0miy5YoWvbV345HauVvcAUnpRuhMMcqTcGOY2+w==
 
-eslint-plugin-jsdoc@~31.3.2:
-  version "31.3.2"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-31.3.2.tgz#ca8e31bf97fc9a4c0038a39cdd1fb921b9e640a2"
-  integrity sha512-MsrQ5+ah4dMez6Z2cLeg9HrUkdeDWzmaebmTKozlHue7o+mANQxSKhn52KclrFz7EkNa/pUIPi4VE3TnseRxuA==
+eslint-plugin-jsdoc@~31.6.0:
+  version "31.6.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-31.6.0.tgz#c91f8cb4e4f8a94a27aafdc41c58eb8c35c9ce9a"
+  integrity sha512-kYhdW+BXHij9n12oHvAC27oDHKEFITz1YJP/C0NPtb+gsGJWxejh5B6dEmmj6oLYOsmNvuCVkdIcqYOyabP2QA==
   dependencies:
     comment-parser "1.1.1"
     debug "^4.3.1"
