@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.28.1](https://github.com/ivmartel/dwv/releases/tag/v0.28.1) - 02/02/2021
+
+### Fixed
+
+- TypeError: i18next.t is not a function [#862](https://github.com/ivmartel/dwv/issues/862)
+
+---
+
 ## [v0.28.0](https://github.com/ivmartel/dwv/releases/tag/v0.28.0) - 28/01/2021
 
 ### Breaking
