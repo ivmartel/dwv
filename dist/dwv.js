@@ -1,4 +1,4 @@
-/*! dwv 0.28.0 2021-01-28 21:17:12 */
+/*! dwv 0.28.1 2021-02-02 23:57:15 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -52,6 +52,12 @@
         window : typeof self !== 'undefined' ?
         self : typeof global !== 'undefined' ?
         global : {};
+
+    // latest i18next (>v17) does not export default
+    // see #862 and https://github.com/i18next/i18next/commit/7c6c235
+    if (typeof i18next.t === 'undefined') {
+      i18next = i18next.default;
+    }
 
 /** @namespace */
 var dwv = dwv || {};
@@ -3830,7 +3836,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.28.0';
+  return '0.28.1';
 };
 
 /**

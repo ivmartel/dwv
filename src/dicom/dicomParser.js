@@ -9,7 +9,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.28.0';
+  return '0.28.1';
 };
 
 /**

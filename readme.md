@@ -6,11 +6,13 @@ DWV (DICOM Web Viewer) is an open source zero footprint medical image viewer lib
 [![Build Status](https://travis-ci.com/ivmartel/dwv.svg?branch=master)](https://travis-ci.com/ivmartel/dwv) [![Coverage Status](https://img.shields.io/coveralls/ivmartel/dwv.svg)](https://coveralls.io/r/ivmartel/dwv?branch=master) [![Code Climate](https://codeclimate.com/github/ivmartel/dwv.svg)](https://codeclimate.com/github/ivmartel/dwv) [![Dependency Status](https://david-dm.org/ivmartel/dwv.svg)](https://david-dm.org/ivmartel/dwv) [![npm](https://img.shields.io/npm/v/dwv.svg)](https://www.npmjs.com/package/dwv)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fivmartel%2Fdwv.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fivmartel%2Fdwv?ref=badge_shield)
 
-Try a [live demo](https://ivmartel.github.io/dwv/) and read a lot more information on the [wiki](https://github.com/ivmartel/dwv/wiki) (such as [Dicom-Support](https://github.com/ivmartel/dwv/wiki/Dicom-Support) or [Pacs-Support](https://github.com/ivmartel/dwv/wiki/Pacs-Support)). You can also check out the [example viewers](https://github.com/ivmartel/dwv/wiki/Examples#viewers-and-integrations) based on dwv.
+Try a [live demo](https://ivmartel.github.io/dwv/) and read a lot more information on the [wiki](https://github.com/ivmartel/dwv/wiki) or the [docs](https://ivmartel.github.io/dwv/doc/stable/) (such as [dicom conformance](https://ivmartel.github.io/dwv/doc/stable/tutorial-conformance.html) or [pacs integrations](https://ivmartel.github.io/dwv/doc/stable/tutorial-integrations.html)). You can also check out the [example viewers](https://github.com/ivmartel/dwv/wiki/Examples#viewers-and-integrations) based on dwv.
 
  - All coding/implementation contributions and comments are welcome.
  - DWV is not certified for diagnostic use.<sup>[1](#footnote1)</sup>
  - Released under GNU GPL-3.0 license (see [license.txt](license.txt)).
+
+If you have additional questions, please [open an issue](https://www.github.com/ivmartel/dwv/issues).
 
 And for those who want to support the dwv development:
 
@@ -60,4 +62,4 @@ All scripts also work with `npm`.
 
 ## Notes
 
-<a name="footnote1">1</a>: Certification refers to official medical software certification that are issued by the FDA or EU Notified Bodies. The sentence here serves as a reminder that the Dicom Web Viewer is not ceritifed, and comes with no warranties (and no possible liability of its authors) as stated in the [license](license.txt). To learn more about standards used in certification, see the [wikipedia Medical software](https://en.wikipedia.org/wiki/Medical_software) page. If you have additional questions, please [open an issue](https://www.github.com/ivmartel/dwv/issues).
+<a name="footnote1">1</a>: Certification refers to official medical software certification that are issued by the FDA or EU Notified Bodies. The sentence here serves as a reminder that the Dicom Web Viewer is not ceritifed, and comes with no warranties (and no possible liability of its authors) as stated in the [license](license.txt). To learn more about standards used in certification, see the [wikipedia Medical software](https://en.wikipedia.org/wiki/Medical_software) page. 
