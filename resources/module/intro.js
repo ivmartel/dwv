@@ -51,3 +51,9 @@
         window : typeof self !== 'undefined' ?
         self : typeof global !== 'undefined' ?
         global : {};
+
+    // latest i18next (>v17) does not export default
+    // see #862 and https://github.com/i18next/i18next/commit/7c6c235
+    if (typeof i18next.t === 'undefined') {
+      i18next = i18next.default;
+    }
