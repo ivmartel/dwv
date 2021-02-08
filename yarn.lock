@@ -3477,9 +3477,9 @@ karma-coverage@^2.0.2:
     minimatch "^3.0.4"
 
 karma-qunit@~4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/karma-qunit/-/karma-qunit-4.1.1.tgz#b097e90bf8ed1e65688ac6903f8ade239ff82d76"
-  integrity sha512-sl4rSTGK1fXWyXdNu8ySQvsf77OuJ1gQg9gbHIj0V05h4FvcNogpirO7R4ijU4L7ioXk8WupvSJZHE7QI9B7uQ==
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/karma-qunit/-/karma-qunit-4.1.2.tgz#fa27697470e749fb4bd63b1b5e487b6165ec9ec8"
+  integrity sha512-taTPqBeHCOlkeKTSzQgIKzAUb79vw3rfbCph+xwwh63tyGjNtljwx91VArhIM9DzIIR3gB9G214wQg+oXI9ycw==
 
 karma@~5.2.3:
   version "5.2.3"
