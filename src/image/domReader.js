@@ -193,7 +193,11 @@ dwv.image.getViewFromDOMVideo = function (
     } else {
       image.appendFrameBuffer(imgBuffer);
     }
+    // increment index
+    ++frameIndex;
   }
+
+  var nextTime = 0;
 
   /**
    * Handle seeked event
@@ -201,11 +205,9 @@ dwv.image.getViewFromDOMVideo = function (
   function onseeked(/*event*/) {
     // store
     storeFrame();
-    // increment index
-    ++frameIndex;
     // set the next time
     // (not using currentTime, it seems to get offseted)
-    var nextTime = frameIndex / frameRate;
+    nextTime += 1 / frameRate;
     if (nextTime <= this.duration) {
       this.currentTime = nextTime;
     } else {
@@ -220,6 +222,6 @@ dwv.image.getViewFromDOMVideo = function (
     }
   }
 
-  // trigger the first seeked
-  video.currentTime = 0;
+  // trigger the first seek
+  video.currentTime = nextTime;
 };
