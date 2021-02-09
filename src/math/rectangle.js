@@ -128,3 +128,38 @@ dwv.math.Rectangle.prototype.getWidth = function () {
 dwv.math.Rectangle.prototype.getHeight = function () {
   return Math.abs(this.getRealHeight());
 };
+
+/**
+ * Quantify a rectangle according to image information.
+ *
+ * @param {object} image The associated image.
+ * @returns {object} A quantification object.
+ */
+dwv.math.Rectangle.prototype.quantify = function (image) {
+  var quant = {};
+  // surface
+  var spacing = image.getGeometry().getSpacing();
+  var surface = this.getWorldSurface(spacing.getColumnSpacing(),
+    spacing.getRowSpacing());
+  if (surface !== null) {
+    quant.surface = {value: surface / 100, unit: dwv.i18n('unit.cm2')};
+  }
+  // stats
+  var subBuffer = [];
+  var minJ = parseInt(this.getBegin().getY(), 10);
+  var maxJ = parseInt(this.getEnd().getY(), 10);
+  var minI = parseInt(this.getBegin().getX(), 10);
+  var maxI = parseInt(this.getEnd().getX(), 10);
+  for (var j = minJ; j < maxJ; ++j) {
+    for (var i = minI; i < maxI; ++i) {
+      subBuffer.push(image.getValue(i, j, 0));
+    }
+  }
+  var quantif = dwv.math.getStats(subBuffer);
+  quant.min = {value: quantif.getMin(), unit: ''};
+  quant.max = {value: quantif.getMax(), unit: ''};
+  quant.mean = {value: quantif.getMean(), unit: ''};
+  quant.stdDev = {value: quantif.getStdDev(), unit: ''};
+  // return
+  return quant;
+};

@@ -211,3 +211,22 @@ dwv.math.getPerpendicularLine = function (line, point, length) {
     new dwv.math.Point2D(beginX, beginY),
     new dwv.math.Point2D(endX, endY));
 };
+
+/**
+ * Quantify a line according to image information.
+ *
+ * @param {object} image The associated image.
+ * @returns {object} A quantification object.
+ */
+dwv.math.Line.prototype.quantify = function (image) {
+  var quant = {};
+  // length
+  var spacing = image.getGeometry().getSpacing();
+  var length = this.getWorldLength(spacing.getColumnSpacing(),
+    spacing.getRowSpacing());
+  if (length !== null) {
+    quant.length = {value: length, unit: dwv.i18n('unit.mm')};
+  }
+  // return
+  return quant;
+};

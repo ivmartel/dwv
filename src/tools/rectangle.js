@@ -58,7 +58,7 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
     name: 'shape'
   });
   // quantification
-  var quant = image.quantifyRect(rectangle);
+  var quant = rectangle.quantify(image);
   var ktext = new Konva.Text({
     fontSize: style.getScaledFontSize(),
     fontFamily: style.getFontFamily(),
@@ -160,7 +160,7 @@ dwv.tool.draw.UpdateRect = function (anchor, image) {
   var p2d1 = new dwv.math.Point2D(bottomRight.x(), bottomRight.y());
   var rect = new dwv.math.Rectangle(p2d0, p2d1);
   // update text
-  var quant = image.quantifyRect(rect);
+  var quant = rect.quantify(image);
   var ktext = klabel.getText();
   ktext.quant = quant;
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));

@@ -89,3 +89,22 @@ dwv.math.Ellipse.prototype.getSurface = function () {
 dwv.math.Ellipse.prototype.getWorldSurface = function (spacingX, spacingY) {
   return dwv.math.mulABC(this.getSurface(), spacingX, spacingY);
 };
+
+/**
+ * Quantify an ellipse according to image information.
+ *
+ * @param {object} image The associated image.
+ * @returns {object} A quantification object.
+ */
+dwv.math.Ellipse.prototype.quantify = function (image) {
+  var quant = {};
+  // surface
+  var spacing = image.getGeometry().getSpacing();
+  var surface = this.getWorldSurface(spacing.getColumnSpacing(),
+    spacing.getRowSpacing());
+  if (surface !== null) {
+    quant.surface = {value: surface / 100, unit: dwv.i18n('unit.cm2')};
+  }
+  // return
+  return quant;
+};

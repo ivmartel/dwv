@@ -60,7 +60,7 @@ dwv.tool.draw.EllipseFactory.prototype.create = function (
     name: 'shape'
   });
   // quantification
-  var quant = image.quantifyEllipse(ellipse);
+  var quant = ellipse.quantify(image);
   var ktext = new Konva.Text({
     fontSize: style.getScaledFontSize(),
     fontFamily: style.getFontFamily(),
@@ -161,7 +161,7 @@ dwv.tool.draw.UpdateEllipse = function (anchor, image) {
   // new ellipse
   var ellipse = new dwv.math.Ellipse(center, radiusAbs.x, radiusAbs.y);
   // update text
-  var quant = image.quantifyEllipse(ellipse);
+  var quant = ellipse.quantify(image);
   var ktext = klabel.getText();
   ktext.quant = quant;
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));

@@ -97,7 +97,7 @@ dwv.tool.draw.RulerFactory.prototype.create = function (points, style, image) {
   });
 
   // quantification
-  var quant = image.quantifyLine(line);
+  var quant = line.quantify(image);
   var ktext = new Konva.Text({
     fontSize: style.getScaledFontSize(),
     fontFamily: style.getFontFamily(),
@@ -208,7 +208,7 @@ dwv.tool.draw.UpdateRuler = function (anchor, image) {
     context.fillStrokeShape(this);
   });
   // update text
-  var quant = image.quantifyLine(line);
+  var quant = line.quantify(image);
   var ktext = klabel.getText();
   ktext.quant = quant;
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
