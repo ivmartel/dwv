@@ -29,14 +29,6 @@ dwv.math.mulABC = function (a, b, c) {
  */
 dwv.math.Ellipse = function (centre, a, b) {
   /**
-   * Circle surface.
-   *
-   * @private
-   * @type {number}
-   */
-  var surface = Math.PI * a * b;
-
-  /**
    * Get the centre (point) of the ellipse.
    *
    * @returns {object} The center (point) of the ellipse.
@@ -44,6 +36,7 @@ dwv.math.Ellipse = function (centre, a, b) {
   this.getCenter = function () {
     return centre;
   };
+
   /**
    * Get the radius of the ellipse on the horizontal axe.
    *
@@ -52,6 +45,7 @@ dwv.math.Ellipse = function (centre, a, b) {
   this.getA = function () {
     return a;
   };
+
   /**
    * Get the radius of the ellipse on the vertical axe.
    *
@@ -60,23 +54,38 @@ dwv.math.Ellipse = function (centre, a, b) {
   this.getB = function () {
     return b;
   };
-  /**
-   * Get the surface of the ellipse.
-   *
-   * @returns {number} The surface of the ellipse.
-   */
-  this.getSurface = function () {
-    return surface;
-  };
-  /**
-   * Get the surface of the ellipse according to a spacing.
-   *
-   * @param {number} spacingX The X spacing.
-   * @param {number} spacingY The Y spacing.
-   * @returns {number} The surface of the ellipse multiplied by the given
-   *  spacing or null for null spacings.
-   */
-  this.getWorldSurface = function (spacingX, spacingY) {
-    return dwv.math.mulABC(surface, spacingX, spacingY);
-  };
 }; // Ellipse class
+
+/**
+ * Check for equality.
+ *
+ * @param {object} rhs The object to compare to.
+ * @returns {boolean} True if both objects are equal.
+ */
+dwv.math.Ellipse.prototype.equals = function (rhs) {
+  return rhs !== null &&
+    this.getCenter().equals(rhs.getCenter()) &&
+    this.getA() === rhs.getA() &&
+    this.getB() === rhs.getB();
+};
+
+/**
+ * Get the surface of the ellipse.
+ *
+ * @returns {number} The surface of the ellipse.
+ */
+dwv.math.Ellipse.prototype.getSurface = function () {
+  return Math.PI * this.getA() * this.getB();
+};
+
+/**
+ * Get the surface of the ellipse according to a spacing.
+ *
+ * @param {number} spacingX The X spacing.
+ * @param {number} spacingY The Y spacing.
+ * @returns {number} The surface of the ellipse multiplied by the given
+ *  spacing or null for null spacings.
+ */
+dwv.math.Ellipse.prototype.getWorldSurface = function (spacingX, spacingY) {
+  return dwv.math.mulABC(this.getSurface(), spacingX, spacingY);
+};

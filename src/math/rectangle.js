@@ -39,15 +39,6 @@ dwv.math.Rectangle = function (begin, end) {
   }
 
   /**
-   * Rectangle surface.
-   *
-   * @private
-   * @type {number}
-   */
-  var surface = Math.abs(end.getX() - begin.getX()) *
-    Math.abs(end.getY() - begin.getY());
-
-  /**
    * Get the begin point of the rectangle.
    *
    * @returns {object} The begin point of the rectangle
@@ -55,6 +46,7 @@ dwv.math.Rectangle = function (begin, end) {
   this.getBegin = function () {
     return begin;
   };
+
   /**
    * Get the end point of the rectangle.
    *
@@ -63,55 +55,76 @@ dwv.math.Rectangle = function (begin, end) {
   this.getEnd = function () {
     return end;
   };
-  /**
-   * Get the real width of the rectangle.
-   *
-   * @returns {number} The real width of the rectangle.
-   */
-  this.getRealWidth = function () {
-    return end.getX() - begin.getX();
-  };
-  /**
-   * Get the real height of the rectangle.
-   *
-   * @returns {number} The real height of the rectangle.
-   */
-  this.getRealHeight = function () {
-    return end.getY() - begin.getY();
-  };
-  /**
-   * Get the width of the rectangle.
-   *
-   * @returns {number} The width of the rectangle.
-   */
-  this.getWidth = function () {
-    return Math.abs(this.getRealWidth());
-  };
-  /**
-   * Get the height of the rectangle.
-   *
-   * @returns {number} The height of the rectangle.
-   */
-  this.getHeight = function () {
-    return Math.abs(this.getRealHeight());
-  };
-  /**
-   * Get the surface of the rectangle.
-   *
-   * @returns {number} The surface of the rectangle.
-   */
-  this.getSurface = function () {
-    return surface;
-  };
-  /**
-   * Get the surface of the circle according to a spacing.
-   *
-   * @param {number} spacingX The X spacing.
-   * @param {number} spacingY The Y spacing.
-   * @returns {number} The surface of the rectangle multiplied by the given
-   *  spacing or null for null spacings.
-   */
-  this.getWorldSurface = function (spacingX, spacingY) {
-    return dwv.math.mulABC(surface, spacingX, spacingY);
-  };
 }; // Rectangle class
+
+/**
+ * Check for equality.
+ *
+ * @param {object} rhs The object to compare to.
+ * @returns {boolean} True if both objects are equal.
+ */
+dwv.math.Rectangle.prototype.equals = function (rhs) {
+  return rhs !== null &&
+    this.getBegin().equals(rhs.getBegin()) &&
+    this.getEnd().equals(rhs.getEnd());
+};
+
+/**
+ * Get the surface of the rectangle.
+ *
+ * @returns {number} The surface of the rectangle.
+ */
+dwv.math.Rectangle.prototype.getSurface = function () {
+  var begin = this.getBegin();
+  var end = this.getEnd();
+  return Math.abs(end.getX() - begin.getX()) *
+    Math.abs(end.getY() - begin.getY());
+};
+
+/**
+ * Get the surface of the circle according to a spacing.
+ *
+ * @param {number} spacingX The X spacing.
+ * @param {number} spacingY The Y spacing.
+ * @returns {number} The surface of the rectangle multiplied by the given
+ *  spacing or null for null spacings.
+ */
+dwv.math.Rectangle.prototype.getWorldSurface = function (spacingX, spacingY) {
+  return dwv.math.mulABC(this.getSurface(), spacingX, spacingY);
+};
+
+/**
+ * Get the real width of the rectangle.
+ *
+ * @returns {number} The real width of the rectangle.
+ */
+dwv.math.Rectangle.prototype.getRealWidth = function () {
+  return this.getEnd().getX() - this.getBegin().getX();
+};
+
+/**
+ * Get the real height of the rectangle.
+ *
+ * @returns {number} The real height of the rectangle.
+ */
+dwv.math.Rectangle.prototype.getRealHeight = function () {
+  return this.getEnd().getY() - this.getBegin().getY();
+};
+
+/**
+ * Get the width of the rectangle.
+ *
+ * @returns {number} The width of the rectangle.
+ */
+dwv.math.Rectangle.prototype.getWidth = function () {
+  return Math.abs(this.getRealWidth());
+};
+
+/**
+ * Get the height of the rectangle.
+ *
+ * @returns {number} The height of the rectangle.
+ */
+dwv.math.Rectangle.prototype.getHeight = function () {
+  return Math.abs(this.getRealHeight());
+};

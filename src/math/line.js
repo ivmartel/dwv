@@ -11,28 +11,6 @@ dwv.math = dwv.math || {};
  */
 dwv.math.Line = function (begin, end) {
   /**
-   * Line delta in the X direction.
-   *
-   * @private
-   * @type {number}
-   */
-  var dx = end.getX() - begin.getX();
-  /**
-   * Line delta in the Y direction.
-   *
-   * @private
-   * @type {number}
-   */
-  var dy = end.getY() - begin.getY();
-  /**
-   * Line length.
-   *
-   * @private
-   * @type {number}
-   */
-  var length = Math.sqrt(dx * dx + dy * dy);
-
-  /**
    * Get the begin point of the line.
    *
    * @returns {object} The beginning point of the line.
@@ -40,6 +18,7 @@ dwv.math.Line = function (begin, end) {
   this.getBegin = function () {
     return begin;
   };
+
   /**
    * Get the end point of the line.
    *
@@ -48,85 +27,112 @@ dwv.math.Line = function (begin, end) {
   this.getEnd = function () {
     return end;
   };
-  /**
-   * Get the line delta in the X direction.
-   *
-   * @returns {number} The delta in the X direction.
-   */
-  this.getDeltaX = function () {
-    return dx;
-  };
-  /**
-   * Get the line delta in the Y direction.
-   *
-   * @returns {number} The delta in the Y direction.
-   */
-  this.getDeltaY = function () {
-    return dy;
-  };
-  /**
-   * Get the length of the line.
-   *
-   * @returns {number} The length of the line.
-   */
-  this.getLength = function () {
-    return length;
-  };
-  /**
-   * Get the length of the line according to a  spacing.
-   *
-   * @param {number} spacingX The X spacing.
-   * @param {number} spacingY The Y spacing.
-   * @returns {number} The length of the line with spacing
-   *  or null for null spacings.
-   */
-  this.getWorldLength = function (spacingX, spacingY) {
-    var wlen = null;
-    if (spacingX !== null && spacingY !== null) {
-      var dxs = dx * spacingX;
-      var dys = dy * spacingY;
-      wlen = Math.sqrt(dxs * dxs + dys * dys);
-    }
-    return wlen;
-  };
-  /**
-   * Get the mid point of the line.
-   *
-   * @returns {object} The mid point of the line.
-   */
-  this.getMidpoint = function () {
-    return new dwv.math.Point2D(
-      parseInt((begin.getX() + end.getX()) / 2, 10),
-      parseInt((begin.getY() + end.getY()) / 2, 10));
-  };
-  /**
-   * Get the slope of the line.
-   *
-   * @returns {number} The slope of the line.
-   */
-  this.getSlope = function () {
-    return dy / dx;
-  };
-  /**
-   * Get the intercept of the line.
-   *
-   * @returns {number} The slope of the line.
-   */
-  this.getIntercept = function () {
-    return (end.getX() * begin.getY() - begin.getX() * end.getY()) / dx;
-  };
-  /**
-   * Get the inclination of the line.
-   *
-   * @returns {number} The inclination of the line.
-   */
-  this.getInclination = function () {
-    // tan(theta) = slope
-    var angle = Math.atan2(dy, dx) * 180 / Math.PI;
-    // shift?
-    return 180 - angle;
-  };
 }; // Line class
+
+/**
+ * Check for equality.
+ *
+ * @param {object} rhs The object to compare to.
+ * @returns {boolean} True if both objects are equal.
+ */
+dwv.math.Line.prototype.equals = function (rhs) {
+  return rhs !== null &&
+    this.getBegin().equals(rhs.getBegin()) &&
+    this.getEnd().equals(rhs.getEnd());
+};
+
+/**
+ * Get the line delta in the X direction.
+ *
+ * @returns {number} The delta in the X direction.
+ */
+dwv.math.Line.prototype.getDeltaX = function () {
+  return this.getEnd().getX() - this.getBegin().getX();
+};
+
+/**
+ * Get the line delta in the Y direction.
+ *
+ * @returns {number} The delta in the Y direction.
+ */
+dwv.math.Line.prototype.getDeltaY = function () {
+  return this.getEnd().getY() - this.getBegin().getY();
+};
+
+/**
+ * Get the length of the line.
+ *
+ * @returns {number} The length of the line.
+ */
+dwv.math.Line.prototype.getLength = function () {
+  return Math.sqrt(
+    this.getDeltaX() * this.getDeltaX() +
+    this.getDeltaY() * this.getDeltaY()
+  );
+};
+
+/**
+ * Get the length of the line according to a  spacing.
+ *
+ * @param {number} spacingX The X spacing.
+ * @param {number} spacingY The Y spacing.
+ * @returns {number} The length of the line with spacing
+ *  or null for null spacings.
+ */
+dwv.math.Line.prototype.getWorldLength = function (spacingX, spacingY) {
+  var wlen = null;
+  if (spacingX !== null && spacingY !== null) {
+    var dxs = this.getDeltaX() * spacingX;
+    var dys = this.getDeltaY() * spacingY;
+    wlen = Math.sqrt(dxs * dxs + dys * dys);
+  }
+  return wlen;
+};
+
+/**
+ * Get the mid point of the line.
+ *
+ * @returns {object} The mid point of the line.
+ */
+dwv.math.Line.prototype.getMidpoint = function () {
+  return new dwv.math.Point2D(
+    parseInt((this.getBegin().getX() + this.getEnd().getX()) / 2, 10),
+    parseInt((this.getBegin().getY() + this.getEnd().getY()) / 2, 10)
+  );
+};
+
+/**
+ * Get the slope of the line.
+ *
+ * @returns {number} The slope of the line.
+ */
+dwv.math.Line.prototype.getSlope = function () {
+  return this.getDeltaY() / this.getDeltaX();
+};
+
+/**
+ * Get the intercept of the line.
+ *
+ * @returns {number} The slope of the line.
+ */
+dwv.math.Line.prototype.getIntercept = function () {
+  return (
+    this.getEnd().getX() * this.getBegin().getY() -
+    this.getBegin().getX() * this.getEnd().getY()
+  ) / this.getDeltaX();
+};
+
+/**
+ * Get the inclination of the line.
+ *
+ * @returns {number} The inclination of the line.
+ */
+dwv.math.Line.prototype.getInclination = function () {
+  // tan(theta) = slope
+  var angle = Math.atan2(this.getDeltaY(), this.getDeltaX()) * 180 / Math.PI;
+  // shift?
+  return 180 - angle;
+};
 
 /**
  * Get the angle between two lines in degree.
