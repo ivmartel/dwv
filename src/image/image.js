@@ -500,6 +500,40 @@ dwv.image.Image.prototype.getRescaledValue = function (i, j, k, f) {
 };
 
 /**
+ * Get the rescaled value of the image at a specific offset.
+ *
+ * @param {number} offset The desired offset.
+ * @param {number} k The Z index.
+ * @param {number} f The frame number.
+ * @returns {number} The rescaled value at the desired offset.
+ * Warning: No size check...
+ */
+dwv.image.Image.prototype.getRescaledValueAtOffset = function (offset, k, f) {
+  var frame = (f || 0);
+  var val = this.getValueAtOffset(offset, frame);
+  if (!this.isIdentityRSI()) {
+    val = this.getRescaleSlopeAndIntercept(k).apply(val);
+  }
+  return val;
+};
+
+/**
+ * Get a list of values for a given iterator.
+ *
+ * @param {object} iterator The iterator to use to loop through data.
+ * @returns {Array} The list of values.
+ */
+dwv.image.Image.prototype.getValues = function (iterator) {
+  var values = [];
+  var ival = iterator.next();
+  while (!ival.done) {
+    values.push(ival.value);
+    ival = iterator.next();
+  }
+  return values;
+};
+
+/**
  * Get a slice index iterator.
  *
  * @param {number} slice The index of the slice.
@@ -531,6 +565,66 @@ dwv.image.Image.prototype.getSliceIterator = function (slice, frame) {
   }
 
   return range;
+};
+
+/**
+ * Get a slice index iterator for a rectangular region.
+ *
+ * @param {number} slice The index of the slice.
+ * @param {number} frame The frame index.
+ * @param {boolean} isRescaled Flag for rescaled values (default false).
+ * @param {dwv.math.Point2D} min The minimum position (optional).
+ * @param {dwv.math.Point2D} max The maximum position (optional).
+ * @returns {object} The slice iterator.
+ */
+dwv.image.Image.prototype.getRegionSliceIterator = function (
+  slice, frame, isRescaled, min, max) {
+  if (this.getNumberOfComponents() !== 1) {
+    throw new Error('Unsupported number of components for region iterator: ' +
+      this.getNumberOfComponents());
+  }
+
+  if (typeof isRescaled === 'undefined') {
+    isRescaled = false;
+  }
+  var size = this.getGeometry().getSize();
+  if (typeof min === 'undefined') {
+    min = new dwv.math.Point2D(0, 0);
+  }
+  if (typeof max === 'undefined') {
+    max = new dwv.math.Point2D(
+      size.getNumberOfColumns() - 1,
+      size.getNumberOfRows() - 1
+    );
+  }
+  var sliceSize = size.getSliceSize();
+  var startOffset = min.getX() +
+    min.getY() * size.getNumberOfColumns() +
+    slice * sliceSize;
+  var endOffset = max.getX() +
+    max.getY() * size.getNumberOfColumns() +
+    slice * sliceSize;
+
+  var image = this;
+  var dataAccessor = null;
+
+  if (isRescaled) {
+    dataAccessor = function (offset) {
+      return image.getRescaledValueAtOffset(offset, slice, frame);
+    };
+  } else {
+    dataAccessor = function (offset) {
+      return image.getValueAtOffset(offset, frame);
+    };
+  }
+
+  // minimum 1 column
+  var rangeNumberOfColumns = Math.max(1, max.getX() - min.getX());
+  var rowIncrement = size.getNumberOfColumns() - rangeNumberOfColumns;
+
+  return dwv.image.rangeRegion(
+    dataAccessor, startOffset, endOffset + 1,
+    1, rangeNumberOfColumns, rowIncrement);
 };
 
 /**

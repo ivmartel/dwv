@@ -39,10 +39,11 @@ dwv.tool.draw.RulerFactory = function () {
  *
  * @param {Array} points The points from which to extract the line.
  * @param {object} style The drawing style.
- * @param {object} image The associated image.
+ * @param {object} viewController The associated view controller.
  * @returns {object} The Konva group.
  */
-dwv.tool.draw.RulerFactory.prototype.create = function (points, style, image) {
+dwv.tool.draw.RulerFactory.prototype.create = function (
+  points, style, viewController) {
   // physical shape
   var line = new dwv.math.Line(points[0], points[1]);
   // draw shape
@@ -97,7 +98,7 @@ dwv.tool.draw.RulerFactory.prototype.create = function (points, style, image) {
   });
 
   // quantification
-  var quant = line.quantify(image);
+  var quant = line.quantify(viewController);
   var ktext = new Konva.Text({
     fontSize: style.getScaledFontSize(),
     fontFamily: style.getFontFamily(),
@@ -134,9 +135,9 @@ dwv.tool.draw.RulerFactory.prototype.create = function (points, style, image) {
  * Update a ruler shape.
  *
  * @param {object} anchor The active anchor.
- * @param {object} image The associated image.
+ * @param {object} viewController The associated view controller.
  */
-dwv.tool.draw.UpdateRuler = function (anchor, image) {
+dwv.tool.draw.UpdateRuler = function (anchor, viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape
@@ -208,7 +209,7 @@ dwv.tool.draw.UpdateRuler = function (anchor, image) {
     context.fillStrokeShape(this);
   });
   // update text
-  var quant = line.quantify(image);
+  var quant = line.quantify(viewController);
   var ktext = klabel.getText();
   ktext.quant = quant;
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));

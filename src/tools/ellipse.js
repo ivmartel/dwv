@@ -39,11 +39,11 @@ dwv.tool.draw.EllipseFactory = function () {
  *
  * @param {Array} points The points from which to extract the ellipse.
  * @param {object} style The drawing style.
- * @param {object} image The associated image.
+ * @param {object} viewController The associated view controller.
  * @returns {object} The Konva group.
  */
 dwv.tool.draw.EllipseFactory.prototype.create = function (
-  points, style, image) {
+  points, style, viewController) {
   // calculate radius
   var a = Math.abs(points[0].getX() - points[1].getX());
   var b = Math.abs(points[0].getY() - points[1].getY());
@@ -60,7 +60,7 @@ dwv.tool.draw.EllipseFactory.prototype.create = function (
     name: 'shape'
   });
   // quantification
-  var quant = ellipse.quantify(image);
+  var quant = ellipse.quantify(viewController);
   var ktext = new Konva.Text({
     fontSize: style.getScaledFontSize(),
     fontFamily: style.getFontFamily(),
@@ -93,9 +93,9 @@ dwv.tool.draw.EllipseFactory.prototype.create = function (
  * Update an ellipse shape.
  *
  * @param {object} anchor The active anchor.
- * @param {object} image The associated image.
+ * @param {object} viewController The associated view controller.
  */
-dwv.tool.draw.UpdateEllipse = function (anchor, image) {
+dwv.tool.draw.UpdateEllipse = function (anchor, viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape
@@ -161,7 +161,7 @@ dwv.tool.draw.UpdateEllipse = function (anchor, image) {
   // new ellipse
   var ellipse = new dwv.math.Ellipse(center, radiusAbs.x, radiusAbs.y);
   // update text
-  var quant = ellipse.quantify(image);
+  var quant = ellipse.quantify(viewController);
   var ktext = klabel.getText();
   ktext.quant = quant;
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));

@@ -81,17 +81,16 @@ dwv.math.Circle.prototype.getWorldSurface = function (spacingX, spacingY) {
 };
 
 /**
- * Quantify an circle according to image information.
+ * Quantify an circle according to view information.
  *
- * @param {object} image The associated image.
+ * @param {object} viewController The associated view controller.
  * @returns {object} A quantification object.
  */
-dwv.math.Circle.prototype.quantify = function (image) {
+dwv.math.Circle.prototype.quantify = function (viewController) {
   var quant = {};
   // surface
-  var spacing = image.getGeometry().getSpacing();
-  var surface = this.getWorldSurface(spacing.getColumnSpacing(),
-    spacing.getRowSpacing());
+  var spacing = viewController.get2DSpacing();
+  var surface = this.getWorldSurface(spacing[0], spacing[1]);
   if (surface !== null) {
     quant.surface = {value: surface / 100, unit: dwv.i18n('unit.cm2')};
   }

@@ -62,6 +62,18 @@ dwv.math.Point2D.prototype.getDistance = function (point2D) {
 };
 
 /**
+ * Round a Point2D.
+ *
+ * @returns {dwv.math.Point2D} The rounded point.
+ */
+dwv.math.Point2D.prototype.getRound = function () {
+  return new dwv.math.Point2D(
+    Math.round(this.getX()),
+    Math.round(this.getY())
+  );
+};
+
+/**
  * Mutable 2D point.
  *
  * @class

@@ -91,17 +91,16 @@ dwv.math.Ellipse.prototype.getWorldSurface = function (spacingX, spacingY) {
 };
 
 /**
- * Quantify an ellipse according to image information.
+ * Quantify an ellipse according to view information.
  *
- * @param {object} image The associated image.
+ * @param {object} viewController The associated view controller.
  * @returns {object} A quantification object.
  */
-dwv.math.Ellipse.prototype.quantify = function (image) {
+dwv.math.Ellipse.prototype.quantify = function (viewController) {
   var quant = {};
   // surface
-  var spacing = image.getGeometry().getSpacing();
-  var surface = this.getWorldSurface(spacing.getColumnSpacing(),
-    spacing.getRowSpacing());
+  var spacing = viewController.get2DSpacing();
+  var surface = this.getWorldSurface(spacing[0], spacing[1]);
   if (surface !== null) {
     quant.surface = {value: surface / 100, unit: dwv.i18n('unit.cm2')};
   }

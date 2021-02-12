@@ -24,12 +24,12 @@ dwv.tool.ShapeEditor = function (app) {
    */
   var shape = null;
   /**
-   * Edited image. Used for quantification update.
+   * Edited view controller. Used for quantification update.
    *
    * @private
    * @type {object}
    */
-  var image = null;
+  var viewController = null;
   /**
    * Active flag.
    *
@@ -69,10 +69,10 @@ dwv.tool.ShapeEditor = function (app) {
   /**
    * Set the associated image.
    *
-   * @param {object} img The associated image.
+   * @param {object} vc The associated view controller.
    */
-  this.setImage = function (img) {
-    image = img;
+  this.setViewController = function (vc) {
+    viewController = vc;
   };
 
   /**
@@ -356,7 +356,7 @@ dwv.tool.ShapeEditor = function (app) {
     anchor.on('dragmove.edit', function (evt) {
       // update shape
       if (updateFunction) {
-        updateFunction(this, image);
+        updateFunction(this, viewController);
       } else {
         dwv.logger.warn('No update function!');
       }
@@ -379,7 +379,7 @@ dwv.tool.ShapeEditor = function (app) {
         startAnchor,
         endAnchor,
         this.getLayer(),
-        image
+        viewController
       );
       chgcmd.onExecute = drawEventCallback;
       chgcmd.onUndo = drawEventCallback;

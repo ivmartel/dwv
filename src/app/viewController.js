@@ -69,6 +69,42 @@ dwv.ViewController = function (view) {
   };
 
   /**
+   * Get the current spacing.
+   *
+   * @returns {Array} The 2D spacing.
+   */
+  this.get2DSpacing = function () {
+    var spacing = view.getImage().getGeometry().getSpacing();
+    return [spacing.getColumnSpacing(), spacing.getRowSpacing()];
+  };
+
+  /**
+   * Get some values from the associated image.
+   *
+   * @param {dwv.math.Point2D} min Minimum point.
+   * @param {dwv.math.Point2D} max Maximum point.
+   * @returns {Array} A list of values.
+   */
+  this.getImageValues = function (min, max) {
+    var image = view.getImage();
+    var iter = image.getRegionSliceIterator(
+      this.getCurrentPosition().k,
+      this.getCurrentFrame(),
+      true, min, max
+    );
+    return image.getValues(iter);
+  };
+
+  /**
+   * Can the image values be quantified?
+   *
+   * @returns {boolean} True if possible.
+   */
+  this.canQuantifyImage = function () {
+    return view.getImage().getNumberOfComponents() === 1;
+  };
+
+  /**
    * Set the current position.
    *
    * @param {object} pos The position.

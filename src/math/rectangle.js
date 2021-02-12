@@ -130,36 +130,36 @@ dwv.math.Rectangle.prototype.getHeight = function () {
 };
 
 /**
- * Quantify a rectangle according to image information.
+ * Quantify a rectangle according to view information.
  *
- * @param {object} image The associated image.
+ * @param {object} viewController The associated view controller.
  * @returns {object} A quantification object.
  */
-dwv.math.Rectangle.prototype.quantify = function (image) {
+dwv.math.Rectangle.prototype.quantify = function (viewController) {
   var quant = {};
   // surface
-  var spacing = image.getGeometry().getSpacing();
-  var surface = this.getWorldSurface(spacing.getColumnSpacing(),
-    spacing.getRowSpacing());
+  var spacing = viewController.get2DSpacing();
+  var surface = this.getWorldSurface(spacing[0], spacing[1]);
   if (surface !== null) {
     quant.surface = {value: surface / 100, unit: dwv.i18n('unit.cm2')};
   }
-  // stats
-  var subBuffer = [];
-  var minJ = parseInt(this.getBegin().getY(), 10);
-  var maxJ = parseInt(this.getEnd().getY(), 10);
-  var minI = parseInt(this.getBegin().getX(), 10);
-  var maxI = parseInt(this.getEnd().getX(), 10);
-  for (var j = minJ; j < maxJ; ++j) {
-    for (var i = minI; i < maxI; ++i) {
-      subBuffer.push(image.getValue(i, j, 0));
-    }
+
+  if (viewController.canQuantifyImage()) {
+    // position to pixel for max: extra X is ok, remove extra Y
+    var roundEnd = this.getEnd().getRound();
+    var max = new dwv.math.Point2D(
+      roundEnd.getX(),
+      Math.max(0, roundEnd.getY() - 1)
+    );
+    var subBuffer = viewController.getImageValues(
+      this.getBegin().getRound(), max);
+    var quantif = dwv.math.getStats(subBuffer);
+    quant.min = {value: quantif.getMin(), unit: ''};
+    quant.max = {value: quantif.getMax(), unit: ''};
+    quant.mean = {value: quantif.getMean(), unit: ''};
+    quant.stdDev = {value: quantif.getStdDev(), unit: ''};
   }
-  var quantif = dwv.math.getStats(subBuffer);
-  quant.min = {value: quantif.getMin(), unit: ''};
-  quant.max = {value: quantif.getMax(), unit: ''};
-  quant.mean = {value: quantif.getMean(), unit: ''};
-  quant.stdDev = {value: quantif.getStdDev(), unit: ''};
+
   // return
   return quant;
 };

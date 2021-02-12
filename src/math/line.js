@@ -213,17 +213,16 @@ dwv.math.getPerpendicularLine = function (line, point, length) {
 };
 
 /**
- * Quantify a line according to image information.
+ * Quantify a line according to view information.
  *
- * @param {object} image The associated image.
+ * @param {object} viewController The associated view controller.
  * @returns {object} A quantification object.
  */
-dwv.math.Line.prototype.quantify = function (image) {
+dwv.math.Line.prototype.quantify = function (viewController) {
   var quant = {};
   // length
-  var spacing = image.getGeometry().getSpacing();
-  var length = this.getWorldLength(spacing.getColumnSpacing(),
-    spacing.getRowSpacing());
+  var spacing = viewController.get2DSpacing();
+  var length = this.getWorldLength(spacing[0], spacing[1]);
   if (length !== null) {
     quant.length = {value: length, unit: dwv.i18n('unit.mm')};
   }

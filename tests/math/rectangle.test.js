@@ -43,3 +43,43 @@ QUnit.test('Test Rectangle.', function (assert) {
   // getWorldSurface
   assert.equal(r00.getWorldSurface(0.5, 0.5), 4, 'getWorldSurface');
 });
+
+/**
+ * Tests for {@link dwv.math.Rectangle}.
+ *
+ * @function module:tests/math~Rectangle
+ */
+QUnit.test('Test Rectangle quantify.', function (assert) {
+  var p00 = new dwv.math.Point2D(0, 0);
+  var p01 = new dwv.math.Point2D(4, 4);
+  var r00 = new dwv.math.Rectangle(p00, p01);
+  // view controller
+  var mockVc0 = {
+    canQuantifyImage: function () {
+      return true;
+    },
+    get2DSpacing: function () {
+      return [1, 1];
+    },
+    getCurrentPosition: function () {
+      return {k: 0};
+    },
+    getImageValues: function () {
+      return [0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0];
+    }
+  };
+  var theoQuant0 = {
+    min: {value: 0, unit: ''},
+    max: {value: 1, unit: ''},
+    mean: {value: 0.25, unit: ''},
+    stdDev: {value: 0.4330127018922193, unit: ''},
+    surface: {value: 0.16, unit: undefined}
+  };
+  var resQuant0 = r00.quantify(mockVc0);
+  assert.equal(resQuant0.min.value, theoQuant0.min.value, 'quant min');
+  assert.equal(resQuant0.max.value, theoQuant0.max.value, 'quant max');
+  assert.equal(resQuant0.mean.value, theoQuant0.mean.value, 'quant mean');
+  assert.equal(resQuant0.stdDev.value, theoQuant0.stdDev.value, 'quant stdDev');
+  assert.equal(
+    resQuant0.surface.value, theoQuant0.surface.value, 'quant surface');
+});
