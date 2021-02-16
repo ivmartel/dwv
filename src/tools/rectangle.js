@@ -39,11 +39,11 @@ dwv.tool.draw.RectangleFactory = function () {
  *
  * @param {Array} points The points from which to extract the rectangle.
  * @param {object} style The drawing style.
- * @param {object} image The associated image.
+ * @param {object} viewController The associated view controller.
  * @returns {object} The Konva group.
  */
 dwv.tool.draw.RectangleFactory.prototype.create = function (
-  points, style, image) {
+  points, style, viewController) {
   // physical shape
   var rectangle = new dwv.math.Rectangle(points[0], points[1]);
   // draw shape
@@ -58,7 +58,7 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
     name: 'shape'
   });
   // quantification
-  var quant = image.quantifyRect(rectangle);
+  var quant = rectangle.quantify(viewController);
   var ktext = new Konva.Text({
     fontSize: style.getScaledFontSize(),
     fontFamily: style.getFontFamily(),
@@ -92,9 +92,9 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
  * Update a rectangle shape.
  *
  * @param {object} anchor The active anchor.
- * @param {object} image The associated image.
+ * @param {object} viewController The associated view controller.
  */
-dwv.tool.draw.UpdateRect = function (anchor, image) {
+dwv.tool.draw.UpdateRect = function (anchor, viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape
@@ -155,12 +155,19 @@ dwv.tool.draw.UpdateRect = function (anchor, image) {
   if (width && height) {
     krect.size({width: width, height: height});
   }
+  // positions: add possible group offset
+  var p2d0 = new dwv.math.Point2D(
+    group.x() + topLeft.x(),
+    group.y() + topLeft.y()
+  );
+  var p2d1 = new dwv.math.Point2D(
+    group.x() + bottomRight.x(),
+    group.y() + bottomRight.y()
+  );
   // new rect
-  var p2d0 = new dwv.math.Point2D(topLeft.x(), topLeft.y());
-  var p2d1 = new dwv.math.Point2D(bottomRight.x(), bottomRight.y());
   var rect = new dwv.math.Rectangle(p2d0, p2d1);
   // update text
-  var quant = image.quantifyRect(rect);
+  var quant = rect.quantify(viewController);
   var ktext = klabel.getText();
   ktext.quant = quant;
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));

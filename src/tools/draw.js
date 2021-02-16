@@ -187,14 +187,14 @@ dwv.tool.Draw = function (app) {
       if (selectedShape && selectedShape !== shapeEditor.getShape()) {
         shapeEditor.disable();
         shapeEditor.setShape(selectedShape);
-        shapeEditor.setImage(app.getImage());
+        shapeEditor.setViewController(app.getViewController());
         shapeEditor.enable();
       }
     } else {
       // disable edition
       shapeEditor.disable();
       shapeEditor.setShape(null);
-      shapeEditor.setImage(null);
+      shapeEditor.setViewController(null);
       // start storing points
       started = true;
       // set factory
@@ -403,7 +403,7 @@ dwv.tool.Draw = function (app) {
     }
     // create shape group
     tmpShapeGroup = currentFactory.create(
-      tmpPoints, self.style, app.getImage());
+      tmpPoints, self.style, app.getViewController());
     // do not listen during creation
     var shape = tmpShapeGroup.getChildren(dwv.draw.isNodeNameShape)[0];
     shape.listening(false);
@@ -425,7 +425,7 @@ dwv.tool.Draw = function (app) {
     }
     // create final shape
     var finalShapeGroup = currentFactory.create(
-      finalPoints, self.style, app.getImage());
+      finalPoints, self.style, app.getViewController());
     finalShapeGroup.id(dwv.math.guid());
 
     // get the position group
@@ -458,7 +458,7 @@ dwv.tool.Draw = function (app) {
     // reset shape display properties
     shapeEditor.disable();
     shapeEditor.setShape(null);
-    shapeEditor.setImage(null);
+    shapeEditor.setViewController(null);
     document.body.style.cursor = 'default';
     // make layer listen or not to events
     app.getDrawStage().listening(flag);
@@ -644,7 +644,7 @@ dwv.tool.Draw = function (app) {
         // disable editor
         shapeEditor.disable();
         shapeEditor.setShape(null);
-        shapeEditor.setImage(null);
+        shapeEditor.setViewController(null);
         // reset colour
         shapeGroup.getChildren(dwv.draw.canNodeChangeColour).forEach(
           function (ashape) {

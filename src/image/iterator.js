@@ -37,6 +37,46 @@ dwv.image.range = function (dataAccessor, start, end, increment) {
 };
 
 /**
+ * Get an iterator for a given range with bounds (for a one component data).
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
+ * @param {Function} dataAccessor Function to access data.
+ * @param {number} start The start of the range (included).
+ * @param {number} end The end of the range (excluded).
+ * @param {number} increment The increment between indicies.
+ * @param {number} regionSize The size of the region to iterate through.
+ * @param {number} regionOffset The offset between regions.
+ * @returns {object} An iterator folowing the iterator and iterable protocol.
+ */
+dwv.image.rangeRegion = function (
+  dataAccessor, start, end, increment, regionSize, regionOffset) {
+  var nextIndex = start;
+  var regionElementCount = 0;
+  // result
+  return {
+    next: function () {
+      if (nextIndex < end) {
+        var result = {
+          value: dataAccessor(nextIndex),
+          done: false
+        };
+        regionElementCount += 1;
+        nextIndex += increment;
+        if (regionElementCount === regionSize) {
+          regionElementCount = 0;
+          nextIndex += regionOffset;
+        }
+        return result;
+      }
+      return {
+        done: true,
+        index: end
+      };
+    }
+  };
+};
+
+/**
  * Get an iterator for a given range for a 3 components data.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
