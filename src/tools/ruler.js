@@ -11,6 +11,11 @@ dwv.tool.draw = dwv.tool.draw || {};
 var Konva = Konva || {};
 
 /**
+ * Default draw label text.
+ */
+dwv.tool.draw.defaultRulerLabelText = '{length}';
+
+/**
  * Ruler factory.
  *
  * @class
@@ -105,7 +110,11 @@ dwv.tool.draw.RulerFactory.prototype.create = function (
     fill: style.getLineColour(),
     name: 'text'
   });
-  ktext.textExpr = '{length}';
+  if (typeof dwv.tool.draw.rulerLabelText !== 'undefined') {
+    ktext.textExpr = dwv.tool.draw.rulerLabelText;
+  } else {
+    ktext.textExpr = dwv.tool.draw.defaultRulerLabelText;
+  }
   ktext.longText = '';
   ktext.quant = quant;
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));

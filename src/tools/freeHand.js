@@ -11,6 +11,11 @@ dwv.tool.draw = dwv.tool.draw || {};
 var Konva = Konva || {};
 
 /**
+ * Default draw label text.
+ */
+dwv.tool.draw.defaultFreeHandLabelText = '';
+
+/**
  * FreeHand factory.
  *
  * @class
@@ -67,7 +72,11 @@ dwv.tool.draw.FreeHandFactory.prototype.create = function (
     fill: style.getLineColour(),
     name: 'text'
   });
-  ktext.textExpr = '';
+  if (typeof dwv.tool.draw.freeHandLabelText !== 'undefined') {
+    ktext.textExpr = dwv.tool.draw.freeHandLabelText;
+  } else {
+    ktext.textExpr = dwv.tool.draw.defaultFreeHandLabelText;
+  }
   ktext.longText = '';
   ktext.quant = null;
   ktext.setText(ktext.textExpr);

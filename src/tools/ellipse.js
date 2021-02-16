@@ -11,6 +11,11 @@ dwv.tool.draw = dwv.tool.draw || {};
 var Konva = Konva || {};
 
 /**
+ * Default draw label text.
+ */
+dwv.tool.draw.defaultEllipseLabelText = '{surface}';
+
+/**
  * Ellipse factory.
  *
  * @class
@@ -67,7 +72,11 @@ dwv.tool.draw.EllipseFactory.prototype.create = function (
     fill: style.getLineColour(),
     name: 'text'
   });
-  ktext.textExpr = '{surface}';
+  if (typeof dwv.tool.draw.ellipseLabelText !== 'undefined') {
+    ktext.textExpr = dwv.tool.draw.ellipseLabelText;
+  } else {
+    ktext.textExpr = dwv.tool.draw.defaultEllipseLabelText;
+  }
   ktext.longText = '';
   ktext.quant = quant;
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));

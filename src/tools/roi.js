@@ -11,6 +11,11 @@ dwv.tool.draw = dwv.tool.draw || {};
 var Konva = Konva || {};
 
 /**
+ * Default draw label text.
+ */
+dwv.tool.draw.defaultRoiLabelText = '';
+
+/**
  * ROI factory.
  *
  * @class
@@ -71,7 +76,11 @@ dwv.tool.draw.RoiFactory.prototype.create = function (
     fill: style.getLineColour(),
     name: 'text'
   });
-  ktext.textExpr = '';
+  if (typeof dwv.tool.draw.roiLabelText !== 'undefined') {
+    ktext.textExpr = dwv.tool.draw.roiLabelText;
+  } else {
+    ktext.textExpr = dwv.tool.draw.defaultRoiLabelText;
+  }
   ktext.longText = '';
   ktext.quant = null;
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));

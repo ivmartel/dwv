@@ -11,6 +11,11 @@ dwv.tool.draw = dwv.tool.draw || {};
 var Konva = Konva || {};
 
 /**
+ * Default draw label text.
+ */
+dwv.tool.draw.defaultRectangleLabelText = '{surface}';
+
+/**
  * Rectangle factory.
  *
  * @class
@@ -65,7 +70,11 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
     fill: style.getLineColour(),
     name: 'text'
   });
-  ktext.textExpr = '{surface}';
+  if (typeof dwv.tool.draw.rectangleLabelText !== 'undefined') {
+    ktext.textExpr = dwv.tool.draw.rectangleLabelText;
+  } else {
+    ktext.textExpr = dwv.tool.draw.defaultRectangleLabelText;
+  }
   ktext.longText = '';
   ktext.quant = quant;
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));

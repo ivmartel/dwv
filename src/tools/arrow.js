@@ -13,6 +13,11 @@ dwv.tool.draw = dwv.tool.draw || {};
 var Konva = Konva || {};
 
 /**
+ * Default draw label text.
+ */
+dwv.tool.draw.defaultArrowLabelText = '';
+
+/**
  * Arrow factory.
  *
  * @class
@@ -90,14 +95,18 @@ dwv.tool.draw.ArrowFactory.prototype.create = function (
     strokeScaleEnabled: false,
     name: 'shape-triangle'
   });
-    // quantification
+  // quantification
   var ktext = new Konva.Text({
     fontSize: style.getScaledFontSize(),
     fontFamily: style.getFontFamily(),
     fill: style.getLineColour(),
     name: 'text'
   });
-  ktext.textExpr = '';
+  if (typeof dwv.tool.draw.arrowLabelText !== 'undefined') {
+    ktext.textExpr = dwv.tool.draw.arrowLabelText;
+  } else {
+    ktext.textExpr = dwv.tool.draw.defaultArrowLabelText;
+  }
   ktext.longText = '';
   ktext.quant = null;
   ktext.setText(ktext.textExpr);

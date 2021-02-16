@@ -11,6 +11,11 @@ dwv.tool.draw = dwv.tool.draw || {};
 var Konva = Konva || {};
 
 /**
+ * Default draw label text.
+ */
+dwv.tool.draw.defaultProtractorLabelText = '{angle}';
+
+/**
  * Protractor factory.
  *
  * @class
@@ -97,7 +102,11 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
       fill: style.getLineColour(),
       name: 'text'
     });
-    ktext.textExpr = '{angle}';
+    if (typeof dwv.tool.draw.protractorLabelText !== 'undefined') {
+      ktext.textExpr = dwv.tool.draw.protractorLabelText;
+    } else {
+      ktext.textExpr = dwv.tool.draw.defaultProtractorLabelText;
+    }
     ktext.longText = '';
     ktext.quant = quant;
     ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
