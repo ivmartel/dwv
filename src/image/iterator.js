@@ -44,15 +44,14 @@ dwv.image.range = function (dataAccessor, start, end, increment) {
  * @param {number} start The start of the range (included).
  * @param {number} end The end of the range (excluded).
  * @param {number} increment The increment between indicies.
- * @param {number} numberOfColumns The number of columns to iterate through.
- * @param {number} rowIncrement The increment from the end of a line to the
- *   start of another.
+ * @param {number} regionSize The size of the region to iterate through.
+ * @param {number} regionOffset The offset between regions.
  * @returns {object} An iterator folowing the iterator and iterable protocol.
  */
 dwv.image.rangeRegion = function (
-  dataAccessor, start, end, increment, numberOfColumns, rowIncrement) {
+  dataAccessor, start, end, increment, regionSize, regionOffset) {
   var nextIndex = start;
-  var countColumn = 0;
+  var regionElementCount = 0;
   // result
   return {
     next: function () {
@@ -61,11 +60,11 @@ dwv.image.rangeRegion = function (
           value: dataAccessor(nextIndex),
           done: false
         };
-        countColumn += 1;
+        regionElementCount += 1;
         nextIndex += increment;
-        if (countColumn === numberOfColumns) {
-          countColumn = 0;
-          nextIndex += rowIncrement;
+        if (regionElementCount === regionSize) {
+          regionElementCount = 0;
+          nextIndex += regionOffset;
         }
         return result;
       }
