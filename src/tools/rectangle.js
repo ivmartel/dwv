@@ -65,7 +65,7 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
     fill: style.getLineColour(),
     name: 'text'
   });
-  ktext.textExpr = '{min}, {max}, {mean}';
+  ktext.textExpr = '{surface}';
   ktext.longText = '';
   ktext.quant = quant;
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
