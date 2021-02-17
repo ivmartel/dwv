@@ -11,11 +11,6 @@ dwv.tool.draw = dwv.tool.draw || {};
 var Konva = Konva || {};
 
 /**
- * Debug flag.
- */
-dwv.tool.draw.debug = false;
-
-/**
  * Default draw label text.
  */
 dwv.tool.draw.defaultRectangleLabelText = '{surface}';
@@ -67,26 +62,6 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
     strokeScaleEnabled: false,
     name: 'shape'
   });
-
-  // debug shadow based on round (used in quantification)
-  var kshadow;
-  if (dwv.tool.draw.debug) {
-    var round = rectangle.getRound();
-    var rWidth = round.max.getX() - round.min.getX();
-    var rHeight = round.max.getY() - round.min.getY();
-    kshadow = new Konva.Rect({
-      x: round.min.getX(),
-      y: round.min.getY(),
-      width: rWidth,
-      height: rHeight,
-      fill: 'grey',
-      strokeWidth: 0,
-      strokeScaleEnabled: false,
-      opacity: 0.3,
-      name: 'shadow'
-    });
-  }
-
   // quantification
   var quant = rectangle.quantify(viewController);
   var ktext = new Konva.Text({
@@ -113,14 +88,20 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
   klabel.add(ktext);
   klabel.add(new Konva.Tag());
 
+  // debug shadow
+  var kshadow;
+  if (dwv.tool.draw.debug) {
+    kshadow = dwv.tool.draw.getShadowRectangle(rectangle);
+  }
+
   // return group
   var group = new Konva.Group();
   group.name('rectangle-group');
-  group.add(kshape);
-  group.add(klabel);
   if (kshadow) {
     group.add(kshadow);
   }
+  group.add(kshape);
+  group.add(klabel);
   group.visible(true); // dont inherit
   return group;
 };
@@ -235,4 +216,27 @@ dwv.tool.draw.UpdateRect = function (anchor, viewController) {
     y: rect.getEnd().getY() + 10
   };
   klabel.position(textPos);
+};
+
+/**
+ * Get the debug shadow.
+ *
+ * @param {object} rectangle The rectangle to shadow.
+ * @returns {object} The shadow konva shape.
+ */
+dwv.tool.draw.getShadowRectangle = function (rectangle) {
+  var round = rectangle.getRound();
+  var rWidth = round.max.getX() - round.min.getX();
+  var rHeight = round.max.getY() - round.min.getY();
+  return new Konva.Rect({
+    x: round.min.getX(),
+    y: round.min.getY(),
+    width: rWidth,
+    height: rHeight,
+    fill: 'grey',
+    strokeWidth: 0,
+    strokeScaleEnabled: false,
+    opacity: 0.3,
+    name: 'shadow'
+  });
 };

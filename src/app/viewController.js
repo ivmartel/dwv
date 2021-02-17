@@ -79,19 +79,42 @@ dwv.ViewController = function (view) {
   };
 
   /**
-   * Get some values from the associated image.
+   * Get some values from the associated image in a region.
    *
    * @param {dwv.math.Point2D} min Minimum point.
    * @param {dwv.math.Point2D} max Maximum point.
    * @returns {Array} A list of values.
    */
-  this.getImageValues = function (min, max) {
+  this.getImageRegionValues = function (min, max) {
     var iter = view.getRegionSliceIterator(
       this.getCurrentPosition().k,
       this.getCurrentFrame(),
       true, min, max
     );
-    return view.getImage().getValues(iter);
+    var values = [];
+    if (iter) {
+      values = view.getImage().getValues(iter);
+    }
+    return values;
+  };
+
+  /**
+   * Get some values from the associated image in variable regions.
+   *
+   * @param {Array} regions A list of regions.
+   * @returns {Array} A list of values.
+   */
+  this.getImageVariableRegionValues = function (regions) {
+    var iter = view.getVariableRegionSliceIterator(
+      this.getCurrentPosition().k,
+      this.getCurrentFrame(),
+      true, regions
+    );
+    var values = [];
+    if (iter) {
+      values = view.getImage().getValues(iter);
+    }
+    return values;
   };
 
   /**

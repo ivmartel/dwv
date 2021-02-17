@@ -749,6 +749,80 @@ dwv.image.View.prototype.getRegionSliceIterator = function (
 };
 
 /**
+ * Get a slice index iterator for a rectangular region.
+ *
+ * @param {number} slice The index of the slice.
+ * @param {number} frame The frame index.
+ * @param {boolean} isRescaled Flag for rescaled values (default false).
+ * @param {Array} regions An array of regions.
+ * @returns {object} The slice iterator.
+ */
+dwv.image.View.prototype.getVariableRegionSliceIterator = function (
+  slice, frame, isRescaled, regions) {
+  var image = this.getImage();
+  if (image.getNumberOfComponents() !== 1) {
+    throw new Error('Unsupported number of components for region iterator: ' +
+      image.getNumberOfComponents());
+  }
+
+  if (typeof isRescaled === 'undefined') {
+    isRescaled = false;
+  }
+  var geometry = image.getGeometry();
+  var size = geometry.getSize();
+
+  var offsetRegions = [];
+  var region;
+  var min = null;
+  var max = null;
+  var index = null;
+  for (var i = 0; i < regions.length; ++i) {
+    region = regions[i];
+    var width = region[1][0] - region[0][0];
+    if (width !== 0) {
+      index = i;
+      if (!min) {
+        min = region[0];
+      }
+      offsetRegions.push([
+        region[0][0],
+        width,
+        size.getNumberOfColumns() - region[1][0]
+      ]);
+    }
+  }
+  if (index !== null) {
+    max = regions[index][1];
+  }
+
+  // exit if no offsets
+  if (offsetRegions.length === 0) {
+    return;
+  }
+
+  var minIndex = new dwv.math.Index3D(min[0], min[1], slice);
+  var startOffset = geometry.indexToOffset(minIndex);
+  var maxIndex = new dwv.math.Index3D(max[0], max[1], slice);
+  var endOffset = geometry.indexToOffset(maxIndex);
+
+  // data accessor
+  var dataAccessor = null;
+  if (isRescaled) {
+    dataAccessor = function (offset) {
+      return image.getRescaledValueAtOffset(offset, slice, frame);
+    };
+  } else {
+    dataAccessor = function (offset) {
+      return image.getValueAtOffset(offset, frame);
+    };
+  }
+
+  return dwv.image.rangeRegions(
+    dataAccessor, startOffset, endOffset + 1,
+    1, offsetRegions);
+};
+
+/**
  * Generate display image data to be given to a canvas.
  *
  * @param {Array} array The array to fill in.

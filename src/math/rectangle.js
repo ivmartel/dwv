@@ -156,11 +156,11 @@ dwv.math.Rectangle.prototype.quantify = function (viewController) {
     quant.surface = {value: surface / 100, unit: dwv.i18n('unit.cm2')};
   }
 
+  // pixel quantification
   if (viewController.canQuantifyImage()) {
     var round = this.getRound();
-    var subBuffer = viewController.getImageValues(
-      round.min, round.max);
-    var quantif = dwv.math.getStats(subBuffer);
+    var values = viewController.getImageRegionValues(round.min, round.max);
+    var quantif = dwv.math.getStats(values);
     quant.min = {value: quantif.getMin(), unit: ''};
     quant.max = {value: quantif.getMax(), unit: ''};
     quant.mean = {value: quantif.getMean(), unit: ''};

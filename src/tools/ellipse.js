@@ -89,9 +89,18 @@ dwv.tool.draw.EllipseFactory.prototype.create = function (
   klabel.add(ktext);
   klabel.add(new Konva.Tag());
 
+  // debug shadow
+  var kshadow;
+  if (dwv.tool.draw.debug) {
+    kshadow = dwv.tool.draw.getShadowEllipse(ellipse);
+  }
+
   // return group
   var group = new Konva.Group();
   group.name('ellipse-group');
+  if (kshadow) {
+    group.add(kshadow);
+  }
   group.add(kshape);
   group.add(klabel);
   group.visible(true); // dont inherit
@@ -128,7 +137,15 @@ dwv.tool.draw.UpdateEllipse = function (anchor, viewController) {
   var bottomLeft = group.getChildren(function (node) {
     return node.id() === 'bottomLeft';
   })[0];
-    // update 'self' (undo case) and special points
+  // debug shadow
+  var kshadow;
+  if (dwv.tool.draw.debug) {
+    kshadow = group.getChildren(function (node) {
+      return node.name() === 'shadow';
+    })[0];
+  }
+
+  // update 'self' (undo case) and special points
   switch (anchor.id()) {
   case 'topLeft':
     topLeft.x(anchor.x());
@@ -161,14 +178,30 @@ dwv.tool.draw.UpdateEllipse = function (anchor, viewController) {
   // update shape
   var radiusX = (topRight.x() - topLeft.x()) / 2;
   var radiusY = (bottomRight.y() - topRight.y()) / 2;
-  var center = {x: topLeft.x() + radiusX, y: topRight.y() + radiusY};
+  var center = {
+    x: topLeft.x() + radiusX,
+    y: topRight.y() + radiusY
+  };
   kellipse.position(center);
   var radiusAbs = {x: Math.abs(radiusX), y: Math.abs(radiusY)};
   if (radiusAbs) {
     kellipse.radius(radiusAbs);
   }
   // new ellipse
-  var ellipse = new dwv.math.Ellipse(center, radiusAbs.x, radiusAbs.y);
+  var centerPoint = new dwv.math.Point2D(
+    group.x() + center.x,
+    group.y() + center.y
+  );
+  var ellipse = new dwv.math.Ellipse(centerPoint, radiusAbs.x, radiusAbs.y);
+
+  // debug shadow
+  if (kshadow) {
+    // remove previous
+    kshadow.destroy();
+    // add new
+    group.add(dwv.tool.draw.getShadowEllipse(ellipse, group));
+  }
+
   // update text
   var quant = ellipse.quantify(viewController);
   var ktext = klabel.getText();
@@ -177,4 +210,43 @@ dwv.tool.draw.UpdateEllipse = function (anchor, viewController) {
   // update position
   var textPos = {x: center.x, y: center.y};
   klabel.position(textPos);
+};
+
+/**
+ * Get the debug shadow.
+ *
+ * @param {object} ellipse The ellipse to shadow.
+ * @param {object} group The associated group.
+ * @returns {object} The shadow konva group.
+ */
+dwv.tool.draw.getShadowEllipse = function (ellipse, group) {
+  // possible group offset
+  var offsetX = 0;
+  var offsetY = 0;
+  if (typeof group !== 'undefined') {
+    offsetX = group.x();
+    offsetY = group.y();
+  }
+  var kshadow = new Konva.Group();
+  kshadow.name('shadow');
+  var regions = ellipse.getRound();
+  for (var i = 0; i < regions.length; ++i) {
+    var region = regions[i];
+    var minX = region[0][0];
+    var minY = region[0][1];
+    var maxX = region[1][0];
+    var pixelLine = new Konva.Rect({
+      x: minX - offsetX,
+      y: minY - offsetY,
+      width: maxX - minX,
+      height: 1,
+      fill: 'grey',
+      strokeWidth: 0,
+      strokeScaleEnabled: false,
+      opacity: 0.3,
+      name: 'shadow-element'
+    });
+    kshadow.add(pixelLine);
+  }
+  return kshadow;
 };
