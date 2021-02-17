@@ -11,6 +11,11 @@ dwv.tool.draw = dwv.tool.draw || {};
 var Konva = Konva || {};
 
 /**
+ * Debug flag.
+ */
+dwv.tool.draw.debug = false;
+
+/**
  * Default draw label text.
  */
 dwv.tool.draw.defaultRectangleLabelText = '{surface}';
@@ -62,6 +67,26 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
     strokeScaleEnabled: false,
     name: 'shape'
   });
+
+  // debug shadow based on round (used in quantification)
+  var kshadow;
+  if (dwv.tool.draw.debug) {
+    var round = rectangle.getRound();
+    var rWidth = round.max.getX() - round.min.getX();
+    var rHeight = round.max.getY() - round.min.getY();
+    kshadow = new Konva.Rect({
+      x: round.min.getX(),
+      y: round.min.getY(),
+      width: rWidth,
+      height: rHeight,
+      fill: 'grey',
+      strokeWidth: 0,
+      strokeScaleEnabled: false,
+      opacity: 0.3,
+      name: 'shadow'
+    });
+  }
+
   // quantification
   var quant = rectangle.quantify(viewController);
   var ktext = new Konva.Text({
@@ -93,6 +118,9 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
   group.name('rectangle-group');
   group.add(kshape);
   group.add(klabel);
+  if (kshadow) {
+    group.add(kshadow);
+  }
   group.visible(true); // dont inherit
   return group;
 };
@@ -110,7 +138,7 @@ dwv.tool.draw.UpdateRect = function (anchor, viewController) {
   var krect = group.getChildren(function (node) {
     return node.name() === 'shape';
   })[0];
-    // associated label
+  // associated label
   var klabel = group.getChildren(function (node) {
     return node.name() === 'label';
   })[0];
@@ -127,7 +155,15 @@ dwv.tool.draw.UpdateRect = function (anchor, viewController) {
   var bottomLeft = group.getChildren(function (node) {
     return node.id() === 'bottomLeft';
   })[0];
-    // update 'self' (undo case) and special points
+  // debug shadow
+  var kshadow;
+  if (dwv.tool.draw.debug) {
+    kshadow = group.getChildren(function (node) {
+      return node.name() === 'shadow';
+    })[0];
+  }
+
+  // update 'self' (undo case) and special points
   switch (anchor.id()) {
   case 'topLeft':
     topLeft.x(anchor.x());
@@ -175,6 +211,19 @@ dwv.tool.draw.UpdateRect = function (anchor, viewController) {
   );
   // new rect
   var rect = new dwv.math.Rectangle(p2d0, p2d1);
+
+  // debug shadow based on round (used in quantification)
+  if (kshadow) {
+    var round = rect.getRound();
+    var rWidth = round.max.getX() - round.min.getX();
+    var rHeight = round.max.getY() - round.min.getY();
+    kshadow.position({
+      x: round.min.getX() - group.x(),
+      y: round.min.getY() - group.y()
+    });
+    kshadow.size({width: rWidth, height: rHeight});
+  }
+
   // update text
   var quant = rect.quantify(viewController);
   var ktext = klabel.getText();

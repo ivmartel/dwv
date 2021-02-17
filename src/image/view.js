@@ -710,24 +710,28 @@ dwv.image.View.prototype.getRegionSliceIterator = function (
   if (typeof isRescaled === 'undefined') {
     isRescaled = false;
   }
-  var size = image.getGeometry().getSize();
+  var geometry = image.getGeometry();
+  var size = geometry.getSize();
   if (typeof min === 'undefined') {
     min = new dwv.math.Point2D(0, 0);
   }
   if (typeof max === 'undefined') {
     max = new dwv.math.Point2D(
       size.getNumberOfColumns() - 1,
-      size.getNumberOfRows() - 1
+      size.getNumberOfRows()
     );
   }
-  var sliceSize = size.getSliceSize();
-  var startOffset = min.getX() +
-    min.getY() * size.getNumberOfColumns() +
-    slice * sliceSize;
-  var endOffset = max.getX() +
-    max.getY() * size.getNumberOfColumns() +
-    slice * sliceSize;
+  // position to pixel for max: extra X is ok, remove extra Y
+  var minIndex = new dwv.math.Index3D(min.getX(), min.getY(), slice);
+  var startOffset = geometry.indexToOffset(minIndex);
+  var maxIndex = new dwv.math.Index3D(max.getX(), max.getY() - 1, slice);
+  var endOffset = geometry.indexToOffset(maxIndex);
 
+  // minimum 1 column
+  var rangeNumberOfColumns = Math.max(1, max.getX() - min.getX());
+  var rowIncrement = size.getNumberOfColumns() - rangeNumberOfColumns;
+
+  // data accessor
   var dataAccessor = null;
   if (isRescaled) {
     dataAccessor = function (offset) {
@@ -738,10 +742,6 @@ dwv.image.View.prototype.getRegionSliceIterator = function (
       return image.getValueAtOffset(offset, frame);
     };
   }
-
-  // minimum 1 column
-  var rangeNumberOfColumns = Math.max(1, max.getX() - min.getX());
-  var rowIncrement = size.getNumberOfColumns() - rangeNumberOfColumns;
 
   return dwv.image.rangeRegion(
     dataAccessor, startOffset, endOffset + 1,

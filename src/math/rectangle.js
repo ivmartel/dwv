@@ -130,6 +130,18 @@ dwv.math.Rectangle.prototype.getHeight = function () {
 };
 
 /**
+ * Get the rounded limits of the rectangle.
+ *
+ * @returns {object} The rounded limits.
+ */
+dwv.math.Rectangle.prototype.getRound = function () {
+  return {
+    min: this.getBegin().getRound(),
+    max: this.getEnd().getRound()
+  };
+};
+
+/**
  * Quantify a rectangle according to view information.
  *
  * @param {object} viewController The associated view controller.
@@ -145,14 +157,9 @@ dwv.math.Rectangle.prototype.quantify = function (viewController) {
   }
 
   if (viewController.canQuantifyImage()) {
-    // position to pixel for max: extra X is ok, remove extra Y
-    var roundEnd = this.getEnd().getRound();
-    var max = new dwv.math.Point2D(
-      roundEnd.getX(),
-      Math.max(0, roundEnd.getY() - 1)
-    );
+    var round = this.getRound();
     var subBuffer = viewController.getImageValues(
-      this.getBegin().getRound(), max);
+      round.min, round.max);
     var quantif = dwv.math.getStats(subBuffer);
     quant.min = {value: quantif.getMin(), unit: ''};
     quant.max = {value: quantif.getMax(), unit: ''};
