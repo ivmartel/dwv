@@ -86,13 +86,12 @@ dwv.ViewController = function (view) {
    * @returns {Array} A list of values.
    */
   this.getImageValues = function (min, max) {
-    var image = view.getImage();
-    var iter = image.getRegionSliceIterator(
+    var iter = view.getRegionSliceIterator(
       this.getCurrentPosition().k,
       this.getCurrentFrame(),
       true, min, max
     );
-    return image.getValues(iter);
+    return view.getImage().getValues(iter);
   };
 
   /**

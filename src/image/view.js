@@ -656,6 +656,99 @@ dwv.image.View.prototype.setWindowLevelMinMax = function () {
 };
 
 /**
+ * Get a slice index iterator.
+ *
+ * @param {number} slice The index of the slice.
+ * @param {number} frame The frame index.
+ * @returns {object} The slice iterator.
+ */
+dwv.image.View.prototype.getSliceIterator = function (slice, frame) {
+  var image = this.getImage();
+  var sliceSize = image.getGeometry().getSize().getSliceSize();
+  var start = slice * sliceSize;
+
+  var dataAccessor = function (offset) {
+    return image.getValueAtOffset(offset, frame);
+  };
+
+  var range = null;
+  if (image.getNumberOfComponents() === 1) {
+    range = dwv.image.range(dataAccessor, start, start + sliceSize);
+  } else if (image.getNumberOfComponents() === 3) {
+    // 3 times bigger...
+    start *= 3;
+    sliceSize *= 3;
+    var isPlanar = image.getPlanarConfiguration() === 1;
+    range = dwv.image.range3d(
+      dataAccessor, start, start + sliceSize, 1, isPlanar);
+  } else {
+    throw new Error('Unsupported number of components: ' +
+      image.getNumberOfComponents());
+  }
+
+  return range;
+};
+
+/**
+ * Get a slice index iterator for a rectangular region.
+ *
+ * @param {number} slice The index of the slice.
+ * @param {number} frame The frame index.
+ * @param {boolean} isRescaled Flag for rescaled values (default false).
+ * @param {dwv.math.Point2D} min The minimum position (optional).
+ * @param {dwv.math.Point2D} max The maximum position (optional).
+ * @returns {object} The slice iterator.
+ */
+dwv.image.View.prototype.getRegionSliceIterator = function (
+  slice, frame, isRescaled, min, max) {
+  var image = this.getImage();
+  if (image.getNumberOfComponents() !== 1) {
+    throw new Error('Unsupported number of components for region iterator: ' +
+      image.getNumberOfComponents());
+  }
+
+  if (typeof isRescaled === 'undefined') {
+    isRescaled = false;
+  }
+  var size = image.getGeometry().getSize();
+  if (typeof min === 'undefined') {
+    min = new dwv.math.Point2D(0, 0);
+  }
+  if (typeof max === 'undefined') {
+    max = new dwv.math.Point2D(
+      size.getNumberOfColumns() - 1,
+      size.getNumberOfRows() - 1
+    );
+  }
+  var sliceSize = size.getSliceSize();
+  var startOffset = min.getX() +
+    min.getY() * size.getNumberOfColumns() +
+    slice * sliceSize;
+  var endOffset = max.getX() +
+    max.getY() * size.getNumberOfColumns() +
+    slice * sliceSize;
+
+  var dataAccessor = null;
+  if (isRescaled) {
+    dataAccessor = function (offset) {
+      return image.getRescaledValueAtOffset(offset, slice, frame);
+    };
+  } else {
+    dataAccessor = function (offset) {
+      return image.getValueAtOffset(offset, frame);
+    };
+  }
+
+  // minimum 1 column
+  var rangeNumberOfColumns = Math.max(1, max.getX() - min.getX());
+  var rowIncrement = size.getNumberOfColumns() - rangeNumberOfColumns;
+
+  return dwv.image.rangeRegion(
+    dataAccessor, startOffset, endOffset + 1,
+    1, rangeNumberOfColumns, rowIncrement);
+};
+
+/**
  * Generate display image data to be given to a canvas.
  *
  * @param {Array} array The array to fill in.
@@ -668,7 +761,7 @@ dwv.image.View.prototype.generateImageData = function (array) {
   var position = this.getCurrentPosition();
   var frame = this.getCurrentFrame();
   var image = this.getImage();
-  var iterator = image.getSliceIterator(position.k, frame);
+  var iterator = this.getSliceIterator(position.k, frame);
 
   var photoInterpretation = image.getPhotometricInterpretation();
   switch (photoInterpretation) {
