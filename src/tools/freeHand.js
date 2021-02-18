@@ -44,11 +44,11 @@ dwv.tool.draw.FreeHandFactory = function () {
  *
  * @param {Array} points The points from which to extract the line.
  * @param {object} style The drawing style.
- * @param {object} _image The associated image.
+ * @param {object} _viewController The associated view controller.
  * @returns {object} The Konva group.
  */
 dwv.tool.draw.FreeHandFactory.prototype.create = function (
-  points, style, _image) {
+  points, style, _viewController) {
   // points stored the Konvajs way
   var arr = [];
   for (var i = 0; i < points.length; ++i) {

@@ -44,11 +44,11 @@ dwv.tool.draw.ProtractorFactory = function () {
  *
  * @param {Array} points The points from which to extract the protractor.
  * @param {object} style The drawing style.
- * @param {object} _image The associated image.
+ * @param {object} _viewController The associated view controller.
  * @returns {object} The Konva group.
  */
 dwv.tool.draw.ProtractorFactory.prototype.create = function (
-  points, style, _image) {
+  points, style, _viewController) {
   // physical shape
   var line0 = new dwv.math.Line(points[0], points[1]);
   // points stored the Konvajs way

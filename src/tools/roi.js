@@ -44,11 +44,11 @@ dwv.tool.draw.RoiFactory = function () {
  *
  * @param {Array} points The points from which to extract the line.
  * @param {object} style The drawing style.
- * @param {object} _image The associated image.
+ * @param {object} _viewController The associated view controller.
  * @returns {object} The Konva group.
  */
 dwv.tool.draw.RoiFactory.prototype.create = function (
-  points, style, _image) {
+  points, style, _viewController) {
   // physical shape
   var roi = new dwv.math.ROI();
   // add input points to the ROI
