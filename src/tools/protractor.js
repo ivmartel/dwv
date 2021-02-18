@@ -116,7 +116,7 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
     var midY = (line0.getMidpoint().getY() + line1.getMidpoint().getY()) / 2;
     var klabel = new Konva.Label({
       x: midX,
-      y: midY - 15,
+      y: midY - style.scale(15),
       name: 'label'
     });
     klabel.add(ktext);
@@ -148,9 +148,10 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
  * Update a protractor shape.
  *
  * @param {object} anchor The active anchor.
- * @param {object} _image The associated image.
+ * @param {object} style The app style.
+ * @param {object} _viewController The associated view controller.
  */
-dwv.tool.draw.UpdateProtractor = function (anchor, _image) {
+dwv.tool.draw.UpdateProtractor = function (anchor, style, _viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape
@@ -229,7 +230,10 @@ dwv.tool.draw.UpdateProtractor = function (anchor, _image) {
   // update position
   var midX = (line0.getMidpoint().getX() + line1.getMidpoint().getX()) / 2;
   var midY = (line0.getMidpoint().getY() + line1.getMidpoint().getY()) / 2;
-  var textPos = {x: midX, y: midY - 15};
+  var textPos = {
+    x: midX,
+    y: midY - style.scale(15)
+  };
   klabel.position(textPos);
 
   // arc

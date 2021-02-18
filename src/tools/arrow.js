@@ -64,9 +64,11 @@ dwv.tool.draw.ArrowFactory.prototype.create = function (
     strokeScaleEnabled: false,
     name: 'shape'
   });
-    // larger hitfunc
-  var linePerp0 = dwv.math.getPerpendicularLine(line, points[0], 10);
-  var linePerp1 = dwv.math.getPerpendicularLine(line, points[1], 10);
+  // larger hitfunc
+  var linePerp0 = dwv.math.getPerpendicularLine(
+    line, points[0], style.scale(10));
+  var linePerp1 = dwv.math.getPerpendicularLine(
+    line, points[1], style.scale(10));
   kshape.hitFunc(function (context) {
     context.beginPath();
     context.moveTo(linePerp0.getBegin().getX(), linePerp0.getBegin().getY());
@@ -114,8 +116,8 @@ dwv.tool.draw.ArrowFactory.prototype.create = function (
   var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
   var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
   var klabel = new Konva.Label({
-    x: line.getEnd().getX() + dX * 25,
-    y: line.getEnd().getY() + dY * 15,
+    x: line.getEnd().getX() + dX * ktext.width(),
+    y: line.getEnd().getY() + dY * style.scale(15),
     name: 'label'
   });
   klabel.add(ktext);
@@ -135,9 +137,10 @@ dwv.tool.draw.ArrowFactory.prototype.create = function (
  * Update an arrow shape.
  *
  * @param {object} anchor The active anchor.
- * @param {object} _image The associated image.
+ * @param {object} style The app style.
+ * @param {object} _viewController The associated view controller.
  */
-dwv.tool.draw.UpdateArrow = function (anchor, _image) {
+dwv.tool.draw.UpdateArrow = function (anchor, style, _viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape
@@ -213,8 +216,8 @@ dwv.tool.draw.UpdateArrow = function (anchor, _image) {
   var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
   var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
   var textPos = {
-    x: line.getEnd().getX() + dX * 25,
-    y: line.getEnd().getY() + dY * 15
+    x: line.getEnd().getX() + dX * ktext.width(),
+    y: line.getEnd().getY() + dY * style.scale(15)
   };
   klabel.position(textPos);
 };

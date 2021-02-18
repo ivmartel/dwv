@@ -204,10 +204,11 @@ dwv.tool.MoveGroupCommand.prototype.onUndo = function (_event) {
  * @param {object} endAnchor The anchor that ends the change.
  * @param {object} layer The layer where to change the group.
  * @param {object} viewController The associated viewController.
+ * @param {object} style The app style.
  * @class
  */
 dwv.tool.ChangeGroupCommand = function (
-  name, func, startAnchor, endAnchor, layer, viewController) {
+  name, func, startAnchor, endAnchor, layer, viewController, style) {
   /**
    * Get the command name.
    *
@@ -224,7 +225,7 @@ dwv.tool.ChangeGroupCommand = function (
    */
   this.execute = function () {
     // change shape
-    func(endAnchor, viewController);
+    func(endAnchor, style, viewController);
     // draw
     layer.draw();
     // callback
@@ -245,7 +246,7 @@ dwv.tool.ChangeGroupCommand = function (
    */
   this.undo = function () {
     // invert change shape
-    func(startAnchor, viewController);
+    func(startAnchor, style, viewController);
     // draw
     layer.draw();
     // callback

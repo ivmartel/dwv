@@ -88,7 +88,7 @@ dwv.tool.draw.RoiFactory.prototype.create = function (
   // label
   var klabel = new Konva.Label({
     x: roi.getPoint(0).getX(),
-    y: roi.getPoint(0).getY() + 10,
+    y: roi.getPoint(0).getY() + style.scale(10),
     name: 'label'
   });
   klabel.add(ktext);
@@ -107,9 +107,10 @@ dwv.tool.draw.RoiFactory.prototype.create = function (
  * Update a roi shape.
  *
  * @param {object} anchor The active anchor.
- * @param {object} _image The associated image.
+ * @param {object} style The app style.
+ * @param {object} _viewController The associated view controller.
  */
-dwv.tool.draw.UpdateRoi = function (anchor, _image) {
+dwv.tool.draw.UpdateRoi = function (anchor, style, _viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape
@@ -141,7 +142,7 @@ dwv.tool.draw.UpdateRoi = function (anchor, _image) {
   // update position
   var textPos = {
     x: points[0] + kroi.x(),
-    y: points[1] + kroi.y() + 10
+    y: points[1] + kroi.y() + style.scale(10)
   };
   klabel.position(textPos);
 

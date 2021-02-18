@@ -84,7 +84,7 @@ dwv.tool.draw.FreeHandFactory.prototype.create = function (
   // label
   var klabel = new Konva.Label({
     x: points[0].getX(),
-    y: points[0].getY() + 10,
+    y: points[0].getY() + style.scale(10),
     name: 'label'
   });
   klabel.add(ktext);
@@ -103,9 +103,10 @@ dwv.tool.draw.FreeHandFactory.prototype.create = function (
  * Update a FreeHand shape.
  *
  * @param {object} anchor The active anchor.
- * @param {object} _image The associated image.
+ * @param {object} style The app style.
+ * @param {object} _viewController The associated view controller.
  */
-dwv.tool.draw.UpdateFreeHand = function (anchor, _image) {
+dwv.tool.draw.UpdateFreeHand = function (anchor, style, _viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape
@@ -136,6 +137,9 @@ dwv.tool.draw.UpdateFreeHand = function (anchor, _image) {
   ktext.quant = null;
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
   // update position
-  var textPos = {x: points[0] + kline.x(), y: points[1] + kline.y() + 10};
+  var textPos = {
+    x: points[0] + kline.x(),
+    y: points[1] + kline.y() + style.scale(10)
+  };
   klabel.position(textPos);
 };

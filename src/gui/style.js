@@ -108,10 +108,19 @@ dwv.html.Style = function () {
   /**
    * Set the display scale.
    *
-   * @param {string} scale The display scale.
+   * @param {number} scale The display scale.
    */
   this.setScale = function (scale) {
     displayScale = scale;
+  };
+
+  /**
+   * Get the display scale.
+   *
+   * @returns {number} scale The display scale.
+   */
+  this.getScale = function () {
+    return displayScale;
   };
 
   /**
