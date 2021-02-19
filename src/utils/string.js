@@ -91,14 +91,15 @@ dwv.utils.replaceFlags = function (inputStr, values) {
   for (var i = 0; i < keys.length; ++i) {
     var valueObj = values[keys[i]];
     if (valueObj !== null && typeof valueObj !== 'undefined' &&
-            valueObj.value !== null && typeof valueObj.value !== 'undefined') {
+      valueObj.value !== null && typeof valueObj.value !== 'undefined') {
       // value string
       var valueStr = valueObj.value.toPrecision(4);
       // add unit if available
       // space or no space? Yes apart from degree...
       // check: https://en.wikipedia.org/wiki/Space_(punctuation)#Spaces_and_unit_symbols
-      if (valueObj.unit !== null && typeof valueObj.unit !== 'undefined' &&
-                valueObj.unit.length !== 0) {
+      if (valueObj.unit !== null &&
+        typeof valueObj.unit !== 'undefined' &&
+        valueObj.unit.length !== 0) {
         if (valueObj.unit !== 'degree') {
           valueStr += ' ';
         }
