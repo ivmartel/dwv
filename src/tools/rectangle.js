@@ -88,9 +88,18 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
   klabel.add(ktext);
   klabel.add(new Konva.Tag());
 
+  // debug shadow
+  var kshadow;
+  if (dwv.tool.draw.debug) {
+    kshadow = dwv.tool.draw.getShadowRectangle(rectangle);
+  }
+
   // return group
   var group = new Konva.Group();
   group.name('rectangle-group');
+  if (kshadow) {
+    group.add(kshadow);
+  }
   group.add(klabel);
   group.add(kshape);
   group.visible(true); // dont inherit
@@ -111,7 +120,7 @@ dwv.tool.draw.UpdateRect = function (anchor, style, viewController) {
   var krect = group.getChildren(function (node) {
     return node.name() === 'shape';
   })[0];
-    // associated label
+  // associated label
   var klabel = group.getChildren(function (node) {
     return node.name() === 'label';
   })[0];
@@ -128,7 +137,15 @@ dwv.tool.draw.UpdateRect = function (anchor, style, viewController) {
   var bottomLeft = group.getChildren(function (node) {
     return node.id() === 'bottomLeft';
   })[0];
-    // update 'self' (undo case) and special points
+  // debug shadow
+  var kshadow;
+  if (dwv.tool.draw.debug) {
+    kshadow = group.getChildren(function (node) {
+      return node.name() === 'shadow';
+    })[0];
+  }
+
+  // update 'self' (undo case) and special points
   switch (anchor.id()) {
   case 'topLeft':
     topLeft.x(anchor.x());
@@ -176,6 +193,19 @@ dwv.tool.draw.UpdateRect = function (anchor, style, viewController) {
   );
   // new rect
   var rect = new dwv.math.Rectangle(p2d0, p2d1);
+
+  // debug shadow based on round (used in quantification)
+  if (kshadow) {
+    var round = rect.getRound();
+    var rWidth = round.max.getX() - round.min.getX();
+    var rHeight = round.max.getY() - round.min.getY();
+    kshadow.position({
+      x: round.min.getX() - group.x(),
+      y: round.min.getY() - group.y()
+    });
+    kshadow.size({width: rWidth, height: rHeight});
+  }
+
   // update text
   var quant = rect.quantify(viewController);
   var ktext = klabel.getText();
@@ -187,4 +217,27 @@ dwv.tool.draw.UpdateRect = function (anchor, style, viewController) {
     y: rect.getEnd().getY() - group.y() + style.scale(10)
   };
   klabel.position(textPos);
+};
+
+/**
+ * Get the debug shadow.
+ *
+ * @param {object} rectangle The rectangle to shadow.
+ * @returns {object} The shadow konva shape.
+ */
+dwv.tool.draw.getShadowRectangle = function (rectangle) {
+  var round = rectangle.getRound();
+  var rWidth = round.max.getX() - round.min.getX();
+  var rHeight = round.max.getY() - round.min.getY();
+  return new Konva.Rect({
+    x: round.min.getX(),
+    y: round.min.getY(),
+    width: rWidth,
+    height: rHeight,
+    fill: 'grey',
+    strokeWidth: 0,
+    strokeScaleEnabled: false,
+    opacity: 0.3,
+    name: 'shadow'
+  });
 };

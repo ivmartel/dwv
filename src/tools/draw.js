@@ -10,6 +10,11 @@ dwv.tool = dwv.tool || {};
 var Konva = Konva || {};
 
 /**
+ * Debug flag.
+ */
+dwv.tool.draw.debug = false;
+
+/**
  * Drawing tool.
  *
  * This tool is responsible for the draw layer group structure. The layout is:
@@ -622,7 +627,9 @@ dwv.tool.Draw = function (app) {
         // reset the group shapes colour
         shapeGroup.getChildren(dwv.draw.canNodeChangeColour).forEach(
           function (ashape) {
-            ashape.stroke(colour);
+            if (typeof ashape.stroke !== 'undefined') {
+              ashape.stroke(colour);
+            }
           });
       }
       // draw

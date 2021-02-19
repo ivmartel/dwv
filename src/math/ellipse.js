@@ -91,6 +91,45 @@ dwv.math.Ellipse.prototype.getWorldSurface = function (spacingX, spacingY) {
 };
 
 /**
+ * Get the rounded limits of the ellipse.
+ * (see https://en.wikipedia.org/wiki/Ellipse#Standard_equation)
+ * Ellipse formula: x*x / a*a + y*y / b*b = 1
+ * => y = (+-)(b/a) * sqrt(a*a - x*x)
+ *
+ * @returns {Array} The rounded limits.
+ */
+dwv.math.Ellipse.prototype.getRound = function () {
+  var centerX = this.getCenter().getX();
+  var centerY = this.getCenter().getY();
+  var radiusX = this.getA();
+  var radiusY = this.getB();
+  var radiusRatio = radiusX / radiusY;
+  var rySquare = Math.pow(radiusY, 2);
+  // Y bounds
+  var minY = centerY - radiusY;
+  var maxY = centerY + radiusY;
+  var regions = [];
+  // loop through lines and store limits
+  for (var y = minY; y < maxY; ++y) {
+    var diff = rySquare - Math.pow(y - centerY, 2);
+    // remove small values (possibly negative)
+    if (Math.abs(diff) < 1e-7) {
+      continue;
+    }
+    var transX = radiusRatio * Math.sqrt(diff);
+    // remove small values
+    if (transX < 0.5) {
+      continue;
+    }
+    regions.push([
+      [Math.round(centerX - transX), Math.round(y)],
+      [Math.round(centerX + transX), Math.round(y)]
+    ]);
+  }
+  return regions;
+};
+
+/**
  * Quantify an ellipse according to view information.
  *
  * @param {object} viewController The associated view controller.
@@ -104,6 +143,20 @@ dwv.math.Ellipse.prototype.quantify = function (viewController) {
   if (surface !== null) {
     quant.surface = {value: surface / 100, unit: dwv.i18n('unit.cm2')};
   }
+
+  // pixel quantification
+  if (viewController.canQuantifyImage()) {
+    var regions = this.getRound();
+    if (regions.length !== 0) {
+      var values = viewController.getImageVariableRegionValues(regions);
+      var quantif = dwv.math.getStats(values);
+      quant.min = {value: quantif.getMin(), unit: ''};
+      quant.max = {value: quantif.getMax(), unit: ''};
+      quant.mean = {value: quantif.getMean(), unit: ''};
+      quant.stdDev = {value: quantif.getStdDev(), unit: ''};
+    }
+  }
+
   // return
   return quant;
 };

@@ -64,7 +64,7 @@ QUnit.test('Test Rectangle quantify.', function (assert) {
     getCurrentPosition: function () {
       return {k: 0};
     },
-    getImageValues: function () {
+    getImageRegionValues: function () {
       return [0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0];
     }
   };
