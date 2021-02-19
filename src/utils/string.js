@@ -64,6 +64,31 @@ dwv.utils.splitKeyValueString = function (inputStr) {
 };
 
 /**
+ * Get flags from an input string. Flags are words surrounded with curly
+ * braces.
+ *
+ * @param {string} inputStr The input string.
+ * @returns {Array} An array of found flags.
+ */
+dwv.utils.getFlags = function (inputStr) {
+  var flags = [];
+  // check input string
+  if (inputStr === null || typeof inputStr === 'undefined') {
+    return flags;
+  }
+
+  // word surrounded by curly braces
+  var regex = /{(\w+)}/g;
+
+  var match = regex.exec(inputStr);
+  while (match) {
+    flags.push(match[1]); // first matching group
+    match = regex.exec(inputStr);
+  }
+  return flags;
+};
+
+/**
  * Replace flags in a input string. Flags are keywords surrounded with curly
  * braces.
  *
@@ -86,8 +111,9 @@ dwv.utils.replaceFlags = function (inputStr, values) {
   if (values === null || typeof values === 'undefined') {
     return res;
   }
-  // loop through values keys
-  var keys = Object.keys(values);
+
+  // loop through flags
+  var keys = dwv.utils.getFlags(inputStr);
   for (var i = 0; i < keys.length; ++i) {
     var valueObj = values[keys[i]];
     if (valueObj !== null && typeof valueObj !== 'undefined' &&
