@@ -354,6 +354,8 @@ dwv.tool.ShapeEditor = function (app) {
     });
     // drag move listener
     anchor.on('dragmove.edit', function (evt) {
+      // validate the anchor position
+      dwv.tool.validateAnchorPosition(app.getDrawStage(), this);
       // update shape
       if (updateFunction) {
         updateFunction(this, app.getStyle(), viewController);
