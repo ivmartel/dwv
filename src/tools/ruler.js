@@ -133,10 +133,10 @@ dwv.tool.draw.RulerFactory.prototype.create = function (
   // return group
   var group = new Konva.Group();
   group.name('ruler-group');
-  group.add(kshape);
+  group.add(klabel);
   group.add(ktick0);
   group.add(ktick1);
-  group.add(klabel);
+  group.add(kshape);
   group.visible(true); // dont inherit
   return group;
 };

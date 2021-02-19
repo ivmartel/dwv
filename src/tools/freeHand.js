@@ -93,8 +93,8 @@ dwv.tool.draw.FreeHandFactory.prototype.create = function (
   // return group
   var group = new Konva.Group();
   group.name('freeHand-group');
-  group.add(kshape);
   group.add(klabel);
+  group.add(kshape);
   group.visible(true); // dont inherit
   return group;
 };

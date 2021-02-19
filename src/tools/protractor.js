@@ -67,8 +67,6 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
   });
   var group = new Konva.Group();
   group.name('protractor-group');
-  group.add(kshape);
-  group.visible(true); // dont inherit
   // text and decoration
   if (points.length === 3) {
     var line1 = new dwv.math.Line(points[1], points[2]);
@@ -140,6 +138,9 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
     group.add(klabel);
     group.add(karc);
   }
+  // add shape to group
+  group.add(kshape);
+  group.visible(true); // dont inherit
   // return group
   return group;
 };

@@ -97,8 +97,8 @@ dwv.tool.draw.RoiFactory.prototype.create = function (
   // return group
   var group = new Konva.Group();
   group.name('roi-group');
-  group.add(kshape);
   group.add(klabel);
+  group.add(kshape);
   group.visible(true); // dont inherit
   return group;
 };
