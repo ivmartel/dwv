@@ -44,11 +44,11 @@ dwv.tool.draw.ProtractorFactory = function () {
  *
  * @param {Array} points The points from which to extract the protractor.
  * @param {object} style The drawing style.
- * @param {object} _image The associated image.
+ * @param {object} _viewController The associated view controller.
  * @returns {object} The Konva group.
  */
 dwv.tool.draw.ProtractorFactory.prototype.create = function (
-  points, style, _image) {
+  points, style, _viewController) {
   // physical shape
   var line0 = new dwv.math.Line(points[0], points[1]);
   // points stored the Konvajs way
@@ -67,8 +67,6 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
   });
   var group = new Konva.Group();
   group.name('protractor-group');
-  group.add(kshape);
-  group.visible(true); // dont inherit
   // text and decoration
   if (points.length === 3) {
     var line1 = new dwv.math.Line(points[1], points[2]);
@@ -116,7 +114,7 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
     var midY = (line0.getMidpoint().getY() + line1.getMidpoint().getY()) / 2;
     var klabel = new Konva.Label({
       x: midX,
-      y: midY - 15,
+      y: midY - style.scale(15),
       name: 'label'
     });
     klabel.add(ktext);
@@ -140,6 +138,9 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
     group.add(klabel);
     group.add(karc);
   }
+  // add shape to group
+  group.add(kshape);
+  group.visible(true); // dont inherit
   // return group
   return group;
 };
@@ -148,9 +149,10 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
  * Update a protractor shape.
  *
  * @param {object} anchor The active anchor.
- * @param {object} _image The associated image.
+ * @param {object} style The app style.
+ * @param {object} _viewController The associated view controller.
  */
-dwv.tool.draw.UpdateProtractor = function (anchor, _image) {
+dwv.tool.draw.UpdateProtractor = function (anchor, style, _viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape
@@ -229,7 +231,10 @@ dwv.tool.draw.UpdateProtractor = function (anchor, _image) {
   // update position
   var midX = (line0.getMidpoint().getX() + line1.getMidpoint().getX()) / 2;
   var midY = (line0.getMidpoint().getY() + line1.getMidpoint().getY()) / 2;
-  var textPos = {x: midX, y: midY - 15};
+  var textPos = {
+    x: midX,
+    y: midY - style.scale(15)
+  };
   klabel.position(textPos);
 
   // arc

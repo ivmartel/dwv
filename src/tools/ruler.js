@@ -63,7 +63,7 @@ dwv.tool.draw.RulerFactory.prototype.create = function (
     name: 'shape'
   });
 
-  var tickLen = 10 * style.getScaledStrokeWidth();
+  var tickLen = style.scale(10);
 
   // tick begin
   var linePerp0 = dwv.math.getPerpendicularLine(line, points[0], tickLen);
@@ -118,12 +118,13 @@ dwv.tool.draw.RulerFactory.prototype.create = function (
   ktext.longText = '';
   ktext.quant = quant;
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+
   // label
   var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
   var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
   var klabel = new Konva.Label({
-    x: line.getEnd().getX() + dX * 25,
-    y: line.getEnd().getY() + dY * 15,
+    x: line.getEnd().getX() + dX * ktext.width(),
+    y: line.getEnd().getY() + dY * style.scale(15),
     name: 'label'
   });
   klabel.add(ktext);
@@ -132,10 +133,10 @@ dwv.tool.draw.RulerFactory.prototype.create = function (
   // return group
   var group = new Konva.Group();
   group.name('ruler-group');
-  group.add(kshape);
+  group.add(klabel);
   group.add(ktick0);
   group.add(ktick1);
-  group.add(klabel);
+  group.add(kshape);
   group.visible(true); // dont inherit
   return group;
 };
@@ -144,9 +145,10 @@ dwv.tool.draw.RulerFactory.prototype.create = function (
  * Update a ruler shape.
  *
  * @param {object} anchor The active anchor.
+ * @param {object} style The app style.
  * @param {object} viewController The associated view controller.
  */
-dwv.tool.draw.UpdateRuler = function (anchor, viewController) {
+dwv.tool.draw.UpdateRuler = function (anchor, style, viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape
@@ -197,12 +199,12 @@ dwv.tool.draw.UpdateRuler = function (anchor, viewController) {
   // tick
   var p2b = new dwv.math.Point2D(bx, by);
   var p2e = new dwv.math.Point2D(ex, ey);
-  var linePerp0 = dwv.math.getPerpendicularLine(line, p2b, 10);
+  var linePerp0 = dwv.math.getPerpendicularLine(line, p2b, style.scale(10));
   ktick0.points([linePerp0.getBegin().getX(),
     linePerp0.getBegin().getY(),
     linePerp0.getEnd().getX(),
     linePerp0.getEnd().getY()]);
-  var linePerp1 = dwv.math.getPerpendicularLine(line, p2e, 10);
+  var linePerp1 = dwv.math.getPerpendicularLine(line, p2e, style.scale(10));
   ktick1.points([linePerp1.getBegin().getX(),
     linePerp1.getBegin().getY(),
     linePerp1.getEnd().getX(),
@@ -226,8 +228,8 @@ dwv.tool.draw.UpdateRuler = function (anchor, viewController) {
   var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
   var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
   var textPos = {
-    x: line.getEnd().getX() + dX * 25,
-    y: line.getEnd().getY() + dY * 15
+    x: line.getEnd().getX() + dX * ktext.width(),
+    y: line.getEnd().getY() + dY * style.scale(15)
   };
   klabel.position(textPos);
 };

@@ -101,8 +101,8 @@ dwv.tool.draw.EllipseFactory.prototype.create = function (
   if (kshadow) {
     group.add(kshadow);
   }
-  group.add(kshape);
   group.add(klabel);
+  group.add(kshape);
   group.visible(true); // dont inherit
   return group;
 };
@@ -111,9 +111,10 @@ dwv.tool.draw.EllipseFactory.prototype.create = function (
  * Update an ellipse shape.
  *
  * @param {object} anchor The active anchor.
+ * @param {object} _style The app style.
  * @param {object} viewController The associated view controller.
  */
-dwv.tool.draw.UpdateEllipse = function (anchor, viewController) {
+dwv.tool.draw.UpdateEllipse = function (anchor, _style, viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape

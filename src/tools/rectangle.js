@@ -82,7 +82,7 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
   // label
   var klabel = new Konva.Label({
     x: rectangle.getBegin().getX(),
-    y: rectangle.getEnd().getY() + 10,
+    y: rectangle.getEnd().getY() + style.scale(10),
     name: 'label'
   });
   klabel.add(ktext);
@@ -100,8 +100,8 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
   if (kshadow) {
     group.add(kshadow);
   }
-  group.add(kshape);
   group.add(klabel);
+  group.add(kshape);
   group.visible(true); // dont inherit
   return group;
 };
@@ -110,9 +110,10 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
  * Update a rectangle shape.
  *
  * @param {object} anchor The active anchor.
+ * @param {object} style The app style.
  * @param {object} viewController The associated view controller.
  */
-dwv.tool.draw.UpdateRect = function (anchor, viewController) {
+dwv.tool.draw.UpdateRect = function (anchor, style, viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape
@@ -212,8 +213,8 @@ dwv.tool.draw.UpdateRect = function (anchor, viewController) {
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
   // update position
   var textPos = {
-    x: rect.getBegin().getX(),
-    y: rect.getEnd().getY() + 10
+    x: rect.getBegin().getX() - group.x(),
+    y: rect.getEnd().getY() - group.y() + style.scale(10)
   };
   klabel.position(textPos);
 };

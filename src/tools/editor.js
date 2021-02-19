@@ -354,9 +354,11 @@ dwv.tool.ShapeEditor = function (app) {
     });
     // drag move listener
     anchor.on('dragmove.edit', function (evt) {
+      // validate the anchor position
+      dwv.tool.validateAnchorPosition(app.getDrawStage(), this);
       // update shape
       if (updateFunction) {
-        updateFunction(this, viewController);
+        updateFunction(this, app.getStyle(), viewController);
       } else {
         dwv.logger.warn('No update function!');
       }
@@ -379,7 +381,8 @@ dwv.tool.ShapeEditor = function (app) {
         startAnchor,
         endAnchor,
         this.getLayer(),
-        viewController
+        viewController,
+        app.getStyle()
       );
       chgcmd.onExecute = drawEventCallback;
       chgcmd.onUndo = drawEventCallback;

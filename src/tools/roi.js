@@ -44,11 +44,11 @@ dwv.tool.draw.RoiFactory = function () {
  *
  * @param {Array} points The points from which to extract the line.
  * @param {object} style The drawing style.
- * @param {object} _image The associated image.
+ * @param {object} _viewController The associated view controller.
  * @returns {object} The Konva group.
  */
 dwv.tool.draw.RoiFactory.prototype.create = function (
-  points, style, _image) {
+  points, style, _viewController) {
   // physical shape
   var roi = new dwv.math.ROI();
   // add input points to the ROI
@@ -88,7 +88,7 @@ dwv.tool.draw.RoiFactory.prototype.create = function (
   // label
   var klabel = new Konva.Label({
     x: roi.getPoint(0).getX(),
-    y: roi.getPoint(0).getY() + 10,
+    y: roi.getPoint(0).getY() + style.scale(10),
     name: 'label'
   });
   klabel.add(ktext);
@@ -97,8 +97,8 @@ dwv.tool.draw.RoiFactory.prototype.create = function (
   // return group
   var group = new Konva.Group();
   group.name('roi-group');
-  group.add(kshape);
   group.add(klabel);
+  group.add(kshape);
   group.visible(true); // dont inherit
   return group;
 };
@@ -107,9 +107,10 @@ dwv.tool.draw.RoiFactory.prototype.create = function (
  * Update a roi shape.
  *
  * @param {object} anchor The active anchor.
- * @param {object} _image The associated image.
+ * @param {object} style The app style.
+ * @param {object} _viewController The associated view controller.
  */
-dwv.tool.draw.UpdateRoi = function (anchor, _image) {
+dwv.tool.draw.UpdateRoi = function (anchor, style, _viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape
@@ -141,7 +142,7 @@ dwv.tool.draw.UpdateRoi = function (anchor, _image) {
   // update position
   var textPos = {
     x: points[0] + kroi.x(),
-    y: points[1] + kroi.y() + 10
+    y: points[1] + kroi.y() + style.scale(10)
   };
   klabel.position(textPos);
 
