@@ -63,7 +63,6 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
     name: 'shape'
   });
   // quantification
-  var quant = rectangle.quantify(viewController);
   var ktext = new Konva.Text({
     fontSize: style.getScaledFontSize(),
     fontFamily: style.getFontFamily(),
@@ -76,7 +75,9 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
     ktext.textExpr = dwv.tool.draw.defaultRectangleLabelText;
   }
   ktext.longText = '';
-  ktext.quant = quant;
+  ktext.quant = rectangle.quantify(
+    viewController,
+    dwv.utils.getFlags(ktext.textExpr));
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
 
   // label
@@ -207,9 +208,10 @@ dwv.tool.draw.UpdateRect = function (anchor, style, viewController) {
   }
 
   // update text
-  var quant = rect.quantify(viewController);
   var ktext = klabel.getText();
-  ktext.quant = quant;
+  ktext.quant = rect.quantify(
+    viewController,
+    dwv.utils.getFlags(ktext.textExpr));
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
   // update position
   var textPos = {

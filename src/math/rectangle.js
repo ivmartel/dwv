@@ -145,9 +145,10 @@ dwv.math.Rectangle.prototype.getRound = function () {
  * Quantify a rectangle according to view information.
  *
  * @param {object} viewController The associated view controller.
+ * @param {Array} flags A list of stat values to calculate.
  * @returns {object} A quantification object.
  */
-dwv.math.Rectangle.prototype.quantify = function (viewController) {
+dwv.math.Rectangle.prototype.quantify = function (viewController, flags) {
   var quant = {};
   // surface
   var spacing = viewController.get2DSpacing();
@@ -160,11 +161,20 @@ dwv.math.Rectangle.prototype.quantify = function (viewController) {
   if (viewController.canQuantifyImage()) {
     var round = this.getRound();
     var values = viewController.getImageRegionValues(round.min, round.max);
-    var quantif = dwv.math.getStats(values);
+    var quantif = dwv.math.getStats(values, flags);
     quant.min = {value: quantif.getMin(), unit: ''};
     quant.max = {value: quantif.getMax(), unit: ''};
     quant.mean = {value: quantif.getMean(), unit: ''};
     quant.stdDev = {value: quantif.getStdDev(), unit: ''};
+    if (typeof quantif.getMedian !== 'undefined') {
+      quant.median = {value: quantif.getMedian(), unit: ''};
+    }
+    if (typeof quantif.getP25 !== 'undefined') {
+      quant.p25 = {value: quantif.getP25(), unit: ''};
+    }
+    if (typeof quantif.getP75 !== 'undefined') {
+      quant.p75 = {value: quantif.getP75(), unit: ''};
+    }
   }
 
   // return

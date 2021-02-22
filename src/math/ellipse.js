@@ -133,9 +133,10 @@ dwv.math.Ellipse.prototype.getRound = function () {
  * Quantify an ellipse according to view information.
  *
  * @param {object} viewController The associated view controller.
+ * @param {Array} flags A list of stat values to calculate.
  * @returns {object} A quantification object.
  */
-dwv.math.Ellipse.prototype.quantify = function (viewController) {
+dwv.math.Ellipse.prototype.quantify = function (viewController, flags) {
   var quant = {};
   // surface
   var spacing = viewController.get2DSpacing();
@@ -149,11 +150,20 @@ dwv.math.Ellipse.prototype.quantify = function (viewController) {
     var regions = this.getRound();
     if (regions.length !== 0) {
       var values = viewController.getImageVariableRegionValues(regions);
-      var quantif = dwv.math.getStats(values);
+      var quantif = dwv.math.getStats(values, flags);
       quant.min = {value: quantif.getMin(), unit: ''};
       quant.max = {value: quantif.getMax(), unit: ''};
       quant.mean = {value: quantif.getMean(), unit: ''};
       quant.stdDev = {value: quantif.getStdDev(), unit: ''};
+      if (typeof quantif.getMedian !== 'undefined') {
+        quant.median = {value: quantif.getMedian(), unit: ''};
+      }
+      if (typeof quantif.getP25 !== 'undefined') {
+        quant.p25 = {value: quantif.getP25(), unit: ''};
+      }
+      if (typeof quantif.getP75 !== 'undefined') {
+        quant.p75 = {value: quantif.getP75(), unit: ''};
+      }
     }
   }
 

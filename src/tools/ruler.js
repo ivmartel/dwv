@@ -103,7 +103,6 @@ dwv.tool.draw.RulerFactory.prototype.create = function (
   });
 
   // quantification
-  var quant = line.quantify(viewController);
   var ktext = new Konva.Text({
     fontSize: style.getScaledFontSize(),
     fontFamily: style.getFontFamily(),
@@ -116,7 +115,9 @@ dwv.tool.draw.RulerFactory.prototype.create = function (
     ktext.textExpr = dwv.tool.draw.defaultRulerLabelText;
   }
   ktext.longText = '';
-  ktext.quant = quant;
+  ktext.quant = line.quantify(
+    viewController,
+    dwv.utils.getFlags(ktext.textExpr));
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
 
   // label
@@ -220,9 +221,10 @@ dwv.tool.draw.UpdateRuler = function (anchor, style, viewController) {
     context.fillStrokeShape(this);
   });
   // update text
-  var quant = line.quantify(viewController);
   var ktext = klabel.getText();
-  ktext.quant = quant;
+  ktext.quant = line.quantify(
+    viewController,
+    dwv.utils.getFlags(ktext.textExpr));
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
   // update position
   var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
