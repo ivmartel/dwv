@@ -65,7 +65,6 @@ dwv.tool.draw.EllipseFactory.prototype.create = function (
     name: 'shape'
   });
   // quantification
-  var quant = ellipse.quantify(viewController);
   var ktext = new Konva.Text({
     fontSize: style.getScaledFontSize(),
     fontFamily: style.getFontFamily(),
@@ -78,7 +77,9 @@ dwv.tool.draw.EllipseFactory.prototype.create = function (
     ktext.textExpr = dwv.tool.draw.defaultEllipseLabelText;
   }
   ktext.longText = '';
-  ktext.quant = quant;
+  ktext.quant = ellipse.quantify(
+    viewController,
+    dwv.utils.getFlags(ktext.textExpr));
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
   // label
   var klabel = new Konva.Label({
@@ -204,9 +205,10 @@ dwv.tool.draw.UpdateEllipse = function (anchor, _style, viewController) {
   }
 
   // update text
-  var quant = ellipse.quantify(viewController);
   var ktext = klabel.getText();
-  ktext.quant = quant;
+  ktext.quant = ellipse.quantify(
+    viewController,
+    dwv.utils.getFlags(ktext.textExpr));
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
   // update position
   var textPos = {x: center.x, y: center.y};

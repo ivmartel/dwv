@@ -88,12 +88,6 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
     }
 
     // quantification
-    var quant = {
-      angle: {
-        value: angle,
-        unit: dwv.i18n('unit.degree')
-      }
-    };
     var ktext = new Konva.Text({
       fontSize: style.getScaledFontSize(),
       fontFamily: style.getFontFamily(),
@@ -106,7 +100,12 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
       ktext.textExpr = dwv.tool.draw.defaultProtractorLabelText;
     }
     ktext.longText = '';
-    ktext.quant = quant;
+    ktext.quant = {
+      angle: {
+        value: angle,
+        unit: dwv.i18n('unit.degree')
+      }
+    };
     ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
 
     // label
@@ -224,9 +223,10 @@ dwv.tool.draw.UpdateProtractor = function (anchor, style, _viewController) {
   }
 
   // update text
-  var quant = {angle: {value: angle, unit: dwv.i18n('unit.degree')}};
   var ktext = klabel.getText();
-  ktext.quant = quant;
+  ktext.quant = {
+    angle: {value: angle, unit: dwv.i18n('unit.degree')}
+  };
   ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
   // update position
   var midX = (line0.getMidpoint().getX() + line1.getMidpoint().getX()) / 2;

@@ -42,13 +42,13 @@ dwv.test.compareImageAndBuffer = function (image, size, buffer, rsi) {
   }
 
   // calculate stats if necessary
-  var statsDiff = new dwv.math.Stats(0, 0, 0, 0);
+  var statsDiff = new dwv.math.SimpleStats(0, 0, 0, 0);
   if (diffs.length !== 0) {
     statsDiff = dwv.math.getStats(diffs);
   }
-  var statsDiffRescaled = new dwv.math.Stats(0, 0, 0, 0);
+  var statsDiffRescaled = new dwv.math.SimpleStats(0, 0, 0, 0);
   if (diffsRescaled.length !== 0) {
-    statsDiffRescaled = dwv.math.getStats(diffsRescaled);
+    statsDiffRescaled = dwv.math.SimpleStats(diffsRescaled);
   }
 
   // return stats
@@ -64,7 +64,7 @@ dwv.test.compareImageAndBuffer = function (image, size, buffer, rsi) {
  * @function module:tests/image~getvalue
  */
 QUnit.test('Test Image getValue.', function (assert) {
-  var zeroStats = new dwv.math.Stats(0, 0, 0, 0);
+  var zeroStats = new dwv.math.SimpleStats(0, 0, 0, 0);
 
   // create a simple image
   var size0 = 4;
@@ -430,7 +430,7 @@ QUnit.test('Test Image compose.', function (assert) {
  * @function module:tests/image~ImageFactory
  */
 QUnit.test('Test ImageFactory.', function (assert) {
-  var zeroStats = new dwv.math.Stats(0, 0, 0, 0);
+  var zeroStats = new dwv.math.SimpleStats(0, 0, 0, 0);
 
   var size0 = 3;
   var imgSize0 = new dwv.image.Size(size0, size0, 1);
