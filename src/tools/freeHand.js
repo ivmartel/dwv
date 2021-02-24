@@ -100,6 +100,29 @@ dwv.tool.draw.FreeHandFactory.prototype.create = function (
 };
 
 /**
+ * Get anchors to update a free hand shape.
+ *
+ * @param {object} shape The associated shape.
+ * @param {object} style The application style.
+ * @param {number} scale The application scale.
+ * @returns {Array} A list of anchors.
+ */
+dwv.tool.draw.GetFreeHandAnchors = function (shape, style, scale) {
+  var points = shape.points();
+
+  var anchors = [];
+  for (var i = 0; i < points.length; i = i + 2) {
+    var px = points[i] + shape.x();
+    var py = points[i + 1] + shape.y();
+    var name = i;
+    anchors.push(dwv.tool.draw.getDefaultAnchor(
+      px, py, name, style, scale
+    ));
+  }
+  return anchors;
+};
+
+/**
  * Update a FreeHand shape.
  *
  * @param {object} anchor The active anchor.

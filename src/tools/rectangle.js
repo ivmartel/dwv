@@ -108,6 +108,36 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
 };
 
 /**
+ * Get anchors to update a rectangle shape.
+ *
+ * @param {object} shape The associated shape.
+ * @param {object} style The application style.
+ * @param {number} scale The application scale.
+ * @returns {Array} A list of anchors.
+ */
+dwv.tool.draw.GetRectAnchors = function (shape, style, scale) {
+  var rectX = shape.x();
+  var rectY = shape.y();
+  var rectWidth = shape.width();
+  var rectHeight = shape.height();
+
+  var anchors = [];
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    rectX, rectY, 'topLeft', style, scale
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    rectX + rectWidth, rectY, 'topRight', style, scale
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    rectX + rectWidth, rectY + rectHeight, 'bottomRight', style, scale
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    rectX, rectY + rectHeight, 'bottomLeft', style, scale
+  ));
+  return anchors;
+};
+
+/**
  * Update a rectangle shape.
  *
  * @param {object} anchor The active anchor.

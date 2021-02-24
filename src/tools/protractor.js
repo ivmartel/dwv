@@ -145,6 +145,30 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
 };
 
 /**
+ * Get anchors to update a protractor shape.
+ *
+ * @param {object} shape The associated shape.
+ * @param {object} style The application style.
+ * @param {number} scale The application scale.
+ * @returns {Array} A list of anchors.
+ */
+dwv.tool.draw.GetProtractorAnchors = function (shape, style, scale) {
+  var points = shape.points();
+
+  var anchors = [];
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    points[0] + shape.x(), points[1] + shape.y(), 'begin', style, scale
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    points[2] + shape.x(), points[3] + shape.y(), 'mid', style, scale
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    points[4] + shape.x(), points[5] + shape.y(), 'end', style, scale
+  ));
+  return anchors;
+};
+
+/**
  * Update a protractor shape.
  *
  * @param {object} anchor The active anchor.

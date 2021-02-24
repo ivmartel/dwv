@@ -10,6 +10,33 @@ dwv.tool = dwv.tool || {};
 var Konva = Konva || {};
 
 /**
+ * Get the default anchor shape.
+ *
+ * @param {number} x The X position.
+ * @param {number} y The Y position.
+ * @param {string} id The shape id.
+ * @param {object} style The application style.
+ * @param {number} scale The application scale.
+ * @returns {object} The default anchor shape.
+ */
+dwv.tool.draw.getDefaultAnchor = function (x, y, id, style, scale) {
+  return new Konva.Circle({
+    x: x,
+    y: y,
+    stroke: '#999',
+    fill: 'rgba(100,100,100,0.7',
+    strokeWidth: style.getStrokeWidth(),
+    strokeScaleEnabled: false,
+    radius: style.scale(6) / scale,
+    name: 'anchor',
+    id: id,
+    dragOnTop: false,
+    draggable: true,
+    visible: false
+  });
+};
+
+/**
  * Shape editor.
  *
  * @param {object} app The associated application.
@@ -205,103 +232,52 @@ dwv.tool.ShapeEditor = function (app) {
     if (!shape || !shape.getLayer()) {
       return;
     }
+
+    var anchors = null;
+
     // get shape group
     var group = shape.getParent();
     // add shape specific anchors to the shape group
     if (shape instanceof Konva.Line) {
-      var points = shape.points();
-
-      var needsBeginEnd = group.name() === 'line-group' ||
-                group.name() === 'ruler-group' ||
-                group.name() === 'protractor-group';
-      var needsMid = group.name() === 'protractor-group';
-
-      var px = 0;
-      var py = 0;
-      var name = '';
-      for (var i = 0; i < points.length; i = i + 2) {
-        px = points[i] + shape.x();
-        py = points[i + 1] + shape.y();
-        name = i;
-        if (needsBeginEnd) {
-          if (i === 0) {
-            name = 'begin';
-          } else if (i === points.length - 2) {
-            name = 'end';
-          }
-        }
-        if (needsMid && i === 2) {
-          name = 'mid';
-        }
-        addAnchor(group, px, py, name);
-      }
-
       if (group.name() === 'line-group') {
         updateFunction = dwv.tool.draw.UpdateArrow;
+        anchors = dwv.tool.draw.GetArrowAnchors(
+          shape, app.getStyle(), app.getScale());
       } else if (group.name() === 'ruler-group') {
         updateFunction = dwv.tool.draw.UpdateRuler;
+        anchors = dwv.tool.draw.GetRulerAnchors(
+          shape, app.getStyle(), app.getScale());
       } else if (group.name() === 'protractor-group') {
         updateFunction = dwv.tool.draw.UpdateProtractor;
+        anchors = dwv.tool.draw.GetProtractorAnchors(
+          shape, app.getStyle(), app.getScale());
       } else if (group.name() === 'roi-group') {
         updateFunction = dwv.tool.draw.UpdateRoi;
+        anchors = dwv.tool.draw.GetRoiAnchors(
+          shape, app.getStyle(), app.getScale());
       } else if (group.name() === 'freeHand-group') {
         updateFunction = dwv.tool.draw.UpdateFreeHand;
+        anchors = dwv.tool.draw.GetFreeHandAnchors(
+          shape, app.getStyle(), app.getScale());
       } else {
         dwv.logger.warn('Cannot update unknown line shape.');
       }
     } else if (shape instanceof Konva.Rect) {
       updateFunction = dwv.tool.draw.UpdateRect;
-      var rectX = shape.x();
-      var rectY = shape.y();
-      var rectWidth = shape.width();
-      var rectHeight = shape.height();
-      addAnchor(group, rectX, rectY, 'topLeft');
-      addAnchor(group, rectX + rectWidth, rectY, 'topRight');
-      addAnchor(group, rectX + rectWidth, rectY + rectHeight, 'bottomRight');
-      addAnchor(group, rectX, rectY + rectHeight, 'bottomLeft');
+      anchors = dwv.tool.draw.GetRectAnchors(
+        shape, app.getStyle(), app.getScale());
     } else if (shape instanceof Konva.Ellipse) {
       updateFunction = dwv.tool.draw.UpdateEllipse;
-      var ellipseX = shape.x();
-      var ellipseY = shape.y();
-      var radius = shape.radius();
-      addAnchor(group, ellipseX - radius.x, ellipseY - radius.y, 'topLeft');
-      addAnchor(group, ellipseX + radius.x, ellipseY - radius.y, 'topRight');
-      addAnchor(group, ellipseX + radius.x, ellipseY + radius.y, 'bottomRight');
-      addAnchor(group, ellipseX - radius.x, ellipseY + radius.y, 'bottomLeft');
+      anchors = dwv.tool.draw.GetEllipseAnchors(
+        shape, app.getStyle(), app.getScale());
     }
-    // add group to layer
-    //shape.getLayer().add( group );
-    //shape.getParent().add( group );
-  }
 
-  /**
-   * Create shape editor controls, i.e. the anchors.
-   *
-   * @param {object} group The group associated with this anchor.
-   * @param {number} x The X position of the anchor.
-   * @param {number} y The Y position of the anchor.
-   * @param {number} id The id of the anchor.
-   * @private
-   */
-  function addAnchor(group, x, y, id) {
-    // anchor shape
-    var anchor = new Konva.Circle({
-      x: x,
-      y: y,
-      stroke: '#999',
-      fill: 'rgba(100,100,100,0.7',
-      strokeWidth: app.getStyle().getScaledStrokeWidth() / app.getScale(),
-      radius: app.getStyle().scale(6) / app.getScale(),
-      name: 'anchor',
-      id: id,
-      dragOnTop: false,
-      draggable: true,
-      visible: false
-    });
-    // set anchor on
-    setAnchorOn(anchor);
-    // add the anchor to the group
-    group.add(anchor);
+    for (var a = 0; a < anchors.length; ++a) {
+      // set anchor on
+      setAnchorOn(anchors[a]);
+      // add the anchor to the group
+      group.add(anchors[a]);
+    }
   }
 
   /**

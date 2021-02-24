@@ -109,6 +109,35 @@ dwv.tool.draw.EllipseFactory.prototype.create = function (
 };
 
 /**
+ * Get anchors to update an ellipse shape.
+ *
+ * @param {object} shape The associated shape.
+ * @param {object} style The application style.
+ * @param {number} scale The application scale.
+ * @returns {Array} A list of anchors.
+ */
+dwv.tool.draw.GetEllipseAnchors = function (shape, style, scale) {
+  var ellipseX = shape.x();
+  var ellipseY = shape.y();
+  var radius = shape.radius();
+
+  var anchors = [];
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    ellipseX - radius.x, ellipseY - radius.y, 'topLeft', style, scale
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    ellipseX + radius.x, ellipseY - radius.y, 'topRight', style, scale
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    ellipseX + radius.x, ellipseY + radius.y, 'bottomRight', style, scale
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    ellipseX - radius.x, ellipseY + radius.y, 'bottomLeft', style, scale
+  ));
+  return anchors;
+};
+
+/**
  * Update an ellipse shape.
  *
  * @param {object} anchor The active anchor.
