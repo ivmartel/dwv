@@ -22,6 +22,14 @@ dwv.tool.draw.defaultRectangleLabelText = '{surface}';
  */
 dwv.tool.draw.RectangleFactory = function () {
   /**
+   * Get the name of the shape group.
+   *
+   * @returns {string} The name.
+   */
+  this.getGroupName = function () {
+    return 'rectangle-group';
+  };
+  /**
    * Get the number of points needed to build the shape.
    *
    * @returns {number} The number of points.
@@ -37,6 +45,16 @@ dwv.tool.draw.RectangleFactory = function () {
   this.getTimeout = function () {
     return 0;
   };
+};
+
+/**
+ * Is the input group a group of this factory?
+ *
+ * @param {object} group The group to test.
+ * @returns {boolean} True if the group is from this fcatory.
+ */
+dwv.tool.draw.RectangleFactory.prototype.isFactoryGroup = function (group) {
+  return this.getGroupName() === group.name();
 };
 
 /**
@@ -97,7 +115,7 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
 
   // return group
   var group = new Konva.Group();
-  group.name('rectangle-group');
+  group.name(this.getGroupName());
   if (kshadow) {
     group.add(kshadow);
   }
@@ -115,7 +133,8 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
  * @param {number} scale The application scale.
  * @returns {Array} A list of anchors.
  */
-dwv.tool.draw.GetRectAnchors = function (shape, style, scale) {
+dwv.tool.draw.RectangleFactory.prototype.getAnchors = function (
+  shape, style, scale) {
   var rectX = shape.x();
   var rectY = shape.y();
   var rectWidth = shape.width();
@@ -139,12 +158,15 @@ dwv.tool.draw.GetRectAnchors = function (shape, style, scale) {
 
 /**
  * Update a rectangle shape.
+ * Warning: do NOT use 'this' here, this method is passed
+ *   as is to the change command.
  *
  * @param {object} anchor The active anchor.
  * @param {object} style The app style.
  * @param {object} viewController The associated view controller.
  */
-dwv.tool.draw.UpdateRect = function (anchor, style, viewController) {
+dwv.tool.draw.RectangleFactory.prototype.update = function (
+  anchor, style, viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape

@@ -44,6 +44,20 @@ dwv.tool.draw.getDefaultAnchor = function (x, y, id, style, scale) {
  */
 dwv.tool.ShapeEditor = function (app) {
   /**
+   * Shape factory list
+   *
+   * @type {object}
+   * @private
+   */
+  var shapeFactoryList = null;
+  /**
+   * Current shape factory.
+   *
+   * @type {object}
+   * @private
+   */
+  var currentFactory = null;
+  /**
    * Edited shape.
    *
    * @private
@@ -65,13 +79,6 @@ dwv.tool.ShapeEditor = function (app) {
    */
   var isActive = false;
   /**
-   * Update function used by anchors to update the shape.
-   *
-   * @private
-   * @type {Function}
-   */
-  var updateFunction = null;
-  /**
    * Draw event callback.
    *
    * @private
@@ -80,15 +87,40 @@ dwv.tool.ShapeEditor = function (app) {
   var drawEventCallback = null;
 
   /**
+   * Set the tool options.
+   *
+   * @param {Array} list The list of shape classes.
+   */
+  this.setFactoryList = function (list) {
+    shapeFactoryList = list;
+  };
+
+  /**
    * Set the shape to edit.
    *
    * @param {object} inshape The shape to edit.
    */
   this.setShape = function (inshape) {
     shape = inshape;
-    // reset anchors
     if (shape) {
+      // remove old anchors
       removeAnchors();
+      // find a factory for the input shape
+      var group = shape.getParent();
+      var keys = Object.keys(shapeFactoryList);
+      currentFactory = null;
+      for (var i = 0; i < keys.length; ++i) {
+        var factory = new shapeFactoryList[keys[i]];
+        if (factory.isFactoryGroup(group)) {
+          currentFactory = factory;
+          // stop at first find
+          break;
+        }
+      }
+      if (currentFactory === null) {
+        throw new Error('Could not find a factory to update shape.');
+      }
+      // add new anchors
       addAnchors();
     }
   };
@@ -232,51 +264,17 @@ dwv.tool.ShapeEditor = function (app) {
     if (!shape || !shape.getLayer()) {
       return;
     }
-
-    var anchors = null;
-
     // get shape group
     var group = shape.getParent();
-    // add shape specific anchors to the shape group
-    if (shape instanceof Konva.Line) {
-      if (group.name() === 'line-group') {
-        updateFunction = dwv.tool.draw.UpdateArrow;
-        anchors = dwv.tool.draw.GetArrowAnchors(
-          shape, app.getStyle(), app.getScale());
-      } else if (group.name() === 'ruler-group') {
-        updateFunction = dwv.tool.draw.UpdateRuler;
-        anchors = dwv.tool.draw.GetRulerAnchors(
-          shape, app.getStyle(), app.getScale());
-      } else if (group.name() === 'protractor-group') {
-        updateFunction = dwv.tool.draw.UpdateProtractor;
-        anchors = dwv.tool.draw.GetProtractorAnchors(
-          shape, app.getStyle(), app.getScale());
-      } else if (group.name() === 'roi-group') {
-        updateFunction = dwv.tool.draw.UpdateRoi;
-        anchors = dwv.tool.draw.GetRoiAnchors(
-          shape, app.getStyle(), app.getScale());
-      } else if (group.name() === 'freeHand-group') {
-        updateFunction = dwv.tool.draw.UpdateFreeHand;
-        anchors = dwv.tool.draw.GetFreeHandAnchors(
-          shape, app.getStyle(), app.getScale());
-      } else {
-        dwv.logger.warn('Cannot update unknown line shape.');
-      }
-    } else if (shape instanceof Konva.Rect) {
-      updateFunction = dwv.tool.draw.UpdateRect;
-      anchors = dwv.tool.draw.GetRectAnchors(
-        shape, app.getStyle(), app.getScale());
-    } else if (shape instanceof Konva.Ellipse) {
-      updateFunction = dwv.tool.draw.UpdateEllipse;
-      anchors = dwv.tool.draw.GetEllipseAnchors(
-        shape, app.getStyle(), app.getScale());
-    }
 
-    for (var a = 0; a < anchors.length; ++a) {
+    // activate and add anchors to group
+    var anchors = currentFactory.getAnchors(
+      shape, app.getStyle(), app.getScale());
+    for (var i = 0; i < anchors.length; ++i) {
       // set anchor on
-      setAnchorOn(anchors[a]);
+      setAnchorOn(anchors[i]);
       // add the anchor to the group
-      group.add(anchors[a]);
+      group.add(anchors[i]);
     }
   }
 
@@ -333,11 +331,7 @@ dwv.tool.ShapeEditor = function (app) {
       // validate the anchor position
       dwv.tool.validateAnchorPosition(app.getDrawStage(), this);
       // update shape
-      if (updateFunction) {
-        updateFunction(this, app.getStyle(), viewController);
-      } else {
-        dwv.logger.warn('No update function!');
-      }
+      currentFactory.update(this, app.getStyle(), viewController);
       // redraw
       if (this.getLayer()) {
         this.getLayer().draw();
@@ -353,7 +347,7 @@ dwv.tool.ShapeEditor = function (app) {
       // store the change command
       var chgcmd = new dwv.tool.ChangeGroupCommand(
         shapeDisplayName,
-        updateFunction,
+        currentFactory.update,
         startAnchor,
         endAnchor,
         this.getLayer(),

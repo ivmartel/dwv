@@ -22,6 +22,14 @@ dwv.tool.draw.defaultRoiLabelText = '';
  */
 dwv.tool.draw.RoiFactory = function () {
   /**
+   * Get the name of the shape group.
+   *
+   * @returns {string} The name.
+   */
+  this.getGroupName = function () {
+    return 'roi-group';
+  };
+  /**
    * Get the number of points needed to build the shape.
    *
    * @returns {number} The number of points.
@@ -37,6 +45,16 @@ dwv.tool.draw.RoiFactory = function () {
   this.getTimeout = function () {
     return 100;
   };
+};
+
+/**
+ * Is the input group a group of this factory?
+ *
+ * @param {object} group The group to test.
+ * @returns {boolean} True if the group is from this fcatory.
+ */
+dwv.tool.draw.RoiFactory.prototype.isFactoryGroup = function (group) {
+  return this.getGroupName() === group.name();
 };
 
 /**
@@ -96,7 +114,7 @@ dwv.tool.draw.RoiFactory.prototype.create = function (
 
   // return group
   var group = new Konva.Group();
-  group.name('roi-group');
+  group.name(this.getGroupName());
   group.add(klabel);
   group.add(kshape);
   group.visible(true); // dont inherit
@@ -111,7 +129,8 @@ dwv.tool.draw.RoiFactory.prototype.create = function (
  * @param {number} scale The application scale.
  * @returns {Array} A list of anchors.
  */
-dwv.tool.draw.GetRoiAnchors = function (shape, style, scale) {
+dwv.tool.draw.RoiFactory.prototype.getAnchors = function (
+  shape, style, scale) {
   var points = shape.points();
 
   var anchors = [];
@@ -128,12 +147,15 @@ dwv.tool.draw.GetRoiAnchors = function (shape, style, scale) {
 
 /**
  * Update a roi shape.
+ * Warning: do NOT use 'this' here, this method is passed
+ *   as is to the change command.
  *
  * @param {object} anchor The active anchor.
  * @param {object} style The app style.
  * @param {object} _viewController The associated view controller.
  */
-dwv.tool.draw.UpdateRoi = function (anchor, style, _viewController) {
+dwv.tool.draw.RoiFactory.prototype.update = function (
+  anchor, style, _viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape

@@ -22,6 +22,14 @@ dwv.tool.draw.defaultEllipseLabelText = '{surface}';
  */
 dwv.tool.draw.EllipseFactory = function () {
   /**
+   * Get the name of the shape group.
+   *
+   * @returns {string} The name.
+   */
+  this.getGroupName = function () {
+    return 'ellipse-group';
+  };
+  /**
    * Get the number of points needed to build the shape.
    *
    * @returns {number} The number of points.
@@ -37,6 +45,16 @@ dwv.tool.draw.EllipseFactory = function () {
   this.getTimeout = function () {
     return 0;
   };
+};
+
+/**
+ * Is the input group a group of this factory?
+ *
+ * @param {object} group The group to test.
+ * @returns {boolean} True if the group is from this fcatory.
+ */
+dwv.tool.draw.EllipseFactory.prototype.isFactoryGroup = function (group) {
+  return this.getGroupName() === group.name();
 };
 
 /**
@@ -98,7 +116,7 @@ dwv.tool.draw.EllipseFactory.prototype.create = function (
 
   // return group
   var group = new Konva.Group();
-  group.name('ellipse-group');
+  group.name(this.getGroupName());
   if (kshadow) {
     group.add(kshadow);
   }
@@ -116,7 +134,8 @@ dwv.tool.draw.EllipseFactory.prototype.create = function (
  * @param {number} scale The application scale.
  * @returns {Array} A list of anchors.
  */
-dwv.tool.draw.GetEllipseAnchors = function (shape, style, scale) {
+dwv.tool.draw.EllipseFactory.prototype.getAnchors = function (
+  shape, style, scale) {
   var ellipseX = shape.x();
   var ellipseY = shape.y();
   var radius = shape.radius();
@@ -139,12 +158,15 @@ dwv.tool.draw.GetEllipseAnchors = function (shape, style, scale) {
 
 /**
  * Update an ellipse shape.
+ * Warning: do NOT use 'this' here, this method is passed
+ *   as is to the change command.
  *
  * @param {object} anchor The active anchor.
  * @param {object} _style The app style.
  * @param {object} viewController The associated view controller.
  */
-dwv.tool.draw.UpdateEllipse = function (anchor, _style, viewController) {
+dwv.tool.draw.EllipseFactory.prototype.update = function (
+  anchor, _style, viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape

@@ -22,6 +22,14 @@ dwv.tool.draw.defaultProtractorLabelText = '{angle}';
  */
 dwv.tool.draw.ProtractorFactory = function () {
   /**
+   * Get the name of the shape group.
+   *
+   * @returns {string} The name.
+   */
+  this.getGroupName = function () {
+    return 'protractor-group';
+  };
+  /**
    * Get the number of points needed to build the shape.
    *
    * @returns {number} The number of points.
@@ -37,6 +45,16 @@ dwv.tool.draw.ProtractorFactory = function () {
   this.getTimeout = function () {
     return 500;
   };
+};
+
+/**
+ * Is the input group a group of this factory?
+ *
+ * @param {object} group The group to test.
+ * @returns {boolean} True if the group is from this fcatory.
+ */
+dwv.tool.draw.ProtractorFactory.prototype.isFactoryGroup = function (group) {
+  return this.getGroupName() === group.name();
 };
 
 /**
@@ -66,7 +84,7 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
     name: 'shape'
   });
   var group = new Konva.Group();
-  group.name('protractor-group');
+  group.name(this.getGroupName());
   // text and decoration
   if (points.length === 3) {
     var line1 = new dwv.math.Line(points[1], points[2]);
@@ -152,7 +170,8 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
  * @param {number} scale The application scale.
  * @returns {Array} A list of anchors.
  */
-dwv.tool.draw.GetProtractorAnchors = function (shape, style, scale) {
+dwv.tool.draw.ProtractorFactory.prototype.getAnchors = function (
+  shape, style, scale) {
   var points = shape.points();
 
   var anchors = [];
@@ -170,12 +189,15 @@ dwv.tool.draw.GetProtractorAnchors = function (shape, style, scale) {
 
 /**
  * Update a protractor shape.
+ * Warning: do NOT use 'this' here, this method is passed
+ *   as is to the change command.
  *
  * @param {object} anchor The active anchor.
  * @param {object} style The app style.
  * @param {object} _viewController The associated view controller.
  */
-dwv.tool.draw.UpdateProtractor = function (anchor, style, _viewController) {
+dwv.tool.draw.ProtractorFactory.prototype.update = function (
+  anchor, style, _viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape

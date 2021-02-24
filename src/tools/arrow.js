@@ -24,6 +24,14 @@ dwv.tool.draw.defaultArrowLabelText = '';
  */
 dwv.tool.draw.ArrowFactory = function () {
   /**
+   * Get the name of the shape group.
+   *
+   * @returns {string} The name.
+   */
+  this.getGroupName = function () {
+    return 'line-group';
+  };
+  /**
    * Get the number of points needed to build the shape.
    *
    * @returns {number} The number of points.
@@ -39,6 +47,16 @@ dwv.tool.draw.ArrowFactory = function () {
   this.getTimeout = function () {
     return 0;
   };
+};
+
+/**
+ * Is the input group a group of this factory?
+ *
+ * @param {object} group The group to test.
+ * @returns {boolean} True if the group is from this fcatory.
+ */
+dwv.tool.draw.ArrowFactory.prototype.isFactoryGroup = function (group) {
+  return this.getGroupName() === group.name();
 };
 
 /**
@@ -125,7 +143,7 @@ dwv.tool.draw.ArrowFactory.prototype.create = function (
 
   // return group
   var group = new Konva.Group();
-  group.name('line-group');
+  group.name(this.getGroupName());
   group.add(klabel);
   group.add(kpoly);
   group.add(kshape);
@@ -141,7 +159,8 @@ dwv.tool.draw.ArrowFactory.prototype.create = function (
  * @param {number} scale The application scale.
  * @returns {Array} A list of anchors.
  */
-dwv.tool.draw.GetArrowAnchors = function (shape, style, scale) {
+dwv.tool.draw.ArrowFactory.prototype.getAnchors = function (
+  shape, style, scale) {
   var points = shape.points();
 
   var anchors = [];
@@ -156,12 +175,15 @@ dwv.tool.draw.GetArrowAnchors = function (shape, style, scale) {
 
 /**
  * Update an arrow shape.
+ * Warning: do NOT use 'this' here, this method is passed
+ *   as is to the change command.
  *
  * @param {object} anchor The active anchor.
  * @param {object} style The app style.
  * @param {object} _viewController The associated view controller.
  */
-dwv.tool.draw.UpdateArrow = function (anchor, style, _viewController) {
+dwv.tool.draw.ArrowFactory.prototype.update = function (
+  anchor, style, _viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape

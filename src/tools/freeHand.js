@@ -22,6 +22,14 @@ dwv.tool.draw.defaultFreeHandLabelText = '';
  */
 dwv.tool.draw.FreeHandFactory = function () {
   /**
+   * Get the name of the shape group.
+   *
+   * @returns {string} The name.
+   */
+  this.getGroupName = function () {
+    return 'freehand-group';
+  };
+  /**
    * Get the number of points needed to build the shape.
    *
    * @returns {number} The number of points.
@@ -37,6 +45,16 @@ dwv.tool.draw.FreeHandFactory = function () {
   this.getTimeout = function () {
     return 25;
   };
+};
+
+/**
+ * Is the input group a group of this factory?
+ *
+ * @param {object} group The group to test.
+ * @returns {boolean} True if the group is from this fcatory.
+ */
+dwv.tool.draw.FreeHandFactory.prototype.isFactoryGroup = function (group) {
+  return this.getGroupName() === group.name();
 };
 
 /**
@@ -92,7 +110,7 @@ dwv.tool.draw.FreeHandFactory.prototype.create = function (
 
   // return group
   var group = new Konva.Group();
-  group.name('freeHand-group');
+  group.name(this.getGroupName());
   group.add(klabel);
   group.add(kshape);
   group.visible(true); // dont inherit
@@ -107,7 +125,8 @@ dwv.tool.draw.FreeHandFactory.prototype.create = function (
  * @param {number} scale The application scale.
  * @returns {Array} A list of anchors.
  */
-dwv.tool.draw.GetFreeHandAnchors = function (shape, style, scale) {
+dwv.tool.draw.FreeHandFactory.prototype.getAnchors = function (
+  shape, style, scale) {
   var points = shape.points();
 
   var anchors = [];
@@ -124,12 +143,15 @@ dwv.tool.draw.GetFreeHandAnchors = function (shape, style, scale) {
 
 /**
  * Update a FreeHand shape.
+ * Warning: do NOT use 'this' here, this method is passed
+ *   as is to the change command.
  *
  * @param {object} anchor The active anchor.
  * @param {object} style The app style.
  * @param {object} _viewController The associated view controller.
  */
-dwv.tool.draw.UpdateFreeHand = function (anchor, style, _viewController) {
+dwv.tool.draw.FreeHandFactory.prototype.update = function (
+  anchor, style, _viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape

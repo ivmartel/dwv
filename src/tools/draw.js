@@ -737,6 +737,8 @@ dwv.tool.Draw = function (app) {
   this.setOptions = function (options) {
     // save the options as the shape factory list
     this.shapeFactoryList = options;
+    // pass them to the editor
+    shapeEditor.setFactoryList(options);
   };
 
   /**
