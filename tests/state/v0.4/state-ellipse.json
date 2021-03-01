@@ -1,0 +1,112 @@
+{
+  "version": "0.4",
+  "window-center": 441,
+  "window-width": 911,
+  "position": {
+    "i": 0,
+    "j": 0,
+    "k": 0
+  },
+  "scale": 1,
+  "scaleCenter": {
+    "x": 0,
+    "y": 0
+  },
+  "translation": {
+    "x": 0,
+    "y": 0
+  },
+  "drawings": {
+    "attrs": {},
+    "className": "Layer",
+    "children": [
+      {
+        "attrs": {
+          "name": "position-group",
+          "id": "slice-0_frame-0"
+        },
+        "className": "Group",
+        "children": [
+          {
+            "attrs": {
+              "name": "ellipse-group",
+              "id": "c6j16qt6vt6",
+              "draggable": true
+            },
+            "className": "Group",
+            "children": [
+              {
+                "attrs": {
+                  "x": 97,
+                  "y": 96,
+                  "name": "label"
+                },
+                "className": "Label",
+                "children": [
+                  {
+                    "attrs": {
+                      "fontSize": 5.333333333333333,
+                      "fontFamily": "Verdana",
+                      "fill": "#ffff80",
+                      "name": "text",
+                      "text": "53.28 cm²"
+                    },
+                    "className": "Text"
+                  },
+                  {
+                    "attrs": {
+                      "width": 21.426986694335938,
+                      "height": 5.333333333333333
+                    },
+                    "className": "Tag"
+                  }
+                ]
+              },
+              {
+                "attrs": {
+                  "x": 90,
+                  "y": 78,
+                  "radiusX": 53,
+                  "radiusY": 32,
+                  "stroke": "#ffff80",
+                  "strokeScaleEnabled": false,
+                  "name": "shape"
+                },
+                "className": "Ellipse"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "drawingsDetails": {
+    "c6j16qt6vt6": {
+      "meta": {
+        "textExpr": "{surface}",
+        "quantification": {
+          "surface": {
+            "value": 53.281411404882896,
+            "unit": "cm²"
+          },
+          "min": {
+            "value": 33,
+            "unit": ""
+          },
+          "max": {
+            "value": 530,
+            "unit": ""
+          },
+          "mean": {
+            "value": 373.8735571878279,
+            "unit": ""
+          },
+          "stdDev": {
+            "value": 81.48455498171317,
+            "unit": ""
+          }
+        }
+      }
+    }
+  }
+}
