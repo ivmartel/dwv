@@ -118,15 +118,18 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
     } else {
       textExpr = dwv.tool.draw.defaultProtractorLabelText;
     }
-    var quantification = {
+    var quant = {
       angle: {
         value: angle,
         unit: dwv.i18n('unit.degree')
       }
     };
-    ktext.setText(dwv.utils.replaceFlags(textExpr, quantification));
+    ktext.setText(dwv.utils.replaceFlags(textExpr, quant));
     // meta data
-    ktext.meta = {textExpr, quantification};
+    ktext.meta = {
+      textExpr: textExpr,
+      quantification: quant
+    };
 
     // label
     var midX = (line0.getMidpoint().getX() + line1.getMidpoint().getX()) / 2;

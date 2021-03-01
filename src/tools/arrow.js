@@ -130,7 +130,10 @@ dwv.tool.draw.ArrowFactory.prototype.create = function (
   }
   ktext.setText(textExpr);
   // meta data
-  ktext.meta = {textExpr, quantification: {}};
+  ktext.meta = {
+    textExpr: textExpr,
+    quantification: {}
+  };
   // label
   var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
   var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;

@@ -95,12 +95,15 @@ dwv.tool.draw.EllipseFactory.prototype.create = function (
   } else {
     textExpr = dwv.tool.draw.defaultEllipseLabelText;
   }
-  var quantification = ellipse.quantify(
+  var quant = ellipse.quantify(
     viewController,
     dwv.utils.getFlags(textExpr));
-  ktext.setText(dwv.utils.replaceFlags(textExpr, quantification));
+  ktext.setText(dwv.utils.replaceFlags(textExpr, quant));
   // meta data
-  ktext.meta = {textExpr, quantification};
+  ktext.meta = {
+    textExpr: textExpr,
+    quantification: quant
+  };
   // label
   var klabel = new Konva.Label({
     x: ellipse.getCenter().getX(),

@@ -133,12 +133,15 @@ dwv.tool.draw.RulerFactory.prototype.create = function (
   } else {
     textExpr = dwv.tool.draw.defaultRulerLabelText;
   }
-  var quantification = line.quantify(
+  var quant = line.quantify(
     viewController,
     dwv.utils.getFlags(textExpr));
-  ktext.setText(dwv.utils.replaceFlags(textExpr, quantification));
+  ktext.setText(dwv.utils.replaceFlags(textExpr, quant));
   // meta data
-  ktext.meta = {textExpr, quantification};
+  ktext.meta = {
+    textExpr: textExpr,
+    quantification: quant
+  };
 
   // label
   var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;

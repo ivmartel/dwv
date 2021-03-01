@@ -102,7 +102,10 @@ dwv.tool.draw.RoiFactory.prototype.create = function (
   }
   ktext.setText(textExpr);
   // meta data
-  ktext.meta = {textExpr, quantification: {}};
+  ktext.meta = {
+    textExpr: textExpr,
+    quantification: {}
+  };
 
   // label
   var klabel = new Konva.Label({
