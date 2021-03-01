@@ -696,7 +696,6 @@ dwv.tool.Draw = function (app) {
     });
     // double click handling: update label
     shapeGroup.on('dblclick', function () {
-
       // get the label object for this shape
       var label = this.findOne('Label');
       // should just be one
@@ -705,27 +704,31 @@ dwv.tool.Draw = function (app) {
       }
       var ktext = label.getText();
 
-      // ask user for new label
-      // TODO remove
-      var labelText = dwv.gui.prompt('Shape label', ktext.textExpr);
+      var onSaveCallback = function (meta) {
+        // store meta
+        ktext.meta = meta;
+        // update text expression
+        ktext.setText(dwv.utils.replaceFlags(
+          ktext.meta.textExpr, ktext.meta.quantification));
+        // trigger event
+        fireEvent({
+          type: 'drawchange'
+        });
+        // draw
+        drawLayer.draw();
+      };
 
-      // if press cancel do nothing
-      if (labelText === null) {
-        return;
-      } else if (labelText === ktext.textExpr) {
-        return;
+      // call client dialog if defined
+      if (typeof dwv.gui.openRoiDialog !== 'undefined') {
+        dwv.gui.openRoiDialog(ktext.meta, onSaveCallback);
+      } else {
+        // simple prompt for the text expression
+        var textExpr = prompt('Label', ktext.meta.textExpr);
+        if (textExpr !== null) {
+          ktext.meta.textExpr = textExpr;
+          onSaveCallback(ktext.meta);
+        }
       }
-      // update text expression and set text
-      ktext.textExpr = labelText;
-      ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
-
-      // trigger event
-      fireEvent({
-        type: 'drawchange'
-      });
-
-      // draw
-      drawLayer.draw();
     });
   };
 

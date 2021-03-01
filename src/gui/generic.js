@@ -4,17 +4,6 @@ dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
- * Ask some text to the user.
- *
- * @param {string} message Text to display to the user.
- * @param {string} defaultText Default value displayed in the text input field.
- * @returns {string} Text entered by the user.
- */
-dwv.gui.base.prompt = function (message, defaultText) {
-  return prompt(message, defaultText);
-};
-
-/**
  * Get a HTML element associated to a container div.
  *
  * @param {number} containerDivId The id of the container div.
