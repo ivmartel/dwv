@@ -127,16 +127,18 @@ dwv.tool.draw.RulerFactory.prototype.create = function (
     fill: style.getLineColour(),
     name: 'text'
   });
+  var textExpr = '';
   if (typeof dwv.tool.draw.rulerLabelText !== 'undefined') {
-    ktext.textExpr = dwv.tool.draw.rulerLabelText;
+    textExpr = dwv.tool.draw.rulerLabelText;
   } else {
-    ktext.textExpr = dwv.tool.draw.defaultRulerLabelText;
+    textExpr = dwv.tool.draw.defaultRulerLabelText;
   }
-  ktext.longText = '';
-  ktext.quant = line.quantify(
+  var quantification = line.quantify(
     viewController,
-    dwv.utils.getFlags(ktext.textExpr));
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    dwv.utils.getFlags(textExpr));
+  ktext.setText(dwv.utils.replaceFlags(textExpr, quantification));
+  // meta data
+  ktext.meta = {textExpr, quantification};
 
   // label
   var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
@@ -263,12 +265,15 @@ dwv.tool.draw.RulerFactory.prototype.update = function (
     context.closePath();
     context.fillStrokeShape(this);
   });
+
   // update text
   var ktext = klabel.getText();
-  ktext.quant = line.quantify(
+  var quantification = line.quantify(
     viewController,
-    dwv.utils.getFlags(ktext.textExpr));
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    dwv.utils.getFlags(ktext.meta.textExpr));
+  ktext.setText(dwv.utils.replaceFlags(ktext.meta.textExpr, quantification));
+  // update meta
+  ktext.meta.quantification = quantification;
   // update position
   var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
   var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;

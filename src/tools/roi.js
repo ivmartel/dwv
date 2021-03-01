@@ -94,14 +94,15 @@ dwv.tool.draw.RoiFactory.prototype.create = function (
     fill: style.getLineColour(),
     name: 'text'
   });
+  var textExpr = '';
   if (typeof dwv.tool.draw.roiLabelText !== 'undefined') {
-    ktext.textExpr = dwv.tool.draw.roiLabelText;
+    textExpr = dwv.tool.draw.roiLabelText;
   } else {
-    ktext.textExpr = dwv.tool.draw.defaultRoiLabelText;
+    textExpr = dwv.tool.draw.defaultRoiLabelText;
   }
-  ktext.longText = '';
-  ktext.quant = null;
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+  ktext.setText(textExpr);
+  // meta data
+  ktext.meta = {textExpr, quantification: {}};
 
   // label
   var klabel = new Konva.Label({
@@ -182,8 +183,7 @@ dwv.tool.draw.RoiFactory.prototype.update = function (
 
   // update text
   var ktext = klabel.getText();
-  ktext.quant = null;
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+  ktext.setText(ktext.meta.textExpr);
   // update position
   var textPos = {
     x: points[0] + kroi.x(),

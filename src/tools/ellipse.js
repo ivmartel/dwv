@@ -89,16 +89,18 @@ dwv.tool.draw.EllipseFactory.prototype.create = function (
     fill: style.getLineColour(),
     name: 'text'
   });
+  var textExpr = '';
   if (typeof dwv.tool.draw.ellipseLabelText !== 'undefined') {
-    ktext.textExpr = dwv.tool.draw.ellipseLabelText;
+    textExpr = dwv.tool.draw.ellipseLabelText;
   } else {
-    ktext.textExpr = dwv.tool.draw.defaultEllipseLabelText;
+    textExpr = dwv.tool.draw.defaultEllipseLabelText;
   }
-  ktext.longText = '';
-  ktext.quant = ellipse.quantify(
+  var quantification = ellipse.quantify(
     viewController,
-    dwv.utils.getFlags(ktext.textExpr));
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    dwv.utils.getFlags(textExpr));
+  ktext.setText(dwv.utils.replaceFlags(textExpr, quantification));
+  // meta data
+  ktext.meta = {textExpr, quantification};
   // label
   var klabel = new Konva.Label({
     x: ellipse.getCenter().getX(),
@@ -257,10 +259,12 @@ dwv.tool.draw.EllipseFactory.prototype.update = function (
 
   // update text
   var ktext = klabel.getText();
-  ktext.quant = ellipse.quantify(
+  var quantification = ellipse.quantify(
     viewController,
-    dwv.utils.getFlags(ktext.textExpr));
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    dwv.utils.getFlags(ktext.meta.textExpr));
+  ktext.setText(dwv.utils.replaceFlags(ktext.meta.textExpr, quantification));
+  // update meta
+  ktext.meta.quantification = quantification;
   // update position
   var textPos = {x: center.x, y: center.y};
   klabel.position(textPos);
