@@ -112,19 +112,24 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
       fill: style.getLineColour(),
       name: 'text'
     });
+    var textExpr = '';
     if (typeof dwv.tool.draw.protractorLabelText !== 'undefined') {
-      ktext.textExpr = dwv.tool.draw.protractorLabelText;
+      textExpr = dwv.tool.draw.protractorLabelText;
     } else {
-      ktext.textExpr = dwv.tool.draw.defaultProtractorLabelText;
+      textExpr = dwv.tool.draw.defaultProtractorLabelText;
     }
-    ktext.longText = '';
-    ktext.quant = {
+    var quant = {
       angle: {
         value: angle,
         unit: dwv.i18n('unit.degree')
       }
     };
-    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    ktext.setText(dwv.utils.replaceFlags(textExpr, quant));
+    // meta data
+    ktext.meta = {
+      textExpr: textExpr,
+      quantification: quant
+    };
 
     // label
     var midX = (line0.getMidpoint().getX() + line1.getMidpoint().getX()) / 2;
@@ -270,10 +275,12 @@ dwv.tool.draw.ProtractorFactory.prototype.update = function (
 
   // update text
   var ktext = klabel.getText();
-  ktext.quant = {
+  var quantification = {
     angle: {value: angle, unit: dwv.i18n('unit.degree')}
   };
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+  ktext.setText(dwv.utils.replaceFlags(ktext.meta.textExpr, quantification));
+  // update meta
+  ktext.meta.quantification = quantification;
   // update position
   var midX = (line0.getMidpoint().getX() + line1.getMidpoint().getX()) / 2;
   var midY = (line0.getMidpoint().getY() + line1.getMidpoint().getY()) / 2;

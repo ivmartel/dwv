@@ -8,6 +8,8 @@ var Konva = Konva || {};
  * Saves: data url/path, display info.
  *
  * History:
+ * - v0.4 (dwv 0.29.0, ??/2021)
+ *   - move drawing details into meta property
  * - v0.3 (dwv v0.23.0, 03/2018)
  *   - new drawing structure, drawings are now the full layer object and
  *     using toObject to avoid saving a string representation
@@ -34,7 +36,7 @@ dwv.State = function () {
   this.toJSON = function (app) {
     // return a JSON string
     return JSON.stringify({
-      version: '0.3',
+      version: '0.4',
       'window-center': app.getViewController().getWindowLevel().center,
       'window-width': app.getViewController().getWindowLevel().width,
       position: app.getViewController().getCurrentPosition(),
@@ -60,6 +62,8 @@ dwv.State = function () {
       res = readV02(data);
     } else if (data.version === '0.3') {
       res = readV03(data);
+    } else if (data.version === '0.4') {
+      res = readV04(data);
     } else {
       throw new Error('Unknown state file format version: \'' +
         data.version + '\'.');
@@ -93,7 +97,8 @@ dwv.State = function () {
     // update drawings
     var v02DAndD = dwv.v01Tov02DrawingsAndDetails(data.drawings);
     data.drawings = dwv.v02Tov03Drawings(v02DAndD.drawings).toObject();
-    data.drawingsDetails = v02DAndD.drawingsDetails;
+    data.drawingsDetails = dwv.v03Tov04DrawingsDetails(
+      v02DAndD.drawingsDetails);
     return data;
   }
   /**
@@ -106,7 +111,8 @@ dwv.State = function () {
   function readV02(data) {
     // update drawings
     data.drawings = dwv.v02Tov03Drawings(data.drawings).toObject();
-    data.drawingsDetails = dwv.v02Tov03DrawingsDetails(data.drawingsDetails);
+    data.drawingsDetails = dwv.v03Tov04DrawingsDetails(
+      dwv.v02Tov03DrawingsDetails(data.drawingsDetails));
     return data;
   }
   /**
@@ -117,6 +123,17 @@ dwv.State = function () {
    * @private
    */
   function readV03(data) {
+    data.drawingsDetails = dwv.v03Tov04DrawingsDetails(data.drawingsDetails);
+    return data;
+  }
+  /**
+   * Read an application state from an Object in v0.4 format.
+   *
+   * @param {object} data The Object representation of the state.
+   * @returns {object} The state object.
+   * @private
+   */
+  function readV04(data) {
     return data;
   }
 
@@ -182,7 +199,7 @@ dwv.v02Tov03Drawings = function (drawings) {
 };
 
 /**
- * Convert drawings from v0.2 to v0.3.
+ * Convert drawings from v0.1 to v0.2.
  * v0.1: text on its own
  * v0.2: text as part of label
  *
@@ -355,6 +372,31 @@ dwv.v02Tov03DrawingsDetails = function (details) {
         };
       }
     }
+  }
+  return res;
+};
+
+/**
+ * Convert drawing details from v0.3 to v0.4.
+ * - v0.3: properties at group root
+ * - v0.4: properties in group meta object
+ *
+ * @param {Array} details An array of drawing details.
+ * @returns {object} The converted drawings.
+ */
+dwv.v03Tov04DrawingsDetails = function (details) {
+  var res = {};
+  var keys = Object.keys(details);
+  // Iterate over each position-groups
+  for (var k = 0, lenk = keys.length; k < lenk; ++k) {
+    var detail = details[keys[k]];
+    res[keys[k]] = {
+      meta: {
+        textExpr: detail.textExpr,
+        longText: detail.longText,
+        quantification: detail.quant
+      }
+    };
   }
   return res;
 };

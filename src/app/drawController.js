@@ -344,8 +344,7 @@ dwv.DrawController = function (drawDiv) {
           frame: position.frameNumber,
           type: type,
           color: shape.stroke(),
-          label: text.textExpr,
-          description: text.longText
+          meta: text.meta
         });
       }
     }
@@ -380,11 +379,9 @@ dwv.DrawController = function (drawDiv) {
         if (texts.length !== 1) {
           dwv.logger.warn('There should not be more than one text per shape.');
         }
-        // get details (non konva vars)
+        // get meta (non konva vars)
         drawingsDetails[group.id()] = {
-          textExpr: texts[0].textExpr,
-          longText: texts[0].longText,
-          quant: texts[0].quant
+          meta: texts[0].meta
         };
       }
     }
@@ -446,11 +443,11 @@ dwv.DrawController = function (drawDiv) {
           var label = stateGroup.getChildren(dwv.draw.isNodeNameLabel)[0];
           var text = label.getText();
           // store details
-          text.textExpr = details.textExpr;
-          text.longText = details.longText;
-          text.quant = details.quant;
+          text.meta = details.meta;
           // reset text (it was not encoded)
-          text.setText(dwv.utils.replaceFlags(text.textExpr, text.quant));
+          text.setText(dwv.utils.replaceFlags(
+            text.meta.textExpr, text.meta.quantification
+          ));
         }
         // execute
         cmd.execute();
@@ -491,9 +488,10 @@ dwv.DrawController = function (drawDiv) {
     var label = group.getChildren(dwv.draw.isNodeNameLabel)[0];
     var text = label.getChildren()[0];
     text.fill(drawDetails.color);
-    text.textExpr = drawDetails.label;
-    text.longText = drawDetails.description;
-    text.setText(dwv.utils.replaceFlags(text.textExpr, text.quant));
+    text.meta = drawDetails.meta;
+    text.setText(dwv.utils.replaceFlags(
+      text.meta.textExpr, text.meta.quantification
+    ));
 
     // udpate current layer
     drawLayer.draw();

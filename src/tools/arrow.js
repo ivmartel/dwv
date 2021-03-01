@@ -122,14 +122,18 @@ dwv.tool.draw.ArrowFactory.prototype.create = function (
     fill: style.getLineColour(),
     name: 'text'
   });
+  var textExpr = '';
   if (typeof dwv.tool.draw.arrowLabelText !== 'undefined') {
-    ktext.textExpr = dwv.tool.draw.arrowLabelText;
+    textExpr = dwv.tool.draw.arrowLabelText;
   } else {
-    ktext.textExpr = dwv.tool.draw.defaultArrowLabelText;
+    textExpr = dwv.tool.draw.defaultArrowLabelText;
   }
-  ktext.longText = '';
-  ktext.quant = null;
-  ktext.setText(ktext.textExpr);
+  ktext.setText(textExpr);
+  // meta data
+  ktext.meta = {
+    textExpr: textExpr,
+    quantification: {}
+  };
   // label
   var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
   var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
@@ -251,10 +255,10 @@ dwv.tool.draw.ArrowFactory.prototype.update = function (
   ktriangle.x(line.getBegin().getX() + ktriangle.radius() * Math.sin(angleRad));
   ktriangle.y(line.getBegin().getY() + ktriangle.radius() * Math.cos(angleRad));
   ktriangle.rotation(-angle);
+
   // update text
   var ktext = klabel.getText();
-  ktext.quant = null;
-  ktext.setText(ktext.textExpr);
+  ktext.setText(ktext.meta.textExpr);
   // update position
   var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
   var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;

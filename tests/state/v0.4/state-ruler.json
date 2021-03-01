@@ -1,0 +1,126 @@
+{
+  "version": "0.4",
+  "window-center": 441,
+  "window-width": 911,
+  "position": {
+    "i": 0,
+    "j": 0,
+    "k": 0
+  },
+  "scale": 1,
+  "scaleCenter": {
+    "x": 0,
+    "y": 0
+  },
+  "translation": {
+    "x": 0,
+    "y": 0
+  },
+  "drawings": {
+    "attrs": {},
+    "className": "Layer",
+    "children": [
+      {
+        "attrs": {
+          "id": "slice-0_frame-0",
+          "name": "position-group"
+        },
+        "className": "Group",
+        "children": [
+          {
+            "attrs": {
+              "name": "ruler-group",
+              "id": "4gvkz8v6wzw",
+              "draggable": true
+            },
+            "className": "Group",
+            "children": [
+              {
+                "attrs": {
+                  "x": 191.39089965820312,
+                  "y": 128.33333333333334,
+                  "name": "label"
+                },
+                "className": "Label",
+                "children": [
+                  {
+                    "attrs": {
+                      "fontSize": 5.333333333333333,
+                      "fontFamily": "Verdana",
+                      "fill": "#ffff80",
+                      "name": "text",
+                      "text": "165.0 mm"
+                    },
+                    "className": "Text"
+                  },
+                  {
+                    "attrs": {
+                      "width": 21.609100341796875,
+                      "height": 5.333333333333333
+                    },
+                    "className": "Tag"
+                  }
+                ]
+              },
+              {
+                "attrs": {
+                  "points": [
+                    52.986111382370524,
+                    133.7778211792829,
+                    53.013888617629476,
+                    138.2221788207171
+                  ],
+                  "stroke": "#ffff80",
+                  "strokeScaleEnabled": false,
+                  "name": "shape-tick0"
+                },
+                "className": "Line"
+              },
+              {
+                "attrs": {
+                  "points": [
+                    212.98611138237052,
+                    132.7778211792829,
+                    213.01388861762948,
+                    137.2221788207171
+                  ],
+                  "stroke": "#ffff80",
+                  "strokeScaleEnabled": false,
+                  "name": "shape-tick1"
+                },
+                "className": "Line"
+              },
+              {
+                "attrs": {
+                  "points": [
+                    51,
+                    135,
+                    216,
+                    134
+                  ],
+                  "stroke": "#ffff80",
+                  "strokeScaleEnabled": false,
+                  "name": "shape"
+                },
+                "className": "Line"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "drawingsDetails": {
+    "4gvkz8v6wzw": {
+      "meta": {
+        "textExpr": "{length}",
+        "quantification": {
+          "length": {
+            "value": 165.00312496948303,
+            "unit": "mm"
+          }
+        }
+      }
+    }
+  }
+}

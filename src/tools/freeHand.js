@@ -27,7 +27,7 @@ dwv.tool.draw.FreeHandFactory = function () {
    * @returns {string} The name.
    */
   this.getGroupName = function () {
-    return 'freehand-group';
+    return 'freeHand-group';
   };
   /**
    * Get the number of points needed to build the shape.
@@ -90,14 +90,18 @@ dwv.tool.draw.FreeHandFactory.prototype.create = function (
     fill: style.getLineColour(),
     name: 'text'
   });
+  var textExpr = '';
   if (typeof dwv.tool.draw.freeHandLabelText !== 'undefined') {
-    ktext.textExpr = dwv.tool.draw.freeHandLabelText;
+    textExpr = dwv.tool.draw.freeHandLabelText;
   } else {
-    ktext.textExpr = dwv.tool.draw.defaultFreeHandLabelText;
+    textExpr = dwv.tool.draw.defaultFreeHandLabelText;
   }
-  ktext.longText = '';
-  ktext.quant = null;
-  ktext.setText(ktext.textExpr);
+  ktext.setText(textExpr);
+  // meta data
+  ktext.meta = {
+    textExpr: textExpr,
+    quantification: {}
+  };
 
   // label
   var klabel = new Konva.Label({
@@ -179,8 +183,7 @@ dwv.tool.draw.FreeHandFactory.prototype.update = function (
 
   // update text
   var ktext = klabel.getText();
-  ktext.quant = null;
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+  ktext.setText(ktext.meta.textExpr);
   // update position
   var textPos = {
     x: points[0] + kline.x(),

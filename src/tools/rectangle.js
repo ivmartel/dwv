@@ -80,24 +80,28 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
     strokeScaleEnabled: false,
     name: 'shape'
   });
-  // quantification
+  // label text
   var ktext = new Konva.Text({
     fontSize: style.getScaledFontSize(),
     fontFamily: style.getFontFamily(),
     fill: style.getLineColour(),
     name: 'text'
   });
+  var textExpr = '';
   if (typeof dwv.tool.draw.rectangleLabelText !== 'undefined') {
-    ktext.textExpr = dwv.tool.draw.rectangleLabelText;
+    textExpr = dwv.tool.draw.rectangleLabelText;
   } else {
-    ktext.textExpr = dwv.tool.draw.defaultRectangleLabelText;
+    textExpr = dwv.tool.draw.defaultRectangleLabelText;
   }
-  ktext.longText = '';
-  ktext.quant = rectangle.quantify(
+  var quant = rectangle.quantify(
     viewController,
-    dwv.utils.getFlags(ktext.textExpr));
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
-
+    dwv.utils.getFlags(textExpr));
+  ktext.setText(dwv.utils.replaceFlags(textExpr, quant));
+  // meta data
+  ktext.meta = {
+    textExpr: textExpr,
+    quantification: quant
+  };
   // label
   var klabel = new Konva.Label({
     x: rectangle.getBegin().getX(),
@@ -261,10 +265,12 @@ dwv.tool.draw.RectangleFactory.prototype.update = function (
 
   // update text
   var ktext = klabel.getText();
-  ktext.quant = rect.quantify(
+  var quantification = rect.quantify(
     viewController,
-    dwv.utils.getFlags(ktext.textExpr));
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    dwv.utils.getFlags(ktext.meta.textExpr));
+  ktext.setText(dwv.utils.replaceFlags(ktext.meta.textExpr, quantification));
+  // update meta
+  ktext.meta.quantification = quantification;
   // update position
   var textPos = {
     x: rect.getBegin().getX() - group.x(),
