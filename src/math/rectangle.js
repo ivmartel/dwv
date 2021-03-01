@@ -82,7 +82,7 @@ dwv.math.Rectangle.prototype.getSurface = function () {
 };
 
 /**
- * Get the surface of the circle according to a spacing.
+ * Get the surface of the rectangle according to a spacing.
  *
  * @param {number} spacingX The X spacing.
  * @param {number} spacingY The Y spacing.
