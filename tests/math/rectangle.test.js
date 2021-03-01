@@ -45,7 +45,7 @@ QUnit.test('Test Rectangle.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.math.Rectangle}.
+ * Tests for {@link dwv.math.Rectangle} quantification.
  *
  * @function module:tests/math~Rectangle
  */
