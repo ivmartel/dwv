@@ -81,12 +81,50 @@ dwv.math.Circle.prototype.getWorldSurface = function (spacingX, spacingY) {
 };
 
 /**
+ * Get the rounded limits of the circle.
+ * (see https://en.wikipedia.org/wiki/Circle#Equations)
+ * Circle formula: x*x + y*y = r*r
+ * => y = (+-) sqrt(r*r - x*x)
+ *
+ * @returns {Array} The rounded limits.
+ */
+dwv.math.Circle.prototype.getRound = function () {
+  var centerX = this.getCenter().getX();
+  var centerY = this.getCenter().getY();
+  var radius = this.getRadius();
+  var rSquare = Math.pow(radius, 2);
+  // Y bounds
+  var minY = centerY - radius;
+  var maxY = centerY + radius;
+  var regions = [];
+  // loop through lines and store limits
+  for (var y = minY; y < maxY; ++y) {
+    var diff = rSquare - Math.pow(y - centerY, 2);
+    // remove small values (possibly negative)
+    if (Math.abs(diff) < 1e-7) {
+      continue;
+    }
+    var transX = Math.sqrt(diff);
+    // remove small values
+    if (transX < 0.5) {
+      continue;
+    }
+    regions.push([
+      [Math.round(centerX - transX), Math.round(y)],
+      [Math.round(centerX + transX), Math.round(y)]
+    ]);
+  }
+  return regions;
+};
+
+/**
  * Quantify an circle according to view information.
  *
  * @param {object} viewController The associated view controller.
+ * @param {Array} flags A list of stat values to calculate.
  * @returns {object} A quantification object.
  */
-dwv.math.Circle.prototype.quantify = function (viewController) {
+dwv.math.Circle.prototype.quantify = function (viewController, flags) {
   var quant = {};
   // surface
   var spacing = viewController.get2DSpacing();
@@ -94,6 +132,29 @@ dwv.math.Circle.prototype.quantify = function (viewController) {
   if (surface !== null) {
     quant.surface = {value: surface / 100, unit: dwv.i18n('unit.cm2')};
   }
+
+  // pixel quantification
+  if (viewController.canQuantifyImage()) {
+    var regions = this.getRound();
+    if (regions.length !== 0) {
+      var values = viewController.getImageVariableRegionValues(regions);
+      var quantif = dwv.math.getStats(values, flags);
+      quant.min = {value: quantif.getMin(), unit: ''};
+      quant.max = {value: quantif.getMax(), unit: ''};
+      quant.mean = {value: quantif.getMean(), unit: ''};
+      quant.stdDev = {value: quantif.getStdDev(), unit: ''};
+      if (typeof quantif.getMedian !== 'undefined') {
+        quant.median = {value: quantif.getMedian(), unit: ''};
+      }
+      if (typeof quantif.getP25 !== 'undefined') {
+        quant.p25 = {value: quantif.getP25(), unit: ''};
+      }
+      if (typeof quantif.getP75 !== 'undefined') {
+        quant.p75 = {value: quantif.getP75(), unit: ''};
+      }
+    }
+  }
+
   // return
   return quant;
 };
