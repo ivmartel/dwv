@@ -142,6 +142,9 @@
         "Ellipse": {
             "name": "Elipse"
         },
+        "Circle": {
+            "name": "Circulo"
+        },
         "Arrow": {
             "name": "Flecha"
         },

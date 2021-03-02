@@ -142,6 +142,9 @@
         "Ellipse": {
             "name": "Elipsă"
         },
+        "Circle": {
+            "name": "Cerc"
+        },
         "Arrow": {
             "name": "Săgeată"
         },

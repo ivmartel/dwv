@@ -142,6 +142,9 @@
         "Ellipse": {
             "name": "椭圆"
         },
+        "Circle": {
+            "name": "圓圈"
+        },
         "Arrow": {
             "name": "箭头"
         },

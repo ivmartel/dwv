@@ -142,6 +142,9 @@
         "Ellipse": {
             "name": "楕円"
         },
+        "Circle": {
+            "name": "サークル"
+        },
         "Arrow": {
             "name": "矢印"
         },
