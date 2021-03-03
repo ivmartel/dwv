@@ -75,4 +75,10 @@ dwv.test.onDOMContentLoadedViewer = function () {
     console.log(event.target.files);
     _app.loadFiles(event.target.files);
   });
+
+  var alpharange = document.getElementById('alpharange');
+  alpharange.oninput = function () {
+    _app.setOpacity(this.value / 100);
+  };
+
 };

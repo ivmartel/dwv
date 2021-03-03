@@ -655,6 +655,16 @@ dwv.App = function () {
   };
 
   /**
+   * Set the image layer opacity.
+   *
+   * @param {number} alpha The opacity ([0:1] range).
+   */
+  this.setOpacity = function (alpha) {
+    imageLayer.setOpacity(alpha);
+    imageLayer.draw();
+  };
+
+  /**
    * Get the list of drawing display details.
    *
    * @returns {object} The list of draw details including id, slice, frame...

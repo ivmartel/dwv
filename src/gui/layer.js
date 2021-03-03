@@ -58,6 +58,32 @@ dwv.html.Layer = function (canvas) {
   var imageData = null;
 
   /**
+   * The layer opacity.
+   *
+   * @private
+   * @type {number}
+   */
+  var opacity = 1;
+
+  /**
+   * Get the layer opacity.
+   *
+   * @returns {number} The opacity ([0:1] range).
+   */
+  this.getOpacity = function () {
+    return opacity;
+  };
+
+  /**
+   * Set the layer opacity.
+   *
+   * @param {number} alpha The opacity ([0:1] range).
+   */
+  this.setOpacity = function (alpha) {
+    opacity = alpha;
+  };
+
+  /**
    * The layer origin.
    *
    * @private
@@ -199,6 +225,9 @@ dwv.html.Layer = function (canvas) {
    * The imageData variable needs to be set
    */
   this.draw = function () {
+    // context opacity
+    context.globalAlpha = opacity;
+
     // clear the context: reset the transform first
     // store the current transformation matrix
     context.save();
