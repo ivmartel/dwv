@@ -329,7 +329,8 @@ dwv.tool.ShapeEditor = function (app) {
     // drag move listener
     anchor.on('dragmove.edit', function (evt) {
       // validate the anchor position
-      dwv.tool.validateAnchorPosition(app.getDrawStage(), this);
+      dwv.tool.validateAnchorPosition(
+        app.getDrawController().getInitialSize(), this);
       // update shape
       currentFactory.update(this, app.getStyle(), viewController);
       // redraw

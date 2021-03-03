@@ -131,6 +131,10 @@ dwv.DrawController = function (drawDiv) {
   var drawLayer;
   // current position group id
   var currentPosGroupId = null;
+  // initial stage width
+  var stageWidth;
+  // initial stage height
+  var stageHeight;
 
   /**
    * Get the current position group.
@@ -162,12 +166,27 @@ dwv.DrawController = function (drawDiv) {
   };
 
   /**
+   * Get the initial stage size.
+   *
+   * @returns {object} The size as {x,y}.
+   */
+  this.getInitialSize = function () {
+    return {
+      x: stageWidth,
+      y: stageHeight
+    };
+  };
+
+  /**
    * Create the controller: sets up the draw stage.
    *
    * @param {number} width The width of the stage.
    * @param {number} height The height of the stage.
    */
   this.create = function (width, height) {
+    // store size
+    stageWidth = width;
+    stageHeight = height;
     // create stage
     drawStage = new Konva.Stage({
       container: drawDiv,

@@ -604,7 +604,8 @@ dwv.tool.Draw = function (app) {
     // drag move event handling
     shapeGroup.on('dragmove.draw', function (event) {
       // validate the group position
-      dwv.tool.validateGroupPosition(app.getDrawStage(), this);
+      dwv.tool.validateGroupPosition(
+        app.getDrawController().getInitialSize(), this);
       // highlight trash when on it
       var offset = dwv.html.getEventOffset(event.evt)[0];
       var eventPos = getRealPosition(offset);
@@ -902,15 +903,12 @@ dwv.tool.boundNodePosition = function (node, min, max) {
 /**
  * Validate a group position.
  *
- * @param {object} stage The stage the group belongs to.
+ * @param {object} stageSize The stage size {x,y}.
  * @param {object} group The group to evaluate.
  * @returns {boolean} True if the position was corrected.
  */
-dwv.tool.validateGroupPosition = function (stage, group) {
-  var scale = stage.scale();
-  var stageRealWidth = stage.width() / scale.x;
-  var stageRealHeight = stage.height() / scale.y;
-  // if anchors get mised, width/height can be negative
+dwv.tool.validateGroupPosition = function (stageSize, group) {
+  // if anchors get mixed, width/height can be negative
   var shape = group.getChildren(dwv.draw.isNodeNameShape)[0];
   var anchorMin = dwv.tool.getAnchorMin(group);
 
@@ -919,8 +917,10 @@ dwv.tool.validateGroupPosition = function (stage, group) {
     y: -anchorMin.y
   };
   var max = {
-    x: stageRealWidth - (anchorMin.x + Math.abs(shape.width())),
-    y: stageRealHeight - (anchorMin.y + Math.abs(shape.height()))
+    x: stageSize.x -
+      (anchorMin.x + Math.abs(shape.width())),
+    y: stageSize.y -
+      (anchorMin.y + Math.abs(shape.height()))
   };
 
   return dwv.tool.boundNodePosition(group, min, max);
@@ -929,15 +929,11 @@ dwv.tool.validateGroupPosition = function (stage, group) {
 /**
  * Validate an anchor position.
  *
- * @param {object} stage The stage the group belongs to.
+ * @param {object} stageSize The stage size {x,y}.
  * @param {object} anchor The anchor to evaluate.
  * @returns {boolean} True if the position was corrected.
  */
-dwv.tool.validateAnchorPosition = function (stage, anchor) {
-  var scale = stage.scale();
-  var stageRealWidth = stage.width() / scale.x;
-  var stageRealHeight = stage.height() / scale.y;
-  // possible group translation
+dwv.tool.validateAnchorPosition = function (stageSize, anchor) {
   var group = anchor.getParent();
 
   var min = {
@@ -945,8 +941,8 @@ dwv.tool.validateAnchorPosition = function (stage, anchor) {
     y: -group.y()
   };
   var max = {
-    x: stageRealWidth - group.x(),
-    y: stageRealHeight - group.y()
+    x: stageSize.x - group.x(),
+    y: stageSize.y - group.y()
   };
 
   return dwv.tool.boundNodePosition(anchor, min, max);
