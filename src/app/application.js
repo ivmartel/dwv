@@ -396,6 +396,7 @@ dwv.App = function () {
     scale = windowScale;
     scaleCenter = {x: 0, y: 0};
     translation = {x: 0, y: 0};
+    style.setZoomScale(windowScale);
     // apply new values
     if (imageLayer) {
       imageLayer.resetLayout(windowScale);
@@ -1043,6 +1044,8 @@ dwv.App = function () {
     if (drawController) {
       drawController.zoomStage(scale, scaleCenter);
     }
+    // update style
+    style.setZoomScale(scale);
     // fire event
     /**
      * Zoom change event.
