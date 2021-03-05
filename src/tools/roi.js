@@ -132,11 +132,9 @@ dwv.tool.draw.RoiFactory.prototype.create = function (
  *
  * @param {object} shape The associated shape.
  * @param {object} style The application style.
- * @param {number} scale The application scale.
  * @returns {Array} A list of anchors.
  */
-dwv.tool.draw.RoiFactory.prototype.getAnchors = function (
-  shape, style, scale) {
+dwv.tool.draw.RoiFactory.prototype.getAnchors = function (shape, style) {
   var points = shape.points();
 
   var anchors = [];
@@ -145,7 +143,7 @@ dwv.tool.draw.RoiFactory.prototype.getAnchors = function (
     var py = points[i + 1] + shape.y();
     var name = i;
     anchors.push(dwv.tool.draw.getDefaultAnchor(
-      px, py, name, style, scale
+      px, py, name, style
     ));
   }
   return anchors;

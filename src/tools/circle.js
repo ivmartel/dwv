@@ -139,27 +139,25 @@ dwv.tool.draw.CircleFactory.prototype.create = function (
  *
  * @param {object} shape The associated shape.
  * @param {object} style The application style.
- * @param {number} scale The application scale.
  * @returns {Array} A list of anchors.
  */
-dwv.tool.draw.CircleFactory.prototype.getAnchors = function (
-  shape, style, scale) {
+dwv.tool.draw.CircleFactory.prototype.getAnchors = function (shape, style) {
   var centerX = shape.x();
   var centerY = shape.y();
   var radius = shape.radius();
 
   var anchors = [];
   anchors.push(dwv.tool.draw.getDefaultAnchor(
-    centerX - radius, centerY, 'left', style, scale
+    centerX - radius, centerY, 'left', style
   ));
   anchors.push(dwv.tool.draw.getDefaultAnchor(
-    centerX + radius, centerY, 'right', style, scale
+    centerX + radius, centerY, 'right', style
   ));
   anchors.push(dwv.tool.draw.getDefaultAnchor(
-    centerX, centerY - radius, 'bottom', style, scale
+    centerX, centerY - radius, 'bottom', style
   ));
   anchors.push(dwv.tool.draw.getDefaultAnchor(
-    centerX, centerY + radius, 'top', style, scale
+    centerX, centerY + radius, 'top', style
   ));
   return anchors;
 };

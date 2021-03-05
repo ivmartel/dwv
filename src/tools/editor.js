@@ -16,10 +16,9 @@ var Konva = Konva || {};
  * @param {number} y The Y position.
  * @param {string} id The shape id.
  * @param {object} style The application style.
- * @param {number} scale The application scale.
  * @returns {object} The default anchor shape.
  */
-dwv.tool.draw.getDefaultAnchor = function (x, y, id, style, scale) {
+dwv.tool.draw.getDefaultAnchor = function (x, y, id, style) {
   return new Konva.Circle({
     x: x,
     y: y,
@@ -27,7 +26,7 @@ dwv.tool.draw.getDefaultAnchor = function (x, y, id, style, scale) {
     fill: 'rgba(100,100,100,0.7',
     strokeWidth: style.getStrokeWidth(),
     strokeScaleEnabled: false,
-    radius: style.scale(6) / scale,
+    radius: style.applyZoomScale(3),
     name: 'anchor',
     id: id,
     dragOnTop: false,
@@ -268,8 +267,7 @@ dwv.tool.ShapeEditor = function (app) {
     var group = shape.getParent();
 
     // activate and add anchors to group
-    var anchors = currentFactory.getAnchors(
-      shape, app.getStyle(), app.getScale());
+    var anchors = currentFactory.getAnchors(shape, app.getStyle());
     for (var i = 0; i < anchors.length; ++i) {
       // set anchor on
       setAnchorOn(anchors[i]);

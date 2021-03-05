@@ -138,27 +138,25 @@ dwv.tool.draw.EllipseFactory.prototype.create = function (
  *
  * @param {object} shape The associated shape.
  * @param {object} style The application style.
- * @param {number} scale The application scale.
  * @returns {Array} A list of anchors.
  */
-dwv.tool.draw.EllipseFactory.prototype.getAnchors = function (
-  shape, style, scale) {
+dwv.tool.draw.EllipseFactory.prototype.getAnchors = function (shape, style) {
   var ellipseX = shape.x();
   var ellipseY = shape.y();
   var radius = shape.radius();
 
   var anchors = [];
   anchors.push(dwv.tool.draw.getDefaultAnchor(
-    ellipseX - radius.x, ellipseY - radius.y, 'topLeft', style, scale
+    ellipseX - radius.x, ellipseY - radius.y, 'topLeft', style
   ));
   anchors.push(dwv.tool.draw.getDefaultAnchor(
-    ellipseX + radius.x, ellipseY - radius.y, 'topRight', style, scale
+    ellipseX + radius.x, ellipseY - radius.y, 'topRight', style
   ));
   anchors.push(dwv.tool.draw.getDefaultAnchor(
-    ellipseX + radius.x, ellipseY + radius.y, 'bottomRight', style, scale
+    ellipseX + radius.x, ellipseY + radius.y, 'bottomRight', style
   ));
   anchors.push(dwv.tool.draw.getDefaultAnchor(
-    ellipseX - radius.x, ellipseY + radius.y, 'bottomLeft', style, scale
+    ellipseX - radius.x, ellipseY + radius.y, 'bottomLeft', style
   ));
   return anchors;
 };

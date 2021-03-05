@@ -136,11 +136,9 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
  *
  * @param {object} shape The associated shape.
  * @param {object} style The application style.
- * @param {number} scale The application scale.
  * @returns {Array} A list of anchors.
  */
-dwv.tool.draw.RectangleFactory.prototype.getAnchors = function (
-  shape, style, scale) {
+dwv.tool.draw.RectangleFactory.prototype.getAnchors = function (shape, style) {
   var rectX = shape.x();
   var rectY = shape.y();
   var rectWidth = shape.width();
@@ -148,16 +146,16 @@ dwv.tool.draw.RectangleFactory.prototype.getAnchors = function (
 
   var anchors = [];
   anchors.push(dwv.tool.draw.getDefaultAnchor(
-    rectX, rectY, 'topLeft', style, scale
+    rectX, rectY, 'topLeft', style
   ));
   anchors.push(dwv.tool.draw.getDefaultAnchor(
-    rectX + rectWidth, rectY, 'topRight', style, scale
+    rectX + rectWidth, rectY, 'topRight', style
   ));
   anchors.push(dwv.tool.draw.getDefaultAnchor(
-    rectX + rectWidth, rectY + rectHeight, 'bottomRight', style, scale
+    rectX + rectWidth, rectY + rectHeight, 'bottomRight', style
   ));
   anchors.push(dwv.tool.draw.getDefaultAnchor(
-    rectX, rectY + rectHeight, 'bottomLeft', style, scale
+    rectX, rectY + rectHeight, 'bottomLeft', style
   ));
   return anchors;
 };
