@@ -107,7 +107,7 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
 
     // quantification
     var ktext = new Konva.Text({
-      fontSize: style.getScaledFontSize(),
+      fontSize: style.getFontSize(),
       fontFamily: style.getFontFamily(),
       fill: style.getLineColour(),
       name: 'text'
@@ -137,6 +137,8 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
     var klabel = new Konva.Label({
       x: midX,
       y: midY - style.scale(15),
+      scaleX: style.applyZoomScale(1),
+      scaleY: style.applyZoomScale(1),
       name: 'label'
     });
     klabel.add(ktext);

@@ -85,7 +85,7 @@ dwv.tool.draw.FreeHandFactory.prototype.create = function (
 
   // text
   var ktext = new Konva.Text({
-    fontSize: style.getScaledFontSize(),
+    fontSize: style.getFontSize(),
     fontFamily: style.getFontFamily(),
     fill: style.getLineColour(),
     name: 'text'
@@ -107,6 +107,8 @@ dwv.tool.draw.FreeHandFactory.prototype.create = function (
   var klabel = new Konva.Label({
     x: points[0].getX(),
     y: points[0].getY() + style.scale(10),
+    scaleX: style.applyZoomScale(1),
+    scaleY: style.applyZoomScale(1),
     name: 'label'
   });
   klabel.add(ktext);
