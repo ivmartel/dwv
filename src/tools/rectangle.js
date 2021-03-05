@@ -82,7 +82,7 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
   });
   // label text
   var ktext = new Konva.Text({
-    fontSize: style.getScaledFontSize(),
+    fontSize: style.getFontSize(),
     fontFamily: style.getFontFamily(),
     fill: style.getLineColour(),
     name: 'text'
@@ -106,6 +106,8 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
   var klabel = new Konva.Label({
     x: rectangle.getBegin().getX(),
     y: rectangle.getEnd().getY() + style.scale(10),
+    scaleX: style.applyZoomScale(1),
+    scaleY: style.applyZoomScale(1),
     name: 'label'
   });
   klabel.add(ktext);

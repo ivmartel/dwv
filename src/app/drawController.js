@@ -262,13 +262,33 @@ dwv.DrawController = function (drawDiv) {
   };
 
   /**
+   * Update label scale: compensate for it so
+   *   that label size stays visually the same.
+   *
+   * @param {object} scale The scale to compensate for
+   */
+  function updateLabelScale(scale) {
+    // same formula as in style::applyZoomScale:
+    // compensate for scale and times 2 so that font 10 looks like a 10
+    var ratioX = 2 / scale.x;
+    var ratioY = 2 / scale.y;
+    // compensate scale for labels
+    var labels = drawStage.find('Label');
+    for (var i = 0; i < labels.length; ++i) {
+      labels[i].scale({x: ratioX, y: ratioY});
+    }
+  }
+
+  /**
    * Reset the stage with a new window scale.
    *
    * @param {number} windowScale The window scale.
    */
   this.resetStage = function (windowScale) {
+    var scale = {x: windowScale, y: windowScale};
     drawStage.offset({x: 0, y: 0});
-    drawStage.scale({x: windowScale, y: windowScale});
+    drawStage.scale(scale);
+    updateLabelScale(scale);
     drawStage.draw();
   };
 
@@ -280,13 +300,15 @@ dwv.DrawController = function (drawDiv) {
    * @param {number} scale the stage scale.
    */
   this.resizeStage = function (width, height, scale) {
+    var newScale = {x: scale, y: scale};
     // resize div
     drawDiv.setAttribute('style',
       'width:' + width + 'px;height:' + height + 'px');
     // resize stage
     drawStage.setWidth(width);
     drawStage.setHeight(height);
-    drawStage.scale({x: scale, y: scale});
+    drawStage.scale(newScale);
+    updateLabelScale(newScale);
     drawStage.draw();
   };
 
@@ -311,6 +333,7 @@ dwv.DrawController = function (drawDiv) {
     // store
     drawStage.offset(newOffset);
     drawStage.scale(newScale);
+    updateLabelScale(newScale);
     drawStage.draw();
   };
 

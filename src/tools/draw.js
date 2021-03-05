@@ -146,7 +146,7 @@ dwv.tool.Draw = function (app) {
    *
    * @type {dwv.html.Style}
    */
-  this.style = new dwv.html.Style();
+  this.style = app.getStyle();
 
   /**
    * Event listeners.
