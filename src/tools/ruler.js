@@ -151,9 +151,8 @@ dwv.tool.draw.RulerFactory.prototype.create = function (
   var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
   var klabel = new Konva.Label({
     x: line.getEnd().getX() + dX * ktext.width(),
-    y: line.getEnd().getY() + dY * style.applyZoomScale(15),
-    scaleX: style.applyZoomScale(1),
-    scaleY: style.applyZoomScale(1),
+    y: line.getEnd().getY() + dY * style.applyZoomScale(15).y,
+    scale: style.applyZoomScale(1),
     name: 'label'
   });
   klabel.add(ktext);
@@ -288,7 +287,7 @@ dwv.tool.draw.RulerFactory.prototype.update = function (
   var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
   var textPos = {
     x: line.getEnd().getX() + dX * ktext.width(),
-    y: line.getEnd().getY() + dY * style.applyZoomScale(15)
+    y: line.getEnd().getY() + dY * style.applyZoomScale(15).y
   };
   klabel.position(textPos);
 };

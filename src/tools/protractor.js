@@ -139,9 +139,8 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
     var midY = (line0.getMidpoint().getY() + line1.getMidpoint().getY()) / 2;
     var klabel = new Konva.Label({
       x: midX,
-      y: midY - style.applyZoomScale(15),
-      scaleX: style.applyZoomScale(1),
-      scaleY: style.applyZoomScale(1),
+      y: midY - style.applyZoomScale(15).y,
+      scale: style.applyZoomScale(1),
       name: 'label'
     });
     klabel.add(ktext);
@@ -292,7 +291,7 @@ dwv.tool.draw.ProtractorFactory.prototype.update = function (
   var midY = (line0.getMidpoint().getY() + line1.getMidpoint().getY()) / 2;
   var textPos = {
     x: midX,
-    y: midY - style.applyZoomScale(15)
+    y: midY - style.applyZoomScale(15).y
   };
   klabel.position(textPos);
 

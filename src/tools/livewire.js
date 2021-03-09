@@ -127,6 +127,9 @@ dwv.tool.Livewire = function (app) {
       // clear vars
       clearPaths();
       clearParentPoints();
+      // update zoom scale
+      self.style.setZoomScale(
+        app.getDrawController().getDrawLayer().getAbsoluteScale());
       // do the training from the first point
       var p = new dwv.math.FastPoint2D(event._x, event._y);
       scissors.doTraining(p);

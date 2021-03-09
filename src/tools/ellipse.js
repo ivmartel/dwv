@@ -111,8 +111,7 @@ dwv.tool.draw.EllipseFactory.prototype.create = function (
   var klabel = new Konva.Label({
     x: ellipse.getCenter().getX(),
     y: ellipse.getCenter().getY(),
-    scaleX: style.applyZoomScale(1),
-    scaleY: style.applyZoomScale(1),
+    scale: style.applyZoomScale(1),
     name: 'label'
   });
   klabel.add(ktext);

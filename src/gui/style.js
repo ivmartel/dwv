@@ -47,9 +47,9 @@ dwv.html.Style = function () {
    * Zoom scale.
    *
    * @private
-   * @type {number}
+   * @type {object}
    */
-  var zoomScale = 1;
+  var zoomScale = {x: 1, y: 1};
   /**
    * Stroke width.
    *
@@ -146,7 +146,7 @@ dwv.html.Style = function () {
   /**
    * Set the zoom scale.
    *
-   * @param {number} scale The zoom scale.
+   * @param {object} scale The zoom scale as {x,y}.
    */
   this.setZoomScale = function (scale) {
     zoomScale = scale;
@@ -155,7 +155,7 @@ dwv.html.Style = function () {
   /**
    * Get the display scale.
    *
-   * @returns {number} scale The display scale.
+   * @returns {number} The display scale.
    */
   this.getScale = function () {
     return displayScale;
@@ -164,7 +164,7 @@ dwv.html.Style = function () {
   /**
    * Get the zoom scale.
    *
-   * @returns {number} scale The zoom scale.
+   * @returns {object} The zoom scale as {x,y}.
    */
   this.getZoomScale = function () {
     return zoomScale;
@@ -184,12 +184,15 @@ dwv.html.Style = function () {
    * Apply zoom scale on an input value.
    *
    * @param {number} value The value to scale.
-   * @returns {number} The scaled value.
+   * @returns {object} The scaled value as {x,y}.
    */
   this.applyZoomScale = function (value) {
     // times 2 so that the font size 10 looks like a 10...
     // (same logic as in the DrawController::updateLabelScale)
-    return 2 * value / zoomScale;
+    return {
+      x: 2 * value / zoomScale.x,
+      y: 2 * value / zoomScale.y
+    };
   };
 
   /**

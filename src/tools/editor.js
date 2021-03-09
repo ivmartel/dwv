@@ -19,7 +19,7 @@ var Konva = Konva || {};
  * @returns {object} The default anchor shape.
  */
 dwv.tool.draw.getDefaultAnchor = function (x, y, id, style) {
-  return new Konva.Circle({
+  return new Konva.Ellipse({
     x: x,
     y: y,
     stroke: '#999',

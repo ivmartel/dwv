@@ -347,6 +347,10 @@ dwv.tool.Floodfill = function (app) {
       return;
     }
 
+    // update zoom scale
+    self.style.setZoomScale(
+      app.getDrawController().getDrawLayer().getAbsoluteScale());
+
     self.started = true;
     initialpoint = getCoord(event);
     paintBorder(initialpoint, initialthreshold);

@@ -174,15 +174,16 @@ dwv.tool.Draw = function (app) {
       return;
     }
 
-    // update scale
-    self.style.setScale(app.getWindowScale());
-
     // determine if the click happened in an existing shape
     var stage = app.getDrawStage();
     var kshape = stage.getIntersection({
       x: event._xs,
       y: event._ys
     });
+
+    // update scale
+    self.style.setScale(app.getWindowScale());
+    self.style.setZoomScale(stage.scale());
 
     if (kshape) {
       var group = kshape.getParent();
