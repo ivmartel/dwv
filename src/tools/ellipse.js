@@ -87,6 +87,9 @@ dwv.tool.draw.EllipseFactory.prototype.create = function (
     fontSize: style.getFontSize(),
     fontFamily: style.getFontFamily(),
     fill: style.getLineColour(),
+    padding: style.getTextPadding(),
+    shadowColor: style.getShadowLineColour(),
+    shadowOffset: style.getShadowOffset(),
     name: 'text'
   });
   var textExpr = '';
@@ -113,7 +116,10 @@ dwv.tool.draw.EllipseFactory.prototype.create = function (
     name: 'label'
   });
   klabel.add(ktext);
-  klabel.add(new Konva.Tag());
+  klabel.add(new Konva.Tag({
+    fill: style.getLineColour(),
+    opacity: style.getTagOpacity()
+  }));
 
   // debug shadow
   var kshadow;

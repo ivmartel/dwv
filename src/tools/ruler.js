@@ -125,6 +125,9 @@ dwv.tool.draw.RulerFactory.prototype.create = function (
     fontSize: style.getFontSize(),
     fontFamily: style.getFontFamily(),
     fill: style.getLineColour(),
+    padding: style.getTextPadding(),
+    shadowColor: style.getShadowLineColour(),
+    shadowOffset: style.getShadowOffset(),
     name: 'text'
   });
   var textExpr = '';
@@ -145,16 +148,19 @@ dwv.tool.draw.RulerFactory.prototype.create = function (
 
   // label
   var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
-  var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
+  var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
   var klabel = new Konva.Label({
     x: line.getEnd().getX() + dX * ktext.width(),
-    y: line.getEnd().getY() + dY * style.scale(15),
+    y: line.getEnd().getY() + dY * style.applyZoomScale(15),
     scaleX: style.applyZoomScale(1),
     scaleY: style.applyZoomScale(1),
     name: 'label'
   });
   klabel.add(ktext);
-  klabel.add(new Konva.Tag());
+  klabel.add(new Konva.Tag({
+    fill: style.getLineColour(),
+    opacity: style.getTagOpacity()
+  }));
 
   // return group
   var group = new Konva.Group();
@@ -279,10 +285,10 @@ dwv.tool.draw.RulerFactory.prototype.update = function (
   ktext.meta.quantification = quantification;
   // update position
   var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
-  var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
+  var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
   var textPos = {
     x: line.getEnd().getX() + dX * ktext.width(),
-    y: line.getEnd().getY() + dY * style.scale(15)
+    y: line.getEnd().getY() + dY * style.applyZoomScale(15)
   };
   klabel.position(textPos);
 };

@@ -59,6 +59,28 @@ dwv.html.Style = function () {
   var strokeWidth = 2;
 
   /**
+   * Shadow offset.
+   *
+   * @private
+   * @type {object}
+   */
+  var shadowOffset = {x: 0.25, y: 0.25};
+  /**
+   * Tag opacity.
+   *
+   * @private
+   * @type {number}
+   */
+  var tagOpacity = 0.2;
+  /**
+   * Text padding.
+   *
+   * @private
+   * @type {number}
+   */
+  var textPadding = 3;
+
+  /**
    * Get the font family.
    *
    * @returns {string} The font family.
@@ -169,6 +191,34 @@ dwv.html.Style = function () {
     // (same logic as in the DrawController::updateLabelScale)
     return 2 * value / zoomScale;
   };
+
+  /**
+   * Get the shadow offset.
+   *
+   * @returns {object} The offset as {x,y}.
+   */
+  this.getShadowOffset = function () {
+    return shadowOffset;
+  };
+
+  /**
+   * Get the tag opacity.
+   *
+   * @returns {number} The opacity.
+   */
+  this.getTagOpacity = function () {
+    return tagOpacity;
+  };
+
+  /**
+   * Get the text padding.
+   *
+   * @returns {number} The padding.
+   */
+  this.getTextPadding = function () {
+    return textPadding;
+  };
+
 };
 
 /**
@@ -205,4 +255,48 @@ dwv.html.Style.prototype.getScaledFontSize = function () {
  */
 dwv.html.Style.prototype.getScaledStrokeWidth = function () {
   return this.scale(this.getStrokeWidth());
+};
+
+/**
+ * Get the shadow line colour.
+ *
+ * @returns {string} The shadow line colour.
+ */
+dwv.html.Style.prototype.getShadowLineColour = function () {
+  return dwv.html.getShadowColour(this.getLineColour());
+};
+
+/**
+ * Get the brightness of a colour given in hexadecimal format.
+ * See https://github.com/bgrins/TinyColor/blob/1.4.2/tinycolor.js#L70
+ *
+ * @param {string} hexColour The colour (as '#ab01ef').
+ * @returns {number} The brightness (range [0,255]).
+ */
+dwv.html.getBrightness = function (hexColour) {
+  // extract rgb
+  var r = parseInt(hexColour.substr(1, 2), 16);
+  var g = parseInt(hexColour.substr(3, 2), 16);
+  var b = parseInt(hexColour.substr(5, 2), 16);
+  return (r * 299 + g * 587 + b * 114) / 1000;
+};
+
+/**
+ * Check if a colour given in hexadecimal format is dark.
+ *
+ * @param {string} hexColour The colour (as '#ab01ef').
+ * @returns {boolean} True if the coluor is dark (brightness < 128).
+ */
+dwv.html.isDarkColour = function (hexColour) {
+  return dwv.html.getBrightness(hexColour) < 128;
+};
+
+/**
+ * Get the shadow colour of an input colour.
+ *
+ * @param {string} hexColour The colour (as '#ab01ef').
+ * @returns {string} The shadow colour (white or black).
+ */
+dwv.html.getShadowColour = function (hexColour) {
+  return dwv.html.isDarkColour(hexColour) ? '#fff' : '#000';
 };

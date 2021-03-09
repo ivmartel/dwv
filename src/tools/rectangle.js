@@ -85,6 +85,9 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
     fontSize: style.getFontSize(),
     fontFamily: style.getFontFamily(),
     fill: style.getLineColour(),
+    padding: style.getTextPadding(),
+    shadowColor: style.getShadowLineColour(),
+    shadowOffset: style.getShadowOffset(),
     name: 'text'
   });
   var textExpr = '';
@@ -105,13 +108,16 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
   // label
   var klabel = new Konva.Label({
     x: rectangle.getBegin().getX(),
-    y: rectangle.getEnd().getY() + style.scale(10),
+    y: rectangle.getEnd().getY(),
     scaleX: style.applyZoomScale(1),
     scaleY: style.applyZoomScale(1),
     name: 'label'
   });
   klabel.add(ktext);
-  klabel.add(new Konva.Tag());
+  klabel.add(new Konva.Tag({
+    fill: style.getLineColour(),
+    opacity: style.getTagOpacity()
+  }));
 
   // debug shadow
   var kshadow;
@@ -274,7 +280,7 @@ dwv.tool.draw.RectangleFactory.prototype.update = function (
   // update position
   var textPos = {
     x: rect.getBegin().getX() - group.x(),
-    y: rect.getEnd().getY() - group.y() + style.scale(10)
+    y: rect.getEnd().getY() - group.y()
   };
   klabel.position(textPos);
 };

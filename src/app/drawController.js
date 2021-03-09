@@ -523,17 +523,26 @@ dwv.DrawController = function (drawDiv) {
       if (typeof shapesExtra[j].stroke() !== 'undefined') {
         shapesExtra[j].stroke(drawDetails.color);
       } else if (typeof shapesExtra[j].fill() !== 'undefined') {
+        // for example text
         shapesExtra[j].fill(drawDetails.color);
       }
     }
     // label
     var label = group.getChildren(dwv.draw.isNodeNameLabel)[0];
-    var text = label.getChildren()[0];
-    text.fill(drawDetails.color);
-    text.meta = drawDetails.meta;
-    text.setText(dwv.utils.replaceFlags(
-      text.meta.textExpr, text.meta.quantification
-    ));
+    var shadowColor = dwv.html.getShadowColour(drawDetails.color);
+    var kids = label.getChildren();
+    for (var k = 0; k < kids.length; ++k) {
+      var kid = kids[k];
+      kid.fill(drawDetails.color);
+      if (kids[k].className === 'Text') {
+        var text = kids[k];
+        text.shadowColor(shadowColor);
+        text.meta = drawDetails.meta;
+        text.setText(dwv.utils.replaceFlags(
+          text.meta.textExpr, text.meta.quantification
+        ));
+      }
+    }
 
     // udpate current layer
     drawLayer.draw();

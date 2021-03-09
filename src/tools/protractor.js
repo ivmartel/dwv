@@ -110,6 +110,9 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
       fontSize: style.getFontSize(),
       fontFamily: style.getFontFamily(),
       fill: style.getLineColour(),
+      padding: style.getTextPadding(),
+      shadowColor: style.getShadowLineColour(),
+      shadowOffset: style.getShadowOffset(),
       name: 'text'
     });
     var textExpr = '';
@@ -136,13 +139,16 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
     var midY = (line0.getMidpoint().getY() + line1.getMidpoint().getY()) / 2;
     var klabel = new Konva.Label({
       x: midX,
-      y: midY - style.scale(15),
+      y: midY - style.applyZoomScale(15),
       scaleX: style.applyZoomScale(1),
       scaleY: style.applyZoomScale(1),
       name: 'label'
     });
     klabel.add(ktext);
-    klabel.add(new Konva.Tag());
+    klabel.add(new Konva.Tag({
+      fill: style.getLineColour(),
+      opacity: style.getTagOpacity()
+    }));
 
     // arc
     var radius = Math.min(line0.getLength(), line1.getLength()) * 33 / 100;
@@ -286,7 +292,7 @@ dwv.tool.draw.ProtractorFactory.prototype.update = function (
   var midY = (line0.getMidpoint().getY() + line1.getMidpoint().getY()) / 2;
   var textPos = {
     x: midX,
-    y: midY - style.scale(15)
+    y: midY - style.applyZoomScale(15)
   };
   klabel.position(textPos);
 
