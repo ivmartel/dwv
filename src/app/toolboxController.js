@@ -35,7 +35,7 @@ dwv.ToolboxController = function (toolList) {
     // TODO Would prefer to have this done in the addLayerListeners
     displayToIndexConverter = layer.displayToIndex;
     // add layer listeners
-    this.addCanvasListeners(layer.getCanvas());
+    this.addLayerListeners(layer);
     // keydown listener
     window.addEventListener('keydown', onMouch, true);
   };
@@ -150,45 +150,41 @@ dwv.ToolboxController = function (toolList) {
   /**
    * Add canvas mouse and touch listeners.
    *
-   * @param {object} canvas The canvas to listen to.
+   * @param {object} layer The layer / canvas to listen to.
    */
-  this.addCanvasListeners = function (canvas) {
-    // allow pointer events
-    canvas.setAttribute('style', 'pointer-events: auto;');
+  this.addLayerListeners = function (layer) {
     // mouse listeners
-    canvas.addEventListener('mousedown', onMouch);
-    canvas.addEventListener('mousemove', onMouch);
-    canvas.addEventListener('mouseup', onMouch);
-    canvas.addEventListener('mouseout', onMouch);
-    canvas.addEventListener('mousewheel', onMouch);
-    canvas.addEventListener('DOMMouseScroll', onMouch);
-    canvas.addEventListener('dblclick', onMouch);
+    layer.addEventListener('mousedown', onMouch);
+    layer.addEventListener('mousemove', onMouch);
+    layer.addEventListener('mouseup', onMouch);
+    layer.addEventListener('mouseout', onMouch);
+    layer.addEventListener('mousewheel', onMouch);
+    layer.addEventListener('DOMMouseScroll', onMouch);
+    layer.addEventListener('dblclick', onMouch);
     // touch listeners
-    canvas.addEventListener('touchstart', onMouch);
-    canvas.addEventListener('touchmove', onMouch);
-    canvas.addEventListener('touchend', onMouch);
+    layer.addEventListener('touchstart', onMouch);
+    layer.addEventListener('touchmove', onMouch);
+    layer.addEventListener('touchend', onMouch);
   };
 
   /**
    * Remove canvas mouse and touch listeners.
    *
-   * @param {object} canvas The canvas to stop listening to.
+   * @param {object} layer The layer / canvas to stop listening to.
    */
-  this.removeCanvasListeners = function (canvas) {
-    // disable pointer events
-    canvas.setAttribute('style', 'pointer-events: none;');
+  this.removeLayerListeners = function (layer) {
     // mouse listeners
-    canvas.removeEventListener('mousedown', onMouch);
-    canvas.removeEventListener('mousemove', onMouch);
-    canvas.removeEventListener('mouseup', onMouch);
-    canvas.removeEventListener('mouseout', onMouch);
-    canvas.removeEventListener('mousewheel', onMouch);
-    canvas.removeEventListener('DOMMouseScroll', onMouch);
-    canvas.removeEventListener('dblclick', onMouch);
+    layer.removeEventListener('mousedown', onMouch);
+    layer.removeEventListener('mousemove', onMouch);
+    layer.removeEventListener('mouseup', onMouch);
+    layer.removeEventListener('mouseout', onMouch);
+    layer.removeEventListener('mousewheel', onMouch);
+    layer.removeEventListener('DOMMouseScroll', onMouch);
+    layer.removeEventListener('dblclick', onMouch);
     // touch listeners
-    canvas.removeEventListener('touchstart', onMouch);
-    canvas.removeEventListener('touchmove', onMouch);
-    canvas.removeEventListener('touchend', onMouch);
+    layer.removeEventListener('touchstart', onMouch);
+    layer.removeEventListener('touchmove', onMouch);
+    layer.removeEventListener('touchend', onMouch);
   };
 
   /**

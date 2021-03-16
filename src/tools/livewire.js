@@ -318,7 +318,7 @@ dwv.tool.Livewire = function (app) {
       scissors.setDimensions(
         size.getNumberOfColumns(),
         size.getNumberOfRows());
-      scissors.setData(app.getImageData().data);
+      scissors.setData(app.getImageLayer().getImageData().data);
 
       // init with the app window scale
       this.style.setScale(app.getWindowScale());

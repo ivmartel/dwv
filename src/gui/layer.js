@@ -9,6 +9,24 @@ dwv.html = dwv.html || {};
  * @param {object} canvas The associated canvas.
  */
 dwv.html.Layer = function (canvas) {
+  // closure to self
+  var self = this;
+
+  /**
+   * The image view.
+   *
+   * @private
+   * @type {object}
+   */
+  var view = null;
+  /**
+   * The view controller.
+   *
+   * @private
+   * @type {object}
+   */
+  var viewController = null;
+
   /**
    * A cache of the initial canvas.
    *
@@ -23,31 +41,6 @@ dwv.html.Layer = function (canvas) {
    * @type {object}
    */
   var context = null;
-
-  /**
-   * Get the layer canvas.
-   *
-   * @returns {object} The layer canvas.
-   */
-  this.getCanvas = function () {
-    return canvas;
-  };
-  /**
-   * Get the layer context.
-   *
-   * @returns {object} The layer context.
-   */
-  this.getContext = function () {
-    return context;
-  };
-  /**
-   * Get the layer offset on page.
-   *
-   * @returns {number} The layer offset on page.
-   */
-  this.getOffset = function () {
-    return canvas.offset();
-  };
 
   /**
    * The image data array.
@@ -131,6 +124,14 @@ dwv.html.Layer = function (canvas) {
   };
 
   /**
+   * Listener handler.
+   *
+   * @type {object}
+   * @private
+   */
+  var listenerHandler = new dwv.utils.ListenerHandler();
+
+  /**
    * Set the canvas width.
    *
    * @param {number} width The new width.
@@ -185,17 +186,6 @@ dwv.html.Layer = function (canvas) {
   };
 
   /**
-   * Set the image data array.
-   *
-   * @param {Array} data The data array.
-   */
-  this.setImageData = function (data) {
-    imageData = data;
-    // update the cached canvas
-    cacheCanvas.getContext('2d').putImageData(imageData, 0, 0);
-  };
-
-  /**
    * Reset the layout.
    *
    * @param {number} izoom The input zoom.
@@ -223,8 +213,26 @@ dwv.html.Layer = function (canvas) {
   /**
    * Draw the content (imageData) of the layer.
    * The imageData variable needs to be set
+   *
+   * @fires dwv.App#renderstart
+   * @fires dwv.App#renderend
    */
   this.draw = function () {
+    /**
+     * Render start event.
+     *
+     * @event dwv.App#renderstart
+     * @type {object}
+     * @property {string} type The event type.
+     */
+    var event = {type: 'renderstart'};
+    fireEvent(event);
+
+    // generate image data from DICOM
+    view.generateImageData(imageData);
+    // pass the data to the canvas
+    cacheCanvas.getContext('2d').putImageData(imageData, 0, 0);
+
     // context opacity
     context.globalAlpha = opacity;
 
@@ -251,15 +259,99 @@ dwv.html.Layer = function (canvas) {
     context.imageSmoothingEnabled = false;
     // draw image
     context.drawImage(cacheCanvas, 0, 0);
+
+    /**
+     * Render end event.
+     *
+     * @event dwv.App#renderend
+     * @type {object}
+     * @property {string} type The event type.
+     */
+    event = {type: 'renderend'};
+    fireEvent(event);
   };
+
+  /**
+   * Handle window/level change.
+   *
+   * @param {object} event The event fired when changing the window/level.
+   * @private
+   */
+  function onWLChange(event) {
+    // generate and draw if no skip flag
+    if (typeof event.skipGenerate === 'undefined' ||
+      event.skipGenerate === false) {
+      self.draw();
+    }
+  }
+
+  /**
+   * Handle colour map change.
+   *
+   * @param {object} _event The event fired when changing the colour map.
+   * @private
+   */
+  function onColourChange(_event) {
+    self.draw();
+  }
+
+  /**
+   * Handle frame change.
+   *
+   * @param {object} event The event fired when changing the frame.
+   * @private
+   */
+  function onFrameChange(event) {
+    // generate and draw if no skip flag
+    if (typeof event.skipGenerate === 'undefined' ||
+      event.skipGenerate === false) {
+      self.draw();
+    }
+  }
+
+  /**
+   * Handle slice change.
+   *
+   * @param {object} _event The event fired when changing the slice.
+   * @private
+   */
+  function onSliceChange(_event) {
+    self.draw();
+  }
 
   /**
    * Initialise the layer: set the canvas and context
    *
-   * @param {number} inputWidth The width of the canvas.
-   * @param {number} inputHeight The height of the canvas.
+   * @param {object} metaData The image meta data.
+   * @param {object} image The image.
    */
-  this.initialise = function (inputWidth, inputHeight) {
+  this.initialise = function (metaData, image) {
+
+    // create view
+    var viewFactory = new dwv.image.ViewFactory();
+    view = viewFactory.create(
+      new dwv.dicom.DicomElementsWrapper(metaData),
+      image);
+
+    // local listeners
+    view.addEventListener('wlwidthchange', onWLChange);
+    view.addEventListener('wlcenterchange', onWLChange);
+    view.addEventListener('colourchange', onColourChange);
+    view.addEventListener('slicechange', onSliceChange);
+    view.addEventListener('framechange', onFrameChange);
+
+    // propagate
+    this.addViewEventListeners();
+    this.addCanvasListeners();
+
+    // create view controller
+    viewController = new dwv.ViewController(view);
+
+    // get sizes
+    var size = image.getGeometry().getSize();
+    var inputWidth = size.getNumberOfColumns();
+    var inputHeight = size.getNumberOfRows();
+
     // find the canvas element
     //canvas = document.getElementById(name);
     //if (!canvas)
@@ -283,12 +375,70 @@ dwv.html.Layer = function (canvas) {
     canvas.height = inputHeight;
     // original empty image data array
     context.clearRect(0, 0, canvas.width, canvas.height);
-    imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    imageData = context.createImageData(
+      inputWidth, inputHeight);
     // cached canvas
     cacheCanvas = document.createElement('canvas');
     cacheCanvas.width = inputWidth;
     cacheCanvas.height = inputHeight;
   };
+
+  /**
+   * Set the image associated to the view.
+   *
+   * @param {object} img The image.
+   */
+  this.setViewImage = function (img) {
+    view.setImage(img);
+  };
+
+  /**
+   * Get the view controller.
+   *
+   * @returns {object} The controller.
+   */
+  this.getViewController = function () {
+    return viewController;
+  };
+
+  /**
+   * Get the canvas image data.
+   *
+   * @returns {object} The image data.
+   */
+  this.getImageData = function () {
+    return imageData;
+  };
+
+  /**
+   * Add an event listener to this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type, will be called with the fired event.
+   */
+  this.addEventListener = function (type, callback) {
+    listenerHandler.add(type, callback);
+  };
+  /**
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type.
+   */
+  this.removeEventListener = function (type, callback) {
+    listenerHandler.remove(type, callback);
+  };
+  /**
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
+   * @private
+   */
+  function fireEvent(event) {
+    listenerHandler.fireEvent(event);
+  }
 
   /**
    * Fill the full context with the current style.
@@ -389,6 +539,58 @@ dwv.html.Layer = function (canvas) {
     canvas.style.top = rhs.getCanvas().offsetTop;
     canvas.style.left = rhs.getCanvas().offsetLeft;
   };
+
+  this.addViewEventListeners = function () {
+    // propagate
+    view.addEventListener('slicechange', fireEvent);
+    view.addEventListener('framechange', fireEvent);
+    view.addEventListener('wlwidthchange', fireEvent);
+    view.addEventListener('wlcenterchange', fireEvent);
+    view.addEventListener('wlpresetadd', fireEvent);
+    view.addEventListener('colourchange', fireEvent);
+    view.addEventListener('positionchange', fireEvent);
+  };
+
+  /**
+   * Add canvas mouse and touch listeners.
+   */
+  this.addCanvasListeners = function () {
+    // allow pointer events
+    canvas.setAttribute('style', 'pointer-events: auto;');
+    // mouse listeners
+    canvas.addEventListener('mousedown', fireEvent);
+    canvas.addEventListener('mousemove', fireEvent);
+    canvas.addEventListener('mouseup', fireEvent);
+    canvas.addEventListener('mouseout', fireEvent);
+    canvas.addEventListener('mousewheel', fireEvent);
+    canvas.addEventListener('DOMMouseScroll', fireEvent);
+    canvas.addEventListener('dblclick', fireEvent);
+    // touch listeners
+    canvas.addEventListener('touchstart', fireEvent);
+    canvas.addEventListener('touchmove', fireEvent);
+    canvas.addEventListener('touchend', fireEvent);
+  };
+
+  /**
+   * Remove canvas mouse and touch listeners.
+   */
+  this.removeCanvasListeners = function () {
+    // disable pointer events
+    canvas.setAttribute('style', 'pointer-events: none;');
+    // mouse listeners
+    canvas.removeEventListener('mousedown', fireEvent);
+    canvas.removeEventListener('mousemove', fireEvent);
+    canvas.removeEventListener('mouseup', fireEvent);
+    canvas.removeEventListener('mouseout', fireEvent);
+    canvas.removeEventListener('mousewheel', fireEvent);
+    canvas.removeEventListener('DOMMouseScroll', fireEvent);
+    canvas.removeEventListener('dblclick', fireEvent);
+    // touch listeners
+    canvas.removeEventListener('touchstart', fireEvent);
+    canvas.removeEventListener('touchmove', fireEvent);
+    canvas.removeEventListener('touchend', fireEvent);
+  };
+
 }; // Layer class
 
 /**

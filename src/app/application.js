@@ -20,8 +20,6 @@ dwv.App = function () {
   var image = null;
   // Original image
   var originalImage = null;
-  // Image data array
-  var imageData = null;
   // Image data width
   var dataWidth = 0;
   // Image data height
@@ -38,10 +36,6 @@ dwv.App = function () {
   // translation
   var translation = {x: 0, y: 0};
 
-  // View
-  var view = null;
-  // View controller
-  var viewController = null;
   // flag to create view on first load
   var viewOnFirstLoadItem = true;
 
@@ -78,28 +72,20 @@ dwv.App = function () {
     return image;
   };
   /**
-   * Set the view.
+   * Set the image.
    *
    * @param {Image} img The associated image.
    */
   this.setImage = function (img) {
     image = img;
-    view.setImage(img);
+    imageLayer.setViewImage(img);
   };
   /**
    * Restore the original image.
    */
   this.restoreOriginalImage = function () {
     image = originalImage;
-    view.setImage(originalImage);
-  };
-  /**
-   * Get the image data array.
-   *
-   * @returns {Array} The image data array.
-   */
-  this.getImageData = function () {
-    return imageData;
+    imageLayer.setViewImage(originalImage);
   };
   /**
    * Is the data mono-slice?
@@ -178,7 +164,7 @@ dwv.App = function () {
    * @returns {object} The controller.
    */
   this.getViewController = function () {
-    return viewController;
+    return imageLayer.getViewController();
   };
 
   /**
@@ -371,8 +357,8 @@ dwv.App = function () {
     }
     // clear objects
     image = null;
-    view = null;
     metaData = null;
+    imageLayer = null;
     // reset undo/redo
     if (undoStack) {
       undoStack = new dwv.tool.UndoStack();
@@ -565,12 +551,13 @@ dwv.App = function () {
    * Init the Window/Level display
    */
   this.initWLDisplay = function () {
+    var controller = imageLayer.getViewController();
     // set window/level to first preset
-    viewController.setWindowLevelPresetById(0);
+    controller.setWindowLevelPresetById(0);
     // default position
-    viewController.setCurrentPosition2D(0, 0);
+    controller.setCurrentPosition2D(0, 0);
     // default frame
-    viewController.setCurrentFrame(0);
+    controller.setCurrentFrame(0);
   };
 
   /**
@@ -578,8 +565,8 @@ dwv.App = function () {
    *
    * @param {object} layer The canvas layer to listen to.
    */
-  this.addToolCanvasListeners = function (layer) {
-    toolboxController.addCanvasListeners(layer);
+  this.addToolLayerListeners = function (layer) {
+    toolboxController.addLayerListeners(layer);
   };
 
   /**
@@ -587,15 +574,20 @@ dwv.App = function () {
    *
    * @param {object} layer The canvas to stop listening to.
    */
-  this.removeToolCanvasListeners = function (layer) {
-    toolboxController.removeCanvasListeners(layer);
+  this.removeToolLayerListeners = function (layer) {
+    toolboxController.removeLayerListeners(layer);
   };
 
   /**
    * Render the current image.
    */
   this.render = function () {
-    generateAndDrawImage();
+    // create view if first tiem
+    if (!imageLayer) {
+      initialiseImageLayer();
+    }
+    // draw the image
+    imageLayer.draw();
   };
 
   /**
@@ -699,7 +691,10 @@ dwv.App = function () {
   this.setDrawings = function (drawings, drawingsDetails) {
     drawController.setDrawings(
       drawings, drawingsDetails, fireEvent, this.addToUndoStack);
-    drawController.activateDrawLayer(viewController);
+    var controller = imageLayer.getViewController();
+    drawController.activateDrawLayer(
+      controller.getCurrentPosition(),
+      controller.getCurrentFrame());
   };
   /**
    * Update a drawing from its details.
@@ -746,30 +741,6 @@ dwv.App = function () {
   // Handler Methods -----------------------------------------------------------
 
   /**
-   * Handle window/level change.
-   *
-   * @param {object} event The event fired when changing the window/level.
-   * @private
-   */
-  function onWLChange(event) {
-    // generate and draw if no skip flag
-    if (typeof event.skipGenerate === 'undefined' ||
-      event.skipGenerate === false) {
-      generateAndDrawImage();
-    }
-  }
-
-  /**
-   * Handle colour map change.
-   *
-   * @param {object} _event The event fired when changing the colour map.
-   * @private
-   */
-  function onColourChange(_event) {
-    generateAndDrawImage();
-  }
-
-  /**
    * Handle frame change.
    *
    * @param {object} event The event fired when changing the frame.
@@ -779,9 +750,11 @@ dwv.App = function () {
     // generate and draw if no skip flag
     if (typeof event.skipGenerate === 'undefined' ||
       event.skipGenerate === false) {
-      generateAndDrawImage();
       if (drawController) {
-        drawController.activateDrawLayer(viewController);
+        var controller = imageLayer.getViewController();
+        drawController.activateDrawLayer(
+          controller.getCurrentPosition(),
+          controller.getCurrentFrame());
       }
     }
   }
@@ -793,9 +766,11 @@ dwv.App = function () {
    * @private
    */
   function onSliceChange(_event) {
-    generateAndDrawImage();
     if (drawController) {
-      drawController.activateDrawLayer(viewController);
+      var controller = imageLayer.getViewController();
+      drawController.activateDrawLayer(
+        controller.getCurrentPosition(),
+        controller.getCurrentFrame());
     }
   }
 
@@ -846,16 +821,16 @@ dwv.App = function () {
     if (event.ctrlKey) {
       if (event.keyCode === 37) { // crtl-arrow-left
         event.preventDefault();
-        self.getViewController().decrementFrameNb();
+        imageLayer.getViewController().decrementFrameNb();
       } else if (event.keyCode === 38) { // crtl-arrow-up
         event.preventDefault();
-        self.getViewController().incrementSliceNb();
+        imageLayer.getViewController().incrementSliceNb();
       } else if (event.keyCode === 39) { // crtl-arrow-right
         event.preventDefault();
-        self.getViewController().incrementFrameNb();
+        imageLayer.getViewController().incrementFrameNb();
       } else if (event.keyCode === 40) { // crtl-arrow-down
         event.preventDefault();
-        self.getViewController().decrementSliceNb();
+        imageLayer.getViewController().decrementSliceNb();
       } else if (event.keyCode === 89) { // crtl-y
         undoStack.redo();
       } else if (event.keyCode === 90) { // crtl-z
@@ -887,7 +862,7 @@ dwv.App = function () {
    * @param {string} colourMap The colour map name.
    */
   this.setColourMap = function (colourMap) {
-    viewController.setColourMapFromName(colourMap);
+    imageLayer.getViewController().setColourMapFromName(colourMap);
   };
 
   /**
@@ -896,7 +871,7 @@ dwv.App = function () {
    * @param {object} preset The window/level preset.
    */
   this.setWindowLevelPreset = function (preset) {
-    viewController.setWindowLevelPreset(preset);
+    imageLayer.getViewController().setWindowLevelPreset(preset);
   };
 
   /**
@@ -985,46 +960,6 @@ dwv.App = function () {
     for (var i = 0; i < listeners[event.type].length; ++i) {
       listeners[event.type][i](event);
     }
-  }
-
-  /**
-   * Generate the image data and draw it.
-   *
-   * @private
-   * @fires dwv.Appk#renderstart
-   * @fires dwv.App#renderend
-   */
-  function generateAndDrawImage() {
-    /**
-     * Render start event.
-     *
-     * @event dwv.App#renderstart
-     * @type {object}
-     * @property {string} type The event type.
-     */
-    var event = {type: 'renderstart'};
-    fireEvent(event);
-
-    // create view if first tiem
-    if (!view) {
-      initialiseView();
-    }
-    // generate image data from DICOM
-    view.generateImageData(imageData);
-    // set the image data of the layer
-    imageLayer.setImageData(imageData);
-    // draw the image
-    imageLayer.draw();
-
-    /**
-     * Render end event.
-     *
-     * @event dwv.App#renderend
-     * @type {object}
-     * @property {string} type The event type.
-     */
-    event = {type: 'renderend'};
-    fireEvent(event);
   }
 
   /**
@@ -1123,7 +1058,7 @@ dwv.App = function () {
     // image layer
     var canImgLay = self.getElement('imageLayer');
     imageLayer = new dwv.html.Layer(canImgLay);
-    imageLayer.initialise(dataWidth, dataHeight);
+    imageLayer.initialise(metaData, image);
     imageLayer.fillContext();
     imageLayer.setStyleDisplay(true);
     // draw layer
@@ -1248,11 +1183,13 @@ dwv.App = function () {
         self.render();
       } else {
         // update slice number if new slice was inserted before
-        if (sliceNb <= view.getCurrentPosition().k) {
-          view.setCurrentPosition({
-            i: view.getCurrentPosition().i,
-            j: view.getCurrentPosition().j,
-            k: view.getCurrentPosition().k + 1
+        var controller = imageLayer.getViewController();
+        var currentPosition = controller.getCurrentPosition();
+        if (sliceNb <= currentPosition.k) {
+          controller.setCurrentPosition({
+            i: currentPosition.i,
+            j: currentPosition.j,
+            k: currentPosition.k + 1
           }, true);
         }
       }
@@ -1267,7 +1204,11 @@ dwv.App = function () {
    */
   function onload(event) {
     if (drawController) {
-      drawController.activateDrawLayer(viewController);
+      var controller = imageLayer.getViewController();
+      drawController.activateDrawLayer(
+        controller.getCurrentPosition(),
+        controller.getCurrentFrame()
+      );
     }
 
     /**
@@ -1377,51 +1318,39 @@ dwv.App = function () {
   }
 
   /**
-   * Create the image view.
+   * Create the image layer.
    * To be called once the DICOM data has been loaded.
    *
    * @private
    */
-  function initialiseView() {
+  function initialiseImageLayer() {
 
     if (!image) {
-      throw new Error('No image to create the view for.');
+      throw new Error('No image to create the layer for.');
     }
-
-    // create view
-    var viewFactory = new dwv.image.ViewFactory();
-    view = viewFactory.create(
-      new dwv.dicom.DicomElementsWrapper(metaData),
-      image);
-
-    // create view controller
-    viewController = new dwv.ViewController(view);
 
     // layout
     var size = image.getGeometry().getSize();
     dataWidth = size.getNumberOfColumns();
     dataHeight = size.getNumberOfRows();
+
     createLayers(dataWidth, dataHeight);
 
-    // get the image data from the image layer
-    imageData = imageLayer.getContext().createImageData(
-      dataWidth, dataHeight);
+    // local listeners
+    imageLayer.addEventListener('slicechange', onSliceChange);
+    imageLayer.addEventListener('framechange', onFrameChange);
 
-    // image listeners
-    view.addEventListener('wlwidthchange', onWLChange);
-    view.addEventListener('wlcenterchange', onWLChange);
-    view.addEventListener('colourchange', onColourChange);
-    view.addEventListener('slicechange', onSliceChange);
-    view.addEventListener('framechange', onFrameChange);
+    // propagate
+    imageLayer.addEventListener('wlwidthchange', fireEvent);
+    imageLayer.addEventListener('wlcenterchange', fireEvent);
+    imageLayer.addEventListener('wlpresetadd', fireEvent);
+    imageLayer.addEventListener('colourchange', fireEvent);
+    imageLayer.addEventListener('positionchange', fireEvent);
+    imageLayer.addEventListener('slicechange', fireEvent);
+    imageLayer.addEventListener('framechange', fireEvent);
 
-    // connect with local listeners
-    view.addEventListener('wlwidthchange', fireEvent);
-    view.addEventListener('wlcenterchange', fireEvent);
-    view.addEventListener('wlpresetadd', fireEvent);
-    view.addEventListener('colourchange', fireEvent);
-    view.addEventListener('positionchange', fireEvent);
-    view.addEventListener('slicechange', fireEvent);
-    view.addEventListener('framechange', fireEvent);
+    imageLayer.addEventListener('renderstart', fireEvent);
+    imageLayer.addEventListener('renderend', fireEvent);
 
     // initialise the toolbox
     if (toolboxController) {

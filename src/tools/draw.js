@@ -507,17 +507,21 @@ dwv.tool.Draw = function (app) {
     var shapeGroups =
       app.getDrawController().getCurrentPosGroup().getChildren();
 
+    var drawCanvas = app.getDrawStage().getContent();
+
     // set shape display properties
     if (visible) {
+      drawCanvas.setAttribute('style', 'pointer-events: auto;');
       // activate tool listeners
-      app.addToolCanvasListeners(app.getDrawStage().getContent());
+      app.addToolLayerListeners(drawCanvas);
       // activate shape listeners
       shapeGroups.forEach(function (group) {
         self.setShapeOn(group);
       });
     } else {
+      drawCanvas.setAttribute('style', 'pointer-events: none;');
       // de-activate tool listeners
-      app.removeToolCanvasListeners(app.getDrawStage().getContent());
+      app.removeToolLayerListeners(drawCanvas);
       // de-activate shape listeners
       shapeGroups.forEach(function (group) {
         setShapeOff(group);

@@ -234,12 +234,13 @@ dwv.DrawController = function (drawDiv) {
   /**
    * Activate the current draw layer.
    *
-   * @param {object} viewController The associated view controller.
+   * @param {object} currentPosition The current {i,j,k} position.
+   * @param {number} currentFrame The current frame number.
    */
-  this.activateDrawLayer = function (viewController) {
+  this.activateDrawLayer = function (currentPosition, currentFrame) {
     // set current position
-    var currentSlice = viewController.getCurrentPosition().k;
-    var currentFrame = viewController.getCurrentFrame();
+    var currentSlice = currentPosition.k;
+    // var currentFrame = viewController.getCurrentFrame();
     // get and store the position group id
     currentPosGroupId = dwv.draw.getDrawPositionGroupId(
       currentSlice, currentFrame);
