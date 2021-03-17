@@ -1064,13 +1064,13 @@ dwv.App = function () {
       }
     }
     // create new canvas
-    var canvas = document.createElement('canvas');
-    canvas.id = 'layer0';
-    canvas.className = 'layer imageLayer';
+    var div0 = document.createElement('div');
+    div0.id = 'layer0';
+    div0.className = 'layer';
     // prepend to container
-    container.prepend(canvas);
+    container.prepend(div0);
     // image layer
-    imageLayer = new dwv.html.ImageLayer(canvas);
+    imageLayer = new dwv.html.ImageLayer(div0);
     imageLayer.initialise(metaData, image);
     imageLayer.display(true);
 

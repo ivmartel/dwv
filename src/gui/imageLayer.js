@@ -5,10 +5,13 @@ dwv.html = dwv.html || {};
 /**
  * Image layer.
  *
+ * @param {object} containerDiv The layer div.
  * @class
- * @param {object} canvas The associated canvas.
  */
-dwv.html.ImageLayer = function (canvas) {
+dwv.html.ImageLayer = function (containerDiv) {
+
+  containerDiv.className += ' imageLayer';
+
   // closure to self
   var self = this;
 
@@ -27,6 +30,13 @@ dwv.html.ImageLayer = function (canvas) {
    */
   var viewController = null;
 
+  /**
+   * The base canvas.
+   *
+   * @private
+   * @type {object}
+   */
+  var canvas = null;
   /**
    * A cache of the initial canvas.
    *
@@ -340,10 +350,6 @@ dwv.html.ImageLayer = function (canvas) {
     view.addEventListener('slicechange', onSliceChange);
     view.addEventListener('framechange', onFrameChange);
 
-    // propagate
-    this.addViewEventListeners();
-    this.addCanvasListeners();
-
     // create view controller
     viewController = new dwv.ViewController(view);
 
@@ -352,13 +358,10 @@ dwv.html.ImageLayer = function (canvas) {
     var inputWidth = size.getNumberOfColumns();
     var inputHeight = size.getNumberOfRows();
 
-    // find the canvas element
-    //canvas = document.getElementById(name);
-    //if (!canvas)
-    //{
-    //    alert("Error: cannot find the canvas element for '" + name + "'.");
-    //    return;
-    //}
+    // create canvas
+    canvas = document.createElement('canvas');
+    containerDiv.appendChild(canvas);
+
     // check that the getContext method exists
     if (!canvas.getContext) {
       alert('Error: no canvas.getContext method.');
@@ -380,6 +383,10 @@ dwv.html.ImageLayer = function (canvas) {
     cacheCanvas = document.createElement('canvas');
     cacheCanvas.width = inputWidth;
     cacheCanvas.height = inputHeight;
+
+    // propagate events
+    this.addViewEventListeners();
+    this.addCanvasListeners();
   };
 
   /**
@@ -578,7 +585,7 @@ dwv.html.ImageLayer = function (canvas) {
     canvas.removeEventListener('touchend', fireEvent);
   };
 
-}; // Layer class
+}; // ImageLayer class
 
 /**
  * Get the positions (without the parent offset) of a list of touch events.
