@@ -1055,12 +1055,25 @@ dwv.App = function () {
    * @private
    */
   function createLayers(dataWidth, dataHeight) {
+    var container = self.getElement('layerContainer');
+    // remove previous canvas
+    var previous = container.getElementsByClassName('layer');
+    if (previous) {
+      for (var i = 0; i < previous.length; ++i) {
+        previous[i].remove();
+      }
+    }
+    // create new canvas
+    var canvas = document.createElement('canvas');
+    canvas.id = 'layer0';
+    canvas.className = 'layer imageLayer';
+    // prepend to container
+    container.prepend(canvas);
     // image layer
-    var canImgLay = self.getElement('imageLayer');
-    imageLayer = new dwv.html.Layer(canImgLay);
+    imageLayer = new dwv.html.ImageLayer(canvas);
     imageLayer.initialise(metaData, image);
-    imageLayer.fillContext();
-    imageLayer.setStyleDisplay(true);
+    imageLayer.display(true);
+
     // draw layer
     var drawDiv = self.getElement('drawDiv');
     if (drawDiv) {

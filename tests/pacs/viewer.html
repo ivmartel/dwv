@@ -30,7 +30,7 @@ body {
 <script type="text/javascript" src="../../src/dicom/dicomParser.js"></script>
 <script type="text/javascript" src="../../src/dicom/dictionary.js"></script>
 <script type="text/javascript" src="../../src/gui/generic.js"></script>
-<script type="text/javascript" src="../../src/gui/layer.js"></script>
+<script type="text/javascript" src="../../src/gui/imageLayer.js"></script>
 <script type="text/javascript" src="../../src/gui/style.js"></script>
 <script type="text/javascript" src="../../src/image/decoder.js"></script>
 <script type="text/javascript" src="../../src/image/dicomBufferToView.js"></script>
@@ -92,9 +92,7 @@ document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedViewer)
 <!-- DWV -->
 <div id="dwv">
   <!-- Layer Container -->
-  <div class="layerContainer">
-    <canvas class="imageLayer">Only for HTML5 compatible browsers...</canvas>
-  </div><!-- /layerContainer -->
+  <div class="layerContainer"></div>
 </div><!-- /dwv -->
 
 <label for="alpharange">Alpha:</label>

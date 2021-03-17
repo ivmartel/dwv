@@ -3,12 +3,12 @@ var dwv = dwv || {};
 dwv.html = dwv.html || {};
 
 /**
- * Window layer.
+ * Image layer.
  *
  * @class
  * @param {object} canvas The associated canvas.
  */
-dwv.html.Layer = function (canvas) {
+dwv.html.ImageLayer = function (canvas) {
   // closure to self
   var self = this;
 
@@ -375,8 +375,7 @@ dwv.html.Layer = function (canvas) {
     canvas.height = inputHeight;
     // original empty image data array
     context.clearRect(0, 0, canvas.width, canvas.height);
-    imageData = context.createImageData(
-      inputWidth, inputHeight);
+    imageData = context.createImageData(inputWidth, inputHeight);
     // cached canvas
     cacheCanvas = document.createElement('canvas');
     cacheCanvas.width = inputWidth;
@@ -441,13 +440,6 @@ dwv.html.Layer = function (canvas) {
   }
 
   /**
-   * Fill the full context with the current style.
-   */
-  this.fillContext = function () {
-    context.fillRect(0, 0, canvas.width, canvas.height);
-  };
-
-  /**
    * Clear the context and reset the image data.
    */
   this.clear = function () {
@@ -459,7 +451,7 @@ dwv.html.Layer = function (canvas) {
   /**
    * Merge two layers.
    *
-   * @param {dwv.html.Layer} layerToMerge The layer to merge.
+   * @param {dwv.html.ImageLayer} layerToMerge The layer to merge.
    *   It will also be emptied.
    */
   this.merge = function (layerToMerge) {
@@ -507,14 +499,10 @@ dwv.html.Layer = function (canvas) {
   /**
    * Display the layer.
    *
-   * @param {boolean} val Whether to display the layer or not.
+   * @param {boolean} flag Whether to display the layer or not.
    */
-  this.setStyleDisplay = function (val) {
-    if (val === true) {
-      canvas.style.display = '';
-    } else {
-      canvas.style.display = 'none';
-    }
+  this.display = function (flag) {
+    canvas.style.display = flag ? '' : 'none';
   };
 
   /**
@@ -523,23 +511,22 @@ dwv.html.Layer = function (canvas) {
    * @returns {boolean} True if the layer is visible.
    */
   this.isVisible = function () {
-    if (canvas.style.display === 'none') {
-      return false;
-    } else {
-      return true;
-    }
+    return canvas.style.display === '';
   };
 
   /**
    * Align on another layer.
    *
-   * @param {dwv.html.Layer} rhs The layer to align on.
+   * @param {dwv.html.ImageLayer} rhs The layer to align on.
    */
   this.align = function (rhs) {
     canvas.style.top = rhs.getCanvas().offsetTop;
     canvas.style.left = rhs.getCanvas().offsetLeft;
   };
 
+  /**
+   * Add view listeners.
+   */
   this.addViewEventListeners = function () {
     // propagate
     view.addEventListener('slicechange', fireEvent);
