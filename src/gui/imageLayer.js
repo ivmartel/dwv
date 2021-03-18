@@ -100,6 +100,43 @@ dwv.html.ImageLayer = function (containerDiv) {
    */
   var listenerHandler = new dwv.utils.ListenerHandler();
 
+  var viewEventNames = [
+    'slicechange',
+    'framechange',
+    'wlwidthchange',
+    'wlcenterchange',
+    'wlpresetadd',
+    'colourchange',
+    'positionchange'
+  ];
+
+  /**
+   * Get the view controller.
+   *
+   * @returns {object} The controller.
+   */
+  this.getViewController = function () {
+    return viewController;
+  };
+
+  /**
+   * Get the canvas image data.
+   *
+   * @returns {object} The image data.
+   */
+  this.getImageData = function () {
+    return imageData;
+  };
+
+  /**
+   * Set the image associated to the view.
+   *
+   * @param {object} img The image.
+   */
+  this.setViewImage = function (img) {
+    view.setImage(img);
+  };
+
   // common layer methods [start] ---------------
 
   /**
@@ -344,13 +381,83 @@ dwv.html.ImageLayer = function (containerDiv) {
     cacheCanvas = document.createElement('canvas');
     cacheCanvas.width = inputWidth;
     cacheCanvas.height = inputHeight;
-
-    // propagate events
-    this.addViewEventListeners();
-    this.addCanvasListeners();
   };
 
+  /**
+   * Activate the layer: propagate interaction and view events.
+   */
+  this.activate = function () {
+    // allow pointer events
+    containerDiv.setAttribute('style', 'pointer-events: auto;');
+    // interaction events
+    var names = dwv.gui.interactionEventNames;
+    for (var i = 0; i < names.length; ++i) {
+      containerDiv.addEventListener(names[i], fireEvent);
+    }
+  };
+
+  /**
+   * Deactivate the layer: stop propagating interaction and view events.
+   */
+  this.deactivate = function () {
+    // disable pointer events
+    containerDiv.setAttribute('style', 'pointer-events: none;');
+    // interaction events
+    var names = dwv.gui.interactionEventNames;
+    for (var i = 0; i < names.length; ++i) {
+      containerDiv.removeEventListener(names[i], fireEvent);
+    }
+  };
+
+  /**
+   * Add an event listener to this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type, will be called with the fired event.
+   */
+  this.addEventListener = function (type, callback) {
+    listenerHandler.add(type, callback);
+  };
+
+  /**
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type.
+   */
+  this.removeEventListener = function (type, callback) {
+    listenerHandler.remove(type, callback);
+  };
+
+  /**
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
+   * @private
+   */
+  function fireEvent(event) {
+    listenerHandler.fireEvent(event);
+  }
+
   // common layer methods [end] ---------------
+
+  /**
+   * Propagate (or not) view events.
+   *
+   * @param {boolean} flag True to propagate.
+   */
+  this.propagateViewEvents = function (flag) {
+    // view events
+    for (var j = 0; j < viewEventNames.length; ++j) {
+      if (flag) {
+        view.addEventListener(viewEventNames[j], fireEvent);
+      } else {
+        view.removeEventListener(viewEventNames[j], fireEvent);
+      }
+    }
+  };
 
   /**
    * Transform a display position to an index.
@@ -414,65 +521,6 @@ dwv.html.ImageLayer = function (containerDiv) {
   }
 
   /**
-   * Set the image associated to the view.
-   *
-   * @param {object} img The image.
-   */
-  this.setViewImage = function (img) {
-    view.setImage(img);
-  };
-
-  /**
-   * Get the view controller.
-   *
-   * @returns {object} The controller.
-   */
-  this.getViewController = function () {
-    return viewController;
-  };
-
-  /**
-   * Get the canvas image data.
-   *
-   * @returns {object} The image data.
-   */
-  this.getImageData = function () {
-    return imageData;
-  };
-
-  /**
-   * Add an event listener to this class.
-   *
-   * @param {string} type The event type.
-   * @param {object} callback The method associated with the provided
-   *   event type, will be called with the fired event.
-   */
-  this.addEventListener = function (type, callback) {
-    listenerHandler.add(type, callback);
-  };
-
-  /**
-   * Remove an event listener from this class.
-   *
-   * @param {string} type The event type.
-   * @param {object} callback The method associated with the provided
-   *   event type.
-   */
-  this.removeEventListener = function (type, callback) {
-    listenerHandler.remove(type, callback);
-  };
-
-  /**
-   * Fire an event: call all associated listeners with the input event object.
-   *
-   * @param {object} event The event to fire.
-   * @private
-   */
-  function fireEvent(event) {
-    listenerHandler.fireEvent(event);
-  }
-
-  /**
    * Clear the context and reset the image data.
    */
   this.clear = function () {
@@ -520,16 +568,6 @@ dwv.html.ImageLayer = function (containerDiv) {
   };
 
   /**
-   * Set the line colour for the layer.
-   *
-   * @param {string} colour The line colour.
-   */
-  this.setLineColour = function (colour) {
-    context.fillStyle = colour;
-    context.strokeStyle = colour;
-  };
-
-  /**
    * Align on another layer.
    *
    * @param {dwv.html.ImageLayer} rhs The layer to align on.
@@ -537,60 +575,6 @@ dwv.html.ImageLayer = function (containerDiv) {
   this.align = function (rhs) {
     canvas.style.top = rhs.getCanvas().offsetTop;
     canvas.style.left = rhs.getCanvas().offsetLeft;
-  };
-
-  /**
-   * Add view listeners.
-   */
-  this.addViewEventListeners = function () {
-    // propagate
-    view.addEventListener('slicechange', fireEvent);
-    view.addEventListener('framechange', fireEvent);
-    view.addEventListener('wlwidthchange', fireEvent);
-    view.addEventListener('wlcenterchange', fireEvent);
-    view.addEventListener('wlpresetadd', fireEvent);
-    view.addEventListener('colourchange', fireEvent);
-    view.addEventListener('positionchange', fireEvent);
-  };
-
-  /**
-   * Add canvas mouse and touch listeners.
-   */
-  this.addCanvasListeners = function () {
-    // allow pointer events
-    canvas.setAttribute('style', 'pointer-events: auto;');
-    // mouse listeners
-    canvas.addEventListener('mousedown', fireEvent);
-    canvas.addEventListener('mousemove', fireEvent);
-    canvas.addEventListener('mouseup', fireEvent);
-    canvas.addEventListener('mouseout', fireEvent);
-    canvas.addEventListener('mousewheel', fireEvent);
-    canvas.addEventListener('DOMMouseScroll', fireEvent);
-    canvas.addEventListener('dblclick', fireEvent);
-    // touch listeners
-    canvas.addEventListener('touchstart', fireEvent);
-    canvas.addEventListener('touchmove', fireEvent);
-    canvas.addEventListener('touchend', fireEvent);
-  };
-
-  /**
-   * Remove canvas mouse and touch listeners.
-   */
-  this.removeCanvasListeners = function () {
-    // disable pointer events
-    canvas.setAttribute('style', 'pointer-events: none;');
-    // mouse listeners
-    canvas.removeEventListener('mousedown', fireEvent);
-    canvas.removeEventListener('mousemove', fireEvent);
-    canvas.removeEventListener('mouseup', fireEvent);
-    canvas.removeEventListener('mouseout', fireEvent);
-    canvas.removeEventListener('mousewheel', fireEvent);
-    canvas.removeEventListener('DOMMouseScroll', fireEvent);
-    canvas.removeEventListener('dblclick', fireEvent);
-    // touch listeners
-    canvas.removeEventListener('touchstart', fireEvent);
-    canvas.removeEventListener('touchmove', fireEvent);
-    canvas.removeEventListener('touchend', fireEvent);
   };
 
 }; // ImageLayer class

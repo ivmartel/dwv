@@ -34,8 +34,6 @@ dwv.ToolboxController = function (toolList) {
     }
     // TODO Would prefer to have this done in the addLayerListeners
     displayToIndexConverter = layer.displayToIndex;
-    // add layer listeners
-    this.addLayerListeners(layer);
     // keydown listener
     window.addEventListener('keydown', onMouch, true);
   };
@@ -142,49 +140,37 @@ dwv.ToolboxController = function (toolList) {
     // seems like jquery is checking if the method exists before it
     // is used...
     if (this.getSelectedTool() &&
-                this.getSelectedTool().getSelectedFilter()) {
+      this.getSelectedTool().getSelectedFilter()) {
       this.getSelectedTool().getSelectedFilter().run(range);
     }
   };
 
   /**
-   * Add canvas mouse and touch listeners.
+   * Listen to layer interaction events.
    *
-   * @param {object} layer The layer / canvas to listen to.
+   * @param {object} layer The layer to listen to.
    */
-  this.addLayerListeners = function (layer) {
-    // mouse listeners
-    layer.addEventListener('mousedown', onMouch);
-    layer.addEventListener('mousemove', onMouch);
-    layer.addEventListener('mouseup', onMouch);
-    layer.addEventListener('mouseout', onMouch);
-    layer.addEventListener('mousewheel', onMouch);
-    layer.addEventListener('DOMMouseScroll', onMouch);
-    layer.addEventListener('dblclick', onMouch);
-    // touch listeners
-    layer.addEventListener('touchstart', onMouch);
-    layer.addEventListener('touchmove', onMouch);
-    layer.addEventListener('touchend', onMouch);
+  this.attachLayer = function (layer) {
+    layer.activate();
+    // interaction events
+    var names = dwv.gui.interactionEventNames;
+    for (var i = 0; i < names.length; ++i) {
+      layer.addEventListener(names[i], onMouch);
+    }
   };
 
   /**
    * Remove canvas mouse and touch listeners.
    *
-   * @param {object} layer The layer / canvas to stop listening to.
+   * @param {object} layer The layer to stop listening to.
    */
-  this.removeLayerListeners = function (layer) {
-    // mouse listeners
-    layer.removeEventListener('mousedown', onMouch);
-    layer.removeEventListener('mousemove', onMouch);
-    layer.removeEventListener('mouseup', onMouch);
-    layer.removeEventListener('mouseout', onMouch);
-    layer.removeEventListener('mousewheel', onMouch);
-    layer.removeEventListener('DOMMouseScroll', onMouch);
-    layer.removeEventListener('dblclick', onMouch);
-    // touch listeners
-    layer.removeEventListener('touchstart', onMouch);
-    layer.removeEventListener('touchmove', onMouch);
-    layer.removeEventListener('touchend', onMouch);
+  this.detachLayer = function (layer) {
+    layer.deactivate();
+    // interaction events
+    var names = dwv.gui.interactionEventNames;
+    for (var i = 0; i < names.length; ++i) {
+      layer.removeEventListener(names[i], onMouch);
+    }
   };
 
   /**

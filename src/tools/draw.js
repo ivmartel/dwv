@@ -466,11 +466,9 @@ dwv.tool.Draw = function (app) {
     shapeEditor.setShape(null);
     shapeEditor.setViewController(null);
     document.body.style.cursor = 'default';
-    // make layer listen or not to events
-    app.getDrawLayer().getKonvaStage().listening(flag);
     // get the current draw layer
     drawLayer = app.getDrawLayer().getKonvaLayer();
-    renderDrawLayer(flag);
+    activateCurrentPositionShapes(flag);
     // listen to app change to update the draw layer
     if (flag) {
       app.addEventListener('slicechange', updateDrawLayer);
@@ -490,38 +488,27 @@ dwv.tool.Draw = function (app) {
    * Update the draw layer.
    */
   function updateDrawLayer() {
-    // activate the draw layer
-    renderDrawLayer(true);
+    // activate the shape at current position
+    activateCurrentPositionShapes(true);
   }
 
   /**
-   * Render (or not) the draw layer.
+   * Activate shapes at current position.
    *
    * @param {boolean} visible Set the draw layer visible or not.
    */
-  function renderDrawLayer(visible) {
-
-    drawLayer.listening(visible);
-
+  function activateCurrentPositionShapes(visible) {
     // get shape groups at the current position
     var shapeGroups =
       app.getDrawController().getCurrentPosGroup().getChildren();
 
-    var drawCanvas = app.getDrawLayer().getKonvaStage().getContent();
-
     // set shape display properties
     if (visible) {
-      drawCanvas.setAttribute('style', 'pointer-events: auto;');
-      // activate tool listeners
-      app.addToolLayerListeners(drawCanvas);
       // activate shape listeners
       shapeGroups.forEach(function (group) {
         self.setShapeOn(group);
       });
     } else {
-      drawCanvas.setAttribute('style', 'pointer-events: none;');
-      // de-activate tool listeners
-      app.removeToolLayerListeners(drawCanvas);
       // de-activate shape listeners
       shapeGroups.forEach(function (group) {
         setShapeOff(group);

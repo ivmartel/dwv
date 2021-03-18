@@ -38,6 +38,14 @@ dwv.html.DrawLayer = function (containerDiv) {
   var drawController = null;
 
   /**
+   * Listener handler.
+   *
+   * @type {object}
+   * @private
+   */
+  var listenerHandler = new dwv.utils.ListenerHandler();
+
+  /**
    * Get the Konva stage.
    *
    * @returns {object} The stage.
@@ -53,6 +61,15 @@ dwv.html.DrawLayer = function (containerDiv) {
    */
   this.getKonvaLayer = function () {
     return konvaLayer;
+  };
+
+  /**
+   * Get the draw controller.
+   *
+   * @returns {object} The controller.
+   */
+  this.getDrawController = function () {
+    return drawController;
   };
 
   // common layer methods [start] ---------------
@@ -204,16 +221,68 @@ dwv.html.DrawLayer = function (containerDiv) {
     drawController = new dwv.DrawController(konvaLayer);
   };
 
-  // common layer methods [end] ---------------
+  /**
+   * Activate the layer: propagate interaction events.
+   */
+  this.activate = function () {
+    konvaStage.listening(true);
+    // allow pointer events
+    containerDiv.setAttribute('style', 'pointer-events: auto;');
+    // interaction events
+    var names = dwv.gui.interactionEventNames;
+    //var canvas = konvaStage.getContent();
+    for (var i = 0; i < names.length; ++i) {
+      containerDiv.addEventListener(names[i], fireEvent);
+    }
+  };
 
   /**
-   * Get the draw controller.
-   *
-   * @returns {object} The controller.
+   * Deactivate the layer: stop propagating interaction events.
    */
-  this.getDrawController = function () {
-    return drawController;
+  this.deactivate = function () {
+    konvaStage.listening(false);
+    // disable pointer events
+    containerDiv.setAttribute('style', 'pointer-events: none;');
+    // interaction events
+    var names = dwv.gui.interactionEventNames;
+    for (var i = 0; i < names.length; ++i) {
+      containerDiv.removeEventListener(names[i], fireEvent);
+    }
   };
+
+  /**
+   * Add an event listener to this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type, will be called with the fired event.
+   */
+  this.addEventListener = function (type, callback) {
+    listenerHandler.add(type, callback);
+  };
+
+  /**
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type.
+   */
+  this.removeEventListener = function (type, callback) {
+    listenerHandler.remove(type, callback);
+  };
+
+  /**
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
+   * @private
+   */
+  function fireEvent(event) {
+    listenerHandler.fireEvent(event);
+  }
+
+  // common layer methods [end] ---------------
 
   /**
    * Update label scale: compensate for it so

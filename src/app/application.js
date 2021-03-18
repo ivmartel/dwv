@@ -561,24 +561,6 @@ dwv.App = function () {
   };
 
   /**
-   * Add canvas mouse and touch listeners.
-   *
-   * @param {object} layer The canvas layer to listen to.
-   */
-  this.addToolLayerListeners = function (layer) {
-    toolboxController.addLayerListeners(layer);
-  };
-
-  /**
-   * Remove layer mouse and touch listeners.
-   *
-   * @param {object} layer The canvas to stop listening to.
-   */
-  this.removeToolLayerListeners = function (layer) {
-    toolboxController.removeLayerListeners(layer);
-  };
-
-  /**
    * Render the current image.
    */
   this.render = function () {
@@ -888,6 +870,17 @@ dwv.App = function () {
    * @param {string} tool The tool.
    */
   this.setTool = function (tool) {
+    var layer = null;
+    var previousLayer = null;
+    if (tool === 'Draw') {
+      layer = drawLayer;
+      previousLayer = imageLayer;
+    } else {
+      layer = imageLayer;
+      previousLayer = drawLayer;
+    }
+    toolboxController.detachLayer(previousLayer);
+    toolboxController.attachLayer(layer);
     toolboxController.setSelectedTool(tool);
   };
 
@@ -1370,6 +1363,7 @@ dwv.App = function () {
     imageLayer.addEventListener('framechange', onFrameChange);
 
     // propagate
+    imageLayer.propagateViewEvents(true);
     imageLayer.addEventListener('wlwidthchange', fireEvent);
     imageLayer.addEventListener('wlcenterchange', fireEvent);
     imageLayer.addEventListener('wlpresetadd', fireEvent);
