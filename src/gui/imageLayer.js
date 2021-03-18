@@ -69,12 +69,73 @@ dwv.html.ImageLayer = function (containerDiv) {
   var opacity = 1;
 
   /**
+   * The layer origin.
+   *
+   * @private
+   * @type {object}
+   */
+  var origin = {x: 0, y: 0};
+
+  /**
+   * The layer zoom.
+   *
+   * @private
+   * @type {object}
+   */
+  var zoom = {x: 1, y: 1};
+
+  /**
+   * The layer translation.
+   *
+   * @private
+   * @type {object}
+   */
+  var trans = {x: 0, y: 0};
+
+  /**
+   * Listener handler.
+   *
+   * @type {object}
+   * @private
+   */
+  var listenerHandler = new dwv.utils.ListenerHandler();
+
+  // common layer methods [start] ---------------
+
+  /**
    * Get the layer opacity.
    *
    * @returns {number} The opacity ([0:1] range).
    */
   this.getOpacity = function () {
     return opacity;
+  };
+
+  /**
+   * Get the layer origin.
+   *
+   * @returns {object} The layer origin as {'x','y'}.
+   */
+  this.getOrigin = function () {
+    return origin;
+  };
+
+  /**
+   * Get the layer zoom.
+   *
+   * @returns {object} The layer zoom as {'x','y'}.
+   */
+  this.getZoom = function () {
+    return zoom;
+  };
+
+  /**
+   * Get the layer translation.
+   *
+   * @returns {object} The layer translation as {'x','y'}.
+   */
+  this.getTrans = function () {
+    return trans;
   };
 
   /**
@@ -87,78 +148,6 @@ dwv.html.ImageLayer = function (containerDiv) {
   };
 
   /**
-   * The layer origin.
-   *
-   * @private
-   * @type {object}
-   */
-  var origin = {x: 0, y: 0};
-  /**
-   * Get the layer origin.
-   *
-   * @returns {object} The layer origin as {'x','y'}.
-   */
-  this.getOrigin = function () {
-    return origin;
-  };
-  /**
-   * The layer zoom.
-   *
-   * @private
-   * @type {object}
-   */
-  var zoom = {x: 1, y: 1};
-  /**
-   * Get the layer zoom.
-   *
-   * @returns {object} The layer zoom as {'x','y'}.
-   */
-  this.getZoom = function () {
-    return zoom;
-  };
-
-  /**
-   * The layer translation.
-   *
-   * @private
-   * @type {object}
-   */
-  var trans = {x: 0, y: 0};
-  /**
-   * Get the layer translation.
-   *
-   * @returns {object} The layer translation as {'x','y'}.
-   */
-  this.getTrans = function () {
-    return trans;
-  };
-
-  /**
-   * Listener handler.
-   *
-   * @type {object}
-   * @private
-   */
-  var listenerHandler = new dwv.utils.ListenerHandler();
-
-  /**
-   * Set the canvas width.
-   *
-   * @param {number} width The new width.
-   */
-  this.setWidth = function (width) {
-    canvas.width = width;
-  };
-  /**
-   * Set the canvas height.
-   *
-   * @param {number} height The new height.
-   */
-  this.setHeight = function (height) {
-    canvas.height = height;
-  };
-
-  /**
    * Set the layer zoom.
    *
    * @param {number} newZoomX The zoom in the X direction.
@@ -166,7 +155,7 @@ dwv.html.ImageLayer = function (containerDiv) {
    * @param {number} centerX The zoom center in the X direction.
    * @param {number} centerY The zoom center in the Y direction.
    */
-  this.zoom = function (newZoomX, newZoomY, centerX, centerY) {
+  this.setZoom = function (newZoomX, newZoomY, centerX, centerY) {
     // The zoom is the ratio between the differences from the center
     // to the origins:
     // centerX - originX = ( centerX - originX0 ) * zoomX
@@ -190,9 +179,22 @@ dwv.html.ImageLayer = function (containerDiv) {
    * @param {number} tx The translation in the X direction.
    * @param {number} ty The translation in the Y direction.
    */
-  this.translate = function (tx, ty) {
+  this.setTranslate = function (tx, ty) {
     trans.x = tx;
     trans.y = ty;
+  };
+
+  /**
+   * Resize the layer.
+   *
+   * @param {number} width The layer width.
+   * @param {number} height The layer height.
+   * @param {number} scale The layer scale.
+   */
+  this.resize = function (width, height, scale) {
+    canvas.width = width;
+    canvas.height = height;
+    this.setZoom(scale, scale, 0, 0);
   };
 
   /**
@@ -200,7 +202,7 @@ dwv.html.ImageLayer = function (containerDiv) {
    *
    * @param {number} izoom The input zoom.
    */
-  this.resetLayout = function (izoom) {
+  this.reset = function (izoom) {
     origin.x = 0;
     origin.y = 0;
     zoom.x = izoom;
@@ -210,14 +212,21 @@ dwv.html.ImageLayer = function (containerDiv) {
   };
 
   /**
-   * Transform a display position to an index.
+   * Display the layer.
    *
-   * @param {dwv.Math.Point2D} point2D The point to convert.
-   * @returns {object} The equivalent index.
+   * @param {boolean} flag Whether to display the layer or not.
    */
-  this.displayToIndex = function (point2D) {
-    return {x: ((point2D.x - origin.x) / zoom.x) - trans.x,
-      y: ((point2D.y - origin.y) / zoom.y) - trans.y};
+  this.display = function (flag) {
+    containerDiv.style.display = flag ? '' : 'none';
+  };
+
+  /**
+   * Check if the layer is visible.
+   *
+   * @returns {boolean} True if the layer is visible.
+   */
+  this.isVisible = function () {
+    return containerDiv.style.display === '';
   };
 
   /**
@@ -282,60 +291,12 @@ dwv.html.ImageLayer = function (containerDiv) {
   };
 
   /**
-   * Handle window/level change.
-   *
-   * @param {object} event The event fired when changing the window/level.
-   * @private
-   */
-  function onWLChange(event) {
-    // generate and draw if no skip flag
-    if (typeof event.skipGenerate === 'undefined' ||
-      event.skipGenerate === false) {
-      self.draw();
-    }
-  }
-
-  /**
-   * Handle colour map change.
-   *
-   * @param {object} _event The event fired when changing the colour map.
-   * @private
-   */
-  function onColourChange(_event) {
-    self.draw();
-  }
-
-  /**
-   * Handle frame change.
-   *
-   * @param {object} event The event fired when changing the frame.
-   * @private
-   */
-  function onFrameChange(event) {
-    // generate and draw if no skip flag
-    if (typeof event.skipGenerate === 'undefined' ||
-      event.skipGenerate === false) {
-      self.draw();
-    }
-  }
-
-  /**
-   * Handle slice change.
-   *
-   * @param {object} _event The event fired when changing the slice.
-   * @private
-   */
-  function onSliceChange(_event) {
-    self.draw();
-  }
-
-  /**
    * Initialise the layer: set the canvas and context
    *
-   * @param {object} metaData The image meta data.
    * @param {object} image The image.
+   * @param {object} metaData The image meta data.
    */
-  this.initialise = function (metaData, image) {
+  this.initialise = function (image, metaData) {
 
     // create view
     var viewFactory = new dwv.image.ViewFactory();
@@ -389,6 +350,69 @@ dwv.html.ImageLayer = function (containerDiv) {
     this.addCanvasListeners();
   };
 
+  // common layer methods [end] ---------------
+
+  /**
+   * Transform a display position to an index.
+   *
+   * @param {dwv.Math.Point2D} point2D The point to convert.
+   * @returns {object} The equivalent index.
+   */
+  this.displayToIndex = function (point2D) {
+    return {
+      x: ((point2D.x - origin.x) / zoom.x) - trans.x,
+      y: ((point2D.y - origin.y) / zoom.y) - trans.y
+    };
+  };
+
+  /**
+   * Handle window/level change.
+   *
+   * @param {object} event The event fired when changing the window/level.
+   * @private
+   */
+  function onWLChange(event) {
+    // generate and draw if no skip flag
+    if (typeof event.skipGenerate === 'undefined' ||
+      event.skipGenerate === false) {
+      self.draw();
+    }
+  }
+
+  /**
+   * Handle colour map change.
+   *
+   * @param {object} _event The event fired when changing the colour map.
+   * @private
+   */
+  function onColourChange(_event) {
+    self.draw();
+  }
+
+  /**
+   * Handle frame change.
+   *
+   * @param {object} event The event fired when changing the frame.
+   * @private
+   */
+  function onFrameChange(event) {
+    // generate and draw if no skip flag
+    if (typeof event.skipGenerate === 'undefined' ||
+      event.skipGenerate === false) {
+      self.draw();
+    }
+  }
+
+  /**
+   * Handle slice change.
+   *
+   * @param {object} _event The event fired when changing the slice.
+   * @private
+   */
+  function onSliceChange(_event) {
+    self.draw();
+  }
+
   /**
    * Set the image associated to the view.
    *
@@ -426,6 +450,7 @@ dwv.html.ImageLayer = function (containerDiv) {
   this.addEventListener = function (type, callback) {
     listenerHandler.add(type, callback);
   };
+
   /**
    * Remove an event listener from this class.
    *
@@ -436,6 +461,7 @@ dwv.html.ImageLayer = function (containerDiv) {
   this.removeEventListener = function (type, callback) {
     listenerHandler.remove(type, callback);
   };
+
   /**
    * Fire an event: call all associated listeners with the input event object.
    *
@@ -501,24 +527,6 @@ dwv.html.ImageLayer = function (containerDiv) {
   this.setLineColour = function (colour) {
     context.fillStyle = colour;
     context.strokeStyle = colour;
-  };
-
-  /**
-   * Display the layer.
-   *
-   * @param {boolean} flag Whether to display the layer or not.
-   */
-  this.display = function (flag) {
-    canvas.style.display = flag ? '' : 'none';
-  };
-
-  /**
-   * Check if the layer is visible.
-   *
-   * @returns {boolean} True if the layer is visible.
-   */
-  this.isVisible = function () {
-    return canvas.style.display === '';
   };
 
   /**

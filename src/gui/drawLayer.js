@@ -1,0 +1,235 @@
+// namespaces
+var dwv = dwv || {};
+dwv.html = dwv.html || {};
+
+/**
+ * The Konva namespace.
+ *
+ * @external Konva
+ * @see https://konvajs.org/
+ */
+var Konva = Konva || {};
+
+/**
+ * Draw layer.
+ *
+ * @param {object} containerDiv The layer div.
+ * @class
+ */
+dwv.html.DrawLayer = function (containerDiv) {
+
+  containerDiv.className += ' drawLayer';
+
+  // konva stage
+  var konvaStage = null;
+  // konva layer
+  var konvaLayer;
+  // initial stage width
+  var stageWidth;
+  // initial stage height
+  var stageHeight;
+
+  /**
+   * The draw controller.
+   *
+   * @private
+   * @type {object}
+   */
+  var drawController = null;
+
+  /**
+   * Get the Konva stage.
+   *
+   * @returns {object} The stage.
+   */
+  this.getKonvaStage = function () {
+    return konvaStage;
+  };
+
+  /**
+   * Get the Konva layer.
+   *
+   * @returns {object} The layer.
+   */
+  this.getKonvaLayer = function () {
+    return konvaLayer;
+  };
+
+  // common layer methods [start] ---------------
+
+  /**
+   * Get the initial stage size.
+   *
+   * @returns {object} The size as {x,y}.
+   */
+  this.getInitialSize = function () {
+    return {
+      x: stageWidth,
+      y: stageHeight
+    };
+  };
+
+  /**
+   * Set the layer opacity.
+   *
+   * @param {number} alpha The opacity ([0:1] range).
+   */
+  this.setOpacity = function (alpha) {
+    konvaStage.opacity(alpha);
+  };
+
+  /**
+   * Zoom the stage.
+   *
+   * @param {number} scale The scale factor.
+   * @param {object} scaleCenter The scale center point.
+   */
+  this.setZoom = function (scale, scaleCenter) {
+    // zoom
+    var newScale = {x: scale, y: scale};
+    // offset
+    // TODO different from the imageLayer offset?
+    var oldScale = konvaStage.scale();
+    var oldOffset = konvaStage.offset();
+    var newOffsetX = (scaleCenter.x / oldScale.x) +
+            oldOffset.x - (scaleCenter.x / newScale.x);
+    var newOffsetY = (scaleCenter.y / oldScale.y) +
+            oldOffset.y - (scaleCenter.y / newScale.y);
+    var newOffset = {x: newOffsetX, y: newOffsetY};
+    // store
+    konvaStage.offset(newOffset);
+    konvaStage.scale(newScale);
+    updateLabelScale(newScale);
+  };
+
+  /**
+   * Set the layer translation.
+   * Translation is according to the last one.
+   *
+   * @param {number} tx The translation in the X direction.
+   * @param {number} ty The translation in the Y direction.
+   */
+  this.setTranslate = function (tx, ty) {
+    konvaStage.offset({x: tx, y: ty});
+  };
+
+  /**
+   * Resize the layer.
+   *
+   * @param {number} width the layer width.
+   * @param {number} height the layer height.
+   * @param {number} scale the layer scale.
+   */
+  this.resize = function (width, height, scale) {
+    var newScale = {x: scale, y: scale};
+    // resize div
+    containerDiv.setAttribute('style',
+      'width:' + width + 'px;height:' + height + 'px');
+    // resize stage
+    konvaStage.setWidth(width);
+    konvaStage.setHeight(height);
+    konvaStage.scale(newScale);
+    updateLabelScale(newScale);
+  };
+
+  /**
+   * Reset the stage with a new window scale.
+   *
+   * @param {number} windowScale The window scale.
+   */
+  this.reset = function (windowScale) {
+    var scale = {x: windowScale, y: windowScale};
+    konvaStage.offset({x: 0, y: 0});
+    konvaStage.scale(scale);
+    updateLabelScale(scale);
+  };
+
+  /**
+   * Display the layer.
+   *
+   * @param {boolean} flag Whether to display the layer or not.
+   */
+  this.display = function (flag) {
+    containerDiv.style.display = flag ? '' : 'none';
+  };
+
+  /**
+   * Check if the layer is visible.
+   *
+   * @returns {boolean} True if the layer is visible.
+   */
+  this.isVisible = function () {
+    return containerDiv.style.display === '';
+  };
+
+  /**
+   * Draw the content (imageData) of the layer.
+   * The imageData variable needs to be set
+   */
+  this.draw = function () {
+    konvaStage.draw();
+  };
+
+  /**
+   * Initialise the layer: set the canvas and context
+   *
+   * @param {object} image The image.
+   * @param {object} _metaData The image meta data.
+   */
+  this.initialise = function (image, _metaData) {
+    // get sizes
+    var size = image.getGeometry().getSize();
+    stageWidth = size.getNumberOfColumns();
+    stageHeight = size.getNumberOfRows();
+
+    // create stage
+    konvaStage = new Konva.Stage({
+      container: containerDiv,
+      width: stageWidth,
+      height: stageHeight,
+      listening: false
+    });
+    // reset style
+    // (avoids a not needed vertical scrollbar)
+    konvaStage.getContent().setAttribute('style', '');
+
+    // create layer
+    konvaLayer = new Konva.Layer({
+      listening: false,
+      visible: true
+    });
+    konvaStage.add(konvaLayer);
+
+    // create draw controller
+    drawController = new dwv.DrawController(konvaLayer);
+  };
+
+  // common layer methods [end] ---------------
+
+  /**
+   * Get the draw controller.
+   *
+   * @returns {object} The controller.
+   */
+  this.getDrawController = function () {
+    return drawController;
+  };
+
+  /**
+   * Update label scale: compensate for it so
+   *   that label size stays visually the same.
+   *
+   * @param {object} scale The scale to compensate for
+   */
+  function updateLabelScale(scale) {
+    // same formula as in style::applyZoomScale:
+    // compensate for scale and times 2 so that font 10 looks like a 10
+    var ratioX = 2 / scale.x;
+    var ratioY = 2 / scale.y;
+    // compensate scale for labels
+    var labels = konvaStage.find('Label');
+    for (var i = 0; i < labels.length; ++i) {
+      labels[i].scale({x: ratioX, y: ratioY});
+    }
+  }
+}; // DrawLayer class

@@ -175,7 +175,7 @@ dwv.tool.Draw = function (app) {
     }
 
     // determine if the click happened in an existing shape
-    var stage = app.getDrawStage();
+    var stage = app.getDrawLayer().getKonvaStage();
     var kshape = stage.getIntersection({
       x: event._xs,
       y: event._ys
@@ -467,9 +467,9 @@ dwv.tool.Draw = function (app) {
     shapeEditor.setViewController(null);
     document.body.style.cursor = 'default';
     // make layer listen or not to events
-    app.getDrawStage().listening(flag);
+    app.getDrawLayer().getKonvaStage().listening(flag);
     // get the current draw layer
-    drawLayer = app.getDrawController().getDrawLayer();
+    drawLayer = app.getDrawLayer().getKonvaLayer();
     renderDrawLayer(flag);
     // listen to app change to update the draw layer
     if (flag) {
@@ -507,7 +507,7 @@ dwv.tool.Draw = function (app) {
     var shapeGroups =
       app.getDrawController().getCurrentPosGroup().getChildren();
 
-    var drawCanvas = app.getDrawStage().getContent();
+    var drawCanvas = app.getDrawLayer().getKonvaStage().getContent();
 
     // set shape display properties
     if (visible) {
@@ -556,7 +556,7 @@ dwv.tool.Draw = function (app) {
    * @private
    */
   function getRealPosition(index) {
-    var stage = app.getDrawStage();
+    var stage = app.getDrawLayer().getKonvaStage();
     return {
       x: stage.offset().x + index.x / stage.scale().x,
       y: stage.offset().y + index.y / stage.scale().y
@@ -594,7 +594,7 @@ dwv.tool.Draw = function (app) {
       // store colour
       colour = shapeGroup.getChildren(dwv.draw.isNodeNameShape)[0].stroke();
       // display trash
-      var stage = app.getDrawStage();
+      var stage = app.getDrawLayer().getKonvaStage();
       var scale = stage.scale();
       var invscale = {x: 1 / scale.x, y: 1 / scale.y};
       trash.x(stage.offset().x + (stage.width() / (2 * scale.x)));
@@ -610,7 +610,7 @@ dwv.tool.Draw = function (app) {
     shapeGroup.on('dragmove.draw', function (event) {
       // validate the group position
       dwv.tool.validateGroupPosition(
-        app.getDrawController().getInitialSize(), this);
+        app.getDrawLayer().getInitialSize(), this);
       // highlight trash when on it
       var offset = dwv.html.getEventOffset(event.evt)[0];
       var eventPos = getRealPosition(offset);

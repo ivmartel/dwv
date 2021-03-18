@@ -44,9 +44,8 @@ dwv.App = function () {
 
   // Image layer
   var imageLayer = null;
-
-  // Draw controller
-  var drawController = null;
+  // Draw layer
+  var drawLayer = null;
 
   // Generic style
   var style = new dwv.html.Style();
@@ -182,7 +181,11 @@ dwv.App = function () {
    * @returns {object} The controller.
    */
   this.getDrawController = function () {
-    return drawController;
+    var controller = null;
+    if (drawLayer) {
+      controller = drawLayer.getDrawController();
+    }
+    return controller;
   };
 
   /**
@@ -195,12 +198,12 @@ dwv.App = function () {
   };
 
   /**
-   * Get the draw stage.
+   * Get the draw layer.
    *
-   * @returns {object} The draw stage.
+   * @returns {object} The draw layer.
    */
-  this.getDrawStage = function () {
-    return drawController.getDrawStage();
+  this.getDrawLayer = function () {
+    return drawLayer;
   };
 
   /**
@@ -351,14 +354,11 @@ dwv.App = function () {
    * Reset the application.
    */
   this.reset = function () {
-    // clear draw
-    if (drawController) {
-      drawController.reset();
-    }
     // clear objects
     image = null;
     metaData = null;
     imageLayer = null;
+    drawLayer = null;
     // reset undo/redo
     if (undoStack) {
       undoStack = new dwv.tool.UndoStack();
@@ -384,11 +384,12 @@ dwv.App = function () {
     translation = {x: 0, y: 0};
     // apply new values
     if (imageLayer) {
-      imageLayer.resetLayout(windowScale);
+      imageLayer.reset(windowScale);
       imageLayer.draw();
     }
-    if (drawController) {
-      drawController.resetStage(windowScale);
+    if (drawLayer) {
+      drawLayer.reset(windowScale);
+      drawLayer.draw();
     }
     // fire events
     if (previousScale !== scale) {
@@ -536,14 +537,13 @@ dwv.App = function () {
       'style', 'width:' + newWidth + 'px;height:' + newHeight + 'px');
     // resize image layer
     if (imageLayer) {
-      imageLayer.setWidth(newWidth);
-      imageLayer.setHeight(newHeight);
-      imageLayer.zoom(scale, scale, 0, 0);
+      imageLayer.resize(newWidth, newHeight, scale);
       imageLayer.draw();
     }
     // resize draw stage
-    if (drawController) {
-      drawController.resizeStage(newWidth, newHeight, scale);
+    if (drawLayer) {
+      drawLayer.resize(newWidth, newHeight, scale);
+      drawLayer.draw();
     }
   };
 
@@ -662,7 +662,7 @@ dwv.App = function () {
    * @returns {object} The list of draw details including id, slice, frame...
    */
   this.getDrawDisplayDetails = function () {
-    return drawController.getDrawDisplayDetails();
+    return this.getDrawController().getDrawDisplayDetails();
   };
 
   /**
@@ -680,6 +680,7 @@ dwv.App = function () {
    * @returns {object} A list of draw details including id, text, quant...
    */
   this.getDrawStoreDetails = function () {
+    var drawController = this.getDrawController();
     return drawController.getDrawStoreDetails();
   };
   /**
@@ -689,6 +690,7 @@ dwv.App = function () {
    * @param {Array} drawingsDetails An array of drawings details.
    */
   this.setDrawings = function (drawings, drawingsDetails) {
+    var drawController = this.getDrawController();
     drawController.setDrawings(
       drawings, drawingsDetails, fireEvent, this.addToUndoStack);
     var controller = imageLayer.getViewController();
@@ -702,12 +704,14 @@ dwv.App = function () {
    * @param {object} drawDetails Details of the drawing to update.
    */
   this.updateDraw = function (drawDetails) {
+    var drawController = this.getDrawController();
     drawController.updateDraw(drawDetails);
   };
   /**
    * Delete all Draws from all layers.
    */
   this.deleteDraws = function () {
+    var drawController = this.getDrawController();
     drawController.deleteDraws(fireEvent, this.addToUndoStack);
   };
   /**
@@ -717,6 +721,7 @@ dwv.App = function () {
    * @returns {boolean} True if the group is visible.
    */
   this.isGroupVisible = function (drawDetails) {
+    var drawController = this.getDrawController();
     return drawController.isGroupVisible(drawDetails);
   };
   /**
@@ -725,6 +730,7 @@ dwv.App = function () {
    * @param {object} drawDetails Details of the drawing to update.
    */
   this.toogleGroupVisibility = function (drawDetails) {
+    var drawController = this.getDrawController();
     drawController.toogleGroupVisibility(drawDetails);
   };
 
@@ -750,6 +756,7 @@ dwv.App = function () {
     // generate and draw if no skip flag
     if (typeof event.skipGenerate === 'undefined' ||
       event.skipGenerate === false) {
+      var drawController = self.getDrawController();
       if (drawController) {
         var controller = imageLayer.getViewController();
         drawController.activateDrawLayer(
@@ -766,6 +773,7 @@ dwv.App = function () {
    * @private
    */
   function onSliceChange(_event) {
+    var drawController = self.getDrawController();
     if (drawController) {
       var controller = imageLayer.getViewController();
       drawController.activateDrawLayer(
@@ -971,12 +979,13 @@ dwv.App = function () {
   function zoomLayers() {
     // image layer
     if (imageLayer) {
-      imageLayer.zoom(scale, scale, scaleCenter.x, scaleCenter.y);
+      imageLayer.setZoom(scale, scale, scaleCenter.x, scaleCenter.y);
       imageLayer.draw();
     }
     // draw layer
-    if (drawController) {
-      drawController.zoomStage(scale, scaleCenter);
+    if (drawLayer) {
+      drawLayer.setZoom(scale, scaleCenter);
+      drawLayer.draw();
     }
     // fire event
     /**
@@ -1018,13 +1027,14 @@ dwv.App = function () {
   function translateLayers() {
     // image layer
     if (imageLayer) {
-      imageLayer.translate(translation.x, translation.y);
+      imageLayer.setTranslate(translation.x, translation.y);
       imageLayer.draw();
       // draw layer
-      if (drawController) {
+      if (drawLayer) {
         var ox = -imageLayer.getOrigin().x / scale - translation.x;
         var oy = -imageLayer.getOrigin().y / scale - translation.y;
-        drawController.translateStage(ox, oy);
+        drawLayer.setTranslate(ox, oy);
+        drawLayer.draw();
       }
       // fire event
       /**
@@ -1050,11 +1060,9 @@ dwv.App = function () {
   /**
    * Create the application layers.
    *
-   * @param {number} dataWidth The width of the input data.
-   * @param {number} dataHeight The height of the input data.
    * @private
    */
-  function createLayers(dataWidth, dataHeight) {
+  function createLayers() {
     var container = self.getElement('layerContainer');
     // remove previous canvas
     var previous = container.getElementsByClassName('layer');
@@ -1063,7 +1071,7 @@ dwv.App = function () {
         previous[i].remove();
       }
     }
-    // create new canvas
+    // create image layer
     var div0 = document.createElement('div');
     div0.id = 'layer0';
     div0.className = 'layer';
@@ -1071,15 +1079,22 @@ dwv.App = function () {
     container.prepend(div0);
     // image layer
     imageLayer = new dwv.html.ImageLayer(div0);
-    imageLayer.initialise(metaData, image);
+    imageLayer.initialise(image, metaData);
     imageLayer.display(true);
 
-    // draw layer
-    var drawDiv = self.getElement('drawDiv');
-    if (drawDiv) {
-      drawController = new dwv.DrawController(drawDiv);
-      drawController.create(dataWidth, dataHeight);
+    if (toolboxController && toolboxController.hasTool('Draw')) {
+      // create draw layer
+      var div1 = document.createElement('div');
+      div1.id = 'layer1';
+      div1.className = 'layer';
+      // prepend to container
+      container.append(div1);
+      // draw layer
+      drawLayer = new dwv.html.DrawLayer(div1);
+      drawLayer.initialise(image, metaData);
+      drawLayer.display(true);
     }
+
     // resize app
     self.fitToSize(self.getLayerContainerSize());
 
@@ -1216,6 +1231,7 @@ dwv.App = function () {
    * @private
    */
   function onload(event) {
+    var drawController = self.getDrawController();
     if (drawController) {
       var controller = imageLayer.getViewController();
       drawController.activateDrawLayer(
@@ -1347,7 +1363,7 @@ dwv.App = function () {
     dataWidth = size.getNumberOfColumns();
     dataHeight = size.getNumberOfRows();
 
-    createLayers(dataWidth, dataHeight);
+    createLayers();
 
     // local listeners
     imageLayer.addEventListener('slicechange', onSliceChange);

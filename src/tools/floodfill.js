@@ -237,7 +237,7 @@ dwv.tool.Floodfill = function (app) {
 
       // draw shape command
       command = new dwv.tool.DrawGroupCommand(shapeGroup, 'floodfill',
-        app.getDrawController().getDrawLayer());
+        app.getDrawLayer().getKonvaLayer());
       command.onExecute = fireEvent;
       command.onUndo = fireEvent;
       // // draw
@@ -349,7 +349,7 @@ dwv.tool.Floodfill = function (app) {
 
     // update zoom scale
     self.style.setZoomScale(
-      app.getDrawController().getDrawLayer().getAbsoluteScale());
+      app.getDrawLayer().getKonvaLayer().getAbsoluteScale());
 
     self.started = true;
     initialpoint = getCoord(event);

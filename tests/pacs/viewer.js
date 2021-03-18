@@ -77,8 +77,14 @@ dwv.test.onDOMContentLoadedViewer = function () {
   });
 
   var alpharange = document.getElementById('alpharange');
+  var alphanumber = document.getElementById('alphanumber');
   alpharange.oninput = function () {
-    _app.setOpacity(this.value / 100);
+    _app.setOpacity(this.value);
+    alphanumber.value = this.value;
+  };
+  alphanumber.oninput = function () {
+    _app.setOpacity(this.value);
+    alpharange.value = this.value;
   };
 
 };

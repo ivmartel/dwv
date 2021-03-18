@@ -56,7 +56,7 @@ dwv.ToolboxController = function (toolList) {
    * @returns {string} The tool list element for the given name.
    */
   this.hasTool = function (name) {
-    return this.getToolList()[name];
+    return typeof this.getToolList()[name] !== 'undefined';
   };
 
   /**

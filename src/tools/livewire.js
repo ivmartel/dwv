@@ -129,7 +129,7 @@ dwv.tool.Livewire = function (app) {
       clearParentPoints();
       // update zoom scale
       self.style.setZoomScale(
-        app.getDrawController().getDrawLayer().getAbsoluteScale());
+        app.getDrawLayer().getKonvaLayer().getAbsoluteScale());
       // do the training from the first point
       var p = new dwv.math.FastPoint2D(event._x, event._y);
       scissors.doTraining(p);
@@ -228,7 +228,7 @@ dwv.tool.Livewire = function (app) {
 
     // draw shape command
     command = new dwv.tool.DrawGroupCommand(shapeGroup, 'livewire',
-      app.getDrawController().getDrawLayer());
+      app.getDrawLayer().getKonvaLayer());
     // draw
     command.execute();
   };

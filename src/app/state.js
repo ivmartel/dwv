@@ -43,7 +43,7 @@ dwv.State = function () {
       scale: app.getScale(),
       scaleCenter: app.getScaleCenter(),
       translation: app.getTranslation(),
-      drawings: app.getDrawController().getDrawLayer().toObject(),
+      drawings: app.getDrawLayer().getKonvaLayer().toObject(),
       drawingsDetails: app.getDrawStoreDetails()
     });
   };
