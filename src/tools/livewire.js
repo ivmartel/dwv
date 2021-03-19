@@ -128,8 +128,10 @@ dwv.tool.Livewire = function (app) {
       clearPaths();
       clearParentPoints();
       // update zoom scale
+      var layerController = app.getLayerController();
+      var drawLayer = layerController.getActiveDrawLayer();
       self.style.setZoomScale(
-        app.getDrawLayer().getKonvaLayer().getAbsoluteScale());
+        drawLayer.getKonvaLayer().getAbsoluteScale());
       // do the training from the first point
       var p = new dwv.math.FastPoint2D(event._x, event._y);
       scissors.doTraining(p);
@@ -178,8 +180,8 @@ dwv.tool.Livewire = function (app) {
     // do the work
     var results = 0;
     var stop = false;
+    dwv.logger.debug('Getting scissors ready...');
     while (!parentPoints[p.y][p.x] && !stop) {
-      dwv.logger.debug('Getting ready...');
       results = scissors.doWork();
 
       if (results.length === 0) {
@@ -193,7 +195,7 @@ dwv.tool.Livewire = function (app) {
         }
       }
     }
-    dwv.logger.debug('Ready!');
+    dwv.logger.debug('Scissors are ready!');
 
     // get the path
     currentPath = new dwv.math.Path();
@@ -221,14 +223,18 @@ dwv.tool.Livewire = function (app) {
     shapeGroup = factory.create(currentPath.pointArray, self.style);
     shapeGroup.id(dwv.math.guid());
 
+    var layerController = app.getLayerController();
+    var drawLayer = layerController.getActiveDrawLayer();
+    var drawController = drawLayer.getDrawController();
+
     // get the position group
-    var posGroup = app.getDrawController().getCurrentPosGroup();
+    var posGroup = drawController.getCurrentPosGroup();
     // add shape group to position group
     posGroup.add(shapeGroup);
 
     // draw shape command
     command = new dwv.tool.DrawGroupCommand(shapeGroup, 'livewire',
-      app.getDrawLayer().getKonvaLayer());
+      drawLayer.getKonvaLayer());
     // draw
     command.execute();
   };
@@ -313,12 +319,15 @@ dwv.tool.Livewire = function (app) {
   this.activate = function (bool) {
     // start scissors if displayed
     if (bool) {
+      var layerController = app.getLayerController();
+      var imageLayer = layerController.getActiveImageLayer();
+
       //scissors = new dwv.math.Scissors();
       var size = app.getImage().getGeometry().getSize();
       scissors.setDimensions(
         size.getNumberOfColumns(),
         size.getNumberOfRows());
-      scissors.setData(app.getImageLayer().getImageData().data);
+      scissors.setData(imageLayer.getImageData().data);
 
       // init with the app window scale
       this.style.setScale(app.getWindowScale());

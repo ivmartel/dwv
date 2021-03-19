@@ -30,11 +30,13 @@ dwv.test.viewerSetup = function () {
   _app.init(config);
 
   // bind events
+  var isFirstRender = null;
   _app.addEventListener('error', function (event) {
     console.error('load error', event);
   });
   _app.addEventListener('loadstart', function () {
     console.time('load-data');
+    isFirstRender = true;
   });
   _app.addEventListener('loadend', function () {
     console.timeEnd('load-data');
@@ -45,6 +47,11 @@ dwv.test.viewerSetup = function () {
   });
   _app.addEventListener('renderend', function () {
     console.timeEnd('render-data');
+    if (isFirstRender) {
+      isFirstRender = false;
+      // select tool
+      _app.setTool('Scroll');
+    }
   });
 
   _app.addEventListener('keydown', function (event) {
@@ -58,8 +65,6 @@ dwv.test.viewerSetup = function () {
     }
   });
 
-  // select tool
-  _app.setTool('Scroll');
   // load from location
   dwv.utils.loadFromUri(window.location.href, _app);
 };

@@ -94,11 +94,14 @@ dwv.tool.ZoomAndPan = function (app) {
       if (Math.abs(diffY) < 15) {
         return;
       }
+      var layerController = app.getLayerController();
+      var viewController =
+        layerController.getActiveImageLayer().getViewController();
       // update view controller
       if (diffY > 0) {
-        app.getViewController().incrementSliceNb();
+        viewController.incrementSliceNb();
       } else {
-        app.getViewController().decrementSliceNb();
+        viewController.decrementSliceNb();
       }
     } else {
       // zoom mode

@@ -34,16 +34,20 @@ dwv.State = function () {
    * @returns {string} The state as a JSON string.
    */
   this.toJSON = function (app) {
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveImageLayer().getViewController();
+    var drawLayer = layerController.getActiveDrawLayer();
     // return a JSON string
     return JSON.stringify({
       version: '0.4',
-      'window-center': app.getViewController().getWindowLevel().center,
-      'window-width': app.getViewController().getWindowLevel().width,
-      position: app.getViewController().getCurrentPosition(),
+      'window-center': viewController.getWindowLevel().center,
+      'window-width': viewController.getWindowLevel().width,
+      position: viewController.getCurrentPosition(),
       scale: app.getScale(),
       scaleCenter: app.getScaleCenter(),
       translation: app.getTranslation(),
-      drawings: app.getDrawLayer().getKonvaLayer().toObject(),
+      drawings: drawLayer.getKonvaLayer().toObject(),
       drawingsDetails: app.getDrawStoreDetails()
     });
   };
@@ -77,10 +81,13 @@ dwv.State = function () {
    * @param {object} data The state data.
    */
   this.apply = function (app, data) {
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveImageLayer().getViewController();
     // display
-    app.getViewController().setWindowLevel(
+    viewController.setWindowLevel(
       data['window-center'], data['window-width']);
-    app.getViewController().setCurrentPosition(data.position);
+    viewController.setCurrentPosition(data.position);
     app.zoom(data.scale, data.scaleCenter.x, data.scaleCenter.y);
     app.translate(data.translation.x, data.translation.y);
     // drawings

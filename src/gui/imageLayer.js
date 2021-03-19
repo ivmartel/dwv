@@ -187,12 +187,10 @@ dwv.html.ImageLayer = function (containerDiv) {
   /**
    * Set the layer zoom.
    *
-   * @param {number} newZoomX The zoom in the X direction.
-   * @param {number} newZoomY The zoom in the Y direction.
-   * @param {number} centerX The zoom center in the X direction.
-   * @param {number} centerY The zoom center in the Y direction.
+   * @param {object} scale The scale factor as {x,y}.
+   * @param {object} center The scale center pointas {x,y}.
    */
-  this.setZoom = function (newZoomX, newZoomY, centerX, centerY) {
+  this.setZoom = function (scale, center) {
     // The zoom is the ratio between the differences from the center
     // to the origins:
     // centerX - originX = ( centerX - originX0 ) * zoomX
@@ -201,24 +199,20 @@ dwv.html.ImageLayer = function (containerDiv) {
     //originY = (centerY / zoomY) + originY - (centerY / newZoomY);
 
     // center in image coordinate system
-    origin.x = centerX - (centerX - origin.x) * (newZoomX / zoom.x);
-    origin.y = centerY - (centerY - origin.y) * (newZoomY / zoom.y);
+    origin.x = center.x - (center.x - origin.x) * (scale.x / zoom.x);
+    origin.y = center.y - (center.y - origin.y) * (scale.y / zoom.y);
 
     // save zoom
-    zoom.x = newZoomX;
-    zoom.y = newZoomY;
+    zoom = scale;
   };
 
   /**
    * Set the layer translation.
-   * Translation is according to the last one.
    *
-   * @param {number} tx The translation in the X direction.
-   * @param {number} ty The translation in the Y direction.
+   * @param {object} translation The translation as {x,y}.
    */
-  this.setTranslate = function (tx, ty) {
-    trans.x = tx;
-    trans.y = ty;
+  this.setTranslate = function (translation) {
+    trans = translation;
   };
 
   /**
@@ -231,7 +225,9 @@ dwv.html.ImageLayer = function (containerDiv) {
   this.resize = function (width, height, scale) {
     canvas.width = width;
     canvas.height = height;
-    this.setZoom(scale, scale, 0, 0);
+    var scale2d = {x: scale, y: scale};
+    var center = {x: 0, y: 0};
+    this.setZoom(scale2d, center);
   };
 
   /**

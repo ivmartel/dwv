@@ -96,38 +96,33 @@ dwv.html.DrawLayer = function (containerDiv) {
   };
 
   /**
-   * Zoom the stage.
+   * Zoom the layer.
    *
-   * @param {number} scale The scale factor.
-   * @param {object} scaleCenter The scale center point.
+   * @param {object} scale The scale factor as {x,y}.
+   * @param {object} center The scale center pointas {x,y}.
    */
-  this.setZoom = function (scale, scaleCenter) {
-    // zoom
-    var newScale = {x: scale, y: scale};
-    // offset
+  this.setZoom = function (scale, center) {
     // TODO different from the imageLayer offset?
     var oldScale = konvaStage.scale();
     var oldOffset = konvaStage.offset();
-    var newOffsetX = (scaleCenter.x / oldScale.x) +
-            oldOffset.x - (scaleCenter.x / newScale.x);
-    var newOffsetY = (scaleCenter.y / oldScale.y) +
-            oldOffset.y - (scaleCenter.y / newScale.y);
+    var newOffsetX = (center.x / oldScale.x) +
+      oldOffset.x - (center.x / scale.x);
+    var newOffsetY = (center.y / oldScale.y) +
+      oldOffset.y - (center.y / scale.y);
     var newOffset = {x: newOffsetX, y: newOffsetY};
     // store
     konvaStage.offset(newOffset);
-    konvaStage.scale(newScale);
-    updateLabelScale(newScale);
+    konvaStage.scale(scale);
+    updateLabelScale(scale);
   };
 
   /**
    * Set the layer translation.
-   * Translation is according to the last one.
    *
-   * @param {number} tx The translation in the X direction.
-   * @param {number} ty The translation in the Y direction.
+   * @param {object} translation The translation as {x,y}.
    */
-  this.setTranslate = function (tx, ty) {
-    konvaStage.offset({x: tx, y: ty});
+  this.setTranslate = function (translation) {
+    konvaStage.offset(translation);
   };
 
   /**
