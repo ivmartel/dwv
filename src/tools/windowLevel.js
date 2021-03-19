@@ -37,7 +37,7 @@ dwv.tool.WindowLevel = function (app) {
     // update view controller
     var layerController = app.getLayerController();
     var viewController =
-      layerController.getActiveImageLayer().getViewController();
+      layerController.getActiveViewLayer().getViewController();
     viewController.setCurrentPosition2D(event._x, event._y);
   };
 
@@ -54,7 +54,7 @@ dwv.tool.WindowLevel = function (app) {
 
     var layerController = app.getLayerController();
     var viewController =
-      layerController.getActiveImageLayer().getViewController();
+      layerController.getActiveViewLayer().getViewController();
 
     // difference to last position
     var diffX = event._x - self.x0;
@@ -136,7 +136,7 @@ dwv.tool.WindowLevel = function (app) {
   this.dblclick = function (event) {
     var layerController = app.getLayerController();
     var viewController =
-      layerController.getActiveImageLayer().getViewController();
+      layerController.getActiveViewLayer().getViewController();
 
     // update view controller
     viewController.setWindowLevel(

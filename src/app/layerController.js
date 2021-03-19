@@ -32,7 +32,7 @@ dwv.LayerController = function () {
     layers = [];
   };
 
-  this.getActiveImageLayer = function () {
+  this.getActiveViewLayer = function () {
     if (layers.length !== 0) {
       return layers[0];
     }

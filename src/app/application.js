@@ -78,7 +78,7 @@ dwv.App = function () {
     image = img;
     // TODO: move...
     if (layerController) {
-      layerController.getActiveImageLayer().setViewImage(img);
+      layerController.getActiveViewLayer().setViewImage(img);
     }
   };
 
@@ -503,8 +503,8 @@ dwv.App = function () {
    * Init the Window/Level display
    */
   this.initWLDisplay = function () {
-    var imageLayer = layerController.getActiveImageLayer();
-    var controller = imageLayer.getViewController();
+    var viewLayer = layerController.getActiveViewLayer();
+    var controller = viewLayer.getViewController();
     // set window/level to first preset
     controller.setWindowLevelPresetById(0);
     // default position
@@ -517,14 +517,14 @@ dwv.App = function () {
    * Render the current image.
    */
   this.render = function () {
-    var imageLayer = layerController.getActiveImageLayer();
+    var viewLayer = layerController.getActiveViewLayer();
     // create view if first tiem
-    if (!imageLayer) {
-      initialiseImageLayer();
-      imageLayer = layerController.getActiveImageLayer();
+    if (!viewLayer) {
+      initialiseViewLayer();
+      viewLayer = layerController.getActiveViewLayer();
     }
     // draw the image
-    imageLayer.draw();
+    viewLayer.draw();
   };
 
   /**
@@ -589,9 +589,9 @@ dwv.App = function () {
    * @param {number} alpha The opacity ([0:1] range).
    */
   this.setOpacity = function (alpha) {
-    var imageLayer = layerController.getActiveImageLayer();
-    imageLayer.setOpacity(alpha);
-    imageLayer.draw();
+    var viewLayer = layerController.getActiveViewLayer();
+    viewLayer.setOpacity(alpha);
+    viewLayer.draw();
   };
 
   /**
@@ -632,7 +632,7 @@ dwv.App = function () {
    */
   this.setDrawings = function (drawings, drawingsDetails) {
     var viewController =
-      layerController.getActiveImageLayer().getViewController();
+      layerController.getActiveViewLayer().getViewController();
     var drawController =
       layerController.getActiveDrawLayer().getDrawController();
 
@@ -707,7 +707,7 @@ dwv.App = function () {
       var drawLayer = layerController.getActiveDrawLayer();
       if (drawLayer) {
         var viewController =
-          layerController.getActiveImageLayer().getViewController();
+          layerController.getActiveViewLayer().getViewController();
         drawLayer.getDrawController().activateDrawLayer(
           viewController.getCurrentPosition(),
           viewController.getCurrentFrame());
@@ -725,7 +725,7 @@ dwv.App = function () {
     var drawLayer = layerController.getActiveDrawLayer();
     if (drawLayer) {
       var viewController =
-        layerController.getActiveImageLayer().getViewController();
+        layerController.getActiveViewLayer().getViewController();
       drawLayer.getDrawController().activateDrawLayer(
         viewController.getCurrentPosition(),
         viewController.getCurrentFrame());
@@ -777,7 +777,7 @@ dwv.App = function () {
    */
   this.defaultOnKeydown = function (event) {
     var viewController =
-      layerController.getActiveImageLayer().getViewController();
+      layerController.getActiveViewLayer().getViewController();
     if (event.ctrlKey) {
       if (event.keyCode === 37) { // crtl-arrow-left
         event.preventDefault();
@@ -823,7 +823,7 @@ dwv.App = function () {
    */
   this.setColourMap = function (colourMap) {
     var viewController =
-      layerController.getActiveImageLayer().getViewController();
+      layerController.getActiveViewLayer().getViewController();
     viewController.setColourMapFromName(colourMap);
   };
 
@@ -834,7 +834,7 @@ dwv.App = function () {
    */
   this.setWindowLevelPreset = function (preset) {
     var viewController =
-      layerController.getActiveImageLayer().getViewController();
+      layerController.getActiveViewLayer().getViewController();
     viewController.setWindowLevelPreset(preset);
   };
 
@@ -850,9 +850,9 @@ dwv.App = function () {
       tool === 'Livewire' ||
       tool === 'Floodfill') {
       layer = layerController.getActiveDrawLayer();
-      previousLayer = layerController.getActiveImageLayer();
+      previousLayer = layerController.getActiveViewLayer();
     } else {
-      layer = layerController.getActiveImageLayer();
+      layer = layerController.getActiveViewLayer();
       previousLayer = layerController.getActiveDrawLayer();
     }
     if (previousLayer) {
@@ -993,17 +993,17 @@ dwv.App = function () {
     //layerController.setTranslate(translation);
     //layerController.draw();
 
-    // image layer
-    var imageLayer = layerController.getActiveImageLayer();
-    if (imageLayer) {
-      imageLayer.setTranslate(translation);
-      imageLayer.draw();
+    // view layer
+    var viewLayer = layerController.getActiveViewLayer();
+    if (viewLayer) {
+      viewLayer.setTranslate(translation);
+      viewLayer.draw();
       // draw layer
       var drawLayer = layerController.getActiveDrawLayer();
       if (drawLayer) {
         var t = {
-          x: -imageLayer.getOrigin().x / scale - translation.x,
-          y: -imageLayer.getOrigin().y / scale - translation.y
+          x: -viewLayer.getOrigin().x / scale - translation.x,
+          y: -viewLayer.getOrigin().y / scale - translation.y
         };
         drawLayer.setTranslate(t);
         drawLayer.draw();
@@ -1051,7 +1051,7 @@ dwv.App = function () {
     // prepend to container
     container.prepend(div0);
     // image layer
-    layerController.addLayer(new dwv.html.ImageLayer(div0));
+    layerController.addLayer(new dwv.html.ViewLayer(div0));
 
     if (toolboxController && toolboxController.hasTool('Draw')) {
       // create draw layer
@@ -1184,7 +1184,7 @@ dwv.App = function () {
       } else {
         // update slice number if new slice was inserted before
         var controller =
-          layerController.getActiveImageLayer().getViewController();
+          layerController.getActiveViewLayer().getViewController();
         var currentPosition = controller.getCurrentPosition();
         if (sliceNb <= currentPosition.k) {
           controller.setCurrentPosition({
@@ -1207,7 +1207,7 @@ dwv.App = function () {
     var drawlayer = layerController.getActiveDrawLayer();
     if (drawlayer) {
       var viewController =
-        layerController.getActiveImageLayer().getViewController();
+        layerController.getActiveViewLayer().getViewController();
       drawlayer.getDrawController().activateDrawLayer(
         viewController.getCurrentPosition(),
         viewController.getCurrentFrame()
@@ -1321,12 +1321,12 @@ dwv.App = function () {
   }
 
   /**
-   * Create the image layer.
+   * Create the view layer.
    * To be called once the DICOM data has been loaded.
    *
    * @private
    */
-  function initialiseImageLayer() {
+  function initialiseViewLayer() {
 
     if (!image) {
       throw new Error('No image to create the layer for.');
@@ -1339,28 +1339,28 @@ dwv.App = function () {
 
     createLayers();
 
-    var imageLayer = layerController.getActiveImageLayer();
+    var viewLayer = layerController.getActiveViewLayer();
 
     // local listeners
-    imageLayer.addEventListener('slicechange', onSliceChange);
-    imageLayer.addEventListener('framechange', onFrameChange);
+    viewLayer.addEventListener('slicechange', onSliceChange);
+    viewLayer.addEventListener('framechange', onFrameChange);
 
     // propagate
-    imageLayer.propagateViewEvents(true);
-    imageLayer.addEventListener('wlwidthchange', fireEvent);
-    imageLayer.addEventListener('wlcenterchange', fireEvent);
-    imageLayer.addEventListener('wlpresetadd', fireEvent);
-    imageLayer.addEventListener('colourchange', fireEvent);
-    imageLayer.addEventListener('positionchange', fireEvent);
-    imageLayer.addEventListener('slicechange', fireEvent);
-    imageLayer.addEventListener('framechange', fireEvent);
+    viewLayer.propagateViewEvents(true);
+    viewLayer.addEventListener('wlwidthchange', fireEvent);
+    viewLayer.addEventListener('wlcenterchange', fireEvent);
+    viewLayer.addEventListener('wlpresetadd', fireEvent);
+    viewLayer.addEventListener('colourchange', fireEvent);
+    viewLayer.addEventListener('positionchange', fireEvent);
+    viewLayer.addEventListener('slicechange', fireEvent);
+    viewLayer.addEventListener('framechange', fireEvent);
 
-    imageLayer.addEventListener('renderstart', fireEvent);
-    imageLayer.addEventListener('renderend', fireEvent);
+    viewLayer.addEventListener('renderstart', fireEvent);
+    viewLayer.addEventListener('renderend', fireEvent);
 
     // initialise the toolbox
     if (toolboxController) {
-      toolboxController.init(imageLayer);
+      toolboxController.init(viewLayer);
     }
   }
 

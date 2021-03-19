@@ -273,7 +273,7 @@ dwv.tool.Floodfill = function (app) {
 
     var layerController = app.getLayerController();
     var viewController =
-      layerController.getActiveImageLayer().getViewController();
+      layerController.getActiveViewLayer().getViewController();
 
     var pos = viewController.getCurrentPosition();
     var threshold = currentthreshold || initialthreshold;
@@ -350,10 +350,10 @@ dwv.tool.Floodfill = function (app) {
    */
   this.mousedown = function (event) {
     var layerController = app.getLayerController();
-    var imageLayer = layerController.getActiveImageLayer();
+    var viewLayer = layerController.getActiveViewLayer();
     var drawLayer = layerController.getActiveDrawLayer();
 
-    imageInfo = imageLayer.getImageData();
+    imageInfo = viewLayer.getImageData();
     if (!imageInfo) {
       dwv.logger.error('No image found');
       return;

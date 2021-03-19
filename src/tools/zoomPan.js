@@ -96,7 +96,7 @@ dwv.tool.ZoomAndPan = function (app) {
       }
       var layerController = app.getLayerController();
       var viewController =
-        layerController.getActiveImageLayer().getViewController();
+        layerController.getActiveViewLayer().getViewController();
       // update view controller
       if (diffY > 0) {
         viewController.incrementSliceNb();

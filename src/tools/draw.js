@@ -197,7 +197,7 @@ dwv.tool.Draw = function (app) {
         shapeEditor.disable();
         shapeEditor.setShape(selectedShape);
         var viewController =
-          layerController.getActiveImageLayer().getViewController();
+          layerController.getActiveViewLayer().getViewController();
         shapeEditor.setViewController(viewController);
         shapeEditor.enable();
       }
@@ -415,7 +415,7 @@ dwv.tool.Draw = function (app) {
     // create shape group
     var layerController = app.getLayerController();
     var viewController =
-      layerController.getActiveImageLayer().getViewController();
+      layerController.getActiveViewLayer().getViewController();
     tmpShapeGroup = currentFactory.create(
       tmpPoints, self.style, viewController);
     // do not listen during creation
@@ -440,7 +440,7 @@ dwv.tool.Draw = function (app) {
 
     var layerController = app.getLayerController();
     var viewController =
-      layerController.getActiveImageLayer().getViewController();
+      layerController.getActiveViewLayer().getViewController();
     var drawController =
       layerController.getActiveDrawLayer().getDrawController();
 

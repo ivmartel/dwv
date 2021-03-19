@@ -34,7 +34,7 @@ dwv.tool.Scroll = function (app) {
     // stop viewer if playing
     var layerController = app.getLayerController();
     var viewController =
-      layerController.getActiveImageLayer().getViewController();
+      layerController.getActiveViewLayer().getViewController();
     if (viewController.isPlaying()) {
       viewController.stop();
     }
@@ -57,7 +57,7 @@ dwv.tool.Scroll = function (app) {
 
     var layerController = app.getLayerController();
     var viewController =
-      layerController.getActiveImageLayer().getViewController();
+      layerController.getActiveViewLayer().getViewController();
 
     // difference to last Y position
     var diffY = event._y - self.y0;
@@ -194,7 +194,7 @@ dwv.tool.Scroll = function (app) {
   function mouseScroll(up) {
     var layerController = app.getLayerController();
     var viewController =
-      layerController.getActiveImageLayer().getViewController();
+      layerController.getActiveViewLayer().getViewController();
 
     var hasSlices =
       (app.getImage().getGeometry().getSize().getNumberOfSlices() !== 1);
@@ -231,7 +231,7 @@ dwv.tool.Scroll = function (app) {
   this.dblclick = function (_event) {
     var layerController = app.getLayerController();
     var viewController =
-      layerController.getActiveImageLayer().getViewController();
+      layerController.getActiveViewLayer().getViewController();
     viewController.play();
   };
 

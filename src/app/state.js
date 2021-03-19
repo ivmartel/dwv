@@ -36,7 +36,7 @@ dwv.State = function () {
   this.toJSON = function (app) {
     var layerController = app.getLayerController();
     var viewController =
-      layerController.getActiveImageLayer().getViewController();
+      layerController.getActiveViewLayer().getViewController();
     var drawLayer = layerController.getActiveDrawLayer();
     // return a JSON string
     return JSON.stringify({
@@ -83,7 +83,7 @@ dwv.State = function () {
   this.apply = function (app, data) {
     var layerController = app.getLayerController();
     var viewController =
-      layerController.getActiveImageLayer().getViewController();
+      layerController.getActiveViewLayer().getViewController();
     // display
     viewController.setWindowLevel(
       data['window-center'], data['window-width']);

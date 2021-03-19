@@ -320,14 +320,14 @@ dwv.tool.Livewire = function (app) {
     // start scissors if displayed
     if (bool) {
       var layerController = app.getLayerController();
-      var imageLayer = layerController.getActiveImageLayer();
+      var viewLayer = layerController.getActiveViewLayer();
 
       //scissors = new dwv.math.Scissors();
       var size = app.getImage().getGeometry().getSize();
       scissors.setDimensions(
         size.getNumberOfColumns(),
         size.getNumberOfRows());
-      scissors.setData(imageLayer.getImageData().data);
+      scissors.setData(viewLayer.getImageData().data);
 
       // init with the app window scale
       this.style.setScale(app.getWindowScale());

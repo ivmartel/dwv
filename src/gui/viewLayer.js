@@ -3,14 +3,14 @@ var dwv = dwv || {};
 dwv.html = dwv.html || {};
 
 /**
- * Image layer.
+ * View layer.
  *
  * @param {object} containerDiv The layer div.
  * @class
  */
-dwv.html.ImageLayer = function (containerDiv) {
+dwv.html.ViewLayer = function (containerDiv) {
 
-  containerDiv.className += ' imageLayer';
+  containerDiv.className += ' viewLayer';
 
   // closure to self
   var self = this;
@@ -528,7 +528,7 @@ dwv.html.ImageLayer = function (containerDiv) {
   /**
    * Merge two layers.
    *
-   * @param {dwv.html.ImageLayer} layerToMerge The layer to merge.
+   * @param {dwv.html.ViewLayer} layerToMerge The layer to merge.
    *   It will also be emptied.
    */
   this.merge = function (layerToMerge) {
@@ -566,14 +566,14 @@ dwv.html.ImageLayer = function (containerDiv) {
   /**
    * Align on another layer.
    *
-   * @param {dwv.html.ImageLayer} rhs The layer to align on.
+   * @param {dwv.html.ViewLayer} rhs The layer to align on.
    */
   this.align = function (rhs) {
     canvas.style.top = rhs.getCanvas().offsetTop;
     canvas.style.left = rhs.getCanvas().offsetLeft;
   };
 
-}; // ImageLayer class
+}; // ViewLayer class
 
 /**
  * Get the positions (without the parent offset) of a list of touch events.

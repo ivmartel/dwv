@@ -102,7 +102,7 @@ dwv.html.DrawLayer = function (containerDiv) {
    * @param {object} center The scale center pointas {x,y}.
    */
   this.setZoom = function (scale, center) {
-    // TODO different from the imageLayer offset?
+    // TODO different from the viewLayer offset?
     var oldScale = konvaStage.scale();
     var oldOffset = konvaStage.offset();
     var newOffsetX = (center.x / oldScale.x) +
