@@ -72,8 +72,6 @@ dwv.html.DrawLayer = function (containerDiv) {
     return drawController;
   };
 
-  // common layer methods [start] ---------------
-
   /**
    * Get the initial stage size.
    *
@@ -86,6 +84,17 @@ dwv.html.DrawLayer = function (containerDiv) {
     };
   };
 
+  // common layer methods [start] ---------------
+
+  /**
+   * Get the layer opacity.
+   *
+   * @returns {number} The opacity ([0:1] range).
+   */
+  this.getOpacity = function () {
+    return konvaStage.opacity();
+  };
+
   /**
    * Set the layer opacity.
    *
@@ -96,68 +105,39 @@ dwv.html.DrawLayer = function (containerDiv) {
   };
 
   /**
-   * Add scale to the layer.
+   * Set the layer scale.
    *
    * @param {object} newScale The scale as {x,y}.
-   * @param {object} center The scale center point as {x,y}.
    */
-  this.addScale = function (newScale, center) {
-    var scale = konvaStage.scale();
-    var offset = konvaStage.offset();
-    konvaStage.offset({
-      x: (center.x / scale.x) + offset.x - (center.x / newScale.x),
-      y: (center.y / scale.y) + offset.y - (center.y / newScale.y)
-    });
+  this.setScale = function (newScale) {
     konvaStage.scale(newScale);
     // update labels
     updateLabelScale(newScale);
   };
 
   /**
-   * Add translation to the layer.
+   * Set the layer offset.
    *
-   * @param {object} translation The translation as {x,y}.
+   * @param {object} newOffset The offset as {x,y}.
    */
-  this.addTranslation = function (translation) {
-    var scale = konvaStage.scale();
-    var offset = konvaStage.offset();
-    konvaStage.offset({
-      x: offset.x - translation.x / scale.x,
-      y: offset.y - translation.y / scale.y
-    });
+  this.setOffset = function (newOffset) {
+    konvaStage.offset(newOffset);
   };
 
   /**
    * Resize the layer.
    *
-   * @param {number} width The layer width.
-   * @param {number} height The layer height.
-   * @param {number} zoom The layer zoom.
+   * @param {object} size The layer size as {x,y}.
+   * @param {object} newScale The layer scale as {x,y}.
    */
-  this.resize = function (width, height, zoom) {
-    var newScale = {x: zoom, y: zoom};
+  this.resize = function (size, newScale) {
     // resize div
     containerDiv.setAttribute('style',
-      'width:' + width + 'px;height:' + height + 'px');
+      'width:' + size.x + 'px;height:' + size.y + 'px');
     // resize stage
-    konvaStage.setWidth(width);
-    konvaStage.setHeight(height);
-    konvaStage.scale(newScale);
-    // update labels
-    updateLabelScale(newScale);
-  };
-
-  /**
-   * Reset the layer.
-   *
-   * @param {number} windowScale The window scale.
-   */
-  this.reset = function (windowScale) {
-    var scale = {x: windowScale, y: windowScale};
-    konvaStage.offset({x: 0, y: 0});
-    konvaStage.scale(scale);
-    // update labels
-    updateLabelScale(scale);
+    konvaStage.setWidth(size.x);
+    konvaStage.setHeight(size.y);
+    this.setScale(newScale);
   };
 
   /**

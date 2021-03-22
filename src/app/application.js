@@ -1326,7 +1326,7 @@ dwv.App = function () {
 
     // initialise the toolbox
     if (toolboxController) {
-      toolboxController.init(viewLayer);
+      toolboxController.init(layerController.displayToIndex);
     }
   }
 

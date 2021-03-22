@@ -26,14 +26,14 @@ dwv.ToolboxController = function (toolList) {
   /**
    * Initialise.
    *
-   * @param {object} layer The associated layer.
+   * @param {Function} converter The display to index converter.
    */
-  this.init = function (layer) {
+  this.init = function (converter) {
     for (var key in toolList) {
       toolList[key].init();
     }
     // TODO Would prefer to have this done in the addLayerListeners
-    displayToIndexConverter = layer.displayToIndex;
+    displayToIndexConverter = converter;
     // keydown listener
     window.addEventListener('keydown', onMouch, true);
   };

@@ -147,24 +147,6 @@ dwv.html.ViewLayer = function (containerDiv) {
   };
 
   /**
-   * Get the layer scale.
-   *
-   * @returns {object} The scale as {x,y}.
-   */
-  this.getScale = function () {
-    return scale;
-  };
-
-  /**
-   * Get the layer offset.
-   *
-   * @returns {object} The offset as {x,y}.
-   */
-  this.getOffset = function () {
-    return offset;
-  };
-
-  /**
    * Set the layer opacity.
    *
    * @param {number} alpha The opacity ([0:1] range).
@@ -174,56 +156,33 @@ dwv.html.ViewLayer = function (containerDiv) {
   };
 
   /**
-   * Add scale to the layer.
+   * Set the layer scale.
    *
    * @param {object} newScale The scale as {x,y}.
-   * @param {object} center The scale center point as {x,y}.
    */
-  this.addScale = function (newScale, center) {
-    // center should stay the same:
-    // newOffset + center / newScale = oldOffset + center / oldScale
-    offset = {
-      x: (center.x / scale.x) + offset.x - (center.x / newScale.x),
-      y: (center.y / scale.y) + offset.y - (center.y / newScale.y)
-    };
+  this.setScale = function (newScale) {
     scale = newScale;
   };
 
   /**
-   * Add translation to the layer.
+   * Set the layer offset.
    *
-   * @param {object} translation The translation as {x,y}.
+   * @param {object} newOffset The offset as {x,y}.
    */
-  this.addTranslation = function (translation) {
-    offset = {
-      x: offset.x - translation.x / scale.x,
-      y: offset.y - translation.y / scale.y
-    };
+  this.setOffset = function (newOffset) {
+    offset = newOffset;
   };
 
   /**
    * Resize the layer.
    *
-   * @param {number} width The layer width.
-   * @param {number} height The layer height.
-   * @param {number} zoom The layer zoom.
+   * @param {object} size The layer size as {x,y}.
+   * @param {object} newScale The layer scale as {x,y}.
    */
-  this.resize = function (width, height, zoom) {
-    canvas.width = width;
-    canvas.height = height;
-    var scale2d = {x: zoom, y: zoom};
-    var center = {x: 0, y: 0};
-    this.addScale(scale2d, center);
-  };
-
-  /**
-   * Reset the layer.
-   *
-   * @param {number} windowScale The window scale.
-   */
-  this.reset = function (windowScale) {
-    scale = {x: windowScale, y: windowScale};
-    offset = {x: 0, y: 0};
+  this.resize = function (size, newScale) {
+    canvas.width = size.x;
+    canvas.height = size.y;
+    scale = newScale;
   };
 
   /**
@@ -442,19 +401,6 @@ dwv.html.ViewLayer = function (containerDiv) {
   };
 
   /**
-   * Transform a display position to an index.
-   *
-   * @param {dwv.Math.Point2D} point2D The point to convert.
-   * @returns {object} The equivalent index.
-   */
-  this.displayToIndex = function (point2D) {
-    return {
-      x: point2D.x / scale.x + offset.x,
-      y: point2D.y / scale.y + offset.y
-    };
-  };
-
-  /**
    * Handle window/level change.
    *
    * @param {object} event The event fired when changing the window/level.
@@ -522,64 +468,3 @@ dwv.html.ViewLayer = function (containerDiv) {
   };
 
 }; // ViewLayer class
-
-/**
- * Get the positions (without the parent offset) of a list of touch events.
- *
- * @param {Array} touches The list of touch events.
- * @returns {Array} The list of positions of the touch events.
- */
-dwv.html.getTouchesPositions = function (touches) {
-  // get the touch offset from all its parents
-  var offsetLeft = 0;
-  var offsetTop = 0;
-  if (touches.length !== 0 &&
-    typeof touches[0].target !== 'undefined') {
-    var offsetParent = touches[0].target.offsetParent;
-    while (offsetParent) {
-      if (!isNaN(offsetParent.offsetLeft)) {
-        offsetLeft += offsetParent.offsetLeft;
-      }
-      if (!isNaN(offsetParent.offsetTop)) {
-        offsetTop += offsetParent.offsetTop;
-      }
-      offsetParent = offsetParent.offsetParent;
-    }
-  } else {
-    dwv.logger.debug('No touch target offset parent.');
-  }
-  // set its position
-  var positions = [];
-  for (var i = 0; i < touches.length; ++i) {
-    positions.push({
-      x: touches[i].pageX - offsetLeft,
-      y: touches[i].pageY - offsetTop
-    });
-  }
-  return positions;
-};
-
-/**
- * Get the offset of an input event.
- *
- * @param {object} event The event to get the offset from.
- * @returns {Array} The array of offsets.
- */
-dwv.html.getEventOffset = function (event) {
-  var positions = [];
-  if (typeof event.targetTouches !== 'undefined' &&
-    event.targetTouches.length !== 0) {
-    // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/targetTouches
-    positions = dwv.html.getTouchesPositions(event.targetTouches);
-  } else if (typeof event.changedTouches !== 'undefined' &&
-      event.changedTouches.length !== 0) {
-    // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/changedTouches
-    positions = dwv.html.getTouchesPositions(event.changedTouches);
-  } else {
-    // layerX is used by Firefox
-    var ex = event.offsetX === undefined ? event.layerX : event.offsetX;
-    var ey = event.offsetY === undefined ? event.layerY : event.offsetY;
-    positions.push({x: ex, y: ey});
-  }
-  return positions;
-};
