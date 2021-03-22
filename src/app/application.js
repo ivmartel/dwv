@@ -505,12 +505,7 @@ dwv.App = function () {
   this.initWLDisplay = function () {
     var viewLayer = layerController.getActiveViewLayer();
     var controller = viewLayer.getViewController();
-    // set window/level to first preset
-    controller.setWindowLevelPresetById(0);
-    // default position
-    controller.setCurrentPosition2D(0, 0);
-    // default frame
-    controller.setCurrentFrame(0);
+    controller.initialise();
   };
 
   /**

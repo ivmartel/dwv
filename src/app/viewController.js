@@ -14,6 +14,18 @@ dwv.ViewController = function (view) {
   var playerID = null;
 
   /**
+   * Initialise the controller.
+   */
+  this.initialise = function () {
+    // set window/level to first preset
+    this.setWindowLevelPresetById(0);
+    // default position
+    this.setCurrentPosition2D(0, 0);
+    // default frame
+    this.setCurrentFrame(0);
+  };
+
+  /**
    * Get the window/level presets names.
    *
    * @returns {Array} The presets names.
