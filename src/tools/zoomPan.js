@@ -65,8 +65,7 @@ dwv.tool.ZoomAndPan = function (app) {
     var tx = event._xs - self.x0;
     var ty = event._ys - self.y0;
     // apply translation
-    //app.translate(tx, ty);
-    app.stepTranslate(tx, ty);
+    app.translate(tx, ty);
     // reset origin point
     self.x0 = event._xs;
     self.y0 = event._ys;

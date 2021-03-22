@@ -69,28 +69,20 @@ dwv.html.ViewLayer = function (containerDiv) {
   var opacity = 1;
 
   /**
-   * The layer origin.
+   * The layer scale.
    *
    * @private
    * @type {object}
    */
-  var origin = {x: 0, y: 0};
+  var scale = {x: 1, y: 1};
 
   /**
-   * The layer zoom.
+   * The layer offset.
    *
    * @private
    * @type {object}
    */
-  var zoom = {x: 1, y: 1};
-
-  /**
-   * The layer translation.
-   *
-   * @private
-   * @type {object}
-   */
-  var trans = {x: 0, y: 0};
+  var offset = {x: 0, y: 0};
 
   /**
    * Listener handler.
@@ -100,6 +92,12 @@ dwv.html.ViewLayer = function (containerDiv) {
    */
   var listenerHandler = new dwv.utils.ListenerHandler();
 
+  /**
+   * List of view event names.
+   *
+   * @type {Array}
+   * @private
+   */
   var viewEventNames = [
     'slicechange',
     'framechange',
@@ -149,30 +147,21 @@ dwv.html.ViewLayer = function (containerDiv) {
   };
 
   /**
-   * Get the layer origin.
+   * Get the layer scale.
    *
-   * @returns {object} The layer origin as {'x','y'}.
+   * @returns {object} The scale as {x,y}.
    */
-  this.getOrigin = function () {
-    return origin;
+  this.getScale = function () {
+    return scale;
   };
 
   /**
-   * Get the layer zoom.
+   * Get the layer offset.
    *
-   * @returns {object} The layer zoom as {'x','y'}.
+   * @returns {object} The offset as {x,y}.
    */
-  this.getZoom = function () {
-    return zoom;
-  };
-
-  /**
-   * Get the layer translation.
-   *
-   * @returns {object} The layer translation as {'x','y'}.
-   */
-  this.getTrans = function () {
-    return trans;
+  this.getOffset = function () {
+    return offset;
   };
 
   /**
@@ -185,34 +174,31 @@ dwv.html.ViewLayer = function (containerDiv) {
   };
 
   /**
-   * Set the layer zoom.
+   * Add scale to the layer.
    *
-   * @param {object} scale The scale factor as {x,y}.
-   * @param {object} center The scale center pointas {x,y}.
+   * @param {object} newScale The scale as {x,y}.
+   * @param {object} center The scale center point as {x,y}.
    */
-  this.setZoom = function (scale, center) {
-    // The zoom is the ratio between the differences from the center
-    // to the origins:
-    // centerX - originX = ( centerX - originX0 ) * zoomX
-    // (center in ~world coordinate system)
-    //originX = (centerX / zoomX) + originX - (centerX / newZoomX);
-    //originY = (centerY / zoomY) + originY - (centerY / newZoomY);
-
-    // center in image coordinate system
-    origin.x = center.x - (center.x - origin.x) * (scale.x / zoom.x);
-    origin.y = center.y - (center.y - origin.y) * (scale.y / zoom.y);
-
-    // save zoom
-    zoom = scale;
+  this.addScale = function (newScale, center) {
+    // center should stay the same:
+    // newOffset + center / newScale = oldOffset + center / oldScale
+    offset = {
+      x: (center.x / scale.x) + offset.x - (center.x / newScale.x),
+      y: (center.y / scale.y) + offset.y - (center.y / newScale.y)
+    };
+    scale = newScale;
   };
 
   /**
-   * Set the layer translation.
+   * Add translation to the layer.
    *
    * @param {object} translation The translation as {x,y}.
    */
-  this.setTranslate = function (translation) {
-    trans = translation;
+  this.addTranslation = function (translation) {
+    offset = {
+      x: offset.x - translation.x / scale.x,
+      y: offset.y - translation.y / scale.y
+    };
   };
 
   /**
@@ -220,28 +206,24 @@ dwv.html.ViewLayer = function (containerDiv) {
    *
    * @param {number} width The layer width.
    * @param {number} height The layer height.
-   * @param {number} scale The layer scale.
+   * @param {number} zoom The layer zoom.
    */
-  this.resize = function (width, height, scale) {
+  this.resize = function (width, height, zoom) {
     canvas.width = width;
     canvas.height = height;
-    var scale2d = {x: scale, y: scale};
+    var scale2d = {x: zoom, y: zoom};
     var center = {x: 0, y: 0};
-    this.setZoom(scale2d, center);
+    this.addScale(scale2d, center);
   };
 
   /**
-   * Reset the layout.
+   * Reset the layer.
    *
-   * @param {number} izoom The input zoom.
+   * @param {number} windowScale The window scale.
    */
-  this.reset = function (izoom) {
-    origin.x = 0;
-    origin.y = 0;
-    zoom.x = izoom;
-    zoom.y = izoom;
-    trans.x = 0;
-    trans.y = 0;
+  this.reset = function (windowScale) {
+    scale = {x: windowScale, y: windowScale};
+    offset = {x: 0, y: 0};
   };
 
   /**
@@ -303,9 +285,14 @@ dwv.html.ViewLayer = function (containerDiv) {
     // [ a c e ]
     // [ b d f ]
     // [ 0 0 1 ]
-    context.setTransform(zoom.x, 0, 0, zoom.y,
-      origin.x + (trans.x * zoom.x),
-      origin.y + (trans.y * zoom.y));
+    context.setTransform(
+      scale.x,
+      0,
+      0,
+      scale.y,
+      -1 * offset.x * scale.x,
+      -1 * offset.y * scale.y
+    );
 
     // disable smoothing (set just before draw, could be reset by resize)
     context.imageSmoothingEnabled = false;
@@ -330,7 +317,6 @@ dwv.html.ViewLayer = function (containerDiv) {
    * @param {object} metaData The image meta data.
    */
   this.initialise = function (image, metaData) {
-
     // create view
     var viewFactory = new dwv.image.ViewFactory();
     view = viewFactory.create(
@@ -380,7 +366,7 @@ dwv.html.ViewLayer = function (containerDiv) {
   };
 
   /**
-   * Activate the layer: propagate interaction and view events.
+   * Activate the layer: propagate events.
    */
   this.activate = function () {
     // allow pointer events
@@ -393,7 +379,7 @@ dwv.html.ViewLayer = function (containerDiv) {
   };
 
   /**
-   * Deactivate the layer: stop propagating interaction and view events.
+   * Deactivate the layer: stop propagating events.
    */
   this.deactivate = function () {
     // disable pointer events
@@ -463,8 +449,8 @@ dwv.html.ViewLayer = function (containerDiv) {
    */
   this.displayToIndex = function (point2D) {
     return {
-      x: ((point2D.x - origin.x) / zoom.x) - trans.x,
-      y: ((point2D.y - origin.y) / zoom.y) - trans.y
+      x: point2D.x / scale.x + offset.x,
+      y: point2D.y / scale.y + offset.y
     };
   };
 
@@ -523,44 +509,6 @@ dwv.html.ViewLayer = function (containerDiv) {
     context.clearRect(0, 0, canvas.width, canvas.height);
     imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     this.resetLayout();
-  };
-
-  /**
-   * Merge two layers.
-   *
-   * @param {dwv.html.ViewLayer} layerToMerge The layer to merge.
-   *   It will also be emptied.
-   */
-  this.merge = function (layerToMerge) {
-    // basic resampling of the merge data to put it at zoom 1:1
-    var mergeImageData = layerToMerge.getContext().getImageData(
-      0, 0, canvas.width, canvas.height);
-    var offMerge = 0;
-    var offMergeJ = 0;
-    var offThis = 0;
-    var offThisJ = 0;
-    var alpha = 0;
-    for (var j = 0; j < canvas.height; ++j) {
-      offMergeJ = parseInt((origin.y + j * zoom.y), 10) * canvas.width;
-      offThisJ = j * canvas.width;
-      for (var i = 0; i < canvas.width; ++i) {
-        // 4 component data: RGB + alpha
-        offMerge = 4 * (parseInt((origin.x + i * zoom.x), 10) + offMergeJ);
-        offThis = 4 * (i + offThisJ);
-        // merge non transparent
-        alpha = mergeImageData.data[offMerge + 3];
-        if (alpha !== 0) {
-          imageData.data[offThis] = mergeImageData.data[offMerge];
-          imageData.data[offThis + 1] = mergeImageData.data[offMerge + 1];
-          imageData.data[offThis + 2] = mergeImageData.data[offMerge + 2];
-          imageData.data[offThis + 3] = alpha;
-        }
-      }
-    }
-    // empty and reset merged layer
-    layerToMerge.clear();
-    // draw the layer
-    this.draw();
   };
 
   /**

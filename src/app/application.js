@@ -571,19 +571,6 @@ dwv.App = function () {
   };
 
   /**
-   * Add a translation to the layers.
-   *
-   * @param {number} tx The step translation along X.
-   * @param {number} ty The step translation along Y.
-   */
-  this.stepTranslate = function (tx, ty) {
-    var txx = translation.x + tx / scale;
-    var tyy = translation.y + ty / scale;
-    translation = {x: txx, y: tyy};
-    translateLayers();
-  };
-
-  /**
    * Set the image layer opacity.
    *
    * @param {number} alpha The opacity ([0:1] range).
@@ -949,7 +936,7 @@ dwv.App = function () {
    */
   function zoomLayers() {
     var newScale = {x: scale, y: scale};
-    layerController.setZoom(newScale, scaleCenter);
+    layerController.addScale(newScale, scaleCenter);
     layerController.draw();
 
     // fire event
@@ -990,43 +977,27 @@ dwv.App = function () {
    * @fires dwv.App#offsetchange
    */
   function translateLayers() {
-    //layerController.setTranslate(translation);
-    //layerController.draw();
+    layerController.addTranslation(translation);
+    layerController.draw();
 
-    // view layer
-    var viewLayer = layerController.getActiveViewLayer();
-    if (viewLayer) {
-      viewLayer.setTranslate(translation);
-      viewLayer.draw();
-      // draw layer
-      var drawLayer = layerController.getActiveDrawLayer();
-      if (drawLayer) {
-        var t = {
-          x: -viewLayer.getOrigin().x / scale - translation.x,
-          y: -viewLayer.getOrigin().y / scale - translation.y
-        };
-        drawLayer.setTranslate(t);
-        drawLayer.draw();
-      }
-      // fire event
-      /**
-       * Offset change event.
-       *
-       * @event dwv.App#translatechange
-       * @type {object}
-       * @property {Array} value The changed value.
-       * @property {number} scale The new scale value.
-       * @property {number} cx The new rotaion center X position.
-       * @property {number} cy The new rotaion center Y position.
-       */
-      fireEvent({
-        type: 'translatechange',
-        value: [translation.x, translation.y],
-        scale: scale,
-        cx: translation.x,
-        cy: translation.y
-      });
-    }
+    // fire event
+    /**
+     * Offset change event.
+     *
+     * @event dwv.App#translatechange
+     * @type {object}
+     * @property {Array} value The changed value.
+     * @property {number} scale The new scale value.
+     * @property {number} cx The new rotaion center X position.
+     * @property {number} cy The new rotaion center Y position.
+     */
+    fireEvent({
+      type: 'translatechange',
+      value: [translation.x, translation.y],
+      scale: scale,
+      cx: translation.x,
+      cy: translation.y
+    });
   }
 
   /**

@@ -43,26 +43,25 @@ dwv.LayerController = function () {
   };
 
   /**
-   * Set the layers' zoom.
+   * Add scale to the layers.
    *
-   * @param {object} scale The scale factor as {x,y}.
-   * @param {object} center The scale center pointas {x,y}.
+   * @param {object} scale The scale as {x,y}.
+   * @param {object} center The scale center point as {x,y}.
    */
-  this.setZoom = function (scale, center) {
+  this.addScale = function (scale, center) {
     for (var i = 0; i < layers.length; ++i) {
-      layers[i].setZoom(scale, center);
+      layers[i].addScale(scale, center);
     }
   };
 
   /**
-   * Set the layer translation.
-   * Translation is according to the last one.
+   * Add translation to the layers.
    *
    * @param {object} translation The translation as {x,y}.
    */
-  this.setTranslate = function (translation) {
+  this.addTranslation = function (translation) {
     for (var i = 0; i < layers.length; ++i) {
-      layers[i].setTranslate(translation);
+      layers[i].addTranslation(translation);
     }
   };
 

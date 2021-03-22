@@ -96,44 +96,46 @@ dwv.html.DrawLayer = function (containerDiv) {
   };
 
   /**
-   * Zoom the layer.
+   * Add scale to the layer.
    *
-   * @param {object} scale The scale factor as {x,y}.
-   * @param {object} center The scale center pointas {x,y}.
+   * @param {object} newScale The scale as {x,y}.
+   * @param {object} center The scale center point as {x,y}.
    */
-  this.setZoom = function (scale, center) {
-    // TODO different from the viewLayer offset?
-    var oldScale = konvaStage.scale();
-    var oldOffset = konvaStage.offset();
-    var newOffsetX = (center.x / oldScale.x) +
-      oldOffset.x - (center.x / scale.x);
-    var newOffsetY = (center.y / oldScale.y) +
-      oldOffset.y - (center.y / scale.y);
-    var newOffset = {x: newOffsetX, y: newOffsetY};
-    // store
-    konvaStage.offset(newOffset);
-    konvaStage.scale(scale);
-    updateLabelScale(scale);
+  this.addScale = function (newScale, center) {
+    var scale = konvaStage.scale();
+    var offset = konvaStage.offset();
+    konvaStage.offset({
+      x: (center.x / scale.x) + offset.x - (center.x / newScale.x),
+      y: (center.y / scale.y) + offset.y - (center.y / newScale.y)
+    });
+    konvaStage.scale(newScale);
+    // update labels
+    updateLabelScale(newScale);
   };
 
   /**
-   * Set the layer translation.
+   * Add translation to the layer.
    *
    * @param {object} translation The translation as {x,y}.
    */
-  this.setTranslate = function (translation) {
-    konvaStage.offset(translation);
+  this.addTranslation = function (translation) {
+    var scale = konvaStage.scale();
+    var offset = konvaStage.offset();
+    konvaStage.offset({
+      x: offset.x - translation.x / scale.x,
+      y: offset.y - translation.y / scale.y
+    });
   };
 
   /**
    * Resize the layer.
    *
-   * @param {number} width the layer width.
-   * @param {number} height the layer height.
-   * @param {number} scale the layer scale.
+   * @param {number} width The layer width.
+   * @param {number} height The layer height.
+   * @param {number} zoom The layer zoom.
    */
-  this.resize = function (width, height, scale) {
-    var newScale = {x: scale, y: scale};
+  this.resize = function (width, height, zoom) {
+    var newScale = {x: zoom, y: zoom};
     // resize div
     containerDiv.setAttribute('style',
       'width:' + width + 'px;height:' + height + 'px');
@@ -141,11 +143,12 @@ dwv.html.DrawLayer = function (containerDiv) {
     konvaStage.setWidth(width);
     konvaStage.setHeight(height);
     konvaStage.scale(newScale);
+    // update labels
     updateLabelScale(newScale);
   };
 
   /**
-   * Reset the stage with a new window scale.
+   * Reset the layer.
    *
    * @param {number} windowScale The window scale.
    */
@@ -153,6 +156,7 @@ dwv.html.DrawLayer = function (containerDiv) {
     var scale = {x: windowScale, y: windowScale};
     konvaStage.offset({x: 0, y: 0});
     konvaStage.scale(scale);
+    // update labels
     updateLabelScale(scale);
   };
 
@@ -217,7 +221,7 @@ dwv.html.DrawLayer = function (containerDiv) {
   };
 
   /**
-   * Activate the layer: propagate interaction events.
+   * Activate the layer: propagate events.
    */
   this.activate = function () {
     konvaStage.listening(true);
@@ -225,14 +229,13 @@ dwv.html.DrawLayer = function (containerDiv) {
     containerDiv.setAttribute('style', 'pointer-events: auto;');
     // interaction events
     var names = dwv.gui.interactionEventNames;
-    //var canvas = konvaStage.getContent();
     for (var i = 0; i < names.length; ++i) {
       containerDiv.addEventListener(names[i], fireEvent);
     }
   };
 
   /**
-   * Deactivate the layer: stop propagating interaction events.
+   * Deactivate the layer: stop propagating events.
    */
   this.deactivate = function () {
     konvaStage.listening(false);
