@@ -131,9 +131,6 @@ dwv.html.DrawLayer = function (containerDiv) {
    * @param {object} newScale The layer scale as {x,y}.
    */
   this.resize = function (size, newScale) {
-    // resize div
-    containerDiv.setAttribute('style',
-      'width:' + size.x + 'px;height:' + size.y + 'px');
     // resize stage
     konvaStage.setWidth(size.x);
     konvaStage.setHeight(size.y);
