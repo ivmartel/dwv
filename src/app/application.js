@@ -426,8 +426,6 @@ dwv.App = function () {
     if (!viewLayer) {
       initialiseLayers();
       viewLayer = layerController.getActiveViewLayer();
-    } else {
-      layerController.initialise(image, metaData);
     }
     // draw the image
     viewLayer.draw();
