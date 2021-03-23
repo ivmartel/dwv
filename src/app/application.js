@@ -45,8 +45,13 @@ dwv.App = function () {
   // UndoStack
   var undoStack = null;
 
-  // listeners
-  var listeners = {};
+  /**
+   * Listener handler.
+   *
+   * @type {object}
+   * @private
+   */
+  var listenerHandler = new dwv.utils.ListenerHandler();
 
   /**
    * Get the image.
@@ -307,35 +312,25 @@ dwv.App = function () {
 
 
   /**
-   * Add an event listener on the app.
+   * Add an event listener to this class.
    *
    * @param {string} type The event type.
-   * @param {object} listener The method associated with the provided
-   *   event type.
+   * @param {object} callback The method associated with the provided
+   *   event type, will be called with the fired event.
    */
-  this.addEventListener = function (type, listener) {
-    if (typeof listeners[type] === 'undefined') {
-      listeners[type] = [];
-    }
-    listeners[type].push(listener);
+  this.addEventListener = function (type, callback) {
+    listenerHandler.add(type, callback);
   };
 
   /**
-   * Remove an event listener from the app.
+   * Remove an event listener from this class.
    *
    * @param {string} type The event type.
-   * @param {object} listener The method associated with the provided
+   * @param {object} callback The method associated with the provided
    *   event type.
    */
-  this.removeEventListener = function (type, listener) {
-    if (typeof listeners[type] === 'undefined') {
-      return;
-    }
-    for (var i = 0; i < listeners[type].length; ++i) {
-      if (listeners[type][i] === listener) {
-        listeners[type].splice(i, 1);
-      }
-    }
+  this.removeEventListener = function (type, callback) {
+    listenerHandler.remove(type, callback);
   };
 
   // load API [begin] -------------------------------------------------------
@@ -799,18 +794,13 @@ dwv.App = function () {
   // Private Methods -----------------------------------------------------------
 
   /**
-   * Fire an event: call all associated listeners.
+   * Fire an event: call all associated listeners with the input event object.
    *
    * @param {object} event The event to fire.
    * @private
    */
   function fireEvent(event) {
-    if (typeof listeners[event.type] === 'undefined') {
-      return;
-    }
-    for (var i = 0; i < listeners[event.type].length; ++i) {
-      listeners[event.type][i](event);
-    }
+    listenerHandler.fireEvent(event);
   }
 
   /**
