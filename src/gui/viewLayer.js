@@ -93,22 +93,6 @@ dwv.html.ViewLayer = function (containerDiv) {
   var listenerHandler = new dwv.utils.ListenerHandler();
 
   /**
-   * List of view event names.
-   *
-   * @type {Array}
-   * @private
-   */
-  var viewEventNames = [
-    'slicechange',
-    'framechange',
-    'wlwidthchange',
-    'wlcenterchange',
-    'wlpresetadd',
-    'colourchange',
-    'positionchange'
-  ];
-
-  /**
    * Get the view controller.
    *
    * @returns {object} The controller.
@@ -391,11 +375,11 @@ dwv.html.ViewLayer = function (containerDiv) {
    */
   this.propagateViewEvents = function (flag) {
     // view events
-    for (var j = 0; j < viewEventNames.length; ++j) {
+    for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
       if (flag) {
-        view.addEventListener(viewEventNames[j], fireEvent);
+        view.addEventListener(dwv.image.viewEventNames[j], fireEvent);
       } else {
-        view.removeEventListener(viewEventNames[j], fireEvent);
+        view.removeEventListener(dwv.image.viewEventNames[j], fireEvent);
       }
     }
   };
