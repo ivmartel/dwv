@@ -50,10 +50,37 @@ dwv.LayerController = function (containerDiv) {
    */
   var offset = {x: 0, y: 0};
 
-  // Image data width
+  /**
+   * The image data width.
+   *
+   * @private
+   * @type {number}
+   */
   var dataWidth = 0;
-  // Image data height
+
+  /**
+   * The image data height.
+   *
+   * @private
+   * @type {number}
+   */
   var dataHeight = 0;
+
+  /**
+   * Active view layer index.
+   *
+   * @private
+   * @type {number}
+   */
+  var activeViewLayerIndex = null;
+
+  /**
+   * Active draw layer index.
+   *
+   * @private
+   * @type {number}
+   */
+  var activeDrawLayerIndex = null;
 
   /**
    * Listener handler.
@@ -109,7 +136,14 @@ dwv.LayerController = function (containerDiv) {
    * @param {object} layer The layer to add.
    */
   this.addLayer = function (layer) {
-    layers.push(layer);
+    var length = layers.push(layer);
+    // update active indices
+    var lastIndex = length - 1;
+    if (layer instanceof dwv.html.ViewLayer) {
+      activeViewLayerIndex = lastIndex;
+    } else if (layer instanceof dwv.html.DrawLayer) {
+      activeDrawLayerIndex = lastIndex;
+    }
   };
 
   /**
@@ -117,6 +151,8 @@ dwv.LayerController = function (containerDiv) {
    */
   this.empty = function () {
     layers = [];
+    activeViewLayerIndex = null;
+    activeDrawLayerIndex = null;
   };
 
   /**
@@ -125,10 +161,7 @@ dwv.LayerController = function (containerDiv) {
    * @returns {object} The layer.
    */
   this.getActiveViewLayer = function () {
-    if (layers.length !== 0) {
-      return layers[0];
-    }
-    return null;
+    return layers[activeViewLayerIndex];
   };
 
   /**
@@ -137,7 +170,7 @@ dwv.LayerController = function (containerDiv) {
    * @returns {object} The layer.
    */
   this.getActiveDrawLayer = function () {
-    return layers[1];
+    return layers[activeDrawLayerIndex];
   };
 
   /**
