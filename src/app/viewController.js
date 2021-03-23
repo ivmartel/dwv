@@ -139,6 +139,25 @@ dwv.ViewController = function (view) {
   };
 
   /**
+   * Can window and level be applied to the data?
+   *
+   * @returns {boolean} True if the data is monochrome.
+   */
+  this.canWindowLevel = function () {
+    return view.getImage().getPhotometricInterpretation()
+      .match(/MONOCHROME/) !== null;
+  };
+
+  /**
+   * Is the data mono-frame?
+   *
+   * @returns {boolean} True if the data only contains one frame.
+   */
+  this.isMonoFrameData = function () {
+    return view.getImage().getNumberOfFrames() === 1;
+  };
+
+  /**
    * Set the current position.
    *
    * @param {object} pos The position.

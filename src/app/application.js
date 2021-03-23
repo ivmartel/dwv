@@ -88,8 +88,9 @@ dwv.App = function () {
    * @returns {boolean} True if the data only contains one frame.
    */
   this.isMonoFrameData = function () {
-    return (this.getImage() && typeof this.getImage() !== 'undefined' &&
-            this.getImage().getNumberOfFrames() === 1);
+    var viewLayer = layerController.getActiveViewLayer();
+    var controller = viewLayer.getViewController();
+    return controller.isMonoFrameData();
   };
   /**
    * Can the data be scrolled?
@@ -106,7 +107,9 @@ dwv.App = function () {
    * @returns {boolean} True if the data is monochrome.
    */
   this.canWindowLevel = function () {
-    return this.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null;
+    var viewLayer = layerController.getActiveViewLayer();
+    var controller = viewLayer.getViewController();
+    return controller.canWindowLevel();
   };
 
   /**
@@ -262,6 +265,7 @@ dwv.App = function () {
     }
 
     // create layer container
+    // warn: needs the DOM to be loaded...
     layerController =
       new dwv.LayerController(self.getElement('layerContainer'));
   };
@@ -653,7 +657,7 @@ dwv.App = function () {
     }
   };
 
-  // Internal mebers shortcuts-----------------------------------------------
+  // Internal members shortcuts-----------------------------------------------
 
   /**
    * Reset the display
