@@ -725,6 +725,9 @@ dwv.App = function () {
     if (previousLayer) {
       toolboxController.detachLayer(previousLayer);
     }
+    // detach to avoid possible double attach
+    toolboxController.detachLayer(layer);
+
     toolboxController.attachLayer(layer);
     toolboxController.setSelectedTool(tool);
   };
