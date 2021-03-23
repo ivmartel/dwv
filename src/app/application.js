@@ -505,6 +505,7 @@ dwv.App = function () {
 
     drawController.setDrawings(
       drawings, drawingsDetails, fireEvent, this.addToUndoStack);
+
     drawController.activateDrawLayer(
       viewController.getCurrentPosition(),
       viewController.getCurrentFrame());
@@ -571,14 +572,7 @@ dwv.App = function () {
     // generate and draw if no skip flag
     if (typeof event.skipGenerate === 'undefined' ||
       event.skipGenerate === false) {
-      var drawLayer = layerController.getActiveDrawLayer();
-      if (drawLayer) {
-        var viewController =
-          layerController.getActiveViewLayer().getViewController();
-        drawLayer.getDrawController().activateDrawLayer(
-          viewController.getCurrentPosition(),
-          viewController.getCurrentFrame());
-      }
+      updateDrawController();
     }
   }
 
@@ -589,14 +583,7 @@ dwv.App = function () {
    * @private
    */
   function onSliceChange(_event) {
-    var drawLayer = layerController.getActiveDrawLayer();
-    if (drawLayer) {
-      var viewController =
-        layerController.getActiveViewLayer().getViewController();
-      drawLayer.getDrawController().activateDrawLayer(
-        viewController.getCurrentPosition(),
-        viewController.getCurrentFrame());
-    }
+    updateDrawController();
   }
 
   /**
@@ -978,15 +965,7 @@ dwv.App = function () {
    * @private
    */
   function onload(event) {
-    var drawlayer = layerController.getActiveDrawLayer();
-    if (drawlayer) {
-      var viewController =
-        layerController.getActiveViewLayer().getViewController();
-      drawlayer.getDrawController().activateDrawLayer(
-        viewController.getCurrentPosition(),
-        viewController.getCurrentFrame()
-      );
-    }
+    updateDrawController();
 
     /**
      * Load event: fired when a load finishes successfully.
@@ -1095,6 +1074,20 @@ dwv.App = function () {
   }
 
   /**
+   * Update draw controller on slice/frame change.
+   */
+  function updateDrawController() {
+    var drawLayer = layerController.getActiveDrawLayer();
+    if (drawLayer) {
+      var viewController =
+        layerController.getActiveViewLayer().getViewController();
+      drawLayer.getDrawController().activateDrawLayer(
+        viewController.getCurrentPosition(),
+        viewController.getCurrentFrame());
+    }
+  }
+
+  /**
    * Create the view layer.
    * To be called once the DICOM data has been loaded.
    *
@@ -1110,11 +1103,11 @@ dwv.App = function () {
 
     var viewLayer = layerController.getActiveViewLayer();
 
-    // local listeners
+    // draw controller slice/frame synch
     viewLayer.addEventListener('slicechange', onSliceChange);
     viewLayer.addEventListener('framechange', onFrameChange);
 
-    // propagate
+    // propagate view events
     viewLayer.propagateViewEvents(true);
     viewLayer.addEventListener('wlwidthchange', fireEvent);
     viewLayer.addEventListener('wlcenterchange', fireEvent);
@@ -1127,6 +1120,7 @@ dwv.App = function () {
     viewLayer.addEventListener('renderstart', fireEvent);
     viewLayer.addEventListener('renderend', fireEvent);
 
+    // propagate layer events
     layerController.addEventListener('zoomchange', fireEvent);
     layerController.addEventListener('offsetchange', fireEvent);
 
