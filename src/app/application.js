@@ -426,6 +426,8 @@ dwv.App = function () {
     if (!viewLayer) {
       initialiseLayers();
       viewLayer = layerController.getActiveViewLayer();
+    } else {
+      layerController.initialise(image, metaData);
     }
     // draw the image
     viewLayer.draw();
@@ -804,13 +806,6 @@ dwv.App = function () {
    */
   function createLayers() {
     var container = self.getElement('layerContainer');
-    // remove previous canvas
-    var previous = container.getElementsByClassName('layer');
-    if (previous) {
-      for (var i = 0; i < previous.length; ++i) {
-        previous[i].remove();
-      }
-    }
 
     // create image layer
     var div0 = document.createElement('div');
@@ -836,8 +831,8 @@ dwv.App = function () {
 
     // init layers
     layerController.initialise(image, metaData);
-    // fit
-    self.fitToContainer();
+    // update style
+    style.setScale(layerController.getWindowScale());
 
     // bind view to app
     bindViewLayer(viewLayer);

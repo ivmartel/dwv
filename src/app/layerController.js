@@ -151,8 +151,16 @@ dwv.LayerController = function (containerDiv) {
    */
   this.empty = function () {
     layers = [];
+    // reset active indices
     activeViewLayerIndex = null;
     activeDrawLayerIndex = null;
+    // clean container div
+    var previous = containerDiv.getElementsByClassName('layer');
+    if (previous) {
+      for (var i = 0; i < previous.length; ++i) {
+        previous[i].remove();
+      }
+    }
   };
 
   /**
@@ -321,14 +329,12 @@ dwv.LayerController = function (containerDiv) {
     var size = image.getGeometry().getSize();
     dataWidth = size.getNumberOfColumns();
     dataHeight = size.getNumberOfRows();
-    // set to default
-    scale = {x: 1, y: 1};
-    offset = {x: 0, y: 0};
-
     // apply to layers
     for (var i = 0; i < layers.length; ++i) {
       layers[i].initialise(image, metaData);
     }
+    // fit data
+    this.fitToContainer();
   };
 
   /**
