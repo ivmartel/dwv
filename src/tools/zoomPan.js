@@ -106,7 +106,7 @@ dwv.tool.ZoomAndPan = function (app) {
       // zoom mode
       var zoom = (lineRatio - 1) / 2;
       if (Math.abs(zoom) % 0.1 <= 0.05) {
-        app.stepZoom(zoom, event._xs, event._ys);
+        app.zoom(zoom, event._xs, event._ys);
       }
     }
   };
@@ -177,7 +177,7 @@ dwv.tool.ZoomAndPan = function (app) {
   this.DOMMouseScroll = function (event) {
     // ev.detail on firefox is 3
     var step = -event.detail / 30;
-    app.stepZoom(step, event._xs, event._ys);
+    app.zoom(step, event._xs, event._ys);
   };
 
   /**
@@ -188,7 +188,7 @@ dwv.tool.ZoomAndPan = function (app) {
   this.mousewheel = function (event) {
     // ev.wheelDelta on chrome is 120
     var step = event.wheelDelta / 1200;
-    app.stepZoom(step, event._xs, event._ys);
+    app.zoom(step, event._xs, event._ys);
   };
 
   /**

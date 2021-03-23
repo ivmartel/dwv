@@ -43,8 +43,6 @@ dwv.tool.Livewire = function (app) {
    * @type {dwv.html.Style}
    */
   this.style = new dwv.html.Style();
-  // init with the app window scale
-  this.style.setScale(app.getWindowScale());
 
   /**
    * Path storage. Paths are stored in reverse order.

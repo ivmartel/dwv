@@ -185,7 +185,6 @@ dwv.tool.Draw = function (app) {
     });
 
     // update scale
-    self.style.setScale(app.getWindowScale());
     self.style.setZoomScale(stage.scale());
 
     if (kshape) {

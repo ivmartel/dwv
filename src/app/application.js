@@ -20,22 +20,9 @@ dwv.App = function () {
   var image = null;
   // Original image
   var originalImage = null;
-  // Image data width
-  var dataWidth = 0;
-  // Image data height
-  var dataHeight = 0;
 
   // Container div id
   var containerDivId = null;
-
-  // Display window scale
-  var windowScale = 1;
-  // main scale
-  var scale = 1;
-  // zoom center
-  var scaleCenter = {x: 0, y: 0};
-  // translation
-  var translation = {x: 0, y: 0};
 
   // flag to create view on first load
   var viewOnFirstLoadItem = true;
@@ -50,7 +37,7 @@ dwv.App = function () {
   var toolboxController = null;
 
   // layer controller
-  var layerController = new dwv.LayerController();
+  var layerController = null;
 
   // load controller
   var loadController = null;
@@ -123,7 +110,7 @@ dwv.App = function () {
    * @returns {number} The main scale.
    */
   this.getScale = function () {
-    return scale / windowScale;
+    return layerController.getScale() / layerController.getWindowScale();
   };
 
   /**
@@ -132,25 +119,16 @@ dwv.App = function () {
    * @returns {number} The window scale.
    */
   this.getWindowScale = function () {
-    return windowScale;
+    return layerController.getWindowScale();
   };
 
   /**
-   * Get the scale center.
+   * Get the layer offset.
    *
-   * @returns {object} The coordinates of the scale center.
+   * @returns {object} The offset.
    */
-  this.getScaleCenter = function () {
-    return scaleCenter;
-  };
-
-  /**
-   * Get the translation.
-   *
-   * @returns {object} The translation.
-   */
-  this.getTranslation = function () {
-    return translation;
+  this.getOffset = function () {
+    return layerController.getOffset();
   };
 
   /**
@@ -277,6 +255,10 @@ dwv.App = function () {
     if (typeof config.viewOnFirstLoadItem !== 'undefined') {
       viewOnFirstLoadItem = config.viewOnFirstLoadItem;
     }
+
+    // create layer container
+    layerController =
+      new dwv.LayerController(self.getElement('layerContainer'));
   };
 
   /**
@@ -285,24 +267,7 @@ dwv.App = function () {
    * @returns {object} The available width and height: {width:X; height:Y}.
    */
   this.getLayerContainerSize = function () {
-    var ldiv = self.getElement('layerContainer');
-    var parent = ldiv.parentNode;
-    // offsetHeight: height of an element, including vertical padding
-    // and borders
-    // ref: https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetHeight
-    var height = parent.offsetHeight;
-    // remove the height of other elements of the container div
-    var kids = parent.children;
-    for (var i = 0; i < kids.length; ++i) {
-      if (!kids[i].classList.contains('layerContainer')) {
-        var styles = window.getComputedStyle(kids[i]);
-        // offsetHeight does not include margin
-        var margin = parseFloat(styles.getPropertyValue('margin-top'), 10) +
-               parseFloat(styles.getPropertyValue('margin-bottom'), 10);
-        height -= (kids[i].offsetHeight + margin);
-      }
-    }
-    return {width: parent.offsetWidth, height: height};
+    return layerController.getLayerContainerSize();
   };
 
   /**
@@ -334,43 +299,10 @@ dwv.App = function () {
 
   /**
    * Reset the layout of the application.
-   *
-   * @fires dwv.App#zoomchange
-   * @fires dwv.App#offsetchange
    */
   this.resetLayout = function () {
-    var previousScale = scale;
-    var previousSC = scaleCenter;
-    var previousTrans = translation;
-    // reset values
-    scale = windowScale;
-    scaleCenter = {x: 0, y: 0};
-    translation = {x: 0, y: 0};
-    // apply new values
-    layerController.reset(windowScale);
+    layerController.reset();
     layerController.draw();
-
-    // fire events
-    if (previousScale !== scale) {
-      fireEvent({
-        type: 'zoomchange',
-        value: [scale],
-        scale: scale,
-        cx: scaleCenter.x,
-        cy: scaleCenter.y
-      });
-    }
-    if ((previousSC.x !== scaleCenter.x || previousSC.y !== scaleCenter.y) ||
-      (previousTrans.x !== translation.x || previousTrans.y !== translation.y)
-    ) {
-      fireEvent({
-        type: 'offsetchange',
-        value: [scaleCenter.x, scaleCenter.y],
-        scale: scale,
-        cx: scaleCenter.x,
-        cy: scaleCenter.y
-      });
-    }
   };
 
 
@@ -469,34 +401,12 @@ dwv.App = function () {
 
   /**
    * Fit the display to the given size. To be called once the image is loaded.
-   *
-   * @param {object} size A size as `{width,height}`.
    */
-  this.fitToSize = function (size) {
-    // previous width
-    var oldWidth = parseInt(windowScale * dataWidth, 10);
-    // find new best fit
-    windowScale = Math.min(
-      (size.width / dataWidth),
-      (size.height / dataHeight)
-    );
-    // new sizes
-    var newWidth = parseInt(windowScale * dataWidth, 10);
-    var newHeight = parseInt(windowScale * dataHeight, 10);
-    // ratio previous/new to add to zoom
-    var mul = newWidth / oldWidth;
-    scale *= mul;
-
-    // update style
-    style.setScale(windowScale);
-
-    // resize container
-    var container = this.getElement('layerContainer');
-    container.setAttribute(
-      'style', 'width:' + newWidth + 'px;height:' + newHeight + 'px');
-    // resize image layer
-    layerController.resize(newWidth, newHeight, scale);
+  this.fitToContainer = function () {
+    layerController.fitToContainer();
     layerController.draw();
+    // update style
+    style.setScale(layerController.getWindowScale());
   };
 
   /**
@@ -525,33 +435,13 @@ dwv.App = function () {
   /**
    * Zoom to the layers.
    *
-   * @param {number} zoom The zoom to apply.
+   * @param {number} step The step to add to the current zoom.
    * @param {number} cx The zoom center X coordinate.
    * @param {number} cy The zoom center Y coordinate.
    */
-  this.zoom = function (zoom, cx, cy) {
-    scale = zoom * windowScale;
-    if (scale <= 0.1) {
-      scale = 0.1;
-    }
-    scaleCenter = {x: cx, y: cy};
-    zoomLayers();
-  };
-
-  /**
-   * Add a step to the layers zoom.
-   *
-   * @param {number} step The zoom step increment. A good step is of 0.1.
-   * @param {number} cx The zoom center X coordinate.
-   * @param {number} cy The zoom center Y coordinate.
-   */
-  this.stepZoom = function (step, cx, cy) {
-    scale += step;
-    if (scale <= 0.1) {
-      scale = 0.1;
-    }
-    scaleCenter = {x: cx, y: cy};
-    zoomLayers();
+  this.zoom = function (step, cx, cy) {
+    layerController.addScale(step, {x: cx, y: cy});
+    layerController.draw();
   };
 
   /**
@@ -561,8 +451,8 @@ dwv.App = function () {
    * @param {number} ty The translation along Y.
    */
   this.translate = function (tx, ty) {
-    translation = {x: tx, y: ty};
-    translateLayers();
+    layerController.addTranslation({x: tx, y: ty});
+    layerController.draw();
   };
 
   /**
@@ -723,7 +613,7 @@ dwv.App = function () {
    * @private
    */
   this.onResize = function (_event) {
-    self.fitToSize(self.getLayerContainerSize());
+    self.fitToContainer();
   };
 
   /**
@@ -924,78 +814,6 @@ dwv.App = function () {
   }
 
   /**
-   * Apply the stored zoom to the layers.
-   *
-   * @private
-   * @fires dwv.App#zoomchange
-   */
-  function zoomLayers() {
-    var newScale = {x: scale, y: scale};
-    layerController.addScale(newScale, scaleCenter);
-    layerController.draw();
-
-    // fire event
-    /**
-     * Zoom change event.
-     *
-     * @event dwv.App#zoomchange
-     * @type {object}
-     * @property {Array} value The changed value.
-     * @property {number} scale The new scale value.
-     * @property {number} cx The new rotaion center X position.
-     * @property {number} cy The new rotaion center Y position.
-     */
-    fireEvent({
-      type: 'zoomchange',
-      value: [scale],
-      scale: scale,
-      cx: scaleCenter.x,
-      cy: scaleCenter.y
-    });
-    /**
-     * Offset change event.
-     *
-     * @event dwv.App#offsetchange
-     * @type {object}
-     * @property {Array} value The changed value.
-     */
-    fireEvent({
-      type: 'offsetchange',
-      value: [scaleCenter.x, scaleCenter.y]
-    });
-  }
-
-  /**
-   * Apply the stored translation to the layers.
-   *
-   * @private
-   * @fires dwv.App#offsetchange
-   */
-  function translateLayers() {
-    layerController.addTranslation(translation);
-    layerController.draw();
-
-    // fire event
-    /**
-     * Offset change event.
-     *
-     * @event dwv.App#translatechange
-     * @type {object}
-     * @property {Array} value The changed value.
-     * @property {number} scale The new scale value.
-     * @property {number} cx The new rotaion center X position.
-     * @property {number} cy The new rotaion center Y position.
-     */
-    fireEvent({
-      type: 'translatechange',
-      value: [translation.x, translation.y],
-      scale: scale,
-      cx: translation.x,
-      cy: translation.y
-    });
-  }
-
-  /**
    * Create the application layers.
    *
    * @private
@@ -1030,13 +848,10 @@ dwv.App = function () {
       layerController.addLayer(new dwv.html.DrawLayer(div1));
     }
 
+    // init layers
     layerController.initialise(image, metaData);
-    layerController.display(true);
-
-    // resize app
-    self.fitToSize(self.getLayerContainerSize());
-
-    self.resetLayout();
+    // fit
+    self.fitToContainer();
   }
 
   /**
@@ -1298,11 +1113,6 @@ dwv.App = function () {
       throw new Error('No image to create the layer for.');
     }
 
-    // layout
-    var size = image.getGeometry().getSize();
-    dataWidth = size.getNumberOfColumns();
-    dataHeight = size.getNumberOfRows();
-
     createLayers();
 
     var viewLayer = layerController.getActiveViewLayer();
@@ -1323,6 +1133,9 @@ dwv.App = function () {
 
     viewLayer.addEventListener('renderstart', fireEvent);
     viewLayer.addEventListener('renderend', fireEvent);
+
+    layerController.addEventListener('zoomchange', fireEvent);
+    layerController.addEventListener('offsetchange', fireEvent);
 
     // initialise the toolbox
     if (toolboxController) {

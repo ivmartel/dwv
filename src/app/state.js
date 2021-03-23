@@ -40,13 +40,12 @@ dwv.State = function () {
     var drawLayer = layerController.getActiveDrawLayer();
     // return a JSON string
     return JSON.stringify({
-      version: '0.4',
+      version: '0.5',
       'window-center': viewController.getWindowLevel().center,
       'window-width': viewController.getWindowLevel().width,
       position: viewController.getCurrentPosition(),
       scale: app.getScale(),
-      scaleCenter: app.getScaleCenter(),
-      translation: app.getTranslation(),
+      offset: app.getOffset(),
       drawings: drawLayer.getKonvaLayer().toObject(),
       drawingsDetails: app.getDrawStoreDetails()
     });
