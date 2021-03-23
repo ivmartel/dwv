@@ -73,6 +73,9 @@ dwv.test.viewerSetup = function () {
  * Last minute.
  */
 dwv.test.onDOMContentLoadedViewer = function () {
+  // setup
+  dwv.test.viewerSetup();
+
   // bind app to input files
   const fileinput = document.getElementById('fileinput');
   fileinput.addEventListener('change', function (event) {
