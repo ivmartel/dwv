@@ -420,7 +420,7 @@ dwv.App = function () {
     var viewLayer = layerController.getActiveViewLayer();
     // create view if first tiem
     if (!viewLayer) {
-      initialiseViewLayer();
+      initialiseLayers();
       viewLayer = layerController.getActiveViewLayer();
     }
     // draw the image
@@ -814,8 +814,10 @@ dwv.App = function () {
     div0.className = 'layer';
     // prepend to container
     container.prepend(div0);
-    // image layer
-    layerController.addLayer(new dwv.html.ViewLayer(div0));
+    // view layer
+    var viewLayer = new dwv.html.ViewLayer(div0);
+    // add to layer controller
+    layerController.addLayer(viewLayer);
 
     if (toolboxController && toolboxController.hasTool('Draw')) {
       // create draw layer
@@ -832,6 +834,9 @@ dwv.App = function () {
     layerController.initialise(image, metaData);
     // fit
     self.fitToContainer();
+
+    // bind view to app
+    bindViewLayer(viewLayer);
   }
 
   /**
@@ -1088,37 +1093,37 @@ dwv.App = function () {
   }
 
   /**
-   * Create the view layer.
+   * Bind view layer events to app.
+   *
+   * @param {object} viewLayer The active view layer.
+   */
+  function bindViewLayer(viewLayer) {
+    // local draw controller slice/frame synch
+    viewLayer.addEventListener('slicechange', onSliceChange);
+    viewLayer.addEventListener('framechange', onFrameChange);
+    // propagate view events
+    viewLayer.propagateViewEvents(true);
+    for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
+      viewLayer.addEventListener(dwv.image.viewEventNames[j], fireEvent);
+    }
+    // propagate viewLayer events
+    viewLayer.addEventListener('renderstart', fireEvent);
+    viewLayer.addEventListener('renderend', fireEvent);
+  }
+
+  /**
+   * Initialise the layers.
    * To be called once the DICOM data has been loaded.
    *
    * @private
    */
-  function initialiseViewLayer() {
-
+  function initialiseLayers() {
     if (!image) {
       throw new Error('No image to create the layer for.');
     }
 
+    //
     createLayers();
-
-    var viewLayer = layerController.getActiveViewLayer();
-
-    // draw controller slice/frame synch
-    viewLayer.addEventListener('slicechange', onSliceChange);
-    viewLayer.addEventListener('framechange', onFrameChange);
-
-    // propagate view events
-    viewLayer.propagateViewEvents(true);
-    viewLayer.addEventListener('wlwidthchange', fireEvent);
-    viewLayer.addEventListener('wlcenterchange', fireEvent);
-    viewLayer.addEventListener('wlpresetadd', fireEvent);
-    viewLayer.addEventListener('colourchange', fireEvent);
-    viewLayer.addEventListener('positionchange', fireEvent);
-    viewLayer.addEventListener('slicechange', fireEvent);
-    viewLayer.addEventListener('framechange', fireEvent);
-
-    viewLayer.addEventListener('renderstart', fireEvent);
-    viewLayer.addEventListener('renderend', fireEvent);
 
     // propagate layer events
     layerController.addEventListener('zoomchange', fireEvent);
