@@ -125,6 +125,7 @@ dwv.tool.Livewire = function (app) {
       // clear vars
       clearPaths();
       clearParentPoints();
+      shapeGroup = null;
       // update zoom scale
       var layerController = app.getLayerController();
       var drawLayer = layerController.getActiveDrawLayer();
