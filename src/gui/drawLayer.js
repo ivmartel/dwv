@@ -18,16 +18,21 @@ var Konva = Konva || {};
  */
 dwv.html.DrawLayer = function (containerDiv) {
 
+  // specific css class name
   containerDiv.className += ' drawLayer';
 
   // konva stage
   var konvaStage = null;
   // konva layer
   var konvaLayer;
-  // initial stage width
-  var stageWidth;
-  // initial stage height
-  var stageHeight;
+
+  /**
+   * The layer size as {x,y}.
+   *
+   * @private
+   * @type {object}
+   */
+  var layerSize;
 
   /**
    * The draw controller.
@@ -72,19 +77,16 @@ dwv.html.DrawLayer = function (containerDiv) {
     return drawController;
   };
 
+  // common layer methods [start] ---------------
+
   /**
-   * Get the initial stage size.
+   * Get the layer size.
    *
    * @returns {object} The size as {x,y}.
    */
-  this.getInitialSize = function () {
-    return {
-      x: stageWidth,
-      y: stageHeight
-    };
+  this.getSize = function () {
+    return layerSize;
   };
-
-  // common layer methods [start] ---------------
 
   /**
    * Get the layer opacity.
@@ -101,7 +103,7 @@ dwv.html.DrawLayer = function (containerDiv) {
    * @param {number} alpha The opacity ([0:1] range).
    */
   this.setOpacity = function (alpha) {
-    konvaStage.opacity(alpha);
+    konvaStage.opacity(Math.min(Math.max(alpha, 0), 1));
   };
 
   /**
@@ -125,15 +127,24 @@ dwv.html.DrawLayer = function (containerDiv) {
   };
 
   /**
-   * Resize the layer.
+   * Set the layer z-index.
    *
-   * @param {object} size The layer size as {x,y}.
+   * @param {number} index The index.
+   */
+  this.setZIndex = function (index) {
+    containerDiv.style.zIndex = index;
+  };
+
+  /**
+   * Resize the layer: update the window scale and layer sizes.
+   *
    * @param {object} newScale The layer scale as {x,y}.
    */
-  this.resize = function (size, newScale) {
+  this.resize = function (newScale) {
     // resize stage
-    konvaStage.setWidth(size.x);
-    konvaStage.setHeight(size.y);
+    konvaStage.setWidth(parseInt(layerSize.x * newScale.x, 10));
+    konvaStage.setHeight(parseInt(layerSize.y * newScale.y, 10));
+    // set scale
     this.setScale(newScale);
   };
 
@@ -172,14 +183,16 @@ dwv.html.DrawLayer = function (containerDiv) {
   this.initialise = function (image, _metaData) {
     // get sizes
     var size = image.getGeometry().getSize();
-    stageWidth = size.getNumberOfColumns();
-    stageHeight = size.getNumberOfRows();
+    layerSize = {
+      x: size.getNumberOfColumns(),
+      y: size.getNumberOfRows()
+    };
 
     // create stage
     konvaStage = new Konva.Stage({
       container: containerDiv,
-      width: stageWidth,
-      height: stageHeight,
+      width: layerSize.x,
+      height: layerSize.y,
       listening: false
     });
     // reset style
@@ -203,7 +216,7 @@ dwv.html.DrawLayer = function (containerDiv) {
   this.activate = function () {
     konvaStage.listening(true);
     // allow pointer events
-    containerDiv.setAttribute('style', 'pointer-events: auto;');
+    containerDiv.style.pointerEvents = 'auto';
     // interaction events
     var names = dwv.gui.interactionEventNames;
     for (var i = 0; i < names.length; ++i) {
@@ -217,7 +230,7 @@ dwv.html.DrawLayer = function (containerDiv) {
   this.deactivate = function () {
     konvaStage.listening(false);
     // disable pointer events
-    containerDiv.setAttribute('style', 'pointer-events: none;');
+    containerDiv.style.pointerEvents = 'none';
     // interaction events
     var names = dwv.gui.interactionEventNames;
     for (var i = 0; i < names.length; ++i) {

@@ -10,6 +10,7 @@ dwv.html = dwv.html || {};
  */
 dwv.html.ViewLayer = function (containerDiv) {
 
+  // specific css class name
   containerDiv.className += ' viewLayer';
 
   // closure to self
@@ -61,6 +62,14 @@ dwv.html.ViewLayer = function (containerDiv) {
   var imageData = null;
 
   /**
+   * The layer size as {x,y}.
+   *
+   * @private
+   * @type {object}
+   */
+  var layerSize;
+
+  /**
    * The layer opacity.
    *
    * @private
@@ -83,6 +92,14 @@ dwv.html.ViewLayer = function (containerDiv) {
    * @type {object}
    */
   var offset = {x: 0, y: 0};
+
+  /**
+   * Data update flag.
+   *
+   * @private
+   * @type {boolean}
+   */
+  var needsDataUpdate = null;
 
   /**
    * Listener handler.
@@ -122,6 +139,15 @@ dwv.html.ViewLayer = function (containerDiv) {
   // common layer methods [start] ---------------
 
   /**
+   * Get the layer size.
+   *
+   * @returns {object} The size as {x,y}.
+   */
+  this.getSize = function () {
+    return layerSize;
+  };
+
+  /**
    * Get the layer opacity.
    *
    * @returns {number} The opacity ([0:1] range).
@@ -136,7 +162,7 @@ dwv.html.ViewLayer = function (containerDiv) {
    * @param {number} alpha The opacity ([0:1] range).
    */
   this.setOpacity = function (alpha) {
-    opacity = alpha;
+    opacity = Math.min(Math.max(alpha, 0), 1);
   };
 
   /**
@@ -158,15 +184,25 @@ dwv.html.ViewLayer = function (containerDiv) {
   };
 
   /**
-   * Resize the layer.
+   * Set the layer z-index.
    *
-   * @param {object} size The layer size as {x,y}.
+   * @param {number} index The index.
+   */
+  this.setZIndex = function (index) {
+    containerDiv.style.zIndex = index;
+  };
+
+  /**
+   * Resize the layer: update the window scale and layer sizes.
+   *
    * @param {object} newScale The layer scale as {x,y}.
    */
-  this.resize = function (size, newScale) {
-    canvas.width = size.x;
-    canvas.height = size.y;
-    scale = newScale;
+  this.resize = function (newScale) {
+    // resize canvas
+    canvas.width = parseInt(layerSize.x * newScale.x, 10);
+    canvas.height = parseInt(layerSize.y * newScale.y, 10);
+    // set scale
+    this.setScale(newScale);
   };
 
   /**
@@ -205,10 +241,10 @@ dwv.html.ViewLayer = function (containerDiv) {
     var event = {type: 'renderstart'};
     fireEvent(event);
 
-    // generate image data from DICOM
-    view.generateImageData(imageData);
-    // pass the data to the canvas
-    cacheCanvas.getContext('2d').putImageData(imageData, 0, 0);
+    // update data if needed
+    if (needsDataUpdate) {
+      updateImageData();
+    }
 
     // context opacity
     context.globalAlpha = opacity;
@@ -278,8 +314,10 @@ dwv.html.ViewLayer = function (containerDiv) {
 
     // get sizes
     var size = image.getGeometry().getSize();
-    var inputWidth = size.getNumberOfColumns();
-    var inputHeight = size.getNumberOfRows();
+    layerSize = {
+      x: size.getNumberOfColumns(),
+      y: size.getNumberOfRows()
+    };
 
     // create canvas
     canvas = document.createElement('canvas');
@@ -297,15 +335,18 @@ dwv.html.ViewLayer = function (containerDiv) {
       return;
     }
     // canvas sizes
-    canvas.width = inputWidth;
-    canvas.height = inputHeight;
+    canvas.width = layerSize.x;
+    canvas.height = layerSize.y;
     // original empty image data array
     context.clearRect(0, 0, canvas.width, canvas.height);
-    imageData = context.createImageData(inputWidth, inputHeight);
+    imageData = context.createImageData(canvas.width, canvas.height);
     // cached canvas
     cacheCanvas = document.createElement('canvas');
-    cacheCanvas.width = inputWidth;
-    cacheCanvas.height = inputHeight;
+    cacheCanvas.width = canvas.width;
+    cacheCanvas.height = canvas.height;
+
+    // update data on first draw
+    needsDataUpdate = true;
   };
 
   /**
@@ -313,7 +354,7 @@ dwv.html.ViewLayer = function (containerDiv) {
    */
   this.activate = function () {
     // allow pointer events
-    containerDiv.setAttribute('style', 'pointer-events: auto;');
+    containerDiv.style.pointerEvents = 'auto';
     // interaction events
     var names = dwv.gui.interactionEventNames;
     for (var i = 0; i < names.length; ++i) {
@@ -326,7 +367,7 @@ dwv.html.ViewLayer = function (containerDiv) {
    */
   this.deactivate = function () {
     // disable pointer events
-    containerDiv.setAttribute('style', 'pointer-events: none;');
+    containerDiv.style.pointerEvents = 'none';
     // interaction events
     var names = dwv.gui.interactionEventNames;
     for (var i = 0; i < names.length; ++i) {
@@ -385,6 +426,18 @@ dwv.html.ViewLayer = function (containerDiv) {
   };
 
   /**
+   * Update the canvas image data.
+   */
+  function updateImageData() {
+    // generate image data
+    view.generateImageData(imageData);
+    // pass the data to the canvas
+    cacheCanvas.getContext('2d').putImageData(imageData, 0, 0);
+    // update data flag
+    needsDataUpdate = false;
+  }
+
+  /**
    * Handle window/level change.
    *
    * @param {object} event The event fired when changing the window/level.
@@ -394,6 +447,7 @@ dwv.html.ViewLayer = function (containerDiv) {
     // generate and draw if no skip flag
     if (typeof event.skipGenerate === 'undefined' ||
       event.skipGenerate === false) {
+      needsDataUpdate = true;
       self.draw();
     }
   }
@@ -405,6 +459,7 @@ dwv.html.ViewLayer = function (containerDiv) {
    * @private
    */
   function onColourChange(_event) {
+    needsDataUpdate = true;
     self.draw();
   }
 
@@ -418,6 +473,7 @@ dwv.html.ViewLayer = function (containerDiv) {
     // generate and draw if no skip flag
     if (typeof event.skipGenerate === 'undefined' ||
       event.skipGenerate === false) {
+      needsDataUpdate = true;
       self.draw();
     }
   }
@@ -429,6 +485,7 @@ dwv.html.ViewLayer = function (containerDiv) {
    * @private
    */
   function onSliceChange(_event) {
+    needsDataUpdate = true;
     self.draw();
   }
 

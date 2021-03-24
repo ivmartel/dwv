@@ -27,7 +27,7 @@ dwv.LayerController = function (containerDiv) {
   var layers = [];
 
   /**
-   * The layer scale.
+   * The layer scale as {x,y}.
    *
    * @private
    * @type {object}
@@ -43,7 +43,7 @@ dwv.LayerController = function (containerDiv) {
   var windowScale = 1;
 
   /**
-   * The layer offset.
+   * The layer offset as {x,y}.
    *
    * @private
    * @type {object}
@@ -51,20 +51,12 @@ dwv.LayerController = function (containerDiv) {
   var offset = {x: 0, y: 0};
 
   /**
-   * The image data width.
+   * The layer size as {x,y}.
    *
    * @private
-   * @type {number}
+   * @type {object}
    */
-  var dataWidth = 0;
-
-  /**
-   * The image data height.
-   *
-   * @private
-   * @type {number}
-   */
-  var dataHeight = 0;
+  var layerSize;
 
   /**
    * Active view layer index.
@@ -131,20 +123,80 @@ dwv.LayerController = function (containerDiv) {
   };
 
   /**
-   * Add a layer to the list.
+   * Get the number of layers handled by this class.
    *
-   * @param {object} layer The layer to add.
+   * @returns {number} The number of layers.
    */
-  this.addLayer = function (layer) {
-    var length = layers.push(layer);
-    // update active indices
-    var lastIndex = length - 1;
-    if (layer instanceof dwv.html.ViewLayer) {
-      activeViewLayerIndex = lastIndex;
-    } else if (layer instanceof dwv.html.DrawLayer) {
-      activeDrawLayerIndex = lastIndex;
-    }
+  this.getNumberOfLayers = function () {
+    return layers.length;
   };
+
+  /**
+   * Set the active view layer.
+   *
+   * @param {number} index The index of the layer to set as active.
+   */
+  this.setActiveViewLayer = function (index) {
+    activeViewLayerIndex = index;
+  };
+
+  /**
+   * Set the active draw layer.
+   *
+   * @param {number} index The index of the layer to set as active.
+   */
+  this.setActiveDrawLayer = function (index) {
+    activeDrawLayerIndex = index;
+  };
+
+  /**
+   * Add a view layer.
+   */
+  this.addViewLayer = function () {
+    // store active index
+    activeViewLayerIndex = layers.length;
+    // create div
+    var div = getNextLayerDiv();
+    // prepend to container
+    containerDiv.append(div);
+    // view layer
+    var layer = new dwv.html.ViewLayer(div);
+    // set z-index: last on top
+    layer.setZIndex(activeViewLayerIndex);
+    // add layer
+    layers.push(layer);
+  };
+
+  /**
+   * Add a draw layer.
+   */
+  this.addDrawLayer = function () {
+    // store active index
+    activeDrawLayerIndex = layers.length;
+    // create div
+    var div = getNextLayerDiv();
+    // prepend to container
+    containerDiv.append(div);
+    // draw layer
+    var layer = new dwv.html.DrawLayer(div);
+    // set z-index: above view + last on top
+    layer.setZIndex(50 + activeDrawLayerIndex);
+    // add layer
+    layers.push(layer);
+  };
+
+  /**
+   * Get the next layer DOM div.
+   *
+   * @returns {object} A DOM div.
+   */
+  function getNextLayerDiv() {
+    var div = document.createElement('div');
+    div.id = 'layer' + layers.length;
+    div.className = 'layer';
+    div.style.pointerEvents = 'none';
+    return div;
+  }
 
   /**
    * Empty the layer list.
@@ -182,31 +234,27 @@ dwv.LayerController = function (containerDiv) {
   };
 
   /**
+   * Get the fit to container scale.
+   * To be called once the image is loaded.
+   *
+   * @returns {number} The scale.
+   */
+  this.getFitToContainerScale = function () {
+    // get container size
+    var size = this.getLayerContainerSize();
+    // best fit
+    return Math.min(
+      (size.x / layerSize.x),
+      (size.y / layerSize.y)
+    );
+  };
+
+  /**
    * Fit the display to the size of the container.
    * To be called once the image is loaded.
    */
   this.fitToContainer = function () {
-    // get container size
-    var size = this.getLayerContainerSize();
-    // previous width
-    var oldWidth = parseInt(windowScale * dataWidth, 10);
-    // find new best fit
-    windowScale = Math.min(
-      (size.width / dataWidth),
-      (size.height / dataHeight)
-    );
-    // new sizes
-    var newWidth = parseInt(windowScale * dataWidth, 10);
-    var newHeight = parseInt(windowScale * dataHeight, 10);
-
-    // resize container
-    containerDiv.setAttribute(
-      'style', 'width: ' + newWidth + 'px;height: ' + newHeight + 'px');
-
-    // ratio previous/new to add to zoom
-    var mul = newWidth / oldWidth;
-    var newScale = scale.x * mul;
-    this.resize(newWidth, newHeight, newScale);
+    this.resize(this.getFitToContainerScale());
   };
 
   /**
@@ -231,7 +279,7 @@ dwv.LayerController = function (containerDiv) {
         height -= (kids[i].offsetHeight + margin);
       }
     }
-    return {width: parent.offsetWidth, height: height};
+    return {x: parent.offsetWidth, y: height};
   };
 
   /**
@@ -327,8 +375,10 @@ dwv.LayerController = function (containerDiv) {
    */
   this.initialise = function (image, metaData) {
     var size = image.getGeometry().getSize();
-    dataWidth = size.getNumberOfColumns();
-    dataHeight = size.getNumberOfRows();
+    layerSize = {
+      x: size.getNumberOfColumns(),
+      y: size.getNumberOfRows()
+    };
     // apply to layers
     for (var i = 0; i < layers.length; ++i) {
       layers[i].initialise(image, metaData);
@@ -346,17 +396,29 @@ dwv.LayerController = function (containerDiv) {
   };
 
   /**
-   * Resize the layer.
+   * Resize the layer: update the window scale and layer sizes.
    *
-   * @param {number} width the layer width.
-   * @param {number} height the layer height.
    * @param {number} newScale the layer scale.
    */
-  this.resize = function (width, height, newScale) {
-    this.setScale({x: newScale, y: newScale});
-    var newSize = {x: width, y: height};
+  this.resize = function (newScale) {
+    // set scale
+    var ratio = newScale / windowScale;
+    scale = {
+      x: scale.x * ratio,
+      y: scale.y * ratio
+    };
+    windowScale = newScale;
+
+    // resize container
+    var width = parseInt(layerSize.x * windowScale, 10);
+    var height = parseInt(layerSize.y * windowScale, 10);
+    containerDiv.style.width = width + 'px';
+    containerDiv.style.height = height + 'px';
+
+    // call resize and scale on layers
     for (var i = 0; i < layers.length; ++i) {
-      layers[i].resize(newSize, scale);
+      layers[i].resize({x: windowScale, y: windowScale});
+      layers[i].setScale(scale);
     }
   };
 

@@ -622,8 +622,7 @@ dwv.tool.Draw = function (app) {
       var layerController = app.getLayerController();
       var drawLayer = layerController.getActiveDrawLayer();
       // validate the group position
-      dwv.tool.validateGroupPosition(
-        drawLayer.getInitialSize(), this);
+      dwv.tool.validateGroupPosition(drawLayer.getSize(), this);
       // highlight trash when on it
       var offset = dwv.html.getEventOffset(event.evt)[0];
       var eventPos = getRealPosition(offset);

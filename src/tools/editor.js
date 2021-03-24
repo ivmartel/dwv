@@ -329,8 +329,7 @@ dwv.tool.ShapeEditor = function (app) {
       var layerController = app.getLayerController();
       var drawLayer = layerController.getActiveDrawLayer();
       // validate the anchor position
-      dwv.tool.validateAnchorPosition(
-        drawLayer.getInitialSize(), this);
+      dwv.tool.validateAnchorPosition(drawLayer.getSize(), this);
       // update shape
       currentFactory.update(this, app.getStyle(), viewController);
       // redraw

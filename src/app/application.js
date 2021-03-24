@@ -13,22 +13,19 @@ dwv.App = function () {
     dwv.logger = dwv.utils.logger.console;
   }
 
-  // Local object
+  // closure to self
   var self = this;
 
   // Image
-  var image = null;
-  // Original image
-  var originalImage = null;
+  var images = [];
+  // meta data
+  var metaData = [];
 
   // Container div id
   var containerDivId = null;
 
   // flag to create view on first load
   var viewOnFirstLoadItem = true;
-
-  // meta data
-  var metaData = null;
 
   // Generic style
   var style = new dwv.html.Style();
@@ -41,6 +38,8 @@ dwv.App = function () {
 
   // load controller
   var loadController = null;
+
+  var isFirstLoadItem = null;
 
   // UndoStack
   var undoStack = null;
@@ -59,7 +58,8 @@ dwv.App = function () {
    * @returns {Image} The associated image.
    */
   this.getImage = function () {
-    return image;
+    // TODO: do...
+    return images[0];
   };
   /**
    * Set the image.
@@ -67,7 +67,8 @@ dwv.App = function () {
    * @param {Image} img The associated image.
    */
   this.setImage = function (img) {
-    image = img;
+    // TODO: do...
+    images[0] = img;
     // TODO: move...
     if (layerController) {
       layerController.getActiveViewLayer().setViewImage(img);
@@ -276,7 +277,8 @@ dwv.App = function () {
    * @returns {object} The available width and height: {width:X; height:Y}.
    */
   this.getLayerContainerSize = function () {
-    return layerController.getLayerContainerSize();
+    var size = layerController.getLayerContainerSize();
+    return {width: size.x, height: size.y};
   };
 
   /**
@@ -294,8 +296,8 @@ dwv.App = function () {
    */
   this.reset = function () {
     // clear objects
-    image = null;
-    metaData = null;
+    images = [];
+    metaData = [];
     layerController.empty();
     // reset undo/redo
     if (undoStack) {
@@ -313,7 +315,6 @@ dwv.App = function () {
     layerController.reset();
     layerController.draw();
   };
-
 
   /**
    * Add an event listener to this class.
@@ -418,17 +419,10 @@ dwv.App = function () {
   };
 
   /**
-   * Render the current image.
+   * Render the current data.
    */
   this.render = function () {
-    var viewLayer = layerController.getActiveViewLayer();
-    // create view if first tiem
-    if (!viewLayer) {
-      initialiseLayers();
-      viewLayer = layerController.getActiveViewLayer();
-    }
-    // draw the image
-    viewLayer.draw();
+    layerController.draw();
   };
 
   /**
@@ -482,7 +476,7 @@ dwv.App = function () {
    * @returns {object} The list of meta data.
    */
   this.getMetaData = function () {
-    return metaData;
+    return metaData[0];
   };
 
   /**
@@ -798,54 +792,18 @@ dwv.App = function () {
   }
 
   /**
-   * Create the application layers.
-   *
-   * @private
-   */
-  function createLayers() {
-    var container = self.getElement('layerContainer');
-
-    // create image layer
-    var div0 = document.createElement('div');
-    div0.id = 'layer0';
-    div0.className = 'layer';
-    // prepend to container
-    container.prepend(div0);
-    // view layer
-    var viewLayer = new dwv.html.ViewLayer(div0);
-    // add to layer controller
-    layerController.addLayer(viewLayer);
-
-    if (toolboxController && toolboxController.hasTool('Draw')) {
-      // create draw layer
-      var div1 = document.createElement('div');
-      div1.id = 'layer1';
-      div1.className = 'layer';
-      // prepend to container
-      container.append(div1);
-      // draw layer
-      layerController.addLayer(new dwv.html.DrawLayer(div1));
-    }
-
-    // init layers
-    layerController.initialise(image, metaData);
-    // update style
-    style.setScale(layerController.getWindowScale());
-
-    // bind view to app
-    bindViewLayer(viewLayer);
-  }
-
-  /**
    * Data load start callback.
    *
    * @param {object} event The load start event.
    * @private
    */
   function onloadstart(event) {
-    if (event.loadtype === 'image') {
-      self.reset();
-    }
+    isFirstLoadItem = true;
+
+    // TODO: add access to reset...
+    // if (event.loadtype === 'image') {
+    //   self.reset();
+    // }
 
     /**
      * Load start event.
@@ -899,20 +857,20 @@ dwv.App = function () {
       dwv.logger.error('Missing loaditem event load type ' + event);
     }
 
-    // first load flag
-    var isFirstLoad = image === null;
     // number returned by image.appendSlice
     var sliceNb = null;
 
+    var lastImageIndex = null;
+
     var eventMetaData = null;
     if (event.loadtype === 'image') {
-      if (isFirstLoad) {
+      if (isFirstLoadItem) {
         // save image
-        originalImage = event.data.image;
-        image = originalImage;
+        images.push(event.data.image);
       } else {
         // append slice
-        sliceNb = image.appendSlice(event.data.image);
+        lastImageIndex = images.length - 1;
+        sliceNb = images[lastImageIndex].appendSlice(event.data.image);
       }
       updateMetaData(event.data.info);
       eventMetaData = event.data.info;
@@ -942,7 +900,15 @@ dwv.App = function () {
 
     // render if asked
     if (event.loadtype === 'image' && viewOnFirstLoadItem) {
-      if (isFirstLoad) {
+      if (isFirstLoadItem) {
+        // create view if first time
+        if (layerController.getNumberOfLayers() === 0) {
+          initialiseBaseLayers(images[0], metaData[0]);
+        } else {
+          lastImageIndex = images.length - 1;
+          addViewLayer(images[lastImageIndex], metaData[lastImageIndex]);
+        }
+        // render
         self.render();
       } else {
         // update slice number if new slice was inserted before
@@ -958,6 +924,9 @@ dwv.App = function () {
         }
       }
     }
+
+    // reset flag
+    isFirstLoadItem = false;
   }
 
   /**
@@ -988,6 +957,7 @@ dwv.App = function () {
    * @private
    */
   function onloadend(event) {
+    isFirstLoadItem = null;
     /**
      * Main load end event: fired when the load finishes,
      *   successfully or not.
@@ -1058,19 +1028,20 @@ dwv.App = function () {
     if (dwv.utils.isArray(newMetaData)) {
       // image file case
       // TODO merge?
-      metaData = newMetaData;
+      metaData.push(newMetaData);
     } else {
       // DICOM data case
       var newDcmMetaData = new dwv.dicom.DicomElementsWrapper(newMetaData);
       var newDcmMetaDataoObj = newDcmMetaData.dumpToObject();
-      if (metaData) {
-        metaData = dwv.utils.mergeObjects(
-          metaData,
+      if (isFirstLoadItem) {
+        metaData.push(newDcmMetaDataoObj);
+      } else {
+        var lastIndex = metaData.length - 1;
+        metaData[lastIndex] = dwv.utils.mergeObjects(
+          metaData[lastIndex],
           newDcmMetaDataoObj,
           'InstanceNumber',
           'value');
-      } else {
-        metaData = newDcmMetaDataoObj;
       }
     }
   }
@@ -1093,6 +1064,7 @@ dwv.App = function () {
    * Bind view layer events to app.
    *
    * @param {object} viewLayer The active view layer.
+   * @private
    */
   function bindViewLayer(viewLayer) {
     // local draw controller slice/frame synch
@@ -1114,13 +1086,20 @@ dwv.App = function () {
    *
    * @private
    */
-  function initialiseLayers() {
-    if (!image) {
-      throw new Error('No image to create the layer for.');
+  function initialiseBaseLayers() {
+    // view layer
+    layerController.addViewLayer();
+    // optional draw layer
+    if (toolboxController && toolboxController.hasTool('Draw')) {
+      layerController.addDrawLayer();
     }
+    // initialise layers
+    layerController.initialise(images[0], metaData[0]);
 
-    //
-    createLayers();
+    // update style
+    style.setScale(layerController.getWindowScale());
+    // bind view to app
+    bindViewLayer(layerController.getActiveViewLayer());
 
     // propagate layer events
     layerController.addEventListener('zoomchange', fireEvent);
@@ -1130,6 +1109,21 @@ dwv.App = function () {
     if (toolboxController) {
       toolboxController.init(layerController.displayToIndex);
     }
+  }
+
+  /**
+   * Add a view layer.
+   *
+   * @param {object} image The image to view.
+   * @param {object} meta The image meta data.
+   */
+  function addViewLayer(image, meta) {
+    layerController.addViewLayer();
+    // active is now the last layer
+    var viewLayer = layerController.getActiveViewLayer();
+    viewLayer.initialise(image, meta);
+    // apply layer scale
+    viewLayer.resize(layerController.getScale());
   }
 
 };
