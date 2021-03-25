@@ -159,21 +159,6 @@ dwv.tool.WindowLevel = function (app) {
   };
 
   /**
-   * Handle mouse wheel event.
-   *
-   * @param {object} event The mouse wheel event.
-   */
-  this.mousewheel = function (event) {
-    // ev.wheelDelta on chrome is 120
-    var step = event.wheelDelta / 1200;
-
-    var layerController = app.getLayerController();
-    var viewLayer = layerController.getActiveViewLayer();
-    viewLayer.setOpacity(viewLayer.getOpacity() + step);
-    viewLayer.draw();
-  };
-
-  /**
    * Activate the tool.
    *
    * @param {boolean} _bool The flag to activate or not.
