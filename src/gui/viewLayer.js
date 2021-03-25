@@ -134,6 +134,7 @@ dwv.html.ViewLayer = function (containerDiv) {
    */
   this.setViewImage = function (img) {
     view.setImage(img);
+    needsDataUpdate = true;
   };
 
   // common layer methods [start] ---------------
