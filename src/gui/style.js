@@ -37,12 +37,12 @@ dwv.html.Style = function () {
    */
   var lineColour = '#ffff80';
   /**
-   * Display scale.
+   * Base scale.
    *
    * @private
-   * @type {number}
+   * @type {object}
    */
-  var displayScale = 1;
+  var baseScale = {x: 1, y: 1};
   /**
    * Zoom scale.
    *
@@ -135,49 +135,50 @@ dwv.html.Style = function () {
   };
 
   /**
-   * Set the display scale.
+   * Set the base scale.
    *
-   * @param {number} scale The display scale.
+   * @param {number} scale The scale as {x,y}.
    */
-  this.setScale = function (scale) {
-    displayScale = scale;
+  this.setBaseScale = function (scale) {
+    baseScale = scale;
   };
 
   /**
    * Set the zoom scale.
    *
-   * @param {object} scale The zoom scale as {x,y}.
+   * @param {object} scale The scale as {x,y}.
    */
   this.setZoomScale = function (scale) {
     zoomScale = scale;
   };
 
   /**
-   * Get the display scale.
+   * Get the base scale.
    *
-   * @returns {number} The display scale.
+   * @returns {number} The scale as {x,y}.
    */
-  this.getScale = function () {
-    return displayScale;
+  this.getBaseScale = function () {
+    return baseScale;
   };
 
   /**
    * Get the zoom scale.
    *
-   * @returns {object} The zoom scale as {x,y}.
+   * @returns {object} The scale as {x,y}.
    */
   this.getZoomScale = function () {
     return zoomScale;
   };
 
   /**
-   * Scale an input value.
+   * Scale an input value using the base scale.
    *
    * @param {number} value The value to scale.
    * @returns {number} The scaled value.
    */
   this.scale = function (value) {
-    return value / displayScale;
+    // TODO: 2D?
+    return value / baseScale.x;
   };
 
   /**

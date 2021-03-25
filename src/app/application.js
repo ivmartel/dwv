@@ -58,7 +58,7 @@ dwv.App = function () {
    * @returns {Image} The associated image.
    */
   this.getImage = function () {
-    // TODO: do...
+    // TODO: add multi data support...
     return images[0];
   };
   /**
@@ -67,12 +67,22 @@ dwv.App = function () {
    * @param {Image} img The associated image.
    */
   this.setImage = function (img) {
-    // TODO: do...
+    // TODO: add multi data support...
     images[0] = img;
     // TODO: move...
     if (layerController) {
       layerController.getActiveViewLayer().setViewImage(img);
     }
+  };
+
+  /**
+   * Get the meta data.
+   *
+   * @returns {object} The list of meta data.
+   */
+  this.getMetaData = function () {
+    // TODO: add multi data support...
+    return metaData[0];
   };
 
   /**
@@ -114,21 +124,21 @@ dwv.App = function () {
   };
 
   /**
-   * Get the main scale.
+   * Get the layer scale on top of the base scale.
    *
-   * @returns {number} The main scale.
+   * @returns {object} The scale as {x,y}.
    */
-  this.getScale = function () {
-    return layerController.getScale() / layerController.getWindowScale();
+  this.getAddedScale = function () {
+    return layerController.getAddedScale();
   };
 
   /**
-   * Get the window scale.
+   * Get the base scale.
    *
-   * @returns {number} The window scale.
+   * @returns {object} The scale as {x,y}.
    */
-  this.getWindowScale = function () {
-    return layerController.getWindowScale();
+  this.getBaseScale = function () {
+    return layerController.getBaseScale();
   };
 
   /**
@@ -406,7 +416,7 @@ dwv.App = function () {
     layerController.fitToContainer();
     layerController.draw();
     // update style
-    style.setScale(layerController.getWindowScale());
+    style.setBaseScale(layerController.getBaseScale());
   };
 
   /**
@@ -468,15 +478,6 @@ dwv.App = function () {
     var drawController =
       layerController.getActiveDrawLayer().getDrawController();
     return drawController.getDrawDisplayDetails();
-  };
-
-  /**
-   * Get the meta data.
-   *
-   * @returns {object} The list of meta data.
-   */
-  this.getMetaData = function () {
-    return metaData[0];
   };
 
   /**
@@ -800,10 +801,9 @@ dwv.App = function () {
   function onloadstart(event) {
     isFirstLoadItem = true;
 
-    // TODO: add access to reset...
-    // if (event.loadtype === 'image') {
-    //   self.reset();
-    // }
+    if (event.loadtype === 'image') {
+      self.reset();
+    }
 
     /**
      * Load start event.
@@ -1097,7 +1097,7 @@ dwv.App = function () {
     layerController.initialise(images[0], metaData[0]);
 
     // update style
-    style.setScale(layerController.getWindowScale());
+    style.setBaseScale(layerController.getBaseScale());
     // bind view to app
     bindViewLayer(layerController.getActiveViewLayer());
 

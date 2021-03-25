@@ -329,7 +329,7 @@ dwv.tool.Livewire = function (app) {
       scissors.setData(viewLayer.getImageData().data);
 
       // init with the app window scale
-      this.style.setScale(app.getWindowScale());
+      this.style.setBaseScale(app.getBaseScale());
       // set the default to the first in the list
       this.setLineColour(this.style.getLineColour());
     }

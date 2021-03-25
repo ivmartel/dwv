@@ -456,7 +456,7 @@ dwv.tool.Floodfill = function (app) {
   this.activate = function (bool) {
     if (bool) {
       // init with the app window scale
-      this.style.setScale(app.getWindowScale());
+      this.style.setBaseScale(app.getBaseScale());
       // set the default to the first in the list
       this.setLineColour(this.style.getLineColour());
     }

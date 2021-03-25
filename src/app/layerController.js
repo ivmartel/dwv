@@ -35,12 +35,12 @@ dwv.LayerController = function (containerDiv) {
   var scale = {x: 1, y: 1};
 
   /**
-   * The window scale.
+   * The base scale as {x,y}: all posterior scale will be on top of this one.
    *
    * @private
-   * @type {number}
+   * @type {object}
    */
-  var windowScale = 1;
+  var baseScale = {x: 1, y: 1};
 
   /**
    * The layer offset as {x,y}.
@@ -92,12 +92,24 @@ dwv.LayerController = function (containerDiv) {
   };
 
   /**
-   * Get the window scale.
+   * Get the base scale.
    *
-   * @returns {number} The window scale.
+   * @returns {object} The scale as {x,y}.
    */
-  this.getWindowScale = function () {
-    return windowScale;
+  this.getBaseScale = function () {
+    return baseScale;
+  };
+
+  /**
+   * Get the added scale: the scale added to the base scale
+   *
+   * @returns {object} The scale as {x,y}.
+   */
+  this.getAddedScale = function () {
+    return {
+      x: scale.x / baseScale.x,
+      y: scale.y / baseScale.y
+    };
   };
 
   /**
@@ -254,7 +266,8 @@ dwv.LayerController = function (containerDiv) {
    * To be called once the image is loaded.
    */
   this.fitToContainer = function () {
-    this.resize(this.getFitToContainerScale());
+    var fitScale = this.getFitToContainerScale();
+    this.resize({x: fitScale, y: fitScale});
   };
 
   /**
@@ -391,33 +404,32 @@ dwv.LayerController = function (containerDiv) {
    * Reset the stage to its initial scale and no offset.
    */
   this.reset = function () {
-    this.setScale({x: windowScale, y: windowScale});
+    this.setScale(baseScale);
     this.setOffset({x: 0, y: 0});
   };
 
   /**
-   * Resize the layer: update the window scale and layer sizes.
+   * Resize the layer: update the base scale and layer sizes.
    *
-   * @param {number} newScale the layer scale.
+   * @param {number} newScale The scale as {x,y}.
    */
   this.resize = function (newScale) {
-    // set scale
-    var ratio = newScale / windowScale;
+    // store
     scale = {
-      x: scale.x * ratio,
-      y: scale.y * ratio
+      x: scale.x * newScale.x / baseScale.x,
+      y: scale.y * newScale.y / baseScale.y
     };
-    windowScale = newScale;
+    baseScale = newScale;
 
     // resize container
-    var width = parseInt(layerSize.x * windowScale, 10);
-    var height = parseInt(layerSize.y * windowScale, 10);
+    var width = parseInt(layerSize.x * baseScale.x, 10);
+    var height = parseInt(layerSize.y * baseScale.y, 10);
     containerDiv.style.width = width + 'px';
     containerDiv.style.height = height + 'px';
 
     // call resize and scale on layers
     for (var i = 0; i < layers.length; ++i) {
-      layers[i].resize({x: windowScale, y: windowScale});
+      layers[i].resize(baseScale);
       layers[i].setScale(scale);
     }
   };

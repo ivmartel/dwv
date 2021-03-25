@@ -491,7 +491,7 @@ dwv.tool.Draw = function (app) {
       app.addEventListener('framechange', updateDrawLayer);
 
       // init with the app window scale
-      this.style.setScale(app.getWindowScale());
+      this.style.setBaseScale(app.getBaseScale());
       // same for colour
       this.setLineColour(this.style.getLineColour());
     } else {
