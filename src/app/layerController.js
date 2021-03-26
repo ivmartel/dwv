@@ -221,8 +221,8 @@ dwv.LayerController = function (containerDiv) {
     // clean container div
     var previous = containerDiv.getElementsByClassName('layer');
     if (previous) {
-      for (var i = 0; i < previous.length; ++i) {
-        previous[i].remove();
+      while (previous.length > 0) {
+        previous[0].remove();
       }
     }
   };
