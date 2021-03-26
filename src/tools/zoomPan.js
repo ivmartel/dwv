@@ -65,8 +65,7 @@ dwv.tool.ZoomAndPan = function (app) {
     var tx = event._xs - self.x0;
     var ty = event._ys - self.y0;
     // apply translation
-    //app.translate(tx, ty);
-    app.stepTranslate(tx, ty);
+    app.translate(tx, ty);
     // reset origin point
     self.x0 = event._xs;
     self.y0 = event._ys;
@@ -94,17 +93,20 @@ dwv.tool.ZoomAndPan = function (app) {
       if (Math.abs(diffY) < 15) {
         return;
       }
+      var layerController = app.getLayerController();
+      var viewController =
+        layerController.getActiveViewLayer().getViewController();
       // update view controller
       if (diffY > 0) {
-        app.getViewController().incrementSliceNb();
+        viewController.incrementSliceNb();
       } else {
-        app.getViewController().decrementSliceNb();
+        viewController.decrementSliceNb();
       }
     } else {
       // zoom mode
       var zoom = (lineRatio - 1) / 2;
       if (Math.abs(zoom) % 0.1 <= 0.05) {
-        app.stepZoom(zoom, event._xs, event._ys);
+        app.zoom(zoom, event._xs, event._ys);
       }
     }
   };
@@ -175,7 +177,7 @@ dwv.tool.ZoomAndPan = function (app) {
   this.DOMMouseScroll = function (event) {
     // ev.detail on firefox is 3
     var step = -event.detail / 30;
-    app.stepZoom(step, event._xs, event._ys);
+    app.zoom(step, event._xs, event._ys);
   };
 
   /**
@@ -186,7 +188,7 @@ dwv.tool.ZoomAndPan = function (app) {
   this.mousewheel = function (event) {
     // ev.wheelDelta on chrome is 120
     var step = event.wheelDelta / 1200;
-    app.stepZoom(step, event._xs, event._ys);
+    app.zoom(step, event._xs, event._ys);
   };
 
   /**

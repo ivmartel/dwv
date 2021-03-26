@@ -156,12 +156,12 @@ dwv.tool.Draw = function (app) {
   var listeners = {};
 
   /**
-   * The associated draw layer.
+   * The associated Konva layer.
    *
    * @private
    * @type {object}
    */
-  var drawLayer = null;
+  var konvaLayer = null;
 
   /**
    * Handle mouse down event.
@@ -174,15 +174,17 @@ dwv.tool.Draw = function (app) {
       return;
     }
 
+    var layerController = app.getLayerController();
+    var drawLayer = layerController.getActiveDrawLayer();
+
     // determine if the click happened in an existing shape
-    var stage = app.getDrawStage();
+    var stage = drawLayer.getKonvaStage();
     var kshape = stage.getIntersection({
       x: event._xs,
       y: event._ys
     });
 
     // update scale
-    self.style.setScale(app.getWindowScale());
     self.style.setZoomScale(stage.scale());
 
     if (kshape) {
@@ -193,7 +195,9 @@ dwv.tool.Draw = function (app) {
       if (selectedShape && selectedShape !== shapeEditor.getShape()) {
         shapeEditor.disable();
         shapeEditor.setShape(selectedShape);
-        shapeEditor.setViewController(app.getViewController());
+        var viewController =
+          layerController.getActiveViewLayer().getViewController();
+        shapeEditor.setViewController(viewController);
         shapeEditor.enable();
       }
     } else {
@@ -376,7 +380,7 @@ dwv.tool.Draw = function (app) {
         shapeGroup.getChildren(dwv.draw.isNodeNameShape)[0]);
       // delete command
       var delcmd = new dwv.tool.DeleteGroupCommand(shapeGroup,
-        shapeDisplayName, drawLayer);
+        shapeDisplayName, konvaLayer);
       delcmd.onExecute = fireEvent;
       delcmd.onUndo = fireEvent;
       delcmd.execute();
@@ -393,7 +397,7 @@ dwv.tool.Draw = function (app) {
       started = false;
       points = [];
       // redraw
-      drawLayer.draw();
+      konvaLayer.draw();
     }
   };
 
@@ -408,15 +412,18 @@ dwv.tool.Draw = function (app) {
       tmpShapeGroup.destroy();
     }
     // create shape group
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
     tmpShapeGroup = currentFactory.create(
-      tmpPoints, self.style, app.getViewController());
+      tmpPoints, self.style, viewController);
     // do not listen during creation
     var shape = tmpShapeGroup.getChildren(dwv.draw.isNodeNameShape)[0];
     shape.listening(false);
-    drawLayer.listening(false);
+    konvaLayer.listening(false);
     // draw shape
-    drawLayer.add(tmpShapeGroup);
-    drawLayer.draw();
+    konvaLayer.add(tmpShapeGroup);
+    konvaLayer.draw();
   }
 
   /**
@@ -429,21 +436,28 @@ dwv.tool.Draw = function (app) {
     if (tmpShapeGroup) {
       tmpShapeGroup.destroy();
     }
+
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
+    var drawController =
+      layerController.getActiveDrawLayer().getDrawController();
+
     // create final shape
     var finalShapeGroup = currentFactory.create(
-      finalPoints, self.style, app.getViewController());
+      finalPoints, self.style, viewController);
     finalShapeGroup.id(dwv.math.guid());
 
     // get the position group
-    var posGroup = app.getDrawController().getCurrentPosGroup();
+    var posGroup = drawController.getCurrentPosGroup();
     // add shape group to position group
     posGroup.add(finalShapeGroup);
 
     // re-activate layer
-    drawLayer.listening(true);
+    konvaLayer.listening(true);
     // draw shape command
     command = new dwv.tool.DrawGroupCommand(
-      finalShapeGroup, self.shapeName, drawLayer);
+      finalShapeGroup, self.shapeName, konvaLayer);
     command.onExecute = fireEvent;
     command.onUndo = fireEvent;
     // execute it
@@ -466,18 +480,18 @@ dwv.tool.Draw = function (app) {
     shapeEditor.setShape(null);
     shapeEditor.setViewController(null);
     document.body.style.cursor = 'default';
-    // make layer listen or not to events
-    app.getDrawStage().listening(flag);
     // get the current draw layer
-    drawLayer = app.getDrawController().getDrawLayer();
-    renderDrawLayer(flag);
+    var layerController = app.getLayerController();
+    var drawLayer = layerController.getActiveDrawLayer();
+    konvaLayer = drawLayer.getKonvaLayer();
+    activateCurrentPositionShapes(flag);
     // listen to app change to update the draw layer
     if (flag) {
       app.addEventListener('slicechange', updateDrawLayer);
       app.addEventListener('framechange', updateDrawLayer);
 
       // init with the app window scale
-      this.style.setScale(app.getWindowScale());
+      this.style.setBaseScale(app.getBaseScale());
       // same for colour
       this.setLineColour(this.style.getLineColour());
     } else {
@@ -490,41 +504,38 @@ dwv.tool.Draw = function (app) {
    * Update the draw layer.
    */
   function updateDrawLayer() {
-    // activate the draw layer
-    renderDrawLayer(true);
+    // activate the shape at current position
+    activateCurrentPositionShapes(true);
   }
 
   /**
-   * Render (or not) the draw layer.
+   * Activate shapes at current position.
    *
    * @param {boolean} visible Set the draw layer visible or not.
    */
-  function renderDrawLayer(visible) {
-
-    drawLayer.listening(visible);
+  function activateCurrentPositionShapes(visible) {
+    var layerController = app.getLayerController();
+    var drawController =
+      layerController.getActiveDrawLayer().getDrawController();
 
     // get shape groups at the current position
     var shapeGroups =
-      app.getDrawController().getCurrentPosGroup().getChildren();
+      drawController.getCurrentPosGroup().getChildren();
 
     // set shape display properties
     if (visible) {
-      // activate tool listeners
-      app.addToolCanvasListeners(app.getDrawStage().getContent());
       // activate shape listeners
       shapeGroups.forEach(function (group) {
         self.setShapeOn(group);
       });
     } else {
-      // de-activate tool listeners
-      app.removeToolCanvasListeners(app.getDrawStage().getContent());
       // de-activate shape listeners
       shapeGroups.forEach(function (group) {
         setShapeOff(group);
       });
     }
     // draw
-    drawLayer.draw();
+    konvaLayer.draw();
   }
 
   /**
@@ -552,7 +563,9 @@ dwv.tool.Draw = function (app) {
    * @private
    */
   function getRealPosition(index) {
-    var stage = app.getDrawStage();
+    var layerController = app.getLayerController();
+    var drawLayer = layerController.getActiveDrawLayer();
+    var stage = drawLayer.getKonvaStage();
     return {
       x: stage.offset().x + index.x / stage.scale().x,
       y: stage.offset().y + index.y / stage.scale().y
@@ -590,23 +603,26 @@ dwv.tool.Draw = function (app) {
       // store colour
       colour = shapeGroup.getChildren(dwv.draw.isNodeNameShape)[0].stroke();
       // display trash
-      var stage = app.getDrawStage();
+      var layerController = app.getLayerController();
+      var drawLayer = layerController.getActiveDrawLayer();
+      var stage = drawLayer.getKonvaStage();
       var scale = stage.scale();
       var invscale = {x: 1 / scale.x, y: 1 / scale.y};
       trash.x(stage.offset().x + (stage.width() / (2 * scale.x)));
       trash.y(stage.offset().y + (stage.height() / (15 * scale.y)));
       trash.scale(invscale);
-      drawLayer.add(trash);
+      konvaLayer.add(trash);
       // deactivate anchors to avoid events on null shape
       shapeEditor.setAnchorsActive(false);
       // draw
-      drawLayer.draw();
+      konvaLayer.draw();
     });
     // drag move event handling
     shapeGroup.on('dragmove.draw', function (event) {
+      var layerController = app.getLayerController();
+      var drawLayer = layerController.getActiveDrawLayer();
       // validate the group position
-      dwv.tool.validateGroupPosition(
-        app.getDrawController().getInitialSize(), this);
+      dwv.tool.validateGroupPosition(drawLayer.getSize(), this);
       // highlight trash when on it
       var offset = dwv.html.getEventOffset(event.evt)[0];
       var eventPos = getRealPosition(offset);
@@ -635,7 +651,7 @@ dwv.tool.Draw = function (app) {
           });
       }
       // draw
-      drawLayer.draw();
+      konvaLayer.draw();
     });
     // drag end event handling
     shapeGroup.on('dragend.draw', function (event) {
@@ -665,7 +681,7 @@ dwv.tool.Draw = function (app) {
         document.body.style.cursor = 'default';
         // delete command
         var delcmd = new dwv.tool.DeleteGroupCommand(this,
-          shapeDisplayName, drawLayer);
+          shapeDisplayName, konvaLayer);
         delcmd.onExecute = fireEvent;
         delcmd.onUndo = fireEvent;
         delcmd.execute();
@@ -676,7 +692,7 @@ dwv.tool.Draw = function (app) {
           y: pos.y - dragStartPos.y};
         if (translation.x !== 0 || translation.y !== 0) {
           var mvcmd = new dwv.tool.MoveGroupCommand(this,
-            shapeDisplayName, translation, drawLayer);
+            shapeDisplayName, translation, konvaLayer);
           mvcmd.onExecute = fireEvent;
           mvcmd.onUndo = fireEvent;
           app.addToUndoStack(mvcmd);
@@ -692,7 +708,7 @@ dwv.tool.Draw = function (app) {
         shapeEditor.resetAnchors();
       }
       // draw
-      drawLayer.draw();
+      konvaLayer.draw();
       // reset start position
       dragStartPos = {x: this.x(), y: this.y()};
     });
@@ -717,7 +733,7 @@ dwv.tool.Draw = function (app) {
           type: 'drawchange'
         });
         // draw
-        drawLayer.draw();
+        konvaLayer.draw();
       };
 
       // call client dialog if defined

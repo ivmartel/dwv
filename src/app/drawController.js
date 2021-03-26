@@ -122,19 +122,11 @@ dwv.draw.getHierarchyLog = function (layer, prefix) {
  * Draw controller.
  *
  * @class
- * @param {object} drawDiv The HTML div used to store the drawings.
+ * @param {object} konvaLayer The draw layer.
  */
-dwv.DrawController = function (drawDiv) {
-  // Draw stage
-  var drawStage = null;
-  // Draw layer
-  var drawLayer;
+dwv.DrawController = function (konvaLayer) {
   // current position group id
   var currentPosGroupId = null;
-  // initial stage width
-  var stageWidth;
-  // initial stage height
-  var stageHeight;
 
   /**
    * Get the current position group.
@@ -143,7 +135,7 @@ dwv.DrawController = function (drawDiv) {
    */
   this.getCurrentPosGroup = function () {
     // get position groups
-    var posGroups = drawLayer.getChildren(function (node) {
+    var posGroups = konvaLayer.getChildren(function (node) {
       return node.id() === currentPosGroupId;
     });
     // if one group, use it
@@ -157,7 +149,7 @@ dwv.DrawController = function (drawDiv) {
       posGroup.id(currentPosGroupId);
       posGroup.visible(true); // dont inherit
       // add new group to layer
-      drawLayer.add(posGroup);
+      konvaLayer.add(posGroup);
     } else {
       dwv.logger.warn('Unexpected number of draw position groups.');
     }
@@ -166,86 +158,28 @@ dwv.DrawController = function (drawDiv) {
   };
 
   /**
-   * Get the initial stage size.
-   *
-   * @returns {object} The size as {x,y}.
-   */
-  this.getInitialSize = function () {
-    return {
-      x: stageWidth,
-      y: stageHeight
-    };
-  };
-
-  /**
-   * Create the controller: sets up the draw stage.
-   *
-   * @param {number} width The width of the stage.
-   * @param {number} height The height of the stage.
-   */
-  this.create = function (width, height) {
-    // store size
-    stageWidth = width;
-    stageHeight = height;
-    // create stage
-    drawStage = new Konva.Stage({
-      container: drawDiv,
-      width: width,
-      height: height,
-      listening: false
-    });
-    // reset style
-    // (avoids a not needed vertical scrollbar)
-    drawStage.getContent().setAttribute('style', '');
-
-    // create layer
-    drawLayer = new Konva.Layer({
-      listening: false,
-      visible: true
-    });
-    drawStage.add(drawLayer);
-  };
-
-  /**
-   * Get the draw layer.
-   *
-   * @returns {object} The draw layer.
-   */
-  this.getDrawLayer = function () {
-    return drawLayer;
-  };
-
-  /**
    * Reset: clear the layers array.
    */
   this.reset = function () {
-    drawLayer = null;
-  };
-
-  /**
-   * Get the draw stage.
-   *
-   * @returns {object} The draw layer.
-   */
-  this.getDrawStage = function () {
-    return drawStage;
+    konvaLayer = null;
   };
 
   /**
    * Activate the current draw layer.
    *
-   * @param {object} viewController The associated view controller.
+   * @param {object} currentPosition The current {i,j,k} position.
+   * @param {number} currentFrame The current frame number.
    */
-  this.activateDrawLayer = function (viewController) {
+  this.activateDrawLayer = function (currentPosition, currentFrame) {
     // set current position
-    var currentSlice = viewController.getCurrentPosition().k;
-    var currentFrame = viewController.getCurrentFrame();
+    var currentSlice = currentPosition.k;
+    // var currentFrame = viewController.getCurrentFrame();
     // get and store the position group id
     currentPosGroupId = dwv.draw.getDrawPositionGroupId(
       currentSlice, currentFrame);
 
     // get all position groups
-    var posGroups = drawLayer.getChildren(dwv.draw.isPositionNode);
+    var posGroups = konvaLayer.getChildren(dwv.draw.isPositionNode);
     // reset or set the visible property
     var visible;
     for (var i = 0, leni = posGroups.length; i < leni; ++i) {
@@ -258,94 +192,7 @@ dwv.DrawController = function (drawDiv) {
     }
 
     // show current draw layer
-    drawLayer.draw();
-  };
-
-  /**
-   * Update label scale: compensate for it so
-   *   that label size stays visually the same.
-   *
-   * @param {object} scale The scale to compensate for
-   */
-  function updateLabelScale(scale) {
-    // same formula as in style::applyZoomScale:
-    // compensate for scale and times 2 so that font 10 looks like a 10
-    var ratioX = 2 / scale.x;
-    var ratioY = 2 / scale.y;
-    // compensate scale for labels
-    var labels = drawStage.find('Label');
-    for (var i = 0; i < labels.length; ++i) {
-      labels[i].scale({x: ratioX, y: ratioY});
-    }
-  }
-
-  /**
-   * Reset the stage with a new window scale.
-   *
-   * @param {number} windowScale The window scale.
-   */
-  this.resetStage = function (windowScale) {
-    var scale = {x: windowScale, y: windowScale};
-    drawStage.offset({x: 0, y: 0});
-    drawStage.scale(scale);
-    updateLabelScale(scale);
-    drawStage.draw();
-  };
-
-  /**
-   * Resize the current stage.
-   *
-   * @param {number} width the stage width.
-   * @param {number} height the stage height.
-   * @param {number} scale the stage scale.
-   */
-  this.resizeStage = function (width, height, scale) {
-    var newScale = {x: scale, y: scale};
-    // resize div
-    drawDiv.setAttribute('style',
-      'width:' + width + 'px;height:' + height + 'px');
-    // resize stage
-    drawStage.setWidth(width);
-    drawStage.setHeight(height);
-    drawStage.scale(newScale);
-    updateLabelScale(newScale);
-    drawStage.draw();
-  };
-
-  /**
-   * Zoom the stage.
-   *
-   * @param {number} scale The scale factor.
-   * @param {object} scaleCenter The scale center point.
-   */
-  this.zoomStage = function (scale, scaleCenter) {
-    // zoom
-    var newScale = {x: scale, y: scale};
-    // offset
-    // TODO different from the imageLayer offset?
-    var oldScale = drawStage.scale();
-    var oldOffset = drawStage.offset();
-    var newOffsetX = (scaleCenter.x / oldScale.x) +
-            oldOffset.x - (scaleCenter.x / newScale.x);
-    var newOffsetY = (scaleCenter.y / oldScale.y) +
-            oldOffset.y - (scaleCenter.y / newScale.y);
-    var newOffset = {x: newOffsetX, y: newOffsetY};
-    // store
-    drawStage.offset(newOffset);
-    drawStage.scale(newScale);
-    updateLabelScale(newScale);
-    drawStage.draw();
-  };
-
-  /**
-   * Translate the stage.
-   *
-   * @param {number} tx The X translation.
-   * @param {number} ty The Y translation.
-   */
-  this.translateStage = function (tx, ty) {
-    drawStage.offset({x: tx, y: ty});
-    drawStage.draw();
+    konvaLayer.draw();
   };
 
   /**
@@ -355,7 +202,7 @@ dwv.DrawController = function (drawDiv) {
    */
   this.getDrawDisplayDetails = function () {
     var list = [];
-    var groups = drawLayer.getChildren();
+    var groups = konvaLayer.getChildren();
     for (var j = 0, lenj = groups.length; j < lenj; ++j) {
       var position = dwv.draw.getPositionFromGroupId(groups[j].id());
       var collec = groups[j].getChildren();
@@ -403,7 +250,7 @@ dwv.DrawController = function (drawDiv) {
     var drawingsDetails = {};
 
     // get all position groups
-    var posGroups = drawLayer.getChildren(dwv.draw.isPositionNode);
+    var posGroups = konvaLayer.getChildren(dwv.draw.isPositionNode);
 
     var posKids;
     var group;
@@ -451,8 +298,8 @@ dwv.DrawController = function (drawDiv) {
       var statePosGroup = statePosGroups[i];
 
       // Get or create position-group if it does not exist and
-      // append it to drawLayer
-      var posGroup = drawLayer.getChildren(
+      // append it to konvaLayer
+      var posGroup = konvaLayer.getChildren(
         dwv.draw.isNodeWithId(statePosGroup.id()))[0];
       if (typeof posGroup === 'undefined') {
         posGroup = new Konva.Group({
@@ -460,7 +307,7 @@ dwv.DrawController = function (drawDiv) {
           name: 'position-group',
           visible: false
         });
-        drawLayer.add(posGroup);
+        konvaLayer.add(posGroup);
       }
 
       var statePosKids = statePosGroup.getChildren();
@@ -475,7 +322,7 @@ dwv.DrawController = function (drawDiv) {
         // create the draw command
         var cmd = new dwv.tool.DrawGroupCommand(
           stateGroup, shape.className,
-          drawLayer, true);
+          konvaLayer, true);
         // draw command callbacks
         cmd.onExecute = cmdCallback;
         cmd.onUndo = cmdCallback;
@@ -505,7 +352,7 @@ dwv.DrawController = function (drawDiv) {
    */
   this.updateDraw = function (drawDetails) {
     // get the group
-    var group = drawLayer.findOne('#' + drawDetails.id);
+    var group = konvaLayer.findOne('#' + drawDetails.id);
     if (typeof group === 'undefined') {
       dwv.logger.warn(
         '[updateDraw] Cannot find group with id: ' + drawDetails.id
@@ -545,7 +392,7 @@ dwv.DrawController = function (drawDiv) {
     }
 
     // udpate current layer
-    drawLayer.draw();
+    konvaLayer.draw();
   };
 
   /**
@@ -556,7 +403,7 @@ dwv.DrawController = function (drawDiv) {
    */
   this.isGroupVisible = function (drawDetails) {
     // get the group
-    var group = drawLayer.findOne('#' + drawDetails.id);
+    var group = konvaLayer.findOne('#' + drawDetails.id);
     if (typeof group === 'undefined') {
       dwv.logger.warn(
         '[isGroupVisible] Cannot find node with id: ' + drawDetails.id
@@ -575,7 +422,7 @@ dwv.DrawController = function (drawDiv) {
    */
   this.toogleGroupVisibility = function (drawDetails) {
     // get the group
-    var group = drawLayer.findOne('#' + drawDetails.id);
+    var group = konvaLayer.findOne('#' + drawDetails.id);
     if (typeof group === 'undefined') {
       dwv.logger.warn(
         '[toogleGroupVisibility] Cannot find node with id: ' + drawDetails.id
@@ -586,7 +433,7 @@ dwv.DrawController = function (drawDiv) {
     group.visible(!group.isVisible());
 
     // udpate current layer
-    drawLayer.draw();
+    konvaLayer.draw();
   };
 
   /**
@@ -598,7 +445,7 @@ dwv.DrawController = function (drawDiv) {
    *   DeleteCommand has been executed.
    */
   this.deleteDrawGroupId = function (groupId, cmdCallback, exeCallback) {
-    var groups = drawLayer.getChildren();
+    var groups = konvaLayer.getChildren();
     var groupToDelete = groups.getChildren(function (node) {
       return node.id() === groupId;
     });
@@ -625,7 +472,7 @@ dwv.DrawController = function (drawDiv) {
     var shape = group.getChildren(dwv.draw.isNodeNameShape)[0];
     var shapeDisplayName = dwv.tool.GetShapeDisplayName(shape);
     var delcmd = new dwv.tool.DeleteGroupCommand(
-      group, shapeDisplayName, drawLayer);
+      group, shapeDisplayName, konvaLayer);
     delcmd.onExecute = cmdCallback;
     delcmd.onUndo = cmdCallback;
     delcmd.execute();
@@ -640,7 +487,7 @@ dwv.DrawController = function (drawDiv) {
    *  DeleteCommand has been executed.
    */
   this.deleteDraws = function (cmdCallback, exeCallback) {
-    var groups = drawLayer.getChildren();
+    var groups = konvaLayer.getChildren();
     while (groups.length) {
       this.deleteDrawGroup(groups[0], cmdCallback, exeCallback);
     }

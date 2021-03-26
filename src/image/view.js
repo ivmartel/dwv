@@ -3,6 +3,21 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
+ * List of view event names.
+ *
+ * @type {Array}
+ */
+dwv.image.viewEventNames = [
+  'slicechange',
+  'framechange',
+  'wlwidthchange',
+  'wlcenterchange',
+  'wlpresetadd',
+  'colourchange',
+  'positionchange'
+];
+
+/**
  * View class.
  *
  * @class

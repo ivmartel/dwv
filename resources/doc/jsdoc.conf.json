@@ -30,6 +30,13 @@
         "tests"
       ]
     },
+    "templates": {
+      "default": {
+        "staticFiles": {
+          "include": ["resources/doc/img"]
+        }
+      }
+    },
     "opts": {
       "recurse": true,
       "readme": "resources/doc/readme-doc.md",

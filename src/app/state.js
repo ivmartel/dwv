@@ -10,6 +10,7 @@ var Konva = Konva || {};
  * History:
  * - v0.4 (dwv 0.29.0, ??/2021)
  *   - move drawing details into meta property
+ *   - remove scale center and translation, add offset
  * - v0.3 (dwv v0.23.0, 03/2018)
  *   - new drawing structure, drawings are now the full layer object and
  *     using toObject to avoid saving a string representation
@@ -34,16 +35,19 @@ dwv.State = function () {
    * @returns {string} The state as a JSON string.
    */
   this.toJSON = function (app) {
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
+    var drawLayer = layerController.getActiveDrawLayer();
     // return a JSON string
     return JSON.stringify({
       version: '0.4',
-      'window-center': app.getViewController().getWindowLevel().center,
-      'window-width': app.getViewController().getWindowLevel().width,
-      position: app.getViewController().getCurrentPosition(),
-      scale: app.getScale(),
-      scaleCenter: app.getScaleCenter(),
-      translation: app.getTranslation(),
-      drawings: app.getDrawController().getDrawLayer().toObject(),
+      'window-center': viewController.getWindowLevel().center,
+      'window-width': viewController.getWindowLevel().width,
+      position: viewController.getCurrentPosition(),
+      scale: app.getAddedScale(),
+      offset: app.getOffset(),
+      drawings: drawLayer.getKonvaLayer().toObject(),
       drawingsDetails: app.getDrawStoreDetails()
     });
   };
@@ -77,13 +81,49 @@ dwv.State = function () {
    * @param {object} data The state data.
    */
   this.apply = function (app, data) {
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
     // display
-    app.getViewController().setWindowLevel(
+    viewController.setWindowLevel(
       data['window-center'], data['window-width']);
-    app.getViewController().setCurrentPosition(data.position);
-    app.zoom(data.scale, data.scaleCenter.x, data.scaleCenter.y);
-    app.translate(data.translation.x, data.translation.y);
-    // drawings
+    viewController.setCurrentPosition(data.position);
+    // apply saved scale on top of current base one
+    var baseScale = app.getLayerController().getBaseScale();
+    var scale = null;
+    var offset = null;
+    if (typeof data.scaleCenter !== 'undefined') {
+      scale = {
+        x: data.scale * baseScale.x,
+        y: data.scale * baseScale.y,
+      };
+      // ---- transform translation (now) ----
+      // Tx = -offset.x * scale.x
+      // => offset.x = -Tx / scale.x
+      // ---- transform translation (before) ----
+      // origin.x = centerX - (centerX - origin.x) * (newZoomX / zoom.x);
+      // (zoom.x -> initial zoom = base scale, origin.x = 0)
+      // Tx = origin.x + (trans.x * zoom.x)
+      var originX = data.scaleCenter.x - data.scaleCenter.x * data.scale;
+      var originY = data.scaleCenter.y - data.scaleCenter.y * data.scale;
+      var oldTx = originX + data.translation.x * scale.x;
+      var oldTy = originY + data.translation.y * scale.y;
+      offset = {
+        x: -oldTx / scale.x,
+        y: -oldTy / scale.y
+      };
+    } else {
+      scale = {
+        x: data.scale.x * baseScale.x,
+        y: data.scale.y * baseScale.y
+      };
+      offset = data.offset;
+    }
+    app.getLayerController().setScale(scale);
+    app.getLayerController().setOffset(offset);
+    // render to draw the view layer
+    app.render();
+    // drawings (will draw the draw layer)
     app.setDrawings(data.drawings, data.drawingsDetails);
   };
   /**

@@ -230,14 +230,18 @@ dwv.tool.Floodfill = function (app) {
       shapeGroup = factory.create(border, self.style);
       shapeGroup.id(dwv.math.guid());
 
+      var layerController = app.getLayerController();
+      var drawLayer = layerController.getActiveDrawLayer();
+      var drawController = drawLayer.getDrawController();
+
       // get the position group
-      var posGroup = app.getDrawController().getCurrentPosGroup();
+      var posGroup = drawController.getCurrentPosGroup();
       // add shape group to position group
       posGroup.add(shapeGroup);
 
       // draw shape command
       command = new dwv.tool.DrawGroupCommand(shapeGroup, 'floodfill',
-        app.getDrawController().getDrawLayer());
+        drawLayer.getKonvaLayer());
       command.onExecute = fireEvent;
       command.onUndo = fireEvent;
       // // draw
@@ -267,7 +271,11 @@ dwv.tool.Floodfill = function (app) {
       shapeGroup.destroy();
     }
 
-    var pos = app.getViewController().getCurrentPosition();
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
+
+    var pos = viewController.getCurrentPosition();
     var threshold = currentthreshold || initialthreshold;
 
     // Iterate over the next images and paint border on each slice.
@@ -278,18 +286,18 @@ dwv.tool.Floodfill = function (app) {
       if (!paintBorder(initialpoint, threshold)) {
         break;
       }
-      app.getViewController().incrementSliceNb();
+      viewController.incrementSliceNb();
     }
-    app.getViewController().setCurrentPosition(pos);
+    viewController.setCurrentPosition(pos);
 
     // Iterate over the prev images and paint border on each slice.
     for (var j = pos.k, jl = ini ? ini : 0; j > jl; j--) {
       if (!paintBorder(initialpoint, threshold)) {
         break;
       }
-      app.getViewController().decrementSliceNb();
+      viewController.decrementSliceNb();
     }
-    app.getViewController().setCurrentPosition(pos);
+    viewController.setCurrentPosition(pos);
   };
 
   /**
@@ -341,7 +349,11 @@ dwv.tool.Floodfill = function (app) {
    * @param {object} event The mouse down event.
    */
   this.mousedown = function (event) {
-    imageInfo = app.getImageData();
+    var layerController = app.getLayerController();
+    var viewLayer = layerController.getActiveViewLayer();
+    var drawLayer = layerController.getActiveDrawLayer();
+
+    imageInfo = viewLayer.getImageData();
     if (!imageInfo) {
       dwv.logger.error('No image found');
       return;
@@ -349,7 +361,7 @@ dwv.tool.Floodfill = function (app) {
 
     // update zoom scale
     self.style.setZoomScale(
-      app.getDrawController().getDrawLayer().getAbsoluteScale());
+      drawLayer.getKonvaLayer().getAbsoluteScale());
 
     self.started = true;
     initialpoint = getCoord(event);
@@ -444,7 +456,7 @@ dwv.tool.Floodfill = function (app) {
   this.activate = function (bool) {
     if (bool) {
       // init with the app window scale
-      this.style.setScale(app.getWindowScale());
+      this.style.setBaseScale(app.getBaseScale());
       // set the default to the first in the list
       this.setLineColour(this.style.getLineColour());
     }

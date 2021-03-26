@@ -24,13 +24,15 @@ body {
 <!-- Local -->
 <script type="text/javascript" src="../../src/app/application.js"></script>
 <script type="text/javascript" src="../../src/app/loadController.js"></script>
+<script type="text/javascript" src="../../src/app/layerController.js"></script>
 <script type="text/javascript" src="../../src/app/viewController.js"></script>
 <script type="text/javascript" src="../../src/app/toolboxController.js"></script>
 <script type="text/javascript" src="../../src/dicom/dicomElementsWrapper.js"></script>
 <script type="text/javascript" src="../../src/dicom/dicomParser.js"></script>
 <script type="text/javascript" src="../../src/dicom/dictionary.js"></script>
 <script type="text/javascript" src="../../src/gui/generic.js"></script>
-<script type="text/javascript" src="../../src/gui/layer.js"></script>
+<script type="text/javascript" src="../../src/gui/drawLayer.js"></script>
+<script type="text/javascript" src="../../src/gui/viewLayer.js"></script>
 <script type="text/javascript" src="../../src/gui/style.js"></script>
 <script type="text/javascript" src="../../src/image/decoder.js"></script>
 <script type="text/javascript" src="../../src/image/dicomBufferToView.js"></script>
@@ -75,8 +77,6 @@ body {
 <!-- Local -->
 <script type="text/javascript" src="./viewer.js"></script>
 <script type="text/javascript">
-dwv.test.viewerSetup();
-// last minute
 document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedViewer);
 </script>
 
@@ -92,13 +92,12 @@ document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedViewer)
 <!-- DWV -->
 <div id="dwv">
   <!-- Layer Container -->
-  <div class="layerContainer">
-    <canvas class="imageLayer">Only for HTML5 compatible browsers...</canvas>
-  </div><!-- /layerContainer -->
+  <div class="layerContainer"></div>
 </div><!-- /dwv -->
 
 <label for="alpharange">Alpha:</label>
-<input type="range" id="alpharange" min="0" max="100" value="100">
+<input type="range" id="alpharange" min="0" max="1" value="1" step="0.1">
+<input type="number" id="alphanumber" min="0" max="1" value="1" step="0.1">
 
 </body>
 </html>

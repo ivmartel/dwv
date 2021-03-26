@@ -32,8 +32,11 @@ dwv.tool.Scroll = function (app) {
    */
   this.mousedown = function (event) {
     // stop viewer if playing
-    if (app.getViewController().isPlaying()) {
-      app.getViewController().stop();
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
+    if (viewController.isPlaying()) {
+      viewController.stop();
     }
     // start flag
     self.started = true;
@@ -52,6 +55,10 @@ dwv.tool.Scroll = function (app) {
       return;
     }
 
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
+
     // difference to last Y position
     var diffY = event._y - self.y0;
     var yMove = (Math.abs(diffY) > 15);
@@ -59,9 +66,9 @@ dwv.tool.Scroll = function (app) {
     if (yMove) {
       // update view controller
       if (diffY > 0) {
-        app.getViewController().decrementSliceNb();
+        viewController.decrementSliceNb();
       } else {
-        app.getViewController().incrementSliceNb();
+        viewController.incrementSliceNb();
       }
     }
 
@@ -72,9 +79,9 @@ dwv.tool.Scroll = function (app) {
     if (xMove) {
       // update view controller
       if (diffX > 0) {
-        app.getViewController().incrementFrameNb();
+        viewController.incrementFrameNb();
       } else {
-        app.getViewController().decrementFrameNb();
+        viewController.decrementFrameNb();
       }
     }
 
@@ -185,20 +192,24 @@ dwv.tool.Scroll = function (app) {
    * @private
    */
   function mouseScroll(up) {
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
+
     var hasSlices =
       (app.getImage().getGeometry().getSize().getNumberOfSlices() !== 1);
     var hasFrames = (app.getImage().getNumberOfFrames() !== 1);
     if (up) {
       if (hasSlices) {
-        app.getViewController().incrementSliceNb();
+        viewController.incrementSliceNb();
       } else if (hasFrames) {
-        app.getViewController().incrementFrameNb();
+        viewController.incrementFrameNb();
       }
     } else {
       if (hasSlices) {
-        app.getViewController().decrementSliceNb();
+        viewController.decrementSliceNb();
       } else if (hasFrames) {
-        app.getViewController().decrementFrameNb();
+        viewController.decrementFrameNb();
       }
     }
   }
@@ -218,7 +229,10 @@ dwv.tool.Scroll = function (app) {
    * @param {object} _event The key down event.
    */
   this.dblclick = function (_event) {
-    app.getViewController().play();
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
+    viewController.play();
   };
 
   /**

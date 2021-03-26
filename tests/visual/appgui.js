@@ -33,9 +33,6 @@ dwv.addDataLine = function (id, fileroot, doc) {
   dwvDiv.className = 'dwv';
   var layConDiv = document.createElement('div');
   layConDiv.className = 'layerContainer';
-  var imgCanvas = document.createElement('canvas');
-  imgCanvas.className = 'imageLayer';
-  layConDiv.appendChild(imgCanvas);
   dwvDiv.appendChild(layConDiv);
   mainDiv.appendChild(dwvDiv);
 

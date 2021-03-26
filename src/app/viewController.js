@@ -14,6 +14,18 @@ dwv.ViewController = function (view) {
   var playerID = null;
 
   /**
+   * Initialise the controller.
+   */
+  this.initialise = function () {
+    // set window/level to first preset
+    this.setWindowLevelPresetById(0);
+    // default position
+    this.setCurrentPosition2D(0, 0);
+    // default frame
+    this.setCurrentFrame(0);
+  };
+
+  /**
    * Get the window/level presets names.
    *
    * @returns {Array} The presets names.
@@ -124,6 +136,25 @@ dwv.ViewController = function (view) {
    */
   this.canQuantifyImage = function () {
     return view.getImage().getNumberOfComponents() === 1;
+  };
+
+  /**
+   * Can window and level be applied to the data?
+   *
+   * @returns {boolean} True if the data is monochrome.
+   */
+  this.canWindowLevel = function () {
+    return view.getImage().getPhotometricInterpretation()
+      .match(/MONOCHROME/) !== null;
+  };
+
+  /**
+   * Is the data mono-frame?
+   *
+   * @returns {boolean} True if the data only contains one frame.
+   */
+  this.isMonoFrameData = function () {
+    return view.getImage().getNumberOfFrames() === 1;
   };
 
   /**
