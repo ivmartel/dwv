@@ -1,0 +1,111 @@
+{
+  "version": "0.3",
+  "window-center": 441,
+  "window-width": 911,
+  "position": {
+    "i": 0,
+    "j": 0,
+    "k": 0
+  },
+  "scale": 1.678145695364239,
+  "scaleCenter": {
+    "x": 178,
+    "y": 396
+  },
+  "translation": {
+    "x": 14.890254609306403,
+    "y": 13.766461808604035
+  },
+  "drawings": {
+    "attrs": {
+      "listening": false,
+      "hitGraphEnabled": false,
+      "visible": true
+    },
+    "className": "Layer",
+    "children": [
+      {
+        "attrs": {
+          "id": "slice-0_frame-0",
+          "name": "position-group",
+          "visible": true
+        },
+        "className": "Group",
+        "children": [
+          {
+            "attrs": {
+              "name": "line-group",
+              "visible": true,
+              "id": "pf8zteo5r4",
+              "draggable": true
+            },
+            "className": "Group",
+            "children": [
+              {
+                "attrs": {
+                  "points": [
+                    53,
+                    136,
+                    139,
+                    89
+                  ],
+                  "stroke": "#ffff80",
+                  "strokeWidth": 1.2610837438423645,
+                  "name": "shape"
+                },
+                "className": "Line"
+              },
+              {
+                "attrs": {
+                  "x": 57.38752668614738,
+                  "y": 133.60216564826828,
+                  "sides": 3,
+                  "radius": 5,
+                  "rotation": -118.65711745655813,
+                  "fill": "#ffff80",
+                  "strokeWidth": 1.2610837438423645,
+                  "name": "shape-triangle"
+                },
+                "className": "RegularPolygon"
+              },
+              {
+                "attrs": {
+                  "x": 114,
+                  "y": 74,
+                  "name": "label"
+                },
+                "className": "Label",
+                "children": [
+                  {
+                    "attrs": {
+                      "fontSize": 7.566502463054187,
+                      "fontFamily": "Verdana",
+                      "fill": "#ffff80",
+                      "name": "text",
+                      "text": "Eye"
+                    },
+                    "className": "Text"
+                  },
+                  {
+                    "attrs": {
+                      "width": 11.733047485351562,
+                      "height": 7.566502463054187
+                    },
+                    "className": "Tag"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "drawingsDetails": {
+    "pf8zteo5r4": {
+      "textExpr": "Eye",
+      "longText": "This is an eye!",
+      "quant": null
+    }
+  }
+}

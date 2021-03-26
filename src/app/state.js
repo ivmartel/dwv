@@ -97,14 +97,20 @@ dwv.State = function () {
         x: data.scale * baseScale.x,
         y: data.scale * baseScale.y,
       };
-      // TODO check calculus...
-      var originX = data.scaleCenter.x -
-        data.scaleCenter.x * data.scale;
-      var originY = data.scaleCenter.y -
-        data.scaleCenter.y * data.scale;
+      // ---- transform translation (now) ----
+      // Tx = -offset.x * scale.x
+      // => offset.x = -Tx / scale.x
+      // ---- transform translation (before) ----
+      // origin.x = centerX - (centerX - origin.x) * (newZoomX / zoom.x);
+      // (zoom.x -> initial zoom = base scale, origin.x = 0)
+      // Tx = origin.x + (trans.x * zoom.x)
+      var originX = data.scaleCenter.x - data.scaleCenter.x * data.scale;
+      var originY = data.scaleCenter.y - data.scaleCenter.y * data.scale;
+      var oldTx = originX + data.translation.x * scale.x;
+      var oldTy = originY + data.translation.y * scale.y;
       offset = {
-        x: originX / data.scale + data.translation.x,
-        y: originY / data.scale + data.translation.y
+        x: -oldTx / scale.x,
+        y: -oldTy / scale.y
       };
     } else {
       scale = {
