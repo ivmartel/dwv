@@ -8,15 +8,17 @@
     "k": 0
   },
   "scale": {
-    "x": 1,
-    "y": 1
+    "x": 2.186754966887416,
+    "y": 2.186754966887416
   },
   "offset": {
-    "x": 0,
-    "y": 0
+    "x": 31.39419723557994,
+    "y": 59.34038772550386
   },
   "drawings": {
-    "attrs": {},
+    "attrs": {
+      "listening": false
+    },
     "className": "Layer",
     "children": [
       {
@@ -28,34 +30,40 @@
         "children": [
           {
             "attrs": {
-              "name": "protractor-group",
-              "id": "49g7kqi3p4u",
+              "name": "line-group",
+              "id": "pf8zteo5r4",
               "draggable": true
             },
             "className": "Group",
             "children": [
               {
                 "attrs": {
-                  "x": 71,
-                  "y": 157.33333333333334,
+                  "x": 130,
+                  "y": 75,
+                  "scaleX": 0.38764385221078157,
+                  "scaleY": 0.38764385221078157,
                   "name": "label"
                 },
                 "className": "Label",
                 "children": [
                   {
                     "attrs": {
-                      "fontSize": 5.333333333333333,
+                      "fontSize": 10,
                       "fontFamily": "Verdana",
                       "fill": "#ffff80",
+                      "padding": 3,
+                      "shadowColor": "#000",
+                      "shadowOffsetX": 0.25,
+                      "shadowOffsetY": 0.25,
                       "name": "text",
-                      "text": "80.15 °"
+                      "text": "Eye"
                     },
                     "className": "Text"
                   },
                   {
                     "attrs": {
-                      "width": 15.4510498046875,
-                      "height": 5.333333333333333
+                      "width": 21.546875,
+                      "height": 16
                     },
                     "className": "Tag"
                   }
@@ -63,27 +71,24 @@
               },
               {
                 "attrs": {
-                  "innerRadius": 17.53663593737408,
-                  "outerRadius": 17.53663593737408,
-                  "stroke": "#ffff80",
+                  "x": 57.38752668614738,
+                  "y": 133.60216564826828,
+                  "sides": 3,
+                  "radius": 5,
+                  "rotation": -118.65711745655813,
+                  "fill": "#ffff80",
                   "strokeScaleEnabled": false,
-                  "angle": 80.69260065780668,
-                  "rotation": -280.49147701233164,
-                  "x": 81,
-                  "y": 146,
-                  "name": "shape-arc"
+                  "name": "shape-triangle"
                 },
-                "className": "Arc"
+                "className": "RegularPolygon"
               },
               {
                 "attrs": {
                   "points": [
-                    33,
-                    164,
-                    81,
-                    145,
-                    93,
-                    198
+                    53,
+                    136,
+                    139,
+                    89
                   ],
                   "stroke": "#ffff80",
                   "strokeScaleEnabled": false,
@@ -98,15 +103,10 @@
     ]
   },
   "drawingsDetails": {
-    "49g7kqi3p4u": {
+    "pf8zteo5r4": {
       "meta": {
-        "textExpr": "{angle}",
-        "quantification": {
-          "angle": {
-            "value": 80.69260065780668,
-            "unit": "°"
-          }
-        }
+        "textExpr": "Eye",
+        "quantification": {}
       }
     }
   }

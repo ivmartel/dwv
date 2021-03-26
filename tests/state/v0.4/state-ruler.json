@@ -7,12 +7,11 @@
     "j": 0,
     "k": 0
   },
-  "scale": 1,
-  "scaleCenter": {
-    "x": 0,
-    "y": 0
+  "scale": {
+    "x": 1,
+    "y": 1
   },
-  "translation": {
+  "offset": {
     "x": 0,
     "y": 0
   },

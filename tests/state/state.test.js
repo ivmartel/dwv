@@ -69,11 +69,16 @@ dwv.test.checkStateHeader = function (jsonData, version, assert) {
     version: version,
     'window-center': 441,
     'window-width': 911,
-    position: {i: 0, j: 0, k: 0},
-    scale: 1,
-    scaleCenter: {x: 0, y: 0},
-    translation: {x: 0, y: 0}
+    position: {i: 0, j: 0, k: 0}
   };
+  if (parseFloat(version) <= 0.3) {
+    headerData.scale = 1;
+    headerData.scaleCenter = {x: 0, y: 0};
+    headerData.translation = {x: 0, y: 0};
+  } else {
+    headerData.scale = {x: 1, y: 1};
+    headerData.offset = {x: 0, y: 0};
+  }
   assert.deepEqual(jsonData, headerData);
 };
 
