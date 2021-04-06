@@ -102,10 +102,18 @@ dwv.html.ViewLayer = function (containerDiv) {
   var needsDataUpdate = null;
 
   /**
+   * The associated data index.
+   *
+   * @private
+   * @type {number}
+   */
+  var dataIndex = null;
+
+  /**
    * Listener handler.
    *
-   * @type {object}
    * @private
+   * @type {object}
    */
   var listenerHandler = new dwv.utils.ListenerHandler();
 
@@ -128,13 +136,16 @@ dwv.html.ViewLayer = function (containerDiv) {
   };
 
   /**
-   * Set the image associated to the view.
+   * Handle an image change event.
    *
-   * @param {object} img The image.
+   * @param {object} event The event.
    */
-  this.setViewImage = function (img) {
-    view.setImage(img);
-    needsDataUpdate = true;
+  this.onimagechange = function (event) {
+    // event.value = [index, image]
+    if (dataIndex === event.value[0]) {
+      view.setImage(event.value[1]);
+      needsDataUpdate = true;
+    }
   };
 
   // common layer methods [start] ---------------
@@ -295,8 +306,10 @@ dwv.html.ViewLayer = function (containerDiv) {
    *
    * @param {object} image The image.
    * @param {object} metaData The image meta data.
+   * @param {number} index The associated data index.
    */
-  this.initialise = function (image, metaData) {
+  this.initialise = function (image, metaData, index) {
+    dataIndex = index;
     // create view
     var viewFactory = new dwv.image.ViewFactory();
     view = viewFactory.create(

@@ -16,10 +16,8 @@ dwv.App = function () {
   // closure to self
   var self = this;
 
-  // Image
-  var images = [];
-  // meta data
-  var metaData = [];
+  // data controller
+  var dataController = null;
 
   // Container div id
   var containerDivId = null;
@@ -58,8 +56,7 @@ dwv.App = function () {
    * @returns {Image} The associated image.
    */
   this.getImage = function () {
-    // TODO: add multi data support...
-    return images[0];
+    return dataController.get(0).image;
   };
   /**
    * Set the image.
@@ -67,12 +64,7 @@ dwv.App = function () {
    * @param {Image} img The associated image.
    */
   this.setImage = function (img) {
-    // TODO: add multi data support...
-    images[0] = img;
-    // TODO: move...
-    if (layerController) {
-      layerController.getActiveViewLayer().setViewImage(img);
-    }
+    dataController.setImage(img, 0);
   };
 
   /**
@@ -81,8 +73,7 @@ dwv.App = function () {
    * @returns {object} The list of meta data.
    */
   this.getMetaData = function () {
-    // TODO: add multi data support...
-    return metaData[0];
+    return dataController.get(0).meta;
   };
 
   /**
@@ -279,6 +270,9 @@ dwv.App = function () {
     // warn: needs the DOM to be loaded...
     layerController =
       new dwv.LayerController(self.getElement('layerContainer'));
+
+    // create data controller
+    dataController = new dwv.DataController();
   };
 
   /**
@@ -306,8 +300,7 @@ dwv.App = function () {
    */
   this.reset = function () {
     // clear objects
-    images = [];
-    metaData = [];
+    dataController.reset();
     layerController.empty();
     // reset undo/redo
     if (undoStack) {
@@ -860,19 +853,15 @@ dwv.App = function () {
     // number returned by image.appendSlice
     var sliceNb = null;
 
-    var lastImageIndex = null;
-
     var eventMetaData = null;
     if (event.loadtype === 'image') {
       if (isFirstLoadItem) {
-        // save image
-        images.push(event.data.image);
+        dataController.addNew(event.data.image, event.data.info);
       } else {
-        // append slice
-        lastImageIndex = images.length - 1;
-        sliceNb = images[lastImageIndex].appendSlice(event.data.image);
+        sliceNb = dataController.updateCurrent(
+          event.data.image, event.data.info);
       }
-      updateMetaData(event.data.info);
+
       eventMetaData = event.data.info;
     } else if (event.loadtype === 'state') {
       var state = new dwv.State();
@@ -901,12 +890,13 @@ dwv.App = function () {
     // render if asked
     if (event.loadtype === 'image' && viewOnFirstLoadItem) {
       if (isFirstLoadItem) {
-        // create view if first time
+        // initialise or add view
+        var dataIndex = dataController.getCurrentIndex();
+        var data = dataController.get(dataIndex);
         if (layerController.getNumberOfLayers() === 0) {
-          initialiseBaseLayers(images[0], metaData[0]);
+          initialiseBaseLayers(data.image, data.meta, dataIndex);
         } else {
-          lastImageIndex = images.length - 1;
-          addViewLayer(images[lastImageIndex], metaData[lastImageIndex]);
+          addViewLayer(data.image, data.meta, dataIndex);
         }
         // render
         self.render();
@@ -1018,35 +1008,6 @@ dwv.App = function () {
   }
 
   /**
-   * Update the stored meta data.
-   *
-   * @param {*} newMetaData The new meta data.
-   * @private
-   */
-  function updateMetaData(newMetaData) {
-    // store the meta data
-    if (dwv.utils.isArray(newMetaData)) {
-      // image file case
-      // TODO merge?
-      metaData.push(newMetaData);
-    } else {
-      // DICOM data case
-      var newDcmMetaData = new dwv.dicom.DicomElementsWrapper(newMetaData);
-      var newDcmMetaDataoObj = newDcmMetaData.dumpToObject();
-      if (isFirstLoadItem) {
-        metaData.push(newDcmMetaDataoObj);
-      } else {
-        var lastIndex = metaData.length - 1;
-        metaData[lastIndex] = dwv.utils.mergeObjects(
-          metaData[lastIndex],
-          newDcmMetaDataoObj,
-          'InstanceNumber',
-          'value');
-      }
-    }
-  }
-
-  /**
    * Update draw controller on slice/frame change.
    */
   function updateDrawController() {
@@ -1084,26 +1045,32 @@ dwv.App = function () {
    * Initialise the layers.
    * To be called once the DICOM data has been loaded.
    *
+   * @param {object} image The image to view.
+   * @param {object} meta The image meta data.
+   * @param {number} dataIndex The data index.
    * @private
    */
-  function initialiseBaseLayers() {
+  function initialiseBaseLayers(image, meta, dataIndex) {
     // view layer
-    layerController.addViewLayer();
+    var viewLayer = layerController.addViewLayer();
     // optional draw layer
     if (toolboxController && toolboxController.hasTool('Draw')) {
       layerController.addDrawLayer();
     }
     // initialise layers
-    layerController.initialise(images[0], metaData[0]);
+    layerController.initialise(image, meta, dataIndex);
 
     // update style
     style.setBaseScale(layerController.getBaseScale());
     // bind view to app
-    bindViewLayer(layerController.getActiveViewLayer());
+    bindViewLayer(viewLayer);
 
     // propagate layer events
     layerController.addEventListener('zoomchange', fireEvent);
     layerController.addEventListener('offsetchange', fireEvent);
+
+    // listen to image changes
+    dataController.addEventListener('imagechange', viewLayer.onimagechange);
 
     // initialise the toolbox
     if (toolboxController) {
@@ -1116,14 +1083,16 @@ dwv.App = function () {
    *
    * @param {object} image The image to view.
    * @param {object} meta The image meta data.
+   * @param {number} dataIndex The data index.
    */
-  function addViewLayer(image, meta) {
-    layerController.addViewLayer();
-    // active is now the last layer
-    var viewLayer = layerController.getActiveViewLayer();
-    viewLayer.initialise(image, meta);
+  function addViewLayer(image, meta, dataIndex) {
+    var viewLayer = layerController.addViewLayer();
+    // initialise
+    viewLayer.initialise(image, meta, dataIndex);
     // apply layer scale
     viewLayer.resize(layerController.getScale());
+    // listen to image changes
+    dataController.addEventListener('imagechange', viewLayer.onimagechange);
   }
 
 };

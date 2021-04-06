@@ -163,6 +163,8 @@ dwv.LayerController = function (containerDiv) {
 
   /**
    * Add a view layer.
+   *
+   * @returns {object} The created layer.
    */
   this.addViewLayer = function () {
     // store active index
@@ -177,10 +179,14 @@ dwv.LayerController = function (containerDiv) {
     layer.setZIndex(activeViewLayerIndex);
     // add layer
     layers.push(layer);
+    // return
+    return layer;
   };
 
   /**
    * Add a draw layer.
+   *
+   * @returns {object} The created layer.
    */
   this.addDrawLayer = function () {
     // store active index
@@ -195,6 +201,8 @@ dwv.LayerController = function (containerDiv) {
     layer.setZIndex(50 + activeDrawLayerIndex);
     // add layer
     layers.push(layer);
+    // return
+    return layer;
   };
 
   /**
@@ -385,8 +393,9 @@ dwv.LayerController = function (containerDiv) {
    *
    * @param {object} image The image.
    * @param {object} metaData The image meta data.
+   * @param {number} dataIndex The data index.
    */
-  this.initialise = function (image, metaData) {
+  this.initialise = function (image, metaData, dataIndex) {
     var size = image.getGeometry().getSize();
     layerSize = {
       x: size.getNumberOfColumns(),
@@ -394,7 +403,7 @@ dwv.LayerController = function (containerDiv) {
     };
     // apply to layers
     for (var i = 0; i < layers.length; ++i) {
-      layers[i].initialise(image, metaData);
+      layers[i].initialise(image, metaData, dataIndex);
     }
     // fit data
     this.fitToContainer();
