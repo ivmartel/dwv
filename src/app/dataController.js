@@ -33,6 +33,15 @@ dwv.DataController = function () {
   var listenerHandler = new dwv.utils.ListenerHandler();
 
   /**
+   * Get the length of the data storage.
+   *
+   * @returns {number} The length.
+   */
+  this.length = function () {
+    return data.length;
+  };
+
+  /**
    * Reset the class: empty the data storage.
    */
   this.reset = function () {

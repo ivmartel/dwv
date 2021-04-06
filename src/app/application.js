@@ -16,19 +16,13 @@ dwv.App = function () {
   // closure to self
   var self = this;
 
+  // app options
+  var options = null;
+
   // data controller
   var dataController = null;
 
-  // Container div id
-  var containerDivId = null;
-
-  // flag to create view on first load
-  var viewOnFirstLoadItem = true;
-
-  // Generic style
-  var style = new dwv.html.Style();
-
-  // Toolbox controller
+  // toolbox controller
   var toolboxController = null;
 
   // layer controller
@@ -37,10 +31,14 @@ dwv.App = function () {
   // load controller
   var loadController = null;
 
+  // first load item flag
   var isFirstLoadItem = null;
 
   // UndoStack
   var undoStack = null;
+
+  // Generic style
+  var style = new dwv.html.Style();
 
   /**
    * Listener handler.
@@ -183,23 +181,36 @@ dwv.App = function () {
   /**
    * Initialise the application.
    *
-   * @param {object} config The application configuration.
+   * @param {object} opt The application options.
    */
-  this.init = function (config) {
-    containerDivId = config.containerDivId;
+  this.init = function (opt) {
+    // store
+    options = opt;
+    // defaults
+    if (typeof options.containerDivId === 'undefined') {
+      options.containerDivId = 'dwv';
+    }
+    if (typeof options.viewOnFirstLoadItem === 'undefined') {
+      options.viewOnFirstLoadItem = true;
+    }
+    if (typeof options.nSimultaneousData === 'undefined') {
+      options.nSimultaneousData = 1;
+    }
+
     // undo stack
     undoStack = new dwv.tool.UndoStack();
     undoStack.addEventListener('undoadd', fireEvent);
     undoStack.addEventListener('undo', fireEvent);
     undoStack.addEventListener('redo', fireEvent);
+
     // tools
-    if (config.tools && config.tools.length !== 0) {
+    if (options.tools && options.tools.length !== 0) {
       // setup the tool list
       var toolList = {};
-      var keys = Object.keys(config.tools);
+      var keys = Object.keys(options.tools);
       for (var t = 0; t < keys.length; ++t) {
         var toolName = keys[t];
-        var toolParams = config.tools[toolName];
+        var toolParams = options.tools[toolName];
         // find the tool in the dwv.tool namespace
         if (typeof dwv.tool[toolName] !== 'undefined') {
           // create tool instance
@@ -219,10 +230,10 @@ dwv.App = function () {
             if (typeof toolParams.type !== 'undefined') {
               type = toolParams.type;
             }
-            var options = toolParams.options;
+            var toolOptions = toolParams.options;
             if (type === 'instance' ||
                 type === 'factory') {
-              options = {};
+              toolOptions = {};
               for (var i = 0; i < toolParams.options.length; ++i) {
                 var optionName = toolParams.options[i];
                 var optionClassName = optionName;
@@ -233,7 +244,7 @@ dwv.App = function () {
                   toolName.slice(1);
                 if (typeof dwv.tool[toolNamespace][optionClassName] !==
                   'undefined') {
-                  options[optionName] =
+                  toolOptions[optionName] =
                     dwv.tool[toolNamespace][optionClassName];
                 } else {
                   dwv.logger.warn('Could not find option class for: ' +
@@ -241,7 +252,7 @@ dwv.App = function () {
                 }
               }
             }
-            toolList[toolName].setOptions(options);
+            toolList[toolName].setOptions(toolOptions);
           }
         } else {
           dwv.logger.warn('Could not initialise unknown tool: ' + toolName);
@@ -252,7 +263,7 @@ dwv.App = function () {
     }
 
     // create load controller
-    loadController = new dwv.LoadController(config.defaultCharacterSet);
+    loadController = new dwv.LoadController(options.defaultCharacterSet);
     loadController.onloadstart = onloadstart;
     loadController.onprogress = onprogress;
     loadController.onloaditem = onloaditem;
@@ -260,11 +271,6 @@ dwv.App = function () {
     loadController.onloadend = onloadend;
     loadController.onerror = onerror;
     loadController.onabort = onabort;
-
-    // flag to view on first load
-    if (typeof config.viewOnFirstLoadItem !== 'undefined') {
-      viewOnFirstLoadItem = config.viewOnFirstLoadItem;
-    }
 
     // create layer container
     // warn: needs the DOM to be loaded...
@@ -292,7 +298,7 @@ dwv.App = function () {
    * @returns {object} The found element or null.
    */
   this.getElement = function (name) {
-    return dwv.gui.getElement(containerDivId, name);
+    return dwv.gui.getElement(options.containerDivId, name);
   };
 
   /**
@@ -794,7 +800,8 @@ dwv.App = function () {
   function onloadstart(event) {
     isFirstLoadItem = true;
 
-    if (event.loadtype === 'image') {
+    if (event.loadtype === 'image' &&
+      dataController.length() === options.nSimultaneousData) {
       self.reset();
     }
 
@@ -888,7 +895,7 @@ dwv.App = function () {
     });
 
     // render if asked
-    if (event.loadtype === 'image' && viewOnFirstLoadItem) {
+    if (event.loadtype === 'image' && options.viewOnFirstLoadItem) {
       if (isFirstLoadItem) {
         // initialise or add view
         var dataIndex = dataController.getCurrentIndex();
