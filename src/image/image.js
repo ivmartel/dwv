@@ -518,22 +518,6 @@ dwv.image.Image.prototype.getRescaledValueAtOffset = function (offset, k, f) {
 };
 
 /**
- * Get a list of values for a given iterator.
- *
- * @param {object} iterator The iterator to use to loop through data.
- * @returns {Array} The list of values.
- */
-dwv.image.Image.prototype.getValues = function (iterator) {
-  var values = [];
-  var ival = iterator.next();
-  while (!ival.done) {
-    values.push(ival.value);
-    ival = iterator.next();
-  }
-  return values;
-};
-
-/**
  * Calculate the data range of the image.
  * WARNING: for speed reasons, only calculated on the first frame...
  *

@@ -98,14 +98,15 @@ dwv.ViewController = function (view) {
    * @returns {Array} A list of values.
    */
   this.getImageRegionValues = function (min, max) {
-    var iter = view.getRegionSliceIterator(
+    var iter = dwv.image.getRegionSliceIterator(
+      view.getImage(),
       this.getCurrentPosition().k,
       this.getCurrentFrame(),
       true, min, max
     );
     var values = [];
     if (iter) {
-      values = view.getImage().getValues(iter);
+      values = dwv.image.getIteratorValues(iter);
     }
     return values;
   };
@@ -117,14 +118,15 @@ dwv.ViewController = function (view) {
    * @returns {Array} A list of values.
    */
   this.getImageVariableRegionValues = function (regions) {
-    var iter = view.getVariableRegionSliceIterator(
+    var iter = dwv.image.getVariableRegionSliceIterator(
+      view.getImage(),
       this.getCurrentPosition().k,
       this.getCurrentFrame(),
       true, regions
     );
     var values = [];
     if (iter) {
-      values = view.getImage().getValues(iter);
+      values = dwv.image.getIteratorValues(iter);
     }
     return values;
   };
