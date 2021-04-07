@@ -161,10 +161,11 @@ dwv.ViewController = function (view) {
    * Set the current position.
    *
    * @param {object} pos The position.
+   * @param {boolean} silent If true, does not fire a slicechange event.
    * @returns {boolean} False if not in bounds.
    */
-  this.setCurrentPosition = function (pos) {
-    return view.setCurrentPosition(pos);
+  this.setCurrentPosition = function (pos, silent) {
+    return view.setCurrentPosition(pos, silent);
   };
 
   /**

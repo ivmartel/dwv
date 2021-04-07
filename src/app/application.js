@@ -561,30 +561,6 @@ dwv.App = function () {
   // Handler Methods -----------------------------------------------------------
 
   /**
-   * Handle frame change.
-   *
-   * @param {object} event The event fired when changing the frame.
-   * @private
-   */
-  function onFrameChange(event) {
-    // generate and draw if no skip flag
-    if (typeof event.skipGenerate === 'undefined' ||
-      event.skipGenerate === false) {
-      updateDrawController();
-    }
-  }
-
-  /**
-   * Handle slice change.
-   *
-   * @param {object} _event The event fired when changing the slice.
-   * @private
-   */
-  function onSliceChange(_event) {
-    updateDrawController();
-  }
-
-  /**
    * Handle resize: fit the display to the window.
    * To be called once the image is loaded.
    * Can be connected to a window 'resize' event.
@@ -933,8 +909,6 @@ dwv.App = function () {
    * @private
    */
   function onload(event) {
-    updateDrawController();
-
     /**
      * Load event: fired when a load finishes successfully.
      *
@@ -1015,29 +989,12 @@ dwv.App = function () {
   }
 
   /**
-   * Update draw controller on slice/frame change.
-   */
-  function updateDrawController() {
-    var drawLayer = layerController.getActiveDrawLayer();
-    if (drawLayer) {
-      var viewController =
-        layerController.getActiveViewLayer().getViewController();
-      drawLayer.getDrawController().activateDrawLayer(
-        viewController.getCurrentPosition(),
-        viewController.getCurrentFrame());
-    }
-  }
-
-  /**
    * Bind view layer events to app.
    *
    * @param {object} viewLayer The active view layer.
    * @private
    */
   function bindViewLayer(viewLayer) {
-    // local draw controller slice/frame synch
-    viewLayer.addEventListener('slicechange', onSliceChange);
-    viewLayer.addEventListener('framechange', onFrameChange);
     // propagate view events
     viewLayer.propagateViewEvents(true);
     for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {

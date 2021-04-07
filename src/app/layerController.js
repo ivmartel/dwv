@@ -254,6 +254,20 @@ dwv.LayerController = function (containerDiv) {
   };
 
   /**
+   * Update draw controller to view position.
+   */
+  this.updateDrawControllerToViewPosition = function () {
+    var drawLayer = layers[activeDrawLayerIndex];
+    if (drawLayer) {
+      var viewController =
+        layers[activeViewLayerIndex].getViewController();
+      drawLayer.getDrawController().activateDrawLayer(
+        viewController.getCurrentPosition(),
+        viewController.getCurrentFrame());
+    }
+  };
+
+  /**
    * Get the fit to container scale.
    * To be called once the image is loaded.
    *
@@ -405,6 +419,16 @@ dwv.LayerController = function (containerDiv) {
     for (var i = 0; i < layers.length; ++i) {
       layers[i].initialise(image, metaData, dataIndex);
     }
+
+    // bind draw to view position
+    var viewLayer = this.getActiveViewLayer();
+    viewLayer.addEventListener(
+      'slicechange', this.updateDrawControllerToViewPosition);
+    viewLayer.addEventListener(
+      'framechange', this.updateDrawControllerToViewPosition);
+    // first update
+    this.updateDrawControllerToViewPosition();
+
     // fit data
     this.fitToContainer();
   };
