@@ -63,9 +63,9 @@ dwv.image.Size.prototype.getTotalSize = function () {
  */
 dwv.image.Size.prototype.equals = function (rhs) {
   return rhs !== null &&
-        this.getNumberOfColumns() === rhs.getNumberOfColumns() &&
-        this.getNumberOfRows() === rhs.getNumberOfRows() &&
-        this.getNumberOfSlices() === rhs.getNumberOfSlices();
+    this.getNumberOfColumns() === rhs.getNumberOfColumns() &&
+    this.getNumberOfRows() === rhs.getNumberOfRows() &&
+    this.getNumberOfSlices() === rhs.getNumberOfSlices();
 };
 
 /**
@@ -78,8 +78,8 @@ dwv.image.Size.prototype.equals = function (rhs) {
  */
 dwv.image.Size.prototype.isInBounds = function (i, j, k) {
   if (i < 0 || i > this.getNumberOfColumns() - 1 ||
-        j < 0 || j > this.getNumberOfRows() - 1 ||
-        k < 0 || k > this.getNumberOfSlices() - 1) {
+    j < 0 || j > this.getNumberOfRows() - 1 ||
+    k < 0 || k > this.getNumberOfSlices() - 1) {
     return false;
   }
   return true;
@@ -92,8 +92,8 @@ dwv.image.Size.prototype.isInBounds = function (i, j, k) {
  */
 dwv.image.Size.prototype.toString = function () {
   return '(' + this.getNumberOfColumns() +
-        ', ' + this.getNumberOfRows() +
-        ', ' + this.getNumberOfSlices() + ')';
+    ', ' + this.getNumberOfRows() +
+    ', ' + this.getNumberOfSlices() + ')';
 };
 
 /**
@@ -139,9 +139,9 @@ dwv.image.Spacing = function (columnSpacing, rowSpacing, sliceSpacing) {
  */
 dwv.image.Spacing.prototype.equals = function (rhs) {
   return rhs !== null &&
-        this.getColumnSpacing() === rhs.getColumnSpacing() &&
-        this.getRowSpacing() === rhs.getRowSpacing() &&
-        this.getSliceSpacing() === rhs.getSliceSpacing();
+    this.getColumnSpacing() === rhs.getColumnSpacing() &&
+    this.getRowSpacing() === rhs.getRowSpacing() &&
+    this.getSliceSpacing() === rhs.getSliceSpacing();
 };
 
 /**
@@ -151,8 +151,8 @@ dwv.image.Spacing.prototype.equals = function (rhs) {
  */
 dwv.image.Spacing.prototype.toString = function () {
   return '(' + this.getColumnSpacing() +
-        ', ' + this.getRowSpacing() +
-        ', ' + this.getSliceSpacing() + ')';
+    ', ' + this.getRowSpacing() +
+    ', ' + this.getSliceSpacing() + ')';
 };
 
 
@@ -272,8 +272,8 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
  */
 dwv.image.Geometry.prototype.toString = function () {
   return 'Origin: ' + this.getOrigin() +
-        ', Size: ' + this.getSize() +
-        ', Spacing: ' + this.getSpacing();
+    ', Size: ' + this.getSize() +
+    ', Spacing: ' + this.getSpacing();
 };
 
 /**
@@ -284,9 +284,9 @@ dwv.image.Geometry.prototype.toString = function () {
  */
 dwv.image.Geometry.prototype.equals = function (rhs) {
   return rhs !== null &&
-        this.getOrigin().equals(rhs.getOrigin()) &&
-        this.getSize().equals(rhs.getSize()) &&
-        this.getSpacing().equals(rhs.getSpacing());
+    this.getOrigin().equals(rhs.getOrigin()) &&
+    this.getSize().equals(rhs.getSize()) &&
+    this.getSpacing().equals(rhs.getSpacing());
 };
 
 /**
@@ -298,8 +298,8 @@ dwv.image.Geometry.prototype.equals = function (rhs) {
 dwv.image.Geometry.prototype.indexToOffset = function (index) {
   var size = this.getSize();
   return index.getI() +
-       index.getJ() * size.getNumberOfColumns() +
-       index.getK() * size.getSliceSize();
+   index.getJ() * size.getNumberOfColumns() +
+   index.getK() * size.getSliceSize();
 };
 
 /**
