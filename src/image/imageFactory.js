@@ -14,10 +14,11 @@ dwv.image.ImageFactory = function () {};
  *
  * @param {object} dicomElements The DICOM tags.
  * @param {Array} pixelBuffer The pixel buffer.
+ * @param {number} numberOfFiles The input number of files.
  * @returns {dwv.image.Image} A new Image.
  */
 dwv.image.ImageFactory.prototype.create = function (
-  dicomElements, pixelBuffer) {
+  dicomElements, pixelBuffer, numberOfFiles) {
   // columns
   var columns = dicomElements.getFromKey('x00280011');
   if (!columns) {
@@ -146,6 +147,8 @@ dwv.image.ImageFactory.prototype.create = function (
 
   // meta information
   var meta = {};
+  // data length
+  meta.numberOfFiles = numberOfFiles;
   // Modality
   var modality = dicomElements.getFromKey('x00080060');
   if (modality) {

@@ -355,37 +355,55 @@ dwv.image.Image = function (geometry, buffer, numberOfFrames, imageUids) {
     }
     var sliceSize = mul * size.getSliceSize();
 
-    // create the new buffer
-    var newBuffer = dwv.dicom.getTypedArray(
-      buffer[f].BYTES_PER_ELEMENT * 8,
-      meta.IsSigned ? 1 : 0,
-      sliceSize * (size.getNumberOfSlices() + 1));
-
-    // append slice at new position
-    var newSliceNb = geometry.getSliceIndex(rhs.getGeometry().getOrigin());
-    if (newSliceNb === 0) {
-      newBuffer.set(rhs.getFrame(f));
-      newBuffer.set(buffer[f], sliceSize);
-    } else if (newSliceNb === size.getNumberOfSlices()) {
-      newBuffer.set(buffer[f]);
-      newBuffer.set(rhs.getFrame(f), size.getNumberOfSlices() * sliceSize);
-    } else {
-      var offset = newSliceNb * sliceSize;
-      newBuffer.set(buffer[f].subarray(0, offset - 1));
-      newBuffer.set(rhs.getFrame(f), offset);
-      newBuffer.set(buffer[f].subarray(offset), offset + sliceSize);
+    // create full buffer if not done yet
+    if (buffer[f].length === sliceSize) {
+      if (typeof meta.numberOfFiles === 'undefined') {
+        throw new Error('Missing number of files for buffer creation.');
+      }
+      // save old
+      var oldBuffer = buffer[f];
+      // create new
+      buffer[f] = dwv.dicom.getTypedArray(
+        buffer[f].BYTES_PER_ELEMENT * 8,
+        meta.IsSigned ? 1 : 0,
+        sliceSize * meta.numberOfFiles);
+      // put old in new
+      buffer[f].set(oldBuffer);
     }
 
-    // update geometry
-    geometry.appendOrigin(rhs.getGeometry().getOrigin(), newSliceNb);
-    // update rsi
-    rsis.splice(newSliceNb, 0, rhs.getRescaleSlopeAndIntercept(0));
+    // store slice
+    var oldNumberOfSlices = size.getNumberOfSlices();
+    var newSliceIndex = geometry.getSliceIndex(rhs.getGeometry().getOrigin());
+    var newSliceOffset = newSliceIndex * sliceSize;
+    // move content if needed
+    var start, end;
+    if (newSliceIndex === 0) {
+      // insert slice before current data
+      start = 0;
+      end = start + oldNumberOfSlices * sliceSize;
+      buffer[f].set(
+        buffer[f].subarray(start, end),
+        newSliceOffset + sliceSize
+      );
+    } else if (newSliceIndex < oldNumberOfSlices) {
+      // insert slice in between current data
+      start = newSliceOffset;
+      end = start + (oldNumberOfSlices - newSliceIndex) * sliceSize;
+      buffer[f].set(
+        buffer[f].subarray(start, end),
+        newSliceOffset + sliceSize
+      );
+    }
+    // add new slice content
+    buffer[f].set(rhs.getBuffer()[f], newSliceOffset);
 
-    // copy to class variables
-    buffer[f] = newBuffer;
+    // update geometry
+    geometry.appendOrigin(rhs.getGeometry().getOrigin(), newSliceIndex);
+    // update rsi
+    rsis.splice(newSliceIndex, 0, rhs.getRescaleSlopeAndIntercept(0));
 
     // insert sop instance UIDs
-    imageUids.splice(newSliceNb, 0, rhs.getImageUids()[0]);
+    imageUids.splice(newSliceIndex, 0, rhs.getImageUids()[0]);
 
     // update window presets
     if (typeof meta.windowPresets !== 'undefined') {
@@ -400,7 +418,7 @@ dwv.image.Image = function (geometry, buffer, numberOfFrames, imageUids) {
             windowPresets[pkey].perslice === true) {
             // use first new preset wl...
             windowPresets[pkey].wl.splice(
-              newSliceNb, 0, rhsPresets[pkey].wl[0]);
+              newSliceIndex, 0, rhsPresets[pkey].wl[0]);
           } else {
             windowPresets[pkey] = rhsPresets[pkey];
           }
@@ -411,8 +429,8 @@ dwv.image.Image = function (geometry, buffer, numberOfFrames, imageUids) {
       }
     }
 
-    // return the appended slice number
-    return newSliceNb;
+    // return the appended slice index
+    return newSliceIndex;
   };
 
   /**

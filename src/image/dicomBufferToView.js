@@ -12,20 +12,20 @@ dwv.image.DicomBufferToView = function () {
   var self = this;
 
   /**
-   * The default character set (optional).
+   * Converter options.
    *
    * @private
-   * @type {string}
+   * @type {object}
    */
-  var defaultCharacterSet;
+  var options;
 
   /**
-   * Set the default character set.
+   * Set the converter options.
    *
-   * @param {string} characterSet The character set.
+   * @param {object} opt The input options.
    */
-  this.setDefaultCharacterSet = function (characterSet) {
-    defaultCharacterSet = characterSet;
+  this.setOptions = function (opt) {
+    options = opt;
   };
 
   /**
@@ -51,7 +51,9 @@ dwv.image.DicomBufferToView = function () {
 
     // DICOM parser
     var dicomParser = new dwv.dicom.DicomParser();
-    dicomParser.setDefaultCharacterSet(defaultCharacterSet);
+    if (typeof options.defaultCharacterSet !== 'undefined') {
+      dicomParser.setDefaultCharacterSet(options.defaultCharacterSet);
+    }
     // parse the buffer
     try {
       dicomParser.parse(buffer);
@@ -78,7 +80,7 @@ dwv.image.DicomBufferToView = function () {
       var imageFactory = new dwv.image.ImageFactory();
       try {
         var image = imageFactory.create(
-          dicomParser.getDicomElements(), pixelBuffer);
+          dicomParser.getDicomElements(), pixelBuffer, options.numberOfFiles);
         // call onload
         self.onloaditem({
           data: {
