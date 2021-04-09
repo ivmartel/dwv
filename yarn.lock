@@ -1052,10 +1052,10 @@ commander@^2.11.0, commander@^2.19.0:
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.20.3.tgz#fd485e84c03eb4881c20722ba48035e8531aeb33"
   integrity sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==
 
-comment-parser@1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/comment-parser/-/comment-parser-1.1.1.tgz#c0581d520677e2cfab1a568e94ea0400df9fe4bd"
-  integrity sha512-vue7cRi1ZO5/72FJ+wZ5+siTSBlUv3ZksTk8bWD2IkaA6obitzMZP3yI65azTJLckwmi8lxfPP5Sd9oGuZ8e2g==
+comment-parser@1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/comment-parser/-/comment-parser-1.1.2.tgz#e5317d7a2ec22b470dcb54a29b25426c30bf39d8"
+  integrity sha512-AOdq0i8ghZudnYv8RUnHrhTgafUGs61Rdz9jemU5x2lnZwAWyOq7vySo626K59e1fVKH1xSRorJwPVRLSWOoAQ==
 
 component-bind@1.0.0:
   version "1.0.0"
@@ -1282,17 +1282,10 @@ debug@^3.1.0, debug@^3.1.1:
   dependencies:
     ms "^2.1.1"
 
-debug@^4.0.1, debug@^4.3.1:
+debug@^4.0.1, debug@^4.1.0, debug@^4.1.1, debug@^4.3.1:
   version "4.3.1"
   resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.1.tgz#f0d229c505e0c6d8c49ac553d1b13dc183f6b2ee"
   integrity sha512-doEwdvm4PCeK4K3RQN2ZC2BYUBaxwLARCqZmMjtF8a51J2Rb0xpVloFRnCODwqjpwnAoao4pelN8l3RJdv3gRQ==
-  dependencies:
-    ms "2.1.2"
-
-debug@^4.1.0, debug@^4.1.1:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/debug/-/debug-4.2.0.tgz#7f150f93920e94c58f5574c2fd01a3110effe7f1"
-  integrity sha512-IX2ncY78vDTjZMFUdmsvIRFY2Cf4FnD0wRs+nQwJU8Lu99/tPFdb0VybiiMTPe3I6rQmwsqQqRBvxU+bZ/I8sg==
   dependencies:
     ms "2.1.2"
 
@@ -1670,12 +1663,12 @@ escape-string-regexp@^2.0.0:
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-2.0.0.tgz#a30304e99daa32e23b2fd20f51babd07cffca344"
   integrity sha512-UpzcLCXolUWcNu5HtVMHYdXJjArjsF9C0aNnquZYY4uW/Vu0miy5YoWvbV345HauVvcAUnpRuhMMcqTcGOY2+w==
 
-eslint-plugin-jsdoc@~31.3.2:
-  version "31.3.2"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-31.3.2.tgz#ca8e31bf97fc9a4c0038a39cdd1fb921b9e640a2"
-  integrity sha512-MsrQ5+ah4dMez6Z2cLeg9HrUkdeDWzmaebmTKozlHue7o+mANQxSKhn52KclrFz7EkNa/pUIPi4VE3TnseRxuA==
+eslint-plugin-jsdoc@~32.3.0:
+  version "32.3.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-32.3.0.tgz#7c9fa5da8c72bd6ad7d97bbf8dee8bc29bec3f9e"
+  integrity sha512-zyx7kajDK+tqS1bHuY5sapkad8P8KT0vdd/lE55j47VPG2MeenSYuIY/M/Pvmzq5g0+3JB+P3BJGUXmHxtuKPQ==
   dependencies:
-    comment-parser "1.1.1"
+    comment-parser "1.1.2"
     debug "^4.3.1"
     jsdoctypeparser "^9.0.0"
     lodash "^4.17.20"
