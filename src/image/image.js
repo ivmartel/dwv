@@ -356,7 +356,8 @@ dwv.image.Image = function (geometry, buffer, numberOfFrames, imageUids) {
     var sliceSize = mul * size.getSliceSize();
 
     // create full buffer if not done yet
-    if (buffer[f].length === sliceSize) {
+    var fullBufferSize = sliceSize * meta.numberOfFiles;
+    if (buffer[f].length !== fullBufferSize) {
       if (typeof meta.numberOfFiles === 'undefined') {
         throw new Error('Missing number of files for buffer creation.');
       }
@@ -366,7 +367,7 @@ dwv.image.Image = function (geometry, buffer, numberOfFrames, imageUids) {
       buffer[f] = dwv.dicom.getTypedArray(
         buffer[f].BYTES_PER_ELEMENT * 8,
         meta.IsSigned ? 1 : 0,
-        sliceSize * meta.numberOfFiles);
+        fullBufferSize);
       // put old in new
       buffer[f].set(oldBuffer);
     }
@@ -383,7 +384,7 @@ dwv.image.Image = function (geometry, buffer, numberOfFrames, imageUids) {
       end = start + oldNumberOfSlices * sliceSize;
       buffer[f].set(
         buffer[f].subarray(start, end),
-        newSliceOffset + sliceSize
+        sliceSize
       );
     } else if (newSliceIndex < oldNumberOfSlices) {
       // insert slice in between current data

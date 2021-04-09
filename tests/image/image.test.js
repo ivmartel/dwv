@@ -202,6 +202,7 @@ QUnit.test('Test Image append slice.', function (assert) {
 
   // image 0
   var image0 = new dwv.image.Image(imgGeometry0, [buffer], 1, ['0']);
+  image0.setMeta({numberOfFiles: 3});
   // append null
   assert.throws(function () {
     image0.appendSlice(null);
@@ -211,6 +212,7 @@ QUnit.test('Test Image append slice.', function (assert) {
   var sliceGeometry = new dwv.image.Geometry(
     sliceOrigin, sliceSize, imgSpacing);
   var slice0 = new dwv.image.Image(sliceGeometry, [sliceBuffer], 1, ['1']);
+  slice0.setMeta({numberOfFiles: 3});
   // append slice before
   image0.appendSlice(slice0);
   // test its values
@@ -235,10 +237,12 @@ QUnit.test('Test Image append slice.', function (assert) {
     imgOrigin, imgSizeMinusOne, imgSpacing);
   imgGeometry1.appendOrigin(new dwv.math.Point3D(0, 0, 1), 1);
   var image1 = new dwv.image.Image(imgGeometry1, [buffer], 1, ['0']);
+  image1.setMeta({numberOfFiles: 3});
   var sliceOrigin1 = new dwv.math.Point3D(0, 0, 2);
   var sliceGeometry1 = new dwv.image.Geometry(
     sliceOrigin1, sliceSize, imgSpacing);
   var slice1 = new dwv.image.Image(sliceGeometry1, [sliceBuffer], 1, ['0']);
+  slice1.setMeta({numberOfFiles: 3});
   // append slice before
   image1.appendSlice(slice1);
   // test its values
@@ -263,10 +267,12 @@ QUnit.test('Test Image append slice.', function (assert) {
     imgOrigin, imgSizeMinusOne, imgSpacing);
   imgGeometry2.appendOrigin(new dwv.math.Point3D(0, 0, 1), 1);
   var image2 = new dwv.image.Image(imgGeometry2, [buffer], 1, ['0']);
+  image2.setMeta({numberOfFiles: 3});
   var sliceOrigin2 = new dwv.math.Point3D(0, 0, 0.4);
   var sliceGeometry2 = new dwv.image.Geometry(
     sliceOrigin2, sliceSize, imgSpacing);
   var slice2 = new dwv.image.Image(sliceGeometry2, [sliceBuffer], 1, ['0']);
+  slice2.setMeta({numberOfFiles: 3});
   // append slice before
   image2.appendSlice(slice2);
   // test its values
