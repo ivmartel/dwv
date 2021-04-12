@@ -257,9 +257,10 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
     } else {
       data = new Uint16Array(arraySize);
       for (var i = 0; i < arraySize; ++i) {
-        data[i] = view.getUint16((byteOffset +
-                    Uint16Array.BYTES_PER_ELEMENT * i),
-        isLittleEndian);
+        data[i] = view.getUint16(
+          byteOffset + Uint16Array.BYTES_PER_ELEMENT * i,
+          isLittleEndian
+        );
       }
     }
     return data;
@@ -283,9 +284,9 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
     } else {
       data = new Int16Array(arraySize);
       for (var i = 0; i < arraySize; ++i) {
-        data[i] = view.getInt16((byteOffset +
-                    Int16Array.BYTES_PER_ELEMENT * i),
-        isLittleEndian);
+        data[i] = view.getInt16(
+          byteOffset + Int16Array.BYTES_PER_ELEMENT * i,
+          isLittleEndian);
       }
     }
     return data;
@@ -309,9 +310,10 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
     } else {
       data = new Uint32Array(arraySize);
       for (var i = 0; i < arraySize; ++i) {
-        data[i] = view.getUint32((byteOffset +
-                    Uint32Array.BYTES_PER_ELEMENT * i),
-        isLittleEndian);
+        data[i] = view.getUint32(
+          byteOffset + Uint32Array.BYTES_PER_ELEMENT * i,
+          isLittleEndian
+        );
       }
     }
     return data;
@@ -335,9 +337,10 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
     } else {
       data = new Int32Array(arraySize);
       for (var i = 0; i < arraySize; ++i) {
-        data[i] = view.getInt32((byteOffset +
-                    Int32Array.BYTES_PER_ELEMENT * i),
-        isLittleEndian);
+        data[i] = view.getInt32(
+          byteOffset + Int32Array.BYTES_PER_ELEMENT * i,
+          isLittleEndian
+        );
       }
     }
     return data;
@@ -361,9 +364,10 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
     } else {
       data = new Float32Array(arraySize);
       for (var i = 0; i < arraySize; ++i) {
-        data[i] = view.getFloat32((byteOffset +
-                    Float32Array.BYTES_PER_ELEMENT * i),
-        isLittleEndian);
+        data[i] = view.getFloat32(
+          byteOffset + Float32Array.BYTES_PER_ELEMENT * i,
+          isLittleEndian
+        );
       }
     }
     return data;
@@ -387,9 +391,10 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
     } else {
       data = new Float64Array(arraySize);
       for (var i = 0; i < arraySize; ++i) {
-        data[i] = view.getFloat64((byteOffset +
-                    Float64Array.BYTES_PER_ELEMENT * i),
-        isLittleEndian);
+        data[i] = view.getFloat64(
+          byteOffset + Float64Array.BYTES_PER_ELEMENT * i,
+          isLittleEndian
+        );
       }
     }
     return data;
@@ -496,8 +501,8 @@ dwv.dicom.Tag = function (group, element) {
  */
 dwv.dicom.Tag.prototype.equals = function (rhs) {
   return rhs !== null &&
-        this.getGroup() === rhs.getGroup() &&
-        this.getElement() === rhs.getElement();
+    this.getGroup() === rhs.getGroup() &&
+    this.getElement() === rhs.getElement();
 };
 
 /**
@@ -508,8 +513,8 @@ dwv.dicom.Tag.prototype.equals = function (rhs) {
  */
 dwv.dicom.Tag.prototype.equals2 = function (rhs) {
   if (rhs === null ||
-        typeof rhs.group === 'undefined' ||
-        typeof rhs.element === 'undefined') {
+    typeof rhs.group === 'undefined' ||
+    typeof rhs.element === 'undefined') {
     return false;
   }
   return this.equals(new dwv.dicom.Tag(rhs.group, rhs.element));
@@ -617,7 +622,7 @@ dwv.dicom.isBigEndianTransferSyntax = function (syntax) {
  */
 dwv.dicom.isJpegBaselineTransferSyntax = function (syntax) {
   return syntax === '1.2.840.10008.1.2.4.50' ||
-        syntax === '1.2.840.10008.1.2.4.51';
+    syntax === '1.2.840.10008.1.2.4.51';
 };
 
 /**
@@ -628,9 +633,9 @@ dwv.dicom.isJpegBaselineTransferSyntax = function (syntax) {
  */
 dwv.dicom.isJpegRetiredTransferSyntax = function (syntax) {
   return (syntax.match(/1.2.840.10008.1.2.4.5/) !== null &&
-        !dwv.dicom.isJpegBaselineTransferSyntax() &&
-        !dwv.dicom.isJpegLosslessTransferSyntax()) ||
-        syntax.match(/1.2.840.10008.1.2.4.6/) !== null;
+    !dwv.dicom.isJpegBaselineTransferSyntax() &&
+    !dwv.dicom.isJpegLosslessTransferSyntax()) ||
+    syntax.match(/1.2.840.10008.1.2.4.6/) !== null;
 };
 
 /**
@@ -641,7 +646,7 @@ dwv.dicom.isJpegRetiredTransferSyntax = function (syntax) {
  */
 dwv.dicom.isJpegLosslessTransferSyntax = function (syntax) {
   return syntax === '1.2.840.10008.1.2.4.57' ||
-        syntax === '1.2.840.10008.1.2.4.70';
+    syntax === '1.2.840.10008.1.2.4.70';
 };
 
 /**
@@ -709,12 +714,12 @@ dwv.dicom.isReadSupportedTransferSyntax = function (syntax) {
   // dwv.dicom.isJpeglsTransferSyntax(syntax): JPEG-LS
 
   return (syntax === '1.2.840.10008.1.2' || // Implicit VR - Little Endian
-        syntax === '1.2.840.10008.1.2.1' || // Explicit VR - Little Endian
-        syntax === '1.2.840.10008.1.2.2' || // Explicit VR - Big Endian
-        dwv.dicom.isJpegBaselineTransferSyntax(syntax) || // JPEG baseline
-        dwv.dicom.isJpegLosslessTransferSyntax(syntax) || // JPEG Lossless
-        dwv.dicom.isJpeg2000TransferSyntax(syntax) || // JPEG 2000
-        dwv.dicom.isRleTransferSyntax(syntax)); // RLE
+    syntax === '1.2.840.10008.1.2.1' || // Explicit VR - Little Endian
+    syntax === '1.2.840.10008.1.2.2' || // Explicit VR - Big Endian
+    dwv.dicom.isJpegBaselineTransferSyntax(syntax) || // JPEG baseline
+    dwv.dicom.isJpegLosslessTransferSyntax(syntax) || // JPEG Lossless
+    dwv.dicom.isJpeg2000TransferSyntax(syntax) || // JPEG 2000
+    dwv.dicom.isRleTransferSyntax(syntax)); // RLE
 };
 
 /**
@@ -977,9 +982,11 @@ dwv.dicom.DicomParser.prototype.readItemDataElement = function (
   // exit if it is a sequence delimitation item
   var isSeqDelim = (item.tag.name === 'xFFFEE0DD');
   if (isSeqDelim) {
-    return {data: itemData,
+    return {
+      data: itemData,
       endOffset: item.endOffset,
-      isSeqDelim: isSeqDelim};
+      isSeqDelim: isSeqDelim
+    };
   }
 
   // store it
@@ -1080,7 +1087,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
       vr = 'UN';
       var dict = dwv.dicom.dictionary;
       if (typeof dict[tag.group] !== 'undefined' &&
-                    typeof dict[tag.group][tag.element] !== 'undefined') {
+        typeof dict[tag.group][tag.element] !== 'undefined') {
         vr = dwv.dicom.dictionary[tag.group][tag.element][0];
       }
       is32bitVLVR = true;
@@ -1285,7 +1292,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
   } else {
     // raw
     if (vr === 'SH' || vr === 'LO' || vr === 'ST' ||
-            vr === 'PN' || vr === 'LT' || vr === 'UT') {
+      vr === 'PN' || vr === 'LT' || vr === 'UT') {
       data = reader.readSpecialString(offset, vl);
     } else {
       data = reader.readString(offset, vl);
@@ -1352,7 +1359,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
     dataElement = this.readDataElement(dataReader, 0, implicit);
     // check that group is 0x0008
     if ((dataElement.tag.group !== oEightGroupBigEndian) &&
-            (dataElement.tag.group !== oEightGroupLittleEndian)) {
+      (dataElement.tag.group !== oEightGroupLittleEndian)) {
       throw new Error(
         'Not a valid DICOM file (no magic DICM word found' +
           'and first element not in 0x0008 group)'
@@ -1409,7 +1416,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
   // check support
   if (!dwv.dicom.isReadSupportedTransferSyntax(syntax)) {
     throw new Error('Unsupported DICOM transfer syntax: \'' + syntax +
-            '\' (' + dwv.dicom.getTransferSyntaxName(syntax) + ')');
+      '\' (' + dwv.dicom.getTransferSyntaxName(syntax) + ')');
   }
 
   // Implicit VR
@@ -1471,15 +1478,15 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
     if (this.dicomElements.x7FE00010.vl !== 'u/l') {
       // compressed should be encapsulated...
       if (dwv.dicom.isJpeg2000TransferSyntax(syntax) ||
-                dwv.dicom.isJpegBaselineTransferSyntax(syntax) ||
-                dwv.dicom.isJpegLosslessTransferSyntax(syntax)) {
+        dwv.dicom.isJpegBaselineTransferSyntax(syntax) ||
+        dwv.dicom.isJpegLosslessTransferSyntax(syntax)) {
         dwv.logger.warn('Compressed but no items...');
       }
 
       // calculate the slice size
       var pixData = this.dicomElements.x7FE00010.value;
       if (pixData && typeof pixData !== 'undefined' &&
-                pixData.length !== 0) {
+        pixData.length !== 0) {
         if (typeof this.dicomElements.x00280010 === 'undefined') {
           throw new Error('Missing image number of rows.');
         }
