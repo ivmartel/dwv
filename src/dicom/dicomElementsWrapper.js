@@ -52,25 +52,18 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
    */
   this.dumpToObject = function () {
     var keys = Object.keys(dicomElements);
-    var dict = dwv.dicom.dictionary;
     var obj = {};
     var dicomElement = null;
-    var dictElement = null;
     var row = null;
     for (var i = 0, leni = keys.length; i < leni; ++i) {
       dicomElement = dicomElements[keys[i]];
       row = {};
-      // dictionnary entry (to get name)
-      dictElement = null;
-      if (typeof dict[dicomElement.tag.group] !== 'undefined' &&
-          typeof dict[dicomElement.tag.group][dicomElement.tag.element] !==
-          'undefined') {
-        dictElement = dict[dicomElement.tag.group][dicomElement.tag.element];
-      }
       // name
-      var name = 'Unknown Tag & Data';
-      if (dictElement !== null) {
-        name = dictElement[2];
+      var tag = new dwv.dicom.Tag(
+        dicomElement.tag.group, dicomElement.tag.element);
+      var name = tag.getNameFromDictionary();
+      if (name === null) {
+        name = 'Unknown Tag & Data';
       }
       // value
       row.value = this.getElementValueAsString(dicomElement);
@@ -251,14 +244,10 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
   // default prefix
   prefix = prefix || '';
 
-  // get element from dictionary
-  var dict = dwv.dicom.dictionary;
-  var dictElement = null;
-  if (typeof dict[dicomElement.tag.group] !== 'undefined' &&
-      typeof dict[dicomElement.tag.group][dicomElement.tag.element] !==
-      'undefined') {
-    dictElement = dict[dicomElement.tag.group][dicomElement.tag.element];
-  }
+  // get tag anme from dictionary
+  var tag = new dwv.dicom.Tag(
+    dicomElement.tag.group, dicomElement.tag.element);
+  var tagName = tag.getNameFromDictionary();
 
   var deSize = dicomElement.value.length;
   var isOtherVR = (dicomElement.vr[0].toUpperCase() === 'O');
@@ -348,8 +337,8 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
   line += ', ';
   line += deSize; //dictElement[1];
   line += ' ';
-  if (dictElement !== null) {
-    line += dictElement[2];
+  if (tagName !== null) {
+    line += tagName;
   } else {
     line += 'Unknown Tag & Data';
   }
@@ -449,8 +438,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
  */
 dwv.dicom.DicomElementsWrapper.prototype.getFromGroupElement = function (
   group, element) {
-  return this.getFromKey(
-    dwv.dicom.getGroupElementKey(group, element));
+  return this.getFromKey(new dwv.dicom.Tag(group, element).getKey());
 };
 
 /**
@@ -462,12 +450,10 @@ dwv.dicom.DicomElementsWrapper.prototype.getFromGroupElement = function (
  */
 dwv.dicom.DicomElementsWrapper.prototype.getFromName = function (name) {
   var value = null;
-  var tagGE = dwv.dicom.getGroupElementFromName(name);
+  var tag = dwv.dicom.getTagFromDictionary(name);
   // check that we are not at the end of the dictionary
-  if (tagGE.group !== null && tagGE.element !== null) {
-    value = this.getFromKey(
-      dwv.dicom.getGroupElementKey(tagGE.group, tagGE.element)
-    );
+  if (tag !== null) {
+    value = this.getFromKey(tag.getKey());
   }
   return value;
 };

@@ -32,19 +32,6 @@ dwv.dicom.cleanString = function (inputStr) {
 };
 
 /**
- * Is the tag group a private tag group ?
- * see: http://dicom.nema.org/medical/dicom/2015a/output/html/part05.html#sect_7.8
- *
- * @param {string} group The group string as '0x####'
- * @returns {boolean} True if the tag group is private,
- *   ie if its group is an odd number.
- */
-dwv.dicom.isPrivateGroup = function (group) {
-  var groupNumber = parseInt(group.substr(2, 6), 10);
-  return (groupNumber % 2) === 1;
-};
-
-/**
  * Get the utfLabel (used by the TextDecoder) from a character set term
  * References:
  * - DICOM [Value Encoding]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_6.html}
@@ -96,34 +83,6 @@ dwv.dicom.getUtfLabel = function (charSetTerm) {
     label = 'chinese';
   }
   return label;
-};
-
-/**
- * Get the group-element pair from a tag string name.
- *
- * @param {string} tagName The tag string name.
- * @returns {object} group-element pair.
- */
-dwv.dicom.getGroupElementFromName = function (tagName) {
-  var group = null;
-  var element = null;
-  var dict = dwv.dicom.dictionary;
-  var keys0 = Object.keys(dict);
-  var keys1 = null;
-  // label for nested loop break
-  outLabel:
-  // search through dictionary
-  for (var k0 = 0, lenK0 = keys0.length; k0 < lenK0; ++k0) {
-    group = keys0[k0];
-    keys1 = Object.keys(dict[group]);
-    for (var k1 = 0, lenK1 = keys1.length; k1 < lenK1; ++k1) {
-      element = keys1[k1];
-      if (dict[group][element][2] === tagName) {
-        break outLabel;
-      }
-    }
-  }
-  return {group: group, element: element};
 };
 
 /**
@@ -502,7 +461,7 @@ dwv.dicom.DicomParser.prototype.readTag = function (reader, offset) {
   var element = reader.readHex(offset);
   offset += Uint16Array.BYTES_PER_ELEMENT;
   // name
-  var name = dwv.dicom.getGroupElementKey(group, element);
+  var name = new dwv.dicom.Tag(group, element).getKey();
   // return
   return {
     group: group,
@@ -640,20 +599,19 @@ dwv.dicom.DicomParser.prototype.readPixelItemDataElement = function (
 dwv.dicom.DicomParser.prototype.readDataElement = function (
   reader, offset, implicit) {
   // Tag: group, element
-  var tag = this.readTag(reader, offset);
-  offset = tag.endOffset;
+  var tagData = this.readTag(reader, offset);
+  var tag = new dwv.dicom.Tag(tagData.group, tagData.element);
+  offset = tagData.endOffset;
 
   // Value Representation (VR)
   var vr = null;
   var is32bitVLVR = false;
-  if (dwv.dicom.isTagWithVR(tag.group, tag.element)) {
+  if (tag.isWithVR()) {
     // implicit VR
     if (implicit) {
-      vr = 'UN';
-      var dict = dwv.dicom.dictionary;
-      if (typeof dict[tag.group] !== 'undefined' &&
-        typeof dict[tag.group][tag.element] !== 'undefined') {
-        vr = dwv.dicom.dictionary[tag.group][tag.element][0];
+      vr = tag.getVrFromDictionary();
+      if (vr === null) {
+        vr = 'UN';
       }
       is32bitVLVR = true;
     } else {
@@ -688,7 +646,8 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
   }
 
   // treat private tag with unknown VR and zero VL as a sequence (see #799)
-  if (dwv.dicom.isPrivateGroup(tag.group) && vr === 'UN' && vl === 0) {
+  //if (dwv.dicom.isPrivateGroup(tag.group) && vr === 'UN' && vl === 0) {
+  if (tag.isPrivate() && vr === 'UN' && vl === 0) {
     vr = 'SQ';
   }
 
@@ -697,8 +656,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
 
   // read sequence elements
   var data = null;
-  var isPixelDataTag = (tag.name === 'x7FE00010');
-  if (isPixelDataTag && vlString === 'u/l') {
+  if (dwv.dicom.isPixelDataTag(tag) && vlString === 'u/l') {
     // pixel data sequence (implicit)
     var pixItemData = this.readPixelItemDataElement(reader, offset, implicit);
     offset = pixItemData.endOffset;
@@ -742,7 +700,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
 
   // return
   var element = {
-    tag: tag,
+    tag: tagData,
     vr: vr,
     vl: vlString,
     startOffset: startOffset,
@@ -774,7 +732,8 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
 
   // data
   var data = null;
-  var isPixelDataTag = tag.name === 'x7FE00010';
+  var isPixelDataTag = dwv.dicom.isPixelDataTag(
+    new dwv.dicom.Tag(tag.group, tag.element));
   if (isPixelDataTag && vl === 'u/l') {
     // implicit pixel data sequence
     data = [];

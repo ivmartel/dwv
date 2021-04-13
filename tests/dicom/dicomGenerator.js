@@ -33,8 +33,8 @@ dwv.dicom.getElementsFromJSONTags = function (tags) {
     offset += size;
     dicomElement.endOffset = offset;
     // create the tag group/element key
-    name = dwv.dicom.getGroupElementKey(
-      dicomElement.tag.group, dicomElement.tag.element);
+    name = new dwv.dicom.Tag(
+      dicomElement.tag.group, dicomElement.tag.element).getKey();
     // store
     dicomElements[name] = dicomElement;
   }

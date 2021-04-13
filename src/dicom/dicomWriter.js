@@ -602,8 +602,8 @@ dwv.dicom.DataWriter.prototype.writePixelDataElementValue = function (
  */
 dwv.dicom.DataWriter.prototype.writeDataElement = function (
   element, byteOffset, isImplicit) {
-  var isTagWithVR = dwv.dicom.isTagWithVR(
-    element.tag.group, element.tag.element);
+  var isTagWithVR = new dwv.dicom.Tag(
+    element.tag.group, element.tag.element).isWithVR();
   var is32bitVLVR = (isImplicit || !isTagWithVR)
     ? true : dwv.dicom.is32bitVLVR(element.vr);
   // group
@@ -614,7 +614,7 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (
   var vr = element.vr;
   // use VR=UN for private sequence
   if (this.useUnVrForPrivateSq &&
-    dwv.dicom.isPrivateGroup(element.tag.group) &&
+    new dwv.dicom.Tag(element.tag.group, element.tag.element).isPrivate() &&
     vr === 'SQ') {
     dwv.logger.warn('Write element using VR=UN for private sequence.');
     vr = 'UN';
@@ -809,15 +809,10 @@ dwv.dicom.DicomWriter = function () {
    */
   this.getElementToWrite = function (element) {
     // get group and tag string name
-    var tagName = null;
-    var dict = dwv.dicom.dictionary;
-    var group = element.tag.group;
-    var groupName = dwv.dicom.TagGroups[group.substr(1)]; // remove first 0
+    var tag = new dwv.dicom.Tag(element.tag.group, element.tag.element);
+    var groupName = tag.getGroupName();
+    var tagName = tag.getNameFromDictionary();
 
-    if (typeof dict[group] !== 'undefined' &&
-      typeof dict[group][element.tag.element] !== 'undefined') {
-      tagName = dict[group][element.tag.element][2];
-    }
     // apply rules:
     var rule;
     if (typeof this.rules[element.tag.name] !== 'undefined') {
@@ -986,16 +981,14 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
  * @param {object} element The DICOM element.
  */
 dwv.dicom.checkUnknownVR = function (element) {
-  var dict = dwv.dicom.dictionary;
   if (element.vr === 'UN') {
-    if (typeof dict[element.tag.group] !== 'undefined' &&
-      typeof dict[element.tag.group][element.tag.element] !== 'undefined') {
-      if (element.vr !== dict[element.tag.group][element.tag.element][0]) {
-        element.vr = dict[element.tag.group][element.tag.element][0];
-        dwv.logger.info('Element ' + element.tag.group +
-          ' ' + element.tag.element +
-          ' VR changed from UN to ' + element.vr);
-      }
+    var tag = dwv.dicom.Tag(element.tag.group, element.tag.element);
+    var dictVr = tag.getVrFromDictionary();
+    if (dictVr !== null && element.vr !== dictVr) {
+      element.vr = dictVr;
+      dwv.logger.info('Element ' + element.tag.group +
+        ' ' + element.tag.element +
+        ' VR changed from UN to ' + element.vr);
     }
   }
 };
@@ -1007,12 +1000,11 @@ dwv.dicom.checkUnknownVR = function (element) {
  * @returns {object} The DICOM element.
  */
 dwv.dicom.getDicomElement = function (tagName) {
-  var tagGE = dwv.dicom.getGroupElementFromName(tagName);
-  var dict = dwv.dicom.dictionary;
+  var tag = dwv.dicom.getTagFromDictionary(tagName);
   // return element definition
   return {
-    tag: {group: tagGE.group, element: tagGE.element},
-    vr: dict[tagGE.group][tagGE.element][0]
+    tag: {group: tag.getGroup(), element: tag.getElement()},
+    vr: tag.getVrFromDictionary()
   };
 };
 
@@ -1066,8 +1058,8 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
           subSize += dwv.dicom.setElementValue(
             subElement, itemData[elemKeys[j]]);
 
-          name = dwv.dicom.getGroupElementKey(
-            subElement.tag.group, subElement.tag.element);
+          name = new dwv.dicom.Tag(
+            subElement.tag.group, subElement.tag.element).getKey();
           itemElements[name] = subElement;
           subSize += dwv.dicom.getDataElementPrefixByteSize(
             subElement.vr, isImplicit);
@@ -1080,8 +1072,8 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
           vl: (explicitLength ? subSize : 'u/l'),
           value: []
         };
-        name = dwv.dicom.getGroupElementKey(
-          itemElement.tag.group, itemElement.tag.element);
+        name = new dwv.dicom.Tag(
+          itemElement.tag.group, itemElement.tag.element).getKey();
         itemElements[name] = itemElement;
         subSize += dwv.dicom.getDataElementPrefixByteSize('NONE', isImplicit);
 
@@ -1093,8 +1085,8 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
             vl: 0,
             value: []
           };
-          name = dwv.dicom.getGroupElementKey(
-            itemDelimElement.tag.group, itemDelimElement.tag.element);
+          name = new dwv.dicom.Tag(
+            itemDelimElement.tag.group, itemDelimElement.tag.element).getKey();
           itemElements[name] = itemDelimElement;
           subSize += dwv.dicom.getDataElementPrefixByteSize('NONE', isImplicit);
         }
