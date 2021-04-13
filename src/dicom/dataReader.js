@@ -20,10 +20,10 @@ dwv.dicom.isNativeLittleEndian = function () {
 dwv.dicom.flipArrayEndianness = function (array) {
   var blen = array.byteLength;
   var u8 = new Uint8Array(array.buffer, array.byteOffset, blen);
-  var bpel = array.BYTES_PER_ELEMENT;
+  var bpe = array.BYTES_PER_ELEMENT;
   var tmp;
-  for (var i = 0; i < blen; i += bpel) {
-    for (var j = i + bpel - 1, k = i; j > k; j--, k++) {
+  for (var i = 0; i < blen; i += bpe) {
+    for (var j = i + bpe - 1, k = i; j > k; j--, k++) {
       tmp = u8[k];
       u8[k] = u8[j];
       u8[j] = tmp;
@@ -127,7 +127,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
   };
 
   /**
-   * Read Float32 (8 bytes) data.
+   * Read Float32 (4 bytes) data.
    *
    * @param {number} byteOffset The offset to start reading from.
    * @returns {number} The read data.
@@ -137,7 +137,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
   };
 
   /**
-   * Read Float64 (16 bytes) data.
+   * Read Float64 (8 bytes) data.
    *
    * @param {number} byteOffset The offset to start reading from.
    * @returns {number} The read data.
@@ -176,10 +176,11 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
    * @returns {Array} The read data.
    */
   this.readUint16Array = function (byteOffset, size) {
-    var arraySize = size / Uint16Array.BYTES_PER_ELEMENT;
+    var bpe = Uint16Array.BYTES_PER_ELEMENT;
+    var arraySize = size / bpe;
     var data = null;
     // byteOffset should be a multiple of Uint16Array.BYTES_PER_ELEMENT (=2)
-    if ((byteOffset % Uint16Array.BYTES_PER_ELEMENT) === 0) {
+    if (byteOffset % bpe === 0) {
       data = new Uint16Array(buffer, byteOffset, arraySize);
       if (needFlip) {
         dwv.dicom.flipArrayEndianness(data);
@@ -187,9 +188,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
     } else {
       data = new Uint16Array(arraySize);
       for (var i = 0; i < arraySize; ++i) {
-        data[i] = this.readUint16(
-          byteOffset + Uint16Array.BYTES_PER_ELEMENT * i
-        );
+        data[i] = this.readUint16(byteOffset + bpe * i);
       }
     }
     return data;
@@ -203,10 +202,11 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
    * @returns {Array} The read data.
    */
   this.readInt16Array = function (byteOffset, size) {
-    var arraySize = size / Int16Array.BYTES_PER_ELEMENT;
+    var bpe = Int16Array.BYTES_PER_ELEMENT;
+    var arraySize = size / bpe;
     var data = null;
     // byteOffset should be a multiple of Int16Array.BYTES_PER_ELEMENT (=2)
-    if ((byteOffset % Int16Array.BYTES_PER_ELEMENT) === 0) {
+    if (byteOffset % bpe === 0) {
       data = new Int16Array(buffer, byteOffset, arraySize);
       if (needFlip) {
         dwv.dicom.flipArrayEndianness(data);
@@ -214,9 +214,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
     } else {
       data = new Int16Array(arraySize);
       for (var i = 0; i < arraySize; ++i) {
-        data[i] = this.readInt16(
-          byteOffset + Int16Array.BYTES_PER_ELEMENT * i
-        );
+        data[i] = this.readInt16(byteOffset + bpe * i);
       }
     }
     return data;
@@ -230,10 +228,11 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
    * @returns {Array} The read data.
    */
   this.readUint32Array = function (byteOffset, size) {
-    var arraySize = size / Uint32Array.BYTES_PER_ELEMENT;
+    var bpe = Uint32Array.BYTES_PER_ELEMENT;
+    var arraySize = size / bpe;
     var data = null;
     // byteOffset should be a multiple of Uint32Array.BYTES_PER_ELEMENT (=4)
-    if ((byteOffset % Uint32Array.BYTES_PER_ELEMENT) === 0) {
+    if (byteOffset % bpe === 0) {
       data = new Uint32Array(buffer, byteOffset, arraySize);
       if (needFlip) {
         dwv.dicom.flipArrayEndianness(data);
@@ -241,9 +240,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
     } else {
       data = new Uint32Array(arraySize);
       for (var i = 0; i < arraySize; ++i) {
-        data[i] = this.readUint32(
-          byteOffset + Uint32Array.BYTES_PER_ELEMENT * i
-        );
+        data[i] = this.readUint32(byteOffset + bpe * i);
       }
     }
     return data;
@@ -257,10 +254,11 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
    * @returns {Array} The read data.
    */
   this.readInt32Array = function (byteOffset, size) {
-    var arraySize = size / Int32Array.BYTES_PER_ELEMENT;
+    var bpe = Int32Array.BYTES_PER_ELEMENT;
+    var arraySize = size / bpe;
     var data = null;
     // byteOffset should be a multiple of Int32Array.BYTES_PER_ELEMENT (=4)
-    if ((byteOffset % Int32Array.BYTES_PER_ELEMENT) === 0) {
+    if (byteOffset % bpe === 0) {
       data = new Int32Array(buffer, byteOffset, arraySize);
       if (needFlip) {
         dwv.dicom.flipArrayEndianness(data);
@@ -268,9 +266,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
     } else {
       data = new Int32Array(arraySize);
       for (var i = 0; i < arraySize; ++i) {
-        data[i] = this.readInt32(
-          byteOffset + Int32Array.BYTES_PER_ELEMENT * i
-        );
+        data[i] = this.readInt32(byteOffset + bpe * i);
       }
     }
     return data;
@@ -284,10 +280,11 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
    * @returns {Array} The read data.
    */
   this.readFloat32Array = function (byteOffset, size) {
-    var arraySize = size / Float32Array.BYTES_PER_ELEMENT;
+    var bpe = Float32Array.BYTES_PER_ELEMENT;
+    var arraySize = size / bpe;
     var data = null;
     // byteOffset should be a multiple of Float32Array.BYTES_PER_ELEMENT (=4)
-    if ((byteOffset % Float32Array.BYTES_PER_ELEMENT) === 0) {
+    if (byteOffset % bpe === 0) {
       data = new Float32Array(buffer, byteOffset, arraySize);
       if (needFlip) {
         dwv.dicom.flipArrayEndianness(data);
@@ -295,9 +292,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
     } else {
       data = new Float32Array(arraySize);
       for (var i = 0; i < arraySize; ++i) {
-        data[i] = this.readFloat32(
-          byteOffset + Float32Array.BYTES_PER_ELEMENT * i
-        );
+        data[i] = this.readFloat32(byteOffset + bpe * i);
       }
     }
     return data;
@@ -311,10 +306,11 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
    * @returns {Array} The read data.
    */
   this.readFloat64Array = function (byteOffset, size) {
-    var arraySize = size / Float64Array.BYTES_PER_ELEMENT;
+    var bpe = Float64Array.BYTES_PER_ELEMENT;
+    var arraySize = size / bpe;
     var data = null;
     // byteOffset should be a multiple of Float64Array.BYTES_PER_ELEMENT (=8)
-    if ((byteOffset % Float64Array.BYTES_PER_ELEMENT) === 0) {
+    if (byteOffset % bpe === 0) {
       data = new Float64Array(buffer, byteOffset, arraySize);
       if (needFlip) {
         dwv.dicom.flipArrayEndianness(data);
@@ -322,9 +318,7 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
     } else {
       data = new Float64Array(arraySize);
       for (var i = 0; i < arraySize; ++i) {
-        data[i] = this.readFloat64(
-          byteOffset + Float64Array.BYTES_PER_ELEMENT * i
-        );
+        data[i] = this.readFloat64(byteOffset + bpe * i);
       }
     }
     return data;
