@@ -29,8 +29,13 @@ dwv.image.ImageFactory.prototype.create = function (
   if (!rows) {
     throw new Error('Missing or empty DICOM image number of rows');
   }
+  var frames = dicomElements.getFromKey('x00280008');
+  if (!frames) {
+    frames = 1;
+  }
+
   // image size
-  var size = new dwv.image.Size(columns, rows);
+  var size = new dwv.image.Size(columns, rows, 1, frames);
 
   // spacing
   var rowSpacing = null;
@@ -105,9 +110,8 @@ dwv.image.ImageFactory.prototype.create = function (
     dicomElements.getFromKey('x00080018'));
 
   // image
-  var image = new dwv.image.Image(
-    geometry, pixelBuffer, pixelBuffer.length, [sopInstanceUid]);
-    // PhotometricInterpretation
+  var image = new dwv.image.Image(geometry, pixelBuffer, [sopInstanceUid]);
+  // PhotometricInterpretation
   var photometricInterpretation = dicomElements.getFromKey('x00280004');
   if (photometricInterpretation) {
     var photo = dwv.dicom.cleanString(photometricInterpretation).toUpperCase();

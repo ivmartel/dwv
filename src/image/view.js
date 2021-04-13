@@ -451,7 +451,8 @@ dwv.image.View = function (image) {
     }
 
     // check if possible
-    if (frame < 0 || frame >= image.getNumberOfFrames()) {
+    var size = image.getGeometry().getSize();
+    if (frame < 0 || frame >= size.getNumberOfFrames()) {
       return false;
     }
     // check if new
@@ -461,7 +462,7 @@ dwv.image.View = function (image) {
       // assign
       currentFrame = frame;
       // fire event for multi frame data
-      if (image.getNumberOfFrames() !== 1) {
+      if (size.getNumberOfFrames() !== 1) {
         /**
          * Frame change event.
          *

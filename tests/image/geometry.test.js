@@ -18,7 +18,7 @@ QUnit.test('Test Size.', function (assert) {
   assert.equal(size0.getNumberOfRows(), 3, 'getNumberOfRows');
   assert.equal(size0.getNumberOfSlices(), 4, 'getNumberOfSlices');
   assert.equal(size0.getSliceSize(), 6, 'getSliceSize');
-  assert.equal(size0.getTotalSize(), 24, 'getTotalSize');
+  assert.equal(size0.getFrameSize(), 24, 'getFrameSize');
   // defaults
   var size00 = new dwv.image.Size(2, 3);
   assert.equal(size00.getNumberOfSlices(), 1, 'getNumberOfSlices default');

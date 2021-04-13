@@ -9,8 +9,10 @@ dwv.image = dwv.image || {};
  * @param {number} numberOfColumns The number of columns.
  * @param {number} numberOfRows The number of rows.
  * @param {number} numberOfSlices The number of slices.
+ * @param {number} numberOfFrames The number of frames.
  */
-dwv.image.Size = function (numberOfColumns, numberOfRows, numberOfSlices) {
+dwv.image.Size = function (
+  numberOfColumns, numberOfRows, numberOfSlices, numberOfFrames) {
   /**
    * Get the number of columns.
    *
@@ -35,6 +37,14 @@ dwv.image.Size = function (numberOfColumns, numberOfRows, numberOfSlices) {
   this.getNumberOfSlices = function () {
     return (numberOfSlices || 1.0);
   };
+  /**
+   * Get the number of frames.
+   *
+   * @returns {number} The number of frames.
+   */
+  this.getNumberOfFrames = function () {
+    return (numberOfFrames || 1.0);
+  };
 };
 
 /**
@@ -47,12 +57,21 @@ dwv.image.Size.prototype.getSliceSize = function () {
 };
 
 /**
+ * Get the size of a frame.
+ *
+ * @returns {number} The size of a frame.
+ */
+dwv.image.Size.prototype.getFrameSize = function () {
+  return this.getSliceSize() * this.getNumberOfSlices();
+};
+
+/**
  * Get the total size.
  *
  * @returns {number} The total size.
  */
 dwv.image.Size.prototype.getTotalSize = function () {
-  return this.getSliceSize() * this.getNumberOfSlices();
+  return this.getFrameSize() * this.getNumberOfFrames();
 };
 
 /**
@@ -65,7 +84,8 @@ dwv.image.Size.prototype.equals = function (rhs) {
   return rhs !== null &&
     this.getNumberOfColumns() === rhs.getNumberOfColumns() &&
     this.getNumberOfRows() === rhs.getNumberOfRows() &&
-    this.getNumberOfSlices() === rhs.getNumberOfSlices();
+    this.getNumberOfSlices() === rhs.getNumberOfSlices() &&
+    this.getNumberOfFrames() === rhs.getNumberOfFrames();
 };
 
 /**
@@ -93,7 +113,8 @@ dwv.image.Size.prototype.isInBounds = function (i, j, k) {
 dwv.image.Size.prototype.toString = function () {
   return '(' + this.getNumberOfColumns() +
     ', ' + this.getNumberOfRows() +
-    ', ' + this.getNumberOfSlices() + ')';
+    ', ' + this.getNumberOfSlices() +
+    ', ' + this.getNumberOfFrames() + ')';
 };
 
 /**
@@ -260,7 +281,9 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
     size = new dwv.image.Size(
       size.getNumberOfColumns(),
       size.getNumberOfRows(),
-      size.getNumberOfSlices() + 1);
+      size.getNumberOfSlices() + 1,
+      size.getNumberOfFrames()
+    );
   };
 
 };

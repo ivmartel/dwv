@@ -186,13 +186,13 @@ QUnit.test('Test Image append slice.', function (assert) {
 
   // slice to append
   var sliceSize = new dwv.image.Size(size, size, 1);
-  var sliceBuffer = new Int16Array(sliceSize.getTotalSize());
+  var sliceBuffer = new Int16Array(sliceSize.getFrameSize());
   for (var i = 0; i < size * size; ++i) {
     sliceBuffer[i] = 2;
   }
 
   // image buffer
-  var buffer = new Int16Array(imgSize.getTotalSize());
+  var buffer = new Int16Array(imgSize.getFrameSize());
   for (var j = 0; j < size * size; ++j) {
     buffer[j] = 0;
   }
@@ -201,7 +201,7 @@ QUnit.test('Test Image append slice.', function (assert) {
   }
 
   // image 0
-  var image0 = new dwv.image.Image(imgGeometry0, [buffer], 1, ['0']);
+  var image0 = new dwv.image.Image(imgGeometry0, [buffer], ['0']);
   image0.setMeta({numberOfFiles: 3});
   // append null
   assert.throws(function () {
@@ -211,7 +211,7 @@ QUnit.test('Test Image append slice.', function (assert) {
   var sliceOrigin = new dwv.math.Point3D(0, 0, -1);
   var sliceGeometry = new dwv.image.Geometry(
     sliceOrigin, sliceSize, imgSpacing);
-  var slice0 = new dwv.image.Image(sliceGeometry, [sliceBuffer], 1, ['1']);
+  var slice0 = new dwv.image.Image(sliceGeometry, [sliceBuffer], ['1']);
   slice0.setMeta({numberOfFiles: 3});
   // append slice before
   image0.appendSlice(slice0);
@@ -236,12 +236,12 @@ QUnit.test('Test Image append slice.', function (assert) {
   var imgGeometry1 = new dwv.image.Geometry(
     imgOrigin, imgSizeMinusOne, imgSpacing);
   imgGeometry1.appendOrigin(new dwv.math.Point3D(0, 0, 1), 1);
-  var image1 = new dwv.image.Image(imgGeometry1, [buffer], 1, ['0']);
+  var image1 = new dwv.image.Image(imgGeometry1, [buffer], ['0']);
   image1.setMeta({numberOfFiles: 3});
   var sliceOrigin1 = new dwv.math.Point3D(0, 0, 2);
   var sliceGeometry1 = new dwv.image.Geometry(
     sliceOrigin1, sliceSize, imgSpacing);
-  var slice1 = new dwv.image.Image(sliceGeometry1, [sliceBuffer], 1, ['0']);
+  var slice1 = new dwv.image.Image(sliceGeometry1, [sliceBuffer], ['0']);
   slice1.setMeta({numberOfFiles: 3});
   // append slice before
   image1.appendSlice(slice1);
@@ -266,12 +266,12 @@ QUnit.test('Test Image append slice.', function (assert) {
   var imgGeometry2 = new dwv.image.Geometry(
     imgOrigin, imgSizeMinusOne, imgSpacing);
   imgGeometry2.appendOrigin(new dwv.math.Point3D(0, 0, 1), 1);
-  var image2 = new dwv.image.Image(imgGeometry2, [buffer], 1, ['0']);
+  var image2 = new dwv.image.Image(imgGeometry2, [buffer], ['0']);
   image2.setMeta({numberOfFiles: 3});
   var sliceOrigin2 = new dwv.math.Point3D(0, 0, 0.4);
   var sliceGeometry2 = new dwv.image.Geometry(
     sliceOrigin2, sliceSize, imgSpacing);
-  var slice2 = new dwv.image.Image(sliceGeometry2, [sliceBuffer], 1, ['0']);
+  var slice2 = new dwv.image.Image(sliceGeometry2, [sliceBuffer], ['0']);
   slice2.setMeta({numberOfFiles: 3});
   // append slice before
   image2.appendSlice(slice2);

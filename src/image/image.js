@@ -13,24 +13,9 @@ dwv.image = dwv.image || {};
  * @class
  * @param {object} geometry The geometry of the image.
  * @param {Array} buffer The image data as an array of frame buffers.
- * @param {number} numberOfFrames The number of frames (optional, can be used
-     to anticipate the final number after appends).
  * @param {Array} imageUids An array of Uids indexed to slice number.
  */
-dwv.image.Image = function (geometry, buffer, numberOfFrames, imageUids) {
-  // use buffer length in not specified
-  if (typeof numberOfFrames === 'undefined') {
-    numberOfFrames = buffer.length;
-  }
-
-  /**
-   * Get the number of frames.
-   *
-   * @returns {number} The number of frames.
-   */
-  this.getNumberOfFrames = function () {
-    return numberOfFrames;
-  };
+dwv.image.Image = function (geometry, buffer, imageUids) {
 
   /**
    * Rescale slope and intercept.
@@ -91,7 +76,7 @@ dwv.image.Image = function (geometry, buffer, numberOfFrames, imageUids) {
    * @type {number}
    */
   var numberOfComponents = buffer.find(isNotNull).length / (
-    geometry.getSize().getTotalSize());
+    geometry.getSize().getFrameSize());
     /**
      * Meta information.
      *
@@ -286,7 +271,8 @@ dwv.image.Image = function (geometry, buffer, numberOfFrames, imageUids) {
   this.clone = function () {
     // clone the image buffer
     var clonedBuffer = [];
-    for (var f = 0, lenf = this.getNumberOfFrames(); f < lenf; ++f) {
+    var size = this.getGeometry().getSize();
+    for (var f = 0, lenf = size.getNumberOfFrames(); f < lenf; ++f) {
       clonedBuffer[f] = buffer[f].slice(0);
     }
     // create the image copy
@@ -543,7 +529,7 @@ dwv.image.Image.prototype.getRescaledValueAtOffset = function (offset, k, f) {
  * @returns {object} The range {min, max}.
  */
 dwv.image.Image.prototype.calculateDataRange = function () {
-  var size = this.getGeometry().getSize().getTotalSize();
+  var size = this.getGeometry().getSize().getFrameSize();
   var nFrames = 1; //this.getNumberOfFrames();
   var min = this.getValueAtOffset(0, 0);
   var max = min;
@@ -620,7 +606,7 @@ dwv.image.Image.prototype.calculateHistogram = function () {
   var rmin = this.getRescaledValue(0, 0, 0);
   var rmax = rmin;
   var rvalue = 0;
-  for (var f = 0, nframes = this.getNumberOfFrames(); f < nframes; ++f) {
+  for (var f = 0, nframes = size.getNumberOfFrames(); f < nframes; ++f) {
     for (var k = 0, nslices = size.getNumberOfSlices(); k < nslices; ++k) {
       for (var j = 0, nrows = size.getNumberOfRows(); j < nrows; ++j) {
         for (var i = 0, ncols = size.getNumberOfColumns(); i < ncols; ++i) {
@@ -680,19 +666,19 @@ dwv.image.Image.prototype.convolute2D = function (weights) {
   var ncols = imgSize.getNumberOfColumns();
   var nrows = imgSize.getNumberOfRows();
   var nslices = imgSize.getNumberOfSlices();
-  var nframes = this.getNumberOfFrames();
+  var nframes = imgSize.getNumberOfFrames();
   var ncomp = this.getNumberOfComponents();
 
   // adapt to number of component and planar configuration
   var factor = 1;
   var componentOffset = 1;
-  var frameOffset = imgSize.getTotalSize();
+  var frameOffset = imgSize.getFrameSize();
   if (ncomp === 3) {
     frameOffset *= 3;
     if (this.getPlanarConfiguration() === 0) {
       factor = 3;
     } else {
-      componentOffset = imgSize.getTotalSize();
+      componentOffset = imgSize.getFrameSize();
     }
   }
 
@@ -823,7 +809,8 @@ dwv.image.Image.prototype.convolute2D = function (weights) {
 dwv.image.Image.prototype.transform = function (operator) {
   var newImage = this.clone();
   var newBuffer = newImage.getBuffer();
-  for (var f = 0, lenf = this.getNumberOfFrames(); f < lenf; ++f) {
+  var size = this.getGeometry().getSize();
+  for (var f = 0, lenf = size.getNumberOfFrames(); f < lenf; ++f) {
     for (var i = 0, leni = newBuffer[f].length; i < leni; ++i) {
       newBuffer[f][i] = operator(newImage.getValueAtOffset(i, f));
     }
@@ -843,7 +830,8 @@ dwv.image.Image.prototype.transform = function (operator) {
 dwv.image.Image.prototype.compose = function (rhs, operator) {
   var newImage = this.clone();
   var newBuffer = newImage.getBuffer();
-  for (var f = 0, lenf = this.getNumberOfFrames(); f < lenf; ++f) {
+  var size = this.getGeometry().getSize();
+  for (var f = 0, lenf = size.getNumberOfFrames(); f < lenf; ++f) {
     for (var i = 0, leni = newBuffer[f].length; i < leni; ++i) {
       // using the operator on the local buffer, i.e. the
       // latest (not original) data

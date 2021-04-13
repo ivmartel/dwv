@@ -48,7 +48,7 @@ dwv.image.getDefaultImage = function (
   // create image
   var geometry = new dwv.image.Geometry(origin, imageSize, imageSpacing);
   var image = new dwv.image.Image(
-    geometry, imageBuffer, numberOfFrames, [imageUid]);
+    geometry, imageBuffer, [imageUid]);
   image.setPhotometricInterpretation('RGB');
   // meta information
   var meta = {};

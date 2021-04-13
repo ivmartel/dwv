@@ -196,9 +196,9 @@ dwv.tool.Scroll = function (app) {
     var viewController =
       layerController.getActiveViewLayer().getViewController();
 
-    var hasSlices =
-      (app.getImage().getGeometry().getSize().getNumberOfSlices() !== 1);
-    var hasFrames = (app.getImage().getNumberOfFrames() !== 1);
+    var size = app.getImage().getGeometry().getSize();
+    var hasSlices = size.getNumberOfSlices() !== 1;
+    var hasFrames = size.getNumberOfFrames() !== 1;
     if (up) {
       if (hasSlices) {
         viewController.incrementSliceNb();
