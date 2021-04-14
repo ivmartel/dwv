@@ -251,7 +251,8 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   this.getValueAtOffsetAndFrame = function (offset, frame) {
     //return buffer[frame][offset];
     var size = this.getGeometry().getSize();
-    return this.getValueAtOffset(frame * size.getFrameSize() + offset);
+    return this.getValueAtOffset(
+      frame * size.getFrameSize() * numberOfComponents + offset);
   };
 
   this.getValueAtOffset = function (offset) {
