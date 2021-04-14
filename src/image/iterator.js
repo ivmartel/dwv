@@ -208,7 +208,7 @@ dwv.image.getSliceIterator = function (image, slice, frame) {
   var start = slice * sliceSize;
 
   var dataAccessor = function (offset) {
-    return image.getValueAtOffset(offset, frame);
+    return image.getValueAtOffsetAndFrame(offset, frame);
   };
 
   var range = null;
@@ -279,7 +279,7 @@ dwv.image.getRegionSliceIterator = function (
     };
   } else {
     dataAccessor = function (offset) {
-      return image.getValueAtOffset(offset, frame);
+      return image.getValueAtOffsetAndFrame(offset, frame);
     };
   }
 
@@ -353,7 +353,7 @@ dwv.image.getVariableRegionSliceIterator = function (
     };
   } else {
     dataAccessor = function (offset) {
-      return image.getValueAtOffset(offset, frame);
+      return image.getValueAtOffsetAndFrame(offset, frame);
     };
   }
 

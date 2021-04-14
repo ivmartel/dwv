@@ -10,6 +10,24 @@ dwv.image = dwv.image || {};
 dwv.image.ImageFactory = function () {};
 
 /**
+ * Check dicom elements. Throws an error if not suitable.
+ *
+ * @param {object} dicomElements The DICOM tags.
+ */
+dwv.image.ImageFactory.prototype.checkElements = function (dicomElements) {
+  // columns
+  var columns = dicomElements.getFromKey('x00280011');
+  if (!columns) {
+    throw new Error('Missing or empty DICOM image number of columns');
+  }
+  // rows
+  var rows = dicomElements.getFromKey('x00280010');
+  if (!rows) {
+    throw new Error('Missing or empty DICOM image number of rows');
+  }
+};
+
+/**
  * Get an {@link dwv.image.Image} object from the read DICOM file.
  *
  * @param {object} dicomElements The DICOM tags.
@@ -29,6 +47,7 @@ dwv.image.ImageFactory.prototype.create = function (
   if (!rows) {
     throw new Error('Missing or empty DICOM image number of rows');
   }
+  // frames
   var frames = dicomElements.getFromKey('x00280008');
   if (!frames) {
     frames = 1;
@@ -109,6 +128,24 @@ dwv.image.ImageFactory.prototype.create = function (
   var sopInstanceUid = dwv.dicom.cleanString(
     dicomElements.getFromKey('x00080018'));
 
+  // Sample per pixels
+  var samplesPerPixel = dicomElements.getFromKey('x00280002');
+  if (!samplesPerPixel) {
+    samplesPerPixel = 1;
+  }
+
+  // check buffer size
+  var bufferSize = size.getTotalSize() * samplesPerPixel;
+  if (bufferSize !== pixelBuffer.length) {
+    dwv.logger.warn('Badly sized pixel buffer: ' +
+      pixelBuffer.length + ' != ' + bufferSize);
+    if (bufferSize < pixelBuffer.length) {
+      pixelBuffer = pixelBuffer.slice(0, size.getTotalSize());
+    } else {
+      throw new Error('Underestimated buffer size, can\'t fix it...');
+    }
+  }
+
   // image
   var image = new dwv.image.Image(geometry, pixelBuffer, [sopInstanceUid]);
   // PhotometricInterpretation
@@ -121,7 +158,6 @@ dwv.image.ImageFactory.prototype.create = function (
       photo = 'RGB';
     }
     // check samples per pixels
-    var samplesPerPixel = parseInt(dicomElements.getFromKey('x00280002'), 10);
     if (photo === 'RGB' && samplesPerPixel === 1) {
       photo = 'PALETTE COLOR';
     }

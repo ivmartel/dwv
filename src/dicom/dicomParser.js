@@ -735,10 +735,8 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
     var itemData;
     if (vlString !== 'u/l') {
       // explicit VR sequence
-      // check vl
-      if (vl === 0) {
-        dwv.logger.warn('Explicit sequence with vl=0.');
-      } else {
+      if (vl !== 0) {
+        // read until the end offset
         var sqEndOffset = offset + vl;
         while (offset < sqEndOffset) {
           itemData = this.readExplicitItemDataElement(reader, offset, implicit);
@@ -824,29 +822,30 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
       );
     }
     // read
+    data = [];
     if (bitsAllocated === 8) {
       if (pixelRepresentation === 0) {
-        data = reader.readUint8Array(offset, vl);
+        data.push(reader.readUint8Array(offset, vl));
       } else {
-        data = reader.readInt8Array(offset, vl);
+        data.push(reader.readInt8Array(offset, vl));
       }
     } else if (bitsAllocated === 16) {
       if (pixelRepresentation === 0) {
-        data = reader.readUint16Array(offset, vl);
+        data.push(reader.readUint16Array(offset, vl));
       } else {
-        data = reader.readInt16Array(offset, vl);
+        data.push(reader.readInt16Array(offset, vl));
       }
     } else if (bitsAllocated === 32) {
       if (pixelRepresentation === 0) {
-        data = reader.readUint32Array(offset, vl);
+        data.push(reader.readUint32Array(offset, vl));
       } else {
-        data = reader.readInt32Array(offset, vl);
+        data.push(reader.readInt32Array(offset, vl));
       }
     } else if (bitsAllocated === 64) {
       if (pixelRepresentation === 0) {
-        data = reader.readUint64Array(offset, vl);
+        data.push(reader.readUint64Array(offset, vl));
       } else {
-        data = reader.readInt64Array(offset, vl);
+        data.push(reader.readInt64Array(offset, vl));
       }
     }
   } else if (vr === 'OB') {
@@ -1091,59 +1090,19 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
     pixelRepresentation, bitsAllocated
   );
 
-  // pixel buffer
-  if (typeof this.dicomElements.x7FE00010 !== 'undefined') {
-
-    var numberOfFrames = 1;
-    if (typeof this.dicomElements.x00280008 !== 'undefined') {
-      numberOfFrames = dwv.dicom.cleanString(
-        this.dicomElements.x00280008.value[0]);
-    }
-
-    if (this.dicomElements.x7FE00010.vl !== 'u/l') {
-      // compressed should be encapsulated...
-      if (dwv.dicom.isJpeg2000TransferSyntax(syntax) ||
-        dwv.dicom.isJpegBaselineTransferSyntax(syntax) ||
-        dwv.dicom.isJpegLosslessTransferSyntax(syntax)) {
-        dwv.logger.warn('Compressed but no items...');
+  // handle fragmented pixel buffer
+  // Reference: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_8.2.html
+  // (third note, "Depending on the transfer syntax...")
+  dataElement = this.dicomElements.x7FE00010;
+  if (typeof dataElement !== 'undefined') {
+    if (dataElement.vl === 'u/l') {
+      var numberOfFrames = 1;
+      if (typeof this.dicomElements.x00280008 !== 'undefined') {
+        numberOfFrames = dwv.dicom.cleanString(
+          this.dicomElements.x00280008.value[0]);
       }
-
-      // calculate the slice size
-      var pixData = this.dicomElements.x7FE00010.value;
-      if (pixData && typeof pixData !== 'undefined' &&
-        pixData.length !== 0) {
-        if (typeof this.dicomElements.x00280010 === 'undefined') {
-          throw new Error('Missing image number of rows.');
-        }
-        if (typeof this.dicomElements.x00280011 === 'undefined') {
-          throw new Error('Missing image number of columns.');
-        }
-        if (typeof this.dicomElements.x00280002 === 'undefined') {
-          throw new Error('Missing image samples per pixel.');
-        }
-        var columns = this.dicomElements.x00280011.value[0];
-        var rows = this.dicomElements.x00280010.value[0];
-        var samplesPerPixel = this.dicomElements.x00280002.value[0];
-        var sliceSize = columns * rows * samplesPerPixel;
-        // slice data in an array of frames
-        var newPixData = [];
-        var frameOffset = 0;
-        for (var g = 0; g < numberOfFrames; ++g) {
-          newPixData[g] = pixData.slice(frameOffset, frameOffset + sliceSize);
-          frameOffset += sliceSize;
-        }
-        // store as pixel data
-        this.dicomElements.x7FE00010.value = newPixData;
-      } else {
-        dwv.logger.info('Empty pixel data.');
-      }
-    } else {
-      // handle fragmented pixel buffer
-      // Reference: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_8.2.html
-      // (third note, "Depending on the transfer syntax...")
-      var pixItems = this.dicomElements.x7FE00010.value;
+      var pixItems = dataElement.value;
       if (pixItems.length > 1 && pixItems.length > numberOfFrames) {
-
         // concatenate pixel data items
         // concat does not work on typed arrays
         //this.pixelBuffer = this.pixelBuffer.concat( dataElement.data );
@@ -1169,7 +1128,7 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
           newPixItems[f] = newBuffer;
         }
         // store as pixel data
-        this.dicomElements.x7FE00010.value = newPixItems;
+        dataElement.value = newPixItems;
       }
     }
   }

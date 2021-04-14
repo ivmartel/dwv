@@ -47,8 +47,7 @@ dwv.image.getDefaultImage = function (
   var origin = new dwv.math.Point3D(0, 0, sliceIndex);
   // create image
   var geometry = new dwv.image.Geometry(origin, imageSize, imageSpacing);
-  var image = new dwv.image.Image(
-    geometry, imageBuffer, [imageUid]);
+  var image = new dwv.image.Image(geometry, imageBuffer, [imageUid]);
   image.setPhotometricInterpretation('RGB');
   // meta information
   var meta = {};
@@ -99,7 +98,7 @@ dwv.image.getViewFromDOMImage = function (domImage, origin) {
   // create view
   var imageBuffer = dwv.image.imageDataToBuffer(imageData);
   var image = dwv.image.getDefaultImage(
-    width, height, sliceIndex, [imageBuffer], 1, sliceIndex);
+    width, height, sliceIndex, imageBuffer, 1, sliceIndex);
 
   // return
   return {
@@ -181,7 +180,7 @@ dwv.image.getViewFromDOMVideo = function (
     if (frameIndex === 0) {
       // create view
       image = dwv.image.getDefaultImage(
-        width, height, 1, [imgBuffer], numberOfFrames, dataIndex);
+        width, height, 1, imgBuffer, numberOfFrames, dataIndex);
       // call callback
       onloaditem({
         data: {

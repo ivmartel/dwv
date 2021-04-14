@@ -58,31 +58,20 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
    * @type {number}
    */
   var planarConfiguration = 0;
-
-  /**
-   * Check if the input element is not null.
-   *
-   * @param {object} element The element to test.
-   * @returns {boolean} True if the input is not null.
-   */
-  var isNotNull = function (element) {
-    return element !== null;
-  };
-
   /**
    * Number of components.
    *
    * @private
    * @type {number}
    */
-  var numberOfComponents = buffer.find(isNotNull).length / (
-    geometry.getSize().getFrameSize());
-    /**
-     * Meta information.
-     *
-     * @private
-     * @type {object}
-     */
+  var numberOfComponents = buffer.length / (
+    geometry.getSize().getTotalSize());
+  /**
+   * Meta information.
+   *
+   * @private
+   * @type {object}
+   */
   var meta = {};
 
   /**
@@ -259,8 +248,14 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
    * @param {number} frame The desired frame.
    * @returns {number} The value at offset.
    */
-  this.getValueAtOffset = function (offset, frame) {
-    return buffer[frame][offset];
+  this.getValueAtOffsetAndFrame = function (offset, frame) {
+    //return buffer[frame][offset];
+    var size = this.getGeometry().getSize();
+    return this.getValueAtOffset(frame * size.getFrameSize() + offset);
+  };
+
+  this.getValueAtOffset = function (offset) {
+    return buffer[offset];
   };
 
   /**
@@ -270,11 +265,11 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
    */
   this.clone = function () {
     // clone the image buffer
-    var clonedBuffer = [];
-    var size = this.getGeometry().getSize();
+    var clonedBuffer = buffer.slice(0);
+    /*var size = this.getGeometry().getSize();
     for (var f = 0, lenf = size.getNumberOfFrames(); f < lenf; ++f) {
       clonedBuffer[f] = buffer[f].slice(0);
-    }
+    }*/
     // create the image copy
     var copy = new dwv.image.Image(this.getGeometry(), clonedBuffer);
     // copy the RSIs
@@ -294,10 +289,10 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
    * Append a slice to the image.
    *
    * @param {Image} rhs The slice to append.
-   * @param {number} frame The frame where to append.
+   * @param {number} _frame The frame where to append.
    * @returns {number} The number of the inserted slice.
    */
-  this.appendSlice = function (rhs, frame) {
+  this.appendSlice = function (rhs, _frame) {
     // check input
     if (rhs === null) {
       throw new Error('Cannot append null slice');
@@ -331,7 +326,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       }
     }
 
-    var f = (typeof frame === 'undefined') ? 0 : frame;
+    //var f = (typeof frame === 'undefined') ? 0 : frame;
 
     // calculate slice size
     var mul = 1;
@@ -341,21 +336,34 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     }
     var sliceSize = mul * size.getSliceSize();
 
+
     // create full buffer if not done yet
     var fullBufferSize = sliceSize * meta.numberOfFiles;
-    if (buffer[f].length !== fullBufferSize) {
+    //var fullBufferSize = this.getGeometry().getSize().getTotalSize();
+    //if (buffer[f].length !== fullBufferSize) {
+    if (buffer.length !== fullBufferSize) {
       if (typeof meta.numberOfFiles === 'undefined') {
         throw new Error('Missing number of files for buffer creation.');
       }
+      // // save old
+      // var oldBuffer = buffer[f];
+      // // create new
+      // buffer[f] = dwv.dicom.getTypedArray(
+      //   buffer[f].BYTES_PER_ELEMENT * 8,
+      //   meta.IsSigned ? 1 : 0,
+      //   fullBufferSize);
+      // // put old in new
+      // buffer[f].set(oldBuffer);
+
       // save old
-      var oldBuffer = buffer[f];
+      var oldBuffer = buffer;
       // create new
-      buffer[f] = dwv.dicom.getTypedArray(
-        buffer[f].BYTES_PER_ELEMENT * 8,
+      buffer = dwv.dicom.getTypedArray(
+        buffer.BYTES_PER_ELEMENT * 8,
         meta.IsSigned ? 1 : 0,
         fullBufferSize);
       // put old in new
-      buffer[f].set(oldBuffer);
+      buffer.set(oldBuffer);
     }
 
     // store slice
@@ -368,21 +376,30 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       // insert slice before current data
       start = 0;
       end = start + oldNumberOfSlices * sliceSize;
-      buffer[f].set(
-        buffer[f].subarray(start, end),
+      // buffer[f].set(
+      //   buffer[f].subarray(start, end),
+      //   sliceSize
+      // );
+      buffer.set(
+        buffer.subarray(start, end),
         sliceSize
       );
     } else if (newSliceIndex < oldNumberOfSlices) {
       // insert slice in between current data
       start = newSliceOffset;
       end = start + (oldNumberOfSlices - newSliceIndex) * sliceSize;
-      buffer[f].set(
-        buffer[f].subarray(start, end),
+      // buffer[f].set(
+      //   buffer[f].subarray(start, end),
+      //   newSliceOffset + sliceSize
+      // );
+      buffer.set(
+        buffer.subarray(start, end),
         newSliceOffset + sliceSize
       );
     }
     // add new slice content
-    buffer[f].set(rhs.getBuffer()[f], newSliceOffset);
+    //buffer[f].set(rhs.getBuffer()[f], newSliceOffset);
+    buffer.set(rhs.getBuffer(), newSliceOffset);
 
     // update geometry
     geometry.appendOrigin(rhs.getGeometry().getOrigin(), newSliceIndex);
@@ -482,7 +499,8 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
 dwv.image.Image.prototype.getValue = function (i, j, k, f) {
   var frame = (f || 0);
   var index = new dwv.math.Index3D(i, j, k);
-  return this.getValueAtOffset(this.getGeometry().indexToOffset(index), frame);
+  return this.getValueAtOffsetAndFrame(
+    this.getGeometry().indexToOffset(index), frame);
 };
 
 /**
@@ -515,7 +533,7 @@ dwv.image.Image.prototype.getRescaledValue = function (i, j, k, f) {
  */
 dwv.image.Image.prototype.getRescaledValueAtOffset = function (offset, k, f) {
   var frame = (f || 0);
-  var val = this.getValueAtOffset(offset, frame);
+  var val = this.getValueAtOffsetAndFrame(offset, frame);
   if (!this.isIdentityRSI()) {
     val = this.getRescaleSlopeAndIntercept(k).apply(val);
   }
@@ -531,12 +549,12 @@ dwv.image.Image.prototype.getRescaledValueAtOffset = function (offset, k, f) {
 dwv.image.Image.prototype.calculateDataRange = function () {
   var size = this.getGeometry().getSize().getFrameSize();
   var nFrames = 1; //this.getNumberOfFrames();
-  var min = this.getValueAtOffset(0, 0);
+  var min = this.getValueAtOffsetAndFrame(0, 0);
   var max = min;
   var value = 0;
   for (var f = 0; f < nFrames; ++f) {
     for (var i = 0; i < size; ++i) {
-      value = this.getValueAtOffset(i, f);
+      value = this.getValueAtOffsetAndFrame(i, f);
       if (value > max) {
         max = value;
       }
@@ -667,6 +685,7 @@ dwv.image.Image.prototype.convolute2D = function (weights) {
   var nrows = imgSize.getNumberOfRows();
   var nslices = imgSize.getNumberOfSlices();
   var nframes = imgSize.getNumberOfFrames();
+  var frameSize = imgSize.getFrameSize();
   var ncomp = this.getNumberOfComponents();
 
   // adapt to number of component and planar configuration
@@ -784,10 +803,10 @@ dwv.image.Image.prototype.convolute2D = function (weights) {
             // fall under the convolution matrix
             newValue = 0;
             for (var wi = 0; wi < 9; ++wi) {
-              newValue += this.getValueAtOffset(
+              newValue += this.getValueAtOffsetAndFrame(
                 pixelOffset + wOffFinal[wi], f) * weights[wi];
             }
-            newBuffer[f][pixelOffset] = newValue;
+            newBuffer[f * frameSize + pixelOffset] = newValue;
             // increment pixel offset
             pixelOffset += factor;
           }
@@ -809,12 +828,16 @@ dwv.image.Image.prototype.convolute2D = function (weights) {
 dwv.image.Image.prototype.transform = function (operator) {
   var newImage = this.clone();
   var newBuffer = newImage.getBuffer();
-  var size = this.getGeometry().getSize();
-  for (var f = 0, lenf = size.getNumberOfFrames(); f < lenf; ++f) {
-    for (var i = 0, leni = newBuffer[f].length; i < leni; ++i) {
-      newBuffer[f][i] = operator(newImage.getValueAtOffset(i, f));
-    }
+  // var size = this.getGeometry().getSize();
+  // for (var f = 0, lenf = size.getNumberOfFrames(); f < lenf; ++f) {
+  //   for (var i = 0, leni = newBuffer[f].length; i < leni; ++i) {
+  //     newBuffer[f][i] = operator(newImage.getValueAtOffset(i, f));
+  //   }
+  // }
+  for (var i = 0, leni = newBuffer.length; i < leni; ++i) {
+    newBuffer[i] = operator(newImage.getValueAtOffset(i));
   }
+
   return newImage;
 };
 
@@ -830,15 +853,23 @@ dwv.image.Image.prototype.transform = function (operator) {
 dwv.image.Image.prototype.compose = function (rhs, operator) {
   var newImage = this.clone();
   var newBuffer = newImage.getBuffer();
-  var size = this.getGeometry().getSize();
-  for (var f = 0, lenf = size.getNumberOfFrames(); f < lenf; ++f) {
-    for (var i = 0, leni = newBuffer[f].length; i < leni; ++i) {
-      // using the operator on the local buffer, i.e. the
-      // latest (not original) data
-      newBuffer[f][i] = Math.floor(
-        operator(this.getValueAtOffset(i, f), rhs.getValueAtOffset(i, f))
-      );
-    }
+  // var size = this.getGeometry().getSize();
+  // for (var f = 0, lenf = size.getNumberOfFrames(); f < lenf; ++f) {
+  //   for (var i = 0, leni = newBuffer[f].length; i < leni; ++i) {
+  //     // using the operator on the local buffer, i.e. the
+  //     // latest (not original) data
+  //     newBuffer[f][i] = Math.floor(
+  //       operator(this.getValueAtOffset(i, f), rhs.getValueAtOffset(i, f))
+  //     );
+  //   }
+  // }
+  for (var i = 0, leni = newBuffer.length; i < leni; ++i) {
+    // using the operator on the local buffer, i.e. the
+    // latest (not original) data
+    newBuffer[i] = Math.floor(
+      operator(this.getValueAtOffset(i), rhs.getValueAtOffset(i))
+    );
   }
+
   return newImage;
 };

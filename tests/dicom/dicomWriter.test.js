@@ -32,16 +32,21 @@ QUnit.test('Test multiframe writer support.', function (assert) {
     var dicomParser = new dwv.dicom.DicomParser();
     dicomParser.parse(this.response);
 
+    var numCols = 256;
+    var numRows = 256;
     var numFrames = 16;
+    var bufferSize = numCols * numRows * numFrames;
 
     // raw tags
     var rawTags = dicomParser.getRawDicomElements();
     // check values
     assert.equal(rawTags.x00280008.value[0], numFrames, 'Number of frames');
+    assert.equal(rawTags.x00280011.value[0], numCols, 'Number of columns');
+    assert.equal(rawTags.x00280010.value[0], numRows, 'Number of rows');
     // length of value array for pixel data
     assert.equal(
-      rawTags.x7FE00010.value.length,
-      numFrames,
+      rawTags.x7FE00010.value[0].length,
+      bufferSize,
       'Length of value array for pixel data');
 
     var dicomWriter = new dwv.dicom.DicomWriter();
@@ -54,10 +59,12 @@ QUnit.test('Test multiframe writer support.', function (assert) {
 
     // check values
     assert.equal(rawTags.x00280008.value[0], numFrames, 'Number of frames');
+    assert.equal(rawTags.x00280011.value[0], numCols, 'Number of columns');
+    assert.equal(rawTags.x00280010.value[0], numRows, 'Number of rows');
     // length of value array for pixel data
     assert.equal(
-      rawTags.x7FE00010.value.length,
-      numFrames,
+      rawTags.x7FE00010.value[0].length,
+      bufferSize,
       'Length of value array for pixel data');
 
     // finish async test
