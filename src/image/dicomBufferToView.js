@@ -153,18 +153,19 @@ dwv.image.DicomBufferToView = function () {
         if (numberOfItems !== 1) {
           // allocate buffer if not done yet
           if (decompressedSize === null) {
-            // hoping for all items to have the same size...
             decompressedSize = event.data[0].length;
             finalBuffer = new event.data[0].constructor(
               numberOfItems * decompressedSize);
+          }
+          // hoping for all items to have the same size...
+          if (event.data[0].length !== decompressedSize) {
+            dwv.logger.warn('Unsupported varying decompressed data size: ' +
+              event.data[0].length + ' != ' + decompressedSize);
           }
           // set buffer item data
           finalBuffer.set(event.data[0], decompressedSize * itemNb);
         } else {
           finalBuffer = event.data[0];
-        }
-        if (event.data[0].length !== decompressedSize) {
-          dwv.logger.warn('Unsupported varying decompressed data size varies.');
         }
         // create image for the first item
         if (itemNb === 0) {
