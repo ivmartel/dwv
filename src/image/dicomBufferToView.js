@@ -163,6 +163,9 @@ dwv.image.DicomBufferToView = function () {
         } else {
           finalBuffer = event.data[0];
         }
+        if (event.data[0].length !== decompressedSize) {
+          dwv.logger.warn('Unsupported varying decompressed data size varies.');
+        }
         // create image for the first item
         if (itemNb === 0) {
           generateImage();
