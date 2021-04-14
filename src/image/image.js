@@ -272,7 +272,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       clonedBuffer[f] = buffer[f].slice(0);
     }*/
     // create the image copy
-    var copy = new dwv.image.Image(this.getGeometry(), clonedBuffer);
+    var copy = new dwv.image.Image(this.getGeometry(), clonedBuffer, imageUids);
     // copy the RSIs
     var nslices = this.getGeometry().getSize().getNumberOfSlices();
     for (var k = 0; k < nslices; ++k) {
