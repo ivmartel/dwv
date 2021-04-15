@@ -262,9 +262,9 @@ dwv.image.getRegionSliceIterator = function (
     );
   }
   // position to pixel for max: extra X is ok, remove extra Y
-  var minIndex = new dwv.math.Index3D(min.getX(), min.getY(), slice);
+  var minIndex = new dwv.math.Index(min.getX(), min.getY(), slice);
   var startOffset = geometry.indexToOffset(minIndex);
-  var maxIndex = new dwv.math.Index3D(max.getX(), max.getY() - 1, slice);
+  var maxIndex = new dwv.math.Index(max.getX(), max.getY() - 1, slice);
   var endOffset = geometry.indexToOffset(maxIndex);
 
   // minimum 1 column
@@ -340,9 +340,9 @@ dwv.image.getVariableRegionSliceIterator = function (
     return;
   }
 
-  var minIndex = new dwv.math.Index3D(min[0], min[1], slice);
+  var minIndex = new dwv.math.Index(min[0], min[1], slice);
   var startOffset = geometry.indexToOffset(minIndex);
-  var maxIndex = new dwv.math.Index3D(max[0], max[1], slice);
+  var maxIndex = new dwv.math.Index(max[0], max[1], slice);
   var endOffset = geometry.indexToOffset(maxIndex);
 
   // data accessor
