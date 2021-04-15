@@ -8,12 +8,8 @@ module.exports = {
   globals: {
     dwv: 'readonly'
   },
-  plugins: [
-    'jsdoc'
-  ],
   extends: [
     'eslint:recommended',
-    'plugin:jsdoc/recommended'
   ],
   rules: {
     // require triple equal
