@@ -98,9 +98,9 @@ dwv.tool.ZoomAndPan = function (app) {
         layerController.getActiveViewLayer().getViewController();
       // update view controller
       if (diffY > 0) {
-        viewController.incrementSliceNb();
+        viewController.incrementIndex(2);
       } else {
-        viewController.decrementSliceNb();
+        viewController.decrementIndex(2);
       }
     } else {
       // zoom mode

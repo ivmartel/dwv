@@ -143,7 +143,7 @@ dwv.tool.WindowLevel = function (app) {
       parseInt(app.getImage().getRescaledValue(
         event._x,
         event._y,
-        viewController.getCurrentPosition().k
+        viewController.getCurrentPosition().get(2)
       ), 10),
       parseInt(viewController.getWindowLevel().width, 10));
   };

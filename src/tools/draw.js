@@ -487,16 +487,14 @@ dwv.tool.Draw = function (app) {
     activateCurrentPositionShapes(flag);
     // listen to app change to update the draw layer
     if (flag) {
-      app.addEventListener('slicechange', updateDrawLayer);
-      app.addEventListener('framechange', updateDrawLayer);
+      app.addEventListener('positionchange', updateDrawLayer);
 
       // init with the app window scale
       this.style.setBaseScale(app.getBaseScale());
       // same for colour
       this.setLineColour(this.style.getLineColour());
     } else {
-      app.removeEventListener('slicechange', updateDrawLayer);
-      app.removeEventListener('framechange', updateDrawLayer);
+      app.removeEventListener('positionchange', updateDrawLayer);
     }
   };
 

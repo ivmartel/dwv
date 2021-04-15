@@ -29,11 +29,16 @@ QUnit.test('Test Size.', function (assert) {
   var size2 = new dwv.image.Size(3, 3, 4);
   assert.equal(size0.equals(size2), 0, 'equals false');
   // is in bounds
-  assert.equal(size0.isInBounds(0, 0, 0), 1, 'isInBounds 0,0,0');
-  assert.equal(size0.isInBounds(0, 0), 1, 'isInBounds 0,0');
-  assert.equal(size0.isInBounds(1, 2, 3), 1, 'isInBounds max');
-  assert.equal(size0.isInBounds(2, 3, 4), 0, 'isInBounds too big');
-  assert.equal(size0.isInBounds(-1, 2, 3), 0, 'isInBounds too small');
+  var index0 = new dwv.math.Index([0, 0, 0]);
+  assert.equal(size0.isInBounds(index0), 1, 'isInBounds 0,0,0');
+  index0 = new dwv.math.Index([0, 0]);
+  assert.equal(size0.isInBounds(index0), 1, 'isInBounds 0,0');
+  index0 = new dwv.math.Index([1, 2, 3]);
+  assert.equal(size0.isInBounds(index0), 1, 'isInBounds max');
+  index0 = new dwv.math.Index([2, 3, 4]);
+  assert.equal(size0.isInBounds(index0), 0, 'isInBounds too big');
+  index0 = new dwv.math.Index([-1, 2, 3]);
+  assert.equal(size0.isInBounds(index0), 0, 'isInBounds too small');
 });
 
 /**

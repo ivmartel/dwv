@@ -504,9 +504,7 @@ dwv.App = function () {
     drawController.setDrawings(
       drawings, drawingsDetails, fireEvent, this.addToUndoStack);
 
-    drawController.activateDrawLayer(
-      viewController.getCurrentPosition(),
-      viewController.getCurrentFrame());
+    drawController.activateDrawLayer(viewController.getCurrentPosition());
   };
   /**
    * Update a drawing from its details.
@@ -609,16 +607,16 @@ dwv.App = function () {
     if (event.ctrlKey) {
       if (event.keyCode === 37) { // crtl-arrow-left
         event.preventDefault();
-        viewController.decrementFrameNb();
+        viewController.decrementIndex(3);
       } else if (event.keyCode === 38) { // crtl-arrow-up
         event.preventDefault();
-        viewController.incrementSliceNb();
+        viewController.incrementIndex(2);
       } else if (event.keyCode === 39) { // crtl-arrow-right
         event.preventDefault();
-        viewController.incrementFrameNb();
+        viewController.incrementIndex(3);
       } else if (event.keyCode === 40) { // crtl-arrow-down
         event.preventDefault();
-        viewController.decrementSliceNb();
+        viewController.decrementIndex(2);
       } else if (event.keyCode === 89) { // crtl-y
         undoStack.redo();
       } else if (event.keyCode === 90) { // crtl-z
@@ -888,12 +886,8 @@ dwv.App = function () {
         var controller =
           layerController.getActiveViewLayer().getViewController();
         var currentPosition = controller.getCurrentPosition();
-        if (sliceNb <= currentPosition.k) {
-          controller.setCurrentPosition({
-            i: currentPosition.i,
-            j: currentPosition.j,
-            k: currentPosition.k + 1
-          }, true);
+        if (sliceNb <= currentPosition.get(2)) {
+          controller.incrementIndex(2, true);
         }
       }
     }

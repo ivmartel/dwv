@@ -44,7 +44,7 @@ dwv.State = function () {
       version: '0.4',
       'window-center': viewController.getWindowLevel().center,
       'window-width': viewController.getWindowLevel().width,
-      position: viewController.getCurrentPosition(),
+      position: viewController.getCurrentPositionAsObject(),
       scale: app.getAddedScale(),
       offset: app.getOffset(),
       drawings: drawLayer.getKonvaLayer().toObject(),
@@ -87,7 +87,7 @@ dwv.State = function () {
     // display
     viewController.setWindowLevel(
       data['window-center'], data['window-width']);
-    viewController.setCurrentPosition(data.position);
+    viewController.setCurrentPositionFromObject(data.position);
     // apply saved scale on top of current base one
     var baseScale = app.getLayerController().getBaseScale();
     var scale = null;

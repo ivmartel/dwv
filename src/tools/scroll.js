@@ -66,9 +66,9 @@ dwv.tool.Scroll = function (app) {
     if (yMove) {
       // update view controller
       if (diffY > 0) {
-        viewController.decrementSliceNb();
+        viewController.decrementIndex(2);
       } else {
-        viewController.incrementSliceNb();
+        viewController.incrementIndex(2);
       }
     }
 
@@ -79,9 +79,9 @@ dwv.tool.Scroll = function (app) {
     if (xMove) {
       // update view controller
       if (diffX > 0) {
-        viewController.incrementFrameNb();
+        viewController.decrementIndex(3);
       } else {
-        viewController.decrementFrameNb();
+        viewController.incrementIndex(3);
       }
     }
 
@@ -196,21 +196,26 @@ dwv.tool.Scroll = function (app) {
     var viewController =
       layerController.getActiveViewLayer().getViewController();
 
-    var size = app.getImage().getGeometry().getSize();
-    var hasSlices = size.getNumberOfSlices() !== 1;
-    var hasFrames = size.getNumberOfFrames() !== 1;
+    // var size = app.getImage().getGeometry().getSize();
+    // var hasSlices = size.getNumberOfSlices() !== 1;
+    // var hasFrames = size.getNumberOfFrames() !== 1;
+    // if (up) {
+    //   if (hasSlices) {
+    //     viewController.incrementSliceNb();
+    //   } else if (hasFrames) {
+    //     viewController.incrementFrameNb();
+    //   }
+    // } else {
+    //   if (hasSlices) {
+    //     viewController.decrementSliceNb();
+    //   } else if (hasFrames) {
+    //     viewController.decrementFrameNb();
+    //   }
+    // }
     if (up) {
-      if (hasSlices) {
-        viewController.incrementSliceNb();
-      } else if (hasFrames) {
-        viewController.incrementFrameNb();
-      }
+      viewController.incrementIndex(2);
     } else {
-      if (hasSlices) {
-        viewController.decrementSliceNb();
-      } else if (hasFrames) {
-        viewController.decrementFrameNb();
-      }
+      viewController.decrementIndex(2);
     }
   }
 

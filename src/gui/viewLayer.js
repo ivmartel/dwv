@@ -320,8 +320,7 @@ dwv.html.ViewLayer = function (containerDiv) {
     view.addEventListener('wlwidthchange', onWLChange);
     view.addEventListener('wlcenterchange', onWLChange);
     view.addEventListener('colourchange', onColourChange);
-    view.addEventListener('slicechange', onSliceChange);
-    view.addEventListener('framechange', onFrameChange);
+    view.addEventListener('positionchange', onPositionChange);
 
     // create view controller
     viewController = new dwv.ViewController(view);
@@ -478,29 +477,19 @@ dwv.html.ViewLayer = function (containerDiv) {
   }
 
   /**
-   * Handle frame change.
+   * Handle position change.
    *
-   * @param {object} event The event fired when changing the frame.
+   * @param {object} event The event fired when changing the position.
    * @private
    */
-  function onFrameChange(event) {
-    // generate and draw if no skip flag
+  function onPositionChange(event) {
     if (typeof event.skipGenerate === 'undefined' ||
       event.skipGenerate === false) {
-      needsDataUpdate = true;
-      self.draw();
+      if (event.diffDims.includes(2) || event.diffDims.includes(3)) {
+        needsDataUpdate = true;
+        self.draw();
+      }
     }
-  }
-
-  /**
-   * Handle slice change.
-   *
-   * @param {object} _event The event fired when changing the slice.
-   * @private
-   */
-  function onSliceChange(_event) {
-    needsDataUpdate = true;
-    self.draw();
   }
 
   /**

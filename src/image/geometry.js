@@ -89,17 +89,18 @@ dwv.image.Size.prototype.equals = function (rhs) {
 };
 
 /**
- * Check that coordinates are within bounds.
+ * Check that an index is within bounds.
  *
  * @param {number} i The column coordinate.
  * @param {number} j The row coordinate.
  * @param {number} k The slice coordinate.
  * @returns {boolean} True if the given coordinates are within bounds.
  */
-dwv.image.Size.prototype.isInBounds = function (i, j, k) {
-  if (i < 0 || i > this.getNumberOfColumns() - 1 ||
-    j < 0 || j > this.getNumberOfRows() - 1 ||
-    k < 0 || k > this.getNumberOfSlices() - 1) {
+dwv.image.Size.prototype.isInBounds = function (index) {
+  if (index.get(0) < 0 || index.get(0) > this.getNumberOfColumns() - 1 ||
+    index.get(1) < 0 || index.get(1) > this.getNumberOfRows() - 1 ||
+    index.get(2) < 0 || index.get(2) > this.getNumberOfSlices() - 1 ||
+    index.get(3) < 0 || index.get(3) > this.getNumberOfFrames() - 1) {
     return false;
   }
   return true;

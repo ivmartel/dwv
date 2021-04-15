@@ -42,23 +42,37 @@ dwv.math.Index = function (values) {
 }; // Index class
 
 /**
- * Check for Index equality.
+ * Check if the input index can be compared to this one.
  *
- * @param {object} rhs The other index to compare to.
- * @returns {boolean} True if both indices are equal.
+ * @param {object} rhs The index to compare to.
+ * @returns {boolean} True if both indices are comparable.
  */
-dwv.math.Index.prototype.equals = function (rhs) {
+dwv.math.Index.prototype.canCompare = function (rhs) {
   // check input is not falsy
   if (!rhs) {
     return false;
   }
   // check length
-  var length = this.length();
-  if (length !== rhs.length()) {
+  if (this.length() !== rhs.length()) {
+    return false;
+  }
+  // seems ok!
+  return true;
+};
+
+/**
+ * Check for Index equality.
+ *
+ * @param {object} rhs The index to compare to.
+ * @returns {boolean} True if both indices are equal.
+ */
+dwv.math.Index.prototype.equals = function (rhs) {
+  // check if can compare
+  if (!this.canCompare(rhs)) {
     return false;
   }
   // check values
-  for (var i = 0; i < length; ++i) {
+  for (var i = 0, leni = this.length(); i < leni; ++i) {
     if (this.get(i) !== rhs.get(i)) {
       return false;
     }
@@ -71,23 +85,39 @@ dwv.math.Index.prototype.equals = function (rhs) {
  * Add another index to this one.
  *
  * @param {object} rhs The index to add.
- * @returns {object} The sum of both indices.
+ * @returns {object} The index representing the sum of both indices.
  */
 dwv.math.Index.prototype.add = function (rhs) {
-  // check input is not falsy
-  if (!rhs) {
+  // check if can compare
+  if (!this.canCompare(rhs)) {
     return null;
   }
-  // check length
-  var length = this.length();
-  if (length !== rhs.length()) {
-    return null;
-  }
-  // values
+  // add values
   var values = [];
-  for (var i = 0; i < length; ++i) {
+  for (var i = 0, leni = this.length(); i < leni; ++i) {
     values.push(this.get(i) + rhs.get(i));
   }
   // seems ok!
   return new dwv.math.Index(values);
+};
+
+/**
+ * Ge the different dimensions.
+ *
+ * @param {object} rhs The index to compare to.
+ * @returns {array} The different dimensions.
+ */
+dwv.math.Index.prototype.differentDims = function (rhs) {
+  // check if can compare
+  if (!this.canCompare(rhs)) {
+    return false;
+  }
+  // values
+  var diffDims = [];
+  for (var i = 0, leni = this.length(); i < leni; ++i) {
+    if (this.get(i) !== rhs.get(i)) {
+      diffDims.push(i);
+    }
+  }
+  return diffDims;
 };

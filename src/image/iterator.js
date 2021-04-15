@@ -199,16 +199,15 @@ dwv.image.getIteratorValues = function (iterator) {
  * Get a slice index iterator.
  *
  * @param {object} image The image to parse.
- * @param {number} slice The index of the slice.
- * @param {number} frame The frame index.
+ * @param {object} position The current position.
  * @returns {object} The slice iterator.
  */
-dwv.image.getSliceIterator = function (image, slice, frame) {
+dwv.image.getSliceIterator = function (image, position) {
   var sliceSize = image.getGeometry().getSize().getSliceSize();
-  var start = slice * sliceSize;
+  var start = position.get(2) * sliceSize;
 
   var dataAccessor = function (offset) {
-    return image.getValueAtOffsetAndFrame(offset, frame);
+    return image.getValueAtOffsetAndFrame(offset, position.get(3));
   };
 
   var range = null;
@@ -233,15 +232,14 @@ dwv.image.getSliceIterator = function (image, slice, frame) {
  * Get a slice index iterator for a rectangular region.
  *
  * @param {object} image The image to parse.
- * @param {number} slice The index of the slice.
- * @param {number} frame The frame index.
+ * @param {object} position The current position.
  * @param {boolean} isRescaled Flag for rescaled values (default false).
  * @param {dwv.math.Point2D} min The minimum position (optional).
  * @param {dwv.math.Point2D} max The maximum position (optional).
  * @returns {object} The slice iterator.
  */
 dwv.image.getRegionSliceIterator = function (
-  image, slice, frame, isRescaled, min, max) {
+  image, position, isRescaled, min, max) {
   if (image.getNumberOfComponents() !== 1) {
     throw new Error('Unsupported number of components for region iterator: ' +
       image.getNumberOfComponents());
@@ -262,6 +260,8 @@ dwv.image.getRegionSliceIterator = function (
     );
   }
   // position to pixel for max: extra X is ok, remove extra Y
+  var slice = position.get(2);
+  var frame = position.get(3);
   var minIndex = new dwv.math.Index([min.getX(), min.getY(), slice]);
   var startOffset = geometry.indexToOffset(minIndex);
   var maxIndex = new dwv.math.Index([max.getX(), max.getY() - 1, slice]);
@@ -292,14 +292,13 @@ dwv.image.getRegionSliceIterator = function (
  * Get a slice index iterator for a rectangular region.
  *
  * @param {object} image The image to parse.
- * @param {number} slice The index of the slice.
- * @param {number} frame The frame index.
+ * @param {object} position The current position.
  * @param {boolean} isRescaled Flag for rescaled values (default false).
  * @param {Array} regions An array of regions.
  * @returns {object} The slice iterator.
  */
 dwv.image.getVariableRegionSliceIterator = function (
-  image, slice, frame, isRescaled, regions) {
+  image, position, isRescaled, regions) {
   if (image.getNumberOfComponents() !== 1) {
     throw new Error('Unsupported number of components for region iterator: ' +
       image.getNumberOfComponents());
@@ -340,6 +339,8 @@ dwv.image.getVariableRegionSliceIterator = function (
     return;
   }
 
+  var slice = position.get(2);
+  var frame = position.get(3);
   var minIndex = new dwv.math.Index([min[0], min[1], slice]);
   var startOffset = geometry.indexToOffset(minIndex);
   var maxIndex = new dwv.math.Index([max[0], max[1], slice]);

@@ -8,8 +8,6 @@ dwv.image = dwv.image || {};
  * @type {Array}
  */
 dwv.image.viewEventNames = [
-  'slicechange',
-  'framechange',
   'wlwidthchange',
   'wlcenterchange',
   'wlpresetadd',
@@ -73,13 +71,6 @@ dwv.image.View = function (image) {
    * @type {object}
    */
   var currentPosition = null;
-  /**
-   * Current frame. Zero based.
-   *
-   * @private
-   * @type {number}
-   */
-  var currentFrame = null;
 
   /**
    * Get the associated image.
@@ -103,8 +94,10 @@ dwv.image.View = function (image) {
    */
   this.setInitialPosition = function () {
     var silent = true;
-    this.setCurrentPosition({i: 0, j: 0, k: 0}, silent);
-    this.setCurrentFrame(0, silent);
+    this.setCurrentPosition(
+      new dwv.math.Index([0, 0, 0, 0]),
+      silent
+    );
   };
 
   /**
@@ -133,11 +126,11 @@ dwv.image.View = function (image) {
    * @fires dwv.image.View#wlcenterchange
    */
   this.getCurrentWindowLut = function (rsi) {
-    // check position (also sets frame)
+    // check position
     if (!this.getCurrentPosition()) {
       this.setInitialPosition();
     }
-    var sliceNumber = this.getCurrentPosition().k;
+    var sliceNumber = this.getCurrentPosition().get(2);
     // use current rsi if not provided
     if (typeof rsi === 'undefined') {
       rsi = image.getRescaleSlopeAndIntercept(sliceNumber);
@@ -328,158 +321,113 @@ dwv.image.View = function (image) {
    * @returns {object} The current position.
    */
   this.getCurrentPosition = function () {
+    return currentPosition;
+  };
+
+  /**
+   * Get the current position.
+   *
+   * @returns {object} The current position.
+   */
+  this.getCurrentPositionAsObject = function () {
     // return a clone to avoid reference problems
     return currentPosition ? {
-      i: currentPosition.i,
-      j: currentPosition.j,
-      k: currentPosition.k
+      i: currentPosition.get(0),
+      j: currentPosition.get(1),
+      k: currentPosition.get(2)
     } : null;
   };
+
   /**
    * Set the current position.
    *
    * @param {object} pos The current position.
-   * @param {boolean} silent If true, does not fire a slicechange event.
    * @returns {boolean} False if not in bounds
-   * @fires dwv.image.View#slicechange
+   */
+  this.setCurrentPositionFromObject = function (pos) {
+    var frame = 0;
+    if (typeof pos.f !== 'undefined') {
+      frame = pos.f;
+    }
+    var posIndex = new dwv.math.Index([pos.i, pos.j, pos.k, frame]);
+    this.setCurrentPosition(posIndex, true);
+  };
+
+  /**
+   * Set the current position.
+   *
+   * @param {object} pos The current position.
+   * @returns {boolean} False if not in bounds
    * @fires dwv.image.View#positionchange
    */
-  this.setCurrentPosition = function (pos, silent) {
+  this.setCurrentPosition = function (posIndex, silent) {
     // check input
     if (typeof silent === 'undefined') {
       silent = false;
     }
 
     // check if possible
-    if (!image.getGeometry().getSize().isInBounds(pos.i, pos.j, pos.k)) {
+    if (!image.getGeometry().getSize().isInBounds(posIndex)) {
       return false;
     }
-    // check if new
-    var equalPos = function (pos1, pos2) {
-      return pos2 !== null &&
-        pos1.i === pos2.i &&
-        pos1.j === pos2.j &&
-        pos1.k === pos2.k;
-    };
-    var isNew = !equalPos(pos, currentPosition);
+
+    var isNew = !currentPosition || !currentPosition.equals(posIndex);
 
     if (isNew) {
-      var isNewSlice = currentPosition
-        ? pos.k !== currentPosition.k : true;
+      var diffDims = null;
+      if (currentPosition) {
+        diffDims = currentPosition.differentDims(posIndex);
+      } else {
+        diffDims = [0, 1, 2, 3];
+      }
       // assign
-      currentPosition = pos;
+      currentPosition = posIndex;
 
-      // fire a 'positionchange' event
+      var eventValue = [
+        posIndex.get(0),
+        posIndex.get(1),
+        posIndex.get(2),
+        posIndex.get(3)
+      ];
+
+      /**
+       * Position change event.
+       *
+       * @event dwv.image.View#positionchange
+       * @type {object}
+       * @property {Array} value The changed value.
+       * @property {number} i The new column position
+       * @property {number} j The new row position
+       * @property {number} k The new slice position
+       * @property {object} pixelValue The image value at the new position,
+       *   (can be undefined).
+       */
+      var posEvent = {
+        type: 'positionchange',
+        value: eventValue,
+        i: posIndex.get(0),
+        j: posIndex.get(1),
+        k: posIndex.get(2),
+        f: posIndex.get(3),
+        diffDims: diffDims
+      };
+
+      // add value if possible
       if (image.getPhotometricInterpretation().match(/MONOCHROME/) !== null) {
         var pixValue = image.getRescaledValue(
-          pos.i, pos.j, pos.k, this.getCurrentFrame());
-        /**
-         * Position change event.
-         *
-         * @event dwv.image.View#positionchange
-         * @type {object}
-         * @property {Array} value The changed value.
-         * @property {number} i The new column position
-         * @property {number} j The new row position
-         * @property {number} k The new slice position
-         * @property {object} pixelValue The image value at the new position,
-         *   (can be undefined).
-         */
-        this.fireEvent({
-          type: 'positionchange',
-          value: [pos.i, pos.j, pos.k, pixValue],
-          i: pos.i,
-          j: pos.j,
-          k: pos.k,
-          pixelValue: pixValue
-        });
-      } else {
-        this.fireEvent({
-          type: 'positionchange',
-          value: [pos.i, pos.j, pos.k],
-          i: pos.i,
-          j: pos.j,
-          k: pos.k
-        });
+          posIndex.get(0),
+          posIndex.get(1),
+          posIndex.get(2),
+          posIndex.get(3)
+        );
+        eventValue.push(pixValue);
+        posEvent.pixelValue = pixValue;
       }
 
-      // fire a slice change event (used to trigger redraw)
-      if (!silent && isNewSlice) {
-        /**
-         * Slice change event.
-         *
-         * @event dwv.image.View#slicechange
-         * @type {object}
-         * @property {Array} value The changed value.
-         * @property {object} data Associated event data: the imageUid.
-         */
-        this.fireEvent({
-          type: 'slicechange',
-          value: [currentPosition.k],
-          data: {
-            imageUid: image.getImageUids()[currentPosition.k]
-          }
-        });
-      }
+      // fire
+      this.fireEvent(posEvent);
     }
 
-    // all good
-    return true;
-  };
-
-  /**
-   * Get the current frame number.
-   *
-   * @returns {number} The current frame number.
-   */
-  this.getCurrentFrame = function () {
-    return currentFrame;
-  };
-
-  /**
-   * Set the current frame number.
-   *
-   * @param {number} frame The current frame number.
-   * @param {boolean} silent Flag to launch events with skipGenerate.
-   * @returns {boolean} False if not in bounds
-   * @fires dwv.image.View#framechange
-   */
-  this.setCurrentFrame = function (frame, silent) {
-    // check input
-    if (typeof silent === 'undefined') {
-      silent = false;
-    }
-
-    // check if possible
-    var size = image.getGeometry().getSize();
-    if (frame < 0 || frame >= size.getNumberOfFrames()) {
-      return false;
-    }
-    // check if new
-    var isNew = currentFrame !== frame;
-
-    if (isNew) {
-      // assign
-      currentFrame = frame;
-      // fire event for multi frame data
-      if (size.getNumberOfFrames() !== 1) {
-        /**
-         * Frame change event.
-         *
-         * @event dwv.image.View#framechange
-         * @type {object}
-         * @property {Array} value The changed value.
-         * @property {number} frame The new frame number
-         * @property {boolean} skipGenerate Flag to skip view generation.
-         */
-        this.fireEvent({
-          type: 'framechange',
-          value: [currentFrame],
-          frame: currentFrame,
-          skipGenerate: silent
-        });
-      }
-    }
     // all good
     return true;
   };
@@ -583,7 +531,7 @@ dwv.image.View = function (image) {
     // special 'perslice' case
     if (typeof preset.perslice !== 'undefined' &&
       preset.perslice === true) {
-      preset = {wl: preset.wl[this.getCurrentPosition().k]};
+      preset = {wl: preset.wl[this.getCurrentPosition().get(2)]};
     }
     // set w/l
     this.setWindowLevel(
@@ -677,14 +625,13 @@ dwv.image.View.prototype.setWindowLevelMinMax = function () {
  * @param {Array} array The array to fill in.
  */
 dwv.image.View.prototype.generateImageData = function (array) {
-  // check position (also sets frame)
+  // check position
   if (!this.getCurrentPosition()) {
     this.setInitialPosition();
   }
-  var position = this.getCurrentPosition();
-  var frame = this.getCurrentFrame();
   var image = this.getImage();
-  var iterator = dwv.image.getSliceIterator(this.getImage(), position.k, frame);
+  var position = this.getCurrentPosition();
+  var iterator = dwv.image.getSliceIterator(image, position);
 
   var photoInterpretation = image.getPhotometricInterpretation();
   switch (photoInterpretation) {

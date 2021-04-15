@@ -262,8 +262,7 @@ dwv.LayerController = function (containerDiv) {
       var viewController =
         layers[activeViewLayerIndex].getViewController();
       drawLayer.getDrawController().activateDrawLayer(
-        viewController.getCurrentPosition(),
-        viewController.getCurrentFrame());
+        viewController.getCurrentPosition());
     }
   };
 
@@ -423,9 +422,7 @@ dwv.LayerController = function (containerDiv) {
     // bind draw to view position
     var viewLayer = this.getActiveViewLayer();
     viewLayer.addEventListener(
-      'slicechange', this.updateDrawControllerToViewPosition);
-    viewLayer.addEventListener(
-      'framechange', this.updateDrawControllerToViewPosition);
+      'positionchange', this.updateDrawControllerToViewPosition);
     // first update
     this.updateDrawControllerToViewPosition();
 
