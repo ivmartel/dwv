@@ -11,29 +11,41 @@ QUnit.module('index');
  * @function module:tests/math~Index
  */
 QUnit.test('Test Index.', function (assert) {
-  var i0 = new dwv.math.Index(1, 2, 3);
+  var i0 = new dwv.math.Index([1, 2, 3]);
   // getX
-  assert.equal(i0.getI(), 1, 'getI');
+  assert.equal(i0.get(0), 1, 'get0');
   // getY
-  assert.equal(i0.getJ(), 2, 'getJ');
+  assert.equal(i0.get(1), 2, 'get1');
   // getZ
-  assert.equal(i0.getK(), 3, 'getK');
-  // can't modify internal i
-  i0.i = 3;
-  assert.equal(i0.getI(), 1, 'getI after .i');
-  // can't modify internal j
-  i0.j = 3;
-  assert.equal(i0.getJ(), 2, 'getJ after .j');
-  // can't modify internal k
-  i0.k = 3;
-  assert.equal(i0.getK(), 3, 'getK after .k');
+  assert.equal(i0.get(2), 3, 'get2');
+
   // equals: true
-  var i1 = new dwv.math.Index(1, 2, 3);
-  assert.equal(i0.equals(i1), true, 'equals true');
+  var i10 = new dwv.math.Index([1, 2, 3]);
+  assert.equal(i10.equals(i10), true, 'equals true');
   // equals: false
-  assert.equal(i0.equals(null), false, 'null equals false');
-  var i2 = new dwv.math.Index(3, 2, 1);
-  assert.equal(i0.equals(i2), false, 'equals false');
+  assert.equal(i10.equals(null), false, 'null equals false');
+  var i11 = new dwv.math.Index([1, 2]);
+  assert.equal(i10.equals(i11), false, 'length equals false');
+  var i12 = new dwv.math.Index([3, 2, 1]);
+  assert.equal(i10.equals(i12), false, 'values equals false');
+
   // to string
-  assert.equal(i0.toString(), '(1, 2, 3)', 'toString');
+  var i20 = new dwv.math.Index([1, 2, 3]);
+  assert.equal(i20.toString(), '(1,2,3)', 'toString');
+
+  // warning: values are NOT cloned. So this can happen:
+  var val3 = [1, 2, 3];
+  var i30 = new dwv.math.Index(val3);
+  assert.equal(i30.get(0), 1, '[clone] get0');
+  val3[0] = 4;
+  assert.equal(i30.get(0), 4, '[clone] get0');
+
+  // addition
+  var i40 = new dwv.math.Index([1, 2, 3]);
+  var i41 = new dwv.math.Index([2, 3, 4]);
+  var i42 = i40.add(i41);
+  assert.equal(i42.get(0), 3, '[add] get0');
+  assert.equal(i42.get(1), 5, '[add] get1');
+  assert.equal(i42.get(2), 7, '[add] get2');
+
 });

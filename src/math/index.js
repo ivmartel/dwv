@@ -3,38 +3,42 @@ var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
 /**
- * Immutable 3D index.
+ * Immutable index.
+ * Warning: the input array is NOT cloned, modifying it will
+ *  modify the index values.
  *
  * @class
- * @param {number} i The column index.
- * @param {number} j The row index.
- * @param {number} k The slice index.
+ * @param {Array} values The index values.
  */
-dwv.math.Index = function (i, j, k) {
+dwv.math.Index = function (values) {
   /**
-   * Get the column index.
+   * Get the index value at the given array index.
    *
-   * @returns {number} The column index.
+   * @param {number} i The index to get.
+   * @returns {number} The value.
    */
-  this.getI = function () {
-    return i;
+  this.get = function (i) {
+    return values[i];
   };
+
   /**
-   * Get the row index.
+   * Get the length of the index.
    *
-   * @returns {number} The row index.
+   * @returns {number} The length.
    */
-  this.getJ = function () {
-    return j;
+  this.length = function () {
+    return values.length;
   };
+
   /**
-   * Get the slice index.
+   * Get a string representation of the Index.
    *
-   * @returns {number} The slice index.
+   * @returns {string} The Index as a string.
    */
-  this.getK = function () {
-    return k;
+  this.toString = function () {
+    return '(' + values.toString() + ')';
   };
+
 }; // Index class
 
 /**
@@ -44,19 +48,46 @@ dwv.math.Index = function (i, j, k) {
  * @returns {boolean} True if both indices are equal.
  */
 dwv.math.Index.prototype.equals = function (rhs) {
-  return rhs !== null &&
-    this.getI() === rhs.getI() &&
-    this.getJ() === rhs.getJ() &&
-    this.getK() === rhs.getK();
+  // check input is not falsy
+  if (!rhs) {
+    return false;
+  }
+  // check length
+  var length = this.length();
+  if (length !== rhs.length()) {
+    return false;
+  }
+  // check values
+  for (var i = 0; i < length; ++i) {
+    if (this.get(i) !== rhs.get(i)) {
+      return false;
+    }
+  }
+  // seems ok!
+  return true;
 };
 
 /**
- * Get a string representation of the Index.
+ * Add another index to this one.
  *
- * @returns {string} The Index as a string.
+ * @param {object} rhs The index to add.
+ * @returns {object} The sum of both indices.
  */
-dwv.math.Index.prototype.toString = function () {
-  return '(' + this.getI() +
-    ', ' + this.getJ() +
-    ', ' + this.getK() + ')';
+dwv.math.Index.prototype.add = function (rhs) {
+  // check input is not falsy
+  if (!rhs) {
+    return null;
+  }
+  // check length
+  var length = this.length();
+  if (length !== rhs.length()) {
+    return null;
+  }
+  // values
+  var values = [];
+  for (var i = 0; i < length; ++i) {
+    values.push(this.get(i) + rhs.get(i));
+  }
+  // seems ok!
+  return new dwv.math.Index(values);
 };

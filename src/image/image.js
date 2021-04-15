@@ -465,7 +465,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
  */
 dwv.image.Image.prototype.getValue = function (i, j, k, f) {
   var frame = (f || 0);
-  var index = new dwv.math.Index(i, j, k);
+  var index = new dwv.math.Index([i, j, k]);
   return this.getValueAtOffsetAndFrame(
     this.getGeometry().indexToOffset(index), frame);
 };

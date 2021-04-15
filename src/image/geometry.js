@@ -320,9 +320,9 @@ dwv.image.Geometry.prototype.equals = function (rhs) {
  */
 dwv.image.Geometry.prototype.indexToOffset = function (index) {
   var size = this.getSize();
-  return index.getI() +
-   index.getJ() * size.getNumberOfColumns() +
-   index.getK() * size.getSliceSize();
+  return index.get(0) +
+   index.get(1) * size.getNumberOfColumns() +
+   index.get(2) * size.getSliceSize();
 };
 
 /**
@@ -335,9 +335,9 @@ dwv.image.Geometry.prototype.indexToWorld = function (index) {
   var origin = this.getOrigin();
   var spacing = this.getSpacing();
   return new dwv.math.Point3D(
-    origin.getX() + index.getI() * spacing.getColumnSpacing(),
-    origin.getY() + index.getJ() * spacing.getRowSpacing(),
-    origin.getZ() + index.getK() * spacing.getSliceSpacing());
+    origin.getX() + index.get(0) * spacing.getColumnSpacing(),
+    origin.getY() + index.get(1) * spacing.getRowSpacing(),
+    origin.getZ() + index.get(2) * spacing.getSliceSpacing());
 };
 
 /**
