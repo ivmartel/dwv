@@ -73,6 +73,14 @@ dwv.image.View = function (image) {
   var currentPosition = null;
 
   /**
+   * Listener handler.
+   *
+   * @type {object}
+   * @private
+   */
+  var listenerHandler = new dwv.utils.ListenerHandler();
+
+  /**
    * Get the associated image.
    *
    * @returns {Image} The associated image.
@@ -177,7 +185,7 @@ dwv.image.View = function (image) {
       wlut.update();
       // fire change event
       if (!lutWl || lutWl.getWidth() !== wl.getWidth()) {
-        this.fireEvent({
+        fireEvent({
           type: 'wlwidthchange',
           value: [wl.getWidth()],
           wc: wl.getCenter(),
@@ -186,7 +194,7 @@ dwv.image.View = function (image) {
         });
       }
       if (!lutWl || lutWl.getCenter() !== wl.getCenter()) {
-        this.fireEvent({
+        fireEvent({
           type: 'wlcenterchange',
           value: [wl.getCenter()],
           wc: wl.getCenter(),
@@ -275,7 +283,7 @@ dwv.image.View = function (image) {
          * @type {object}
          * @property {string} name The name of the preset.
          */
-        this.fireEvent({
+        fireEvent({
           type: 'wlpresetadd',
           name: key
         });
@@ -308,7 +316,7 @@ dwv.image.View = function (image) {
      * @property {number} wc The new window center value.
      * @property {number} ww The new window wdth value.
      */
-    this.fireEvent({
+    fireEvent({
       type: 'colourchange',
       wc: this.getCurrentWindowLut().getWindowLevel().getCenter(),
       ww: this.getCurrentWindowLut().getWindowLevel().getWidth()
@@ -425,7 +433,7 @@ dwv.image.View = function (image) {
       }
 
       // fire
-      this.fireEvent(posEvent);
+      fireEvent(posEvent);
     }
 
     // all good
@@ -482,7 +490,7 @@ dwv.image.View = function (image) {
          * @property {number} ww The new window wdth value.
          * @property {boolean} skipGenerate Flag to skip view generation.
          */
-        this.fireEvent({
+        fireEvent({
           type: 'wlwidthchange',
           value: [width],
           wc: center,
@@ -502,7 +510,7 @@ dwv.image.View = function (image) {
          * @property {number} ww The new window wdth value.
          * @property {boolean} skipGenerate Flag to skip view generation.
          */
-        this.fireEvent({
+        fireEvent({
           type: 'wlcenterchange',
           value: [center],
           wc: center,
@@ -564,28 +572,36 @@ dwv.image.View = function (image) {
   };
 
   /**
-   * View listeners
+   * Add an event listener to this class.
    *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type, will be called with the fired event.
+   */
+  this.addEventListener = function (type, callback) {
+    listenerHandler.add(type, callback);
+  };
+
+  /**
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type.
+   */
+  this.removeEventListener = function (type, callback) {
+    listenerHandler.remove(type, callback);
+  };
+
+  /**
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
    * @private
-   * @type {object}
    */
-  var listeners = {};
-  /**
-   * Get the view listeners.
-   *
-   * @returns {object} The view listeners.
-   */
-  this.getListeners = function () {
-    return listeners;
-  };
-  /**
-   * Set the view listeners.
-   *
-   * @param {object} list The view listeners.
-   */
-  this.setListeners = function (list) {
-    listeners = list;
-  };
+  function fireEvent(event) {
+    listenerHandler.fireEvent(event);
+  }
 };
 
 /**
@@ -672,52 +688,5 @@ dwv.image.View.prototype.generateImageData = function (array) {
   default:
     throw new Error(
       'Unsupported photometric interpretation: ' + photoInterpretation);
-  }
-};
-
-/**
- * Add an event listener on the view.
- *
- * @param {string} type The event type.
- * @param {object} listener The method associated with the provided event type.
- */
-dwv.image.View.prototype.addEventListener = function (type, listener) {
-  var listeners = this.getListeners();
-  if (!listeners[type]) {
-    listeners[type] = [];
-  }
-  listeners[type].push(listener);
-};
-
-/**
- * Remove an event listener on the view.
- *
- * @param {string} type The event type.
- * @param {object} listener The method associated with the provided event type.
- */
-dwv.image.View.prototype.removeEventListener = function (type, listener) {
-  var listeners = this.getListeners();
-  if (!listeners[type]) {
-    return;
-  }
-  for (var i = 0; i < listeners[type].length; ++i) {
-    if (listeners[type][i] === listener) {
-      listeners[type].splice(i, 1);
-    }
-  }
-};
-
-/**
- * Fire an event: call all associated listeners.
- *
- * @param {object} event The event to fire.
- */
-dwv.image.View.prototype.fireEvent = function (event) {
-  var listeners = this.getListeners();
-  if (!listeners[event.type]) {
-    return;
-  }
-  for (var i = 0; i < listeners[event.type].length; ++i) {
-    listeners[event.type][i](event);
   }
 };
