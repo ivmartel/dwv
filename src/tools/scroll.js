@@ -196,26 +196,21 @@ dwv.tool.Scroll = function (app) {
     var viewController =
       layerController.getActiveViewLayer().getViewController();
 
-    // var size = app.getImage().getGeometry().getSize();
-    // var hasSlices = size.getNumberOfSlices() !== 1;
-    // var hasFrames = size.getNumberOfFrames() !== 1;
-    // if (up) {
-    //   if (hasSlices) {
-    //     viewController.incrementSliceNb();
-    //   } else if (hasFrames) {
-    //     viewController.incrementFrameNb();
-    //   }
-    // } else {
-    //   if (hasSlices) {
-    //     viewController.decrementSliceNb();
-    //   } else if (hasFrames) {
-    //     viewController.decrementFrameNb();
-    //   }
-    // }
+    var size = app.getImage().getGeometry().getSize();
+    var hasSlices = size.getNumberOfSlices() !== 1;
+    var hasFrames = size.getNumberOfFrames() !== 1;
     if (up) {
-      viewController.incrementIndex(2);
+      if (hasSlices) {
+        viewController.incrementIndex(2);
+      } else if (hasFrames) {
+        viewController.incrementIndex(3);
+      }
     } else {
-      viewController.decrementIndex(2);
+      if (hasSlices) {
+        viewController.decrementIndex(2);
+      } else if (hasFrames) {
+        viewController.decrementIndex(3);
+      }
     }
   }
 

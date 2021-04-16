@@ -270,7 +270,7 @@ dwv.ViewController = function (view) {
             );
           }
         } else if (nFrames !== 1) {
-          if (!self.incrementIndex(2)) {
+          if (!self.incrementIndex(3)) {
             var pos = self.getCurrentPosition();
             self.setCurrentPosition(
               new dwv.math.Index([
