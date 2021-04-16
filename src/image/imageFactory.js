@@ -54,7 +54,7 @@ dwv.image.ImageFactory.prototype.create = function (
   }
 
   // image size
-  var size = new dwv.image.Size(columns, rows, 1, frames);
+  var size = new dwv.image.Size([columns, rows, 1, frames]);
 
   // spacing
   var rowSpacing = null;

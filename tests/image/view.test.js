@@ -13,7 +13,7 @@ QUnit.module('view');
 QUnit.test('Test listeners.', function (assert) {
   // create an image
   var size0 = 4;
-  var imgSize0 = new dwv.image.Size(size0, size0, 1);
+  var imgSize0 = new dwv.image.Size([size0, size0, 1]);
   var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
   var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
   var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
@@ -53,7 +53,7 @@ QUnit.test('Test listeners.', function (assert) {
 QUnit.test('Test playback milliseconds.', function (assert) {
   // create an image
   var size0 = 4;
-  var imgSize0 = new dwv.image.Size(size0, size0, 1);
+  var imgSize0 = new dwv.image.Size([size0, size0, 1]);
   var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
   var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
   var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
@@ -93,7 +93,7 @@ QUnit.test('Test playback milliseconds.', function (assert) {
 QUnit.test('Test generate data MONO.', function (assert) {
   // create an image
   var size0 = 2;
-  var imgSize0 = new dwv.image.Size(size0, size0, 1);
+  var imgSize0 = new dwv.image.Size([size0, size0, 1, 1]);
   var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
   var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
   var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
@@ -151,7 +151,7 @@ QUnit.test('Test generate data MONO.', function (assert) {
 QUnit.test('Test generate data RGB.', function (assert) {
   // create an image
   var size0 = 2;
-  var imgSize0 = new dwv.image.Size(size0, size0, 1);
+  var imgSize0 = new dwv.image.Size([size0, size0, 1, 1]);
   var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
   var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
   var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
@@ -250,7 +250,7 @@ QUnit.test('Test generate data RGB.', function (assert) {
 QUnit.test('Test generate data timing.', function (assert) {
   // create an image
   var size0 = 128;
-  var imgSize0 = new dwv.image.Size(size0, size0, 1);
+  var imgSize0 = new dwv.image.Size([size0, size0, 1, 1]);
   var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
   var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
   var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);

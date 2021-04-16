@@ -25,7 +25,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
    */
   var rsis = [];
   // initialise RSIs
-  for (var s = 0, nslices = geometry.getSize().getNumberOfSlices();
+  for (var s = 0, nslices = geometry.getSize().get(2);
     s < nslices; ++s) {
     rsis.push(new dwv.image.RescaleSlopeAndIntercept(1, 0));
   }
@@ -270,7 +270,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     // create the image copy
     var copy = new dwv.image.Image(this.getGeometry(), clonedBuffer, imageUids);
     // copy the RSIs
-    var nslices = this.getGeometry().getSize().getNumberOfSlices();
+    var nslices = this.getGeometry().getSize().get(2);
     for (var k = 0; k < nslices; ++k) {
       copy.setRescaleSlopeAndIntercept(this.getRescaleSlopeAndIntercept(k), k);
     }
@@ -295,13 +295,13 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     }
     var rhsSize = rhs.getGeometry().getSize();
     var size = geometry.getSize();
-    if (rhsSize.getNumberOfSlices() !== 1) {
+    if (rhsSize.get(2) !== 1) {
       throw new Error('Cannot append more than one slice');
     }
-    if (size.getNumberOfColumns() !== rhsSize.getNumberOfColumns()) {
+    if (size.get(0) !== rhsSize.get(0)) {
       throw new Error('Cannot append a slice with different number of columns');
     }
-    if (size.getNumberOfRows() !== rhsSize.getNumberOfRows()) {
+    if (size.get(1) !== rhsSize.get(1)) {
       throw new Error('Cannot append a slice with different number of rows');
     }
     if (!geometry.getOrientation().equals(
@@ -343,7 +343,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     }
 
     // store slice
-    var oldNumberOfSlices = size.getNumberOfSlices();
+    var oldNumberOfSlices = size.get(2);
     var newSliceIndex = geometry.getSliceIndex(rhs.getGeometry().getOrigin());
     var newSliceOffset = newSliceIndex * sliceSize;
     // move content if needed
@@ -558,9 +558,9 @@ dwv.image.Image.prototype.calculateRescaledDataRange = function () {
     var rmax = rmin;
     var rvalue = 0;
     for (var f = 0, nframes = nFrames; f < nframes; ++f) {
-      for (var k = 0, nslices = size.getNumberOfSlices(); k < nslices; ++k) {
-        for (var j = 0, nrows = size.getNumberOfRows(); j < nrows; ++j) {
-          for (var i = 0, ncols = size.getNumberOfColumns(); i < ncols; ++i) {
+      for (var k = 0, nslices = size.get(2); k < nslices; ++k) {
+        for (var j = 0, nrows = size.get(1); j < nrows; ++j) {
+          for (var i = 0, ncols = size.get(0); i < ncols; ++i) {
             rvalue = this.getRescaledValue(i, j, k, f);
             if (rvalue > rmax) {
               rmax = rvalue;
@@ -591,10 +591,10 @@ dwv.image.Image.prototype.calculateHistogram = function () {
   var rmin = this.getRescaledValue(0, 0, 0);
   var rmax = rmin;
   var rvalue = 0;
-  for (var f = 0, nframes = size.getNumberOfFrames(); f < nframes; ++f) {
-    for (var k = 0, nslices = size.getNumberOfSlices(); k < nslices; ++k) {
-      for (var j = 0, nrows = size.getNumberOfRows(); j < nrows; ++j) {
-        for (var i = 0, ncols = size.getNumberOfColumns(); i < ncols; ++i) {
+  for (var f = 0, nframes = size.get(3); f < nframes; ++f) {
+    for (var k = 0, nslices = size.get(2); k < nslices; ++k) {
+      for (var j = 0, nrows = size.get(1); j < nrows; ++j) {
+        for (var i = 0, ncols = size.get(0); i < ncols; ++i) {
           value = this.getValue(i, j, k, f);
           if (value > max) {
             max = value;
@@ -648,10 +648,10 @@ dwv.image.Image.prototype.convolute2D = function (weights) {
   var newBuffer = newImage.getBuffer();
 
   var imgSize = this.getGeometry().getSize();
-  var ncols = imgSize.getNumberOfColumns();
-  var nrows = imgSize.getNumberOfRows();
-  var nslices = imgSize.getNumberOfSlices();
-  var nframes = imgSize.getNumberOfFrames();
+  var ncols = imgSize.get(0);
+  var nrows = imgSize.get(1);
+  var nslices = imgSize.get(2);
+  var nframes = imgSize.get(3);
   var frameSize = imgSize.getFrameSize();
   var ncomp = this.getNumberOfComponents();
 

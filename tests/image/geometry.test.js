@@ -12,33 +12,33 @@ QUnit.module('geometry');
  * @function module:tests/image~size
  */
 QUnit.test('Test Size.', function (assert) {
-  var size0 = new dwv.image.Size(2, 3, 4);
+  var size0 = new dwv.image.Size([2, 3, 4]);
   // test its values
-  assert.equal(size0.getNumberOfColumns(), 2, 'getNumberOfColumns');
-  assert.equal(size0.getNumberOfRows(), 3, 'getNumberOfRows');
-  assert.equal(size0.getNumberOfSlices(), 4, 'getNumberOfSlices');
+  assert.equal(size0.get(0), 2, 'getNumberOfColumns');
+  assert.equal(size0.get(1), 3, 'getNumberOfRows');
+  assert.equal(size0.get(2), 4, 'getNumberOfSlices');
   assert.equal(size0.getSliceSize(), 6, 'getSliceSize');
   assert.equal(size0.getFrameSize(), 24, 'getFrameSize');
   // defaults
-  var size00 = new dwv.image.Size(2, 3);
-  assert.equal(size00.getNumberOfSlices(), 1, 'getNumberOfSlices default');
+  //var size00 = new dwv.image.Size([2, 3]);
+  //assert.equal(size00.get(2), 1, 'getNumberOfSlices default');
   // equality
-  assert.equal(size0.equals(size0), 1, 'equals self true');
-  var size1 = new dwv.image.Size(2, 3, 4);
-  assert.equal(size0.equals(size1), 1, 'equals true');
-  var size2 = new dwv.image.Size(3, 3, 4);
-  assert.equal(size0.equals(size2), 0, 'equals false');
+  assert.equal(size0.equals(size0), true, 'equals self true');
+  var size1 = new dwv.image.Size([2, 3, 4]);
+  assert.equal(size0.equals(size1), true, 'equals true');
+  var size2 = new dwv.image.Size([3, 3, 4]);
+  assert.equal(size0.equals(size2), false, 'equals false');
   // is in bounds
   var index0 = new dwv.math.Index([0, 0, 0]);
-  assert.equal(size0.isInBounds(index0), 1, 'isInBounds 0,0,0');
+  assert.equal(size0.isInBounds(index0), true, 'isInBounds 0,0,0');
   index0 = new dwv.math.Index([0, 0]);
-  assert.equal(size0.isInBounds(index0), 1, 'isInBounds 0,0');
+  assert.equal(size0.isInBounds(index0), false, 'isInBounds 0,0');
   index0 = new dwv.math.Index([1, 2, 3]);
-  assert.equal(size0.isInBounds(index0), 1, 'isInBounds max');
+  assert.equal(size0.isInBounds(index0), true, 'isInBounds max');
   index0 = new dwv.math.Index([2, 3, 4]);
-  assert.equal(size0.isInBounds(index0), 0, 'isInBounds too big');
+  assert.equal(size0.isInBounds(index0), false, 'isInBounds too big');
   index0 = new dwv.math.Index([-1, 2, 3]);
-  assert.equal(size0.isInBounds(index0), 0, 'isInBounds too small');
+  assert.equal(size0.isInBounds(index0), false, 'isInBounds too small');
 });
 
 /**

@@ -255,8 +255,8 @@ dwv.image.getRegionSliceIterator = function (
   }
   if (typeof max === 'undefined') {
     max = new dwv.math.Point2D(
-      size.getNumberOfColumns() - 1,
-      size.getNumberOfRows()
+      size.get(0) - 1,
+      size.get(1)
     );
   }
   // position to pixel for max: extra X is ok, remove extra Y
@@ -269,7 +269,7 @@ dwv.image.getRegionSliceIterator = function (
 
   // minimum 1 column
   var rangeNumberOfColumns = Math.max(1, max.getX() - min.getX());
-  var rowIncrement = size.getNumberOfColumns() - rangeNumberOfColumns;
+  var rowIncrement = size.get(0) - rangeNumberOfColumns;
 
   // data accessor
   var dataAccessor = null;
@@ -326,7 +326,7 @@ dwv.image.getVariableRegionSliceIterator = function (
       offsetRegions.push([
         region[0][0],
         width,
-        size.getNumberOfColumns() - region[1][0]
+        size.get(0) - region[1][0]
       ]);
     }
   }

@@ -184,8 +184,8 @@ dwv.html.DrawLayer = function (containerDiv) {
     // get sizes
     var size = image.getGeometry().getSize();
     layerSize = {
-      x: size.getNumberOfColumns(),
-      y: size.getNumberOfRows()
+      x: size.get(0),
+      y: size.get(1)
     };
 
     // create stage

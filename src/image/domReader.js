@@ -39,7 +39,7 @@ dwv.image.getDefaultImage = function (
   imageBuffer, numberOfFrames,
   imageUid) {
   // image size
-  var imageSize = new dwv.image.Size(width, height);
+  var imageSize = new dwv.image.Size([width, height, 1, 1]);
   // default spacing
   // TODO: misleading...
   var imageSpacing = new dwv.image.Spacing(1, 1);

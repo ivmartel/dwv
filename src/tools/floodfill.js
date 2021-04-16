@@ -281,7 +281,7 @@ dwv.tool.Floodfill = function (app) {
     // Iterate over the next images and paint border on each slice.
     for (var i = pos.get(2),
       len = end
-        ? end : app.getImage().getGeometry().getSize().getNumberOfSlices();
+        ? end : app.getImage().getGeometry().getSize().get(2);
       i < len; i++) {
       if (!paintBorder(initialpoint, threshold)) {
         break;

@@ -161,7 +161,7 @@ dwv.ViewController = function (view) {
    * @returns {boolean} True if the data only contains one frame.
    */
   this.isMonoFrameData = function () {
-    return view.getImage().getGeometry().getSize().getNumberOfFrames() === 1;
+    return view.getImage().getGeometry().getSize().get(3) === 1;
   };
 
   /**
@@ -249,8 +249,8 @@ dwv.ViewController = function (view) {
   this.play = function () {
     if (playerID === null) {
       var size = view.getImage().getGeometry().getSize();
-      var nSlices = size.getNumberOfSlices();
-      var nFrames = size.getNumberOfFrames();
+      var nSlices = size.get(2);
+      var nFrames = size.get(3);
       var recommendedDisplayFrameRate =
         view.getImage().getMeta().RecommendedDisplayFrameRate;
       var milliseconds = view.getPlaybackMilliseconds(
