@@ -48,7 +48,7 @@ dwv.math.Index = function (values) {
  * @returns {boolean} True if both indices are comparable.
  */
 dwv.math.Index.prototype.canCompare = function (rhs) {
-  // check input is not falsy
+  // check input
   if (!rhs) {
     return false;
   }
@@ -120,4 +120,19 @@ dwv.math.Index.prototype.differentDims = function (rhs) {
     }
   }
   return diffDims;
+};
+
+/**
+ * Get the current index with a new 2D base.
+ *
+ * @param {number} i The new 0 index.
+ * @param {number} j The new 1 index.
+ * @returns {object} The new index.
+ */
+dwv.math.Index.prototype.getWithNew2D = function (i, j) {
+  var values = [i, j];
+  for (var l = 2; l < this.length(); ++l) {
+    values.push(this.get(l));
+  }
+  return new dwv.math.Index(values);
 };
