@@ -870,8 +870,8 @@ dwv.App = function () {
       loadtype: event.loadtype
     });
 
-    // render if asked
-    if (event.loadtype === 'image' && options.viewOnFirstLoadItem) {
+    // adapt context
+    if (event.loadtype === 'image') {
       if (isFirstLoadItem) {
         // initialise or add view
         var dataIndex = dataController.getCurrentIndex();
@@ -881,8 +881,6 @@ dwv.App = function () {
         } else {
           addViewLayer(data.image, data.meta, dataIndex);
         }
-        // render
-        self.render();
       } else {
         // update slice number if new slice was inserted before
         var controller =
@@ -895,6 +893,11 @@ dwv.App = function () {
             k: currentPosition.k + 1
           }, true);
         }
+      }
+
+      // render if flag allows
+      if (isFirstLoadItem && options.viewOnFirstLoadItem) {
+        self.render();
       }
     }
 
