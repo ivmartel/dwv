@@ -12,23 +12,25 @@ dwv.image = dwv.image || {};
  *
  * @class
  * @param {object} geometry The geometry of the image.
- * @param {Array} buffer The image data as an array of frame buffers.
+ * @param {Array} buffer The image data as a one dimensional buffer.
  * @param {Array} imageUids An array of Uids indexed to slice number.
  */
 dwv.image.Image = function (geometry, buffer, imageUids) {
 
   /**
-   * Rescale slope and intercept.
+   * Constant rescale slope and intercept (default).
    *
    * @private
    * @type {number}
    */
-  var rsis = [];
-  // initialise RSIs
-  for (var s = 0, nslices = geometry.getSize().get(2);
-    s < nslices; ++s) {
-    rsis.push(new dwv.image.RescaleSlopeAndIntercept(1, 0));
-  }
+  var rsi = new dwv.image.RescaleSlopeAndIntercept(1, 0);
+  /**
+   * Varying rescale slope and intercept.
+   *
+   * @private
+   * @type {array}
+   */
+  var rsis = null;
   /**
    * Flag to know if the RSIs are all identity (1,0).
    *
@@ -123,47 +125,98 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   this.getBuffer = function () {
     return buffer;
   };
+
   /**
-   * Get the data buffer of the image.
+   * Can the image values be quantified?
    *
-   * @param {number} frame The frame number.
-   * @todo dangerous...
-   * @returns {Array} The data buffer of the frame.
+   * @returns {boolean} True if only one component.
    */
-  this.getFrame = function (frame) {
-    return buffer[frame];
+  this.canQuantify = function () {
+    return this.getNumberOfComponents() === 1;
+  };
+
+  /**
+   * Can window and level be applied to the data?
+   *
+   * @returns {boolean} True if the data is monochrome.
+   */
+  this.canWindowLevel = function () {
+    return this.getPhotometricInterpretation()
+      .match(/MONOCHROME/) !== null;
+  };
+
+  /**
+   * Can the data be scrolled?
+   *
+   * @returns {boolean} True if the data has more than one slice or frame.
+   */
+  this.canScroll = function () {
+    var size = this.getGeometry().getSize();
+    var nSlices = size.get(2);
+    var nFrames = 1;
+    if (typeof size.get(3) !== 'undefined') {
+      nFrames = size.get(3);
+    }
+    var nFiles = 1;
+    if (typeof meta.numberOfFiles !== 'undefined') {
+      nFiles = meta.numberOfFiles;
+    }
+    return nSlices !== 1 || nFrames !== 1 || nFiles !== 1;
   };
 
   /**
    * Get the rescale slope and intercept.
    *
-   * @param {number} k The slice index.
+   * @param {number} k The slice index (only needed for non constant rsi).
    * @returns {object} The rescale slope and intercept.
    */
   this.getRescaleSlopeAndIntercept = function (k) {
-    return rsis[k];
+    var res = rsi;
+    if (!this.isConstantRSI()) {
+      if (typeof k === 'undefined') {
+        throw new Error('Cannot get non constant RSI with empty slice index.');
+      }
+      res = rsis[k];
+    }
+    return res;
   };
+
   /**
    * Set the rescale slope and intercept.
    *
-   * @param {Array} inRsi The input rescale slope and intercept.
-   * @param {number} k The slice index (optional).
+   * @param {object} inRsi The input rescale slope and intercept.
+   * @param {number} k The slice index (only needed for non constant rsi).
    */
   this.setRescaleSlopeAndIntercept = function (inRsi, k) {
-    if (typeof k === 'undefined') {
-      k = 0;
-    }
-    rsis[k] = inRsi;
-
-    // update RSI flags
-    isIdentityRSI = true;
-    isConstantRSI = true;
-    for (var s = 0, lens = rsis.length; s < lens; ++s) {
-      if (!rsis[s].isID()) {
-        isIdentityRSI = false;
+    // update identity flag
+    isIdentityRSI = isIdentityRSI && inRsi.isID();
+    // update constant flag
+    if (!isConstantRSI) {
+      if (typeof k === 'undefined') {
+        throw new Error(
+          'Cannot store non constant RSI with empty slice index.');
       }
-      if (s > 0 && !rsis[s].equals(rsis[s - 1])) {
-        isConstantRSI = false;
+      rsis[k] = inRsi;
+    } else {
+      if (!rsi.equals(inRsi)) {
+        if (typeof k === 'undefined') {
+          // no slice index, replace existing
+          rsi = inRsi;
+        } else {
+          // first non constant rsi
+          isConstantRSI = false;
+          console.log('non constant rsi !');
+          // switch to non constant mode
+          rsis = [];
+          // initialise RSIs
+          for (var s = 0, nslices = geometry.getSize().get(2);
+            s < nslices; ++s) {
+            rsis.push(rsi);
+          }
+          // store
+          rsi = null;
+          rsis[k] = inRsi;
+        }
       }
     }
   };
@@ -245,16 +298,8 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
    * Get value at offset. Warning: No size check...
    *
    * @param {number} offset The desired offset.
-   * @param {number} frame The desired frame.
    * @returns {number} The value at offset.
    */
-  this.getValueAtOffsetAndFrame = function (offset, frame) {
-    //return buffer[frame][offset];
-    var size = this.getGeometry().getSize();
-    return this.getValueAtOffset(
-      frame * size.getFrameSize() * numberOfComponents + offset);
-  };
-
   this.getValueAtOffset = function (offset) {
     return buffer[offset];
   };
@@ -269,10 +314,15 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     var clonedBuffer = buffer.slice(0);
     // create the image copy
     var copy = new dwv.image.Image(this.getGeometry(), clonedBuffer, imageUids);
-    // copy the RSIs
-    var nslices = this.getGeometry().getSize().get(2);
-    for (var k = 0; k < nslices; ++k) {
-      copy.setRescaleSlopeAndIntercept(this.getRescaleSlopeAndIntercept(k), k);
+    // copy the RSI(s)
+    if (this.isConstantRSI()) {
+      copy.setRescaleSlopeAndIntercept(this.getRescaleSlopeAndIntercept());
+    } else {
+      var nslices = this.getGeometry().getSize().get(2);
+      for (var k = 0; k < nslices; ++k) {
+        copy.setRescaleSlopeAndIntercept(
+          this.getRescaleSlopeAndIntercept(k), k);
+      }
     }
     // copy extras
     copy.setPhotometricInterpretation(this.getPhotometricInterpretation());
@@ -371,7 +421,9 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     // update geometry
     geometry.appendOrigin(rhs.getGeometry().getOrigin(), newSliceIndex);
     // update rsi
-    rsis.splice(newSliceIndex, 0, rhs.getRescaleSlopeAndIntercept(0));
+    // (rhs should just have one rsi)
+    this.setRescaleSlopeAndIntercept(
+      rhs.getRescaleSlopeAndIntercept(), newSliceIndex);
 
     // insert sop instance UIDs
     imageUids.splice(newSliceIndex, 0, rhs.getImageUids()[0]);
@@ -408,9 +460,34 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
    * Append a frame buffer to the image.
    *
    * @param {object} frameBuffer The frame buffer to append.
+   * @param {number} frameIndex The frame index.
    */
-  this.appendFrameBuffer = function (frameBuffer) {
-    buffer.push(frameBuffer);
+  this.appendFrameBuffer = function (frameBuffer, frameIndex) {
+    // create full buffer if not done yet
+    var size = geometry.getSize();
+    var frameSize = numberOfComponents * size.getFrameSize();
+    var fullBufferSize = frameSize * meta.numberOfFiles;
+    if (buffer.length !== fullBufferSize) {
+      if (typeof meta.numberOfFiles === 'undefined') {
+        throw new Error('Missing number of files for buffer creation.');
+      }
+      // save old
+      var oldBuffer = buffer;
+      // create new
+      buffer = dwv.dicom.getTypedArray(
+        buffer.BYTES_PER_ELEMENT * 8,
+        meta.IsSigned ? 1 : 0,
+        fullBufferSize);
+      // put old in new
+      buffer.set(oldBuffer);
+    }
+    // append
+    if (frameIndex >= meta.numberOfFiles) {
+      throw new Error(
+        'Cannot append a frame at an index above the number of frames');
+    }
+    buffer.set(frameBuffer, frameSize * frameIndex);
+    geometry.appendFrame();
   };
 
   /**
@@ -465,13 +542,23 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
  */
 dwv.image.Image.prototype.getValue = function (i, j, k, f) {
   var frame = (f || 0);
-  var index = new dwv.math.Index([i, j, k]);
-  return this.getValueAtOffsetAndFrame(
-    this.getGeometry().indexToOffset(index), frame);
+  var index = new dwv.math.Index([i, j, k, frame]);
+  return this.getValueAtOffset(this.getGeometry().indexToOffset(index));
 };
 
 /**
- * Get the rescaled value of the image at a specific coordinate.
+ * Get the value of the image at a specific index.
+ *
+ * @param {object} index The index.
+ * @returns {number} The value at the desired position.
+ * Warning: No size check...
+ */
+dwv.image.Image.prototype.getValueAtIndex = function (index) {
+  return this.getValueAtOffset(this.getGeometry().indexToOffset(index));
+};
+
+/**
+ * Get the rescaled value of the image at a specific position.
  *
  * @param {number} i The X index.
  * @param {number} j The Y index.
@@ -484,25 +571,44 @@ dwv.image.Image.prototype.getRescaledValue = function (i, j, k, f) {
   var frame = (f || 0);
   var val = this.getValue(i, j, k, frame);
   if (!this.isIdentityRSI()) {
-    val = this.getRescaleSlopeAndIntercept(k).apply(val);
+    if (this.isConstantRSI()) {
+      val = this.getRescaleSlopeAndIntercept().apply(val);
+    } else {
+      val = this.getRescaleSlopeAndIntercept(k).apply(val);
+    }
   }
   return val;
+};
+
+/**
+ * Get the rescaled value of the image at a specific index.
+ *
+ * @param {object} index The index.
+ * @returns {number} The rescaled value at the desired position.
+ * Warning: No size check...
+ */
+dwv.image.Image.prototype.getRescaledValueAtIndex = function (index) {
+  return this.getRescaledValueAtOffset(
+    this.getGeometry().indexToOffset(index)
+  );
 };
 
 /**
  * Get the rescaled value of the image at a specific offset.
  *
  * @param {number} offset The desired offset.
- * @param {number} k The Z index.
- * @param {number} f The frame number.
  * @returns {number} The rescaled value at the desired offset.
  * Warning: No size check...
  */
-dwv.image.Image.prototype.getRescaledValueAtOffset = function (offset, k, f) {
-  var frame = (f || 0);
-  var val = this.getValueAtOffsetAndFrame(offset, frame);
+dwv.image.Image.prototype.getRescaledValueAtOffset = function (offset) {
+  var val = this.getValueAtOffset(offset);
   if (!this.isIdentityRSI()) {
-    val = this.getRescaleSlopeAndIntercept(k).apply(val);
+    if (this.isConstantRSI()) {
+      val = this.getRescaleSlopeAndIntercept().apply(val);
+    } else {
+      var index = this.getGeometry().offsetToIndex(offset);
+      val = this.getRescaleSlopeAndIntercept(index.get(2)).apply(val);
+    }
   }
   return val;
 };
@@ -514,20 +620,22 @@ dwv.image.Image.prototype.getRescaledValueAtOffset = function (offset, k, f) {
  * @returns {object} The range {min, max}.
  */
 dwv.image.Image.prototype.calculateDataRange = function () {
-  var size = this.getGeometry().getSize().getFrameSize();
-  var nFrames = 1; //this.getNumberOfFrames();
-  var min = this.getValueAtOffsetAndFrame(0, 0);
+  var min = this.getValueAtOffset(0);
   var max = min;
   var value = 0;
-  for (var f = 0; f < nFrames; ++f) {
-    for (var i = 0; i < size; ++i) {
-      value = this.getValueAtOffsetAndFrame(i, f);
-      if (value > max) {
-        max = value;
-      }
-      if (value < min) {
-        min = value;
-      }
+  var size = this.getGeometry().getSize();
+  var leni = size.getTotalSize();
+  // max to one frame
+  if (size.length() === 3) {
+    leni = size.getDimSize(3);
+  }
+  for (var i = 0; i < leni; ++i) {
+    value = this.getValueAtOffset(i);
+    if (value > max) {
+      max = value;
+    }
+    if (value < min) {
+      min = value;
     }
   }
   // return
@@ -545,31 +653,29 @@ dwv.image.Image.prototype.calculateRescaledDataRange = function () {
     return this.getDataRange();
   } else if (this.isConstantRSI()) {
     var range = this.getDataRange();
-    var resmin = this.getRescaleSlopeAndIntercept(0).apply(range.min);
-    var resmax = this.getRescaleSlopeAndIntercept(0).apply(range.max);
+    var resmin = this.getRescaleSlopeAndIntercept().apply(range.min);
+    var resmax = this.getRescaleSlopeAndIntercept().apply(range.max);
     return {
       min: ((resmin < resmax) ? resmin : resmax),
       max: ((resmin > resmax) ? resmin : resmax)
     };
   } else {
-    var size = this.getGeometry().getSize();
-    var nFrames = 1; //this.getNumberOfFrames();
-    var rmin = this.getRescaledValue(0, 0, 0);
+    var rmin = this.getRescaledValueAtOffset(0);
     var rmax = rmin;
     var rvalue = 0;
-    for (var f = 0, nframes = nFrames; f < nframes; ++f) {
-      for (var k = 0, nslices = size.get(2); k < nslices; ++k) {
-        for (var j = 0, nrows = size.get(1); j < nrows; ++j) {
-          for (var i = 0, ncols = size.get(0); i < ncols; ++i) {
-            rvalue = this.getRescaledValue(i, j, k, f);
-            if (rvalue > rmax) {
-              rmax = rvalue;
-            }
-            if (rvalue < rmin) {
-              rmin = rvalue;
-            }
-          }
-        }
+    var size = this.getGeometry().getSize();
+    var leni = size.getTotalSize();
+    // max to one frame
+    if (size.length() === 3) {
+      leni = size.getDimSize(3);
+    }
+    for (var i = 0; i < leni; ++i) {
+      rvalue = this.getRescaledValueAtOffset(i);
+      if (rvalue > rmax) {
+        rmax = rvalue;
+      }
+      if (rvalue < rmin) {
+        rmin = rvalue;
       }
     }
     // return
@@ -585,34 +691,28 @@ dwv.image.Image.prototype.calculateRescaledDataRange = function () {
 dwv.image.Image.prototype.calculateHistogram = function () {
   var size = this.getGeometry().getSize();
   var histo = [];
-  var min = this.getValue(0, 0, 0);
+  var min = this.getValueAtOffset(0);
   var max = min;
   var value = 0;
-  var rmin = this.getRescaledValue(0, 0, 0);
+  var rmin = this.getRescaledValueAtOffset(0);
   var rmax = rmin;
   var rvalue = 0;
-  for (var f = 0, nframes = size.get(3); f < nframes; ++f) {
-    for (var k = 0, nslices = size.get(2); k < nslices; ++k) {
-      for (var j = 0, nrows = size.get(1); j < nrows; ++j) {
-        for (var i = 0, ncols = size.get(0); i < ncols; ++i) {
-          value = this.getValue(i, j, k, f);
-          if (value > max) {
-            max = value;
-          }
-          if (value < min) {
-            min = value;
-          }
-          rvalue = this.getRescaleSlopeAndIntercept(k).apply(value);
-          if (rvalue > rmax) {
-            rmax = rvalue;
-          }
-          if (rvalue < rmin) {
-            rmin = rvalue;
-          }
-          histo[rvalue] = (histo[rvalue] || 0) + 1;
-        }
-      }
+  for (var i = 0, leni = size.getTotalSize(); i < leni; ++i) {
+    value = this.getValueAtOffset(i);
+    if (value > max) {
+      max = value;
     }
+    if (value < min) {
+      min = value;
+    }
+    rvalue = this.getRescaledValueAtOffset(i);
+    if (rvalue > rmax) {
+      rmax = rvalue;
+    }
+    if (rvalue < rmin) {
+      rmin = rvalue;
+    }
+    histo[rvalue] = (histo[rvalue] || 0) + 1;
   }
   // set data range
   var dataRange = {min: min, max: max};
@@ -650,21 +750,19 @@ dwv.image.Image.prototype.convolute2D = function (weights) {
   var imgSize = this.getGeometry().getSize();
   var ncols = imgSize.get(0);
   var nrows = imgSize.get(1);
-  var nslices = imgSize.get(2);
-  var nframes = imgSize.get(3);
   var frameSize = imgSize.getFrameSize();
   var ncomp = this.getNumberOfComponents();
 
   // adapt to number of component and planar configuration
   var factor = 1;
   var componentOffset = 1;
-  var frameOffset = imgSize.getFrameSize();
+  var frameOffset = frameSize;
   if (ncomp === 3) {
     frameOffset *= 3;
     if (this.getPlanarConfiguration() === 0) {
       factor = 3;
     } else {
-      componentOffset = imgSize.getFrameSize();
+      componentOffset = frameSize;
     }
   }
 
@@ -738,12 +836,14 @@ dwv.image.Image.prototype.convolute2D = function (weights) {
   var newValue = 0;
   var wOffFinal = [];
   // go through the destination image pixels
-  for (var f = 0; f < nframes; f++) {
+  var nFrames = imgSize.length() === 3
+    ? imgSize.get(3) : 1;
+  for (var f = 0; f < nFrames; f++) {
     pixelOffset = f * frameOffset;
     for (var c = 0; c < ncomp; c++) {
       // special component offset
       pixelOffset += c * componentOffset;
-      for (var k = 0; k < nslices; k++) {
+      for (var k = 0; k < imgSize.get(2); k++) {
         for (var j = 0; j < nrows; j++) {
           for (var i = 0; i < ncols; i++) {
             wOffFinal = wOff;
@@ -770,10 +870,10 @@ dwv.image.Image.prototype.convolute2D = function (weights) {
             // fall under the convolution matrix
             newValue = 0;
             for (var wi = 0; wi < 9; ++wi) {
-              newValue += this.getValueAtOffsetAndFrame(
-                pixelOffset + wOffFinal[wi], f) * weights[wi];
+              newValue += this.getValueAtOffset(
+                pixelOffset + wOffFinal[wi]) * weights[wi];
             }
-            newBuffer[f * frameSize * ncomp + pixelOffset] = newValue;
+            newBuffer[pixelOffset] = newValue;
             // increment pixel offset
             pixelOffset += factor;
           }

@@ -327,10 +327,7 @@ dwv.html.ViewLayer = function (containerDiv) {
 
     // get sizes
     var size = image.getGeometry().getSize();
-    layerSize = {
-      x: size.get(0),
-      y: size.get(1)
-    };
+    layerSize = size.get2D();
 
     // create canvas
     canvas = document.createElement('canvas');

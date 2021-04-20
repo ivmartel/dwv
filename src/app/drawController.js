@@ -171,10 +171,10 @@ dwv.DrawController = function (konvaLayer) {
    * @param {number} currentFrame The current frame number.
    */
   this.activateDrawLayer = function (currentPosition) {
-    // set current position
-    var currentSlice = currentPosition.get(2);
-    var currentFrame = currentPosition.get(3);
     // get and store the position group id
+    var currentSlice = currentPosition.get(2);
+    var currentFrame = currentPosition.length() === 3
+      ? currentPosition.get(3) : 0;
     currentPosGroupId = dwv.draw.getDrawPositionGroupId(
       currentSlice, currentFrame);
 

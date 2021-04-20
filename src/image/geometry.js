@@ -51,8 +51,8 @@ dwv.image.Size.prototype.getDimSize = function (dimension) {
   if (dimension > this.length()) {
     return null;
   }
-  var size = this.get(0);
-  for (var i = 1; i < dimension; ++i) {
+  var size = 1;
+  for (var i = 0; i < dimension; ++i) {
     size *= this.get(i);
   }
   return size;
@@ -93,7 +93,7 @@ dwv.image.Size.prototype.getTotalSize = function () {
  */
 dwv.image.Size.prototype.equals = function (rhs) {
   // check input
-  if (rhs === null) {
+  if (!rhs) {
     return false;
   }
   // check length
@@ -121,7 +121,7 @@ dwv.image.Size.prototype.equals = function (rhs) {
  */
 dwv.image.Size.prototype.isInBounds = function (index) {
   // check input
-  if (index === null) {
+  if (!index) {
     return false;
   }
   // check length
@@ -137,6 +137,18 @@ dwv.image.Size.prototype.isInBounds = function (index) {
   }
   // seems ok!
   return true;
+};
+
+/**
+ * Get the 2D base of this size.
+ *
+ * @returns {object} The 2D base [0,1] as {x,y}.
+ */
+dwv.image.Size.prototype.get2D = function () {
+  return {
+    x: this.get(0),
+    y: this.get(1)
+  };
 };
 
 /**
@@ -308,6 +320,20 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
     ]);
   };
 
+  /**
+   * Append a frame to the geometry.
+   *
+   */
+  this.appendFrame = function () {
+    // increment frame number
+    size = new dwv.image.Size([
+      size.get(0),
+      size.get(1),
+      size.get(2),
+      size.get(3) + 1
+    ]);
+  };
+
 };
 
 /**
@@ -338,13 +364,35 @@ dwv.image.Geometry.prototype.equals = function (rhs) {
  * Convert an index to an offset in memory.
  *
  * @param {object} index The index to convert.
- * @returns {number} The offset
+ * @returns {number} The offset.
  */
 dwv.image.Geometry.prototype.indexToOffset = function (index) {
   var size = this.getSize();
-  return index.get(0) +
-   index.get(1) * size.getDimSize(1) +
-   index.get(2) * size.getDimSize(2);
+  var offset = 0;
+  for (var i = 0; i < index.length(); ++i) {
+    offset += index.get(i) * size.getDimSize(i);
+  }
+  return offset;
+};
+
+/**
+ * Convert an offset in memory to an index.
+ *
+ * @param {number} offset The offset to convert.
+ * @returns {object} The index.
+ */
+dwv.image.Geometry.prototype.offsetToIndex = function (offset) {
+  var size = this.getSize();
+  var values = new Array(size.length());
+  var off = offset;
+  var dimSize = 0;
+  for (var i = size.length() - 1; i > 0; --i) {
+    dimSize = size.getDimSize(i);
+    values[i] = Math.floor(off / dimSize);
+    off = off - values[i] * dimSize;
+  }
+  values[0] = off;
+  return new dwv.math.Index(values);
 };
 
 /**

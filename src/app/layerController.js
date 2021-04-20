@@ -410,10 +410,7 @@ dwv.LayerController = function (containerDiv) {
    */
   this.initialise = function (image, metaData, dataIndex) {
     var size = image.getGeometry().getSize();
-    layerSize = {
-      x: size.get(0),
-      y: size.get(1)
-    };
+    layerSize = size.get2D();
     // apply to layers
     for (var i = 0; i < layers.length; ++i) {
       layers[i].initialise(image, metaData, dataIndex);

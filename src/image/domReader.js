@@ -52,6 +52,9 @@ dwv.image.getDefaultImage = function (
   // meta information
   var meta = {};
   meta.BitsStored = 8;
+  if (typeof numberOfFrames !== 'undefined') {
+    meta.numberOfFiles = numberOfFrames;
+  }
   image.setMeta(meta);
   // return
   return image;
@@ -131,7 +134,7 @@ dwv.image.getViewFromDOMVideo = function (
   // default frame rate...
   var frameRate = 30;
   // number of frames
-  var numberOfFrames = Math.floor(video.duration * frameRate);
+  var numberOfFrames = Math.ceil(video.duration * frameRate);
 
   // video properties
   var info = [];
@@ -190,7 +193,7 @@ dwv.image.getViewFromDOMVideo = function (
         source: origin
       });
     } else {
-      image.appendFrameBuffer(imgBuffer);
+      image.appendFrameBuffer(imgBuffer, frameIndex);
     }
     // increment index
     ++frameIndex;

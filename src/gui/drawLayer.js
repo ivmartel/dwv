@@ -183,10 +183,7 @@ dwv.html.DrawLayer = function (containerDiv) {
   this.initialise = function (image, _metaData) {
     // get sizes
     var size = image.getGeometry().getSize();
-    layerSize = {
-      x: size.get(0),
-      y: size.get(1)
-    };
+    layerSize = size.get2D();
 
     // create stage
     konvaStage = new Konva.Stage({

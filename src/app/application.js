@@ -75,30 +75,14 @@ dwv.App = function () {
   };
 
   /**
-   * Is the data mono-slice?
-   *
-   * @returns {boolean} True if the data only contains one slice.
-   */
-  this.isMonoSliceData = function () {
-    return loadController.isMonoSliceData();
-  };
-  /**
-   * Is the data mono-frame?
-   *
-   * @returns {boolean} True if the data only contains one frame.
-   */
-  this.isMonoFrameData = function () {
-    var viewLayer = layerController.getActiveViewLayer();
-    var controller = viewLayer.getViewController();
-    return controller.isMonoFrameData();
-  };
-  /**
    * Can the data be scrolled?
    *
    * @returns {boolean} True if the data has more than one slice or frame.
    */
   this.canScroll = function () {
-    return !this.isMonoSliceData() || !this.isMonoFrameData();
+    var viewLayer = layerController.getActiveViewLayer();
+    var controller = viewLayer.getViewController();
+    return controller.canScroll();
   };
 
   /**

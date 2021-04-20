@@ -142,26 +142,25 @@ dwv.ViewController = function (view) {
    * @returns {boolean} True if possible.
    */
   this.canQuantifyImage = function () {
-    return view.getImage().getNumberOfComponents() === 1;
+    return view.getImage().canQuantify();
   };
 
   /**
    * Can window and level be applied to the data?
    *
-   * @returns {boolean} True if the data is monochrome.
+   * @returns {boolean} True if possible.
    */
   this.canWindowLevel = function () {
-    return view.getImage().getPhotometricInterpretation()
-      .match(/MONOCHROME/) !== null;
+    return view.getImage().canWindowLevel();
   };
 
   /**
-   * Is the data mono-frame?
+   * Can the data be scrolled?
    *
-   * @returns {boolean} True if the data only contains one frame.
+   * @returns {boolean} True if the data has more than one slice or frame.
    */
-  this.isMonoFrameData = function () {
-    return view.getImage().getGeometry().getSize().get(3) === 1;
+  this.canScroll = function () {
+    return view.getImage().canScroll();
   };
 
   /**
