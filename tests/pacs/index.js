@@ -17,6 +17,26 @@ var _dataDicom = [
       'LittleEndianExplicit [1.2.840.10008.1.2.1], bits: 16-12-11'
   },
   {
+    title: 'Baby MRI (DICOMDIR)',
+    uri: {
+      type: 'dwvtest',
+      file: 'bbmri.dcmdir'
+    },
+    img: 'babymri-dcmdir.png',
+    desc: 'Brain MR, 256*256*5, ' +
+      'LittleEndianExplicit [1.2.840.10008.1.2.1], bits: 16-12-11'
+  },
+  {
+    title: 'Baby MRI (zip)',
+    uri: {
+      type: 'dwvtest',
+      file: 'bbmri.zip'
+    },
+    img: 'babymri-zip.png',
+    desc: 'Brain MR, 256*256*5, ' +
+      'LittleEndianExplicit [1.2.840.10008.1.2.1], bits: 16-12-11'
+  },
+  {
     title: 'Toutatix',
     uri: {
       type: 'dwvtest',
