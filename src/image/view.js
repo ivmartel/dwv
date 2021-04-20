@@ -365,6 +365,7 @@ dwv.image.View = function (image) {
    * Set the current position.
    *
    * @param {object} pos The current position.
+   * @param {boolean} silent Flag to fire event or not.
    * @returns {boolean} False if not in bounds
    * @fires dwv.image.View#positionchange
    */
@@ -388,52 +389,54 @@ dwv.image.View = function (image) {
       } else {
         diffDims = [0, 1, 2, 3];
       }
+
       // assign
       currentPosition = posIndex;
 
-      var eventValue = [
-        posIndex.get(0),
-        posIndex.get(1),
-        posIndex.get(2),
-        posIndex.get(3)
-      ];
-
-      /**
-       * Position change event.
-       *
-       * @event dwv.image.View#positionchange
-       * @type {object}
-       * @property {Array} value The changed value.
-       * @property {number} i The new column position
-       * @property {number} j The new row position
-       * @property {number} k The new slice position
-       * @property {object} pixelValue The image value at the new position,
-       *   (can be undefined).
-       */
-      var posEvent = {
-        type: 'positionchange',
-        value: eventValue,
-        i: posIndex.get(0),
-        j: posIndex.get(1),
-        k: posIndex.get(2),
-        f: posIndex.get(3),
-        diffDims: diffDims
-      };
-
-      // add value if possible
-      if (image.getPhotometricInterpretation().match(/MONOCHROME/) !== null) {
-        var pixValue = image.getRescaledValue(
+      if (!silent) {
+        var eventValue = [
           posIndex.get(0),
           posIndex.get(1),
-          posIndex.get(2),
-          posIndex.get(3)
-        );
-        eventValue.push(pixValue);
-        posEvent.pixelValue = pixValue;
-      }
+          posIndex.get(2)
+        ];
+        if (posIndex.length() === 3) {
+          eventValue.push(posIndex.get(3));
+        }
 
-      // fire
-      fireEvent(posEvent);
+        /**
+         * Position change event.
+         *
+         * @event dwv.image.View#positionchange
+         * @type {object}
+         * @property {Array} value The changed value.
+         * @property {number} i The new column position
+         * @property {number} j The new row position
+         * @property {number} k The new slice position
+         * @property {object} pixelValue The image value at the new position,
+         *   (can be undefined).
+         */
+        var posEvent = {
+          type: 'positionchange',
+          value: eventValue,
+          i: posIndex.get(0),
+          j: posIndex.get(1),
+          k: posIndex.get(2),
+          diffDims: diffDims
+        };
+        if (posIndex.length() === 3) {
+          posEvent.f = posIndex.get(3);
+        }
+
+        // add value if possible
+        if (image.canQuantify()) {
+          var pixValue = image.getRescaledValueAtIndex(posIndex);
+          eventValue.push(pixValue);
+          posEvent.pixelValue = pixValue;
+        }
+
+        // fire
+        fireEvent(posEvent);
+      }
     }
 
     // all good
