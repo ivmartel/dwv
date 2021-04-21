@@ -35,7 +35,6 @@
     "grunt-contrib-copy": "~1.0.0",
     "grunt-contrib-uglify": "~5.0.0",
     "grunt-contrib-watch": "~1.1.0",
-    "grunt-coveralls": "~2.0.0",
     "grunt-eslint": "~23.0.0",
     "grunt-karma": "~4.0.0",
     "http-server": "^0.12.3",
