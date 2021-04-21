@@ -35,31 +35,40 @@ echo "Finishing release for '$releaseVersion' with next version '$nextVersion'..
 
 ###################
 
-# 1. commit prepared changes
-mnRelVersion="${releaseVersion%.*}"
-git commit -a -m "Release v${mnRelVersion}"
+echo "---------------------------"
+echo "1/4 commit prepared changes"
+echo "---------------------------"
+
+releaseBranch="v${releaseVersion}"
+git commit -a -m "Release ${releaseBranch}"
 
 ###################
 
-# 2 udpate master branch
+echo "------------------------"
+echo "2/4 udpate master branch"
+echo "------------------------"
+
 git checkout master
 # merge release into master
-git merge --no-ff v$mnRelVersion
+git merge --no-ff $releaseBranch
 # push master
 git push origin master
 
 ###################
 
-# 3. update develop branch
+echo "-------------------------"
+echo "3/4 update develop branch"
+echo "-------------------------"
+
 git checkout develop
 # merge release into develop
-git merge --no-ff v$mnRelVersion
+git merge --no-ff $releaseBranch
 # update version number in files
-a0="\"version\": \"${releaseVersion}\""
-b0="\"version\": \"${nextVersion}-beta\""
+a0="  \"version\": \"[0-9]+\.[0-9]+\.[0-9]+\","
+b0="  \"version\": \"${nextVersion}-beta\","
 sed -i -r "s/${a0}/${b0}/g" package.json
-a1="return '${releaseVersion}';"
-b1="return '${nextVersion}-beta';"
+a1="  return '[0-9]+\.[0-9]+\.[0-9]+';"
+b1="  return '${nextVersion}-beta';"
 sed -i -r "s/${a1}/${b1}/g" src/dicom/dicomParser.js
 # commit
 git commit -a -m "Bumped version number to v${nextVersion}-beta"
@@ -68,9 +77,13 @@ git push origin develop
 
 ###################
 
-# 4. clean up
-git branch -d v$mnRelVersion
+echo "------------"
+echo "4/4 clean up"
+echo "------------"
+
+git branch -d $releaseBranch
 
 ###################
 
+echo "-----------------------"
 echo "Done finishing release."
