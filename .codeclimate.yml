@@ -1,5 +1,7 @@
----
-engines:
+version: "2"
+plugins:
+  eslint:
+    enabled: true
   csslint:
     enabled: true
   duplication:
@@ -7,16 +9,9 @@ engines:
     config:
       languages:
       - javascript
-  eslint:
-    enabled: true
   fixme:
     enabled: true
-ratings:
-  paths:
-  - "**.css"
-  - "**.inc"
-  - "**.js"
-exclude_paths:
-- decoders/
-- dist/
-- resources/
+exclude_patterns:
+- "decoders/"
+- "dist/"
+- "resources/"
