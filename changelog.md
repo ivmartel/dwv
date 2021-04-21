@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.28.2](https://github.com/ivmartel/dwv/releases/tag/v0.28.2) - 20/04/2021
+
+### Fixed
+
+- Do not force i18next dependency [#910](https://github.com/ivmartel/dwv/issues/910)
+
+---
+
 ## [v0.28.1](https://github.com/ivmartel/dwv/releases/tag/v0.28.1) - 02/02/2021
 
 ### Fixed

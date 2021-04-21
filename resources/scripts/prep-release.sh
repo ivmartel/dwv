@@ -35,32 +35,51 @@ echo "Preparing release for '$releaseVersion' with previous version '$prevVersio
 
 ###################
 
-# 1. create release branch
-mnRelVersion="${releaseVersion%.*}"
-git checkout -b v$mnRelVersion
+echo "-------------------------"
+echo "1/4 create release branch"
+echo "-------------------------"
+
+releaseBranch="v${releaseVersion}"
+git checkout -b $releaseBranch
 
 ###################
 
-# 2. update version number in files
-a0="\"version\": \"${releaseVersion}-beta\""
-b0="\"version\": \"${releaseVersion}\""
+echo "----------------------------------"
+echo "2/4 update version number in files"
+echo "----------------------------------"
+
+a0="  \"version\": \"[0-9]+\.[0-9]+\.[0-9]+-beta\","
+b0="  \"version\": \"${releaseVersion}\","
 sed -i -r "s/${a0}/${b0}/g" package.json
-a1="return '${releaseVersion}-beta';"
-b1="return '${releaseVersion}';"
+a1="  return '[0-9]+\.[0-9]+\.[0-9]+-beta';"
+b1="  return '${releaseVersion}';"
 sed -i -r "s/${a1}/${b1}/g" src/dicom/dicomParser.js
 
 ###################
 
-# 3. create build
+echo "----------------"
+echo "3/4 create build"
+echo "----------------"
+
 yarn run build
 # copy build to dist
 cp build/dist/*.js dist
 
 ###################
 
-# 4. update changelog
+echo "--------------------"
+echo "4/4 update changelog"
+echo "--------------------"
+
+# gren wants an existing tag...
+git tag v$releaseVersion
+git push origin --tags
+# run gren
 yarn run gren changelog --generate --override --changelog-filename=new.md \
   --tags=v$prevVersion..v$releaseVersion --milestone-match=$releaseVersion 
+# delete tag
+git tag -d v$releaseVersion
+git push --delete origin v$releaseVersion
 # line: separator between releases
 echo -en '\n---\n' > line.md
 # old: changelog with no title
@@ -74,4 +93,5 @@ rm old.md
 
 ###################
 
+echo "-----------------------"
 echo "Done preparing release."
