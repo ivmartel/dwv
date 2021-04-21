@@ -1,4 +1,4 @@
-/*! dwv 0.28.1 2021-04-21 09:40:46 */
+/*! dwv 0.28.2 2021-04-21 10:00:15 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -3837,7 +3837,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.28.1';
+  return '0.28.2';
 };
 
 /**
