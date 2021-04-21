@@ -20,7 +20,7 @@ All of them: [ivmartel/fiddles](https://jsfiddle.net/user/ivmartel/fiddles/).
 ## Module
 
 DICOM parsing using node:
- * [parser example #1](https://runkit.com/ivmartel/runkit-npm-dwv): parse DICOM data and display a tag.
+ * [parser example #1](https://runkit.com/ivmartel/runkit-npm-dwv-parse-ex-1): parse DICOM data and display a tag.
 
 ## Viewers and integrations
 
