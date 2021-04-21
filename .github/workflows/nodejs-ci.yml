@@ -24,5 +24,8 @@ jobs:
       run: yarn run test-ci --coverage --verbose
     - name: Build
       run: yarn run build
-    - name: Send coverage to coveralls
-      run: grunt coveralls
+    - name: Coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        path-to-lcov: 'build/coverage/dwv/report-lcovonly.txt'
+        github-token: ${{ secrets.GITHUB_TOKEN }}
