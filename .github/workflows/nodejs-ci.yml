@@ -1,9 +1,4 @@
-# This workflow will:
-# - do a clean install of node dependencies
-# - run lint
-# - run tests
-# - build the source code
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+# Node.js CI workflow
 
 name: Node.js CI
 
@@ -11,20 +6,23 @@ on: [push, pull_request]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js
+    - name: Check out code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Setup Node.js
       uses: actions/setup-node@v1
       with:
         node-version: '14.x'
-    - name: Install
+    - name: Install dependencies
       run: yarn install --frozen-lockfile
-    - name: Lint
+    - name: Run lint
       run: yarn run lint
-    - name: Test
+    - name: Run tests
       run: yarn run test-ci --coverage --verbose
     - name: Build
       run: yarn run build
+    - name: Send coverage to coveralls
+      run: grunt coveralls
