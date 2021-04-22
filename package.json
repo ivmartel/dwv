@@ -39,11 +39,11 @@
     "grunt-karma": "~4.0.0",
     "http-server": "^0.12.3",
     "jsdoc": "3.6.6",
-    "karma": "~5.2.3",
-    "karma-chrome-launcher": "~3.1.0",
-    "karma-coverage": "^2.0.2",
-    "karma-qunit": "~4.1.1",
-    "qunit": "~2.14.0"
+    "karma": "^6.3.2",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-coverage": "^2.0.3",
+    "karma-qunit": "^4.1.2",
+    "qunit": "^2.15.0"
   },
   "scripts": {
     "lint": "grunt lint",
