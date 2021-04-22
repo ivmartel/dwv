@@ -2163,7 +2163,7 @@ grunt-cli@^1.4.2, grunt-cli@~1.4.2:
     nopt "~4.0.1"
     v8flags "~3.2.0"
 
-grunt-contrib-concat@~1.0.1:
+grunt-contrib-concat@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/grunt-contrib-concat/-/grunt-contrib-concat-1.0.1.tgz#61509863084e871d7e86de48c015259ed97745bd"
   integrity sha1-YVCYYwhOhx1+ht5IwBUlntl3Rb0=
@@ -2171,7 +2171,7 @@ grunt-contrib-concat@~1.0.1:
     chalk "^1.0.0"
     source-map "^0.5.3"
 
-grunt-contrib-copy@~1.0.0:
+grunt-contrib-copy@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/grunt-contrib-copy/-/grunt-contrib-copy-1.0.0.tgz#7060c6581e904b8ab0d00f076e0a8f6e3e7c3573"
   integrity sha1-cGDGWB6QS4qw0A8HbgqPbj58NXM=
@@ -2179,17 +2179,17 @@ grunt-contrib-copy@~1.0.0:
     chalk "^1.1.1"
     file-sync-cmp "^0.1.0"
 
-grunt-contrib-uglify@~5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/grunt-contrib-uglify/-/grunt-contrib-uglify-5.0.0.tgz#04dda8a4f44f4e4a147aa26c6259404fd8097a49"
-  integrity sha512-rIFFPJMWKnh6oxDe2b810Ysg5SKoiI0u/FvuvAVpvJ7VHILkKtGqA4jgJ1JWruWQ+1m5FtB1lVSK81YyzIgDUw==
+grunt-contrib-uglify@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/grunt-contrib-uglify/-/grunt-contrib-uglify-5.0.1.tgz#d1eeccafdfedc27353e5f610415d18340c568c51"
+  integrity sha512-T/aXZ4WIpAtoswZqb6HROKg7uq9QbKwl+lUuOwK4eoFj3tFv9/a/oMyd3/qvetV29Pbf8P1YYda1gDwZppr60A==
   dependencies:
     chalk "^2.4.1"
     maxmin "^2.1.0"
-    uglify-js "^3.5.0"
+    uglify-js "^3.13.3"
     uri-path "^1.0.0"
 
-grunt-contrib-watch@~1.1.0:
+grunt-contrib-watch@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/grunt-contrib-watch/-/grunt-contrib-watch-1.1.0.tgz#c143ca5b824b288a024b856639a5345aedb78ed4"
   integrity sha512-yGweN+0DW5yM+oo58fRu/XIRrPcn3r4tQx+nL7eMRwjpvk+rQY6R8o94BPK0i2UhTg9FN21hS+m8vR8v9vXfeg==
@@ -2199,7 +2199,7 @@ grunt-contrib-watch@~1.1.0:
     lodash "^4.17.10"
     tiny-lr "^1.1.1"
 
-grunt-eslint@~23.0.0:
+grunt-eslint@^23.0.0:
   version "23.0.0"
   resolved "https://registry.yarnpkg.com/grunt-eslint/-/grunt-eslint-23.0.0.tgz#47c804613c59646b2cfa402eb8d301e55b206bcf"
   integrity sha512-QqHSAiGF08EVD7YlD4OSRWuLRaDvpsRdTptwy9WaxUXE+03mCLVA/lEaR6SHWehF7oUwIqCEjaNONeeeWlB4LQ==
@@ -2207,7 +2207,7 @@ grunt-eslint@~23.0.0:
     chalk "^4.0.0"
     eslint "^7.0.0"
 
-grunt-karma@~4.0.0:
+grunt-karma@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/grunt-karma/-/grunt-karma-4.0.0.tgz#faaeaff37ee71ebd75313da4cec1268500d51190"
   integrity sha512-L3YpIAW6NB5tQ3cb6VoJCCCWfIJ0nqeyxs/SF6N385sMSadZ6RjBllP2kOUE2plkT8T8DR3bGVqzgH+vUDTsuQ==
@@ -2889,7 +2889,7 @@ jsbn@~0.1.0:
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
   integrity sha1-peZUwuWi3rXyAdls77yoDA7y9RM=
 
-jsdoc@3.6.6:
+jsdoc@^3.6.6:
   version "3.6.6"
   resolved "https://registry.yarnpkg.com/jsdoc/-/jsdoc-3.6.6.tgz#9fe162bbdb13ee7988bf74352b5147565bcfd8e1"
   integrity sha512-znR99e1BHeyEkSvgDDpX0sTiTu+8aQyDl9DawrkOGZTTW8hv0deIFXx87114zJ7gRaDZKVQD/4tr1ifmJp9xhQ==
@@ -5454,10 +5454,10 @@ uc.micro@^1.0.1, uc.micro@^1.0.5:
   resolved "https://registry.yarnpkg.com/uc.micro/-/uc.micro-1.0.6.tgz#9c411a802a409a91fc6cf74081baba34b24499ac"
   integrity sha512-8Y75pvTYkLJW2hWQHXxoqRgV7qb9B+9vFEtidML+7koHUFapnVJAZ6cKs+Qjz5Aw3aZWHMC6u0wJE3At+nSGwA==
 
-uglify-js@^3.5.0:
-  version "3.10.4"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.10.4.tgz#dd680f5687bc0d7a93b14a3482d16db6eba2bfbb"
-  integrity sha512-kBFT3U4Dcj4/pJ52vfjCSfyLyvG9VYYuGYPmrPvAxRw/i7xHiT4VvCev+uiEMcEEiu6UNB6KgWmGtSUYIWScbw==
+uglify-js@^3.13.3:
+  version "3.13.4"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.13.4.tgz#592588bb9f47ae03b24916e2471218d914955574"
+  integrity sha512-kv7fCkIXyQIilD5/yQy8O+uagsYIOt5cZvs890W40/e/rvjMSzJw81o9Bg0tkURxzZBROtDQhW2LFjOGoK3RZw==
 
 uid-number@0.0.6:
   version "0.0.6"
