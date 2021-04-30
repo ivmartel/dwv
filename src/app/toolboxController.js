@@ -195,7 +195,7 @@ dwv.ToolboxController = function (toolList) {
     var offsets = null;
     var position = null;
     if (event.type === 'touchstart' ||
-            event.type === 'touchmove') {
+      event.type === 'touchmove') {
       // event offset(s)
       offsets = dwv.html.getEventOffset(event);
       // should have at least one offset
@@ -215,12 +215,12 @@ dwv.ToolboxController = function (toolList) {
       // set handle event flag
       handled = true;
     } else if (event.type === 'mousemove' ||
-            event.type === 'mousedown' ||
-            event.type === 'mouseup' ||
-            event.type === 'mouseout' ||
-            event.type === 'mousewheel' ||
-            event.type === 'dblclick' ||
-            event.type === 'DOMMouseScroll') {
+      event.type === 'mousedown' ||
+      event.type === 'mouseup' ||
+      event.type === 'mouseout' ||
+      event.type === 'mousewheel' ||
+      event.type === 'dblclick' ||
+      event.type === 'DOMMouseScroll') {
       offsets = dwv.html.getEventOffset(event);
       event._xs = offsets[0].x;
       event._ys = offsets[0].y;
@@ -230,7 +230,7 @@ dwv.ToolboxController = function (toolList) {
       // set handle event flag
       handled = true;
     } else if (event.type === 'keydown' ||
-                event.type === 'touchend') {
+      event.type === 'touchend') {
       handled = true;
     }
 
