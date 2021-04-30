@@ -218,9 +218,8 @@ dwv.ToolboxController = function (toolList) {
       event.type === 'mousedown' ||
       event.type === 'mouseup' ||
       event.type === 'mouseout' ||
-      event.type === 'mousewheel' ||
-      event.type === 'dblclick' ||
-      event.type === 'DOMMouseScroll') {
+      event.type === 'wheel' ||
+      event.type === 'dblclick') {
       offsets = dwv.html.getEventOffset(event);
       event._xs = offsets[0].x;
       event._ys = offsets[0].y;
