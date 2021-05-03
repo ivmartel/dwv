@@ -8,13 +8,38 @@ dwv.gui.interactionEventNames = [
   'mousemove',
   'mouseup',
   'mouseout',
-  'mousewheel',
-  'DOMMouseScroll',
+  'wheel',
   'dblclick',
   'touchstart',
   'touchmove',
   'touchend'
 ];
+
+/**
+ * Get the size available for a div.
+ *
+ * @param {object} div The input div.
+ * @returns {object} The available width and height as {x,y}.
+ */
+dwv.gui.getDivSize = function (div) {
+  var parent = div.parentNode;
+  // offsetHeight: height of an element, including vertical padding
+  // and borders
+  // ref: https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetHeight
+  var height = parent.offsetHeight;
+  // remove the height of other elements of the container div
+  var kids = parent.children;
+  for (var i = 0; i < kids.length; ++i) {
+    if (!kids[i].classList.contains(div.className)) {
+      var styles = window.getComputedStyle(kids[i]);
+      // offsetHeight does not include margin
+      var margin = parseFloat(styles.getPropertyValue('margin-top'), 10) +
+             parseFloat(styles.getPropertyValue('margin-bottom'), 10);
+      height -= (kids[i].offsetHeight + margin);
+    }
+  }
+  return {x: parent.offsetWidth, y: height};
+};
 
 /**
  * Layer controller.
@@ -56,7 +81,7 @@ dwv.LayerController = function (containerDiv) {
    * @private
    * @type {object}
    */
-  var layerSize;
+  var layerSize = dwv.gui.getDivSize(containerDiv);
 
   /**
    * Active view layer index.
@@ -297,23 +322,7 @@ dwv.LayerController = function (containerDiv) {
    * @returns {object} The available width and height as {width,height}.
    */
   this.getLayerContainerSize = function () {
-    var parent = containerDiv.parentNode;
-    // offsetHeight: height of an element, including vertical padding
-    // and borders
-    // ref: https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetHeight
-    var height = parent.offsetHeight;
-    // remove the height of other elements of the container div
-    var kids = parent.children;
-    for (var i = 0; i < kids.length; ++i) {
-      if (!kids[i].classList.contains('layerContainer')) {
-        var styles = window.getComputedStyle(kids[i]);
-        // offsetHeight does not include margin
-        var margin = parseFloat(styles.getPropertyValue('margin-top'), 10) +
-               parseFloat(styles.getPropertyValue('margin-bottom'), 10);
-        height -= (kids[i].offsetHeight + margin);
-      }
-    }
-    return {x: parent.offsetWidth, y: height};
+    return dwv.gui.getDivSize(containerDiv);
   };
 
   /**

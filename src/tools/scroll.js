@@ -158,27 +158,12 @@ dwv.tool.Scroll = function (app) {
   };
 
   /**
-   * Handle mouse scroll event (fired by Firefox).
-   *
-   * @param {object} event The mouse scroll event.
-   */
-  this.DOMMouseScroll = function (event) {
-    // ev.detail on firefox is 3
-    if (event.detail < 0) {
-      mouseScroll(true);
-    } else {
-      mouseScroll(false);
-    }
-  };
-
-  /**
    * Handle mouse wheel event.
    *
    * @param {object} event The mouse wheel event.
    */
-  this.mousewheel = function (event) {
-    // ev.wheelDelta on chrome is 120
-    if (event.wheelDelta > 0) {
+  this.wheel = function (event) {
+    if (event.deltaY < 0) {
       mouseScroll(true);
     } else {
       mouseScroll(false);

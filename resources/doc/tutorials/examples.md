@@ -9,6 +9,7 @@ DICOM parsing:
 Displays:
  * [display example #1](https://jsfiddle.net/ivmartel/LteeL0gf/) ([gist](https://gist.github.com/ivmartel/7415ca9b21209e83b5e713d838529795)): the simplest DICOM display example!
  * [display example #1.1](https://jsfiddle.net/ivmartel/jkcmj0px/): any number of displays you want
+ * [display example #1.2](https://jsfiddle.net/ivmartel/5ew3t619/): manual render
  * [display example #2](https://jsfiddle.net/ivmartel/kkp7ytk3/): with window/level or zoom
  * [display example #2.1](https://jsfiddle.net/ivmartel/fugw49be/): with draw tool
  * [display example #3](https://jsfiddle.net/ivmartel/hmetaz6f/): with multiple slices
@@ -19,7 +20,7 @@ All of them: [ivmartel/fiddles](https://jsfiddle.net/user/ivmartel/fiddles/).
 ## Module
 
 DICOM parsing using node:
- * [parser example #1](https://runkit.com/ivmartel/runkit-npm-dwv): parse DICOM data and display a tag.
+ * [parser example #1](https://runkit.com/ivmartel/runkit-npm-dwv-parse-ex-1): parse DICOM data and display a tag.
 
 ## Viewers and integrations
 
@@ -29,5 +30,3 @@ DICOM parsing using node:
  * [dwv-angular](https://github.com/ivmartel/dwv-angular): integration with Angular ([demo](https://ivmartel.github.io/dwv-angular/))
  * [dwv-react](https://github.com/ivmartel/dwv-react): integration with React ([demo](https://ivmartel.github.io/dwv-react/))
  * [dwv-vue](https://github.com/ivmartel/dwv-vue): integration with Vue.js ([demo](https://ivmartel.github.io/dwv-vue/))
-
-

@@ -1,4 +1,4 @@
-/*! dwv 0.28.1 2021-02-02 23:57:15 */
+/*! dwv 0.28.1 2021-04-21 09:40:46 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -55,7 +55,8 @@
 
     // latest i18next (>v17) does not export default
     // see #862 and https://github.com/i18next/i18next/commit/7c6c235
-    if (typeof i18next.t === 'undefined') {
+    if (typeof i18next !== 'undefined' &&
+      typeof i18next.t === 'undefined') {
       i18next = i18next.default;
     }
 
