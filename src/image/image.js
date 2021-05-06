@@ -28,7 +28,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
    * Varying rescale slope and intercept.
    *
    * @private
-   * @type {array}
+   * @type {Array}
    */
   var rsis = null;
   /**

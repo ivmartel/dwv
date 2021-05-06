@@ -350,7 +350,6 @@ dwv.image.View = function (image) {
    * Set the current position.
    *
    * @param {object} pos The current position.
-   * @returns {boolean} False if not in bounds
    */
   this.setCurrentPositionFromObject = function (pos) {
     var frame = 0;
@@ -364,7 +363,7 @@ dwv.image.View = function (image) {
   /**
    * Set the current position.
    *
-   * @param {object} pos The current position.
+   * @param {object} posIndex The current position.
    * @param {boolean} silent Flag to fire event or not.
    * @returns {boolean} False if not in bounds
    * @fires dwv.image.View#positionchange

@@ -114,9 +114,7 @@ dwv.image.Size.prototype.equals = function (rhs) {
 /**
  * Check that an index is within bounds.
  *
- * @param {number} i The column coordinate.
- * @param {number} j The row coordinate.
- * @param {number} k The slice coordinate.
+ * @param {object} index The index to check.
  * @returns {boolean} True if the given coordinates are within bounds.
  */
 dwv.image.Size.prototype.isInBounds = function (index) {

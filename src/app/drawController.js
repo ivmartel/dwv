@@ -167,8 +167,7 @@ dwv.DrawController = function (konvaLayer) {
   /**
    * Activate the current draw layer.
    *
-   * @param {object} currentPosition The current {i,j,k} position.
-   * @param {number} currentFrame The current frame number.
+   * @param {object} currentPosition The current position.
    */
   this.activateDrawLayer = function (currentPosition) {
     // get and store the position group id

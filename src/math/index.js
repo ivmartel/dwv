@@ -105,7 +105,7 @@ dwv.math.Index.prototype.add = function (rhs) {
  * Ge the different dimensions.
  *
  * @param {object} rhs The index to compare to.
- * @returns {array} The different dimensions.
+ * @returns {Array} The different dimensions.
  */
 dwv.math.Index.prototype.differentDims = function (rhs) {
   // check if can compare
