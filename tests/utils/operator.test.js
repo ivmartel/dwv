@@ -81,7 +81,10 @@ QUnit.test('Test merge objects.', function (assert) {
   var ref00 = {
     id: {value: [0, 1], merged: true},
     a: {value: 1},
-    b: {value: {0: 1, 1: 2}}
+    b: {value: {
+      0: {value: 1},
+      1: {value: 2}
+    }}
   };
   var res00 = dwv.utils.mergeObjects(obj001, obj002, 'id', 'value');
   assert.equal(
@@ -95,7 +98,10 @@ QUnit.test('Test merge objects.', function (assert) {
   var ref01 = {
     id: {value: [0, 1], merged: true},
     a: {value: 1},
-    b: {value: {0: [1], 1: [2]}}
+    b: {value: {
+      0: {value: [1]},
+      1: {value: [2]}
+    }}
   };
   var res01 = dwv.utils.mergeObjects(obj011, obj012, 'id', 'value');
   assert.equal(
@@ -107,13 +113,20 @@ QUnit.test('Test merge objects.', function (assert) {
   var obj021 = {
     id: {value: [0, 1], merged: true},
     a: {value: 1},
-    b: {value: {0: 1, 1: 2}}
+    b: {value: {
+      0: {value: 1},
+      1: {value: 2}
+    }}
   };
   var obj022 = {id: {value: 2}, a: {value: 1}, b: {value: 2}};
   var ref02 = {
     id: {value: [0, 1, 2], merged: true},
     a: {value: 1},
-    b: {value: {0: 1, 1: 2, 2: 2}}
+    b: {value: {
+      0: {value: 1},
+      1: {value: 2},
+      2: {value: 2}
+    }}
   };
   var res02 = dwv.utils.mergeObjects(obj021, obj022, 'id', 'value');
   assert.equal(
@@ -125,13 +138,24 @@ QUnit.test('Test merge objects.', function (assert) {
   var obj031 = {
     id: {value: [0, 1], merged: true},
     a: {value: 1},
-    b: {value: {0: 1, 1: 2}}
+    b: {value: {
+      0: {value: 1},
+      1: {value: 2}
+    }}
   };
   var obj032 = {id: {value: 2}, a: {value: 2}, b: {value: 3}};
   var ref03 = {
     id: {value: [0, 1, 2], merged: true},
-    a: {value: {0: 1, 1: 1, 2: 2}},
-    b: {value: {0: 1, 1: 2, 2: 3}}
+    a: {value: {
+      0: {value: 1},
+      1: {value: 1},
+      2: {value: 2}
+    }},
+    b: {value: {
+      0: {value: 1},
+      1: {value: 2},
+      2: {value: 3}
+    }}
   };
   var res03 = dwv.utils.mergeObjects(obj031, obj032, 'id', 'value');
   assert.equal(
@@ -144,8 +168,14 @@ QUnit.test('Test merge objects.', function (assert) {
   var obj102 = {id: {value: 1}, a: {value: 2}, b: {value: 1}};
   var ref10 = {
     id: {value: [0, 1], merged: true},
-    a: {value: {0: 1, 1: 2}},
-    b: {value: {0: null, 1: 1}}
+    a: {value: {
+      0: {value: 1},
+      1: {value: 2}
+    }},
+    b: {value: {
+      0: null,
+      1: {value: 1}
+    }}
   };
   var res10 = dwv.utils.mergeObjects(obj101, obj102, 'id', 'value');
   assert.equal(
@@ -158,8 +188,14 @@ QUnit.test('Test merge objects.', function (assert) {
   var obj112 = {id: {value: 1}, a: {value: 2}};
   var ref11 = {
     id: {value: [0, 1], merged: true},
-    a: {value: {0: 1, 1: 2}},
-    b: {value: {0: 1, 1: null}}
+    a: {value: {
+      0: {value: 1},
+      1: {value: 2}
+    }},
+    b: {value: {
+      0: {value: 1},
+      1: null
+    }}
   };
   var res11 = dwv.utils.mergeObjects(obj111, obj112, 'id', 'value');
   assert.equal(
@@ -172,8 +208,14 @@ QUnit.test('Test merge objects.', function (assert) {
   var obj122 = {id: {value: 1}, a: {value: 2}, b: {value: 1}};
   var ref12 = {
     id: {value: [0, 1], merged: true},
-    a: {value: {0: 1, 1: 2}},
-    b: {value: {0: null, 1: 1}}
+    a: {value: {
+      0: {value: 1},
+      1: {value: 2}
+    }},
+    b: {value: {
+      0: {},
+      1: {value: 1}
+    }}
   };
   var res12 = dwv.utils.mergeObjects(obj121, obj122, 'id', 'value');
   assert.equal(
@@ -186,8 +228,14 @@ QUnit.test('Test merge objects.', function (assert) {
   var obj132 = {id: {value: 1}, a: {value: 2}, b: {}};
   var ref13 = {
     id: {value: [0, 1], merged: true},
-    a: {value: {0: 1, 1: 2}},
-    b: {value: {0: 1, 1: null}}
+    a: {value: {
+      0: {value: 1},
+      1: {value: 2}
+    }},
+    b: {value: {
+      0: {value: 1},
+      1: {}
+    }}
   };
   var res13 = dwv.utils.mergeObjects(obj131, obj132, 'id', 'value');
   assert.equal(

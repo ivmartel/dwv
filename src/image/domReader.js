@@ -82,21 +82,19 @@ dwv.image.getViewFromDOMImage = function (domImage, origin) {
   var imageData = ctx.getImageData(0, 0, width, height);
 
   // image properties
-  var info = [];
+  var info = {};
   if (typeof domImage.origin === 'string') {
-    info.push({name: 'origin', value: domImage.origin});
+    info['origin'] = {value: domImage.origin};
   } else {
-    info.push({name: 'fileName', value: domImage.origin.name});
-    info.push({name: 'fileType', value: domImage.origin.type});
-    info.push({
-      name: 'fileLastModifiedDate', value: domImage.origin.lastModifiedDate
-    });
+    info['fileName'] = {value: domImage.origin.name};
+    info['fileType'] = {value: domImage.origin.type};
+    info['fileLastModifiedDate'] = {value: domImage.origin.lastModifiedDate};
   }
-  info.push({name: 'imageWidth', value: width});
-  info.push({name: 'imageHeight', value: height});
+  info['imageWidth'] = {value: width};
+  info['imageHeight'] = {value: height};
 
   var sliceIndex = domImage.index ? domImage.index : 0;
-  info.push({name: 'imageUid', value: sliceIndex});
+  info['imageUid'] = {value: sliceIndex};
 
   // create view
   var imageBuffer = dwv.image.imageDataToBuffer(imageData);
@@ -137,17 +135,15 @@ dwv.image.getViewFromDOMVideo = function (
   var numberOfFrames = Math.ceil(video.duration * frameRate);
 
   // video properties
-  var info = [];
+  var info = {};
   if (video.file) {
-    info.push({name: 'fileName', value: video.file.name});
-    info.push({name: 'fileType', value: video.file.type});
-    info.push({
-      name: 'fileLastModifiedDate', value: video.file.lastModifiedDate
-    });
+    info['fileName'] = {value: video.file.name};
+    info['fileType'] = {value: video.file.type};
+    info['fileLastModifiedDate'] = {value: video.file.lastModifiedDate};
   }
-  info.push({name: 'imageWidth', value: width});
-  info.push({name: 'imageHeight', value: height});
-  info.push({name: 'numberOfFrames', value: numberOfFrames});
+  info['imageWidth'] = {value: width};
+  info['imageHeight'] = {value: height};
+  info['numberOfFrames'] = {value: numberOfFrames};
 
   // draw the image in the canvas in order to get its data
   var canvas = document.createElement('canvas');

@@ -46,7 +46,7 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
   };
 
   /**
-   * Dump the DICOM tags to an array.
+   * Dump the DICOM tags to an object.
    *
    * @returns {object} The DICOM tags as an object.
    */
@@ -54,28 +54,74 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
     var keys = Object.keys(dicomElements);
     var obj = {};
     var dicomElement = null;
-    var row = null;
     for (var i = 0, leni = keys.length; i < leni; ++i) {
       dicomElement = dicomElements[keys[i]];
-      row = {};
-      // name
-      var tag = new dwv.dicom.Tag(
-        dicomElement.tag.group, dicomElement.tag.element);
-      var name = tag.getNameFromDictionary();
-      if (name === null) {
-        name = 'Unknown Tag & Data';
-      }
-      // value
-      row.value = this.getElementValueAsString(dicomElement);
-      // others
-      row.group = dicomElement.tag.group;
-      row.element = dicomElement.tag.element;
-      row.vr = dicomElement.vr;
-      row.vl = dicomElement.vl;
-
-      obj[name] = row;
+      obj[this.getTagName(dicomElement.tag)] =
+        this.getElementAsObject(dicomElement);
     }
     return obj;
+  };
+
+  /**
+   * Get a tag string name from the dictionary.
+   *
+   * @param {object} tag The DICOM tag object.
+   * @returns {string} The tag name.
+   */
+  this.getTagName = function (tag) {
+    var tagObj = new dwv.dicom.Tag(tag.group, tag.element);
+    var name = tagObj.getNameFromDictionary();
+    if (name === null) {
+      name = 'Unknown Tag & Data';
+    }
+    return name;
+  };
+
+  /**
+   * Get a DICOM element as a simple object.
+   *
+   * @param {object} dicomElement The DICOM element.
+   * @returns {object} The element as a simple object.
+   */
+  this.getElementAsObject = function (dicomElement) {
+    // element value
+    var value = null;
+
+    var isPixel = dicomElement.tag.group === '0x7FE0' &&
+      dicomElement.tag.element === '0x0010';
+
+    var vr = dicomElement.vr;
+    if (vr === 'SQ' &&
+      typeof dicomElement.value !== 'undefined' &&
+      !isPixel) {
+      value = [];
+      var items = dicomElement.value;
+      var itemValues = null;
+      for (var i = 0; i < items.length; ++i) {
+        itemValues = {};
+        var keys = Object.keys(items[i]);
+        for (var k = 0; k < keys.length; ++k) {
+          var itemElement = items[i][keys[k]];
+          var key = this.getTagName(itemElement.tag);
+          // do not inclure Item elements
+          if (key !== 'Item') {
+            itemValues[key] = this.getElementAsObject(itemElement);
+          }
+        }
+        value.push(itemValues);
+      }
+    } else {
+      value = this.getElementValueAsString(dicomElement);
+    }
+
+    // return
+    return {
+      value: value,
+      group: dicomElement.tag.group,
+      element: dicomElement.tag.element,
+      vr: vr,
+      vl: dicomElement.vl
+    };
   };
 
   /**

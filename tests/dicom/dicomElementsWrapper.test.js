@@ -149,7 +149,26 @@ QUnit.test('Test simple DICOM wrapping.', function (assert) {
       },
       {
         name: 'ReferencedImageSequence',
-        value: '[object Object]',
+        value: [
+          [
+            {
+              element: '0x1150',
+              group: '0x0008',
+              name: 'ReferencedSOPClassUID',
+              value: '1.2.840.10008.5.1.4.1.1.4',
+              vl: 25,
+              vr: 'UI'
+            },
+            {
+              element: '0x1155',
+              group: '0x0008',
+              name: 'ReferencedSOPInstanceUID',
+              value: '1.3.12.2.1107.5.2.32.35162.2012021515511672669154094',
+              vl: 52,
+              vr: 'UI'
+            }
+          ]
+        ],
         group: '0x0008',
         element: '0x1140',
         vr: 'SQ',
