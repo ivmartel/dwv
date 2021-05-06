@@ -41,7 +41,21 @@ dwv.utils.objectToArray = function (obj) {
     var innerKeys = Object.keys(obj[key]);
     for (var j = 0; j < innerKeys.length; ++j) {
       var innerKey = innerKeys[j];
-      row[innerKey] = obj[key][innerKey];
+      var value = obj[key][innerKey];
+      if (dwv.utils.isArray(value)) {
+        var arrayValues = [];
+        for (var k = 0; k < value.length; ++k) {
+          if (dwv.utils.isObject(value[k])) {
+            arrayValues.push(dwv.utils.objectToArray(value[k]));
+          } else {
+            arrayValues.push(value[k]);
+          }
+        }
+        value = arrayValues;
+      } else if (dwv.utils.isObject(value)) {
+        value = dwv.utils.objectToArray(value);
+      }
+      row[innerKey] = value;
     }
     array.push(row);
   }
@@ -51,11 +65,29 @@ dwv.utils.objectToArray = function (obj) {
 /**
  * Merge two similar objects.
  * Objects need to be in the form of:
- * {idKey: {valueKey: 0}, key0: {valueKey: "abc"}, key1: {valueKey: 33}}
+ * <code>
+ * {
+ *   idKey: {valueKey: 0},
+ *   key0: {valueKey: "abc"},
+ *   key1: {valueKey: 33}
+ * }
+ * </code>
  * Merged objects will be in the form of:
- * { idKey: {valueKey: [0,1,2], merged: true},
- *   key0: {valueKey: {0: "abc", 1: "def", 2: "ghi"},
- *   key1: {valueKey: {0: 33, 1: 44, 2: 55}} }
+ * <code>
+ * {
+ *   idKey: {valueKey: [0,1,2], merged: true},
+ *   key0: {valueKey: {
+ *     0: {valueKey: "abc"},
+ *     1: {valueKey: "def"},
+ *     2: {valueKey: "ghi"}
+ *   }},
+ *   key1: {valueKey: {
+ *     0: {valueKey: 33},
+ *     1: {valueKey: 44},
+ *     2: {valueKey: 55}
+ *   }}
+ * }
+ * </code>
  *
  * @param {object} obj1 The first object, can be the result of a previous merge.
  * @param {object} obj2 The second object.
@@ -134,17 +166,19 @@ dwv.utils.mergeObjects = function (obj1, obj2, idKey, valueKey) {
     var key = keys[i];
     if (key !== idKey) {
       // first
+      var value1 = null;
       var subValue1 = null;
       if (Object.prototype.hasOwnProperty.call(obj1, key)) {
-        var value1 = obj1[key];
+        value1 = obj1[key];
         if (Object.prototype.hasOwnProperty.call(value1, valueKey)) {
           subValue1 = value1[valueKey];
         }
       }
       // second
+      var value2 = null;
       var subValue2 = null;
       if (Object.prototype.hasOwnProperty.call(obj2, key)) {
-        var value2 = obj2[key];
+        value2 = obj2[key];
         if (Object.prototype.hasOwnProperty.call(value2, valueKey)) {
           subValue2 = value2[valueKey];
         }
@@ -163,16 +197,16 @@ dwv.utils.mergeObjects = function (obj1, obj2, idKey, valueKey) {
             // copy it with the index list
             value[valueKey] = {};
             for (var j = 0; j < id1.length; j++) {
-              value[valueKey][id1[j]] = subValue1;
+              value[valueKey][id1[j]] = value1;
             }
           }
           // add obj2 value
-          value[valueKey][id2] = subValue2;
+          value[valueKey][id2] = value2;
         } else {
           // create merge object
           var newValue = {};
-          newValue[id1] = subValue1;
-          newValue[id2] = subValue2;
+          newValue[id1] = value1;
+          newValue[id2] = value2;
           value[valueKey] = newValue;
         }
       } else {
