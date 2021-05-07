@@ -823,7 +823,9 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
     }
     // read
     data = [];
-    if (bitsAllocated === 8) {
+    if (bitsAllocated === 1) {
+      data = reader.readBinaryArray(offset, vl);
+    } else if (bitsAllocated === 8) {
       if (pixelRepresentation === 0) {
         data.push(reader.readUint8Array(offset, vl));
       } else {
@@ -847,6 +849,8 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
       } else {
         data.push(reader.readInt64Array(offset, vl));
       }
+    } else {
+      throw new Error('Unsupported bits allocated: ' + bitsAllocated);
     }
   } else if (vr === 'OB') {
     data = reader.readUint8Array(offset, vl);
