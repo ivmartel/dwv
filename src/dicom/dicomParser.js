@@ -824,7 +824,7 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
     // read
     data = [];
     if (bitsAllocated === 1) {
-      data = reader.readBinaryArray(offset, vl);
+      data.push(reader.readBinaryArray(offset, vl));
     } else if (bitsAllocated === 8) {
       if (pixelRepresentation === 0) {
         data.push(reader.readUint8Array(offset, vl));
