@@ -211,6 +211,15 @@ dwv.html.DrawLayer = function (containerDiv) {
   };
 
   /**
+   * Update the layer position.
+   *
+   * @param {object} pos The new position.
+   */
+  this.updatePosition = function (pos) {
+    this.getDrawController().activateDrawLayer(pos[0], pos[1]);
+  };
+
+  /**
    * Activate the layer: propagate events.
    */
   this.activate = function () {

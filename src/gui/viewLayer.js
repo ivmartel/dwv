@@ -504,6 +504,17 @@ dwv.html.ViewLayer = function (containerDiv) {
   }
 
   /**
+   * Update the layer position.
+   *
+   * @param {object} pos The new position.
+   */
+  this.updatePosition = function (pos) {
+    viewController.setCurrentPosition(pos[0]);
+    viewController.setCurrentFrame(pos[1]);
+    needsDataUpdate = true;
+  };
+
+  /**
    * Clear the context and reset the image data.
    */
   this.clear = function () {

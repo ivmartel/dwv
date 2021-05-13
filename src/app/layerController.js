@@ -169,12 +169,47 @@ dwv.LayerController = function (containerDiv) {
   };
 
   /**
+   * Get the active image layer.
+   *
+   * @returns {object} The layer.
+   */
+  this.getActiveViewLayer = function () {
+    return layers[activeViewLayerIndex];
+  };
+
+  /**
+   * Get the active draw layer.
+   *
+   * @returns {object} The layer.
+   */
+  this.getActiveDrawLayer = function () {
+    return layers[activeDrawLayerIndex];
+  };
+
+  /**
    * Set the active view layer.
    *
    * @param {number} index The index of the layer to set as active.
    */
   this.setActiveViewLayer = function (index) {
+    // un-bind previous layer
+    var viewLayer0 = this.getActiveViewLayer();
+    if (viewLayer0) {
+      viewLayer0.removeEventListener(
+        'slicechange', this.updatePosition);
+      viewLayer0.removeEventListener(
+        'framechange', this.updatePosition);
+    }
+
+    // set index
     activeViewLayerIndex = index;
+
+    // bind new layer
+    var viewLayer = this.getActiveViewLayer();
+    viewLayer.addEventListener(
+      'slicechange', this.updatePosition);
+    viewLayer.addEventListener(
+      'framechange', this.updatePosition);
   };
 
   /**
@@ -192,8 +227,8 @@ dwv.LayerController = function (containerDiv) {
    * @returns {object} The created layer.
    */
   this.addViewLayer = function () {
-    // store active index
-    activeViewLayerIndex = layers.length;
+    // layer index
+    var viewLayerIndex = layers.length;
     // create div
     var div = getNextLayerDiv();
     // prepend to container
@@ -201,9 +236,11 @@ dwv.LayerController = function (containerDiv) {
     // view layer
     var layer = new dwv.html.ViewLayer(div);
     // set z-index: last on top
-    layer.setZIndex(activeViewLayerIndex);
+    layer.setZIndex(viewLayerIndex);
     // add layer
     layers.push(layer);
+    // mark it as active
+    this.setActiveViewLayer(viewLayerIndex);
     // return
     return layer;
   };
@@ -261,34 +298,19 @@ dwv.LayerController = function (containerDiv) {
   };
 
   /**
-   * Get the active image layer.
-   *
-   * @returns {object} The layer.
+   * Update layers to the active view position.
    */
-  this.getActiveViewLayer = function () {
-    return layers[activeViewLayerIndex];
-  };
-
-  /**
-   * Get the active draw layer.
-   *
-   * @returns {object} The layer.
-   */
-  this.getActiveDrawLayer = function () {
-    return layers[activeDrawLayerIndex];
-  };
-
-  /**
-   * Update draw controller to view position.
-   */
-  this.updateDrawControllerToViewPosition = function () {
-    var drawLayer = layers[activeDrawLayerIndex];
-    if (drawLayer) {
-      var viewController =
-        layers[activeViewLayerIndex].getViewController();
-      drawLayer.getDrawController().activateDrawLayer(
-        viewController.getCurrentPosition(),
-        viewController.getCurrentFrame());
+  this.updatePosition = function () {
+    var viewController =
+      layers[activeViewLayerIndex].getViewController();
+    var pos = [
+      viewController.getCurrentPosition(),
+      viewController.getCurrentFrame()
+    ];
+    for (var i = 0; i < layers.length; ++i) {
+      if (i !== activeViewLayerIndex) {
+        layers[i].updatePosition(pos);
+      }
     }
   };
 
@@ -428,16 +450,8 @@ dwv.LayerController = function (containerDiv) {
     for (var i = 0; i < layers.length; ++i) {
       layers[i].initialise(image, metaData, dataIndex);
     }
-
-    // bind draw to view position
-    var viewLayer = this.getActiveViewLayer();
-    viewLayer.addEventListener(
-      'slicechange', this.updateDrawControllerToViewPosition);
-    viewLayer.addEventListener(
-      'framechange', this.updateDrawControllerToViewPosition);
-    // first update
-    this.updateDrawControllerToViewPosition();
-
+    // first position update
+    this.updatePosition();
     // fit data
     this.fitToContainer();
   };
