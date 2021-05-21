@@ -2,6 +2,9 @@
 var dwv = dwv || {};
 dwv.utils = dwv.utils || {};
 
+// example implementation: dcmtk/dcmiod/libsrc/cielabutil.cc
+// https://github.com/DCMTK/dcmtk/blob/DCMTK-3.6.6/dcmiod/libsrc/cielabutil.cc
+
 /**
  * Convert YBR to RGB.
  *
@@ -22,17 +25,50 @@ dwv.utils.ybrToRgb = function (y, cb, cr) {
 };
 
 /**
- * Unsigned int CIE LAB value to CIE LAB value.
+ * Unsigned int CIE LAB value ([0, 65535]) to CIE LAB value
+ *   (L: [0, 100], a: [-128, 127], b: [-128, 127]).
  *
  * @param {object} triplet CIE LAB triplet as {l,a,b} with unsigned range.
- * @returns {object} CIE XYZ triplet as {x,y,z} with CIE LAB range.
+ * @returns {object} CIE LAB triplet as {l,a,b} with CIE LAB range.
  */
 dwv.utils.uintLabToLab = function (triplet) {
+  // 0.001525902 = 100 / 65535
+  // 0.003891051 = 255 / 65535
   return {
-    l: triplet.l * 100 / 65536,
-    a: (triplet.a * 255 / 65536) - 128,
-    b: (triplet.b * 255 / 65536) - 128,
+    l: 0.001525902 * triplet.l,
+    a: 0.003891051 * triplet.a - 128,
+    b: 0.003891051 * triplet.b - 128,
   };
+};
+
+/**
+ * CIE LAB value (L: [0, 100], a: [-128, 127], b: [-128, 127]) to
+ *   unsigned int CIE LAB ([0, 65535]).
+ *
+ * @param {object} triplet CIE XYZ triplet as {x,y,z} with CIE LAB range.
+ * @returns {object} CIE LAB triplet as {l,a,b} with unsigned range.
+ */
+dwv.utils.labToUintLab = function (triplet) {
+  // 655.35 = 65535 / 100
+  // aUint = (a + 128) * 65535 / 255
+  // 257 = 65535 / 255
+  // 32896 = 257 * 128
+  return {
+    l: 655.35 * triplet.l,
+    a: 257 * triplet.a + 32896,
+    b: 257 * triplet.b + 32896,
+  };
+};
+
+/**
+ * CIE Standard Illuminant D65
+ *
+ * @see https://en.wikipedia.org/wiki/Illuminant_D65
+ */
+dwv.utils.d65 = {
+  x: 95.0489,
+  y: 100,
+  z: 108.884
 };
 
 /**
@@ -44,27 +80,59 @@ dwv.utils.uintLabToLab = function (triplet) {
  * @returns {object} CIE XYZ triplet as {x,y,z}.
  */
 dwv.utils.cielabToCiexyz = function (triplet) {
-  var func = function (x) {
+  var invLabFunc = function (x) {
     var res = null;
+    // delta = 6 / 29 = 0.206896552
     if (x > 0.206896552) {
       res = Math.pow(x, 3);
     } else {
+      // 0.128418549 = 3 * delta^2
+      // 0.017712903 = 3 * delta^2 * (4 / 29)
       res = 0.128418549 * x - 0.017712903;
     }
     return res;
   };
 
+  var illuminant = dwv.utils.d65;
   var l0 = (triplet.l + 16) / 116;
-  var d65 = {
-    x: 95.0489,
-    y: 100,
-    z: 108.884
-  };
 
   return {
-    x: d65.x * func(l0 + triplet.a / 500),
-    y: d65.y * func(l0),
-    z: d65.z * func(l0 - triplet.b / 200)
+    x: illuminant.x * invLabFunc(l0 + triplet.a / 500),
+    y: illuminant.y * invLabFunc(l0),
+    z: illuminant.z * invLabFunc(l0 - triplet.b / 200)
+  };
+};
+
+/**
+ * Convert CIE XYZ to CIE LAB (standard illuminant D65, 2degree 1931).
+ *
+ * @see https://en.wikipedia.org/wiki/CIELAB_color_space#From_CIEXYZ_to_CIELAB
+ *
+ * @param {object} triplet CIE XYZ triplet as {x,y,z}.
+ * @returns {object} CIE LAB triplet as {l,a,b}.
+ */
+dwv.utils.ciexyzToCielab = function (triplet) {
+  var labFunc = function (x) {
+    var res = null;
+    // delta = 6 / 29 = 0.206896552
+    // delta^3 = 0.008856452
+    if (x > 0.008856452) {
+      res = Math.pow(x, 0.333333333);
+    } else {
+      // 7.787037037 = 1 / 3 * delta^2
+      // 0.137931034 = 4 / 29
+      res = 7.787037037 * x + 0.137931034;
+    }
+    return res;
+  };
+
+  var illuminant = dwv.utils.d65;
+  var fy = labFunc(triplet.y / illuminant.y);
+
+  return {
+    l: 116 * fy - 16,
+    a: 500 * (labFunc(triplet.x / illuminant.x) - fy),
+    b: 200 * (fy - labFunc(triplet.z / illuminant.z))
   };
 };
 
@@ -73,7 +141,7 @@ dwv.utils.cielabToCiexyz = function (triplet) {
  *
  * @see https://en.wikipedia.org/wiki/SRGB#The_forward_transformation_(CIE_XYZ_to_sRGB)
  *
- * @param {object} triplet CIE XYZ triplet as {l,a,b}.
+ * @param {object} triplet CIE XYZ triplet as {x,y,z}.
  * @returns {object} sRGB triplet as {r,g,b}.
  */
 dwv.utils.ciexyzToSrgb = function (triplet) {
@@ -82,7 +150,8 @@ dwv.utils.ciexyzToSrgb = function (triplet) {
     if (x <= 0.0031308) {
       res = 12.92 * x;
     } else {
-      res = 1.055 * Math.pow(x, 1 / 2.4) - 0.055;
+      // 0.416666667 = 1 / 2.4
+      res = 1.055 * Math.pow(x, 0.416666667) - 0.055;
     }
     return res;
   };
@@ -99,11 +168,51 @@ dwv.utils.ciexyzToSrgb = function (triplet) {
 };
 
 /**
+ * Convert sRGB to CIE XYZ.
+ *
+ * @see https://en.wikipedia.org/wiki/SRGB#The_forward_transformation_(CIE_XYZ_to_sRGB)
+ *
+ * @param {object} triplet sRGB triplet as {r,g,b}.
+ * @returns {object} CIE XYZ triplet as {x,y,z}.
+ */
+dwv.utils.srgbToCiexyz = function (triplet) {
+  var invGammaFunc = function (x) {
+    var res = null;
+    if (x <= 0.04045) {
+      res = x / 12.92;
+    } else {
+      res = Math.pow((x + 0.055) / 1.055, 2.4);
+    }
+    return res;
+  };
+
+  var rl = invGammaFunc(triplet.r / 255);
+  var gl = invGammaFunc(triplet.g / 255);
+  var bl = invGammaFunc(triplet.b / 255);
+
+  return {
+    x: 100 * (0.4124 * rl + 0.3576 * gl + 0.1805 * bl),
+    y: 100 * (0.2126 * rl + 0.7152 * gl + 0.0722 * bl),
+    z: 100 * (0.0193 * rl + 0.1192 * gl + 0.9505 * bl)
+  };
+};
+
+/**
  * Convert CIE LAB to sRGB (standard illuminant D65).
  *
  * @param {object} triplet CIE LAB triplet as {l,a,b}.
- * @returns {object} sRGB triplet as {x,y,z}.
+ * @returns {object} sRGB triplet as {r,g,b}.
  */
 dwv.utils.cielabToSrgb = function (triplet) {
   return dwv.utils.ciexyzToSrgb(dwv.utils.cielabToCiexyz(triplet));
+};
+
+/**
+ * Convert sRGB to CIE LAB (standard illuminant D65).
+ *
+ * @param {object} triplet sRGB triplet as {r,g,b}.
+ * @returns {object} CIE LAB triplet as {l,a,b}.
+ */
+dwv.utils.srgbToCielab = function (triplet) {
+  return dwv.utils.ciexyzToCielab(dwv.utils.srgbToCiexyz(triplet));
 };
