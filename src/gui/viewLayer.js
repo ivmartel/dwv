@@ -1,6 +1,6 @@
 // namespaces
 var dwv = dwv || {};
-dwv.html = dwv.html || {};
+dwv.gui = dwv.gui || {};
 
 /**
  * View layer.
@@ -8,7 +8,7 @@ dwv.html = dwv.html || {};
  * @param {object} containerDiv The layer div.
  * @class
  */
-dwv.html.ViewLayer = function (containerDiv) {
+dwv.gui.ViewLayer = function (containerDiv) {
 
   // specific css class name
   containerDiv.className += ' viewLayer';
@@ -501,7 +501,7 @@ dwv.html.ViewLayer = function (containerDiv) {
   /**
    * Align on another layer.
    *
-   * @param {dwv.html.ViewLayer} rhs The layer to align on.
+   * @param {dwv.gui.ViewLayer} rhs The layer to align on.
    */
   this.align = function (rhs) {
     canvas.style.top = rhs.getCanvas().offsetTop;

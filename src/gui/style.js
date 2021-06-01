@@ -1,13 +1,13 @@
 // namespaces
 var dwv = dwv || {};
-dwv.html = dwv.html || {};
+dwv.gui = dwv.gui || {};
 
 /**
  * Style class.
  *
  * @class
  */
-dwv.html.Style = function () {
+dwv.gui.Style = function () {
   /**
    * Font size.
    *
@@ -230,7 +230,7 @@ dwv.html.Style = function () {
  *
  * @returns {string} The font definition string.
  */
-dwv.html.Style.prototype.getFontStr = function () {
+dwv.gui.Style.prototype.getFontStr = function () {
   return ('normal ' + this.getFontSize() + 'px sans-serif');
 };
 
@@ -239,7 +239,7 @@ dwv.html.Style.prototype.getFontStr = function () {
  *
  * @returns {number} The line height.
  */
-dwv.html.Style.prototype.getLineHeight = function () {
+dwv.gui.Style.prototype.getLineHeight = function () {
   return (this.getFontSize() + this.getFontSize() / 5);
 };
 
@@ -248,7 +248,7 @@ dwv.html.Style.prototype.getLineHeight = function () {
  *
  * @returns {number} The scaled font size.
  */
-dwv.html.Style.prototype.getScaledFontSize = function () {
+dwv.gui.Style.prototype.getScaledFontSize = function () {
   return this.scale(this.getFontSize());
 };
 
@@ -257,7 +257,7 @@ dwv.html.Style.prototype.getScaledFontSize = function () {
  *
  * @returns {number} The scaled stroke width.
  */
-dwv.html.Style.prototype.getScaledStrokeWidth = function () {
+dwv.gui.Style.prototype.getScaledStrokeWidth = function () {
   return this.scale(this.getStrokeWidth());
 };
 
@@ -266,41 +266,6 @@ dwv.html.Style.prototype.getScaledStrokeWidth = function () {
  *
  * @returns {string} The shadow line colour.
  */
-dwv.html.Style.prototype.getShadowLineColour = function () {
-  return dwv.html.getShadowColour(this.getLineColour());
-};
-
-/**
- * Get the brightness of a colour given in hexadecimal format.
- * See https://github.com/bgrins/TinyColor/blob/1.4.2/tinycolor.js#L70
- *
- * @param {string} hexColour The colour (as '#ab01ef').
- * @returns {number} The brightness (range [0,255]).
- */
-dwv.html.getBrightness = function (hexColour) {
-  // extract rgb
-  var r = parseInt(hexColour.substr(1, 2), 16);
-  var g = parseInt(hexColour.substr(3, 2), 16);
-  var b = parseInt(hexColour.substr(5, 2), 16);
-  return (r * 299 + g * 587 + b * 114) / 1000;
-};
-
-/**
- * Check if a colour given in hexadecimal format is dark.
- *
- * @param {string} hexColour The colour (as '#ab01ef').
- * @returns {boolean} True if the coluor is dark (brightness < 128).
- */
-dwv.html.isDarkColour = function (hexColour) {
-  return dwv.html.getBrightness(hexColour) < 128;
-};
-
-/**
- * Get the shadow colour of an input colour.
- *
- * @param {string} hexColour The colour (as '#ab01ef').
- * @returns {string} The shadow colour (white or black).
- */
-dwv.html.getShadowColour = function (hexColour) {
-  return dwv.html.isDarkColour(hexColour) ? '#fff' : '#000';
+dwv.gui.Style.prototype.getShadowLineColour = function () {
+  return dwv.utils.getShadowColour(this.getLineColour());
 };

@@ -38,7 +38,7 @@ dwv.App = function () {
   var undoStack = null;
 
   // Generic style
-  var style = new dwv.html.Style();
+  var style = new dwv.gui.Style();
 
   /**
    * Listener handler.
@@ -972,7 +972,7 @@ dwv.App = function () {
   /**
    * Bind view layer events to app.
    *
-   * @param {object} viewLayer The active view layer.
+   * @param {object} viewLayer The view layer.
    * @private
    */
   function bindViewLayer(viewLayer) {
@@ -984,6 +984,23 @@ dwv.App = function () {
     // propagate viewLayer events
     viewLayer.addEventListener('renderstart', fireEvent);
     viewLayer.addEventListener('renderend', fireEvent);
+  }
+
+  /**
+   * Un-Bind view layer events from app.
+   *
+   * @param {object} viewLayer The view layer.
+   * @private
+   */
+  function unbindViewLayer(viewLayer) {
+    // stop propagating view events
+    viewLayer.propagateViewEvents(false);
+    for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
+      viewLayer.removeEventListener(dwv.image.viewEventNames[j], fireEvent);
+    }
+    // stop propagating viewLayer events
+    viewLayer.removeEventListener('renderstart', fireEvent);
+    viewLayer.removeEventListener('renderend', fireEvent);
   }
 
   /**
@@ -1031,6 +1048,9 @@ dwv.App = function () {
    * @param {number} dataIndex The data index.
    */
   function addViewLayer(image, meta, dataIndex) {
+    // un-bind previous
+    unbindViewLayer(layerController.getActiveViewLayer());
+
     var viewLayer = layerController.addViewLayer();
     // initialise
     viewLayer.initialise(image, meta, dataIndex);
@@ -1038,6 +1058,9 @@ dwv.App = function () {
     viewLayer.resize(layerController.getScale());
     // listen to image changes
     dataController.addEventListener('imagechange', viewLayer.onimagechange);
+
+    // bind new
+    bindViewLayer(viewLayer);
   }
 
 };

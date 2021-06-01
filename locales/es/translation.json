@@ -115,6 +115,12 @@
             "click": "Haga click en un pixel para crear un contorno basado en su intensidad",
             "tap": "Toque un pixel para crear un contorno basado en su intensidad"
         },
+        "Opacity": {
+            "name": "Opacidad",
+            "brief": "Permite cambiar la opacidad de la capa de vista actual. ",
+            "mouse_drag": "Un arrastre horizontal del mouse cambia la opacidad de la capa haciéndola más opaca o transparente.",
+            "touch_drag": "Un arrastre táctil horizontal cambia la opacidad de la capa haciéndola más opaca o transparente."
+        },
         "info": {
             "position": "Posición = {{value}}",
             "value": "Valor ={{value}}",

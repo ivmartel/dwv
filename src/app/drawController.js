@@ -375,7 +375,7 @@ dwv.DrawController = function (konvaLayer) {
     }
     // label
     var label = group.getChildren(dwv.draw.isNodeNameLabel)[0];
-    var shadowColor = dwv.html.getShadowColour(drawDetails.color);
+    var shadowColor = dwv.utils.getShadowColour(drawDetails.color);
     var kids = label.getChildren();
     for (var k = 0; k < kids.length; ++k) {
       var kid = kids[k];

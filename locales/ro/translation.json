@@ -115,6 +115,12 @@
             "click": "Faceți clic pe pixel pentru a crea un contur în funcție de intensitatea acestuia.",
             "tap": "Atingeți un pixel pentru a crea un contur în funcție de intensitatea acestuia."
         },
+        "Opacity": {
+            "name": "Opacitate",
+            "brief": "Permite schimbarea opacității stratului de vizualizare curent.",
+            "mouse_drag": "O glisare orizontală a mouse-ului modifică opacitatea stratului, făcându-l fie mai opac, fie transparent.",
+            "touch_drag": "O atingere orizontală modifică opacitatea stratului, făcându-l fie mai opac, fie transparent."
+        },
         "info": {
             "position": "Poz = {{value}}",
             "value": "Valoare = {{value}}",

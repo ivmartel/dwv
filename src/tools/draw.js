@@ -144,7 +144,7 @@ dwv.tool.Draw = function (app) {
   /**
    * Drawing style.
    *
-   * @type {dwv.html.Style}
+   * @type {dwv.gui.Style}
    */
   this.style = app.getStyle();
 
@@ -622,7 +622,7 @@ dwv.tool.Draw = function (app) {
       // validate the group position
       dwv.tool.validateGroupPosition(drawLayer.getSize(), this);
       // highlight trash when on it
-      var offset = dwv.html.getEventOffset(event.evt)[0];
+      var offset = dwv.gui.getEventOffset(event.evt)[0];
       var eventPos = getRealPosition(offset);
       var trashHalfWidth = trash.width() * trash.scaleX() / 2;
       var trashHalfHeight = trash.height() * trash.scaleY() / 2;
@@ -657,7 +657,7 @@ dwv.tool.Draw = function (app) {
       // remove trash
       trash.remove();
       // delete case
-      var offset = dwv.html.getEventOffset(event.evt)[0];
+      var offset = dwv.gui.getEventOffset(event.evt)[0];
       var eventPos = getRealPosition(offset);
       var trashHalfWidth = trash.width() * trash.scaleX() / 2;
       var trashHalfHeight = trash.height() * trash.scaleY() / 2;

@@ -1,45 +1,6 @@
 // namespaces
 var dwv = dwv || {};
 dwv.gui = dwv.gui || {};
-dwv.html = dwv.html || {};
-
-dwv.gui.interactionEventNames = [
-  'mousedown',
-  'mousemove',
-  'mouseup',
-  'mouseout',
-  'wheel',
-  'dblclick',
-  'touchstart',
-  'touchmove',
-  'touchend'
-];
-
-/**
- * Get the size available for a div.
- *
- * @param {object} div The input div.
- * @returns {object} The available width and height as {x,y}.
- */
-dwv.gui.getDivSize = function (div) {
-  var parent = div.parentNode;
-  // offsetHeight: height of an element, including vertical padding
-  // and borders
-  // ref: https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetHeight
-  var height = parent.offsetHeight;
-  // remove the height of other elements of the container div
-  var kids = parent.children;
-  for (var i = 0; i < kids.length; ++i) {
-    if (!kids[i].classList.contains(div.className)) {
-      var styles = window.getComputedStyle(kids[i]);
-      // offsetHeight does not include margin
-      var margin = parseFloat(styles.getPropertyValue('margin-top'), 10) +
-             parseFloat(styles.getPropertyValue('margin-bottom'), 10);
-      height -= (kids[i].offsetHeight + margin);
-    }
-  }
-  return {x: parent.offsetWidth, y: height};
-};
 
 /**
  * Layer controller.
@@ -169,12 +130,47 @@ dwv.LayerController = function (containerDiv) {
   };
 
   /**
+   * Get the active image layer.
+   *
+   * @returns {object} The layer.
+   */
+  this.getActiveViewLayer = function () {
+    return layers[activeViewLayerIndex];
+  };
+
+  /**
+   * Get the active draw layer.
+   *
+   * @returns {object} The layer.
+   */
+  this.getActiveDrawLayer = function () {
+    return layers[activeDrawLayerIndex];
+  };
+
+  /**
    * Set the active view layer.
    *
    * @param {number} index The index of the layer to set as active.
    */
   this.setActiveViewLayer = function (index) {
+    // un-bind previous layer
+    var viewLayer0 = this.getActiveViewLayer();
+    if (viewLayer0) {
+      viewLayer0.removeEventListener(
+        'slicechange', this.updatePosition);
+      viewLayer0.removeEventListener(
+        'framechange', this.updatePosition);
+    }
+
+    // set index
     activeViewLayerIndex = index;
+
+    // bind new layer
+    var viewLayer = this.getActiveViewLayer();
+    viewLayer.addEventListener(
+      'slicechange', this.updatePosition);
+    viewLayer.addEventListener(
+      'framechange', this.updatePosition);
   };
 
   /**
@@ -192,18 +188,20 @@ dwv.LayerController = function (containerDiv) {
    * @returns {object} The created layer.
    */
   this.addViewLayer = function () {
-    // store active index
-    activeViewLayerIndex = layers.length;
+    // layer index
+    var viewLayerIndex = layers.length;
     // create div
     var div = getNextLayerDiv();
     // prepend to container
     containerDiv.append(div);
     // view layer
-    var layer = new dwv.html.ViewLayer(div);
+    var layer = new dwv.gui.ViewLayer(div);
     // set z-index: last on top
-    layer.setZIndex(activeViewLayerIndex);
+    layer.setZIndex(viewLayerIndex);
     // add layer
     layers.push(layer);
+    // mark it as active
+    this.setActiveViewLayer(viewLayerIndex);
     // return
     return layer;
   };
@@ -221,7 +219,7 @@ dwv.LayerController = function (containerDiv) {
     // prepend to container
     containerDiv.append(div);
     // draw layer
-    var layer = new dwv.html.DrawLayer(div);
+    var layer = new dwv.gui.DrawLayer(div);
     // set z-index: above view + last on top
     layer.setZIndex(50 + activeDrawLayerIndex);
     // add layer
@@ -261,18 +259,7 @@ dwv.LayerController = function (containerDiv) {
   };
 
   /**
-   * Get the active image layer.
-   *
-   * @returns {object} The layer.
-   */
-  this.getActiveViewLayer = function () {
-    return layers[activeViewLayerIndex];
-  };
-
-  /**
-   * Get the active draw layer.
-   *
-   * @returns {object} The layer.
+   * Update layers to the active view position.
    */
   this.getActiveDrawLayer = function () {
     return layers[activeDrawLayerIndex];
@@ -463,10 +450,17 @@ dwv.LayerController = function (containerDiv) {
     containerDiv.style.width = width + 'px';
     containerDiv.style.height = height + 'px';
 
-    // call resize and scale on layers
-    for (var i = 0; i < layers.length; ++i) {
-      layers[i].resize(baseScale);
-      layers[i].setScale(scale);
+    // resize if test passes
+    if (dwv.gui.canCreateCanvas(width, height)) {
+      // call resize and scale on layers
+      for (var i = 0; i < layers.length; ++i) {
+        layers[i].resize(baseScale);
+        layers[i].setScale(scale);
+      }
+    } else {
+      dwv.logger.warn('Cannot create a ' + width + ' * ' + height +
+        ' canvas, trying half the size...');
+      this.resize({x: newScale.x * 0.5, y: newScale.y * 0.5});
     }
   };
 
@@ -523,64 +517,3 @@ dwv.LayerController = function (containerDiv) {
   }
 
 }; // LayerController class
-
-/**
- * Get the positions (without the parent offset) of a list of touch events.
- *
- * @param {Array} touches The list of touch events.
- * @returns {Array} The list of positions of the touch events.
- */
-dwv.html.getTouchesPositions = function (touches) {
-  // get the touch offset from all its parents
-  var offsetLeft = 0;
-  var offsetTop = 0;
-  if (touches.length !== 0 &&
-    typeof touches[0].target !== 'undefined') {
-    var offsetParent = touches[0].target.offsetParent;
-    while (offsetParent) {
-      if (!isNaN(offsetParent.offsetLeft)) {
-        offsetLeft += offsetParent.offsetLeft;
-      }
-      if (!isNaN(offsetParent.offsetTop)) {
-        offsetTop += offsetParent.offsetTop;
-      }
-      offsetParent = offsetParent.offsetParent;
-    }
-  } else {
-    dwv.logger.debug('No touch target offset parent.');
-  }
-  // set its position
-  var positions = [];
-  for (var i = 0; i < touches.length; ++i) {
-    positions.push({
-      x: touches[i].pageX - offsetLeft,
-      y: touches[i].pageY - offsetTop
-    });
-  }
-  return positions;
-};
-
-/**
- * Get the offset of an input event.
- *
- * @param {object} event The event to get the offset from.
- * @returns {Array} The array of offsets.
- */
-dwv.html.getEventOffset = function (event) {
-  var positions = [];
-  if (typeof event.targetTouches !== 'undefined' &&
-    event.targetTouches.length !== 0) {
-    // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/targetTouches
-    positions = dwv.html.getTouchesPositions(event.targetTouches);
-  } else if (typeof event.changedTouches !== 'undefined' &&
-      event.changedTouches.length !== 0) {
-    // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/changedTouches
-    positions = dwv.html.getTouchesPositions(event.changedTouches);
-  } else {
-    // layerX is used by Firefox
-    var ex = event.offsetX === undefined ? event.layerX : event.offsetX;
-    var ey = event.offsetY === undefined ? event.layerY : event.offsetY;
-    positions.push({x: ex, y: ey});
-  }
-  return positions;
-};

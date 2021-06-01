@@ -115,6 +115,12 @@
             "click": "Click on pixel to create a contour based on its intensity.",
             "tap": "Touch a pixel to create a contour based on its intensity."
         },
+        "Opacity": {
+            "name": "Opacity",
+            "brief": "Allows to change the opacity of the current view layer.",
+            "mouse_drag": "A horizontal mouse drag changes the layer opacity making it either more opaque or transparent.",
+            "touch_drag": "A horizontal touch drag changes the layer opacity making it either more opaque or transparent."
+        },
         "info": {
             "position": "Pos = {{value}}",
             "value": "Value = {{value}}",

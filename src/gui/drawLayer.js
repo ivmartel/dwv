@@ -1,6 +1,6 @@
 // namespaces
 var dwv = dwv || {};
-dwv.html = dwv.html || {};
+dwv.gui = dwv.gui || {};
 
 /**
  * The Konva namespace.
@@ -16,7 +16,7 @@ var Konva = Konva || {};
  * @param {object} containerDiv The layer div.
  * @class
  */
-dwv.html.DrawLayer = function (containerDiv) {
+dwv.gui.DrawLayer = function (containerDiv) {
 
   // specific css class name
   containerDiv.className += ' drawLayer';
@@ -205,6 +205,15 @@ dwv.html.DrawLayer = function (containerDiv) {
 
     // create draw controller
     drawController = new dwv.DrawController(konvaLayer);
+  };
+
+  /**
+   * Update the layer position.
+   *
+   * @param {object} pos The new position.
+   */
+  this.updatePosition = function (pos) {
+    this.getDrawController().activateDrawLayer(pos[0], pos[1]);
   };
 
   /**

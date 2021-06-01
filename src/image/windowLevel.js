@@ -3,6 +3,23 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
+ * Minimum window width value.
+ *
+ * @see http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2
+ */
+dwv.image.MinWindowWidth = 1;
+
+/**
+ * Validate an input window width.
+ *
+ * @param {number} value The value to test.
+ * @returns {number} A valid window width.
+ */
+dwv.image.validateWindowWidth = function (value) {
+  return value < dwv.image.MinWindowWidth ? dwv.image.MinWindowWidth : value;
+};
+
+/**
  * WindowLevel class.
  * <br>Pseudo-code:
  * <pre>
@@ -18,9 +35,10 @@ dwv.image = dwv.image || {};
  *
  */
 dwv.image.WindowLevel = function (center, width) {
-  // avoid zero width
-  if (width === 0) {
-    throw new Error('A window level with a width of zero is not possible.');
+  // check width
+  if (width < dwv.image.MinWindowWidth) {
+    throw new Error('Window width shall always be greater than or equal to ' +
+      dwv.image.MinWindowWidth);
   }
 
   /**

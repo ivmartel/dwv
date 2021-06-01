@@ -115,6 +115,12 @@
             "click": "Click on pixel to create a contour based on its intensity.",
             "tap": "Touch a pixel to create a contour based on its intensity."
         },
+        "Opacity": {
+            "name": "Opacità",
+            "brief": "Permette di modificare l'opacità del livello di visualizzazione corrente.",
+            "mouse_drag": "Un trascinamento orizzontale del mouse modifica l'opacità del livello rendendolo più opaco o trasparente.",
+            "touch_drag": "Un tocco di trascinamento orizzontale cambia l'opacità del livello rendendolo più opaco o trasparente."
+        },
         "info": {
             "position": "Pos = {{value}}",
             "value": "Valore = {{value}}",
