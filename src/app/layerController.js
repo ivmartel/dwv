@@ -445,7 +445,7 @@ dwv.LayerController = function (containerDiv) {
     containerDiv.style.height = height + 'px';
 
     // resize if test passes
-    if (dwv.html.canCreateCanvas(width, height)) {
+    if (dwv.gui.canCreateCanvas(width, height)) {
       // call resize and scale on layers
       for (var i = 0; i < layers.length; ++i) {
         layers[i].resize(baseScale);
