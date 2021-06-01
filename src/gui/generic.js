@@ -128,3 +128,37 @@ dwv.gui.getEventOffset = function (event) {
   }
   return positions;
 };
+
+/**
+ * Test if a canvas with the input size can be created.
+ *
+ * @see https://github.com/ivmartel/dwv/issues/902
+ * @see https://github.com/jhildenbiddle/canvas-size/blob/v1.2.4/src/canvas-test.js
+ *
+ * @param {number} width The canvas width.
+ * @param {number} height The canvas height.
+ * @returns {boolean} True is the canvas can be created.
+ */
+dwv.gui.canCreateCanvas = function (width, height) {
+  // test canvas with input size
+  var testCvs = document.createElement('canvas');
+  testCvs.width = width;
+  testCvs.height = height;
+  // crop canvas to speed up test
+  var cropCvs = document.createElement('canvas');
+  cropCvs.width = 1;
+  cropCvs.height = 1;
+  // contexts
+  var testCtx = testCvs.getContext('2d');
+  var cropCtx = cropCvs.getContext('2d');
+  // set data
+  if (testCtx) {
+    testCtx.fillRect(width - 1, height - 1, 1, 1);
+    // Render the test pixel in the bottom-right corner of the
+    // test canvas in the top-left of the 1x1 crop canvas. This
+    // dramatically reducing the time for getImageData to complete.
+    cropCtx.drawImage(testCvs, width - 1, height - 1, 1, 1, 0, 0, 1, 1);
+  }
+  // Verify image data (alpha component, Pass = 255, Fail = 0)
+  return cropCtx && cropCtx.getImageData(0, 0, 1, 1).data[3] !== 0;
+};

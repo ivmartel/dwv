@@ -444,10 +444,17 @@ dwv.LayerController = function (containerDiv) {
     containerDiv.style.width = width + 'px';
     containerDiv.style.height = height + 'px';
 
-    // call resize and scale on layers
-    for (var i = 0; i < layers.length; ++i) {
-      layers[i].resize(baseScale);
-      layers[i].setScale(scale);
+    // resize if test passes
+    if (dwv.html.canCreateCanvas(width, height)) {
+      // call resize and scale on layers
+      for (var i = 0; i < layers.length; ++i) {
+        layers[i].resize(baseScale);
+        layers[i].setScale(scale);
+      }
+    } else {
+      dwv.logger.warn('Cannot create a ' + width + ' * ' + height +
+        ' canvas, trying half the size...');
+      this.resize({x: newScale.x * 0.5, y: newScale.y * 0.5});
     }
   };
 
