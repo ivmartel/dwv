@@ -40,9 +40,9 @@ dwv.tool.Livewire = function (app) {
   /**
    * Drawing style.
    *
-   * @type {dwv.html.Style}
+   * @type {dwv.gui.Style}
    */
-  this.style = new dwv.html.Style();
+  this.style = new dwv.gui.Style();
 
   /**
    * Path storage. Paths are stored in reverse order.

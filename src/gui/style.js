@@ -1,13 +1,13 @@
 // namespaces
 var dwv = dwv || {};
-dwv.html = dwv.html || {};
+dwv.gui = dwv.gui || {};
 
 /**
  * Style class.
  *
  * @class
  */
-dwv.html.Style = function () {
+dwv.gui.Style = function () {
   /**
    * Font size.
    *
@@ -230,7 +230,7 @@ dwv.html.Style = function () {
  *
  * @returns {string} The font definition string.
  */
-dwv.html.Style.prototype.getFontStr = function () {
+dwv.gui.Style.prototype.getFontStr = function () {
   return ('normal ' + this.getFontSize() + 'px sans-serif');
 };
 
@@ -239,7 +239,7 @@ dwv.html.Style.prototype.getFontStr = function () {
  *
  * @returns {number} The line height.
  */
-dwv.html.Style.prototype.getLineHeight = function () {
+dwv.gui.Style.prototype.getLineHeight = function () {
   return (this.getFontSize() + this.getFontSize() / 5);
 };
 
@@ -248,7 +248,7 @@ dwv.html.Style.prototype.getLineHeight = function () {
  *
  * @returns {number} The scaled font size.
  */
-dwv.html.Style.prototype.getScaledFontSize = function () {
+dwv.gui.Style.prototype.getScaledFontSize = function () {
   return this.scale(this.getFontSize());
 };
 
@@ -257,7 +257,7 @@ dwv.html.Style.prototype.getScaledFontSize = function () {
  *
  * @returns {number} The scaled stroke width.
  */
-dwv.html.Style.prototype.getScaledStrokeWidth = function () {
+dwv.gui.Style.prototype.getScaledStrokeWidth = function () {
   return this.scale(this.getStrokeWidth());
 };
 
@@ -266,6 +266,6 @@ dwv.html.Style.prototype.getScaledStrokeWidth = function () {
  *
  * @returns {string} The shadow line colour.
  */
-dwv.html.Style.prototype.getShadowLineColour = function () {
+dwv.gui.Style.prototype.getShadowLineColour = function () {
   return dwv.utils.getShadowColour(this.getLineColour());
 };

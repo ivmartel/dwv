@@ -74,7 +74,7 @@ dwv.gui.getDivSize = function (div) {
  * @param {Array} touches The list of touch events.
  * @returns {Array} The list of positions of the touch events.
  */
-dwv.html.getTouchesPositions = function (touches) {
+dwv.gui.getTouchesPositions = function (touches) {
   // get the touch offset from all its parents
   var offsetLeft = 0;
   var offsetTop = 0;
@@ -110,16 +110,16 @@ dwv.html.getTouchesPositions = function (touches) {
  * @param {object} event The event to get the offset from.
  * @returns {Array} The array of offsets.
  */
-dwv.html.getEventOffset = function (event) {
+dwv.gui.getEventOffset = function (event) {
   var positions = [];
   if (typeof event.targetTouches !== 'undefined' &&
     event.targetTouches.length !== 0) {
     // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/targetTouches
-    positions = dwv.html.getTouchesPositions(event.targetTouches);
+    positions = dwv.gui.getTouchesPositions(event.targetTouches);
   } else if (typeof event.changedTouches !== 'undefined' &&
       event.changedTouches.length !== 0) {
     // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/changedTouches
-    positions = dwv.html.getTouchesPositions(event.changedTouches);
+    positions = dwv.gui.getTouchesPositions(event.changedTouches);
   } else {
     // layerX is used by Firefox
     var ex = event.offsetX === undefined ? event.layerX : event.offsetX;
