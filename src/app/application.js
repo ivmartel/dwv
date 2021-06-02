@@ -869,7 +869,7 @@ dwv.App = function () {
           layerController.getActiveViewLayer().getViewController();
         var currentPosition = controller.getCurrentPosition();
         if (sliceNb <= currentPosition.get(2)) {
-          controller.incrementIndex(2, true);
+          controller.incrementIndex(2);
         }
       }
 
