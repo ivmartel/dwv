@@ -255,13 +255,6 @@ dwv.LayerController = function (containerDiv) {
   };
 
   /**
-   * Update layers to the active view position.
-   */
-  this.getActiveDrawLayer = function () {
-    return layers[activeDrawLayerIndex];
-  };
-
-  /**
    * Update draw controller to view position.
    */
   this.updateDrawControllerToViewPosition = function () {
