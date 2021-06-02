@@ -197,7 +197,7 @@ dwv.ToolboxController = function (toolList) {
     if (event.type === 'touchstart' ||
       event.type === 'touchmove') {
       // event offset(s)
-      offsets = dwv.html.getEventOffset(event);
+      offsets = dwv.gui.getEventOffset(event);
       // should have at least one offset
       event._xs = offsets[0].x;
       event._ys = offsets[0].y;
@@ -220,7 +220,7 @@ dwv.ToolboxController = function (toolList) {
       event.type === 'mouseout' ||
       event.type === 'wheel' ||
       event.type === 'dblclick') {
-      offsets = dwv.html.getEventOffset(event);
+      offsets = dwv.gui.getEventOffset(event);
       event._xs = offsets[0].x;
       event._ys = offsets[0].y;
       position = displayToIndexConverter(offsets[0]);

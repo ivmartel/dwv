@@ -25,6 +25,58 @@ dwv.utils.ybrToRgb = function (y, cb, cr) {
 };
 
 /**
+ * Convert a hexadecimal colour to RGB.
+ *
+ * @param {string} hexColour The hexadecimal color as '#ab01ef'.
+ * @returns {object} RGB equivalent as {r,g,b}.
+ */
+dwv.utils.hexToRgb = function (hexColour) {
+  return {
+    r: parseInt(hexColour.substr(1, 2), 16),
+    g: parseInt(hexColour.substr(3, 2), 16),
+    b: parseInt(hexColour.substr(5, 2), 16)
+  };
+};
+
+/**
+ * Get the brightness of a RGB colour: calculates
+ * the luma (Y) of the YIQ colour space.
+ *
+ * @see https://en.wikipedia.org/wiki/YIQ#From_RGB_to_YIQ
+ *
+ * @param {object} rgbTriplet RGB triplet.
+ * @returns {number} The brightness ([0,1]).
+ */
+dwv.utils.getBrightness = function (rgbTriplet) {
+  // 0.001172549 = 0.299 / 255
+  // 0.002301961 = 0.587 / 255
+  // 0.000447059 = 0.114 / 255
+  return rgbTriplet.r * 0.001172549 +
+    rgbTriplet.g * 0.002301961 +
+    rgbTriplet.b * 0.000447059;
+};
+
+/**
+ * Check if a colour given in hexadecimal format is dark.
+ *
+ * @param {string} hexColour The colour (as '#ab01ef').
+ * @returns {boolean} True if the colour is dark (brightness < 0.5).
+ */
+dwv.utils.isDarkColour = function (hexColour) {
+  return dwv.utils.getBrightness(dwv.utils.hexToRgb(hexColour)) < 0.5;
+};
+
+/**
+ * Get the shadow colour of an input colour.
+ *
+ * @param {string} hexColour The colour (as '#ab01ef').
+ * @returns {string} The shadow colour (white or black).
+ */
+dwv.utils.getShadowColour = function (hexColour) {
+  return dwv.utils.isDarkColour(hexColour) ? '#fff' : '#000';
+};
+
+/**
  * Unsigned int CIE LAB value ([0, 65535]) to CIE LAB value
  *   (L: [0, 100], a: [-128, 127], b: [-128, 127]).
  *

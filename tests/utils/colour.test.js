@@ -40,6 +40,55 @@ QUnit.test('Test ybrToRgb.', function (assert) {
 });
 
 /**
+ * Tests for {@link dwv.utils.hexToRgb}.
+ *
+ * @function module:tests/utils~hexToRgb
+ */
+QUnit.test('Test hexToRgb.', function (assert) {
+  var rgb00 = dwv.utils.hexToRgb('#000000');
+  assert.equal(rgb00.r, 0, 'hexToRgb #000000: r');
+  assert.equal(rgb00.g, 0, 'hexToRgb #000000: g');
+  assert.equal(rgb00.b, 0, 'hexToRgb #000000: b');
+
+  var rgb01 = dwv.utils.hexToRgb('#ffffff');
+  assert.equal(rgb01.r, 255, 'hexToRgb #ffffff: r');
+  assert.equal(rgb01.g, 255, 'hexToRgb #ffffff: g');
+  assert.equal(rgb01.b, 255, 'hexToRgb #ffffff: b');
+
+  var rgb02 = dwv.utils.hexToRgb('#7f7f7f');
+  assert.equal(rgb02.r, 127, 'hexToRgb #7f7f7f: r');
+  assert.equal(rgb02.g, 127, 'hexToRgb #7f7f7f: g');
+  assert.equal(rgb02.b, 127, 'hexToRgb #7f7f7f: b');
+
+  var rgb03 = dwv.utils.hexToRgb('#4e33d6');
+  assert.equal(rgb03.r, 78, 'hexToRgb #4e33d6: r');
+  assert.equal(rgb03.g, 51, 'hexToRgb #4e33d6: g');
+  assert.equal(rgb03.b, 214, 'hexToRgb #4e33d6: b');
+});
+
+/**
+ * Tests for {@link dwv.utils.isDarkColour}.
+ *
+ * @function module:tests/utils~isDarkColour
+ */
+QUnit.test('Test isDarkColour.', function (assert) {
+  var test00 = dwv.utils.isDarkColour('#000000');
+  assert.equal(test00, true, 'isDarkColour black');
+
+  var test01 = dwv.utils.isDarkColour('#ffffff');
+  assert.equal(test01, false, 'isDarkColour white');
+
+  var test02 = dwv.utils.isDarkColour('#7f7f7f');
+  assert.equal(test02, true, 'isDarkColour grey 0');
+
+  var test03 = dwv.utils.isDarkColour('#7f7f8f');
+  assert.equal(test03, false, 'isDarkColour grey 1');
+
+  var test04 = dwv.utils.isDarkColour('#4e33d6');
+  assert.equal(test04, true, 'isDarkColour blue');
+});
+
+/**
  * Tests for {@link dwv.utils.cielabToCiexyz}.
  * ref: https://www.easyrgb.com/en/convert.php
  *

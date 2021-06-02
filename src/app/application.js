@@ -38,7 +38,7 @@ dwv.App = function () {
   var undoStack = null;
 
   // Generic style
-  var style = new dwv.html.Style();
+  var style = new dwv.gui.Style();
 
   /**
    * Listener handler.

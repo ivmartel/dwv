@@ -129,9 +129,9 @@ dwv.tool.Floodfill = function (app) {
   /**
    * Drawing style.
    *
-   * @type {dwv.html.Style}
+   * @type {dwv.gui.Style}
    */
-  this.style = new dwv.html.Style();
+  this.style = new dwv.gui.Style();
 
   /**
    * Listener handler.
