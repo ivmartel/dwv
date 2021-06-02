@@ -6,11 +6,14 @@ dwv.utils.logger = dwv.utils.logger || {};
 dwv.utils.logger.console = dwv.utils.logger.console || {};
 
 /**
- * The dwv code uses `dwv.logger.[trace, debug, info...]` to log text at
- * different levels.
+ * Main logger, defaults to the console logger.
  */
+dwv.logger = dwv.utils.logger.console;
 
-// available log levels
+/**
+ * Available log levels.
+ * Note: need to activate verbose level in Chrome console to see DEBUG messages.
+ */
 dwv.utils.logger.levels = {
   TRACE: 0,
   DEBUG: 1,

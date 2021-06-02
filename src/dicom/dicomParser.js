@@ -899,11 +899,6 @@ dwv.dicom.getDataElementPrefixByteSize = function (vr, isImplicit) {
  * @class
  */
 dwv.dicom.DicomParser = function () {
-  // check logger
-  if (typeof dwv.logger === 'undefined') {
-    dwv.logger = dwv.utils.logger.console;
-  }
-
   /**
    * The list of DICOM elements.
    *
