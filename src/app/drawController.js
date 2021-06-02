@@ -384,10 +384,12 @@ dwv.DrawController = function (konvaLayer) {
       if (kids[k].className === 'Text') {
         var text = kids[k];
         text.shadowColor(shadowColor);
-        text.meta = drawDetails.meta;
-        text.setText(dwv.utils.replaceFlags(
-          text.meta.textExpr, text.meta.quantification
-        ));
+        if (typeof drawDetails.meta !== 'undefined') {
+          text.meta = drawDetails.meta;
+          text.setText(dwv.utils.replaceFlags(
+            text.meta.textExpr, text.meta.quantification
+          ));
+        }
       }
     }
 
