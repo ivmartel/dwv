@@ -157,9 +157,7 @@ dwv.LayerController = function (containerDiv) {
     var viewLayer0 = this.getActiveViewLayer();
     if (viewLayer0) {
       viewLayer0.removeEventListener(
-        'slicechange', this.updatePosition);
-      viewLayer0.removeEventListener(
-        'framechange', this.updatePosition);
+        'postitionchange', this.updatePosition);
     }
 
     // set index
@@ -168,9 +166,7 @@ dwv.LayerController = function (containerDiv) {
     // bind new layer
     var viewLayer = this.getActiveViewLayer();
     viewLayer.addEventListener(
-      'slicechange', this.updatePosition);
-    viewLayer.addEventListener(
-      'framechange', this.updatePosition);
+      'postitionchange', this.updatePosition);
   };
 
   /**
