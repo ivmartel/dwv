@@ -134,7 +134,6 @@ dwv.gui.getEventOffset = function (event) {
  *
  * @see https://github.com/ivmartel/dwv/issues/902
  * @see https://github.com/jhildenbiddle/canvas-size/blob/v1.2.4/src/canvas-test.js
- *
  * @param {number} width The canvas width.
  * @param {number} height The canvas height.
  * @returns {boolean} True is the canvas can be created.

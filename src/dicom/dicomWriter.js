@@ -19,7 +19,6 @@ dwv.dicom.getDwvUIDPrefix = function () {
  * @see http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_9.html
  * @see http://dicomiseasy.blogspot.com/2011/12/chapter-4-dicom-objects-in-chapter-3.html
  * @see https://stackoverflow.com/questions/46304306/how-to-generate-unique-dicom-uid
- *
  * @param {string} tagName The input tag.
  * @returns {string} The corresponding UID.
  */
