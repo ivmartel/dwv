@@ -12,11 +12,13 @@ var Konva = Konva || {};
 /**
  * Get the draw group id for a given position.
  *
- * @param {number} sliceNumber The slice number.
- * @param {number} frameNumber The frame number.
- * @returns {number} The group id.
+ * @param {object} currentPosition The current position.
+ * @returns {string} The group id.
  */
-dwv.draw.getDrawPositionGroupId = function (sliceNumber, frameNumber) {
+dwv.draw.getDrawPositionGroupId = function (currentPosition) {
+  var sliceNumber = currentPosition.get(2);
+  var frameNumber = currentPosition.length() === 3
+    ? currentPosition.get(3) : 0;
   return 'slice-' + sliceNumber + '_frame-' + frameNumber;
 };
 
@@ -171,11 +173,7 @@ dwv.DrawController = function (konvaLayer) {
    */
   this.activateDrawLayer = function (currentPosition) {
     // get and store the position group id
-    var currentSlice = currentPosition.get(2);
-    var currentFrame = currentPosition.length() === 3
-      ? currentPosition.get(3) : 0;
-    currentPosGroupId = dwv.draw.getDrawPositionGroupId(
-      currentSlice, currentFrame);
+    currentPosGroupId = dwv.draw.getDrawPositionGroupId(currentPosition);
 
     // get all position groups
     var posGroups = konvaLayer.getChildren(dwv.draw.isPositionNode);

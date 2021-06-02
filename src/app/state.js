@@ -211,7 +211,7 @@ dwv.v02Tov03Drawings = function (drawings) {
       if (groupShapes.length !== 0) {
         // Create position-group set as visible and append it to drawLayer
         parentGroup = new Konva.Group({
-          id: dwv.draw.getDrawPositionGroupId(k, f),
+          id: dwv.draw.getDrawPositionGroupId(new dwv.math.Index([1, 1, k, f])),
           name: 'position-group',
           visible: false
         });
