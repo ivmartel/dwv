@@ -17,7 +17,7 @@ var Konva = Konva || {};
  */
 dwv.draw.getDrawPositionGroupId = function (currentPosition) {
   var sliceNumber = currentPosition.get(2);
-  var frameNumber = currentPosition.length() === 3
+  var frameNumber = currentPosition.length() === 4
     ? currentPosition.get(3) : 0;
   return 'slice-' + sliceNumber + '_frame-' + frameNumber;
 };
