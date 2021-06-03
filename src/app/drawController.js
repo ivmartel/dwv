@@ -321,8 +321,7 @@ dwv.DrawController = function (konvaLayer) {
         var shape = stateGroup.getChildren(dwv.draw.isNodeNameShape)[0];
         // create the draw command
         var cmd = new dwv.tool.DrawGroupCommand(
-          stateGroup, shape.className,
-          konvaLayer, true);
+          stateGroup, shape.className, konvaLayer);
         // draw command callbacks
         cmd.onExecute = cmdCallback;
         cmd.onUndo = cmdCallback;
