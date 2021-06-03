@@ -1,4 +1,4 @@
-/*! dwv 0.28.1 2021-04-21 09:40:46 */
+/*! dwv 0.29.0 2021-06-03 18:22:16 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -70,66 +70,40 @@ var dwv = dwv || {};
  * @tutorial examples
  */
 dwv.App = function () {
-  // check logger
-  if (typeof dwv.logger === 'undefined') {
-    dwv.logger = dwv.utils.logger.console;
-  }
-
-  // Local object
+  // closure to self
   var self = this;
 
-  // Image
-  var image = null;
-  // Original image
-  var originalImage = null;
-  // Image data array
-  var imageData = null;
-  // Image data width
-  var dataWidth = 0;
-  // Image data height
-  var dataHeight = 0;
+  // app options
+  var options = null;
 
-  // Container div id
-  var containerDivId = null;
-  // Display window scale
-  var windowScale = 1;
-  // main scale
-  var scale = 1;
-  // zoom center
-  var scaleCenter = {x: 0, y: 0};
-  // translation
-  var translation = {x: 0, y: 0};
+  // data controller
+  var dataController = null;
 
-  // View
-  var view = null;
-  // View controller
-  var viewController = null;
-  // flag to create view on first load
-  var viewOnFirstLoadItem = true;
-
-  // meta data
-  var metaData = null;
-
-  // Image layer
-  var imageLayer = null;
-
-  // Draw controller
-  var drawController = null;
-
-  // Generic style
-  var style = new dwv.html.Style();
-
-  // Toolbox controller
+  // toolbox controller
   var toolboxController = null;
+
+  // layer controller
+  var layerController = null;
 
   // load controller
   var loadController = null;
 
+  // first load item flag
+  var isFirstLoadItem = null;
+
   // UndoStack
   var undoStack = null;
 
-  // listeners
-  var listeners = {};
+  // Generic style
+  var style = new dwv.gui.Style();
+
+  /**
+   * Listener handler.
+   *
+   * @type {object}
+   * @private
+   */
+  var listenerHandler = new dwv.utils.ListenerHandler();
 
   /**
    * Get the image.
@@ -137,32 +111,26 @@ dwv.App = function () {
    * @returns {Image} The associated image.
    */
   this.getImage = function () {
-    return image;
+    return dataController.get(0).image;
   };
   /**
-   * Set the view.
+   * Set the image.
    *
    * @param {Image} img The associated image.
    */
   this.setImage = function (img) {
-    image = img;
-    view.setImage(img);
+    dataController.setImage(img, 0);
   };
+
   /**
-   * Restore the original image.
-   */
-  this.restoreOriginalImage = function () {
-    image = originalImage;
-    view.setImage(originalImage);
-  };
-  /**
-   * Get the image data array.
+   * Get the meta data.
    *
-   * @returns {Array} The image data array.
+   * @returns {object} The list of meta data.
    */
-  this.getImageData = function () {
-    return imageData;
+  this.getMetaData = function () {
+    return dataController.get(0).meta;
   };
+
   /**
    * Is the data mono-slice?
    *
@@ -177,8 +145,9 @@ dwv.App = function () {
    * @returns {boolean} True if the data only contains one frame.
    */
   this.isMonoFrameData = function () {
-    return (this.getImage() && typeof this.getImage() !== 'undefined' &&
-            this.getImage().getNumberOfFrames() === 1);
+    var viewLayer = layerController.getActiveViewLayer();
+    var controller = viewLayer.getViewController();
+    return controller.isMonoFrameData();
   };
   /**
    * Can the data be scrolled?
@@ -195,52 +164,36 @@ dwv.App = function () {
    * @returns {boolean} True if the data is monochrome.
    */
   this.canWindowLevel = function () {
-    return this.getImage().getPhotometricInterpretation().match(/MONOCHROME/) !== null;
+    var viewLayer = layerController.getActiveViewLayer();
+    var controller = viewLayer.getViewController();
+    return controller.canWindowLevel();
   };
 
   /**
-   * Get the main scale.
+   * Get the layer scale on top of the base scale.
    *
-   * @returns {number} The main scale.
+   * @returns {object} The scale as {x,y}.
    */
-  this.getScale = function () {
-    return scale / windowScale;
+  this.getAddedScale = function () {
+    return layerController.getAddedScale();
   };
 
   /**
-   * Get the window scale.
+   * Get the base scale.
    *
-   * @returns {number} The window scale.
+   * @returns {object} The scale as {x,y}.
    */
-  this.getWindowScale = function () {
-    return windowScale;
+  this.getBaseScale = function () {
+    return layerController.getBaseScale();
   };
 
   /**
-   * Get the scale center.
+   * Get the layer offset.
    *
-   * @returns {object} The coordinates of the scale center.
+   * @returns {object} The offset.
    */
-  this.getScaleCenter = function () {
-    return scaleCenter;
-  };
-
-  /**
-   * Get the translation.
-   *
-   * @returns {object} The translation.
-   */
-  this.getTranslation = function () {
-    return translation;
-  };
-
-  /**
-   * Get the view controller.
-   *
-   * @returns {object} The controller.
-   */
-  this.getViewController = function () {
-    return viewController;
+  this.getOffset = function () {
+    return layerController.getOffset();
   };
 
   /**
@@ -253,30 +206,12 @@ dwv.App = function () {
   };
 
   /**
-   * Get the draw controller.
+   * Get the layer controller.
    *
    * @returns {object} The controller.
    */
-  this.getDrawController = function () {
-    return drawController;
-  };
-
-  /**
-   * Get the image layer.
-   *
-   * @returns {object} The image layer.
-   */
-  this.getImageLayer = function () {
-    return imageLayer;
-  };
-
-  /**
-   * Get the draw stage.
-   *
-   * @returns {object} The draw stage.
-   */
-  this.getDrawStage = function () {
-    return drawController.getDrawStage();
+  this.getLayerController = function () {
+    return layerController;
   };
 
   /**
@@ -303,23 +238,36 @@ dwv.App = function () {
   /**
    * Initialise the application.
    *
-   * @param {object} config The application configuration.
+   * @param {object} opt The application options.
    */
-  this.init = function (config) {
-    containerDivId = config.containerDivId;
+  this.init = function (opt) {
+    // store
+    options = opt;
+    // defaults
+    if (typeof options.containerDivId === 'undefined') {
+      options.containerDivId = 'dwv';
+    }
+    if (typeof options.viewOnFirstLoadItem === 'undefined') {
+      options.viewOnFirstLoadItem = true;
+    }
+    if (typeof options.nSimultaneousData === 'undefined') {
+      options.nSimultaneousData = 1;
+    }
+
     // undo stack
     undoStack = new dwv.tool.UndoStack();
     undoStack.addEventListener('undoadd', fireEvent);
     undoStack.addEventListener('undo', fireEvent);
     undoStack.addEventListener('redo', fireEvent);
+
     // tools
-    if (config.tools && config.tools.length !== 0) {
+    if (options.tools && options.tools.length !== 0) {
       // setup the tool list
       var toolList = {};
-      var keys = Object.keys(config.tools);
+      var keys = Object.keys(options.tools);
       for (var t = 0; t < keys.length; ++t) {
         var toolName = keys[t];
-        var toolParams = config.tools[toolName];
+        var toolParams = options.tools[toolName];
         // find the tool in the dwv.tool namespace
         if (typeof dwv.tool[toolName] !== 'undefined') {
           // create tool instance
@@ -339,10 +287,10 @@ dwv.App = function () {
             if (typeof toolParams.type !== 'undefined') {
               type = toolParams.type;
             }
-            var options = toolParams.options;
+            var toolOptions = toolParams.options;
             if (type === 'instance' ||
                 type === 'factory') {
-              options = {};
+              toolOptions = {};
               for (var i = 0; i < toolParams.options.length; ++i) {
                 var optionName = toolParams.options[i];
                 var optionClassName = optionName;
@@ -353,7 +301,7 @@ dwv.App = function () {
                   toolName.slice(1);
                 if (typeof dwv.tool[toolNamespace][optionClassName] !==
                   'undefined') {
-                  options[optionName] =
+                  toolOptions[optionName] =
                     dwv.tool[toolNamespace][optionClassName];
                 } else {
                   dwv.logger.warn('Could not find option class for: ' +
@@ -361,7 +309,7 @@ dwv.App = function () {
                 }
               }
             }
-            toolList[toolName].setOptions(options);
+            toolList[toolName].setOptions(toolOptions);
           }
         } else {
           dwv.logger.warn('Could not initialise unknown tool: ' + toolName);
@@ -372,7 +320,7 @@ dwv.App = function () {
     }
 
     // create load controller
-    loadController = new dwv.LoadController(config.defaultCharacterSet);
+    loadController = new dwv.LoadController(options.defaultCharacterSet);
     loadController.onloadstart = onloadstart;
     loadController.onprogress = onprogress;
     loadController.onloaditem = onloaditem;
@@ -381,10 +329,13 @@ dwv.App = function () {
     loadController.onerror = onerror;
     loadController.onabort = onabort;
 
-    // flag to view on first load
-    if (typeof config.viewOnFirstLoadItem !== 'undefined') {
-      viewOnFirstLoadItem = config.viewOnFirstLoadItem;
-    }
+    // create layer container
+    // warn: needs the DOM to be loaded...
+    layerController =
+      new dwv.LayerController(self.getElement('layerContainer'));
+
+    // create data controller
+    dataController = new dwv.DataController();
   };
 
   /**
@@ -393,24 +344,8 @@ dwv.App = function () {
    * @returns {object} The available width and height: {width:X; height:Y}.
    */
   this.getLayerContainerSize = function () {
-    var ldiv = self.getElement('layerContainer');
-    var parent = ldiv.parentNode;
-    // offsetHeight: height of an element, including vertical padding
-    // and borders
-    // ref: https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetHeight
-    var height = parent.offsetHeight;
-    // remove the height of other elements of the container div
-    var kids = parent.children;
-    for (var i = 0; i < kids.length; ++i) {
-      if (!kids[i].classList.contains('layerContainer')) {
-        var styles = window.getComputedStyle(kids[i]);
-        // offsetHeight does not include margin
-        var margin = parseFloat(styles.getPropertyValue('margin-top'), 10) +
-               parseFloat(styles.getPropertyValue('margin-bottom'), 10);
-        height -= (kids[i].offsetHeight + margin);
-      }
-    }
-    return {width: parent.offsetWidth, height: height};
+    var size = layerController.getLayerContainerSize();
+    return {width: size.x, height: size.y};
   };
 
   /**
@@ -420,21 +355,16 @@ dwv.App = function () {
    * @returns {object} The found element or null.
    */
   this.getElement = function (name) {
-    return dwv.gui.getElement(containerDivId, name);
+    return dwv.gui.getElement(options.containerDivId, name);
   };
 
   /**
    * Reset the application.
    */
   this.reset = function () {
-    // clear draw
-    if (drawController) {
-      drawController.reset();
-    }
     // clear objects
-    image = null;
-    view = null;
-    metaData = null;
+    dataController.reset();
+    layerController.empty();
     // reset undo/redo
     if (undoStack) {
       undoStack = new dwv.tool.UndoStack();
@@ -446,80 +376,32 @@ dwv.App = function () {
 
   /**
    * Reset the layout of the application.
-   *
-   * @fires dwv.App#zoomchange
-   * @fires dwv.App#offsetchange
    */
   this.resetLayout = function () {
-    var previousScale = scale;
-    var previousSC = scaleCenter;
-    var previousTrans = translation;
-    // reset values
-    scale = windowScale;
-    scaleCenter = {x: 0, y: 0};
-    translation = {x: 0, y: 0};
-    // apply new values
-    if (imageLayer) {
-      imageLayer.resetLayout(windowScale);
-      imageLayer.draw();
-    }
-    if (drawController) {
-      drawController.resetStage(windowScale);
-    }
-    // fire events
-    if (previousScale !== scale) {
-      fireEvent({
-        type: 'zoomchange',
-        value: [scale],
-        scale: scale,
-        cx: scaleCenter.x,
-        cy: scaleCenter.y
-      });
-    }
-    if ((previousSC.x !== scaleCenter.x || previousSC.y !== scaleCenter.y) ||
-      (previousTrans.x !== translation.x || previousTrans.y !== translation.y)
-    ) {
-      fireEvent({
-        type: 'offsetchange',
-        value: [scaleCenter.x, scaleCenter.y],
-        scale: scale,
-        cx: scaleCenter.x,
-        cy: scaleCenter.y
-      });
-    }
-  };
-
-
-  /**
-   * Add an event listener on the app.
-   *
-   * @param {string} type The event type.
-   * @param {object} listener The method associated with the provided
-   *   event type.
-   */
-  this.addEventListener = function (type, listener) {
-    if (typeof listeners[type] === 'undefined') {
-      listeners[type] = [];
-    }
-    listeners[type].push(listener);
+    layerController.reset();
+    layerController.draw();
   };
 
   /**
-   * Remove an event listener from the app.
+   * Add an event listener to this class.
    *
    * @param {string} type The event type.
-   * @param {object} listener The method associated with the provided
+   * @param {object} callback The method associated with the provided
+   *   event type, will be called with the fired event.
+   */
+  this.addEventListener = function (type, callback) {
+    listenerHandler.add(type, callback);
+  };
+
+  /**
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
    *   event type.
    */
-  this.removeEventListener = function (type, listener) {
-    if (typeof listeners[type] === 'undefined') {
-      return;
-    }
-    for (var i = 0; i < listeners[type].length; ++i) {
-      if (listeners[type][i] === listener) {
-        listeners[type].splice(i, 1);
-      }
-    }
+  this.removeEventListener = function (type, callback) {
+    listenerHandler.remove(type, callback);
   };
 
   // load API [begin] -------------------------------------------------------
@@ -585,111 +467,40 @@ dwv.App = function () {
 
   /**
    * Fit the display to the given size. To be called once the image is loaded.
-   *
-   * @param {object} size A size as `{width,height}`.
    */
-  this.fitToSize = function (size) {
-    // previous width
-    var oldWidth = parseInt(windowScale * dataWidth, 10);
-    // find new best fit
-    windowScale = Math.min(
-      (size.width / dataWidth),
-      (size.height / dataHeight)
-    );
-    // new sizes
-    var newWidth = parseInt(windowScale * dataWidth, 10);
-    var newHeight = parseInt(windowScale * dataHeight, 10);
-    // ratio previous/new to add to zoom
-    var mul = newWidth / oldWidth;
-    scale *= mul;
-
+  this.fitToContainer = function () {
+    layerController.fitToContainer();
+    layerController.draw();
     // update style
-    style.setScale(windowScale);
-
-    // resize container
-    var container = this.getElement('layerContainer');
-    container.setAttribute(
-      'style', 'width:' + newWidth + 'px;height:' + newHeight + 'px');
-    // resize image layer
-    if (imageLayer) {
-      imageLayer.setWidth(newWidth);
-      imageLayer.setHeight(newHeight);
-      imageLayer.zoom(scale, scale, 0, 0);
-      imageLayer.draw();
-    }
-    // resize draw stage
-    if (drawController) {
-      drawController.resizeStage(newWidth, newHeight, scale);
-    }
+    style.setBaseScale(layerController.getBaseScale());
   };
 
   /**
    * Init the Window/Level display
    */
   this.initWLDisplay = function () {
-    // set window/level to first preset
-    viewController.setWindowLevelPresetById(0);
-    // default position
-    viewController.setCurrentPosition2D(0, 0);
-    // default frame
-    viewController.setCurrentFrame(0);
+    var viewLayer = layerController.getActiveViewLayer();
+    var controller = viewLayer.getViewController();
+    controller.initialise();
   };
 
   /**
-   * Add canvas mouse and touch listeners.
-   *
-   * @param {object} layer The canvas layer to listen to.
-   */
-  this.addToolCanvasListeners = function (layer) {
-    toolboxController.addCanvasListeners(layer);
-  };
-
-  /**
-   * Remove layer mouse and touch listeners.
-   *
-   * @param {object} layer The canvas to stop listening to.
-   */
-  this.removeToolCanvasListeners = function (layer) {
-    toolboxController.removeCanvasListeners(layer);
-  };
-
-  /**
-   * Render the current image.
+   * Render the current data.
    */
   this.render = function () {
-    generateAndDrawImage();
+    layerController.draw();
   };
 
   /**
    * Zoom to the layers.
    *
-   * @param {number} zoom The zoom to apply.
+   * @param {number} step The step to add to the current zoom.
    * @param {number} cx The zoom center X coordinate.
    * @param {number} cy The zoom center Y coordinate.
    */
-  this.zoom = function (zoom, cx, cy) {
-    scale = zoom * windowScale;
-    if (scale <= 0.1) {
-      scale = 0.1;
-    }
-    scaleCenter = {x: cx, y: cy};
-    zoomLayers();
-  };
-
-  /**
-   * Add a step to the layers zoom.
-   *
-   * @param {number} step The zoom step increment. A good step is of 0.1.
-   * @param {number} cx The zoom center X coordinate.
-   * @param {number} cy The zoom center Y coordinate.
-   */
-  this.stepZoom = function (step, cx, cy) {
-    scale += step;
-    if (scale <= 0.1) {
-      scale = 0.1;
-    }
-    scaleCenter = {x: cx, y: cy};
-    zoomLayers();
+  this.zoom = function (step, cx, cy) {
+    layerController.addScale(step, {x: cx, y: cy});
+    layerController.draw();
   };
 
   /**
@@ -699,21 +510,19 @@ dwv.App = function () {
    * @param {number} ty The translation along Y.
    */
   this.translate = function (tx, ty) {
-    translation = {x: tx, y: ty};
-    translateLayers();
+    layerController.addTranslation({x: tx, y: ty});
+    layerController.draw();
   };
 
   /**
-   * Add a translation to the layers.
+   * Set the image layer opacity.
    *
-   * @param {number} tx The step translation along X.
-   * @param {number} ty The step translation along Y.
+   * @param {number} alpha The opacity ([0:1] range).
    */
-  this.stepTranslate = function (tx, ty) {
-    var txx = translation.x + tx / scale;
-    var tyy = translation.y + ty / scale;
-    translation = {x: txx, y: tyy};
-    translateLayers();
+  this.setOpacity = function (alpha) {
+    var viewLayer = layerController.getActiveViewLayer();
+    viewLayer.setOpacity(alpha);
+    viewLayer.draw();
   };
 
   /**
@@ -722,16 +531,9 @@ dwv.App = function () {
    * @returns {object} The list of draw details including id, slice, frame...
    */
   this.getDrawDisplayDetails = function () {
+    var drawController =
+      layerController.getActiveDrawLayer().getDrawController();
     return drawController.getDrawDisplayDetails();
-  };
-
-  /**
-   * Get the meta data.
-   *
-   * @returns {object} The list of meta data.
-   */
-  this.getMetaData = function () {
-    return metaData;
   };
 
   /**
@@ -740,6 +542,8 @@ dwv.App = function () {
    * @returns {object} A list of draw details including id, text, quant...
    */
   this.getDrawStoreDetails = function () {
+    var drawController =
+      layerController.getActiveDrawLayer().getDrawController();
     return drawController.getDrawStoreDetails();
   };
   /**
@@ -749,9 +553,17 @@ dwv.App = function () {
    * @param {Array} drawingsDetails An array of drawings details.
    */
   this.setDrawings = function (drawings, drawingsDetails) {
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
+    var drawController =
+      layerController.getActiveDrawLayer().getDrawController();
+
     drawController.setDrawings(
       drawings, drawingsDetails, fireEvent, this.addToUndoStack);
-    drawController.activateDrawLayer(viewController);
+
+    drawController.activateDrawLayer(
+      viewController.getCurrentPosition(),
+      viewController.getCurrentFrame());
   };
   /**
    * Update a drawing from its details.
@@ -759,12 +571,16 @@ dwv.App = function () {
    * @param {object} drawDetails Details of the drawing to update.
    */
   this.updateDraw = function (drawDetails) {
+    var drawController =
+      layerController.getActiveDrawLayer().getDrawController();
     drawController.updateDraw(drawDetails);
   };
   /**
    * Delete all Draws from all layers.
    */
   this.deleteDraws = function () {
+    var drawController =
+      layerController.getActiveDrawLayer().getDrawController();
     drawController.deleteDraws(fireEvent, this.addToUndoStack);
   };
   /**
@@ -774,6 +590,8 @@ dwv.App = function () {
    * @returns {boolean} True if the group is visible.
    */
   this.isGroupVisible = function (drawDetails) {
+    var drawController =
+      layerController.getActiveDrawLayer().getDrawController();
     return drawController.isGroupVisible(drawDetails);
   };
   /**
@@ -782,6 +600,8 @@ dwv.App = function () {
    * @param {object} drawDetails Details of the drawing to update.
    */
   this.toogleGroupVisibility = function (drawDetails) {
+    var drawController =
+      layerController.getActiveDrawLayer().getDrawController();
     drawController.toogleGroupVisibility(drawDetails);
   };
 
@@ -798,60 +618,6 @@ dwv.App = function () {
   // Handler Methods -----------------------------------------------------------
 
   /**
-   * Handle window/level change.
-   *
-   * @param {object} event The event fired when changing the window/level.
-   * @private
-   */
-  function onWLChange(event) {
-    // generate and draw if no skip flag
-    if (typeof event.skipGenerate === 'undefined' ||
-      event.skipGenerate === false) {
-      generateAndDrawImage();
-    }
-  }
-
-  /**
-   * Handle colour map change.
-   *
-   * @param {object} _event The event fired when changing the colour map.
-   * @private
-   */
-  function onColourChange(_event) {
-    generateAndDrawImage();
-  }
-
-  /**
-   * Handle frame change.
-   *
-   * @param {object} event The event fired when changing the frame.
-   * @private
-   */
-  function onFrameChange(event) {
-    // generate and draw if no skip flag
-    if (typeof event.skipGenerate === 'undefined' ||
-      event.skipGenerate === false) {
-      generateAndDrawImage();
-      if (drawController) {
-        drawController.activateDrawLayer(viewController);
-      }
-    }
-  }
-
-  /**
-   * Handle slice change.
-   *
-   * @param {object} _event The event fired when changing the slice.
-   * @private
-   */
-  function onSliceChange(_event) {
-    generateAndDrawImage();
-    if (drawController) {
-      drawController.activateDrawLayer(viewController);
-    }
-  }
-
-  /**
    * Handle resize: fit the display to the window.
    * To be called once the image is loaded.
    * Can be connected to a window 'resize' event.
@@ -860,7 +626,7 @@ dwv.App = function () {
    * @private
    */
   this.onResize = function (_event) {
-    self.fitToSize(self.getLayerContainerSize());
+    self.fitToContainer();
   };
 
   /**
@@ -895,19 +661,21 @@ dwv.App = function () {
    * @fires dwv.tool.UndoStack#redo
    */
   this.defaultOnKeydown = function (event) {
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
     if (event.ctrlKey) {
       if (event.keyCode === 37) { // crtl-arrow-left
         event.preventDefault();
-        self.getViewController().decrementFrameNb();
+        viewController.decrementFrameNb();
       } else if (event.keyCode === 38) { // crtl-arrow-up
         event.preventDefault();
-        self.getViewController().incrementSliceNb();
+        viewController.incrementSliceNb();
       } else if (event.keyCode === 39) { // crtl-arrow-right
         event.preventDefault();
-        self.getViewController().incrementFrameNb();
+        viewController.incrementFrameNb();
       } else if (event.keyCode === 40) { // crtl-arrow-down
         event.preventDefault();
-        self.getViewController().decrementSliceNb();
+        viewController.decrementSliceNb();
       } else if (event.keyCode === 89) { // crtl-y
         undoStack.redo();
       } else if (event.keyCode === 90) { // crtl-z
@@ -916,7 +684,7 @@ dwv.App = function () {
     }
   };
 
-  // Internal mebers shortcuts-----------------------------------------------
+  // Internal members shortcuts-----------------------------------------------
 
   /**
    * Reset the display
@@ -939,6 +707,8 @@ dwv.App = function () {
    * @param {string} colourMap The colour map name.
    */
   this.setColourMap = function (colourMap) {
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
     viewController.setColourMapFromName(colourMap);
   };
 
@@ -948,6 +718,8 @@ dwv.App = function () {
    * @param {object} preset The window/level preset.
    */
   this.setWindowLevelPreset = function (preset) {
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
     viewController.setWindowLevelPreset(preset);
   };
 
@@ -957,6 +729,24 @@ dwv.App = function () {
    * @param {string} tool The tool.
    */
   this.setTool = function (tool) {
+    var layer = null;
+    var previousLayer = null;
+    if (tool === 'Draw' ||
+      tool === 'Livewire' ||
+      tool === 'Floodfill') {
+      layer = layerController.getActiveDrawLayer();
+      previousLayer = layerController.getActiveViewLayer();
+    } else {
+      layer = layerController.getActiveViewLayer();
+      previousLayer = layerController.getActiveDrawLayer();
+    }
+    if (previousLayer) {
+      toolboxController.detachLayer(previousLayer);
+    }
+    // detach to avoid possible double attach
+    toolboxController.detachLayer(layer);
+
+    toolboxController.attachLayer(layer);
     toolboxController.setSelectedTool(tool);
   };
 
@@ -1025,169 +815,13 @@ dwv.App = function () {
   // Private Methods -----------------------------------------------------------
 
   /**
-   * Fire an event: call all associated listeners.
+   * Fire an event: call all associated listeners with the input event object.
    *
    * @param {object} event The event to fire.
    * @private
    */
   function fireEvent(event) {
-    if (typeof listeners[event.type] === 'undefined') {
-      return;
-    }
-    for (var i = 0; i < listeners[event.type].length; ++i) {
-      listeners[event.type][i](event);
-    }
-  }
-
-  /**
-   * Generate the image data and draw it.
-   *
-   * @private
-   * @fires dwv.Appk#renderstart
-   * @fires dwv.App#renderend
-   */
-  function generateAndDrawImage() {
-    /**
-     * Render start event.
-     *
-     * @event dwv.App#renderstart
-     * @type {object}
-     * @property {string} type The event type.
-     */
-    var event = {type: 'renderstart'};
-    fireEvent(event);
-
-    // create view if first tiem
-    if (!view) {
-      initialiseView();
-    }
-    // generate image data from DICOM
-    view.generateImageData(imageData);
-    // set the image data of the layer
-    imageLayer.setImageData(imageData);
-    // draw the image
-    imageLayer.draw();
-
-    /**
-     * Render end event.
-     *
-     * @event dwv.App#renderend
-     * @type {object}
-     * @property {string} type The event type.
-     */
-    event = {type: 'renderend'};
-    fireEvent(event);
-  }
-
-  /**
-   * Apply the stored zoom to the layers.
-   *
-   * @private
-   * @fires dwv.App#zoomchange
-   */
-  function zoomLayers() {
-    // image layer
-    if (imageLayer) {
-      imageLayer.zoom(scale, scale, scaleCenter.x, scaleCenter.y);
-      imageLayer.draw();
-    }
-    // draw layer
-    if (drawController) {
-      drawController.zoomStage(scale, scaleCenter);
-    }
-    // fire event
-    /**
-     * Zoom change event.
-     *
-     * @event dwv.App#zoomchange
-     * @type {object}
-     * @property {Array} value The changed value.
-     * @property {number} scale The new scale value.
-     * @property {number} cx The new rotaion center X position.
-     * @property {number} cy The new rotaion center Y position.
-     */
-    fireEvent({
-      type: 'zoomchange',
-      value: [scale],
-      scale: scale,
-      cx: scaleCenter.x,
-      cy: scaleCenter.y
-    });
-    /**
-     * Offset change event.
-     *
-     * @event dwv.App#offsetchange
-     * @type {object}
-     * @property {Array} value The changed value.
-     */
-    fireEvent({
-      type: 'offsetchange',
-      value: [scaleCenter.x, scaleCenter.y]
-    });
-  }
-
-  /**
-   * Apply the stored translation to the layers.
-   *
-   * @private
-   * @fires dwv.App#offsetchange
-   */
-  function translateLayers() {
-    // image layer
-    if (imageLayer) {
-      imageLayer.translate(translation.x, translation.y);
-      imageLayer.draw();
-      // draw layer
-      if (drawController) {
-        var ox = -imageLayer.getOrigin().x / scale - translation.x;
-        var oy = -imageLayer.getOrigin().y / scale - translation.y;
-        drawController.translateStage(ox, oy);
-      }
-      // fire event
-      /**
-       * Offset change event.
-       *
-       * @event dwv.App#translatechange
-       * @type {object}
-       * @property {Array} value The changed value.
-       * @property {number} scale The new scale value.
-       * @property {number} cx The new rotaion center X position.
-       * @property {number} cy The new rotaion center Y position.
-       */
-      fireEvent({
-        type: 'translatechange',
-        value: [imageLayer.getTrans().x, imageLayer.getTrans().y],
-        scale: scale,
-        cx: imageLayer.getTrans().x,
-        cy: imageLayer.getTrans().y
-      });
-    }
-  }
-
-  /**
-   * Create the application layers.
-   *
-   * @param {number} dataWidth The width of the input data.
-   * @param {number} dataHeight The height of the input data.
-   * @private
-   */
-  function createLayers(dataWidth, dataHeight) {
-    // image layer
-    var canImgLay = self.getElement('imageLayer');
-    imageLayer = new dwv.html.Layer(canImgLay);
-    imageLayer.initialise(dataWidth, dataHeight);
-    imageLayer.fillContext();
-    imageLayer.setStyleDisplay(true);
-    // draw layer
-    var drawDiv = self.getElement('drawDiv');
-    if (drawDiv) {
-      drawController = new dwv.DrawController(drawDiv);
-      drawController.create(dataWidth, dataHeight);
-    }
-    // resize app
-    self.fitToSize(self.getLayerContainerSize());
-
-    self.resetLayout();
+    listenerHandler.fireEvent(event);
   }
 
   /**
@@ -1197,7 +831,10 @@ dwv.App = function () {
    * @private
    */
   function onloadstart(event) {
-    if (event.loadtype === 'image') {
+    isFirstLoadItem = true;
+
+    if (event.loadtype === 'image' &&
+      dataController.length() === options.nSimultaneousData) {
       self.reset();
     }
 
@@ -1253,22 +890,18 @@ dwv.App = function () {
       dwv.logger.error('Missing loaditem event load type ' + event);
     }
 
-    // first load flag
-    var isFirstLoad = image === null;
     // number returned by image.appendSlice
     var sliceNb = null;
 
     var eventMetaData = null;
     if (event.loadtype === 'image') {
-      if (isFirstLoad) {
-        // save image
-        originalImage = event.data.image;
-        image = originalImage;
+      if (isFirstLoadItem) {
+        dataController.addNew(event.data.image, event.data.info);
       } else {
-        // append slice
-        sliceNb = image.appendSlice(event.data.image);
+        sliceNb = dataController.updateCurrent(
+          event.data.image, event.data.info);
       }
-      updateMetaData(event.data.info);
+
       eventMetaData = event.data.info;
     } else if (event.loadtype === 'state') {
       var state = new dwv.State();
@@ -1294,21 +927,39 @@ dwv.App = function () {
       loadtype: event.loadtype
     });
 
-    // render if asked
-    if (event.loadtype === 'image' && viewOnFirstLoadItem) {
-      if (isFirstLoad) {
-        self.render();
+    // adapt context
+    if (event.loadtype === 'image') {
+      if (isFirstLoadItem) {
+        // initialise or add view
+        var dataIndex = dataController.getCurrentIndex();
+        var data = dataController.get(dataIndex);
+        if (layerController.getNumberOfLayers() === 0) {
+          initialiseBaseLayers(data.image, data.meta, dataIndex);
+        } else {
+          addViewLayer(data.image, data.meta, dataIndex);
+        }
       } else {
         // update slice number if new slice was inserted before
-        if (sliceNb <= view.getCurrentPosition().k) {
-          view.setCurrentPosition({
-            i: view.getCurrentPosition().i,
-            j: view.getCurrentPosition().j,
-            k: view.getCurrentPosition().k + 1
+        var controller =
+          layerController.getActiveViewLayer().getViewController();
+        var currentPosition = controller.getCurrentPosition();
+        if (sliceNb <= currentPosition.k) {
+          controller.setCurrentPosition({
+            i: currentPosition.i,
+            j: currentPosition.j,
+            k: currentPosition.k + 1
           }, true);
         }
       }
+
+      // render if flag allows
+      if (isFirstLoadItem && options.viewOnFirstLoadItem) {
+        self.render();
+      }
     }
+
+    // reset flag
+    isFirstLoadItem = false;
   }
 
   /**
@@ -1318,10 +969,6 @@ dwv.App = function () {
    * @private
    */
   function onload(event) {
-    if (drawController) {
-      drawController.activateDrawLayer(viewController);
-    }
-
     /**
      * Load event: fired when a load finishes successfully.
      *
@@ -1341,6 +988,7 @@ dwv.App = function () {
    * @private
    */
   function onloadend(event) {
+    isFirstLoadItem = null;
     /**
      * Main load end event: fired when the load finishes,
      *   successfully or not.
@@ -1401,87 +1049,279 @@ dwv.App = function () {
   }
 
   /**
-   * Update the stored meta data.
+   * Bind view layer events to app.
    *
-   * @param {*} newMetaData The new meta data.
+   * @param {object} viewLayer The view layer.
    * @private
    */
-  function updateMetaData(newMetaData) {
-    // store the meta data
-    if (dwv.utils.isArray(newMetaData)) {
-      // image file case
-      // TODO merge?
-      metaData = newMetaData;
-    } else {
-      // DICOM data case
-      var newDcmMetaData = new dwv.dicom.DicomElementsWrapper(newMetaData);
-      var newDcmMetaDataoObj = newDcmMetaData.dumpToObject();
-      if (metaData) {
-        metaData = dwv.utils.mergeObjects(
-          metaData,
-          newDcmMetaDataoObj,
-          'InstanceNumber',
-          'value');
-      } else {
-        metaData = newDcmMetaDataoObj;
-      }
+  function bindViewLayer(viewLayer) {
+    // propagate view events
+    viewLayer.propagateViewEvents(true);
+    for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
+      viewLayer.addEventListener(dwv.image.viewEventNames[j], fireEvent);
+    }
+    // propagate viewLayer events
+    viewLayer.addEventListener('renderstart', fireEvent);
+    viewLayer.addEventListener('renderend', fireEvent);
+  }
+
+  /**
+   * Un-Bind view layer events from app.
+   *
+   * @param {object} viewLayer The view layer.
+   * @private
+   */
+  function unbindViewLayer(viewLayer) {
+    // stop propagating view events
+    viewLayer.propagateViewEvents(false);
+    for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
+      viewLayer.removeEventListener(dwv.image.viewEventNames[j], fireEvent);
+    }
+    // stop propagating viewLayer events
+    viewLayer.removeEventListener('renderstart', fireEvent);
+    viewLayer.removeEventListener('renderend', fireEvent);
+  }
+
+  /**
+   * Initialise the layers.
+   * To be called once the DICOM data has been loaded.
+   *
+   * @param {object} image The image to view.
+   * @param {object} meta The image meta data.
+   * @param {number} dataIndex The data index.
+   * @private
+   */
+  function initialiseBaseLayers(image, meta, dataIndex) {
+    // view layer
+    var viewLayer = layerController.addViewLayer();
+    // optional draw layer
+    if (toolboxController && toolboxController.hasTool('Draw')) {
+      layerController.addDrawLayer();
+    }
+    // initialise layers
+    layerController.initialise(image, meta, dataIndex);
+
+    // update style
+    style.setBaseScale(layerController.getBaseScale());
+    // bind view to app
+    bindViewLayer(viewLayer);
+
+    // propagate layer events
+    layerController.addEventListener('zoomchange', fireEvent);
+    layerController.addEventListener('offsetchange', fireEvent);
+
+    // listen to image changes
+    dataController.addEventListener('imagechange', viewLayer.onimagechange);
+
+    // initialise the toolbox
+    if (toolboxController) {
+      toolboxController.init(layerController.displayToIndex);
     }
   }
 
   /**
-   * Create the image view.
-   * To be called once the DICOM data has been loaded.
+   * Add a view layer.
    *
-   * @private
+   * @param {object} image The image to view.
+   * @param {object} meta The image meta data.
+   * @param {number} dataIndex The data index.
    */
-  function initialiseView() {
+  function addViewLayer(image, meta, dataIndex) {
+    // un-bind previous
+    unbindViewLayer(layerController.getActiveViewLayer());
 
-    if (!image) {
-      throw new Error('No image to create the view for.');
-    }
+    var viewLayer = layerController.addViewLayer();
+    // initialise
+    viewLayer.initialise(image, meta, dataIndex);
+    // apply layer scale
+    viewLayer.resize(layerController.getScale());
+    // listen to image changes
+    dataController.addEventListener('imagechange', viewLayer.onimagechange);
 
-    // create view
-    var viewFactory = new dwv.image.ViewFactory();
-    view = viewFactory.create(
-      new dwv.dicom.DicomElementsWrapper(metaData),
-      image);
-
-    // create view controller
-    viewController = new dwv.ViewController(view);
-
-    // layout
-    var size = image.getGeometry().getSize();
-    dataWidth = size.getNumberOfColumns();
-    dataHeight = size.getNumberOfRows();
-    createLayers(dataWidth, dataHeight);
-
-    // get the image data from the image layer
-    imageData = imageLayer.getContext().createImageData(
-      dataWidth, dataHeight);
-
-    // image listeners
-    view.addEventListener('wlwidthchange', onWLChange);
-    view.addEventListener('wlcenterchange', onWLChange);
-    view.addEventListener('colourchange', onColourChange);
-    view.addEventListener('slicechange', onSliceChange);
-    view.addEventListener('framechange', onFrameChange);
-
-    // connect with local listeners
-    view.addEventListener('wlwidthchange', fireEvent);
-    view.addEventListener('wlcenterchange', fireEvent);
-    view.addEventListener('wlpresetadd', fireEvent);
-    view.addEventListener('colourchange', fireEvent);
-    view.addEventListener('positionchange', fireEvent);
-    view.addEventListener('slicechange', fireEvent);
-    view.addEventListener('framechange', fireEvent);
-
-    // initialise the toolbox
-    if (toolboxController) {
-      toolboxController.init(imageLayer);
-    }
+    // bind new
+    bindViewLayer(viewLayer);
   }
 
 };
+
+// namespaces
+var dwv = dwv || {};
+
+/*
+ * Data (list of {image, meta}) controller.
+ *
+ * @class
+ */
+dwv.DataController = function () {
+
+  /**
+   * List of {image, meta}.
+   *
+   * @private
+   * @type {Array}
+   */
+  var data = [];
+
+  /**
+   * Current data index.
+   *
+   * @private
+   * @type {number}
+   */
+  var currentIndex = null;
+
+  /**
+   * Listener handler.
+   *
+   * @type {object}
+   * @private
+   */
+  var listenerHandler = new dwv.utils.ListenerHandler();
+
+  /**
+   * Get the length of the data storage.
+   *
+   * @returns {number} The length.
+   */
+  this.length = function () {
+    return data.length;
+  };
+
+  /**
+   * Reset the class: empty the data storage.
+   */
+  this.reset = function () {
+    currentIndex = null;
+    data = [];
+  };
+
+  /**
+   * Get a data at a given index.
+   *
+   * @param {number} index The index of the data.
+   * @returns {object} The data.
+   */
+  this.get = function (index) {
+    return data[index];
+  };
+
+  /**
+   * Get the current data index.
+   *
+   * @returns {number} The index.
+   */
+  this.getCurrentIndex = function () {
+    return currentIndex;
+  };
+
+  /**
+   * Set the image at a given index.
+   *
+   * @param {object} image The image to set.
+   * @param {number} index The index of the data.
+   */
+  this.setImage = function (image, index) {
+    data[index].image = image;
+    fireEvent({
+      type: 'imagechange',
+      value: [index, image]
+    });
+  };
+
+  /**
+   * Add a new data.
+   *
+   * @param {object} image The image.
+   * @param {object} meta The image meta.
+   */
+  this.addNew = function (image, meta) {
+    currentIndex = data.length;
+    // store the new image
+    data.push({
+      image: image,
+      meta: getMetaObject(meta)
+    });
+  };
+
+  /**
+   * Update the current data.
+   *
+   * @param {object} image The image.
+   * @param {object} meta The image meta.
+   * @returns {number} The slice number at which the image was added.
+   */
+  this.updateCurrent = function (image, meta) {
+    var currentData = data[currentIndex];
+    // add slice to current image
+    var sliceNb = currentData.image.appendSlice(image);
+    // update meta data
+    var idKey = '';
+    if (typeof meta.x00020010 !== 'undefined') {
+      // dicom case
+      idKey = 'InstanceNumber';
+    } else {
+      idKey = 'imageUid';
+    }
+    currentData.meta = dwv.utils.mergeObjects(
+      currentData.meta,
+      getMetaObject(meta),
+      idKey,
+      'value');
+
+    return sliceNb;
+  };
+
+  /**
+   * Add an event listener to this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type, will be called with the fired event.
+   */
+  this.addEventListener = function (type, callback) {
+    listenerHandler.add(type, callback);
+  };
+
+  /**
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type.
+   */
+  this.removeEventListener = function (type, callback) {
+    listenerHandler.remove(type, callback);
+  };
+
+  /**
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
+   * @private
+   */
+  function fireEvent(event) {
+    listenerHandler.fireEvent(event);
+  }
+
+  /**
+   * Get a meta data object.
+   *
+   * @param {*} meta The meta data to convert.
+   * @returns {*} object for DICOM, array for DOM image.
+   */
+  function getMetaObject(meta) {
+    var metaObj = null;
+    // wrap meta if dicom (x00020010: transfer syntax)
+    if (typeof meta.x00020010 !== 'undefined') {
+      var newDcmMetaData = new dwv.dicom.DicomElementsWrapper(meta);
+      metaObj = newDcmMetaData.dumpToObject();
+    } else {
+      metaObj = meta;
+    }
+    return metaObj;
+  }
+
+}; // ImageController class
 
 // namespaces
 var dwv = dwv || {};
@@ -1607,13 +1447,9 @@ dwv.draw.getHierarchyLog = function (layer, prefix) {
  * Draw controller.
  *
  * @class
- * @param {object} drawDiv The HTML div used to store the drawings.
+ * @param {object} konvaLayer The draw layer.
  */
-dwv.DrawController = function (drawDiv) {
-  // Draw stage
-  var drawStage = null;
-  // Draw layer
-  var drawLayer;
+dwv.DrawController = function (konvaLayer) {
   // current position group id
   var currentPosGroupId = null;
 
@@ -1624,7 +1460,7 @@ dwv.DrawController = function (drawDiv) {
    */
   this.getCurrentPosGroup = function () {
     // get position groups
-    var posGroups = drawLayer.getChildren(function (node) {
+    var posGroups = konvaLayer.getChildren(function (node) {
       return node.id() === currentPosGroupId;
     });
     // if one group, use it
@@ -1638,7 +1474,7 @@ dwv.DrawController = function (drawDiv) {
       posGroup.id(currentPosGroupId);
       posGroup.visible(true); // dont inherit
       // add new group to layer
-      drawLayer.add(posGroup);
+      konvaLayer.add(posGroup);
     } else {
       dwv.logger.warn('Unexpected number of draw position groups.');
     }
@@ -1647,71 +1483,28 @@ dwv.DrawController = function (drawDiv) {
   };
 
   /**
-   * Create the controller: sets up the draw stage.
-   *
-   * @param {number} width The width of the stage.
-   * @param {number} height The height of the stage.
-   */
-  this.create = function (width, height) {
-    // create stage
-    drawStage = new Konva.Stage({
-      container: drawDiv,
-      width: width,
-      height: height,
-      listening: false
-    });
-    // reset style
-    // (avoids a not needed vertical scrollbar)
-    drawStage.getContent().setAttribute('style', '');
-
-    // create layer
-    drawLayer = new Konva.Layer({
-      listening: false,
-      visible: true
-    });
-    drawStage.add(drawLayer);
-  };
-
-  /**
-   * Get the draw layer.
-   *
-   * @returns {object} The draw layer.
-   */
-  this.getDrawLayer = function () {
-    return drawLayer;
-  };
-
-  /**
    * Reset: clear the layers array.
    */
   this.reset = function () {
-    drawLayer = null;
-  };
-
-  /**
-   * Get the draw stage.
-   *
-   * @returns {object} The draw layer.
-   */
-  this.getDrawStage = function () {
-    return drawStage;
+    konvaLayer = null;
   };
 
   /**
    * Activate the current draw layer.
    *
-   * @param {object} viewController The associated view controller.
+   * @param {object} currentPosition The current {i,j,k} position.
+   * @param {number} currentFrame The current frame number.
    */
-  this.activateDrawLayer = function (viewController) {
+  this.activateDrawLayer = function (currentPosition, currentFrame) {
     // set current position
-    var currentSlice = viewController.getCurrentPosition().k;
-    var currentFrame = viewController.getCurrentFrame();
+    var currentSlice = currentPosition.k;
+    // var currentFrame = viewController.getCurrentFrame();
     // get and store the position group id
     currentPosGroupId = dwv.draw.getDrawPositionGroupId(
       currentSlice, currentFrame);
 
     // get all position groups
-    var posGroups = drawLayer.getChildren(dwv.draw.isPositionNode);
+    var posGroups = konvaLayer.getChildren(dwv.draw.isPositionNode);
     // reset or set the visible property
     var visible;
     for (var i = 0, leni = posGroups.length; i < leni; ++i) {
@@ -1724,71 +1517,7 @@ dwv.DrawController = function (drawDiv) {
     }
 
     // show current draw layer
-    drawLayer.draw();
-  };
-
-  /**
-   * Reset the stage with a new window scale.
-   *
-   * @param {number} windowScale The window scale.
-   */
-  this.resetStage = function (windowScale) {
-    drawStage.offset({x: 0, y: 0});
-    drawStage.scale({x: windowScale, y: windowScale});
-    drawStage.draw();
-  };
-
-  /**
-   * Resize the current stage.
-   *
-   * @param {number} width the stage width.
-   * @param {number} height the stage height.
-   * @param {number} scale the stage scale.
-   */
-  this.resizeStage = function (width, height, scale) {
-    // resize div
-    drawDiv.setAttribute('style',
-      'width:' + width + 'px;height:' + height + 'px');
-    // resize stage
-    drawStage.setWidth(width);
-    drawStage.setHeight(height);
-    drawStage.scale({x: scale, y: scale});
-    drawStage.draw();
-  };
-
-  /**
-   * Zoom the stage.
-   *
-   * @param {number} scale The scale factor.
-   * @param {object} scaleCenter The scale center point.
-   */
-  this.zoomStage = function (scale, scaleCenter) {
-    // zoom
-    var newScale = {x: scale, y: scale};
-    // offset
-    // TODO different from the imageLayer offset?
-    var oldScale = drawStage.scale();
-    var oldOffset = drawStage.offset();
-    var newOffsetX = (scaleCenter.x / oldScale.x) +
-            oldOffset.x - (scaleCenter.x / newScale.x);
-    var newOffsetY = (scaleCenter.y / oldScale.y) +
-            oldOffset.y - (scaleCenter.y / newScale.y);
-    var newOffset = {x: newOffsetX, y: newOffsetY};
-    // store
-    drawStage.offset(newOffset);
-    drawStage.scale(newScale);
-    drawStage.draw();
-  };
-
-  /**
-   * Translate the stage.
-   *
-   * @param {number} tx The X translation.
-   * @param {number} ty The Y translation.
-   */
-  this.translateStage = function (tx, ty) {
-    drawStage.offset({x: tx, y: ty});
-    drawStage.draw();
+    konvaLayer.draw();
   };
 
   /**
@@ -1798,7 +1527,7 @@ dwv.DrawController = function (drawDiv) {
    */
   this.getDrawDisplayDetails = function () {
     var list = [];
-    var groups = drawLayer.getChildren();
+    var groups = konvaLayer.getChildren();
     for (var j = 0, lenj = groups.length; j < lenj; ++j) {
       var position = dwv.draw.getPositionFromGroupId(groups[j].id());
       var collec = groups[j].getChildren();
@@ -1829,8 +1558,7 @@ dwv.DrawController = function (drawDiv) {
           frame: position.frameNumber,
           type: type,
           color: shape.stroke(),
-          label: text.textExpr,
-          description: text.longText
+          meta: text.meta
         });
       }
     }
@@ -1847,7 +1575,7 @@ dwv.DrawController = function (drawDiv) {
     var drawingsDetails = {};
 
     // get all position groups
-    var posGroups = drawLayer.getChildren(dwv.draw.isPositionNode);
+    var posGroups = konvaLayer.getChildren(dwv.draw.isPositionNode);
 
     var posKids;
     var group;
@@ -1865,11 +1593,9 @@ dwv.DrawController = function (drawDiv) {
         if (texts.length !== 1) {
           dwv.logger.warn('There should not be more than one text per shape.');
         }
-        // get details (non konva vars)
+        // get meta (non konva vars)
         drawingsDetails[group.id()] = {
-          textExpr: texts[0].textExpr,
-          longText: texts[0].longText,
-          quant: texts[0].quant
+          meta: texts[0].meta
         };
       }
     }
@@ -1897,8 +1623,8 @@ dwv.DrawController = function (drawDiv) {
       var statePosGroup = statePosGroups[i];
 
       // Get or create position-group if it does not exist and
-      // append it to drawLayer
-      var posGroup = drawLayer.getChildren(
+      // append it to konvaLayer
+      var posGroup = konvaLayer.getChildren(
         dwv.draw.isNodeWithId(statePosGroup.id()))[0];
       if (typeof posGroup === 'undefined') {
         posGroup = new Konva.Group({
@@ -1906,7 +1632,7 @@ dwv.DrawController = function (drawDiv) {
           name: 'position-group',
           visible: false
         });
-        drawLayer.add(posGroup);
+        konvaLayer.add(posGroup);
       }
 
       var statePosKids = statePosGroup.getChildren();
@@ -1920,8 +1646,7 @@ dwv.DrawController = function (drawDiv) {
         var shape = stateGroup.getChildren(dwv.draw.isNodeNameShape)[0];
         // create the draw command
         var cmd = new dwv.tool.DrawGroupCommand(
-          stateGroup, shape.className,
-          drawLayer, true);
+          stateGroup, shape.className, konvaLayer);
         // draw command callbacks
         cmd.onExecute = cmdCallback;
         cmd.onUndo = cmdCallback;
@@ -1931,11 +1656,11 @@ dwv.DrawController = function (drawDiv) {
           var label = stateGroup.getChildren(dwv.draw.isNodeNameLabel)[0];
           var text = label.getText();
           // store details
-          text.textExpr = details.textExpr;
-          text.longText = details.longText;
-          text.quant = details.quant;
+          text.meta = details.meta;
           // reset text (it was not encoded)
-          text.setText(dwv.utils.replaceFlags(text.textExpr, text.quant));
+          text.setText(dwv.utils.replaceFlags(
+            text.meta.textExpr, text.meta.quantification
+          ));
         }
         // execute
         cmd.execute();
@@ -1951,7 +1676,7 @@ dwv.DrawController = function (drawDiv) {
    */
   this.updateDraw = function (drawDetails) {
     // get the group
-    var group = drawLayer.findOne('#' + drawDetails.id);
+    var group = konvaLayer.findOne('#' + drawDetails.id);
     if (typeof group === 'undefined') {
       dwv.logger.warn(
         '[updateDraw] Cannot find group with id: ' + drawDetails.id
@@ -1969,19 +1694,32 @@ dwv.DrawController = function (drawDiv) {
       if (typeof shapesExtra[j].stroke() !== 'undefined') {
         shapesExtra[j].stroke(drawDetails.color);
       } else if (typeof shapesExtra[j].fill() !== 'undefined') {
+        // for example text
         shapesExtra[j].fill(drawDetails.color);
       }
     }
     // label
     var label = group.getChildren(dwv.draw.isNodeNameLabel)[0];
-    var text = label.getChildren()[0];
-    text.fill(drawDetails.color);
-    text.textExpr = drawDetails.label;
-    text.longText = drawDetails.description;
-    text.setText(dwv.utils.replaceFlags(text.textExpr, text.quant));
+    var shadowColor = dwv.utils.getShadowColour(drawDetails.color);
+    var kids = label.getChildren();
+    for (var k = 0; k < kids.length; ++k) {
+      var kid = kids[k];
+      kid.fill(drawDetails.color);
+      if (kids[k].className === 'Text') {
+        var text = kids[k];
+        text.shadowColor(shadowColor);
+        if (typeof drawDetails.meta !== 'undefined') {
+          text.meta = drawDetails.meta;
+          text.setText(dwv.utils.replaceFlags(
+            text.meta.textExpr, text.meta.quantification
+          ));
+          label.setVisible(text.meta.textExpr.length !== 0);
+        }
+      }
+    }
 
     // udpate current layer
-    drawLayer.draw();
+    konvaLayer.draw();
   };
 
   /**
@@ -1992,7 +1730,7 @@ dwv.DrawController = function (drawDiv) {
    */
   this.isGroupVisible = function (drawDetails) {
     // get the group
-    var group = drawLayer.findOne('#' + drawDetails.id);
+    var group = konvaLayer.findOne('#' + drawDetails.id);
     if (typeof group === 'undefined') {
       dwv.logger.warn(
         '[isGroupVisible] Cannot find node with id: ' + drawDetails.id
@@ -2011,7 +1749,7 @@ dwv.DrawController = function (drawDiv) {
    */
   this.toogleGroupVisibility = function (drawDetails) {
     // get the group
-    var group = drawLayer.findOne('#' + drawDetails.id);
+    var group = konvaLayer.findOne('#' + drawDetails.id);
     if (typeof group === 'undefined') {
       dwv.logger.warn(
         '[toogleGroupVisibility] Cannot find node with id: ' + drawDetails.id
@@ -2022,7 +1760,7 @@ dwv.DrawController = function (drawDiv) {
     group.visible(!group.isVisible());
 
     // udpate current layer
-    drawLayer.draw();
+    konvaLayer.draw();
   };
 
   /**
@@ -2034,7 +1772,7 @@ dwv.DrawController = function (drawDiv) {
    *   DeleteCommand has been executed.
    */
   this.deleteDrawGroupId = function (groupId, cmdCallback, exeCallback) {
-    var groups = drawLayer.getChildren();
+    var groups = konvaLayer.getChildren();
     var groupToDelete = groups.getChildren(function (node) {
       return node.id() === groupId;
     });
@@ -2061,7 +1799,7 @@ dwv.DrawController = function (drawDiv) {
     var shape = group.getChildren(dwv.draw.isNodeNameShape)[0];
     var shapeDisplayName = dwv.tool.GetShapeDisplayName(shape);
     var delcmd = new dwv.tool.DeleteGroupCommand(
-      group, shapeDisplayName, drawLayer);
+      group, shapeDisplayName, konvaLayer);
     delcmd.onExecute = cmdCallback;
     delcmd.onUndo = cmdCallback;
     delcmd.execute();
@@ -2076,13 +1814,527 @@ dwv.DrawController = function (drawDiv) {
    *  DeleteCommand has been executed.
    */
   this.deleteDraws = function (cmdCallback, exeCallback) {
-    var groups = drawLayer.getChildren();
+    var groups = konvaLayer.getChildren();
     while (groups.length) {
       this.deleteDrawGroup(groups[0], cmdCallback, exeCallback);
     }
   };
 
 }; // class dwv.DrawController
+
+// namespaces
+var dwv = dwv || {};
+dwv.gui = dwv.gui || {};
+
+/**
+ * Layer controller.
+ *
+ * @param {object} containerDiv The layer div.
+ * @class
+ */
+dwv.LayerController = function (containerDiv) {
+
+  var layers = [];
+
+  /**
+   * The layer scale as {x,y}.
+   *
+   * @private
+   * @type {object}
+   */
+  var scale = {x: 1, y: 1};
+
+  /**
+   * The base scale as {x,y}: all posterior scale will be on top of this one.
+   *
+   * @private
+   * @type {object}
+   */
+  var baseScale = {x: 1, y: 1};
+
+  /**
+   * The layer offset as {x,y}.
+   *
+   * @private
+   * @type {object}
+   */
+  var offset = {x: 0, y: 0};
+
+  /**
+   * The layer size as {x,y}.
+   *
+   * @private
+   * @type {object}
+   */
+  var layerSize = dwv.gui.getDivSize(containerDiv);
+
+  /**
+   * Active view layer index.
+   *
+   * @private
+   * @type {number}
+   */
+  var activeViewLayerIndex = null;
+
+  /**
+   * Active draw layer index.
+   *
+   * @private
+   * @type {number}
+   */
+  var activeDrawLayerIndex = null;
+
+  /**
+   * Listener handler.
+   *
+   * @type {object}
+   * @private
+   */
+  var listenerHandler = new dwv.utils.ListenerHandler();
+
+  /**
+   * Get the layer scale.
+   *
+   * @returns {object} The scale as {x,y}.
+   */
+  this.getScale = function () {
+    return scale;
+  };
+
+  /**
+   * Get the base scale.
+   *
+   * @returns {object} The scale as {x,y}.
+   */
+  this.getBaseScale = function () {
+    return baseScale;
+  };
+
+  /**
+   * Get the added scale: the scale added to the base scale
+   *
+   * @returns {object} The scale as {x,y}.
+   */
+  this.getAddedScale = function () {
+    return {
+      x: scale.x / baseScale.x,
+      y: scale.y / baseScale.y
+    };
+  };
+
+  /**
+   * Get the layer offset.
+   *
+   * @returns {object} The offset as {x,y}.
+   */
+  this.getOffset = function () {
+    return offset;
+  };
+
+  /**
+   * Transform a display position to an index.
+   *
+   * @param {dwv.Math.Point2D} point2D The point to convert.
+   * @returns {object} The equivalent index.
+   */
+  this.displayToIndex = function (point2D) {
+    return {
+      x: point2D.x / scale.x + offset.x,
+      y: point2D.y / scale.y + offset.y
+    };
+  };
+
+  /**
+   * Get the number of layers handled by this class.
+   *
+   * @returns {number} The number of layers.
+   */
+  this.getNumberOfLayers = function () {
+    return layers.length;
+  };
+
+  /**
+   * Get the active image layer.
+   *
+   * @returns {object} The layer.
+   */
+  this.getActiveViewLayer = function () {
+    return layers[activeViewLayerIndex];
+  };
+
+  /**
+   * Get the active draw layer.
+   *
+   * @returns {object} The layer.
+   */
+  this.getActiveDrawLayer = function () {
+    return layers[activeDrawLayerIndex];
+  };
+
+  /**
+   * Set the active view layer.
+   *
+   * @param {number} index The index of the layer to set as active.
+   */
+  this.setActiveViewLayer = function (index) {
+    // un-bind previous layer
+    var viewLayer0 = this.getActiveViewLayer();
+    if (viewLayer0) {
+      viewLayer0.removeEventListener(
+        'slicechange', this.updatePosition);
+      viewLayer0.removeEventListener(
+        'framechange', this.updatePosition);
+    }
+
+    // set index
+    activeViewLayerIndex = index;
+
+    // bind new layer
+    var viewLayer = this.getActiveViewLayer();
+    viewLayer.addEventListener(
+      'slicechange', this.updatePosition);
+    viewLayer.addEventListener(
+      'framechange', this.updatePosition);
+  };
+
+  /**
+   * Set the active draw layer.
+   *
+   * @param {number} index The index of the layer to set as active.
+   */
+  this.setActiveDrawLayer = function (index) {
+    activeDrawLayerIndex = index;
+  };
+
+  /**
+   * Add a view layer.
+   *
+   * @returns {object} The created layer.
+   */
+  this.addViewLayer = function () {
+    // layer index
+    var viewLayerIndex = layers.length;
+    // create div
+    var div = getNextLayerDiv();
+    // prepend to container
+    containerDiv.append(div);
+    // view layer
+    var layer = new dwv.gui.ViewLayer(div);
+    // set z-index: last on top
+    layer.setZIndex(viewLayerIndex);
+    // add layer
+    layers.push(layer);
+    // mark it as active
+    this.setActiveViewLayer(viewLayerIndex);
+    // return
+    return layer;
+  };
+
+  /**
+   * Add a draw layer.
+   *
+   * @returns {object} The created layer.
+   */
+  this.addDrawLayer = function () {
+    // store active index
+    activeDrawLayerIndex = layers.length;
+    // create div
+    var div = getNextLayerDiv();
+    // prepend to container
+    containerDiv.append(div);
+    // draw layer
+    var layer = new dwv.gui.DrawLayer(div);
+    // set z-index: above view + last on top
+    layer.setZIndex(50 + activeDrawLayerIndex);
+    // add layer
+    layers.push(layer);
+    // return
+    return layer;
+  };
+
+  /**
+   * Get the next layer DOM div.
+   *
+   * @returns {object} A DOM div.
+   */
+  function getNextLayerDiv() {
+    var div = document.createElement('div');
+    div.id = 'layer' + layers.length;
+    div.className = 'layer';
+    div.style.pointerEvents = 'none';
+    return div;
+  }
+
+  /**
+   * Empty the layer list.
+   */
+  this.empty = function () {
+    layers = [];
+    // reset active indices
+    activeViewLayerIndex = null;
+    activeDrawLayerIndex = null;
+    // clean container div
+    var previous = containerDiv.getElementsByClassName('layer');
+    if (previous) {
+      while (previous.length > 0) {
+        previous[0].remove();
+      }
+    }
+  };
+
+  /**
+   * Update layers to the active view position.
+   */
+  this.updatePosition = function () {
+    var viewController =
+      layers[activeViewLayerIndex].getViewController();
+    var pos = [
+      viewController.getCurrentPosition(),
+      viewController.getCurrentFrame()
+    ];
+    for (var i = 0; i < layers.length; ++i) {
+      if (i !== activeViewLayerIndex) {
+        layers[i].updatePosition(pos);
+      }
+    }
+  };
+
+  /**
+   * Get the fit to container scale.
+   * To be called once the image is loaded.
+   *
+   * @returns {number} The scale.
+   */
+  this.getFitToContainerScale = function () {
+    // get container size
+    var size = this.getLayerContainerSize();
+    // best fit
+    return Math.min(
+      (size.x / layerSize.x),
+      (size.y / layerSize.y)
+    );
+  };
+
+  /**
+   * Fit the display to the size of the container.
+   * To be called once the image is loaded.
+   */
+  this.fitToContainer = function () {
+    var fitScale = this.getFitToContainerScale();
+    this.resize({x: fitScale, y: fitScale});
+  };
+
+  /**
+   * Get the size available for the layer container div.
+   *
+   * @returns {object} The available width and height as {width,height}.
+   */
+  this.getLayerContainerSize = function () {
+    return dwv.gui.getDivSize(containerDiv);
+  };
+
+  /**
+   * Add scale to the layers. Scale cannot go lower than 0.1.
+   *
+   * @param {object} scaleStep The scale to add.
+   * @param {object} center The scale center point as {x,y}.
+   */
+  this.addScale = function (scaleStep, center) {
+    var newScale = {
+      x: Math.max(scale.x + scaleStep, 0.1),
+      y: Math.max(scale.y + scaleStep, 0.1)
+    };
+    // center should stay the same:
+    // newOffset + center / newScale = oldOffset + center / oldScale
+    this.setOffset({
+      x: (center.x / scale.x) + offset.x - (center.x / newScale.x),
+      y: (center.y / scale.y) + offset.y - (center.y / newScale.y)
+    });
+    this.setScale(newScale);
+  };
+
+  /**
+   * Set the layers' scale.
+   *
+   * @param {object} newScale The scale to apply as {x,y}.
+   * @fires dwv.LayerController#zoomchange
+   */
+  this.setScale = function (newScale) {
+    scale = newScale;
+    // apply to layers
+    for (var i = 0; i < layers.length; ++i) {
+      layers[i].setScale(scale);
+    }
+
+    /**
+     * Zoom change event.
+     *
+     * @event dwv.LayerController#zoomchange
+     * @type {object}
+     * @property {Array} value The changed value.
+     */
+    fireEvent({
+      type: 'zoomchange',
+      value: [scale.x, scale.y],
+    });
+  };
+
+  /**
+   * Add translation to the layers.
+   *
+   * @param {object} translation The translation as {x,y}.
+   */
+  this.addTranslation = function (translation) {
+    this.setOffset({
+      x: offset.x - translation.x / scale.x,
+      y: offset.y - translation.y / scale.y
+    });
+  };
+
+  /**
+   * Set the layers' offset.
+   *
+   * @param {object} newOffset The offset as {x,y}.
+   * @fires dwv.LayerController#offsetchange
+   */
+  this.setOffset = function (newOffset) {
+    // store
+    offset = newOffset;
+    // apply to layers
+    for (var i = 0; i < layers.length; ++i) {
+      layers[i].setOffset(offset);
+    }
+
+    /**
+     * Offset change event.
+     *
+     * @event dwv.LayerController#offsetchange
+     * @type {object}
+     * @property {Array} value The changed value.
+     */
+    fireEvent({
+      type: 'offsetchange',
+      value: [offset.x, offset.y],
+    });
+  };
+
+  /**
+   * Initialise the layer: set the canvas and context
+   *
+   * @param {object} image The image.
+   * @param {object} metaData The image meta data.
+   * @param {number} dataIndex The data index.
+   */
+  this.initialise = function (image, metaData, dataIndex) {
+    var size = image.getGeometry().getSize();
+    layerSize = {
+      x: size.getNumberOfColumns(),
+      y: size.getNumberOfRows()
+    };
+    // apply to layers
+    for (var i = 0; i < layers.length; ++i) {
+      layers[i].initialise(image, metaData, dataIndex);
+    }
+    // first position update
+    this.updatePosition();
+    // fit data
+    this.fitToContainer();
+  };
+
+  /**
+   * Reset the stage to its initial scale and no offset.
+   */
+  this.reset = function () {
+    this.setScale(baseScale);
+    this.setOffset({x: 0, y: 0});
+  };
+
+  /**
+   * Resize the layer: update the base scale and layer sizes.
+   *
+   * @param {number} newScale The scale as {x,y}.
+   */
+  this.resize = function (newScale) {
+    // store
+    scale = {
+      x: scale.x * newScale.x / baseScale.x,
+      y: scale.y * newScale.y / baseScale.y
+    };
+    baseScale = newScale;
+
+    // resize container
+    var width = parseInt(layerSize.x * baseScale.x, 10);
+    var height = parseInt(layerSize.y * baseScale.y, 10);
+    containerDiv.style.width = width + 'px';
+    containerDiv.style.height = height + 'px';
+
+    // resize if test passes
+    if (dwv.gui.canCreateCanvas(width, height)) {
+      // call resize and scale on layers
+      for (var i = 0; i < layers.length; ++i) {
+        layers[i].resize(baseScale);
+        layers[i].setScale(scale);
+      }
+    } else {
+      dwv.logger.warn('Cannot create a ' + width + ' * ' + height +
+        ' canvas, trying half the size...');
+      this.resize({x: newScale.x * 0.5, y: newScale.y * 0.5});
+    }
+  };
+
+  /**
+   * Draw the layer.
+   */
+  this.draw = function () {
+    for (var i = 0; i < layers.length; ++i) {
+      layers[i].draw();
+    }
+  };
+
+  /**
+   * Display the layer.
+   *
+   * @param {boolean} flag Whether to display the layer or not.
+   */
+  this.display = function (flag) {
+    for (var i = 0; i < layers.length; ++i) {
+      layers[i].display(flag);
+    }
+  };
+
+  /**
+   * Add an event listener to this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type, will be called with the fired event.
+   */
+  this.addEventListener = function (type, callback) {
+    listenerHandler.add(type, callback);
+  };
+
+  /**
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type.
+   */
+  this.removeEventListener = function (type, callback) {
+    listenerHandler.remove(type, callback);
+  };
+
+  /**
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
+   * @private
+   */
+  function fireEvent(event) {
+    listenerHandler.fireEvent(event);
+  }
+
+}; // LayerController class
 
 // namespaces
 var dwv = dwv || {};
@@ -2370,6 +2622,9 @@ var Konva = Konva || {};
  * Saves: data url/path, display info.
  *
  * History:
+ * - v0.4 (dwv 0.29.0, 06/2021)
+ *   - move drawing details into meta property
+ *   - remove scale center and translation, add offset
  * - v0.3 (dwv v0.23.0, 03/2018)
  *   - new drawing structure, drawings are now the full layer object and
  *     using toObject to avoid saving a string representation
@@ -2394,16 +2649,19 @@ dwv.State = function () {
    * @returns {string} The state as a JSON string.
    */
   this.toJSON = function (app) {
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
+    var drawLayer = layerController.getActiveDrawLayer();
     // return a JSON string
     return JSON.stringify({
-      version: '0.3',
-      'window-center': app.getViewController().getWindowLevel().center,
-      'window-width': app.getViewController().getWindowLevel().width,
-      position: app.getViewController().getCurrentPosition(),
-      scale: app.getScale(),
-      scaleCenter: app.getScaleCenter(),
-      translation: app.getTranslation(),
-      drawings: app.getDrawController().getDrawLayer().toObject(),
+      version: '0.4',
+      'window-center': viewController.getWindowLevel().center,
+      'window-width': viewController.getWindowLevel().width,
+      position: viewController.getCurrentPosition(),
+      scale: app.getAddedScale(),
+      offset: app.getOffset(),
+      drawings: drawLayer.getKonvaLayer().toObject(),
       drawingsDetails: app.getDrawStoreDetails()
     });
   };
@@ -2422,6 +2680,8 @@ dwv.State = function () {
       res = readV02(data);
     } else if (data.version === '0.3') {
       res = readV03(data);
+    } else if (data.version === '0.4') {
+      res = readV04(data);
     } else {
       throw new Error('Unknown state file format version: \'' +
         data.version + '\'.');
@@ -2435,13 +2695,49 @@ dwv.State = function () {
    * @param {object} data The state data.
    */
   this.apply = function (app, data) {
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
     // display
-    app.getViewController().setWindowLevel(
+    viewController.setWindowLevel(
       data['window-center'], data['window-width']);
-    app.getViewController().setCurrentPosition(data.position);
-    app.zoom(data.scale, data.scaleCenter.x, data.scaleCenter.y);
-    app.translate(data.translation.x, data.translation.y);
-    // drawings
+    viewController.setCurrentPosition(data.position);
+    // apply saved scale on top of current base one
+    var baseScale = app.getLayerController().getBaseScale();
+    var scale = null;
+    var offset = null;
+    if (typeof data.scaleCenter !== 'undefined') {
+      scale = {
+        x: data.scale * baseScale.x,
+        y: data.scale * baseScale.y,
+      };
+      // ---- transform translation (now) ----
+      // Tx = -offset.x * scale.x
+      // => offset.x = -Tx / scale.x
+      // ---- transform translation (before) ----
+      // origin.x = centerX - (centerX - origin.x) * (newZoomX / zoom.x);
+      // (zoom.x -> initial zoom = base scale, origin.x = 0)
+      // Tx = origin.x + (trans.x * zoom.x)
+      var originX = data.scaleCenter.x - data.scaleCenter.x * data.scale;
+      var originY = data.scaleCenter.y - data.scaleCenter.y * data.scale;
+      var oldTx = originX + data.translation.x * scale.x;
+      var oldTy = originY + data.translation.y * scale.y;
+      offset = {
+        x: -oldTx / scale.x,
+        y: -oldTy / scale.y
+      };
+    } else {
+      scale = {
+        x: data.scale.x * baseScale.x,
+        y: data.scale.y * baseScale.y
+      };
+      offset = data.offset;
+    }
+    app.getLayerController().setScale(scale);
+    app.getLayerController().setOffset(offset);
+    // render to draw the view layer
+    app.render();
+    // drawings (will draw the draw layer)
     app.setDrawings(data.drawings, data.drawingsDetails);
   };
   /**
@@ -2455,7 +2751,8 @@ dwv.State = function () {
     // update drawings
     var v02DAndD = dwv.v01Tov02DrawingsAndDetails(data.drawings);
     data.drawings = dwv.v02Tov03Drawings(v02DAndD.drawings).toObject();
-    data.drawingsDetails = v02DAndD.drawingsDetails;
+    data.drawingsDetails = dwv.v03Tov04DrawingsDetails(
+      v02DAndD.drawingsDetails);
     return data;
   }
   /**
@@ -2468,7 +2765,8 @@ dwv.State = function () {
   function readV02(data) {
     // update drawings
     data.drawings = dwv.v02Tov03Drawings(data.drawings).toObject();
-    data.drawingsDetails = dwv.v02Tov03DrawingsDetails(data.drawingsDetails);
+    data.drawingsDetails = dwv.v03Tov04DrawingsDetails(
+      dwv.v02Tov03DrawingsDetails(data.drawingsDetails));
     return data;
   }
   /**
@@ -2479,6 +2777,17 @@ dwv.State = function () {
    * @private
    */
   function readV03(data) {
+    data.drawingsDetails = dwv.v03Tov04DrawingsDetails(data.drawingsDetails);
+    return data;
+  }
+  /**
+   * Read an application state from an Object in v0.4 format.
+   *
+   * @param {object} data The Object representation of the state.
+   * @returns {object} The state object.
+   * @private
+   */
+  function readV04(data) {
     return data;
   }
 
@@ -2544,7 +2853,7 @@ dwv.v02Tov03Drawings = function (drawings) {
 };
 
 /**
- * Convert drawings from v0.2 to v0.3.
+ * Convert drawings from v0.1 to v0.2.
  * v0.1: text on its own
  * v0.2: text as part of label
  *
@@ -2722,6 +3031,31 @@ dwv.v02Tov03DrawingsDetails = function (details) {
 };
 
 /**
+ * Convert drawing details from v0.3 to v0.4.
+ * - v0.3: properties at group root
+ * - v0.4: properties in group meta object
+ *
+ * @param {Array} details An array of drawing details.
+ * @returns {object} The converted drawings.
+ */
+dwv.v03Tov04DrawingsDetails = function (details) {
+  var res = {};
+  var keys = Object.keys(details);
+  // Iterate over each position-groups
+  for (var k = 0, lenk = keys.length; k < lenk; ++k) {
+    var detail = details[keys[k]];
+    res[keys[k]] = {
+      meta: {
+        textExpr: detail.textExpr,
+        longText: detail.longText,
+        quantification: detail.quant
+      }
+    };
+  }
+  return res;
+};
+
+/**
  * Get the hex code of a string colour for a colour used in pre dwv v0.17.
  *
  * @param {string} name The name of a colour.
@@ -2774,16 +3108,14 @@ dwv.ToolboxController = function (toolList) {
   /**
    * Initialise.
    *
-   * @param {object} layer The associated layer.
+   * @param {Function} converter The display to index converter.
    */
-  this.init = function (layer) {
+  this.init = function (converter) {
     for (var key in toolList) {
       toolList[key].init();
     }
     // TODO Would prefer to have this done in the addLayerListeners
-    displayToIndexConverter = layer.displayToIndex;
-    // add layer listeners
-    this.addCanvasListeners(layer.getCanvas());
+    displayToIndexConverter = converter;
     // keydown listener
     window.addEventListener('keydown', onMouch, true);
   };
@@ -2804,7 +3136,7 @@ dwv.ToolboxController = function (toolList) {
    * @returns {string} The tool list element for the given name.
    */
   this.hasTool = function (name) {
-    return this.getToolList()[name];
+    return typeof this.getToolList()[name] !== 'undefined';
   };
 
   /**
@@ -2890,53 +3222,37 @@ dwv.ToolboxController = function (toolList) {
     // seems like jquery is checking if the method exists before it
     // is used...
     if (this.getSelectedTool() &&
-                this.getSelectedTool().getSelectedFilter()) {
+      this.getSelectedTool().getSelectedFilter()) {
       this.getSelectedTool().getSelectedFilter().run(range);
     }
   };
 
   /**
-   * Add canvas mouse and touch listeners.
+   * Listen to layer interaction events.
    *
-   * @param {object} canvas The canvas to listen to.
+   * @param {object} layer The layer to listen to.
    */
-  this.addCanvasListeners = function (canvas) {
-    // allow pointer events
-    canvas.setAttribute('style', 'pointer-events: auto;');
-    // mouse listeners
-    canvas.addEventListener('mousedown', onMouch);
-    canvas.addEventListener('mousemove', onMouch);
-    canvas.addEventListener('mouseup', onMouch);
-    canvas.addEventListener('mouseout', onMouch);
-    canvas.addEventListener('mousewheel', onMouch);
-    canvas.addEventListener('DOMMouseScroll', onMouch);
-    canvas.addEventListener('dblclick', onMouch);
-    // touch listeners
-    canvas.addEventListener('touchstart', onMouch);
-    canvas.addEventListener('touchmove', onMouch);
-    canvas.addEventListener('touchend', onMouch);
+  this.attachLayer = function (layer) {
+    layer.activate();
+    // interaction events
+    var names = dwv.gui.interactionEventNames;
+    for (var i = 0; i < names.length; ++i) {
+      layer.addEventListener(names[i], onMouch);
+    }
   };
 
   /**
    * Remove canvas mouse and touch listeners.
    *
-   * @param {object} canvas The canvas to stop listening to.
+   * @param {object} layer The layer to stop listening to.
    */
-  this.removeCanvasListeners = function (canvas) {
-    // disable pointer events
-    canvas.setAttribute('style', 'pointer-events: none;');
-    // mouse listeners
-    canvas.removeEventListener('mousedown', onMouch);
-    canvas.removeEventListener('mousemove', onMouch);
-    canvas.removeEventListener('mouseup', onMouch);
-    canvas.removeEventListener('mouseout', onMouch);
-    canvas.removeEventListener('mousewheel', onMouch);
-    canvas.removeEventListener('DOMMouseScroll', onMouch);
-    canvas.removeEventListener('dblclick', onMouch);
-    // touch listeners
-    canvas.removeEventListener('touchstart', onMouch);
-    canvas.removeEventListener('touchmove', onMouch);
-    canvas.removeEventListener('touchend', onMouch);
+  this.detachLayer = function (layer) {
+    layer.deactivate();
+    // interaction events
+    var names = dwv.gui.interactionEventNames;
+    for (var i = 0; i < names.length; ++i) {
+      layer.removeEventListener(names[i], onMouch);
+    }
   };
 
   /**
@@ -2961,9 +3277,9 @@ dwv.ToolboxController = function (toolList) {
     var offsets = null;
     var position = null;
     if (event.type === 'touchstart' ||
-            event.type === 'touchmove') {
+      event.type === 'touchmove') {
       // event offset(s)
-      offsets = dwv.html.getEventOffset(event);
+      offsets = dwv.gui.getEventOffset(event);
       // should have at least one offset
       event._xs = offsets[0].x;
       event._ys = offsets[0].y;
@@ -2981,13 +3297,12 @@ dwv.ToolboxController = function (toolList) {
       // set handle event flag
       handled = true;
     } else if (event.type === 'mousemove' ||
-            event.type === 'mousedown' ||
-            event.type === 'mouseup' ||
-            event.type === 'mouseout' ||
-            event.type === 'mousewheel' ||
-            event.type === 'dblclick' ||
-            event.type === 'DOMMouseScroll') {
-      offsets = dwv.html.getEventOffset(event);
+      event.type === 'mousedown' ||
+      event.type === 'mouseup' ||
+      event.type === 'mouseout' ||
+      event.type === 'wheel' ||
+      event.type === 'dblclick') {
+      offsets = dwv.gui.getEventOffset(event);
       event._xs = offsets[0].x;
       event._ys = offsets[0].y;
       position = displayToIndexConverter(offsets[0]);
@@ -2996,7 +3311,7 @@ dwv.ToolboxController = function (toolList) {
       // set handle event flag
       handled = true;
     } else if (event.type === 'keydown' ||
-                event.type === 'touchend') {
+      event.type === 'touchend') {
       handled = true;
     }
 
@@ -3028,6 +3343,18 @@ dwv.ViewController = function (view) {
   var self = this;
   // Slice/frame player ID (created by setInterval)
   var playerID = null;
+
+  /**
+   * Initialise the controller.
+   */
+  this.initialise = function () {
+    // set window/level to first preset
+    this.setWindowLevelPresetById(0);
+    // default position
+    this.setCurrentPosition2D(0, 0);
+    // default frame
+    this.setCurrentFrame(0);
+  };
 
   /**
    * Get the window/level presets names.
@@ -3085,13 +3412,93 @@ dwv.ViewController = function (view) {
   };
 
   /**
+   * Get the current spacing.
+   *
+   * @returns {Array} The 2D spacing.
+   */
+  this.get2DSpacing = function () {
+    var spacing = view.getImage().getGeometry().getSpacing();
+    return [spacing.getColumnSpacing(), spacing.getRowSpacing()];
+  };
+
+  /**
+   * Get some values from the associated image in a region.
+   *
+   * @param {dwv.math.Point2D} min Minimum point.
+   * @param {dwv.math.Point2D} max Maximum point.
+   * @returns {Array} A list of values.
+   */
+  this.getImageRegionValues = function (min, max) {
+    var iter = dwv.image.getRegionSliceIterator(
+      view.getImage(),
+      this.getCurrentPosition().k,
+      this.getCurrentFrame(),
+      true, min, max
+    );
+    var values = [];
+    if (iter) {
+      values = dwv.image.getIteratorValues(iter);
+    }
+    return values;
+  };
+
+  /**
+   * Get some values from the associated image in variable regions.
+   *
+   * @param {Array} regions A list of regions.
+   * @returns {Array} A list of values.
+   */
+  this.getImageVariableRegionValues = function (regions) {
+    var iter = dwv.image.getVariableRegionSliceIterator(
+      view.getImage(),
+      this.getCurrentPosition().k,
+      this.getCurrentFrame(),
+      true, regions
+    );
+    var values = [];
+    if (iter) {
+      values = dwv.image.getIteratorValues(iter);
+    }
+    return values;
+  };
+
+  /**
+   * Can the image values be quantified?
+   *
+   * @returns {boolean} True if possible.
+   */
+  this.canQuantifyImage = function () {
+    return view.getImage().getNumberOfComponents() === 1;
+  };
+
+  /**
+   * Can window and level be applied to the data?
+   *
+   * @returns {boolean} True if the data is monochrome.
+   */
+  this.canWindowLevel = function () {
+    return view.getImage().getPhotometricInterpretation()
+      .match(/MONOCHROME/) !== null;
+  };
+
+  /**
+   * Is the data mono-frame?
+   *
+   * @returns {boolean} True if the data only contains one frame.
+   */
+  this.isMonoFrameData = function () {
+    return view.getImage().getNumberOfFrames() === 1;
+  };
+
+  /**
    * Set the current position.
    *
    * @param {object} pos The position.
+   * @param {boolean} silent If true, does not fire a slicechange event.
    * @returns {boolean} False if not in bounds.
    */
-  this.setCurrentPosition = function (pos) {
-    return view.setCurrentPosition(pos);
+  this.setCurrentPosition = function (pos, silent) {
+    return view.setCurrentPosition(pos, silent);
   };
 
   /**
@@ -3335,43 +3742,89 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
   };
 
   /**
-   * Dump the DICOM tags to an array.
+   * Dump the DICOM tags to an object.
    *
    * @returns {object} The DICOM tags as an object.
    */
   this.dumpToObject = function () {
     var keys = Object.keys(dicomElements);
-    var dict = dwv.dicom.dictionary;
     var obj = {};
     var dicomElement = null;
-    var dictElement = null;
-    var row = null;
     for (var i = 0, leni = keys.length; i < leni; ++i) {
       dicomElement = dicomElements[keys[i]];
-      row = {};
-      // dictionnary entry (to get name)
-      dictElement = null;
-      if (typeof dict[dicomElement.tag.group] !== 'undefined' &&
-          typeof dict[dicomElement.tag.group][dicomElement.tag.element] !==
-          'undefined') {
-        dictElement = dict[dicomElement.tag.group][dicomElement.tag.element];
-      }
-      // name
-      var name = 'Unknown Tag & Data';
-      if (dictElement !== null) {
-        name = dictElement[2];
-      }
-      // value
-      row.value = this.getElementValueAsString(dicomElement);
-      // others
-      row.group = dicomElement.tag.group;
-      row.element = dicomElement.tag.element;
-      row.vr = dicomElement.vr;
-      row.vl = dicomElement.vl;
-
-      obj[name] = row;
+      obj[this.getTagName(dicomElement.tag)] =
+        this.getElementAsObject(dicomElement);
     }
     return obj;
+  };
+
+  /**
+   * Get a tag string name from the dictionary.
+   *
+   * @param {object} tag The DICOM tag object.
+   * @returns {string} The tag name.
+   */
+  this.getTagName = function (tag) {
+    var dict = dwv.dicom.dictionary;
+    // dictionnary entry
+    var dictElement = null;
+    if (typeof dict[tag.group] !== 'undefined' &&
+      typeof dict[tag.group][tag.element] !== 'undefined') {
+      dictElement = dict[tag.group][tag.element];
+    }
+    // name
+    var name = 'Unknown Tag & Data';
+    if (dictElement !== null) {
+      name = dictElement[2];
+    }
+    return name;
+  };
+
+  /**
+   * Get a DICOM element as a simple object.
+   *
+   * @param {object} dicomElement The DICOM element.
+   * @returns {object} The element as a simple object.
+   */
+  this.getElementAsObject = function (dicomElement) {
+    // element value
+    var value = null;
+
+    var isPixel = dicomElement.tag.group === '0x7FE0' &&
+      dicomElement.tag.element === '0x0010';
+
+    var vr = dicomElement.vr;
+    if (vr === 'SQ' &&
+      typeof dicomElement.value !== 'undefined' &&
+      !isPixel) {
+      value = [];
+      var items = dicomElement.value;
+      var itemValues = null;
+      for (var i = 0; i < items.length; ++i) {
+        itemValues = {};
+        var keys = Object.keys(items[i]);
+        for (var k = 0; k < keys.length; ++k) {
+          var itemElement = items[i][keys[k]];
+          var key = this.getTagName(itemElement.tag);
+          // do not inclure Item elements
+          if (key !== 'Item') {
+            itemValues[key] = this.getElementAsObject(itemElement);
+          }
+        }
+        value.push(itemValues);
+      }
+    } else {
+      value = this.getElementValueAsString(dicomElement);
+    }
+
+    // return
+    return {
+      value: value,
+      group: dicomElement.tag.group,
+      element: dicomElement.tag.element,
+      vr: vr,
+      vl: dicomElement.vl
+    };
   };
 
   /**
@@ -3837,7 +4290,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.28.1';
+  return '0.29.0';
 };
 
 /**
@@ -4045,6 +4498,29 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
    */
   this.readInt32 = function (byteOffset) {
     return view.getInt32(byteOffset, isLittleEndian);
+  };
+  /**
+   * Read binary (0/1) array.
+   *
+   * @param {number} byteOffset The offset to start reading from.
+   * @param {number} size The size of the array.
+   * @returns {Array} The read data.
+   */
+  this.readBinaryArray = function (byteOffset, size) {
+    // input
+    var bitArray = new Uint8Array(buffer, byteOffset, size);
+    // result
+    var byteArrayLength = 8 * bitArray.length;
+    var data = new Uint8Array(byteArrayLength);
+    var bitNumber = 0;
+    var bitIndex = 0;
+    for (var i = 0; i < byteArrayLength; ++i) {
+      bitNumber = i % 8;
+      bitIndex = Math.floor(i / 8);
+      // see https://stackoverflow.com/questions/4854207/get-a-specific-bit-from-byte/4854257
+      data[i] = 255 * ((bitArray[bitIndex] & (1 << bitNumber)) !== 0);
+    }
+    return data;
   };
   /**
    * Read Uint8 array.
@@ -4704,11 +5180,6 @@ dwv.dicom.getDataElementPrefixByteSize = function (vr, isImplicit) {
  * @class
  */
 dwv.dicom.DicomParser = function () {
-  // check logger
-  if (typeof dwv.logger === 'undefined') {
-    dwv.logger = dwv.utils.logger.console;
-  }
-
   /**
    * The list of DICOM elements.
    *
@@ -4990,7 +5461,9 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
       );
     }
     // read
-    if (bitsAllocated === 8) {
+    if (bitsAllocated === 1) {
+      data = reader.readBinaryArray(offset, vl);
+    } else if (bitsAllocated === 8) {
       if (pixelRepresentation === 0) {
         data = reader.readUint8Array(offset, vl);
       } else {
@@ -5014,6 +5487,8 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
       } else {
         data = reader.readInt64Array(offset, vl);
       }
+    } else {
+      throw new Error('Unsupported bits allocated: ' + bitsAllocated);
     }
     offset += vl;
   } else if (vr === 'OB') {
@@ -5392,7 +5867,6 @@ dwv.dicom.getDwvUIDPrefix = function () {
  * @see http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_9.html
  * @see http://dicomiseasy.blogspot.com/2011/12/chapter-4-dicom-objects-in-chapter-3.html
  * @see https://stackoverflow.com/questions/46304306/how-to-generate-unique-dicom-uid
- *
  * @param {string} tagName The input tag.
  * @returns {string} The corresponding UID.
  */
@@ -5654,6 +6128,30 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian) {
 };
 
 /**
+ * Write a boolean array as binary.
+ *
+ * @param {number} byteOffset The offset to start writing from.
+ * @param {Array} array The array to write.
+ * @returns {number} The new offset position.
+ */
+dwv.dicom.DataWriter.prototype.writeBinaryArray = function (byteOffset, array) {
+  if (array.length % 8 !== 0) {
+    throw new Error('Cannot write boolean array as binary.');
+  }
+  var byte = null;
+  var val = null;
+  for (var i = 0, len = array.length; i < len; i += 8) {
+    byte = 0;
+    for (var j = 0; j < 8; ++j) {
+      val = array[i + j] === 0 ? 0 : 1;
+      byte += val << j;
+    }
+    byteOffset = this.writeUint8(byteOffset, byte);
+  }
+  return byteOffset;
+};
+
+/**
  * Write Uint8 array.
  *
  * @param {number} byteOffset The offset to start writing from.
@@ -5844,16 +6342,22 @@ dwv.dicom.DataWriter.prototype.writeDataElementItems = function (
  * Write data with a specific Value Representation (VR).
  *
  * @param {string} vr The data Value Representation (VR).
+ * @param {string} vl The data Value Length (VL).
  * @param {number} byteOffset The offset to start writing from.
  * @param {Array} value The array to write.
  * @param {boolean} isImplicit Is the DICOM VR implicit?
  * @returns {number} The new offset position.
  */
 dwv.dicom.DataWriter.prototype.writeDataElementValue = function (
-  vr, byteOffset, value, isImplicit) {
+  vr, vl, byteOffset, value, isImplicit) {
   // first check input type to know how to write
   if (value instanceof Uint8Array) {
-    byteOffset = this.writeUint8Array(byteOffset, value);
+    // binary data has been expanded 8 times at read
+    if (value.length === 8 * vl) {
+      byteOffset = this.writeBinaryArray(byteOffset, value);
+    } else {
+      byteOffset = this.writeUint8Array(byteOffset, value);
+    }
   } else if (value instanceof Int8Array) {
     byteOffset = this.writeInt8Array(byteOffset, value);
   } else if (value instanceof Uint16Array) {
@@ -5929,7 +6433,7 @@ dwv.dicom.DataWriter.prototype.writePixelDataElementValue = function (
     }
     // write
     byteOffset = this.writeDataElementValue(
-      vr, byteOffset, finalValue, isImplicit);
+      vr, vl, byteOffset, finalValue, isImplicit);
   } else {
     // pixel data as sequence
     var item = {};
@@ -6026,7 +6530,7 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (
       element.vr, element.vl, byteOffset, value, isImplicit);
   } else {
     byteOffset = this.writeDataElementValue(
-      element.vr, byteOffset, value, isImplicit);
+      element.vr, element.vl, byteOffset, value, isImplicit);
   }
 
   // sequence delimitation item for sequence with implicit length
@@ -10828,18 +11332,324 @@ dwv.dicom.TagGroups = {
 // namespaces
 var dwv = dwv || {};
 dwv.gui = dwv.gui || {};
+
+/**
+ * The Konva namespace.
+ *
+ * @external Konva
+ * @see https://konvajs.org/
+ */
+var Konva = Konva || {};
+
+/**
+ * Draw layer.
+ *
+ * @param {object} containerDiv The layer div.
+ * @class
+ */
+dwv.gui.DrawLayer = function (containerDiv) {
+
+  // specific css class name
+  containerDiv.className += ' drawLayer';
+
+  // konva stage
+  var konvaStage = null;
+  // konva layer
+  var konvaLayer;
+
+  /**
+   * The layer size as {x,y}.
+   *
+   * @private
+   * @type {object}
+   */
+  var layerSize;
+
+  /**
+   * The draw controller.
+   *
+   * @private
+   * @type {object}
+   */
+  var drawController = null;
+
+  /**
+   * Listener handler.
+   *
+   * @type {object}
+   * @private
+   */
+  var listenerHandler = new dwv.utils.ListenerHandler();
+
+  /**
+   * Get the Konva stage.
+   *
+   * @returns {object} The stage.
+   */
+  this.getKonvaStage = function () {
+    return konvaStage;
+  };
+
+  /**
+   * Get the Konva layer.
+   *
+   * @returns {object} The layer.
+   */
+  this.getKonvaLayer = function () {
+    return konvaLayer;
+  };
+
+  /**
+   * Get the draw controller.
+   *
+   * @returns {object} The controller.
+   */
+  this.getDrawController = function () {
+    return drawController;
+  };
+
+  // common layer methods [start] ---------------
+
+  /**
+   * Get the layer size.
+   *
+   * @returns {object} The size as {x,y}.
+   */
+  this.getSize = function () {
+    return layerSize;
+  };
+
+  /**
+   * Get the layer opacity.
+   *
+   * @returns {number} The opacity ([0:1] range).
+   */
+  this.getOpacity = function () {
+    return konvaStage.opacity();
+  };
+
+  /**
+   * Set the layer opacity.
+   *
+   * @param {number} alpha The opacity ([0:1] range).
+   */
+  this.setOpacity = function (alpha) {
+    konvaStage.opacity(Math.min(Math.max(alpha, 0), 1));
+  };
+
+  /**
+   * Set the layer scale.
+   *
+   * @param {object} newScale The scale as {x,y}.
+   */
+  this.setScale = function (newScale) {
+    konvaStage.scale(newScale);
+    // update labels
+    updateLabelScale(newScale);
+  };
+
+  /**
+   * Set the layer offset.
+   *
+   * @param {object} newOffset The offset as {x,y}.
+   */
+  this.setOffset = function (newOffset) {
+    konvaStage.offset(newOffset);
+  };
+
+  /**
+   * Set the layer z-index.
+   *
+   * @param {number} index The index.
+   */
+  this.setZIndex = function (index) {
+    containerDiv.style.zIndex = index;
+  };
+
+  /**
+   * Resize the layer: update the window scale and layer sizes.
+   *
+   * @param {object} newScale The layer scale as {x,y}.
+   */
+  this.resize = function (newScale) {
+    // resize stage
+    konvaStage.setWidth(parseInt(layerSize.x * newScale.x, 10));
+    konvaStage.setHeight(parseInt(layerSize.y * newScale.y, 10));
+    // set scale
+    this.setScale(newScale);
+  };
+
+  /**
+   * Display the layer.
+   *
+   * @param {boolean} flag Whether to display the layer or not.
+   */
+  this.display = function (flag) {
+    containerDiv.style.display = flag ? '' : 'none';
+  };
+
+  /**
+   * Check if the layer is visible.
+   *
+   * @returns {boolean} True if the layer is visible.
+   */
+  this.isVisible = function () {
+    return containerDiv.style.display === '';
+  };
+
+  /**
+   * Draw the content (imageData) of the layer.
+   * The imageData variable needs to be set
+   */
+  this.draw = function () {
+    konvaStage.draw();
+  };
+
+  /**
+   * Initialise the layer: set the canvas and context
+   *
+   * @param {object} image The image.
+   * @param {object} _metaData The image meta data.
+   */
+  this.initialise = function (image, _metaData) {
+    // get sizes
+    var size = image.getGeometry().getSize();
+    layerSize = {
+      x: size.getNumberOfColumns(),
+      y: size.getNumberOfRows()
+    };
+
+    // create stage
+    konvaStage = new Konva.Stage({
+      container: containerDiv,
+      width: layerSize.x,
+      height: layerSize.y,
+      listening: false
+    });
+    // reset style
+    // (avoids a not needed vertical scrollbar)
+    konvaStage.getContent().setAttribute('style', '');
+
+    // create layer
+    konvaLayer = new Konva.Layer({
+      listening: false,
+      visible: true
+    });
+    konvaStage.add(konvaLayer);
+
+    // create draw controller
+    drawController = new dwv.DrawController(konvaLayer);
+  };
+
+  /**
+   * Update the layer position.
+   *
+   * @param {object} pos The new position.
+   */
+  this.updatePosition = function (pos) {
+    this.getDrawController().activateDrawLayer(pos[0], pos[1]);
+  };
+
+  /**
+   * Activate the layer: propagate events.
+   */
+  this.activate = function () {
+    konvaStage.listening(true);
+    // allow pointer events
+    containerDiv.style.pointerEvents = 'auto';
+    // interaction events
+    var names = dwv.gui.interactionEventNames;
+    for (var i = 0; i < names.length; ++i) {
+      containerDiv.addEventListener(names[i], fireEvent);
+    }
+  };
+
+  /**
+   * Deactivate the layer: stop propagating events.
+   */
+  this.deactivate = function () {
+    konvaStage.listening(false);
+    // disable pointer events
+    containerDiv.style.pointerEvents = 'none';
+    // interaction events
+    var names = dwv.gui.interactionEventNames;
+    for (var i = 0; i < names.length; ++i) {
+      containerDiv.removeEventListener(names[i], fireEvent);
+    }
+  };
+
+  /**
+   * Add an event listener to this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type, will be called with the fired event.
+   */
+  this.addEventListener = function (type, callback) {
+    listenerHandler.add(type, callback);
+  };
+
+  /**
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type.
+   */
+  this.removeEventListener = function (type, callback) {
+    listenerHandler.remove(type, callback);
+  };
+
+  /**
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
+   * @private
+   */
+  function fireEvent(event) {
+    listenerHandler.fireEvent(event);
+  }
+
+  // common layer methods [end] ---------------
+
+  /**
+   * Update label scale: compensate for it so
+   *   that label size stays visually the same.
+   *
+   * @param {object} scale The scale to compensate for
+   */
+  function updateLabelScale(scale) {
+    // same formula as in style::applyZoomScale:
+    // compensate for scale and times 2 so that font 10 looks like a 10
+    var ratioX = 2 / scale.x;
+    var ratioY = 2 / scale.y;
+    // compensate scale for labels
+    var labels = konvaStage.find('Label');
+    for (var i = 0; i < labels.length; ++i) {
+      labels[i].scale({x: ratioX, y: ratioY});
+    }
+  }
+}; // DrawLayer class
+
+// namespaces
+var dwv = dwv || {};
+dwv.gui = dwv.gui || {};
 dwv.gui.base = dwv.gui.base || {};
 
 /**
- * Ask some text to the user.
- *
- * @param {string} message Text to display to the user.
- * @param {string} defaultText Default value displayed in the text input field.
- * @returns {string} Text entered by the user.
+ * List of interaction event names.
  */
-dwv.gui.base.prompt = function (message, defaultText) {
-  return prompt(message, defaultText);
-};
+dwv.gui.interactionEventNames = [
+  'mousedown',
+  'mousemove',
+  'mouseup',
+  'mouseout',
+  'wheel',
+  'dblclick',
+  'touchstart',
+  'touchmove',
+  'touchend'
+];
 
 /**
  * Get a HTML element associated to a container div.
@@ -10865,369 +11675,31 @@ dwv.gui.base.getElement = function (containerDivId, name) {
   return element;
 };
 
-// namespaces
-var dwv = dwv || {};
-dwv.html = dwv.html || {};
-
 /**
- * Window layer.
+ * Get the size available for a div.
  *
- * @class
- * @param {object} canvas The associated canvas.
+ * @param {object} div The input div.
+ * @returns {object} The available width and height as {x,y}.
  */
-dwv.html.Layer = function (canvas) {
-  /**
-   * A cache of the initial canvas.
-   *
-   * @private
-   * @type {object}
-   */
-  var cacheCanvas = null;
-  /**
-   * The associated CanvasRenderingContext2D.
-   *
-   * @private
-   * @type {object}
-   */
-  var context = null;
-
-  /**
-   * Get the layer canvas.
-   *
-   * @returns {object} The layer canvas.
-   */
-  this.getCanvas = function () {
-    return canvas;
-  };
-  /**
-   * Get the layer context.
-   *
-   * @returns {object} The layer context.
-   */
-  this.getContext = function () {
-    return context;
-  };
-  /**
-   * Get the layer offset on page.
-   *
-   * @returns {number} The layer offset on page.
-   */
-  this.getOffset = function () {
-    return canvas.offset();
-  };
-
-  /**
-   * The image data array.
-   *
-   * @private
-   * @type {Array}
-   */
-  var imageData = null;
-
-  /**
-   * The layer origin.
-   *
-   * @private
-   * @type {object}
-   */
-  var origin = {x: 0, y: 0};
-  /**
-   * Get the layer origin.
-   *
-   * @returns {object} The layer origin as {'x','y'}.
-   */
-  this.getOrigin = function () {
-    return origin;
-  };
-  /**
-   * The layer zoom.
-   *
-   * @private
-   * @type {object}
-   */
-  var zoom = {x: 1, y: 1};
-  /**
-   * Get the layer zoom.
-   *
-   * @returns {object} The layer zoom as {'x','y'}.
-   */
-  this.getZoom = function () {
-    return zoom;
-  };
-
-  /**
-   * The layer translation.
-   *
-   * @private
-   * @type {object}
-   */
-  var trans = {x: 0, y: 0};
-  /**
-   * Get the layer translation.
-   *
-   * @returns {object} The layer translation as {'x','y'}.
-   */
-  this.getTrans = function () {
-    return trans;
-  };
-
-  /**
-   * Set the canvas width.
-   *
-   * @param {number} width The new width.
-   */
-  this.setWidth = function (width) {
-    canvas.width = width;
-  };
-  /**
-   * Set the canvas height.
-   *
-   * @param {number} height The new height.
-   */
-  this.setHeight = function (height) {
-    canvas.height = height;
-  };
-
-  /**
-   * Set the layer zoom.
-   *
-   * @param {number} newZoomX The zoom in the X direction.
-   * @param {number} newZoomY The zoom in the Y direction.
-   * @param {number} centerX The zoom center in the X direction.
-   * @param {number} centerY The zoom center in the Y direction.
-   */
-  this.zoom = function (newZoomX, newZoomY, centerX, centerY) {
-    // The zoom is the ratio between the differences from the center
-    // to the origins:
-    // centerX - originX = ( centerX - originX0 ) * zoomX
-    // (center in ~world coordinate system)
-    //originX = (centerX / zoomX) + originX - (centerX / newZoomX);
-    //originY = (centerY / zoomY) + originY - (centerY / newZoomY);
-
-    // center in image coordinate system
-    origin.x = centerX - (centerX - origin.x) * (newZoomX / zoom.x);
-    origin.y = centerY - (centerY - origin.y) * (newZoomY / zoom.y);
-
-    // save zoom
-    zoom.x = newZoomX;
-    zoom.y = newZoomY;
-  };
-
-  /**
-   * Set the layer translation.
-   * Translation is according to the last one.
-   *
-   * @param {number} tx The translation in the X direction.
-   * @param {number} ty The translation in the Y direction.
-   */
-  this.translate = function (tx, ty) {
-    trans.x = tx;
-    trans.y = ty;
-  };
-
-  /**
-   * Set the image data array.
-   *
-   * @param {Array} data The data array.
-   */
-  this.setImageData = function (data) {
-    imageData = data;
-    // update the cached canvas
-    cacheCanvas.getContext('2d').putImageData(imageData, 0, 0);
-  };
-
-  /**
-   * Reset the layout.
-   *
-   * @param {number} izoom The input zoom.
-   */
-  this.resetLayout = function (izoom) {
-    origin.x = 0;
-    origin.y = 0;
-    zoom.x = izoom;
-    zoom.y = izoom;
-    trans.x = 0;
-    trans.y = 0;
-  };
-
-  /**
-   * Transform a display position to an index.
-   *
-   * @param {dwv.Math.Point2D} point2D The point to convert.
-   * @returns {object} The equivalent index.
-   */
-  this.displayToIndex = function (point2D) {
-    return {x: ((point2D.x - origin.x) / zoom.x) - trans.x,
-      y: ((point2D.y - origin.y) / zoom.y) - trans.y};
-  };
-
-  /**
-   * Draw the content (imageData) of the layer.
-   * The imageData variable needs to be set
-   */
-  this.draw = function () {
-    // clear the context: reset the transform first
-    // store the current transformation matrix
-    context.save();
-    // use the identity matrix while clearing the canvas
-    context.setTransform(1, 0, 0, 1, 0, 0);
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    // restore the transform
-    context.restore();
-
-    // draw the cached canvas on the context
-    // transform takes as input a, b, c, d, e, f to create
-    // the transform matrix (column-major order):
-    // [ a c e ]
-    // [ b d f ]
-    // [ 0 0 1 ]
-    context.setTransform(zoom.x, 0, 0, zoom.y,
-      origin.x + (trans.x * zoom.x),
-      origin.y + (trans.y * zoom.y));
-
-    // disable smoothing (set just before draw, could be reset by resize)
-    context.imageSmoothingEnabled = false;
-    // draw image
-    context.drawImage(cacheCanvas, 0, 0);
-  };
-
-  /**
-   * Initialise the layer: set the canvas and context
-   *
-   * @param {number} inputWidth The width of the canvas.
-   * @param {number} inputHeight The height of the canvas.
-   */
-  this.initialise = function (inputWidth, inputHeight) {
-    // find the canvas element
-    //canvas = document.getElementById(name);
-    //if (!canvas)
-    //{
-    //    alert("Error: cannot find the canvas element for '" + name + "'.");
-    //    return;
-    //}
-    // check that the getContext method exists
-    if (!canvas.getContext) {
-      alert('Error: no canvas.getContext method.');
-      return;
+dwv.gui.getDivSize = function (div) {
+  var parent = div.parentNode;
+  // offsetHeight: height of an element, including vertical padding
+  // and borders
+  // ref: https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetHeight
+  var height = parent.offsetHeight;
+  // remove the height of other elements of the container div
+  var kids = parent.children;
+  for (var i = 0; i < kids.length; ++i) {
+    if (!kids[i].classList.contains(div.className)) {
+      var styles = window.getComputedStyle(kids[i]);
+      // offsetHeight does not include margin
+      var margin = parseFloat(styles.getPropertyValue('margin-top'), 10) +
+             parseFloat(styles.getPropertyValue('margin-bottom'), 10);
+      height -= (kids[i].offsetHeight + margin);
     }
-    // get the 2D context
-    context = canvas.getContext('2d');
-    if (!context) {
-      alert('Error: failed to get the 2D context.');
-      return;
-    }
-    // canvas sizes
-    canvas.width = inputWidth;
-    canvas.height = inputHeight;
-    // original empty image data array
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-    // cached canvas
-    cacheCanvas = document.createElement('canvas');
-    cacheCanvas.width = inputWidth;
-    cacheCanvas.height = inputHeight;
-  };
-
-  /**
-   * Fill the full context with the current style.
-   */
-  this.fillContext = function () {
-    context.fillRect(0, 0, canvas.width, canvas.height);
-  };
-
-  /**
-   * Clear the context and reset the image data.
-   */
-  this.clear = function () {
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-    this.resetLayout();
-  };
-
-  /**
-   * Merge two layers.
-   *
-   * @param {dwv.html.Layer} layerToMerge The layer to merge.
-   *   It will also be emptied.
-   */
-  this.merge = function (layerToMerge) {
-    // basic resampling of the merge data to put it at zoom 1:1
-    var mergeImageData = layerToMerge.getContext().getImageData(
-      0, 0, canvas.width, canvas.height);
-    var offMerge = 0;
-    var offMergeJ = 0;
-    var offThis = 0;
-    var offThisJ = 0;
-    var alpha = 0;
-    for (var j = 0; j < canvas.height; ++j) {
-      offMergeJ = parseInt((origin.y + j * zoom.y), 10) * canvas.width;
-      offThisJ = j * canvas.width;
-      for (var i = 0; i < canvas.width; ++i) {
-        // 4 component data: RGB + alpha
-        offMerge = 4 * (parseInt((origin.x + i * zoom.x), 10) + offMergeJ);
-        offThis = 4 * (i + offThisJ);
-        // merge non transparent
-        alpha = mergeImageData.data[offMerge + 3];
-        if (alpha !== 0) {
-          imageData.data[offThis] = mergeImageData.data[offMerge];
-          imageData.data[offThis + 1] = mergeImageData.data[offMerge + 1];
-          imageData.data[offThis + 2] = mergeImageData.data[offMerge + 2];
-          imageData.data[offThis + 3] = alpha;
-        }
-      }
-    }
-    // empty and reset merged layer
-    layerToMerge.clear();
-    // draw the layer
-    this.draw();
-  };
-
-  /**
-   * Set the line colour for the layer.
-   *
-   * @param {string} colour The line colour.
-   */
-  this.setLineColour = function (colour) {
-    context.fillStyle = colour;
-    context.strokeStyle = colour;
-  };
-
-  /**
-   * Display the layer.
-   *
-   * @param {boolean} val Whether to display the layer or not.
-   */
-  this.setStyleDisplay = function (val) {
-    if (val === true) {
-      canvas.style.display = '';
-    } else {
-      canvas.style.display = 'none';
-    }
-  };
-
-  /**
-   * Check if the layer is visible.
-   *
-   * @returns {boolean} True if the layer is visible.
-   */
-  this.isVisible = function () {
-    if (canvas.style.display === 'none') {
-      return false;
-    } else {
-      return true;
-    }
-  };
-
-  /**
-   * Align on another layer.
-   *
-   * @param {dwv.html.Layer} rhs The layer to align on.
-   */
-  this.align = function (rhs) {
-    canvas.style.top = rhs.getCanvas().offsetTop;
-    canvas.style.left = rhs.getCanvas().offsetLeft;
-  };
-}; // Layer class
+  }
+  return {x: parent.offsetWidth, y: height};
+};
 
 /**
  * Get the positions (without the parent offset) of a list of touch events.
@@ -11235,7 +11707,7 @@ dwv.html.Layer = function (canvas) {
  * @param {Array} touches The list of touch events.
  * @returns {Array} The list of positions of the touch events.
  */
-dwv.html.getTouchesPositions = function (touches) {
+dwv.gui.getTouchesPositions = function (touches) {
   // get the touch offset from all its parents
   var offsetLeft = 0;
   var offsetTop = 0;
@@ -11271,16 +11743,16 @@ dwv.html.getTouchesPositions = function (touches) {
  * @param {object} event The event to get the offset from.
  * @returns {Array} The array of offsets.
  */
-dwv.html.getEventOffset = function (event) {
+dwv.gui.getEventOffset = function (event) {
   var positions = [];
   if (typeof event.targetTouches !== 'undefined' &&
     event.targetTouches.length !== 0) {
     // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/targetTouches
-    positions = dwv.html.getTouchesPositions(event.targetTouches);
+    positions = dwv.gui.getTouchesPositions(event.targetTouches);
   } else if (typeof event.changedTouches !== 'undefined' &&
       event.changedTouches.length !== 0) {
     // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/changedTouches
-    positions = dwv.html.getTouchesPositions(event.changedTouches);
+    positions = dwv.gui.getTouchesPositions(event.changedTouches);
   } else {
     // layerX is used by Firefox
     var ex = event.offsetX === undefined ? event.layerX : event.offsetX;
@@ -11290,23 +11762,56 @@ dwv.html.getEventOffset = function (event) {
   return positions;
 };
 
+/**
+ * Test if a canvas with the input size can be created.
+ *
+ * @see https://github.com/ivmartel/dwv/issues/902
+ * @see https://github.com/jhildenbiddle/canvas-size/blob/v1.2.4/src/canvas-test.js
+ * @param {number} width The canvas width.
+ * @param {number} height The canvas height.
+ * @returns {boolean} True is the canvas can be created.
+ */
+dwv.gui.canCreateCanvas = function (width, height) {
+  // test canvas with input size
+  var testCvs = document.createElement('canvas');
+  testCvs.width = width;
+  testCvs.height = height;
+  // crop canvas to speed up test
+  var cropCvs = document.createElement('canvas');
+  cropCvs.width = 1;
+  cropCvs.height = 1;
+  // contexts
+  var testCtx = testCvs.getContext('2d');
+  var cropCtx = cropCvs.getContext('2d');
+  // set data
+  if (testCtx) {
+    testCtx.fillRect(width - 1, height - 1, 1, 1);
+    // Render the test pixel in the bottom-right corner of the
+    // test canvas in the top-left of the 1x1 crop canvas. This
+    // dramatically reducing the time for getImageData to complete.
+    cropCtx.drawImage(testCvs, width - 1, height - 1, 1, 1, 0, 0, 1, 1);
+  }
+  // Verify image data (alpha component, Pass = 255, Fail = 0)
+  return cropCtx && cropCtx.getImageData(0, 0, 1, 1).data[3] !== 0;
+};
+
 // namespaces
 var dwv = dwv || {};
-dwv.html = dwv.html || {};
+dwv.gui = dwv.gui || {};
 
 /**
  * Style class.
  *
  * @class
  */
-dwv.html.Style = function () {
+dwv.gui.Style = function () {
   /**
    * Font size.
    *
    * @private
    * @type {number}
    */
-  var fontSize = 12;
+  var fontSize = 10;
   /**
    * Font family.
    *
@@ -11329,12 +11834,19 @@ dwv.html.Style = function () {
    */
   var lineColour = '#ffff80';
   /**
-   * Display scale.
+   * Base scale.
    *
    * @private
-   * @type {number}
+   * @type {object}
    */
-  var displayScale = 1;
+  var baseScale = {x: 1, y: 1};
+  /**
+   * Zoom scale.
+   *
+   * @private
+   * @type {object}
+   */
+  var zoomScale = {x: 1, y: 1};
   /**
    * Stroke width.
    *
@@ -11342,6 +11854,28 @@ dwv.html.Style = function () {
    * @type {number}
    */
   var strokeWidth = 2;
+
+  /**
+   * Shadow offset.
+   *
+   * @private
+   * @type {object}
+   */
+  var shadowOffset = {x: 0.25, y: 0.25};
+  /**
+   * Tag opacity.
+   *
+   * @private
+   * @type {number}
+   */
+  var tagOpacity = 0.2;
+  /**
+   * Text padding.
+   *
+   * @private
+   * @type {number}
+   */
+  var textPadding = 3;
 
   /**
    * Get the font family.
@@ -11398,23 +11932,94 @@ dwv.html.Style = function () {
   };
 
   /**
-   * Set the display scale.
+   * Set the base scale.
    *
-   * @param {string} scale The display scale.
+   * @param {number} scale The scale as {x,y}.
    */
-  this.setScale = function (scale) {
-    displayScale = scale;
+  this.setBaseScale = function (scale) {
+    baseScale = scale;
   };
 
   /**
-   * Scale an input value.
+   * Set the zoom scale.
+   *
+   * @param {object} scale The scale as {x,y}.
+   */
+  this.setZoomScale = function (scale) {
+    zoomScale = scale;
+  };
+
+  /**
+   * Get the base scale.
+   *
+   * @returns {number} The scale as {x,y}.
+   */
+  this.getBaseScale = function () {
+    return baseScale;
+  };
+
+  /**
+   * Get the zoom scale.
+   *
+   * @returns {object} The scale as {x,y}.
+   */
+  this.getZoomScale = function () {
+    return zoomScale;
+  };
+
+  /**
+   * Scale an input value using the base scale.
    *
    * @param {number} value The value to scale.
    * @returns {number} The scaled value.
    */
   this.scale = function (value) {
-    return value / displayScale;
+    // TODO: 2D?
+    return value / baseScale.x;
   };
+
+  /**
+   * Apply zoom scale on an input value.
+   *
+   * @param {number} value The value to scale.
+   * @returns {object} The scaled value as {x,y}.
+   */
+  this.applyZoomScale = function (value) {
+    // times 2 so that the font size 10 looks like a 10...
+    // (same logic as in the DrawController::updateLabelScale)
+    return {
+      x: 2 * value / zoomScale.x,
+      y: 2 * value / zoomScale.y
+    };
+  };
+
+  /**
+   * Get the shadow offset.
+   *
+   * @returns {object} The offset as {x,y}.
+   */
+  this.getShadowOffset = function () {
+    return shadowOffset;
+  };
+
+  /**
+   * Get the tag opacity.
+   *
+   * @returns {number} The opacity.
+   */
+  this.getTagOpacity = function () {
+    return tagOpacity;
+  };
+
+  /**
+   * Get the text padding.
+   *
+   * @returns {number} The padding.
+   */
+  this.getTextPadding = function () {
+    return textPadding;
+  };
+
 };
 
 /**
@@ -11422,7 +12027,7 @@ dwv.html.Style = function () {
  *
  * @returns {string} The font definition string.
  */
-dwv.html.Style.prototype.getFontStr = function () {
+dwv.gui.Style.prototype.getFontStr = function () {
   return ('normal ' + this.getFontSize() + 'px sans-serif');
 };
 
@@ -11431,7 +12036,7 @@ dwv.html.Style.prototype.getFontStr = function () {
  *
  * @returns {number} The line height.
  */
-dwv.html.Style.prototype.getLineHeight = function () {
+dwv.gui.Style.prototype.getLineHeight = function () {
   return (this.getFontSize() + this.getFontSize() / 5);
 };
 
@@ -11440,7 +12045,7 @@ dwv.html.Style.prototype.getLineHeight = function () {
  *
  * @returns {number} The scaled font size.
  */
-dwv.html.Style.prototype.getScaledFontSize = function () {
+dwv.gui.Style.prototype.getScaledFontSize = function () {
   return this.scale(this.getFontSize());
 };
 
@@ -11449,9 +12054,555 @@ dwv.html.Style.prototype.getScaledFontSize = function () {
  *
  * @returns {number} The scaled stroke width.
  */
-dwv.html.Style.prototype.getScaledStrokeWidth = function () {
+dwv.gui.Style.prototype.getScaledStrokeWidth = function () {
   return this.scale(this.getStrokeWidth());
 };
+
+/**
+ * Get the shadow line colour.
+ *
+ * @returns {string} The shadow line colour.
+ */
+dwv.gui.Style.prototype.getShadowLineColour = function () {
+  return dwv.utils.getShadowColour(this.getLineColour());
+};
+
+// namespaces
+var dwv = dwv || {};
+dwv.gui = dwv.gui || {};
+
+/**
+ * View layer.
+ *
+ * @param {object} containerDiv The layer div.
+ * @class
+ */
+dwv.gui.ViewLayer = function (containerDiv) {
+
+  // specific css class name
+  containerDiv.className += ' viewLayer';
+
+  // closure to self
+  var self = this;
+
+  /**
+   * The image view.
+   *
+   * @private
+   * @type {object}
+   */
+  var view = null;
+  /**
+   * The view controller.
+   *
+   * @private
+   * @type {object}
+   */
+  var viewController = null;
+
+  /**
+   * The base canvas.
+   *
+   * @private
+   * @type {object}
+   */
+  var canvas = null;
+  /**
+   * A cache of the initial canvas.
+   *
+   * @private
+   * @type {object}
+   */
+  var cacheCanvas = null;
+  /**
+   * The associated CanvasRenderingContext2D.
+   *
+   * @private
+   * @type {object}
+   */
+  var context = null;
+
+  /**
+   * The image data array.
+   *
+   * @private
+   * @type {Array}
+   */
+  var imageData = null;
+
+  /**
+   * The layer size as {x,y}.
+   *
+   * @private
+   * @type {object}
+   */
+  var layerSize;
+
+  /**
+   * The layer opacity.
+   *
+   * @private
+   * @type {number}
+   */
+  var opacity = 1;
+
+  /**
+   * The layer scale.
+   *
+   * @private
+   * @type {object}
+   */
+  var scale = {x: 1, y: 1};
+
+  /**
+   * The layer offset.
+   *
+   * @private
+   * @type {object}
+   */
+  var offset = {x: 0, y: 0};
+
+  /**
+   * Data update flag.
+   *
+   * @private
+   * @type {boolean}
+   */
+  var needsDataUpdate = null;
+
+  /**
+   * The associated data index.
+   *
+   * @private
+   * @type {number}
+   */
+  var dataIndex = null;
+
+  /**
+   * Listener handler.
+   *
+   * @private
+   * @type {object}
+   */
+  var listenerHandler = new dwv.utils.ListenerHandler();
+
+  /**
+   * Get the view controller.
+   *
+   * @returns {object} The controller.
+   */
+  this.getViewController = function () {
+    return viewController;
+  };
+
+  /**
+   * Get the canvas image data.
+   *
+   * @returns {object} The image data.
+   */
+  this.getImageData = function () {
+    return imageData;
+  };
+
+  /**
+   * Handle an image change event.
+   *
+   * @param {object} event The event.
+   */
+  this.onimagechange = function (event) {
+    // event.value = [index, image]
+    if (dataIndex === event.value[0]) {
+      view.setImage(event.value[1]);
+      needsDataUpdate = true;
+    }
+  };
+
+  // common layer methods [start] ---------------
+
+  /**
+   * Get the layer size.
+   *
+   * @returns {object} The size as {x,y}.
+   */
+  this.getSize = function () {
+    return layerSize;
+  };
+
+  /**
+   * Get the layer opacity.
+   *
+   * @returns {number} The opacity ([0:1] range).
+   */
+  this.getOpacity = function () {
+    return opacity;
+  };
+
+  /**
+   * Set the layer opacity.
+   *
+   * @param {number} alpha The opacity ([0:1] range).
+   */
+  this.setOpacity = function (alpha) {
+    opacity = Math.min(Math.max(alpha, 0), 1);
+  };
+
+  /**
+   * Set the layer scale.
+   *
+   * @param {object} newScale The scale as {x,y}.
+   */
+  this.setScale = function (newScale) {
+    scale = newScale;
+  };
+
+  /**
+   * Set the layer offset.
+   *
+   * @param {object} newOffset The offset as {x,y}.
+   */
+  this.setOffset = function (newOffset) {
+    offset = newOffset;
+  };
+
+  /**
+   * Set the layer z-index.
+   *
+   * @param {number} index The index.
+   */
+  this.setZIndex = function (index) {
+    containerDiv.style.zIndex = index;
+  };
+
+  /**
+   * Resize the layer: update the window scale and layer sizes.
+   *
+   * @param {object} newScale The layer scale as {x,y}.
+   */
+  this.resize = function (newScale) {
+    // resize canvas
+    canvas.width = parseInt(layerSize.x * newScale.x, 10);
+    canvas.height = parseInt(layerSize.y * newScale.y, 10);
+    // set scale
+    this.setScale(newScale);
+  };
+
+  /**
+   * Display the layer.
+   *
+   * @param {boolean} flag Whether to display the layer or not.
+   */
+  this.display = function (flag) {
+    containerDiv.style.display = flag ? '' : 'none';
+  };
+
+  /**
+   * Check if the layer is visible.
+   *
+   * @returns {boolean} True if the layer is visible.
+   */
+  this.isVisible = function () {
+    return containerDiv.style.display === '';
+  };
+
+  /**
+   * Draw the content (imageData) of the layer.
+   * The imageData variable needs to be set
+   *
+   * @fires dwv.App#renderstart
+   * @fires dwv.App#renderend
+   */
+  this.draw = function () {
+    /**
+     * Render start event.
+     *
+     * @event dwv.App#renderstart
+     * @type {object}
+     * @property {string} type The event type.
+     */
+    var event = {type: 'renderstart'};
+    fireEvent(event);
+
+    // update data if needed
+    if (needsDataUpdate) {
+      updateImageData();
+    }
+
+    // context opacity
+    context.globalAlpha = opacity;
+
+    // clear the context: reset the transform first
+    // store the current transformation matrix
+    context.save();
+    // use the identity matrix while clearing the canvas
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    // restore the transform
+    context.restore();
+
+    // draw the cached canvas on the context
+    // transform takes as input a, b, c, d, e, f to create
+    // the transform matrix (column-major order):
+    // [ a c e ]
+    // [ b d f ]
+    // [ 0 0 1 ]
+    context.setTransform(
+      scale.x,
+      0,
+      0,
+      scale.y,
+      -1 * offset.x * scale.x,
+      -1 * offset.y * scale.y
+    );
+
+    // disable smoothing (set just before draw, could be reset by resize)
+    context.imageSmoothingEnabled = false;
+    // draw image
+    context.drawImage(cacheCanvas, 0, 0);
+
+    /**
+     * Render end event.
+     *
+     * @event dwv.App#renderend
+     * @type {object}
+     * @property {string} type The event type.
+     */
+    event = {type: 'renderend'};
+    fireEvent(event);
+  };
+
+  /**
+   * Initialise the layer: set the canvas and context
+   *
+   * @param {object} image The image.
+   * @param {object} metaData The image meta data.
+   * @param {number} index The associated data index.
+   */
+  this.initialise = function (image, metaData, index) {
+    dataIndex = index;
+    // create view
+    var viewFactory = new dwv.image.ViewFactory();
+    view = viewFactory.create(
+      new dwv.dicom.DicomElementsWrapper(metaData),
+      image);
+
+    // local listeners
+    view.addEventListener('wlwidthchange', onWLChange);
+    view.addEventListener('wlcenterchange', onWLChange);
+    view.addEventListener('colourchange', onColourChange);
+    view.addEventListener('slicechange', onSliceChange);
+    view.addEventListener('framechange', onFrameChange);
+
+    // create view controller
+    viewController = new dwv.ViewController(view);
+
+    // get sizes
+    var size = image.getGeometry().getSize();
+    layerSize = {
+      x: size.getNumberOfColumns(),
+      y: size.getNumberOfRows()
+    };
+
+    // create canvas
+    canvas = document.createElement('canvas');
+    containerDiv.appendChild(canvas);
+
+    // check that the getContext method exists
+    if (!canvas.getContext) {
+      alert('Error: no canvas.getContext method.');
+      return;
+    }
+    // get the 2D context
+    context = canvas.getContext('2d');
+    if (!context) {
+      alert('Error: failed to get the 2D context.');
+      return;
+    }
+    // canvas sizes
+    canvas.width = layerSize.x;
+    canvas.height = layerSize.y;
+    // original empty image data array
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    imageData = context.createImageData(canvas.width, canvas.height);
+    // cached canvas
+    cacheCanvas = document.createElement('canvas');
+    cacheCanvas.width = canvas.width;
+    cacheCanvas.height = canvas.height;
+
+    // update data on first draw
+    needsDataUpdate = true;
+  };
+
+  /**
+   * Activate the layer: propagate events.
+   */
+  this.activate = function () {
+    // allow pointer events
+    containerDiv.style.pointerEvents = 'auto';
+    // interaction events
+    var names = dwv.gui.interactionEventNames;
+    for (var i = 0; i < names.length; ++i) {
+      containerDiv.addEventListener(names[i], fireEvent);
+    }
+  };
+
+  /**
+   * Deactivate the layer: stop propagating events.
+   */
+  this.deactivate = function () {
+    // disable pointer events
+    containerDiv.style.pointerEvents = 'none';
+    // interaction events
+    var names = dwv.gui.interactionEventNames;
+    for (var i = 0; i < names.length; ++i) {
+      containerDiv.removeEventListener(names[i], fireEvent);
+    }
+  };
+
+  /**
+   * Add an event listener to this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type, will be called with the fired event.
+   */
+  this.addEventListener = function (type, callback) {
+    listenerHandler.add(type, callback);
+  };
+
+  /**
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type.
+   */
+  this.removeEventListener = function (type, callback) {
+    listenerHandler.remove(type, callback);
+  };
+
+  /**
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
+   * @private
+   */
+  function fireEvent(event) {
+    listenerHandler.fireEvent(event);
+  }
+
+  // common layer methods [end] ---------------
+
+  /**
+   * Propagate (or not) view events.
+   *
+   * @param {boolean} flag True to propagate.
+   */
+  this.propagateViewEvents = function (flag) {
+    // view events
+    for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
+      if (flag) {
+        view.addEventListener(dwv.image.viewEventNames[j], fireEvent);
+      } else {
+        view.removeEventListener(dwv.image.viewEventNames[j], fireEvent);
+      }
+    }
+  };
+
+  /**
+   * Update the canvas image data.
+   */
+  function updateImageData() {
+    // generate image data
+    view.generateImageData(imageData);
+    // pass the data to the canvas
+    cacheCanvas.getContext('2d').putImageData(imageData, 0, 0);
+    // update data flag
+    needsDataUpdate = false;
+  }
+
+  /**
+   * Handle window/level change.
+   *
+   * @param {object} event The event fired when changing the window/level.
+   * @private
+   */
+  function onWLChange(event) {
+    // generate and draw if no skip flag
+    if (typeof event.skipGenerate === 'undefined' ||
+      event.skipGenerate === false) {
+      needsDataUpdate = true;
+      self.draw();
+    }
+  }
+
+  /**
+   * Handle colour map change.
+   *
+   * @param {object} _event The event fired when changing the colour map.
+   * @private
+   */
+  function onColourChange(_event) {
+    needsDataUpdate = true;
+    self.draw();
+  }
+
+  /**
+   * Handle frame change.
+   *
+   * @param {object} event The event fired when changing the frame.
+   * @private
+   */
+  function onFrameChange(event) {
+    // generate and draw if no skip flag
+    if (typeof event.skipGenerate === 'undefined' ||
+      event.skipGenerate === false) {
+      needsDataUpdate = true;
+      self.draw();
+    }
+  }
+
+  /**
+   * Handle slice change.
+   *
+   * @param {object} _event The event fired when changing the slice.
+   * @private
+   */
+  function onSliceChange(_event) {
+    needsDataUpdate = true;
+    self.draw();
+  }
+
+  /**
+   * Update the layer position.
+   *
+   * @param {object} pos The new position.
+   */
+  this.updatePosition = function (pos) {
+    viewController.setCurrentPosition(pos[0]);
+    viewController.setCurrentFrame(pos[1]);
+    needsDataUpdate = true;
+  };
+
+  /**
+   * Clear the context and reset the image data.
+   */
+  this.clear = function () {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    this.resetLayout();
+  };
+
+  /**
+   * Align on another layer.
+   *
+   * @param {dwv.gui.ViewLayer} rhs The layer to align on.
+   */
+  this.align = function (rhs) {
+    canvas.style.top = rhs.getCanvas().offsetTop;
+    canvas.style.left = rhs.getCanvas().offsetLeft;
+  };
+
+}; // ViewLayer class
 
 // namespaces
 var dwv = dwv || {};
@@ -12172,21 +13323,19 @@ dwv.image.getViewFromDOMImage = function (domImage, origin) {
   var imageData = ctx.getImageData(0, 0, width, height);
 
   // image properties
-  var info = [];
+  var info = {};
   if (typeof domImage.origin === 'string') {
-    info.push({name: 'origin', value: domImage.origin});
+    info['origin'] = {value: domImage.origin};
   } else {
-    info.push({name: 'fileName', value: domImage.origin.name});
-    info.push({name: 'fileType', value: domImage.origin.type});
-    info.push({
-      name: 'fileLastModifiedDate', value: domImage.origin.lastModifiedDate
-    });
+    info['fileName'] = {value: domImage.origin.name};
+    info['fileType'] = {value: domImage.origin.type};
+    info['fileLastModifiedDate'] = {value: domImage.origin.lastModifiedDate};
   }
-  info.push({name: 'imageWidth', value: width});
-  info.push({name: 'imageHeight', value: height});
+  info['imageWidth'] = {value: width};
+  info['imageHeight'] = {value: height};
 
   var sliceIndex = domImage.index ? domImage.index : 0;
-  info.push({name: 'imageUid', value: sliceIndex});
+  info['imageUid'] = {value: sliceIndex};
 
   // create view
   var imageBuffer = dwv.image.imageDataToBuffer(imageData);
@@ -12227,17 +13376,15 @@ dwv.image.getViewFromDOMVideo = function (
   var numberOfFrames = Math.floor(video.duration * frameRate);
 
   // video properties
-  var info = [];
+  var info = {};
   if (video.file) {
-    info.push({name: 'fileName', value: video.file.name});
-    info.push({name: 'fileType', value: video.file.type});
-    info.push({
-      name: 'fileLastModifiedDate', value: video.file.lastModifiedDate
-    });
+    info['fileName'] = {value: video.file.name};
+    info['fileType'] = {value: video.file.type};
+    info['fileLastModifiedDate'] = {value: video.file.lastModifiedDate};
   }
-  info.push({name: 'imageWidth', value: width});
-  info.push({name: 'imageHeight', value: height});
-  info.push({name: 'numberOfFrames', value: numberOfFrames});
+  info['imageWidth'] = {value: width};
+  info['imageHeight'] = {value: height};
+  info['numberOfFrames'] = {value: numberOfFrames};
 
   // draw the image in the canvas in order to get its data
   var canvas = document.createElement('canvas');
@@ -12285,7 +13432,11 @@ dwv.image.getViewFromDOMVideo = function (
     } else {
       image.appendFrameBuffer(imgBuffer);
     }
+    // increment index
+    ++frameIndex;
   }
+
+  var nextTime = 0;
 
   /**
    * Handle seeked event
@@ -12293,11 +13444,9 @@ dwv.image.getViewFromDOMVideo = function (
   function onseeked(/*event*/) {
     // store
     storeFrame();
-    // increment index
-    ++frameIndex;
     // set the next time
     // (not using currentTime, it seems to get offseted)
-    var nextTime = frameIndex / frameRate;
+    nextTime += 1 / frameRate;
     if (nextTime <= this.duration) {
       this.currentTime = nextTime;
     } else {
@@ -12312,8 +13461,8 @@ dwv.image.getViewFromDOMVideo = function (
     }
   }
 
-  // trigger the first seeked
-  video.currentTime = 0;
+  // trigger the first seek
+  video.currentTime = nextTime;
 };
 
 // namespaces
@@ -12626,9 +13775,9 @@ dwv.image.Size.prototype.getTotalSize = function () {
  */
 dwv.image.Size.prototype.equals = function (rhs) {
   return rhs !== null &&
-        this.getNumberOfColumns() === rhs.getNumberOfColumns() &&
-        this.getNumberOfRows() === rhs.getNumberOfRows() &&
-        this.getNumberOfSlices() === rhs.getNumberOfSlices();
+    this.getNumberOfColumns() === rhs.getNumberOfColumns() &&
+    this.getNumberOfRows() === rhs.getNumberOfRows() &&
+    this.getNumberOfSlices() === rhs.getNumberOfSlices();
 };
 
 /**
@@ -12641,8 +13790,8 @@ dwv.image.Size.prototype.equals = function (rhs) {
  */
 dwv.image.Size.prototype.isInBounds = function (i, j, k) {
   if (i < 0 || i > this.getNumberOfColumns() - 1 ||
-        j < 0 || j > this.getNumberOfRows() - 1 ||
-        k < 0 || k > this.getNumberOfSlices() - 1) {
+    j < 0 || j > this.getNumberOfRows() - 1 ||
+    k < 0 || k > this.getNumberOfSlices() - 1) {
     return false;
   }
   return true;
@@ -12655,8 +13804,8 @@ dwv.image.Size.prototype.isInBounds = function (i, j, k) {
  */
 dwv.image.Size.prototype.toString = function () {
   return '(' + this.getNumberOfColumns() +
-        ', ' + this.getNumberOfRows() +
-        ', ' + this.getNumberOfSlices() + ')';
+    ', ' + this.getNumberOfRows() +
+    ', ' + this.getNumberOfSlices() + ')';
 };
 
 /**
@@ -12702,9 +13851,9 @@ dwv.image.Spacing = function (columnSpacing, rowSpacing, sliceSpacing) {
  */
 dwv.image.Spacing.prototype.equals = function (rhs) {
   return rhs !== null &&
-        this.getColumnSpacing() === rhs.getColumnSpacing() &&
-        this.getRowSpacing() === rhs.getRowSpacing() &&
-        this.getSliceSpacing() === rhs.getSliceSpacing();
+    this.getColumnSpacing() === rhs.getColumnSpacing() &&
+    this.getRowSpacing() === rhs.getRowSpacing() &&
+    this.getSliceSpacing() === rhs.getSliceSpacing();
 };
 
 /**
@@ -12714,8 +13863,8 @@ dwv.image.Spacing.prototype.equals = function (rhs) {
  */
 dwv.image.Spacing.prototype.toString = function () {
   return '(' + this.getColumnSpacing() +
-        ', ' + this.getRowSpacing() +
-        ', ' + this.getSliceSpacing() + ')';
+    ', ' + this.getRowSpacing() +
+    ', ' + this.getSliceSpacing() + ')';
 };
 
 
@@ -12835,8 +13984,8 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
  */
 dwv.image.Geometry.prototype.toString = function () {
   return 'Origin: ' + this.getOrigin() +
-        ', Size: ' + this.getSize() +
-        ', Spacing: ' + this.getSpacing();
+    ', Size: ' + this.getSize() +
+    ', Spacing: ' + this.getSpacing();
 };
 
 /**
@@ -12847,9 +13996,9 @@ dwv.image.Geometry.prototype.toString = function () {
  */
 dwv.image.Geometry.prototype.equals = function (rhs) {
   return rhs !== null &&
-        this.getOrigin().equals(rhs.getOrigin()) &&
-        this.getSize().equals(rhs.getSize()) &&
-        this.getSpacing().equals(rhs.getSpacing());
+    this.getOrigin().equals(rhs.getOrigin()) &&
+    this.getSize().equals(rhs.getSize()) &&
+    this.getSpacing().equals(rhs.getSpacing());
 };
 
 /**
@@ -12861,8 +14010,8 @@ dwv.image.Geometry.prototype.equals = function (rhs) {
 dwv.image.Geometry.prototype.indexToOffset = function (index) {
   var size = this.getSize();
   return index.getI() +
-       index.getJ() * size.getNumberOfColumns() +
-       index.getK() * size.getSliceSize();
+   index.getJ() * size.getNumberOfColumns() +
+   index.getK() * size.getSliceSize();
 };
 
 /**
@@ -13397,37 +14546,21 @@ dwv.image.Image.prototype.getRescaledValue = function (i, j, k, f) {
 };
 
 /**
- * Get a slice index iterator.
+ * Get the rescaled value of the image at a specific offset.
  *
- * @param {number} slice The index of the slice.
- * @param {number} frame The frame index.
- * @returns {object} The slice iterator.
+ * @param {number} offset The desired offset.
+ * @param {number} k The Z index.
+ * @param {number} f The frame number.
+ * @returns {number} The rescaled value at the desired offset.
+ * Warning: No size check...
  */
-dwv.image.Image.prototype.getSliceIterator = function (slice, frame) {
-  var sliceSize = this.getGeometry().getSize().getSliceSize();
-  var start = slice * sliceSize;
-
-  var image = this;
-  var dataAccessor = function (offset) {
-    return image.getValueAtOffset(offset, frame);
-  };
-
-  var range = null;
-  if (this.getNumberOfComponents() === 1) {
-    range = dwv.image.range(dataAccessor, start, start + sliceSize);
-  } else if (this.getNumberOfComponents() === 3) {
-    // 3 times bigger...
-    start *= 3;
-    sliceSize *= 3;
-    var isPlanar = this.getPlanarConfiguration() === 1;
-    range = dwv.image.range3d(
-      dataAccessor, start, start + sliceSize, 1, isPlanar);
-  } else {
-    throw new Error('Unsupported number of components: ' +
-      this.getNumberOfComponents());
+dwv.image.Image.prototype.getRescaledValueAtOffset = function (offset, k, f) {
+  var frame = (f || 0);
+  var val = this.getValueAtOffset(offset, frame);
+  if (!this.isIdentityRSI()) {
+    val = this.getRescaleSlopeAndIntercept(k).apply(val);
   }
-
-  return range;
+  return val;
 };
 
 /**
@@ -13747,79 +14880,6 @@ dwv.image.Image.prototype.compose = function (rhs, operator) {
     }
   }
   return newImage;
-};
-
-/**
- * Quantify a line according to image information.
- *
- * @param {object} line The line to quantify.
- * @returns {object} A quantification object.
- */
-dwv.image.Image.prototype.quantifyLine = function (line) {
-  var quant = {};
-  // length
-  var spacing = this.getGeometry().getSpacing();
-  var length = line.getWorldLength(spacing.getColumnSpacing(),
-    spacing.getRowSpacing());
-  if (length !== null) {
-    quant.length = {value: length, unit: dwv.i18n('unit.mm')};
-  }
-  // return
-  return quant;
-};
-
-/**
- * Quantify a rectangle according to image information.
- *
- * @param {object} rect The rectangle to quantify.
- * @returns {object} A quantification object.
- */
-dwv.image.Image.prototype.quantifyRect = function (rect) {
-  var quant = {};
-  // surface
-  var spacing = this.getGeometry().getSpacing();
-  var surface = rect.getWorldSurface(spacing.getColumnSpacing(),
-    spacing.getRowSpacing());
-  if (surface !== null) {
-    quant.surface = {value: surface / 100, unit: dwv.i18n('unit.cm2')};
-  }
-  // stats
-  var subBuffer = [];
-  var minJ = parseInt(rect.getBegin().getY(), 10);
-  var maxJ = parseInt(rect.getEnd().getY(), 10);
-  var minI = parseInt(rect.getBegin().getX(), 10);
-  var maxI = parseInt(rect.getEnd().getX(), 10);
-  for (var j = minJ; j < maxJ; ++j) {
-    for (var i = minI; i < maxI; ++i) {
-      subBuffer.push(this.getValue(i, j, 0));
-    }
-  }
-  var quantif = dwv.math.getStats(subBuffer);
-  quant.min = {value: quantif.getMin(), unit: ''};
-  quant.max = {value: quantif.getMax(), unit: ''};
-  quant.mean = {value: quantif.getMean(), unit: ''};
-  quant.stdDev = {value: quantif.getStdDev(), unit: ''};
-  // return
-  return quant;
-};
-
-/**
- * Quantify an ellipse according to image information.
- *
- * @param {object} ellipse The ellipse to quantify.
- * @returns {object} A quantification object.
- */
-dwv.image.Image.prototype.quantifyEllipse = function (ellipse) {
-  var quant = {};
-  // surface
-  var spacing = this.getGeometry().getSpacing();
-  var surface = ellipse.getWorldSurface(spacing.getColumnSpacing(),
-    spacing.getRowSpacing());
-  if (surface !== null) {
-    quant.surface = {value: surface / 100, unit: dwv.i18n('unit.cm2')};
-  }
-  // return
-  return quant;
 };
 
 // namespaces
@@ -14150,6 +15210,92 @@ dwv.image.range = function (dataAccessor, start, end, increment) {
 };
 
 /**
+ * Get an iterator for a given range with bounds (for a one component data).
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
+ * @param {Function} dataAccessor Function to access data.
+ * @param {number} start The start of the range (included).
+ * @param {number} end The end of the range (excluded).
+ * @param {number} increment The increment between indicies.
+ * @param {number} regionSize The size of the region to iterate through.
+ * @param {number} regionOffset The offset between regions.
+ * @returns {object} An iterator folowing the iterator and iterable protocol.
+ */
+dwv.image.rangeRegion = function (
+  dataAccessor, start, end, increment, regionSize, regionOffset) {
+  var nextIndex = start;
+  var regionElementCount = 0;
+  // result
+  return {
+    next: function () {
+      if (nextIndex < end) {
+        var result = {
+          value: dataAccessor(nextIndex),
+          done: false
+        };
+        regionElementCount += 1;
+        nextIndex += increment;
+        if (regionElementCount === regionSize) {
+          regionElementCount = 0;
+          nextIndex += regionOffset;
+        }
+        return result;
+      }
+      return {
+        done: true,
+        index: end
+      };
+    }
+  };
+};
+
+/**
+ * Get an iterator for a given range with bounds (for a one component data).
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
+ * @param {Function} dataAccessor Function to access data.
+ * @param {number} start The start of the range (included).
+ * @param {number} end The end of the range (excluded).
+ * @param {number} increment The increment between indicies.
+ * @param {Array} regions An array of regions: [off0, size, off1].
+ * @returns {object} An iterator folowing the iterator and iterable protocol.
+ */
+dwv.image.rangeRegions = function (
+  dataAccessor, start, end, increment, regions) {
+  var nextIndex = start;
+  var regionCount = 0;
+  var regionElementCount = 0;
+  // result
+  return {
+    next: function () {
+      if (nextIndex < end) {
+        var result = {
+          value: dataAccessor(nextIndex),
+          done: false
+        };
+        regionElementCount += 1;
+        nextIndex += increment;
+        if (regionElementCount === regions[regionCount][1]) {
+          regionElementCount = 0;
+          // off1 of current group
+          nextIndex += regions[regionCount][2];
+          regionCount += 1;
+          // off0 of next group
+          if (regionCount < regions.length) {
+            nextIndex += regions[regionCount][0];
+          }
+        }
+        return result;
+      }
+      return {
+        done: true,
+        index: end
+      };
+    }
+  };
+};
+
+/**
  * Get an iterator for a given range for a 3 components data.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
@@ -14204,6 +15350,189 @@ dwv.image.range3d = function (dataAccessor, start, end, increment, isPlanar) {
       };
     }
   };
+};
+
+/**
+ * Get a list of values for a given iterator.
+ *
+ * @param {object} iterator The iterator to use to loop through data.
+ * @returns {Array} The list of values.
+ */
+dwv.image.getIteratorValues = function (iterator) {
+  var values = [];
+  var ival = iterator.next();
+  while (!ival.done) {
+    values.push(ival.value);
+    ival = iterator.next();
+  }
+  return values;
+};
+
+/**
+ * Get a slice index iterator.
+ *
+ * @param {object} image The image to parse.
+ * @param {number} slice The index of the slice.
+ * @param {number} frame The frame index.
+ * @returns {object} The slice iterator.
+ */
+dwv.image.getSliceIterator = function (image, slice, frame) {
+  var sliceSize = image.getGeometry().getSize().getSliceSize();
+  var start = slice * sliceSize;
+
+  var dataAccessor = function (offset) {
+    return image.getValueAtOffset(offset, frame);
+  };
+
+  var range = null;
+  if (image.getNumberOfComponents() === 1) {
+    range = dwv.image.range(dataAccessor, start, start + sliceSize);
+  } else if (image.getNumberOfComponents() === 3) {
+    // 3 times bigger...
+    start *= 3;
+    sliceSize *= 3;
+    var isPlanar = image.getPlanarConfiguration() === 1;
+    range = dwv.image.range3d(
+      dataAccessor, start, start + sliceSize, 1, isPlanar);
+  } else {
+    throw new Error('Unsupported number of components: ' +
+      image.getNumberOfComponents());
+  }
+
+  return range;
+};
+
+/**
+ * Get a slice index iterator for a rectangular region.
+ *
+ * @param {object} image The image to parse.
+ * @param {number} slice The index of the slice.
+ * @param {number} frame The frame index.
+ * @param {boolean} isRescaled Flag for rescaled values (default false).
+ * @param {dwv.math.Point2D} min The minimum position (optional).
+ * @param {dwv.math.Point2D} max The maximum position (optional).
+ * @returns {object} The slice iterator.
+ */
+dwv.image.getRegionSliceIterator = function (
+  image, slice, frame, isRescaled, min, max) {
+  if (image.getNumberOfComponents() !== 1) {
+    throw new Error('Unsupported number of components for region iterator: ' +
+      image.getNumberOfComponents());
+  }
+
+  if (typeof isRescaled === 'undefined') {
+    isRescaled = false;
+  }
+  var geometry = image.getGeometry();
+  var size = geometry.getSize();
+  if (typeof min === 'undefined') {
+    min = new dwv.math.Point2D(0, 0);
+  }
+  if (typeof max === 'undefined') {
+    max = new dwv.math.Point2D(
+      size.getNumberOfColumns() - 1,
+      size.getNumberOfRows()
+    );
+  }
+  // position to pixel for max: extra X is ok, remove extra Y
+  var minIndex = new dwv.math.Index3D(min.getX(), min.getY(), slice);
+  var startOffset = geometry.indexToOffset(minIndex);
+  var maxIndex = new dwv.math.Index3D(max.getX(), max.getY() - 1, slice);
+  var endOffset = geometry.indexToOffset(maxIndex);
+
+  // minimum 1 column
+  var rangeNumberOfColumns = Math.max(1, max.getX() - min.getX());
+  var rowIncrement = size.getNumberOfColumns() - rangeNumberOfColumns;
+
+  // data accessor
+  var dataAccessor = null;
+  if (isRescaled) {
+    dataAccessor = function (offset) {
+      return image.getRescaledValueAtOffset(offset, slice, frame);
+    };
+  } else {
+    dataAccessor = function (offset) {
+      return image.getValueAtOffset(offset, frame);
+    };
+  }
+
+  return dwv.image.rangeRegion(
+    dataAccessor, startOffset, endOffset + 1,
+    1, rangeNumberOfColumns, rowIncrement);
+};
+
+/**
+ * Get a slice index iterator for a rectangular region.
+ *
+ * @param {object} image The image to parse.
+ * @param {number} slice The index of the slice.
+ * @param {number} frame The frame index.
+ * @param {boolean} isRescaled Flag for rescaled values (default false).
+ * @param {Array} regions An array of regions.
+ * @returns {object} The slice iterator.
+ */
+dwv.image.getVariableRegionSliceIterator = function (
+  image, slice, frame, isRescaled, regions) {
+  if (image.getNumberOfComponents() !== 1) {
+    throw new Error('Unsupported number of components for region iterator: ' +
+      image.getNumberOfComponents());
+  }
+
+  if (typeof isRescaled === 'undefined') {
+    isRescaled = false;
+  }
+  var geometry = image.getGeometry();
+  var size = geometry.getSize();
+
+  var offsetRegions = [];
+  var region;
+  var min = null;
+  var max = null;
+  var index = null;
+  for (var i = 0; i < regions.length; ++i) {
+    region = regions[i];
+    var width = region[1][0] - region[0][0];
+    if (width !== 0) {
+      index = i;
+      if (!min) {
+        min = region[0];
+      }
+      offsetRegions.push([
+        region[0][0],
+        width,
+        size.getNumberOfColumns() - region[1][0]
+      ]);
+    }
+  }
+  if (index !== null) {
+    max = regions[index][1];
+  }
+
+  // exit if no offsets
+  if (offsetRegions.length === 0) {
+    return;
+  }
+
+  var minIndex = new dwv.math.Index3D(min[0], min[1], slice);
+  var startOffset = geometry.indexToOffset(minIndex);
+  var maxIndex = new dwv.math.Index3D(max[0], max[1], slice);
+  var endOffset = geometry.indexToOffset(maxIndex);
+
+  // data accessor
+  var dataAccessor = null;
+  if (isRescaled) {
+    dataAccessor = function (offset) {
+      return image.getRescaledValueAtOffset(offset, slice, frame);
+    };
+  } else {
+    dataAccessor = function (offset) {
+      return image.getValueAtOffset(offset, frame);
+    };
+  }
+
+  return dwv.image.rangeRegions(
+    dataAccessor, startOffset, endOffset + 1,
+    1, offsetRegions);
 };
 
 // namespaces
@@ -14621,6 +15950,21 @@ dwv.image.RescaleSlopeAndIntercept.prototype.isID = function () {
 // namespaces
 var dwv = dwv || {};
 dwv.image = dwv.image || {};
+
+/**
+ * List of view event names.
+ *
+ * @type {Array}
+ */
+dwv.image.viewEventNames = [
+  'slicechange',
+  'framechange',
+  'wlwidthchange',
+  'wlcenterchange',
+  'wlpresetadd',
+  'colourchange',
+  'positionchange'
+];
 
 /**
  * View class.
@@ -15288,7 +16632,7 @@ dwv.image.View.prototype.generateImageData = function (array) {
   var position = this.getCurrentPosition();
   var frame = this.getCurrentFrame();
   var image = this.getImage();
-  var iterator = image.getSliceIterator(position.k, frame);
+  var iterator = dwv.image.getSliceIterator(this.getImage(), position.k, frame);
 
   var photoInterpretation = image.getPhotometricInterpretation();
   switch (photoInterpretation) {
@@ -15439,6 +16783,9 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image) {
   // store
   view.setWindowPresets(windowPresets);
 
+  // set the initial position
+  view.setInitialPosition();
+
   return view;
 };
 
@@ -15567,26 +16914,16 @@ dwv.image.generateImageDataYbrFull = function (
   array,
   iterator) {
   var index = 0;
-  var y, cb, cr;
-  var r, g, b;
+  var rgb = null;
   var ival = iterator.next();
   while (!ival.done) {
-    // pixel values
-    y = ival.value[0];
-    cb = ival.value[1];
-    cr = ival.value[2];
-    // convert to rgb
-    // theory:
-    // http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.7.html#sect_C.7.6.3.1.2
-    // reverse equation:
-    // https://en.wikipedia.org/wiki/YCbCr#JPEG_conversion
-    r = y + 1.402 * (cr - 128);
-    g = y - 0.34414 * (cb - 128) - 0.71414 * (cr - 128);
-    b = y + 1.772 * (cb - 128);
+    // convert ybr to rgb
+    rgb = dwv.utils.ybrToRgb(
+      ival.value[0], ival.value[1], ival.value[2]);
     // store data
-    array.data[index] = r;
-    array.data[index + 1] = g;
-    array.data[index + 2] = b;
+    array.data[index] = rgb.r;
+    array.data[index + 1] = rgb.g;
+    array.data[index + 2] = rgb.b;
     array.data[index + 3] = 0xff;
     // increment
     index += 4;
@@ -15599,6 +16936,23 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
+ * Minimum window width value.
+ *
+ * @see http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2
+ */
+dwv.image.MinWindowWidth = 1;
+
+/**
+ * Validate an input window width.
+ *
+ * @param {number} value The value to test.
+ * @returns {number} A valid window width.
+ */
+dwv.image.validateWindowWidth = function (value) {
+  return value < dwv.image.MinWindowWidth ? dwv.image.MinWindowWidth : value;
+};
+
+/**
  * WindowLevel class.
  * <br>Pseudo-code:
  * <pre>
@@ -15607,16 +16961,16 @@ dwv.image = dwv.image || {};
  *  else y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin) + ymin
  * </pre>
  *
+ * @see DICOM doc for [Window Center and Window Width]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2}
  * @param {number} center The window center.
  * @param {number} width The window width.
  * @class
- * @see DICOM doc for [Window Center and Window Width]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2}
- *
  */
 dwv.image.WindowLevel = function (center, width) {
-  // avoid zero width
-  if (width === 0) {
-    throw new Error('A window level with a width of zero is not possible.');
+  // check width
+  if (width < dwv.image.MinWindowWidth) {
+    throw new Error('Window width shall always be greater than or equal to ' +
+      dwv.image.MinWindowWidth);
   }
 
   /**
@@ -18326,6 +19680,572 @@ dwv.math.BucketQueue.prototype.buildArray = function (newSize) {
 var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
+/**
+ * Mulitply the three inputs if the last two are not null.
+ *
+ * @param {number} a The first input.
+ * @param {number} b The second input.
+ * @param {number} c The third input.
+ * @returns {number} The multiplication of the three inputs or
+ *  null if one of the last two is null.
+ */
+dwv.math.mulABC = function (a, b, c) {
+  var res = null;
+  if (b !== null && c !== null) {
+    res = a * b * c;
+  }
+  return res;
+};
+
+/**
+ * Circle shape.
+ *
+ * @class
+ * @param {object} centre A Point2D representing the centre of the circle.
+ * @param {number} radius The radius of the circle.
+ */
+dwv.math.Circle = function (centre, radius) {
+  /**
+   * Get the centre (point) of the circle.
+   *
+   * @returns {object} The center (point) of the circle.
+   */
+  this.getCenter = function () {
+    return centre;
+  };
+
+  /**
+   * Get the radius of the circle.
+   *
+   * @returns {number} The radius of the circle.
+   */
+  this.getRadius = function () {
+    return radius;
+  };
+
+}; // Circle class
+
+/**
+ * Check for equality.
+ *
+ * @param {object} rhs The object to compare to.
+ * @returns {boolean} True if both objects are equal.
+ */
+dwv.math.Circle.prototype.equals = function (rhs) {
+  return rhs !== null &&
+    this.getCenter().equals(rhs.getCenter()) &&
+    this.getRadius() === rhs.getRadius();
+};
+
+/**
+ * Get the surface of the circle.
+ *
+ * @returns {number} The surface of the circle.
+ */
+dwv.math.Circle.prototype.getSurface = function () {
+  return Math.PI * this.getRadius() * this.getRadius();
+};
+
+/**
+ * Get the surface of the circle according to a spacing.
+ *
+ * @param {number} spacingX The X spacing.
+ * @param {number} spacingY The Y spacing.
+ * @returns {number} The surface of the circle multiplied by the given
+ *  spacing or null for null spacings.
+ */
+dwv.math.Circle.prototype.getWorldSurface = function (spacingX, spacingY) {
+  return dwv.math.mulABC(this.getSurface(), spacingX, spacingY);
+};
+
+/**
+ * Get the rounded limits of the circle.
+ * (see https://en.wikipedia.org/wiki/Circle#Equations)
+ * Circle formula: x*x + y*y = r*r
+ * => y = (+-) sqrt(r*r - x*x)
+ *
+ * @returns {Array} The rounded limits.
+ */
+dwv.math.Circle.prototype.getRound = function () {
+  var centerX = this.getCenter().getX();
+  var centerY = this.getCenter().getY();
+  var radius = this.getRadius();
+  var rSquare = Math.pow(radius, 2);
+  // Y bounds
+  var minY = centerY - radius;
+  var maxY = centerY + radius;
+  var regions = [];
+  // loop through lines and store limits
+  for (var y = minY; y < maxY; ++y) {
+    var diff = rSquare - Math.pow(y - centerY, 2);
+    // remove small values (possibly negative)
+    if (Math.abs(diff) < 1e-7) {
+      continue;
+    }
+    var transX = Math.sqrt(diff);
+    // remove small values
+    if (transX < 0.5) {
+      continue;
+    }
+    regions.push([
+      [Math.round(centerX - transX), Math.round(y)],
+      [Math.round(centerX + transX), Math.round(y)]
+    ]);
+  }
+  return regions;
+};
+
+/**
+ * Quantify an circle according to view information.
+ *
+ * @param {object} viewController The associated view controller.
+ * @param {Array} flags A list of stat values to calculate.
+ * @returns {object} A quantification object.
+ */
+dwv.math.Circle.prototype.quantify = function (viewController, flags) {
+  var quant = {};
+  // surface
+  var spacing = viewController.get2DSpacing();
+  var surface = this.getWorldSurface(spacing[0], spacing[1]);
+  if (surface !== null) {
+    quant.surface = {value: surface / 100, unit: dwv.i18n('unit.cm2')};
+  }
+
+  // pixel quantification
+  if (viewController.canQuantifyImage()) {
+    var regions = this.getRound();
+    if (regions.length !== 0) {
+      var values = viewController.getImageVariableRegionValues(regions);
+      var quantif = dwv.math.getStats(values, flags);
+      quant.min = {value: quantif.getMin(), unit: ''};
+      quant.max = {value: quantif.getMax(), unit: ''};
+      quant.mean = {value: quantif.getMean(), unit: ''};
+      quant.stdDev = {value: quantif.getStdDev(), unit: ''};
+      if (typeof quantif.getMedian !== 'undefined') {
+        quant.median = {value: quantif.getMedian(), unit: ''};
+      }
+      if (typeof quantif.getP25 !== 'undefined') {
+        quant.p25 = {value: quantif.getP25(), unit: ''};
+      }
+      if (typeof quantif.getP75 !== 'undefined') {
+        quant.p75 = {value: quantif.getP75(), unit: ''};
+      }
+    }
+  }
+
+  // return
+  return quant;
+};
+
+// namespaces
+var dwv = dwv || {};
+dwv.math = dwv.math || {};
+
+/**
+ * Mulitply the three inputs if the last two are not null.
+ *
+ * @param {number} a The first input.
+ * @param {number} b The second input.
+ * @param {number} c The third input.
+ * @returns {number} The multiplication of the three inputs or
+ *  null if one of the last two is null.
+ */
+dwv.math.mulABC = function (a, b, c) {
+  var res = null;
+  if (b !== null && c !== null) {
+    res = a * b * c;
+  }
+  return res;
+};
+
+/**
+ * Ellipse shape.
+ *
+ * @class
+ * @param {object} centre A Point2D representing the centre of the ellipse.
+ * @param {number} a The radius of the ellipse on the horizontal axe.
+ * @param {number} b The radius of the ellipse on the vertical axe.
+ */
+dwv.math.Ellipse = function (centre, a, b) {
+  /**
+   * Get the centre (point) of the ellipse.
+   *
+   * @returns {object} The center (point) of the ellipse.
+   */
+  this.getCenter = function () {
+    return centre;
+  };
+
+  /**
+   * Get the radius of the ellipse on the horizontal axe.
+   *
+   * @returns {number} The radius of the ellipse on the horizontal axe.
+   */
+  this.getA = function () {
+    return a;
+  };
+
+  /**
+   * Get the radius of the ellipse on the vertical axe.
+   *
+   * @returns {number} The radius of the ellipse on the vertical axe.
+   */
+  this.getB = function () {
+    return b;
+  };
+}; // Ellipse class
+
+/**
+ * Check for equality.
+ *
+ * @param {object} rhs The object to compare to.
+ * @returns {boolean} True if both objects are equal.
+ */
+dwv.math.Ellipse.prototype.equals = function (rhs) {
+  return rhs !== null &&
+    this.getCenter().equals(rhs.getCenter()) &&
+    this.getA() === rhs.getA() &&
+    this.getB() === rhs.getB();
+};
+
+/**
+ * Get the surface of the ellipse.
+ *
+ * @returns {number} The surface of the ellipse.
+ */
+dwv.math.Ellipse.prototype.getSurface = function () {
+  return Math.PI * this.getA() * this.getB();
+};
+
+/**
+ * Get the surface of the ellipse according to a spacing.
+ *
+ * @param {number} spacingX The X spacing.
+ * @param {number} spacingY The Y spacing.
+ * @returns {number} The surface of the ellipse multiplied by the given
+ *  spacing or null for null spacings.
+ */
+dwv.math.Ellipse.prototype.getWorldSurface = function (spacingX, spacingY) {
+  return dwv.math.mulABC(this.getSurface(), spacingX, spacingY);
+};
+
+/**
+ * Get the rounded limits of the ellipse.
+ * (see https://en.wikipedia.org/wiki/Ellipse#Standard_equation)
+ * Ellipse formula: x*x / a*a + y*y / b*b = 1
+ * => y = (+-)(b/a) * sqrt(a*a - x*x)
+ *
+ * @returns {Array} The rounded limits.
+ */
+dwv.math.Ellipse.prototype.getRound = function () {
+  var centerX = this.getCenter().getX();
+  var centerY = this.getCenter().getY();
+  var radiusX = this.getA();
+  var radiusY = this.getB();
+  var radiusRatio = radiusX / radiusY;
+  var rySquare = Math.pow(radiusY, 2);
+  // Y bounds
+  var minY = centerY - radiusY;
+  var maxY = centerY + radiusY;
+  var regions = [];
+  // loop through lines and store limits
+  for (var y = minY; y < maxY; ++y) {
+    var diff = rySquare - Math.pow(y - centerY, 2);
+    // remove small values (possibly negative)
+    if (Math.abs(diff) < 1e-7) {
+      continue;
+    }
+    var transX = radiusRatio * Math.sqrt(diff);
+    // remove small values
+    if (transX < 0.5) {
+      continue;
+    }
+    regions.push([
+      [Math.round(centerX - transX), Math.round(y)],
+      [Math.round(centerX + transX), Math.round(y)]
+    ]);
+  }
+  return regions;
+};
+
+/**
+ * Quantify an ellipse according to view information.
+ *
+ * @param {object} viewController The associated view controller.
+ * @param {Array} flags A list of stat values to calculate.
+ * @returns {object} A quantification object.
+ */
+dwv.math.Ellipse.prototype.quantify = function (viewController, flags) {
+  var quant = {};
+  // surface
+  var spacing = viewController.get2DSpacing();
+  var surface = this.getWorldSurface(spacing[0], spacing[1]);
+  if (surface !== null) {
+    quant.surface = {value: surface / 100, unit: dwv.i18n('unit.cm2')};
+  }
+
+  // pixel quantification
+  if (viewController.canQuantifyImage()) {
+    var regions = this.getRound();
+    if (regions.length !== 0) {
+      var values = viewController.getImageVariableRegionValues(regions);
+      var quantif = dwv.math.getStats(values, flags);
+      quant.min = {value: quantif.getMin(), unit: ''};
+      quant.max = {value: quantif.getMax(), unit: ''};
+      quant.mean = {value: quantif.getMean(), unit: ''};
+      quant.stdDev = {value: quantif.getStdDev(), unit: ''};
+      if (typeof quantif.getMedian !== 'undefined') {
+        quant.median = {value: quantif.getMedian(), unit: ''};
+      }
+      if (typeof quantif.getP25 !== 'undefined') {
+        quant.p25 = {value: quantif.getP25(), unit: ''};
+      }
+      if (typeof quantif.getP75 !== 'undefined') {
+        quant.p75 = {value: quantif.getP75(), unit: ''};
+      }
+    }
+  }
+
+  // return
+  return quant;
+};
+
+// namespaces
+var dwv = dwv || {};
+dwv.math = dwv.math || {};
+
+/**
+ * Line shape.
+ *
+ * @class
+ * @param {object} begin A Point2D representing the beginning of the line.
+ * @param {object} end A Point2D representing the end of the line.
+ */
+dwv.math.Line = function (begin, end) {
+  /**
+   * Get the begin point of the line.
+   *
+   * @returns {object} The beginning point of the line.
+   */
+  this.getBegin = function () {
+    return begin;
+  };
+
+  /**
+   * Get the end point of the line.
+   *
+   * @returns {object} The ending point of the line.
+   */
+  this.getEnd = function () {
+    return end;
+  };
+}; // Line class
+
+/**
+ * Check for equality.
+ *
+ * @param {object} rhs The object to compare to.
+ * @returns {boolean} True if both objects are equal.
+ */
+dwv.math.Line.prototype.equals = function (rhs) {
+  return rhs !== null &&
+    this.getBegin().equals(rhs.getBegin()) &&
+    this.getEnd().equals(rhs.getEnd());
+};
+
+/**
+ * Get the line delta in the X direction.
+ *
+ * @returns {number} The delta in the X direction.
+ */
+dwv.math.Line.prototype.getDeltaX = function () {
+  return this.getEnd().getX() - this.getBegin().getX();
+};
+
+/**
+ * Get the line delta in the Y direction.
+ *
+ * @returns {number} The delta in the Y direction.
+ */
+dwv.math.Line.prototype.getDeltaY = function () {
+  return this.getEnd().getY() - this.getBegin().getY();
+};
+
+/**
+ * Get the length of the line.
+ *
+ * @returns {number} The length of the line.
+ */
+dwv.math.Line.prototype.getLength = function () {
+  return Math.sqrt(
+    this.getDeltaX() * this.getDeltaX() +
+    this.getDeltaY() * this.getDeltaY()
+  );
+};
+
+/**
+ * Get the length of the line according to a  spacing.
+ *
+ * @param {number} spacingX The X spacing.
+ * @param {number} spacingY The Y spacing.
+ * @returns {number} The length of the line with spacing
+ *  or null for null spacings.
+ */
+dwv.math.Line.prototype.getWorldLength = function (spacingX, spacingY) {
+  var wlen = null;
+  if (spacingX !== null && spacingY !== null) {
+    var dxs = this.getDeltaX() * spacingX;
+    var dys = this.getDeltaY() * spacingY;
+    wlen = Math.sqrt(dxs * dxs + dys * dys);
+  }
+  return wlen;
+};
+
+/**
+ * Get the mid point of the line.
+ *
+ * @returns {object} The mid point of the line.
+ */
+dwv.math.Line.prototype.getMidpoint = function () {
+  return new dwv.math.Point2D(
+    parseInt((this.getBegin().getX() + this.getEnd().getX()) / 2, 10),
+    parseInt((this.getBegin().getY() + this.getEnd().getY()) / 2, 10)
+  );
+};
+
+/**
+ * Get the slope of the line.
+ *
+ * @returns {number} The slope of the line.
+ */
+dwv.math.Line.prototype.getSlope = function () {
+  return this.getDeltaY() / this.getDeltaX();
+};
+
+/**
+ * Get the intercept of the line.
+ *
+ * @returns {number} The slope of the line.
+ */
+dwv.math.Line.prototype.getIntercept = function () {
+  return (
+    this.getEnd().getX() * this.getBegin().getY() -
+    this.getBegin().getX() * this.getEnd().getY()
+  ) / this.getDeltaX();
+};
+
+/**
+ * Get the inclination of the line.
+ *
+ * @returns {number} The inclination of the line.
+ */
+dwv.math.Line.prototype.getInclination = function () {
+  // tan(theta) = slope
+  var angle = Math.atan2(this.getDeltaY(), this.getDeltaX()) * 180 / Math.PI;
+  // shift?
+  return 180 - angle;
+};
+
+/**
+ * Get the angle between two lines in degree.
+ *
+ * @param {object} line0 The first line.
+ * @param {object} line1 The second line.
+ * @returns {number} The angle.
+ */
+dwv.math.getAngle = function (line0, line1) {
+  var dx0 = line0.getDeltaX();
+  var dy0 = line0.getDeltaY();
+  var dx1 = line1.getDeltaX();
+  var dy1 = line1.getDeltaY();
+  // dot = ||a||*||b||*cos(theta)
+  var dot = dx0 * dx1 + dy0 * dy1;
+  // cross = ||a||*||b||*sin(theta)
+  var det = dx0 * dy1 - dy0 * dx1;
+  // tan = sin / cos
+  var angle = Math.atan2(det, dot) * 180 / Math.PI;
+  // complementary angle
+  // shift?
+  return 360 - (180 - angle);
+};
+
+/**
+ * Get a perpendicular line to an input one.
+ *
+ * @param {object} line The line to be perpendicular to.
+ * @param {object} point The middle point of the perpendicular line.
+ * @param {number} length The length of the perpendicular line.
+ * @returns {object} A perpendicular line.
+ */
+dwv.math.getPerpendicularLine = function (line, point, length) {
+  // begin point
+  var beginX = 0;
+  var beginY = 0;
+  // end point
+  var endX = 0;
+  var endY = 0;
+
+  // check slope:
+  // 0 -> horizontal
+  // Infinite -> vertical (a/Infinite = 0)
+  if (line.getSlope() !== 0) {
+    // a0 * a1 = -1
+    var slope = -1 / line.getSlope();
+    // y0 = a1*x0 + b1 -> b1 = y0 - a1*x0
+    var intercept = point.getY() - slope * point.getX();
+
+    // 1. (x - x0)^2 + (y - y0)^2 = d^2
+    // 2. a = (y - y0) / (x - x0) -> y = a*(x - x0) + y0
+    // ->  (x - x0)^2 + m^2 * (x - x0)^2 = d^2
+    // -> x = x0 +- d / sqrt(1+m^2)
+
+    // length is the distance between begin and end,
+    // point is half way between both -> d = length / 2
+    var dx = length / (2 * Math.sqrt(1 + slope * slope));
+
+    // begin point
+    beginX = point.getX() - dx;
+    beginY = slope * beginX + intercept;
+    // end point
+    endX = point.getX() + dx;
+    endY = slope * endX + intercept;
+  } else {
+    // horizontal input line -> perpendicular is vertical!
+    // begin point
+    beginX = point.getX();
+    beginY = point.getY() - length / 2;
+    // end point
+    endX = point.getX();
+    endY = point.getY() + length / 2;
+  }
+  // perpendicalar line
+  return new dwv.math.Line(
+    new dwv.math.Point2D(beginX, beginY),
+    new dwv.math.Point2D(endX, endY));
+};
+
+/**
+ * Quantify a line according to view information.
+ *
+ * @param {object} viewController The associated view controller.
+ * @returns {object} A quantification object.
+ */
+dwv.math.Line.prototype.quantify = function (viewController) {
+  var quant = {};
+  // length
+  var spacing = viewController.get2DSpacing();
+  var length = this.getWorldLength(spacing[0], spacing[1]);
+  if (length !== null) {
+    quant.length = {value: length, unit: dwv.i18n('unit.mm')};
+  }
+  // return
+  return quant;
+};
+
+// namespaces
+var dwv = dwv || {};
+dwv.math = dwv.math || {};
+
 // difference between 1 and the smallest floating point number greater than 1
 if (typeof Number.EPSILON === 'undefined') {
   Number.EPSILON = Math.pow(2, -52);
@@ -18442,6 +20362,118 @@ var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
 /**
+ * Path shape.
+ *
+ * @class
+ * @param {Array} inputPointArray The list of Point2D that make
+ *   the path (optional).
+ * @param {Array} inputControlPointIndexArray The list of control point of path,
+ *  as indexes (optional).
+ * Note: first and last point do not need to be equal.
+ */
+dwv.math.Path = function (inputPointArray, inputControlPointIndexArray) {
+  /**
+   * List of points.
+   *
+   * @type {Array}
+   */
+  this.pointArray = inputPointArray ? inputPointArray.slice() : [];
+  /**
+   * List of control points.
+   *
+   * @type {Array}
+   */
+  this.controlPointIndexArray = inputControlPointIndexArray
+    ? inputControlPointIndexArray.slice() : [];
+}; // Path class
+
+/**
+ * Get a point of the list.
+ *
+ * @param {number} index The index of the point to get (beware, no size check).
+ * @returns {object} The Point2D at the given index.
+ */
+dwv.math.Path.prototype.getPoint = function (index) {
+  return this.pointArray[index];
+};
+
+/**
+ * Is the given point a control point.
+ *
+ * @param {object} point The Point2D to check.
+ * @returns {boolean} True if a control point.
+ */
+dwv.math.Path.prototype.isControlPoint = function (point) {
+  var index = this.pointArray.indexOf(point);
+  if (index !== -1) {
+    return this.controlPointIndexArray.indexOf(index) !== -1;
+  } else {
+    throw new Error('Error: isControlPoint called with not in list point.');
+  }
+};
+
+/**
+ * Get the length of the path.
+ *
+ * @returns {number} The length of the path.
+ */
+dwv.math.Path.prototype.getLength = function () {
+  return this.pointArray.length;
+};
+
+/**
+ * Add a point to the path.
+ *
+ * @param {object} point The Point2D to add.
+ */
+dwv.math.Path.prototype.addPoint = function (point) {
+  this.pointArray.push(point);
+};
+
+/**
+ * Add a control point to the path.
+ *
+ * @param {object} point The Point2D to make a control point.
+ */
+dwv.math.Path.prototype.addControlPoint = function (point) {
+  var index = this.pointArray.indexOf(point);
+  if (index !== -1) {
+    this.controlPointIndexArray.push(index);
+  } else {
+    throw new Error(
+      'Error: addControlPoint called with no point in list point.');
+  }
+};
+
+/**
+ * Add points to the path.
+ *
+ * @param {Array} newPointArray The list of Point2D to add.
+ */
+dwv.math.Path.prototype.addPoints = function (newPointArray) {
+  this.pointArray = this.pointArray.concat(newPointArray);
+};
+
+/**
+ * Append a Path to this one.
+ *
+ * @param {dwv.math.Path} other The Path to append.
+ */
+dwv.math.Path.prototype.appenPath = function (other) {
+  var oldSize = this.pointArray.length;
+  this.pointArray = this.pointArray.concat(other.pointArray);
+  var indexArray = [];
+  for (var i = 0; i < other.controlPointIndexArray.length; ++i) {
+    indexArray[i] = other.controlPointIndexArray[i] + oldSize;
+  }
+  this.controlPointIndexArray = this.controlPointIndexArray.concat(indexArray);
+};
+
+// namespaces
+var dwv = dwv || {};
+dwv.math = dwv.math || {};
+
+/**
  * Immutable 2D point.
  *
  * @class
@@ -18498,6 +20530,18 @@ dwv.math.Point2D.prototype.getDistance = function (point2D) {
   return Math.sqrt(
     (this.getX() - point2D.getX()) * (this.getX() - point2D.getX()) +
     (this.getY() - point2D.getY()) * (this.getY() - point2D.getY()));
+};
+
+/**
+ * Round a Point2D.
+ *
+ * @returns {dwv.math.Point2D} The rounded point.
+ */
+dwv.math.Point2D.prototype.getRound = function () {
+  return new dwv.math.Point2D(
+    Math.round(this.getX()),
+    Math.round(this.getY())
+  );
 };
 
 /**
@@ -18676,6 +20720,244 @@ dwv.math.Index3D.prototype.toString = function () {
     ', ' + this.getJ() +
     ', ' + this.getK() + ')';
 };
+
+// namespaces
+var dwv = dwv || {};
+dwv.math = dwv.math || {};
+
+/**
+ * Mulitply the three inputs if the last two are not null.
+ *
+ * @param {number} a The first input.
+ * @param {number} b The second input.
+ * @param {number} c The third input.
+ * @returns {number} The multiplication of the three inputs or
+ *  null if one of the last two is null.
+ */
+dwv.math.mulABC = function (a, b, c) {
+  var res = null;
+  if (b !== null && c !== null) {
+    res = a * b * c;
+  }
+  return res;
+};
+
+/**
+ * Rectangle shape.
+ *
+ * @class
+ * @param {object} begin A Point2D representing the beginning of the rectangle.
+ * @param {object} end A Point2D representing the end of the rectangle.
+ */
+dwv.math.Rectangle = function (begin, end) {
+  if (end.getX() < begin.getX()) {
+    var tmpX = begin.getX();
+    begin = new dwv.math.Point2D(end.getX(), begin.getY());
+    end = new dwv.math.Point2D(tmpX, end.getY());
+  }
+  if (end.getY() < begin.getY()) {
+    var tmpY = begin.getY();
+    begin = new dwv.math.Point2D(begin.getX(), end.getY());
+    end = new dwv.math.Point2D(end.getX(), tmpY);
+  }
+
+  /**
+   * Get the begin point of the rectangle.
+   *
+   * @returns {object} The begin point of the rectangle
+   */
+  this.getBegin = function () {
+    return begin;
+  };
+
+  /**
+   * Get the end point of the rectangle.
+   *
+   * @returns {object} The end point of the rectangle
+   */
+  this.getEnd = function () {
+    return end;
+  };
+}; // Rectangle class
+
+/**
+ * Check for equality.
+ *
+ * @param {object} rhs The object to compare to.
+ * @returns {boolean} True if both objects are equal.
+ */
+dwv.math.Rectangle.prototype.equals = function (rhs) {
+  return rhs !== null &&
+    this.getBegin().equals(rhs.getBegin()) &&
+    this.getEnd().equals(rhs.getEnd());
+};
+
+/**
+ * Get the surface of the rectangle.
+ *
+ * @returns {number} The surface of the rectangle.
+ */
+dwv.math.Rectangle.prototype.getSurface = function () {
+  var begin = this.getBegin();
+  var end = this.getEnd();
+  return Math.abs(end.getX() - begin.getX()) *
+    Math.abs(end.getY() - begin.getY());
+};
+
+/**
+ * Get the surface of the rectangle according to a spacing.
+ *
+ * @param {number} spacingX The X spacing.
+ * @param {number} spacingY The Y spacing.
+ * @returns {number} The surface of the rectangle multiplied by the given
+ *  spacing or null for null spacings.
+ */
+dwv.math.Rectangle.prototype.getWorldSurface = function (spacingX, spacingY) {
+  return dwv.math.mulABC(this.getSurface(), spacingX, spacingY);
+};
+
+/**
+ * Get the real width of the rectangle.
+ *
+ * @returns {number} The real width of the rectangle.
+ */
+dwv.math.Rectangle.prototype.getRealWidth = function () {
+  return this.getEnd().getX() - this.getBegin().getX();
+};
+
+/**
+ * Get the real height of the rectangle.
+ *
+ * @returns {number} The real height of the rectangle.
+ */
+dwv.math.Rectangle.prototype.getRealHeight = function () {
+  return this.getEnd().getY() - this.getBegin().getY();
+};
+
+/**
+ * Get the width of the rectangle.
+ *
+ * @returns {number} The width of the rectangle.
+ */
+dwv.math.Rectangle.prototype.getWidth = function () {
+  return Math.abs(this.getRealWidth());
+};
+
+/**
+ * Get the height of the rectangle.
+ *
+ * @returns {number} The height of the rectangle.
+ */
+dwv.math.Rectangle.prototype.getHeight = function () {
+  return Math.abs(this.getRealHeight());
+};
+
+/**
+ * Get the rounded limits of the rectangle.
+ *
+ * @returns {object} The rounded limits.
+ */
+dwv.math.Rectangle.prototype.getRound = function () {
+  return {
+    min: this.getBegin().getRound(),
+    max: this.getEnd().getRound()
+  };
+};
+
+/**
+ * Quantify a rectangle according to view information.
+ *
+ * @param {object} viewController The associated view controller.
+ * @param {Array} flags A list of stat values to calculate.
+ * @returns {object} A quantification object.
+ */
+dwv.math.Rectangle.prototype.quantify = function (viewController, flags) {
+  var quant = {};
+  // surface
+  var spacing = viewController.get2DSpacing();
+  var surface = this.getWorldSurface(spacing[0], spacing[1]);
+  if (surface !== null) {
+    quant.surface = {value: surface / 100, unit: dwv.i18n('unit.cm2')};
+  }
+
+  // pixel quantification
+  if (viewController.canQuantifyImage()) {
+    var round = this.getRound();
+    var values = viewController.getImageRegionValues(round.min, round.max);
+    var quantif = dwv.math.getStats(values, flags);
+    quant.min = {value: quantif.getMin(), unit: ''};
+    quant.max = {value: quantif.getMax(), unit: ''};
+    quant.mean = {value: quantif.getMean(), unit: ''};
+    quant.stdDev = {value: quantif.getStdDev(), unit: ''};
+    if (typeof quantif.getMedian !== 'undefined') {
+      quant.median = {value: quantif.getMedian(), unit: ''};
+    }
+    if (typeof quantif.getP25 !== 'undefined') {
+      quant.p25 = {value: quantif.getP25(), unit: ''};
+    }
+    if (typeof quantif.getP75 !== 'undefined') {
+      quant.p75 = {value: quantif.getP75(), unit: ''};
+    }
+  }
+
+  // return
+  return quant;
+};
+
+// namespaces
+var dwv = dwv || {};
+dwv.math = dwv.math || {};
+
+/**
+ * Region Of Interest shape.
+ * Note: should be a closed path.
+ *
+ * @class
+ */
+dwv.math.ROI = function () {
+  /**
+   * List of points.
+   *
+   * @private
+   * @type {Array}
+   */
+  var points = [];
+
+  /**
+   * Get a point of the list at a given index.
+   *
+   * @param {number} index The index of the point to get
+   *   (beware, no size check).
+   * @returns {object} The Point2D at the given index.
+   */
+  this.getPoint = function (index) {
+    return points[index];
+  };
+  /**
+   * Get the length of the point list.
+   *
+   * @returns {number} The length of the point list.
+   */
+  this.getLength = function () {
+    return points.length;
+  };
+  /**
+   * Add a point to the ROI.
+   *
+   * @param {object} point The Point2D to add.
+   */
+  this.addPoint = function (point) {
+    points.push(point);
+  };
+  /**
+   * Add points to the ROI.
+   *
+   * @param {Array} rhs The array of POints2D to add.
+   */
+  this.addPoints = function (rhs) {
+    points = points.concat(rhs);
+  };
+}; // ROI class
 
 // namespaces
 var dwv = dwv || {};
@@ -19291,603 +21573,7 @@ var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
 /**
- * Mulitply the three inputs if the last two are not null.
- *
- * @param {number} a The first input.
- * @param {number} b The second input.
- * @param {number} c The third input.
- * @returns {number} The multiplication of the three inputs or
- *  null if one of the last two is null.
- */
-dwv.math.mulABC = function (a, b, c) {
-  var res = null;
-  if (b !== null && c !== null) {
-    res = a * b * c;
-  }
-  return res;
-};
-
-/**
- * Circle shape.
- *
- * @class
- * @param {object} centre A Point2D representing the centre of the circle.
- * @param {number} radius The radius of the circle.
- */
-dwv.math.Circle = function (centre, radius) {
-  /**
-   * Circle surface.
-   *
-   * @private
-   * @type {number}
-   */
-  var surface = Math.PI * radius * radius;
-
-  /**
-   * Get the centre (point) of the circle.
-   *
-   * @returns {object} The center (point) of the circle.
-   */
-  this.getCenter = function () {
-    return centre;
-  };
-  /**
-   * Get the radius of the circle.
-   *
-   * @returns {number} The radius of the circle.
-   */
-  this.getRadius = function () {
-    return radius;
-  };
-  /**
-   * Get the surface of the circle.
-   *
-   * @returns {number} The surface of the circle.
-   */
-  this.getSurface = function () {
-    return surface;
-  };
-  /**
-   * Get the surface of the circle according to a spacing.
-   *
-   * @param {number} spacingX The X spacing.
-   * @param {number} spacingY The Y spacing.
-   * @returns {number} The surface of the circle multiplied by the given
-   *  spacing or null for null spacings.
-   */
-  this.getWorldSurface = function (spacingX, spacingY) {
-    return dwv.math.mulABC(surface, spacingX, spacingY);
-  };
-}; // Circle class
-
-/**
- * Ellipse shape.
- *
- * @class
- * @param {object} centre A Point2D representing the centre of the ellipse.
- * @param {number} a The radius of the ellipse on the horizontal axe.
- * @param {number} b The radius of the ellipse on the vertical axe.
- */
-dwv.math.Ellipse = function (centre, a, b) {
-  /**
-   * Circle surface.
-   *
-   * @private
-   * @type {number}
-   */
-  var surface = Math.PI * a * b;
-
-  /**
-   * Get the centre (point) of the ellipse.
-   *
-   * @returns {object} The center (point) of the ellipse.
-   */
-  this.getCenter = function () {
-    return centre;
-  };
-  /**
-   * Get the radius of the ellipse on the horizontal axe.
-   *
-   * @returns {number} The radius of the ellipse on the horizontal axe.
-   */
-  this.getA = function () {
-    return a;
-  };
-  /**
-   * Get the radius of the ellipse on the vertical axe.
-   *
-   * @returns {number} The radius of the ellipse on the vertical axe.
-   */
-  this.getB = function () {
-    return b;
-  };
-  /**
-   * Get the surface of the ellipse.
-   *
-   * @returns {number} The surface of the ellipse.
-   */
-  this.getSurface = function () {
-    return surface;
-  };
-  /**
-   * Get the surface of the ellipse according to a spacing.
-   *
-   * @param {number} spacingX The X spacing.
-   * @param {number} spacingY The Y spacing.
-   * @returns {number} The surface of the ellipse multiplied by the given
-   *  spacing or null for null spacings.
-   */
-  this.getWorldSurface = function (spacingX, spacingY) {
-    return dwv.math.mulABC(surface, spacingX, spacingY);
-  };
-}; // Circle class
-
-/**
- * Line shape.
- *
- * @class
- * @param {object} begin A Point2D representing the beginning of the line.
- * @param {object} end A Point2D representing the end of the line.
- */
-dwv.math.Line = function (begin, end) {
-  /**
-   * Line delta in the X direction.
-   *
-   * @private
-   * @type {number}
-   */
-  var dx = end.getX() - begin.getX();
-  /**
-   * Line delta in the Y direction.
-   *
-   * @private
-   * @type {number}
-   */
-  var dy = end.getY() - begin.getY();
-  /**
-   * Line length.
-   *
-   * @private
-   * @type {number}
-   */
-  var length = Math.sqrt(dx * dx + dy * dy);
-
-  /**
-   * Get the begin point of the line.
-   *
-   * @returns {object} The beginning point of the line.
-   */
-  this.getBegin = function () {
-    return begin;
-  };
-  /**
-   * Get the end point of the line.
-   *
-   * @returns {object} The ending point of the line.
-   */
-  this.getEnd = function () {
-    return end;
-  };
-  /**
-   * Get the line delta in the X direction.
-   *
-   * @returns {number} The delta in the X direction.
-   */
-  this.getDeltaX = function () {
-    return dx;
-  };
-  /**
-   * Get the line delta in the Y direction.
-   *
-   * @returns {number} The delta in the Y direction.
-   */
-  this.getDeltaY = function () {
-    return dy;
-  };
-  /**
-   * Get the length of the line.
-   *
-   * @returns {number} The length of the line.
-   */
-  this.getLength = function () {
-    return length;
-  };
-  /**
-   * Get the length of the line according to a  spacing.
-   *
-   * @param {number} spacingX The X spacing.
-   * @param {number} spacingY The Y spacing.
-   * @returns {number} The length of the line with spacing
-   *  or null for null spacings.
-   */
-  this.getWorldLength = function (spacingX, spacingY) {
-    var wlen = null;
-    if (spacingX !== null && spacingY !== null) {
-      var dxs = dx * spacingX;
-      var dys = dy * spacingY;
-      wlen = Math.sqrt(dxs * dxs + dys * dys);
-    }
-    return wlen;
-  };
-  /**
-   * Get the mid point of the line.
-   *
-   * @returns {object} The mid point of the line.
-   */
-  this.getMidpoint = function () {
-    return new dwv.math.Point2D(
-      parseInt((begin.getX() + end.getX()) / 2, 10),
-      parseInt((begin.getY() + end.getY()) / 2, 10));
-  };
-  /**
-   * Get the slope of the line.
-   *
-   * @returns {number} The slope of the line.
-   */
-  this.getSlope = function () {
-    return dy / dx;
-  };
-  /**
-   * Get the intercept of the line.
-   *
-   * @returns {number} The slope of the line.
-   */
-  this.getIntercept = function () {
-    return (end.getX() * begin.getY() - begin.getX() * end.getY()) / dx;
-  };
-  /**
-   * Get the inclination of the line.
-   *
-   * @returns {number} The inclination of the line.
-   */
-  this.getInclination = function () {
-    // tan(theta) = slope
-    var angle = Math.atan2(dy, dx) * 180 / Math.PI;
-    // shift?
-    return 180 - angle;
-  };
-}; // Line class
-
-/**
- * Get the angle between two lines in degree.
- *
- * @param {object} line0 The first line.
- * @param {object} line1 The second line.
- * @returns {number} The angle.
- */
-dwv.math.getAngle = function (line0, line1) {
-  var dx0 = line0.getDeltaX();
-  var dy0 = line0.getDeltaY();
-  var dx1 = line1.getDeltaX();
-  var dy1 = line1.getDeltaY();
-  // dot = ||a||*||b||*cos(theta)
-  var dot = dx0 * dx1 + dy0 * dy1;
-  // cross = ||a||*||b||*sin(theta)
-  var det = dx0 * dy1 - dy0 * dx1;
-  // tan = sin / cos
-  var angle = Math.atan2(det, dot) * 180 / Math.PI;
-  // complementary angle
-  // shift?
-  return 360 - (180 - angle);
-};
-
-/**
- * Get a perpendicular line to an input one.
- *
- * @param {object} line The line to be perpendicular to.
- * @param {object} point The middle point of the perpendicular line.
- * @param {number} length The length of the perpendicular line.
- * @returns {object} A perpendicular line.
- */
-dwv.math.getPerpendicularLine = function (line, point, length) {
-  // begin point
-  var beginX = 0;
-  var beginY = 0;
-  // end point
-  var endX = 0;
-  var endY = 0;
-
-  // check slope:
-  // 0 -> horizontal
-  // Infinite -> vertical (a/Infinite = 0)
-  if (line.getSlope() !== 0) {
-    // a0 * a1 = -1
-    var slope = -1 / line.getSlope();
-    // y0 = a1*x0 + b1 -> b1 = y0 - a1*x0
-    var intercept = point.getY() - slope * point.getX();
-
-    // 1. (x - x0)^2 + (y - y0)^2 = d^2
-    // 2. a = (y - y0) / (x - x0) -> y = a*(x - x0) + y0
-    // ->  (x - x0)^2 + m^2 * (x - x0)^2 = d^2
-    // -> x = x0 +- d / sqrt(1+m^2)
-
-    // length is the distance between begin and end,
-    // point is half way between both -> d = length / 2
-    var dx = length / (2 * Math.sqrt(1 + slope * slope));
-
-    // begin point
-    beginX = point.getX() - dx;
-    beginY = slope * beginX + intercept;
-    // end point
-    endX = point.getX() + dx;
-    endY = slope * endX + intercept;
-  } else {
-    // horizontal input line -> perpendicular is vertical!
-    // begin point
-    beginX = point.getX();
-    beginY = point.getY() - length / 2;
-    // end point
-    endX = point.getX();
-    endY = point.getY() + length / 2;
-  }
-  // perpendicalar line
-  return new dwv.math.Line(
-    new dwv.math.Point2D(beginX, beginY),
-    new dwv.math.Point2D(endX, endY));
-};
-
-/**
- * Rectangle shape.
- *
- * @class
- * @param {object} begin A Point2D representing the beginning of the rectangle.
- * @param {object} end A Point2D representing the end of the rectangle.
- */
-dwv.math.Rectangle = function (begin, end) {
-  if (end.getX() < begin.getX()) {
-    var tmpX = begin.getX();
-    begin = new dwv.math.Point2D(end.getX(), begin.getY());
-    end = new dwv.math.Point2D(tmpX, end.getY());
-  }
-  if (end.getY() < begin.getY()) {
-    var tmpY = begin.getY();
-    begin = new dwv.math.Point2D(begin.getX(), end.getY());
-    end = new dwv.math.Point2D(end.getX(), tmpY);
-  }
-
-  /**
-   * Rectangle surface.
-   *
-   * @private
-   * @type {number}
-   */
-  var surface = Math.abs(end.getX() - begin.getX()) *
-    Math.abs(end.getY() - begin.getY());
-
-  /**
-   * Get the begin point of the rectangle.
-   *
-   * @returns {object} The begin point of the rectangle
-   */
-  this.getBegin = function () {
-    return begin;
-  };
-  /**
-   * Get the end point of the rectangle.
-   *
-   * @returns {object} The end point of the rectangle
-   */
-  this.getEnd = function () {
-    return end;
-  };
-  /**
-   * Get the real width of the rectangle.
-   *
-   * @returns {number} The real width of the rectangle.
-   */
-  this.getRealWidth = function () {
-    return end.getX() - begin.getX();
-  };
-  /**
-   * Get the real height of the rectangle.
-   *
-   * @returns {number} The real height of the rectangle.
-   */
-  this.getRealHeight = function () {
-    return end.getY() - begin.getY();
-  };
-  /**
-   * Get the width of the rectangle.
-   *
-   * @returns {number} The width of the rectangle.
-   */
-  this.getWidth = function () {
-    return Math.abs(this.getRealWidth());
-  };
-  /**
-   * Get the height of the rectangle.
-   *
-   * @returns {number} The height of the rectangle.
-   */
-  this.getHeight = function () {
-    return Math.abs(this.getRealHeight());
-  };
-  /**
-   * Get the surface of the rectangle.
-   *
-   * @returns {number} The surface of the rectangle.
-   */
-  this.getSurface = function () {
-    return surface;
-  };
-  /**
-   * Get the surface of the circle according to a spacing.
-   *
-   * @param {number} spacingX The X spacing.
-   * @param {number} spacingY The Y spacing.
-   * @returns {number} The surface of the rectangle multiplied by the given
-   *  spacing or null for null spacings.
-   */
-  this.getWorldSurface = function (spacingX, spacingY) {
-    return dwv.math.mulABC(surface, spacingX, spacingY);
-  };
-}; // Rectangle class
-
-/**
- * Region Of Interest shape.
- * Note: should be a closed path.
- *
- * @class
- */
-dwv.math.ROI = function () {
-  /**
-   * List of points.
-   *
-   * @private
-   * @type {Array}
-   */
-  var points = [];
-
-  /**
-   * Get a point of the list at a given index.
-   *
-   * @param {number} index The index of the point to get
-   *   (beware, no size check).
-   * @returns {object} The Point2D at the given index.
-   */
-  this.getPoint = function (index) {
-    return points[index];
-  };
-  /**
-   * Get the length of the point list.
-   *
-   * @returns {number} The length of the point list.
-   */
-  this.getLength = function () {
-    return points.length;
-  };
-  /**
-   * Add a point to the ROI.
-   *
-   * @param {object} point The Point2D to add.
-   */
-  this.addPoint = function (point) {
-    points.push(point);
-  };
-  /**
-   * Add points to the ROI.
-   *
-   * @param {Array} rhs The array of POints2D to add.
-   */
-  this.addPoints = function (rhs) {
-    points = points.concat(rhs);
-  };
-}; // ROI class
-
-/**
- * Path shape.
- *
- * @class
- * @param {Array} inputPointArray The list of Point2D that make
- *   the path (optional).
- * @param {Array} inputControlPointIndexArray The list of control point of path,
- *  as indexes (optional).
- * Note: first and last point do not need to be equal.
- */
-dwv.math.Path = function (inputPointArray, inputControlPointIndexArray) {
-  /**
-   * List of points.
-   *
-   * @type {Array}
-   */
-  this.pointArray = inputPointArray ? inputPointArray.slice() : [];
-  /**
-   * List of control points.
-   *
-   * @type {Array}
-   */
-  this.controlPointIndexArray = inputControlPointIndexArray
-    ? inputControlPointIndexArray.slice() : [];
-}; // Path class
-
-/**
- * Get a point of the list.
- *
- * @param {number} index The index of the point to get (beware, no size check).
- * @returns {object} The Point2D at the given index.
- */
-dwv.math.Path.prototype.getPoint = function (index) {
-  return this.pointArray[index];
-};
-
-/**
- * Is the given point a control point.
- *
- * @param {object} point The Point2D to check.
- * @returns {boolean} True if a control point.
- */
-dwv.math.Path.prototype.isControlPoint = function (point) {
-  var index = this.pointArray.indexOf(point);
-  if (index !== -1) {
-    return this.controlPointIndexArray.indexOf(index) !== -1;
-  } else {
-    throw new Error('Error: isControlPoint called with not in list point.');
-  }
-};
-
-/**
- * Get the length of the path.
- *
- * @returns {number} The length of the path.
- */
-dwv.math.Path.prototype.getLength = function () {
-  return this.pointArray.length;
-};
-
-/**
- * Add a point to the path.
- *
- * @param {object} point The Point2D to add.
- */
-dwv.math.Path.prototype.addPoint = function (point) {
-  this.pointArray.push(point);
-};
-
-/**
- * Add a control point to the path.
- *
- * @param {object} point The Point2D to make a control point.
- */
-dwv.math.Path.prototype.addControlPoint = function (point) {
-  var index = this.pointArray.indexOf(point);
-  if (index !== -1) {
-    this.controlPointIndexArray.push(index);
-  } else {
-    throw new Error(
-      'Error: addControlPoint called with no point in list point.');
-  }
-};
-
-/**
- * Add points to the path.
- *
- * @param {Array} newPointArray The list of Point2D to add.
- */
-dwv.math.Path.prototype.addPoints = function (newPointArray) {
-  this.pointArray = this.pointArray.concat(newPointArray);
-};
-
-/**
- * Append a Path to this one.
- *
- * @param {dwv.math.Path} other The Path to append.
- */
-dwv.math.Path.prototype.appenPath = function (other) {
-  var oldSize = this.pointArray.length;
-  this.pointArray = this.pointArray.concat(other.pointArray);
-  var indexArray = [];
-  for (var i = 0; i < other.controlPointIndexArray.length; ++i) {
-    indexArray[i] = other.controlPointIndexArray[i] + oldSize;
-  }
-  this.controlPointIndexArray = this.controlPointIndexArray.concat(indexArray);
-};
-
-// namespaces
-var dwv = dwv || {};
-dwv.math = dwv.math || {};
-
-/**
- * Basic statistics
+ * Simple statistics
  *
  * @class
  * @param {number} min The minimum value.
@@ -19895,7 +21581,7 @@ dwv.math = dwv.math || {};
  * @param {number} mean The mean value.
  * @param {number} stdDev The standard deviation.
  */
-dwv.math.Stats = function (min, max, mean, stdDev) {
+dwv.math.SimpleStats = function (min, max, mean, stdDev) {
   /**
    * Get the minimum value.
    *
@@ -19936,12 +21622,12 @@ dwv.math.Stats = function (min, max, mean, stdDev) {
  * @param {object} rhs The other Stats object to compare to.
  * @returns {boolean} True if both Stats object are equal.
  */
-dwv.math.Stats.prototype.equals = function (rhs) {
+dwv.math.SimpleStats.prototype.equals = function (rhs) {
   return rhs !== null &&
-        this.getMin() === rhs.getMin() &&
-        this.getMax() === rhs.getMax() &&
-        this.getMean() === rhs.getMean() &&
-        this.getStdDev() === rhs.getStdDev();
+    this.getMin() === rhs.getMin() &&
+    this.getMax() === rhs.getMax() &&
+    this.getMean() === rhs.getMean() &&
+    this.getStdDev() === rhs.getStdDev();
 };
 
 /**
@@ -19949,7 +21635,7 @@ dwv.math.Stats.prototype.equals = function (rhs) {
  *
  * @returns {object} An object representation of the stats.
  */
-dwv.math.Stats.prototype.asObject = function () {
+dwv.math.SimpleStats.prototype.asObject = function () {
   return {
     min: this.getMin(),
     max: this.getMax(),
@@ -19958,25 +21644,86 @@ dwv.math.Stats.prototype.asObject = function () {
   };
 };
 
+dwv.math.FullStats = function (min, max, mean, stdDev, median, p25, p75) {
+  dwv.math.SimpleStats.call(this, min, max, mean, stdDev);
+  /**
+   * Get the median value.
+   *
+   * @returns {number} The median value.
+   */
+  this.getMedian = function () {
+    return median;
+  };
+  /**
+   * Get the 25th persentile value.
+   *
+   * @returns {number} The 25th persentile value.
+   */
+  this.getP25 = function () {
+    return p25;
+  };
+  /**
+   * Get the 75th persentile value.
+   *
+   * @returns {number} The 75th persentile value.
+   */
+  this.getP75 = function () {
+    return p75;
+  };
+};
+
+// inherit from simple stats
+dwv.math.FullStats.prototype = Object.create(dwv.math.SimpleStats.prototype);
+Object.defineProperty(dwv.math.FullStats.prototype, 'constructor', {
+  value: dwv.math.FullStats,
+  enumerable: false, // so that it does not appear in 'for in' loop
+  writable: true
+});
+
 /**
  * Get the minimum, maximum, mean and standard deviation
  * of an array of values.
  * Note: could use {@link https://github.com/tmcw/simple-statistics}.
  *
  * @param {Array} array The array of values to extract stats from.
+ * @param {Array} flags A list of stat values to calculate.
  * @returns {dwv.math.Stats} A stats object.
  */
-dwv.math.getStats = function (array) {
+dwv.math.getStats = function (array, flags) {
+  if (dwv.math.includesFullStatsFlags(flags)) {
+    return dwv.math.getFullStats(array);
+  } else {
+    return dwv.math.getSimpleStats(array);
+  }
+};
+
+/**
+ * Does the input flag list contain a full stat element?
+ *
+ * @param {Array} flags A list of stat values to calculate.
+ * @returns {boolean} True if one of the flags is a full start flag.
+ */
+dwv.math.includesFullStatsFlags = function (flags) {
+  return typeof flags !== 'undefined' &&
+    flags !== null &&
+    flags.includes('median', 'p25', 'p75');
+};
+
+/**
+ * Get simple stats: minimum, maximum, mean and standard deviation
+ * of an array of values.
+ *
+ * @param {Array} array The array of values to extract stats from.
+ * @returns {dwv.math.SimpleStats} A simple stats object.
+ */
+dwv.math.getSimpleStats = function (array) {
   var min = array[0];
   var max = min;
-  var mean = 0;
   var sum = 0;
   var sumSqr = 0;
-  var stdDev = 0;
-  var variance = 0;
-
   var val = 0;
-  for (var i = 0; i < array.length; ++i) {
+  var length = array.length;
+  for (var i = 0; i < length; ++i) {
     val = array[i];
     if (val < min) {
       min = val;
@@ -19987,12 +21734,75 @@ dwv.math.getStats = function (array) {
     sumSqr += val * val;
   }
 
-  mean = sum / array.length;
+  var mean = sum / length;
   // see http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
-  variance = sumSqr / array.length - mean * mean;
-  stdDev = Math.sqrt(variance);
+  var variance = sumSqr / length - mean * mean;
+  var stdDev = Math.sqrt(variance);
 
-  return new dwv.math.Stats(min, max, mean, stdDev);
+  return new dwv.math.SimpleStats(min, max, mean, stdDev);
+};
+
+/**
+ * Get full stats: minimum, maximum, mean, standard deviation, median, 25%
+ * and 75% percentile of an array of values.
+ *
+ * @param {Array} array The array of values to extract stats from.
+ * @returns {dwv.math.FullStats} A full stats object.
+ */
+dwv.math.getFullStats = function (array) {
+  // get simple stats
+  var simpleStats = dwv.math.getSimpleStats(array);
+
+  // sort array... can get slow...
+  array.sort(function (a, b) {
+    return a - b;
+  });
+
+  var median = dwv.math.getPercentile(array, 0.5);
+  var p25 = dwv.math.getPercentile(array, 0.25);
+  var p75 = dwv.math.getPercentile(array, 0.75);
+
+  return new dwv.math.FullStats(
+    simpleStats.getMin(),
+    simpleStats.getMax(),
+    simpleStats.getMean(),
+    simpleStats.getStdDev(),
+    median,
+    p25,
+    p75
+  );
+};
+
+/**
+ * Get an arrays' percentile. Uses linear interpolation for percentiles
+ * that lie between data points.
+ * see https://en.wikipedia.org/wiki/Percentile (second variant interpolation)
+ *
+ * @param {Array} array The sorted array of values.
+ * @param {number} ratio The percentile ratio [0-1].
+ * @returns {number} The percentile,
+ */
+dwv.math.getPercentile = function (array, ratio) {
+  // check input
+  if (array.length === 0) {
+    throw new Error('Empty array provided for percentile calculation.');
+  }
+  if (ratio < 0 || ratio > 1) {
+    throw new Error(
+      'Invalid ratio provided for percentile calculation: ' + ratio);
+  }
+  // return min for ratio=0 amd max for ratio=1
+  if (ratio === 0) {
+    return array[0];
+  } else if (ratio === 1) {
+    return array[array.length - 1];
+  }
+  // general case: interpolate between indices if needed
+  var i = (array.length - 1) * ratio;
+  var i0 = Math.floor(i);
+  var v0 = array[i0];
+  var v1 = array[i0 + 1];
+  return v0 + (v1 - v0) * (i - i0);
 };
 
 /**
@@ -20122,11 +21932,24 @@ dwv.tool.draw = dwv.tool.draw || {};
 var Konva = Konva || {};
 
 /**
+ * Default draw label text.
+ */
+dwv.tool.draw.defaultArrowLabelText = '';
+
+/**
  * Arrow factory.
  *
  * @class
  */
 dwv.tool.draw.ArrowFactory = function () {
+  /**
+   * Get the name of the shape group.
+   *
+   * @returns {string} The name.
+   */
+  this.getGroupName = function () {
+    return 'line-group';
+  };
   /**
    * Get the number of points needed to build the shape.
    *
@@ -20146,15 +21969,25 @@ dwv.tool.draw.ArrowFactory = function () {
 };
 
 /**
+ * Is the input group a group of this factory?
+ *
+ * @param {object} group The group to test.
+ * @returns {boolean} True if the group is from this fcatory.
+ */
+dwv.tool.draw.ArrowFactory.prototype.isFactoryGroup = function (group) {
+  return this.getGroupName() === group.name();
+};
+
+/**
  * Create an arrow shape to be displayed.
  *
  * @param {Array} points The points from which to extract the line.
  * @param {object} style The drawing style.
- * @param {object} _image The associated image.
+ * @param {object} _viewController The associated view controller.
  * @returns {object} The Konva object.
  */
 dwv.tool.draw.ArrowFactory.prototype.create = function (
-  points, style, _image) {
+  points, style, _viewController) {
   // physical shape
   var line = new dwv.math.Line(points[0], points[1]);
   // draw shape
@@ -20168,9 +22001,11 @@ dwv.tool.draw.ArrowFactory.prototype.create = function (
     strokeScaleEnabled: false,
     name: 'shape'
   });
-    // larger hitfunc
-  var linePerp0 = dwv.math.getPerpendicularLine(line, points[0], 10);
-  var linePerp1 = dwv.math.getPerpendicularLine(line, points[1], 10);
+  // larger hitfunc
+  var linePerp0 = dwv.math.getPerpendicularLine(
+    line, points[0], style.scale(10));
+  var linePerp1 = dwv.math.getPerpendicularLine(
+    line, points[1], style.scale(10));
   kshape.hitFunc(function (context) {
     context.beginPath();
     context.moveTo(linePerp0.getBegin().getX(), linePerp0.getBegin().getY());
@@ -20199,45 +22034,85 @@ dwv.tool.draw.ArrowFactory.prototype.create = function (
     strokeScaleEnabled: false,
     name: 'shape-triangle'
   });
-    // quantification
+  // quantification
   var ktext = new Konva.Text({
-    fontSize: style.getScaledFontSize(),
+    fontSize: style.getFontSize(),
     fontFamily: style.getFontFamily(),
     fill: style.getLineColour(),
+    padding: style.getTextPadding(),
+    shadowColor: style.getShadowLineColour(),
+    shadowOffset: style.getShadowOffset(),
     name: 'text'
   });
-  ktext.textExpr = '';
-  ktext.longText = '';
-  ktext.quant = null;
-  ktext.setText(ktext.textExpr);
+  var textExpr = '';
+  if (typeof dwv.tool.draw.arrowLabelText !== 'undefined') {
+    textExpr = dwv.tool.draw.arrowLabelText;
+  } else {
+    textExpr = dwv.tool.draw.defaultArrowLabelText;
+  }
+  ktext.setText(textExpr);
+  // meta data
+  ktext.meta = {
+    textExpr: textExpr,
+    quantification: {}
+  };
   // label
   var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
-  var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
+  var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
   var klabel = new Konva.Label({
-    x: line.getEnd().getX() + dX * 25,
-    y: line.getEnd().getY() + dY * 15,
+    x: line.getEnd().getX() + dX * ktext.width(),
+    y: line.getEnd().getY() + dY * style.applyZoomScale(15).y,
+    scale: style.applyZoomScale(1),
+    visible: textExpr.length !== 0,
     name: 'label'
   });
   klabel.add(ktext);
-  klabel.add(new Konva.Tag());
+  klabel.add(new Konva.Tag({
+    fill: style.getLineColour(),
+    opacity: style.getTagOpacity()
+  }));
 
   // return group
   var group = new Konva.Group();
-  group.name('line-group');
-  group.add(kshape);
-  group.add(kpoly);
+  group.name(this.getGroupName());
   group.add(klabel);
+  group.add(kpoly);
+  group.add(kshape);
   group.visible(true); // dont inherit
   return group;
 };
 
 /**
+ * Get anchors to update an arrow shape.
+ *
+ * @param {object} shape The associated shape.
+ * @param {object} style The application style.
+ * @returns {Array} A list of anchors.
+ */
+dwv.tool.draw.ArrowFactory.prototype.getAnchors = function (shape, style) {
+  var points = shape.points();
+
+  var anchors = [];
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    points[0] + shape.x(), points[1] + shape.y(), 'begin', style
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    points[2] + shape.x(), points[3] + shape.y(), 'end', style
+  ));
+  return anchors;
+};
+
+/**
  * Update an arrow shape.
+ * Warning: do NOT use 'this' here, this method is passed
+ *   as is to the change command.
  *
  * @param {object} anchor The active anchor.
- * @param {object} _image The associated image.
+ * @param {object} style The app style.
+ * @param {object} _viewController The associated view controller.
  */
-dwv.tool.draw.UpdateArrow = function (anchor, _image) {
+dwv.tool.draw.ArrowFactory.prototype.update = function (
+  anchor, style, _viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape
@@ -20305,18 +22180,350 @@ dwv.tool.draw.UpdateArrow = function (anchor, _image) {
   ktriangle.x(line.getBegin().getX() + ktriangle.radius() * Math.sin(angleRad));
   ktriangle.y(line.getBegin().getY() + ktriangle.radius() * Math.cos(angleRad));
   ktriangle.rotation(-angle);
+
   // update text
   var ktext = klabel.getText();
-  ktext.quant = null;
-  ktext.setText(ktext.textExpr);
+  ktext.setText(ktext.meta.textExpr);
   // update position
   var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
-  var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
+  var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
   var textPos = {
-    x: line.getEnd().getX() + dX * 25,
-    y: line.getEnd().getY() + dY * 15
+    x: line.getEnd().getX() + dX * ktext.width(),
+    y: line.getEnd().getY() + dY * style.applyZoomScale(15).y
   };
   klabel.position(textPos);
+};
+
+// namespaces
+var dwv = dwv || {};
+dwv.tool = dwv.tool || {};
+dwv.tool.draw = dwv.tool.draw || {};
+/**
+ * The Konva namespace.
+ *
+ * @external Konva
+ * @see https://konvajs.org/
+ */
+var Konva = Konva || {};
+
+/**
+ * Default draw label text.
+ */
+dwv.tool.draw.defaultCircleLabelText = '{surface}';
+
+/**
+ * Circle factory.
+ *
+ * @class
+ */
+dwv.tool.draw.CircleFactory = function () {
+  /**
+   * Get the name of the shape group.
+   *
+   * @returns {string} The name.
+   */
+  this.getGroupName = function () {
+    return 'circle-group';
+  };
+  /**
+   * Get the number of points needed to build the shape.
+   *
+   * @returns {number} The number of points.
+   */
+  this.getNPoints = function () {
+    return 2;
+  };
+  /**
+   * Get the timeout between point storage.
+   *
+   * @returns {number} The timeout in milliseconds.
+   */
+  this.getTimeout = function () {
+    return 0;
+  };
+};
+
+/**
+ * Is the input group a group of this factory?
+ *
+ * @param {object} group The group to test.
+ * @returns {boolean} True if the group is from this fcatory.
+ */
+dwv.tool.draw.CircleFactory.prototype.isFactoryGroup = function (group) {
+  return this.getGroupName() === group.name();
+};
+
+/**
+ * Create a circle shape to be displayed.
+ *
+ * @param {Array} points The points from which to extract the circle.
+ * @param {object} style The drawing style.
+ * @param {object} viewController The associated view controller.
+ * @returns {object} The Konva group.
+ */
+dwv.tool.draw.CircleFactory.prototype.create = function (
+  points, style, viewController) {
+  // calculate radius
+  var a = Math.abs(points[0].getX() - points[1].getX());
+  var b = Math.abs(points[0].getY() - points[1].getY());
+  var radius = Math.round(Math.sqrt(a * a + b * b));
+  // physical shape
+  var circle = new dwv.math.Circle(points[0], radius);
+  // draw shape
+  var kshape = new Konva.Circle({
+    x: circle.getCenter().getX(),
+    y: circle.getCenter().getY(),
+    radius: circle.getRadius(),
+    stroke: style.getLineColour(),
+    strokeWidth: style.getStrokeWidth(),
+    strokeScaleEnabled: false,
+    name: 'shape'
+  });
+  // quantification
+  var ktext = new Konva.Text({
+    fontSize: style.getFontSize(),
+    fontFamily: style.getFontFamily(),
+    fill: style.getLineColour(),
+    padding: style.getTextPadding(),
+    shadowColor: style.getShadowLineColour(),
+    shadowOffset: style.getShadowOffset(),
+    name: 'text'
+  });
+  var textExpr = '';
+  if (typeof dwv.tool.draw.circleLabelText !== 'undefined') {
+    textExpr = dwv.tool.draw.circleLabelText;
+  } else {
+    textExpr = dwv.tool.draw.defaultCircleLabelText;
+  }
+  var quant = circle.quantify(
+    viewController,
+    dwv.utils.getFlags(textExpr));
+  ktext.setText(dwv.utils.replaceFlags(textExpr, quant));
+  // meta data
+  ktext.meta = {
+    textExpr: textExpr,
+    quantification: quant
+  };
+  // label
+  var klabel = new Konva.Label({
+    x: circle.getCenter().getX(),
+    y: circle.getCenter().getY(),
+    scale: style.applyZoomScale(1),
+    visible: textExpr.length !== 0,
+    name: 'label'
+  });
+  klabel.add(ktext);
+  klabel.add(new Konva.Tag({
+    fill: style.getLineColour(),
+    opacity: style.getTagOpacity()
+  }));
+
+  // debug shadow
+  var kshadow;
+  if (dwv.tool.draw.debug) {
+    kshadow = dwv.tool.draw.getShadowCircle(circle);
+  }
+
+  // return group
+  var group = new Konva.Group();
+  group.name(this.getGroupName());
+  if (kshadow) {
+    group.add(kshadow);
+  }
+  group.add(klabel);
+  group.add(kshape);
+  group.visible(true); // dont inherit
+  return group;
+};
+
+/**
+ * Get anchors to update a circle shape.
+ *
+ * @param {object} shape The associated shape.
+ * @param {object} style The application style.
+ * @returns {Array} A list of anchors.
+ */
+dwv.tool.draw.CircleFactory.prototype.getAnchors = function (shape, style) {
+  var centerX = shape.x();
+  var centerY = shape.y();
+  var radius = shape.radius();
+
+  var anchors = [];
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    centerX - radius, centerY, 'left', style
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    centerX + radius, centerY, 'right', style
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    centerX, centerY - radius, 'bottom', style
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    centerX, centerY + radius, 'top', style
+  ));
+  return anchors;
+};
+
+/**
+ * Update a circle shape.
+ * Warning: do NOT use 'this' here, this method is passed
+ *   as is to the change command.
+ *
+ * @param {object} anchor The active anchor.
+ * @param {object} _style The app style.
+ * @param {object} viewController The associated view controller.
+ */
+dwv.tool.draw.CircleFactory.prototype.update = function (
+  anchor, _style, viewController) {
+  // parent group
+  var group = anchor.getParent();
+  // associated shape
+  var kcircle = group.getChildren(function (node) {
+    return node.name() === 'shape';
+  })[0];
+  // associated label
+  var klabel = group.getChildren(function (node) {
+    return node.name() === 'label';
+  })[0];
+  // find special points
+  var left = group.getChildren(function (node) {
+    return node.id() === 'left';
+  })[0];
+  var right = group.getChildren(function (node) {
+    return node.id() === 'right';
+  })[0];
+  var bottom = group.getChildren(function (node) {
+    return node.id() === 'bottom';
+  })[0];
+  var top = group.getChildren(function (node) {
+    return node.id() === 'top';
+  })[0];
+  // debug shadow
+  var kshadow;
+  if (dwv.tool.draw.debug) {
+    kshadow = group.getChildren(function (node) {
+      return node.name() === 'shadow';
+    })[0];
+  }
+
+  // circle center
+  var center = {
+    x: kcircle.x(),
+    y: kcircle.y()
+  };
+
+  var radius;
+
+  // update 'self' (undo case) and special points
+  switch (anchor.id()) {
+  case 'left':
+    radius = center.x - anchor.x();
+    // force y
+    left.y(right.y());
+    // update others
+    right.x(center.x + radius);
+    bottom.y(center.y - radius);
+    top.y(center.y + radius);
+    break;
+  case 'right':
+    radius = anchor.x() - center.x;
+    // force y
+    right.y(left.y());
+    // update others
+    left.x(center.x - radius);
+    bottom.y(center.y - radius);
+    top.y(center.y + radius);
+    break;
+  case 'bottom':
+    radius = center.y - anchor.y();
+    // force x
+    bottom.x(top.x());
+    // update others
+    left.x(center.x - radius);
+    right.x(center.x + radius);
+    top.y(center.y + radius);
+    break;
+  case 'top':
+    radius = anchor.y() - center.y;
+    // force x
+    top.x(bottom.x());
+    // update others
+    left.x(center.x - radius);
+    right.x(center.x + radius);
+    bottom.y(center.y - radius);
+    break;
+  default :
+    dwv.logger.error('Unhandled anchor id: ' + anchor.id());
+    break;
+  }
+
+  // update shape: just update the radius
+  kcircle.radius(Math.abs(radius));
+  // new circle
+  var centerPoint = new dwv.math.Point2D(
+    group.x() + center.x,
+    group.y() + center.y
+  );
+  var circle = new dwv.math.Circle(centerPoint, radius);
+
+  // debug shadow
+  if (kshadow) {
+    // remove previous
+    kshadow.destroy();
+    // add new
+    group.add(dwv.tool.draw.getShadowCircle(circle, group));
+  }
+
+  // update text
+  var ktext = klabel.getText();
+  var quantification = circle.quantify(
+    viewController,
+    dwv.utils.getFlags(ktext.meta.textExpr));
+  ktext.setText(dwv.utils.replaceFlags(ktext.meta.textExpr, quantification));
+  // update meta
+  ktext.meta.quantification = quantification;
+  // update position
+  var textPos = {x: center.x, y: center.y};
+  klabel.position(textPos);
+};
+
+/**
+ * Get the debug shadow.
+ *
+ * @param {object} circle The circle to shadow.
+ * @param {object} group The associated group.
+ * @returns {object} The shadow konva group.
+ */
+dwv.tool.draw.getShadowCircle = function (circle, group) {
+  // possible group offset
+  var offsetX = 0;
+  var offsetY = 0;
+  if (typeof group !== 'undefined') {
+    offsetX = group.x();
+    offsetY = group.y();
+  }
+  var kshadow = new Konva.Group();
+  kshadow.name('shadow');
+  var regions = circle.getRound();
+  for (var i = 0; i < regions.length; ++i) {
+    var region = regions[i];
+    var minX = region[0][0];
+    var minY = region[0][1];
+    var maxX = region[1][0];
+    var pixelLine = new Konva.Rect({
+      x: minX - offsetX,
+      y: minY - offsetY,
+      width: maxX - minX,
+      height: 1,
+      fill: 'grey',
+      strokeWidth: 0,
+      strokeScaleEnabled: false,
+      opacity: 0.3,
+      name: 'shadow-element'
+    });
+    kshadow.add(pixelLine);
+  }
+  return kshadow;
 };
 
 // namespaces
@@ -20329,6 +22536,11 @@ dwv.tool = dwv.tool || {};
  * @see https://konvajs.org/
  */
 var Konva = Konva || {};
+
+/**
+ * Debug flag.
+ */
+dwv.tool.draw.debug = false;
 
 /**
  * Drawing tool.
@@ -20460,9 +22672,9 @@ dwv.tool.Draw = function (app) {
   /**
    * Drawing style.
    *
-   * @type {dwv.html.Style}
+   * @type {dwv.gui.Style}
    */
-  this.style = new dwv.html.Style();
+  this.style = app.getStyle();
 
   /**
    * Event listeners.
@@ -20472,12 +22684,12 @@ dwv.tool.Draw = function (app) {
   var listeners = {};
 
   /**
-   * The associated draw layer.
+   * The associated Konva layer.
    *
    * @private
    * @type {object}
    */
-  var drawLayer = null;
+  var konvaLayer = null;
 
   /**
    * Handle mouse down event.
@@ -20490,15 +22702,18 @@ dwv.tool.Draw = function (app) {
       return;
     }
 
-    // update scale
-    self.style.setScale(app.getWindowScale());
+    var layerController = app.getLayerController();
+    var drawLayer = layerController.getActiveDrawLayer();
 
     // determine if the click happened in an existing shape
-    var stage = app.getDrawStage();
+    var stage = drawLayer.getKonvaStage();
     var kshape = stage.getIntersection({
       x: event._xs,
       y: event._ys
     });
+
+    // update scale
+    self.style.setZoomScale(stage.scale());
 
     if (kshape) {
       var group = kshape.getParent();
@@ -20508,14 +22723,16 @@ dwv.tool.Draw = function (app) {
       if (selectedShape && selectedShape !== shapeEditor.getShape()) {
         shapeEditor.disable();
         shapeEditor.setShape(selectedShape);
-        shapeEditor.setImage(app.getImage());
+        var viewController =
+          layerController.getActiveViewLayer().getViewController();
+        shapeEditor.setViewController(viewController);
         shapeEditor.enable();
       }
     } else {
       // disable edition
       shapeEditor.disable();
       shapeEditor.setShape(null);
-      shapeEditor.setImage(null);
+      shapeEditor.setViewController(null);
       // start storing points
       started = true;
       // set factory
@@ -20691,7 +22908,7 @@ dwv.tool.Draw = function (app) {
         shapeGroup.getChildren(dwv.draw.isNodeNameShape)[0]);
       // delete command
       var delcmd = new dwv.tool.DeleteGroupCommand(shapeGroup,
-        shapeDisplayName, drawLayer);
+        shapeDisplayName, konvaLayer);
       delcmd.onExecute = fireEvent;
       delcmd.onUndo = fireEvent;
       delcmd.execute();
@@ -20708,7 +22925,7 @@ dwv.tool.Draw = function (app) {
       started = false;
       points = [];
       // redraw
-      drawLayer.draw();
+      konvaLayer.draw();
     }
   };
 
@@ -20723,15 +22940,18 @@ dwv.tool.Draw = function (app) {
       tmpShapeGroup.destroy();
     }
     // create shape group
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
     tmpShapeGroup = currentFactory.create(
-      tmpPoints, self.style, app.getImage());
+      tmpPoints, self.style, viewController);
     // do not listen during creation
     var shape = tmpShapeGroup.getChildren(dwv.draw.isNodeNameShape)[0];
     shape.listening(false);
-    drawLayer.listening(false);
+    konvaLayer.listening(false);
     // draw shape
-    drawLayer.add(tmpShapeGroup);
-    drawLayer.draw();
+    konvaLayer.add(tmpShapeGroup);
+    konvaLayer.draw();
   }
 
   /**
@@ -20744,21 +22964,28 @@ dwv.tool.Draw = function (app) {
     if (tmpShapeGroup) {
       tmpShapeGroup.destroy();
     }
+
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
+    var drawController =
+      layerController.getActiveDrawLayer().getDrawController();
+
     // create final shape
     var finalShapeGroup = currentFactory.create(
-      finalPoints, self.style, app.getImage());
+      finalPoints, self.style, viewController);
     finalShapeGroup.id(dwv.math.guid());
 
     // get the position group
-    var posGroup = app.getDrawController().getCurrentPosGroup();
+    var posGroup = drawController.getCurrentPosGroup();
     // add shape group to position group
     posGroup.add(finalShapeGroup);
 
     // re-activate layer
-    drawLayer.listening(true);
+    konvaLayer.listening(true);
     // draw shape command
     command = new dwv.tool.DrawGroupCommand(
-      finalShapeGroup, self.shapeName, drawLayer);
+      finalShapeGroup, self.shapeName, konvaLayer);
     command.onExecute = fireEvent;
     command.onUndo = fireEvent;
     // execute it
@@ -20779,20 +23006,20 @@ dwv.tool.Draw = function (app) {
     // reset shape display properties
     shapeEditor.disable();
     shapeEditor.setShape(null);
-    shapeEditor.setImage(null);
+    shapeEditor.setViewController(null);
     document.body.style.cursor = 'default';
-    // make layer listen or not to events
-    app.getDrawStage().listening(flag);
     // get the current draw layer
-    drawLayer = app.getDrawController().getDrawLayer();
-    renderDrawLayer(flag);
+    var layerController = app.getLayerController();
+    var drawLayer = layerController.getActiveDrawLayer();
+    konvaLayer = drawLayer.getKonvaLayer();
+    activateCurrentPositionShapes(flag);
     // listen to app change to update the draw layer
     if (flag) {
       app.addEventListener('slicechange', updateDrawLayer);
       app.addEventListener('framechange', updateDrawLayer);
 
       // init with the app window scale
-      this.style.setScale(app.getWindowScale());
+      this.style.setBaseScale(app.getBaseScale());
       // same for colour
       this.setLineColour(this.style.getLineColour());
     } else {
@@ -20805,41 +23032,38 @@ dwv.tool.Draw = function (app) {
    * Update the draw layer.
    */
   function updateDrawLayer() {
-    // activate the draw layer
-    renderDrawLayer(true);
+    // activate the shape at current position
+    activateCurrentPositionShapes(true);
   }
 
   /**
-   * Render (or not) the draw layer.
+   * Activate shapes at current position.
    *
    * @param {boolean} visible Set the draw layer visible or not.
    */
-  function renderDrawLayer(visible) {
-
-    drawLayer.listening(visible);
+  function activateCurrentPositionShapes(visible) {
+    var layerController = app.getLayerController();
+    var drawController =
+      layerController.getActiveDrawLayer().getDrawController();
 
     // get shape groups at the current position
     var shapeGroups =
-      app.getDrawController().getCurrentPosGroup().getChildren();
+      drawController.getCurrentPosGroup().getChildren();
 
     // set shape display properties
     if (visible) {
-      // activate tool listeners
-      app.addToolCanvasListeners(app.getDrawStage().getContent());
       // activate shape listeners
       shapeGroups.forEach(function (group) {
         self.setShapeOn(group);
       });
     } else {
-      // de-activate tool listeners
-      app.removeToolCanvasListeners(app.getDrawStage().getContent());
       // de-activate shape listeners
       shapeGroups.forEach(function (group) {
         setShapeOff(group);
       });
     }
     // draw
-    drawLayer.draw();
+    konvaLayer.draw();
   }
 
   /**
@@ -20867,7 +23091,9 @@ dwv.tool.Draw = function (app) {
    * @private
    */
   function getRealPosition(index) {
-    var stage = app.getDrawStage();
+    var layerController = app.getLayerController();
+    var drawLayer = layerController.getActiveDrawLayer();
+    var stage = drawLayer.getKonvaStage();
     return {
       x: stage.offset().x + index.x / stage.scale().x,
       y: stage.offset().y + index.y / stage.scale().y
@@ -20905,22 +23131,28 @@ dwv.tool.Draw = function (app) {
       // store colour
       colour = shapeGroup.getChildren(dwv.draw.isNodeNameShape)[0].stroke();
       // display trash
-      var stage = app.getDrawStage();
+      var layerController = app.getLayerController();
+      var drawLayer = layerController.getActiveDrawLayer();
+      var stage = drawLayer.getKonvaStage();
       var scale = stage.scale();
       var invscale = {x: 1 / scale.x, y: 1 / scale.y};
       trash.x(stage.offset().x + (stage.width() / (2 * scale.x)));
       trash.y(stage.offset().y + (stage.height() / (15 * scale.y)));
       trash.scale(invscale);
-      drawLayer.add(trash);
+      konvaLayer.add(trash);
       // deactivate anchors to avoid events on null shape
       shapeEditor.setAnchorsActive(false);
       // draw
-      drawLayer.draw();
+      konvaLayer.draw();
     });
     // drag move event handling
     shapeGroup.on('dragmove.draw', function (event) {
+      var layerController = app.getLayerController();
+      var drawLayer = layerController.getActiveDrawLayer();
+      // validate the group position
+      dwv.tool.validateGroupPosition(drawLayer.getSize(), this);
       // highlight trash when on it
-      var offset = dwv.html.getEventOffset(event.evt)[0];
+      var offset = dwv.gui.getEventOffset(event.evt)[0];
       var eventPos = getRealPosition(offset);
       var trashHalfWidth = trash.width() * trash.scaleX() / 2;
       var trashHalfHeight = trash.height() * trash.scaleY() / 2;
@@ -20941,11 +23173,13 @@ dwv.tool.Draw = function (app) {
         // reset the group shapes colour
         shapeGroup.getChildren(dwv.draw.canNodeChangeColour).forEach(
           function (ashape) {
-            ashape.stroke(colour);
+            if (typeof ashape.stroke !== 'undefined') {
+              ashape.stroke(colour);
+            }
           });
       }
       // draw
-      drawLayer.draw();
+      konvaLayer.draw();
     });
     // drag end event handling
     shapeGroup.on('dragend.draw', function (event) {
@@ -20953,7 +23187,7 @@ dwv.tool.Draw = function (app) {
       // remove trash
       trash.remove();
       // delete case
-      var offset = dwv.html.getEventOffset(event.evt)[0];
+      var offset = dwv.gui.getEventOffset(event.evt)[0];
       var eventPos = getRealPosition(offset);
       var trashHalfWidth = trash.width() * trash.scaleX() / 2;
       var trashHalfHeight = trash.height() * trash.scaleY() / 2;
@@ -20965,7 +23199,7 @@ dwv.tool.Draw = function (app) {
         // disable editor
         shapeEditor.disable();
         shapeEditor.setShape(null);
-        shapeEditor.setImage(null);
+        shapeEditor.setViewController(null);
         // reset colour
         shapeGroup.getChildren(dwv.draw.canNodeChangeColour).forEach(
           function (ashape) {
@@ -20975,7 +23209,7 @@ dwv.tool.Draw = function (app) {
         document.body.style.cursor = 'default';
         // delete command
         var delcmd = new dwv.tool.DeleteGroupCommand(this,
-          shapeDisplayName, drawLayer);
+          shapeDisplayName, konvaLayer);
         delcmd.onExecute = fireEvent;
         delcmd.onUndo = fireEvent;
         delcmd.execute();
@@ -20986,7 +23220,7 @@ dwv.tool.Draw = function (app) {
           y: pos.y - dragStartPos.y};
         if (translation.x !== 0 || translation.y !== 0) {
           var mvcmd = new dwv.tool.MoveGroupCommand(this,
-            shapeDisplayName, translation, drawLayer);
+            shapeDisplayName, translation, konvaLayer);
           mvcmd.onExecute = fireEvent;
           mvcmd.onUndo = fireEvent;
           app.addToUndoStack(mvcmd);
@@ -21002,13 +23236,12 @@ dwv.tool.Draw = function (app) {
         shapeEditor.resetAnchors();
       }
       // draw
-      drawLayer.draw();
+      konvaLayer.draw();
       // reset start position
       dragStartPos = {x: this.x(), y: this.y()};
     });
     // double click handling: update label
     shapeGroup.on('dblclick', function () {
-
       // get the label object for this shape
       var label = this.findOne('Label');
       // should just be one
@@ -21017,27 +23250,33 @@ dwv.tool.Draw = function (app) {
       }
       var ktext = label.getText();
 
-      // ask user for new label
-      // TODO remove
-      var labelText = dwv.gui.prompt('Shape label', ktext.textExpr);
+      var onSaveCallback = function (meta) {
+        // store meta
+        ktext.meta = meta;
+        // update text expression
+        ktext.setText(dwv.utils.replaceFlags(
+          ktext.meta.textExpr, ktext.meta.quantification));
+        label.setVisible(ktext.meta.textExpr.length !== 0);
 
-      // if press cancel do nothing
-      if (labelText === null) {
-        return;
-      } else if (labelText === ktext.textExpr) {
-        return;
+        // trigger event
+        fireEvent({
+          type: 'drawchange'
+        });
+        // draw
+        konvaLayer.draw();
+      };
+
+      // call client dialog if defined
+      if (typeof dwv.gui.openRoiDialog !== 'undefined') {
+        dwv.gui.openRoiDialog(ktext.meta, onSaveCallback);
+      } else {
+        // simple prompt for the text expression
+        var textExpr = prompt('Label', ktext.meta.textExpr);
+        if (textExpr !== null) {
+          ktext.meta.textExpr = textExpr;
+          onSaveCallback(ktext.meta);
+        }
       }
-      // update text expression and set text
-      ktext.textExpr = labelText;
-      ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
-
-      // trigger event
-      fireEvent({
-        type: 'drawchange'
-      });
-
-      // draw
-      drawLayer.draw();
     });
   };
 
@@ -21049,6 +23288,8 @@ dwv.tool.Draw = function (app) {
   this.setOptions = function (options) {
     // save the options as the shape factory list
     this.shapeFactoryList = options;
+    // pass them to the editor
+    shapeEditor.setFactoryList(options);
   };
 
   /**
@@ -21093,7 +23334,7 @@ dwv.tool.Draw = function (app) {
   /**
    * Set the line colour of the drawing.
    *
-   * @param {string} colour The colour to set.
+   * @param {string} colour The colour to set
    */
   this.setLineColour = function (colour) {
     this.style.setLineColour(colour);
@@ -21159,6 +23400,101 @@ dwv.tool.Draw.prototype.hasShape = function (name) {
   return this.shapeFactoryList[name];
 };
 
+/**
+ * Get the minimum position in a groups' anchors.
+ *
+ * @param {object} group The group that contains anchors.
+ * @returns {object} The minimum position.
+ */
+dwv.tool.getAnchorMin = function (group) {
+  var anchors = group.find('.anchor');
+  if (anchors.length === 0) {
+    return;
+  }
+  var minX = anchors[0].x();
+  var minY = anchors[0].y();
+  anchors.each(function (anchor) {
+    minX = Math.min(minX, anchor.x());
+    minY = Math.min(minY, anchor.y());
+  });
+  return {x: minX, y: minY};
+};
+
+/**
+ * Bound a node position.
+ *
+ * @param {object} node The node to bound the position.
+ * @param {object} min The minimum position.
+ * @param {object} max The maximum position.
+ * @returns {boolean} True if the position was corrected.
+ */
+dwv.tool.boundNodePosition = function (node, min, max) {
+  var changed = false;
+  if (node.x() < min.x) {
+    node.x(min.x);
+    changed = true;
+  } else if (node.x() > max.x) {
+    node.x(max.x);
+    changed = true;
+  }
+  if (node.y() < min.y) {
+    node.y(min.y);
+    changed = true;
+  } else if (node.y() > max.y) {
+    node.y(max.y);
+    changed = true;
+  }
+  return changed;
+};
+
+/**
+ * Validate a group position.
+ *
+ * @param {object} stageSize The stage size {x,y}.
+ * @param {object} group The group to evaluate.
+ * @returns {boolean} True if the position was corrected.
+ */
+dwv.tool.validateGroupPosition = function (stageSize, group) {
+  // if anchors get mixed, width/height can be negative
+  var shape = group.getChildren(dwv.draw.isNodeNameShape)[0];
+  var anchorMin = dwv.tool.getAnchorMin(group);
+
+  var min = {
+    x: -anchorMin.x,
+    y: -anchorMin.y
+  };
+  var max = {
+    x: stageSize.x -
+      (anchorMin.x + Math.abs(shape.width())),
+    y: stageSize.y -
+      (anchorMin.y + Math.abs(shape.height()))
+  };
+
+  return dwv.tool.boundNodePosition(group, min, max);
+};
+
+/**
+ * Validate an anchor position.
+ *
+ * @param {object} stageSize The stage size {x,y}.
+ * @param {object} anchor The anchor to evaluate.
+ * @returns {boolean} True if the position was corrected.
+ */
+dwv.tool.validateAnchorPosition = function (stageSize, anchor) {
+  var group = anchor.getParent();
+
+  var min = {
+    x: -group.x(),
+    y: -group.y()
+  };
+  var max = {
+    x: stageSize.x - group.x(),
+    y: stageSize.y - group.y()
+  };
+
+  return dwv.tool.boundNodePosition(anchor, min, max);
+};
+
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
@@ -21205,7 +23541,7 @@ dwv.tool.GetShapeDisplayName = function (shape) {
  * @class
  */
 dwv.tool.DrawGroupCommand = function (group, name, layer, silent) {
-  var isSilent = (typeof silent === 'undefined') ? false : true;
+  var isSilent = (typeof silent === 'undefined') ? false : silent;
 
   // group parent
   var parent = group.getParent();
@@ -21364,11 +23700,12 @@ dwv.tool.MoveGroupCommand.prototype.onUndo = function (_event) {
  * @param {object} startAnchor The anchor that starts the change.
  * @param {object} endAnchor The anchor that ends the change.
  * @param {object} layer The layer where to change the group.
- * @param {object} image The associated image.
+ * @param {object} viewController The associated viewController.
+ * @param {object} style The app style.
  * @class
  */
 dwv.tool.ChangeGroupCommand = function (
-  name, func, startAnchor, endAnchor, layer, image) {
+  name, func, startAnchor, endAnchor, layer, viewController, style) {
   /**
    * Get the command name.
    *
@@ -21385,7 +23722,7 @@ dwv.tool.ChangeGroupCommand = function (
    */
   this.execute = function () {
     // change shape
-    func(endAnchor, image);
+    func(endAnchor, style, viewController);
     // draw
     layer.draw();
     // callback
@@ -21406,7 +23743,7 @@ dwv.tool.ChangeGroupCommand = function (
    */
   this.undo = function () {
     // invert change shape
-    func(startAnchor, image);
+    func(startAnchor, style, viewController);
     // draw
     layer.draw();
     // callback
@@ -21523,12 +23860,52 @@ dwv.tool = dwv.tool || {};
 var Konva = Konva || {};
 
 /**
+ * Get the default anchor shape.
+ *
+ * @param {number} x The X position.
+ * @param {number} y The Y position.
+ * @param {string} id The shape id.
+ * @param {object} style The application style.
+ * @returns {object} The default anchor shape.
+ */
+dwv.tool.draw.getDefaultAnchor = function (x, y, id, style) {
+  return new Konva.Ellipse({
+    x: x,
+    y: y,
+    stroke: '#999',
+    fill: 'rgba(100,100,100,0.7',
+    strokeWidth: style.getStrokeWidth(),
+    strokeScaleEnabled: false,
+    radius: style.applyZoomScale(3),
+    name: 'anchor',
+    id: id,
+    dragOnTop: false,
+    draggable: true,
+    visible: false
+  });
+};
+
+/**
  * Shape editor.
  *
  * @param {object} app The associated application.
  * @class
  */
 dwv.tool.ShapeEditor = function (app) {
+  /**
+   * Shape factory list
+   *
+   * @type {object}
+   * @private
+   */
+  var shapeFactoryList = null;
+  /**
+   * Current shape factory.
+   *
+   * @type {object}
+   * @private
+   */
+  var currentFactory = null;
   /**
    * Edited shape.
    *
@@ -21537,12 +23914,12 @@ dwv.tool.ShapeEditor = function (app) {
    */
   var shape = null;
   /**
-   * Edited image. Used for quantification update.
+   * Edited view controller. Used for quantification update.
    *
    * @private
    * @type {object}
    */
-  var image = null;
+  var viewController = null;
   /**
    * Active flag.
    *
@@ -21550,13 +23927,6 @@ dwv.tool.ShapeEditor = function (app) {
    * @type {boolean}
    */
   var isActive = false;
-  /**
-   * Update function used by anchors to update the shape.
-   *
-   * @private
-   * @type {Function}
-   */
-  var updateFunction = null;
   /**
    * Draw event callback.
    *
@@ -21566,15 +23936,40 @@ dwv.tool.ShapeEditor = function (app) {
   var drawEventCallback = null;
 
   /**
+   * Set the tool options.
+   *
+   * @param {Array} list The list of shape classes.
+   */
+  this.setFactoryList = function (list) {
+    shapeFactoryList = list;
+  };
+
+  /**
    * Set the shape to edit.
    *
    * @param {object} inshape The shape to edit.
    */
   this.setShape = function (inshape) {
     shape = inshape;
-    // reset anchors
     if (shape) {
+      // remove old anchors
       removeAnchors();
+      // find a factory for the input shape
+      var group = shape.getParent();
+      var keys = Object.keys(shapeFactoryList);
+      currentFactory = null;
+      for (var i = 0; i < keys.length; ++i) {
+        var factory = new shapeFactoryList[keys[i]];
+        if (factory.isFactoryGroup(group)) {
+          currentFactory = factory;
+          // stop at first find
+          break;
+        }
+      }
+      if (currentFactory === null) {
+        throw new Error('Could not find a factory to update shape.');
+      }
+      // add new anchors
       addAnchors();
     }
   };
@@ -21582,10 +23977,10 @@ dwv.tool.ShapeEditor = function (app) {
   /**
    * Set the associated image.
    *
-   * @param {object} img The associated image.
+   * @param {object} vc The associated view controller.
    */
-  this.setImage = function (img) {
-    image = img;
+  this.setViewController = function (vc) {
+    viewController = vc;
   };
 
   /**
@@ -21720,101 +24115,15 @@ dwv.tool.ShapeEditor = function (app) {
     }
     // get shape group
     var group = shape.getParent();
-    // add shape specific anchors to the shape group
-    if (shape instanceof Konva.Line) {
-      var points = shape.points();
 
-      var needsBeginEnd = group.name() === 'line-group' ||
-                group.name() === 'ruler-group' ||
-                group.name() === 'protractor-group';
-      var needsMid = group.name() === 'protractor-group';
-
-      var px = 0;
-      var py = 0;
-      var name = '';
-      for (var i = 0; i < points.length; i = i + 2) {
-        px = points[i] + shape.x();
-        py = points[i + 1] + shape.y();
-        name = i;
-        if (needsBeginEnd) {
-          if (i === 0) {
-            name = 'begin';
-          } else if (i === points.length - 2) {
-            name = 'end';
-          }
-        }
-        if (needsMid && i === 2) {
-          name = 'mid';
-        }
-        addAnchor(group, px, py, name);
-      }
-
-      if (group.name() === 'line-group') {
-        updateFunction = dwv.tool.draw.UpdateArrow;
-      } else if (group.name() === 'ruler-group') {
-        updateFunction = dwv.tool.draw.UpdateRuler;
-      } else if (group.name() === 'protractor-group') {
-        updateFunction = dwv.tool.draw.UpdateProtractor;
-      } else if (group.name() === 'roi-group') {
-        updateFunction = dwv.tool.draw.UpdateRoi;
-      } else if (group.name() === 'freeHand-group') {
-        updateFunction = dwv.tool.draw.UpdateFreeHand;
-      } else {
-        dwv.logger.warn('Cannot update unknown line shape.');
-      }
-    } else if (shape instanceof Konva.Rect) {
-      updateFunction = dwv.tool.draw.UpdateRect;
-      var rectX = shape.x();
-      var rectY = shape.y();
-      var rectWidth = shape.width();
-      var rectHeight = shape.height();
-      addAnchor(group, rectX, rectY, 'topLeft');
-      addAnchor(group, rectX + rectWidth, rectY, 'topRight');
-      addAnchor(group, rectX + rectWidth, rectY + rectHeight, 'bottomRight');
-      addAnchor(group, rectX, rectY + rectHeight, 'bottomLeft');
-    } else if (shape instanceof Konva.Ellipse) {
-      updateFunction = dwv.tool.draw.UpdateEllipse;
-      var ellipseX = shape.x();
-      var ellipseY = shape.y();
-      var radius = shape.radius();
-      addAnchor(group, ellipseX - radius.x, ellipseY - radius.y, 'topLeft');
-      addAnchor(group, ellipseX + radius.x, ellipseY - radius.y, 'topRight');
-      addAnchor(group, ellipseX + radius.x, ellipseY + radius.y, 'bottomRight');
-      addAnchor(group, ellipseX - radius.x, ellipseY + radius.y, 'bottomLeft');
+    // activate and add anchors to group
+    var anchors = currentFactory.getAnchors(shape, app.getStyle());
+    for (var i = 0; i < anchors.length; ++i) {
+      // set anchor on
+      setAnchorOn(anchors[i]);
+      // add the anchor to the group
+      group.add(anchors[i]);
     }
-    // add group to layer
-    //shape.getLayer().add( group );
-    //shape.getParent().add( group );
-  }
-
-  /**
-   * Create shape editor controls, i.e. the anchors.
-   *
-   * @param {object} group The group associated with this anchor.
-   * @param {number} x The X position of the anchor.
-   * @param {number} y The Y position of the anchor.
-   * @param {number} id The id of the anchor.
-   * @private
-   */
-  function addAnchor(group, x, y, id) {
-    // anchor shape
-    var anchor = new Konva.Circle({
-      x: x,
-      y: y,
-      stroke: '#999',
-      fill: 'rgba(100,100,100,0.7',
-      strokeWidth: app.getStyle().getScaledStrokeWidth() / app.getScale(),
-      radius: app.getStyle().scale(6) / app.getScale(),
-      name: 'anchor',
-      id: id,
-      dragOnTop: false,
-      draggable: true,
-      visible: false
-    });
-    // set anchor on
-    setAnchorOn(anchor);
-    // add the anchor to the group
-    group.add(anchor);
   }
 
   /**
@@ -21867,12 +24176,12 @@ dwv.tool.ShapeEditor = function (app) {
     });
     // drag move listener
     anchor.on('dragmove.edit', function (evt) {
+      var layerController = app.getLayerController();
+      var drawLayer = layerController.getActiveDrawLayer();
+      // validate the anchor position
+      dwv.tool.validateAnchorPosition(drawLayer.getSize(), this);
       // update shape
-      if (updateFunction) {
-        updateFunction(this, image);
-      } else {
-        dwv.logger.warn('No update function!');
-      }
+      currentFactory.update(this, app.getStyle(), viewController);
       // redraw
       if (this.getLayer()) {
         this.getLayer().draw();
@@ -21888,11 +24197,12 @@ dwv.tool.ShapeEditor = function (app) {
       // store the change command
       var chgcmd = new dwv.tool.ChangeGroupCommand(
         shapeDisplayName,
-        updateFunction,
+        currentFactory.update,
         startAnchor,
         endAnchor,
         this.getLayer(),
-        image
+        viewController,
+        app.getStyle()
       );
       chgcmd.onExecute = drawEventCallback;
       chgcmd.onUndo = drawEventCallback;
@@ -21958,11 +24268,24 @@ dwv.tool.draw = dwv.tool.draw || {};
 var Konva = Konva || {};
 
 /**
+ * Default draw label text.
+ */
+dwv.tool.draw.defaultEllipseLabelText = '{surface}';
+
+/**
  * Ellipse factory.
  *
  * @class
  */
 dwv.tool.draw.EllipseFactory = function () {
+  /**
+   * Get the name of the shape group.
+   *
+   * @returns {string} The name.
+   */
+  this.getGroupName = function () {
+    return 'ellipse-group';
+  };
   /**
    * Get the number of points needed to build the shape.
    *
@@ -21982,15 +24305,25 @@ dwv.tool.draw.EllipseFactory = function () {
 };
 
 /**
+ * Is the input group a group of this factory?
+ *
+ * @param {object} group The group to test.
+ * @returns {boolean} True if the group is from this fcatory.
+ */
+dwv.tool.draw.EllipseFactory.prototype.isFactoryGroup = function (group) {
+  return this.getGroupName() === group.name();
+};
+
+/**
  * Create an ellipse shape to be displayed.
  *
  * @param {Array} points The points from which to extract the ellipse.
  * @param {object} style The drawing style.
- * @param {object} image The associated image.
+ * @param {object} viewController The associated view controller.
  * @returns {object} The Konva group.
  */
 dwv.tool.draw.EllipseFactory.prototype.create = function (
-  points, style, image) {
+  points, style, viewController) {
   // calculate radius
   var a = Math.abs(points[0].getX() - points[1].getX());
   var b = Math.abs(points[0].getY() - points[1].getY());
@@ -22007,42 +24340,101 @@ dwv.tool.draw.EllipseFactory.prototype.create = function (
     name: 'shape'
   });
   // quantification
-  var quant = image.quantifyEllipse(ellipse);
   var ktext = new Konva.Text({
-    fontSize: style.getScaledFontSize(),
+    fontSize: style.getFontSize(),
     fontFamily: style.getFontFamily(),
     fill: style.getLineColour(),
+    padding: style.getTextPadding(),
+    shadowColor: style.getShadowLineColour(),
+    shadowOffset: style.getShadowOffset(),
     name: 'text'
   });
-  ktext.textExpr = '{surface}';
-  ktext.longText = '';
-  ktext.quant = quant;
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+  var textExpr = '';
+  if (typeof dwv.tool.draw.ellipseLabelText !== 'undefined') {
+    textExpr = dwv.tool.draw.ellipseLabelText;
+  } else {
+    textExpr = dwv.tool.draw.defaultEllipseLabelText;
+  }
+  var quant = ellipse.quantify(
+    viewController,
+    dwv.utils.getFlags(textExpr));
+  ktext.setText(dwv.utils.replaceFlags(textExpr, quant));
+  // meta data
+  ktext.meta = {
+    textExpr: textExpr,
+    quantification: quant
+  };
   // label
   var klabel = new Konva.Label({
     x: ellipse.getCenter().getX(),
     y: ellipse.getCenter().getY(),
+    scale: style.applyZoomScale(1),
+    visible: textExpr.length !== 0,
     name: 'label'
   });
   klabel.add(ktext);
-  klabel.add(new Konva.Tag());
+  klabel.add(new Konva.Tag({
+    fill: style.getLineColour(),
+    opacity: style.getTagOpacity()
+  }));
+
+  // debug shadow
+  var kshadow;
+  if (dwv.tool.draw.debug) {
+    kshadow = dwv.tool.draw.getShadowEllipse(ellipse);
+  }
 
   // return group
   var group = new Konva.Group();
-  group.name('ellipse-group');
-  group.add(kshape);
+  group.name(this.getGroupName());
+  if (kshadow) {
+    group.add(kshadow);
+  }
   group.add(klabel);
+  group.add(kshape);
   group.visible(true); // dont inherit
   return group;
 };
 
 /**
+ * Get anchors to update an ellipse shape.
+ *
+ * @param {object} shape The associated shape.
+ * @param {object} style The application style.
+ * @returns {Array} A list of anchors.
+ */
+dwv.tool.draw.EllipseFactory.prototype.getAnchors = function (shape, style) {
+  var ellipseX = shape.x();
+  var ellipseY = shape.y();
+  var radius = shape.radius();
+
+  var anchors = [];
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    ellipseX - radius.x, ellipseY - radius.y, 'topLeft', style
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    ellipseX + radius.x, ellipseY - radius.y, 'topRight', style
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    ellipseX + radius.x, ellipseY + radius.y, 'bottomRight', style
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    ellipseX - radius.x, ellipseY + radius.y, 'bottomLeft', style
+  ));
+  return anchors;
+};
+
+/**
  * Update an ellipse shape.
+ * Warning: do NOT use 'this' here, this method is passed
+ *   as is to the change command.
  *
  * @param {object} anchor The active anchor.
- * @param {object} image The associated image.
+ * @param {object} _style The app style.
+ * @param {object} viewController The associated view controller.
  */
-dwv.tool.draw.UpdateEllipse = function (anchor, image) {
+dwv.tool.draw.EllipseFactory.prototype.update = function (
+  anchor, _style, viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape
@@ -22066,7 +24458,15 @@ dwv.tool.draw.UpdateEllipse = function (anchor, image) {
   var bottomLeft = group.getChildren(function (node) {
     return node.id() === 'bottomLeft';
   })[0];
-    // update 'self' (undo case) and special points
+  // debug shadow
+  var kshadow;
+  if (dwv.tool.draw.debug) {
+    kshadow = group.getChildren(function (node) {
+      return node.name() === 'shadow';
+    })[0];
+  }
+
+  // update 'self' (undo case) and special points
   switch (anchor.id()) {
   case 'topLeft':
     topLeft.x(anchor.x());
@@ -22099,22 +24499,80 @@ dwv.tool.draw.UpdateEllipse = function (anchor, image) {
   // update shape
   var radiusX = (topRight.x() - topLeft.x()) / 2;
   var radiusY = (bottomRight.y() - topRight.y()) / 2;
-  var center = {x: topLeft.x() + radiusX, y: topRight.y() + radiusY};
+  var center = {
+    x: topLeft.x() + radiusX,
+    y: topRight.y() + radiusY
+  };
   kellipse.position(center);
   var radiusAbs = {x: Math.abs(radiusX), y: Math.abs(radiusY)};
   if (radiusAbs) {
     kellipse.radius(radiusAbs);
   }
   // new ellipse
-  var ellipse = new dwv.math.Ellipse(center, radiusAbs.x, radiusAbs.y);
+  var centerPoint = new dwv.math.Point2D(
+    group.x() + center.x,
+    group.y() + center.y
+  );
+  var ellipse = new dwv.math.Ellipse(centerPoint, radiusAbs.x, radiusAbs.y);
+
+  // debug shadow
+  if (kshadow) {
+    // remove previous
+    kshadow.destroy();
+    // add new
+    group.add(dwv.tool.draw.getShadowEllipse(ellipse, group));
+  }
+
   // update text
-  var quant = image.quantifyEllipse(ellipse);
   var ktext = klabel.getText();
-  ktext.quant = quant;
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+  var quantification = ellipse.quantify(
+    viewController,
+    dwv.utils.getFlags(ktext.meta.textExpr));
+  ktext.setText(dwv.utils.replaceFlags(ktext.meta.textExpr, quantification));
+  // update meta
+  ktext.meta.quantification = quantification;
   // update position
   var textPos = {x: center.x, y: center.y};
   klabel.position(textPos);
+};
+
+/**
+ * Get the debug shadow.
+ *
+ * @param {object} ellipse The ellipse to shadow.
+ * @param {object} group The associated group.
+ * @returns {object} The shadow konva group.
+ */
+dwv.tool.draw.getShadowEllipse = function (ellipse, group) {
+  // possible group offset
+  var offsetX = 0;
+  var offsetY = 0;
+  if (typeof group !== 'undefined') {
+    offsetX = group.x();
+    offsetY = group.y();
+  }
+  var kshadow = new Konva.Group();
+  kshadow.name('shadow');
+  var regions = ellipse.getRound();
+  for (var i = 0; i < regions.length; ++i) {
+    var region = regions[i];
+    var minX = region[0][0];
+    var minY = region[0][1];
+    var maxX = region[1][0];
+    var pixelLine = new Konva.Rect({
+      x: minX - offsetX,
+      y: minY - offsetY,
+      width: maxX - minX,
+      height: 1,
+      fill: 'grey',
+      strokeWidth: 0,
+      strokeScaleEnabled: false,
+      opacity: 0.3,
+      name: 'shadow-element'
+    });
+    kshadow.add(pixelLine);
+  }
+  return kshadow;
 };
 
 // namespaces
@@ -22772,9 +25230,9 @@ dwv.tool.Floodfill = function (app) {
   /**
    * Drawing style.
    *
-   * @type {dwv.html.Style}
+   * @type {dwv.gui.Style}
    */
-  this.style = new dwv.html.Style();
+  this.style = new dwv.gui.Style();
 
   /**
    * Listener handler.
@@ -22873,14 +25331,18 @@ dwv.tool.Floodfill = function (app) {
       shapeGroup = factory.create(border, self.style);
       shapeGroup.id(dwv.math.guid());
 
+      var layerController = app.getLayerController();
+      var drawLayer = layerController.getActiveDrawLayer();
+      var drawController = drawLayer.getDrawController();
+
       // get the position group
-      var posGroup = app.getDrawController().getCurrentPosGroup();
+      var posGroup = drawController.getCurrentPosGroup();
       // add shape group to position group
       posGroup.add(shapeGroup);
 
       // draw shape command
       command = new dwv.tool.DrawGroupCommand(shapeGroup, 'floodfill',
-        app.getDrawController().getDrawLayer());
+        drawLayer.getKonvaLayer());
       command.onExecute = fireEvent;
       command.onUndo = fireEvent;
       // // draw
@@ -22910,7 +25372,11 @@ dwv.tool.Floodfill = function (app) {
       shapeGroup.destroy();
     }
 
-    var pos = app.getViewController().getCurrentPosition();
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
+
+    var pos = viewController.getCurrentPosition();
     var threshold = currentthreshold || initialthreshold;
 
     // Iterate over the next images and paint border on each slice.
@@ -22921,18 +25387,18 @@ dwv.tool.Floodfill = function (app) {
       if (!paintBorder(initialpoint, threshold)) {
         break;
       }
-      app.getViewController().incrementSliceNb();
+      viewController.incrementSliceNb();
     }
-    app.getViewController().setCurrentPosition(pos);
+    viewController.setCurrentPosition(pos);
 
     // Iterate over the prev images and paint border on each slice.
     for (var j = pos.k, jl = ini ? ini : 0; j > jl; j--) {
       if (!paintBorder(initialpoint, threshold)) {
         break;
       }
-      app.getViewController().decrementSliceNb();
+      viewController.decrementSliceNb();
     }
-    app.getViewController().setCurrentPosition(pos);
+    viewController.setCurrentPosition(pos);
   };
 
   /**
@@ -22984,11 +25450,19 @@ dwv.tool.Floodfill = function (app) {
    * @param {object} event The mouse down event.
    */
   this.mousedown = function (event) {
-    imageInfo = app.getImageData();
+    var layerController = app.getLayerController();
+    var viewLayer = layerController.getActiveViewLayer();
+    var drawLayer = layerController.getActiveDrawLayer();
+
+    imageInfo = viewLayer.getImageData();
     if (!imageInfo) {
       dwv.logger.error('No image found');
       return;
     }
+
+    // update zoom scale
+    self.style.setZoomScale(
+      drawLayer.getKonvaLayer().getAbsoluteScale());
 
     self.started = true;
     initialpoint = getCoord(event);
@@ -23083,7 +25557,7 @@ dwv.tool.Floodfill = function (app) {
   this.activate = function (bool) {
     if (bool) {
       // init with the app window scale
-      this.style.setScale(app.getWindowScale());
+      this.style.setBaseScale(app.getBaseScale());
       // set the default to the first in the list
       this.setLineColour(this.style.getLineColour());
     }
@@ -23169,11 +25643,24 @@ dwv.tool.draw = dwv.tool.draw || {};
 var Konva = Konva || {};
 
 /**
+ * Default draw label text.
+ */
+dwv.tool.draw.defaultFreeHandLabelText = '';
+
+/**
  * FreeHand factory.
  *
  * @class
  */
 dwv.tool.draw.FreeHandFactory = function () {
+  /**
+   * Get the name of the shape group.
+   *
+   * @returns {string} The name.
+   */
+  this.getGroupName = function () {
+    return 'freeHand-group';
+  };
   /**
    * Get the number of points needed to build the shape.
    *
@@ -23193,15 +25680,25 @@ dwv.tool.draw.FreeHandFactory = function () {
 };
 
 /**
+ * Is the input group a group of this factory?
+ *
+ * @param {object} group The group to test.
+ * @returns {boolean} True if the group is from this fcatory.
+ */
+dwv.tool.draw.FreeHandFactory.prototype.isFactoryGroup = function (group) {
+  return this.getGroupName() === group.name();
+};
+
+/**
  * Create a roi shape to be displayed.
  *
  * @param {Array} points The points from which to extract the line.
  * @param {object} style The drawing style.
- * @param {object} _image The associated image.
+ * @param {object} _viewController The associated view controller.
  * @returns {object} The Konva group.
  */
 dwv.tool.draw.FreeHandFactory.prototype.create = function (
-  points, style, _image) {
+  points, style, _viewController) {
   // points stored the Konvajs way
   var arr = [];
   for (var i = 0; i < points.length; ++i) {
@@ -23220,41 +25717,80 @@ dwv.tool.draw.FreeHandFactory.prototype.create = function (
 
   // text
   var ktext = new Konva.Text({
-    fontSize: style.getScaledFontSize(),
+    fontSize: style.getFontSize(),
     fontFamily: style.getFontFamily(),
     fill: style.getLineColour(),
     name: 'text'
   });
-  ktext.textExpr = '';
-  ktext.longText = '';
-  ktext.quant = null;
-  ktext.setText(ktext.textExpr);
+  var textExpr = '';
+  if (typeof dwv.tool.draw.freeHandLabelText !== 'undefined') {
+    textExpr = dwv.tool.draw.freeHandLabelText;
+  } else {
+    textExpr = dwv.tool.draw.defaultFreeHandLabelText;
+  }
+  ktext.setText(textExpr);
+  // meta data
+  ktext.meta = {
+    textExpr: textExpr,
+    quantification: {}
+  };
 
   // label
   var klabel = new Konva.Label({
     x: points[0].getX(),
-    y: points[0].getY() + 10,
+    y: points[0].getY() + style.scale(10),
+    scale: style.applyZoomScale(1),
+    visible: textExpr.length !== 0,
     name: 'label'
   });
   klabel.add(ktext);
-  klabel.add(new Konva.Tag());
+  klabel.add(new Konva.Tag({
+    fill: style.getLineColour(),
+    opacity: style.getTagOpacity()
+  }));
 
   // return group
   var group = new Konva.Group();
-  group.name('freeHand-group');
-  group.add(kshape);
+  group.name(this.getGroupName());
   group.add(klabel);
+  group.add(kshape);
   group.visible(true); // dont inherit
   return group;
 };
 
 /**
+ * Get anchors to update a free hand shape.
+ *
+ * @param {object} shape The associated shape.
+ * @param {object} style The application style.
+ * @returns {Array} A list of anchors.
+ */
+dwv.tool.draw.FreeHandFactory.prototype.getAnchors = function (shape, style) {
+  var points = shape.points();
+
+  var anchors = [];
+  for (var i = 0; i < points.length; i = i + 2) {
+    var px = points[i] + shape.x();
+    var py = points[i + 1] + shape.y();
+    var name = i;
+    anchors.push(dwv.tool.draw.getDefaultAnchor(
+      px, py, name, style
+    ));
+  }
+  return anchors;
+};
+
+/**
  * Update a FreeHand shape.
+ * Warning: do NOT use 'this' here, this method is passed
+ *   as is to the change command.
  *
  * @param {object} anchor The active anchor.
- * @param {object} _image The associated image.
+ * @param {object} style The app style.
+ * @param {object} _viewController The associated view controller.
  */
-dwv.tool.draw.UpdateFreeHand = function (anchor, _image) {
+dwv.tool.draw.FreeHandFactory.prototype.update = function (
+  anchor, style, _viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape
@@ -23282,10 +25818,12 @@ dwv.tool.draw.UpdateFreeHand = function (anchor, _image) {
 
   // update text
   var ktext = klabel.getText();
-  ktext.quant = null;
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+  ktext.setText(ktext.meta.textExpr);
   // update position
-  var textPos = {x: points[0] + kline.x(), y: points[1] + kline.y() + 10};
+  var textPos = {
+    x: points[0] + kline.x(),
+    y: points[1] + kline.y() + style.scale(10)
+  };
   klabel.position(textPos);
 };
 
@@ -23331,11 +25869,9 @@ dwv.tool.Livewire = function (app) {
   /**
    * Drawing style.
    *
-   * @type {dwv.html.Style}
+   * @type {dwv.gui.Style}
    */
-  this.style = new dwv.html.Style();
-  // init with the app window scale
-  this.style.setScale(app.getWindowScale());
+  this.style = new dwv.gui.Style();
 
   /**
    * Path storage. Paths are stored in reverse order.
@@ -23418,6 +25954,12 @@ dwv.tool.Livewire = function (app) {
       // clear vars
       clearPaths();
       clearParentPoints();
+      shapeGroup = null;
+      // update zoom scale
+      var layerController = app.getLayerController();
+      var drawLayer = layerController.getActiveDrawLayer();
+      self.style.setZoomScale(
+        drawLayer.getKonvaLayer().getAbsoluteScale());
       // do the training from the first point
       var p = new dwv.math.FastPoint2D(event._x, event._y);
       scissors.doTraining(p);
@@ -23435,7 +25977,7 @@ dwv.tool.Livewire = function (app) {
         command.onExecute = fireEvent;
         command.onUndo = fireEvent;
         // debug
-        dwv.logger.debug('Done.');
+        dwv.logger.debug('[livewire] finialise path.');
         // save command in undo stack
         app.addToUndoStack(command);
         // set flag
@@ -23466,8 +26008,8 @@ dwv.tool.Livewire = function (app) {
     // do the work
     var results = 0;
     var stop = false;
+    dwv.logger.debug('[livewire] getting ready...');
     while (!parentPoints[p.y][p.x] && !stop) {
-      dwv.logger.debug('Getting ready...');
       results = scissors.doWork();
 
       if (results.length === 0) {
@@ -23481,7 +26023,7 @@ dwv.tool.Livewire = function (app) {
         }
       }
     }
-    dwv.logger.debug('Ready!');
+    dwv.logger.debug('[livewire] ready!');
 
     // get the path
     currentPath = new dwv.math.Path();
@@ -23509,14 +26051,18 @@ dwv.tool.Livewire = function (app) {
     shapeGroup = factory.create(currentPath.pointArray, self.style);
     shapeGroup.id(dwv.math.guid());
 
+    var layerController = app.getLayerController();
+    var drawLayer = layerController.getActiveDrawLayer();
+    var drawController = drawLayer.getDrawController();
+
     // get the position group
-    var posGroup = app.getDrawController().getCurrentPosGroup();
+    var posGroup = drawController.getCurrentPosGroup();
     // add shape group to position group
     posGroup.add(shapeGroup);
 
     // draw shape command
     command = new dwv.tool.DrawGroupCommand(shapeGroup, 'livewire',
-      app.getDrawController().getDrawLayer());
+      drawLayer.getKonvaLayer());
     // draw
     command.execute();
   };
@@ -23546,7 +26092,7 @@ dwv.tool.Livewire = function (app) {
    * @param {object} _event The double click event.
    */
   this.dblclick = function (_event) {
-    dwv.logger.debug('dblclick');
+    dwv.logger.debug('[livewire] dblclick');
     // save command in undo stack
     app.addToUndoStack(command);
     // set flag
@@ -23601,15 +26147,18 @@ dwv.tool.Livewire = function (app) {
   this.activate = function (bool) {
     // start scissors if displayed
     if (bool) {
+      var layerController = app.getLayerController();
+      var viewLayer = layerController.getActiveViewLayer();
+
       //scissors = new dwv.math.Scissors();
       var size = app.getImage().getGeometry().getSize();
       scissors.setDimensions(
         size.getNumberOfColumns(),
         size.getNumberOfRows());
-      scissors.setData(app.getImageData().data);
+      scissors.setData(viewLayer.getImageData().data);
 
       // init with the app window scale
-      this.style.setScale(app.getWindowScale());
+      this.style.setBaseScale(app.getBaseScale());
       // set the default to the first in the list
       this.setLineColour(this.style.getLineColour());
     }
@@ -23679,6 +26228,167 @@ dwv.tool.Livewire.prototype.setLineColour = function (colour) {
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
+
+/**
+ * Opacity class.
+ *
+ * @class
+ * @param {object} app The associated application.
+ */
+dwv.tool.Opacity = function (app) {
+  /**
+   * Closure to self: to be used by event handlers.
+   *
+   * @private
+   * @type {dwv.tool.Opacity}
+   */
+  var self = this;
+  /**
+   * Interaction start flag.
+   *
+   * @type {boolean}
+   */
+  this.started = false;
+
+  /**
+   * Handle mouse down event.
+   *
+   * @param {object} event The mouse down event.
+   */
+  this.mousedown = function (event) {
+    // start flag
+    self.started = true;
+    // first position
+    self.x0 = event._x;
+    self.y0 = event._y;
+  };
+
+  /**
+   * Handle mouse move event.
+   *
+   * @param {object} event The mouse move event.
+   */
+  this.mousemove = function (event) {
+    if (!self.started) {
+      return;
+    }
+
+    // difference to last X position
+    var diffX = event._x - self.x0;
+    var xMove = (Math.abs(diffX) > 15);
+    // do not trigger for small moves
+    if (xMove) {
+      var layerController = app.getLayerController();
+      var viewLayer = layerController.getActiveViewLayer();
+      var op = viewLayer.getOpacity();
+      viewLayer.setOpacity(op + (diffX / 200));
+      viewLayer.draw();
+
+      // reset origin point
+      self.x0 = event._x;
+    }
+  };
+
+  /**
+   * Handle mouse up event.
+   *
+   * @param {object} _event The mouse up event.
+   */
+  this.mouseup = function (_event) {
+    if (self.started) {
+      // stop recording
+      self.started = false;
+    }
+  };
+
+  /**
+   * Handle mouse out event.
+   *
+   * @param {object} event The mouse out event.
+   */
+  this.mouseout = function (event) {
+    self.mouseup(event);
+  };
+
+  /**
+   * Handle touch start event.
+   *
+   * @param {object} event The touch start event.
+   */
+  this.touchstart = function (event) {
+    // call mouse equivalent
+    self.mousedown(event);
+  };
+
+  /**
+   * Handle touch move event.
+   *
+   * @param {object} event The touch move event.
+   */
+  this.touchmove = function (event) {
+    // call mouse equivalent
+    self.mousemove(event);
+  };
+
+  /**
+   * Handle touch end event.
+   *
+   * @param {object} event The touch end event.
+   */
+  this.touchend = function (event) {
+    // call mouse equivalent
+    self.mouseup(event);
+  };
+
+  /**
+   * Handle key down event.
+   *
+   * @param {object} event The key down event.
+   */
+  this.keydown = function (event) {
+    event.context = 'dwv.tool.Opacity';
+    app.onKeydown(event);
+  };
+
+  /**
+   * Activate the tool.
+   *
+   * @param {boolean} _bool The flag to activate or not.
+   */
+  this.activate = function (_bool) {
+    // does nothing
+  };
+
+  /**
+   * Initialise the tool.
+   */
+  this.init = function () {
+    // does nothing
+  };
+
+}; // Opacity class
+
+/**
+ * Help for this tool.
+ *
+ * @returns {object} The help content.
+ */
+dwv.tool.Opacity.prototype.getHelpKeys = function () {
+  return {
+    title: 'tool.Opacity.name',
+    brief: 'tool.Opacity.brief',
+    mouse: {
+      mouse_drag: 'tool.Opacity.mouse_drag',
+    },
+    touch: {
+      touch_drag: 'tool.Opacity.touch_drag',
+    }
+  };
+};
+
+// namespaces
+var dwv = dwv || {};
+dwv.tool = dwv.tool || {};
 dwv.tool.draw = dwv.tool.draw || {};
 /**
  * The Konva namespace.
@@ -23689,11 +26399,24 @@ dwv.tool.draw = dwv.tool.draw || {};
 var Konva = Konva || {};
 
 /**
+ * Default draw label text.
+ */
+dwv.tool.draw.defaultProtractorLabelText = '{angle}';
+
+/**
  * Protractor factory.
  *
  * @class
  */
 dwv.tool.draw.ProtractorFactory = function () {
+  /**
+   * Get the name of the shape group.
+   *
+   * @returns {string} The name.
+   */
+  this.getGroupName = function () {
+    return 'protractor-group';
+  };
   /**
    * Get the number of points needed to build the shape.
    *
@@ -23713,15 +26436,25 @@ dwv.tool.draw.ProtractorFactory = function () {
 };
 
 /**
+ * Is the input group a group of this factory?
+ *
+ * @param {object} group The group to test.
+ * @returns {boolean} True if the group is from this fcatory.
+ */
+dwv.tool.draw.ProtractorFactory.prototype.isFactoryGroup = function (group) {
+  return this.getGroupName() === group.name();
+};
+
+/**
  * Create a protractor shape to be displayed.
  *
  * @param {Array} points The points from which to extract the protractor.
  * @param {object} style The drawing style.
- * @param {object} _image The associated image.
+ * @param {object} _viewController The associated view controller.
  * @returns {object} The Konva group.
  */
 dwv.tool.draw.ProtractorFactory.prototype.create = function (
-  points, style, _image) {
+  points, style, _viewController) {
   // physical shape
   var line0 = new dwv.math.Line(points[0], points[1]);
   // points stored the Konvajs way
@@ -23739,9 +26472,7 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
     name: 'shape'
   });
   var group = new Konva.Group();
-  group.name('protractor-group');
-  group.add(kshape);
-  group.visible(true); // dont inherit
+  group.name(this.getGroupName());
   // text and decoration
   if (points.length === 3) {
     var line1 = new dwv.math.Line(points[1], points[2]);
@@ -23763,33 +26494,49 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
     }
 
     // quantification
+    var ktext = new Konva.Text({
+      fontSize: style.getFontSize(),
+      fontFamily: style.getFontFamily(),
+      fill: style.getLineColour(),
+      padding: style.getTextPadding(),
+      shadowColor: style.getShadowLineColour(),
+      shadowOffset: style.getShadowOffset(),
+      name: 'text'
+    });
+    var textExpr = '';
+    if (typeof dwv.tool.draw.protractorLabelText !== 'undefined') {
+      textExpr = dwv.tool.draw.protractorLabelText;
+    } else {
+      textExpr = dwv.tool.draw.defaultProtractorLabelText;
+    }
     var quant = {
       angle: {
         value: angle,
         unit: dwv.i18n('unit.degree')
       }
     };
-    var ktext = new Konva.Text({
-      fontSize: style.getScaledFontSize(),
-      fontFamily: style.getFontFamily(),
-      fill: style.getLineColour(),
-      name: 'text'
-    });
-    ktext.textExpr = '{angle}';
-    ktext.longText = '';
-    ktext.quant = quant;
-    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    ktext.setText(dwv.utils.replaceFlags(textExpr, quant));
+    // meta data
+    ktext.meta = {
+      textExpr: textExpr,
+      quantification: quant
+    };
 
     // label
     var midX = (line0.getMidpoint().getX() + line1.getMidpoint().getX()) / 2;
     var midY = (line0.getMidpoint().getY() + line1.getMidpoint().getY()) / 2;
     var klabel = new Konva.Label({
       x: midX,
-      y: midY - 15,
+      y: midY - style.applyZoomScale(15).y,
+      scale: style.applyZoomScale(1),
+      visible: textExpr.length !== 0,
       name: 'label'
     });
     klabel.add(ktext);
-    klabel.add(new Konva.Tag());
+    klabel.add(new Konva.Tag({
+      fill: style.getLineColour(),
+      opacity: style.getTagOpacity()
+    }));
 
     // arc
     var radius = Math.min(line0.getLength(), line1.getLength()) * 33 / 100;
@@ -23809,17 +26556,47 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
     group.add(klabel);
     group.add(karc);
   }
+  // add shape to group
+  group.add(kshape);
+  group.visible(true); // dont inherit
   // return group
   return group;
 };
 
 /**
+ * Get anchors to update a protractor shape.
+ *
+ * @param {object} shape The associated shape.
+ * @param {object} style The application style.
+ * @returns {Array} A list of anchors.
+ */
+dwv.tool.draw.ProtractorFactory.prototype.getAnchors = function (shape, style) {
+  var points = shape.points();
+
+  var anchors = [];
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    points[0] + shape.x(), points[1] + shape.y(), 'begin', style
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    points[2] + shape.x(), points[3] + shape.y(), 'mid', style
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    points[4] + shape.x(), points[5] + shape.y(), 'end', style
+  ));
+  return anchors;
+};
+
+/**
  * Update a protractor shape.
+ * Warning: do NOT use 'this' here, this method is passed
+ *   as is to the change command.
  *
  * @param {object} anchor The active anchor.
- * @param {object} _image The associated image.
+ * @param {object} style The app style.
+ * @param {object} _viewController The associated view controller.
  */
-dwv.tool.draw.UpdateProtractor = function (anchor, _image) {
+dwv.tool.draw.ProtractorFactory.prototype.update = function (
+  anchor, style, _viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape
@@ -23891,14 +26668,20 @@ dwv.tool.draw.UpdateProtractor = function (anchor, _image) {
   }
 
   // update text
-  var quant = {angle: {value: angle, unit: dwv.i18n('unit.degree')}};
   var ktext = klabel.getText();
-  ktext.quant = quant;
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+  var quantification = {
+    angle: {value: angle, unit: dwv.i18n('unit.degree')}
+  };
+  ktext.setText(dwv.utils.replaceFlags(ktext.meta.textExpr, quantification));
+  // update meta
+  ktext.meta.quantification = quantification;
   // update position
   var midX = (line0.getMidpoint().getX() + line1.getMidpoint().getX()) / 2;
   var midY = (line0.getMidpoint().getY() + line1.getMidpoint().getY()) / 2;
-  var textPos = {x: midX, y: midY - 15};
+  var textPos = {
+    x: midX,
+    y: midY - style.applyZoomScale(15).y
+  };
   klabel.position(textPos);
 
   // arc
@@ -23924,11 +26707,24 @@ dwv.tool.draw = dwv.tool.draw || {};
 var Konva = Konva || {};
 
 /**
+ * Default draw label text.
+ */
+dwv.tool.draw.defaultRectangleLabelText = '{surface}';
+
+/**
  * Rectangle factory.
  *
  * @class
  */
 dwv.tool.draw.RectangleFactory = function () {
+  /**
+   * Get the name of the shape group.
+   *
+   * @returns {string} The name.
+   */
+  this.getGroupName = function () {
+    return 'rectangle-group';
+  };
   /**
    * Get the number of points needed to build the shape.
    *
@@ -23948,15 +26744,25 @@ dwv.tool.draw.RectangleFactory = function () {
 };
 
 /**
+ * Is the input group a group of this factory?
+ *
+ * @param {object} group The group to test.
+ * @returns {boolean} True if the group is from this fcatory.
+ */
+dwv.tool.draw.RectangleFactory.prototype.isFactoryGroup = function (group) {
+  return this.getGroupName() === group.name();
+};
+
+/**
  * Create a rectangle shape to be displayed.
  *
  * @param {Array} points The points from which to extract the rectangle.
  * @param {object} style The drawing style.
- * @param {object} image The associated image.
+ * @param {object} viewController The associated view controller.
  * @returns {object} The Konva group.
  */
 dwv.tool.draw.RectangleFactory.prototype.create = function (
-  points, style, image) {
+  points, style, viewController) {
   // physical shape
   var rectangle = new dwv.math.Rectangle(points[0], points[1]);
   // draw shape
@@ -23970,51 +26776,110 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
     strokeScaleEnabled: false,
     name: 'shape'
   });
-  // quantification
-  var quant = image.quantifyRect(rectangle);
+  // label text
   var ktext = new Konva.Text({
-    fontSize: style.getScaledFontSize(),
+    fontSize: style.getFontSize(),
     fontFamily: style.getFontFamily(),
     fill: style.getLineColour(),
+    padding: style.getTextPadding(),
+    shadowColor: style.getShadowLineColour(),
+    shadowOffset: style.getShadowOffset(),
     name: 'text'
   });
-  ktext.textExpr = '{surface}';
-  ktext.longText = '';
-  ktext.quant = quant;
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
-
+  var textExpr = '';
+  if (typeof dwv.tool.draw.rectangleLabelText !== 'undefined') {
+    textExpr = dwv.tool.draw.rectangleLabelText;
+  } else {
+    textExpr = dwv.tool.draw.defaultRectangleLabelText;
+  }
+  var quant = rectangle.quantify(
+    viewController,
+    dwv.utils.getFlags(textExpr));
+  ktext.setText(dwv.utils.replaceFlags(textExpr, quant));
+  // meta data
+  ktext.meta = {
+    textExpr: textExpr,
+    quantification: quant
+  };
   // label
   var klabel = new Konva.Label({
     x: rectangle.getBegin().getX(),
-    y: rectangle.getEnd().getY() + 10,
+    y: rectangle.getEnd().getY(),
+    scale: style.applyZoomScale(1),
+    visible: textExpr.length !== 0,
     name: 'label'
   });
   klabel.add(ktext);
-  klabel.add(new Konva.Tag());
+  klabel.add(new Konva.Tag({
+    fill: style.getLineColour(),
+    opacity: style.getTagOpacity()
+  }));
+
+  // debug shadow
+  var kshadow;
+  if (dwv.tool.draw.debug) {
+    kshadow = dwv.tool.draw.getShadowRectangle(rectangle);
+  }
 
   // return group
   var group = new Konva.Group();
-  group.name('rectangle-group');
-  group.add(kshape);
+  group.name(this.getGroupName());
+  if (kshadow) {
+    group.add(kshadow);
+  }
   group.add(klabel);
+  group.add(kshape);
   group.visible(true); // dont inherit
   return group;
 };
 
 /**
+ * Get anchors to update a rectangle shape.
+ *
+ * @param {object} shape The associated shape.
+ * @param {object} style The application style.
+ * @returns {Array} A list of anchors.
+ */
+dwv.tool.draw.RectangleFactory.prototype.getAnchors = function (shape, style) {
+  var rectX = shape.x();
+  var rectY = shape.y();
+  var rectWidth = shape.width();
+  var rectHeight = shape.height();
+
+  var anchors = [];
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    rectX, rectY, 'topLeft', style
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    rectX + rectWidth, rectY, 'topRight', style
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    rectX + rectWidth, rectY + rectHeight, 'bottomRight', style
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    rectX, rectY + rectHeight, 'bottomLeft', style
+  ));
+  return anchors;
+};
+
+/**
  * Update a rectangle shape.
+ * Warning: do NOT use 'this' here, this method is passed
+ *   as is to the change command.
  *
  * @param {object} anchor The active anchor.
- * @param {object} image The associated image.
+ * @param {object} style The app style.
+ * @param {object} viewController The associated view controller.
  */
-dwv.tool.draw.UpdateRect = function (anchor, image) {
+dwv.tool.draw.RectangleFactory.prototype.update = function (
+  anchor, style, viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape
   var krect = group.getChildren(function (node) {
     return node.name() === 'shape';
   })[0];
-    // associated label
+  // associated label
   var klabel = group.getChildren(function (node) {
     return node.name() === 'label';
   })[0];
@@ -24031,7 +26896,15 @@ dwv.tool.draw.UpdateRect = function (anchor, image) {
   var bottomLeft = group.getChildren(function (node) {
     return node.id() === 'bottomLeft';
   })[0];
-    // update 'self' (undo case) and special points
+  // debug shadow
+  var kshadow;
+  if (dwv.tool.draw.debug) {
+    kshadow = group.getChildren(function (node) {
+      return node.name() === 'shadow';
+    })[0];
+  }
+
+  // update 'self' (undo case) and special points
   switch (anchor.id()) {
   case 'topLeft':
     topLeft.x(anchor.x());
@@ -24068,21 +26941,67 @@ dwv.tool.draw.UpdateRect = function (anchor, image) {
   if (width && height) {
     krect.size({width: width, height: height});
   }
+  // positions: add possible group offset
+  var p2d0 = new dwv.math.Point2D(
+    group.x() + topLeft.x(),
+    group.y() + topLeft.y()
+  );
+  var p2d1 = new dwv.math.Point2D(
+    group.x() + bottomRight.x(),
+    group.y() + bottomRight.y()
+  );
   // new rect
-  var p2d0 = new dwv.math.Point2D(topLeft.x(), topLeft.y());
-  var p2d1 = new dwv.math.Point2D(bottomRight.x(), bottomRight.y());
   var rect = new dwv.math.Rectangle(p2d0, p2d1);
+
+  // debug shadow based on round (used in quantification)
+  if (kshadow) {
+    var round = rect.getRound();
+    var rWidth = round.max.getX() - round.min.getX();
+    var rHeight = round.max.getY() - round.min.getY();
+    kshadow.position({
+      x: round.min.getX() - group.x(),
+      y: round.min.getY() - group.y()
+    });
+    kshadow.size({width: rWidth, height: rHeight});
+  }
+
   // update text
-  var quant = image.quantifyRect(rect);
   var ktext = klabel.getText();
-  ktext.quant = quant;
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+  var quantification = rect.quantify(
+    viewController,
+    dwv.utils.getFlags(ktext.meta.textExpr));
+  ktext.setText(dwv.utils.replaceFlags(ktext.meta.textExpr, quantification));
+  // update meta
+  ktext.meta.quantification = quantification;
   // update position
   var textPos = {
-    x: rect.getBegin().getX(),
-    y: rect.getEnd().getY() + 10
+    x: rect.getBegin().getX() - group.x(),
+    y: rect.getEnd().getY() - group.y()
   };
   klabel.position(textPos);
+};
+
+/**
+ * Get the debug shadow.
+ *
+ * @param {object} rectangle The rectangle to shadow.
+ * @returns {object} The shadow konva shape.
+ */
+dwv.tool.draw.getShadowRectangle = function (rectangle) {
+  var round = rectangle.getRound();
+  var rWidth = round.max.getX() - round.min.getX();
+  var rHeight = round.max.getY() - round.min.getY();
+  return new Konva.Rect({
+    x: round.min.getX(),
+    y: round.min.getY(),
+    width: rWidth,
+    height: rHeight,
+    fill: 'grey',
+    strokeWidth: 0,
+    strokeScaleEnabled: false,
+    opacity: 0.3,
+    name: 'shadow'
+  });
 };
 
 // namespaces
@@ -24098,11 +27017,24 @@ dwv.tool.draw = dwv.tool.draw || {};
 var Konva = Konva || {};
 
 /**
+ * Default draw label text.
+ */
+dwv.tool.draw.defaultRoiLabelText = '';
+
+/**
  * ROI factory.
  *
  * @class
  */
 dwv.tool.draw.RoiFactory = function () {
+  /**
+   * Get the name of the shape group.
+   *
+   * @returns {string} The name.
+   */
+  this.getGroupName = function () {
+    return 'roi-group';
+  };
   /**
    * Get the number of points needed to build the shape.
    *
@@ -24122,15 +27054,25 @@ dwv.tool.draw.RoiFactory = function () {
 };
 
 /**
+ * Is the input group a group of this factory?
+ *
+ * @param {object} group The group to test.
+ * @returns {boolean} True if the group is from this fcatory.
+ */
+dwv.tool.draw.RoiFactory.prototype.isFactoryGroup = function (group) {
+  return this.getGroupName() === group.name();
+};
+
+/**
  * Create a roi shape to be displayed.
  *
  * @param {Array} points The points from which to extract the line.
  * @param {object} style The drawing style.
- * @param {object} _image The associated image.
+ * @param {object} _viewController The associated view controller.
  * @returns {object} The Konva group.
  */
 dwv.tool.draw.RoiFactory.prototype.create = function (
-  points, style, _image) {
+  points, style, _viewController) {
   // physical shape
   var roi = new dwv.math.ROI();
   // add input points to the ROI
@@ -24153,41 +27095,80 @@ dwv.tool.draw.RoiFactory.prototype.create = function (
 
   // text
   var ktext = new Konva.Text({
-    fontSize: style.getScaledFontSize(),
+    fontSize: style.getFontSize(),
     fontFamily: style.getFontFamily(),
     fill: style.getLineColour(),
     name: 'text'
   });
-  ktext.textExpr = '';
-  ktext.longText = '';
-  ktext.quant = null;
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+  var textExpr = '';
+  if (typeof dwv.tool.draw.roiLabelText !== 'undefined') {
+    textExpr = dwv.tool.draw.roiLabelText;
+  } else {
+    textExpr = dwv.tool.draw.defaultRoiLabelText;
+  }
+  ktext.setText(textExpr);
+  // meta data
+  ktext.meta = {
+    textExpr: textExpr,
+    quantification: {}
+  };
 
   // label
   var klabel = new Konva.Label({
     x: roi.getPoint(0).getX(),
-    y: roi.getPoint(0).getY() + 10,
+    y: roi.getPoint(0).getY() + style.scale(10),
+    scale: style.applyZoomScale(1),
+    visible: textExpr.length !== 0,
     name: 'label'
   });
   klabel.add(ktext);
-  klabel.add(new Konva.Tag());
+  klabel.add(new Konva.Tag({
+    fill: style.getLineColour(),
+    opacity: style.getTagOpacity()
+  }));
 
   // return group
   var group = new Konva.Group();
-  group.name('roi-group');
-  group.add(kshape);
+  group.name(this.getGroupName());
   group.add(klabel);
+  group.add(kshape);
   group.visible(true); // dont inherit
   return group;
 };
 
 /**
+ * Get anchors to update a roi shape.
+ *
+ * @param {object} shape The associated shape.
+ * @param {object} style The application style.
+ * @returns {Array} A list of anchors.
+ */
+dwv.tool.draw.RoiFactory.prototype.getAnchors = function (shape, style) {
+  var points = shape.points();
+
+  var anchors = [];
+  for (var i = 0; i < points.length; i = i + 2) {
+    var px = points[i] + shape.x();
+    var py = points[i + 1] + shape.y();
+    var name = i;
+    anchors.push(dwv.tool.draw.getDefaultAnchor(
+      px, py, name, style
+    ));
+  }
+  return anchors;
+};
+
+/**
  * Update a roi shape.
+ * Warning: do NOT use 'this' here, this method is passed
+ *   as is to the change command.
  *
  * @param {object} anchor The active anchor.
- * @param {object} _image The associated image.
+ * @param {object} style The app style.
+ * @param {object} _viewController The associated view controller.
  */
-dwv.tool.draw.UpdateRoi = function (anchor, _image) {
+dwv.tool.draw.RoiFactory.prototype.update = function (
+  anchor, style, _viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape
@@ -24214,12 +27195,11 @@ dwv.tool.draw.UpdateRoi = function (anchor, _image) {
 
   // update text
   var ktext = klabel.getText();
-  ktext.quant = null;
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+  ktext.setText(ktext.meta.textExpr);
   // update position
   var textPos = {
     x: points[0] + kroi.x(),
-    y: points[1] + kroi.y() + 10
+    y: points[1] + kroi.y() + style.scale(10)
   };
   klabel.position(textPos);
 
@@ -24238,11 +27218,24 @@ dwv.tool.draw = dwv.tool.draw || {};
 var Konva = Konva || {};
 
 /**
+ * Default draw label text.
+ */
+dwv.tool.draw.defaultRulerLabelText = '{length}';
+
+/**
  * Ruler factory.
  *
  * @class
  */
 dwv.tool.draw.RulerFactory = function () {
+  /**
+   * Get the name of the shape group.
+   *
+   * @returns {string} The name.
+   */
+  this.getGroupName = function () {
+    return 'ruler-group';
+  };
   /**
    * Get the number of points needed to build the shape.
    *
@@ -24262,14 +27255,25 @@ dwv.tool.draw.RulerFactory = function () {
 };
 
 /**
+ * Is the input group a group of this factory?
+ *
+ * @param {object} group The group to test.
+ * @returns {boolean} True if the group is from this fcatory.
+ */
+dwv.tool.draw.RulerFactory.prototype.isFactoryGroup = function (group) {
+  return this.getGroupName() === group.name();
+};
+
+/**
  * Create a ruler shape to be displayed.
  *
  * @param {Array} points The points from which to extract the line.
  * @param {object} style The drawing style.
- * @param {object} image The associated image.
+ * @param {object} viewController The associated view controller.
  * @returns {object} The Konva group.
  */
-dwv.tool.draw.RulerFactory.prototype.create = function (points, style, image) {
+dwv.tool.draw.RulerFactory.prototype.create = function (
+  points, style, viewController) {
   // physical shape
   var line = new dwv.math.Line(points[0], points[1]);
   // draw shape
@@ -24284,7 +27288,7 @@ dwv.tool.draw.RulerFactory.prototype.create = function (points, style, image) {
     name: 'shape'
   });
 
-  var tickLen = 10 * style.getScaledStrokeWidth();
+  var tickLen = style.scale(10);
 
   // tick begin
   var linePerp0 = dwv.math.getPerpendicularLine(line, points[0], tickLen);
@@ -24324,46 +27328,89 @@ dwv.tool.draw.RulerFactory.prototype.create = function (points, style, image) {
   });
 
   // quantification
-  var quant = image.quantifyLine(line);
   var ktext = new Konva.Text({
-    fontSize: style.getScaledFontSize(),
+    fontSize: style.getFontSize(),
     fontFamily: style.getFontFamily(),
     fill: style.getLineColour(),
+    padding: style.getTextPadding(),
+    shadowColor: style.getShadowLineColour(),
+    shadowOffset: style.getShadowOffset(),
     name: 'text'
   });
-  ktext.textExpr = '{length}';
-  ktext.longText = '';
-  ktext.quant = quant;
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+  var textExpr = '';
+  if (typeof dwv.tool.draw.rulerLabelText !== 'undefined') {
+    textExpr = dwv.tool.draw.rulerLabelText;
+  } else {
+    textExpr = dwv.tool.draw.defaultRulerLabelText;
+  }
+  var quant = line.quantify(
+    viewController,
+    dwv.utils.getFlags(textExpr));
+  ktext.setText(dwv.utils.replaceFlags(textExpr, quant));
+  // meta data
+  ktext.meta = {
+    textExpr: textExpr,
+    quantification: quant
+  };
+
   // label
   var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
-  var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
+  var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
   var klabel = new Konva.Label({
-    x: line.getEnd().getX() + dX * 25,
-    y: line.getEnd().getY() + dY * 15,
+    x: line.getEnd().getX() + dX * ktext.width(),
+    y: line.getEnd().getY() + dY * style.applyZoomScale(15).y,
+    scale: style.applyZoomScale(1),
+    visible: textExpr.length !== 0,
     name: 'label'
   });
   klabel.add(ktext);
-  klabel.add(new Konva.Tag());
+  klabel.add(new Konva.Tag({
+    fill: style.getLineColour(),
+    opacity: style.getTagOpacity()
+  }));
 
   // return group
   var group = new Konva.Group();
-  group.name('ruler-group');
-  group.add(kshape);
+  group.name(this.getGroupName());
+  group.add(klabel);
   group.add(ktick0);
   group.add(ktick1);
-  group.add(klabel);
+  group.add(kshape);
   group.visible(true); // dont inherit
   return group;
 };
 
 /**
+ * Get anchors to update a ruler shape.
+ *
+ * @param {object} shape The associated shape.
+ * @param {object} style The application style.
+ * @returns {Array} A list of anchors.
+ */
+dwv.tool.draw.RulerFactory.prototype.getAnchors = function (shape, style) {
+  var points = shape.points();
+
+  var anchors = [];
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    points[0] + shape.x(), points[1] + shape.y(), 'begin', style
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    points[2] + shape.x(), points[3] + shape.y(), 'end', style
+  ));
+  return anchors;
+};
+
+/**
  * Update a ruler shape.
+ * Warning: do NOT use 'this' here, this method is passed
+ *   as is to the change command.
  *
  * @param {object} anchor The active anchor.
- * @param {object} image The associated image.
+ * @param {object} style The app style.
+ * @param {object} viewController The associated view controller.
  */
-dwv.tool.draw.UpdateRuler = function (anchor, image) {
+dwv.tool.draw.RulerFactory.prototype.update = function (
+  anchor, style, viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape
@@ -24414,12 +27461,12 @@ dwv.tool.draw.UpdateRuler = function (anchor, image) {
   // tick
   var p2b = new dwv.math.Point2D(bx, by);
   var p2e = new dwv.math.Point2D(ex, ey);
-  var linePerp0 = dwv.math.getPerpendicularLine(line, p2b, 10);
+  var linePerp0 = dwv.math.getPerpendicularLine(line, p2b, style.scale(10));
   ktick0.points([linePerp0.getBegin().getX(),
     linePerp0.getBegin().getY(),
     linePerp0.getEnd().getX(),
     linePerp0.getEnd().getY()]);
-  var linePerp1 = dwv.math.getPerpendicularLine(line, p2e, 10);
+  var linePerp1 = dwv.math.getPerpendicularLine(line, p2e, style.scale(10));
   ktick1.points([linePerp1.getBegin().getX(),
     linePerp1.getBegin().getY(),
     linePerp1.getEnd().getX(),
@@ -24434,17 +27481,21 @@ dwv.tool.draw.UpdateRuler = function (anchor, image) {
     context.closePath();
     context.fillStrokeShape(this);
   });
+
   // update text
-  var quant = image.quantifyLine(line);
   var ktext = klabel.getText();
-  ktext.quant = quant;
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+  var quantification = line.quantify(
+    viewController,
+    dwv.utils.getFlags(ktext.meta.textExpr));
+  ktext.setText(dwv.utils.replaceFlags(ktext.meta.textExpr, quantification));
+  // update meta
+  ktext.meta.quantification = quantification;
   // update position
   var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
-  var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
+  var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
   var textPos = {
-    x: line.getEnd().getX() + dX * 25,
-    y: line.getEnd().getY() + dY * 15
+    x: line.getEnd().getX() + dX * ktext.width(),
+    y: line.getEnd().getY() + dY * style.applyZoomScale(15).y
   };
   klabel.position(textPos);
 };
@@ -24483,8 +27534,11 @@ dwv.tool.Scroll = function (app) {
    */
   this.mousedown = function (event) {
     // stop viewer if playing
-    if (app.getViewController().isPlaying()) {
-      app.getViewController().stop();
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
+    if (viewController.isPlaying()) {
+      viewController.stop();
     }
     // start flag
     self.started = true;
@@ -24503,6 +27557,10 @@ dwv.tool.Scroll = function (app) {
       return;
     }
 
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
+
     // difference to last Y position
     var diffY = event._y - self.y0;
     var yMove = (Math.abs(diffY) > 15);
@@ -24510,9 +27568,9 @@ dwv.tool.Scroll = function (app) {
     if (yMove) {
       // update view controller
       if (diffY > 0) {
-        app.getViewController().decrementSliceNb();
+        viewController.decrementSliceNb();
       } else {
-        app.getViewController().incrementSliceNb();
+        viewController.incrementSliceNb();
       }
     }
 
@@ -24523,9 +27581,9 @@ dwv.tool.Scroll = function (app) {
     if (xMove) {
       // update view controller
       if (diffX > 0) {
-        app.getViewController().incrementFrameNb();
+        viewController.incrementFrameNb();
       } else {
-        app.getViewController().decrementFrameNb();
+        viewController.decrementFrameNb();
       }
     }
 
@@ -24602,27 +27660,12 @@ dwv.tool.Scroll = function (app) {
   };
 
   /**
-   * Handle mouse scroll event (fired by Firefox).
-   *
-   * @param {object} event The mouse scroll event.
-   */
-  this.DOMMouseScroll = function (event) {
-    // ev.detail on firefox is 3
-    if (event.detail < 0) {
-      mouseScroll(true);
-    } else {
-      mouseScroll(false);
-    }
-  };
-
-  /**
    * Handle mouse wheel event.
    *
    * @param {object} event The mouse wheel event.
    */
-  this.mousewheel = function (event) {
-    // ev.wheelDelta on chrome is 120
-    if (event.wheelDelta > 0) {
+  this.wheel = function (event) {
+    if (event.deltaY < 0) {
       mouseScroll(true);
     } else {
       mouseScroll(false);
@@ -24636,20 +27679,24 @@ dwv.tool.Scroll = function (app) {
    * @private
    */
   function mouseScroll(up) {
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
+
     var hasSlices =
       (app.getImage().getGeometry().getSize().getNumberOfSlices() !== 1);
     var hasFrames = (app.getImage().getNumberOfFrames() !== 1);
     if (up) {
       if (hasSlices) {
-        app.getViewController().incrementSliceNb();
+        viewController.incrementSliceNb();
       } else if (hasFrames) {
-        app.getViewController().incrementFrameNb();
+        viewController.incrementFrameNb();
       }
     } else {
       if (hasSlices) {
-        app.getViewController().decrementSliceNb();
+        viewController.decrementSliceNb();
       } else if (hasFrames) {
-        app.getViewController().decrementFrameNb();
+        viewController.decrementFrameNb();
       }
     }
   }
@@ -24669,7 +27716,10 @@ dwv.tool.Scroll = function (app) {
    * @param {object} _event The key down event.
    */
   this.dblclick = function (_event) {
-    app.getViewController().play();
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
+    viewController.play();
   };
 
   /**
@@ -24900,7 +27950,10 @@ dwv.tool.WindowLevel = function (app) {
     self.x0 = event._x;
     self.y0 = event._y;
     // update view controller
-    app.getViewController().setCurrentPosition2D(event._x, event._y);
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
+    viewController.setCurrentPosition2D(event._x, event._y);
   };
 
   /**
@@ -24913,23 +27966,30 @@ dwv.tool.WindowLevel = function (app) {
     if (!self.started) {
       return;
     }
+
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
+
     // difference to last position
     var diffX = event._x - self.x0;
     var diffY = self.y0 - event._y;
     // calculate new window level
     var windowCenter =
-      parseInt(app.getViewController().getWindowLevel().center, 10) + diffY;
+      parseInt(viewController.getWindowLevel().center, 10) + diffY;
     var windowWidth =
-      parseInt(app.getViewController().getWindowLevel().width, 10) + diffX;
+      parseInt(viewController.getWindowLevel().width, 10) + diffX;
+    // bound window width
+    windowWidth = dwv.image.validateWindowWidth(windowWidth);
 
     // add the manual preset to the view
-    app.getViewController().addWindowLevelPresets({
+    viewController.addWindowLevelPresets({
       manual: {
         wl: new dwv.image.WindowLevel(windowCenter, windowWidth),
         name: 'manual'
       }
     });
-    app.getViewController().setWindowLevelPreset('manual');
+    viewController.setWindowLevelPreset('manual');
 
     // store position
     self.x0 = event._x;
@@ -24991,14 +28051,18 @@ dwv.tool.WindowLevel = function (app) {
    * @param {object} event The double click event.
    */
   this.dblclick = function (event) {
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
+
     // update view controller
-    app.getViewController().setWindowLevel(
+    viewController.setWindowLevel(
       parseInt(app.getImage().getRescaledValue(
         event._x,
         event._y,
-        app.getViewController().getCurrentPosition().k
+        viewController.getCurrentPosition().k
       ), 10),
-      parseInt(app.getViewController().getWindowLevel().width, 10));
+      parseInt(viewController.getWindowLevel().width, 10));
   };
 
   /**
@@ -25115,8 +28179,7 @@ dwv.tool.ZoomAndPan = function (app) {
     var tx = event._xs - self.x0;
     var ty = event._ys - self.y0;
     // apply translation
-    //app.translate(tx, ty);
-    app.stepTranslate(tx, ty);
+    app.translate(tx, ty);
     // reset origin point
     self.x0 = event._xs;
     self.y0 = event._ys;
@@ -25144,17 +28207,20 @@ dwv.tool.ZoomAndPan = function (app) {
       if (Math.abs(diffY) < 15) {
         return;
       }
+      var layerController = app.getLayerController();
+      var viewController =
+        layerController.getActiveViewLayer().getViewController();
       // update view controller
       if (diffY > 0) {
-        app.getViewController().incrementSliceNb();
+        viewController.incrementSliceNb();
       } else {
-        app.getViewController().decrementSliceNb();
+        viewController.decrementSliceNb();
       }
     } else {
       // zoom mode
       var zoom = (lineRatio - 1) / 2;
       if (Math.abs(zoom) % 0.1 <= 0.05) {
-        app.stepZoom(zoom, event._xs, event._ys);
+        app.zoom(zoom, event._xs, event._ys);
       }
     }
   };
@@ -25218,25 +28284,13 @@ dwv.tool.ZoomAndPan = function (app) {
   };
 
   /**
-   * Handle mouse scroll event (fired by Firefox).
-   *
-   * @param {object} event The mouse scroll event.
-   */
-  this.DOMMouseScroll = function (event) {
-    // ev.detail on firefox is 3
-    var step = -event.detail / 30;
-    app.stepZoom(step, event._xs, event._ys);
-  };
-
-  /**
    * Handle mouse wheel event.
    *
    * @param {object} event The mouse wheel event.
    */
-  this.mousewheel = function (event) {
-    // ev.wheelDelta on chrome is 120
-    var step = event.wheelDelta / 1200;
-    app.stepZoom(step, event._xs, event._ys);
+  this.wheel = function (event) {
+    var step = -event.deltaY / 500;
+    app.zoom(step, event._xs, event._ys);
   };
 
   /**
@@ -25285,6 +28339,271 @@ dwv.tool.ZoomAndPan.prototype.getHelpKeys = function () {
  */
 dwv.tool.ZoomAndPan.prototype.init = function () {
   // does nothing
+};
+
+// namespaces
+var dwv = dwv || {};
+dwv.utils = dwv.utils || {};
+
+// example implementation: dcmtk/dcmiod/libsrc/cielabutil.cc
+// https://github.com/DCMTK/dcmtk/blob/DCMTK-3.6.6/dcmiod/libsrc/cielabutil.cc
+
+/**
+ * Convert YBR to RGB.
+ *
+ * @see http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.7.html#sect_C.7.6.3.1.2
+ * @see https://en.wikipedia.org/wiki/YCbCr#JPEG_conversion
+ * @param {number} y The Y component.
+ * @param {number} cb The Cb component.
+ * @param {number} cr The Cr component.
+ * @returns {object} RGB equivalent as {r,g,b}.
+ */
+dwv.utils.ybrToRgb = function (y, cb, cr) {
+  return {
+    r: y + 1.402 * (cr - 128),
+    g: y - 0.34414 * (cb - 128) - 0.71414 * (cr - 128),
+    b: y + 1.772 * (cb - 128)
+  };
+};
+
+/**
+ * Convert a hexadecimal colour to RGB.
+ *
+ * @param {string} hexColour The hexadecimal color as '#ab01ef'.
+ * @returns {object} RGB equivalent as {r,g,b}.
+ */
+dwv.utils.hexToRgb = function (hexColour) {
+  return {
+    r: parseInt(hexColour.substr(1, 2), 16),
+    g: parseInt(hexColour.substr(3, 2), 16),
+    b: parseInt(hexColour.substr(5, 2), 16)
+  };
+};
+
+/**
+ * Get the brightness of a RGB colour: calculates
+ * the luma (Y) of the YIQ colour space.
+ *
+ * @see https://en.wikipedia.org/wiki/YIQ#From_RGB_to_YIQ
+ * @param {object} rgbTriplet RGB triplet.
+ * @returns {number} The brightness ([0,1]).
+ */
+dwv.utils.getBrightness = function (rgbTriplet) {
+  // 0.001172549 = 0.299 / 255
+  // 0.002301961 = 0.587 / 255
+  // 0.000447059 = 0.114 / 255
+  return rgbTriplet.r * 0.001172549 +
+    rgbTriplet.g * 0.002301961 +
+    rgbTriplet.b * 0.000447059;
+};
+
+/**
+ * Check if a colour given in hexadecimal format is dark.
+ *
+ * @param {string} hexColour The colour (as '#ab01ef').
+ * @returns {boolean} True if the colour is dark (brightness < 0.5).
+ */
+dwv.utils.isDarkColour = function (hexColour) {
+  return dwv.utils.getBrightness(dwv.utils.hexToRgb(hexColour)) < 0.5;
+};
+
+/**
+ * Get the shadow colour of an input colour.
+ *
+ * @param {string} hexColour The colour (as '#ab01ef').
+ * @returns {string} The shadow colour (white or black).
+ */
+dwv.utils.getShadowColour = function (hexColour) {
+  return dwv.utils.isDarkColour(hexColour) ? '#fff' : '#000';
+};
+
+/**
+ * Unsigned int CIE LAB value ([0, 65535]) to CIE LAB value
+ *   (L: [0, 100], a: [-128, 127], b: [-128, 127]).
+ *
+ * @param {object} triplet CIE LAB triplet as {l,a,b} with unsigned range.
+ * @returns {object} CIE LAB triplet as {l,a,b} with CIE LAB range.
+ */
+dwv.utils.uintLabToLab = function (triplet) {
+  // 0.001525902 = 100 / 65535
+  // 0.003891051 = 255 / 65535
+  return {
+    l: 0.001525902 * triplet.l,
+    a: 0.003891051 * triplet.a - 128,
+    b: 0.003891051 * triplet.b - 128,
+  };
+};
+
+/**
+ * CIE LAB value (L: [0, 100], a: [-128, 127], b: [-128, 127]) to
+ *   unsigned int CIE LAB ([0, 65535]).
+ *
+ * @param {object} triplet CIE XYZ triplet as {x,y,z} with CIE LAB range.
+ * @returns {object} CIE LAB triplet as {l,a,b} with unsigned range.
+ */
+dwv.utils.labToUintLab = function (triplet) {
+  // 655.35 = 65535 / 100
+  // aUint = (a + 128) * 65535 / 255
+  // 257 = 65535 / 255
+  // 32896 = 257 * 128
+  return {
+    l: 655.35 * triplet.l,
+    a: 257 * triplet.a + 32896,
+    b: 257 * triplet.b + 32896,
+  };
+};
+
+/**
+ * CIE Standard Illuminant D65
+ *
+ * @see https://en.wikipedia.org/wiki/Illuminant_D65
+ */
+dwv.utils.d65 = {
+  x: 95.0489,
+  y: 100,
+  z: 108.884
+};
+
+/**
+ * Convert CIE LAB to CIE XYZ (standard illuminant D65, 2degree 1931).
+ *
+ * @see https://en.wikipedia.org/wiki/CIELAB_color_space#From_CIELAB_to_CIEXYZ
+ * @param {object} triplet CIE LAB triplet as {l,a,b}.
+ * @returns {object} CIE XYZ triplet as {x,y,z}.
+ */
+dwv.utils.cielabToCiexyz = function (triplet) {
+  var invLabFunc = function (x) {
+    var res = null;
+    // delta = 6 / 29 = 0.206896552
+    if (x > 0.206896552) {
+      res = Math.pow(x, 3);
+    } else {
+      // 0.128418549 = 3 * delta^2
+      // 0.017712903 = 3 * delta^2 * (4 / 29)
+      res = 0.128418549 * x - 0.017712903;
+    }
+    return res;
+  };
+
+  var illuminant = dwv.utils.d65;
+  var l0 = (triplet.l + 16) / 116;
+
+  return {
+    x: illuminant.x * invLabFunc(l0 + triplet.a / 500),
+    y: illuminant.y * invLabFunc(l0),
+    z: illuminant.z * invLabFunc(l0 - triplet.b / 200)
+  };
+};
+
+/**
+ * Convert CIE XYZ to CIE LAB (standard illuminant D65, 2degree 1931).
+ *
+ * @see https://en.wikipedia.org/wiki/CIELAB_color_space#From_CIEXYZ_to_CIELAB
+ * @param {object} triplet CIE XYZ triplet as {x,y,z}.
+ * @returns {object} CIE LAB triplet as {l,a,b}.
+ */
+dwv.utils.ciexyzToCielab = function (triplet) {
+  var labFunc = function (x) {
+    var res = null;
+    // delta = 6 / 29 = 0.206896552
+    // delta^3 = 0.008856452
+    if (x > 0.008856452) {
+      res = Math.pow(x, 0.333333333);
+    } else {
+      // 7.787037037 = 1 / 3 * delta^2
+      // 0.137931034 = 4 / 29
+      res = 7.787037037 * x + 0.137931034;
+    }
+    return res;
+  };
+
+  var illuminant = dwv.utils.d65;
+  var fy = labFunc(triplet.y / illuminant.y);
+
+  return {
+    l: 116 * fy - 16,
+    a: 500 * (labFunc(triplet.x / illuminant.x) - fy),
+    b: 200 * (fy - labFunc(triplet.z / illuminant.z))
+  };
+};
+
+/**
+ * Convert CIE XYZ to sRGB.
+ *
+ * @see https://en.wikipedia.org/wiki/SRGB#The_forward_transformation_(CIE_XYZ_to_sRGB)
+ * @param {object} triplet CIE XYZ triplet as {x,y,z}.
+ * @returns {object} sRGB triplet as {r,g,b}.
+ */
+dwv.utils.ciexyzToSrgb = function (triplet) {
+  var gammaFunc = function (x) {
+    var res = null;
+    if (x <= 0.0031308) {
+      res = 12.92 * x;
+    } else {
+      // 0.416666667 = 1 / 2.4
+      res = 1.055 * Math.pow(x, 0.416666667) - 0.055;
+    }
+    return res;
+  };
+
+  var x = triplet.x / 100;
+  var y = triplet.y / 100;
+  var z = triplet.z / 100;
+
+  return {
+    r: Math.round(255 * gammaFunc(3.2406 * x - 1.5372 * y - 0.4986 * z)),
+    g: Math.round(255 * gammaFunc(-0.9689 * x + 1.8758 * y + 0.0415 * z)),
+    b: Math.round(255 * gammaFunc(0.0557 * x - 0.2040 * y + 1.0570 * z))
+  };
+};
+
+/**
+ * Convert sRGB to CIE XYZ.
+ *
+ * @see https://en.wikipedia.org/wiki/SRGB#The_forward_transformation_(CIE_XYZ_to_sRGB)
+ * @param {object} triplet sRGB triplet as {r,g,b}.
+ * @returns {object} CIE XYZ triplet as {x,y,z}.
+ */
+dwv.utils.srgbToCiexyz = function (triplet) {
+  var invGammaFunc = function (x) {
+    var res = null;
+    if (x <= 0.04045) {
+      res = x / 12.92;
+    } else {
+      res = Math.pow((x + 0.055) / 1.055, 2.4);
+    }
+    return res;
+  };
+
+  var rl = invGammaFunc(triplet.r / 255);
+  var gl = invGammaFunc(triplet.g / 255);
+  var bl = invGammaFunc(triplet.b / 255);
+
+  return {
+    x: 100 * (0.4124 * rl + 0.3576 * gl + 0.1805 * bl),
+    y: 100 * (0.2126 * rl + 0.7152 * gl + 0.0722 * bl),
+    z: 100 * (0.0193 * rl + 0.1192 * gl + 0.9505 * bl)
+  };
+};
+
+/**
+ * Convert CIE LAB to sRGB (standard illuminant D65).
+ *
+ * @param {object} triplet CIE LAB triplet as {l,a,b}.
+ * @returns {object} sRGB triplet as {r,g,b}.
+ */
+dwv.utils.cielabToSrgb = function (triplet) {
+  return dwv.utils.ciexyzToSrgb(dwv.utils.cielabToCiexyz(triplet));
+};
+
+/**
+ * Convert sRGB to CIE LAB (standard illuminant D65).
+ *
+ * @param {object} triplet sRGB triplet as {r,g,b}.
+ * @returns {object} CIE LAB triplet as {l,a,b}.
+ */
+dwv.utils.srgbToCielab = function (triplet) {
+  return dwv.utils.ciexyzToCielab(dwv.utils.srgbToCiexyz(triplet));
 };
 
 // namespaces
@@ -25830,11 +29149,14 @@ dwv.utils.logger = dwv.utils.logger || {};
 dwv.utils.logger.console = dwv.utils.logger.console || {};
 
 /**
- * The dwv code uses `dwv.logger.[trace, debug, info...]` to log text at
- * different levels.
+ * Main logger, defaults to the console logger.
  */
+dwv.logger = dwv.utils.logger.console;
 
-// available log levels
+/**
+ * Available log levels.
+ * Note: need to activate verbose level in Chrome console to see DEBUG messages.
+ */
 dwv.utils.logger.levels = {
   TRACE: 0,
   DEBUG: 1,
@@ -26622,7 +29944,21 @@ dwv.utils.objectToArray = function (obj) {
     var innerKeys = Object.keys(obj[key]);
     for (var j = 0; j < innerKeys.length; ++j) {
       var innerKey = innerKeys[j];
-      row[innerKey] = obj[key][innerKey];
+      var value = obj[key][innerKey];
+      if (dwv.utils.isArray(value)) {
+        var arrayValues = [];
+        for (var k = 0; k < value.length; ++k) {
+          if (dwv.utils.isObject(value[k])) {
+            arrayValues.push(dwv.utils.objectToArray(value[k]));
+          } else {
+            arrayValues.push(value[k]);
+          }
+        }
+        value = arrayValues;
+      } else if (dwv.utils.isObject(value)) {
+        value = dwv.utils.objectToArray(value);
+      }
+      row[innerKey] = value;
     }
     array.push(row);
   }
@@ -26632,11 +29968,29 @@ dwv.utils.objectToArray = function (obj) {
 /**
  * Merge two similar objects.
  * Objects need to be in the form of:
- * {idKey: {valueKey: 0}, key0: {valueKey: "abc"}, key1: {valueKey: 33}}
+ * <code>
+ * {
+ *   idKey: {valueKey: 0},
+ *   key0: {valueKey: "abc"},
+ *   key1: {valueKey: 33}
+ * }
+ * </code>
  * Merged objects will be in the form of:
- * { idKey: {valueKey: [0,1,2], merged: true},
- *   key0: {valueKey: {0: "abc", 1: "def", 2: "ghi"},
- *   key1: {valueKey: {0: 33, 1: 44, 2: 55}} }
+ * <code>
+ * {
+ *   idKey: {valueKey: [0,1,2], merged: true},
+ *   key0: {valueKey: {
+ *     0: {valueKey: "abc"},
+ *     1: {valueKey: "def"},
+ *     2: {valueKey: "ghi"}
+ *   }},
+ *   key1: {valueKey: {
+ *     0: {valueKey: 33},
+ *     1: {valueKey: 44},
+ *     2: {valueKey: 55}
+ *   }}
+ * }
+ * </code>
  *
  * @param {object} obj1 The first object, can be the result of a previous merge.
  * @param {object} obj2 The second object.
@@ -26715,17 +30069,19 @@ dwv.utils.mergeObjects = function (obj1, obj2, idKey, valueKey) {
     var key = keys[i];
     if (key !== idKey) {
       // first
+      var value1 = null;
       var subValue1 = null;
       if (Object.prototype.hasOwnProperty.call(obj1, key)) {
-        var value1 = obj1[key];
+        value1 = obj1[key];
         if (Object.prototype.hasOwnProperty.call(value1, valueKey)) {
           subValue1 = value1[valueKey];
         }
       }
       // second
+      var value2 = null;
       var subValue2 = null;
       if (Object.prototype.hasOwnProperty.call(obj2, key)) {
-        var value2 = obj2[key];
+        value2 = obj2[key];
         if (Object.prototype.hasOwnProperty.call(value2, valueKey)) {
           subValue2 = value2[valueKey];
         }
@@ -26744,16 +30100,16 @@ dwv.utils.mergeObjects = function (obj1, obj2, idKey, valueKey) {
             // copy it with the index list
             value[valueKey] = {};
             for (var j = 0; j < id1.length; j++) {
-              value[valueKey][id1[j]] = subValue1;
+              value[valueKey][id1[j]] = value1;
             }
           }
           // add obj2 value
-          value[valueKey][id2] = subValue2;
+          value[valueKey][id2] = value2;
         } else {
           // create merge object
           var newValue = {};
-          newValue[id1] = subValue1;
-          newValue[id2] = subValue2;
+          newValue[id1] = value1;
+          newValue[id2] = value2;
           value[valueKey] = newValue;
         }
       } else {
@@ -26993,6 +30349,31 @@ dwv.utils.splitKeyValueString = function (inputStr) {
 };
 
 /**
+ * Get flags from an input string. Flags are words surrounded with curly
+ * braces.
+ *
+ * @param {string} inputStr The input string.
+ * @returns {Array} An array of found flags.
+ */
+dwv.utils.getFlags = function (inputStr) {
+  var flags = [];
+  // check input string
+  if (inputStr === null || typeof inputStr === 'undefined') {
+    return flags;
+  }
+
+  // word surrounded by curly braces
+  var regex = /{(\w+)}/g;
+
+  var match = regex.exec(inputStr);
+  while (match) {
+    flags.push(match[1]); // first matching group
+    match = regex.exec(inputStr);
+  }
+  return flags;
+};
+
+/**
  * Replace flags in a input string. Flags are keywords surrounded with curly
  * braces.
  *
@@ -27015,19 +30396,21 @@ dwv.utils.replaceFlags = function (inputStr, values) {
   if (values === null || typeof values === 'undefined') {
     return res;
   }
-  // loop through values keys
-  var keys = Object.keys(values);
+
+  // loop through flags
+  var keys = dwv.utils.getFlags(inputStr);
   for (var i = 0; i < keys.length; ++i) {
     var valueObj = values[keys[i]];
     if (valueObj !== null && typeof valueObj !== 'undefined' &&
-            valueObj.value !== null && typeof valueObj.value !== 'undefined') {
+      valueObj.value !== null && typeof valueObj.value !== 'undefined') {
       // value string
       var valueStr = valueObj.value.toPrecision(4);
       // add unit if available
       // space or no space? Yes apart from degree...
       // check: https://en.wikipedia.org/wiki/Space_(punctuation)#Spaces_and_unit_symbols
-      if (valueObj.unit !== null && typeof valueObj.unit !== 'undefined' &&
-                valueObj.unit.length !== 0) {
+      if (valueObj.unit !== null &&
+        typeof valueObj.unit !== 'undefined' &&
+        valueObj.unit.length !== 0) {
         if (valueObj.unit !== 'degree') {
           valueStr += ' ';
         }
