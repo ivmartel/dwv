@@ -108,10 +108,14 @@ dwv.tool.draw.FreeHandFactory.prototype.create = function (
     x: points[0].getX(),
     y: points[0].getY() + style.scale(10),
     scale: style.applyZoomScale(1),
+    visible: textExpr.length !== 0,
     name: 'label'
   });
   klabel.add(ktext);
-  klabel.add(new Konva.Tag());
+  klabel.add(new Konva.Tag({
+    fill: style.getLineColour(),
+    opacity: style.getTagOpacity()
+  }));
 
   // return group
   var group = new Konva.Group();

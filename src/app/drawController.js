@@ -388,6 +388,7 @@ dwv.DrawController = function (konvaLayer) {
           text.setText(dwv.utils.replaceFlags(
             text.meta.textExpr, text.meta.quantification
           ));
+          label.setVisible(text.meta.textExpr.length !== 0);
         }
       }
     }

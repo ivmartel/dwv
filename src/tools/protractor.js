@@ -141,6 +141,7 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
       x: midX,
       y: midY - style.applyZoomScale(15).y,
       scale: style.applyZoomScale(1),
+      visible: textExpr.length !== 0,
       name: 'label'
     });
     klabel.add(ktext);

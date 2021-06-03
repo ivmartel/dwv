@@ -144,10 +144,14 @@ dwv.tool.draw.ArrowFactory.prototype.create = function (
     x: line.getEnd().getX() + dX * ktext.width(),
     y: line.getEnd().getY() + dY * style.applyZoomScale(15).y,
     scale: style.applyZoomScale(1),
+    visible: textExpr.length !== 0,
     name: 'label'
   });
   klabel.add(ktext);
-  klabel.add(new Konva.Tag());
+  klabel.add(new Konva.Tag({
+    fill: style.getLineColour(),
+    opacity: style.getTagOpacity()
+  }));
 
   // return group
   var group = new Konva.Group();
