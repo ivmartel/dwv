@@ -122,3 +122,53 @@ QUnit.test('Test 3 components iterator.', function (assert) {
   }
   assert.equal(test3Max, i3Theo, '#3 3d iterator max');
 });
+
+/**
+ * Tests for {@link dwv.image.rangeRegion}.
+ *
+ * @function module:tests/image~rangeRegion
+ */
+QUnit.test('Test region iterator.', function (assert) {
+  var dataAccessor = function (offset) {
+    return offset;
+  };
+  // test #0: simulate regular iterator
+  var test0Min = 0;
+  var test0Max = 10;
+  var test0Incr = 1;
+  var test0NCols = 3;
+  var test0RowIncr = 0;
+  var i0Theo = test0Min;
+  var iter0 = dwv.image.rangeRegion(
+    dataAccessor, test0Min, test0Max, test0Incr, test0NCols, test0RowIncr);
+  var ival0 = iter0.next();
+  while (!ival0.done) {
+    assert.equal(ival0.value, i0Theo, '#0 iterator next');
+    ival0 = iter0.next();
+    ++i0Theo;
+  }
+  assert.equal(test0Max, i0Theo, '#0 iterator max');
+
+  // test #1: with col/row
+  var test1Min = 0;
+  var test1Max = 10;
+  var test1Incr = 1;
+  var test1NCols = 2;
+  var test1RowIncr = 1;
+  var i1Theo = test1Min;
+  var iter1 = dwv.image.rangeRegion(
+    dataAccessor, test1Min, test1Max, test1Incr, test1NCols, test1RowIncr);
+  var ival1 = iter1.next();
+  var countCol = 0;
+  while (!ival1.done) {
+    assert.equal(ival1.value, i1Theo, '#1 iterator next');
+    ival1 = iter1.next();
+    ++i1Theo;
+    ++countCol;
+    if (countCol === test1NCols) {
+      countCol = 0;
+      i1Theo += test1RowIncr;
+    }
+  }
+  assert.equal(test1Max, i1Theo, '#1 iterator max');
+});

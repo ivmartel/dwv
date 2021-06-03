@@ -9,7 +9,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.28.2';
+  return '0.29.0';
 };
 
 /**
@@ -217,6 +217,29 @@ dwv.dicom.DataReader = function (buffer, isLittleEndian) {
    */
   this.readInt32 = function (byteOffset) {
     return view.getInt32(byteOffset, isLittleEndian);
+  };
+  /**
+   * Read binary (0/1) array.
+   *
+   * @param {number} byteOffset The offset to start reading from.
+   * @param {number} size The size of the array.
+   * @returns {Array} The read data.
+   */
+  this.readBinaryArray = function (byteOffset, size) {
+    // input
+    var bitArray = new Uint8Array(buffer, byteOffset, size);
+    // result
+    var byteArrayLength = 8 * bitArray.length;
+    var data = new Uint8Array(byteArrayLength);
+    var bitNumber = 0;
+    var bitIndex = 0;
+    for (var i = 0; i < byteArrayLength; ++i) {
+      bitNumber = i % 8;
+      bitIndex = Math.floor(i / 8);
+      // see https://stackoverflow.com/questions/4854207/get-a-specific-bit-from-byte/4854257
+      data[i] = 255 * ((bitArray[bitIndex] & (1 << bitNumber)) !== 0);
+    }
+    return data;
   };
   /**
    * Read Uint8 array.
@@ -876,11 +899,6 @@ dwv.dicom.getDataElementPrefixByteSize = function (vr, isImplicit) {
  * @class
  */
 dwv.dicom.DicomParser = function () {
-  // check logger
-  if (typeof dwv.logger === 'undefined') {
-    dwv.logger = dwv.utils.logger.console;
-  }
-
   /**
    * The list of DICOM elements.
    *
@@ -1162,7 +1180,9 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
       );
     }
     // read
-    if (bitsAllocated === 8) {
+    if (bitsAllocated === 1) {
+      data = reader.readBinaryArray(offset, vl);
+    } else if (bitsAllocated === 8) {
       if (pixelRepresentation === 0) {
         data = reader.readUint8Array(offset, vl);
       } else {
@@ -1186,6 +1206,8 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
       } else {
         data = reader.readInt64Array(offset, vl);
       }
+    } else {
+      throw new Error('Unsupported bits allocated: ' + bitsAllocated);
     }
     offset += vl;
   } else if (vr === 'OB') {

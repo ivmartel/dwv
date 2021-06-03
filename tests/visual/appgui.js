@@ -17,8 +17,8 @@ dwv.image.decoderScripts = {
 
 // get element
 dwv.gui.getElement = dwv.gui.base.getElement;
-// set logger (optional)
-dwv.logger = dwv.utils.logger.console;
+// logger level (optional)
+dwv.logger.level = dwv.utils.logger.levels.DEBUG;
 
 // check environment support
 dwv.env.check();
@@ -33,9 +33,6 @@ dwv.addDataLine = function (id, fileroot, doc) {
   dwvDiv.className = 'dwv';
   var layConDiv = document.createElement('div');
   layConDiv.className = 'layerContainer';
-  var imgCanvas = document.createElement('canvas');
-  imgCanvas.className = 'imageLayer';
-  layConDiv.appendChild(imgCanvas);
   dwvDiv.appendChild(layConDiv);
   mainDiv.appendChild(dwvDiv);
 

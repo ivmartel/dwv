@@ -1,5 +1,32 @@
 # Changelog
 
+## [v0.29.0](https://github.com/ivmartel/dwv/releases/tag/v0.29.0) - 03/06/2021
+
+### Breaking
+
+- Allow for multiple image layers [#893](https://github.com/ivmartel/dwv/issues/893)
+- Move roi meta data to meta object [#883](https://github.com/ivmartel/dwv/issues/883)
+
+### Added
+
+- Add utilities for CIE lab colour conversion [#940](https://github.com/ivmartel/dwv/issues/940)
+- Send draw creation events at state load [#939](https://github.com/ivmartel/dwv/issues/939)
+- Recurse in sequences when extracting meta data [#921](https://github.com/ivmartel/dwv/issues/921)
+- Add support for binary data [#919](https://github.com/ivmartel/dwv/issues/919)
+- Use the wheel event [#917](https://github.com/ivmartel/dwv/issues/917)
+- Remove bower configuration [#913](https://github.com/ivmartel/dwv/issues/913)
+- Move to Github actions [#912](https://github.com/ivmartel/dwv/issues/912)
+- Mouse drag: Lowering WW below 0 Exception [#903](https://github.com/ivmartel/dwv/issues/903)
+- Add shadow to text and background to label [#889](https://github.com/ivmartel/dwv/issues/889)
+- Fix label text size [#887](https://github.com/ivmartel/dwv/issues/887)
+- Allow to change the image layer opacity [#886](https://github.com/ivmartel/dwv/issues/886)
+- Add circle draw shape [#885](https://github.com/ivmartel/dwv/issues/885)
+- Add median, 25% and 75% percentiles to shape quantification [#877](https://github.com/ivmartel/dwv/issues/877)
+- Add pixel quantification for ellipse [#871](https://github.com/ivmartel/dwv/issues/871)
+- Out of view text [#151](https://github.com/ivmartel/dwv/issues/151)
+
+---
+
 ## [v0.28.2](https://github.com/ivmartel/dwv/releases/tag/v0.28.2) - 20/04/2021
 
 ### Fixed

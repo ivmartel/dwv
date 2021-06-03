@@ -35,7 +35,10 @@ dwv.tool.WindowLevel = function (app) {
     self.x0 = event._x;
     self.y0 = event._y;
     // update view controller
-    app.getViewController().setCurrentPosition2D(event._x, event._y);
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
+    viewController.setCurrentPosition2D(event._x, event._y);
   };
 
   /**
@@ -48,23 +51,30 @@ dwv.tool.WindowLevel = function (app) {
     if (!self.started) {
       return;
     }
+
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
+
     // difference to last position
     var diffX = event._x - self.x0;
     var diffY = self.y0 - event._y;
     // calculate new window level
     var windowCenter =
-      parseInt(app.getViewController().getWindowLevel().center, 10) + diffY;
+      parseInt(viewController.getWindowLevel().center, 10) + diffY;
     var windowWidth =
-      parseInt(app.getViewController().getWindowLevel().width, 10) + diffX;
+      parseInt(viewController.getWindowLevel().width, 10) + diffX;
+    // bound window width
+    windowWidth = dwv.image.validateWindowWidth(windowWidth);
 
     // add the manual preset to the view
-    app.getViewController().addWindowLevelPresets({
+    viewController.addWindowLevelPresets({
       manual: {
         wl: new dwv.image.WindowLevel(windowCenter, windowWidth),
         name: 'manual'
       }
     });
-    app.getViewController().setWindowLevelPreset('manual');
+    viewController.setWindowLevelPreset('manual');
 
     // store position
     self.x0 = event._x;
@@ -126,14 +136,18 @@ dwv.tool.WindowLevel = function (app) {
    * @param {object} event The double click event.
    */
   this.dblclick = function (event) {
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
+
     // update view controller
-    app.getViewController().setWindowLevel(
+    viewController.setWindowLevel(
       parseInt(app.getImage().getRescaledValue(
         event._x,
         event._y,
-        app.getViewController().getCurrentPosition().k
+        viewController.getCurrentPosition().k
       ), 10),
-      parseInt(app.getViewController().getWindowLevel().width, 10));
+      parseInt(viewController.getWindowLevel().width, 10));
   };
 
   /**

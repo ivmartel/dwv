@@ -21,16 +21,21 @@ body {
   border: 1px dotted gray;
 }
 </style>
+<!-- Third party (load) -->
+<script type="text/javascript" src="../../node_modules/jszip/dist/jszip.min.js"></script>
 <!-- Local -->
 <script type="text/javascript" src="../../src/app/application.js"></script>
+<script type="text/javascript" src="../../src/app/dataController.js"></script>
 <script type="text/javascript" src="../../src/app/loadController.js"></script>
+<script type="text/javascript" src="../../src/app/layerController.js"></script>
 <script type="text/javascript" src="../../src/app/viewController.js"></script>
 <script type="text/javascript" src="../../src/app/toolboxController.js"></script>
 <script type="text/javascript" src="../../src/dicom/dicomElementsWrapper.js"></script>
 <script type="text/javascript" src="../../src/dicom/dicomParser.js"></script>
 <script type="text/javascript" src="../../src/dicom/dictionary.js"></script>
 <script type="text/javascript" src="../../src/gui/generic.js"></script>
-<script type="text/javascript" src="../../src/gui/layer.js"></script>
+<script type="text/javascript" src="../../src/gui/drawLayer.js"></script>
+<script type="text/javascript" src="../../src/gui/viewLayer.js"></script>
 <script type="text/javascript" src="../../src/gui/style.js"></script>
 <script type="text/javascript" src="../../src/image/decoder.js"></script>
 <script type="text/javascript" src="../../src/image/dicomBufferToView.js"></script>
@@ -54,17 +59,17 @@ body {
 <script type="text/javascript" src="../../src/io/urlsLoader.js"></script>
 <script type="text/javascript" src="../../src/io/filesLoader.js"></script>
 <script type="text/javascript" src="../../src/io/dicomDataLoader.js"></script>
+<script type="text/javascript" src="../../src/io/memoryLoader.js"></script>
 <script type="text/javascript" src="../../src/io/rawImageLoader.js"></script>
+<script type="text/javascript" src="../../src/io/zipLoader.js"></script>
 <script type="text/javascript" src="../../src/math/bucketQueue.js"></script>
 <script type="text/javascript" src="../../src/math/matrix.js"></script>
 <script type="text/javascript" src="../../src/math/point.js"></script>
-<script type="text/javascript" src="../../src/math/scissors.js"></script>
-<script type="text/javascript" src="../../src/math/shapes.js"></script>
-<script type="text/javascript" src="../../src/math/stats.js"></script>
 <script type="text/javascript" src="../../src/math/vector.js"></script>
 <script type="text/javascript" src="../../src/tools/undo.js"></script>
 <script type="text/javascript" src="../../src/tools/scroll.js"></script>
 <script type="text/javascript" src="../../src/tools/windowLevel.js"></script>
+<script type="text/javascript" src="../../src/utils/colour.js"></script>
 <script type="text/javascript" src="../../src/utils/env.js"></script>
 <script type="text/javascript" src="../../src/utils/listen.js"></script>
 <script type="text/javascript" src="../../src/utils/logger.js"></script>
@@ -78,8 +83,6 @@ body {
 <!-- Local -->
 <script type="text/javascript" src="./viewer.js"></script>
 <script type="text/javascript">
-dwv.test.viewerSetup();
-// last minute
 document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedViewer);
 </script>
 
@@ -95,10 +98,12 @@ document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedViewer)
 <!-- DWV -->
 <div id="dwv">
   <!-- Layer Container -->
-  <div class="layerContainer">
-    <canvas class="imageLayer">Only for HTML5 compatible browsers...</canvas>
-  </div><!-- /layerContainer -->
+  <div class="layerContainer"></div>
 </div><!-- /dwv -->
+
+<label for="alpharange">Alpha:</label>
+<input type="range" id="alpharange" min="0" max="1" value="1" step="0.1">
+<input type="number" id="alphanumber" min="0" max="1" value="1" step="0.1">
 
 </body>
 </html>

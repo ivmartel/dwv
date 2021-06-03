@@ -10,6 +10,11 @@ dwv.tool = dwv.tool || {};
 var Konva = Konva || {};
 
 /**
+ * Debug flag.
+ */
+dwv.tool.draw.debug = false;
+
+/**
  * Drawing tool.
  *
  * This tool is responsible for the draw layer group structure. The layout is:
@@ -139,9 +144,9 @@ dwv.tool.Draw = function (app) {
   /**
    * Drawing style.
    *
-   * @type {dwv.html.Style}
+   * @type {dwv.gui.Style}
    */
-  this.style = new dwv.html.Style();
+  this.style = app.getStyle();
 
   /**
    * Event listeners.
@@ -151,12 +156,12 @@ dwv.tool.Draw = function (app) {
   var listeners = {};
 
   /**
-   * The associated draw layer.
+   * The associated Konva layer.
    *
    * @private
    * @type {object}
    */
-  var drawLayer = null;
+  var konvaLayer = null;
 
   /**
    * Handle mouse down event.
@@ -169,15 +174,18 @@ dwv.tool.Draw = function (app) {
       return;
     }
 
-    // update scale
-    self.style.setScale(app.getWindowScale());
+    var layerController = app.getLayerController();
+    var drawLayer = layerController.getActiveDrawLayer();
 
     // determine if the click happened in an existing shape
-    var stage = app.getDrawStage();
+    var stage = drawLayer.getKonvaStage();
     var kshape = stage.getIntersection({
       x: event._xs,
       y: event._ys
     });
+
+    // update scale
+    self.style.setZoomScale(stage.scale());
 
     if (kshape) {
       var group = kshape.getParent();
@@ -187,14 +195,16 @@ dwv.tool.Draw = function (app) {
       if (selectedShape && selectedShape !== shapeEditor.getShape()) {
         shapeEditor.disable();
         shapeEditor.setShape(selectedShape);
-        shapeEditor.setImage(app.getImage());
+        var viewController =
+          layerController.getActiveViewLayer().getViewController();
+        shapeEditor.setViewController(viewController);
         shapeEditor.enable();
       }
     } else {
       // disable edition
       shapeEditor.disable();
       shapeEditor.setShape(null);
-      shapeEditor.setImage(null);
+      shapeEditor.setViewController(null);
       // start storing points
       started = true;
       // set factory
@@ -370,7 +380,7 @@ dwv.tool.Draw = function (app) {
         shapeGroup.getChildren(dwv.draw.isNodeNameShape)[0]);
       // delete command
       var delcmd = new dwv.tool.DeleteGroupCommand(shapeGroup,
-        shapeDisplayName, drawLayer);
+        shapeDisplayName, konvaLayer);
       delcmd.onExecute = fireEvent;
       delcmd.onUndo = fireEvent;
       delcmd.execute();
@@ -387,7 +397,7 @@ dwv.tool.Draw = function (app) {
       started = false;
       points = [];
       // redraw
-      drawLayer.draw();
+      konvaLayer.draw();
     }
   };
 
@@ -402,15 +412,18 @@ dwv.tool.Draw = function (app) {
       tmpShapeGroup.destroy();
     }
     // create shape group
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
     tmpShapeGroup = currentFactory.create(
-      tmpPoints, self.style, app.getImage());
+      tmpPoints, self.style, viewController);
     // do not listen during creation
     var shape = tmpShapeGroup.getChildren(dwv.draw.isNodeNameShape)[0];
     shape.listening(false);
-    drawLayer.listening(false);
+    konvaLayer.listening(false);
     // draw shape
-    drawLayer.add(tmpShapeGroup);
-    drawLayer.draw();
+    konvaLayer.add(tmpShapeGroup);
+    konvaLayer.draw();
   }
 
   /**
@@ -423,21 +436,28 @@ dwv.tool.Draw = function (app) {
     if (tmpShapeGroup) {
       tmpShapeGroup.destroy();
     }
+
+    var layerController = app.getLayerController();
+    var viewController =
+      layerController.getActiveViewLayer().getViewController();
+    var drawController =
+      layerController.getActiveDrawLayer().getDrawController();
+
     // create final shape
     var finalShapeGroup = currentFactory.create(
-      finalPoints, self.style, app.getImage());
+      finalPoints, self.style, viewController);
     finalShapeGroup.id(dwv.math.guid());
 
     // get the position group
-    var posGroup = app.getDrawController().getCurrentPosGroup();
+    var posGroup = drawController.getCurrentPosGroup();
     // add shape group to position group
     posGroup.add(finalShapeGroup);
 
     // re-activate layer
-    drawLayer.listening(true);
+    konvaLayer.listening(true);
     // draw shape command
     command = new dwv.tool.DrawGroupCommand(
-      finalShapeGroup, self.shapeName, drawLayer);
+      finalShapeGroup, self.shapeName, konvaLayer);
     command.onExecute = fireEvent;
     command.onUndo = fireEvent;
     // execute it
@@ -458,20 +478,20 @@ dwv.tool.Draw = function (app) {
     // reset shape display properties
     shapeEditor.disable();
     shapeEditor.setShape(null);
-    shapeEditor.setImage(null);
+    shapeEditor.setViewController(null);
     document.body.style.cursor = 'default';
-    // make layer listen or not to events
-    app.getDrawStage().listening(flag);
     // get the current draw layer
-    drawLayer = app.getDrawController().getDrawLayer();
-    renderDrawLayer(flag);
+    var layerController = app.getLayerController();
+    var drawLayer = layerController.getActiveDrawLayer();
+    konvaLayer = drawLayer.getKonvaLayer();
+    activateCurrentPositionShapes(flag);
     // listen to app change to update the draw layer
     if (flag) {
       app.addEventListener('slicechange', updateDrawLayer);
       app.addEventListener('framechange', updateDrawLayer);
 
       // init with the app window scale
-      this.style.setScale(app.getWindowScale());
+      this.style.setBaseScale(app.getBaseScale());
       // same for colour
       this.setLineColour(this.style.getLineColour());
     } else {
@@ -484,41 +504,38 @@ dwv.tool.Draw = function (app) {
    * Update the draw layer.
    */
   function updateDrawLayer() {
-    // activate the draw layer
-    renderDrawLayer(true);
+    // activate the shape at current position
+    activateCurrentPositionShapes(true);
   }
 
   /**
-   * Render (or not) the draw layer.
+   * Activate shapes at current position.
    *
    * @param {boolean} visible Set the draw layer visible or not.
    */
-  function renderDrawLayer(visible) {
-
-    drawLayer.listening(visible);
+  function activateCurrentPositionShapes(visible) {
+    var layerController = app.getLayerController();
+    var drawController =
+      layerController.getActiveDrawLayer().getDrawController();
 
     // get shape groups at the current position
     var shapeGroups =
-      app.getDrawController().getCurrentPosGroup().getChildren();
+      drawController.getCurrentPosGroup().getChildren();
 
     // set shape display properties
     if (visible) {
-      // activate tool listeners
-      app.addToolCanvasListeners(app.getDrawStage().getContent());
       // activate shape listeners
       shapeGroups.forEach(function (group) {
         self.setShapeOn(group);
       });
     } else {
-      // de-activate tool listeners
-      app.removeToolCanvasListeners(app.getDrawStage().getContent());
       // de-activate shape listeners
       shapeGroups.forEach(function (group) {
         setShapeOff(group);
       });
     }
     // draw
-    drawLayer.draw();
+    konvaLayer.draw();
   }
 
   /**
@@ -546,7 +563,9 @@ dwv.tool.Draw = function (app) {
    * @private
    */
   function getRealPosition(index) {
-    var stage = app.getDrawStage();
+    var layerController = app.getLayerController();
+    var drawLayer = layerController.getActiveDrawLayer();
+    var stage = drawLayer.getKonvaStage();
     return {
       x: stage.offset().x + index.x / stage.scale().x,
       y: stage.offset().y + index.y / stage.scale().y
@@ -584,22 +603,28 @@ dwv.tool.Draw = function (app) {
       // store colour
       colour = shapeGroup.getChildren(dwv.draw.isNodeNameShape)[0].stroke();
       // display trash
-      var stage = app.getDrawStage();
+      var layerController = app.getLayerController();
+      var drawLayer = layerController.getActiveDrawLayer();
+      var stage = drawLayer.getKonvaStage();
       var scale = stage.scale();
       var invscale = {x: 1 / scale.x, y: 1 / scale.y};
       trash.x(stage.offset().x + (stage.width() / (2 * scale.x)));
       trash.y(stage.offset().y + (stage.height() / (15 * scale.y)));
       trash.scale(invscale);
-      drawLayer.add(trash);
+      konvaLayer.add(trash);
       // deactivate anchors to avoid events on null shape
       shapeEditor.setAnchorsActive(false);
       // draw
-      drawLayer.draw();
+      konvaLayer.draw();
     });
     // drag move event handling
     shapeGroup.on('dragmove.draw', function (event) {
+      var layerController = app.getLayerController();
+      var drawLayer = layerController.getActiveDrawLayer();
+      // validate the group position
+      dwv.tool.validateGroupPosition(drawLayer.getSize(), this);
       // highlight trash when on it
-      var offset = dwv.html.getEventOffset(event.evt)[0];
+      var offset = dwv.gui.getEventOffset(event.evt)[0];
       var eventPos = getRealPosition(offset);
       var trashHalfWidth = trash.width() * trash.scaleX() / 2;
       var trashHalfHeight = trash.height() * trash.scaleY() / 2;
@@ -620,11 +645,13 @@ dwv.tool.Draw = function (app) {
         // reset the group shapes colour
         shapeGroup.getChildren(dwv.draw.canNodeChangeColour).forEach(
           function (ashape) {
-            ashape.stroke(colour);
+            if (typeof ashape.stroke !== 'undefined') {
+              ashape.stroke(colour);
+            }
           });
       }
       // draw
-      drawLayer.draw();
+      konvaLayer.draw();
     });
     // drag end event handling
     shapeGroup.on('dragend.draw', function (event) {
@@ -632,7 +659,7 @@ dwv.tool.Draw = function (app) {
       // remove trash
       trash.remove();
       // delete case
-      var offset = dwv.html.getEventOffset(event.evt)[0];
+      var offset = dwv.gui.getEventOffset(event.evt)[0];
       var eventPos = getRealPosition(offset);
       var trashHalfWidth = trash.width() * trash.scaleX() / 2;
       var trashHalfHeight = trash.height() * trash.scaleY() / 2;
@@ -644,7 +671,7 @@ dwv.tool.Draw = function (app) {
         // disable editor
         shapeEditor.disable();
         shapeEditor.setShape(null);
-        shapeEditor.setImage(null);
+        shapeEditor.setViewController(null);
         // reset colour
         shapeGroup.getChildren(dwv.draw.canNodeChangeColour).forEach(
           function (ashape) {
@@ -654,7 +681,7 @@ dwv.tool.Draw = function (app) {
         document.body.style.cursor = 'default';
         // delete command
         var delcmd = new dwv.tool.DeleteGroupCommand(this,
-          shapeDisplayName, drawLayer);
+          shapeDisplayName, konvaLayer);
         delcmd.onExecute = fireEvent;
         delcmd.onUndo = fireEvent;
         delcmd.execute();
@@ -665,7 +692,7 @@ dwv.tool.Draw = function (app) {
           y: pos.y - dragStartPos.y};
         if (translation.x !== 0 || translation.y !== 0) {
           var mvcmd = new dwv.tool.MoveGroupCommand(this,
-            shapeDisplayName, translation, drawLayer);
+            shapeDisplayName, translation, konvaLayer);
           mvcmd.onExecute = fireEvent;
           mvcmd.onUndo = fireEvent;
           app.addToUndoStack(mvcmd);
@@ -681,13 +708,12 @@ dwv.tool.Draw = function (app) {
         shapeEditor.resetAnchors();
       }
       // draw
-      drawLayer.draw();
+      konvaLayer.draw();
       // reset start position
       dragStartPos = {x: this.x(), y: this.y()};
     });
     // double click handling: update label
     shapeGroup.on('dblclick', function () {
-
       // get the label object for this shape
       var label = this.findOne('Label');
       // should just be one
@@ -696,27 +722,33 @@ dwv.tool.Draw = function (app) {
       }
       var ktext = label.getText();
 
-      // ask user for new label
-      // TODO remove
-      var labelText = dwv.gui.prompt('Shape label', ktext.textExpr);
+      var onSaveCallback = function (meta) {
+        // store meta
+        ktext.meta = meta;
+        // update text expression
+        ktext.setText(dwv.utils.replaceFlags(
+          ktext.meta.textExpr, ktext.meta.quantification));
+        label.setVisible(ktext.meta.textExpr.length !== 0);
 
-      // if press cancel do nothing
-      if (labelText === null) {
-        return;
-      } else if (labelText === ktext.textExpr) {
-        return;
+        // trigger event
+        fireEvent({
+          type: 'drawchange'
+        });
+        // draw
+        konvaLayer.draw();
+      };
+
+      // call client dialog if defined
+      if (typeof dwv.gui.openRoiDialog !== 'undefined') {
+        dwv.gui.openRoiDialog(ktext.meta, onSaveCallback);
+      } else {
+        // simple prompt for the text expression
+        var textExpr = prompt('Label', ktext.meta.textExpr);
+        if (textExpr !== null) {
+          ktext.meta.textExpr = textExpr;
+          onSaveCallback(ktext.meta);
+        }
       }
-      // update text expression and set text
-      ktext.textExpr = labelText;
-      ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
-
-      // trigger event
-      fireEvent({
-        type: 'drawchange'
-      });
-
-      // draw
-      drawLayer.draw();
     });
   };
 
@@ -728,6 +760,8 @@ dwv.tool.Draw = function (app) {
   this.setOptions = function (options) {
     // save the options as the shape factory list
     this.shapeFactoryList = options;
+    // pass them to the editor
+    shapeEditor.setFactoryList(options);
   };
 
   /**
@@ -772,7 +806,7 @@ dwv.tool.Draw = function (app) {
   /**
    * Set the line colour of the drawing.
    *
-   * @param {string} colour The colour to set.
+   * @param {string} colour The colour to set
    */
   this.setLineColour = function (colour) {
     this.style.setLineColour(colour);
@@ -836,4 +870,99 @@ dwv.tool.Draw.prototype.setShapeName = function (name) {
  */
 dwv.tool.Draw.prototype.hasShape = function (name) {
   return this.shapeFactoryList[name];
+};
+
+/**
+ * Get the minimum position in a groups' anchors.
+ *
+ * @param {object} group The group that contains anchors.
+ * @returns {object} The minimum position.
+ */
+dwv.tool.getAnchorMin = function (group) {
+  var anchors = group.find('.anchor');
+  if (anchors.length === 0) {
+    return;
+  }
+  var minX = anchors[0].x();
+  var minY = anchors[0].y();
+  anchors.each(function (anchor) {
+    minX = Math.min(minX, anchor.x());
+    minY = Math.min(minY, anchor.y());
+  });
+  return {x: minX, y: minY};
+};
+
+/**
+ * Bound a node position.
+ *
+ * @param {object} node The node to bound the position.
+ * @param {object} min The minimum position.
+ * @param {object} max The maximum position.
+ * @returns {boolean} True if the position was corrected.
+ */
+dwv.tool.boundNodePosition = function (node, min, max) {
+  var changed = false;
+  if (node.x() < min.x) {
+    node.x(min.x);
+    changed = true;
+  } else if (node.x() > max.x) {
+    node.x(max.x);
+    changed = true;
+  }
+  if (node.y() < min.y) {
+    node.y(min.y);
+    changed = true;
+  } else if (node.y() > max.y) {
+    node.y(max.y);
+    changed = true;
+  }
+  return changed;
+};
+
+/**
+ * Validate a group position.
+ *
+ * @param {object} stageSize The stage size {x,y}.
+ * @param {object} group The group to evaluate.
+ * @returns {boolean} True if the position was corrected.
+ */
+dwv.tool.validateGroupPosition = function (stageSize, group) {
+  // if anchors get mixed, width/height can be negative
+  var shape = group.getChildren(dwv.draw.isNodeNameShape)[0];
+  var anchorMin = dwv.tool.getAnchorMin(group);
+
+  var min = {
+    x: -anchorMin.x,
+    y: -anchorMin.y
+  };
+  var max = {
+    x: stageSize.x -
+      (anchorMin.x + Math.abs(shape.width())),
+    y: stageSize.y -
+      (anchorMin.y + Math.abs(shape.height()))
+  };
+
+  return dwv.tool.boundNodePosition(group, min, max);
+};
+
+/**
+ * Validate an anchor position.
+ *
+ * @param {object} stageSize The stage size {x,y}.
+ * @param {object} anchor The anchor to evaluate.
+ * @returns {boolean} True if the position was corrected.
+ */
+dwv.tool.validateAnchorPosition = function (stageSize, anchor) {
+  var group = anchor.getParent();
+
+  var min = {
+    x: -group.x(),
+    y: -group.y()
+  };
+  var max = {
+    x: stageSize.x - group.x(),
+    y: stageSize.y - group.y()
+  };
+
+  return dwv.tool.boundNodePosition(anchor, min, max);
 };

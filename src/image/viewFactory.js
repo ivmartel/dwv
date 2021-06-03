@@ -58,5 +58,8 @@ dwv.image.ViewFactory.prototype.create = function (dicomElements, image) {
   // store
   view.setWindowPresets(windowPresets);
 
+  // set the initial position
+  view.setInitialPosition();
+
   return view;
 };

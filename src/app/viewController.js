@@ -14,6 +14,18 @@ dwv.ViewController = function (view) {
   var playerID = null;
 
   /**
+   * Initialise the controller.
+   */
+  this.initialise = function () {
+    // set window/level to first preset
+    this.setWindowLevelPresetById(0);
+    // default position
+    this.setCurrentPosition2D(0, 0);
+    // default frame
+    this.setCurrentFrame(0);
+  };
+
+  /**
    * Get the window/level presets names.
    *
    * @returns {Array} The presets names.
@@ -69,13 +81,93 @@ dwv.ViewController = function (view) {
   };
 
   /**
+   * Get the current spacing.
+   *
+   * @returns {Array} The 2D spacing.
+   */
+  this.get2DSpacing = function () {
+    var spacing = view.getImage().getGeometry().getSpacing();
+    return [spacing.getColumnSpacing(), spacing.getRowSpacing()];
+  };
+
+  /**
+   * Get some values from the associated image in a region.
+   *
+   * @param {dwv.math.Point2D} min Minimum point.
+   * @param {dwv.math.Point2D} max Maximum point.
+   * @returns {Array} A list of values.
+   */
+  this.getImageRegionValues = function (min, max) {
+    var iter = dwv.image.getRegionSliceIterator(
+      view.getImage(),
+      this.getCurrentPosition().k,
+      this.getCurrentFrame(),
+      true, min, max
+    );
+    var values = [];
+    if (iter) {
+      values = dwv.image.getIteratorValues(iter);
+    }
+    return values;
+  };
+
+  /**
+   * Get some values from the associated image in variable regions.
+   *
+   * @param {Array} regions A list of regions.
+   * @returns {Array} A list of values.
+   */
+  this.getImageVariableRegionValues = function (regions) {
+    var iter = dwv.image.getVariableRegionSliceIterator(
+      view.getImage(),
+      this.getCurrentPosition().k,
+      this.getCurrentFrame(),
+      true, regions
+    );
+    var values = [];
+    if (iter) {
+      values = dwv.image.getIteratorValues(iter);
+    }
+    return values;
+  };
+
+  /**
+   * Can the image values be quantified?
+   *
+   * @returns {boolean} True if possible.
+   */
+  this.canQuantifyImage = function () {
+    return view.getImage().getNumberOfComponents() === 1;
+  };
+
+  /**
+   * Can window and level be applied to the data?
+   *
+   * @returns {boolean} True if the data is monochrome.
+   */
+  this.canWindowLevel = function () {
+    return view.getImage().getPhotometricInterpretation()
+      .match(/MONOCHROME/) !== null;
+  };
+
+  /**
+   * Is the data mono-frame?
+   *
+   * @returns {boolean} True if the data only contains one frame.
+   */
+  this.isMonoFrameData = function () {
+    return view.getImage().getNumberOfFrames() === 1;
+  };
+
+  /**
    * Set the current position.
    *
    * @param {object} pos The position.
+   * @param {boolean} silent If true, does not fire a slicechange event.
    * @returns {boolean} False if not in bounds.
    */
-  this.setCurrentPosition = function (pos) {
-    return view.setCurrentPosition(pos);
+  this.setCurrentPosition = function (pos, silent) {
+    return view.setCurrentPosition(pos, silent);
   };
 
   /**

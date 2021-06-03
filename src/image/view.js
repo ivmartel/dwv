@@ -3,6 +3,21 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
+ * List of view event names.
+ *
+ * @type {Array}
+ */
+dwv.image.viewEventNames = [
+  'slicechange',
+  'framechange',
+  'wlwidthchange',
+  'wlcenterchange',
+  'wlpresetadd',
+  'colourchange',
+  'positionchange'
+];
+
+/**
  * View class.
  *
  * @class
@@ -668,7 +683,7 @@ dwv.image.View.prototype.generateImageData = function (array) {
   var position = this.getCurrentPosition();
   var frame = this.getCurrentFrame();
   var image = this.getImage();
-  var iterator = image.getSliceIterator(position.k, frame);
+  var iterator = dwv.image.getSliceIterator(this.getImage(), position.k, frame);
 
   var photoInterpretation = image.getPhotometricInterpretation();
   switch (photoInterpretation) {

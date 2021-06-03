@@ -13,11 +13,24 @@ dwv.tool.draw = dwv.tool.draw || {};
 var Konva = Konva || {};
 
 /**
+ * Default draw label text.
+ */
+dwv.tool.draw.defaultArrowLabelText = '';
+
+/**
  * Arrow factory.
  *
  * @class
  */
 dwv.tool.draw.ArrowFactory = function () {
+  /**
+   * Get the name of the shape group.
+   *
+   * @returns {string} The name.
+   */
+  this.getGroupName = function () {
+    return 'line-group';
+  };
   /**
    * Get the number of points needed to build the shape.
    *
@@ -37,15 +50,25 @@ dwv.tool.draw.ArrowFactory = function () {
 };
 
 /**
+ * Is the input group a group of this factory?
+ *
+ * @param {object} group The group to test.
+ * @returns {boolean} True if the group is from this fcatory.
+ */
+dwv.tool.draw.ArrowFactory.prototype.isFactoryGroup = function (group) {
+  return this.getGroupName() === group.name();
+};
+
+/**
  * Create an arrow shape to be displayed.
  *
  * @param {Array} points The points from which to extract the line.
  * @param {object} style The drawing style.
- * @param {object} _image The associated image.
+ * @param {object} _viewController The associated view controller.
  * @returns {object} The Konva object.
  */
 dwv.tool.draw.ArrowFactory.prototype.create = function (
-  points, style, _image) {
+  points, style, _viewController) {
   // physical shape
   var line = new dwv.math.Line(points[0], points[1]);
   // draw shape
@@ -59,9 +82,11 @@ dwv.tool.draw.ArrowFactory.prototype.create = function (
     strokeScaleEnabled: false,
     name: 'shape'
   });
-    // larger hitfunc
-  var linePerp0 = dwv.math.getPerpendicularLine(line, points[0], 10);
-  var linePerp1 = dwv.math.getPerpendicularLine(line, points[1], 10);
+  // larger hitfunc
+  var linePerp0 = dwv.math.getPerpendicularLine(
+    line, points[0], style.scale(10));
+  var linePerp1 = dwv.math.getPerpendicularLine(
+    line, points[1], style.scale(10));
   kshape.hitFunc(function (context) {
     context.beginPath();
     context.moveTo(linePerp0.getBegin().getX(), linePerp0.getBegin().getY());
@@ -90,45 +115,85 @@ dwv.tool.draw.ArrowFactory.prototype.create = function (
     strokeScaleEnabled: false,
     name: 'shape-triangle'
   });
-    // quantification
+  // quantification
   var ktext = new Konva.Text({
-    fontSize: style.getScaledFontSize(),
+    fontSize: style.getFontSize(),
     fontFamily: style.getFontFamily(),
     fill: style.getLineColour(),
+    padding: style.getTextPadding(),
+    shadowColor: style.getShadowLineColour(),
+    shadowOffset: style.getShadowOffset(),
     name: 'text'
   });
-  ktext.textExpr = '';
-  ktext.longText = '';
-  ktext.quant = null;
-  ktext.setText(ktext.textExpr);
+  var textExpr = '';
+  if (typeof dwv.tool.draw.arrowLabelText !== 'undefined') {
+    textExpr = dwv.tool.draw.arrowLabelText;
+  } else {
+    textExpr = dwv.tool.draw.defaultArrowLabelText;
+  }
+  ktext.setText(textExpr);
+  // meta data
+  ktext.meta = {
+    textExpr: textExpr,
+    quantification: {}
+  };
   // label
   var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
-  var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
+  var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
   var klabel = new Konva.Label({
-    x: line.getEnd().getX() + dX * 25,
-    y: line.getEnd().getY() + dY * 15,
+    x: line.getEnd().getX() + dX * ktext.width(),
+    y: line.getEnd().getY() + dY * style.applyZoomScale(15).y,
+    scale: style.applyZoomScale(1),
+    visible: textExpr.length !== 0,
     name: 'label'
   });
   klabel.add(ktext);
-  klabel.add(new Konva.Tag());
+  klabel.add(new Konva.Tag({
+    fill: style.getLineColour(),
+    opacity: style.getTagOpacity()
+  }));
 
   // return group
   var group = new Konva.Group();
-  group.name('line-group');
-  group.add(kshape);
-  group.add(kpoly);
+  group.name(this.getGroupName());
   group.add(klabel);
+  group.add(kpoly);
+  group.add(kshape);
   group.visible(true); // dont inherit
   return group;
 };
 
 /**
+ * Get anchors to update an arrow shape.
+ *
+ * @param {object} shape The associated shape.
+ * @param {object} style The application style.
+ * @returns {Array} A list of anchors.
+ */
+dwv.tool.draw.ArrowFactory.prototype.getAnchors = function (shape, style) {
+  var points = shape.points();
+
+  var anchors = [];
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    points[0] + shape.x(), points[1] + shape.y(), 'begin', style
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    points[2] + shape.x(), points[3] + shape.y(), 'end', style
+  ));
+  return anchors;
+};
+
+/**
  * Update an arrow shape.
+ * Warning: do NOT use 'this' here, this method is passed
+ *   as is to the change command.
  *
  * @param {object} anchor The active anchor.
- * @param {object} _image The associated image.
+ * @param {object} style The app style.
+ * @param {object} _viewController The associated view controller.
  */
-dwv.tool.draw.UpdateArrow = function (anchor, _image) {
+dwv.tool.draw.ArrowFactory.prototype.update = function (
+  anchor, style, _viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape
@@ -196,16 +261,16 @@ dwv.tool.draw.UpdateArrow = function (anchor, _image) {
   ktriangle.x(line.getBegin().getX() + ktriangle.radius() * Math.sin(angleRad));
   ktriangle.y(line.getBegin().getY() + ktriangle.radius() * Math.cos(angleRad));
   ktriangle.rotation(-angle);
+
   // update text
   var ktext = klabel.getText();
-  ktext.quant = null;
-  ktext.setText(ktext.textExpr);
+  ktext.setText(ktext.meta.textExpr);
   // update position
   var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
-  var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
+  var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
   var textPos = {
-    x: line.getEnd().getX() + dX * 25,
-    y: line.getEnd().getY() + dY * 15
+    x: line.getEnd().getX() + dX * ktext.width(),
+    y: line.getEnd().getY() + dY * style.applyZoomScale(15).y
   };
   klabel.position(textPos);
 };

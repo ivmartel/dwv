@@ -64,6 +64,31 @@ dwv.utils.splitKeyValueString = function (inputStr) {
 };
 
 /**
+ * Get flags from an input string. Flags are words surrounded with curly
+ * braces.
+ *
+ * @param {string} inputStr The input string.
+ * @returns {Array} An array of found flags.
+ */
+dwv.utils.getFlags = function (inputStr) {
+  var flags = [];
+  // check input string
+  if (inputStr === null || typeof inputStr === 'undefined') {
+    return flags;
+  }
+
+  // word surrounded by curly braces
+  var regex = /{(\w+)}/g;
+
+  var match = regex.exec(inputStr);
+  while (match) {
+    flags.push(match[1]); // first matching group
+    match = regex.exec(inputStr);
+  }
+  return flags;
+};
+
+/**
  * Replace flags in a input string. Flags are keywords surrounded with curly
  * braces.
  *
@@ -86,19 +111,21 @@ dwv.utils.replaceFlags = function (inputStr, values) {
   if (values === null || typeof values === 'undefined') {
     return res;
   }
-  // loop through values keys
-  var keys = Object.keys(values);
+
+  // loop through flags
+  var keys = dwv.utils.getFlags(inputStr);
   for (var i = 0; i < keys.length; ++i) {
     var valueObj = values[keys[i]];
     if (valueObj !== null && typeof valueObj !== 'undefined' &&
-            valueObj.value !== null && typeof valueObj.value !== 'undefined') {
+      valueObj.value !== null && typeof valueObj.value !== 'undefined') {
       // value string
       var valueStr = valueObj.value.toPrecision(4);
       // add unit if available
       // space or no space? Yes apart from degree...
       // check: https://en.wikipedia.org/wiki/Space_(punctuation)#Spaces_and_unit_symbols
-      if (valueObj.unit !== null && typeof valueObj.unit !== 'undefined' &&
-                valueObj.unit.length !== 0) {
+      if (valueObj.unit !== null &&
+        typeof valueObj.unit !== 'undefined' &&
+        valueObj.unit.length !== 0) {
         if (valueObj.unit !== 'degree') {
           valueStr += ' ';
         }

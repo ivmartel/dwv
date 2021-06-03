@@ -10,6 +10,8 @@ dwv.image.decoderScripts = {
 };
 // get element
 dwv.gui.getElement = dwv.gui.base.getElement;
+// logger level (optional)
+dwv.logger.level = dwv.utils.logger.levels.DEBUG;
 
 var _app = null;
 
@@ -30,11 +32,13 @@ dwv.test.viewerSetup = function () {
   _app.init(config);
 
   // bind events
+  var isFirstRender = null;
   _app.addEventListener('error', function (event) {
     console.error('load error', event);
   });
   _app.addEventListener('loadstart', function () {
     console.time('load-data');
+    isFirstRender = true;
   });
   _app.addEventListener('loadend', function () {
     console.timeEnd('load-data');
@@ -45,6 +49,11 @@ dwv.test.viewerSetup = function () {
   });
   _app.addEventListener('renderend', function () {
     console.timeEnd('render-data');
+    if (isFirstRender) {
+      isFirstRender = false;
+      // select tool
+      _app.setTool('Scroll');
+    }
   });
 
   _app.addEventListener('keydown', function (event) {
@@ -58,8 +67,6 @@ dwv.test.viewerSetup = function () {
     }
   });
 
-  // select tool
-  _app.setTool('Scroll');
   // load from location
   dwv.utils.loadFromUri(window.location.href, _app);
 };
@@ -68,6 +75,9 @@ dwv.test.viewerSetup = function () {
  * Last minute.
  */
 dwv.test.onDOMContentLoadedViewer = function () {
+  // setup
+  dwv.test.viewerSetup();
+
   // bind app to input files
   const fileinput = document.getElementById('fileinput');
   fileinput.addEventListener('change', function (event) {
@@ -75,4 +85,16 @@ dwv.test.onDOMContentLoadedViewer = function () {
     console.log(event.target.files);
     _app.loadFiles(event.target.files);
   });
+
+  var alpharange = document.getElementById('alpharange');
+  var alphanumber = document.getElementById('alphanumber');
+  alpharange.oninput = function () {
+    _app.setOpacity(this.value);
+    alphanumber.value = this.value;
+  };
+  alphanumber.oninput = function () {
+    _app.setOpacity(this.value);
+    alpharange.value = this.value;
+  };
+
 };

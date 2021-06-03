@@ -115,6 +115,12 @@
             "click": "Klicken auf Pixel erzeut eine Kontur auf Basis des Grauwerts.",
             "tap": "Tippen auf Pixel erzeut eine Kontur auf Basis des Grauwerts."
         },
+        "Opacity": {
+            "name": "Opazität",
+            "brief": "Ermöglicht das Ändern der Deckkraft der aktuellen Ansichtsebene.",
+            "mouse_drag": "Durch horizontales Ziehen mit der Maus wird die Deckkraft der Ebene geändert, sodass sie entweder undurchsichtiger oder transparenter wird.",
+            "touch_drag": "Durch horizontales Ziehen wird die Deckkraft der Ebene geändert, sodass sie entweder undurchsichtiger oder transparenter wird."
+        },
         "info": {
             "position": "Position = {{value}}",
             "value": "Grauwert = {{value}}",
@@ -141,6 +147,9 @@
         },
         "Ellipse": {
             "name": "Ellipse"
+        },
+        "Circle": {
+            "name": "Kreis"
         },
         "Arrow": {
             "name": "Pfeil"

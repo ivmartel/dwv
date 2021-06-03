@@ -26,16 +26,14 @@ dwv.ToolboxController = function (toolList) {
   /**
    * Initialise.
    *
-   * @param {object} layer The associated layer.
+   * @param {Function} converter The display to index converter.
    */
-  this.init = function (layer) {
+  this.init = function (converter) {
     for (var key in toolList) {
       toolList[key].init();
     }
     // TODO Would prefer to have this done in the addLayerListeners
-    displayToIndexConverter = layer.displayToIndex;
-    // add layer listeners
-    this.addCanvasListeners(layer.getCanvas());
+    displayToIndexConverter = converter;
     // keydown listener
     window.addEventListener('keydown', onMouch, true);
   };
@@ -56,7 +54,7 @@ dwv.ToolboxController = function (toolList) {
    * @returns {string} The tool list element for the given name.
    */
   this.hasTool = function (name) {
-    return this.getToolList()[name];
+    return typeof this.getToolList()[name] !== 'undefined';
   };
 
   /**
@@ -142,53 +140,37 @@ dwv.ToolboxController = function (toolList) {
     // seems like jquery is checking if the method exists before it
     // is used...
     if (this.getSelectedTool() &&
-                this.getSelectedTool().getSelectedFilter()) {
+      this.getSelectedTool().getSelectedFilter()) {
       this.getSelectedTool().getSelectedFilter().run(range);
     }
   };
 
   /**
-   * Add canvas mouse and touch listeners.
+   * Listen to layer interaction events.
    *
-   * @param {object} canvas The canvas to listen to.
+   * @param {object} layer The layer to listen to.
    */
-  this.addCanvasListeners = function (canvas) {
-    // allow pointer events
-    canvas.setAttribute('style', 'pointer-events: auto;');
-    // mouse listeners
-    canvas.addEventListener('mousedown', onMouch);
-    canvas.addEventListener('mousemove', onMouch);
-    canvas.addEventListener('mouseup', onMouch);
-    canvas.addEventListener('mouseout', onMouch);
-    canvas.addEventListener('mousewheel', onMouch);
-    canvas.addEventListener('DOMMouseScroll', onMouch);
-    canvas.addEventListener('dblclick', onMouch);
-    // touch listeners
-    canvas.addEventListener('touchstart', onMouch);
-    canvas.addEventListener('touchmove', onMouch);
-    canvas.addEventListener('touchend', onMouch);
+  this.attachLayer = function (layer) {
+    layer.activate();
+    // interaction events
+    var names = dwv.gui.interactionEventNames;
+    for (var i = 0; i < names.length; ++i) {
+      layer.addEventListener(names[i], onMouch);
+    }
   };
 
   /**
    * Remove canvas mouse and touch listeners.
    *
-   * @param {object} canvas The canvas to stop listening to.
+   * @param {object} layer The layer to stop listening to.
    */
-  this.removeCanvasListeners = function (canvas) {
-    // disable pointer events
-    canvas.setAttribute('style', 'pointer-events: none;');
-    // mouse listeners
-    canvas.removeEventListener('mousedown', onMouch);
-    canvas.removeEventListener('mousemove', onMouch);
-    canvas.removeEventListener('mouseup', onMouch);
-    canvas.removeEventListener('mouseout', onMouch);
-    canvas.removeEventListener('mousewheel', onMouch);
-    canvas.removeEventListener('DOMMouseScroll', onMouch);
-    canvas.removeEventListener('dblclick', onMouch);
-    // touch listeners
-    canvas.removeEventListener('touchstart', onMouch);
-    canvas.removeEventListener('touchmove', onMouch);
-    canvas.removeEventListener('touchend', onMouch);
+  this.detachLayer = function (layer) {
+    layer.deactivate();
+    // interaction events
+    var names = dwv.gui.interactionEventNames;
+    for (var i = 0; i < names.length; ++i) {
+      layer.removeEventListener(names[i], onMouch);
+    }
   };
 
   /**
@@ -213,9 +195,9 @@ dwv.ToolboxController = function (toolList) {
     var offsets = null;
     var position = null;
     if (event.type === 'touchstart' ||
-            event.type === 'touchmove') {
+      event.type === 'touchmove') {
       // event offset(s)
-      offsets = dwv.html.getEventOffset(event);
+      offsets = dwv.gui.getEventOffset(event);
       // should have at least one offset
       event._xs = offsets[0].x;
       event._ys = offsets[0].y;
@@ -233,13 +215,12 @@ dwv.ToolboxController = function (toolList) {
       // set handle event flag
       handled = true;
     } else if (event.type === 'mousemove' ||
-            event.type === 'mousedown' ||
-            event.type === 'mouseup' ||
-            event.type === 'mouseout' ||
-            event.type === 'mousewheel' ||
-            event.type === 'dblclick' ||
-            event.type === 'DOMMouseScroll') {
-      offsets = dwv.html.getEventOffset(event);
+      event.type === 'mousedown' ||
+      event.type === 'mouseup' ||
+      event.type === 'mouseout' ||
+      event.type === 'wheel' ||
+      event.type === 'dblclick') {
+      offsets = dwv.gui.getEventOffset(event);
       event._xs = offsets[0].x;
       event._ys = offsets[0].y;
       position = displayToIndexConverter(offsets[0]);
@@ -248,7 +229,7 @@ dwv.ToolboxController = function (toolList) {
       // set handle event flag
       handled = true;
     } else if (event.type === 'keydown' ||
-                event.type === 'touchend') {
+      event.type === 'touchend') {
       handled = true;
     }
 

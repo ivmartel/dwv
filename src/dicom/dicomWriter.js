@@ -19,7 +19,6 @@ dwv.dicom.getDwvUIDPrefix = function () {
  * @see http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_9.html
  * @see http://dicomiseasy.blogspot.com/2011/12/chapter-4-dicom-objects-in-chapter-3.html
  * @see https://stackoverflow.com/questions/46304306/how-to-generate-unique-dicom-uid
- *
  * @param {string} tagName The input tag.
  * @returns {string} The corresponding UID.
  */
@@ -281,6 +280,30 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian) {
 };
 
 /**
+ * Write a boolean array as binary.
+ *
+ * @param {number} byteOffset The offset to start writing from.
+ * @param {Array} array The array to write.
+ * @returns {number} The new offset position.
+ */
+dwv.dicom.DataWriter.prototype.writeBinaryArray = function (byteOffset, array) {
+  if (array.length % 8 !== 0) {
+    throw new Error('Cannot write boolean array as binary.');
+  }
+  var byte = null;
+  var val = null;
+  for (var i = 0, len = array.length; i < len; i += 8) {
+    byte = 0;
+    for (var j = 0; j < 8; ++j) {
+      val = array[i + j] === 0 ? 0 : 1;
+      byte += val << j;
+    }
+    byteOffset = this.writeUint8(byteOffset, byte);
+  }
+  return byteOffset;
+};
+
+/**
  * Write Uint8 array.
  *
  * @param {number} byteOffset The offset to start writing from.
@@ -471,16 +494,22 @@ dwv.dicom.DataWriter.prototype.writeDataElementItems = function (
  * Write data with a specific Value Representation (VR).
  *
  * @param {string} vr The data Value Representation (VR).
+ * @param {string} vl The data Value Length (VL).
  * @param {number} byteOffset The offset to start writing from.
  * @param {Array} value The array to write.
  * @param {boolean} isImplicit Is the DICOM VR implicit?
  * @returns {number} The new offset position.
  */
 dwv.dicom.DataWriter.prototype.writeDataElementValue = function (
-  vr, byteOffset, value, isImplicit) {
+  vr, vl, byteOffset, value, isImplicit) {
   // first check input type to know how to write
   if (value instanceof Uint8Array) {
-    byteOffset = this.writeUint8Array(byteOffset, value);
+    // binary data has been expanded 8 times at read
+    if (value.length === 8 * vl) {
+      byteOffset = this.writeBinaryArray(byteOffset, value);
+    } else {
+      byteOffset = this.writeUint8Array(byteOffset, value);
+    }
   } else if (value instanceof Int8Array) {
     byteOffset = this.writeInt8Array(byteOffset, value);
   } else if (value instanceof Uint16Array) {
@@ -556,7 +585,7 @@ dwv.dicom.DataWriter.prototype.writePixelDataElementValue = function (
     }
     // write
     byteOffset = this.writeDataElementValue(
-      vr, byteOffset, finalValue, isImplicit);
+      vr, vl, byteOffset, finalValue, isImplicit);
   } else {
     // pixel data as sequence
     var item = {};
@@ -653,7 +682,7 @@ dwv.dicom.DataWriter.prototype.writeDataElement = function (
       element.vr, element.vl, byteOffset, value, isImplicit);
   } else {
     byteOffset = this.writeDataElementValue(
-      element.vr, byteOffset, value, isImplicit);
+      element.vr, element.vl, byteOffset, value, isImplicit);
   }
 
   // sequence delimitation item for sequence with implicit length

@@ -1,0 +1,113 @@
+{
+  "version": "0.4",
+  "window-center": 441,
+  "window-width": 911,
+  "position": {
+    "i": 0,
+    "j": 0,
+    "k": 0
+  },
+  "scale": {
+    "x": 1,
+    "y": 1
+  },
+  "offset": {
+    "x": 0,
+    "y": 0
+  },
+  "drawings": {
+    "attrs": {},
+    "className": "Layer",
+    "children": [
+      {
+        "attrs": {
+          "id": "slice-0_frame-0",
+          "name": "position-group"
+        },
+        "className": "Group",
+        "children": [
+          {
+            "attrs": {
+              "name": "protractor-group",
+              "id": "49g7kqi3p4u",
+              "draggable": true
+            },
+            "className": "Group",
+            "children": [
+              {
+                "attrs": {
+                  "x": 71,
+                  "y": 157.33333333333334,
+                  "name": "label"
+                },
+                "className": "Label",
+                "children": [
+                  {
+                    "attrs": {
+                      "fontSize": 5.333333333333333,
+                      "fontFamily": "Verdana",
+                      "fill": "#ffff80",
+                      "name": "text",
+                      "text": "80.15 °"
+                    },
+                    "className": "Text"
+                  },
+                  {
+                    "attrs": {
+                      "width": 15.4510498046875,
+                      "height": 5.333333333333333
+                    },
+                    "className": "Tag"
+                  }
+                ]
+              },
+              {
+                "attrs": {
+                  "innerRadius": 17.53663593737408,
+                  "outerRadius": 17.53663593737408,
+                  "stroke": "#ffff80",
+                  "strokeScaleEnabled": false,
+                  "angle": 80.69260065780668,
+                  "rotation": -280.49147701233164,
+                  "x": 81,
+                  "y": 146,
+                  "name": "shape-arc"
+                },
+                "className": "Arc"
+              },
+              {
+                "attrs": {
+                  "points": [
+                    33,
+                    164,
+                    81,
+                    145,
+                    93,
+                    198
+                  ],
+                  "stroke": "#ffff80",
+                  "strokeScaleEnabled": false,
+                  "name": "shape"
+                },
+                "className": "Line"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "drawingsDetails": {
+    "49g7kqi3p4u": {
+      "meta": {
+        "textExpr": "{angle}",
+        "quantification": {
+          "angle": {
+            "value": 80.69260065780668,
+            "unit": "°"
+          }
+        }
+      }
+    }
+  }
+}

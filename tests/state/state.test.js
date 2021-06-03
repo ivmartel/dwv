@@ -69,11 +69,16 @@ dwv.test.checkStateHeader = function (jsonData, version, assert) {
     version: version,
     'window-center': 441,
     'window-width': 911,
-    position: {i: 0, j: 0, k: 0},
-    scale: 1,
-    scaleCenter: {x: 0, y: 0},
-    translation: {x: 0, y: 0}
+    position: {i: 0, j: 0, k: 0}
   };
+  if (parseFloat(version) <= 0.3) {
+    headerData.scale = 1;
+    headerData.scaleCenter = {x: 0, y: 0};
+    headerData.translation = {x: 0, y: 0};
+  } else {
+    headerData.scale = {x: 1, y: 1};
+    headerData.offset = {x: 0, y: 0};
+  }
   assert.deepEqual(jsonData, headerData);
 };
 
@@ -114,6 +119,8 @@ dwv.test.checkDrawings = function (drawings, details, version, type, assert) {
       'Group',
       'Position group first level is a group.');
 
+    var unit = parseFloat(version) <= 0.3 ? 'mm' : ' mm';
+
     // shape specific checks
     if (type === 'arrow') {
       dwv.test.checkArrowDrawing(posGroupKid, details, version, assert);
@@ -122,21 +129,23 @@ dwv.test.checkDrawings = function (drawings, details, version, type, assert) {
         id: '4gvkz8v6wzw',
         points: [51, 135, 216, 134],
         colour: '#ffff80',
-        text: '165.0mm',
+        text: '165.0' + unit,
         textExpr: '{length}',
         longText: 'What a ruler!'
       };
-      dwv.test.checkRulerDrawing(posGroupKid, details, refRuler, assert);
+      dwv.test.checkRulerDrawing(
+        posGroupKid, details, version, refRuler, assert);
     } else if (type === 'line' && version === '0.1') {
       var refLine = {
         id: '4gvkz8v6wzw',
         points: [51, 135, 216, 134],
         colour: '#ffff00',
-        text: '165.0mm',
+        text: '165.0' + unit,
         textExpr: '{length}',
         longText: ''
       };
-      dwv.test.checkRulerDrawing(posGroupKid, details, refLine, assert);
+      dwv.test.checkRulerDrawing(
+        posGroupKid, details, version, refLine, assert);
     } else if (type === 'roi') {
       dwv.test.checkRoiDrawing(posGroupKid, details, version, assert);
     } else if (type === 'hand') {
@@ -235,11 +244,13 @@ dwv.test.checkArrowDrawing = function (posGroupKid, details, version, assert) {
   // details
   var details0 = details.pf8zteo5r4;
   assert.equal(
-    details0.textExpr, 'Eye', 'Details textExpr has the proper value.');
-  assert.equal(
-    details0.longText,
-    'This is an eye!',
-    'Details longText has the proper value.');
+    details0.meta.textExpr, 'Eye', 'Details textExpr has the proper value.');
+  if (parseFloat(version) <= 0.3) {
+    assert.equal(
+      details0.meta.longText,
+      'This is an eye!',
+      'Details longText has the proper value.');
+  }
 };
 
 /**
@@ -247,10 +258,12 @@ dwv.test.checkArrowDrawing = function (posGroupKid, details, version, assert) {
  *
  * @param {object} posGroupKid The position group (only) kid.
  * @param {object} details The drawing details
+ * @param {string} version The state format version.
  * @param {string} ref The reference data to compare to.
  * @param {object} assert The qunit assert.
  */
-dwv.test.checkRulerDrawing = function (posGroupKid, details, ref, assert) {
+dwv.test.checkRulerDrawing = function (
+  posGroupKid, details, version, ref, assert) {
   // check group
   assert.equal(
     posGroupKid.attrs.name, 'ruler-group', 'Shape group is a ruler group.');
@@ -328,13 +341,15 @@ dwv.test.checkRulerDrawing = function (posGroupKid, details, ref, assert) {
   // details
   var details0 = details[ref.id];
   assert.equal(
-    details0.textExpr,
+    details0.meta.textExpr,
     ref.textExpr,
     'Details textExpr has the proper value.');
-  assert.equal(
-    details0.longText,
-    ref.longText,
-    'Details longText has the proper value.');
+  if (parseFloat(version) <= 0.3) {
+    assert.equal(
+      details0.meta.longText,
+      ref.longText,
+      'Details longText has the proper value.');
+  }
 };
 
 /**
@@ -350,12 +365,13 @@ dwv.test.checkRulerDrawings = function (layerKids, details, version, assert) {
   var ndraws = 5;
   assert.equal(layerKids.length, ndraws, 'Layer has ' + ndraws + ' kids.');
 
+  var unit = parseFloat(version) <= 0.3 ? 'mm' : ' mm';
   var refRulers = [
     {
       id: 'onzlkbs8p',
       points: [120, 110, 120, 60],
       colour: '#ffff00',
-      text: '50.00mm',
+      text: '50.00' + unit,
       textExpr: '{length}',
       longText: (version === '0.1' ? '' : 'First ruler.')
     },
@@ -363,7 +379,7 @@ dwv.test.checkRulerDrawings = function (layerKids, details, version, assert) {
       id: 'u9bvidgkjc9',
       points: [120, 110, 170, 110],
       colour: '#ff0000',
-      text: '50.00mm',
+      text: '50.00' + unit,
       textExpr: '{length}',
       longText: (version === '0.1' ? '' : 'Second ruler.')
     },
@@ -371,7 +387,7 @@ dwv.test.checkRulerDrawings = function (layerKids, details, version, assert) {
       id: 'c9abkegq62j',
       points: [120, 110, 120, 160],
       colour: '#ffffff',
-      text: '50.00mm',
+      text: '50.00' + unit,
       textExpr: '{length}',
       longText: (version === '0.1' ? '' : 'Third ruler.')
     },
@@ -379,7 +395,7 @@ dwv.test.checkRulerDrawings = function (layerKids, details, version, assert) {
       id: 'uiav43zjw1',
       points: [120, 110, 60, 110],
       colour: '#00ff00',
-      text: '50.00mm',
+      text: '50.00' + unit,
       textExpr: '{length}',
       longText: (version === '0.1' ? '' : 'Fourth ruler.')
     },
@@ -387,7 +403,7 @@ dwv.test.checkRulerDrawings = function (layerKids, details, version, assert) {
       id: '26ir11b9ugl',
       points: [120, 110, 120, 60],
       colour: '#ff00ff',
-      text: '50.00mm',
+      text: '50.00' + unit,
       textExpr: '{length}',
       longText: (version === '0.1' ? '' : 'Fifth ruler.')
     }
@@ -415,7 +431,8 @@ dwv.test.checkRulerDrawings = function (layerKids, details, version, assert) {
       'Group',
       'Position group first level is a group.');
 
-    dwv.test.checkRulerDrawing(posGroupKid, details, refRulers[i], assert);
+    dwv.test.checkRulerDrawing(
+      posGroupKid, details, version, refRulers[i], assert);
   }
 };
 
@@ -504,13 +521,15 @@ dwv.test.checkRoiDrawing = function (posGroupKid, details, version, assert) {
   if (version !== '0.1') {
     var details0 = details['4l24ofouhmf'];
     assert.equal(
-      details0.textExpr,
+      details0.meta.textExpr,
       'Brain',
       'Details textExpr has the proper value.');
-    assert.equal(
-      details0.longText,
-      'This is a squary brain!',
-      'Details longText has the proper value.');
+    if (version === '0.2' || version === '0.3') {
+      assert.equal(
+        details0.meta.longText,
+        'This is a squary brain!',
+        'Details longText has the proper value.');
+    }
   }
 };
 
@@ -604,13 +623,15 @@ dwv.test.checkHandDrawing = function (posGroupKid, details, version, assert) {
   // details
   var details0 = details['08m011yjp8je'];
   assert.equal(
-    details0.textExpr,
+    details0.meta.textExpr,
     'Brain',
     'Details textExpr has the proper value.');
-  assert.equal(
-    details0.longText,
-    'This is a roundy brain!',
-    'Details longText has the proper value.');
+  if (version === '0.2' || version === '0.3') {
+    assert.equal(
+      details0.meta.longText,
+      'This is a roundy brain!',
+      'Details longText has the proper value.');
+  }
 };
 
 /**
@@ -679,9 +700,10 @@ dwv.test.checkEllipseDrawing = function (
         labelGroupKid0.className,
         'Text',
         'Label group first level is a text.');
+      var unit = parseFloat(version) <= 0.3 ? 'cm2' : ' cm²';
       assert.equal(
         labelGroupKid0.attrs.text,
-        '53.28cm2',
+        '53.28' + unit,
         'Text has the proper value.');
       var labelGroupKid1 = shapeGroupKid.children[1];
       assert.equal(
@@ -697,13 +719,15 @@ dwv.test.checkEllipseDrawing = function (
   if (version !== '0.1') {
     var details0 = details.c6j16qt6vt6;
     assert.equal(
-      details0.textExpr,
+      details0.meta.textExpr,
       '{surface}',
       'Details textExpr has the proper value.');
-    assert.equal(
-      details0.longText,
-      'What a surface!',
-      'Details longText has the proper value.');
+    if (version === '0.2' || version === '0.3') {
+      assert.equal(
+        details0.meta.longText,
+        'What a surface!',
+        'Details longText has the proper value.');
+    }
   }
 };
 
@@ -768,9 +792,10 @@ dwv.test.checkProtractorDrawing = function (
         labelGroupKid0.className,
         'Text',
         'Label group first level is a text.');
+      var unit = parseFloat(version) <= 0.3 ? '°' : ' °';
       assert.equal(
         labelGroupKid0.attrs.text,
-        '80.15°',
+        '80.15' + unit,
         'Text has the proper value.');
       var labelGroupKid1 = shapeGroupKid.children[1];
       assert.equal(
@@ -792,13 +817,15 @@ dwv.test.checkProtractorDrawing = function (
   if (version !== '0.1') {
     var details0 = details['49g7kqi3p4u'];
     assert.equal(
-      details0.textExpr,
+      details0.meta.textExpr,
       '{angle}',
       'Details textExpr has the proper value.');
-    assert.equal(
-      details0.longText,
-      'What an angle!',
-      'Details longText has the proper value.');
+    if (version === '0.2' || version === '0.3') {
+      assert.equal(
+        details0.meta.longText,
+        'What an angle!',
+        'Details longText has the proper value.');
+    }
   }
 };
 
@@ -874,9 +901,10 @@ dwv.test.checkRectangleDrawing = function (
         labelGroupKid0.className,
         'Text',
         'Label group first level is a text.');
+      var unit = parseFloat(version, 10) <= 0.3 ? 'cm2' : ' cm²';
       assert.equal(
         labelGroupKid0.attrs.text,
-        '66.56cm2',
+        '66.56' + unit,
         'Text has the proper value.');
       var labelGroupKid1 = shapeGroupKid.children[1];
       assert.equal(
@@ -892,13 +920,15 @@ dwv.test.checkRectangleDrawing = function (
   if (version !== '0.1') {
     var details0 = details.db0puu209qe;
     assert.equal(
-      details0.textExpr,
+      details0.meta.textExpr,
       '{surface}',
       'Details textExpr has the proper value.');
-    assert.equal(
-      details0.longText,
-      'What a rectangle!',
-      'Details longText has the proper value.');
+    if (version === '0.2' || version === '0.3') {
+      assert.equal(
+        details0.meta.longText,
+        'What a rectangle!',
+        'Details longText has the proper value.');
+    }
   }
 };
 
@@ -1098,4 +1128,77 @@ QUnit.test('Test read v0.3 state: rectangle.', function (assert) {
  */
 QUnit.test('Test read v0.3 state: ruler multi-slice.', function (assert) {
   dwv.test.testState('0.3', 'ruler_multi-slice', assert);
+});
+
+/**
+ * Tests for {@link dwv.State} v0.4 containing an arrow.
+ *
+ * @function module:tests/state~testV04Arrow
+ */
+QUnit.test('Test read v0.4 state: arrow.', function (assert) {
+  dwv.test.testState('0.4', 'arrow', assert);
+});
+
+/**
+ * Tests for {@link dwv.State} v0.4 containing a ruler.
+ *
+ * @function module:tests/state~testV04Ruler
+ */
+QUnit.test('Test read v0.4 state: ruler.', function (assert) {
+  dwv.test.testState('0.4', 'ruler', assert);
+});
+
+/**
+ * Tests for {@link dwv.State} v0.4 containing a roi.
+ *
+ * @function module:tests/state~testV04Roi
+ */
+QUnit.test('Test read v0.4 state: roi.', function (assert) {
+  dwv.test.testState('0.4', 'roi', assert);
+});
+
+/**
+ * Tests for {@link dwv.State} v0.4 containing a hand draw.
+ *
+ * @function module:tests/state~testV04Hand
+ */
+QUnit.test('Test read v0.4 state: hand.', function (assert) {
+  dwv.test.testState('0.4', 'hand', assert);
+});
+
+/**
+ * Tests for {@link dwv.State} v0.4 containing an ellipse.
+ *
+ * @function module:tests/state~testV04Ellipse
+ */
+QUnit.test('Test read v0.4 state: ellipse.', function (assert) {
+  dwv.test.testState('0.4', 'ellipse', assert);
+});
+
+/**
+ * Tests for {@link dwv.State} v0.4 containing a protractor.
+ *
+ * @function module:tests/state~testV04Protractor
+ */
+QUnit.test('Test read v0.4 state: protractor.', function (assert) {
+  dwv.test.testState('0.4', 'protractor', assert);
+});
+
+
+/**
+ * Tests for {@link dwv.State} v0.4 containing a rectangle.
+ *
+ * @function module:tests/state~testV04Rectangle
+ */
+QUnit.test('Test read v0.4 state: rectangle.', function (assert) {
+  dwv.test.testState('0.4', 'rectangle', assert);
+});
+
+/**
+ * Tests for {@link dwv.State} v0.4 containing a multi slice ruler.
+ *
+ * @function module:tests/state~testV04MultiSliceRuler
+ */
+QUnit.test('Test read v0.4 state: ruler multi-slice.', function (assert) {
+  dwv.test.testState('0.4', 'ruler_multi-slice', assert);
 });

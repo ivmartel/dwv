@@ -14,7 +14,7 @@ helpFunction()
   exit 1 # Exit script after printing help
 }
 
-while getopts "r:p:h" opt
+while getopts "r:n:h" opt
 do
    case "$opt" in
       r ) releaseVersion="$OPTARG" ;;

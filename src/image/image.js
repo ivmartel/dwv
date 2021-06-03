@@ -500,37 +500,21 @@ dwv.image.Image.prototype.getRescaledValue = function (i, j, k, f) {
 };
 
 /**
- * Get a slice index iterator.
+ * Get the rescaled value of the image at a specific offset.
  *
- * @param {number} slice The index of the slice.
- * @param {number} frame The frame index.
- * @returns {object} The slice iterator.
+ * @param {number} offset The desired offset.
+ * @param {number} k The Z index.
+ * @param {number} f The frame number.
+ * @returns {number} The rescaled value at the desired offset.
+ * Warning: No size check...
  */
-dwv.image.Image.prototype.getSliceIterator = function (slice, frame) {
-  var sliceSize = this.getGeometry().getSize().getSliceSize();
-  var start = slice * sliceSize;
-
-  var image = this;
-  var dataAccessor = function (offset) {
-    return image.getValueAtOffset(offset, frame);
-  };
-
-  var range = null;
-  if (this.getNumberOfComponents() === 1) {
-    range = dwv.image.range(dataAccessor, start, start + sliceSize);
-  } else if (this.getNumberOfComponents() === 3) {
-    // 3 times bigger...
-    start *= 3;
-    sliceSize *= 3;
-    var isPlanar = this.getPlanarConfiguration() === 1;
-    range = dwv.image.range3d(
-      dataAccessor, start, start + sliceSize, 1, isPlanar);
-  } else {
-    throw new Error('Unsupported number of components: ' +
-      this.getNumberOfComponents());
+dwv.image.Image.prototype.getRescaledValueAtOffset = function (offset, k, f) {
+  var frame = (f || 0);
+  var val = this.getValueAtOffset(offset, frame);
+  if (!this.isIdentityRSI()) {
+    val = this.getRescaleSlopeAndIntercept(k).apply(val);
   }
-
-  return range;
+  return val;
 };
 
 /**
@@ -850,77 +834,4 @@ dwv.image.Image.prototype.compose = function (rhs, operator) {
     }
   }
   return newImage;
-};
-
-/**
- * Quantify a line according to image information.
- *
- * @param {object} line The line to quantify.
- * @returns {object} A quantification object.
- */
-dwv.image.Image.prototype.quantifyLine = function (line) {
-  var quant = {};
-  // length
-  var spacing = this.getGeometry().getSpacing();
-  var length = line.getWorldLength(spacing.getColumnSpacing(),
-    spacing.getRowSpacing());
-  if (length !== null) {
-    quant.length = {value: length, unit: dwv.i18n('unit.mm')};
-  }
-  // return
-  return quant;
-};
-
-/**
- * Quantify a rectangle according to image information.
- *
- * @param {object} rect The rectangle to quantify.
- * @returns {object} A quantification object.
- */
-dwv.image.Image.prototype.quantifyRect = function (rect) {
-  var quant = {};
-  // surface
-  var spacing = this.getGeometry().getSpacing();
-  var surface = rect.getWorldSurface(spacing.getColumnSpacing(),
-    spacing.getRowSpacing());
-  if (surface !== null) {
-    quant.surface = {value: surface / 100, unit: dwv.i18n('unit.cm2')};
-  }
-  // stats
-  var subBuffer = [];
-  var minJ = parseInt(rect.getBegin().getY(), 10);
-  var maxJ = parseInt(rect.getEnd().getY(), 10);
-  var minI = parseInt(rect.getBegin().getX(), 10);
-  var maxI = parseInt(rect.getEnd().getX(), 10);
-  for (var j = minJ; j < maxJ; ++j) {
-    for (var i = minI; i < maxI; ++i) {
-      subBuffer.push(this.getValue(i, j, 0));
-    }
-  }
-  var quantif = dwv.math.getStats(subBuffer);
-  quant.min = {value: quantif.getMin(), unit: ''};
-  quant.max = {value: quantif.getMax(), unit: ''};
-  quant.mean = {value: quantif.getMean(), unit: ''};
-  quant.stdDev = {value: quantif.getStdDev(), unit: ''};
-  // return
-  return quant;
-};
-
-/**
- * Quantify an ellipse according to image information.
- *
- * @param {object} ellipse The ellipse to quantify.
- * @returns {object} A quantification object.
- */
-dwv.image.Image.prototype.quantifyEllipse = function (ellipse) {
-  var quant = {};
-  // surface
-  var spacing = this.getGeometry().getSpacing();
-  var surface = ellipse.getWorldSurface(spacing.getColumnSpacing(),
-    spacing.getRowSpacing());
-  if (surface !== null) {
-    quant.surface = {value: surface / 100, unit: dwv.i18n('unit.cm2')};
-  }
-  // return
-  return quant;
 };

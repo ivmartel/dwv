@@ -115,6 +115,12 @@
             "click": "Cliquer sur un pixel pour créer un coutour basé sur son intensité.",
             "tap": "Appuyer sur un pixel pour créer un coutour basé sur son intensité."
         },
+        "Opacity": {
+            "name": "Opacitée",
+            "brief": "Permet de changer l'opacitée de la couche visible.",
+            "mouse_drag": "Un glissement horizontal de la souris modifie l'opacité du calque en le rendant plus opaque ou transparent.",
+            "touch_drag": "Un glissement tactile horizontal modifie l'opacité du calque en le rendant plus opaque ou transparent. "
+        },
         "info": {
             "position": "Pos = {{value}}",
             "value": "Valeur = {{value}}",
@@ -141,6 +147,9 @@
         },
         "Ellipse": {
             "name": "Ellipse"
+        },
+        "Circle": {
+            "name": "Cercle"
         },
         "Arrow": {
             "name": "Pointeur"

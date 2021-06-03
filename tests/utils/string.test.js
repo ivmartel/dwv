@@ -80,6 +80,50 @@ QUnit.test('Test EndsWith.', function (assert) {
 });
 
 /**
+ * Tests for {@link dwv.utils.getFlags}.
+ *
+ * @function module:tests/utils~getFlags
+ */
+QUnit.test('Test getFlags.', function (assert) {
+  // empty
+  assert.equal(
+    dwv.utils.getFlags('').length, 0, 'getFlags empty');
+  // null
+  assert.equal(
+    dwv.utils.getFlags(null).length, 0, 'getFlags null');
+  // undefined
+  assert.equal(
+    dwv.utils.getFlags().length, 0, 'getFlags undefined');
+  // nothing to do
+  var str00 = 'abcd';
+  assert.equal(
+    dwv.utils.getFlags(str00).length, 0, 'getFlags nothing to do');
+  // empty braces
+  var str01 = '{}';
+  assert.equal(
+    dwv.utils.getFlags(str01).length, 0, 'getFlags empty braces');
+
+  // real #0
+  var str10 = '{a}';
+  assert.equal(
+    dwv.utils.getFlags(str10)[0], 'a', 'getFlags #0');
+  // real #1
+  var str11 = 'aaa{a}aaa';
+  assert.equal(
+    dwv.utils.getFlags(str11)[0], 'a', 'getFlags #1');
+  // real #2
+  var str12 = '{a}-{b}-{c}';
+  var res12 = dwv.utils.getFlags(str12);
+  assert.equal(res12[0], 'a', 'getFlags #2.0');
+  assert.equal(res12[1], 'b', 'getFlags #2.1');
+  assert.equal(res12[2], 'c', 'getFlags #2.2');
+  // real #3
+  var str13 = '{a{b}}';
+  assert.equal(
+    dwv.utils.getFlags(str13)[0], 'b', 'getFlags #3');
+});
+
+/**
  * Tests for {@link dwv.utils.replaceFlags}.
  *
  * @function module:tests/utils~replaceFlags

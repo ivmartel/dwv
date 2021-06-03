@@ -11,11 +11,24 @@ dwv.tool.draw = dwv.tool.draw || {};
 var Konva = Konva || {};
 
 /**
+ * Default draw label text.
+ */
+dwv.tool.draw.defaultRulerLabelText = '{length}';
+
+/**
  * Ruler factory.
  *
  * @class
  */
 dwv.tool.draw.RulerFactory = function () {
+  /**
+   * Get the name of the shape group.
+   *
+   * @returns {string} The name.
+   */
+  this.getGroupName = function () {
+    return 'ruler-group';
+  };
   /**
    * Get the number of points needed to build the shape.
    *
@@ -35,14 +48,25 @@ dwv.tool.draw.RulerFactory = function () {
 };
 
 /**
+ * Is the input group a group of this factory?
+ *
+ * @param {object} group The group to test.
+ * @returns {boolean} True if the group is from this fcatory.
+ */
+dwv.tool.draw.RulerFactory.prototype.isFactoryGroup = function (group) {
+  return this.getGroupName() === group.name();
+};
+
+/**
  * Create a ruler shape to be displayed.
  *
  * @param {Array} points The points from which to extract the line.
  * @param {object} style The drawing style.
- * @param {object} image The associated image.
+ * @param {object} viewController The associated view controller.
  * @returns {object} The Konva group.
  */
-dwv.tool.draw.RulerFactory.prototype.create = function (points, style, image) {
+dwv.tool.draw.RulerFactory.prototype.create = function (
+  points, style, viewController) {
   // physical shape
   var line = new dwv.math.Line(points[0], points[1]);
   // draw shape
@@ -57,7 +81,7 @@ dwv.tool.draw.RulerFactory.prototype.create = function (points, style, image) {
     name: 'shape'
   });
 
-  var tickLen = 10 * style.getScaledStrokeWidth();
+  var tickLen = style.scale(10);
 
   // tick begin
   var linePerp0 = dwv.math.getPerpendicularLine(line, points[0], tickLen);
@@ -97,46 +121,89 @@ dwv.tool.draw.RulerFactory.prototype.create = function (points, style, image) {
   });
 
   // quantification
-  var quant = image.quantifyLine(line);
   var ktext = new Konva.Text({
-    fontSize: style.getScaledFontSize(),
+    fontSize: style.getFontSize(),
     fontFamily: style.getFontFamily(),
     fill: style.getLineColour(),
+    padding: style.getTextPadding(),
+    shadowColor: style.getShadowLineColour(),
+    shadowOffset: style.getShadowOffset(),
     name: 'text'
   });
-  ktext.textExpr = '{length}';
-  ktext.longText = '';
-  ktext.quant = quant;
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+  var textExpr = '';
+  if (typeof dwv.tool.draw.rulerLabelText !== 'undefined') {
+    textExpr = dwv.tool.draw.rulerLabelText;
+  } else {
+    textExpr = dwv.tool.draw.defaultRulerLabelText;
+  }
+  var quant = line.quantify(
+    viewController,
+    dwv.utils.getFlags(textExpr));
+  ktext.setText(dwv.utils.replaceFlags(textExpr, quant));
+  // meta data
+  ktext.meta = {
+    textExpr: textExpr,
+    quantification: quant
+  };
+
   // label
   var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
-  var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
+  var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
   var klabel = new Konva.Label({
-    x: line.getEnd().getX() + dX * 25,
-    y: line.getEnd().getY() + dY * 15,
+    x: line.getEnd().getX() + dX * ktext.width(),
+    y: line.getEnd().getY() + dY * style.applyZoomScale(15).y,
+    scale: style.applyZoomScale(1),
+    visible: textExpr.length !== 0,
     name: 'label'
   });
   klabel.add(ktext);
-  klabel.add(new Konva.Tag());
+  klabel.add(new Konva.Tag({
+    fill: style.getLineColour(),
+    opacity: style.getTagOpacity()
+  }));
 
   // return group
   var group = new Konva.Group();
-  group.name('ruler-group');
-  group.add(kshape);
+  group.name(this.getGroupName());
+  group.add(klabel);
   group.add(ktick0);
   group.add(ktick1);
-  group.add(klabel);
+  group.add(kshape);
   group.visible(true); // dont inherit
   return group;
 };
 
 /**
+ * Get anchors to update a ruler shape.
+ *
+ * @param {object} shape The associated shape.
+ * @param {object} style The application style.
+ * @returns {Array} A list of anchors.
+ */
+dwv.tool.draw.RulerFactory.prototype.getAnchors = function (shape, style) {
+  var points = shape.points();
+
+  var anchors = [];
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    points[0] + shape.x(), points[1] + shape.y(), 'begin', style
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    points[2] + shape.x(), points[3] + shape.y(), 'end', style
+  ));
+  return anchors;
+};
+
+/**
  * Update a ruler shape.
+ * Warning: do NOT use 'this' here, this method is passed
+ *   as is to the change command.
  *
  * @param {object} anchor The active anchor.
- * @param {object} image The associated image.
+ * @param {object} style The app style.
+ * @param {object} viewController The associated view controller.
  */
-dwv.tool.draw.UpdateRuler = function (anchor, image) {
+dwv.tool.draw.RulerFactory.prototype.update = function (
+  anchor, style, viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape
@@ -187,12 +254,12 @@ dwv.tool.draw.UpdateRuler = function (anchor, image) {
   // tick
   var p2b = new dwv.math.Point2D(bx, by);
   var p2e = new dwv.math.Point2D(ex, ey);
-  var linePerp0 = dwv.math.getPerpendicularLine(line, p2b, 10);
+  var linePerp0 = dwv.math.getPerpendicularLine(line, p2b, style.scale(10));
   ktick0.points([linePerp0.getBegin().getX(),
     linePerp0.getBegin().getY(),
     linePerp0.getEnd().getX(),
     linePerp0.getEnd().getY()]);
-  var linePerp1 = dwv.math.getPerpendicularLine(line, p2e, 10);
+  var linePerp1 = dwv.math.getPerpendicularLine(line, p2e, style.scale(10));
   ktick1.points([linePerp1.getBegin().getX(),
     linePerp1.getBegin().getY(),
     linePerp1.getEnd().getX(),
@@ -207,17 +274,21 @@ dwv.tool.draw.UpdateRuler = function (anchor, image) {
     context.closePath();
     context.fillStrokeShape(this);
   });
+
   // update text
-  var quant = image.quantifyLine(line);
   var ktext = klabel.getText();
-  ktext.quant = quant;
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+  var quantification = line.quantify(
+    viewController,
+    dwv.utils.getFlags(ktext.meta.textExpr));
+  ktext.setText(dwv.utils.replaceFlags(ktext.meta.textExpr, quantification));
+  // update meta
+  ktext.meta.quantification = quantification;
   // update position
   var dX = line.getBegin().getX() > line.getEnd().getX() ? 0 : -1;
-  var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0.5;
+  var dY = line.getBegin().getY() > line.getEnd().getY() ? -1 : 0;
   var textPos = {
-    x: line.getEnd().getX() + dX * 25,
-    y: line.getEnd().getY() + dY * 15
+    x: line.getEnd().getX() + dX * ktext.width(),
+    y: line.getEnd().getY() + dY * style.applyZoomScale(15).y
   };
   klabel.position(textPos);
 };

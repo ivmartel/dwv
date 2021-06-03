@@ -10,12 +10,52 @@ dwv.tool = dwv.tool || {};
 var Konva = Konva || {};
 
 /**
+ * Get the default anchor shape.
+ *
+ * @param {number} x The X position.
+ * @param {number} y The Y position.
+ * @param {string} id The shape id.
+ * @param {object} style The application style.
+ * @returns {object} The default anchor shape.
+ */
+dwv.tool.draw.getDefaultAnchor = function (x, y, id, style) {
+  return new Konva.Ellipse({
+    x: x,
+    y: y,
+    stroke: '#999',
+    fill: 'rgba(100,100,100,0.7',
+    strokeWidth: style.getStrokeWidth(),
+    strokeScaleEnabled: false,
+    radius: style.applyZoomScale(3),
+    name: 'anchor',
+    id: id,
+    dragOnTop: false,
+    draggable: true,
+    visible: false
+  });
+};
+
+/**
  * Shape editor.
  *
  * @param {object} app The associated application.
  * @class
  */
 dwv.tool.ShapeEditor = function (app) {
+  /**
+   * Shape factory list
+   *
+   * @type {object}
+   * @private
+   */
+  var shapeFactoryList = null;
+  /**
+   * Current shape factory.
+   *
+   * @type {object}
+   * @private
+   */
+  var currentFactory = null;
   /**
    * Edited shape.
    *
@@ -24,12 +64,12 @@ dwv.tool.ShapeEditor = function (app) {
    */
   var shape = null;
   /**
-   * Edited image. Used for quantification update.
+   * Edited view controller. Used for quantification update.
    *
    * @private
    * @type {object}
    */
-  var image = null;
+  var viewController = null;
   /**
    * Active flag.
    *
@@ -37,13 +77,6 @@ dwv.tool.ShapeEditor = function (app) {
    * @type {boolean}
    */
   var isActive = false;
-  /**
-   * Update function used by anchors to update the shape.
-   *
-   * @private
-   * @type {Function}
-   */
-  var updateFunction = null;
   /**
    * Draw event callback.
    *
@@ -53,15 +86,40 @@ dwv.tool.ShapeEditor = function (app) {
   var drawEventCallback = null;
 
   /**
+   * Set the tool options.
+   *
+   * @param {Array} list The list of shape classes.
+   */
+  this.setFactoryList = function (list) {
+    shapeFactoryList = list;
+  };
+
+  /**
    * Set the shape to edit.
    *
    * @param {object} inshape The shape to edit.
    */
   this.setShape = function (inshape) {
     shape = inshape;
-    // reset anchors
     if (shape) {
+      // remove old anchors
       removeAnchors();
+      // find a factory for the input shape
+      var group = shape.getParent();
+      var keys = Object.keys(shapeFactoryList);
+      currentFactory = null;
+      for (var i = 0; i < keys.length; ++i) {
+        var factory = new shapeFactoryList[keys[i]];
+        if (factory.isFactoryGroup(group)) {
+          currentFactory = factory;
+          // stop at first find
+          break;
+        }
+      }
+      if (currentFactory === null) {
+        throw new Error('Could not find a factory to update shape.');
+      }
+      // add new anchors
       addAnchors();
     }
   };
@@ -69,10 +127,10 @@ dwv.tool.ShapeEditor = function (app) {
   /**
    * Set the associated image.
    *
-   * @param {object} img The associated image.
+   * @param {object} vc The associated view controller.
    */
-  this.setImage = function (img) {
-    image = img;
+  this.setViewController = function (vc) {
+    viewController = vc;
   };
 
   /**
@@ -207,101 +265,15 @@ dwv.tool.ShapeEditor = function (app) {
     }
     // get shape group
     var group = shape.getParent();
-    // add shape specific anchors to the shape group
-    if (shape instanceof Konva.Line) {
-      var points = shape.points();
 
-      var needsBeginEnd = group.name() === 'line-group' ||
-                group.name() === 'ruler-group' ||
-                group.name() === 'protractor-group';
-      var needsMid = group.name() === 'protractor-group';
-
-      var px = 0;
-      var py = 0;
-      var name = '';
-      for (var i = 0; i < points.length; i = i + 2) {
-        px = points[i] + shape.x();
-        py = points[i + 1] + shape.y();
-        name = i;
-        if (needsBeginEnd) {
-          if (i === 0) {
-            name = 'begin';
-          } else if (i === points.length - 2) {
-            name = 'end';
-          }
-        }
-        if (needsMid && i === 2) {
-          name = 'mid';
-        }
-        addAnchor(group, px, py, name);
-      }
-
-      if (group.name() === 'line-group') {
-        updateFunction = dwv.tool.draw.UpdateArrow;
-      } else if (group.name() === 'ruler-group') {
-        updateFunction = dwv.tool.draw.UpdateRuler;
-      } else if (group.name() === 'protractor-group') {
-        updateFunction = dwv.tool.draw.UpdateProtractor;
-      } else if (group.name() === 'roi-group') {
-        updateFunction = dwv.tool.draw.UpdateRoi;
-      } else if (group.name() === 'freeHand-group') {
-        updateFunction = dwv.tool.draw.UpdateFreeHand;
-      } else {
-        dwv.logger.warn('Cannot update unknown line shape.');
-      }
-    } else if (shape instanceof Konva.Rect) {
-      updateFunction = dwv.tool.draw.UpdateRect;
-      var rectX = shape.x();
-      var rectY = shape.y();
-      var rectWidth = shape.width();
-      var rectHeight = shape.height();
-      addAnchor(group, rectX, rectY, 'topLeft');
-      addAnchor(group, rectX + rectWidth, rectY, 'topRight');
-      addAnchor(group, rectX + rectWidth, rectY + rectHeight, 'bottomRight');
-      addAnchor(group, rectX, rectY + rectHeight, 'bottomLeft');
-    } else if (shape instanceof Konva.Ellipse) {
-      updateFunction = dwv.tool.draw.UpdateEllipse;
-      var ellipseX = shape.x();
-      var ellipseY = shape.y();
-      var radius = shape.radius();
-      addAnchor(group, ellipseX - radius.x, ellipseY - radius.y, 'topLeft');
-      addAnchor(group, ellipseX + radius.x, ellipseY - radius.y, 'topRight');
-      addAnchor(group, ellipseX + radius.x, ellipseY + radius.y, 'bottomRight');
-      addAnchor(group, ellipseX - radius.x, ellipseY + radius.y, 'bottomLeft');
+    // activate and add anchors to group
+    var anchors = currentFactory.getAnchors(shape, app.getStyle());
+    for (var i = 0; i < anchors.length; ++i) {
+      // set anchor on
+      setAnchorOn(anchors[i]);
+      // add the anchor to the group
+      group.add(anchors[i]);
     }
-    // add group to layer
-    //shape.getLayer().add( group );
-    //shape.getParent().add( group );
-  }
-
-  /**
-   * Create shape editor controls, i.e. the anchors.
-   *
-   * @param {object} group The group associated with this anchor.
-   * @param {number} x The X position of the anchor.
-   * @param {number} y The Y position of the anchor.
-   * @param {number} id The id of the anchor.
-   * @private
-   */
-  function addAnchor(group, x, y, id) {
-    // anchor shape
-    var anchor = new Konva.Circle({
-      x: x,
-      y: y,
-      stroke: '#999',
-      fill: 'rgba(100,100,100,0.7',
-      strokeWidth: app.getStyle().getScaledStrokeWidth() / app.getScale(),
-      radius: app.getStyle().scale(6) / app.getScale(),
-      name: 'anchor',
-      id: id,
-      dragOnTop: false,
-      draggable: true,
-      visible: false
-    });
-    // set anchor on
-    setAnchorOn(anchor);
-    // add the anchor to the group
-    group.add(anchor);
   }
 
   /**
@@ -354,12 +326,12 @@ dwv.tool.ShapeEditor = function (app) {
     });
     // drag move listener
     anchor.on('dragmove.edit', function (evt) {
+      var layerController = app.getLayerController();
+      var drawLayer = layerController.getActiveDrawLayer();
+      // validate the anchor position
+      dwv.tool.validateAnchorPosition(drawLayer.getSize(), this);
       // update shape
-      if (updateFunction) {
-        updateFunction(this, image);
-      } else {
-        dwv.logger.warn('No update function!');
-      }
+      currentFactory.update(this, app.getStyle(), viewController);
       // redraw
       if (this.getLayer()) {
         this.getLayer().draw();
@@ -375,11 +347,12 @@ dwv.tool.ShapeEditor = function (app) {
       // store the change command
       var chgcmd = new dwv.tool.ChangeGroupCommand(
         shapeDisplayName,
-        updateFunction,
+        currentFactory.update,
         startAnchor,
         endAnchor,
         this.getLayer(),
-        image
+        viewController,
+        app.getStyle()
       );
       chgcmd.onExecute = drawEventCallback;
       chgcmd.onUndo = drawEventCallback;

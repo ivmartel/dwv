@@ -42,7 +42,6 @@ var saucelabs = new SauceLabs({
  *   for saucelabs possibilities.
  * @see http://seleniumhq.github.io/selenium/docs/api/javascript/index.html
  *   for the webdriver API.
- *
  * @param {object} caps Desired capabilities for the webdriver. Minimum of
  *   {'browserName', 'version', 'platform'}.
  */
@@ -79,7 +78,7 @@ dwv.test.sauceTest = function (caps) {
         10000);
     }).then(function () {
     // get the image layer
-    return driver.findElement(webdriver.By.className('imageLayer'));
+    return driver.findElement(webdriver.By.className('viewLayer'));
   }).then(function (element) {
     // simulate a mouse move on the image layer
     return driver.actions().
@@ -92,7 +91,7 @@ dwv.test.sauceTest = function (caps) {
     return driver.sleep(5 * 1000);
   }).then(function () {
     // get the image layer
-    return driver.findElement(webdriver.By.className('imageLayer'));
+    return driver.findElement(webdriver.By.className('viewLayer'));
   }).then(function (element) {
     // simulate a mouse move on the image layer
     return driver.actions().

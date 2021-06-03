@@ -40,11 +40,9 @@ dwv.tool.Livewire = function (app) {
   /**
    * Drawing style.
    *
-   * @type {dwv.html.Style}
+   * @type {dwv.gui.Style}
    */
-  this.style = new dwv.html.Style();
-  // init with the app window scale
-  this.style.setScale(app.getWindowScale());
+  this.style = new dwv.gui.Style();
 
   /**
    * Path storage. Paths are stored in reverse order.
@@ -127,6 +125,12 @@ dwv.tool.Livewire = function (app) {
       // clear vars
       clearPaths();
       clearParentPoints();
+      shapeGroup = null;
+      // update zoom scale
+      var layerController = app.getLayerController();
+      var drawLayer = layerController.getActiveDrawLayer();
+      self.style.setZoomScale(
+        drawLayer.getKonvaLayer().getAbsoluteScale());
       // do the training from the first point
       var p = new dwv.math.FastPoint2D(event._x, event._y);
       scissors.doTraining(p);
@@ -144,7 +148,7 @@ dwv.tool.Livewire = function (app) {
         command.onExecute = fireEvent;
         command.onUndo = fireEvent;
         // debug
-        dwv.logger.debug('Done.');
+        dwv.logger.debug('[livewire] finialise path.');
         // save command in undo stack
         app.addToUndoStack(command);
         // set flag
@@ -175,8 +179,8 @@ dwv.tool.Livewire = function (app) {
     // do the work
     var results = 0;
     var stop = false;
+    dwv.logger.debug('[livewire] getting ready...');
     while (!parentPoints[p.y][p.x] && !stop) {
-      dwv.logger.debug('Getting ready...');
       results = scissors.doWork();
 
       if (results.length === 0) {
@@ -190,7 +194,7 @@ dwv.tool.Livewire = function (app) {
         }
       }
     }
-    dwv.logger.debug('Ready!');
+    dwv.logger.debug('[livewire] ready!');
 
     // get the path
     currentPath = new dwv.math.Path();
@@ -218,14 +222,18 @@ dwv.tool.Livewire = function (app) {
     shapeGroup = factory.create(currentPath.pointArray, self.style);
     shapeGroup.id(dwv.math.guid());
 
+    var layerController = app.getLayerController();
+    var drawLayer = layerController.getActiveDrawLayer();
+    var drawController = drawLayer.getDrawController();
+
     // get the position group
-    var posGroup = app.getDrawController().getCurrentPosGroup();
+    var posGroup = drawController.getCurrentPosGroup();
     // add shape group to position group
     posGroup.add(shapeGroup);
 
     // draw shape command
     command = new dwv.tool.DrawGroupCommand(shapeGroup, 'livewire',
-      app.getDrawController().getDrawLayer());
+      drawLayer.getKonvaLayer());
     // draw
     command.execute();
   };
@@ -255,7 +263,7 @@ dwv.tool.Livewire = function (app) {
    * @param {object} _event The double click event.
    */
   this.dblclick = function (_event) {
-    dwv.logger.debug('dblclick');
+    dwv.logger.debug('[livewire] dblclick');
     // save command in undo stack
     app.addToUndoStack(command);
     // set flag
@@ -310,15 +318,18 @@ dwv.tool.Livewire = function (app) {
   this.activate = function (bool) {
     // start scissors if displayed
     if (bool) {
+      var layerController = app.getLayerController();
+      var viewLayer = layerController.getActiveViewLayer();
+
       //scissors = new dwv.math.Scissors();
       var size = app.getImage().getGeometry().getSize();
       scissors.setDimensions(
         size.getNumberOfColumns(),
         size.getNumberOfRows());
-      scissors.setData(app.getImageData().data);
+      scissors.setData(viewLayer.getImageData().data);
 
       // init with the app window scale
-      this.style.setScale(app.getWindowScale());
+      this.style.setBaseScale(app.getBaseScale());
       // set the default to the first in the list
       this.setLineColour(this.style.getLineColour());
     }

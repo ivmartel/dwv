@@ -1,0 +1,105 @@
+{
+  "version": "0.4",
+  "window-center": 441,
+  "window-width": 911,
+  "position": {
+    "i": 0,
+    "j": 0,
+    "k": 0
+  },
+  "scale": {
+    "x": 1,
+    "y": 1
+  },
+  "offset": {
+    "x": 0,
+    "y": 0
+  },
+  "drawings": {
+    "attrs": {},
+    "className": "Layer",
+    "children": [
+      {
+        "attrs": {
+          "id": "slice-0_frame-0",
+          "name": "position-group"
+        },
+        "className": "Group",
+        "children": [
+          {
+            "attrs": {
+              "name": "line-group",
+              "id": "pf8zteo5r4",
+              "draggable": true
+            },
+            "className": "Group",
+            "children": [
+              {
+                "attrs": {
+                  "x": 131.00000000000001,
+                  "y": 81.33333333333333,
+                  "name": "label"
+                },
+                "className": "Label",
+                "children": [
+                  {
+                    "attrs": {
+                      "fontSize": 5.333333333333333,
+                      "fontFamily": "Verdana",
+                      "fill": "#ffff80",
+                      "name": "text",
+                      "text": "Eye"
+                    },
+                    "className": "Text"
+                  },
+                  {
+                    "attrs": {
+                      "width": 8.283584594726562,
+                      "height": 5.333333333333333
+                    },
+                    "className": "Tag"
+                  }
+                ]
+              },
+              {
+                "attrs": {
+                  "x": 57.38752668614738,
+                  "y": 133.60216564826828,
+                  "sides": 3,
+                  "radius": 5,
+                  "rotation": -118.65711745655813,
+                  "fill": "#ffff80",
+                  "strokeScaleEnabled": false,
+                  "name": "shape-triangle"
+                },
+                "className": "RegularPolygon"
+              },
+              {
+                "attrs": {
+                  "points": [
+                    53,
+                    136,
+                    139,
+                    89
+                  ],
+                  "stroke": "#ffff80",
+                  "strokeScaleEnabled": false,
+                  "name": "shape"
+                },
+                "className": "Line"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "drawingsDetails": {
+    "pf8zteo5r4": {
+      "meta": {
+        "textExpr": "Eye",
+        "quantification": {}
+      }
+    }
+  }
+}

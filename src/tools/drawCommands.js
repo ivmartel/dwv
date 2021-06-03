@@ -44,7 +44,7 @@ dwv.tool.GetShapeDisplayName = function (shape) {
  * @class
  */
 dwv.tool.DrawGroupCommand = function (group, name, layer, silent) {
-  var isSilent = (typeof silent === 'undefined') ? false : true;
+  var isSilent = (typeof silent === 'undefined') ? false : silent;
 
   // group parent
   var parent = group.getParent();
@@ -203,11 +203,12 @@ dwv.tool.MoveGroupCommand.prototype.onUndo = function (_event) {
  * @param {object} startAnchor The anchor that starts the change.
  * @param {object} endAnchor The anchor that ends the change.
  * @param {object} layer The layer where to change the group.
- * @param {object} image The associated image.
+ * @param {object} viewController The associated viewController.
+ * @param {object} style The app style.
  * @class
  */
 dwv.tool.ChangeGroupCommand = function (
-  name, func, startAnchor, endAnchor, layer, image) {
+  name, func, startAnchor, endAnchor, layer, viewController, style) {
   /**
    * Get the command name.
    *
@@ -224,7 +225,7 @@ dwv.tool.ChangeGroupCommand = function (
    */
   this.execute = function () {
     // change shape
-    func(endAnchor, image);
+    func(endAnchor, style, viewController);
     // draw
     layer.draw();
     // callback
@@ -245,7 +246,7 @@ dwv.tool.ChangeGroupCommand = function (
    */
   this.undo = function () {
     // invert change shape
-    func(startAnchor, image);
+    func(startAnchor, style, viewController);
     // draw
     layer.draw();
     // callback

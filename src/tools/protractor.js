@@ -11,11 +11,24 @@ dwv.tool.draw = dwv.tool.draw || {};
 var Konva = Konva || {};
 
 /**
+ * Default draw label text.
+ */
+dwv.tool.draw.defaultProtractorLabelText = '{angle}';
+
+/**
  * Protractor factory.
  *
  * @class
  */
 dwv.tool.draw.ProtractorFactory = function () {
+  /**
+   * Get the name of the shape group.
+   *
+   * @returns {string} The name.
+   */
+  this.getGroupName = function () {
+    return 'protractor-group';
+  };
   /**
    * Get the number of points needed to build the shape.
    *
@@ -35,15 +48,25 @@ dwv.tool.draw.ProtractorFactory = function () {
 };
 
 /**
+ * Is the input group a group of this factory?
+ *
+ * @param {object} group The group to test.
+ * @returns {boolean} True if the group is from this fcatory.
+ */
+dwv.tool.draw.ProtractorFactory.prototype.isFactoryGroup = function (group) {
+  return this.getGroupName() === group.name();
+};
+
+/**
  * Create a protractor shape to be displayed.
  *
  * @param {Array} points The points from which to extract the protractor.
  * @param {object} style The drawing style.
- * @param {object} _image The associated image.
+ * @param {object} _viewController The associated view controller.
  * @returns {object} The Konva group.
  */
 dwv.tool.draw.ProtractorFactory.prototype.create = function (
-  points, style, _image) {
+  points, style, _viewController) {
   // physical shape
   var line0 = new dwv.math.Line(points[0], points[1]);
   // points stored the Konvajs way
@@ -61,9 +84,7 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
     name: 'shape'
   });
   var group = new Konva.Group();
-  group.name('protractor-group');
-  group.add(kshape);
-  group.visible(true); // dont inherit
+  group.name(this.getGroupName());
   // text and decoration
   if (points.length === 3) {
     var line1 = new dwv.math.Line(points[1], points[2]);
@@ -85,33 +106,49 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
     }
 
     // quantification
+    var ktext = new Konva.Text({
+      fontSize: style.getFontSize(),
+      fontFamily: style.getFontFamily(),
+      fill: style.getLineColour(),
+      padding: style.getTextPadding(),
+      shadowColor: style.getShadowLineColour(),
+      shadowOffset: style.getShadowOffset(),
+      name: 'text'
+    });
+    var textExpr = '';
+    if (typeof dwv.tool.draw.protractorLabelText !== 'undefined') {
+      textExpr = dwv.tool.draw.protractorLabelText;
+    } else {
+      textExpr = dwv.tool.draw.defaultProtractorLabelText;
+    }
     var quant = {
       angle: {
         value: angle,
         unit: dwv.i18n('unit.degree')
       }
     };
-    var ktext = new Konva.Text({
-      fontSize: style.getScaledFontSize(),
-      fontFamily: style.getFontFamily(),
-      fill: style.getLineColour(),
-      name: 'text'
-    });
-    ktext.textExpr = '{angle}';
-    ktext.longText = '';
-    ktext.quant = quant;
-    ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+    ktext.setText(dwv.utils.replaceFlags(textExpr, quant));
+    // meta data
+    ktext.meta = {
+      textExpr: textExpr,
+      quantification: quant
+    };
 
     // label
     var midX = (line0.getMidpoint().getX() + line1.getMidpoint().getX()) / 2;
     var midY = (line0.getMidpoint().getY() + line1.getMidpoint().getY()) / 2;
     var klabel = new Konva.Label({
       x: midX,
-      y: midY - 15,
+      y: midY - style.applyZoomScale(15).y,
+      scale: style.applyZoomScale(1),
+      visible: textExpr.length !== 0,
       name: 'label'
     });
     klabel.add(ktext);
-    klabel.add(new Konva.Tag());
+    klabel.add(new Konva.Tag({
+      fill: style.getLineColour(),
+      opacity: style.getTagOpacity()
+    }));
 
     // arc
     var radius = Math.min(line0.getLength(), line1.getLength()) * 33 / 100;
@@ -131,17 +168,47 @@ dwv.tool.draw.ProtractorFactory.prototype.create = function (
     group.add(klabel);
     group.add(karc);
   }
+  // add shape to group
+  group.add(kshape);
+  group.visible(true); // dont inherit
   // return group
   return group;
 };
 
 /**
+ * Get anchors to update a protractor shape.
+ *
+ * @param {object} shape The associated shape.
+ * @param {object} style The application style.
+ * @returns {Array} A list of anchors.
+ */
+dwv.tool.draw.ProtractorFactory.prototype.getAnchors = function (shape, style) {
+  var points = shape.points();
+
+  var anchors = [];
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    points[0] + shape.x(), points[1] + shape.y(), 'begin', style
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    points[2] + shape.x(), points[3] + shape.y(), 'mid', style
+  ));
+  anchors.push(dwv.tool.draw.getDefaultAnchor(
+    points[4] + shape.x(), points[5] + shape.y(), 'end', style
+  ));
+  return anchors;
+};
+
+/**
  * Update a protractor shape.
+ * Warning: do NOT use 'this' here, this method is passed
+ *   as is to the change command.
  *
  * @param {object} anchor The active anchor.
- * @param {object} _image The associated image.
+ * @param {object} style The app style.
+ * @param {object} _viewController The associated view controller.
  */
-dwv.tool.draw.UpdateProtractor = function (anchor, _image) {
+dwv.tool.draw.ProtractorFactory.prototype.update = function (
+  anchor, style, _viewController) {
   // parent group
   var group = anchor.getParent();
   // associated shape
@@ -213,14 +280,20 @@ dwv.tool.draw.UpdateProtractor = function (anchor, _image) {
   }
 
   // update text
-  var quant = {angle: {value: angle, unit: dwv.i18n('unit.degree')}};
   var ktext = klabel.getText();
-  ktext.quant = quant;
-  ktext.setText(dwv.utils.replaceFlags(ktext.textExpr, ktext.quant));
+  var quantification = {
+    angle: {value: angle, unit: dwv.i18n('unit.degree')}
+  };
+  ktext.setText(dwv.utils.replaceFlags(ktext.meta.textExpr, quantification));
+  // update meta
+  ktext.meta.quantification = quantification;
   // update position
   var midX = (line0.getMidpoint().getX() + line1.getMidpoint().getX()) / 2;
   var midY = (line0.getMidpoint().getY() + line1.getMidpoint().getY()) / 2;
-  var textPos = {x: midX, y: midY - 15};
+  var textPos = {
+    x: midX,
+    y: midY - style.applyZoomScale(15).y
+  };
   klabel.position(textPos);
 
   // arc

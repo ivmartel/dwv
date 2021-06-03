@@ -34,15 +34,6 @@ module.exports = function (grunt) {
         singleRun: true
       }
     },
-    coveralls: {
-      options: {
-        // don't fail if coveralls fails
-        force: true
-      },
-      main_target: {
-        src: 'build/coverage/dwv/report-lcovonly.txt'
-      }
-    },
     concat: {
       options: {
         banner: '/*!' +
@@ -109,7 +100,6 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-coveralls');
   grunt.loadNpmTasks('grunt-eslint');
   grunt.loadNpmTasks('grunt-karma');
 
