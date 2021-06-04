@@ -16,9 +16,8 @@
         {"value": "wlwidthchange", "pos": "br", "format": "WW: {v0}"},
         {"value": "zoomchange", "pos": "br", "format": "Z: {v0}", "precision": "3"},
         {"value": "offsetchange", "pos": "br", "format": "Off: {v0},{v1}", "precision": "round"},
-        {"value": "positionchange", "pos": "br", "format": "Pos: {v0},{v1},{v2}"},
-        {"value": "framechange", "pos": "br", "format": "Frame: {v0}"},
-        {"value": "positionchange", "pos": "br", "format": "Valore: {v3}"}
+        {"value": "positionchange", "pos": "br", "format": "Pos: {v0}"},
+        {"value": "positionchange", "pos": "br", "format": "Valore: {v1}"}
     ],
     "DOM": [
         {"tags": ["fileName"], "pos": "tl"},
@@ -31,9 +30,8 @@
         {"value": "wlwidthchange", "pos": "br", "format": "WW: {v0}"},
         {"value": "zoomchange", "pos": "br", "format": "Z: {v0}", "precision": "3"},
         {"value": "offsetchange", "pos": "br", "format": "Off: {v0},{v1}", "precision": "round"},
-        {"value": "positionchange", "pos": "br", "format": "Pos: {v0},{v1},{v2}"},
-        {"value": "framechange", "pos": "br", "format": "Frame: {v0}"},
-        {"value": "positionchange", "pos": "br", "format": "Valore: {v3}"}
+        {"value": "positionchange", "pos": "br", "format": "Pos: {v0}"},
+        {"value": "positionchange", "pos": "br", "format": "Valore: {v1}"}
     ],
     "*": [
         {"tags": ["x00100020"], "pos": "tl"},
@@ -55,8 +53,7 @@
         {"value": "wlwidthchange", "pos": "br", "format": "WW: {v0}"},
         {"value": "zoomchange", "pos": "br", "format": "Z: {v0}", "precision": "3"},
         {"value": "offsetchange", "pos": "br", "format": "Off: {v0},{v1}", "precision": "round"},
-        {"value": "positionchange", "pos": "br", "format": "Pos: {v0},{v1},{v2}"},
-        {"value": "framechange", "pos": "br", "format": "Frame: {v0}"},
-        {"value": "positionchange", "pos": "br", "format": "Valore: {v3}"}
+        {"value": "positionchange", "pos": "br", "format": "Pos: {v0}"},
+        {"value": "positionchange", "pos": "br", "format": "Valore: {v1}"}
     ]
 }

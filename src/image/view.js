@@ -393,44 +393,27 @@ dwv.image.View = function (image) {
       currentPosition = posIndex;
 
       if (!silent) {
-        var eventValue = [
-          posIndex.get(0),
-          posIndex.get(1),
-          posIndex.get(2)
-        ];
-        if (posIndex.length() === 3) {
-          eventValue.push(posIndex.get(3));
-        }
-
         /**
          * Position change event.
          *
          * @event dwv.image.View#positionchange
          * @type {object}
-         * @property {Array} value The changed value.
-         * @property {number} i The new column position
-         * @property {number} j The new row position
-         * @property {number} k The new slice position
-         * @property {object} pixelValue The image value at the new position,
-         *   (can be undefined).
+         * @property {Array} value The changed value as [index, pixelValue].
+         * @property {Array} diffDims An array of modified indices.
          */
         var posEvent = {
           type: 'positionchange',
-          value: eventValue,
-          i: posIndex.get(0),
-          j: posIndex.get(1),
-          k: posIndex.get(2),
-          diffDims: diffDims
+          value: [posIndex.getValues()],
+          diffDims: diffDims,
+          data: {
+            imageUid: image.getImageUid(posIndex)
+          }
         };
-        if (posIndex.length() === 3) {
-          posEvent.f = posIndex.get(3);
-        }
 
         // add value if possible
         if (image.canQuantify()) {
           var pixValue = image.getRescaledValueAtIndex(posIndex);
-          eventValue.push(pixValue);
-          posEvent.pixelValue = pixValue;
+          posEvent.value.push(pixValue);
         }
 
         // fire

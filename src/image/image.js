@@ -99,12 +99,17 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   var histogram = null;
 
   /**
-   * Get the image UIDs indexed by slice number.
+   * Get the image UID at a given index.
    *
-   * @returns {Array} The UIDs array.
+   * @param {object} index The index at which to get the id.
+   * @returns {string} The UID.
    */
-  this.getImageUids = function () {
-    return imageUids;
+  this.getImageUid = function (index) {
+    var uid = imageUids[0];
+    if (imageUids.length !== 1 && typeof index !== 'undefined') {
+      uid = imageUids[index.get(2)];
+    }
+    return uid;
   };
 
   /**
@@ -426,7 +431,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       rhs.getRescaleSlopeAndIntercept(), newSliceIndex);
 
     // insert sop instance UIDs
-    imageUids.splice(newSliceIndex, 0, rhs.getImageUids()[0]);
+    imageUids.splice(newSliceIndex, 0, rhs.getImageUid());
 
     // update window presets
     if (typeof meta.windowPresets !== 'undefined') {
