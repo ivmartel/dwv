@@ -193,7 +193,7 @@ dwv.ViewController = function (view) {
    */
   this.setCurrentPosition2D = function (i, j) {
     return view.setCurrentPosition(
-      new dwv.math.Index(view.getCurrentPosition().getWithNew2D(i, j))
+      view.getCurrentPosition().getWithNew2D(i, j)
     );
   };
 
