@@ -42,7 +42,7 @@ dwv.math.Index = function (values) {
   /**
    * Get the values of this index.
    *
-   * @returns {array} The array of values.
+   * @returns {Array} The array of values.
    */
   this.getValues = function () {
     return values.slice();
