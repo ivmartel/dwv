@@ -39,6 +39,15 @@ dwv.math.Index = function (values) {
     return '(' + values.toString() + ')';
   };
 
+  /**
+   * Get the values of this index.
+   *
+   * @returns {array} The array of values.
+   */
+  this.getValues = function () {
+    return values.slice();
+  };
+
 }; // Index class
 
 /**
