@@ -110,6 +110,7 @@ dwv.tool.draw.RectangleFactory.prototype.create = function (
     x: rectangle.getBegin().getX(),
     y: rectangle.getEnd().getY(),
     scale: style.applyZoomScale(1),
+    visible: textExpr.length !== 0,
     name: 'label'
   });
   klabel.add(ktext);

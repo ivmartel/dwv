@@ -44,7 +44,7 @@ dwv.tool.GetShapeDisplayName = function (shape) {
  * @class
  */
 dwv.tool.DrawGroupCommand = function (group, name, layer, silent) {
-  var isSilent = (typeof silent === 'undefined') ? false : true;
+  var isSilent = (typeof silent === 'undefined') ? false : silent;
 
   // group parent
   var parent = group.getParent();

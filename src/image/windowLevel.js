@@ -28,11 +28,10 @@ dwv.image.validateWindowWidth = function (value) {
  *  else y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin) + ymin
  * </pre>
  *
+ * @see DICOM doc for [Window Center and Window Width]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2}
  * @param {number} center The window center.
  * @param {number} width The window width.
  * @class
- * @see DICOM doc for [Window Center and Window Width]{@link http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.11.html#sect_C.11.2.1.2}
- *
  */
 dwv.image.WindowLevel = function (center, width) {
   // check width

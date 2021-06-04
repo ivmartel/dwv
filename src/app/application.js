@@ -8,11 +8,6 @@ var dwv = dwv || {};
  * @tutorial examples
  */
 dwv.App = function () {
-  // check logger
-  if (typeof dwv.logger === 'undefined') {
-    dwv.logger = dwv.utils.logger.console;
-  }
-
   // closure to self
   var self = this;
 

@@ -726,6 +726,8 @@ dwv.tool.Draw = function (app) {
         // update text expression
         ktext.setText(dwv.utils.replaceFlags(
           ktext.meta.textExpr, ktext.meta.quantification));
+        label.setVisible(ktext.meta.textExpr.length !== 0);
+
         // trigger event
         fireEvent({
           type: 'drawchange'

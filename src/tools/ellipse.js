@@ -112,6 +112,7 @@ dwv.tool.draw.EllipseFactory.prototype.create = function (
     x: ellipse.getCenter().getX(),
     y: ellipse.getCenter().getY(),
     scale: style.applyZoomScale(1),
+    visible: textExpr.length !== 0,
     name: 'label'
   });
   klabel.add(ktext);

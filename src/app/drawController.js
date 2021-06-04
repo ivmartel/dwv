@@ -318,8 +318,7 @@ dwv.DrawController = function (konvaLayer) {
         var shape = stateGroup.getChildren(dwv.draw.isNodeNameShape)[0];
         // create the draw command
         var cmd = new dwv.tool.DrawGroupCommand(
-          stateGroup, shape.className,
-          konvaLayer, true);
+          stateGroup, shape.className, konvaLayer);
         // draw command callbacks
         cmd.onExecute = cmdCallback;
         cmd.onUndo = cmdCallback;
@@ -381,10 +380,13 @@ dwv.DrawController = function (konvaLayer) {
       if (kids[k].className === 'Text') {
         var text = kids[k];
         text.shadowColor(shadowColor);
-        text.meta = drawDetails.meta;
-        text.setText(dwv.utils.replaceFlags(
-          text.meta.textExpr, text.meta.quantification
-        ));
+        if (typeof drawDetails.meta !== 'undefined') {
+          text.meta = drawDetails.meta;
+          text.setText(dwv.utils.replaceFlags(
+            text.meta.textExpr, text.meta.quantification
+          ));
+          label.setVisible(text.meta.textExpr.length !== 0);
+        }
       }
     }
 

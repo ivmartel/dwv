@@ -8,7 +8,7 @@ var Konva = Konva || {};
  * Saves: data url/path, display info.
  *
  * History:
- * - v0.4 (dwv 0.29.0, ??/2021)
+ * - v0.4 (dwv 0.29.0, 06/2021)
  *   - move drawing details into meta property
  *   - remove scale center and translation, add offset
  * - v0.3 (dwv v0.23.0, 03/2018)

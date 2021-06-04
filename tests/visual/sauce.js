@@ -42,7 +42,6 @@ var saucelabs = new SauceLabs({
  *   for saucelabs possibilities.
  * @see http://seleniumhq.github.io/selenium/docs/api/javascript/index.html
  *   for the webdriver API.
- *
  * @param {object} caps Desired capabilities for the webdriver. Minimum of
  *   {'browserName', 'version', 'platform'}.
  */

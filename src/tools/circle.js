@@ -113,6 +113,7 @@ dwv.tool.draw.CircleFactory.prototype.create = function (
     x: circle.getCenter().getX(),
     y: circle.getCenter().getY(),
     scale: style.applyZoomScale(1),
+    visible: textExpr.length !== 0,
     name: 'label'
   });
   klabel.add(ktext);

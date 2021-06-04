@@ -39,6 +39,8 @@ echo "-------------------------"
 echo "1/4 create release branch"
 echo "-------------------------"
 
+git checkout develop
+git pull
 releaseBranch="v${releaseVersion}"
 git checkout -b $releaseBranch
 
