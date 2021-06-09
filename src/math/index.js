@@ -172,10 +172,10 @@ dwv.math.getZeroIndex = function (size) {
 };
 
 /**
-* Get a string id from the index values in the form of: '#0-1_#1-2'.
-*
-* @param {number} minDim The start dimension.
-* @returns {string} The string id.
+ * Get a string id from the index values in the form of: '#0-1_#1-2'.
+ *
+ * @param {number} minDim The start dimension.
+ * @returns {string} The string id.
  */
 dwv.math.Index.prototype.toStringId = function (minDim) {
   if (typeof minDim === 'undefined') {
@@ -195,11 +195,11 @@ dwv.math.Index.prototype.toStringId = function (minDim) {
 };
 
 /**
-* Get an index from an id string in the form of: '#0-1_#1-2'
-* (result of index.toStringId).
-*
-* @param {string} inputStr The input string.
-* @returns {object} The corresponding index.
+ * Get an index from an id string in the form of: '#0-1_#1-2'
+ * (result of index.toStringId).
+ *
+ * @param {string} inputStr The input string.
+ * @returns {object} The corresponding index.
  */
 dwv.math.getFromStringId = function (inputStr) {
   // split ids

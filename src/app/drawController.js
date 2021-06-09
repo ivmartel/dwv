@@ -197,7 +197,7 @@ dwv.DrawController = function (konvaLayer) {
   /**
    * Get a list of drawing display details.
    *
-   * @returns {array} A list of draw details as
+   * @returns {Array} A list of draw details as
    *   {id, position, type, color, meta}
    */
   this.getDrawDisplayDetails = function () {
