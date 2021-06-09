@@ -450,7 +450,7 @@ dwv.App = function () {
   /**
    * Get the list of drawing display details.
    *
-   * @returns {object} The list of draw details including id, slice, frame...
+   * @returns {object} The list of draw details including id, position...
    */
   this.getDrawDisplayDetails = function () {
     var drawController =
