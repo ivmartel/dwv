@@ -58,12 +58,13 @@ dwv.tool.Scroll = function (app) {
     var layerController = app.getLayerController();
     var viewController =
       layerController.getActiveViewLayer().getViewController();
+    var size = app.getImage().getGeometry().getSize();
 
     // difference to last Y position
     var diffY = event._y - self.y0;
     var yMove = (Math.abs(diffY) > 15);
     // do not trigger for small moves
-    if (yMove) {
+    if (yMove && size.canScroll(2)) {
       // update view controller
       if (diffY > 0) {
         viewController.decrementIndex(2);
@@ -76,7 +77,7 @@ dwv.tool.Scroll = function (app) {
     var diffX = event._x - self.x0;
     var xMove = (Math.abs(diffX) > 15);
     // do not trigger for small moves
-    if (xMove) {
+    if (xMove && size.canScroll(3)) {
       // update view controller
       if (diffX > 0) {
         viewController.decrementIndex(3);
@@ -182,19 +183,11 @@ dwv.tool.Scroll = function (app) {
       layerController.getActiveViewLayer().getViewController();
 
     var size = app.getImage().getGeometry().getSize();
-    var hasSlices = size.get(2) !== 1;
-    var hasFrames = size.get(3) !== 1;
-    if (up) {
-      if (hasSlices) {
+    if (size.canScroll(2)) {
+      if (up) {
         viewController.incrementIndex(2);
-      } else if (hasFrames) {
-        viewController.incrementIndex(3);
-      }
-    } else {
-      if (hasSlices) {
+      } else {
         viewController.decrementIndex(2);
-      } else if (hasFrames) {
-        viewController.decrementIndex(3);
       }
     }
   }

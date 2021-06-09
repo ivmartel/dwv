@@ -205,7 +205,7 @@ dwv.image.getIteratorValues = function (iterator) {
  */
 dwv.image.getSliceIterator = function (image, position, isRescaled) {
   var geometry = image.getGeometry();
-  var sliceSize = geometry.getSize().getSliceSize();
+  var sliceSize = geometry.getSize().getDimSize(2);
   var start = geometry.indexToOffset(position.getWithNew2D(0, 0));
 
   // default to non rescaled data

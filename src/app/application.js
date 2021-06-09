@@ -72,7 +72,7 @@ dwv.App = function () {
   /**
    * Can the data be scrolled?
    *
-   * @returns {boolean} True if the data has more than one slice or frame.
+   * @returns {boolean} True if the data has a third dimension greater than one.
    */
   this.canScroll = function () {
     var viewLayer = layerController.getActiveViewLayer();
@@ -571,10 +571,10 @@ dwv.App = function () {
    * Key down event handler example.
    * - CRTL-Z: undo
    * - CRTL-Y: redo
-   * - CRTL-ARROW_LEFT: next frame
-   * - CRTL-ARROW_UP: next slice
-   * - CRTL-ARROW_RIGHT: previous frame
-   * - CRTL-ARROW_DOWN: previous slice
+   * - CRTL-ARROW_LEFT: next element on fourth dim
+   * - CRTL-ARROW_UP: next element on third dim
+   * - CRTL-ARROW_RIGHT: previous element on fourth dim
+   * - CRTL-ARROW_DOWN: previous element on third dim
    *
    * @param {object} event The key down event.
    * @fires dwv.tool.UndoStack#undo
@@ -583,19 +583,28 @@ dwv.App = function () {
   this.defaultOnKeydown = function (event) {
     var viewController =
       layerController.getActiveViewLayer().getViewController();
+    var size = self.getImage().getGeometry().getSize();
     if (event.ctrlKey) {
       if (event.keyCode === 37) { // crtl-arrow-left
         event.preventDefault();
-        viewController.decrementIndex(3);
+        if (size.canScroll(3)) {
+          viewController.decrementIndex(3);
+        }
       } else if (event.keyCode === 38) { // crtl-arrow-up
         event.preventDefault();
-        viewController.incrementIndex(2);
+        if (size.canScroll(2)) {
+          viewController.incrementIndex(2);
+        }
       } else if (event.keyCode === 39) { // crtl-arrow-right
         event.preventDefault();
-        viewController.incrementIndex(3);
+        if (size.canScroll(3)) {
+          viewController.incrementIndex(3);
+        }
       } else if (event.keyCode === 40) { // crtl-arrow-down
         event.preventDefault();
-        viewController.decrementIndex(2);
+        if (size.canScroll(2)) {
+          viewController.decrementIndex(2);
+        }
       } else if (event.keyCode === 89) { // crtl-y
         undoStack.redo();
       } else if (event.keyCode === 90) { // crtl-z

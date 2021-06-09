@@ -10,7 +10,7 @@ var dwv = dwv || {};
 dwv.ViewController = function (view) {
   // closure to self
   var self = this;
-  // Slice/frame player ID (created by setInterval)
+  // third dimension player ID (created by setInterval)
   var playerID = null;
 
   /**
@@ -63,7 +63,7 @@ dwv.ViewController = function (view) {
   /**
    * Check if the controller is playing.
    *
-   * @returns {boolean} True is the controler is playing slices/frames.
+   * @returns {boolean} True if the controler is playing.
    */
   this.isPlaying = function () {
     return (playerID !== null);
@@ -76,15 +76,6 @@ dwv.ViewController = function (view) {
    */
   this.getCurrentPosition = function () {
     return view.getCurrentPosition();
-  };
-
-  /**
-   * Get the current position.
-   *
-   * @returns {object} The position.
-   */
-  this.getCurrentPositionAsObject = function () {
-    return view.getCurrentPositionAsObject();
   };
 
   /**
@@ -157,7 +148,7 @@ dwv.ViewController = function (view) {
   /**
    * Can the data be scrolled?
    *
-   * @returns {boolean} True if the data has more than one slice or frame.
+   * @returns {boolean} True if the data has a third dimension greater than one.
    */
   this.canScroll = function () {
     return view.getImage().canScroll();
@@ -172,16 +163,6 @@ dwv.ViewController = function (view) {
    */
   this.setCurrentPosition = function (pos, silent) {
     return view.setCurrentPosition(pos, silent);
-  };
-
-  /**
-   * Set the current position from an object.
-   *
-   * @param {object} pos The position.
-   * @returns {boolean} False if not in bounds.
-   */
-  this.setCurrentPositionFromObject = function (pos) {
-    return view.setCurrentPositionFromObject(pos);
   };
 
   /**
@@ -243,40 +224,20 @@ dwv.ViewController = function (view) {
   this.play = function () {
     if (playerID === null) {
       var size = view.getImage().getGeometry().getSize();
-      var nSlices = size.get(2);
-      var nFrames = size.get(3);
       var recommendedDisplayFrameRate =
         view.getImage().getMeta().RecommendedDisplayFrameRate;
       var milliseconds = view.getPlaybackMilliseconds(
         recommendedDisplayFrameRate);
 
       playerID = setInterval(function () {
-        if (nSlices !== 1) {
+        if (size.get(2) !== 1) {
           if (!self.incrementIndex(2)) {
             var pos1 = self.getCurrentPosition();
-            self.setCurrentPosition(
-              new dwv.math.Index([
-                pos1.get(0),
-                pos1.get(1),
-                0,
-                pos1.get(3)
-              ])
-            );
-          }
-        } else if (nFrames !== 1) {
-          if (!self.incrementIndex(3)) {
-            var pos = self.getCurrentPosition();
-            self.setCurrentPosition(
-              new dwv.math.Index([
-                pos.get(0),
-                pos.get(1),
-                pos.get(2),
-                0
-              ])
-            );
+            var values = pos1.getValues();
+            values[2] = 0;
+            self.setCurrentPosition(new dwv.math.Index(values));
           }
         }
-
       }, milliseconds);
     } else {
       this.stop();

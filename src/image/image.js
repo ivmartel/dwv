@@ -153,20 +153,15 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   /**
    * Can the data be scrolled?
    *
-   * @returns {boolean} True if the data has more than one slice or frame.
+   * @returns {boolean} True if the data has a third dimension greater than one.
    */
   this.canScroll = function () {
     var size = this.getGeometry().getSize();
-    var nSlices = size.get(2);
-    var nFrames = 1;
-    if (typeof size.get(3) !== 'undefined') {
-      nFrames = size.get(3);
-    }
     var nFiles = 1;
     if (typeof meta.numberOfFiles !== 'undefined') {
       nFiles = meta.numberOfFiles;
     }
-    return nSlices !== 1 || nFrames !== 1 || nFiles !== 1;
+    return size.get(2) !== 1 || nFiles !== 1;
   };
 
   /**
@@ -210,7 +205,6 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
         } else {
           // first non constant rsi
           isConstantRSI = false;
-          console.log('non constant rsi !');
           // switch to non constant mode
           rsis = [];
           // initialise RSIs
@@ -378,7 +372,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     }
 
     // calculate slice size
-    var sliceSize = numberOfComponents * size.getSliceSize();
+    var sliceSize = numberOfComponents * size.getDimSize(2);
 
     // create full buffer if not done yet
     var fullBufferSize = sliceSize * meta.numberOfFiles;
@@ -470,7 +464,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   this.appendFrameBuffer = function (frameBuffer, frameIndex) {
     // create full buffer if not done yet
     var size = geometry.getSize();
-    var frameSize = numberOfComponents * size.getFrameSize();
+    var frameSize = numberOfComponents * size.getDimSize(2);
     var fullBufferSize = frameSize * meta.numberOfFiles;
     if (buffer.length !== fullBufferSize) {
       if (typeof meta.numberOfFiles === 'undefined') {
@@ -630,8 +624,8 @@ dwv.image.Image.prototype.calculateDataRange = function () {
   var value = 0;
   var size = this.getGeometry().getSize();
   var leni = size.getTotalSize();
-  // max to one frame
-  if (size.length() === 3) {
+  // max to 3D
+  if (size.length() >= 3) {
     leni = size.getDimSize(3);
   }
   for (var i = 0; i < leni; ++i) {
@@ -670,7 +664,7 @@ dwv.image.Image.prototype.calculateRescaledDataRange = function () {
     var rvalue = 0;
     var size = this.getGeometry().getSize();
     var leni = size.getTotalSize();
-    // max to one frame
+    // max to 3D
     if (size.length() === 3) {
       leni = size.getDimSize(3);
     }
@@ -738,9 +732,10 @@ dwv.image.Image.prototype.calculateHistogram = function () {
 /**
  * Convolute the image with a given 2D kernel.
  *
+ * Note: Uses raw buffer values.
+ *
  * @param {Array} weights The weights of the 2D kernel as a 3x3 matrix.
  * @returns {Image} The convoluted image.
- * Note: Uses the raw buffer values.
  */
 dwv.image.Image.prototype.convolute2D = function (weights) {
   if (weights.length !== 9) {
@@ -753,21 +748,38 @@ dwv.image.Image.prototype.convolute2D = function (weights) {
   var newBuffer = newImage.getBuffer();
 
   var imgSize = this.getGeometry().getSize();
+  var dimOffset = imgSize.getDimSize(2) * this.getNumberOfComponents();
+  for (var k = 0; k < imgSize.get(2); ++k) {
+    this.convoluteBuffer(weights, newBuffer, k * dimOffset);
+  }
+
+  return newImage;
+};
+
+/**
+ * Convolute an image buffer with a given 2D kernel.
+ *
+ * Note: Uses raw buffer values.
+ *
+ * @param {Array} weights The weights of the 2D kernel as a 3x3 matrix.
+ * @param {Array} buffer The buffer to convolute.
+ * @param {number} startOffset The index to start at.
+ */
+dwv.image.Image.prototype.convoluteBuffer = function (
+  weights, buffer, startOffset) {
+  var imgSize = this.getGeometry().getSize();
   var ncols = imgSize.get(0);
   var nrows = imgSize.get(1);
-  var frameSize = imgSize.getFrameSize();
   var ncomp = this.getNumberOfComponents();
 
-  // adapt to number of component and planar configuration
+  // number of component and planar configuration vars
   var factor = 1;
   var componentOffset = 1;
-  var frameOffset = frameSize;
   if (ncomp === 3) {
-    frameOffset *= 3;
     if (this.getPlanarConfiguration() === 0) {
       factor = 3;
     } else {
-      componentOffset = frameSize;
+      componentOffset = imgSize.getDimSize(2);
     }
   }
 
@@ -837,56 +849,46 @@ dwv.image.Image.prototype.convolute2D = function (weights) {
   /*jshint indent:4 */
 
   // loop vars
-  var pixelOffset = 0;
+  var pixelOffset = startOffset;
   var newValue = 0;
   var wOffFinal = [];
-  // go through the destination image pixels
-  var nFrames = imgSize.length() === 3
-    ? imgSize.get(3) : 1;
-  for (var f = 0; f < nFrames; f++) {
-    pixelOffset = f * frameOffset;
-    for (var c = 0; c < ncomp; c++) {
-      // special component offset
-      pixelOffset += c * componentOffset;
-      for (var k = 0; k < imgSize.get(2); k++) {
-        for (var j = 0; j < nrows; j++) {
-          for (var i = 0; i < ncols; i++) {
-            wOffFinal = wOff;
-            // special border cases
-            if (i === 0 && j === 0) {
-              wOffFinal = wOff00;
-            } else if (i === 0 && j === (nrows - 1)) {
-              wOffFinal = wOff0n;
-            } else if (i === (ncols - 1) && j === 0) {
-              wOffFinal = wOffn0;
-            } else if (i === (ncols - 1) && j === (nrows - 1)) {
-              wOffFinal = wOffnn;
-            } else if (i === 0 && j !== (nrows - 1) && j !== 0) {
-              wOffFinal = wOff0x;
-            } else if (i === (ncols - 1) && j !== (nrows - 1) && j !== 0) {
-              wOffFinal = wOffnx;
-            } else if (i !== 0 && i !== (ncols - 1) && j === 0) {
-              wOffFinal = wOffx0;
-            } else if (i !== 0 && i !== (ncols - 1) && j === (nrows - 1)) {
-              wOffFinal = wOffxn;
-            }
-
-            // calculate the weighed sum of the source image pixels that
-            // fall under the convolution matrix
-            newValue = 0;
-            for (var wi = 0; wi < 9; ++wi) {
-              newValue += this.getValueAtOffset(
-                pixelOffset + wOffFinal[wi]) * weights[wi];
-            }
-            newBuffer[pixelOffset] = newValue;
-            // increment pixel offset
-            pixelOffset += factor;
-          }
+  for (var c = 0; c < ncomp; ++c) {
+    // component offset
+    pixelOffset += c * componentOffset;
+    for (var j = 0; j < nrows; ++j) {
+      for (var i = 0; i < ncols; ++i) {
+        wOffFinal = wOff;
+        // special border cases
+        if (i === 0 && j === 0) {
+          wOffFinal = wOff00;
+        } else if (i === 0 && j === (nrows - 1)) {
+          wOffFinal = wOff0n;
+        } else if (i === (ncols - 1) && j === 0) {
+          wOffFinal = wOffn0;
+        } else if (i === (ncols - 1) && j === (nrows - 1)) {
+          wOffFinal = wOffnn;
+        } else if (i === 0 && j !== (nrows - 1) && j !== 0) {
+          wOffFinal = wOff0x;
+        } else if (i === (ncols - 1) && j !== (nrows - 1) && j !== 0) {
+          wOffFinal = wOffnx;
+        } else if (i !== 0 && i !== (ncols - 1) && j === 0) {
+          wOffFinal = wOffx0;
+        } else if (i !== 0 && i !== (ncols - 1) && j === (nrows - 1)) {
+          wOffFinal = wOffxn;
         }
+        // calculate the weighed sum of the source image pixels that
+        // fall under the convolution matrix
+        newValue = 0;
+        for (var wi = 0; wi < 9; ++wi) {
+          newValue += this.getValueAtOffset(
+            pixelOffset + wOffFinal[wi]) * weights[wi];
+        }
+        buffer[pixelOffset] = newValue;
+        // increment pixel offset
+        pixelOffset += factor;
       }
     }
   }
-  return newImage;
 };
 
 /**

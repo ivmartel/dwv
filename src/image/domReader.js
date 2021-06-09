@@ -39,7 +39,7 @@ dwv.image.getDefaultImage = function (
   imageBuffer, numberOfFrames,
   imageUid) {
   // image size
-  var imageSize = new dwv.image.Size([width, height, 1, 1]);
+  var imageSize = new dwv.image.Size([width, height, 1]);
   // default spacing
   // TODO: misleading...
   var imageSpacing = new dwv.image.Spacing(1, 1);
@@ -144,6 +144,7 @@ dwv.image.getViewFromDOMVideo = function (
   info['imageWidth'] = {value: width};
   info['imageHeight'] = {value: height};
   info['numberOfFrames'] = {value: numberOfFrames};
+  info['imageUid'] = {value: 0};
 
   // draw the image in the canvas in order to get its data
   var canvas = document.createElement('canvas');

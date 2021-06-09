@@ -142,7 +142,7 @@ QUnit.test('Test Image getValue.', function (assert) {
 QUnit.test('Test Image histogram.', function (assert) {
   // create a simple image
   var size0 = 4;
-  var imgSize0 = new dwv.image.Size([size0, size0, 1, 1]);
+  var imgSize0 = new dwv.image.Size([size0, size0, 1]);
   var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
   var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
   var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
@@ -176,8 +176,8 @@ QUnit.test('Test Image histogram.', function (assert) {
  */
 QUnit.test('Test Image append slice.', function (assert) {
   var size = 4;
-  var imgSize = new dwv.image.Size([size, size, 2, 1]);
-  var imgSizeMinusOne = new dwv.image.Size([size, size, 1, 1]);
+  var imgSize = new dwv.image.Size([size, size, 2]);
+  var imgSizeMinusOne = new dwv.image.Size([size, size, 1]);
   var imgSpacing = new dwv.image.Spacing(1, 1, 1);
   var imgOrigin = new dwv.math.Point3D(0, 0, 0);
   var imgGeometry0 = new dwv.image.Geometry(
@@ -186,13 +186,13 @@ QUnit.test('Test Image append slice.', function (assert) {
 
   // slice to append
   var sliceSize = new dwv.image.Size([size, size, 1]);
-  var sliceBuffer = new Int16Array(sliceSize.getFrameSize());
+  var sliceBuffer = new Int16Array(sliceSize.getTotalSize());
   for (var i = 0; i < size * size; ++i) {
     sliceBuffer[i] = 2;
   }
 
   // image buffer
-  var buffer = new Int16Array(imgSize.getFrameSize());
+  var buffer = new Int16Array(imgSize.getTotalSize());
   for (var j = 0; j < size * size; ++j) {
     buffer[j] = 0;
   }
@@ -301,7 +301,7 @@ QUnit.test('Test Image append slice.', function (assert) {
 QUnit.test('Test Image convolute2D.', function (assert) {
   // create a simple image
   var size0 = 3;
-  var imgSize0 = new dwv.image.Size([size0, size0, 1, 1]);
+  var imgSize0 = new dwv.image.Size([size0, size0, 1]);
   var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
   var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
   var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
@@ -439,7 +439,7 @@ QUnit.test('Test ImageFactory.', function (assert) {
   var zeroStats = new dwv.math.SimpleStats(0, 0, 0, 0);
 
   var size0 = 3;
-  var imgSize0 = new dwv.image.Size([size0, size0, 1, 1]);
+  var imgSize0 = new dwv.image.Size([size0, size0, 1]);
   var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
   var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
   var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);

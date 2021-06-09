@@ -12,6 +12,38 @@ QUnit.module('geometry');
  * @function module:tests/image~size
  */
 QUnit.test('Test Size.', function (assert) {
+  // error cases
+  assert.throws(function () {
+    new dwv.image.Size();
+  },
+  new Error('Cannot create size with no values.'),
+  'size with undef values array.');
+  assert.throws(function () {
+    new dwv.image.Size(null);
+  },
+  new Error('Cannot create size with no values.'),
+  'size with null values array.');
+  assert.throws(function () {
+    new dwv.image.Size([]);
+  },
+  new Error('Cannot create size with empty values.'),
+  'size with empty values array.');
+  assert.throws(function () {
+    new dwv.image.Size([2, 2, 0]);
+  },
+  new Error('Cannot create size with non number or zero values.'),
+  'size with zero values.');
+  assert.throws(function () {
+    new dwv.image.Size([2, undefined, 2]);
+  },
+  new Error('Cannot create size with non number or zero values.'),
+  'size with undef values.');
+  assert.throws(function () {
+    new dwv.image.Size([2, 'a', 2]);
+  },
+  new Error('Cannot create size with non number or zero values.'),
+  'size with string values.');
+
   var size0 = new dwv.image.Size([2, 3, 4]);
   // length
   assert.equal(size0.length(), 3, 'length');
@@ -27,9 +59,6 @@ QUnit.test('Test Size.', function (assert) {
   assert.equal(size0.getDimSize(3), 24, 'getDimSize 3');
   assert.equal(size0.getTotalSize(), 24, 'getTotalSize');
   assert.equal(size0.getDimSize(4), null, 'getDimSize 4 (above dim)');
-
-  assert.equal(size0.getSliceSize(), 6, 'getSliceSize');
-  assert.equal(size0.getFrameSize(), 24, 'getFrameSize');
 
   // equality
   assert.equal(size0.equals(null), false, 'equals null false');
@@ -54,6 +83,13 @@ QUnit.test('Test Size.', function (assert) {
   assert.equal(size0.isInBounds(index0), false, 'isInBounds too big');
   index0 = new dwv.math.Index([-1, 2, 3]);
   assert.equal(size0.isInBounds(index0), false, 'isInBounds too small');
+
+  // can scroll
+  var size20 = new dwv.image.Size([2, 1, 2]);
+  assert.equal(size20.canScroll(0), true, 'canScroll 20-0');
+  assert.equal(size20.canScroll(1), false, 'canScroll 20-1');
+  assert.equal(size20.canScroll(2), true, 'canScroll 20-2');
+  assert.equal(size20.canScroll(3), false, 'canScroll 20-3');
 });
 
 /**

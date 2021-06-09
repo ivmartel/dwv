@@ -14,6 +14,7 @@ var Konva = Konva || {};
  *
  * @param {object} currentPosition The current position.
  * @returns {string} The group id.
+ * @deprecated Use the index.toStringId instead.
  */
 dwv.draw.getDrawPositionGroupId = function (currentPosition) {
   var sliceNumber = currentPosition.get(2);
@@ -27,6 +28,7 @@ dwv.draw.getDrawPositionGroupId = function (currentPosition) {
  *
  * @param {string} groupId The group id.
  * @returns {object} The slice and frame number.
+ * @deprecated Use the dwv.math.getFromStringId instead.
  */
 dwv.draw.getPositionFromGroupId = function (groupId) {
   var sepIndex = groupId.indexOf('_');
@@ -173,7 +175,7 @@ dwv.DrawController = function (konvaLayer) {
    */
   this.activateDrawLayer = function (currentPosition) {
     // get and store the position group id
-    currentPosGroupId = dwv.draw.getDrawPositionGroupId(currentPosition);
+    currentPosGroupId = currentPosition.toStringId(2);
 
     // get all position groups
     var posGroups = konvaLayer.getChildren(dwv.draw.isPositionNode);
@@ -195,13 +197,14 @@ dwv.DrawController = function (konvaLayer) {
   /**
    * Get a list of drawing display details.
    *
-   * @returns {object} A list of draw details including id, slice, frame...
+   * @returns {array} A list of draw details as
+   *   {id, position, type, color, meta}
    */
   this.getDrawDisplayDetails = function () {
     var list = [];
     var groups = konvaLayer.getChildren();
     for (var j = 0, lenj = groups.length; j < lenj; ++j) {
-      var position = dwv.draw.getPositionFromGroupId(groups[j].id());
+      var position = dwv.math.getFromStringId(groups[j].id());
       var collec = groups[j].getChildren();
       for (var i = 0, leni = collec.length; i < leni; ++i) {
         var shape = collec[i].getChildren(dwv.draw.isNodeNameShape)[0];
@@ -226,8 +229,7 @@ dwv.DrawController = function (konvaLayer) {
         }
         list.push({
           id: collec[i].id(),
-          slice: position.sliceNumber,
-          frame: position.frameNumber,
+          position: position.toString(),
           type: type,
           color: shape.stroke(),
           meta: text.meta

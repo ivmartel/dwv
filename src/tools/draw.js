@@ -20,7 +20,7 @@ dwv.tool.draw.debug = false;
  * This tool is responsible for the draw layer group structure. The layout is:
  *
  * drawLayer
- * |_ positionGroup: name="position-group", id="slice-#_frame-#""
+ * |_ positionGroup: name="position-group", id="#2-0#_#3-1""
  *    |_ shapeGroup: name="{shape name}-group", id="#"
  *       |_ shape: name="shape"
  *       |_ label: name="label"

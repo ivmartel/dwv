@@ -1,0 +1,119 @@
+{
+  "version": "0.5",
+  "window-center": 441,
+  "window-width": 911,
+  "position": [
+    0,
+    0,
+    0
+  ],
+  "scale": {
+    "x": 1,
+    "y": 1
+  },
+  "offset": {
+    "x": 0,
+    "y": 0
+  },
+  "drawings": {
+    "attrs": {},
+    "className": "Layer",
+    "children": [
+      {
+        "attrs": {
+          "name": "position-group",
+          "id": "#2-0"
+        },
+        "className": "Group",
+        "children": [
+          {
+            "attrs": {
+              "name": "rectangle-group",
+              "id": "db0puu209qe",
+              "draggable": true
+            },
+            "className": "Group",
+            "children": [
+              {
+                "attrs": {
+                  "x": 80,
+                  "y": 132,
+                  "scaleX": 1.103448275862069,
+                  "scaleY": 1.103448275862069,
+                  "name": "label"
+                },
+                "className": "Label",
+                "children": [
+                  {
+                    "attrs": {
+                      "fontSize": 10,
+                      "fontFamily": "Verdana",
+                      "fill": "#ffff80",
+                      "padding": 3,
+                      "shadowColor": "#000",
+                      "shadowOffsetX": 0.25,
+                      "shadowOffsetY": 0.25,
+                      "name": "text",
+                      "text": "66.56 cm²"
+                    },
+                    "className": "Text"
+                  },
+                  {
+                    "attrs": {
+                      "fill": "#ffff80",
+                      "opacity": 0.2,
+                      "width": 21.426986694335938,
+                      "height": 5.333333333333333
+                    },
+                    "className": "Tag"
+                  }
+                ]
+              },
+              {
+                "attrs": {
+                  "x": 80,
+                  "y": 58,
+                  "width": 104,
+                  "height": 64,
+                  "stroke": "#ffff80",
+                  "strokeScaleEnabled": false,
+                  "name": "shape"
+                },
+                "className": "Rect"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "drawingsDetails": {
+    "db0puu209qe": {
+      "meta": {
+        "textExpr": "{surface}",
+        "quantification": {
+          "surface": {
+            "value": 66.56,
+            "unit": "cm²"
+          },
+          "min": {
+            "value": 33,
+            "unit": ""
+          },
+          "max": {
+            "value": 602,
+            "unit": ""
+          },
+          "mean": {
+            "value": 390.69515931372547,
+            "unit": ""
+          },
+          "stdDev": {
+            "value": 93.5630483721294,
+            "unit": ""
+          }
+        }
+      }
+    }
+  }
+}

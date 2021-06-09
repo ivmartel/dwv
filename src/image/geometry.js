@@ -11,6 +11,19 @@ dwv.image = dwv.image || {};
  * @param {Array} values The size values.
  */
 dwv.image.Size = function (values) {
+  if (!values || typeof values === 'undefined') {
+    throw new Error('Cannot create size with no values.');
+  }
+  if (values.length === 0) {
+    throw new Error('Cannot create size with empty values.');
+  }
+  var valueCheck = function (val) {
+    return !isNaN(val) && val !== 0;
+  };
+  if (!values.every(valueCheck)) {
+    throw new Error('Cannot create size with non number or zero values.');
+  }
+
   /**
    * Get the size value at the given array index.
    *
@@ -39,7 +52,26 @@ dwv.image.Size = function (values) {
     return '(' + values.toString() + ')';
   };
 
+  /**
+   * Get the values of this index.
+   *
+   * @returns {Array} The array of values.
+   */
+  this.getValues = function () {
+    return values.slice();
+  };
+
 }; // Size class
+
+/**
+ * Check if a dimension exists and has more than one element.
+ *
+ * @param {object} dimension The dimension to check.
+ * @returns {boolean} True if scrollable.
+ */
+dwv.image.Size.prototype.canScroll = function (dimension) {
+  return this.length() >= dimension + 1 && this.get(dimension) !== 1;
+};
 
 /**
  * Get the size of a given dimension.
@@ -56,24 +88,6 @@ dwv.image.Size.prototype.getDimSize = function (dimension) {
     size *= this.get(i);
   }
   return size;
-};
-
-/**
- * Get the size of a slice.
- *
- * @returns {number} The size of a slice.
- */
-dwv.image.Size.prototype.getSliceSize = function () {
-  return this.getDimSize(2);
-};
-
-/**
- * Get the size of a frame.
- *
- * @returns {number} The size of a frame.
- */
-dwv.image.Size.prototype.getFrameSize = function () {
-  return this.getDimSize(3);
 };
 
 /**
@@ -309,13 +323,10 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
   this.appendOrigin = function (origin, index) {
     // add in origin array
     origins.splice(index, 0, origin);
-    // increment slice number
-    size = new dwv.image.Size([
-      size.get(0),
-      size.get(1),
-      size.get(2) + 1,
-      size.get(3)
-    ]);
+    // increment second dimension
+    var values = size.getValues();
+    values[2] += 1;
+    size = new dwv.image.Size(values);
   };
 
   /**
@@ -323,13 +334,10 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
    *
    */
   this.appendFrame = function () {
-    // increment frame number
-    size = new dwv.image.Size([
-      size.get(0),
-      size.get(1),
-      size.get(2),
-      size.get(3) + 1
-    ]);
+    // increment second dimension
+    var values = size.getValues();
+    values[2] += 1;
+    size = new dwv.image.Size(values);
   };
 
 };

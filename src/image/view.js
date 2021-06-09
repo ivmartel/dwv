@@ -103,7 +103,7 @@ dwv.image.View = function (image) {
   this.setInitialPosition = function () {
     var silent = true;
     this.setCurrentPosition(
-      new dwv.math.Index([0, 0, 0, 0]),
+      dwv.math.getZeroIndex(image.getGeometry().getSize().length()),
       silent
     );
   };
@@ -330,34 +330,6 @@ dwv.image.View = function (image) {
    */
   this.getCurrentPosition = function () {
     return currentPosition;
-  };
-
-  /**
-   * Get the current position.
-   *
-   * @returns {object} The current position.
-   */
-  this.getCurrentPositionAsObject = function () {
-    // return a clone to avoid reference problems
-    return currentPosition ? {
-      i: currentPosition.get(0),
-      j: currentPosition.get(1),
-      k: currentPosition.get(2)
-    } : null;
-  };
-
-  /**
-   * Set the current position.
-   *
-   * @param {object} pos The current position.
-   */
-  this.setCurrentPositionFromObject = function (pos) {
-    var frame = 0;
-    if (typeof pos.f !== 'undefined') {
-      frame = pos.f;
-    }
-    var posIndex = new dwv.math.Index([pos.i, pos.j, pos.k, frame]);
-    this.setCurrentPosition(posIndex, true);
   };
 
   /**
