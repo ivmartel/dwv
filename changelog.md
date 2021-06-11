@@ -1,5 +1,14 @@
 # Changelog
 
+## [v0.29.1](https://github.com/ivmartel/dwv/releases/tag/v0.29.1) - 11/06/2021
+
+### Added
+
+- Reduce z-index of draw layers [#945](https://github.com/ivmartel/dwv/issues/945)
+- Postpone DOM first access [#944](https://github.com/ivmartel/dwv/issues/944)
+
+---
+
 ## [v0.29.0](https://github.com/ivmartel/dwv/releases/tag/v0.29.0) - 03/06/2021
 
 ### Breaking

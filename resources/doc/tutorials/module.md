@@ -42,22 +42,6 @@ Links:
 
 For development purposes, you can create your own npm package by calling `npm pack` in the root folder. You can then install it in your project folder using `npm install dwv-#.tgz`.
 
-## Bower
-
-Bower is a package manager for web components: it downloads them and puts them in a `bower_components` folder that you can then reference in your web page. To install dwv and its dependencies run:
-
-    bower install dwv
-
-The dwv distribution files are then available from the `bower_components/dwv/dist` folder (`dwv.min.js` and `dwv.js`).
-
-During development, you can use local folders. Publicise a folder containing a `bower.json` by calling `bower link` in it (remove it by calling `bower uninstall dwv`). You can then reference it in you project by calling `bower link dwv`.
-
-Links:
- * [Bower](https://bower.io/)
- * `bower.json` [standard](https://github.com/bower/spec/blob/master/json.md)
-
-For development purposes, you can link bower to the dwv source folder, run `bower link` in the root folder. Then call `bower link dwv` in your project folder.
-
 ## AMD
 
 AMD is an Asynchronous Module Definition, modules are loaded only when they are needed. The [requirejs](http://requirejs.org) library defines the function needed to use AMD (see its [API](http://requirejs.org/docs/api.html)). This [repo](https://github.com/volojs/create-template) gives a good example. Dwv can be 'required' by using its file name or directly if it is in the config `baseUrl` :

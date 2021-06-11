@@ -11,19 +11,16 @@ These are the standards that should be used when coding for this project.
  * Versioning: [Semantic Versioning](http://semver.org/)
  * Branch: try to follow some kind of [branching model](http://nvie.com/posts/a-successful-git-branching-model/) 
 
-These standards are enforced using Continuous Integration with [travis-ci](https://travis-ci.org): builds using [node](http://nodejs.org/) (see `.travis.yml`) and [yarn](https://classic.yarnpkg.com). Travis executes `yarn install` that reads the `package.json` file and then runs `yarn run test`. This test target is configured to run a task runner called [Grunt](http://gruntjs.com/) which is configured with the `Gruntfile.js` file. The result will be pushed to the gh-pages branch using the script described [here](http://sleepycoders.blogspot.se/2013/03/sharing-travis-ci-generated-files.html) (note, to encrypt the github token you need to install travis). For windows, see [rubyinstaller](http://rubyinstaller.org/downloads/), download the ruby installer and the dev kit (install it with `ruby dk.rb init` and `ruby dk.rb install`). In turn, Grunt will run:
-  * [grunt-karma](https://www.npmjs.org/package/grunt-karma) that allows to run qunit tests using a headless browser such a Google Chrome
-  * [grunt-eslint](https://www.npmjs.org/package/grunt-eslint) that lints the code
-  * [grunt-contrib-concat](https://www.npmjs.org/package/grunt-contrib-concat) that concatenates a list of files together
-  * [grunt-contrib-uglify](https://www.npmjs.org/package/grunt-contrib-uglify) that minifies the code
-  * [grunt-jsdoc](https://www.npmjs.org/package/grunt-jsdoc) that creates documentation
+These standards are enforced using Continuous Integration with [github-actions](https://github.com/features/actions): builds using [node](http://nodejs.org/) (see `.github/workflows/nodejs-ci.yml`) and [yarn](https://classic.yarnpkg.com). The CI basically executes `yarn install` that reads the `package.json` file and then runs `yarn run test`. This test target is configured to run a task runner called [Grunt](http://gruntjs.com/) which is configured with the `Gruntfile.js` file. The `package.json` file contains shortcuts to grunt scripts:
+  * `yarn run test` -> [grunt-karma](https://www.npmjs.org/package/grunt-karma) that allows to run qunit tests using a headless browser such a Google Chrome
+  * `yarn run lint` -> [grunt-eslint](https://www.npmjs.org/package/grunt-eslint) that lints the code
+  * `yarn run build` -> [grunt-contrib-concat](https://www.npmjs.org/package/grunt-contrib-concat) that concatenates a list of files together and [grunt-contrib-uglify](https://www.npmjs.org/package/grunt-contrib-uglify) that minifies the code
 
 Others
  * Icons: firefox-os [styleguide](http://www.mozilla.org/en-US/styleguide/products/firefox-os/icons/)
 
 ## Services
- * Github ([status](https://status.github.com/))
- * [Travis](https://travis-ci.com) ([status](http://status.travis-ci.com/)): continuous integration, [dwv page](https://travis-ci.org/ivmartel/dwv)
+ * Github ([status](https://status.github.com/)), [build status](https://github.com/ivmartel/dwv/actions)
  * [Code Climate](https://codeclimate.com) ([status](http://status.codeclimate.com/)): code review + test coverage + lint, [dwv page](https://codeclimate.com/github/ivmartel/dwv)
  * [David-dm](https://david-dm.org/): dependency up to date checker, [dwv page](https://david-dm.org/ivmartel/dwv)
  * [Coveralls](https://coveralls.io/) ([status](http://status.coveralls.io/)): test coverage, [dwv page](https://coveralls.io/github/ivmartel/dwv)
