@@ -1,4 +1,4 @@
-/*! dwv 0.29.0 2021-06-03 18:22:16 */
+/*! dwv 0.29.1 2021-06-11 17:43:54 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -207,6 +207,7 @@ dwv.App = function () {
 
   /**
    * Get the layer controller.
+   * The controller is available after the first loaded item.
    *
    * @returns {object} The controller.
    */
@@ -328,11 +329,6 @@ dwv.App = function () {
     loadController.onloadend = onloadend;
     loadController.onerror = onerror;
     loadController.onabort = onabort;
-
-    // create layer container
-    // warn: needs the DOM to be loaded...
-    layerController =
-      new dwv.LayerController(self.getElement('layerContainer'));
 
     // create data controller
     dataController = new dwv.DataController();
@@ -930,6 +926,12 @@ dwv.App = function () {
     // adapt context
     if (event.loadtype === 'image') {
       if (isFirstLoadItem) {
+        // create layer controller if not done yet
+        // warn: needs a loaded DOM
+        if (!layerController) {
+          layerController =
+            new dwv.LayerController(self.getElement('layerContainer'));
+        }
         // initialise or add view
         var dataIndex = dataController.getCurrentIndex();
         var data = dataController.get(dataIndex);
@@ -2045,7 +2047,7 @@ dwv.LayerController = function (containerDiv) {
     // draw layer
     var layer = new dwv.gui.DrawLayer(div);
     // set z-index: above view + last on top
-    layer.setZIndex(50 + activeDrawLayerIndex);
+    layer.setZIndex(10 + activeDrawLayerIndex);
     // add layer
     layers.push(layer);
     // return
@@ -4290,7 +4292,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.29.0';
+  return '0.29.1';
 };
 
 /**

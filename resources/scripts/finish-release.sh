@@ -53,7 +53,7 @@ then
    usage
 fi
 
-infoEcho "Finishing release for '$releaseVersion' with next version '$nextVersion'..."
+info "Finishing release for '$releaseVersion' with next version '$nextVersion'..."
 
 ###################
 if [ $step -eq 1 ]
