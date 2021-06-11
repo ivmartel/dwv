@@ -1,99 +1,127 @@
 #!/bin/bash
 #Script to prepare a release (finish it with finish-release).
 
-helpFunction()
-{
+# exit when any command fails
+set -e
+
+# print usage information
+usage() {
   echo ""
   echo "Usage: $0 -r releaseVersion -p previousVersion"
   echo -e "  -r The release version, format 'm.n.p'"
   echo -e "  -p The previous version for issue gathering in changelog, format 'm.n.p'"
+  echo -e "  -s The step at which to start (optional, [1,4])"
   echo -e "Warning: the command needs to be run from the root of the repository."
   echo -e "Example:"
   echo -e "> prep-release -r 0.28.0 -p 0.27.0"
   echo ""
   exit 1 # Exit script after printing help
 }
+# print error message (red)
+error() {
+  echo -e "\033[31;31m[prep] $1\033[0m"
+}
+# print info message (blue)
+info() {
+  echo -e "\033[34;34m[prep] $1\033[0m"
+}
 
-while getopts "r:p:h" opt
+# script step
+step=1
+
+# input options
+while getopts "r:p:s:h" opt
 do
    case "$opt" in
       r ) releaseVersion="$OPTARG" ;;
       p ) prevVersion="$OPTARG" ;;
-      h ) helpFunction ;;
-      ? ) helpFunction ;; # Print helpFunction in case parameter is non-existent
+      s ) step="$OPTARG" ;;
+      h ) usage ;;
+      ? ) usage ;; # Print usage in case parameter is non-existent
    esac
 done
 
-# Print helpFunction in case parameters are empty
-if [ -z "$releaseVersion" ] || [ -z "$prevVersion" ]
+# check option content
+if [ -z "$releaseVersion" ]
 then
-   echo "Some or all of the parameters are empty.";
-   helpFunction
+   error "Empty release version";
+   usage
+fi
+if [ -z "$prevVersion" ]
+then
+   error "Empty previous version";
+   usage
 fi
 
-echo "Preparing release for '$releaseVersion' with previous version '$prevVersion'..."
+info "Preparing release for '$releaseVersion' with previous version '$prevVersion'..."
 
 ###################
+if [ $step -eq 1 ]
+then
+  info "(1/4) create release branch"
 
-echo "-------------------------"
-echo "1/4 create release branch"
-echo "-------------------------"
-
-git checkout develop
-git pull
-releaseBranch="v${releaseVersion}"
-git checkout -b $releaseBranch
-
-###################
-
-echo "----------------------------------"
-echo "2/4 update version number in files"
-echo "----------------------------------"
-
-a0="  \"version\": \"[0-9]+\.[0-9]+\.[0-9]+-beta\","
-b0="  \"version\": \"${releaseVersion}\","
-sed -i -r "s/${a0}/${b0}/g" package.json
-a1="  return '[0-9]+\.[0-9]+\.[0-9]+-beta';"
-b1="  return '${releaseVersion}';"
-sed -i -r "s/${a1}/${b1}/g" src/dicom/dicomParser.js
+  git checkout develop
+  git pull
+  releaseBranch="v${releaseVersion}"
+  git checkout -b $releaseBranch
+  
+  ((step++))
+fi
 
 ###################
+if [ $step -eq 2 ]
+then
+  info "(2/4) update version number in files"
 
-echo "----------------"
-echo "3/4 create build"
-echo "----------------"
-
-yarn run build
-# copy build to dist
-cp build/dist/*.js dist
-
-###################
-
-echo "--------------------"
-echo "4/4 update changelog"
-echo "--------------------"
-
-# gren wants an existing tag...
-git tag v$releaseVersion
-git push origin --tags
-# run gren
-yarn run gren changelog --generate --override --changelog-filename=new.md \
-  --tags=v$prevVersion..v$releaseVersion --milestone-match=$releaseVersion 
-# delete tag
-git tag -d v$releaseVersion
-git push --delete origin v$releaseVersion
-# line: separator between releases
-echo -en '\n---\n' > line.md
-# old: changelog with no title
-tail -n +2 changelog.md > old.md
-# concat new + line + old
-cat new.md line.md old.md > changelog.md
-# clean up
-rm new.md
-rm line.md
-rm old.md
+  a0="  \"version\": \"[0-9]+\.[0-9]+\.[0-9]+-beta\","
+  b0="  \"version\": \"${releaseVersion}\","
+  sed -i -r "s/${a0}/${b0}/g" package.json
+  a1="  return '[0-9]+\.[0-9]+\.[0-9]+-beta';"
+  b1="  return '${releaseVersion}';"
+  sed -i -r "s/${a1}/${b1}/g" src/dicom/dicomParser.js
+  
+  ((step++))
+fi
 
 ###################
+if [ $step -eq 3 ]
+then
+  info "(3/4) create build"
 
-echo "-----------------------"
-echo "Done preparing release."
+  yarn run build
+  # copy build to dist
+  cp build/dist/*.js dist
+  
+  ((step++))
+fi
+
+###################
+if [ $step -eq 4 ]
+then
+  info "(4/4) update changelog"
+
+  # gren wants an existing tag...
+  git tag v$releaseVersion
+  git push origin --tags
+  # run gren
+  yarn run gren changelog --generate --override --changelog-filename=new.md \
+    --tags=v$prevVersion..v$releaseVersion --milestone-match=$releaseVersion 
+  # delete tag
+  git tag -d v$releaseVersion
+  git push --delete origin v$releaseVersion
+  # line: separator between releases
+  echo -en '\n---\n' > line.md
+  # old: changelog with no title
+  tail -n +2 changelog.md > old.md
+  # concat new + line + old
+  cat new.md line.md old.md > changelog.md
+  # clean up
+  rm new.md
+  rm line.md
+  rm old.md
+  
+  ((step++))
+fi
+
+###################
+info "Done preparing release!"
