@@ -221,7 +221,7 @@ dwv.LayerController = function (containerDiv) {
     // draw layer
     var layer = new dwv.gui.DrawLayer(div);
     // set z-index: above view + last on top
-    layer.setZIndex(50 + activeDrawLayerIndex);
+    layer.setZIndex(10 + activeDrawLayerIndex);
     // add layer
     layers.push(layer);
     // return
