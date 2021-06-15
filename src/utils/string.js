@@ -185,17 +185,26 @@ dwv.utils.getRootPath = function (path) {
 };
 
 /**
- * Get a file extension
+ * Get a file extension: anything after the last dot.
+ * File name starting with a dot are discarded.
+ * Extensions are expected to contain at least one letter.
  *
  * @param {string} filePath The file path containing the file name.
  * @returns {string} The lower case file extension or null for none.
  */
 dwv.utils.getFileExtension = function (filePath) {
   var ext = null;
-  if (typeof filePath !== 'undefined' && filePath) {
-    var pathSplit = filePath.split('.');
+  if (typeof filePath !== 'undefined' &&
+    filePath !== null &&
+    filePath[0] !== '.') {
+    var pathSplit = filePath.toLowerCase().split('.');
     if (pathSplit.length !== 1) {
-      ext = pathSplit.pop().toLowerCase();
+      ext = pathSplit.pop();
+      // extension should contain at least one letter and no slash
+      var regExp = /[a-z]/;
+      if (!regExp.test(ext) || ext.includes('/')) {
+        ext = null;
+      }
     }
   }
   return ext;

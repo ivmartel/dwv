@@ -190,6 +190,8 @@ QUnit.test('Test getFileExtension.', function (assert) {
   assert.equal(dwv.utils.getFileExtension(null), null, 'getFileExtension null');
   // empty
   assert.equal(dwv.utils.getFileExtension(''), null, 'getFileExtension empty');
+  // dot
+  assert.equal(dwv.utils.getFileExtension('.'), null, 'getFileExtension dot');
   // no extension
   assert.equal(
     dwv.utils.getFileExtension('filename'),
@@ -198,17 +200,32 @@ QUnit.test('Test getFileExtension.', function (assert) {
   var test00 = 'image.png';
   var res00 = 'png';
   assert.equal(
-    dwv.utils.getFileExtension(test00), res00, 'getFileExtension 00');
+    dwv.utils.getFileExtension(test00), res00, 'getFileExtension 00: simple');
   // test #01
   var test01 = 'IMAGE.PNG';
   var res01 = 'png';
   assert.equal(
-    dwv.utils.getFileExtension(test01), res01, 'getFileExtension 01');
+    dwv.utils.getFileExtension(test01), res01,
+    'getFileExtension 01: upper case');
   // test #02
   var test02 = 'image.10.png';
   var res02 = 'png';
   assert.equal(
-    dwv.utils.getFileExtension(test02), res02, 'getFileExtension 02');
+    dwv.utils.getFileExtension(test02), res02,
+    'getFileExtension 02: multiple dots');
+  // test #03
+  var test03 = '.profile';
+  var res03 = null;
+  assert.equal(
+    dwv.utils.getFileExtension(test03), res03,
+    'getFileExtension 04: start with dot');
+  // test #04
+  var test04 = 'MR.1.3.12.123456.123456789';
+  var res04 = null;
+  assert.equal(
+    dwv.utils.getFileExtension(test04), res04,
+    'getFileExtension 03: dots and numbers');
+
   // test #10
   var test10 = '/path/to/file/image.png';
   var res10 = 'png';
@@ -219,4 +236,9 @@ QUnit.test('Test getFileExtension.', function (assert) {
   var res11 = 'png';
   assert.equal(
     dwv.utils.getFileExtension(test11), res11, 'getFileExtension 11');
+  // test #12
+  var test12 = 'domain.org/path/to/file/IMAGE';
+  var res12 = null;
+  assert.equal(
+    dwv.utils.getFileExtension(test12), res12, 'getFileExtension 12');
 });
