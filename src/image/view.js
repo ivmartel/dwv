@@ -8,8 +8,6 @@ dwv.image = dwv.image || {};
  * @type {Array}
  */
 dwv.image.viewEventNames = [
-  'slicechange',
-  'framechange',
   'wlwidthchange',
   'wlcenterchange',
   'wlpresetadd',
@@ -73,13 +71,14 @@ dwv.image.View = function (image) {
    * @type {object}
    */
   var currentPosition = null;
+
   /**
-   * Current frame. Zero based.
+   * Listener handler.
    *
+   * @type {object}
    * @private
-   * @type {number}
    */
-  var currentFrame = null;
+  var listenerHandler = new dwv.utils.ListenerHandler();
 
   /**
    * Get the associated image.
@@ -103,8 +102,10 @@ dwv.image.View = function (image) {
    */
   this.setInitialPosition = function () {
     var silent = true;
-    this.setCurrentPosition({i: 0, j: 0, k: 0}, silent);
-    this.setCurrentFrame(0, silent);
+    this.setCurrentPosition(
+      dwv.math.getZeroIndex(image.getGeometry().getSize().length()),
+      silent
+    );
   };
 
   /**
@@ -133,11 +134,11 @@ dwv.image.View = function (image) {
    * @fires dwv.image.View#wlcenterchange
    */
   this.getCurrentWindowLut = function (rsi) {
-    // check position (also sets frame)
+    // check position
     if (!this.getCurrentPosition()) {
       this.setInitialPosition();
     }
-    var sliceNumber = this.getCurrentPosition().k;
+    var sliceNumber = this.getCurrentPosition().get(2);
     // use current rsi if not provided
     if (typeof rsi === 'undefined') {
       rsi = image.getRescaleSlopeAndIntercept(sliceNumber);
@@ -184,7 +185,7 @@ dwv.image.View = function (image) {
       wlut.update();
       // fire change event
       if (!lutWl || lutWl.getWidth() !== wl.getWidth()) {
-        this.fireEvent({
+        fireEvent({
           type: 'wlwidthchange',
           value: [wl.getWidth()],
           wc: wl.getCenter(),
@@ -193,7 +194,7 @@ dwv.image.View = function (image) {
         });
       }
       if (!lutWl || lutWl.getCenter() !== wl.getCenter()) {
-        this.fireEvent({
+        fireEvent({
           type: 'wlcenterchange',
           value: [wl.getCenter()],
           wc: wl.getCenter(),
@@ -282,7 +283,7 @@ dwv.image.View = function (image) {
          * @type {object}
          * @property {string} name The name of the preset.
          */
-        this.fireEvent({
+        fireEvent({
           type: 'wlpresetadd',
           name: key
         });
@@ -315,7 +316,7 @@ dwv.image.View = function (image) {
      * @property {number} wc The new window center value.
      * @property {number} ww The new window wdth value.
      */
-    this.fireEvent({
+    fireEvent({
       type: 'colourchange',
       wc: this.getCurrentWindowLut().getWindowLevel().getCenter(),
       ww: this.getCurrentWindowLut().getWindowLevel().getWidth()
@@ -328,157 +329,70 @@ dwv.image.View = function (image) {
    * @returns {object} The current position.
    */
   this.getCurrentPosition = function () {
-    // return a clone to avoid reference problems
-    return currentPosition ? {
-      i: currentPosition.i,
-      j: currentPosition.j,
-      k: currentPosition.k
-    } : null;
+    return currentPosition;
   };
+
   /**
    * Set the current position.
    *
-   * @param {object} pos The current position.
-   * @param {boolean} silent If true, does not fire a slicechange event.
+   * @param {object} posIndex The current position.
+   * @param {boolean} silent Flag to fire event or not.
    * @returns {boolean} False if not in bounds
-   * @fires dwv.image.View#slicechange
    * @fires dwv.image.View#positionchange
    */
-  this.setCurrentPosition = function (pos, silent) {
+  this.setCurrentPosition = function (posIndex, silent) {
     // check input
     if (typeof silent === 'undefined') {
       silent = false;
     }
 
     // check if possible
-    if (!image.getGeometry().getSize().isInBounds(pos.i, pos.j, pos.k)) {
+    if (!image.getGeometry().getSize().isInBounds(posIndex)) {
       return false;
     }
-    // check if new
-    var equalPos = function (pos1, pos2) {
-      return pos2 !== null &&
-        pos1.i === pos2.i &&
-        pos1.j === pos2.j &&
-        pos1.k === pos2.k;
-    };
-    var isNew = !equalPos(pos, currentPosition);
+
+    var isNew = !currentPosition || !currentPosition.equals(posIndex);
 
     if (isNew) {
-      var isNewSlice = currentPosition
-        ? pos.k !== currentPosition.k : true;
-      // assign
-      currentPosition = pos;
+      var diffDims = null;
+      if (currentPosition) {
+        diffDims = currentPosition.differentDims(posIndex);
+      } else {
+        diffDims = [0, 1, 2, 3];
+      }
 
-      // fire a 'positionchange' event
-      if (image.getPhotometricInterpretation().match(/MONOCHROME/) !== null) {
-        var pixValue = image.getRescaledValue(
-          pos.i, pos.j, pos.k, this.getCurrentFrame());
+      // assign
+      currentPosition = posIndex;
+
+      if (!silent) {
         /**
          * Position change event.
          *
          * @event dwv.image.View#positionchange
          * @type {object}
-         * @property {Array} value The changed value.
-         * @property {number} i The new column position
-         * @property {number} j The new row position
-         * @property {number} k The new slice position
-         * @property {object} pixelValue The image value at the new position,
-         *   (can be undefined).
+         * @property {Array} value The changed value as [index, pixelValue].
+         * @property {Array} diffDims An array of modified indices.
          */
-        this.fireEvent({
+        var posEvent = {
           type: 'positionchange',
-          value: [pos.i, pos.j, pos.k, pixValue],
-          i: pos.i,
-          j: pos.j,
-          k: pos.k,
-          pixelValue: pixValue
-        });
-      } else {
-        this.fireEvent({
-          type: 'positionchange',
-          value: [pos.i, pos.j, pos.k],
-          i: pos.i,
-          j: pos.j,
-          k: pos.k
-        });
-      }
-
-      // fire a slice change event (used to trigger redraw)
-      if (!silent && isNewSlice) {
-        /**
-         * Slice change event.
-         *
-         * @event dwv.image.View#slicechange
-         * @type {object}
-         * @property {Array} value The changed value.
-         * @property {object} data Associated event data: the imageUid.
-         */
-        this.fireEvent({
-          type: 'slicechange',
-          value: [currentPosition.k],
+          value: [posIndex.getValues()],
+          diffDims: diffDims,
           data: {
-            imageUid: image.getImageUids()[currentPosition.k]
+            imageUid: image.getImageUid(posIndex)
           }
-        });
+        };
+
+        // add value if possible
+        if (image.canQuantify()) {
+          var pixValue = image.getRescaledValueAtIndex(posIndex);
+          posEvent.value.push(pixValue);
+        }
+
+        // fire
+        fireEvent(posEvent);
       }
     }
 
-    // all good
-    return true;
-  };
-
-  /**
-   * Get the current frame number.
-   *
-   * @returns {number} The current frame number.
-   */
-  this.getCurrentFrame = function () {
-    return currentFrame;
-  };
-
-  /**
-   * Set the current frame number.
-   *
-   * @param {number} frame The current frame number.
-   * @param {boolean} silent Flag to launch events with skipGenerate.
-   * @returns {boolean} False if not in bounds
-   * @fires dwv.image.View#framechange
-   */
-  this.setCurrentFrame = function (frame, silent) {
-    // check input
-    if (typeof silent === 'undefined') {
-      silent = false;
-    }
-
-    // check if possible
-    if (frame < 0 || frame >= image.getNumberOfFrames()) {
-      return false;
-    }
-    // check if new
-    var isNew = currentFrame !== frame;
-
-    if (isNew) {
-      // assign
-      currentFrame = frame;
-      // fire event for multi frame data
-      if (image.getNumberOfFrames() !== 1) {
-        /**
-         * Frame change event.
-         *
-         * @event dwv.image.View#framechange
-         * @type {object}
-         * @property {Array} value The changed value.
-         * @property {number} frame The new frame number
-         * @property {boolean} skipGenerate Flag to skip view generation.
-         */
-        this.fireEvent({
-          type: 'framechange',
-          value: [currentFrame],
-          frame: currentFrame,
-          skipGenerate: silent
-        });
-      }
-    }
     // all good
     return true;
   };
@@ -533,7 +447,7 @@ dwv.image.View = function (image) {
          * @property {number} ww The new window wdth value.
          * @property {boolean} skipGenerate Flag to skip view generation.
          */
-        this.fireEvent({
+        fireEvent({
           type: 'wlwidthchange',
           value: [width],
           wc: center,
@@ -553,7 +467,7 @@ dwv.image.View = function (image) {
          * @property {number} ww The new window wdth value.
          * @property {boolean} skipGenerate Flag to skip view generation.
          */
-        this.fireEvent({
+        fireEvent({
           type: 'wlcenterchange',
           value: [center],
           wc: center,
@@ -582,7 +496,7 @@ dwv.image.View = function (image) {
     // special 'perslice' case
     if (typeof preset.perslice !== 'undefined' &&
       preset.perslice === true) {
-      preset = {wl: preset.wl[this.getCurrentPosition().k]};
+      preset = {wl: preset.wl[this.getCurrentPosition().get(2)]};
     }
     // set w/l
     this.setWindowLevel(
@@ -615,28 +529,36 @@ dwv.image.View = function (image) {
   };
 
   /**
-   * View listeners
+   * Add an event listener to this class.
    *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type, will be called with the fired event.
+   */
+  this.addEventListener = function (type, callback) {
+    listenerHandler.add(type, callback);
+  };
+
+  /**
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type.
+   */
+  this.removeEventListener = function (type, callback) {
+    listenerHandler.remove(type, callback);
+  };
+
+  /**
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
    * @private
-   * @type {object}
    */
-  var listeners = {};
-  /**
-   * Get the view listeners.
-   *
-   * @returns {object} The view listeners.
-   */
-  this.getListeners = function () {
-    return listeners;
-  };
-  /**
-   * Set the view listeners.
-   *
-   * @param {object} list The view listeners.
-   */
-  this.setListeners = function (list) {
-    listeners = list;
-  };
+  function fireEvent(event) {
+    listenerHandler.fireEvent(event);
+  }
 };
 
 /**
@@ -676,14 +598,13 @@ dwv.image.View.prototype.setWindowLevelMinMax = function () {
  * @param {Array} array The array to fill in.
  */
 dwv.image.View.prototype.generateImageData = function (array) {
-  // check position (also sets frame)
+  // check position
   if (!this.getCurrentPosition()) {
     this.setInitialPosition();
   }
-  var position = this.getCurrentPosition();
-  var frame = this.getCurrentFrame();
   var image = this.getImage();
-  var iterator = dwv.image.getSliceIterator(this.getImage(), position.k, frame);
+  var position = this.getCurrentPosition();
+  var iterator = dwv.image.getSliceIterator(image, position);
 
   var photoInterpretation = image.getPhotometricInterpretation();
   switch (photoInterpretation) {
@@ -724,52 +645,5 @@ dwv.image.View.prototype.generateImageData = function (array) {
   default:
     throw new Error(
       'Unsupported photometric interpretation: ' + photoInterpretation);
-  }
-};
-
-/**
- * Add an event listener on the view.
- *
- * @param {string} type The event type.
- * @param {object} listener The method associated with the provided event type.
- */
-dwv.image.View.prototype.addEventListener = function (type, listener) {
-  var listeners = this.getListeners();
-  if (!listeners[type]) {
-    listeners[type] = [];
-  }
-  listeners[type].push(listener);
-};
-
-/**
- * Remove an event listener on the view.
- *
- * @param {string} type The event type.
- * @param {object} listener The method associated with the provided event type.
- */
-dwv.image.View.prototype.removeEventListener = function (type, listener) {
-  var listeners = this.getListeners();
-  if (!listeners[type]) {
-    return;
-  }
-  for (var i = 0; i < listeners[type].length; ++i) {
-    if (listeners[type][i] === listener) {
-      listeners[type].splice(i, 1);
-    }
-  }
-};
-
-/**
- * Fire an event: call all associated listeners.
- *
- * @param {object} event The event to fire.
- */
-dwv.image.View.prototype.fireEvent = function (event) {
-  var listeners = this.getListeners();
-  if (!listeners[event.type]) {
-    return;
-  }
-  for (var i = 0; i < listeners[event.type].length; ++i) {
-    listeners[event.type][i](event);
   }
 };

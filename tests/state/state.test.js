@@ -69,7 +69,7 @@ dwv.test.checkStateHeader = function (jsonData, version, assert) {
     version: version,
     'window-center': 441,
     'window-width': 911,
-    position: {i: 0, j: 0, k: 0}
+    position: [0, 0, 0]
   };
   if (parseFloat(version) <= 0.3) {
     headerData.scale = 1;
@@ -109,7 +109,7 @@ dwv.test.checkDrawings = function (drawings, details, version, type, assert) {
       'Layer first level is a position group.');
     assert.equal(
       layerKid.attrs.id,
-      'slice-0_frame-0',
+      '#2-0',
       'Position group has the proper id.');
 
     // third level: shape group(s)
@@ -421,7 +421,7 @@ dwv.test.checkRulerDrawings = function (layerKids, details, version, assert) {
       'Layer first level is a position group.');
     assert.equal(
       layerKid.attrs.id,
-      'slice-' + (i + 1) + '_frame-0',
+      '#2-' + (i + 1),
       'Position group has the proper id.');
 
     // third level: shape group(s)
@@ -1201,4 +1201,77 @@ QUnit.test('Test read v0.4 state: rectangle.', function (assert) {
  */
 QUnit.test('Test read v0.4 state: ruler multi-slice.', function (assert) {
   dwv.test.testState('0.4', 'ruler_multi-slice', assert);
+});
+
+/**
+ * Tests for {@link dwv.State} v0.5 containing an arrow.
+ *
+ * @function module:tests/state~testV05Arrow
+ */
+QUnit.test('Test read v0.5 state: arrow.', function (assert) {
+  dwv.test.testState('0.5', 'arrow', assert);
+});
+
+/**
+ * Tests for {@link dwv.State} v0.5 containing a ruler.
+ *
+ * @function module:tests/state~testV05Ruler
+ */
+QUnit.test('Test read v0.5 state: ruler.', function (assert) {
+  dwv.test.testState('0.5', 'ruler', assert);
+});
+
+/**
+ * Tests for {@link dwv.State} v0.5 containing a roi.
+ *
+ * @function module:tests/state~testV05Roi
+ */
+QUnit.test('Test read v0.5 state: roi.', function (assert) {
+  dwv.test.testState('0.5', 'roi', assert);
+});
+
+/**
+ * Tests for {@link dwv.State} v0.5 containing a hand draw.
+ *
+ * @function module:tests/state~testV05Hand
+ */
+QUnit.test('Test read v0.5 state: hand.', function (assert) {
+  dwv.test.testState('0.5', 'hand', assert);
+});
+
+/**
+ * Tests for {@link dwv.State} v0.5 containing an ellipse.
+ *
+ * @function module:tests/state~testV05Ellipse
+ */
+QUnit.test('Test read v0.5 state: ellipse.', function (assert) {
+  dwv.test.testState('0.5', 'ellipse', assert);
+});
+
+/**
+ * Tests for {@link dwv.State} v0.5 containing a protractor.
+ *
+ * @function module:tests/state~testV05Protractor
+ */
+QUnit.test('Test read v0.5 state: protractor.', function (assert) {
+  dwv.test.testState('0.5', 'protractor', assert);
+});
+
+
+/**
+ * Tests for {@link dwv.State} v0.5 containing a rectangle.
+ *
+ * @function module:tests/state~testV05Rectangle
+ */
+QUnit.test('Test read v0.5 state: rectangle.', function (assert) {
+  dwv.test.testState('0.5', 'rectangle', assert);
+});
+
+/**
+ * Tests for {@link dwv.State} v0.5 containing a multi slice ruler.
+ *
+ * @function module:tests/state~testV05MultiSliceRuler
+ */
+QUnit.test('Test read v0.5 state: ruler multi-slice.', function (assert) {
+  dwv.test.testState('0.5', 'ruler_multi-slice', assert);
 });

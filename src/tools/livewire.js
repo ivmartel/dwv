@@ -87,7 +87,7 @@ dwv.tool.Livewire = function (app) {
    * @private
    */
   function clearParentPoints() {
-    var nrows = app.getImage().getGeometry().getSize().getNumberOfRows();
+    var nrows = app.getImage().getGeometry().getSize().get(1);
     for (var i = 0; i < nrows; ++i) {
       parentPoints[i] = [];
     }
@@ -324,8 +324,8 @@ dwv.tool.Livewire = function (app) {
       //scissors = new dwv.math.Scissors();
       var size = app.getImage().getGeometry().getSize();
       scissors.setDimensions(
-        size.getNumberOfColumns(),
-        size.getNumberOfRows());
+        size.get(0),
+        size.get(1));
       scissors.setData(viewLayer.getImageData().data);
 
       // init with the app window scale

@@ -70,30 +70,14 @@ dwv.App = function () {
   };
 
   /**
-   * Is the data mono-slice?
-   *
-   * @returns {boolean} True if the data only contains one slice.
-   */
-  this.isMonoSliceData = function () {
-    return loadController.isMonoSliceData();
-  };
-  /**
-   * Is the data mono-frame?
-   *
-   * @returns {boolean} True if the data only contains one frame.
-   */
-  this.isMonoFrameData = function () {
-    var viewLayer = layerController.getActiveViewLayer();
-    var controller = viewLayer.getViewController();
-    return controller.isMonoFrameData();
-  };
-  /**
    * Can the data be scrolled?
    *
-   * @returns {boolean} True if the data has more than one slice or frame.
+   * @returns {boolean} True if the data has a third dimension greater than one.
    */
   this.canScroll = function () {
-    return !this.isMonoSliceData() || !this.isMonoFrameData();
+    var viewLayer = layerController.getActiveViewLayer();
+    var controller = viewLayer.getViewController();
+    return controller.canScroll();
   };
 
   /**
@@ -462,7 +446,7 @@ dwv.App = function () {
   /**
    * Get the list of drawing display details.
    *
-   * @returns {object} The list of draw details including id, slice, frame...
+   * @returns {object} The list of draw details including id, position...
    */
   this.getDrawDisplayDetails = function () {
     var drawController =
@@ -495,9 +479,7 @@ dwv.App = function () {
     drawController.setDrawings(
       drawings, drawingsDetails, fireEvent, this.addToUndoStack);
 
-    drawController.activateDrawLayer(
-      viewController.getCurrentPosition(),
-      viewController.getCurrentFrame());
+    drawController.activateDrawLayer(viewController.getCurrentPosition());
   };
   /**
    * Update a drawing from its details.
@@ -585,10 +567,10 @@ dwv.App = function () {
    * Key down event handler example.
    * - CRTL-Z: undo
    * - CRTL-Y: redo
-   * - CRTL-ARROW_LEFT: next frame
-   * - CRTL-ARROW_UP: next slice
-   * - CRTL-ARROW_RIGHT: previous frame
-   * - CRTL-ARROW_DOWN: previous slice
+   * - CRTL-ARROW_LEFT: next element on fourth dim
+   * - CRTL-ARROW_UP: next element on third dim
+   * - CRTL-ARROW_RIGHT: previous element on fourth dim
+   * - CRTL-ARROW_DOWN: previous element on third dim
    *
    * @param {object} event The key down event.
    * @fires dwv.tool.UndoStack#undo
@@ -597,19 +579,28 @@ dwv.App = function () {
   this.defaultOnKeydown = function (event) {
     var viewController =
       layerController.getActiveViewLayer().getViewController();
+    var size = self.getImage().getGeometry().getSize();
     if (event.ctrlKey) {
       if (event.keyCode === 37) { // crtl-arrow-left
         event.preventDefault();
-        viewController.decrementFrameNb();
+        if (size.canScroll(3)) {
+          viewController.decrementIndex(3);
+        }
       } else if (event.keyCode === 38) { // crtl-arrow-up
         event.preventDefault();
-        viewController.incrementSliceNb();
+        if (size.canScroll(2)) {
+          viewController.incrementIndex(2);
+        }
       } else if (event.keyCode === 39) { // crtl-arrow-right
         event.preventDefault();
-        viewController.incrementFrameNb();
+        if (size.canScroll(3)) {
+          viewController.incrementIndex(3);
+        }
       } else if (event.keyCode === 40) { // crtl-arrow-down
         event.preventDefault();
-        viewController.decrementSliceNb();
+        if (size.canScroll(2)) {
+          viewController.decrementIndex(2);
+        }
       } else if (event.keyCode === 89) { // crtl-y
         undoStack.redo();
       } else if (event.keyCode === 90) { // crtl-z
@@ -883,12 +874,8 @@ dwv.App = function () {
         var controller =
           layerController.getActiveViewLayer().getViewController();
         var currentPosition = controller.getCurrentPosition();
-        if (sliceNb <= currentPosition.k) {
-          controller.setCurrentPosition({
-            i: currentPosition.i,
-            j: currentPosition.j,
-            k: currentPosition.k + 1
-          }, true);
+        if (sliceNb <= currentPosition.get(2)) {
+          controller.incrementIndex(2);
         }
       }
 

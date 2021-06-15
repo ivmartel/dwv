@@ -16,9 +16,8 @@
         {"value": "wlwidthchange", "pos": "br", "format": "窗宽: {v0}"},
         {"value": "zoomchange", "pos": "br", "format": "Z: {v0}", "precision": "3"},
         {"value": "offsetchange", "pos": "br", "format": "Off: {v0},{v1}", "precision": "round"},
-        {"value": "positionchange", "pos": "br", "format": "位置: {v0},{v1},{v2}"},
-        {"value": "framechange", "pos": "br", "format": "频谱: {v0}"},
-        {"value": "positionchange", "pos": "br", "format": "值: {v3}"}
+        {"value": "positionchange", "pos": "br", "format": "位置: {v0}"},
+        {"value": "positionchange", "pos": "br", "format": "值: {v1}"}
     ],
     "DOM": [
         {"tags": ["fileName"], "pos": "tl"},
@@ -30,10 +29,9 @@
         {"value": "wlcenterchange", "pos": "br", "format": "窗位: {v0}"},
         {"value": "wlwidthchange", "pos": "br", "format": "窗宽: {v0}"},
         {"value": "zoomchange", "pos": "br", "format": "Z: {v0}"},
-        {"value": "offsetchange", "pos": "br", "format": "Off: {v0},{v1}", "precision": "3"},
-        {"value": "positionchange", "pos": "br", "format": "位置: {v0},{v1},{v2}", "precision": "round"},
-        {"value": "framechange", "pos": "br", "format": "频谱: {v0}"},
-        {"value": "positionchange", "pos": "br", "format": "值: {v3}"}
+        {"value": "offsetchange", "pos": "br", "format": "Off: {v0},{v1}", "precision": "round"},
+        {"value": "positionchange", "pos": "br", "format": "位置: {v0}"},
+        {"value": "positionchange", "pos": "br", "format": "值: {v1}"}
     ],
     "*": [
         {"tags": ["x00100020"], "pos": "tl"},
@@ -55,8 +53,7 @@
         {"value": "wlwidthchange", "pos": "br", "format": "窗宽: {v0}"},
         {"value": "zoomchange", "pos": "br", "format": "Z: {v0}", "precision": "3"},
         {"value": "offsetchange", "pos": "br", "format": "Off: {v0},{v1}", "precision": "round"},
-        {"value": "positionchange", "pos": "br", "format": "位置: {v0},{v1},{v2}"},
-        {"value": "framechange", "pos": "br", "format": "频谱: {v0}"},
-        {"value": "positionchange", "pos": "br", "format": "值: {v3}"}
+        {"value": "positionchange", "pos": "br", "format": "位置: {v0}"},
+        {"value": "positionchange", "pos": "br", "format": "值: {v1}"}
     ]
 }

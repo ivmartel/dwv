@@ -49,7 +49,9 @@ dcmb.BenchFunctionRunner = function () {
     // avoid creating functions in loops
     var getFunc = function (f, a) {
       return function () {
-        f(a);
+        // run on a clone of the input array
+        // (in case it is modified...)
+        f(a.slice());
       };
     };
     // add parsers to suite

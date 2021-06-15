@@ -3,47 +3,91 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
- * 2D/3D Size class.
+ * Immutable Size class.
+ * Warning: the input array is NOT cloned, modifying it will
+ *  modify the index values.
  *
  * @class
- * @param {number} numberOfColumns The number of columns.
- * @param {number} numberOfRows The number of rows.
- * @param {number} numberOfSlices The number of slices.
+ * @param {Array} values The size values.
  */
-dwv.image.Size = function (numberOfColumns, numberOfRows, numberOfSlices) {
-  /**
-   * Get the number of columns.
-   *
-   * @returns {number} The number of columns.
-   */
-  this.getNumberOfColumns = function () {
-    return numberOfColumns;
+dwv.image.Size = function (values) {
+  if (!values || typeof values === 'undefined') {
+    throw new Error('Cannot create size with no values.');
+  }
+  if (values.length === 0) {
+    throw new Error('Cannot create size with empty values.');
+  }
+  var valueCheck = function (val) {
+    return !isNaN(val) && val !== 0;
   };
+  if (!values.every(valueCheck)) {
+    throw new Error('Cannot create size with non number or zero values.');
+  }
+
   /**
-   * Get the number of rows.
+   * Get the size value at the given array index.
    *
-   * @returns {number} The number of rows.
+   * @param {number} i The index to get.
+   * @returns {number} The value.
    */
-  this.getNumberOfRows = function () {
-    return numberOfRows;
+  this.get = function (i) {
+    return values[i];
   };
+
   /**
-   * Get the number of slices.
+   * Get the length of the index.
    *
-   * @returns {number} The number of slices.
+   * @returns {number} The length.
    */
-  this.getNumberOfSlices = function () {
-    return (numberOfSlices || 1.0);
+  this.length = function () {
+    return values.length;
   };
+
+  /**
+   * Get a string representation of the size.
+   *
+   * @returns {string} The Size as a string.
+   */
+  this.toString = function () {
+    return '(' + values.toString() + ')';
+  };
+
+  /**
+   * Get the values of this index.
+   *
+   * @returns {Array} The array of values.
+   */
+  this.getValues = function () {
+    return values.slice();
+  };
+
+}; // Size class
+
+/**
+ * Check if a dimension exists and has more than one element.
+ *
+ * @param {object} dimension The dimension to check.
+ * @returns {boolean} True if scrollable.
+ */
+dwv.image.Size.prototype.canScroll = function (dimension) {
+  return this.length() >= dimension + 1 && this.get(dimension) !== 1;
 };
 
 /**
- * Get the size of a slice.
+ * Get the size of a given dimension.
  *
- * @returns {number} The size of a slice.
+ * @param {number} dimension The dimension.
+ * @returns {number} The size.
  */
-dwv.image.Size.prototype.getSliceSize = function () {
-  return this.getNumberOfColumns() * this.getNumberOfRows();
+dwv.image.Size.prototype.getDimSize = function (dimension) {
+  if (dimension > this.length()) {
+    return null;
+  }
+  var size = 1;
+  for (var i = 0; i < dimension; ++i) {
+    size *= this.get(i);
+  }
+  return size;
 };
 
 /**
@@ -52,7 +96,7 @@ dwv.image.Size.prototype.getSliceSize = function () {
  * @returns {number} The total size.
  */
 dwv.image.Size.prototype.getTotalSize = function () {
-  return this.getSliceSize() * this.getNumberOfSlices();
+  return this.getDimSize(this.length());
 };
 
 /**
@@ -62,38 +106,61 @@ dwv.image.Size.prototype.getTotalSize = function () {
  * @returns {boolean} True if both objects are equal.
  */
 dwv.image.Size.prototype.equals = function (rhs) {
-  return rhs !== null &&
-    this.getNumberOfColumns() === rhs.getNumberOfColumns() &&
-    this.getNumberOfRows() === rhs.getNumberOfRows() &&
-    this.getNumberOfSlices() === rhs.getNumberOfSlices();
-};
-
-/**
- * Check that coordinates are within bounds.
- *
- * @param {number} i The column coordinate.
- * @param {number} j The row coordinate.
- * @param {number} k The slice coordinate.
- * @returns {boolean} True if the given coordinates are within bounds.
- */
-dwv.image.Size.prototype.isInBounds = function (i, j, k) {
-  if (i < 0 || i > this.getNumberOfColumns() - 1 ||
-    j < 0 || j > this.getNumberOfRows() - 1 ||
-    k < 0 || k > this.getNumberOfSlices() - 1) {
+  // check input
+  if (!rhs) {
     return false;
   }
+  // check length
+  var length = this.length();
+  if (length !== rhs.length()) {
+    return false;
+  }
+  // check values
+  for (var i = 0; i < length; ++i) {
+    if (this.get(i) !== rhs.get(i)) {
+      return false;
+    }
+  }
+  // seems ok!
   return true;
 };
 
 /**
- * Get a string representation of the Vector3D.
+ * Check that an index is within bounds.
  *
- * @returns {string} The vector as a string.
+ * @param {object} index The index to check.
+ * @returns {boolean} True if the given coordinates are within bounds.
  */
-dwv.image.Size.prototype.toString = function () {
-  return '(' + this.getNumberOfColumns() +
-    ', ' + this.getNumberOfRows() +
-    ', ' + this.getNumberOfSlices() + ')';
+dwv.image.Size.prototype.isInBounds = function (index) {
+  // check input
+  if (!index) {
+    return false;
+  }
+  // check length
+  var length = this.length();
+  if (length !== index.length()) {
+    return false;
+  }
+  // check values
+  for (var i = 0; i < length; ++i) {
+    if (index.get(i) < 0 || index.get(i) > this.get(i) - 1) {
+      return false;
+    }
+  }
+  // seems ok!
+  return true;
+};
+
+/**
+ * Get the 2D base of this size.
+ *
+ * @returns {object} The 2D base [0,1] as {x,y}.
+ */
+dwv.image.Size.prototype.get2D = function () {
+  return {
+    x: this.get(0),
+    y: this.get(1)
+  };
 };
 
 /**
@@ -256,11 +323,21 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
   this.appendOrigin = function (origin, index) {
     // add in origin array
     origins.splice(index, 0, origin);
-    // increment slice number
-    size = new dwv.image.Size(
-      size.getNumberOfColumns(),
-      size.getNumberOfRows(),
-      size.getNumberOfSlices() + 1);
+    // increment second dimension
+    var values = size.getValues();
+    values[2] += 1;
+    size = new dwv.image.Size(values);
+  };
+
+  /**
+   * Append a frame to the geometry.
+   *
+   */
+  this.appendFrame = function () {
+    // increment second dimension
+    var values = size.getValues();
+    values[2] += 1;
+    size = new dwv.image.Size(values);
   };
 
 };
@@ -293,13 +370,35 @@ dwv.image.Geometry.prototype.equals = function (rhs) {
  * Convert an index to an offset in memory.
  *
  * @param {object} index The index to convert.
- * @returns {number} The offset
+ * @returns {number} The offset.
  */
 dwv.image.Geometry.prototype.indexToOffset = function (index) {
   var size = this.getSize();
-  return index.getI() +
-   index.getJ() * size.getNumberOfColumns() +
-   index.getK() * size.getSliceSize();
+  var offset = 0;
+  for (var i = 0; i < index.length(); ++i) {
+    offset += index.get(i) * size.getDimSize(i);
+  }
+  return offset;
+};
+
+/**
+ * Convert an offset in memory to an index.
+ *
+ * @param {number} offset The offset to convert.
+ * @returns {object} The index.
+ */
+dwv.image.Geometry.prototype.offsetToIndex = function (offset) {
+  var size = this.getSize();
+  var values = new Array(size.length());
+  var off = offset;
+  var dimSize = 0;
+  for (var i = size.length() - 1; i > 0; --i) {
+    dimSize = size.getDimSize(i);
+    values[i] = Math.floor(off / dimSize);
+    off = off - values[i] * dimSize;
+  }
+  values[0] = off;
+  return new dwv.math.Index(values);
 };
 
 /**
@@ -312,9 +411,9 @@ dwv.image.Geometry.prototype.indexToWorld = function (index) {
   var origin = this.getOrigin();
   var spacing = this.getSpacing();
   return new dwv.math.Point3D(
-    origin.getX() + index.getI() * spacing.getColumnSpacing(),
-    origin.getY() + index.getJ() * spacing.getRowSpacing(),
-    origin.getZ() + index.getK() * spacing.getSliceSpacing());
+    origin.getX() + index.get(0) * spacing.getColumnSpacing(),
+    origin.getY() + index.get(1) * spacing.getRowSpacing(),
+    origin.getZ() + index.get(2) * spacing.getSliceSpacing());
 };
 
 /**

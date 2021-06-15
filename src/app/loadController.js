@@ -12,8 +12,6 @@ dwv.LoadController = function (defaultCharacterSet) {
   var self = this;
   // current loader
   var currentLoader = null;
-  // Is the data mono-slice?
-  var isMonoSliceData = null;
 
   /**
    * Load a list of files. Can be image files or a state file.
@@ -71,15 +69,6 @@ dwv.LoadController = function (defaultCharacterSet) {
       currentLoader.abort();
       currentLoader = null;
     }
-  };
-
-  /**
-   * Is the data mono-slice?
-   *
-   * @returns {boolean} True if the data only contains one slice.
-   */
-  this.isMonoSliceData = function () {
-    return isMonoSliceData;
   };
 
   // private ----------------------------------------------------------------
@@ -151,21 +140,6 @@ dwv.LoadController = function (defaultCharacterSet) {
    * @private
    */
   function loadImageData(data, loader, options) {
-    // first data name
-    var firstName = '';
-    if (typeof data[0].name !== 'undefined') {
-      firstName = data[0].name;
-    } else {
-      firstName = data[0];
-    }
-
-    // flag used by scroll to decide wether to activate or not
-    // TODO: supposing multi-slice for zip files, could not be...
-    isMonoSliceData = (data.length === 1 &&
-            firstName.split('.').pop().toLowerCase() !== 'zip' &&
-            !dwv.utils.endsWith(firstName, 'DICOMDIR') &&
-            !dwv.utils.endsWith(firstName, '.dcmdir'));
-
     // set IO
     var loadtype = 'image';
     loader.setDefaultCharacterSet(defaultCharacterSet);

@@ -32,16 +32,21 @@ QUnit.test('Test multiframe writer support.', function (assert) {
     var dicomParser = new dwv.dicom.DicomParser();
     dicomParser.parse(this.response);
 
+    var numCols = 256;
+    var numRows = 256;
     var numFrames = 16;
+    var bufferSize = numCols * numRows * numFrames;
 
     // raw tags
     var rawTags = dicomParser.getRawDicomElements();
     // check values
     assert.equal(rawTags.x00280008.value[0], numFrames, 'Number of frames');
+    assert.equal(rawTags.x00280011.value[0], numCols, 'Number of columns');
+    assert.equal(rawTags.x00280010.value[0], numRows, 'Number of rows');
     // length of value array for pixel data
     assert.equal(
-      rawTags.x7FE00010.value.length,
-      numFrames,
+      rawTags.x7FE00010.value[0].length,
+      bufferSize,
       'Length of value array for pixel data');
 
     var dicomWriter = new dwv.dicom.DicomWriter();
@@ -54,10 +59,12 @@ QUnit.test('Test multiframe writer support.', function (assert) {
 
     // check values
     assert.equal(rawTags.x00280008.value[0], numFrames, 'Number of frames');
+    assert.equal(rawTags.x00280011.value[0], numCols, 'Number of columns');
+    assert.equal(rawTags.x00280010.value[0], numRows, 'Number of rows');
     // length of value array for pixel data
     assert.equal(
-      rawTags.x7FE00010.value.length,
-      numFrames,
+      rawTags.x7FE00010.value[0].length,
+      bufferSize,
       'Length of value array for pixel data');
 
     // finish async test
@@ -199,28 +206,29 @@ dwv.test.compare = function (jsonTags, dicomElements, name, comparator) {
   }
   var keys = Object.keys(jsonTags);
   for (var k = 0; k < keys.length; ++k) {
-    var tag = keys[k];
-    var tagGE = dwv.dicom.getGroupElementFromName(tag);
-    var tagKey = dwv.dicom.getGroupElementKey(tagGE.group, tagGE.element);
+    var tagName = keys[k];
+    var tag = dwv.dicom.getTagFromDictionary(tagName);
+    var tagKey = tag.getKey();
     var element = dicomElements.getDEFromKey(tagKey);
     var value = dicomElements.getFromKey(tagKey, true);
     if (element.vr !== 'SQ') {
       comparator.equal(
         dwv.test.toString(value),
-        jsonTags[tag],
-        name + ' - ' + tag);
+        jsonTags[tagName],
+        name + ' - ' + tagName);
     } else {
       // check content
-      if (jsonTags[tag] === null || jsonTags[tag] === 0) {
+      if (jsonTags[tagName] === null || jsonTags[tagName] === 0) {
         continue;
       }
       // supposing same order of subkeys and indices...
-      var subKeys = Object.keys(jsonTags[tag]);
+      var subKeys = Object.keys(jsonTags[tagName]);
       var index = 0;
       for (var sk = 0; sk < subKeys.length; ++sk) {
         if (subKeys[sk] !== 'explicitLength') {
           var wrap = new dwv.dicom.DicomElementsWrapper(value[index]);
-          dwv.test.compare(jsonTags[tag][subKeys[sk]], wrap, name, comparator);
+          dwv.test.compare(
+            jsonTags[tagName][subKeys[sk]], wrap, name, comparator);
           ++index;
         }
       }

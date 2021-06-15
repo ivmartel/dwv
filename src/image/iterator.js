@@ -199,17 +199,29 @@ dwv.image.getIteratorValues = function (iterator) {
  * Get a slice index iterator.
  *
  * @param {object} image The image to parse.
- * @param {number} slice The index of the slice.
- * @param {number} frame The frame index.
+ * @param {object} position The current position.
+ * @param {boolean} isRescaled Flag for rescaled values (default false).
  * @returns {object} The slice iterator.
  */
-dwv.image.getSliceIterator = function (image, slice, frame) {
-  var sliceSize = image.getGeometry().getSize().getSliceSize();
-  var start = slice * sliceSize;
+dwv.image.getSliceIterator = function (image, position, isRescaled) {
+  var geometry = image.getGeometry();
+  var sliceSize = geometry.getSize().getDimSize(2);
+  var start = geometry.indexToOffset(position.getWithNew2D(0, 0));
 
-  var dataAccessor = function (offset) {
-    return image.getValueAtOffset(offset, frame);
-  };
+  // default to non rescaled data
+  if (typeof isRescaled === 'undefined') {
+    isRescaled = false;
+  }
+  var dataAccessor = null;
+  if (isRescaled) {
+    dataAccessor = function (offset) {
+      return image.getRescaledValueAtOffset(offset);
+    };
+  } else {
+    dataAccessor = function (offset) {
+      return image.getValueAtOffset(offset);
+    };
+  }
 
   var range = null;
   if (image.getNumberOfComponents() === 1) {
@@ -233,23 +245,34 @@ dwv.image.getSliceIterator = function (image, slice, frame) {
  * Get a slice index iterator for a rectangular region.
  *
  * @param {object} image The image to parse.
- * @param {number} slice The index of the slice.
- * @param {number} frame The frame index.
+ * @param {object} position The current position.
  * @param {boolean} isRescaled Flag for rescaled values (default false).
  * @param {dwv.math.Point2D} min The minimum position (optional).
  * @param {dwv.math.Point2D} max The maximum position (optional).
  * @returns {object} The slice iterator.
  */
 dwv.image.getRegionSliceIterator = function (
-  image, slice, frame, isRescaled, min, max) {
+  image, position, isRescaled, min, max) {
   if (image.getNumberOfComponents() !== 1) {
     throw new Error('Unsupported number of components for region iterator: ' +
       image.getNumberOfComponents());
   }
 
+  // default to non rescaled data
   if (typeof isRescaled === 'undefined') {
     isRescaled = false;
   }
+  var dataAccessor = null;
+  if (isRescaled) {
+    dataAccessor = function (offset) {
+      return image.getRescaledValueAtOffset(offset);
+    };
+  } else {
+    dataAccessor = function (offset) {
+      return image.getValueAtOffset(offset);
+    };
+  }
+
   var geometry = image.getGeometry();
   var size = geometry.getSize();
   if (typeof min === 'undefined') {
@@ -257,31 +280,21 @@ dwv.image.getRegionSliceIterator = function (
   }
   if (typeof max === 'undefined') {
     max = new dwv.math.Point2D(
-      size.getNumberOfColumns() - 1,
-      size.getNumberOfRows()
+      size.get(0) - 1,
+      size.get(1)
     );
   }
   // position to pixel for max: extra X is ok, remove extra Y
-  var minIndex = new dwv.math.Index3D(min.getX(), min.getY(), slice);
-  var startOffset = geometry.indexToOffset(minIndex);
-  var maxIndex = new dwv.math.Index3D(max.getX(), max.getY() - 1, slice);
-  var endOffset = geometry.indexToOffset(maxIndex);
+  var startOffset = geometry.indexToOffset(position.getWithNew2D(
+    min.getX(), min.getY()
+  ));
+  var endOffset = geometry.indexToOffset(position.getWithNew2D(
+    max.getX(), max.getY() - 1
+  ));
 
   // minimum 1 column
   var rangeNumberOfColumns = Math.max(1, max.getX() - min.getX());
-  var rowIncrement = size.getNumberOfColumns() - rangeNumberOfColumns;
-
-  // data accessor
-  var dataAccessor = null;
-  if (isRescaled) {
-    dataAccessor = function (offset) {
-      return image.getRescaledValueAtOffset(offset, slice, frame);
-    };
-  } else {
-    dataAccessor = function (offset) {
-      return image.getValueAtOffset(offset, frame);
-    };
-  }
+  var rowIncrement = size.get(0) - rangeNumberOfColumns;
 
   return dwv.image.rangeRegion(
     dataAccessor, startOffset, endOffset + 1,
@@ -292,22 +305,33 @@ dwv.image.getRegionSliceIterator = function (
  * Get a slice index iterator for a rectangular region.
  *
  * @param {object} image The image to parse.
- * @param {number} slice The index of the slice.
- * @param {number} frame The frame index.
+ * @param {object} position The current position.
  * @param {boolean} isRescaled Flag for rescaled values (default false).
  * @param {Array} regions An array of regions.
  * @returns {object} The slice iterator.
  */
 dwv.image.getVariableRegionSliceIterator = function (
-  image, slice, frame, isRescaled, regions) {
+  image, position, isRescaled, regions) {
   if (image.getNumberOfComponents() !== 1) {
     throw new Error('Unsupported number of components for region iterator: ' +
       image.getNumberOfComponents());
   }
 
+  // default to non rescaled data
   if (typeof isRescaled === 'undefined') {
     isRescaled = false;
   }
+  var dataAccessor = null;
+  if (isRescaled) {
+    dataAccessor = function (offset) {
+      return image.getRescaledValueAtOffset(offset);
+    };
+  } else {
+    dataAccessor = function (offset) {
+      return image.getValueAtOffset(offset);
+    };
+  }
+
   var geometry = image.getGeometry();
   var size = geometry.getSize();
 
@@ -327,7 +351,7 @@ dwv.image.getVariableRegionSliceIterator = function (
       offsetRegions.push([
         region[0][0],
         width,
-        size.getNumberOfColumns() - region[1][0]
+        size.get(0) - region[1][0]
       ]);
     }
   }
@@ -340,22 +364,12 @@ dwv.image.getVariableRegionSliceIterator = function (
     return;
   }
 
-  var minIndex = new dwv.math.Index3D(min[0], min[1], slice);
-  var startOffset = geometry.indexToOffset(minIndex);
-  var maxIndex = new dwv.math.Index3D(max[0], max[1], slice);
-  var endOffset = geometry.indexToOffset(maxIndex);
-
-  // data accessor
-  var dataAccessor = null;
-  if (isRescaled) {
-    dataAccessor = function (offset) {
-      return image.getRescaledValueAtOffset(offset, slice, frame);
-    };
-  } else {
-    dataAccessor = function (offset) {
-      return image.getValueAtOffset(offset, frame);
-    };
-  }
+  var startOffset = geometry.indexToOffset(position.getWithNew2D(
+    min[0], min[1]
+  ));
+  var endOffset = geometry.indexToOffset(position.getWithNew2D(
+    max[0], max[1]
+  ));
 
   return dwv.image.rangeRegions(
     dataAccessor, startOffset, endOffset + 1,

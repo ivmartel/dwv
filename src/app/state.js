@@ -8,6 +8,9 @@ var Konva = Konva || {};
  * Saves: data url/path, display info.
  *
  * History:
+ * - v0.5 (dwv 0.30.0, ??/2021)
+ *   - store position as array
+ *   - new draw position group key
  * - v0.4 (dwv 0.29.0, 06/2021)
  *   - move drawing details into meta property
  *   - remove scale center and translation, add offset
@@ -41,10 +44,10 @@ dwv.State = function () {
     var drawLayer = layerController.getActiveDrawLayer();
     // return a JSON string
     return JSON.stringify({
-      version: '0.4',
+      version: '0.5',
       'window-center': viewController.getWindowLevel().center,
       'window-width': viewController.getWindowLevel().width,
-      position: viewController.getCurrentPosition(),
+      position: viewController.getCurrentPosition().getValues(),
       scale: app.getAddedScale(),
       offset: app.getOffset(),
       drawings: drawLayer.getKonvaLayer().toObject(),
@@ -68,6 +71,8 @@ dwv.State = function () {
       res = readV03(data);
     } else if (data.version === '0.4') {
       res = readV04(data);
+    } else if (data.version === '0.5') {
+      res = readV05(data);
     } else {
       throw new Error('Unknown state file format version: \'' +
         data.version + '\'.');
@@ -87,7 +92,8 @@ dwv.State = function () {
     // display
     viewController.setWindowLevel(
       data['window-center'], data['window-width']);
-    viewController.setCurrentPosition(data.position);
+    viewController.setCurrentPosition(
+      new dwv.math.Index(data.position), true);
     // apply saved scale on top of current base one
     var baseScale = app.getLayerController().getBaseScale();
     var scale = null;
@@ -134,11 +140,15 @@ dwv.State = function () {
    * @private
    */
   function readV01(data) {
-    // update drawings
+    // v0.1 -> v0.2
     var v02DAndD = dwv.v01Tov02DrawingsAndDetails(data.drawings);
+    // v0.2 -> v0.3, v0.4
     data.drawings = dwv.v02Tov03Drawings(v02DAndD.drawings).toObject();
     data.drawingsDetails = dwv.v03Tov04DrawingsDetails(
       v02DAndD.drawingsDetails);
+    // v0.4 -> v0.5
+    data = dwv.v04Tov05Data(data);
+    data.drawings = dwv.v04Tov05Drawings(data.drawings);
     return data;
   }
   /**
@@ -149,10 +159,13 @@ dwv.State = function () {
    * @private
    */
   function readV02(data) {
-    // update drawings
+    // v0.2 -> v0.3, v0.4
     data.drawings = dwv.v02Tov03Drawings(data.drawings).toObject();
     data.drawingsDetails = dwv.v03Tov04DrawingsDetails(
       dwv.v02Tov03DrawingsDetails(data.drawingsDetails));
+    // v0.4 -> v0.5
+    data = dwv.v04Tov05Data(data);
+    data.drawings = dwv.v04Tov05Drawings(data.drawings);
     return data;
   }
   /**
@@ -163,7 +176,11 @@ dwv.State = function () {
    * @private
    */
   function readV03(data) {
+    // v0.3 -> v0.4
     data.drawingsDetails = dwv.v03Tov04DrawingsDetails(data.drawingsDetails);
+    // v0.4 -> v0.5
+    data = dwv.v04Tov05Data(data);
+    data.drawings = dwv.v04Tov05Drawings(data.drawings);
     return data;
   }
   /**
@@ -174,6 +191,19 @@ dwv.State = function () {
    * @private
    */
   function readV04(data) {
+    // v0.4 -> v0.5
+    data = dwv.v04Tov05Data(data);
+    data.drawings = dwv.v04Tov05Drawings(data.drawings);
+    return data;
+  }
+  /**
+   * Read an application state from an Object in v0.5 format.
+   *
+   * @param {object} data The Object representation of the state.
+   * @returns {object} The state object.
+   * @private
+   */
+  function readV05(data) {
     return data;
   }
 
@@ -211,7 +241,7 @@ dwv.v02Tov03Drawings = function (drawings) {
       if (groupShapes.length !== 0) {
         // Create position-group set as visible and append it to drawLayer
         parentGroup = new Konva.Group({
-          id: dwv.draw.getDrawPositionGroupId(k, f),
+          id: dwv.draw.getDrawPositionGroupId(new dwv.math.Index([1, 1, k, f])),
           name: 'position-group',
           visible: false
         });
@@ -439,6 +469,48 @@ dwv.v03Tov04DrawingsDetails = function (details) {
     };
   }
   return res;
+};
+
+/**
+ * Convert drawing from v0.4 to v0.5.
+ * - v0.4: position as object
+ * - v0.5: position as array
+ *
+ * @param {Array} data An array of drawing.
+ * @returns {object} The converted drawings.
+ */
+dwv.v04Tov05Data = function (data) {
+  var pos = data.position;
+  data.position = [pos.i, pos.j, pos.k];
+  return data;
+};
+
+/**
+ * Convert drawing from v0.4 to v0.5.
+ * - v0.4: draw id as 'slice-0_frame-1'
+ * - v0.5: draw id as '#2-0_#3-1''
+ *
+ * @param {Array} inputDrawings An array of drawing.
+ * @returns {object} The converted drawings.
+ */
+dwv.v04Tov05Drawings = function (inputDrawings) {
+  // Iterate over each position-groups
+  var posGroups = inputDrawings.children;
+  for (var k = 0, lenk = posGroups.length; k < lenk; ++k) {
+    var posGroup = posGroups[k];
+    var id = posGroup.attrs.id;
+    var ids = id.split('_');
+    var sliceNumber = parseInt(ids[0].substring(6), 10); // 'slice-0'
+    var frameNumber = parseInt(ids[1].substring(6), 10); // 'frame-0'
+    var newId = '#2-';
+    if (sliceNumber === 0 && frameNumber !== 0) {
+      newId += frameNumber;
+    } else {
+      newId += sliceNumber;
+    }
+    posGroup.attrs.id = newId;
+  }
+  return inputDrawings;
 };
 
 /**

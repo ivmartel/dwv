@@ -157,9 +157,7 @@ dwv.LayerController = function (containerDiv) {
     var viewLayer0 = this.getActiveViewLayer();
     if (viewLayer0) {
       viewLayer0.removeEventListener(
-        'slicechange', this.updatePosition);
-      viewLayer0.removeEventListener(
-        'framechange', this.updatePosition);
+        'postitionchange', this.updatePosition);
     }
 
     // set index
@@ -168,9 +166,7 @@ dwv.LayerController = function (containerDiv) {
     // bind new layer
     var viewLayer = this.getActiveViewLayer();
     viewLayer.addEventListener(
-      'slicechange', this.updatePosition);
-    viewLayer.addEventListener(
-      'framechange', this.updatePosition);
+      'postitionchange', this.updatePosition);
   };
 
   /**
@@ -259,19 +255,15 @@ dwv.LayerController = function (containerDiv) {
   };
 
   /**
-   * Update layers to the active view position.
+   * Update draw controller to view position.
    */
-  this.updatePosition = function () {
-    var viewController =
-      layers[activeViewLayerIndex].getViewController();
-    var pos = [
-      viewController.getCurrentPosition(),
-      viewController.getCurrentFrame()
-    ];
-    for (var i = 0; i < layers.length; ++i) {
-      if (i !== activeViewLayerIndex) {
-        layers[i].updatePosition(pos);
-      }
+  this.updateDrawControllerToViewPosition = function () {
+    var drawLayer = layers[activeDrawLayerIndex];
+    if (drawLayer) {
+      var viewController =
+        layers[activeViewLayerIndex].getViewController();
+      drawLayer.getDrawController().activateDrawLayer(
+        viewController.getCurrentPosition());
     }
   };
 
@@ -403,16 +395,19 @@ dwv.LayerController = function (containerDiv) {
    */
   this.initialise = function (image, metaData, dataIndex) {
     var size = image.getGeometry().getSize();
-    layerSize = {
-      x: size.getNumberOfColumns(),
-      y: size.getNumberOfRows()
-    };
+    layerSize = size.get2D();
     // apply to layers
     for (var i = 0; i < layers.length; ++i) {
       layers[i].initialise(image, metaData, dataIndex);
     }
-    // first position update
-    this.updatePosition();
+
+    // bind draw to view position
+    var viewLayer = this.getActiveViewLayer();
+    viewLayer.addEventListener(
+      'positionchange', this.updateDrawControllerToViewPosition);
+    // first update
+    this.updateDrawControllerToViewPosition();
+
     // fit data
     this.fitToContainer();
   };

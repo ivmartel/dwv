@@ -12,20 +12,20 @@ dwv.image.DicomBufferToView = function () {
   var self = this;
 
   /**
-   * The default character set (optional).
+   * Converter options.
    *
    * @private
-   * @type {string}
+   * @type {object}
    */
-  var defaultCharacterSet;
+  var options;
 
   /**
-   * Set the default character set.
+   * Set the converter options.
    *
-   * @param {string} characterSet The character set.
+   * @param {object} opt The input options.
    */
-  this.setDefaultCharacterSet = function (characterSet) {
-    defaultCharacterSet = characterSet;
+  this.setOptions = function (opt) {
+    options = opt;
   };
 
   /**
@@ -51,10 +51,16 @@ dwv.image.DicomBufferToView = function () {
 
     // DICOM parser
     var dicomParser = new dwv.dicom.DicomParser();
-    dicomParser.setDefaultCharacterSet(defaultCharacterSet);
+    var imageFactory = new dwv.image.ImageFactory();
+
+    if (typeof options.defaultCharacterSet !== 'undefined') {
+      dicomParser.setDefaultCharacterSet(options.defaultCharacterSet);
+    }
     // parse the buffer
     try {
       dicomParser.parse(buffer);
+      // check elements are good for image
+      imageFactory.checkElements(dicomParser.getDicomElements());
     } catch (error) {
       self.onerror({
         error: error,
@@ -67,18 +73,23 @@ dwv.image.DicomBufferToView = function () {
     }
 
     var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
+    // help GC: discard pixel buffer from elements
+    dicomParser.getRawDicomElements().x7FE00010.value = [];
     var syntax = dwv.dicom.cleanString(
       dicomParser.getRawDicomElements().x00020010.value[0]);
     var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
     var needDecompression = (algoName !== null);
 
+    // default
+    var finalBuffer = pixelBuffer[0];
+
     // generate the image
     var generateImage = function (/*event*/) {
       // create the image
-      var imageFactory = new dwv.image.ImageFactory();
       try {
         var image = imageFactory.create(
-          dicomParser.getDicomElements(), pixelBuffer);
+          dicomParser.getDicomElements(),
+          finalBuffer, options.numberOfFiles);
         // call onload
         self.onloaditem({
           data: {
@@ -123,26 +134,43 @@ dwv.image.DicomBufferToView = function () {
         pixelMeta.planarConfiguration = planarConfigurationElement.value[0];
       }
 
-      // number of frames
-      var numberOfFrames = pixelBuffer.length;
+      // number of items
+      var numberOfItems = pixelBuffer.length;
+      var decompressedSize = null;
 
       // decoder callback
-      var countDecodedFrames = 0;
-      var onDecodedFrame = function (event) {
-        ++countDecodedFrames;
+      var countDecodedItems = 0;
+      var onDecodedItem = function (event) {
+        ++countDecodedItems;
         // send progress
         self.onprogress({
           lengthComputable: true,
-          loaded: (countDecodedFrames * 100 / numberOfFrames),
+          loaded: (countDecodedItems * 100 / numberOfItems),
           total: 100,
           index: dataIndex,
           source: origin
         });
         // store data
-        var frameNb = event.index;
-        pixelBuffer[frameNb] = event.data[0];
-        // create image for the first frame
-        if (frameNb === 0) {
+        var itemNb = event.index;
+        if (numberOfItems !== 1) {
+          // allocate buffer if not done yet
+          if (decompressedSize === null) {
+            decompressedSize = event.data[0].length;
+            finalBuffer = new event.data[0].constructor(
+              numberOfItems * decompressedSize);
+          }
+          // hoping for all items to have the same size...
+          if (event.data[0].length !== decompressedSize) {
+            dwv.logger.warn('Unsupported varying decompressed data size: ' +
+              event.data[0].length + ' != ' + decompressedSize);
+          }
+          // set buffer item data
+          finalBuffer.set(event.data[0], decompressedSize * itemNb);
+        } else {
+          finalBuffer = event.data[0];
+        }
+        // create image for the first item
+        if (itemNb === 0) {
           generateImage();
         }
       };
@@ -150,18 +178,18 @@ dwv.image.DicomBufferToView = function () {
       // setup the decoder (one decoder per convert)
       // TODO check if it is ok to create a worker pool per file...
       pixelDecoder = new dwv.image.PixelBufferDecoder(
-        algoName, numberOfFrames);
+        algoName, numberOfItems);
       // callbacks
       // pixelDecoder.ondecodestart: nothing to do
-      pixelDecoder.ondecodeditem = onDecodedFrame;
+      pixelDecoder.ondecodeditem = onDecodedItem;
       pixelDecoder.ondecoded = self.onload;
       pixelDecoder.ondecodeend = self.onloadend;
       pixelDecoder.onerror = self.onerror;
       pixelDecoder.onabort = self.onabort;
 
       // launch decode
-      for (var f = 0; f < numberOfFrames; ++f) {
-        pixelDecoder.decode(pixelBuffer[f], pixelMeta, f);
+      for (var i = 0; i < numberOfItems; ++i) {
+        pixelDecoder.decode(pixelBuffer[i], pixelMeta, i);
       }
     } else {
       // no decompression

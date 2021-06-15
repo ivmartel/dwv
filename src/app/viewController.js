@@ -10,7 +10,7 @@ var dwv = dwv || {};
 dwv.ViewController = function (view) {
   // closure to self
   var self = this;
-  // Slice/frame player ID (created by setInterval)
+  // third dimension player ID (created by setInterval)
   var playerID = null;
 
   /**
@@ -21,8 +21,6 @@ dwv.ViewController = function (view) {
     this.setWindowLevelPresetById(0);
     // default position
     this.setCurrentPosition2D(0, 0);
-    // default frame
-    this.setCurrentFrame(0);
   };
 
   /**
@@ -65,7 +63,7 @@ dwv.ViewController = function (view) {
   /**
    * Check if the controller is playing.
    *
-   * @returns {boolean} True is the controler is playing slices/frames.
+   * @returns {boolean} True if the controler is playing.
    */
   this.isPlaying = function () {
     return (playerID !== null);
@@ -100,8 +98,7 @@ dwv.ViewController = function (view) {
   this.getImageRegionValues = function (min, max) {
     var iter = dwv.image.getRegionSliceIterator(
       view.getImage(),
-      this.getCurrentPosition().k,
-      this.getCurrentFrame(),
+      this.getCurrentPosition(),
       true, min, max
     );
     var values = [];
@@ -120,8 +117,7 @@ dwv.ViewController = function (view) {
   this.getImageVariableRegionValues = function (regions) {
     var iter = dwv.image.getVariableRegionSliceIterator(
       view.getImage(),
-      this.getCurrentPosition().k,
-      this.getCurrentFrame(),
+      this.getCurrentPosition(),
       true, regions
     );
     var values = [];
@@ -137,33 +133,32 @@ dwv.ViewController = function (view) {
    * @returns {boolean} True if possible.
    */
   this.canQuantifyImage = function () {
-    return view.getImage().getNumberOfComponents() === 1;
+    return view.getImage().canQuantify();
   };
 
   /**
    * Can window and level be applied to the data?
    *
-   * @returns {boolean} True if the data is monochrome.
+   * @returns {boolean} True if possible.
    */
   this.canWindowLevel = function () {
-    return view.getImage().getPhotometricInterpretation()
-      .match(/MONOCHROME/) !== null;
+    return view.getImage().canWindowLevel();
   };
 
   /**
-   * Is the data mono-frame?
+   * Can the data be scrolled?
    *
-   * @returns {boolean} True if the data only contains one frame.
+   * @returns {boolean} True if the data has a third dimension greater than one.
    */
-  this.isMonoFrameData = function () {
-    return view.getImage().getNumberOfFrames() === 1;
+  this.canScroll = function () {
+    return view.getImage().canScroll();
   };
 
   /**
    * Set the current position.
    *
    * @param {object} pos The position.
-   * @param {boolean} silent If true, does not fire a slicechange event.
+   * @param {boolean} silent If true, does not fire a positionchange event.
    * @returns {boolean} False if not in bounds.
    */
   this.setCurrentPosition = function (pos, silent) {
@@ -178,94 +173,49 @@ dwv.ViewController = function (view) {
    * @returns {boolean} False if not in bounds.
    */
   this.setCurrentPosition2D = function (i, j) {
-    return view.setCurrentPosition({
-      i: i,
-      j: j,
-      k: view.getCurrentPosition().k
-    });
+    return view.setCurrentPosition(
+      view.getCurrentPosition().getWithNew2D(i, j)
+    );
   };
 
   /**
-   * Set the current slice position.
+   * Increment the provided dimension.
    *
-   * @param {number} k The slice index.
+   * @param {number} dim The dimension to increment.
+   * @param {boolean} silent Do not send event.
    * @returns {boolean} False if not in bounds.
    */
-  this.setCurrentSlice = function (k) {
-    return view.setCurrentPosition({
-      i: view.getCurrentPosition().i,
-      j: view.getCurrentPosition().j,
-      k: k
-    });
+  this.incrementIndex = function (dim, silent) {
+    var pos = view.getCurrentPosition();
+    var values = new Array(pos.length());
+    values.fill(0);
+    if (dim < values.length) {
+      values[dim] = 1;
+    } else {
+      console.warn('Cannot increment given index: ', dim, values.length);
+    }
+    var incr = new dwv.math.Index(values);
+    return view.setCurrentPosition(pos.add(incr), silent);
   };
 
   /**
-   * Increment the current slice number.
+   * Decrement the provided dimension.
    *
+   * @param {number} dim The dimension to increment.
+   * @param {boolean} silent Do not send event.
    * @returns {boolean} False if not in bounds.
    */
-  this.incrementSliceNb = function () {
-    return self.setCurrentSlice(view.getCurrentPosition().k + 1);
-  };
-
-  /**
-   * Decrement the current slice number.
-   *
-   * @returns {boolean} False if not in bounds.
-   */
-  this.decrementSliceNb = function () {
-    return self.setCurrentSlice(view.getCurrentPosition().k - 1);
-  };
-
-  /**
-   * Get the current frame.
-   *
-   * @returns {number} The frame number.
-   */
-  this.getCurrentFrame = function () {
-    return view.getCurrentFrame();
-  };
-
-  /**
-   * Set the current frame.
-   *
-   * @param {number} number The frame number.
-   * @returns {boolean} False if not in bounds.
-   */
-  this.setCurrentFrame = function (number) {
-    return view.setCurrentFrame(number);
-  };
-
-  /**
-   * Increment the current frame.
-   *
-   * @returns {boolean} False if not in bounds.
-   */
-  this.incrementFrameNb = function () {
-    return view.setCurrentFrame(view.getCurrentFrame() + 1);
-  };
-
-  /**
-   * Decrement the current frame.
-   *
-   * @returns {boolean} False if not in bounds.
-   */
-  this.decrementFrameNb = function () {
-    return view.setCurrentFrame(view.getCurrentFrame() - 1);
-  };
-
-  /**
-   * Go to first slice .
-   *
-   * @returns {boolean} False if not in bounds.
-   * @deprecated Use the setCurrentSlice function.
-   */
-  this.goFirstSlice = function () {
-    return view.setCurrentPosition({
-      i: view.getCurrentPosition().i,
-      j: view.getCurrentPosition().j,
-      k: 0
-    });
+  this.decrementIndex = function (dim, silent) {
+    var pos = view.getCurrentPosition();
+    var values = new Array(pos.length());
+    values.fill(0);
+    if (dim < values.length) {
+      values[dim] = -1;
+    } else {
+      console.warn('Cannot decrement given index: ', dim, values.length);
+    }
+    var incr = new dwv.math.Index(values);
+    return view.setCurrentPosition(pos.add(incr), silent);
   };
 
   /**
@@ -273,24 +223,21 @@ dwv.ViewController = function (view) {
    */
   this.play = function () {
     if (playerID === null) {
-      var nSlices = view.getImage().getGeometry().getSize().getNumberOfSlices();
-      var nFrames = view.getImage().getNumberOfFrames();
+      var size = view.getImage().getGeometry().getSize();
       var recommendedDisplayFrameRate =
         view.getImage().getMeta().RecommendedDisplayFrameRate;
       var milliseconds = view.getPlaybackMilliseconds(
         recommendedDisplayFrameRate);
 
       playerID = setInterval(function () {
-        if (nSlices !== 1) {
-          if (!self.incrementSliceNb()) {
-            self.setCurrentSlice(0);
-          }
-        } else if (nFrames !== 1) {
-          if (!self.incrementFrameNb()) {
-            self.setCurrentFrame(0);
+        if (size.get(2) !== 1) {
+          if (!self.incrementIndex(2)) {
+            var pos1 = self.getCurrentPosition();
+            var values = pos1.getValues();
+            values[2] = 0;
+            self.setCurrentPosition(new dwv.math.Index(values));
           }
         }
-
       }, milliseconds);
     } else {
       this.stop();
