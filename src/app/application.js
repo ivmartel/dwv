@@ -129,6 +129,7 @@ dwv.App = function () {
 
   /**
    * Get the layer controller.
+   * The controller is available after the first loaded item.
    *
    * @returns {object} The controller.
    */
@@ -250,11 +251,6 @@ dwv.App = function () {
     loadController.onloadend = onloadend;
     loadController.onerror = onerror;
     loadController.onabort = onabort;
-
-    // create layer container
-    // warn: needs the DOM to be loaded...
-    layerController =
-      new dwv.LayerController(self.getElement('layerContainer'));
 
     // create data controller
     dataController = new dwv.DataController();
@@ -859,6 +855,12 @@ dwv.App = function () {
     // adapt context
     if (event.loadtype === 'image') {
       if (isFirstLoadItem) {
+        // create layer controller if not done yet
+        // warn: needs a loaded DOM
+        if (!layerController) {
+          layerController =
+            new dwv.LayerController(self.getElement('layerContainer'));
+        }
         // initialise or add view
         var dataIndex = dataController.getCurrentIndex();
         var data = dataController.get(dataIndex);
