@@ -73,6 +73,8 @@ dwv.image.DicomBufferToView = function () {
     }
 
     var pixelBuffer = dicomParser.getRawDicomElements().x7FE00010.value;
+    // help GC: discard pixel buffer from elements
+    dicomParser.getRawDicomElements().x7FE00010.value = [];
     var syntax = dwv.dicom.cleanString(
       dicomParser.getRawDicomElements().x00020010.value[0]);
     var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
