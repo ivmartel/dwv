@@ -61,24 +61,8 @@ dwv.image.ImageFactory.prototype.create = function (
   // image size
   var size = new dwv.image.Size(sizeValues);
 
-  // spacing
-  var rowSpacing = null;
-  var columnSpacing = null;
-  // PixelSpacing
-  var pixelSpacing = dicomElements.getFromKey('x00280030');
-  // ImagerPixelSpacing
-  var imagerPixelSpacing = dicomElements.getFromKey('x00181164');
-  if (pixelSpacing && pixelSpacing[0] && pixelSpacing[1]) {
-    rowSpacing = parseFloat(pixelSpacing[0]);
-    columnSpacing = parseFloat(pixelSpacing[1]);
-  } else if (imagerPixelSpacing &&
-    imagerPixelSpacing[0] &&
-    imagerPixelSpacing[1]) {
-    rowSpacing = parseFloat(imagerPixelSpacing[0]);
-    columnSpacing = parseFloat(imagerPixelSpacing[1]);
-  }
   // image spacing
-  var spacing = new dwv.image.Spacing(columnSpacing, rowSpacing);
+  var spacing = dicomElements.getPixelSpacing();
 
   // TransferSyntaxUID
   var transferSyntaxUID = dicomElements.getFromKey('x00020010');

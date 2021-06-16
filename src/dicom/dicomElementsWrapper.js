@@ -505,6 +505,43 @@ dwv.dicom.DicomElementsWrapper.prototype.getFromName = function (name) {
 };
 
 /**
+ * Get the pixel spacing from the different spacing tags.
+ *
+ * @return {object} The read spacing or the default [1,1].
+ */
+dwv.dicom.DicomElementsWrapper.prototype.getPixelSpacing = function () {
+  // default
+  var rowSpacing = 1;
+  var columnSpacing = 1;
+
+  // 1. PixelSpacing
+  // 2. ImagerPixelSpacing
+  // 3. NominalScannedPixelSpacing
+  // 4. PixelAspectRatio
+  var keys = ['x00280030', 'x00181164', 'x00182010', 'x00280034'];
+  for (var k = 0; k < keys.length; ++k) {
+    var spacing = this.getFromKey(keys[k], true);
+    if (spacing && spacing.length === 2) {
+      rowSpacing = parseFloat(spacing[0]);
+      columnSpacing = parseFloat(spacing[1]);
+      break;
+    }
+  }
+
+  // check
+  if (columnSpacing === 0) {
+    dwv.logger.warn('Zero column spacing.');
+    columnSpacing = 1;
+  }
+  if (rowSpacing === 0) {
+    dwv.logger.warn('Zero row spacing.');
+    rowSpacing = 1;
+  }
+  // return
+  return new dwv.image.Spacing(columnSpacing, rowSpacing);
+};
+
+/**
  * Get the file list from a DICOMDIR
  *
  * @param {object} data The buffer data of the DICOMDIR
