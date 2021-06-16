@@ -273,13 +273,17 @@ dwv.LayerController = function (containerDiv) {
    *
    * @returns {number} The scale.
    */
-  this.getFitToContainerScale = function () {
+  this.getFitToContainerScale = function (spacing) {
     // get container size
-    var size = this.getLayerContainerSize();
+    var containerSize = this.getLayerContainerSize();
+    var realSize = {
+      x: layerSize.x * spacing.getColumnSpacing(),
+      y: layerSize.y * spacing.getRowSpacing()
+    };
     // best fit
     return Math.min(
-      (size.x / layerSize.x),
-      (size.y / layerSize.y)
+      (containerSize.x / realSize.x),
+      (containerSize.y / realSize.y)
     );
   };
 
@@ -287,9 +291,12 @@ dwv.LayerController = function (containerDiv) {
    * Fit the display to the size of the container.
    * To be called once the image is loaded.
    */
-  this.fitToContainer = function () {
-    var fitScale = this.getFitToContainerScale();
-    this.resize({x: fitScale, y: fitScale});
+  this.fitToContainer = function (spacing) {
+    var fitScale = this.getFitToContainerScale(spacing);
+    this.resize({
+      x: fitScale * spacing.getColumnSpacing(),
+      y: fitScale * spacing.getRowSpacing()
+    });
   };
 
   /**
@@ -309,8 +316,8 @@ dwv.LayerController = function (containerDiv) {
    */
   this.addScale = function (scaleStep, center) {
     var newScale = {
-      x: Math.max(scale.x + scaleStep, 0.1),
-      y: Math.max(scale.y + scaleStep, 0.1)
+      x: Math.max(scale.x + scale.x * scaleStep, 0.1),
+      y: Math.max(scale.y + scale.y * scaleStep, 0.1)
     };
     // center should stay the same:
     // newOffset + center / newScale = oldOffset + center / oldScale
@@ -409,7 +416,8 @@ dwv.LayerController = function (containerDiv) {
     this.updateDrawControllerToViewPosition();
 
     // fit data
-    this.fitToContainer();
+    var spacing = image.getGeometry().getSpacing();
+    this.fitToContainer(spacing);
   };
 
   /**
