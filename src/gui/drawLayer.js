@@ -142,8 +142,8 @@ dwv.gui.DrawLayer = function (containerDiv) {
    */
   this.resize = function (newScale) {
     // resize stage
-    konvaStage.setWidth(parseInt(layerSize.x * newScale.x, 10));
-    konvaStage.setHeight(parseInt(layerSize.y * newScale.y, 10));
+    konvaStage.setWidth(Math.floor(layerSize.x * newScale.x));
+    konvaStage.setHeight(Math.floor(layerSize.y * newScale.y));
     // set scale
     this.setScale(newScale);
   };
