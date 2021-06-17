@@ -271,6 +271,7 @@ dwv.LayerController = function (containerDiv) {
    * Get the fit to container scale.
    * To be called once the image is loaded.
    *
+   * @param {object} spacing The image spacing.
    * @returns {number} The scale.
    */
   this.getFitToContainerScale = function (spacing) {
@@ -290,6 +291,8 @@ dwv.LayerController = function (containerDiv) {
   /**
    * Fit the display to the size of the container.
    * To be called once the image is loaded.
+   *
+   * @param {object} spacing The image spacing.
    */
   this.fitToContainer = function (spacing) {
     var fitScale = this.getFitToContainerScale(spacing);

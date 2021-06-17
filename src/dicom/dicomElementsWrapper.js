@@ -507,7 +507,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getFromName = function (name) {
 /**
  * Get the pixel spacing from the different spacing tags.
  *
- * @return {object} The read spacing or the default [1,1].
+ * @returns {object} The read spacing or the default [1,1].
  */
 dwv.dicom.DicomElementsWrapper.prototype.getPixelSpacing = function () {
   // default
