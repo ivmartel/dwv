@@ -211,8 +211,8 @@ dwv.gui.ViewLayer = function (containerDiv) {
    */
   this.resize = function (newScale) {
     // resize canvas
-    canvas.width = parseInt(layerSize.x * newScale.x, 10);
-    canvas.height = parseInt(layerSize.y * newScale.y, 10);
+    canvas.width = Math.floor(layerSize.x * newScale.x);
+    canvas.height = Math.floor(layerSize.y * newScale.y);
     // set scale
     this.setScale(newScale);
   };

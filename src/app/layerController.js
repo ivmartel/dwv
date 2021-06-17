@@ -445,8 +445,8 @@ dwv.LayerController = function (containerDiv) {
     baseScale = newScale;
 
     // resize container
-    var width = parseInt(layerSize.x * baseScale.x, 10);
-    var height = parseInt(layerSize.y * baseScale.y, 10);
+    var width = Math.floor(layerSize.x * baseScale.x);
+    var height = Math.floor(layerSize.y * baseScale.y);
     containerDiv.style.width = width + 'px';
     containerDiv.style.height = height + 'px';
 
