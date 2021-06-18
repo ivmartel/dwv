@@ -43,6 +43,7 @@ dwv.gui.getElement = function (containerDivId, name) {
 
 /**
  * Get a HTML element associated to a container div. Defaults to local one.
+ *
  * @see dwv.gui.getElement
  */
 dwv.getElement = dwv.gui.getElement;

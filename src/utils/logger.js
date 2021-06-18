@@ -8,7 +8,8 @@ dwv.utils.logger = dwv.utils.logger || {};
 dwv.utils.logger.console = dwv.utils.logger.console || {};
 
 /**
- * Main logger, defaults to the console logger.
+ * Main logger namespace. Defaults to the console logger.
+ *
  * @see dwv.utils.logger.console
  */
 dwv.logger = dwv.utils.logger.console;
