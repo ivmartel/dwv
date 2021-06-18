@@ -51,7 +51,7 @@ dwv.image.DicomBufferToView = function () {
 
     // DICOM parser
     var dicomParser = new dwv.dicom.DicomParser();
-    var imageFactory = new dwv.image.ImageFactory();
+    var imageFactory = new dwv.ImageFactory();
 
     if (typeof options.defaultCharacterSet !== 'undefined') {
       dicomParser.setDefaultCharacterSet(options.defaultCharacterSet);

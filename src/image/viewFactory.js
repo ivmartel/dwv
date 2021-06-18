@@ -3,11 +3,18 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
- * View factory.
+ * {@link dwv.image.View} factory.
  *
  * @class
  */
 dwv.image.ViewFactory = function () {};
+
+/**
+ * {@link dwv.image.View} factory. Defaults to local one.
+ *
+ * @see dwv.image.ViewFactory
+ */
+dwv.ViewFactory = dwv.image.ViewFactory;
 
 /**
  * Get an View object from the read DICOM file.

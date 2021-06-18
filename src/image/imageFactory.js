@@ -10,6 +10,13 @@ dwv.image = dwv.image || {};
 dwv.image.ImageFactory = function () {};
 
 /**
+ * {@link dwv.image.Image} factory. Defaults to local one.
+ *
+ * @see dwv.image.ImageFactory
+ */
+dwv.ImageFactory = dwv.image.ImageFactory;
+
+/**
  * Check dicom elements. Throws an error if not suitable.
  *
  * @param {object} dicomElements The DICOM tags.

@@ -311,7 +311,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
   this.initialise = function (image, metaData, index) {
     dataIndex = index;
     // create view
-    var viewFactory = new dwv.image.ViewFactory();
+    var viewFactory = new dwv.ViewFactory();
     view = viewFactory.create(
       new dwv.dicom.DicomElementsWrapper(metaData),
       image);
