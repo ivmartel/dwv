@@ -737,11 +737,11 @@ dwv.tool.Draw = function (app) {
       };
 
       // call client dialog if defined
-      if (typeof dwv.gui.openRoiDialog !== 'undefined') {
-        dwv.gui.openRoiDialog(ktext.meta, onSaveCallback);
+      if (typeof dwv.openRoiDialog !== 'undefined') {
+        dwv.openRoiDialog(ktext.meta, onSaveCallback);
       } else {
         // simple prompt for the text expression
-        var textExpr = prompt('Label', ktext.meta.textExpr);
+        var textExpr = dwv.prompt('Label', ktext.meta.textExpr);
         if (textExpr !== null) {
           ktext.meta.textExpr = textExpr;
           onSaveCallback(ktext.meta);

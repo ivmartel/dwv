@@ -49,6 +49,33 @@ dwv.gui.getElement = function (containerDivId, name) {
 dwv.getElement = dwv.gui.getElement;
 
 /**
+ * Prompt the user for some text. Uses window.prompt.
+ *
+ * @param {string} message The message in front of the input field.
+ * @param {string} value The input default value.
+ * @returns {string} The new value.
+ */
+dwv.gui.prompt = function (message, value) {
+  return prompt(message, value);
+};
+
+/**
+ * Prompt the user for some text. Defaults to local one.
+ *
+ * @see dwv.gui.prompt
+ */
+dwv.prompt = dwv.gui.prompt;
+
+/**
+ * Open a dialogue to edit roi data. Defaults to undefined.
+ *
+ * @param {object} data The roi data.
+ * @param {Function} callback The callback to launch on dialogue exit.
+ * @see dwv.tool.Draw
+ */
+dwv.openRoiDialog;
+
+/**
  * Get the size available for a div.
  *
  * @param {object} div The input div.
