@@ -273,7 +273,7 @@ dwv.App = function () {
    * @returns {object} The found element or null.
    */
   this.getElement = function (name) {
-    return dwv.gui.getElement(options.containerDivId, name);
+    return dwv.getElement(options.containerDivId, name);
   };
 
   /**

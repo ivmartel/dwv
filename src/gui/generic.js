@@ -1,7 +1,6 @@
 // namespaces
 var dwv = dwv || {};
 dwv.gui = dwv.gui || {};
-dwv.gui.base = dwv.gui.base || {};
 
 /**
  * List of interaction event names.
@@ -25,7 +24,7 @@ dwv.gui.interactionEventNames = [
  * @param {string} name The name or id to find.
  * @returns {object} The found element or null.
  */
-dwv.gui.base.getElement = function (containerDivId, name) {
+dwv.gui.getElement = function (containerDivId, name) {
   // get by class in the container div
   var parent = document.getElementById(containerDivId);
   if (!parent) {
@@ -41,6 +40,12 @@ dwv.gui.base.getElement = function (containerDivId, name) {
   }
   return element;
 };
+
+/**
+ * Get a HTML element associated to a container div. Defaults to local one.
+ * @see dwv.gui.getElement
+ */
+dwv.getElement = dwv.gui.getElement;
 
 /**
  * Get the size available for a div.
