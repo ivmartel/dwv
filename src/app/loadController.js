@@ -1,5 +1,6 @@
 // namespaces
 var dwv = dwv || {};
+dwv.ctrl = dwv.ctrl || {};
 
 /**
  * Load controller.
@@ -7,7 +8,7 @@ var dwv = dwv || {};
  * @param {string} defaultCharacterSet The default character set.
  * @class
  */
-dwv.LoadController = function (defaultCharacterSet) {
+dwv.ctrl.LoadController = function (defaultCharacterSet) {
   // closure to self
   var self = this;
   // current loader
@@ -209,14 +210,14 @@ dwv.LoadController = function (defaultCharacterSet) {
  *
  * @param {object} _event The load start event.
  */
-dwv.LoadController.prototype.onloadstart = function (_event) {};
+dwv.ctrl.LoadController.prototype.onloadstart = function (_event) {};
 /**
  * Handle a load progress event.
  * Default does nothing.
  *
  * @param {object} _event The progress event.
  */
-dwv.LoadController.prototype.onprogress = function (_event) {};
+dwv.ctrl.LoadController.prototype.onprogress = function (_event) {};
 /**
  * Handle a load event.
  * Default does nothing.
@@ -224,7 +225,7 @@ dwv.LoadController.prototype.onprogress = function (_event) {};
  * @param {object} _event The load event fired
  *   when a file has been loaded successfully.
  */
-dwv.LoadController.prototype.onload = function (_event) {};
+dwv.ctrl.LoadController.prototype.onload = function (_event) {};
 /**
  * Handle a load end event.
  * Default does nothing.
@@ -232,18 +233,18 @@ dwv.LoadController.prototype.onload = function (_event) {};
  * @param {object} _event The load end event fired
  *  when a file load has completed, successfully or not.
  */
-dwv.LoadController.prototype.onloadend = function (_event) {};
+dwv.ctrl.LoadController.prototype.onloadend = function (_event) {};
 /**
  * Handle an error event.
  * Default does nothing.
  *
  * @param {object} _event The error event.
  */
-dwv.LoadController.prototype.onerror = function (_event) {};
+dwv.ctrl.LoadController.prototype.onerror = function (_event) {};
 /**
  * Handle an abort event.
  * Default does nothing.
  *
  * @param {object} _event The abort event.
  */
-dwv.LoadController.prototype.onabort = function (_event) {};
+dwv.ctrl.LoadController.prototype.onabort = function (_event) {};

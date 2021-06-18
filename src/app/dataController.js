@@ -1,12 +1,14 @@
 // namespaces
 var dwv = dwv || {};
+/** @namespace */
+dwv.ctrl = dwv.ctrl || {};
 
 /*
  * Data (list of {image, meta}) controller.
  *
  * @class
  */
-dwv.DataController = function () {
+dwv.ctrl.DataController = function () {
 
   /**
    * List of {image, meta}.

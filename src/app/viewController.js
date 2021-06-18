@@ -1,5 +1,6 @@
 // namespaces
 var dwv = dwv || {};
+dwv.ctrl = dwv.ctrl || {};
 
 /**
  * View controller.
@@ -7,7 +8,7 @@ var dwv = dwv || {};
  * @param {dwv.image.View} view The associated view.
  * @class
  */
-dwv.ViewController = function (view) {
+dwv.ctrl.ViewController = function (view) {
   // closure to self
   var self = this;
   // third dimension player ID (created by setInterval)
@@ -308,4 +309,4 @@ dwv.ViewController = function (view) {
     this.setColourMap(dwv.tool.colourMaps[name]);
   };
 
-}; // class dwv.ViewController
+}; // class ViewController

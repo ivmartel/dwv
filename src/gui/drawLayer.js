@@ -1,5 +1,6 @@
 // namespaces
 var dwv = dwv || {};
+/** @namespace */
 dwv.gui = dwv.gui || {};
 
 /**
@@ -204,7 +205,7 @@ dwv.gui.DrawLayer = function (containerDiv) {
     konvaStage.add(konvaLayer);
 
     // create draw controller
-    drawController = new dwv.DrawController(konvaLayer);
+    drawController = new dwv.ctrl.DrawController(konvaLayer);
   };
 
   /**

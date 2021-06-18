@@ -1,6 +1,8 @@
 // namespaces
 var dwv = dwv || {};
 dwv.draw = dwv.draw || {};
+dwv.ctrl = dwv.ctrl || {};
+
 /**
  * The Konva namespace.
  *
@@ -128,7 +130,7 @@ dwv.draw.getHierarchyLog = function (layer, prefix) {
  * @class
  * @param {object} konvaLayer The draw layer.
  */
-dwv.DrawController = function (konvaLayer) {
+dwv.ctrl.DrawController = function (konvaLayer) {
   // current position group id
   var currentPosGroupId = null;
 
@@ -494,4 +496,4 @@ dwv.DrawController = function (konvaLayer) {
     }
   };
 
-}; // class dwv.DrawController
+}; // class DrawController

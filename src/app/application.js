@@ -239,11 +239,11 @@ dwv.App = function () {
         }
       }
       // add tools to the controller
-      toolboxController = new dwv.ToolboxController(toolList);
+      toolboxController = new dwv.ctrl.ToolboxController(toolList);
     }
 
     // create load controller
-    loadController = new dwv.LoadController(options.defaultCharacterSet);
+    loadController = new dwv.ctrl.LoadController(options.defaultCharacterSet);
     loadController.onloadstart = onloadstart;
     loadController.onprogress = onprogress;
     loadController.onloaditem = onloaditem;
@@ -253,7 +253,7 @@ dwv.App = function () {
     loadController.onabort = onabort;
 
     // create data controller
-    dataController = new dwv.DataController();
+    dataController = new dwv.ctrl.DataController();
   };
 
   /**
@@ -861,7 +861,7 @@ dwv.App = function () {
         // warn: needs a loaded DOM
         if (!layerController) {
           layerController =
-            new dwv.LayerController(self.getElement('layerContainer'));
+            new dwv.ctrl.LayerController(self.getElement('layerContainer'));
         }
         // initialise or add view
         var dataIndex = dataController.getCurrentIndex();

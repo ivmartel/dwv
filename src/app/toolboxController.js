@@ -1,5 +1,6 @@
 // namespaces
 var dwv = dwv || {};
+dwv.ctrl = dwv.ctrl || {};
 
 /**
  * Toolbox controller.
@@ -7,7 +8,7 @@ var dwv = dwv || {};
  * @param {Array} toolList The list of tool objects.
  * @class
  */
-dwv.ToolboxController = function (toolList) {
+dwv.ctrl.ToolboxController = function (toolList) {
   /**
    * Point converter function
    *
@@ -245,4 +246,4 @@ dwv.ToolboxController = function (toolList) {
     }
   }
 
-}; // class dwv.ToolboxController
+}; // class ToolboxController

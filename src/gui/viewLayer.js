@@ -323,7 +323,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
     view.addEventListener('positionchange', onPositionChange);
 
     // create view controller
-    viewController = new dwv.ViewController(view);
+    viewController = new dwv.ctrl.ViewController(view);
 
     // get sizes
     var size = image.getGeometry().getSize();

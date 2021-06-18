@@ -1,5 +1,6 @@
 // namespaces
 var dwv = dwv || {};
+dwv.ctrl = dwv.ctrl || {};
 dwv.gui = dwv.gui || {};
 
 /**
@@ -8,7 +9,7 @@ dwv.gui = dwv.gui || {};
  * @param {object} containerDiv The layer div.
  * @class
  */
-dwv.LayerController = function (containerDiv) {
+dwv.ctrl.LayerController = function (containerDiv) {
 
   var layers = [];
 
@@ -335,7 +336,7 @@ dwv.LayerController = function (containerDiv) {
    * Set the layers' scale.
    *
    * @param {object} newScale The scale to apply as {x,y}.
-   * @fires dwv.LayerController#zoomchange
+   * @fires dwv.ctrl.LayerController#zoomchange
    */
   this.setScale = function (newScale) {
     scale = newScale;
@@ -347,7 +348,7 @@ dwv.LayerController = function (containerDiv) {
     /**
      * Zoom change event.
      *
-     * @event dwv.LayerController#zoomchange
+     * @event dwv.ctrl.LayerController#zoomchange
      * @type {object}
      * @property {Array} value The changed value.
      */
@@ -373,7 +374,7 @@ dwv.LayerController = function (containerDiv) {
    * Set the layers' offset.
    *
    * @param {object} newOffset The offset as {x,y}.
-   * @fires dwv.LayerController#offsetchange
+   * @fires dwv.ctrl.LayerController#offsetchange
    */
   this.setOffset = function (newOffset) {
     // store
@@ -386,7 +387,7 @@ dwv.LayerController = function (containerDiv) {
     /**
      * Offset change event.
      *
-     * @event dwv.LayerController#offsetchange
+     * @event dwv.ctrl.LayerController#offsetchange
      * @type {object}
      * @property {Array} value The changed value.
      */
