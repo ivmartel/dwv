@@ -302,7 +302,7 @@ dwv.v01Tov02DrawingsAndDetails = function (inputDrawings) {
         var kshape = drawGroup.getChildren(function (node) {
           return node.name() === 'shape';
         })[0];
-        kshape.stroke(dwv.getColourHex(kshape.stroke()));
+        kshape.stroke(dwv.utils.colourNameToHex(kshape.stroke()));
         // special line case
         if (drawGroup.name() === 'line-group') {
           // update name
@@ -511,29 +511,4 @@ dwv.v04Tov05Drawings = function (inputDrawings) {
     posGroup.attrs.id = newId;
   }
   return inputDrawings;
-};
-
-/**
- * Get the hex code of a string colour for a colour used in pre dwv v0.17.
- *
- * @param {string} name The name of a colour.
- * @returns {string} The hex representing the colour.
- */
-dwv.getColourHex = function (name) {
-  // default colours used in dwv version < 0.17
-  var dict = {
-    Yellow: '#ffff00',
-    Red: '#ff0000',
-    White: '#ffffff',
-    Green: '#008000',
-    Blue: '#0000ff',
-    Lime: '#00ff00',
-    Fuchsia: '#ff00ff',
-    Black: '#000000'
-  };
-  var res = '#ffff00';
-  if (typeof dict[name] !== 'undefined') {
-    res = dict[name];
-  }
-  return res;
 };

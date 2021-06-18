@@ -262,3 +262,28 @@ dwv.utils.cielabToSrgb = function (triplet) {
 dwv.utils.srgbToCielab = function (triplet) {
   return dwv.utils.ciexyzToCielab(dwv.utils.srgbToCiexyz(triplet));
 };
+
+/**
+ * Get the hex code of a string colour for a colour used in pre dwv v0.17.
+ *
+ * @param {string} name The name of a colour.
+ * @returns {string} The hex representing the colour.
+ */
+dwv.utils.colourNameToHex = function (name) {
+  // default colours used in dwv version < 0.17
+  var dict = {
+    Yellow: '#ffff00',
+    Red: '#ff0000',
+    White: '#ffffff',
+    Green: '#008000',
+    Blue: '#0000ff',
+    Lime: '#00ff00',
+    Fuchsia: '#ff00ff',
+    Black: '#000000'
+  };
+  var res = '#ffff00';
+  if (typeof dict[name] !== 'undefined') {
+    res = dict[name];
+  }
+  return res;
+};
