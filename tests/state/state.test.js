@@ -39,7 +39,7 @@ dwv.test.testState = function (version, type, assert) {
       return;
     }
     // read state
-    var state = new dwv.State();
+    var state = new dwv.io.State();
     var jsonData = state.fromJSON(this.responseText);
     // check drawings values
     dwv.test.checkDrawings(
@@ -933,7 +933,7 @@ dwv.test.checkRectangleDrawing = function (
 };
 
 /**
- * Tests for {@link dwv.State} v0.1 containing a line.
+ * Tests for {@link dwv.io.State} v0.1 containing a line.
  *
  * @function module:tests/state~testV01Line
  */
@@ -942,7 +942,7 @@ QUnit.test('Test read v0.1 state: line.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.1 containing a roi.
+ * Tests for {@link dwv.io.State} v0.1 containing a roi.
  *
  * @function module:tests/state~testV01Roi
  */
@@ -951,7 +951,7 @@ QUnit.test('Test read v0.1 state: roi.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.1 containing an ellipse.
+ * Tests for {@link dwv.io.State} v0.1 containing an ellipse.
  *
  * @function module:tests/state~testV01Ellipse
  */
@@ -960,7 +960,7 @@ QUnit.test('Test read v0.1 state: ellipse.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.1 containing a protractor.
+ * Tests for {@link dwv.io.State} v0.1 containing a protractor.
  *
  * @function module:tests/state~testV01Protractor
  */
@@ -969,7 +969,7 @@ QUnit.test('Test read v0.1 state: protractor.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.1 containing a rectangle.
+ * Tests for {@link dwv.io.State} v0.1 containing a rectangle.
  *
  * @function module:tests/state~testV01Rectangle
  */
@@ -978,7 +978,7 @@ QUnit.test('Test read v0.1 state: rectangle.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.1 containing a multi slice ruler.
+ * Tests for {@link dwv.io.State} v0.1 containing a multi slice ruler.
  *
  * @function module:tests/state~testV01MultiSliceRuler
  */
@@ -987,7 +987,7 @@ QUnit.test('Test read v0.1 state: line multi-slice.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.2 containing an arrow.
+ * Tests for {@link dwv.io.State} v0.2 containing an arrow.
  *
  * @function module:tests/state~testV02Arrow
  */
@@ -996,7 +996,7 @@ QUnit.test('Test read v0.2 state: arrow.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.2 containing a ruler.
+ * Tests for {@link dwv.io.State} v0.2 containing a ruler.
  *
  * @function module:tests/state~testV02Ruler
  */
@@ -1005,7 +1005,7 @@ QUnit.test('Test read v0.2 state: ruler.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.2 containing a roi.
+ * Tests for {@link dwv.io.State} v0.2 containing a roi.
  *
  * @function module:tests/state~testV02Roi
  */
@@ -1014,7 +1014,7 @@ QUnit.test('Test read v0.2 state: roi.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.2 containing a hand draw.
+ * Tests for {@link dwv.io.State} v0.2 containing a hand draw.
  *
  * @function module:tests/state~testV02Hand
  */
@@ -1023,7 +1023,7 @@ QUnit.test('Test read v0.2 state: hand.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.2 containing an ellipse.
+ * Tests for {@link dwv.io.State} v0.2 containing an ellipse.
  *
  * @function module:tests/state~testV02Ellipses
  */
@@ -1032,7 +1032,7 @@ QUnit.test('Test read v0.2 state: ellipse.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.2 containing a protractor.
+ * Tests for {@link dwv.io.State} v0.2 containing a protractor.
  *
  * @function module:tests/state~testV02Protractor
  */
@@ -1041,7 +1041,7 @@ QUnit.test('Test read v0.2 state: protractor.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.2 containing a rectangle.
+ * Tests for {@link dwv.io.State} v0.2 containing a rectangle.
  *
  * @function module:tests/state~testV02Rectangle
  */
@@ -1050,7 +1050,7 @@ QUnit.test('Test read v0.2 state: rectangle.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.2 containing a multi slice ruler.
+ * Tests for {@link dwv.io.State} v0.2 containing a multi slice ruler.
  *
  * @function module:tests/state~testV02MultiSliceRuler
  */
@@ -1059,7 +1059,7 @@ QUnit.test('Test read v0.2 state: ruler multi-slice.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.3 containing an arrow.
+ * Tests for {@link dwv.io.State} v0.3 containing an arrow.
  *
  * @function module:tests/state~testV03Arrow
  */
@@ -1068,7 +1068,7 @@ QUnit.test('Test read v0.3 state: arrow.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.3 containing a ruler.
+ * Tests for {@link dwv.io.State} v0.3 containing a ruler.
  *
  * @function module:tests/state~testV03Ruler
  */
@@ -1077,7 +1077,7 @@ QUnit.test('Test read v0.3 state: ruler.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.3 containing a roi.
+ * Tests for {@link dwv.io.State} v0.3 containing a roi.
  *
  * @function module:tests/state~testV03Roi
  */
@@ -1086,7 +1086,7 @@ QUnit.test('Test read v0.3 state: roi.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.3 containing a hand draw.
+ * Tests for {@link dwv.io.State} v0.3 containing a hand draw.
  *
  * @function module:tests/state~testV03Hand
  */
@@ -1095,7 +1095,7 @@ QUnit.test('Test read v0.3 state: hand.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.3 containing an ellipse.
+ * Tests for {@link dwv.io.State} v0.3 containing an ellipse.
  *
  * @function module:tests/state~testV03Ellipse
  */
@@ -1104,7 +1104,7 @@ QUnit.test('Test read v0.3 state: ellipse.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.3 containing a protractor.
+ * Tests for {@link dwv.io.State} v0.3 containing a protractor.
  *
  * @function module:tests/state~testV03Protractor
  */
@@ -1113,7 +1113,7 @@ QUnit.test('Test read v0.3 state: protractor.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.3 containing a rectangle.
+ * Tests for {@link dwv.io.State} v0.3 containing a rectangle.
  *
  * @function module:tests/state~testV03Rectangle
  */
@@ -1122,7 +1122,7 @@ QUnit.test('Test read v0.3 state: rectangle.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.3 containing a multi slice ruler.
+ * Tests for {@link dwv.io.State} v0.3 containing a multi slice ruler.
  *
  * @function module:tests/state~testV03MultiSliceRuler
  */
@@ -1131,7 +1131,7 @@ QUnit.test('Test read v0.3 state: ruler multi-slice.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.4 containing an arrow.
+ * Tests for {@link dwv.io.State} v0.4 containing an arrow.
  *
  * @function module:tests/state~testV04Arrow
  */
@@ -1140,7 +1140,7 @@ QUnit.test('Test read v0.4 state: arrow.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.4 containing a ruler.
+ * Tests for {@link dwv.io.State} v0.4 containing a ruler.
  *
  * @function module:tests/state~testV04Ruler
  */
@@ -1149,7 +1149,7 @@ QUnit.test('Test read v0.4 state: ruler.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.4 containing a roi.
+ * Tests for {@link dwv.io.State} v0.4 containing a roi.
  *
  * @function module:tests/state~testV04Roi
  */
@@ -1158,7 +1158,7 @@ QUnit.test('Test read v0.4 state: roi.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.4 containing a hand draw.
+ * Tests for {@link dwv.io.State} v0.4 containing a hand draw.
  *
  * @function module:tests/state~testV04Hand
  */
@@ -1167,7 +1167,7 @@ QUnit.test('Test read v0.4 state: hand.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.4 containing an ellipse.
+ * Tests for {@link dwv.io.State} v0.4 containing an ellipse.
  *
  * @function module:tests/state~testV04Ellipse
  */
@@ -1176,7 +1176,7 @@ QUnit.test('Test read v0.4 state: ellipse.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.4 containing a protractor.
+ * Tests for {@link dwv.io.State} v0.4 containing a protractor.
  *
  * @function module:tests/state~testV04Protractor
  */
@@ -1186,7 +1186,7 @@ QUnit.test('Test read v0.4 state: protractor.', function (assert) {
 
 
 /**
- * Tests for {@link dwv.State} v0.4 containing a rectangle.
+ * Tests for {@link dwv.io.State} v0.4 containing a rectangle.
  *
  * @function module:tests/state~testV04Rectangle
  */
@@ -1195,7 +1195,7 @@ QUnit.test('Test read v0.4 state: rectangle.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.4 containing a multi slice ruler.
+ * Tests for {@link dwv.io.State} v0.4 containing a multi slice ruler.
  *
  * @function module:tests/state~testV04MultiSliceRuler
  */
@@ -1204,7 +1204,7 @@ QUnit.test('Test read v0.4 state: ruler multi-slice.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.5 containing an arrow.
+ * Tests for {@link dwv.io.State} v0.5 containing an arrow.
  *
  * @function module:tests/state~testV05Arrow
  */
@@ -1213,7 +1213,7 @@ QUnit.test('Test read v0.5 state: arrow.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.5 containing a ruler.
+ * Tests for {@link dwv.io.State} v0.5 containing a ruler.
  *
  * @function module:tests/state~testV05Ruler
  */
@@ -1222,7 +1222,7 @@ QUnit.test('Test read v0.5 state: ruler.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.5 containing a roi.
+ * Tests for {@link dwv.io.State} v0.5 containing a roi.
  *
  * @function module:tests/state~testV05Roi
  */
@@ -1231,7 +1231,7 @@ QUnit.test('Test read v0.5 state: roi.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.5 containing a hand draw.
+ * Tests for {@link dwv.io.State} v0.5 containing a hand draw.
  *
  * @function module:tests/state~testV05Hand
  */
@@ -1240,7 +1240,7 @@ QUnit.test('Test read v0.5 state: hand.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.5 containing an ellipse.
+ * Tests for {@link dwv.io.State} v0.5 containing an ellipse.
  *
  * @function module:tests/state~testV05Ellipse
  */
@@ -1249,7 +1249,7 @@ QUnit.test('Test read v0.5 state: ellipse.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.5 containing a protractor.
+ * Tests for {@link dwv.io.State} v0.5 containing a protractor.
  *
  * @function module:tests/state~testV05Protractor
  */
@@ -1259,7 +1259,7 @@ QUnit.test('Test read v0.5 state: protractor.', function (assert) {
 
 
 /**
- * Tests for {@link dwv.State} v0.5 containing a rectangle.
+ * Tests for {@link dwv.io.State} v0.5 containing a rectangle.
  *
  * @function module:tests/state~testV05Rectangle
  */
@@ -1268,7 +1268,7 @@ QUnit.test('Test read v0.5 state: rectangle.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.State} v0.5 containing a multi slice ruler.
+ * Tests for {@link dwv.io.State} v0.5 containing a multi slice ruler.
  *
  * @function module:tests/state~testV05MultiSliceRuler
  */

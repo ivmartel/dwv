@@ -529,7 +529,7 @@ dwv.App = function () {
    * @returns {object} The state of the app as a JSON object.
    */
   this.getState = function () {
-    var state = new dwv.State();
+    var state = new dwv.io.State();
     return state.toJSON(self);
   };
 
@@ -831,7 +831,7 @@ dwv.App = function () {
 
       eventMetaData = event.data.info;
     } else if (event.loadtype === 'state') {
-      var state = new dwv.State();
+      var state = new dwv.io.State();
       state.apply(self, state.fromJSON(event.data));
       eventMetaData = 'state';
     }
