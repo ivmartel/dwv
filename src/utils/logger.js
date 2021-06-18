@@ -2,11 +2,14 @@
 var dwv = dwv || {};
 /** @namespace */
 dwv.utils = dwv.utils || {};
+/** @namespace */
 dwv.utils.logger = dwv.utils.logger || {};
+/** @namespace */
 dwv.utils.logger.console = dwv.utils.logger.console || {};
 
 /**
  * Main logger, defaults to the console logger.
+ * @see dwv.utils.logger.console
  */
 dwv.logger = dwv.utils.logger.console;
 
