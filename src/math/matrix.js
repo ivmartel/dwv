@@ -85,7 +85,7 @@ dwv.math.Matrix33.prototype.toString = function () {
  * @param {object} vector3D The input 3D vector
  * @returns {object} The result 3D vector
  */
-dwv.math.Matrix33.multiplyVector3D = function (vector3D) {
+dwv.math.Matrix33.prototype.multiplyVector3D = function (vector3D) {
   // cache matrix values
   var m00 = this.get(0, 0); var m01 = this.get(0, 1); var m02 = this.get(0, 2);
   var m10 = this.get(1, 0); var m11 = this.get(1, 1); var m12 = this.get(1, 2);
