@@ -80,25 +80,54 @@ dwv.math.Matrix33.prototype.toString = function () {
 };
 
 /**
- * Multiply this matrix by a 3D vector.
+ * Multiply this matrix by a 3D array.
  *
- * @param {object} vector3D The input 3D vector
- * @returns {object} The result 3D vector
+ * @param {array} array3D The input 3D array.
+ * @returns {array} The result 3D array.
  */
-dwv.math.Matrix33.prototype.multiplyVector3D = function (vector3D) {
-  // cache matrix values
+dwv.math.Matrix33.prototype.multiplyArray3D = function (array3D) {
+  // matrix values
   var m00 = this.get(0, 0); var m01 = this.get(0, 1); var m02 = this.get(0, 2);
   var m10 = this.get(1, 0); var m11 = this.get(1, 1); var m12 = this.get(1, 2);
   var m20 = this.get(2, 0); var m21 = this.get(2, 1); var m22 = this.get(2, 2);
-  // cache vector values
-  var vx = vector3D.getX();
-  var vy = vector3D.getY();
-  var vz = vector3D.getZ();
-  // calculate
-  return new dwv.math.Vector3D(
-    (m00 * vx) + (m01 * vy) + (m02 * vz),
-    (m10 * vx) + (m11 * vy) + (m12 * vz),
-    (m20 * vx) + (m21 * vy) + (m22 * vz));
+  // array values
+  var a0 = array3D[0];
+  var a1 = array3D[1];
+  var a2 = array3D[2];
+  // multiply
+  return [
+    (m00 * a0) + (m01 * a1) + (m02 * a2),
+    (m10 * a0) + (m11 * a1) + (m12 * a2),
+    (m20 * a0) + (m21 * a1) + (m22 * a2)
+  ];
+};
+
+/**
+ * Multiply this matrix by a 3D vector.
+ *
+ * @param {object} vector3D The input 3D vector.
+ * @returns {object} The result 3D vector.
+ */
+dwv.math.Matrix33.prototype.multiplyVector3D = function (vector3D) {
+  var array3D = this.multiplyArray3D(
+    [vector3D.getX(), vector3D.getY(), vector3D.getZ()]
+  );
+  return new dwv.math.Vector3D(array3D[0], array3D[1], array3D[2]);
+};
+
+/**
+ * Multiply this matrix by a 3D index.
+ *
+ * @param {object} index3D The input 3D index.
+ * @returns {object} The result 3D index.
+ */
+dwv.math.Matrix33.prototype.multiplyIndex3D = function (index3D) {
+  if (index3D.length() !== 3) {
+    throw new Error('Cannot multiply matrix 3x3 with non 3D index: ',
+      index3D.length());
+  }
+  var array3D = this.multiplyArray3D(index3D.getValues());
+  return new dwv.math.Index(array3D);
 };
 
 /**
