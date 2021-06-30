@@ -387,12 +387,14 @@ dwv.App = function () {
    * Fit the display to the given size. To be called once the image is loaded.
    */
   this.fitToContainer = function () {
-    layerController.fitToContainer(
-      self.getImage().getGeometry().getSpacing()
-    );
-    layerController.draw();
-    // update style
-    style.setBaseScale(layerController.getBaseScale());
+    if (layerController) {
+      layerController.fitToContainer(
+        self.getImage().getGeometry().getSpacing()
+      );
+      layerController.draw();
+      // update style
+      style.setBaseScale(layerController.getBaseScale());
+    }
   };
 
   /**
