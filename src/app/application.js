@@ -408,6 +408,22 @@ dwv.App = function () {
    * Render the current data.
    */
   this.render = function () {
+
+    // create layer controller if not done yet
+    // warn: needs a loaded DOM
+    if (!layerController) {
+      layerController =
+        new dwv.ctrl.LayerController(self.getElement('layerContainer'));
+      // initialise or add view
+      var dataIndex = dataController.getCurrentIndex();
+      var data = dataController.get(dataIndex);
+      if (layerController.getNumberOfLayers() === 0) {
+        initialiseBaseLayers(data.image, data.meta, dataIndex);
+      } else {
+        addViewLayer(data.image, data.meta, dataIndex);
+      }
+    }
+
     layerController.draw();
   };
 
@@ -856,31 +872,15 @@ dwv.App = function () {
 
     // adapt context
     if (event.loadtype === 'image') {
-      if (isFirstLoadItem) {
-        // create layer controller if not done yet
-        // warn: needs a loaded DOM
-        if (!layerController) {
-          layerController =
-            new dwv.ctrl.LayerController(self.getElement('layerContainer'));
-        }
-        // initialise or add view
-        var dataIndex = dataController.getCurrentIndex();
-        var data = dataController.get(dataIndex);
-        if (layerController.getNumberOfLayers() === 0) {
-          initialiseBaseLayers(data.image, data.meta, dataIndex);
-        } else {
-          addViewLayer(data.image, data.meta, dataIndex);
-        }
-      } else {
-        // update slice number if new slice was inserted before
+      // update view current position if new slice was inserted before
+      if (layerController) {
         var controller =
           layerController.getActiveViewLayer().getViewController();
         var currentPosition = controller.getCurrentPosition();
         if (sliceNb <= currentPosition.get(2)) {
-          controller.incrementIndex(2);
+          controller.incrementIndex(2, true);
         }
       }
-
       // render if flag allows
       if (isFirstLoadItem && options.viewOnFirstLoadItem) {
         self.render();
