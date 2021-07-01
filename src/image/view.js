@@ -687,3 +687,23 @@ dwv.image.View.prototype.decrementIndex = function (dim, silent) {
   var incr = new dwv.math.Index(values);
   return this.setCurrentPosition(pos.add(incr), silent);
 };
+
+/**
+ * Decrement the scroll dimension index.
+ *
+ * @param {boolean} silent Do not send event.
+ * @returns {boolean} False if not in bounds.
+ */
+dwv.image.View.prototype.decrementScrollIndex = function (silent) {
+  return this.decrementIndex(2, silent);
+};
+
+/**
+ * Increment the scroll dimension index.
+ *
+ * @param {boolean} silent Do not send event.
+ * @returns {boolean} False if not in bounds.
+ */
+dwv.image.View.prototype.incrementScrollIndex = function (silent) {
+  return this.incrementIndex(2, silent);
+};

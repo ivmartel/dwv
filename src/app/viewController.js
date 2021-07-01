@@ -202,24 +202,42 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
+   * Decrement the scroll dimension index.
+   *
+   * @param {boolean} silent Do not send event.
+   * @returns {boolean} False if not in bounds.
+   */
+  this.decrementScrollIndex = function (silent) {
+    return view.decrementScrollIndex(silent);
+  };
+
+  /**
+   * Increment the scroll dimension index.
+   *
+   * @param {boolean} silent Do not send event.
+   * @returns {boolean} False if not in bounds.
+   */
+  this.incrementScrollIndex = function (silent) {
+    return view.incrementScrollIndex(silent);
+  };
+
+  /**
    *
    */
   this.play = function () {
     if (playerID === null) {
-      var size = view.getImage().getGeometry().getSize();
       var recommendedDisplayFrameRate =
         view.getImage().getMeta().RecommendedDisplayFrameRate;
       var milliseconds = view.getPlaybackMilliseconds(
         recommendedDisplayFrameRate);
 
       playerID = setInterval(function () {
-        if (size.get(2) !== 1) {
-          if (!self.incrementIndex(2)) {
-            var pos1 = self.getCurrentPosition();
-            var values = pos1.getValues();
-            values[2] = 0;
-            self.setCurrentPosition(new dwv.math.Index(values));
-          }
+        // end of scroll, loop back
+        if (!self.incrementScrollIndex()) {
+          var pos1 = self.getCurrentPosition();
+          var values = pos1.getValues();
+          values[2] = 0;
+          self.setCurrentPosition(new dwv.math.Index(values));
         }
       }, milliseconds);
     } else {
