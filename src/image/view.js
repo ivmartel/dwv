@@ -647,3 +647,43 @@ dwv.image.View.prototype.generateImageData = function (array) {
       'Unsupported photometric interpretation: ' + photoInterpretation);
   }
 };
+
+/**
+ * Increment the provided dimension.
+ *
+ * @param {number} dim The dimension to increment.
+ * @param {boolean} silent Do not send event.
+ * @returns {boolean} False if not in bounds.
+ */
+dwv.image.View.prototype.incrementIndex = function (dim, silent) {
+  var pos = this.getCurrentPosition();
+  var values = new Array(pos.length());
+  values.fill(0);
+  if (dim < values.length) {
+    values[dim] = 1;
+  } else {
+    console.warn('Cannot increment given index: ', dim, values.length);
+  }
+  var incr = new dwv.math.Index(values);
+  return this.setCurrentPosition(pos.add(incr), silent);
+};
+
+/**
+ * Decrement the provided dimension.
+ *
+ * @param {number} dim The dimension to increment.
+ * @param {boolean} silent Do not send event.
+ * @returns {boolean} False if not in bounds.
+ */
+dwv.image.View.prototype.decrementIndex = function (dim, silent) {
+  var pos = this.getCurrentPosition();
+  var values = new Array(pos.length());
+  values.fill(0);
+  if (dim < values.length) {
+    values[dim] = -1;
+  } else {
+    console.warn('Cannot decrement given index: ', dim, values.length);
+  }
+  var incr = new dwv.math.Index(values);
+  return this.setCurrentPosition(pos.add(incr), silent);
+};

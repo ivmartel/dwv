@@ -187,16 +187,7 @@ dwv.ctrl.ViewController = function (view) {
    * @returns {boolean} False if not in bounds.
    */
   this.incrementIndex = function (dim, silent) {
-    var pos = view.getCurrentPosition();
-    var values = new Array(pos.length());
-    values.fill(0);
-    if (dim < values.length) {
-      values[dim] = 1;
-    } else {
-      console.warn('Cannot increment given index: ', dim, values.length);
-    }
-    var incr = new dwv.math.Index(values);
-    return view.setCurrentPosition(pos.add(incr), silent);
+    return view.incrementIndex(dim, silent);
   };
 
   /**
@@ -207,16 +198,7 @@ dwv.ctrl.ViewController = function (view) {
    * @returns {boolean} False if not in bounds.
    */
   this.decrementIndex = function (dim, silent) {
-    var pos = view.getCurrentPosition();
-    var values = new Array(pos.length());
-    values.fill(0);
-    if (dim < values.length) {
-      values[dim] = -1;
-    } else {
-      console.warn('Cannot decrement given index: ', dim, values.length);
-    }
-    var incr = new dwv.math.Index(values);
-    return view.setCurrentPosition(pos.add(incr), silent);
+    return view.decrementIndex(dim, silent);
   };
 
   /**
