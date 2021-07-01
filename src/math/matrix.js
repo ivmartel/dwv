@@ -82,8 +82,8 @@ dwv.math.Matrix33.prototype.toString = function () {
 /**
  * Multiply this matrix by a 3D array.
  *
- * @param {array} array3D The input 3D array.
- * @returns {array} The result 3D array.
+ * @param {Array} array3D The input 3D array.
+ * @returns {Array} The result 3D array.
  */
 dwv.math.Matrix33.prototype.multiplyArray3D = function (array3D) {
   // matrix values
