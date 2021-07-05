@@ -155,13 +155,13 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
    *
    * @returns {boolean} True if the data has a third dimension greater than one.
    */
-  this.canScroll = function () {
+  this.canScroll = function (viewOrientation) {
     var size = this.getGeometry().getSize();
     var nFiles = 1;
     if (typeof meta.numberOfFiles !== 'undefined') {
       nFiles = meta.numberOfFiles;
     }
-    return size.get(2) !== 1 || nFiles !== 1;
+    return size.canScroll(viewOrientation) || nFiles !== 1;
   };
 
   /**

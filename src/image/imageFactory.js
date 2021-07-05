@@ -108,10 +108,17 @@ dwv.image.ImageFactory.prototype.create = function (
       parseFloat(imageOrientationPatient[4]),
       parseFloat(imageOrientationPatient[5]));
     var normal = rowCosines.crossProduct(colCosines);
-    orientationMatrix = new dwv.math.Matrix33(
-      rowCosines.getX(), rowCosines.getY(), rowCosines.getZ(),
-      colCosines.getX(), colCosines.getY(), colCosines.getZ(),
-      normal.getX(), normal.getY(), normal.getZ());
+    orientationMatrix = new dwv.math.Matrix33([
+      rowCosines.getX(),
+      rowCosines.getY(),
+      rowCosines.getZ(),
+      colCosines.getX(),
+      colCosines.getY(),
+      colCosines.getZ(),
+      normal.getX(),
+      normal.getY(),
+      normal.getZ()
+    ]);
   }
 
   // geometry
@@ -210,6 +217,12 @@ dwv.image.ImageFactory.prototype.create = function (
   meta.IsSigned = false;
   if (pixelRepresentation) {
     meta.IsSigned = (pixelRepresentation === 1);
+  }
+  // PatientPosition
+  var patientPosition = dicomElements.getFromKey('x00185100');
+  meta.PatientPosition = false;
+  if (patientPosition) {
+    meta.PatientPosition = patientPosition;
   }
 
   // window level presets

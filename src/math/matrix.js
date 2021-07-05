@@ -10,27 +10,10 @@ if (typeof Number.EPSILON === 'undefined') {
 /**
  * Immutable 3x3 Matrix.
  *
- * @param {number} m00 m[0][0]
- * @param {number} m01 m[0][1]
- * @param {number} m02 m[0][2]
- * @param {number} m10 m[1][0]
- * @param {number} m11 m[1][1]
- * @param {number} m12 m[1][2]
- * @param {number} m20 m[2][0]
- * @param {number} m21 m[2][1]
- * @param {number} m22 m[2][2]
+ * @param {Array} values row-major ordered 9 values.
  * @class
  */
-dwv.math.Matrix33 = function (
-  m00, m01, m02,
-  m10, m11, m12,
-  m20, m21, m22) {
-  // row-major order
-  var mat = new Float32Array(9);
-  mat[0] = m00; mat[1] = m01; mat[2] = m02;
-  mat[3] = m10; mat[4] = m11; mat[5] = m12;
-  mat[6] = m20; mat[7] = m21; mat[8] = m22;
-
+dwv.math.Matrix33 = function (values) {
   /**
    * Get a value of the matrix.
    *
@@ -39,7 +22,7 @@ dwv.math.Matrix33 = function (
    * @returns {number} The value at the position.
    */
   this.get = function (row, col) {
-    return mat[row * 3 + col];
+    return values[row * 3 + col];
   };
 }; // Matrix33
 
@@ -136,8 +119,86 @@ dwv.math.Matrix33.prototype.multiplyIndex3D = function (index3D) {
  * @returns {object} The identity matrix.
  */
 dwv.math.getIdentityMat33 = function () {
-  return new dwv.math.Matrix33(
+  /* eslint-disable array-element-newline */
+  return new dwv.math.Matrix33([
     1, 0, 0,
     0, 1, 0,
-    0, 0, 1);
+    0, 0, 1
+  ]);
+  /* eslint-enable array-element-newline */
+};
+
+dwv.math.Matrix33.prototype.getRowAbsMax = function (row) {
+  var values = [
+    Math.abs(this.get(row, 0)),
+    Math.abs(this.get(row, 1)),
+    Math.abs(this.get(row, 2))
+  ];
+  var absMax = Math.max.apply(null, values);
+  var index = values.indexOf(absMax);
+  return {
+    value: this.get(row, index),
+    index: index
+  };
+};
+
+/**
+ * Get the directions of an orientation matrix.
+ *
+ * @returns {string} A string made of 'x', 'y', 'z'.
+ */
+dwv.math.Matrix33.prototype.getMajorDirections = function () {
+  var res = [];
+  for (var i = 0; i < 3; ++i) {
+    res.push(this.getRowAbsMax(i).index);
+  }
+  return res;
+};
+
+/**
+ * Get the third direction index of an orientation matrix.
+ *
+ * @returns {number} The index.
+ */
+dwv.math.Matrix33.prototype.getThirdRowMajorDirection = function () {
+  return this.getRowAbsMax(2).index;
+};
+
+dwv.math.Matrix33.prototype.getMajorDirectionsAsString = function () {
+  var getLetter = function (index) {
+    if (index === 0) {
+      return 'x';
+    } else if (index === 1) {
+      return 'y';
+    } else if (index === 2) {
+      return 'z';
+    } else {
+      throw new Error('Bad matrix row index.');
+    }
+  };
+  var res = '';
+  var majorDirs = this.getMajorDirections();
+  for (var i = 0; i < majorDirs.length; ++i) {
+    res += getLetter(majorDirs[i]);
+  }
+  return res;
+};
+
+dwv.math.Matrix33.prototype.getCompensatingViewOrientation = function (
+  inputDirs) {
+  var majorDirs = this.getMajorDirections();
+  var normalDirs = [
+    [1, 0, 0],
+    [0, 1, 0],
+    [0, 0, 1]
+  ];
+  var res = new Array(9);
+  for (var i = 0; i < 3; ++i) {
+    var posInInputDirs = inputDirs.indexOf(i);
+    var posInMajorDirs = majorDirs.indexOf(i);
+    // insert the normal dir at the position of the input dir
+    res.splice.apply(
+      res, [posInInputDirs * 3, 3].concat(normalDirs[posInMajorDirs]));
+  }
+  return new dwv.math.Matrix33(res);
 };

@@ -405,11 +405,21 @@ dwv.ctrl.LayerController = function (containerDiv) {
    * @param {number} dataIndex The data index.
    */
   this.initialise = function (image, metaData, dataIndex) {
-    var size = image.getGeometry().getSize();
+    // axial
+    //var dirs = [0, 1, 2];
+    // coronal
+    //var dirs = [0, 2, 1];
+    // sagittal
+    var dirs = [1, 2, 0];
+
+    var orientation =
+      image.getGeometry().getOrientation().getCompensatingViewOrientation(dirs);
+
+    var size = image.getGeometry().getSize(orientation);
     layerSize = size.get2D();
     // apply to layers
     for (var i = 0; i < layers.length; ++i) {
-      layers[i].initialise(image, metaData, dataIndex);
+      layers[i].initialise(image, metaData, dataIndex, orientation);
     }
 
     // bind draw to view position
@@ -420,7 +430,7 @@ dwv.ctrl.LayerController = function (containerDiv) {
     this.updateDrawControllerToViewPosition();
 
     // fit data
-    var spacing = image.getGeometry().getSpacing();
+    var spacing = image.getGeometry().getSpacing(orientation);
     this.fitToContainer(spacing);
   };
 

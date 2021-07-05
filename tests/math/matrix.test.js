@@ -14,18 +14,23 @@ QUnit.module('matrix');
 QUnit.test('Test Matrix44.', function (assert) {
   var m0 = new dwv.math.getIdentityMat33();
   var m1 = new dwv.math.getIdentityMat33();
-  var m2 = new dwv.math.Matrix33(
+  /* eslint-disable array-element-newline */
+  var m2 = new dwv.math.Matrix33([
     1, 2, 3,
     4, 5, 6,
-    7, 8, 9);
-  var m3 = new dwv.math.Matrix33(
+    7, 8, 9
+  ]);
+  var m3 = new dwv.math.Matrix33([
     1.001, 2.001, 3.001,
     4.001, 5.001, 6.001,
-    7.001, 8.001, 9.001);
-  var m4 = new dwv.math.Matrix33(
+    7.001, 8.001, 9.001
+  ]);
+  var m4 = new dwv.math.Matrix33([
     1.002, 2.002, 3.002,
     4.002, 5.002, 6.002,
-    7.002, 8.002, 9.002);
+    7.002, 8.002, 9.002
+  ]);
+  /* eslint-enable array-element-newline */
 
   // equals
   assert.equal(m0.equals(m1), true, 'equals true');

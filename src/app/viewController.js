@@ -152,7 +152,7 @@ dwv.ctrl.ViewController = function (view) {
    * @returns {boolean} True if the data has a third dimension greater than one.
    */
   this.canScroll = function () {
-    return view.getImage().canScroll();
+    return view.getImage().canScroll(view.getOrientation());
   };
 
   /**
@@ -225,6 +225,9 @@ dwv.ctrl.ViewController = function (view) {
    *
    */
   this.play = function () {
+    if (!this.canScroll()) {
+      return;
+    }
     if (playerID === null) {
       var recommendedDisplayFrameRate =
         view.getImage().getMeta().RecommendedDisplayFrameRate;
@@ -236,7 +239,8 @@ dwv.ctrl.ViewController = function (view) {
         if (!self.incrementScrollIndex()) {
           var pos1 = self.getCurrentPosition();
           var values = pos1.getValues();
-          values[2] = 0;
+          var orientation = view.getOrientation();
+          values[orientation.getThirdRowMajorDirection()] = 0;
           self.setCurrentPosition(new dwv.math.Index(values));
         }
       }, milliseconds);

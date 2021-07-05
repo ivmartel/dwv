@@ -64,7 +64,7 @@ dwv.tool.Scroll = function (app) {
     var diffY = event._y - self.y0;
     var yMove = (Math.abs(diffY) > 15);
     // do not trigger for small moves
-    if (yMove) {
+    if (yMove && viewController.canScroll()) {
       // update view controller
       if (diffY > 0) {
         viewController.decrementScrollIndex();
@@ -77,7 +77,7 @@ dwv.tool.Scroll = function (app) {
     var diffX = event._x - self.x0;
     var xMove = (Math.abs(diffX) > 15);
     // do not trigger for small moves
-    if (xMove && size.canScroll(3)) {
+    if (xMove && size.moreThanOne(3)) {
       // update view controller
       if (diffX > 0) {
         viewController.decrementIndex(3);

@@ -69,8 +69,19 @@ dwv.image.Size = function (values) {
  * @param {object} dimension The dimension to check.
  * @returns {boolean} True if scrollable.
  */
-dwv.image.Size.prototype.canScroll = function (dimension) {
+dwv.image.Size.prototype.moreThanOne = function (dimension) {
   return this.length() >= dimension + 1 && this.get(dimension) !== 1;
+};
+
+/**
+ * Check if the third direction of an orientation matrix has a size
+ * of more than one.
+ *
+ * @param {object} viewOrientation The orientation matrix.
+ * @param {boolean} True if the dimension is scrollable.
+ */
+dwv.image.Size.prototype.canScroll = function (viewOrientation) {
+  return this.moreThanOne(viewOrientation.getThirdRowMajorDirection());
 };
 
 /**
@@ -263,18 +274,40 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
   /**
    * Get the object size.
    *
+   * @param {object} viewOrientation The view orientation (optional)
    * @returns {object} The object size.
    */
-  this.getSize = function () {
-    return size;
+  this.getSize = function (viewOrientation) {
+    var res = size;
+    if (viewOrientation && typeof viewOrientation !== 'undefined') {
+      var vec = new dwv.math.Vector3D(
+        size.get(0),
+        size.get(1),
+        size.get(2)
+      );
+      var vec2 = viewOrientation.multiplyVector3D(vec);
+      res = new dwv.image.Size([vec2.getX(), vec2.getY(), vec2.getZ()]);
+    }
+    return res;
   };
   /**
    * Get the object spacing.
    *
+   * @param {object} viewOrientation The view orientation (optional)
    * @returns {object} The object spacing.
    */
-  this.getSpacing = function () {
-    return spacing;
+  this.getSpacing = function (viewOrientation) {
+    var res = spacing;
+    if (viewOrientation && typeof viewOrientation !== 'undefined') {
+      var vec = new dwv.math.Vector3D(
+        spacing.getColumnSpacing(),
+        spacing.getRowSpacing(),
+        spacing.getSliceSpacing()
+      );
+      var vec2 = viewOrientation.multiplyVector3D(vec);
+      res = new dwv.image.Spacing(vec2.getX(), vec2.getY(), vec2.getZ());
+    }
+    return res;
   };
   /**
    * Get the object orientation.

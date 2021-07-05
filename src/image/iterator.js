@@ -37,6 +37,82 @@ dwv.image.range = function (dataAccessor, start, end, increment) {
 };
 
 /**
+ * Range 2...
+ *
+ * @param {Function} dataAccessor Function to access data.
+ * @param {number} start The start of the range (included).
+ * @param {number} end The end of the range (excluded).
+ * @param {number} increment The increment between indicies.
+ * @param {number} countMax An internal count after which
+ *   countIncrement is applied.
+ * @param {number} countIncrement The increment after countMax is reached,
+ *   the value is from count start to the next count start.
+ * @param {boolean} reverse1 If true, loop from end to start.
+ * @param {boolean} reverse2 If true, loop from count end to count start.
+ * @returns {object} An iterator folowing the iterator and iterable protocol.
+ */
+dwv.image.range2 = function (dataAccessor, start, end, increment,
+  countMax, countIncrement, reverse1, reverse2) {
+  if (typeof reverse1 === 'undefined') {
+    reverse1 = false;
+  }
+  if (typeof reverse2 === 'undefined') {
+    reverse2 = false;
+  }
+
+  // reverse1: start <-> end
+  increment = reverse1 ? -1 * increment : increment;
+  countIncrement = reverse1 ? -1 * countIncrement : countIncrement;
+  // reverse2: start count <-> end count
+  if (reverse2) {
+    if (reverse1) {
+      end += (countMax - 1) * increment;
+    } else {
+      start += (countMax - 1) * increment;
+    }
+    increment *= -1;
+  }
+
+  // countIncrement is from count start to the next count start
+  var finalCountIncrement = countIncrement - countMax * increment;
+  // initial next index
+  var nextIndex = reverse1 ? end : start;
+
+  // test index function
+  var testIndex = function (i) {
+    return i < end;
+  };
+  if (reverse1) {
+    testIndex = function (i) {
+      return i > start;
+    };
+  }
+  var count = 0;
+  // result
+  return {
+    next: function () {
+      if (testIndex(nextIndex)) {
+        var result = {
+          value: dataAccessor(nextIndex),
+          done: false
+        };
+        nextIndex += increment;
+        ++count;
+        if (count === countMax) {
+          count = 0;
+          nextIndex += finalCountIncrement;
+        }
+        return result;
+      }
+      return {
+        done: true,
+        index: end
+      };
+    }
+  };
+};
+
+/**
  * Get an iterator for a given range with bounds (for a one component data).
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
@@ -201,12 +277,14 @@ dwv.image.getIteratorValues = function (iterator) {
  * @param {object} image The image to parse.
  * @param {object} position The current position.
  * @param {boolean} isRescaled Flag for rescaled values (default false).
+ * @param {object} viewOrientation The view orientation.
  * @returns {object} The slice iterator.
  */
-dwv.image.getSliceIterator = function (image, position, isRescaled) {
+dwv.image.getSliceIterator = function (
+  image, position, isRescaled, viewOrientation) {
   var geometry = image.getGeometry();
-  var sliceSize = geometry.getSize().getDimSize(2);
-  var start = geometry.indexToOffset(position.getWithNew2D(0, 0));
+  // TODO: zero-ify non direction index?
+  var start = geometry.indexToOffset(position);
 
   // default to non rescaled data
   if (typeof isRescaled === 'undefined') {
@@ -223,9 +301,56 @@ dwv.image.getSliceIterator = function (image, position, isRescaled) {
     };
   }
 
+  var size = geometry.getSize();
+  var ncols = size.get(0);
+  var nrows = size.get(1);
+  var nslices = size.get(2);
+  var sliceSize = size.getDimSize(2);
+
   var range = null;
   if (image.getNumberOfComponents() === 1) {
-    range = dwv.image.range(dataAccessor, start, start + sliceSize);
+    // first pixel: top left -> inverts left/right, top/bottom...
+
+    var patPos = image.getMeta().PatientPosition;
+    console.log('patPos: ', patPos);
+    var or = geometry.getOrientation();
+    console.log('image orient: ', or.getMajorDirections());
+
+    // HFS: min slice -> feet, max slice -> head
+    //   reverse1: true, reverse2: true
+    var reverse1 = true;
+    var reverse2 = true;
+
+    var dir = viewOrientation.getMajorDirectionsAsString();
+    var end = null;
+    if (dir === 'xyz' || dir === 'yxz') {
+      // axial
+      end = start + sliceSize;
+      range = dwv.image.range(dataAccessor, start, end);
+    } else if (dir === 'yzx' || dir === 'zyx') {
+      // coronal
+      end = start + (nslices - 1) * sliceSize +
+        ncols * (nrows - 1);
+      if (dir === 'yzx') {
+        range = dwv.image.range2(dataAccessor,
+          start, end, ncols, nrows, sliceSize, reverse1, reverse2);
+      } else {
+        range = dwv.image.range2(dataAccessor,
+          start, end, sliceSize, nslices, ncols, reverse1, reverse2);
+      }
+    } else if (dir === 'xzy' || dir === 'zxy') {
+      // sagittal
+      end = start + (nslices - 1) * sliceSize + ncols;
+      if (dir === 'xzy') {
+        range = dwv.image.range2(dataAccessor,
+          start, end, 1, ncols, sliceSize, reverse1, reverse2);
+      } else {
+        range = dwv.image.range2(dataAccessor,
+          start, end, sliceSize, nslices, 1, reverse1, reverse2);
+      }
+    } else {
+      throw new Error('Unknown direction: ' + dir);
+    }
   } else if (image.getNumberOfComponents() === 3) {
     // 3 times bigger...
     start *= 3;
