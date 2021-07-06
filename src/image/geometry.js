@@ -254,6 +254,8 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
   if (typeof orientation === 'undefined') {
     orientation = new dwv.math.getIdentityMat33();
   }
+  // flag to know if new origins were added
+  var newOrigins = false;
 
   /**
    * Get the object first origin.
@@ -290,6 +292,33 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
     }
     return res;
   };
+
+  /**
+   * Get the slice spacing from the difference in the Z directions
+   * of the origins.
+   *
+   * @returns {number} The spacing.
+   */
+  this.getSliceGeometrySpacing = function () {
+    if (origins.length === 1) {
+      return 1;
+    }
+    var spacing = null;
+    for (var i = 0; i < origins.length - 1; ++i) {
+      var diff = Math.abs(
+        origins[i].getZ() - origins[i + 1].getZ()
+      );
+      if (spacing === null) {
+        spacing = diff;
+      } else {
+        if (!dwv.math.isSimilar(spacing, diff, dwv.math.BIG_EPSILON)) {
+          dwv.logger.warn('Varying slice spacing: ' + (spacing - diff));
+        }
+      }
+    }
+    return spacing;
+  };
+
   /**
    * Get the object spacing.
    *
@@ -297,6 +326,15 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
    * @returns {object} The object spacing.
    */
   this.getSpacing = function (viewOrientation) {
+    // update slice spacing after appendSlice
+    if (newOrigins) {
+      spacing = new dwv.image.Spacing(
+        spacing.getColumnSpacing(),
+        spacing.getRowSpacing(),
+        this.getSliceGeometrySpacing()
+      );
+      newOrigins = false;
+    }
     var res = spacing;
     if (viewOrientation && typeof viewOrientation !== 'undefined') {
       var vec = new dwv.math.Vector3D(
@@ -354,6 +392,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
    * @param {number} index The index at which to append.
    */
   this.appendOrigin = function (origin, index) {
+    newOrigins = true;
     // add in origin array
     origins.splice(index, 0, origin);
     // increment second dimension

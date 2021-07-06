@@ -3,9 +3,26 @@ var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
 // difference between 1 and the smallest floating point number greater than 1
+// -> ~2e-16
 if (typeof Number.EPSILON === 'undefined') {
   Number.EPSILON = Math.pow(2, -52);
 }
+// -> ~2e-12
+dwv.math.BIG_EPSILON = Number.EPSILON * 1e4;
+
+/**
+ * Check if two numbers are similar.
+ *
+ * @param {number} a The first number.
+ * @param {number} b The second number.
+ * @param {number} tol The comparison tolerance.
+ */
+dwv.math.isSimilar = function (a, b, tol) {
+  if (typeof tol === 'undefined') {
+    tol = Number.EPSILON;
+  }
+  return Math.abs(a - b) < tol;
+};
 
 /**
  * Immutable 3x3 Matrix.
@@ -35,19 +52,15 @@ dwv.math.Matrix33 = function (values) {
  * @returns {boolean} True if both matrices are equal.
  */
 dwv.math.Matrix33.prototype.equals = function (rhs, p) {
-  if (typeof p === 'undefined') {
-    p = Number.EPSILON;
-  }
-
-  return Math.abs(this.get(0, 0) - rhs.get(0, 0)) < p &&
-    Math.abs(this.get(0, 1) - rhs.get(0, 1)) < p &&
-    Math.abs(this.get(0, 2) - rhs.get(0, 2)) < p &&
-    Math.abs(this.get(1, 0) - rhs.get(1, 0)) < p &&
-    Math.abs(this.get(1, 1) - rhs.get(1, 1)) < p &&
-    Math.abs(this.get(1, 2) - rhs.get(1, 2)) < p &&
-    Math.abs(this.get(2, 0) - rhs.get(2, 0)) < p &&
-    Math.abs(this.get(2, 1) - rhs.get(2, 1)) < p &&
-    Math.abs(this.get(2, 2) - rhs.get(2, 2)) < p;
+  return dwv.math.isSimilar(this.get(0, 0), rhs.get(0, 0), p) &&
+    dwv.math.isSimilar(this.get(0, 1), rhs.get(0, 1), p) &&
+    dwv.math.isSimilar(this.get(0, 2), rhs.get(0, 2), p) &&
+    dwv.math.isSimilar(this.get(1, 0), rhs.get(1, 0), p) &&
+    dwv.math.isSimilar(this.get(1, 1), rhs.get(1, 1), p) &&
+    dwv.math.isSimilar(this.get(1, 2), rhs.get(1, 2), p) &&
+    dwv.math.isSimilar(this.get(2, 0), rhs.get(2, 0), p) &&
+    dwv.math.isSimilar(this.get(2, 1), rhs.get(2, 1), p) &&
+    dwv.math.isSimilar(this.get(2, 2), rhs.get(2, 2), p);
 };
 
 /**
