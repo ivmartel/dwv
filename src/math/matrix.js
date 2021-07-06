@@ -156,9 +156,9 @@ dwv.math.Matrix33.prototype.getRowAbsMax = function (row) {
 };
 
 /**
- * Get the directions of an orientation matrix.
+ * Get the major directions of an orientation matrix.
  *
- * @returns {string} A string made of 'x', 'y', 'z'.
+ * @returns {array} A 3D array of indices.
  */
 dwv.math.Matrix33.prototype.getMajorDirections = function () {
   var res = [];
@@ -177,6 +177,11 @@ dwv.math.Matrix33.prototype.getThirdRowMajorDirection = function () {
   return this.getRowAbsMax(2).index;
 };
 
+/**
+ * Get the major directions of an oritentation matrix as a string.
+ *
+ * @returns {string} The major directions as a combination of 'x', 'y' and 'z'.
+ */
 dwv.math.Matrix33.prototype.getMajorDirectionsAsString = function () {
   var getLetter = function (index) {
     if (index === 0) {
@@ -197,6 +202,14 @@ dwv.math.Matrix33.prototype.getMajorDirectionsAsString = function () {
   return res;
 };
 
+/**
+ * Get an orientation matrix that compensates an input one to show axial views
+ * as along Z.
+ *
+ * @param {array} inputDirs The major directions indices of the matrix to
+ *   compensate.
+ * @returns {object} The compensating matrix.
+ */
 dwv.math.Matrix33.prototype.getCompensatingViewOrientation = function (
   inputDirs) {
   var majorDirs = this.getMajorDirections();
