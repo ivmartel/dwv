@@ -76,26 +76,56 @@ dwv.math.Matrix33.prototype.toString = function () {
 };
 
 /**
+ * Multiply this matrix by another.
+ *
+ * @param {object} rhs The matrix to multiply by.
+ * @returns {object} The product matrix.
+ */
+dwv.math.Matrix33.prototype.multiply = function (rhs) {
+  var values = [];
+  for (var i = 0; i < 3; ++i) {
+    for (var j = 0; j < 3; ++j) {
+      var tmp = 0;
+      for (var k = 0; k < 3; ++k) {
+        tmp += this.get(i, k) * rhs.get(k, j);
+      }
+      values.push(tmp);
+    }
+  }
+  return new dwv.math.Matrix33(values);
+};
+
+/**
+ * Get the absolute value of this matrix.
+ *
+ * @returns {object} The result matrix.
+ */
+dwv.math.Matrix33.prototype.getAbs = function () {
+  var values = [];
+  for (var i = 0; i < 3; ++i) {
+    for (var j = 0; j < 3; ++j) {
+      values.push(Math.abs(this.get(i, j)));
+    }
+  }
+  return new dwv.math.Matrix33(values);
+};
+
+/**
  * Multiply this matrix by a 3D array.
  *
  * @param {Array} array3D The input 3D array.
  * @returns {Array} The result 3D array.
  */
 dwv.math.Matrix33.prototype.multiplyArray3D = function (array3D) {
-  // matrix values
-  var m00 = this.get(0, 0); var m01 = this.get(0, 1); var m02 = this.get(0, 2);
-  var m10 = this.get(1, 0); var m11 = this.get(1, 1); var m12 = this.get(1, 2);
-  var m20 = this.get(2, 0); var m21 = this.get(2, 1); var m22 = this.get(2, 2);
-  // array values
-  var a0 = array3D[0];
-  var a1 = array3D[1];
-  var a2 = array3D[2];
-  // multiply
-  return [
-    (m00 * a0) + (m01 * a1) + (m02 * a2),
-    (m10 * a0) + (m11 * a1) + (m12 * a2),
-    (m20 * a0) + (m21 * a1) + (m22 * a2)
-  ];
+  var values = [];
+  for (var i = 0; i < 3; ++i) {
+    var tmp = 0;
+    for (var j = 0; j < 3; ++j) {
+      tmp += this.get(i, j) * array3D[j];
+    }
+    values.push(tmp);
+  }
+  return values;
 };
 
 /**
@@ -127,20 +157,53 @@ dwv.math.Matrix33.prototype.multiplyIndex3D = function (index3D) {
 };
 
 /**
- * Create a 3x3 identity matrix.
+ * Get the inverse of this matrix.
  *
- * @returns {object} The identity matrix.
+ * @returns {object} The inverse matrix.
+ * @see https://en.wikipedia.org/wiki/Invertible_matrix#Inversion_of_3_%C3%97_3_matrices
  */
-dwv.math.getIdentityMat33 = function () {
-  /* eslint-disable array-element-newline */
-  return new dwv.math.Matrix33([
-    1, 0, 0,
-    0, 1, 0,
-    0, 0, 1
-  ]);
-  /* eslint-enable array-element-newline */
+dwv.math.Matrix33.prototype.getInverse = function () {
+  var a = this.get(0, 0);
+  var b = this.get(0, 1);
+  var c = this.get(0, 2);
+  var d = this.get(1, 0);
+  var e = this.get(1, 1);
+  var f = this.get(1, 2);
+  var g = this.get(2, 0);
+  var h = this.get(2, 1);
+  var i = this.get(2, 2);
+
+  var a2 = e * i - f * h;
+  var b2 = f * g - d * i;
+  var c2 = d * h - e * g;
+
+  var det = a * a2 + b * b2 + c * c2;
+  if (det === 0) {
+    dwv.logger.warn('Cannot invert matrix with zero determinant.');
+    return;
+  }
+
+  var values = [
+    a2 / det,
+    (c * h - b * i) / det,
+    (b * f - c * e) / det,
+    b2 / det,
+    (a * i - c * g) / det,
+    (c * d - a * f) / det,
+    c2 / det,
+    (b * g - a * h) / det,
+    (a * e - b * d) / det
+  ];
+
+  return new dwv.math.Matrix33(values);
 };
 
+/**
+ * Get the index of the maximum in absolute value of a row.
+ *
+ * @param {number} row The row to get the maximum from.
+ * @param {object} The {value,index} of the maximum.
+ */
 dwv.math.Matrix33.prototype.getRowAbsMax = function (row) {
   var values = [
     Math.abs(this.get(row, 0)),
@@ -156,16 +219,25 @@ dwv.math.Matrix33.prototype.getRowAbsMax = function (row) {
 };
 
 /**
- * Get the major directions of an orientation matrix.
+ * Get this matrix with only zero and +/- ones instead of the maximum,
  *
- * @returns {array} A 3D array of indices.
+ * @returns {object} The simplified matrix.
  */
-dwv.math.Matrix33.prototype.getMajorDirections = function () {
+dwv.math.Matrix33.prototype.asOneAndZeros = function () {
   var res = [];
-  for (var i = 0; i < 3; ++i) {
-    res.push(this.getRowAbsMax(i).index);
+  for (var j = 0; j < 3; ++j) {
+    var max = this.getRowAbsMax(j);
+    var sign = max.value > 0 ? 1 : -1;
+    for (var i = 0; i < 3; ++i) {
+      if (i === max.index) {
+        //res.push(1);
+        res.push(1 * sign);
+      } else {
+        res.push(0);
+      }
+    }
   }
-  return res;
+  return new dwv.math.Matrix33(res);
 };
 
 /**
@@ -178,53 +250,12 @@ dwv.math.Matrix33.prototype.getThirdRowMajorDirection = function () {
 };
 
 /**
- * Get the major directions of an oritentation matrix as a string.
+ * Create a 3x3 identity matrix.
  *
- * @returns {string} The major directions as a combination of 'x', 'y' and 'z'.
+ * @returns {object} The identity matrix.
  */
-dwv.math.Matrix33.prototype.getMajorDirectionsAsString = function () {
-  var getLetter = function (index) {
-    if (index === 0) {
-      return 'x';
-    } else if (index === 1) {
-      return 'y';
-    } else if (index === 2) {
-      return 'z';
-    } else {
-      throw new Error('Bad matrix row index.');
-    }
-  };
-  var res = '';
-  var majorDirs = this.getMajorDirections();
-  for (var i = 0; i < majorDirs.length; ++i) {
-    res += getLetter(majorDirs[i]);
-  }
-  return res;
-};
-
-/**
- * Get an orientation matrix that compensates an input one to show axial views
- * as along Z.
- *
- * @param {array} inputDirs The major directions indices of the matrix to
- *   compensate.
- * @returns {object} The compensating matrix.
- */
-dwv.math.Matrix33.prototype.getCompensatingViewOrientation = function (
-  inputDirs) {
-  var majorDirs = this.getMajorDirections();
-  var normalDirs = [
-    [1, 0, 0],
-    [0, 1, 0],
-    [0, 0, 1]
-  ];
-  var res = new Array(9);
-  for (var i = 0; i < 3; ++i) {
-    var posInInputDirs = inputDirs.indexOf(i);
-    var posInMajorDirs = majorDirs.indexOf(i);
-    // insert the normal dir at the position of the input dir
-    res.splice.apply(
-      res, [posInInputDirs * 3, 3].concat(normalDirs[posInMajorDirs]));
-  }
-  return new dwv.math.Matrix33(res);
+dwv.math.getIdentityMat33 = function () {
+  return new dwv.math.Matrix33([
+    1, 0, 0, 0, 1, 0, 0, 0, 1
+  ]);
 };

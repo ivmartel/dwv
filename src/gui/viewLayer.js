@@ -329,7 +329,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
     viewController = new dwv.ctrl.ViewController(view);
 
     // get sizes
-    var size = image.getGeometry().getSize(viewOrientation);
+    var size = image.getGeometry().getSize(viewOrientation.getAbs());
     layerSize = size.get2D();
 
     // create canvas
@@ -486,7 +486,8 @@ dwv.gui.ViewLayer = function (containerDiv) {
     if (typeof event.skipGenerate === 'undefined' ||
       event.skipGenerate === false) {
       var viewOrientation = view.getOrientation();
-      if (event.diffDims.includes(viewOrientation.getThirdRowMajorDirection()) ||
+      if (event.diffDims.includes(
+        viewOrientation.getThirdRowMajorDirection()) ||
         event.diffDims.includes(3)) {
         needsDataUpdate = true;
         self.draw();

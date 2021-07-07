@@ -304,10 +304,14 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
       return 1;
     }
     var spacing = null;
+    var orientation2 = orientation.asOneAndZeros();
     for (var i = 0; i < origins.length - 1; ++i) {
-      var diff = Math.abs(
-        origins[i].getZ() - origins[i + 1].getZ()
-      );
+      var origin1 = orientation2.multiplyVector3D(origins[i]);
+      var origin2 = orientation2.multiplyVector3D(origins[i + 1]);
+      var diff = Math.abs(origin1.getZ() - origin2.getZ());
+      if (diff === 0) {
+        throw new Error('Zero slice spacing.');
+      }
       if (spacing === null) {
         spacing = diff;
       } else {
