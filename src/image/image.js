@@ -153,7 +153,9 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   /**
    * Can the data be scrolled?
    *
-   * @returns {boolean} True if the data has a third dimension greater than one.
+   * @param {object} viewOrientation The view orientation.
+   * @returns {boolean} True if the data has a third dimension greater than one
+   *   after applying the view orientation.
    */
   this.canScroll = function (viewOrientation) {
     var size = this.getGeometry().getSize();

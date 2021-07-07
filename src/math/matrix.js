@@ -16,6 +16,7 @@ dwv.math.BIG_EPSILON = Number.EPSILON * 1e4;
  * @param {number} a The first number.
  * @param {number} b The second number.
  * @param {number} tol The comparison tolerance.
+ * @returns {boolean} True if similar.
  */
 dwv.math.isSimilar = function (a, b, tol) {
   if (typeof tol === 'undefined') {
@@ -202,7 +203,7 @@ dwv.math.Matrix33.prototype.getInverse = function () {
  * Get the index of the maximum in absolute value of a row.
  *
  * @param {number} row The row to get the maximum from.
- * @param {object} The {value,index} of the maximum.
+ * @returns {object} The {value,index} of the maximum.
  */
 dwv.math.Matrix33.prototype.getRowAbsMax = function (row) {
   var values = [

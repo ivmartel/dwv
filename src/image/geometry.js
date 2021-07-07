@@ -67,7 +67,7 @@ dwv.image.Size = function (values) {
  * Check if a dimension exists and has more than one element.
  *
  * @param {object} dimension The dimension to check.
- * @returns {boolean} True if scrollable.
+ * @returns {boolean} True if the size is more than one.
  */
 dwv.image.Size.prototype.moreThanOne = function (dimension) {
   return this.length() >= dimension + 1 && this.get(dimension) !== 1;
@@ -78,7 +78,7 @@ dwv.image.Size.prototype.moreThanOne = function (dimension) {
  * of more than one.
  *
  * @param {object} viewOrientation The orientation matrix.
- * @param {boolean} True if the dimension is scrollable.
+ * @returns {boolean} True if scrollable.
  */
 dwv.image.Size.prototype.canScroll = function (viewOrientation) {
   return this.moreThanOne(viewOrientation.getThirdRowMajorDirection());
