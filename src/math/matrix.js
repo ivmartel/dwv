@@ -220,6 +220,26 @@ dwv.math.Matrix33.prototype.getRowAbsMax = function (row) {
 };
 
 /**
+ * Get the index of the maximum in absolute value of a column.
+ *
+ * @param {number} col The column to get the maximum from.
+ * @returns {object} The {value,index} of the maximum.
+ */
+dwv.math.Matrix33.prototype.getColAbsMax = function (col) {
+  var values = [
+    Math.abs(this.get(0, col)),
+    Math.abs(this.get(1, col)),
+    Math.abs(this.get(2, col))
+  ];
+  var absMax = Math.max.apply(null, values);
+  var index = values.indexOf(absMax);
+  return {
+    value: this.get(index, col),
+    index: index
+  };
+};
+
+/**
  * Get this matrix with only zero and +/- ones instead of the maximum,
  *
  * @returns {object} The simplified matrix.
@@ -242,12 +262,10 @@ dwv.math.Matrix33.prototype.asOneAndZeros = function () {
 };
 
 /**
- * Get the third direction index of an orientation matrix.
- *
- * @returns {number} The index.
+ * Get the third column direction index of an orientation matrix.
  */
-dwv.math.Matrix33.prototype.getThirdRowMajorDirection = function () {
-  return this.getRowAbsMax(2).index;
+dwv.math.Matrix33.prototype.getThirdColMajorDirection = function () {
+  return this.getColAbsMax(2).index;
 };
 
 /**

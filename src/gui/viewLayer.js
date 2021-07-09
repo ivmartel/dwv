@@ -487,7 +487,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
       event.skipGenerate === false) {
       var viewOrientation = view.getOrientation();
       if (event.diffDims.includes(
-        viewOrientation.getThirdRowMajorDirection()) ||
+        viewOrientation.getThirdColMajorDirection()) ||
         event.diffDims.includes(3)) {
         needsDataUpdate = true;
         self.draw();

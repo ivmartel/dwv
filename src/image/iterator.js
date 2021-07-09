@@ -309,61 +309,65 @@ dwv.image.getSliceIterator = function (
 
   var range = null;
   if (image.getNumberOfComponents() === 1) {
-    var rowMax0 = viewOrientation.getRowAbsMax(0);
-    var rowMax1 = viewOrientation.getRowAbsMax(1);
-    var rowMax2 = viewOrientation.getRowAbsMax(2);
+    if (viewOrientation && typeof viewOrientation !== 'undefined') {
+      var dirMax0 = viewOrientation.getColAbsMax(0);
+      var dirMax2 = viewOrientation.getColAbsMax(2);
 
-    var isPositive = function (value) {
-      return value >= 0;
-    };
+      // first pixel: top left -> inverts left/right, top/bottom...
+      // => default recontructed is reverse=true
+      var reverse1 = true;
+      var reverse2 = true;
 
-    // first pixel: top left -> inverts left/right, top/bottom...
-    // => default is reverse=true
-    var reverse1 = isPositive(rowMax0.value);
-    var reverse2 = isPositive(rowMax1.value);
-
-    var end = null;
-    if (rowMax2.index === 2) {
-      // axial: xyz or yxz
-      end = start + sliceSize;
-      if (rowMax0.index === 0) {
-        // xyz: bbmri:sag, ct-d2:ax
-        reverse1 = !reverse1;
-        range = dwv.image.range2(dataAccessor,
-          start, end, 1, ncols, nrows, reverse1, reverse2);
+      var end = null;
+      if (dirMax2.index === 2) {
+        // axial: xyz or yxz
+        end = start + sliceSize;
+        if (dirMax0.index === 0) {
+          // xyz (r1:0, r2:0)
+          reverse1 = !reverse1;
+          reverse2 = !reverse1;
+          range = dwv.image.range2(dataAccessor,
+            start, end, 1, ncols, nrows, reverse1, reverse2);
+        } else {
+          // yxz  (r1:1, r2:0, guessed... no data...)
+          reverse1 = true;
+          reverse2 = !reverse1;
+          range = dwv.image.range2(dataAccessor,
+            start, end, ncols, nrows, 1, reverse1, reverse2);
+        }
+      } else if (dirMax2.index === 0) {
+        // coronal: xzy or zxy
+        end = start + (nslices - 1) * sliceSize +
+          ncols * (nrows - 1);
+        if (dirMax0.index === 1) {
+          // xzy (r1:1, r2:1)
+          range = dwv.image.range2(dataAccessor,
+            start, end, ncols, nrows, sliceSize, reverse1, reverse2);
+        } else {
+          // zxy (r0:1, r2:1)
+          reverse1 = !reverse1;
+          range = dwv.image.range2(dataAccessor,
+            start, end, sliceSize, nslices, ncols, reverse1, reverse2);
+        }
+      } else if (dirMax2.index === 1) {
+        // sagittal: yzx or zyx
+        end = start + (nslices - 1) * sliceSize + ncols;
+        if (dirMax0.index === 0) {
+          // yzx (r1:1, r2:1)
+          range = dwv.image.range2(dataAccessor,
+            start, end, 1, ncols, sliceSize, reverse1, reverse2);
+        } else {
+          // zyx (r1:0, r2:1)
+          reverse1 = !reverse1;
+          range = dwv.image.range2(dataAccessor,
+            start, end, sliceSize, nslices, 1, reverse1, reverse2);
+        }
       } else {
-        // yxz
-        range = dwv.image.range2(dataAccessor,
-          start, end, ncols, nrows, 1, reverse1, reverse2);
-      }
-    } else if (rowMax2.index === 0) {
-      // coronal: yzx or zyx
-      end = start + (nslices - 1) * sliceSize +
-        ncols * (nrows - 1);
-      if (rowMax0.index === 1) {
-        // yzx ct-d2:sag
-        range = dwv.image.range2(dataAccessor,
-          start, end, ncols, nrows, sliceSize, reverse1, reverse2);
-      } else {
-        // zyx bbmri:cor
-        reverse2 = !reverse2;
-        range = dwv.image.range2(dataAccessor,
-          start, end, sliceSize, nslices, ncols, reverse1, reverse2);
-      }
-    } else if (rowMax2.index === 1) {
-      // sagittal: xzy or zxy
-      end = start + (nslices - 1) * sliceSize + ncols;
-      if (rowMax0.index === 0) {
-        // xzy ct-d2:cor
-        range = dwv.image.range2(dataAccessor,
-          start, end, 1, ncols, sliceSize, reverse1, reverse2);
-      } else {
-        // zxy bbmri:ax
-        range = dwv.image.range2(dataAccessor,
-          start, end, sliceSize, nslices, 1, reverse1, reverse2);
+        throw new Error('Unknown direction: ' + dirMax2.index);
       }
     } else {
-      throw new Error('Unknown direction: ' + rowMax2.index);
+      // default case
+      range = dwv.image.range(dataAccessor, start, start + sliceSize);
     }
   } else if (image.getNumberOfComponents() === 3) {
     // 3 times bigger...

@@ -722,7 +722,7 @@ dwv.image.View.prototype.decrementIndex = function (dim, silent) {
  */
 dwv.image.View.prototype.decrementScrollIndex = function (silent) {
   var orientation = this.getOrientation();
-  return this.decrementIndex(orientation.getThirdRowMajorDirection(), silent);
+  return this.decrementIndex(orientation.getThirdColMajorDirection(), silent);
 };
 
 /**
@@ -733,5 +733,5 @@ dwv.image.View.prototype.decrementScrollIndex = function (silent) {
  */
 dwv.image.View.prototype.incrementScrollIndex = function (silent) {
   var orientation = this.getOrientation();
-  return this.incrementIndex(orientation.getThirdRowMajorDirection(), silent);
+  return this.incrementIndex(orientation.getThirdColMajorDirection(), silent);
 };

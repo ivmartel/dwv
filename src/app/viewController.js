@@ -240,7 +240,7 @@ dwv.ctrl.ViewController = function (view) {
           var pos1 = self.getCurrentPosition();
           var values = pos1.getValues();
           var orientation = view.getOrientation();
-          values[orientation.getThirdRowMajorDirection()] = 0;
+          values[orientation.getThirdColMajorDirection()] = 0;
           self.setCurrentPosition(new dwv.math.Index(values));
         }
       }, milliseconds);

@@ -81,7 +81,7 @@ dwv.image.Size.prototype.moreThanOne = function (dimension) {
  * @returns {boolean} True if scrollable.
  */
 dwv.image.Size.prototype.canScroll = function (viewOrientation) {
-  return this.moreThanOne(viewOrientation.getThirdRowMajorDirection());
+  return this.moreThanOne(viewOrientation.getThirdColMajorDirection());
 };
 
 /**
@@ -287,7 +287,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
         size.get(1),
         size.get(2)
       );
-      var vec2 = viewOrientation.multiplyVector3D(vec);
+      var vec2 = viewOrientation.getInverse().multiplyVector3D(vec);
       res = new dwv.image.Size([vec2.getX(), vec2.getY(), vec2.getZ()]);
     }
     return res;
@@ -304,13 +304,18 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
       return 1;
     }
     var spacing = null;
-    var orientation2 = orientation.asOneAndZeros();
+    // (x, y, z) = orientationMatrix * (i, j, k)
+    // -> inv(orientationMatrix) * (x, y, z) = (i, j, k)
+    // applied on the patient position, reorders indices
+    // so that Z is the slice direction
+    var orientation2 = orientation.getInverse().asOneAndZeros();
     for (var i = 0; i < origins.length - 1; ++i) {
       var origin1 = orientation2.multiplyVector3D(origins[i]);
       var origin2 = orientation2.multiplyVector3D(origins[i + 1]);
       var diff = Math.abs(origin1.getZ() - origin2.getZ());
       if (diff === 0) {
-        throw new Error('Zero slice spacing.');
+        throw new Error('Zero slice spacing.' +
+          origin1.toString() + ' ' + origin2.toString());
       }
       if (spacing === null) {
         spacing = diff;
@@ -346,7 +351,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
         spacing.getRowSpacing(),
         spacing.getSliceSpacing()
       );
-      var vec2 = viewOrientation.multiplyVector3D(vec);
+      var vec2 = viewOrientation.getInverse().multiplyVector3D(vec);
       res = new dwv.image.Spacing(vec2.getX(), vec2.getY(), vec2.getZ());
     }
     return res;

@@ -405,26 +405,33 @@ dwv.ctrl.LayerController = function (containerDiv) {
    * @param {number} dataIndex The data index.
    */
   this.initialise = function (image, metaData, dataIndex) {
+    /* eslint-disable array-element-newline */
     // axial
     //var targetOrientation = dwv.math.getIdentityMat33();
-    // coronal
-    // var targetOrientation = new dwv.math.Matrix33([
-    //   1, 0, 0, 0, 0, 1, 0, 1, 0
-    // ]);
-    // sagittal
+    // coronal (xzy)
     var targetOrientation = new dwv.math.Matrix33([
-      0, 1, 0, 0, 0, 1, 1, 0, 0
+      1, 0, 0,
+      0, 0, 1,
+      0, 1, 0
     ]);
+    // sagittal (yzx)
+    // var targetOrientation = new dwv.math.Matrix33([
+    //   0, 0, 1,
+    //   1, 0, 0,
+    //   0, 1, 0
+    // ]);
+    /* eslint-enable array-element-newline */
 
     var geometry = image.getGeometry();
     // image orientation as one and zeros
     var imgOrientation = geometry.getOrientation().asOneAndZeros();
-    // viewOrientation * imgOrientation = targetOrientation
-    // -> viewOrientation = targetOrientation * inv(imgOrientation)
+    // imgOrientation * viewOrientation = targetOrientation
+    // -> viewOrientation = inv(imgOrientation) * targetOrientation
     var viewOrientation =
-      targetOrientation.multiply(imgOrientation.getInverse());
+      imgOrientation.getInverse().multiply(targetOrientation);
+    var absViewOrientation = viewOrientation.getAbs();
 
-    var size = image.getGeometry().getSize(viewOrientation.getAbs());
+    var size = image.getGeometry().getSize(absViewOrientation);
     layerSize = size.get2D();
     // apply to layers
     for (var i = 0; i < layers.length; ++i) {
@@ -439,7 +446,7 @@ dwv.ctrl.LayerController = function (containerDiv) {
     this.updateDrawControllerToViewPosition();
 
     // fit data
-    var spacing = image.getGeometry().getSpacing(viewOrientation.getAbs());
+    var spacing = image.getGeometry().getSpacing(absViewOrientation);
     this.fitToContainer(spacing);
   };
 
