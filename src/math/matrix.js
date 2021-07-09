@@ -263,6 +263,8 @@ dwv.math.Matrix33.prototype.asOneAndZeros = function () {
 
 /**
  * Get the third column direction index of an orientation matrix.
+ *
+ * @returns {number} The index of the absolute maximum of the last column.
  */
 dwv.math.Matrix33.prototype.getThirdColMajorDirection = function () {
   return this.getColAbsMax(2).index;
