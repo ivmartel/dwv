@@ -157,7 +157,6 @@ QUnit.test('Test Matrix33 inverse.', function (assert) {
     23 / 295,
     -26 / 295
   ]);
-  console.log('invm10', invm10.toString());
   assert.ok(invm10.equals(res10), 'inverse #1');
 
   // double inverse
