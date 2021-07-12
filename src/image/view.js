@@ -72,12 +72,12 @@ dwv.image.View = function (image) {
    */
   var currentPosition = null;
   /**
-   * View orientation.
+   * View orientation. Undefined will use the original slice ordering.
    *
    * @private
    * @type {object}
    */
-  var orientation = dwv.math.getIdentityMat33();
+  var orientation;
 
   /**
    * Listener handler.
@@ -721,8 +721,14 @@ dwv.image.View.prototype.decrementIndex = function (dim, silent) {
  * @returns {boolean} False if not in bounds.
  */
 dwv.image.View.prototype.decrementScrollIndex = function (silent) {
+  var index = null;
   var orientation = this.getOrientation();
-  return this.decrementIndex(orientation.getThirdColMajorDirection(), silent);
+  if (typeof orientation !== 'undefined') {
+    index = orientation.getThirdColMajorDirection();
+  } else {
+    index = 2;
+  }
+  return this.decrementIndex(index, silent);
 };
 
 /**
@@ -732,6 +738,12 @@ dwv.image.View.prototype.decrementScrollIndex = function (silent) {
  * @returns {boolean} False if not in bounds.
  */
 dwv.image.View.prototype.incrementScrollIndex = function (silent) {
+  var index = null;
   var orientation = this.getOrientation();
-  return this.incrementIndex(orientation.getThirdColMajorDirection(), silent);
+  if (typeof orientation !== 'undefined') {
+    index = orientation.getThirdColMajorDirection();
+  } else {
+    index = 2;
+  }
+  return this.incrementIndex(index, silent);
 };
