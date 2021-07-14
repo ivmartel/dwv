@@ -121,619 +121,6 @@ dwv.dicom.padElementValue = function (element, value) {
 };
 
 /**
- * Data writer.
- *
- * Example usage:
- *   var parser = new dwv.dicom.DicomParser();
- *   parser.parse(this.response);
- *
- *   var writer = new dwv.dicom.DicomWriter(parser.getRawDicomElements());
- *   var blob = new Blob([writer.getBuffer()], {type: 'application/dicom'});
- *
- *   var element = document.getElementById("download");
- *   element.href = URL.createObjectURL(blob);
- *   element.download = "anonym.dcm";
- *
- * @class
- * @param {Array} buffer The input array buffer.
- * @param {boolean} isLittleEndian Flag to tell if the data is
- *   little or big endian.
- */
-dwv.dicom.DataWriter = function (buffer, isLittleEndian) {
-  // Set endian flag if not defined.
-  if (typeof isLittleEndian === 'undefined') {
-    isLittleEndian = true;
-  }
-
-  // Default text encoder
-  var defaultTextEncoder = {};
-  defaultTextEncoder.encode = function (buffer) {
-    var result = new Uint8Array(buffer.length);
-    for (var i = 0, leni = buffer.length; i < leni; ++i) {
-      result[i] = buffer.charCodeAt(i);
-    }
-    return result;
-  };
-
-  // Text encoder
-  var textEncoder = defaultTextEncoder;
-  if (typeof window.TextEncoder !== 'undefined') {
-    textEncoder = new TextEncoder('iso-8859-1');
-  }
-
-  /**
-   * Set the utfLabel used to construct the TextEncoder.
-   *
-   * @param {string} label The encoding label.
-   */
-  this.setUtfLabel = function (label) {
-    if (typeof window.TextEncoder !== 'undefined') {
-      textEncoder = new TextEncoder(label);
-    }
-  };
-
-  // private DataView
-  var view = new DataView(buffer);
-
-  // flag to use VR=UN for private sequences, default to false
-  // (mainly used in tests)
-  this.useUnVrForPrivateSq = false;
-
-  /**
-   * Write Uint8 data.
-   *
-   * @param {number} byteOffset The offset to start writing from.
-   * @param {number} value The data to write.
-   * @returns {number} The new offset position.
-   */
-  this.writeUint8 = function (byteOffset, value) {
-    view.setUint8(byteOffset, value);
-    return byteOffset + Uint8Array.BYTES_PER_ELEMENT;
-  };
-
-  /**
-   * Write Int8 data.
-   *
-   * @param {number} byteOffset The offset to start writing from.
-   * @param {number} value The data to write.
-   * @returns {number} The new offset position.
-   */
-  this.writeInt8 = function (byteOffset, value) {
-    view.setInt8(byteOffset, value);
-    return byteOffset + Int8Array.BYTES_PER_ELEMENT;
-  };
-
-  /**
-   * Write Uint16 data.
-   *
-   * @param {number} byteOffset The offset to start writing from.
-   * @param {number} value The data to write.
-   * @returns {number} The new offset position.
-   */
-  this.writeUint16 = function (byteOffset, value) {
-    view.setUint16(byteOffset, value, isLittleEndian);
-    return byteOffset + Uint16Array.BYTES_PER_ELEMENT;
-  };
-
-  /**
-   * Write Int16 data.
-   *
-   * @param {number} byteOffset The offset to start writing from.
-   * @param {number} value The data to write.
-   * @returns {number} The new offset position.
-   */
-  this.writeInt16 = function (byteOffset, value) {
-    view.setInt16(byteOffset, value, isLittleEndian);
-    return byteOffset + Int16Array.BYTES_PER_ELEMENT;
-  };
-
-  /**
-   * Write Uint32 data.
-   *
-   * @param {number} byteOffset The offset to start writing from.
-   * @param {number} value The data to write.
-   * @returns {number} The new offset position.
-   */
-  this.writeUint32 = function (byteOffset, value) {
-    view.setUint32(byteOffset, value, isLittleEndian);
-    return byteOffset + Uint32Array.BYTES_PER_ELEMENT;
-  };
-
-  /**
-   * Write Int32 data.
-   *
-   * @param {number} byteOffset The offset to start writing from.
-   * @param {number} value The data to write.
-   * @returns {number} The new offset position.
-   */
-  this.writeInt32 = function (byteOffset, value) {
-    view.setInt32(byteOffset, value, isLittleEndian);
-    return byteOffset + Int32Array.BYTES_PER_ELEMENT;
-  };
-
-  /**
-   * Write Float32 data.
-   *
-   * @param {number} byteOffset The offset to start writing from.
-   * @param {number} value The data to write.
-   * @returns {number} The new offset position.
-   */
-  this.writeFloat32 = function (byteOffset, value) {
-    view.setFloat32(byteOffset, value, isLittleEndian);
-    return byteOffset + Float32Array.BYTES_PER_ELEMENT;
-  };
-
-  /**
-   * Write Float64 data.
-   *
-   * @param {number} byteOffset The offset to start writing from.
-   * @param {number} value The data to write.
-   * @returns {number} The new offset position.
-   */
-  this.writeFloat64 = function (byteOffset, value) {
-    view.setFloat64(byteOffset, value, isLittleEndian);
-    return byteOffset + Float64Array.BYTES_PER_ELEMENT;
-  };
-
-  /**
-   * Write string data as hexadecimal.
-   *
-   * @param {number} byteOffset The offset to start writing from.
-   * @param {number} str The padded hexadecimal string to write ('0x####').
-   * @returns {number} The new offset position.
-   */
-  this.writeHex = function (byteOffset, str) {
-    // remove first two chars and parse
-    var value = parseInt(str.substr(2), 16);
-    view.setUint16(byteOffset, value, isLittleEndian);
-    return byteOffset + Uint16Array.BYTES_PER_ELEMENT;
-  };
-
-  /**
-   * Write string data.
-   *
-   * @param {number} byteOffset The offset to start writing from.
-   * @param {number} str The data to write.
-   * @returns {number} The new offset position.
-   */
-  this.writeString = function (byteOffset, str) {
-    var data = defaultTextEncoder.encode(str);
-    return this.writeUint8Array(byteOffset, data);
-  };
-
-  /**
-   * Write data as a 'special' string, encoding it if the
-   *   TextEncoder is available.
-   *
-   * @param {number} byteOffset The offset to start reading from.
-   * @param {number} str The data to write.
-   * @returns {number} The new offset position.
-   */
-  this.writeSpecialString = function (byteOffset, str) {
-    var data = textEncoder.encode(str);
-    return this.writeUint8Array(byteOffset, data);
-  };
-
-};
-
-/**
- * Write a boolean array as binary.
- *
- * @param {number} byteOffset The offset to start writing from.
- * @param {Array} array The array to write.
- * @returns {number} The new offset position.
- */
-dwv.dicom.DataWriter.prototype.writeBinaryArray = function (byteOffset, array) {
-  if (array.length % 8 !== 0) {
-    throw new Error('Cannot write boolean array as binary.');
-  }
-  var byte = null;
-  var val = null;
-  for (var i = 0, len = array.length; i < len; i += 8) {
-    byte = 0;
-    for (var j = 0; j < 8; ++j) {
-      val = array[i + j] === 0 ? 0 : 1;
-      byte += val << j;
-    }
-    byteOffset = this.writeUint8(byteOffset, byte);
-  }
-  return byteOffset;
-};
-
-/**
- * Write Uint8 array.
- *
- * @param {number} byteOffset The offset to start writing from.
- * @param {Array} array The array to write.
- * @returns {number} The new offset position.
- */
-dwv.dicom.DataWriter.prototype.writeUint8Array = function (byteOffset, array) {
-  for (var i = 0, len = array.length; i < len; ++i) {
-    byteOffset = this.writeUint8(byteOffset, array[i]);
-  }
-  return byteOffset;
-};
-
-/**
- * Write Int8 array.
- *
- * @param {number} byteOffset The offset to start writing from.
- * @param {Array} array The array to write.
- * @returns {number} The new offset position.
- */
-dwv.dicom.DataWriter.prototype.writeInt8Array = function (byteOffset, array) {
-  for (var i = 0, len = array.length; i < len; ++i) {
-    byteOffset = this.writeInt8(byteOffset, array[i]);
-  }
-  return byteOffset;
-};
-
-/**
- * Write Uint16 array.
- *
- * @param {number} byteOffset The offset to start writing from.
- * @param {Array} array The array to write.
- * @returns {number} The new offset position.
- */
-dwv.dicom.DataWriter.prototype.writeUint16Array = function (byteOffset, array) {
-  for (var i = 0, len = array.length; i < len; ++i) {
-    byteOffset = this.writeUint16(byteOffset, array[i]);
-  }
-  return byteOffset;
-};
-
-/**
- * Write Int16 array.
- *
- * @param {number} byteOffset The offset to start writing from.
- * @param {Array} array The array to write.
- * @returns {number} The new offset position.
- */
-dwv.dicom.DataWriter.prototype.writeInt16Array = function (byteOffset, array) {
-  for (var i = 0, len = array.length; i < len; ++i) {
-    byteOffset = this.writeInt16(byteOffset, array[i]);
-  }
-  return byteOffset;
-};
-
-/**
- * Write Uint32 array.
- *
- * @param {number} byteOffset The offset to start writing from.
- * @param {Array} array The array to write.
- * @returns {number} The new offset position.
- */
-dwv.dicom.DataWriter.prototype.writeUint32Array = function (byteOffset, array) {
-  for (var i = 0, len = array.length; i < len; ++i) {
-    byteOffset = this.writeUint32(byteOffset, array[i]);
-  }
-  return byteOffset;
-};
-
-/**
- * Write Int32 array.
- *
- * @param {number} byteOffset The offset to start writing from.
- * @param {Array} array The array to write.
- * @returns {number} The new offset position.
- */
-dwv.dicom.DataWriter.prototype.writeInt32Array = function (byteOffset, array) {
-  for (var i = 0, len = array.length; i < len; ++i) {
-    byteOffset = this.writeInt32(byteOffset, array[i]);
-  }
-  return byteOffset;
-};
-
-/**
- * Write Float32 array.
- *
- * @param {number} byteOffset The offset to start writing from.
- * @param {Array} array The array to write.
- * @returns {number} The new offset position.
- */
-dwv.dicom.DataWriter.prototype.writeFloat32Array = function (
-  byteOffset, array) {
-  for (var i = 0, len = array.length; i < len; ++i) {
-    byteOffset = this.writeFloat32(byteOffset, array[i]);
-  }
-  return byteOffset;
-};
-
-/**
- * Write Float64 array.
- *
- * @param {number} byteOffset The offset to start writing from.
- * @param {Array} array The array to write.
- * @returns {number} The new offset position.
- */
-dwv.dicom.DataWriter.prototype.writeFloat64Array = function (
-  byteOffset, array) {
-  for (var i = 0, len = array.length; i < len; ++i) {
-    byteOffset = this.writeFloat64(byteOffset, array[i]);
-  }
-  return byteOffset;
-};
-
-/**
- * Write a list of items.
- *
- * @param {number} byteOffset The offset to start writing from.
- * @param {Array} items The list of items to write.
- * @param {boolean} isImplicit Is the DICOM VR implicit?
- * @returns {number} The new offset position.
- */
-dwv.dicom.DataWriter.prototype.writeDataElementItems = function (
-  byteOffset, items, isImplicit) {
-  var item = null;
-  for (var i = 0; i < items.length; ++i) {
-    item = items[i];
-    var itemKeys = Object.keys(item);
-    if (itemKeys.length === 0) {
-      continue;
-    }
-    // item element (create new to not modify original)
-    var implicitLength = item.xFFFEE000.vl === 'u/l';
-    var itemElement = {
-      tag: item.xFFFEE000.tag,
-      vr: item.xFFFEE000.vr,
-      vl: implicitLength ? 0xffffffff : item.xFFFEE000.vl,
-      value: []
-    };
-    byteOffset = this.writeDataElement(itemElement, byteOffset, isImplicit);
-    // write rest
-    for (var m = 0; m < itemKeys.length; ++m) {
-      if (itemKeys[m] !== 'xFFFEE000' && itemKeys[m] !== 'xFFFEE00D') {
-        byteOffset = this.writeDataElement(
-          item[itemKeys[m]], byteOffset, isImplicit);
-      }
-    }
-    // item delimitation
-    if (implicitLength) {
-      var itemDelimElement = {
-        tag: {
-          group: '0xFFFE',
-          element: '0xE00D',
-          name: 'ItemDelimitationItem'
-        },
-        vr: 'NONE',
-        vl: 0,
-        value: []
-      };
-      byteOffset = this.writeDataElement(
-        itemDelimElement, byteOffset, isImplicit);
-    }
-  }
-
-  // return new offset
-  return byteOffset;
-};
-
-/**
- * Write data with a specific Value Representation (VR).
- *
- * @param {string} vr The data Value Representation (VR).
- * @param {string} vl The data Value Length (VL).
- * @param {number} byteOffset The offset to start writing from.
- * @param {Array} value The array to write.
- * @param {boolean} isImplicit Is the DICOM VR implicit?
- * @returns {number} The new offset position.
- */
-dwv.dicom.DataWriter.prototype.writeDataElementValue = function (
-  vr, vl, byteOffset, value, isImplicit) {
-  // first check input type to know how to write
-  if (value instanceof Uint8Array) {
-    // binary data has been expanded 8 times at read
-    if (value.length === 8 * vl) {
-      byteOffset = this.writeBinaryArray(byteOffset, value);
-    } else {
-      byteOffset = this.writeUint8Array(byteOffset, value);
-    }
-  } else if (value instanceof Int8Array) {
-    byteOffset = this.writeInt8Array(byteOffset, value);
-  } else if (value instanceof Uint16Array) {
-    byteOffset = this.writeUint16Array(byteOffset, value);
-  } else if (value instanceof Int16Array) {
-    byteOffset = this.writeInt16Array(byteOffset, value);
-  } else if (value instanceof Uint32Array) {
-    byteOffset = this.writeUint32Array(byteOffset, value);
-  } else if (value instanceof Int32Array) {
-    byteOffset = this.writeInt32Array(byteOffset, value);
-  } else {
-    // switch according to VR if input type is undefined
-    if (vr === 'UN') {
-      byteOffset = this.writeUint8Array(byteOffset, value);
-    } else if (vr === 'OB') {
-      byteOffset = this.writeInt8Array(byteOffset, value);
-    } else if (vr === 'OW') {
-      byteOffset = this.writeInt16Array(byteOffset, value);
-    } else if (vr === 'OF') {
-      byteOffset = this.writeInt32Array(byteOffset, value);
-    } else if (vr === 'OD') {
-      byteOffset = this.writeInt64Array(byteOffset, value);
-    } else if (vr === 'US') {
-      byteOffset = this.writeUint16Array(byteOffset, value);
-    } else if (vr === 'SS') {
-      byteOffset = this.writeInt16Array(byteOffset, value);
-    } else if (vr === 'UL') {
-      byteOffset = this.writeUint32Array(byteOffset, value);
-    } else if (vr === 'SL') {
-      byteOffset = this.writeInt32Array(byteOffset, value);
-    } else if (vr === 'FL') {
-      byteOffset = this.writeFloat32Array(byteOffset, value);
-    } else if (vr === 'FD') {
-      byteOffset = this.writeFloat64Array(byteOffset, value);
-    } else if (vr === 'SQ') {
-      byteOffset = this.writeDataElementItems(byteOffset, value, isImplicit);
-    } else if (vr === 'AT') {
-      for (var i = 0; i < value.length; ++i) {
-        var hexString = value[i] + '';
-        var hexString1 = hexString.substring(1, 5);
-        var hexString2 = hexString.substring(6, 10);
-        var dec1 = parseInt(hexString1, 16);
-        var dec2 = parseInt(hexString2, 16);
-        var atValue = new Uint16Array([dec1, dec2]);
-        byteOffset = this.writeUint16Array(byteOffset, atValue);
-      }
-    } else {
-      // join if array
-      if (Array.isArray(value)) {
-        value = value.join('\\');
-      }
-      // write
-      if (vr === 'SH' || vr === 'LO' || vr === 'ST' ||
-        vr === 'PN' || vr === 'LT' || vr === 'UT') {
-        byteOffset = this.writeSpecialString(byteOffset, value);
-      } else {
-        byteOffset = this.writeString(byteOffset, value);
-      }
-    }
-  }
-  // return new offset
-  return byteOffset;
-};
-
-/**
- * Write a pixel data element.
- *
- * @param {string} vr The data Value Representation (VR).
- * @param {string} vl The data Value Length (VL).
- * @param {number} byteOffset The offset to start writing from.
- * @param {Array} value The array to write.
- * @param {boolean} isImplicit Is the DICOM VR implicit?
- * @returns {number} The new offset position.
- */
-dwv.dicom.DataWriter.prototype.writePixelDataElementValue = function (
-  vr, vl, byteOffset, value, isImplicit) {
-  // explicit length
-  if (vl !== 'u/l') {
-    var finalValue = value[0];
-    // flatten multi frame
-    if (value.length > 1) {
-      finalValue = dwv.dicom.flattenArrayOfTypedArrays(value);
-    }
-    // write
-    byteOffset = this.writeDataElementValue(
-      vr, vl, byteOffset, finalValue, isImplicit);
-  } else {
-    // pixel data as sequence
-    var item = {};
-    // first item: basic offset table
-    item.xFFFEE000 = {
-      tag: {
-        group: '0xFFFE',
-        element: '0xE000',
-        name: 'xFFFEE000'
-      },
-      vr: 'UN',
-      vl: 0,
-      value: []
-    };
-    // data
-    for (var i = 0; i < value.length; ++i) {
-      item[i] = {
-        tag: {
-          group: '0xFFFE',
-          element: '0xE000',
-          name: 'xFFFEE000'
-        },
-        vr: vr,
-        vl: value[i].length,
-        value: value[i]
-      };
-    }
-    // write
-    byteOffset = this.writeDataElementItems(byteOffset, [item], isImplicit);
-  }
-
-  // return new offset
-  return byteOffset;
-};
-
-/**
- * Write a data element.
- *
- * @param {object} element The DICOM data element to write.
- * @param {number} byteOffset The offset to start writing from.
- * @param {boolean} isImplicit Is the DICOM VR implicit?
- * @returns {number} The new offset position.
- */
-dwv.dicom.DataWriter.prototype.writeDataElement = function (
-  element, byteOffset, isImplicit) {
-  var isTagWithVR = new dwv.dicom.Tag(
-    element.tag.group, element.tag.element).isWithVR();
-  var is32bitVLVR = (isImplicit || !isTagWithVR)
-    ? true : dwv.dicom.is32bitVLVR(element.vr);
-  // group
-  byteOffset = this.writeHex(byteOffset, element.tag.group);
-  // element
-  byteOffset = this.writeHex(byteOffset, element.tag.element);
-  // VR
-  var vr = element.vr;
-  // use VR=UN for private sequence
-  if (this.useUnVrForPrivateSq &&
-    new dwv.dicom.Tag(element.tag.group, element.tag.element).isPrivate() &&
-    vr === 'SQ') {
-    dwv.logger.warn('Write element using VR=UN for private sequence.');
-    vr = 'UN';
-  }
-  if (isTagWithVR && !isImplicit) {
-    byteOffset = this.writeString(byteOffset, vr);
-    // reserved 2 bytes for 32bit VL
-    if (is32bitVLVR) {
-      byteOffset += 2;
-    }
-  }
-
-  // update vl for sequence or item with implicit length
-  var vl = element.vl;
-  if (dwv.dicom.isImplicitLengthSequence(element) ||
-        dwv.dicom.isImplicitLengthItem(element) ||
-        dwv.dicom.isImplicitLengthPixels(element)) {
-    vl = 0xffffffff;
-  }
-  // VL
-  if (is32bitVLVR) {
-    byteOffset = this.writeUint32(byteOffset, vl);
-  } else {
-    byteOffset = this.writeUint16(byteOffset, vl);
-  }
-
-  // value
-  var value = element.value;
-  // check value
-  if (typeof value === 'undefined') {
-    value = [];
-  }
-  // write
-  if (element.tag.name === 'x7FE00010') {
-    byteOffset = this.writePixelDataElementValue(
-      element.vr, element.vl, byteOffset, value, isImplicit);
-  } else {
-    byteOffset = this.writeDataElementValue(
-      element.vr, element.vl, byteOffset, value, isImplicit);
-  }
-
-  // sequence delimitation item for sequence with implicit length
-  if (dwv.dicom.isImplicitLengthSequence(element) ||
-         dwv.dicom.isImplicitLengthPixels(element)) {
-    var seqDelimElement = {
-      tag: {
-        group: '0xFFFE',
-        element: '0xE0DD',
-        name: 'SequenceDelimitationItem'
-      },
-      vr: 'NONE',
-      vl: 0,
-      value: []
-    };
-    byteOffset = this.writeDataElement(seqDelimElement, byteOffset, isImplicit);
-  }
-
-  // return new offset
-  return byteOffset;
-};
-
-/**
  * Is this element an implicit length sequence?
  *
  * @param {object} element The element to check.
@@ -796,6 +183,17 @@ dwv.dicom.flattenArrayOfTypedArrays = function (initialArray) {
 
 /**
  * DICOM writer.
+ *
+ * Example usage:
+ *   var parser = new dwv.dicom.DicomParser();
+ *   parser.parse(this.response);
+ *
+ *   var writer = new dwv.dicom.DicomWriter(parser.getRawDicomElements());
+ *   var blob = new Blob([writer.getBuffer()], {type: 'application/dicom'});
+ *
+ *   var element = document.getElementById("download");
+ *   element.href = URL.createObjectURL(blob);
+ *   element.download = "anonym.dcm";
  *
  * @class
  */
@@ -888,6 +286,293 @@ dwv.dicom.DicomWriter = function () {
     // apply action on element and return
     return actions[rule.action](element, rule.value);
   };
+};
+
+/**
+ * Write a list of items.
+ *
+ * @param {object} writer The raw data writer.
+ * @param {number} byteOffset The offset to start writing from.
+ * @param {Array} items The list of items to write.
+ * @param {boolean} isImplicit Is the DICOM VR implicit?
+ * @returns {number} The new offset position.
+ */
+dwv.dicom.DicomWriter.prototype.writeDataElementItems = function (
+  writer, byteOffset, items, isImplicit) {
+  var item = null;
+  for (var i = 0; i < items.length; ++i) {
+    item = items[i];
+    var itemKeys = Object.keys(item);
+    if (itemKeys.length === 0) {
+      continue;
+    }
+    // item element (create new to not modify original)
+    var implicitLength = item.xFFFEE000.vl === 'u/l';
+    var itemElement = {
+      tag: item.xFFFEE000.tag,
+      vr: item.xFFFEE000.vr,
+      vl: implicitLength ? 0xffffffff : item.xFFFEE000.vl,
+      value: []
+    };
+    byteOffset = this.writeDataElement(
+      writer, itemElement, byteOffset, isImplicit);
+    // write rest
+    for (var m = 0; m < itemKeys.length; ++m) {
+      if (itemKeys[m] !== 'xFFFEE000' && itemKeys[m] !== 'xFFFEE00D') {
+        byteOffset = this.writeDataElement(
+          writer, item[itemKeys[m]], byteOffset, isImplicit);
+      }
+    }
+    // item delimitation
+    if (implicitLength) {
+      var itemDelimElement = {
+        tag: {
+          group: '0xFFFE',
+          element: '0xE00D',
+          name: 'ItemDelimitationItem'
+        },
+        vr: 'NONE',
+        vl: 0,
+        value: []
+      };
+      byteOffset = this.writeDataElement(
+        writer, itemDelimElement, byteOffset, isImplicit);
+    }
+  }
+
+  // return new offset
+  return byteOffset;
+};
+
+/**
+ * Write data with a specific Value Representation (VR).
+ *
+ * @param {object} writer The raw data writer.
+ * @param {string} vr The data Value Representation (VR).
+ * @param {string} vl The data Value Length (VL).
+ * @param {number} byteOffset The offset to start writing from.
+ * @param {Array} value The array to write.
+ * @param {boolean} isImplicit Is the DICOM VR implicit?
+ * @returns {number} The new offset position.
+ */
+dwv.dicom.DicomWriter.prototype.writeDataElementValue = function (
+  writer, vr, vl, byteOffset, value, isImplicit) {
+  // first check input type to know how to write
+  if (value instanceof Uint8Array) {
+    // binary data has been expanded 8 times at read
+    if (value.length === 8 * vl) {
+      byteOffset = writer.writeBinaryArray(byteOffset, value);
+    } else {
+      byteOffset = writer.writeUint8Array(byteOffset, value);
+    }
+  } else if (value instanceof Int8Array) {
+    byteOffset = writer.writeInt8Array(byteOffset, value);
+  } else if (value instanceof Uint16Array) {
+    byteOffset = writer.writeUint16Array(byteOffset, value);
+  } else if (value instanceof Int16Array) {
+    byteOffset = writer.writeInt16Array(byteOffset, value);
+  } else if (value instanceof Uint32Array) {
+    byteOffset = writer.writeUint32Array(byteOffset, value);
+  } else if (value instanceof Int32Array) {
+    byteOffset = writer.writeInt32Array(byteOffset, value);
+  } else {
+    // switch according to VR if input type is undefined
+    if (vr === 'UN') {
+      byteOffset = writer.writeUint8Array(byteOffset, value);
+    } else if (vr === 'OB') {
+      byteOffset = writer.writeInt8Array(byteOffset, value);
+    } else if (vr === 'OW') {
+      byteOffset = writer.writeInt16Array(byteOffset, value);
+    } else if (vr === 'OF') {
+      byteOffset = writer.writeInt32Array(byteOffset, value);
+    } else if (vr === 'OD') {
+      byteOffset = writer.writeInt64Array(byteOffset, value);
+    } else if (vr === 'US') {
+      byteOffset = writer.writeUint16Array(byteOffset, value);
+    } else if (vr === 'SS') {
+      byteOffset = writer.writeInt16Array(byteOffset, value);
+    } else if (vr === 'UL') {
+      byteOffset = writer.writeUint32Array(byteOffset, value);
+    } else if (vr === 'SL') {
+      byteOffset = writer.writeInt32Array(byteOffset, value);
+    } else if (vr === 'FL') {
+      byteOffset = writer.writeFloat32Array(byteOffset, value);
+    } else if (vr === 'FD') {
+      byteOffset = writer.writeFloat64Array(byteOffset, value);
+    } else if (vr === 'SQ') {
+      byteOffset = this.writeDataElementItems(
+        writer, byteOffset, value, isImplicit);
+    } else if (vr === 'AT') {
+      for (var i = 0; i < value.length; ++i) {
+        var hexString = value[i] + '';
+        var hexString1 = hexString.substring(1, 5);
+        var hexString2 = hexString.substring(6, 10);
+        var dec1 = parseInt(hexString1, 16);
+        var dec2 = parseInt(hexString2, 16);
+        var atValue = new Uint16Array([dec1, dec2]);
+        byteOffset = writer.writeUint16Array(byteOffset, atValue);
+      }
+    } else {
+      // join if array
+      if (Array.isArray(value)) {
+        value = value.join('\\');
+      }
+      // write
+      if (vr === 'SH' || vr === 'LO' || vr === 'ST' ||
+        vr === 'PN' || vr === 'LT' || vr === 'UT') {
+        byteOffset = writer.writeSpecialString(byteOffset, value);
+      } else {
+        byteOffset = writer.writeString(byteOffset, value);
+      }
+    }
+  }
+  // return new offset
+  return byteOffset;
+};
+
+/**
+ * Write a pixel data element.
+ *
+ * @param {object} writer The raw data writer.
+ * @param {string} vr The data Value Representation (VR).
+ * @param {string} vl The data Value Length (VL).
+ * @param {number} byteOffset The offset to start writing from.
+ * @param {Array} value The array to write.
+ * @param {boolean} isImplicit Is the DICOM VR implicit?
+ * @returns {number} The new offset position.
+ */
+dwv.dicom.DicomWriter.prototype.writePixelDataElementValue = function (
+  writer, vr, vl, byteOffset, value, isImplicit) {
+  // explicit length
+  if (vl !== 'u/l') {
+    var finalValue = value[0];
+    // flatten multi frame
+    if (value.length > 1) {
+      finalValue = dwv.dicom.flattenArrayOfTypedArrays(value);
+    }
+    // write
+    byteOffset = this.writeDataElementValue(
+      writer, vr, vl, byteOffset, finalValue, isImplicit);
+  } else {
+    // pixel data as sequence
+    var item = {};
+    // first item: basic offset table
+    item.xFFFEE000 = {
+      tag: {
+        group: '0xFFFE',
+        element: '0xE000',
+        name: 'xFFFEE000'
+      },
+      vr: 'UN',
+      vl: 0,
+      value: []
+    };
+    // data
+    for (var i = 0; i < value.length; ++i) {
+      item[i] = {
+        tag: {
+          group: '0xFFFE',
+          element: '0xE000',
+          name: 'xFFFEE000'
+        },
+        vr: vr,
+        vl: value[i].length,
+        value: value[i]
+      };
+    }
+    // write
+    byteOffset = this.writeDataElementItems(
+      writer, byteOffset, [item], isImplicit);
+  }
+
+  // return new offset
+  return byteOffset;
+};
+
+/**
+ * Write a data element.
+ *
+ * @param {object} writer The raw data writer.
+ * @param {object} element The DICOM data element to write.
+ * @param {number} byteOffset The offset to start writing from.
+ * @param {boolean} isImplicit Is the DICOM VR implicit?
+ * @returns {number} The new offset position.
+ */
+dwv.dicom.DicomWriter.prototype.writeDataElement = function (
+  writer, element, byteOffset, isImplicit) {
+  var isTagWithVR = new dwv.dicom.Tag(
+    element.tag.group, element.tag.element).isWithVR();
+  var is32bitVLVR = (isImplicit || !isTagWithVR)
+    ? true : dwv.dicom.is32bitVLVR(element.vr);
+  // group
+  byteOffset = writer.writeHex(byteOffset, element.tag.group);
+  // element
+  byteOffset = writer.writeHex(byteOffset, element.tag.element);
+  // VR
+  var vr = element.vr;
+  // use VR=UN for private sequence
+  if (this.useUnVrForPrivateSq &&
+    new dwv.dicom.Tag(element.tag.group, element.tag.element).isPrivate() &&
+    vr === 'SQ') {
+    dwv.logger.warn('Write element using VR=UN for private sequence.');
+    vr = 'UN';
+  }
+  if (isTagWithVR && !isImplicit) {
+    byteOffset = writer.writeString(byteOffset, vr);
+    // reserved 2 bytes for 32bit VL
+    if (is32bitVLVR) {
+      byteOffset += 2;
+    }
+  }
+
+  // update vl for sequence or item with implicit length
+  var vl = element.vl;
+  if (dwv.dicom.isImplicitLengthSequence(element) ||
+        dwv.dicom.isImplicitLengthItem(element) ||
+        dwv.dicom.isImplicitLengthPixels(element)) {
+    vl = 0xffffffff;
+  }
+  // VL
+  if (is32bitVLVR) {
+    byteOffset = writer.writeUint32(byteOffset, vl);
+  } else {
+    byteOffset = writer.writeUint16(byteOffset, vl);
+  }
+
+  // value
+  var value = element.value;
+  // check value
+  if (typeof value === 'undefined') {
+    value = [];
+  }
+  // write
+  if (element.tag.name === 'x7FE00010') {
+    byteOffset = this.writePixelDataElementValue(
+      writer, element.vr, element.vl, byteOffset, value, isImplicit);
+  } else {
+    byteOffset = this.writeDataElementValue(
+      writer, element.vr, element.vl, byteOffset, value, isImplicit);
+  }
+
+  // sequence delimitation item for sequence with implicit length
+  if (dwv.dicom.isImplicitLengthSequence(element) ||
+         dwv.dicom.isImplicitLengthPixels(element)) {
+    var seqDelimElement = {
+      tag: {
+        group: '0xFFFE',
+        element: '0xE0DD',
+        name: 'SequenceDelimitationItem'
+      },
+      vr: 'NONE',
+      vl: 0,
+      value: []
+    };
+    byteOffset = this.writeDataElement(
+      writer, seqDelimElement, byteOffset, isImplicit);
+  }
+
+  // return new offset
+  return byteOffset;
 };
 
 /**
@@ -1005,10 +690,10 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
   // DICM
   offset = metaWriter.writeString(offset, 'DICM');
   // FileMetaInformationGroupLength
-  offset = metaWriter.writeDataElement(fmigl, offset, false);
+  offset = this.writeDataElement(metaWriter, fmigl, offset, false);
   // write meta
   for (var j = 0, lenj = metaElements.length; j < lenj; ++j) {
-    offset = metaWriter.writeDataElement(metaElements[j], offset, false);
+    offset = this.writeDataElement(metaWriter, metaElements[j], offset, false);
   }
 
   // check meta position
@@ -1024,7 +709,8 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
   dataWriter.useUnVrForPrivateSq = this.useUnVrForPrivateSq;
   // write non meta
   for (var k = 0, lenk = rawElements.length; k < lenk; ++k) {
-    offset = dataWriter.writeDataElement(rawElements[k], offset, isImplicit);
+    offset = this.writeDataElement(
+      dataWriter, rawElements[k], offset, isImplicit);
   }
 
   // check final position
