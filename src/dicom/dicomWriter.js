@@ -983,7 +983,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
   if (offset !== metaOffset) {
     dwv.logger.warn('Bad size calculation... meta offset: ' + offset +
       ', calculated size:' + metaOffset +
-      '(diff:', offset - metaOffset, ')');
+      ' (diff:' + (offset - metaOffset) + ')');
   }
 
   // pass flag to writer
@@ -997,7 +997,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
   if (offset !== totalSize) {
     dwv.logger.warn('Bad size calculation... final offset: ' + offset +
       ', calculated size:' + totalSize +
-      '(diff:', offset - totalSize, ')');
+      ' (diff:' + (offset - totalSize) + ')');
   }
   // return
   return buffer;
