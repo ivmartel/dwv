@@ -145,6 +145,33 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian) {
     isLittleEndian = true;
   }
 
+  // Default text encoder
+  var defaultTextEncoder = {};
+  defaultTextEncoder.encode = function (buffer) {
+    var result = new Uint8Array(buffer.length);
+    for (var i = 0, leni = buffer.length; i < leni; ++i) {
+      result[i] = buffer.charCodeAt(i);
+    }
+    return result;
+  };
+
+  // Text encoder
+  var textEncoder = defaultTextEncoder;
+  if (typeof window.TextEncoder !== 'undefined') {
+    textEncoder = new TextEncoder('iso-8859-1');
+  }
+
+  /**
+   * Set the utfLabel used to construct the TextEncoder.
+   *
+   * @param {string} label The encoding label.
+   */
+  this.setUtfLabel = function (label) {
+    if (typeof window.TextEncoder !== 'undefined') {
+      textEncoder = new TextEncoder(label);
+    }
+  };
+
   // private DataView
   var view = new DataView(buffer);
 
@@ -270,11 +297,21 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian) {
    * @returns {number} The new offset position.
    */
   this.writeString = function (byteOffset, str) {
-    for (var i = 0, len = str.length; i < len; ++i) {
-      view.setUint8(byteOffset, str.charCodeAt(i));
-      byteOffset += Uint8Array.BYTES_PER_ELEMENT;
-    }
-    return byteOffset;
+    var data = defaultTextEncoder.encode(str);
+    return this.writeUint8Array(byteOffset, data);
+  };
+
+  /**
+   * Write data as a 'special' string, encoding it if the
+   *   TextEncoder is available.
+   *
+   * @param {number} byteOffset The offset to start reading from.
+   * @param {number} str The data to write.
+   * @returns {number} The new offset position.
+   */
+  this.writeSpecialString = function (byteOffset, str) {
+    var data = textEncoder.encode(str);
+    return this.writeUint8Array(byteOffset, data);
   };
 
 };
@@ -418,25 +455,6 @@ dwv.dicom.DataWriter.prototype.writeFloat64Array = function (
 };
 
 /**
- * Write string array.
- *
- * @param {number} byteOffset The offset to start writing from.
- * @param {Array} array The array to write.
- * @returns {number} The new offset position.
- */
-dwv.dicom.DataWriter.prototype.writeStringArray = function (byteOffset, array) {
-  for (var i = 0, len = array.length; i < len; ++i) {
-    // separator
-    if (i !== 0) {
-      byteOffset = this.writeString(byteOffset, '\\');
-    }
-    // value
-    byteOffset = this.writeString(byteOffset, array[i].toString());
-  }
-  return byteOffset;
-};
-
-/**
  * Write a list of items.
  *
  * @param {number} byteOffset The offset to start writing from.
@@ -557,7 +575,17 @@ dwv.dicom.DataWriter.prototype.writeDataElementValue = function (
         byteOffset = this.writeUint16Array(byteOffset, atValue);
       }
     } else {
-      byteOffset = this.writeStringArray(byteOffset, value);
+      // join if array
+      if (Array.isArray(value)) {
+        value = value.join('\\');
+      }
+      // write
+      if (vr === 'SH' || vr === 'LO' || vr === 'ST' ||
+        vr === 'PN' || vr === 'LT' || vr === 'UT') {
+        byteOffset = this.writeSpecialString(byteOffset, value);
+      } else {
+        byteOffset = this.writeString(byteOffset, value);
+      }
     }
   }
   // return new offset
@@ -967,6 +995,12 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
   var buffer = new ArrayBuffer(totalSize);
   var metaWriter = new dwv.dicom.DataWriter(buffer);
   var dataWriter = new dwv.dicom.DataWriter(buffer, !isBigEndian);
+  // special character set
+  if (typeof dicomElements.x00080005 !== 'undefined') {
+    var scs = dwv.dicom.cleanString(dicomElements.x00080005.value[0]);
+    dataWriter.setUtfLabel(dwv.dicom.getUtfLabel(scs));
+  }
+
   var offset = 128;
   // DICM
   offset = metaWriter.writeString(offset, 'DICM');
