@@ -731,7 +731,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
  */
 dwv.dicom.checkUnknownVR = function (element) {
   if (element.vr === 'UN') {
-    var tag = dwv.dicom.Tag(element.tag.group, element.tag.element);
+    var tag = new dwv.dicom.Tag(element.tag.group, element.tag.element);
     var dictVr = tag.getVrFromDictionary();
     if (dictVr !== null && element.vr !== dictVr) {
       element.vr = dictVr;
