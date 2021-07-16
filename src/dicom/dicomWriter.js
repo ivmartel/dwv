@@ -633,11 +633,6 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
       var realVl = element.endOffset - element.startOffset;
       localSize += parseInt(realVl, 10);
 
-      // add size of pixel sequence delimitation items
-      if (dwv.dicom.isImplicitLengthPixels(element)) {
-        localSize += dwv.dicom.getDataElementPrefixByteSize('NONE', isImplicit);
-      }
-
       // sort elements
       if (groupName === 'Meta Element') {
         metaElements.push(element);
