@@ -32,9 +32,9 @@ dwv.tool.Scroll = function (app) {
    */
   this.mousedown = function (event) {
     // stop viewer if playing
-    var layerController = app.getLayerController();
+    var layerGroup = app.getLayerGroup();
     var viewController =
-      layerController.getActiveViewLayer().getViewController();
+      layerGroup.getActiveViewLayer().getViewController();
     if (viewController.isPlaying()) {
       viewController.stop();
     }
@@ -55,9 +55,9 @@ dwv.tool.Scroll = function (app) {
       return;
     }
 
-    var layerController = app.getLayerController();
+    var layerGroup = app.getLayerGroup();
     var viewController =
-      layerController.getActiveViewLayer().getViewController();
+      layerGroup.getActiveViewLayer().getViewController();
     var size = app.getImage().getGeometry().getSize();
 
     // difference to last Y position
@@ -178,9 +178,9 @@ dwv.tool.Scroll = function (app) {
    * @private
    */
   function mouseScroll(up) {
-    var layerController = app.getLayerController();
+    var layerGroup = app.getLayerGroup();
     var viewController =
-      layerController.getActiveViewLayer().getViewController();
+      layerGroup.getActiveViewLayer().getViewController();
     if (up) {
       viewController.incrementScrollIndex();
     } else {
@@ -203,9 +203,9 @@ dwv.tool.Scroll = function (app) {
    * @param {object} _event The key down event.
    */
   this.dblclick = function (_event) {
-    var layerController = app.getLayerController();
+    var layerGroup = app.getLayerGroup();
     var viewController =
-      layerController.getActiveViewLayer().getViewController();
+      layerGroup.getActiveViewLayer().getViewController();
     viewController.play();
   };
 

@@ -20,11 +20,11 @@ dwv.App = function () {
   // toolbox controller
   var toolboxController = null;
 
-  // layer controller
-  var layerController = null;
-
   // load controller
   var loadController = null;
+
+  // layer group
+  var layerGroup = null;
 
   // first load item flag
   var isFirstLoadItem = null;
@@ -75,7 +75,7 @@ dwv.App = function () {
    * @returns {boolean} True if the data has a third dimension greater than one.
    */
   this.canScroll = function () {
-    var viewLayer = layerController.getActiveViewLayer();
+    var viewLayer = layerGroup.getActiveViewLayer();
     var controller = viewLayer.getViewController();
     return controller.canScroll();
   };
@@ -86,7 +86,7 @@ dwv.App = function () {
    * @returns {boolean} True if the data is monochrome.
    */
   this.canWindowLevel = function () {
-    var viewLayer = layerController.getActiveViewLayer();
+    var viewLayer = layerGroup.getActiveViewLayer();
     var controller = viewLayer.getViewController();
     return controller.canWindowLevel();
   };
@@ -97,7 +97,7 @@ dwv.App = function () {
    * @returns {object} The scale as {x,y}.
    */
   this.getAddedScale = function () {
-    return layerController.getAddedScale();
+    return layerGroup.getAddedScale();
   };
 
   /**
@@ -106,7 +106,7 @@ dwv.App = function () {
    * @returns {object} The scale as {x,y}.
    */
   this.getBaseScale = function () {
-    return layerController.getBaseScale();
+    return layerGroup.getBaseScale();
   };
 
   /**
@@ -115,7 +115,7 @@ dwv.App = function () {
    * @returns {object} The offset.
    */
   this.getOffset = function () {
-    return layerController.getOffset();
+    return layerGroup.getOffset();
   };
 
   /**
@@ -133,8 +133,8 @@ dwv.App = function () {
    *
    * @returns {object} The controller.
    */
-  this.getLayerController = function () {
-    return layerController;
+  this.getLayerGroup = function () {
+    return layerGroup;
   };
 
   /**
@@ -262,7 +262,7 @@ dwv.App = function () {
    * @returns {object} The available width and height: {width:X; height:Y}.
    */
   this.getLayerContainerSize = function () {
-    var size = layerController.getLayerContainerSize();
+    var size = layerGroup.getLayerContainerSize();
     return {width: size.x, height: size.y};
   };
 
@@ -282,7 +282,7 @@ dwv.App = function () {
   this.reset = function () {
     // clear objects
     dataController.reset();
-    layerController.empty();
+    layerGroup.empty();
     // reset undo/redo
     if (undoStack) {
       undoStack = new dwv.tool.UndoStack();
@@ -296,8 +296,8 @@ dwv.App = function () {
    * Reset the layout of the application.
    */
   this.resetLayout = function () {
-    layerController.reset();
-    layerController.draw();
+    layerGroup.reset();
+    layerGroup.draw();
   };
 
   /**
@@ -387,13 +387,13 @@ dwv.App = function () {
    * Fit the display to the given size. To be called once the image is loaded.
    */
   this.fitToContainer = function () {
-    if (layerController) {
-      layerController.fitToContainer(
+    if (layerGroup) {
+      layerGroup.fitToContainer(
         self.getImage().getGeometry().getSpacing()
       );
-      layerController.draw();
+      layerGroup.draw();
       // update style
-      style.setBaseScale(layerController.getBaseScale());
+      style.setBaseScale(layerGroup.getBaseScale());
     }
   };
 
@@ -401,7 +401,7 @@ dwv.App = function () {
    * Init the Window/Level display
    */
   this.initWLDisplay = function () {
-    var viewLayer = layerController.getActiveViewLayer();
+    var viewLayer = layerGroup.getActiveViewLayer();
     var controller = viewLayer.getViewController();
     controller.initialise();
   };
@@ -413,20 +413,20 @@ dwv.App = function () {
 
     // create layer controller if not done yet
     // warn: needs a loaded DOM
-    if (!layerController) {
-      layerController =
-        new dwv.ctrl.LayerController(self.getElement('layerContainer'));
+    if (!layerGroup) {
+      layerGroup =
+        new dwv.gui.LayerGroup(self.getElement('layerContainer'));
       // initialise or add view
       var dataIndex = dataController.getCurrentIndex();
       var data = dataController.get(dataIndex);
-      if (layerController.getNumberOfLayers() === 0) {
+      if (layerGroup.getNumberOfLayers() === 0) {
         initialiseBaseLayers(data.image, data.meta, dataIndex);
       } else {
         addViewLayer(data.image, data.meta, dataIndex);
       }
     }
 
-    layerController.draw();
+    layerGroup.draw();
   };
 
   /**
@@ -437,8 +437,8 @@ dwv.App = function () {
    * @param {number} cy The zoom center Y coordinate.
    */
   this.zoom = function (step, cx, cy) {
-    layerController.addScale(step, {x: cx, y: cy});
-    layerController.draw();
+    layerGroup.addScale(step, {x: cx, y: cy});
+    layerGroup.draw();
   };
 
   /**
@@ -448,8 +448,8 @@ dwv.App = function () {
    * @param {number} ty The translation along Y.
    */
   this.translate = function (tx, ty) {
-    layerController.addTranslation({x: tx, y: ty});
-    layerController.draw();
+    layerGroup.addTranslation({x: tx, y: ty});
+    layerGroup.draw();
   };
 
   /**
@@ -458,7 +458,7 @@ dwv.App = function () {
    * @param {number} alpha The opacity ([0:1] range).
    */
   this.setOpacity = function (alpha) {
-    var viewLayer = layerController.getActiveViewLayer();
+    var viewLayer = layerGroup.getActiveViewLayer();
     viewLayer.setOpacity(alpha);
     viewLayer.draw();
   };
@@ -470,7 +470,7 @@ dwv.App = function () {
    */
   this.getDrawDisplayDetails = function () {
     var drawController =
-      layerController.getActiveDrawLayer().getDrawController();
+      layerGroup.getActiveDrawLayer().getDrawController();
     return drawController.getDrawDisplayDetails();
   };
 
@@ -481,7 +481,7 @@ dwv.App = function () {
    */
   this.getDrawStoreDetails = function () {
     var drawController =
-      layerController.getActiveDrawLayer().getDrawController();
+      layerGroup.getActiveDrawLayer().getDrawController();
     return drawController.getDrawStoreDetails();
   };
   /**
@@ -492,9 +492,9 @@ dwv.App = function () {
    */
   this.setDrawings = function (drawings, drawingsDetails) {
     var viewController =
-      layerController.getActiveViewLayer().getViewController();
+      layerGroup.getActiveViewLayer().getViewController();
     var drawController =
-      layerController.getActiveDrawLayer().getDrawController();
+      layerGroup.getActiveDrawLayer().getDrawController();
 
     drawController.setDrawings(
       drawings, drawingsDetails, fireEvent, this.addToUndoStack);
@@ -508,7 +508,7 @@ dwv.App = function () {
    */
   this.updateDraw = function (drawDetails) {
     var drawController =
-      layerController.getActiveDrawLayer().getDrawController();
+      layerGroup.getActiveDrawLayer().getDrawController();
     drawController.updateDraw(drawDetails);
   };
   /**
@@ -516,7 +516,7 @@ dwv.App = function () {
    */
   this.deleteDraws = function () {
     var drawController =
-      layerController.getActiveDrawLayer().getDrawController();
+      layerGroup.getActiveDrawLayer().getDrawController();
     drawController.deleteDraws(fireEvent, this.addToUndoStack);
   };
   /**
@@ -527,7 +527,7 @@ dwv.App = function () {
    */
   this.isGroupVisible = function (drawDetails) {
     var drawController =
-      layerController.getActiveDrawLayer().getDrawController();
+      layerGroup.getActiveDrawLayer().getDrawController();
     return drawController.isGroupVisible(drawDetails);
   };
   /**
@@ -537,7 +537,7 @@ dwv.App = function () {
    */
   this.toogleGroupVisibility = function (drawDetails) {
     var drawController =
-      layerController.getActiveDrawLayer().getDrawController();
+      layerGroup.getActiveDrawLayer().getDrawController();
     drawController.toogleGroupVisibility(drawDetails);
   };
 
@@ -598,7 +598,7 @@ dwv.App = function () {
    */
   this.defaultOnKeydown = function (event) {
     var viewController =
-      layerController.getActiveViewLayer().getViewController();
+      layerGroup.getActiveViewLayer().getViewController();
     var size = self.getImage().getGeometry().getSize();
     if (event.ctrlKey) {
       if (event.keyCode === 37) { // crtl-arrow-left
@@ -653,7 +653,7 @@ dwv.App = function () {
    */
   this.setColourMap = function (colourMap) {
     var viewController =
-      layerController.getActiveViewLayer().getViewController();
+      layerGroup.getActiveViewLayer().getViewController();
     viewController.setColourMapFromName(colourMap);
   };
 
@@ -664,7 +664,7 @@ dwv.App = function () {
    */
   this.setWindowLevelPreset = function (preset) {
     var viewController =
-      layerController.getActiveViewLayer().getViewController();
+      layerGroup.getActiveViewLayer().getViewController();
     viewController.setWindowLevelPreset(preset);
   };
 
@@ -679,11 +679,11 @@ dwv.App = function () {
     if (tool === 'Draw' ||
       tool === 'Livewire' ||
       tool === 'Floodfill') {
-      layer = layerController.getActiveDrawLayer();
-      previousLayer = layerController.getActiveViewLayer();
+      layer = layerGroup.getActiveDrawLayer();
+      previousLayer = layerGroup.getActiveViewLayer();
     } else {
-      layer = layerController.getActiveViewLayer();
-      previousLayer = layerController.getActiveDrawLayer();
+      layer = layerGroup.getActiveViewLayer();
+      previousLayer = layerGroup.getActiveDrawLayer();
     }
     if (previousLayer) {
       toolboxController.detachLayer(previousLayer);
@@ -875,9 +875,9 @@ dwv.App = function () {
     // adapt context
     if (event.loadtype === 'image') {
       // update view current position if new slice was inserted before
-      if (layerController) {
+      if (layerGroup) {
         var controller =
-          layerController.getActiveViewLayer().getViewController();
+          layerGroup.getActiveViewLayer().getViewController();
         var currentPosition = controller.getCurrentPosition();
         if (sliceNb <= currentPosition.get(2)) {
           controller.incrementIndex(2, true);
@@ -1024,29 +1024,29 @@ dwv.App = function () {
    */
   function initialiseBaseLayers(image, meta, dataIndex) {
     // view layer
-    var viewLayer = layerController.addViewLayer();
+    var viewLayer = layerGroup.addViewLayer();
     // optional draw layer
     if (toolboxController && toolboxController.hasTool('Draw')) {
-      layerController.addDrawLayer();
+      layerGroup.addDrawLayer();
     }
     // initialise layers
-    layerController.initialise(image, meta, dataIndex);
+    layerGroup.initialise(image, meta, dataIndex);
 
     // update style
-    style.setBaseScale(layerController.getBaseScale());
+    style.setBaseScale(layerGroup.getBaseScale());
     // bind view to app
     bindViewLayer(viewLayer);
 
     // propagate layer events
-    layerController.addEventListener('zoomchange', fireEvent);
-    layerController.addEventListener('offsetchange', fireEvent);
+    layerGroup.addEventListener('zoomchange', fireEvent);
+    layerGroup.addEventListener('offsetchange', fireEvent);
 
     // listen to image changes
     dataController.addEventListener('imagechange', viewLayer.onimagechange);
 
     // initialise the toolbox
     if (toolboxController) {
-      toolboxController.init(layerController.displayToIndex);
+      toolboxController.init(layerGroup.displayToIndex);
     }
   }
 
@@ -1059,13 +1059,13 @@ dwv.App = function () {
    */
   function addViewLayer(image, meta, dataIndex) {
     // un-bind previous
-    unbindViewLayer(layerController.getActiveViewLayer());
+    unbindViewLayer(layerGroup.getActiveViewLayer());
 
-    var viewLayer = layerController.addViewLayer();
+    var viewLayer = layerGroup.addViewLayer();
     // initialise
     viewLayer.initialise(image, meta, dataIndex);
     // apply layer scale
-    viewLayer.resize(layerController.getScale());
+    viewLayer.resize(layerGroup.getScale());
     // listen to image changes
     dataController.addEventListener('imagechange', viewLayer.onimagechange);
 

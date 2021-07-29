@@ -93,9 +93,9 @@ dwv.tool.ZoomAndPan = function (app) {
       if (Math.abs(diffY) < 15) {
         return;
       }
-      var layerController = app.getLayerController();
+      var layerGroup = app.getLayerGroup();
       var viewController =
-        layerController.getActiveViewLayer().getViewController();
+        layerGroup.getActiveViewLayer().getViewController();
       var size = app.getImage().getGeometry().getSize();
       // update view controller
       if (size.canScroll(2)) {

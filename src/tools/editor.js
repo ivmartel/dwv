@@ -326,8 +326,8 @@ dwv.tool.ShapeEditor = function (app) {
     });
     // drag move listener
     anchor.on('dragmove.edit', function (evt) {
-      var layerController = app.getLayerController();
-      var drawLayer = layerController.getActiveDrawLayer();
+      var layerGroup = app.getLayerGroup();
+      var drawLayer = layerGroup.getActiveDrawLayer();
       // validate the anchor position
       dwv.tool.validateAnchorPosition(drawLayer.getSize(), this);
       // update shape

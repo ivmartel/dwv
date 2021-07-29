@@ -39,10 +39,10 @@ dwv.io.State = function () {
    * @returns {string} The state as a JSON string.
    */
   this.toJSON = function (app) {
-    var layerController = app.getLayerController();
+    var layerGroup = app.getLayerGroup();
     var viewController =
-      layerController.getActiveViewLayer().getViewController();
-    var drawLayer = layerController.getActiveDrawLayer();
+      layerGroup.getActiveViewLayer().getViewController();
+    var drawLayer = layerGroup.getActiveDrawLayer();
     // return a JSON string
     return JSON.stringify({
       version: '0.5',
@@ -87,16 +87,16 @@ dwv.io.State = function () {
    * @param {object} data The state data.
    */
   this.apply = function (app, data) {
-    var layerController = app.getLayerController();
+    var layerGroup = app.getLayerGroup();
     var viewController =
-      layerController.getActiveViewLayer().getViewController();
+      layerGroup.getActiveViewLayer().getViewController();
     // display
     viewController.setWindowLevel(
       data['window-center'], data['window-width']);
     viewController.setCurrentPosition(
       new dwv.math.Index(data.position), true);
     // apply saved scale on top of current base one
-    var baseScale = app.getLayerController().getBaseScale();
+    var baseScale = app.getLayerGroup().getBaseScale();
     var scale = null;
     var offset = null;
     if (typeof data.scaleCenter !== 'undefined') {
@@ -126,8 +126,8 @@ dwv.io.State = function () {
       };
       offset = data.offset;
     }
-    app.getLayerController().setScale(scale);
-    app.getLayerController().setOffset(offset);
+    app.getLayerGroup().setScale(scale);
+    app.getLayerGroup().setOffset(offset);
     // render to draw the view layer
     app.render();
     // drawings (will draw the draw layer)

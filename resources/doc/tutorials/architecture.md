@@ -7,10 +7,8 @@ This page lists details about the dwv architecture.
 - `LoadController`: handles I/O, the first layer handles the source being
   `File`, `Url`, `Memory` and the second one handles data type, `Dicom`, `Zip`
   `rawImage`, `rawVideo` and `json`
-- `LayerController`: the layers follow a
-  [model-view-controller](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller)
-  (MVC) design for the different kinds of layers,
-for now `View` and `Draw`.
+- `LayerGroup`: a group of layers associated to an HTML div,
+  for now of type `View` and `Draw`. Layers follow the [model-view-controller](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller) (MVC) design.
 - `ToolboxController`: handles tools and dispatches interaction events to the selected
   one
 

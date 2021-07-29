@@ -230,8 +230,8 @@ dwv.tool.Floodfill = function (app) {
       shapeGroup = factory.create(border, self.style);
       shapeGroup.id(dwv.math.guid());
 
-      var layerController = app.getLayerController();
-      var drawLayer = layerController.getActiveDrawLayer();
+      var layerGroup = app.getLayerGroup();
+      var drawLayer = layerGroup.getActiveDrawLayer();
       var drawController = drawLayer.getDrawController();
 
       // get the position group
@@ -271,9 +271,9 @@ dwv.tool.Floodfill = function (app) {
       shapeGroup.destroy();
     }
 
-    var layerController = app.getLayerController();
+    var layerGroup = app.getLayerGroup();
     var viewController =
-      layerController.getActiveViewLayer().getViewController();
+      layerGroup.getActiveViewLayer().getViewController();
 
     var pos = viewController.getCurrentPosition();
     var threshold = currentthreshold || initialthreshold;
@@ -349,9 +349,9 @@ dwv.tool.Floodfill = function (app) {
    * @param {object} event The mouse down event.
    */
   this.mousedown = function (event) {
-    var layerController = app.getLayerController();
-    var viewLayer = layerController.getActiveViewLayer();
-    var drawLayer = layerController.getActiveDrawLayer();
+    var layerGroup = app.getLayerGroup();
+    var viewLayer = layerGroup.getActiveViewLayer();
+    var drawLayer = layerGroup.getActiveDrawLayer();
 
     imageInfo = viewLayer.getImageData();
     if (!imageInfo) {
