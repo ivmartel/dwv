@@ -2261,11 +2261,11 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   integrity sha512-nTnJ528pbqxYanhpDYsi4Rd8MAeaBA67+RZ10CM1m3bTAVFEDcd5AuA4a6W5YkGZ1iNXHzZz8T6TBKLeBuNriQ==
 
 grunt-cli@^1.4.2, grunt-cli@~1.4.2:
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/grunt-cli/-/grunt-cli-1.4.2.tgz#8a83dcc89ebd92d278ccd6014105011cffc71165"
-  integrity sha512-wsu6BZh7KCnfeaSkDrKIAvOlqGKxNRTZjc8xfZlvxCByQIqUfZ31kh5uHpPnhQ4NdVgvaWaVxa1LUbVU80nACw==
+  version "1.4.3"
+  resolved "https://registry.yarnpkg.com/grunt-cli/-/grunt-cli-1.4.3.tgz#22c9f1a3d2780bf9b0d206e832e40f8f499175ff"
+  integrity sha512-9Dtx/AhVeB4LYzsViCjUQkd0Kw0McN2gYpdmGYKtE2a5Yt7v1Q+HYZVWhqXc/kGnxlMtqKDxSwotiGeFmkrCoQ==
   dependencies:
-    grunt-known-options "~1.1.1"
+    grunt-known-options "~2.0.0"
     interpret "~1.1.0"
     liftup "~3.0.1"
     nopt "~4.0.1"
@@ -2321,11 +2321,6 @@ grunt-karma@^4.0.2:
   integrity sha512-4+iBBkXZjHHMDAG5kpHCdDUqlSEBJ6sqouLMRf0p+QB8wGMs300DtaCQphHqd7pM3gpXoGVT3yRRsT7KOZpJMA==
   dependencies:
     lodash "^4.17.10"
-
-grunt-known-options@~1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/grunt-known-options/-/grunt-known-options-1.1.1.tgz#6cc088107bd0219dc5d3e57d91923f469059804d"
-  integrity sha512-cHwsLqoighpu7TuYj5RonnEuxGVFnztcUqTqp5rXFGYL4OuPFofwC4Ycg7n9fYwvK6F5WbYgeVOwph9Crs2fsQ==
 
 grunt-known-options@~2.0.0:
   version "2.0.0"
