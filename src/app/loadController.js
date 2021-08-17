@@ -14,6 +14,19 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
   // current loader
   var currentLoader = null;
 
+  // load counter
+  var counter = -1;
+
+  /**
+   * Get the next load id.
+   *
+   * @returns {number} The next id.
+   */
+  function getNextLoadId() {
+    ++counter;
+    return counter;
+  }
+
   /**
    * Load a list of files. Can be image files or a state file.
    *
@@ -141,26 +154,27 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    * @private
    */
   function loadImageData(data, loader, options) {
+    var loadId = getNextLoadId();
     // set IO
-    var loadtype = 'image';
+    var loadType = 'image';
     loader.setDefaultCharacterSet(defaultCharacterSet);
     loader.onloadstart = function (event) {
       // store loader to allow abort
       currentLoader = loader;
       // callback
-      augmentCallbackEvent(self.onloadstart, loadtype)(event);
+      augmentCallbackEvent(self.onloadstart, loadType, loadId)(event);
     };
-    loader.onprogress = augmentCallbackEvent(self.onprogress, loadtype);
-    loader.onloaditem = augmentCallbackEvent(self.onloaditem, loadtype);
-    loader.onload = augmentCallbackEvent(self.onload, loadtype);
+    loader.onprogress = augmentCallbackEvent(self.onprogress, loadType, loadId);
+    loader.onloaditem = augmentCallbackEvent(self.onloaditem, loadType, loadId);
+    loader.onload = augmentCallbackEvent(self.onload, loadType, loadId);
     loader.onloadend = function (event) {
       // reset current loader
       currentLoader = null;
       // callback
-      augmentCallbackEvent(self.onloadend, loadtype)(event);
+      augmentCallbackEvent(self.onloadend, loadType, loadId)(event);
     };
-    loader.onerror = augmentCallbackEvent(self.onerror, loadtype);
-    loader.onabort = augmentCallbackEvent(self.onabort, loadtype);
+    loader.onerror = augmentCallbackEvent(self.onerror, loadType, loadId);
+    loader.onabort = augmentCallbackEvent(self.onabort, loadType, loadId);
     // launch load
     loader.load(data, options);
   }
@@ -174,15 +188,17 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    * @private
    */
   function loadStateData(data, loader, options) {
-    var loadtype = 'state';
+    var loadId = getNextLoadId();
+    var loadType = 'state';
     // set callbacks
-    loader.onloadstart = augmentCallbackEvent(self.onloadstart, loadtype);
-    loader.onprogress = augmentCallbackEvent(self.onprogress, loadtype);
-    loader.onloaditem = augmentCallbackEvent(self.onloaditem, loadtype);
-    loader.onload = augmentCallbackEvent(self.onload, loadtype);
-    loader.onloadend = augmentCallbackEvent(self.onloadend, loadtype);
-    loader.onerror = augmentCallbackEvent(self.onerror, loadtype);
-    loader.onabort = augmentCallbackEvent(self.onabort, loadtype);
+    loader.onloadstart =
+      augmentCallbackEvent(self.onloadstart, loadType, loadId);
+    loader.onprogress = augmentCallbackEvent(self.onprogress, loadType, loadId);
+    loader.onloaditem = augmentCallbackEvent(self.onloaditem, loadType, loadId);
+    loader.onload = augmentCallbackEvent(self.onload, loadType, loadId);
+    loader.onloadend = augmentCallbackEvent(self.onloadend, loadType, loadId);
+    loader.onerror = augmentCallbackEvent(self.onerror, loadType, loadId);
+    loader.onabort = augmentCallbackEvent(self.onabort, loadType, loadId);
     // launch load
     loader.load(data, options);
   }
@@ -192,12 +208,14 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    *  passed to a callback.
    *
    * @param {object} callback The callback to update.
-   * @param {string} loadtype The loadtype property to add to the event.
+   * @param {string} loadType The loadtype property to add to the event.
+   * @param {number} loadId The load id.
    * @returns {object} A function representing the modified callback.
    */
-  function augmentCallbackEvent(callback, loadtype) {
+  function augmentCallbackEvent(callback, loadType, loadId) {
     return function (event) {
-      event.loadtype = loadtype;
+      event.loadtype = loadType;
+      event.loadid = loadId;
       callback(event);
     };
   }
