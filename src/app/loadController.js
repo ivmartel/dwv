@@ -176,7 +176,18 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
     loader.onerror = augmentCallbackEvent(self.onerror, loadType, loadId);
     loader.onabort = augmentCallbackEvent(self.onabort, loadType, loadId);
     // launch load
-    loader.load(data, options);
+    try {
+      loader.load(data, options);
+    } catch (error) {
+      self.onerror({
+        error: error,
+        loadId: loadId
+      });
+      self.onloadend({
+        loadId: loadId
+      });
+      return;
+    }
   }
 
   /**
@@ -200,7 +211,18 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
     loader.onerror = augmentCallbackEvent(self.onerror, loadType, loadId);
     loader.onabort = augmentCallbackEvent(self.onabort, loadType, loadId);
     // launch load
-    loader.load(data, options);
+    try {
+      loader.load(data, options);
+    } catch (error) {
+      self.onerror({
+        error: error,
+        loadId: loadId
+      });
+      self.onloadend({
+        loadId: loadId
+      });
+      return;
+    }
   }
 
   /**
