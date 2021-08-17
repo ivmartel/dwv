@@ -175,6 +175,19 @@ dwv.gui.ViewLayer = function (containerDiv) {
    */
   this.setOpacity = function (alpha) {
     opacity = Math.min(Math.max(alpha, 0), 1);
+
+    /**
+     * Opacity change event.
+     *
+     * @event dwv.App#opacitychange
+     * @type {object}
+     * @property {string} type The event type.
+     */
+    var event = {
+      type: 'opacitychange',
+      value: [opacity]
+    };
+    fireEvent(event);
   };
 
   /**
@@ -425,6 +438,9 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @param {boolean} flag True to propagate.
    */
   this.propagateViewEvents = function (flag) {
+    if (!view) {
+      return;
+    }
     // view events
     for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
       if (flag) {

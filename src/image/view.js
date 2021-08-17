@@ -12,7 +12,8 @@ dwv.image.viewEventNames = [
   'wlcenterchange',
   'wlpresetadd',
   'colourchange',
-  'positionchange'
+  'positionchange',
+  'opacitychange'
 ];
 
 /**
