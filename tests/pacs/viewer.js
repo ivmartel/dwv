@@ -17,9 +17,30 @@ var _app = null;
  * Setup simple dwv app.
  */
 dwv.test.viewerSetup = function () {
-  // config
+  // stage options
+  // var containerDivIds = {
+  //   0: ['layerGroup']
+  // };
+  // single data, multiple layer group
+  var containerDivIds = {
+    0: ['layerGroup', 'layerGroup1']
+  };
+  // multiple data, multiple layer group
+  // -> set nSimultaneousData to 2 in app config
+  // var containerDivIds = {
+  //   0: ['layerGroup'],
+  //   1: ['layerGroup']
+  // };
+  var binders = [
+    new dwv.gui.ZoomBinder(),
+    //new dwv.gui.OpacityBinder()
+  ];
+
+  // app config
   var config = {
-    containerDivId: 'dwv',
+    //nSimultaneousData: 2,
+    containerDivIds: containerDivIds,
+    binders: binders,
     tools: {
       Scroll: {},
       WindowLevel: {}
@@ -84,6 +105,23 @@ dwv.test.onDOMContentLoadedViewer = function () {
     _app.loadFiles(event.target.files);
   });
 
+  // zoom range
+  var zoomrange = document.getElementById('zoomrange');
+  var zoomnumber = document.getElementById('zoomnumber');
+  zoomrange.oninput = function () {
+    var scale = {x: this.value, y: this.value};
+    _app.getLayerGroup().setScale(scale);
+    _app.getLayerGroup().draw();
+    zoomnumber.value = this.value;
+  };
+  zoomnumber.oninput = function () {
+    var scale = {x: this.value, y: this.value};
+    _app.getLayerGroup().setScale(scale);
+    _app.getLayerGroup().draw();
+    zoomnumber.value = this.value;
+  };
+
+  // alpha range
   var alpharange = document.getElementById('alpharange');
   var alphanumber = document.getElementById('alphanumber');
   alpharange.oninput = function () {

@@ -48,6 +48,7 @@ body { font-family: Arial, Helvetica, sans-serif; }
 <script type="text/javascript" src="../../src/gui/drawLayer.js"></script>
 <script type="text/javascript" src="../../src/gui/layerGroup.js"></script>
 <script type="text/javascript" src="../../src/gui/viewLayer.js"></script>
+<script type="text/javascript" src="../../src/gui/stage.js"></script>
 <script type="text/javascript" src="../../src/gui/style.js"></script>
 <script type="text/javascript" src="../../src/image/decoder.js"></script>
 <script type="text/javascript" src="../../src/image/dicomBufferToView.js"></script>
@@ -94,35 +95,35 @@ body { font-family: Arial, Helvetica, sans-serif; }
 // launch when page is loaded
 document.addEventListener("DOMContentLoaded", function (/*event*/)
 {
-    dwv.addDataLine("dwv0", "leadtools-8BitsJpegLossyGrayScale", {
+    dwv.addDataLine(0, "leadtools-8BitsJpegLossyGrayScale", {
         'origin': 'LeadTools',
         'path': '8BitsJpegLossyGrayScale.zip',
         't-syntax': '1.2.840.10008.1.2.4.50 (jpeg baseline)',
         'modality': 'OT', 'photo': 'MONOCHROME2',
         'bits': '8-8-7', 'pixel-vr': 'OW',
     });
-    dwv.addDataLine("dwv1", "nema-mr1_jply", {
+    dwv.addDataLine(1, "nema-mr1_jply", {
         'origin': 'Nema WG04',
         'path': 'compsamples_jpeg/IMAGES/JPLY/MR1_JPLY',
         't-syntax': '1.2.840.10008.1.2.4.51 (jpeg baseline)',
         'modality': 'MR', 'photo': 'MONOCHROME2',
         'bits': '16-12-11', 'pixel-vr': 'OB',
     });
-    dwv.addDataLine("dwv2", "nema-nm1_jply", {
+    dwv.addDataLine(2, "nema-nm1_jply", {
         'origin': 'Nema WG04',
         'path': 'compsamples_jpeg/IMAGES/JPLY/NM1_JPLY',
         't-syntax': '1.2.840.10008.1.2.4.51 (jpeg baseline)',
         'modality': 'NM', 'photo': 'MONOCHROME2',
         'bits': '16-12-11', 'pixel-vr': 'OB',
     });
-    dwv.addDataLine("dwv3", "nema-ct1_jpll", {
+    dwv.addDataLine(3, "nema-ct1_jpll", {
         'origin': 'Nema WG04',
         'path': 'compsamples_jpeg/IMAGES/JPLL/CT1_JPLL',
         't-syntax': '1.2.840.10008.1.2.4.70 (jpeg lossless)',
         'modality': 'CT', 'photo': 'MONOCHROME2',
         'bits': '16-16-15', 'pixel-vr': 'OB',
     });
-    dwv.addDataLine("dwv4", "nema-nm1_jpll", {
+    dwv.addDataLine(4, "nema-nm1_jpll", {
         'origin': 'Nema WG04',
         'path': 'compsamples_jpeg/IMAGES/JPLL/NM1_JPLL',
         't-syntax': '1.2.840.10008.1.2.4.70 (jpeg lossless)',

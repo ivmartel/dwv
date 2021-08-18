@@ -38,6 +38,7 @@ body {
 <script type="text/javascript" src="../../src/gui/drawLayer.js"></script>
 <script type="text/javascript" src="../../src/gui/layerGroup.js"></script>
 <script type="text/javascript" src="../../src/gui/viewLayer.js"></script>
+<script type="text/javascript" src="../../src/gui/stage.js"></script>
 <script type="text/javascript" src="../../src/gui/style.js"></script>
 <script type="text/javascript" src="../../src/image/decoder.js"></script>
 <script type="text/javascript" src="../../src/image/dicomBufferToView.js"></script>
@@ -100,9 +101,16 @@ document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedViewer)
 
 <!-- DWV -->
 <div id="dwv">
-  <!-- Layer Container -->
-  <div class="layerContainer"></div>
+  <!-- Layer groups -->
+  <div id="layerGroup"></div>
+  <div id="layerGroup1"></div>
 </div><!-- /dwv -->
+
+<label for="zoomrange">Zoom:</label>
+<input type="range" id="zoomrange" min="0.1" max="2" value="1" step="0.1">
+<input type="number" id="zoomnumber" min="0.1" max="2" value="1" step="0.1">
+
+<br>
 
 <label for="alpharange">Alpha:</label>
 <input type="range" id="alpharange" min="0" max="1" value="1" step="0.1">
