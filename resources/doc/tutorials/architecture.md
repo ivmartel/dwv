@@ -1,16 +1,15 @@
 This page lists details about the dwv architecture.
 
-## Overview
-![archi](architecture-overview.png)
+## Layers
+![layers](layers.png)
 
 - `App`: main class
 - `LoadController`: handles I/O, the first layer handles the source being
   `File`, `Url`, `Memory` and the second one handles data type, `Dicom`, `Zip`
   `rawImage`, `rawVideo` and `json`
-- `LayerGroup`: a group of layers associated to an HTML div,
+- `LayerGroup`: a group of layers associated to an HTML element,
   for now of type `View` and `Draw`. Layers follow the [model-view-controller](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller) (MVC) design.
-- `ToolboxController`: handles tools and dispatches interaction events to the selected
-  one
+- `Stage`: the class that handles a list of LayerGroups for optional synchronisation
 
 ## Data load
 Data can come from 3 types of source: url (via a [HttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest)), file (via a [FileReader](https://developer.mozilla.org/en-US/docs/Web/API/FileReader)) or directly as a memory buffer. The 3 'meta' loaders responsible for each source are: [UrlsLoader](./dwv.io.UrlsLoader.html), [FilesLoader](./dwv.io.FilesLoader.html) and [MemoryLoader](./dwv.io.MemoryLoader.html).
