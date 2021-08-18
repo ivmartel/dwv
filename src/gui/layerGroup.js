@@ -6,9 +6,10 @@ dwv.gui = dwv.gui || {};
  * Layer group.
  *
  * @param {object} containerDiv The associated HTML div.
+ * @param {number} groupId The group id.
  * @class
  */
-dwv.gui.LayerGroup = function (containerDiv) {
+dwv.gui.LayerGroup = function (containerDiv, groupId) {
 
   var layers = [];
 
@@ -67,6 +68,15 @@ dwv.gui.LayerGroup = function (containerDiv) {
    * @private
    */
   var listenerHandler = new dwv.utils.ListenerHandler();
+
+  /**
+   * Get the Id of the container div.
+   *
+   * @returns {string} The id of the div.
+   */
+  this.getElementId = function () {
+    return containerDiv.id;
+  };
 
   /**
    * Get the layer scale.
@@ -158,6 +168,7 @@ dwv.gui.LayerGroup = function (containerDiv) {
     if (viewLayer0) {
       viewLayer0.removeEventListener(
         'postitionchange', this.updatePosition);
+      unbindViewLayer(viewLayer0);
     }
 
     // set index
@@ -167,7 +178,41 @@ dwv.gui.LayerGroup = function (containerDiv) {
     var viewLayer = this.getActiveViewLayer();
     viewLayer.addEventListener(
       'postitionchange', this.updatePosition);
+    bindViewLayer(viewLayer);
   };
+
+  /**
+   * Bind view layer events to this.
+   *
+   * @param {object} viewLayer The view layer to bind.
+   */
+  function bindViewLayer(viewLayer) {
+    // propagate view events
+    viewLayer.propagateViewEvents(true);
+    for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
+      viewLayer.addEventListener(dwv.image.viewEventNames[j], fireEvent);
+    }
+    // propagate viewLayer events
+    viewLayer.addEventListener('renderstart', fireEvent);
+    viewLayer.addEventListener('renderend', fireEvent);
+  }
+
+  /**
+   * Unbind view layer events from this.
+   *
+   * @param {object} viewLayer The view layer to unbind.
+   */
+  function unbindViewLayer(viewLayer) {
+    // stop propagating view events
+    viewLayer.propagateViewEvents(false);
+    for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
+      viewLayer.removeEventListener(dwv.image.viewEventNames[j], fireEvent);
+    }
+    // stop propagating viewLayer events
+    viewLayer.removeEventListener('renderstart', fireEvent);
+    viewLayer.removeEventListener('renderend', fireEvent);
+  }
+
 
   /**
    * Set the active draw layer.
@@ -231,7 +276,7 @@ dwv.gui.LayerGroup = function (containerDiv) {
    */
   function getNextLayerDiv() {
     var div = document.createElement('div');
-    div.id = 'layer' + layers.length;
+    div.id = 'layer-' + groupId + '-' + layers.length;
     div.className = 'layer';
     div.style.pointerEvents = 'none';
     return div;
@@ -276,7 +321,7 @@ dwv.gui.LayerGroup = function (containerDiv) {
    */
   this.getFitToContainerScale = function (spacing) {
     // get container size
-    var containerSize = this.getLayerContainerSize();
+    var containerSize = this.getContainerSize();
     var realSize = {
       x: layerSize.x * spacing.getColumnSpacing(),
       y: layerSize.y * spacing.getRowSpacing()
@@ -303,11 +348,11 @@ dwv.gui.LayerGroup = function (containerDiv) {
   };
 
   /**
-   * Get the size available for the layer container div.
+   * Get the size available for the container div.
    *
    * @returns {object} The available width and height as {width,height}.
    */
-  this.getLayerContainerSize = function () {
+  this.getContainerSize = function () {
     return dwv.gui.getDivSize(containerDiv);
   };
 
@@ -404,6 +449,7 @@ dwv.gui.LayerGroup = function (containerDiv) {
    * @param {number} dataIndex The data index.
    */
   this.initialise = function (image, metaData, dataIndex) {
+    // set member var
     var size = image.getGeometry().getSize();
     layerSize = size.get2D();
     // apply to layers
