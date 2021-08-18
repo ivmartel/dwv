@@ -23,6 +23,7 @@ dwv.gui.interactionEventNames = [
  * @param {number} containerDivId The id of the container div.
  * @param {string} name The name or id to find.
  * @returns {object} The found element or null.
+ * @deprecated
  */
 dwv.gui.getElement = function (containerDivId, name) {
   // get by class in the container div
@@ -45,6 +46,7 @@ dwv.gui.getElement = function (containerDivId, name) {
  * Get a HTML element associated to a container div. Defaults to local one.
  *
  * @see dwv.gui.getElement
+ * @deprecated
  */
 dwv.getElement = dwv.gui.getElement;
 
@@ -90,7 +92,7 @@ dwv.gui.getDivSize = function (div) {
   // remove the height of other elements of the container div
   var kids = parent.children;
   for (var i = 0; i < kids.length; ++i) {
-    if (!kids[i].classList.contains(div.className)) {
+    if (kids[i].id !== div.id) {
       var styles = window.getComputedStyle(kids[i]);
       // offsetHeight does not include margin
       var margin = parseFloat(styles.getPropertyValue('margin-top'), 10) +
