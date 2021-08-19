@@ -18,18 +18,17 @@ var _app = null;
  */
 dwv.test.viewerSetup = function () {
   // stage options
-  // var containerDivIds = {
-  //   0: ['layerGroup']
-  // };
   // single data, multiple layer group
-  var containerDivIds = {
-    0: ['layerGroup', 'layerGroup1']
+  var dataViewConfigs = {
+    0: [{
+      divId: 'layerGroup'
+    }]
   };
   // multiple data, multiple layer group
   // -> set nSimultaneousData to 2 in app config
   // var containerDivIds = {
-  //   0: ['layerGroup'],
-  //   1: ['layerGroup']
+  //   0: [{divId: 'layerGroup'}],
+  //   1: [{divId: 'layerGroup'}]
   // };
   var binders = [
     new dwv.gui.ZoomBinder(),
@@ -39,7 +38,7 @@ dwv.test.viewerSetup = function () {
   // app config
   var config = {
     //nSimultaneousData: 2,
-    containerDivIds: containerDivIds,
+    dataViewConfigs: dataViewConfigs,
     binders: binders,
     tools: {
       Scroll: {},

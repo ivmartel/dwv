@@ -422,20 +422,22 @@ dwv.App = function () {
    * @param {number} dataIndex The data index.
    * @returns {array} The list of associated element ids.
    */
-  function getContainerDivIds(dataIndex) {
-    var elementIds = null;
-    var defaultIds = ['layerGroup'];
-    if (options.containerDivIds === null ||
-      typeof options.containerDivIds === 'undefined') {
-      elementIds = defaultIds;
-    } else if (typeof options.containerDivIds['*'] !== 'undefined') {
-      elementIds = options.containerDivIds['*'];
-    } else if (dataIndex > options.containerDivIds.length - 1) {
-      elementIds = defaultIds;
+  function getViewConfigs(dataIndex) {
+    var configs = null;
+    var defaultConfig = {
+      divId: 'layerGroup'
+    };
+    if (options.dataViewConfigs === null ||
+      typeof options.dataViewConfigs === 'undefined') {
+      configs = [defaultConfig];
+    } else if (typeof options.dataViewConfigs['*'] !== 'undefined') {
+      configs = options.dataViewConfigs['*'];
+    } else if (dataIndex > options.dataViewConfigs.length - 1) {
+      configs = [defaultConfig];
     } else {
-      elementIds = options.containerDivIds[dataIndex];
+      configs = options.dataViewConfigs[dataIndex];
     }
-    return elementIds;
+    return configs;
   }
 
   /**
@@ -447,24 +449,24 @@ dwv.App = function () {
     if (typeof dataIndex === 'undefined') {
       dataIndex = dataController.getCurrentIndex();
     }
-    var elementIds = getContainerDivIds(dataIndex);
-    // loop on all possible div ids
-    for (var i = 0; i < elementIds.length; ++i) {
-      var elementId = elementIds[i];
+    // loop on all configs
+    var viewConfigs = getViewConfigs(dataIndex);
+    for (var i = 0; i < viewConfigs.length; ++i) {
+      var config = viewConfigs[i];
       // create layer group if not done yet
       // warn: needs a loaded DOM
       var layerGroup =
-        stage.getLayerGroupWithElementId(elementId);
+        stage.getLayerGroupWithElementId(config.divId);
       if (!layerGroup) {
         // create new layer group
-        var element = document.getElementById(elementId);
+        var element = document.getElementById(config.divId);
         layerGroup = stage.addLayerGroup(element);
       }
       // initialise or add view
       if (layerGroup.getNumberOfLayers() === 0) {
-        initialiseBaseLayers(dataIndex, elementId);
+        initialiseBaseLayers(dataIndex, config.divId);
       } else {
-        addViewLayer(dataIndex, elementId);
+        addViewLayer(dataIndex, config.divId);
       }
       // draw
       layerGroup.draw();
