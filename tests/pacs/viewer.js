@@ -8,8 +8,6 @@ dwv.image.decoderScripts = {
   'jpeg-baseline': '../../decoders/pdfjs/decode-jpegbaseline.js',
   rle: '../../decoders/dwv/decode-rle.js'
 };
-// get element
-dwv.gui.getElement = dwv.gui.base.getElement;
 // logger level (optional)
 dwv.logger.level = dwv.utils.logger.levels.DEBUG;
 
@@ -19,8 +17,10 @@ var _app = null;
  * Setup simple dwv app.
  */
 dwv.test.viewerSetup = function () {
+  var viewOnFirstLoadItem = false;
   // config
   var config = {
+    viewOnFirstLoadItem: viewOnFirstLoadItem,
     containerDivId: 'dwv',
     tools: {
       Scroll: {},
@@ -39,6 +39,15 @@ dwv.test.viewerSetup = function () {
   _app.addEventListener('loadstart', function () {
     console.time('load-data');
     isFirstRender = true;
+  });
+  _app.addEventListener('loadprogress', function () {
+    var percent = Math.ceil((event.loaded / event.total) * 100);
+    document.getElementById('loadprogress').value = percent;
+  });
+  _app.addEventListener('load', function () {
+    if (!viewOnFirstLoadItem) {
+      _app.render();
+    }
   });
   _app.addEventListener('loadend', function () {
     console.timeEnd('load-data');

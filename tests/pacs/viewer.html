@@ -11,13 +11,16 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
+progress {
+  width: 40%;
+}
 .input {
   margin-bottom: 10px;
   padding: 5px;
   background-color: gainsboro;
 }
 #fileinput {
-  width: 80%;
+  width: 50%;
   border: 1px dotted gray;
 }
 </style>
@@ -96,6 +99,7 @@ document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedViewer)
 <div class="input">
 <label for="fileinput">Input:</label>
 <input type="file" id="fileinput" multiple>
+<progress id="loadprogress" max="100" value="0"></progress>
 </div>
 
 <!-- DWV -->
