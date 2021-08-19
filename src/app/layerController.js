@@ -398,6 +398,38 @@ dwv.ctrl.LayerController = function (containerDiv) {
   };
 
   /**
+   * Get an orientation matrix from a name.
+   *
+   * @param {string} name The orientation name.
+   * @returns {object} The orientation matrix.
+   */
+  function getOrientationMatrix(name) {
+    var matrix = null;
+    if (name === 'axial') {
+      matrix = dwv.math.getIdentityMat33();
+    } else if (name === 'coronal') {
+      // coronal (xzy)
+      /* eslint-disable array-element-newline */
+      matrix = new dwv.math.Matrix33([
+        1, 0, 0,
+        0, 0, 1,
+        0, 1, 0
+      ]);
+      /* eslint-enable array-element-newline */
+    } else if (name === 'sagittal') {
+      // sagittal (yzx)
+      /* eslint-disable array-element-newline */
+      matrix = new dwv.math.Matrix33([
+        0, 0, 1,
+        1, 0, 0,
+        0, 1, 0
+      ]);
+      /* eslint-enable array-element-newline */
+    }
+    return matrix;
+  }
+
+  /**
    * Initialise the layer: set the canvas and context
    *
    * @param {object} image The image.
@@ -405,30 +437,19 @@ dwv.ctrl.LayerController = function (containerDiv) {
    * @param {number} dataIndex The data index.
    */
   this.initialise = function (image, metaData, dataIndex) {
-    /* eslint-disable array-element-newline */
-    // axial
-    //var targetOrientation = dwv.math.getIdentityMat33();
-    // coronal (xzy)
-    var targetOrientation = new dwv.math.Matrix33([
-      1, 0, 0,
-      0, 0, 1,
-      0, 1, 0
-    ]);
-    // sagittal (yzx)
-    // var targetOrientation = new dwv.math.Matrix33([
-    //   0, 0, 1,
-    //   1, 0, 0,
-    //   0, 1, 0
-    // ]);
-    /* eslint-enable array-element-newline */
-
     var geometry = image.getGeometry();
-    // image orientation as one and zeros
-    var imgOrientation = geometry.getOrientation().asOneAndZeros();
-    // imgOrientation * viewOrientation = targetOrientation
-    // -> viewOrientation = inv(imgOrientation) * targetOrientation
-    var viewOrientation =
-      imgOrientation.getInverse().multiply(targetOrientation);
+
+    var targetOrientationName = 'axial';
+    var viewOrientation = dwv.math.getIdentityMat33();
+    if (typeof targetOrientationName !== 'undefined') {
+      var targetOrientation = getOrientationMatrix(targetOrientationName);
+      // image orientation as one and zeros
+      var imgOrientation = geometry.getOrientation().asOneAndZeros();
+      // imgOrientation * viewOrientation = targetOrientation
+      // -> viewOrientation = inv(imgOrientation) * targetOrientation
+      viewOrientation =
+        imgOrientation.getInverse().multiply(targetOrientation);
+    }
     var absViewOrientation = viewOrientation.getAbs();
 
     var size = image.getGeometry().getSize(absViewOrientation);
