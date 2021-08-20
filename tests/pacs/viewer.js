@@ -41,8 +41,11 @@ dwv.test.viewerSetup = function () {
     isFirstRender = true;
   });
   _app.addEventListener('loadprogress', function () {
-    var percent = Math.ceil((event.loaded / event.total) * 100);
-    document.getElementById('loadprogress').value = percent;
+    if (typeof event.lengthComputable !== 'undefined' &&
+      event.lengthComputable) {
+      var percent = Math.ceil((event.loaded / event.total) * 100);
+      document.getElementById('loadprogress').value = percent;
+    }
   });
   _app.addEventListener('load', function () {
     if (!viewOnFirstLoadItem) {
