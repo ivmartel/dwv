@@ -12,7 +12,7 @@ dwv.image = dwv.image || {};
  * @param {number} increment The increment between indicies (default=1).
  * @returns {object} An iterator folowing the iterator and iterable protocol.
  */
-dwv.image.range = function (dataAccessor, start, end, increment) {
+dwv.image.simpleRange = function (dataAccessor, start, end, increment) {
   if (typeof increment === 'undefined') {
     increment = 1;
   }
@@ -376,7 +376,7 @@ dwv.image.getSliceIterator = function (
       }
     } else {
       // default case
-      range = dwv.image.range(dataAccessor, start, start + sliceSize);
+      range = dwv.image.simpleRange(dataAccessor, start, start + sliceSize);
     }
   } else if (image.getNumberOfComponents() === 3) {
     // 3 times bigger...

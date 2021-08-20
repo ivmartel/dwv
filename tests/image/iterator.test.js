@@ -11,7 +11,7 @@ QUnit.module('image');
  *
  * @function module:tests/image~range
  */
-QUnit.test('Test iterator.', function (assert) {
+QUnit.test('Test simpleRange iterator.', function (assert) {
   var dataAccessor = function (offset) {
     return offset;
   };
@@ -19,7 +19,7 @@ QUnit.test('Test iterator.', function (assert) {
   var test0Min = 0;
   var test0Max = 10;
   var i0Theo = test0Min;
-  var iter0 = dwv.image.range(dataAccessor, test0Min, test0Max);
+  var iter0 = dwv.image.simpleRange(dataAccessor, test0Min, test0Max);
   var ival0 = iter0.next();
   while (!ival0.done) {
     assert.equal(ival0.value, i0Theo, '#0 iterator next');
@@ -33,7 +33,7 @@ QUnit.test('Test iterator.', function (assert) {
   var test1Max = 21;
   var test1Incr = 2;
   var i1Theo = test1Min;
-  var iter1 = dwv.image.range(dataAccessor, test1Min, test1Max, test1Incr);
+  var iter1 = dwv.image.simpleRange(dataAccessor, test1Min, test1Max, test1Incr);
   var ival1 = iter1.next();
   while (!ival1.done) {
     assert.equal(ival1.value, i1Theo, '#1 iterator next');
