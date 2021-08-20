@@ -283,8 +283,14 @@ dwv.image.getIteratorValues = function (iterator) {
 dwv.image.getSliceIterator = function (
   image, position, isRescaled, viewOrientation) {
   var geometry = image.getGeometry();
-  // TODO: zero-ify non direction index?
-  var start = geometry.indexToOffset(position);
+  // zero-ify non direction index
+  var values = position.getValues();
+  var dirMax2Index = viewOrientation.getColAbsMax(2).index;
+  var indexFilter = function (element, index) {
+    return index === dirMax2Index ? element : 0;
+  };
+  var posStart = new dwv.math.Index(values.map(indexFilter));
+  var start = geometry.indexToOffset(posStart);
 
   // default to non rescaled data
   if (typeof isRescaled === 'undefined') {
