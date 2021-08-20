@@ -33,7 +33,8 @@ QUnit.test('Test simpleRange iterator.', function (assert) {
   var test1Max = 21;
   var test1Incr = 2;
   var i1Theo = test1Min;
-  var iter1 = dwv.image.simpleRange(dataAccessor, test1Min, test1Max, test1Incr);
+  var iter1 = dwv.image.simpleRange(
+    dataAccessor, test1Min, test1Max, test1Incr);
   var ival1 = iter1.next();
   while (!ival1.done) {
     assert.equal(ival1.value, i1Theo, '#1 iterator next');
