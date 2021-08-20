@@ -174,9 +174,15 @@ dwv.ctrl.ViewController = function (view) {
    * @returns {boolean} False if not in bounds.
    */
   this.setCurrentPosition2D = function (i, j) {
-    return view.setCurrentPosition(
-      view.getCurrentPosition().getWithNew2D(i, j)
-    );
+    // abs? otherwise negative position...
+    var orientation = view.getOrientation().getAbs();
+    // keep third direction
+    var dirMax2 = orientation.getColAbsMax(2);
+    var k = view.getCurrentPosition().get(dirMax2.index);
+    var posPlane = new dwv.math.Index([i, j, k]);
+    // pos3D = orientation * posPlane
+    var pos3D = orientation.multiplyIndex3D(posPlane);
+    return view.setCurrentPosition(pos3D);
   };
 
   /**
