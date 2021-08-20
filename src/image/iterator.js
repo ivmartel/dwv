@@ -334,13 +334,13 @@ dwv.image.getSliceIterator = function (
         if (dirMax0.index === 0) {
           // xyz (r1:0, r2:0)
           reverse1 = !reverse1;
-          reverse2 = !reverse1;
+          reverse2 = !reverse2;
           range = dwv.image.range2(dataAccessor,
-            start, end, 1, ncols, nrows, reverse1, reverse2);
+            start, end, 1, ncols, ncols, reverse1, reverse2);
         } else {
           // yxz  (r1:1, r2:0, guessed... no data...)
           reverse1 = true;
-          reverse2 = !reverse1;
+          reverse2 = !reverse2;
           range = dwv.image.range2(dataAccessor,
             start, end, ncols, nrows, 1, reverse1, reverse2);
         }
