@@ -127,8 +127,8 @@ dwv.tool.Livewire = function (app) {
       clearParentPoints();
       shapeGroup = null;
       // update zoom scale
-      var layerController = app.getLayerController();
-      var drawLayer = layerController.getActiveDrawLayer();
+      var layerGroup = app.getLayerGroup();
+      var drawLayer = layerGroup.getActiveDrawLayer();
       self.style.setZoomScale(
         drawLayer.getKonvaLayer().getAbsoluteScale());
       // do the training from the first point
@@ -222,8 +222,8 @@ dwv.tool.Livewire = function (app) {
     shapeGroup = factory.create(currentPath.pointArray, self.style);
     shapeGroup.id(dwv.math.guid());
 
-    var layerController = app.getLayerController();
-    var drawLayer = layerController.getActiveDrawLayer();
+    var layerGroup = app.getLayerGroup();
+    var drawLayer = layerGroup.getActiveDrawLayer();
     var drawController = drawLayer.getDrawController();
 
     // get the position group
@@ -318,8 +318,8 @@ dwv.tool.Livewire = function (app) {
   this.activate = function (bool) {
     // start scissors if displayed
     if (bool) {
-      var layerController = app.getLayerController();
-      var viewLayer = layerController.getActiveViewLayer();
+      var layerGroup = app.getLayerGroup();
+      var viewLayer = layerGroup.getActiveViewLayer();
 
       //scissors = new dwv.math.Scissors();
       var size = app.getImage().getGeometry().getSize();

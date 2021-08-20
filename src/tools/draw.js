@@ -174,8 +174,8 @@ dwv.tool.Draw = function (app) {
       return;
     }
 
-    var layerController = app.getLayerController();
-    var drawLayer = layerController.getActiveDrawLayer();
+    var layerGroup = app.getLayerGroup();
+    var drawLayer = layerGroup.getActiveDrawLayer();
 
     // determine if the click happened in an existing shape
     var stage = drawLayer.getKonvaStage();
@@ -196,7 +196,7 @@ dwv.tool.Draw = function (app) {
         shapeEditor.disable();
         shapeEditor.setShape(selectedShape);
         var viewController =
-          layerController.getActiveViewLayer().getViewController();
+          layerGroup.getActiveViewLayer().getViewController();
         shapeEditor.setViewController(viewController);
         shapeEditor.enable();
       }
@@ -412,9 +412,9 @@ dwv.tool.Draw = function (app) {
       tmpShapeGroup.destroy();
     }
     // create shape group
-    var layerController = app.getLayerController();
+    var layerGroup = app.getLayerGroup();
     var viewController =
-      layerController.getActiveViewLayer().getViewController();
+      layerGroup.getActiveViewLayer().getViewController();
     tmpShapeGroup = currentFactory.create(
       tmpPoints, self.style, viewController);
     // do not listen during creation
@@ -437,11 +437,11 @@ dwv.tool.Draw = function (app) {
       tmpShapeGroup.destroy();
     }
 
-    var layerController = app.getLayerController();
+    var layerGroup = app.getLayerGroup();
     var viewController =
-      layerController.getActiveViewLayer().getViewController();
+      layerGroup.getActiveViewLayer().getViewController();
     var drawController =
-      layerController.getActiveDrawLayer().getDrawController();
+      layerGroup.getActiveDrawLayer().getDrawController();
 
     // create final shape
     var finalShapeGroup = currentFactory.create(
@@ -481,8 +481,8 @@ dwv.tool.Draw = function (app) {
     shapeEditor.setViewController(null);
     document.body.style.cursor = 'default';
     // get the current draw layer
-    var layerController = app.getLayerController();
-    var drawLayer = layerController.getActiveDrawLayer();
+    var layerGroup = app.getLayerGroup();
+    var drawLayer = layerGroup.getActiveDrawLayer();
     konvaLayer = drawLayer.getKonvaLayer();
     activateCurrentPositionShapes(flag);
     // listen to app change to update the draw layer
@@ -512,9 +512,9 @@ dwv.tool.Draw = function (app) {
    * @param {boolean} visible Set the draw layer visible or not.
    */
   function activateCurrentPositionShapes(visible) {
-    var layerController = app.getLayerController();
+    var layerGroup = app.getLayerGroup();
     var drawController =
-      layerController.getActiveDrawLayer().getDrawController();
+      layerGroup.getActiveDrawLayer().getDrawController();
 
     // get shape groups at the current position
     var shapeGroups =
@@ -561,8 +561,8 @@ dwv.tool.Draw = function (app) {
    * @private
    */
   function getRealPosition(index) {
-    var layerController = app.getLayerController();
-    var drawLayer = layerController.getActiveDrawLayer();
+    var layerGroup = app.getLayerGroup();
+    var drawLayer = layerGroup.getActiveDrawLayer();
     var stage = drawLayer.getKonvaStage();
     return {
       x: stage.offset().x + index.x / stage.scale().x,
@@ -601,8 +601,8 @@ dwv.tool.Draw = function (app) {
       // store colour
       colour = shapeGroup.getChildren(dwv.draw.isNodeNameShape)[0].stroke();
       // display trash
-      var layerController = app.getLayerController();
-      var drawLayer = layerController.getActiveDrawLayer();
+      var layerGroup = app.getLayerGroup();
+      var drawLayer = layerGroup.getActiveDrawLayer();
       var stage = drawLayer.getKonvaStage();
       var scale = stage.scale();
       var invscale = {x: 1 / scale.x, y: 1 / scale.y};
@@ -617,8 +617,8 @@ dwv.tool.Draw = function (app) {
     });
     // drag move event handling
     shapeGroup.on('dragmove.draw', function (event) {
-      var layerController = app.getLayerController();
-      var drawLayer = layerController.getActiveDrawLayer();
+      var layerGroup = app.getLayerGroup();
+      var drawLayer = layerGroup.getActiveDrawLayer();
       // validate the group position
       dwv.tool.validateGroupPosition(drawLayer.getSize(), this);
       // highlight trash when on it

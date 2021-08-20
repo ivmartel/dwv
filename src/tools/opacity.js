@@ -51,8 +51,8 @@ dwv.tool.Opacity = function (app) {
     var xMove = (Math.abs(diffX) > 15);
     // do not trigger for small moves
     if (xMove) {
-      var layerController = app.getLayerController();
-      var viewLayer = layerController.getActiveViewLayer();
+      var layerGroup = app.getLayerGroup();
+      var viewLayer = layerGroup.getActiveViewLayer();
       var op = viewLayer.getOpacity();
       viewLayer.setOpacity(op + (diffX / 200));
       viewLayer.draw();
