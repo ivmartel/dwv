@@ -450,9 +450,8 @@ dwv.ctrl.LayerController = function (containerDiv) {
       viewOrientation =
         imgOrientation.getInverse().multiply(targetOrientation);
     }
-    var absViewOrientation = viewOrientation.getAbs();
 
-    var size = image.getGeometry().getSize(absViewOrientation);
+    var size = image.getGeometry().getSize(viewOrientation);
     layerSize = size.get2D();
     // apply to layers
     for (var i = 0; i < layers.length; ++i) {
@@ -467,7 +466,7 @@ dwv.ctrl.LayerController = function (containerDiv) {
     this.updateDrawControllerToViewPosition();
 
     // fit data
-    var spacing = image.getGeometry().getSpacing(absViewOrientation);
+    var spacing = image.getGeometry().getSpacing(viewOrientation);
     this.fitToContainer(spacing);
   };
 

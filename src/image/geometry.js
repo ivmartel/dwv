@@ -287,7 +287,9 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
         size.get(1),
         size.get(2)
       );
-      var vec2 = viewOrientation.getInverse().multiplyVector3D(vec);
+      // size = orientation * sizeOriented
+      // -> inv(orientation) * size = sizeOriented
+      var vec2 = viewOrientation.getInverse().getAbs().multiplyVector3D(vec);
       res = new dwv.image.Size([vec2.getX(), vec2.getY(), vec2.getZ()]);
     }
     return res;
@@ -351,7 +353,9 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
         spacing.getRowSpacing(),
         spacing.getSliceSpacing()
       );
-      var vec2 = viewOrientation.getInverse().multiplyVector3D(vec);
+      // spacing = orientation * spacingOriented
+      // -> inv(orientation) * spacing = spacingOriented
+      var vec2 = viewOrientation.getInverse().getAbs().multiplyVector3D(vec);
       res = new dwv.image.Spacing(vec2.getX(), vec2.getY(), vec2.getZ());
     }
     return res;
