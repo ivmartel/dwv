@@ -2885,11 +2885,6 @@ js-beautify@^1.7.4:
     mkdirp "^1.0.4"
     nopt "^5.0.0"
 
-js-reporters@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/js-reporters/-/js-reporters-2.0.0.tgz#62ad6a512f1740d3ab4686b0059dd9f57cc0708b"
-  integrity sha512-VJd/86niT7GzsaVc+Yxrs8QPrYl1orzv8bYZPuSOtxU6rk/pv8aOXTcIa7HaANvtvdLMTsZspAiucNQ6T2QFHw==
-
 js-tokens@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
@@ -4495,12 +4490,11 @@ query-string@^6.8.2:
     strict-uri-encode "^2.0.0"
 
 qunit@^2.15.0:
-  version "2.15.0"
-  resolved "https://registry.yarnpkg.com/qunit/-/qunit-2.15.0.tgz#8ba3a3c5d13369ab1740337680600a98a7f8b591"
-  integrity sha512-9ZoOILeyRZzrdvy2m7M4S76bneGD75Bh4B2aot3uKRKZuoEvA9gevvzU339L805Ys0AN2C7cnAV9nIBD5t72IQ==
+  version "2.16.0"
+  resolved "https://registry.yarnpkg.com/qunit/-/qunit-2.16.0.tgz#b8ed63d512e5d4eaada5afc0c6c9e8b844181ba1"
+  integrity sha512-88x9t+rRMbB6IrCIUZvYU4pJy7NiBEv7SX8jD4LZAsIj+dV+kwGnFStOmPNvqa6HM96VZMD8CIIFKH2+3qvluA==
   dependencies:
     commander "7.1.0"
-    js-reporters "2.0.0"
     node-watch "0.7.1"
     tiny-glob "0.2.8"
 
