@@ -438,7 +438,8 @@ dwv.gui.LayerGroup = function (containerDiv) {
   this.initialise = function (image, metaData, dataIndex) {
     var geometry = image.getGeometry();
 
-    var targetOrientationName = 'axial';
+    // undefined orientation uses the incoming ordering
+    var targetOrientationName;
     var viewOrientation = dwv.math.getIdentityMat33();
     if (typeof targetOrientationName !== 'undefined') {
       var targetOrientation = getOrientationMatrix(targetOrientationName);
