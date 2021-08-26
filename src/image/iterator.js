@@ -3,7 +3,7 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
- * Get an iterator for a given range for a one component data.
+ * Get an simple iterator for a given range for a one component data.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
  * @param {Function} dataAccessor Function to access data.
@@ -37,7 +37,7 @@ dwv.image.simpleRange = function (dataAccessor, start, end, increment) {
 };
 
 /**
- * Range 2...
+ * Get an iterator for a given range for a one component data.
  *
  * @param {Function} dataAccessor Function to access data.
  * @param {number} start Zero-based index at which to start the iteration.
@@ -51,7 +51,7 @@ dwv.image.simpleRange = function (dataAccessor, start, end, increment) {
  * @param {boolean} reverse2 If true, loop from count end to count start.
  * @returns {object} An iterator folowing the iterator and iterable protocol.
  */
-dwv.image.range2 = function (dataAccessor, start, end, increment,
+dwv.image.range = function (dataAccessor, start, end, increment,
   countMax, countIncrement, reverse1, reverse2) {
   if (typeof reverse1 === 'undefined') {
     reverse1 = false;
@@ -337,13 +337,13 @@ dwv.image.getSliceIterator = function (
           // xyz (r1:0, r2:0)
           reverse1 = !reverse1;
           reverse2 = !reverse2;
-          range = dwv.image.range2(dataAccessor,
+          range = dwv.image.range(dataAccessor,
             start, end, 1, ncols, ncols, reverse1, reverse2);
         } else {
           // yxz  (r1:1, r2:0, guessed... no data...)
           reverse1 = true;
           reverse2 = !reverse2;
-          range = dwv.image.range2(dataAccessor,
+          range = dwv.image.range(dataAccessor,
             start, end, ncols, nrows, 1, reverse1, reverse2);
         }
       } else if (dirMax2.index === 0) {
@@ -352,12 +352,12 @@ dwv.image.getSliceIterator = function (
           ncols * (nrows - 1);
         if (dirMax0.index === 1) {
           // yzx (r1:1, r2:1)
-          range = dwv.image.range2(dataAccessor,
+          range = dwv.image.range(dataAccessor,
             start, end, ncols, nrows, sliceSize, reverse1, reverse2);
         } else {
           // zyx (r1:0, r2:1)
           reverse1 = !reverse1;
-          range = dwv.image.range2(dataAccessor,
+          range = dwv.image.range(dataAccessor,
             start, end, sliceSize, nslices, ncols, reverse1, reverse2);
         }
       } else if (dirMax2.index === 1) {
@@ -365,12 +365,12 @@ dwv.image.getSliceIterator = function (
         end = start + (nslices - 1) * sliceSize + ncols - 1;
         if (dirMax0.index === 0) {
           // xzy (r1:1, r2:1)
-          range = dwv.image.range2(dataAccessor,
+          range = dwv.image.range(dataAccessor,
             start, end, 1, ncols, sliceSize, reverse1, reverse2);
         } else {
           // zxy (r0:1, r2:1)
           reverse1 = !reverse1;
-          range = dwv.image.range2(dataAccessor,
+          range = dwv.image.range(dataAccessor,
             start, end, sliceSize, nslices, 1, reverse1, reverse2);
         }
       } else {

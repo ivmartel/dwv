@@ -45,11 +45,11 @@ QUnit.test('Test simpleRange iterator.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.image.range2}.
+ * Tests for {@link dwv.image.range}.
  *
- * @function module:tests/image~range2
+ * @function module:tests/image~range
  */
-QUnit.test('Test range2 iterator.', function (assert) {
+QUnit.test('Test range iterator.', function (assert) {
   /**
    * Run the iterator and store values.
    *
@@ -134,12 +134,12 @@ QUnit.test('Test range2 iterator.', function (assert) {
     for (var k = 0; k < nslices; ++k) {
       var min = k * sliceSize;
       var max = (k + 1) * sliceSize;
-      var iter = dwv.image.range2(dataAccessor,
+      var iter = dwv.image.range(dataAccessor,
         min, max - 1, 1, ncols, ncols, reverse1, reverse2);
       var res = runIter(iter);
       var theo = theoValues.slice(min, max);
       assert.deepEqual(res, theo,
-        'range2 axial ' + reverse1 + '-' + reverse2 + '#' + k);
+        'range axial ' + reverse1 + '-' + reverse2 + '#' + k);
     }
   }
 
@@ -205,14 +205,14 @@ QUnit.test('Test range2 iterator.', function (assert) {
     for (var j = 0; j < nrows; ++j) {
       var min = j * ncols;
       var max = min + (nslices - 1) * sliceSize + ncols;
-      var iter = dwv.image.range2(dataAccessor,
+      var iter = dwv.image.range(dataAccessor,
         min, max - 1, 1, ncols, sliceSize, reverse1, reverse2);
       var res = runIter(iter);
       var minVals = j * viewSize;
       var maxVals = (j + 1) * viewSize;
       var theo = theoValues.slice(minVals, maxVals);
       assert.deepEqual(res, theo,
-        'range2 coronal ' + reverse1 + '-' + reverse2 + '#' + j);
+        'range coronal ' + reverse1 + '-' + reverse2 + '#' + j);
     }
   }
 
@@ -294,14 +294,14 @@ QUnit.test('Test range2 iterator.', function (assert) {
     for (var i = 0; i < ncols; ++i) {
       var min = i;
       var max = min + (nslices - 1) * sliceSize + ncols * (nrows - 1);
-      var iter = dwv.image.range2(dataAccessor,
+      var iter = dwv.image.range(dataAccessor,
         min, max, ncols, nrows, sliceSize, reverse1, reverse2);
       var res = runIter(iter);
       var minVals = i * viewSize;
       var maxVals = (i + 1) * viewSize;
       var theo = theoValues.slice(minVals, maxVals);
       assert.deepEqual(res, theo,
-        'range2 sagittal ' + reverse1 + '-' + reverse2 + '#' + i);
+        'range sagittal ' + reverse1 + '-' + reverse2 + '#' + i);
     }
   }
 
