@@ -325,7 +325,7 @@ dwv.image.getSliceIterator = function (
       var dirMax2 = viewOrientation.getColAbsMax(2);
 
       // first pixel: top left -> inverts left/right, top/bottom...
-      // => default recontructed is reverse=true
+      // => default is reverse=true
       var reverse1 = true;
       var reverse2 = true;
 
