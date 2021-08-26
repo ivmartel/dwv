@@ -40,12 +40,12 @@ dwv.image.simpleRange = function (dataAccessor, start, end, increment) {
  * Range 2...
  *
  * @param {Function} dataAccessor Function to access data.
- * @param {number} start The start of the range (included).
- * @param {number} end The end of the range (excluded).
- * @param {number} increment The increment between indicies.
- * @param {number} countMax An internal count after which
+ * @param {number} start Zero-based index at which to start the iteration.
+ * @param {number} end Zero-based index at which to end the iteration.
+ * @param {number} increment Increment between indicies.
+ * @param {number} countMax Number of applied increment after which
  *   countIncrement is applied.
- * @param {number} countIncrement The increment after countMax is reached,
+ * @param {number} countIncrement Increment after countMax is reached,
  *   the value is from count start to the next count start.
  * @param {boolean} reverse1 If true, loop from end to start.
  * @param {boolean} reverse2 If true, loop from count end to count start.
@@ -60,31 +60,33 @@ dwv.image.range2 = function (dataAccessor, start, end, increment,
     reverse2 = false;
   }
 
-  // reverse1: start <-> end
-  increment = reverse1 ? -1 * increment : increment;
-  countIncrement = reverse1 ? -1 * countIncrement : countIncrement;
-  // reverse2: start count <-> end count
-  if (reverse2) {
-    if (reverse1) {
-      end += (countMax - 1) * increment;
+  // first index of the iteration
+  var nextIndex;
+  // adapt first index and increments to reverse values
+  if (reverse1) {
+    nextIndex = end;
+    countIncrement *= -1;
+    if (reverse2) {
+      nextIndex -= (countMax - 1) * increment;
     } else {
-      start += (countMax - 1) * increment;
+      increment *= -1;
     }
-    increment *= -1;
+  } else {
+    nextIndex = start;
+    if (reverse2) {
+      nextIndex += (countMax - 1) * increment;
+      increment *= -1;
+    }
   }
-
-  // countIncrement is from count start to the next count start
   var finalCountIncrement = countIncrement - countMax * increment;
-  // initial next index
-  var nextIndex = reverse1 ? end : start;
 
   // test index function
   var testIndex = function (i) {
-    return i < end;
+    return i <= end;
   };
   if (reverse1) {
     testIndex = function (i) {
-      return i > start;
+      return i >= start;
     };
   }
   var count = 0;
@@ -330,7 +332,7 @@ dwv.image.getSliceIterator = function (
       var end = null;
       if (dirMax2.index === 2) {
         // axial: xyz or yxz
-        end = start + sliceSize;
+        end = start + sliceSize - 1;
         if (dirMax0.index === 0) {
           // xyz (r1:0, r2:0)
           reverse1 = !reverse1;
@@ -345,28 +347,28 @@ dwv.image.getSliceIterator = function (
             start, end, ncols, nrows, 1, reverse1, reverse2);
         }
       } else if (dirMax2.index === 0) {
-        // coronal: xzy or zxy
+        // sagittal: yzx or zyx
         end = start + (nslices - 1) * sliceSize +
           ncols * (nrows - 1);
         if (dirMax0.index === 1) {
-          // xzy (r1:1, r2:1)
+          // yzx (r1:1, r2:1)
           range = dwv.image.range2(dataAccessor,
             start, end, ncols, nrows, sliceSize, reverse1, reverse2);
         } else {
-          // zxy (r0:1, r2:1)
+          // zyx (r1:0, r2:1)
           reverse1 = !reverse1;
           range = dwv.image.range2(dataAccessor,
             start, end, sliceSize, nslices, ncols, reverse1, reverse2);
         }
       } else if (dirMax2.index === 1) {
-        // sagittal: yzx or zyx
-        end = start + (nslices - 1) * sliceSize + ncols;
+        // coronal: xzy or zxy
+        end = start + (nslices - 1) * sliceSize + ncols - 1;
         if (dirMax0.index === 0) {
-          // yzx (r1:1, r2:1)
+          // xzy (r1:1, r2:1)
           range = dwv.image.range2(dataAccessor,
             start, end, 1, ncols, sliceSize, reverse1, reverse2);
         } else {
-          // zyx (r1:0, r2:1)
+          // zxy (r0:1, r2:1)
           reverse1 = !reverse1;
           range = dwv.image.range2(dataAccessor,
             start, end, sliceSize, nslices, 1, reverse1, reverse2);
