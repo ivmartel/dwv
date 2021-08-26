@@ -70,6 +70,24 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   var listenerHandler = new dwv.utils.ListenerHandler();
 
   /**
+   * The orientation name.
+   * Undefined orientation uses the incoming ordering
+   *
+   * @type {String}
+   * @private
+   */
+  var targetOrientationName;
+
+  /**
+   * Set the orientation.
+   *
+   * @param {String} orientationName The orientation name.
+   */
+  this.setOrientation = function (orientationName) {
+    targetOrientationName = orientationName;
+  };
+
+  /**
    * Get the Id of the container div.
    *
    * @returns {string} The id of the div.
@@ -483,8 +501,6 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   this.initialise = function (image, metaData, dataIndex) {
     var geometry = image.getGeometry();
 
-    // undefined orientation uses the incoming ordering
-    var targetOrientationName;
     var viewOrientation = dwv.math.getIdentityMat33();
     if (typeof targetOrientationName !== 'undefined') {
       var targetOrientation = getOrientationMatrix(targetOrientationName);

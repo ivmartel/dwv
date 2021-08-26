@@ -416,11 +416,11 @@ dwv.App = function () {
   };
 
   /**
-   * Get the layer group element ids from a data index.
-   * Defaults to 'layerGroup' if no association object has been set.
+   * Get the layer group configuration from a data index.
+   * Defaults to div id 'layerGroup' if no association object has been set.
    *
    * @param {number} dataIndex The data index.
-   * @returns {array} The list of associated element ids.
+   * @returns {array} The list of associated configs.
    */
   function getViewConfigs(dataIndex) {
     var configs = null;
@@ -461,6 +461,9 @@ dwv.App = function () {
         // create new layer group
         var element = document.getElementById(config.divId);
         layerGroup = stage.addLayerGroup(element);
+        if (typeof config.orientation !== 'undefined') {
+          layerGroup.setOrientation(config.orientation);
+        }
       }
       // initialise or add view
       if (layerGroup.getNumberOfLayers() === 0) {
