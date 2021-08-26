@@ -95,7 +95,8 @@ dwv.image.ImageFactory.prototype.create = function (
     slicePosition[2] = parseInt(instanceNumber, 10);
   }
 
-  // slice orientation
+  // slice orientation (cosines are matrices' columns)
+  // http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.2.html#sect_C.7.6.2.1.1
   var imageOrientationPatient = dicomElements.getFromKey('x00200037');
   var orientationMatrix;
   if (imageOrientationPatient) {
@@ -108,10 +109,17 @@ dwv.image.ImageFactory.prototype.create = function (
       parseFloat(imageOrientationPatient[4]),
       parseFloat(imageOrientationPatient[5]));
     var normal = rowCosines.crossProduct(colCosines);
-    orientationMatrix = new dwv.math.Matrix33(
-      rowCosines.getX(), rowCosines.getY(), rowCosines.getZ(),
-      colCosines.getX(), colCosines.getY(), colCosines.getZ(),
-      normal.getX(), normal.getY(), normal.getZ());
+    orientationMatrix = new dwv.math.Matrix33([
+      rowCosines.getX(),
+      colCosines.getX(),
+      normal.getX(),
+      rowCosines.getY(),
+      colCosines.getY(),
+      normal.getY(),
+      rowCosines.getZ(),
+      colCosines.getZ(),
+      normal.getZ()
+    ]);
   }
 
   // geometry
@@ -210,6 +218,12 @@ dwv.image.ImageFactory.prototype.create = function (
   meta.IsSigned = false;
   if (pixelRepresentation) {
     meta.IsSigned = (pixelRepresentation === 1);
+  }
+  // PatientPosition
+  var patientPosition = dicomElements.getFromKey('x00185100');
+  meta.PatientPosition = false;
+  if (patientPosition) {
+    meta.PatientPosition = patientPosition;
   }
 
   // window level presets

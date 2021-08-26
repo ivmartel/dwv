@@ -307,14 +307,17 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @param {object} image The image.
    * @param {object} metaData The image meta data.
    * @param {number} index The associated data index.
+   * @param {object} viewOrientation The view orientation matrix.
    */
-  this.initialise = function (image, metaData, index) {
+  this.initialise = function (image, metaData, index, viewOrientation) {
     dataIndex = index;
     // create view
     var viewFactory = new dwv.ViewFactory();
     view = viewFactory.create(
       new dwv.dicom.DicomElementsWrapper(metaData),
       image);
+
+    view.setOrientation(viewOrientation);
 
     // local listeners
     view.addEventListener('wlwidthchange', onWLChange);
@@ -326,7 +329,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
     viewController = new dwv.ctrl.ViewController(view);
 
     // get sizes
-    var size = image.getGeometry().getSize();
+    var size = image.getGeometry().getSize(viewOrientation.getAbs());
     layerSize = size.get2D();
 
     // create canvas
@@ -482,7 +485,10 @@ dwv.gui.ViewLayer = function (containerDiv) {
   function onPositionChange(event) {
     if (typeof event.skipGenerate === 'undefined' ||
       event.skipGenerate === false) {
-      if (event.diffDims.includes(2) || event.diffDims.includes(3)) {
+      var viewOrientation = view.getOrientation();
+      if (event.diffDims.includes(
+        viewOrientation.getThirdColMajorDirection()) ||
+        event.diffDims.includes(3)) {
         needsDataUpdate = true;
         self.draw();
       }

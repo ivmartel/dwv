@@ -17,8 +17,10 @@ var _app = null;
  * Setup simple dwv app.
  */
 dwv.test.viewerSetup = function () {
+  var viewOnFirstLoadItem = false;
   // config
   var config = {
+    viewOnFirstLoadItem: viewOnFirstLoadItem,
     containerDivId: 'dwv',
     tools: {
       Scroll: {},
@@ -37,6 +39,18 @@ dwv.test.viewerSetup = function () {
   _app.addEventListener('loadstart', function () {
     console.time('load-data');
     isFirstRender = true;
+  });
+  _app.addEventListener('loadprogress', function () {
+    if (typeof event.lengthComputable !== 'undefined' &&
+      event.lengthComputable) {
+      var percent = Math.ceil((event.loaded / event.total) * 100);
+      document.getElementById('loadprogress').value = percent;
+    }
+  });
+  _app.addEventListener('load', function () {
+    if (!viewOnFirstLoadItem) {
+      _app.render();
+    }
   });
   _app.addEventListener('loadend', function () {
     console.timeEnd('load-data');

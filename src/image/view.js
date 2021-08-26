@@ -71,6 +71,13 @@ dwv.image.View = function (image) {
    * @type {object}
    */
   var currentPosition = null;
+  /**
+   * View orientation. Undefined will use the original slice ordering.
+   *
+   * @private
+   * @type {object}
+   */
+  var orientation;
 
   /**
    * Listener handler.
@@ -95,6 +102,24 @@ dwv.image.View = function (image) {
    */
   this.setImage = function (inImage) {
     image = inImage;
+  };
+
+  /**
+   * Get the view orientation.
+   *
+   * @returns {object} The orientation matrix.
+   */
+  this.getOrientation = function () {
+    return orientation;
+  };
+
+  /**
+   * Set the view orientation.
+   *
+   * @param {object} mat33 The orientation matrix.
+   */
+  this.setOrientation = function (mat33) {
+    orientation = mat33;
   };
 
   /**
@@ -604,7 +629,8 @@ dwv.image.View.prototype.generateImageData = function (array) {
   }
   var image = this.getImage();
   var position = this.getCurrentPosition();
-  var iterator = dwv.image.getSliceIterator(image, position);
+  var iterator = dwv.image.getSliceIterator(
+    image, position, false, this.getOrientation());
 
   var photoInterpretation = image.getPhotometricInterpretation();
   switch (photoInterpretation) {
@@ -695,7 +721,14 @@ dwv.image.View.prototype.decrementIndex = function (dim, silent) {
  * @returns {boolean} False if not in bounds.
  */
 dwv.image.View.prototype.decrementScrollIndex = function (silent) {
-  return this.decrementIndex(2, silent);
+  var index = null;
+  var orientation = this.getOrientation();
+  if (typeof orientation !== 'undefined') {
+    index = orientation.getThirdColMajorDirection();
+  } else {
+    index = 2;
+  }
+  return this.decrementIndex(index, silent);
 };
 
 /**
@@ -705,5 +738,12 @@ dwv.image.View.prototype.decrementScrollIndex = function (silent) {
  * @returns {boolean} False if not in bounds.
  */
 dwv.image.View.prototype.incrementScrollIndex = function (silent) {
-  return this.incrementIndex(2, silent);
+  var index = null;
+  var orientation = this.getOrientation();
+  if (typeof orientation !== 'undefined') {
+    index = orientation.getThirdColMajorDirection();
+  } else {
+    index = 2;
+  }
+  return this.incrementIndex(index, silent);
 };
