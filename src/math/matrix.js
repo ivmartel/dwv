@@ -3,34 +3,35 @@ var dwv = dwv || {};
 dwv.math = dwv.math || {};
 
 // difference between 1 and the smallest floating point number greater than 1
+// -> ~2e-16
 if (typeof Number.EPSILON === 'undefined') {
   Number.EPSILON = Math.pow(2, -52);
 }
+// -> ~2e-12
+dwv.math.BIG_EPSILON = Number.EPSILON * 1e4;
+
+/**
+ * Check if two numbers are similar.
+ *
+ * @param {number} a The first number.
+ * @param {number} b The second number.
+ * @param {number} tol The comparison tolerance.
+ * @returns {boolean} True if similar.
+ */
+dwv.math.isSimilar = function (a, b, tol) {
+  if (typeof tol === 'undefined') {
+    tol = Number.EPSILON;
+  }
+  return Math.abs(a - b) < tol;
+};
 
 /**
  * Immutable 3x3 Matrix.
  *
- * @param {number} m00 m[0][0]
- * @param {number} m01 m[0][1]
- * @param {number} m02 m[0][2]
- * @param {number} m10 m[1][0]
- * @param {number} m11 m[1][1]
- * @param {number} m12 m[1][2]
- * @param {number} m20 m[2][0]
- * @param {number} m21 m[2][1]
- * @param {number} m22 m[2][2]
+ * @param {Array} values row-major ordered 9 values.
  * @class
  */
-dwv.math.Matrix33 = function (
-  m00, m01, m02,
-  m10, m11, m12,
-  m20, m21, m22) {
-  // row-major order
-  var mat = new Float32Array(9);
-  mat[0] = m00; mat[1] = m01; mat[2] = m02;
-  mat[3] = m10; mat[4] = m11; mat[5] = m12;
-  mat[6] = m20; mat[7] = m21; mat[8] = m22;
-
+dwv.math.Matrix33 = function (values) {
   /**
    * Get a value of the matrix.
    *
@@ -39,7 +40,7 @@ dwv.math.Matrix33 = function (
    * @returns {number} The value at the position.
    */
   this.get = function (row, col) {
-    return mat[row * 3 + col];
+    return values[row * 3 + col];
   };
 }; // Matrix33
 
@@ -52,19 +53,15 @@ dwv.math.Matrix33 = function (
  * @returns {boolean} True if both matrices are equal.
  */
 dwv.math.Matrix33.prototype.equals = function (rhs, p) {
-  if (typeof p === 'undefined') {
-    p = Number.EPSILON;
-  }
-
-  return Math.abs(this.get(0, 0) - rhs.get(0, 0)) < p &&
-    Math.abs(this.get(0, 1) - rhs.get(0, 1)) < p &&
-    Math.abs(this.get(0, 2) - rhs.get(0, 2)) < p &&
-    Math.abs(this.get(1, 0) - rhs.get(1, 0)) < p &&
-    Math.abs(this.get(1, 1) - rhs.get(1, 1)) < p &&
-    Math.abs(this.get(1, 2) - rhs.get(1, 2)) < p &&
-    Math.abs(this.get(2, 0) - rhs.get(2, 0)) < p &&
-    Math.abs(this.get(2, 1) - rhs.get(2, 1)) < p &&
-    Math.abs(this.get(2, 2) - rhs.get(2, 2)) < p;
+  return dwv.math.isSimilar(this.get(0, 0), rhs.get(0, 0), p) &&
+    dwv.math.isSimilar(this.get(0, 1), rhs.get(0, 1), p) &&
+    dwv.math.isSimilar(this.get(0, 2), rhs.get(0, 2), p) &&
+    dwv.math.isSimilar(this.get(1, 0), rhs.get(1, 0), p) &&
+    dwv.math.isSimilar(this.get(1, 1), rhs.get(1, 1), p) &&
+    dwv.math.isSimilar(this.get(1, 2), rhs.get(1, 2), p) &&
+    dwv.math.isSimilar(this.get(2, 0), rhs.get(2, 0), p) &&
+    dwv.math.isSimilar(this.get(2, 1), rhs.get(2, 1), p) &&
+    dwv.math.isSimilar(this.get(2, 2), rhs.get(2, 2), p);
 };
 
 /**
@@ -80,26 +77,56 @@ dwv.math.Matrix33.prototype.toString = function () {
 };
 
 /**
+ * Multiply this matrix by another.
+ *
+ * @param {object} rhs The matrix to multiply by.
+ * @returns {object} The product matrix.
+ */
+dwv.math.Matrix33.prototype.multiply = function (rhs) {
+  var values = [];
+  for (var i = 0; i < 3; ++i) {
+    for (var j = 0; j < 3; ++j) {
+      var tmp = 0;
+      for (var k = 0; k < 3; ++k) {
+        tmp += this.get(i, k) * rhs.get(k, j);
+      }
+      values.push(tmp);
+    }
+  }
+  return new dwv.math.Matrix33(values);
+};
+
+/**
+ * Get the absolute value of this matrix.
+ *
+ * @returns {object} The result matrix.
+ */
+dwv.math.Matrix33.prototype.getAbs = function () {
+  var values = [];
+  for (var i = 0; i < 3; ++i) {
+    for (var j = 0; j < 3; ++j) {
+      values.push(Math.abs(this.get(i, j)));
+    }
+  }
+  return new dwv.math.Matrix33(values);
+};
+
+/**
  * Multiply this matrix by a 3D array.
  *
  * @param {Array} array3D The input 3D array.
  * @returns {Array} The result 3D array.
  */
 dwv.math.Matrix33.prototype.multiplyArray3D = function (array3D) {
-  // matrix values
-  var m00 = this.get(0, 0); var m01 = this.get(0, 1); var m02 = this.get(0, 2);
-  var m10 = this.get(1, 0); var m11 = this.get(1, 1); var m12 = this.get(1, 2);
-  var m20 = this.get(2, 0); var m21 = this.get(2, 1); var m22 = this.get(2, 2);
-  // array values
-  var a0 = array3D[0];
-  var a1 = array3D[1];
-  var a2 = array3D[2];
-  // multiply
-  return [
-    (m00 * a0) + (m01 * a1) + (m02 * a2),
-    (m10 * a0) + (m11 * a1) + (m12 * a2),
-    (m20 * a0) + (m21 * a1) + (m22 * a2)
-  ];
+  var values = [];
+  for (var i = 0; i < 3; ++i) {
+    var tmp = 0;
+    for (var j = 0; j < 3; ++j) {
+      tmp += this.get(i, j) * array3D[j];
+    }
+    values.push(tmp);
+  }
+  return values;
 };
 
 /**
@@ -131,13 +158,125 @@ dwv.math.Matrix33.prototype.multiplyIndex3D = function (index3D) {
 };
 
 /**
+ * Get the inverse of this matrix.
+ *
+ * @returns {object} The inverse matrix.
+ * @see https://en.wikipedia.org/wiki/Invertible_matrix#Inversion_of_3_%C3%97_3_matrices
+ */
+dwv.math.Matrix33.prototype.getInverse = function () {
+  var a = this.get(0, 0);
+  var b = this.get(0, 1);
+  var c = this.get(0, 2);
+  var d = this.get(1, 0);
+  var e = this.get(1, 1);
+  var f = this.get(1, 2);
+  var g = this.get(2, 0);
+  var h = this.get(2, 1);
+  var i = this.get(2, 2);
+
+  var a2 = e * i - f * h;
+  var b2 = f * g - d * i;
+  var c2 = d * h - e * g;
+
+  var det = a * a2 + b * b2 + c * c2;
+  if (det === 0) {
+    dwv.logger.warn('Cannot invert matrix with zero determinant.');
+    return;
+  }
+
+  var values = [
+    a2 / det,
+    (c * h - b * i) / det,
+    (b * f - c * e) / det,
+    b2 / det,
+    (a * i - c * g) / det,
+    (c * d - a * f) / det,
+    c2 / det,
+    (b * g - a * h) / det,
+    (a * e - b * d) / det
+  ];
+
+  return new dwv.math.Matrix33(values);
+};
+
+/**
+ * Get the index of the maximum in absolute value of a row.
+ *
+ * @param {number} row The row to get the maximum from.
+ * @returns {object} The {value,index} of the maximum.
+ */
+dwv.math.Matrix33.prototype.getRowAbsMax = function (row) {
+  var values = [
+    Math.abs(this.get(row, 0)),
+    Math.abs(this.get(row, 1)),
+    Math.abs(this.get(row, 2))
+  ];
+  var absMax = Math.max.apply(null, values);
+  var index = values.indexOf(absMax);
+  return {
+    value: this.get(row, index),
+    index: index
+  };
+};
+
+/**
+ * Get the index of the maximum in absolute value of a column.
+ *
+ * @param {number} col The column to get the maximum from.
+ * @returns {object} The {value,index} of the maximum.
+ */
+dwv.math.Matrix33.prototype.getColAbsMax = function (col) {
+  var values = [
+    Math.abs(this.get(0, col)),
+    Math.abs(this.get(1, col)),
+    Math.abs(this.get(2, col))
+  ];
+  var absMax = Math.max.apply(null, values);
+  var index = values.indexOf(absMax);
+  return {
+    value: this.get(index, col),
+    index: index
+  };
+};
+
+/**
+ * Get this matrix with only zero and +/- ones instead of the maximum,
+ *
+ * @returns {object} The simplified matrix.
+ */
+dwv.math.Matrix33.prototype.asOneAndZeros = function () {
+  var res = [];
+  for (var j = 0; j < 3; ++j) {
+    var max = this.getRowAbsMax(j);
+    var sign = max.value > 0 ? 1 : -1;
+    for (var i = 0; i < 3; ++i) {
+      if (i === max.index) {
+        //res.push(1);
+        res.push(1 * sign);
+      } else {
+        res.push(0);
+      }
+    }
+  }
+  return new dwv.math.Matrix33(res);
+};
+
+/**
+ * Get the third column direction index of an orientation matrix.
+ *
+ * @returns {number} The index of the absolute maximum of the last column.
+ */
+dwv.math.Matrix33.prototype.getThirdColMajorDirection = function () {
+  return this.getColAbsMax(2).index;
+};
+
+/**
  * Create a 3x3 identity matrix.
  *
  * @returns {object} The identity matrix.
  */
 dwv.math.getIdentityMat33 = function () {
-  return new dwv.math.Matrix33(
-    1, 0, 0,
-    0, 1, 0,
-    0, 0, 1);
+  return new dwv.math.Matrix33([
+    1, 0, 0, 0, 1, 0, 0, 0, 1
+  ]);
 };

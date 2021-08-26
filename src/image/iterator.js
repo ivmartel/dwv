@@ -3,7 +3,7 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
- * Get an iterator for a given range for a one component data.
+ * Get an simple iterator for a given range for a one component data.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols
  * @param {Function} dataAccessor Function to access data.
@@ -12,7 +12,7 @@ dwv.image = dwv.image || {};
  * @param {number} increment The increment between indicies (default=1).
  * @returns {object} An iterator folowing the iterator and iterable protocol.
  */
-dwv.image.range = function (dataAccessor, start, end, increment) {
+dwv.image.simpleRange = function (dataAccessor, start, end, increment) {
   if (typeof increment === 'undefined') {
     increment = 1;
   }
@@ -26,6 +26,84 @@ dwv.image.range = function (dataAccessor, start, end, increment) {
           done: false
         };
         nextIndex += increment;
+        return result;
+      }
+      return {
+        done: true,
+        index: end
+      };
+    }
+  };
+};
+
+/**
+ * Get an iterator for a given range for a one component data.
+ *
+ * @param {Function} dataAccessor Function to access data.
+ * @param {number} start Zero-based index at which to start the iteration.
+ * @param {number} end Zero-based index at which to end the iteration.
+ * @param {number} increment Increment between indicies.
+ * @param {number} countMax Number of applied increment after which
+ *   countIncrement is applied.
+ * @param {number} countIncrement Increment after countMax is reached,
+ *   the value is from count start to the next count start.
+ * @param {boolean} reverse1 If true, loop from end to start.
+ * @param {boolean} reverse2 If true, loop from count end to count start.
+ * @returns {object} An iterator folowing the iterator and iterable protocol.
+ */
+dwv.image.range = function (dataAccessor, start, end, increment,
+  countMax, countIncrement, reverse1, reverse2) {
+  if (typeof reverse1 === 'undefined') {
+    reverse1 = false;
+  }
+  if (typeof reverse2 === 'undefined') {
+    reverse2 = false;
+  }
+
+  // first index of the iteration
+  var nextIndex;
+  // adapt first index and increments to reverse values
+  if (reverse1) {
+    nextIndex = end;
+    countIncrement *= -1;
+    if (reverse2) {
+      nextIndex -= (countMax - 1) * increment;
+    } else {
+      increment *= -1;
+    }
+  } else {
+    nextIndex = start;
+    if (reverse2) {
+      nextIndex += (countMax - 1) * increment;
+      increment *= -1;
+    }
+  }
+  var finalCountIncrement = countIncrement - countMax * increment;
+
+  // test index function
+  var testIndex = function (i) {
+    return i <= end;
+  };
+  if (reverse1) {
+    testIndex = function (i) {
+      return i >= start;
+    };
+  }
+  var count = 0;
+  // result
+  return {
+    next: function () {
+      if (testIndex(nextIndex)) {
+        var result = {
+          value: dataAccessor(nextIndex),
+          done: false
+        };
+        nextIndex += increment;
+        ++count;
+        if (count === countMax) {
+          count = 0;
+          nextIndex += finalCountIncrement;
+        }
         return result;
       }
       return {
@@ -201,12 +279,23 @@ dwv.image.getIteratorValues = function (iterator) {
  * @param {object} image The image to parse.
  * @param {object} position The current position.
  * @param {boolean} isRescaled Flag for rescaled values (default false).
+ * @param {object} viewOrientation The view orientation.
  * @returns {object} The slice iterator.
  */
-dwv.image.getSliceIterator = function (image, position, isRescaled) {
+dwv.image.getSliceIterator = function (
+  image, position, isRescaled, viewOrientation) {
   var geometry = image.getGeometry();
-  var sliceSize = geometry.getSize().getDimSize(2);
-  var start = geometry.indexToOffset(position.getWithNew2D(0, 0));
+  // zero-ify non direction index
+  var dirMax2Index = 2;
+  if (viewOrientation && typeof viewOrientation !== 'undefined') {
+    dirMax2Index = viewOrientation.getColAbsMax(2).index;
+  }
+  var posValues = position.getValues();
+  var indexFilter = function (element, index) {
+    return index === dirMax2Index ? element : 0;
+  };
+  var posStart = new dwv.math.Index(posValues.map(indexFilter));
+  var start = geometry.indexToOffset(posStart);
 
   // default to non rescaled data
   if (typeof isRescaled === 'undefined') {
@@ -223,9 +312,74 @@ dwv.image.getSliceIterator = function (image, position, isRescaled) {
     };
   }
 
+  var size = geometry.getSize();
+  var ncols = size.get(0);
+  var nrows = size.get(1);
+  var nslices = size.get(2);
+  var sliceSize = size.getDimSize(2);
+
   var range = null;
   if (image.getNumberOfComponents() === 1) {
-    range = dwv.image.range(dataAccessor, start, start + sliceSize);
+    if (viewOrientation && typeof viewOrientation !== 'undefined') {
+      var dirMax0 = viewOrientation.getColAbsMax(0);
+      var dirMax2 = viewOrientation.getColAbsMax(2);
+
+      // first pixel: top left -> inverts left/right, top/bottom...
+      // => default is reverse=true
+      var reverse1 = true;
+      var reverse2 = true;
+
+      var end = null;
+      if (dirMax2.index === 2) {
+        // axial: xyz or yxz
+        end = start + sliceSize - 1;
+        if (dirMax0.index === 0) {
+          // xyz (r1:0, r2:0)
+          reverse1 = !reverse1;
+          reverse2 = !reverse2;
+          range = dwv.image.range(dataAccessor,
+            start, end, 1, ncols, ncols, reverse1, reverse2);
+        } else {
+          // yxz  (r1:1, r2:0, guessed... no data...)
+          reverse1 = true;
+          reverse2 = !reverse2;
+          range = dwv.image.range(dataAccessor,
+            start, end, ncols, nrows, 1, reverse1, reverse2);
+        }
+      } else if (dirMax2.index === 0) {
+        // sagittal: yzx or zyx
+        end = start + (nslices - 1) * sliceSize +
+          ncols * (nrows - 1);
+        if (dirMax0.index === 1) {
+          // yzx (r1:1, r2:1)
+          range = dwv.image.range(dataAccessor,
+            start, end, ncols, nrows, sliceSize, reverse1, reverse2);
+        } else {
+          // zyx (r1:0, r2:1)
+          reverse1 = !reverse1;
+          range = dwv.image.range(dataAccessor,
+            start, end, sliceSize, nslices, ncols, reverse1, reverse2);
+        }
+      } else if (dirMax2.index === 1) {
+        // coronal: xzy or zxy
+        end = start + (nslices - 1) * sliceSize + ncols - 1;
+        if (dirMax0.index === 0) {
+          // xzy (r1:1, r2:1)
+          range = dwv.image.range(dataAccessor,
+            start, end, 1, ncols, sliceSize, reverse1, reverse2);
+        } else {
+          // zxy (r0:1, r2:1)
+          reverse1 = !reverse1;
+          range = dwv.image.range(dataAccessor,
+            start, end, sliceSize, nslices, 1, reverse1, reverse2);
+        }
+      } else {
+        throw new Error('Unknown direction: ' + dirMax2.index);
+      }
+    } else {
+      // default case
+      range = dwv.image.simpleRange(dataAccessor, start, start + sliceSize);
+    }
   } else if (image.getNumberOfComponents() === 3) {
     // 3 times bigger...
     start *= 3;

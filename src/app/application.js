@@ -654,23 +654,23 @@ dwv.App = function () {
     if (event.ctrlKey) {
       if (event.keyCode === 37) { // crtl-arrow-left
         event.preventDefault();
-        if (size.canScroll(3)) {
+        if (size.moreThanOne(3)) {
           viewController.decrementIndex(3);
         }
       } else if (event.keyCode === 38) { // crtl-arrow-up
         event.preventDefault();
-        if (size.canScroll(2)) {
-          viewController.incrementIndex(2);
+        if (viewController.canScroll()) {
+          viewController.incrementScrollIndex();
         }
       } else if (event.keyCode === 39) { // crtl-arrow-right
         event.preventDefault();
-        if (size.canScroll(3)) {
+        if (size.moreThanOne(3)) {
           viewController.incrementIndex(3);
         }
       } else if (event.keyCode === 40) { // crtl-arrow-down
         event.preventDefault();
-        if (size.canScroll(2)) {
-          viewController.decrementIndex(2);
+        if (viewController.canScroll()) {
+          viewController.decrementScrollIndex();
         }
       } else if (event.keyCode === 89) { // crtl-y
         undoStack.redo();

@@ -67,10 +67,21 @@ dwv.image.Size = function (values) {
  * Check if a dimension exists and has more than one element.
  *
  * @param {object} dimension The dimension to check.
+ * @returns {boolean} True if the size is more than one.
+ */
+dwv.image.Size.prototype.moreThanOne = function (dimension) {
+  return this.length() >= dimension + 1 && this.get(dimension) !== 1;
+};
+
+/**
+ * Check if the third direction of an orientation matrix has a size
+ * of more than one.
+ *
+ * @param {object} viewOrientation The orientation matrix.
  * @returns {boolean} True if scrollable.
  */
-dwv.image.Size.prototype.canScroll = function (dimension) {
-  return this.length() >= dimension + 1 && this.get(dimension) !== 1;
+dwv.image.Size.prototype.canScroll = function (viewOrientation) {
+  return this.moreThanOne(viewOrientation.getThirdColMajorDirection());
 };
 
 /**
@@ -243,6 +254,8 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
   if (typeof orientation === 'undefined') {
     orientation = new dwv.math.getIdentityMat33();
   }
+  // flag to know if new origins were added
+  var newOrigins = false;
 
   /**
    * Get the object first origin.
@@ -263,18 +276,89 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
   /**
    * Get the object size.
    *
+   * @param {object} viewOrientation The view orientation (optional)
    * @returns {object} The object size.
    */
-  this.getSize = function () {
-    return size;
+  this.getSize = function (viewOrientation) {
+    var res = size;
+    if (viewOrientation && typeof viewOrientation !== 'undefined') {
+      var vec = new dwv.math.Vector3D(
+        size.get(0),
+        size.get(1),
+        size.get(2)
+      );
+      // size = orientation * sizeOriented
+      // -> inv(orientation) * size = sizeOriented
+      var vec2 = viewOrientation.getInverse().getAbs().multiplyVector3D(vec);
+      res = new dwv.image.Size([vec2.getX(), vec2.getY(), vec2.getZ()]);
+    }
+    return res;
   };
+
+  /**
+   * Get the slice spacing from the difference in the Z directions
+   * of the origins.
+   *
+   * @returns {number} The spacing.
+   */
+  this.getSliceGeometrySpacing = function () {
+    if (origins.length === 1) {
+      return 1;
+    }
+    var spacing = null;
+    // (x, y, z) = orientationMatrix * (i, j, k)
+    // -> inv(orientationMatrix) * (x, y, z) = (i, j, k)
+    // applied on the patient position, reorders indices
+    // so that Z is the slice direction
+    var orientation2 = orientation.getInverse().asOneAndZeros();
+    for (var i = 0; i < origins.length - 1; ++i) {
+      var origin1 = orientation2.multiplyVector3D(origins[i]);
+      var origin2 = orientation2.multiplyVector3D(origins[i + 1]);
+      var diff = Math.abs(origin1.getZ() - origin2.getZ());
+      if (diff === 0) {
+        throw new Error('Zero slice spacing.' +
+          origin1.toString() + ' ' + origin2.toString());
+      }
+      if (spacing === null) {
+        spacing = diff;
+      } else {
+        if (!dwv.math.isSimilar(spacing, diff, dwv.math.BIG_EPSILON)) {
+          dwv.logger.warn('Varying slice spacing: ' + (spacing - diff));
+        }
+      }
+    }
+    return spacing;
+  };
+
   /**
    * Get the object spacing.
    *
+   * @param {object} viewOrientation The view orientation (optional)
    * @returns {object} The object spacing.
    */
-  this.getSpacing = function () {
-    return spacing;
+  this.getSpacing = function (viewOrientation) {
+    // update slice spacing after appendSlice
+    if (newOrigins) {
+      spacing = new dwv.image.Spacing(
+        spacing.getColumnSpacing(),
+        spacing.getRowSpacing(),
+        this.getSliceGeometrySpacing()
+      );
+      newOrigins = false;
+    }
+    var res = spacing;
+    if (viewOrientation && typeof viewOrientation !== 'undefined') {
+      var vec = new dwv.math.Vector3D(
+        spacing.getColumnSpacing(),
+        spacing.getRowSpacing(),
+        spacing.getSliceSpacing()
+      );
+      // spacing = orientation * spacingOriented
+      // -> inv(orientation) * spacing = spacingOriented
+      var vec2 = viewOrientation.getInverse().getAbs().multiplyVector3D(vec);
+      res = new dwv.image.Spacing(vec2.getX(), vec2.getY(), vec2.getZ());
+    }
+    return res;
   };
   /**
    * Get the object orientation.
@@ -321,6 +405,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
    * @param {number} index The index at which to append.
    */
   this.appendOrigin = function (origin, index) {
+    newOrigins = true;
     // add in origin array
     origins.splice(index, 0, origin);
     // increment second dimension

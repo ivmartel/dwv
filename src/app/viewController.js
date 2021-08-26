@@ -152,7 +152,7 @@ dwv.ctrl.ViewController = function (view) {
    * @returns {boolean} True if the data has a third dimension greater than one.
    */
   this.canScroll = function () {
-    return view.getImage().canScroll();
+    return view.getImage().canScroll(view.getOrientation());
   };
 
   /**
@@ -174,9 +174,15 @@ dwv.ctrl.ViewController = function (view) {
    * @returns {boolean} False if not in bounds.
    */
   this.setCurrentPosition2D = function (i, j) {
-    return view.setCurrentPosition(
-      view.getCurrentPosition().getWithNew2D(i, j)
-    );
+    // abs? otherwise negative position...
+    var orientation = view.getOrientation().getAbs();
+    // keep third direction
+    var dirMax2 = orientation.getColAbsMax(2);
+    var k = view.getCurrentPosition().get(dirMax2.index);
+    var posPlane = new dwv.math.Index([i, j, k]);
+    // pos3D = orientation * posPlane
+    var pos3D = orientation.multiplyIndex3D(posPlane);
+    return view.setCurrentPosition(pos3D);
   };
 
   /**
@@ -225,6 +231,9 @@ dwv.ctrl.ViewController = function (view) {
    *
    */
   this.play = function () {
+    if (!this.canScroll()) {
+      return;
+    }
     if (playerID === null) {
       var recommendedDisplayFrameRate =
         view.getImage().getMeta().RecommendedDisplayFrameRate;
@@ -236,7 +245,8 @@ dwv.ctrl.ViewController = function (view) {
         if (!self.incrementScrollIndex()) {
           var pos1 = self.getCurrentPosition();
           var values = pos1.getValues();
-          values[2] = 0;
+          var orientation = view.getOrientation();
+          values[orientation.getThirdColMajorDirection()] = 0;
           self.setCurrentPosition(new dwv.math.Index(values));
         }
       }, milliseconds);

@@ -86,10 +86,10 @@ QUnit.test('Test Size.', function (assert) {
 
   // can scroll
   var size20 = new dwv.image.Size([2, 1, 2]);
-  assert.equal(size20.canScroll(0), true, 'canScroll 20-0');
-  assert.equal(size20.canScroll(1), false, 'canScroll 20-1');
-  assert.equal(size20.canScroll(2), true, 'canScroll 20-2');
-  assert.equal(size20.canScroll(3), false, 'canScroll 20-3');
+  assert.equal(size20.moreThanOne(0), true, 'moreThanOne 20-0');
+  assert.equal(size20.moreThanOne(1), false, 'moreThanOne 20-1');
+  assert.equal(size20.moreThanOne(2), true, 'moreThanOne 20-2');
+  assert.equal(size20.moreThanOne(3), false, 'moreThanOne 20-3');
 });
 
 /**
