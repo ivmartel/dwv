@@ -320,7 +320,7 @@ dwv.tool.Livewire = function (app) {
   this.activate = function (bool) {
     // start scissors if displayed
     if (bool) {
-      var layerGroup = app.getActiveLayerGroup());
+      var layerGroup = app.getActiveLayerGroup();
       var viewLayer = layerGroup.getActiveViewLayer();
 
       //scissors = new dwv.math.Scissors();
