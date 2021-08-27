@@ -739,25 +739,28 @@ dwv.App = function () {
    * @param {string} tool The tool.
    */
   this.setTool = function (tool) {
-    var layerGroup = stage.getActiveLayerGroup();
-    var layer = null;
-    var previousLayer = null;
-    if (tool === 'Draw' ||
-      tool === 'Livewire' ||
-      tool === 'Floodfill') {
-      layer = layerGroup.getActiveDrawLayer();
-      previousLayer = layerGroup.getActiveViewLayer();
-    } else {
-      layer = layerGroup.getActiveViewLayer();
-      previousLayer = layerGroup.getActiveDrawLayer();
-    }
-    if (previousLayer) {
-      toolboxController.detachLayer(previousLayer);
-    }
-    // detach to avoid possible double attach
-    toolboxController.detachLayer(layer);
+    for (var i = 0; i < stage.getNumberOfLayerGroups(); ++i) {
+      var layerGroup = stage.getLayerGroup(i);
+      var layer = null;
+      var previousLayer = null;
+      if (tool === 'Draw' ||
+        tool === 'Livewire' ||
+        tool === 'Floodfill') {
+        layer = layerGroup.getActiveDrawLayer();
+        previousLayer = layerGroup.getActiveViewLayer();
+      } else {
+        layer = layerGroup.getActiveViewLayer();
+        previousLayer = layerGroup.getActiveDrawLayer();
+      }
+      if (previousLayer) {
+        toolboxController.detachLayer(previousLayer, layerGroup.displayToIndex);
+      }
+      // detach to avoid possible double attach
+      toolboxController.detachLayer(layer, layerGroup.displayToIndex);
 
-    toolboxController.attachLayer(layer);
+      toolboxController.attachLayer(layer, layerGroup.displayToIndex);
+    }
+
     toolboxController.setSelectedTool(tool);
   };
 
@@ -1117,7 +1120,7 @@ dwv.App = function () {
 
     // initialise the toolbox
     if (toolboxController) {
-      toolboxController.init(layerGroup.displayToIndex);
+      toolboxController.init();
     }
   }
 

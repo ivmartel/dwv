@@ -10,13 +10,6 @@ dwv.ctrl = dwv.ctrl || {};
  */
 dwv.ctrl.ToolboxController = function (toolList) {
   /**
-   * Point converter function
-   *
-   * @private
-   */
-  var displayToIndexConverter = null;
-
-  /**
    * Selected tool.
    *
    * @type {object}
@@ -26,17 +19,13 @@ dwv.ctrl.ToolboxController = function (toolList) {
 
   /**
    * Initialise.
-   *
-   * @param {Function} converter The display to index converter.
    */
-  this.init = function (converter) {
+  this.init = function () {
     for (var key in toolList) {
       toolList[key].init();
     }
-    // TODO Would prefer to have this done in the addLayerListeners
-    displayToIndexConverter = converter;
     // keydown listener
-    window.addEventListener('keydown', onMouch, true);
+    window.addEventListener('keydown', getOnMouch(), true);
   };
 
   /**
@@ -150,13 +139,14 @@ dwv.ctrl.ToolboxController = function (toolList) {
    * Listen to layer interaction events.
    *
    * @param {object} layer The layer to listen to.
+   * @param {object} displayToIndexConverter The display to index converter.
    */
-  this.attachLayer = function (layer) {
+  this.attachLayer = function (layer, displayToIndexConverter) {
     layer.activate();
     // interaction events
     var names = dwv.gui.interactionEventNames;
     for (var i = 0; i < names.length; ++i) {
-      layer.addEventListener(names[i], onMouch);
+      layer.addEventListener(names[i], getOnMouch(displayToIndexConverter));
     }
   };
 
@@ -164,13 +154,14 @@ dwv.ctrl.ToolboxController = function (toolList) {
    * Remove canvas mouse and touch listeners.
    *
    * @param {object} layer The layer to stop listening to.
+   * @param {object} displayToIndexConverter The display to index converter.
    */
-  this.detachLayer = function (layer) {
+  this.detachLayer = function (layer, displayToIndexConverter) {
     layer.deactivate();
     // interaction events
     var names = dwv.gui.interactionEventNames;
     for (var i = 0; i < names.length; ++i) {
-      layer.removeEventListener(names[i], onMouch);
+      layer.removeEventListener(names[i], getOnMouch(displayToIndexConverter));
     }
   };
 
@@ -179,71 +170,73 @@ dwv.ctrl.ToolboxController = function (toolList) {
    * the mouse/touch position relative to the canvas element.
    * It then passes it to the current tool.
    *
-   * @param {object} event The event to handle.
+   * @param {object} displayToIndexConverter The display to index converter.
    * @private
    */
-  function onMouch(event) {
-    // make sure we have a tool
-    if (!selectedTool) {
-      return;
-    }
+  function getOnMouch(displayToIndexConverter) {
+    return function (event) {
+      // make sure we have a tool
+      if (!selectedTool) {
+        return;
+      }
 
-    // flag not to get confused between touch and mouse
-    var handled = false;
-    // Store the event position relative to the image canvas
-    // in an extra member of the event:
-    // event._x and event._y.
-    var offsets = null;
-    var position = null;
-    if (event.type === 'touchstart' ||
-      event.type === 'touchmove') {
-      // event offset(s)
-      offsets = dwv.gui.getEventOffset(event);
-      // should have at least one offset
-      event._xs = offsets[0].x;
-      event._ys = offsets[0].y;
-      position = displayToIndexConverter(offsets[0]);
-      event._x = parseInt(position.x, 10);
-      event._y = parseInt(position.y, 10);
-      // possible second
-      if (offsets.length === 2) {
-        event._x1s = offsets[1].x;
-        event._y1s = offsets[1].y;
-        position = displayToIndexConverter(offsets[1]);
-        event._x1 = parseInt(position.x, 10);
-        event._y1 = parseInt(position.y, 10);
+      // flag not to get confused between touch and mouse
+      var handled = false;
+      // Store the event position relative to the image canvas
+      // in an extra member of the event:
+      // event._x and event._y.
+      var offsets = null;
+      var position = null;
+      if (event.type === 'touchstart' ||
+        event.type === 'touchmove') {
+        // event offset(s)
+        offsets = dwv.gui.getEventOffset(event);
+        // should have at least one offset
+        event._xs = offsets[0].x;
+        event._ys = offsets[0].y;
+        position = displayToIndexConverter(offsets[0]);
+        event._x = parseInt(position.x, 10);
+        event._y = parseInt(position.y, 10);
+        // possible second
+        if (offsets.length === 2) {
+          event._x1s = offsets[1].x;
+          event._y1s = offsets[1].y;
+          position = displayToIndexConverter(offsets[1]);
+          event._x1 = parseInt(position.x, 10);
+          event._y1 = parseInt(position.y, 10);
+        }
+        // set handle event flag
+        handled = true;
+      } else if (event.type === 'mousemove' ||
+        event.type === 'mousedown' ||
+        event.type === 'mouseup' ||
+        event.type === 'mouseout' ||
+        event.type === 'wheel' ||
+        event.type === 'dblclick') {
+        offsets = dwv.gui.getEventOffset(event);
+        event._xs = offsets[0].x;
+        event._ys = offsets[0].y;
+        position = displayToIndexConverter(offsets[0]);
+        event._x = parseInt(position.x, 10);
+        event._y = parseInt(position.y, 10);
+        // set handle event flag
+        handled = true;
+      } else if (event.type === 'keydown' ||
+        event.type === 'touchend') {
+        handled = true;
       }
-      // set handle event flag
-      handled = true;
-    } else if (event.type === 'mousemove' ||
-      event.type === 'mousedown' ||
-      event.type === 'mouseup' ||
-      event.type === 'mouseout' ||
-      event.type === 'wheel' ||
-      event.type === 'dblclick') {
-      offsets = dwv.gui.getEventOffset(event);
-      event._xs = offsets[0].x;
-      event._ys = offsets[0].y;
-      position = displayToIndexConverter(offsets[0]);
-      event._x = parseInt(position.x, 10);
-      event._y = parseInt(position.y, 10);
-      // set handle event flag
-      handled = true;
-    } else if (event.type === 'keydown' ||
-      event.type === 'touchend') {
-      handled = true;
-    }
 
-    // Call the event handler of the curently selected tool.
-    if (handled) {
-      if (event.type !== 'keydown') {
-        event.preventDefault();
+      // Call the event handler of the curently selected tool.
+      if (handled) {
+        if (event.type !== 'keydown') {
+          event.preventDefault();
+        }
+        var func = selectedTool[event.type];
+        if (func) {
+          func(event);
+        }
       }
-      var func = selectedTool[event.type];
-      if (func) {
-        func(event);
-      }
-    }
+    };
   }
 
 }; // class ToolboxController
