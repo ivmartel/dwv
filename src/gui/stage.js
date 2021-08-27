@@ -65,6 +65,15 @@ dwv.gui.Stage = function () {
   };
 
   /**
+   * Get the number of layer groups that form the stage.
+   *
+   * @returns {number} The number of layer groups.
+   */
+  this.getNumberOfLayerGroups = function () {
+    return layerGroups.length;
+  };
+
+  /**
    * Get the active layer group.
    *
    * @returns {object} The layer group.

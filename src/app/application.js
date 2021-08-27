@@ -125,13 +125,24 @@ dwv.App = function () {
   };
 
   /**
-   * Get the layer controller.
-   * The controller is available after the first loaded item.
+   * Get the active layer group.
+   * The layer is available after the first loaded item.
    *
-   * @returns {object} The controller.
+   * @returns {object} The layer group.
    */
-  this.getLayerGroup = function () {
+  this.getActiveLayerGroup = function () {
     return stage.getActiveLayerGroup();
+  };
+
+  /**
+   * Get a layer group by id.
+   * The layer is available after the first loaded item.
+   *
+   * @param {number} groupId The group id.
+   * @returns {object} The layer group.
+   */
+  this.getLayerGroupById = function (groupId) {
+    return stage.getLayerGroup(groupId);
   };
 
   /**

@@ -3,6 +3,55 @@ var dwv = dwv || {};
 dwv.gui = dwv.gui || {};
 
 /**
+ * Get the layer group div id.
+ *
+ * @param {number} groupId The layer group id.
+ * @param {number} layerId The lyaer id.
+ * @returns {string} A string id.
+ */
+dwv.gui.getLayerGroupDivId = function (groupId, layerId) {
+  return 'layer-' + groupId + '-' + layerId;
+};
+
+/**
+ * Get the layer details from a div id.
+ *
+ * @param {string} idString The layer group id.
+ * @returns {object} The layer details as {groupId, layerId}.
+ */
+dwv.gui.getLayerDetailsFromLayerDivId = function (idString) {
+  var posHyphen = idString.lastIndexOf('-');
+  var groupId = null;
+  var layerId = null;
+  if (posHyphen !== -1) {
+    groupId = parseInt(idString.substring(6, posHyphen), 10);
+    layerId = parseInt(idString.substring(posHyphen), 10);
+  }
+  return {
+    groupId: groupId,
+    layerId: layerId
+  };
+};
+
+/**
+ * Get the layer details from a mouse event.
+ *
+ * @param {object} event The event to get the layer div id from.
+ * @returns {object} The layer details as {groupId, layerId}.
+ */
+dwv.gui.getLayerDetailsFromToolEvent = function (event) {
+  var res = null;
+  // the target of the tool event is the layer canvas,
+  // its parent should be the layer div
+  var divId = event.target.parentElement.id;
+  if (typeof divId !== 'undefined') {
+    res = dwv.gui.getLayerDetailsFromLayerDivId(divId);
+  }
+  return res;
+};
+
+
+/**
  * Layer group.
  *
  * @param {object} containerDiv The associated HTML div.
@@ -94,6 +143,15 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    */
   this.getElementId = function () {
     return containerDiv.id;
+  };
+
+  /**
+   * Get the layer group id.
+   *
+   * @returns {number} The id.
+   */
+  this.getGroupId = function () {
+    return groupId;
   };
 
   /**
@@ -294,7 +352,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    */
   function getNextLayerDiv() {
     var div = document.createElement('div');
-    div.id = 'layer-' + groupId + '-' + layers.length;
+    div.id = dwv.gui.getLayerGroupDivId(groupId, layers.length);
     div.className = 'layer';
     div.style.pointerEvents = 'none';
     return div;

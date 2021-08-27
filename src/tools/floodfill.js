@@ -221,7 +221,7 @@ dwv.tool.Floodfill = function (app) {
    * @param {number} threshold The border threshold.
    * @returns {boolean} False if no border.
    */
-  var paintBorder = function (point, threshold) {
+  var paintBorder = function (point, threshold, layerGroup) {
     // Calculate the border
     border = calcBorder(point, threshold);
     // Paint the border
@@ -230,7 +230,6 @@ dwv.tool.Floodfill = function (app) {
       shapeGroup = factory.create(border, self.style);
       shapeGroup.id(dwv.math.guid());
 
-      var layerGroup = app.getLayerGroup();
       var drawLayer = layerGroup.getActiveDrawLayer();
       var drawController = drawLayer.getDrawController();
 
@@ -261,7 +260,7 @@ dwv.tool.Floodfill = function (app) {
    * @param {number} ini The first slice to extend to.
    * @param {number} end The last slice to extend to.
    */
-  this.extend = function (ini, end) {
+  this.extend = function (ini, end, layerGroup) {
     //avoid errors
     if (!initialpoint) {
       throw '\'initialpoint\' not found. User must click before use extend!';
@@ -271,7 +270,6 @@ dwv.tool.Floodfill = function (app) {
       shapeGroup.destroy();
     }
 
-    var layerGroup = app.getLayerGroup();
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
 
@@ -283,7 +281,7 @@ dwv.tool.Floodfill = function (app) {
       len = end
         ? end : app.getImage().getGeometry().getSize().get(2);
       i < len; i++) {
-      if (!paintBorder(initialpoint, threshold)) {
+      if (!paintBorder(initialpoint, threshold, layerGroup)) {
         break;
       }
       viewController.incrementIndex(2);
@@ -292,7 +290,7 @@ dwv.tool.Floodfill = function (app) {
 
     // Iterate over the prev images and paint border on each slice.
     for (var j = pos.get(2), jl = ini ? ini : 0; j > jl; j--) {
-      if (!paintBorder(initialpoint, threshold)) {
+      if (!paintBorder(initialpoint, threshold, layerGroup)) {
         break;
       }
       viewController.decrementIndex(2);
@@ -349,7 +347,8 @@ dwv.tool.Floodfill = function (app) {
    * @param {object} event The mouse down event.
    */
   this.mousedown = function (event) {
-    var layerGroup = app.getLayerGroup();
+    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var drawLayer = layerGroup.getActiveDrawLayer();
 
@@ -365,7 +364,7 @@ dwv.tool.Floodfill = function (app) {
 
     self.started = true;
     initialpoint = getCoord(event);
-    paintBorder(initialpoint, initialthreshold);
+    paintBorder(initialpoint, initialthreshold, layerGroup);
     self.onThresholdChange(initialthreshold);
   };
 
@@ -395,7 +394,9 @@ dwv.tool.Floodfill = function (app) {
   this.mouseup = function (_event) {
     self.started = false;
     if (extender) {
-      self.extend();
+      var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+      self.extend(layerGroup);
     }
   };
 

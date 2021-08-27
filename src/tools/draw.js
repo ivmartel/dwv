@@ -174,7 +174,8 @@ dwv.tool.Draw = function (app) {
       return;
     }
 
-    var layerGroup = app.getLayerGroup();
+    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var drawLayer = layerGroup.getActiveDrawLayer();
 
     // determine if the click happened in an existing shape
@@ -230,7 +231,7 @@ dwv.tool.Draw = function (app) {
 
     // draw line to current pos
     if (Math.abs(event._x - lastPoint.getX()) > 0 ||
-                Math.abs(event._y - lastPoint.getY()) > 0) {
+      Math.abs(event._y - lastPoint.getY()) > 0) {
       // clear last added point from the list (but not the first one)
       // if it was marked as temporary
       if (points.length !== 1 &&
@@ -244,16 +245,18 @@ dwv.tool.Draw = function (app) {
       // add it to the list
       points.push(lastPoint);
       // update points
-      onNewPoints(points);
+      var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+      onNewPoints(points, layerGroup);
     }
   };
 
   /**
    * Handle mouse up event.
    *
-   * @param {object} _event The mouse up event.
+   * @param {object} event The mouse up event.
    */
-  this.mouseup = function (_event) {
+  this.mouseup = function (event) {
     // exit if not started draw
     if (!started) {
       return;
@@ -267,7 +270,9 @@ dwv.tool.Draw = function (app) {
     // do we have all the needed points
     if (points.length === currentFactory.getNPoints()) {
       // store points
-      onFinalPoints(points);
+      var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+      onFinalPoints(points, layerGroup);
       // reset flag
       started = false;
     } else {
@@ -281,9 +286,9 @@ dwv.tool.Draw = function (app) {
   /**
    * Handle double click event.
    *
-   * @param {object} _event The mouse up event.
+   * @param {object} event The mouse up event.
    */
-  this.dblclick = function (_event) {
+  this.dblclick = function (event) {
     // exit if not started draw
     if (!started) {
       return;
@@ -295,7 +300,9 @@ dwv.tool.Draw = function (app) {
     }
 
     // store points
-    onFinalPoints(points);
+    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    onFinalPoints(points, layerGroup);
     // reset flag
     started = false;
   };
@@ -330,7 +337,7 @@ dwv.tool.Draw = function (app) {
     }
 
     if (Math.abs(event._x - lastPoint.getX()) > 0 ||
-                Math.abs(event._y - lastPoint.getY()) > 0) {
+      Math.abs(event._y - lastPoint.getY()) > 0) {
       // clear last added point from the list (but not the first one)
       if (points.length !== 1) {
         points.pop();
@@ -347,7 +354,9 @@ dwv.tool.Draw = function (app) {
         }, currentFactory.getTimeout());
       }
       // update points
-      onNewPoints(points);
+      var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+      onNewPoints(points, layerGroup);
     }
   };
 
@@ -406,13 +415,12 @@ dwv.tool.Draw = function (app) {
    *
    * @param {Array} tmpPoints The array of new points.
    */
-  function onNewPoints(tmpPoints) {
+  function onNewPoints(tmpPoints, layerGroup) {
     // remove temporary shape draw
     if (tmpShapeGroup) {
       tmpShapeGroup.destroy();
     }
     // create shape group
-    var layerGroup = app.getLayerGroup();
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
     tmpShapeGroup = currentFactory.create(
@@ -431,13 +439,12 @@ dwv.tool.Draw = function (app) {
    *
    * @param {Array} finalPoints The array of points.
    */
-  function onFinalPoints(finalPoints) {
+  function onFinalPoints(finalPoints, layerGroup) {
     // reset temporary shape group
     if (tmpShapeGroup) {
       tmpShapeGroup.destroy();
     }
 
-    var layerGroup = app.getLayerGroup();
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
     var drawController =
@@ -481,29 +488,33 @@ dwv.tool.Draw = function (app) {
     shapeEditor.setViewController(null);
     document.body.style.cursor = 'default';
     // get the current draw layer
-    var layerGroup = app.getLayerGroup();
+    var layerGroup = app.getActiveLayerGroup();
     var drawLayer = layerGroup.getActiveDrawLayer();
     konvaLayer = drawLayer.getKonvaLayer();
-    activateCurrentPositionShapes(flag);
+    activateCurrentPositionShapes(flag, layerGroup);
     // listen to app change to update the draw layer
     if (flag) {
-      app.addEventListener('positionchange', updateDrawLayer);
+      app.addEventListener('positionchange', function () {
+        updateDrawLayer(layerGroup);
+      });
 
       // init with the app window scale
       this.style.setBaseScale(app.getBaseScale());
       // same for colour
       this.setLineColour(this.style.getLineColour());
     } else {
-      app.removeEventListener('positionchange', updateDrawLayer);
+      app.removeEventListener('positionchange', function () {
+        updateDrawLayer(layerGroup);
+      });
     }
   };
 
   /**
    * Update the draw layer.
    */
-  function updateDrawLayer() {
+  function updateDrawLayer(layerGroup) {
     // activate the shape at current position
-    activateCurrentPositionShapes(true);
+    activateCurrentPositionShapes(true, layerGroup);
   }
 
   /**
@@ -511,8 +522,7 @@ dwv.tool.Draw = function (app) {
    *
    * @param {boolean} visible Set the draw layer visible or not.
    */
-  function activateCurrentPositionShapes(visible) {
-    var layerGroup = app.getLayerGroup();
+  function activateCurrentPositionShapes(visible, layerGroup) {
     var drawController =
       layerGroup.getActiveDrawLayer().getDrawController();
 
@@ -560,8 +570,7 @@ dwv.tool.Draw = function (app) {
    * @returns {object} The reasl position in the image.
    * @private
    */
-  function getRealPosition(index) {
-    var layerGroup = app.getLayerGroup();
+  function getRealPosition(index, layerGroup) {
     var drawLayer = layerGroup.getActiveDrawLayer();
     var stage = drawLayer.getKonvaStage();
     return {
@@ -597,11 +606,12 @@ dwv.tool.Draw = function (app) {
     var colour = null;
 
     // drag start event handling
-    shapeGroup.on('dragstart.draw', function (/*event*/) {
+    shapeGroup.on('dragstart.draw', function (event) {
       // store colour
       colour = shapeGroup.getChildren(dwv.draw.isNodeNameShape)[0].stroke();
       // display trash
-      var layerGroup = app.getLayerGroup();
+      var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
       var drawLayer = layerGroup.getActiveDrawLayer();
       var stage = drawLayer.getKonvaStage();
       var scale = stage.scale();
@@ -617,13 +627,14 @@ dwv.tool.Draw = function (app) {
     });
     // drag move event handling
     shapeGroup.on('dragmove.draw', function (event) {
-      var layerGroup = app.getLayerGroup();
+      var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
       var drawLayer = layerGroup.getActiveDrawLayer();
       // validate the group position
       dwv.tool.validateGroupPosition(drawLayer.getSize(), this);
       // highlight trash when on it
       var offset = dwv.gui.getEventOffset(event.evt)[0];
-      var eventPos = getRealPosition(offset);
+      var eventPos = getRealPosition(offset, layerGroup);
       var trashHalfWidth = trash.width() * trash.scaleX() / 2;
       var trashHalfHeight = trash.height() * trash.scaleY() / 2;
       if (Math.abs(eventPos.x - trash.x()) < trashHalfWidth &&
@@ -658,7 +669,7 @@ dwv.tool.Draw = function (app) {
       trash.remove();
       // delete case
       var offset = dwv.gui.getEventOffset(event.evt)[0];
-      var eventPos = getRealPosition(offset);
+      var eventPos = getRealPosition(offset, layerGroup);
       var trashHalfWidth = trash.width() * trash.scaleX() / 2;
       var trashHalfHeight = trash.height() * trash.scaleY() / 2;
       if (Math.abs(eventPos.x - trash.x()) < trashHalfWidth &&
