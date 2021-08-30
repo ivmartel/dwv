@@ -390,11 +390,21 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
         closestSliceIndex = i;
       }
     }
-    // we have the closest point, are we before or after
+    var closestOrigin = origins[closestSliceIndex];
+    // direction between the input point and the closest origin
+    var pointDir = point.minus(closestOrigin);
+    // use third orientation matrix column as base plane vector
     var normal = new dwv.math.Vector3D(
       orientation.get(2, 0), orientation.get(2, 1), orientation.get(2, 2));
-    var dotProd = normal.dotProduct(point.minus(origins[closestSliceIndex]));
-    var sliceIndex = (dotProd > 0) ? closestSliceIndex + 1 : closestSliceIndex;
+    // a.dot(b) = ||a|| * ||b|| * cos(theta)
+    // (https://en.wikipedia.org/wiki/Dot_product#Geometric_definition)
+    // -> the sign of the dot product depends on the cosinus of
+    //    the angle between the vectors
+    //   -> >0 => vectors are codirectional
+    //   -> <0 => vectors are oposite
+    var dotProd = normal.dotProduct(pointDir);
+    // oposite vectors get higher index
+    var sliceIndex = (dotProd < 0) ? closestSliceIndex + 1 : closestSliceIndex;
     return sliceIndex;
   };
 
