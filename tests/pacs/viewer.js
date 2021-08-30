@@ -21,9 +21,20 @@ dwv.test.viewerSetup = function () {
   // stage options
   // single data, multiple layer group
   var dataViewConfigs = {
-    0: [{
-      divId: 'layerGroup'
-    }]
+    0: [
+      {
+        divId: 'layerGroup',
+        orientation: 'axial'
+      },
+      {
+        divId: 'layerGroup1',
+        orientation: 'coronal'
+      },
+      {
+        divId: 'layerGroup2',
+        orientation: 'sagittal'
+      }
+    ]
   };
   // multiple data, multiple layer group
   // -> set nSimultaneousData to 2 in app config
@@ -32,7 +43,9 @@ dwv.test.viewerSetup = function () {
   //   1: [{divId: 'layerGroup'}]
   // };
   var binders = [
+    new dwv.gui.PositionBinder(),
     new dwv.gui.ZoomBinder(),
+    new dwv.gui.OffsetBinder(),
     //new dwv.gui.OpacityBinder()
   ];
 
@@ -45,7 +58,8 @@ dwv.test.viewerSetup = function () {
     binders: binders,
     tools: {
       Scroll: {},
-      WindowLevel: {}
+      WindowLevel: {},
+      ZoomAndPan: {}
     }
   };
   // app
@@ -97,6 +111,9 @@ dwv.test.viewerSetup = function () {
     } else if (event.keyCode === 87) { // w
       console.log('%c tool: windowlevel', 'color: teal;');
       _app.setTool('WindowLevel');
+    } else if (event.keyCode === 90) { // z
+      console.log('%c tool: zoomandpan', 'color: teal;');
+      _app.setTool('ZoomAndPan');
     }
   });
 
@@ -124,14 +141,14 @@ dwv.test.onDOMContentLoadedViewer = function () {
   var zoomnumber = document.getElementById('zoomnumber');
   zoomrange.oninput = function () {
     var scale = {x: this.value, y: this.value};
-    _app.getLayerGroup().setScale(scale);
-    _app.getLayerGroup().draw();
+    _app.getActiveLayerGroup().setScale(scale);
+    _app.getActiveLayerGroup().draw();
     zoomnumber.value = this.value;
   };
   zoomnumber.oninput = function () {
     var scale = {x: this.value, y: this.value};
-    _app.getLayerGroup().setScale(scale);
-    _app.getLayerGroup().draw();
+    _app.getActiveLayerGroup().setScale(scale);
+    _app.getActiveLayerGroup().draw();
     zoomnumber.value = this.value;
   };
 

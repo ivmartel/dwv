@@ -23,6 +23,11 @@ progress {
   width: 50%;
   border: 1px dotted gray;
 }
+.group {
+  width: 250px;
+  height: 250px;
+  margin: 5px;
+}
 </style>
 <!-- Third party (load) -->
 <script type="text/javascript" src="../../node_modules/jszip/dist/jszip.min.js"></script>
@@ -76,6 +81,7 @@ progress {
 <script type="text/javascript" src="../../src/tools/undo.js"></script>
 <script type="text/javascript" src="../../src/tools/scroll.js"></script>
 <script type="text/javascript" src="../../src/tools/windowLevel.js"></script>
+<script type="text/javascript" src="../../src/tools/zoomPan.js"></script>
 <script type="text/javascript" src="../../src/utils/colour.js"></script>
 <script type="text/javascript" src="../../src/utils/env.js"></script>
 <script type="text/javascript" src="../../src/utils/listen.js"></script>
@@ -106,7 +112,9 @@ document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedViewer)
 <!-- DWV -->
 <div id="dwv">
   <!-- Layer groups -->
-  <div id="layerGroup"></div>
+  <div id="layerGroup" class="group"></div>
+  <div id="layerGroup1" class="group"></div>
+  <div id="layerGroup2" class="group"></div>
 </div><!-- /dwv -->
 
 <label for="zoomrange">Zoom:</label>
