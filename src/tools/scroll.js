@@ -44,6 +44,8 @@ dwv.tool.Scroll = function (app) {
     // first position
     self.x0 = event._x;
     self.y0 = event._y;
+    // update position
+    viewController.setCurrentPosition2D(event._x, event._y);
   };
 
   /**

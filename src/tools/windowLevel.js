@@ -34,11 +34,6 @@ dwv.tool.WindowLevel = function (app) {
     // store initial position
     self.x0 = event._x;
     self.y0 = event._y;
-    // update view controller
-    var layerGroup = app.getLayerGroup();
-    var viewController =
-      layerGroup.getActiveViewLayer().getViewController();
-    viewController.setCurrentPosition2D(event._x, event._y);
   };
 
   /**
