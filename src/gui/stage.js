@@ -3,6 +3,22 @@ var dwv = dwv || {};
 dwv.gui = dwv.gui || {};
 
 /**
+ * Position binder.
+ */
+dwv.gui.PositionBinder = function () {
+  this.getEventType = function () {
+    return 'positionchange';
+  };
+  this.getCallback = function (layerGroup) {
+    return function (event) {
+      var pos = new dwv.math.Index(event.value[0]);
+      var vc = layerGroup.getActiveViewLayer().getViewController();
+      vc.setCurrentPosition(pos);
+    };
+  };
+};
+
+/**
  * Zoom binder.
  */
 dwv.gui.ZoomBinder = function () {
@@ -12,6 +28,24 @@ dwv.gui.ZoomBinder = function () {
   this.getCallback = function (layerGroup) {
     return function (event) {
       layerGroup.setScale({
+        x: event.value[0],
+        y: event.value[1]
+      });
+      layerGroup.draw();
+    };
+  };
+};
+
+/**
+ * Offset binder.
+ */
+dwv.gui.OffsetBinder = function () {
+  this.getEventType = function () {
+    return 'offsetchange';
+  };
+  this.getCallback = function (layerGroup) {
+    return function (event) {
+      layerGroup.setOffset({
         x: event.value[0],
         y: event.value[1]
       });
