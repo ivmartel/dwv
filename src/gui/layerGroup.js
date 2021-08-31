@@ -68,7 +68,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    * @private
    * @type {object}
    */
-  var scale = {x: 1, y: 1};
+  var scale = {x: 1, y: 1, z: 1};
 
   /**
    * The base scale as {x,y}: all posterior scale will be on top of this one.
@@ -76,7 +76,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    * @private
    * @type {object}
    */
-  var baseScale = {x: 1, y: 1};
+  var baseScale = {x: 1, y: 1, z: 1};
 
   /**
    * The layer offset as {x,y}.
@@ -84,7 +84,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    * @private
    * @type {object}
    */
-  var offset = {x: 0, y: 0};
+  var offset = {x: 0, y: 0, z: 0};
 
   /**
    * The layer size as {x,y}.
@@ -135,6 +135,49 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   var viewOrientation;
 
   /**
+   * Reorder values to follow orientation.
+   *
+   * @param {object} values Values as {x,y,z}
+   * @returns {object} Reoriented values as {x,y,z}.
+   */
+  function getOriented(values) {
+    var orientedValues = dwv.image.getOrientedArray3D(
+      [
+        values.x,
+        values.y,
+        values.z
+      ],
+      viewOrientation);
+    return {
+      x: orientedValues[0],
+      y: orientedValues[1],
+      z: orientedValues[2]
+    };
+  }
+
+  /**
+   * Reorder values to compensate for orientation.
+   *
+   * @param {object} values Values as {x,y,z}
+   * @returns {object} 'Deoriented' values as {x,y,z}.
+   */
+  function getDeOriented(values) {
+    var deOrientedValues = dwv.image.getDeOrientedArray3D(
+      [
+        values.x,
+        values.y,
+        values.z
+      ],
+      viewOrientation
+    );
+    return {
+      x: deOrientedValues[0],
+      y: deOrientedValues[1],
+      z: deOrientedValues[2]
+    };
+  }
+
+  /**
    * Set the target orientation.
    *
    * @param {object} orientation The target orientation matrix.
@@ -164,7 +207,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   /**
    * Get the layer scale.
    *
-   * @returns {object} The scale as {x,y}.
+   * @returns {object} The scale as {x,y,z}.
    */
   this.getScale = function () {
     return scale;
@@ -173,7 +216,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   /**
    * Get the base scale.
    *
-   * @returns {object} The scale as {x,y}.
+   * @returns {object} The scale as {x,y,z}.
    */
   this.getBaseScale = function () {
     return baseScale;
@@ -182,19 +225,20 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   /**
    * Get the added scale: the scale added to the base scale
    *
-   * @returns {object} The scale as {x,y}.
+   * @returns {object} The scale as {x,y,z}.
    */
   this.getAddedScale = function () {
     return {
       x: scale.x / baseScale.x,
-      y: scale.y / baseScale.y
+      y: scale.y / baseScale.y,
+      z: scale.z / baseScale.z
     };
   };
 
   /**
    * Get the layer offset.
    *
-   * @returns {object} The offset as {x,y}.
+   * @returns {object} The offset as {x,y,z}.
    */
   this.getOffset = function () {
     return offset;
@@ -207,9 +251,11 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    * @returns {object} The equivalent index.
    */
   this.displayToIndex = function (point2D) {
+    var scale2D = getOriented(scale);
+    var offset2D = getOriented(offset);
     return {
-      x: point2D.x / scale.x + offset.x,
-      y: point2D.y / scale.y + offset.y
+      x: point2D.x / scale2D.x + offset2D.x,
+      y: point2D.y / scale2D.y + offset2D.y
     };
   };
 
@@ -399,7 +445,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    * Get the fit to container scale.
    * To be called once the image is loaded.
    *
-   * @param {object} spacing The image spacing.
+   * @param {object} spacing The oriented image spacing.
    * @returns {number} The scale.
    */
   this.getFitToContainerScale = function (spacing) {
@@ -420,13 +466,14 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    * Fit the display to the size of the container.
    * To be called once the image is loaded.
    *
-   * @param {object} spacing The image spacing.
+   * @param {object} spacing The oriented image spacing.
    */
   this.fitToContainer = function (spacing) {
     var fitScale = this.getFitToContainerScale(spacing);
     this.resize({
       x: fitScale * spacing.getColumnSpacing(),
-      y: fitScale * spacing.getRowSpacing()
+      y: fitScale * spacing.getRowSpacing(),
+      z: fitScale * spacing.getSliceSpacing()
     });
   };
 
@@ -443,18 +490,21 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    * Add scale to the layers. Scale cannot go lower than 0.1.
    *
    * @param {object} scaleStep The scale to add.
-   * @param {object} center The scale center point as {x,y}.
+   * @param {object} center The scale center point as {x,y,z}.
    */
   this.addScale = function (scaleStep, center) {
     var newScale = {
       x: Math.max(scale.x + scale.x * scaleStep, 0.1),
-      y: Math.max(scale.y + scale.y * scaleStep, 0.1)
+      y: Math.max(scale.y + scale.y * scaleStep, 0.1),
+      z: Math.max(scale.z + scale.z * scaleStep, 0.1)
     };
     // center should stay the same:
     // newOffset + center / newScale = oldOffset + center / oldScale
+    var realCenter = getDeOriented(center);
     this.setOffset({
-      x: (center.x / scale.x) + offset.x - (center.x / newScale.x),
-      y: (center.y / scale.y) + offset.y - (center.y / newScale.y)
+      x: (realCenter.x / scale.x) + offset.x - (realCenter.x / newScale.x),
+      y: (realCenter.y / scale.y) + offset.y - (realCenter.y / newScale.y),
+      z: (realCenter.z / scale.z) + offset.z - (realCenter.z / newScale.z)
     });
     this.setScale(newScale);
   };
@@ -462,14 +512,15 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   /**
    * Set the layers' scale.
    *
-   * @param {object} newScale The scale to apply as {x,y}.
+   * @param {object} newScale The scale to apply as {x,y,z}.
    * @fires dwv.ctrl.LayerGroup#zoomchange
    */
   this.setScale = function (newScale) {
     scale = newScale;
     // apply to layers
+    var scale2D = getOriented(scale);
     for (var i = 0; i < layers.length; ++i) {
-      layers[i].setScale(scale);
+      layers[i].setScale(scale2D);
     }
 
     /**
@@ -481,7 +532,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
      */
     fireEvent({
       type: 'zoomchange',
-      value: [scale.x, scale.y],
+      value: [scale.x, scale.y, scale.z],
     });
   };
 
@@ -491,24 +542,32 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    * @param {object} translation The translation as {x,y}.
    */
   this.addTranslation = function (translation) {
+    var realTrans = getDeOriented(
+      {
+        x: translation.x,
+        y: translation.y,
+        z: 0
+      });
     this.setOffset({
-      x: offset.x - translation.x / scale.x,
-      y: offset.y - translation.y / scale.y
+      x: offset.x - realTrans.x / scale.x,
+      y: offset.y - realTrans.y / scale.y,
+      z: offset.z - realTrans.z / scale.z
     });
   };
 
   /**
    * Set the layers' offset.
    *
-   * @param {object} newOffset The offset as {x,y}.
+   * @param {object} newOffset The offset as {x,y,z}.
    * @fires dwv.ctrl.LayerGroup#offsetchange
    */
   this.setOffset = function (newOffset) {
     // store
     offset = newOffset;
     // apply to layers
+    var offset2D = getOriented(offset);
     for (var i = 0; i < layers.length; ++i) {
-      layers[i].setOffset(offset);
+      layers[i].setOffset(offset2D);
     }
 
     /**
@@ -520,7 +579,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
      */
     fireEvent({
       type: 'offsetchange',
-      value: [offset.x, offset.y],
+      value: [offset.x, offset.y, offset.z],
     });
   };
 
@@ -569,39 +628,46 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    */
   this.reset = function () {
     this.setScale(baseScale);
-    this.setOffset({x: 0, y: 0});
+    this.setOffset({x: 0, y: 0, z: 0});
   };
 
   /**
    * Resize the layer: update the base scale and layer sizes.
    *
-   * @param {number} newScale The scale as {x,y}.
+   * @param {number} newScale The scale as {x,y,z}.
    */
   this.resize = function (newScale) {
     // store
     scale = {
       x: scale.x * newScale.x / baseScale.x,
-      y: scale.y * newScale.y / baseScale.y
+      y: scale.y * newScale.y / baseScale.y,
+      z: scale.z * newScale.z / baseScale.z
     };
     baseScale = newScale;
 
     // resize container
-    var width = Math.floor(layerSize.x * baseScale.x);
-    var height = Math.floor(layerSize.y * baseScale.y);
+    var baseScale2D = getOriented(baseScale);
+    var width = Math.floor(layerSize.x * baseScale2D.x);
+    var height = Math.floor(layerSize.y * baseScale2D.y);
     containerDiv.style.width = width + 'px';
     containerDiv.style.height = height + 'px';
 
     // resize if test passes
     if (dwv.gui.canCreateCanvas(width, height)) {
       // call resize and scale on layers
+      var scale2D = getOriented(scale);
       for (var i = 0; i < layers.length; ++i) {
-        layers[i].resize(baseScale);
-        layers[i].setScale(scale);
+        layers[i].resize(baseScale2D);
+        layers[i].setScale(scale2D);
       }
     } else {
       dwv.logger.warn('Cannot create a ' + width + ' * ' + height +
         ' canvas, trying half the size...');
-      this.resize({x: newScale.x * 0.5, y: newScale.y * 0.5});
+      this.resize({
+        x: newScale.x * 0.5,
+        y: newScale.y * 0.5,
+        z: newScale.z * 0.5
+      });
     }
   };
 

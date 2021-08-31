@@ -536,3 +536,16 @@ dwv.image.getOrientedArray3D = function (array3D, orientation) {
   // -> inv(orientation) * values = orientedValues
   return orientation.getInverse().getAbs().multiplyArray3D(array3D);
 };
+
+/**
+ * Get the raw values of an oriented input 3D array.
+ *
+ * @param {array} array3D The 3D array.
+ * @param {object} orientation The orientation 3D matrix.
+ * @returns {array} The values reordered to compensate the orientation.
+ */
+dwv.image.getDeOrientedArray3D = function (array3D, orientation) {
+  // values = orientation * orientedValues
+  // -> inv(orientation) * values = orientedValues
+  return orientation.getAbs().multiplyArray3D(array3D);
+};

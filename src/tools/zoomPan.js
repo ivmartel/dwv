@@ -65,7 +65,10 @@ dwv.tool.ZoomAndPan = function (app) {
     var tx = event._xs - self.x0;
     var ty = event._ys - self.y0;
     // apply translation
-    app.translate(tx, ty);
+    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    layerGroup.addTranslation({x: tx, y: ty});
+    layerGroup.draw();
     // reset origin point
     self.x0 = event._xs;
     self.y0 = event._ys;
@@ -85,6 +88,10 @@ dwv.tool.ZoomAndPan = function (app) {
     var newLine = new dwv.math.Line(point0, point1);
     var lineRatio = newLine.getLength() / self.line0.getLength();
 
+    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var viewController = layerGroup.getActiveViewLayer().getViewController();
+
     if (lineRatio === 1) {
       // scroll mode
       // difference  to last position
@@ -93,10 +100,6 @@ dwv.tool.ZoomAndPan = function (app) {
       if (Math.abs(diffY) < 15) {
         return;
       }
-      var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
-      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
-      var viewController =
-        layerGroup.getActiveViewLayer().getViewController();
       var size = app.getImage().getGeometry().getSize();
       // update view controller
       if (size.canScroll(2)) {
@@ -110,7 +113,11 @@ dwv.tool.ZoomAndPan = function (app) {
       // zoom mode
       var zoom = (lineRatio - 1) / 2;
       if (Math.abs(zoom) % 0.1 <= 0.05) {
-        app.zoom(zoom, event._xs, event._ys);
+        // keep third direction
+        var k = viewController.getCurrentScrollPosition();
+        layerGroup.addScale(zoom, {x: event._xs, y: event._ys, z: k});
+        layerGroup.draw();
+
       }
     }
   };
@@ -180,7 +187,14 @@ dwv.tool.ZoomAndPan = function (app) {
    */
   this.wheel = function (event) {
     var step = -event.deltaY / 500;
-    app.zoom(step, event._xs, event._ys);
+
+    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    // keep third direction
+    var vc = layerGroup.getActiveViewLayer().getViewController();
+    var k = vc.getCurrentScrollPosition();
+    layerGroup.addScale(step, {x: event._xs, y: event._ys, z: k});
+    layerGroup.draw();
   };
 
   /**

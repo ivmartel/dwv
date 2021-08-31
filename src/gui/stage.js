@@ -29,7 +29,8 @@ dwv.gui.ZoomBinder = function () {
     return function (event) {
       layerGroup.setScale({
         x: event.value[0],
-        y: event.value[1]
+        y: event.value[1],
+        z: event.value[2]
       });
       layerGroup.draw();
     };
@@ -47,7 +48,8 @@ dwv.gui.OffsetBinder = function () {
     return function (event) {
       layerGroup.setOffset({
         x: event.value[0],
-        y: event.value[1]
+        y: event.value[1],
+        z: event.value[2]
       });
       layerGroup.draw();
     };

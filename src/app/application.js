@@ -501,7 +501,9 @@ dwv.App = function () {
    */
   this.zoom = function (step, cx, cy) {
     var layerGroup = stage.getActiveLayerGroup();
-    layerGroup.addScale(step, {x: cx, y: cy});
+    var viewController = layerGroup.getActiveViewLayer().getViewController();
+    var k = viewController.getCurrentScrollPosition();
+    layerGroup.addScale(step, {x: cx, y: cy, z: k});
     layerGroup.draw();
   };
 
