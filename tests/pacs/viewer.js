@@ -75,7 +75,7 @@ dwv.test.viewerSetup = function () {
     console.time('load-data');
     isFirstRender = true;
   });
-  _app.addEventListener('loadprogress', function () {
+  _app.addEventListener('loadprogress', function (event) {
     if (typeof event.lengthComputable !== 'undefined' &&
       event.lengthComputable) {
       var percent = Math.ceil((event.loaded / event.total) * 100);
