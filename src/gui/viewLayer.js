@@ -136,6 +136,15 @@ dwv.gui.ViewLayer = function (containerDiv) {
   };
 
   /**
+   * Get the id of the layer.
+   *
+   * @returns {string} The string id.
+   */
+  this.getId = function () {
+    return containerDiv.id;
+  };
+
+  /**
    * Handle an image change event.
    *
    * @param {object} event The event.
