@@ -473,7 +473,8 @@ dwv.App = function () {
         var element = document.getElementById(config.divId);
         layerGroup = stage.addLayerGroup(element);
         if (typeof config.orientation !== 'undefined') {
-          layerGroup.setOrientation(config.orientation);
+          layerGroup.setOrientation(
+            dwv.math.getMatrixFromName(config.orientation));
         }
       }
       // initialise or add view

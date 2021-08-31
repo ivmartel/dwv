@@ -119,21 +119,37 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   var listenerHandler = new dwv.utils.ListenerHandler();
 
   /**
-   * The orientation name.
-   * Undefined orientation uses the incoming ordering
+   * The target orientation matrix.
    *
    * @type {String}
    * @private
    */
-  var targetOrientationName;
+  var targetOrientation;
 
   /**
-   * Set the orientation.
+   * The view orientation matrix.
    *
-   * @param {String} orientationName The orientation name.
+   * @type {String}
+   * @private
    */
-  this.setOrientation = function (orientationName) {
-    targetOrientationName = orientationName;
+  var viewOrientation;
+
+  /**
+   * Set the target orientation.
+   *
+   * @param {object} orientation The target orientation matrix.
+   */
+  this.setOrientation = function (orientation) {
+    targetOrientation = orientation;
+  };
+
+  /**
+   * Get the view orientation.
+   *
+   * @returns {object} orientation The view orientation matrix.
+   */
+  this.getOrientation = function () {
+    return viewOrientation;
   };
 
   /**
@@ -518,38 +534,6 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   };
 
   /**
-   * Get an orientation matrix from a name.
-   *
-   * @param {string} name The orientation name.
-   * @returns {object} The orientation matrix.
-   */
-  function getOrientationMatrix(name) {
-    var matrix = null;
-    if (name === 'axial') {
-      matrix = dwv.math.getIdentityMat33();
-    } else if (name === 'coronal') {
-      // coronal (xzy)
-      /* eslint-disable array-element-newline */
-      matrix = new dwv.math.Matrix33([
-        1, 0, 0,
-        0, 0, 1,
-        0, 1, 0
-      ]);
-      /* eslint-enable array-element-newline */
-    } else if (name === 'sagittal') {
-      // sagittal (yzx)
-      /* eslint-disable array-element-newline */
-      matrix = new dwv.math.Matrix33([
-        0, 0, 1,
-        1, 0, 0,
-        0, 1, 0
-      ]);
-      /* eslint-enable array-element-newline */
-    }
-    return matrix;
-  }
-
-  /**
    * Initialise the layer: set the canvas and context
    *
    * @param {object} image The image.
@@ -559,10 +543,10 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   this.initialise = function (image, metaData, dataIndex) {
     var geometry = image.getGeometry();
 
-    var viewOrientation = dwv.math.getIdentityMat33();
-    if (typeof targetOrientationName !== 'undefined') {
-      var targetOrientation = getOrientationMatrix(targetOrientationName);
+    viewOrientation = dwv.math.getIdentityMat33();
+    if (typeof targetOrientation !== 'undefined') {
       // image orientation as one and zeros
+      // -> view orientation is one and zeros
       var imgOrientation = geometry.getOrientation().asOneAndZeros();
       // imgOrientation * viewOrientation = targetOrientation
       // -> viewOrientation = inv(imgOrientation) * targetOrientation
