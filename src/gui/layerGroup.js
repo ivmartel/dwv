@@ -121,7 +121,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   /**
    * The target orientation matrix.
    *
-   * @type {String}
+   * @type {object}
    * @private
    */
   var targetOrientation;
@@ -129,7 +129,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   /**
    * The view orientation matrix.
    *
-   * @type {String}
+   * @type {object}
    * @private
    */
   var viewOrientation;
@@ -141,15 +141,6 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    */
   this.setOrientation = function (orientation) {
     targetOrientation = orientation;
-  };
-
-  /**
-   * Get the view orientation.
-   *
-   * @returns {object} orientation The view orientation matrix.
-   */
-  this.getOrientation = function () {
-    return viewOrientation;
   };
 
   /**
