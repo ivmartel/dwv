@@ -25,7 +25,7 @@ dwv.gui.getLayerDetailsFromLayerDivId = function (idString) {
   var layerId = null;
   if (posHyphen !== -1) {
     groupId = parseInt(idString.substring(6, posHyphen), 10);
-    layerId = parseInt(idString.substring(posHyphen), 10);
+    layerId = parseInt(idString.substring(posHyphen + 1), 10);
   }
   return {
     groupId: groupId,
