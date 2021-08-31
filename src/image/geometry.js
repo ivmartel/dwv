@@ -282,15 +282,14 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
   this.getSize = function (viewOrientation) {
     var res = size;
     if (viewOrientation && typeof viewOrientation !== 'undefined') {
-      var vec = new dwv.math.Vector3D(
-        size.get(0),
-        size.get(1),
-        size.get(2)
-      );
-      // size = orientation * sizeOriented
-      // -> inv(orientation) * size = sizeOriented
-      var vec2 = viewOrientation.getInverse().getAbs().multiplyVector3D(vec);
-      res = new dwv.image.Size([vec2.getX(), vec2.getY(), vec2.getZ()]);
+      var values = dwv.image.getOrientedArray3D(
+        [
+          size.get(0),
+          size.get(1),
+          size.get(2)
+        ],
+        viewOrientation);
+      res = new dwv.image.Size(values);
     }
     return res;
   };
@@ -348,15 +347,14 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
     }
     var res = spacing;
     if (viewOrientation && typeof viewOrientation !== 'undefined') {
-      var vec = new dwv.math.Vector3D(
-        spacing.getColumnSpacing(),
-        spacing.getRowSpacing(),
-        spacing.getSliceSpacing()
-      );
-      // spacing = orientation * spacingOriented
-      // -> inv(orientation) * spacing = spacingOriented
-      var vec2 = viewOrientation.getInverse().getAbs().multiplyVector3D(vec);
-      res = new dwv.image.Spacing(vec2.getX(), vec2.getY(), vec2.getZ());
+      var values = dwv.image.getOrientedArray3D(
+        [
+          spacing.getColumnSpacing(),
+          spacing.getRowSpacing(),
+          spacing.getSliceSpacing()
+        ],
+        viewOrientation);
+      res = new dwv.image.Spacing(values[0], values[1], values[2]);
     }
     return res;
   };
@@ -524,4 +522,17 @@ dwv.image.Geometry.prototype.worldToIndex = function (point) {
     point.getX() / spacing.getColumnSpacing() - origin.getX(),
     point.getY() / spacing.getRowSpacing() - origin.getY(),
     point.getZ() / spacing.getSliceSpacing() - origin.getZ());
+};
+
+/**
+ * Get the oriented values of an input 3D array.
+ *
+ * @param {array} array3D The 3D array.
+ * @param {object} orientation The orientation 3D matrix.
+ * @returns {array} The values reordered according to the orientation.
+ */
+dwv.image.getOrientedArray3D = function (array3D, orientation) {
+  // values = orientation * orientedValues
+  // -> inv(orientation) * values = orientedValues
+  return orientation.getInverse().getAbs().multiplyArray3D(array3D);
 };
