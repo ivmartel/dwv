@@ -716,12 +716,11 @@ dwv.image.View.prototype.decrementIndex = function (dim, silent) {
 };
 
 /**
- * Decrement the scroll dimension index.
+ * Get the scroll dimension index.
  *
- * @param {boolean} silent Do not send event.
- * @returns {boolean} False if not in bounds.
+ * @returns {number} The index.
  */
-dwv.image.View.prototype.decrementScrollIndex = function (silent) {
+dwv.image.View.prototype.getScrollIndex = function () {
   var index = null;
   var orientation = this.getOrientation();
   if (typeof orientation !== 'undefined') {
@@ -729,7 +728,17 @@ dwv.image.View.prototype.decrementScrollIndex = function (silent) {
   } else {
     index = 2;
   }
-  return this.decrementIndex(index, silent);
+  return index;
+};
+
+/**
+ * Decrement the scroll dimension index.
+ *
+ * @param {boolean} silent Do not send event.
+ * @returns {boolean} False if not in bounds.
+ */
+dwv.image.View.prototype.decrementScrollIndex = function (silent) {
+  return this.decrementIndex(this.getScrollIndex(), silent);
 };
 
 /**
@@ -739,12 +748,5 @@ dwv.image.View.prototype.decrementScrollIndex = function (silent) {
  * @returns {boolean} False if not in bounds.
  */
 dwv.image.View.prototype.incrementScrollIndex = function (silent) {
-  var index = null;
-  var orientation = this.getOrientation();
-  if (typeof orientation !== 'undefined') {
-    index = orientation.getThirdColMajorDirection();
-  } else {
-    index = 2;
-  }
-  return this.incrementIndex(index, silent);
+  return this.incrementIndex(this.getScrollIndex(), silent);
 };
