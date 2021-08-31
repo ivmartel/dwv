@@ -136,22 +136,6 @@ dwv.test.onDOMContentLoadedViewer = function () {
     _app.loadFiles(event.target.files);
   });
 
-  // zoom range
-  var zoomrange = document.getElementById('zoomrange');
-  var zoomnumber = document.getElementById('zoomnumber');
-  zoomrange.oninput = function () {
-    var scale = {x: this.value, y: this.value};
-    _app.getActiveLayerGroup().setScale(scale);
-    _app.getActiveLayerGroup().draw();
-    zoomnumber.value = this.value;
-  };
-  zoomnumber.oninput = function () {
-    var scale = {x: this.value, y: this.value};
-    _app.getActiveLayerGroup().setScale(scale);
-    _app.getActiveLayerGroup().draw();
-    zoomnumber.value = this.value;
-  };
-
   // alpha range
   var alpharange = document.getElementById('alpharange');
   var alphanumber = document.getElementById('alphanumber');
