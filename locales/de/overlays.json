@@ -12,8 +12,8 @@
         {"tags": ["x00080020", "x00080030"], "pos": "tr", "format": "{v0} {v1}"},
         {"tags": ["x00080060"], "pos": "tr"},
 
-        {"value": "wlcenterchange", "pos": "br", "format": "WC: {v0}"},
-        {"value": "wlwidthchange", "pos": "br", "format": "WW: {v0}"},
+        {"value": "wlchange", "pos": "br", "format": "WC: {v0}"},
+        {"value": "wlchange", "pos": "br", "format": "WW: {v1}"},
         {"value": "zoomchange", "pos": "br", "format": "Z: {v0}", "precision": "3"},
         {"value": "offsetchange", "pos": "br", "format": "Off: {v0},{v1}", "precision": "round"},
         {"value": "positionchange", "pos": "br", "format": "Pos: {v0}"},
@@ -26,8 +26,8 @@
 
         {"tags": ["imageWidth", "imageHeight"], "pos": "bl", "format": "RES: {v0}x{v1}"},
 
-        {"value": "wlcenterchange", "pos": "br", "format": "WC: {v0}"},
-        {"value": "wlwidthchange", "pos": "br", "format": "WW: {v0}"},
+        {"value": "wlchange", "pos": "br", "format": "WC: {v0}"},
+        {"value": "wlchange", "pos": "br", "format": "WW: {v1}"},
         {"value": "zoomchange", "pos": "br", "format": "Z: {v0}", "precision": "3"},
         {"value": "offsetchange", "pos": "br", "format": "Off: {v0},{v1}", "precision": "round"},
         {"value": "positionchange", "pos": "br", "format": "Pos: {v0}"},
@@ -49,8 +49,8 @@
         {"tags": ["x00080020", "x00080030"], "pos": "tr", "format": "{v0} {v1}"},
         {"tags": ["x00080060"], "pos": "tr"},
 
-        {"value": "wlcenterchange", "pos": "br", "format": "WC: {v0}"},
-        {"value": "wlwidthchange", "pos": "br", "format": "WW: {v0}"},
+        {"value": "wlchange", "pos": "br", "format": "WC: {v0}"},
+        {"value": "wlchange", "pos": "br", "format": "WW: {v1}"},
         {"value": "zoomchange", "pos": "br", "format": "Z: {v0}", "precision": "3"},
         {"value": "offsetchange", "pos": "br", "format": "Off: {v0},{v1}", "precision": "round"},
         {"value": "positionchange", "pos": "br", "format": "Pos: {v0}"},

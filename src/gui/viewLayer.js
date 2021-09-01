@@ -342,8 +342,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
     view.setOrientation(viewOrientation);
 
     // local listeners
-    view.addEventListener('wlwidthchange', onWLChange);
-    view.addEventListener('wlcenterchange', onWLChange);
+    view.addEventListener('wlchange', onWLChange);
     view.addEventListener('colourchange', onColourChange);
     view.addEventListener('positionchange', onPositionChange);
 
