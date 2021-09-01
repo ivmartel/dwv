@@ -44,9 +44,8 @@ dwv.gui.getLayerDetailsFromToolEvent = function (event) {
   // the target of the tool event is the layer canvas,
   // move up until we find the layer div (a div with class 'layer')
   var layerDiv = event.target.closest('.layer');
-  var divId = layerDiv.id;
-  if (typeof divId !== 'undefined') {
-    res = dwv.gui.getLayerDetailsFromLayerDivId(divId);
+  if (layerDiv && typeof layerDiv.id !== 'undefined') {
+    res = dwv.gui.getLayerDetailsFromLayerDivId(layerDiv.id);
   }
   return res;
 };
