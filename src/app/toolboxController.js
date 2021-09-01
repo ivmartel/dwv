@@ -184,10 +184,6 @@ dwv.ctrl.ToolboxController = function (toolList) {
    * @private
    */
   function getOnMouch(layerId, eventType, displayToIndexConverter) {
-    if (typeof callbackStore[layerId] === 'undefined') {
-      callbackStore[layerId] = [];
-    }
-
     // augment event with converted offsets
     var augmentEventOffsets = function (event) {
       // event offset(s)
@@ -218,6 +214,10 @@ dwv.ctrl.ToolboxController = function (toolList) {
       }
     };
 
+    if (typeof callbackStore[layerId] === 'undefined') {
+      callbackStore[layerId] = [];
+    }
+
     if (typeof callbackStore[layerId][eventType] === 'undefined') {
       var callback = null;
       if (eventType === 'keydown') {
@@ -239,9 +239,9 @@ dwv.ctrl.ToolboxController = function (toolList) {
       }
       // store callback
       callbackStore[layerId][eventType] = callback;
-    } else {
-      return callbackStore[layerId][eventType];
     }
+
+    return callbackStore[layerId][eventType];
   }
 
 }; // class ToolboxController
