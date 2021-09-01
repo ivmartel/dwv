@@ -43,6 +43,7 @@ dwv.test.viewerSetup = function () {
   //   1: [{divId: 'layerGroup'}]
   // };
   var binders = [
+    new dwv.gui.WindowLevelBinder(),
     new dwv.gui.PositionBinder(),
     new dwv.gui.ZoomBinder(),
     new dwv.gui.OffsetBinder(),

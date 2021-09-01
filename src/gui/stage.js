@@ -3,6 +3,22 @@ var dwv = dwv || {};
 dwv.gui = dwv.gui || {};
 
 /**
+ * Window/level binder.
+ */
+dwv.gui.WindowLevelBinder = function () {
+  this.getEventType = function () {
+    return 'wlchange';
+  };
+  this.getCallback = function (layerGroup) {
+    return function (event) {
+      //console.log('WindowLevelBinder', event);
+      var vc = layerGroup.getActiveViewLayer().getViewController();
+      vc.setWindowLevel(event.value[0], event.value[1]);
+    };
+  };
+};
+
+/**
  * Position binder.
  */
 dwv.gui.PositionBinder = function () {
