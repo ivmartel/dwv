@@ -414,6 +414,7 @@ dwv.tool.Draw = function (app) {
    * Update the current draw with new points.
    *
    * @param {Array} tmpPoints The array of new points.
+   * @param {object} layerGroup The origin layer group.
    */
   function onNewPoints(tmpPoints, layerGroup) {
     // remove temporary shape draw
@@ -438,6 +439,7 @@ dwv.tool.Draw = function (app) {
    * Create the final shape from a point list.
    *
    * @param {Array} finalPoints The array of points.
+   * @param {object} layerGroup The origin layer group.
    */
   function onFinalPoints(finalPoints, layerGroup) {
     // reset temporary shape group
@@ -473,7 +475,7 @@ dwv.tool.Draw = function (app) {
     app.addToUndoStack(command);
 
     // activate shape listeners
-    self.setShapeOn(finalShapeGroup);
+    self.setShapeOn(finalShapeGroup, layerGroup);
   }
 
   /**
@@ -511,6 +513,8 @@ dwv.tool.Draw = function (app) {
 
   /**
    * Update the draw layer.
+   *
+   * @param {object} layerGroup The origin layer group.
    */
   function updateDrawLayer(layerGroup) {
     // activate the shape at current position
@@ -521,6 +525,7 @@ dwv.tool.Draw = function (app) {
    * Activate shapes at current position.
    *
    * @param {boolean} visible Set the draw layer visible or not.
+   * @param {object} layerGroup The origin layer group.
    */
   function activateCurrentPositionShapes(visible, layerGroup) {
     var drawController =
@@ -534,7 +539,7 @@ dwv.tool.Draw = function (app) {
     if (visible) {
       // activate shape listeners
       shapeGroups.forEach(function (group) {
-        self.setShapeOn(group);
+        self.setShapeOn(group, layerGroup);
       });
     } else {
       // de-activate shape listeners
@@ -567,6 +572,7 @@ dwv.tool.Draw = function (app) {
    * Get the real position from an event.
    *
    * @param {object} index The input index.
+   * @param {object} layerGroup The origin layer group.
    * @returns {object} The reasl position in the image.
    * @private
    */
@@ -583,8 +589,9 @@ dwv.tool.Draw = function (app) {
    * Set shape group on properties.
    *
    * @param {object} shapeGroup The shape group to set on.
+   * @param {object} layerGroup The origin layer group.
    */
-  this.setShapeOn = function (shapeGroup) {
+  this.setShapeOn = function (shapeGroup, layerGroup) {
     // mouse over styling
     shapeGroup.on('mouseover', function () {
       document.body.style.cursor = 'pointer';
@@ -606,12 +613,10 @@ dwv.tool.Draw = function (app) {
     var colour = null;
 
     // drag start event handling
-    shapeGroup.on('dragstart.draw', function (event) {
+    shapeGroup.on('dragstart.draw', function (/*event*/) {
       // store colour
       colour = shapeGroup.getChildren(dwv.draw.isNodeNameShape)[0].stroke();
       // display trash
-      var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
-      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
       var drawLayer = layerGroup.getActiveDrawLayer();
       var stage = drawLayer.getKonvaStage();
       var scale = stage.scale();
@@ -627,8 +632,6 @@ dwv.tool.Draw = function (app) {
     });
     // drag move event handling
     shapeGroup.on('dragmove.draw', function (event) {
-      var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
-      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
       var drawLayer = layerGroup.getActiveDrawLayer();
       // validate the group position
       dwv.tool.validateGroupPosition(drawLayer.getSize(), this);
@@ -638,7 +641,7 @@ dwv.tool.Draw = function (app) {
       var trashHalfWidth = trash.width() * trash.scaleX() / 2;
       var trashHalfHeight = trash.height() * trash.scaleY() / 2;
       if (Math.abs(eventPos.x - trash.x()) < trashHalfWidth &&
-                    Math.abs(eventPos.y - trash.y()) < trashHalfHeight) {
+        Math.abs(eventPos.y - trash.y()) < trashHalfHeight) {
         trash.getChildren().each(function (tshape) {
           tshape.stroke('orange');
         });
@@ -673,7 +676,7 @@ dwv.tool.Draw = function (app) {
       var trashHalfWidth = trash.width() * trash.scaleX() / 2;
       var trashHalfHeight = trash.height() * trash.scaleY() / 2;
       if (Math.abs(eventPos.x - trash.x()) < trashHalfWidth &&
-                    Math.abs(eventPos.y - trash.y()) < trashHalfHeight) {
+        Math.abs(eventPos.y - trash.y()) < trashHalfHeight) {
         // compensate for the drag translation
         this.x(dragStartPos.x);
         this.y(dragStartPos.y);
