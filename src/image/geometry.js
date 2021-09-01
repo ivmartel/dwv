@@ -527,9 +527,9 @@ dwv.image.Geometry.prototype.worldToIndex = function (point) {
 /**
  * Get the oriented values of an input 3D array.
  *
- * @param {array} array3D The 3D array.
+ * @param {Array} array3D The 3D array.
  * @param {object} orientation The orientation 3D matrix.
- * @returns {array} The values reordered according to the orientation.
+ * @returns {Array} The values reordered according to the orientation.
  */
 dwv.image.getOrientedArray3D = function (array3D, orientation) {
   // values = orientation * orientedValues
@@ -540,9 +540,9 @@ dwv.image.getOrientedArray3D = function (array3D, orientation) {
 /**
  * Get the raw values of an oriented input 3D array.
  *
- * @param {array} array3D The 3D array.
+ * @param {Array} array3D The 3D array.
  * @param {object} orientation The orientation 3D matrix.
- * @returns {array} The values reordered to compensate the orientation.
+ * @returns {Array} The values reordered to compensate the orientation.
  */
 dwv.image.getDeOrientedArray3D = function (array3D, orientation) {
   // values = orientation * orientedValues

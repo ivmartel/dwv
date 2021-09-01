@@ -279,7 +279,7 @@ dwv.App = function () {
   /**
    * Get a HTML element associated to the application.
    *
-   * @param {string} name The name or id to find.
+   * @param {string} _name The name or id to find.
    * @returns {object} The found element or null.
    * @deprecated
    */
@@ -431,7 +431,7 @@ dwv.App = function () {
    * Defaults to div id 'layerGroup' if no association object has been set.
    *
    * @param {number} dataIndex The data index.
-   * @returns {array} The list of associated configs.
+   * @returns {Array} The list of associated configs.
    */
   function getViewConfigs(dataIndex) {
     var configs = null;

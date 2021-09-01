@@ -180,7 +180,10 @@ dwv.ctrl.ToolboxController = function (toolList) {
    * the mouse/touch position relative to the canvas element.
    * It then passes it to the current tool.
    *
+   * @param {string} layerId The layer id.
+   * @param {string} eventType The event type.
    * @param {object} displayToIndexConverter The display to index converter.
+   * @returns {object} A callback for the provided layer and event.
    * @private
    */
   function getOnMouch(layerId, eventType, displayToIndexConverter) {

@@ -219,6 +219,7 @@ dwv.tool.Floodfill = function (app) {
    * @private
    * @param {object} point The start point.
    * @param {number} threshold The border threshold.
+   * @param {object} layerGroup The origin layer group.
    * @returns {boolean} False if no border.
    */
   var paintBorder = function (point, threshold, layerGroup) {
@@ -259,6 +260,7 @@ dwv.tool.Floodfill = function (app) {
    *
    * @param {number} ini The first slice to extend to.
    * @param {number} end The last slice to extend to.
+   * @param {object} layerGroup The origin layer group.
    */
   this.extend = function (ini, end, layerGroup) {
     //avoid errors

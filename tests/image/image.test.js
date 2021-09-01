@@ -175,6 +175,13 @@ QUnit.test('Test Image histogram.', function (assert) {
  * @function module:tests/image~append
  */
 QUnit.test('Test Image append slice.', function (assert) {
+  /**
+   * Compare two arrays of vectors.
+   *
+   * @param {Array} arr0 The first array.
+   * @param {Array} arr1 The second array.
+   * @returns {boolean} True if both arrays are equal.
+   */
   function compareArrayOfVectors(arr0, arr1) {
     return arr0.every(function (element, index) {
       return element.equals(arr1[index]);
