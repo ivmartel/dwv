@@ -92,11 +92,11 @@ dwv.test.viewerSetup = function () {
     console.timeEnd('load-data');
     console.log(_app.getMetaData());
   });
-  _app.addEventListener('renderstart', function () {
-    console.time('render-data');
+  _app.addEventListener('renderstart', function (event) {
+    console.time('render-data ' + event.layerid);
   });
-  _app.addEventListener('renderend', function () {
-    console.timeEnd('render-data');
+  _app.addEventListener('renderend', function (event) {
+    console.timeEnd('render-data ' + event.layerid);
     if (isFirstRender) {
       isFirstRender = false;
       // select tool

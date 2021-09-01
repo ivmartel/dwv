@@ -272,7 +272,10 @@ dwv.gui.ViewLayer = function (containerDiv) {
      * @type {object}
      * @property {string} type The event type.
      */
-    var event = {type: 'renderstart'};
+    var event = {
+      type: 'renderstart',
+      layerid: this.getId()
+    };
     fireEvent(event);
 
     // update data if needed
@@ -319,7 +322,10 @@ dwv.gui.ViewLayer = function (containerDiv) {
      * @type {object}
      * @property {string} type The event type.
      */
-    event = {type: 'renderend'};
+    event = {
+      type: 'renderend',
+      layerid: this.getId()
+    };
     fireEvent(event);
   };
 
