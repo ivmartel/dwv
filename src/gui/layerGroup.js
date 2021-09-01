@@ -470,11 +470,11 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    */
   this.fitToContainer = function (spacing) {
     var fitScale = this.getFitToContainerScale(spacing);
-    this.resize({
+    this.resize(getDeOriented({
       x: fitScale * spacing.getColumnSpacing(),
       y: fitScale * spacing.getRowSpacing(),
       z: fitScale * spacing.getSliceSpacing()
-    });
+    }));
   };
 
   /**
