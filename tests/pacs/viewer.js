@@ -92,11 +92,13 @@ dwv.test.viewerSetup = function () {
     console.timeEnd('load-data');
     console.log(_app.getMetaData());
   });
-  _app.addEventListener('renderstart', function (event) {
-    console.time('render-data ' + event.layerid);
-  });
-  _app.addEventListener('renderend', function (event) {
-    console.timeEnd('render-data ' + event.layerid);
+  // _app.addEventListener('renderstart', function (event) {
+  //   console.time('render-data ' + event.layerid);
+  // });
+  // _app.addEventListener('renderend', function (event) {
+  //   console.timeEnd('render-data ' + event.layerid);
+  // });
+  _app.addEventListener('renderend', function () {
     if (isFirstRender) {
       isFirstRender = false;
       // select tool
@@ -129,8 +131,13 @@ dwv.test.onDOMContentLoadedViewer = function () {
   // setup
   dwv.test.viewerSetup();
 
+  var resetButton = document.getElementById('reset');
+  resetButton.addEventListener('click', function () {
+    _app.resetLayout();
+  });
+
   // bind app to input files
-  const fileinput = document.getElementById('fileinput');
+  var fileinput = document.getElementById('fileinput');
   fileinput.addEventListener('change', function (event) {
     console.log('%c ----------------', 'color: teal;');
     console.log(event.target.files);
