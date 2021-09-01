@@ -23,7 +23,8 @@ progress {
   width: 50%;
   border: 1px dotted gray;
 }
-.group {
+.layerGroup {
+  display:inline-block;
   width: 250px;
   height: 250px;
   margin: 5px;
@@ -112,9 +113,9 @@ document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedViewer)
 <!-- DWV -->
 <div id="dwv">
   <!-- Layer groups -->
-  <div id="layerGroup" class="group"></div>
-  <div id="layerGroup1" class="group"></div>
-  <div id="layerGroup2" class="group"></div>
+  <div id="layerGroup" class="layerGroup"></div>
+  <div id="layerGroup1" class="layerGroup"></div>
+  <div id="layerGroup2" class="layerGroup"></div>
 </div><!-- /dwv -->
 
 <label for="alpharange">Alpha:</label>
