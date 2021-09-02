@@ -81,7 +81,11 @@ dwv.image.Size.prototype.moreThanOne = function (dimension) {
  * @returns {boolean} True if scrollable.
  */
 dwv.image.Size.prototype.canScroll = function (viewOrientation) {
-  return this.moreThanOne(viewOrientation.getThirdColMajorDirection());
+  var dimension = 2;
+  if (typeof viewOrientation !== 'undefined') {
+    dimension = viewOrientation.getThirdColMajorDirection();
+  }
+  return this.moreThanOne(dimension);
 };
 
 /**

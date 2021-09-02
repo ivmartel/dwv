@@ -186,10 +186,13 @@ dwv.ctrl.ViewController = function (view) {
     // keep third direction
     var k = this.getCurrentScrollPosition();
     var posPlane = new dwv.math.Index([i, j, k]);
-    // abs? otherwise negative position...
-    var orientation = view.getOrientation().getAbs();
-    // pos3D = orientation * posPlane
-    var pos3D = orientation.multiplyIndex3D(posPlane);
+    var pos3D = posPlane;
+    var orientation = view.getOrientation();
+    if (typeof orientation !== 'undefined') {
+      // abs? otherwise negative position...
+      // pos3D = orientation * posPlane
+      pos3D = orientation.getAbs().multiplyIndex3D(posPlane);
+    }
     return view.setCurrentPosition(pos3D);
   };
 
