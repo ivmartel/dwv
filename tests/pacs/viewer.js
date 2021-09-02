@@ -18,43 +18,72 @@ var _app = null;
  */
 dwv.test.viewerSetup = function () {
 
+  /**
+   * Append a layer div in the root 'dwv' one.
+   *
+   * @param {string} id The id of the layer.
+   */
+  function addLayer(id) {
+    var layer = document.createElement('div');
+    layer.id = id;
+    layer.className = 'layerGroup';
+    var root = document.getElementById('dwv');
+    root.appendChild(layer);
+  }
+
   // stage options
-  // single data, multiple layer group
-  var dataViewConfigs = {
-    0: [
-      {
-        divId: 'layerGroup',
-        orientation: 'axial'
-      },
-      {
-        divId: 'layerGroup1',
-        orientation: 'coronal'
-      },
-      {
-        divId: 'layerGroup2',
-        orientation: 'sagittal'
-      }
-    ]
-  };
-  // multiple data, multiple layer group
-  // -> set nSimultaneousData to 2 in app config
-  // var containerDivIds = {
-  //   0: [{divId: 'layerGroup'}],
-  //   1: [{divId: 'layerGroup'}]
-  // };
+  var dataViewConfigs;
+  var nSimultaneousData = 1;
+  var viewOnFirstLoadItem = false;
+
+  var mode = 0; // simplest, multi, mpr
+  if (mode === 0) {
+    // simplest
+    dataViewConfigs = {0: [{divId: 'layerGroup0'}]};
+  } else if (mode === 1) {
+    // multiple data, multiple layer group
+    nSimultaneousData = 2;
+    addLayer('layerGroup1');
+    dataViewConfigs = {
+      0: [{divId: 'layerGroup0'}],
+      1: [{divId: 'layerGroup1'}]
+    };
+  } else if (mode === 2) {
+    // single data, multiple layer groups -> MPR
+    viewOnFirstLoadItem = false;
+    addLayer('layerGroup1');
+    addLayer('layerGroup2');
+    dataViewConfigs = {
+      0: [
+        {
+          divId: 'layerGroup0',
+          orientation: 'axial'
+        },
+        {
+          divId: 'layerGroup1',
+          orientation: 'coronal'
+        },
+        {
+          divId: 'layerGroup2',
+          orientation: 'sagittal'
+        }
+      ]
+    };
+  }
+
+  // layer group binders
   var binders = [
     new dwv.gui.WindowLevelBinder(),
     new dwv.gui.PositionBinder(),
     new dwv.gui.ZoomBinder(),
     new dwv.gui.OffsetBinder(),
-    //new dwv.gui.OpacityBinder()
+    new dwv.gui.OpacityBinder()
   ];
 
   // app config
-  var viewOnFirstLoadItem = false;
   var config = {
     viewOnFirstLoadItem: viewOnFirstLoadItem,
-    //nSimultaneousData: 2,
+    nSimultaneousData: nSimultaneousData,
     dataViewConfigs: dataViewConfigs,
     binders: binders,
     tools: {
