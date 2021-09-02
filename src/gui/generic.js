@@ -78,32 +78,6 @@ dwv.prompt = dwv.gui.prompt;
 dwv.openRoiDialog;
 
 /**
- * Get the size available for a div.
- *
- * @param {object} div The input div.
- * @returns {object} The available width and height as {x,y}.
- */
-dwv.gui.getDivSize = function (div) {
-  var parent = div.parentNode;
-  // offsetHeight: height of an element, including vertical padding
-  // and borders
-  // ref: https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetHeight
-  var height = parent.offsetHeight;
-  // remove the height of other elements of the container div
-  var kids = parent.children;
-  for (var i = 0; i < kids.length; ++i) {
-    if (kids[i].id !== div.id) {
-      var styles = window.getComputedStyle(kids[i]);
-      // offsetHeight does not include margin
-      var margin = parseFloat(styles.getPropertyValue('margin-top'), 10) +
-             parseFloat(styles.getPropertyValue('margin-bottom'), 10);
-      height -= (kids[i].offsetHeight + margin);
-    }
-  }
-  return {x: parent.offsetWidth, y: height};
-};
-
-/**
  * Get the positions (without the parent offset) of a list of touch events.
  *
  * @param {Array} touches The list of touch events.

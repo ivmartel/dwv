@@ -267,16 +267,6 @@ dwv.App = function () {
   };
 
   /**
-   * Get the size available for the layer container div.
-   *
-   * @returns {object} The available width and height: {width:X; height:Y}.
-   */
-  this.getLayerGroupContainerSize = function () {
-    var size = stage.getActiveLayerGroup().getContainerSize();
-    return {width: size.x, height: size.y};
-  };
-
-  /**
    * Get a HTML element associated to the application.
    *
    * @param {string} _name The name or id to find.

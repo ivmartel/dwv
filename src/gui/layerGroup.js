@@ -92,7 +92,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    * @private
    * @type {object}
    */
-  var layerSize = dwv.gui.getDivSize(containerDiv);
+  var layerSize;
 
   /**
    * Active view layer index.
@@ -450,7 +450,10 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    */
   this.getFitToContainerScale = function (spacing) {
     // get container size
-    var containerSize = this.getContainerSize();
+    var containerSize = {
+      x: containerDiv.offsetWidth,
+      y: containerDiv.offsetHeight
+    };
     var realSize = {
       x: layerSize.x * spacing.getColumnSpacing(),
       y: layerSize.y * spacing.getRowSpacing()
@@ -475,15 +478,6 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
       y: fitScale * spacing.getRowSpacing(),
       z: fitScale * spacing.getSliceSpacing()
     }));
-  };
-
-  /**
-   * Get the size available for the container div.
-   *
-   * @returns {object} The available width and height as {width,height}.
-   */
-  this.getContainerSize = function () {
-    return dwv.gui.getDivSize(containerDiv);
   };
 
   /**
@@ -645,12 +639,10 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     };
     baseScale = newScale;
 
-    // resize container
+    // resize layers
     var baseScale2D = getOriented(baseScale);
     var width = Math.floor(layerSize.x * baseScale2D.x);
     var height = Math.floor(layerSize.y * baseScale2D.y);
-    containerDiv.style.width = width + 'px';
-    containerDiv.style.height = height + 'px';
 
     // resize if test passes
     if (dwv.gui.canCreateCanvas(width, height)) {
