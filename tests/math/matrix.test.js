@@ -163,3 +163,79 @@ QUnit.test('Test Matrix33 inverse.', function (assert) {
   var invinvm10 = invm10.getInverse();
   assert.ok(invinvm10.equals(m10, dwv.math.BIG_EPSILON), 'inverse #1 twice');
 });
+
+/**
+ * Tests for {@link dwv.math.Matrix33} getAbs.
+ *
+ * @function module:tests/math~Matrix33
+ */
+QUnit.test('Test Matrix33 abs.', function (assert) {
+  var m00 = new dwv.math.Matrix33([
+    -1, -2, -3, -4, -5, -6, -7, -8, -9
+  ]);
+  var theo00 = new dwv.math.Matrix33([
+    1, 2, 3, 4, 5, 6, 7, 8, 9
+  ]);
+  assert.ok(m00.getAbs().equals(theo00), 'Matrix33 abs');
+});
+
+/**
+ * Tests for {@link dwv.math.Matrix33} asOneAndZeros.
+ *
+ * @function module:tests/math~Matrix33
+ */
+QUnit.test('Test Matrix33 asOneAndZeros.', function (assert) {
+  // test #00
+  var m00 = new dwv.math.Matrix33([
+    1, 2, 3, 4, 5, 6, 7, 8, 9
+  ]);
+  var theo00 = new dwv.math.Matrix33([
+    0, 0, 1, 0, 0, 1, 0, 0, 1
+  ]);
+  assert.ok(m00.asOneAndZeros().equals(theo00), 'Matrix33 asOneAndZeros #00');
+
+  // test #01
+  var m01 = new dwv.math.Matrix33([
+    3, 2, 1, 100, 99, 98, 5.5, 5.6, 5.4
+  ]);
+  var theo01 = new dwv.math.Matrix33([
+    1, 0, 0, 1, 0, 0, 0, 1, 0
+  ]);
+  assert.ok(m01.asOneAndZeros().equals(theo01), 'Matrix33 asOneAndZeros #01');
+});
+
+/**
+ * Tests for {@link dwv.math.Matrix33} factories.
+ *
+ * @function module:tests/math~Matrix33
+ */
+QUnit.test('Test Matrix33 factories.', function (assert) {
+  // test #00
+  var m00 = dwv.math.getIdentityMat33();
+  var theo00 = new dwv.math.Matrix33([
+    1, 0, 0, 0, 1, 0, 0, 0, 1
+  ]);
+  assert.ok(m00.equals(theo00), 'Matrix33 factory id');
+
+  // test #01
+  var m01 = dwv.math.getMatrixFromName('axial');
+  assert.ok(m01.equals(theo00), 'Matrix33 factory axial');
+
+  // test #02
+  var m02 = dwv.math.getMatrixFromName('coronal');
+  var theo02 = new dwv.math.Matrix33([
+    1, 0, 0, 0, 0, 1, 0, 1, 0
+  ]);
+  assert.ok(m02.equals(theo02), 'Matrix33 factory coronal');
+
+  // test #03
+  var m03 = dwv.math.getMatrixFromName('sagittal');
+  var theo03 = new dwv.math.Matrix33([
+    0, 0, 1, 1, 0, 0, 0, 1, 0
+  ]);
+  assert.ok(m03.equals(theo03), 'Matrix33 factory sagittal');
+
+  // test #04
+  var m04 = dwv.math.getMatrixFromName('godo');
+  assert.equal(m04, null, 'Matrix33 factory unknown name');
+});
