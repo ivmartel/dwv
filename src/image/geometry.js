@@ -314,6 +314,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
     // applied on the patient position, reorders indices
     // so that Z is the slice direction
     var orientation2 = orientation.getInverse().asOneAndZeros();
+    var deltas = [];
     for (var i = 0; i < origins.length - 1; ++i) {
       var origin1 = orientation2.multiplyVector3D(origins[i]);
       var origin2 = orientation2.multiplyVector3D(origins[i + 1]);
@@ -326,9 +327,18 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
         spacing = diff;
       } else {
         if (!dwv.math.isSimilar(spacing, diff, dwv.math.BIG_EPSILON)) {
-          dwv.logger.warn('Varying slice spacing: ' + (spacing - diff));
+          deltas.push(Math.abs(spacing - diff));
         }
       }
+    }
+    // warn if non constant
+    if (deltas.length !== 0) {
+      var sumReducer = function (sum, value) {
+        return sum + value;
+      };
+      var mean = deltas.reduce(sumReducer) / deltas.length;
+      dwv.logger.warn('Varying slice spacing, mean delta: ' +
+        mean.toFixed(3) + ' (' + deltas.length + ' case(s))');
     }
     return spacing;
   };
