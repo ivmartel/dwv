@@ -90,6 +90,10 @@ QUnit.test('Test Size.', function (assert) {
   assert.equal(size20.moreThanOne(1), false, 'moreThanOne 20-1');
   assert.equal(size20.moreThanOne(2), true, 'moreThanOne 20-2');
   assert.equal(size20.moreThanOne(3), false, 'moreThanOne 20-3');
+
+  // get 2D
+  assert.deepEqual(size0.get2D(), {x: 2, y: 3}, 'get2D 2,3,4');
+
 });
 
 /**
@@ -148,5 +152,13 @@ QUnit.test('Test Geometry.', function (assert) {
       imgGeometry0.indexToOffset(index), offset, 'indexToOffset #' + i);
     assert.ok(
       imgGeometry0.offsetToIndex(offset).equals(index), 'offsetToIndex #' + i);
+
+    var theoPoint = new dwv.math.Point3D(
+      testData[i].vals[0], testData[i].vals[1], testData[i].vals[2]
+    );
+    var resPoint = imgGeometry0.indexToWorld(index);
+    assert.true(theoPoint.equals(resPoint), 'indexToWorkd #' + i);
+    var resPoint2 = imgGeometry0.worldToIndex(theoPoint);
+    assert.true(theoPoint.equals(resPoint2), 'worldToIndex #' + i);
   }
 });
