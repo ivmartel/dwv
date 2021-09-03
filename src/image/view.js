@@ -8,11 +8,11 @@ dwv.image = dwv.image || {};
  * @type {Array}
  */
 dwv.image.viewEventNames = [
-  'wlwidthchange',
-  'wlcenterchange',
+  'wlchange',
   'wlpresetadd',
   'colourchange',
-  'positionchange'
+  'positionchange',
+  'opacitychange'
 ];
 
 /**
@@ -155,8 +155,7 @@ dwv.image.View = function (image) {
    * @param {object} rsi Optional image rsi, will take the one of the
    *   current slice otherwise.
    * @returns {Window} The window LUT of the image.
-   * @fires dwv.image.View#wlwidthchange
-   * @fires dwv.image.View#wlcenterchange
+   * @fires dwv.image.View#wlchange
    */
   this.getCurrentWindowLut = function (rsi) {
     // check position
@@ -209,19 +208,12 @@ dwv.image.View = function (image) {
       wlut.setWindowLevel(wl);
       wlut.update();
       // fire change event
-      if (!lutWl || lutWl.getWidth() !== wl.getWidth()) {
+      if (!lutWl ||
+        lutWl.getWidth() !== wl.getWidth() ||
+        lutWl.getCenter() !== wl.getCenter()) {
         fireEvent({
-          type: 'wlwidthchange',
-          value: [wl.getWidth()],
-          wc: wl.getCenter(),
-          ww: wl.getWidth(),
-          skipGenerate: true
-        });
-      }
-      if (!lutWl || lutWl.getCenter() !== wl.getCenter()) {
-        fireEvent({
-          type: 'wlcenterchange',
-          value: [wl.getCenter()],
+          type: 'wlchange',
+          value: [wl.getCenter(), wl.getWidth()],
           wc: wl.getCenter(),
           ww: wl.getWidth(),
           skipGenerate: true
@@ -430,8 +422,7 @@ dwv.image.View = function (image) {
    * @param {string} name Associated preset name, defaults to 'manual'.
    * Warning: uses the latest set rescale LUT or the default linear one.
    * @param {boolean} silent Flag to launch events with skipGenerate.
-   * @fires dwv.image.View#wlwidthchange
-   * @fires dwv.image.View#wlcenterchange
+   * @fires dwv.image.View#wlchange
    */
   this.setWindowLevel = function (center, width, name, silent) {
     // window width shall be >= 1 (see https://www.dabsoft.ch/dicom/3/C.11.2.1.2/)
@@ -461,11 +452,11 @@ dwv.image.View = function (image) {
       currentWl = newWl;
       currentPresetName = name;
 
-      if (isNewWidth) {
+      if (isNewWidth || isNewCenter) {
         /**
-         * Window/level width change event.
+         * Window/level change event.
          *
-         * @event dwv.image.View#wlwidthchange
+         * @event dwv.image.View#wlchange
          * @type {object}
          * @property {Array} value The changed value.
          * @property {number} wc The new window center value.
@@ -473,28 +464,8 @@ dwv.image.View = function (image) {
          * @property {boolean} skipGenerate Flag to skip view generation.
          */
         fireEvent({
-          type: 'wlwidthchange',
-          value: [width],
-          wc: center,
-          ww: width,
-          skipGenerate: silent
-        });
-      }
-
-      if (isNewCenter) {
-        /**
-         * Window/level center change event.
-         *
-         * @event dwv.image.View#wlcenterchange
-         * @type {object}
-         * @property {Array} value The changed value.
-         * @property {number} wc The new window center value.
-         * @property {number} ww The new window wdth value.
-         * @property {boolean} skipGenerate Flag to skip view generation.
-         */
-        fireEvent({
-          type: 'wlcenterchange',
-          value: [center],
+          type: 'wlchange',
+          value: [center, width],
           wc: center,
           ww: width,
           skipGenerate: silent
@@ -715,12 +686,11 @@ dwv.image.View.prototype.decrementIndex = function (dim, silent) {
 };
 
 /**
- * Decrement the scroll dimension index.
+ * Get the scroll dimension index.
  *
- * @param {boolean} silent Do not send event.
- * @returns {boolean} False if not in bounds.
+ * @returns {number} The index.
  */
-dwv.image.View.prototype.decrementScrollIndex = function (silent) {
+dwv.image.View.prototype.getScrollIndex = function () {
   var index = null;
   var orientation = this.getOrientation();
   if (typeof orientation !== 'undefined') {
@@ -728,7 +698,17 @@ dwv.image.View.prototype.decrementScrollIndex = function (silent) {
   } else {
     index = 2;
   }
-  return this.decrementIndex(index, silent);
+  return index;
+};
+
+/**
+ * Decrement the scroll dimension index.
+ *
+ * @param {boolean} silent Do not send event.
+ * @returns {boolean} False if not in bounds.
+ */
+dwv.image.View.prototype.decrementScrollIndex = function (silent) {
+  return this.decrementIndex(this.getScrollIndex(), silent);
 };
 
 /**
@@ -738,12 +718,5 @@ dwv.image.View.prototype.decrementScrollIndex = function (silent) {
  * @returns {boolean} False if not in bounds.
  */
 dwv.image.View.prototype.incrementScrollIndex = function (silent) {
-  var index = null;
-  var orientation = this.getOrientation();
-  if (typeof orientation !== 'undefined') {
-    index = orientation.getThirdColMajorDirection();
-  } else {
-    index = 2;
-  }
-  return this.incrementIndex(index, silent);
+  return this.incrementIndex(this.getScrollIndex(), silent);
 };

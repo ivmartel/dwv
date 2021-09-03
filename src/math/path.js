@@ -82,7 +82,7 @@ dwv.math.Path.prototype.addControlPoint = function (point) {
     this.controlPointIndexArray.push(index);
   } else {
     throw new Error(
-      'Error: addControlPoint called with no point in list point.');
+      'Cannot mark a non registered point as control point.');
   }
 };
 

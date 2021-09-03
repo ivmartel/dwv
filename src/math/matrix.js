@@ -118,6 +118,10 @@ dwv.math.Matrix33.prototype.getAbs = function () {
  * @returns {Array} The result 3D array.
  */
 dwv.math.Matrix33.prototype.multiplyArray3D = function (array3D) {
+  if (array3D.length !== 3) {
+    throw new Error('Cannot multiply 3x3 matrix with non 3D array: ',
+      array3D.length);
+  }
   var values = [];
   for (var i = 0; i < 3; ++i) {
     var tmp = 0;
@@ -149,10 +153,6 @@ dwv.math.Matrix33.prototype.multiplyVector3D = function (vector3D) {
  * @returns {object} The result 3D index.
  */
 dwv.math.Matrix33.prototype.multiplyIndex3D = function (index3D) {
-  if (index3D.length() !== 3) {
-    throw new Error('Cannot multiply matrix 3x3 with non 3D index: ',
-      index3D.length());
-  }
   var array3D = this.multiplyArray3D(index3D.getValues());
   return new dwv.math.Index(array3D);
 };
@@ -279,4 +279,36 @@ dwv.math.getIdentityMat33 = function () {
   return new dwv.math.Matrix33([
     1, 0, 0, 0, 1, 0, 0, 0, 1
   ]);
+};
+
+/**
+ * Get an orientation matrix from a name.
+ *
+ * @param {string} name The orientation name.
+ * @returns {object} The orientation matrix.
+ */
+dwv.math.getMatrixFromName = function (name) {
+  var matrix = null;
+  if (name === 'axial') {
+    matrix = dwv.math.getIdentityMat33();
+  } else if (name === 'coronal') {
+    // coronal (xzy)
+    /* eslint-disable array-element-newline */
+    matrix = new dwv.math.Matrix33([
+      1, 0, 0,
+      0, 0, 1,
+      0, 1, 0
+    ]);
+    /* eslint-enable array-element-newline */
+  } else if (name === 'sagittal') {
+    // sagittal (yzx)
+    /* eslint-disable array-element-newline */
+    matrix = new dwv.math.Matrix33([
+      0, 0, 1,
+      1, 0, 0,
+      0, 1, 0
+    ]);
+    /* eslint-enable array-element-newline */
+  }
+  return matrix;
 };

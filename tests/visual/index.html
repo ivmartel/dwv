@@ -45,6 +45,7 @@ body { font-family: Arial, Helvetica, sans-serif; }
 <script type="text/javascript" src="../../src/gui/drawLayer.js"></script>
 <script type="text/javascript" src="../../src/gui/layerGroup.js"></script>
 <script type="text/javascript" src="../../src/gui/viewLayer.js"></script>
+<script type="text/javascript" src="../../src/gui/stage.js"></script>
 <script type="text/javascript" src="../../src/gui/style.js"></script>
 <script type="text/javascript" src="../../src/image/decoder.js"></script>
 <script type="text/javascript" src="../../src/image/dicomBufferToView.js"></script>
@@ -91,49 +92,49 @@ body { font-family: Arial, Helvetica, sans-serif; }
 // launch when page is loaded
 document.addEventListener("DOMContentLoaded", function (/*event*/)
 {
-    dwv.addDataLine("dwv0", "osirix-toutatix-100", {
+    dwv.addDataLine(0, "osirix-toutatix-100", {
         'origin': 'Osirix',
         'path': 'TOUTATIX/Cardiac 1CTA_CORONARY_ARTERIES_TESTBOLUS (Adult)/Heart w-o 1.5  B25f  55% /IM-0001-0100.dcm',
         't-syntax': '1.2.840.10008.1.2.1',
         'modality': 'CT', 'photo': 'Monochrome2',
         'bits': '16-12-11', 'pixel-vr': 'OW',
     });
-    dwv.addDataLine("dwv1", "osirix-goudurix", {
+    dwv.addDataLine(1, "osirix-goudurix", {
         'origin': 'Osirix',
         'path': 'GOUDURIX/Specials 1_CORONARY_CTA_COMBI_SMH/70 % 1.0  B30f/IM-0001-0100.dcm',
         't-syntax': '1.2.840.10008.1.2',
         'modality': 'CT', 'photo': 'Monochrome2',
         'bits': '16-12-11', 'pixel-vr': 'OX',
     });
-    dwv.addDataLine("dwv2", "dicompyler-ct.0", {
+    dwv.addDataLine(2, "dicompyler-ct.0", {
         'origin': 'dicompyler',
         'path': 'dicompyler/ct/ct.0.dcm',
         't-syntax': '1.2.840.10008.1.2',
         'modality': 'CT', 'photo': 'Monochrome2',
         'bits': '16-16-15', 'pixel-vr': 'OX',
     });
-    dwv.addDataLine("dwv3", "gdcm-CR-MONO1-10-chest", {
+    dwv.addDataLine(3, "gdcm-CR-MONO1-10-chest", {
         'origin': 'GDCM (+ DCIM prefix)',
         'path': 'CR-MONO1-10-chest.dcm',
         't-syntax': '1.2.840.10008.1.2.1',
         'modality': 'CR', 'photo': 'Monochrome1',
         'bits': '16-10-9', 'pixel-vr': 'OW',
     });
-    dwv.addDataLine("dwv4", "gdcm-CT-MONO2-8-abdo", {
+    dwv.addDataLine(4, "gdcm-CT-MONO2-8-abdo", {
         'origin': 'GDCM',
         'path': 'CT-MONO2-8-abdo.dcm',
         't-syntax': '1.2.840.10008.1.2',
         'modality': 'CT', 'photo': 'Monochrome2',
         'bits': '8-8-7', 'pixel-vr': 'OX',
     });
-    dwv.addDataLine("dwv5", "gdcm-US-RGB-8-epicard", {
+    dwv.addDataLine(5, "gdcm-US-RGB-8-epicard", {
         'origin': 'GDCM',
         'path': 'US-RGB-8-epicard.dcm',
         't-syntax': '1.2.840.10008.1.2.2',
         'modality': 'US', 'photo': 'RGB (planar=1)',
         'bits': '8-8-7', 'pixel-vr': 'OB',
     });
-    dwv.addDataLine("dwv6", "gdcm-US-RGB-8-esopecho", {
+    dwv.addDataLine(6, "gdcm-US-RGB-8-esopecho", {
         'origin': 'GDCM',
         'path': 'US-RGB-8-esopecho.dcm',
         't-syntax': '1.2.840.10008.1.2.1',

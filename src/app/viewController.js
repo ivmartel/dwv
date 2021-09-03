@@ -80,6 +80,15 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
+   * Get the current scroll position.
+   *
+   * @returns {object} The position.
+   */
+  this.getCurrentScrollPosition = function () {
+    return view.getCurrentPosition().get(view.getScrollIndex());
+  };
+
+  /**
    * Get the current spacing.
    *
    * @returns {Array} The 2D spacing.
@@ -174,14 +183,16 @@ dwv.ctrl.ViewController = function (view) {
    * @returns {boolean} False if not in bounds.
    */
   this.setCurrentPosition2D = function (i, j) {
-    // abs? otherwise negative position...
-    var orientation = view.getOrientation().getAbs();
     // keep third direction
-    var dirMax2 = orientation.getColAbsMax(2);
-    var k = view.getCurrentPosition().get(dirMax2.index);
+    var k = this.getCurrentScrollPosition();
     var posPlane = new dwv.math.Index([i, j, k]);
-    // pos3D = orientation * posPlane
-    var pos3D = orientation.multiplyIndex3D(posPlane);
+    var pos3D = posPlane;
+    var orientation = view.getOrientation();
+    if (typeof orientation !== 'undefined') {
+      // abs? otherwise negative position...
+      // pos3D = orientation * posPlane
+      pos3D = orientation.getAbs().multiplyIndex3D(posPlane);
+    }
     return view.setCurrentPosition(pos3D);
   };
 

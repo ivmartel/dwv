@@ -17,14 +17,79 @@ var _app = null;
  * Setup simple dwv app.
  */
 dwv.test.viewerSetup = function () {
+
+  /**
+   * Append a layer div in the root 'dwv' one.
+   *
+   * @param {string} id The id of the layer.
+   */
+  function addLayer(id) {
+    var layer = document.createElement('div');
+    layer.id = id;
+    layer.className = 'layerGroup';
+    var root = document.getElementById('dwv');
+    root.appendChild(layer);
+  }
+
+  // stage options
+  var dataViewConfigs;
+  var nSimultaneousData = 1;
   var viewOnFirstLoadItem = false;
-  // config
+
+  var mode = 0; // simplest, multi, mpr
+  if (mode === 0) {
+    // simplest
+    dataViewConfigs = {0: [{divId: 'layerGroup0'}]};
+  } else if (mode === 1) {
+    // multiple data, multiple layer group
+    nSimultaneousData = 2;
+    addLayer('layerGroup1');
+    dataViewConfigs = {
+      0: [{divId: 'layerGroup0'}],
+      1: [{divId: 'layerGroup1'}]
+    };
+  } else if (mode === 2) {
+    // single data, multiple layer groups -> MPR
+    viewOnFirstLoadItem = false;
+    addLayer('layerGroup1');
+    addLayer('layerGroup2');
+    dataViewConfigs = {
+      0: [
+        {
+          divId: 'layerGroup0',
+          orientation: 'axial'
+        },
+        {
+          divId: 'layerGroup1',
+          orientation: 'coronal'
+        },
+        {
+          divId: 'layerGroup2',
+          orientation: 'sagittal'
+        }
+      ]
+    };
+  }
+
+  // layer group binders
+  var binders = [
+    new dwv.gui.WindowLevelBinder(),
+    new dwv.gui.PositionBinder(),
+    new dwv.gui.ZoomBinder(),
+    new dwv.gui.OffsetBinder(),
+    new dwv.gui.OpacityBinder()
+  ];
+
+  // app config
   var config = {
     viewOnFirstLoadItem: viewOnFirstLoadItem,
-    containerDivId: 'dwv',
+    nSimultaneousData: nSimultaneousData,
+    dataViewConfigs: dataViewConfigs,
+    binders: binders,
     tools: {
       Scroll: {},
-      WindowLevel: {}
+      WindowLevel: {},
+      ZoomAndPan: {}
     }
   };
   // app
@@ -40,7 +105,7 @@ dwv.test.viewerSetup = function () {
     console.time('load-data');
     isFirstRender = true;
   });
-  _app.addEventListener('loadprogress', function () {
+  _app.addEventListener('loadprogress', function (event) {
     if (typeof event.lengthComputable !== 'undefined' &&
       event.lengthComputable) {
       var percent = Math.ceil((event.loaded / event.total) * 100);
@@ -56,11 +121,13 @@ dwv.test.viewerSetup = function () {
     console.timeEnd('load-data');
     console.log(_app.getMetaData());
   });
-  _app.addEventListener('renderstart', function () {
-    console.time('render-data');
-  });
+  // _app.addEventListener('renderstart', function (event) {
+  //   console.time('render-data ' + event.layerid);
+  // });
+  // _app.addEventListener('renderend', function (event) {
+  //   console.timeEnd('render-data ' + event.layerid);
+  // });
   _app.addEventListener('renderend', function () {
-    console.timeEnd('render-data');
     if (isFirstRender) {
       isFirstRender = false;
       // select tool
@@ -76,6 +143,9 @@ dwv.test.viewerSetup = function () {
     } else if (event.keyCode === 87) { // w
       console.log('%c tool: windowlevel', 'color: teal;');
       _app.setTool('WindowLevel');
+    } else if (event.keyCode === 90) { // z
+      console.log('%c tool: zoomandpan', 'color: teal;');
+      _app.setTool('ZoomAndPan');
     }
   });
 
@@ -90,14 +160,20 @@ dwv.test.onDOMContentLoadedViewer = function () {
   // setup
   dwv.test.viewerSetup();
 
+  var resetButton = document.getElementById('reset');
+  resetButton.addEventListener('click', function () {
+    _app.resetLayout();
+  });
+
   // bind app to input files
-  const fileinput = document.getElementById('fileinput');
+  var fileinput = document.getElementById('fileinput');
   fileinput.addEventListener('change', function (event) {
     console.log('%c ----------------', 'color: teal;');
     console.log(event.target.files);
     _app.loadFiles(event.target.files);
   });
 
+  // alpha range
   var alpharange = document.getElementById('alpharange');
   var alphanumber = document.getElementById('alphanumber');
   alpharange.oninput = function () {

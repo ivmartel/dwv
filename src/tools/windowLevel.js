@@ -34,11 +34,6 @@ dwv.tool.WindowLevel = function (app) {
     // store initial position
     self.x0 = event._x;
     self.y0 = event._y;
-    // update view controller
-    var layerGroup = app.getLayerGroup();
-    var viewController =
-      layerGroup.getActiveViewLayer().getViewController();
-    viewController.setCurrentPosition2D(event._x, event._y);
   };
 
   /**
@@ -52,7 +47,8 @@ dwv.tool.WindowLevel = function (app) {
       return;
     }
 
-    var layerGroup = app.getLayerGroup();
+    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
 
@@ -136,7 +132,8 @@ dwv.tool.WindowLevel = function (app) {
    * @param {object} event The double click event.
    */
   this.dblclick = function (event) {
-    var layerGroup = app.getLayerGroup();
+    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
 

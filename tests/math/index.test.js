@@ -107,5 +107,23 @@ QUnit.test('Test Index stringId.', function (assert) {
   },
   new Error('Minimum dim cannot be equal or greater than length.'),
   'toStringId error');
+});
 
+/**
+ * Tests for {@link dwv.math.Index} to and from string conversion.
+ *
+ * @function module:tests/math~Index
+ */
+QUnit.test('Test Index string.', function (assert) {
+  var i00str = '(0,0,0)';
+  var theo00 = new dwv.math.Index([0, 0, 0]);
+  assert.equal(theo00.toString(), i00str, 'toString #00');
+  assert.ok(dwv.math.getFromString(i00str).equals(theo00),
+    'getFromString #00');
+
+  var i01str = '(1,2,3)';
+  var theo01 = new dwv.math.Index([1, 2, 3]);
+  assert.equal(theo01.toString(), i01str, 'toString #01');
+  assert.ok(dwv.math.getFromString(i01str).equals(theo01),
+    'getFromString #01');
 });

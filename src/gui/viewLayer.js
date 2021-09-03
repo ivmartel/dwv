@@ -136,6 +136,15 @@ dwv.gui.ViewLayer = function (containerDiv) {
   };
 
   /**
+   * Get the id of the layer.
+   *
+   * @returns {string} The string id.
+   */
+  this.getId = function () {
+    return containerDiv.id;
+  };
+
+  /**
    * Handle an image change event.
    *
    * @param {object} event The event.
@@ -175,6 +184,19 @@ dwv.gui.ViewLayer = function (containerDiv) {
    */
   this.setOpacity = function (alpha) {
     opacity = Math.min(Math.max(alpha, 0), 1);
+
+    /**
+     * Opacity change event.
+     *
+     * @event dwv.App#opacitychange
+     * @type {object}
+     * @property {string} type The event type.
+     */
+    var event = {
+      type: 'opacitychange',
+      value: [opacity]
+    };
+    fireEvent(event);
   };
 
   /**
@@ -250,7 +272,10 @@ dwv.gui.ViewLayer = function (containerDiv) {
      * @type {object}
      * @property {string} type The event type.
      */
-    var event = {type: 'renderstart'};
+    var event = {
+      type: 'renderstart',
+      layerid: this.getId()
+    };
     fireEvent(event);
 
     // update data if needed
@@ -297,7 +322,10 @@ dwv.gui.ViewLayer = function (containerDiv) {
      * @type {object}
      * @property {string} type The event type.
      */
-    event = {type: 'renderend'};
+    event = {
+      type: 'renderend',
+      layerid: this.getId()
+    };
     fireEvent(event);
   };
 
@@ -320,8 +348,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
     view.setOrientation(viewOrientation);
 
     // local listeners
-    view.addEventListener('wlwidthchange', onWLChange);
-    view.addEventListener('wlcenterchange', onWLChange);
+    view.addEventListener('wlchange', onWLChange);
     view.addEventListener('colourchange', onColourChange);
     view.addEventListener('positionchange', onPositionChange);
 
@@ -329,7 +356,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
     viewController = new dwv.ctrl.ViewController(view);
 
     // get sizes
-    var size = image.getGeometry().getSize(viewOrientation.getAbs());
+    var size = image.getGeometry().getSize(viewOrientation);
     layerSize = size.get2D();
 
     // create canvas
@@ -428,6 +455,9 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @param {boolean} flag True to propagate.
    */
   this.propagateViewEvents = function (flag) {
+    if (!view) {
+      return;
+    }
     // view events
     for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
       if (flag) {
@@ -485,10 +515,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
   function onPositionChange(event) {
     if (typeof event.skipGenerate === 'undefined' ||
       event.skipGenerate === false) {
-      var viewOrientation = view.getOrientation();
-      if (event.diffDims.includes(
-        viewOrientation.getThirdColMajorDirection()) ||
-        event.diffDims.includes(3)) {
+      if (event.diffDims.includes(view.getScrollIndex())) {
         needsDataUpdate = true;
         self.draw();
       }

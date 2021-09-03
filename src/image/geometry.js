@@ -81,7 +81,11 @@ dwv.image.Size.prototype.moreThanOne = function (dimension) {
  * @returns {boolean} True if scrollable.
  */
 dwv.image.Size.prototype.canScroll = function (viewOrientation) {
-  return this.moreThanOne(viewOrientation.getThirdColMajorDirection());
+  var dimension = 2;
+  if (typeof viewOrientation !== 'undefined') {
+    dimension = viewOrientation.getThirdColMajorDirection();
+  }
+  return this.moreThanOne(dimension);
 };
 
 /**
@@ -282,15 +286,14 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
   this.getSize = function (viewOrientation) {
     var res = size;
     if (viewOrientation && typeof viewOrientation !== 'undefined') {
-      var vec = new dwv.math.Vector3D(
-        size.get(0),
-        size.get(1),
-        size.get(2)
-      );
-      // size = orientation * sizeOriented
-      // -> inv(orientation) * size = sizeOriented
-      var vec2 = viewOrientation.getInverse().getAbs().multiplyVector3D(vec);
-      res = new dwv.image.Size([vec2.getX(), vec2.getY(), vec2.getZ()]);
+      var values = dwv.image.getOrientedArray3D(
+        [
+          size.get(0),
+          size.get(1),
+          size.get(2)
+        ],
+        viewOrientation);
+      res = new dwv.image.Size(values);
     }
     return res;
   };
@@ -311,6 +314,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
     // applied on the patient position, reorders indices
     // so that Z is the slice direction
     var orientation2 = orientation.getInverse().asOneAndZeros();
+    var deltas = [];
     for (var i = 0; i < origins.length - 1; ++i) {
       var origin1 = orientation2.multiplyVector3D(origins[i]);
       var origin2 = orientation2.multiplyVector3D(origins[i + 1]);
@@ -323,9 +327,18 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
         spacing = diff;
       } else {
         if (!dwv.math.isSimilar(spacing, diff, dwv.math.BIG_EPSILON)) {
-          dwv.logger.warn('Varying slice spacing: ' + (spacing - diff));
+          deltas.push(Math.abs(spacing - diff));
         }
       }
+    }
+    // warn if non constant
+    if (deltas.length !== 0) {
+      var sumReducer = function (sum, value) {
+        return sum + value;
+      };
+      var mean = deltas.reduce(sumReducer) / deltas.length;
+      dwv.logger.warn('Varying slice spacing, mean delta: ' +
+        mean.toFixed(3) + ' (' + deltas.length + ' case(s))');
     }
     return spacing;
   };
@@ -348,15 +361,14 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
     }
     var res = spacing;
     if (viewOrientation && typeof viewOrientation !== 'undefined') {
-      var vec = new dwv.math.Vector3D(
-        spacing.getColumnSpacing(),
-        spacing.getRowSpacing(),
-        spacing.getSliceSpacing()
-      );
-      // spacing = orientation * spacingOriented
-      // -> inv(orientation) * spacing = spacingOriented
-      var vec2 = viewOrientation.getInverse().getAbs().multiplyVector3D(vec);
-      res = new dwv.image.Spacing(vec2.getX(), vec2.getY(), vec2.getZ());
+      var values = dwv.image.getOrientedArray3D(
+        [
+          spacing.getColumnSpacing(),
+          spacing.getRowSpacing(),
+          spacing.getSliceSpacing()
+        ],
+        viewOrientation);
+      res = new dwv.image.Spacing(values[0], values[1], values[2]);
     }
     return res;
   };
@@ -390,11 +402,21 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
         closestSliceIndex = i;
       }
     }
-    // we have the closest point, are we before or after
+    var closestOrigin = origins[closestSliceIndex];
+    // direction between the input point and the closest origin
+    var pointDir = point.minus(closestOrigin);
+    // use third orientation matrix column as base plane vector
     var normal = new dwv.math.Vector3D(
       orientation.get(2, 0), orientation.get(2, 1), orientation.get(2, 2));
-    var dotProd = normal.dotProduct(point.minus(origins[closestSliceIndex]));
-    var sliceIndex = (dotProd > 0) ? closestSliceIndex + 1 : closestSliceIndex;
+    // a.dot(b) = ||a|| * ||b|| * cos(theta)
+    // (https://en.wikipedia.org/wiki/Dot_product#Geometric_definition)
+    // -> the sign of the dot product depends on the cosinus of
+    //    the angle between the vectors
+    //   -> >0 => vectors are codirectional
+    //   -> <0 => vectors are oposite
+    var dotProd = normal.dotProduct(pointDir);
+    // oposite vectors get higher index
+    var sliceIndex = (dotProd < 0) ? closestSliceIndex + 1 : closestSliceIndex;
     return sliceIndex;
   };
 
@@ -514,4 +536,30 @@ dwv.image.Geometry.prototype.worldToIndex = function (point) {
     point.getX() / spacing.getColumnSpacing() - origin.getX(),
     point.getY() / spacing.getRowSpacing() - origin.getY(),
     point.getZ() / spacing.getSliceSpacing() - origin.getZ());
+};
+
+/**
+ * Get the oriented values of an input 3D array.
+ *
+ * @param {Array} array3D The 3D array.
+ * @param {object} orientation The orientation 3D matrix.
+ * @returns {Array} The values reordered according to the orientation.
+ */
+dwv.image.getOrientedArray3D = function (array3D, orientation) {
+  // values = orientation * orientedValues
+  // -> inv(orientation) * values = orientedValues
+  return orientation.getInverse().getAbs().multiplyArray3D(array3D);
+};
+
+/**
+ * Get the raw values of an oriented input 3D array.
+ *
+ * @param {Array} array3D The 3D array.
+ * @param {object} orientation The orientation 3D matrix.
+ * @returns {Array} The values reordered to compensate the orientation.
+ */
+dwv.image.getDeOrientedArray3D = function (array3D, orientation) {
+  // values = orientation * orientedValues
+  // -> inv(orientation) * values = orientedValues
+  return orientation.getAbs().multiplyArray3D(array3D);
 };

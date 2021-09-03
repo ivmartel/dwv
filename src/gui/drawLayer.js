@@ -78,6 +78,15 @@ dwv.gui.DrawLayer = function (containerDiv) {
     return drawController;
   };
 
+  /**
+   * Get the id of the layer.
+   *
+   * @returns {string} The string id.
+   */
+  this.getId = function () {
+    return containerDiv.id;
+  };
+
   // common layer methods [start] ---------------
 
   /**

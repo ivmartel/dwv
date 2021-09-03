@@ -324,25 +324,20 @@ dwv.image.getSliceIterator = function (
       var dirMax0 = viewOrientation.getColAbsMax(0);
       var dirMax2 = viewOrientation.getColAbsMax(2);
 
-      // first pixel: top left -> inverts left/right, top/bottom...
-      // => default is reverse=true
-      var reverse1 = true;
-      var reverse2 = true;
+      // default reverse
+      var reverse1 = false;
+      var reverse2 = false;
 
       var end = null;
       if (dirMax2.index === 2) {
         // axial: xyz or yxz
         end = start + sliceSize - 1;
         if (dirMax0.index === 0) {
-          // xyz (r1:0, r2:0)
-          reverse1 = !reverse1;
-          reverse2 = !reverse2;
+          // xyz
           range = dwv.image.range(dataAccessor,
             start, end, 1, ncols, ncols, reverse1, reverse2);
         } else {
-          // yxz  (r1:1, r2:0, guessed... no data...)
-          reverse1 = true;
-          reverse2 = !reverse2;
+          // yxz  (guessed... no data...)
           range = dwv.image.range(dataAccessor,
             start, end, ncols, nrows, 1, reverse1, reverse2);
         }
@@ -351,12 +346,11 @@ dwv.image.getSliceIterator = function (
         end = start + (nslices - 1) * sliceSize +
           ncols * (nrows - 1);
         if (dirMax0.index === 1) {
-          // yzx (r1:1, r2:1)
+          // yzx
           range = dwv.image.range(dataAccessor,
             start, end, ncols, nrows, sliceSize, reverse1, reverse2);
         } else {
-          // zyx (r1:0, r2:1)
-          reverse1 = !reverse1;
+          // zyx
           range = dwv.image.range(dataAccessor,
             start, end, sliceSize, nslices, ncols, reverse1, reverse2);
         }
@@ -364,12 +358,11 @@ dwv.image.getSliceIterator = function (
         // coronal: xzy or zxy
         end = start + (nslices - 1) * sliceSize + ncols - 1;
         if (dirMax0.index === 0) {
-          // xzy (r1:1, r2:1)
+          // xzy
           range = dwv.image.range(dataAccessor,
             start, end, 1, ncols, sliceSize, reverse1, reverse2);
         } else {
-          // zxy (r0:1, r2:1)
-          reverse1 = !reverse1;
+          // zxy
           range = dwv.image.range(dataAccessor,
             start, end, sliceSize, nslices, 1, reverse1, reverse2);
         }

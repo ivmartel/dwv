@@ -127,7 +127,8 @@ dwv.tool.Livewire = function (app) {
       clearParentPoints();
       shapeGroup = null;
       // update zoom scale
-      var layerGroup = app.getLayerGroup();
+      var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
       var drawLayer = layerGroup.getActiveDrawLayer();
       self.style.setZoomScale(
         drawLayer.getKonvaLayer().getAbsoluteScale());
@@ -222,7 +223,8 @@ dwv.tool.Livewire = function (app) {
     shapeGroup = factory.create(currentPath.pointArray, self.style);
     shapeGroup.id(dwv.math.guid());
 
-    var layerGroup = app.getLayerGroup();
+    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var drawLayer = layerGroup.getActiveDrawLayer();
     var drawController = drawLayer.getDrawController();
 
@@ -318,7 +320,7 @@ dwv.tool.Livewire = function (app) {
   this.activate = function (bool) {
     // start scissors if displayed
     if (bool) {
-      var layerGroup = app.getLayerGroup();
+      var layerGroup = app.getActiveLayerGroup();
       var viewLayer = layerGroup.getActiveViewLayer();
 
       //scissors = new dwv.math.Scissors();

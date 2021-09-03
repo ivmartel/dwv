@@ -11,8 +11,21 @@ dwv.ctrl = dwv.ctrl || {};
 dwv.ctrl.LoadController = function (defaultCharacterSet) {
   // closure to self
   var self = this;
-  // current loader
-  var currentLoader = null;
+  // current loaders
+  var currentLoaders = {};
+
+  // load counter
+  var counter = -1;
+
+  /**
+   * Get the next load id.
+   *
+   * @returns {number} The next id.
+   */
+  function getNextLoadId() {
+    ++counter;
+    return counter;
+  }
 
   /**
    * Load a list of files. Can be image files or a state file.
@@ -56,19 +69,18 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
   this.loadImageObject = function (data) {
     // create IO
     var memoryIO = new dwv.io.MemoryLoader();
-    // create options
-    var options = {};
     // load data
-    loadImageData(data, memoryIO, options);
+    loadData(data, memoryIO, 'image');
   };
 
   /**
-   * Abort the current load.
+   * Abort the current loaders.
    */
   this.abort = function () {
-    if (currentLoader) {
-      currentLoader.abort();
-      currentLoader = null;
+    var keys = Object.keys(currentLoaders);
+    for (var i = 0; i < keys.length; ++i) {
+      currentLoaders[i].loader.abort();
+      delete currentLoaders[i];
     }
   };
 
@@ -83,8 +95,9 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
   function loadImageFiles(files) {
     // create IO
     var fileIO = new dwv.io.FilesLoader();
+    fileIO.setDefaultCharacterSet(defaultCharacterSet);
     // load data
-    loadImageData(files, fileIO);
+    loadData(files, fileIO, 'image');
   }
 
   /**
@@ -99,8 +112,9 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
   function loadImageUrls(urls, options) {
     // create IO
     var urlIO = new dwv.io.UrlsLoader();
+    urlIO.setDefaultCharacterSet(defaultCharacterSet);
     // load data
-    loadImageData(urls, urlIO, options);
+    loadData(urls, urlIO, 'image', options);
   }
 
   /**
@@ -113,7 +127,7 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
     // create IO
     var fileIO = new dwv.io.FilesLoader();
     // load data
-    loadStateData([file], fileIO);
+    loadData([file], fileIO, 'state');
   }
 
   /**
@@ -129,62 +143,69 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
     // create IO
     var urlIO = new dwv.io.UrlsLoader();
     // load data
-    loadStateData([url], urlIO, options);
+    loadData([url], urlIO, 'state', options);
   }
 
   /**
-   * Load a list of image data.
+   * Load a list of data.
    *
    * @param {Array} data Array of data to load.
    * @param {object} loader The data loader.
+   * @param {string} loadType The data load type: 'image' or 'state'.
    * @param {object} options Options passed to the final loader.
    * @private
    */
-  function loadImageData(data, loader, options) {
-    // set IO
-    var loadtype = 'image';
-    loader.setDefaultCharacterSet(defaultCharacterSet);
+  function loadData(data, loader, loadType, options) {
+    var loadId = getNextLoadId();
+    var eventInfo = {
+      loadtype: loadType,
+      loadid: loadId
+    };
+    // set callbacks
     loader.onloadstart = function (event) {
       // store loader to allow abort
-      currentLoader = loader;
+      currentLoaders[loadId] = {
+        loader: loader,
+        isFirstItem: true
+      };
       // callback
-      augmentCallbackEvent(self.onloadstart, loadtype)(event);
+      augmentCallbackEvent(self.onloadstart, eventInfo)(event);
     };
-    loader.onprogress = augmentCallbackEvent(self.onprogress, loadtype);
-    loader.onloaditem = augmentCallbackEvent(self.onloaditem, loadtype);
-    loader.onload = augmentCallbackEvent(self.onload, loadtype);
+    loader.onprogress = augmentCallbackEvent(self.onprogress, eventInfo);
+    loader.onloaditem = function (event) {
+      var isFirstItem = currentLoaders[loadId].isFirstItem;
+      var eventInfoItem = {
+        loadtype: loadType,
+        loadid: loadId,
+        isfirstitem: isFirstItem
+      };
+      augmentCallbackEvent(self.onloaditem, eventInfoItem)(event);
+      if (isFirstItem) {
+        currentLoaders[loadId].isFirstItem = false;
+      }
+    };
+    loader.onload = augmentCallbackEvent(self.onload, eventInfo);
     loader.onloadend = function (event) {
       // reset current loader
-      currentLoader = null;
+      delete currentLoaders[loadId];
       // callback
-      augmentCallbackEvent(self.onloadend, loadtype)(event);
+      augmentCallbackEvent(self.onloadend, eventInfo)(event);
     };
-    loader.onerror = augmentCallbackEvent(self.onerror, loadtype);
-    loader.onabort = augmentCallbackEvent(self.onabort, loadtype);
+    loader.onerror = augmentCallbackEvent(self.onerror, eventInfo);
+    loader.onabort = augmentCallbackEvent(self.onabort, eventInfo);
     // launch load
-    loader.load(data, options);
-  }
-
-  /**
-   * Load a State data.
-   *
-   * @param {Array} data Array of data to load.
-   * @param {object} loader The data loader.
-   * @param {object} options Options passed to the final loader.
-   * @private
-   */
-  function loadStateData(data, loader, options) {
-    var loadtype = 'state';
-    // set callbacks
-    loader.onloadstart = augmentCallbackEvent(self.onloadstart, loadtype);
-    loader.onprogress = augmentCallbackEvent(self.onprogress, loadtype);
-    loader.onloaditem = augmentCallbackEvent(self.onloaditem, loadtype);
-    loader.onload = augmentCallbackEvent(self.onload, loadtype);
-    loader.onloadend = augmentCallbackEvent(self.onloadend, loadtype);
-    loader.onerror = augmentCallbackEvent(self.onerror, loadtype);
-    loader.onabort = augmentCallbackEvent(self.onabort, loadtype);
-    // launch load
-    loader.load(data, options);
+    try {
+      loader.load(data, options);
+    } catch (error) {
+      self.onerror({
+        error: error,
+        loadId: loadId
+      });
+      self.onloadend({
+        loadId: loadId
+      });
+      return;
+    }
   }
 
   /**
@@ -192,12 +213,16 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    *  passed to a callback.
    *
    * @param {object} callback The callback to update.
-   * @param {string} loadtype The loadtype property to add to the event.
+   * @param {object} info Info object to append to the event.
    * @returns {object} A function representing the modified callback.
    */
-  function augmentCallbackEvent(callback, loadtype) {
+  function augmentCallbackEvent(callback, info) {
     return function (event) {
-      event.loadtype = loadtype;
+      var keys = Object.keys(info);
+      for (var i = 0; i < keys.length; ++i) {
+        var key = keys[i];
+        event[key] = info[key];
+      }
       callback(event);
     };
   }

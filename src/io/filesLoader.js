@@ -270,7 +270,7 @@ dwv.io.FilesLoader = function () {
       }
     }
     if (!foundLoader) {
-      throw new Error('No loader found for file: ' + dataElement);
+      throw new Error('No loader found for file: ' + dataElement.name);
     }
 
     var getLoadHandler = function (loader, dataElement, i) {

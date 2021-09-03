@@ -23,6 +23,11 @@ progress {
   width: 50%;
   border: 1px dotted gray;
 }
+.layerGroup {
+  display:inline-block;
+  height: 250px;
+  margin: 5px;
+}
 </style>
 <!-- Third party (load) -->
 <script type="text/javascript" src="../../node_modules/jszip/dist/jszip.min.js"></script>
@@ -41,6 +46,7 @@ progress {
 <script type="text/javascript" src="../../src/gui/drawLayer.js"></script>
 <script type="text/javascript" src="../../src/gui/layerGroup.js"></script>
 <script type="text/javascript" src="../../src/gui/viewLayer.js"></script>
+<script type="text/javascript" src="../../src/gui/stage.js"></script>
 <script type="text/javascript" src="../../src/gui/style.js"></script>
 <script type="text/javascript" src="../../src/image/decoder.js"></script>
 <script type="text/javascript" src="../../src/image/dicomBufferToView.js"></script>
@@ -75,6 +81,7 @@ progress {
 <script type="text/javascript" src="../../src/tools/undo.js"></script>
 <script type="text/javascript" src="../../src/tools/scroll.js"></script>
 <script type="text/javascript" src="../../src/tools/windowLevel.js"></script>
+<script type="text/javascript" src="../../src/tools/zoomPan.js"></script>
 <script type="text/javascript" src="../../src/utils/colour.js"></script>
 <script type="text/javascript" src="../../src/utils/env.js"></script>
 <script type="text/javascript" src="../../src/utils/listen.js"></script>
@@ -104,9 +111,13 @@ document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedViewer)
 
 <!-- DWV -->
 <div id="dwv">
-  <!-- Layer Container -->
-  <div class="layerContainer"></div>
+  <!-- Layer groups -->
+  <div id="layerGroup0" class="layerGroup"></div>
 </div><!-- /dwv -->
+
+<button id="reset">Reset Layout</button>
+
+<br>
 
 <label for="alpharange">Alpha:</label>
 <input type="range" id="alpharange" min="0" max="1" value="1" step="0.1">

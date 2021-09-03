@@ -32,7 +32,8 @@ dwv.tool.Scroll = function (app) {
    */
   this.mousedown = function (event) {
     // stop viewer if playing
-    var layerGroup = app.getLayerGroup();
+    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
     if (viewController.isPlaying()) {
@@ -43,6 +44,8 @@ dwv.tool.Scroll = function (app) {
     // first position
     self.x0 = event._x;
     self.y0 = event._y;
+    // update position
+    viewController.setCurrentPosition2D(event._x, event._y);
   };
 
   /**
@@ -55,7 +58,8 @@ dwv.tool.Scroll = function (app) {
       return;
     }
 
-    var layerGroup = app.getLayerGroup();
+    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
     var size = app.getImage().getGeometry().getSize();
@@ -164,21 +168,13 @@ dwv.tool.Scroll = function (app) {
    * @param {object} event The mouse wheel event.
    */
   this.wheel = function (event) {
+    var up = false;
     if (event.deltaY < 0) {
-      mouseScroll(true);
-    } else {
-      mouseScroll(false);
+      up = true;
     }
-  };
 
-  /**
-   * Mouse scroll action.
-   *
-   * @param {boolean} up True to increment, false to decrement.
-   * @private
-   */
-  function mouseScroll(up) {
-    var layerGroup = app.getLayerGroup();
+    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
     if (up) {
@@ -186,7 +182,7 @@ dwv.tool.Scroll = function (app) {
     } else {
       viewController.decrementScrollIndex();
     }
-  }
+  };
 
   /**
    * Handle key down event.
@@ -200,10 +196,11 @@ dwv.tool.Scroll = function (app) {
   /**
    * Handle double click.
    *
-   * @param {object} _event The key down event.
+   * @param {object} event The key down event.
    */
-  this.dblclick = function (_event) {
-    var layerGroup = app.getLayerGroup();
+  this.dblclick = function (event) {
+    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
     viewController.play();
