@@ -60,6 +60,7 @@ dwv.math.BucketQueue.prototype.pop = function () {
   return ret;
 };
 
+// TODO: needs at least two items...
 dwv.math.BucketQueue.prototype.remove = function (item) {
   // Tries to remove item from queue. Returns true on success, false otherwise
   if (!item) {
