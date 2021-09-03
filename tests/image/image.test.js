@@ -240,7 +240,6 @@ QUnit.test('Test Image append slice.', function (assert) {
   sliceOrigins0[0] = new dwv.math.Point3D(0, 0, 2);
   sliceOrigins0[1] = new dwv.math.Point3D(0, 0, 1);
   sliceOrigins0[2] = new dwv.math.Point3D(0, 0, 0);
-  console.log(imgGeometry0.getOrigins()[0].toString());
   assert.ok(
     compareArrayOfVectors(imgGeometry0.getOrigins(), sliceOrigins0),
     'Slice positions (append before)');

@@ -11,7 +11,6 @@ dwv.gui.WindowLevelBinder = function () {
   };
   this.getCallback = function (layerGroup) {
     return function (event) {
-      //console.log('WindowLevelBinder', event);
       var vc = layerGroup.getActiveViewLayer().getViewController();
       vc.setWindowLevel(event.value[0], event.value[1]);
     };
