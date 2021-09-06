@@ -108,7 +108,8 @@ dwv.test.runIterator = function (iter) {
 /**
  * Check iter.
  *
- * @param {function} getIter Function to get the iter at a given position.
+ * @param {object} assert The qunit assert.
+ * @param {Function} getIter Function to get the iter at a given position.
  * @param {Array} theoValues Theoretical values.
  * @param {string} name String to identify test.
  */
@@ -183,7 +184,7 @@ QUnit.test('Test range iterator.', function (assert) {
    *
    * @param {boolean} reverse1 Start-end flag.
    * @param {boolean} reverse2 Count start-end flag.
-   * @returns {function} A get iterator function.
+   * @returns {Function} A get iterator function.
    */
   var getAxIter = function (reverse1, reverse2) {
     return function (index) {
@@ -210,7 +211,7 @@ QUnit.test('Test range iterator.', function (assert) {
    *
    * @param {boolean} reverse1 Start-end flag.
    * @param {boolean} reverse2 Count start-end flag.
-   * @returns {function} A get iterator function.
+   * @returns {Function} A get iterator function.
    */
   var getCoroIter = function (reverse1, reverse2) {
     return function (index) {
@@ -237,7 +238,7 @@ QUnit.test('Test range iterator.', function (assert) {
    *
    * @param {boolean} reverse1 Start-end flag.
    * @param {boolean} reverse2 Count start-end flag.
-   * @returns {function} A get iterator function.
+   * @returns {Function} A get iterator function.
    */
   var getSagIter = function (reverse1, reverse2) {
     return function (index) {
