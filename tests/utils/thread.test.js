@@ -38,8 +38,7 @@ QUnit.test('Test ThreadPool.', function (assert) {
   // called on work item (end of task)
   var countWorkItem = 0;
   pool.onworkitem = function (event) {
-    if (typeof event.index !== 'undefined' &&
-            event.data[0] === 'papageno papagena') {
+    if (event.data[0] === 'papageno papagena') {
       ++countWorkItem;
     }
   };
@@ -48,7 +47,9 @@ QUnit.test('Test ThreadPool.', function (assert) {
   for (var i = 0; i < nTestWorkers; ++i) {
     // create worker task
     var workerTask = new dwv.utils.WorkerTask(
-      '/tests/utils/worker.js', {input: 'papageno'}, i);
+      '/tests/utils/worker.js',
+      {input: 'papageno'},
+      {itemNumber: i, numberOfItems: nTestWorkers});
     // add it the queue and run it
     pool.addWorkerTask(workerTask);
   }
