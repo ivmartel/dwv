@@ -34,7 +34,7 @@ dwv.test.viewerSetup = function () {
   // stage options
   var dataViewConfigs;
   var nSimultaneousData = 1;
-  var viewOnFirstLoadItem = false;
+  var viewOnFirstLoadItem = true;
 
   var mode = 0; // simplest, multi, mpr
   if (mode === 0) {
