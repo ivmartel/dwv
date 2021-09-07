@@ -459,10 +459,17 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
       y: layerSize.y * spacing.getRowSpacing()
     };
     // best fit
-    return Math.min(
-      (containerSize.x / realSize.x),
-      (containerSize.y / realSize.y)
-    );
+    var scaleX = containerSize.x / realSize.x;
+    var scaleY = containerSize.y / realSize.y;
+    // return minimum and not zero
+    var scales = [];
+    if (scaleX > 0) {
+      scales.push(scaleX);
+    }
+    if (scaleY > 0) {
+      scales.push(scaleY);
+    }
+    return Math.min.apply(null, scales);
   };
 
   /**
