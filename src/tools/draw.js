@@ -157,14 +157,6 @@ dwv.tool.Draw = function (app) {
   var listeners = {};
 
   /**
-   * The associated Konva layer.
-   *
-   * @private
-   * @type {object}
-   */
-  var konvaLayer = null;
-
-  /**
    * Handle mouse down event.
    *
    * @param {object} event The mouse down event.
@@ -381,11 +373,13 @@ dwv.tool.Draw = function (app) {
       event.context = 'dwv.tool.Draw';
       app.onKeydown(event);
     }
+    var konvaLayer;
 
     // press delete key
     if (event.keyCode === 46 && shapeEditor.isActive()) {
       // get shape
       var shapeGroup = shapeEditor.getShape().getParent();
+      konvaLayer = shapeGroup.getLayer();
       var shapeDisplayName = dwv.tool.GetShapeDisplayName(
         shapeGroup.getChildren(dwv.draw.isNodeNameShape)[0]);
       // delete command
@@ -398,11 +392,11 @@ dwv.tool.Draw = function (app) {
     }
 
     // escape key: exit shape creation
-    if (event.keyCode === 27) {
+    if (event.keyCode === 27 && tmpShapeGroup !== null) {
+      konvaLayer = tmpShapeGroup.getLayer();
       // reset temporary shape group
-      if (tmpShapeGroup) {
-        tmpShapeGroup.destroy();
-      }
+      tmpShapeGroup.destroy();
+      tmpShapeGroup = null;
       // reset flag and points
       started = false;
       points = [];
@@ -418,10 +412,15 @@ dwv.tool.Draw = function (app) {
    * @param {object} layerGroup The origin layer group.
    */
   function onNewPoints(tmpPoints, layerGroup) {
+    var drawLayer = layerGroup.getActiveDrawLayer();
+    var konvaLayer = drawLayer.getKonvaLayer();
+
     // remove temporary shape draw
     if (tmpShapeGroup) {
       tmpShapeGroup.destroy();
+      tmpShapeGroup = null;
     }
+
     // create shape group
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
@@ -443,9 +442,13 @@ dwv.tool.Draw = function (app) {
    * @param {object} layerGroup The origin layer group.
    */
   function onFinalPoints(finalPoints, layerGroup) {
+    var drawLayer = layerGroup.getActiveDrawLayer();
+    var konvaLayer = drawLayer.getKonvaLayer();
+
     // reset temporary shape group
     if (tmpShapeGroup) {
       tmpShapeGroup.destroy();
+      tmpShapeGroup = null;
     }
 
     var viewController =
@@ -492,8 +495,6 @@ dwv.tool.Draw = function (app) {
     document.body.style.cursor = 'default';
     // get the current draw layer
     var layerGroup = app.getActiveLayerGroup();
-    var drawLayer = layerGroup.getActiveDrawLayer();
-    konvaLayer = drawLayer.getKonvaLayer();
     activateCurrentPositionShapes(flag, layerGroup);
     // listen to app change to update the draw layer
     if (flag) {
@@ -549,6 +550,8 @@ dwv.tool.Draw = function (app) {
       });
     }
     // draw
+    var drawLayer = layerGroup.getActiveDrawLayer();
+    var konvaLayer = drawLayer.getKonvaLayer();
     konvaLayer.draw();
   }
 
@@ -601,6 +604,9 @@ dwv.tool.Draw = function (app) {
     shapeGroup.on('mouseout', function () {
       document.body.style.cursor = 'default';
     });
+
+    var drawLayer = layerGroup.getActiveDrawLayer();
+    var konvaLayer = drawLayer.getKonvaLayer();
 
     // make it draggable
     shapeGroup.draggable(true);
