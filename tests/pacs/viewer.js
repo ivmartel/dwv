@@ -89,7 +89,8 @@ dwv.test.viewerSetup = function () {
     tools: {
       Scroll: {},
       WindowLevel: {},
-      ZoomAndPan: {}
+      ZoomAndPan: {},
+      Draw: {options: ['Rectangle'], type: 'factory'}
     }
   };
   // app
@@ -135,6 +136,11 @@ dwv.test.viewerSetup = function () {
     }
   });
 
+  _app.addEventListener('positionchange', function (event) {
+    var input = document.getElementById('position');
+    input.value = event.value[0];
+  });
+
   _app.addEventListener('keydown', function (event) {
     _app.defaultOnKeydown(event);
     if (event.keyCode === 83) { // s
@@ -146,6 +152,10 @@ dwv.test.viewerSetup = function () {
     } else if (event.keyCode === 90) { // z
       console.log('%c tool: zoomandpan', 'color: teal;');
       _app.setTool('ZoomAndPan');
+    } else if (event.keyCode === 68) { // d
+      console.log('%c tool: draw', 'color: teal;');
+      _app.setTool('Draw');
+      _app.setDrawShape('Rectangle');
     }
   });
 

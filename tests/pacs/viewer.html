@@ -26,7 +26,16 @@ progress {
 .layerGroup {
   display:inline-block;
   height: 250px;
+  width: 250px;
   margin: 5px;
+  background-color: gainsboro;
+}
+.layer {
+  position: absolute;
+  /*pointer-events: none;*/
+}
+.line {
+  padding: 5px;
 }
 </style>
 <!-- Third party (load) -->
@@ -92,7 +101,17 @@ progress {
 <script type="text/javascript" src="../../src/utils/string.js"></script>
 <script type="text/javascript" src="../../src/utils/thread.js"></script>
 <script type="text/javascript" src="../../src/utils/uri.js"></script>
-
+<!-- draw -->
+<script type="text/javascript" src="../../node_modules/konva/konva.min.js"></script>
+<script type="text/javascript" src="../../node_modules/i18next/i18next.min.js"></script>
+<script type="text/javascript" src="../../src/app/drawController.js"></script>
+<script type="text/javascript" src="../../src/tools/draw.js"></script>
+<script type="text/javascript" src="../../src/tools/drawCommands.js"></script>
+<script type="text/javascript" src="../../src/tools/editor.js"></script>
+<script type="text/javascript" src="../../src/tools/rectangle.js"></script>
+<script type="text/javascript" src="../../src/math/rectangle.js"></script>
+<script type="text/javascript" src="../../src/math/stats.js"></script>
+<script type="text/javascript" src="../../src/utils/i18n.js"></script>
 <!-- Local -->
 <script type="text/javascript" src="./viewer.js"></script>
 <script type="text/javascript">
@@ -115,13 +134,20 @@ document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedViewer)
   <div id="layerGroup0" class="layerGroup"></div>
 </div><!-- /dwv -->
 
+<div class="line">
+<label for="position">Position:</label>
+<input type="text" id="position">
+</div>
+
+<div class="line">
 <button id="reset">Reset Layout</button>
+</div>
 
-<br>
-
+<div class="line">
 <label for="alpharange">Alpha:</label>
 <input type="range" id="alpharange" min="0" max="1" value="1" step="0.1">
 <input type="number" id="alphanumber" min="0" max="1" value="1" step="0.1">
+</div>
 
 </body>
 </html>
