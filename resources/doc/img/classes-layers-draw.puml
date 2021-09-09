@@ -1,0 +1,12 @@
+@startuml
+
+class KonvaShape
+class DrawLayer
+class DrawController
+class ViewController
+
+KonvaShape ..> ViewController: Uses
+DrawController .* KonvaShape
+DrawLayer .* DrawController
+
+@enduml

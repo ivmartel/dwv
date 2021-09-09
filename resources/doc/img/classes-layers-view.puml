@@ -1,0 +1,20 @@
+@startuml
+
+class Image
+class View
+class ViewController
+class ViewLayer
+
+note right of Image
+  3D + t
+end note
+
+note right of View
+  2D
+end note
+
+View ..> Image: Uses
+ViewController .* View
+ViewLayer .* ViewController
+
+@enduml
