@@ -276,9 +276,13 @@ dwv.math.Matrix33.prototype.getThirdColMajorDirection = function () {
  * @returns {object} The identity matrix.
  */
 dwv.math.getIdentityMat33 = function () {
+  /* eslint-disable array-element-newline */
   return new dwv.math.Matrix33([
-    1, 0, 0, 0, 1, 0, 0, 0, 1
+    1, 0, 0,
+    0, 1, 0,
+    0, 0, 1
   ]);
+  /* eslint-enable array-element-newline */
 };
 
 /**
@@ -297,9 +301,13 @@ dwv.math.isIdentityMat33 = function (mat33) {
  * @returns {object} The coronal matrix.
  */
 dwv.math.getCoronalMat33 = function () {
+  /* eslint-disable array-element-newline */
   return new dwv.math.Matrix33([
-    1, 0, 0, 0, 0, 1, 0, 1, 0
+    1, 0, 0,
+    0, 0, 1,
+    0, 1, 0
   ]);
+  /* eslint-enable array-element-newline */
 };
 
 /**
@@ -308,9 +316,13 @@ dwv.math.getCoronalMat33 = function () {
  * @returns {object} The sagittal matrix.
  */
 dwv.math.getSagittalMat33 = function () {
+  /* eslint-disable array-element-newline */
   return new dwv.math.Matrix33([
-    0, 1, 0, 0, 0, 1, 1, 0, 0
+    0, 0, 1,
+    1, 0, 0,
+    0, 1, 0
   ]);
+  /* eslint-enable array-element-newline */
 };
 
 /**
