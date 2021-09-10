@@ -50,6 +50,30 @@ dwv.test.data.iterator0 = {
     [23, 24, 25, 20, 21, 22],
     [33, 34, 35, 30, 31, 32]
   ],
+  valuesAx2: [
+    [0, 3, 1, 4, 2, 5],
+    [10, 13, 11, 14, 12, 15],
+    [20, 23, 21, 24, 22, 25],
+    [30, 33, 31, 34, 32, 35]
+  ],
+  valuesAx2R1: [
+    [5, 2, 4, 1, 3, 0],
+    [15, 12, 14, 11, 13, 10],
+    [25, 22, 24, 21, 23, 20],
+    [35, 32, 34, 31, 33, 30]
+  ],
+  valuesAx2R2: [
+    [3, 0, 4, 1, 5, 2],
+    [13, 10, 14, 11, 15, 12],
+    [23, 20, 24, 21, 25, 22],
+    [33, 30, 34, 31, 35, 32]
+  ],
+  valuesAx2R1R2: [
+    [2, 5, 1, 4, 0, 3],
+    [12, 15, 11, 14, 10, 13],
+    [22, 25, 21, 24, 20, 23],
+    [32, 35, 31, 34, 30, 33]
+  ],
   valuesCo: [
     [0, 1, 2, 10, 11, 12, 20, 21, 22, 30, 31, 32],
     [3, 4, 5, 13, 14, 15, 23, 24, 25, 33, 34, 35]
@@ -65,6 +89,22 @@ dwv.test.data.iterator0 = {
   valuesCoR1R2: [
     [30, 31, 32, 20, 21, 22, 10, 11, 12, 0, 1, 2],
     [33, 34, 35, 23, 24, 25, 13, 14, 15, 3, 4, 5]
+  ],
+  valuesCo2: [
+    [0, 10, 20, 30, 1, 11, 21, 31, 2, 12, 22, 32],
+    [3, 13, 23, 33, 4, 14, 24, 34, 5, 15, 25, 35]
+  ],
+  valuesCo2R1: [
+    [32, 22, 12, 2, 31, 21, 11, 1, 30, 20, 10, 0],
+    [35, 25, 15, 5, 34, 24, 14, 4, 33, 23, 13, 3]
+  ],
+  valuesCo2R2: [
+    [30, 20, 10, 0, 31, 21, 11, 1, 32, 22, 12, 2],
+    [33, 23, 13, 3, 34, 24, 14, 4, 35, 25, 15, 5]
+  ],
+  valuesCo2R1R2: [
+    [2, 12, 22, 32, 1, 11, 21, 31, 0, 10, 20, 30],
+    [5, 15, 25, 35, 4, 14, 24, 34, 3, 13, 23, 33]
   ],
   valuesSa: [
     [0, 3, 10, 13, 20, 23, 30, 33],
@@ -85,6 +125,26 @@ dwv.test.data.iterator0 = {
     [30, 33, 20, 23, 10, 13, 0, 3],
     [31, 34, 21, 24, 11, 14, 1, 4],
     [32, 35, 22, 25, 12, 15, 2, 5]
+  ],
+  valuesSa2: [
+    [0, 10, 20, 30, 3, 13, 23, 33],
+    [1, 11, 21, 31, 4, 14, 24, 34],
+    [2, 12, 22, 32, 5, 15, 25, 35]
+  ],
+  valuesSa2R1: [
+    [33, 23, 13, 3, 30, 20, 10, 0],
+    [34, 24, 14, 4, 31, 21, 11, 1],
+    [35, 25, 15, 5, 32, 22, 12, 2]
+  ],
+  valuesSa2R2: [
+    [30, 20, 10, 0, 33, 23, 13, 3],
+    [31, 21, 11, 1, 34, 24, 14, 4],
+    [32, 22, 12, 2, 35, 25, 15, 5]
+  ],
+  valuesSa2R1R2: [
+    [3, 13, 23, 33, 0, 10, 20, 30],
+    [4, 14, 24, 34, 1, 11, 21, 31],
+    [5, 15, 25, 35, 2, 12, 22, 32]
   ]
 };
 /* eslint-enable array-element-newline */
@@ -164,34 +224,25 @@ QUnit.test('Test simpleRange iterator.', function (assert) {
  *
  * @function module:tests/image~range
  */
-QUnit.test('Test range iterator.', function (assert) {
-
+QUnit.test('Test range iterator: axial', function (assert) {
   // test data
   var testData0 = dwv.test.data.iterator0;
   var ncols = testData0.ncols;
   var nrows = testData0.nrows;
-  var nslices = testData0.nslices;
   var sliceSize = ncols * nrows;
-
   var dataAccessor = function (offset) {
     return testData0.buffer[offset];
   };
 
-  // axial: xyz or yxz
-
-  /**
-   * Get an axial iterator.
-   *
-   * @param {boolean} reverse1 Start-end flag.
-   * @param {boolean} reverse2 Count start-end flag.
-   * @returns {Function} A get iterator function.
-   */
+  // axial: xyz
   var getAxIter = function (reverse1, reverse2) {
     return function (index) {
       var min = index * sliceSize;
-      var max = (index + 1) * sliceSize;
+      var max = min + sliceSize;
+      var start = reverse1 ? max - 1 : min;
+      var maxIter = sliceSize;
       return dwv.image.range(dataAccessor,
-        min, max - 1, 1, ncols, ncols, reverse1, reverse2);
+        start, maxIter, 1, ncols, ncols, reverse1, reverse2);
     };
   };
 
@@ -204,21 +255,53 @@ QUnit.test('Test range iterator.', function (assert) {
   dwv.test.checkIterator(assert,
     getAxIter(true, true), testData0.valuesAxR1R2, 'axialR1R2');
 
-  // coronal: xzy or zxy
+  // axial: yxz
+  var getAx2Iter = function (reverse1, reverse2) {
+    return function (index) {
+      var min = index * sliceSize;
+      var max = min + sliceSize;
+      var start = reverse1 ? max - 1 : min;
+      var maxIter = sliceSize;
+      return dwv.image.range(dataAccessor,
+        start, maxIter, ncols, nrows, 1, reverse1, reverse2);
+    };
+  };
 
-  /**
-   * Get an coronal iterator.
-   *
-   * @param {boolean} reverse1 Start-end flag.
-   * @param {boolean} reverse2 Count start-end flag.
-   * @returns {Function} A get iterator function.
-   */
+  dwv.test.checkIterator(assert,
+    getAx2Iter(false, false), testData0.valuesAx2, 'axial2');
+  dwv.test.checkIterator(assert,
+    getAx2Iter(true, false), testData0.valuesAx2R1, 'axial2R1');
+  dwv.test.checkIterator(assert,
+    getAx2Iter(false, true), testData0.valuesAx2R2, 'axial2R2');
+  dwv.test.checkIterator(assert,
+    getAx2Iter(true, true), testData0.valuesAx2R1R2, 'axial2R1R2');
+});
+
+/**
+ * Tests for {@link dwv.image.range}.
+ *
+ * @function module:tests/image~range
+ */
+QUnit.test('Test range iterator: coronal', function (assert) {
+  // test data
+  var testData0 = dwv.test.data.iterator0;
+  var ncols = testData0.ncols;
+  var nrows = testData0.nrows;
+  var nslices = testData0.nslices;
+  var sliceSize = ncols * nrows;
+  var dataAccessor = function (offset) {
+    return testData0.buffer[offset];
+  };
+
+  // coronal: xzy
   var getCoroIter = function (reverse1, reverse2) {
     return function (index) {
       var min = index * ncols;
       var max = min + (nslices - 1) * sliceSize + ncols;
+      var start = reverse1 ? max - 1 : min;
+      var maxIter = nslices * ncols;
       return dwv.image.range(dataAccessor,
-        min, max - 1, 1, ncols, sliceSize, reverse1, reverse2);
+        start, maxIter, 1, ncols, sliceSize, reverse1, reverse2);
     };
   };
 
@@ -231,21 +314,53 @@ QUnit.test('Test range iterator.', function (assert) {
   dwv.test.checkIterator(assert,
     getCoroIter(true, true), testData0.valuesCoR1R2, 'coronalR1R2');
 
-  // sagittal: yzx or zyx
+  // coronal: zxy
+  var getCoro2Iter = function (reverse1, reverse2) {
+    return function (index) {
+      var min = index * ncols;
+      var max = min + (nslices - 1) * sliceSize + ncols;
+      var start = reverse1 ? max - 1 : min;
+      var maxIter = nslices * ncols;
+      return dwv.image.range(dataAccessor,
+        start, maxIter, sliceSize, nslices, 1, reverse1, reverse2);
+    };
+  };
 
-  /**
-   * Get an sagittal iterator.
-   *
-   * @param {boolean} reverse1 Start-end flag.
-   * @param {boolean} reverse2 Count start-end flag.
-   * @returns {Function} A get iterator function.
-   */
+  dwv.test.checkIterator(assert,
+    getCoro2Iter(false, false), testData0.valuesCo2, 'coronal2');
+  dwv.test.checkIterator(assert,
+    getCoro2Iter(true, false), testData0.valuesCo2R1, 'coronal2R1');
+  dwv.test.checkIterator(assert,
+    getCoro2Iter(false, true), testData0.valuesCo2R2, 'coronal2R2');
+  dwv.test.checkIterator(assert,
+    getCoro2Iter(true, true), testData0.valuesCo2R1R2, 'coronal2R1R2');
+});
+
+/**
+ * Tests for {@link dwv.image.range}.
+ *
+ * @function module:tests/image~range
+ */
+QUnit.test('Test range iterator: sagittal', function (assert) {
+  // test data
+  var testData0 = dwv.test.data.iterator0;
+  var ncols = testData0.ncols;
+  var nrows = testData0.nrows;
+  var nslices = testData0.nslices;
+  var sliceSize = ncols * nrows;
+  var dataAccessor = function (offset) {
+    return testData0.buffer[offset];
+  };
+
+  // sagittal: yzx
   var getSagIter = function (reverse1, reverse2) {
     return function (index) {
       var min = index;
       var max = min + (nslices - 1) * sliceSize + ncols * (nrows - 1);
+      var start = reverse1 ? max : min;
+      var maxIter = nslices * nrows;
       return dwv.image.range(dataAccessor,
-        min, max, ncols, nrows, sliceSize, reverse1, reverse2);
+        start, maxIter, ncols, nrows, sliceSize, reverse1, reverse2);
     };
   };
 
@@ -257,6 +372,27 @@ QUnit.test('Test range iterator.', function (assert) {
     getSagIter(false, true), testData0.valuesSaR2, 'sagittalR2');
   dwv.test.checkIterator(assert,
     getSagIter(true, true), testData0.valuesSaR1R2, 'sagittalR1R2');
+
+  // sagittal: zyx
+  var getSag2Iter = function (reverse1, reverse2) {
+    return function (index) {
+      var min = index;
+      var max = min + (nslices - 1) * sliceSize + ncols * (nrows - 1);
+      var start = reverse1 ? max : min;
+      var maxIter = nslices * nrows;
+      return dwv.image.range(dataAccessor,
+        start, maxIter, sliceSize, nslices, ncols, reverse1, reverse2);
+    };
+  };
+
+  dwv.test.checkIterator(assert,
+    getSag2Iter(false, false), testData0.valuesSa2, 'sagittal2');
+  dwv.test.checkIterator(assert,
+    getSag2Iter(true, false), testData0.valuesSa2R1, 'sagittal2R1');
+  dwv.test.checkIterator(assert,
+    getSag2Iter(false, true), testData0.valuesSa2R2, 'sagittal2R2');
+  dwv.test.checkIterator(assert,
+    getSag2Iter(true, true), testData0.valuesSa2R1R2, 'sagittal2R1R2');
 });
 
 /**
@@ -363,7 +499,7 @@ QUnit.test('Test getSliceIterator.', function (assert) {
   var isRescaled = false;
   var viewOrientation;
 
-  // axial: xyz or yxz
+  // axial
   var getAxIter = function (orientation) {
     return function (index) {
       var position = new dwv.math.Index([0, 0, index]);
@@ -372,11 +508,22 @@ QUnit.test('Test getSliceIterator.', function (assert) {
     };
   };
 
+  // axial: xyz
   viewOrientation = dwv.math.getIdentityMat33();
   dwv.test.checkIterator(assert,
     getAxIter(viewOrientation), testData0.valuesAx, 'axial');
+  // axial: yxz
+  /* eslint-disable array-element-newline */
+  viewOrientation = new dwv.math.Matrix33([
+    0, 1, 0,
+    1, 0, 0,
+    0, 0, 1
+  ]);
+  /* eslint-enable array-element-newline */
+  dwv.test.checkIterator(assert,
+    getAxIter(viewOrientation), testData0.valuesAx2, 'axial2');
 
-  // coronal: xzy or zxy
+  // coronal
   var getCoroIter = function (orientation) {
     return function (index) {
       var position = new dwv.math.Index([0, index, 0]);
@@ -385,11 +532,22 @@ QUnit.test('Test getSliceIterator.', function (assert) {
     };
   };
 
+  // coronal: xzy
   viewOrientation = dwv.math.getMatrixFromName('coronal');
   dwv.test.checkIterator(assert,
     getCoroIter(viewOrientation), testData0.valuesCo, 'coronal');
+  // coronal: zxy
+  /* eslint-disable array-element-newline */
+  viewOrientation = new dwv.math.Matrix33([
+    0, 1, 0,
+    0, 0, 1,
+    1, 0, 0
+  ]);
+  /* eslint-enable array-element-newline */
+  dwv.test.checkIterator(assert,
+    getCoroIter(viewOrientation), testData0.valuesCo2, 'coronal2');
 
-  // sagittal: yzx or zyx
+  // sagittal
   var getSagIter = function (orientation) {
     return function (index) {
       var position = new dwv.math.Index([index, 0, 0]);
@@ -398,10 +556,20 @@ QUnit.test('Test getSliceIterator.', function (assert) {
     };
   };
 
+  // sagittal: yzx
   viewOrientation = dwv.math.getMatrixFromName('sagittal');
   dwv.test.checkIterator(assert,
     getSagIter(viewOrientation), testData0.valuesSa, 'sagittal');
-
+  // sagittal: zyx
+  /* eslint-disable array-element-newline */
+  viewOrientation = new dwv.math.Matrix33([
+    0, 0, 1,
+    0, 1, 0,
+    1, 0, 0
+  ]);
+  /* eslint-enable array-element-newline */
+  dwv.test.checkIterator(assert,
+    getSagIter(viewOrientation), testData0.valuesSa2, 'sagittal2');
 });
 
 /**
