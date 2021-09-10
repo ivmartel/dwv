@@ -1,12 +1,12 @@
 This page lists the possible error thrown by the application with some explanation and a possible quick fix.
 
-## Not a valid DICOM file 
+## Not a valid DICOM file
 
 Message: `Not a valid DICOM file (no magic DICM word found)`
 
 Context: Loading a DICOM file.
 
-All DICOM files should start with the DICOM prefix `DICM` (see [tutorial-conformance.html#validity](./tutorial-conformance.html#validity) for some exceptions and more details). 
+All DICOM files should start with the DICOM prefix `DICM` (see [tutorial-conformance.html#validity](./tutorial-conformance.html#validity) for some exceptions and more details).
 
 To fix the data you can use tolerant conversion tools such as [gdcm](http://gdcm.sourceforge.net/wiki/index.php/Main_Page). Convert the data to raw with `gdcmconv --raw -i {in-dcm_file_path} -o {out-dcm_file_path}`.
 
@@ -16,7 +16,7 @@ Message: `RequestError: An error occurred while reading 'file.dcm' (http status:
 
 Context: Loading a DICOM file.
 
-The data cannot be accessed, either because it does not exist, there has been a problem while transmitting it or because you do not have access permission to it. 
+The data cannot be accessed, either because it does not exist, there has been a problem while transmitting it or because you do not have access permission to it.
 
 The debug window of your browser should give you more info of the reason why the request did not succeed.
 

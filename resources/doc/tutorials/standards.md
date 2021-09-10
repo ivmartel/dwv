@@ -9,7 +9,7 @@ These are the standards that should be used when coding for this project.
  * Test: use of [QUnit](https://qunitjs.com/) via [Karma](https://karma-runner.github.io),
  * Documentation: use of [jsdoc](https://jsdoc.app/),
  * Versioning: [Semantic Versioning](http://semver.org/)
- * Branch: try to follow some kind of [branching model](http://nvie.com/posts/a-successful-git-branching-model/) 
+ * Branch: try to follow some kind of [branching model](http://nvie.com/posts/a-successful-git-branching-model/)
 
 These standards are enforced using Continuous Integration with [github-actions](https://github.com/features/actions): builds using [node](http://nodejs.org/) (see `.github/workflows/nodejs-ci.yml`) and [yarn](https://classic.yarnpkg.com). The CI basically executes `yarn install` that reads the `package.json` file and then runs `yarn run test`. This test target is configured to run a task runner called [Grunt](http://gruntjs.com/) which is configured with the `Gruntfile.js` file. The `package.json` file contains shortcuts to grunt scripts:
   * `yarn run test` -> [grunt-karma](https://www.npmjs.org/package/grunt-karma) that allows to run qunit tests using a headless browser such a Google Chrome

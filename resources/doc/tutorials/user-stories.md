@@ -6,7 +6,7 @@ Definitions:
 * _DICOM data_: a single or multiple DICOM files.
 * _Image data_: a single or multiple image files in JPG or PNG format.
 * _File_: represents file data typically obtained from the underlying file system. It is provided via an HTML input field with the 'file' type or via drag and drop. See the HTML5 [FileAPI](https://www.w3.org/TR/FileAPI/) for more details.
-* _Url_: the data is accessed via a url which resolves to data published on the same server as the application or on one that allows Cross-Origin Resource Sharing (CORS). 
+* _Url_: the data is accessed via a url which resolves to data published on the same server as the application or on one that allows Cross-Origin Resource Sharing (CORS).
 
 #### DWV-URS-IO-001 Load DICOM file(s)
 The user can load DICOM data provided as one or multiple HTML File(s).
@@ -66,10 +66,10 @@ Only the first series of the first study of the first patient will be loaded.
 The library can be integrated in a web application, a browser without any extensions must be sufficient to run the application.
 
 #### DWV-URS-UI-002 Display
-The user can generate a view of the image data in an optimised way according to external window properties. 
+The user can generate a view of the image data in an optimised way according to external window properties.
 
 #### DWV-URS-UI-003 Interaction
-The user can interact with content with a computer mouse or with a finger on touch enabled devices. 
+The user can interact with content with a computer mouse or with a finger on touch enabled devices.
 
 #### DWV-URS-UI-004 Overlay information
 The user can generate an overlay to view the current window and level, the zoom level, the X and Y coordinates and the pixel intensity.
@@ -91,7 +91,7 @@ The user can change the window/level of the displayed data. The window/level val
 Specific window/level data pre-sets must be made available. They are modality specific. For examples see: [radiantviewer](http://www.radiantviewer.com/dicom-viewer-manual/change_brightness_contrast.htm) or this [thread](http://forum.dicom-cd.de/viewtopic.php?p=9998&sid=28bfed23e680aae327c66d5ab7d28396).
 
 #### DWV-URS-UI-009 Slice scroll
-The user can scroll the different slices of a multi-slice data using `left click drag` or `one touch drag`. 
+The user can scroll the different slices of a multi-slice data using `left click drag` or `one touch drag`.
 
 #### DWV-URS-UI-010 Zoom/Pan
 The user can zoom/pan the displayed data. The zoom value must be displayed to the user. The user must be able to reset the zoom/pan value to their original values. The default interaction are:
@@ -135,7 +135,7 @@ Examples:
 The DICOM data could be uploaded to a private cloud storage with the patient owning it. The storage could be a generic one (for example Google Drive) or a specific medical one (for example a hospital HIS with external access). A storage system that wants to meet the previous requirements would need to implement the following:
  * a DICOM Web Viewer to view data
  * a DICOM Web Annotator to add annotations to data
- * a DICOM Web Anonymiser to view/download anonymous data 
+ * a DICOM Web Anonymiser to view/download anonymous data
 
 Each functionality being accessible via access rights such as view, annotate and download decided at the moment of sharing the data. View and annotate could be done live between multiple users. Download can only be done anonymously to avoid a data breach.
 
