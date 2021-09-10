@@ -109,17 +109,13 @@ dwv.image.ImageFactory.prototype.create = function (
       parseFloat(imageOrientationPatient[4]),
       parseFloat(imageOrientationPatient[5]));
     var normal = rowCosines.crossProduct(colCosines);
+    /* eslint-disable array-element-newline */
     orientationMatrix = new dwv.math.Matrix33([
-      rowCosines.getX(),
-      colCosines.getX(),
-      normal.getX(),
-      rowCosines.getY(),
-      colCosines.getY(),
-      normal.getY(),
-      rowCosines.getZ(),
-      colCosines.getZ(),
-      normal.getZ()
+      rowCosines.getX(), colCosines.getX(), normal.getX(),
+      rowCosines.getY(), colCosines.getY(), normal.getY(),
+      rowCosines.getZ(), colCosines.getZ(), normal.getZ()
     ]);
+    /* eslint-enable array-element-newline */
   }
 
   // geometry
