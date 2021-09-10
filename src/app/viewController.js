@@ -106,11 +106,45 @@ dwv.ctrl.ViewController = function (view) {
    * @returns {Array} A list of values.
    */
   this.getImageRegionValues = function (min, max) {
+    var image = view.getImage();
+    var orientation = view.getOrientation();
+    var position = this.getCurrentPosition();
+    var rescaled = true;
+
+    // created oriented slice if needed
+    if (!dwv.math.isIdentityMat33(orientation)) {
+      // generate slice values
+      var sliceIter = dwv.image.getSliceIterator(
+        image,
+        position,
+        rescaled,
+        orientation
+      );
+      var sliceValues = dwv.image.getIteratorValues(sliceIter);
+      // oriented geometry
+      var orientedSize = image.getGeometry().getSize(orientation);
+      var sizeValues = orientedSize.getValues();
+      sizeValues[2] = 1;
+      var sliceSize = new dwv.image.Size(sizeValues);
+      var orientedSpacing = image.getGeometry().getSpacing(orientation);
+      var sliceSpacing = new dwv.image.Spacing(
+        orientedSpacing.getColumnSpacing(),
+        orientedSpacing.getRowSpacing(),
+        1
+      );
+      var sliceOrigin = new dwv.math.Point3D(0, 0, 0);
+      var sliceGeometry =
+        new dwv.image.Geometry(sliceOrigin, sliceSize, sliceSpacing);
+      // slice image
+      image = new dwv.image.Image(sliceGeometry, sliceValues);
+      // update position
+      position = new dwv.math.Index([0, 0, 0]);
+      rescaled = false;
+    }
+
+    // get region values
     var iter = dwv.image.getRegionSliceIterator(
-      view.getImage(),
-      this.getCurrentPosition(),
-      true, min, max
-    );
+      image, position, rescaled, min, max);
     var values = [];
     if (iter) {
       values = dwv.image.getIteratorValues(iter);
