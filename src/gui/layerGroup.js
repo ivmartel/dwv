@@ -296,7 +296,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     var viewLayer0 = this.getActiveViewLayer();
     if (viewLayer0) {
       viewLayer0.removeEventListener(
-        'postitionchange', this.updatePosition);
+        'positionchange', this.updateDrawControllerToViewPosition);
       unbindViewLayer(viewLayer0);
     }
 
@@ -306,7 +306,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     // bind new layer
     var viewLayer = this.getActiveViewLayer();
     viewLayer.addEventListener(
-      'postitionchange', this.updatePosition);
+      'positionchange', this.updateDrawControllerToViewPosition);
     bindViewLayer(viewLayer);
   };
 
