@@ -949,6 +949,11 @@ dwv.tool.validateGroupPosition = function (stageSize, group) {
   // if anchors get mixed, width/height can be negative
   var shape = group.getChildren(dwv.draw.isNodeNameShape)[0];
   var anchorMin = dwv.tool.getAnchorMin(group);
+  // handle no anchor: when dragging the label, the editor does
+  //   not activate
+  if (typeof anchorMin === 'undefined') {
+    return null;
+  }
 
   var min = {
     x: -anchorMin.x,
