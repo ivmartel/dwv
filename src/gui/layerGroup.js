@@ -437,7 +437,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
       var viewController =
         layers[activeViewLayerIndex].getViewController();
       drawLayer.getDrawController().activateDrawLayer(
-        viewController.getCurrentPosition());
+        viewController.getCurrentOrientedPosition());
     }
   };
 

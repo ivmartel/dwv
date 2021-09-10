@@ -80,6 +80,18 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
+   * Get the current oriented position.
+   *
+   * @returns {object} The position.
+   */
+  this.getCurrentOrientedPosition = function () {
+    // values = orientation * orientedValues
+    // -> inv(orientation) * values = orientedValues
+    return view.getOrientation().getInverse().multiplyIndex3D(
+      view.getCurrentPosition());
+  };
+
+  /**
    * Get the current scroll position.
    *
    * @returns {object} The position.
