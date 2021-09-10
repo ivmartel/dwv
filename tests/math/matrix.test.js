@@ -231,7 +231,7 @@ QUnit.test('Test Matrix33 factories.', function (assert) {
   // test #03
   var m03 = dwv.math.getMatrixFromName('sagittal');
   var theo03 = new dwv.math.Matrix33([
-    0, 0, 1, 1, 0, 0, 0, 1, 0
+    0, 1, 0, 0, 0, 1, 1, 0, 0
   ]);
   assert.ok(m03.equals(theo03), 'Matrix33 factory sagittal');
 

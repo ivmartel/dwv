@@ -282,6 +282,38 @@ dwv.math.getIdentityMat33 = function () {
 };
 
 /**
+ * Check if a matrix is a 3x3 identity matrix.
+ *
+ * @param {object} mat33 The matrix to test.
+ * @returns {boolean} True if identity.
+ */
+dwv.math.isIdentityMat33 = function (mat33) {
+  return mat33.equals(dwv.math.getIdentityMat33());
+};
+
+/**
+ * Create a 3x3 coronal (xzy) matrix.
+ *
+ * @returns {object} The coronal matrix.
+ */
+dwv.math.getCoronalMat33 = function () {
+  return new dwv.math.Matrix33([
+    1, 0, 0, 0, 0, 1, 0, 1, 0
+  ]);
+};
+
+/**
+ * Create a 3x3 sagittal (yzx) matrix.
+ *
+ * @returns {object} The sagittal matrix.
+ */
+dwv.math.getSagittalMat33 = function () {
+  return new dwv.math.Matrix33([
+    0, 1, 0, 0, 0, 1, 1, 0, 0
+  ]);
+};
+
+/**
  * Get an orientation matrix from a name.
  *
  * @param {string} name The orientation name.
@@ -292,23 +324,9 @@ dwv.math.getMatrixFromName = function (name) {
   if (name === 'axial') {
     matrix = dwv.math.getIdentityMat33();
   } else if (name === 'coronal') {
-    // coronal (xzy)
-    /* eslint-disable array-element-newline */
-    matrix = new dwv.math.Matrix33([
-      1, 0, 0,
-      0, 0, 1,
-      0, 1, 0
-    ]);
-    /* eslint-enable array-element-newline */
+    matrix = dwv.math.getCoronalMat33();
   } else if (name === 'sagittal') {
-    // sagittal (yzx)
-    /* eslint-disable array-element-newline */
-    matrix = new dwv.math.Matrix33([
-      0, 0, 1,
-      1, 0, 0,
-      0, 1, 0
-    ]);
-    /* eslint-enable array-element-newline */
+    matrix = dwv.math.getSagittalMat33();
   }
   return matrix;
 };
