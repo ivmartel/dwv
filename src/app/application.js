@@ -169,7 +169,20 @@ dwv.App = function () {
   /**
    * Initialise the application.
    *
-   * @param {object} opt The application options.
+   * @param {object} opt The application option with:
+   * - `dataViewConfigs`: data indexed object containing the data view
+   *   configurations in the form of a list of objects containing:
+   *   - divId: the HTML div id
+   *   - orientation: optional 'axial', 'coronal' or 'sagittal' otientation
+   *     string (default undefined keeps the original slice order)
+   * - `binders`: array of layerGroup binders
+   * - `tools`: tool name indexed object containing individual tool
+   *   configurations
+   * - `nSimultaneousData`: number of simultaneus data
+   * - `viewOnFirstLoadItem`: boolean flag to trigger the first data render
+   *   after the first loaded data or not
+   * - `defaultCharacterSet`: the default chraracter set string used for DICOM
+   *   parsing
    */
   this.init = function (opt) {
     // store

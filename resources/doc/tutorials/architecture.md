@@ -4,7 +4,7 @@ This page lists details about the dwv architecture.
 ![classes-layers](classes-layers.png)
 
 The first level is the stage, this class handles a list of LayerGroups for optional synchronisation. A layerGroup is
-a group of layers associated to an HTML element, for now of type `View` and `Draw`.
+a group of layers associated to an HTML element, for now of type `View` and `Draw`. The configuration of the stage is done at the creation of the app. See [app::init](./dwv.App.html#init) method for details.
 
 ![classes-layers-view](classes-layers-view.png)
 
