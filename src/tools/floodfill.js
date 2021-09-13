@@ -349,7 +349,7 @@ dwv.tool.Floodfill = function (app) {
    * @param {object} event The mouse down event.
    */
   this.mousedown = function (event) {
-    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var drawLayer = layerGroup.getActiveDrawLayer();
@@ -396,7 +396,7 @@ dwv.tool.Floodfill = function (app) {
   this.mouseup = function (_event) {
     self.started = false;
     if (extender) {
-      var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+      var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
       var layerGroup = app.getLayerGroupById(layerDetails.groupId);
       self.extend(layerGroup);
     }

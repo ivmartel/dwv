@@ -32,7 +32,7 @@ dwv.tool.Scroll = function (app) {
    */
   this.mousedown = function (event) {
     // stop viewer if playing
-    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
@@ -58,7 +58,7 @@ dwv.tool.Scroll = function (app) {
       return;
     }
 
-    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
@@ -173,7 +173,7 @@ dwv.tool.Scroll = function (app) {
       up = true;
     }
 
-    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
@@ -199,7 +199,7 @@ dwv.tool.Scroll = function (app) {
    * @param {object} event The key down event.
    */
   this.dblclick = function (event) {
-    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();

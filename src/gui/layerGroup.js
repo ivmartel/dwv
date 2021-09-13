@@ -36,13 +36,14 @@ dwv.gui.getLayerDetailsFromLayerDivId = function (idString) {
 /**
  * Get the layer details from a mouse event.
  *
- * @param {object} event The event to get the layer div id from.
+ * @param {object} event The event to get the layer div id from. Expecting
+ * an event origininating from a canvas inside a layer HTML div
+ * with the 'layer' class and id generated with `dwv.gui.getLayerGroupDivId`.
  * @returns {object} The layer details as {groupId, layerId}.
  */
-dwv.gui.getLayerDetailsFromToolEvent = function (event) {
+dwv.gui.getLayerDetailsFromEvent = function (event) {
   var res = null;
-  // the target of the tool event is the layer canvas,
-  // move up until we find the layer div (a div with class 'layer')
+  // get the closest element from the event target and with the 'layer' class
   var layerDiv = event.target.closest('.layer');
   if (layerDiv && typeof layerDiv.id !== 'undefined') {
     res = dwv.gui.getLayerDetailsFromLayerDivId(layerDiv.id);

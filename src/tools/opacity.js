@@ -51,7 +51,7 @@ dwv.tool.Opacity = function (app) {
     var xMove = (Math.abs(diffX) > 15);
     // do not trigger for small moves
     if (xMove) {
-      var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+      var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
       var layerGroup = app.getLayerGroupById(layerDetails.groupId);
       var viewLayer = layerGroup.getActiveViewLayer();
       var op = viewLayer.getOpacity();

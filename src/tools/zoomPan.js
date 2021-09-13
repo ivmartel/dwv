@@ -65,7 +65,7 @@ dwv.tool.ZoomAndPan = function (app) {
     var tx = event._xs - self.x0;
     var ty = event._ys - self.y0;
     // apply translation
-    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     layerGroup.addTranslation({x: tx, y: ty});
     layerGroup.draw();
@@ -88,7 +88,7 @@ dwv.tool.ZoomAndPan = function (app) {
     var newLine = new dwv.math.Line(point0, point1);
     var lineRatio = newLine.getLength() / self.line0.getLength();
 
-    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var viewController = layerGroup.getActiveViewLayer().getViewController();
 
@@ -188,7 +188,7 @@ dwv.tool.ZoomAndPan = function (app) {
   this.wheel = function (event) {
     var step = -event.deltaY / 500;
 
-    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     // keep third direction
     var vc = layerGroup.getActiveViewLayer().getViewController();

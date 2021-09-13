@@ -47,7 +47,7 @@ dwv.tool.WindowLevel = function (app) {
       return;
     }
 
-    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
@@ -132,7 +132,7 @@ dwv.tool.WindowLevel = function (app) {
    * @param {object} event The double click event.
    */
   this.dblclick = function (event) {
-    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();

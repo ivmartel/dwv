@@ -167,7 +167,7 @@ dwv.tool.Draw = function (app) {
       return;
     }
 
-    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var drawLayer = layerGroup.getActiveDrawLayer();
 
@@ -238,7 +238,7 @@ dwv.tool.Draw = function (app) {
       // add it to the list
       points.push(lastPoint);
       // update points
-      var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+      var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
       var layerGroup = app.getLayerGroupById(layerDetails.groupId);
       onNewPoints(points, layerGroup);
     }
@@ -263,7 +263,7 @@ dwv.tool.Draw = function (app) {
     // do we have all the needed points
     if (points.length === currentFactory.getNPoints()) {
       // store points
-      var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+      var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
       var layerGroup = app.getLayerGroupById(layerDetails.groupId);
       onFinalPoints(points, layerGroup);
       // reset flag
@@ -293,7 +293,7 @@ dwv.tool.Draw = function (app) {
     }
 
     // store points
-    var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     onFinalPoints(points, layerGroup);
     // reset flag
@@ -347,7 +347,7 @@ dwv.tool.Draw = function (app) {
         }, currentFactory.getTimeout());
       }
       // update points
-      var layerDetails = dwv.gui.getLayerDetailsFromToolEvent(event);
+      var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
       var layerGroup = app.getLayerGroupById(layerDetails.groupId);
       onNewPoints(points, layerGroup);
     }
