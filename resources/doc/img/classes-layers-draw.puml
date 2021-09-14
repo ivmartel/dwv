@@ -1,12 +1,18 @@
 @startuml
 
-class KonvaShape
-class DrawLayer
+class KonvaShape {
+  (mvc:model)
+}
+class DrawLayer {
+  (mvc:view)
+}
 class DrawController
-class ViewController
 
-KonvaShape ..> ViewController: Uses
-DrawController .* KonvaShape
-DrawLayer .* DrawController
+circle User
+
+KonvaShape --> DrawLayer: updates
+DrawLayer -- User: sees
+User -up-> DrawController: uses
+DrawController -up-> KonvaShape: manipulates
 
 @enduml

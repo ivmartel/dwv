@@ -11,7 +11,7 @@ class LayerGroup {
 class ViewLayer
 class DrawLayer
 
-App ..> Stage: Uses
+App --* "1" Stage
 Stage --* "0..*" LayerGroup
 LayerGroup --* "0..*" ViewLayer
 LayerGroup --* "0..*" DrawLayer

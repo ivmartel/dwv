@@ -1,20 +1,19 @@
 @startuml
 
-class Image
-class View
+class View {
+  (mvc:model)
+}
+class ViewLayer {
+  (mvc:view)
+}
 class ViewController
-class ViewLayer
 
-note right of Image
-  3D + t
-end note
+circle User
 
-note right of View
-  2D
-end note
+View --> ViewLayer: updates
+ViewLayer -- User: sees
+User -up-> ViewController: uses
+ViewController -up-> View: manipulates
 
-View ..> Image: Uses
-ViewController .* View
-ViewLayer .* ViewController
 
 @enduml

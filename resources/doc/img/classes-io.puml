@@ -17,16 +17,16 @@ interface SpecificDataLoader ##[dashed] {
   canLoadFile()
 }
 
-App ..> LoadController: Uses
-LoadController ..> UrlsLoader: Uses
-LoadController ..> FilesLoader: Uses
-LoadController ..> MemoryLoader: Uses
+App ..> LoadController: uses
+LoadController ..> UrlsLoader: uses
+LoadController ..> FilesLoader: uses
+LoadController ..> MemoryLoader: uses
 
-UrlsLoader .up.> XMLHttpRequest: Uses
-FilesLoader .up.> FileReader: Uses
+UrlsLoader .up.> XMLHttpRequest: uses
+FilesLoader .up.> FileReader: uses
 
-UrlsLoader ..> SpecificDataLoader: Uses
-FilesLoader ..> SpecificDataLoader: Uses
-MemoryLoader ..> SpecificDataLoader: Uses
+UrlsLoader ..> SpecificDataLoader: uses
+FilesLoader ..> SpecificDataLoader: uses
+MemoryLoader ..> SpecificDataLoader: uses
 
 @enduml
