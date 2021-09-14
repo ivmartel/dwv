@@ -14,7 +14,7 @@ deactivate RescaleLut
 WindowLut -> View: window lut
 deactivate WindowLut
 
-View -> ColourMap: get color map
+View -> ColourMap: get colour map
 activate ColourMap
 ColourMap -> View: map
 deactivate ColourMap
