@@ -649,7 +649,7 @@ dwv.tool.Draw = function (app) {
       var trashHalfHeight = trash.height() * trash.scaleY() / 2;
       if (Math.abs(eventPos.x - trash.x()) < trashHalfWidth &&
         Math.abs(eventPos.y - trash.y()) < trashHalfHeight) {
-        trash.getChildren().each(function (tshape) {
+        trash.getChildren().forEach(function (tshape) {
           tshape.stroke('orange');
         });
         // change the group shapes colour
@@ -658,7 +658,7 @@ dwv.tool.Draw = function (app) {
             ashape.stroke('red');
           });
       } else {
-        trash.getChildren().each(function (tshape) {
+        trash.getChildren().forEach(function (tshape) {
           tshape.stroke('red');
         });
         // reset the group shapes colour
@@ -904,10 +904,11 @@ dwv.tool.getAnchorMin = function (group) {
   }
   var minX = anchors[0].x();
   var minY = anchors[0].y();
-  anchors.each(function (anchor) {
-    minX = Math.min(minX, anchor.x());
-    minY = Math.min(minY, anchor.y());
-  });
+  for (var i = 0; i < anchors.length; ++i) {
+    minX = Math.min(minX, anchors[i].x());
+    minY = Math.min(minY, anchors[i].y());
+  }
+
   return {x: minX, y: minY};
 };
 

@@ -208,7 +208,7 @@ dwv.tool.ShapeEditor = function (app) {
   function applyFuncToAnchors(func) {
     if (shape && shape.getParent()) {
       var anchors = shape.getParent().find('.anchor');
-      anchors.each(func);
+      anchors.forEach(func);
     }
   }
 
