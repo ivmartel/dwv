@@ -33,20 +33,22 @@ to its answer to the `canLoadUrl` or `canLoadFile` call. The current specialised
 1. [ZipLoader](./dwv.io.ZipLoader.html): for data compressed in a ZIP file
 
 ## View creation
+![sequence-view-creation](sequence-view-creation.png)
+
 The library will use a series of steps and LookUp Tables (LUT) to convert the file data into the
 canvas array data:
 1. Extract the data from the recreated 3D volume using position and orientation
-  and abstracted as an [iterator](https://en.wikipedia.org/wiki/Iterator_pattern)
-   - See [image/iterator.js](./dwv.image.html#.range)
+  and abstracted folowing the [iterator pattern](https://en.wikipedia.org/wiki/Iterator_pattern)
+  (see [image/iterator.js](./dwv.image.html#.range))
 1. From stored type range to physical range using a [Modality LUT](http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.html): rescale slope and intercept are used
    in the conversion equation: `y = slope * x + intercept`
-   - See [image/rescaleLut.js](./dwv.image.RescaleLut.html)
+   (see [image/rescaleLut.js](./dwv.image.RescaleLut.html))
 1. Select part of the range using a [VOI LUT](http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.2.html#table_C.11-2) (Value Of Interest): window width and level (or centre)
    allow to focus on a specific range (especially useful for normed data such
    as in CT)
-   - See [image/windowLut.js](./dwv.image.WindowLut.html)
+   (see [image/windowLut.js](./dwv.image.WindowLut.html))
 1. Assign a colour to each values using a colour map
-   - See [image/lut.js](./dwv.image.lut.html)
+   (see [image/lut.js](./dwv.image.lut.html))
 1. You now have the canvas data!
 
 All this is materialised in the `dwv.image.generateImageData*` functions.

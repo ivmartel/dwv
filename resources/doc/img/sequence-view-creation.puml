@@ -1,0 +1,22 @@
+@startuml
+
+View -> Image: get image data
+activate Image
+Image -> View: image iterator
+deactivate Image
+
+View -> WindowLut: get window lut
+activate WindowLut
+WindowLut --> RescaleLut: get rescale lut
+activate RescaleLut
+RescaleLut --> WindowLut: rescale lut
+deactivate RescaleLut
+WindowLut -> View: window lut
+deactivate WindowLut
+
+View -> ColourMap: get color map
+activate ColourMap
+ColourMap -> View: map
+deactivate ColourMap
+
+@enduml
