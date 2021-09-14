@@ -1,5 +1,9 @@
 This page lists details about the dwv architecture.
 
+* [Layers](#layers)
+* [Data load](#data-load)
+* [View creation](#view-creation)
+
 ## Layers
 ![classes-layers](classes-layers.png)
 
