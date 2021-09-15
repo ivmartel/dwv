@@ -28,12 +28,12 @@ dwv.gui.DrawLayer = function (containerDiv) {
   var konvaLayer;
 
   /**
-   * The layer size as {x,y}.
+   * The layer base size as {x,y}.
    *
    * @private
    * @type {object}
    */
-  var layerSize;
+  var baseSize;
 
   /**
    * The draw controller.
@@ -90,12 +90,12 @@ dwv.gui.DrawLayer = function (containerDiv) {
   // common layer methods [start] ---------------
 
   /**
-   * Get the layer size.
+   * Get the layer base size (without scale).
    *
    * @returns {object} The size as {x,y}.
    */
-  this.getSize = function () {
-    return layerSize;
+  this.getBaseSize = function () {
+    return baseSize;
   };
 
   /**
@@ -152,8 +152,8 @@ dwv.gui.DrawLayer = function (containerDiv) {
    */
   this.resize = function (newScale) {
     // resize stage
-    konvaStage.setWidth(Math.floor(layerSize.x * newScale.x));
-    konvaStage.setHeight(Math.floor(layerSize.y * newScale.y));
+    konvaStage.setWidth(Math.floor(baseSize.x * newScale.x));
+    konvaStage.setHeight(Math.floor(baseSize.y * newScale.y));
     // set scale
     this.setScale(newScale);
   };
@@ -195,13 +195,13 @@ dwv.gui.DrawLayer = function (containerDiv) {
   this.initialise = function (image, _metaData, _index, viewOrientation) {
     // get sizes
     var size = image.getGeometry().getSize(viewOrientation);
-    layerSize = size.get2D();
+    baseSize = size.get2D();
 
     // create stage
     konvaStage = new Konva.Stage({
       container: containerDiv,
-      width: layerSize.x,
-      height: layerSize.y,
+      width: baseSize.x,
+      height: baseSize.y,
       listening: false
     });
     // reset style

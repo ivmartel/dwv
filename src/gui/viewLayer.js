@@ -32,19 +32,19 @@ dwv.gui.ViewLayer = function (containerDiv) {
   var viewController = null;
 
   /**
-   * The base canvas.
+   * The main display canvas.
    *
    * @private
    * @type {object}
    */
   var canvas = null;
   /**
-   * A cache of the initial canvas.
+   * The offscreen canvas: used to store the raw, unscaled pixel data.
    *
    * @private
    * @type {object}
    */
-  var cacheCanvas = null;
+  var offscreenCanvas = null;
   /**
    * The associated CanvasRenderingContext2D.
    *
@@ -62,12 +62,12 @@ dwv.gui.ViewLayer = function (containerDiv) {
   var imageData = null;
 
   /**
-   * The layer size as {x,y}.
+   * The layer base size as {x,y}.
    *
    * @private
    * @type {object}
    */
-  var layerSize;
+  var baseSize;
 
   /**
    * The layer opacity.
@@ -160,12 +160,12 @@ dwv.gui.ViewLayer = function (containerDiv) {
   // common layer methods [start] ---------------
 
   /**
-   * Get the layer size.
+   * Get the layer base size (without scale).
    *
    * @returns {object} The size as {x,y}.
    */
-  this.getSize = function () {
-    return layerSize;
+  this.getBaseSize = function () {
+    return baseSize;
   };
 
   /**
@@ -233,8 +233,8 @@ dwv.gui.ViewLayer = function (containerDiv) {
    */
   this.resize = function (newScale) {
     // resize canvas
-    canvas.width = Math.floor(layerSize.x * newScale.x);
-    canvas.height = Math.floor(layerSize.y * newScale.y);
+    canvas.width = Math.floor(baseSize.x * newScale.x);
+    canvas.height = Math.floor(baseSize.y * newScale.y);
     // set scale
     this.setScale(newScale);
   };
@@ -313,7 +313,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
     // disable smoothing (set just before draw, could be reset by resize)
     context.imageSmoothingEnabled = false;
     // draw image
-    context.drawImage(cacheCanvas, 0, 0);
+    context.drawImage(offscreenCanvas, 0, 0);
 
     /**
      * Render end event.
@@ -357,7 +357,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
 
     // get sizes
     var size = image.getGeometry().getSize(viewOrientation);
-    layerSize = size.get2D();
+    baseSize = size.get2D();
 
     // create canvas
     canvas = document.createElement('canvas');
@@ -375,15 +375,15 @@ dwv.gui.ViewLayer = function (containerDiv) {
       return;
     }
     // canvas sizes
-    canvas.width = layerSize.x;
-    canvas.height = layerSize.y;
+    canvas.width = baseSize.x;
+    canvas.height = baseSize.y;
+    // off screen canvas
+    offscreenCanvas = document.createElement('canvas');
+    offscreenCanvas.width = baseSize.x;
+    offscreenCanvas.height = baseSize.y;
     // original empty image data array
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    imageData = context.createImageData(canvas.width, canvas.height);
-    // cached canvas
-    cacheCanvas = document.createElement('canvas');
-    cacheCanvas.width = canvas.width;
-    cacheCanvas.height = canvas.height;
+    context.clearRect(0, 0, baseSize.x, baseSize.y);
+    imageData = context.createImageData(baseSize.x, baseSize.y);
 
     // update data on first draw
     needsDataUpdate = true;
@@ -474,8 +474,8 @@ dwv.gui.ViewLayer = function (containerDiv) {
   function updateImageData() {
     // generate image data
     view.generateImageData(imageData);
-    // pass the data to the canvas
-    cacheCanvas.getContext('2d').putImageData(imageData, 0, 0);
+    // pass the data to the off screen canvas
+    offscreenCanvas.getContext('2d').putImageData(imageData, 0, 0);
     // update data flag
     needsDataUpdate = false;
   }

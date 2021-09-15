@@ -641,7 +641,7 @@ dwv.tool.Draw = function (app) {
     shapeGroup.on('dragmove.draw', function (event) {
       var drawLayer = layerGroup.getActiveDrawLayer();
       // validate the group position
-      dwv.tool.validateGroupPosition(drawLayer.getSize(), this);
+      dwv.tool.validateGroupPosition(drawLayer.getBaseSize(), this);
       // highlight trash when on it
       var offset = dwv.gui.getEventOffset(event.evt)[0];
       var eventPos = getRealPosition(offset, layerGroup);
