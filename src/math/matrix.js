@@ -342,3 +342,74 @@ dwv.math.getMatrixFromName = function (name) {
   }
   return matrix;
 };
+
+/**
+ * Get the oriented values of an input 3D array.
+ *
+ * @param {Array} array3D The 3D array.
+ * @param {object} orientation The orientation 3D matrix.
+ * @returns {Array} The values reordered according to the orientation.
+ */
+dwv.math.getOrientedArray3D = function (array3D, orientation) {
+  // values = orientation * orientedValues
+  // -> inv(orientation) * values = orientedValues
+  return orientation.getInverse().getAbs().multiplyArray3D(array3D);
+};
+
+/**
+ * Get the raw values of an oriented input 3D array.
+ *
+ * @param {Array} array3D The 3D array.
+ * @param {object} orientation The orientation 3D matrix.
+ * @returns {Array} The values reordered to compensate the orientation.
+ */
+dwv.math.getDeOrientedArray3D = function (array3D, orientation) {
+  // values = orientation * orientedValues
+  // -> inv(orientation) * values = orientedValues
+  return orientation.getAbs().multiplyArray3D(array3D);
+};
+
+/**
+ * Reorder values to follow orientation.
+ *
+ * @param {object} values Values as {x,y,z}.
+ * @param {object} orientation The orientation.
+* @returns {object} Reoriented values as {x,y,z}.
+ */
+dwv.math.getOrientedXYZ = function (values, orientation) {
+  var orientedValues = dwv.math.getOrientedArray3D(
+    [
+      values.x,
+      values.y,
+      values.z
+    ],
+    orientation);
+  return {
+    x: orientedValues[0],
+    y: orientedValues[1],
+    z: orientedValues[2]
+  };
+};
+
+/**
+ * Reorder values to compensate for orientation.
+ *
+ * @param {object} values Values as {x,y,z}.
+ * @param {object} orientation The orientation.
+ * @returns {object} 'Deoriented' values as {x,y,z}.
+ */
+dwv.math.getDeOrientedXYZ = function (values, orientation) {
+  var deOrientedValues = dwv.math.getDeOrientedArray3D(
+    [
+      values.x,
+      values.y,
+      values.z
+    ],
+    orientation
+  );
+  return {
+    x: deOrientedValues[0],
+    y: deOrientedValues[1],
+    z: deOrientedValues[2]
+  };
+};

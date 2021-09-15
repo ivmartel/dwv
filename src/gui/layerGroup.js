@@ -51,6 +51,39 @@ dwv.gui.getLayerDetailsFromEvent = function (event) {
   return res;
 };
 
+/**
+ * Get the fit to container scale.
+ * To be called with an existing HTML element!
+ *
+ * @param {object} containerDiv The container.
+ * @param {object} realSize The oriented image real size (size*spacing).
+ * @param {object} spacing The oriented image spacing.
+ * @returns {object} The scale as {x,y,z}.
+ */
+dwv.gui.getFitToContainerScale = function (containerDiv, realSize, spacing) {
+  // check container size
+  if (containerDiv.offsetWidth === 0 &&
+    containerDiv.offsetHeight === 0) {
+    throw new Error('Cannot fit to zero sized container.');
+  }
+  // best fit
+  var scaleX = containerDiv.offsetWidth / realSize[0];
+  var scaleY = containerDiv.offsetHeight / realSize[1];
+  // minimum scale and not zero
+  var scale = null;
+  if (scaleX > 0 && scaleY > 0) {
+    scale = Math.min(scaleX, scaleY);
+  } else {
+    scale = scaleX === 0 ? scaleY : scaleX;
+  }
+  // return 3D scale
+  var scale3D = {
+    x: scale * spacing.getColumnSpacing(),
+    y: scale * spacing.getRowSpacing(),
+    z: scale * spacing.getSliceSpacing()
+  };
+  return scale3D;
+};
 
 /**
  * Layer group.
@@ -136,49 +169,6 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   var viewOrientation;
 
   /**
-   * Reorder values to follow orientation.
-   *
-   * @param {object} values Values as {x,y,z}
-   * @returns {object} Reoriented values as {x,y,z}.
-   */
-  function getOriented(values) {
-    var orientedValues = dwv.image.getOrientedArray3D(
-      [
-        values.x,
-        values.y,
-        values.z
-      ],
-      viewOrientation);
-    return {
-      x: orientedValues[0],
-      y: orientedValues[1],
-      z: orientedValues[2]
-    };
-  }
-
-  /**
-   * Reorder values to compensate for orientation.
-   *
-   * @param {object} values Values as {x,y,z}
-   * @returns {object} 'Deoriented' values as {x,y,z}.
-   */
-  function getDeOriented(values) {
-    var deOrientedValues = dwv.image.getDeOrientedArray3D(
-      [
-        values.x,
-        values.y,
-        values.z
-      ],
-      viewOrientation
-    );
-    return {
-      x: deOrientedValues[0],
-      y: deOrientedValues[1],
-      z: deOrientedValues[2]
-    };
-  }
-
-  /**
    * Set the target orientation.
    *
    * @param {object} orientation The target orientation matrix.
@@ -252,8 +242,8 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    * @returns {object} The equivalent index.
    */
   this.displayToIndex = function (point2D) {
-    var scale2D = getOriented(scale);
-    var offset2D = getOriented(offset);
+    var scale2D = dwv.math.getOrientedXYZ(scale, viewOrientation);
+    var offset2D = dwv.math.getOrientedXYZ(offset, viewOrientation);
     return {
       x: point2D.x / scale2D.x + offset2D.x,
       y: point2D.y / scale2D.y + offset2D.y
@@ -443,49 +433,15 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   };
 
   /**
-   * Get the fit to container scale.
-   * To be called once the image is loaded.
-   *
-   * @param {object} spacing The oriented image spacing.
-   * @returns {number} The scale.
-   */
-  this.getFitToContainerScale = function (spacing) {
-    // get container size
-    var containerSize = {
-      x: containerDiv.offsetWidth,
-      y: containerDiv.offsetHeight
-    };
-    var realSize = {
-      x: layerSize.x * spacing.getColumnSpacing(),
-      y: layerSize.y * spacing.getRowSpacing()
-    };
-    // best fit
-    var scaleX = containerSize.x / realSize.x;
-    var scaleY = containerSize.y / realSize.y;
-    // return minimum and not zero
-    var scales = [];
-    if (scaleX > 0) {
-      scales.push(scaleX);
-    }
-    if (scaleY > 0) {
-      scales.push(scaleY);
-    }
-    return Math.min.apply(null, scales);
-  };
-
-  /**
    * Fit the display to the size of the container.
    * To be called once the image is loaded.
    *
    * @param {object} spacing The oriented image spacing.
    */
-  this.fitToContainer = function (spacing) {
-    var fitScale = this.getFitToContainerScale(spacing);
-    this.resize(getDeOriented({
-      x: fitScale * spacing.getColumnSpacing(),
-      y: fitScale * spacing.getRowSpacing(),
-      z: fitScale * spacing.getSliceSpacing()
-    }));
+  this.fitToContainer = function (realSize, spacing) {
+    var fitScale = dwv.gui.getFitToContainerScale(
+      containerDiv, realSize, spacing);
+    this.resize(dwv.math.getDeOrientedXYZ(fitScale, viewOrientation));
   };
 
   /**
@@ -502,7 +458,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     };
     // center should stay the same:
     // newOffset + center / newScale = oldOffset + center / oldScale
-    var realCenter = getDeOriented(center);
+    var realCenter = dwv.math.getDeOrientedXYZ(center, viewOrientation);
     this.setOffset({
       x: (realCenter.x / scale.x) + offset.x - (realCenter.x / newScale.x),
       y: (realCenter.y / scale.y) + offset.y - (realCenter.y / newScale.y),
@@ -520,7 +476,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   this.setScale = function (newScale) {
     scale = newScale;
     // apply to layers
-    var scale2D = getOriented(scale);
+    var scale2D = dwv.math.getOrientedXYZ(scale, viewOrientation);
     for (var i = 0; i < layers.length; ++i) {
       layers[i].setScale(scale2D);
     }
@@ -544,12 +500,13 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    * @param {object} translation The translation as {x,y}.
    */
   this.addTranslation = function (translation) {
-    var realTrans = getDeOriented(
+    var realTrans = dwv.math.getDeOrientedXYZ(
       {
         x: translation.x,
         y: translation.y,
         z: 0
-      });
+      },
+      viewOrientation);
     this.setOffset({
       x: offset.x - realTrans.x / scale.x,
       y: offset.y - realTrans.y / scale.y,
@@ -567,7 +524,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     // store
     offset = newOffset;
     // apply to layers
-    var offset2D = getOriented(offset);
+    var offset2D = dwv.math.getOrientedXYZ(offset, viewOrientation);
     for (var i = 0; i < layers.length; ++i) {
       layers[i].setOffset(offset2D);
     }
@@ -621,8 +578,9 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     this.updateDrawControllerToViewPosition();
 
     // fit data
+    var realSize = image.getGeometry().getRealSize(viewOrientation);
     var spacing = image.getGeometry().getSpacing(viewOrientation);
-    this.fitToContainer(spacing);
+    this.fitToContainer(realSize, spacing);
   };
 
   /**
@@ -648,14 +606,14 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     baseScale = newScale;
 
     // resize layers
-    var baseScale2D = getOriented(baseScale);
+    var baseScale2D = dwv.math.getOrientedXYZ(baseScale, viewOrientation);
     var width = Math.floor(layerSize.x * baseScale2D.x);
     var height = Math.floor(layerSize.y * baseScale2D.y);
 
     // resize if test passes
     if (dwv.gui.canCreateCanvas(width, height)) {
       // call resize and scale on layers
-      var scale2D = getOriented(scale);
+      var scale2D = dwv.math.getOrientedXYZ(scale, viewOrientation);
       for (var i = 0; i < layers.length; ++i) {
         layers[i].resize(baseScale2D);
         layers[i].setScale(scale2D);
