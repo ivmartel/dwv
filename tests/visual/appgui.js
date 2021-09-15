@@ -31,13 +31,13 @@ dwv.addDataLine = function (id, fileroot, doc) {
   dwvDiv.className = 'dwv';
   var layConDiv = document.createElement('div');
   layConDiv.id = 'layerGroup' + id;
+  layConDiv.className = 'layerGroup';
   dwvDiv.appendChild(layConDiv);
   mainDiv.appendChild(dwvDiv);
 
   // dwv application
   var config = {
-    containerDivIds: {0: [layConDiv.id]},
-    skipLoadUrl: true
+    dataViewConfigs: {0: [{divId: layConDiv.id}]},
   };
   var url = '../data/' + fileroot + '.dcm';
   var app = new dwv.App();

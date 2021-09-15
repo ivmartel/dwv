@@ -38,6 +38,7 @@ module.exports = function (config) {
       // extra served content
       {pattern: 'tests/**/*.html', included: false},
       {pattern: 'tests/visual/appgui.js', included: false},
+      {pattern: 'tests/visual/style.css', included: false},
       {pattern: 'tests/dicom/pages/*.js', included: false},
       {pattern: 'tests/image/pages/*.js', included: false},
       {pattern: 'tests/pacs/*.js', included: false},
