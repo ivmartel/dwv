@@ -118,6 +118,17 @@ dwv.gui.ViewLayer = function (containerDiv) {
   var listenerHandler = new dwv.utils.ListenerHandler();
 
   /**
+   * Set the associated view.
+   *
+   * @param {object} inputView The view.
+   */
+  this.setView = function (inputView) {
+    view = inputView;
+    // create view controller
+    viewController = new dwv.ctrl.ViewController(view);
+  };
+
+  /**
    * Get the view controller.
    *
    * @returns {object} The controller.
@@ -332,19 +343,13 @@ dwv.gui.ViewLayer = function (containerDiv) {
   /**
    * Initialise the layer: set the canvas and context
    *
-   * @param {object} image The image.
-   * @param {object} metaData The image meta data.
+   * @param {object} imageGeometry The image geometry.
    * @param {number} index The associated data index.
    * @param {object} viewOrientation The view orientation matrix.
    */
-  this.initialise = function (image, metaData, index, viewOrientation) {
+  this.initialise = function (imageGeometry, index, viewOrientation) {
     dataIndex = index;
-    // create view
-    var viewFactory = new dwv.ViewFactory();
-    view = viewFactory.create(
-      new dwv.dicom.DicomElementsWrapper(metaData),
-      image);
-
+    // update view
     view.setOrientation(viewOrientation);
 
     // local listeners
@@ -352,11 +357,8 @@ dwv.gui.ViewLayer = function (containerDiv) {
     view.addEventListener('colourchange', onColourChange);
     view.addEventListener('positionchange', onPositionChange);
 
-    // create view controller
-    viewController = new dwv.ctrl.ViewController(view);
-
     // get sizes
-    var size = image.getGeometry().getSize(viewOrientation);
+    var size = imageGeometry.getSize(viewOrientation);
     baseSize = size.get2D();
 
     // create canvas

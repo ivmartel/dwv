@@ -187,14 +187,13 @@ dwv.gui.DrawLayer = function (containerDiv) {
   /**
    * Initialise the layer: set the canvas and context
    *
-   * @param {object} image The image.
-   * @param {object} _metaData The image meta data.
+   * @param {object} imageGeometry The image geometry.
    * @param {number} _index The associated data index.
    * @param {object} viewOrientation The view orientation matrix.
    */
-  this.initialise = function (image, _metaData, _index, viewOrientation) {
+  this.initialise = function (imageGeometry, _index, viewOrientation) {
     // get sizes
-    var size = image.getGeometry().getSize(viewOrientation);
+    var size = imageGeometry.getSize(viewOrientation);
     baseSize = size.get2D();
 
     // create stage

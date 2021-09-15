@@ -1103,14 +1103,21 @@ dwv.App = function () {
         layerGroupElementId);
     }
 
+    // create view
+    var viewFactory = new dwv.ViewFactory();
+    var view = viewFactory.create(
+      new dwv.dicom.DicomElementsWrapper(data.meta),
+      data.image);
+
     // view layer
-    var viewLayer = layerGroup.addViewLayer();
+    var viewLayer = layerGroup.addViewLayer(view);
+
     // optional draw layer
     if (toolboxController && toolboxController.hasTool('Draw')) {
       layerGroup.addDrawLayer();
     }
     // initialise layers
-    layerGroup.initialise(data.image, data.meta, dataIndex);
+    layerGroup.initialise(data.image.getGeometry(), dataIndex);
 
     // update style
     style.setBaseScale(layerGroup.getBaseScale());
@@ -1150,9 +1157,16 @@ dwv.App = function () {
     // un-bind previous
     unbindViewLayer(layerGroup.getActiveViewLayer());
 
-    var viewLayer = layerGroup.addViewLayer();
+    // create view
+    var viewFactory = new dwv.ViewFactory();
+    var view = viewFactory.create(
+      new dwv.dicom.DicomElementsWrapper(data.meta),
+      data.image);
+
+    // view layer
+    var viewLayer = layerGroup.addViewLayer(view);
     // initialise
-    viewLayer.initialise(data.image, data.meta, dataIndex);
+    viewLayer.initialise(data.image.getGeometry(), dataIndex);
     // apply layer scale
     viewLayer.resize(layerGroup.getScale());
     // listen to image changes

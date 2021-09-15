@@ -346,9 +346,10 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   /**
    * Add a view layer.
    *
+   * @param {object} view The associated view.
    * @returns {object} The created layer.
    */
-  this.addViewLayer = function () {
+  this.addViewLayer = function (view) {
     // layer index
     var viewLayerIndex = layers.length;
     // create div
@@ -359,6 +360,8 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     var layer = new dwv.gui.ViewLayer(div);
     // set z-index: last on top
     layer.setZIndex(viewLayerIndex);
+    // set view
+    layer.setView(view);
     // add layer
     layers.push(layer);
     // mark it as active
@@ -436,6 +439,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    * Fit the display to the size of the container.
    * To be called once the image is loaded.
    *
+   * @param {object} realSize The oriented image real size (size*spacing).
    * @param {object} spacing The oriented image spacing.
    */
   this.fitToContainer = function (realSize, spacing) {
@@ -545,29 +549,26 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   /**
    * Initialise the layer: set the canvas and context
    *
-   * @param {object} image The image.
-   * @param {object} metaData The image meta data.
+   * @param {object} imageGeometry The image geometry.
    * @param {number} dataIndex The data index.
    */
-  this.initialise = function (image, metaData, dataIndex) {
-    var geometry = image.getGeometry();
-
+  this.initialise = function (imageGeometry, dataIndex) {
     viewOrientation = dwv.math.getIdentityMat33();
     if (typeof targetOrientation !== 'undefined') {
       // image orientation as one and zeros
       // -> view orientation is one and zeros
-      var imgOrientation = geometry.getOrientation().asOneAndZeros();
+      var imgOrientation = imageGeometry.getOrientation().asOneAndZeros();
       // imgOrientation * viewOrientation = targetOrientation
       // -> viewOrientation = inv(imgOrientation) * targetOrientation
       viewOrientation =
         imgOrientation.getInverse().multiply(targetOrientation);
     }
 
-    var size = image.getGeometry().getSize(viewOrientation);
+    var size = imageGeometry.getSize(viewOrientation);
     layerSize = size.get2D();
     // apply to layers
     for (var i = 0; i < layers.length; ++i) {
-      layers[i].initialise(image, metaData, dataIndex, viewOrientation);
+      layers[i].initialise(imageGeometry, dataIndex, viewOrientation);
     }
 
     // bind draw to view position
@@ -578,8 +579,8 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     this.updateDrawControllerToViewPosition();
 
     // fit data
-    var realSize = image.getGeometry().getRealSize(viewOrientation);
-    var spacing = image.getGeometry().getSpacing(viewOrientation);
+    var realSize = imageGeometry.getRealSize(viewOrientation);
+    var spacing = imageGeometry.getSpacing(viewOrientation);
     this.fitToContainer(realSize, spacing);
   };
 
