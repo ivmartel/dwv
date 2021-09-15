@@ -43,11 +43,11 @@ dwv.tool.ZoomAndPan = function (app) {
   this.twotouchdown = function (event) {
     self.started = true;
     // store first point
-    self.x0 = event._x;
-    self.y0 = event._y;
+    self.x0 = event._xs;
+    self.y0 = event._ys;
     // first line
-    var point0 = new dwv.math.Point2D(event._x, event._y);
-    var point1 = new dwv.math.Point2D(event._x1, event._y1);
+    var point0 = new dwv.math.Point2D(event._xs, event._ys);
+    var point1 = new dwv.math.Point2D(event._x1s, event._y1s);
     self.line0 = new dwv.math.Line(point0, point1);
     self.midPoint = self.line0.getMidpoint();
   };
@@ -83,8 +83,8 @@ dwv.tool.ZoomAndPan = function (app) {
     if (!self.started) {
       return;
     }
-    var point0 = new dwv.math.Point2D(event._x, event._y);
-    var point1 = new dwv.math.Point2D(event._x1, event._y1);
+    var point0 = new dwv.math.Point2D(event._xs, event._ys);
+    var point1 = new dwv.math.Point2D(event._x1s, event._y1s);
     var newLine = new dwv.math.Line(point0, point1);
     var lineRatio = newLine.getLength() / self.line0.getLength();
 
@@ -95,7 +95,7 @@ dwv.tool.ZoomAndPan = function (app) {
     if (lineRatio === 1) {
       // scroll mode
       // difference  to last position
-      var diffY = event._y - self.y0;
+      var diffY = event._ys - self.y0;
       // do not trigger for small moves
       if (Math.abs(diffY) < 15) {
         return;

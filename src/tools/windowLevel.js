@@ -32,8 +32,8 @@ dwv.tool.WindowLevel = function (app) {
     // set start flag
     self.started = true;
     // store initial position
-    self.x0 = event._x;
-    self.y0 = event._y;
+    self.x0 = event._xs;
+    self.y0 = event._ys;
   };
 
   /**
@@ -53,8 +53,8 @@ dwv.tool.WindowLevel = function (app) {
       layerGroup.getActiveViewLayer().getViewController();
 
     // difference to last position
-    var diffX = event._x - self.x0;
-    var diffY = self.y0 - event._y;
+    var diffX = event._xs - self.x0;
+    var diffY = self.y0 - event._ys;
     // calculate new window level
     var windowCenter =
       parseInt(viewController.getWindowLevel().center, 10) + diffY;
@@ -73,8 +73,8 @@ dwv.tool.WindowLevel = function (app) {
     viewController.setWindowLevelPreset('manual');
 
     // store position
-    self.x0 = event._x;
-    self.y0 = event._y;
+    self.x0 = event._xs;
+    self.y0 = event._ys;
   };
 
   /**

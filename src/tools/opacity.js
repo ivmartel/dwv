@@ -32,8 +32,8 @@ dwv.tool.Opacity = function (app) {
     // start flag
     self.started = true;
     // first position
-    self.x0 = event._x;
-    self.y0 = event._y;
+    self.x0 = event._xs;
+    self.y0 = event._ys;
   };
 
   /**
@@ -47,7 +47,7 @@ dwv.tool.Opacity = function (app) {
     }
 
     // difference to last X position
-    var diffX = event._x - self.x0;
+    var diffX = event._xs - self.x0;
     var xMove = (Math.abs(diffX) > 15);
     // do not trigger for small moves
     if (xMove) {
@@ -59,7 +59,7 @@ dwv.tool.Opacity = function (app) {
       viewLayer.draw();
 
       // reset origin point
-      self.x0 = event._x;
+      self.x0 = event._xs;
     }
   };
 
