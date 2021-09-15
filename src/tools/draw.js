@@ -206,7 +206,11 @@ dwv.tool.Draw = function (app) {
       // clear array
       points = [];
       // store point
-      lastPoint = new dwv.math.Point2D(event._x, event._y);
+      var pos = layerGroup.displayToIndex({
+        x: event._xs,
+        y: event._ys,
+      });
+      lastPoint = new dwv.math.Point2D(pos.x, pos.y);
       points.push(lastPoint);
     }
   };
@@ -222,9 +226,16 @@ dwv.tool.Draw = function (app) {
       return;
     }
 
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var pos = layerGroup.displayToIndex({
+      x: event._xs,
+      y: event._ys,
+    });
+
     // draw line to current pos
-    if (Math.abs(event._x - lastPoint.getX()) > 0 ||
-      Math.abs(event._y - lastPoint.getY()) > 0) {
+    if (Math.abs(pos.x - lastPoint.getX()) > 0 ||
+      Math.abs(pos.y - lastPoint.getY()) > 0) {
       // clear last added point from the list (but not the first one)
       // if it was marked as temporary
       if (points.length !== 1 &&
@@ -232,14 +243,12 @@ dwv.tool.Draw = function (app) {
         points.pop();
       }
       // current point
-      lastPoint = new dwv.math.Point2D(event._x, event._y);
+      lastPoint = new dwv.math.Point2D(pos.x, pos.y);
       // mark it as temporary
       lastPoint.tmp = true;
       // add it to the list
       points.push(lastPoint);
       // update points
-      var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
       onNewPoints(points, layerGroup);
     }
   };
@@ -329,14 +338,21 @@ dwv.tool.Draw = function (app) {
       return;
     }
 
-    if (Math.abs(event._x - lastPoint.getX()) > 0 ||
-      Math.abs(event._y - lastPoint.getY()) > 0) {
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var pos = layerGroup.displayToIndex({
+      x: event._xs,
+      y: event._ys,
+    });
+
+    if (Math.abs(pos.x - lastPoint.getX()) > 0 ||
+      Math.abs(pos.y - lastPoint.getY()) > 0) {
       // clear last added point from the list (but not the first one)
       if (points.length !== 1) {
         points.pop();
       }
       // current point
-      lastPoint = new dwv.math.Point2D(event._x, event._y);
+      lastPoint = new dwv.math.Point2D(pos.x, pos.y);
       // add current one to the list
       points.push(lastPoint);
       // allow for anchor points
@@ -347,8 +363,6 @@ dwv.tool.Draw = function (app) {
         }, currentFactory.getTimeout());
       }
       // update points
-      var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
       onNewPoints(points, layerGroup);
     }
   };

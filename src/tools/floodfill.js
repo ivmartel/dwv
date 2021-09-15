@@ -168,7 +168,12 @@ dwv.tool.Floodfill = function (app) {
    * @private
    */
   var getCoord = function (event) {
-    return {x: event._x, y: event._y};
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    return layerGroup.displayToIndex({
+      x: event._xs,
+      y: event._ys,
+    });
   };
 
   /**

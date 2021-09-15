@@ -134,6 +134,10 @@ dwv.tool.WindowLevel = function (app) {
   this.dblclick = function (event) {
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var pos = layerGroup.displayToIndex({
+      x: event._xs,
+      y: event._ys,
+    });
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
 
@@ -141,8 +145,8 @@ dwv.tool.WindowLevel = function (app) {
     viewController.setWindowLevel(
       parseInt(app.getImage().getRescaledValueAtIndex(
         viewController.getCurrentPosition().getWithNew2D(
-          event._x,
-          event._y
+          pos.x,
+          pos.y
         )
       ), 10),
       parseInt(viewController.getWindowLevel().width, 10));

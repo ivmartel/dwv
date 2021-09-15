@@ -117,32 +117,37 @@ dwv.tool.Livewire = function (app) {
    * @param {object} event The mouse down event.
    */
   this.mousedown = function (event) {
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var pos = layerGroup.displayToIndex({
+      x: event._xs,
+      y: event._ys,
+    });
+
     // first time
     if (!self.started) {
       self.started = true;
-      self.x0 = event._x;
-      self.y0 = event._y;
+      self.x0 = pos.x;
+      self.y0 = pos.y;
       // clear vars
       clearPaths();
       clearParentPoints();
       shapeGroup = null;
       // update zoom scale
-      var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
       var drawLayer = layerGroup.getActiveDrawLayer();
       self.style.setZoomScale(
         drawLayer.getKonvaLayer().getAbsoluteScale());
       // do the training from the first point
-      var p = new dwv.math.FastPoint2D(event._x, event._y);
+      var p = new dwv.math.FastPoint2D(pos.x, pos.y);
       scissors.doTraining(p);
       // add the initial point to the path
-      var p0 = new dwv.math.Point2D(event._x, event._y);
+      var p0 = new dwv.math.Point2D(pos.x, pos.y);
       path.addPoint(p0);
       path.addControlPoint(p0);
     } else {
       // final point: at 'tolerance' of the initial point
-      if ((Math.abs(event._x - self.x0) < tolerance) &&
-        (Math.abs(event._y - self.y0) < tolerance)) {
+      if ((Math.abs(pos.x - self.x0) < tolerance) &&
+        (Math.abs(pos.y - self.y0) < tolerance)) {
         // draw
         self.mousemove(event);
         // listen
@@ -158,7 +163,7 @@ dwv.tool.Livewire = function (app) {
         // anchor point
         path = currentPath;
         clearParentPoints();
-        var pn = new dwv.math.FastPoint2D(event._x, event._y);
+        var pn = new dwv.math.FastPoint2D(pos.x, pos.y);
         scissors.doTraining(pn);
         path.addControlPoint(currentPath.getPoint(0));
       }
@@ -174,8 +179,15 @@ dwv.tool.Livewire = function (app) {
     if (!self.started) {
       return;
     }
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var pos = layerGroup.displayToIndex({
+      x: event._xs,
+      y: event._ys,
+    });
+
     // set the point to find the path to
-    var p = new dwv.math.FastPoint2D(event._x, event._y);
+    var p = new dwv.math.FastPoint2D(pos.x, pos.y);
     scissors.setPoint(p);
     // do the work
     var results = 0;

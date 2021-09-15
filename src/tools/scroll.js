@@ -42,10 +42,15 @@ dwv.tool.Scroll = function (app) {
     // start flag
     self.started = true;
     // first position
-    self.x0 = event._x;
-    self.y0 = event._y;
-    // update position
-    viewController.setCurrentPosition2D(event._x, event._y);
+    self.x0 = event._xs;
+    self.y0 = event._ys;
+
+    // update controller position
+    var pos = layerGroup.displayToIndex({
+      x: event._xs,
+      y: event._ys,
+    });
+    viewController.setCurrentPosition2D(pos.x, pos.y);
   };
 
   /**
@@ -65,7 +70,7 @@ dwv.tool.Scroll = function (app) {
     var size = app.getImage().getGeometry().getSize();
 
     // difference to last Y position
-    var diffY = event._y - self.y0;
+    var diffY = event._ys - self.y0;
     var yMove = (Math.abs(diffY) > 15);
     // do not trigger for small moves
     if (yMove && viewController.canScroll()) {
@@ -78,7 +83,7 @@ dwv.tool.Scroll = function (app) {
     }
 
     // difference to last X position
-    var diffX = event._x - self.x0;
+    var diffX = event._xs - self.x0;
     var xMove = (Math.abs(diffX) > 15);
     // do not trigger for small moves
     if (xMove && size.moreThanOne(3)) {
@@ -92,10 +97,10 @@ dwv.tool.Scroll = function (app) {
 
     // reset origin point
     if (xMove) {
-      self.x0 = event._x;
+      self.x0 = event._xs;
     }
     if (yMove) {
-      self.y0 = event._y;
+      self.y0 = event._ys;
     }
   };
 

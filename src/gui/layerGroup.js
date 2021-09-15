@@ -247,8 +247,8 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     var scale2D = dwv.math.getOrientedXYZ(scale, viewOrientation);
     var offset2D = dwv.math.getOrientedXYZ(offset, viewOrientation);
     return {
-      x: point2D.x / scale2D.x + offset2D.x,
-      y: point2D.y / scale2D.y + offset2D.y
+      x: parseInt(point2D.x / scale2D.x + offset2D.x, 10),
+      y: parseInt(point2D.y / scale2D.y + offset2D.y, 10)
     };
   };
 
