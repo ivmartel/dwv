@@ -147,15 +147,14 @@ dwv.ctrl.ToolboxController = function (toolList) {
    * Listen to layer interaction events.
    *
    * @param {object} layer The layer to listen to.
-   * @param {object} displayToIndexConverter The display to index converter.
    */
-  this.attachLayer = function (layer, displayToIndexConverter) {
+  this.attachLayer = function (layer) {
     layer.activate();
     // interaction events
     var names = dwv.gui.interactionEventNames;
     for (var i = 0; i < names.length; ++i) {
       layer.addEventListener(names[i],
-        getOnMouch(layer.getId(), names[i], displayToIndexConverter));
+        getOnMouch(layer.getId(), names[i]));
     }
   };
 
@@ -163,15 +162,14 @@ dwv.ctrl.ToolboxController = function (toolList) {
    * Remove canvas mouse and touch listeners.
    *
    * @param {object} layer The layer to stop listening to.
-   * @param {object} displayToIndexConverter The display to index converter.
    */
-  this.detachLayer = function (layer, displayToIndexConverter) {
+  this.detachLayer = function (layer) {
     layer.deactivate();
     // interaction events
     var names = dwv.gui.interactionEventNames;
     for (var i = 0; i < names.length; ++i) {
       layer.removeEventListener(names[i],
-        getOnMouch(layer.getId(), names[i], displayToIndexConverter));
+        getOnMouch(layer.getId(), names[i]));
     }
   };
 
@@ -182,11 +180,10 @@ dwv.ctrl.ToolboxController = function (toolList) {
    *
    * @param {string} layerId The layer id.
    * @param {string} eventType The event type.
-   * @param {object} displayToIndexConverter The display to index converter.
    * @returns {object} A callback for the provided layer and event.
    * @private
    */
-  function getOnMouch(layerId, eventType, displayToIndexConverter) {
+  function getOnMouch(layerId, eventType) {
     // augment event with converted offsets
     var augmentEventOffsets = function (event) {
       // event offset(s)
@@ -194,16 +191,10 @@ dwv.ctrl.ToolboxController = function (toolList) {
       // should have at least one offset
       event._xs = offsets[0].x;
       event._ys = offsets[0].y;
-      var position = displayToIndexConverter(offsets[0]);
-      event._x = parseInt(position.x, 10);
-      event._y = parseInt(position.y, 10);
       // possible second
       if (offsets.length === 2) {
         event._x1s = offsets[1].x;
         event._y1s = offsets[1].y;
-        position = displayToIndexConverter(offsets[1]);
-        event._x1 = parseInt(position.x, 10);
-        event._y1 = parseInt(position.y, 10);
       }
     };
 

@@ -757,12 +757,12 @@ dwv.App = function () {
         previousLayer = layerGroup.getActiveDrawLayer();
       }
       if (previousLayer) {
-        toolboxController.detachLayer(previousLayer, layerGroup.displayToIndex);
+        toolboxController.detachLayer(previousLayer);
       }
       // detach to avoid possible double attach
-      toolboxController.detachLayer(layer, layerGroup.displayToIndex);
+      toolboxController.detachLayer(layer);
 
-      toolboxController.attachLayer(layer, layerGroup.displayToIndex);
+      toolboxController.attachLayer(layer);
     }
 
     toolboxController.setSelectedTool(tool);
