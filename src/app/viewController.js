@@ -85,10 +85,14 @@ dwv.ctrl.ViewController = function (view) {
    * @returns {object} The position.
    */
   this.getCurrentOrientedPosition = function () {
+    var res = view.getCurrentPosition();
     // values = orientation * orientedValues
     // -> inv(orientation) * values = orientedValues
-    return view.getOrientation().getInverse().multiplyIndex3D(
-      view.getCurrentPosition());
+    if (typeof view.getOrientation() !== 'undefined') {
+      res = view.getOrientation().getInverse().multiplyIndex3D(
+        view.getCurrentPosition());
+    }
+    return res;
   };
 
   /**
