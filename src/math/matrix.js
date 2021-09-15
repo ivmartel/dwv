@@ -374,7 +374,7 @@ dwv.math.getDeOrientedArray3D = function (array3D, orientation) {
  *
  * @param {object} values Values as {x,y,z}.
  * @param {object} orientation The orientation.
-* @returns {object} Reoriented values as {x,y,z}.
+ * @returns {object} Reoriented values as {x,y,z}.
  */
 dwv.math.getOrientedXYZ = function (values, orientation) {
   var orientedValues = dwv.math.getOrientedArray3D(
