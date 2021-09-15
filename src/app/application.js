@@ -411,9 +411,7 @@ dwv.App = function () {
   this.fitToContainer = function () {
     var layerGroup = stage.getActiveLayerGroup();
     if (layerGroup) {
-      layerGroup.fitToContainer(
-        self.getImage().getGeometry().getSpacing()
-      );
+      layerGroup.fitToContainer(self.getImage().getGeometry());
       layerGroup.draw();
       // update style
       style.setBaseScale(layerGroup.getBaseScale());

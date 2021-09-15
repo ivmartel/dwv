@@ -374,22 +374,6 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
   };
 
   /**
-   * Get the real size (size * spacing) of the data.
-   *
-   * @param {object} viewOrientation The view orientation (optional)
-   * @returns {Array} The real size.
-   */
-  this.getRealSize = function (viewOrientation) {
-    var size = this.getSize(viewOrientation);
-    var spacing = this.getSpacing(viewOrientation);
-    return [
-      size.get(0) * spacing.getColumnSpacing(),
-      size.get(1) * spacing.getRowSpacing(),
-      size.get(2) * spacing.getSliceSpacing(),
-    ];
-  };
-
-  /**
    * Get the object orientation.
    *
    * @returns {object} The object orientation.

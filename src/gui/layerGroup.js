@@ -56,19 +56,21 @@ dwv.gui.getLayerDetailsFromEvent = function (event) {
  * To be called with an existing HTML element!
  *
  * @param {object} containerDiv The container.
- * @param {object} realSize The oriented image real size (size*spacing).
+ * @param {object} size The oriented image size.
  * @param {object} spacing The oriented image spacing.
  * @returns {object} The scale as {x,y,z}.
  */
-dwv.gui.getFitToContainerScale = function (containerDiv, realSize, spacing) {
+dwv.gui.getFitToContainerScale = function (containerDiv, size, spacing) {
   // check container size
   if (containerDiv.offsetWidth === 0 &&
     containerDiv.offsetHeight === 0) {
     throw new Error('Cannot fit to zero sized container.');
   }
   // best fit
-  var scaleX = containerDiv.offsetWidth / realSize[0];
-  var scaleY = containerDiv.offsetHeight / realSize[1];
+  var scaleX =
+    containerDiv.offsetWidth / (size.get(0) * spacing.getColumnSpacing());
+  var scaleY =
+    containerDiv.offsetHeight / (size.get(1) * spacing.getRowSpacing());
   // minimum scale and not zero
   var scale = null;
   if (scaleX > 0 && scaleY > 0) {
@@ -439,12 +441,14 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    * Fit the display to the size of the container.
    * To be called once the image is loaded.
    *
-   * @param {object} realSize The oriented image real size (size*spacing).
-   * @param {object} spacing The oriented image spacing.
+   * @param {object} geometry The image geomtry.
    */
-  this.fitToContainer = function (realSize, spacing) {
+  this.fitToContainer = function (geometry) {
     var fitScale = dwv.gui.getFitToContainerScale(
-      containerDiv, realSize, spacing);
+      containerDiv,
+      geometry.getSize(viewOrientation),
+      geometry.getSpacing(viewOrientation)
+    );
     this.resize(dwv.math.getDeOrientedXYZ(fitScale, viewOrientation));
   };
 
@@ -579,9 +583,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     this.updateDrawControllerToViewPosition();
 
     // fit data
-    var realSize = imageGeometry.getRealSize(viewOrientation);
-    var spacing = imageGeometry.getSpacing(viewOrientation);
-    this.fitToContainer(realSize, spacing);
+    this.fitToContainer(imageGeometry);
   };
 
   /**
