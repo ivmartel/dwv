@@ -189,12 +189,12 @@ dwv.ctrl.ToolboxController = function (toolList) {
       // event offset(s)
       var offsets = dwv.gui.getEventOffset(event);
       // should have at least one offset
-      event._xs = offsets[0].x;
-      event._ys = offsets[0].y;
+      event._x = offsets[0].x;
+      event._y = offsets[0].y;
       // possible second
       if (offsets.length === 2) {
-        event._x1s = offsets[1].x;
-        event._y1s = offsets[1].y;
+        event._x1 = offsets[1].x;
+        event._y1 = offsets[1].y;
       }
     };
 

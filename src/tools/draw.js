@@ -174,8 +174,8 @@ dwv.tool.Draw = function (app) {
     // determine if the click happened in an existing shape
     var stage = drawLayer.getKonvaStage();
     var kshape = stage.getIntersection({
-      x: event._xs,
-      y: event._ys
+      x: event._x,
+      y: event._y
     });
 
     // update scale
@@ -207,8 +207,8 @@ dwv.tool.Draw = function (app) {
       points = [];
       // store point
       var pos = layerGroup.displayToIndex({
-        x: event._xs,
-        y: event._ys,
+        x: event._x,
+        y: event._y,
       });
       lastPoint = new dwv.math.Point2D(pos.x, pos.y);
       points.push(lastPoint);
@@ -229,8 +229,8 @@ dwv.tool.Draw = function (app) {
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var pos = layerGroup.displayToIndex({
-      x: event._xs,
-      y: event._ys,
+      x: event._x,
+      y: event._y,
     });
 
     // draw line to current pos
@@ -341,8 +341,8 @@ dwv.tool.Draw = function (app) {
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var pos = layerGroup.displayToIndex({
-      x: event._xs,
-      y: event._ys,
+      x: event._x,
+      y: event._y,
     });
 
     if (Math.abs(pos.x - lastPoint.getX()) > 0 ||

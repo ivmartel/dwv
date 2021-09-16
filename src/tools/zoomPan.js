@@ -31,8 +31,8 @@ dwv.tool.ZoomAndPan = function (app) {
   this.mousedown = function (event) {
     self.started = true;
     // first position
-    self.x0 = event._xs;
-    self.y0 = event._ys;
+    self.x0 = event._x;
+    self.y0 = event._y;
   };
 
   /**
@@ -43,11 +43,11 @@ dwv.tool.ZoomAndPan = function (app) {
   this.twotouchdown = function (event) {
     self.started = true;
     // store first point
-    self.x0 = event._xs;
-    self.y0 = event._ys;
+    self.x0 = event._x;
+    self.y0 = event._y;
     // first line
-    var point0 = new dwv.math.Point2D(event._xs, event._ys);
-    var point1 = new dwv.math.Point2D(event._x1s, event._y1s);
+    var point0 = new dwv.math.Point2D(event._x, event._y);
+    var point1 = new dwv.math.Point2D(event._x1, event._y1);
     self.line0 = new dwv.math.Line(point0, point1);
     self.midPoint = self.line0.getMidpoint();
   };
@@ -62,16 +62,16 @@ dwv.tool.ZoomAndPan = function (app) {
       return;
     }
     // calculate translation
-    var tx = event._xs - self.x0;
-    var ty = event._ys - self.y0;
+    var tx = event._x - self.x0;
+    var ty = event._y - self.y0;
     // apply translation
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     layerGroup.addTranslation({x: tx, y: ty});
     layerGroup.draw();
     // reset origin point
-    self.x0 = event._xs;
-    self.y0 = event._ys;
+    self.x0 = event._x;
+    self.y0 = event._y;
   };
 
   /**
@@ -83,8 +83,8 @@ dwv.tool.ZoomAndPan = function (app) {
     if (!self.started) {
       return;
     }
-    var point0 = new dwv.math.Point2D(event._xs, event._ys);
-    var point1 = new dwv.math.Point2D(event._x1s, event._y1s);
+    var point0 = new dwv.math.Point2D(event._x, event._y);
+    var point1 = new dwv.math.Point2D(event._x1, event._y1);
     var newLine = new dwv.math.Line(point0, point1);
     var lineRatio = newLine.getLength() / self.line0.getLength();
 
@@ -95,7 +95,7 @@ dwv.tool.ZoomAndPan = function (app) {
     if (lineRatio === 1) {
       // scroll mode
       // difference  to last position
-      var diffY = event._ys - self.y0;
+      var diffY = event._y - self.y0;
       // do not trigger for small moves
       if (Math.abs(diffY) < 15) {
         return;
@@ -115,7 +115,7 @@ dwv.tool.ZoomAndPan = function (app) {
       if (Math.abs(zoom) % 0.1 <= 0.05) {
         // keep third direction
         var k = viewController.getCurrentScrollPosition();
-        layerGroup.addScale(zoom, {x: event._xs, y: event._ys, z: k});
+        layerGroup.addScale(zoom, {x: event._x, y: event._y, z: k});
         layerGroup.draw();
 
       }
@@ -193,7 +193,7 @@ dwv.tool.ZoomAndPan = function (app) {
     // keep third direction
     var vc = layerGroup.getActiveViewLayer().getViewController();
     var k = vc.getCurrentScrollPosition();
-    layerGroup.addScale(step, {x: event._xs, y: event._ys, z: k});
+    layerGroup.addScale(step, {x: event._x, y: event._y, z: k});
     layerGroup.draw();
   };
 

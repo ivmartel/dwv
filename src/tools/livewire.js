@@ -120,8 +120,8 @@ dwv.tool.Livewire = function (app) {
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var pos = layerGroup.displayToIndex({
-      x: event._xs,
-      y: event._ys,
+      x: event._x,
+      y: event._y,
     });
 
     // first time
@@ -182,8 +182,8 @@ dwv.tool.Livewire = function (app) {
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var pos = layerGroup.displayToIndex({
-      x: event._xs,
-      y: event._ys,
+      x: event._x,
+      y: event._y,
     });
 
     // set the point to find the path to
