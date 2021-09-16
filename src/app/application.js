@@ -473,6 +473,10 @@ dwv.App = function () {
         // create new layer group
         var element = document.getElementById(config.divId);
         layerGroup = stage.addLayerGroup(element);
+        // propagate layer group events
+        layerGroup.addEventListener('zoomchange', fireEvent);
+        layerGroup.addEventListener('offsetchange', fireEvent);
+        // optional orientation
         if (typeof config.orientation !== 'undefined') {
           layerGroup.setOrientation(
             dwv.math.getMatrixFromName(config.orientation));
