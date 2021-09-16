@@ -126,14 +126,18 @@ dwv.gui.getEventOffset = function (event) {
     // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/targetTouches
     positions = dwv.gui.getTouchesPositions(event.targetTouches);
   } else if (typeof event.changedTouches !== 'undefined' &&
-      event.changedTouches.length !== 0) {
+    event.changedTouches.length !== 0) {
     // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/changedTouches
     positions = dwv.gui.getTouchesPositions(event.changedTouches);
   } else {
-    // layerX is used by Firefox
-    var ex = event.offsetX === undefined ? event.layerX : event.offsetX;
-    var ey = event.offsetY === undefined ? event.layerY : event.offsetY;
-    positions.push({x: ex, y: ey});
+    // offsetX/Y: the offset in the X coordinate of the mouse pointer
+    // between that event and the padding edge of the target node
+    // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/offsetX
+    // https://caniuse.com/mdn-api_mouseevent_offsetx
+    positions.push({
+      x: event.offsetX,
+      y: event.offsetY
+    });
   }
   return positions;
 };
