@@ -78,8 +78,8 @@ dwv.math.Vector3D.prototype.norm = function () {
  * Get the cross product with another Vector3D, ie the
  * vector that is perpendicular to both a and b.
  * If both vectors are parallel, the cross product is a zero vector.
- * @see https://en.wikipedia.org/wiki/Cross_product
  *
+ * @see https://en.wikipedia.org/wiki/Cross_product
  * @param {object} vector3D The input vector.
  * @returns {object} The result vector.
  */
@@ -92,8 +92,8 @@ dwv.math.Vector3D.prototype.crossProduct = function (vector3D) {
 
 /**
  * Get the dot product with another Vector3D.
- * @see https://en.wikipedia.org/wiki/Dot_product
  *
+ * @see https://en.wikipedia.org/wiki/Dot_product
  * @param {object} vector3D The input vector.
  * @returns {number} The dot product.
  */

@@ -235,8 +235,6 @@ dwv.tool.Livewire = function (app) {
     shapeGroup = factory.create(currentPath.pointArray, self.style);
     shapeGroup.id(dwv.math.guid());
 
-    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var drawLayer = layerGroup.getActiveDrawLayer();
     var drawController = drawLayer.getDrawController();
 
