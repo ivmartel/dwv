@@ -26,7 +26,10 @@ dwv.gui.PositionBinder = function () {
   };
   this.getCallback = function (layerGroup) {
     return function (event) {
-      var pos = new dwv.math.Index(event.value[0]);
+      var pos = new dwv.math.Point3D(
+        event.value[1][0],
+        event.value[1][1],
+        event.value[1][2]);
       var vc = layerGroup.getActiveViewLayer().getViewController();
       vc.setCurrentPosition(pos);
     };
@@ -228,7 +231,8 @@ dwv.gui.Stage = function () {
   this.unbind = function () {
     if (layerGroups.length === 0 ||
       layerGroups.length === 1 ||
-      binders.length === 0) {
+      binders.length === 0 ||
+      !callbackStore) {
       return;
     }
     // remove listeners

@@ -237,6 +237,18 @@ dwv.image.Spacing.prototype.toString = function () {
     ', ' + this.getSliceSpacing() + ')';
 };
 
+/**
+ * Get the 2D base of this size.
+ *
+ * @returns {object} The 2D base [col,row] as {x,y}.
+ */
+dwv.image.Spacing.prototype.get2D = function () {
+  return {
+    x: this.getColumnSpacing(),
+    y: this.getRowSpacing()
+  };
+};
+
 
 /**
  * 2D/3D Geometry class.

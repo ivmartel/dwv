@@ -67,7 +67,15 @@ dwv.tool.ZoomAndPan = function (app) {
     // apply translation
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
-    layerGroup.addTranslation({x: tx, y: ty});
+    var viewLayer = layerGroup.getActiveViewLayer();
+    var viewController = viewLayer.getViewController();
+    var planeOffset = viewLayer.displayToPlaneScale(tx, ty);
+    var offset3D = viewController.getOffset3DFromPlaneOffset(planeOffset);
+    layerGroup.addTranslation({
+      x: offset3D.getX(),
+      y: offset3D.getY(),
+      z: offset3D.getZ()
+    });
     layerGroup.draw();
     // reset origin point
     self.x0 = event._x;
@@ -90,7 +98,8 @@ dwv.tool.ZoomAndPan = function (app) {
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
-    var viewController = layerGroup.getActiveViewLayer().getViewController();
+    var viewLayer = layerGroup.getActiveViewLayer();
+    var viewController = viewLayer.getViewController();
 
     if (lineRatio === 1) {
       // scroll mode
@@ -113,11 +122,10 @@ dwv.tool.ZoomAndPan = function (app) {
       // zoom mode
       var zoom = (lineRatio - 1) / 2;
       if (Math.abs(zoom) % 0.1 <= 0.05) {
-        // keep third direction
-        var k = viewController.getCurrentScrollPosition();
-        layerGroup.addScale(zoom, {x: event._x, y: event._y, z: k});
+        var planePos = viewLayer.displayToPlanePos(event._x, event._y);
+        var center = viewController.getPositionFromPlanePoint(planePos);
+        layerGroup.addScale(zoom, center);
         layerGroup.draw();
-
       }
     }
   };
@@ -190,10 +198,11 @@ dwv.tool.ZoomAndPan = function (app) {
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
-    // keep third direction
-    var vc = layerGroup.getActiveViewLayer().getViewController();
-    var k = vc.getCurrentScrollPosition();
-    layerGroup.addScale(step, {x: event._x, y: event._y, z: k});
+    var viewLayer = layerGroup.getActiveViewLayer();
+    var viewController = viewLayer.getViewController();
+    var planePos = viewLayer.displayToPlanePos(event._x, event._y);
+    var center = viewController.getPositionFromPlanePoint(planePos);
+    layerGroup.addScale(step, center);
     layerGroup.draw();
   };
 

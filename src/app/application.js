@@ -414,7 +414,7 @@ dwv.App = function () {
       layerGroup.fitToContainer(self.getImage().getGeometry());
       layerGroup.draw();
       // update style
-      style.setBaseScale(layerGroup.getBaseScale());
+      //style.setBaseScale(layerGroup.getBaseScale());
     }
   };
 
@@ -478,7 +478,7 @@ dwv.App = function () {
         layerGroup.addEventListener('offsetchange', fireEvent);
         // optional orientation
         if (typeof config.orientation !== 'undefined') {
-          layerGroup.setOrientation(
+          layerGroup.setTargetOrientation(
             dwv.math.getMatrixFromName(config.orientation));
         }
       }
@@ -491,10 +491,6 @@ dwv.App = function () {
       // draw
       layerGroup.draw();
     }
-
-    // bind stage layer groups
-    stage.bind();
-
   };
 
   /**
@@ -572,7 +568,7 @@ dwv.App = function () {
     drawController.setDrawings(
       drawings, drawingsDetails, fireEvent, this.addToUndoStack);
 
-    drawController.activateDrawLayer(viewController.getCurrentPosition());
+    drawController.activateDrawLayer(viewController.getCurrentOrientedIndex());
   };
   /**
    * Update a drawing from its details.
@@ -955,8 +951,8 @@ dwv.App = function () {
       if (layerGroup) {
         var controller =
           layerGroup.getActiveViewLayer().getViewController();
-        var currentPosition = controller.getCurrentPosition();
-        if (sliceNb <= currentPosition.get(2)) {
+        var currentIndex = controller.getCurrentIndex();
+        if (sliceNb <= currentIndex.get(2)) {
           controller.incrementIndex(2, true);
         }
       }
@@ -1105,33 +1101,15 @@ dwv.App = function () {
         layerGroupElementId);
     }
 
-    // create view
-    var viewFactory = new dwv.ViewFactory();
-    var view = viewFactory.create(
-      new dwv.dicom.DicomElementsWrapper(data.meta),
-      data.image);
-
-    // view layer
-    var viewLayer = layerGroup.addViewLayer(view);
-
-    // optional draw layer
-    if (toolboxController && toolboxController.hasTool('Draw')) {
-      layerGroup.addDrawLayer();
-    }
-    // initialise layers
-    layerGroup.initialise(data.image.getGeometry(), dataIndex);
+    // add layers
+    addViewLayer(dataIndex, layerGroupElementId);
 
     // update style
-    style.setBaseScale(layerGroup.getBaseScale());
-    // bind view to app
-    bindViewLayer(viewLayer);
+    //style.setBaseScale(layerGroup.getBaseScale());
 
-    // propagate layer events
-    layerGroup.addEventListener('zoomchange', fireEvent);
-    layerGroup.addEventListener('offsetchange', fireEvent);
-
-    // listen to image changes
-    dataController.addEventListener('imagechange', viewLayer.onimagechange);
+    // // propagate layer events
+    // layerGroup.addEventListener('zoomchange', fireEvent);
+    // layerGroup.addEventListener('offsetchange', fireEvent);
 
     // initialise the toolbox
     if (toolboxController) {
@@ -1155,27 +1133,61 @@ dwv.App = function () {
       throw new Error('Cannot initialise layers with group id: ' +
         layerGroupElementId);
     }
+    var imageGeometry = data.image.getGeometry();
 
-    // un-bind previous
-    unbindViewLayer(layerGroup.getActiveViewLayer());
+    // un-bind
+    if (typeof layerGroup.getActiveViewLayer() !== 'undefined') {
+      unbindViewLayer(layerGroup.getActiveViewLayer());
+    }
+    stage.unbind();
 
-    // create view
+    // create and setup view
     var viewFactory = new dwv.ViewFactory();
     var view = viewFactory.create(
       new dwv.dicom.DicomElementsWrapper(data.meta),
       data.image);
+    var viewOrientation = dwv.gui.getViewOrientation(
+      imageGeometry,
+      layerGroup.getTargetOrientation()
+    );
+    view.setOrientation(viewOrientation);
+
+    // TODO: find another way for a default colour map
+    if (dataIndex !== 0) {
+      view.setColourMap(dwv.image.lut.rainbow);
+    }
 
     // view layer
-    var viewLayer = layerGroup.addViewLayer(view);
-    // initialise
-    viewLayer.initialise(data.image.getGeometry(), dataIndex);
-    // apply layer scale
-    viewLayer.resize(layerGroup.getScale());
+    var viewLayer = layerGroup.addViewLayer();
+    viewLayer.setView(view);
+    var size2D = imageGeometry.getSize(viewOrientation).get2D();
+    var spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
+    viewLayer.initialise(size2D, spacing2D, dataIndex);
+
     // listen to image changes
     dataController.addEventListener('imagechange', viewLayer.onimagechange);
 
-    // bind new
+    // bind
     bindViewLayer(viewLayer);
+    stage.bind();
+
+    // optional draw layer
+    if (toolboxController && toolboxController.hasTool('Draw')) {
+      var dl = layerGroup.addDrawLayer();
+      dl.initialise(size2D, spacing2D, dataIndex);
+      dl.setPlaneHelper(viewLayer.getViewController().getPlaneHelper());
+
+      var vc = viewLayer.getViewController();
+      var pos = vc.getCurrentPosition();
+      var posValues = [pos.getX(), pos.getY(), pos.getZ()];
+      var value = [
+        vc.getCurrentIndex().getValues(),
+        posValues
+      ];
+      layerGroup.updateLayersToPositionChange({value: value});
+    }
+
+    layerGroup.fitToContainer();
   }
 
 };

@@ -206,10 +206,8 @@ dwv.tool.Draw = function (app) {
       // clear array
       points = [];
       // store point
-      var pos = layerGroup.displayToIndex({
-        x: event._x,
-        y: event._y,
-      });
+      var viewLayer = layerGroup.getActiveViewLayer();
+      var pos = viewLayer.displayToPlanePos(event._x, event._y);
       lastPoint = new dwv.math.Point2D(pos.x, pos.y);
       points.push(lastPoint);
     }
@@ -228,10 +226,8 @@ dwv.tool.Draw = function (app) {
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
-    var pos = layerGroup.displayToIndex({
-      x: event._x,
-      y: event._y,
-    });
+    var viewLayer = layerGroup.getActiveViewLayer();
+    var pos = viewLayer.displayToPlanePos(event._x, event._y);
 
     // draw line to current pos
     if (Math.abs(pos.x - lastPoint.getX()) > 0 ||
@@ -340,10 +336,8 @@ dwv.tool.Draw = function (app) {
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
-    var pos = layerGroup.displayToIndex({
-      x: event._x,
-      y: event._y,
-    });
+    var viewLayer = layerGroup.getActiveViewLayer();
+    var pos = viewLayer.displayToPlanePos(event._x, event._y);
 
     if (Math.abs(pos.x - lastPoint.getX()) > 0 ||
       Math.abs(pos.y - lastPoint.getY()) > 0) {
@@ -512,12 +506,10 @@ dwv.tool.Draw = function (app) {
     activateCurrentPositionShapes(flag, layerGroup);
     // listen to app change to update the draw layer
     if (flag) {
+      // TODO: merge with drawController.activateDrawLayer?
       app.addEventListener('positionchange', function () {
         updateDrawLayer(layerGroup);
       });
-
-      // init with the app window scale
-      this.style.setBaseScale(app.getBaseScale());
       // same for colour
       this.setLineColour(this.style.getLineColour());
     } else {
@@ -588,10 +580,11 @@ dwv.tool.Draw = function (app) {
 
   /**
    * Get the real position from an event.
+   * TODO: use layer method?
    *
    * @param {object} index The input index.
    * @param {object} layerGroup The origin layer group.
-   * @returns {object} The reasl position in the image.
+   * @returns {object} The real position in the image.
    * @private
    */
   function getRealPosition(index, layerGroup) {

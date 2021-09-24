@@ -58,7 +58,7 @@ dwv.gui.getLayerDetailsFromEvent = function (event) {
  * @param {object} containerDiv The container.
  * @param {object} size The oriented image size.
  * @param {object} spacing The oriented image spacing.
- * @returns {object} The scale as {x,y,z}.
+ * @returns {object} The scale as {x,y}.
  */
 dwv.gui.getFitToContainerScale = function (containerDiv, size, spacing) {
   // check container size
@@ -67,10 +67,8 @@ dwv.gui.getFitToContainerScale = function (containerDiv, size, spacing) {
     throw new Error('Cannot fit to zero sized container.');
   }
   // best fit
-  var scaleX =
-    containerDiv.offsetWidth / (size.get(0) * spacing.getColumnSpacing());
-  var scaleY =
-    containerDiv.offsetHeight / (size.get(1) * spacing.getRowSpacing());
+  var scaleX = containerDiv.offsetWidth / (size.x * spacing.x);
+  var scaleY = containerDiv.offsetHeight / (size.y * spacing.y);
   // minimum scale and not zero
   var scale = null;
   if (scaleX > 0 && scaleY > 0) {
@@ -78,17 +76,50 @@ dwv.gui.getFitToContainerScale = function (containerDiv, size, spacing) {
   } else {
     scale = scaleX === 0 ? scaleY : scaleX;
   }
-  // return 3D scale
-  var scale3D = {
-    x: scale * spacing.getColumnSpacing(),
-    y: scale * spacing.getRowSpacing(),
-    z: scale * spacing.getSliceSpacing()
+  // return 2D scale
+  return {
+    x: scale * spacing.x,
+    y: scale * spacing.y
   };
-  return scale3D;
+};
+
+/**
+ * Get a view orientation according to an image geometry (with its orientation)
+ * and target orientation.
+ *
+ * @param {object} imageGeometry The image geometry.
+ * @param {object} targetOrientation The target orientation.
+ * @returns {object} The view orientation.
+ */
+dwv.gui.getViewOrientation = function (imageGeometry, targetOrientation) {
+  var viewOrientation = dwv.math.getIdentityMat33();
+  if (typeof targetOrientation !== 'undefined') {
+    // image orientation as one and zeros
+    // -> view orientation is one and zeros
+    var imgOrientation = imageGeometry.getOrientation().asOneAndZeros();
+    // imgOrientation * viewOrientation = targetOrientation
+    // -> viewOrientation = inv(imgOrientation) * targetOrientation
+    viewOrientation =
+      imgOrientation.getInverse().multiply(targetOrientation);
+  }
+  return viewOrientation;
 };
 
 /**
  * Layer group.
+ *
+ * Display position: {x,y}
+ * Plane position: Index (access: get(i))
+ * (world) Position: Point3D (access: getX, getY, getZ)
+ *
+ * Display -> World:
+ * planePos = viewLayer.displayToPlanePos(displayPos)
+ * -> compensate for layer scale and offset
+ * pos = viewController.getPositionFromPlanePoint(planePos)
+ *
+ * World -> display
+ * planePos = viewController.getOffset3DFromPlaneOffset(pos)
+ * no need yet for a planePos to displayPos...
  *
  * @param {object} containerDiv The associated HTML div.
  * @param {number} groupId The group id.
@@ -123,14 +154,6 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   var offset = {x: 0, y: 0, z: 0};
 
   /**
-   * The layer size as {x,y}.
-   *
-   * @private
-   * @type {object}
-   */
-  var layerSize;
-
-  /**
    * Active view layer index.
    *
    * @private
@@ -163,19 +186,20 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   var targetOrientation;
 
   /**
-   * The view orientation matrix.
+   * Get the target orientation.
    *
-   * @type {object}
-   * @private
+   * @returns {object} The orientation matrix.
    */
-  var viewOrientation;
+  this.getTargetOrientation = function () {
+    return targetOrientation;
+  };
 
   /**
    * Set the target orientation.
    *
-   * @param {object} orientation The target orientation matrix.
+   * @param {object} orientation The orientation matrix.
    */
-  this.setOrientation = function (orientation) {
+  this.setTargetOrientation = function (orientation) {
     targetOrientation = orientation;
   };
 
@@ -238,21 +262,6 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   };
 
   /**
-   * Transform a display position to an index.
-   *
-   * @param {dwv.Math.Point2D} point2D The point to convert.
-   * @returns {object} The equivalent index.
-   */
-  this.displayToIndex = function (point2D) {
-    var scale2D = dwv.math.getOrientedXYZ(scale, viewOrientation);
-    var offset2D = dwv.math.getOrientedXYZ(offset, viewOrientation);
-    return {
-      x: parseInt(point2D.x / scale2D.x + offset2D.x, 10),
-      y: parseInt(point2D.y / scale2D.y + offset2D.y, 10)
-    };
-  };
-
-  /**
    * Get the number of layers handled by this class.
    *
    * @returns {number} The number of layers.
@@ -289,7 +298,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     var viewLayer0 = this.getActiveViewLayer();
     if (viewLayer0) {
       viewLayer0.removeEventListener(
-        'positionchange', this.updateDrawControllerToViewPosition);
+        'positionchange', this.updateLayersToPositionChange);
       unbindViewLayer(viewLayer0);
     }
 
@@ -299,7 +308,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     // bind new layer
     var viewLayer = this.getActiveViewLayer();
     viewLayer.addEventListener(
-      'positionchange', this.updateDrawControllerToViewPosition);
+      'positionchange', this.updateLayersToPositionChange);
     bindViewLayer(viewLayer);
   };
 
@@ -348,10 +357,9 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   /**
    * Add a view layer.
    *
-   * @param {object} view The associated view.
    * @returns {object} The created layer.
    */
-  this.addViewLayer = function (view) {
+  this.addViewLayer = function () {
     // layer index
     var viewLayerIndex = layers.length;
     // create div
@@ -362,8 +370,6 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     var layer = new dwv.gui.ViewLayer(div);
     // set z-index: last on top
     layer.setZIndex(viewLayerIndex);
-    // set view
-    layer.setView(view);
     // add layer
     layers.push(layer);
     // mark it as active
@@ -425,53 +431,69 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   };
 
   /**
-   * Update draw controller to view position.
+   * Update layers (but not the active view layer) to a position change.
+   *
+   * @param {object} event The position change event.
    */
-  this.updateDrawControllerToViewPosition = function () {
-    var drawLayer = layers[activeDrawLayerIndex];
-    if (drawLayer) {
-      var viewController =
-        layers[activeViewLayerIndex].getViewController();
-      drawLayer.getDrawController().activateDrawLayer(
-        viewController.getCurrentOrientedPosition());
+  this.updateLayersToPositionChange = function (event) {
+    for (var i = 0; i < layers.length; ++i) {
+      if (i !== activeViewLayerIndex) {
+        layers[i].setCurrentPosition(event.value);
+      }
     }
   };
 
   /**
    * Fit the display to the size of the container.
    * To be called once the image is loaded.
-   *
-   * @param {object} geometry The image geomtry.
    */
-  this.fitToContainer = function (geometry) {
-    var fitScale = dwv.gui.getFitToContainerScale(
-      containerDiv,
-      geometry.getSize(viewOrientation),
-      geometry.getSpacing(viewOrientation)
-    );
-    this.resize(dwv.math.getDeOrientedXYZ(fitScale, viewOrientation));
+  this.fitToContainer = function () {
+    // check container size
+    if (containerDiv.offsetWidth === 0 &&
+      containerDiv.offsetHeight === 0) {
+      throw new Error('Cannot fit to zero sized container.');
+    }
+    // find best fit
+    var fitScales = [];
+    for (var i = 0; i < layers.length; ++i) {
+      var fullSize = layers[i].getFullSize();
+      fitScales.push(containerDiv.offsetWidth / fullSize.x);
+      fitScales.push(containerDiv.offsetHeight / fullSize.y);
+    }
+    var fitScale = Math.min.apply(null, fitScales);
+    // apply to layers
+    for (var j = 0; j < layers.length; ++j) {
+      layers[j].fitToContainer(fitScale);
+    }
   };
 
   /**
    * Add scale to the layers. Scale cannot go lower than 0.1.
    *
    * @param {object} scaleStep The scale to add.
-   * @param {object} center The scale center point as {x,y,z}.
+   * @param {object} center The scale center Point3D.
    */
   this.addScale = function (scaleStep, center) {
     var newScale = {
-      x: Math.max(scale.x + scale.x * scaleStep, 0.1),
-      y: Math.max(scale.y + scale.y * scaleStep, 0.1),
-      z: Math.max(scale.z + scale.z * scaleStep, 0.1)
+      x: scale.x * (1 + scaleStep),
+      y: scale.y * (1 + scaleStep),
+      z: scale.z * (1 + scaleStep)
+    };
+    var centerPlane = {
+      x: (center.getX() - offset.x) * scale.x,
+      y: (center.getY() - offset.y) * scale.y,
+      z: (center.getZ() - offset.z) * scale.z
     };
     // center should stay the same:
-    // newOffset + center / newScale = oldOffset + center / oldScale
-    var realCenter = dwv.math.getDeOrientedXYZ(center, viewOrientation);
-    this.setOffset({
-      x: (realCenter.x / scale.x) + offset.x - (realCenter.x / newScale.x),
-      y: (realCenter.y / scale.y) + offset.y - (realCenter.y / newScale.y),
-      z: (realCenter.z / scale.z) + offset.z - (realCenter.z / newScale.z)
-    });
+    // center / newScale + newOffset = center / oldScale + oldOffset
+    // => newOffset = center / oldScale + oldOffset - center / newScale
+    var newOffset = {
+      x: (centerPlane.x / scale.x) + offset.x - (centerPlane.x / newScale.x),
+      y: (centerPlane.y / scale.y) + offset.y - (centerPlane.y / newScale.y),
+      z: (centerPlane.z / scale.z) + offset.z - (centerPlane.z / newScale.z)
+    };
+
+    this.setOffset(newOffset);
     this.setScale(newScale);
   };
 
@@ -484,9 +506,8 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   this.setScale = function (newScale) {
     scale = newScale;
     // apply to layers
-    var scale2D = dwv.math.getOrientedXYZ(scale, viewOrientation);
     for (var i = 0; i < layers.length; ++i) {
-      layers[i].setScale(scale2D);
+      layers[i].setScale(scale);
     }
 
     /**
@@ -505,20 +526,13 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   /**
    * Add translation to the layers.
    *
-   * @param {object} translation The translation as {x,y}.
+   * @param {object} translation The translation as {x,y,z}.
    */
   this.addTranslation = function (translation) {
-    var realTrans = dwv.math.getDeOrientedXYZ(
-      {
-        x: translation.x,
-        y: translation.y,
-        z: 0
-      },
-      viewOrientation);
     this.setOffset({
-      x: offset.x - realTrans.x / scale.x,
-      y: offset.y - realTrans.y / scale.y,
-      z: offset.z - realTrans.z / scale.z
+      x: offset.x - translation.x,
+      y: offset.y - translation.y,
+      z: offset.z - translation.z
     });
   };
 
@@ -532,9 +546,8 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     // store
     offset = newOffset;
     // apply to layers
-    var offset2D = dwv.math.getOrientedXYZ(offset, viewOrientation);
     for (var i = 0; i < layers.length; ++i) {
-      layers[i].setOffset(offset2D);
+      layers[i].setOffset(offset);
     }
 
     /**
@@ -551,85 +564,11 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   };
 
   /**
-   * Initialise the layer: set the canvas and context
-   *
-   * @param {object} imageGeometry The image geometry.
-   * @param {number} dataIndex The data index.
-   */
-  this.initialise = function (imageGeometry, dataIndex) {
-    viewOrientation = dwv.math.getIdentityMat33();
-    if (typeof targetOrientation !== 'undefined') {
-      // image orientation as one and zeros
-      // -> view orientation is one and zeros
-      var imgOrientation = imageGeometry.getOrientation().asOneAndZeros();
-      // imgOrientation * viewOrientation = targetOrientation
-      // -> viewOrientation = inv(imgOrientation) * targetOrientation
-      viewOrientation =
-        imgOrientation.getInverse().multiply(targetOrientation);
-    }
-
-    var size = imageGeometry.getSize(viewOrientation);
-    layerSize = size.get2D();
-    // apply to layers
-    for (var i = 0; i < layers.length; ++i) {
-      layers[i].initialise(imageGeometry, dataIndex, viewOrientation);
-    }
-
-    // bind draw to view position
-    var viewLayer = this.getActiveViewLayer();
-    viewLayer.addEventListener(
-      'positionchange', this.updateDrawControllerToViewPosition);
-    // first update
-    this.updateDrawControllerToViewPosition();
-
-    // fit data
-    this.fitToContainer(imageGeometry);
-  };
-
-  /**
    * Reset the stage to its initial scale and no offset.
    */
   this.reset = function () {
     this.setScale(baseScale);
     this.setOffset({x: 0, y: 0, z: 0});
-  };
-
-  /**
-   * Resize the layer: update the base scale and layer sizes.
-   *
-   * @param {number} newScale The scale as {x,y,z}.
-   */
-  this.resize = function (newScale) {
-    // store
-    scale = {
-      x: scale.x * newScale.x / baseScale.x,
-      y: scale.y * newScale.y / baseScale.y,
-      z: scale.z * newScale.z / baseScale.z
-    };
-    baseScale = newScale;
-
-    // resize layers
-    var baseScale2D = dwv.math.getOrientedXYZ(baseScale, viewOrientation);
-    var width = Math.floor(layerSize.x * baseScale2D.x);
-    var height = Math.floor(layerSize.y * baseScale2D.y);
-
-    // resize if test passes
-    if (dwv.gui.canCreateCanvas(width, height)) {
-      // call resize and scale on layers
-      var scale2D = dwv.math.getOrientedXYZ(scale, viewOrientation);
-      for (var i = 0; i < layers.length; ++i) {
-        layers[i].resize(baseScale2D);
-        layers[i].setScale(scale2D);
-      }
-    } else {
-      dwv.logger.warn('Cannot create a ' + width + ' * ' + height +
-        ' canvas, trying half the size...');
-      this.resize({
-        x: newScale.x * 0.5,
-        y: newScale.y * 0.5,
-        z: newScale.z * 0.5
-      });
-    }
   };
 
   /**

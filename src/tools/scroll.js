@@ -34,8 +34,8 @@ dwv.tool.Scroll = function (app) {
     // stop viewer if playing
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
-    var viewController =
-      layerGroup.getActiveViewLayer().getViewController();
+    var viewLayer = layerGroup.getActiveViewLayer();
+    var viewController = viewLayer.getViewController();
     if (viewController.isPlaying()) {
       viewController.stop();
     }
@@ -46,11 +46,8 @@ dwv.tool.Scroll = function (app) {
     self.y0 = event._y;
 
     // update controller position
-    var pos = layerGroup.displayToIndex({
-      x: event._x,
-      y: event._y,
-    });
-    viewController.setCurrentPosition2D(pos.x, pos.y);
+    var planePos = viewLayer.displayToPlanePos(event._x, event._y);
+    viewController.setCurrentPosition2D(planePos.x, planePos.y);
   };
 
   /**
