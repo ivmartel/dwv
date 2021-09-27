@@ -279,7 +279,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
    * @returns {object} The object first origin.
    */
   this.getOrigin = function () {
-    return origin;
+    return origins[0];
   };
   /**
    * Get the object origins.

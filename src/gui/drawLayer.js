@@ -52,6 +52,14 @@ dwv.gui.DrawLayer = function (containerDiv) {
   var fitScale = {x: 1, y: 1};
 
   /**
+   * The base layer offset.
+   *
+   * @private
+   * @type {object}
+   */
+  var baseOffset = {x: 0, y: 0};
+
+  /**
    * The draw controller.
    *
    * @private
@@ -184,7 +192,28 @@ dwv.gui.DrawLayer = function (containerDiv) {
    */
   this.setOffset = function (newOffset) {
     var planeNewOffset = planeHelper.getPlaneOffsetFromOffset3D(newOffset);
-    konvaStage.offset(planeNewOffset);
+    konvaStage.offset({
+      x: baseOffset.x + planeNewOffset.x,
+      y: baseOffset.y + planeNewOffset.y
+    });
+  };
+
+  /**
+   * Set the base layer offset. Resets the layer offset.
+   *
+   * @param {object} newOffset The offset as {x,y}.
+   */
+  this.setBaseOffset = function (off) {
+    baseOffset = planeHelper.getPlaneOffsetFromOffset3D({
+      x: off.getX(),
+      y: off.getY(),
+      z: off.getZ()
+    });
+    // reset offset
+    konvaStage.offset({
+      x: baseOffset.x,
+      y: baseOffset.y
+    });
   };
 
   /**

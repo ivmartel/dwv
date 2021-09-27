@@ -110,6 +110,14 @@ dwv.gui.ViewLayer = function (containerDiv) {
   var offset = {x: 0, y: 0};
 
   /**
+   * The base layer offset.
+   *
+   * @private
+   * @type {object}
+   */
+  var baseOffset = {x: 0, y: 0};
+
+  /**
    * Data update flag.
    *
    * @private
@@ -253,6 +261,22 @@ dwv.gui.ViewLayer = function (containerDiv) {
   };
 
   /**
+   * Set the base layer offset. Resets the layer offset.
+   *
+   * @param {object} newOffset The offset as {x,y}.
+   */
+  this.setBaseOffset = function (off) {
+    var helper = viewController.getPlaneHelper();
+    baseOffset = helper.getPlaneOffsetFromOffset3D({
+      x: off.getX(),
+      y: off.getY(),
+      z: off.getZ()
+    });
+    // reset offset
+    offset = baseOffset;
+  };
+
+  /**
    * Set the layer offset.
    *
    * @param {object} newOffset The offset as {x,y}.
@@ -260,7 +284,10 @@ dwv.gui.ViewLayer = function (containerDiv) {
   this.setOffset = function (newOffset) {
     var helper = viewController.getPlaneHelper();
     var planeNewOffset = helper.getPlaneOffsetFromOffset3D(newOffset);
-    offset = planeNewOffset;
+    offset = {
+      x: baseOffset.x + planeNewOffset.x,
+      y: baseOffset.y + planeNewOffset.y
+    };
   };
 
   /**

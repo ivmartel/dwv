@@ -1164,6 +1164,16 @@ dwv.App = function () {
     var spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
     viewLayer.initialise(size2D, spacing2D, dataIndex);
 
+    // compensate origin difference
+    var diff = null;
+    if (dataIndex !== 0) {
+      var data0 = dataController.get(0);
+      var origin0 = data0.image.getGeometry().getOrigin();
+      var origin1 = imageGeometry.getOrigin();
+      diff = origin0.minus(origin1);
+      viewLayer.setBaseOffset(diff);
+    }
+
     // listen to image changes
     dataController.addEventListener('imagechange', viewLayer.onimagechange);
 
@@ -1185,6 +1195,11 @@ dwv.App = function () {
         posValues
       ];
       layerGroup.updateLayersToPositionChange({value: value});
+
+      // compensate origin difference
+      if (dataIndex !== 0) {
+        dl.setBaseOffset(diff);
+      }
     }
 
     layerGroup.fitToContainer();
