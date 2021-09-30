@@ -23,7 +23,6 @@ Others
  * Github ([status](https://status.github.com/)), [build status](https://github.com/ivmartel/dwv/actions)
  * [Code Climate](https://codeclimate.com) ([status](http://status.codeclimate.com/)): code review + test coverage + lint, [dwv page](https://codeclimate.com/github/ivmartel/dwv)
  * [David-dm](https://david-dm.org/): dependency up to date checker, [dwv page](https://david-dm.org/ivmartel/dwv)
- * [Coveralls](https://coveralls.io/) ([status](http://status.coveralls.io/)): test coverage, [dwv page](https://coveralls.io/github/ivmartel/dwv)
  * [Transifex](https://www.transifex.com): translations, [dwv page](https://www.transifex.com/ivmartel/dwv/)
  * [Dependabot](https://github.com/dependabot): dependency up to date bot checker
 

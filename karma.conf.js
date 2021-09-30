@@ -78,7 +78,15 @@ module.exports = function (config) {
         {type: 'html', subdir: 'report-html'},
         {type: 'lcovonly', subdir: '.', file: 'report-lcovonly.txt'},
         {type: 'text-summary'}
-      ]
+      ],
+      check: {
+        global: {
+          statements: 44,
+          branches: 44,
+          functions: 32,
+          lines: 43
+        }
+      }
     },
     reporters: ['progress'],
     logLevel: config.LOG_INFO,
