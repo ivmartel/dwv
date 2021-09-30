@@ -14,6 +14,21 @@ dwv.ctrl.ViewController = function (view) {
   // third dimension player ID (created by setInterval)
   var playerID = null;
 
+  // setup the plane helper
+  var planeHelper = new dwv.image.PlaneHelper(
+    view.getImage().getGeometry().getSpacing(),
+    view.getOrientation()
+  );
+
+  /**
+   * Get the plane helper.
+   *
+   * @returns {object} The helper.
+   */
+  this.getPlaneHelper = function () {
+    return planeHelper;
+  };
+
   /**
    * Initialise the controller.
    */
@@ -80,17 +95,26 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
-   * Get the current oriented position.
+   * Get the current index.
    *
-   * @returns {object} The position.
+   * @returns {object} The current index.
    */
-  this.getCurrentOrientedPosition = function () {
-    var res = view.getCurrentPosition();
+  this.getCurrentIndex = function () {
+    return view.getCurrentIndex();
+  };
+
+  /**
+   * Get the current oriented index.
+   *
+   * @returns {object} The index.
+   */
+  this.getCurrentOrientedIndex = function () {
+    var res = view.getCurrentIndex();
     // values = orientation * orientedValues
     // -> inv(orientation) * values = orientedValues
     if (typeof view.getOrientation() !== 'undefined') {
-      res = view.getOrientation().getInverse().multiplyIndex3D(
-        view.getCurrentPosition());
+      res = view.getOrientation().getInverse().getAbs().multiplyIndex3D(
+        view.getCurrentIndex());
     }
     return res;
   };
@@ -100,8 +124,21 @@ dwv.ctrl.ViewController = function (view) {
    *
    * @returns {object} The position.
    */
+  this.getCurrentScrollIndex = function () {
+    return view.getCurrentIndex().get(view.getScrollIndex());
+  };
+
   this.getCurrentScrollPosition = function () {
-    return view.getCurrentPosition().get(view.getScrollIndex());
+    var scrollIndex = view.getScrollIndex();
+    var z = null;
+    if (scrollIndex === 0) {
+      z = view.getCurrentPosition().getX();
+    } else if (scrollIndex === 1) {
+      z = view.getCurrentPosition().getY();
+    } else if (scrollIndex === 2) {
+      z = view.getCurrentPosition().getZ();
+    }
+    return z;
   };
 
   /**
@@ -124,7 +161,7 @@ dwv.ctrl.ViewController = function (view) {
   this.getImageRegionValues = function (min, max) {
     var image = view.getImage();
     var orientation = view.getOrientation();
-    var position = this.getCurrentPosition();
+    var position = this.getCurrentIndex();
     var rescaled = true;
 
     // created oriented slice if needed
@@ -177,7 +214,7 @@ dwv.ctrl.ViewController = function (view) {
   this.getImageVariableRegionValues = function (regions) {
     var iter = dwv.image.getVariableRegionSliceIterator(
       view.getImage(),
-      this.getCurrentPosition(),
+      this.getCurrentIndex(),
       true, regions
     );
     var values = [];
@@ -226,24 +263,38 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
-   * Set the current 2D (i,j) position.
+   * Set the current 2D (x,y) position.
    *
-   * @param {number} i The column index.
-   * @param {number} j The row index.
+   * @param {number} x The column position.
+   * @param {number} y The row position.
    * @returns {boolean} False if not in bounds.
    */
-  this.setCurrentPosition2D = function (i, j) {
+  this.setCurrentPosition2D = function (x, y) {
+    return view.setCurrentPosition(
+      this.getPositionFromPlanePoint({x: x, y: y}));
+  };
+
+  this.getPositionFromPlanePoint = function (point2D) {
     // keep third direction
-    var k = this.getCurrentScrollPosition();
-    var posPlane = new dwv.math.Index([i, j, k]);
-    var pos3D = posPlane;
-    var orientation = view.getOrientation();
-    if (typeof orientation !== 'undefined') {
-      // abs? otherwise negative position...
-      // pos3D = orientation * posPlane
-      pos3D = orientation.getAbs().multiplyIndex3D(posPlane);
-    }
-    return view.setCurrentPosition(pos3D);
+    var k = this.getCurrentScrollIndex();
+    var planePoint = new dwv.math.Point3D(
+      point2D.x, point2D.y, k);
+
+    //planeHelper.getPlaneOffsetFromOffset3D(offset2D);
+
+    var point = planeHelper.getDeOrientedVector3D(planePoint);
+
+    // ~indexToWorld
+    //var origin = view.getImage().getGeometry().getOrigin();
+    var spacing = view.getImage().getGeometry().getSpacing();
+    return new dwv.math.Point3D(
+      /*origin.getX() + */point.getX() * spacing.getColumnSpacing(),
+      /*origin.getY() + */point.getY() * spacing.getRowSpacing(),
+      /*origin.getZ() + */point.getZ() * spacing.getSliceSpacing());
+  };
+
+  this.getOffset3DFromPlaneOffset = function (offset2D) {
+    return planeHelper.getOffset3DFromPlaneOffset(offset2D);
   };
 
   /**
@@ -304,7 +355,7 @@ dwv.ctrl.ViewController = function (view) {
       playerID = setInterval(function () {
         // end of scroll, loop back
         if (!self.incrementScrollIndex()) {
-          var pos1 = self.getCurrentPosition();
+          var pos1 = self.getCurrentIndex();
           var values = pos1.getValues();
           var orientation = view.getOrientation();
           values[orientation.getThirdColMajorDirection()] = 0;

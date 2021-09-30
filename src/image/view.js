@@ -65,7 +65,7 @@ dwv.image.View = function (image) {
    */
   var colourMap = dwv.image.lut.plain;
   /**
-   * Current position.
+   * Current position as a Point3D.
    *
    * @private
    * @type {object}
@@ -128,7 +128,7 @@ dwv.image.View = function (image) {
   this.setInitialPosition = function () {
     var silent = true;
     this.setCurrentPosition(
-      dwv.math.getZeroIndex(image.getGeometry().getSize().length()),
+      new dwv.math.Point3D(0, 0, 0),
       silent
     );
   };
@@ -162,7 +162,7 @@ dwv.image.View = function (image) {
     if (!this.getCurrentPosition()) {
       this.setInitialPosition();
     }
-    var sliceNumber = this.getCurrentPosition().get(2);
+    var sliceNumber = this.getCurrentIndex().get(2);
     // use current rsi if not provided
     if (typeof rsi === 'undefined') {
       rsi = image.getRescaleSlopeAndIntercept(sliceNumber);
@@ -350,36 +350,50 @@ dwv.image.View = function (image) {
   };
 
   /**
+   * Get the current index.
+   *
+   * @returns {object} The current index.
+   */
+  this.getCurrentIndex = function () {
+    return currentPosition.toIndex(this.getImage().getGeometry().getSpacing());
+  };
+
+  /**
    * Set the current position.
    *
-   * @param {object} posIndex The current position.
+   * @param {object} newPosition The new position.
    * @param {boolean} silent Flag to fire event or not.
    * @returns {boolean} False if not in bounds
    * @fires dwv.image.View#positionchange
    */
-  this.setCurrentPosition = function (posIndex, silent) {
+  this.setCurrentPosition = function (newPosition, silent) {
     // check input
     if (typeof silent === 'undefined') {
       silent = false;
     }
 
+    var geometry = image.getGeometry();
+    var spacing = geometry.getSpacing();
+    var posIndex = newPosition.toIndex(spacing);
+
     // check if possible
-    if (!image.getGeometry().getSize().isInBounds(posIndex)) {
+    if (!geometry.getSize().isInBounds(posIndex)) {
       return false;
     }
 
-    var isNew = !currentPosition || !currentPosition.equals(posIndex);
+    var currentIndex = currentPosition ? this.getCurrentIndex() : null;
+    var isNew = !currentIndex || !currentIndex.equals(posIndex);
 
     if (isNew) {
       var diffDims = null;
       if (currentPosition) {
-        diffDims = currentPosition.differentDims(posIndex);
+        diffDims = currentIndex.differentDims(posIndex);
       } else {
         diffDims = [0, 1, 2, 3];
       }
 
       // assign
-      currentPosition = posIndex;
+      currentPosition = newPosition;
 
       if (!silent) {
         /**
@@ -392,7 +406,14 @@ dwv.image.View = function (image) {
          */
         var posEvent = {
           type: 'positionchange',
-          value: [posIndex.getValues()],
+          value: [
+            posIndex.getValues(),
+            [
+              currentPosition.getX(),
+              currentPosition.getY(),
+              currentPosition.getZ()
+            ]
+          ],
           diffDims: diffDims,
           data: {
             imageUid: image.getImageUid(posIndex)
@@ -492,7 +513,7 @@ dwv.image.View = function (image) {
     // special 'perslice' case
     if (typeof preset.perslice !== 'undefined' &&
       preset.perslice === true) {
-      preset = {wl: preset.wl[this.getCurrentPosition().get(2)]};
+      preset = {wl: preset.wl[this.getCurrentIndex().get(2)]};
     }
     // set w/l
     this.setWindowLevel(
@@ -599,7 +620,7 @@ dwv.image.View.prototype.generateImageData = function (array) {
     this.setInitialPosition();
   }
   var image = this.getImage();
-  var position = this.getCurrentPosition();
+  var position = this.getCurrentIndex();
   var iterator = dwv.image.getSliceIterator(
     image, position, false, this.getOrientation());
 
@@ -653,8 +674,8 @@ dwv.image.View.prototype.generateImageData = function (array) {
  * @returns {boolean} False if not in bounds.
  */
 dwv.image.View.prototype.incrementIndex = function (dim, silent) {
-  var pos = this.getCurrentPosition();
-  var values = new Array(pos.length());
+  var index = this.getCurrentIndex();
+  var values = new Array(index.length());
   values.fill(0);
   if (dim < values.length) {
     values[dim] = 1;
@@ -662,7 +683,9 @@ dwv.image.View.prototype.incrementIndex = function (dim, silent) {
     console.warn('Cannot increment given index: ', dim, values.length);
   }
   var incr = new dwv.math.Index(values);
-  return this.setCurrentPosition(pos.add(incr), silent);
+  var newIndex = index.add(incr);
+  var spacing = this.getImage().getGeometry().getSpacing();
+  return this.setCurrentPosition(newIndex.toPoint3D(spacing), silent);
 };
 
 /**
@@ -673,8 +696,8 @@ dwv.image.View.prototype.incrementIndex = function (dim, silent) {
  * @returns {boolean} False if not in bounds.
  */
 dwv.image.View.prototype.decrementIndex = function (dim, silent) {
-  var pos = this.getCurrentPosition();
-  var values = new Array(pos.length());
+  var index = this.getCurrentIndex();
+  var values = new Array(index.length());
   values.fill(0);
   if (dim < values.length) {
     values[dim] = -1;
@@ -682,7 +705,9 @@ dwv.image.View.prototype.decrementIndex = function (dim, silent) {
     console.warn('Cannot decrement given index: ', dim, values.length);
   }
   var incr = new dwv.math.Index(values);
-  return this.setCurrentPosition(pos.add(incr), silent);
+  var newIndex = index.add(incr);
+  var spacing = this.getImage().getGeometry().getSpacing();
+  return this.setCurrentPosition(newIndex.toPoint3D(spacing), silent);
 };
 
 /**

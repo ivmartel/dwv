@@ -160,15 +160,17 @@ dwv.math.Index.prototype.getWithNew2D = function (i, j) {
 };
 
 /**
- * Get an index with values set to 0 and the input size.
+ * Convert an Index to a Point3D using an input spacing.
  *
- * @param {number} size The size of the index.
- * @returns {object} The zero index.
+ * @param {object} spacing The image spacing.
+ * @returns {object} The new Point3D.
  */
-dwv.math.getZeroIndex = function (size) {
-  var values = new Array(size);
-  values.fill(0);
-  return new dwv.math.Index(values);
+dwv.math.Index.prototype.toPoint3D = function (spacing) {
+  return new dwv.math.Point3D(
+    this.get(0) * spacing.getColumnSpacing(),
+    this.get(1) * spacing.getRowSpacing(),
+    this.get(2) * spacing.getSliceSpacing()
+  );
 };
 
 /**
@@ -235,4 +237,16 @@ dwv.math.getFromString = function (inputStr) {
     return parseInt(value, 10);
   };
   return new dwv.math.Index(strValues.map(toint));
+};
+
+/**
+ * Get an index with values set to 0 and the input size.
+ *
+ * @param {number} size The size of the index.
+ * @returns {object} The zero index.
+ */
+dwv.math.getZeroIndex = function (size) {
+  var values = new Array(size);
+  values.fill(0);
+  return new dwv.math.Index(values);
 };

@@ -36,12 +36,44 @@ dwv.gui.DrawLayer = function (containerDiv) {
   var baseSize;
 
   /**
+   * The layer base spacing as {x,y}.
+   *
+   * @private
+   * @type {object}
+   */
+  var baseSpacing;
+
+  /**
+   * The layer fit scale.
+   *
+   * @private
+   * @type {object}
+   */
+  var fitScale = {x: 1, y: 1};
+
+  /**
+   * The base layer offset.
+   *
+   * @private
+   * @type {object}
+   */
+  var baseOffset = {x: 0, y: 0};
+
+  /**
    * The draw controller.
    *
    * @private
    * @type {object}
    */
   var drawController = null;
+
+  /**
+   * The plane helper.
+   *
+   * @private
+   * @type {object}
+   */
+  var planeHelper;
 
   /**
    * Listener handler.
@@ -79,6 +111,17 @@ dwv.gui.DrawLayer = function (containerDiv) {
   };
 
   /**
+   * Set the plane helper.
+   *
+   * @param {object} helper The helper.
+   */
+  this.setPlaneHelper = function (helper) {
+    planeHelper = helper;
+  };
+
+  // common layer methods [start] ---------------
+
+  /**
    * Get the id of the layer.
    *
    * @returns {string} The string id.
@@ -87,7 +130,17 @@ dwv.gui.DrawLayer = function (containerDiv) {
     return containerDiv.id;
   };
 
-  // common layer methods [start] ---------------
+  /**
+   * Get the data full size.
+   *
+   * @returns {object} The full size as {x,y}
+   */
+  this.getFullSize = function () {
+    return {
+      x: baseSize.x * baseSpacing.x,
+      y: baseSize.y * baseSpacing.y
+    };
+  };
 
   /**
    * Get the layer base size (without scale).
@@ -122,9 +175,14 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @param {object} newScale The scale as {x,y}.
    */
   this.setScale = function (newScale) {
-    konvaStage.scale(newScale);
-    // update labels
-    updateLabelScale(newScale);
+    var orientedNewScale = planeHelper.getOrientedXYZ(newScale);
+    var fullScale = {
+      x: fitScale.x * orientedNewScale.x,
+      y: fitScale.y * orientedNewScale.y
+    };
+    konvaStage.scale(fullScale);
+    // update labelss
+    updateLabelScale(fullScale);
   };
 
   /**
@@ -133,29 +191,38 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @param {object} newOffset The offset as {x,y}.
    */
   this.setOffset = function (newOffset) {
-    konvaStage.offset(newOffset);
+    var planeNewOffset = planeHelper.getPlaneOffsetFromOffset3D(newOffset);
+    konvaStage.offset({
+      x: baseOffset.x + planeNewOffset.x,
+      y: baseOffset.y + planeNewOffset.y
+    });
   };
 
   /**
-   * Set the layer z-index.
+   * Set the base layer offset. Resets the layer offset.
    *
-   * @param {number} index The index.
+   * @param {object} off The offset as {x,y}.
    */
-  this.setZIndex = function (index) {
-    containerDiv.style.zIndex = index;
+  this.setBaseOffset = function (off) {
+    baseOffset = planeHelper.getPlaneOffsetFromOffset3D({
+      x: off.getX(),
+      y: off.getY(),
+      z: off.getZ()
+    });
+    // reset offset
+    konvaStage.offset({
+      x: baseOffset.x,
+      y: baseOffset.y
+    });
   };
 
   /**
-   * Resize the layer: update the window scale and layer sizes.
+   * Activate the layer.
    *
-   * @param {object} newScale The layer scale as {x,y}.
+   * @param {boolean} flag True to activate the layer.
    */
-  this.resize = function (newScale) {
-    // resize stage
-    konvaStage.setWidth(Math.floor(baseSize.x * newScale.x));
-    konvaStage.setHeight(Math.floor(baseSize.y * newScale.y));
-    // set scale
-    this.setScale(newScale);
+  this.setActive = function (flag) {
+    containerDiv.style['pointer-events'] = flag ? 'auto' : 'none';
   };
 
   /**
@@ -187,14 +254,14 @@ dwv.gui.DrawLayer = function (containerDiv) {
   /**
    * Initialise the layer: set the canvas and context
    *
-   * @param {object} imageGeometry The image geometry.
+   * @param {object} size The image size.
+   * @param {object} spacing The image spacing.
    * @param {number} _index The associated data index.
-   * @param {object} viewOrientation The view orientation matrix.
    */
-  this.initialise = function (imageGeometry, _index, viewOrientation) {
-    // get sizes
-    var size = imageGeometry.getSize(viewOrientation);
-    baseSize = size.get2D();
+  this.initialise = function (size, spacing, _index) {
+    // set locals
+    baseSize = size;
+    baseSpacing = spacing;
 
     // create stage
     konvaStage = new Konva.Stage({
@@ -219,12 +286,23 @@ dwv.gui.DrawLayer = function (containerDiv) {
   };
 
   /**
-   * Update the layer position.
+   * Fit the layer to its parent container.
    *
-   * @param {object} pos The new position.
+   * @param {number} fitScale1D The 1D fit scale.
    */
-  this.updatePosition = function (pos) {
-    this.getDrawController().activateDrawLayer(pos[0], pos[1]);
+  this.fitToContainer = function (fitScale1D) {
+    // update fit scale
+    fitScale = {
+      x: fitScale1D * baseSpacing.x,
+      y: fitScale1D * baseSpacing.y
+    };
+    // update konva
+    var width = containerDiv.parentElement.offsetWidth;
+    var height = containerDiv.parentElement.offsetHeight;
+    konvaStage.setWidth(width);
+    konvaStage.setHeight(height);
+    // reset scale
+    this.setScale({x: 1, y: 1, z: 1});
   };
 
   /**
@@ -253,6 +331,17 @@ dwv.gui.DrawLayer = function (containerDiv) {
     for (var i = 0; i < names.length; ++i) {
       containerDiv.removeEventListener(names[i], fireEvent);
     }
+  };
+
+  /**
+   * Set the current position.
+   *
+   * @param {Array} value The position change values: [index, point]
+   */
+  this.setCurrentPosition = function (value) {
+    var index = new dwv.math.Index(value[0]);
+    var orientedIndex = planeHelper.getOrientedIndex(index);
+    this.getDrawController().activateDrawLayer(orientedIndex);
   };
 
   /**

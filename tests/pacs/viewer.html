@@ -2,7 +2,7 @@
 <html>
 
 <head>
-<title>DWV DICOM Check</title>
+<title>DWV Test Viewer</title>
 <meta charset="UTF-8">
 <meta name="description" content="DICOM Web Viewer (DWV) simple version">
 <meta name="keywords" content="DICOM,HTML5,JavaScript,medical,imaging,DWV">
@@ -10,6 +10,15 @@
 <style type="text/css">
 body {
   font-family: Arial, Helvetica, sans-serif;
+}
+table, td, th {
+  border: 1px solid #aaa;
+}
+table {
+  border-collapse: collapse;
+}
+td, th {
+  padding: 10px;
 }
 progress {
   width: 40%;
@@ -25,8 +34,8 @@ progress {
 }
 .layerGroup {
   display:inline-block;
-  height: 250px;
-  width: 250px;
+  height: 350px;
+  width: 350px;
   margin: 5px;
   background-color: gainsboro;
 }
@@ -65,6 +74,7 @@ progress {
 <script type="text/javascript" src="../../src/image/imageFactory.js"></script>
 <script type="text/javascript" src="../../src/image/iterator.js"></script>
 <script type="text/javascript" src="../../src/image/luts.js"></script>
+<script type="text/javascript" src="../../src/image/planeHelper.js"></script>
 <script type="text/javascript" src="../../src/image/rescaleLut.js"></script>
 <script type="text/javascript" src="../../src/image/rsi.js"></script>
 <script type="text/javascript" src="../../src/image/view.js"></script>
@@ -128,10 +138,7 @@ document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedViewer)
 </div>
 
 <!-- DWV -->
-<div id="dwv">
-  <!-- Layer groups -->
-  <div id="layerGroup0" class="layerGroup"></div>
-</div><!-- /dwv -->
+<div id="dwv"></div>
 
 <div class="line">
 <label for="position">Position:</label>
@@ -142,11 +149,7 @@ document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedViewer)
 <button id="reset">Reset Layout</button>
 </div>
 
-<div class="line">
-<label for="alpharange">Alpha:</label>
-<input type="range" id="alpharange" min="0" max="1" value="1" step="0.1">
-<input type="number" id="alphanumber" min="0" max="1" value="1" step="0.1">
-</div>
+<div id="layersdetails"></div>
 
 </body>
 </html>

@@ -70,6 +70,14 @@ dwv.gui.ViewLayer = function (containerDiv) {
   var baseSize;
 
   /**
+   * The layer base spacing as {x,y}.
+   *
+   * @private
+   * @type {object}
+   */
+  var baseSpacing;
+
+  /**
    * The layer opacity.
    *
    * @private
@@ -86,12 +94,28 @@ dwv.gui.ViewLayer = function (containerDiv) {
   var scale = {x: 1, y: 1};
 
   /**
+   * The layer fit scale.
+   *
+   * @private
+   * @type {object}
+   */
+  var fitScale = {x: 1, y: 1};
+
+  /**
    * The layer offset.
    *
    * @private
    * @type {object}
    */
   var offset = {x: 0, y: 0};
+
+  /**
+   * The base layer offset.
+   *
+   * @private
+   * @type {object}
+   */
+  var baseOffset = {x: 0, y: 0};
 
   /**
    * Data update flag.
@@ -147,15 +171,6 @@ dwv.gui.ViewLayer = function (containerDiv) {
   };
 
   /**
-   * Get the id of the layer.
-   *
-   * @returns {string} The string id.
-   */
-  this.getId = function () {
-    return containerDiv.id;
-  };
-
-  /**
    * Handle an image change event.
    *
    * @param {object} event The event.
@@ -169,6 +184,27 @@ dwv.gui.ViewLayer = function (containerDiv) {
   };
 
   // common layer methods [start] ---------------
+
+  /**
+   * Get the id of the layer.
+   *
+   * @returns {string} The string id.
+   */
+  this.getId = function () {
+    return containerDiv.id;
+  };
+
+  /**
+   * Get the data full size.
+   *
+   * @returns {object} The full size as {x,y}
+   */
+  this.getFullSize = function () {
+    return {
+      x: baseSize.x * baseSpacing.x,
+      y: baseSize.y * baseSpacing.y
+    };
+  };
 
   /**
    * Get the layer base size (without scale).
@@ -216,7 +252,28 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @param {object} newScale The scale as {x,y}.
    */
   this.setScale = function (newScale) {
-    scale = newScale;
+    var helper = viewController.getPlaneHelper();
+    var orientedNewScale = helper.getOrientedXYZ(newScale);
+    scale = {
+      x: fitScale.x * orientedNewScale.x,
+      y: fitScale.y * orientedNewScale.y
+    };
+  };
+
+  /**
+   * Set the base layer offset. Resets the layer offset.
+   *
+   * @param {object} off The offset as {x,y}.
+   */
+  this.setBaseOffset = function (off) {
+    var helper = viewController.getPlaneHelper();
+    baseOffset = helper.getPlaneOffsetFromOffset3D({
+      x: off.getX(),
+      y: off.getY(),
+      z: off.getZ()
+    });
+    // reset offset
+    offset = baseOffset;
   };
 
   /**
@@ -225,29 +282,51 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @param {object} newOffset The offset as {x,y}.
    */
   this.setOffset = function (newOffset) {
-    offset = newOffset;
+    var helper = viewController.getPlaneHelper();
+    var planeNewOffset = helper.getPlaneOffsetFromOffset3D(newOffset);
+    offset = {
+      x: baseOffset.x + planeNewOffset.x,
+      y: baseOffset.y + planeNewOffset.y
+    };
   };
 
   /**
-   * Set the layer z-index.
+   * Transform a display position to an index.
    *
-   * @param {number} index The index.
+   * @param {number} x The X position.
+   * @param {number} y The Y position.
+   * @returns {object} The equivalent index.
    */
-  this.setZIndex = function (index) {
-    containerDiv.style.zIndex = index;
+  this.displayToPlaneIndex = function (x, y) {
+    var planePos = this.displayToPlanePos(x, y);
+    return new dwv.math.Index([
+      Math.floor(planePos.x),
+      Math.floor(planePos.y)
+    ]);
+  };
+
+  this.displayToPlaneScale = function (x, y) {
+    return {
+      x: x / scale.x,
+      y: y / scale.y
+    };
+  };
+
+  this.displayToPlanePos = function (x, y) {
+    var deScaled = this.displayToPlaneScale(x, y);
+    return {
+      x: deScaled.x + offset.x,
+      y: deScaled.y + offset.y
+    };
   };
 
   /**
-   * Resize the layer: update the window scale and layer sizes.
+   * Activate the layer.
    *
-   * @param {object} newScale The layer scale as {x,y}.
+   * @param {boolean} flag True to activate the layer.
    */
-  this.resize = function (newScale) {
-    // resize canvas
-    canvas.width = Math.floor(baseSize.x * newScale.x);
-    canvas.height = Math.floor(baseSize.y * newScale.y);
-    // set scale
-    this.setScale(newScale);
+  this.setActive = function (flag) {
+    containerDiv.style['pointer-events'] = flag ? 'auto' : 'none';
   };
 
   /**
@@ -343,23 +422,20 @@ dwv.gui.ViewLayer = function (containerDiv) {
   /**
    * Initialise the layer: set the canvas and context
    *
-   * @param {object} imageGeometry The image geometry.
+   * @param {object} size The image size.
+   * @param {object} spacing The image spacing.
    * @param {number} index The associated data index.
-   * @param {object} viewOrientation The view orientation matrix.
    */
-  this.initialise = function (imageGeometry, index, viewOrientation) {
+  this.initialise = function (size, spacing, index) {
+    // set locals
+    baseSize = size;
+    baseSpacing = spacing;
     dataIndex = index;
-    // update view
-    view.setOrientation(viewOrientation);
 
     // local listeners
     view.addEventListener('wlchange', onWLChange);
     view.addEventListener('colourchange', onColourChange);
     view.addEventListener('positionchange', onPositionChange);
-
-    // get sizes
-    var size = imageGeometry.getSize(viewOrientation);
-    baseSize = size.get2D();
 
     // create canvas
     canvas = document.createElement('canvas');
@@ -376,6 +452,12 @@ dwv.gui.ViewLayer = function (containerDiv) {
       alert('Error: failed to get the 2D context.');
       return;
     }
+
+    // check canvas
+    if (!dwv.gui.canCreateCanvas(baseSize.x, baseSize.y)) {
+      throw new Error('Cannot create canvas ' + baseSize.x + ', ' + baseSize.y);
+    }
+
     // canvas sizes
     canvas.width = baseSize.x;
     canvas.height = baseSize.y;
@@ -389,6 +471,29 @@ dwv.gui.ViewLayer = function (containerDiv) {
 
     // update data on first draw
     needsDataUpdate = true;
+  };
+
+  /**
+   * Fit the layer to its parent container.
+   *
+   * @param {number} fitScale1D The 1D fit scale.
+   */
+  this.fitToContainer = function (fitScale1D) {
+    // update fit scale
+    fitScale = {
+      x: fitScale1D * baseSpacing.x,
+      y: fitScale1D * baseSpacing.y
+    };
+    // update canvas
+    var width = containerDiv.parentElement.offsetWidth;
+    var height = containerDiv.parentElement.offsetHeight;
+    if (!dwv.gui.canCreateCanvas(width, height)) {
+      throw new Error('Cannot resize canvas ' + width + ', ' + height);
+    }
+    canvas.width = width;
+    canvas.height = height;
+    // reset scale
+    this.setScale({x: 1, y: 1, z: 1});
   };
 
   /**
@@ -523,6 +628,16 @@ dwv.gui.ViewLayer = function (containerDiv) {
       }
     }
   }
+
+  /**
+   * Set the current position.
+   *
+   * @param {Array} value The position change values: [index, point]
+   */
+  this.setCurrentPosition = function (value) {
+    view.setCurrentPosition(new dwv.math.Point3D(
+      value[1][0], value[1][1], value[1][2]));
+  };
 
   /**
    * Clear the context and reset the image data.

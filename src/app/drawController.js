@@ -173,11 +173,11 @@ dwv.ctrl.DrawController = function (konvaLayer) {
   /**
    * Activate the current draw layer.
    *
-   * @param {object} currentPosition The current position.
+   * @param {object} currentIndex The current index.
    */
-  this.activateDrawLayer = function (currentPosition) {
+  this.activateDrawLayer = function (currentIndex) {
     // get and store the position group id
-    currentPosGroupId = currentPosition.toStringId(2);
+    currentPosGroupId = currentIndex.toStringId(2);
 
     // get all position groups
     var posGroups = konvaLayer.getChildren(dwv.draw.isPositionNode);

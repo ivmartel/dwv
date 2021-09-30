@@ -170,10 +170,12 @@ dwv.tool.Floodfill = function (app) {
   var getCoord = function (event) {
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
-    return layerGroup.displayToIndex({
-      x: event._x,
-      y: event._y,
-    });
+    var viewLayer = layerGroup.getActiveViewLayer();
+    var index = viewLayer.displayToPlaneIndex(event._x, event._y);
+    return {
+      x: index.get(0),
+      y: index.get(1)
+    };
   };
 
   /**
@@ -280,7 +282,7 @@ dwv.tool.Floodfill = function (app) {
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
 
-    var pos = viewController.getCurrentPosition();
+    var pos = viewController.getCurrentIndex();
     var threshold = currentthreshold || initialthreshold;
 
     // Iterate over the next images and paint border on each slice.
