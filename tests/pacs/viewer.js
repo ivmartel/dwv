@@ -85,7 +85,7 @@ dwv.test.viewerSetup = function () {
   var nSimultaneousData = 1;
   var viewOnFirstLoadItem = true;
 
-  var mode = 0;
+  var mode = 3;
   addLayer('layerGroup0');
   if (mode === 0) {
     // simplest: one data, one layer group
