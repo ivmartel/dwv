@@ -297,6 +297,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     // un-bind previous layer
     var viewLayer0 = this.getActiveViewLayer();
     if (viewLayer0) {
+      viewLayer0.setActive(false);
       viewLayer0.removeEventListener(
         'positionchange', this.updateLayersToPositionChange);
       unbindViewLayer(viewLayer0);
@@ -307,6 +308,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
 
     // bind new layer
     var viewLayer = this.getActiveViewLayer();
+    viewLayer.setActive(true);
     viewLayer.addEventListener(
       'positionchange', this.updateLayersToPositionChange);
     bindViewLayer(viewLayer);
@@ -368,8 +370,6 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     containerDiv.append(div);
     // view layer
     var layer = new dwv.gui.ViewLayer(div);
-    // set z-index: last on top
-    layer.setZIndex(viewLayerIndex);
     // add layer
     layers.push(layer);
     // mark it as active
@@ -392,8 +392,6 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     containerDiv.append(div);
     // draw layer
     var layer = new dwv.gui.DrawLayer(div);
-    // set z-index: above view + last on top
-    layer.setZIndex(10 + activeDrawLayerIndex);
     // add layer
     layers.push(layer);
     // return

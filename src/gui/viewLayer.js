@@ -321,12 +321,12 @@ dwv.gui.ViewLayer = function (containerDiv) {
   };
 
   /**
-   * Set the layer z-index.
+   * Activate the layer.
    *
-   * @param {number} index The index.
+   * @param {boolean} flag True to activate the layer.
    */
-  this.setZIndex = function (index) {
-    containerDiv.style.zIndex = index;
+  this.setActive = function (flag) {
+    containerDiv.style['pointer-events'] = flag ? 'auto' : 'none';
   };
 
   /**
