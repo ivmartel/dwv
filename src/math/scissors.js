@@ -202,8 +202,8 @@ dwv.math.gradUnitVector = function (gradX, gradY, px, py, out) {
 };
 
 dwv.math.gradDirection = function (gradX, gradY, px, py, qx, qy) {
-  var __dgpuv = new dwv.math.FastPoint2D(-1, -1);
-  var __gdquv = new dwv.math.FastPoint2D(-1, -1);
+  var __dgpuv = {x: -1, y: -1};
+  var __gdquv = {x: -1, y: -1};
   // Compute the gradiant direction, in radians, between to points
   dwv.math.gradUnitVector(gradX, gradY, px, py, __dgpuv);
   dwv.math.gradUnitVector(gradX, gradY, qx, qy, __gdquv);
@@ -236,7 +236,7 @@ dwv.math.computeSides = function (dist, gradX, gradY, greyscale) {
   sides.inside = [];
   sides.outside = [];
 
-  var guv = new dwv.math.FastPoint2D(-1, -1); // Current gradient unit vector
+  var guv = {x: -1, y: -1}; // Current gradient unit vector
 
   for (var y = 0; y < gradX.length; y++) {
     sides.inside[y] = [];
@@ -520,7 +520,7 @@ dwv.math.Scissors.prototype.adj = function (p) {
   for (var y = sy; y <= ey; y++) {
     for (var x = sx; x <= ex; x++) {
       if (x !== p.x || y !== p.y) {
-        list[idx++] = new dwv.math.FastPoint2D(x, y);
+        list[idx++] = {x: x, y: y};
       }
     }
   }

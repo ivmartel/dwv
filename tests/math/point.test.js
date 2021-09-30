@@ -45,34 +45,6 @@ QUnit.test('Test Point2D.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.math.FastPoint2D}.
- *
- * @function module:tests/math~FastPoint2D
- */
-QUnit.test('Test FastPoint2D.', function (assert) {
-  var p0 = new dwv.math.FastPoint2D(1, 2);
-  // x
-  assert.equal(p0.x, 1, 'x');
-  // y
-  assert.equal(p0.y, 2, 'y');
-  // can modify x
-  p0.x = 3;
-  assert.equal(p0.x, 3, 'modified x');
-  // can modify y
-  p0.y = 4;
-  assert.equal(p0.y, 4, 'modified y');
-  // equals: true
-  var p1 = new dwv.math.FastPoint2D(3, 4);
-  assert.equal(p0.equals(p1), true, 'equals true');
-  // equals: false
-  assert.equal(p0.equals(null), false, 'null equals false');
-  var p2 = new dwv.math.FastPoint2D(4, 3);
-  assert.equal(p0.equals(p2), false, 'equals false');
-  // to string
-  assert.equal(p0.toString(), '(3, 4)', 'toString');
-});
-
-/**
  * Tests for {@link dwv.math.Point3D}.
  *
  * @function module:tests/math~Point3D

@@ -197,7 +197,6 @@ dwv.tool.Floodfill = function (app) {
       bytes: 4
     };
 
-    // var p = new dwv.math.FastPoint2D(points.x, points.y);
     mask = MagicWand.floodFill(image, points.x, points.y, threshold);
     mask = MagicWand.gaussBlurOnlyBorder(mask, blurRadius);
 

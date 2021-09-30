@@ -74,39 +74,6 @@ dwv.math.Point2D.prototype.getRound = function () {
 };
 
 /**
- * Mutable 2D point.
- *
- * @class
- * @param {number} x The X coordinate for the point.
- * @param {number} y The Y coordinate for the point.
- */
-dwv.math.FastPoint2D = function (x, y) {
-  this.x = x;
-  this.y = y;
-}; // FastPoint2D class
-
-/**
- * Check for FastPoint2D equality.
- *
- * @param {object} rhs The other point to compare to.
- * @returns {boolean} True if both points are equal.
- */
-dwv.math.FastPoint2D.prototype.equals = function (rhs) {
-  return rhs !== null &&
-    this.x === rhs.x &&
-    this.y === rhs.y;
-};
-
-/**
- * Get a string representation of the FastPoint2D.
- *
- * @returns {string} The point as a string.
- */
-dwv.math.FastPoint2D.prototype.toString = function () {
-  return '(' + this.x + ', ' + this.y + ')';
-};
-
-/**
  * Immutable 3D point.
  *
  * @class

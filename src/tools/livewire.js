@@ -136,7 +136,7 @@ dwv.tool.Livewire = function (app) {
       self.style.setZoomScale(
         drawLayer.getKonvaLayer().getAbsoluteScale());
       // do the training from the first point
-      var p = new dwv.math.FastPoint2D(index.get(0), index.get(1));
+      var p = {x: index.get(0), y: index.get(1)};
       scissors.doTraining(p);
       // add the initial point to the path
       var p0 = new dwv.math.Point2D(index.get(0), index.get(1));
@@ -161,7 +161,7 @@ dwv.tool.Livewire = function (app) {
         // anchor point
         path = currentPath;
         clearParentPoints();
-        var pn = new dwv.math.FastPoint2D(index.get(0), index.get(1));
+        var pn = {x: index.get(0), y: index.get(1)};
         scissors.doTraining(pn);
         path.addControlPoint(currentPath.getPoint(0));
       }
@@ -183,7 +183,7 @@ dwv.tool.Livewire = function (app) {
     var index = viewLayer.displayToPlaneIndex(event._x, event._y);
 
     // set the point to find the path to
-    var p = new dwv.math.FastPoint2D(index.get(0), index.get(1));
+    var p = {x: index.get(0), y: index.get(1)};
     scissors.setPoint(p);
     // do the work
     var results = 0;
