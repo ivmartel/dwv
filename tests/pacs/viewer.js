@@ -31,30 +31,25 @@ dwv.test.viewerSetup = function () {
     root.appendChild(layer);
   }
 
-  // stage options
-  var dataViewConfigs;
-  var nSimultaneousData = 1;
-  var viewOnFirstLoadItem = true;
+  function createSimpleDataViewConfig(numberOfData, sameDiv) {
+    if (typeof sameDiv === 'undefined') {
+      sameDiv = false;
+    }
+    var configs = {};
+    for (var i = 0; i < numberOfData; ++i) {
+      var divName = 'layerGroup0';
+      if (!sameDiv) {
+        divName = 'layerGroup' + i;
+      }
+      configs[i] = [{divId: divName}];
+    }
+    return configs;
+  }
 
-  var mode = 0; // simplest, multi, mpr
-  if (mode === 0) {
-    // simplest
-    dataViewConfigs = {0: [{divId: 'layerGroup0'}]};
-  } else if (mode === 1) {
-    // multiple data, multiple layer group
-    nSimultaneousData = 2;
-    addLayer('layerGroup1');
-    dataViewConfigs = {
-      0: [{divId: 'layerGroup0'}],
-      1: [{divId: 'layerGroup1'}]
-    };
-  } else if (mode === 2) {
-    // single data, multiple layer groups -> MPR
-    viewOnFirstLoadItem = false;
-    addLayer('layerGroup1');
-    addLayer('layerGroup2');
-    dataViewConfigs = {
-      0: [
+  function createMPRDataViewConfig(numberOfData) {
+    var configs = {};
+    for (var i = 0; i < numberOfData; ++i) {
+      configs[i] = [
         {
           divId: 'layerGroup0',
           orientation: 'axial'
@@ -67,8 +62,38 @@ dwv.test.viewerSetup = function () {
           divId: 'layerGroup2',
           orientation: 'sagittal'
         }
-      ]
-    };
+      ];
+    }
+    return configs;
+  }
+
+  // stage options
+  var dataViewConfigs;
+  var nSimultaneousData = 1;
+  var viewOnFirstLoadItem = true;
+
+  var mode = 0;
+  addLayer('layerGroup0');
+  if (mode === 0) {
+    // simplest: one data, one layer group
+    dataViewConfigs = createSimpleDataViewConfig(nSimultaneousData);
+  } else if (mode === 1) {
+    // multiple data, multiple layer group
+    nSimultaneousData = 2;
+    addLayer('layerGroup1');
+    dataViewConfigs = createSimpleDataViewConfig(nSimultaneousData);
+    console.log(dataViewConfigs);
+  } else if (mode === 2) {
+    // multiple data, one layer group
+    nSimultaneousData = 2;
+    dataViewConfigs = createSimpleDataViewConfig(nSimultaneousData, true);
+  } else if (mode === 3) {
+    // single data, multiple layer groups -> MPR
+    viewOnFirstLoadItem = false;
+    nSimultaneousData = 2;
+    addLayer('layerGroup1');
+    addLayer('layerGroup2');
+    dataViewConfigs = createMPRDataViewConfig(nSimultaneousData);
   }
 
   // layer group binders
@@ -113,10 +138,14 @@ dwv.test.viewerSetup = function () {
       document.getElementById('loadprogress').value = percent;
     }
   });
+  var dataLoad = 0;
   _app.addEventListener('load', function () {
     if (!viewOnFirstLoadItem) {
       _app.render();
     }
+    // update active layer
+    dwv.test.addLayerRow(dataLoad);
+    ++dataLoad;
   });
   _app.addEventListener('loadend', function () {
     console.timeEnd('load-data');
@@ -141,6 +170,9 @@ dwv.test.viewerSetup = function () {
     input.value = event.value[0];
   });
 
+  console.log(
+    '%c Available tools: (s)croll, (w)indowlevel, (z)oomandpan, (d)raw.',
+    'color: teal;');
   _app.addEventListener('keydown', function (event) {
     _app.defaultOnKeydown(event);
     if (event.keyCode === 83) { // s
@@ -163,6 +195,151 @@ dwv.test.viewerSetup = function () {
   dwv.utils.loadFromUri(window.location.href, _app);
 };
 
+dwv.test.addLayerRow = function (id) {
+  var lg = _app.getActiveLayerGroup();
+  var vl = lg.getActiveViewLayer();
+  var vc = vl.getViewController();
+  var wl = vc.getWindowLevel();
+
+  var table = document.getElementById('layerstable');
+  var body;
+  // create table if not present
+  if (!table) {
+    table = document.createElement('table');
+    table.id = 'layerstable';
+    var header = table.createTHead();
+    var trow = header.insertRow(0);
+    var insertTCell = function (text) {
+      var th = document.createElement('th');
+      th.innerHTML = text;
+      trow.appendChild(th);
+    };
+    insertTCell('Active');
+    insertTCell('Id');
+    insertTCell('Width');
+    insertTCell('Center');
+    insertTCell('Alpha');
+    body = table.createTBody();
+    var div = document.getElementById('layersdetails');
+    div.appendChild(table);
+  } else {
+    body = table.getElementsByTagName('tbody')[0];
+  }
+
+  // add new layer row
+  var row = body.insertRow();
+  var cell;
+
+  // cell: id
+  cell = row.insertCell();
+  cell.appendChild(document.createTextNode(id));
+
+  // cell: radio
+  var radio = document.createElement('input');
+  radio.type = 'radio';
+  radio.name = 'layerselect';
+  radio.id = id;
+  radio.checked = true;
+  radio.onchange = function (event) {
+    for (var i = 0; i < _app.getNumberOfLayerGroups(); ++i) {
+      _app.getLayerGroupById(i).setActiveViewLayer(2 * event.srcElement.id);
+    }
+  };
+  cell = row.insertCell();
+  cell.appendChild(radio);
+
+  var dataRange = _app.getImage().getRescaledDataRange();
+
+  // cell: window width
+  cell = row.insertCell();
+  var widthrange = document.createElement('input');
+  widthrange.type = 'range';
+  widthrange.max = dataRange.max - dataRange.min;
+  widthrange.min = 0;
+  widthrange.step = (dataRange.max - dataRange.min) * 0.1;
+  widthrange.value = wl.width;
+  var widthnumber = document.createElement('input');
+  widthnumber.type = 'number';
+  widthnumber.max = widthrange.max;
+  widthnumber.min = widthrange.min;
+  widthnumber.step = widthrange.step;
+  widthnumber.value = widthrange.value;
+  cell.appendChild(widthrange);
+  cell.appendChild(widthnumber);
+
+  // cell: window center
+  cell = row.insertCell();
+  var centerrange = document.createElement('input');
+  centerrange.type = 'range';
+  centerrange.max = dataRange.max;
+  centerrange.min = dataRange.min;
+  centerrange.step = (dataRange.max - dataRange.min) * 0.001;
+  centerrange.value = wl.center;
+  var centernumber = document.createElement('input');
+  centernumber.type = 'number';
+  centernumber.max = centerrange.max;
+  centernumber.min = centerrange.min;
+  centernumber.step = centerrange.step;
+  centernumber.value = centerrange.value;
+  cell.appendChild(centerrange);
+  cell.appendChild(centernumber);
+
+  var changeWidth = function (value) {
+    vc.setWindowLevel(centernumber.value, value);
+    vl.draw();
+  };
+  widthnumber.oninput = function () {
+    changeWidth(this.value);
+    widthrange.value = this.value;
+  };
+  widthrange.oninput = function () {
+    changeWidth(this.value);
+    widthnumber.value = this.value;
+  };
+
+  var changeCenter = function (value) {
+    vc.setWindowLevel(value, widthnumber.value);
+    vl.draw();
+  };
+  centernumber.oninput = function () {
+    changeCenter(this.value);
+    centerrange.value = this.value;
+  };
+  centerrange.oninput = function () {
+    changeCenter(this.value);
+    centernumber.value = this.value;
+  };
+
+  // cell: opactiy
+  cell = row.insertCell();
+  var changeOpacity = function (value) {
+    vl.setOpacity(value);
+    vl.draw();
+  };
+  var opacityrange = document.createElement('input');
+  opacityrange.type = 'range';
+  opacityrange.max = 1;
+  opacityrange.min = 0;
+  opacityrange.step = 0.1;
+  opacityrange.value = 1;
+  var opacitynumber = document.createElement('input');
+  opacitynumber.type = 'number';
+  opacitynumber.max = opacityrange.max;
+  opacitynumber.min = opacityrange.min;
+  opacitynumber.step = opacityrange.step;
+  opacitynumber.value = opacityrange.value;
+  opacitynumber.oninput = function () {
+    changeOpacity(this.value);
+    opacityrange.value = this.value;
+  };
+  opacityrange.oninput = function () {
+    changeOpacity(this.value);
+    opacitynumber.value = this.value;
+  };
+  cell.appendChild(opacityrange);
+  cell.appendChild(opacitynumber);
+};
+
 /**
  * Last minute.
  */
@@ -182,17 +359,4 @@ dwv.test.onDOMContentLoadedViewer = function () {
     console.log(event.target.files);
     _app.loadFiles(event.target.files);
   });
-
-  // alpha range
-  var alpharange = document.getElementById('alpharange');
-  var alphanumber = document.getElementById('alphanumber');
-  alpharange.oninput = function () {
-    _app.setOpacity(this.value);
-    alphanumber.value = this.value;
-  };
-  alphanumber.oninput = function () {
-    _app.setOpacity(this.value);
-    alpharange.value = this.value;
-  };
-
 };
