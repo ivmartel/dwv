@@ -485,9 +485,6 @@ dwv.gui.ViewLayer = function (containerDiv) {
       y: fitScale1D * baseSpacing.y
     };
     // update canvas
-    console.log('fitScale1D', fitScale1D);
-    // var width = Math.floor(baseSize.x * fitScale.x);
-    // var height = Math.floor(baseSize.y * fitScale.y);
     var width = containerDiv.parentElement.offsetWidth;
     var height = containerDiv.parentElement.offsetHeight;
     if (!dwv.gui.canCreateCanvas(width, height)) {
