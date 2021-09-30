@@ -31,6 +31,13 @@ dwv.test.viewerSetup = function () {
     root.appendChild(layer);
   }
 
+  /**
+   * Create simple view config(s).
+   *
+   * @param {number} numberOfData The number of data.
+   * @param {boolean} sameDiv If all data go in the same div.
+   * @returns {object} The view config.
+   */
   function createSimpleDataViewConfig(numberOfData, sameDiv) {
     if (typeof sameDiv === 'undefined') {
       sameDiv = false;
@@ -46,6 +53,12 @@ dwv.test.viewerSetup = function () {
     return configs;
   }
 
+  /**
+   * Create MPR view config(s).
+   *
+   * @param {number} numberOfData The number of data.
+   * @returns {object} The view config.
+   */
   function createMPRDataViewConfig(numberOfData) {
     var configs = {};
     for (var i = 0; i < numberOfData; ++i) {
