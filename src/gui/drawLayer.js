@@ -201,7 +201,7 @@ dwv.gui.DrawLayer = function (containerDiv) {
   /**
    * Set the base layer offset. Resets the layer offset.
    *
-   * @param {object} newOffset The offset as {x,y}.
+   * @param {object} off The offset as {x,y}.
    */
   this.setBaseOffset = function (off) {
     baseOffset = planeHelper.getPlaneOffsetFromOffset3D({
