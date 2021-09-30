@@ -146,6 +146,15 @@ dwv.App = function () {
   };
 
   /**
+   * Get the number of layer groups.
+   *
+   * @returns {number} The number of groups.
+   */
+  this.getNumberOfLayerGroups = function () {
+    return stage.getNumberOfLayerGroups();
+  };
+
+  /**
    * Get the app style.
    *
    * @returns {object} The app style.
