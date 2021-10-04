@@ -418,6 +418,15 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
+   * Set the view per value alpha function.
+   *
+   * @param {function} func The function.
+   */
+  this.setViewAlphaFunction = function (func) {
+    view.alphaFunction = func;
+  };
+
+  /**
    * Set the colour map from a name.
    *
    * @param {string} name The name of the colour map to set.

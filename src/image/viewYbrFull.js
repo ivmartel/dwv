@@ -7,10 +7,12 @@ dwv.image = dwv.image || {};
  *
  * @param {Array} array The array to store the outut data
  * @param {object} iterator Position iterator.
+ * @param {function} alphaFunc The alpha function.
  */
 dwv.image.generateImageDataYbrFull = function (
   array,
-  iterator) {
+  iterator,
+  alphaFunc) {
   var index = 0;
   var rgb = null;
   var ival = iterator.next();
@@ -22,7 +24,7 @@ dwv.image.generateImageDataYbrFull = function (
     array.data[index] = rgb.r;
     array.data[index + 1] = rgb.g;
     array.data[index + 2] = rgb.b;
-    array.data[index + 3] = 0xff;
+    array.data[index + 3] = alphaFunc(ival.value);
     // increment
     index += 4;
     ival = iterator.next();

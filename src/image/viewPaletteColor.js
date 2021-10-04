@@ -7,12 +7,14 @@ dwv.image = dwv.image || {};
  *
  * @param {Array} array The array to store the outut data
  * @param {object} iterator Position iterator.
+ * @param {function} alphaFunc The alpha function.
  * @param {object} colourMap The colour map.
  * @param {boolean} is16BitsStored Flag to know if the data is 16bits.
  */
 dwv.image.generateImageDataPaletteColor = function (
   array,
   iterator,
+  alphaFunc,
   colourMap,
   is16BitsStored) {
   // right shift 8
@@ -41,7 +43,7 @@ dwv.image.generateImageDataPaletteColor = function (
       array.data[index + 1] = colourMap.green[pxValue];
       array.data[index + 2] = colourMap.blue[pxValue];
     }
-    array.data[index + 3] = 0xff;
+    array.data[index + 3] = alphaFunc(pxValue);
     // increment
     index += 4;
     ival = iterator.next();

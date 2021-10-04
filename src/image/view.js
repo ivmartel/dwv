@@ -149,6 +149,18 @@ dwv.image.View = function (image) {
   };
 
   /**
+   * Per value alpha function.
+   *
+   * @param {mixed} _value The pixel value. Can be a number for monochrome
+   *  data or an array for RGB data.
+   * @returns {number} The coresponding alpha [0,255].
+   */
+  this.alphaFunction = function (_value) {
+    // default always returns fully visible
+    return 0xff;
+  };
+
+  /**
    * Get the window LUT of the image.
    * Warning: can be undefined in no window/level was set.
    *
@@ -631,6 +643,7 @@ dwv.image.View.prototype.generateImageData = function (array) {
     dwv.image.generateImageDataMonochrome(
       array,
       iterator,
+      this.alphaFunction,
       this.getCurrentWindowLut(),
       this.getColourMap()
     );
@@ -640,6 +653,7 @@ dwv.image.View.prototype.generateImageData = function (array) {
     dwv.image.generateImageDataPaletteColor(
       array,
       iterator,
+      this.alphaFunction,
       this.getColourMap(),
       image.getMeta().BitsStored === 16
     );
@@ -649,6 +663,7 @@ dwv.image.View.prototype.generateImageData = function (array) {
     dwv.image.generateImageDataRgb(
       array,
       iterator,
+      this.alphaFunction,
       this.getCurrentWindowLut()
     );
     break;
@@ -656,7 +671,8 @@ dwv.image.View.prototype.generateImageData = function (array) {
   case 'YBR_FULL':
     dwv.image.generateImageDataYbrFull(
       array,
-      iterator
+      iterator,
+      this.alphaFunction
     );
     break;
 
