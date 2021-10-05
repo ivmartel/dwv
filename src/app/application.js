@@ -1116,10 +1116,6 @@ dwv.App = function () {
     // update style
     //style.setBaseScale(layerGroup.getBaseScale());
 
-    // // propagate layer events
-    // layerGroup.addEventListener('zoomchange', fireEvent);
-    // layerGroup.addEventListener('offsetchange', fireEvent);
-
     // initialise the toolbox
     if (toolboxController) {
       toolboxController.init();
