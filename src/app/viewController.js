@@ -120,14 +120,28 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
-   * Get the current scroll position.
+   * Get the scroll index.
    *
-   * @returns {object} The position.
+   * @returns {number} The index.
    */
-  this.getCurrentScrollIndex = function () {
+  this.getScrollIndex = function () {
+    return view.getScrollIndex();
+  };
+
+  /**
+   * Get the current scroll index value.
+   *
+   * @returns {object} The value.
+   */
+  this.getCurrentScrollIndexValue = function () {
     return view.getCurrentIndex().get(view.getScrollIndex());
   };
 
+  /**
+   * Get the current scroll position value.
+   *
+   * @returns {object} The value.
+   */
   this.getCurrentScrollPosition = function () {
     var scrollIndex = view.getScrollIndex();
     var z = null;
@@ -139,6 +153,24 @@ dwv.ctrl.ViewController = function (view) {
       z = view.getCurrentPosition().getZ();
     }
     return z;
+  };
+
+  /**
+   * Generate display image data to be given to a canvas.
+   *
+   * @param {Array} array The array to fill in.
+   */
+  this.generateImageData = function (array) {
+    view.generateImageData(array);
+  };
+
+  /**
+   * Set the associated image.
+   *
+   * @param {Image} img The associated image.
+   */
+  this.setImage = function (img) {
+    view.setImage(img);
   };
 
   /**
@@ -276,7 +308,7 @@ dwv.ctrl.ViewController = function (view) {
 
   this.getPositionFromPlanePoint = function (point2D) {
     // keep third direction
-    var k = this.getCurrentScrollIndex();
+    var k = this.getCurrentScrollIndexValue();
     var planePoint = new dwv.math.Point3D(
       point2D.x, point2D.y, k);
 

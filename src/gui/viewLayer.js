@@ -148,6 +148,10 @@ dwv.gui.ViewLayer = function (containerDiv) {
    */
   this.setView = function (inputView) {
     view = inputView;
+    // local listeners
+    view.addEventListener('wlchange', onWLChange);
+    view.addEventListener('colourchange', onColourChange);
+    view.addEventListener('positionchange', onPositionChange);
     // create view controller
     viewController = new dwv.ctrl.ViewController(view);
   };
@@ -178,7 +182,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
   this.onimagechange = function (event) {
     // event.value = [index, image]
     if (dataIndex === event.value[0]) {
-      view.setImage(event.value[1]);
+      viewController.setImage(event.value[1]);
       needsDataUpdate = true;
     }
   };
@@ -432,11 +436,6 @@ dwv.gui.ViewLayer = function (containerDiv) {
     baseSpacing = spacing;
     dataIndex = index;
 
-    // local listeners
-    view.addEventListener('wlchange', onWLChange);
-    view.addEventListener('colourchange', onColourChange);
-    view.addEventListener('positionchange', onPositionChange);
-
     // create canvas
     canvas = document.createElement('canvas');
     containerDiv.appendChild(canvas);
@@ -580,7 +579,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
    */
   function updateImageData() {
     // generate image data
-    view.generateImageData(imageData);
+    viewController.generateImageData(imageData);
     // pass the data to the off screen canvas
     offscreenCanvas.getContext('2d').putImageData(imageData, 0, 0);
     // update data flag
@@ -622,7 +621,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
   function onPositionChange(event) {
     if (typeof event.skipGenerate === 'undefined' ||
       event.skipGenerate === false) {
-      if (event.diffDims.includes(view.getScrollIndex())) {
+      if (event.diffDims.includes(viewController.getScrollIndex())) {
         needsDataUpdate = true;
         self.draw();
       }
@@ -635,7 +634,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @param {Array} value The position change values: [index, point]
    */
   this.setCurrentPosition = function (value) {
-    view.setCurrentPosition(new dwv.math.Point3D(
+    viewController.setCurrentPosition(new dwv.math.Point3D(
       value[1][0], value[1][1], value[1][2]));
   };
 
