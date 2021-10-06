@@ -306,16 +306,19 @@ dwv.ctrl.ViewController = function (view) {
       this.getPositionFromPlanePoint({x: x, y: y}));
   };
 
+  /**
+   * Get a 3D position from a plane 2D position.
+   *
+   * @param {object} point2D The 2D position as {x,y}.
+   * @returns {object} The 3D point.
+   */
   this.getPositionFromPlanePoint = function (point2D) {
     // keep third direction
     var k = this.getCurrentScrollIndexValue();
     var planePoint = new dwv.math.Point3D(
       point2D.x, point2D.y, k);
-
-    //planeHelper.getPlaneOffsetFromOffset3D(offset2D);
-
+    // de-orient
     var point = planeHelper.getDeOrientedVector3D(planePoint);
-
     // ~indexToWorld
     //var origin = view.getImage().getGeometry().getOrigin();
     var spacing = view.getImage().getGeometry().getSpacing();
@@ -325,6 +328,12 @@ dwv.ctrl.ViewController = function (view) {
       /*origin.getZ() + */point.getZ() * spacing.getSliceSpacing());
   };
 
+  /**
+   * Get a 3D offset from a plane one.
+   *
+   * @param {object} offset2D The plane offset as {x,y}.
+   * @returns {object} The 3D world offset.
+   */
   this.getOffset3DFromPlaneOffset = function (offset2D) {
     return planeHelper.getOffset3DFromPlaneOffset(offset2D);
   };
