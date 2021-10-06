@@ -752,6 +752,9 @@ dwv.App = function () {
    * @param {string} tool The tool.
    */
   this.setTool = function (tool) {
+    // bind tool to layer: not really important which layer since
+    //   tools are responsible for finding the event source layer
+    //   but there needs to be at least one binding...
     for (var i = 0; i < stage.getNumberOfLayerGroups(); ++i) {
       var layerGroup = stage.getLayerGroup(i);
       var layer = null;
@@ -774,6 +777,7 @@ dwv.App = function () {
       toolboxController.bindLayer(layer);
     }
 
+    // set toolbox tool
     toolboxController.setSelectedTool(tool);
   };
 
