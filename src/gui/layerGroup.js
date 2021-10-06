@@ -127,6 +127,9 @@ dwv.gui.getViewOrientation = function (imageGeometry, targetOrientation) {
  */
 dwv.gui.LayerGroup = function (containerDiv, groupId) {
 
+  // closure to self
+  var self = this;
+  // list of layers
   var layers = [];
 
   /**
@@ -297,20 +300,14 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     // un-bind previous layer
     var viewLayer0 = this.getActiveViewLayer();
     if (viewLayer0) {
-      viewLayer0.setActive(false);
-      viewLayer0.removeEventListener(
-        'positionchange', this.updateLayersToPositionChange);
       unbindViewLayer(viewLayer0);
     }
 
-    // set index
+    // set active index
     activeViewLayerIndex = index;
 
     // bind new layer
     var viewLayer = this.getActiveViewLayer();
-    viewLayer.setActive(true);
-    viewLayer.addEventListener(
-      'positionchange', this.updateLayersToPositionChange);
     bindViewLayer(viewLayer);
   };
 
@@ -320,8 +317,10 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    * @param {object} viewLayer The view layer to bind.
    */
   function bindViewLayer(viewLayer) {
-    // propagate view events
-    viewLayer.propagateViewEvents(true);
+    // listen to position change to update other layers
+    viewLayer.addEventListener(
+      'positionchange', self.updateLayersToPositionChange);
+    // propagate view viewLayer-layer events
     for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
       viewLayer.addEventListener(dwv.image.viewEventNames[j], fireEvent);
     }
@@ -336,8 +335,10 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    * @param {object} viewLayer The view layer to unbind.
    */
   function unbindViewLayer(viewLayer) {
-    // stop propagating view events
-    viewLayer.propagateViewEvents(false);
+    // stop listening to position change
+    viewLayer.removeEventListener(
+      'positionchange', self.updateLayersToPositionChange);
+    // stop propagating viewLayer-view events
     for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
       viewLayer.removeEventListener(dwv.image.viewEventNames[j], fireEvent);
     }

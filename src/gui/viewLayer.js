@@ -325,15 +325,6 @@ dwv.gui.ViewLayer = function (containerDiv) {
   };
 
   /**
-   * Activate the layer.
-   *
-   * @param {boolean} flag True to activate the layer.
-   */
-  this.setActive = function (flag) {
-    containerDiv.style['pointer-events'] = flag ? 'auto' : 'none';
-  };
-
-  /**
    * Display the layer.
    *
    * @param {boolean} flag Whether to display the layer or not.
