@@ -217,15 +217,6 @@ dwv.gui.DrawLayer = function (containerDiv) {
   };
 
   /**
-   * Activate the layer.
-   *
-   * @param {boolean} flag True to activate the layer.
-   */
-  this.setActive = function (flag) {
-    containerDiv.style['pointer-events'] = flag ? 'auto' : 'none';
-  };
-
-  /**
    * Display the layer.
    *
    * @param {boolean} flag Whether to display the layer or not.
@@ -306,9 +297,9 @@ dwv.gui.DrawLayer = function (containerDiv) {
   };
 
   /**
-   * Activate the layer: propagate events.
+   * Enable and listen to container interaction events.
    */
-  this.activate = function () {
+  this.bindInteraction = function () {
     konvaStage.listening(true);
     // allow pointer events
     containerDiv.style.pointerEvents = 'auto';
@@ -320,9 +311,9 @@ dwv.gui.DrawLayer = function (containerDiv) {
   };
 
   /**
-   * Deactivate the layer: stop propagating events.
+   * Disable and stop listening to container interaction events.
    */
-  this.deactivate = function () {
+  this.unbindInteraction = function () {
     konvaStage.listening(false);
     // disable pointer events
     containerDiv.style.pointerEvents = 'none';

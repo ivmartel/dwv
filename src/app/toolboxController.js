@@ -148,8 +148,8 @@ dwv.ctrl.ToolboxController = function (toolList) {
    *
    * @param {object} layer The layer to listen to.
    */
-  this.attachLayer = function (layer) {
-    layer.activate();
+  this.bindLayer = function (layer) {
+    layer.bindInteraction();
     // interaction events
     var names = dwv.gui.interactionEventNames;
     for (var i = 0; i < names.length; ++i) {
@@ -163,8 +163,8 @@ dwv.ctrl.ToolboxController = function (toolList) {
    *
    * @param {object} layer The layer to stop listening to.
    */
-  this.detachLayer = function (layer) {
-    layer.deactivate();
+  this.unbindLayer = function (layer) {
+    layer.unbindInteraction();
     // interaction events
     var names = dwv.gui.interactionEventNames;
     for (var i = 0; i < names.length; ++i) {

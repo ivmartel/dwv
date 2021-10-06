@@ -487,9 +487,9 @@ dwv.gui.ViewLayer = function (containerDiv) {
   };
 
   /**
-   * Activate the layer: propagate events.
+   * Enable and listen to container interaction events.
    */
-  this.activate = function () {
+  this.bindInteraction = function () {
     // allow pointer events
     containerDiv.style.pointerEvents = 'auto';
     // interaction events
@@ -500,9 +500,9 @@ dwv.gui.ViewLayer = function (containerDiv) {
   };
 
   /**
-   * Deactivate the layer: stop propagating events.
+   * Disable and stop listening to container interaction events.
    */
-  this.deactivate = function () {
+  this.unbindInteraction = function () {
     // disable pointer events
     containerDiv.style.pointerEvents = 'none';
     // interaction events
