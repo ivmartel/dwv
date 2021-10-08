@@ -7,7 +7,7 @@ dwv.image = dwv.image || {};
  *
  * @param {Array} array The array to store the outut data
  * @param {object} iterator Position iterator.
- * @param {function} alphaFunc The alpha function.
+ * @param {Function} alphaFunc The alpha function.
  * @param {object} colourMap The colour map.
  * @param {boolean} is16BitsStored Flag to know if the data is 16bits.
  */
