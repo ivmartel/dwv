@@ -124,27 +124,6 @@ dwv.math.Index.prototype.add = function (rhs) {
 };
 
 /**
- * Ge the different dimensions.
- *
- * @param {object} rhs The index to compare to.
- * @returns {Array} The different dimensions.
- */
-dwv.math.Index.prototype.differentDims = function (rhs) {
-  // check if can compare
-  if (!this.canCompare(rhs)) {
-    return false;
-  }
-  // values
-  var diffDims = [];
-  for (var i = 0, leni = this.length(); i < leni; ++i) {
-    if (this.get(i) !== rhs.get(i)) {
-      diffDims.push(i);
-    }
-  }
-  return diffDims;
-};
-
-/**
  * Get the current index with a new 2D base.
  *
  * @param {number} i The new 0 index.
@@ -157,20 +136,6 @@ dwv.math.Index.prototype.getWithNew2D = function (i, j) {
     values.push(this.get(l));
   }
   return new dwv.math.Index(values);
-};
-
-/**
- * Convert an Index to a Point3D using an input spacing.
- *
- * @param {object} spacing The image spacing.
- * @returns {object} The new Point3D.
- */
-dwv.math.Index.prototype.toPoint3D = function (spacing) {
-  return new dwv.math.Point3D(
-    this.get(0) * spacing.getColumnSpacing(),
-    this.get(1) * spacing.getRowSpacing(),
-    this.get(2) * spacing.getSliceSpacing()
-  );
 };
 
 /**
@@ -194,30 +159,6 @@ dwv.math.Index.prototype.toStringId = function (minDim) {
     res += '#' + i + '-' + this.get(i);
   }
   return res;
-};
-
-/**
- * Get an index from an id string in the form of: '#0-1_#1-2'
- * (result of index.toStringId).
- *
- * @param {string} inputStr The input string.
- * @returns {object} The corresponding index.
- */
-dwv.math.getFromStringId = function (inputStr) {
-  // split ids
-  var strIds = inputStr.split('_');
-  // get the first dim of the string
-  var minDim = strIds[0].substring(1, 2);
-  // set first values
-  var values = [];
-  for (var i = 0; i < minDim; ++i) {
-    values.push(0);
-  }
-  // get other values from the input string
-  for (var j = 0; j < strIds.length; ++j) {
-    values.push(parseInt(strIds[j].substring(3), 10));
-  }
-  return new dwv.math.Index(values);
 };
 
 /**

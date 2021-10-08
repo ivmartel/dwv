@@ -104,12 +104,11 @@ dwv.ctrl.DataController = function () {
    *
    * @param {object} image The image.
    * @param {object} meta The image meta.
-   * @returns {number} The slice number at which the image was added.
    */
   this.updateCurrent = function (image, meta) {
     var currentData = data[currentIndex];
     // add slice to current image
-    var sliceNb = currentData.image.appendSlice(image);
+    currentData.image.appendSlice(image);
     // update meta data
     var idKey = '';
     if (typeof meta.x00020010 !== 'undefined') {
@@ -123,8 +122,6 @@ dwv.ctrl.DataController = function () {
       getMetaObject(meta),
       idKey,
       'value');
-
-    return sliceNb;
   };
 
   /**

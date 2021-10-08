@@ -102,3 +102,60 @@ dwv.math.Vector3D.prototype.dotProduct = function (vector3D) {
     (this.getY() * vector3D.getY()) +
     (this.getZ() * vector3D.getZ());
 };
+
+/**
+ * Get a string id from the index values in the form of: '#0-1_#1-2'.
+ *
+ * @param {number} minDim The start dimension.
+ * @returns {string} The string id.
+ */
+dwv.math.Vector3D.prototype.toStringId = function (minDim) {
+  if (typeof minDim === 'undefined') {
+    minDim = 0;
+  }
+  if (minDim >= 3) {
+    throw new Error('Minimum dim cannot be equal or greater than length.');
+  }
+  var res = '';
+  for (var i = minDim; i < 3; ++i) {
+    if (i !== minDim) {
+      res += '_';
+    }
+    res += '#' + i + '-';
+    if (i === 0) {
+      res += this.getX();
+    } else if (i === 1) {
+      res += this.getY();
+    } else if (i === 2) {
+      res += this.getZ();
+    }
+  }
+  return res;
+};
+
+/**
+ * Get an index from an id string in the form of: '#0-1_#1-2'
+ * (result of index.toStringId).
+ *
+ * @param {string} inputStr The input string.
+ * @returns {object} The corresponding index.
+ */
+dwv.math.getVectorFromStringId = function (inputStr) {
+  // split ids
+  var strIds = inputStr.split('_');
+  // get the first dim of the string
+  var minDim = strIds[0].substring(1, 2);
+  // set first values
+  var values = [];
+  for (var i = 0; i < minDim; ++i) {
+    values.push(0);
+  }
+  // get other values from the input string
+  for (var j = 0; j < strIds.length; ++j) {
+    values.push(parseInt(strIds[j].substring(3), 10));
+  }
+  if (values.length !== 3) {
+    throw new Error('Cannot create vector from string: ' + inputStr);
+  }
+  return new dwv.math.Vector3D(values[0], values[1], values[2]);
+};

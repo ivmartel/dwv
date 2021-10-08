@@ -104,17 +104,16 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
-   * Get the current oriented index.
+   * Get the current oriented position.
    *
    * @returns {object} The index.
    */
-  this.getCurrentOrientedIndex = function () {
-    var res = view.getCurrentIndex();
+  this.getCurrentOrientedPosition = function () {
+    var res = view.getCurrentPosition();
     // values = orientation * orientedValues
     // -> inv(orientation) * values = orientedValues
     if (typeof view.getOrientation() !== 'undefined') {
-      res = view.getOrientation().getInverse().getAbs().multiplyIndex3D(
-        view.getCurrentIndex());
+      res = view.getOrientation().getInverse().getAbs().multiplyVector3D(res);
     }
     return res;
   };
@@ -315,17 +314,34 @@ dwv.ctrl.ViewController = function (view) {
   this.getPositionFromPlanePoint = function (point2D) {
     // keep third direction
     var k = this.getCurrentScrollIndexValue();
-    var planePoint = new dwv.math.Point3D(
-      point2D.x, point2D.y, k);
+    var planePoint = new dwv.math.Point3D(point2D.x, point2D.y, k);
     // de-orient
     var point = planeHelper.getDeOrientedVector3D(planePoint);
-    // ~indexToWorld
-    //var origin = view.getImage().getGeometry().getOrigin();
-    var spacing = view.getImage().getGeometry().getSpacing();
+    // ~indexToWorld to not loose precision
+    var geometry = view.getImage().getGeometry();
+    return geometry.pointToWorld(point);
+  };
+
+  /**
+   * Get a plane 3D position from a plane 2D position: does not compensate
+   *   for the image origin. Needed for setting the scale center...
+   *
+   * @param {object} point2D The 2D position as {x,y}.
+   * @returns {object} The 3D point.
+   */
+  this.getPlanePositionFromPlanePoint = function (point2D) {
+    // keep third direction
+    var k = this.getCurrentScrollIndexValue();
+    var planePoint = new dwv.math.Point3D(point2D.x, point2D.y, k);
+    // de-orient
+    var point = planeHelper.getDeOrientedVector3D(planePoint);
+    // ~indexToWorld to not loose precision
+    var geometry = view.getImage().getGeometry();
+    var spacing = geometry.getSpacing();
     return new dwv.math.Point3D(
-      /*origin.getX() + */point.getX() * spacing.getColumnSpacing(),
-      /*origin.getY() + */point.getY() * spacing.getRowSpacing(),
-      /*origin.getZ() + */point.getZ() * spacing.getSliceSpacing());
+      point.getX() * spacing.getColumnSpacing(),
+      point.getY() * spacing.getRowSpacing(),
+      point.getZ() * spacing.getSliceSpacing());
   };
 
   /**
@@ -381,7 +397,7 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
-   *
+   * Scroll play: loop through all slices.
    */
   this.play = function () {
     if (!this.canScroll()) {
@@ -400,7 +416,9 @@ dwv.ctrl.ViewController = function (view) {
           var values = pos1.getValues();
           var orientation = view.getOrientation();
           values[orientation.getThirdColMajorDirection()] = 0;
-          self.setCurrentPosition(new dwv.math.Index(values));
+          var index = new dwv.math.Index(values);
+          var geometry = view.getImage().getGeometry();
+          self.setCurrentPosition(geometry.indexToWorld(index));
         }
       }, milliseconds);
     } else {
@@ -409,7 +427,7 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
-   *
+   * Stop scroll playing.
    */
   this.stop = function () {
     if (playerID !== null) {
@@ -461,7 +479,7 @@ dwv.ctrl.ViewController = function (view) {
   /**
    * Set the view per value alpha function.
    *
-   * @param {function} func The function.
+   * @param {Function} func The function.
    */
   this.setViewAlphaFunction = function (func) {
     view.alphaFunction = func;

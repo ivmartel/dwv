@@ -157,17 +157,3 @@ dwv.math.Point3D.prototype.minus = function (point3D) {
     (this.getY() - point3D.getY()),
     (this.getZ() - point3D.getZ()));
 };
-
-/**
- * Convert a Point3D to an Index using an input spacing.
- *
- * @param {object} spacing The image spacing.
- * @returns {object} The new Index.
- */
-dwv.math.Point3D.prototype.toIndex = function (spacing) {
-  return new dwv.math.Index([
-    Math.floor(this.getX() / spacing.getColumnSpacing()),
-    Math.floor(this.getY() / spacing.getRowSpacing()),
-    Math.floor(this.getZ() / spacing.getSliceSpacing())
-  ]);
-};

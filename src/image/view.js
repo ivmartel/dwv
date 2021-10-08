@@ -128,7 +128,7 @@ dwv.image.View = function (image) {
   this.setInitialPosition = function () {
     var silent = true;
     this.setCurrentPosition(
-      new dwv.math.Point3D(0, 0, 0),
+      image.getGeometry().getOrigin(),
       silent
     );
   };
@@ -151,7 +151,7 @@ dwv.image.View = function (image) {
   /**
    * Per value alpha function.
    *
-   * @param {mixed} _value The pixel value. Can be a number for monochrome
+   * @param {*} _value The pixel value. Can be a number for monochrome
    *  data or an array for RGB data.
    * @returns {number} The coresponding alpha [0,255].
    */
@@ -367,7 +367,8 @@ dwv.image.View = function (image) {
    * @returns {object} The current index.
    */
   this.getCurrentIndex = function () {
-    return currentPosition.toIndex(this.getImage().getGeometry().getSpacing());
+    var geometry = this.getImage().getGeometry();
+    return geometry.worldToIndex(currentPosition);
   };
 
   /**
@@ -384,22 +385,31 @@ dwv.image.View = function (image) {
       silent = false;
     }
 
-    var geometry = image.getGeometry();
-    var spacing = geometry.getSpacing();
-    var posIndex = newPosition.toIndex(spacing);
-
     // check if possible
-    if (!geometry.getSize().isInBounds(posIndex)) {
+    var geometry = image.getGeometry();
+    if (!geometry.isInBounds(newPosition)) {
       return false;
     }
 
-    var currentIndex = currentPosition ? this.getCurrentIndex() : null;
-    var isNew = !currentIndex || !currentIndex.equals(posIndex);
+    var isNew = !currentPosition || !currentPosition.equals(newPosition);
 
     if (isNew) {
+      var posIndex = geometry.worldToIndex(newPosition);
       var diffDims = null;
       if (currentPosition) {
-        diffDims = currentIndex.differentDims(posIndex);
+        var diff = currentPosition.minus(newPosition);
+        if (diff.getX() !== 0) {
+          diffDims = diffDims || [];
+          diffDims.push(0);
+        }
+        if (diff.getY() !== 0) {
+          diffDims = diffDims || [];
+          diffDims.push(1);
+        }
+        if (diff.getZ() !== 0) {
+          diffDims = diffDims || [];
+          diffDims.push(2);
+        }
       } else {
         diffDims = [0, 1, 2, 3];
       }
@@ -700,8 +710,8 @@ dwv.image.View.prototype.incrementIndex = function (dim, silent) {
   }
   var incr = new dwv.math.Index(values);
   var newIndex = index.add(incr);
-  var spacing = this.getImage().getGeometry().getSpacing();
-  return this.setCurrentPosition(newIndex.toPoint3D(spacing), silent);
+  var geometry = this.getImage().getGeometry();
+  return this.setCurrentPosition(geometry.indexToWorld(newIndex), silent);
 };
 
 /**
@@ -722,8 +732,8 @@ dwv.image.View.prototype.decrementIndex = function (dim, silent) {
   }
   var incr = new dwv.math.Index(values);
   var newIndex = index.add(incr);
-  var spacing = this.getImage().getGeometry().getSpacing();
-  return this.setCurrentPosition(newIndex.toPoint3D(spacing), silent);
+  var geometry = this.getImage().getGeometry();
+  return this.setCurrentPosition(geometry.indexToWorld(newIndex), silent);
 };
 
 /**

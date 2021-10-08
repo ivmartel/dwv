@@ -26,12 +26,13 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
   var newOrigins = false;
 
   /**
-   * Get the object first origin.
+   * Get the object origin.
+   * This should be the lowest origin to ease calculations (?).
    *
-   * @returns {object} The object first origin.
+   * @returns {object} The object origin.
    */
   this.getOrigin = function () {
-    return origins[0];
+    return origins[origins.length - 1];
   };
   /**
    * Get the object origins.
@@ -148,6 +149,12 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
 
   /**
    * Get the slice position of a point in the current slice layout.
+   * Slice indices increase with decreasing origins (high index -> low origin),
+   * this simplified the handling of reconstruction since it means
+   * the displayed data is in the same 'direction' as the extracted data.
+   * As seen in the getOrigin method, the main origin is the lowest one.
+   * This implies that the index to world and reverse method do some flipping
+   * magic...
    *
    * @param {object} point The point to evaluate.
    * @returns {number} The slice index.
@@ -239,6 +246,46 @@ dwv.image.Geometry.prototype.equals = function (rhs) {
 };
 
 /**
+ * Get the real size (spacing * size).
+ *
+ * @returns {Array} The real size.
+ */
+dwv.image.Geometry.prototype.getRealSize = function () {
+  var size = this.getSize();
+  var spacing = this.getSpacing();
+  return [
+    size.get(0) * spacing.getColumnSpacing(),
+    size.get(1) * spacing.getRowSpacing(),
+    size.get(2) * spacing.getSliceSpacing(),
+  ];
+};
+
+/**
+ * Check that a point is within bounds.
+ *
+ * @param {object} point3D The point to check.
+ * @returns {boolean} True if the given coordinates are within bounds.
+ */
+dwv.image.Geometry.prototype.isInBounds = function (point3D) {
+  // since the origin is the lowest point, we can use it as min
+  var min = this.getOrigin();
+  var realSize = this.getRealSize();
+  var max = new dwv.math.Point3D(
+    min.getX() + realSize[0],
+    min.getY() + realSize[1],
+    min.getZ() + realSize[2]
+  );
+
+  return point3D !== null &&
+    point3D.getX() >= min.getX() &&
+    point3D.getY() >= min.getY() &&
+    point3D.getZ() >= min.getZ() &&
+    point3D.getX() < max.getX() &&
+    point3D.getY() < max.getY() &&
+    point3D.getZ() < max.getZ();
+};
+
+/**
  * Convert an index to an offset in memory.
  *
  * @param {object} index The index to convert.
@@ -274,6 +321,17 @@ dwv.image.Geometry.prototype.offsetToIndex = function (offset) {
 };
 
 /**
+ * Flip the K index.
+ *
+ * @param {object} size The image size.
+ * @param {number} k The index.
+ * @returns {number} The iflipped index.
+ */
+function flipK(size, k) {
+  return (size.get(2) - 1) - k;
+}
+
+/**
  * Convert an index into world coordinates.
  *
  * @param {object} index The index to convert.
@@ -282,10 +340,33 @@ dwv.image.Geometry.prototype.offsetToIndex = function (offset) {
 dwv.image.Geometry.prototype.indexToWorld = function (index) {
   var origin = this.getOrigin();
   var spacing = this.getSpacing();
+
+  // flip K index (because of the slice order given by getSliceIndex)
+  var k = flipK(this.getSize(), index.get(2));
+
   return new dwv.math.Point3D(
     origin.getX() + index.get(0) * spacing.getColumnSpacing(),
     origin.getY() + index.get(1) * spacing.getRowSpacing(),
-    origin.getZ() + index.get(2) * spacing.getSliceSpacing());
+    origin.getZ() + k * spacing.getSliceSpacing());
+};
+
+/**
+ * Convert a point into world coordinates.
+ *
+ * @param {object} point The point to convert.
+ * @returns {dwv.image.Point3D} The corresponding world point.
+ */
+dwv.image.Geometry.prototype.pointToWorld = function (point) {
+  var origin = this.getOrigin();
+  var spacing = this.getSpacing();
+
+  // flip K index (because of the slice order given by getSliceIndex)
+  var k = flipK(this.getSize(), point.getZ());
+
+  return new dwv.math.Point3D(
+    origin.getX() + point.getX() * spacing.getColumnSpacing(),
+    origin.getY() + point.getY() * spacing.getRowSpacing(),
+    origin.getZ() + k * spacing.getSliceSpacing());
 };
 
 /**
@@ -297,8 +378,13 @@ dwv.image.Geometry.prototype.indexToWorld = function (index) {
 dwv.image.Geometry.prototype.worldToIndex = function (point) {
   var origin = this.getOrigin();
   var spacing = this.getSpacing();
-  return new dwv.math.Point3D(
-    point.getX() / spacing.getColumnSpacing() - origin.getX(),
-    point.getY() / spacing.getRowSpacing() - origin.getY(),
-    point.getZ() / spacing.getSliceSpacing() - origin.getZ());
+
+  return new dwv.math.Index([
+    Math.round((point.getX() - origin.getX()) / spacing.getColumnSpacing()),
+    Math.round((point.getY() - origin.getY()) / spacing.getRowSpacing()),
+    // flip K index (because of the slice order given by getSliceIndex)
+    flipK(this.getSize(),
+      Math.round((point.getZ() - origin.getZ()) / spacing.getSliceSpacing())
+    )
+  ]);
 };

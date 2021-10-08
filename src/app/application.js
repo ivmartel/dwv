@@ -919,9 +919,6 @@ dwv.App = function () {
       dwv.logger.error('Missing loaditem event load type.');
     }
 
-    // number returned by image.appendSlice
-    var sliceNb = null;
-
     var isFirstLoadItem = event.isfirstitem;
 
     var eventMetaData = null;
@@ -929,7 +926,7 @@ dwv.App = function () {
       if (isFirstLoadItem) {
         dataController.addNew(event.data.image, event.data.info);
       } else {
-        sliceNb = dataController.updateCurrent(
+        dataController.updateCurrent(
           event.data.image, event.data.info);
       }
       eventMetaData = event.data.info;
@@ -957,22 +954,10 @@ dwv.App = function () {
       loadtype: event.loadtype
     });
 
-    // adapt context
-    if (event.loadtype === 'image') {
-      // update view current position if new slice was inserted before
-      var layerGroup = stage.getActiveLayerGroup();
-      if (layerGroup) {
-        var controller =
-          layerGroup.getActiveViewLayer().getViewController();
-        var currentIndex = controller.getCurrentIndex();
-        if (sliceNb <= currentIndex.get(2)) {
-          controller.incrementIndex(2, true);
-        }
-      }
-      // render if flag allows
-      if (isFirstLoadItem && options.viewOnFirstLoadItem) {
-        self.render(event.loadid);
-      }
+    // render if first and flag allows
+    if (event.loadtype === 'image' &&
+      isFirstLoadItem && options.viewOnFirstLoadItem) {
+      self.render(event.loadid);
     }
   }
 
@@ -1198,10 +1183,10 @@ dwv.App = function () {
 
       var vc = viewLayer.getViewController();
       var pos = vc.getCurrentPosition();
-      var posValues = [pos.getX(), pos.getY(), pos.getZ()];
+      // positionchange event like data (no need for index)
       var value = [
-        vc.getCurrentIndex().getValues(),
-        posValues
+        null,
+        [pos.getX(), pos.getY(), pos.getZ()]
       ];
       layerGroup.updateLayersToPositionChange({value: value});
 

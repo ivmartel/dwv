@@ -30,7 +30,7 @@ dwv.draw.getDrawPositionGroupId = function (currentPosition) {
  *
  * @param {string} groupId The group id.
  * @returns {object} The slice and frame number.
- * @deprecated Use the dwv.math.getFromStringId instead.
+ * @deprecated Use the dwv.math.getVectorFromStringId instead.
  */
 dwv.draw.getPositionFromGroupId = function (groupId) {
   var sepIndex = groupId.indexOf('_');
@@ -173,11 +173,12 @@ dwv.ctrl.DrawController = function (konvaLayer) {
   /**
    * Activate the current draw layer.
    *
-   * @param {object} currentIndex The current index.
+   * @param {object} position The current position.
    */
-  this.activateDrawLayer = function (currentIndex) {
+  this.activateDrawLayer = function (position) {
+    // TODO: add layer info
     // get and store the position group id
-    currentPosGroupId = currentIndex.toStringId(2);
+    currentPosGroupId = position.toStringId(2);
 
     // get all position groups
     var posGroups = konvaLayer.getChildren(dwv.draw.isPositionNode);
@@ -206,7 +207,7 @@ dwv.ctrl.DrawController = function (konvaLayer) {
     var list = [];
     var groups = konvaLayer.getChildren();
     for (var j = 0, lenj = groups.length; j < lenj; ++j) {
-      var position = dwv.math.getFromStringId(groups[j].id());
+      var position = dwv.math.getVectorFromStringId(groups[j].id());
       var collec = groups[j].getChildren();
       for (var i = 0, leni = collec.length; i < leni; ++i) {
         var shape = collec[i].getChildren(dwv.draw.isNodeNameShape)[0];

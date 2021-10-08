@@ -50,6 +50,6 @@ QUnit.test('Test Geometry.', function (assert) {
     var resPoint = imgGeometry0.indexToWorld(index);
     assert.true(theoPoint.equals(resPoint), 'indexToWorkd #' + i);
     var resPoint2 = imgGeometry0.worldToIndex(theoPoint);
-    assert.true(theoPoint.equals(resPoint2), 'worldToIndex #' + i);
+    assert.true(index.equals(resPoint2), 'worldToIndex #' + i);
   }
 });
