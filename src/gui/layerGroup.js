@@ -435,9 +435,11 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    * @param {object} event The position change event.
    */
   this.updateLayersToPositionChange = function (event) {
+    var position = new dwv.math.Point3D(
+      event.value[1][0], event.value[1][1], event.value[1][2]);
     for (var i = 0; i < layers.length; ++i) {
       if (i !== activeViewLayerIndex) {
-        layers[i].setCurrentPosition(event.value);
+        layers[i].setCurrentPosition(position);
       }
     }
   };

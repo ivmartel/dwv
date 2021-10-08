@@ -327,12 +327,11 @@ dwv.gui.DrawLayer = function (containerDiv) {
   /**
    * Set the current position.
    *
-   * @param {Array} value The position change values: [index, point]
+   * @param {object} position The new position.
    */
-  this.setCurrentPosition = function (value) {
-    var index = new dwv.math.Index(value[0]);
-    var orientedIndex = planeHelper.getOrientedIndex(index);
-    this.getDrawController().activateDrawLayer(orientedIndex);
+  this.setCurrentPosition = function (position) {
+    var orientedPos = planeHelper.getOrientedVector3D(position);
+    this.getDrawController().activateDrawLayer(orientedPos);
   };
 
   /**
