@@ -183,7 +183,7 @@ dwv.gui.Stage = function () {
    * Empty the layer group list.
    */
   this.empty = function () {
-    this.unbind();
+    this.unbindLayerGroups();
     layerGroups = [];
     activeLayerGroupIndex = null;
   };
