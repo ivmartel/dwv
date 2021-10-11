@@ -482,9 +482,8 @@ dwv.App = function () {
         // create new layer group
         var element = document.getElementById(config.divId);
         layerGroup = stage.addLayerGroup(element);
-        // propagate layer group events
-        layerGroup.addEventListener('zoomchange', fireEvent);
-        layerGroup.addEventListener('offsetchange', fireEvent);
+        // bind events
+        bindLayerGroup(layerGroup);
         // optional orientation
         if (typeof config.orientation !== 'undefined') {
           layerGroup.setTargetOrientation(
@@ -1047,37 +1046,22 @@ dwv.App = function () {
   }
 
   /**
-   * Bind view layer events to app.
+   * Bind layer group events to app.
    *
-   * @param {object} viewLayer The view layer.
+   * @param {object} group The layer group.
    * @private
    */
-  function bindViewLayer(viewLayer) {
-    // propagate view events
-    viewLayer.propagateViewEvents(true);
-    for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
-      viewLayer.addEventListener(dwv.image.viewEventNames[j], fireEvent);
-    }
+  function bindLayerGroup(group) {
+    // propagate layer group events
+    group.addEventListener('zoomchange', fireEvent);
+    group.addEventListener('offsetchange', fireEvent);
     // propagate viewLayer events
-    viewLayer.addEventListener('renderstart', fireEvent);
-    viewLayer.addEventListener('renderend', fireEvent);
-  }
-
-  /**
-   * Un-Bind view layer events from app.
-   *
-   * @param {object} viewLayer The view layer.
-   * @private
-   */
-  function unbindViewLayer(viewLayer) {
-    // stop propagating view events
-    viewLayer.propagateViewEvents(false);
+    group.addEventListener('renderstart', fireEvent);
+    group.addEventListener('renderend', fireEvent);
+    // propagate view events
     for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
-      viewLayer.removeEventListener(dwv.image.viewEventNames[j], fireEvent);
+      group.addEventListener(dwv.image.viewEventNames[j], fireEvent);
     }
-    // stop propagating viewLayer events
-    viewLayer.removeEventListener('renderstart', fireEvent);
-    viewLayer.removeEventListener('renderend', fireEvent);
   }
 
   /**
@@ -1130,10 +1114,7 @@ dwv.App = function () {
     var imageGeometry = data.image.getGeometry();
 
     // un-bind
-    if (typeof layerGroup.getActiveViewLayer() !== 'undefined') {
-      unbindViewLayer(layerGroup.getActiveViewLayer());
-    }
-    stage.unbind();
+    stage.unbindLayerGroups();
 
     // create and setup view
     var viewFactory = new dwv.ViewFactory();
@@ -1172,8 +1153,7 @@ dwv.App = function () {
     dataController.addEventListener('imagechange', viewLayer.onimagechange);
 
     // bind
-    bindViewLayer(viewLayer);
-    stage.bind();
+    stage.bindLayerGroups();
 
     // optional draw layer
     if (toolboxController && toolboxController.hasTool('Draw')) {

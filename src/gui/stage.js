@@ -148,11 +148,11 @@ dwv.gui.Stage = function () {
     // add to storage
     var isBound = callbackStore && callbackStore.length !== 0;
     if (isBound) {
-      this.unbind();
+      this.unbindLayerGroups();
     }
     layerGroups.push(layerGroup);
     if (isBound) {
-      this.bind();
+      this.bindLayerGroups();
     }
     // return created group
     return layerGroup;
@@ -209,7 +209,7 @@ dwv.gui.Stage = function () {
   /**
    * Bind the layer groups of the stage.
    */
-  this.bind = function () {
+  this.bindLayerGroups = function () {
     if (layerGroups.length === 0 ||
       layerGroups.length === 1 ||
       binders.length === 0) {
@@ -228,7 +228,7 @@ dwv.gui.Stage = function () {
   /**
    * Unbind the layer groups of the stage.
    */
-  this.unbind = function () {
+  this.unbindLayerGroups = function () {
     if (layerGroups.length === 0 ||
       layerGroups.length === 1 ||
       binders.length === 0 ||

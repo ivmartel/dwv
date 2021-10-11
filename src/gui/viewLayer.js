@@ -17,13 +17,6 @@ dwv.gui.ViewLayer = function (containerDiv) {
   var self = this;
 
   /**
-   * The image view.
-   *
-   * @private
-   * @type {object}
-   */
-  var view = null;
-  /**
    * The view controller.
    *
    * @private
@@ -144,14 +137,17 @@ dwv.gui.ViewLayer = function (containerDiv) {
   /**
    * Set the associated view.
    *
-   * @param {object} inputView The view.
+   * @param {object} view The view.
    */
-  this.setView = function (inputView) {
-    view = inputView;
+  this.setView = function (view) {
     // local listeners
     view.addEventListener('wlchange', onWLChange);
     view.addEventListener('colourchange', onColourChange);
     view.addEventListener('positionchange', onPositionChange);
+    // view events
+    for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
+      view.addEventListener(dwv.image.viewEventNames[j], fireEvent);
+    }
     // create view controller
     viewController = new dwv.ctrl.ViewController(view);
   };
@@ -545,25 +541,6 @@ dwv.gui.ViewLayer = function (containerDiv) {
   }
 
   // common layer methods [end] ---------------
-
-  /**
-   * Propagate (or not) view events.
-   *
-   * @param {boolean} flag True to propagate.
-   */
-  this.propagateViewEvents = function (flag) {
-    if (!view) {
-      return;
-    }
-    // view events
-    for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
-      if (flag) {
-        view.addEventListener(dwv.image.viewEventNames[j], fireEvent);
-      } else {
-        view.removeEventListener(dwv.image.viewEventNames[j], fireEvent);
-      }
-    }
-  };
 
   /**
    * Update the canvas image data.
