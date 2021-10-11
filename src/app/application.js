@@ -1128,8 +1128,10 @@ dwv.App = function () {
     view.setOrientation(viewOrientation);
 
     // TODO: find another way for a default colour map
+    var opacity = 1;
     if (dataIndex !== 0) {
       view.setColourMap(dwv.image.lut.rainbow);
+      opacity = 0.5;
     }
 
     // view layer
@@ -1138,6 +1140,7 @@ dwv.App = function () {
     var size2D = imageGeometry.getSize(viewOrientation).get2D();
     var spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
     viewLayer.initialise(size2D, spacing2D, dataIndex);
+    viewLayer.setOpacity(opacity);
 
     // compensate origin difference
     var diff = null;
