@@ -745,10 +745,10 @@ chalk@^2.0.0, chalk@^2.0.1, chalk@^2.1.0, chalk@^2.4.1:
     escape-string-regexp "^1.0.5"
     supports-color "^5.3.0"
 
-chalk@^4.0.0, chalk@~4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/chalk/-/chalk-4.1.0.tgz#4e14870a618d9e2edd97dd8345fd9d9dc315646a"
-  integrity sha512-qwx12AxXe2Q5xQ43Ac//I6v5aXTipYrSESdOgzrN+9XjgEpyjpKuvSGaN4qE93f7TQTlerQQ8S+EQ0EyDoVL1A==
+chalk@^4.0.0, chalk@^4.1.2, chalk@~4.1.0:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/chalk/-/chalk-4.1.2.tgz#aac4e2b7734a740867aeb16bf02aad556a1e7a01"
+  integrity sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==
   dependencies:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
@@ -2169,12 +2169,12 @@ grunt-cli@^1.4.2, grunt-cli@~1.4.2:
     nopt "~4.0.1"
     v8flags "~3.2.0"
 
-grunt-contrib-concat@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/grunt-contrib-concat/-/grunt-contrib-concat-1.0.1.tgz#61509863084e871d7e86de48c015259ed97745bd"
-  integrity sha1-YVCYYwhOhx1+ht5IwBUlntl3Rb0=
+grunt-contrib-concat@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/grunt-contrib-concat/-/grunt-contrib-concat-2.0.0.tgz#3af65e4663186abce6052a6bed345b53c0551090"
+  integrity sha512-/cfWwsGiprVTOl7c2bZwMdQ8hIf3e1f4szm1i7qhY9hOnR/X2KL+Xe7dynNweTYHa6aWPZx2B5GPsUpxAXNCaA==
   dependencies:
-    chalk "^1.0.0"
+    chalk "^4.1.2"
     source-map "^0.5.3"
 
 grunt-contrib-copy@^1.0.0:
