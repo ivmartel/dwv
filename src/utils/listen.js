@@ -6,6 +6,7 @@ dwv.utils = dwv.utils || {};
  * ListenerHandler class: handles add/removing and firing listeners.
  *
  * @class
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget#example
  */
 dwv.utils.ListenerHandler = function () {
   /**
@@ -61,9 +62,11 @@ dwv.utils.ListenerHandler = function () {
     if (typeof listeners[event.type] === 'undefined') {
       return;
     }
-    // fire events
-    for (var i = 0; i < listeners[event.type].length; ++i) {
-      listeners[event.type][i](event);
+    // fire events from a copy of the listeners array
+    // to avoid interference from possible add/remove
+    var stack = listeners[event.type].slice();
+    for (var i = 0; i < stack.length; ++i) {
+      stack[i](event);
     }
   };
 };
