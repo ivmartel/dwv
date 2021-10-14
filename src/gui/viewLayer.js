@@ -127,6 +127,15 @@ dwv.gui.ViewLayer = function (containerDiv) {
   var dataIndex = null;
 
   /**
+   * Get the associated data index.
+   *
+   * @returns {number} The index.
+   */
+  this.getDataIndex = function () {
+    return dataIndex;
+  };
+
+  /**
    * Listener handler.
    *
    * @private
@@ -537,6 +546,8 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @private
    */
   function fireEvent(event) {
+    event.srclayerid = self.getId();
+    event.dataindex = dataIndex;
     listenerHandler.fireEvent(event);
   }
 

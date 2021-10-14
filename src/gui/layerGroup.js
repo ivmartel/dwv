@@ -297,18 +297,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    * @param {number} index The index of the layer to set as active.
    */
   this.setActiveViewLayer = function (index) {
-    // un-bind previous layer
-    var viewLayer0 = this.getActiveViewLayer();
-    if (viewLayer0) {
-      unbindViewLayer(viewLayer0);
-    }
-
-    // set active index
     activeViewLayerIndex = index;
-
-    // bind new layer
-    var viewLayer = this.getActiveViewLayer();
-    bindViewLayer(viewLayer);
   };
 
   /**
@@ -317,7 +306,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    * @param {object} viewLayer The view layer to bind.
    */
   function bindViewLayer(viewLayer) {
-    // listen to position change to update other layers
+    // listen to position change to update other group layers
     viewLayer.addEventListener(
       'positionchange', self.updateLayersToPositionChange);
     // propagate view viewLayer-layer events
@@ -328,25 +317,6 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     viewLayer.addEventListener('renderstart', fireEvent);
     viewLayer.addEventListener('renderend', fireEvent);
   }
-
-  /**
-   * Unbind view layer events from this.
-   *
-   * @param {object} viewLayer The view layer to unbind.
-   */
-  function unbindViewLayer(viewLayer) {
-    // stop listening to position change
-    viewLayer.removeEventListener(
-      'positionchange', self.updateLayersToPositionChange);
-    // stop propagating viewLayer-view events
-    for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
-      viewLayer.removeEventListener(dwv.image.viewEventNames[j], fireEvent);
-    }
-    // stop propagating viewLayer events
-    viewLayer.removeEventListener('renderstart', fireEvent);
-    viewLayer.removeEventListener('renderend', fireEvent);
-  }
-
 
   /**
    * Set the active draw layer.
@@ -375,6 +345,8 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     layers.push(layer);
     // mark it as active
     this.setActiveViewLayer(viewLayerIndex);
+    // bind view layer events
+    bindViewLayer(layer);
     // return
     return layer;
   };
@@ -435,11 +407,30 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    * @param {object} event The position change event.
    */
   this.updateLayersToPositionChange = function (event) {
+    // pause positionchange listeners
+    for (var j = 0; j < layers.length; ++j) {
+      if (layers[j] instanceof dwv.gui.ViewLayer) {
+        layers[j].removeEventListener(
+          'positionchange', self.updateLayersToPositionChange);
+        layers[j].removeEventListener('positionchange', fireEvent);
+      }
+    }
+
     var position = new dwv.math.Point3D(
       event.value[1][0], event.value[1][1], event.value[1][2]);
+    // update position for all layers except the source one
     for (var i = 0; i < layers.length; ++i) {
-      if (i !== activeViewLayerIndex) {
+      if (layers[i].getId() !== event.srclayerid) {
         layers[i].setCurrentPosition(position);
+      }
+    }
+
+    // re-start positionchange listeners
+    for (var k = 0; k < layers.length; ++k) {
+      if (layers[k] instanceof dwv.gui.ViewLayer) {
+        layers[k].addEventListener(
+          'positionchange', self.updateLayersToPositionChange);
+        layers[k].addEventListener('positionchange', fireEvent);
       }
     }
   };

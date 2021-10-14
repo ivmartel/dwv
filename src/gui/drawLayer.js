@@ -22,6 +22,9 @@ dwv.gui.DrawLayer = function (containerDiv) {
   // specific css class name
   containerDiv.className += ' drawLayer';
 
+  // closure to self
+  var self = this;
+
   // konva stage
   var konvaStage = null;
   // konva layer
@@ -74,6 +77,23 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @type {object}
    */
   var planeHelper;
+
+  /**
+   * The associated data index.
+   *
+   * @private
+   * @type {number}
+   */
+  var dataIndex = null;
+
+  /**
+   * Get the associated data index.
+   *
+   * @returns {number} The index.
+   */
+  this.getDataIndex = function () {
+    return dataIndex;
+  };
 
   /**
    * Listener handler.
@@ -247,12 +267,13 @@ dwv.gui.DrawLayer = function (containerDiv) {
    *
    * @param {object} size The image size.
    * @param {object} spacing The image spacing.
-   * @param {number} _index The associated data index.
+   * @param {number} index The associated data index.
    */
-  this.initialise = function (size, spacing, _index) {
+  this.initialise = function (size, spacing, index) {
     // set locals
     baseSize = size;
     baseSpacing = spacing;
+    dataIndex = index;
 
     // create stage
     konvaStage = new Konva.Stage({
@@ -363,6 +384,8 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * @private
    */
   function fireEvent(event) {
+    event.srclayerid = self.getId();
+    event.dataindex = dataIndex;
     listenerHandler.fireEvent(event);
   }
 
