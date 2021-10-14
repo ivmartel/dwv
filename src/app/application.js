@@ -135,6 +135,17 @@ dwv.App = function () {
   };
 
   /**
+   * Get the view layers associated to a data index.
+   * The layer are available after the first loaded item.
+   *
+   * @param {number} index The data index.
+   * @returns {Array} The layers.
+   */
+  this.getViewLayersByDataIndex = function (index) {
+    return stage.getViewLayersByDataIndex(index);
+  };
+
+  /**
    * Get a layer group by id.
    * The layer is available after the first loaded item.
    *
@@ -472,6 +483,9 @@ dwv.App = function () {
     }
     // loop on all configs
     var viewConfigs = getViewConfigs(dataIndex);
+    if (!viewConfigs) {
+      throw new Error('No view config for data: ' + dataIndex);
+    }
     for (var i = 0; i < viewConfigs.length; ++i) {
       var config = viewConfigs[i];
       // create layer group if not done yet

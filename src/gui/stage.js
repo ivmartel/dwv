@@ -11,8 +11,11 @@ dwv.gui.WindowLevelBinder = function () {
   };
   this.getCallback = function (layerGroup) {
     return function (event) {
-      var vc = layerGroup.getActiveViewLayer().getViewController();
-      vc.setWindowLevel(event.value[0], event.value[1]);
+      var viewLayers = layerGroup.getViewLayersByDataIndex(event.dataindex);
+      if (viewLayers.length !== 0) {
+        var vc = viewLayers[0].getViewController();
+        vc.setWindowLevel(event.value[0], event.value[1]);
+      }
     };
   };
 };
@@ -75,7 +78,7 @@ dwv.gui.OffsetBinder = function () {
 };
 
 /**
- * Opacity binder.
+ * Opacity binder. Only propagates to view layers of the same data.
  */
 dwv.gui.OpacityBinder = function () {
   this.getEventType = function () {
@@ -83,9 +86,16 @@ dwv.gui.OpacityBinder = function () {
   };
   this.getCallback = function (layerGroup) {
     return function (event) {
-      var viewLayer = layerGroup.getActiveViewLayer();
-      viewLayer.setOpacity(event.value);
-      viewLayer.draw();
+      // exit if no data index
+      if (typeof event.dataindex === 'undefined') {
+        return;
+      }
+      // propagate to first view layer
+      var viewLayers = layerGroup.getViewLayersByDataIndex(event.dataindex);
+      if (viewLayers.length !== 0) {
+        viewLayers[0].setOpacity(event.value);
+        viewLayers[0].draw();
+      }
     };
   };
 };
@@ -134,6 +144,20 @@ dwv.gui.Stage = function () {
    */
   this.getActiveLayerGroup = function () {
     return this.getLayerGroup(activeLayerGroupIndex);
+  };
+
+  /**
+   * Get the view layers associated to a data index.
+   *
+   * @param {number} index The data index.
+   * @returns {Array} The layers.
+   */
+  this.getViewLayersByDataIndex = function (index) {
+    var res = [];
+    for (var i = 0; i < layerGroups.length; ++i) {
+      res = res.concat(layerGroups[i].getViewLayersByDataIndex(index));
+    }
+    return res;
   };
 
   /**
