@@ -770,23 +770,24 @@ dwv.App = function () {
     //   but there needs to be at least one binding...
     for (var i = 0; i < stage.getNumberOfLayerGroups(); ++i) {
       var layerGroup = stage.getLayerGroup(i);
+      // unbind previous layer
+      var vl = layerGroup.getActiveViewLayer();
+      if (vl) {
+        toolboxController.unbindLayer(vl);
+      }
+      var dl = layerGroup.getActiveDrawLayer();
+      if (dl) {
+        toolboxController.unbindLayer(dl);
+      }
+      // bind new layer
       var layer = null;
-      var previousLayer = null;
       if (tool === 'Draw' ||
         tool === 'Livewire' ||
         tool === 'Floodfill') {
         layer = layerGroup.getActiveDrawLayer();
-        previousLayer = layerGroup.getActiveViewLayer();
       } else {
         layer = layerGroup.getActiveViewLayer();
-        previousLayer = layerGroup.getActiveDrawLayer();
       }
-      if (previousLayer) {
-        toolboxController.unbindLayer(previousLayer);
-      }
-      // detach to avoid possible double attach
-      toolboxController.unbindLayer(layer);
-
       toolboxController.bindLayer(layer);
     }
 
