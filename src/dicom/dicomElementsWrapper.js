@@ -221,7 +221,10 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function (
     var tmSeconds = tmValue.length >= 6 ? tmValue.substr(4, 2) : '00';
     str = tmHour + ':' + tmMinute + ':' + tmSeconds;
   } else {
-    var isOtherVR = (dicomElement.vr[0].toUpperCase() === 'O');
+    var isOtherVR = false;
+    if (dicomElement.vr.length !== 0) {
+      isOtherVR = (dicomElement.vr[0].toUpperCase() === 'O');
+    }
     var isFloatNumberVR = (dicomElement.vr === 'FL' ||
             dicomElement.vr === 'FD' ||
             dicomElement.vr === 'DS');
@@ -296,7 +299,10 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
   var tagName = tag.getNameFromDictionary();
 
   var deSize = dicomElement.value.length;
-  var isOtherVR = (dicomElement.vr[0].toUpperCase() === 'O');
+  var isOtherVR = false;
+  if (dicomElement.vr.length !== 0) {
+    isOtherVR = (dicomElement.vr[0].toUpperCase() === 'O');
+  }
 
   // no size for delimitations
   if (dicomElement.tag.group === '0xFFFE' && (
