@@ -12,7 +12,8 @@ dwv.image.viewEventNames = [
   'wlpresetadd',
   'colourchange',
   'positionchange',
-  'opacitychange'
+  'opacitychange',
+  'alphafuncchange'
 ];
 
 /**
@@ -155,9 +156,37 @@ dwv.image.View = function (image) {
    *  data or an array for RGB data.
    * @returns {number} The coresponding alpha [0,255].
    */
-  this.alphaFunction = function (_value) {
+  var alphaFunction = function (_value) {
     // default always returns fully visible
     return 0xff;
+  };
+
+  /**
+   * Get the alpha function.
+   *
+   * @returns {Function} The function.
+   */
+  this.getAlphaFunction = function () {
+    return alphaFunction;
+  };
+
+  /**
+   * Set alpha function.
+   *
+   * @param {Function} func The function.
+   * @fires dwv.image.View#alphafuncchange
+   */
+  this.setAlphaFunction = function (func) {
+    alphaFunction = func;
+    /**
+     * Alpha func change event.
+     *
+     * @event dwv.image.View#alphafuncchange
+     * @type {object}
+     */
+    fireEvent({
+      type: 'alphafuncchange'
+    });
   };
 
   /**
@@ -653,7 +682,7 @@ dwv.image.View.prototype.generateImageData = function (array) {
     dwv.image.generateImageDataMonochrome(
       array,
       iterator,
-      this.alphaFunction,
+      this.getAlphaFunction(),
       this.getCurrentWindowLut(),
       this.getColourMap()
     );
@@ -663,7 +692,7 @@ dwv.image.View.prototype.generateImageData = function (array) {
     dwv.image.generateImageDataPaletteColor(
       array,
       iterator,
-      this.alphaFunction,
+      this.getAlphaFunction(),
       this.getColourMap(),
       image.getMeta().BitsStored === 16
     );
@@ -673,7 +702,7 @@ dwv.image.View.prototype.generateImageData = function (array) {
     dwv.image.generateImageDataRgb(
       array,
       iterator,
-      this.alphaFunction,
+      this.getAlphaFunction(),
       this.getCurrentWindowLut()
     );
     break;
@@ -682,7 +711,7 @@ dwv.image.View.prototype.generateImageData = function (array) {
     dwv.image.generateImageDataYbrFull(
       array,
       iterator,
-      this.alphaFunction
+      this.getAlphaFunction()
     );
     break;
 

@@ -482,7 +482,7 @@ dwv.ctrl.ViewController = function (view) {
    * @param {Function} func The function.
    */
   this.setViewAlphaFunction = function (func) {
-    view.alphaFunction = func;
+    view.setAlphaFunction(func);
   };
 
   /**

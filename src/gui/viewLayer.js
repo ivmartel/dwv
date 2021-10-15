@@ -153,6 +153,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
     view.addEventListener('wlchange', onWLChange);
     view.addEventListener('colourchange', onColourChange);
     view.addEventListener('positionchange', onPositionChange);
+    view.addEventListener('alphafuncchange', onAlphaFuncChange);
     // view events
     for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
       view.addEventListener(dwv.image.viewEventNames[j], fireEvent);
@@ -604,6 +605,20 @@ dwv.gui.ViewLayer = function (containerDiv) {
         needsDataUpdate = true;
         self.draw();
       }
+    }
+  }
+
+  /**
+   * Handle alpha function change.
+   *
+   * @param {object} event The event fired when changing the function.
+   * @private
+   */
+  function onAlphaFuncChange(event) {
+    if (typeof event.skipGenerate === 'undefined' ||
+      event.skipGenerate === false) {
+      needsDataUpdate = true;
+      self.draw();
     }
   }
 
