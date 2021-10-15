@@ -185,18 +185,18 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function (
   // Polyfill for Number.isInteger.
   var isInteger = Number.isInteger || function (value) {
     return typeof value === 'number' &&
-        isFinite(value) &&
-        Math.floor(value) === value;
+      isFinite(value) &&
+      Math.floor(value) === value;
   };
 
   // TODO Support sequences.
 
   if (dicomElement.vr !== 'SQ' &&
-        dicomElement.value.length === 1 && dicomElement.value[0] === '') {
+    dicomElement.value.length === 1 && dicomElement.value[0] === '') {
     str += '(no value available)';
   } else if (dicomElement.tag.group === '0x7FE0' &&
-        dicomElement.tag.element === '0x0010' &&
-        dicomElement.vl === 'u/l') {
+    dicomElement.tag.element === '0x0010' &&
+    dicomElement.vl === 'u/l') {
     str = '(PixelSequence)';
   } else if (dicomElement.vr === 'DA' && pretty) {
     var daValue = dicomElement.value[0];
@@ -226,8 +226,8 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function (
       isOtherVR = (dicomElement.vr[0].toUpperCase() === 'O');
     }
     var isFloatNumberVR = (dicomElement.vr === 'FL' ||
-            dicomElement.vr === 'FD' ||
-            dicomElement.vr === 'DS');
+      dicomElement.vr === 'FD' ||
+      dicomElement.vr === 'DS');
     var valueStr = '';
     for (var k = 0, lenk = dicomElement.value.length; k < lenk; ++k) {
       valueStr = '';
@@ -307,15 +307,15 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
   // no size for delimitations
   if (dicomElement.tag.group === '0xFFFE' && (
     dicomElement.tag.element === '0xE00D' ||
-            dicomElement.tag.element === '0xE0DD')) {
+    dicomElement.tag.element === '0xE0DD')) {
     deSize = 0;
   } else if (isOtherVR) {
     deSize = 1;
   }
 
   var isPixSequence = (dicomElement.tag.group === '0x7FE0' &&
-        dicomElement.tag.element === '0x0010' &&
-        dicomElement.vl === 'u/l');
+    dicomElement.tag.element === '0x0010' &&
+    dicomElement.vl === 'u/l');
 
   var line = null;
 
@@ -562,7 +562,7 @@ dwv.dicom.getFileListFromDicomDir = function (data) {
 
   // Directory Record Sequence
   if (typeof elements.x00041220 === 'undefined' ||
-        typeof elements.x00041220.value === 'undefined') {
+    typeof elements.x00041220.value === 'undefined') {
     dwv.logger.warn('No Directory Record Sequence found in DICOMDIR.');
     return;
   }
@@ -579,7 +579,7 @@ dwv.dicom.getFileListFromDicomDir = function (data) {
   for (var i = 0; i < dirSeq.length; ++i) {
     // Directory Record Type
     if (typeof dirSeq[i].x00041430 === 'undefined' ||
-            typeof dirSeq[i].x00041430.value === 'undefined') {
+      typeof dirSeq[i].x00041430.value === 'undefined') {
       continue;
     }
     var recType = dwv.dicom.cleanString(dirSeq[i].x00041430.value[0]);
@@ -594,7 +594,7 @@ dwv.dicom.getFileListFromDicomDir = function (data) {
     } else if (recType === 'IMAGE') {
       // Referenced File ID
       if (typeof dirSeq[i].x00041500 === 'undefined' ||
-                typeof dirSeq[i].x00041500.value === 'undefined') {
+        typeof dirSeq[i].x00041500.value === 'undefined') {
         continue;
       }
       var refFileIds = dirSeq[i].x00041500.value;
