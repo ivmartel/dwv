@@ -309,6 +309,23 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   };
 
   /**
+   * Get the draw layers associated to a data index.
+   *
+   * @param {number} index The data index.
+   * @returns {Array} The layers.
+   */
+  this.getDrawLayersByDataIndex = function (index) {
+    var res = [];
+    for (var i = 0; i < layers.length; ++i) {
+      if (layers[i] instanceof dwv.gui.DrawLayer &&
+        layers[i].getDataIndex() === index) {
+        res.push(layers[i]);
+      }
+    }
+    return res;
+  };
+
+  /**
    * Set the active view layer.
    *
    * @param {number} index The index of the layer to set as active.
@@ -318,22 +335,19 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   };
 
   /**
-   * Bind view layer events to this.
+   * Set the active view layer with a data index.
    *
-   * @param {object} viewLayer The view layer to bind.
+   * @param {number} index The data index.
    */
-  function bindViewLayer(viewLayer) {
-    // listen to position change to update other group layers
-    viewLayer.addEventListener(
-      'positionchange', self.updateLayersToPositionChange);
-    // propagate view viewLayer-layer events
-    for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
-      viewLayer.addEventListener(dwv.image.viewEventNames[j], fireEvent);
+  this.setActiveViewLayerByDataIndex = function (index) {
+    for (var i = 0; i < layers.length; ++i) {
+      if (layers[i] instanceof dwv.gui.ViewLayer &&
+        layers[i].getDataIndex() === index) {
+        this.setActiveViewLayer(i);
+        break;
+      }
     }
-    // propagate viewLayer events
-    viewLayer.addEventListener('renderstart', fireEvent);
-    viewLayer.addEventListener('renderend', fireEvent);
-  }
+  };
 
   /**
    * Set the active draw layer.
@@ -342,6 +356,21 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    */
   this.setActiveDrawLayer = function (index) {
     activeDrawLayerIndex = index;
+  };
+
+  /**
+   * Set the active draw layer with a data index.
+   *
+   * @param {number} index The data index.
+   */
+  this.setActiveDrawLayerByDataIndex = function (index) {
+    for (var i = 0; i < layers.length; ++i) {
+      if (layers[i] instanceof dwv.gui.DrawLayer &&
+        layers[i].getDataIndex() === index) {
+        this.setActiveDrawLayer(i);
+        break;
+      }
+    }
   };
 
   /**
@@ -387,6 +416,24 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     // return
     return layer;
   };
+
+  /**
+   * Bind view layer events to this.
+   *
+   * @param {object} viewLayer The view layer to bind.
+   */
+  function bindViewLayer(viewLayer) {
+    // listen to position change to update other group layers
+    viewLayer.addEventListener(
+      'positionchange', self.updateLayersToPositionChange);
+    // propagate view viewLayer-layer events
+    for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
+      viewLayer.addEventListener(dwv.image.viewEventNames[j], fireEvent);
+    }
+    // propagate viewLayer events
+    viewLayer.addEventListener('renderstart', fireEvent);
+    viewLayer.addEventListener('renderend', fireEvent);
+  }
 
   /**
    * Get the next layer DOM div.
