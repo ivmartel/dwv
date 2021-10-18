@@ -18,105 +18,73 @@ var _app = null;
  */
 dwv.test.viewerSetup = function () {
 
-  /**
-   * Append a layer div in the root 'dwv' one.
-   *
-   * @param {string} id The id of the layer.
-   */
-  function addLayer(id) {
-    var layer = document.createElement('div');
-    layer.id = id;
-    layer.className = 'layerGroup';
-    var root = document.getElementById('dwv');
-    root.appendChild(layer);
-  }
-
-  /**
-   * Create simple view config(s).
-   *
-   * @param {number} numberOfData The number of data.
-   * @param {boolean} sameDiv If all data go in the same div.
-   * @returns {object} The view config.
-   */
-  function createSimpleDataViewConfig(numberOfData, sameDiv) {
-    if (typeof sameDiv === 'undefined') {
-      sameDiv = false;
-    }
-    var configs = {};
-    for (var i = 0; i < numberOfData; ++i) {
-      var divName = 'layerGroup0';
-      if (!sameDiv) {
-        divName = 'layerGroup' + i;
-      }
-      configs[i] = [{divId: divName}];
-    }
-    return configs;
-  }
-
-  /**
-   * Create MPR view config(s).
-   *
-   * @param {number} numberOfData The number of data.
-   * @returns {object} The view config.
-   */
-  function createMPRDataViewConfig(numberOfData) {
-    var configs = {};
-    for (var i = 0; i < numberOfData; ++i) {
-      configs[i] = [
-        {
-          divId: 'layerGroup0',
-          orientation: 'axial'
-        },
-        {
-          divId: 'layerGroup1',
-          orientation: 'coronal'
-        },
-        {
-          divId: 'layerGroup2',
-          orientation: 'sagittal'
-        }
-      ];
-    }
-    return configs;
-  }
-
   // stage options
   var dataViewConfigs;
   var nSimultaneousData = 1;
   var viewOnFirstLoadItem = true;
 
-  var mode = 3;
-  addLayer('layerGroup0');
-  if (mode === 0) {
-    // simplest: one data, one layer group
-    dataViewConfigs = createSimpleDataViewConfig(nSimultaneousData);
-  } else if (mode === 1) {
-    // multiple data, multiple layer group
-    nSimultaneousData = 2;
-    addLayer('layerGroup1');
-    dataViewConfigs = createSimpleDataViewConfig(nSimultaneousData);
-    console.log(dataViewConfigs);
-  } else if (mode === 2) {
-    // multiple data, one layer group
-    nSimultaneousData = 2;
-    dataViewConfigs = createSimpleDataViewConfig(nSimultaneousData, true);
-  } else if (mode === 3) {
-    // single data, multiple layer groups -> MPR
-    viewOnFirstLoadItem = false;
-    nSimultaneousData = 2;
-    addLayer('layerGroup1');
-    addLayer('layerGroup2');
-    dataViewConfigs = createMPRDataViewConfig(nSimultaneousData);
-  }
-
   // layer group binders
-  var binders = [
+  var binders = [];
+  var fullBinders = [
     new dwv.gui.WindowLevelBinder(),
     new dwv.gui.PositionBinder(),
     new dwv.gui.ZoomBinder(),
     new dwv.gui.OffsetBinder(),
     new dwv.gui.OpacityBinder()
   ];
+
+  var mode = 0;
+  if (mode === 0) {
+    // simplest: one data, one layer group
+    addLayerGroup('layerGroup0');
+    dataViewConfigs = createSimpleDataViewConfig(nSimultaneousData);
+  } else if (mode === 1) {
+    // multiple data, one layer group
+    nSimultaneousData = 5;
+    addLayerGroup('layerGroup0');
+    dataViewConfigs = createSimpleDataViewConfig(nSimultaneousData, true);
+    binders = fullBinders;
+  } else if (mode === 2) {
+    // multiple data, multiple layer group
+    nSimultaneousData = 4;
+    addLayerGroup('layerGroup0');
+    addLayerGroup('layerGroup1');
+    dataViewConfigs = {
+      0: [
+        {
+          divId: 'layerGroup0'
+        },
+        {
+          divId: 'layerGroup1'
+        }
+      ],
+      1: [
+        {
+          divId: 'layerGroup0'
+        }
+      ],
+      2: [
+        {
+          divId: 'layerGroup1'
+        }
+      ],
+      3: [
+        {
+          divId: 'layerGroup1'
+        }
+      ]
+    };
+    binders = fullBinders;
+  } else if (mode === 3) {
+    // single data, multiple layer groups -> MPR
+    viewOnFirstLoadItem = false;
+    nSimultaneousData = 2;
+    addLayerGroup('layerGroup0');
+    addLayerGroup('layerGroup1');
+    addLayerGroup('layerGroup2');
+    dataViewConfigs = createMPRDataViewConfig(nSimultaneousData);
+    binders = fullBinders;
+  }
 
   // app config
   var config = {
@@ -156,20 +124,14 @@ dwv.test.viewerSetup = function () {
     if (!viewOnFirstLoadItem) {
       _app.render();
     }
-    // update active layer
-    dwv.test.addLayerRow(dataLoad);
+    // add data control row
+    addDataRow(dataLoad, dataViewConfigs);
     ++dataLoad;
   });
   _app.addEventListener('loadend', function () {
     console.timeEnd('load-data');
     console.log(_app.getMetaData());
   });
-  // _app.addEventListener('renderstart', function (event) {
-  //   console.time('render-data ' + event.layerid);
-  // });
-  // _app.addEventListener('renderend', function (event) {
-  //   console.timeEnd('render-data ' + event.layerid);
-  // });
   _app.addEventListener('renderend', function () {
     if (isFirstRender) {
       isFirstRender = false;
@@ -180,7 +142,13 @@ dwv.test.viewerSetup = function () {
 
   _app.addEventListener('positionchange', function (event) {
     var input = document.getElementById('position');
-    input.value = event.value[0];
+    var toFixed2 = function (val) {
+      var str = val.toString();
+      return str.slice(0, str.indexOf('.') + 2);
+    };
+    input.value = toFixed2(event.value[1][0]) + ', ' +
+      toFixed2(event.value[1][1]) + ', ' +
+      toFixed2(event.value[1][2]);
   });
 
   console.log(
@@ -208,9 +176,144 @@ dwv.test.viewerSetup = function () {
   dwv.utils.loadFromUri(window.location.href, _app);
 };
 
-dwv.test.addLayerRow = function (id) {
-  var lg = _app.getActiveLayerGroup();
-  var vl = lg.getActiveViewLayer();
+/**
+ * Last minute.
+ */
+dwv.test.onDOMContentLoadedViewer = function () {
+  // setup
+  dwv.test.viewerSetup();
+
+  var positionInput = document.getElementById('position');
+  positionInput.addEventListener('change', function () {
+    var vls = _app.getViewLayersByDataIndex(0);
+    var vc = vls[0].getViewController();
+    var values = this.value.split(',');
+    vc.setCurrentPosition(new dwv.math.Point3D(
+      parseFloat(values[0]), parseFloat(values[1]), parseFloat(values[2]))
+    );
+  });
+
+  var resetButton = document.getElementById('reset');
+  resetButton.addEventListener('click', function () {
+    _app.resetLayout();
+  });
+
+  // bind app to input files
+  var fileinput = document.getElementById('fileinput');
+  fileinput.addEventListener('change', function (event) {
+    console.log('%c ----------------', 'color: teal;');
+    console.log(event.target.files);
+    _app.loadFiles(event.target.files);
+  });
+};
+
+/**
+ * Append a layer div in the root 'dwv' one.
+ *
+ * @param {string} id The id of the layer.
+ */
+function addLayerGroup(id) {
+  var layer = document.createElement('div');
+  layer.id = id;
+  layer.className = 'layerGroup';
+  var root = document.getElementById('dwv');
+  root.appendChild(layer);
+}
+
+/**
+ * Create simple view config(s).
+ *
+ * @param {number} numberOfData The number of data.
+ * @param {boolean} sameDiv If all data go in the same div.
+ * @returns {object} The view config.
+ */
+function createSimpleDataViewConfig(numberOfData, sameDiv) {
+  if (typeof sameDiv === 'undefined') {
+    sameDiv = false;
+  }
+  var configs = {};
+  for (var i = 0; i < numberOfData; ++i) {
+    var divName = 'layerGroup0';
+    if (!sameDiv) {
+      divName = 'layerGroup' + i;
+    }
+    configs[i] = [{divId: divName}];
+  }
+  return configs;
+}
+
+/**
+ * Create MPR view config(s).
+ *
+ * @param {number} numberOfData The number of data.
+ * @returns {object} The view config.
+ */
+function createMPRDataViewConfig(numberOfData) {
+  var configs = {};
+  for (var i = 0; i < numberOfData; ++i) {
+    configs[i] = [
+      {
+        divId: 'layerGroup0',
+        orientation: 'axial'
+      },
+      {
+        divId: 'layerGroup1',
+        orientation: 'coronal'
+      },
+      {
+        divId: 'layerGroup2',
+        orientation: 'sagittal'
+      }
+    ];
+  }
+  return configs;
+}
+
+/**
+ * Get the layer groups ids from the data view configs.
+ *
+ * @param {object} dataViewConfigs The configs.
+ * @returns {Array} The list of ids.
+ */
+function getLayerGroupIds(dataViewConfigs) {
+  var divIds = [];
+  var keys = Object.keys(dataViewConfigs);
+  for (var i = 0; i < keys.length; ++i) {
+    var dataViewConfig = dataViewConfigs[keys[i]];
+    for (var j = 0; j < dataViewConfig.length; ++j) {
+      var divId = dataViewConfig[j].divId;
+      if (!divIds.includes(divId)) {
+        divIds.push(divId);
+      }
+    }
+  }
+  return divIds;
+}
+
+/**
+ * Get the layer group ids associated to a data.
+ *
+ * @param {Array} dataViewConfig The data view config.
+ * @returns {Array} The list of ids.
+ */
+function getDataLayerGroupIds(dataViewConfig) {
+  var divIds = [];
+  for (var j = 0; j < dataViewConfig.length; ++j) {
+    divIds.push(dataViewConfig[j].divId);
+  }
+  return divIds;
+}
+
+/**
+ * Add a data row.
+ *
+ * @param {number} id The data index.
+ * @param {object} dataViewConfigs The view configurations.
+ */
+function addDataRow(id, dataViewConfigs) {
+  var layerGroupIds = getLayerGroupIds(dataViewConfigs);
+
+  var vl = _app.getViewLayersByDataIndex(id)[0];
   var vc = vl.getViewController();
   var wl = vc.getWindowLevel();
 
@@ -227,8 +330,11 @@ dwv.test.addLayerRow = function (id) {
       th.innerHTML = text;
       trow.appendChild(th);
     };
-    insertTCell('Active');
     insertTCell('Id');
+    for (var j = 0; j < layerGroupIds.length; ++j) {
+      insertTCell('LG' + j);
+    }
+    insertTCell('Alpha Range');
     insertTCell('Width');
     insertTCell('Center');
     insertTCell('Alpha');
@@ -248,20 +354,62 @@ dwv.test.addLayerRow = function (id) {
   cell.appendChild(document.createTextNode(id));
 
   // cell: radio
-  var radio = document.createElement('input');
-  radio.type = 'radio';
-  radio.name = 'layerselect';
-  radio.id = id;
-  radio.checked = true;
-  radio.onchange = function (event) {
-    for (var i = 0; i < _app.getNumberOfLayerGroups(); ++i) {
-      _app.getLayerGroupById(i).setActiveViewLayer(2 * event.srcElement.id);
+  var dataLayerGroupsIds = getDataLayerGroupIds(dataViewConfigs[id]);
+  for (var l = 0; l < layerGroupIds.length; ++l) {
+    var layerGroupId = layerGroupIds[l];
+    cell = row.insertCell();
+    if (!dataLayerGroupsIds.includes(layerGroupId)) {
+      continue;
     }
-  };
-  cell = row.insertCell();
-  cell.appendChild(radio);
+    var radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = 'layerselect-' + l;
+    radio.id = l + '-' + id;
+    radio.checked = true;
+    radio.onchange = function (event) {
+      var fullId = event.srcElement.id;
+      var groupId = fullId.substring(0, fullId.indexOf('-'));
+      var dataId = fullId.substring(fullId.indexOf('-') + 1);
+      var lg = _app.getLayerGroupById(groupId);
+      lg.setActiveViewLayerByDataIndex(parseInt(dataId, 10));
+    };
+    cell.appendChild(radio);
+  }
 
   var dataRange = _app.getImage().getRescaledDataRange();
+
+  // cell: data range
+  cell = row.insertCell();
+  var widthmin = document.createElement('input');
+  widthmin.type = 'range';
+  widthmin.max = dataRange.max;
+  widthmin.min = dataRange.min;
+  widthmin.step = (dataRange.max - dataRange.min) * 0.001;
+  widthmin.value = dataRange.min;
+  var widthmax = document.createElement('input');
+  widthmax.type = 'range';
+  widthmax.max = widthmin.max;
+  widthmax.min = widthmin.min;
+  widthmax.step = widthmin.step;
+  widthmax.value = dataRange.max;
+  cell.appendChild(widthmin);
+  cell.appendChild(widthmax);
+
+  var changeAlphaFunc = function (min, max) {
+    var func = function (value) {
+      if (value > min && value < max) {
+        return 255;
+      }
+      return 0;
+    };
+    vc.setViewAlphaFunction(func);
+  };
+  widthmin.oninput = function () {
+    changeAlphaFunc(this.value, widthmax.value);
+  };
+  widthmax.oninput = function () {
+    changeAlphaFunc(widthmin.value, this.value);
+  };
 
   // cell: window width
   cell = row.insertCell();
@@ -269,7 +417,7 @@ dwv.test.addLayerRow = function (id) {
   widthrange.type = 'range';
   widthrange.max = dataRange.max - dataRange.min;
   widthrange.min = 0;
-  widthrange.step = (dataRange.max - dataRange.min) * 0.1;
+  widthrange.step = (dataRange.max - dataRange.min) * 0.001;
   widthrange.value = wl.width;
   var widthnumber = document.createElement('input');
   widthnumber.type = 'number';
@@ -299,7 +447,6 @@ dwv.test.addLayerRow = function (id) {
 
   var changeWidth = function (value) {
     vc.setWindowLevel(centernumber.value, value);
-    vl.draw();
   };
   widthnumber.oninput = function () {
     changeWidth(this.value);
@@ -334,7 +481,7 @@ dwv.test.addLayerRow = function (id) {
   opacityrange.max = 1;
   opacityrange.min = 0;
   opacityrange.step = 0.1;
-  opacityrange.value = 1;
+  opacityrange.value = vl.getOpacity();
   var opacitynumber = document.createElement('input');
   opacitynumber.type = 'number';
   opacitynumber.max = opacityrange.max;
@@ -351,25 +498,4 @@ dwv.test.addLayerRow = function (id) {
   };
   cell.appendChild(opacityrange);
   cell.appendChild(opacitynumber);
-};
-
-/**
- * Last minute.
- */
-dwv.test.onDOMContentLoadedViewer = function () {
-  // setup
-  dwv.test.viewerSetup();
-
-  var resetButton = document.getElementById('reset');
-  resetButton.addEventListener('click', function () {
-    _app.resetLayout();
-  });
-
-  // bind app to input files
-  var fileinput = document.getElementById('fileinput');
-  fileinput.addEventListener('change', function (event) {
-    console.log('%c ----------------', 'color: teal;');
-    console.log(event.target.files);
-    _app.loadFiles(event.target.files);
-  });
-};
+}
