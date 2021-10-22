@@ -109,13 +109,19 @@ dwv.math.Vector3D.prototype.dotProduct = function (vector3D) {
  * @param {number} minDim The start dimension.
  * @returns {string} The string id.
  */
-dwv.math.Vector3D.prototype.toStringId = function (minDim) {
+dwv.math.Vector3D.prototype.toStringId = function (minDim, precision) {
   if (typeof minDim === 'undefined') {
     minDim = 0;
   }
   if (minDim >= 3) {
     throw new Error('Minimum dim cannot be equal or greater than length.');
   }
+  if (typeof precision === 'undefined') {
+    precision = 5;
+  }
+  var toString = function (x) {
+    return Number.parseFloat(x).toPrecision(precision);
+  };
   var res = '';
   for (var i = minDim; i < 3; ++i) {
     if (i !== minDim) {
@@ -123,11 +129,11 @@ dwv.math.Vector3D.prototype.toStringId = function (minDim) {
     }
     res += '#' + i + '-';
     if (i === 0) {
-      res += this.getX();
+      res += toString(this.getX());
     } else if (i === 1) {
-      res += this.getY();
+      res += toString(this.getY());
     } else if (i === 2) {
-      res += this.getZ();
+      res += toString(this.getZ());
     }
   }
   return res;
