@@ -5,7 +5,8 @@ dwv.gui = dwv.gui || {};
 /**
  * View layer.
  *
- * @param {object} containerDiv The layer div.
+ * @param {object} containerDiv The layer div, its id will be used
+ *   as this layer id.
  * @class
  */
 dwv.gui.ViewLayer = function (containerDiv) {
@@ -205,9 +206,9 @@ dwv.gui.ViewLayer = function (containerDiv) {
   };
 
   /**
-   * Get the data full size.
+   * Get the data full size, ie size * spacing.
    *
-   * @returns {object} The full size as {x,y}
+   * @returns {object} The full size as {x,y}.
    */
   this.getFullSize = function () {
     return {
