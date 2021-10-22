@@ -505,10 +505,12 @@ dwv.App = function () {
         }
       }
       // initialise or add view
-      if (layerGroup.getNumberOfLayers() === 0) {
-        initialiseBaseLayers(dataIndex, config.divId);
-      } else {
-        addViewLayer(dataIndex, config.divId);
+      if (layerGroup.getViewLayersByDataIndex(dataIndex).length === 0) {
+        if (layerGroup.getNumberOfLayers() === 0) {
+          initialiseBaseLayers(dataIndex, config.divId);
+        } else {
+          addViewLayer(dataIndex, config.divId);
+        }
       }
       // draw
       layerGroup.draw();
@@ -590,7 +592,8 @@ dwv.App = function () {
     drawController.setDrawings(
       drawings, drawingsDetails, fireEvent, this.addToUndoStack);
 
-    drawController.activateDrawLayer(viewController.getCurrentOrientedIndex());
+    drawController.activateDrawLayer(
+      viewController.getCurrentOrientedPosition());
   };
   /**
    * Update a drawing from its details.

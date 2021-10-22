@@ -43,12 +43,13 @@ dwv.io.State = function () {
     var viewController =
       layerGroup.getActiveViewLayer().getViewController();
     var drawLayer = layerGroup.getActiveDrawLayer();
+    var position = viewController.getCurrentPosition();
     // return a JSON string
     return JSON.stringify({
       version: '0.5',
       'window-center': viewController.getWindowLevel().center,
       'window-width': viewController.getWindowLevel().width,
-      position: viewController.getCurrentPosition().getValues(),
+      position: [position.getX(), position.getY(), position.getZ()],
       scale: app.getAddedScale(),
       offset: app.getOffset(),
       drawings: drawLayer.getKonvaLayer().toObject(),
@@ -94,7 +95,8 @@ dwv.io.State = function () {
     viewController.setWindowLevel(
       data['window-center'], data['window-width']);
     viewController.setCurrentPosition(
-      new dwv.math.Index(data.position), true);
+      new dwv.math.Point3D(
+        data.position[0], data.position[1], data.position[2]), true);
     // apply saved scale on top of current base one
     var baseScale = app.getActiveLayerGroup().getBaseScale();
     var scale = null;
@@ -103,6 +105,7 @@ dwv.io.State = function () {
       scale = {
         x: data.scale * baseScale.x,
         y: data.scale * baseScale.y,
+        z: 1
       };
       // ---- transform translation (now) ----
       // Tx = -offset.x * scale.x
@@ -117,14 +120,20 @@ dwv.io.State = function () {
       var oldTy = originY + data.translation.y * scale.y;
       offset = {
         x: -oldTx / scale.x,
-        y: -oldTy / scale.y
+        y: -oldTy / scale.y,
+        z: 0
       };
     } else {
       scale = {
         x: data.scale.x * baseScale.x,
-        y: data.scale.y * baseScale.y
+        y: data.scale.y * baseScale.y,
+        z: 1
       };
-      offset = data.offset;
+      offset = {
+        x: data.offset.x,
+        y: data.offset.y,
+        z: 0
+      };
     }
     app.getActiveLayerGroup().setScale(scale);
     app.getActiveLayerGroup().setOffset(offset);
