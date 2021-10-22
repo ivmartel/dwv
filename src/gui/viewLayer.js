@@ -481,8 +481,9 @@ dwv.gui.ViewLayer = function (containerDiv) {
       y: fitScale1D * baseSpacing.y
     };
     // update canvas
-    var width = containerDiv.parentElement.offsetWidth;
-    var height = containerDiv.parentElement.offsetHeight;
+    var fullSize = this.getFullSize();
+    var width = Math.floor(fullSize.x * fitScale1D);
+    var height = Math.floor(fullSize.y * fitScale1D);
     if (!dwv.gui.canCreateCanvas(width, height)) {
       throw new Error('Cannot resize canvas ' + width + ', ' + height);
     }

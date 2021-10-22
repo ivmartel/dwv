@@ -309,8 +309,9 @@ dwv.gui.DrawLayer = function (containerDiv) {
       y: fitScale1D * baseSpacing.y
     };
     // update konva
-    var width = containerDiv.parentElement.offsetWidth;
-    var height = containerDiv.parentElement.offsetHeight;
+    var fullSize = this.getFullSize();
+    var width = Math.floor(fullSize.x * fitScale1D);
+    var height = Math.floor(fullSize.y * fitScale1D);
     konvaStage.setWidth(width);
     konvaStage.setHeight(height);
     // reset scale
