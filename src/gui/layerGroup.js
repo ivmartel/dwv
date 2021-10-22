@@ -52,38 +52,6 @@ dwv.gui.getLayerDetailsFromEvent = function (event) {
 };
 
 /**
- * Get the fit to container scale.
- * To be called with an existing HTML element!
- *
- * @param {object} containerDiv The container.
- * @param {object} size The oriented image size.
- * @param {object} spacing The oriented image spacing.
- * @returns {object} The scale as {x,y}.
- */
-dwv.gui.getFitToContainerScale = function (containerDiv, size, spacing) {
-  // check container size
-  if (containerDiv.offsetWidth === 0 &&
-    containerDiv.offsetHeight === 0) {
-    throw new Error('Cannot fit to zero sized container.');
-  }
-  // best fit
-  var scaleX = containerDiv.offsetWidth / (size.x * spacing.x);
-  var scaleY = containerDiv.offsetHeight / (size.y * spacing.y);
-  // minimum scale and not zero
-  var scale = null;
-  if (scaleX > 0 && scaleY > 0) {
-    scale = Math.min(scaleX, scaleY);
-  } else {
-    scale = scaleX === 0 ? scaleY : scaleX;
-  }
-  // return 2D scale
-  return {
-    x: scale * spacing.x,
-    y: scale * spacing.y
-  };
-};
-
-/**
  * Get a view orientation according to an image geometry (with its orientation)
  * and target orientation.
  *
