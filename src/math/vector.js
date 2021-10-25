@@ -107,6 +107,8 @@ dwv.math.Vector3D.prototype.dotProduct = function (vector3D) {
  * Get a string id from the index values in the form of: '#0-1_#1-2'.
  *
  * @param {number} minDim The start dimension.
+ * @param {number} precision The number of significant digits used in
+ *   number to string conversion.
  * @returns {string} The string id.
  */
 dwv.math.Vector3D.prototype.toStringId = function (minDim, precision) {
