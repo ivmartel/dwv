@@ -5,7 +5,7 @@
   "position": [
     0,
     0,
-    0
+    114.63
   ],
   "scale": {
     "x": 2.186754966887416,
@@ -23,7 +23,7 @@
     "children": [
       {
         "attrs": {
-          "id": "#2-0",
+          "id": "#2-114.63",
           "name": "position-group"
         },
         "className": "Group",

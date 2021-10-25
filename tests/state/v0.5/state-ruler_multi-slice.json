@@ -5,7 +5,7 @@
   "position": [
     0,
     0,
-    0
+    114.63
   ],
   "scale": {
     "x": 1,
@@ -22,7 +22,7 @@
       {
         "attrs": {
           "name": "position-group",
-          "id": "#2-1",
+          "id": "#2-116.87",
           "visible": false
         },
         "className": "Group",
@@ -118,7 +118,7 @@
       {
         "attrs": {
           "name": "position-group",
-          "id": "#2-2",
+          "id": "#2-125.85",
           "visible": false
         },
         "className": "Group",
@@ -214,7 +214,7 @@
       {
         "attrs": {
           "name": "position-group",
-          "id": "#2-3",
+          "id": "#2-134.84",
           "visible": false
         },
         "className": "Group",
@@ -310,7 +310,7 @@
       {
         "attrs": {
           "name": "position-group",
-          "id": "#2-4",
+          "id": "#2-143.82",
           "visible": false
         },
         "className": "Group",
@@ -406,7 +406,7 @@
       {
         "attrs": {
           "name": "position-group",
-          "id": "#2-5"
+          "id": "#2-152.81"
         },
         "className": "Group",
         "children": [

@@ -69,7 +69,6 @@ dwv.test.checkStateHeader = function (jsonData, version, assert) {
     version: version,
     'window-center': 441,
     'window-width': 911,
-    position: [0, 0, 0]
   };
   if (parseFloat(version) <= 0.3) {
     headerData.scale = 1;
@@ -78,6 +77,11 @@ dwv.test.checkStateHeader = function (jsonData, version, assert) {
   } else {
     headerData.scale = {x: 1, y: 1};
     headerData.offset = {x: 0, y: 0};
+  }
+  if (parseFloat(version) <= 0.4) {
+    headerData.position = [0, 0, 0];
+  } else {
+    headerData.position = [0, 0, 114.63];
   }
   assert.deepEqual(jsonData, headerData);
 };
@@ -107,9 +111,13 @@ dwv.test.checkDrawings = function (drawings, details, version, type, assert) {
       layerKid.attrs.name,
       'position-group',
       'Layer first level is a position group.');
+    var groupId = '#2-114.63';
+    if (version <= 0.4) {
+      groupId = '#2-0';
+    }
     assert.equal(
       layerKid.attrs.id,
-      '#2-0',
+      groupId,
       'Position group has the proper id.');
 
     // third level: shape group(s)
@@ -409,6 +417,8 @@ dwv.test.checkRulerDrawings = function (layerKids, details, version, assert) {
     }
   ];
 
+  var groupIds = [116.87, 125.85, 134.84, 143.82, 152.81];
+
   for (var i = 0; i < ndraws; ++i) {
     var layerKid = layerKids[i];
     assert.equal(
@@ -419,9 +429,13 @@ dwv.test.checkRulerDrawings = function (layerKids, details, version, assert) {
       layerKid.attrs.name,
       'position-group',
       'Layer first level is a position group.');
+    var groupId = '#2-' + groupIds[i];
+    if (version <= 0.4) {
+      groupId = '#2-' + (i + 1);
+    }
     assert.equal(
       layerKid.attrs.id,
-      '#2-' + (i + 1),
+      groupId,
       'Position group has the proper id.');
 
     // third level: shape group(s)
