@@ -27,7 +27,7 @@
     "benchmark": "~2.1.4",
     "docdash": "~1.2.0",
     "eslint": "~7.32.0",
-    "eslint-plugin-jsdoc": "~36.1.0",
+    "eslint-plugin-jsdoc": "~37.0.3",
     "github-release-notes": "0.17.2",
     "grunt": "^1.4.0",
     "grunt-cli": "^1.4.2",
