@@ -198,7 +198,6 @@ dwv.App = function () {
    * - `binders`: array of layerGroup binders
    * - `tools`: tool name indexed object containing individual tool
    *   configurations
-   * - `nSimultaneousData`: number of simultaneus data
    * - `viewOnFirstLoadItem`: boolean flag to trigger the first data render
    *   after the first loaded data or not
    * - `defaultCharacterSet`: the default chraracter set string used for DICOM
@@ -210,9 +209,6 @@ dwv.App = function () {
     // defaults
     if (typeof options.viewOnFirstLoadItem === 'undefined') {
       options.viewOnFirstLoadItem = true;
-    }
-    if (typeof options.nSimultaneousData === 'undefined') {
-      options.nSimultaneousData = 1;
     }
 
     // undo stack
@@ -879,11 +875,6 @@ dwv.App = function () {
    * @private
    */
   function onloadstart(event) {
-    if (event.loadtype === 'image' &&
-      dataController.length() === options.nSimultaneousData) {
-      self.reset();
-    }
-
     /**
      * Load start event.
      *
