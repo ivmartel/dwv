@@ -451,17 +451,14 @@ dwv.App = function () {
    * @returns {Array} The list of associated configs.
    */
   function getViewConfigs(dataIndex) {
-    var configs = null;
-    var defaultConfig = {
-      divId: 'layerGroup'
-    };
+    // check options
     if (options.dataViewConfigs === null ||
       typeof options.dataViewConfigs === 'undefined') {
-      configs = [defaultConfig];
-    } else if (typeof options.dataViewConfigs['*'] !== 'undefined') {
+      throw new Error('No available data iew configuration');
+    }
+    var configs = null;
+    if (typeof options.dataViewConfigs['*'] !== 'undefined') {
       configs = options.dataViewConfigs['*'];
-    } else if (dataIndex > options.dataViewConfigs.length - 1) {
-      configs = [defaultConfig];
     } else {
       configs = options.dataViewConfigs[dataIndex];
     }
