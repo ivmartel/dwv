@@ -20,7 +20,6 @@ dwv.test.viewerSetup = function () {
 
   // stage options
   var dataViewConfigs;
-  var nSimultaneousData = 1;
   var viewOnFirstLoadItem = true;
 
   // layer group binders
@@ -33,20 +32,17 @@ dwv.test.viewerSetup = function () {
     new dwv.gui.OpacityBinder()
   ];
 
-  var mode = 0;
+  var mode = 2;
   if (mode === 0) {
-    // simplest: one data, one layer group
-    addLayerGroup('layerGroup0');
-    dataViewConfigs = createSimpleDataViewConfig(nSimultaneousData);
+    // simplest: one layer group
+    dataViewConfigs = createSimpleDataViewConfig();
   } else if (mode === 1) {
-    // multiple data, one layer group
-    nSimultaneousData = 5;
-    addLayerGroup('layerGroup0');
-    dataViewConfigs = createSimpleDataViewConfig(nSimultaneousData, true);
+    // MPR
+    viewOnFirstLoadItem = false;
+    dataViewConfigs = createMPRDataViewConfig();
     binders = fullBinders;
   } else if (mode === 2) {
     // multiple data, multiple layer group
-    nSimultaneousData = 4;
     addLayerGroup('layerGroup0');
     addLayerGroup('layerGroup1');
     dataViewConfigs = {
@@ -75,21 +71,11 @@ dwv.test.viewerSetup = function () {
       ]
     };
     binders = fullBinders;
-  } else if (mode === 3) {
-    // single data, multiple layer groups -> MPR
-    viewOnFirstLoadItem = false;
-    nSimultaneousData = 2;
-    addLayerGroup('layerGroup0');
-    addLayerGroup('layerGroup1');
-    addLayerGroup('layerGroup2');
-    dataViewConfigs = createMPRDataViewConfig(nSimultaneousData);
-    binders = fullBinders;
   }
 
   // app config
   var config = {
     viewOnFirstLoadItem: viewOnFirstLoadItem,
-    nSimultaneousData: nSimultaneousData,
     dataViewConfigs: dataViewConfigs,
     binders: binders,
     tools: {
@@ -223,35 +209,24 @@ function addLayerGroup(id) {
 /**
  * Create simple view config(s).
  *
- * @param {number} numberOfData The number of data.
- * @param {boolean} sameDiv If all data go in the same div.
  * @returns {object} The view config.
  */
-function createSimpleDataViewConfig(numberOfData, sameDiv) {
-  if (typeof sameDiv === 'undefined') {
-    sameDiv = false;
-  }
-  var configs = {};
-  for (var i = 0; i < numberOfData; ++i) {
-    var divName = 'layerGroup0';
-    if (!sameDiv) {
-      divName = 'layerGroup' + i;
-    }
-    configs[i] = [{divId: divName}];
-  }
-  return configs;
+function createSimpleDataViewConfig() {
+  addLayerGroup('layerGroup0');
+  return {'*': [{divId: 'layerGroup0'}]};
 }
 
 /**
  * Create MPR view config(s).
  *
- * @param {number} numberOfData The number of data.
  * @returns {object} The view config.
  */
-function createMPRDataViewConfig(numberOfData) {
-  var configs = {};
-  for (var i = 0; i < numberOfData; ++i) {
-    configs[i] = [
+function createMPRDataViewConfig() {
+  addLayerGroup('layerGroup0');
+  addLayerGroup('layerGroup1');
+  addLayerGroup('layerGroup2');
+  return {
+    '*': [
       {
         divId: 'layerGroup0',
         orientation: 'axial'
@@ -264,9 +239,8 @@ function createMPRDataViewConfig(numberOfData) {
         divId: 'layerGroup2',
         orientation: 'sagittal'
       }
-    ];
-  }
-  return configs;
+    ]
+  };
 }
 
 /**
@@ -354,7 +328,11 @@ function addDataRow(id, dataViewConfigs) {
   cell.appendChild(document.createTextNode(id));
 
   // cell: radio
-  var dataLayerGroupsIds = getDataLayerGroupIds(dataViewConfigs[id]);
+  var viewConfig = dataViewConfigs[id];
+  if (typeof viewConfig === 'undefined') {
+    viewConfig = dataViewConfigs['*'];
+  }
+  var dataLayerGroupsIds = getDataLayerGroupIds(viewConfig);
   for (var l = 0; l < layerGroupIds.length; ++l) {
     var layerGroupId = layerGroupIds[l];
     cell = row.insertCell();
