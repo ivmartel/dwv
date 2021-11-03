@@ -32,7 +32,7 @@ dwv.test.viewerSetup = function () {
     new dwv.gui.OpacityBinder()
   ];
 
-  var mode = 2;
+  var mode = 0;
   if (mode === 0) {
     // simplest: one layer group
     dataViewConfigs = createSimpleDataViewConfig();
