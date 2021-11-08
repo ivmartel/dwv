@@ -62,9 +62,8 @@ dwv.tool.Scroll = function (app) {
 
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
-    var viewController =
-      layerGroup.getActiveViewLayer().getViewController();
-    var size = app.getImage().getGeometry().getSize();
+    var viewLayer = layerGroup.getActiveViewLayer();
+    var viewController = viewLayer.getViewController();
 
     // difference to last Y position
     var diffY = event._y - self.y0;
@@ -83,7 +82,8 @@ dwv.tool.Scroll = function (app) {
     var diffX = event._x - self.x0;
     var xMove = (Math.abs(diffX) > 15);
     // do not trigger for small moves
-    if (xMove && size.moreThanOne(3)) {
+    var imageSize = viewController.getImageSize();
+    if (xMove && imageSize.moreThanOne(3)) {
       // update view controller
       if (diffX > 0) {
         viewController.decrementIndex(3);

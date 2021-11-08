@@ -43,27 +43,46 @@ dwv.App = function () {
   /**
    * Get the image.
    *
+   * @param {number} index The data index.
    * @returns {Image} The associated image.
    */
-  this.getImage = function () {
-    return dataController.get(0).image;
+  this.getImage = function (index) {
+    return dataController.get(index).image;
+  };
+  /**
+   * Get the last loaded image.
+   *
+   * @returns {Image} The image.
+   */
+  this.getLastImage = function () {
+    return dataController.get(dataController.length() - 1).image;
   };
   /**
    * Set the image.
    *
    * @param {Image} img The associated image.
+   * @param {number} index The data index.
    */
-  this.setImage = function (img) {
-    dataController.setImage(img, 0);
+  this.setImage = function (img, index) {
+    dataController.setImage(img, index);
+  };
+  /**
+   * Set the last image.
+   *
+   * @param {Image} img The associated image.
+   */
+  this.setLastImage = function (img) {
+    dataController.setImage(img, dataController.length() - 1);
   };
 
   /**
    * Get the meta data.
    *
+   * @param {number} index The data index.
    * @returns {object} The list of meta data.
    */
-  this.getMetaData = function () {
-    return dataController.get(0).meta;
+  this.getMetaData = function (index) {
+    return dataController.get(index).meta;
   };
 
   /**
@@ -436,7 +455,7 @@ dwv.App = function () {
   this.fitToContainer = function () {
     var layerGroup = stage.getActiveLayerGroup();
     if (layerGroup) {
-      layerGroup.fitToContainer(self.getImage().getGeometry());
+      layerGroup.fitToContainer(self.getLastImage().getGeometry());
       layerGroup.draw();
       // update style
       //style.setBaseScale(layerGroup.getBaseScale());
@@ -718,7 +737,7 @@ dwv.App = function () {
   this.defaultOnKeydown = function (event) {
     var viewController =
       stage.getActiveLayerGroup().getActiveViewLayer().getViewController();
-    var size = self.getImage().getGeometry().getSize();
+    var size = viewController.getImageSize();
     if (event.ctrlKey) {
       if (event.keyCode === 37) { // crtl-arrow-left
         event.preventDefault();

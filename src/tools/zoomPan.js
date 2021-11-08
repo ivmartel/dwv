@@ -109,9 +109,9 @@ dwv.tool.ZoomAndPan = function (app) {
       if (Math.abs(diffY) < 15) {
         return;
       }
-      var size = app.getImage().getGeometry().getSize();
+      var imageSize = viewController.getImageSize();
       // update view controller
-      if (size.canScroll(2)) {
+      if (imageSize.canScroll(2)) {
         if (diffY > 0) {
           viewController.incrementIndex(2);
         } else {

@@ -136,12 +136,12 @@ dwv.tool.WindowLevel = function (app) {
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var index = viewLayer.displayToPlaneIndex(event._x, event._y);
-    var viewController =
-      layerGroup.getActiveViewLayer().getViewController();
+    var viewController = viewLayer.getViewController();
+    var image = app.getImage(viewLayer.getDataIndex());
 
     // update view controller
     viewController.setWindowLevel(
-      parseInt(app.getImage().getRescaledValueAtIndex(
+      parseInt(image.getRescaledValueAtIndex(
         viewController.getCurrentIndex().getWithNew2D(
           index.get(0),
           index.get(1)

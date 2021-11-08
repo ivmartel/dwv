@@ -100,9 +100,9 @@ dwv.test.viewerSetup = function () {
     addDataRow(dataLoad, dataViewConfigs);
     ++dataLoad;
   });
-  _app.addEventListener('loadend', function () {
+  _app.addEventListener('loadend', function (event) {
     console.timeEnd('load-data');
-    console.log(_app.getMetaData());
+    console.log(_app.getMetaData(event.loadid));
   });
   _app.addEventListener('renderend', function () {
     if (isFirstRender) {
@@ -452,7 +452,7 @@ function addDataRow(id, dataViewConfigs) {
     cell.appendChild(radio);
   }
 
-  var dataRange = _app.getImage().getRescaledDataRange();
+  var dataRange = _app.getImage(vl.getDataIndex()).getRescaledDataRange();
 
   // cell: data range
   cell = row.insertCell();

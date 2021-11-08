@@ -282,12 +282,13 @@ dwv.tool.Floodfill = function (app) {
       layerGroup.getActiveViewLayer().getViewController();
 
     var pos = viewController.getCurrentIndex();
+    var imageSize = viewController.getImageSize();
     var threshold = currentthreshold || initialthreshold;
 
     // Iterate over the next images and paint border on each slice.
     for (var i = pos.get(2),
       len = end
-        ? end : app.getImage().getGeometry().getSize().get(2);
+        ? end : imageSize.get(2);
       i < len; i++) {
       if (!paintBorder(initialpoint, threshold, layerGroup)) {
         break;

@@ -232,7 +232,7 @@ dwv.tool.filter.Threshold = function (app) {
     filter.setMax(args.max);
     // reset the image if asked
     if (resetImage) {
-      filter.setOriginalImage(app.getImage());
+      filter.setOriginalImage(app.getLastImage());
       resetImage = false;
     }
     var command = new dwv.tool.RunFilterCommand(filter, app);
@@ -314,7 +314,7 @@ dwv.tool.filter.Sharpen = function (app) {
    */
   this.run = function (_args) {
     var filter = new dwv.image.filter.Sharpen();
-    filter.setOriginalImage(app.getImage());
+    filter.setOriginalImage(app.getLastImage());
     var command = new dwv.tool.RunFilterCommand(filter, app);
     command.onExecute = fireEvent;
     command.onUndo = fireEvent;
@@ -393,7 +393,7 @@ dwv.tool.filter.Sobel = function (app) {
    */
   dwv.tool.filter.Sobel.prototype.run = function (_args) {
     var filter = new dwv.image.filter.Sobel();
-    filter.setOriginalImage(app.getImage());
+    filter.setOriginalImage(app.getLastImage());
     var command = new dwv.tool.RunFilterCommand(filter, app);
     command.onExecute = fireEvent;
     command.onUndo = fireEvent;
@@ -459,7 +459,7 @@ dwv.tool.RunFilterCommand = function (filter, app) {
    */
   this.execute = function () {
     // run filter and set app image
-    app.setImage(filter.update());
+    app.setLastImage(filter.update());
     // update display
     app.render();
     /**
@@ -485,7 +485,7 @@ dwv.tool.RunFilterCommand = function (filter, app) {
    */
   this.undo = function () {
     // reset the image
-    app.setImage(filter.getOriginalImage());
+    app.setLastImage(filter.getOriginalImage());
     // update display
     app.render();
     /**

@@ -283,6 +283,15 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
+   * Get the image size.
+   *
+   * @returns {object} The size.
+   */
+  this.getImageSize = function () {
+    return view.getImage().getGeometry().getSize();
+  };
+
+  /**
    * Set the current position.
    *
    * @param {object} pos The position.

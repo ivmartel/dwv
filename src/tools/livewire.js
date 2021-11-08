@@ -84,10 +84,11 @@ dwv.tool.Livewire = function (app) {
   /**
    * Clear the parent points list.
    *
+   * @param {object} imageSize The image size.
    * @private
    */
-  function clearParentPoints() {
-    var nrows = app.getImage().getGeometry().getSize().get(1);
+  function clearParentPoints(imageSize) {
+    var nrows = imageSize.get(1);
     for (var i = 0; i < nrows; ++i) {
       parentPoints[i] = [];
     }
@@ -120,6 +121,7 @@ dwv.tool.Livewire = function (app) {
     var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var viewLayer = layerGroup.getActiveViewLayer();
+    var imageSize = viewLayer.getViewController().getImageSize();
     var index = viewLayer.displayToPlaneIndex(event._x, event._y);
 
     // first time
@@ -129,7 +131,7 @@ dwv.tool.Livewire = function (app) {
       self.y0 = index.get(1);
       // clear vars
       clearPaths();
-      clearParentPoints();
+      clearParentPoints(imageSize);
       shapeGroup = null;
       // update zoom scale
       var drawLayer = layerGroup.getActiveDrawLayer();
@@ -160,7 +162,7 @@ dwv.tool.Livewire = function (app) {
       } else {
         // anchor point
         path = currentPath;
-        clearParentPoints();
+        clearParentPoints(imageSize);
         var pn = {x: index.get(0), y: index.get(1)};
         scissors.doTraining(pn);
         path.addControlPoint(currentPath.getPoint(0));
@@ -330,10 +332,10 @@ dwv.tool.Livewire = function (app) {
       var viewLayer = layerGroup.getActiveViewLayer();
 
       //scissors = new dwv.math.Scissors();
-      var size = app.getImage().getGeometry().getSize();
+      var imageSize = viewLayer.getViewController().getImageSize();
       scissors.setDimensions(
-        size.get(0),
-        size.get(1));
+        imageSize.get(0),
+        imageSize.get(1));
       scissors.setData(viewLayer.getImageData().data);
 
       // init with the app window scale
