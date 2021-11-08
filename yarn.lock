@@ -929,10 +929,10 @@ combined-stream@^1.0.6, combined-stream@~1.0.6:
   dependencies:
     delayed-stream "~1.0.0"
 
-commander@7.1.0:
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-7.1.0.tgz#f2eaecf131f10e36e07d894698226e36ae0eb5ff"
-  integrity sha512-pRxBna3MJe6HKnBGsDyMv8ETbptw3axEdYHoqNh7gu5oDcew8fs0xnivZGm06Ogk8zGAJ9VX+OPEr2GXEQK4dg==
+commander@7.2.0:
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-7.2.0.tgz#a36cb57d0b501ce108e4d20559a150a391d97ab7"
+  integrity sha512-QrWXB+ZQSVPmIWIhtEO9H+gwHaMGYiF5ChvoJ+K9ZGHG/sVsa6yiesAD1GC/x46sET00Xlwo1u49RVVVzvcSkw==
 
 commander@^2.11.0, commander@^2.19.0:
   version "2.20.3"
@@ -3646,10 +3646,10 @@ node-gyp@^5.0.2, node-gyp@^5.1.0:
     tar "^4.4.12"
     which "^1.3.1"
 
-node-watch@0.7.1:
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/node-watch/-/node-watch-0.7.1.tgz#0caaa6a6833b0d533487f953c52a6c787769ba7c"
-  integrity sha512-UWblPYuZYrkCQCW5PxAwYSxaELNBLUckrTBBk8xr1/bUgyOkYYTsUcV4e3ytcazFEOyiRyiUrsG37pu6I0I05g==
+node-watch@0.7.2:
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/node-watch/-/node-watch-0.7.2.tgz#545f057da8500487eb8287adcb4cb5a7338d7e21"
+  integrity sha512-g53VjSARRv1JdST0LZRIg8RiuLr1TaBbVPsVvxh0/0Ymvi0xYUjDuoqQQAWtHJQUXhiShowPT/aXKNeHBcyQsw==
 
 nopt@^4.0.1, nopt@^4.0.3, nopt@~4.0.1:
   version "4.0.3"
@@ -4435,12 +4435,12 @@ query-string@^6.8.2:
     strict-uri-encode "^2.0.0"
 
 qunit@^2.15.0:
-  version "2.17.1"
-  resolved "https://registry.yarnpkg.com/qunit/-/qunit-2.17.1.tgz#1969efe4c9b776b4b8cd4fc2fb9634e8f762e177"
-  integrity sha512-Gx1tpSfYbjRe4TRKCVBLlnCaVThF5Pdnmbbv/zLFfgWKddeQHV/eNi1BG392hw4gEDh2sflMj8kmPJlT7+kVMA==
+  version "2.17.2"
+  resolved "https://registry.yarnpkg.com/qunit/-/qunit-2.17.2.tgz#5cb278e131d931f25c109a0fdb0518be7754c25a"
+  integrity sha512-17isVvuOmALzsPjiV7wFg/6O5vJYXBrQZPwocfQSSh0I/rXvfX7bKMFJ4GMVW3U4P8r2mBeUy8EAngti4QD2Vw==
   dependencies:
-    commander "7.1.0"
-    node-watch "0.7.1"
+    commander "7.2.0"
+    node-watch "0.7.2"
     tiny-glob "0.2.9"
 
 qw@~1.0.1:
