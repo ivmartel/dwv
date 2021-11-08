@@ -67,6 +67,15 @@ dwv.App = function () {
   };
 
   /**
+   * Get the number of loaded data.
+   *
+   * @returns {number} The number.
+   */
+  this.getNumberOfLoadedData = function () {
+    return dataController.length();
+  };
+
+  /**
    * Can the data be scrolled?
    *
    * @returns {boolean} True if the data has a third dimension greater than one.
@@ -464,6 +473,29 @@ dwv.App = function () {
     }
     return configs;
   }
+
+  /**
+   * Set the data view configuration (see the init options for details).
+   *
+   * @param {object} configs The configuration list.
+   */
+  this.setDataViewConfig = function (configs) {
+    // clean up
+    stage.empty();
+    // set new
+    options.dataViewConfigs = configs;
+    // re-bind layers
+    stage.bindLayerGroups();
+  };
+
+  /**
+   * Set the layer groups binders.
+   *
+   * @param {Array} list The binders list.
+   */
+  this.setLayerGroupsBinders = function (list) {
+    stage.setBinders(list);
+  };
 
   /**
    * Render the current data.
