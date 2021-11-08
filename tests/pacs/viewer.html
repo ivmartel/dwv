@@ -148,8 +148,15 @@ document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedViewer)
 </div>
 
 <div class="line">
-<button id="reset">Reset Layout</button>
+<label for="changelayout">Layout:</label>
+<select name="layout" id="changelayout" disabled>
+ <option value="single">Single</option>
+ <option value="mpr">MPR</option>
+</select>
+<button id="resetlayout" disabled>Reset Layout</button>
 </div>
+
+<div class="line" id="binders">Binders:</div>
 
 <div id="layersdetails"></div>
 

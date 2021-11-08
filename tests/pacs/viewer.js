@@ -17,30 +17,18 @@ var _app = null;
  * Setup simple dwv app.
  */
 dwv.test.viewerSetup = function () {
-
   // stage options
   var dataViewConfigs;
   var viewOnFirstLoadItem = true;
 
-  // layer group binders
-  var binders = [];
-  var fullBinders = [
-    new dwv.gui.WindowLevelBinder(),
-    new dwv.gui.PositionBinder(),
-    new dwv.gui.ZoomBinder(),
-    new dwv.gui.OffsetBinder(),
-    new dwv.gui.OpacityBinder()
-  ];
-
   var mode = 0;
   if (mode === 0) {
     // simplest: one layer group
-    dataViewConfigs = createSimpleDataViewConfig();
+    dataViewConfigs = prepareAndGetSimpleDataViewConfig();
   } else if (mode === 1) {
     // MPR
     viewOnFirstLoadItem = false;
-    dataViewConfigs = createMPRDataViewConfig();
-    binders = fullBinders;
+    dataViewConfigs = prepareAndGetMPRDataViewConfig();
   } else if (mode === 2) {
     // multiple data, multiple layer group
     addLayerGroup('layerGroup0');
@@ -70,14 +58,12 @@ dwv.test.viewerSetup = function () {
         }
       ]
     };
-    binders = fullBinders;
   }
 
   // app config
   var config = {
     viewOnFirstLoadItem: viewOnFirstLoadItem,
     dataViewConfigs: dataViewConfigs,
-    binders: binders,
     tools: {
       Scroll: {},
       WindowLevel: {},
@@ -123,6 +109,11 @@ dwv.test.viewerSetup = function () {
       isFirstRender = false;
       // select tool
       _app.setTool('Scroll');
+
+      var changeLayoutSelect = document.getElementById('changelayout');
+      changeLayoutSelect.disabled = false;
+      var resetLayoutButton = document.getElementById('resetlayout');
+      resetLayoutButton.disabled = false;
     }
   });
 
@@ -179,10 +170,33 @@ dwv.test.onDOMContentLoadedViewer = function () {
     );
   });
 
-  var resetButton = document.getElementById('reset');
-  resetButton.addEventListener('click', function () {
+  var resetLayoutButton = document.getElementById('resetlayout');
+  resetLayoutButton.addEventListener('click', function () {
     _app.resetLayout();
   });
+
+  var changeLayoutSelect = document.getElementById('changelayout');
+  changeLayoutSelect.addEventListener('change', function (event) {
+    var configs;
+    var value = event.target.value;
+    if (value === 'mpr') {
+      configs = prepareAndGetMPRDataViewConfig();
+    } else {
+      configs = prepareAndGetSimpleDataViewConfig();
+    }
+
+    _app.setDataViewConfig(configs);
+
+    clearDataTable();
+    for (var i = 0; i < _app.getNumberOfLoadedData(); ++i) {
+      _app.render(i);
+      addDataRow(i, configs);
+    }
+
+    _app.setTool('Scroll');
+  });
+
+  setupBindersCheckboxes();
 
   // bind app to input files
   var fileinput = document.getElementById('fileinput');
@@ -199,11 +213,11 @@ dwv.test.onDOMContentLoadedViewer = function () {
  * @param {string} id The id of the layer.
  */
 function addLayerGroup(id) {
-  var layer = document.createElement('div');
-  layer.id = id;
-  layer.className = 'layerGroup';
+  var layerDiv = document.createElement('div');
+  layerDiv.id = id;
+  layerDiv.className = 'layerGroup';
   var root = document.getElementById('dwv');
-  root.appendChild(layer);
+  root.appendChild(layerDiv);
 }
 
 /**
@@ -211,7 +225,11 @@ function addLayerGroup(id) {
  *
  * @returns {object} The view config.
  */
-function createSimpleDataViewConfig() {
+function prepareAndGetSimpleDataViewConfig() {
+  // clean up
+  var dwvDiv = document.getElementById('dwv');
+  dwvDiv.innerHTML = '';
+  // add div
   addLayerGroup('layerGroup0');
   return {'*': [{divId: 'layerGroup0'}]};
 }
@@ -221,7 +239,11 @@ function createSimpleDataViewConfig() {
  *
  * @returns {object} The view config.
  */
-function createMPRDataViewConfig() {
+function prepareAndGetMPRDataViewConfig() {
+  // clean up
+  var dwvDiv = document.getElementById('dwv');
+  dwvDiv.innerHTML = '';
+  // add divs
   addLayerGroup('layerGroup0');
   addLayerGroup('layerGroup1');
   addLayerGroup('layerGroup2');
@@ -279,6 +301,63 @@ function getDataLayerGroupIds(dataViewConfig) {
 }
 
 /**
+ * Setup the binders checkboxes
+ */
+function setupBindersCheckboxes() {
+  var bindersDiv = document.getElementById('binders');
+  var propList = [
+    'WindowLevel',
+    'Position',
+    'Zoom',
+    'Offset',
+    'Opacity'
+  ];
+  var binders = [];
+  function addBinder(propName) {
+    binders.push(new dwv.gui[propName + 'Binder']);
+    _app.setLayerGroupsBinders(binders);
+  }
+  function removeBinder(propName) {
+    for (var i = 0; i < binders.length; ++i) {
+      if (binders[i] instanceof dwv.gui[propName + 'Binder']) {
+        binders.splice(i, 1);
+      }
+    }
+    console.log('remove', propName, binders);
+    _app.setBinders(binders);
+  }
+  function getOnInputChange(propName) {
+    return function (event) {
+      if (event.target.checked) {
+        addBinder(propName);
+      } else {
+        removeBinder(propName);
+      }
+    };
+  }
+  for (var i = 0; i < propList.length; ++i) {
+    var propName = propList[i];
+
+    var input = document.createElement('input');
+    input.id = i;
+    input.type = 'checkbox';
+    input.onchange = getOnInputChange(propName);
+
+    var label = document.createElement('label');
+    label.for = i;
+    label.appendChild(input);
+    label.appendChild(document.createTextNode(propName));
+
+    bindersDiv.appendChild(label);
+  }
+}
+
+function clearDataTable() {
+  var detailsDiv = document.getElementById('layersdetails');
+  detailsDiv.innerHTML = '';
+}
+
+/**
  * Add a data row.
  *
  * @param {number} id The data index.
@@ -286,8 +365,9 @@ function getDataLayerGroupIds(dataViewConfig) {
  */
 function addDataRow(id, dataViewConfigs) {
   var layerGroupIds = getLayerGroupIds(dataViewConfigs);
-
-  var vl = _app.getViewLayersByDataIndex(id)[0];
+  // use first view layer
+  var vls = _app.getViewLayersByDataIndex(id);
+  var vl = vls[0];
   var vc = vl.getViewController();
   var wl = vc.getWindowLevel();
 
