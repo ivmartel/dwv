@@ -313,19 +313,34 @@ function setupBindersCheckboxes() {
     'Opacity'
   ];
   var binders = [];
+  /**
+   * Add a binder.
+   *
+   * @param {string} propName The name of the property to bind.
+   */
   function addBinder(propName) {
     binders.push(new dwv.gui[propName + 'Binder']);
     _app.setLayerGroupsBinders(binders);
   }
+  /**
+   * Remove a binder.
+   *
+   * @param {string} propName The name of the property to bind.
+   */
   function removeBinder(propName) {
     for (var i = 0; i < binders.length; ++i) {
       if (binders[i] instanceof dwv.gui[propName + 'Binder']) {
         binders.splice(i, 1);
       }
     }
-    console.log('remove', propName, binders);
     _app.setBinders(binders);
   }
+  /**
+   * Get the input change handler for a binder.
+   *
+   * @param {string} propName The name of the property to bind.
+   * @returns {object} The handler.
+   */
   function getOnInputChange(propName) {
     return function (event) {
       if (event.target.checked) {
@@ -352,6 +367,9 @@ function setupBindersCheckboxes() {
   }
 }
 
+/**
+ * Clear the data table.
+ */
 function clearDataTable() {
   var detailsDiv = document.getElementById('layersdetails');
   detailsDiv.innerHTML = '';
