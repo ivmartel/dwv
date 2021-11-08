@@ -195,12 +195,19 @@ dwv.gui.Stage = function () {
   };
 
   /**
-   * Set the stage binders.
+   * Set the layer groups binders.
    *
    * @param {Array} list The list of binder objects.
    */
   this.setBinders = function (list) {
-    binders = list;
+    if (typeof list === 'undefined' || list === null) {
+      throw new Error('Cannot set null or undefined binders');
+    }
+    if (binders.length !== 0) {
+      this.unbindLayerGroups();
+    }
+    binders = list.slice();
+    this.bindLayerGroups();
   };
 
   /**
@@ -208,6 +215,9 @@ dwv.gui.Stage = function () {
    */
   this.empty = function () {
     this.unbindLayerGroups();
+    for (var i = 0; i < layerGroups.length; ++i) {
+      layerGroups[i].empty();
+    }
     layerGroups = [];
     activeLayerGroupIndex = null;
   };
