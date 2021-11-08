@@ -333,7 +333,7 @@ function setupBindersCheckboxes() {
         binders.splice(i, 1);
       }
     }
-    _app.setBinders(binders);
+    _app.setLayerGroupsBinders(binders);
   }
   /**
    * Get the input change handler for a binder.
