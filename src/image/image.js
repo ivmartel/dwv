@@ -21,7 +21,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
    * Constant rescale slope and intercept (default).
    *
    * @private
-   * @type {number}
+   * @type {object}
    */
   var rsi = new dwv.image.RescaleSlopeAndIntercept(1, 0);
   /**
@@ -178,7 +178,11 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       if (typeof k === 'undefined') {
         throw new Error('Cannot get non constant RSI with empty slice index.');
       }
-      res = rsis[k];
+      if (typeof rsis[k] !== 'undefined') {
+        res = rsis[k];
+      } else {
+        dwv.logger.warn('undefined non constant rsi at ' + k);
+      }
     }
     return res;
   };
@@ -198,7 +202,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
         throw new Error(
           'Cannot store non constant RSI with empty slice index.');
       }
-      rsis[k] = inRsi;
+      rsis.splice(k, 0, inRsi);
     } else {
       if (!rsi.equals(inRsi)) {
         if (typeof k === 'undefined') {
@@ -216,7 +220,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
           }
           // store
           rsi = null;
-          rsis[k] = inRsi;
+          rsis.splice(k, 0, inRsi);
         }
       }
     }
