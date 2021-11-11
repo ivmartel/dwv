@@ -80,8 +80,8 @@ dwv.test.viewerSetup = function () {
   _app.addEventListener('error', function (event) {
     console.error('load error', event);
   });
-  _app.addEventListener('loadstart', function () {
-    console.time('load-data');
+  _app.addEventListener('loadstart', function (event) {
+    console.time('load-data-' + event.loadid);
     isFirstRender = true;
   });
   _app.addEventListener('loadprogress', function (event) {
@@ -101,7 +101,7 @@ dwv.test.viewerSetup = function () {
     ++dataLoad;
   });
   _app.addEventListener('loadend', function (event) {
-    console.timeEnd('load-data');
+    console.timeEnd('load-data-' + event.loadid);
     console.log(_app.getMetaData(event.loadid));
   });
   _app.addEventListener('renderend', function () {
