@@ -92,9 +92,9 @@ dwv.test.viewerSetup = function () {
     }
   });
   var dataLoad = 0;
-  _app.addEventListener('load', function () {
+  _app.addEventListener('load', function (event) {
     if (!viewOnFirstLoadItem) {
-      _app.render();
+      _app.render(event.loadid);
     }
     // add data control row
     addDataRow(dataLoad, dataViewConfigs);
