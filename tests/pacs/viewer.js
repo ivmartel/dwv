@@ -21,6 +21,9 @@ dwv.test.viewerSetup = function () {
   var dataViewConfigs;
   var viewOnFirstLoadItem = true;
 
+  // use for concurrent load
+  var numberOfDataToLoad = 1;
+
   var mode = 0;
   if (mode === 0) {
     // simplest: one layer group
@@ -76,19 +79,23 @@ dwv.test.viewerSetup = function () {
   _app.init(config);
 
   // bind events
-  var isFirstRender = null;
   _app.addEventListener('error', function (event) {
     console.error('load error', event);
   });
   _app.addEventListener('loadstart', function (event) {
     console.time('load-data-' + event.loadid);
-    isFirstRender = true;
   });
+  var dataLoadProgress = new Array(numberOfDataToLoad);
+  var sumReducer = function (sum, value) {
+    return sum + value;
+  };
   _app.addEventListener('loadprogress', function (event) {
     if (typeof event.lengthComputable !== 'undefined' &&
       event.lengthComputable) {
-      var percent = Math.ceil((event.loaded / event.total) * 100);
-      document.getElementById('loadprogress').value = percent;
+      dataLoadProgress[event.loadid] =
+        Math.ceil((event.loaded / event.total) * 100);
+      document.getElementById('loadprogress').value =
+        dataLoadProgress.reduce(sumReducer) / numberOfDataToLoad;
     }
   });
   var dataLoad = 0;
@@ -99,14 +106,8 @@ dwv.test.viewerSetup = function () {
     // add data control row
     addDataRow(dataLoad, dataViewConfigs);
     ++dataLoad;
-  });
-  _app.addEventListener('loadend', function (event) {
-    console.timeEnd('load-data-' + event.loadid);
-    console.log(_app.getMetaData(event.loadid));
-  });
-  _app.addEventListener('renderend', function () {
-    if (isFirstRender) {
-      isFirstRender = false;
+    // init gui
+    if (dataLoad === numberOfDataToLoad) {
       // select tool
       _app.setTool('Scroll');
 
@@ -115,6 +116,10 @@ dwv.test.viewerSetup = function () {
       var resetLayoutButton = document.getElementById('resetlayout');
       resetLayoutButton.disabled = false;
     }
+  });
+  _app.addEventListener('loadend', function (event) {
+    console.timeEnd('load-data-' + event.loadid);
+    console.log(_app.getMetaData(event.loadid));
   });
 
   _app.addEventListener('positionchange', function (event) {
