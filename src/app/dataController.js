@@ -55,10 +55,10 @@ dwv.ctrl.DataController = function () {
   /**
    * Set the image at a given index.
    *
-   * @param {object} image The image to set.
    * @param {number} index The index of the data.
+   * @param {object} image The image to set.
    */
-  this.setImage = function (image, index) {
+  this.setImage = function (index, image) {
     data[index].image = image;
     fireEvent({
       type: 'imagechange',

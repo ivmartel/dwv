@@ -60,11 +60,11 @@ dwv.App = function () {
   /**
    * Set the image.
    *
-   * @param {Image} img The associated image.
    * @param {number} index The data index.
+   * @param {Image} img The associated image.
    */
-  this.setImage = function (img, index) {
-    dataController.setImage(img, index);
+  this.setImage = function (index, img) {
+    dataController.setImage(index, img);
   };
   /**
    * Set the last image.
@@ -72,7 +72,7 @@ dwv.App = function () {
    * @param {Image} img The associated image.
    */
   this.setLastImage = function (img) {
-    dataController.setImage(img, dataController.length() - 1);
+    dataController.setImage(dataController.length() - 1, img);
   };
 
   /**
