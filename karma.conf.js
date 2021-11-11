@@ -29,7 +29,7 @@ module.exports = function (config) {
       {pattern: 'node_modules/benchmark/benchmark.js', watched: false},
       // test data
       {pattern: 'locales/**/translation.json', included: false, type: 'js'},
-      {pattern: 'tests/data/*.dcm', included: false},
+      {pattern: 'tests/data/**/*.dcm', included: false},
       {pattern: 'tests/data/DICOMDIR', included: false},
       {pattern: 'tests/data/*.dcmdir', included: false},
       {pattern: 'tests/data/*.zip', included: false},
