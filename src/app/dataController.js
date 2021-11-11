@@ -19,14 +19,6 @@ dwv.ctrl.DataController = function () {
   var data = [];
 
   /**
-   * Current data index.
-   *
-   * @private
-   * @type {number}
-   */
-  var currentIndex = null;
-
-  /**
    * Listener handler.
    *
    * @type {object}
@@ -47,7 +39,6 @@ dwv.ctrl.DataController = function () {
    * Reset the class: empty the data storage.
    */
   this.reset = function () {
-    currentIndex = null;
     data = [];
   };
 
@@ -59,15 +50,6 @@ dwv.ctrl.DataController = function () {
    */
   this.get = function (index) {
     return data[index];
-  };
-
-  /**
-   * Get the current data index.
-   *
-   * @returns {number} The index.
-   */
-  this.getCurrentIndex = function () {
-    return currentIndex;
   };
 
   /**
@@ -91,7 +73,6 @@ dwv.ctrl.DataController = function () {
    * @param {object} meta The image meta.
    */
   this.addNew = function (image, meta) {
-    currentIndex = data.length;
     // store the new image
     data.push({
       image: image,
@@ -102,13 +83,14 @@ dwv.ctrl.DataController = function () {
   /**
    * Update the current data.
    *
+   * @param {number} index The index of the data.
    * @param {object} image The image.
    * @param {object} meta The image meta.
    */
-  this.updateCurrent = function (image, meta) {
-    var currentData = data[currentIndex];
+  this.update = function (index, image, meta) {
+    var dataToUpdate = data[index];
     // add slice to current image
-    currentData.image.appendSlice(image);
+    dataToUpdate.image.appendSlice(image);
     // update meta data
     var idKey = '';
     if (typeof meta.x00020010 !== 'undefined') {
@@ -117,8 +99,8 @@ dwv.ctrl.DataController = function () {
     } else {
       idKey = 'imageUid';
     }
-    currentData.meta = dwv.utils.mergeObjects(
-      currentData.meta,
+    dataToUpdate.meta = dwv.utils.mergeObjects(
+      dataToUpdate.meta,
       getMetaObject(meta),
       idKey,
       'value');

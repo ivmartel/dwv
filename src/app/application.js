@@ -522,8 +522,8 @@ dwv.App = function () {
    * @param {number} dataIndex The data index to render.
    */
   this.render = function (dataIndex) {
-    if (typeof dataIndex === 'undefined') {
-      dataIndex = dataController.getCurrentIndex();
+    if (typeof dataIndex === 'undefined' || dataIndex === null) {
+      throw new Error('Cannot render without data index');
     }
     // loop on all configs
     var viewConfigs = getViewConfigs(dataIndex);
@@ -982,8 +982,8 @@ dwv.App = function () {
       if (isFirstLoadItem) {
         dataController.addNew(event.data.image, event.data.info);
       } else {
-        dataController.updateCurrent(
-          event.data.image, event.data.info);
+        dataController.update(
+          event.loadid, event.data.image, event.data.info);
       }
       eventMetaData = event.data.info;
     } else if (event.loadtype === 'state') {
