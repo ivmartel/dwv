@@ -102,8 +102,10 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
         return sum + value;
       };
       var mean = deltas.reduce(sumReducer) / deltas.length;
-      dwv.logger.warn('Varying slice spacing, mean delta: ' +
-        mean.toFixed(3) + ' (' + deltas.length + ' case(s))');
+      if (mean > 1e-4) {
+        dwv.logger.warn('Varying slice spacing, mean delta: ' +
+          mean.toFixed(3) + ' (' + deltas.length + ' case(s))');
+      }
     }
     return spacing;
   };
