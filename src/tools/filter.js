@@ -461,7 +461,7 @@ dwv.tool.RunFilterCommand = function (filter, app) {
     // run filter and set app image
     app.setLastImage(filter.update());
     // update display
-    app.render();
+    app.render(0); //todo: fix
     /**
      * Filter run event.
      *
@@ -487,7 +487,7 @@ dwv.tool.RunFilterCommand = function (filter, app) {
     // reset the image
     app.setLastImage(filter.getOriginalImage());
     // update display
-    app.render();
+    app.render(0); //todo: fix
     /**
      * Filter undo event.
      *
