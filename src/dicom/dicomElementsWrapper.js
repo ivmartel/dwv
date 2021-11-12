@@ -72,7 +72,7 @@ dwv.dicom.DicomElementsWrapper = function (dicomElements) {
     var tagObj = new dwv.dicom.Tag(tag.group, tag.element);
     var name = tagObj.getNameFromDictionary();
     if (name === null) {
-      name = 'Unknown Tag & Data';
+      name = tagObj.getKey2();
     }
     return name;
   };

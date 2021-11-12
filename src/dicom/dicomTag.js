@@ -65,6 +65,15 @@ dwv.dicom.Tag.prototype.getKey = function () {
 };
 
 /**
+ * Get a simplified group-element key.
+ *
+ * @returns {string} The key.
+ */
+dwv.dicom.Tag.prototype.getKey2 = function () {
+  return this.getGroup().substr(2, 6) + this.getElement().substr(2, 6);
+};
+
+/**
  * Get the group name as defined in dwv.dicom.TagGroups.
  *
  * @returns {string} The name.
