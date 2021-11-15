@@ -493,9 +493,9 @@ dwv.image.View = function (image) {
    * @param {boolean} silent If true, does not fire a positionchange event.
    * @returns {boolean} False if not in bounds.
    */
-  this.setCurrentIndex = function (index) {
+  this.setCurrentIndex = function (index, silent) {
     var geometry = this.getImage().getGeometry();
-    return this.setCurrentPosition(geometry.indexToWorld(index));
+    return this.setCurrentPosition(geometry.indexToWorld(index), silent);
   };
 
   /**
