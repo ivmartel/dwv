@@ -487,6 +487,18 @@ dwv.image.View = function (image) {
   };
 
   /**
+   * Set the current index.
+   *
+   * @param {object} index The index.
+   * @param {boolean} silent If true, does not fire a positionchange event.
+   * @returns {boolean} False if not in bounds.
+   */
+  this.setCurrentIndex = function (index) {
+    var geometry = this.getImage().getGeometry();
+    return this.setCurrentPosition(geometry.indexToWorld(index));
+  };
+
+  /**
    * Set the view window/level.
    *
    * @param {number} center The window center.
