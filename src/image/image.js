@@ -338,6 +338,25 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   };
 
   /**
+   * Re-allocate buffer memory to an input size.
+   *
+   * @param {number} size The new size.
+   */
+  function realloc(size) {
+    // save buffer
+    var tmpBuffer = buffer;
+    // create new
+    buffer = dwv.dicom.getTypedArray(
+      buffer.BYTES_PER_ELEMENT * 8,
+      meta.IsSigned ? 1 : 0,
+      size);
+    // put old in new
+    buffer.set(tmpBuffer);
+    // clean
+    tmpBuffer = null;
+  }
+
+  /**
    * Append a slice to the image.
    *
    * @param {Image} rhs The slice to append.
@@ -381,20 +400,12 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     var sliceSize = numberOfComponents * size.getDimSize(2);
 
     // create full buffer if not done yet
+    if (typeof meta.numberOfFiles === 'undefined') {
+      throw new Error('Missing number of files for buffer manipulation.');
+    }
     var fullBufferSize = sliceSize * meta.numberOfFiles;
     if (buffer.length !== fullBufferSize) {
-      if (typeof meta.numberOfFiles === 'undefined') {
-        throw new Error('Missing number of files for buffer creation.');
-      }
-      // save old
-      var oldBuffer = buffer;
-      // create new
-      buffer = dwv.dicom.getTypedArray(
-        buffer.BYTES_PER_ELEMENT * 8,
-        meta.IsSigned ? 1 : 0,
-        fullBufferSize);
-      // put old in new
-      buffer.set(oldBuffer);
+      realloc(fullBufferSize);
     }
 
     // store slice
@@ -471,20 +482,12 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     // create full buffer if not done yet
     var size = geometry.getSize();
     var frameSize = numberOfComponents * size.getDimSize(2);
+    if (typeof meta.numberOfFiles === 'undefined') {
+      throw new Error('Missing number of files for frame buffer manipulation.');
+    }
     var fullBufferSize = frameSize * meta.numberOfFiles;
     if (buffer.length !== fullBufferSize) {
-      if (typeof meta.numberOfFiles === 'undefined') {
-        throw new Error('Missing number of files for buffer creation.');
-      }
-      // save old
-      var oldBuffer = buffer;
-      // create new
-      buffer = dwv.dicom.getTypedArray(
-        buffer.BYTES_PER_ELEMENT * 8,
-        meta.IsSigned ? 1 : 0,
-        fullBufferSize);
-      // put old in new
-      buffer.set(oldBuffer);
+      realloc(fullBufferSize);
     }
     // append
     if (frameIndex >= meta.numberOfFiles) {
