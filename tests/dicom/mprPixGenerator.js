@@ -36,10 +36,12 @@ var MPRPixGenerator = function (options) {
     for (var i = 0; i < imgs.length; ++i) {
       img = imgs[i];
       if (img.width !== halfNCols) {
-        throw Error('Image width mismatch: ' + img.width + '!=' + halfNCols);
+        throw new Error('Image width mismatch: ' +
+          img.width + '!=' + halfNCols);
       }
       if (img.height !== halfNRows) {
-        throw Error('Image height mismatch: ' + img.height + '!=' + halfNRows);
+        throw new Error('Image height mismatch: ' +
+          img.height + '!=' + halfNRows);
       }
     }
     // store
@@ -53,8 +55,8 @@ var MPRPixGenerator = function (options) {
 
   this.generate = function (pixelBuffer, sliceNumber) {
     if (sliceNumber > numberOfSlices) {
-      throw Error('Cannot generate slice, number is above size: ' +
-      sliceNumber + ', ' + numberOfSlices);
+      throw new Error('Cannot generate slice, number is above size: ' +
+        sliceNumber + ', ' + numberOfSlices);
     }
     // axial
     var offset = 0;

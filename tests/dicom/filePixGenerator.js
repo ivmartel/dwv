@@ -17,11 +17,11 @@ var FilePixGenerator = function (options) {
     for (var i = 0; i < imgs.length; ++i) {
       img = imgs[i];
       if (img.width !== numberOfColumns) {
-        throw Error('Image width mismatch: ' +
+        throw new Error('Image width mismatch: ' +
           img.width + '!=' + numberOfColumns);
       }
       if (img.height !== numberOfRows) {
-        throw Error('Image height mismatch: ' +
+        throw new Error('Image height mismatch: ' +
           img.height + '!=' + numberOfRows);
       }
     }
