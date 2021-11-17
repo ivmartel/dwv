@@ -92,14 +92,22 @@ dwv.image.Size.prototype.canScroll = function (viewOrientation) {
  * Get the size of a given dimension.
  *
  * @param {number} dimension The dimension.
+ * @param {number} start The start dimension to start counting from.
  * @returns {number} The size.
  */
-dwv.image.Size.prototype.getDimSize = function (dimension) {
+dwv.image.Size.prototype.getDimSize = function (dimension, start) {
   if (dimension > this.length()) {
     return null;
   }
+  if (typeof start === 'undefined') {
+    start = 0;
+  } else {
+    if (start < 0 || start > dimension) {
+      throw new Error('Invalid start value for getDimSize');
+    }
+  }
   var size = 1;
-  for (var i = 0; i < dimension; ++i) {
+  for (var i = start; i < dimension; ++i) {
     size *= this.get(i);
   }
   return size;
@@ -174,16 +182,20 @@ dwv.image.Size.prototype.isInBounds = function (index) {
  * @returns {number} The offset.
  */
 dwv.image.Size.prototype.indexToOffset = function (index, start) {
+  // TODO check for equality
+  if (index.length() < this.length()) {
+    throw new Error('Incompatible index and size length');
+  }
   if (typeof start === 'undefined') {
     start = 0;
   } else {
-    if (start < 0 || start > index.length - 1) {
+    if (start < 0 || start > this.length() - 1) {
       throw new Error('Invalid start value for indexToOffset');
     }
   }
   var offset = 0;
   for (var i = start; i < this.length(); ++i) {
-    offset += index.get(i) * this.getDimSize(i);
+    offset += index.get(i) * this.getDimSize(i, start);
   }
   return offset;
 };

@@ -100,32 +100,66 @@ QUnit.test('Test Size.', function (assert) {
  * @function module:tests/image~indexToOffset
  */
 QUnit.test('Test index to and from offset.', function (assert) {
-  var size0 = new dwv.image.Size([4, 4, 1]);
-
-  var testData = [
-    {vals: [0, 0, 0], offset: 0},
-    {vals: [1, 0, 0], offset: 1},
-    {vals: [2, 0, 0], offset: 2},
-    {vals: [3, 0, 0], offset: 3},
-    {vals: [0, 1, 0], offset: 4},
-    {vals: [1, 1, 0], offset: 5},
-    {vals: [2, 1, 0], offset: 6},
-    {vals: [3, 1, 0], offset: 7},
-    {vals: [0, 2, 0], offset: 8},
-    {vals: [1, 2, 0], offset: 9},
-    {vals: [2, 2, 0], offset: 10},
-    {vals: [3, 2, 0], offset: 11},
-    {vals: [0, 3, 0], offset: 12},
-    {vals: [1, 3, 0], offset: 13},
-    {vals: [2, 3, 0], offset: 14},
-    {vals: [3, 3, 0], offset: 15}
+  var size00 = new dwv.image.Size([4, 3, 2]);
+  var testData00 = [
+    {values: [0, 0, 0], offset: 0},
+    {values: [1, 0, 0], offset: 1},
+    {values: [2, 0, 0], offset: 2},
+    {values: [3, 0, 0], offset: 3},
+    {values: [0, 1, 0], offset: 4},
+    {values: [1, 1, 0], offset: 5},
+    {values: [2, 1, 0], offset: 6},
+    {values: [3, 1, 0], offset: 7},
+    {values: [0, 2, 0], offset: 8},
+    {values: [1, 2, 0], offset: 9},
+    {values: [2, 2, 0], offset: 10},
+    {values: [3, 2, 0], offset: 11},
+    {values: [0, 0, 1], offset: 12},
+    {values: [1, 0, 1], offset: 13},
+    {values: [2, 0, 1], offset: 14},
+    {values: [3, 0, 1], offset: 15},
+    {values: [0, 1, 1], offset: 16},
+    {values: [1, 1, 1], offset: 17},
+    {values: [2, 1, 1], offset: 18},
+    {values: [3, 1, 1], offset: 19},
+    {values: [0, 2, 1], offset: 20},
+    {values: [1, 2, 1], offset: 21},
+    {values: [2, 2, 1], offset: 22},
+    {values: [3, 2, 1], offset: 23}
   ];
-  for (var i = 0; i < testData.length; ++i) {
-    var index = new dwv.math.Index(testData[i].vals);
-    var offset = testData[i].offset;
+  for (var i = 0; i < testData00.length; ++i) {
+    var index = new dwv.math.Index(testData00[i].values);
+    var offset = testData00[i].offset;
     assert.equal(
-      size0.indexToOffset(index), offset, 'indexToOffset #' + i);
+      size00.indexToOffset(index), offset, 'indexToOffset #' + i);
     assert.ok(
-      size0.offsetToIndex(offset).equals(index), 'offsetToIndex #' + i);
+      size00.offsetToIndex(offset).equals(index), 'offsetToIndex #' + i);
   }
+
+  // test indexToOffset with start
+  var size01 = new dwv.image.Size([5, 4, 3, 2]);
+  var index01 = new dwv.math.Index([0, 0, 0, 0]);
+  // error: start too big
+  assert.throws(function () {
+    size01.indexToOffset(index01, 4);
+  },
+  new Error('Invalid start value for indexToOffset'),
+  'indexToOffset start too big');
+  // error: index bad length
+  var index02 = new dwv.math.Index([0, 0, 0]);
+  assert.throws(function () {
+    size01.indexToOffset(index02, 2);
+  },
+  new Error('Incompatible index and size length'),
+  'indexToOffset start index bad length');
+  // no error
+  assert.equal(size01.indexToOffset(index01, 2), 0, 'indexToOffset start #0');
+  var index03 = new dwv.math.Index([0, 0, 1, 0]);
+  assert.equal(size01.indexToOffset(index03, 2), 1, 'indexToOffset start #1');
+  var index04 = new dwv.math.Index([0, 0, 0, 1]);
+  assert.equal(size01.indexToOffset(index04, 2), 3, 'indexToOffset start #2');
+  var index05 = new dwv.math.Index([0, 0, 3, 2]);
+  assert.equal(size01.indexToOffset(index05, 2), 9, 'indexToOffset start #3');
+  var index06 = new dwv.math.Index([0, 0, 3, 2]);
+  assert.equal(size01.indexToOffset(index06, 3), 2, 'indexToOffset start #4');
 });
