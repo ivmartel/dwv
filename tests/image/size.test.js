@@ -95,3 +95,39 @@ QUnit.test('Test Size.', function (assert) {
   assert.deepEqual(size0.get2D(), {x: 2, y: 3}, 'get2D 2,3,4');
 
 });
+
+/**
+ * Tests for {@link dwv.image.Size.indexToOffset}.
+ *
+ * @function module:tests/image~indexToOffset
+ */
+QUnit.test('Test index to and from offset.', function (assert) {
+  var size0 = new dwv.image.Size([4, 4, 1]);
+
+  var testData = [
+    {vals: [0, 0, 0], offset: 0},
+    {vals: [1, 0, 0], offset: 1},
+    {vals: [2, 0, 0], offset: 2},
+    {vals: [3, 0, 0], offset: 3},
+    {vals: [0, 1, 0], offset: 4},
+    {vals: [1, 1, 0], offset: 5},
+    {vals: [2, 1, 0], offset: 6},
+    {vals: [3, 1, 0], offset: 7},
+    {vals: [0, 2, 0], offset: 8},
+    {vals: [1, 2, 0], offset: 9},
+    {vals: [2, 2, 0], offset: 10},
+    {vals: [3, 2, 0], offset: 11},
+    {vals: [0, 3, 0], offset: 12},
+    {vals: [1, 3, 0], offset: 13},
+    {vals: [2, 3, 0], offset: 14},
+    {vals: [3, 3, 0], offset: 15}
+  ];
+  for (var i = 0; i < testData.length; ++i) {
+    var index = new dwv.math.Index(testData[i].vals);
+    var offset = testData[i].offset;
+    assert.equal(
+      size0.indexToOffset(index), offset, 'indexToOffset #' + i);
+    assert.ok(
+      size0.offsetToIndex(offset).equals(index), 'offsetToIndex #' + i);
+  }
+});

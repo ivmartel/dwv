@@ -38,11 +38,6 @@ QUnit.test('Test Geometry.', function (assert) {
   ];
   for (var i = 0; i < testData.length; ++i) {
     var index = new dwv.math.Index(testData[i].vals);
-    var offset = testData[i].offset;
-    assert.equal(
-      imgGeometry0.indexToOffset(index), offset, 'indexToOffset #' + i);
-    assert.ok(
-      imgGeometry0.offsetToIndex(offset).equals(index), 'offsetToIndex #' + i);
 
     var theoPoint = new dwv.math.Point3D(
       testData[i].vals[0], testData[i].vals[1], testData[i].vals[2]

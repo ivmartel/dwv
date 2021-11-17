@@ -567,7 +567,8 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
 dwv.image.Image.prototype.getValue = function (i, j, k, f) {
   var frame = (f || 0);
   var index = new dwv.math.Index([i, j, k, frame]);
-  return this.getValueAtOffset(this.getGeometry().indexToOffset(index));
+  return this.getValueAtOffset(
+    this.getGeometry().getSize().indexToOffset(index));
 };
 
 /**
@@ -578,7 +579,8 @@ dwv.image.Image.prototype.getValue = function (i, j, k, f) {
  * Warning: No size check...
  */
 dwv.image.Image.prototype.getValueAtIndex = function (index) {
-  return this.getValueAtOffset(this.getGeometry().indexToOffset(index));
+  return this.getValueAtOffset(
+    this.getGeometry().getSize().indexToOffset(index));
 };
 
 /**
@@ -613,7 +615,7 @@ dwv.image.Image.prototype.getRescaledValue = function (i, j, k, f) {
  */
 dwv.image.Image.prototype.getRescaledValueAtIndex = function (index) {
   return this.getRescaledValueAtOffset(
-    this.getGeometry().indexToOffset(index)
+    this.getGeometry().getSize().indexToOffset(index)
   );
 };
 
@@ -630,7 +632,7 @@ dwv.image.Image.prototype.getRescaledValueAtOffset = function (offset) {
     if (this.isConstantRSI()) {
       val = this.getRescaleSlopeAndIntercept().apply(val);
     } else {
-      var index = this.getGeometry().offsetToIndex(offset);
+      var index = this.getGeometry().getSize().offsetToIndex(offset);
       val = this.getRescaleSlopeAndIntercept(index.get(2)).apply(val);
     }
   }

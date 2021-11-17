@@ -282,7 +282,7 @@ dwv.image.getIteratorValues = function (iterator) {
  */
 dwv.image.getSliceIterator = function (
   image, position, isRescaled, viewOrientation) {
-  var geometry = image.getGeometry();
+  var size = image.getGeometry().getSize();
   // zero-ify non direction index
   var dirMax2Index = 2;
   if (viewOrientation && typeof viewOrientation !== 'undefined') {
@@ -293,7 +293,7 @@ dwv.image.getSliceIterator = function (
     return index === dirMax2Index ? element : 0;
   };
   var posStart = new dwv.math.Index(posValues.map(indexFilter));
-  var start = geometry.indexToOffset(posStart);
+  var start = size.indexToOffset(posStart);
 
   // default to non rescaled data
   if (typeof isRescaled === 'undefined') {
@@ -310,7 +310,6 @@ dwv.image.getSliceIterator = function (
     };
   }
 
-  var size = geometry.getSize();
   var ncols = size.get(0);
   var nrows = size.get(1);
   var nslices = size.get(2);
@@ -417,8 +416,7 @@ dwv.image.getRegionSliceIterator = function (
     };
   }
 
-  var geometry = image.getGeometry();
-  var size = geometry.getSize();
+  var size = image.getGeometry().getSize();
   if (typeof min === 'undefined') {
     min = new dwv.math.Point2D(0, 0);
   }
@@ -429,10 +427,10 @@ dwv.image.getRegionSliceIterator = function (
     );
   }
   // position to pixel for max: extra X is ok, remove extra Y
-  var startOffset = geometry.indexToOffset(position.getWithNew2D(
+  var startOffset = size.indexToOffset(position.getWithNew2D(
     min.getX(), min.getY()
   ));
-  var endOffset = geometry.indexToOffset(position.getWithNew2D(
+  var endOffset = size.indexToOffset(position.getWithNew2D(
     max.getX(), max.getY() - 1
   ));
 
@@ -476,8 +474,7 @@ dwv.image.getVariableRegionSliceIterator = function (
     };
   }
 
-  var geometry = image.getGeometry();
-  var size = geometry.getSize();
+  var size = image.getGeometry().getSize();
 
   var offsetRegions = [];
   var region;
@@ -508,10 +505,10 @@ dwv.image.getVariableRegionSliceIterator = function (
     return;
   }
 
-  var startOffset = geometry.indexToOffset(position.getWithNew2D(
+  var startOffset = size.indexToOffset(position.getWithNew2D(
     min[0], min[1]
   ));
-  var endOffset = geometry.indexToOffset(position.getWithNew2D(
+  var endOffset = size.indexToOffset(position.getWithNew2D(
     max[0], max[1]
   ));
 

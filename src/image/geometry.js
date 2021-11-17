@@ -288,41 +288,6 @@ dwv.image.Geometry.prototype.isInBounds = function (point3D) {
 };
 
 /**
- * Convert an index to an offset in memory.
- *
- * @param {object} index The index to convert.
- * @returns {number} The offset.
- */
-dwv.image.Geometry.prototype.indexToOffset = function (index) {
-  var size = this.getSize();
-  var offset = 0;
-  for (var i = 0; i < index.length(); ++i) {
-    offset += index.get(i) * size.getDimSize(i);
-  }
-  return offset;
-};
-
-/**
- * Convert an offset in memory to an index.
- *
- * @param {number} offset The offset to convert.
- * @returns {object} The index.
- */
-dwv.image.Geometry.prototype.offsetToIndex = function (offset) {
-  var size = this.getSize();
-  var values = new Array(size.length());
-  var off = offset;
-  var dimSize = 0;
-  for (var i = size.length() - 1; i > 0; --i) {
-    dimSize = size.getDimSize(i);
-    values[i] = Math.floor(off / dimSize);
-    off = off - values[i] * dimSize;
-  }
-  values[0] = off;
-  return new dwv.math.Index(values);
-};
-
-/**
  * Flip the K index.
  *
  * @param {object} size The image size.

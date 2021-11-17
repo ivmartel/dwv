@@ -167,6 +167,47 @@ dwv.image.Size.prototype.isInBounds = function (index) {
 };
 
 /**
+ * Convert an index to an offset in memory.
+ *
+ * @param {object} index The index to convert.
+ * @param {number} start The start dimension to base the offset on.
+ * @returns {number} The offset.
+ */
+dwv.image.Size.prototype.indexToOffset = function (index, start) {
+  if (typeof start === 'undefined') {
+    start = 0;
+  } else {
+    if (start < 0 || start > index.length - 1) {
+      throw new Error('Invalid start value for indexToOffset');
+    }
+  }
+  var offset = 0;
+  for (var i = start; i < this.length(); ++i) {
+    offset += index.get(i) * this.getDimSize(i);
+  }
+  return offset;
+};
+
+/**
+ * Convert an offset in memory to an index.
+ *
+ * @param {number} offset The offset to convert.
+ * @returns {object} The index.
+ */
+dwv.image.Size.prototype.offsetToIndex = function (offset) {
+  var values = new Array(this.length());
+  var off = offset;
+  var dimSize = 0;
+  for (var i = this.length() - 1; i > 0; --i) {
+    dimSize = this.getDimSize(i);
+    values[i] = Math.floor(off / dimSize);
+    off = off - values[i] * dimSize;
+  }
+  values[0] = off;
+  return new dwv.math.Index(values);
+};
+
+/**
  * Get the 2D base of this size.
  *
  * @returns {object} The 2D base [0,1] as {x,y}.
