@@ -1,10 +1,8 @@
 /**
  * Tests for the 'gui/LayerGroup.js' file.
  */
-/** @module tests/gui */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
-QUnit.module('gui');
 
 /**
  * Tests for {@link dwv.gui.LayerGroup} string id.

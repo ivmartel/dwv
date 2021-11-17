@@ -1,10 +1,8 @@
 /**
  * Tests for the 'dicom/dicomParser.js' file.
  */
-/** @module tests/dicom */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
-QUnit.module('dicomParser');
 
 // WARNING about PhantomJS 1.9
 // ---------------------------

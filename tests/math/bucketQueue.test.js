@@ -1,9 +1,10 @@
 /**
  * Tests for the 'math/BucketQueue.js' file.
  */
+/** @module tests/math */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
-QUnit.module('BucketQueue');
+QUnit.module('math');
 
 /**
  * Tests for {@link dwv.math.BucketQueue}.

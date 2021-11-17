@@ -6,10 +6,8 @@ dwv.test.data = dwv.test.data || {};
 /**
  * Tests for the 'image/iterator.js' file.
  */
-/** @module tests/image */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
-QUnit.module('image');
 
 /* eslint-disable array-element-newline */
 dwv.test.data.iterator0 = {

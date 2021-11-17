@@ -1,10 +1,8 @@
 /**
  * Tests for the 'utils/logger' file.
  */
-/** @module tests/utils */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
-QUnit.module('utils');
 
 /**
  * Tests for {@link dwv.utils.logger}.

@@ -7,7 +7,6 @@ dwv.test = dwv.test || {};
  */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
-QUnit.module('dicomWriter');
 
 /**
  * Tests for {@link dwv.dicom.DicomWriter} using simple DICOM data.

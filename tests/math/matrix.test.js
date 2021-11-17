@@ -4,7 +4,6 @@
 /** @module tests/math */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
-QUnit.module('matrix');
 
 /**
  * Tests for {@link dwv.math.Matrix33}.

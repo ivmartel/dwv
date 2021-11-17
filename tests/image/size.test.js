@@ -1,10 +1,8 @@
 /**
  * Tests for the 'image/size.js' file.
  */
-/** @module tests/image */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
-QUnit.module('image');
 
 /**
  * Tests for {@link dwv.image.Size}.
