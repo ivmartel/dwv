@@ -441,6 +441,9 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     this.setRescaleSlopeAndIntercept(
       rhs.getRescaleSlopeAndIntercept(), newSliceIndex);
 
+    // current number of images
+    var numberOfImages = imageUids.length;
+
     // insert sop instance UIDs
     imageUids.splice(newSliceIndex, 0, rhs.getImageUid());
 
@@ -452,17 +455,30 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       var pkey = null;
       for (var i = 0; i < keys.length; ++i) {
         pkey = keys[i];
-        if (typeof windowPresets[pkey] !== 'undefined') {
-          if (typeof windowPresets[pkey].perslice !== 'undefined' &&
-            windowPresets[pkey].perslice === true) {
-            // use first new preset wl...
+        var rhsPreset = rhsPresets[pkey];
+        var windowPreset = windowPresets[pkey];
+        if (typeof windowPreset !== 'undefined') {
+          // if not set or false, check perslice
+          if (typeof windowPreset.perslice === 'undefined' ||
+            windowPreset.perslice === false) {
+            // if different preset.wl, mark it as perslice
+            if (!windowPreset.wl[0].equals(rhsPreset.wl[0])) {
+              windowPreset.perslice = true;
+              // fill wl array with copy of wl[0]
+              // (loop on number of images minus the existing one)
+              for (var j = 0; j < numberOfImages - 1; ++j) {
+                windowPreset.wl.push(windowPreset.wl[0]);
+              }
+            }
+          }
+          // store (first) rhs preset.wl if needed
+          if (typeof windowPreset.perslice !== 'undefined' &&
+            windowPreset.perslice === true) {
             windowPresets[pkey].wl.splice(
-              newSliceIndex, 0, rhsPresets[pkey].wl[0]);
-          } else {
-            windowPresets[pkey] = rhsPresets[pkey];
+              newSliceIndex, 0, rhsPreset.wl[0]);
           }
         } else {
-          // update
+          // if not defined (it should be), store all
           windowPresets[pkey] = rhsPresets[pkey];
         }
       }

@@ -242,8 +242,7 @@ dwv.image.ImageFactory.prototype.create = function (
         }
         windowPresets[name] = {
           wl: [new dwv.image.WindowLevel(center, width)],
-          name: name,
-          perslice: true
+          name: name
         };
       }
       if (width === 0) {

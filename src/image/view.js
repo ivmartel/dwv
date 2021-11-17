@@ -571,16 +571,18 @@ dwv.image.View = function (image) {
     }
     // special min/max
     if (name === 'minmax' && typeof preset.wl === 'undefined') {
-      preset.wl = this.getWindowLevelMinMax();
+      preset.wl = [this.getWindowLevelMinMax()];
     }
-    // special 'perslice' case
+    // default to first
+    var wl = preset.wl[0];
+    // check if 'perslice' case
     if (typeof preset.perslice !== 'undefined' &&
       preset.perslice === true) {
-      preset = {wl: preset.wl[this.getCurrentIndex().get(2)]};
+      wl = preset.wl[this.getCurrentIndex().get(2)];
     }
     // set w/l
     this.setWindowLevel(
-      preset.wl.getCenter(), preset.wl.getWidth(), name, silent);
+      wl.getCenter(), wl.getWidth(), name, silent);
   };
 
   /**
