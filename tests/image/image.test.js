@@ -107,7 +107,7 @@ QUnit.test('Test Image getValue.', function (assert) {
   var slope1 = 2;
   var intercept1 = 10;
   var rsi1 = new dwv.image.RescaleSlopeAndIntercept(slope1, intercept1);
-  image1.setRescaleSlopeAndIntercept(rsi1, 0);
+  image1.setRescaleSlopeAndIntercept(rsi1, new dwv.math.Index([0, 0, 0]));
   // test its geometry
   assert.equal(image1.getGeometry(), imgGeometry0, 'Image geometry');
   // test its values

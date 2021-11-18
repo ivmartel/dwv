@@ -107,7 +107,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   this.getImageUid = function (index) {
     var uid = imageUids[0];
     if (imageUids.length !== 1 && typeof index !== 'undefined') {
-      uid = imageUids[index.get(2)];
+      uid = imageUids[this.getSecondaryOffset(index)];
     }
     return uid;
   };
@@ -167,45 +167,76 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   };
 
   /**
+   * Get the secondary offset max.
+   *
+   * @returns {number} The maximum offset.
+   */
+  function getSecondaryOffsetMax() {
+    return geometry.getSize().getTotalSize(2);
+  }
+
+  /**
+   * Get the secondary offset: an offset that takes into account
+   *   the slice and above dimension numbers.
+   *
+   * @param {object} index The index.
+   * @returns {number} The offset.
+   */
+  this.getSecondaryOffset = function (index) {
+    return geometry.getSize().indexToOffset(index, 2);
+  };
+
+  /**
    * Get the rescale slope and intercept.
    *
-   * @param {number} k The slice index (only needed for non constant rsi).
+   * @param {object} index The index (only needed for non constant rsi).
    * @returns {object} The rescale slope and intercept.
    */
-  this.getRescaleSlopeAndIntercept = function (k) {
+  this.getRescaleSlopeAndIntercept = function (index) {
     var res = rsi;
     if (!this.isConstantRSI()) {
-      if (typeof k === 'undefined') {
+      if (typeof index === 'undefined') {
         throw new Error('Cannot get non constant RSI with empty slice index.');
       }
-      if (typeof rsis[k] !== 'undefined') {
-        res = rsis[k];
+      var offset = this.getSecondaryOffset(index);
+      if (typeof rsis[offset] !== 'undefined') {
+        res = rsis[offset];
       } else {
-        dwv.logger.warn('undefined non constant rsi at ' + k);
+        dwv.logger.warn('undefined non constant rsi at ' + offset);
       }
     }
     return res;
   };
 
   /**
+   * Get the rsi at a specified (secondary) offset.
+   *
+   * @param {number} offset The desired (secondary) offset.
+   * @returns {object} The coresponding rsi.
+   */
+  function getRescaleSlopeAndInterceptAtOffset(offset) {
+    return rsis[offset];
+  }
+
+  /**
    * Set the rescale slope and intercept.
    *
    * @param {object} inRsi The input rescale slope and intercept.
-   * @param {number} k The slice index (only needed for non constant rsi).
+   * @param {number} offset The rsi offset (only needed for non constant rsi).
    */
-  this.setRescaleSlopeAndIntercept = function (inRsi, k) {
+  this.setRescaleSlopeAndIntercept = function (inRsi, offset) {
     // update identity flag
     isIdentityRSI = isIdentityRSI && inRsi.isID();
     // update constant flag
     if (!isConstantRSI) {
-      if (typeof k === 'undefined') {
+      if (typeof index === 'undefined') {
         throw new Error(
           'Cannot store non constant RSI with empty slice index.');
       }
-      rsis.splice(k, 0, inRsi);
+      rsis.splice(offset, 0, inRsi);
     } else {
       if (!rsi.equals(inRsi)) {
-        if (typeof k === 'undefined') {
+        if (typeof index === 'undefined') {
           // no slice index, replace existing
           rsi = inRsi;
         } else {
@@ -214,13 +245,12 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
           // switch to non constant mode
           rsis = [];
           // initialise RSIs
-          for (var s = 0, nslices = geometry.getSize().get(2);
-            s < nslices; ++s) {
-            rsis.push(rsi);
+          for (var i = 0, leni = getSecondaryOffsetMax(); i < leni; ++i) {
+            rsis.push(i);
           }
           // store
           rsi = null;
-          rsis.splice(k, 0, inRsi);
+          rsis.splice(offset, 0, inRsi);
         }
       }
     }
@@ -323,10 +353,9 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     if (this.isConstantRSI()) {
       copy.setRescaleSlopeAndIntercept(this.getRescaleSlopeAndIntercept());
     } else {
-      var nslices = this.getGeometry().getSize().get(2);
-      for (var k = 0; k < nslices; ++k) {
+      for (var i = 0; i < getSecondaryOffsetMax(); ++i) {
         copy.setRescaleSlopeAndIntercept(
-          this.getRescaleSlopeAndIntercept(k), k);
+          getRescaleSlopeAndInterceptAtOffset(i), i);
       }
     }
     // copy extras
@@ -434,18 +463,23 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     // add new slice content
     buffer.set(rhs.getBuffer(), newSliceOffset);
 
+    var values = new Array(geometry.getSize().length(), 0);
+    values[2] = newSliceIndex;
+    var index = new dwv.math.Index(values);
+    var secondaryOffset = this.getSecondaryOffset(index);
+
     // update geometry
     geometry.appendOrigin(rhs.getGeometry().getOrigin(), newSliceIndex);
     // update rsi
     // (rhs should just have one rsi)
     this.setRescaleSlopeAndIntercept(
-      rhs.getRescaleSlopeAndIntercept(), newSliceIndex);
+      rhs.getRescaleSlopeAndIntercept(), secondaryOffset);
 
     // current number of images
     var numberOfImages = imageUids.length;
 
     // insert sop instance UIDs
-    imageUids.splice(newSliceIndex, 0, rhs.getImageUid());
+    imageUids.splice(secondaryOffset, 0, rhs.getImageUid());
 
     // update window presets
     if (typeof meta.windowPresets !== 'undefined') {
@@ -475,7 +509,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
           if (typeof windowPreset.perslice !== 'undefined' &&
             windowPreset.perslice === true) {
             windowPresets[pkey].wl.splice(
-              newSliceIndex, 0, rhsPreset.wl[0]);
+              secondaryOffset, 0, rhsPreset.wl[0]);
           }
         } else {
           // if not defined (it should be), store all
@@ -594,13 +628,17 @@ dwv.image.Image.prototype.getValueAtIndex = function (index) {
  * Warning: No size check...
  */
 dwv.image.Image.prototype.getRescaledValue = function (i, j, k, f) {
-  var frame = (f || 0);
-  var val = this.getValue(i, j, k, frame);
+  if (typeof f === 'undefined') {
+    f = 0;
+  }
+  var val = this.getValue(i, j, k, f);
   if (!this.isIdentityRSI()) {
     if (this.isConstantRSI()) {
       val = this.getRescaleSlopeAndIntercept().apply(val);
     } else {
-      val = this.getRescaleSlopeAndIntercept(k).apply(val);
+      var values = [i, j, k, f];
+      var index = new dwv.math.Index(values);
+      val = this.getRescaleSlopeAndIntercept(index).apply(val);
     }
   }
   return val;
@@ -633,7 +671,7 @@ dwv.image.Image.prototype.getRescaledValueAtOffset = function (offset) {
       val = this.getRescaleSlopeAndIntercept().apply(val);
     } else {
       var index = this.getGeometry().getSize().offsetToIndex(offset);
-      val = this.getRescaleSlopeAndIntercept(index.get(2)).apply(val);
+      val = this.getRescaleSlopeAndIntercept(index).apply(val);
     }
   }
   return val;

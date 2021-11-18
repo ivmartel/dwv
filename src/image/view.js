@@ -203,10 +203,10 @@ dwv.image.View = function (image) {
     if (!this.getCurrentPosition()) {
       this.setInitialPosition();
     }
-    var sliceNumber = this.getCurrentIndex().get(2);
+    var currentIndex = this.getCurrentIndex();
     // use current rsi if not provided
     if (typeof rsi === 'undefined') {
-      rsi = image.getRescaleSlopeAndIntercept(sliceNumber);
+      rsi = image.getRescaleSlopeAndIntercept(currentIndex);
     }
 
     // get the current window level
@@ -217,7 +217,8 @@ dwv.image.View = function (image) {
       typeof windowPresets[currentPresetName].perslice !== 'undefined' &&
       windowPresets[currentPresetName].perslice === true) {
       // get the preset for this slice
-      wl = windowPresets[currentPresetName].wl[sliceNumber];
+      var offset = image.getSecondaryOffset(currentIndex);
+      wl = windowPresets[currentPresetName].wl[offset];
     }
     // regular case
     if (!wl) {
@@ -315,18 +316,16 @@ dwv.image.View = function (image) {
    * Add window presets to the existing ones.
    *
    * @param {object} presets The window presets.
-   * @param {number} k The slice the preset belong to.
    */
-  this.addWindowPresets = function (presets, k) {
+  this.addWindowPresets = function (presets) {
     var keys = Object.keys(presets);
     var key = null;
     for (var i = 0; i < keys.length; ++i) {
       key = keys[i];
       if (typeof windowPresets[key] !== 'undefined') {
         if (typeof windowPresets[key].perslice !== 'undefined' &&
-                    windowPresets[key].perslice === true) {
-          // use first new preset wl...
-          windowPresets[key].wl.splice(k, 0, presets[key].wl[0]);
+          windowPresets[key].perslice === true) {
+          throw new Error('Cannot add perslice preset');
         } else {
           windowPresets[key] = presets[key];
         }
@@ -578,7 +577,8 @@ dwv.image.View = function (image) {
     // check if 'perslice' case
     if (typeof preset.perslice !== 'undefined' &&
       preset.perslice === true) {
-      wl = preset.wl[this.getCurrentIndex().get(2)];
+      var offset = image.getSecondaryOffset(this.getCurrentIndex());
+      wl = preset.wl[offset];
     }
     // set w/l
     this.setWindowLevel(
