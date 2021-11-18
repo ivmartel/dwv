@@ -92,7 +92,7 @@ dwv.image.Size.prototype.canScroll = function (viewOrientation) {
  * Get the size of a given dimension.
  *
  * @param {number} dimension The dimension.
- * @param {number} start The start dimension to start counting from.
+ * @param {number} start Optional start dimension to start counting from.
  * @returns {number} The size.
  */
 dwv.image.Size.prototype.getDimSize = function (dimension, start) {
@@ -116,10 +116,11 @@ dwv.image.Size.prototype.getDimSize = function (dimension, start) {
 /**
  * Get the total size.
  *
+ * @param {number} start Optional start dimension to base the offset on.
  * @returns {number} The total size.
  */
-dwv.image.Size.prototype.getTotalSize = function () {
-  return this.getDimSize(this.length());
+dwv.image.Size.prototype.getTotalSize = function (start) {
+  return this.getDimSize(this.length(), start);
 };
 
 /**
@@ -178,7 +179,7 @@ dwv.image.Size.prototype.isInBounds = function (index) {
  * Convert an index to an offset in memory.
  *
  * @param {object} index The index to convert.
- * @param {number} start The start dimension to base the offset on.
+ * @param {number} start Optional start dimension to base the offset on.
  * @returns {number} The offset.
  */
 dwv.image.Size.prototype.indexToOffset = function (index, start) {
