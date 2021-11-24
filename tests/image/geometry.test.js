@@ -14,7 +14,7 @@ QUnit.module('image');
 QUnit.test('Test Geometry.', function (assert) {
   var size0 = 4;
   var imgSize0 = new dwv.image.Size([size0, size0, 1]);
-  var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+  var imgSpacing0 = new dwv.image.Spacing([1, 1, 1]);
   var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
   var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
 

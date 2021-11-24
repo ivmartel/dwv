@@ -68,7 +68,7 @@ QUnit.test('Test Image getValue.', function (assert) {
   // create a simple image
   var size0 = 4;
   var imgSize0 = new dwv.image.Size([size0, size0, 1]);
-  var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+  var imgSpacing0 = new dwv.image.Spacing([1, 1, 1]);
   var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
   var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
   var buffer0 = [];
@@ -142,7 +142,7 @@ QUnit.test('Test Image histogram.', function (assert) {
   // create a simple image
   var size0 = 4;
   var imgSize0 = new dwv.image.Size([size0, size0, 1]);
-  var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+  var imgSpacing0 = new dwv.image.Spacing([1, 1, 1]);
   var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
   var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
   var buffer0 = [];
@@ -190,7 +190,7 @@ QUnit.test('Test Image append slice.', function (assert) {
   var size = 4;
   var imgSize = new dwv.image.Size([size, size, 2]);
   var imgSizeMinusOne = new dwv.image.Size([size, size, 1]);
-  var imgSpacing = new dwv.image.Spacing(1, 1, 1);
+  var imgSpacing = new dwv.image.Spacing([1, 1, 1]);
   var imgOrigin = new dwv.math.Point3D(0, 0, 1);
   var imgGeometry0 = new dwv.image.Geometry(
     imgOrigin, imgSizeMinusOne, imgSpacing);
@@ -311,7 +311,7 @@ QUnit.test('Test Image convolute2D.', function (assert) {
   // create a simple image
   var size0 = 3;
   var imgSize0 = new dwv.image.Size([size0, size0, 1]);
-  var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+  var imgSpacing0 = new dwv.image.Spacing([1, 1, 1]);
   var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
   var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
   var buffer0 = [];
@@ -353,7 +353,7 @@ QUnit.test('Test Image transform.', function (assert) {
   // create a simple image
   var size0 = 3;
   var imgSize0 = new dwv.image.Size([size0, size0, 1]);
-  var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+  var imgSpacing0 = new dwv.image.Spacing([1, 1, 1]);
   var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
   var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
   var buffer0 = [];
@@ -409,7 +409,7 @@ QUnit.test('Test Image compose.', function (assert) {
   // create two simple images
   var size0 = 3;
   var imgSize0 = new dwv.image.Size([size0, size0, 1]);
-  var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+  var imgSpacing0 = new dwv.image.Spacing([1, 1, 1]);
   var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
   var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
   var buffer0 = [];
@@ -449,7 +449,7 @@ QUnit.test('Test ImageFactory.', function (assert) {
 
   var size0 = 3;
   var imgSize0 = new dwv.image.Size([size0, size0, 1]);
-  var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+  var imgSpacing0 = new dwv.image.Spacing([1, 1, 1]);
   var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
   var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
   var buffer0 = [];
@@ -465,7 +465,7 @@ QUnit.test('Test ImageFactory.', function (assert) {
   dicomElements0.x00280010 = {value: imgSize0.get(1)};
   // spacing
   dicomElements0.x00280030 = {
-    value: [imgSpacing0.getRowSpacing(), imgSpacing0.getColumnSpacing()]
+    value: [imgSpacing0.get(1), imgSpacing0.get(2)]
   };
   // transfer syntax (explicit VR)
   dicomElements0.x00020010 = {value: '1.2.840.10008.1.2.1'};

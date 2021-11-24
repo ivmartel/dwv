@@ -179,7 +179,7 @@ dwv.ctrl.ViewController = function (view) {
    */
   this.get2DSpacing = function () {
     var spacing = view.getImage().getGeometry().getSpacing();
-    return [spacing.getColumnSpacing(), spacing.getRowSpacing()];
+    return [spacing.get(0), spacing.get(1)];
   };
 
   /**
@@ -211,11 +211,9 @@ dwv.ctrl.ViewController = function (view) {
       sizeValues[2] = 1;
       var sliceSize = new dwv.image.Size(sizeValues);
       var orientedSpacing = image.getGeometry().getSpacing(orientation);
-      var sliceSpacing = new dwv.image.Spacing(
-        orientedSpacing.getColumnSpacing(),
-        orientedSpacing.getRowSpacing(),
-        1
-      );
+      var spacingValues = orientedSpacing.getValues();
+      spacingValues[2] = 1;
+      var sliceSpacing = new dwv.image.Spacing(spacingValues);
       var sliceOrigin = new dwv.math.Point3D(0, 0, 0);
       var sliceGeometry =
         new dwv.image.Geometry(sliceOrigin, sliceSize, sliceSpacing);
@@ -339,7 +337,8 @@ dwv.ctrl.ViewController = function (view) {
     var point = planeHelper.getDeOrientedVector3D(planePoint);
     // ~indexToWorld to not loose precision
     var geometry = view.getImage().getGeometry();
-    return geometry.pointToWorld(point);
+    var point3D = geometry.pointToWorld(point);
+    return this.getCurrentPosition().mergeWith3D(point3D);
   };
 
   /**
@@ -359,9 +358,9 @@ dwv.ctrl.ViewController = function (view) {
     var geometry = view.getImage().getGeometry();
     var spacing = geometry.getSpacing();
     return new dwv.math.Point3D(
-      point.getX() * spacing.getColumnSpacing(),
-      point.getY() * spacing.getRowSpacing(),
-      point.getZ() * spacing.getSliceSpacing());
+      point.getX() * spacing.get(0),
+      point.getY() * spacing.get(1),
+      point.getZ() * spacing.get(2));
   };
 
   /**

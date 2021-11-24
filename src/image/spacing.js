@@ -3,39 +3,65 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
- * 2D/3D Spacing class.
+ * Immutable Spacing class.
+ * Warning: the input array is NOT cloned, modifying it will
+ *  modify the index values.
  *
  * @class
- * @param {number} columnSpacing The column spacing.
- * @param {number} rowSpacing The row spacing.
- * @param {number} sliceSpacing The slice spacing.
+ * @param {Array} values The size values.
  */
-dwv.image.Spacing = function (columnSpacing, rowSpacing, sliceSpacing) {
-  /**
-   * Get the column spacing.
-   *
-   * @returns {number} The column spacing.
-   */
-  this.getColumnSpacing = function () {
-    return columnSpacing;
+dwv.image.Spacing = function (values) {
+  if (!values || typeof values === 'undefined') {
+    throw new Error('Cannot create spacing with no values.');
+  }
+  if (values.length === 0) {
+    throw new Error('Cannot create spacing with empty values.');
+  }
+  var valueCheck = function (val) {
+    return !isNaN(val) && val !== 0;
   };
+  if (!values.every(valueCheck)) {
+    throw new Error('Cannot create spacing with non number or zero values.');
+  }
+
   /**
-   * Get the row spacing.
+   * Get the spacing value at the given array index.
    *
-   * @returns {number} The row spacing.
+   * @param {number} i The index to get.
+   * @returns {number} The value.
    */
-  this.getRowSpacing = function () {
-    return rowSpacing;
+  this.get = function (i) {
+    return values[i];
   };
+
   /**
-   * Get the slice spacing.
+   * Get the length of the spacing.
    *
-   * @returns {number} The slice spacing.
+   * @returns {number} The length.
    */
-  this.getSliceSpacing = function () {
-    return (sliceSpacing || 1.0);
+  this.length = function () {
+    return values.length;
   };
-};
+
+  /**
+   * Get a string representation of the spacing.
+   *
+   * @returns {string} The spacing as a string.
+   */
+  this.toString = function () {
+    return '(' + values.toString() + ')';
+  };
+
+  /**
+   * Get the values of this spacing.
+   *
+   * @returns {Array} The array of values.
+   */
+  this.getValues = function () {
+    return values.slice();
+  };
+
+}; // Spacing class
 
 /**
  * Check for equality.
@@ -44,21 +70,23 @@ dwv.image.Spacing = function (columnSpacing, rowSpacing, sliceSpacing) {
  * @returns {boolean} True if both objects are equal.
  */
 dwv.image.Spacing.prototype.equals = function (rhs) {
-  return rhs !== null &&
-    this.getColumnSpacing() === rhs.getColumnSpacing() &&
-    this.getRowSpacing() === rhs.getRowSpacing() &&
-    this.getSliceSpacing() === rhs.getSliceSpacing();
-};
-
-/**
- * Get a string representation of the Vector3D.
- *
- * @returns {string} The vector as a string.
- */
-dwv.image.Spacing.prototype.toString = function () {
-  return '(' + this.getColumnSpacing() +
-    ', ' + this.getRowSpacing() +
-    ', ' + this.getSliceSpacing() + ')';
+  // check input
+  if (!rhs) {
+    return false;
+  }
+  // check length
+  var length = this.length();
+  if (length !== rhs.length()) {
+    return false;
+  }
+  // check values
+  for (var i = 0; i < length; ++i) {
+    if (this.get(i) !== rhs.get(i)) {
+      return false;
+    }
+  }
+  // seems ok!
+  return true;
 };
 
 /**
@@ -68,7 +96,7 @@ dwv.image.Spacing.prototype.toString = function () {
  */
 dwv.image.Spacing.prototype.get2D = function () {
   return {
-    x: this.getColumnSpacing(),
-    y: this.getRowSpacing()
+    x: this.get(0),
+    y: this.get(1)
   };
 };
