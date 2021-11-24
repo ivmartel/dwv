@@ -31,14 +31,16 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    * Load a list of files. Can be image files or a state file.
    *
    * @param {Array} files The list of files to load.
+   * @param {object} options The options object, can contain:
+   *  - timepoint: an object with time information
    */
-  this.loadFiles = function (files) {
+  this.loadFiles = function (files, options) {
     // has been checked for emptiness.
     var ext = files[0].name.split('.').pop().toLowerCase();
     if (ext === 'json') {
-      loadStateFile(files[0]);
+      loadStateFile(files[0], options);
     } else {
-      loadImageFiles(files);
+      loadImageFiles(files, options);
     }
   };
 
@@ -90,14 +92,16 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    * Load a list of image files.
    *
    * @param {Array} files The list of image files to load.
+   * @param {object} options The options object, can contain:
+   *  - timepoint: an object with time information
    * @private
    */
-  function loadImageFiles(files) {
+  function loadImageFiles(files, options) {
     // create IO
     var fileIO = new dwv.io.FilesLoader();
     fileIO.setDefaultCharacterSet(defaultCharacterSet);
     // load data
-    loadData(files, fileIO, 'image');
+    loadData(files, fileIO, 'image', options);
   }
 
   /**
@@ -121,13 +125,14 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    * Load a State file.
    *
    * @param {string} file The state file to load.
+   * @param {object} options The options object.
    * @private
    */
-  function loadStateFile(file) {
+  function loadStateFile(file, options) {
     // create IO
     var fileIO = new dwv.io.FilesLoader();
     // load data
-    loadData([file], fileIO, 'state');
+    loadData([file], fileIO, 'state', options);
   }
 
   /**
@@ -156,11 +161,19 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    * @private
    */
   function loadData(data, loader, loadType, options) {
-    var loadId = getNextLoadId();
     var eventInfo = {
       loadtype: loadType,
-      loadid: loadId
     };
+
+    var loadId = null;
+    if (typeof options.timepoint !== 'undefined') {
+      loadId = options.timepoint.dataId;
+      eventInfo.timepoint = options.timepoint;
+    } else {
+      loadId = getNextLoadId();
+    }
+    eventInfo.loadid = loadId;
+
     // set callbacks
     loader.onloadstart = function (event) {
       // store loader to allow abort
@@ -179,6 +192,9 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
         loadid: loadId,
         isfirstitem: isFirstItem
       };
+      if (typeof options.timepoint !== 'undefined') {
+        eventInfoItem.timepoint = options.timepoint;
+      }
       augmentCallbackEvent(self.onloaditem, eventInfoItem)(event);
       if (isFirstItem) {
         currentLoaders[loadId].isFirstItem = false;

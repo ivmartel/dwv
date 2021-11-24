@@ -25,6 +25,22 @@ dwv.image.viewEventNames = [
  * (either directly or with helper methods).
  */
 dwv.image.View = function (image) {
+  // closure to self
+  var self = this;
+
+  // listen to appendframe event to update the current position
+  //   to add the extra dimension
+  image.addEventListener('appendframe', function () {
+    // update current position if first appendFrame
+    var position = self.getCurrentPosition();
+    if (position.length() === 3) {
+      // add dimension
+      var values = position.getValues();
+      values.push(0);
+      self.setCurrentPosition(new dwv.math.Point(values));
+    }
+  });
+
   /**
    * Window lookup tables, indexed per Rescale Slope and Intercept (RSI).
    *

@@ -99,6 +99,14 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   var histogram = null;
 
   /**
+   * Listener handler.
+   *
+   * @private
+   * @type {object}
+   */
+  var listenerHandler = new dwv.utils.ListenerHandler();
+
+  /**
    * Get the image UID at a given index.
    *
    * @param {object} index The index at which to get the id.
@@ -159,6 +167,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
    */
   this.canScroll = function (viewOrientation) {
     var size = this.getGeometry().getSize();
+    // also check the numberOfFiles in case we are in the middle of a load
     var nFiles = 1;
     if (typeof meta.numberOfFiles !== 'undefined') {
       nFiles = meta.numberOfFiles;
@@ -389,9 +398,12 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
    * Append a slice to the image.
    *
    * @param {Image} rhs The slice to append.
-   * @returns {number} The number of the inserted slice.
+   * @param {number} timeId An optional time ID.
    */
-  this.appendSlice = function (rhs) {
+  this.appendSlice = function (rhs, timeId) {
+    if (typeof timeId === 'undefined') {
+      timeId = 0;
+    }
     // check input
     if (rhs === null) {
       throw new Error('Cannot append null slice');
@@ -433,43 +445,55 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       throw new Error('Missing number of files for buffer manipulation.');
     }
     var fullBufferSize = sliceSize * meta.numberOfFiles;
+    if (size.length() === 4) {
+      fullBufferSize *= size.get(3);
+    }
     if (buffer.length !== fullBufferSize) {
       realloc(fullBufferSize);
     }
 
-    // store slice
-    var oldNumberOfSlices = size.get(2);
     var newSliceIndex = geometry.getSliceIndex(rhs.getGeometry().getOrigin());
-    var newSliceOffset = newSliceIndex * sliceSize;
-    // move content if needed
-    var start, end;
-    if (newSliceIndex === 0) {
-      // insert slice before current data
-      start = 0;
-      end = start + oldNumberOfSlices * sliceSize;
-      buffer.set(
-        buffer.subarray(start, end),
-        sliceSize
-      );
-    } else if (newSliceIndex < oldNumberOfSlices) {
-      // insert slice in between current data
-      start = newSliceOffset;
-      end = start + (oldNumberOfSlices - newSliceIndex) * sliceSize;
-      buffer.set(
-        buffer.subarray(start, end),
-        newSliceOffset + sliceSize
-      );
-    }
-    // add new slice content
-    buffer.set(rhs.getBuffer(), newSliceOffset);
-
-    var values = new Array(geometry.getSize().length(), 0);
+    var values = new Array(geometry.getSize().length());
+    values.fill(0);
     values[2] = newSliceIndex;
+    if (size.length() === 4) {
+      values[3] = timeId;
+    }
     var index = new dwv.math.Index(values);
+    var primaryOffset = size.indexToOffset(index);
     var secondaryOffset = this.getSecondaryOffset(index);
 
+    // first frame special slice by slice append
+    if (timeId === 0) {
+      // store slice
+      var oldNumberOfSlices = size.get(2);
+      // move content if needed
+      var start = primaryOffset;
+      var end;
+      if (newSliceIndex === 0) {
+        // insert slice before current data
+        end = start + oldNumberOfSlices * sliceSize;
+        buffer.set(
+          buffer.subarray(start, end),
+          primaryOffset + sliceSize
+        );
+      } else if (newSliceIndex < oldNumberOfSlices) {
+        // insert slice in between current data
+        end = start + (oldNumberOfSlices - newSliceIndex) * sliceSize;
+        buffer.set(
+          buffer.subarray(start, end),
+          primaryOffset + sliceSize
+        );
+      }
+    }
+
+    // add new slice content
+    buffer.set(rhs.getBuffer(), primaryOffset);
+
     // update geometry
-    geometry.appendOrigin(rhs.getGeometry().getOrigin(), newSliceIndex);
+    if (timeId === 0) {
+      geometry.appendOrigin(rhs.getGeometry().getOrigin(), newSliceIndex);
+    }
     // update rsi
     // (rhs should just have one rsi)
     this.setRescaleSlopeAndIntercept(
@@ -517,9 +541,6 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
         }
       }
     }
-
-    // return the appended slice index
-    return newSliceIndex;
   };
 
   /**
@@ -536,6 +557,9 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       throw new Error('Missing number of files for frame buffer manipulation.');
     }
     var fullBufferSize = frameSize * meta.numberOfFiles;
+    if (size.length() === 4) {
+      fullBufferSize *= size.get(3);
+    }
     if (buffer.length !== fullBufferSize) {
       realloc(fullBufferSize);
     }
@@ -545,7 +569,15 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
         'Cannot append a frame at an index above the number of frames');
     }
     buffer.set(frameBuffer, frameSize * frameIndex);
+  };
+
+  /**
+   * Append a frame to the image.
+   */
+  this.appendFrame = function () {
     geometry.appendFrame();
+    fireEvent({type: 'appendframe'});
+    // memory will be updated at the first appendSlice or appendFrameBuffer
   };
 
   /**
@@ -586,6 +618,38 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     }
     return histogram;
   };
+
+  /**
+   * Add an event listener to this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type, will be called with the fired event.
+   */
+  this.addEventListener = function (type, callback) {
+    listenerHandler.add(type, callback);
+  };
+
+  /**
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type.
+   */
+  this.removeEventListener = function (type, callback) {
+    listenerHandler.remove(type, callback);
+  };
+
+  /**
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
+   * @private
+   */
+  function fireEvent(event) {
+    listenerHandler.fireEvent(event);
+  }
 };
 
 /**

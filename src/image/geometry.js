@@ -213,10 +213,17 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
    *
    */
   this.appendFrame = function () {
-    // increment second dimension
-    var values = size.getValues();
-    values[2] += 1;
-    size = new dwv.image.Size(values);
+    // increment third dimension
+    var sizeValues = size.getValues();
+    var spacingValues = spacing.getValues();
+    if (sizeValues.length === 4) {
+      sizeValues[3] += 1;
+    } else {
+      sizeValues.push(2);
+      spacingValues.push(1);
+    }
+    size = new dwv.image.Size(sizeValues);
+    spacing = new dwv.image.Spacing(spacingValues);
   };
 
 };

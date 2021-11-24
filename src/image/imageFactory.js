@@ -55,14 +55,12 @@ dwv.image.ImageFactory.prototype.create = function (
     throw new Error('Missing or empty DICOM image number of rows');
   }
 
-  var sizeValues = [columns, rows];
+  var sizeValues = [columns, rows, 1];
 
   // frames
   var frames = dicomElements.getFromKey('x00280008');
   if (frames) {
     sizeValues.push(frames);
-  } else {
-    sizeValues.push(1);
   }
 
   // image size
