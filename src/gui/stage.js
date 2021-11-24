@@ -29,10 +29,7 @@ dwv.gui.PositionBinder = function () {
   };
   this.getCallback = function (layerGroup) {
     return function (event) {
-      var pos = new dwv.math.Point3D(
-        event.value[1][0],
-        event.value[1][1],
-        event.value[1][2]);
+      var pos = new dwv.math.Point(event.value[1]);
       var vc = layerGroup.getActiveViewLayer().getViewController();
       vc.setCurrentPosition(pos);
     };

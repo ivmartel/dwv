@@ -104,6 +104,24 @@ dwv.image.PlaneHelper = function (spacing, orientation) {
   };
 
   /**
+   * Orient an input point.
+   *
+   * @param {object} point The input point.
+   * @returns {object} The oriented point.
+   */
+  this.getOrientedPoint = function (point) {
+    var planePoint = point;
+    if (typeof orientation !== 'undefined') {
+      // abs? otherwise negative index...
+      // vector = orientation * planeVector
+      var point3D =
+        orientation.getInverse().getAbs().multiplyPoint3D(point.get3D());
+      planePoint = point.mergeWith3D(point3D);
+    }
+    return planePoint;
+  };
+
+  /**
    * De-orient an input vector.
    *
    * @param {object} planeVector The input vector.

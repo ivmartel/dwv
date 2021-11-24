@@ -39,9 +39,9 @@ QUnit.test('Test Geometry.', function (assert) {
   for (var i = 0; i < testData.length; ++i) {
     var index = new dwv.math.Index(testData[i].vals);
 
-    var theoPoint = new dwv.math.Point3D(
+    var theoPoint = new dwv.math.Point([
       testData[i].vals[0], testData[i].vals[1], testData[i].vals[2]
-    );
+    ]);
     var resPoint = imgGeometry0.indexToWorld(index);
     assert.true(theoPoint.equals(resPoint), 'indexToWorkd #' + i);
     var resPoint2 = imgGeometry0.worldToIndex(theoPoint);

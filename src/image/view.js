@@ -128,8 +128,14 @@ dwv.image.View = function (image) {
    */
   this.setInitialPosition = function () {
     var silent = true;
+
+    var geometry = image.getGeometry();
+    var values = new Array(geometry.getSize().length());
+    values.fill(0);
+    var index = new dwv.math.Index(values);
+
     this.setCurrentPosition(
-      image.getGeometry().getOrigin(),
+      geometry.indexToWorld(index),
       silent
     );
   };
@@ -425,21 +431,26 @@ dwv.image.View = function (image) {
       var posIndex = geometry.worldToIndex(newPosition);
       var diffDims = null;
       if (currentPosition) {
-        var diff = currentPosition.minus(newPosition);
-        if (diff.getX() !== 0) {
-          diffDims = diffDims || [];
-          diffDims.push(0);
-        }
-        if (diff.getY() !== 0) {
-          diffDims = diffDims || [];
-          diffDims.push(1);
-        }
-        if (diff.getZ() !== 0) {
-          diffDims = diffDims || [];
-          diffDims.push(2);
+        if (currentPosition.canCompare(newPosition)) {
+          diffDims = currentPosition.compare(newPosition);
+        } else {
+          diffDims = [];
+          var minLen = Math.min(currentPosition.length(), newPosition.length());
+          for (var i = 0; i < minLen; ++i) {
+            if (currentPosition.get(i) !== newPosition.get(i)) {
+              diffDims.push(i);
+            }
+          }
+          var maxLen = Math.max(currentPosition.length(), newPosition.length());
+          for (var j = minLen; j < maxLen; ++j) {
+            diffDims.push(j);
+          }
         }
       } else {
-        diffDims = [0, 1, 2, 3];
+        diffDims = [];
+        for (var k = 0; k < newPosition.length(); ++k) {
+          diffDims.push(k);
+        }
       }
 
       // assign
@@ -458,11 +469,7 @@ dwv.image.View = function (image) {
           type: 'positionchange',
           value: [
             posIndex.getValues(),
-            [
-              currentPosition.getX(),
-              currentPosition.getY(),
-              currentPosition.getZ()
-            ]
+            currentPosition.getValues(),
           ],
           diffDims: diffDims,
           data: {

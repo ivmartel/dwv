@@ -147,6 +147,19 @@ dwv.math.Matrix33.prototype.multiplyVector3D = function (vector3D) {
 };
 
 /**
+ * Multiply this matrix by a 3D point.
+ *
+ * @param {object} point3D The input 3D point.
+ * @returns {object} The result 3D point.
+ */
+dwv.math.Matrix33.prototype.multiplyPoint3D = function (point3D) {
+  var array3D = this.multiplyArray3D(
+    [point3D.getX(), point3D.getY(), point3D.getZ()]
+  );
+  return new dwv.math.Point3D(array3D[0], array3D[1], array3D[2]);
+};
+
+/**
  * Multiply this matrix by a 3D index.
  *
  * @param {object} index3D The input 3D index.
