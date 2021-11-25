@@ -603,7 +603,17 @@ dwv.gui.ViewLayer = function (containerDiv) {
   function onPositionChange(event) {
     if (typeof event.skipGenerate === 'undefined' ||
       event.skipGenerate === false) {
-      if (event.diffDims.includes(viewController.getScrollIndex())) {
+      // 3D dimensions
+      var dims3D = [0, 1, 2];
+      // remove scroll index
+      var indexScrollIndex = dims3D.indexOf(viewController.getScrollIndex());
+      dims3D.splice(indexScrollIndex, 1);
+      // remove non scroll index from diff dims
+      var diffDims = event.diffDims.filter(function (item) {
+        return dims3D.indexOf(item) === -1;
+      });
+      // update if we have something left
+      if (diffDims.length !== 0) {
         needsDataUpdate = true;
         self.draw();
       }

@@ -486,7 +486,7 @@ QUnit.test('Test getSliceIterator.', function (assert) {
   var imgSize00 = new dwv.image.Size([
     testData0.ncols, testData0.nrows, 1
   ]);
-  var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+  var imgSpacing0 = new dwv.image.Spacing([1, 1, 1]);
   var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
   var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize00, imgSpacing0);
   imgGeometry0.appendOrigin(new dwv.math.Point3D(0, 0, 1), 1);

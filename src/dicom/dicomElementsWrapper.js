@@ -543,8 +543,10 @@ dwv.dicom.DicomElementsWrapper.prototype.getPixelSpacing = function () {
     dwv.logger.warn('Zero row spacing.');
     rowSpacing = 1;
   }
+
   // return
-  return new dwv.image.Spacing(columnSpacing, rowSpacing);
+  // (slice spacing will be calculated using the image position patient)
+  return new dwv.image.Spacing([columnSpacing, rowSpacing, 1]);
 };
 
 /**

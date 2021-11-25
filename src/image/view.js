@@ -25,6 +25,22 @@ dwv.image.viewEventNames = [
  * (either directly or with helper methods).
  */
 dwv.image.View = function (image) {
+  // closure to self
+  var self = this;
+
+  // listen to appendframe event to update the current position
+  //   to add the extra dimension
+  image.addEventListener('appendframe', function () {
+    // update current position if first appendFrame
+    var position = self.getCurrentPosition();
+    if (position.length() === 3) {
+      // add dimension
+      var values = position.getValues();
+      values.push(0);
+      self.setCurrentPosition(new dwv.math.Point(values));
+    }
+  });
+
   /**
    * Window lookup tables, indexed per Rescale Slope and Intercept (RSI).
    *
@@ -128,8 +144,14 @@ dwv.image.View = function (image) {
    */
   this.setInitialPosition = function () {
     var silent = true;
+
+    var geometry = image.getGeometry();
+    var values = new Array(geometry.getSize().length());
+    values.fill(0);
+    var index = new dwv.math.Index(values);
+
     this.setCurrentPosition(
-      image.getGeometry().getOrigin(),
+      geometry.indexToWorld(index),
       silent
     );
   };
@@ -203,10 +225,10 @@ dwv.image.View = function (image) {
     if (!this.getCurrentPosition()) {
       this.setInitialPosition();
     }
-    var sliceNumber = this.getCurrentIndex().get(2);
+    var currentIndex = this.getCurrentIndex();
     // use current rsi if not provided
     if (typeof rsi === 'undefined') {
-      rsi = image.getRescaleSlopeAndIntercept(sliceNumber);
+      rsi = image.getRescaleSlopeAndIntercept(currentIndex);
     }
 
     // get the current window level
@@ -217,7 +239,8 @@ dwv.image.View = function (image) {
       typeof windowPresets[currentPresetName].perslice !== 'undefined' &&
       windowPresets[currentPresetName].perslice === true) {
       // get the preset for this slice
-      wl = windowPresets[currentPresetName].wl[sliceNumber];
+      var offset = image.getSecondaryOffset(currentIndex);
+      wl = windowPresets[currentPresetName].wl[offset];
     }
     // regular case
     if (!wl) {
@@ -315,18 +338,16 @@ dwv.image.View = function (image) {
    * Add window presets to the existing ones.
    *
    * @param {object} presets The window presets.
-   * @param {number} k The slice the preset belong to.
    */
-  this.addWindowPresets = function (presets, k) {
+  this.addWindowPresets = function (presets) {
     var keys = Object.keys(presets);
     var key = null;
     for (var i = 0; i < keys.length; ++i) {
       key = keys[i];
       if (typeof windowPresets[key] !== 'undefined') {
         if (typeof windowPresets[key].perslice !== 'undefined' &&
-                    windowPresets[key].perslice === true) {
-          // use first new preset wl...
-          windowPresets[key].wl.splice(k, 0, presets[key].wl[0]);
+          windowPresets[key].perslice === true) {
+          throw new Error('Cannot add perslice preset');
         } else {
           windowPresets[key] = presets[key];
         }
@@ -426,21 +447,26 @@ dwv.image.View = function (image) {
       var posIndex = geometry.worldToIndex(newPosition);
       var diffDims = null;
       if (currentPosition) {
-        var diff = currentPosition.minus(newPosition);
-        if (diff.getX() !== 0) {
-          diffDims = diffDims || [];
-          diffDims.push(0);
-        }
-        if (diff.getY() !== 0) {
-          diffDims = diffDims || [];
-          diffDims.push(1);
-        }
-        if (diff.getZ() !== 0) {
-          diffDims = diffDims || [];
-          diffDims.push(2);
+        if (currentPosition.canCompare(newPosition)) {
+          diffDims = currentPosition.compare(newPosition);
+        } else {
+          diffDims = [];
+          var minLen = Math.min(currentPosition.length(), newPosition.length());
+          for (var i = 0; i < minLen; ++i) {
+            if (currentPosition.get(i) !== newPosition.get(i)) {
+              diffDims.push(i);
+            }
+          }
+          var maxLen = Math.max(currentPosition.length(), newPosition.length());
+          for (var j = minLen; j < maxLen; ++j) {
+            diffDims.push(j);
+          }
         }
       } else {
-        diffDims = [0, 1, 2, 3];
+        diffDims = [];
+        for (var k = 0; k < newPosition.length(); ++k) {
+          diffDims.push(k);
+        }
       }
 
       // assign
@@ -459,11 +485,7 @@ dwv.image.View = function (image) {
           type: 'positionchange',
           value: [
             posIndex.getValues(),
-            [
-              currentPosition.getX(),
-              currentPosition.getY(),
-              currentPosition.getZ()
-            ]
+            currentPosition.getValues(),
           ],
           diffDims: diffDims,
           data: {
@@ -578,7 +600,8 @@ dwv.image.View = function (image) {
     // check if 'perslice' case
     if (typeof preset.perslice !== 'undefined' &&
       preset.perslice === true) {
-      wl = preset.wl[this.getCurrentIndex().get(2)];
+      var offset = image.getSecondaryOffset(this.getCurrentIndex());
+      wl = preset.wl[offset];
     }
     // set w/l
     this.setWindowLevel(

@@ -119,23 +119,21 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
   this.getSpacing = function (viewOrientation) {
     // update slice spacing after appendSlice
     if (newOrigins) {
-      spacing = new dwv.image.Spacing(
-        spacing.getColumnSpacing(),
-        spacing.getRowSpacing(),
-        this.getSliceGeometrySpacing()
-      );
+      var values = spacing.getValues();
+      values[2] = this.getSliceGeometrySpacing();
+      spacing = new dwv.image.Spacing(values);
       newOrigins = false;
     }
     var res = spacing;
     if (viewOrientation && typeof viewOrientation !== 'undefined') {
-      var values = dwv.math.getOrientedArray3D(
+      var orientedValues = dwv.math.getOrientedArray3D(
         [
-          spacing.getColumnSpacing(),
-          spacing.getRowSpacing(),
-          spacing.getSliceSpacing()
+          spacing.get(0),
+          spacing.get(1),
+          spacing.get(2)
         ],
         viewOrientation);
-      res = new dwv.image.Spacing(values[0], values[1], values[2]);
+      res = new dwv.image.Spacing(orientedValues);
     }
     return res;
   };
@@ -215,10 +213,17 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
    *
    */
   this.appendFrame = function () {
-    // increment second dimension
-    var values = size.getValues();
-    values[2] += 1;
-    size = new dwv.image.Size(values);
+    // increment third dimension
+    var sizeValues = size.getValues();
+    var spacingValues = spacing.getValues();
+    if (sizeValues.length === 4) {
+      sizeValues[3] += 1;
+    } else {
+      sizeValues.push(2);
+      spacingValues.push(1);
+    }
+    size = new dwv.image.Size(sizeValues);
+    spacing = new dwv.image.Spacing(spacingValues);
   };
 
 };
@@ -255,36 +260,49 @@ dwv.image.Geometry.prototype.equals = function (rhs) {
 dwv.image.Geometry.prototype.getRealSize = function () {
   var size = this.getSize();
   var spacing = this.getSpacing();
-  return [
-    size.get(0) * spacing.getColumnSpacing(),
-    size.get(1) * spacing.getRowSpacing(),
-    size.get(2) * spacing.getSliceSpacing(),
-  ];
+  var values = [];
+  for (var i = 0; i < size.length(); ++i) {
+    values.push(size.get(i) * spacing.get(i));
+  }
+  return values;
 };
 
 /**
  * Check that a point is within bounds.
  *
- * @param {object} point3D The point to check.
+ * @param {object} point The point to check.
  * @returns {boolean} True if the given coordinates are within bounds.
  */
-dwv.image.Geometry.prototype.isInBounds = function (point3D) {
+dwv.image.Geometry.prototype.isInBounds = function (point) {
   // since the origin is the lowest point, we can use it as min
-  var min = this.getOrigin();
+  var origin = this.getOrigin();
+  var spacing = this.getSpacing();
+  var min = new dwv.math.Point3D(
+    origin.getX() - spacing.get(0) / 2,
+    origin.getY() - spacing.get(1) / 2,
+    origin.getZ() - spacing.get(2) / 2
+  );
   var realSize = this.getRealSize();
   var max = new dwv.math.Point3D(
     min.getX() + realSize[0],
     min.getY() + realSize[1],
     min.getZ() + realSize[2]
   );
-
-  return point3D !== null &&
-    point3D.getX() >= min.getX() &&
-    point3D.getY() >= min.getY() &&
-    point3D.getZ() >= min.getZ() &&
-    point3D.getX() < max.getX() &&
-    point3D.getY() < max.getY() &&
-    point3D.getZ() < max.getZ();
+  var inBounds = point.get3D().isInBounds(min, max);
+  // other dimensions
+  if (point.length() > 3) {
+    var size = this.getSize();
+    if (size.length() === point.length()) {
+      for (var i = 3; i < point.length(); ++i) {
+        inBounds = inBounds &&
+          point.get(i) >= 0 &&
+          point.get(i) < size.get(i);
+      }
+    } else {
+      throw new Error('Incompatible point and size number of dimension');
+    }
+  }
+  return inBounds;
 };
 
 /**
@@ -311,10 +329,12 @@ dwv.image.Geometry.prototype.indexToWorld = function (index) {
   // flip K index (because of the slice order given by getSliceIndex)
   var k = flipK(this.getSize(), index.get(2));
 
-  return new dwv.math.Point3D(
-    origin.getX() + index.get(0) * spacing.getColumnSpacing(),
-    origin.getY() + index.get(1) * spacing.getRowSpacing(),
-    origin.getZ() + k * spacing.getSliceSpacing());
+  var values = index.getValues();
+  values[0] = origin.getX() + index.get(0) * spacing.get(0);
+  values[1] = origin.getY() + index.get(1) * spacing.get(1);
+  values[2] = origin.getZ() + k * spacing.get(2);
+
+  return new dwv.math.Point(values);
 };
 
 /**
@@ -331,9 +351,9 @@ dwv.image.Geometry.prototype.pointToWorld = function (point) {
   var k = flipK(this.getSize(), point.getZ());
 
   return new dwv.math.Point3D(
-    origin.getX() + point.getX() * spacing.getColumnSpacing(),
-    origin.getY() + point.getY() * spacing.getRowSpacing(),
-    origin.getZ() + k * spacing.getSliceSpacing());
+    origin.getX() + point.getX() * spacing.get(0),
+    origin.getY() + point.getY() * spacing.get(1),
+    origin.getZ() + k * spacing.get(2));
 };
 
 /**
@@ -345,13 +365,16 @@ dwv.image.Geometry.prototype.pointToWorld = function (point) {
 dwv.image.Geometry.prototype.worldToIndex = function (point) {
   var origin = this.getOrigin();
   var spacing = this.getSpacing();
+  var point3D = point.get3D();
 
-  return new dwv.math.Index([
-    Math.round((point.getX() - origin.getX()) / spacing.getColumnSpacing()),
-    Math.round((point.getY() - origin.getY()) / spacing.getRowSpacing()),
-    // flip K index (because of the slice order given by getSliceIndex)
-    flipK(this.getSize(),
-      Math.round((point.getZ() - origin.getZ()) / spacing.getSliceSpacing())
-    )
-  ]);
+  var values = point.getValues();
+  values[0] = Math.round(
+    (point3D.getX() - origin.getX()) / spacing.get(0));
+  values[1] = Math.round(
+    (point3D.getY() - origin.getY()) / spacing.get(1));
+  values[2] = flipK(this.getSize(),
+    Math.round((point3D.getZ() - origin.getZ()) / spacing.get(2))
+  );
+
+  return new dwv.math.Index(values);
 };

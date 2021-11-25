@@ -99,6 +99,14 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   var histogram = null;
 
   /**
+   * Listener handler.
+   *
+   * @private
+   * @type {object}
+   */
+  var listenerHandler = new dwv.utils.ListenerHandler();
+
+  /**
    * Get the image UID at a given index.
    *
    * @param {object} index The index at which to get the id.
@@ -107,7 +115,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   this.getImageUid = function (index) {
     var uid = imageUids[0];
     if (imageUids.length !== 1 && typeof index !== 'undefined') {
-      uid = imageUids[index.get(2)];
+      uid = imageUids[this.getSecondaryOffset(index)];
     }
     return uid;
   };
@@ -159,6 +167,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
    */
   this.canScroll = function (viewOrientation) {
     var size = this.getGeometry().getSize();
+    // also check the numberOfFiles in case we are in the middle of a load
     var nFiles = 1;
     if (typeof meta.numberOfFiles !== 'undefined') {
       nFiles = meta.numberOfFiles;
@@ -167,45 +176,76 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   };
 
   /**
+   * Get the secondary offset max.
+   *
+   * @returns {number} The maximum offset.
+   */
+  function getSecondaryOffsetMax() {
+    return geometry.getSize().getTotalSize(2);
+  }
+
+  /**
+   * Get the secondary offset: an offset that takes into account
+   *   the slice and above dimension numbers.
+   *
+   * @param {object} index The index.
+   * @returns {number} The offset.
+   */
+  this.getSecondaryOffset = function (index) {
+    return geometry.getSize().indexToOffset(index, 2);
+  };
+
+  /**
    * Get the rescale slope and intercept.
    *
-   * @param {number} k The slice index (only needed for non constant rsi).
+   * @param {object} index The index (only needed for non constant rsi).
    * @returns {object} The rescale slope and intercept.
    */
-  this.getRescaleSlopeAndIntercept = function (k) {
+  this.getRescaleSlopeAndIntercept = function (index) {
     var res = rsi;
     if (!this.isConstantRSI()) {
-      if (typeof k === 'undefined') {
+      if (typeof index === 'undefined') {
         throw new Error('Cannot get non constant RSI with empty slice index.');
       }
-      if (typeof rsis[k] !== 'undefined') {
-        res = rsis[k];
+      var offset = this.getSecondaryOffset(index);
+      if (typeof rsis[offset] !== 'undefined') {
+        res = rsis[offset];
       } else {
-        dwv.logger.warn('undefined non constant rsi at ' + k);
+        dwv.logger.warn('undefined non constant rsi at ' + offset);
       }
     }
     return res;
   };
 
   /**
+   * Get the rsi at a specified (secondary) offset.
+   *
+   * @param {number} offset The desired (secondary) offset.
+   * @returns {object} The coresponding rsi.
+   */
+  function getRescaleSlopeAndInterceptAtOffset(offset) {
+    return rsis[offset];
+  }
+
+  /**
    * Set the rescale slope and intercept.
    *
    * @param {object} inRsi The input rescale slope and intercept.
-   * @param {number} k The slice index (only needed for non constant rsi).
+   * @param {number} offset The rsi offset (only needed for non constant rsi).
    */
-  this.setRescaleSlopeAndIntercept = function (inRsi, k) {
+  this.setRescaleSlopeAndIntercept = function (inRsi, offset) {
     // update identity flag
     isIdentityRSI = isIdentityRSI && inRsi.isID();
     // update constant flag
     if (!isConstantRSI) {
-      if (typeof k === 'undefined') {
+      if (typeof index === 'undefined') {
         throw new Error(
           'Cannot store non constant RSI with empty slice index.');
       }
-      rsis.splice(k, 0, inRsi);
+      rsis.splice(offset, 0, inRsi);
     } else {
       if (!rsi.equals(inRsi)) {
-        if (typeof k === 'undefined') {
+        if (typeof index === 'undefined') {
           // no slice index, replace existing
           rsi = inRsi;
         } else {
@@ -214,13 +254,12 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
           // switch to non constant mode
           rsis = [];
           // initialise RSIs
-          for (var s = 0, nslices = geometry.getSize().get(2);
-            s < nslices; ++s) {
-            rsis.push(rsi);
+          for (var i = 0, leni = getSecondaryOffsetMax(); i < leni; ++i) {
+            rsis.push(i);
           }
           // store
           rsi = null;
-          rsis.splice(k, 0, inRsi);
+          rsis.splice(offset, 0, inRsi);
         }
       }
     }
@@ -323,10 +362,9 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     if (this.isConstantRSI()) {
       copy.setRescaleSlopeAndIntercept(this.getRescaleSlopeAndIntercept());
     } else {
-      var nslices = this.getGeometry().getSize().get(2);
-      for (var k = 0; k < nslices; ++k) {
+      for (var i = 0; i < getSecondaryOffsetMax(); ++i) {
         copy.setRescaleSlopeAndIntercept(
-          this.getRescaleSlopeAndIntercept(k), k);
+          getRescaleSlopeAndInterceptAtOffset(i), i);
       }
     }
     // copy extras
@@ -360,9 +398,12 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
    * Append a slice to the image.
    *
    * @param {Image} rhs The slice to append.
-   * @returns {number} The number of the inserted slice.
+   * @param {number} timeId An optional time ID.
    */
-  this.appendSlice = function (rhs) {
+  this.appendSlice = function (rhs, timeId) {
+    if (typeof timeId === 'undefined') {
+      timeId = 0;
+    }
     // check input
     if (rhs === null) {
       throw new Error('Cannot append null slice');
@@ -404,48 +445,65 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       throw new Error('Missing number of files for buffer manipulation.');
     }
     var fullBufferSize = sliceSize * meta.numberOfFiles;
+    if (size.length() === 4) {
+      fullBufferSize *= size.get(3);
+    }
     if (buffer.length !== fullBufferSize) {
       realloc(fullBufferSize);
     }
 
-    // store slice
-    var oldNumberOfSlices = size.get(2);
     var newSliceIndex = geometry.getSliceIndex(rhs.getGeometry().getOrigin());
-    var newSliceOffset = newSliceIndex * sliceSize;
-    // move content if needed
-    var start, end;
-    if (newSliceIndex === 0) {
-      // insert slice before current data
-      start = 0;
-      end = start + oldNumberOfSlices * sliceSize;
-      buffer.set(
-        buffer.subarray(start, end),
-        sliceSize
-      );
-    } else if (newSliceIndex < oldNumberOfSlices) {
-      // insert slice in between current data
-      start = newSliceOffset;
-      end = start + (oldNumberOfSlices - newSliceIndex) * sliceSize;
-      buffer.set(
-        buffer.subarray(start, end),
-        newSliceOffset + sliceSize
-      );
+    var values = new Array(geometry.getSize().length());
+    values.fill(0);
+    values[2] = newSliceIndex;
+    if (size.length() === 4) {
+      values[3] = timeId;
     }
+    var index = new dwv.math.Index(values);
+    var primaryOffset = size.indexToOffset(index);
+    var secondaryOffset = this.getSecondaryOffset(index);
+
+    // first frame special slice by slice append
+    if (timeId === 0) {
+      // store slice
+      var oldNumberOfSlices = size.get(2);
+      // move content if needed
+      var start = primaryOffset;
+      var end;
+      if (newSliceIndex === 0) {
+        // insert slice before current data
+        end = start + oldNumberOfSlices * sliceSize;
+        buffer.set(
+          buffer.subarray(start, end),
+          primaryOffset + sliceSize
+        );
+      } else if (newSliceIndex < oldNumberOfSlices) {
+        // insert slice in between current data
+        end = start + (oldNumberOfSlices - newSliceIndex) * sliceSize;
+        buffer.set(
+          buffer.subarray(start, end),
+          primaryOffset + sliceSize
+        );
+      }
+    }
+
     // add new slice content
-    buffer.set(rhs.getBuffer(), newSliceOffset);
+    buffer.set(rhs.getBuffer(), primaryOffset);
 
     // update geometry
-    geometry.appendOrigin(rhs.getGeometry().getOrigin(), newSliceIndex);
+    if (timeId === 0) {
+      geometry.appendOrigin(rhs.getGeometry().getOrigin(), newSliceIndex);
+    }
     // update rsi
     // (rhs should just have one rsi)
     this.setRescaleSlopeAndIntercept(
-      rhs.getRescaleSlopeAndIntercept(), newSliceIndex);
+      rhs.getRescaleSlopeAndIntercept(), secondaryOffset);
 
     // current number of images
     var numberOfImages = imageUids.length;
 
     // insert sop instance UIDs
-    imageUids.splice(newSliceIndex, 0, rhs.getImageUid());
+    imageUids.splice(secondaryOffset, 0, rhs.getImageUid());
 
     // update window presets
     if (typeof meta.windowPresets !== 'undefined') {
@@ -475,7 +533,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
           if (typeof windowPreset.perslice !== 'undefined' &&
             windowPreset.perslice === true) {
             windowPresets[pkey].wl.splice(
-              newSliceIndex, 0, rhsPreset.wl[0]);
+              secondaryOffset, 0, rhsPreset.wl[0]);
           }
         } else {
           // if not defined (it should be), store all
@@ -483,9 +541,6 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
         }
       }
     }
-
-    // return the appended slice index
-    return newSliceIndex;
   };
 
   /**
@@ -502,6 +557,9 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       throw new Error('Missing number of files for frame buffer manipulation.');
     }
     var fullBufferSize = frameSize * meta.numberOfFiles;
+    if (size.length() === 4) {
+      fullBufferSize *= size.get(3);
+    }
     if (buffer.length !== fullBufferSize) {
       realloc(fullBufferSize);
     }
@@ -511,7 +569,15 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
         'Cannot append a frame at an index above the number of frames');
     }
     buffer.set(frameBuffer, frameSize * frameIndex);
+  };
+
+  /**
+   * Append a frame to the image.
+   */
+  this.appendFrame = function () {
     geometry.appendFrame();
+    fireEvent({type: 'appendframe'});
+    // memory will be updated at the first appendSlice or appendFrameBuffer
   };
 
   /**
@@ -552,6 +618,38 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     }
     return histogram;
   };
+
+  /**
+   * Add an event listener to this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type, will be called with the fired event.
+   */
+  this.addEventListener = function (type, callback) {
+    listenerHandler.add(type, callback);
+  };
+
+  /**
+   * Remove an event listener from this class.
+   *
+   * @param {string} type The event type.
+   * @param {object} callback The method associated with the provided
+   *   event type.
+   */
+  this.removeEventListener = function (type, callback) {
+    listenerHandler.remove(type, callback);
+  };
+
+  /**
+   * Fire an event: call all associated listeners with the input event object.
+   *
+   * @param {object} event The event to fire.
+   * @private
+   */
+  function fireEvent(event) {
+    listenerHandler.fireEvent(event);
+  }
 };
 
 /**
@@ -594,13 +692,17 @@ dwv.image.Image.prototype.getValueAtIndex = function (index) {
  * Warning: No size check...
  */
 dwv.image.Image.prototype.getRescaledValue = function (i, j, k, f) {
-  var frame = (f || 0);
-  var val = this.getValue(i, j, k, frame);
+  if (typeof f === 'undefined') {
+    f = 0;
+  }
+  var val = this.getValue(i, j, k, f);
   if (!this.isIdentityRSI()) {
     if (this.isConstantRSI()) {
       val = this.getRescaleSlopeAndIntercept().apply(val);
     } else {
-      val = this.getRescaleSlopeAndIntercept(k).apply(val);
+      var values = [i, j, k, f];
+      var index = new dwv.math.Index(values);
+      val = this.getRescaleSlopeAndIntercept(index).apply(val);
     }
   }
   return val;
@@ -633,7 +735,7 @@ dwv.image.Image.prototype.getRescaledValueAtOffset = function (offset) {
       val = this.getRescaleSlopeAndIntercept().apply(val);
     } else {
       var index = this.getGeometry().getSize().offsetToIndex(offset);
-      val = this.getRescaleSlopeAndIntercept(index.get(2)).apply(val);
+      val = this.getRescaleSlopeAndIntercept(index).apply(val);
     }
   }
   return val;

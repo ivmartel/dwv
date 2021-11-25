@@ -66,7 +66,7 @@ dwv.tool.WindowLevel = function (app) {
     // add the manual preset to the view
     viewController.addWindowLevelPresets({
       manual: {
-        wl: new dwv.image.WindowLevel(windowCenter, windowWidth),
+        wl: [new dwv.image.WindowLevel(windowCenter, windowWidth)],
         name: 'manual'
       }
     });

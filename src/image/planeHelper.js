@@ -53,9 +53,9 @@ dwv.image.PlaneHelper = function (spacing, orientation) {
    */
   function offsetIndexToWorld(off) {
     return new dwv.math.Vector3D(
-      off.getX() * spacing.getColumnSpacing(),
-      off.getY() * spacing.getRowSpacing(),
-      off.getZ() * spacing.getSliceSpacing());
+      off.getX() * spacing.get(0),
+      off.getY() * spacing.get(1),
+      off.getZ() * spacing.get(2));
   }
 
   /**
@@ -66,9 +66,9 @@ dwv.image.PlaneHelper = function (spacing, orientation) {
    */
   function offsetWorldToIndex(off) {
     return new dwv.math.Vector3D(
-      off.x / spacing.getColumnSpacing(),
-      off.y / spacing.getRowSpacing(),
-      off.z / spacing.getSliceSpacing());
+      off.x / spacing.get(0),
+      off.y / spacing.get(1),
+      off.z / spacing.get(2));
   }
 
   /**
@@ -101,6 +101,24 @@ dwv.image.PlaneHelper = function (spacing, orientation) {
       planeIndex = orientation.getInverse().getAbs().multiplyIndex3D(index);
     }
     return planeIndex;
+  };
+
+  /**
+   * Orient an input point.
+   *
+   * @param {object} point The input point.
+   * @returns {object} The oriented point.
+   */
+  this.getOrientedPoint = function (point) {
+    var planePoint = point;
+    if (typeof orientation !== 'undefined') {
+      // abs? otherwise negative index...
+      // vector = orientation * planeVector
+      var point3D =
+        orientation.getInverse().getAbs().multiplyPoint3D(point.get3D());
+      planePoint = point.mergeWith3D(point3D);
+    }
+    return planePoint;
   };
 
   /**

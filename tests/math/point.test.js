@@ -85,3 +85,101 @@ QUnit.test('Test Point3D.', function (assert) {
   var p33 = new dwv.math.Point3D(0, 1, 3);
   assert.equal(p0.getDistance(p33), Math.sqrt(2), 'getDistance #4');
 });
+
+/**
+ * Tests for {@link dwv.math.Point}.
+ *
+ * @function module:tests/math~Point
+ */
+QUnit.test('Test Point.', function (assert) {
+  var p0 = new dwv.math.Point([1, 2, 3]);
+  // getX
+  assert.equal(p0.get(0), 1, 'getX');
+  // getY
+  assert.equal(p0.get(1), 2, 'getY');
+  // getZ
+  assert.equal(p0.get(2), 3, 'getZ');
+  // equals: true
+  var p1 = new dwv.math.Point([1, 2, 3]);
+  assert.equal(p0.equals(p1), true, 'equals true');
+  // equals: false
+  assert.equal(p0.equals(null), false, 'null equals false');
+  var p2 = new dwv.math.Point([3, 2, 1]);
+  assert.equal(p0.equals(p2), false, 'equals false');
+  // to string
+  assert.equal(p0.toString(), '(1,2,3)', 'toString');
+
+  // compare
+  var res30 = p0.compare(p0);
+  assert.equal(res30.length, 0, '[compare] #0');
+  var p31 = new dwv.math.Point([2, 3, 4]);
+  var res31 = p0.compare(p31);
+  assert.equal(res31.length, 3, '[compare] #1 length');
+  assert.equal(res31[0], 0, '[compare] #1 [0]');
+  assert.equal(res31[1], 1, '[compare] #1 [1]');
+  assert.equal(res31[2], 2, '[compare] #1 [2]');
+  var p32 = new dwv.math.Point([1, 3, 4]);
+  var res32 = p0.compare(p32);
+  assert.equal(res32.length, 2, '[compare] #2 length');
+  assert.equal(res32[0], 1, '[compare] #2 [0]');
+  assert.equal(res32[1], 2, '[compare] #2 [1]');
+
+  // addition
+  var p40 = new dwv.math.Point([2, 3, 4]);
+  var res40 = p0.add(p40);
+  assert.equal(res40.get(0), 3, '[add] get0');
+  assert.equal(res40.get(1), 5, '[add] get1');
+  assert.equal(res40.get(2), 7, '[add] get2');
+
+  // mergeWith3D
+  var p50 = new dwv.math.Point([1, 2, 3, 4]);
+  var p3D0 = new dwv.math.Point3D(5, 6, 7);
+  var res50 = p50.mergeWith3D(p3D0);
+  assert.equal(res50.length(), 4, '[merge] #0 length');
+  assert.equal(res50.get(0), 5, '[merge] #0 [0]');
+  assert.equal(res50.get(1), 6, '[merge] #0 [1]');
+  assert.equal(res50.get(2), 7, '[merge] #0 [2]');
+  assert.equal(res50.get(3), 4, '[merge] #0 [3]');
+
+  // isInBounds
+  var min60 = new dwv.math.Point([0, 1, 2]);
+  var max60 = new dwv.math.Point([2, 3, 4]);
+  assert.ok(p0.isInBounds(min60, max60), '[isInBounds] #0');
+  var min61 = new dwv.math.Point([2, 1, 2]);
+  assert.ok(!p0.isInBounds(min61, max60), '[isInBounds] #1');
+  var max62 = new dwv.math.Point([2, 3, 2]);
+  assert.ok(!p0.isInBounds(min60, max62), '[isInBounds] #2');
+});
+
+/**
+ * Tests for {@link dwv.math.Point} to and from stringId conversion.
+ *
+ * @function module:tests/math~Point
+ */
+QUnit.test('Test Point stringId.', function (assert) {
+  var i00 = new dwv.math.Point([1, 2, 3]);
+  var i00strId = '#0-1.0000_#1-2.0000_#2-3.0000';
+  assert.equal(i00.toStringId(), i00strId, 'toStringId #00');
+  assert.ok(dwv.math.getPointFromStringId(i00strId).equals(i00),
+    'getFromStringId #00');
+
+  var i01 = new dwv.math.Point([0, 2, 3]);
+  var i01strId = '#1-2.0000_#2-3.0000';
+  assert.equal(i01.toStringId(1), i01strId, 'toStringId #01');
+  assert.ok(dwv.math.getPointFromStringId(i01strId).equals(i01),
+    'getFromStringId #01');
+
+  var i02 = new dwv.math.Point([0, 0, 3]);
+  var i02strId = '#2-3.0000';
+  assert.equal(i02.toStringId(2), i02strId, 'toStringId #02');
+  assert.ok(dwv.math.getPointFromStringId(i02strId).equals(i02),
+    'getFromStringId #02');
+
+  // error case
+  var i10 = new dwv.math.Point([0, 0, 0]);
+  assert.throws(function () {
+    i10.toStringId(3);
+  },
+  new Error('Minimum dim cannot be equal or greater than length.'),
+  'toStringId error');
+});

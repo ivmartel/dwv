@@ -139,48 +139,6 @@ dwv.math.Index.prototype.getWithNew2D = function (i, j) {
 };
 
 /**
- * Get a string id from the index values in the form of: '#0-1_#1-2'.
- *
- * @param {number} minDim The start dimension.
- * @returns {string} The string id.
- */
-dwv.math.Index.prototype.toStringId = function (minDim) {
-  if (typeof minDim === 'undefined') {
-    minDim = 0;
-  }
-  if (minDim >= this.length()) {
-    throw new Error('Minimum dim cannot be equal or greater than length.');
-  }
-  var res = '';
-  for (var i = minDim; i < this.length(); ++i) {
-    if (i !== minDim) {
-      res += '_';
-    }
-    res += '#' + i + '-' + this.get(i);
-  }
-  return res;
-};
-
-/**
- * Get an index from a string in the form of: '(0,1,2)'
- * (result of index.toString).
- *
- * @param {string} inputStr The input string.
- * @returns {object} The corresponding index.
- */
-dwv.math.getFromString = function (inputStr) {
-  // remove parenthesis
-  var valStr = inputStr.substring(1, inputStr.length - 1);
-  // values
-  var strValues = valStr.split(',');
-  // string to int
-  var toint = function (value) {
-    return parseInt(value, 10);
-  };
-  return new dwv.math.Index(strValues.map(toint));
-};
-
-/**
  * Get an index with values set to 0 and the input size.
  *
  * @param {number} size The size of the index.

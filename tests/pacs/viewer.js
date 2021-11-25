@@ -12,6 +12,7 @@ dwv.image.decoderScripts = {
 dwv.logger.level = dwv.utils.logger.levels.DEBUG;
 
 var _app = null;
+var _mode = 0;
 
 /**
  * Setup simple dwv app.
@@ -24,15 +25,14 @@ dwv.test.viewerSetup = function () {
   // use for concurrent load
   var numberOfDataToLoad = 1;
 
-  var mode = 0;
-  if (mode === 0) {
+  if (_mode === 0) {
     // simplest: one layer group
     dataViewConfigs = prepareAndGetSimpleDataViewConfig();
-  } else if (mode === 1) {
+  } else if (_mode === 1) {
     // MPR
     viewOnFirstLoadItem = false;
     dataViewConfigs = prepareAndGetMPRDataViewConfig();
-  } else if (mode === 2) {
+  } else if (_mode === 2) {
     // multiple data, multiple layer group
     addLayerGroup('layerGroup0');
     addLayerGroup('layerGroup1');
@@ -61,6 +61,9 @@ dwv.test.viewerSetup = function () {
         }
       ]
     };
+  } else if (_mode === 3) {
+    // timepoint mode
+    dataViewConfigs = prepareAndGetSimpleDataViewConfig();
   }
 
   // app config
@@ -104,7 +107,9 @@ dwv.test.viewerSetup = function () {
       _app.render(event.loadid);
     }
     // add data control row
-    addDataRow(dataLoad, dataViewConfigs);
+    if (_mode !== 3) {
+      addDataRow(dataLoad, dataViewConfigs);
+    }
     ++dataLoad;
     // init gui
     if (dataLoad === numberOfDataToLoad) {
@@ -128,9 +133,11 @@ dwv.test.viewerSetup = function () {
       var str = val.toString();
       return str.slice(0, str.indexOf('.') + 2);
     };
-    input.value = toFixed2(event.value[1][0]) + ', ' +
-      toFixed2(event.value[1][1]) + ', ' +
-      toFixed2(event.value[1][2]);
+    var values = event.value[1];
+    input.value = values.map(toFixed2);
+    // index as small text
+    var span = document.getElementById('positionspan');
+    span.innerHTML = '(index: ' + event.value[0] + ')';
   });
 
   console.log(
@@ -204,11 +211,17 @@ dwv.test.onDOMContentLoadedViewer = function () {
   setupBindersCheckboxes();
 
   // bind app to input files
+  var timeId = -1;
   var fileinput = document.getElementById('fileinput');
   fileinput.addEventListener('change', function (event) {
+    ++timeId;
     console.log('%c ----------------', 'color: teal;');
     console.log(event.target.files);
-    _app.loadFiles(event.target.files);
+    var options = {};
+    if (_mode === 3) {
+      options = {timepoint: {id: timeId, dataId: 0}};
+    }
+    _app.loadFiles(event.target.files, options);
   });
 };
 

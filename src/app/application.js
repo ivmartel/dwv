@@ -386,6 +386,8 @@ dwv.App = function () {
    * Load a list of files. Can be image files or a state file.
    *
    * @param {Array} files The list of files to load.
+   * @param {object} options The options object, can contain:
+   *  - timepoint: an object with time information
    * @fires dwv.App#loadstart
    * @fires dwv.App#loadprogress
    * @fires dwv.App#loaditem
@@ -393,12 +395,12 @@ dwv.App = function () {
    * @fires dwv.App#error
    * @fires dwv.App#abort
    */
-  this.loadFiles = function (files) {
+  this.loadFiles = function (files, options) {
     if (files.length === 0) {
       dwv.logger.warn('Ignoring empty input file list.');
       return;
     }
-    loadController.loadFiles(files);
+    loadController.loadFiles(files, options);
   };
 
   /**
@@ -976,14 +978,20 @@ dwv.App = function () {
     }
 
     var isFirstLoadItem = event.isfirstitem;
+    var isTimepoint = typeof event.timepoint !== 'undefined';
+    var timeId = 0;
+    if (isTimepoint) {
+      timeId = event.timepoint.id;
+    }
 
     var eventMetaData = null;
     if (event.loadtype === 'image') {
-      if (isFirstLoadItem) {
+      if (isFirstLoadItem && timeId === 0) {
         dataController.addNew(event.data.image, event.data.info);
       } else {
         dataController.update(
-          event.loadid, event.data.image, event.data.info);
+          event.loadid, event.data.image, event.data.info,
+          timeId);
       }
       eventMetaData = event.data.info;
     } else if (event.loadtype === 'state') {
@@ -1226,7 +1234,7 @@ dwv.App = function () {
       // positionchange event like data (no need for index)
       var value = [
         null,
-        [pos.getX(), pos.getY(), pos.getZ()]
+        pos.getValues()
       ];
       layerGroup.updateLayersToPositionChange({value: value});
 

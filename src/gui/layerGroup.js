@@ -448,8 +448,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
       }
     }
 
-    var position = new dwv.math.Point3D(
-      event.value[1][0], event.value[1][1], event.value[1][2]);
+    var position = new dwv.math.Point(event.value[1]);
     // update position for all layers except the source one
     for (var i = 0; i < layers.length; ++i) {
       if (layers[i].getId() !== event.srclayerid) {

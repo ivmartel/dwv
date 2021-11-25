@@ -289,8 +289,9 @@ dwv.image.getSliceIterator = function (
     dirMax2Index = viewOrientation.getColAbsMax(2).index;
   }
   var posValues = position.getValues();
+  // keep the main direction and any other than 3D
   var indexFilter = function (element, index) {
-    return index === dirMax2Index ? element : 0;
+    return (index === dirMax2Index || index > 2) ? element : 0;
   };
   var posStart = new dwv.math.Index(posValues.map(indexFilter));
   var start = size.indexToOffset(posStart);
