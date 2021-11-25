@@ -12,7 +12,7 @@ dwv.image.decoderScripts = {
 dwv.logger.level = dwv.utils.logger.levels.DEBUG;
 
 var _app = null;
-var _mode = 3;
+var _mode = 0;
 
 /**
  * Setup simple dwv app.
