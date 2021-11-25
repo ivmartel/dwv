@@ -165,8 +165,15 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
       loadtype: loadType,
     };
 
+    // check if timepoint
+    var hasTimepoint = false;
+    if (typeof options !== 'undefined' &&
+      typeof options.timepoint !== 'undefined') {
+      hasTimepoint = true;
+    }
+
     var loadId = null;
-    if (typeof options.timepoint !== 'undefined') {
+    if (hasTimepoint) {
       loadId = options.timepoint.dataId;
       eventInfo.timepoint = options.timepoint;
     } else {
@@ -192,7 +199,7 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
         loadid: loadId,
         isfirstitem: isFirstItem
       };
-      if (typeof options.timepoint !== 'undefined') {
+      if (hasTimepoint) {
         eventInfoItem.timepoint = options.timepoint;
       }
       augmentCallbackEvent(self.onloaditem, eventInfoItem)(event);
