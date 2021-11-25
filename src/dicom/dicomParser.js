@@ -13,6 +13,22 @@ dwv.getVersion = function () {
 };
 
 /**
+ * Check that an input buffer includes the DICOM prefix 'DICM'
+ * after the 128 bytes preamble.
+ * Ref: [DICOM File Meta]{@link https://dicom.nema.org/dicom/2013/output/chtml/part10/chapter_7.html#sect_7.1}
+ *
+ * @param {ArrayBuffer} buffer The buffer to check.
+ * @returns {boolean} True if the buffer includes the prefix.
+ */
+dwv.dicom.hasDicomPrefix = function (buffer) {
+  var prefixArray = new Uint8Array(buffer, 128, 4);
+  var stringReducer = function (previous, current) {
+    return previous += String.fromCharCode(current);
+  };
+  return prefixArray.reduce(stringReducer, '') === 'DICM';
+};
+
+/**
  * Clean string: trim and remove ending.
  *
  * @param {string} inputStr The string to clean.
