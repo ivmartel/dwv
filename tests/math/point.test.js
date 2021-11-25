@@ -108,6 +108,47 @@ QUnit.test('Test Point.', function (assert) {
   assert.equal(p0.equals(p2), false, 'equals false');
   // to string
   assert.equal(p0.toString(), '(1,2,3)', 'toString');
+
+  // compare
+  var res30 = p0.compare(p0);
+  assert.equal(res30.length, 0, '[compare] #0');
+  var p31 = new dwv.math.Point([2, 3, 4]);
+  var res31 = p0.compare(p31);
+  assert.equal(res31.length, 3, '[compare] #1 length');
+  assert.equal(res31[0], 0, '[compare] #1 [0]');
+  assert.equal(res31[1], 1, '[compare] #1 [1]');
+  assert.equal(res31[2], 2, '[compare] #1 [2]');
+  var p32 = new dwv.math.Point([1, 3, 4]);
+  var res32 = p0.compare(p32);
+  assert.equal(res32.length, 2, '[compare] #2 length');
+  assert.equal(res32[0], 1, '[compare] #2 [0]');
+  assert.equal(res32[1], 2, '[compare] #2 [1]');
+
+  // addition
+  var p40 = new dwv.math.Point([2, 3, 4]);
+  var res40 = p0.add(p40);
+  assert.equal(res40.get(0), 3, '[add] get0');
+  assert.equal(res40.get(1), 5, '[add] get1');
+  assert.equal(res40.get(2), 7, '[add] get2');
+
+  // mergeWith3D
+  var p50 = new dwv.math.Point([1, 2, 3, 4]);
+  var p3D0 = new dwv.math.Point3D(5, 6, 7);
+  var res50 = p50.mergeWith3D(p3D0);
+  assert.equal(res50.length(), 4, '[merge] #0 length');
+  assert.equal(res50.get(0), 5, '[merge] #0 [0]');
+  assert.equal(res50.get(1), 6, '[merge] #0 [1]');
+  assert.equal(res50.get(2), 7, '[merge] #0 [2]');
+  assert.equal(res50.get(3), 4, '[merge] #0 [3]');
+
+  // isInBounds
+  var min60 = new dwv.math.Point([0, 1, 2]);
+  var max60 = new dwv.math.Point([2, 3, 4]);
+  assert.ok(p0.isInBounds(min60, max60), '[isInBounds] #0');
+  var min61 = new dwv.math.Point([2, 1, 2]);
+  assert.ok(!p0.isInBounds(min61, max60), '[isInBounds] #1');
+  var max62 = new dwv.math.Point([2, 3, 2]);
+  assert.ok(!p0.isInBounds(min60, max62), '[isInBounds] #2');
 });
 
 /**
