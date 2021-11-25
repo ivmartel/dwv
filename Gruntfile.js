@@ -12,7 +12,7 @@ module.exports = function (grunt) {
     pkg: grunt.file.readJSON('package.json'),
     eslint: {
       options: {
-        configFile: '.eslint-full.js'
+        overrideConfigFile: '.eslint-full.js'
       },
       files: [
         'Gruntfile.js',
