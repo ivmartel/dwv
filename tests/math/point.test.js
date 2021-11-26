@@ -140,15 +140,6 @@ QUnit.test('Test Point.', function (assert) {
   assert.equal(res50.get(1), 6, '[merge] #0 [1]');
   assert.equal(res50.get(2), 7, '[merge] #0 [2]');
   assert.equal(res50.get(3), 4, '[merge] #0 [3]');
-
-  // isInBounds
-  var min60 = new dwv.math.Point([0, 1, 2]);
-  var max60 = new dwv.math.Point([2, 3, 4]);
-  assert.ok(p0.isInBounds(min60, max60), '[isInBounds] #0');
-  var min61 = new dwv.math.Point([2, 1, 2]);
-  assert.ok(!p0.isInBounds(min61, max60), '[isInBounds] #1');
-  var max62 = new dwv.math.Point([2, 3, 2]);
-  assert.ok(!p0.isInBounds(min60, max62), '[isInBounds] #2');
 });
 
 /**

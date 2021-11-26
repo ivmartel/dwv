@@ -159,23 +159,6 @@ dwv.math.Point3D.prototype.minus = function (point3D) {
 };
 
 /**
- * Check that a point is within input bounds.
- *
- * @param {object} min The minimum point.
- * @param {object} max The maximum point.
- * @returns {boolean} True if the given coordinates are within bounds.
- */
-dwv.math.Point3D.prototype.isInBounds = function (min, max) {
-  return this.getX() >= min.getX() &&
-    this.getY() >= min.getY() &&
-    this.getZ() >= min.getZ() &&
-    this.getX() <= max.getX() &&
-    this.getY() <= max.getY() &&
-    this.getZ() <= max.getZ();
-};
-
-
-/**
  * Immutable point.
  * Warning: the input array is NOT cloned, modifying it will
  *  modify the index values.
@@ -338,28 +321,6 @@ dwv.math.Point.prototype.mergeWith3D = function (rhs) {
   values[1] = rhs.getY();
   values[2] = rhs.getZ();
   return new dwv.math.Point(values);
-};
-
-/**
- * Check that a point is within bounds.
- *
- * @param {object} min The minimum point.
- * @param {object} max The maximum point.
- * @returns {boolean} True if the given coordinates are within bounds.
- */
-dwv.math.Point.prototype.isInBounds = function (min, max) {
-  // check if can compare
-  if (!this.canCompare(min) || !this.canCompare(max)) {
-    return null;
-  }
-  // check values
-  for (var i = 0; i < this.length(); ++i) {
-    if (this.get(i) < min.get(i) || this.get(i) > max.get(i)) {
-      return false;
-    }
-  }
-  // all good
-  return true;
 };
 
 /**
