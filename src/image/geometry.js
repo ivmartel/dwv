@@ -44,6 +44,8 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
   };
   /**
    * Get the object size.
+   * Warning: the size comes as stored in DICOM, meaning that it could
+   * be oriented.
    *
    * @param {object} viewOrientation The view orientation (optional)
    * @returns {object} The object size.
@@ -112,6 +114,8 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
 
   /**
    * Get the object spacing.
+   * Warning: the size comes as stored in DICOM, meaning that it could
+   * be oriented.
    *
    * @param {object} viewOrientation The view orientation (optional)
    * @returns {object} The object spacing.
@@ -250,21 +254,6 @@ dwv.image.Geometry.prototype.equals = function (rhs) {
     this.getOrigin().equals(rhs.getOrigin()) &&
     this.getSize().equals(rhs.getSize()) &&
     this.getSpacing().equals(rhs.getSpacing());
-};
-
-/**
- * Get the real size (spacing * size).
- *
- * @returns {Array} The real size.
- */
-dwv.image.Geometry.prototype.getRealSize = function () {
-  var size = this.getSize();
-  var spacing = this.getSpacing();
-  var values = [];
-  for (var i = 0; i < size.length(); ++i) {
-    values.push(size.get(i) * spacing.get(i));
-  }
-  return values;
 };
 
 /**
