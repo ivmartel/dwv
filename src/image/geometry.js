@@ -270,39 +270,13 @@ dwv.image.Geometry.prototype.getRealSize = function () {
 /**
  * Check that a point is within bounds.
  *
- * @param {object} point The point to check.
+ * @param {dwv.math.Point} point The point to check.
  * @returns {boolean} True if the given coordinates are within bounds.
  */
 dwv.image.Geometry.prototype.isInBounds = function (point) {
-  // since the origin is the lowest point, we can use it as min
-  var origin = this.getOrigin();
-  var spacing = this.getSpacing();
-  var min = new dwv.math.Point3D(
-    origin.getX() - spacing.get(0) / 2,
-    origin.getY() - spacing.get(1) / 2,
-    origin.getZ() - spacing.get(2) / 2
-  );
-  var realSize = this.getRealSize();
-  var max = new dwv.math.Point3D(
-    min.getX() + realSize[0],
-    min.getY() + realSize[1],
-    min.getZ() + realSize[2]
-  );
-  var inBounds = point.get3D().isInBounds(min, max);
-  // other dimensions
-  if (point.length() > 3) {
-    var size = this.getSize();
-    if (size.length() === point.length()) {
-      for (var i = 3; i < point.length(); ++i) {
-        inBounds = inBounds &&
-          point.get(i) >= 0 &&
-          point.get(i) < size.get(i);
-      }
-    } else {
-      throw new Error('Incompatible point and size number of dimension');
-    }
-  }
-  return inBounds;
+  // get the corresponding index
+  var index = this.worldToIndex(point);
+  return this.getSize().isInBounds(index);
 };
 
 /**
@@ -319,62 +293,88 @@ function flipK(size, k) {
 /**
  * Convert an index into world coordinates.
  *
- * @param {object} index The index to convert.
- * @returns {dwv.image.Point3D} The corresponding point.
+ * @param {dwv.math.Index} index The index to convert.
+ * @returns {dwv.math.Point} The corresponding point.
  */
 dwv.image.Geometry.prototype.indexToWorld = function (index) {
-  var origin = this.getOrigin();
-  var spacing = this.getSpacing();
-
   // flip K index (because of the slice order given by getSliceIndex)
   var k = flipK(this.getSize(), index.get(2));
-
+  // apply spacing
+  // (spacing is oriented, apply before orientation)
+  var spacing = this.getSpacing();
+  var orientedPoint3D = new dwv.math.Point3D(
+    index.get(0) * spacing.get(0),
+    index.get(1) * spacing.get(1),
+    k * spacing.get(2)
+  );
+  // de-orient
+  var point3D = this.getOrientation().multiplyPoint3D(orientedPoint3D);
+  // keep >3d values
   var values = index.getValues();
-  values[0] = origin.getX() + index.get(0) * spacing.get(0);
-  values[1] = origin.getY() + index.get(1) * spacing.get(1);
-  values[2] = origin.getZ() + k * spacing.get(2);
-
+  var origin = this.getOrigin();
+  values[0] = origin.getX() + point3D.getX();
+  values[1] = origin.getY() + point3D.getY();
+  values[2] = origin.getZ() + point3D.getZ();
+  // return point
   return new dwv.math.Point(values);
 };
 
 /**
- * Convert a point into world coordinates.
+ * Convert a 3D point into world coordinates.
  *
- * @param {object} point The point to convert.
- * @returns {dwv.image.Point3D} The corresponding world point.
+ * @param {dwv.math.Point3D} point The 3D point to convert.
+ * @returns {dwv.math.Point3D} The corresponding world 3D point.
  */
 dwv.image.Geometry.prototype.pointToWorld = function (point) {
-  var origin = this.getOrigin();
-  var spacing = this.getSpacing();
-
   // flip K index (because of the slice order given by getSliceIndex)
   var k = flipK(this.getSize(), point.getZ());
-
+  // apply spacing
+  // (spacing is oriented, apply before orientation)
+  var spacing = this.getSpacing();
+  var orientedPoint3D = new dwv.math.Point3D(
+    point.getX() * spacing.get(0),
+    point.getY() * spacing.get(1),
+    k * spacing.get(2)
+  );
+  // de-orient
+  var point3D = this.getOrientation().multiplyPoint3D(orientedPoint3D);
+  // return point3D
+  var origin = this.getOrigin();
   return new dwv.math.Point3D(
-    origin.getX() + point.getX() * spacing.get(0),
-    origin.getY() + point.getY() * spacing.get(1),
-    origin.getZ() + k * spacing.get(2));
+    origin.getX() + point3D.getX(),
+    origin.getY() + point3D.getY(),
+    origin.getZ() + point3D.getZ()
+  );
 };
 
 /**
  * Convert world coordinates into an index.
  *
- * @param {object} point The point to convert.
- * @returns {dwv.image.Index} The corresponding index.
+ * @param {dwv.math.Point} point The point to convert.
+ * @returns {dwv.math.Index} The corresponding index.
  */
 dwv.image.Geometry.prototype.worldToIndex = function (point) {
+  // compensate for origin
+  // (origin is not oriented, compensate before orientation)
   var origin = this.getOrigin();
-  var spacing = this.getSpacing();
-  var point3D = point.get3D();
-
-  var values = point.getValues();
-  values[0] = Math.round(
-    (point3D.getX() - origin.getX()) / spacing.get(0));
-  values[1] = Math.round(
-    (point3D.getY() - origin.getY()) / spacing.get(1));
-  values[2] = flipK(this.getSize(),
-    Math.round((point3D.getZ() - origin.getZ()) / spacing.get(2))
+  var point3D = new dwv.math.Point3D(
+    point.get(0) - origin.getX(),
+    point.get(1) - origin.getY(),
+    point.get(2) - origin.getZ()
   );
-
+  // orient
+  var orientedPoint3D =
+    this.getOrientation().getInverse().multiplyPoint3D(point3D);
+  // keep >3d values
+  var values = point.getValues();
+  // apply spacing and round
+  var spacing = this.getSpacing();
+  values[0] = Math.round(orientedPoint3D.getX() / spacing.get(0));
+  values[1] = Math.round(orientedPoint3D.getY() / spacing.get(1));
+  // flip K index (because of the slice order given by getSliceIndex)
+  values[2] = flipK(this.getSize(),
+    Math.round(orientedPoint3D.getZ() / spacing.get(2))
+  );
+  // return index
   return new dwv.math.Index(values);
 };
