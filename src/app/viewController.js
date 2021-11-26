@@ -338,6 +338,7 @@ dwv.ctrl.ViewController = function (view) {
     // ~indexToWorld to not loose precision
     var geometry = view.getImage().getGeometry();
     var point3D = geometry.pointToWorld(point);
+    // merge with current position to keep extra dimensions
     return this.getCurrentPosition().mergeWith3D(point3D);
   };
 
