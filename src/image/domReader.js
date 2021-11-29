@@ -42,7 +42,7 @@ dwv.image.getDefaultImage = function (
   var imageSize = new dwv.image.Size([width, height, 1]);
   // default spacing
   // TODO: misleading...
-  var imageSpacing = new dwv.image.Spacing([1, 1]);
+  var imageSpacing = new dwv.image.Spacing([1, 1, 1]);
   // default origin
   var origin = new dwv.math.Point3D(0, 0, sliceIndex);
   // create image

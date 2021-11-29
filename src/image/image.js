@@ -557,9 +557,6 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       throw new Error('Missing number of files for frame buffer manipulation.');
     }
     var fullBufferSize = frameSize * meta.numberOfFiles;
-    if (size.length() === 4) {
-      fullBufferSize *= size.get(3);
-    }
     if (buffer.length !== fullBufferSize) {
       realloc(fullBufferSize);
     }
@@ -569,6 +566,8 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
         'Cannot append a frame at an index above the number of frames');
     }
     buffer.set(frameBuffer, frameSize * frameIndex);
+    // update geometry
+    this.appendFrame();
   };
 
   /**
