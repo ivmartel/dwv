@@ -13,7 +13,7 @@ var MagicWand = MagicWand || {};
  * Floodfill painting tool.
  *
  * @class
- * @param {object} app The associated application.
+ * @param {dwv.App} app The associated application.
  */
 dwv.tool.Floodfill = function (app) {
   /**

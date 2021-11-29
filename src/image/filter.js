@@ -70,13 +70,13 @@ dwv.image.filter.Threshold = function () {
    * Original image.
    *
    * @private
-   * @type {object}
+   * @type {dwv.image.Image}
    */
   var originalImage = null;
   /**
    * Set the original image.
    *
-   * @param {object} image The original image.
+   * @param {dwv.image.Image} image The original image.
    */
   this.setOriginalImage = function (image) {
     originalImage = image;
@@ -84,7 +84,7 @@ dwv.image.filter.Threshold = function () {
   /**
    * Get the original image.
    *
-   * @returns {object} image The original image.
+   * @returns {dwv.image.Image} image The original image.
    */
   this.getOriginalImage = function () {
     return originalImage;
@@ -94,7 +94,7 @@ dwv.image.filter.Threshold = function () {
 /**
  * Transform the main image using this filter.
  *
- * @returns {object} The transformed image.
+ * @returns {dwv.image.Image} The transformed image.
  */
 dwv.image.filter.Threshold.prototype.update = function () {
   var image = this.getOriginalImage();
@@ -128,13 +128,13 @@ dwv.image.filter.Sharpen = function () {
    * Original image.
    *
    * @private
-   * @type {object}
+   * @type {dwv.image.Image}
    */
   var originalImage = null;
   /**
    * Set the original image.
    *
-   * @param {object} image The original image.
+   * @param {dwv.image.Image} image The original image.
    */
   this.setOriginalImage = function (image) {
     originalImage = image;
@@ -142,7 +142,7 @@ dwv.image.filter.Sharpen = function () {
   /**
    * Get the original image.
    *
-   * @returns {object} image The original image.
+   * @returns {dwv.image.Image} image The original image.
    */
   this.getOriginalImage = function () {
     return originalImage;
@@ -152,7 +152,7 @@ dwv.image.filter.Sharpen = function () {
 /**
  * Transform the main image using this filter.
  *
- * @returns {object} The transformed image.
+ * @returns {dwv.image.Image} The transformed image.
  */
 dwv.image.filter.Sharpen.prototype.update = function () {
   var image = this.getOriginalImage();
@@ -187,13 +187,13 @@ dwv.image.filter.Sobel = function () {
    * Original image.
    *
    * @private
-   * @type {object}
+   * @type {dwv.image.Image}
    */
   var originalImage = null;
   /**
    * Set the original image.
    *
-   * @param {object} image The original image.
+   * @param {dwv.image.Image} image The original image.
    */
   this.setOriginalImage = function (image) {
     originalImage = image;
@@ -201,7 +201,7 @@ dwv.image.filter.Sobel = function () {
   /**
    * Get the original image.
    *
-   * @returns {object} image The original image.
+   * @returns {dwv.image.Image} image The original image.
    */
   this.getOriginalImage = function () {
     return originalImage;
@@ -211,7 +211,7 @@ dwv.image.filter.Sobel = function () {
 /**
  * Transform the main image using this filter.
  *
- * @returns {object} The transformed image.
+ * @returns {dwv.image.Image} The transformed image.
  */
 dwv.image.filter.Sobel.prototype.update = function () {
   var image = this.getOriginalImage();

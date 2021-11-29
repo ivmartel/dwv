@@ -55,9 +55,9 @@ dwv.gui.getLayerDetailsFromEvent = function (event) {
  * Get a view orientation according to an image geometry (with its orientation)
  * and target orientation.
  *
- * @param {object} imageGeometry The image geometry.
- * @param {object} targetOrientation The target orientation.
- * @returns {object} The view orientation.
+ * @param {dwv.image.Geometry} imageGeometry The image geometry.
+ * @param {dwv.math.Matrix33} targetOrientation The target orientation.
+ * @returns {dwv.math.Matrix33} The view orientation.
  */
 dwv.gui.getViewOrientation = function (imageGeometry, targetOrientation) {
   var viewOrientation = dwv.math.getIdentityMat33();
@@ -159,7 +159,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   /**
    * Get the target orientation.
    *
-   * @returns {object} The orientation matrix.
+   * @returns {dwv.math.Matrix33} The orientation matrix.
    */
   this.getTargetOrientation = function () {
     return targetOrientation;
@@ -168,7 +168,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   /**
    * Set the target orientation.
    *
-   * @param {object} orientation The orientation matrix.
+   * @param {dwv.math.Matrix33} orientation The orientation matrix.
    */
   this.setTargetOrientation = function (orientation) {
     targetOrientation = orientation;
@@ -406,7 +406,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   /**
    * Get the next layer DOM div.
    *
-   * @returns {object} A DOM div.
+   * @returns {HTMLElement} A DOM div.
    */
   function getNextLayerDiv() {
     var div = document.createElement('div');
@@ -493,8 +493,8 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   /**
    * Add scale to the layers. Scale cannot go lower than 0.1.
    *
-   * @param {object} scaleStep The scale to add.
-   * @param {object} center The scale center Point3D.
+   * @param {number} scaleStep The scale to add.
+   * @param {dwv.math.Point3D} center The scale center Point3D.
    */
   this.addScale = function (scaleStep, center) {
     var newScale = {

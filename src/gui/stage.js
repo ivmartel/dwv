@@ -119,7 +119,7 @@ dwv.gui.Stage = function () {
    * Get the layer group at the given index.
    *
    * @param {number} index The index.
-   * @returns {object} The layer group.
+   * @returns {dwv.gui.LayerGroup} The layer group.
    */
   this.getLayerGroup = function (index) {
     return layerGroups[index];
@@ -137,7 +137,7 @@ dwv.gui.Stage = function () {
   /**
    * Get the active layer group.
    *
-   * @returns {object} The layer group.
+   * @returns {dwv.gui.LayerGroup} The layer group.
    */
   this.getActiveLayerGroup = function () {
     return this.getLayerGroup(activeLayerGroupIndex);
@@ -161,7 +161,7 @@ dwv.gui.Stage = function () {
    * Add a layer group to the list.
    *
    * @param {object} htmlElement The HTML element of the layer group.
-   * @returns {object} The newly created layer group.
+   * @returns {dwv.gui.LayerGroup} The newly created layer group.
    */
   this.addLayerGroup = function (htmlElement) {
     activeLayerGroupIndex = layerGroups.length;
@@ -183,7 +183,7 @@ dwv.gui.Stage = function () {
    * Get a layer group from an HTML element id.
    *
    * @param {string} id The element id to find.
-   * @returns {object} The layer group.
+   * @returns {dwv.gui.LayerGroup} The layer group.
    */
   this.getLayerGroupWithElementId = function (id) {
     return layerGroups.find(function (item) {

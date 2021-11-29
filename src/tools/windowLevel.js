@@ -6,7 +6,7 @@ dwv.tool = dwv.tool || {};
  * WindowLevel tool: handle window/level related events.
  *
  * @class
- * @param {object} app The associated application.
+ * @param {dwv.App} app The associated application.
  */
 dwv.tool.WindowLevel = function (app) {
   /**

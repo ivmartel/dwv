@@ -6,7 +6,7 @@ dwv.tool = dwv.tool || {};
  * Opacity class.
  *
  * @class
- * @param {object} app The associated application.
+ * @param {dwv.App} app The associated application.
  */
 dwv.tool.Opacity = function (app) {
   /**

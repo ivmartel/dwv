@@ -47,7 +47,7 @@ dwv.math.Matrix33 = function (values) {
 /**
  * Check for Matrix33 equality.
  *
- * @param {object} rhs The other matrix to compare to.
+ * @param {dwv.math.Matrix33} rhs The other matrix to compare to.
  * @param {number} p A numeric expression for the precision to use in check
  *   (ex: 0.001). Defaults to Number.EPSILON if not provided.
  * @returns {boolean} True if both matrices are equal.
@@ -79,8 +79,8 @@ dwv.math.Matrix33.prototype.toString = function () {
 /**
  * Multiply this matrix by another.
  *
- * @param {object} rhs The matrix to multiply by.
- * @returns {object} The product matrix.
+ * @param {dwv.math.Matrix33} rhs The matrix to multiply by.
+ * @returns {dwv.math.Matrix33} The product matrix.
  */
 dwv.math.Matrix33.prototype.multiply = function (rhs) {
   var values = [];
@@ -99,7 +99,7 @@ dwv.math.Matrix33.prototype.multiply = function (rhs) {
 /**
  * Get the absolute value of this matrix.
  *
- * @returns {object} The result matrix.
+ * @returns {dwv.math.Matrix33} The result matrix.
  */
 dwv.math.Matrix33.prototype.getAbs = function () {
   var values = [];
@@ -136,8 +136,8 @@ dwv.math.Matrix33.prototype.multiplyArray3D = function (array3D) {
 /**
  * Multiply this matrix by a 3D vector.
  *
- * @param {object} vector3D The input 3D vector.
- * @returns {object} The result 3D vector.
+ * @param {dwv.math.Vector3D} vector3D The input 3D vector.
+ * @returns {dwv.math.Vector3D} The result 3D vector.
  */
 dwv.math.Matrix33.prototype.multiplyVector3D = function (vector3D) {
   var array3D = this.multiplyArray3D(
@@ -149,8 +149,8 @@ dwv.math.Matrix33.prototype.multiplyVector3D = function (vector3D) {
 /**
  * Multiply this matrix by a 3D point.
  *
- * @param {object} point3D The input 3D point.
- * @returns {object} The result 3D point.
+ * @param {dwv.math.Point3D} point3D The input 3D point.
+ * @returns {dwv.math.Point3D} The result 3D point.
  */
 dwv.math.Matrix33.prototype.multiplyPoint3D = function (point3D) {
   var array3D = this.multiplyArray3D(
@@ -162,8 +162,8 @@ dwv.math.Matrix33.prototype.multiplyPoint3D = function (point3D) {
 /**
  * Multiply this matrix by a 3D index.
  *
- * @param {object} index3D The input 3D index.
- * @returns {object} The result 3D index.
+ * @param {dwv.math.Index} index3D The input 3D index.
+ * @returns {dwv.math.Index} The result 3D index.
  */
 dwv.math.Matrix33.prototype.multiplyIndex3D = function (index3D) {
   var array3D = this.multiplyArray3D(index3D.getValues());
@@ -173,7 +173,7 @@ dwv.math.Matrix33.prototype.multiplyIndex3D = function (index3D) {
 /**
  * Get the inverse of this matrix.
  *
- * @returns {object} The inverse matrix.
+ * @returns {dwv.math.Matrix33} The inverse matrix.
  * @see https://en.wikipedia.org/wiki/Invertible_matrix#Inversion_of_3_%C3%97_3_matrices
  */
 dwv.math.Matrix33.prototype.getInverse = function () {
@@ -255,7 +255,7 @@ dwv.math.Matrix33.prototype.getColAbsMax = function (col) {
 /**
  * Get this matrix with only zero and +/- ones instead of the maximum,
  *
- * @returns {object} The simplified matrix.
+ * @returns {dwv.math.Matrix33} The simplified matrix.
  */
 dwv.math.Matrix33.prototype.asOneAndZeros = function () {
   var res = [];
@@ -286,7 +286,7 @@ dwv.math.Matrix33.prototype.getThirdColMajorDirection = function () {
 /**
  * Create a 3x3 identity matrix.
  *
- * @returns {object} The identity matrix.
+ * @returns {dwv.math.Matrix33} The identity matrix.
  */
 dwv.math.getIdentityMat33 = function () {
   /* eslint-disable array-element-newline */
@@ -301,7 +301,7 @@ dwv.math.getIdentityMat33 = function () {
 /**
  * Check if a matrix is a 3x3 identity matrix.
  *
- * @param {object} mat33 The matrix to test.
+ * @param {dwv.math.Matrix33} mat33 The matrix to test.
  * @returns {boolean} True if identity.
  */
 dwv.math.isIdentityMat33 = function (mat33) {
@@ -311,7 +311,7 @@ dwv.math.isIdentityMat33 = function (mat33) {
 /**
  * Create a 3x3 coronal (xzy) matrix.
  *
- * @returns {object} The coronal matrix.
+ * @returns {dwv.math.Matrix33} The coronal matrix.
  */
 dwv.math.getCoronalMat33 = function () {
   /* eslint-disable array-element-newline */
@@ -326,7 +326,7 @@ dwv.math.getCoronalMat33 = function () {
 /**
  * Create a 3x3 sagittal (yzx) matrix.
  *
- * @returns {object} The sagittal matrix.
+ * @returns {dwv.math.Matrix33} The sagittal matrix.
  */
 dwv.math.getSagittalMat33 = function () {
   /* eslint-disable array-element-newline */
@@ -342,7 +342,7 @@ dwv.math.getSagittalMat33 = function () {
  * Get an orientation matrix from a name.
  *
  * @param {string} name The orientation name.
- * @returns {object} The orientation matrix.
+ * @returns {dwv.math.Matrix33} The orientation matrix.
  */
 dwv.math.getMatrixFromName = function (name) {
   var matrix = null;
@@ -360,7 +360,7 @@ dwv.math.getMatrixFromName = function (name) {
  * Get the oriented values of an input 3D array.
  *
  * @param {Array} array3D The 3D array.
- * @param {object} orientation The orientation 3D matrix.
+ * @param {dwv.math.Matrix33} orientation The orientation 3D matrix.
  * @returns {Array} The values reordered according to the orientation.
  */
 dwv.math.getOrientedArray3D = function (array3D, orientation) {
@@ -373,7 +373,7 @@ dwv.math.getOrientedArray3D = function (array3D, orientation) {
  * Get the raw values of an oriented input 3D array.
  *
  * @param {Array} array3D The 3D array.
- * @param {object} orientation The orientation 3D matrix.
+ * @param {dwv.math.Matrix33} orientation The orientation 3D matrix.
  * @returns {Array} The values reordered to compensate the orientation.
  */
 dwv.math.getDeOrientedArray3D = function (array3D, orientation) {

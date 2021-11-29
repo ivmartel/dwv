@@ -306,7 +306,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
    *
    * @param {number} x The X position.
    * @param {number} y The Y position.
-   * @returns {object} The equivalent index.
+   * @returns {dwv.math.Index} The equivalent index.
    */
   this.displayToPlaneIndex = function (x, y) {
     var planePos = this.displayToPlanePos(x, y);
@@ -424,8 +424,8 @@ dwv.gui.ViewLayer = function (containerDiv) {
   /**
    * Initialise the layer: set the canvas and context
    *
-   * @param {object} size The image size.
-   * @param {object} spacing The image spacing.
+   * @param {object} size The image size as {x,y}.
+   * @param {object} spacing The image spacing as {x,y}.
    * @param {number} index The associated data index.
    */
   this.initialise = function (size, spacing, index) {
@@ -637,7 +637,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
   /**
    * Set the current position.
    *
-   * @param {object} position The new position.
+   * @param {dwv.math.Point} position The new position.
    */
   this.setCurrentPosition = function (position) {
     viewController.setCurrentPosition(position);

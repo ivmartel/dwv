@@ -32,7 +32,7 @@ dwv.math.Path = function (inputPointArray, inputControlPointIndexArray) {
  * Get a point of the list.
  *
  * @param {number} index The index of the point to get (beware, no size check).
- * @returns {object} The Point2D at the given index.
+ * @returns {dwv.math.Point2D} The Point2D at the given index.
  */
 dwv.math.Path.prototype.getPoint = function (index) {
   return this.pointArray[index];
@@ -41,7 +41,7 @@ dwv.math.Path.prototype.getPoint = function (index) {
 /**
  * Is the given point a control point.
  *
- * @param {object} point The Point2D to check.
+ * @param {dwv.math.Point2D} point The Point2D to check.
  * @returns {boolean} True if a control point.
  */
 dwv.math.Path.prototype.isControlPoint = function (point) {
@@ -65,7 +65,7 @@ dwv.math.Path.prototype.getLength = function () {
 /**
  * Add a point to the path.
  *
- * @param {object} point The Point2D to add.
+ * @param {dwv.math.Point2D} point The Point2D to add.
  */
 dwv.math.Path.prototype.addPoint = function (point) {
   this.pointArray.push(point);
@@ -74,7 +74,7 @@ dwv.math.Path.prototype.addPoint = function (point) {
 /**
  * Add a control point to the path.
  *
- * @param {object} point The Point2D to make a control point.
+ * @param {dwv.math.Point2D} point The Point2D to make a control point.
  */
 dwv.math.Path.prototype.addControlPoint = function (point) {
   var index = this.pointArray.indexOf(point);

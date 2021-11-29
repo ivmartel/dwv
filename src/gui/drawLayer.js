@@ -14,7 +14,7 @@ var Konva = Konva || {};
 /**
  * Draw layer.
  *
- * @param {object} containerDiv The layer div, its id will be used
+ * @param {HTMLElement} containerDiv The layer div, its id will be used
  *   as this layer id.
  * @class
  */
@@ -266,8 +266,8 @@ dwv.gui.DrawLayer = function (containerDiv) {
   /**
    * Initialise the layer: set the canvas and context
    *
-   * @param {object} size The image size.
-   * @param {object} spacing The image spacing.
+   * @param {object} size The image size as {x,y}.
+   * @param {object} spacing The image spacing as {x,y}.
    * @param {number} index The associated data index.
    */
   this.initialise = function (size, spacing, index) {
@@ -350,7 +350,7 @@ dwv.gui.DrawLayer = function (containerDiv) {
   /**
    * Set the current position.
    *
-   * @param {object} position The new position.
+   * @param {dwv.math.Point} position The new position.
    */
   this.setCurrentPosition = function (position) {
     var orientedPos = planeHelper.getOrientedPoint(position);
@@ -397,7 +397,7 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * Update label scale: compensate for it so
    *   that label size stays visually the same.
    *
-   * @param {object} scale The scale to compensate for
+   * @param {object} scale The scale to compensate for as {x,y}.
    */
   function updateLabelScale(scale) {
     // same formula as in style::applyZoomScale:

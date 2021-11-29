@@ -31,7 +31,7 @@ dwv.math.Point2D = function (x, y) {
 /**
  * Check for Point2D equality.
  *
- * @param {object} rhs The other point to compare to.
+ * @param {dwv.math.Point2D} rhs The other point to compare to.
  * @returns {boolean} True if both points are equal.
  */
 dwv.math.Point2D.prototype.equals = function (rhs) {
@@ -111,7 +111,7 @@ dwv.math.Point3D = function (x, y, z) {
 /**
  * Check for Point3D equality.
  *
- * @param {object} rhs The other point to compare to.
+ * @param {dwv.math.Point3D} rhs The other point to compare to.
  * @returns {boolean} True if both points are equal.
  */
 dwv.math.Point3D.prototype.equals = function (rhs) {
@@ -149,7 +149,7 @@ dwv.math.Point3D.prototype.getDistance = function (point3D) {
  * Get the difference to another Point3D.
  *
  * @param {dwv.math.Point3D} point3D The input point.
- * @returns {object} The 3D vector from the input point to this one.
+ * @returns {dwv.math.Point3D} The 3D vector from the input point to this one.
  */
 dwv.math.Point3D.prototype.minus = function (point3D) {
   return new dwv.math.Vector3D(
@@ -222,7 +222,7 @@ dwv.math.Point = function (values) {
 /**
  * Check if the input point can be compared to this one.
  *
- * @param {object} rhs The point to compare to.
+ * @param {dwv.math.Point} rhs The point to compare to.
  * @returns {boolean} True if both points are comparable.
  */
 dwv.math.Point.prototype.canCompare = function (rhs) {
@@ -241,7 +241,7 @@ dwv.math.Point.prototype.canCompare = function (rhs) {
 /**
  * Check for Point equality.
  *
- * @param {object} rhs The point to compare to.
+ * @param {dwv.math.Point} rhs The point to compare to.
  * @returns {boolean} True if both points are equal.
  */
 dwv.math.Point.prototype.equals = function (rhs) {
@@ -262,7 +262,7 @@ dwv.math.Point.prototype.equals = function (rhs) {
 /**
  * Compare points and return different dimensions.
  *
- * @param {object} rhs The point to compare to.
+ * @param {dwv.math.Point} rhs The point to compare to.
  * @returns {Array} The list of different dimensions.
  */
 dwv.math.Point.prototype.compare = function (rhs) {
@@ -283,7 +283,7 @@ dwv.math.Point.prototype.compare = function (rhs) {
 /**
  * Get the 3D part of this point.
  *
- * @returns {object} The Point3D.
+ * @returns {dwv.math.Point3D} The Point3D.
  */
 dwv.math.Point.prototype.get3D = function () {
   return new dwv.math.Point3D(this.get(0), this.get(1), this.get(2));
@@ -292,8 +292,8 @@ dwv.math.Point.prototype.get3D = function () {
 /**
  * Add another point to this one.
  *
- * @param {object} rhs The point to add.
- * @returns {object} The point representing the sum of both indices.
+ * @param {dwv.math.Point} rhs The point to add.
+ * @returns {dwv.math.Point} The point representing the sum of both points.
  */
 dwv.math.Point.prototype.add = function (rhs) {
   // check if can compare
@@ -312,8 +312,8 @@ dwv.math.Point.prototype.add = function (rhs) {
 /**
  * Merge this point with a Point3D to create a new point.
  *
- * @param {object} rhs The Point3D to merge with.
- * @returns {object} The merge result.
+ * @param {dwv.math.Point3D} rhs The Point3D to merge with.
+ * @returns {dwv.math.Point} The merge result.
  */
 dwv.math.Point.prototype.mergeWith3D = function (rhs) {
   var values = this.getValues();
@@ -359,7 +359,7 @@ dwv.math.Point.prototype.toStringId = function (minDim, precision) {
  * (result of point.toStringId).
  *
  * @param {string} inputStr The input string.
- * @returns {object} The corresponding index.
+ * @returns {dwv.math.Point} The corresponding point.
  */
 dwv.math.getPointFromStringId = function (inputStr) {
   // split ids

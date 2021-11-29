@@ -6,8 +6,8 @@ dwv.image = dwv.image || {};
  * Plane geometry helper.
  *
  * @class
- * @param {object} spacing The spacing.
- * @param {object} orientation The orientation.
+ * @param {dwv.image.Spacing} spacing The spacing.
+ * @param {dwv.math.Matrix} orientation The orientation.
  */
 dwv.image.PlaneHelper = function (spacing, orientation) {
 
@@ -15,7 +15,7 @@ dwv.image.PlaneHelper = function (spacing, orientation) {
    * Get a 3D offset from a plane one.
    *
    * @param {object} offset2D The plane offset as {x,y}.
-   * @returns {object} The 3D world offset.
+   * @returns {dwv.math.Vector3D} The 3D world offset.
    */
   this.getOffset3DFromPlaneOffset = function (offset2D) {
     // make 3D
@@ -30,7 +30,7 @@ dwv.image.PlaneHelper = function (spacing, orientation) {
   /**
    * Get a plane offset from a 3D one.
    *
-   * @param {object} offset3D The 3D offset.
+   * @param {dwv.math.Point3D} offset3D The 3D offset.
    * @returns {object} The plane offset as {x,y}.
    */
   this.getPlaneOffsetFromOffset3D = function (offset3D) {
@@ -48,8 +48,8 @@ dwv.image.PlaneHelper = function (spacing, orientation) {
   /**
    * Apply spacing to an offset.
    *
-   * @param {object} off The 3D offset.
-   * @returns {object} The world offset.
+   * @param {dwv.math.Point3D} off The 3D offset.
+   * @returns {dwv.math.Vector3D} The world offset.
    */
   function offsetIndexToWorld(off) {
     return new dwv.math.Vector3D(
@@ -61,8 +61,8 @@ dwv.image.PlaneHelper = function (spacing, orientation) {
   /**
    * Remove spacing from an offset.
    *
-   * @param {object} off The world offset.
-   * @returns {object} The 3D offset.
+   * @param {object} off The world offset object as {x,y,z}.
+   * @returns {dwv.math.Vector3D} The 3D offset.
    */
   function offsetWorldToIndex(off) {
     return new dwv.math.Vector3D(
@@ -74,8 +74,8 @@ dwv.image.PlaneHelper = function (spacing, orientation) {
   /**
    * Orient an input vector.
    *
-   * @param {object} vector The input vector.
-   * @returns {object} The oriented vector.
+   * @param {dwv.math.Vector3D} vector The input vector.
+   * @returns {dwv.math.Vector3D} The oriented vector.
    */
   this.getOrientedVector3D = function (vector) {
     var planeVector = vector;
@@ -90,8 +90,8 @@ dwv.image.PlaneHelper = function (spacing, orientation) {
   /**
    * Orient an input index.
    *
-   * @param {object} index The input index.
-   * @returns {object} The oriented index.
+   * @param {dwv.math.Index} index The input index.
+   * @returns {dwv.math.Index} The oriented index.
    */
   this.getOrientedIndex = function (index) {
     var planeIndex = index;
@@ -106,8 +106,8 @@ dwv.image.PlaneHelper = function (spacing, orientation) {
   /**
    * Orient an input point.
    *
-   * @param {object} point The input point.
-   * @returns {object} The oriented point.
+   * @param {dwv.math.Point3D} point The input point.
+   * @returns {dwv.math.Point3D} The oriented point.
    */
   this.getOrientedPoint = function (point) {
     var planePoint = point;
@@ -124,8 +124,8 @@ dwv.image.PlaneHelper = function (spacing, orientation) {
   /**
    * De-orient an input vector.
    *
-   * @param {object} planeVector The input vector.
-   * @returns {object} The de-orienteded vector.
+   * @param {dwv.math.Vector3D} planeVector The input vector.
+   * @returns {dwv.math.Vector3D} The de-orienteded vector.
    */
   this.getDeOrientedVector3D = function (planeVector) {
     var vector = planeVector;

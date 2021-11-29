@@ -124,7 +124,7 @@ dwv.image.View = function (image) {
   /**
    * Get the view orientation.
    *
-   * @returns {object} The orientation matrix.
+   * @returns {dwv.math.Matrix33} The orientation matrix.
    */
   this.getOrientation = function () {
     return orientation;
@@ -133,7 +133,7 @@ dwv.image.View = function (image) {
   /**
    * Set the view orientation.
    *
-   * @param {object} mat33 The orientation matrix.
+   * @param {dwv.math.Matrix33} mat33 The orientation matrix.
    */
   this.setOrientation = function (mat33) {
     orientation = mat33;
@@ -405,7 +405,7 @@ dwv.image.View = function (image) {
   /**
    * Get the current position.
    *
-   * @returns {object} The current position.
+   * @returns {dwv.math.Point} The current position.
    */
   this.getCurrentPosition = function () {
     return currentPosition;
@@ -414,7 +414,7 @@ dwv.image.View = function (image) {
   /**
    * Get the current index.
    *
-   * @returns {object} The current index.
+   * @returns {dwv.math.Index} The current index.
    */
   this.getCurrentIndex = function () {
     var geometry = this.getImage().getGeometry();
@@ -424,7 +424,7 @@ dwv.image.View = function (image) {
   /**
    * Set the current position.
    *
-   * @param {object} newPosition The new position.
+   * @param {dwv.math.Point} newPosition The new position.
    * @param {boolean} silent Flag to fire event or not.
    * @returns {boolean} False if not in bounds
    * @fires dwv.image.View#positionchange
@@ -511,7 +511,7 @@ dwv.image.View = function (image) {
   /**
    * Set the current index.
    *
-   * @param {object} index The index.
+   * @param {dwv.math.Index} index The index.
    * @param {boolean} silent If true, does not fire a positionchange event.
    * @returns {boolean} False if not in bounds.
    */

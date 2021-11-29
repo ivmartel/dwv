@@ -282,7 +282,7 @@ dwv.tool.draw.EllipseFactory.prototype.update = function (
 /**
  * Get the debug shadow.
  *
- * @param {object} ellipse The ellipse to shadow.
+ * @param {dwv.math.Ellipse} ellipse The ellipse to shadow.
  * @param {object} group The associated group.
  * @returns {object} The shadow konva group.
  */

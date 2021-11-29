@@ -31,7 +31,7 @@ dwv.dicom.Tag = function (group, element) {
 /**
  * Check for Tag equality.
  *
- * @param {object} rhs The other tag to compare to.
+ * @param {dwv.dicom.Tag} rhs The other tag to compare to.
  * @returns {boolean} True if both tags are equal.
  */
 dwv.dicom.Tag.prototype.equals = function (rhs) {
@@ -182,7 +182,7 @@ dwv.dicom.getFileMetaInformationGroupLengthTag = function () {
 /**
  * Is the input tag the FileMetaInformationGroupLength Tag.
  *
- * @param {object} tag The tag to test.
+ * @param {dwv.dicom.Tag} tag The tag to test.
  * @returns {boolean} True if the asked tag.
  */
 dwv.dicom.isFileMetaInformationGroupLengthTag = function (tag) {
@@ -192,7 +192,7 @@ dwv.dicom.isFileMetaInformationGroupLengthTag = function (tag) {
 /**
  * Get the Item Tag.
  *
- * @returns {object} The tag.
+ * @returns {dwv.dicom.Tag} The tag.
  */
 dwv.dicom.getItemTag = function () {
   return new dwv.dicom.Tag('0xFFFE', '0xE000');
@@ -201,7 +201,7 @@ dwv.dicom.getItemTag = function () {
 /**
  * Is the input tag the Item Tag.
  *
- * @param {object} tag The tag to test.
+ * @param {dwv.dicom.Tag} tag The tag to test.
  * @returns {boolean} True if the asked tag.
  */
 dwv.dicom.isItemTag = function (tag) {
@@ -211,7 +211,7 @@ dwv.dicom.isItemTag = function (tag) {
 /**
  * Get the ItemDelimitationItem Tag.
  *
- * @returns {object} The tag.
+ * @returns {dwv.dicom.Tag} The tag.
  */
 dwv.dicom.getItemDelimitationItemTag = function () {
   return new dwv.dicom.Tag('0xFFFE', '0xE00D');
@@ -220,7 +220,7 @@ dwv.dicom.getItemDelimitationItemTag = function () {
 /**
  * Is the input tag the ItemDelimitationItem Tag.
  *
- * @param {object} tag The tag to test.
+ * @param {dwv.dicom.Tag} tag The tag to test.
  * @returns {boolean} True if the asked tag.
  */
 dwv.dicom.isItemDelimitationItemTag = function (tag) {
@@ -230,7 +230,7 @@ dwv.dicom.isItemDelimitationItemTag = function (tag) {
 /**
  * Get the SequenceDelimitationItem Tag.
  *
- * @returns {object} The tag.
+ * @returns {dwv.dicom.Tag} The tag.
  */
 dwv.dicom.getSequenceDelimitationItemTag = function () {
   return new dwv.dicom.Tag('0xFFFE', '0xE0DD');
@@ -239,7 +239,7 @@ dwv.dicom.getSequenceDelimitationItemTag = function () {
 /**
  * Is the input tag the SequenceDelimitationItem Tag.
  *
- * @param {object} tag The tag to test.
+ * @param {dwv.dicom.Tag} tag The tag to test.
  * @returns {boolean} True if the asked tag.
  */
 dwv.dicom.isSequenceDelimitationItemTag = function (tag) {
@@ -249,7 +249,7 @@ dwv.dicom.isSequenceDelimitationItemTag = function (tag) {
 /**
  * Get the PixelData Tag.
  *
- * @returns {object} The tag.
+ * @returns {dwv.dicom.Tag} The tag.
  */
 dwv.dicom.getPixelDataTag = function () {
   return new dwv.dicom.Tag('0x7FE0', '0x0010');
@@ -258,7 +258,7 @@ dwv.dicom.getPixelDataTag = function () {
 /**
  * Is the input tag the PixelData Tag.
  *
- * @param {object} tag The tag to test.
+ * @param {dwv.dicom.Tag} tag The tag to test.
  * @returns {boolean} True if the asked tag.
  */
 dwv.dicom.isPixelDataTag = function (tag) {

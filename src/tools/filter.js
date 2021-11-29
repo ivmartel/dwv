@@ -8,7 +8,7 @@ dwv.tool.filter = dwv.tool.filter || {};
  * Filter tool.
  *
  * @class
- * @param {object} app The associated app.
+ * @param {dwv.App} app The associated app.
  */
 dwv.tool.Filter = function (app) {
   /**
@@ -178,7 +178,7 @@ dwv.tool.Filter.prototype.hasFilter = function (name) {
  * Threshold filter tool.
  *
  * @class
- * @param {object} app The associated application.
+ * @param {dwv.App} app The associated application.
  */
 dwv.tool.filter.Threshold = function (app) {
   /**
@@ -280,7 +280,7 @@ dwv.tool.filter.Threshold = function (app) {
  * Sharpen filter tool.
  *
  * @class
- * @param {object} app The associated application.
+ * @param {dwv.App} app The associated application.
  */
 dwv.tool.filter.Sharpen = function (app) {
   /**
@@ -359,7 +359,7 @@ dwv.tool.filter.Sharpen = function (app) {
  * Sobel filter tool.
  *
  * @class
- * @param {object} app The associated application.
+ * @param {dwv.App} app The associated application.
  */
 dwv.tool.filter.Sobel = function (app) {
   /**
@@ -439,7 +439,7 @@ dwv.tool.filter.Sobel = function (app) {
  *
  * @class
  * @param {object} filter The filter to run.
- * @param {object} app The associated application.
+ * @param {dwv.App} app The associated application.
  */
 dwv.tool.RunFilterCommand = function (filter, app) {
 

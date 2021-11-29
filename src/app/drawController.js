@@ -14,7 +14,7 @@ var Konva = Konva || {};
 /**
  * Get the draw group id for a given position.
  *
- * @param {object} currentPosition The current position.
+ * @param {dwv.math.Point} currentPosition The current position.
  * @returns {string} The group id.
  * @deprecated Use the index.toStringId instead.
  */
@@ -173,7 +173,7 @@ dwv.ctrl.DrawController = function (konvaLayer) {
   /**
    * Activate the current draw layer.
    *
-   * @param {object} position The current position.
+   * @param {dwv.math.Point} position The current position.
    */
   this.activateDrawLayer = function (position) {
     // TODO: add layer info

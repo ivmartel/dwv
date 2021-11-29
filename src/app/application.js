@@ -156,7 +156,7 @@ dwv.App = function () {
    * Get the active layer group.
    * The layer is available after the first loaded item.
    *
-   * @returns {object} The layer group.
+   * @returns {dwv.gui.LayerGroup} The layer group.
    */
   this.getActiveLayerGroup = function () {
     return stage.getActiveLayerGroup();
@@ -178,7 +178,7 @@ dwv.App = function () {
    * The layer is available after the first loaded item.
    *
    * @param {number} groupId The group id.
-   * @returns {object} The layer group.
+   * @returns {dwv.gui.LayerGroup} The layer group.
    */
   this.getLayerGroupById = function (groupId) {
     return stage.getLayerGroup(groupId);

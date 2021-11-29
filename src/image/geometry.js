@@ -6,10 +6,10 @@ dwv.image = dwv.image || {};
  * 2D/3D Geometry class.
  *
  * @class
- * @param {object} origin The object origin (a 3D point).
- * @param {object} size The object size.
- * @param {object} spacing The object spacing.
- * @param {object} orientation The object orientation (3*3 matrix,
+ * @param {dwv.math.Point3D} origin The object origin (a 3D point).
+ * @param {dwv.image.Size} size The object size.
+ * @param {dwv.image.Spacing} spacing The object spacing.
+ * @param {dwv.math.Matrix33} orientation The object orientation (3*3 matrix,
  *   default to 3*3 identity).
  */
 dwv.image.Geometry = function (origin, size, spacing, orientation) {
@@ -29,7 +29,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
    * Get the object origin.
    * This should be the lowest origin to ease calculations (?).
    *
-   * @returns {object} The object origin.
+   * @returns {dwv.math.Point3D} The object origin.
    */
   this.getOrigin = function () {
     return origins[origins.length - 1];
@@ -47,8 +47,8 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
    * Warning: the size comes as stored in DICOM, meaning that it could
    * be oriented.
    *
-   * @param {object} viewOrientation The view orientation (optional)
-   * @returns {object} The object size.
+   * @param {dwv.math.Matrix33} viewOrientation The view orientation (optional)
+   * @returns {dwv.image.Size} The object size.
    */
   this.getSize = function (viewOrientation) {
     var res = size;
@@ -117,8 +117,8 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
    * Warning: the size comes as stored in DICOM, meaning that it could
    * be oriented.
    *
-   * @param {object} viewOrientation The view orientation (optional)
-   * @returns {object} The object spacing.
+   * @param {dwv.math.Matrix33} viewOrientation The view orientation (optional)
+   * @returns {dwv.image.Spacing} The object spacing.
    */
   this.getSpacing = function (viewOrientation) {
     // update slice spacing after appendSlice
@@ -145,7 +145,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
   /**
    * Get the object orientation.
    *
-   * @returns {object} The object orientation.
+   * @returns {dwv.math.Matrix33} The object orientation.
    */
   this.getOrientation = function () {
     return orientation;
@@ -160,7 +160,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
    * This implies that the index to world and reverse method do some flipping
    * magic...
    *
-   * @param {object} point The point to evaluate.
+   * @param {dwv.math.Point3D} point The point to evaluate.
    * @returns {number} The slice index.
    */
   this.getSliceIndex = function (point) {
@@ -199,7 +199,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
   /**
    * Append an origin to the geometry.
    *
-   * @param {object} origin The origin to append.
+   * @param {dwv.math.Point3D} origin The origin to append.
    * @param {number} index The index at which to append.
    */
   this.appendOrigin = function (origin, index) {
@@ -271,9 +271,9 @@ dwv.image.Geometry.prototype.isInBounds = function (point) {
 /**
  * Flip the K index.
  *
- * @param {object} size The image size.
+ * @param {dwv.image.Size} size The image size.
  * @param {number} k The index.
- * @returns {number} The iflipped index.
+ * @returns {number} The flipped index.
  */
 function flipK(size, k) {
   return (size.get(2) - 1) - k;

@@ -23,14 +23,15 @@ dwv.math.mulABC = function (a, b, c) {
  * Circle shape.
  *
  * @class
- * @param {object} centre A Point2D representing the centre of the circle.
+ * @param {dwv.math.Point2D} centre A Point2D representing the centre
+ *   of the circle.
  * @param {number} radius The radius of the circle.
  */
 dwv.math.Circle = function (centre, radius) {
   /**
    * Get the centre (point) of the circle.
    *
-   * @returns {object} The center (point) of the circle.
+   * @returns {dwv.math.Point2D} The center (point) of the circle.
    */
   this.getCenter = function () {
     return centre;
@@ -50,7 +51,7 @@ dwv.math.Circle = function (centre, radius) {
 /**
  * Check for equality.
  *
- * @param {object} rhs The object to compare to.
+ * @param {dwv.math.Circle} rhs The object to compare to.
  * @returns {boolean} True if both objects are equal.
  */
 dwv.math.Circle.prototype.equals = function (rhs) {
@@ -120,7 +121,8 @@ dwv.math.Circle.prototype.getRound = function () {
 /**
  * Quantify an circle according to view information.
  *
- * @param {object} viewController The associated view controller.
+ * @param {dwv.ctrl.ViewController} viewController The associated view
+ *   controller.
  * @param {Array} flags A list of stat values to calculate.
  * @returns {object} A quantification object.
  */

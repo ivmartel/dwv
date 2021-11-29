@@ -66,7 +66,7 @@ dwv.math.Index = function (values) {
 /**
  * Check if the input index can be compared to this one.
  *
- * @param {object} rhs The index to compare to.
+ * @param {dwv.math.Index} rhs The index to compare to.
  * @returns {boolean} True if both indices are comparable.
  */
 dwv.math.Index.prototype.canCompare = function (rhs) {
@@ -85,7 +85,7 @@ dwv.math.Index.prototype.canCompare = function (rhs) {
 /**
  * Check for Index equality.
  *
- * @param {object} rhs The index to compare to.
+ * @param {dwv.math.Index} rhs The index to compare to.
  * @returns {boolean} True if both indices are equal.
  */
 dwv.math.Index.prototype.equals = function (rhs) {
@@ -106,8 +106,8 @@ dwv.math.Index.prototype.equals = function (rhs) {
 /**
  * Add another index to this one.
  *
- * @param {object} rhs The index to add.
- * @returns {object} The index representing the sum of both indices.
+ * @param {dwv.math.Index} rhs The index to add.
+ * @returns {dwv.math.Index} The index representing the sum of both indices.
  */
 dwv.math.Index.prototype.add = function (rhs) {
   // check if can compare
@@ -128,7 +128,7 @@ dwv.math.Index.prototype.add = function (rhs) {
  *
  * @param {number} i The new 0 index.
  * @param {number} j The new 1 index.
- * @returns {object} The new index.
+ * @returns {dwv.math.Index} The new index.
  */
 dwv.math.Index.prototype.getWithNew2D = function (i, j) {
   var values = [i, j];
@@ -142,7 +142,7 @@ dwv.math.Index.prototype.getWithNew2D = function (i, j) {
  * Get an index with values set to 0 and the input size.
  *
  * @param {number} size The size of the index.
- * @returns {object} The zero index.
+ * @returns {dwv.math.Index} The zero index.
  */
 dwv.math.getZeroIndex = function (size) {
   var values = new Array(size);

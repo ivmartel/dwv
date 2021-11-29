@@ -6,7 +6,7 @@ dwv.tool = dwv.tool || {};
  * Scroll class.
  *
  * @class
- * @param {object} app The associated application.
+ * @param {dwv.App} app The associated application.
  */
 dwv.tool.Scroll = function (app) {
   /**

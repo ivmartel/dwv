@@ -11,7 +11,7 @@ dwv.image = dwv.image || {};
  * - planar configuration (default RGBRGB...).
  *
  * @class
- * @param {object} geometry The geometry of the image.
+ * @param {dwv.image.Geometry} geometry The geometry of the image.
  * @param {Array} buffer The image data as a one dimensional buffer.
  * @param {Array} imageUids An array of Uids indexed to slice number.
  */
@@ -109,7 +109,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   /**
    * Get the image UID at a given index.
    *
-   * @param {object} index The index at which to get the id.
+   * @param {dwv.math.Index} index The index at which to get the id.
    * @returns {string} The UID.
    */
   this.getImageUid = function (index) {
@@ -123,7 +123,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   /**
    * Get the geometry of the image.
    *
-   * @returns {object} The size of the image.
+   * @returns {dwv.image.Geometry} The geometry.
    */
   this.getGeometry = function () {
     return geometry;
@@ -161,7 +161,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   /**
    * Can the data be scrolled?
    *
-   * @param {object} viewOrientation The view orientation.
+   * @param {dwv.math.Matrix33} viewOrientation The view orientation.
    * @returns {boolean} True if the data has a third dimension greater than one
    *   after applying the view orientation.
    */
@@ -188,7 +188,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
    * Get the secondary offset: an offset that takes into account
    *   the slice and above dimension numbers.
    *
-   * @param {object} index The index.
+   * @param {dwv.math.Index} index The index.
    * @returns {number} The offset.
    */
   this.getSecondaryOffset = function (index) {
@@ -198,7 +198,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   /**
    * Get the rescale slope and intercept.
    *
-   * @param {object} index The index (only needed for non constant rsi).
+   * @param {dwv.math.Index} index The index (only needed for non constant rsi).
    * @returns {object} The rescale slope and intercept.
    */
   this.getRescaleSlopeAndIntercept = function (index) {
@@ -672,7 +672,7 @@ dwv.image.Image.prototype.getValue = function (i, j, k, f) {
 /**
  * Get the value of the image at a specific index.
  *
- * @param {object} index The index.
+ * @param {dwv.math.Index} index The index.
  * @returns {number} The value at the desired position.
  * Warning: No size check...
  */
@@ -711,7 +711,7 @@ dwv.image.Image.prototype.getRescaledValue = function (i, j, k, f) {
 /**
  * Get the rescaled value of the image at a specific index.
  *
- * @param {object} index The index.
+ * @param {dwv.math.Index} index The index.
  * @returns {number} The rescaled value at the desired position.
  * Warning: No size check...
  */

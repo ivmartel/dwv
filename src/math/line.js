@@ -6,14 +6,15 @@ dwv.math = dwv.math || {};
  * Line shape.
  *
  * @class
- * @param {object} begin A Point2D representing the beginning of the line.
- * @param {object} end A Point2D representing the end of the line.
+ * @param {dwv.math.Point2D} begin A Point2D representing the beginning
+ *   of the line.
+ * @param {dwv.math.Point2D} end A Point2D representing the end of the line.
  */
 dwv.math.Line = function (begin, end) {
   /**
    * Get the begin point of the line.
    *
-   * @returns {object} The beginning point of the line.
+   * @returns {dwv.math.Point2D} The beginning point of the line.
    */
   this.getBegin = function () {
     return begin;
@@ -22,7 +23,7 @@ dwv.math.Line = function (begin, end) {
   /**
    * Get the end point of the line.
    *
-   * @returns {object} The ending point of the line.
+   * @returns {dwv.math.Point2D} The ending point of the line.
    */
   this.getEnd = function () {
     return end;
@@ -32,7 +33,7 @@ dwv.math.Line = function (begin, end) {
 /**
  * Check for equality.
  *
- * @param {object} rhs The object to compare to.
+ * @param {dwv.math.Line} rhs The object to compare to.
  * @returns {boolean} True if both objects are equal.
  */
 dwv.math.Line.prototype.equals = function (rhs) {
@@ -92,7 +93,7 @@ dwv.math.Line.prototype.getWorldLength = function (spacingX, spacingY) {
 /**
  * Get the mid point of the line.
  *
- * @returns {object} The mid point of the line.
+ * @returns {dwv.math.Point2D} The mid point of the line.
  */
 dwv.math.Line.prototype.getMidpoint = function () {
   return new dwv.math.Point2D(
@@ -137,8 +138,8 @@ dwv.math.Line.prototype.getInclination = function () {
 /**
  * Get the angle between two lines in degree.
  *
- * @param {object} line0 The first line.
- * @param {object} line1 The second line.
+ * @param {dwv.math.Line} line0 The first line.
+ * @param {dwv.math.Line} line1 The second line.
  * @returns {number} The angle.
  */
 dwv.math.getAngle = function (line0, line1) {
@@ -160,8 +161,8 @@ dwv.math.getAngle = function (line0, line1) {
 /**
  * Get a perpendicular line to an input one.
  *
- * @param {object} line The line to be perpendicular to.
- * @param {object} point The middle point of the perpendicular line.
+ * @param {dwv.math.Line} line The line to be perpendicular to.
+ * @param {dwv.math.Point2D} point The middle point of the perpendicular line.
  * @param {number} length The length of the perpendicular line.
  * @returns {object} A perpendicular line.
  */

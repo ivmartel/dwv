@@ -36,7 +36,7 @@ dwv.tool.draw.debug = false;
  *    cons: slice/frame display: 2 loops
  *
  * @class
- * @param {object} app The associated application.
+ * @param {dwv.App} app The associated application.
  */
 dwv.tool.Draw = function (app) {
   /**
@@ -417,7 +417,7 @@ dwv.tool.Draw = function (app) {
    * Update the current draw with new points.
    *
    * @param {Array} tmpPoints The array of new points.
-   * @param {object} layerGroup The origin layer group.
+   * @param {dwv.gui.LayerGroup} layerGroup The origin layer group.
    */
   function onNewPoints(tmpPoints, layerGroup) {
     var drawLayer = layerGroup.getActiveDrawLayer();
@@ -447,7 +447,7 @@ dwv.tool.Draw = function (app) {
    * Create the final shape from a point list.
    *
    * @param {Array} finalPoints The array of points.
-   * @param {object} layerGroup The origin layer group.
+   * @param {dwv.gui.LayerGroup} layerGroup The origin layer group.
    */
   function onFinalPoints(finalPoints, layerGroup) {
     var drawLayer = layerGroup.getActiveDrawLayer();
@@ -522,7 +522,7 @@ dwv.tool.Draw = function (app) {
   /**
    * Update the draw layer.
    *
-   * @param {object} layerGroup The origin layer group.
+   * @param {dwv.gui.LayerGroup} layerGroup The origin layer group.
    */
   function updateDrawLayer(layerGroup) {
     // activate the shape at current position
@@ -533,7 +533,7 @@ dwv.tool.Draw = function (app) {
    * Activate shapes at current position.
    *
    * @param {boolean} visible Set the draw layer visible or not.
-   * @param {object} layerGroup The origin layer group.
+   * @param {dwv.gui.LayerGroup} layerGroup The origin layer group.
    */
   function activateCurrentPositionShapes(visible, layerGroup) {
     var drawController =
@@ -582,9 +582,9 @@ dwv.tool.Draw = function (app) {
    * Get the real position from an event.
    * TODO: use layer method?
    *
-   * @param {object} index The input index.
-   * @param {object} layerGroup The origin layer group.
-   * @returns {object} The real position in the image.
+   * @param {object} index The input index as {x,y}.
+   * @param {dwv.gui.LayerGroup} layerGroup The origin layer group.
+   * @returns {object} The real position in the image as {x,y}.
    * @private
    */
   function getRealPosition(index, layerGroup) {
@@ -600,7 +600,7 @@ dwv.tool.Draw = function (app) {
    * Set shape group on properties.
    *
    * @param {object} shapeGroup The shape group to set on.
-   * @param {object} layerGroup The origin layer group.
+   * @param {dwv.gui.LayerGroup} layerGroup The origin layer group.
    */
   this.setShapeOn = function (shapeGroup, layerGroup) {
     // mouse over styling
@@ -902,7 +902,7 @@ dwv.tool.Draw.prototype.hasShape = function (name) {
  * Get the minimum position in a groups' anchors.
  *
  * @param {object} group The group that contains anchors.
- * @returns {object} The minimum position.
+ * @returns {object} The minimum position as {x,y}.
  */
 dwv.tool.getAnchorMin = function (group) {
   var anchors = group.find('.anchor');
@@ -923,8 +923,8 @@ dwv.tool.getAnchorMin = function (group) {
  * Bound a node position.
  *
  * @param {object} node The node to bound the position.
- * @param {object} min The minimum position.
- * @param {object} max The maximum position.
+ * @param {object} min The minimum position as {x,y}.
+ * @param {object} max The maximum position as {x,y}.
  * @returns {boolean} True if the position was corrected.
  */
 dwv.tool.boundNodePosition = function (node, min, max) {

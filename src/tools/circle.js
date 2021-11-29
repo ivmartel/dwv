@@ -294,7 +294,7 @@ dwv.tool.draw.CircleFactory.prototype.update = function (
 /**
  * Get the debug shadow.
  *
- * @param {object} circle The circle to shadow.
+ * @param {dwv.math.Circle} circle The circle to shadow.
  * @param {object} group The associated group.
  * @returns {object} The shadow konva group.
  */

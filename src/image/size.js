@@ -66,7 +66,7 @@ dwv.image.Size = function (values) {
 /**
  * Check if a dimension exists and has more than one element.
  *
- * @param {object} dimension The dimension to check.
+ * @param {number} dimension The dimension to check.
  * @returns {boolean} True if the size is more than one.
  */
 dwv.image.Size.prototype.moreThanOne = function (dimension) {
@@ -77,7 +77,7 @@ dwv.image.Size.prototype.moreThanOne = function (dimension) {
  * Check if the third direction of an orientation matrix has a size
  * of more than one.
  *
- * @param {object} viewOrientation The orientation matrix.
+ * @param {dwv.math.Matrix33} viewOrientation The orientation matrix.
  * @returns {boolean} True if scrollable.
  */
 dwv.image.Size.prototype.canScroll = function (viewOrientation) {
@@ -152,7 +152,7 @@ dwv.image.Size.prototype.equals = function (rhs) {
 /**
  * Check that an index is within bounds.
  *
- * @param {object} index The index to check.
+ * @param {dwv.math.Index} index The index to check.
  * @returns {boolean} True if the given coordinates are within bounds.
  */
 dwv.image.Size.prototype.isInBounds = function (index) {
@@ -178,7 +178,7 @@ dwv.image.Size.prototype.isInBounds = function (index) {
 /**
  * Convert an index to an offset in memory.
  *
- * @param {object} index The index to convert.
+ * @param {dwv.math.Index} index The index to convert.
  * @param {number} start Optional start dimension to base the offset on.
  * @returns {number} The offset.
  */
@@ -205,7 +205,7 @@ dwv.image.Size.prototype.indexToOffset = function (index, start) {
  * Convert an offset in memory to an index.
  *
  * @param {number} offset The offset to convert.
- * @returns {object} The index.
+ * @returns {dwv.math.Index} The index.
  */
 dwv.image.Size.prototype.offsetToIndex = function (offset) {
   var values = new Array(this.length());

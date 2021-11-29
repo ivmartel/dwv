@@ -88,7 +88,7 @@ dwv.ctrl.ViewController = function (view) {
   /**
    * Get the current position.
    *
-   * @returns {object} The position.
+   * @returns {dwv.math.Point} The position.
    */
   this.getCurrentPosition = function () {
     return view.getCurrentPosition();
@@ -97,7 +97,7 @@ dwv.ctrl.ViewController = function (view) {
   /**
    * Get the current index.
    *
-   * @returns {object} The current index.
+   * @returns {dwv.math.Index} The current index.
    */
   this.getCurrentIndex = function () {
     return view.getCurrentIndex();
@@ -106,7 +106,7 @@ dwv.ctrl.ViewController = function (view) {
   /**
    * Get the current oriented position.
    *
-   * @returns {object} The index.
+   * @returns {dwv.math.Point} The position.
    */
   this.getCurrentOrientedPosition = function () {
     var res = view.getCurrentPosition();
@@ -283,7 +283,7 @@ dwv.ctrl.ViewController = function (view) {
   /**
    * Get the image size.
    *
-   * @returns {object} The size.
+   * @returns {dwv.image.Size} The size.
    */
   this.getImageSize = function () {
     return view.getImage().getGeometry().getSize();
@@ -292,7 +292,7 @@ dwv.ctrl.ViewController = function (view) {
   /**
    * Set the current position.
    *
-   * @param {object} pos The position.
+   * @param {dwv.math.Point} pos The position.
    * @param {boolean} silent If true, does not fire a positionchange event.
    * @returns {boolean} False if not in bounds.
    */
@@ -315,7 +315,7 @@ dwv.ctrl.ViewController = function (view) {
   /**
    * Set the current index.
    *
-   * @param {object} index The index.
+   * @param {dwv.math.Index} index The index.
    * @param {boolean} silent If true, does not fire a positionchange event.
    * @returns {boolean} False if not in bounds.
    */
@@ -326,8 +326,8 @@ dwv.ctrl.ViewController = function (view) {
   /**
    * Get a 3D position from a plane 2D position.
    *
-   * @param {object} point2D The 2D position as {x,y}.
-   * @returns {object} The 3D point.
+   * @param {dwv.math.Point2D} point2D The 2D position as {x,y}.
+   * @returns {dwv.math.Point} The 3D point.
    */
   this.getPositionFromPlanePoint = function (point2D) {
     // keep third direction
@@ -346,8 +346,8 @@ dwv.ctrl.ViewController = function (view) {
    * Get a plane 3D position from a plane 2D position: does not compensate
    *   for the image origin. Needed for setting the scale center...
    *
-   * @param {object} point2D The 2D position as {x,y}.
-   * @returns {object} The 3D point.
+   * @param {dwv.math.Point2D} point2D The 2D position as {x,y}.
+   * @returns {dwv.math.Point3D} The 3D point.
    */
   this.getPlanePositionFromPlanePoint = function (point2D) {
     // keep third direction
@@ -368,7 +368,7 @@ dwv.ctrl.ViewController = function (view) {
    * Get a 3D offset from a plane one.
    *
    * @param {object} offset2D The plane offset as {x,y}.
-   * @returns {object} The 3D world offset.
+   * @returns {dwv.math.Vector3D} The 3D world offset.
    */
   this.getOffset3DFromPlaneOffset = function (offset2D) {
     return planeHelper.getOffset3DFromPlaneOffset(offset2D);

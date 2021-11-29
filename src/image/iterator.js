@@ -274,10 +274,10 @@ dwv.image.getIteratorValues = function (iterator) {
 /**
  * Get a slice index iterator.
  *
- * @param {object} image The image to parse.
- * @param {object} position The current position.
+ * @param {dwv.image.Image} image The image to parse.
+ * @param {dwv.math.Point} position The current position.
  * @param {boolean} isRescaled Flag for rescaled values (default false).
- * @param {object} viewOrientation The view orientation.
+ * @param {dwv.math.Matrix33} viewOrientation The view orientation.
  * @returns {object} The slice iterator.
  */
 dwv.image.getSliceIterator = function (
@@ -388,8 +388,8 @@ dwv.image.getSliceIterator = function (
 /**
  * Get a slice index iterator for a rectangular region.
  *
- * @param {object} image The image to parse.
- * @param {object} position The current position.
+ * @param {dwv.image.Image} image The image to parse.
+ * @param {dwv.math.Point} position The current position.
  * @param {boolean} isRescaled Flag for rescaled values (default false).
  * @param {dwv.math.Point2D} min The minimum position (optional).
  * @param {dwv.math.Point2D} max The maximum position (optional).
@@ -447,8 +447,8 @@ dwv.image.getRegionSliceIterator = function (
 /**
  * Get a slice index iterator for a rectangular region.
  *
- * @param {object} image The image to parse.
- * @param {object} position The current position.
+ * @param {dwv.image.Image} image The image to parse.
+ * @param {dwv.math.Point} position The current position.
  * @param {boolean} isRescaled Flag for rescaled values (default false).
  * @param {Array} regions An array of regions.
  * @returns {object} The slice iterator.

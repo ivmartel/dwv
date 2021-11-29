@@ -21,7 +21,7 @@ dwv.ctrl.DataController = function () {
   /**
    * Listener handler.
    *
-   * @type {object}
+   * @type {dwv.utils.ListenerHandler}
    * @private
    */
   var listenerHandler = new dwv.utils.ListenerHandler();
@@ -56,7 +56,7 @@ dwv.ctrl.DataController = function () {
    * Set the image at a given index.
    *
    * @param {number} index The index of the data.
-   * @param {object} image The image to set.
+   * @param {dwv.image.Image} image The image to set.
    */
   this.setImage = function (index, image) {
     data[index].image = image;
@@ -69,7 +69,7 @@ dwv.ctrl.DataController = function () {
   /**
    * Add a new data.
    *
-   * @param {object} image The image.
+   * @param {dwv.image.Image} image The image.
    * @param {object} meta The image meta.
    */
   this.addNew = function (image, meta) {
@@ -84,7 +84,7 @@ dwv.ctrl.DataController = function () {
    * Update the current data.
    *
    * @param {number} index The index of the data.
-   * @param {object} image The image.
+   * @param {dwv.image.Image} image The image.
    * @param {object} meta The image meta.
    * @param {number} timeId The time ID.
    */

@@ -291,7 +291,7 @@ dwv.dicom.DicomWriter = function () {
 /**
  * Write a list of items.
  *
- * @param {object} writer The raw data writer.
+ * @param {dwv.dicom.DataWriter} writer The raw data writer.
  * @param {number} byteOffset The offset to start writing from.
  * @param {Array} items The list of items to write.
  * @param {boolean} isImplicit Is the DICOM VR implicit?
@@ -347,7 +347,7 @@ dwv.dicom.DicomWriter.prototype.writeDataElementItems = function (
 /**
  * Write data with a specific Value Representation (VR).
  *
- * @param {object} writer The raw data writer.
+ * @param {dwv.dicom.DataWriter} writer The raw data writer.
  * @param {string} vr The data Value Representation (VR).
  * @param {string} vl The data Value Length (VL).
  * @param {number} byteOffset The offset to start writing from.
@@ -433,7 +433,7 @@ dwv.dicom.DicomWriter.prototype.writeDataElementValue = function (
 /**
  * Write a pixel data element.
  *
- * @param {object} writer The raw data writer.
+ * @param {dwv.dicom.DataWriter} writer The raw data writer.
  * @param {string} vr The data Value Representation (VR).
  * @param {string} vl The data Value Length (VL).
  * @param {number} byteOffset The offset to start writing from.
@@ -492,7 +492,7 @@ dwv.dicom.DicomWriter.prototype.writePixelDataElementValue = function (
 /**
  * Write a data element.
  *
- * @param {object} writer The raw data writer.
+ * @param {dwv.dicom.DataWriter} writer The raw data writer.
  * @param {object} element The DICOM data element to write.
  * @param {number} byteOffset The offset to start writing from.
  * @param {boolean} isImplicit Is the DICOM VR implicit?

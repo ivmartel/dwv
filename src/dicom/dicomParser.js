@@ -525,7 +525,7 @@ dwv.dicom.DicomParser.prototype.getDicomElements = function () {
 /**
  * Read a DICOM tag.
  *
- * @param {object} reader The raw data reader.
+ * @param {dwv.dicom.DataReader} reader The raw data reader.
  * @param {number} offset The offset where to start to read.
  * @returns {object} An object containing the tags 'group',
  *   'element' and 'name'.
@@ -551,7 +551,7 @@ dwv.dicom.DicomParser.prototype.readTag = function (reader, offset) {
 /**
  * Read an explicit item data element.
  *
- * @param {object} reader The raw data reader.
+ * @param {dwv.dicom.DataReader} reader The raw data reader.
  * @param {number} offset The offset where to start to read.
  * @param {boolean} implicit Is the DICOM VR implicit?
  * @returns {object} The item data as a list of data elements.
@@ -584,7 +584,7 @@ dwv.dicom.DicomParser.prototype.readExplicitItemDataElement = function (
 /**
  * Read an implicit item data element.
  *
- * @param {object} reader The raw data reader.
+ * @param {dwv.dicom.DataReader} reader The raw data reader.
  * @param {number} offset The offset where to start to read.
  * @param {boolean} implicit Is the DICOM VR implicit?
  * @returns {object} The item data as a list of data elements.
@@ -631,7 +631,7 @@ dwv.dicom.DicomParser.prototype.readImplicitItemDataElement = function (
  * Read the pixel item data element.
  * Ref: [Single frame fragments]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_A.4.html#table_A.4-1}.
  *
- * @param {object} reader The raw data reader.
+ * @param {dwv.dicom.DataReader} reader The raw data reader.
  * @param {number} offset The offset where to start to read.
  * @param {boolean} implicit Is the DICOM VR implicit?
  * @returns {Array} The item data as an array of data elements.
@@ -667,7 +667,7 @@ dwv.dicom.DicomParser.prototype.readPixelItemDataElement = function (
  * Read a DICOM data element.
  * Reference: [DICOM VRs]{@link http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#table_6.2-1}.
  *
- * @param {object} reader The raw data reader.
+ * @param {dwv.dicom.DataReader} reader The raw data reader.
  * @param {number} offset The offset where to start to read.
  * @param {boolean} implicit Is the DICOM VR implicit?
  * @returns {object} An object containing the element
@@ -791,7 +791,7 @@ dwv.dicom.DicomParser.prototype.readDataElement = function (
  * Interpret the data of an element.
  *
  * @param {object} element The data element.
- * @param {object} reader The reader.
+ * @param {dwv.dicom.DataReader} reader The raw data reader.
  * @param {number} pixelRepresentation PixelRepresentation 0->unsigned,
  *   1->signed (needed for pixel data or VR=xs).
  * @param {number} bitsAllocated Bits allocated (needed for pixel data).
@@ -940,7 +940,7 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
  * Interpret the data of a list of elements.
  *
  * @param {Array} elements A list of data elements.
- * @param {object} reader The reader.
+ * @param {dwv.dicom.DataReader} reader The raw data reader.
  * @param {number} pixelRepresentation PixelRepresentation 0->unsigned,
  *   1->signed.
  * @param {number} bitsAllocated Bits allocated.
