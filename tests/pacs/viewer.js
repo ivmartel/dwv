@@ -131,7 +131,14 @@ dwv.test.viewerSetup = function () {
     var input = document.getElementById('position');
     var toFixed2 = function (val) {
       var str = val.toString();
-      return str.slice(0, str.indexOf('.') + 2);
+      var value = null;
+      var dotIndex = str.indexOf('.');
+      if (dotIndex === -1) {
+        value = str;
+      } else {
+        value = str.slice(0, Math.min(dotIndex + 2, str.length));
+      }
+      return value;
     };
     var values = event.value[1];
     input.value = values.map(toFixed2);
