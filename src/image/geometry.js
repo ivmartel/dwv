@@ -233,9 +233,9 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
 };
 
 /**
- * Get a string representation of the Vector3D.
+ * Get a string representation of the geometry.
  *
- * @returns {string} The vector as a string.
+ * @returns {string} The geometry as a string.
  */
 dwv.image.Geometry.prototype.toString = function () {
   return 'Origin: ' + this.getOrigin() +
