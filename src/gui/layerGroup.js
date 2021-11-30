@@ -448,11 +448,12 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
       }
     }
 
+    var index = new dwv.math.Index(event.value[0]);
     var position = new dwv.math.Point(event.value[1]);
     // update position for all layers except the source one
     for (var i = 0; i < layers.length; ++i) {
       if (layers[i].getId() !== event.srclayerid) {
-        layers[i].setCurrentPosition(position);
+        layers[i].setCurrentPosition(position, index);
       }
     }
 

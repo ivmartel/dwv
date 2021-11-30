@@ -179,4 +179,20 @@ dwv.image.PlaneHelper = function (spacing, orientation) {
       z: deOrientedValues[2]
     };
   };
+
+  /**
+   * Get the scroll dimension index.
+   *
+   * @returns {number} The index.
+   */
+  this.getScrollIndex = function () {
+    var index = null;
+    if (typeof orientation !== 'undefined') {
+      index = orientation.getThirdColMajorDirection();
+    } else {
+      index = 2;
+    }
+    return index;
+  };
+
 };

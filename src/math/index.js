@@ -149,3 +149,65 @@ dwv.math.getZeroIndex = function (size) {
   values.fill(0);
   return new dwv.math.Index(values);
 };
+
+/**
+ * Get a string id from the index values in the form of: '#0-1_#1-2'.
+ *
+ * @param {Array} dims Optional list of dimensions to use.
+ * @returns {string} The string id.
+ */
+dwv.math.Index.prototype.toStringId = function (dims) {
+  if (typeof dims === 'undefined') {
+    dims = [];
+    for (var j = 0; j < this.length(); ++j) {
+      dims.push(j);
+    }
+  }
+  for (var ii = 0; ii < dims.length; ++ii) {
+    if (dims[ii] >= this.length()) {
+      throw new Error('Non valid dimension for toStringId.');
+    }
+  }
+  var res = '';
+  for (var i = 0; i < dims.length; ++i) {
+    if (i !== 0) {
+      res += '_';
+    }
+    res += '#' + dims[i] + '-' + this.get(dims[i]);
+  }
+  return res;
+};
+
+/**
+ * Get an index from an id string in the form of: '#0-1_#1-2'
+ * (result of index.toStringId).
+ *
+ * @param {string} inputStr The input string.
+ * @returns {dwv.math.Index} The corresponding index.
+ */
+dwv.math.getIndexFromStringId = function (inputStr) {
+  // split ids
+  var strIds = inputStr.split('_');
+  // get the size of the index
+  var pointLength = 0;
+  var dim;
+  for (var i = 0; i < strIds.length; ++i) {
+    dim = parseInt(strIds[i].substring(1, 2), 10);
+    if (dim > pointLength) {
+      pointLength = dim;
+    }
+  }
+  if (pointLength === 0) {
+    throw new Error('No dimension found in point stringId');
+  }
+  // default values
+  var values = new Array(pointLength);
+  values.fill(0);
+  // get other values from the input string
+  for (var j = 0; j < strIds.length; ++j) {
+    dim = parseInt(strIds[j].substring(1, 3), 10);
+    var value = parseInt(strIds[j].substring(3), 10);
+    values[dim] = value;
+  }
+  return new dwv.math.Point(values);
+};

@@ -638,8 +638,9 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * Set the current position.
    *
    * @param {dwv.math.Point} position The new position.
+   * @param {dwv.math.Index} _index The new index.
    */
-  this.setCurrentPosition = function (position) {
+  this.setCurrentPosition = function (position, _index) {
     viewController.setCurrentPosition(position);
   };
 
