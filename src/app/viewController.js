@@ -143,15 +143,7 @@ dwv.ctrl.ViewController = function (view) {
    */
   this.getCurrentScrollPosition = function () {
     var scrollIndex = view.getScrollIndex();
-    var z = null;
-    if (scrollIndex === 0) {
-      z = view.getCurrentPosition().getX();
-    } else if (scrollIndex === 1) {
-      z = view.getCurrentPosition().getY();
-    } else if (scrollIndex === 2) {
-      z = view.getCurrentPosition().getZ();
-    }
-    return z;
+    return view.getCurrentPosition().get(scrollIndex);
   };
 
   /**
