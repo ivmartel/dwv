@@ -98,9 +98,30 @@ dwv.image.DicomBufferToView = function () {
       // allocate buffer if not done yet
       if (typeof decompressedSizes[dataIndex] === 'undefined') {
         decompressedSizes[dataIndex] = decodedData.length;
-        // TODO Handle max allocation size
-        finalBufferStore[dataIndex] = new decodedData.constructor(
-          event.numberOfItems * decompressedSizes[dataIndex]);
+        var fullSize = event.numberOfItems * decompressedSizes[dataIndex];
+        try {
+          finalBufferStore[dataIndex] = new decodedData.constructor(fullSize);
+        } catch (error) {
+          if (error instanceof RangeError) {
+            var powerOf2 = Math.floor(Math.log(fullSize) / Math.log(2));
+            dwv.logger.error('Cannot allocate ' +
+              decodedData.constructor.name +
+              ' of size: ' +
+              fullSize + ' (>2^' + powerOf2 + ') for decompressed data.');
+          }
+          // abort
+          pixelDecoder.abort();
+          // send events
+          self.onerror({
+            error: error,
+            source: origin
+          });
+          self.onloadend({
+            source: origin
+          });
+          // exit
+          return;
+        }
       }
       // hoping for all items to have the same size...
       if (decodedData.length !== decompressedSizes[dataIndex]) {

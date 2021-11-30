@@ -388,6 +388,9 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       buffer.BYTES_PER_ELEMENT * 8,
       meta.IsSigned ? 1 : 0,
       size);
+    if (buffer === null) {
+      throw new Error('Cannot reallocate data for image.');
+    }
     // put old in new
     buffer.set(tmpBuffer);
     // clean
