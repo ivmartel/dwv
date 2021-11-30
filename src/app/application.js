@@ -1230,11 +1230,10 @@ dwv.App = function () {
       dl.setPlaneHelper(viewLayer.getViewController().getPlaneHelper());
 
       var vc = viewLayer.getViewController();
-      var pos = vc.getCurrentPosition();
-      // positionchange event like data (no need for index)
+      // positionchange event like data
       var value = [
-        null,
-        pos.getValues()
+        vc.getCurrentIndex().getValues(),
+        vc.getCurrentPosition().getValues()
       ];
       layerGroup.updateLayersToPositionChange({value: value});
 
