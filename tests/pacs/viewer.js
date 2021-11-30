@@ -103,6 +103,7 @@ dwv.test.viewerSetup = function () {
   });
   var dataLoad = 0;
   _app.addEventListener('load', function (event) {
+    console.log(_app.getMetaData(event.loadid));
     if (!viewOnFirstLoadItem) {
       _app.render(event.loadid);
     }
@@ -124,7 +125,6 @@ dwv.test.viewerSetup = function () {
   });
   _app.addEventListener('loadend', function (event) {
     console.timeEnd('load-data-' + event.loadid);
-    console.log(_app.getMetaData(event.loadid));
   });
 
   _app.addEventListener('positionchange', function (event) {
