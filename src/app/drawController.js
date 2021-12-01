@@ -212,7 +212,7 @@ dwv.ctrl.DrawController = function (konvaLayer) {
     var list = [];
     var groups = konvaLayer.getChildren();
     for (var j = 0, lenj = groups.length; j < lenj; ++j) {
-      var position = dwv.math.getPointFromStringId(groups[j].id());
+      var position = dwv.math.getIndexFromStringId(groups[j].id());
       var collec = groups[j].getChildren();
       for (var i = 0, leni = collec.length; i < leni; ++i) {
         var shape = collec[i].getChildren(dwv.draw.isNodeNameShape)[0];
