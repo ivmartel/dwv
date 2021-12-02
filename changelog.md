@@ -1,5 +1,28 @@
 # Changelog
 
+## [v0.30.0](https://github.com/ivmartel/dwv/releases/tag/v0.30.0) - 02/12/2021
+
+### Added
+
+- Allow for manual frame add [#1034](https://github.com/ivmartel/dwv/issues/1034)
+- Add support for multi-resolution data [#1003](https://github.com/ivmartel/dwv/issues/1003)
+- Remove coveralls and use karma coverage check [#1002](https://github.com/ivmartel/dwv/issues/1002)
+- Use the same (web) worker for multiple data decode [#993](https://github.com/ivmartel/dwv/issues/993)
+- Add text encoding in data writer [#963](https://github.com/ivmartel/dwv/issues/963)
+- Support anisotropic pixels [#952](https://github.com/ivmartel/dwv/issues/952)
+- Check data allocation size to avoid error [#951](https://github.com/ivmartel/dwv/issues/951)
+- Allow to load files based on UID [#949](https://github.com/ivmartel/dwv/issues/949)
+- Simplify image class data storage [#905](https://github.com/ivmartel/dwv/issues/905)
+- Multi-slice view [#133](https://github.com/ivmartel/dwv/issues/133)
+- Add MPR [#4](https://github.com/ivmartel/dwv/issues/4)
+
+### Fixed
+
+- Check var length before accessing it [#1017](https://github.com/ivmartel/dwv/issues/1017)
+- Drag&drop of the ruler label causes console errors [#994](https://github.com/ivmartel/dwv/issues/994)
+
+---
+
 ## [v0.29.1](https://github.com/ivmartel/dwv/releases/tag/v0.29.1) - 11/06/2021
 
 ### Added
