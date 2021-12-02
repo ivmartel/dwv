@@ -1062,7 +1062,10 @@ dwv.dicom.DicomParser.prototype.parse = function (buffer) {
     }
   }
 
-  // safety check...
+  // safety checks...
+  if (isNaN(offset)) {
+    throw new Error('Problem while parsing, bad offset');
+  }
   if (buffer.byteLength !== offset) {
     dwv.logger.warn('Did not reach the end of the buffer: ' +
       offset + ' != ' + buffer.byteLength);
