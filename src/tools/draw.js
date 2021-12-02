@@ -649,6 +649,11 @@ dwv.tool.Draw = function (app) {
       var drawLayer = layerGroup.getActiveDrawLayer();
       // validate the group position
       dwv.tool.validateGroupPosition(drawLayer.getBaseSize(), this);
+      // update quantification if possible
+      if (typeof currentFactory.updateQuantification !== 'undefined') {
+        var vc = layerGroup.getActiveViewLayer().getViewController();
+        currentFactory.updateQuantification(this, vc);
+      }
       // highlight trash when on it
       var offset = dwv.gui.getEventOffset(event.evt)[0];
       var eventPos = getRealPosition(offset, layerGroup);

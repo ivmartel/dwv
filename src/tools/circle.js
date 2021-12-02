@@ -278,6 +278,51 @@ dwv.tool.draw.CircleFactory.prototype.update = function (
     group.add(dwv.tool.draw.getShadowCircle(circle, group));
   }
 
+  // update label position
+  var textPos = {x: center.x, y: center.y};
+  klabel.position(textPos);
+
+  // update quantification
+  dwv.tool.draw.updateCircleQuantification(group, viewController);
+};
+
+/**
+ * Update the quantification of a Circle.
+ *
+ * @param {object} group The group with the shape.
+ * @param {object} viewController The associated view controller.
+ */
+dwv.tool.draw.CircleFactory.prototype.updateQuantification = function (
+  group, viewController) {
+  dwv.tool.draw.updateCircleQuantification(group, viewController);
+};
+
+/**
+ * Update the quantification of a Circle (as a static
+ *   function to be used in update).
+ *
+ * @param {object} group The group with the shape.
+ * @param {object} viewController The associated view controller.
+ */
+dwv.tool.draw.updateCircleQuantification = function (
+  group, viewController) {
+  // associated shape
+  var kcircle = group.getChildren(function (node) {
+    return node.name() === 'shape';
+  })[0];
+  // associated label
+  var klabel = group.getChildren(function (node) {
+    return node.name() === 'label';
+  })[0];
+
+  // positions: add possible group offset
+  var centerPoint = new dwv.math.Point2D(
+    group.x() + kcircle.x(),
+    group.y() + kcircle.y()
+  );
+  // circle
+  var circle = new dwv.math.Circle(centerPoint, kcircle.radius());
+
   // update text
   var ktext = klabel.getText();
   var quantification = circle.quantify(
@@ -286,9 +331,6 @@ dwv.tool.draw.CircleFactory.prototype.update = function (
   ktext.setText(dwv.utils.replaceFlags(ktext.meta.textExpr, quantification));
   // update meta
   ktext.meta.quantification = quantification;
-  // update position
-  var textPos = {x: center.x, y: center.y};
-  klabel.position(textPos);
 };
 
 /**
