@@ -15,8 +15,6 @@ dwv.image.decoderScripts = {
   rle: '../../decoders/dwv/decode-rle.js'
 };
 
-// get element
-dwv.gui.getElement = dwv.gui.base.getElement;
 // logger level (optional)
 dwv.logger.level = dwv.utils.logger.levels.DEBUG;
 
@@ -29,17 +27,17 @@ dwv.addDataLine = function (id, fileroot, doc) {
 
   // dwv container
   var dwvDiv = document.createElement('div');
-  dwvDiv.id = id;
+  dwvDiv.id = 'dwv' + id;
   dwvDiv.className = 'dwv';
   var layConDiv = document.createElement('div');
-  layConDiv.className = 'layerContainer';
+  layConDiv.id = 'layerGroup' + id;
+  layConDiv.className = 'layerGroup';
   dwvDiv.appendChild(layConDiv);
   mainDiv.appendChild(dwvDiv);
 
   // dwv application
   var config = {
-    containerDivId: id,
-    skipLoadUrl: true
+    dataViewConfigs: {0: [{divId: layConDiv.id}]},
   };
   var url = '../data/' + fileroot + '.dcm';
   var app = new dwv.App();

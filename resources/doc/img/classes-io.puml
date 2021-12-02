@@ -1,0 +1,32 @@
+@startuml
+
+class XMLHttpRequest #lightblue;line:green
+class FileReader #lightblue;line:green
+
+class App {
+  loadURLs()
+  loadFiles()
+  loadImageObject()
+}
+class LoadController
+class UrlsLoader
+class FilesLoader
+class MemoryLoader
+interface SpecificDataLoader ##[dashed] {
+  canLoadUrl()
+  canLoadFile()
+}
+
+App ..> LoadController: uses
+LoadController ..> UrlsLoader: uses
+LoadController ..> FilesLoader: uses
+LoadController ..> MemoryLoader: uses
+
+UrlsLoader .up.> XMLHttpRequest: uses
+FilesLoader .up.> FileReader: uses
+
+UrlsLoader ..> SpecificDataLoader: uses
+FilesLoader ..> SpecificDataLoader: uses
+MemoryLoader ..> SpecificDataLoader: uses
+
+@enduml

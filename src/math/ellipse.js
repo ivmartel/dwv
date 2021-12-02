@@ -23,7 +23,8 @@ dwv.math.mulABC = function (a, b, c) {
  * Ellipse shape.
  *
  * @class
- * @param {object} centre A Point2D representing the centre of the ellipse.
+ * @param {dwv.math.Point2D} centre A Point2D representing the centre
+ *   of the ellipse.
  * @param {number} a The radius of the ellipse on the horizontal axe.
  * @param {number} b The radius of the ellipse on the vertical axe.
  */
@@ -31,7 +32,7 @@ dwv.math.Ellipse = function (centre, a, b) {
   /**
    * Get the centre (point) of the ellipse.
    *
-   * @returns {object} The center (point) of the ellipse.
+   * @returns {dwv.math.Point2D} The center (point) of the ellipse.
    */
   this.getCenter = function () {
     return centre;
@@ -59,7 +60,7 @@ dwv.math.Ellipse = function (centre, a, b) {
 /**
  * Check for equality.
  *
- * @param {object} rhs The object to compare to.
+ * @param {dwv.math.Ellipse} rhs The object to compare to.
  * @returns {boolean} True if both objects are equal.
  */
 dwv.math.Ellipse.prototype.equals = function (rhs) {
@@ -132,7 +133,8 @@ dwv.math.Ellipse.prototype.getRound = function () {
 /**
  * Quantify an ellipse according to view information.
  *
- * @param {object} viewController The associated view controller.
+ * @param {dwv.ctrl.ViewController} viewController The associated view
+ *   controller.
  * @param {Array} flags A list of stat values to calculate.
  * @returns {object} A quantification object.
  */

@@ -3,7 +3,6 @@
  */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
-QUnit.module('point');
 
 /**
  * Tests for {@link dwv.math.Point2D}.
@@ -42,34 +41,6 @@ QUnit.test('Test Point2D.', function (assert) {
   var p33 = new dwv.math.Point2D(0, 1);
   assert.equal(p0.getDistance(p33), Math.sqrt(2), 'getDistance #4');
 
-});
-
-/**
- * Tests for {@link dwv.math.FastPoint2D}.
- *
- * @function module:tests/math~FastPoint2D
- */
-QUnit.test('Test FastPoint2D.', function (assert) {
-  var p0 = new dwv.math.FastPoint2D(1, 2);
-  // x
-  assert.equal(p0.x, 1, 'x');
-  // y
-  assert.equal(p0.y, 2, 'y');
-  // can modify x
-  p0.x = 3;
-  assert.equal(p0.x, 3, 'modified x');
-  // can modify y
-  p0.y = 4;
-  assert.equal(p0.y, 4, 'modified y');
-  // equals: true
-  var p1 = new dwv.math.FastPoint2D(3, 4);
-  assert.equal(p0.equals(p1), true, 'equals true');
-  // equals: false
-  assert.equal(p0.equals(null), false, 'null equals false');
-  var p2 = new dwv.math.FastPoint2D(4, 3);
-  assert.equal(p0.equals(p2), false, 'equals false');
-  // to string
-  assert.equal(p0.toString(), '(3, 4)', 'toString');
 });
 
 /**
@@ -116,34 +87,57 @@ QUnit.test('Test Point3D.', function (assert) {
 });
 
 /**
- * Tests for {@link dwv.math.Index3D}.
+ * Tests for {@link dwv.math.Point}.
  *
- * @function module:tests/math~Index3D
+ * @function module:tests/math~Point
  */
-QUnit.test('Test Index3D.', function (assert) {
-  var i0 = new dwv.math.Index3D(1, 2, 3);
+QUnit.test('Test Point.', function (assert) {
+  var p0 = new dwv.math.Point([1, 2, 3]);
   // getX
-  assert.equal(i0.getI(), 1, 'getI');
+  assert.equal(p0.get(0), 1, 'getX');
   // getY
-  assert.equal(i0.getJ(), 2, 'getJ');
+  assert.equal(p0.get(1), 2, 'getY');
   // getZ
-  assert.equal(i0.getK(), 3, 'getK');
-  // can't modify internal i
-  i0.i = 3;
-  assert.equal(i0.getI(), 1, 'getI after .i');
-  // can't modify internal j
-  i0.j = 3;
-  assert.equal(i0.getJ(), 2, 'getJ after .j');
-  // can't modify internal k
-  i0.k = 3;
-  assert.equal(i0.getK(), 3, 'getK after .k');
+  assert.equal(p0.get(2), 3, 'getZ');
   // equals: true
-  var i1 = new dwv.math.Index3D(1, 2, 3);
-  assert.equal(i0.equals(i1), true, 'equals true');
+  var p1 = new dwv.math.Point([1, 2, 3]);
+  assert.equal(p0.equals(p1), true, 'equals true');
   // equals: false
-  assert.equal(i0.equals(null), false, 'null equals false');
-  var i2 = new dwv.math.Index3D(3, 2, 1);
-  assert.equal(i0.equals(i2), false, 'equals false');
+  assert.equal(p0.equals(null), false, 'null equals false');
+  var p2 = new dwv.math.Point([3, 2, 1]);
+  assert.equal(p0.equals(p2), false, 'equals false');
   // to string
-  assert.equal(i0.toString(), '(1, 2, 3)', 'toString');
+  assert.equal(p0.toString(), '(1,2,3)', 'toString');
+
+  // compare
+  var res30 = p0.compare(p0);
+  assert.equal(res30.length, 0, '[compare] #0');
+  var p31 = new dwv.math.Point([2, 3, 4]);
+  var res31 = p0.compare(p31);
+  assert.equal(res31.length, 3, '[compare] #1 length');
+  assert.equal(res31[0], 0, '[compare] #1 [0]');
+  assert.equal(res31[1], 1, '[compare] #1 [1]');
+  assert.equal(res31[2], 2, '[compare] #1 [2]');
+  var p32 = new dwv.math.Point([1, 3, 4]);
+  var res32 = p0.compare(p32);
+  assert.equal(res32.length, 2, '[compare] #2 length');
+  assert.equal(res32[0], 1, '[compare] #2 [0]');
+  assert.equal(res32[1], 2, '[compare] #2 [1]');
+
+  // addition
+  var p40 = new dwv.math.Point([2, 3, 4]);
+  var res40 = p0.add(p40);
+  assert.equal(res40.get(0), 3, '[add] get0');
+  assert.equal(res40.get(1), 5, '[add] get1');
+  assert.equal(res40.get(2), 7, '[add] get2');
+
+  // mergeWith3D
+  var p50 = new dwv.math.Point([1, 2, 3, 4]);
+  var p3D0 = new dwv.math.Point3D(5, 6, 7);
+  var res50 = p50.mergeWith3D(p3D0);
+  assert.equal(res50.length(), 4, '[merge] #0 length');
+  assert.equal(res50.get(0), 5, '[merge] #0 [0]');
+  assert.equal(res50.get(1), 6, '[merge] #0 [1]');
+  assert.equal(res50.get(2), 7, '[merge] #0 [2]');
+  assert.equal(res50.get(3), 4, '[merge] #0 [3]');
 });

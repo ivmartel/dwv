@@ -36,10 +36,10 @@ dwv.utils.ThreadPool = function (poolSize) {
     if (freeThreads.length > 0) {
       // get the first free worker thread
       var workerThread = freeThreads.shift();
-      // run the input task
-      workerThread.run(workerTask);
       // add the thread to the runnning list
       runningThreads.push(workerThread);
+      // run the input task
+      workerThread.run(workerTask);
     } else {
       // no free thread, add task to queue
       taskQueue.push(workerTask);
@@ -204,15 +204,15 @@ dwv.utils.WorkerThread = function (parentPool) {
   this.run = function (workerTask) {
     // store task
     runningTask = workerTask;
-    // create a new web worker
-    if (runningTask.script !== null) {
+    // create a new web worker if not done yet
+    if (typeof worker === 'undefined') {
       worker = new Worker(runningTask.script);
       // set callbacks
       worker.onmessage = onmessage;
       worker.onerror = onerror;
-      // launch the worker
-      worker.postMessage(runningTask.startMessage);
     }
+    // launch the worker
+    worker.postMessage(runningTask.startMessage);
   };
 
   /**
@@ -221,8 +221,6 @@ dwv.utils.WorkerThread = function (parentPool) {
   this.stop = function () {
     // stop the worker
     worker.terminate();
-    // tell the parent pool this thread is free
-    parentPool.onTaskEnd(this);
   };
 
   /**
@@ -234,11 +232,14 @@ dwv.utils.WorkerThread = function (parentPool) {
    * @private
    */
   function onmessage(event) {
-    // pass to parent
-    event.index = runningTask.id;
+    // augment event
+    event.itemNumber = runningTask.info.itemNumber;
+    event.numberOfItems = runningTask.info.numberOfItems;
+    event.dataIndex = runningTask.info.dataIndex;
+    // send event
     parentPool.onworkitem(event);
-    // stop the worker and free the thread
-    self.stop();
+    // tell the parent pool the task is done
+    parentPool.onTaskEnd(self);
   }
 
   /**
@@ -248,6 +249,10 @@ dwv.utils.WorkerThread = function (parentPool) {
    * @private
    */
   function onerror(event) {
+    // augment event
+    event.itemNumber = runningTask.info.itemNumber;
+    event.numberOfItems = runningTask.info.numberOfItems;
+    event.dataIndex = runningTask.info.dataIndex;
     // pass to parent
     parentPool.handleWorkerError(event);
     // stop the worker and free the thread
@@ -261,13 +266,13 @@ dwv.utils.WorkerThread = function (parentPool) {
  * @class
  * @param {string} script The worker script.
  * @param {object} message The data to pass to the worker.
- * @param {number} index The worker id.
+ * @param {object} info Information object about the input data.
  */
-dwv.utils.WorkerTask = function (script, message, index) {
+dwv.utils.WorkerTask = function (script, message, info) {
   // worker script
   this.script = script;
   // worker start message
   this.startMessage = message;
-  // worker id
-  this.id = index;
+  // information about the work data
+  this.info = info;
 };

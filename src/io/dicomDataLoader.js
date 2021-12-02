@@ -62,10 +62,8 @@ dwv.io.DicomDataLoader = function () {
   this.load = function (buffer, origin, index) {
     // setup db2v ony once
     if (!isLoading) {
-      // set character set
-      if (typeof options.defaultCharacterSet !== 'undefined') {
-        db2v.setDefaultCharacterSet(options.defaultCharacterSet);
-      }
+      // pass options
+      db2v.setOptions(options);
       // connect handlers
       db2v.onloadstart = self.onloadstart;
       db2v.onprogress = self.onprogress;

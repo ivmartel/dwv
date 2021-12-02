@@ -1,5 +1,6 @@
 // namespaces
 var dwv = dwv || {};
+dwv.ctrl = dwv.ctrl || {};
 
 /**
  * View controller.
@@ -7,11 +8,26 @@ var dwv = dwv || {};
  * @param {dwv.image.View} view The associated view.
  * @class
  */
-dwv.ViewController = function (view) {
+dwv.ctrl.ViewController = function (view) {
   // closure to self
   var self = this;
-  // Slice/frame player ID (created by setInterval)
+  // third dimension player ID (created by setInterval)
   var playerID = null;
+
+  // setup the plane helper
+  var planeHelper = new dwv.image.PlaneHelper(
+    view.getImage().getGeometry().getSpacing(),
+    view.getOrientation()
+  );
+
+  /**
+   * Get the plane helper.
+   *
+   * @returns {object} The helper.
+   */
+  this.getPlaneHelper = function () {
+    return planeHelper;
+  };
 
   /**
    * Initialise the controller.
@@ -21,8 +37,6 @@ dwv.ViewController = function (view) {
     this.setWindowLevelPresetById(0);
     // default position
     this.setCurrentPosition2D(0, 0);
-    // default frame
-    this.setCurrentFrame(0);
   };
 
   /**
@@ -65,7 +79,7 @@ dwv.ViewController = function (view) {
   /**
    * Check if the controller is playing.
    *
-   * @returns {boolean} True is the controler is playing slices/frames.
+   * @returns {boolean} True if the controler is playing.
    */
   this.isPlaying = function () {
     return (playerID !== null);
@@ -74,10 +88,80 @@ dwv.ViewController = function (view) {
   /**
    * Get the current position.
    *
-   * @returns {object} The position.
+   * @returns {dwv.math.Point} The position.
    */
   this.getCurrentPosition = function () {
     return view.getCurrentPosition();
+  };
+
+  /**
+   * Get the current index.
+   *
+   * @returns {dwv.math.Index} The current index.
+   */
+  this.getCurrentIndex = function () {
+    return view.getCurrentIndex();
+  };
+
+  /**
+   * Get the current oriented position.
+   *
+   * @returns {dwv.math.Point} The position.
+   */
+  this.getCurrentOrientedPosition = function () {
+    var res = view.getCurrentPosition();
+    // values = orientation * orientedValues
+    // -> inv(orientation) * values = orientedValues
+    if (typeof view.getOrientation() !== 'undefined') {
+      res = view.getOrientation().getInverse().getAbs().multiplyVector3D(res);
+    }
+    return res;
+  };
+
+  /**
+   * Get the scroll index.
+   *
+   * @returns {number} The index.
+   */
+  this.getScrollIndex = function () {
+    return view.getScrollIndex();
+  };
+
+  /**
+   * Get the current scroll index value.
+   *
+   * @returns {object} The value.
+   */
+  this.getCurrentScrollIndexValue = function () {
+    return view.getCurrentIndex().get(view.getScrollIndex());
+  };
+
+  /**
+   * Get the current scroll position value.
+   *
+   * @returns {object} The value.
+   */
+  this.getCurrentScrollPosition = function () {
+    var scrollIndex = view.getScrollIndex();
+    return view.getCurrentPosition().get(scrollIndex);
+  };
+
+  /**
+   * Generate display image data to be given to a canvas.
+   *
+   * @param {Array} array The array to fill in.
+   */
+  this.generateImageData = function (array) {
+    view.generateImageData(array);
+  };
+
+  /**
+   * Set the associated image.
+   *
+   * @param {Image} img The associated image.
+   */
+  this.setImage = function (img) {
+    view.setImage(img);
   };
 
   /**
@@ -87,7 +171,7 @@ dwv.ViewController = function (view) {
    */
   this.get2DSpacing = function () {
     var spacing = view.getImage().getGeometry().getSpacing();
-    return [spacing.getColumnSpacing(), spacing.getRowSpacing()];
+    return [spacing.get(0), spacing.get(1)];
   };
 
   /**
@@ -98,12 +182,43 @@ dwv.ViewController = function (view) {
    * @returns {Array} A list of values.
    */
   this.getImageRegionValues = function (min, max) {
+    var image = view.getImage();
+    var orientation = view.getOrientation();
+    var position = this.getCurrentIndex();
+    var rescaled = true;
+
+    // created oriented slice if needed
+    if (!dwv.math.isIdentityMat33(orientation)) {
+      // generate slice values
+      var sliceIter = dwv.image.getSliceIterator(
+        image,
+        position,
+        rescaled,
+        orientation
+      );
+      var sliceValues = dwv.image.getIteratorValues(sliceIter);
+      // oriented geometry
+      var orientedSize = image.getGeometry().getSize(orientation);
+      var sizeValues = orientedSize.getValues();
+      sizeValues[2] = 1;
+      var sliceSize = new dwv.image.Size(sizeValues);
+      var orientedSpacing = image.getGeometry().getSpacing(orientation);
+      var spacingValues = orientedSpacing.getValues();
+      spacingValues[2] = 1;
+      var sliceSpacing = new dwv.image.Spacing(spacingValues);
+      var sliceOrigin = new dwv.math.Point3D(0, 0, 0);
+      var sliceGeometry =
+        new dwv.image.Geometry(sliceOrigin, sliceSize, sliceSpacing);
+      // slice image
+      image = new dwv.image.Image(sliceGeometry, sliceValues);
+      // update position
+      position = new dwv.math.Index([0, 0, 0]);
+      rescaled = false;
+    }
+
+    // get region values
     var iter = dwv.image.getRegionSliceIterator(
-      view.getImage(),
-      this.getCurrentPosition().k,
-      this.getCurrentFrame(),
-      true, min, max
-    );
+      image, position, rescaled, min, max);
     var values = [];
     if (iter) {
       values = dwv.image.getIteratorValues(iter);
@@ -120,8 +235,7 @@ dwv.ViewController = function (view) {
   this.getImageVariableRegionValues = function (regions) {
     var iter = dwv.image.getVariableRegionSliceIterator(
       view.getImage(),
-      this.getCurrentPosition().k,
-      this.getCurrentFrame(),
+      this.getCurrentIndex(),
       true, regions
     );
     var values = [];
@@ -137,33 +251,41 @@ dwv.ViewController = function (view) {
    * @returns {boolean} True if possible.
    */
   this.canQuantifyImage = function () {
-    return view.getImage().getNumberOfComponents() === 1;
+    return view.getImage().canQuantify();
   };
 
   /**
    * Can window and level be applied to the data?
    *
-   * @returns {boolean} True if the data is monochrome.
+   * @returns {boolean} True if possible.
    */
   this.canWindowLevel = function () {
-    return view.getImage().getPhotometricInterpretation()
-      .match(/MONOCHROME/) !== null;
+    return view.getImage().canWindowLevel();
   };
 
   /**
-   * Is the data mono-frame?
+   * Can the data be scrolled?
    *
-   * @returns {boolean} True if the data only contains one frame.
+   * @returns {boolean} True if the data has a third dimension greater than one.
    */
-  this.isMonoFrameData = function () {
-    return view.getImage().getNumberOfFrames() === 1;
+  this.canScroll = function () {
+    return view.getImage().canScroll(view.getOrientation());
+  };
+
+  /**
+   * Get the image size.
+   *
+   * @returns {dwv.image.Size} The size.
+   */
+  this.getImageSize = function () {
+    return view.getImage().getGeometry().getSize();
   };
 
   /**
    * Set the current position.
    *
-   * @param {object} pos The position.
-   * @param {boolean} silent If true, does not fire a slicechange event.
+   * @param {dwv.math.Point} pos The position.
+   * @param {boolean} silent If true, does not fire a positionchange event.
    * @returns {boolean} False if not in bounds.
    */
   this.setCurrentPosition = function (pos, silent) {
@@ -171,126 +293,145 @@ dwv.ViewController = function (view) {
   };
 
   /**
-   * Set the current 2D (i,j) position.
+   * Set the current 2D (x,y) position.
    *
-   * @param {number} i The column index.
-   * @param {number} j The row index.
+   * @param {number} x The column position.
+   * @param {number} y The row position.
    * @returns {boolean} False if not in bounds.
    */
-  this.setCurrentPosition2D = function (i, j) {
-    return view.setCurrentPosition({
-      i: i,
-      j: j,
-      k: view.getCurrentPosition().k
-    });
+  this.setCurrentPosition2D = function (x, y) {
+    return view.setCurrentPosition(
+      this.getPositionFromPlanePoint({x: x, y: y}));
   };
 
   /**
-   * Set the current slice position.
+   * Set the current index.
    *
-   * @param {number} k The slice index.
+   * @param {dwv.math.Index} index The index.
+   * @param {boolean} silent If true, does not fire a positionchange event.
    * @returns {boolean} False if not in bounds.
    */
-  this.setCurrentSlice = function (k) {
-    return view.setCurrentPosition({
-      i: view.getCurrentPosition().i,
-      j: view.getCurrentPosition().j,
-      k: k
-    });
+  this.setCurrentIndex = function (index, silent) {
+    return view.setCurrentIndex(index, silent);
   };
 
   /**
-   * Increment the current slice number.
+   * Get a 3D position from a plane 2D position.
    *
+   * @param {dwv.math.Point2D} point2D The 2D position as {x,y}.
+   * @returns {dwv.math.Point} The 3D point.
+   */
+  this.getPositionFromPlanePoint = function (point2D) {
+    // keep third direction
+    var k = this.getCurrentScrollIndexValue();
+    var planePoint = new dwv.math.Point3D(point2D.x, point2D.y, k);
+    // de-orient
+    var point = planeHelper.getDeOrientedVector3D(planePoint);
+    // ~indexToWorld to not loose precision
+    var geometry = view.getImage().getGeometry();
+    var point3D = geometry.pointToWorld(point);
+    // merge with current position to keep extra dimensions
+    return this.getCurrentPosition().mergeWith3D(point3D);
+  };
+
+  /**
+   * Get a plane 3D position from a plane 2D position: does not compensate
+   *   for the image origin. Needed for setting the scale center...
+   *
+   * @param {dwv.math.Point2D} point2D The 2D position as {x,y}.
+   * @returns {dwv.math.Point3D} The 3D point.
+   */
+  this.getPlanePositionFromPlanePoint = function (point2D) {
+    // keep third direction
+    var k = this.getCurrentScrollIndexValue();
+    var planePoint = new dwv.math.Point3D(point2D.x, point2D.y, k);
+    // de-orient
+    var point = planeHelper.getDeOrientedVector3D(planePoint);
+    // ~indexToWorld to not loose precision
+    var geometry = view.getImage().getGeometry();
+    var spacing = geometry.getSpacing();
+    return new dwv.math.Point3D(
+      point.getX() * spacing.get(0),
+      point.getY() * spacing.get(1),
+      point.getZ() * spacing.get(2));
+  };
+
+  /**
+   * Get a 3D offset from a plane one.
+   *
+   * @param {object} offset2D The plane offset as {x,y}.
+   * @returns {dwv.math.Vector3D} The 3D world offset.
+   */
+  this.getOffset3DFromPlaneOffset = function (offset2D) {
+    return planeHelper.getOffset3DFromPlaneOffset(offset2D);
+  };
+
+  /**
+   * Increment the provided dimension.
+   *
+   * @param {number} dim The dimension to increment.
+   * @param {boolean} silent Do not send event.
    * @returns {boolean} False if not in bounds.
    */
-  this.incrementSliceNb = function () {
-    return self.setCurrentSlice(view.getCurrentPosition().k + 1);
+  this.incrementIndex = function (dim, silent) {
+    return view.incrementIndex(dim, silent);
   };
 
   /**
-   * Decrement the current slice number.
+   * Decrement the provided dimension.
    *
+   * @param {number} dim The dimension to increment.
+   * @param {boolean} silent Do not send event.
    * @returns {boolean} False if not in bounds.
    */
-  this.decrementSliceNb = function () {
-    return self.setCurrentSlice(view.getCurrentPosition().k - 1);
+  this.decrementIndex = function (dim, silent) {
+    return view.decrementIndex(dim, silent);
   };
 
   /**
-   * Get the current frame.
+   * Decrement the scroll dimension index.
    *
-   * @returns {number} The frame number.
-   */
-  this.getCurrentFrame = function () {
-    return view.getCurrentFrame();
-  };
-
-  /**
-   * Set the current frame.
-   *
-   * @param {number} number The frame number.
+   * @param {boolean} silent Do not send event.
    * @returns {boolean} False if not in bounds.
    */
-  this.setCurrentFrame = function (number) {
-    return view.setCurrentFrame(number);
+  this.decrementScrollIndex = function (silent) {
+    return view.decrementScrollIndex(silent);
   };
 
   /**
-   * Increment the current frame.
+   * Increment the scroll dimension index.
    *
+   * @param {boolean} silent Do not send event.
    * @returns {boolean} False if not in bounds.
    */
-  this.incrementFrameNb = function () {
-    return view.setCurrentFrame(view.getCurrentFrame() + 1);
+  this.incrementScrollIndex = function (silent) {
+    return view.incrementScrollIndex(silent);
   };
 
   /**
-   * Decrement the current frame.
-   *
-   * @returns {boolean} False if not in bounds.
-   */
-  this.decrementFrameNb = function () {
-    return view.setCurrentFrame(view.getCurrentFrame() - 1);
-  };
-
-  /**
-   * Go to first slice .
-   *
-   * @returns {boolean} False if not in bounds.
-   * @deprecated Use the setCurrentSlice function.
-   */
-  this.goFirstSlice = function () {
-    return view.setCurrentPosition({
-      i: view.getCurrentPosition().i,
-      j: view.getCurrentPosition().j,
-      k: 0
-    });
-  };
-
-  /**
-   *
+   * Scroll play: loop through all slices.
    */
   this.play = function () {
+    if (!this.canScroll()) {
+      return;
+    }
     if (playerID === null) {
-      var nSlices = view.getImage().getGeometry().getSize().getNumberOfSlices();
-      var nFrames = view.getImage().getNumberOfFrames();
       var recommendedDisplayFrameRate =
         view.getImage().getMeta().RecommendedDisplayFrameRate;
       var milliseconds = view.getPlaybackMilliseconds(
         recommendedDisplayFrameRate);
 
       playerID = setInterval(function () {
-        if (nSlices !== 1) {
-          if (!self.incrementSliceNb()) {
-            self.setCurrentSlice(0);
-          }
-        } else if (nFrames !== 1) {
-          if (!self.incrementFrameNb()) {
-            self.setCurrentFrame(0);
-          }
+        // end of scroll, loop back
+        if (!self.incrementScrollIndex()) {
+          var pos1 = self.getCurrentIndex();
+          var values = pos1.getValues();
+          var orientation = view.getOrientation();
+          values[orientation.getThirdColMajorDirection()] = 0;
+          var index = new dwv.math.Index(values);
+          var geometry = view.getImage().getGeometry();
+          self.setCurrentPosition(geometry.indexToWorld(index));
         }
-
       }, milliseconds);
     } else {
       this.stop();
@@ -298,7 +439,7 @@ dwv.ViewController = function (view) {
   };
 
   /**
-   *
+   * Stop scroll playing.
    */
   this.stop = function () {
     if (playerID !== null) {
@@ -348,6 +489,15 @@ dwv.ViewController = function (view) {
   };
 
   /**
+   * Set the view per value alpha function.
+   *
+   * @param {Function} func The function.
+   */
+  this.setViewAlphaFunction = function (func) {
+    view.setAlphaFunction(func);
+  };
+
+  /**
    * Set the colour map from a name.
    *
    * @param {string} name The name of the colour map to set.
@@ -361,4 +511,4 @@ dwv.ViewController = function (view) {
     this.setColourMap(dwv.tool.colourMaps[name]);
   };
 
-}; // class dwv.ViewController
+}; // class ViewController

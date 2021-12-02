@@ -269,6 +269,58 @@ dwv.tool.draw.RectangleFactory.prototype.update = function (
     kshadow.size({width: rWidth, height: rHeight});
   }
 
+  // update label position
+  var textPos = {
+    x: rect.getBegin().getX() - group.x(),
+    y: rect.getEnd().getY() - group.y()
+  };
+  klabel.position(textPos);
+
+  // update quantification
+  dwv.tool.draw.updateRectangleQuantification(group, viewController);
+};
+
+/**
+ * Update the quantification of a Rectangle.
+ *
+ * @param {object} group The group with the shape.
+ * @param {object} viewController The associated view controller.
+ */
+dwv.tool.draw.RectangleFactory.prototype.updateQuantification = function (
+  group, viewController) {
+  dwv.tool.draw.updateRectangleQuantification(group, viewController);
+};
+
+/**
+ * Update the quantification of a Rectangle (as a static
+ *   function to be used in update).
+ *
+ * @param {object} group The group with the shape.
+ * @param {object} viewController The associated view controller.
+ */
+dwv.tool.draw.updateRectangleQuantification = function (
+  group, viewController) {
+  // associated shape
+  var krect = group.getChildren(function (node) {
+    return node.name() === 'shape';
+  })[0];
+  // associated label
+  var klabel = group.getChildren(function (node) {
+    return node.name() === 'label';
+  })[0];
+
+  // positions: add possible group offset
+  var p2d0 = new dwv.math.Point2D(
+    group.x() + krect.x(),
+    group.y() + krect.y()
+  );
+  var p2d1 = new dwv.math.Point2D(
+    p2d0.getX() + krect.width(),
+    p2d0.getY() + krect.height()
+  );
+  // rectangle
+  var rect = new dwv.math.Rectangle(p2d0, p2d1);
+
   // update text
   var ktext = klabel.getText();
   var quantification = rect.quantify(
@@ -277,12 +329,6 @@ dwv.tool.draw.RectangleFactory.prototype.update = function (
   ktext.setText(dwv.utils.replaceFlags(ktext.meta.textExpr, quantification));
   // update meta
   ktext.meta.quantification = quantification;
-  // update position
-  var textPos = {
-    x: rect.getBegin().getX() - group.x(),
-    y: rect.getEnd().getY() - group.y()
-  };
-  klabel.position(textPos);
 };
 
 /**

@@ -22,7 +22,7 @@ dwv.math.ROI = function () {
    *
    * @param {number} index The index of the point to get
    *   (beware, no size check).
-   * @returns {object} The Point2D at the given index.
+   * @returns {dwv.math.Point2D} The Point2D at the given index.
    */
   this.getPoint = function (index) {
     return points[index];
@@ -38,7 +38,7 @@ dwv.math.ROI = function () {
   /**
    * Add a point to the ROI.
    *
-   * @param {object} point The Point2D to add.
+   * @param {dwv.math.Point2D} point The Point2D to add.
    */
   this.addPoint = function (point) {
     points.push(point);

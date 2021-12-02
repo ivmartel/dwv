@@ -40,7 +40,7 @@ dwv.tool.GetShapeDisplayName = function (shape) {
  * @param {object} group The group draw.
  * @param {string} name The shape display name.
  * @param {object} layer The layer where to draw the group.
- * @param {object} silent Whether to send a creation event or not.
+ * @param {boolean} silent Whether to send a creation event or not.
  * @class
  */
 dwv.tool.DrawGroupCommand = function (group, name, layer, silent) {

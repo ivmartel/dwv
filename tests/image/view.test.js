@@ -3,7 +3,6 @@
  */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
-QUnit.module('view');
 
 /**
  * Tests for {@link dwv.image.View} listeners.
@@ -13,15 +12,15 @@ QUnit.module('view');
 QUnit.test('Test listeners.', function (assert) {
   // create an image
   var size0 = 4;
-  var imgSize0 = new dwv.image.Size(size0, size0, 1);
-  var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+  var imgSize0 = new dwv.image.Size([size0, size0, 1]);
+  var imgSpacing0 = new dwv.image.Spacing([1, 1, 1]);
   var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
   var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
   var buffer0 = [];
   for (var i = 0; i < size0 * size0; ++i) {
     buffer0[i] = i;
   }
-  var image0 = new dwv.image.Image(imgGeometry0, [buffer0]);
+  var image0 = new dwv.image.Image(imgGeometry0, buffer0);
   image0.setMeta({BitsStored: 8});
   // create a view
   var view0 = new dwv.image.View(image0);
@@ -34,14 +33,14 @@ QUnit.test('Test listeners.', function (assert) {
     assert.equal(event.ww, 1, 'Expected call to listener2.');
   };
     // with two listeners
-  view0.addEventListener('wlcenterchange', listener1);
-  view0.addEventListener('wlcenterchange', listener2);
+  view0.addEventListener('wlchange', listener1);
+  view0.addEventListener('wlchange', listener2);
   view0.setWindowLevel(0, 1);
   // without listener2
-  view0.removeEventListener('wlcenterchange', listener2);
+  view0.removeEventListener('wlchange', listener2);
   view0.setWindowLevel(0, 2);
   // without listener1
-  view0.removeEventListener('wlcenterchange', listener1);
+  view0.removeEventListener('wlchange', listener1);
   view0.setWindowLevel(1, 1);
 });
 
@@ -53,15 +52,15 @@ QUnit.test('Test listeners.', function (assert) {
 QUnit.test('Test playback milliseconds.', function (assert) {
   // create an image
   var size0 = 4;
-  var imgSize0 = new dwv.image.Size(size0, size0, 1);
-  var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+  var imgSize0 = new dwv.image.Size([size0, size0, 1]);
+  var imgSpacing0 = new dwv.image.Spacing([1, 1, 1]);
   var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
   var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
   var buffer0 = [];
   for (var i = 0; i < size0 * size0; ++i) {
     buffer0[i] = i;
   }
-  var image0 = new dwv.image.Image(imgGeometry0, [buffer0]);
+  var image0 = new dwv.image.Image(imgGeometry0, buffer0);
   image0.setMeta({RecommendedDisplayFrameRate: 20});
 
   // create a view
@@ -93,15 +92,15 @@ QUnit.test('Test playback milliseconds.', function (assert) {
 QUnit.test('Test generate data MONO.', function (assert) {
   // create an image
   var size0 = 2;
-  var imgSize0 = new dwv.image.Size(size0, size0, 1);
-  var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+  var imgSize0 = new dwv.image.Size([size0, size0, 1]);
+  var imgSpacing0 = new dwv.image.Spacing([1, 1, 1]);
   var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
   var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
   var buffer0 = [];
   for (var i = 0; i < size0 * size0; ++i) {
     buffer0[i] = i;
   }
-  var image0 = new dwv.image.Image(imgGeometry0, [buffer0]);
+  var image0 = new dwv.image.Image(imgGeometry0, buffer0);
   image0.setMeta({BitsStored: 8});
   // create a view
   var view0 = new dwv.image.View(image0);
@@ -151,8 +150,8 @@ QUnit.test('Test generate data MONO.', function (assert) {
 QUnit.test('Test generate data RGB.', function (assert) {
   // create an image
   var size0 = 2;
-  var imgSize0 = new dwv.image.Size(size0, size0, 1);
-  var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+  var imgSize0 = new dwv.image.Size([size0, size0, 1]);
+  var imgSpacing0 = new dwv.image.Spacing([1, 1, 1]);
   var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
   var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
   var buffer0 = [];
@@ -166,7 +165,7 @@ QUnit.test('Test generate data RGB.', function (assert) {
     buffer0[index + 2] = value;
     index += 3;
   }
-  var image0 = new dwv.image.Image(imgGeometry0, [buffer0]);
+  var image0 = new dwv.image.Image(imgGeometry0, buffer0);
   image0.setPhotometricInterpretation('RGB');
   image0.setMeta({BitsStored: 8});
   // create a view
@@ -219,7 +218,7 @@ QUnit.test('Test generate data RGB.', function (assert) {
     buffer1[index + 3] = 255;
     index += 4;
   }
-  var image1 = new dwv.image.Image(imgGeometry0, [buffer1]);
+  var image1 = new dwv.image.Image(imgGeometry0, buffer1);
   image1.setPhotometricInterpretation('RGB');
   image1.setPlanarConfiguration(1);
   image1.setMeta({BitsStored: 8});
@@ -250,15 +249,15 @@ QUnit.test('Test generate data RGB.', function (assert) {
 QUnit.test('Test generate data timing.', function (assert) {
   // create an image
   var size0 = 128;
-  var imgSize0 = new dwv.image.Size(size0, size0, 1);
-  var imgSpacing0 = new dwv.image.Spacing(1, 1, 1);
+  var imgSize0 = new dwv.image.Size([size0, size0, 1]);
+  var imgSpacing0 = new dwv.image.Spacing([1, 1, 1]);
   var imgOrigin0 = new dwv.math.Point3D(0, 0, 0);
   var imgGeometry0 = new dwv.image.Geometry(imgOrigin0, imgSize0, imgSpacing0);
   var buffer0 = [];
   for (var i = 0; i < size0 * size0; ++i) {
     buffer0[i] = i;
   }
-  var image0 = new dwv.image.Image(imgGeometry0, [buffer0]);
+  var image0 = new dwv.image.Image(imgGeometry0, buffer0);
   image0.setMeta({BitsStored: 8});
   // create a view
   var view0 = new dwv.image.View(image0);

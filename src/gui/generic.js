@@ -1,7 +1,6 @@
 // namespaces
 var dwv = dwv || {};
 dwv.gui = dwv.gui || {};
-dwv.gui.base = dwv.gui.base || {};
 
 /**
  * List of interaction event names.
@@ -24,8 +23,9 @@ dwv.gui.interactionEventNames = [
  * @param {number} containerDivId The id of the container div.
  * @param {string} name The name or id to find.
  * @returns {object} The found element or null.
+ * @deprecated
  */
-dwv.gui.base.getElement = function (containerDivId, name) {
+dwv.gui.getElement = function (containerDivId, name) {
   // get by class in the container div
   var parent = document.getElementById(containerDivId);
   if (!parent) {
@@ -43,30 +43,39 @@ dwv.gui.base.getElement = function (containerDivId, name) {
 };
 
 /**
- * Get the size available for a div.
+ * Get a HTML element associated to a container div. Defaults to local one.
  *
- * @param {object} div The input div.
- * @returns {object} The available width and height as {x,y}.
+ * @see dwv.gui.getElement
+ * @deprecated
  */
-dwv.gui.getDivSize = function (div) {
-  var parent = div.parentNode;
-  // offsetHeight: height of an element, including vertical padding
-  // and borders
-  // ref: https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetHeight
-  var height = parent.offsetHeight;
-  // remove the height of other elements of the container div
-  var kids = parent.children;
-  for (var i = 0; i < kids.length; ++i) {
-    if (!kids[i].classList.contains(div.className)) {
-      var styles = window.getComputedStyle(kids[i]);
-      // offsetHeight does not include margin
-      var margin = parseFloat(styles.getPropertyValue('margin-top'), 10) +
-             parseFloat(styles.getPropertyValue('margin-bottom'), 10);
-      height -= (kids[i].offsetHeight + margin);
-    }
-  }
-  return {x: parent.offsetWidth, y: height};
+dwv.getElement = dwv.gui.getElement;
+
+/**
+ * Prompt the user for some text. Uses window.prompt.
+ *
+ * @param {string} message The message in front of the input field.
+ * @param {string} value The input default value.
+ * @returns {string} The new value.
+ */
+dwv.gui.prompt = function (message, value) {
+  return prompt(message, value);
 };
+
+/**
+ * Prompt the user for some text. Defaults to local one.
+ *
+ * @see dwv.gui.prompt
+ */
+dwv.prompt = dwv.gui.prompt;
+
+/**
+ * Open a dialogue to edit roi data. Defaults to undefined.
+ *
+ * @param {object} data The roi data.
+ * @param {Function} callback The callback to launch on dialogue exit.
+ * @see dwv.tool.Draw
+ */
+dwv.openRoiDialog;
 
 /**
  * Get the positions (without the parent offset) of a list of touch events.
@@ -117,14 +126,18 @@ dwv.gui.getEventOffset = function (event) {
     // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/targetTouches
     positions = dwv.gui.getTouchesPositions(event.targetTouches);
   } else if (typeof event.changedTouches !== 'undefined' &&
-      event.changedTouches.length !== 0) {
+    event.changedTouches.length !== 0) {
     // see https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/changedTouches
     positions = dwv.gui.getTouchesPositions(event.changedTouches);
   } else {
-    // layerX is used by Firefox
-    var ex = event.offsetX === undefined ? event.layerX : event.offsetX;
-    var ey = event.offsetY === undefined ? event.layerY : event.offsetY;
-    positions.push({x: ex, y: ey});
+    // offsetX/Y: the offset in the X coordinate of the mouse pointer
+    // between that event and the padding edge of the target node
+    // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/offsetX
+    // https://caniuse.com/mdn-api_mouseevent_offsetx
+    positions.push({
+      x: event.offsetX,
+      y: event.offsetY
+    });
   }
   return positions;
 };

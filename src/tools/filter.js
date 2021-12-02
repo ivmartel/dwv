@@ -8,7 +8,7 @@ dwv.tool.filter = dwv.tool.filter || {};
  * Filter tool.
  *
  * @class
- * @param {object} app The associated app.
+ * @param {dwv.App} app The associated app.
  */
 dwv.tool.Filter = function (app) {
   /**
@@ -178,7 +178,7 @@ dwv.tool.Filter.prototype.hasFilter = function (name) {
  * Threshold filter tool.
  *
  * @class
- * @param {object} app The associated application.
+ * @param {dwv.App} app The associated application.
  */
 dwv.tool.filter.Threshold = function (app) {
   /**
@@ -232,7 +232,7 @@ dwv.tool.filter.Threshold = function (app) {
     filter.setMax(args.max);
     // reset the image if asked
     if (resetImage) {
-      filter.setOriginalImage(app.getImage());
+      filter.setOriginalImage(app.getLastImage());
       resetImage = false;
     }
     var command = new dwv.tool.RunFilterCommand(filter, app);
@@ -280,7 +280,7 @@ dwv.tool.filter.Threshold = function (app) {
  * Sharpen filter tool.
  *
  * @class
- * @param {object} app The associated application.
+ * @param {dwv.App} app The associated application.
  */
 dwv.tool.filter.Sharpen = function (app) {
   /**
@@ -314,7 +314,7 @@ dwv.tool.filter.Sharpen = function (app) {
    */
   this.run = function (_args) {
     var filter = new dwv.image.filter.Sharpen();
-    filter.setOriginalImage(app.getImage());
+    filter.setOriginalImage(app.getLastImage());
     var command = new dwv.tool.RunFilterCommand(filter, app);
     command.onExecute = fireEvent;
     command.onUndo = fireEvent;
@@ -359,7 +359,7 @@ dwv.tool.filter.Sharpen = function (app) {
  * Sobel filter tool.
  *
  * @class
- * @param {object} app The associated application.
+ * @param {dwv.App} app The associated application.
  */
 dwv.tool.filter.Sobel = function (app) {
   /**
@@ -393,7 +393,7 @@ dwv.tool.filter.Sobel = function (app) {
    */
   dwv.tool.filter.Sobel.prototype.run = function (_args) {
     var filter = new dwv.image.filter.Sobel();
-    filter.setOriginalImage(app.getImage());
+    filter.setOriginalImage(app.getLastImage());
     var command = new dwv.tool.RunFilterCommand(filter, app);
     command.onExecute = fireEvent;
     command.onUndo = fireEvent;
@@ -439,7 +439,7 @@ dwv.tool.filter.Sobel = function (app) {
  *
  * @class
  * @param {object} filter The filter to run.
- * @param {object} app The associated application.
+ * @param {dwv.App} app The associated application.
  */
 dwv.tool.RunFilterCommand = function (filter, app) {
 
@@ -459,9 +459,9 @@ dwv.tool.RunFilterCommand = function (filter, app) {
    */
   this.execute = function () {
     // run filter and set app image
-    app.setImage(filter.update());
+    app.setLastImage(filter.update());
     // update display
-    app.render();
+    app.render(0); //todo: fix
     /**
      * Filter run event.
      *
@@ -485,9 +485,9 @@ dwv.tool.RunFilterCommand = function (filter, app) {
    */
   this.undo = function () {
     // reset the image
-    app.setImage(filter.getOriginalImage());
+    app.setLastImage(filter.getOriginalImage());
     // update display
-    app.render();
+    app.render(0); //todo: fix
     /**
      * Filter undo event.
      *

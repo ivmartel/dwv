@@ -6,7 +6,7 @@ dwv.tool = dwv.tool || {};
  * ZoomAndPan class.
  *
  * @class
- * @param {object} app The associated application.
+ * @param {dwv.App} app The associated application.
  */
 dwv.tool.ZoomAndPan = function (app) {
   /**
@@ -31,8 +31,8 @@ dwv.tool.ZoomAndPan = function (app) {
   this.mousedown = function (event) {
     self.started = true;
     // first position
-    self.x0 = event._xs;
-    self.y0 = event._ys;
+    self.x0 = event._x;
+    self.y0 = event._y;
   };
 
   /**
@@ -62,13 +62,24 @@ dwv.tool.ZoomAndPan = function (app) {
       return;
     }
     // calculate translation
-    var tx = event._xs - self.x0;
-    var ty = event._ys - self.y0;
+    var tx = event._x - self.x0;
+    var ty = event._y - self.y0;
     // apply translation
-    app.translate(tx, ty);
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var viewLayer = layerGroup.getActiveViewLayer();
+    var viewController = viewLayer.getViewController();
+    var planeOffset = viewLayer.displayToPlaneScale(tx, ty);
+    var offset3D = viewController.getOffset3DFromPlaneOffset(planeOffset);
+    layerGroup.addTranslation({
+      x: offset3D.getX(),
+      y: offset3D.getY(),
+      z: offset3D.getZ()
+    });
+    layerGroup.draw();
     // reset origin point
-    self.x0 = event._xs;
-    self.y0 = event._ys;
+    self.x0 = event._x;
+    self.y0 = event._y;
   };
 
   /**
@@ -85,6 +96,11 @@ dwv.tool.ZoomAndPan = function (app) {
     var newLine = new dwv.math.Line(point0, point1);
     var lineRatio = newLine.getLength() / self.line0.getLength();
 
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var viewLayer = layerGroup.getActiveViewLayer();
+    var viewController = viewLayer.getViewController();
+
     if (lineRatio === 1) {
       // scroll mode
       // difference  to last position
@@ -93,20 +109,23 @@ dwv.tool.ZoomAndPan = function (app) {
       if (Math.abs(diffY) < 15) {
         return;
       }
-      var layerController = app.getLayerController();
-      var viewController =
-        layerController.getActiveViewLayer().getViewController();
+      var imageSize = viewController.getImageSize();
       // update view controller
-      if (diffY > 0) {
-        viewController.incrementSliceNb();
-      } else {
-        viewController.decrementSliceNb();
+      if (imageSize.canScroll(2)) {
+        if (diffY > 0) {
+          viewController.incrementIndex(2);
+        } else {
+          viewController.decrementIndex(2);
+        }
       }
     } else {
       // zoom mode
       var zoom = (lineRatio - 1) / 2;
       if (Math.abs(zoom) % 0.1 <= 0.05) {
-        app.zoom(zoom, event._xs, event._ys);
+        var planePos = viewLayer.displayToPlanePos(event._x, event._y);
+        var center = viewController.getPositionFromPlanePoint(planePos);
+        layerGroup.addScale(zoom, center);
+        layerGroup.draw();
       }
     }
   };
@@ -176,7 +195,15 @@ dwv.tool.ZoomAndPan = function (app) {
    */
   this.wheel = function (event) {
     var step = -event.deltaY / 500;
-    app.zoom(step, event._xs, event._ys);
+
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var viewLayer = layerGroup.getActiveViewLayer();
+    var viewController = viewLayer.getViewController();
+    var planePos = viewLayer.displayToPlanePos(event._x, event._y);
+    var center = viewController.getPlanePositionFromPlanePoint(planePos);
+    layerGroup.addScale(step, center);
+    layerGroup.draw();
   };
 
   /**

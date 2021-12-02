@@ -3,7 +3,6 @@
  */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
-QUnit.module('stats');
 
 /**
  * Tests for {@link dwv.math.Stats.equals}.

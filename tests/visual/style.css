@@ -1,0 +1,37 @@
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.snapshot {
+  float: left;
+  margin: 5px;
+  max-width: 200px;
+  max-height: 200px;
+}
+.dwv {
+  float: left;
+  margin: 5px;
+}
+.layerGroup {
+  width: 200px;
+  height: 200px;
+}
+.doc {
+  float: left;
+  margin: 5px;
+}
+.path {
+  border-bottom: 1px dashed #999;
+  text-decoration: none;
+}
+.key {
+  color: #999;
+}
+.separator {
+  clear: both;
+}
+.footer {
+  margin-top: 15px;
+  padding: 5px;
+  background-color: #ccc;
+}

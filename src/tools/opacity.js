@@ -6,7 +6,7 @@ dwv.tool = dwv.tool || {};
  * Opacity class.
  *
  * @class
- * @param {object} app The associated application.
+ * @param {dwv.App} app The associated application.
  */
 dwv.tool.Opacity = function (app) {
   /**
@@ -51,8 +51,9 @@ dwv.tool.Opacity = function (app) {
     var xMove = (Math.abs(diffX) > 15);
     // do not trigger for small moves
     if (xMove) {
-      var layerController = app.getLayerController();
-      var viewLayer = layerController.getActiveViewLayer();
+      var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+      var viewLayer = layerGroup.getActiveViewLayer();
       var op = viewLayer.getOpacity();
       viewLayer.setOpacity(op + (diffX / 200));
       viewLayer.draw();

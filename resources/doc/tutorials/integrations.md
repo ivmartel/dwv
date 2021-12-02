@@ -2,7 +2,7 @@ This page details some integrations of dwv. PACS integrations will use Web Acces
 
 Quick summary: [Conquest](#conquest) &#x2705;, [dcm4chee](#dcm4chee) &#x2705;, [Orthanc](#orthanc) &#x2705;, [ClearCanvas](#clearcanvas) &#x274C;, [Google](#google) &#x2705;, [WordPress](#wordpress) &#x2705;
 
-## Conquest 
+## Conquest
 [Conquest](http://ingenium.home.xs4all.nl/dicom.html): _"a full featured DICOM server based on the public domain UCDMC DICOM code"_ ([entry](http://www.idoimaging.com/program/183) on idoimaging). License: Public Domain (see [medfloss](http://www.medfloss.org/node/93)).
 
 Tested version: [1.4.17](http://forum.image-systems.biz/viewtopic.php?f=33&t=18892). See this [thread](http://85.214.110.44/forum/forum/index.php?thread/17196-conquest-and-html5-js-dicom-viewer-dwv-dwv016-below/) on the Conquest forum and the issue [#15](https://github.com/ivmartel/dwv/issues/15). Operational since dwv `v0.3.0`, available in the [dwv-jqmobile](https://github.com/ivmartel/dwv-jqmobile), [dwv-jqui](https://github.com/ivmartel/dwv-jqui) and [dwv-simplistic](https://github.com/ivmartel/dwv-simplistic) demos.
@@ -12,9 +12,9 @@ To setup DWV, follow the instructions written in the lua files of the respective
 Conquest installation details:
   * Under Fedora 18: [install under ubuntu linux](http://blog.kyodium.net/2010/10/install-conquest-on-ubuntu-1004.html) after [installing apache](http://www.howtoforge.com/installing-apache2-with-php5-and-mysql-support-on-fedora-17-lamp)
     * the g++ fedora package is called `gcc-c++`
-    * the cgi-bin folder is in `/var/www` 
+    * the cgi-bin folder is in `/var/www`
     * launching services is done using `systemctl`: for example `systemctl start httpd.service` and `systemctl start mysqld.service`
-  * Under Windows7: 
+  * Under Windows7:
     * using [wamp5](http://www.wampserver.com/) (install as admin, see [forum](http://forum.wampserver.com/read.php?1,88043)), the cgi bin folder is in `wamp/bin/apache/apache##/cgi-bin`
     * to launch the PACS: start the wamp service and run the `ConquestDICOMServer.exe`, you can then access the web interface at http://127.0.0.1/cgi-bin/dgate.exe?mode=top.
 

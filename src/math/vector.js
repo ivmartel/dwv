@@ -45,9 +45,9 @@ dwv.math.Vector3D = function (x, y, z) {
  */
 dwv.math.Vector3D.prototype.equals = function (rhs) {
   return rhs !== null &&
-        this.getX() === rhs.getX() &&
-        this.getY() === rhs.getY() &&
-        this.getZ() === rhs.getZ();
+    this.getX() === rhs.getX() &&
+    this.getY() === rhs.getY() &&
+    this.getZ() === rhs.getZ();
 };
 
 /**
@@ -57,8 +57,8 @@ dwv.math.Vector3D.prototype.equals = function (rhs) {
  */
 dwv.math.Vector3D.prototype.toString = function () {
   return '(' + this.getX() +
-        ', ' + this.getY() +
-        ', ' + this.getZ() + ')';
+    ', ' + this.getY() +
+    ', ' + this.getZ() + ')';
 };
 
 /**
@@ -67,9 +67,11 @@ dwv.math.Vector3D.prototype.toString = function () {
  * @returns {number} The norm.
  */
 dwv.math.Vector3D.prototype.norm = function () {
-  return Math.sqrt((this.getX() * this.getX()) +
-        (this.getY() * this.getY()) +
-        (this.getZ() * this.getZ()));
+  return Math.sqrt(
+    (this.getX() * this.getX()) +
+    (this.getY() * this.getY()) +
+    (this.getZ() * this.getZ())
+  );
 };
 
 /**
@@ -77,8 +79,9 @@ dwv.math.Vector3D.prototype.norm = function () {
  * vector that is perpendicular to both a and b.
  * If both vectors are parallel, the cross product is a zero vector.
  *
- * @param {object} vector3D The input vector.
- * @returns {object} The result vector.
+ * @see https://en.wikipedia.org/wiki/Cross_product
+ * @param {dwv.math.Vector3D} vector3D The input vector.
+ * @returns {dwv.math.Vector3D} The result vector.
  */
 dwv.math.Vector3D.prototype.crossProduct = function (vector3D) {
   return new dwv.math.Vector3D(
@@ -90,11 +93,12 @@ dwv.math.Vector3D.prototype.crossProduct = function (vector3D) {
 /**
  * Get the dot product with another Vector3D.
  *
- * @param {object} vector3D The input vector.
+ * @see https://en.wikipedia.org/wiki/Dot_product
+ * @param {dwv.math.Vector3D} vector3D The input vector.
  * @returns {number} The dot product.
  */
 dwv.math.Vector3D.prototype.dotProduct = function (vector3D) {
   return (this.getX() * vector3D.getX()) +
-        (this.getY() * vector3D.getY()) +
-        (this.getZ() * vector3D.getZ());
+    (this.getY() * vector3D.getY()) +
+    (this.getZ() * vector3D.getZ());
 };

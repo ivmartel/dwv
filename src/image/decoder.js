@@ -40,27 +40,29 @@ var hasJpeg2000Decoder = (typeof JpxImage !== 'undefined');
  */
 dwv.image.AsynchPixelBufferDecoder = function (script, _numberOfData) {
   // initialise the thread pool
-  var pool = new dwv.utils.ThreadPool(15);
+  var pool = new dwv.utils.ThreadPool(10);
   // flag to know if callbacks are set
   var areCallbacksSet = false;
+  // closure to self
+  var self = this;
 
   /**
    * Decode a pixel buffer.
    *
    * @param {Array} pixelBuffer The pixel buffer.
    * @param {object} pixelMeta The input meta data.
-   * @param {number} index The index of the input data.
+   * @param {object} info Information object about the input data.
    */
-  this.decode = function (pixelBuffer, pixelMeta, index) {
+  this.decode = function (pixelBuffer, pixelMeta, info) {
     if (!areCallbacksSet) {
       areCallbacksSet = true;
       // set event handlers
-      pool.onworkstart = this.ondecodestart;
-      pool.onworkitem = this.ondecodeditem;
-      pool.onwork = this.ondecoded;
-      pool.onworkend = this.ondecodeend;
-      pool.onerror = this.onerror;
-      pool.onabort = this.onabort;
+      pool.onworkstart = self.ondecodestart;
+      pool.onworkitem = self.ondecodeditem;
+      pool.onwork = self.ondecoded;
+      pool.onworkend = self.ondecodeend;
+      pool.onerror = self.onerror;
+      pool.onabort = self.onabort;
     }
     // create worker task
     var workerTask = new dwv.utils.WorkerTask(
@@ -69,7 +71,7 @@ dwv.image.AsynchPixelBufferDecoder = function (script, _numberOfData) {
         buffer: pixelBuffer,
         meta: pixelMeta
       },
-      index
+      info
     );
     // add it the queue and run it
     pool.addWorkerTask(workerTask);
@@ -150,12 +152,12 @@ dwv.image.SynchPixelBufferDecoder = function (algoName, numberOfData) {
    *
    * @param {Array} pixelBuffer The pixel buffer.
    * @param {object} pixelMeta The input meta data.
-   * @param {number} index The index of the input data.
+   * @param {object} info Information object about the input data.
    * @external jpeg
    * @external JpegImage
    * @external JpxImage
    */
-  this.decode = function (pixelBuffer, pixelMeta, index) {
+  this.decode = function (pixelBuffer, pixelMeta, info) {
     ++decodeCount;
 
     var decoder = null;
@@ -213,7 +215,7 @@ dwv.image.SynchPixelBufferDecoder = function (algoName, numberOfData) {
     // send decode events
     this.ondecodeditem({
       data: [decodedBuffer],
-      index: index
+      index: info.itemNumber
     });
     // decode end?
     if (decodeCount === numberOfData) {
@@ -304,7 +306,7 @@ dwv.image.PixelBufferDecoder = function (algoName, numberOfData) {
 
   // initialise the asynch decoder (if possible)
   if (typeof dwv.image.decoderScripts !== 'undefined' &&
-            typeof dwv.image.decoderScripts[algoName] !== 'undefined') {
+    typeof dwv.image.decoderScripts[algoName] !== 'undefined') {
     pixelDecoder = new dwv.image.AsynchPixelBufferDecoder(
       dwv.image.decoderScripts[algoName], numberOfData);
   } else {
@@ -320,9 +322,9 @@ dwv.image.PixelBufferDecoder = function (algoName, numberOfData) {
    *
    * @param {Array} pixelBuffer The input data buffer.
    * @param {object} pixelMeta The input meta data.
-   * @param {number} index The index of the input data.
+   * @param {object} info Information object about the input data.
    */
-  this.decode = function (pixelBuffer, pixelMeta, index) {
+  this.decode = function (pixelBuffer, pixelMeta, info) {
     if (!areCallbacksSet) {
       areCallbacksSet = true;
       // set callbacks
@@ -334,7 +336,7 @@ dwv.image.PixelBufferDecoder = function (algoName, numberOfData) {
       pixelDecoder.onabort = this.onabort;
     }
     // decode and call the callback
-    pixelDecoder.decode(pixelBuffer, pixelMeta, index);
+    pixelDecoder.decode(pixelBuffer, pixelMeta, info);
   };
 
   /**

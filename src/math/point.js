@@ -31,7 +31,7 @@ dwv.math.Point2D = function (x, y) {
 /**
  * Check for Point2D equality.
  *
- * @param {object} rhs The other point to compare to.
+ * @param {dwv.math.Point2D} rhs The other point to compare to.
  * @returns {boolean} True if both points are equal.
  */
 dwv.math.Point2D.prototype.equals = function (rhs) {
@@ -74,39 +74,6 @@ dwv.math.Point2D.prototype.getRound = function () {
 };
 
 /**
- * Mutable 2D point.
- *
- * @class
- * @param {number} x The X coordinate for the point.
- * @param {number} y The Y coordinate for the point.
- */
-dwv.math.FastPoint2D = function (x, y) {
-  this.x = x;
-  this.y = y;
-}; // FastPoint2D class
-
-/**
- * Check for FastPoint2D equality.
- *
- * @param {object} rhs The other point to compare to.
- * @returns {boolean} True if both points are equal.
- */
-dwv.math.FastPoint2D.prototype.equals = function (rhs) {
-  return rhs !== null &&
-    this.x === rhs.x &&
-    this.y === rhs.y;
-};
-
-/**
- * Get a string representation of the FastPoint2D.
- *
- * @returns {string} The point as a string.
- */
-dwv.math.FastPoint2D.prototype.toString = function () {
-  return '(' + this.x + ', ' + this.y + ')';
-};
-
-/**
  * Immutable 3D point.
  *
  * @class
@@ -144,7 +111,7 @@ dwv.math.Point3D = function (x, y, z) {
 /**
  * Check for Point3D equality.
  *
- * @param {object} rhs The other point to compare to.
+ * @param {dwv.math.Point3D} rhs The other point to compare to.
  * @returns {boolean} True if both points are equal.
  */
 dwv.math.Point3D.prototype.equals = function (rhs) {
@@ -182,7 +149,7 @@ dwv.math.Point3D.prototype.getDistance = function (point3D) {
  * Get the difference to another Point3D.
  *
  * @param {dwv.math.Point3D} point3D The input point.
- * @returns {object} The 3D vector from the input point to this one.
+ * @returns {dwv.math.Point3D} The 3D vector from the input point to this one.
  */
 dwv.math.Point3D.prototype.minus = function (point3D) {
   return new dwv.math.Vector3D(
@@ -192,60 +159,166 @@ dwv.math.Point3D.prototype.minus = function (point3D) {
 };
 
 /**
- * Immutable 3D index.
+ * Immutable point.
+ * Warning: the input array is NOT cloned, modifying it will
+ *  modify the index values.
  *
  * @class
- * @param {number} i The column index.
- * @param {number} j The row index.
- * @param {number} k The slice index.
+ * @param {Array} values The point values.
  */
-dwv.math.Index3D = function (i, j, k) {
-  /**
-   * Get the column index.
-   *
-   * @returns {number} The column index.
-   */
-  this.getI = function () {
-    return i;
+dwv.math.Point = function (values) {
+  if (!values || typeof values === 'undefined') {
+    throw new Error('Cannot create point with no values.');
+  }
+  if (values.length === 0) {
+    throw new Error('Cannot create point with empty values.');
+  }
+  var valueCheck = function (val) {
+    return !isNaN(val);
   };
+  if (!values.every(valueCheck)) {
+    throw new Error('Cannot create point with non number values.');
+  }
+
   /**
-   * Get the row index.
+   * Get the index value at the given array index.
    *
-   * @returns {number} The row index.
+   * @param {number} i The index to get.
+   * @returns {number} The value.
    */
-  this.getJ = function () {
-    return j;
+  this.get = function (i) {
+    return values[i];
   };
+
   /**
-   * Get the slice index.
+   * Get the length of the index.
    *
-   * @returns {number} The slice index.
+   * @returns {number} The length.
    */
-  this.getK = function () {
-    return k;
+  this.length = function () {
+    return values.length;
   };
-}; // Index3D class
+
+  /**
+   * Get a string representation of the Index.
+   *
+   * @returns {string} The Index as a string.
+   */
+  this.toString = function () {
+    return '(' + values.toString() + ')';
+  };
+
+  /**
+   * Get the values of this index.
+   *
+   * @returns {Array} The array of values.
+   */
+  this.getValues = function () {
+    return values.slice();
+  };
+
+}; // Point class
 
 /**
- * Check for Index3D equality.
+ * Check if the input point can be compared to this one.
  *
- * @param {object} rhs The other index to compare to.
- * @returns {boolean} True if both indices are equal.
+ * @param {dwv.math.Point} rhs The point to compare to.
+ * @returns {boolean} True if both points are comparable.
  */
-dwv.math.Index3D.prototype.equals = function (rhs) {
-  return rhs !== null &&
-    this.getI() === rhs.getI() &&
-    this.getJ() === rhs.getJ() &&
-    this.getK() === rhs.getK();
+dwv.math.Point.prototype.canCompare = function (rhs) {
+  // check input
+  if (!rhs) {
+    return false;
+  }
+  // check length
+  if (this.length() !== rhs.length()) {
+    return false;
+  }
+  // seems ok!
+  return true;
 };
 
 /**
- * Get a string representation of the Index3D.
+ * Check for Point equality.
  *
- * @returns {string} The Index3D as a string.
+ * @param {dwv.math.Point} rhs The point to compare to.
+ * @returns {boolean} True if both points are equal.
  */
-dwv.math.Index3D.prototype.toString = function () {
-  return '(' + this.getI() +
-    ', ' + this.getJ() +
-    ', ' + this.getK() + ')';
+dwv.math.Point.prototype.equals = function (rhs) {
+  // check if can compare
+  if (!this.canCompare(rhs)) {
+    return false;
+  }
+  // check values
+  for (var i = 0, leni = this.length(); i < leni; ++i) {
+    if (this.get(i) !== rhs.get(i)) {
+      return false;
+    }
+  }
+  // seems ok!
+  return true;
+};
+
+/**
+ * Compare points and return different dimensions.
+ *
+ * @param {dwv.math.Point} rhs The point to compare to.
+ * @returns {Array} The list of different dimensions.
+ */
+dwv.math.Point.prototype.compare = function (rhs) {
+  // check if can compare
+  if (!this.canCompare(rhs)) {
+    return null;
+  }
+  // check values
+  var diffDims = [];
+  for (var i = 0, leni = this.length(); i < leni; ++i) {
+    if (this.get(i) !== rhs.get(i)) {
+      diffDims.push(i);
+    }
+  }
+  return diffDims;
+};
+
+/**
+ * Get the 3D part of this point.
+ *
+ * @returns {dwv.math.Point3D} The Point3D.
+ */
+dwv.math.Point.prototype.get3D = function () {
+  return new dwv.math.Point3D(this.get(0), this.get(1), this.get(2));
+};
+
+/**
+ * Add another point to this one.
+ *
+ * @param {dwv.math.Point} rhs The point to add.
+ * @returns {dwv.math.Point} The point representing the sum of both points.
+ */
+dwv.math.Point.prototype.add = function (rhs) {
+  // check if can compare
+  if (!this.canCompare(rhs)) {
+    return null;
+  }
+  var values = [];
+  var values0 = this.getValues();
+  var values1 = rhs.getValues();
+  for (var i = 0; i < values0.length; ++i) {
+    values.push(values0[i] + values1[i]);
+  }
+  return new dwv.math.Point(values);
+};
+
+/**
+ * Merge this point with a Point3D to create a new point.
+ *
+ * @param {dwv.math.Point3D} rhs The Point3D to merge with.
+ * @returns {dwv.math.Point} The merge result.
+ */
+dwv.math.Point.prototype.mergeWith3D = function (rhs) {
+  var values = this.getValues();
+  values[0] = rhs.getX();
+  values[1] = rhs.getY();
+  values[2] = rhs.getZ();
+  return new dwv.math.Point(values);
 };

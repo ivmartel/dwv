@@ -6,31 +6,7 @@
 <meta charset="UTF-8">
 <meta name="description" content="DICOM Web Viewer (DWV) simple version">
 <meta name="keywords" content="DICOM,HTML5,JavaScript,medical,imaging,DWV">
-<!-- Style -->
-<style type="text/css">
-body { font-family: Arial, Helvetica, sans-serif; }
-.snapshot {
-    float: left; margin: 5px;
-    max-width: 200px; max-height: 200px;
-}
-.dwv {
-    float: left; margin: 5px;
-    width: 200px; height: 200px;
-}
-.doc { float: left; margin: 5px; }
-.path {
-  border-bottom: 1px dashed #999;
-  text-decoration: none;
-}
-.key {
-    color: #999;
-}
-.separator { clear: both; }
-.footer {
-    margin-top: 15px; padding: 5px;
-    background-color: #ccc;
-}
-</style>
+<link type="text/css" rel="stylesheet" href="style.css" />
 <!-- Third party (load) -->
 <script type="text/javascript" src="../../decoders/rii-mango/lossless-min.js"></script>
 <script type="text/javascript" src="../../decoders/pdfjs/jpg.js"></script>
@@ -38,14 +14,17 @@ body { font-family: Arial, Helvetica, sans-serif; }
 <script type="text/javascript" src="../../src/app/application.js"></script>
 <script type="text/javascript" src="../../src/app/dataController.js"></script>
 <script type="text/javascript" src="../../src/app/loadController.js"></script>
-<script type="text/javascript" src="../../src/app/layerController.js"></script>
 <script type="text/javascript" src="../../src/app/viewController.js"></script>
+<script type="text/javascript" src="../../src/dicom/dataReader.js"></script>
 <script type="text/javascript" src="../../src/dicom/dicomElementsWrapper.js"></script>
 <script type="text/javascript" src="../../src/dicom/dicomParser.js"></script>
+<script type="text/javascript" src="../../src/dicom/dicomTag.js"></script>
 <script type="text/javascript" src="../../src/dicom/dictionary.js"></script>
 <script type="text/javascript" src="../../src/gui/generic.js"></script>
 <script type="text/javascript" src="../../src/gui/drawLayer.js"></script>
+<script type="text/javascript" src="../../src/gui/layerGroup.js"></script>
 <script type="text/javascript" src="../../src/gui/viewLayer.js"></script>
+<script type="text/javascript" src="../../src/gui/stage.js"></script>
 <script type="text/javascript" src="../../src/gui/style.js"></script>
 <script type="text/javascript" src="../../src/image/decoder.js"></script>
 <script type="text/javascript" src="../../src/image/dicomBufferToView.js"></script>
@@ -55,8 +34,11 @@ body { font-family: Arial, Helvetica, sans-serif; }
 <script type="text/javascript" src="../../src/image/imageFactory.js"></script>
 <script type="text/javascript" src="../../src/image/iterator.js"></script>
 <script type="text/javascript" src="../../src/image/luts.js"></script>
+<script type="text/javascript" src="../../src/image/planeHelper.js"></script>
 <script type="text/javascript" src="../../src/image/rescaleLut.js"></script>
 <script type="text/javascript" src="../../src/image/rsi.js"></script>
+<script type="text/javascript" src="../../src/image/size.js"></script>
+<script type="text/javascript" src="../../src/image/spacing.js"></script>
 <script type="text/javascript" src="../../src/image/view.js"></script>
 <script type="text/javascript" src="../../src/image/viewFactory.js"></script>
 <script type="text/javascript" src="../../src/image/viewMonochrome.js"></script>
@@ -68,6 +50,7 @@ body { font-family: Arial, Helvetica, sans-serif; }
 <script type="text/javascript" src="../../src/io/urlsLoader.js"></script>
 <script type="text/javascript" src="../../src/io/dicomDataLoader.js"></script>
 <script type="text/javascript" src="../../src/math/bucketQueue.js"></script>
+<script type="text/javascript" src="../../src/math/index.js"></script>
 <script type="text/javascript" src="../../src/math/matrix.js"></script>
 <script type="text/javascript" src="../../src/math/point.js"></script>
 <script type="text/javascript" src="../../src/math/vector.js"></script>
@@ -91,35 +74,35 @@ body { font-family: Arial, Helvetica, sans-serif; }
 // launch when page is loaded
 document.addEventListener("DOMContentLoaded", function (/*event*/)
 {
-    dwv.addDataLine("dwv0", "leadtools-8BitsJpegLossyGrayScale", {
+    dwv.addDataLine(0, "leadtools-8BitsJpegLossyGrayScale", {
         'origin': 'LeadTools',
         'path': '8BitsJpegLossyGrayScale.zip',
         't-syntax': '1.2.840.10008.1.2.4.50 (jpeg baseline)',
         'modality': 'OT', 'photo': 'MONOCHROME2',
         'bits': '8-8-7', 'pixel-vr': 'OW',
     });
-    dwv.addDataLine("dwv1", "nema-mr1_jply", {
+    dwv.addDataLine(1, "nema-mr1_jply", {
         'origin': 'Nema WG04',
         'path': 'compsamples_jpeg/IMAGES/JPLY/MR1_JPLY',
         't-syntax': '1.2.840.10008.1.2.4.51 (jpeg baseline)',
         'modality': 'MR', 'photo': 'MONOCHROME2',
         'bits': '16-12-11', 'pixel-vr': 'OB',
     });
-    dwv.addDataLine("dwv2", "nema-nm1_jply", {
+    dwv.addDataLine(2, "nema-nm1_jply", {
         'origin': 'Nema WG04',
         'path': 'compsamples_jpeg/IMAGES/JPLY/NM1_JPLY',
         't-syntax': '1.2.840.10008.1.2.4.51 (jpeg baseline)',
         'modality': 'NM', 'photo': 'MONOCHROME2',
         'bits': '16-12-11', 'pixel-vr': 'OB',
     });
-    dwv.addDataLine("dwv3", "nema-ct1_jpll", {
+    dwv.addDataLine(3, "nema-ct1_jpll", {
         'origin': 'Nema WG04',
         'path': 'compsamples_jpeg/IMAGES/JPLL/CT1_JPLL',
         't-syntax': '1.2.840.10008.1.2.4.70 (jpeg lossless)',
         'modality': 'CT', 'photo': 'MONOCHROME2',
         'bits': '16-16-15', 'pixel-vr': 'OB',
     });
-    dwv.addDataLine("dwv4", "nema-nm1_jpll", {
+    dwv.addDataLine(4, "nema-nm1_jpll", {
         'origin': 'Nema WG04',
         'path': 'compsamples_jpeg/IMAGES/JPLL/NM1_JPLL',
         't-syntax': '1.2.840.10008.1.2.4.70 (jpeg lossless)',

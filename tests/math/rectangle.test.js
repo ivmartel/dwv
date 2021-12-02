@@ -3,7 +3,6 @@
  */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
-QUnit.module('shape-rectangle');
 
 /**
  * Tests for {@link dwv.math.Rectangle}.
@@ -62,7 +61,7 @@ QUnit.test('Test Rectangle quantify.', function (assert) {
       return [1, 1];
     },
     getCurrentPosition: function () {
-      return {k: 0};
+      return new dwv.math.Index([0, 0, 0]);
     },
     getImageRegionValues: function () {
       return [0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0];

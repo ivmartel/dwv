@@ -6,7 +6,7 @@ dwv.tool = dwv.tool || {};
  * Scroll class.
  *
  * @class
- * @param {object} app The associated application.
+ * @param {dwv.App} app The associated application.
  */
 dwv.tool.Scroll = function (app) {
   /**
@@ -32,9 +32,10 @@ dwv.tool.Scroll = function (app) {
    */
   this.mousedown = function (event) {
     // stop viewer if playing
-    var layerController = app.getLayerController();
-    var viewController =
-      layerController.getActiveViewLayer().getViewController();
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var viewLayer = layerGroup.getActiveViewLayer();
+    var viewController = viewLayer.getViewController();
     if (viewController.isPlaying()) {
       viewController.stop();
     }
@@ -43,6 +44,10 @@ dwv.tool.Scroll = function (app) {
     // first position
     self.x0 = event._x;
     self.y0 = event._y;
+
+    // update controller position
+    var planePos = viewLayer.displayToPlanePos(event._x, event._y);
+    viewController.setCurrentPosition2D(planePos.x, planePos.y);
   };
 
   /**
@@ -55,20 +60,21 @@ dwv.tool.Scroll = function (app) {
       return;
     }
 
-    var layerController = app.getLayerController();
-    var viewController =
-      layerController.getActiveViewLayer().getViewController();
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var viewLayer = layerGroup.getActiveViewLayer();
+    var viewController = viewLayer.getViewController();
 
     // difference to last Y position
     var diffY = event._y - self.y0;
     var yMove = (Math.abs(diffY) > 15);
     // do not trigger for small moves
-    if (yMove) {
+    if (yMove && viewController.canScroll()) {
       // update view controller
       if (diffY > 0) {
-        viewController.decrementSliceNb();
+        viewController.decrementScrollIndex();
       } else {
-        viewController.incrementSliceNb();
+        viewController.incrementScrollIndex();
       }
     }
 
@@ -76,12 +82,13 @@ dwv.tool.Scroll = function (app) {
     var diffX = event._x - self.x0;
     var xMove = (Math.abs(diffX) > 15);
     // do not trigger for small moves
-    if (xMove) {
+    var imageSize = viewController.getImageSize();
+    if (xMove && imageSize.moreThanOne(3)) {
       // update view controller
       if (diffX > 0) {
-        viewController.incrementFrameNb();
+        viewController.decrementIndex(3);
       } else {
-        viewController.decrementFrameNb();
+        viewController.incrementIndex(3);
       }
     }
 
@@ -163,41 +170,21 @@ dwv.tool.Scroll = function (app) {
    * @param {object} event The mouse wheel event.
    */
   this.wheel = function (event) {
+    var up = false;
     if (event.deltaY < 0) {
-      mouseScroll(true);
+      up = true;
+    }
+
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var viewController =
+      layerGroup.getActiveViewLayer().getViewController();
+    if (up) {
+      viewController.incrementScrollIndex();
     } else {
-      mouseScroll(false);
+      viewController.decrementScrollIndex();
     }
   };
-
-  /**
-   * Mouse scroll action.
-   *
-   * @param {boolean} up True to increment, false to decrement.
-   * @private
-   */
-  function mouseScroll(up) {
-    var layerController = app.getLayerController();
-    var viewController =
-      layerController.getActiveViewLayer().getViewController();
-
-    var hasSlices =
-      (app.getImage().getGeometry().getSize().getNumberOfSlices() !== 1);
-    var hasFrames = (app.getImage().getNumberOfFrames() !== 1);
-    if (up) {
-      if (hasSlices) {
-        viewController.incrementSliceNb();
-      } else if (hasFrames) {
-        viewController.incrementFrameNb();
-      }
-    } else {
-      if (hasSlices) {
-        viewController.decrementSliceNb();
-      } else if (hasFrames) {
-        viewController.decrementFrameNb();
-      }
-    }
-  }
 
   /**
    * Handle key down event.
@@ -211,12 +198,13 @@ dwv.tool.Scroll = function (app) {
   /**
    * Handle double click.
    *
-   * @param {object} _event The key down event.
+   * @param {object} event The key down event.
    */
-  this.dblclick = function (_event) {
-    var layerController = app.getLayerController();
+  this.dblclick = function (event) {
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var viewController =
-      layerController.getActiveViewLayer().getViewController();
+      layerGroup.getActiveViewLayer().getViewController();
     viewController.play();
   };
 

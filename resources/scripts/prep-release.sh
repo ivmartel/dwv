@@ -55,6 +55,9 @@ fi
 
 info "Preparing release for '$releaseVersion' with previous version '$prevVersion'..."
 
+# branch name
+releaseBranch="v${releaseVersion}"
+
 ###################
 if [ $step -eq 1 ]
 then
@@ -62,7 +65,6 @@ then
 
   git checkout develop
   git pull
-  releaseBranch="v${releaseVersion}"
   git checkout -b $releaseBranch
   
   ((step++))

@@ -55,12 +55,14 @@ fi
 
 info "Finishing release for '$releaseVersion' with next version '$nextVersion'..."
 
+# branch name
+releaseBranch="v${releaseVersion}"
+
 ###################
 if [ $step -eq 1 ]
 then
   info "(1/4) commit prepared changes"
 
-  releaseBranch="v${releaseVersion}"
   git commit -a -m "Release ${releaseBranch}"
   
   ((step++))

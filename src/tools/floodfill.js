@@ -13,7 +13,7 @@ var MagicWand = MagicWand || {};
  * Floodfill painting tool.
  *
  * @class
- * @param {object} app The associated application.
+ * @param {dwv.App} app The associated application.
  */
 dwv.tool.Floodfill = function (app) {
   /**
@@ -168,7 +168,14 @@ dwv.tool.Floodfill = function (app) {
    * @private
    */
   var getCoord = function (event) {
-    return {x: event._x, y: event._y};
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var viewLayer = layerGroup.getActiveViewLayer();
+    var index = viewLayer.displayToPlaneIndex(event._x, event._y);
+    return {
+      x: index.get(0),
+      y: index.get(1)
+    };
   };
 
   /**
@@ -190,7 +197,6 @@ dwv.tool.Floodfill = function (app) {
       bytes: 4
     };
 
-    // var p = new dwv.math.FastPoint2D(points.x, points.y);
     mask = MagicWand.floodFill(image, points.x, points.y, threshold);
     mask = MagicWand.gaussBlurOnlyBorder(mask, blurRadius);
 
@@ -219,9 +225,10 @@ dwv.tool.Floodfill = function (app) {
    * @private
    * @param {object} point The start point.
    * @param {number} threshold The border threshold.
+   * @param {object} layerGroup The origin layer group.
    * @returns {boolean} False if no border.
    */
-  var paintBorder = function (point, threshold) {
+  var paintBorder = function (point, threshold, layerGroup) {
     // Calculate the border
     border = calcBorder(point, threshold);
     // Paint the border
@@ -230,8 +237,7 @@ dwv.tool.Floodfill = function (app) {
       shapeGroup = factory.create(border, self.style);
       shapeGroup.id(dwv.math.guid());
 
-      var layerController = app.getLayerController();
-      var drawLayer = layerController.getActiveDrawLayer();
+      var drawLayer = layerGroup.getActiveDrawLayer();
       var drawController = drawLayer.getDrawController();
 
       // get the position group
@@ -260,8 +266,9 @@ dwv.tool.Floodfill = function (app) {
    *
    * @param {number} ini The first slice to extend to.
    * @param {number} end The last slice to extend to.
+   * @param {object} layerGroup The origin layer group.
    */
-  this.extend = function (ini, end) {
+  this.extend = function (ini, end, layerGroup) {
     //avoid errors
     if (!initialpoint) {
       throw '\'initialpoint\' not found. User must click before use extend!';
@@ -271,31 +278,31 @@ dwv.tool.Floodfill = function (app) {
       shapeGroup.destroy();
     }
 
-    var layerController = app.getLayerController();
     var viewController =
-      layerController.getActiveViewLayer().getViewController();
+      layerGroup.getActiveViewLayer().getViewController();
 
-    var pos = viewController.getCurrentPosition();
+    var pos = viewController.getCurrentIndex();
+    var imageSize = viewController.getImageSize();
     var threshold = currentthreshold || initialthreshold;
 
     // Iterate over the next images and paint border on each slice.
-    for (var i = pos.k,
+    for (var i = pos.get(2),
       len = end
-        ? end : app.getImage().getGeometry().getSize().getNumberOfSlices();
+        ? end : imageSize.get(2);
       i < len; i++) {
-      if (!paintBorder(initialpoint, threshold)) {
+      if (!paintBorder(initialpoint, threshold, layerGroup)) {
         break;
       }
-      viewController.incrementSliceNb();
+      viewController.incrementIndex(2);
     }
     viewController.setCurrentPosition(pos);
 
     // Iterate over the prev images and paint border on each slice.
-    for (var j = pos.k, jl = ini ? ini : 0; j > jl; j--) {
-      if (!paintBorder(initialpoint, threshold)) {
+    for (var j = pos.get(2), jl = ini ? ini : 0; j > jl; j--) {
+      if (!paintBorder(initialpoint, threshold, layerGroup)) {
         break;
       }
-      viewController.decrementSliceNb();
+      viewController.decrementIndex(2);
     }
     viewController.setCurrentPosition(pos);
   };
@@ -349,9 +356,10 @@ dwv.tool.Floodfill = function (app) {
    * @param {object} event The mouse down event.
    */
   this.mousedown = function (event) {
-    var layerController = app.getLayerController();
-    var viewLayer = layerController.getActiveViewLayer();
-    var drawLayer = layerController.getActiveDrawLayer();
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var viewLayer = layerGroup.getActiveViewLayer();
+    var drawLayer = layerGroup.getActiveDrawLayer();
 
     imageInfo = viewLayer.getImageData();
     if (!imageInfo) {
@@ -365,7 +373,7 @@ dwv.tool.Floodfill = function (app) {
 
     self.started = true;
     initialpoint = getCoord(event);
-    paintBorder(initialpoint, initialthreshold);
+    paintBorder(initialpoint, initialthreshold, layerGroup);
     self.onThresholdChange(initialthreshold);
   };
 
@@ -395,7 +403,9 @@ dwv.tool.Floodfill = function (app) {
   this.mouseup = function (_event) {
     self.started = false;
     if (extender) {
-      self.extend();
+      var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+      self.extend(layerGroup);
     }
   };
 

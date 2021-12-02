@@ -277,6 +277,7 @@ dwv.io.UrlsLoader = function () {
         foundLoader = true;
         // load options
         loader.setOptions({
+          numberOfFiles: data.length,
           defaultCharacterSet: self.getDefaultCharacterSet()
         });
         // set loader callbacks

@@ -195,6 +195,7 @@ dwv.io.MemoryLoader = function () {
         foundLoader = true;
         // load options
         loader.setOptions({
+          numberOfFiles: data.length,
           defaultCharacterSet: this.getDefaultCharacterSet()
         });
         // set loader callbacks

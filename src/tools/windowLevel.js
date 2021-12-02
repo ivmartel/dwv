@@ -6,7 +6,7 @@ dwv.tool = dwv.tool || {};
  * WindowLevel tool: handle window/level related events.
  *
  * @class
- * @param {object} app The associated application.
+ * @param {dwv.App} app The associated application.
  */
 dwv.tool.WindowLevel = function (app) {
   /**
@@ -34,11 +34,6 @@ dwv.tool.WindowLevel = function (app) {
     // store initial position
     self.x0 = event._x;
     self.y0 = event._y;
-    // update view controller
-    var layerController = app.getLayerController();
-    var viewController =
-      layerController.getActiveViewLayer().getViewController();
-    viewController.setCurrentPosition2D(event._x, event._y);
   };
 
   /**
@@ -52,9 +47,10 @@ dwv.tool.WindowLevel = function (app) {
       return;
     }
 
-    var layerController = app.getLayerController();
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var viewController =
-      layerController.getActiveViewLayer().getViewController();
+      layerGroup.getActiveViewLayer().getViewController();
 
     // difference to last position
     var diffX = event._x - self.x0;
@@ -70,7 +66,7 @@ dwv.tool.WindowLevel = function (app) {
     // add the manual preset to the view
     viewController.addWindowLevelPresets({
       manual: {
-        wl: new dwv.image.WindowLevel(windowCenter, windowWidth),
+        wl: [new dwv.image.WindowLevel(windowCenter, windowWidth)],
         name: 'manual'
       }
     });
@@ -136,16 +132,20 @@ dwv.tool.WindowLevel = function (app) {
    * @param {object} event The double click event.
    */
   this.dblclick = function (event) {
-    var layerController = app.getLayerController();
-    var viewController =
-      layerController.getActiveViewLayer().getViewController();
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var viewLayer = layerGroup.getActiveViewLayer();
+    var index = viewLayer.displayToPlaneIndex(event._x, event._y);
+    var viewController = viewLayer.getViewController();
+    var image = app.getImage(viewLayer.getDataIndex());
 
     // update view controller
     viewController.setWindowLevel(
-      parseInt(app.getImage().getRescaledValue(
-        event._x,
-        event._y,
-        viewController.getCurrentPosition().k
+      parseInt(image.getRescaledValueAtIndex(
+        viewController.getCurrentIndex().getWithNew2D(
+          index.get(0),
+          index.get(1)
+        )
       ), 10),
       parseInt(viewController.getWindowLevel().width, 10));
   };

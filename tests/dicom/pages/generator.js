@@ -89,6 +89,8 @@ function generateSlice(pixelGeneratorName, sliceNumber) {
   // image position
   var spacing = tags.PixelSpacing[0];
   tags.ImagePositionPatient = [0, 0, sliceNumber * spacing];
+  // instance number
+  tags.InstanceNumber = sliceNumber.toString();
   // convert JSON to DICOM element object
   var res = dwv.dicom.getElementsFromJSONTags(tags);
   var dicomElements = res.elements;

@@ -1,10 +1,8 @@
 /**
  * Tests for the 'dicom/dicomParser.js' file.
  */
-/** @module tests/dicom */
 // Do not warn if these variables were not defined before.
 /* global QUnit */
-QUnit.module('dicomParser');
 
 // WARNING about PhantomJS 1.9
 // ---------------------------
@@ -41,6 +39,8 @@ QUnit.test('Test simple DICOM parsing.', function (assert) {
   };
   request.onload = function (/*event*/) {
     assert.ok((this.response.byteLength !== 0), 'Got a response.');
+    assert.ok(dwv.dicom.hasDicomPrefix(this.response),
+      'Response has DICOM prefix.');
 
     // parse DICOM
     var dicomParser = new dwv.dicom.DicomParser();
@@ -107,6 +107,8 @@ QUnit.test('Test sequence DICOM parsing.', function (assert) {
   request.responseType = 'arraybuffer';
   request.onload = function (/*event*/) {
     assert.ok((this.response.byteLength !== 0), 'Got a response.');
+    assert.ok(dwv.dicom.hasDicomPrefix(this.response),
+      'Response has DICOM prefix.');
 
     // parse DICOM
     var dicomParser = new dwv.dicom.DicomParser();

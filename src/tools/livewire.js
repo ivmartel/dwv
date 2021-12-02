@@ -6,7 +6,7 @@ dwv.tool = dwv.tool || {};
  * Livewire painting tool.
  *
  * @class
- * @param {object} app The associated application.
+ * @param {dwv.App} app The associated application.
  */
 dwv.tool.Livewire = function (app) {
   /**
@@ -84,10 +84,11 @@ dwv.tool.Livewire = function (app) {
   /**
    * Clear the parent points list.
    *
+   * @param {object} imageSize The image size.
    * @private
    */
-  function clearParentPoints() {
-    var nrows = app.getImage().getGeometry().getSize().getNumberOfRows();
+  function clearParentPoints(imageSize) {
+    var nrows = imageSize.get(1);
     for (var i = 0; i < nrows; ++i) {
       parentPoints[i] = [];
     }
@@ -117,31 +118,36 @@ dwv.tool.Livewire = function (app) {
    * @param {object} event The mouse down event.
    */
   this.mousedown = function (event) {
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var viewLayer = layerGroup.getActiveViewLayer();
+    var imageSize = viewLayer.getViewController().getImageSize();
+    var index = viewLayer.displayToPlaneIndex(event._x, event._y);
+
     // first time
     if (!self.started) {
       self.started = true;
-      self.x0 = event._x;
-      self.y0 = event._y;
+      self.x0 = index.get(0);
+      self.y0 = index.get(1);
       // clear vars
       clearPaths();
-      clearParentPoints();
+      clearParentPoints(imageSize);
       shapeGroup = null;
       // update zoom scale
-      var layerController = app.getLayerController();
-      var drawLayer = layerController.getActiveDrawLayer();
+      var drawLayer = layerGroup.getActiveDrawLayer();
       self.style.setZoomScale(
         drawLayer.getKonvaLayer().getAbsoluteScale());
       // do the training from the first point
-      var p = new dwv.math.FastPoint2D(event._x, event._y);
+      var p = {x: index.get(0), y: index.get(1)};
       scissors.doTraining(p);
       // add the initial point to the path
-      var p0 = new dwv.math.Point2D(event._x, event._y);
+      var p0 = new dwv.math.Point2D(index.get(0), index.get(1));
       path.addPoint(p0);
       path.addControlPoint(p0);
     } else {
       // final point: at 'tolerance' of the initial point
-      if ((Math.abs(event._x - self.x0) < tolerance) &&
-        (Math.abs(event._y - self.y0) < tolerance)) {
+      if ((Math.abs(index.get(0) - self.x0) < tolerance) &&
+        (Math.abs(index.get(1) - self.y0) < tolerance)) {
         // draw
         self.mousemove(event);
         // listen
@@ -156,8 +162,8 @@ dwv.tool.Livewire = function (app) {
       } else {
         // anchor point
         path = currentPath;
-        clearParentPoints();
-        var pn = new dwv.math.FastPoint2D(event._x, event._y);
+        clearParentPoints(imageSize);
+        var pn = {x: index.get(0), y: index.get(1)};
         scissors.doTraining(pn);
         path.addControlPoint(currentPath.getPoint(0));
       }
@@ -173,8 +179,13 @@ dwv.tool.Livewire = function (app) {
     if (!self.started) {
       return;
     }
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+    var viewLayer = layerGroup.getActiveViewLayer();
+    var index = viewLayer.displayToPlaneIndex(event._x, event._y);
+
     // set the point to find the path to
-    var p = new dwv.math.FastPoint2D(event._x, event._y);
+    var p = {x: index.get(0), y: index.get(1)};
     scissors.setPoint(p);
     // do the work
     var results = 0;
@@ -222,8 +233,7 @@ dwv.tool.Livewire = function (app) {
     shapeGroup = factory.create(currentPath.pointArray, self.style);
     shapeGroup.id(dwv.math.guid());
 
-    var layerController = app.getLayerController();
-    var drawLayer = layerController.getActiveDrawLayer();
+    var drawLayer = layerGroup.getActiveDrawLayer();
     var drawController = drawLayer.getDrawController();
 
     // get the position group
@@ -318,14 +328,14 @@ dwv.tool.Livewire = function (app) {
   this.activate = function (bool) {
     // start scissors if displayed
     if (bool) {
-      var layerController = app.getLayerController();
-      var viewLayer = layerController.getActiveViewLayer();
+      var layerGroup = app.getActiveLayerGroup();
+      var viewLayer = layerGroup.getActiveViewLayer();
 
       //scissors = new dwv.math.Scissors();
-      var size = app.getImage().getGeometry().getSize();
+      var imageSize = viewLayer.getViewController().getImageSize();
       scissors.setDimensions(
-        size.getNumberOfColumns(),
-        size.getNumberOfRows());
+        imageSize.get(0),
+        imageSize.get(1));
       scissors.setData(viewLayer.getImageData().data);
 
       // init with the app window scale

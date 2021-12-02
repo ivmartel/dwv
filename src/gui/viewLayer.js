@@ -5,7 +5,8 @@ dwv.gui = dwv.gui || {};
 /**
  * View layer.
  *
- * @param {object} containerDiv The layer div.
+ * @param {object} containerDiv The layer div, its id will be used
+ *   as this layer id.
  * @class
  */
 dwv.gui.ViewLayer = function (containerDiv) {
@@ -17,13 +18,6 @@ dwv.gui.ViewLayer = function (containerDiv) {
   var self = this;
 
   /**
-   * The image view.
-   *
-   * @private
-   * @type {object}
-   */
-  var view = null;
-  /**
    * The view controller.
    *
    * @private
@@ -32,19 +26,19 @@ dwv.gui.ViewLayer = function (containerDiv) {
   var viewController = null;
 
   /**
-   * The base canvas.
+   * The main display canvas.
    *
    * @private
    * @type {object}
    */
   var canvas = null;
   /**
-   * A cache of the initial canvas.
+   * The offscreen canvas: used to store the raw, unscaled pixel data.
    *
    * @private
    * @type {object}
    */
-  var cacheCanvas = null;
+  var offscreenCanvas = null;
   /**
    * The associated CanvasRenderingContext2D.
    *
@@ -62,12 +56,20 @@ dwv.gui.ViewLayer = function (containerDiv) {
   var imageData = null;
 
   /**
-   * The layer size as {x,y}.
+   * The layer base size as {x,y}.
    *
    * @private
    * @type {object}
    */
-  var layerSize;
+  var baseSize;
+
+  /**
+   * The layer base spacing as {x,y}.
+   *
+   * @private
+   * @type {object}
+   */
+  var baseSpacing;
 
   /**
    * The layer opacity.
@@ -86,12 +88,28 @@ dwv.gui.ViewLayer = function (containerDiv) {
   var scale = {x: 1, y: 1};
 
   /**
+   * The layer fit scale.
+   *
+   * @private
+   * @type {object}
+   */
+  var fitScale = {x: 1, y: 1};
+
+  /**
    * The layer offset.
    *
    * @private
    * @type {object}
    */
   var offset = {x: 0, y: 0};
+
+  /**
+   * The base layer offset.
+   *
+   * @private
+   * @type {object}
+   */
+  var baseOffset = {x: 0, y: 0};
 
   /**
    * Data update flag.
@@ -110,12 +128,40 @@ dwv.gui.ViewLayer = function (containerDiv) {
   var dataIndex = null;
 
   /**
+   * Get the associated data index.
+   *
+   * @returns {number} The index.
+   */
+  this.getDataIndex = function () {
+    return dataIndex;
+  };
+
+  /**
    * Listener handler.
    *
    * @private
    * @type {object}
    */
   var listenerHandler = new dwv.utils.ListenerHandler();
+
+  /**
+   * Set the associated view.
+   *
+   * @param {object} view The view.
+   */
+  this.setView = function (view) {
+    // local listeners
+    view.addEventListener('wlchange', onWLChange);
+    view.addEventListener('colourchange', onColourChange);
+    view.addEventListener('positionchange', onPositionChange);
+    view.addEventListener('alphafuncchange', onAlphaFuncChange);
+    // view events
+    for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
+      view.addEventListener(dwv.image.viewEventNames[j], fireEvent);
+    }
+    // create view controller
+    viewController = new dwv.ctrl.ViewController(view);
+  };
 
   /**
    * Get the view controller.
@@ -143,7 +189,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
   this.onimagechange = function (event) {
     // event.value = [index, image]
     if (dataIndex === event.value[0]) {
-      view.setImage(event.value[1]);
+      viewController.setImage(event.value[1]);
       needsDataUpdate = true;
     }
   };
@@ -151,12 +197,33 @@ dwv.gui.ViewLayer = function (containerDiv) {
   // common layer methods [start] ---------------
 
   /**
-   * Get the layer size.
+   * Get the id of the layer.
+   *
+   * @returns {string} The string id.
+   */
+  this.getId = function () {
+    return containerDiv.id;
+  };
+
+  /**
+   * Get the data full size, ie size * spacing.
+   *
+   * @returns {object} The full size as {x,y}.
+   */
+  this.getFullSize = function () {
+    return {
+      x: baseSize.x * baseSpacing.x,
+      y: baseSize.y * baseSpacing.y
+    };
+  };
+
+  /**
+   * Get the layer base size (without scale).
    *
    * @returns {object} The size as {x,y}.
    */
-  this.getSize = function () {
-    return layerSize;
+  this.getBaseSize = function () {
+    return baseSize;
   };
 
   /**
@@ -175,6 +242,19 @@ dwv.gui.ViewLayer = function (containerDiv) {
    */
   this.setOpacity = function (alpha) {
     opacity = Math.min(Math.max(alpha, 0), 1);
+
+    /**
+     * Opacity change event.
+     *
+     * @event dwv.App#opacitychange
+     * @type {object}
+     * @property {string} type The event type.
+     */
+    var event = {
+      type: 'opacitychange',
+      value: [opacity]
+    };
+    fireEvent(event);
   };
 
   /**
@@ -183,7 +263,28 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @param {object} newScale The scale as {x,y}.
    */
   this.setScale = function (newScale) {
-    scale = newScale;
+    var helper = viewController.getPlaneHelper();
+    var orientedNewScale = helper.getOrientedXYZ(newScale);
+    scale = {
+      x: fitScale.x * orientedNewScale.x,
+      y: fitScale.y * orientedNewScale.y
+    };
+  };
+
+  /**
+   * Set the base layer offset. Resets the layer offset.
+   *
+   * @param {object} off The offset as {x,y}.
+   */
+  this.setBaseOffset = function (off) {
+    var helper = viewController.getPlaneHelper();
+    baseOffset = helper.getPlaneOffsetFromOffset3D({
+      x: off.getX(),
+      y: off.getY(),
+      z: off.getZ()
+    });
+    // reset offset
+    offset = baseOffset;
   };
 
   /**
@@ -192,29 +293,42 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @param {object} newOffset The offset as {x,y}.
    */
   this.setOffset = function (newOffset) {
-    offset = newOffset;
+    var helper = viewController.getPlaneHelper();
+    var planeNewOffset = helper.getPlaneOffsetFromOffset3D(newOffset);
+    offset = {
+      x: baseOffset.x + planeNewOffset.x,
+      y: baseOffset.y + planeNewOffset.y
+    };
   };
 
   /**
-   * Set the layer z-index.
+   * Transform a display position to an index.
    *
-   * @param {number} index The index.
+   * @param {number} x The X position.
+   * @param {number} y The Y position.
+   * @returns {dwv.math.Index} The equivalent index.
    */
-  this.setZIndex = function (index) {
-    containerDiv.style.zIndex = index;
+  this.displayToPlaneIndex = function (x, y) {
+    var planePos = this.displayToPlanePos(x, y);
+    return new dwv.math.Index([
+      Math.floor(planePos.x),
+      Math.floor(planePos.y)
+    ]);
   };
 
-  /**
-   * Resize the layer: update the window scale and layer sizes.
-   *
-   * @param {object} newScale The layer scale as {x,y}.
-   */
-  this.resize = function (newScale) {
-    // resize canvas
-    canvas.width = parseInt(layerSize.x * newScale.x, 10);
-    canvas.height = parseInt(layerSize.y * newScale.y, 10);
-    // set scale
-    this.setScale(newScale);
+  this.displayToPlaneScale = function (x, y) {
+    return {
+      x: x / scale.x,
+      y: y / scale.y
+    };
+  };
+
+  this.displayToPlanePos = function (x, y) {
+    var deScaled = this.displayToPlaneScale(x, y);
+    return {
+      x: deScaled.x + offset.x,
+      y: deScaled.y + offset.y
+    };
   };
 
   /**
@@ -250,7 +364,10 @@ dwv.gui.ViewLayer = function (containerDiv) {
      * @type {object}
      * @property {string} type The event type.
      */
-    var event = {type: 'renderstart'};
+    var event = {
+      type: 'renderstart',
+      layerid: this.getId()
+    };
     fireEvent(event);
 
     // update data if needed
@@ -288,7 +405,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
     // disable smoothing (set just before draw, could be reset by resize)
     context.imageSmoothingEnabled = false;
     // draw image
-    context.drawImage(cacheCanvas, 0, 0);
+    context.drawImage(offscreenCanvas, 0, 0);
 
     /**
      * Render end event.
@@ -297,41 +414,25 @@ dwv.gui.ViewLayer = function (containerDiv) {
      * @type {object}
      * @property {string} type The event type.
      */
-    event = {type: 'renderend'};
+    event = {
+      type: 'renderend',
+      layerid: this.getId()
+    };
     fireEvent(event);
   };
 
   /**
    * Initialise the layer: set the canvas and context
    *
-   * @param {object} image The image.
-   * @param {object} metaData The image meta data.
+   * @param {object} size The image size as {x,y}.
+   * @param {object} spacing The image spacing as {x,y}.
    * @param {number} index The associated data index.
    */
-  this.initialise = function (image, metaData, index) {
+  this.initialise = function (size, spacing, index) {
+    // set locals
+    baseSize = size;
+    baseSpacing = spacing;
     dataIndex = index;
-    // create view
-    var viewFactory = new dwv.image.ViewFactory();
-    view = viewFactory.create(
-      new dwv.dicom.DicomElementsWrapper(metaData),
-      image);
-
-    // local listeners
-    view.addEventListener('wlwidthchange', onWLChange);
-    view.addEventListener('wlcenterchange', onWLChange);
-    view.addEventListener('colourchange', onColourChange);
-    view.addEventListener('slicechange', onSliceChange);
-    view.addEventListener('framechange', onFrameChange);
-
-    // create view controller
-    viewController = new dwv.ViewController(view);
-
-    // get sizes
-    var size = image.getGeometry().getSize();
-    layerSize = {
-      x: size.getNumberOfColumns(),
-      y: size.getNumberOfRows()
-    };
 
     // create canvas
     canvas = document.createElement('canvas');
@@ -348,25 +449,55 @@ dwv.gui.ViewLayer = function (containerDiv) {
       alert('Error: failed to get the 2D context.');
       return;
     }
+
+    // check canvas
+    if (!dwv.gui.canCreateCanvas(baseSize.x, baseSize.y)) {
+      throw new Error('Cannot create canvas ' + baseSize.x + ', ' + baseSize.y);
+    }
+
     // canvas sizes
-    canvas.width = layerSize.x;
-    canvas.height = layerSize.y;
+    canvas.width = baseSize.x;
+    canvas.height = baseSize.y;
+    // off screen canvas
+    offscreenCanvas = document.createElement('canvas');
+    offscreenCanvas.width = baseSize.x;
+    offscreenCanvas.height = baseSize.y;
     // original empty image data array
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    imageData = context.createImageData(canvas.width, canvas.height);
-    // cached canvas
-    cacheCanvas = document.createElement('canvas');
-    cacheCanvas.width = canvas.width;
-    cacheCanvas.height = canvas.height;
+    context.clearRect(0, 0, baseSize.x, baseSize.y);
+    imageData = context.createImageData(baseSize.x, baseSize.y);
 
     // update data on first draw
     needsDataUpdate = true;
   };
 
   /**
-   * Activate the layer: propagate events.
+   * Fit the layer to its parent container.
+   *
+   * @param {number} fitScale1D The 1D fit scale.
    */
-  this.activate = function () {
+  this.fitToContainer = function (fitScale1D) {
+    // update fit scale
+    fitScale = {
+      x: fitScale1D * baseSpacing.x,
+      y: fitScale1D * baseSpacing.y
+    };
+    // update canvas
+    var fullSize = this.getFullSize();
+    var width = Math.floor(fullSize.x * fitScale1D);
+    var height = Math.floor(fullSize.y * fitScale1D);
+    if (!dwv.gui.canCreateCanvas(width, height)) {
+      throw new Error('Cannot resize canvas ' + width + ', ' + height);
+    }
+    canvas.width = width;
+    canvas.height = height;
+    // reset scale
+    this.setScale({x: 1, y: 1, z: 1});
+  };
+
+  /**
+   * Enable and listen to container interaction events.
+   */
+  this.bindInteraction = function () {
     // allow pointer events
     containerDiv.style.pointerEvents = 'auto';
     // interaction events
@@ -377,9 +508,9 @@ dwv.gui.ViewLayer = function (containerDiv) {
   };
 
   /**
-   * Deactivate the layer: stop propagating events.
+   * Disable and stop listening to container interaction events.
    */
-  this.deactivate = function () {
+  this.unbindInteraction = function () {
     // disable pointer events
     containerDiv.style.pointerEvents = 'none';
     // interaction events
@@ -418,35 +549,21 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @private
    */
   function fireEvent(event) {
+    event.srclayerid = self.getId();
+    event.dataindex = dataIndex;
     listenerHandler.fireEvent(event);
   }
 
   // common layer methods [end] ---------------
 
   /**
-   * Propagate (or not) view events.
-   *
-   * @param {boolean} flag True to propagate.
-   */
-  this.propagateViewEvents = function (flag) {
-    // view events
-    for (var j = 0; j < dwv.image.viewEventNames.length; ++j) {
-      if (flag) {
-        view.addEventListener(dwv.image.viewEventNames[j], fireEvent);
-      } else {
-        view.removeEventListener(dwv.image.viewEventNames[j], fireEvent);
-      }
-    }
-  };
-
-  /**
    * Update the canvas image data.
    */
   function updateImageData() {
     // generate image data
-    view.generateImageData(imageData);
-    // pass the data to the canvas
-    cacheCanvas.getContext('2d').putImageData(imageData, 0, 0);
+    viewController.generateImageData(imageData);
+    // pass the data to the off screen canvas
+    offscreenCanvas.getContext('2d').putImageData(imageData, 0, 0);
     // update data flag
     needsDataUpdate = false;
   }
@@ -478,13 +595,38 @@ dwv.gui.ViewLayer = function (containerDiv) {
   }
 
   /**
-   * Handle frame change.
+   * Handle position change.
    *
-   * @param {object} event The event fired when changing the frame.
+   * @param {object} event The event fired when changing the position.
    * @private
    */
-  function onFrameChange(event) {
-    // generate and draw if no skip flag
+  function onPositionChange(event) {
+    if (typeof event.skipGenerate === 'undefined' ||
+      event.skipGenerate === false) {
+      // 3D dimensions
+      var dims3D = [0, 1, 2];
+      // remove scroll index
+      var indexScrollIndex = dims3D.indexOf(viewController.getScrollIndex());
+      dims3D.splice(indexScrollIndex, 1);
+      // remove non scroll index from diff dims
+      var diffDims = event.diffDims.filter(function (item) {
+        return dims3D.indexOf(item) === -1;
+      });
+      // update if we have something left
+      if (diffDims.length !== 0) {
+        needsDataUpdate = true;
+        self.draw();
+      }
+    }
+  }
+
+  /**
+   * Handle alpha function change.
+   *
+   * @param {object} event The event fired when changing the function.
+   * @private
+   */
+  function onAlphaFuncChange(event) {
     if (typeof event.skipGenerate === 'undefined' ||
       event.skipGenerate === false) {
       needsDataUpdate = true;
@@ -493,25 +635,13 @@ dwv.gui.ViewLayer = function (containerDiv) {
   }
 
   /**
-   * Handle slice change.
+   * Set the current position.
    *
-   * @param {object} _event The event fired when changing the slice.
-   * @private
+   * @param {dwv.math.Point} position The new position.
+   * @param {dwv.math.Index} _index The new index.
    */
-  function onSliceChange(_event) {
-    needsDataUpdate = true;
-    self.draw();
-  }
-
-  /**
-   * Update the layer position.
-   *
-   * @param {object} pos The new position.
-   */
-  this.updatePosition = function (pos) {
-    viewController.setCurrentPosition(pos[0]);
-    viewController.setCurrentFrame(pos[1]);
-    needsDataUpdate = true;
+  this.setCurrentPosition = function (position, _index) {
+    viewController.setCurrentPosition(position);
   };
 
   /**

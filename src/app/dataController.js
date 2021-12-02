@@ -1,12 +1,14 @@
 // namespaces
 var dwv = dwv || {};
+/** @namespace */
+dwv.ctrl = dwv.ctrl || {};
 
 /*
  * Data (list of {image, meta}) controller.
  *
  * @class
  */
-dwv.DataController = function () {
+dwv.ctrl.DataController = function () {
 
   /**
    * List of {image, meta}.
@@ -17,17 +19,9 @@ dwv.DataController = function () {
   var data = [];
 
   /**
-   * Current data index.
-   *
-   * @private
-   * @type {number}
-   */
-  var currentIndex = null;
-
-  /**
    * Listener handler.
    *
-   * @type {object}
+   * @type {dwv.utils.ListenerHandler}
    * @private
    */
   var listenerHandler = new dwv.utils.ListenerHandler();
@@ -45,7 +39,6 @@ dwv.DataController = function () {
    * Reset the class: empty the data storage.
    */
   this.reset = function () {
-    currentIndex = null;
     data = [];
   };
 
@@ -60,21 +53,12 @@ dwv.DataController = function () {
   };
 
   /**
-   * Get the current data index.
-   *
-   * @returns {number} The index.
-   */
-  this.getCurrentIndex = function () {
-    return currentIndex;
-  };
-
-  /**
    * Set the image at a given index.
    *
-   * @param {object} image The image to set.
    * @param {number} index The index of the data.
+   * @param {dwv.image.Image} image The image to set.
    */
-  this.setImage = function (image, index) {
+  this.setImage = function (index, image) {
     data[index].image = image;
     fireEvent({
       type: 'imagechange',
@@ -85,11 +69,10 @@ dwv.DataController = function () {
   /**
    * Add a new data.
    *
-   * @param {object} image The image.
+   * @param {dwv.image.Image} image The image.
    * @param {object} meta The image meta.
    */
   this.addNew = function (image, meta) {
-    currentIndex = data.length;
     // store the new image
     data.push({
       image: image,
@@ -100,29 +83,43 @@ dwv.DataController = function () {
   /**
    * Update the current data.
    *
-   * @param {object} image The image.
+   * @param {number} index The index of the data.
+   * @param {dwv.image.Image} image The image.
    * @param {object} meta The image meta.
-   * @returns {number} The slice number at which the image was added.
+   * @param {number} timeId The time ID.
    */
-  this.updateCurrent = function (image, meta) {
-    var currentData = data[currentIndex];
-    // add slice to current image
-    var sliceNb = currentData.image.appendSlice(image);
-    // update meta data
-    var idKey = '';
-    if (typeof meta.x00020010 !== 'undefined') {
-      // dicom case
-      idKey = 'InstanceNumber';
-    } else {
-      idKey = 'imageUid';
-    }
-    currentData.meta = dwv.utils.mergeObjects(
-      currentData.meta,
-      getMetaObject(meta),
-      idKey,
-      'value');
+  this.update = function (index, image, meta, timeId) {
+    var dataToUpdate = data[index];
 
-    return sliceNb;
+    // handle possible timepoint
+    if (typeof timeId !== 'undefined') {
+      var size = dataToUpdate.image.getGeometry().getSize();
+      // append frame for first frame (still 3D) or other frames
+      if ((size.length() === 3 && timeId !== 0) ||
+        (size.length() > 3 && timeId >= size.get(3))) {
+        dataToUpdate.image.appendFrame();
+      }
+    }
+
+    // add slice to current image
+    dataToUpdate.image.appendSlice(image, timeId);
+
+    // update meta data
+    // TODO add time support
+    if (timeId === 0) {
+      var idKey = '';
+      if (typeof meta.x00020010 !== 'undefined') {
+        // dicom case
+        idKey = 'InstanceNumber';
+      } else {
+        idKey = 'imageUid';
+      }
+      dataToUpdate.meta = dwv.utils.mergeObjects(
+        dataToUpdate.meta,
+        getMetaObject(meta),
+        idKey,
+        'value');
+    }
   };
 
   /**

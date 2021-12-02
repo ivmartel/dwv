@@ -2,7 +2,7 @@
 <html>
 
 <head>
-<title>DWV DICOM Check</title>
+<title>DWV Test Viewer</title>
 <meta charset="UTF-8">
 <meta name="description" content="DICOM Web Viewer (DWV) simple version">
 <meta name="keywords" content="DICOM,HTML5,JavaScript,medical,imaging,DWV">
@@ -11,14 +11,43 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
+table, td, th {
+  border: 1px solid #aaa;
+}
+table {
+  border-collapse: collapse;
+}
+td, th {
+  padding: 10px;
+}
+progress {
+  width: 40%;
+}
+span {
+  font-size: small;
+  font-style: italic;
+}
 .input {
   margin-bottom: 10px;
   padding: 5px;
   background-color: gainsboro;
 }
 #fileinput {
-  width: 80%;
+  width: 50%;
   border: 1px dotted gray;
+}
+.layerGroup {
+  display:inline-block;
+  height: 350px;
+  width: 350px;
+  margin: 5px;
+  background-color: gainsboro;
+}
+.layer {
+  position: absolute;
+}
+.line {
+  padding: 5px;
 }
 </style>
 <!-- Third party (load) -->
@@ -27,15 +56,18 @@ body {
 <script type="text/javascript" src="../../src/app/application.js"></script>
 <script type="text/javascript" src="../../src/app/dataController.js"></script>
 <script type="text/javascript" src="../../src/app/loadController.js"></script>
-<script type="text/javascript" src="../../src/app/layerController.js"></script>
 <script type="text/javascript" src="../../src/app/viewController.js"></script>
 <script type="text/javascript" src="../../src/app/toolboxController.js"></script>
+<script type="text/javascript" src="../../src/dicom/dataReader.js"></script>
 <script type="text/javascript" src="../../src/dicom/dicomElementsWrapper.js"></script>
 <script type="text/javascript" src="../../src/dicom/dicomParser.js"></script>
+<script type="text/javascript" src="../../src/dicom/dicomTag.js"></script>
 <script type="text/javascript" src="../../src/dicom/dictionary.js"></script>
 <script type="text/javascript" src="../../src/gui/generic.js"></script>
 <script type="text/javascript" src="../../src/gui/drawLayer.js"></script>
+<script type="text/javascript" src="../../src/gui/layerGroup.js"></script>
 <script type="text/javascript" src="../../src/gui/viewLayer.js"></script>
+<script type="text/javascript" src="../../src/gui/stage.js"></script>
 <script type="text/javascript" src="../../src/gui/style.js"></script>
 <script type="text/javascript" src="../../src/image/decoder.js"></script>
 <script type="text/javascript" src="../../src/image/dicomBufferToView.js"></script>
@@ -46,8 +78,11 @@ body {
 <script type="text/javascript" src="../../src/image/imageFactory.js"></script>
 <script type="text/javascript" src="../../src/image/iterator.js"></script>
 <script type="text/javascript" src="../../src/image/luts.js"></script>
+<script type="text/javascript" src="../../src/image/planeHelper.js"></script>
 <script type="text/javascript" src="../../src/image/rescaleLut.js"></script>
 <script type="text/javascript" src="../../src/image/rsi.js"></script>
+<script type="text/javascript" src="../../src/image/size.js"></script>
+<script type="text/javascript" src="../../src/image/spacing.js"></script>
 <script type="text/javascript" src="../../src/image/view.js"></script>
 <script type="text/javascript" src="../../src/image/viewFactory.js"></script>
 <script type="text/javascript" src="../../src/image/viewMonochrome.js"></script>
@@ -61,14 +96,17 @@ body {
 <script type="text/javascript" src="../../src/io/dicomDataLoader.js"></script>
 <script type="text/javascript" src="../../src/io/memoryLoader.js"></script>
 <script type="text/javascript" src="../../src/io/rawImageLoader.js"></script>
+<script type="text/javascript" src="../../src/io/rawVideoLoader.js"></script>
 <script type="text/javascript" src="../../src/io/zipLoader.js"></script>
 <script type="text/javascript" src="../../src/math/bucketQueue.js"></script>
+<script type="text/javascript" src="../../src/math/index.js"></script>
 <script type="text/javascript" src="../../src/math/matrix.js"></script>
 <script type="text/javascript" src="../../src/math/point.js"></script>
 <script type="text/javascript" src="../../src/math/vector.js"></script>
 <script type="text/javascript" src="../../src/tools/undo.js"></script>
 <script type="text/javascript" src="../../src/tools/scroll.js"></script>
 <script type="text/javascript" src="../../src/tools/windowLevel.js"></script>
+<script type="text/javascript" src="../../src/tools/zoomPan.js"></script>
 <script type="text/javascript" src="../../src/utils/colour.js"></script>
 <script type="text/javascript" src="../../src/utils/env.js"></script>
 <script type="text/javascript" src="../../src/utils/listen.js"></script>
@@ -79,7 +117,17 @@ body {
 <script type="text/javascript" src="../../src/utils/string.js"></script>
 <script type="text/javascript" src="../../src/utils/thread.js"></script>
 <script type="text/javascript" src="../../src/utils/uri.js"></script>
-
+<!-- draw -->
+<script type="text/javascript" src="../../node_modules/konva/konva.min.js"></script>
+<script type="text/javascript" src="../../node_modules/i18next/i18next.min.js"></script>
+<script type="text/javascript" src="../../src/app/drawController.js"></script>
+<script type="text/javascript" src="../../src/tools/draw.js"></script>
+<script type="text/javascript" src="../../src/tools/drawCommands.js"></script>
+<script type="text/javascript" src="../../src/tools/editor.js"></script>
+<script type="text/javascript" src="../../src/tools/rectangle.js"></script>
+<script type="text/javascript" src="../../src/math/rectangle.js"></script>
+<script type="text/javascript" src="../../src/math/stats.js"></script>
+<script type="text/javascript" src="../../src/utils/i18n.js"></script>
 <!-- Local -->
 <script type="text/javascript" src="./viewer.js"></script>
 <script type="text/javascript">
@@ -93,17 +141,30 @@ document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedViewer)
 <div class="input">
 <label for="fileinput">Input:</label>
 <input type="file" id="fileinput" multiple>
+<progress id="loadprogress" max="100" value="0"></progress>
 </div>
 
 <!-- DWV -->
-<div id="dwv">
-  <!-- Layer Container -->
-  <div class="layerContainer"></div>
-</div><!-- /dwv -->
+<div id="dwv"></div>
 
-<label for="alpharange">Alpha:</label>
-<input type="range" id="alpharange" min="0" max="1" value="1" step="0.1">
-<input type="number" id="alphanumber" min="0" max="1" value="1" step="0.1">
+<div class="line">
+<label for="position">Position:</label>
+<input type="text" id="position">
+<span id="positionspan"></span>
+</div>
+
+<div class="line">
+<label for="changelayout">Layout:</label>
+<select name="layout" id="changelayout" disabled>
+ <option value="single">Single</option>
+ <option value="mpr">MPR</option>
+</select>
+<button id="resetlayout" disabled>Reset Layout</button>
+</div>
+
+<div class="line" id="binders">Binders:</div>
+
+<div id="layersdetails"></div>
 
 </body>
 </html>

@@ -23,8 +23,10 @@ dwv.math.mulABC = function (a, b, c) {
  * Rectangle shape.
  *
  * @class
- * @param {object} begin A Point2D representing the beginning of the rectangle.
- * @param {object} end A Point2D representing the end of the rectangle.
+ * @param {dwv.math.Point2D} begin A Point2D representing the beginning
+ *   of the rectangle.
+ * @param {dwv.math.Point2D} end A Point2D representing the end
+ *   of the rectangle.
  */
 dwv.math.Rectangle = function (begin, end) {
   if (end.getX() < begin.getX()) {
@@ -41,7 +43,7 @@ dwv.math.Rectangle = function (begin, end) {
   /**
    * Get the begin point of the rectangle.
    *
-   * @returns {object} The begin point of the rectangle
+   * @returns {dwv.math.Point2D} The begin point of the rectangle
    */
   this.getBegin = function () {
     return begin;
@@ -50,7 +52,7 @@ dwv.math.Rectangle = function (begin, end) {
   /**
    * Get the end point of the rectangle.
    *
-   * @returns {object} The end point of the rectangle
+   * @returns {dwv.math.Point2D} The end point of the rectangle
    */
   this.getEnd = function () {
     return end;
@@ -60,7 +62,7 @@ dwv.math.Rectangle = function (begin, end) {
 /**
  * Check for equality.
  *
- * @param {object} rhs The object to compare to.
+ * @param {dwv.math.Rectangle} rhs The object to compare to.
  * @returns {boolean} True if both objects are equal.
  */
 dwv.math.Rectangle.prototype.equals = function (rhs) {

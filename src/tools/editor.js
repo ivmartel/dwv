@@ -1,6 +1,7 @@
 // namespaces
 var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
+dwv.tool.draw = dwv.tool.draw || {};
 /**
  * The Konva namespace.
  *
@@ -207,7 +208,7 @@ dwv.tool.ShapeEditor = function (app) {
   function applyFuncToAnchors(func) {
     if (shape && shape.getParent()) {
       var anchors = shape.getParent().find('.anchor');
-      anchors.each(func);
+      anchors.forEach(func);
     }
   }
 
@@ -326,10 +327,11 @@ dwv.tool.ShapeEditor = function (app) {
     });
     // drag move listener
     anchor.on('dragmove.edit', function (evt) {
-      var layerController = app.getLayerController();
-      var drawLayer = layerController.getActiveDrawLayer();
+      var layerDetails = dwv.gui.getLayerDetailsFromEvent(evt.evt);
+      var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+      var drawLayer = layerGroup.getActiveDrawLayer();
       // validate the anchor position
-      dwv.tool.validateAnchorPosition(drawLayer.getSize(), this);
+      dwv.tool.validateAnchorPosition(drawLayer.getBaseSize(), this);
       // update shape
       currentFactory.update(this, app.getStyle(), viewController);
       // redraw

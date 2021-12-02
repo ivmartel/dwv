@@ -29,7 +29,7 @@ module.exports = function (config) {
       {pattern: 'node_modules/benchmark/benchmark.js', watched: false},
       // test data
       {pattern: 'locales/**/translation.json', included: false, type: 'js'},
-      {pattern: 'tests/data/*.dcm', included: false},
+      {pattern: 'tests/data/**/*.dcm', included: false},
       {pattern: 'tests/data/DICOMDIR', included: false},
       {pattern: 'tests/data/*.dcmdir', included: false},
       {pattern: 'tests/data/*.zip', included: false},
@@ -38,6 +38,7 @@ module.exports = function (config) {
       // extra served content
       {pattern: 'tests/**/*.html', included: false},
       {pattern: 'tests/visual/appgui.js', included: false},
+      {pattern: 'tests/visual/style.css', included: false},
       {pattern: 'tests/dicom/pages/*.js', included: false},
       {pattern: 'tests/image/pages/*.js', included: false},
       {pattern: 'tests/pacs/*.js', included: false},
@@ -77,7 +78,15 @@ module.exports = function (config) {
         {type: 'html', subdir: 'report-html'},
         {type: 'lcovonly', subdir: '.', file: 'report-lcovonly.txt'},
         {type: 'text-summary'}
-      ]
+      ],
+      check: {
+        global: {
+          statements: 40,
+          branches: 40,
+          functions: 30,
+          lines: 40
+        }
+      }
     },
     reporters: ['progress'],
     logLevel: config.LOG_INFO,

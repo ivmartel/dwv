@@ -312,7 +312,7 @@ dwv.utils.decodeManifest = function (manifest, nslices) {
  * Load from an input uri
  *
  * @param {string} uri The input uri, for example: 'window.location.href'.
- * @param {object} app The associated app that handles the load.
+ * @param {dwv.App} app The associated app that handles the load.
  */
 dwv.utils.loadFromUri = function (uri, app) {
   var query = dwv.utils.getUriQuery(uri);

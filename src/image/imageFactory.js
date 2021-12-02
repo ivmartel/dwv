@@ -10,14 +10,18 @@ dwv.image = dwv.image || {};
 dwv.image.ImageFactory = function () {};
 
 /**
- * Get an {@link dwv.image.Image} object from the read DICOM file.
+ * {@link dwv.image.Image} factory. Defaults to local one.
+ *
+ * @see dwv.image.ImageFactory
+ */
+dwv.ImageFactory = dwv.image.ImageFactory;
+
+/**
+ * Check dicom elements. Throws an error if not suitable.
  *
  * @param {object} dicomElements The DICOM tags.
- * @param {Array} pixelBuffer The pixel buffer.
- * @returns {dwv.image.Image} A new Image.
  */
-dwv.image.ImageFactory.prototype.create = function (
-  dicomElements, pixelBuffer) {
+dwv.image.ImageFactory.prototype.checkElements = function (dicomElements) {
   // columns
   var columns = dicomElements.getFromKey('x00280011');
   if (!columns) {
@@ -28,27 +32,42 @@ dwv.image.ImageFactory.prototype.create = function (
   if (!rows) {
     throw new Error('Missing or empty DICOM image number of rows');
   }
-  // image size
-  var size = new dwv.image.Size(columns, rows);
+};
 
-  // spacing
-  var rowSpacing = null;
-  var columnSpacing = null;
-  // PixelSpacing
-  var pixelSpacing = dicomElements.getFromKey('x00280030');
-  // ImagerPixelSpacing
-  var imagerPixelSpacing = dicomElements.getFromKey('x00181164');
-  if (pixelSpacing && pixelSpacing[0] && pixelSpacing[1]) {
-    rowSpacing = parseFloat(pixelSpacing[0]);
-    columnSpacing = parseFloat(pixelSpacing[1]);
-  } else if (imagerPixelSpacing &&
-    imagerPixelSpacing[0] &&
-    imagerPixelSpacing[1]) {
-    rowSpacing = parseFloat(imagerPixelSpacing[0]);
-    columnSpacing = parseFloat(imagerPixelSpacing[1]);
+/**
+ * Get an {@link dwv.image.Image} object from the read DICOM file.
+ *
+ * @param {object} dicomElements The DICOM tags.
+ * @param {Array} pixelBuffer The pixel buffer.
+ * @param {number} numberOfFiles The input number of files.
+ * @returns {dwv.image.Image} A new Image.
+ */
+dwv.image.ImageFactory.prototype.create = function (
+  dicomElements, pixelBuffer, numberOfFiles) {
+  // columns
+  var columns = dicomElements.getFromKey('x00280011');
+  if (!columns) {
+    throw new Error('Missing or empty DICOM image number of columns');
   }
+  // rows
+  var rows = dicomElements.getFromKey('x00280010');
+  if (!rows) {
+    throw new Error('Missing or empty DICOM image number of rows');
+  }
+
+  var sizeValues = [columns, rows, 1];
+
+  // frames
+  var frames = dicomElements.getFromKey('x00280008');
+  if (frames) {
+    sizeValues.push(frames);
+  }
+
+  // image size
+  var size = new dwv.image.Size(sizeValues);
+
   // image spacing
-  var spacing = new dwv.image.Spacing(columnSpacing, rowSpacing);
+  var spacing = dicomElements.getPixelSpacing();
 
   // TransferSyntaxUID
   var transferSyntaxUID = dicomElements.getFromKey('x00020010');
@@ -59,22 +78,16 @@ dwv.image.ImageFactory.prototype.create = function (
 
   // ImagePositionPatient
   var imagePositionPatient = dicomElements.getFromKey('x00200032');
-  // InstanceNumber
-  var instanceNumber = dicomElements.getFromKey('x00200013');
-
   // slice position
   var slicePosition = new Array(0, 0, 0);
   if (imagePositionPatient) {
     slicePosition = [parseFloat(imagePositionPatient[0]),
       parseFloat(imagePositionPatient[1]),
       parseFloat(imagePositionPatient[2])];
-  } else if (instanceNumber) {
-    // use instanceNumber as slice index if no imagePositionPatient was provided
-    dwv.logger.warn('Using instanceNumber as imagePositionPatient.');
-    slicePosition[2] = parseInt(instanceNumber, 10);
   }
 
-  // slice orientation
+  // slice orientation (cosines are matrices' columns)
+  // http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.2.html#sect_C.7.6.2.1.1
   var imageOrientationPatient = dicomElements.getFromKey('x00200037');
   var orientationMatrix;
   if (imageOrientationPatient) {
@@ -87,10 +100,13 @@ dwv.image.ImageFactory.prototype.create = function (
       parseFloat(imageOrientationPatient[4]),
       parseFloat(imageOrientationPatient[5]));
     var normal = rowCosines.crossProduct(colCosines);
-    orientationMatrix = new dwv.math.Matrix33(
-      rowCosines.getX(), rowCosines.getY(), rowCosines.getZ(),
-      colCosines.getX(), colCosines.getY(), colCosines.getZ(),
-      normal.getX(), normal.getY(), normal.getZ());
+    /* eslint-disable array-element-newline */
+    orientationMatrix = new dwv.math.Matrix33([
+      rowCosines.getX(), colCosines.getX(), normal.getX(),
+      rowCosines.getY(), colCosines.getY(), normal.getY(),
+      rowCosines.getZ(), colCosines.getZ(), normal.getZ()
+    ]);
+    /* eslint-enable array-element-newline */
   }
 
   // geometry
@@ -103,10 +119,27 @@ dwv.image.ImageFactory.prototype.create = function (
   var sopInstanceUid = dwv.dicom.cleanString(
     dicomElements.getFromKey('x00080018'));
 
+  // Sample per pixels
+  var samplesPerPixel = dicomElements.getFromKey('x00280002');
+  if (!samplesPerPixel) {
+    samplesPerPixel = 1;
+  }
+
+  // check buffer size
+  var bufferSize = size.getTotalSize() * samplesPerPixel;
+  if (bufferSize !== pixelBuffer.length) {
+    dwv.logger.warn('Badly sized pixel buffer: ' +
+      pixelBuffer.length + ' != ' + bufferSize);
+    if (bufferSize < pixelBuffer.length) {
+      pixelBuffer = pixelBuffer.slice(0, size.getTotalSize());
+    } else {
+      throw new Error('Underestimated buffer size, can\'t fix it...');
+    }
+  }
+
   // image
-  var image = new dwv.image.Image(
-    geometry, pixelBuffer, pixelBuffer.length, [sopInstanceUid]);
-    // PhotometricInterpretation
+  var image = new dwv.image.Image(geometry, pixelBuffer, [sopInstanceUid]);
+  // PhotometricInterpretation
   var photometricInterpretation = dicomElements.getFromKey('x00280004');
   if (photometricInterpretation) {
     var photo = dwv.dicom.cleanString(photometricInterpretation).toUpperCase();
@@ -116,7 +149,6 @@ dwv.image.ImageFactory.prototype.create = function (
       photo = 'RGB';
     }
     // check samples per pixels
-    var samplesPerPixel = parseInt(dicomElements.getFromKey('x00280002'), 10);
     if (photo === 'RGB' && samplesPerPixel === 1) {
       photo = 'PALETTE COLOR';
     }
@@ -146,6 +178,8 @@ dwv.image.ImageFactory.prototype.create = function (
 
   // meta information
   var meta = {};
+  // data length
+  meta.numberOfFiles = numberOfFiles;
   // Modality
   var modality = dicomElements.getFromKey('x00080060');
   if (modality) {
@@ -172,6 +206,12 @@ dwv.image.ImageFactory.prototype.create = function (
   if (pixelRepresentation) {
     meta.IsSigned = (pixelRepresentation === 1);
   }
+  // PatientPosition
+  var patientPosition = dicomElements.getFromKey('x00185100');
+  meta.PatientPosition = false;
+  if (patientPosition) {
+    meta.PatientPosition = patientPosition;
+  }
 
   // window level presets
   var windowPresets = {};
@@ -193,8 +233,7 @@ dwv.image.ImageFactory.prototype.create = function (
         }
         windowPresets[name] = {
           wl: [new dwv.image.WindowLevel(center, width)],
-          name: name,
-          perslice: true
+          name: name
         };
       }
       if (width === 0) {

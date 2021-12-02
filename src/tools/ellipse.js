@@ -266,6 +266,52 @@ dwv.tool.draw.EllipseFactory.prototype.update = function (
     group.add(dwv.tool.draw.getShadowEllipse(ellipse, group));
   }
 
+  // update label position
+  var textPos = {x: center.x, y: center.y};
+  klabel.position(textPos);
+
+  // update quantification
+  dwv.tool.draw.updateEllipseQuantification(group, viewController);
+};
+
+/**
+ * Update the quantification of an Ellipse.
+ *
+ * @param {object} group The group with the shape.
+ * @param {object} viewController The associated view controller.
+ */
+dwv.tool.draw.EllipseFactory.prototype.updateQuantification = function (
+  group, viewController) {
+  dwv.tool.draw.updateEllipseQuantification(group, viewController);
+};
+
+/**
+ * Update the quantification of an Ellipse (as a static
+ *   function to be used in update).
+ *
+ * @param {object} group The group with the shape.
+ * @param {object} viewController The associated view controller.
+ */
+dwv.tool.draw.updateEllipseQuantification = function (
+  group, viewController) {
+  // associated shape
+  var kellipse = group.getChildren(function (node) {
+    return node.name() === 'shape';
+  })[0];
+  // associated label
+  var klabel = group.getChildren(function (node) {
+    return node.name() === 'label';
+  })[0];
+
+  // positions: add possible group offset
+  var centerPoint = new dwv.math.Point2D(
+    group.x() + kellipse.x(),
+    group.y() + kellipse.y()
+  );
+  // circle
+  var ellipse = new dwv.math.Ellipse(
+    centerPoint, kellipse.radius().x, kellipse.radius().y);
+
   // update text
   var ktext = klabel.getText();
   var quantification = ellipse.quantify(
@@ -274,15 +320,12 @@ dwv.tool.draw.EllipseFactory.prototype.update = function (
   ktext.setText(dwv.utils.replaceFlags(ktext.meta.textExpr, quantification));
   // update meta
   ktext.meta.quantification = quantification;
-  // update position
-  var textPos = {x: center.x, y: center.y};
-  klabel.position(textPos);
 };
 
 /**
  * Get the debug shadow.
  *
- * @param {object} ellipse The ellipse to shadow.
+ * @param {dwv.math.Ellipse} ellipse The ellipse to shadow.
  * @param {object} group The associated group.
  * @returns {object} The shadow konva group.
  */

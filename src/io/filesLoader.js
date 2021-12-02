@@ -246,6 +246,7 @@ dwv.io.FilesLoader = function () {
         foundLoader = true;
         // load options
         loader.setOptions({
+          numberOfFiles: data.length,
           defaultCharacterSet: this.getDefaultCharacterSet()
         });
         // set loader callbacks
@@ -269,7 +270,7 @@ dwv.io.FilesLoader = function () {
       }
     }
     if (!foundLoader) {
-      throw new Error('No loader found for file: ' + dataElement);
+      throw new Error('No loader found for file: ' + dataElement.name);
     }
 
     var getLoadHandler = function (loader, dataElement, i) {
