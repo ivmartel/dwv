@@ -6,7 +6,7 @@ DWV (DICOM Web Viewer) is an open source zero footprint medical image viewer lib
 [![Node.js CI](https://github.com/ivmartel/dwv/actions/workflows/nodejs-ci.yml/badge.svg)](https://github.com/ivmartel/dwv/actions/workflows/nodejs-ci.yml) [![npm](https://img.shields.io/npm/v/dwv.svg)](https://www.npmjs.com/package/dwv)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=VQWYY8ZS75H3E&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
 
-Try a [live demo](https://ivmartel.github.io/dwv/) and read a lot more information on the [docs](https://ivmartel.github.io/dwv/doc/stable/) (such as [examples](https://ivmartel.github.io/dwv/doc/stable/tutorial-examples.html), [dicom conformance](https://ivmartel.github.io/dwv/doc/stable/tutorial-conformance.html), [pacs integrations](https://ivmartel.github.io/dwv/doc/stable/tutorial-integrations.html)). You can also check out the [wiki](https://github.com/ivmartel/dwv/wiki).
+Try a [live demo](https://ivmartel.github.io/dwv/) and read a lot more information on the [docs](https://ivmartel.github.io/dwv/doc/stable/index.html) (such as [examples](https://ivmartel.github.io/dwv/doc/stable/tutorial-examples.html), [dicom conformance](https://ivmartel.github.io/dwv/doc/stable/tutorial-conformance.html), [pacs integrations](https://ivmartel.github.io/dwv/doc/stable/tutorial-integrations.html)). You can also check out the [wiki](https://github.com/ivmartel/dwv/wiki).
 
  - All coding/implementation contributions and comments are welcome.
  - DWV is not certified for diagnostic use.<sup>[1](#footnote1)</sup>
