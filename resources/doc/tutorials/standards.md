@@ -21,10 +21,13 @@ Others
 
 ## Services
  * Github ([status](https://status.github.com/)), [build status](https://github.com/ivmartel/dwv/actions)
+ * [Transifex](https://www.transifex.com): translations, [dwv page](https://www.transifex.com/ivmartel/dwv/)
+ * [Dependabot](https://github.com/dependabot): dependency up to date bot checker, [dwv page](https://github.com/ivmartel/dwv/security/dependabot)
+
+Others:
  * [Code Climate](https://codeclimate.com) ([status](http://status.codeclimate.com/)): code review + test coverage + lint, [dwv page](https://codeclimate.com/github/ivmartel/dwv)
  * [David-dm](https://david-dm.org/): dependency up to date checker, [dwv page](https://david-dm.org/ivmartel/dwv)
- * [Transifex](https://www.transifex.com): translations, [dwv page](https://www.transifex.com/ivmartel/dwv/)
- * [Dependabot](https://github.com/dependabot): dependency up to date bot checker
+ * [Fossa](https://fossa.com/): license check, [dwv page](https://app.fossa.io/projects/git%2Bgithub.com%2Fivmartel%2Fdwv)
 
 ## Generic
  * Certification: [Europe](http://ec.europa.eu/growth/sectors/medical-devices/), [US](https://www.fda.gov/MedicalDevices) (FDA) -> [IEC_62304](https://en.wikipedia.org/wiki/IEC_62304)

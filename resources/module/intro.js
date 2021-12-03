@@ -58,3 +58,9 @@
       typeof i18next.t === 'undefined') {
       i18next = i18next.default;
     }
+
+    // Konva (>=v8) comes as a module, see #1044
+    if (typeof Konva !== 'undefined' &&
+      typeof Konva.Group === 'undefined') {
+      Konva = Konva.default;
+    }
