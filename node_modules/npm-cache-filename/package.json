@@ -1,0 +1,23 @@
+{
+  "name": "npm-cache-filename",
+  "version": "1.0.2",
+  "description": "Given a cache folder and url, return the appropriate cache folder.",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "tap": "^1.2.0"
+  },
+  "scripts": {
+    "test": "tap test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/npm/npm-cache-filename"
+  },
+  "author": "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/npm/npm-cache-filename/issues"
+  },
+  "homepage": "https://github.com/npm/npm-cache-filename"
+}

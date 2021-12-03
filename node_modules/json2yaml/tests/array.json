@@ -1,0 +1,22 @@
+[
+  "baz",
+  "qux",
+  "quxx",
+  null,
+  true,
+  {
+    "foo": "bar",
+    "corge": null,
+    "grault": 1,
+    "garply": true,
+    "waldo": "false",
+    "fred": "undefined"
+  },
+  [
+    "hello",
+    "world"
+  ],
+  42,
+  [
+  ]
+]

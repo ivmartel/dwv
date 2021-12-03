@@ -1,0 +1,50 @@
+{
+  "name": "bin-links",
+  "version": "1.1.8",
+  "publishConfig": {
+    "tag": "legacy"
+  },
+  "description": "JavaScript package binary linker",
+  "main": "index.js",
+  "scripts": {
+    "prerelease": "npm t",
+    "postrelease": "npm publish && git push --follow-tags",
+    "posttest": "standard",
+    "release": "standard-version -s",
+    "test": "tap -J --nyc-arg=--all --coverage test/*.js --100"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/npm/bin-links.git"
+  },
+  "keywords": [
+    "npm",
+    "gentle",
+    "fs"
+  ],
+  "author": "Mike Sherov",
+  "license": "Artistic-2.0",
+  "bugs": {
+    "url": "https://github.com/npm/bin-links/issues"
+  },
+  "homepage": "https://github.com/npm/bin-links#readme",
+  "dependencies": {
+    "bluebird": "^3.5.3",
+    "cmd-shim": "^3.0.0",
+    "gentle-fs": "^2.3.0",
+    "graceful-fs": "^4.1.15",
+    "npm-normalize-package-bin": "^1.0.0",
+    "write-file-atomic": "^2.3.0"
+  },
+  "devDependencies": {
+    "mkdirp": "^0.5.1",
+    "nyc": "^13.1.0",
+    "rimraf": "^2.6.3",
+    "standard": "^10.0.3",
+    "standard-version": "^4.4.0",
+    "tap": "^12.1.3"
+  },
+  "files": [
+    "index.js"
+  ]
+}

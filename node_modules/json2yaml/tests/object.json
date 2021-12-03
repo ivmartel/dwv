@@ -1,0 +1,17 @@
+{
+  "foo": "bar",
+  "baz": [
+    "qux",
+    "quxx"
+  ],
+  "corge": {
+    "grault": 1,
+    "garply": true,
+    "waldo": "false",
+    "fred": null
+  },
+  "empty": {
+  },
+  "hello": "world",
+  "answer": 42
+}

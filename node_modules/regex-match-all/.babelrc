@@ -1,0 +1,4 @@
+{
+  "presets": ["stage-1", "es2015"],
+  "plugins": ["transform-object-assign"]
+}
