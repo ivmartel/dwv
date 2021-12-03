@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.30.1](https://github.com/ivmartel/dwv/releases/tag/v0.30.1) - 03/12/2021
+
+### Fixed
+
+- Missing class for Konva [#1044](https://github.com/ivmartel/dwv/issues/1044)
+
+---
+
 ## [v0.30.0](https://github.com/ivmartel/dwv/releases/tag/v0.30.0) - 02/12/2021
 
 ### Added
