@@ -1,4 +1,4 @@
-/*! dwv 0.30.0 2021-12-02 15:55:09 */
+/*! dwv 0.30.1 2021-12-03 15:19:33 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -58,6 +58,12 @@
     if (typeof i18next !== 'undefined' &&
       typeof i18next.t === 'undefined') {
       i18next = i18next.default;
+    }
+
+    // Konva (>=v8) comes as a module, see #1044
+    if (typeof Konva !== 'undefined' &&
+      typeof Konva.Group === 'undefined') {
+      Konva = Konva.default;
     }
 
 /** @namespace */
@@ -4392,7 +4398,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.30.0';
+  return '0.30.1';
 };
 
 /**
