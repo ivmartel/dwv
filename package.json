@@ -18,6 +18,9 @@
   "engines": {
     "node": ">= 14.0.0"
   },
+  "browserslist": [
+    "defaults"
+  ],
   "dependencies": {
     "i18next": "~20.6.0",
     "i18next-browser-languagedetector": "~6.1.2",
