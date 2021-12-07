@@ -1,4 +1,4 @@
-/*! dwv 0.30.1 2021-12-03 15:19:33 */
+/*! dwv 0.30.2 2021-12-07 15:14:29 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -24,7 +24,7 @@
             require('i18next-xhr-backend'),
             require('i18next-browser-languagedetector'),
             require('jszip'),
-            require('konva'),
+            import('konva'),
             require('magic-wand-tool')
         );
     } else {
@@ -4398,7 +4398,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.30.1';
+  return '0.30.2';
 };
 
 /**
