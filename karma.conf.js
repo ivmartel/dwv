@@ -15,7 +15,7 @@ module.exports = function (config) {
       {pattern: 'node_modules/konva/konva.min.js', watched: false},
       {pattern: 'node_modules/i18next/i18next.min.js', watched: false},
       {
-        pattern: 'node_modules/i18next-xhr-backend/i18nextXHRBackend.min.js',
+        pattern: 'node_modules/i18next-http-backend/i18nextHttpBackend.min.js',
         watched: false
       },
       {

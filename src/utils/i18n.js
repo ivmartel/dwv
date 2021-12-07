@@ -8,12 +8,12 @@ var dwv = dwv || {};
  */
 var i18next = i18next || {};
 /**
- * The i18nextXHRBackend namespace.
+ * The i18nextHttpBackend namespace.
  *
- * @external i18nextXHRBackend
- * @see https://github.com/i18next/i18next-xhr-backend
+ * @external i18nextHttpBackend
+ * @see https://github.com/i18next/i18next-http-backend
  */
-var i18nextXHRBackend = i18nextXHRBackend || {};
+var i18nextHttpBackend = i18nextHttpBackend || {};
 /**
  * The i18nextBrowserLanguageDetector namespace.
  *
@@ -47,8 +47,8 @@ dwv.i18nInitialise = function (language, localesPath) {
     load: 'languageOnly',
     backend: {loadPath: lpath + '/locales/{{lng}}/{{ns}}.json'}
   };
-    // use the XHR backend to get translation files
-  var i18n = i18next.use(i18nextXHRBackend);
+    // use the HTTP backend to get translation files
+  var i18n = i18next.use(i18nextHttpBackend);
   // use browser language or the specified one
   if (lng === 'auto') {
     i18n.use(i18nextBrowserLanguageDetector);

@@ -5,7 +5,7 @@
         // AMD. Register as an anonymous module.
         define([
             'i18next',
-            'i18next-xhr-backend',
+            'i18next-http-backend',
             'i18next-browser-languagedetector',
             'jszip',
             'konva',
@@ -16,11 +16,10 @@
         // only CommonJS-like environments that support module.exports,
         // like Node.
 
-        // i18next-xhr-backend: requires XMlHttpRequest
         // Konva: requires 'canvas'
         module.exports = factory(
             require('i18next'),
-            require('i18next-xhr-backend'),
+            require('i18next-http-backend'),
             require('i18next-browser-languagedetector'),
             require('jszip'),
             import('konva'),
@@ -30,7 +29,7 @@
         // Browser globals (root is window)
         root.dwv = factory(
             root.i18next,
-            root.i18nextXHRBackend,
+            root.i18nextHttpBackend,
             root.i18nextBrowserLanguageDetector,
             root.JSZip,
             root.Konva,
@@ -39,7 +38,7 @@
     }
 }(this, function (
     i18next,
-    i18nextXHRBackend,
+    i18nextHttpBackend,
     i18nextBrowserLanguageDetector,
     JSZip,
     Konva,
