@@ -23,7 +23,7 @@
             require('i18next-xhr-backend'),
             require('i18next-browser-languagedetector'),
             require('jszip'),
-            require('konva'),
+            import('konva'),
             require('magic-wand-tool')
         );
     } else {

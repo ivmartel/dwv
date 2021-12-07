@@ -1,5 +1,18 @@
 # Changelog
 
+## [v0.30.2](https://github.com/ivmartel/dwv/releases/tag/v0.30.2) - 07/12/2021
+
+### Added
+
+- Add browserlist to package.json [#1052](https://github.com/ivmartel/dwv/issues/1052)
+- Add engines to package.json [#1050](https://github.com/ivmartel/dwv/issues/1050)
+
+### Fixed
+
+- require() of ES modules is not supported [#1045](https://github.com/ivmartel/dwv/issues/1045)
+
+---
+
 ## [v0.30.1](https://github.com/ivmartel/dwv/releases/tag/v0.30.1) - 03/12/2021
 
 ### Fixed
