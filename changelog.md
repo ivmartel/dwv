@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.30.3](https://github.com/ivmartel/dwv/releases/tag/v0.30.3) - 09/12/2021
+
+### Fixed
+
+- y.Group is not a constructor [#1055](https://github.com/ivmartel/dwv/issues/1055)
+
+---
+
 ## [v0.30.2](https://github.com/ivmartel/dwv/releases/tag/v0.30.2) - 07/12/2021
 
 ### Added
