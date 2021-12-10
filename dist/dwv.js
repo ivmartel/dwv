@@ -1,4 +1,4 @@
-/*! dwv 0.30.3 2021-12-09 16:13:34 */
+/*! dwv 0.30.4 2021-12-10 19:20:41 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -6,7 +6,7 @@
         // AMD. Register as an anonymous module.
         define([
             'i18next',
-            'i18next-xhr-backend',
+            'i18next-http-backend',
             'i18next-browser-languagedetector',
             'jszip',
             'konva',
@@ -17,11 +17,10 @@
         // only CommonJS-like environments that support module.exports,
         // like Node.
 
-        // i18next-xhr-backend: requires XMlHttpRequest
         // Konva: requires 'canvas'
         module.exports = factory(
             require('i18next'),
-            require('i18next-xhr-backend'),
+            require('i18next-http-backend'),
             require('i18next-browser-languagedetector'),
             require('jszip'),
             require('konva/cmj'),
@@ -31,7 +30,7 @@
         // Browser globals (root is window)
         root.dwv = factory(
             root.i18next,
-            root.i18nextXHRBackend,
+            root.i18nextHttpBackend,
             root.i18nextBrowserLanguageDetector,
             root.JSZip,
             root.Konva,
@@ -40,7 +39,7 @@
     }
 }(this, function (
     i18next,
-    i18nextXHRBackend,
+    i18nextHttpBackend,
     i18nextBrowserLanguageDetector,
     JSZip,
     Konva,
@@ -49,20 +48,27 @@
     // similar to what browserify does but reversed
     // https://www.contentful.com/blog/2017/01/17/the-global-object-in-javascript/
     var window = typeof window !== 'undefined' ?
-        window : typeof self !== 'undefined' ?
-        self : typeof global !== 'undefined' ?
-        global : {};
+      window : typeof self !== 'undefined' ?
+      self : typeof global !== 'undefined' ?
+      global : {};
 
-    // latest i18next (>v17) does not export default
-    // see #862 and https://github.com/i18next/i18next/commit/7c6c235
-    if (typeof i18next !== 'undefined' &&
-      typeof i18next.t === 'undefined') {
+    // if it has a default, treat it as ESM
+    var isEsmModule = function (mod) {
+      return typeof mod !== 'undefined' &&
+        typeof mod.default !== 'undefined';
+    }
+    // i18next (>v17) comes as a module, see #862
+    if (isEsmModule(i18next)) {
       i18next = i18next.default;
     }
-
+    if (isEsmModule(i18nextHttpBackend)) {
+      i18nextHttpBackend = i18nextHttpBackend.default;
+    }
+    if (isEsmModule(i18nextBrowserLanguageDetector)) {
+      i18nextBrowserLanguageDetector = i18nextBrowserLanguageDetector.default;
+    }
     // Konva (>=v8) comes as a module, see #1044
-    if (typeof Konva !== 'undefined' &&
-      typeof Konva.Group === 'undefined') {
+    if (isEsmModule(Konva)) {
       Konva = Konva.default;
     }
 
@@ -4398,7 +4404,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.30.3';
+  return '0.30.4';
 };
 
 /**
@@ -32351,12 +32357,12 @@ var dwv = dwv || {};
  */
 var i18next = i18next || {};
 /**
- * The i18nextXHRBackend namespace.
+ * The i18nextHttpBackend namespace.
  *
- * @external i18nextXHRBackend
- * @see https://github.com/i18next/i18next-xhr-backend
+ * @external i18nextHttpBackend
+ * @see https://github.com/i18next/i18next-http-backend
  */
-var i18nextXHRBackend = i18nextXHRBackend || {};
+var i18nextHttpBackend = i18nextHttpBackend || {};
 /**
  * The i18nextBrowserLanguageDetector namespace.
  *
@@ -32390,8 +32396,8 @@ dwv.i18nInitialise = function (language, localesPath) {
     load: 'languageOnly',
     backend: {loadPath: lpath + '/locales/{{lng}}/{{ns}}.json'}
   };
-    // use the XHR backend to get translation files
-  var i18n = i18next.use(i18nextXHRBackend);
+    // use the HTTP backend to get translation files
+  var i18n = i18next.use(i18nextHttpBackend);
   // use browser language or the specified one
   if (lng === 'auto') {
     i18n.use(i18nextBrowserLanguageDetector);
