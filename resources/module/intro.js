@@ -51,15 +51,22 @@
         self : typeof global !== 'undefined' ?
         global : {};
 
-    // latest i18next (>v17) does not export default
-    // see #862 and https://github.com/i18next/i18next/commit/7c6c235
-    if (typeof i18next !== 'undefined' &&
-      typeof i18next.t === 'undefined') {
+    // if it has a default, treat it as ESM
+    var isEsmModule = function (mod) {
+      return typeof mod !== 'undefined' &&
+        typeof mod.default !== 'undefined';
+    }
+    // i18next (>v17) comes as a module, see #862
+    if (isEsmModule(i18next)) {
       i18next = i18next.default;
     }
-
+    if (isEsmModule(i18nextHttpBackend)) {
+      i18nextHttpBackend = i18nextHttpBackend.default;
+    }
+    if (isEsmModule(i18nextBrowserLanguageDetector)) {
+      i18nextBrowserLanguageDetector = i18nextBrowserLanguageDetector.default;
+    }
     // Konva (>=v8) comes as a module, see #1044
-    if (typeof Konva !== 'undefined' &&
-      typeof Konva.Group === 'undefined') {
+    if (isEsmModule(Konva)) {
       Konva = Konva.default;
     }
