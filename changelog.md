@@ -1,5 +1,18 @@
 # Changelog
 
+## [v0.30.4](https://github.com/ivmartel/dwv/releases/tag/v0.30.4) - 10/12/2021
+
+### Fixed
+
+- Load i18next plugins as modules [#1057](https://github.com/ivmartel/dwv/issues/1057)
+- Update overlays after event data change [#1056](https://github.com/ivmartel/dwv/issues/1056)
+
+### Dependencies
+
+- Replace i18next-xhr-backend with i18next-http-backend [#1049](https://github.com/ivmartel/dwv/issues/1049)
+
+---
+
 ## [v0.30.3](https://github.com/ivmartel/dwv/releases/tag/v0.30.3) - 09/12/2021
 
 ### Fixed

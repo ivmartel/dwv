@@ -17,7 +17,7 @@
         {"value": "zoomchange", "pos": "br", "format": "Z: {v0}", "precision": "3"},
         {"value": "offsetchange", "pos": "br", "format": "Off: {v0},{v1}", "precision": "round"},
         {"value": "positionchange", "pos": "br", "format": "位置: {v0}"},
-        {"value": "positionchange", "pos": "br", "format": "值: {v1}"}
+        {"value": "positionchange", "pos": "br", "format": "值: {v2}"}
     ],
     "DOM": [
         {"tags": ["fileName"], "pos": "tl"},
@@ -54,6 +54,6 @@
         {"value": "zoomchange", "pos": "br", "format": "Z: {v0}", "precision": "3"},
         {"value": "offsetchange", "pos": "br", "format": "Off: {v0},{v1}", "precision": "round"},
         {"value": "positionchange", "pos": "br", "format": "位置: {v0}"},
-        {"value": "positionchange", "pos": "br", "format": "值: {v1}"}
+        {"value": "positionchange", "pos": "br", "format": "值: {v2}"}
     ]
 }
