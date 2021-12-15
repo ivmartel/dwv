@@ -85,7 +85,13 @@ dwv.image.Size.prototype.canScroll = function (viewOrientation) {
   if (typeof viewOrientation !== 'undefined') {
     dimension = viewOrientation.getThirdColMajorDirection();
   }
-  return this.moreThanOne(dimension);
+  var scroll3D = this.moreThanOne(dimension);
+  var canScroll = scroll3D;
+  // check possible other dimensions
+  for (var i = 3; i < this.length(); ++i) {
+    canScroll = canScroll || this.moreThanOne(i);
+  }
+  return canScroll;
 };
 
 /**
