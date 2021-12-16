@@ -74,8 +74,8 @@ dwv.image.Size.prototype.moreThanOne = function (dimension) {
 };
 
 /**
- * Check if the third direction of an orientation matrix has a size
- * of more than one.
+ * Check if the associated data is scrollable: either in 3D or
+ * in other directions.
  *
  * @param {dwv.math.Matrix33} viewOrientation The orientation matrix.
  * @returns {boolean} True if scrollable.
@@ -85,8 +85,7 @@ dwv.image.Size.prototype.canScroll = function (viewOrientation) {
   if (typeof viewOrientation !== 'undefined') {
     dimension = viewOrientation.getThirdColMajorDirection();
   }
-  var scroll3D = this.moreThanOne(dimension);
-  var canScroll = scroll3D;
+  var canScroll = this.moreThanOne(dimension);
   // check possible other dimensions
   for (var i = 3; i < this.length(); ++i) {
     canScroll = canScroll || this.moreThanOne(i);
