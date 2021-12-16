@@ -1,4 +1,4 @@
-/*! dwv 0.30.4 2021-12-10 19:20:41 */
+/*! dwv 0.30.5 2021-12-16 11:23:07 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -2813,7 +2813,8 @@ dwv.ctrl.ViewController = function (view) {
   /**
    * Can the data be scrolled?
    *
-   * @returns {boolean} True if the data has a third dimension greater than one.
+   * @returns {boolean} True if the data has either the third dimension
+   * or above greater than one.
    */
   this.canScroll = function () {
     return view.getImage().canScroll(view.getOrientation());
@@ -2959,22 +2960,36 @@ dwv.ctrl.ViewController = function (view) {
    * Scroll play: loop through all slices.
    */
   this.play = function () {
+    // ensure data is scrollable: dim >= 3
     if (!this.canScroll()) {
       return;
     }
     if (playerID === null) {
+      var image = view.getImage();
       var recommendedDisplayFrameRate =
-        view.getImage().getMeta().RecommendedDisplayFrameRate;
+        image.getMeta().RecommendedDisplayFrameRate;
       var milliseconds = view.getPlaybackMilliseconds(
         recommendedDisplayFrameRate);
+      var size = image.getGeometry().getSize();
+      var canScroll3D = size.canScroll3D();
 
       playerID = setInterval(function () {
+        var canDoMore = false;
+        if (canScroll3D) {
+          canDoMore = self.incrementScrollIndex();
+        } else {
+          canDoMore = self.incrementIndex(3);
+        }
         // end of scroll, loop back
-        if (!self.incrementScrollIndex()) {
+        if (!canDoMore) {
           var pos1 = self.getCurrentIndex();
           var values = pos1.getValues();
           var orientation = view.getOrientation();
-          values[orientation.getThirdColMajorDirection()] = 0;
+          if (canScroll3D) {
+            values[orientation.getThirdColMajorDirection()] = 0;
+          } else {
+            values[3] = 0;
+          }
           var index = new dwv.math.Index(values);
           var geometry = view.getImage().getGeometry();
           self.setCurrentPosition(geometry.indexToWorld(index));
@@ -4404,7 +4419,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.30.4';
+  return '0.30.5';
 };
 
 /**
@@ -17743,18 +17758,33 @@ dwv.image.Size.prototype.moreThanOne = function (dimension) {
 };
 
 /**
- * Check if the third direction of an orientation matrix has a size
- * of more than one.
+ * Check if the associated data is scrollable in 3D.
  *
  * @param {dwv.math.Matrix33} viewOrientation The orientation matrix.
  * @returns {boolean} True if scrollable.
  */
-dwv.image.Size.prototype.canScroll = function (viewOrientation) {
+dwv.image.Size.prototype.canScroll3D = function (viewOrientation) {
   var dimension = 2;
   if (typeof viewOrientation !== 'undefined') {
     dimension = viewOrientation.getThirdColMajorDirection();
   }
   return this.moreThanOne(dimension);
+};
+
+/**
+ * Check if the associated data is scrollable: either in 3D or
+ * in other directions.
+ *
+ * @param {dwv.math.Matrix33} viewOrientation The orientation matrix.
+ * @returns {boolean} True if scrollable.
+ */
+dwv.image.Size.prototype.canScroll = function (viewOrientation) {
+  var canScroll = this.canScroll3D(viewOrientation);
+  // check possible other dimensions
+  for (var i = 3; i < this.length(); ++i) {
+    canScroll = canScroll || this.moreThanOne(i);
+  }
+  return canScroll;
 };
 
 /**
@@ -31012,9 +31042,9 @@ dwv.tool.Scroll = function (app) {
     if (xMove && imageSize.moreThanOne(3)) {
       // update view controller
       if (diffX > 0) {
-        viewController.decrementIndex(3);
-      } else {
         viewController.incrementIndex(3);
+      } else {
+        viewController.decrementIndex(3);
       }
     }
 
@@ -34037,6 +34067,8 @@ dwv.utils.ThreadPool = function (poolSize) {
       // use input thread to run the waiting task
       workerThread.run(workerTask);
     } else {
+      // stop the worker
+      workerThread.stop();
       // no task to run, add to free list
       freeThreads.push(workerThread);
       // remove from running list
