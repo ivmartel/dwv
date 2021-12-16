@@ -424,11 +424,11 @@ dwv.ctrl.ViewController = function (view) {
       var milliseconds = view.getPlaybackMilliseconds(
         recommendedDisplayFrameRate);
       var size = image.getGeometry().getSize();
-      var is3D = size.length() === 3;
+      var canScroll3D = size.canScroll3D();
 
       playerID = setInterval(function () {
         var canDoMore = false;
-        if (is3D) {
+        if (canScroll3D) {
           canDoMore = self.incrementScrollIndex();
         } else {
           canDoMore = self.incrementIndex(3);
@@ -438,8 +438,9 @@ dwv.ctrl.ViewController = function (view) {
           var pos1 = self.getCurrentIndex();
           var values = pos1.getValues();
           var orientation = view.getOrientation();
-          values[orientation.getThirdColMajorDirection()] = 0;
-          if (values.length === 4) {
+          if (canScroll3D) {
+            values[orientation.getThirdColMajorDirection()] = 0;
+          } else {
             values[3] = 0;
           }
           var index = new dwv.math.Index(values);

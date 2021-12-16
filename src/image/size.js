@@ -74,6 +74,20 @@ dwv.image.Size.prototype.moreThanOne = function (dimension) {
 };
 
 /**
+ * Check if the associated data is scrollable in 3D.
+ *
+ * @param {dwv.math.Matrix33} viewOrientation The orientation matrix.
+ * @returns {boolean} True if scrollable.
+ */
+dwv.image.Size.prototype.canScroll3D = function (viewOrientation) {
+  var dimension = 2;
+  if (typeof viewOrientation !== 'undefined') {
+    dimension = viewOrientation.getThirdColMajorDirection();
+  }
+  return this.moreThanOne(dimension);
+};
+
+/**
  * Check if the associated data is scrollable: either in 3D or
  * in other directions.
  *
@@ -81,11 +95,7 @@ dwv.image.Size.prototype.moreThanOne = function (dimension) {
  * @returns {boolean} True if scrollable.
  */
 dwv.image.Size.prototype.canScroll = function (viewOrientation) {
-  var dimension = 2;
-  if (typeof viewOrientation !== 'undefined') {
-    dimension = viewOrientation.getThirdColMajorDirection();
-  }
-  var canScroll = this.moreThanOne(dimension);
+  var canScroll = this.canScroll3D(viewOrientation);
   // check possible other dimensions
   for (var i = 3; i < this.length(); ++i) {
     canScroll = canScroll || this.moreThanOne(i);
