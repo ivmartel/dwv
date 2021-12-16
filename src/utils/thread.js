@@ -70,6 +70,8 @@ dwv.utils.ThreadPool = function (poolSize) {
       // use input thread to run the waiting task
       workerThread.run(workerTask);
     } else {
+      // stop the worker
+      workerThread.stop();
       // no task to run, add to free list
       freeThreads.push(workerThread);
       // remove from running list

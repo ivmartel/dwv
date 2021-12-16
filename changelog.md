@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.30.5](https://github.com/ivmartel/dwv/releases/tag/v0.30.5) - 16/12/2021
+
+### Fixed
+
+- Allow to play multi-frame data [#1064](https://github.com/ivmartel/dwv/issues/1064)
+- Allow scroll for multi-frame data [#1063](https://github.com/ivmartel/dwv/issues/1063)
+- Stop worker if no tasks left [#1062](https://github.com/ivmartel/dwv/issues/1062)
+
+---
+
 ## [v0.30.4](https://github.com/ivmartel/dwv/releases/tag/v0.30.4) - 10/12/2021
 
 ### Fixed

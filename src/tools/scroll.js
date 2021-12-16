@@ -86,9 +86,9 @@ dwv.tool.Scroll = function (app) {
     if (xMove && imageSize.moreThanOne(3)) {
       // update view controller
       if (diffX > 0) {
-        viewController.decrementIndex(3);
-      } else {
         viewController.incrementIndex(3);
+      } else {
+        viewController.decrementIndex(3);
       }
     }
 

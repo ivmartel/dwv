@@ -266,7 +266,8 @@ dwv.ctrl.ViewController = function (view) {
   /**
    * Can the data be scrolled?
    *
-   * @returns {boolean} True if the data has a third dimension greater than one.
+   * @returns {boolean} True if the data has either the third dimension
+   * or above greater than one.
    */
   this.canScroll = function () {
     return view.getImage().canScroll(view.getOrientation());
@@ -412,22 +413,36 @@ dwv.ctrl.ViewController = function (view) {
    * Scroll play: loop through all slices.
    */
   this.play = function () {
+    // ensure data is scrollable: dim >= 3
     if (!this.canScroll()) {
       return;
     }
     if (playerID === null) {
+      var image = view.getImage();
       var recommendedDisplayFrameRate =
-        view.getImage().getMeta().RecommendedDisplayFrameRate;
+        image.getMeta().RecommendedDisplayFrameRate;
       var milliseconds = view.getPlaybackMilliseconds(
         recommendedDisplayFrameRate);
+      var size = image.getGeometry().getSize();
+      var canScroll3D = size.canScroll3D();
 
       playerID = setInterval(function () {
+        var canDoMore = false;
+        if (canScroll3D) {
+          canDoMore = self.incrementScrollIndex();
+        } else {
+          canDoMore = self.incrementIndex(3);
+        }
         // end of scroll, loop back
-        if (!self.incrementScrollIndex()) {
+        if (!canDoMore) {
           var pos1 = self.getCurrentIndex();
           var values = pos1.getValues();
           var orientation = view.getOrientation();
-          values[orientation.getThirdColMajorDirection()] = 0;
+          if (canScroll3D) {
+            values[orientation.getThirdColMajorDirection()] = 0;
+          } else {
+            values[3] = 0;
+          }
           var index = new dwv.math.Index(values);
           var geometry = view.getImage().getGeometry();
           self.setCurrentPosition(geometry.indexToWorld(index));
