@@ -304,6 +304,13 @@ dwv.gui.ViewLayer = function (containerDiv) {
     ]);
   };
 
+  /**
+   * Remove scale from a display position.
+   *
+   * @param {number} x The X position.
+   * @param {number} y The Y position.
+   * @returns {object} The de-scaled position as {x,y}.
+   */
   this.displayToPlaneScale = function (x, y) {
     return {
       x: x / scale.x,
@@ -311,11 +318,33 @@ dwv.gui.ViewLayer = function (containerDiv) {
     };
   };
 
+  /**
+   * Get a plane position from a display position.
+   *
+   * @param {number} x The X position.
+   * @param {number} y The Y position.
+   * @returns {object} The plane position as {x,y}.
+   */
   this.displayToPlanePos = function (x, y) {
     var deScaled = this.displayToPlaneScale(x, y);
     return {
       x: deScaled.x + offset.x,
       y: deScaled.y + offset.y
+    };
+  };
+
+  /**
+   * Get a main plane position from a display position.
+   *
+   * @param {number} x The X position.
+   * @param {number} y The Y position.
+   * @returns {object} The main plane position as {x,y}.
+   */
+  this.displayToMainPlanePos = function (x, y) {
+    var planePos = this.displayToPlanePos(x, y);
+    return {
+      x: planePos.x - baseOffset.x,
+      y: planePos.y - baseOffset.y
     };
   };
 
