@@ -1,5 +1,14 @@
 # Changelog
 
+## [v0.30.6](https://github.com/ivmartel/dwv/releases/tag/v0.30.6) - 20/12/2021
+
+### Fixed
+
+- Zoom does not stay centred with overlay data [#1066](https://github.com/ivmartel/dwv/issues/1066)
+- Image limit for offset overlap [#1065](https://github.com/ivmartel/dwv/issues/1065)
+
+---
+
 ## [v0.30.5](https://github.com/ivmartel/dwv/releases/tag/v0.30.5) - 16/12/2021
 
 ### Fixed
