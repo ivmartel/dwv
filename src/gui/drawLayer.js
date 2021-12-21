@@ -152,18 +152,6 @@ dwv.gui.DrawLayer = function (containerDiv) {
   };
 
   /**
-   * Get the data full size, ie size * spacing.
-   *
-   * @returns {object} The full size as {x,y}.
-   */
-  this.getFullSize = function () {
-    return {
-      x: baseSize.x * baseSpacing.x,
-      y: baseSize.y * baseSpacing.y
-    };
-  };
-
-  /**
    * Get the layer base size (without scale).
    *
    * @returns {object} The size as {x,y}.
@@ -302,19 +290,17 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * Fit the layer to its parent container.
    *
    * @param {number} fitScale1D The 1D fit scale.
+   * @param {object} fitSize The fit size as {x,y}.
    */
-  this.fitToContainer = function (fitScale1D) {
+  this.fitToContainer = function (fitScale1D, fitSize) {
     // update fit scale
     fitScale = {
       x: fitScale1D * baseSpacing.x,
       y: fitScale1D * baseSpacing.y
     };
     // update konva
-    var fullSize = this.getFullSize();
-    var width = Math.floor(fullSize.x * fitScale1D);
-    var height = Math.floor(fullSize.y * fitScale1D);
-    konvaStage.setWidth(width);
-    konvaStage.setHeight(height);
+    konvaStage.setWidth(fitSize.x);
+    konvaStage.setHeight(fitSize.y);
     // reset scale
     this.setScale({x: 1, y: 1, z: 1});
   };

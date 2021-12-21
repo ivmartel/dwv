@@ -457,7 +457,12 @@ dwv.App = function () {
   this.fitToContainer = function () {
     var layerGroup = stage.getActiveLayerGroup();
     if (layerGroup) {
-      layerGroup.fitToContainer(self.getLastImage().getGeometry());
+      var geometry = self.getLastImage().getGeometry();
+      var size = geometry.getSize().get2D();
+      var spacing = geometry.getSpacing().get2D();
+      var width = size.x * spacing.x;
+      var height = size.y * spacing.y;
+      layerGroup.fitToContainer({x: width, y: height});
       layerGroup.draw();
       // update style
       //style.setBaseScale(layerGroup.getBaseScale());
@@ -1243,7 +1248,27 @@ dwv.App = function () {
       }
     }
 
-    layerGroup.fitToContainer();
+    // fit to the maximum size
+    var maxSize = {x: 0, y: 0};
+    for (var i = 0; i < dataController.length(); ++i) {
+      var dc = dataController.get(i);
+      var geometry = dc.image.getGeometry();
+      var viewOrient = dwv.gui.getViewOrientation(
+        geometry,
+        layerGroup.getTargetOrientation()
+      );
+      var size = geometry.getSize(viewOrient).get2D();
+      var spacing = geometry.getSpacing(viewOrient).get2D();
+      var width = size.x * spacing.x;
+      if (width > maxSize.x) {
+        maxSize.x = width;
+      }
+      var height = size.y * spacing.y;
+      if (height > maxSize.y) {
+        maxSize.y = height;
+      }
+    }
+    layerGroup.fitToContainer(maxSize);
   }
 
 };

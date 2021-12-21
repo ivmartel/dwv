@@ -470,24 +470,27 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   /**
    * Fit the display to the size of the container.
    * To be called once the image is loaded.
+   *
+   * @param {object} realSize 2D real size (in mm) to fit provided as {x,y}.
    */
-  this.fitToContainer = function () {
+  this.fitToContainer = function (realSize) {
     // check container size
     if (containerDiv.offsetWidth === 0 &&
       containerDiv.offsetHeight === 0) {
       throw new Error('Cannot fit to zero sized container.');
     }
     // find best fit
-    var fitScales = [];
-    for (var i = 0; i < layers.length; ++i) {
-      var fullSize = layers[i].getFullSize();
-      fitScales.push(containerDiv.offsetWidth / fullSize.x);
-      fitScales.push(containerDiv.offsetHeight / fullSize.y);
-    }
-    var fitScale = Math.min.apply(null, fitScales);
+    var fitScale = Math.min(
+      containerDiv.offsetWidth / realSize.x,
+      containerDiv.offsetHeight / realSize.y
+    );
+    var fitSize = {
+      x: Math.floor(realSize.x * fitScale),
+      y: Math.floor(realSize.y * fitScale)
+    };
     // apply to layers
     for (var j = 0; j < layers.length; ++j) {
-      layers[j].fitToContainer(fitScale);
+      layers[j].fitToContainer(fitScale, fitSize);
     }
   };
 
