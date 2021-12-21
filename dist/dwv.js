@@ -1,4 +1,4 @@
-/*! dwv 0.30.5 2021-12-16 11:23:07 */
+/*! dwv 0.30.6 2021-12-21 11:22:44 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -531,7 +531,12 @@ dwv.App = function () {
   this.fitToContainer = function () {
     var layerGroup = stage.getActiveLayerGroup();
     if (layerGroup) {
-      layerGroup.fitToContainer(self.getLastImage().getGeometry());
+      var geometry = self.getLastImage().getGeometry();
+      var size = geometry.getSize().get2D();
+      var spacing = geometry.getSpacing().get2D();
+      var width = size.x * spacing.x;
+      var height = size.y * spacing.y;
+      layerGroup.fitToContainer({x: width, y: height});
       layerGroup.draw();
       // update style
       //style.setBaseScale(layerGroup.getBaseScale());
@@ -1317,7 +1322,27 @@ dwv.App = function () {
       }
     }
 
-    layerGroup.fitToContainer();
+    // fit to the maximum size
+    var maxSize = {x: 0, y: 0};
+    for (var i = 0; i < dataController.length(); ++i) {
+      var dc = dataController.get(i);
+      var geometry = dc.image.getGeometry();
+      var viewOrient = dwv.gui.getViewOrientation(
+        geometry,
+        layerGroup.getTargetOrientation()
+      );
+      var size = geometry.getSize(viewOrient).get2D();
+      var spacing = geometry.getSpacing(viewOrient).get2D();
+      var width = size.x * spacing.x;
+      if (width > maxSize.x) {
+        maxSize.x = width;
+      }
+      var height = size.y * spacing.y;
+      if (height > maxSize.y) {
+        maxSize.y = height;
+      }
+    }
+    layerGroup.fitToContainer(maxSize);
   }
 
 };
@@ -4419,7 +4444,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.30.5';
+  return '0.30.6';
 };
 
 /**
@@ -11213,18 +11238,6 @@ dwv.gui.DrawLayer = function (containerDiv) {
   };
 
   /**
-   * Get the data full size, ie size * spacing.
-   *
-   * @returns {object} The full size as {x,y}.
-   */
-  this.getFullSize = function () {
-    return {
-      x: baseSize.x * baseSpacing.x,
-      y: baseSize.y * baseSpacing.y
-    };
-  };
-
-  /**
    * Get the layer base size (without scale).
    *
    * @returns {object} The size as {x,y}.
@@ -11363,19 +11376,17 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * Fit the layer to its parent container.
    *
    * @param {number} fitScale1D The 1D fit scale.
+   * @param {object} fitSize The fit size as {x,y}.
    */
-  this.fitToContainer = function (fitScale1D) {
+  this.fitToContainer = function (fitScale1D, fitSize) {
     // update fit scale
     fitScale = {
       x: fitScale1D * baseSpacing.x,
       y: fitScale1D * baseSpacing.y
     };
     // update konva
-    var fullSize = this.getFullSize();
-    var width = Math.floor(fullSize.x * fitScale1D);
-    var height = Math.floor(fullSize.y * fitScale1D);
-    konvaStage.setWidth(width);
-    konvaStage.setHeight(height);
+    konvaStage.setWidth(fitSize.x);
+    konvaStage.setHeight(fitSize.y);
     // reset scale
     this.setScale({x: 1, y: 1, z: 1});
   };
@@ -12123,24 +12134,27 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   /**
    * Fit the display to the size of the container.
    * To be called once the image is loaded.
+   *
+   * @param {object} realSize 2D real size (in mm) to fit provided as {x,y}.
    */
-  this.fitToContainer = function () {
+  this.fitToContainer = function (realSize) {
     // check container size
     if (containerDiv.offsetWidth === 0 &&
       containerDiv.offsetHeight === 0) {
       throw new Error('Cannot fit to zero sized container.');
     }
     // find best fit
-    var fitScales = [];
-    for (var i = 0; i < layers.length; ++i) {
-      var fullSize = layers[i].getFullSize();
-      fitScales.push(containerDiv.offsetWidth / fullSize.x);
-      fitScales.push(containerDiv.offsetHeight / fullSize.y);
-    }
-    var fitScale = Math.min.apply(null, fitScales);
+    var fitScale = Math.min(
+      containerDiv.offsetWidth / realSize.x,
+      containerDiv.offsetHeight / realSize.y
+    );
+    var fitSize = {
+      x: Math.floor(realSize.x * fitScale),
+      y: Math.floor(realSize.y * fitScale)
+    };
     // apply to layers
     for (var j = 0; j < layers.length; ++j) {
-      layers[j].fitToContainer(fitScale);
+      layers[j].fitToContainer(fitScale, fitSize);
     }
   };
 
@@ -13129,18 +13143,6 @@ dwv.gui.ViewLayer = function (containerDiv) {
   };
 
   /**
-   * Get the data full size, ie size * spacing.
-   *
-   * @returns {object} The full size as {x,y}.
-   */
-  this.getFullSize = function () {
-    return {
-      x: baseSize.x * baseSpacing.x,
-      y: baseSize.y * baseSpacing.y
-    };
-  };
-
-  /**
    * Get the layer base size (without scale).
    *
    * @returns {object} The size as {x,y}.
@@ -13239,6 +13241,13 @@ dwv.gui.ViewLayer = function (containerDiv) {
     ]);
   };
 
+  /**
+   * Remove scale from a display position.
+   *
+   * @param {number} x The X position.
+   * @param {number} y The Y position.
+   * @returns {object} The de-scaled position as {x,y}.
+   */
   this.displayToPlaneScale = function (x, y) {
     return {
       x: x / scale.x,
@@ -13246,11 +13255,33 @@ dwv.gui.ViewLayer = function (containerDiv) {
     };
   };
 
+  /**
+   * Get a plane position from a display position.
+   *
+   * @param {number} x The X position.
+   * @param {number} y The Y position.
+   * @returns {object} The plane position as {x,y}.
+   */
   this.displayToPlanePos = function (x, y) {
     var deScaled = this.displayToPlaneScale(x, y);
     return {
       x: deScaled.x + offset.x,
       y: deScaled.y + offset.y
+    };
+  };
+
+  /**
+   * Get a main plane position from a display position.
+   *
+   * @param {number} x The X position.
+   * @param {number} y The Y position.
+   * @returns {object} The main plane position as {x,y}.
+   */
+  this.displayToMainPlanePos = function (x, y) {
+    var planePos = this.displayToPlanePos(x, y);
+    return {
+      x: planePos.x - baseOffset.x,
+      y: planePos.y - baseOffset.y
     };
   };
 
@@ -13358,6 +13389,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
     dataIndex = index;
 
     // create canvas
+    // (canvas size is set in fitToContainer)
     canvas = document.createElement('canvas');
     containerDiv.appendChild(canvas);
 
@@ -13378,9 +13410,6 @@ dwv.gui.ViewLayer = function (containerDiv) {
       throw new Error('Cannot create canvas ' + baseSize.x + ', ' + baseSize.y);
     }
 
-    // canvas sizes
-    canvas.width = baseSize.x;
-    canvas.height = baseSize.y;
     // off screen canvas
     offscreenCanvas = document.createElement('canvas');
     offscreenCanvas.width = baseSize.x;
@@ -13397,17 +13426,17 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * Fit the layer to its parent container.
    *
    * @param {number} fitScale1D The 1D fit scale.
+   * @param {object} fitSize The fit size as {x,y}.
    */
-  this.fitToContainer = function (fitScale1D) {
+  this.fitToContainer = function (fitScale1D, fitSize) {
     // update fit scale
     fitScale = {
       x: fitScale1D * baseSpacing.x,
       y: fitScale1D * baseSpacing.y
     };
-    // update canvas
-    var fullSize = this.getFullSize();
-    var width = Math.floor(fullSize.x * fitScale1D);
-    var height = Math.floor(fullSize.y * fitScale1D);
+    // new canvas size
+    var width = fitSize.x;
+    var height = fitSize.y;
     if (!dwv.gui.canCreateCanvas(width, height)) {
       throw new Error('Cannot resize canvas ' + width + ', ' + height);
     }
@@ -31756,7 +31785,7 @@ dwv.tool.ZoomAndPan = function (app) {
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var viewController = viewLayer.getViewController();
-    var planePos = viewLayer.displayToPlanePos(event._x, event._y);
+    var planePos = viewLayer.displayToMainPlanePos(event._x, event._y);
     var center = viewController.getPlanePositionFromPlanePoint(planePos);
     layerGroup.addScale(step, center);
     layerGroup.draw();
