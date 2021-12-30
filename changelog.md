@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.30.7](https://github.com/ivmartel/dwv/releases/tag/v0.30.7) - 28/12/2021
+
+### Fixed
+
+- Pinch zoom is not working [#1070](https://github.com/ivmartel/dwv/issues/1070)
+
+---
+
 ## [v0.30.6](https://github.com/ivmartel/dwv/releases/tag/v0.30.6) - 20/12/2021
 
 ### Fixed
