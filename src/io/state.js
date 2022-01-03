@@ -49,7 +49,7 @@ dwv.io.State = function () {
       version: '0.5',
       'window-center': viewController.getWindowLevel().center,
       'window-width': viewController.getWindowLevel().width,
-      position: [position.getX(), position.getY(), position.getZ()],
+      position: position.getValues(),
       scale: app.getAddedScale(),
       offset: app.getOffset(),
       drawings: drawLayer.getKonvaLayer().toObject(),
