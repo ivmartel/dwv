@@ -111,10 +111,7 @@ dwv.test.checkDrawings = function (drawings, details, version, type, assert) {
       layerKid.attrs.name,
       'position-group',
       'Layer first level is a position group.');
-    var groupId = '#2-114.63';
-    if (version <= 0.4) {
-      groupId = '#2-0';
-    }
+    var groupId = '#2-0';
     assert.equal(
       layerKid.attrs.id,
       groupId,
@@ -417,8 +414,6 @@ dwv.test.checkRulerDrawings = function (layerKids, details, version, assert) {
     }
   ];
 
-  var groupIds = [116.87, 125.85, 134.84, 143.82, 152.81];
-
   for (var i = 0; i < ndraws; ++i) {
     var layerKid = layerKids[i];
     assert.equal(
@@ -429,10 +424,7 @@ dwv.test.checkRulerDrawings = function (layerKids, details, version, assert) {
       layerKid.attrs.name,
       'position-group',
       'Layer first level is a position group.');
-    var groupId = '#2-' + groupIds[i];
-    if (version <= 0.4) {
-      groupId = '#2-' + (i + 1);
-    }
+    var groupId = '#2-' + (i + 1);
     assert.equal(
       layerKid.attrs.id,
       groupId,
