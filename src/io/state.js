@@ -94,8 +94,7 @@ dwv.io.State = function () {
     // display
     viewController.setWindowLevel(
       data['window-center'], data['window-width']);
-    viewController.setCurrentPosition(
-      new dwv.math.Point(data.position), true);
+    viewController.setCurrentPosition(new dwv.math.Point(data.position));
     // apply saved scale on top of current base one
     var baseScale = app.getActiveLayerGroup().getBaseScale();
     var scale = null;
