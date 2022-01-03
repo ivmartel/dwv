@@ -110,7 +110,6 @@ dwv.ctrl.ViewController = function (view) {
    */
   this.getCurrentOrientedIndex = function () {
     var res = view.getCurrentIndex();
-    console.log('current', res.toString(), this.getCurrentPosition().toString());
     // values = orientation * orientedValues
     // -> inv(orientation) * values = orientedValues
     if (typeof view.getOrientation() !== 'undefined') {
