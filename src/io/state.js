@@ -95,8 +95,7 @@ dwv.io.State = function () {
     viewController.setWindowLevel(
       data['window-center'], data['window-width']);
     viewController.setCurrentPosition(
-      new dwv.math.Point3D(
-        data.position[0], data.position[1], data.position[2]), true);
+      new dwv.math.Point(data.position), true);
     // apply saved scale on top of current base one
     var baseScale = app.getActiveLayerGroup().getBaseScale();
     var scale = null;
