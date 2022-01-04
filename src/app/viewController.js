@@ -108,12 +108,17 @@ dwv.ctrl.ViewController = function (view) {
    *
    * @returns {dwv.math.Point} The position.
    */
-  this.getCurrentOrientedPosition = function () {
-    var res = view.getCurrentPosition();
+  this.getCurrentOrientedIndex = function () {
+    var res = view.getCurrentIndex();
     // values = orientation * orientedValues
     // -> inv(orientation) * values = orientedValues
     if (typeof view.getOrientation() !== 'undefined') {
-      res = view.getOrientation().getInverse().getAbs().multiplyVector3D(res);
+      var index3D = new dwv.math.Index(
+        [res.get(0), res.get(1), res.get(2)]);
+      var orientedIndex3D =
+         view.getOrientation().getInverse().getAbs().multiplyIndex3D(index3D);
+      var values = orientedIndex3D.getValues();
+      res = new dwv.math.Index(values);
     }
     return res;
   };

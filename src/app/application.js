@@ -644,7 +644,8 @@ dwv.App = function () {
       drawings, drawingsDetails, fireEvent, this.addToUndoStack);
 
     drawController.activateDrawLayer(
-      viewController.getCurrentOrientedPosition());
+      viewController.getCurrentOrientedIndex(),
+      viewController.getScrollIndex());
   };
   /**
    * Update a drawing from its details.
