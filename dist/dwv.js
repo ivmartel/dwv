@@ -1,4 +1,4 @@
-/*! dwv 0.30.7 2021-12-30 11:37:54 */
+/*! dwv 0.30.8 2022-01-04 12:43:27 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -718,7 +718,8 @@ dwv.App = function () {
       drawings, drawingsDetails, fireEvent, this.addToUndoStack);
 
     drawController.activateDrawLayer(
-      viewController.getCurrentOrientedPosition());
+      viewController.getCurrentOrientedIndex(),
+      viewController.getScrollIndex());
   };
   /**
    * Update a drawing from its details.
@@ -2680,12 +2681,17 @@ dwv.ctrl.ViewController = function (view) {
    *
    * @returns {dwv.math.Point} The position.
    */
-  this.getCurrentOrientedPosition = function () {
-    var res = view.getCurrentPosition();
+  this.getCurrentOrientedIndex = function () {
+    var res = view.getCurrentIndex();
     // values = orientation * orientedValues
     // -> inv(orientation) * values = orientedValues
     if (typeof view.getOrientation() !== 'undefined') {
-      res = view.getOrientation().getInverse().getAbs().multiplyVector3D(res);
+      var index3D = new dwv.math.Index(
+        [res.get(0), res.get(1), res.get(2)]);
+      var orientedIndex3D =
+         view.getOrientation().getInverse().getAbs().multiplyIndex3D(index3D);
+      var values = orientedIndex3D.getValues();
+      res = new dwv.math.Index(values);
     }
     return res;
   };
@@ -4444,7 +4450,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.30.7';
+  return '0.30.8';
 };
 
 /**
@@ -21033,7 +21039,7 @@ dwv.io.State = function () {
       version: '0.5',
       'window-center': viewController.getWindowLevel().center,
       'window-width': viewController.getWindowLevel().width,
-      position: [position.getX(), position.getY(), position.getZ()],
+      position: position.getValues(),
       scale: app.getAddedScale(),
       offset: app.getOffset(),
       drawings: drawLayer.getKonvaLayer().toObject(),
@@ -21078,9 +21084,7 @@ dwv.io.State = function () {
     // display
     viewController.setWindowLevel(
       data['window-center'], data['window-width']);
-    viewController.setCurrentPosition(
-      new dwv.math.Point3D(
-        data.position[0], data.position[1], data.position[2]), true);
+    viewController.setCurrentPosition(new dwv.math.Point(data.position));
     // apply saved scale on top of current base one
     var baseScale = app.getActiveLayerGroup().getBaseScale();
     var scale = null;
