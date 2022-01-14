@@ -1197,6 +1197,20 @@ dwv.App = function () {
     );
     view.setOrientation(viewOrientation);
 
+    // make pixel of value 0 transparent for segmentation
+    // (assuming RGB data)
+    if (data.image.getMeta().Modality === 'SEG') {
+      view.setAlphaFunction(function (value) {
+        if (value[0] === 0 &&
+          value[1] === 0 &&
+          value[2] === 0) {
+          return 1;
+        } else {
+          return 0xff;
+        }
+      });
+    }
+
     // TODO: find another way for a default colour map
     var opacity = 1;
     if (dataIndex !== 0) {
@@ -1215,11 +1229,14 @@ dwv.App = function () {
     // compensate origin difference
     var diff = null;
     if (dataIndex !== 0) {
+      // offset from the top, use first origin
       var data0 = dataController.get(0);
-      var origin0 = data0.image.getGeometry().getOrigin();
-      var origin1 = imageGeometry.getOrigin();
+      var origin0 = data0.image.getGeometry().getOrigins()[0];
+      var origin1 = imageGeometry.getOrigins()[0];
       diff = origin0.minus(origin1);
-      viewLayer.setBaseOffset(diff);
+      // ...
+      viewLayer.setBaseOffset(new dwv.math.Vector3D(
+        diff.getX(), diff.getY(), -1 * diff.getZ()));
     }
 
     // listen to image changes
