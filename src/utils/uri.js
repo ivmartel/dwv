@@ -131,16 +131,19 @@ dwv.utils.getUriQuery = function (uri) {
  * or encoded URI with base and key value/pairs:
  *   [dwv root]?input=encodeURIComponent([root]?key0=value0&key1=value1)
  *
- *  @param {string} query The query part to the input URI.
- *  @param {Function} callback The function to call with the decoded file urls.
+ * @param {string} query The query part to the input URI.
+ * @param {Function} callback The function to call with the decoded file urls.
+ * @param {object} options Optional url request options.
  */
-dwv.utils.decodeQuery = function (query, callback) {
+dwv.utils.decodeQuery = function (query, callback, options) {
   // manifest
   if (query.type && query.type === 'manifest') {
     dwv.utils.decodeManifestQuery(query, callback);
   } else {
     // default case: encoded URI with base and key/value pairs
-    callback(dwv.utils.decodeKeyValueUri(query.input, query.dwvReplaceMode));
+    callback(
+      dwv.utils.decodeKeyValueUri(query.input, query.dwvReplaceMode),
+      options);
   }
 };
 
@@ -313,12 +316,13 @@ dwv.utils.decodeManifest = function (manifest, nslices) {
  *
  * @param {string} uri The input uri, for example: 'window.location.href'.
  * @param {dwv.App} app The associated app that handles the load.
+ * @param {object} options Optional url request options.
  */
-dwv.utils.loadFromUri = function (uri, app) {
+dwv.utils.loadFromUri = function (uri, app, options) {
   var query = dwv.utils.getUriQuery(uri);
   // check query
   if (query && typeof query.input !== 'undefined') {
-    dwv.utils.loadFromQuery(query, app);
+    dwv.utils.loadFromQuery(query, app, options);
   }
   // no else to allow for empty uris
 };
@@ -328,10 +332,11 @@ dwv.utils.loadFromUri = function (uri, app) {
  *
  * @param {object} query A query derived from an uri.
  * @param {object} app The associated app that handles the load.
+ * @param {object} options Optional url request options.
  */
-dwv.utils.loadFromQuery = function (query, app) {
+dwv.utils.loadFromQuery = function (query, app, options) {
   // load base
-  dwv.utils.decodeQuery(query, app.loadURLs);
+  dwv.utils.decodeQuery(query, app.loadURLs, options);
   // optional display state
   if (typeof query.state !== 'undefined') {
     var onLoadEnd = function (/*event*/) {
