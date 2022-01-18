@@ -161,12 +161,34 @@ dwv.io.ZipLoader.prototype.canLoadFile = function (file) {
  * Check if the loader can load the provided url.
  *
  * @param {string} url The url to check.
+ * @param {object} options The url request options.
  * @returns {boolean} True if the url can be loaded.
  */
-dwv.io.ZipLoader.prototype.canLoadUrl = function (url) {
+dwv.io.ZipLoader.prototype.canLoadUrl = function (url, options) {
+  // if there are options.requestHeaders, just base check on them
+  if (typeof options !== 'undefined' &&
+    typeof options.requestHeaders !== 'undefined') {
+    // starts with 'application/zip'
+    var isZip = function (element) {
+      return element.name === 'Accept' &&
+        dwv.utils.startsWith(element.value, 'application/zip');
+    };
+    return typeof options.requestHeaders.find(isZip) !== 'undefined';
+  }
+
   var urlObjext = dwv.utils.getUrlFromUri(url);
   var ext = dwv.utils.getFileExtension(urlObjext.pathname);
   return (ext === 'zip');
+};
+
+/**
+ * Check if the loader can load the provided memory object.
+ *
+ * @param {object} _mem The memory object.
+ * @returns {boolean} True if the object can be loaded.
+ */
+dwv.io.ZipLoader.prototype.canLoadMemory = function (_mem) {
+  return false;
 };
 
 /**

@@ -114,13 +114,38 @@ dwv.io.RawVideoLoader.prototype.canLoadFile = function (file) {
  * Check if the loader can load the provided url.
  *
  * @param {string} url The url to check.
+ * @param {object} options The url request options.
  * @returns {boolean} True if the url can be loaded.
  */
-dwv.io.RawVideoLoader.prototype.canLoadUrl = function (url) {
+dwv.io.RawVideoLoader.prototype.canLoadUrl = function (url, options) {
+  // if there are options.requestHeaders, just base check on them
+  if (typeof options !== 'undefined' &&
+    typeof options.requestHeaders !== 'undefined') {
+    // starts with 'video/'
+    var isVideo = function (element) {
+      return element.name === 'Accept' &&
+        dwv.utils.startsWith(element.value, 'video/');
+    };
+    return typeof options.requestHeaders.find(isVideo) !== 'undefined';
+  }
+
   var urlObjext = dwv.utils.getUrlFromUri(url);
   var ext = dwv.utils.getFileExtension(urlObjext.pathname);
   return (ext === 'mp4') || (ext === 'ogg') ||
             (ext === 'webm');
+};
+
+/**
+ * Check if the loader can load the provided memory object.
+ *
+ * @param {object} mem The memory object.
+ * @returns {boolean} True if the object can be loaded.
+ */
+dwv.io.RawVideoLoader.prototype.canLoadMemory = function (mem) {
+  if (typeof mem.filename !== 'undefined') {
+    return this.canLoadFile(mem.filename);
+  }
+  return false;
 };
 
 /**
