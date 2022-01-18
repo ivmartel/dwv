@@ -142,8 +142,15 @@ dwv.utils.parseMultipart = function (arr) {
     }
 
     // get part
-    // (partHeaderEndIndex plus the size of the separator)
-    part.data = u8Array.slice(partHeaderEndIndex + 4, nextBoundaryIndex);
+    // partHeaderEndIndex plus the size of the '\r\n\r\n' separator
+    var dataBeginIndex = partHeaderEndIndex + 4;
+    // nextBoundaryIndex minus the previous '\r\n'
+    var dataEndIndex = nextBoundaryIndex - 2;
+    if (dataBeginIndex < dataEndIndex) {
+      part.data = u8Array.slice(dataBeginIndex, dataEndIndex).buffer;
+    } else {
+      part.data = new Uint8Array();
+    }
 
     // store part
     parts.push(part);

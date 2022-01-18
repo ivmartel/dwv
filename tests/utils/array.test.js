@@ -7,13 +7,13 @@
 QUnit.module('utils');
 
 // test data
-var multipart01 = 'trash1\r\n';
+var multipart01 = 'preamble\r\n';
 multipart01 += '--boundary\r\n';
 multipart01 += '\r\n';
 multipart01 += '--boundary--';
 
 // (taken from https://github.com/jmhmd/parse-multipart-data/blob/master/src/multipart.ts)
-var multipart10 = 'trash1\r\n';
+var multipart10 = 'preamble\r\n';
 multipart10 += '------WebKitFormBoundaryvef1fLxmoUdYZWXp\r\n';
 multipart10 +=
   'Content-Disposition: form-data; name="uploads[]"; filename="A.txt"\r\n';
@@ -35,6 +35,7 @@ multipart10 += 'Content-Disposition: form-data; name="input1"\r\n';
 multipart10 += '\r\n';
 multipart10 += 'value1\r\n';
 multipart10 += '------WebKitFormBoundaryvef1fLxmoUdYZWXp--\r\n';
+multipart10 += 'epilogue\r\n';
 
 /**
  * Tests for {@link dwv.utils.parseMultipart}.
