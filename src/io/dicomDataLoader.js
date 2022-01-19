@@ -118,7 +118,7 @@ dwv.io.DicomDataLoader.prototype.canLoadFile = function (file) {
  *  - the url has no 'contentType' and no extension or the extension is 'dcm'
  *
  * @param {string} url The url to check.
- * @param {object} options The url request options.
+ * @param {object} options Optional url request options.
  * @returns {boolean} True if the url can be loaded.
  */
 dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url, options) {
