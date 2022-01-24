@@ -1,0 +1,26 @@
+name: Node.js CI
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Setup Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '16.x'
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+    - name: Run lint
+      run: yarn run lint
+    - name: Run tests
+      run: yarn run test-ci
+    - name: Build
+      run: yarn run build
