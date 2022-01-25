@@ -232,8 +232,8 @@ dwv.utils.getFileExtension = function (filePath) {
  * @returns {Uint8Array} The Uint8Array.
  */
 dwv.utils.stringToUint8Array = function (str) {
-  const arr = new Uint8Array(str.length);
-  for (let i = 0, leni = str.length; i < leni; i++) {
+  var arr = new Uint8Array(str.length);
+  for (var i = 0, leni = str.length; i < leni; i++) {
     arr[i] = str.charCodeAt(i);
   }
   return arr;
