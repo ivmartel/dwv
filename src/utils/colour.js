@@ -200,7 +200,8 @@ dwv.utils.ciexyzToSrgb = function (triplet) {
       // 0.416666667 = 1 / 2.4
       res = 1.055 * Math.pow(x, 0.416666667) - 0.055;
     }
-    return res;
+    // clip [0,1]
+    return Math.min(1, Math.max(0, res));
   };
 
   var x = triplet.x / 100;
