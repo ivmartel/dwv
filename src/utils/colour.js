@@ -24,12 +24,12 @@ dwv.utils.ybrToRgb = function (y, cb, cr) {
 };
 
 /**
- * Convert a hexadecimal colour to RGB.
+ * Convert a hex color into RGB.
  *
- * @param {string} hexColour The hexadecimal color as '#ab01ef'.
- * @returns {object} RGB equivalent as {r,g,b}.
+ * @param {string} hexStr The hex color as '#ab01ef'.
+ * @returns {object} The RGB values as {r,g,b}.
  */
-dwv.utils.hexToRgb = function (hexColour) {
+dwv.utils.hexToRgb = function (hexStr) {
   return {
     r: parseInt(hexStr.substring(1, 3), 16),
     g: parseInt(hexStr.substring(3, 5), 16),
@@ -111,7 +111,7 @@ dwv.utils.labToUintLab = function (triplet) {
 };
 
 /**
- * CIE Standard Illuminant D65
+ * CIE Standard Illuminant D65, standard 2° observer.
  *
  * @see https://en.wikipedia.org/wiki/Illuminant_D65
  */
@@ -187,7 +187,7 @@ dwv.utils.ciexyzToCielab = function (triplet) {
 /**
  * Convert CIE XYZ to sRGB.
  *
- * @see https://en.wikipedia.org/wiki/SRGB#The_forward_transformation_(CIE_XYZ_to_sRGB)
+ * @see https://en.wikipedia.org/wiki/SRGB#From_CIE_XYZ_to_sRGB
  * @param {object} triplet CIE XYZ triplet as {x,y,z}.
  * @returns {object} sRGB triplet as {r,g,b}.
  */
@@ -218,7 +218,7 @@ dwv.utils.ciexyzToSrgb = function (triplet) {
 /**
  * Convert sRGB to CIE XYZ.
  *
- * @see https://en.wikipedia.org/wiki/SRGB#The_forward_transformation_(CIE_XYZ_to_sRGB)
+ * @see https://en.wikipedia.org/wiki/SRGB#From_sRGB_to_CIE_XYZ
  * @param {object} triplet sRGB triplet as {r,g,b}.
  * @returns {object} CIE XYZ triplet as {x,y,z}.
  */
