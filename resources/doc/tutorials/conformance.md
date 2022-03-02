@@ -37,8 +37,20 @@ See the [definition](http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C
 ## Data elements
 All Value Representations (VR) should be supported. See the official [list](http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#table_6.2-1).
 
-## WADO
-Web Access to Dicom persistent Objects (WADO) is part of the [DICOMWeb](https://en.wikipedia.org/wiki/DICOMweb) services defined in [Part 3.18](http://dicom.nema.org/dicom/2013/output/chtml/part18/PS3.18.html). WADO-URI can be provided in the DWV URL using `?input=` since <font color="green">v0.3</font>.
+## Dicom web
+Web Access to Dicom persistent Objects (see [DICOMweb](https://en.wikipedia.org/wiki/DICOMweb))
+
+### WADO-RS
+-> RESTful Services (RS) (see [Part 3.18 sect 6.5](https://dicom.nema.org/dicom/2013/output/chtml/part18/sect_6.5.html))
+
+WADO-RS is supported via the `MultipartLoader` since <font color="green">v0.31</font>.
+
+The default `Accept` header should be something like: `multipart/related; type="application/dicom"; transfer-syntax=*'`.
+
+### WADO-URI
+-> URI based (see [Part 3.18 sect 6.2](https://dicom.nema.org/dicom/2013/output/chtml/part18/sect_6.2.html))
+
+WADO-URI can be provided in the DWV URL using `?input=` since <font color="green">v0.3</font>.
 
 Arguments follow regular URI standard.
  * `requestType`: WADO. **Required**

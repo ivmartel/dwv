@@ -17,11 +17,26 @@ dwv.utils.capitaliseFirstLetter = function (string) {
 };
 
 /**
+ * Check if a string starts with the input element.
+ *
+ * @param {string} str The input string.
+ * @param {string} start The searched start.
+ * @returns {boolean} True if the input string starts with the searched string.
+ */
+dwv.utils.startsWith = function (str, start) {
+  if (typeof str === 'undefined' || str === null ||
+    typeof start === 'undefined' || start === null) {
+    return false;
+  }
+  return str.substr(0, start.length) === start;
+};
+
+/**
  * Check if a string ends with the input element.
  *
  * @param {string} str The input string.
  * @param {string} end The searched ending.
- * @returns {boolean} True if the input string ends with the seached ending.
+ * @returns {boolean} True if the input string ends with the searched string.
  */
 dwv.utils.endsWith = function (str, end) {
   if (typeof str === 'undefined' || str === null ||
@@ -208,4 +223,18 @@ dwv.utils.getFileExtension = function (filePath) {
     }
   }
   return ext;
+};
+
+/**
+ * Convert a string to a Uint8Array.
+ *
+ * @param {string} str The string to convert.
+ * @returns {Uint8Array} The Uint8Array.
+ */
+dwv.utils.stringToUint8Array = function (str) {
+  var arr = new Uint8Array(str.length);
+  for (var i = 0, leni = str.length; i < leni; i++) {
+    arr[i] = str.charCodeAt(i);
+  }
+  return arr;
 };

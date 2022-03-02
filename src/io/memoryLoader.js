@@ -191,7 +191,7 @@ dwv.io.MemoryLoader = function () {
     var foundLoader = false;
     for (var l = 0; l < loaders.length; ++l) {
       loader = loaders[l];
-      if (loader.canLoadUrl(dataElement.filename)) {
+      if (loader.canLoadMemory(dataElement)) {
         foundLoader = true;
         // load options
         loader.setOptions({
@@ -226,7 +226,7 @@ dwv.io.MemoryLoader = function () {
     for (var i = 0; i < data.length; ++i) {
       dataElement = data[i];
       // check loader
-      if (!loader.canLoadFile({name: dataElement.filename})) {
+      if (!loader.canLoadMemory(dataElement)) {
         throw new Error('Input data of different type: ' +
           dataElement.filename);
       }

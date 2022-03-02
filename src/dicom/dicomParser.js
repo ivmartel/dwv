@@ -337,7 +337,7 @@ dwv.dicom.guessTransferSyntax = function (firstDataElement) {
     group !== oEightGroupLittleEndian) {
     throw new Error(
       'Not a valid DICOM file (no magic DICM word found' +
-        'and first element not in 0x0008 group)'
+        ' and first element not in 0x0008 group)'
     );
   }
   // reasonable assumption: 2 uppercase characters => explicit vr

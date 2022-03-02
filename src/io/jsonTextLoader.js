@@ -105,12 +105,43 @@ dwv.io.JSONTextLoader.prototype.canLoadFile = function (file) {
  * Check if the loader can load the provided url.
  *
  * @param {string} url The url to check.
+ * @param {object} options Optional url request options.
  * @returns {boolean} True if the url can be loaded.
  */
-dwv.io.JSONTextLoader.prototype.canLoadUrl = function (url) {
+dwv.io.JSONTextLoader.prototype.canLoadUrl = function (url, options) {
+  // if there are options.requestHeader, just base check on them
+  if (typeof options !== 'undefined' &&
+    typeof options.requestHeaders !== 'undefined') {
+    // starts with 'application/json' or 'application/dicom+json
+    var isJson = function (element) {
+      return element.name === 'Accept' &&
+        dwv.utils.startsWith(element.value, 'application/json') &&
+        dwv.utils.startsWith(element.value, 'application/dicom+json');
+    };
+    return typeof options.requestHeaders.find(isJson) !== 'undefined';
+  }
+
   var urlObjext = dwv.utils.getUrlFromUri(url);
   var ext = dwv.utils.getFileExtension(urlObjext.pathname);
   return (ext === 'json');
+};
+
+/**
+ * Check if the loader can load the provided memory object.
+ *
+ * @param {object} mem The memory object.
+ * @returns {boolean} True if the object can be loaded.
+ */
+dwv.io.JSONTextLoader.prototype.canLoadMemory = function (mem) {
+  if (typeof mem['Content-Type'] !== 'undefined') {
+    if (mem['Content-Type'].includes('json')) {
+      return true;
+    }
+  }
+  if (typeof mem.filename !== 'undefined') {
+    return this.canLoadFile(mem.filename);
+  }
+  return false;
 };
 
 /**
