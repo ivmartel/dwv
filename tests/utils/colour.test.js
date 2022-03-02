@@ -45,25 +45,33 @@ QUnit.test('Test ybrToRgb.', function (assert) {
  * @function module:tests/utils~hexToRgb
  */
 QUnit.test('Test hexToRgb.', function (assert) {
-  var rgb00 = dwv.utils.hexToRgb('#000000');
-  assert.equal(rgb00.r, 0, 'hexToRgb #000000: r');
-  assert.equal(rgb00.g, 0, 'hexToRgb #000000: g');
-  assert.equal(rgb00.b, 0, 'hexToRgb #000000: b');
+  var hex00 = '#000000';
+  var rgb00 = dwv.utils.hexToRgb(hex00);
+  assert.equal(rgb00.r, 0, 'hexToRgb #00: r');
+  assert.equal(rgb00.g, 0, 'hexToRgb #00: g');
+  assert.equal(rgb00.b, 0, 'hexToRgb #00: b');
+  assert.equal(dwv.utils.rgbToHex(rgb00), hex00, 'rgbToHex #00');
 
-  var rgb01 = dwv.utils.hexToRgb('#ffffff');
-  assert.equal(rgb01.r, 255, 'hexToRgb #ffffff: r');
-  assert.equal(rgb01.g, 255, 'hexToRgb #ffffff: g');
-  assert.equal(rgb01.b, 255, 'hexToRgb #ffffff: b');
+  var hex01 = '#ffffff';
+  var rgb01 = dwv.utils.hexToRgb(hex01);
+  assert.equal(rgb01.r, 255, 'hexToRgb #01: r');
+  assert.equal(rgb01.g, 255, 'hexToRgb #01: g');
+  assert.equal(rgb01.b, 255, 'hexToRgb #01: b');
+  assert.equal(dwv.utils.rgbToHex(rgb01), hex01, 'rgbToHex #01');
 
-  var rgb02 = dwv.utils.hexToRgb('#7f7f7f');
-  assert.equal(rgb02.r, 127, 'hexToRgb #7f7f7f: r');
-  assert.equal(rgb02.g, 127, 'hexToRgb #7f7f7f: g');
-  assert.equal(rgb02.b, 127, 'hexToRgb #7f7f7f: b');
+  var hex02 = '#7f7f7f';
+  var rgb02 = dwv.utils.hexToRgb(hex02);
+  assert.equal(rgb02.r, 127, 'hexToRgb #02: r');
+  assert.equal(rgb02.g, 127, 'hexToRgb #02: g');
+  assert.equal(rgb02.b, 127, 'hexToRgb #02: b');
+  assert.equal(dwv.utils.rgbToHex(rgb02), hex02, 'rgbToHex #02');
 
-  var rgb03 = dwv.utils.hexToRgb('#4e33d6');
-  assert.equal(rgb03.r, 78, 'hexToRgb #4e33d6: r');
-  assert.equal(rgb03.g, 51, 'hexToRgb #4e33d6: g');
-  assert.equal(rgb03.b, 214, 'hexToRgb #4e33d6: b');
+  var hex03 = '#4e33d6';
+  var rgb03 = dwv.utils.hexToRgb(hex03);
+  assert.equal(rgb03.r, 78, 'hexToRgb #03: r');
+  assert.equal(rgb03.g, 51, 'hexToRgb #03: g');
+  assert.equal(rgb03.b, 214, 'hexToRgb #03: b');
+  assert.equal(dwv.utils.rgbToHex(rgb03), hex03, 'rgbToHex #03');
 });
 
 /**

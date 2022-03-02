@@ -38,6 +38,17 @@ dwv.utils.hexToRgb = function (hexStr) {
 };
 
 /**
+ * Convert RGB to its hex equivalent.
+ *
+ * @param {object} rgb The RGB object as {r,g,b}.
+ * @returns {string} A string representing the hex color as '#ab01ef'.
+ */
+dwv.utils.rgbToHex = function (rgb) {
+  return '#' +
+    ((1 << 24) + (rgb.r << 16) + (rgb.g << 8) + rgb.b).toString(16).slice(1);
+};
+
+/**
  * Get the brightness of a RGB colour: calculates
  * the luma (Y) of the YIQ colour space.
  *
