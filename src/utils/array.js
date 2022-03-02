@@ -164,3 +164,53 @@ dwv.utils.parseMultipart = function (arr) {
 
   return parts;
 };
+
+/**
+ * Build a multipart message.
+ * See: https://en.wikipedia.org/wiki/MIME#Multipart_messages
+ * See: https://hg.orthanc-server.com/orthanc-dicomweb/file/tip/Resources/Samples/JavaScript/stow-rs.js
+ *
+ * @param {Array} parts The message parts as an array of object containing
+ *   content headers and messages as the data property (as returned by parse).
+ * @param {string} boundary The message boundary.
+ * @returns {Uint8Array} The full multipart message.
+ */
+dwv.utils.buildMultipart = function (parts, boundary) {
+  var lineBreak = '\r\n';
+  // build headers and calculate size
+  var partsSize = 0;
+  var headers = [];
+  for (var i = 0; i < parts.length; ++i) {
+    var headerStr = '--' + boundary + lineBreak;
+    var partKeys = Object.keys(parts[i]);
+    for (var k = 0; k < partKeys.length; ++k) {
+      var key = partKeys[k];
+      if (key !== 'data') {
+        headerStr += key + ': ' + parts[i][key] + lineBreak;
+      }
+    }
+    headerStr += lineBreak;
+    var header = dwv.utils.stringToUint8Array(headerStr);
+    headers.push(header);
+    partsSize += header.byteLength + parts[i].data.byteLength;
+  }
+  // build trailer
+  var trailerStr = '--' + boundary + '--' + lineBreak;
+  var trailer = dwv.utils.stringToUint8Array(trailerStr);
+
+  // final buffer
+  var buffer = new Uint8Array(partsSize + trailer.byteLength);
+  var offset = 0;
+  // concatenate parts
+  for (var j = 0; j < parts.length; ++j) {
+    buffer.set(headers[j], offset);
+    offset += headers[j].byteLength;
+    buffer.set(new Uint8Array(parts[j].data), offset);
+    offset += parts[j].data.byteLength;
+  }
+  // end buffer with trailer
+  buffer.set(trailer, offset);
+
+  // return
+  return buffer;
+};
