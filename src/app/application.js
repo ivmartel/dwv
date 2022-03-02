@@ -452,20 +452,15 @@ dwv.App = function () {
   // load API [end] ---------------------------------------------------------
 
   /**
-   * Fit the display to the given size. To be called once the image is loaded.
+   * Fit the display to the data of each layer group.
+   * To be called once the image is loaded.
    */
   this.fitToContainer = function () {
-    var layerGroup = stage.getActiveLayerGroup();
-    if (layerGroup) {
-      var geometry = self.getLastImage().getGeometry();
-      var size = geometry.getSize().get2D();
-      var spacing = geometry.getSpacing().get2D();
-      var width = size.x * spacing.x;
-      var height = size.y * spacing.y;
-      layerGroup.fitToContainer({x: width, y: height});
+    for (var i = 0; i < stage.getNumberOfLayerGroups(); ++i) {
+      var layerGroup = stage.getLayerGroup(i);
+      var mazSize = getLayerGroupMaxSize(layerGroup);
+      layerGroup.fitToContainer(mazSize);
       layerGroup.draw();
-      // update style
-      //style.setBaseScale(layerGroup.getBaseScale());
     }
   };
 
@@ -1167,6 +1162,36 @@ dwv.App = function () {
   }
 
   /**
+   * Get the data max size for a layer group.
+   *
+   * @todo Filter for data of the layer group.
+   * @param {object} lg The layer group.
+   * @returns {object} The max size as {x,y}.
+   */
+  function getLayerGroupMaxSize(lg) {
+    var maxSize = {x: 0, y: 0};
+    for (var i = 0; i < dataController.length(); ++i) {
+      var dc = dataController.get(i);
+      var geometry = dc.image.getGeometry();
+      var viewOrient = dwv.gui.getViewOrientation(
+        geometry,
+        lg.getTargetOrientation()
+      );
+      var size = geometry.getSize(viewOrient).get2D();
+      var spacing = geometry.getSpacing(viewOrient).get2D();
+      var width = size.x * spacing.x;
+      if (width > maxSize.x) {
+        maxSize.x = width;
+      }
+      var height = size.y * spacing.y;
+      if (height > maxSize.y) {
+        maxSize.y = height;
+      }
+    }
+    return maxSize;
+  }
+
+  /**
    * Add a view layer.
    *
    * @param {number} dataIndex The data index.
@@ -1250,25 +1275,7 @@ dwv.App = function () {
     }
 
     // fit to the maximum size
-    var maxSize = {x: 0, y: 0};
-    for (var i = 0; i < dataController.length(); ++i) {
-      var dc = dataController.get(i);
-      var geometry = dc.image.getGeometry();
-      var viewOrient = dwv.gui.getViewOrientation(
-        geometry,
-        layerGroup.getTargetOrientation()
-      );
-      var size = geometry.getSize(viewOrient).get2D();
-      var spacing = geometry.getSpacing(viewOrient).get2D();
-      var width = size.x * spacing.x;
-      if (width > maxSize.x) {
-        maxSize.x = width;
-      }
-      var height = size.y * spacing.y;
-      if (height > maxSize.y) {
-        maxSize.y = height;
-      }
-    }
+    var maxSize = getLayerGroupMaxSize(layerGroup);
     layerGroup.fitToContainer(maxSize);
   }
 
