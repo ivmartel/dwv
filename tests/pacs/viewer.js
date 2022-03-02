@@ -12,7 +12,10 @@ dwv.image.decoderScripts = {
 dwv.logger.level = dwv.utils.logger.levels.DEBUG;
 
 var _app = null;
+
+// viewer options
 var _mode = 0;
+var _dicomWeb = true;
 
 /**
  * Setup simple dwv app.
@@ -168,8 +171,16 @@ dwv.test.viewerSetup = function () {
     }
   });
 
-  // load from location
-  dwv.utils.loadFromUri(window.location.href, _app);
+  var options = {};
+  // special dicom web request header
+  if (_dicomWeb) {
+    options.requestHeaders = [{
+      name: 'Accept',
+      value: 'multipart/related; type="application/dicom"; transfer-syntax=*'
+    }];
+  }
+  // load from window location
+  dwv.utils.loadFromUri(window.location.href, _app, options);
 };
 
 /**
