@@ -15,7 +15,7 @@ var _app = null;
 
 // viewer options
 var _mode = 0;
-var _dicomWeb = true;
+var _dicomWeb = false;
 
 /**
  * Setup simple dwv app.
