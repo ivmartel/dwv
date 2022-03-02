@@ -31,9 +31,9 @@ dwv.utils.ybrToRgb = function (y, cb, cr) {
  */
 dwv.utils.hexToRgb = function (hexColour) {
   return {
-    r: parseInt(hexColour.substr(1, 2), 16),
-    g: parseInt(hexColour.substr(3, 2), 16),
-    b: parseInt(hexColour.substr(5, 2), 16)
+    r: parseInt(hexStr.substring(1, 3), 16),
+    g: parseInt(hexStr.substring(3, 5), 16),
+    b: parseInt(hexStr.substring(5, 7), 16)
   };
 };
 
