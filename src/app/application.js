@@ -484,7 +484,7 @@ dwv.App = function () {
     // check options
     if (options.dataViewConfigs === null ||
       typeof options.dataViewConfigs === 'undefined') {
-      throw new Error('No available data iew configuration');
+      throw new Error('No available data view configuration');
     }
     var configs = null;
     if (typeof options.dataViewConfigs['*'] !== 'undefined') {
