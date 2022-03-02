@@ -221,7 +221,7 @@ dwv.App = function () {
    * - `dataViewConfigs`: data indexed object containing the data view
    *   configurations in the form of a list of objects containing:
    *   - divId: the HTML div id
-   *   - orientation: optional 'axial', 'coronal' or 'sagittal' otientation
+   *   - orientation: optional 'axial', 'coronal' or 'sagittal' orientation
    *     string (default undefined keeps the original slice order)
    * - `binders`: array of layerGroup binders
    * - `tools`: tool name indexed object containing individual tool
