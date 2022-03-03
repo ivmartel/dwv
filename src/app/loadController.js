@@ -193,17 +193,21 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
     };
     loader.onprogress = augmentCallbackEvent(self.onprogress, eventInfo);
     loader.onloaditem = function (event) {
-      var isFirstItem = currentLoaders[loadId].isFirstItem;
       var eventInfoItem = {
         loadtype: loadType,
-        loadid: loadId,
-        isfirstitem: isFirstItem
+        loadid: loadId
       };
+      if (typeof currentLoaders[loadId] !== 'undefined') {
+        eventInfoItem.isfirstitem = currentLoaders[loadId].isFirstItem;
+      }
       if (hasTimepoint) {
         eventInfoItem.timepoint = options.timepoint;
       }
+      // callback
       augmentCallbackEvent(self.onloaditem, eventInfoItem)(event);
-      if (isFirstItem) {
+      // update loader
+      if (typeof currentLoaders[loadId] !== 'undefined' &&
+        currentLoaders[loadId].isFirstItem) {
         currentLoaders[loadId].isFirstItem = false;
       }
     };
