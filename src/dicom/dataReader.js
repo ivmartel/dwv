@@ -385,5 +385,5 @@ dwv.dicom.DataReader.prototype.readHex = function (byteOffset) {
   // read and convert to hex string
   var str = this.readUint16(byteOffset).toString(16);
   // return padded
-  return '0x0000'.substr(0, 6 - str.length) + str.toUpperCase();
+  return '0x0000'.substring(0, 6 - str.length) + str.toUpperCase();
 };

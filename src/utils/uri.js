@@ -92,13 +92,13 @@ dwv.utils.splitUri = function (uri) {
   var sepIndex = null;
   if (uri && (sepIndex = uri.indexOf('?')) !== -1) {
     // base: before the '?'
-    result.base = uri.substr(0, sepIndex);
+    result.base = uri.substring(0, sepIndex);
     // query : after the '?' and until possible '#'
     var hashIndex = uri.indexOf('#');
     if (hashIndex === -1) {
       hashIndex = uri.length;
     }
-    var query = uri.substr(sepIndex + 1, (hashIndex - 1 - sepIndex));
+    var query = uri.substring(sepIndex + 1, hashIndex);
     // split key/value pairs of the query
     result.query = dwv.utils.splitKeyValueString(query);
   }

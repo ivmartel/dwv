@@ -384,8 +384,8 @@ dwv.io.v01Tov02DrawingsAndDetails = function (inputDrawings) {
         if (drawGroup.name() === 'ruler-group') {
           quant = {
             length: {
-              value: parseFloat(textExpr.substr(0, txtLen - 2)),
-              unit: textExpr.substr(-2, 2)
+              value: parseFloat(textExpr.substring(0, txtLen - 2)),
+              unit: textExpr.substring(-2)
             }
           };
           textExpr = '{length}';
@@ -393,8 +393,8 @@ dwv.io.v01Tov02DrawingsAndDetails = function (inputDrawings) {
                     drawGroup.name() === 'rectangle-group') {
           quant = {
             surface: {
-              value: parseFloat(textExpr.substr(0, txtLen - 3)),
-              unit: textExpr.substr(-3, 3)
+              value: parseFloat(textExpr.substring(0, txtLen - 3)),
+              unit: textExpr.substring(-3)
             }
           };
           textExpr = '{surface}';
@@ -402,8 +402,8 @@ dwv.io.v01Tov02DrawingsAndDetails = function (inputDrawings) {
                     drawGroup.name() === 'rectangle-group') {
           quant = {
             angle: {
-              value: parseFloat(textExpr.substr(0, txtLen - 1)),
-              unit: textExpr.substr(-1, 1)
+              value: parseFloat(textExpr.substring(0, txtLen - 1)),
+              unit: textExpr.substring(-1)
             }
           };
           textExpr = '{angle}';

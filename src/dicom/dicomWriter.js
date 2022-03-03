@@ -619,7 +619,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
       dwv.dicom.checkUnknownVR(element);
 
       // tag group name (remove first 0)
-      groupName = dwv.dicom.TagGroups[element.tag.group.substr(1)];
+      groupName = dwv.dicom.TagGroups[element.tag.group.substring(1)];
 
       // prefix
       if (groupName === 'Meta Element') {

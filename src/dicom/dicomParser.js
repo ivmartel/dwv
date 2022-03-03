@@ -123,7 +123,7 @@ dwv.dicom.getReverseOrientation = function (ori) {
 
   var rori = '';
   for (var n = 0; n < ori.length; n++) {
-    var o = ori.substr(n, 1);
+    var o = ori.substring(n, n + 1);
     var r = rlabels[o];
     if (r) {
       rori += r;
@@ -905,9 +905,9 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
       var stri = raw[i].toString(16);
       var stri1 = raw[i + 1].toString(16);
       var str = '(';
-      str += '0000'.substr(0, 4 - stri.length) + stri.toUpperCase();
+      str += '0000'.substring(0, 4 - stri.length) + stri.toUpperCase();
       str += ',';
-      str += '0000'.substr(0, 4 - stri1.length) + stri1.toUpperCase();
+      str += '0000'.substring(0, 4 - stri1.length) + stri1.toUpperCase();
       str += ')';
       data.push(str);
     }
