@@ -478,12 +478,12 @@ function clearDataTable() {
 /**
  * Get a control div: label, range and number field.
  *
- * @param {String} id The control id.
- * @param {String} name The control name.
+ * @param {string} id The control id.
+ * @param {string} name The control name.
  * @param {number} min The control minimum value.
  * @param {number} max The control maximum value.
  * @param {number} value The control value.
- * @param {function} callback The callback on control value change.
+ * @param {Function} callback The callback on control value change.
  * @param {number} precision Optional number field float precision.
  * @returns {object} The control div.
  */
