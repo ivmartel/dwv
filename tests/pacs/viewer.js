@@ -386,21 +386,38 @@ function setupBindersCheckboxes() {
       }
     };
   }
+  // individual binders
   for (var i = 0; i < propList.length; ++i) {
     var propName = propList[i];
 
     var input = document.createElement('input');
-    input.id = i;
+    input.id = 'binder-' + i;
     input.type = 'checkbox';
     input.onchange = getOnInputChange(propName);
 
     var label = document.createElement('label');
-    label.for = i;
-    label.appendChild(input);
+    label.htmlFor = input.id;
     label.appendChild(document.createTextNode(propName));
 
+    bindersDiv.appendChild(input);
     bindersDiv.appendChild(label);
   }
+
+  // check all
+  var allInput = document.createElement('input');
+  allInput.id = 'binder-all';
+  allInput.type = 'checkbox';
+  allInput.onchange = function () {
+    for (var j = 0; j < propList.length; ++j) {
+      document.getElementById('binder-' + j).click();
+    }
+  };
+  var allLabel = document.createElement('label');
+  allLabel.htmlFor = allInput.id;
+  allLabel.appendChild(document.createTextNode('all'));
+  bindersDiv.appendChild(allInput);
+  bindersDiv.appendChild(allLabel);
+
 }
 
 /**
