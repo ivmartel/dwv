@@ -412,6 +412,63 @@ function clearDataTable() {
 }
 
 /**
+ * Get a control div: label, range and number field.
+ *
+ * @param {String} id The control id.
+ * @param {String} name The control name.
+ * @param {number} min The control minimum value.
+ * @param {number} max The control maximum value.
+ * @param {number} value The control value.
+ * @param {function} callback The callback on control value change.
+ * @param {number} precision Optional number field float precision.
+ * @returns {object} The control div.
+ */
+function getControlDiv(id, name, min, max, value, callback, precision) {
+  var range = document.createElement('input');
+  range.id = id + '-range';
+  range.className = 'ctrl-range';
+  range.type = 'range';
+  range.min = min;
+  range.max = max;
+  range.step = (max - min) * 0.01;
+  range.value = value;
+
+  var label = document.createElement('label');
+  label.id = id + '-label';
+  label.className = 'ctrl-label';
+  label.htmlFor = range.id;
+  label.appendChild(document.createTextNode(name));
+
+  var number = document.createElement('input');
+  number.id = id + '-number';
+  number.className = 'ctrl-number';
+  number.type = 'number';
+  number.min = range.min;
+  number.max = range.max;
+  number.step = range.step;
+  number.value = parseFloat(range.value).toPrecision(precision);
+
+  // callback and bind range and number
+  number.oninput = function () {
+    range.value = this.value;
+    callback(this.value);
+  };
+  range.oninput = function () {
+    number.value = parseFloat(this.value).toPrecision(precision);
+    callback(this.value);
+  };
+
+  var div = document.createElement('div');
+  div.id = id + '-ctrl';
+  div.className = 'ctrl';
+  div.appendChild(label);
+  div.appendChild(range);
+  div.appendChild(number);
+
+  return div;
+}
+
+/**
  * Add a data row.
  *
  * @param {number} id The data index.
@@ -443,8 +500,7 @@ function addDataRow(id, dataViewConfigs) {
       insertTCell('LG' + j);
     }
     insertTCell('Alpha Range');
-    insertTCell('Width');
-    insertTCell('Center');
+    insertTCell('Contrast');
     insertTCell('Alpha');
     body = table.createTBody();
     var div = document.getElementById('layersdetails');
@@ -489,25 +545,16 @@ function addDataRow(id, dataViewConfigs) {
   }
 
   var dataRange = _app.getImage(vl.getDataIndex()).getRescaledDataRange();
+  var floatPrecision = 4;
 
-  // cell: data range
+  // cell: alpha range
   cell = row.insertCell();
-  var widthmin = document.createElement('input');
-  widthmin.type = 'range';
-  widthmin.max = dataRange.max;
-  widthmin.min = dataRange.min;
-  widthmin.step = (dataRange.max - dataRange.min) * 0.001;
-  widthmin.value = dataRange.min;
-  var widthmax = document.createElement('input');
-  widthmax.type = 'range';
-  widthmax.max = widthmin.max;
-  widthmax.min = widthmin.min;
-  widthmax.step = widthmin.step;
-  widthmax.value = dataRange.max;
-  cell.appendChild(widthmin);
-  cell.appendChild(widthmax);
-
-  var changeAlphaFunc = function (min, max) {
+  var minId = 'value-min-' + id;
+  var maxId = 'value-max-' + id;
+  // calback
+  var changeAlphaFunc = function () {
+    var min = parseFloat(document.getElementById(minId + '-number').value);
+    var max = parseFloat(document.getElementById(maxId + '-number').value);
     var func = function (value) {
       if (value >= min && value <= max) {
         return 255;
@@ -516,98 +563,42 @@ function addDataRow(id, dataViewConfigs) {
     };
     vc.setViewAlphaFunction(func);
   };
-  widthmin.oninput = function () {
-    changeAlphaFunc(this.value, widthmax.value);
-  };
-  widthmax.oninput = function () {
-    changeAlphaFunc(widthmin.value, this.value);
-  };
+  // add controls
+  cell.appendChild(getControlDiv(minId, 'min',
+    dataRange.min, dataRange.max, dataRange.min,
+    changeAlphaFunc, floatPrecision));
+  cell.appendChild(getControlDiv(maxId, 'max',
+    dataRange.min, dataRange.max, dataRange.max,
+    changeAlphaFunc, floatPrecision));
 
-  // cell: window width
+  // cell: contrast
   cell = row.insertCell();
-  var widthrange = document.createElement('input');
-  widthrange.type = 'range';
-  widthrange.max = dataRange.max - dataRange.min;
-  widthrange.min = 0;
-  widthrange.step = (dataRange.max - dataRange.min) * 0.001;
-  widthrange.value = wl.width;
-  var widthnumber = document.createElement('input');
-  widthnumber.type = 'number';
-  widthnumber.max = widthrange.max;
-  widthnumber.min = widthrange.min;
-  widthnumber.step = widthrange.step;
-  widthnumber.value = widthrange.value;
-  cell.appendChild(widthrange);
-  cell.appendChild(widthnumber);
-
-  // cell: window center
-  cell = row.insertCell();
-  var centerrange = document.createElement('input');
-  centerrange.type = 'range';
-  centerrange.max = dataRange.max;
-  centerrange.min = dataRange.min;
-  centerrange.step = (dataRange.max - dataRange.min) * 0.001;
-  centerrange.value = wl.center;
-  var centernumber = document.createElement('input');
-  centernumber.type = 'number';
-  centernumber.max = centerrange.max;
-  centernumber.min = centerrange.min;
-  centernumber.step = centerrange.step;
-  centernumber.value = centerrange.value;
-  cell.appendChild(centerrange);
-  cell.appendChild(centernumber);
-
-  var changeWidth = function (value) {
-    vc.setWindowLevel(centernumber.value, value);
+  var widthId = 'width-' + id;
+  var centerId = 'center-' + id;
+  // calback
+  var changeContrast = function () {
+    var width = parseFloat(document.getElementById(widthId + '-number').value);
+    var center =
+      parseFloat(document.getElementById(centerId + '-number').value);
+    vc.setWindowLevel(center, width);
   };
-  widthnumber.oninput = function () {
-    changeWidth(this.value);
-    widthrange.value = this.value;
-  };
-  widthrange.oninput = function () {
-    changeWidth(this.value);
-    widthnumber.value = this.value;
-  };
-
-  var changeCenter = function (value) {
-    vc.setWindowLevel(value, widthnumber.value);
-    vl.draw();
-  };
-  centernumber.oninput = function () {
-    changeCenter(this.value);
-    centerrange.value = this.value;
-  };
-  centerrange.oninput = function () {
-    changeCenter(this.value);
-    centernumber.value = this.value;
-  };
+  // add controls
+  cell.appendChild(getControlDiv(widthId, 'width',
+    0, dataRange.max - dataRange.min, wl.width,
+    changeContrast, floatPrecision));
+  cell.appendChild(getControlDiv(centerId, 'center',
+    dataRange.min, dataRange.max, wl.center,
+    changeContrast, floatPrecision));
 
   // cell: opactiy
   cell = row.insertCell();
+  var opacityId = 'opactiy-' + id;
+  // calback
   var changeOpacity = function (value) {
     vl.setOpacity(value);
     vl.draw();
   };
-  var opacityrange = document.createElement('input');
-  opacityrange.type = 'range';
-  opacityrange.max = 1;
-  opacityrange.min = 0;
-  opacityrange.step = 0.1;
-  opacityrange.value = vl.getOpacity();
-  var opacitynumber = document.createElement('input');
-  opacitynumber.type = 'number';
-  opacitynumber.max = opacityrange.max;
-  opacitynumber.min = opacityrange.min;
-  opacitynumber.step = opacityrange.step;
-  opacitynumber.value = opacityrange.value;
-  opacitynumber.oninput = function () {
-    changeOpacity(this.value);
-    opacityrange.value = this.value;
-  };
-  opacityrange.oninput = function () {
-    changeOpacity(this.value);
-    opacitynumber.value = this.value;
-  };
-  cell.appendChild(opacityrange);
-  cell.appendChild(opacitynumber);
+  // add controls
+  cell.appendChild(getControlDiv(opacityId, 'opacity',
+    0, 1, vl.getOpacity(), changeOpacity));
 }
