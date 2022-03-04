@@ -12,6 +12,7 @@ dwv.image.decoderScripts = {
 dwv.logger.level = dwv.utils.logger.levels.DEBUG;
 
 var _app = null;
+var _tools = null;
 
 // viewer options
 var _mode = 0;
@@ -69,16 +70,19 @@ dwv.test.viewerSetup = function () {
     dataViewConfigs = prepareAndGetSimpleDataViewConfig();
   }
 
+  // tools
+  _tools = {
+    Scroll: {},
+    WindowLevel: {},
+    ZoomAndPan: {},
+    Draw: {options: ['Rectangle'], type: 'factory'}
+  };
+
   // app config
   var config = {
     viewOnFirstLoadItem: viewOnFirstLoadItem,
     dataViewConfigs: dataViewConfigs,
-    tools: {
-      Scroll: {},
-      WindowLevel: {},
-      ZoomAndPan: {},
-      Draw: {options: ['Rectangle'], type: 'factory'}
-    }
+    tools: _tools
   };
   // app
   _app = new dwv.App();
@@ -150,25 +154,9 @@ dwv.test.viewerSetup = function () {
     span.innerHTML = '(index: ' + event.value[0] + ')';
   });
 
-  console.log(
-    '%c Available tools: (s)croll, (w)indowlevel, (z)oomandpan, (d)raw.',
-    'color: teal;');
+  // default keyboard shortcuts
   _app.addEventListener('keydown', function (event) {
     _app.defaultOnKeydown(event);
-    if (event.keyCode === 83) { // s
-      console.log('%c tool: scroll', 'color: teal;');
-      _app.setTool('Scroll');
-    } else if (event.keyCode === 87) { // w
-      console.log('%c tool: windowlevel', 'color: teal;');
-      _app.setTool('WindowLevel');
-    } else if (event.keyCode === 90) { // z
-      console.log('%c tool: zoomandpan', 'color: teal;');
-      _app.setTool('ZoomAndPan');
-    } else if (event.keyCode === 68) { // d
-      console.log('%c tool: draw', 'color: teal;');
-      _app.setTool('Draw');
-      _app.setDrawShape('Rectangle');
-    }
   });
 
   var options = {};
@@ -223,10 +211,21 @@ dwv.test.onDOMContentLoadedViewer = function () {
       addDataRow(i, configs);
     }
 
-    _app.setTool('Scroll');
+    // need to set tool after config change
+    var toolsInput = document.getElementsByName('tools');
+    var toolIndex = null;
+    for (var j = 0; j < toolsInput.length; ++j) {
+      if (toolsInput[j].checked) {
+        toolIndex = j;
+        break;
+      }
+    }
+    _app.setTool(Object.keys(_tools)[toolIndex]);
   });
 
   setupBindersCheckboxes();
+
+  setupToolsCheckboxes();
 
   // bind app to input files
   var timeId = -1;
@@ -417,7 +416,55 @@ function setupBindersCheckboxes() {
   allLabel.appendChild(document.createTextNode('all'));
   bindersDiv.appendChild(allInput);
   bindersDiv.appendChild(allLabel);
+}
 
+/**
+ * Setup the tools checkboxes
+ */
+function setupToolsCheckboxes() {
+  var toolsDiv = document.getElementById('tools');
+  var keys = Object.keys(_tools);
+
+  var getChangeTool = function (tool) {
+    return function () {
+      _app.setTool(tool);
+      if (tool === 'Draw') {
+        _app.setDrawShape('Rectangle');
+      }
+    };
+  };
+
+  var getKeyCheck = function (char, input) {
+    return function (event) {
+      if (event.keyCode === char) {
+        input.click();
+      }
+    };
+  };
+
+  for (var i = 0; i < keys.length; ++i) {
+    var key = keys[i];
+
+    var input = document.createElement('input');
+    input.id = 'tool-' + i;
+    input.name = 'tools';
+    input.type = 'radio';
+    input.onchange = getChangeTool(key);
+
+    if (key === 'Scroll') {
+      input.checked = true;
+    }
+
+    var label = document.createElement('label');
+    label.htmlFor = input.id;
+    label.appendChild(document.createTextNode(key));
+
+    toolsDiv.appendChild(input);
+    toolsDiv.appendChild(label);
+
+    // keyboard shortcut
+    window.addEventListener('keydown', getKeyCheck(key.charCodeAt(0), input));
+  }
 }
 
 /**
