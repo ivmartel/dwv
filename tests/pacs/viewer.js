@@ -509,7 +509,7 @@ function addDataRow(id, dataViewConfigs) {
 
   var changeAlphaFunc = function (min, max) {
     var func = function (value) {
-      if (value > min && value < max) {
+      if (value >= min && value <= max) {
         return 255;
       }
       return 0;
