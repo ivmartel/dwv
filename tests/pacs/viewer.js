@@ -148,10 +148,14 @@ dwv.test.viewerSetup = function () {
       return value;
     };
     var values = event.value[1];
+    var text = '(index: ' + event.value[0] + ')';
+    if (event.value.length > 2) {
+      text += ' value: ' + event.value[2];
+    }
     input.value = values.map(toFixed2);
     // index as small text
     var span = document.getElementById('positionspan');
-    span.innerHTML = '(index: ' + event.value[0] + ')';
+    span.innerHTML = text;
   });
 
   // default keyboard shortcuts
@@ -608,7 +612,9 @@ function addDataRow(id, dataViewConfigs) {
     cell.appendChild(radio);
   }
 
-  var dataRange = _app.getImage(vl.getDataIndex()).getRescaledDataRange();
+  var image = _app.getImage(vl.getDataIndex());
+  var dataRange = image.getDataRange();
+  var rescaledDataRange = image.getRescaledDataRange();
   var floatPrecision = 4;
 
   // cell: alpha range
@@ -648,10 +654,10 @@ function addDataRow(id, dataViewConfigs) {
   };
   // add controls
   cell.appendChild(getControlDiv(widthId, 'width',
-    0, dataRange.max - dataRange.min, wl.width,
+    0, rescaledDataRange.max - rescaledDataRange.min, wl.width,
     changeContrast, floatPrecision));
   cell.appendChild(getControlDiv(centerId, 'center',
-    dataRange.min, dataRange.max, wl.center,
+    rescaledDataRange.min, rescaledDataRange.max, wl.center,
     changeContrast, floatPrecision));
 
   // cell: opactiy
