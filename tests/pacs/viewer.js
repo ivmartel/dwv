@@ -496,9 +496,9 @@ function getControlDiv(id, name, min, max, value, callback, precision) {
   range.id = id + '-range';
   range.className = 'ctrl-range';
   range.type = 'range';
-  range.min = min;
-  range.max = max;
-  range.step = (max - min) * 0.01;
+  range.min = min.toPrecision(precision);
+  range.max = max.toPrecision(precision);
+  range.step = ((max - min) * 0.01).toPrecision(precision);
   range.value = value;
 
   var label = document.createElement('label');
@@ -514,7 +514,7 @@ function getControlDiv(id, name, min, max, value, callback, precision) {
   number.min = range.min;
   number.max = range.max;
   number.step = range.step;
-  number.value = parseFloat(range.value).toPrecision(precision);
+  number.value = parseFloat(value).toPrecision(precision);
 
   // callback and bind range and number
   number.oninput = function () {
