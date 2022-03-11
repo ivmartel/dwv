@@ -553,9 +553,9 @@ dwv.App = function () {
       // initialise or add view
       if (layerGroup.getViewLayersByDataIndex(dataIndex).length === 0) {
         if (layerGroup.getNumberOfLayers() === 0) {
-          initialiseBaseLayers(dataIndex, config.divId);
+          initialiseBaseLayers(dataIndex, config);
         } else {
-          addViewLayer(dataIndex, config.divId);
+          addViewLayer(dataIndex, config);
         }
       }
       // draw
@@ -1136,25 +1136,12 @@ dwv.App = function () {
    * To be called once the DICOM data has been loaded.
    *
    * @param {number} dataIndex The data index.
-   * @param {string} layerGroupElementId The layer group element id.
+   * @param {object} dataViewConfig The data view config.
    * @private
    */
-  function initialiseBaseLayers(dataIndex, layerGroupElementId) {
-    var data = dataController.get(dataIndex);
-    if (!data) {
-      throw new Error('Cannot initialise layers with data id: ' + dataIndex);
-    }
-    var layerGroup = stage.getLayerGroupWithElementId(layerGroupElementId);
-    if (!layerGroup) {
-      throw new Error('Cannot initialise layers with group id: ' +
-        layerGroupElementId);
-    }
-
+  function initialiseBaseLayers(dataIndex, dataViewConfig) {
     // add layers
-    addViewLayer(dataIndex, layerGroupElementId);
-
-    // update style
-    //style.setBaseScale(layerGroup.getBaseScale());
+    addViewLayer(dataIndex, dataViewConfig);
 
     // initialise the toolbox
     if (toolboxController) {
@@ -1196,17 +1183,17 @@ dwv.App = function () {
    * Add a view layer.
    *
    * @param {number} dataIndex The data index.
-   * @param {string} layerGroupElementId The layer group element id.
+   * @param {object} dataViewConfig The data view config.
    */
-  function addViewLayer(dataIndex, layerGroupElementId) {
+  function addViewLayer(dataIndex, dataViewConfig) {
     var data = dataController.get(dataIndex);
     if (!data) {
-      throw new Error('Cannot initialise layers with data id: ' + dataIndex);
+      throw new Error('Cannot initialise layer with data id: ' + dataIndex);
     }
-    var layerGroup = stage.getLayerGroupWithElementId(layerGroupElementId);
+    var layerGroup = stage.getLayerGroupWithElementId(dataViewConfig.divId);
     if (!layerGroup) {
-      throw new Error('Cannot initialise layers with group id: ' +
-        layerGroupElementId);
+      throw new Error('Cannot initialise layer with group id: ' +
+        dataViewConfig.divId);
     }
     var imageGeometry = data.image.getGeometry();
 
@@ -1224,11 +1211,20 @@ dwv.App = function () {
     );
     view.setOrientation(viewOrientation);
 
-    // TODO: find another way for a default colour map
+    // colour map
+    if (typeof dataViewConfig.colourMap !== 'undefined') {
+      view.setColourMap(dataViewConfig.colourMap);
+    }
+
+    // opacity
     var opacity = 1;
-    if (dataIndex !== 0) {
-      view.setColourMap(dwv.image.lut.rainbow);
+    // do we have more than one layer
+    if (layerGroup.getNumberOfLayers() !== 0) {
       opacity = 0.5;
+      // set color map if non was provided
+      if (typeof dataViewConfig.colourMap === 'undefined') {
+        view.setColourMap(dwv.image.lut.rainbow);
+      }
     }
 
     // view layer
