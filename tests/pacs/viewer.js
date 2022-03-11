@@ -631,7 +631,9 @@ function addDataRow(id, dataViewConfigs) {
       }
       return 0;
     };
-    vc.setViewAlphaFunction(func);
+    for (var i = 0; i < vls.length; ++i) {
+      vls[i].getViewController().setViewAlphaFunction(func);
+    }
   };
   // add controls
   cell.appendChild(getControlDiv(minId, 'min',
