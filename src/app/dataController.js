@@ -14,9 +14,9 @@ dwv.ctrl.DataController = function () {
    * List of {image, meta}.
    *
    * @private
-   * @type {Array}
+   * @type {object}
    */
-  var data = [];
+  var data = {};
 
   /**
    * Listener handler.
@@ -32,7 +32,7 @@ dwv.ctrl.DataController = function () {
    * @returns {number} The length.
    */
   this.length = function () {
-    return data.length;
+    return Object.keys(data).length;
   };
 
   /**
@@ -69,15 +69,19 @@ dwv.ctrl.DataController = function () {
   /**
    * Add a new data.
    *
+   * @param {number} index The index of the data.
    * @param {dwv.image.Image} image The image.
    * @param {object} meta The image meta.
    */
-  this.addNew = function (image, meta) {
+  this.addNew = function (index, image, meta) {
+    if (typeof data[index] !== 'undefined') {
+      throw new Error('Index already used in storage: ' + index);
+    }
     // store the new image
-    data.push({
+    data[index] = {
       image: image,
       meta: getMetaObject(meta)
-    });
+    };
   };
 
   /**

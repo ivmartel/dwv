@@ -988,7 +988,8 @@ dwv.App = function () {
     var eventMetaData = null;
     if (event.loadtype === 'image') {
       if (isFirstLoadItem && timeId === 0) {
-        dataController.addNew(event.data.image, event.data.info);
+        dataController.addNew(
+          event.loadid, event.data.image, event.data.info);
       } else {
         dataController.update(
           event.loadid, event.data.image, event.data.info,
