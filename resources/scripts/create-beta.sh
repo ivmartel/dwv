@@ -81,7 +81,6 @@ then
   info "(3/4) commit changes"
 
   git commit -a -m "Beta v${betaVersion}"
-  # push master
   git push origin develop
 
   ((step++))
