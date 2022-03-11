@@ -66,7 +66,7 @@ then
   git checkout develop
   git pull
   git checkout -b $releaseBranch
-  
+
   ((step++))
 fi
 
@@ -75,13 +75,13 @@ if [ $step -eq 2 ]
 then
   info "(2/4) update version number in files"
 
-  a0="  \"version\": \"[0-9]+\.[0-9]+\.[0-9]+-beta\","
+  a0="  \"version\": \"[0-9]+\.[0-9]+\.[0-9]+-beta\.[0-9]+\","
   b0="  \"version\": \"${releaseVersion}\","
   sed -i -r "s/${a0}/${b0}/g" package.json
-  a1="  return '[0-9]+\.[0-9]+\.[0-9]+-beta';"
+  a1="  return '[0-9]+\.[0-9]+\.[0-9]+-beta\.[0-9]+';"
   b1="  return '${releaseVersion}';"
   sed -i -r "s/${a1}/${b1}/g" src/dicom/dicomParser.js
-  
+
   ((step++))
 fi
 
@@ -93,7 +93,7 @@ then
   yarn run build
   # copy build to dist
   cp build/dist/*.js dist
-  
+
   ((step++))
 fi
 
@@ -107,7 +107,7 @@ then
   git push origin --tags
   # run gren
   yarn run gren changelog --generate --override --changelog-filename=new.md \
-    --tags=v$prevVersion..v$releaseVersion --milestone-match=$releaseVersion 
+    --tags=v$prevVersion..v$releaseVersion --milestone-match=$releaseVersion
   # delete tag
   git tag -d v$releaseVersion
   git push --delete origin v$releaseVersion
@@ -121,7 +121,7 @@ then
   rm new.md
   rm line.md
   rm old.md
-  
+
   ((step++))
 fi
 
