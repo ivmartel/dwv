@@ -3113,9 +3113,9 @@ klaw@^4.0.1:
   integrity sha512-pgsE40/SvC7st04AHiISNewaIMUbY5V/K8b21ekiPiFoYs/EYSdsGa+FJArB1d441uq4Q8zZyIxvAzkGNlBdRw==
 
 konva@~8.3.0:
-  version "8.3.3"
-  resolved "https://registry.yarnpkg.com/konva/-/konva-8.3.3.tgz#409c811a7aa474e075e8928b8a931cf12d4dd517"
-  integrity sha512-S/v9JW3gNr4mweRwk4JLiJSnQAWs3aZBU4SY9pXGgCFxIvSDbKTnXTDYb2IMxFnurh3ItiR249RG0NvozHd1OA==
+  version "8.3.4"
+  resolved "https://registry.yarnpkg.com/konva/-/konva-8.3.4.tgz#59b6bfd43a04ed5430eaae96a978afb954d90558"
+  integrity sha512-5FZpkASFeDpeg1NsJ5k6e5sgK/4PomqBUhr48OVVMwpXHM7pJTphbN9z7+QN64+rKz0zOHnZxrAOt01X0KAZhQ==
 
 latest-version@^3.0.0:
   version "3.1.0"
