@@ -515,7 +515,7 @@ dwv.dicom.DicomElementsWrapper.prototype.getFromName = function (name) {
 /**
  * Extract a size from dicom elements.
  *
- * @returns {Object} The size.
+ * @returns {object} The size.
  */
 dwv.dicom.DicomElementsWrapper.prototype.getImageSize = function () {
   // rows
