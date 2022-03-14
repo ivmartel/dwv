@@ -701,14 +701,19 @@ dwv.image.View.prototype.setWindowLevelMinMax = function () {
  * Generate display image data to be given to a canvas.
  *
  * @param {Array} array The array to fill in.
+ * @param {dwv.math.Point} position Optional position at which to generate,
+ *   otherwise generates at current position.
  */
-dwv.image.View.prototype.generateImageData = function (array) {
+dwv.image.View.prototype.generateImageData = function (array, position) {
   // check position
-  if (!this.getCurrentPosition()) {
-    this.setInitialPosition();
+  if (typeof position === 'undefined') {
+    if (!this.getCurrentPosition()) {
+      this.setInitialPosition();
+    }
+    position = this.getCurrentIndex();
   }
+
   var image = this.getImage();
-  var position = this.getCurrentIndex();
   var iterator = dwv.image.getSliceIterator(
     image, position, false, this.getOrientation());
 

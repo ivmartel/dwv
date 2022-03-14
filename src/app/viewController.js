@@ -155,9 +155,11 @@ dwv.ctrl.ViewController = function (view) {
    * Generate display image data to be given to a canvas.
    *
    * @param {Array} array The array to fill in.
+   * @param {dwv.math.Point} position Optional position at which to generate,
+   *   otherwise generates at current position.
    */
-  this.generateImageData = function (array) {
-    view.generateImageData(array);
+  this.generateImageData = function (array, position) {
+    view.generateImageData(array, position);
   };
 
   /**
