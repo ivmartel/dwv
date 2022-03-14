@@ -176,8 +176,8 @@ QUnit.test('Test patient anonymisation', function (assert) {
  */
 dwv.test.toString = function (obj) {
   var res = obj.toString();
-  if (res.substr(0, 7) === '[object' &&
-        res.substr((res.length - 6), 6) === 'Array]') {
+  if (res.substring(0, 7) === '[object' &&
+    res.substring(-6) === 'Array]') {
     res = '';
     for (var i = 0; i < obj.length; ++i) {
       res += obj[i];

@@ -1,5 +1,32 @@
 # Changelog
 
+## [v0.30.8](https://github.com/ivmartel/dwv/releases/tag/v0.30.8) - 03/01/2022
+
+### Fixed
+
+- Load state shape does not show on correct slice [#1078](https://github.com/ivmartel/dwv/issues/1078)
+- TypeError: point.get is not a function when loading state [#1077](https://github.com/ivmartel/dwv/issues/1077)
+- Uncaught TypeError: t.getX is not a function when saving state [#1072](https://github.com/ivmartel/dwv/issues/1072)
+
+---
+
+## [v0.30.7](https://github.com/ivmartel/dwv/releases/tag/v0.30.7) - 28/12/2021
+
+### Fixed
+
+- Pinch zoom is not working [#1070](https://github.com/ivmartel/dwv/issues/1070)
+
+---
+
+## [v0.30.6](https://github.com/ivmartel/dwv/releases/tag/v0.30.6) - 20/12/2021
+
+### Fixed
+
+- Zoom does not stay centred with overlay data [#1066](https://github.com/ivmartel/dwv/issues/1066)
+- Image limit for offset overlap [#1065](https://github.com/ivmartel/dwv/issues/1065)
+
+---
+
 ## [v0.30.5](https://github.com/ivmartel/dwv/releases/tag/v0.30.5) - 16/12/2021
 
 ### Fixed

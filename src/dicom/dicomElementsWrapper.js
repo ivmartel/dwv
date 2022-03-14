@@ -210,15 +210,17 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function (
       dayBeginIndex = 8;
     }
     var da = new Date(
-      parseInt(daValue.substr(0, 4), 10),
-      parseInt(daValue.substr(monthBeginIndex, 2), 10) - 1, // 0-11 range
-      parseInt(daValue.substr(dayBeginIndex, 2), 10));
+      parseInt(daValue.substring(0, 4), 10),
+      parseInt(daValue.substring(
+        monthBeginIndex, monthBeginIndex + 2), 10) - 1, // 0-11 range
+      parseInt(daValue.substring(
+        dayBeginIndex, dayBeginIndex + 2), 10));
     str = da.toLocaleDateString();
   } else if (dicomElement.vr === 'TM' && pretty) {
     var tmValue = dicomElement.value[0];
-    var tmHour = tmValue.substr(0, 2);
-    var tmMinute = tmValue.length >= 4 ? tmValue.substr(2, 2) : '00';
-    var tmSeconds = tmValue.length >= 6 ? tmValue.substr(4, 2) : '00';
+    var tmHour = tmValue.substring(0, 2);
+    var tmMinute = tmValue.length >= 4 ? tmValue.substring(2, 4) : '00';
+    var tmSeconds = tmValue.length >= 6 ? tmValue.substring(4, 6) : '00';
     str = tmHour + ':' + tmMinute + ':' + tmSeconds;
   } else {
     var isOtherVR = false;
@@ -248,9 +250,9 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function (
       } else if (isOtherVR) {
         var tmp = dicomElement.value[k].toString(16);
         if (dicomElement.vr === 'OB') {
-          tmp = '00'.substr(0, 2 - tmp.length) + tmp;
+          tmp = '00'.substring(0, 2 - tmp.length) + tmp;
         } else {
-          tmp = '0000'.substr(0, 4 - tmp.length) + tmp;
+          tmp = '0000'.substring(0, 4 - tmp.length) + tmp;
         }
         valueStr += tmp;
       } else if (typeof dicomElement.value[k] === 'string') {
@@ -321,9 +323,9 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
 
   // (group,element)
   line = '(';
-  line += dicomElement.tag.group.substr(2, 5).toLowerCase();
+  line += dicomElement.tag.group.substring(2).toLowerCase();
   line += ',';
-  line += dicomElement.tag.element.substr(2, 5).toLowerCase();
+  line += dicomElement.tag.element.substring(2).toLowerCase();
   line += ') ';
   // value representation
   line += dicomElement.vr;

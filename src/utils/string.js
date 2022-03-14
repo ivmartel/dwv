@@ -17,18 +17,36 @@ dwv.utils.capitaliseFirstLetter = function (string) {
 };
 
 /**
+ * Check if a string starts with the input element.
+ *
+ * @param {string} str The input string.
+ * @param {string} search The searched start.
+ * @param {number} rawPos The position in this string at which to begin
+ *  searching for searchString. Defaults to 0.
+ * @returns {boolean} True if the input string starts with the searched string.
+ */
+dwv.utils.startsWith = function (str, search, rawPos) {
+  if (typeof str === 'undefined' || str === null ||
+    typeof search === 'undefined' || search === null) {
+    return false;
+  }
+  var pos = rawPos > 0 ? rawPos | 0 : 0;
+  return str.substring(pos, pos + search.length) === search;
+};
+
+/**
  * Check if a string ends with the input element.
  *
  * @param {string} str The input string.
- * @param {string} end The searched ending.
- * @returns {boolean} True if the input string ends with the seached ending.
+ * @param {string} search The searched ending.
+ * @returns {boolean} True if the input string ends with the searched string.
  */
-dwv.utils.endsWith = function (str, end) {
+dwv.utils.endsWith = function (str, search) {
   if (typeof str === 'undefined' || str === null ||
-        typeof end === 'undefined' || end === null) {
+    typeof search === 'undefined' || search === null) {
     return false;
   }
-  return str.substr(str.length - end.length) === end;
+  return str.substring(str.length - search.length) === search;
 };
 
 /**
@@ -208,4 +226,18 @@ dwv.utils.getFileExtension = function (filePath) {
     }
   }
   return ext;
+};
+
+/**
+ * Convert a string to a Uint8Array.
+ *
+ * @param {string} str The string to convert.
+ * @returns {Uint8Array} The Uint8Array.
+ */
+dwv.utils.stringToUint8Array = function (str) {
+  var arr = new Uint8Array(str.length);
+  for (var i = 0, leni = str.length; i < leni; i++) {
+    arr[i] = str.charCodeAt(i);
+  }
+  return arr;
 };

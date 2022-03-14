@@ -155,7 +155,7 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian) {
    */
   this.writeHex = function (byteOffset, str) {
     // remove first two chars and parse
-    var value = parseInt(str.substr(2), 16);
+    var value = parseInt(str.substring(2), 16);
     view.setUint16(byteOffset, value, isLittleEndian);
     return byteOffset + Uint16Array.BYTES_PER_ELEMENT;
   };

@@ -167,7 +167,7 @@ dwv.i18nPage = function () {
  * @returns {string} The path to the locale resource.
  */
 dwv.i18nGetLocalePath = function (filename) {
-  var lng = i18next.language.substr(0, 2);
+  var lng = i18next.language.substring(0, 2);
   return dwv.i18nLocalesPath +
         '/locales/' + lng + '/' + filename;
 };
@@ -180,7 +180,7 @@ dwv.i18nGetLocalePath = function (filename) {
  * @returns {string} The path to the locale resource.
  */
 dwv.i18nGetFallbackLocalePath = function (filename) {
-  var lng = i18next.languages[i18next.languages.length - 1].substr(0, 2);
+  var lng = i18next.languages[i18next.languages.length - 1].substring(0, 2);
   return dwv.i18nLocalesPath +
         '/locales/' + lng + '/' + filename;
 };

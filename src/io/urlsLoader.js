@@ -273,7 +273,7 @@ dwv.io.UrlsLoader = function () {
     var foundLoader = false;
     for (var l = 0; l < loaders.length; ++l) {
       loader = loaders[l];
-      if (loader.canLoadUrl(dataElement)) {
+      if (loader.canLoadUrl(dataElement, options)) {
         foundLoader = true;
         // load options
         loader.setOptions({
@@ -341,7 +341,7 @@ dwv.io.UrlsLoader = function () {
       dataElement = data[i];
 
       // check loader
-      if (!loader.canLoadUrl(dataElement)) {
+      if (!loader.canLoadUrl(dataElement, options)) {
         throw new Error('Input url of different type: ' + dataElement);
       }
       /**

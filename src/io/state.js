@@ -49,7 +49,7 @@ dwv.io.State = function () {
       version: '0.5',
       'window-center': viewController.getWindowLevel().center,
       'window-width': viewController.getWindowLevel().width,
-      position: [position.getX(), position.getY(), position.getZ()],
+      position: position.getValues(),
       scale: app.getAddedScale(),
       offset: app.getOffset(),
       drawings: drawLayer.getKonvaLayer().toObject(),
@@ -94,9 +94,7 @@ dwv.io.State = function () {
     // display
     viewController.setWindowLevel(
       data['window-center'], data['window-width']);
-    viewController.setCurrentPosition(
-      new dwv.math.Point3D(
-        data.position[0], data.position[1], data.position[2]), true);
+    viewController.setCurrentPosition(new dwv.math.Point(data.position));
     // apply saved scale on top of current base one
     var baseScale = app.getActiveLayerGroup().getBaseScale();
     var scale = null;
@@ -386,8 +384,8 @@ dwv.io.v01Tov02DrawingsAndDetails = function (inputDrawings) {
         if (drawGroup.name() === 'ruler-group') {
           quant = {
             length: {
-              value: parseFloat(textExpr.substr(0, txtLen - 2)),
-              unit: textExpr.substr(-2, 2)
+              value: parseFloat(textExpr.substring(0, txtLen - 2)),
+              unit: textExpr.substring(-2)
             }
           };
           textExpr = '{length}';
@@ -395,8 +393,8 @@ dwv.io.v01Tov02DrawingsAndDetails = function (inputDrawings) {
                     drawGroup.name() === 'rectangle-group') {
           quant = {
             surface: {
-              value: parseFloat(textExpr.substr(0, txtLen - 3)),
-              unit: textExpr.substr(-3, 3)
+              value: parseFloat(textExpr.substring(0, txtLen - 3)),
+              unit: textExpr.substring(-3)
             }
           };
           textExpr = '{surface}';
@@ -404,8 +402,8 @@ dwv.io.v01Tov02DrawingsAndDetails = function (inputDrawings) {
                     drawGroup.name() === 'rectangle-group') {
           quant = {
             angle: {
-              value: parseFloat(textExpr.substr(0, txtLen - 1)),
-              unit: textExpr.substr(-1, 1)
+              value: parseFloat(textExpr.substring(0, txtLen - 1)),
+              unit: textExpr.substring(-1)
             }
           };
           textExpr = '{angle}';

@@ -619,7 +619,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
       dwv.dicom.checkUnknownVR(element);
 
       // tag group name (remove first 0)
-      groupName = dwv.dicom.TagGroups[element.tag.group.substr(1)];
+      groupName = dwv.dicom.TagGroups[element.tag.group.substring(1)];
 
       // prefix
       if (groupName === 'Meta Element') {
@@ -897,4 +897,41 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
 
   // return the size of that data
   return size;
+};
+
+/**
+ * Get the DICOM element from a DICOM tags object.
+ *
+ * @param {object} tags The DICOM tags object.
+ * @returns {object} The DICOM elements and the end offset.
+ */
+dwv.dicom.getElementsFromJSONTags = function (tags) {
+  // transfer syntax
+  var isImplicit = dwv.dicom.isImplicitTransferSyntax(tags.TransferSyntaxUID);
+  // convert JSON to DICOM element object
+  var keys = Object.keys(tags);
+  var dicomElements = {};
+  var dicomElement;
+  var name;
+  var offset = 128 + 4; // preamble
+  var size;
+  for (var k = 0, len = keys.length; k < len; ++k) {
+    // get the DICOM element definition from its name
+    dicomElement = dwv.dicom.getDicomElement(keys[k]);
+    // set its value
+    size = dwv.dicom.setElementValue(dicomElement, tags[keys[k]], isImplicit);
+    // set offsets
+    offset += dwv.dicom.getDataElementPrefixByteSize(
+      dicomElement.vr, isImplicit);
+    dicomElement.startOffset = offset;
+    offset += size;
+    dicomElement.endOffset = offset;
+    // create the tag group/element key
+    name = new dwv.dicom.Tag(
+      dicomElement.tag.group, dicomElement.tag.element).getKey();
+    // store
+    dicomElements[name] = dicomElement;
+  }
+  // return
+  return {elements: dicomElements, offset: offset};
 };

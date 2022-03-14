@@ -58,19 +58,21 @@ dwv.dicom.Tag.prototype.equals2 = function (rhs) {
 /**
  * Get the group-element key used to store DICOM elements.
  *
- * @returns {string} The key.
+ * @returns {string} The key as 'x########'.
  */
 dwv.dicom.Tag.prototype.getKey = function () {
-  return 'x' + this.getGroup().substr(2, 6) + this.getElement().substr(2, 6);
+  // group and element are in the '0x####' form
+  return 'x' + this.getGroup().substring(2) + this.getElement().substring(2);
 };
 
 /**
  * Get a simplified group-element key.
  *
- * @returns {string} The key.
+ * @returns {string} The key as '########'.
  */
 dwv.dicom.Tag.prototype.getKey2 = function () {
-  return this.getGroup().substr(2, 6) + this.getElement().substr(2, 6);
+  // group and element are in the '0x####' form
+  return this.getGroup().substring(2) + this.getElement().substring(2);
 };
 
 /**
@@ -79,7 +81,9 @@ dwv.dicom.Tag.prototype.getKey2 = function () {
  * @returns {string} The name.
  */
 dwv.dicom.Tag.prototype.getGroupName = function () {
-  return dwv.dicom.TagGroups[this.getGroup().substr(1)];
+  // group is in the '0x####' form
+  // TagGroups include the x
+  return dwv.dicom.TagGroups[this.getGroup().substring(1)];
 };
 
 
@@ -90,7 +94,7 @@ dwv.dicom.Tag.prototype.getGroupName = function () {
  * @returns {object} The DICOM tag.
  */
 dwv.dicom.getTagFromKey = function (key) {
-  return new dwv.dicom.Tag(key.substr(1, 4), key.substr(5, 8));
+  return new dwv.dicom.Tag(key.substring(1, 5), key.substring(5, 9));
 };
 
 /**
@@ -114,7 +118,8 @@ dwv.dicom.Tag.prototype.isWithVR = function () {
  *   ie if its group is an odd number.
  */
 dwv.dicom.Tag.prototype.isPrivate = function () {
-  var groupNumber = parseInt(this.getGroup().substr(2, 6), 10);
+  // group is in the '0x####' form
+  var groupNumber = parseInt(this.getGroup().substring(2), 10);
   return groupNumber % 2 === 1;
 };
 

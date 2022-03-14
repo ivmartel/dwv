@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>DICOM web</title>
+<style>
+body {
+  background-color: #efefef;
+  font-family: Arial, Helvetica, sans-serif;
+}
+table, td, th {
+  border: 1px solid #aaa;
+}
+table {
+  border-collapse: collapse;
+}
+td, th {
+  padding: 10px;
+}
+.error {
+  color: red;
+}
+</style>
+<script type="text/javascript" src="./dcmweb.js"></script>
+</head>
+<body>
+
+<div data-role="page">
+<div data-role="content">
+
+<h1>DICOM web browser</h1>
+
+<p>
+For the view link to work, set the <code>_dicomWeb</code> flag to true in
+the <code>./viewer.js</code>.
+<br>The search button launches a qido search to: <code>root url + series?</code>
+</p>
+
+<p>
+<label for="rooturl">Root url:</label>
+<input id="rooturl" type='text' size=40
+  value="http://localhost:8042/dicom-web/">
+<button id="search" onclick="dwv.test.qidoSearch()">Search</button>
+</p>
+
+<div id="result"></div>
+
+</div><!-- /page -->
+</div><!-- /content -->
+
+</body>
+</html>

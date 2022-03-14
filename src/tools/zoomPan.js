@@ -122,8 +122,9 @@ dwv.tool.ZoomAndPan = function (app) {
       // zoom mode
       var zoom = (lineRatio - 1) / 2;
       if (Math.abs(zoom) % 0.1 <= 0.05) {
-        var planePos = viewLayer.displayToPlanePos(event._x, event._y);
-        var center = viewController.getPositionFromPlanePoint(planePos);
+        var planePos = viewLayer.displayToMainPlanePos(
+          self.midPoint.getX(), self.midPoint.getY());
+        var center = viewController.getPlanePositionFromPlanePoint(planePos);
         layerGroup.addScale(zoom, center);
         layerGroup.draw();
       }

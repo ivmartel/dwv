@@ -221,7 +221,7 @@ dwv.App = function () {
    * - `dataViewConfigs`: data indexed object containing the data view
    *   configurations in the form of a list of objects containing:
    *   - divId: the HTML div id
-   *   - orientation: optional 'axial', 'coronal' or 'sagittal' otientation
+   *   - orientation: optional 'axial', 'coronal' or 'sagittal' orientation
    *     string (default undefined keeps the original slice order)
    * - `binders`: array of layerGroup binders
    * - `tools`: tool name indexed object containing individual tool
@@ -452,20 +452,15 @@ dwv.App = function () {
   // load API [end] ---------------------------------------------------------
 
   /**
-   * Fit the display to the given size. To be called once the image is loaded.
+   * Fit the display to the data of each layer group.
+   * To be called once the image is loaded.
    */
   this.fitToContainer = function () {
-    var layerGroup = stage.getActiveLayerGroup();
-    if (layerGroup) {
-      var geometry = self.getLastImage().getGeometry();
-      var size = geometry.getSize().get2D();
-      var spacing = geometry.getSpacing().get2D();
-      var width = size.x * spacing.x;
-      var height = size.y * spacing.y;
-      layerGroup.fitToContainer({x: width, y: height});
+    for (var i = 0; i < stage.getNumberOfLayerGroups(); ++i) {
+      var layerGroup = stage.getLayerGroup(i);
+      var mazSize = getLayerGroupMaxSize(layerGroup);
+      layerGroup.fitToContainer(mazSize);
       layerGroup.draw();
-      // update style
-      //style.setBaseScale(layerGroup.getBaseScale());
     }
   };
 
@@ -489,7 +484,7 @@ dwv.App = function () {
     // check options
     if (options.dataViewConfigs === null ||
       typeof options.dataViewConfigs === 'undefined') {
-      throw new Error('No available data iew configuration');
+      throw new Error('No available data view configuration');
     }
     var configs = null;
     if (typeof options.dataViewConfigs['*'] !== 'undefined') {
@@ -558,9 +553,9 @@ dwv.App = function () {
       // initialise or add view
       if (layerGroup.getViewLayersByDataIndex(dataIndex).length === 0) {
         if (layerGroup.getNumberOfLayers() === 0) {
-          initialiseBaseLayers(dataIndex, config.divId);
+          initialiseBaseLayers(dataIndex, config);
         } else {
-          addViewLayer(dataIndex, config.divId);
+          addViewLayer(dataIndex, config);
         }
       }
       // draw
@@ -644,7 +639,8 @@ dwv.App = function () {
       drawings, drawingsDetails, fireEvent, this.addToUndoStack);
 
     drawController.activateDrawLayer(
-      viewController.getCurrentOrientedPosition());
+      viewController.getCurrentOrientedIndex(),
+      viewController.getScrollIndex());
   };
   /**
    * Update a drawing from its details.
@@ -992,7 +988,8 @@ dwv.App = function () {
     var eventMetaData = null;
     if (event.loadtype === 'image') {
       if (isFirstLoadItem && timeId === 0) {
-        dataController.addNew(event.data.image, event.data.info);
+        dataController.addNew(
+          event.loadid, event.data.image, event.data.info);
       } else {
         dataController.update(
           event.loadid, event.data.image, event.data.info,
@@ -1139,25 +1136,12 @@ dwv.App = function () {
    * To be called once the DICOM data has been loaded.
    *
    * @param {number} dataIndex The data index.
-   * @param {string} layerGroupElementId The layer group element id.
+   * @param {object} dataViewConfig The data view config.
    * @private
    */
-  function initialiseBaseLayers(dataIndex, layerGroupElementId) {
-    var data = dataController.get(dataIndex);
-    if (!data) {
-      throw new Error('Cannot initialise layers with data id: ' + dataIndex);
-    }
-    var layerGroup = stage.getLayerGroupWithElementId(layerGroupElementId);
-    if (!layerGroup) {
-      throw new Error('Cannot initialise layers with group id: ' +
-        layerGroupElementId);
-    }
-
+  function initialiseBaseLayers(dataIndex, dataViewConfig) {
     // add layers
-    addViewLayer(dataIndex, layerGroupElementId);
-
-    // update style
-    //style.setBaseScale(layerGroup.getBaseScale());
+    addViewLayer(dataIndex, dataViewConfig);
 
     // initialise the toolbox
     if (toolboxController) {
@@ -1166,20 +1150,50 @@ dwv.App = function () {
   }
 
   /**
+   * Get the data max size for a layer group.
+   *
+   * @todo Filter for data of the layer group.
+   * @param {object} lg The layer group.
+   * @returns {object} The max size as {x,y}.
+   */
+  function getLayerGroupMaxSize(lg) {
+    var maxSize = {x: 0, y: 0};
+    for (var i = 0; i < dataController.length(); ++i) {
+      var dc = dataController.get(i);
+      var geometry = dc.image.getGeometry();
+      var viewOrient = dwv.gui.getViewOrientation(
+        geometry,
+        lg.getTargetOrientation()
+      );
+      var size = geometry.getSize(viewOrient).get2D();
+      var spacing = geometry.getSpacing(viewOrient).get2D();
+      var width = size.x * spacing.x;
+      if (width > maxSize.x) {
+        maxSize.x = width;
+      }
+      var height = size.y * spacing.y;
+      if (height > maxSize.y) {
+        maxSize.y = height;
+      }
+    }
+    return maxSize;
+  }
+
+  /**
    * Add a view layer.
    *
    * @param {number} dataIndex The data index.
-   * @param {string} layerGroupElementId The layer group element id.
+   * @param {object} dataViewConfig The data view config.
    */
-  function addViewLayer(dataIndex, layerGroupElementId) {
+  function addViewLayer(dataIndex, dataViewConfig) {
     var data = dataController.get(dataIndex);
     if (!data) {
-      throw new Error('Cannot initialise layers with data id: ' + dataIndex);
+      throw new Error('Cannot initialise layer with data id: ' + dataIndex);
     }
-    var layerGroup = stage.getLayerGroupWithElementId(layerGroupElementId);
+    var layerGroup = stage.getLayerGroupWithElementId(dataViewConfig.divId);
     if (!layerGroup) {
-      throw new Error('Cannot initialise layers with group id: ' +
-        layerGroupElementId);
+      throw new Error('Cannot initialise layer with group id: ' +
+        dataViewConfig.divId);
     }
     var imageGeometry = data.image.getGeometry();
 
@@ -1211,11 +1225,20 @@ dwv.App = function () {
       });
     }
 
-    // TODO: find another way for a default colour map
+    // colour map
+    if (typeof dataViewConfig.colourMap !== 'undefined') {
+      view.setColourMap(dataViewConfig.colourMap);
+    }
+
+    // opacity
     var opacity = 1;
-    if (dataIndex !== 0) {
-      view.setColourMap(dwv.image.lut.rainbow);
+    // do we have more than one layer
+    if (layerGroup.getNumberOfLayers() !== 0) {
       opacity = 0.5;
+      // set color map if non was provided
+      if (typeof dataViewConfig.colourMap === 'undefined') {
+        view.setColourMap(dwv.image.lut.rainbow);
+      }
     }
 
     // view layer
@@ -1266,25 +1289,7 @@ dwv.App = function () {
     }
 
     // fit to the maximum size
-    var maxSize = {x: 0, y: 0};
-    for (var i = 0; i < dataController.length(); ++i) {
-      var dc = dataController.get(i);
-      var geometry = dc.image.getGeometry();
-      var viewOrient = dwv.gui.getViewOrientation(
-        geometry,
-        layerGroup.getTargetOrientation()
-      );
-      var size = geometry.getSize(viewOrient).get2D();
-      var spacing = geometry.getSpacing(viewOrient).get2D();
-      var width = size.x * spacing.x;
-      if (width > maxSize.x) {
-        maxSize.x = width;
-      }
-      var height = size.y * spacing.y;
-      if (height > maxSize.y) {
-        maxSize.y = height;
-      }
-    }
+    var maxSize = getLayerGroupMaxSize(layerGroup);
     layerGroup.fitToContainer(maxSize);
   }
 

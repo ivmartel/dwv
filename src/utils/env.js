@@ -269,8 +269,10 @@ dwv.env.check = function () {
 
   // check string startsWith
   if (!String.prototype.startsWith) {
-    String.prototype.startsWith = function (search, pos) {
-      return this.substr(!pos || pos < 0 ? 0 : +pos, search.length) === search;
-    };
+    Object.defineProperty(String.prototype, 'startsWith', {
+      value: function (search, rawPos) {
+        return dwv.utils.startsWith(this, search, rawPos);
+      }
+    });
   }
 };

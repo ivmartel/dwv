@@ -12,7 +12,11 @@ dwv.image.decoderScripts = {
 dwv.logger.level = dwv.utils.logger.levels.DEBUG;
 
 var _app = null;
+var _tools = null;
+
+// viewer options
 var _mode = 0;
+var _dicomWeb = false;
 
 /**
  * Setup simple dwv app.
@@ -66,16 +70,19 @@ dwv.test.viewerSetup = function () {
     dataViewConfigs = prepareAndGetSimpleDataViewConfig();
   }
 
+  // tools
+  _tools = {
+    Scroll: {},
+    WindowLevel: {},
+    ZoomAndPan: {},
+    Draw: {options: ['Rectangle'], type: 'factory'}
+  };
+
   // app config
   var config = {
     viewOnFirstLoadItem: viewOnFirstLoadItem,
     dataViewConfigs: dataViewConfigs,
-    tools: {
-      Scroll: {},
-      WindowLevel: {},
-      ZoomAndPan: {},
-      Draw: {options: ['Rectangle'], type: 'factory'}
-    }
+    tools: _tools
   };
   // app
   _app = new dwv.App();
@@ -141,35 +148,31 @@ dwv.test.viewerSetup = function () {
       return value;
     };
     var values = event.value[1];
+    var text = '(index: ' + event.value[0] + ')';
+    if (event.value.length > 2) {
+      text += ' value: ' + event.value[2];
+    }
     input.value = values.map(toFixed2);
     // index as small text
     var span = document.getElementById('positionspan');
-    span.innerHTML = '(index: ' + event.value[0] + ')';
+    span.innerHTML = text;
   });
 
-  console.log(
-    '%c Available tools: (s)croll, (w)indowlevel, (z)oomandpan, (d)raw.',
-    'color: teal;');
+  // default keyboard shortcuts
   _app.addEventListener('keydown', function (event) {
     _app.defaultOnKeydown(event);
-    if (event.keyCode === 83) { // s
-      console.log('%c tool: scroll', 'color: teal;');
-      _app.setTool('Scroll');
-    } else if (event.keyCode === 87) { // w
-      console.log('%c tool: windowlevel', 'color: teal;');
-      _app.setTool('WindowLevel');
-    } else if (event.keyCode === 90) { // z
-      console.log('%c tool: zoomandpan', 'color: teal;');
-      _app.setTool('ZoomAndPan');
-    } else if (event.keyCode === 68) { // d
-      console.log('%c tool: draw', 'color: teal;');
-      _app.setTool('Draw');
-      _app.setDrawShape('Rectangle');
-    }
   });
 
-  // load from location
-  dwv.utils.loadFromUri(window.location.href, _app);
+  var options = {};
+  // special dicom web request header
+  if (_dicomWeb) {
+    options.requestHeaders = [{
+      name: 'Accept',
+      value: 'multipart/related; type="application/dicom"; transfer-syntax=*'
+    }];
+  }
+  // load from window location
+  dwv.utils.loadFromUri(window.location.href, _app, options);
 };
 
 /**
@@ -212,10 +215,21 @@ dwv.test.onDOMContentLoadedViewer = function () {
       addDataRow(i, configs);
     }
 
-    _app.setTool('Scroll');
+    // need to set tool after config change
+    var toolsInput = document.getElementsByName('tools');
+    var toolIndex = null;
+    for (var j = 0; j < toolsInput.length; ++j) {
+      if (toolsInput[j].checked) {
+        toolIndex = j;
+        break;
+      }
+    }
+    _app.setTool(Object.keys(_tools)[toolIndex]);
   });
 
   setupBindersCheckboxes();
+
+  setupToolsCheckboxes();
 
   // bind app to input files
   var timeId = -1;
@@ -375,20 +389,85 @@ function setupBindersCheckboxes() {
       }
     };
   }
+  // individual binders
   for (var i = 0; i < propList.length; ++i) {
     var propName = propList[i];
 
     var input = document.createElement('input');
-    input.id = i;
+    input.id = 'binder-' + i;
     input.type = 'checkbox';
     input.onchange = getOnInputChange(propName);
 
     var label = document.createElement('label');
-    label.for = i;
-    label.appendChild(input);
+    label.htmlFor = input.id;
     label.appendChild(document.createTextNode(propName));
 
+    bindersDiv.appendChild(input);
     bindersDiv.appendChild(label);
+  }
+
+  // check all
+  var allInput = document.createElement('input');
+  allInput.id = 'binder-all';
+  allInput.type = 'checkbox';
+  allInput.onchange = function () {
+    for (var j = 0; j < propList.length; ++j) {
+      document.getElementById('binder-' + j).click();
+    }
+  };
+  var allLabel = document.createElement('label');
+  allLabel.htmlFor = allInput.id;
+  allLabel.appendChild(document.createTextNode('all'));
+  bindersDiv.appendChild(allInput);
+  bindersDiv.appendChild(allLabel);
+}
+
+/**
+ * Setup the tools checkboxes
+ */
+function setupToolsCheckboxes() {
+  var toolsDiv = document.getElementById('tools');
+  var keys = Object.keys(_tools);
+
+  var getChangeTool = function (tool) {
+    return function () {
+      _app.setTool(tool);
+      if (tool === 'Draw') {
+        _app.setDrawShape('Rectangle');
+      }
+    };
+  };
+
+  var getKeyCheck = function (char, input) {
+    return function (event) {
+      if (event.keyCode === char) {
+        input.click();
+      }
+    };
+  };
+
+  for (var i = 0; i < keys.length; ++i) {
+    var key = keys[i];
+
+    var input = document.createElement('input');
+    input.id = 'tool-' + i;
+    input.name = 'tools';
+    input.type = 'radio';
+    input.onchange = getChangeTool(key);
+
+    if (key === 'Scroll') {
+      input.checked = true;
+    }
+
+    var label = document.createElement('label');
+    label.htmlFor = input.id;
+    label.appendChild(document.createTextNode(key));
+
+    toolsDiv.appendChild(input);
+    toolsDiv.appendChild(label);
+
+    // keyboard shortcut
+    window.addEventListener('keydown', getKeyCheck(key.charCodeAt(0), input));
   }
 }
 
@@ -398,6 +477,63 @@ function setupBindersCheckboxes() {
 function clearDataTable() {
   var detailsDiv = document.getElementById('layersdetails');
   detailsDiv.innerHTML = '';
+}
+
+/**
+ * Get a control div: label, range and number field.
+ *
+ * @param {string} id The control id.
+ * @param {string} name The control name.
+ * @param {number} min The control minimum value.
+ * @param {number} max The control maximum value.
+ * @param {number} value The control value.
+ * @param {Function} callback The callback on control value change.
+ * @param {number} precision Optional number field float precision.
+ * @returns {object} The control div.
+ */
+function getControlDiv(id, name, min, max, value, callback, precision) {
+  var range = document.createElement('input');
+  range.id = id + '-range';
+  range.className = 'ctrl-range';
+  range.type = 'range';
+  range.min = min.toPrecision(precision);
+  range.max = max.toPrecision(precision);
+  range.step = ((max - min) * 0.01).toPrecision(precision);
+  range.value = value;
+
+  var label = document.createElement('label');
+  label.id = id + '-label';
+  label.className = 'ctrl-label';
+  label.htmlFor = range.id;
+  label.appendChild(document.createTextNode(name));
+
+  var number = document.createElement('input');
+  number.id = id + '-number';
+  number.className = 'ctrl-number';
+  number.type = 'number';
+  number.min = range.min;
+  number.max = range.max;
+  number.step = range.step;
+  number.value = parseFloat(value).toPrecision(precision);
+
+  // callback and bind range and number
+  number.oninput = function () {
+    range.value = this.value;
+    callback(this.value);
+  };
+  range.oninput = function () {
+    number.value = parseFloat(this.value).toPrecision(precision);
+    callback(this.value);
+  };
+
+  var div = document.createElement('div');
+  div.id = id + '-ctrl';
+  div.className = 'ctrl';
+  div.appendChild(label);
+  div.appendChild(range);
+  div.appendChild(number);
+
+  return div;
 }
 
 /**
@@ -432,8 +568,7 @@ function addDataRow(id, dataViewConfigs) {
       insertTCell('LG' + j);
     }
     insertTCell('Alpha Range');
-    insertTCell('Width');
-    insertTCell('Center');
+    insertTCell('Contrast');
     insertTCell('Alpha');
     body = table.createTBody();
     var div = document.getElementById('layersdetails');
@@ -477,126 +612,65 @@ function addDataRow(id, dataViewConfigs) {
     cell.appendChild(radio);
   }
 
-  var dataRange = _app.getImage(vl.getDataIndex()).getRescaledDataRange();
+  var image = _app.getImage(vl.getDataIndex());
+  var dataRange = image.getDataRange();
+  var rescaledDataRange = image.getRescaledDataRange();
+  var floatPrecision = 4;
 
-  // cell: data range
+  // cell: alpha range
   cell = row.insertCell();
-  var widthmin = document.createElement('input');
-  widthmin.type = 'range';
-  widthmin.max = dataRange.max;
-  widthmin.min = dataRange.min;
-  widthmin.step = (dataRange.max - dataRange.min) * 0.001;
-  widthmin.value = dataRange.min;
-  var widthmax = document.createElement('input');
-  widthmax.type = 'range';
-  widthmax.max = widthmin.max;
-  widthmax.min = widthmin.min;
-  widthmax.step = widthmin.step;
-  widthmax.value = dataRange.max;
-  cell.appendChild(widthmin);
-  cell.appendChild(widthmax);
-
-  var changeAlphaFunc = function (min, max) {
+  var minId = 'value-min-' + id;
+  var maxId = 'value-max-' + id;
+  // calback
+  var changeAlphaFunc = function () {
+    var min = parseFloat(document.getElementById(minId + '-number').value);
+    var max = parseFloat(document.getElementById(maxId + '-number').value);
     var func = function (value) {
-      if (value > min && value < max) {
+      if (value >= min && value <= max) {
         return 255;
       }
       return 0;
     };
-    vc.setViewAlphaFunction(func);
+    for (var i = 0; i < vls.length; ++i) {
+      vls[i].getViewController().setViewAlphaFunction(func);
+    }
   };
-  widthmin.oninput = function () {
-    changeAlphaFunc(this.value, widthmax.value);
-  };
-  widthmax.oninput = function () {
-    changeAlphaFunc(widthmin.value, this.value);
-  };
+  // add controls
+  cell.appendChild(getControlDiv(minId, 'min',
+    dataRange.min, dataRange.max, dataRange.min,
+    changeAlphaFunc, floatPrecision));
+  cell.appendChild(getControlDiv(maxId, 'max',
+    dataRange.min, dataRange.max, dataRange.max,
+    changeAlphaFunc, floatPrecision));
 
-  // cell: window width
+  // cell: contrast
   cell = row.insertCell();
-  var widthrange = document.createElement('input');
-  widthrange.type = 'range';
-  widthrange.max = dataRange.max - dataRange.min;
-  widthrange.min = 0;
-  widthrange.step = (dataRange.max - dataRange.min) * 0.001;
-  widthrange.value = wl.width;
-  var widthnumber = document.createElement('input');
-  widthnumber.type = 'number';
-  widthnumber.max = widthrange.max;
-  widthnumber.min = widthrange.min;
-  widthnumber.step = widthrange.step;
-  widthnumber.value = widthrange.value;
-  cell.appendChild(widthrange);
-  cell.appendChild(widthnumber);
-
-  // cell: window center
-  cell = row.insertCell();
-  var centerrange = document.createElement('input');
-  centerrange.type = 'range';
-  centerrange.max = dataRange.max;
-  centerrange.min = dataRange.min;
-  centerrange.step = (dataRange.max - dataRange.min) * 0.001;
-  centerrange.value = wl.center;
-  var centernumber = document.createElement('input');
-  centernumber.type = 'number';
-  centernumber.max = centerrange.max;
-  centernumber.min = centerrange.min;
-  centernumber.step = centerrange.step;
-  centernumber.value = centerrange.value;
-  cell.appendChild(centerrange);
-  cell.appendChild(centernumber);
-
-  var changeWidth = function (value) {
-    vc.setWindowLevel(centernumber.value, value);
+  var widthId = 'width-' + id;
+  var centerId = 'center-' + id;
+  // calback
+  var changeContrast = function () {
+    var width = parseFloat(document.getElementById(widthId + '-number').value);
+    var center =
+      parseFloat(document.getElementById(centerId + '-number').value);
+    vc.setWindowLevel(center, width);
   };
-  widthnumber.oninput = function () {
-    changeWidth(this.value);
-    widthrange.value = this.value;
-  };
-  widthrange.oninput = function () {
-    changeWidth(this.value);
-    widthnumber.value = this.value;
-  };
-
-  var changeCenter = function (value) {
-    vc.setWindowLevel(value, widthnumber.value);
-    vl.draw();
-  };
-  centernumber.oninput = function () {
-    changeCenter(this.value);
-    centerrange.value = this.value;
-  };
-  centerrange.oninput = function () {
-    changeCenter(this.value);
-    centernumber.value = this.value;
-  };
+  // add controls
+  cell.appendChild(getControlDiv(widthId, 'width',
+    0, rescaledDataRange.max - rescaledDataRange.min, wl.width,
+    changeContrast, floatPrecision));
+  cell.appendChild(getControlDiv(centerId, 'center',
+    rescaledDataRange.min, rescaledDataRange.max, wl.center,
+    changeContrast, floatPrecision));
 
   // cell: opactiy
   cell = row.insertCell();
+  var opacityId = 'opactiy-' + id;
+  // calback
   var changeOpacity = function (value) {
     vl.setOpacity(value);
     vl.draw();
   };
-  var opacityrange = document.createElement('input');
-  opacityrange.type = 'range';
-  opacityrange.max = 1;
-  opacityrange.min = 0;
-  opacityrange.step = 0.1;
-  opacityrange.value = vl.getOpacity();
-  var opacitynumber = document.createElement('input');
-  opacitynumber.type = 'number';
-  opacitynumber.max = opacityrange.max;
-  opacitynumber.min = opacityrange.min;
-  opacitynumber.step = opacityrange.step;
-  opacitynumber.value = opacityrange.value;
-  opacitynumber.oninput = function () {
-    changeOpacity(this.value);
-    opacityrange.value = this.value;
-  };
-  opacityrange.oninput = function () {
-    changeOpacity(this.value);
-    opacitynumber.value = this.value;
-  };
-  cell.appendChild(opacityrange);
-  cell.appendChild(opacitynumber);
+  // add controls
+  cell.appendChild(getControlDiv(opacityId, 'opacity',
+    0, 1, vl.getOpacity(), changeOpacity));
 }

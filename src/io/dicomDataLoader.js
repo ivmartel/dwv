@@ -118,9 +118,22 @@ dwv.io.DicomDataLoader.prototype.canLoadFile = function (file) {
  *  - the url has no 'contentType' and no extension or the extension is 'dcm'
  *
  * @param {string} url The url to check.
+ * @param {object} options Optional url request options.
  * @returns {boolean} True if the url can be loaded.
  */
-dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url) {
+dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url, options) {
+  // if there are options.requestHeaders, just base check on them
+  if (typeof options !== 'undefined' &&
+    typeof options.requestHeaders !== 'undefined') {
+    // starts with 'application/dicom'
+    var isDicom = function (element) {
+      return element.name === 'Accept' &&
+        dwv.utils.startsWith(element.value, 'application/dicom') &&
+        element.value[18] !== '+';
+    };
+    return typeof options.requestHeaders.find(isDicom) !== 'undefined';
+  }
+
   var urlObjext = dwv.utils.getUrlFromUri(url);
   // extension
   var ext = dwv.utils.getFileExtension(urlObjext.pathname);
@@ -129,10 +142,27 @@ dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url) {
   // content type (for wado url)
   var contentType = urlObjext.searchParams.get('contentType');
   var hasContentType = contentType !== null &&
-        typeof contentType !== 'undefined';
+    typeof contentType !== 'undefined';
   var hasDicomContentType = (contentType === 'application/dicom');
 
   return hasContentType ? hasDicomContentType : (hasNoExt || hasDcmExt);
+};
+
+/**
+ * Check if the loader can load the provided memory object.
+ *
+ * @param {object} mem The memory object.
+ * @returns {boolean} True if the object can be loaded.
+ */
+dwv.io.DicomDataLoader.prototype.canLoadMemory = function (mem) {
+  if (typeof mem['Content-Type'] !== 'undefined' &&
+    mem['Content-Type'] === 'application/dicom') {
+    return true;
+  }
+  if (typeof mem.filename !== 'undefined') {
+    return this.canLoadFile(mem.filename);
+  }
+  return false;
 };
 
 /**

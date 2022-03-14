@@ -64,7 +64,7 @@ then
   info "(1/4) commit prepared changes"
 
   git commit -a -m "Release ${releaseBranch}"
-  
+
   ((step++))
 fi
 
@@ -78,7 +78,7 @@ then
   git merge --no-ff $releaseBranch
   # push master
   git push origin master
-  
+
   ((step++))
 fi
 
@@ -92,16 +92,16 @@ then
   git merge --no-ff $releaseBranch
   # update version number in files
   a0="  \"version\": \"[0-9]+\.[0-9]+\.[0-9]+\","
-  b0="  \"version\": \"${nextVersion}-beta\","
+  b0="  \"version\": \"${nextVersion}-beta.0\","
   sed -i -r "s/${a0}/${b0}/g" package.json
   a1="  return '[0-9]+\.[0-9]+\.[0-9]+';"
-  b1="  return '${nextVersion}-beta';"
+  b1="  return '${nextVersion}-beta.0';"
   sed -i -r "s/${a1}/${b1}/g" src/dicom/dicomParser.js
   # commit
-  git commit -a -m "Bumped version number to v${nextVersion}-beta"
+  git commit -a -m "Bumped version number to v${nextVersion}-beta.0"
   # push develop
   git push origin develop
-  
+
   ((step++))
 fi
 

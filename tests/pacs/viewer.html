@@ -41,7 +41,7 @@ span {
   height: 350px;
   width: 350px;
   margin: 5px;
-  background-color: gainsboro;
+  background-color: limeGreen;
 }
 .layer {
   position: absolute;
@@ -96,6 +96,7 @@ span {
 <script type="text/javascript" src="../../src/io/filesLoader.js"></script>
 <script type="text/javascript" src="../../src/io/dicomDataLoader.js"></script>
 <script type="text/javascript" src="../../src/io/memoryLoader.js"></script>
+<script type="text/javascript" src="../../src/io/multipartLoader.js"></script>
 <script type="text/javascript" src="../../src/io/rawImageLoader.js"></script>
 <script type="text/javascript" src="../../src/io/rawVideoLoader.js"></script>
 <script type="text/javascript" src="../../src/io/zipLoader.js"></script>
@@ -108,6 +109,7 @@ span {
 <script type="text/javascript" src="../../src/tools/scroll.js"></script>
 <script type="text/javascript" src="../../src/tools/windowLevel.js"></script>
 <script type="text/javascript" src="../../src/tools/zoomPan.js"></script>
+<script type="text/javascript" src="../../src/utils/array.js"></script>
 <script type="text/javascript" src="../../src/utils/colour.js"></script>
 <script type="text/javascript" src="../../src/utils/env.js"></script>
 <script type="text/javascript" src="../../src/utils/listen.js"></script>
@@ -164,6 +166,8 @@ document.addEventListener('DOMContentLoaded', dwv.test.onDOMContentLoadedViewer)
 </div>
 
 <div class="line" id="binders">Binders:</div>
+
+<div class="line" id="tools">Tools:</div>
 
 <div id="layersdetails"></div>
 

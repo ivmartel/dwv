@@ -1,4 +1,4 @@
-/*! dwv 0.30.5 2021-12-16 11:23:07 */
+/*! dwv 0.31.0-beta.0 2022-03-11 16:27:12 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -295,7 +295,7 @@ dwv.App = function () {
    * - `dataViewConfigs`: data indexed object containing the data view
    *   configurations in the form of a list of objects containing:
    *   - divId: the HTML div id
-   *   - orientation: optional 'axial', 'coronal' or 'sagittal' otientation
+   *   - orientation: optional 'axial', 'coronal' or 'sagittal' orientation
    *     string (default undefined keeps the original slice order)
    * - `binders`: array of layerGroup binders
    * - `tools`: tool name indexed object containing individual tool
@@ -526,15 +526,15 @@ dwv.App = function () {
   // load API [end] ---------------------------------------------------------
 
   /**
-   * Fit the display to the given size. To be called once the image is loaded.
+   * Fit the display to the data of each layer group.
+   * To be called once the image is loaded.
    */
   this.fitToContainer = function () {
-    var layerGroup = stage.getActiveLayerGroup();
-    if (layerGroup) {
-      layerGroup.fitToContainer(self.getLastImage().getGeometry());
+    for (var i = 0; i < stage.getNumberOfLayerGroups(); ++i) {
+      var layerGroup = stage.getLayerGroup(i);
+      var mazSize = getLayerGroupMaxSize(layerGroup);
+      layerGroup.fitToContainer(mazSize);
       layerGroup.draw();
-      // update style
-      //style.setBaseScale(layerGroup.getBaseScale());
     }
   };
 
@@ -558,7 +558,7 @@ dwv.App = function () {
     // check options
     if (options.dataViewConfigs === null ||
       typeof options.dataViewConfigs === 'undefined') {
-      throw new Error('No available data iew configuration');
+      throw new Error('No available data view configuration');
     }
     var configs = null;
     if (typeof options.dataViewConfigs['*'] !== 'undefined') {
@@ -713,7 +713,8 @@ dwv.App = function () {
       drawings, drawingsDetails, fireEvent, this.addToUndoStack);
 
     drawController.activateDrawLayer(
-      viewController.getCurrentOrientedPosition());
+      viewController.getCurrentOrientedIndex(),
+      viewController.getScrollIndex());
   };
   /**
    * Update a drawing from its details.
@@ -1061,7 +1062,8 @@ dwv.App = function () {
     var eventMetaData = null;
     if (event.loadtype === 'image') {
       if (isFirstLoadItem && timeId === 0) {
-        dataController.addNew(event.data.image, event.data.info);
+        dataController.addNew(
+          event.loadid, event.data.image, event.data.info);
       } else {
         dataController.update(
           event.loadid, event.data.image, event.data.info,
@@ -1235,6 +1237,36 @@ dwv.App = function () {
   }
 
   /**
+   * Get the data max size for a layer group.
+   *
+   * @todo Filter for data of the layer group.
+   * @param {object} lg The layer group.
+   * @returns {object} The max size as {x,y}.
+   */
+  function getLayerGroupMaxSize(lg) {
+    var maxSize = {x: 0, y: 0};
+    for (var i = 0; i < dataController.length(); ++i) {
+      var dc = dataController.get(i);
+      var geometry = dc.image.getGeometry();
+      var viewOrient = dwv.gui.getViewOrientation(
+        geometry,
+        lg.getTargetOrientation()
+      );
+      var size = geometry.getSize(viewOrient).get2D();
+      var spacing = geometry.getSpacing(viewOrient).get2D();
+      var width = size.x * spacing.x;
+      if (width > maxSize.x) {
+        maxSize.x = width;
+      }
+      var height = size.y * spacing.y;
+      if (height > maxSize.y) {
+        maxSize.y = height;
+      }
+    }
+    return maxSize;
+  }
+
+  /**
    * Add a view layer.
    *
    * @param {number} dataIndex The data index.
@@ -1317,7 +1349,9 @@ dwv.App = function () {
       }
     }
 
-    layerGroup.fitToContainer();
+    // fit to the maximum size
+    var maxSize = getLayerGroupMaxSize(layerGroup);
+    layerGroup.fitToContainer(maxSize);
   }
 
 };
@@ -1338,9 +1372,9 @@ dwv.ctrl.DataController = function () {
    * List of {image, meta}.
    *
    * @private
-   * @type {Array}
+   * @type {object}
    */
-  var data = [];
+  var data = {};
 
   /**
    * Listener handler.
@@ -1356,7 +1390,7 @@ dwv.ctrl.DataController = function () {
    * @returns {number} The length.
    */
   this.length = function () {
-    return data.length;
+    return Object.keys(data).length;
   };
 
   /**
@@ -1393,15 +1427,19 @@ dwv.ctrl.DataController = function () {
   /**
    * Add a new data.
    *
+   * @param {number} index The index of the data.
    * @param {dwv.image.Image} image The image.
    * @param {object} meta The image meta.
    */
-  this.addNew = function (image, meta) {
+  this.addNew = function (index, image, meta) {
+    if (typeof data[index] !== 'undefined') {
+      throw new Error('Index already used in storage: ' + index);
+    }
     // store the new image
-    data.push({
+    data[index] = {
       image: image,
       meta: getMetaObject(meta)
-    });
+    };
   };
 
   /**
@@ -2199,17 +2237,21 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
     };
     loader.onprogress = augmentCallbackEvent(self.onprogress, eventInfo);
     loader.onloaditem = function (event) {
-      var isFirstItem = currentLoaders[loadId].isFirstItem;
       var eventInfoItem = {
         loadtype: loadType,
-        loadid: loadId,
-        isfirstitem: isFirstItem
+        loadid: loadId
       };
+      if (typeof currentLoaders[loadId] !== 'undefined') {
+        eventInfoItem.isfirstitem = currentLoaders[loadId].isFirstItem;
+      }
       if (hasTimepoint) {
         eventInfoItem.timepoint = options.timepoint;
       }
+      // callback
       augmentCallbackEvent(self.onloaditem, eventInfoItem)(event);
-      if (isFirstItem) {
+      // update loader
+      if (typeof currentLoaders[loadId] !== 'undefined' &&
+        currentLoaders[loadId].isFirstItem) {
         currentLoaders[loadId].isFirstItem = false;
       }
     };
@@ -2655,12 +2697,17 @@ dwv.ctrl.ViewController = function (view) {
    *
    * @returns {dwv.math.Point} The position.
    */
-  this.getCurrentOrientedPosition = function () {
-    var res = view.getCurrentPosition();
+  this.getCurrentOrientedIndex = function () {
+    var res = view.getCurrentIndex();
     // values = orientation * orientedValues
     // -> inv(orientation) * values = orientedValues
     if (typeof view.getOrientation() !== 'undefined') {
-      res = view.getOrientation().getInverse().getAbs().multiplyVector3D(res);
+      var index3D = new dwv.math.Index(
+        [res.get(0), res.get(1), res.get(2)]);
+      var orientedIndex3D =
+         view.getOrientation().getInverse().getAbs().multiplyIndex3D(index3D);
+      var values = orientedIndex3D.getValues();
+      res = new dwv.math.Index(values);
     }
     return res;
   };
@@ -3462,7 +3509,7 @@ dwv.dicom.DataReader.prototype.readHex = function (byteOffset) {
   // read and convert to hex string
   var str = this.readUint16(byteOffset).toString(16);
   // return padded
-  return '0x0000'.substr(0, 6 - str.length) + str.toUpperCase();
+  return '0x0000'.substring(0, 6 - str.length) + str.toUpperCase();
 };
 
 // namespaces
@@ -3622,7 +3669,7 @@ dwv.dicom.DataWriter = function (buffer, isLittleEndian) {
    */
   this.writeHex = function (byteOffset, str) {
     // remove first two chars and parse
-    var value = parseInt(str.substr(2), 16);
+    var value = parseInt(str.substring(2), 16);
     view.setUint16(byteOffset, value, isLittleEndian);
     return byteOffset + Uint16Array.BYTES_PER_ELEMENT;
   };
@@ -4004,15 +4051,17 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function (
       dayBeginIndex = 8;
     }
     var da = new Date(
-      parseInt(daValue.substr(0, 4), 10),
-      parseInt(daValue.substr(monthBeginIndex, 2), 10) - 1, // 0-11 range
-      parseInt(daValue.substr(dayBeginIndex, 2), 10));
+      parseInt(daValue.substring(0, 4), 10),
+      parseInt(daValue.substring(
+        monthBeginIndex, monthBeginIndex + 2), 10) - 1, // 0-11 range
+      parseInt(daValue.substring(
+        dayBeginIndex, dayBeginIndex + 2), 10));
     str = da.toLocaleDateString();
   } else if (dicomElement.vr === 'TM' && pretty) {
     var tmValue = dicomElement.value[0];
-    var tmHour = tmValue.substr(0, 2);
-    var tmMinute = tmValue.length >= 4 ? tmValue.substr(2, 2) : '00';
-    var tmSeconds = tmValue.length >= 6 ? tmValue.substr(4, 2) : '00';
+    var tmHour = tmValue.substring(0, 2);
+    var tmMinute = tmValue.length >= 4 ? tmValue.substring(2, 4) : '00';
+    var tmSeconds = tmValue.length >= 6 ? tmValue.substring(4, 6) : '00';
     str = tmHour + ':' + tmMinute + ':' + tmSeconds;
   } else {
     var isOtherVR = false;
@@ -4042,9 +4091,9 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementValueAsString = function (
       } else if (isOtherVR) {
         var tmp = dicomElement.value[k].toString(16);
         if (dicomElement.vr === 'OB') {
-          tmp = '00'.substr(0, 2 - tmp.length) + tmp;
+          tmp = '00'.substring(0, 2 - tmp.length) + tmp;
         } else {
-          tmp = '0000'.substr(0, 4 - tmp.length) + tmp;
+          tmp = '0000'.substring(0, 4 - tmp.length) + tmp;
         }
         valueStr += tmp;
       } else if (typeof dicomElement.value[k] === 'string') {
@@ -4115,9 +4164,9 @@ dwv.dicom.DicomElementsWrapper.prototype.getElementAsString = function (
 
   // (group,element)
   line = '(';
-  line += dicomElement.tag.group.substr(2, 5).toLowerCase();
+  line += dicomElement.tag.group.substring(2).toLowerCase();
   line += ',';
-  line += dicomElement.tag.element.substr(2, 5).toLowerCase();
+  line += dicomElement.tag.element.substring(2).toLowerCase();
   line += ') ';
   // value representation
   line += dicomElement.vr;
@@ -4419,7 +4468,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.30.5';
+  return '0.31.0-beta.0';
 };
 
 /**
@@ -4533,7 +4582,7 @@ dwv.dicom.getReverseOrientation = function (ori) {
 
   var rori = '';
   for (var n = 0; n < ori.length; n++) {
-    var o = ori.substr(n, 1);
+    var o = ori.substring(n, n + 1);
     var r = rlabels[o];
     if (r) {
       rori += r;
@@ -4747,7 +4796,7 @@ dwv.dicom.guessTransferSyntax = function (firstDataElement) {
     group !== oEightGroupLittleEndian) {
     throw new Error(
       'Not a valid DICOM file (no magic DICM word found' +
-        'and first element not in 0x0008 group)'
+        ' and first element not in 0x0008 group)'
     );
   }
   // reasonable assumption: 2 uppercase characters => explicit vr
@@ -5315,9 +5364,9 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
       var stri = raw[i].toString(16);
       var stri1 = raw[i + 1].toString(16);
       var str = '(';
-      str += '0000'.substr(0, 4 - stri.length) + stri.toUpperCase();
+      str += '0000'.substring(0, 4 - stri.length) + stri.toUpperCase();
       str += ',';
-      str += '0000'.substr(0, 4 - stri1.length) + stri1.toUpperCase();
+      str += '0000'.substring(0, 4 - stri1.length) + stri1.toUpperCase();
       str += ')';
       data.push(str);
     }
@@ -5630,19 +5679,21 @@ dwv.dicom.Tag.prototype.equals2 = function (rhs) {
 /**
  * Get the group-element key used to store DICOM elements.
  *
- * @returns {string} The key.
+ * @returns {string} The key as 'x########'.
  */
 dwv.dicom.Tag.prototype.getKey = function () {
-  return 'x' + this.getGroup().substr(2, 6) + this.getElement().substr(2, 6);
+  // group and element are in the '0x####' form
+  return 'x' + this.getGroup().substring(2) + this.getElement().substring(2);
 };
 
 /**
  * Get a simplified group-element key.
  *
- * @returns {string} The key.
+ * @returns {string} The key as '########'.
  */
 dwv.dicom.Tag.prototype.getKey2 = function () {
-  return this.getGroup().substr(2, 6) + this.getElement().substr(2, 6);
+  // group and element are in the '0x####' form
+  return this.getGroup().substring(2) + this.getElement().substring(2);
 };
 
 /**
@@ -5651,7 +5702,9 @@ dwv.dicom.Tag.prototype.getKey2 = function () {
  * @returns {string} The name.
  */
 dwv.dicom.Tag.prototype.getGroupName = function () {
-  return dwv.dicom.TagGroups[this.getGroup().substr(1)];
+  // group is in the '0x####' form
+  // TagGroups include the x
+  return dwv.dicom.TagGroups[this.getGroup().substring(1)];
 };
 
 
@@ -5662,7 +5715,7 @@ dwv.dicom.Tag.prototype.getGroupName = function () {
  * @returns {object} The DICOM tag.
  */
 dwv.dicom.getTagFromKey = function (key) {
-  return new dwv.dicom.Tag(key.substr(1, 4), key.substr(5, 8));
+  return new dwv.dicom.Tag(key.substring(1, 5), key.substring(5, 9));
 };
 
 /**
@@ -5686,7 +5739,8 @@ dwv.dicom.Tag.prototype.isWithVR = function () {
  *   ie if its group is an odd number.
  */
 dwv.dicom.Tag.prototype.isPrivate = function () {
-  var groupNumber = parseInt(this.getGroup().substr(2, 6), 10);
+  // group is in the '0x####' form
+  var groupNumber = parseInt(this.getGroup().substring(2), 10);
   return groupNumber % 2 === 1;
 };
 
@@ -6490,7 +6544,7 @@ dwv.dicom.DicomWriter.prototype.getBuffer = function (dicomElements) {
       dwv.dicom.checkUnknownVR(element);
 
       // tag group name (remove first 0)
-      groupName = dwv.dicom.TagGroups[element.tag.group.substr(1)];
+      groupName = dwv.dicom.TagGroups[element.tag.group.substring(1)];
 
       // prefix
       if (groupName === 'Meta Element') {
@@ -6768,6 +6822,43 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
 
   // return the size of that data
   return size;
+};
+
+/**
+ * Get the DICOM element from a DICOM tags object.
+ *
+ * @param {object} tags The DICOM tags object.
+ * @returns {object} The DICOM elements and the end offset.
+ */
+dwv.dicom.getElementsFromJSONTags = function (tags) {
+  // transfer syntax
+  var isImplicit = dwv.dicom.isImplicitTransferSyntax(tags.TransferSyntaxUID);
+  // convert JSON to DICOM element object
+  var keys = Object.keys(tags);
+  var dicomElements = {};
+  var dicomElement;
+  var name;
+  var offset = 128 + 4; // preamble
+  var size;
+  for (var k = 0, len = keys.length; k < len; ++k) {
+    // get the DICOM element definition from its name
+    dicomElement = dwv.dicom.getDicomElement(keys[k]);
+    // set its value
+    size = dwv.dicom.setElementValue(dicomElement, tags[keys[k]], isImplicit);
+    // set offsets
+    offset += dwv.dicom.getDataElementPrefixByteSize(
+      dicomElement.vr, isImplicit);
+    dicomElement.startOffset = offset;
+    offset += size;
+    dicomElement.endOffset = offset;
+    // create the tag group/element key
+    name = new dwv.dicom.Tag(
+      dicomElement.tag.group, dicomElement.tag.element).getKey();
+    // store
+    dicomElements[name] = dicomElement;
+  }
+  // return
+  return {elements: dicomElements, offset: offset};
 };
 
 /*eslint max-len:0*/
@@ -11213,18 +11304,6 @@ dwv.gui.DrawLayer = function (containerDiv) {
   };
 
   /**
-   * Get the data full size, ie size * spacing.
-   *
-   * @returns {object} The full size as {x,y}.
-   */
-  this.getFullSize = function () {
-    return {
-      x: baseSize.x * baseSpacing.x,
-      y: baseSize.y * baseSpacing.y
-    };
-  };
-
-  /**
    * Get the layer base size (without scale).
    *
    * @returns {object} The size as {x,y}.
@@ -11363,19 +11442,17 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * Fit the layer to its parent container.
    *
    * @param {number} fitScale1D The 1D fit scale.
+   * @param {object} fitSize The fit size as {x,y}.
    */
-  this.fitToContainer = function (fitScale1D) {
+  this.fitToContainer = function (fitScale1D, fitSize) {
     // update fit scale
     fitScale = {
       x: fitScale1D * baseSpacing.x,
       y: fitScale1D * baseSpacing.y
     };
     // update konva
-    var fullSize = this.getFullSize();
-    var width = Math.floor(fullSize.x * fitScale1D);
-    var height = Math.floor(fullSize.y * fitScale1D);
-    konvaStage.setWidth(width);
-    konvaStage.setHeight(height);
+    konvaStage.setWidth(fitSize.x);
+    konvaStage.setHeight(fitSize.y);
     // reset scale
     this.setScale({x: 1, y: 1, z: 1});
   };
@@ -12123,24 +12200,27 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   /**
    * Fit the display to the size of the container.
    * To be called once the image is loaded.
+   *
+   * @param {object} realSize 2D real size (in mm) to fit provided as {x,y}.
    */
-  this.fitToContainer = function () {
+  this.fitToContainer = function (realSize) {
     // check container size
     if (containerDiv.offsetWidth === 0 &&
       containerDiv.offsetHeight === 0) {
       throw new Error('Cannot fit to zero sized container.');
     }
     // find best fit
-    var fitScales = [];
-    for (var i = 0; i < layers.length; ++i) {
-      var fullSize = layers[i].getFullSize();
-      fitScales.push(containerDiv.offsetWidth / fullSize.x);
-      fitScales.push(containerDiv.offsetHeight / fullSize.y);
-    }
-    var fitScale = Math.min.apply(null, fitScales);
+    var fitScale = Math.min(
+      containerDiv.offsetWidth / realSize.x,
+      containerDiv.offsetHeight / realSize.y
+    );
+    var fitSize = {
+      x: Math.floor(realSize.x * fitScale),
+      y: Math.floor(realSize.y * fitScale)
+    };
     // apply to layers
     for (var j = 0; j < layers.length; ++j) {
-      layers[j].fitToContainer(fitScale);
+      layers[j].fitToContainer(fitScale, fitSize);
     }
   };
 
@@ -13129,18 +13209,6 @@ dwv.gui.ViewLayer = function (containerDiv) {
   };
 
   /**
-   * Get the data full size, ie size * spacing.
-   *
-   * @returns {object} The full size as {x,y}.
-   */
-  this.getFullSize = function () {
-    return {
-      x: baseSize.x * baseSpacing.x,
-      y: baseSize.y * baseSpacing.y
-    };
-  };
-
-  /**
    * Get the layer base size (without scale).
    *
    * @returns {object} The size as {x,y}.
@@ -13239,6 +13307,13 @@ dwv.gui.ViewLayer = function (containerDiv) {
     ]);
   };
 
+  /**
+   * Remove scale from a display position.
+   *
+   * @param {number} x The X position.
+   * @param {number} y The Y position.
+   * @returns {object} The de-scaled position as {x,y}.
+   */
   this.displayToPlaneScale = function (x, y) {
     return {
       x: x / scale.x,
@@ -13246,11 +13321,33 @@ dwv.gui.ViewLayer = function (containerDiv) {
     };
   };
 
+  /**
+   * Get a plane position from a display position.
+   *
+   * @param {number} x The X position.
+   * @param {number} y The Y position.
+   * @returns {object} The plane position as {x,y}.
+   */
   this.displayToPlanePos = function (x, y) {
     var deScaled = this.displayToPlaneScale(x, y);
     return {
       x: deScaled.x + offset.x,
       y: deScaled.y + offset.y
+    };
+  };
+
+  /**
+   * Get a main plane position from a display position.
+   *
+   * @param {number} x The X position.
+   * @param {number} y The Y position.
+   * @returns {object} The main plane position as {x,y}.
+   */
+  this.displayToMainPlanePos = function (x, y) {
+    var planePos = this.displayToPlanePos(x, y);
+    return {
+      x: planePos.x - baseOffset.x,
+      y: planePos.y - baseOffset.y
     };
   };
 
@@ -13358,6 +13455,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
     dataIndex = index;
 
     // create canvas
+    // (canvas size is set in fitToContainer)
     canvas = document.createElement('canvas');
     containerDiv.appendChild(canvas);
 
@@ -13378,9 +13476,6 @@ dwv.gui.ViewLayer = function (containerDiv) {
       throw new Error('Cannot create canvas ' + baseSize.x + ', ' + baseSize.y);
     }
 
-    // canvas sizes
-    canvas.width = baseSize.x;
-    canvas.height = baseSize.y;
     // off screen canvas
     offscreenCanvas = document.createElement('canvas');
     offscreenCanvas.width = baseSize.x;
@@ -13397,17 +13492,17 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * Fit the layer to its parent container.
    *
    * @param {number} fitScale1D The 1D fit scale.
+   * @param {object} fitSize The fit size as {x,y}.
    */
-  this.fitToContainer = function (fitScale1D) {
+  this.fitToContainer = function (fitScale1D, fitSize) {
     // update fit scale
     fitScale = {
       x: fitScale1D * baseSpacing.x,
       y: fitScale1D * baseSpacing.y
     };
-    // update canvas
-    var fullSize = this.getFullSize();
-    var width = Math.floor(fullSize.x * fitScale1D);
-    var height = Math.floor(fullSize.y * fitScale1D);
+    // new canvas size
+    var width = fitSize.x;
+    var height = fitSize.y;
     if (!dwv.gui.canCreateCanvas(width, height)) {
       throw new Error('Cannot resize canvas ' + width + ', ' + height);
     }
@@ -19562,9 +19657,22 @@ dwv.io.DicomDataLoader.prototype.canLoadFile = function (file) {
  *  - the url has no 'contentType' and no extension or the extension is 'dcm'
  *
  * @param {string} url The url to check.
+ * @param {object} options Optional url request options.
  * @returns {boolean} True if the url can be loaded.
  */
-dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url) {
+dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url, options) {
+  // if there are options.requestHeaders, just base check on them
+  if (typeof options !== 'undefined' &&
+    typeof options.requestHeaders !== 'undefined') {
+    // starts with 'application/dicom'
+    var isDicom = function (element) {
+      return element.name === 'Accept' &&
+        dwv.utils.startsWith(element.value, 'application/dicom') &&
+        element.value[18] !== '+';
+    };
+    return typeof options.requestHeaders.find(isDicom) !== 'undefined';
+  }
+
   var urlObjext = dwv.utils.getUrlFromUri(url);
   // extension
   var ext = dwv.utils.getFileExtension(urlObjext.pathname);
@@ -19573,10 +19681,27 @@ dwv.io.DicomDataLoader.prototype.canLoadUrl = function (url) {
   // content type (for wado url)
   var contentType = urlObjext.searchParams.get('contentType');
   var hasContentType = contentType !== null &&
-        typeof contentType !== 'undefined';
+    typeof contentType !== 'undefined';
   var hasDicomContentType = (contentType === 'application/dicom');
 
   return hasContentType ? hasDicomContentType : (hasNoExt || hasDcmExt);
+};
+
+/**
+ * Check if the loader can load the provided memory object.
+ *
+ * @param {object} mem The memory object.
+ * @returns {boolean} True if the object can be loaded.
+ */
+dwv.io.DicomDataLoader.prototype.canLoadMemory = function (mem) {
+  if (typeof mem['Content-Type'] !== 'undefined' &&
+    mem['Content-Type'] === 'application/dicom') {
+    return true;
+  }
+  if (typeof mem.filename !== 'undefined') {
+    return this.canLoadFile(mem.filename);
+  }
+  return false;
 };
 
 /**
@@ -20154,12 +20279,43 @@ dwv.io.JSONTextLoader.prototype.canLoadFile = function (file) {
  * Check if the loader can load the provided url.
  *
  * @param {string} url The url to check.
+ * @param {object} options Optional url request options.
  * @returns {boolean} True if the url can be loaded.
  */
-dwv.io.JSONTextLoader.prototype.canLoadUrl = function (url) {
+dwv.io.JSONTextLoader.prototype.canLoadUrl = function (url, options) {
+  // if there are options.requestHeader, just base check on them
+  if (typeof options !== 'undefined' &&
+    typeof options.requestHeaders !== 'undefined') {
+    // starts with 'application/json' or 'application/dicom+json
+    var isJson = function (element) {
+      return element.name === 'Accept' &&
+        dwv.utils.startsWith(element.value, 'application/json') &&
+        dwv.utils.startsWith(element.value, 'application/dicom+json');
+    };
+    return typeof options.requestHeaders.find(isJson) !== 'undefined';
+  }
+
   var urlObjext = dwv.utils.getUrlFromUri(url);
   var ext = dwv.utils.getFileExtension(urlObjext.pathname);
   return (ext === 'json');
+};
+
+/**
+ * Check if the loader can load the provided memory object.
+ *
+ * @param {object} mem The memory object.
+ * @returns {boolean} True if the object can be loaded.
+ */
+dwv.io.JSONTextLoader.prototype.canLoadMemory = function (mem) {
+  if (typeof mem['Content-Type'] !== 'undefined') {
+    if (mem['Content-Type'].includes('json')) {
+      return true;
+    }
+  }
+  if (typeof mem.filename !== 'undefined') {
+    return this.canLoadFile(mem.filename);
+  }
+  return false;
 };
 
 /**
@@ -20424,7 +20580,7 @@ dwv.io.MemoryLoader = function () {
     var foundLoader = false;
     for (var l = 0; l < loaders.length; ++l) {
       loader = loaders[l];
-      if (loader.canLoadUrl(dataElement.filename)) {
+      if (loader.canLoadMemory(dataElement)) {
         foundLoader = true;
         // load options
         loader.setOptions({
@@ -20459,7 +20615,7 @@ dwv.io.MemoryLoader = function () {
     for (var i = 0; i < data.length; ++i) {
       dataElement = data[i];
       // check loader
-      if (!loader.canLoadFile({name: dataElement.filename})) {
+      if (!loader.canLoadMemory(dataElement)) {
         throw new Error('Input data of different type: ' +
           dataElement.filename);
       }
@@ -20532,6 +20688,214 @@ dwv.io.MemoryLoader.prototype.onerror = function (_event) {};
  * @param {object} _event The abort event.
  */
 dwv.io.MemoryLoader.prototype.onabort = function (_event) {};
+
+// namespaces
+var dwv = dwv || {};
+dwv.io = dwv.io || {};
+
+/**
+ * Multipart data loader.
+ *
+ * @class
+ */
+dwv.io.MultipartLoader = function () {
+  // closure to self
+  var self = this;
+
+  /**
+   * Loading flag.
+   *
+   * @private
+   * @type {boolean}
+   */
+  var isLoading = false;
+
+  /**
+   * Set the loader options.
+   *
+   * @param {object} _opt The input options.
+   */
+  this.setOptions = function (_opt) {
+    // does nothing
+  };
+
+  /**
+   * Is the load ongoing?
+   *
+   * @returns {boolean} True if loading.
+   */
+  this.isLoading = function () {
+    return isLoading;
+  };
+
+  /**
+   * Load data.
+   *
+   * @param {object} buffer The DICOM buffer.
+   * @param {string} origin The data origin.
+   * @param {number} index The data index.
+   */
+  this.load = function (buffer, origin, index) {
+    // send start event
+    this.onloadstart({
+      source: origin
+    });
+    // set loading flag
+    isLoading = true;
+
+    var memoryIO = new dwv.io.MemoryLoader();
+    // memoryIO.onloadstart: nothing to do
+    memoryIO.onprogress = function (progress) {
+      // add 50% to take into account the un-Multipartping
+      progress.loaded = 50 + progress.loaded / 2;
+      // set data index
+      progress.index = index;
+      self.onprogress(progress);
+    };
+    memoryIO.onloaditem = self.onloaditem;
+    memoryIO.onload = self.onload;
+    memoryIO.onloadend = function (event) {
+      // reset loading flag
+      isLoading = false;
+      // call listeners
+      self.onloadend(event);
+    };
+    memoryIO.onerror = self.onerror;
+    memoryIO.onabort = self.onabort;
+    // launch
+    memoryIO.load(dwv.utils.parseMultipart(buffer));
+  };
+
+  /**
+   * Abort load: pass to listeners.
+   */
+  this.abort = function () {
+    // reset loading flag
+    isLoading = false;
+    // call listeners
+    self.onabort({});
+    self.onloadend({});
+  };
+
+}; // class MultipartLoader
+
+/**
+ * Check if the loader can load the provided file.
+ *
+ * @param {object} _file The file to check.
+ * @returns {boolean} True if the file can be loaded.
+ */
+dwv.io.MultipartLoader.prototype.canLoadFile = function (_file) {
+  return false;
+};
+
+/**
+ * Check if the loader can load the provided url.
+ *
+ * @param {string} url The url to check.
+ * @param {object} options The url request options.
+ * @returns {boolean} True if the url can be loaded.
+ */
+dwv.io.MultipartLoader.prototype.canLoadUrl = function (url, options) {
+  // if there are options.requestHeaders, just base check on them
+  if (typeof options !== 'undefined' &&
+    typeof options.requestHeaders !== 'undefined') {
+    var isMultipart = function (element) {
+      return element.name === 'Accept' &&
+        dwv.utils.startsWith(element.value, 'multipart/related');
+    };
+    return typeof options.requestHeaders.find(isMultipart) !== 'undefined';
+  }
+
+  return false;
+};
+
+/**
+ * Check if the loader can load the provided memory object.
+ *
+ * @param {object} _mem The memory object.
+ * @returns {boolean} True if the url can be loaded.
+ */
+dwv.io.MultipartLoader.prototype.canLoadMemory = function (_mem) {
+  return false;
+};
+
+/**
+ * Get the file content type needed by the loader.
+ *
+ * @returns {number} One of the 'dwv.io.fileContentTypes'.
+ */
+dwv.io.MultipartLoader.prototype.loadFileAs = function () {
+  return dwv.io.fileContentTypes.ArrayBuffer;
+};
+
+/**
+ * Get the url content type needed by the loader.
+ *
+ * @returns {number} One of the 'dwv.io.urlContentTypes'.
+ */
+dwv.io.MultipartLoader.prototype.loadUrlAs = function () {
+  return dwv.io.urlContentTypes.ArrayBuffer;
+};
+
+/**
+ * Handle a load start event.
+ * Default does nothing.
+ *
+ * @param {object} _event The load start event.
+ */
+dwv.io.MultipartLoader.prototype.onloadstart = function (_event) {};
+/**
+ * Handle a load progress event.
+ * Default does nothing.
+ *
+ * @param {object} _event The progress event.
+ */
+dwv.io.MultipartLoader.prototype.onprogress = function (_event) {};
+/**
+ * Handle a load item event.
+ * Default does nothing.
+ *
+ * @param {object} _event The load item event fired
+ *   when a file item has been loaded successfully.
+ */
+dwv.io.MultipartLoader.prototype.onloaditem = function (_event) {};
+/**
+ * Handle a load event.
+ * Default does nothing.
+ *
+ * @param {object} _event The load event fired
+ *   when a file has been loaded successfully.
+ */
+dwv.io.MultipartLoader.prototype.onload = function (_event) {};
+/**
+ * Handle an load end event.
+ * Default does nothing.
+ *
+ * @param {object} _event The load end event fired
+ *  when a file load has completed, successfully or not.
+ */
+dwv.io.MultipartLoader.prototype.onloadend = function (_event) {};
+/**
+ * Handle an error event.
+ * Default does nothing.
+ *
+ * @param {object} _event The error event.
+ */
+dwv.io.MultipartLoader.prototype.onerror = function (_event) {};
+/**
+ * Handle an abort event.
+ * Default does nothing.
+ *
+ * @param {object} _event The abort event.
+ */
+dwv.io.MultipartLoader.prototype.onabort = function (_event) {};
+
+/**
+ * Add to Loader list.
+ */
+dwv.io.loaderList = dwv.io.loaderList || [];
+dwv.io.loaderList.push('MultipartLoader');
 
 // namespaces
 var dwv = dwv || {};
@@ -20663,9 +21027,21 @@ dwv.io.RawImageLoader.prototype.canLoadFile = function (file) {
  * Check if the loader can load the provided url.
  *
  * @param {string} url The url to check.
+ * @param {object} options Optional url request options.
  * @returns {boolean} True if the url can be loaded.
  */
-dwv.io.RawImageLoader.prototype.canLoadUrl = function (url) {
+dwv.io.RawImageLoader.prototype.canLoadUrl = function (url, options) {
+  // if there are options.requestHeaders, just base check on them
+  if (typeof options !== 'undefined' &&
+    typeof options.requestHeaders !== 'undefined') {
+    // starts with 'image/'
+    var isImage = function (element) {
+      return element.name === 'Accept' &&
+        dwv.utils.startsWith(element.value, 'image/');
+    };
+    return typeof options.requestHeaders.find(isImage) !== 'undefined';
+  }
+
   var urlObjext = dwv.utils.getUrlFromUri(url);
   // extension
   var ext = dwv.utils.getFileExtension(urlObjext.pathname);
@@ -20680,6 +21056,19 @@ dwv.io.RawImageLoader.prototype.canLoadUrl = function (url) {
         (contentType === 'image/gif');
 
   return hasContentType ? hasImageContentType : hasImageExt;
+};
+
+/**
+ * Check if the loader can load the provided memory object.
+ *
+ * @param {object} mem The memory object.
+ * @returns {boolean} True if the object can be loaded.
+ */
+dwv.io.RawImageLoader.prototype.canLoadMemory = function (mem) {
+  if (typeof mem.filename !== 'undefined') {
+    return this.canLoadFile(mem.filename);
+  }
+  return false;
 };
 
 /**
@@ -20867,13 +21256,38 @@ dwv.io.RawVideoLoader.prototype.canLoadFile = function (file) {
  * Check if the loader can load the provided url.
  *
  * @param {string} url The url to check.
+ * @param {object} options Optional url request options.
  * @returns {boolean} True if the url can be loaded.
  */
-dwv.io.RawVideoLoader.prototype.canLoadUrl = function (url) {
+dwv.io.RawVideoLoader.prototype.canLoadUrl = function (url, options) {
+  // if there are options.requestHeaders, just base check on them
+  if (typeof options !== 'undefined' &&
+    typeof options.requestHeaders !== 'undefined') {
+    // starts with 'video/'
+    var isVideo = function (element) {
+      return element.name === 'Accept' &&
+        dwv.utils.startsWith(element.value, 'video/');
+    };
+    return typeof options.requestHeaders.find(isVideo) !== 'undefined';
+  }
+
   var urlObjext = dwv.utils.getUrlFromUri(url);
   var ext = dwv.utils.getFileExtension(urlObjext.pathname);
   return (ext === 'mp4') || (ext === 'ogg') ||
             (ext === 'webm');
+};
+
+/**
+ * Check if the loader can load the provided memory object.
+ *
+ * @param {object} mem The memory object.
+ * @returns {boolean} True if the object can be loaded.
+ */
+dwv.io.RawVideoLoader.prototype.canLoadMemory = function (mem) {
+  if (typeof mem.filename !== 'undefined') {
+    return this.canLoadFile(mem.filename);
+  }
+  return false;
 };
 
 /**
@@ -21004,7 +21418,7 @@ dwv.io.State = function () {
       version: '0.5',
       'window-center': viewController.getWindowLevel().center,
       'window-width': viewController.getWindowLevel().width,
-      position: [position.getX(), position.getY(), position.getZ()],
+      position: position.getValues(),
       scale: app.getAddedScale(),
       offset: app.getOffset(),
       drawings: drawLayer.getKonvaLayer().toObject(),
@@ -21049,9 +21463,7 @@ dwv.io.State = function () {
     // display
     viewController.setWindowLevel(
       data['window-center'], data['window-width']);
-    viewController.setCurrentPosition(
-      new dwv.math.Point3D(
-        data.position[0], data.position[1], data.position[2]), true);
+    viewController.setCurrentPosition(new dwv.math.Point(data.position));
     // apply saved scale on top of current base one
     var baseScale = app.getActiveLayerGroup().getBaseScale();
     var scale = null;
@@ -21341,8 +21753,8 @@ dwv.io.v01Tov02DrawingsAndDetails = function (inputDrawings) {
         if (drawGroup.name() === 'ruler-group') {
           quant = {
             length: {
-              value: parseFloat(textExpr.substr(0, txtLen - 2)),
-              unit: textExpr.substr(-2, 2)
+              value: parseFloat(textExpr.substring(0, txtLen - 2)),
+              unit: textExpr.substring(-2)
             }
           };
           textExpr = '{length}';
@@ -21350,8 +21762,8 @@ dwv.io.v01Tov02DrawingsAndDetails = function (inputDrawings) {
                     drawGroup.name() === 'rectangle-group') {
           quant = {
             surface: {
-              value: parseFloat(textExpr.substr(0, txtLen - 3)),
-              unit: textExpr.substr(-3, 3)
+              value: parseFloat(textExpr.substring(0, txtLen - 3)),
+              unit: textExpr.substring(-3)
             }
           };
           textExpr = '{surface}';
@@ -21359,8 +21771,8 @@ dwv.io.v01Tov02DrawingsAndDetails = function (inputDrawings) {
                     drawGroup.name() === 'rectangle-group') {
           quant = {
             angle: {
-              value: parseFloat(textExpr.substr(0, txtLen - 1)),
-              unit: textExpr.substr(-1, 1)
+              value: parseFloat(textExpr.substring(0, txtLen - 1)),
+              unit: textExpr.substring(-1)
             }
           };
           textExpr = '{angle}';
@@ -21753,7 +22165,7 @@ dwv.io.UrlsLoader = function () {
     var foundLoader = false;
     for (var l = 0; l < loaders.length; ++l) {
       loader = loaders[l];
-      if (loader.canLoadUrl(dataElement)) {
+      if (loader.canLoadUrl(dataElement, options)) {
         foundLoader = true;
         // load options
         loader.setOptions({
@@ -21821,7 +22233,7 @@ dwv.io.UrlsLoader = function () {
       dataElement = data[i];
 
       // check loader
-      if (!loader.canLoadUrl(dataElement)) {
+      if (!loader.canLoadUrl(dataElement, options)) {
         throw new Error('Input url of different type: ' + dataElement);
       }
       /**
@@ -22175,12 +22587,34 @@ dwv.io.ZipLoader.prototype.canLoadFile = function (file) {
  * Check if the loader can load the provided url.
  *
  * @param {string} url The url to check.
+ * @param {object} options Optional url request options.
  * @returns {boolean} True if the url can be loaded.
  */
-dwv.io.ZipLoader.prototype.canLoadUrl = function (url) {
+dwv.io.ZipLoader.prototype.canLoadUrl = function (url, options) {
+  // if there are options.requestHeaders, just base check on them
+  if (typeof options !== 'undefined' &&
+    typeof options.requestHeaders !== 'undefined') {
+    // starts with 'application/zip'
+    var isZip = function (element) {
+      return element.name === 'Accept' &&
+        dwv.utils.startsWith(element.value, 'application/zip');
+    };
+    return typeof options.requestHeaders.find(isZip) !== 'undefined';
+  }
+
   var urlObjext = dwv.utils.getUrlFromUri(url);
   var ext = dwv.utils.getFileExtension(urlObjext.pathname);
   return (ext === 'zip');
+};
+
+/**
+ * Check if the loader can load the provided memory object.
+ *
+ * @param {object} _mem The memory object.
+ * @returns {boolean} True if the object can be loaded.
+ */
+dwv.io.ZipLoader.prototype.canLoadMemory = function (_mem) {
+  return false;
 };
 
 /**
@@ -31678,8 +32112,9 @@ dwv.tool.ZoomAndPan = function (app) {
       // zoom mode
       var zoom = (lineRatio - 1) / 2;
       if (Math.abs(zoom) % 0.1 <= 0.05) {
-        var planePos = viewLayer.displayToPlanePos(event._x, event._y);
-        var center = viewController.getPositionFromPlanePoint(planePos);
+        var planePos = viewLayer.displayToMainPlanePos(
+          self.midPoint.getX(), self.midPoint.getY());
+        var center = viewController.getPlanePositionFromPlanePoint(planePos);
         layerGroup.addScale(zoom, center);
         layerGroup.draw();
       }
@@ -31756,7 +32191,7 @@ dwv.tool.ZoomAndPan = function (app) {
     var layerGroup = app.getLayerGroupById(layerDetails.groupId);
     var viewLayer = layerGroup.getActiveViewLayer();
     var viewController = viewLayer.getViewController();
-    var planePos = viewLayer.displayToPlanePos(event._x, event._y);
+    var planePos = viewLayer.displayToMainPlanePos(event._x, event._y);
     var center = viewController.getPlanePositionFromPlanePoint(planePos);
     layerGroup.addScale(step, center);
     layerGroup.draw();
@@ -31814,6 +32249,223 @@ dwv.tool.ZoomAndPan.prototype.init = function () {
 var dwv = dwv || {};
 dwv.utils = dwv.utils || {};
 
+/**
+ * Convert a Uint8Array to a string.
+ *
+ * @param {Uint8Array} arr The array to convert.
+ * @returns {string} The array as string.
+ */
+dwv.utils.uint8ArrayToString = function (arr) {
+  return String.fromCharCode.apply(String, arr);
+};
+
+/**
+ * Array find in a subset of the input array.
+ * Equivalent to: arr.slice(start, end).find(callbackFn)
+ *
+ * @param {Array} arr The input array to search.
+ * @param {Function} callbackFn The find function.
+ * @param {number} start The array start index.
+ * @param {number} end The array end index.
+ * @returns {number} The index where the element was found.
+ */
+dwv.utils.findInArraySubset = function (arr, callbackFn, start, end) {
+  // check inputs
+  if (typeof start === 'undefined' ||
+    start < 0 ||
+    start >= arr.length
+  ) {
+    start = 0;
+  }
+  if (typeof end === 'undefined' ||
+    end <= start ||
+    end > arr.length) {
+    end = arr.length;
+  }
+  // run
+  for (var i = start; i < end; ++i) {
+    if (callbackFn(arr[i], i, arr)) {
+      return i;
+    }
+  }
+  return;
+};
+
+/**
+ * Get a find in array callback.
+ *
+ * @param {Array} arr1 The array to find.
+ * @returns {Function} The find callback function.
+ */
+dwv.utils.getFindArrayInArrayCallback = function (arr1) {
+  return function (element, index, arr0) {
+    for (var i = 0; i < arr1.length; ++i) {
+      if (arr0[index + i] !== arr1[i]) {
+        return false;
+      }
+    }
+    return true;
+  };
+};
+
+/**
+ * Extract each element of a multipart ArrayBuffer.
+ * https://en.wikipedia.org/wiki/MIME#Multipart_messages
+ *
+ * @param {ArrayBuffer} arr The multipart array.
+ * @returns {Array} The multipart parts as an array of object as
+ *  {'Content-Type', ..., data} (depending on header tags)
+ */
+dwv.utils.parseMultipart = function (arr) {
+  var u8Array = new Uint8Array(arr);
+
+  var parts = [];
+  // check input
+  if (u8Array.length === 0) {
+    return parts;
+  }
+
+  // \r\n\r\n
+  var doubleReturnNew = new Uint8Array([0x0d, 0x0a, 0x0d, 0x0a]);
+  var partHeaderEndCb = dwv.utils.getFindArrayInArrayCallback(doubleReturnNew);
+
+  // look for boundary in first part header
+  var partHeaderEndIndex = dwv.utils.findInArraySubset(
+    u8Array, partHeaderEndCb, 0
+  );
+  if (typeof partHeaderEndIndex === 'undefined') {
+    throw new Error('Can\'t find the end of the first multipart header');
+  }
+  var firstPartHeader = u8Array.slice(0, partHeaderEndIndex);
+  // switch to string to use split
+  var lines = dwv.utils.uint8ArrayToString(firstPartHeader).split('\r\n');
+  // boundary should start with '--'
+  var boundaryStr;
+  for (var i = 0; i < lines.length; ++i) {
+    if (lines[i][0] === '-' && lines[i][1] === '-') {
+      boundaryStr = lines[i];
+      break;
+    }
+  }
+  if (typeof boundaryStr === 'undefined') {
+    throw new Error('Can\'t find the boundary between multi-parts');
+  }
+  var boundary = dwv.utils.stringToUint8Array(boundaryStr);
+  var boundaryCb = dwv.utils.getFindArrayInArrayCallback(boundary);
+  var boundaryLen = boundaryStr.length;
+
+  // skip mime header
+  var nextBoundaryIndex = dwv.utils.findInArraySubset(
+    u8Array, boundaryCb, 0
+  );
+
+  // loop through content
+  while (typeof partHeaderEndIndex !== 'undefined') {
+    var part = {};
+
+    // header
+    var partHeader = u8Array.slice(
+      nextBoundaryIndex + boundaryLen, partHeaderEndIndex);
+    // split into object
+    var partHeaderLines =
+      dwv.utils.uint8ArrayToString(partHeader).split('\r\n');
+    for (var l = 0; l < partHeaderLines.length; ++l) {
+      var line = partHeaderLines[l];
+      var semiColonIndex = line.indexOf(':');
+      if (semiColonIndex !== -1) {
+        var key = line.substring(0, semiColonIndex).trim();
+        var val = line.substring(semiColonIndex + 1).trim();
+        part[key] = val;
+      }
+    }
+
+    // find next boundary
+    nextBoundaryIndex = dwv.utils.findInArraySubset(
+      u8Array, boundaryCb, partHeaderEndIndex
+    );
+    // exit if none
+    if (typeof nextBoundaryIndex === 'undefined') {
+      break;
+    }
+
+    // get part
+    // partHeaderEndIndex plus the size of the '\r\n\r\n' separator
+    var dataBeginIndex = partHeaderEndIndex + 4;
+    // nextBoundaryIndex minus the previous '\r\n'
+    var dataEndIndex = nextBoundaryIndex - 2;
+    if (dataBeginIndex < dataEndIndex) {
+      part.data = u8Array.slice(dataBeginIndex, dataEndIndex).buffer;
+    } else {
+      part.data = new Uint8Array();
+    }
+
+    // store part
+    parts.push(part);
+
+    // find next part header end
+    partHeaderEndIndex = dwv.utils.findInArraySubset(
+      u8Array, partHeaderEndCb,
+      nextBoundaryIndex + boundaryLen
+    );
+  }
+
+  return parts;
+};
+
+/**
+ * Build a multipart message.
+ * See: https://en.wikipedia.org/wiki/MIME#Multipart_messages
+ * See: https://hg.orthanc-server.com/orthanc-dicomweb/file/tip/Resources/Samples/JavaScript/stow-rs.js
+ *
+ * @param {Array} parts The message parts as an array of object containing
+ *   content headers and messages as the data property (as returned by parse).
+ * @param {string} boundary The message boundary.
+ * @returns {Uint8Array} The full multipart message.
+ */
+dwv.utils.buildMultipart = function (parts, boundary) {
+  var lineBreak = '\r\n';
+  // build headers and calculate size
+  var partsSize = 0;
+  var headers = [];
+  for (var i = 0; i < parts.length; ++i) {
+    var headerStr = '--' + boundary + lineBreak;
+    var partKeys = Object.keys(parts[i]);
+    for (var k = 0; k < partKeys.length; ++k) {
+      var key = partKeys[k];
+      if (key !== 'data') {
+        headerStr += key + ': ' + parts[i][key] + lineBreak;
+      }
+    }
+    headerStr += lineBreak;
+    var header = dwv.utils.stringToUint8Array(headerStr);
+    headers.push(header);
+    partsSize += header.byteLength + parts[i].data.byteLength;
+  }
+  // build trailer
+  var trailerStr = '--' + boundary + '--' + lineBreak;
+  var trailer = dwv.utils.stringToUint8Array(trailerStr);
+
+  // final buffer
+  var buffer = new Uint8Array(partsSize + trailer.byteLength);
+  var offset = 0;
+  // concatenate parts
+  for (var j = 0; j < parts.length; ++j) {
+    buffer.set(headers[j], offset);
+    offset += headers[j].byteLength;
+    buffer.set(new Uint8Array(parts[j].data), offset);
+    offset += parts[j].data.byteLength;
+  }
+  // end buffer with trailer
+  buffer.set(trailer, offset);
+
+  // return
+  return buffer;
+};
+
+// namespaces
+var dwv = dwv || {};
+dwv.utils = dwv.utils || {};
+
 // example implementation: dcmtk/dcmiod/libsrc/cielabutil.cc
 // https://github.com/DCMTK/dcmtk/blob/DCMTK-3.6.6/dcmiod/libsrc/cielabutil.cc
 
@@ -31836,17 +32488,28 @@ dwv.utils.ybrToRgb = function (y, cb, cr) {
 };
 
 /**
- * Convert a hexadecimal colour to RGB.
+ * Convert a hex color into RGB.
  *
- * @param {string} hexColour The hexadecimal color as '#ab01ef'.
- * @returns {object} RGB equivalent as {r,g,b}.
+ * @param {string} hexStr The hex color as '#ab01ef'.
+ * @returns {object} The RGB values as {r,g,b}.
  */
-dwv.utils.hexToRgb = function (hexColour) {
+dwv.utils.hexToRgb = function (hexStr) {
   return {
-    r: parseInt(hexColour.substr(1, 2), 16),
-    g: parseInt(hexColour.substr(3, 2), 16),
-    b: parseInt(hexColour.substr(5, 2), 16)
+    r: parseInt(hexStr.substring(1, 3), 16),
+    g: parseInt(hexStr.substring(3, 5), 16),
+    b: parseInt(hexStr.substring(5, 7), 16)
   };
+};
+
+/**
+ * Convert RGB to its hex equivalent.
+ *
+ * @param {object} rgb The RGB object as {r,g,b}.
+ * @returns {string} A string representing the hex color as '#ab01ef'.
+ */
+dwv.utils.rgbToHex = function (rgb) {
+  return '#' +
+    ((1 << 24) + (rgb.r << 16) + (rgb.g << 8) + rgb.b).toString(16).slice(1);
 };
 
 /**
@@ -31923,7 +32586,7 @@ dwv.utils.labToUintLab = function (triplet) {
 };
 
 /**
- * CIE Standard Illuminant D65
+ * CIE Standard Illuminant D65, standard 2° observer.
  *
  * @see https://en.wikipedia.org/wiki/Illuminant_D65
  */
@@ -31999,7 +32662,7 @@ dwv.utils.ciexyzToCielab = function (triplet) {
 /**
  * Convert CIE XYZ to sRGB.
  *
- * @see https://en.wikipedia.org/wiki/SRGB#The_forward_transformation_(CIE_XYZ_to_sRGB)
+ * @see https://en.wikipedia.org/wiki/SRGB#From_CIE_XYZ_to_sRGB
  * @param {object} triplet CIE XYZ triplet as {x,y,z}.
  * @returns {object} sRGB triplet as {r,g,b}.
  */
@@ -32012,7 +32675,8 @@ dwv.utils.ciexyzToSrgb = function (triplet) {
       // 0.416666667 = 1 / 2.4
       res = 1.055 * Math.pow(x, 0.416666667) - 0.055;
     }
-    return res;
+    // clip [0,1]
+    return Math.min(1, Math.max(0, res));
   };
 
   var x = triplet.x / 100;
@@ -32029,7 +32693,7 @@ dwv.utils.ciexyzToSrgb = function (triplet) {
 /**
  * Convert sRGB to CIE XYZ.
  *
- * @see https://en.wikipedia.org/wiki/SRGB#The_forward_transformation_(CIE_XYZ_to_sRGB)
+ * @see https://en.wikipedia.org/wiki/SRGB#From_sRGB_to_CIE_XYZ
  * @param {object} triplet sRGB triplet as {r,g,b}.
  * @returns {object} CIE XYZ triplet as {x,y,z}.
  */
@@ -32371,9 +33035,11 @@ dwv.env.check = function () {
 
   // check string startsWith
   if (!String.prototype.startsWith) {
-    String.prototype.startsWith = function (search, pos) {
-      return this.substr(!pos || pos < 0 ? 0 : +pos, search.length) === search;
-    };
+    Object.defineProperty(String.prototype, 'startsWith', {
+      value: function (search, rawPos) {
+        return dwv.utils.startsWith(this, search, rawPos);
+      }
+    });
   }
 };
 
@@ -32546,7 +33212,7 @@ dwv.i18nPage = function () {
  * @returns {string} The path to the locale resource.
  */
 dwv.i18nGetLocalePath = function (filename) {
-  var lng = i18next.language.substr(0, 2);
+  var lng = i18next.language.substring(0, 2);
   return dwv.i18nLocalesPath +
         '/locales/' + lng + '/' + filename;
 };
@@ -32559,7 +33225,7 @@ dwv.i18nGetLocalePath = function (filename) {
  * @returns {string} The path to the locale resource.
  */
 dwv.i18nGetFallbackLocalePath = function (filename) {
-  var lng = i18next.languages[i18next.languages.length - 1].substr(0, 2);
+  var lng = i18next.languages[i18next.languages.length - 1].substring(0, 2);
   return dwv.i18nLocalesPath +
         '/locales/' + lng + '/' + filename;
 };
@@ -33802,18 +34468,36 @@ dwv.utils.capitaliseFirstLetter = function (string) {
 };
 
 /**
+ * Check if a string starts with the input element.
+ *
+ * @param {string} str The input string.
+ * @param {string} search The searched start.
+ * @param {number} rawPos The position in this string at which to begin
+ *  searching for searchString. Defaults to 0.
+ * @returns {boolean} True if the input string starts with the searched string.
+ */
+dwv.utils.startsWith = function (str, search, rawPos) {
+  if (typeof str === 'undefined' || str === null ||
+    typeof search === 'undefined' || search === null) {
+    return false;
+  }
+  var pos = rawPos > 0 ? rawPos | 0 : 0;
+  return str.substring(pos, pos + search.length) === search;
+};
+
+/**
  * Check if a string ends with the input element.
  *
  * @param {string} str The input string.
- * @param {string} end The searched ending.
- * @returns {boolean} True if the input string ends with the seached ending.
+ * @param {string} search The searched ending.
+ * @returns {boolean} True if the input string ends with the searched string.
  */
-dwv.utils.endsWith = function (str, end) {
+dwv.utils.endsWith = function (str, search) {
   if (typeof str === 'undefined' || str === null ||
-        typeof end === 'undefined' || end === null) {
+    typeof search === 'undefined' || search === null) {
     return false;
   }
-  return str.substr(str.length - end.length) === end;
+  return str.substring(str.length - search.length) === search;
 };
 
 /**
@@ -33993,6 +34677,20 @@ dwv.utils.getFileExtension = function (filePath) {
     }
   }
   return ext;
+};
+
+/**
+ * Convert a string to a Uint8Array.
+ *
+ * @param {string} str The string to convert.
+ * @returns {Uint8Array} The Uint8Array.
+ */
+dwv.utils.stringToUint8Array = function (str) {
+  var arr = new Uint8Array(str.length);
+  for (var i = 0, leni = str.length; i < leni; i++) {
+    arr[i] = str.charCodeAt(i);
+  }
+  return arr;
 };
 
 // namespaces
@@ -34370,13 +35068,13 @@ dwv.utils.splitUri = function (uri) {
   var sepIndex = null;
   if (uri && (sepIndex = uri.indexOf('?')) !== -1) {
     // base: before the '?'
-    result.base = uri.substr(0, sepIndex);
+    result.base = uri.substring(0, sepIndex);
     // query : after the '?' and until possible '#'
     var hashIndex = uri.indexOf('#');
     if (hashIndex === -1) {
       hashIndex = uri.length;
     }
-    var query = uri.substr(sepIndex + 1, (hashIndex - 1 - sepIndex));
+    var query = uri.substring(sepIndex + 1, hashIndex);
     // split key/value pairs of the query
     result.query = dwv.utils.splitKeyValueString(query);
   }
@@ -34409,16 +35107,19 @@ dwv.utils.getUriQuery = function (uri) {
  * or encoded URI with base and key value/pairs:
  *   [dwv root]?input=encodeURIComponent([root]?key0=value0&key1=value1)
  *
- *  @param {string} query The query part to the input URI.
- *  @param {Function} callback The function to call with the decoded file urls.
+ * @param {string} query The query part to the input URI.
+ * @param {Function} callback The function to call with the decoded file urls.
+ * @param {object} options Optional url request options.
  */
-dwv.utils.decodeQuery = function (query, callback) {
+dwv.utils.decodeQuery = function (query, callback, options) {
   // manifest
   if (query.type && query.type === 'manifest') {
     dwv.utils.decodeManifestQuery(query, callback);
   } else {
     // default case: encoded URI with base and key/value pairs
-    callback(dwv.utils.decodeKeyValueUri(query.input, query.dwvReplaceMode));
+    callback(
+      dwv.utils.decodeKeyValueUri(query.input, query.dwvReplaceMode),
+      options);
   }
 };
 
@@ -34591,12 +35292,13 @@ dwv.utils.decodeManifest = function (manifest, nslices) {
  *
  * @param {string} uri The input uri, for example: 'window.location.href'.
  * @param {dwv.App} app The associated app that handles the load.
+ * @param {object} options Optional url request options.
  */
-dwv.utils.loadFromUri = function (uri, app) {
+dwv.utils.loadFromUri = function (uri, app, options) {
   var query = dwv.utils.getUriQuery(uri);
   // check query
   if (query && typeof query.input !== 'undefined') {
-    dwv.utils.loadFromQuery(query, app);
+    dwv.utils.loadFromQuery(query, app, options);
   }
   // no else to allow for empty uris
 };
@@ -34606,10 +35308,11 @@ dwv.utils.loadFromUri = function (uri, app) {
  *
  * @param {object} query A query derived from an uri.
  * @param {object} app The associated app that handles the load.
+ * @param {object} options Optional url request options.
  */
-dwv.utils.loadFromQuery = function (query, app) {
+dwv.utils.loadFromQuery = function (query, app, options) {
   // load base
-  dwv.utils.decodeQuery(query, app.loadURLs);
+  dwv.utils.decodeQuery(query, app.loadURLs, options);
   // optional display state
   if (typeof query.state !== 'undefined') {
     var onLoadEnd = function (/*event*/) {

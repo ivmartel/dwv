@@ -36,6 +36,61 @@ QUnit.test('Test CapitaliseFirstLetter.', function (assert) {
 });
 
 /**
+ * Tests for {@link dwv.utils.startsWith}.
+ *
+ * @function module:tests/utils~startsWith
+ */
+QUnit.test('Test StartsWith.', function (assert) {
+  // undefined
+  assert.equal(dwv.utils.startsWith(), false, 'StartsWith undefined');
+  assert.equal(
+    dwv.utils.startsWith('test'),
+    false, 'StartsWith start undefined');
+  // null
+  assert.equal(dwv.utils.startsWith(null), false, 'StartsWith null');
+  assert.equal(
+    dwv.utils.startsWith('test', null),
+    false, 'StartsWith start null');
+  // empty
+  assert.equal(dwv.utils.startsWith('', ''), true, 'StartsWith empty');
+  assert.equal(
+    dwv.utils.startsWith('test', ''),
+    true, 'StartsWith start empty');
+  // short
+  assert.equal(dwv.utils.startsWith('a', 'a'), true, 'StartsWith one letter');
+  assert.equal(
+    dwv.utils.startsWith('a', 'A'),
+    false,
+    'StartsWith one letter case sensitive');
+  // start bigger than input
+  assert.equal(
+    dwv.utils.startsWith('a', 'aba'),
+    false, 'StartsWith large start');
+  // space
+  assert.equal(
+    dwv.utils.startsWith(' test', ' '),
+    true, 'StartsWith start space');
+  assert.equal(
+    dwv.utils.startsWith(' test', 'a'),
+    false, 'StartsWith with space');
+  // regular
+  assert.equal(
+    dwv.utils.startsWith('Winter is coming.', 'W'), true, 'StartsWith test#0');
+  assert.equal(
+    dwv.utils.startsWith('Winter is coming.', 'Winter'),
+    true, 'StartsWith test#1');
+  assert.equal(
+    dwv.utils.startsWith('Winter is coming.', 'WINT'),
+    false, 'StartsWith test#2');
+  assert.equal(
+    dwv.utils.startsWith('Winter is coming.', 'Winter is'),
+    true, 'StartsWith test#3');
+  assert.equal(
+    dwv.utils.startsWith('Winter is coming.', 'Winter is coming.'),
+    true, 'StartsWith test#4');
+});
+
+/**
  * Tests for {@link dwv.utils.endsWith}.
  *
  * @function module:tests/utils~endsWith

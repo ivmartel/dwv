@@ -9,7 +9,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.0-beta';
+  return '0.31.0-beta.0';
 };
 
 /**
@@ -123,7 +123,7 @@ dwv.dicom.getReverseOrientation = function (ori) {
 
   var rori = '';
   for (var n = 0; n < ori.length; n++) {
-    var o = ori.substr(n, 1);
+    var o = ori.substring(n, n + 1);
     var r = rlabels[o];
     if (r) {
       rori += r;
@@ -337,7 +337,7 @@ dwv.dicom.guessTransferSyntax = function (firstDataElement) {
     group !== oEightGroupLittleEndian) {
     throw new Error(
       'Not a valid DICOM file (no magic DICM word found' +
-        'and first element not in 0x0008 group)'
+        ' and first element not in 0x0008 group)'
     );
   }
   // reasonable assumption: 2 uppercase characters => explicit vr
@@ -905,9 +905,9 @@ dwv.dicom.DicomParser.prototype.interpretElement = function (
       var stri = raw[i].toString(16);
       var stri1 = raw[i + 1].toString(16);
       var str = '(';
-      str += '0000'.substr(0, 4 - stri.length) + stri.toUpperCase();
+      str += '0000'.substring(0, 4 - stri.length) + stri.toUpperCase();
       str += ',';
-      str += '0000'.substr(0, 4 - stri1.length) + stri1.toUpperCase();
+      str += '0000'.substring(0, 4 - stri1.length) + stri1.toUpperCase();
       str += ')';
       data.push(str);
     }
