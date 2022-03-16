@@ -29,10 +29,12 @@ str10 += '\r\n';
 str10 += '@22X222Y\r\n';
 str10 += '222Z\r222W\n2220\r\n';
 str10 += '666@\r\n';
+str10 += '\r\n';
 str10 += '------WebKitFormBoundaryvef1fLxmoUdYZWXp\r\n';
 str10 += 'Content-Disposition: form-data; name="input1"\r\n';
 str10 += '\r\n';
 str10 += 'value1\r\n';
+str10 += '\r\n';
 str10 += '------WebKitFormBoundaryvef1fLxmoUdYZWXp--\r\n';
 
 /* eslint-disable array-element-newline */
@@ -45,8 +47,7 @@ var multipart10 = {
       data: new Uint8Array([
         64, 49, 49, 88, 49, 49, 49, 89, 13, 10,
         49, 49, 49, 90, 13, 67, 67, 67, 67, 10, 67, 67, 67, 67, 13, 10,
-        67, 67, 67, 67, 67, 64, 13, 10,
-        13, 10
+        67, 67, 67, 67, 67, 64, 13, 10
       ])
     },
     {

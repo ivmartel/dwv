@@ -181,7 +181,11 @@ dwv.utils.buildMultipart = function (parts, boundary) {
   var partsSize = 0;
   var headers = [];
   for (var i = 0; i < parts.length; ++i) {
-    var headerStr = '--' + boundary + lineBreak;
+    var headerStr = '';
+    if (i !== 0) {
+      headerStr += lineBreak;
+    }
+    headerStr += '--' + boundary + lineBreak;
     var partKeys = Object.keys(parts[i]);
     for (var k = 0; k < partKeys.length; ++k) {
       var key = partKeys[k];
@@ -195,7 +199,7 @@ dwv.utils.buildMultipart = function (parts, boundary) {
     partsSize += header.byteLength + parts[i].data.byteLength;
   }
   // build trailer
-  var trailerStr = '--' + boundary + '--' + lineBreak;
+  var trailerStr = lineBreak + '--' + boundary + '--' + lineBreak;
   var trailer = dwv.utils.stringToUint8Array(trailerStr);
 
   // final buffer
