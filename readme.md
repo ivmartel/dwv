@@ -32,27 +32,15 @@ yarn run test
 
 ## Available Scripts
 
-``` bash
-# install dependencies
-yarn install
+ - `ìnstall`: install dependencies
+ - `lint`: run code linting
+ - `test`: opens a web page with test pages and karmas' results (with live reload)
+ - `test-ci`: one shot test run
+ - `build`: create release files
+ - `doc`: create documentation
+ - `dev`: watch for changes and copy build (to be connected with a demo viewer)
 
-# run linting
-yarn run lint
-
-# run unit tests with hot reload at localhost:8080
-yarn run test
-
-# create release files
-yarn run build
-
-# create documentation
-yarn run doc
-
-# watch for changes and copy build (to be connected with a demo viewer)
-yarn run dev
-```
-
-Using `yarn` as the main package manager. Best to use it to install since
+I'm using `yarn` as the main package manager. Best to use it to install since
 the lock file (that contains the exact dependency tree) is a yarn file.
 All scripts also work with `npm`.
 
