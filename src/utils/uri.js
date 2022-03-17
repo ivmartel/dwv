@@ -339,8 +339,10 @@ dwv.utils.loadFromQuery = function (query, app, options) {
   dwv.utils.decodeQuery(query, app.loadURLs, options);
   // optional display state
   if (typeof query.state !== 'undefined') {
+    // queue after main data load
     var onLoadEnd = function (/*event*/) {
-      app.loadURLs(query.state);
+      app.removeEventListener('loadend', onLoadEnd);
+      app.loadURLs([query.state]);
     };
     app.addEventListener('loadend', onLoadEnd);
   }
