@@ -49,11 +49,20 @@ dwv.image.DicomBufferToView = function () {
    * @param {string} origin The data origin.
    */
   function generateImage(index, origin) {
+    var dicomElements = dicomParserStore[index].getDicomElements();
+
+    var modality = dwv.dicom.cleanString(dicomElements.getFromKey('x00080060'));
+    var factory;
+    if (modality && modality === 'SEG') {
+      factory = new dwv.image.MaskFactory();
+    } else {
+      factory = new dwv.image.ImageFactory();
+    }
+
     // create the image
     try {
-      var imageFactory = new dwv.ImageFactory();
-      var image = imageFactory.create(
-        dicomParserStore[index].getDicomElements(),
+      var image = factory.create(
+        dicomElements,
         finalBufferStore[index],
         options.numberOfFiles);
       // call onloaditem

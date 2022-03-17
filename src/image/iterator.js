@@ -210,10 +210,10 @@ dwv.image.rangeRegions = function (
  * @param {boolean} isPlanar A flag to know if the data is planar
  *   (RRRR...GGGG...BBBB...) or not (RGBRGBRGBRGB...), defaults to false.
  * @returns {object} A 3 components iterator folowing the iterator and iterable
- *   protocol, with extra 'value1' and 'value2' for the second and
- *   third component.
+ *   protocol, the value is an array of size 3 with each component.
  */
-dwv.image.range3d = function (dataAccessor, start, end, increment, isPlanar) {
+dwv.image.simpleRange3d = function (
+  dataAccessor, start, end, increment, isPlanar) {
   if (typeof increment === 'undefined') {
     increment = 1;
   }
@@ -250,6 +250,84 @@ dwv.image.range3d = function (dataAccessor, start, end, increment, isPlanar) {
       return {
         done: true,
         index: [end]
+      };
+    }
+  };
+};
+
+/**
+ * Get an iterator for a given range for a 3 components data.
+ *
+ * Using 'maxIter' and not an 'end' index since it fails in some edge cases
+ * (for ex coronal2, ie zxy)
+ *
+ * @param {Function} dataAccessor Function to access data.
+ * @param {number} start Zero-based index at which to start the iteration.
+ * @param {number} maxIter The maximum number of iterations.
+ * @param {number} increment Increment between indicies.
+ * @param {number} blockMaxIter Number of applied increment after which
+ *   blockIncrement is applied.
+ * @param {number} blockIncrement Increment after blockMaxIter is reached,
+ *   the value is from block start to the next block start.
+ * @param {boolean} reverse1 If true, loop from end to start.
+ *   WARN: don't forget to set the value of start as the last index!
+ * @param {boolean} reverse2 If true, loop from block end to block start.
+ * @param {boolean} isPlanar A flag to know if the data is planar
+ *   (RRRR...GGGG...BBBB...) or not (RGBRGBRGBRGB...), defaults to false.
+ * @returns {object} An iterator folowing the iterator and iterable protocol.
+ */
+dwv.image.range3d = function (dataAccessor, start, maxIter, increment,
+  blockMaxIter, blockIncrement, reverse1, reverse2, isPlanar) {
+  var iters = [];
+  if (isPlanar) {
+    iters.push(dwv.image.range(
+      dataAccessor, start, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+    iters.push(dwv.image.range(
+      dataAccessor, start + maxIter * increment, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+    iters.push(dwv.image.range(
+      dataAccessor, start + 2 * maxIter * increment, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+  } else {
+    increment *= 3;
+    blockIncrement *= 3;
+    iters.push(dwv.image.range(
+      dataAccessor, start, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+    iters.push(dwv.image.range(
+      dataAccessor, start + 1, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+    iters.push(dwv.image.range(
+      dataAccessor, start + 2, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+  }
+
+  // result
+  return {
+    next: function () {
+      var r0 = iters[0].next();
+      var r1 = iters[1].next();
+      var r2 = iters[2].next();
+      if (!r0.done) {
+        return {
+          value: [
+            r0.value,
+            r1.value,
+            r2.value
+          ],
+          done: false
+        };
+      }
+      return {
+        done: true,
+        index: r2.index
       };
     }
   };
@@ -316,70 +394,82 @@ dwv.image.getSliceIterator = function (
   var nslices = size.get(2);
   var sliceSize = size.getDimSize(2);
 
+  var ncomp = image.getNumberOfComponents();
+  var isPlanar = image.getPlanarConfiguration() === 1;
+  var getRange = function (
+    dataAccessor, start, maxIter, increment,
+    blockMaxIter, blockIncrement, reverse1, reverse2) {
+    if (ncomp === 1) {
+      return dwv.image.range(dataAccessor, start, maxIter, increment,
+        blockMaxIter, blockIncrement, reverse1, reverse2);
+    } else if (ncomp === 3) {
+      return dwv.image.range3d(dataAccessor, 3 * start, maxIter, increment,
+        blockMaxIter, blockIncrement, reverse1, reverse2, isPlanar);
+    }
+  };
+
   var range = null;
-  if (image.getNumberOfComponents() === 1) {
-    if (viewOrientation && typeof viewOrientation !== 'undefined') {
-      var dirMax0 = viewOrientation.getColAbsMax(0);
-      var dirMax2 = viewOrientation.getColAbsMax(2);
+  if (viewOrientation && typeof viewOrientation !== 'undefined') {
+    var dirMax0 = viewOrientation.getColAbsMax(0);
+    var dirMax2 = viewOrientation.getColAbsMax(2);
 
-      // default reverse
-      var reverse1 = false;
-      var reverse2 = false;
+    // default reverse
+    var reverse1 = false;
+    var reverse2 = false;
 
-      var maxIter = null;
-      if (dirMax2.index === 2) {
-        // axial
-        maxIter = ncols * nrows;
-        if (dirMax0.index === 0) {
-          // xyz
-          range = dwv.image.range(dataAccessor,
-            start, maxIter, 1, ncols, ncols, reverse1, reverse2);
-        } else {
-          // yxz
-          range = dwv.image.range(dataAccessor,
-            start, maxIter, ncols, nrows, 1, reverse1, reverse2);
-        }
-      } else if (dirMax2.index === 0) {
-        // sagittal
-        maxIter = nslices * nrows;
-        if (dirMax0.index === 1) {
-          // yzx
-          range = dwv.image.range(dataAccessor,
-            start, maxIter, ncols, nrows, sliceSize, reverse1, reverse2);
-        } else {
-          // zyx
-          range = dwv.image.range(dataAccessor,
-            start, maxIter, sliceSize, nslices, ncols, reverse1, reverse2);
-        }
-      } else if (dirMax2.index === 1) {
-        // coronal
-        maxIter = nslices * ncols;
-        if (dirMax0.index === 0) {
-          // xzy
-          range = dwv.image.range(dataAccessor,
-            start, maxIter, 1, ncols, sliceSize, reverse1, reverse2);
-        } else {
-          // zxy
-          range = dwv.image.range(dataAccessor,
-            start, maxIter, sliceSize, nslices, 1, reverse1, reverse2);
-        }
+    var maxIter = null;
+    if (dirMax2.index === 2) {
+      // axial
+      maxIter = ncols * nrows;
+      if (dirMax0.index === 0) {
+        // xyz
+        range = getRange(dataAccessor,
+          start, maxIter, 1, ncols, ncols, reverse1, reverse2);
       } else {
-        throw new Error('Unknown direction: ' + dirMax2.index);
+        // yxz
+        range = getRange(dataAccessor,
+          start, maxIter, ncols, nrows, 1, reverse1, reverse2);
+      }
+    } else if (dirMax2.index === 0) {
+      // sagittal
+      maxIter = nslices * nrows;
+      if (dirMax0.index === 1) {
+        // yzx
+        range = getRange(dataAccessor,
+          start, maxIter, ncols, nrows, sliceSize, reverse1, reverse2);
+      } else {
+        // zyx
+        range = getRange(dataAccessor,
+          start, maxIter, sliceSize, nslices, ncols, reverse1, reverse2);
+      }
+    } else if (dirMax2.index === 1) {
+      // coronal
+      maxIter = nslices * ncols;
+      if (dirMax0.index === 0) {
+        // xzy
+        range = getRange(dataAccessor,
+          start, maxIter, 1, ncols, sliceSize, reverse1, reverse2);
+      } else {
+        // zxy
+        range = getRange(dataAccessor,
+          start, maxIter, sliceSize, nslices, 1, reverse1, reverse2);
       }
     } else {
-      // default case
-      range = dwv.image.simpleRange(dataAccessor, start, start + sliceSize);
+      throw new Error('Unknown direction: ' + dirMax2.index);
     }
-  } else if (image.getNumberOfComponents() === 3) {
-    // 3 times bigger...
-    start *= 3;
-    sliceSize *= 3;
-    var isPlanar = image.getPlanarConfiguration() === 1;
-    range = dwv.image.range3d(
-      dataAccessor, start, start + sliceSize, 1, isPlanar);
   } else {
-    throw new Error('Unsupported number of components: ' +
-      image.getNumberOfComponents());
+    if (image.getNumberOfComponents() === 1) {
+      range = dwv.image.simpleRange(dataAccessor, start, start + sliceSize);
+    } else if (image.getNumberOfComponents() === 3) {
+      // 3 times bigger...
+      start *= 3;
+      sliceSize *= 3;
+      range = dwv.image.simpleRange3d(
+        dataAccessor, start, start + sliceSize, 1, isPlanar);
+    } else {
+      throw new Error('Unsupported number of components: ' +
+        image.getNumberOfComponents());
+    }
   }
 
   return range;

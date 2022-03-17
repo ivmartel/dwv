@@ -513,6 +513,26 @@ dwv.dicom.DicomElementsWrapper.prototype.getFromName = function (name) {
 };
 
 /**
+ * Extract a size from dicom elements.
+ *
+ * @returns {object} The size.
+ */
+dwv.dicom.DicomElementsWrapper.prototype.getImageSize = function () {
+  // rows
+  var rows = this.getFromKey('x00280010');
+  if (!rows) {
+    throw new Error('Missing or empty DICOM image number of rows');
+  }
+  // columns
+  var columns = this.getFromKey('x00280011');
+  if (!columns) {
+    throw new Error('Missing or empty DICOM image number of columns');
+  }
+  return new dwv.image.Size([columns, rows, 1]);
+};
+
+
+/**
  * Get the pixel spacing from the different spacing tags.
  *
  * @returns {object} The read spacing or the default [1,1].

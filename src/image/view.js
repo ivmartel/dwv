@@ -435,16 +435,28 @@ dwv.image.View = function (image) {
       silent = false;
     }
 
-    // check if possible
     var geometry = image.getGeometry();
+    var posIndex = geometry.worldToIndex(newPosition);
+
+    // check if possible
     if (!geometry.isInBounds(newPosition)) {
+      if (!silent) {
+        // fire event with valid: false
+        fireEvent({
+          type: 'positionchange',
+          value: [
+            posIndex.getValues(),
+            newPosition.getValues(),
+          ],
+          valid: false
+        });
+      }
       return false;
     }
 
     var isNew = !currentPosition || !currentPosition.equals(newPosition);
 
     if (isNew) {
-      var posIndex = geometry.worldToIndex(newPosition);
       var diffDims = null;
       if (currentPosition) {
         if (currentPosition.canCompare(newPosition)) {
@@ -517,7 +529,11 @@ dwv.image.View = function (image) {
    */
   this.setCurrentIndex = function (index, silent) {
     var geometry = this.getImage().getGeometry();
-    return this.setCurrentPosition(geometry.indexToWorld(index), silent);
+    var position = geometry.indexToWorld(index);
+    if (!geometry.isInBounds(position)) {
+      return false;
+    }
+    return this.setCurrentPosition(position, silent);
   };
 
   /**
@@ -781,8 +797,7 @@ dwv.image.View.prototype.incrementIndex = function (dim, silent) {
   }
   var incr = new dwv.math.Index(values);
   var newIndex = index.add(incr);
-  var geometry = this.getImage().getGeometry();
-  return this.setCurrentPosition(geometry.indexToWorld(newIndex), silent);
+  return this.setCurrentIndex(newIndex, silent);
 };
 
 /**
@@ -803,8 +818,7 @@ dwv.image.View.prototype.decrementIndex = function (dim, silent) {
   }
   var incr = new dwv.math.Index(values);
   var newIndex = index.add(incr);
-  var geometry = this.getImage().getGeometry();
-  return this.setCurrentPosition(geometry.indexToWorld(newIndex), silent);
+  return this.setCurrentIndex(newIndex, silent);
 };
 
 /**
