@@ -48,6 +48,14 @@ dwv.gui.ViewLayer = function (containerDiv) {
   var context = null;
 
   /**
+   * Flag to know if the context has been cleared.
+   *
+   * @private
+   * @type {boolean}
+   */
+  var isContextClear = true;
+
+  /**
    * The image data array.
    *
    * @private
@@ -395,14 +403,8 @@ dwv.gui.ViewLayer = function (containerDiv) {
     // context opacity
     context.globalAlpha = opacity;
 
-    // clear the context: reset the transform first
-    // store the current transformation matrix
-    context.save();
-    // use the identity matrix while clearing the canvas
-    context.setTransform(1, 0, 0, 1, 0, 0);
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    // restore the transform
-    context.restore();
+    // clear context
+    this.clear();
 
     // draw the cached canvas on the context
     // transform takes as input a, b, c, d, e, f to create
@@ -423,6 +425,9 @@ dwv.gui.ViewLayer = function (containerDiv) {
     context.imageSmoothingEnabled = false;
     // draw image
     context.drawImage(offscreenCanvas, 0, 0);
+
+    // set clear flag
+    isContextClear = false;
 
     /**
      * Render end event.
@@ -618,6 +623,11 @@ dwv.gui.ViewLayer = function (containerDiv) {
   function onPositionChange(event) {
     if (typeof event.skipGenerate === 'undefined' ||
       event.skipGenerate === false) {
+      // clear for non valid events
+      if (typeof event.valid !== 'undefined' && !event.valid) {
+        self.clear();
+        return;
+      }
       // 3D dimensions
       var dims3D = [0, 1, 2];
       // remove scroll index
@@ -660,12 +670,22 @@ dwv.gui.ViewLayer = function (containerDiv) {
   };
 
   /**
-   * Clear the context and reset the image data.
+   * Clear the context.
    */
   this.clear = function () {
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-    this.resetLayout();
+    if (!isContextClear) {
+      // clear the context: reset the transform first
+      // store the current transformation matrix
+      context.save();
+      // use the identity matrix while clearing the canvas
+      context.setTransform(1, 0, 0, 1, 0, 0);
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      // restore the transform
+      context.restore();
+
+      // update clear flag
+      isContextClear = true;
+    }
   };
 
   /**
