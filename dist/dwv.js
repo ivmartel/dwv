@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-beta.0 2022-03-11 16:27:12 */
+/*! dwv 0.31.0-beta.1 2022-03-17 17:17:41 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -627,9 +627,9 @@ dwv.App = function () {
       // initialise or add view
       if (layerGroup.getViewLayersByDataIndex(dataIndex).length === 0) {
         if (layerGroup.getNumberOfLayers() === 0) {
-          initialiseBaseLayers(dataIndex, config.divId);
+          initialiseBaseLayers(dataIndex, config);
         } else {
-          addViewLayer(dataIndex, config.divId);
+          addViewLayer(dataIndex, config);
         }
       }
       // draw
@@ -1210,25 +1210,12 @@ dwv.App = function () {
    * To be called once the DICOM data has been loaded.
    *
    * @param {number} dataIndex The data index.
-   * @param {string} layerGroupElementId The layer group element id.
+   * @param {object} dataViewConfig The data view config.
    * @private
    */
-  function initialiseBaseLayers(dataIndex, layerGroupElementId) {
-    var data = dataController.get(dataIndex);
-    if (!data) {
-      throw new Error('Cannot initialise layers with data id: ' + dataIndex);
-    }
-    var layerGroup = stage.getLayerGroupWithElementId(layerGroupElementId);
-    if (!layerGroup) {
-      throw new Error('Cannot initialise layers with group id: ' +
-        layerGroupElementId);
-    }
-
+  function initialiseBaseLayers(dataIndex, dataViewConfig) {
     // add layers
-    addViewLayer(dataIndex, layerGroupElementId);
-
-    // update style
-    //style.setBaseScale(layerGroup.getBaseScale());
+    addViewLayer(dataIndex, dataViewConfig);
 
     // initialise the toolbox
     if (toolboxController) {
@@ -1270,17 +1257,17 @@ dwv.App = function () {
    * Add a view layer.
    *
    * @param {number} dataIndex The data index.
-   * @param {string} layerGroupElementId The layer group element id.
+   * @param {object} dataViewConfig The data view config.
    */
-  function addViewLayer(dataIndex, layerGroupElementId) {
+  function addViewLayer(dataIndex, dataViewConfig) {
     var data = dataController.get(dataIndex);
     if (!data) {
-      throw new Error('Cannot initialise layers with data id: ' + dataIndex);
+      throw new Error('Cannot initialise layer with data id: ' + dataIndex);
     }
-    var layerGroup = stage.getLayerGroupWithElementId(layerGroupElementId);
+    var layerGroup = stage.getLayerGroupWithElementId(dataViewConfig.divId);
     if (!layerGroup) {
-      throw new Error('Cannot initialise layers with group id: ' +
-        layerGroupElementId);
+      throw new Error('Cannot initialise layer with group id: ' +
+        dataViewConfig.divId);
     }
     var imageGeometry = data.image.getGeometry();
 
@@ -1298,11 +1285,34 @@ dwv.App = function () {
     );
     view.setOrientation(viewOrientation);
 
-    // TODO: find another way for a default colour map
+    // make pixel of value 0 transparent for segmentation
+    // (assuming RGB data)
+    if (data.image.getMeta().Modality === 'SEG') {
+      view.setAlphaFunction(function (value) {
+        if (value[0] === 0 &&
+          value[1] === 0 &&
+          value[2] === 0) {
+          return 1;
+        } else {
+          return 0xff;
+        }
+      });
+    }
+
+    // colour map
+    if (typeof dataViewConfig.colourMap !== 'undefined') {
+      view.setColourMap(dataViewConfig.colourMap);
+    }
+
+    // opacity
     var opacity = 1;
-    if (dataIndex !== 0) {
-      view.setColourMap(dwv.image.lut.rainbow);
+    // do we have more than one layer
+    if (layerGroup.getNumberOfLayers() !== 0) {
       opacity = 0.5;
+      // set color map if non was provided
+      if (typeof dataViewConfig.colourMap === 'undefined') {
+        view.setColourMap(dwv.image.lut.rainbow);
+      }
     }
 
     // view layer
@@ -1316,11 +1326,14 @@ dwv.App = function () {
     // compensate origin difference
     var diff = null;
     if (dataIndex !== 0) {
+      // offset from the top, use first origin
       var data0 = dataController.get(0);
-      var origin0 = data0.image.getGeometry().getOrigin();
-      var origin1 = imageGeometry.getOrigin();
+      var origin0 = data0.image.getGeometry().getOrigins()[0];
+      var origin1 = imageGeometry.getOrigins()[0];
       diff = origin0.minus(origin1);
-      viewLayer.setBaseOffset(diff);
+      // TODO: check why -z...
+      viewLayer.setBaseOffset(new dwv.math.Vector3D(
+        diff.getX(), diff.getY(), -1 * diff.getZ()));
     }
 
     // listen to image changes
@@ -2744,9 +2757,11 @@ dwv.ctrl.ViewController = function (view) {
    * Generate display image data to be given to a canvas.
    *
    * @param {Array} array The array to fill in.
+   * @param {dwv.math.Point} position Optional position at which to generate,
+   *   otherwise generates at current position.
    */
-  this.generateImageData = function (array) {
-    view.generateImageData(array);
+  this.generateImageData = function (array, position) {
+    view.generateImageData(array, position);
   };
 
   /**
@@ -4354,6 +4369,26 @@ dwv.dicom.DicomElementsWrapper.prototype.getFromName = function (name) {
 };
 
 /**
+ * Extract a size from dicom elements.
+ *
+ * @returns {object} The size.
+ */
+dwv.dicom.DicomElementsWrapper.prototype.getImageSize = function () {
+  // rows
+  var rows = this.getFromKey('x00280010');
+  if (!rows) {
+    throw new Error('Missing or empty DICOM image number of rows');
+  }
+  // columns
+  var columns = this.getFromKey('x00280011');
+  if (!columns) {
+    throw new Error('Missing or empty DICOM image number of columns');
+  }
+  return new dwv.image.Size([columns, rows, 1]);
+};
+
+
+/**
  * Get the pixel spacing from the different spacing tags.
  *
  * @returns {object} The read spacing or the default [1,1].
@@ -4468,7 +4503,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.0-beta.0';
+  return '0.31.0-beta.1';
 };
 
 /**
@@ -13051,6 +13086,14 @@ dwv.gui.ViewLayer = function (containerDiv) {
   var context = null;
 
   /**
+   * Flag to know if the context has been cleared.
+   *
+   * @private
+   * @type {boolean}
+   */
+  var isContextClear = true;
+
+  /**
    * The image data array.
    *
    * @private
@@ -13398,14 +13441,8 @@ dwv.gui.ViewLayer = function (containerDiv) {
     // context opacity
     context.globalAlpha = opacity;
 
-    // clear the context: reset the transform first
-    // store the current transformation matrix
-    context.save();
-    // use the identity matrix while clearing the canvas
-    context.setTransform(1, 0, 0, 1, 0, 0);
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    // restore the transform
-    context.restore();
+    // clear context
+    this.clear();
 
     // draw the cached canvas on the context
     // transform takes as input a, b, c, d, e, f to create
@@ -13426,6 +13463,9 @@ dwv.gui.ViewLayer = function (containerDiv) {
     context.imageSmoothingEnabled = false;
     // draw image
     context.drawImage(offscreenCanvas, 0, 0);
+
+    // set clear flag
+    isContextClear = false;
 
     /**
      * Render end event.
@@ -13621,6 +13661,11 @@ dwv.gui.ViewLayer = function (containerDiv) {
   function onPositionChange(event) {
     if (typeof event.skipGenerate === 'undefined' ||
       event.skipGenerate === false) {
+      // clear for non valid events
+      if (typeof event.valid !== 'undefined' && !event.valid) {
+        self.clear();
+        return;
+      }
       // 3D dimensions
       var dims3D = [0, 1, 2];
       // remove scroll index
@@ -13663,12 +13708,22 @@ dwv.gui.ViewLayer = function (containerDiv) {
   };
 
   /**
-   * Clear the context and reset the image data.
+   * Clear the context.
    */
   this.clear = function () {
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-    this.resetLayout();
+    if (!isContextClear) {
+      // clear the context: reset the transform first
+      // store the current transformation matrix
+      context.save();
+      // use the identity matrix while clearing the canvas
+      context.setTransform(1, 0, 0, 1, 0, 0);
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      // restore the transform
+      context.restore();
+
+      // update clear flag
+      isContextClear = true;
+    }
   };
 
   /**
@@ -14130,11 +14185,20 @@ dwv.image.DicomBufferToView = function () {
    * @param {string} origin The data origin.
    */
   function generateImage(index, origin) {
+    var dicomElements = dicomParserStore[index].getDicomElements();
+
+    var modality = dwv.dicom.cleanString(dicomElements.getFromKey('x00080060'));
+    var factory;
+    if (modality && modality === 'SEG') {
+      factory = new dwv.image.MaskFactory();
+    } else {
+      factory = new dwv.image.ImageFactory();
+    }
+
     // create the image
     try {
-      var imageFactory = new dwv.ImageFactory();
-      var image = imageFactory.create(
-        dicomParserStore[index].getDicomElements(),
+      var image = factory.create(
+        dicomElements,
         finalBufferStore[index],
         options.numberOfFiles);
       // call onloaditem
@@ -16858,10 +16922,10 @@ dwv.image.rangeRegions = function (
  * @param {boolean} isPlanar A flag to know if the data is planar
  *   (RRRR...GGGG...BBBB...) or not (RGBRGBRGBRGB...), defaults to false.
  * @returns {object} A 3 components iterator folowing the iterator and iterable
- *   protocol, with extra 'value1' and 'value2' for the second and
- *   third component.
+ *   protocol, the value is an array of size 3 with each component.
  */
-dwv.image.range3d = function (dataAccessor, start, end, increment, isPlanar) {
+dwv.image.simpleRange3d = function (
+  dataAccessor, start, end, increment, isPlanar) {
   if (typeof increment === 'undefined') {
     increment = 1;
   }
@@ -16898,6 +16962,84 @@ dwv.image.range3d = function (dataAccessor, start, end, increment, isPlanar) {
       return {
         done: true,
         index: [end]
+      };
+    }
+  };
+};
+
+/**
+ * Get an iterator for a given range for a 3 components data.
+ *
+ * Using 'maxIter' and not an 'end' index since it fails in some edge cases
+ * (for ex coronal2, ie zxy)
+ *
+ * @param {Function} dataAccessor Function to access data.
+ * @param {number} start Zero-based index at which to start the iteration.
+ * @param {number} maxIter The maximum number of iterations.
+ * @param {number} increment Increment between indicies.
+ * @param {number} blockMaxIter Number of applied increment after which
+ *   blockIncrement is applied.
+ * @param {number} blockIncrement Increment after blockMaxIter is reached,
+ *   the value is from block start to the next block start.
+ * @param {boolean} reverse1 If true, loop from end to start.
+ *   WARN: don't forget to set the value of start as the last index!
+ * @param {boolean} reverse2 If true, loop from block end to block start.
+ * @param {boolean} isPlanar A flag to know if the data is planar
+ *   (RRRR...GGGG...BBBB...) or not (RGBRGBRGBRGB...), defaults to false.
+ * @returns {object} An iterator folowing the iterator and iterable protocol.
+ */
+dwv.image.range3d = function (dataAccessor, start, maxIter, increment,
+  blockMaxIter, blockIncrement, reverse1, reverse2, isPlanar) {
+  var iters = [];
+  if (isPlanar) {
+    iters.push(dwv.image.range(
+      dataAccessor, start, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+    iters.push(dwv.image.range(
+      dataAccessor, start + maxIter * increment, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+    iters.push(dwv.image.range(
+      dataAccessor, start + 2 * maxIter * increment, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+  } else {
+    increment *= 3;
+    blockIncrement *= 3;
+    iters.push(dwv.image.range(
+      dataAccessor, start, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+    iters.push(dwv.image.range(
+      dataAccessor, start + 1, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+    iters.push(dwv.image.range(
+      dataAccessor, start + 2, maxIter, increment,
+      blockMaxIter, blockIncrement, reverse1, reverse2
+    ));
+  }
+
+  // result
+  return {
+    next: function () {
+      var r0 = iters[0].next();
+      var r1 = iters[1].next();
+      var r2 = iters[2].next();
+      if (!r0.done) {
+        return {
+          value: [
+            r0.value,
+            r1.value,
+            r2.value
+          ],
+          done: false
+        };
+      }
+      return {
+        done: true,
+        index: r2.index
       };
     }
   };
@@ -16964,70 +17106,82 @@ dwv.image.getSliceIterator = function (
   var nslices = size.get(2);
   var sliceSize = size.getDimSize(2);
 
+  var ncomp = image.getNumberOfComponents();
+  var isPlanar = image.getPlanarConfiguration() === 1;
+  var getRange = function (
+    dataAccessor, start, maxIter, increment,
+    blockMaxIter, blockIncrement, reverse1, reverse2) {
+    if (ncomp === 1) {
+      return dwv.image.range(dataAccessor, start, maxIter, increment,
+        blockMaxIter, blockIncrement, reverse1, reverse2);
+    } else if (ncomp === 3) {
+      return dwv.image.range3d(dataAccessor, 3 * start, maxIter, increment,
+        blockMaxIter, blockIncrement, reverse1, reverse2, isPlanar);
+    }
+  };
+
   var range = null;
-  if (image.getNumberOfComponents() === 1) {
-    if (viewOrientation && typeof viewOrientation !== 'undefined') {
-      var dirMax0 = viewOrientation.getColAbsMax(0);
-      var dirMax2 = viewOrientation.getColAbsMax(2);
+  if (viewOrientation && typeof viewOrientation !== 'undefined') {
+    var dirMax0 = viewOrientation.getColAbsMax(0);
+    var dirMax2 = viewOrientation.getColAbsMax(2);
 
-      // default reverse
-      var reverse1 = false;
-      var reverse2 = false;
+    // default reverse
+    var reverse1 = false;
+    var reverse2 = false;
 
-      var maxIter = null;
-      if (dirMax2.index === 2) {
-        // axial
-        maxIter = ncols * nrows;
-        if (dirMax0.index === 0) {
-          // xyz
-          range = dwv.image.range(dataAccessor,
-            start, maxIter, 1, ncols, ncols, reverse1, reverse2);
-        } else {
-          // yxz
-          range = dwv.image.range(dataAccessor,
-            start, maxIter, ncols, nrows, 1, reverse1, reverse2);
-        }
-      } else if (dirMax2.index === 0) {
-        // sagittal
-        maxIter = nslices * nrows;
-        if (dirMax0.index === 1) {
-          // yzx
-          range = dwv.image.range(dataAccessor,
-            start, maxIter, ncols, nrows, sliceSize, reverse1, reverse2);
-        } else {
-          // zyx
-          range = dwv.image.range(dataAccessor,
-            start, maxIter, sliceSize, nslices, ncols, reverse1, reverse2);
-        }
-      } else if (dirMax2.index === 1) {
-        // coronal
-        maxIter = nslices * ncols;
-        if (dirMax0.index === 0) {
-          // xzy
-          range = dwv.image.range(dataAccessor,
-            start, maxIter, 1, ncols, sliceSize, reverse1, reverse2);
-        } else {
-          // zxy
-          range = dwv.image.range(dataAccessor,
-            start, maxIter, sliceSize, nslices, 1, reverse1, reverse2);
-        }
+    var maxIter = null;
+    if (dirMax2.index === 2) {
+      // axial
+      maxIter = ncols * nrows;
+      if (dirMax0.index === 0) {
+        // xyz
+        range = getRange(dataAccessor,
+          start, maxIter, 1, ncols, ncols, reverse1, reverse2);
       } else {
-        throw new Error('Unknown direction: ' + dirMax2.index);
+        // yxz
+        range = getRange(dataAccessor,
+          start, maxIter, ncols, nrows, 1, reverse1, reverse2);
+      }
+    } else if (dirMax2.index === 0) {
+      // sagittal
+      maxIter = nslices * nrows;
+      if (dirMax0.index === 1) {
+        // yzx
+        range = getRange(dataAccessor,
+          start, maxIter, ncols, nrows, sliceSize, reverse1, reverse2);
+      } else {
+        // zyx
+        range = getRange(dataAccessor,
+          start, maxIter, sliceSize, nslices, ncols, reverse1, reverse2);
+      }
+    } else if (dirMax2.index === 1) {
+      // coronal
+      maxIter = nslices * ncols;
+      if (dirMax0.index === 0) {
+        // xzy
+        range = getRange(dataAccessor,
+          start, maxIter, 1, ncols, sliceSize, reverse1, reverse2);
+      } else {
+        // zxy
+        range = getRange(dataAccessor,
+          start, maxIter, sliceSize, nslices, 1, reverse1, reverse2);
       }
     } else {
-      // default case
-      range = dwv.image.simpleRange(dataAccessor, start, start + sliceSize);
+      throw new Error('Unknown direction: ' + dirMax2.index);
     }
-  } else if (image.getNumberOfComponents() === 3) {
-    // 3 times bigger...
-    start *= 3;
-    sliceSize *= 3;
-    var isPlanar = image.getPlanarConfiguration() === 1;
-    range = dwv.image.range3d(
-      dataAccessor, start, start + sliceSize, 1, isPlanar);
   } else {
-    throw new Error('Unsupported number of components: ' +
-      image.getNumberOfComponents());
+    if (image.getNumberOfComponents() === 1) {
+      range = dwv.image.simpleRange(dataAccessor, start, start + sliceSize);
+    } else if (image.getNumberOfComponents() === 3) {
+      // 3 times bigger...
+      start *= 3;
+      sliceSize *= 3;
+      range = dwv.image.simpleRange3d(
+        dataAccessor, start, start + sliceSize, 1, isPlanar);
+    } else {
+      throw new Error('Unsupported number of components: ' +
+        image.getNumberOfComponents());
+    }
   }
 
   return range;
@@ -17404,6 +17558,358 @@ dwv.image.lut.test = {
    "green": dwv.image.lut.buildLut(dwv.image.lut.id),
    "blue":  dwv.image.lut.buildLut(dwv.image.lut.id)
 };*/
+
+// namespaces
+var dwv = dwv || {};
+dwv.image = dwv.image || {};
+
+/**
+ * Mask {@link dwv.image.Image} factory.
+ *
+ * @class
+ */
+dwv.image.MaskFactory = function () {};
+
+/**
+ * Get an {@link dwv.image.Image} object from the read DICOM file.
+ *
+ * @param {object} dicomElements The DICOM tags.
+ * @param {Array} pixelBuffer The pixel buffer.
+ * @returns {dwv.image.Image} A new Image.
+ */
+dwv.image.MaskFactory.prototype.create = function (
+  dicomElements, pixelBuffer) {
+  // columns
+  var columns = dicomElements.getFromKey('x00280011');
+  if (!columns) {
+    throw new Error('Missing or empty DICOM image number of columns');
+  }
+  // rows
+  var rows = dicomElements.getFromKey('x00280010');
+  if (!rows) {
+    throw new Error('Missing or empty DICOM image number of rows');
+  }
+  var sliceSize = columns * rows;
+
+  // frames
+  var frames = dicomElements.getFromKey('x00280008');
+  if (!frames) {
+    frames = 1;
+  } else {
+    frames = parseInt(frames, 10);
+  }
+
+  if (frames !== pixelBuffer.length / sliceSize) {
+    throw new Error(
+      'Buffer and numberOfFrames meta are not equal.');
+  }
+
+  // Segmentation Type
+  var segType = dicomElements.getFromKey('x00620001');
+  if (!segType) {
+    throw new Error('Missing or empty DICOM segmentation type');
+  } else {
+    segType = dwv.dicom.cleanString(segType);
+  }
+  if (segType !== 'BINARY') {
+    throw new Error('Unsupported segmentation type: ' + segType);
+  }
+
+  // check if compressed
+  var syntax = dwv.dicom.cleanString(dicomElements.getFromKey('x00020010'));
+  var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
+  if (algoName !== null) {
+    throw new Error('Unsupported compressed segmentation: ' + algoName);
+  }
+
+  // Segment Sequence
+  var segSequence = dicomElements.getFromKey('x00620002', true);
+  if (!segSequence || typeof segSequence === 'undefined') {
+    throw new Error('Missing or empty segmentation sequence');
+  }
+  var labels = [];
+  var storeAsRGB = false;
+  for (var i = 0; i < segSequence.length; ++i) {
+    // value -> Segment Number
+    // name -> Segment Label
+    var label = {
+      value: segSequence[i].x00620004.value[0],
+      name: dwv.dicom.cleanString(segSequence[i].x00620005.value[0]),
+      algorithmType: dwv.dicom.cleanString(segSequence[i].x00620008.value[0])
+    };
+    // Segment Algorithm Name
+    if (segSequence[i].x00620009) {
+      label.algorithmName =
+        dwv.dicom.cleanString(segSequence[i].x00620009.value[0]);
+    }
+    // Recommended Display CIELab Value
+    if (typeof segSequence[i].x0062000D !== 'undefined') {
+      var cielabElement = segSequence[i].x0062000D.value;
+      var rgb = dwv.utils.cielabToSrgb(dwv.utils.uintLabToLab({
+        l: cielabElement[0],
+        a: cielabElement[1],
+        b: cielabElement[2]
+      }));
+      label.colour = rgb;
+      // create rgb image
+      storeAsRGB = true;
+    }
+    // store
+    labels.push(label);
+  }
+
+  // image size
+  var size = dicomElements.getImageSize();
+
+  var getSpacingFromMeasure = function (measure) {
+    if (typeof measure.x00280030 === 'undefined') {
+      return null;
+    }
+    var pixelSpacing = measure.x00280030;
+    var spacingValues = [
+      parseFloat(pixelSpacing.value[0]),
+      parseFloat(pixelSpacing.value[1])
+    ];
+    if (typeof measure.x00180088 !== 'undefined') {
+      var sliceThickness = measure.x00180088;
+      spacingValues.push(parseFloat(sliceThickness.value[0]));
+    }
+    return new dwv.image.Spacing(spacingValues);
+  };
+
+  // Shared Functional Groups Sequence
+  var spacing;
+  var imageOrientationPatient;
+  var sharedFunctionalGroupsSeq = dicomElements.getFromKey('x52009229', true);
+  if (sharedFunctionalGroupsSeq.length !== 0) {
+    // should be only one
+    var funcGroup0 = sharedFunctionalGroupsSeq[0];
+    // Plane Orientation Sequence
+    if (typeof funcGroup0.x00209116 !== 'undefined') {
+      var planeOrientationSeq = funcGroup0.x00209116;
+      if (planeOrientationSeq.value.length !== 0) {
+        // should be only one
+        imageOrientationPatient = planeOrientationSeq.value[0].x00200037.value;
+      } else {
+        dwv.logger.warn(
+          'No shared functional group plane orientation sequence items.');
+      }
+    }
+    // Pixel Measures Sequence
+    if (typeof funcGroup0.x00289110 !== 'undefined') {
+      var pixelMeasuresSeq = funcGroup0.x00289110;
+      if (pixelMeasuresSeq.value.length !== 0) {
+        // should be only one
+        spacing = getSpacingFromMeasure(pixelMeasuresSeq.value[0]);
+      } else {
+        dwv.logger.warn(
+          'No shared functional group pixel measure sequence items.');
+      }
+    }
+  }
+
+  // position patient utility functions
+  var equalPosPat = function (pos1, pos2) {
+    return JSON.stringify(pos1) === JSON.stringify(pos2);
+  };
+
+  var comparePosPat = function (pos1, pos2) {
+    var diff = null;
+    var posLen = pos1.length;
+    var index = posLen;
+    for (var i = 0; i < posLen; ++i) {
+      --index;
+      diff = pos2[index] - pos1[index];
+      if (diff !== 0) {
+        return diff;
+      }
+    }
+    return diff;
+  };
+
+  var includesPosPat = function (arr, val) {
+    return arr.some(function (arrVal) {
+      return equalPosPat(val, arrVal);
+    });
+  };
+
+  var findIndexPosPat = function (arr, val) {
+    return arr.findIndex(function (arrVal) {
+      return equalPosPat(val, arrVal);
+    });
+  };
+
+  var arrayEquals = function (arr0, arr1) {
+    if (arr0 === null || arr1 === null) {
+      return false;
+    }
+    if (arr0.length !== arr1.length) {
+      return false;
+    }
+    return arr0.every(function (element, index) {
+      return element === arr1[index];
+    });
+  };
+
+  // Per-frame Functional Groups Sequence
+  var perFrameFuncGroupSequence = dicomElements.getFromKey('x52009230', true);
+  if (!perFrameFuncGroupSequence ||
+    typeof perFrameFuncGroupSequence === 'undefined') {
+    throw new Error('Missing or empty per frame functional sequence');
+  }
+  if (frames !== perFrameFuncGroupSequence.length) {
+    throw new Error(
+      'perFrameFuncGroupSequence meta and numberOfFrames are not equal.');
+  }
+  // create frame info object from per frame func
+  var frameInfos = [];
+  var posPats = [];
+  for (var j = 0; j < perFrameFuncGroupSequence.length; ++j) {
+    var frameFunc = perFrameFuncGroupSequence[j];
+    // Derivation Image Sequence
+    var referencedSOPInstanceUID;
+    if (typeof frameFunc.x00089124 !== 'undefined') {
+      var derivationImageSq = frameFunc.x00089124.value;
+      // Source Image Sequence
+      if (typeof derivationImageSq[0].x00082112 !== 'undefined') {
+        var sourceImageSq = derivationImageSq[0].x00082112.value;
+        // Referenced SOP Instance UID
+        if (typeof sourceImageSq[0].x00081155 !== 'undefined') {
+          referencedSOPInstanceUID = sourceImageSq[0].x00081155.value[0];
+        }
+      }
+    }
+    // Frame Content Sequence
+    var frameContentSq = frameFunc.x00209111.value;
+    // Dimension Index Value
+    var dimIndex = frameContentSq[0].x00209157.value;
+    // Plane Position Sequence
+    var planePosSq = frameFunc.x00209113.value;
+    // Image Position (Patient)
+    var imagePosPat = planePosSq[0].x00200032.value;
+    for (var p = 0; p < imagePosPat.length; ++p) {
+      imagePosPat[p] = parseFloat(imagePosPat[p], 10);
+    }
+    if (!includesPosPat(posPats, imagePosPat)) {
+      posPats.push(imagePosPat);
+    }
+    frameInfos.push({
+      dimIndex: dimIndex,
+      imagePosPat: imagePosPat,
+      referencedSOPInstanceUID: referencedSOPInstanceUID
+    });
+    // Plane Orientation Sequence
+    if (typeof frameFunc.x00209116 !== 'undefined') {
+      var framePlaneOrientationSeq = frameFunc.x00209116;
+      if (framePlaneOrientationSeq.value.length !== 0) {
+        // should only be one
+        var frameImageOrientation =
+          framePlaneOrientationSeq.value[0].x00200037.value;
+        if (typeof imageOrientationPatient === 'undefined') {
+          imageOrientationPatient = frameImageOrientation;
+        } else {
+          if (!arrayEquals(frameImageOrientation, imageOrientationPatient)) {
+            throw new Error('Unsupported multi orientation dicom seg.');
+          }
+        }
+      }
+    }
+    // Pixel Measures Sequence
+    if (typeof frameFunc.x00289110 !== 'undefined') {
+      var framePixelMeasuresSeq = frameFunc.x00289110;
+      if (framePixelMeasuresSeq.value.length !== 0) {
+        // should only be one
+        var frameSpacing =
+          getSpacingFromMeasure(framePixelMeasuresSeq.value[0]);
+        if (typeof spacing === 'undefined') {
+          spacing = frameSpacing;
+        } else {
+          if (!spacing.equals(frameSpacing)) {
+            throw new Error('Unsupported multi resolution dicom seg.');
+          }
+        }
+      } else {
+        dwv.logger.warn(
+          'No shared functional group pixel measure sequence items.');
+      }
+    }
+  }
+  // sort positions patient
+  posPats.sort(comparePosPat);
+
+  // create output buffer
+  // as many slices as posPats -> gap slices between groups are not represented
+  var numberOfSlices = posPats.length;
+  var mul = storeAsRGB ? 3 : 1;
+  var buffer = new pixelBuffer.constructor(mul * sliceSize * numberOfSlices);
+  buffer.fill(0);
+  // merge frame buffers
+  var sliceOffset = null;
+  var sliceIndex = null;
+  var frameOffset = null;
+  var labelIndex = null;
+  for (var f = 0; f < frameInfos.length; ++f) {
+    // get the slice index from the position in the posPat array
+    sliceIndex = findIndexPosPat(posPats, frameInfos[f].imagePosPat);
+    frameOffset = sliceSize * f;
+    labelIndex = frameInfos[f].dimIndex[0] - 1;
+    sliceOffset = sliceSize * sliceIndex;
+    var pixelValue;
+    if (storeAsRGB) {
+      pixelValue = labels[labelIndex].colour;
+    } else {
+      pixelValue = labels[labelIndex].value;
+    }
+    for (var l = 0; l < sliceSize; ++l) {
+      if (pixelBuffer[frameOffset + l] !== 0) {
+        var offset = mul * (sliceOffset + l);
+        if (storeAsRGB) {
+          buffer[offset] = pixelValue.r;
+          buffer[offset + 1] = pixelValue.g;
+          buffer[offset + 2] = pixelValue.b;
+        } else {
+          buffer[offset] = pixelValue;
+        }
+      }
+    }
+  }
+
+  if (typeof spacing === 'undefined') {
+    throw Error('No spacing found in DICOM seg file.');
+  }
+
+  // geometry
+  var point3DFromArray = function (arr) {
+    return new dwv.math.Point3D(arr[0], arr[1], arr[2]);
+  };
+  var origin = point3DFromArray(posPats[0]);
+  var geometry = new dwv.image.Geometry(origin, size, spacing);
+  var uids = [0];
+  for (var m = 1; m < numberOfSlices; ++m) {
+    // args: origin, volumeNumber, uid, index, increment
+    geometry.appendOrigin(point3DFromArray(posPats[m]), m);
+    uids.push(m);
+  }
+
+  // create image
+  var image = new dwv.image.Image(geometry, buffer, uids);
+  if (storeAsRGB) {
+    image.setPhotometricInterpretation('RGB');
+  }
+  // image meta
+  var meta = {
+    Modality: 'SEG',
+    BitsStored: 8,
+    labels: labels,
+    frameInfos: frameInfos,
+    SeriesInstanceUID: dicomElements.getFromKey('x0020000E'),
+    SOPInstanceUID: dicomElements.getFromKey('x00080018'),
+    ImageOrientationPatient: imageOrientationPatient
+  };
+  image.setMeta(meta);
+
+  return image;
+};
 
 // namespaces
 var dwv = dwv || {};
@@ -18566,16 +19072,28 @@ dwv.image.View = function (image) {
       silent = false;
     }
 
-    // check if possible
     var geometry = image.getGeometry();
+    var posIndex = geometry.worldToIndex(newPosition);
+
+    // check if possible
     if (!geometry.isInBounds(newPosition)) {
+      if (!silent) {
+        // fire event with valid: false
+        fireEvent({
+          type: 'positionchange',
+          value: [
+            posIndex.getValues(),
+            newPosition.getValues(),
+          ],
+          valid: false
+        });
+      }
       return false;
     }
 
     var isNew = !currentPosition || !currentPosition.equals(newPosition);
 
     if (isNew) {
-      var posIndex = geometry.worldToIndex(newPosition);
       var diffDims = null;
       if (currentPosition) {
         if (currentPosition.canCompare(newPosition)) {
@@ -18648,7 +19166,11 @@ dwv.image.View = function (image) {
    */
   this.setCurrentIndex = function (index, silent) {
     var geometry = this.getImage().getGeometry();
-    return this.setCurrentPosition(geometry.indexToWorld(index), silent);
+    var position = geometry.indexToWorld(index);
+    if (!geometry.isInBounds(position)) {
+      return false;
+    }
+    return this.setCurrentPosition(position, silent);
   };
 
   /**
@@ -18832,14 +19354,19 @@ dwv.image.View.prototype.setWindowLevelMinMax = function () {
  * Generate display image data to be given to a canvas.
  *
  * @param {Array} array The array to fill in.
+ * @param {dwv.math.Point} position Optional position at which to generate,
+ *   otherwise generates at current position.
  */
-dwv.image.View.prototype.generateImageData = function (array) {
+dwv.image.View.prototype.generateImageData = function (array, position) {
   // check position
-  if (!this.getCurrentPosition()) {
-    this.setInitialPosition();
+  if (typeof position === 'undefined') {
+    if (!this.getCurrentPosition()) {
+      this.setInitialPosition();
+    }
+    position = this.getCurrentIndex();
   }
+
   var image = this.getImage();
-  var position = this.getCurrentIndex();
   var iterator = dwv.image.getSliceIterator(
     image, position, false, this.getOrientation());
 
@@ -18907,8 +19434,7 @@ dwv.image.View.prototype.incrementIndex = function (dim, silent) {
   }
   var incr = new dwv.math.Index(values);
   var newIndex = index.add(incr);
-  var geometry = this.getImage().getGeometry();
-  return this.setCurrentPosition(geometry.indexToWorld(newIndex), silent);
+  return this.setCurrentIndex(newIndex, silent);
 };
 
 /**
@@ -18929,8 +19455,7 @@ dwv.image.View.prototype.decrementIndex = function (dim, silent) {
   }
   var incr = new dwv.math.Index(values);
   var newIndex = index.add(incr);
-  var geometry = this.getImage().getGeometry();
-  return this.setCurrentPosition(geometry.indexToWorld(newIndex), silent);
+  return this.setCurrentIndex(newIndex, silent);
 };
 
 /**
@@ -32428,7 +32953,11 @@ dwv.utils.buildMultipart = function (parts, boundary) {
   var partsSize = 0;
   var headers = [];
   for (var i = 0; i < parts.length; ++i) {
-    var headerStr = '--' + boundary + lineBreak;
+    var headerStr = '';
+    if (i !== 0) {
+      headerStr += lineBreak;
+    }
+    headerStr += '--' + boundary + lineBreak;
     var partKeys = Object.keys(parts[i]);
     for (var k = 0; k < partKeys.length; ++k) {
       var key = partKeys[k];
@@ -32442,7 +32971,7 @@ dwv.utils.buildMultipart = function (parts, boundary) {
     partsSize += header.byteLength + parts[i].data.byteLength;
   }
   // build trailer
-  var trailerStr = '--' + boundary + '--' + lineBreak;
+  var trailerStr = lineBreak + '--' + boundary + '--' + lineBreak;
   var trailer = dwv.utils.stringToUint8Array(trailerStr);
 
   // final buffer
@@ -35315,8 +35844,10 @@ dwv.utils.loadFromQuery = function (query, app, options) {
   dwv.utils.decodeQuery(query, app.loadURLs, options);
   // optional display state
   if (typeof query.state !== 'undefined') {
+    // queue after main data load
     var onLoadEnd = function (/*event*/) {
-      app.loadURLs(query.state);
+      app.removeEventListener('loadend', onLoadEnd);
+      app.loadURLs([query.state]);
     };
     app.addEventListener('loadend', onLoadEnd);
   }
