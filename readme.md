@@ -12,7 +12,7 @@ Try a [live demo](https://ivmartel.github.io/dwv/) and read a lot more informati
  - DWV is not certified for diagnostic use.<sup>[1](#footnote1)</sup>
  - Released under GNU GPL-3.0 license (see [license.txt](license.txt)).
 
-If you have additional questions, please [open an issue](https://www.github.com/ivmartel/dwv/issues).
+If you have questions, please [open an issue](https://www.github.com/ivmartel/dwv/issues).
 
 ## Steps to run the viewer from scratch
 
