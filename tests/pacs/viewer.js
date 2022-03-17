@@ -110,13 +110,15 @@ dwv.test.viewerSetup = function () {
   });
   var dataLoad = 0;
   _app.addEventListener('load', function (event) {
-    console.log(_app.getMetaData(event.loadid));
     if (!viewOnFirstLoadItem) {
       _app.render(event.loadid);
     }
-    // add data control row
-    if (_mode !== 3) {
-      addDataRow(dataLoad, dataViewConfigs);
+    // add data control row for images
+    if (event.loadtype === 'image') {
+      console.log(_app.getMetaData(event.loadid));
+      if (_mode !== 3) {
+        addDataRow(dataLoad, dataViewConfigs);
+      }
     }
     ++dataLoad;
     // init gui
