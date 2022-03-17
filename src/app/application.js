@@ -1257,7 +1257,7 @@ dwv.App = function () {
       var origin0 = data0.image.getGeometry().getOrigins()[0];
       var origin1 = imageGeometry.getOrigins()[0];
       diff = origin0.minus(origin1);
-      // ...
+      // TODO: check why -z...
       viewLayer.setBaseOffset(new dwv.math.Vector3D(
         diff.getX(), diff.getY(), -1 * diff.getZ()));
     }
