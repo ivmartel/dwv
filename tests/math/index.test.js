@@ -55,6 +55,21 @@ QUnit.test('Test Index.', function (assert) {
   var i12 = new dwv.math.Index([3, 2, 1]);
   assert.equal(i10.equals(i12), false, 'values equals false');
 
+  // compare
+  var res13 = i0.compare(i0);
+  assert.equal(res13.length, 0, '[compare] #0');
+  var i14 = new dwv.math.Index([2, 3, 4]);
+  var res14 = i0.compare(i14);
+  assert.equal(res14.length, 3, '[compare] #1 length');
+  assert.equal(res14[0], 0, '[compare] #1 [0]');
+  assert.equal(res14[1], 1, '[compare] #1 [1]');
+  assert.equal(res14[2], 2, '[compare] #1 [2]');
+  var i15 = new dwv.math.Point([1, 3, 4]);
+  var res15 = i0.compare(i15);
+  assert.equal(res15.length, 2, '[compare] #2 length');
+  assert.equal(res15[0], 1, '[compare] #2 [0]');
+  assert.equal(res15[1], 2, '[compare] #2 [1]');
+
   // to string
   var i20 = new dwv.math.Index([1, 2, 3]);
   assert.equal(i20.toString(), '(1,2,3)', 'toString');

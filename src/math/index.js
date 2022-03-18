@@ -104,6 +104,27 @@ dwv.math.Index.prototype.equals = function (rhs) {
 };
 
 /**
+ * Compare indices and return different dimensions.
+ *
+ * @param {dwv.math.Index} rhs The index to compare to.
+ * @returns {Array} The list of different dimensions.
+ */
+dwv.math.Index.prototype.compare = function (rhs) {
+  // check if can compare
+  if (!this.canCompare(rhs)) {
+    return null;
+  }
+  // check values
+  var diffDims = [];
+  for (var i = 0, leni = this.length(); i < leni; ++i) {
+    if (this.get(i) !== rhs.get(i)) {
+      diffDims.push(i);
+    }
+  }
+  return diffDims;
+};
+
+/**
  * Add another index to this one.
  *
  * @param {dwv.math.Index} rhs The index to add.
