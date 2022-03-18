@@ -263,8 +263,16 @@ dwv.image.Geometry.prototype.equals = function (rhs) {
  * @returns {boolean} True if the given coordinates are within bounds.
  */
 dwv.image.Geometry.prototype.isInBounds = function (point) {
-  // get the corresponding index
-  var index = this.worldToIndex(point);
+  return this.isIndexInBounds(this.worldToIndex(point));
+};
+
+/**
+ * Check that a index is within bounds.
+ *
+ * @param {dwv.math.Index} index The index to check.
+ * @returns {boolean} True if the given coordinates are within bounds.
+ */
+dwv.image.Geometry.prototype.isIndexInBounds = function (index) {
   return this.getSize().isInBounds(index);
 };
 
