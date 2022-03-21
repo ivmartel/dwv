@@ -10,11 +10,15 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The dwv UID prefix.
  */
 dwv.dicom.getDwvUIDPrefix = function () {
-  return '1.2.826.0.1.3680043.9.7278.1.';
+  return '1.2.826.0.1.3680043.9.7278.1';
 };
+
+// local generated uid counter
+var _uidCount = 0;
 
 /**
  * Get a UID for a DICOM tag.
+ * Note: Use https://github.com/uuidjs/uuid?
  *
  * @see http://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_9.html
  * @see http://dicomiseasy.blogspot.com/2011/12/chapter-4-dicom-objects-in-chapter-3.html
@@ -23,17 +27,34 @@ dwv.dicom.getDwvUIDPrefix = function () {
  * @returns {string} The corresponding UID.
  */
 dwv.dicom.getUID = function (tagName) {
-  var uid = dwv.dicom.getDwvUIDPrefix();
+  var prefix = dwv.dicom.getDwvUIDPrefix() + '.';
+  var uid = '';
   if (tagName === 'ImplementationClassUID') {
-    uid += dwv.getVersion();
-  } else if (tagName === 'SOPInstanceUID') {
-    for (var i = 0; i < tagName.length; ++i) {
-      uid += tagName.charCodeAt(i);
-    }
-    // add date (only numbers)
-    uid += '.' + (new Date()).toISOString().replace(/\D/g, '');
+    uid = prefix + dwv.getVersion();
   } else {
-    throw new Error('Don\'t know how to generate a UID for the tag ' + tagName);
+    // date (only numbers), do not keep milliseconds
+    var date = (new Date()).toISOString().replace(/\D/g, '');
+    var datePart = '.' + date.substring(0, 14);
+    // count
+    _uidCount += 1;
+    var countPart = '.' + _uidCount;
+
+    // uid = prefix . tag . date . count
+    uid = prefix;
+
+    // limit tag part to not exceed 64 length
+    var nonTagLength = prefix.length + countPart.length + datePart.length;
+    var leni = Math.min(tagName.length, 64 - nonTagLength);
+    if (leni > 1) {
+      var tagNumber = '';
+      for (var i = 0; i < leni; ++i) {
+        tagNumber += tagName.charCodeAt(i);
+      }
+      uid += tagNumber.substring(0, leni);
+    }
+
+    // finish
+    uid += datePart + countPart;
   }
   return uid;
 };

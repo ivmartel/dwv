@@ -9,6 +9,35 @@ dwv.test = dwv.test || {};
 /* global QUnit */
 
 /**
+ * Tests getUID.
+ *
+ * @function module:tests/dicom~getUID
+ */
+QUnit.test('Test getUID', function (assert) {
+  // check size
+  var uid00 = dwv.dicom.getUID('mytag');
+  assert.ok(uid00.length <= 64, 'uid length #0');
+  var uid01 = dwv.dicom.getUID('mysuperlongtagthatneverfinishes');
+  assert.ok(uid01.length <= 64, 'uid length #1');
+
+  // consecutive for same tag are different
+  var uid10 = dwv.dicom.getUID('mytag');
+  var uid11 = dwv.dicom.getUID('mytag');
+  assert.notEqual(uid10, uid11, 'Consecutive getUID');
+
+  // groups do not start with 0
+  var parts = uid10.split('.');
+  var count = 0;
+  for (var i = 0; i < parts.length; ++i) {
+    var part = parts[i];
+    if (part[0] === '0' && part.length !== 1) {
+      ++count;
+    }
+  }
+  assert.ok(count === 0, 'Zero at start of part');
+});
+
+/**
  * Tests for {@link dwv.dicom.DicomWriter} using simple DICOM data.
  * Using remote file for CI integration.
  *
