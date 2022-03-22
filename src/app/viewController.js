@@ -313,6 +313,17 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
+   * Set the current index.
+   *
+   * @param {dwv.math.Index} index The index.
+   * @param {boolean} silent If true, does not fire a positionchange event.
+   * @returns {boolean} False if not in bounds.
+   */
+  this.setCurrentIndex = function (index, silent) {
+    return view.setCurrentIndex(index, silent);
+  };
+
+  /**
    * Get a 3D position from a plane 2D position.
    *
    * @param {dwv.math.Point2D} point2D The 2D position as {x,y}.
