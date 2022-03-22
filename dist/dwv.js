@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-beta.2 2022-03-22 15:40:31 */
+/*! dwv 0.31.0-beta.3 2022-03-22 16:38:42 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -2918,6 +2918,17 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
+   * Set the current index.
+   *
+   * @param {dwv.math.Index} index The index.
+   * @param {boolean} silent If true, does not fire a positionchange event.
+   * @returns {boolean} False if not in bounds.
+   */
+  this.setCurrentIndex = function (index, silent) {
+    return view.setCurrentIndex(index, silent);
+  };
+
+  /**
    * Get a 3D position from a plane 2D position.
    *
    * @param {dwv.math.Point2D} point2D The 2D position as {x,y}.
@@ -4495,7 +4506,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.0-beta.2';
+  return '0.31.0-beta.3';
 };
 
 /**
