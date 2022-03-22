@@ -268,6 +268,21 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   };
 
   /**
+   * Get the view layers data indices.
+   *
+   * @returns {Array} The list of indices.
+   */
+  this.getViewDataIndices = function () {
+    var res = [];
+    for (var i = 0; i < layers.length; ++i) {
+      if (layers[i] instanceof dwv.gui.ViewLayer) {
+        res.push(layers[i].getDataIndex());
+      }
+    }
+    return res;
+  };
+
+  /**
    * Get the active draw layer.
    *
    * @returns {object} The layer.

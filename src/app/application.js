@@ -1152,18 +1152,19 @@ dwv.App = function () {
   /**
    * Get the data max size for a layer group.
    *
-   * @todo Filter for data of the layer group.
-   * @param {object} lg The layer group.
+   * @param {object} layerGroup The layer group.
    * @returns {object} The max size as {x,y}.
    */
-  function getLayerGroupMaxSize(lg) {
+  function getLayerGroupMaxSize(layerGroup) {
     var maxSize = {x: 0, y: 0};
-    for (var i = 0; i < dataController.length(); ++i) {
-      var dc = dataController.get(i);
-      var geometry = dc.image.getGeometry();
+    // loop through layer group data
+    var indices = layerGroup.getViewDataIndices();
+    for (var i = 0; i < indices.length; ++i) {
+      var data = dataController.get(indices[i]);
+      var geometry = data.image.getGeometry();
       var viewOrient = dwv.gui.getViewOrientation(
         geometry,
-        lg.getTargetOrientation()
+        layerGroup.getTargetOrientation()
       );
       var size = geometry.getSize(viewOrient).get2D();
       var spacing = geometry.getSpacing(viewOrient).get2D();
@@ -1233,6 +1234,7 @@ dwv.App = function () {
     // opacity
     var opacity = 1;
     // do we have more than one layer
+    // (the layer has not been added to the layer group yet)
     if (layerGroup.getNumberOfLayers() !== 0) {
       opacity = 0.5;
       // set color map if non was provided
@@ -1251,9 +1253,10 @@ dwv.App = function () {
 
     // compensate origin difference
     var diff = null;
-    if (dataIndex !== 0) {
+    if (layerGroup.getNumberOfLayers() !== 1) {
+      var firstDataIndex = layerGroup.getViewDataIndices()[0];
+      var data0 = dataController.get(firstDataIndex);
       // offset from the top, use first origin
-      var data0 = dataController.get(0);
       var origin0 = data0.image.getGeometry().getOrigins()[0];
       var origin1 = imageGeometry.getOrigins()[0];
       diff = origin0.minus(origin1);
@@ -1282,8 +1285,8 @@ dwv.App = function () {
       ];
       layerGroup.updateLayersToPositionChange({value: value});
 
-      // compensate origin difference
-      if (dataIndex !== 0) {
+      // compensate origin difference if needed
+      if (diff) {
         dl.setBaseOffset(diff);
       }
     }
