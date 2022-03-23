@@ -486,10 +486,10 @@ dwv.App = function () {
       typeof options.dataViewConfigs === 'undefined') {
       throw new Error('No available data view configuration');
     }
-    var configs = null;
+    var configs = [];
     if (typeof options.dataViewConfigs['*'] !== 'undefined') {
       configs = options.dataViewConfigs['*'];
-    } else {
+    } else if (typeof options.dataViewConfigs[dataIndex] !== 'undefined') {
       configs = options.dataViewConfigs[dataIndex];
     }
     return configs;
