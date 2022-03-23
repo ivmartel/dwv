@@ -1022,6 +1022,7 @@ dwv.App = function () {
 
     // render if first and flag allows
     if (event.loadtype === 'image' &&
+      getViewConfigs(event.loadid).length !== 0 &&
       isFirstLoadItem && options.viewOnFirstLoadItem) {
       self.render(event.loadid);
     }
