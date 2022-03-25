@@ -25,8 +25,15 @@ td, th {
 .error {
   color: red;
 }
+.success {
+  color: green;
+}
 </style>
+<!-- Local -->
 <script type="text/javascript" src="./dcmweb.js"></script>
+<!-- dwv -->
+<script type="text/javascript" src="../../src/utils/array.js"></script>
+<script type="text/javascript" src="../../src/utils/string.js"></script>
 </head>
 <body>
 
@@ -38,14 +45,24 @@ td, th {
 <p>
 For the view link to work, set the <code>_dicomWeb</code> flag to true in
 the <code>./viewer.js</code>.
-<br>The search button launches a qido search to: <code>root url + series?</code>
 </p>
 
 <p>
 <label for="rooturl">Root url:</label>
 <input id="rooturl" type='text' size=40
   value="http://localhost:8042/dicom-web/">
-<button id="search" onclick="dwv.test.qidoSearch()">Search</button>
+</p>
+
+<p>
+STOW test with local bbmri data:
+<button id="search" onclick="dwv.test.stow()">STOW</button>
+</p>
+
+<p>
+<label for="qidoArgs">QIDO query:</label>
+<input id="qidoArgs" type='text' size=30
+  value="/series?">
+<button id="search" onclick="dwv.test.qidoSearch()">QIDO</button>
 </p>
 
 <div id="result"></div>

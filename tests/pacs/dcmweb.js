@@ -61,9 +61,75 @@ dwv.test.qidoSearch = function () {
   });
 
   var rootUrl = document.getElementById('rooturl').value;
-  qidoReq.open('GET', rootUrl + 'series?');
+  var qidoArgs = document.getElementById('qidoArgs').value;
+  qidoReq.open('GET', rootUrl + qidoArgs);
   qidoReq.setRequestHeader('Accept', 'application/dicom+json');
   qidoReq.send();
+};
+
+/**
+ * Launch a STOW request.
+ */
+dwv.test.stow = function () {
+  var div = document.getElementById('result');
+
+  var stowReq = new XMLHttpRequest();
+  var message;
+  stowReq.addEventListener('load', function (event) {
+    var status = event.currentTarget.status;
+    // bad status
+    if (status !== 200 && status !== 204) {
+      message = 'Bad status in STOW-RS request: ' +
+        status + ' (' + event.currentTarget.statusText + ').';
+      div.appendChild(dwv.test.getMessagePara(message, 'error'));
+      return;
+    }
+    // no content
+    if (status === 204 ||
+      !event.target.response ||
+      typeof event.target.response === 'undefined') {
+      message = 'No content.';
+      div.appendChild(dwv.test.getMessagePara(message));
+      return;
+    }
+    // parse json
+    message = 'STOW-RS successful!!';
+    div.appendChild(dwv.test.getMessagePara(message, 'success'));
+  });
+  stowReq.addEventListener('error', function (error) {
+    message = 'Error in STOW-RS request';
+    console.error(message, error);
+    message += ', see console for details.';
+    div.appendChild(dwv.test.getMessagePara(message, 'error'));
+  });
+
+  // local data fetch request
+  var dataReq = new XMLHttpRequest();
+  dataReq.open('GET', '../data/bbmri-53323131.dcm');
+  dataReq.responseType = 'arraybuffer';
+
+  dataReq.addEventListener('load', function (event) {
+    // bundle response in multipart
+    var res = event.target.response;
+    var parts = [{
+      'Content-Type': 'application/dicom',
+      data: new Uint8Array(res)
+    }];
+    var boundary = '----dwttestboundary';
+    var content = dwv.utils.buildMultipart(parts, boundary);
+
+    // launch STOW query
+    var rootUrl = document.getElementById('rooturl').value;
+    stowReq.open('POST', rootUrl + 'studies');
+    stowReq.setRequestHeader('Accept', 'application/dicom+json');
+    stowReq.setRequestHeader('Content-Type',
+      'multipart/related; type="application/dicom"; boundary=' + boundary);
+    stowReq.send(content);
+  });
+
+  // launch local data fetch
+  dataReq.send();
+
 };
 
 /**
@@ -73,6 +139,8 @@ dwv.test.qidoSearch = function () {
  */
 function qidoResponseToTable(json) {
   var viewerUrl = './viewer.html?input=';
+
+  var hasSeries = typeof json[0]['0020000E'] !== 'undefined';
 
   var table = document.createElement('table');
   table.id = 'series-table';
@@ -88,11 +156,13 @@ function qidoResponseToTable(json) {
     th.innerHTML = text;
     trow.appendChild(th);
   };
-  insertTCell('#', '20px');
+  insertTCell('#', '40px');
   insertTCell('Study');
-  insertTCell('Series');
-  insertTCell('Modality', '70px');
-  insertTCell('Action');
+  if (hasSeries) {
+    insertTCell('Series');
+    insertTCell('Modality', '70px');
+    insertTCell('Action');
+  }
 
   // table body
   var body = table.createTBody();
@@ -107,21 +177,24 @@ function qidoResponseToTable(json) {
     var studyUid = json[i]['0020000D'].Value;
     cell.title = studyUid;
     cell.appendChild(document.createTextNode(studyUid));
-    // series
-    cell = row.insertCell();
-    var seriesUid = json[i]['0020000E'].Value;
-    cell.title = seriesUid;
-    cell.appendChild(document.createTextNode(seriesUid));
-    // modality
-    cell = row.insertCell();
-    cell.appendChild(document.createTextNode(json[i]['00080060'].Value));
-    // action
-    cell = row.insertCell();
-    var a = document.createElement('a');
-    a.href = viewerUrl + json[i]['00081190'].Value;
-    a.target = '_blank';
-    a.appendChild(document.createTextNode('view'));
-    cell.appendChild(a);
+
+    if (hasSeries) {
+      // series
+      cell = row.insertCell();
+      var seriesUid = json[i]['0020000E'].Value;
+      cell.title = seriesUid;
+      cell.appendChild(document.createTextNode(seriesUid));
+      // modality
+      cell = row.insertCell();
+      cell.appendChild(document.createTextNode(json[i]['00080060'].Value));
+      // action
+      cell = row.insertCell();
+      var a = document.createElement('a');
+      a.href = viewerUrl + json[i]['00081190'].Value;
+      a.target = '_blank';
+      a.appendChild(document.createTextNode('view'));
+      cell.appendChild(a);
+    }
   }
 
   var div = document.getElementById('result');
