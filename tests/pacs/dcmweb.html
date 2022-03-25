@@ -13,9 +13,14 @@ table, td, th {
 }
 table {
   border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
 }
 td, th {
   padding: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .error {
   color: red;

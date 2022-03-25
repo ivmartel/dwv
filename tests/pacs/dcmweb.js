@@ -80,14 +80,18 @@ function qidoResponseToTable(json) {
   // table header
   var header = table.createTHead();
   var trow = header.insertRow(0);
-  var insertTCell = function (text) {
+  var insertTCell = function (text, width) {
     var th = document.createElement('th');
+    if (typeof width !== 'undefined') {
+      th.width = width;
+    }
     th.innerHTML = text;
     trow.appendChild(th);
   };
+  insertTCell('#', '20px');
   insertTCell('Study');
   insertTCell('Series');
-  insertTCell('Modality');
+  insertTCell('Modality', '70px');
   insertTCell('Action');
 
   // table body
@@ -95,12 +99,19 @@ function qidoResponseToTable(json) {
   var cell;
   for (var i = 0; i < json.length; ++i) {
     var row = body.insertRow();
+    // number
+    cell = row.insertCell();
+    cell.appendChild(document.createTextNode(i));
     // study
     cell = row.insertCell();
-    cell.appendChild(document.createTextNode(json[i]['0020000D'].Value));
+    var studyUid = json[i]['0020000D'].Value;
+    cell.title = studyUid;
+    cell.appendChild(document.createTextNode(studyUid));
     // series
     cell = row.insertCell();
-    cell.appendChild(document.createTextNode(json[i]['0020000E'].Value));
+    var seriesUid = json[i]['0020000E'].Value;
+    cell.title = seriesUid;
+    cell.appendChild(document.createTextNode(seriesUid));
     // modality
     cell = row.insertCell();
     cell.appendChild(document.createTextNode(json[i]['00080060'].Value));
