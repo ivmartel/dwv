@@ -103,33 +103,53 @@ dwv.test.stow = function () {
     div.appendChild(dwv.test.getMessagePara(message, 'error'));
   });
 
-  // local data fetch request
-  var dataReq = new XMLHttpRequest();
-  dataReq.open('GET', '../data/bbmri-53323131.dcm');
-  dataReq.responseType = 'arraybuffer';
+  // local files to request
+  var urls = [
+    '../data/bbmri-53323131.dcm',
+    '../data/bbmri-53323275.dcm',
+    '../data/bbmri-53323419.dcm'
+  ];
+  // files' data
+  var data = [];
 
-  dataReq.addEventListener('load', function (event) {
-    // bundle response in multipart
-    var res = event.target.response;
-    var parts = [{
-      'Content-Type': 'application/dicom',
-      data: new Uint8Array(res)
-    }];
-    var boundary = '----dwttestboundary';
-    var content = dwv.utils.buildMultipart(parts, boundary);
+  // load handler: store data and, when all data is received, launch STOW
+  var onload = function (event) {
+    // store
+    if (data.length < urls.length) {
+      data.push(event.target.response);
+    }
 
-    // launch STOW query
-    var rootUrl = document.getElementById('rooturl').value;
-    stowReq.open('POST', rootUrl + 'studies');
-    stowReq.setRequestHeader('Accept', 'application/dicom+json');
-    stowReq.setRequestHeader('Content-Type',
-      'multipart/related; type="application/dicom"; boundary=' + boundary);
-    stowReq.send(content);
-  });
+    // if all, launch STOW
+    if (data.length === urls.length) {
+      // bundle data in multipart
+      var parts = [];
+      for (var j = 0; j < data.length; ++j) {
+        parts.push({
+          'Content-Type': 'application/dicom',
+          data: new Uint8Array(data[j])
+        });
+      }
+      var boundary = '----dwttestboundary';
+      var content = dwv.utils.buildMultipart(parts, boundary);
 
-  // launch local data fetch
-  dataReq.send();
+      // STOW request
+      var rootUrl = document.getElementById('rooturl').value;
+      stowReq.open('POST', rootUrl + 'studies');
+      stowReq.setRequestHeader('Accept', 'application/dicom+json');
+      stowReq.setRequestHeader('Content-Type',
+        'multipart/related; type="application/dicom"; boundary=' + boundary);
+      stowReq.send(content);
+    }
+  };
 
+  // launch data requests
+  for (var i = 0; i < urls.length; ++i) {
+    var req = new XMLHttpRequest();
+    req.open('GET', urls[i]);
+    req.responseType = 'arraybuffer';
+    req.addEventListener('load', onload);
+    req.send();
+  }
 };
 
 /**
