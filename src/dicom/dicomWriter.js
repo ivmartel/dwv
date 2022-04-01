@@ -84,8 +84,9 @@ dwv.dicom.isNonStringVr = function (vr) {
 
 /**
  * Is the input VR a VR that stores data in a typed array.
- * @param {String} vr The element VR.
- * @retuns True if the VR is a typed array one.
+ *
+ * @param {string} vr The element VR.
+ * @returns {boolean} True if the VR is a typed array one.
  */
 dwv.dicom.isTypedArrayVr = function (vr) {
   return vr === 'OB' || vr === 'OW' ||
