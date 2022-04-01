@@ -76,10 +76,23 @@ dwv.dicom.isEven = function (number) {
  * @returns {boolean} True if the VR is a non string one.
  */
 dwv.dicom.isNonStringVr = function (vr) {
-  return vr === 'UN' || vr === 'OB' || vr === 'OW' ||
-        vr === 'OF' || vr === 'OD' || vr === 'US' || vr === 'SS' ||
-        vr === 'UL' || vr === 'SL' || vr === 'FL' || vr === 'FD' ||
-        vr === 'SQ' || vr === 'AT';
+  return vr === 'UN' ||
+    vr === 'SQ' ||
+    vr === 'AT' ||
+    dwv.dicom.isTypedArrayVr(vr);
+};
+
+/**
+ * Is the input VR a VR that stores data in a typed array.
+ * @param {String} vr The element VR.
+ * @retuns True if the VR is a typed array one.
+ */
+dwv.dicom.isTypedArrayVr = function (vr) {
+  return vr === 'OB' || vr === 'OW' ||
+    vr === 'OF' || vr === 'OD' ||
+    vr === 'US' || vr === 'SS' ||
+    vr === 'UL' || vr === 'SL' ||
+    vr === 'FL' || vr === 'FD';
 };
 
 /**
@@ -876,43 +889,55 @@ dwv.dicom.setElementValue = function (element, value, isImplicit) {
     // set the value and calculate size
     size = 0;
     var paddedValue = dwv.dicom.padElementValue(element, value);
-    if (value instanceof Array) {
+    if (element.vr === 'AT') {
       element.value = paddedValue;
-      for (var k = 0; k < paddedValue.length; ++k) {
-        // spearator
-        if (k !== 0) {
-          size += 1;
-        }
-        // value
-        size += paddedValue[k].toString().length;
+      size = 4;
+    } else if (dwv.dicom.isTypedArrayVr(element.vr)) {
+      // convert non array (number) value to array
+      if (typeof value.length === 'undefined') {
+        element.value = [paddedValue];
+      } else {
+        element.value = paddedValue;
+      }
+      size = element.value.length;
+
+      // convert size to bytes
+      if (element.vr === 'US' || element.vr === 'OW') {
+        size *= Uint16Array.BYTES_PER_ELEMENT;
+      } else if (element.vr === 'SS') {
+        size *= Int16Array.BYTES_PER_ELEMENT;
+      } else if (element.vr === 'UL') {
+        size *= Uint32Array.BYTES_PER_ELEMENT;
+      } else if (element.vr === 'SL') {
+        size *= Int32Array.BYTES_PER_ELEMENT;
+      } else if (element.vr === 'FL') {
+        size *= Float32Array.BYTES_PER_ELEMENT;
+      } else if (element.vr === 'FD') {
+        size *= Float64Array.BYTES_PER_ELEMENT;
       }
     } else {
-      element.value = [paddedValue];
-      if (typeof paddedValue !== 'undefined' &&
-        typeof paddedValue.length !== 'undefined') {
-        size = paddedValue.length;
+      if (value instanceof Array) {
+        element.value = paddedValue;
+        for (var k = 0; k < paddedValue.length; ++k) {
+          // separator
+          if (k !== 0) {
+            size += 1;
+          }
+          // value
+          size += paddedValue[k].toString().length;
+        }
       } else {
-        // numbers
-        size = 1;
+        element.value = [paddedValue];
+        if (typeof paddedValue !== 'undefined' &&
+          typeof paddedValue.length !== 'undefined') {
+          size = paddedValue.length;
+        } else {
+          // numbers
+          size = 1;
+        }
       }
     }
 
-    // convert size to bytes
-    if (element.vr === 'US' || element.vr === 'OW') {
-      size *= Uint16Array.BYTES_PER_ELEMENT;
-    } else if (element.vr === 'SS') {
-      size *= Int16Array.BYTES_PER_ELEMENT;
-    } else if (element.vr === 'UL') {
-      size *= Uint32Array.BYTES_PER_ELEMENT;
-    } else if (element.vr === 'SL') {
-      size *= Int32Array.BYTES_PER_ELEMENT;
-    } else if (element.vr === 'FL') {
-      size *= Float32Array.BYTES_PER_ELEMENT;
-    } else if (element.vr === 'FD') {
-      size *= Float64Array.BYTES_PER_ELEMENT;
-    } else {
-      size *= Uint8Array.BYTES_PER_ELEMENT;
-    }
     element.vl = size;
   }
 
