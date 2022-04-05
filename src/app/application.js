@@ -1252,20 +1252,6 @@ dwv.App = function () {
     viewLayer.initialise(size2D, spacing2D, dataIndex);
     viewLayer.setOpacity(opacity);
 
-    // compensate origin difference
-    var diff = null;
-    if (layerGroup.getNumberOfLayers() !== 1) {
-      var firstDataIndex = layerGroup.getViewDataIndices()[0];
-      var data0 = dataController.get(firstDataIndex);
-      // offset from the top, use first origin
-      var origin0 = data0.image.getGeometry().getOrigins()[0];
-      var origin1 = imageGeometry.getOrigins()[0];
-      diff = origin0.minus(origin1);
-      // TODO: check why -z...
-      viewLayer.setBaseOffset(new dwv.math.Vector3D(
-        diff.getX(), diff.getY(), -1 * diff.getZ()));
-    }
-
     // listen to image changes
     dataController.addEventListener('imagechange', viewLayer.onimagechange);
 
@@ -1285,11 +1271,6 @@ dwv.App = function () {
         vc.getCurrentPosition().getValues()
       ];
       layerGroup.updateLayersToPositionChange({value: value});
-
-      // compensate origin difference if needed
-      if (diff) {
-        dl.setBaseOffset(diff);
-      }
     }
 
     // fit to the maximum size

@@ -465,10 +465,38 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
 
     var index = new dwv.math.Index(event.value[0]);
     var position = new dwv.math.Point(event.value[1]);
+    // origin of the first view layer
+    var baseOrigin = null;
     // update position for all layers except the source one
     for (var i = 0; i < layers.length; ++i) {
+
+      // update base offset (does not trigger redraw)
+      // TODO check draw layers update
+      var hasSetOffset = false;
+      if (layers[i] instanceof dwv.gui.ViewLayer) {
+        var vc = layers[i].getViewController();
+        var origin = vc.getOrigin(position);
+        if (!baseOrigin) {
+          baseOrigin = origin;
+        } else {
+          if (vc.canSetPosition(position)) {
+            var diff = baseOrigin.minus(origin);
+            // TODO: check why -z...
+            hasSetOffset = layers[i].setBaseOffset(new dwv.math.Vector3D(
+              diff.getX(), diff.getY(), -1 * diff.getZ()));
+          }
+        }
+      }
+
+      // update position (triggers redraw)
+      var hasSetPos = false;
       if (layers[i].getId() !== event.srclayerid) {
-        layers[i].setCurrentPosition(position, index);
+        hasSetPos = layers[i].setCurrentPosition(position, index);
+      }
+
+      // force redraw if needed
+      if (!hasSetPos && hasSetOffset) {
+        layers[i].draw();
       }
     }
 

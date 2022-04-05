@@ -420,6 +420,19 @@ dwv.image.View = function (image) {
     return currentIndex;
   };
 
+  this.canSetPosition = function (position) {
+    var geometry = image.getGeometry();
+    var index = geometry.worldToIndex(position);
+    return geometry.isIndexInBounds(index);
+  };
+
+  this.getOrigin = function (position) {
+    var geometry = image.getGeometry();
+    var index = geometry.worldToIndex(position);
+    var scrollValue = index.get(this.getScrollIndex());
+    return geometry.getOrigins()[scrollValue];
+  };
+
   /**
    * Set the current position.
    *
@@ -468,6 +481,7 @@ dwv.image.View = function (image) {
 
     // check if possible
     if (!geometry.isIndexInBounds(index)) {
+      // do no send invalid positionchange event: avoid empty repaint
       return false;
     }
 
@@ -531,6 +545,8 @@ dwv.image.View = function (image) {
         // fire
         fireEvent(posEvent);
       }
+    } else {
+      return false;
     }
 
     // all good

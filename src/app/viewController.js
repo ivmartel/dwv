@@ -141,6 +141,10 @@ dwv.ctrl.ViewController = function (view) {
     return view.getCurrentIndex().get(view.getScrollIndex());
   };
 
+  this.getOrigin = function (position) {
+    return view.getOrigin(position);
+  };
+
   /**
    * Get the current scroll position value.
    *
@@ -287,6 +291,10 @@ dwv.ctrl.ViewController = function (view) {
    */
   this.getImageSize = function () {
     return view.getImage().getGeometry().getSize();
+  };
+
+  this.canSetPosition = function (position) {
+    return view.canSetPosition(position);
   };
 
   /**
