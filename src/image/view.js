@@ -429,7 +429,9 @@ dwv.image.View = function (image) {
   this.getOrigin = function (position) {
     var geometry = image.getGeometry();
     var index = geometry.worldToIndex(position);
-    var scrollValue = index.get(this.getScrollIndex());
+    var nativeScrollIndex =
+      geometry.getOrientation().getThirdColMajorDirection();
+    var scrollValue = index.get(nativeScrollIndex);
     return geometry.getOrigins()[scrollValue];
   };
 
