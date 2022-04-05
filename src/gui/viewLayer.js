@@ -270,17 +270,27 @@ dwv.gui.ViewLayer = function (containerDiv) {
   /**
    * Set the base layer offset. Resets the layer offset.
    *
-   * @param {object} off The offset as {x,y}.
+   * @param {dwv.math.Vector3D} off The offset vector.
+   * @returns {boolean} True if the offset was updated.
    */
   this.setBaseOffset = function (off) {
     var helper = viewController.getPlaneHelper();
-    baseOffset = helper.getPlaneOffsetFromOffset3D({
+    var planeOffset = helper.getPlaneOffsetFromOffset3D({
       x: off.getX(),
       y: off.getY(),
       z: off.getZ()
     });
-    // reset offset
-    offset = baseOffset;
+    var needsUpdate = baseOffset.x !== planeOffset.x ||
+      baseOffset.y !== planeOffset.y;
+    // reset offset if needed
+    if (needsUpdate) {
+      offset = {
+        x: offset.x - baseOffset.x + planeOffset.x,
+        y: offset.y - baseOffset.y + planeOffset.y
+      };
+      baseOffset = planeOffset;
+    }
+    return needsUpdate;
   };
 
   /**
@@ -664,9 +674,10 @@ dwv.gui.ViewLayer = function (containerDiv) {
    *
    * @param {dwv.math.Point} position The new position.
    * @param {dwv.math.Index} _index The new index.
+   * @returns {boolean} True if the position was updated.
    */
   this.setCurrentPosition = function (position, _index) {
-    viewController.setCurrentPosition(position);
+    return viewController.setCurrentPosition(position);
   };
 
   /**

@@ -210,19 +210,27 @@ dwv.gui.DrawLayer = function (containerDiv) {
   /**
    * Set the base layer offset. Resets the layer offset.
    *
-   * @param {object} off The offset as {x,y}.
+   * @param {dwv.math.Vector3D} off The offset vector
+   * @returns {boolean} True if the offset was updated.
    */
   this.setBaseOffset = function (off) {
-    baseOffset = planeHelper.getPlaneOffsetFromOffset3D({
+    var planeOffset = planeHelper.getPlaneOffsetFromOffset3D({
       x: off.getX(),
       y: off.getY(),
       z: off.getZ()
     });
-    // reset offset
-    konvaStage.offset({
-      x: baseOffset.x,
-      y: baseOffset.y
-    });
+    var needsUpdate = baseOffset.x !== planeOffset.x ||
+      baseOffset.y !== planeOffset.y;
+    // reset offset if needed
+    if (needsUpdate) {
+      var offset = konvaStage.offset();
+      konvaStage.offset({
+        x: offset.x - baseOffset.x + planeOffset.x,
+        y: offset.y - baseOffset.y + planeOffset.y
+      });
+      baseOffset = planeOffset;
+    }
+    return needsUpdate;
   };
 
   /**
@@ -338,10 +346,13 @@ dwv.gui.DrawLayer = function (containerDiv) {
    *
    * @param {dwv.math.Point} position The new position.
    * @param {dwv.math.Index} index The new index.
+   * @returns {boolean} True if the position was updated.
    */
   this.setCurrentPosition = function (position, index) {
     this.getDrawController().activateDrawLayer(
       index, planeHelper.getScrollIndex());
+    // TODO: add check
+    return true;
   };
 
   /**
