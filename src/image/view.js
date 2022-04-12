@@ -428,11 +428,13 @@ dwv.image.View = function (image) {
 
   this.getOrigin = function (position) {
     var geometry = image.getGeometry();
-    var index = geometry.worldToIndex(position);
-    var nativeScrollIndex =
-      geometry.getOrientation().getThirdColMajorDirection();
-    var scrollValue = index.get(nativeScrollIndex);
-    return geometry.getOrigins()[scrollValue];
+    var originIndex = 0;
+    if (typeof position !== 'undefined') {
+      var index = geometry.worldToIndex(position);
+      // index is reoriented, 2 is scroll index
+      originIndex = index.get(2);
+    }
+    return geometry.getOrigins()[originIndex];
   };
 
   /**
