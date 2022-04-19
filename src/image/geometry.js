@@ -143,6 +143,15 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
   };
 
   /**
+   * Get the image spacing in real world.
+   *
+   * @returns {dwv.image.Spacing} The object spacing.
+   */
+  this.getRealSpacing = function () {
+    return this.getSpacing(orientation.getInverse().asOneAndZeros());
+  };
+
+  /**
    * Get the object orientation.
    *
    * @returns {dwv.math.Matrix33} The object orientation.
