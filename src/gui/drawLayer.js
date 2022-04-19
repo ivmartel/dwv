@@ -208,27 +208,29 @@ dwv.gui.DrawLayer = function (containerDiv) {
   };
 
   /**
-   * Set the base layer offset. Resets the layer offset.
+   * Set the base layer offset. Updates the layer offset.
    *
-   * @param {dwv.math.Vector3D} off The offset vector
+   * @param {dwv.math.Vector3D} scrollOffset The scroll offset vector.
+   * @param {dwv.math.Vector3D} planeOffset The plane offset vector.
    * @returns {boolean} True if the offset was updated.
    */
-  this.setBaseOffset = function (off) {
-    var planeOffset = planeHelper.getPlaneOffsetFromOffset3D({
-      x: off.getX(),
-      y: off.getY(),
-      z: off.getZ()
+  this.setBaseOffset = function (scrollOffset, planeOffset) {
+    var scrollIndex = planeHelper.getNativeScrollIndex();
+    var newOffset = planeHelper.getPlaneOffsetFromOffset3D({
+      x: scrollIndex === 0 ? scrollOffset.getX() : planeOffset.getX(),
+      y: scrollIndex === 1 ? scrollOffset.getY() : planeOffset.getY(),
+      z: scrollIndex === 2 ? scrollOffset.getZ() : planeOffset.getZ(),
     });
-    var needsUpdate = baseOffset.x !== planeOffset.x ||
-      baseOffset.y !== planeOffset.y;
+    var needsUpdate = baseOffset.x !== newOffset.x ||
+      baseOffset.y !== newOffset.y;
     // reset offset if needed
     if (needsUpdate) {
       var offset = konvaStage.offset();
       konvaStage.offset({
-        x: offset.x - baseOffset.x + planeOffset.x,
-        y: offset.y - baseOffset.y + planeOffset.y
+        x: offset.x - baseOffset.x + newOffset.x,
+        y: offset.y - baseOffset.y + newOffset.y
       });
-      baseOffset = planeOffset;
+      baseOffset = newOffset;
     }
     return needsUpdate;
   };

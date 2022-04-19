@@ -465,10 +465,56 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
 
     var index = new dwv.math.Index(event.value[0]);
     var position = new dwv.math.Point(event.value[1]);
+    // origin of the first view layer
+    var baseOrigin0 = null;
+    var baseOrigin = null;
     // update position for all layers except the source one
     for (var i = 0; i < layers.length; ++i) {
+
+      // update base offset (does not trigger redraw)
+      // TODO check draw layers update
+      var hasSetOffset = false;
+      if (layers[i] instanceof dwv.gui.ViewLayer) {
+        var vc = layers[i].getViewController();
+        var origin0 = vc.getOrigin();
+        var origin = vc.getOrigin(position);
+        if (!baseOrigin) {
+          baseOrigin0 = origin0;
+          baseOrigin = origin;
+        } else {
+          if (vc.canSetPosition(position)) {
+            if (typeof origin0 === 'undefined') {
+              console.log('no origin0', layers[i].getId());
+            }
+            if (typeof origin === 'undefined') {
+              console.log('no origin', layers[i].getId());
+            }
+
+            // TODO: compensate for possible different orientation
+            // TODO: check why -z...
+
+            var scrollDiff = baseOrigin0.minus(origin0);
+            var scrollOffset = new dwv.math.Vector3D(
+              scrollDiff.getX(), scrollDiff.getY(), -1 * scrollDiff.getZ());
+
+            var planeDiff = baseOrigin.minus(origin);
+            var planeOffset = new dwv.math.Vector3D(
+              planeDiff.getX(), planeDiff.getY(), -1 * planeDiff.getZ());
+
+            hasSetOffset = layers[i].setBaseOffset(scrollOffset, planeOffset);
+          }
+        }
+      }
+
+      // update position (triggers redraw)
+      var hasSetPos = false;
       if (layers[i].getId() !== event.srclayerid) {
-        layers[i].setCurrentPosition(position, index);
+        hasSetPos = layers[i].setCurrentPosition(position, index);
+      }
+
+      // force redraw if needed
+      if (!hasSetPos && hasSetOffset) {
+        layers[i].draw();
       }
     }
 

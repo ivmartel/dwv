@@ -114,7 +114,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
 
   /**
    * Get the object spacing.
-   * Warning: the size comes as stored in DICOM, meaning that it could
+   * Warning: the spacing comes as stored in DICOM, meaning that it could
    * be oriented.
    *
    * @param {dwv.math.Matrix33} viewOrientation The view orientation (optional)
@@ -140,6 +140,15 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
       res = new dwv.image.Spacing(orientedValues);
     }
     return res;
+  };
+
+  /**
+   * Get the image spacing in real world.
+   *
+   * @returns {dwv.image.Spacing} The object spacing.
+   */
+  this.getRealSpacing = function () {
+    return this.getSpacing(orientation.getInverse().asOneAndZeros());
   };
 
   /**
@@ -353,6 +362,7 @@ dwv.image.Geometry.prototype.pointToWorld = function (point) {
 dwv.image.Geometry.prototype.worldToIndex = function (point) {
   // compensate for origin
   // (origin is not oriented, compensate before orientation)
+  // TODO: use slice origin...
   var origin = this.getOrigin();
   var point3D = new dwv.math.Point3D(
     point.get(0) - origin.getX(),
