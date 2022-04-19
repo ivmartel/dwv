@@ -7,9 +7,17 @@ dwv.image = dwv.image || {};
  *
  * @class
  * @param {dwv.image.Spacing} spacing The spacing.
- * @param {dwv.math.Matrix} orientation The orientation.
+ * @param {dwv.math.Matrix} imageOrientation The image oientation.
+ * @param {dwv.math.Matrix} viewOrientation The view orientation.
  */
-dwv.image.PlaneHelper = function (spacing, orientation) {
+dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
+
+  // [Img] -- Oi --> [Real] <-- Ot -- [Target]
+  // Pi = (Oi)-1 * Ot * Pt = Ov * Pt
+  // Ov = (Oi)-1 * Ot
+  // Ot = Oi * Ov
+  var targetOrientation =
+    imageOrientation.asOneAndZeros().multiply(viewOrientation);
 
   /**
    * Get a 3D offset from a plane one.
@@ -30,7 +38,7 @@ dwv.image.PlaneHelper = function (spacing, orientation) {
   /**
    * Get a plane offset from a 3D one.
    *
-   * @param {dwv.math.Point3D} offset3D The 3D offset.
+   * @param {object} offset3D The 3D offset as {x,y,z}.
    * @returns {object} The plane offset as {x,y}.
    */
   this.getPlaneOffsetFromOffset3D = function (offset3D) {
@@ -79,10 +87,8 @@ dwv.image.PlaneHelper = function (spacing, orientation) {
    */
   this.getOrientedVector3D = function (vector) {
     var planeVector = vector;
-    if (typeof orientation !== 'undefined') {
-      // abs? otherwise negative index...
-      // vector = orientation * planeVector
-      planeVector = orientation.getInverse().getAbs().multiplyVector3D(vector);
+    if (typeof targetOrientation !== 'undefined') {
+      planeVector = targetOrientation.getInverse().multiplyVector3D(vector);
     }
     return planeVector;
   };
@@ -95,10 +101,10 @@ dwv.image.PlaneHelper = function (spacing, orientation) {
    */
   this.getOrientedIndex = function (index) {
     var planeIndex = index;
-    if (typeof orientation !== 'undefined') {
+    if (typeof viewOrientation !== 'undefined') {
       // abs? otherwise negative index...
-      // vector = orientation * planeVector
-      planeIndex = orientation.getInverse().getAbs().multiplyIndex3D(index);
+      // vector = viewOrientation * planeVector
+      planeIndex = viewOrientation.getInverse().getAbs().multiplyIndex3D(index);
     }
     return planeIndex;
   };
@@ -111,11 +117,11 @@ dwv.image.PlaneHelper = function (spacing, orientation) {
    */
   this.getOrientedPoint = function (point) {
     var planePoint = point;
-    if (typeof orientation !== 'undefined') {
+    if (typeof viewOrientation !== 'undefined') {
       // abs? otherwise negative index...
-      // vector = orientation * planeVector
+      // vector = viewOrientation * planeVector
       var point3D =
-        orientation.getInverse().getAbs().multiplyPoint3D(point.get3D());
+        viewOrientation.getInverse().getAbs().multiplyPoint3D(point.get3D());
       planePoint = point.mergeWith3D(point3D);
     }
     return planePoint;
@@ -129,16 +135,30 @@ dwv.image.PlaneHelper = function (spacing, orientation) {
    */
   this.getDeOrientedVector3D = function (planeVector) {
     var vector = planeVector;
-    if (typeof orientation !== 'undefined') {
-      // abs? otherwise negative index...
-      // vector = orientation * planePoint
-      vector = orientation.getAbs().multiplyVector3D(planeVector);
+    if (typeof targetOrientation !== 'undefined') {
+      vector = targetOrientation.multiplyVector3D(planeVector);
     }
     return vector;
   };
 
   /**
-   * Reorder values to follow orientation.
+   * Get the image oriented values for an input vector.
+   *
+   * @param {dwv.math.Vector3D} planeVector The input vector.
+   * @returns {dwv.math.Vector3D} The de-orienteded vector.
+   */
+  this.getImageOrientedVector3D = function (planeVector) {
+    var vector = planeVector;
+    if (typeof viewOrientation !== 'undefined') {
+      // abs? otherwise negative index...
+      // vector = viewOrientation * planePoint
+      vector = viewOrientation.getAbs().multiplyVector3D(planeVector);
+    }
+    return vector;
+  };
+
+  /**
+   * Reorder values to follow view orientation.
    *
    * @param {object} values Values as {x,y,z}.
    * @returns {object} Reoriented values as {x,y,z}.
@@ -150,7 +170,7 @@ dwv.image.PlaneHelper = function (spacing, orientation) {
         values.y,
         values.z
       ],
-      orientation);
+      viewOrientation);
     return {
       x: orientedValues[0],
       y: orientedValues[1],
@@ -159,7 +179,7 @@ dwv.image.PlaneHelper = function (spacing, orientation) {
   };
 
   /**
-   * Reorder values to compensate for orientation.
+   * Reorder values to compensate for view orientation.
    *
    * @param {object} values Values as {x,y,z}.
    * @returns {object} 'Deoriented' values as {x,y,z}.
@@ -171,7 +191,7 @@ dwv.image.PlaneHelper = function (spacing, orientation) {
         values.y,
         values.z
       ],
-      orientation
+      viewOrientation
     );
     return {
       x: deOrientedValues[0],
@@ -181,14 +201,29 @@ dwv.image.PlaneHelper = function (spacing, orientation) {
   };
 
   /**
-   * Get the scroll dimension index.
+   * Get the (view) scroll dimension index.
    *
    * @returns {number} The index.
    */
   this.getScrollIndex = function () {
     var index = null;
-    if (typeof orientation !== 'undefined') {
-      index = orientation.getThirdColMajorDirection();
+    if (typeof viewOrientation !== 'undefined') {
+      index = viewOrientation.getThirdColMajorDirection();
+    } else {
+      index = 2;
+    }
+    return index;
+  };
+
+  /**
+   * Get the native (image) scroll dimension index.
+   *
+   * @returns {number} The index.
+   */
+  this.getNativeScrollIndex = function () {
+    var index = null;
+    if (typeof imageOrientation !== 'undefined') {
+      index = imageOrientation.getThirdColMajorDirection();
     } else {
       index = 2;
     }
