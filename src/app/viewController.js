@@ -14,9 +14,15 @@ dwv.ctrl.ViewController = function (view) {
   // third dimension player ID (created by setInterval)
   var playerID = null;
 
+  // check view
+  if (typeof view.getImage() === 'undefined') {
+    throw new Error('View does not have an image, cannot setup controller');
+  }
+
   // setup the plane helper
   var planeHelper = new dwv.image.PlaneHelper(
-    view.getImage().getGeometry().getSpacing(),
+    view.getImage().getGeometry().getRealSpacing(),
+    view.getImage().getGeometry().getOrientation(),
     view.getOrientation()
   );
 
@@ -316,8 +322,18 @@ dwv.ctrl.ViewController = function (view) {
    * @returns {boolean} False if not in bounds.
    */
   this.setCurrentPosition2D = function (x, y) {
-    return view.setCurrentPosition(
-      this.getPositionFromPlanePoint({x: x, y: y}));
+    // keep third direction
+    var k = this.getCurrentScrollIndexValue();
+    var planePoint = new dwv.math.Point3D(x, y, k);
+    // de-orient
+    var point = planeHelper.getImageOrientedVector3D(planePoint);
+    // ~indexToWorld to not loose precision
+    var geometry = view.getImage().getGeometry();
+    var point3D = geometry.pointToWorld(point);
+    // merge with current position to keep extra dimensions
+    var position = this.getCurrentPosition().mergeWith3D(point3D);
+
+    return view.setCurrentPosition(position);
   };
 
   /**
@@ -329,25 +345,6 @@ dwv.ctrl.ViewController = function (view) {
    */
   this.setCurrentIndex = function (index, silent) {
     return view.setCurrentIndex(index, silent);
-  };
-
-  /**
-   * Get a 3D position from a plane 2D position.
-   *
-   * @param {dwv.math.Point2D} point2D The 2D position as {x,y}.
-   * @returns {dwv.math.Point} The 3D point.
-   */
-  this.getPositionFromPlanePoint = function (point2D) {
-    // keep third direction
-    var k = this.getCurrentScrollIndexValue();
-    var planePoint = new dwv.math.Point3D(point2D.x, point2D.y, k);
-    // de-orient
-    var point = planeHelper.getDeOrientedVector3D(planePoint);
-    // ~indexToWorld to not loose precision
-    var geometry = view.getImage().getGeometry();
-    var point3D = geometry.pointToWorld(point);
-    // merge with current position to keep extra dimensions
-    return this.getCurrentPosition().mergeWith3D(point3D);
   };
 
   /**
@@ -365,7 +362,7 @@ dwv.ctrl.ViewController = function (view) {
     var point = planeHelper.getDeOrientedVector3D(planePoint);
     // ~indexToWorld to not loose precision
     var geometry = view.getImage().getGeometry();
-    var spacing = geometry.getSpacing();
+    var spacing = geometry.getRealSpacing();
     return new dwv.math.Point3D(
       point.getX() * spacing.get(0),
       point.getY() * spacing.get(1),
