@@ -577,7 +577,8 @@ dwv.App = function () {
     var layerGroup = stage.getActiveLayerGroup();
     var viewController = layerGroup.getActiveViewLayer().getViewController();
     var k = viewController.getCurrentScrollPosition();
-    layerGroup.addScale(step, {x: cx, y: cy, z: k});
+    var center = new dwv.math.Point3D(cx, cy, k);
+    layerGroup.addScale(step, center);
     layerGroup.draw();
   };
 
