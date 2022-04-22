@@ -85,9 +85,14 @@ File data storage, either one frame per file or multiple:
  * without code extensions: &#x2705; *(since v0.15.0, see [#248](https://github.com/ivmartel/dwv/issues/248))*
  * with code extensions: &#x274C;
 
-## Radiotherapy
-The Part PS 3.3 of the DICOM Standard specifies the set of Information Object Definitions (IODs) which provide an abstract definition of real-world objects applicable to communication of digital medical information. The Attributes of an IOD describe the properties of a Real-World Object Instance. Related Attributes are grouped into [Modules](http://dicom.nema.org/dicom/2013/output/chtml/part03/chapter_C.html) which represent a higher level of semantics documented in the Module Specifications found in Annex C of the DICOM Standard. Source: [leadtools](http://www.leadtools.com/sdk/medical/dicom-spec.htm).
+## IOD and Modules
+The Part PS 3.3 of the DICOM Standard specifies the set of Information Object Definitions (IODs) which provide an abstract definition of real-world objects applicable to communication of digital medical information. The Attributes of an IOD describe the properties of a Real-World Object Instance. Related Attributes are grouped into [Modules](http://dicom.nema.org/dicom/2013/output/chtml/part03/chapter_C.html) which represent a higher level of semantics documented in the Module Specifications found in Annex C of the DICOM Standard.
 
-This list are the modules of interest:
- * [Radiotherapy module](http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.8.html#sect_C.8.8) -> &#x274C;
- * [Waveform module](http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.10.html#sect_C.10.9) -> &#x274C;
+An overview of modules for each IOD is defined in [sect_A.1.4](https://dicom.nema.org/dicom/2013/output/chtml/part03/chapter_A.html#sect_A.1.4) (legend: [sect_A.1.3](https://dicom.nema.org/dicom/2013/output/chtml/part03/chapter_A.html#sect_A.1.3)).
+
+Some IODs:
+ * [CT](https://dicom.nema.org/dicom/2013/output/chtml/part03/sect_A.3.html)
+ * [MR](https://dicom.nema.org/dicom/2013/output/chtml/part03/sect_A.4.html)
+ * [RT Image](https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.17.3.html)
+ * [PET](https://dicom.nema.org/dicom/2013/output/chtml/part03/sect_A.21.html)
+ * [Segmentation](https://dicom.nema.org/dicom/2013/output/chtml/part03/sect_A.51.html)
