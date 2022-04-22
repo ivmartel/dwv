@@ -35,7 +35,8 @@ dwv.tool.draw.FreeHandFactory = function () {
    * @returns {number} The number of points.
    */
   this.getNPoints = function () {
-    return 1000;
+    // undefined to end with double click
+    return;
   };
   /**
    * Get the timeout between point storage.

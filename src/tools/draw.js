@@ -282,11 +282,15 @@ dwv.tool.Draw = function (app) {
   };
 
   /**
-   * Handle double click event.
+   * Handle double click event: some tools use it to finish interaction.
    *
-   * @param {object} event The mouse up event.
+   * @param {object} event The double click event.
    */
   this.dblclick = function (event) {
+    // only end by double click undefined NPoints
+    if (typeof currentFactory.getNPoints() !== 'undefined') {
+      return;
+    }
     // exit if not started draw
     if (!started) {
       return;
