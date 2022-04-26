@@ -32,7 +32,7 @@ dwv.tool.draw.FreeHandFactory = function () {
   /**
    * Get the number of points needed to build the shape.
    *
-   * @returns {number} The number of points.
+   * @returns {number|undefined} The number of points.
    */
   this.getNPoints = function () {
     // undefined to end with double click
