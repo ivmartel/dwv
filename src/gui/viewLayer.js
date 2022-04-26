@@ -408,7 +408,8 @@ dwv.gui.ViewLayer = function (containerDiv) {
      */
     var event = {
       type: 'renderstart',
-      layerid: this.getId()
+      layerid: this.getId(),
+      dataid: this.getDataIndex()
     };
     fireEvent(event);
 
@@ -452,7 +453,8 @@ dwv.gui.ViewLayer = function (containerDiv) {
      */
     event = {
       type: 'renderend',
-      layerid: this.getId()
+      layerid: this.getId(),
+      dataid: this.getDataIndex()
     };
     fireEvent(event);
   };
