@@ -48,12 +48,12 @@ dwv.gui.ViewLayer = function (containerDiv) {
   var context = null;
 
   /**
-   * Flag to know if the context has been cleared.
+   * Flag to know if the current position is valid.
    *
    * @private
    * @type {boolean}
    */
-  var isContextClear = true;
+  var isValidPosition = true;
 
   /**
    * The image data array.
@@ -394,6 +394,11 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @fires dwv.App#renderend
    */
   this.draw = function () {
+    // skip for non valid position
+    if (!isValidPosition) {
+      return;
+    }
+
     /**
      * Render start event.
      *
@@ -437,9 +442,6 @@ dwv.gui.ViewLayer = function (containerDiv) {
     context.imageSmoothingEnabled = false;
     // draw image
     context.drawImage(offscreenCanvas, 0, 0);
-
-    // set clear flag
-    isContextClear = false;
 
     /**
      * Render end event.
@@ -608,8 +610,9 @@ dwv.gui.ViewLayer = function (containerDiv) {
    */
   function onWLChange(event) {
     // generate and draw if no skip flag
-    if (typeof event.skipGenerate === 'undefined' ||
-      event.skipGenerate === false) {
+    var skip = typeof event.skipGenerate !== 'undefined' &&
+      event.skipGenerate === true;
+    if (!skip) {
       needsDataUpdate = true;
       self.draw();
     }
@@ -622,8 +625,12 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @private
    */
   function onColourChange(_event) {
-    needsDataUpdate = true;
-    self.draw();
+    var skip = typeof event.skipGenerate !== 'undefined' &&
+      event.skipGenerate === true;
+    if (!skip) {
+      needsDataUpdate = true;
+      self.draw();
+    }
   }
 
   /**
@@ -633,26 +640,34 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @private
    */
   function onPositionChange(event) {
-    if (typeof event.skipGenerate === 'undefined' ||
-      event.skipGenerate === false) {
+    var skip = typeof event.skipGenerate !== 'undefined' &&
+      event.skipGenerate === true;
+    if (!skip) {
+      var valid = typeof event.valid === 'undefined' || event.valid;
       // clear for non valid events
-      if (typeof event.valid !== 'undefined' && !event.valid) {
-        self.clear();
-        return;
-      }
-      // 3D dimensions
-      var dims3D = [0, 1, 2];
-      // remove scroll index
-      var indexScrollIndex = dims3D.indexOf(viewController.getScrollIndex());
-      dims3D.splice(indexScrollIndex, 1);
-      // remove non scroll index from diff dims
-      var diffDims = event.diffDims.filter(function (item) {
-        return dims3D.indexOf(item) === -1;
-      });
-      // update if we have something left
-      if (diffDims.length !== 0) {
-        needsDataUpdate = true;
-        self.draw();
+      if (!valid) {
+        // clear only once
+        if (isValidPosition) {
+          isValidPosition = false;
+          self.clear();
+        }
+      } else {
+        // reset valid flag
+        isValidPosition = true;
+        // 3D dimensions
+        var dims3D = [0, 1, 2];
+        // remove scroll index
+        var indexScrollIndex = dims3D.indexOf(viewController.getScrollIndex());
+        dims3D.splice(indexScrollIndex, 1);
+        // remove non scroll index from diff dims
+        var diffDims = event.diffDims.filter(function (item) {
+          return dims3D.indexOf(item) === -1;
+        });
+        // update if we have something left
+        if (diffDims.length !== 0) {
+          needsDataUpdate = true;
+          self.draw();
+        }
       }
     }
   }
@@ -664,8 +679,9 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @private
    */
   function onAlphaFuncChange(event) {
-    if (typeof event.skipGenerate === 'undefined' ||
-      event.skipGenerate === false) {
+    var skip = typeof event.skipGenerate !== 'undefined' &&
+      event.skipGenerate === true;
+    if (!skip) {
       needsDataUpdate = true;
       self.draw();
     }
@@ -686,19 +702,14 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * Clear the context.
    */
   this.clear = function () {
-    if (!isContextClear) {
-      // clear the context: reset the transform first
-      // store the current transformation matrix
-      context.save();
-      // use the identity matrix while clearing the canvas
-      context.setTransform(1, 0, 0, 1, 0, 0);
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      // restore the transform
-      context.restore();
-
-      // update clear flag
-      isContextClear = true;
-    }
+    // clear the context: reset the transform first
+    // store the current transformation matrix
+    context.save();
+    // use the identity matrix while clearing the canvas
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    // restore the transform
+    context.restore();
   };
 
   /**
