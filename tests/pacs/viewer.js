@@ -108,32 +108,40 @@ dwv.test.viewerSetup = function () {
         dataLoadProgress.reduce(sumReducer) / numberOfDataToLoad;
     }
   });
-  var dataLoad = 0;
   _app.addEventListener('load', function (event) {
     if (!viewOnFirstLoadItem) {
       _app.render(event.loadid);
     }
-    // add data control row for images
-    if (event.loadtype === 'image') {
-      console.log(_app.getMetaData(event.loadid));
-      if (_mode !== 3) {
-        addDataRow(dataLoad, dataViewConfigs);
-      }
-    }
-    ++dataLoad;
-    // init gui
-    if (dataLoad === numberOfDataToLoad) {
-      // select tool
-      _app.setTool('Scroll');
-
-      var changeLayoutSelect = document.getElementById('changelayout');
-      changeLayoutSelect.disabled = false;
-      var resetLayoutButton = document.getElementById('resetlayout');
-      resetLayoutButton.disabled = false;
-    }
   });
   _app.addEventListener('loadend', function (event) {
     console.timeEnd('load-data-' + event.loadid);
+  });
+
+  var dataLoad = 0;
+  var firstRender = [];
+  _app.addEventListener('renderend', function (event) {
+    // update UI at first render
+    if (!firstRender.includes(event.dataid)) {
+      // store data id
+      firstRender.push(event.dataid);
+      // log meta data
+      console.log(_app.getMetaData(event.dataid));
+      // add data row
+      if (_mode !== 3) {
+        addDataRow(dataLoad, dataViewConfigs);
+      }
+      ++dataLoad;
+      // init gui
+      if (dataLoad === numberOfDataToLoad) {
+        // select tool
+        _app.setTool('Scroll');
+
+        var changeLayoutSelect = document.getElementById('changelayout');
+        changeLayoutSelect.disabled = false;
+        var resetLayoutButton = document.getElementById('resetlayout');
+        resetLayoutButton.disabled = false;
+      }
+    }
   });
 
   _app.addEventListener('positionchange', function (event) {
