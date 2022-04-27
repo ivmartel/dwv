@@ -471,7 +471,7 @@ dwv.image.View = function (image) {
    *
    * @param {dwv.math.Index} index The new index.
    * @param {boolean} silent Flag to fire event or not.
-   * @returns {boolean} False if not in bounds
+   * @returns {boolean} False if not in bounds.
    * @fires dwv.image.View#positionchange
    */
   this.setCurrentIndex = function (index, silent) {
@@ -489,68 +489,63 @@ dwv.image.View = function (image) {
       return false;
     }
 
-    var isNew = !currentIndex || !currentIndex.equals(index);
-
-    if (isNew) {
-      var diffDims = null;
-      if (currentIndex) {
-        if (currentIndex.canCompare(index)) {
-          diffDims = currentIndex.compare(index);
-        } else {
-          diffDims = [];
-          var minLen = Math.min(currentIndex.length(), index.length());
-          for (var i = 0; i < minLen; ++i) {
-            if (currentIndex.get(i) !== index.get(i)) {
-              diffDims.push(i);
-            }
-          }
-          var maxLen = Math.max(currentIndex.length(), index.length());
-          for (var j = minLen; j < maxLen; ++j) {
-            diffDims.push(j);
-          }
-        }
+    // calculate diff dims before updating internal currentIndex
+    var diffDims = null;
+    if (currentIndex) {
+      if (currentIndex.canCompare(index)) {
+        diffDims = currentIndex.compare(index);
       } else {
         diffDims = [];
-        for (var k = 0; k < index.length(); ++k) {
-          diffDims.push(k);
-        }
-      }
-
-      // assign
-      currentIndex = index;
-
-      if (!silent) {
-        /**
-         * Position change event.
-         *
-         * @event dwv.image.View#positionchange
-         * @type {object}
-         * @property {Array} value The changed value as [index, pixelValue].
-         * @property {Array} diffDims An array of modified indices.
-         */
-        var posEvent = {
-          type: 'positionchange',
-          value: [
-            index.getValues(),
-            position.getValues(),
-          ],
-          diffDims: diffDims,
-          data: {
-            imageUid: image.getImageUid(index)
+        var minLen = Math.min(currentIndex.length(), index.length());
+        for (var i = 0; i < minLen; ++i) {
+          if (currentIndex.get(i) !== index.get(i)) {
+            diffDims.push(i);
           }
-        };
-
-        // add value if possible
-        if (image.canQuantify()) {
-          var pixValue = image.getRescaledValueAtIndex(index);
-          posEvent.value.push(pixValue);
         }
-
-        // fire
-        fireEvent(posEvent);
+        var maxLen = Math.max(currentIndex.length(), index.length());
+        for (var j = minLen; j < maxLen; ++j) {
+          diffDims.push(j);
+        }
       }
     } else {
-      return false;
+      diffDims = [];
+      for (var k = 0; k < index.length(); ++k) {
+        diffDims.push(k);
+      }
+    }
+
+    // assign
+    currentIndex = index;
+
+    if (!silent) {
+      /**
+       * Position change event.
+       *
+       * @event dwv.image.View#positionchange
+       * @type {object}
+       * @property {Array} value The changed value as [index, pixelValue].
+       * @property {Array} diffDims An array of modified indices.
+       */
+      var posEvent = {
+        type: 'positionchange',
+        value: [
+          index.getValues(),
+          position.getValues(),
+        ],
+        diffDims: diffDims,
+        data: {
+          imageUid: image.getImageUid(index)
+        }
+      };
+
+      // add value if possible
+      if (image.canQuantify()) {
+        var pixValue = image.getRescaledValueAtIndex(index);
+        posEvent.value.push(pixValue);
+      }
+
+      // fire
+      fireEvent(posEvent);
     }
 
     // all good
