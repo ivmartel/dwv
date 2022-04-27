@@ -654,8 +654,6 @@ dwv.gui.ViewLayer = function (containerDiv) {
           self.clear();
         }
       } else {
-        // reset valid flag
-        isValidPosition = true;
         // 3D dimensions
         var dims3D = [0, 1, 2];
         // remove scroll index
@@ -666,7 +664,10 @@ dwv.gui.ViewLayer = function (containerDiv) {
           return dims3D.indexOf(item) === -1;
         });
         // update if we have something left
-        if (diffDims.length !== 0) {
+        if (diffDims.length !== 0 || !isValidPosition) {
+          // reset valid flag
+          isValidPosition = true;
+          // reset update flag
           needsDataUpdate = true;
           self.draw();
         }
