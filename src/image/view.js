@@ -420,12 +420,24 @@ dwv.image.View = function (image) {
     return currentIndex;
   };
 
+  /**
+   * Check is the provided position can be set.
+   *
+   * @param {dwv.math.Point} position The position.
+   * @returns {boolean} True is the position is in bounds.
+   */
   this.canSetPosition = function (position) {
     var geometry = image.getGeometry();
     var index = geometry.worldToIndex(position);
     return geometry.isIndexInBounds(index);
   };
 
+  /**
+   * Get the origin at a given position.
+   *
+   * @param {dwv.math.Point} position The position.
+   * @returns {dwv.math.Point} The origin.
+   */
   this.getOrigin = function (position) {
     var geometry = image.getGeometry();
     var originIndex = 0;

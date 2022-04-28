@@ -299,6 +299,12 @@ dwv.ctrl.ViewController = function (view) {
     return view.getImage().getGeometry().getSize();
   };
 
+  /**
+   * Check is the provided position can be set.
+   *
+   * @param {dwv.math.Point} position The position.
+   * @returns {boolean} True is the position is in bounds.
+   */
   this.canSetPosition = function (position) {
     return view.canSetPosition(position);
   };
