@@ -75,6 +75,7 @@ dwv.test.viewerSetup = function () {
     Scroll: {},
     WindowLevel: {},
     ZoomAndPan: {},
+    Opacity: {},
     Draw: {options: ['Rectangle'], type: 'factory'}
   };
 
@@ -494,6 +495,7 @@ function setupToolsCheckboxes() {
  */
 function bindAppToControls() {
   _app.addEventListener('wlchange', onWLChange);
+  _app.addEventListener('opacitychange', onOpacityChange);
 }
 
 /**
@@ -501,6 +503,7 @@ function bindAppToControls() {
  */
 function unbindAppToControls() {
   _app.removeEventListener('wlchange', onWLChange);
+  _app.removeEventListener('opacitychange', onOpacityChange);
 }
 
 /**
@@ -509,14 +512,34 @@ function unbindAppToControls() {
  * @param {object} event The change event.
  */
 function onWLChange(event) {
-  var widthElemId = 'width-' + event.dataindex + '-number';
-  var widthElem = document.getElementById(widthElemId);
-  widthElem.value = event.value[1];
-  widthElem.dispatchEvent(new InputEvent('input'));
-  var centerElemId = 'center-' + event.dataindex + '-number';
-  var centerElem = document.getElementById(centerElemId);
-  centerElem.value = event.value[0];
-  centerElem.dispatchEvent(new InputEvent('input'));
+  // width number
+  var elemId = 'width-' + event.dataindex + '-number';
+  var elem = document.getElementById(elemId);
+  elem.value = event.value[1];
+  // width range
+  elemId = 'width-' + event.dataindex + '-range';
+  elem = document.getElementById(elemId);
+  elem.value = event.value[1];
+  // center number
+  elemId = 'center-' + event.dataindex + '-number';
+  elem = document.getElementById(elemId);
+  elem.value = event.value[0];
+  // center range
+  elemId = 'center-' + event.dataindex + '-range';
+  elem = document.getElementById(elemId);
+  elem.value = event.value[0];
+}
+
+function onOpacityChange(event) {
+  var value = parseFloat(event.value[0]).toPrecision(3);
+  // number
+  var elemId = 'opacity-' + event.dataindex + '-number';
+  var elem = document.getElementById(elemId);
+  elem.value = value;
+  // range
+  elemId = 'opacity-' + event.dataindex + '-range';
+  elem = document.getElementById(elemId);
+  elem.value = value;
 }
 
 /**
