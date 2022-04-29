@@ -237,6 +237,10 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @param {number} alpha The opacity ([0:1] range).
    */
   this.setOpacity = function (alpha) {
+    if (alpha === opacity) {
+      return;
+    }
+
     opacity = Math.min(Math.max(alpha, 0), 1);
 
     /**
