@@ -300,6 +300,15 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
+   * Get the image rescaled data range.
+   *
+   * @returns {object} The range as {min, max}.
+   */
+  this.getImageRescaledDataRange = function () {
+    return view.getImage().getRescaledDataRange();
+  };
+
+  /**
    * Check is the provided position can be set.
    *
    * @param {dwv.math.Point} position The position.

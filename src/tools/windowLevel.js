@@ -55,11 +55,16 @@ dwv.tool.WindowLevel = function (app) {
     // difference to last position
     var diffX = event._x - self.x0;
     var diffY = self.y0 - event._y;
+    // data range
+    var range = viewController.getImageRescaledDataRange();
+    // 1/1000 seems to give reasonable results...
+    var pixelToIntensity = (range.max - range.min) * 0.001;
+
     // calculate new window level
-    var windowCenter =
-      parseInt(viewController.getWindowLevel().center, 10) + diffY;
-    var windowWidth =
-      parseInt(viewController.getWindowLevel().width, 10) + diffX;
+    var center = parseInt(viewController.getWindowLevel().center, 10);
+    var width = parseInt(viewController.getWindowLevel().width, 10);
+    var windowCenter = center + diffY * pixelToIntensity;
+    var windowWidth = width + diffX * pixelToIntensity;
     // bound window width
     windowWidth = dwv.image.validateWindowWidth(windowWidth);
 
