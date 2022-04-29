@@ -129,6 +129,8 @@ dwv.test.viewerSetup = function () {
       // add data row
       if (_mode !== 3) {
         addDataRow(dataLoad, dataViewConfigs);
+        // bind app to controls
+        bindAppToControls();
       }
       ++dataLoad;
       // init gui
@@ -217,6 +219,9 @@ dwv.test.onDOMContentLoadedViewer = function () {
       configs = prepareAndGetSimpleDataViewConfig();
     }
 
+    // unbind app to controls
+    unbindAppToControls();
+
     _app.setDataViewConfig(configs);
 
     clearDataTable();
@@ -224,6 +229,9 @@ dwv.test.onDOMContentLoadedViewer = function () {
       _app.render(i);
       addDataRow(i, configs);
     }
+
+    // bind app to controls
+    bindAppToControls();
 
     // need to set tool after config change
     var toolsInput = document.getElementsByName('tools');
@@ -479,6 +487,36 @@ function setupToolsCheckboxes() {
     // keyboard shortcut
     window.addEventListener('keydown', getKeyCheck(key.charCodeAt(0), input));
   }
+}
+
+/**
+ * Bind app to controls.
+ */
+function bindAppToControls() {
+  _app.addEventListener('wlchange', onWLChange);
+}
+
+/**
+ * Unbind app to controls.
+ */
+function unbindAppToControls() {
+  _app.removeEventListener('wlchange', onWLChange);
+}
+
+/**
+ * Handle app wl change.
+ *
+ * @param {object} event The change event.
+ */
+function onWLChange(event) {
+  var widthElemId = 'width-' + event.dataindex + '-number';
+  var widthElem = document.getElementById(widthElemId);
+  widthElem.value = event.value[1];
+  widthElem.dispatchEvent(new InputEvent('input'));
+  var centerElemId = 'center-' + event.dataindex + '-number';
+  var centerElem = document.getElementById(centerElemId);
+  centerElem.value = event.value[0];
+  centerElem.dispatchEvent(new InputEvent('input'));
 }
 
 /**
