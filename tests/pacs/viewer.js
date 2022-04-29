@@ -119,13 +119,13 @@ dwv.test.viewerSetup = function () {
 
   var dataLoad = 0;
   var firstRender = [];
-  _app.addEventListener('renderend', function (event) {
+  _app.addEventListener('loadend', function (event) {
     // update UI at first render
-    if (!firstRender.includes(event.dataid)) {
+    if (!firstRender.includes(event.loadid)) {
       // store data id
       firstRender.push(event.dataid);
       // log meta data
-      console.log(_app.getMetaData(event.dataid));
+      console.log(_app.getMetaData(event.loadid));
       // add data row
       if (_mode !== 3) {
         addDataRow(dataLoad, dataViewConfigs);
@@ -631,7 +631,7 @@ function addDataRow(id, dataViewConfigs) {
   cell = row.insertCell();
   var minId = 'value-min-' + id;
   var maxId = 'value-max-' + id;
-  // calback
+  // callback
   var changeAlphaFunc = function () {
     var min = parseFloat(document.getElementById(minId + '-number').value);
     var max = parseFloat(document.getElementById(maxId + '-number').value);
@@ -657,9 +657,10 @@ function addDataRow(id, dataViewConfigs) {
   cell = row.insertCell();
   var widthId = 'width-' + id;
   var centerId = 'center-' + id;
-  // calback
+  // callback
   var changeContrast = function () {
-    var width = parseFloat(document.getElementById(widthId + '-number').value);
+    var width =
+      parseFloat(document.getElementById(widthId + '-number').value);
     var center =
       parseFloat(document.getElementById(centerId + '-number').value);
     vc.setWindowLevel(center, width);
@@ -674,13 +675,13 @@ function addDataRow(id, dataViewConfigs) {
 
   // cell: opactiy
   cell = row.insertCell();
-  var opacityId = 'opactiy-' + id;
-  // calback
+  var opacityId = 'opacity-' + id;
+  // callback
   var changeOpacity = function (value) {
     vl.setOpacity(value);
     vl.draw();
   };
   // add controls
   cell.appendChild(getControlDiv(opacityId, 'opacity',
-    0, 1, vl.getOpacity(), changeOpacity));
+    0, 1, vl.getOpacity(), changeOpacity, floatPrecision));
 }
