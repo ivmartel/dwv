@@ -63,8 +63,8 @@ dwv.tool.WindowLevel = function (app) {
     // calculate new window level
     var center = parseInt(viewController.getWindowLevel().center, 10);
     var width = parseInt(viewController.getWindowLevel().width, 10);
-    var windowCenter = center + diffY * pixelToIntensity;
-    var windowWidth = width + diffX * pixelToIntensity;
+    var windowCenter = center + Math.round(diffY * pixelToIntensity);
+    var windowWidth = width + Math.round(diffX * pixelToIntensity);
     // bound window width
     windowWidth = dwv.image.validateWindowWidth(windowWidth);
 
