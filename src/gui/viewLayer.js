@@ -469,12 +469,14 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @param {object} size The image size as {x,y}.
    * @param {object} spacing The image spacing as {x,y}.
    * @param {number} index The associated data index.
+   * @param {number} alpha The initial data opacity.
    */
-  this.initialise = function (size, spacing, index) {
+  this.initialise = function (size, spacing, index, alpha) {
     // set locals
     baseSize = size;
     baseSpacing = spacing;
     dataIndex = index;
+    opacity = Math.min(Math.max(alpha, 0), 1);
 
     // create canvas
     // (canvas size is set in fitToContainer)
