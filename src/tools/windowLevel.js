@@ -58,7 +58,7 @@ dwv.tool.WindowLevel = function (app) {
     // data range
     var range = viewController.getImageRescaledDataRange();
     // 1/1000 seems to give reasonable results...
-    var pixelToIntensity = (range.max - range.min) * 0.001;
+    var pixelToIntensity = (range.max - range.min) * 0.01;
 
     // calculate new window level
     var center = parseInt(viewController.getWindowLevel().center, 10);
