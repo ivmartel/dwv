@@ -309,6 +309,28 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
+   * Compare the input meta data to the associated image one.
+   *
+   * @param {object} meta The meta data.
+   * @returns {boolean} True if the associated image has equal meta data.
+   */
+  this.equalImageMeta = function (meta) {
+    var imageMeta = view.getImage().getMeta();
+    // loop through input meta keys
+    var metaKeys = Object.keys(meta);
+    for (var i = 0; i < metaKeys.length; ++i) {
+      var metaKey = metaKeys[i];
+      if (typeof imageMeta[metaKey] === 'undefined') {
+        return false;
+      }
+      if (imageMeta[metaKey] !== meta[metaKey]) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  /**
    * Check is the provided position can be set.
    *
    * @param {dwv.math.Point} position The position.

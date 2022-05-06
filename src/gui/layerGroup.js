@@ -268,6 +268,24 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   };
 
   /**
+   * Search view layers for equal imae meta data.
+   *
+   * @param {object} meta The meta data to find.
+   * @returns {Array} The list of view layers that contain matched data.
+   */
+  this.searchViewLayers = function (meta) {
+    var res = [];
+    for (var i = 0; i < layers.length; ++i) {
+      if (layers[i] instanceof dwv.gui.ViewLayer) {
+        if (layers[i].getViewController().equalImageMeta(meta)) {
+          res.push(layers[i]);
+        }
+      }
+    }
+    return res;
+  };
+
+  /**
    * Get the view layers data indices.
    *
    * @returns {Array} The list of indices.
