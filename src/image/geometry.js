@@ -42,6 +42,22 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
   this.getOrigins = function () {
     return origins;
   };
+
+  /**
+   * Check if a point is in the origin list.
+   *
+   * @param {{dwv.math.Point3} point3D The point to check.
+   * @returns {boolean} True if in list.
+   */
+  this.includesOrigin = function (point3D) {
+    for (var i = 0; i < origins.length; ++i) {
+      if (origins[i].equals(point3D)) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   /**
    * Get the object size.
    * Warning: the size comes as stored in DICOM, meaning that it could
