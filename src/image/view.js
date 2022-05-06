@@ -723,7 +723,7 @@ dwv.image.View.prototype.getWindowLevelMinMax = function () {
   var width = max - min;
   // full black / white images, defaults to 1.
   if (width < 1) {
-    dwv.logger.warn('Zero or negative width, defaulting to one.');
+    dwv.logger.warn('Zero or negative window width, defaulting to one.');
     width = 1;
   }
   var center = min + width / 2;
