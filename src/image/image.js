@@ -432,7 +432,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     }
     // all meta should be equal
     for (var key in meta) {
-      if (key === 'windowPresets') {
+      if (key === 'windowPresets' || key === 'numberOfFiles') {
         continue;
       }
       if (meta[key] !== rhs.getMeta()[key]) {
@@ -463,8 +463,8 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       values[3] = timeId;
     }
     var index = new dwv.math.Index(values);
-    var primaryOffset = size.indexToOffset(index);
-    var secondaryOffset = this.getSecondaryOffset(index);
+    var primaryOffset = size.indexToOffset(index) * numberOfComponents;
+    var secondaryOffset = this.getSecondaryOffset(index) * numberOfComponents;
 
     // first frame special slice by slice append
     if (timeId === 0) {
