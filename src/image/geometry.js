@@ -46,7 +46,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
   /**
    * Check if a point is in the origin list.
    *
-   * @param {{dwv.math.Point3} point3D The point to check.
+   * @param {dwv.math.Point3D} point3D The point to check.
    * @returns {boolean} True if in list.
    */
   this.includesOrigin = function (point3D) {
