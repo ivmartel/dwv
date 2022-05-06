@@ -530,6 +530,11 @@ function onWLChange(event) {
   elem.value = event.value[0];
 }
 
+/**
+ * Handle app opacity change.
+ *
+ * @param {object} event The change event.
+ */
 function onOpacityChange(event) {
   var value = parseFloat(event.value[0]).toPrecision(3);
   // number
