@@ -1267,13 +1267,16 @@ dwv.App = function () {
       dl.initialise(size2D, spacing2D, dataIndex);
       dl.setPlaneHelper(viewLayer.getViewController().getPlaneHelper());
 
+      // force positionchange to sync layers
       var vc = viewLayer.getViewController();
-      // positionchange event like data
       var value = [
         vc.getCurrentIndex().getValues(),
         vc.getCurrentPosition().getValues()
       ];
-      layerGroup.updateLayersToPositionChange({value: value});
+      layerGroup.updateLayersToPositionChange({
+        value: value,
+        srclayerid: viewLayer.getId()
+      });
     }
 
     // fit to the maximum size
