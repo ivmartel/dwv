@@ -126,12 +126,10 @@ dwv.test.viewerSetup = function () {
       // store data id
       firstRender.push(event.dataid);
       // log meta data
-      console.log(_app.getMetaData(event.loadid));
+      console.log('metadata', _app.getMetaData(event.loadid));
       // add data row
       if (_mode !== 3) {
-        addDataRow(dataLoad, dataViewConfigs);
-        // bind app to controls
-        bindAppToControls();
+        addDataRow(event.loadid, dataViewConfigs);
       }
       ++dataLoad;
       // init gui
@@ -228,11 +226,9 @@ dwv.test.onDOMContentLoadedViewer = function () {
     clearDataTable();
     for (var i = 0; i < _app.getNumberOfLoadedData(); ++i) {
       _app.render(i);
+      // add data row (will bind controls)
       addDataRow(i, configs);
     }
-
-    // bind app to controls
-    bindAppToControls();
 
     // need to set tool after config change
     var toolsInput = document.getElementsByName('tools');
@@ -515,19 +511,29 @@ function onWLChange(event) {
   // width number
   var elemId = 'width-' + event.dataindex + '-number';
   var elem = document.getElementById(elemId);
-  elem.value = event.value[1];
+  if (elem) {
+    elem.value = event.value[1];
+  } else {
+    console.warn('wl change: HTML not ready?');
+  }
   // width range
   elemId = 'width-' + event.dataindex + '-range';
   elem = document.getElementById(elemId);
-  elem.value = event.value[1];
+  if (elem) {
+    elem.value = event.value[1];
+  }
   // center number
   elemId = 'center-' + event.dataindex + '-number';
   elem = document.getElementById(elemId);
-  elem.value = event.value[0];
+  if (elem) {
+    elem.value = event.value[0];
+  }
   // center range
   elemId = 'center-' + event.dataindex + '-range';
   elem = document.getElementById(elemId);
-  elem.value = event.value[0];
+  if (elem) {
+    elem.value = event.value[0];
+  }
 }
 
 /**
@@ -540,11 +546,17 @@ function onOpacityChange(event) {
   // number
   var elemId = 'opacity-' + event.dataindex + '-number';
   var elem = document.getElementById(elemId);
-  elem.value = value;
+  if (elem) {
+    elem.value = value;
+  } else {
+    console.warn('opacity change: HTML not ready?');
+  }
   // range
   elemId = 'opacity-' + event.dataindex + '-range';
   elem = document.getElementById(elemId);
-  elem.value = value;
+  if (elem) {
+    elem.value = value;
+  }
 }
 
 /**
@@ -619,6 +631,11 @@ function getControlDiv(id, name, min, max, value, callback, precision) {
  * @param {object} dataViewConfigs The view configurations.
  */
 function addDataRow(id, dataViewConfigs) {
+  // bind app to controls on first id
+  if (id === 0) {
+    bindAppToControls();
+  }
+
   var layerGroupIds = getLayerGroupIds(dataViewConfigs);
   // use first view layer
   var vls = _app.getViewLayersByDataIndex(id);
