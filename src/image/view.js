@@ -461,7 +461,7 @@ dwv.image.View = function (image) {
     // send invalid event if not in bounds
     var geometry = image.getGeometry();
     var index = geometry.worldToIndex(position);
-    if (!geometry.isIndexInBounds(index)) {
+    if (!geometry.isIndexInBounds(index, this.getScrollIndex())) {
       if (!silent) {
         // fire event with valid: false
         fireEvent({
@@ -496,7 +496,7 @@ dwv.image.View = function (image) {
     var position = geometry.indexToWorld(index);
 
     // check if possible
-    if (!geometry.isIndexInBounds(index)) {
+    if (!geometry.isIndexInBounds(index, this.getScrollIndex())) {
       // do no send invalid positionchange event: avoid empty repaint
       return false;
     }

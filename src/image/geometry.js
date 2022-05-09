@@ -295,10 +295,11 @@ dwv.image.Geometry.prototype.isInBounds = function (point) {
  * Check that a index is within bounds.
  *
  * @param {dwv.math.Index} index The index to check.
+ * @param {number} dir Optional direction to check.
  * @returns {boolean} True if the given coordinates are within bounds.
  */
-dwv.image.Geometry.prototype.isIndexInBounds = function (index) {
-  return this.getSize().isInBounds(index);
+dwv.image.Geometry.prototype.isIndexInBounds = function (index, dir) {
+  return this.getSize().isInBounds(index, dir);
 };
 
 /**

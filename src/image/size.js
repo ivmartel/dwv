@@ -168,9 +168,10 @@ dwv.image.Size.prototype.equals = function (rhs) {
  * Check that an index is within bounds.
  *
  * @param {dwv.math.Index} index The index to check.
+ * @param {number} dir Optional direction to check.
  * @returns {boolean} True if the given coordinates are within bounds.
  */
-dwv.image.Size.prototype.isInBounds = function (index) {
+dwv.image.Size.prototype.isInBounds = function (index, dir) {
   // check input
   if (!index) {
     return false;
@@ -180,10 +181,19 @@ dwv.image.Size.prototype.isInBounds = function (index) {
   if (length !== index.length()) {
     return false;
   }
-  // check values
-  for (var i = 0; i < length; ++i) {
-    if (index.get(i) < 0 || index.get(i) > this.get(i) - 1) {
+  // check values is 0 <= v < size
+  var inBound = function (value, size) {
+    return value >= 0 && value < size;
+  };
+  if (typeof dir !== 'undefined') {
+    if (!inBound(index.get(dir), this.get(dir))) {
       return false;
+    }
+  } else {
+    for (var i = 0; i < length; ++i) {
+      if (!inBound(index.get(i), this.get(i))) {
+        return false;
+      }
     }
   }
   // seems ok!
