@@ -91,7 +91,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
     if (origins.length === 1) {
       return 1;
     }
-    var spacing = null;
+    var sliceSpacing = null;
     // (x, y, z) = orientationMatrix * (i, j, k)
     // -> inv(orientationMatrix) * (x, y, z) = (i, j, k)
     // applied on the patient position, reorders indices
@@ -106,11 +106,11 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
         throw new Error('Zero slice spacing.' +
           origin1.toString() + ' ' + origin2.toString());
       }
-      if (spacing === null) {
-        spacing = diff;
+      if (sliceSpacing === null) {
+        sliceSpacing = diff;
       } else {
-        if (!dwv.math.isSimilar(spacing, diff, dwv.math.BIG_EPSILON)) {
-          deltas.push(Math.abs(spacing - diff));
+        if (!dwv.math.isSimilar(sliceSpacing, diff, dwv.math.BIG_EPSILON)) {
+          deltas.push(Math.abs(sliceSpacing - diff));
         }
       }
     }
@@ -125,7 +125,8 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
           mean.toFixed(3) + ' (' + deltas.length + ' case(s))');
       }
     }
-    return spacing;
+
+    return sliceSpacing;
   };
 
   /**
