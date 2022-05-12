@@ -83,11 +83,12 @@ dwv.image.View = function (image) {
   var colourMap = dwv.image.lut.plain;
   /**
    * Current position as a Point3D.
+   * Store position and not index to stay geometry independent.
    *
    * @private
    * @type {dwv.math.Index}
    */
-  var currentIndex = null;
+  var currentPosition = null;
   /**
    * View orientation. Undefined will use the original slice ordering.
    *
@@ -225,6 +226,7 @@ dwv.image.View = function (image) {
     if (!this.getCurrentIndex()) {
       this.setInitialIndex();
     }
+    var currentIndex = this.getCurrentIndex();
     // use current rsi if not provided
     if (typeof rsi === 'undefined') {
       rsi = image.getRescaleSlopeAndIntercept(currentIndex);
@@ -407,8 +409,7 @@ dwv.image.View = function (image) {
    * @returns {dwv.math.Point} The current position.
    */
   this.getCurrentPosition = function () {
-    var geometry = this.getImage().getGeometry();
-    return geometry.indexToWorld(currentIndex);
+    return currentPosition;
   };
 
   /**
@@ -417,7 +418,8 @@ dwv.image.View = function (image) {
    * @returns {dwv.math.Index} The current index.
    */
   this.getCurrentIndex = function () {
-    return currentIndex;
+    var geometry = this.getImage().getGeometry();
+    return geometry.worldToIndex(this.getCurrentPosition());
   };
 
   /**
@@ -429,7 +431,7 @@ dwv.image.View = function (image) {
   this.canSetPosition = function (position) {
     var geometry = image.getGeometry();
     var index = geometry.worldToIndex(position);
-    return geometry.isIndexInBounds(index);
+    return geometry.isIndexInBounds(index, this.getScrollIndex());
   };
 
   /**
@@ -501,8 +503,12 @@ dwv.image.View = function (image) {
       return false;
     }
 
-    // calculate diff dims before updating internal currentIndex
+    // calculate diff dims before updating internal
     var diffDims = null;
+    var currentIndex = null;
+    if (this.getCurrentPosition()) {
+      currentIndex = this.getCurrentIndex();
+    }
     if (currentIndex) {
       if (currentIndex.canCompare(index)) {
         diffDims = currentIndex.compare(index);
@@ -527,7 +533,7 @@ dwv.image.View = function (image) {
     }
 
     // assign
-    currentIndex = index;
+    currentPosition = position;
 
     if (!silent) {
       /**
