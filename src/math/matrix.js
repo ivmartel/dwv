@@ -32,6 +32,9 @@ dwv.math.isSimilar = function (a, b, tol) {
  * @class
  */
 dwv.math.Matrix33 = function (values) {
+  // matrix inverse, calculated at first ask
+  var inverse = null;
+
   /**
    * Get a value of the matrix.
    *
@@ -42,6 +45,20 @@ dwv.math.Matrix33 = function (values) {
   this.get = function (row, col) {
     return values[row * 3 + col];
   };
+
+  /**
+   * Get the inverse of this matrix.
+   *
+   * @returns {dwv.math.Matrix33|undefined} The inverse matrix or undefined
+   *   if the determinant is zero.
+   */
+  this.getInverse = function () {
+    if (inverse === null) {
+      inverse = dwv.math.getMatrixInverse(this);
+    }
+    return inverse;
+  };
+
 }; // Matrix33
 
 /**
@@ -53,15 +70,16 @@ dwv.math.Matrix33 = function (values) {
  * @returns {boolean} True if both matrices are equal.
  */
 dwv.math.Matrix33.prototype.equals = function (rhs, p) {
-  return dwv.math.isSimilar(this.get(0, 0), rhs.get(0, 0), p) &&
-    dwv.math.isSimilar(this.get(0, 1), rhs.get(0, 1), p) &&
-    dwv.math.isSimilar(this.get(0, 2), rhs.get(0, 2), p) &&
-    dwv.math.isSimilar(this.get(1, 0), rhs.get(1, 0), p) &&
-    dwv.math.isSimilar(this.get(1, 1), rhs.get(1, 1), p) &&
-    dwv.math.isSimilar(this.get(1, 2), rhs.get(1, 2), p) &&
-    dwv.math.isSimilar(this.get(2, 0), rhs.get(2, 0), p) &&
-    dwv.math.isSimilar(this.get(2, 1), rhs.get(2, 1), p) &&
-    dwv.math.isSimilar(this.get(2, 2), rhs.get(2, 2), p);
+  // TODO: add type check
+  // check values
+  for (var i = 0; i < 3; ++i) {
+    for (var j = 0; j < 3; ++j) {
+      if (!dwv.math.isSimilar(this.get(i, j), rhs.get(i, j), p)) {
+        return false;
+      }
+    }
+  }
+  return true;
 };
 
 /**
@@ -70,10 +88,20 @@ dwv.math.Matrix33.prototype.equals = function (rhs, p) {
  * @returns {string} The matrix as a string.
  */
 dwv.math.Matrix33.prototype.toString = function () {
-  return '[' + this.get(0, 0) + ', ' + this.get(0, 1) + ', ' + this.get(0, 2) +
-    '\n ' + this.get(1, 0) + ', ' + this.get(1, 1) + ', ' + this.get(1, 2) +
-    '\n ' + this.get(2, 0) + ', ' + this.get(2, 1) + ', ' + this.get(2, 2) +
-    ']';
+  var str = '[';
+  for (var i = 0; i < 3; ++i) {
+    if (i !== 0) {
+      str += ', \n ';
+    }
+    for (var j = 0; j < 3; ++j) {
+      if (j !== 0) {
+        str += ', ';
+      }
+      str += this.get(i, j);
+    }
+  }
+  str += ']';
+  return str;
 };
 
 /**
@@ -171,42 +199,46 @@ dwv.math.Matrix33.prototype.multiplyIndex3D = function (index3D) {
 };
 
 /**
- * Get the inverse of this matrix.
+ * Get the inverse of an input 3*3 matrix.
  *
- * @returns {dwv.math.Matrix33} The inverse matrix.
+ * @param {dwv.math.Matrix33} m The input matrix.
+ * @returns {dwv.math.Matrix33|undefined} The inverse matrix or undefined
+ *   if the determinant is zero.
  * @see https://en.wikipedia.org/wiki/Invertible_matrix#Inversion_of_3_%C3%97_3_matrices
+ * @see https://github.com/willnode/N-Matrix-Programmer
  */
-dwv.math.Matrix33.prototype.getInverse = function () {
-  var a = this.get(0, 0);
-  var b = this.get(0, 1);
-  var c = this.get(0, 2);
-  var d = this.get(1, 0);
-  var e = this.get(1, 1);
-  var f = this.get(1, 2);
-  var g = this.get(2, 0);
-  var h = this.get(2, 1);
-  var i = this.get(2, 2);
+dwv.math.getMatrixInverse = function (m) {
+  var m00 = m.get(0, 0);
+  var m01 = m.get(0, 1);
+  var m02 = m.get(0, 2);
+  var m10 = m.get(1, 0);
+  var m11 = m.get(1, 1);
+  var m12 = m.get(1, 2);
+  var m20 = m.get(2, 0);
+  var m21 = m.get(2, 1);
+  var m22 = m.get(2, 2);
 
-  var a2 = e * i - f * h;
-  var b2 = f * g - d * i;
-  var c2 = d * h - e * g;
+  var a1212 = m11 * m22 - m12 * m21;
+  var a2012 = m12 * m20 - m10 * m22;
+  var a0112 = m10 * m21 - m11 * m20;
 
-  var det = a * a2 + b * b2 + c * c2;
+  var det = m00 * a1212 + m01 * a2012 + m02 * a0112;
   if (det === 0) {
-    dwv.logger.warn('Cannot invert matrix with zero determinant.');
+    dwv.logger.warn('Cannot invert 3*3 matrix with zero determinant.');
     return;
   }
+  det = 1 / det;
 
   var values = [
-    a2 / det,
-    (c * h - b * i) / det,
-    (b * f - c * e) / det,
-    b2 / det,
-    (a * i - c * g) / det,
-    (c * d - a * f) / det,
-    c2 / det,
-    (b * g - a * h) / det,
-    (a * e - b * d) / det
+    det * a1212,
+    det * (m02 * m21 - m01 * m22),
+    det * (m01 * m12 - m02 * m11),
+    det * a2012,
+    det * (m00 * m22 - m02 * m20),
+    det * (m02 * m10 - m00 * m12),
+    det * a0112,
+    det * (m01 * m20 - m00 * m21),
+    det * (m00 * m11 - m01 * m10)
   ];
 
   return new dwv.math.Matrix33(values);
