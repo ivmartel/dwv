@@ -96,7 +96,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
     // -> inv(orientationMatrix) * (x, y, z) = (i, j, k)
     // applied on the patient position, reorders indices
     // so that Z is the slice direction
-    var orientation2 = orientation.getInverse().asOneAndZeros();
+    var orientation2 = orientation.getInverse();
     var deltas = [];
     for (var i = 0; i < origins.length - 1; ++i) {
       var origin1 = orientation2.multiplyVector3D(origins[i]);
@@ -217,8 +217,13 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
     //   -> >0 => vectors are codirectional
     //   -> <0 => vectors are oposite
     var dotProd = normal.dotProduct(pointDir);
+    var test = dotProd < 0;
+    // TODO: check why coronal behaves differently...
+    if (orientation.getThirdColMajorDirection() === 1) {
+      test = dotProd > 0;
+    }
     // oposite vectors get higher index
-    var sliceIndex = (dotProd < 0) ? closestSliceIndex + 1 : closestSliceIndex;
+    var sliceIndex = test ? closestSliceIndex + 1 : closestSliceIndex;
     return sliceIndex;
   };
 
@@ -400,7 +405,7 @@ dwv.image.Geometry.prototype.worldToIndex = function (point) {
   var k = Math.round(orientedPoint3D.getZ() / spacing.get(2));
   // abs to fix #1163
   // TODO: find out why k can sometimes be negative...
-  values[2] = flipK(this.getSize(), Math.abs(k));
+  values[2] = flipK(this.getSize(), k);
 
   // return index
   return new dwv.math.Index(values);
