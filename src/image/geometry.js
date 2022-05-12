@@ -396,9 +396,11 @@ dwv.image.Geometry.prototype.worldToIndex = function (point) {
   values[0] = Math.round(orientedPoint3D.getX() / spacing.get(0));
   values[1] = Math.round(orientedPoint3D.getY() / spacing.get(1));
   // flip K index (because of the slice order given by getSliceIndex)
-  values[2] = flipK(this.getSize(),
-    Math.round(orientedPoint3D.getZ() / spacing.get(2))
-  );
+  var k = Math.round(orientedPoint3D.getZ() / spacing.get(2));
+  // abs to fix #1130
+  // TODO: find out why k can sometimes be negative...
+  values[2] = flipK(this.getSize(), Math.abs(k));
+
   // return index
   return new dwv.math.Index(values);
 };
