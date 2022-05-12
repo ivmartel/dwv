@@ -418,8 +418,12 @@ dwv.image.View = function (image) {
    * @returns {dwv.math.Index} The current index.
    */
   this.getCurrentIndex = function () {
+    var position = this.getCurrentPosition();
+    if (!position) {
+      return null;
+    }
     var geometry = this.getImage().getGeometry();
-    return geometry.worldToIndex(this.getCurrentPosition());
+    return geometry.worldToIndex(position);
   };
 
   /**
