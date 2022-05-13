@@ -122,6 +122,21 @@ dwv.math.Point3D.prototype.equals = function (rhs) {
 };
 
 /**
+ * Check for Point3D similarity.
+ *
+ * @param {dwv.math.Point3D} rhs The other point to compare to.
+ * @param {number} tol Optional comparison tolerance,
+ *   default to Number.EPSILON.
+ * @returns {boolean} True if both points are equal.
+ */
+dwv.math.Point3D.prototype.isSimilar = function (rhs, tol) {
+  return rhs !== null &&
+    dwv.math.isSimilar(this.getX(), rhs.getX(), tol) &&
+    dwv.math.isSimilar(this.getY(), rhs.getY(), tol) &&
+    dwv.math.isSimilar(this.getZ(), rhs.getZ(), tol);
+};
+
+/**
  * Get a string representation of the Point3D.
  *
  * @returns {string} The point as a string.

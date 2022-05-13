@@ -51,7 +51,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
    */
   this.includesOrigin = function (point3D) {
     for (var i = 0; i < origins.length; ++i) {
-      if (origins[i].equals(point3D)) {
+      if (origins[i].isSimilar(point3D, dwv.math.BIG_EPSILON)) {
         return true;
       }
     }
