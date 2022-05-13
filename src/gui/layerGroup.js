@@ -496,17 +496,15 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
         var vc = layers[i].getViewController();
         // origin0 should always be there
         var origin0 = vc.getOrigin();
-        var origin = vc.getOrigin(position);
         // depending on position, origin could be undefined
-        if (typeof origin === 'undefined') {
-          continue;
-        }
+        var origin = vc.getOrigin(position);
 
         if (!baseOrigin) {
           baseOrigin0 = origin0;
           baseOrigin = origin;
         } else {
-          if (vc.canSetPosition(position)) {
+          if (vc.canSetPosition(position) &&
+            typeof origin !== 'undefined') {
             // TODO: compensate for possible different orientation
             // TODO: check why -z...
 
