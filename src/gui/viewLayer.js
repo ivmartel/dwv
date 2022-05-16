@@ -198,6 +198,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
     // event.value = [index, image]
     if (dataIndex === event.value[0]) {
       viewController.setImage(event.value[1]);
+      setBaseSize(viewController.getImageSize().get2D());
       needsDataUpdate = true;
     }
   };
@@ -473,7 +474,6 @@ dwv.gui.ViewLayer = function (containerDiv) {
    */
   this.initialise = function (size, spacing, index, alpha) {
     // set locals
-    baseSize = size;
     baseSpacing = spacing;
     dataIndex = index;
     opacity = Math.min(Math.max(alpha, 0), 1);
@@ -495,22 +495,37 @@ dwv.gui.ViewLayer = function (containerDiv) {
       return;
     }
 
-    // check canvas
-    if (!dwv.gui.canCreateCanvas(baseSize.x, baseSize.y)) {
-      throw new Error('Cannot create canvas ' + baseSize.x + ', ' + baseSize.y);
-    }
-
     // off screen canvas
     offscreenCanvas = document.createElement('canvas');
+
+    // set base size: needs an existing context and off screen canvas
+    setBaseSize(size);
+
+    // update data on first draw
+    needsDataUpdate = true;
+  };
+
+  /**
+   * Set the base size of the layer.
+   *
+   * @param {object} size The size as {x,y}.
+   */
+  function setBaseSize(size) {
+    // check canvas creation
+    if (!dwv.gui.canCreateCanvas(size.x, size.y)) {
+      throw new Error('Cannot create canvas ' + size.x + ', ' + size.y);
+    }
+
+    // set local
+    baseSize = size;
+
+    // off screen canvas
     offscreenCanvas.width = baseSize.x;
     offscreenCanvas.height = baseSize.y;
     // original empty image data array
     context.clearRect(0, 0, baseSize.x, baseSize.y);
     imageData = context.createImageData(baseSize.x, baseSize.y);
-
-    // update data on first draw
-    needsDataUpdate = true;
-  };
+  }
 
   /**
    * Fit the layer to its parent container.
