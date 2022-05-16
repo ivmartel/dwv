@@ -484,8 +484,8 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     var index = new dwv.math.Index(event.value[0]);
     var position = new dwv.math.Point(event.value[1]);
     // origin of the first view layer
-    var baseOrigin0 = null;
-    var baseOrigin = null;
+    var baseViewLayerOrigin0 = null;
+    var baseViewLayerOrigin = null;
     // update position for all layers except the source one
     for (var i = 0; i < layers.length; ++i) {
 
@@ -499,20 +499,20 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
         // depending on position, origin could be undefined
         var origin = vc.getOrigin(position);
 
-        if (!baseOrigin) {
-          baseOrigin0 = origin0;
-          baseOrigin = origin;
+        if (!baseViewLayerOrigin) {
+          baseViewLayerOrigin0 = origin0;
+          baseViewLayerOrigin = origin;
         } else {
           if (vc.canSetPosition(position) &&
             typeof origin !== 'undefined') {
-            // TODO: compensate for possible different orientation
+            // TODO: compensate for possible different orientation between views
             // TODO: check why -z...
 
-            var scrollDiff = baseOrigin0.minus(origin0);
+            var scrollDiff = baseViewLayerOrigin0.minus(origin0);
             var scrollOffset = new dwv.math.Vector3D(
               scrollDiff.getX(), scrollDiff.getY(), -1 * scrollDiff.getZ());
 
-            var planeDiff = baseOrigin.minus(origin);
+            var planeDiff = baseViewLayerOrigin.minus(origin);
             var planeOffset = new dwv.math.Vector3D(
               planeDiff.getX(), planeDiff.getY(), -1 * planeDiff.getZ());
 
