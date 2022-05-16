@@ -76,7 +76,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
           size.get(2)
         ],
         viewOrientation);
-      res = new dwv.image.Size(values);
+      res = new dwv.image.Size(values.concat(size.getValues().slice(3)));
     }
     return res;
   };
