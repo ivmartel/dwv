@@ -496,6 +496,16 @@ dwv.App = function () {
   }
 
   /**
+   * Get the data view config.
+   * Carefull, returns a reference, do not modify without resetting.
+   *
+   * @returns {object} The configuration list.
+   */
+  this.getDataViewConfig = function () {
+    return options.dataViewConfigs;
+  };
+
+  /**
    * Set the data view configuration (see the init options for details).
    *
    * @param {object} configs The configuration list.

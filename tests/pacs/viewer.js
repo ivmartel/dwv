@@ -129,7 +129,7 @@ dwv.test.viewerSetup = function () {
       console.log('metadata', _app.getMetaData(event.loadid));
       // add data row
       if (_mode !== 3) {
-        addDataRow(event.loadid, dataViewConfigs);
+        addDataRow(event.loadid);
       }
       ++dataLoad;
       // init gui
@@ -221,13 +221,14 @@ dwv.test.onDOMContentLoadedViewer = function () {
     // unbind app to controls
     unbindAppToControls();
 
+    // set config
     _app.setDataViewConfig(configs);
 
     clearDataTable();
     for (var i = 0; i < _app.getNumberOfLoadedData(); ++i) {
       _app.render(i);
       // add data row (will bind controls)
-      addDataRow(i, configs);
+      addDataRow(i);
     }
 
     // need to set tool after config change
@@ -628,15 +629,15 @@ function getControlDiv(id, name, min, max, value, callback, precision) {
  * Add a data row.
  *
  * @param {number} id The data index.
- * @param {object} dataViewConfigs The view configurations.
  */
-function addDataRow(id, dataViewConfigs) {
+function addDataRow(id) {
   // bind app to controls on first id
   if (id === 0) {
     bindAppToControls();
   }
 
-  var layerGroupIds = getLayerGroupIds(dataViewConfigs);
+  var dataViewConfigs = _app.getDataViewConfig();
+  var allLayerGroupIds = getLayerGroupIds(dataViewConfigs);
   // use first view layer
   var vls = _app.getViewLayersByDataIndex(id);
   var vl = vls[0];
@@ -657,7 +658,7 @@ function addDataRow(id, dataViewConfigs) {
       trow.appendChild(th);
     };
     insertTCell('Id');
-    for (var j = 0; j < layerGroupIds.length; ++j) {
+    for (var j = 0; j < allLayerGroupIds.length; ++j) {
       insertTCell('LG' + j);
     }
     insertTCell('Alpha Range');
@@ -684,8 +685,8 @@ function addDataRow(id, dataViewConfigs) {
     viewConfig = dataViewConfigs['*'];
   }
   var dataLayerGroupsIds = getDataLayerGroupIds(viewConfig);
-  for (var l = 0; l < layerGroupIds.length; ++l) {
-    var layerGroupId = layerGroupIds[l];
+  for (var l = 0; l < allLayerGroupIds.length; ++l) {
+    var layerGroupId = allLayerGroupIds[l];
     cell = row.insertCell();
     if (!dataLayerGroupsIds.includes(layerGroupId)) {
       continue;
