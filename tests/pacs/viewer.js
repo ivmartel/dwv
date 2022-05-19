@@ -368,6 +368,12 @@ function setupBindersCheckboxes() {
     'Opacity'
   ];
   var binders = [];
+  // add all binders at startup
+  for (var b = 0; b < propList.length; ++b) {
+    binders.push(new dwv.gui[propList[b] + 'Binder']);
+  }
+  _app.setLayerGroupsBinders(binders);
+
   /**
    * Add a binder.
    *
@@ -412,6 +418,7 @@ function setupBindersCheckboxes() {
     var input = document.createElement('input');
     input.id = 'binder-' + i;
     input.type = 'checkbox';
+    input.checked = true;
     input.onchange = getOnInputChange(propName);
 
     var label = document.createElement('label');
@@ -426,6 +433,7 @@ function setupBindersCheckboxes() {
   var allInput = document.createElement('input');
   allInput.id = 'binder-all';
   allInput.type = 'checkbox';
+  allInput.checked = true;
   allInput.onchange = function () {
     for (var j = 0; j < propList.length; ++j) {
       document.getElementById('binder-' + j).click();
