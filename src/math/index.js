@@ -172,6 +172,21 @@ dwv.math.getZeroIndex = function (size) {
 };
 
 /**
+ * Get an array sort callback.
+ * f(a,b) > 0 -> b,a
+ * f(a,b) < 0 -> a,b
+ * f(a,b) = 0 -> original order
+ *
+ * @param {number} direction The direction to use to compare indices.
+ * @returns {Function} A function that compares two dwv.math.Index.
+ */
+dwv.math.getIndexCompareFunction = function (direction) {
+  return function (a, b) {
+    return a.get(direction) - b.get(direction);
+  };
+};
+
+/**
  * Get a string id from the index values in the form of: '#0-1_#1-2'.
  *
  * @param {Array} dims Optional list of dimensions to use.

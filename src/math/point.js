@@ -174,6 +174,19 @@ dwv.math.Point3D.prototype.minus = function (point3D) {
 };
 
 /**
+ * Get an array find callback for a given point.
+ *
+ * @param {dwv.math.Point3D} point The point to compare to.
+ * @returns {Function} A function that compares its input point to the one
+ *   given as input to this function.
+ */
+dwv.math.getEqualPoint3DFunction = function (point) {
+  return function (element) {
+    return element.equals(point);
+  };
+};
+
+/**
  * Immutable point.
  * Warning: the input array is NOT cloned, modifying it will
  *  modify the index values.
