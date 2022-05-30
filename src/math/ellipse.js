@@ -172,3 +172,57 @@ dwv.math.Ellipse.prototype.quantify = function (viewController, flags) {
   // return
   return quant;
 };
+
+/**
+ * Get the indices that form a ellpise.
+ *
+ * @param {dwv.math.Index} center The ellipse center.
+ * @param {Array} radius The 2 ellipse radiuses.
+ * @param {Array} dir The 2 ellipse directions.
+ * @returns {Array} The indices of the ellipse.
+ */
+dwv.math.getEllipseIndices = function (center, radius, dir) {
+  var centerValues = center.getValues();
+  // keep all values for possible extra dimensions
+  var values = centerValues.slice();
+  var indices = [];
+  var radiusI = radius[0];
+  var radiusJ = radius[1];
+  var radiusRatio = radiusI / radiusJ;
+  var radiusJ2 = Math.pow(radiusJ, 2);
+  var di = dir[0];
+  var dj = dir[1];
+  // deduce 4 positions from top right
+  for (var j = 0; j < radiusJ; ++j) {
+    // right triangle formed by radiuses, j and len
+    // ellipse: i*i / a*a + j*j / b*b = 1
+    // -> i = a/b * sqrt(b*b - j*j)
+    var len = Math.round(
+      radiusRatio * Math.sqrt(radiusJ2 - Math.pow(j, 2)));
+    var jmax = centerValues[dj] + j;
+    var jmin = centerValues[dj] - j;
+    for (var i = 0; i < len; ++i) {
+      var imax = centerValues[di] + i;
+      var imin = centerValues[di] - i;
+
+      // right
+      values[di] = imax;
+      // right - top
+      values[dj] = jmax;
+      indices.push(new dwv.math.Index(values.slice()));
+      // right - bottom
+      values[dj] = jmin;
+      indices.push(new dwv.math.Index(values.slice()));
+
+      // left
+      values[di] = imin;
+      // left - top
+      values[dj] = jmax;
+      indices.push(new dwv.math.Index(values.slice()));
+      // left - bottom
+      values[dj] = jmin;
+      indices.push(new dwv.math.Index(values.slice()));
+    }
+  }
+  return indices;
+};
