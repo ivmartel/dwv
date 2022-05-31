@@ -534,6 +534,11 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @param {object} fitSize The fit size as {x,y}.
    */
   this.fitToContainer = function (fitScale1D, fitSize) {
+    // previous scale without fit
+    var previousScale = {
+      x: scale.x / fitScale.x,
+      y: scale.y / fitScale.y
+    };
     // update fit scale
     fitScale = {
       x: fitScale1D * baseSpacing.x,
@@ -547,8 +552,11 @@ dwv.gui.ViewLayer = function (containerDiv) {
     }
     canvas.width = width;
     canvas.height = height;
-    // reset scale
-    this.setScale({x: 1, y: 1, z: 1});
+    // reset previous scale with new fit
+    scale = {
+      x: previousScale.x * fitScale.x,
+      y: previousScale.y * fitScale.y
+    };
   };
 
   /**

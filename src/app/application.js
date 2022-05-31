@@ -1264,6 +1264,8 @@ dwv.App = function () {
     var size2D = imageGeometry.getSize(viewOrientation).get2D();
     var spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
     viewLayer.initialise(size2D, spacing2D, dataIndex, opacity);
+    viewLayer.setScale(layerGroup.getScale());
+    viewLayer.setOffset(layerGroup.getOffset());
 
     // listen to image changes
     dataController.addEventListener('imagechange', viewLayer.onimagechange);
