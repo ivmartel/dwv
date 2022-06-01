@@ -52,25 +52,40 @@ dwv.gui.getLayerDetailsFromEvent = function (event) {
 };
 
 /**
- * Get a view orientation according to an image geometry (with its orientation)
- * and target orientation.
+ * Get the view orientation according to an image and target orientation.
  *
- * @param {dwv.image.Geometry} imageGeometry The image geometry.
+ * @param {dwv.math.Matrix33} imageOrientation The image geometry.
  * @param {dwv.math.Matrix33} targetOrientation The target orientation.
  * @returns {dwv.math.Matrix33} The view orientation.
  */
-dwv.gui.getViewOrientation = function (imageGeometry, targetOrientation) {
+dwv.gui.getViewOrientation = function (imageOrientation, targetOrientation) {
   var viewOrientation = dwv.math.getIdentityMat33();
   if (typeof targetOrientation !== 'undefined') {
-    // image orientation as one and zeros
-    // -> view orientation is one and zeros
-    var imgOrientation = imageGeometry.getOrientation().asOneAndZeros();
-    // imgOrientation * viewOrientation = targetOrientation
-    // -> viewOrientation = inv(imgOrientation) * targetOrientation
+    // i: image, v: view, t: target, O: orientation, P: point
+    // [Img] -- Oi --> [Real] <-- Ot -- [Target]
+    // Pi = (Oi)-1 * Ot * Pt = Ov * Pt
+    // -> Ov = (Oi)-1 * Ot
+    // TODO: asOneAndZeros simplifies but not nice...
     viewOrientation =
-      imgOrientation.getInverse().multiply(targetOrientation);
+      imageOrientation.asOneAndZeros().getInverse().multiply(targetOrientation);
   }
   return viewOrientation;
+};
+
+/**
+ * Get the target orientation according to an image and view orientation.
+ *
+ * @param {dwv.math.Matrix33} imageOrientation The image geometry.
+ * @param {dwv.math.Matrix33} viewOrientation The view orientation.
+ * @returns {dwv.math.Matrix33} The target orientation.
+ */
+dwv.gui.getTargetOrientation = function (imageOrientation, viewOrientation) {
+  // i: image, v: view, t: target, O: orientation, P: point
+  // [Img] -- Oi --> [Real] <-- Ot -- [Target]
+  // Pi = (Oi)-1 * Ot * Pt = Ov * Pt
+  // -> Ot = Oi * Ov
+  // note: asOneAndZeros as in dwv.gui.getViewOrientation...
+  return imageOrientation.asOneAndZeros().multiply(viewOrientation);
 };
 
 /**

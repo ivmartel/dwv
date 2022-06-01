@@ -1178,7 +1178,7 @@ dwv.App = function () {
       var data = dataController.get(indices[i]);
       var geometry = data.image.getGeometry();
       var viewOrient = dwv.gui.getViewOrientation(
-        geometry,
+        geometry.getOrientation(),
         layerGroup.getTargetOrientation()
       );
       var size = geometry.getSize(viewOrient).get2D();
@@ -1222,7 +1222,7 @@ dwv.App = function () {
       new dwv.dicom.DicomElementsWrapper(data.meta),
       data.image);
     var viewOrientation = dwv.gui.getViewOrientation(
-      imageGeometry,
+      imageGeometry.getOrientation(),
       layerGroup.getTargetOrientation()
     );
     view.setOrientation(viewOrientation);

@@ -12,12 +12,8 @@ dwv.image = dwv.image || {};
  */
 dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
 
-  // [Img] -- Oi --> [Real] <-- Ot -- [Target]
-  // Pi = (Oi)-1 * Ot * Pt = Ov * Pt
-  // Ov = (Oi)-1 * Ot
-  // Ot = Oi * Ov
-  var targetOrientation =
-    imageOrientation.asOneAndZeros().multiply(viewOrientation);
+  var targetOrientation = dwv.gui.getTargetOrientation(
+    imageOrientation, viewOrientation);
 
   /**
    * Get a 3D offset from a plane one.
