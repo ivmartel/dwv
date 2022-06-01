@@ -96,11 +96,11 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
     // -> inv(orientationMatrix) * (x, y, z) = (i, j, k)
     // applied on the patient position, reorders indices
     // so that Z is the slice direction
-    var orientation2 = orientation.getInverse();
+    var invOrientation = orientation.getInverse();
     var deltas = [];
     for (var i = 0; i < origins.length - 1; ++i) {
-      var origin1 = orientation2.multiplyVector3D(origins[i]);
-      var origin2 = orientation2.multiplyVector3D(origins[i + 1]);
+      var origin1 = invOrientation.multiplyVector3D(origins[i]);
+      var origin2 = invOrientation.multiplyVector3D(origins[i + 1]);
       var diff = Math.abs(origin1.getZ() - origin2.getZ());
       if (diff === 0) {
         throw new Error('Zero slice spacing.' +
