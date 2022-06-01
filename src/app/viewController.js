@@ -396,7 +396,7 @@ dwv.ctrl.ViewController = function (view) {
     var k = this.getCurrentScrollIndexValue();
     var planePoint = new dwv.math.Point3D(point2D.x, point2D.y, k);
     // de-orient
-    var point = planeHelper.getDeOrientedVector3D(planePoint);
+    var point = planeHelper.getTargetDeOrientedVector3D(planePoint);
     // ~indexToWorld to not loose precision
     var geometry = view.getImage().getGeometry();
     var spacing = geometry.getRealSpacing();

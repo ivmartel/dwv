@@ -26,9 +26,12 @@ dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
     var planeOffset = new dwv.math.Vector3D(
       offset2D.x, offset2D.y, 0);
     // de-orient
-    var pixelOffset = this.getDeOrientedVector3D(planeOffset);
-    // offset indexToWorld
-    return offsetIndexToWorld(pixelOffset);
+    var pixelOffset = this.getTargetDeOrientedVector3D(planeOffset);
+    // ~indexToWorld
+    return new dwv.math.Vector3D(
+      pixelOffset.getX() * spacing.get(0),
+      pixelOffset.getY() * spacing.get(1),
+      pixelOffset.getZ() * spacing.get(2));
   };
 
   /**
@@ -38,10 +41,13 @@ dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
    * @returns {object} The plane offset as {x,y}.
    */
   this.getPlaneOffsetFromOffset3D = function (offset3D) {
-    // offset worldToIndex
-    var pixelOffset = offsetWorldToIndex(offset3D);
+    // ~worldToIndex
+    var pixelOffset = new dwv.math.Vector3D(
+      offset3D.x / spacing.get(0),
+      offset3D.y / spacing.get(1),
+      offset3D.z / spacing.get(2));
     // orient
-    var planeOffset = this.getOrientedVector3D(pixelOffset);
+    var planeOffset = this.getTargetOrientedVector3D(pixelOffset);
     // make 2D
     return {
       x: planeOffset.getX(),
@@ -50,38 +56,12 @@ dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
   };
 
   /**
-   * Apply spacing to an offset.
-   *
-   * @param {dwv.math.Point3D} off The 3D offset.
-   * @returns {dwv.math.Vector3D} The world offset.
-   */
-  function offsetIndexToWorld(off) {
-    return new dwv.math.Vector3D(
-      off.getX() * spacing.get(0),
-      off.getY() * spacing.get(1),
-      off.getZ() * spacing.get(2));
-  }
-
-  /**
-   * Remove spacing from an offset.
-   *
-   * @param {object} off The world offset object as {x,y,z}.
-   * @returns {dwv.math.Vector3D} The 3D offset.
-   */
-  function offsetWorldToIndex(off) {
-    return new dwv.math.Vector3D(
-      off.x / spacing.get(0),
-      off.y / spacing.get(1),
-      off.z / spacing.get(2));
-  }
-
-  /**
-   * Orient an input vector.
+   * Orient an input vector from real to target space.
    *
    * @param {dwv.math.Vector3D} vector The input vector.
    * @returns {dwv.math.Vector3D} The oriented vector.
    */
-  this.getOrientedVector3D = function (vector) {
+  this.getTargetOrientedVector3D = function (vector) {
     var planeVector = vector;
     if (typeof targetOrientation !== 'undefined') {
       planeVector = targetOrientation.getInverse().multiplyVector3D(vector);
@@ -90,46 +70,12 @@ dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
   };
 
   /**
-   * Orient an input index.
-   *
-   * @param {dwv.math.Index} index The input index.
-   * @returns {dwv.math.Index} The oriented index.
-   */
-  this.getOrientedIndex = function (index) {
-    var planeIndex = index;
-    if (typeof viewOrientation !== 'undefined') {
-      // abs? otherwise negative index...
-      // vector = viewOrientation * planeVector
-      planeIndex = viewOrientation.getInverse().getAbs().multiplyIndex3D(index);
-    }
-    return planeIndex;
-  };
-
-  /**
-   * Orient an input point.
-   *
-   * @param {dwv.math.Point3D} point The input point.
-   * @returns {dwv.math.Point3D} The oriented point.
-   */
-  this.getOrientedPoint = function (point) {
-    var planePoint = point;
-    if (typeof viewOrientation !== 'undefined') {
-      // abs? otherwise negative index...
-      // vector = viewOrientation * planeVector
-      var point3D =
-        viewOrientation.getInverse().getAbs().multiplyPoint3D(point.get3D());
-      planePoint = point.mergeWith3D(point3D);
-    }
-    return planePoint;
-  };
-
-  /**
-   * De-orient an input vector.
+   * De-orient an input vector from target to real space.
    *
    * @param {dwv.math.Vector3D} planeVector The input vector.
    * @returns {dwv.math.Vector3D} The de-orienteded vector.
    */
-  this.getDeOrientedVector3D = function (planeVector) {
+  this.getTargetDeOrientedVector3D = function (planeVector) {
     var vector = planeVector;
     if (typeof targetOrientation !== 'undefined') {
       vector = targetOrientation.multiplyVector3D(planeVector);
@@ -138,10 +84,10 @@ dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
   };
 
   /**
-   * Get the image oriented values for an input vector.
+   * Orient an input vector from target to image space.
    *
    * @param {dwv.math.Vector3D} planeVector The input vector.
-   * @returns {dwv.math.Vector3D} The de-orienteded vector.
+   * @returns {dwv.math.Vector3D} The orienteded vector.
    */
   this.getImageOrientedVector3D = function (planeVector) {
     var vector = planeVector;
@@ -171,28 +117,6 @@ dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
       x: orientedValues[0],
       y: orientedValues[1],
       z: orientedValues[2]
-    };
-  };
-
-  /**
-   * Reorder values to compensate for view orientation.
-   *
-   * @param {object} values Values as {x,y,z}.
-   * @returns {object} 'Deoriented' values as {x,y,z}.
-   */
-  this.getDeOrientedXYZ = function (values) {
-    var deOrientedValues = dwv.math.getDeOrientedArray3D(
-      [
-        values.x,
-        values.y,
-        values.z
-      ],
-      viewOrientation
-    );
-    return {
-      x: deOrientedValues[0],
-      y: deOrientedValues[1],
-      z: deOrientedValues[2]
     };
   };
 
