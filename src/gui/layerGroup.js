@@ -53,6 +53,7 @@ dwv.gui.getLayerDetailsFromEvent = function (event) {
 
 /**
  * Get the view orientation according to an image and target orientation.
+ * The view orientation is used to go from target to image space.
  *
  * @param {dwv.math.Matrix33} imageOrientation The image geometry.
  * @param {dwv.math.Matrix33} targetOrientation The target orientation.
@@ -74,6 +75,7 @@ dwv.gui.getViewOrientation = function (imageOrientation, targetOrientation) {
 
 /**
  * Get the target orientation according to an image and view orientation.
+ * The target orientation is used to go from target to real space.
  *
  * @param {dwv.math.Matrix33} imageOrientation The image geometry.
  * @param {dwv.math.Matrix33} viewOrientation The view orientation.
