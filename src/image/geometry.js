@@ -165,6 +165,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
    * @returns {dwv.image.Spacing} The object spacing.
    */
   this.getRealSpacing = function () {
+    // asOneAndZeros to not change spacing values...
     return this.getSpacing(orientation.getInverse().asOneAndZeros());
   };
 
