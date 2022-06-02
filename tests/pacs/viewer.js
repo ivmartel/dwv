@@ -76,7 +76,8 @@ dwv.test.viewerSetup = function () {
     WindowLevel: {},
     ZoomAndPan: {},
     Opacity: {},
-    Draw: {options: ['Rectangle'], type: 'factory'}
+    //Draw: {options: ['Rectangle'], type: 'factory'}
+    Brush: {}
   };
 
   // app config

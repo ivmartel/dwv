@@ -94,6 +94,39 @@ dwv.App = function () {
     return dataController.length();
   };
 
+  this.addNewData = function (image, meta) {
+    var id = dataController.length();
+
+    fireEvent({
+      type: 'loadstart',
+      loadtype: 'image',
+      source: 'internal',
+      loadid: id
+    });
+
+    dataController.addNew(id, image, meta);
+
+    fireEvent({
+      type: 'load',
+      loadtype: 'image',
+      source: 'internal',
+      loadid: id
+    });
+
+    if (options.viewOnFirstLoadItem) {
+      this.render(id);
+    }
+
+    fireEvent({
+      type: 'loadend',
+      loadtype: 'image',
+      source: 'internal',
+      loadid: id
+    });
+
+    return id;
+  };
+
   /**
    * Can the data be scrolled?
    *
