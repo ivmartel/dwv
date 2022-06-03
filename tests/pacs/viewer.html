@@ -42,9 +42,20 @@ span {
   width: 350px;
   margin: 5px;
   background-color: limeGreen;
+  /* allow child centering */
+  position: relative;
 }
 .layer {
+  /* needed for overlay */
   position: absolute;
+  /* center */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+canvas {
+  /* avoid parent auto-resize */
+  vertical-align: middle;
 }
 .line {
   padding: 5px;
