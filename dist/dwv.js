@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-beta.4 2022-04-21 16:49:31 */
+/*! dwv 0.31.0-beta.5 2022-06-16 10:33:58 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -570,6 +570,16 @@ dwv.App = function () {
   }
 
   /**
+   * Get the data view config.
+   * Carefull, returns a reference, do not modify without resetting.
+   *
+   * @returns {object} The configuration list.
+   */
+  this.getDataViewConfig = function () {
+    return options.dataViewConfigs;
+  };
+
+  /**
    * Set the data view configuration (see the init options for details).
    *
    * @param {object} configs The configuration list.
@@ -651,7 +661,8 @@ dwv.App = function () {
     var layerGroup = stage.getActiveLayerGroup();
     var viewController = layerGroup.getActiveViewLayer().getViewController();
     var k = viewController.getCurrentScrollPosition();
-    layerGroup.addScale(step, {x: cx, y: cy, z: k});
+    var center = new dwv.math.Point3D(cx, cy, k);
+    layerGroup.addScale(step, center);
     layerGroup.draw();
   };
 
@@ -1241,7 +1252,7 @@ dwv.App = function () {
       var data = dataController.get(indices[i]);
       var geometry = data.image.getGeometry();
       var viewOrient = dwv.gui.getViewOrientation(
-        geometry,
+        geometry.getOrientation(),
         layerGroup.getTargetOrientation()
       );
       var size = geometry.getSize(viewOrient).get2D();
@@ -1285,7 +1296,7 @@ dwv.App = function () {
       new dwv.dicom.DicomElementsWrapper(data.meta),
       data.image);
     var viewOrientation = dwv.gui.getViewOrientation(
-      imageGeometry,
+      imageGeometry.getOrientation(),
       layerGroup.getTargetOrientation()
     );
     view.setOrientation(viewOrientation);
@@ -1326,8 +1337,9 @@ dwv.App = function () {
     viewLayer.setView(view);
     var size2D = imageGeometry.getSize(viewOrientation).get2D();
     var spacing2D = imageGeometry.getSpacing(viewOrientation).get2D();
-    viewLayer.initialise(size2D, spacing2D, dataIndex);
-    viewLayer.setOpacity(opacity);
+    viewLayer.initialise(size2D, spacing2D, dataIndex, opacity);
+    viewLayer.setScale(layerGroup.getScale());
+    viewLayer.setOffset(layerGroup.getOffset());
 
     // listen to image changes
     dataController.addEventListener('imagechange', viewLayer.onimagechange);
@@ -1341,13 +1353,16 @@ dwv.App = function () {
       dl.initialise(size2D, spacing2D, dataIndex);
       dl.setPlaneHelper(viewLayer.getViewController().getPlaneHelper());
 
+      // force positionchange to sync layers
       var vc = viewLayer.getViewController();
-      // positionchange event like data
       var value = [
         vc.getCurrentIndex().getValues(),
         vc.getCurrentPosition().getValues()
       ];
-      layerGroup.updateLayersToPositionChange({value: value});
+      layerGroup.updateLayersToPositionChange({
+        value: value,
+        srclayerid: viewLayer.getId()
+      });
     }
 
     // fit to the maximum size
@@ -2886,9 +2901,46 @@ dwv.ctrl.ViewController = function (view) {
    * @returns {dwv.image.Size} The size.
    */
   this.getImageSize = function () {
-    return view.getImage().getGeometry().getSize();
+    return view.getImage().getGeometry().getSize(view.getOrientation());
   };
 
+  /**
+   * Get the image rescaled data range.
+   *
+   * @returns {object} The range as {min, max}.
+   */
+  this.getImageRescaledDataRange = function () {
+    return view.getImage().getRescaledDataRange();
+  };
+
+  /**
+   * Compare the input meta data to the associated image one.
+   *
+   * @param {object} meta The meta data.
+   * @returns {boolean} True if the associated image has equal meta data.
+   */
+  this.equalImageMeta = function (meta) {
+    var imageMeta = view.getImage().getMeta();
+    // loop through input meta keys
+    var metaKeys = Object.keys(meta);
+    for (var i = 0; i < metaKeys.length; ++i) {
+      var metaKey = metaKeys[i];
+      if (typeof imageMeta[metaKey] === 'undefined') {
+        return false;
+      }
+      if (imageMeta[metaKey] !== meta[metaKey]) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  /**
+   * Check is the provided position can be set.
+   *
+   * @param {dwv.math.Point} position The position.
+   * @returns {boolean} True is the position is in bounds.
+   */
   this.canSetPosition = function (position) {
     return view.canSetPosition(position);
   };
@@ -2949,7 +3001,7 @@ dwv.ctrl.ViewController = function (view) {
     var k = this.getCurrentScrollIndexValue();
     var planePoint = new dwv.math.Point3D(point2D.x, point2D.y, k);
     // de-orient
-    var point = planeHelper.getDeOrientedVector3D(planePoint);
+    var point = planeHelper.getTargetDeOrientedVector3D(planePoint);
     // ~indexToWorld to not loose precision
     var geometry = view.getImage().getGeometry();
     var spacing = geometry.getRealSpacing();
@@ -4496,7 +4548,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.0-beta.4';
+  return '0.31.0-beta.5';
 };
 
 /**
@@ -11870,25 +11922,42 @@ dwv.gui.getLayerDetailsFromEvent = function (event) {
 };
 
 /**
- * Get a view orientation according to an image geometry (with its orientation)
- * and target orientation.
+ * Get the view orientation according to an image and target orientation.
+ * The view orientation is used to go from target to image space.
  *
- * @param {dwv.image.Geometry} imageGeometry The image geometry.
+ * @param {dwv.math.Matrix33} imageOrientation The image geometry.
  * @param {dwv.math.Matrix33} targetOrientation The target orientation.
  * @returns {dwv.math.Matrix33} The view orientation.
  */
-dwv.gui.getViewOrientation = function (imageGeometry, targetOrientation) {
+dwv.gui.getViewOrientation = function (imageOrientation, targetOrientation) {
   var viewOrientation = dwv.math.getIdentityMat33();
   if (typeof targetOrientation !== 'undefined') {
-    // image orientation as one and zeros
-    // -> view orientation is one and zeros
-    var imgOrientation = imageGeometry.getOrientation().asOneAndZeros();
-    // imgOrientation * viewOrientation = targetOrientation
-    // -> viewOrientation = inv(imgOrientation) * targetOrientation
+    // i: image, v: view, t: target, O: orientation, P: point
+    // [Img] -- Oi --> [Real] <-- Ot -- [Target]
+    // Pi = (Oi)-1 * Ot * Pt = Ov * Pt
+    // -> Ov = (Oi)-1 * Ot
+    // TODO: asOneAndZeros simplifies but not nice...
     viewOrientation =
-      imgOrientation.getInverse().multiply(targetOrientation);
+      imageOrientation.asOneAndZeros().getInverse().multiply(targetOrientation);
   }
   return viewOrientation;
+};
+
+/**
+ * Get the target orientation according to an image and view orientation.
+ * The target orientation is used to go from target to real space.
+ *
+ * @param {dwv.math.Matrix33} imageOrientation The image geometry.
+ * @param {dwv.math.Matrix33} viewOrientation The view orientation.
+ * @returns {dwv.math.Matrix33} The target orientation.
+ */
+dwv.gui.getTargetOrientation = function (imageOrientation, viewOrientation) {
+  // i: image, v: view, t: target, O: orientation, P: point
+  // [Img] -- Oi --> [Real] <-- Ot -- [Target]
+  // Pi = (Oi)-1 * Ot * Pt = Ov * Pt
+  // -> Ot = Oi * Ov
+  // note: asOneAndZeros as in dwv.gui.getViewOrientation...
+  return imageOrientation.asOneAndZeros().multiply(viewOrientation);
 };
 
 /**
@@ -12080,6 +12149,24 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
       if (layers[i] instanceof dwv.gui.ViewLayer &&
         layers[i].getDataIndex() === index) {
         res.push(layers[i]);
+      }
+    }
+    return res;
+  };
+
+  /**
+   * Search view layers for equal imae meta data.
+   *
+   * @param {object} meta The meta data to find.
+   * @returns {Array} The list of view layers that contain matched data.
+   */
+  this.searchViewLayers = function (meta) {
+    var res = [];
+    for (var i = 0; i < layers.length; ++i) {
+      if (layers[i] instanceof dwv.gui.ViewLayer) {
+        if (layers[i].getViewController().equalImageMeta(meta)) {
+          res.push(layers[i]);
+        }
       }
     }
     return res;
@@ -12284,8 +12371,8 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
     var index = new dwv.math.Index(event.value[0]);
     var position = new dwv.math.Point(event.value[1]);
     // origin of the first view layer
-    var baseOrigin0 = null;
-    var baseOrigin = null;
+    var baseViewLayerOrigin0 = null;
+    var baseViewLayerOrigin = null;
     // update position for all layers except the source one
     for (var i = 0; i < layers.length; ++i) {
 
@@ -12294,28 +12381,25 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
       var hasSetOffset = false;
       if (layers[i] instanceof dwv.gui.ViewLayer) {
         var vc = layers[i].getViewController();
+        // origin0 should always be there
         var origin0 = vc.getOrigin();
+        // depending on position, origin could be undefined
         var origin = vc.getOrigin(position);
-        if (!baseOrigin) {
-          baseOrigin0 = origin0;
-          baseOrigin = origin;
-        } else {
-          if (vc.canSetPosition(position)) {
-            if (typeof origin0 === 'undefined') {
-              console.log('no origin0', layers[i].getId());
-            }
-            if (typeof origin === 'undefined') {
-              console.log('no origin', layers[i].getId());
-            }
 
-            // TODO: compensate for possible different orientation
+        if (!baseViewLayerOrigin) {
+          baseViewLayerOrigin0 = origin0;
+          baseViewLayerOrigin = origin;
+        } else {
+          if (vc.canSetPosition(position) &&
+            typeof origin !== 'undefined') {
+            // TODO: compensate for possible different orientation between views
             // TODO: check why -z...
 
-            var scrollDiff = baseOrigin0.minus(origin0);
+            var scrollDiff = baseViewLayerOrigin0.minus(origin0);
             var scrollOffset = new dwv.math.Vector3D(
               scrollDiff.getX(), scrollDiff.getY(), -1 * scrollDiff.getZ());
 
-            var planeDiff = baseOrigin.minus(origin);
+            var planeDiff = baseViewLayerOrigin.minus(origin);
             var planeOffset = new dwv.math.Vector3D(
               planeDiff.getX(), planeDiff.getY(), -1 * planeDiff.getZ());
 
@@ -13200,12 +13284,12 @@ dwv.gui.ViewLayer = function (containerDiv) {
   var context = null;
 
   /**
-   * Flag to know if the context has been cleared.
+   * Flag to know if the current position is valid.
    *
    * @private
    * @type {boolean}
    */
-  var isContextClear = true;
+  var isValidPosition = true;
 
   /**
    * The image data array.
@@ -13350,6 +13434,7 @@ dwv.gui.ViewLayer = function (containerDiv) {
     // event.value = [index, image]
     if (dataIndex === event.value[0]) {
       viewController.setImage(event.value[1]);
+      setBaseSize(viewController.getImageSize().get2D());
       needsDataUpdate = true;
     }
   };
@@ -13389,6 +13474,10 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @param {number} alpha The opacity ([0:1] range).
    */
   this.setOpacity = function (alpha) {
+    if (alpha === opacity) {
+      return;
+    }
+
     opacity = Math.min(Math.max(alpha, 0), 1);
 
     /**
@@ -13546,6 +13635,11 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @fires dwv.App#renderend
    */
   this.draw = function () {
+    // skip for non valid position
+    if (!isValidPosition) {
+      return;
+    }
+
     /**
      * Render start event.
      *
@@ -13555,7 +13649,8 @@ dwv.gui.ViewLayer = function (containerDiv) {
      */
     var event = {
       type: 'renderstart',
-      layerid: this.getId()
+      layerid: this.getId(),
+      dataid: this.getDataIndex()
     };
     fireEvent(event);
 
@@ -13590,9 +13685,6 @@ dwv.gui.ViewLayer = function (containerDiv) {
     // draw image
     context.drawImage(offscreenCanvas, 0, 0);
 
-    // set clear flag
-    isContextClear = false;
-
     /**
      * Render end event.
      *
@@ -13602,7 +13694,8 @@ dwv.gui.ViewLayer = function (containerDiv) {
      */
     event = {
       type: 'renderend',
-      layerid: this.getId()
+      layerid: this.getId(),
+      dataid: this.getDataIndex()
     };
     fireEvent(event);
   };
@@ -13613,12 +13706,13 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @param {object} size The image size as {x,y}.
    * @param {object} spacing The image spacing as {x,y}.
    * @param {number} index The associated data index.
+   * @param {number} alpha The initial data opacity.
    */
-  this.initialise = function (size, spacing, index) {
+  this.initialise = function (size, spacing, index, alpha) {
     // set locals
-    baseSize = size;
     baseSpacing = spacing;
     dataIndex = index;
+    opacity = Math.min(Math.max(alpha, 0), 1);
 
     // create canvas
     // (canvas size is set in fitToContainer)
@@ -13637,22 +13731,37 @@ dwv.gui.ViewLayer = function (containerDiv) {
       return;
     }
 
-    // check canvas
-    if (!dwv.gui.canCreateCanvas(baseSize.x, baseSize.y)) {
-      throw new Error('Cannot create canvas ' + baseSize.x + ', ' + baseSize.y);
-    }
-
     // off screen canvas
     offscreenCanvas = document.createElement('canvas');
+
+    // set base size: needs an existing context and off screen canvas
+    setBaseSize(size);
+
+    // update data on first draw
+    needsDataUpdate = true;
+  };
+
+  /**
+   * Set the base size of the layer.
+   *
+   * @param {object} size The size as {x,y}.
+   */
+  function setBaseSize(size) {
+    // check canvas creation
+    if (!dwv.gui.canCreateCanvas(size.x, size.y)) {
+      throw new Error('Cannot create canvas ' + size.x + ', ' + size.y);
+    }
+
+    // set local
+    baseSize = size;
+
+    // off screen canvas
     offscreenCanvas.width = baseSize.x;
     offscreenCanvas.height = baseSize.y;
     // original empty image data array
     context.clearRect(0, 0, baseSize.x, baseSize.y);
     imageData = context.createImageData(baseSize.x, baseSize.y);
-
-    // update data on first draw
-    needsDataUpdate = true;
-  };
+  }
 
   /**
    * Fit the layer to its parent container.
@@ -13661,6 +13770,11 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @param {object} fitSize The fit size as {x,y}.
    */
   this.fitToContainer = function (fitScale1D, fitSize) {
+    // previous scale without fit
+    var previousScale = {
+      x: scale.x / fitScale.x,
+      y: scale.y / fitScale.y
+    };
     // update fit scale
     fitScale = {
       x: fitScale1D * baseSpacing.x,
@@ -13674,8 +13788,11 @@ dwv.gui.ViewLayer = function (containerDiv) {
     }
     canvas.width = width;
     canvas.height = height;
-    // reset scale
-    this.setScale({x: 1, y: 1, z: 1});
+    // reset previous scale with new fit
+    scale = {
+      x: previousScale.x * fitScale.x,
+      y: previousScale.y * fitScale.y
+    };
   };
 
   /**
@@ -13760,8 +13877,9 @@ dwv.gui.ViewLayer = function (containerDiv) {
    */
   function onWLChange(event) {
     // generate and draw if no skip flag
-    if (typeof event.skipGenerate === 'undefined' ||
-      event.skipGenerate === false) {
+    var skip = typeof event.skipGenerate !== 'undefined' &&
+      event.skipGenerate === true;
+    if (!skip) {
       needsDataUpdate = true;
       self.draw();
     }
@@ -13774,8 +13892,12 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @private
    */
   function onColourChange(_event) {
-    needsDataUpdate = true;
-    self.draw();
+    var skip = typeof event.skipGenerate !== 'undefined' &&
+      event.skipGenerate === true;
+    if (!skip) {
+      needsDataUpdate = true;
+      self.draw();
+    }
   }
 
   /**
@@ -13785,26 +13907,35 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @private
    */
   function onPositionChange(event) {
-    if (typeof event.skipGenerate === 'undefined' ||
-      event.skipGenerate === false) {
+    var skip = typeof event.skipGenerate !== 'undefined' &&
+      event.skipGenerate === true;
+    if (!skip) {
+      var valid = typeof event.valid === 'undefined' || event.valid;
       // clear for non valid events
-      if (typeof event.valid !== 'undefined' && !event.valid) {
-        self.clear();
-        return;
-      }
-      // 3D dimensions
-      var dims3D = [0, 1, 2];
-      // remove scroll index
-      var indexScrollIndex = dims3D.indexOf(viewController.getScrollIndex());
-      dims3D.splice(indexScrollIndex, 1);
-      // remove non scroll index from diff dims
-      var diffDims = event.diffDims.filter(function (item) {
-        return dims3D.indexOf(item) === -1;
-      });
-      // update if we have something left
-      if (diffDims.length !== 0) {
-        needsDataUpdate = true;
-        self.draw();
+      if (!valid) {
+        // clear only once
+        if (isValidPosition) {
+          isValidPosition = false;
+          self.clear();
+        }
+      } else {
+        // 3D dimensions
+        var dims3D = [0, 1, 2];
+        // remove scroll index
+        var indexScrollIndex = dims3D.indexOf(viewController.getScrollIndex());
+        dims3D.splice(indexScrollIndex, 1);
+        // remove non scroll index from diff dims
+        var diffDims = event.diffDims.filter(function (item) {
+          return dims3D.indexOf(item) === -1;
+        });
+        // update if we have something left
+        if (diffDims.length !== 0 || !isValidPosition) {
+          // reset valid flag
+          isValidPosition = true;
+          // reset update flag
+          needsDataUpdate = true;
+          self.draw();
+        }
       }
     }
   }
@@ -13816,8 +13947,9 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @private
    */
   function onAlphaFuncChange(event) {
-    if (typeof event.skipGenerate === 'undefined' ||
-      event.skipGenerate === false) {
+    var skip = typeof event.skipGenerate !== 'undefined' &&
+      event.skipGenerate === true;
+    if (!skip) {
       needsDataUpdate = true;
       self.draw();
     }
@@ -13838,19 +13970,14 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * Clear the context.
    */
   this.clear = function () {
-    if (!isContextClear) {
-      // clear the context: reset the transform first
-      // store the current transformation matrix
-      context.save();
-      // use the identity matrix while clearing the canvas
-      context.setTransform(1, 0, 0, 1, 0, 0);
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      // restore the transform
-      context.restore();
-
-      // update clear flag
-      isContextClear = true;
-    }
+    // clear the context: reset the transform first
+    // store the current transformation matrix
+    context.save();
+    // use the identity matrix while clearing the canvas
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    // restore the transform
+    context.restore();
   };
 
   /**
@@ -15120,6 +15247,22 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
   this.getOrigins = function () {
     return origins;
   };
+
+  /**
+   * Check if a point is in the origin list.
+   *
+   * @param {dwv.math.Point3D} point3D The point to check.
+   * @returns {boolean} True if in list.
+   */
+  this.includesOrigin = function (point3D) {
+    for (var i = 0; i < origins.length; ++i) {
+      if (origins[i].isSimilar(point3D, dwv.math.BIG_EPSILON)) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   /**
    * Get the object size.
    * Warning: the size comes as stored in DICOM, meaning that it could
@@ -15138,7 +15281,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
           size.get(2)
         ],
         viewOrientation);
-      res = new dwv.image.Size(values);
+      res = new dwv.image.Size(values.concat(size.getValues().slice(3)));
     }
     return res;
   };
@@ -15153,26 +15296,26 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
     if (origins.length === 1) {
       return 1;
     }
-    var spacing = null;
+    var sliceSpacing = null;
     // (x, y, z) = orientationMatrix * (i, j, k)
     // -> inv(orientationMatrix) * (x, y, z) = (i, j, k)
     // applied on the patient position, reorders indices
     // so that Z is the slice direction
-    var orientation2 = orientation.getInverse().asOneAndZeros();
+    var invOrientation = orientation.getInverse();
     var deltas = [];
     for (var i = 0; i < origins.length - 1; ++i) {
-      var origin1 = orientation2.multiplyVector3D(origins[i]);
-      var origin2 = orientation2.multiplyVector3D(origins[i + 1]);
+      var origin1 = invOrientation.multiplyVector3D(origins[i]);
+      var origin2 = invOrientation.multiplyVector3D(origins[i + 1]);
       var diff = Math.abs(origin1.getZ() - origin2.getZ());
       if (diff === 0) {
         throw new Error('Zero slice spacing.' +
           origin1.toString() + ' ' + origin2.toString());
       }
-      if (spacing === null) {
-        spacing = diff;
+      if (sliceSpacing === null) {
+        sliceSpacing = diff;
       } else {
-        if (!dwv.math.isSimilar(spacing, diff, dwv.math.BIG_EPSILON)) {
-          deltas.push(Math.abs(spacing - diff));
+        if (!dwv.math.isSimilar(sliceSpacing, diff, dwv.math.BIG_EPSILON)) {
+          deltas.push(Math.abs(sliceSpacing - diff));
         }
       }
     }
@@ -15187,7 +15330,8 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
           mean.toFixed(3) + ' (' + deltas.length + ' case(s))');
       }
     }
-    return spacing;
+
+    return sliceSpacing;
   };
 
   /**
@@ -15226,6 +15370,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
    * @returns {dwv.image.Spacing} The object spacing.
    */
   this.getRealSpacing = function () {
+    // asOneAndZeros to not change spacing values...
     return this.getSpacing(orientation.getInverse().asOneAndZeros());
   };
 
@@ -15278,8 +15423,13 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
     //   -> >0 => vectors are codirectional
     //   -> <0 => vectors are oposite
     var dotProd = normal.dotProduct(pointDir);
+    var test = dotProd < 0;
+    // TODO: check why coronal behaves differently...
+    if (orientation.getThirdColMajorDirection() === 1) {
+      test = dotProd > 0;
+    }
     // oposite vectors get higher index
-    var sliceIndex = (dotProd < 0) ? closestSliceIndex + 1 : closestSliceIndex;
+    var sliceIndex = test ? closestSliceIndex + 1 : closestSliceIndex;
     return sliceIndex;
   };
 
@@ -15357,10 +15507,11 @@ dwv.image.Geometry.prototype.isInBounds = function (point) {
  * Check that a index is within bounds.
  *
  * @param {dwv.math.Index} index The index to check.
+ * @param {number} dir Optional direction to check.
  * @returns {boolean} True if the given coordinates are within bounds.
  */
-dwv.image.Geometry.prototype.isIndexInBounds = function (index) {
-  return this.getSize().isInBounds(index);
+dwv.image.Geometry.prototype.isIndexInBounds = function (index, dir) {
+  return this.getSize().isInBounds(index, dir);
 };
 
 /**
@@ -15457,9 +15608,11 @@ dwv.image.Geometry.prototype.worldToIndex = function (point) {
   values[0] = Math.round(orientedPoint3D.getX() / spacing.get(0));
   values[1] = Math.round(orientedPoint3D.getY() / spacing.get(1));
   // flip K index (because of the slice order given by getSliceIndex)
-  values[2] = flipK(this.getSize(),
-    Math.round(orientedPoint3D.getZ() / spacing.get(2))
-  );
+  var k = Math.round(orientedPoint3D.getZ() / spacing.get(2));
+  // abs to fix #1163
+  // TODO: find out why k can sometimes be negative...
+  values[2] = flipK(this.getSize(), k);
+
   // return index
   return new dwv.math.Index(values);
 };
@@ -15898,7 +16051,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     }
     // all meta should be equal
     for (var key in meta) {
-      if (key === 'windowPresets') {
+      if (key === 'windowPresets' || key === 'numberOfFiles') {
         continue;
       }
       if (meta[key] !== rhs.getMeta()[key]) {
@@ -15929,8 +16082,8 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       values[3] = timeId;
     }
     var index = new dwv.math.Index(values);
-    var primaryOffset = size.indexToOffset(index);
-    var secondaryOffset = this.getSecondaryOffset(index);
+    var primaryOffset = size.indexToOffset(index) * numberOfComponents;
+    var secondaryOffset = this.getSecondaryOffset(index) * numberOfComponents;
 
     // first frame special slice by slice append
     if (timeId === 0) {
@@ -17908,7 +18061,7 @@ dwv.image.MaskFactory.prototype.create = function (
   }
   // create frame info object from per frame func
   var frameInfos = [];
-  var posPats = [];
+  var framePosPats = [];
   for (var j = 0; j < perFrameFuncGroupSequence.length; ++j) {
     var frameFunc = perFrameFuncGroupSequence[j];
     // Derivation Image Sequence
@@ -17935,8 +18088,8 @@ dwv.image.MaskFactory.prototype.create = function (
     for (var p = 0; p < imagePosPat.length; ++p) {
       imagePosPat[p] = parseFloat(imagePosPat[p], 10);
     }
-    if (!includesPosPat(posPats, imagePosPat)) {
-      posPats.push(imagePosPat);
+    if (!includesPosPat(framePosPats, imagePosPat)) {
+      framePosPats.push(imagePosPat);
     }
     frameInfos.push({
       dimIndex: dimIndex,
@@ -17980,7 +18133,22 @@ dwv.image.MaskFactory.prototype.create = function (
     }
   }
   // sort positions patient
-  posPats.sort(comparePosPat);
+  framePosPats.sort(comparePosPat);
+
+  // add missing posPats
+  var posPats = [];
+  var sliceSpacing = spacing.get(2);
+  for (var g = 0; g < framePosPats.length - 1; ++g) {
+    posPats.push(framePosPats[g]);
+    var nextZ = framePosPats[g][2] - sliceSpacing;
+    var diff = Math.abs(nextZ - framePosPats[g + 1][2]);
+    while (diff > sliceSpacing) {
+      posPats.push([framePosPats[g][0], framePosPats[g][1], nextZ]);
+      nextZ -= sliceSpacing;
+      diff = Math.abs(nextZ - framePosPats[g + 1][2]);
+    }
+  }
+  posPats.push(framePosPats[framePosPats.length - 1]);
 
   // create output buffer
   // as many slices as posPats -> gap slices between groups are not represented
@@ -18070,12 +18238,8 @@ dwv.image = dwv.image || {};
  */
 dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
 
-  // [Img] -- Oi --> [Real] <-- Ot -- [Target]
-  // Pi = (Oi)-1 * Ot * Pt = Ov * Pt
-  // Ov = (Oi)-1 * Ot
-  // Ot = Oi * Ov
-  var targetOrientation =
-    imageOrientation.asOneAndZeros().multiply(viewOrientation);
+  var targetOrientation = dwv.gui.getTargetOrientation(
+    imageOrientation, viewOrientation);
 
   /**
    * Get a 3D offset from a plane one.
@@ -18088,9 +18252,12 @@ dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
     var planeOffset = new dwv.math.Vector3D(
       offset2D.x, offset2D.y, 0);
     // de-orient
-    var pixelOffset = this.getDeOrientedVector3D(planeOffset);
-    // offset indexToWorld
-    return offsetIndexToWorld(pixelOffset);
+    var pixelOffset = this.getTargetDeOrientedVector3D(planeOffset);
+    // ~indexToWorld
+    return new dwv.math.Vector3D(
+      pixelOffset.getX() * spacing.get(0),
+      pixelOffset.getY() * spacing.get(1),
+      pixelOffset.getZ() * spacing.get(2));
   };
 
   /**
@@ -18100,10 +18267,13 @@ dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
    * @returns {object} The plane offset as {x,y}.
    */
   this.getPlaneOffsetFromOffset3D = function (offset3D) {
-    // offset worldToIndex
-    var pixelOffset = offsetWorldToIndex(offset3D);
+    // ~worldToIndex
+    var pixelOffset = new dwv.math.Vector3D(
+      offset3D.x / spacing.get(0),
+      offset3D.y / spacing.get(1),
+      offset3D.z / spacing.get(2));
     // orient
-    var planeOffset = this.getOrientedVector3D(pixelOffset);
+    var planeOffset = this.getTargetOrientedVector3D(pixelOffset);
     // make 2D
     return {
       x: planeOffset.getX(),
@@ -18112,38 +18282,12 @@ dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
   };
 
   /**
-   * Apply spacing to an offset.
-   *
-   * @param {dwv.math.Point3D} off The 3D offset.
-   * @returns {dwv.math.Vector3D} The world offset.
-   */
-  function offsetIndexToWorld(off) {
-    return new dwv.math.Vector3D(
-      off.getX() * spacing.get(0),
-      off.getY() * spacing.get(1),
-      off.getZ() * spacing.get(2));
-  }
-
-  /**
-   * Remove spacing from an offset.
-   *
-   * @param {object} off The world offset object as {x,y,z}.
-   * @returns {dwv.math.Vector3D} The 3D offset.
-   */
-  function offsetWorldToIndex(off) {
-    return new dwv.math.Vector3D(
-      off.x / spacing.get(0),
-      off.y / spacing.get(1),
-      off.z / spacing.get(2));
-  }
-
-  /**
-   * Orient an input vector.
+   * Orient an input vector from real to target space.
    *
    * @param {dwv.math.Vector3D} vector The input vector.
    * @returns {dwv.math.Vector3D} The oriented vector.
    */
-  this.getOrientedVector3D = function (vector) {
+  this.getTargetOrientedVector3D = function (vector) {
     var planeVector = vector;
     if (typeof targetOrientation !== 'undefined') {
       planeVector = targetOrientation.getInverse().multiplyVector3D(vector);
@@ -18152,46 +18296,12 @@ dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
   };
 
   /**
-   * Orient an input index.
-   *
-   * @param {dwv.math.Index} index The input index.
-   * @returns {dwv.math.Index} The oriented index.
-   */
-  this.getOrientedIndex = function (index) {
-    var planeIndex = index;
-    if (typeof viewOrientation !== 'undefined') {
-      // abs? otherwise negative index...
-      // vector = viewOrientation * planeVector
-      planeIndex = viewOrientation.getInverse().getAbs().multiplyIndex3D(index);
-    }
-    return planeIndex;
-  };
-
-  /**
-   * Orient an input point.
-   *
-   * @param {dwv.math.Point3D} point The input point.
-   * @returns {dwv.math.Point3D} The oriented point.
-   */
-  this.getOrientedPoint = function (point) {
-    var planePoint = point;
-    if (typeof viewOrientation !== 'undefined') {
-      // abs? otherwise negative index...
-      // vector = viewOrientation * planeVector
-      var point3D =
-        viewOrientation.getInverse().getAbs().multiplyPoint3D(point.get3D());
-      planePoint = point.mergeWith3D(point3D);
-    }
-    return planePoint;
-  };
-
-  /**
-   * De-orient an input vector.
+   * De-orient an input vector from target to real space.
    *
    * @param {dwv.math.Vector3D} planeVector The input vector.
    * @returns {dwv.math.Vector3D} The de-orienteded vector.
    */
-  this.getDeOrientedVector3D = function (planeVector) {
+  this.getTargetDeOrientedVector3D = function (planeVector) {
     var vector = planeVector;
     if (typeof targetOrientation !== 'undefined') {
       vector = targetOrientation.multiplyVector3D(planeVector);
@@ -18200,10 +18310,10 @@ dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
   };
 
   /**
-   * Get the image oriented values for an input vector.
+   * Orient an input vector from target to image space.
    *
    * @param {dwv.math.Vector3D} planeVector The input vector.
-   * @returns {dwv.math.Vector3D} The de-orienteded vector.
+   * @returns {dwv.math.Vector3D} The orienteded vector.
    */
   this.getImageOrientedVector3D = function (planeVector) {
     var vector = planeVector;
@@ -18233,28 +18343,6 @@ dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
       x: orientedValues[0],
       y: orientedValues[1],
       z: orientedValues[2]
-    };
-  };
-
-  /**
-   * Reorder values to compensate for view orientation.
-   *
-   * @param {object} values Values as {x,y,z}.
-   * @returns {object} 'Deoriented' values as {x,y,z}.
-   */
-  this.getDeOrientedXYZ = function (values) {
-    var deOrientedValues = dwv.math.getDeOrientedArray3D(
-      [
-        values.x,
-        values.y,
-        values.z
-      ],
-      viewOrientation
-    );
-    return {
-      x: deOrientedValues[0],
-      y: deOrientedValues[1],
-      z: deOrientedValues[2]
     };
   };
 
@@ -18633,9 +18721,10 @@ dwv.image.Size.prototype.equals = function (rhs) {
  * Check that an index is within bounds.
  *
  * @param {dwv.math.Index} index The index to check.
+ * @param {number} dir Optional direction to check.
  * @returns {boolean} True if the given coordinates are within bounds.
  */
-dwv.image.Size.prototype.isInBounds = function (index) {
+dwv.image.Size.prototype.isInBounds = function (index, dir) {
   // check input
   if (!index) {
     return false;
@@ -18645,10 +18734,19 @@ dwv.image.Size.prototype.isInBounds = function (index) {
   if (length !== index.length()) {
     return false;
   }
-  // check values
-  for (var i = 0; i < length; ++i) {
-    if (index.get(i) < 0 || index.get(i) > this.get(i) - 1) {
+  // check values is 0 <= v < size
+  var inBound = function (value, size) {
+    return value >= 0 && value < size;
+  };
+  if (typeof dir !== 'undefined') {
+    if (!inBound(index.get(dir), this.get(dir))) {
       return false;
+    }
+  } else {
+    for (var i = 0; i < length; ++i) {
+      if (!inBound(index.get(i), this.get(i))) {
+        return false;
+      }
     }
   }
   // seems ok!
@@ -18900,11 +18998,12 @@ dwv.image.View = function (image) {
   var colourMap = dwv.image.lut.plain;
   /**
    * Current position as a Point3D.
+   * Store position and not index to stay geometry independent.
    *
    * @private
    * @type {dwv.math.Index}
    */
-  var currentIndex = null;
+  var currentPosition = null;
   /**
    * View orientation. Undefined will use the original slice ordering.
    *
@@ -19042,6 +19141,7 @@ dwv.image.View = function (image) {
     if (!this.getCurrentIndex()) {
       this.setInitialIndex();
     }
+    var currentIndex = this.getCurrentIndex();
     // use current rsi if not provided
     if (typeof rsi === 'undefined') {
       rsi = image.getRescaleSlopeAndIntercept(currentIndex);
@@ -19224,8 +19324,7 @@ dwv.image.View = function (image) {
    * @returns {dwv.math.Point} The current position.
    */
   this.getCurrentPosition = function () {
-    var geometry = this.getImage().getGeometry();
-    return geometry.indexToWorld(currentIndex);
+    return currentPosition;
   };
 
   /**
@@ -19234,15 +19333,32 @@ dwv.image.View = function (image) {
    * @returns {dwv.math.Index} The current index.
    */
   this.getCurrentIndex = function () {
-    return currentIndex;
+    var position = this.getCurrentPosition();
+    if (!position) {
+      return null;
+    }
+    var geometry = this.getImage().getGeometry();
+    return geometry.worldToIndex(position);
   };
 
+  /**
+   * Check is the provided position can be set.
+   *
+   * @param {dwv.math.Point} position The position.
+   * @returns {boolean} True is the position is in bounds.
+   */
   this.canSetPosition = function (position) {
     var geometry = image.getGeometry();
     var index = geometry.worldToIndex(position);
-    return geometry.isIndexInBounds(index);
+    return geometry.isIndexInBounds(index, this.getScrollIndex());
   };
 
+  /**
+   * Get the origin at a given position.
+   *
+   * @param {dwv.math.Point} position The position.
+   * @returns {dwv.math.Point} The origin.
+   */
   this.getOrigin = function (position) {
     var geometry = image.getGeometry();
     var originIndex = 0;
@@ -19266,7 +19382,7 @@ dwv.image.View = function (image) {
     // send invalid event if not in bounds
     var geometry = image.getGeometry();
     var index = geometry.worldToIndex(position);
-    if (!geometry.isIndexInBounds(index)) {
+    if (!geometry.isIndexInBounds(index, this.getScrollIndex())) {
       if (!silent) {
         // fire event with valid: false
         fireEvent({
@@ -19288,7 +19404,7 @@ dwv.image.View = function (image) {
    *
    * @param {dwv.math.Index} index The new index.
    * @param {boolean} silent Flag to fire event or not.
-   * @returns {boolean} False if not in bounds
+   * @returns {boolean} False if not in bounds.
    * @fires dwv.image.View#positionchange
    */
   this.setCurrentIndex = function (index, silent) {
@@ -19301,73 +19417,72 @@ dwv.image.View = function (image) {
     var position = geometry.indexToWorld(index);
 
     // check if possible
-    if (!geometry.isIndexInBounds(index)) {
+    if (!geometry.isIndexInBounds(index, this.getScrollIndex())) {
       // do no send invalid positionchange event: avoid empty repaint
       return false;
     }
 
-    var isNew = !currentIndex || !currentIndex.equals(index);
-
-    if (isNew) {
-      var diffDims = null;
-      if (currentIndex) {
-        if (currentIndex.canCompare(index)) {
-          diffDims = currentIndex.compare(index);
-        } else {
-          diffDims = [];
-          var minLen = Math.min(currentIndex.length(), index.length());
-          for (var i = 0; i < minLen; ++i) {
-            if (currentIndex.get(i) !== index.get(i)) {
-              diffDims.push(i);
-            }
-          }
-          var maxLen = Math.max(currentIndex.length(), index.length());
-          for (var j = minLen; j < maxLen; ++j) {
-            diffDims.push(j);
-          }
-        }
+    // calculate diff dims before updating internal
+    var diffDims = null;
+    var currentIndex = null;
+    if (this.getCurrentPosition()) {
+      currentIndex = this.getCurrentIndex();
+    }
+    if (currentIndex) {
+      if (currentIndex.canCompare(index)) {
+        diffDims = currentIndex.compare(index);
       } else {
         diffDims = [];
-        for (var k = 0; k < index.length(); ++k) {
-          diffDims.push(k);
-        }
-      }
-
-      // assign
-      currentIndex = index;
-
-      if (!silent) {
-        /**
-         * Position change event.
-         *
-         * @event dwv.image.View#positionchange
-         * @type {object}
-         * @property {Array} value The changed value as [index, pixelValue].
-         * @property {Array} diffDims An array of modified indices.
-         */
-        var posEvent = {
-          type: 'positionchange',
-          value: [
-            index.getValues(),
-            position.getValues(),
-          ],
-          diffDims: diffDims,
-          data: {
-            imageUid: image.getImageUid(index)
+        var minLen = Math.min(currentIndex.length(), index.length());
+        for (var i = 0; i < minLen; ++i) {
+          if (currentIndex.get(i) !== index.get(i)) {
+            diffDims.push(i);
           }
-        };
-
-        // add value if possible
-        if (image.canQuantify()) {
-          var pixValue = image.getRescaledValueAtIndex(index);
-          posEvent.value.push(pixValue);
         }
-
-        // fire
-        fireEvent(posEvent);
+        var maxLen = Math.max(currentIndex.length(), index.length());
+        for (var j = minLen; j < maxLen; ++j) {
+          diffDims.push(j);
+        }
       }
     } else {
-      return false;
+      diffDims = [];
+      for (var k = 0; k < index.length(); ++k) {
+        diffDims.push(k);
+      }
+    }
+
+    // assign
+    currentPosition = position;
+
+    if (!silent) {
+      /**
+       * Position change event.
+       *
+       * @event dwv.image.View#positionchange
+       * @type {object}
+       * @property {Array} value The changed value as [index, pixelValue].
+       * @property {Array} diffDims An array of modified indices.
+       */
+      var posEvent = {
+        type: 'positionchange',
+        value: [
+          index.getValues(),
+          position.getValues(),
+        ],
+        diffDims: diffDims,
+        data: {
+          imageUid: image.getImageUid(index)
+        }
+      };
+
+      // add value if possible
+      if (image.canQuantify()) {
+        var pixValue = image.getRescaledValueAtIndex(index);
+        posEvent.value.push(pixValue);
+      }
+
+      // fire
+      fireEvent(posEvent);
     }
 
     // all good
@@ -19533,7 +19648,7 @@ dwv.image.View.prototype.getWindowLevelMinMax = function () {
   var width = max - min;
   // full black / white images, defaults to 1.
   if (width < 1) {
-    dwv.logger.warn('Zero or negative width, defaulting to one.');
+    dwv.logger.warn('Zero or negative window width, defaulting to one.');
     width = 1;
   }
   var center = min + width / 2;
@@ -23870,6 +23985,60 @@ dwv.math.Ellipse.prototype.quantify = function (viewController, flags) {
   return quant;
 };
 
+/**
+ * Get the indices that form a ellpise.
+ *
+ * @param {dwv.math.Index} center The ellipse center.
+ * @param {Array} radius The 2 ellipse radiuses.
+ * @param {Array} dir The 2 ellipse directions.
+ * @returns {Array} The indices of the ellipse.
+ */
+dwv.math.getEllipseIndices = function (center, radius, dir) {
+  var centerValues = center.getValues();
+  // keep all values for possible extra dimensions
+  var values = centerValues.slice();
+  var indices = [];
+  var radiusI = radius[0];
+  var radiusJ = radius[1];
+  var radiusRatio = radiusI / radiusJ;
+  var radiusJ2 = Math.pow(radiusJ, 2);
+  var di = dir[0];
+  var dj = dir[1];
+  // deduce 4 positions from top right
+  for (var j = 0; j < radiusJ; ++j) {
+    // right triangle formed by radiuses, j and len
+    // ellipse: i*i / a*a + j*j / b*b = 1
+    // -> i = a/b * sqrt(b*b - j*j)
+    var len = Math.round(
+      radiusRatio * Math.sqrt(radiusJ2 - Math.pow(j, 2)));
+    var jmax = centerValues[dj] + j;
+    var jmin = centerValues[dj] - j;
+    for (var i = 0; i < len; ++i) {
+      var imax = centerValues[di] + i;
+      var imin = centerValues[di] - i;
+
+      // right
+      values[di] = imax;
+      // right - top
+      values[dj] = jmax;
+      indices.push(new dwv.math.Index(values.slice()));
+      // right - bottom
+      values[dj] = jmin;
+      indices.push(new dwv.math.Index(values.slice()));
+
+      // left
+      values[di] = imin;
+      // left - top
+      values[dj] = jmax;
+      indices.push(new dwv.math.Index(values.slice()));
+      // left - bottom
+      values[dj] = jmin;
+      indices.push(new dwv.math.Index(values.slice()));
+    }
+  }
+  return indices;
+};
+
 // namespaces
 var dwv = dwv || {};
 dwv.math = dwv.math || {};
@@ -24041,6 +24210,21 @@ dwv.math.getZeroIndex = function (size) {
   var values = new Array(size);
   values.fill(0);
   return new dwv.math.Index(values);
+};
+
+/**
+ * Get an array sort callback.
+ * f(a,b) > 0 -> b,a
+ * f(a,b) < 0 -> a,b
+ * f(a,b) = 0 -> original order
+ *
+ * @param {number} direction The direction to use to compare indices.
+ * @returns {Function} A function that compares two dwv.math.Index.
+ */
+dwv.math.getIndexCompareFunction = function (direction) {
+  return function (a, b) {
+    return a.get(direction) - b.get(direction);
+  };
 };
 
 /**
@@ -24372,6 +24556,9 @@ dwv.math.isSimilar = function (a, b, tol) {
  * @class
  */
 dwv.math.Matrix33 = function (values) {
+  // matrix inverse, calculated at first ask
+  var inverse = null;
+
   /**
    * Get a value of the matrix.
    *
@@ -24382,6 +24569,20 @@ dwv.math.Matrix33 = function (values) {
   this.get = function (row, col) {
     return values[row * 3 + col];
   };
+
+  /**
+   * Get the inverse of this matrix.
+   *
+   * @returns {dwv.math.Matrix33|undefined} The inverse matrix or undefined
+   *   if the determinant is zero.
+   */
+  this.getInverse = function () {
+    if (inverse === null) {
+      inverse = dwv.math.getMatrixInverse(this);
+    }
+    return inverse;
+  };
+
 }; // Matrix33
 
 /**
@@ -24393,15 +24594,16 @@ dwv.math.Matrix33 = function (values) {
  * @returns {boolean} True if both matrices are equal.
  */
 dwv.math.Matrix33.prototype.equals = function (rhs, p) {
-  return dwv.math.isSimilar(this.get(0, 0), rhs.get(0, 0), p) &&
-    dwv.math.isSimilar(this.get(0, 1), rhs.get(0, 1), p) &&
-    dwv.math.isSimilar(this.get(0, 2), rhs.get(0, 2), p) &&
-    dwv.math.isSimilar(this.get(1, 0), rhs.get(1, 0), p) &&
-    dwv.math.isSimilar(this.get(1, 1), rhs.get(1, 1), p) &&
-    dwv.math.isSimilar(this.get(1, 2), rhs.get(1, 2), p) &&
-    dwv.math.isSimilar(this.get(2, 0), rhs.get(2, 0), p) &&
-    dwv.math.isSimilar(this.get(2, 1), rhs.get(2, 1), p) &&
-    dwv.math.isSimilar(this.get(2, 2), rhs.get(2, 2), p);
+  // TODO: add type check
+  // check values
+  for (var i = 0; i < 3; ++i) {
+    for (var j = 0; j < 3; ++j) {
+      if (!dwv.math.isSimilar(this.get(i, j), rhs.get(i, j), p)) {
+        return false;
+      }
+    }
+  }
+  return true;
 };
 
 /**
@@ -24410,10 +24612,20 @@ dwv.math.Matrix33.prototype.equals = function (rhs, p) {
  * @returns {string} The matrix as a string.
  */
 dwv.math.Matrix33.prototype.toString = function () {
-  return '[' + this.get(0, 0) + ', ' + this.get(0, 1) + ', ' + this.get(0, 2) +
-    '\n ' + this.get(1, 0) + ', ' + this.get(1, 1) + ', ' + this.get(1, 2) +
-    '\n ' + this.get(2, 0) + ', ' + this.get(2, 1) + ', ' + this.get(2, 2) +
-    ']';
+  var str = '[';
+  for (var i = 0; i < 3; ++i) {
+    if (i !== 0) {
+      str += ', \n ';
+    }
+    for (var j = 0; j < 3; ++j) {
+      if (j !== 0) {
+        str += ', ';
+      }
+      str += this.get(i, j);
+    }
+  }
+  str += ']';
+  return str;
 };
 
 /**
@@ -24511,42 +24723,46 @@ dwv.math.Matrix33.prototype.multiplyIndex3D = function (index3D) {
 };
 
 /**
- * Get the inverse of this matrix.
+ * Get the inverse of an input 3*3 matrix.
  *
- * @returns {dwv.math.Matrix33} The inverse matrix.
+ * @param {dwv.math.Matrix33} m The input matrix.
+ * @returns {dwv.math.Matrix33|undefined} The inverse matrix or undefined
+ *   if the determinant is zero.
  * @see https://en.wikipedia.org/wiki/Invertible_matrix#Inversion_of_3_%C3%97_3_matrices
+ * @see https://github.com/willnode/N-Matrix-Programmer
  */
-dwv.math.Matrix33.prototype.getInverse = function () {
-  var a = this.get(0, 0);
-  var b = this.get(0, 1);
-  var c = this.get(0, 2);
-  var d = this.get(1, 0);
-  var e = this.get(1, 1);
-  var f = this.get(1, 2);
-  var g = this.get(2, 0);
-  var h = this.get(2, 1);
-  var i = this.get(2, 2);
+dwv.math.getMatrixInverse = function (m) {
+  var m00 = m.get(0, 0);
+  var m01 = m.get(0, 1);
+  var m02 = m.get(0, 2);
+  var m10 = m.get(1, 0);
+  var m11 = m.get(1, 1);
+  var m12 = m.get(1, 2);
+  var m20 = m.get(2, 0);
+  var m21 = m.get(2, 1);
+  var m22 = m.get(2, 2);
 
-  var a2 = e * i - f * h;
-  var b2 = f * g - d * i;
-  var c2 = d * h - e * g;
+  var a1212 = m11 * m22 - m12 * m21;
+  var a2012 = m12 * m20 - m10 * m22;
+  var a0112 = m10 * m21 - m11 * m20;
 
-  var det = a * a2 + b * b2 + c * c2;
+  var det = m00 * a1212 + m01 * a2012 + m02 * a0112;
   if (det === 0) {
-    dwv.logger.warn('Cannot invert matrix with zero determinant.');
+    dwv.logger.warn('Cannot invert 3*3 matrix with zero determinant.');
     return;
   }
+  det = 1 / det;
 
   var values = [
-    a2 / det,
-    (c * h - b * i) / det,
-    (b * f - c * e) / det,
-    b2 / det,
-    (a * i - c * g) / det,
-    (c * d - a * f) / det,
-    c2 / det,
-    (b * g - a * h) / det,
-    (a * e - b * d) / det
+    det * a1212,
+    det * (m02 * m21 - m01 * m22),
+    det * (m01 * m12 - m02 * m11),
+    det * a2012,
+    det * (m00 * m22 - m02 * m20),
+    det * (m02 * m10 - m00 * m12),
+    det * a0112,
+    det * (m01 * m20 - m00 * m21),
+    det * (m00 * m11 - m01 * m10)
   ];
 
   return new dwv.math.Matrix33(values);
@@ -24958,6 +25174,21 @@ dwv.math.Point3D.prototype.equals = function (rhs) {
 };
 
 /**
+ * Check for Point3D similarity.
+ *
+ * @param {dwv.math.Point3D} rhs The other point to compare to.
+ * @param {number} tol Optional comparison tolerance,
+ *   default to Number.EPSILON.
+ * @returns {boolean} True if both points are equal.
+ */
+dwv.math.Point3D.prototype.isSimilar = function (rhs, tol) {
+  return rhs !== null &&
+    dwv.math.isSimilar(this.getX(), rhs.getX(), tol) &&
+    dwv.math.isSimilar(this.getY(), rhs.getY(), tol) &&
+    dwv.math.isSimilar(this.getZ(), rhs.getZ(), tol);
+};
+
+/**
  * Get a string representation of the Point3D.
  *
  * @returns {string} The point as a string.
@@ -24992,6 +25223,19 @@ dwv.math.Point3D.prototype.minus = function (point3D) {
     (this.getX() - point3D.getX()),
     (this.getY() - point3D.getY()),
     (this.getZ() - point3D.getZ()));
+};
+
+/**
+ * Get an array find callback for a given point.
+ *
+ * @param {dwv.math.Point3D} point The point to compare to.
+ * @returns {Function} A function that compares its input point to the one
+ *   given as input to this function.
+ */
+dwv.math.getEqualPoint3DFunction = function (point) {
+  return function (element) {
+    return element.equals(point);
+  };
 };
 
 /**
@@ -27296,11 +27540,15 @@ dwv.tool.Draw = function (app) {
   };
 
   /**
-   * Handle double click event.
+   * Handle double click event: some tools use it to finish interaction.
    *
-   * @param {object} event The mouse up event.
+   * @param {object} event The double click event.
    */
   this.dblclick = function (event) {
+    // only end by double click undefined NPoints
+    if (typeof currentFactory.getNPoints() !== 'undefined') {
+      return;
+    }
     // exit if not started draw
     if (!started) {
       return;
@@ -30242,10 +30490,11 @@ dwv.tool.draw.FreeHandFactory = function () {
   /**
    * Get the number of points needed to build the shape.
    *
-   * @returns {number} The number of points.
+   * @returns {number|undefined} The number of points.
    */
   this.getNPoints = function () {
-    return 1000;
+    // undefined to end with double click
+    return undefined;
   };
   /**
    * Get the timeout between point storage.
@@ -31673,10 +31922,11 @@ dwv.tool.draw.RoiFactory = function () {
   /**
    * Get the number of points needed to build the shape.
    *
-   * @returns {number} The number of points.
+   * @returns {number|undefined} The number of points.
    */
   this.getNPoints = function () {
-    return 50;
+    // undefined to end with double click
+    return undefined;
   };
   /**
    * Get the timeout between point storage.
@@ -32593,11 +32843,16 @@ dwv.tool.WindowLevel = function (app) {
     // difference to last position
     var diffX = event._x - self.x0;
     var diffY = self.y0 - event._y;
+    // data range
+    var range = viewController.getImageRescaledDataRange();
+    // 1/1000 seems to give reasonable results...
+    var pixelToIntensity = (range.max - range.min) * 0.01;
+
     // calculate new window level
-    var windowCenter =
-      parseInt(viewController.getWindowLevel().center, 10) + diffY;
-    var windowWidth =
-      parseInt(viewController.getWindowLevel().width, 10) + diffX;
+    var center = parseInt(viewController.getWindowLevel().center, 10);
+    var width = parseInt(viewController.getWindowLevel().width, 10);
+    var windowCenter = center + Math.round(diffY * pixelToIntensity);
+    var windowWidth = width + Math.round(diffX * pixelToIntensity);
     // bound window width
     windowWidth = dwv.image.validateWindowWidth(windowWidth);
 
