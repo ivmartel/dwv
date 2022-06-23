@@ -1031,7 +1031,9 @@ dwv.App = function () {
       type: 'loaditem',
       data: eventMetaData,
       source: event.source,
-      loadtype: event.loadtype
+      loadtype: event.loadtype,
+      loadid: event.loadid,
+      isfirstitem: event.isfirstitem
     });
 
     // render if first and flag allows
