@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-beta.5 2022-06-16 10:33:58 */
+/*! dwv 0.31.0-beta.6 2022-06-23 18:02:33 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -1105,7 +1105,9 @@ dwv.App = function () {
       type: 'loaditem',
       data: eventMetaData,
       source: event.source,
-      loadtype: event.loadtype
+      loadtype: event.loadtype,
+      loadid: event.loadid,
+      isfirstitem: event.isfirstitem
     });
 
     // render if first and flag allows
@@ -4548,7 +4550,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.0-beta.5';
+  return '0.31.0-beta.6';
 };
 
 /**
