@@ -202,7 +202,7 @@ dwv.image.MaskFactory.prototype.create = function (
   }
   // create frame info object from per frame func
   var frameInfos = [];
-  var posPats = [];
+  var framePosPats = [];
   for (var j = 0; j < perFrameFuncGroupSequence.length; ++j) {
     var frameFunc = perFrameFuncGroupSequence[j];
     // Derivation Image Sequence
@@ -229,8 +229,8 @@ dwv.image.MaskFactory.prototype.create = function (
     for (var p = 0; p < imagePosPat.length; ++p) {
       imagePosPat[p] = parseFloat(imagePosPat[p], 10);
     }
-    if (!includesPosPat(posPats, imagePosPat)) {
-      posPats.push(imagePosPat);
+    if (!includesPosPat(framePosPats, imagePosPat)) {
+      framePosPats.push(imagePosPat);
     }
     frameInfos.push({
       dimIndex: dimIndex,
@@ -274,7 +274,22 @@ dwv.image.MaskFactory.prototype.create = function (
     }
   }
   // sort positions patient
-  posPats.sort(comparePosPat);
+  framePosPats.sort(comparePosPat);
+
+  // add missing posPats
+  var posPats = [];
+  var sliceSpacing = spacing.get(2);
+  for (var g = 0; g < framePosPats.length - 1; ++g) {
+    posPats.push(framePosPats[g]);
+    var nextZ = framePosPats[g][2] - sliceSpacing;
+    var diff = Math.abs(nextZ - framePosPats[g + 1][2]);
+    while (diff > sliceSpacing) {
+      posPats.push([framePosPats[g][0], framePosPats[g][1], nextZ]);
+      nextZ -= sliceSpacing;
+      diff = Math.abs(nextZ - framePosPats[g + 1][2]);
+    }
+  }
+  posPats.push(framePosPats[framePosPats.length - 1]);
 
   // create output buffer
   // as many slices as posPats -> gap slices between groups are not represented

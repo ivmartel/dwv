@@ -45,11 +45,20 @@ dwv.gui.ZoomBinder = function () {
   };
   this.getCallback = function (layerGroup) {
     return function (event) {
-      layerGroup.setScale({
+      var scale = {
         x: event.value[0],
         y: event.value[1],
         z: event.value[2]
-      });
+      };
+      var center;
+      if (event.value.length === 6) {
+        center = new dwv.math.Point3D(
+          event.value[3],
+          event.value[4],
+          event.value[5]
+        );
+      }
+      layerGroup.setScale(scale, center);
       layerGroup.draw();
     };
   };
@@ -234,6 +243,33 @@ dwv.gui.Stage = function () {
   this.draw = function () {
     for (var i = 0; i < layerGroups.length; ++i) {
       layerGroups[i].draw();
+    }
+  };
+
+  /**
+   * Synchronise the fit scale of the group layers.
+   */
+  this.syncLayerGroupScale = function () {
+    var minScale;
+    var hasScale = [];
+    for (var i = 0; i < layerGroups.length; ++i) {
+      var scale = layerGroups[i].calculateFitScale();
+      if (typeof scale !== 'undefined') {
+        hasScale.push(i);
+        if (typeof minScale === 'undefined' || scale < minScale) {
+          minScale = scale;
+        }
+      }
+    }
+    // exit if no scale
+    if (typeof minScale === 'undefined') {
+      return;
+    }
+    // apply min scale to layers
+    for (var j = 0; j < layerGroups.length; ++j) {
+      if (hasScale.includes(j)) {
+        layerGroups[j].setFitScale(minScale);
+      }
     }
   };
 

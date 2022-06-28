@@ -100,19 +100,19 @@ dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
   };
 
   /**
-   * Reorder values to follow view orientation.
+   * Reorder values to follow target orientation.
    *
    * @param {object} values Values as {x,y,z}.
    * @returns {object} Reoriented values as {x,y,z}.
    */
-  this.getOrientedXYZ = function (values) {
+  this.getTargetOrientedXYZ = function (values) {
     var orientedValues = dwv.math.getOrientedArray3D(
       [
         values.x,
         values.y,
         values.z
       ],
-      viewOrientation);
+      targetOrientation);
     return {
       x: orientedValues[0],
       y: orientedValues[1],
