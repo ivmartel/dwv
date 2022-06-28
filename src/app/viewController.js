@@ -300,6 +300,21 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
+   * Get the image world (mm) 2D size.
+   *
+   * @returns {object} The 2D size as {x,y}.
+   */
+  this.getImageWorldSize = function () {
+    var geometry = view.getImage().getGeometry();
+    var size = geometry.getSize(view.getOrientation()).get2D();
+    var spacing = geometry.getSpacing(view.getOrientation()).get2D();
+    return {
+      x: size.x * spacing.x,
+      y: size.y * spacing.y
+    };
+  };
+
+  /**
    * Get the image rescaled data range.
    *
    * @returns {object} The range as {min, max}.
