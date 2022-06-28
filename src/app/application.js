@@ -321,6 +321,9 @@ dwv.App = function () {
     if (typeof options.binders !== 'undefined') {
       stage.setBinders(options.binders);
     }
+
+    // create layer groups
+    createLayerGroups(options.dataViewConfigs);
   };
 
   /**
@@ -458,8 +461,7 @@ dwv.App = function () {
   this.fitToContainer = function () {
     for (var i = 0; i < stage.getNumberOfLayerGroups(); ++i) {
       var layerGroup = stage.getLayerGroup(i);
-      var mazSize = getLayerGroupMaxSize(layerGroup);
-      layerGroup.fitToContainer(mazSize);
+      layerGroup.fitToContainer();
       layerGroup.draw();
     }
   };
@@ -515,9 +517,40 @@ dwv.App = function () {
     stage.empty();
     // set new
     options.dataViewConfigs = configs;
-    // re-bind layers
-    stage.bindLayerGroups();
+    // create layer groups
+    createLayerGroups(configs);
   };
+
+  /**
+   * Create layer groups according to a data view config:
+   * adds them to stage and bind them.
+   *
+   * @param {object} dataViewConfigs The data view config.
+   */
+  function createLayerGroups(dataViewConfigs) {
+    var dataKeys = Object.keys(dataViewConfigs);
+    var divIds = [];
+    for (var i = 0; i < dataKeys.length; ++i) {
+      var dataConfigs = dataViewConfigs[dataKeys[i]];
+      for (var j = 0; j < dataConfigs.length; ++j) {
+        var viewConfig = dataConfigs[j];
+        // view configs can contain the same divIds, avoid duplicating
+        if (!divIds.includes(viewConfig.divId)) {
+          // create new layer group
+          var element = document.getElementById(viewConfig.divId);
+          var layerGroup = stage.addLayerGroup(element);
+          // bind events
+          bindLayerGroupToApp(layerGroup);
+          // optional orientation
+          if (typeof viewConfig.orientation !== 'undefined') {
+            layerGroup.setTargetOrientation(
+              dwv.math.getMatrixFromName(viewConfig.orientation));
+          }
+          divIds.push(viewConfig.divId);
+        }
+      }
+    }
+  }
 
   /**
    * Set the layer groups binders.
@@ -547,23 +580,14 @@ dwv.App = function () {
     }
     for (var i = 0; i < viewConfigs.length; ++i) {
       var config = viewConfigs[i];
-      // create layer group if not done yet
-      // warn: needs a loaded DOM
       var layerGroup =
         stage.getLayerGroupWithElementId(config.divId);
+      // layer group must exist
       if (!layerGroup) {
-        // create new layer group
-        var element = document.getElementById(config.divId);
-        layerGroup = stage.addLayerGroup(element);
-        // bind events
-        bindLayerGroup(layerGroup);
-        // optional orientation
-        if (typeof config.orientation !== 'undefined') {
-          layerGroup.setTargetOrientation(
-            dwv.math.getMatrixFromName(config.orientation));
-        }
+        throw new Error('No layer group for ' + config.divId);
       }
       // initialise or add view
+      // warn: needs a loaded DOM
       if (layerGroup.getViewLayersByDataIndex(dataIndex).length === 0) {
         if (layerGroup.getNumberOfLayers() === 0) {
           initialiseBaseLayers(dataIndex, config);
@@ -1135,7 +1159,7 @@ dwv.App = function () {
    * @param {object} group The layer group.
    * @private
    */
-  function bindLayerGroup(group) {
+  function bindLayerGroupToApp(group) {
     // propagate layer group events
     group.addEventListener('zoomchange', fireEvent);
     group.addEventListener('offsetchange', fireEvent);
@@ -1164,37 +1188,6 @@ dwv.App = function () {
     if (toolboxController) {
       toolboxController.init();
     }
-  }
-
-  /**
-   * Get the data max size for a layer group.
-   *
-   * @param {object} layerGroup The layer group.
-   * @returns {object} The max size as {x,y}.
-   */
-  function getLayerGroupMaxSize(layerGroup) {
-    var maxSize = {x: 0, y: 0};
-    // loop through layer group data
-    var indices = layerGroup.getViewDataIndices();
-    for (var i = 0; i < indices.length; ++i) {
-      var data = dataController.get(indices[i]);
-      var geometry = data.image.getGeometry();
-      var viewOrient = dwv.gui.getViewOrientation(
-        geometry.getOrientation(),
-        layerGroup.getTargetOrientation()
-      );
-      var size = geometry.getSize(viewOrient).get2D();
-      var spacing = geometry.getSpacing(viewOrient).get2D();
-      var width = size.x * spacing.x;
-      if (width > maxSize.x) {
-        maxSize.x = width;
-      }
-      var height = size.y * spacing.y;
-      if (height > maxSize.y) {
-        maxSize.y = height;
-      }
-    }
-    return maxSize;
   }
 
   /**
@@ -1293,9 +1286,8 @@ dwv.App = function () {
       });
     }
 
-    // fit to the maximum size
-    var maxSize = getLayerGroupMaxSize(layerGroup);
-    layerGroup.fitToContainer(maxSize);
+    // sync layer groups
+    stage.syncLayerGroupScale();
   }
 
 };

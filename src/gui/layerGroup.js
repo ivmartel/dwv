@@ -91,6 +91,35 @@ dwv.gui.getTargetOrientation = function (imageOrientation, viewOrientation) {
 };
 
 /**
+ * Get a scaled offset to adapt to new scale and such as the input center
+ * stays at the same position.
+ *
+ * @param {object} offset The previous offset as {x,y}.
+ * @param {object} scale The previous scale as {x,y}.
+ * @param {object} newScale The new scale as {x,y}.
+ * @param {object} center The scale center as {x,y}.
+ */
+dwv.gui.getScaledOffset = function (offset, scale, newScale, center) {
+  // worldPoint = indexPoint / scale + offset
+  //=> indexPoint = (worldPoint - offset ) * scale
+
+  // plane center should stay the same:
+  // indexCenter / newScale + newOffset =
+  //   indexCenter / oldScale + oldOffset
+  //=> newOffset = indexCenter / oldScale + oldOffset -
+  //     indexCenter / newScale
+  //=> newOffset = worldCenter - indexCenter / newScale
+  var indexCenter = {
+    x: (center.x - offset.x) * scale.x,
+    y: (center.y - offset.y) * scale.y
+  };
+  return {
+    x: center.x - (indexCenter.x / newScale.x),
+    y: center.y - (indexCenter.y / newScale.y)
+  };
+};
+
+/**
  * Layer group.
  *
  * Display position: {x,y}
@@ -561,30 +590,79 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   };
 
   /**
-   * Fit the display to the size of the container.
-   * To be called once the image is loaded.
+   * Calculate the fit scale: the scale that fits the largest data.
    *
-   * @param {object} realSize 2D real size (in mm) to fit provided as {x,y}.
+   * @returns {number|undefined} The fit scale.
    */
-  this.fitToContainer = function (realSize) {
-    // check container size
+  this.calculateFitScale = function () {
+    // check container
     if (containerDiv.offsetWidth === 0 &&
       containerDiv.offsetHeight === 0) {
       throw new Error('Cannot fit to zero sized container.');
     }
-    // find best fit
-    var fitScale = Math.min(
-      containerDiv.offsetWidth / realSize.x,
-      containerDiv.offsetHeight / realSize.y
+    // get max size
+    var maxSize = this.getMaxSize();
+    if (typeof maxSize === 'undefined') {
+      return undefined;
+    }
+    // return best fit
+    return Math.min(
+      containerDiv.offsetWidth / maxSize.x,
+      containerDiv.offsetHeight / maxSize.y
     );
-    var fitSize = {
-      x: Math.floor(realSize.x * fitScale),
-      y: Math.floor(realSize.y * fitScale)
+  };
+
+  /**
+   * Set the layer group fit scale.
+   *
+   * @param {number} scaleIn The fit scale.
+   */
+  this.setFitScale = function (scaleIn) {
+    // get maximum size
+    var maxSize = this.getMaxSize();
+    // exit if none
+    if (typeof maxSize === 'undefined') {
+      return;
+    }
+
+    var containerSize = {
+      x: containerDiv.offsetWidth,
+      y: containerDiv.offsetHeight
     };
+    // offset to keep data centered
+    var fitOffset = {
+      x: -0.5 * (containerSize.x - Math.floor(maxSize.x * scaleIn)),
+      y: -0.5 * (containerSize.y - Math.floor(maxSize.y * scaleIn))
+    };
+
     // apply to layers
     for (var j = 0; j < layers.length; ++j) {
-      layers[j].fitToContainer(fitScale, fitSize);
+      layers[j].fitToContainer(scaleIn, containerSize, fitOffset);
     }
+  };
+
+  /**
+   * Get the largest data size.
+   *
+   * @returns {object|undefined} The largest size as {x,y}.
+   */
+  this.getMaxSize = function () {
+    var maxSize = {x: 0, y: 0};
+    for (var j = 0; j < layers.length; ++j) {
+      if (layers[j] instanceof dwv.gui.ViewLayer) {
+        var size = layers[j].getImageWorldSize();
+        if (size.x > maxSize.x) {
+          maxSize.x = size.x;
+        }
+        if (size.y > maxSize.y) {
+          maxSize.y = size.y;
+        }
+      }
+    }
+    if (maxSize.x === 0 && maxSize.y === 0) {
+      maxSize = undefined;
+    }
+    return maxSize;
   };
 
   /**
@@ -599,22 +677,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
       y: scale.y * (1 + scaleStep),
       z: scale.z * (1 + scaleStep)
     };
-    var centerPlane = {
-      x: (center.getX() - offset.x) * scale.x,
-      y: (center.getY() - offset.y) * scale.y,
-      z: (center.getZ() - offset.z) * scale.z
-    };
-    // center should stay the same:
-    // center / newScale + newOffset = center / oldScale + oldOffset
-    // => newOffset = center / oldScale + oldOffset - center / newScale
-    var newOffset = {
-      x: (centerPlane.x / scale.x) + offset.x - (centerPlane.x / newScale.x),
-      y: (centerPlane.y / scale.y) + offset.y - (centerPlane.y / newScale.y),
-      z: (centerPlane.z / scale.z) + offset.z - (centerPlane.z / newScale.z)
-    };
-
-    this.setOffset(newOffset);
-    this.setScale(newScale);
+    this.setScale(newScale, center);
   };
 
   /**
@@ -623,11 +686,23 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    * @param {object} newScale The scale to apply as {x,y,z}.
    * @fires dwv.ctrl.LayerGroup#zoomchange
    */
-  this.setScale = function (newScale) {
+  this.setScale = function (newScale, center) {
     scale = newScale;
     // apply to layers
     for (var i = 0; i < layers.length; ++i) {
-      layers[i].setScale(scale);
+      layers[i].setScale(scale, center);
+    }
+
+    // event value
+    var value = [
+      newScale.x,
+      newScale.y,
+      newScale.z
+    ];
+    if (typeof center !== 'undefined') {
+      value.push(center.getX());
+      value.push(center.getY());
+      value.push(center.getZ());
     }
 
     /**
@@ -639,7 +714,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
      */
     fireEvent({
       type: 'zoomchange',
-      value: [scale.x, scale.y, scale.z],
+      value: value
     });
   };
 

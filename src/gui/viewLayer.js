@@ -120,6 +120,22 @@ dwv.gui.ViewLayer = function (containerDiv) {
   var baseOffset = {x: 0, y: 0};
 
   /**
+   * The view offset.
+   *
+   * @private
+   * @type {object}
+   */
+  var viewOffset = {x: 0, y: 0};
+
+  /**
+   * The zoom offset.
+   *
+   * @private
+   * @type {object}
+   */
+  var zoomOffset = {x: 0, y: 0};
+
+  /**
    * Data update flag.
    *
    * @private
@@ -224,6 +240,15 @@ dwv.gui.ViewLayer = function (containerDiv) {
   };
 
   /**
+   * Get the image world (mm) 2D size.
+   *
+   * @returns {object} The 2D size as {x,y}.
+   */
+  this.getImageWorldSize = function () {
+    return viewController.getImageWorldSize();
+  };
+
+  /**
    * Get the layer opacity.
    *
    * @returns {number} The opacity ([0:1] range).
@@ -262,14 +287,57 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * Set the layer scale.
    *
    * @param {object} newScale The scale as {x,y}.
+   * @param {dwv.math.Point3D} center The scale center.
    */
-  this.setScale = function (newScale) {
+  this.setScale = function (newScale, center) {
     var helper = viewController.getPlaneHelper();
-    var orientedNewScale = helper.getOrientedXYZ(newScale);
-    scale = {
+    var orientedNewScale = helper.getTargetOrientedXYZ(newScale);
+    var finalNewScale = {
       x: fitScale.x * orientedNewScale.x,
       y: fitScale.y * orientedNewScale.y
     };
+
+    if (newScale.x === 1 &&
+      newScale.y === 1 &&
+      newScale.z === 1) {
+      // reset zoom offset for scale=1
+      var resetOffset = {
+        x: offset.x - zoomOffset.x,
+        y: offset.y - zoomOffset.y
+      };
+      // store new offset
+      zoomOffset = {x: 0, y: 0};
+      offset = resetOffset;
+    } else {
+      if (typeof center !== 'undefined') {
+        var worldCenter = helper.getPlaneOffsetFromOffset3D({
+          x: center.getX(),
+          y: center.getY(),
+          z: center.getZ()
+        });
+        // center was obtained with viewLayer.displayToPlanePosNoBase
+        // compensated for baseOffset
+        // TODO: justify...
+        worldCenter = {
+          x: worldCenter.x + baseOffset.x,
+          y: worldCenter.y + baseOffset.y
+        };
+
+        var newOffset = dwv.gui.getScaledOffset(
+          offset, scale, finalNewScale, worldCenter);
+
+        var newZoomOffset = {
+          x: zoomOffset.x + newOffset.x - offset.x,
+          y: zoomOffset.y + newOffset.y - offset.y
+        };
+        // store new offset
+        zoomOffset = newZoomOffset;
+        offset = newOffset;
+      }
+    }
+
+    // store new scale
+    scale = finalNewScale;
   };
 
   /**
@@ -309,8 +377,8 @@ dwv.gui.ViewLayer = function (containerDiv) {
     var helper = viewController.getPlaneHelper();
     var planeNewOffset = helper.getPlaneOffsetFromOffset3D(newOffset);
     offset = {
-      x: baseOffset.x + planeNewOffset.x,
-      y: baseOffset.y + planeNewOffset.y
+      x: viewOffset.x + baseOffset.x + zoomOffset.x + planeNewOffset.x,
+      y: viewOffset.y + baseOffset.y + zoomOffset.y + planeNewOffset.y
     };
   };
 
@@ -532,8 +600,18 @@ dwv.gui.ViewLayer = function (containerDiv) {
    *
    * @param {number} fitScale1D The 1D fit scale.
    * @param {object} fitSize The fit size as {x,y}.
+   * @param {object} fitOffset The fit offset as {x,y}.
    */
-  this.fitToContainer = function (fitScale1D, fitSize) {
+  this.fitToContainer = function (fitScale1D, fitSize, fitOffset) {
+    // update canvas size
+    var width = fitSize.x;
+    var height = fitSize.y;
+    if (!dwv.gui.canCreateCanvas(width, height)) {
+      throw new Error('Cannot resize canvas ' + width + ', ' + height);
+    }
+    canvas.width = width;
+    canvas.height = height;
+
     // previous scale without fit
     var previousScale = {
       x: scale.x / fitScale.x,
@@ -544,18 +622,20 @@ dwv.gui.ViewLayer = function (containerDiv) {
       x: fitScale1D * baseSpacing.x,
       y: fitScale1D * baseSpacing.y
     };
-    // new canvas size
-    var width = fitSize.x;
-    var height = fitSize.y;
-    if (!dwv.gui.canCreateCanvas(width, height)) {
-      throw new Error('Cannot resize canvas ' + width + ', ' + height);
-    }
-    canvas.width = width;
-    canvas.height = height;
-    // reset previous scale with new fit
+    // update scale
     scale = {
       x: previousScale.x * fitScale.x,
       y: previousScale.y * fitScale.y
+    };
+
+    // update offsets
+    viewOffset = {
+      x: fitOffset.x / fitScale.x,
+      y: fitOffset.y / fitScale.y
+    };
+    offset = {
+      x: viewOffset.x + baseOffset.x + zoomOffset.x,
+      y: viewOffset.y + baseOffset.y + zoomOffset.y
     };
   };
 
