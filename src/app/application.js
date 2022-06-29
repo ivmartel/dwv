@@ -44,7 +44,7 @@ dwv.App = function () {
    * Get the image.
    *
    * @param {number} index The data index.
-   * @returns {Image} The associated image.
+   * @returns {dwv.image.Image} The associated image.
    */
   this.getImage = function (index) {
     return dataController.get(index).image;
@@ -52,16 +52,16 @@ dwv.App = function () {
   /**
    * Get the last loaded image.
    *
-   * @returns {Image} The image.
+   * @returns {dwv.image.Image} The image.
    */
   this.getLastImage = function () {
     return dataController.get(dataController.length() - 1).image;
   };
   /**
-   * Set the image.
+   * Set the image at the given index.
    *
    * @param {number} index The data index.
-   * @param {Image} img The associated image.
+   * @param {dwv.image.Image} img The associated image.
    */
   this.setImage = function (index, img) {
     dataController.setImage(index, img);
@@ -69,10 +69,63 @@ dwv.App = function () {
   /**
    * Set the last image.
    *
-   * @param {Image} img The associated image.
+   * @param {dwv.image.Image} img The associated image.
    */
   this.setLastImage = function (img) {
     dataController.setImage(dataController.length() - 1, img);
+  };
+
+  /**
+   * Add a new image.
+   *
+   * @param {dwv.image.Image} image The new image.
+   * @param {object} meta The image meta.
+   * @returns {number} The new image id.
+   */
+  this.addNewImage = function (image, meta) {
+    var id = dataController.length();
+
+    // load start event
+    fireEvent({
+      type: 'loadstart',
+      loadtype: 'image',
+      source: 'internal',
+      loadid: id
+    });
+
+    // add image to data controller
+    dataController.addNew(id, image, meta);
+
+    // load item event
+    fireEvent({
+      type: 'loaditem',
+      loadtype: 'image',
+      data: meta,
+      source: 'internal',
+      loadid: id,
+      isfirstitem: true
+    });
+
+    // optional render
+    if (options.viewOnFirstLoadItem) {
+      this.render(id);
+    }
+
+    // load events
+    fireEvent({
+      type: 'load',
+      loadtype: 'image',
+      source: 'internal',
+      loadid: id
+    });
+    fireEvent({
+      type: 'loadend',
+      loadtype: 'image',
+      source: 'internal',
+      loadid: id
+    });
+
+    return id;
   };
 
   /**
