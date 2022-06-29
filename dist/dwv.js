@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-beta.6 2022-06-23 18:02:33 */
+/*! dwv 0.31.0-beta.7 2022-06-29 15:19:10 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -118,7 +118,7 @@ dwv.App = function () {
    * Get the image.
    *
    * @param {number} index The data index.
-   * @returns {Image} The associated image.
+   * @returns {dwv.image.Image} The associated image.
    */
   this.getImage = function (index) {
     return dataController.get(index).image;
@@ -126,16 +126,16 @@ dwv.App = function () {
   /**
    * Get the last loaded image.
    *
-   * @returns {Image} The image.
+   * @returns {dwv.image.Image} The image.
    */
   this.getLastImage = function () {
     return dataController.get(dataController.length() - 1).image;
   };
   /**
-   * Set the image.
+   * Set the image at the given index.
    *
    * @param {number} index The data index.
-   * @param {Image} img The associated image.
+   * @param {dwv.image.Image} img The associated image.
    */
   this.setImage = function (index, img) {
     dataController.setImage(index, img);
@@ -143,10 +143,63 @@ dwv.App = function () {
   /**
    * Set the last image.
    *
-   * @param {Image} img The associated image.
+   * @param {dwv.image.Image} img The associated image.
    */
   this.setLastImage = function (img) {
     dataController.setImage(dataController.length() - 1, img);
+  };
+
+  /**
+   * Add a new image.
+   *
+   * @param {dwv.image.Image} image The new image.
+   * @param {object} meta The image meta.
+   * @returns {number} The new image id.
+   */
+  this.addNewImage = function (image, meta) {
+    var id = dataController.length();
+
+    // load start event
+    fireEvent({
+      type: 'loadstart',
+      loadtype: 'image',
+      source: 'internal',
+      loadid: id
+    });
+
+    // add image to data controller
+    dataController.addNew(id, image, meta);
+
+    // load item event
+    fireEvent({
+      type: 'loaditem',
+      loadtype: 'image',
+      data: meta,
+      source: 'internal',
+      loadid: id,
+      isfirstitem: true
+    });
+
+    // optional render
+    if (options.viewOnFirstLoadItem) {
+      this.render(id);
+    }
+
+    // load events
+    fireEvent({
+      type: 'load',
+      loadtype: 'image',
+      source: 'internal',
+      loadid: id
+    });
+    fireEvent({
+      type: 'loadend',
+      loadtype: 'image',
+      source: 'internal',
+      loadid: id
+    });
+
+    return id;
   };
 
   /**
@@ -395,6 +448,9 @@ dwv.App = function () {
     if (typeof options.binders !== 'undefined') {
       stage.setBinders(options.binders);
     }
+
+    // create layer groups
+    createLayerGroups(options.dataViewConfigs);
   };
 
   /**
@@ -532,8 +588,7 @@ dwv.App = function () {
   this.fitToContainer = function () {
     for (var i = 0; i < stage.getNumberOfLayerGroups(); ++i) {
       var layerGroup = stage.getLayerGroup(i);
-      var mazSize = getLayerGroupMaxSize(layerGroup);
-      layerGroup.fitToContainer(mazSize);
+      layerGroup.fitToContainer();
       layerGroup.draw();
     }
   };
@@ -589,9 +644,40 @@ dwv.App = function () {
     stage.empty();
     // set new
     options.dataViewConfigs = configs;
-    // re-bind layers
-    stage.bindLayerGroups();
+    // create layer groups
+    createLayerGroups(configs);
   };
+
+  /**
+   * Create layer groups according to a data view config:
+   * adds them to stage and bind them.
+   *
+   * @param {object} dataViewConfigs The data view config.
+   */
+  function createLayerGroups(dataViewConfigs) {
+    var dataKeys = Object.keys(dataViewConfigs);
+    var divIds = [];
+    for (var i = 0; i < dataKeys.length; ++i) {
+      var dataConfigs = dataViewConfigs[dataKeys[i]];
+      for (var j = 0; j < dataConfigs.length; ++j) {
+        var viewConfig = dataConfigs[j];
+        // view configs can contain the same divIds, avoid duplicating
+        if (!divIds.includes(viewConfig.divId)) {
+          // create new layer group
+          var element = document.getElementById(viewConfig.divId);
+          var layerGroup = stage.addLayerGroup(element);
+          // bind events
+          bindLayerGroupToApp(layerGroup);
+          // optional orientation
+          if (typeof viewConfig.orientation !== 'undefined') {
+            layerGroup.setTargetOrientation(
+              dwv.math.getMatrixFromName(viewConfig.orientation));
+          }
+          divIds.push(viewConfig.divId);
+        }
+      }
+    }
+  }
 
   /**
    * Set the layer groups binders.
@@ -621,23 +707,14 @@ dwv.App = function () {
     }
     for (var i = 0; i < viewConfigs.length; ++i) {
       var config = viewConfigs[i];
-      // create layer group if not done yet
-      // warn: needs a loaded DOM
       var layerGroup =
         stage.getLayerGroupWithElementId(config.divId);
+      // layer group must exist
       if (!layerGroup) {
-        // create new layer group
-        var element = document.getElementById(config.divId);
-        layerGroup = stage.addLayerGroup(element);
-        // bind events
-        bindLayerGroup(layerGroup);
-        // optional orientation
-        if (typeof config.orientation !== 'undefined') {
-          layerGroup.setTargetOrientation(
-            dwv.math.getMatrixFromName(config.orientation));
-        }
+        throw new Error('No layer group for ' + config.divId);
       }
       // initialise or add view
+      // warn: needs a loaded DOM
       if (layerGroup.getViewLayersByDataIndex(dataIndex).length === 0) {
         if (layerGroup.getNumberOfLayers() === 0) {
           initialiseBaseLayers(dataIndex, config);
@@ -1209,7 +1286,7 @@ dwv.App = function () {
    * @param {object} group The layer group.
    * @private
    */
-  function bindLayerGroup(group) {
+  function bindLayerGroupToApp(group) {
     // propagate layer group events
     group.addEventListener('zoomchange', fireEvent);
     group.addEventListener('offsetchange', fireEvent);
@@ -1238,37 +1315,6 @@ dwv.App = function () {
     if (toolboxController) {
       toolboxController.init();
     }
-  }
-
-  /**
-   * Get the data max size for a layer group.
-   *
-   * @param {object} layerGroup The layer group.
-   * @returns {object} The max size as {x,y}.
-   */
-  function getLayerGroupMaxSize(layerGroup) {
-    var maxSize = {x: 0, y: 0};
-    // loop through layer group data
-    var indices = layerGroup.getViewDataIndices();
-    for (var i = 0; i < indices.length; ++i) {
-      var data = dataController.get(indices[i]);
-      var geometry = data.image.getGeometry();
-      var viewOrient = dwv.gui.getViewOrientation(
-        geometry.getOrientation(),
-        layerGroup.getTargetOrientation()
-      );
-      var size = geometry.getSize(viewOrient).get2D();
-      var spacing = geometry.getSpacing(viewOrient).get2D();
-      var width = size.x * spacing.x;
-      if (width > maxSize.x) {
-        maxSize.x = width;
-      }
-      var height = size.y * spacing.y;
-      if (height > maxSize.y) {
-        maxSize.y = height;
-      }
-    }
-    return maxSize;
   }
 
   /**
@@ -1367,9 +1413,8 @@ dwv.App = function () {
       });
     }
 
-    // fit to the maximum size
-    var maxSize = getLayerGroupMaxSize(layerGroup);
-    layerGroup.fitToContainer(maxSize);
+    // sync layer groups
+    stage.syncLayerGroupScale();
   }
 
 };
@@ -2907,6 +2952,21 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
+   * Get the image world (mm) 2D size.
+   *
+   * @returns {object} The 2D size as {x,y}.
+   */
+  this.getImageWorldSize = function () {
+    var geometry = view.getImage().getGeometry();
+    var size = geometry.getSize(view.getOrientation()).get2D();
+    var spacing = geometry.getSpacing(view.getOrientation()).get2D();
+    return {
+      x: size.x * spacing.x,
+      y: size.y * spacing.y
+    };
+  };
+
+  /**
    * Get the image rescaled data range.
    *
    * @returns {object} The range as {min, max}.
@@ -2989,6 +3049,25 @@ dwv.ctrl.ViewController = function (view) {
    */
   this.setCurrentIndex = function (index, silent) {
     return view.setCurrentIndex(index, silent);
+  };
+
+  /**
+   * Get a 3D position from a plane 2D position.
+   *
+   * @param {dwv.math.Point2D} point2D The 2D position as {x,y}.
+   * @returns {dwv.math.Point} The 3D point.
+   */
+  this.getPositionFromPlanePoint = function (point2D) {
+    // keep third direction
+    var k = this.getCurrentScrollIndexValue();
+    var planePoint = new dwv.math.Point3D(point2D.x, point2D.y, k);
+    // de-orient
+    var point = planeHelper.getImageOrientedVector3D(planePoint);
+    // ~indexToWorld to not loose precision
+    var geometry = view.getImage().getGeometry();
+    var point3D = geometry.pointToWorld(point);
+    // merge with current position to keep extra dimensions
+    return this.getCurrentPosition().mergeWith3D(point3D);
   };
 
   /**
@@ -4550,7 +4629,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.0-beta.6';
+  return '0.31.0-beta.7';
 };
 
 /**
@@ -11345,6 +11424,22 @@ dwv.gui.DrawLayer = function (containerDiv) {
   var baseOffset = {x: 0, y: 0};
 
   /**
+   * The view offset.
+   *
+   * @private
+   * @type {object}
+   */
+  var viewOffset = {x: 0, y: 0};
+
+  /**
+   * The zoom offset.
+   *
+   * @private
+   * @type {object}
+   */
+  var zoomOffset = {x: 0, y: 0};
+
+  /**
    * The draw controller.
    *
    * @private
@@ -11463,16 +11558,59 @@ dwv.gui.DrawLayer = function (containerDiv) {
    * Set the layer scale.
    *
    * @param {object} newScale The scale as {x,y}.
+   * @param {dwv.math.Point3D} center The scale center.
    */
-  this.setScale = function (newScale) {
-    var orientedNewScale = planeHelper.getOrientedXYZ(newScale);
-    var fullScale = {
+  this.setScale = function (newScale, center) {
+    var orientedNewScale = planeHelper.getTargetOrientedXYZ(newScale);
+    var finalNewScale = {
       x: fitScale.x * orientedNewScale.x,
       y: fitScale.y * orientedNewScale.y
     };
-    konvaStage.scale(fullScale);
-    // update labelss
-    updateLabelScale(fullScale);
+
+    var offset = konvaStage.offset();
+
+    if (newScale.x === 1 &&
+      newScale.y === 1 &&
+      newScale.z === 1) {
+      // reset zoom offset for scale=1
+      var resetOffset = {
+        x: offset.x - zoomOffset.x,
+        y: offset.y - zoomOffset.y
+      };
+      // store new offset
+      zoomOffset = {x: 0, y: 0};
+      konvaStage.offset(resetOffset);
+    } else {
+      if (typeof center !== 'undefined') {
+        var worldCenter = planeHelper.getPlaneOffsetFromOffset3D({
+          x: center.getX(),
+          y: center.getY(),
+          z: center.getZ()
+        });
+        // center was obtained with viewLayer.displayToPlanePosNoBase
+        // compensated for baseOffset
+        // TODO: justify...
+        worldCenter = {
+          x: worldCenter.x + baseOffset.x,
+          y: worldCenter.y + baseOffset.y
+        };
+
+        var newOffset = dwv.gui.getScaledOffset(
+          offset, konvaStage.scale(), finalNewScale, worldCenter);
+
+        var newZoomOffset = {
+          x: zoomOffset.x + newOffset.x - offset.x,
+          y: zoomOffset.y + newOffset.y - offset.y
+        };
+        // store new offset
+        zoomOffset = newZoomOffset;
+        konvaStage.offset(newOffset);
+      }
+    }
+
+    konvaStage.scale(finalNewScale);
+    // update labels
+    updateLabelScale(finalNewScale);
   };
 
   /**
@@ -11483,8 +11621,8 @@ dwv.gui.DrawLayer = function (containerDiv) {
   this.setOffset = function (newOffset) {
     var planeNewOffset = planeHelper.getPlaneOffsetFromOffset3D(newOffset);
     konvaStage.offset({
-      x: baseOffset.x + planeNewOffset.x,
-      y: baseOffset.y + planeNewOffset.y
+      x: viewOffset.x + baseOffset.x + zoomOffset.x + planeNewOffset.x,
+      y: viewOffset.y + baseOffset.y + zoomOffset.y + planeNewOffset.y
     });
   };
 
@@ -11582,18 +11720,38 @@ dwv.gui.DrawLayer = function (containerDiv) {
    *
    * @param {number} fitScale1D The 1D fit scale.
    * @param {object} fitSize The fit size as {x,y}.
+   * @param {object} fitOffset The fit offset as {x,y}.
    */
-  this.fitToContainer = function (fitScale1D, fitSize) {
+  this.fitToContainer = function (fitScale1D, fitSize, fitOffset) {
+    // update konva
+    konvaStage.setWidth(fitSize.x);
+    konvaStage.setHeight(fitSize.y);
+
+    // previous scale without fit
+    var previousScale = {
+      x: konvaStage.scale().x / fitScale.x,
+      y: konvaStage.scale().y / fitScale.y
+    };
     // update fit scale
     fitScale = {
       x: fitScale1D * baseSpacing.x,
       y: fitScale1D * baseSpacing.y
     };
-    // update konva
-    konvaStage.setWidth(fitSize.x);
-    konvaStage.setHeight(fitSize.y);
-    // reset scale
-    this.setScale({x: 1, y: 1, z: 1});
+    // update scale
+    konvaStage.scale({
+      x: previousScale.x * fitScale.x,
+      y: previousScale.y * fitScale.y
+    });
+
+    // update offsets
+    viewOffset = {
+      x: fitOffset.x / fitScale.x,
+      y: fitOffset.y / fitScale.y
+    };
+    konvaStage.offset({
+      x: viewOffset.x + baseOffset.x + zoomOffset.x,
+      y: viewOffset.y + baseOffset.y + zoomOffset.y
+    });
   };
 
   /**
@@ -11960,6 +12118,36 @@ dwv.gui.getTargetOrientation = function (imageOrientation, viewOrientation) {
   // -> Ot = Oi * Ov
   // note: asOneAndZeros as in dwv.gui.getViewOrientation...
   return imageOrientation.asOneAndZeros().multiply(viewOrientation);
+};
+
+/**
+ * Get a scaled offset to adapt to new scale and such as the input center
+ * stays at the same position.
+ *
+ * @param {object} offset The previous offset as {x,y}.
+ * @param {object} scale The previous scale as {x,y}.
+ * @param {object} newScale The new scale as {x,y}.
+ * @param {object} center The scale center as {x,y}.
+ * @returns {object} The scaled offset as {x,y}.
+ */
+dwv.gui.getScaledOffset = function (offset, scale, newScale, center) {
+  // worldPoint = indexPoint / scale + offset
+  //=> indexPoint = (worldPoint - offset ) * scale
+
+  // plane center should stay the same:
+  // indexCenter / newScale + newOffset =
+  //   indexCenter / oldScale + oldOffset
+  //=> newOffset = indexCenter / oldScale + oldOffset -
+  //     indexCenter / newScale
+  //=> newOffset = worldCenter - indexCenter / newScale
+  var indexCenter = {
+    x: (center.x - offset.x) * scale.x,
+    y: (center.y - offset.y) * scale.y
+  };
+  return {
+    x: center.x - (indexCenter.x / newScale.x),
+    y: center.y - (indexCenter.y / newScale.y)
+  };
 };
 
 /**
@@ -12433,30 +12621,79 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
   };
 
   /**
-   * Fit the display to the size of the container.
-   * To be called once the image is loaded.
+   * Calculate the fit scale: the scale that fits the largest data.
    *
-   * @param {object} realSize 2D real size (in mm) to fit provided as {x,y}.
+   * @returns {number|undefined} The fit scale.
    */
-  this.fitToContainer = function (realSize) {
-    // check container size
+  this.calculateFitScale = function () {
+    // check container
     if (containerDiv.offsetWidth === 0 &&
       containerDiv.offsetHeight === 0) {
       throw new Error('Cannot fit to zero sized container.');
     }
-    // find best fit
-    var fitScale = Math.min(
-      containerDiv.offsetWidth / realSize.x,
-      containerDiv.offsetHeight / realSize.y
+    // get max size
+    var maxSize = this.getMaxSize();
+    if (typeof maxSize === 'undefined') {
+      return undefined;
+    }
+    // return best fit
+    return Math.min(
+      containerDiv.offsetWidth / maxSize.x,
+      containerDiv.offsetHeight / maxSize.y
     );
-    var fitSize = {
-      x: Math.floor(realSize.x * fitScale),
-      y: Math.floor(realSize.y * fitScale)
+  };
+
+  /**
+   * Set the layer group fit scale.
+   *
+   * @param {number} scaleIn The fit scale.
+   */
+  this.setFitScale = function (scaleIn) {
+    // get maximum size
+    var maxSize = this.getMaxSize();
+    // exit if none
+    if (typeof maxSize === 'undefined') {
+      return;
+    }
+
+    var containerSize = {
+      x: containerDiv.offsetWidth,
+      y: containerDiv.offsetHeight
     };
+    // offset to keep data centered
+    var fitOffset = {
+      x: -0.5 * (containerSize.x - Math.floor(maxSize.x * scaleIn)),
+      y: -0.5 * (containerSize.y - Math.floor(maxSize.y * scaleIn))
+    };
+
     // apply to layers
     for (var j = 0; j < layers.length; ++j) {
-      layers[j].fitToContainer(fitScale, fitSize);
+      layers[j].fitToContainer(scaleIn, containerSize, fitOffset);
     }
+  };
+
+  /**
+   * Get the largest data size.
+   *
+   * @returns {object|undefined} The largest size as {x,y}.
+   */
+  this.getMaxSize = function () {
+    var maxSize = {x: 0, y: 0};
+    for (var j = 0; j < layers.length; ++j) {
+      if (layers[j] instanceof dwv.gui.ViewLayer) {
+        var size = layers[j].getImageWorldSize();
+        if (size.x > maxSize.x) {
+          maxSize.x = size.x;
+        }
+        if (size.y > maxSize.y) {
+          maxSize.y = size.y;
+        }
+      }
+    }
+    if (maxSize.x === 0 && maxSize.y === 0) {
+      maxSize = undefined;
+    }
+    return maxSize;
   };
 
   /**
@@ -12471,35 +12708,33 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
       y: scale.y * (1 + scaleStep),
       z: scale.z * (1 + scaleStep)
     };
-    var centerPlane = {
-      x: (center.getX() - offset.x) * scale.x,
-      y: (center.getY() - offset.y) * scale.y,
-      z: (center.getZ() - offset.z) * scale.z
-    };
-    // center should stay the same:
-    // center / newScale + newOffset = center / oldScale + oldOffset
-    // => newOffset = center / oldScale + oldOffset - center / newScale
-    var newOffset = {
-      x: (centerPlane.x / scale.x) + offset.x - (centerPlane.x / newScale.x),
-      y: (centerPlane.y / scale.y) + offset.y - (centerPlane.y / newScale.y),
-      z: (centerPlane.z / scale.z) + offset.z - (centerPlane.z / newScale.z)
-    };
-
-    this.setOffset(newOffset);
-    this.setScale(newScale);
+    this.setScale(newScale, center);
   };
 
   /**
    * Set the layers' scale.
    *
    * @param {object} newScale The scale to apply as {x,y,z}.
+   * @param {dwv.math.Point3D} center The scale center Point3D.
    * @fires dwv.ctrl.LayerGroup#zoomchange
    */
-  this.setScale = function (newScale) {
+  this.setScale = function (newScale, center) {
     scale = newScale;
     // apply to layers
     for (var i = 0; i < layers.length; ++i) {
-      layers[i].setScale(scale);
+      layers[i].setScale(scale, center);
+    }
+
+    // event value
+    var value = [
+      newScale.x,
+      newScale.y,
+      newScale.z
+    ];
+    if (typeof center !== 'undefined') {
+      value.push(center.getX());
+      value.push(center.getY());
+      value.push(center.getZ());
     }
 
     /**
@@ -12511,7 +12746,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
      */
     fireEvent({
       type: 'zoomchange',
-      value: [scale.x, scale.y, scale.z],
+      value: value
     });
   };
 
@@ -12664,11 +12899,20 @@ dwv.gui.ZoomBinder = function () {
   };
   this.getCallback = function (layerGroup) {
     return function (event) {
-      layerGroup.setScale({
+      var scale = {
         x: event.value[0],
         y: event.value[1],
         z: event.value[2]
-      });
+      };
+      var center;
+      if (event.value.length === 6) {
+        center = new dwv.math.Point3D(
+          event.value[3],
+          event.value[4],
+          event.value[5]
+        );
+      }
+      layerGroup.setScale(scale, center);
       layerGroup.draw();
     };
   };
@@ -12853,6 +13097,33 @@ dwv.gui.Stage = function () {
   this.draw = function () {
     for (var i = 0; i < layerGroups.length; ++i) {
       layerGroups[i].draw();
+    }
+  };
+
+  /**
+   * Synchronise the fit scale of the group layers.
+   */
+  this.syncLayerGroupScale = function () {
+    var minScale;
+    var hasScale = [];
+    for (var i = 0; i < layerGroups.length; ++i) {
+      var scale = layerGroups[i].calculateFitScale();
+      if (typeof scale !== 'undefined') {
+        hasScale.push(i);
+        if (typeof minScale === 'undefined' || scale < minScale) {
+          minScale = scale;
+        }
+      }
+    }
+    // exit if no scale
+    if (typeof minScale === 'undefined') {
+      return;
+    }
+    // apply min scale to layers
+    for (var j = 0; j < layerGroups.length; ++j) {
+      if (hasScale.includes(j)) {
+        layerGroups[j].setFitScale(minScale);
+      }
     }
   };
 
@@ -13358,6 +13629,22 @@ dwv.gui.ViewLayer = function (containerDiv) {
   var baseOffset = {x: 0, y: 0};
 
   /**
+   * The view offset.
+   *
+   * @private
+   * @type {object}
+   */
+  var viewOffset = {x: 0, y: 0};
+
+  /**
+   * The zoom offset.
+   *
+   * @private
+   * @type {object}
+   */
+  var zoomOffset = {x: 0, y: 0};
+
+  /**
    * Data update flag.
    *
    * @private
@@ -13462,6 +13749,15 @@ dwv.gui.ViewLayer = function (containerDiv) {
   };
 
   /**
+   * Get the image world (mm) 2D size.
+   *
+   * @returns {object} The 2D size as {x,y}.
+   */
+  this.getImageWorldSize = function () {
+    return viewController.getImageWorldSize();
+  };
+
+  /**
    * Get the layer opacity.
    *
    * @returns {number} The opacity ([0:1] range).
@@ -13500,14 +13796,57 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * Set the layer scale.
    *
    * @param {object} newScale The scale as {x,y}.
+   * @param {dwv.math.Point3D} center The scale center.
    */
-  this.setScale = function (newScale) {
+  this.setScale = function (newScale, center) {
     var helper = viewController.getPlaneHelper();
-    var orientedNewScale = helper.getOrientedXYZ(newScale);
-    scale = {
+    var orientedNewScale = helper.getTargetOrientedXYZ(newScale);
+    var finalNewScale = {
       x: fitScale.x * orientedNewScale.x,
       y: fitScale.y * orientedNewScale.y
     };
+
+    if (newScale.x === 1 &&
+      newScale.y === 1 &&
+      newScale.z === 1) {
+      // reset zoom offset for scale=1
+      var resetOffset = {
+        x: offset.x - zoomOffset.x,
+        y: offset.y - zoomOffset.y
+      };
+      // store new offset
+      zoomOffset = {x: 0, y: 0};
+      offset = resetOffset;
+    } else {
+      if (typeof center !== 'undefined') {
+        var worldCenter = helper.getPlaneOffsetFromOffset3D({
+          x: center.getX(),
+          y: center.getY(),
+          z: center.getZ()
+        });
+        // center was obtained with viewLayer.displayToPlanePosNoBase
+        // compensated for baseOffset
+        // TODO: justify...
+        worldCenter = {
+          x: worldCenter.x + baseOffset.x,
+          y: worldCenter.y + baseOffset.y
+        };
+
+        var newOffset = dwv.gui.getScaledOffset(
+          offset, scale, finalNewScale, worldCenter);
+
+        var newZoomOffset = {
+          x: zoomOffset.x + newOffset.x - offset.x,
+          y: zoomOffset.y + newOffset.y - offset.y
+        };
+        // store new offset
+        zoomOffset = newZoomOffset;
+        offset = newOffset;
+      }
+    }
+
+    // store new scale
+    scale = finalNewScale;
   };
 
   /**
@@ -13547,8 +13886,8 @@ dwv.gui.ViewLayer = function (containerDiv) {
     var helper = viewController.getPlaneHelper();
     var planeNewOffset = helper.getPlaneOffsetFromOffset3D(newOffset);
     offset = {
-      x: baseOffset.x + planeNewOffset.x,
-      y: baseOffset.y + planeNewOffset.y
+      x: viewOffset.x + baseOffset.x + zoomOffset.x + planeNewOffset.x,
+      y: viewOffset.y + baseOffset.y + zoomOffset.y + planeNewOffset.y
     };
   };
 
@@ -13770,8 +14109,18 @@ dwv.gui.ViewLayer = function (containerDiv) {
    *
    * @param {number} fitScale1D The 1D fit scale.
    * @param {object} fitSize The fit size as {x,y}.
+   * @param {object} fitOffset The fit offset as {x,y}.
    */
-  this.fitToContainer = function (fitScale1D, fitSize) {
+  this.fitToContainer = function (fitScale1D, fitSize, fitOffset) {
+    // update canvas size
+    var width = fitSize.x;
+    var height = fitSize.y;
+    if (!dwv.gui.canCreateCanvas(width, height)) {
+      throw new Error('Cannot resize canvas ' + width + ', ' + height);
+    }
+    canvas.width = width;
+    canvas.height = height;
+
     // previous scale without fit
     var previousScale = {
       x: scale.x / fitScale.x,
@@ -13782,18 +14131,20 @@ dwv.gui.ViewLayer = function (containerDiv) {
       x: fitScale1D * baseSpacing.x,
       y: fitScale1D * baseSpacing.y
     };
-    // new canvas size
-    var width = fitSize.x;
-    var height = fitSize.y;
-    if (!dwv.gui.canCreateCanvas(width, height)) {
-      throw new Error('Cannot resize canvas ' + width + ', ' + height);
-    }
-    canvas.width = width;
-    canvas.height = height;
-    // reset previous scale with new fit
+    // update scale
     scale = {
       x: previousScale.x * fitScale.x,
       y: previousScale.y * fitScale.y
+    };
+
+    // update offsets
+    viewOffset = {
+      x: fitOffset.x / fitScale.x,
+      y: fitOffset.y / fitScale.y
+    };
+    offset = {
+      x: viewOffset.x + baseOffset.x + zoomOffset.x,
+      y: viewOffset.y + baseOffset.y + zoomOffset.y
     };
   };
 
@@ -18328,19 +18679,19 @@ dwv.image.PlaneHelper = function (spacing, imageOrientation, viewOrientation) {
   };
 
   /**
-   * Reorder values to follow view orientation.
+   * Reorder values to follow target orientation.
    *
    * @param {object} values Values as {x,y,z}.
    * @returns {object} Reoriented values as {x,y,z}.
    */
-  this.getOrientedXYZ = function (values) {
+  this.getTargetOrientedXYZ = function (values) {
     var orientedValues = dwv.math.getOrientedArray3D(
       [
         values.x,
         values.y,
         values.z
       ],
-      viewOrientation);
+      targetOrientation);
     return {
       x: orientedValues[0],
       y: orientedValues[1],
