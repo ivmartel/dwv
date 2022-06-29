@@ -400,6 +400,25 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
+   * Get a 3D position from a plane 2D position.
+   *
+   * @param {dwv.math.Point2D} point2D The 2D position as {x,y}.
+   * @returns {dwv.math.Point} The 3D point.
+   */
+  this.getPositionFromPlanePoint = function (point2D) {
+    // keep third direction
+    var k = this.getCurrentScrollIndexValue();
+    var planePoint = new dwv.math.Point3D(point2D.x, point2D.y, k);
+    // de-orient
+    var point = planeHelper.getImageOrientedVector3D(planePoint);
+    // ~indexToWorld to not loose precision
+    var geometry = view.getImage().getGeometry();
+    var point3D = geometry.pointToWorld(point);
+    // merge with current position to keep extra dimensions
+    return this.getCurrentPosition().mergeWith3D(point3D);
+  };
+
+  /**
    * Get a plane 3D position from a plane 2D position: does not compensate
    *   for the image origin. Needed for setting the scale center...
    *
