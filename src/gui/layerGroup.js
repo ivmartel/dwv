@@ -98,6 +98,7 @@ dwv.gui.getTargetOrientation = function (imageOrientation, viewOrientation) {
  * @param {object} scale The previous scale as {x,y}.
  * @param {object} newScale The new scale as {x,y}.
  * @param {object} center The scale center as {x,y}.
+ * @returns {object} The scaled offset as {x,y}.
  */
 dwv.gui.getScaledOffset = function (offset, scale, newScale, center) {
   // worldPoint = indexPoint / scale + offset
@@ -684,6 +685,7 @@ dwv.gui.LayerGroup = function (containerDiv, groupId) {
    * Set the layers' scale.
    *
    * @param {object} newScale The scale to apply as {x,y,z}.
+   * @param {dwv.math.Point3D} center The scale center Point3D.
    * @fires dwv.ctrl.LayerGroup#zoomchange
    */
   this.setScale = function (newScale, center) {
