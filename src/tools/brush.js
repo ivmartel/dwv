@@ -3,6 +3,48 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
 /**
+ * Get the indices that form a circle for this view.
+ * Can be an ellipse to adapt to view.
+ *
+ * @param {dwv.math.Point2D} point2D The circle center.
+ * @param {number} radius The circle radius.
+ * @param {Array} dims The 2 dimensions.
+ * @returns {Array} The indices of the circle.
+ */
+dwv.tool.getCircleIndices = function (geometry, position, radiuses, dims) {
+  var centerIndex = geometry.worldToIndex(position);
+  return dwv.math.getEllipseIndices(centerIndex, radiuses, dims);
+};
+
+/**
+ * Get the data origins that correspond to input indices.
+ *
+ * @param {Array} indices An array of dwv.math.Index.
+ * @returns {Array} An array of origins (dwv.math.Point3D).
+ */
+dwv.tool.getOriginsFromIndices = function (geometry, indices) {
+  var sorted = indices.sort(dwv.math.getIndexCompareFunction(2));
+  var iStart = sorted[0].get(2);
+  var iEnd = sorted[sorted.length - 1].get(2);
+  return geometry.getOrigins().slice(iStart, iEnd + 1);
+};
+
+/**
+ * Get the data offsets that correspond to input indices.
+ *
+ * @param {Array} indices An array of dwv.math.Index.
+ * @returns {Array} An array of offsets.
+ */
+dwv.tool.getOffsetsFromIndices = function (geometry, indices) {
+  var imageSize = geometry.getSize();
+  var offsets = [];
+  for (var i = 0; i < indices.length; ++i) {
+    offsets.push(imageSize.indexToOffset(indices[i]));
+  }
+  return offsets;
+};
+
+/**
  * Brush class.
  *
  * @class
@@ -100,29 +142,37 @@ dwv.tool.Brush = function (app) {
     var viewController = viewLayer.getViewController();
     var position = viewController.getPositionFromPlanePoint(planePos);
 
-    var scrollIndex = viewController.getScrollIndex();
-    var circleDims;
-    if (scrollIndex === 0) {
-      circleDims = [1, 2];
-    } else if (scrollIndex === 1) {
-      circleDims = [0, 2];
-    } else if (scrollIndex === 2) {
-      circleDims = [0, 1];
-    }
-
     // create mask if not done yet
+    var imageGeometry = app.getImage(0).getGeometry();
     if (!mask) {
-      var imageGeometry = app.getImage(0).getGeometry();
       var imgK = imageGeometry.worldToIndex(position).get(2);
       mask = createMaskImage(imageGeometry, imageGeometry.getOrigins()[imgK]);
       // fires load events and renders data
-      maskId = app.addNewData(mask, {});
+      maskId = app.addNewImage(mask, {});
+    }
+
+    var scrollIndex = viewController.getScrollIndex();
+    var circleDims;
+    var radiuses;
+    var spacing = imageGeometry.getSpacing(imageGeometry.getOrientation());
+    var r0 = Math.round(brushSize / spacing.get(0));
+    var r1 = Math.round(brushSize / spacing.get(1));
+    var r2 = Math.round(brushSize / spacing.get(2));
+    if (scrollIndex === 0) {
+      circleDims = [1, 2];
+      radiuses = [r1, r2];
+    } else if (scrollIndex === 1) {
+      circleDims = [0, 2];
+      radiuses = [r0, r2];
+    } else if (scrollIndex === 2) {
+      circleDims = [0, 1];
+      radiuses = [r0, r1];
     }
 
     // circle indices in the image geometry
     var circleIndices =
-      viewController.getCircleIndices(planePos, brushSize, circleDims);
-    var origins = viewController.getOriginsFromIndices(circleIndices);
+      dwv.tool.getCircleIndices(imageGeometry, position, radiuses, circleDims);
+    var origins = dwv.tool.getOriginsFromIndices(imageGeometry, circleIndices);
     if (origins.length === 0) {
       throw new Error('No brush origins...');
     }
@@ -211,10 +261,11 @@ dwv.tool.Brush = function (app) {
 
     // circle indices in the mask geometry
     var maskPlanePos = maskVl.displayToPlanePos(event._x, event._y);
-    var maskCircleIndices = maskVc.getCircleIndices(
-      maskPlanePos, brushSize, circleDims);
+    var maskPosition = maskVc.getPositionFromPlanePoint(maskPlanePos);
+    var maskCircleIndices = dwv.tool.getCircleIndices(
+      maskGeometry, maskPosition, radiuses, circleDims);
 
-    return maskVc.getOffsetsFromIndices(maskCircleIndices);
+    return dwv.tool.getOffsetsFromIndices(maskGeometry, maskCircleIndices);
   }
 
   /**

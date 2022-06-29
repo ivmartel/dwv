@@ -419,65 +419,6 @@ dwv.ctrl.ViewController = function (view) {
   };
 
   /**
-   * Get the indices that form a circle for this view.
-   * Can be an ellipse to adapt to view.
-   *
-   * @param {dwv.math.Point2D} point2D The circle center.
-   * @param {number} radius The circle radius.
-   * @param {Array} dims The 2 dimensions.
-   * @returns {Array} The indices of the circle.
-   */
-  this.getCircleIndices = function (point2D, radius, dims) {
-    var geometry = view.getImage().getGeometry();
-    var position = this.getPositionFromPlanePoint(point2D);
-    var centerIndex = geometry.worldToIndex(position);
-    var scrollIndex = this.getScrollIndex();
-    var radiuses = [];
-    var spacing = geometry.getSpacing(geometry.getOrientation());
-    var r0 = Math.round(radius / spacing.get(0));
-    var r1 = Math.round(radius / spacing.get(1));
-    var r2 = Math.round(radius / spacing.get(2));
-    if (scrollIndex === 0) {
-      radiuses = [r1, r2];
-    } else if (scrollIndex === 1) {
-      radiuses = [r0, r2];
-    } else if (scrollIndex === 2) {
-      radiuses = [r0, r1];
-    }
-    return dwv.math.getEllipseIndices(centerIndex, radiuses, dims);
-  };
-
-  /**
-   * Get the data origins that correspond to input indices.
-   *
-   * @param {Array} indices An array of dwv.math.Index.
-   * @returns {Array} An array of origins (dwv.math.Point3D).
-   */
-  this.getOriginsFromIndices = function (indices) {
-    var sorted = indices.sort(dwv.math.getIndexCompareFunction(2));
-    var iStart = sorted[0].get(2);
-    var iEnd = sorted[sorted.length - 1].get(2);
-    var geometry = view.getImage().getGeometry();
-    return geometry.getOrigins().slice(iStart, iEnd + 1);
-  };
-
-  /**
-   * Get the data offsets that correspond to input indices.
-   *
-   * @param {Array} indices An array of dwv.math.Index.
-   * @returns {Array} An array of offsets.
-   */
-  this.getOffsetsFromIndices = function (indices) {
-    var geometry = view.getImage().getGeometry();
-    var imageSize = geometry.getSize();
-    var offsets = [];
-    for (var i = 0; i < indices.length; ++i) {
-      offsets.push(imageSize.indexToOffset(indices[i]));
-    }
-    return offsets;
-  };
-
-  /**
    * Get a plane 3D position from a plane 2D position: does not compensate
    *   for the image origin. Needed for setting the scale center...
    *
