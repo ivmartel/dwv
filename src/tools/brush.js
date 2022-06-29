@@ -3,11 +3,12 @@ var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
 
 /**
- * Get the indices that form a circle for this view.
+ * Get the indices that form a circle.
  * Can be an ellipse to adapt to view.
  *
- * @param {dwv.math.Point2D} point2D The circle center.
- * @param {number} radius The circle radius.
+ * @param {dwv.image.Geometry} geometry The geometry.
+ * @param {dwv.math.Point3D} position The circle center.
+ * @param {Array} radiuses The circle radiuses.
  * @param {Array} dims The 2 dimensions.
  * @returns {Array} The indices of the circle.
  */
@@ -19,6 +20,7 @@ dwv.tool.getCircleIndices = function (geometry, position, radiuses, dims) {
 /**
  * Get the data origins that correspond to input indices.
  *
+ * @param {dwv.image.Geometry} geometry The geometry.
  * @param {Array} indices An array of dwv.math.Index.
  * @returns {Array} An array of origins (dwv.math.Point3D).
  */
@@ -32,6 +34,7 @@ dwv.tool.getOriginsFromIndices = function (geometry, indices) {
 /**
  * Get the data offsets that correspond to input indices.
  *
+ * @param {dwv.image.Geometry} geometry The geometry.
  * @param {Array} indices An array of dwv.math.Index.
  * @returns {Array} An array of offsets.
  */

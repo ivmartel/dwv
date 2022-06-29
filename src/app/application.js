@@ -80,6 +80,7 @@ dwv.App = function () {
    *
    * @param {dwv.image.Image} image The new image.
    * @param {object} meta The image meta.
+   * @returns {number} The new image id.
    */
   this.addNewImage = function (image, meta) {
     var id = dataController.length();
