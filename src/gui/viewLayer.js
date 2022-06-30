@@ -603,40 +603,63 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @param {object} fitOffset The fit offset as {x,y}.
    */
   this.fitToContainer = function (fitScale1D, fitSize, fitOffset) {
-    // update canvas size
-    var width = fitSize.x;
-    var height = fitSize.y;
-    if (!dwv.gui.canCreateCanvas(width, height)) {
-      throw new Error('Cannot resize canvas ' + width + ', ' + height);
+    var needsDraw = false;
+
+    // update canvas size if needed (triggers canvas reset)
+    if (canvas.width !== fitSize.x || canvas.height !== fitSize.y) {
+      if (!dwv.gui.canCreateCanvas(fitSize.x, fitSize.y)) {
+        throw new Error('Cannot resize canvas ' + fitSize.x + ', ' + fitSize.y);
+      }
+      // canvas size  change triggers canvas reset
+      canvas.width = fitSize.x;
+      canvas.height = fitSize.y;
+      // update draw flag
+      needsDraw = true;
     }
-    canvas.width = width;
-    canvas.height = height;
 
     // previous scale without fit
     var previousScale = {
       x: scale.x / fitScale.x,
       y: scale.y / fitScale.y
     };
-    // update fit scale
-    fitScale = {
+    // fit scale
+    var newFitScale = {
       x: fitScale1D * baseSpacing.x,
       y: fitScale1D * baseSpacing.y
     };
-    // update scale
-    scale = {
-      x: previousScale.x * fitScale.x,
-      y: previousScale.y * fitScale.y
+    // scale
+    var newScale = {
+      x: previousScale.x * newFitScale.x,
+      y: previousScale.y * newFitScale.y
     };
+    // check if different
+    if (previousScale.x !== newScale.x || previousScale.y !== newScale.y) {
+      fitScale = newFitScale;
+      scale = newScale;
+      // update draw flag
+      needsDraw = true;
+    }
 
-    // update offsets
-    viewOffset = {
-      x: fitOffset.x / fitScale.x,
-      y: fitOffset.y / fitScale.y
+    // view offset
+    var newViewOffset = {
+      x: fitOffset.x / newFitScale.x,
+      y: fitOffset.y / newFitScale.y
     };
-    offset = {
-      x: viewOffset.x + baseOffset.x + zoomOffset.x,
-      y: viewOffset.y + baseOffset.y + zoomOffset.y
-    };
+    // check if different
+    if (viewOffset.x !== newViewOffset.x || viewOffset.y !== newViewOffset.y) {
+      viewOffset = newViewOffset;
+      offset = {
+        x: viewOffset.x + baseOffset.x + zoomOffset.x,
+        y: viewOffset.y + baseOffset.y + zoomOffset.y
+      };
+      // update draw flag
+      needsDraw = true;
+    }
+
+    // draw if needed
+    if (needsDraw) {
+      this.draw();
+    }
   };
 
   /**
