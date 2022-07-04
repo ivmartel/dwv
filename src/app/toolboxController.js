@@ -139,6 +139,7 @@ dwv.ToolboxController = function ()
         canvas.addEventListener("mouseup", onMouch);
         canvas.addEventListener("mouseout", onMouch);
         canvas.addEventListener("mousewheel", onMouch);
+        canvas.addEventListener("wheel", onMouch);
         canvas.addEventListener("DOMMouseScroll", onMouch);
         canvas.addEventListener("dblclick", onMouch);
         // touch listeners

@@ -29,6 +29,13 @@ dwv.tool.Scroll = function(app)
     var touchTimerID = null;
 
     /**
+     * Accumulated wheel event deltaY.
+     *
+     * @type {number}
+     */
+    var wheelDeltaY = 0;
+
+    /**
      * Handle mouse down event.
      * @param {Object} event The mouse down event.
      */
@@ -166,9 +173,24 @@ dwv.tool.Scroll = function(app)
      * Handle mouse wheel event.
      * @param {Object} event The mouse wheel event.
      */
-    this.mousewheel = function (event) {
-        // ev.wheelDelta on chrome is 120
-        if ( event.wheelDelta > 0 ) {
+    this.wheel = function (event) {
+        // deltaMode (deltaY values on my machine...):
+        // - 0 (DOM_DELTA_PIXEL): chrome, deltaY mouse scroll = 53
+        // - 1 (DOM_DELTA_LINE): firefox, deltaY mouse scroll = 6
+        // - 2 (DOM_DELTA_PAGE): ??
+        // TODO: check scroll event
+        var scrollMin = 52;
+        if (event.deltaMode === 1) {
+            scrollMin = 5.99;
+        }
+        wheelDeltaY += event.deltaY;
+        if (Math.abs(wheelDeltaY) < scrollMin) {
+            return;
+        } else {
+            wheelDeltaY = 0;
+        }
+
+        if ( event.deltaY > 0 ) {
             mouseScroll(true);
         } else {
             mouseScroll(false);
