@@ -28,7 +28,7 @@ dwv.math.Index = function (values) {
    * Get the index value at the given array index.
    *
    * @param {number} i The index to get.
-   * @returns {number} The value.
+   * @returns {number|undefined} The value or undefined if not in range.
    */
   this.get = function (i) {
     return values[i];
