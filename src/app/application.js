@@ -1071,14 +1071,15 @@ dwv.App = function () {
 
     var isFirstLoadItem = event.isfirstitem;
     var isTimepoint = typeof event.timepoint !== 'undefined';
-    var timeId = 0;
+    var timeId;
     if (isTimepoint) {
       timeId = event.timepoint.id;
     }
 
     var eventMetaData = null;
     if (event.loadtype === 'image') {
-      if (isFirstLoadItem && timeId === 0) {
+      if (isFirstLoadItem &&
+        (typeof timeId === 'undefined' || timeId === 0)) {
         dataController.addNew(
           event.loadid, event.data.image, event.data.info);
       } else {

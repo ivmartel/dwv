@@ -4,6 +4,36 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
+ * Get the slice index of an input slice into a volume geometry.
+ *
+ * @param {dwv.image.Geometry} volumeGeometry The volume geometry.
+ * @param {object} volumeMeta The volume meta data.
+ * @param {dwv.image.Geometry} sliceGeometry The slice geometry.
+ * @param {object} sliceMeta The slice meta data.
+ * @param {number} timeId Optional time ID.
+ * @returns {dwv.math.Index} The index of the slice in the volume geomtry.
+ */
+dwv.image.getSliceIndex = function (
+  volumeGeometry,
+  volumeMeta,
+  sliceGeometry,
+  sliceMeta,
+  timeId) {
+  var values = [];
+  // x, y
+  values.push(0);
+  values.push(0);
+  // z
+  values.push(volumeGeometry.getSliceIndex(sliceGeometry.getOrigin(), timeId));
+  // time
+  if (typeof timeId !== 'undefined') {
+    values.push(timeId);
+  }
+  // return index
+  return new dwv.math.Index(values);
+};
+
+/**
  * Image class.
  * Usable once created, optional are:
  * - rescale slope and intercept (default 1:0),
@@ -404,9 +434,6 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
    * @param {number} timeId An optional time ID.
    */
   this.appendSlice = function (rhs, timeId) {
-    if (typeof timeId === 'undefined') {
-      timeId = 0;
-    }
     // check input
     if (rhs === null) {
       throw new Error('Cannot append null slice');
@@ -440,6 +467,27 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       }
     }
 
+    // append frame for first frame (still 3D) or other frames
+    var isNewFrame = false;
+    if (typeof timeId !== 'undefined') {
+      if ((size.length() === 3 && timeId !== 0) ||
+        (size.length() > 3 && timeId >= size.get(3))) {
+        // update grometry
+        this.appendFrame(rhs.getGeometry().getOrigin(), timeId);
+        // update size
+        size = geometry.getSize();
+        // update flag
+        isNewFrame = true;
+      }
+    }
+
+    // get slice index
+    var index = dwv.image.getSliceIndex(
+      geometry, meta, rhs.getGeometry(), rhs.getMeta(), timeId);
+
+    // set slice index
+    var newSliceIndex = index.get(2);
+
     // calculate slice size
     var sliceSize = numberOfComponents * size.getDimSize(2);
 
@@ -455,47 +503,28 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       realloc(fullBufferSize);
     }
 
-    var newSliceIndex = geometry.getSliceIndex(rhs.getGeometry().getOrigin());
-    var values = new Array(geometry.getSize().length());
-    values.fill(0);
-    values[2] = newSliceIndex;
-    if (size.length() === 4) {
-      values[3] = timeId;
-    }
-    var index = new dwv.math.Index(values);
     var primaryOffset = size.indexToOffset(index) * numberOfComponents;
     var secondaryOffset = this.getSecondaryOffset(index) * numberOfComponents;
+    var maxOffset = size.getTotalSize() * numberOfComponents - 1;
 
-    // first frame special slice by slice append
-    if (timeId === 0) {
-      // store slice
-      var oldNumberOfSlices = size.get(2);
-      // move content if needed
-      var start = primaryOffset;
-      var end;
-      if (newSliceIndex === 0) {
-        // insert slice before current data
-        end = start + oldNumberOfSlices * sliceSize;
-        buffer.set(
-          buffer.subarray(start, end),
-          primaryOffset + sliceSize
-        );
-      } else if (newSliceIndex < oldNumberOfSlices) {
-        // insert slice in between current data
-        end = start + (oldNumberOfSlices - newSliceIndex) * sliceSize;
-        buffer.set(
-          buffer.subarray(start, end),
-          primaryOffset + sliceSize
-        );
-      }
+    // move content if needed
+    if (primaryOffset < maxOffset) {
+      var endMin = sliceSize;
+      var endMax = fullBufferSize - sliceSize;
+      var end = Math.min(endMax, Math.max(endMin, maxOffset));
+      buffer.set(
+        buffer.subarray(primaryOffset, end),
+        primaryOffset + sliceSize
+      );
     }
 
     // add new slice content
     buffer.set(rhs.getBuffer(), primaryOffset);
 
     // update geometry
-    if (timeId === 0) {
-      geometry.appendOrigin(rhs.getGeometry().getOrigin(), newSliceIndex);
+    if (!isNewFrame) {
+      geometry.appendOrigin(
+        rhs.getGeometry().getOrigin(), newSliceIndex, timeId);
     }
     // update rsi
     // (rhs should just have one rsi)
@@ -576,8 +605,8 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
   /**
    * Append a frame to the image.
    */
-  this.appendFrame = function () {
-    geometry.appendFrame();
+  this.appendFrame = function (time, origin) {
+    geometry.appendFrame(time, origin);
     fireEvent({type: 'appendframe'});
     // memory will be updated at the first appendSlice or appendFrameBuffer
   };
