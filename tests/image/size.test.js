@@ -81,6 +81,20 @@ QUnit.test('Test Size.', function (assert) {
   assert.equal(size0.isInBounds(index0), false, 'isInBounds too big');
   index0 = new dwv.math.Index([-1, 2, 3]);
   assert.equal(size0.isInBounds(index0), false, 'isInBounds too small');
+  // with dirs
+  index0 = new dwv.math.Index([0, 0, 0]);
+  assert.equal(size0.isInBounds(index0, [0, 1]), true,
+    'isInBounds [0, 1] 0,0,0');
+  assert.equal(size0.isInBounds(index0, [1, 2]), true,
+    'isInBounds [1, 2] 0,0,0');
+  assert.throws(function () {
+    size0.isInBounds(index0, [1, 3]);
+  },
+  new Error('Wrong input dir value: 3'),
+  'isInBounds bad dir');
+  index0 = new dwv.math.Index([2, 3, 4]);
+  assert.equal(size0.isInBounds(index0, [1, 2]), false,
+    'isInBounds [0, 1] 2,3,4');
 
   // can scroll
   var size20 = new dwv.image.Size([2, 1, 2]);

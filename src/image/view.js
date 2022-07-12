@@ -435,7 +435,11 @@ dwv.image.View = function (image) {
   this.canSetPosition = function (position) {
     var geometry = image.getGeometry();
     var index = geometry.worldToIndex(position);
-    return geometry.isIndexInBounds(index, this.getScrollIndex());
+    var dirs = [this.getScrollIndex()];
+    if (index.length() === 4) {
+      dirs.push(3);
+    }
+    return geometry.isIndexInBounds(index, dirs);
   };
 
   /**
@@ -467,7 +471,11 @@ dwv.image.View = function (image) {
     // send invalid event if not in bounds
     var geometry = image.getGeometry();
     var index = geometry.worldToIndex(position);
-    if (!geometry.isIndexInBounds(index, this.getScrollIndex())) {
+    var dirs = [this.getScrollIndex()];
+    if (index.length() === 4) {
+      dirs.push(3);
+    }
+    if (!geometry.isIndexInBounds(index, dirs)) {
       if (!silent) {
         // fire event with valid: false
         fireEvent({
@@ -502,7 +510,11 @@ dwv.image.View = function (image) {
     var position = geometry.indexToWorld(index);
 
     // check if possible
-    if (!geometry.isIndexInBounds(index, this.getScrollIndex())) {
+    var dirs = [this.getScrollIndex()];
+    if (index.length() === 4) {
+      dirs.push(3);
+    }
+    if (!geometry.isIndexInBounds(index, dirs)) {
       // do no send invalid positionchange event: avoid empty repaint
       return false;
     }
