@@ -17,7 +17,9 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
   var origins = [origin];
   // local helper object for time points
   var timeOrigins = {};
+  var initialTime;
   if (typeof time !== 'undefined') {
+    initialTime = time;
     timeOrigins[time] = [origin];
   }
   // check input orientation
@@ -26,6 +28,67 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
   }
   // flag to know if new origins were added
   var newOrigins = false;
+
+  /**
+   * Get the time value that was passed at construction.
+   *
+   * @returns {number} The time value.
+   */
+  this.getInitialTime = function () {
+    return initialTime;
+  };
+
+  /**
+   * Get the total number of slices.
+   * Can be different from what is stored in the size object
+   *  during a volume with time points creation process.
+   *
+   * @returns {number} The total count.
+   */
+  this.getCurrentTotalNumberOfSlices = function () {
+    var keys = Object.keys(timeOrigins);
+    if (keys.length === 0) {
+      return origins.length;
+    }
+    var count = 0;
+    for (var i = 0; i < keys.length; ++i) {
+      count += timeOrigins[keys[i]].length;
+    }
+    return count;
+  };
+
+  /**
+   * Check if a time point has associated slices.
+   *
+   * @param {number} time The time point to check.
+   * @returns {boolean} True if slices are present.
+   */
+  this.hasSlicesAtTime = function (time) {
+    return typeof timeOrigins[time] !== 'undefined';
+  };
+
+  /**
+   * Get the number of slices stored for time points preceding
+   * the input one.
+   *
+   * @param {number} time The time point to check.
+   * @returns {number} The count.
+   */
+  this.getCurrentNumberOfSlicesBeforeTime = function (time) {
+    var keys = Object.keys(timeOrigins);
+    if (keys.length === 0) {
+      return;
+    }
+    var count = 0;
+    for (var i = 0; i < keys.length; ++i) {
+      var key = keys[i];
+      if (parseInt(key, 10) === time) {
+        break;
+      }
+      count += timeOrigins[key].length;
+    }
+    return count;
+  };
 
   /**
    * Get the object origin.
@@ -247,7 +310,7 @@ dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
     if (typeof time !== 'undefined') {
       timeOrigins[time].splice(index, 0, origin);
     }
-    if (typeof time === 'undefined' || time === 0) {
+    if (typeof time === 'undefined' || time === initialTime) {
       newOrigins = true;
       // add in origin array
       origins.splice(index, 0, origin);

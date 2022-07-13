@@ -467,18 +467,20 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       }
     }
 
-    // append frame for first frame (still 3D) or other frames
+    // possible time
+    if (typeof timeId === 'undefined') {
+      timeId = rhs.getGeometry().getInitialTime();
+    }
+
+    // append frame if needed
     var isNewFrame = false;
-    if (typeof timeId !== 'undefined') {
-      if ((size.length() === 3 && timeId !== 0) ||
-        (size.length() > 3 && timeId >= size.get(3))) {
-        // update grometry
-        this.appendFrame(rhs.getGeometry().getOrigin(), timeId);
-        // update size
-        size = geometry.getSize();
-        // update flag
-        isNewFrame = true;
-      }
+    if (typeof timeId !== 'undefined' && !geometry.hasSlicesAtTime(timeId)) {
+      // update grometry
+      this.appendFrame(rhs.getGeometry().getOrigin(), timeId);
+      // update size
+      size = geometry.getSize();
+      // update flag
+      isNewFrame = true;
     }
 
     // get slice index
@@ -496,30 +498,28 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       throw new Error('Missing number of files for buffer manipulation.');
     }
     var fullBufferSize = sliceSize * meta.numberOfFiles;
-    if (size.length() === 4) {
-      fullBufferSize *= size.get(3);
-    }
     if (buffer.length !== fullBufferSize) {
       realloc(fullBufferSize);
     }
 
-    var primaryOffset = size.indexToOffset(index) * numberOfComponents;
-    var secondaryOffset = this.getSecondaryOffset(index) * numberOfComponents;
-    var maxOffset = size.getTotalSize() * numberOfComponents - 1;
-
+    // current number of slices
+    var numberOfSlices = newSliceIndex;
+    if (typeof timeId !== 'undefined') {
+      numberOfSlices += geometry.getCurrentNumberOfSlicesBeforeTime(timeId);
+    }
+    // offset of the input slice
+    var indexOffset = numberOfSlices * sliceSize;
+    var maxOffset = geometry.getCurrentTotalNumberOfSlices() * sliceSize;
     // move content if needed
-    if (primaryOffset < maxOffset) {
-      var endMin = sliceSize;
-      var endMax = fullBufferSize - sliceSize;
-      var end = Math.min(endMax, Math.max(endMin, maxOffset));
+
+    if (indexOffset < maxOffset) {
       buffer.set(
-        buffer.subarray(primaryOffset, end),
-        primaryOffset + sliceSize
+        buffer.subarray(indexOffset, maxOffset),
+        indexOffset + sliceSize
       );
     }
-
     // add new slice content
-    buffer.set(rhs.getBuffer(), primaryOffset);
+    buffer.set(rhs.getBuffer(), indexOffset);
 
     // update geometry
     if (!isNewFrame) {
@@ -529,13 +529,13 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     // update rsi
     // (rhs should just have one rsi)
     this.setRescaleSlopeAndIntercept(
-      rhs.getRescaleSlopeAndIntercept(), secondaryOffset);
+      rhs.getRescaleSlopeAndIntercept(), numberOfSlices);
 
     // current number of images
     var numberOfImages = imageUids.length;
 
     // insert sop instance UIDs
-    imageUids.splice(secondaryOffset, 0, rhs.getImageUid());
+    imageUids.splice(numberOfSlices, 0, rhs.getImageUid());
 
     // update window presets
     if (typeof meta.windowPresets !== 'undefined') {
@@ -565,7 +565,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
           if (typeof windowPreset.perslice !== 'undefined' &&
             windowPreset.perslice === true) {
             windowPresets[pkey].wl.splice(
-              secondaryOffset, 0, rhsPreset.wl[0]);
+              numberOfSlices, 0, rhsPreset.wl[0]);
           }
         } else {
           // if not defined (it should be), store all
@@ -604,6 +604,9 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
 
   /**
    * Append a frame to the image.
+   *
+   * @param {number} time The frame time value.
+   * @param {dwv.math.Point3D} origin The origin of the frame.
    */
   this.appendFrame = function (time, origin) {
     geometry.appendFrame(time, origin);
