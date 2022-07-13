@@ -100,20 +100,18 @@ dwv.ctrl.DataController = function () {
 
     // update meta data
     // TODO add time support
-    if (timeId === 0) {
-      var idKey = '';
-      if (typeof meta.x00020010 !== 'undefined') {
-        // dicom case
-        idKey = 'InstanceNumber';
-      } else {
-        idKey = 'imageUid';
-      }
-      dataToUpdate.meta = dwv.utils.mergeObjects(
-        dataToUpdate.meta,
-        getMetaObject(meta),
-        idKey,
-        'value');
+    var idKey = '';
+    if (typeof meta.x00020010 !== 'undefined') {
+      // dicom case
+      idKey = 'InstanceNumber';
+    } else {
+      idKey = 'imageUid';
     }
+    dataToUpdate.meta = dwv.utils.mergeObjects(
+      dataToUpdate.meta,
+      getMetaObject(meta),
+      idKey,
+      'value');
   };
 
   /**
