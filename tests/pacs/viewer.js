@@ -18,6 +18,12 @@ var _tools = null;
 var _mode = 0;
 var _dicomWeb = false;
 
+// example private logic for time value retrieval
+dwv.getTimeValue = function (elements) {
+  var time = elements.getFromKey('xABCD0123');
+  return parseInt(time, 10);
+};
+
 /**
  * Setup simple dwv app.
  */

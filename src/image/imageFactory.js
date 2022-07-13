@@ -112,7 +112,17 @@ dwv.image.ImageFactory.prototype.create = function (
   // geometry
   var origin = new dwv.math.Point3D(
     slicePosition[0], slicePosition[1], slicePosition[2]);
-  var time = 0;
+
+  var time;
+  // optional private logic for time fetch
+  if (typeof dwv.getTimeValue !== 'undefined') {
+    var timeValue = dwv.getTimeValue(dicomElements);
+    // avoid NaN
+    if (!isNaN(timeValue)) {
+      time = timeValue;
+    }
+  }
+
   var geometry = new dwv.image.Geometry(
     origin, size, spacing, orientationMatrix, time);
 
