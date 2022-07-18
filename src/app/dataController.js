@@ -90,13 +90,12 @@ dwv.ctrl.DataController = function () {
    * @param {number} index The index of the data.
    * @param {dwv.image.Image} image The image.
    * @param {object} meta The image meta.
-   * @param {number} timeId Optional time ID.
    */
-  this.update = function (index, image, meta, timeId) {
+  this.update = function (index, image, meta) {
     var dataToUpdate = data[index];
 
     // add slice to current image
-    dataToUpdate.image.appendSlice(image, timeId);
+    dataToUpdate.image.appendSlice(image);
 
     // update meta data
     // TODO add time support

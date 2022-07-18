@@ -31,16 +31,14 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    * Load a list of files. Can be image files or a state file.
    *
    * @param {Array} files The list of files to load.
-   * @param {object} options The options object, can contain:
-   *  - timepoint: an object with time information
    */
-  this.loadFiles = function (files, options) {
+  this.loadFiles = function (files) {
     // has been checked for emptiness.
     var ext = files[0].name.split('.').pop().toLowerCase();
     if (ext === 'json') {
-      loadStateFile(files[0], options);
+      loadStateFile(files[0]);
     } else {
-      loadImageFiles(files, options);
+      loadImageFiles(files);
     }
   };
 
@@ -92,16 +90,14 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    * Load a list of image files.
    *
    * @param {Array} files The list of image files to load.
-   * @param {object} options The options object, can contain:
-   *  - timepoint: an object with time information
    * @private
    */
-  function loadImageFiles(files, options) {
+  function loadImageFiles(files) {
     // create IO
     var fileIO = new dwv.io.FilesLoader();
     fileIO.setDefaultCharacterSet(defaultCharacterSet);
     // load data
-    loadData(files, fileIO, 'image', options);
+    loadData(files, fileIO, 'image');
   }
 
   /**
@@ -125,14 +121,13 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    * Load a State file.
    *
    * @param {string} file The state file to load.
-   * @param {object} options The options object.
    * @private
    */
-  function loadStateFile(file, options) {
+  function loadStateFile(file) {
     // create IO
     var fileIO = new dwv.io.FilesLoader();
     // load data
-    loadData([file], fileIO, 'state', options);
+    loadData([file], fileIO, 'state');
   }
 
   /**
@@ -165,20 +160,8 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
       loadtype: loadType,
     };
 
-    // check if timepoint
-    var hasTimepoint = false;
-    if (typeof options !== 'undefined' &&
-      typeof options.timepoint !== 'undefined') {
-      hasTimepoint = true;
-    }
-
-    var loadId = null;
-    if (hasTimepoint) {
-      loadId = options.timepoint.dataId;
-      eventInfo.timepoint = options.timepoint;
-    } else {
-      loadId = getNextLoadId();
-    }
+    // load id
+    var loadId = getNextLoadId();
     eventInfo.loadid = loadId;
 
     // set callbacks
@@ -199,9 +182,6 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
       };
       if (typeof currentLoaders[loadId] !== 'undefined') {
         eventInfoItem.isfirstitem = currentLoaders[loadId].isFirstItem;
-      }
-      if (hasTimepoint) {
-        eventInfoItem.timepoint = options.timepoint;
       }
       // callback
       augmentCallbackEvent(self.onloaditem, eventInfoItem)(event);

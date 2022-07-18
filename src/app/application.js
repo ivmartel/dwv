@@ -442,8 +442,6 @@ dwv.App = function () {
    * Load a list of files. Can be image files or a state file.
    *
    * @param {Array} files The list of files to load.
-   * @param {object} options The options object, can contain:
-   *  - timepoint: an object with time information
    * @fires dwv.App#loadstart
    * @fires dwv.App#loadprogress
    * @fires dwv.App#loaditem
@@ -451,12 +449,12 @@ dwv.App = function () {
    * @fires dwv.App#error
    * @fires dwv.App#abort
    */
-  this.loadFiles = function (files, options) {
+  this.loadFiles = function (files) {
     if (files.length === 0) {
       dwv.logger.warn('Ignoring empty input file list.');
       return;
     }
-    loadController.loadFiles(files, options);
+    loadController.loadFiles(files);
   };
 
   /**
@@ -1070,22 +1068,15 @@ dwv.App = function () {
     }
 
     var isFirstLoadItem = event.isfirstitem;
-    var isTimepoint = typeof event.timepoint !== 'undefined';
-    var timeId;
-    if (isTimepoint) {
-      timeId = event.timepoint.id;
-    }
 
     var eventMetaData = null;
     if (event.loadtype === 'image') {
-      if (isFirstLoadItem &&
-        (typeof timeId === 'undefined' || timeId === 0)) {
+      if (isFirstLoadItem) {
         dataController.addNew(
           event.loadid, event.data.image, event.data.info);
       } else {
         dataController.update(
-          event.loadid, event.data.image, event.data.info,
-          timeId);
+          event.loadid, event.data.image, event.data.info);
       }
       eventMetaData = event.data.info;
     } else if (event.loadtype === 'state') {

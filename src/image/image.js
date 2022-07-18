@@ -7,18 +7,13 @@ dwv.image = dwv.image || {};
  * Get the slice index of an input slice into a volume geometry.
  *
  * @param {dwv.image.Geometry} volumeGeometry The volume geometry.
- * @param {object} volumeMeta The volume meta data.
  * @param {dwv.image.Geometry} sliceGeometry The slice geometry.
- * @param {object} sliceMeta The slice meta data.
- * @param {number} timeId Optional time ID.
  * @returns {dwv.math.Index} The index of the slice in the volume geomtry.
  */
-dwv.image.getSliceIndex = function (
-  volumeGeometry,
-  volumeMeta,
-  sliceGeometry,
-  sliceMeta,
-  timeId) {
+dwv.image.getSliceIndex = function (volumeGeometry, sliceGeometry) {
+  // possible time
+  var timeId = sliceGeometry.getInitialTime();
+  // index values
   var values = [];
   // x, y
   values.push(0);
@@ -431,9 +426,8 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
    * Append a slice to the image.
    *
    * @param {Image} rhs The slice to append.
-   * @param {number} timeId An optional time ID.
    */
-  this.appendSlice = function (rhs, timeId) {
+  this.appendSlice = function (rhs) {
     // check input
     if (rhs === null) {
       throw new Error('Cannot append null slice');
@@ -468,9 +462,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     }
 
     // possible time
-    if (typeof timeId === 'undefined') {
-      timeId = rhs.getGeometry().getInitialTime();
-    }
+    var timeId = rhs.getGeometry().getInitialTime();
 
     // append frame if needed
     var isNewFrame = false;
@@ -484,8 +476,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     }
 
     // get slice index
-    var index = dwv.image.getSliceIndex(
-      geometry, meta, rhs.getGeometry(), rhs.getMeta(), timeId);
+    var index = dwv.image.getSliceIndex(geometry, rhs.getGeometry());
 
     // set slice index
     var newSliceIndex = index.get(2);
@@ -511,7 +502,6 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     var indexOffset = numberOfSlices * sliceSize;
     var maxOffset = geometry.getCurrentTotalNumberOfSlices() * sliceSize;
     // move content if needed
-
     if (indexOffset < maxOffset) {
       buffer.set(
         buffer.subarray(indexOffset, maxOffset),
