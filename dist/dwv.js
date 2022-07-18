@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-beta.7 2022-06-29 15:19:10 */
+/*! dwv 0.31.0-beta.8 2022-07-18 12:43:16 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -448,9 +448,6 @@ dwv.App = function () {
     if (typeof options.binders !== 'undefined') {
       stage.setBinders(options.binders);
     }
-
-    // create layer groups
-    createLayerGroups(options.dataViewConfigs);
   };
 
   /**
@@ -516,8 +513,6 @@ dwv.App = function () {
    * Load a list of files. Can be image files or a state file.
    *
    * @param {Array} files The list of files to load.
-   * @param {object} options The options object, can contain:
-   *  - timepoint: an object with time information
    * @fires dwv.App#loadstart
    * @fires dwv.App#loadprogress
    * @fires dwv.App#loaditem
@@ -525,12 +520,12 @@ dwv.App = function () {
    * @fires dwv.App#error
    * @fires dwv.App#abort
    */
-  this.loadFiles = function (files, options) {
+  this.loadFiles = function (files) {
     if (files.length === 0) {
       dwv.logger.warn('Ignoring empty input file list.');
       return;
     }
-    loadController.loadFiles(files, options);
+    loadController.loadFiles(files);
   };
 
   /**
@@ -697,6 +692,13 @@ dwv.App = function () {
     if (typeof dataIndex === 'undefined' || dataIndex === null) {
       throw new Error('Cannot render without data index');
     }
+
+    // create layer groups if not done yet
+    // (create all to allow for ratio sync)
+    if (stage.getNumberOfLayerGroups() === 0) {
+      createLayerGroups(options.dataViewConfigs);
+    }
+
     // loop on all configs
     var viewConfigs = getViewConfigs(dataIndex);
     // nothing to do if no view config
@@ -1144,21 +1146,15 @@ dwv.App = function () {
     }
 
     var isFirstLoadItem = event.isfirstitem;
-    var isTimepoint = typeof event.timepoint !== 'undefined';
-    var timeId = 0;
-    if (isTimepoint) {
-      timeId = event.timepoint.id;
-    }
 
     var eventMetaData = null;
     if (event.loadtype === 'image') {
-      if (isFirstLoadItem && timeId === 0) {
+      if (isFirstLoadItem) {
         dataController.addNew(
           event.loadid, event.data.image, event.data.info);
       } else {
         dataController.update(
-          event.loadid, event.data.image, event.data.info,
-          timeId);
+          event.loadid, event.data.image, event.data.info);
       }
       eventMetaData = event.data.info;
     } else if (event.loadtype === 'state') {
@@ -1511,40 +1507,27 @@ dwv.ctrl.DataController = function () {
    * @param {number} index The index of the data.
    * @param {dwv.image.Image} image The image.
    * @param {object} meta The image meta.
-   * @param {number} timeId The time ID.
    */
-  this.update = function (index, image, meta, timeId) {
+  this.update = function (index, image, meta) {
     var dataToUpdate = data[index];
 
-    // handle possible timepoint
-    if (typeof timeId !== 'undefined') {
-      var size = dataToUpdate.image.getGeometry().getSize();
-      // append frame for first frame (still 3D) or other frames
-      if ((size.length() === 3 && timeId !== 0) ||
-        (size.length() > 3 && timeId >= size.get(3))) {
-        dataToUpdate.image.appendFrame();
-      }
-    }
-
     // add slice to current image
-    dataToUpdate.image.appendSlice(image, timeId);
+    dataToUpdate.image.appendSlice(image);
 
     // update meta data
     // TODO add time support
-    if (timeId === 0) {
-      var idKey = '';
-      if (typeof meta.x00020010 !== 'undefined') {
-        // dicom case
-        idKey = 'InstanceNumber';
-      } else {
-        idKey = 'imageUid';
-      }
-      dataToUpdate.meta = dwv.utils.mergeObjects(
-        dataToUpdate.meta,
-        getMetaObject(meta),
-        idKey,
-        'value');
+    var idKey = '';
+    if (typeof meta.x00020010 !== 'undefined') {
+      // dicom case
+      idKey = 'InstanceNumber';
+    } else {
+      idKey = 'imageUid';
     }
+    dataToUpdate.meta = dwv.utils.mergeObjects(
+      dataToUpdate.meta,
+      getMetaObject(meta),
+      idKey,
+      'value');
   };
 
   /**
@@ -2138,16 +2121,14 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    * Load a list of files. Can be image files or a state file.
    *
    * @param {Array} files The list of files to load.
-   * @param {object} options The options object, can contain:
-   *  - timepoint: an object with time information
    */
-  this.loadFiles = function (files, options) {
+  this.loadFiles = function (files) {
     // has been checked for emptiness.
     var ext = files[0].name.split('.').pop().toLowerCase();
     if (ext === 'json') {
-      loadStateFile(files[0], options);
+      loadStateFile(files[0]);
     } else {
-      loadImageFiles(files, options);
+      loadImageFiles(files);
     }
   };
 
@@ -2199,16 +2180,14 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    * Load a list of image files.
    *
    * @param {Array} files The list of image files to load.
-   * @param {object} options The options object, can contain:
-   *  - timepoint: an object with time information
    * @private
    */
-  function loadImageFiles(files, options) {
+  function loadImageFiles(files) {
     // create IO
     var fileIO = new dwv.io.FilesLoader();
     fileIO.setDefaultCharacterSet(defaultCharacterSet);
     // load data
-    loadData(files, fileIO, 'image', options);
+    loadData(files, fileIO, 'image');
   }
 
   /**
@@ -2232,14 +2211,13 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
    * Load a State file.
    *
    * @param {string} file The state file to load.
-   * @param {object} options The options object.
    * @private
    */
-  function loadStateFile(file, options) {
+  function loadStateFile(file) {
     // create IO
     var fileIO = new dwv.io.FilesLoader();
     // load data
-    loadData([file], fileIO, 'state', options);
+    loadData([file], fileIO, 'state');
   }
 
   /**
@@ -2272,20 +2250,8 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
       loadtype: loadType,
     };
 
-    // check if timepoint
-    var hasTimepoint = false;
-    if (typeof options !== 'undefined' &&
-      typeof options.timepoint !== 'undefined') {
-      hasTimepoint = true;
-    }
-
-    var loadId = null;
-    if (hasTimepoint) {
-      loadId = options.timepoint.dataId;
-      eventInfo.timepoint = options.timepoint;
-    } else {
-      loadId = getNextLoadId();
-    }
+    // load id
+    var loadId = getNextLoadId();
     eventInfo.loadid = loadId;
 
     // set callbacks
@@ -2306,9 +2272,6 @@ dwv.ctrl.LoadController = function (defaultCharacterSet) {
       };
       if (typeof currentLoaders[loadId] !== 'undefined') {
         eventInfoItem.isfirstitem = currentLoaders[loadId].isFirstItem;
-      }
-      if (hasTimepoint) {
-        eventInfoItem.timepoint = options.timepoint;
       }
       // callback
       augmentCallbackEvent(self.onloaditem, eventInfoItem)(event);
@@ -4554,6 +4517,16 @@ dwv.dicom.DicomElementsWrapper.prototype.getPixelSpacing = function () {
 };
 
 /**
+ * Get the time.
+ *
+ * @returns {number|undefined} The time value if available.
+ */
+dwv.dicom.DicomElementsWrapper.prototype.getTime = function () {
+  // default returns undefined
+  return undefined;
+};
+
+/**
  * Get the file list from a DICOMDIR
  *
  * @param {object} data The buffer data of the DICOMDIR
@@ -4629,7 +4602,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.0-beta.7';
+  return '0.31.0-beta.8';
 };
 
 /**
@@ -14112,40 +14085,63 @@ dwv.gui.ViewLayer = function (containerDiv) {
    * @param {object} fitOffset The fit offset as {x,y}.
    */
   this.fitToContainer = function (fitScale1D, fitSize, fitOffset) {
-    // update canvas size
-    var width = fitSize.x;
-    var height = fitSize.y;
-    if (!dwv.gui.canCreateCanvas(width, height)) {
-      throw new Error('Cannot resize canvas ' + width + ', ' + height);
+    var needsDraw = false;
+
+    // update canvas size if needed (triggers canvas reset)
+    if (canvas.width !== fitSize.x || canvas.height !== fitSize.y) {
+      if (!dwv.gui.canCreateCanvas(fitSize.x, fitSize.y)) {
+        throw new Error('Cannot resize canvas ' + fitSize.x + ', ' + fitSize.y);
+      }
+      // canvas size  change triggers canvas reset
+      canvas.width = fitSize.x;
+      canvas.height = fitSize.y;
+      // update draw flag
+      needsDraw = true;
     }
-    canvas.width = width;
-    canvas.height = height;
 
     // previous scale without fit
     var previousScale = {
       x: scale.x / fitScale.x,
       y: scale.y / fitScale.y
     };
-    // update fit scale
-    fitScale = {
+    // fit scale
+    var newFitScale = {
       x: fitScale1D * baseSpacing.x,
       y: fitScale1D * baseSpacing.y
     };
-    // update scale
-    scale = {
-      x: previousScale.x * fitScale.x,
-      y: previousScale.y * fitScale.y
+    // scale
+    var newScale = {
+      x: previousScale.x * newFitScale.x,
+      y: previousScale.y * newFitScale.y
     };
+    // check if different
+    if (previousScale.x !== newScale.x || previousScale.y !== newScale.y) {
+      fitScale = newFitScale;
+      scale = newScale;
+      // update draw flag
+      needsDraw = true;
+    }
 
-    // update offsets
-    viewOffset = {
-      x: fitOffset.x / fitScale.x,
-      y: fitOffset.y / fitScale.y
+    // view offset
+    var newViewOffset = {
+      x: fitOffset.x / newFitScale.x,
+      y: fitOffset.y / newFitScale.y
     };
-    offset = {
-      x: viewOffset.x + baseOffset.x + zoomOffset.x,
-      y: viewOffset.y + baseOffset.y + zoomOffset.y
-    };
+    // check if different
+    if (viewOffset.x !== newViewOffset.x || viewOffset.y !== newViewOffset.y) {
+      viewOffset = newViewOffset;
+      offset = {
+        x: viewOffset.x + baseOffset.x + zoomOffset.x,
+        y: viewOffset.y + baseOffset.y + zoomOffset.y
+      };
+      // update draw flag
+      needsDraw = true;
+    }
+
+    // draw if needed
+    if (needsDraw) {
+      this.draw();
+    }
   };
 
   /**
@@ -15569,19 +15565,84 @@ dwv.image = dwv.image || {};
  * @param {dwv.image.Spacing} spacing The object spacing.
  * @param {dwv.math.Matrix33} orientation The object orientation (3*3 matrix,
  *   default to 3*3 identity).
+ * @param {number} time Optional time index.
  */
-dwv.image.Geometry = function (origin, size, spacing, orientation) {
-  // check input origin
-  if (typeof origin === 'undefined') {
-    origin = new dwv.math.Point3D(0, 0, 0);
-  }
+dwv.image.Geometry = function (origin, size, spacing, orientation, time) {
   var origins = [origin];
+  // local helper object for time points
+  var timeOrigins = {};
+  var initialTime;
+  if (typeof time !== 'undefined') {
+    initialTime = time;
+    timeOrigins[time] = [origin];
+  }
   // check input orientation
   if (typeof orientation === 'undefined') {
     orientation = new dwv.math.getIdentityMat33();
   }
   // flag to know if new origins were added
   var newOrigins = false;
+
+  /**
+   * Get the time value that was passed at construction.
+   *
+   * @returns {number} The time value.
+   */
+  this.getInitialTime = function () {
+    return initialTime;
+  };
+
+  /**
+   * Get the total number of slices.
+   * Can be different from what is stored in the size object
+   *  during a volume with time points creation process.
+   *
+   * @returns {number} The total count.
+   */
+  this.getCurrentTotalNumberOfSlices = function () {
+    var keys = Object.keys(timeOrigins);
+    if (keys.length === 0) {
+      return origins.length;
+    }
+    var count = 0;
+    for (var i = 0; i < keys.length; ++i) {
+      count += timeOrigins[keys[i]].length;
+    }
+    return count;
+  };
+
+  /**
+   * Check if a time point has associated slices.
+   *
+   * @param {number} time The time point to check.
+   * @returns {boolean} True if slices are present.
+   */
+  this.hasSlicesAtTime = function (time) {
+    return typeof timeOrigins[time] !== 'undefined';
+  };
+
+  /**
+   * Get the number of slices stored for time points preceding
+   * the input one.
+   *
+   * @param {number} time The time point to check.
+   * @returns {number} The count.
+   */
+  this.getCurrentNumberOfSlicesBeforeTime = function (time) {
+    var keys = Object.keys(timeOrigins);
+    if (keys.length === 0) {
+      return;
+    }
+    var count = 0;
+    for (var i = 0; i < keys.length; ++i) {
+      var key = keys[i];
+      if (parseInt(key, 10) === time) {
+        break;
+      }
+      count += timeOrigins[key].length;
+    }
+    return count;
+  };
 
   /**
    * Get the object origin.
@@ -15746,24 +15807,30 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
    * magic...
    *
    * @param {dwv.math.Point3D} point The point to evaluate.
+   * @param {number} time Optional time index.
    * @returns {number} The slice index.
    */
-  this.getSliceIndex = function (point) {
+  this.getSliceIndex = function (point, time) {
     // cannot use this.worldToIndex(point).getK() since
     // we cannot guaranty consecutive slices...
 
+    var localOrigins = origins;
+    if (typeof time !== 'undefined') {
+      localOrigins = timeOrigins[time];
+    }
+
     // find the closest index
     var closestSliceIndex = 0;
-    var minDist = point.getDistance(origins[0]);
+    var minDist = point.getDistance(localOrigins[0]);
     var dist = 0;
-    for (var i = 0; i < origins.length; ++i) {
-      dist = point.getDistance(origins[i]);
+    for (var i = 0; i < localOrigins.length; ++i) {
+      dist = point.getDistance(localOrigins[i]);
       if (dist < minDist) {
         minDist = dist;
         closestSliceIndex = i;
       }
     }
-    var closestOrigin = origins[closestSliceIndex];
+    var closestOrigin = localOrigins[closestSliceIndex];
     // direction between the input point and the closest origin
     var pointDir = point.minus(closestOrigin);
     // use third orientation matrix column as base plane vector
@@ -15791,22 +15858,32 @@ dwv.image.Geometry = function (origin, size, spacing, orientation) {
    *
    * @param {dwv.math.Point3D} origin The origin to append.
    * @param {number} index The index at which to append.
+   * @param {number} time Optional time index.
    */
-  this.appendOrigin = function (origin, index) {
-    newOrigins = true;
-    // add in origin array
-    origins.splice(index, 0, origin);
-    // increment second dimension
-    var values = size.getValues();
-    values[2] += 1;
-    size = new dwv.image.Size(values);
+  this.appendOrigin = function (origin, index, time) {
+    if (typeof time !== 'undefined') {
+      timeOrigins[time].splice(index, 0, origin);
+    }
+    if (typeof time === 'undefined' || time === initialTime) {
+      newOrigins = true;
+      // add in origin array
+      origins.splice(index, 0, origin);
+      // increment second dimension
+      var values = size.getValues();
+      values[2] += 1;
+      size = new dwv.image.Size(values);
+    }
   };
 
   /**
    * Append a frame to the geometry.
    *
+   * @param {dwv.math.Point3D} origin The origin to append.
+   * @param {number} time Optional time index.
    */
-  this.appendFrame = function () {
+  this.appendFrame = function (origin, time) {
+    // add origin to list
+    timeOrigins[time] = [origin];
     // increment third dimension
     var sizeValues = size.getValues();
     var spacingValues = spacing.getValues();
@@ -15860,11 +15937,11 @@ dwv.image.Geometry.prototype.isInBounds = function (point) {
  * Check that a index is within bounds.
  *
  * @param {dwv.math.Index} index The index to check.
- * @param {number} dir Optional direction to check.
+ * @param {Array} dirs Optional list of directions to check.
  * @returns {boolean} True if the given coordinates are within bounds.
  */
-dwv.image.Geometry.prototype.isIndexInBounds = function (index, dir) {
-  return this.getSize().isInBounds(index, dir);
+dwv.image.Geometry.prototype.isIndexInBounds = function (index, dirs) {
+  return this.getSize().isInBounds(index, dirs);
 };
 
 /**
@@ -15974,6 +16051,31 @@ dwv.image.Geometry.prototype.worldToIndex = function (point) {
 var dwv = dwv || {};
 /** @namespace */
 dwv.image = dwv.image || {};
+
+/**
+ * Get the slice index of an input slice into a volume geometry.
+ *
+ * @param {dwv.image.Geometry} volumeGeometry The volume geometry.
+ * @param {dwv.image.Geometry} sliceGeometry The slice geometry.
+ * @returns {dwv.math.Index} The index of the slice in the volume geomtry.
+ */
+dwv.image.getSliceIndex = function (volumeGeometry, sliceGeometry) {
+  // possible time
+  var timeId = sliceGeometry.getInitialTime();
+  // index values
+  var values = [];
+  // x, y
+  values.push(0);
+  values.push(0);
+  // z
+  values.push(volumeGeometry.getSliceIndex(sliceGeometry.getOrigin(), timeId));
+  // time
+  if (typeof timeId !== 'undefined') {
+    values.push(timeId);
+  }
+  // return index
+  return new dwv.math.Index(values);
+};
 
 /**
  * Image class.
@@ -16373,12 +16475,8 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
    * Append a slice to the image.
    *
    * @param {Image} rhs The slice to append.
-   * @param {number} timeId An optional time ID.
    */
-  this.appendSlice = function (rhs, timeId) {
-    if (typeof timeId === 'undefined') {
-      timeId = 0;
-    }
+  this.appendSlice = function (rhs) {
     // check input
     if (rhs === null) {
       throw new Error('Cannot append null slice');
@@ -16412,6 +16510,26 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       }
     }
 
+    // possible time
+    var timeId = rhs.getGeometry().getInitialTime();
+
+    // append frame if needed
+    var isNewFrame = false;
+    if (typeof timeId !== 'undefined' && !geometry.hasSlicesAtTime(timeId)) {
+      // update grometry
+      this.appendFrame(rhs.getGeometry().getOrigin(), timeId);
+      // update size
+      size = geometry.getSize();
+      // update flag
+      isNewFrame = true;
+    }
+
+    // get slice index
+    var index = dwv.image.getSliceIndex(geometry, rhs.getGeometry());
+
+    // set slice index
+    var newSliceIndex = index.get(2);
+
     // calculate slice size
     var sliceSize = numberOfComponents * size.getDimSize(2);
 
@@ -16420,65 +16538,43 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       throw new Error('Missing number of files for buffer manipulation.');
     }
     var fullBufferSize = sliceSize * meta.numberOfFiles;
-    if (size.length() === 4) {
-      fullBufferSize *= size.get(3);
-    }
     if (buffer.length !== fullBufferSize) {
       realloc(fullBufferSize);
     }
 
-    var newSliceIndex = geometry.getSliceIndex(rhs.getGeometry().getOrigin());
-    var values = new Array(geometry.getSize().length());
-    values.fill(0);
-    values[2] = newSliceIndex;
-    if (size.length() === 4) {
-      values[3] = timeId;
+    // current number of slices
+    var numberOfSlices = newSliceIndex;
+    if (typeof timeId !== 'undefined') {
+      numberOfSlices += geometry.getCurrentNumberOfSlicesBeforeTime(timeId);
     }
-    var index = new dwv.math.Index(values);
-    var primaryOffset = size.indexToOffset(index) * numberOfComponents;
-    var secondaryOffset = this.getSecondaryOffset(index) * numberOfComponents;
-
-    // first frame special slice by slice append
-    if (timeId === 0) {
-      // store slice
-      var oldNumberOfSlices = size.get(2);
-      // move content if needed
-      var start = primaryOffset;
-      var end;
-      if (newSliceIndex === 0) {
-        // insert slice before current data
-        end = start + oldNumberOfSlices * sliceSize;
-        buffer.set(
-          buffer.subarray(start, end),
-          primaryOffset + sliceSize
-        );
-      } else if (newSliceIndex < oldNumberOfSlices) {
-        // insert slice in between current data
-        end = start + (oldNumberOfSlices - newSliceIndex) * sliceSize;
-        buffer.set(
-          buffer.subarray(start, end),
-          primaryOffset + sliceSize
-        );
-      }
+    // offset of the input slice
+    var indexOffset = numberOfSlices * sliceSize;
+    var maxOffset = geometry.getCurrentTotalNumberOfSlices() * sliceSize;
+    // move content if needed
+    if (indexOffset < maxOffset) {
+      buffer.set(
+        buffer.subarray(indexOffset, maxOffset),
+        indexOffset + sliceSize
+      );
     }
-
     // add new slice content
-    buffer.set(rhs.getBuffer(), primaryOffset);
+    buffer.set(rhs.getBuffer(), indexOffset);
 
     // update geometry
-    if (timeId === 0) {
-      geometry.appendOrigin(rhs.getGeometry().getOrigin(), newSliceIndex);
+    if (!isNewFrame) {
+      geometry.appendOrigin(
+        rhs.getGeometry().getOrigin(), newSliceIndex, timeId);
     }
     // update rsi
     // (rhs should just have one rsi)
     this.setRescaleSlopeAndIntercept(
-      rhs.getRescaleSlopeAndIntercept(), secondaryOffset);
+      rhs.getRescaleSlopeAndIntercept(), numberOfSlices);
 
     // current number of images
     var numberOfImages = imageUids.length;
 
     // insert sop instance UIDs
-    imageUids.splice(secondaryOffset, 0, rhs.getImageUid());
+    imageUids.splice(numberOfSlices, 0, rhs.getImageUid());
 
     // update window presets
     if (typeof meta.windowPresets !== 'undefined') {
@@ -16508,7 +16604,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
           if (typeof windowPreset.perslice !== 'undefined' &&
             windowPreset.perslice === true) {
             windowPresets[pkey].wl.splice(
-              secondaryOffset, 0, rhsPreset.wl[0]);
+              numberOfSlices, 0, rhsPreset.wl[0]);
           }
         } else {
           // if not defined (it should be), store all
@@ -16547,9 +16643,12 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
 
   /**
    * Append a frame to the image.
+   *
+   * @param {number} time The frame time value.
+   * @param {dwv.math.Point3D} origin The origin of the frame.
    */
-  this.appendFrame = function () {
-    geometry.appendFrame();
+  this.appendFrame = function (time, origin) {
+    geometry.appendFrame(time, origin);
     fireEvent({type: 'appendframe'});
     // memory will be updated at the first appendSlice or appendFrameBuffer
   };
@@ -17147,8 +17246,9 @@ dwv.image.ImageFactory.prototype.create = function (
   // geometry
   var origin = new dwv.math.Point3D(
     slicePosition[0], slicePosition[1], slicePosition[2]);
+  var time = dicomElements.getTime();
   var geometry = new dwv.image.Geometry(
-    origin, size, spacing, orientationMatrix);
+    origin, size, spacing, orientationMatrix, time);
 
   // sop instance UID
   var sopInstanceUid = dwv.dicom.cleanString(
@@ -19074,10 +19174,10 @@ dwv.image.Size.prototype.equals = function (rhs) {
  * Check that an index is within bounds.
  *
  * @param {dwv.math.Index} index The index to check.
- * @param {number} dir Optional direction to check.
+ * @param {Array} dirs Optional list of directions to check.
  * @returns {boolean} True if the given coordinates are within bounds.
  */
-dwv.image.Size.prototype.isInBounds = function (index, dir) {
+dwv.image.Size.prototype.isInBounds = function (index, dirs) {
   // check input
   if (!index) {
     return false;
@@ -19087,19 +19187,27 @@ dwv.image.Size.prototype.isInBounds = function (index, dir) {
   if (length !== index.length()) {
     return false;
   }
+  // create dirs if not there
+  if (typeof dirs === 'undefined') {
+    dirs = [];
+    for (var j = 0; j < length; ++j) {
+      dirs.push(j);
+    }
+  } else {
+    for (var k = 0; k < length; ++k) {
+      if (dirs[k] > length - 1) {
+        throw new Error('Wrong input dir value: ' + dirs[k]);
+      }
+    }
+  }
   // check values is 0 <= v < size
   var inBound = function (value, size) {
     return value >= 0 && value < size;
   };
-  if (typeof dir !== 'undefined') {
-    if (!inBound(index.get(dir), this.get(dir))) {
+  // check
+  for (var i = 0; i < dirs.length; ++i) {
+    if (!inBound(index.get(dirs[i]), this.get(dirs[i]))) {
       return false;
-    }
-  } else {
-    for (var i = 0; i < length; ++i) {
-      if (!inBound(index.get(i), this.get(i))) {
-        return false;
-      }
     }
   }
   // seems ok!
@@ -19703,7 +19811,11 @@ dwv.image.View = function (image) {
   this.canSetPosition = function (position) {
     var geometry = image.getGeometry();
     var index = geometry.worldToIndex(position);
-    return geometry.isIndexInBounds(index, this.getScrollIndex());
+    var dirs = [this.getScrollIndex()];
+    if (index.length() === 4) {
+      dirs.push(3);
+    }
+    return geometry.isIndexInBounds(index, dirs);
   };
 
   /**
@@ -19735,7 +19847,11 @@ dwv.image.View = function (image) {
     // send invalid event if not in bounds
     var geometry = image.getGeometry();
     var index = geometry.worldToIndex(position);
-    if (!geometry.isIndexInBounds(index, this.getScrollIndex())) {
+    var dirs = [this.getScrollIndex()];
+    if (index.length() === 4) {
+      dirs.push(3);
+    }
+    if (!geometry.isIndexInBounds(index, dirs)) {
       if (!silent) {
         // fire event with valid: false
         fireEvent({
@@ -19770,7 +19886,11 @@ dwv.image.View = function (image) {
     var position = geometry.indexToWorld(index);
 
     // check if possible
-    if (!geometry.isIndexInBounds(index, this.getScrollIndex())) {
+    var dirs = [this.getScrollIndex()];
+    if (index.length() === 4) {
+      dirs.push(3);
+    }
+    if (!geometry.isIndexInBounds(index, dirs)) {
       // do no send invalid positionchange event: avoid empty repaint
       return false;
     }
@@ -24422,7 +24542,7 @@ dwv.math.Index = function (values) {
    * Get the index value at the given array index.
    *
    * @param {number} i The index to get.
-   * @returns {number} The value.
+   * @returns {number|undefined} The value or undefined if not in range.
    */
   this.get = function (i) {
     return values[i];
@@ -32766,6 +32886,13 @@ dwv.tool.Scroll = function (app) {
   var touchTimerID = null;
 
   /**
+   * Accumulated wheel event deltaY.
+   *
+   * @type {number}
+   */
+  var wheelDeltaY = 0;
+
+  /**
    * Handle mouse down event.
    *
    * @param {object} event The mouse down event.
@@ -32910,6 +33037,22 @@ dwv.tool.Scroll = function (app) {
    * @param {object} event The mouse wheel event.
    */
   this.wheel = function (event) {
+    // deltaMode (deltaY values on my machine...):
+    // - 0 (DOM_DELTA_PIXEL): chrome, deltaY mouse scroll = 53
+    // - 1 (DOM_DELTA_LINE): firefox, deltaY mouse scroll = 6
+    // - 2 (DOM_DELTA_PAGE): ??
+    // TODO: check scroll event
+    var scrollMin = 52;
+    if (event.deltaMode === 1) {
+      scrollMin = 5.99;
+    }
+    wheelDeltaY += event.deltaY;
+    if (Math.abs(wheelDeltaY) < scrollMin) {
+      return;
+    } else {
+      wheelDeltaY = 0;
+    }
+
     var up = false;
     if (event.deltaY < 0) {
       up = true;
