@@ -572,6 +572,16 @@ dwv.dicom.DicomElementsWrapper.prototype.getPixelSpacing = function () {
 };
 
 /**
+ * Get the time.
+ *
+ * @returns {number|undefined} The time value if available.
+ */
+dwv.dicom.DicomElementsWrapper.prototype.getTime = function () {
+  // default returns undefined
+  return undefined;
+};
+
+/**
  * Get the file list from a DICOMDIR
  *
  * @param {object} data The buffer data of the DICOMDIR

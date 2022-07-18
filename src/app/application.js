@@ -374,9 +374,6 @@ dwv.App = function () {
     if (typeof options.binders !== 'undefined') {
       stage.setBinders(options.binders);
     }
-
-    // create layer groups
-    createLayerGroups(options.dataViewConfigs);
   };
 
   /**
@@ -621,6 +618,13 @@ dwv.App = function () {
     if (typeof dataIndex === 'undefined' || dataIndex === null) {
       throw new Error('Cannot render without data index');
     }
+
+    // create layer groups if not done yet
+    // (create all to allow for ratio sync)
+    if (stage.getNumberOfLayerGroups() === 0) {
+      createLayerGroups(options.dataViewConfigs);
+    }
+
     // loop on all configs
     var viewConfigs = getViewConfigs(dataIndex);
     // nothing to do if no view config
