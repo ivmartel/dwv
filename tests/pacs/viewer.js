@@ -19,9 +19,13 @@ var _mode = 0;
 var _dicomWeb = false;
 
 // example private logic for time value retrieval
-// dwv.getTimeValue = function (elements) {
-//   var time = elements.getFromKey('xABCD0123');
-//   return parseInt(time, 10);
+// dwv.dicom.DicomElementsWrapper.prototype.getTime = function () {
+//   var value;
+//   var time = this.getFromKey('xABCD0123');
+//   if (typeof time !== 'undefined') {
+//     value = parseInt(time, 10);
+//   }
+//   return value;
 // };
 
 /**
