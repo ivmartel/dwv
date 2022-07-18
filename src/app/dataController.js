@@ -90,40 +90,27 @@ dwv.ctrl.DataController = function () {
    * @param {number} index The index of the data.
    * @param {dwv.image.Image} image The image.
    * @param {object} meta The image meta.
-   * @param {number} timeId The time ID.
    */
-  this.update = function (index, image, meta, timeId) {
+  this.update = function (index, image, meta) {
     var dataToUpdate = data[index];
 
-    // handle possible timepoint
-    if (typeof timeId !== 'undefined') {
-      var size = dataToUpdate.image.getGeometry().getSize();
-      // append frame for first frame (still 3D) or other frames
-      if ((size.length() === 3 && timeId !== 0) ||
-        (size.length() > 3 && timeId >= size.get(3))) {
-        dataToUpdate.image.appendFrame();
-      }
-    }
-
     // add slice to current image
-    dataToUpdate.image.appendSlice(image, timeId);
+    dataToUpdate.image.appendSlice(image);
 
     // update meta data
     // TODO add time support
-    if (timeId === 0) {
-      var idKey = '';
-      if (typeof meta.x00020010 !== 'undefined') {
-        // dicom case
-        idKey = 'InstanceNumber';
-      } else {
-        idKey = 'imageUid';
-      }
-      dataToUpdate.meta = dwv.utils.mergeObjects(
-        dataToUpdate.meta,
-        getMetaObject(meta),
-        idKey,
-        'value');
+    var idKey = '';
+    if (typeof meta.x00020010 !== 'undefined') {
+      // dicom case
+      idKey = 'InstanceNumber';
+    } else {
+      idKey = 'imageUid';
     }
+    dataToUpdate.meta = dwv.utils.mergeObjects(
+      dataToUpdate.meta,
+      getMetaObject(meta),
+      idKey,
+      'value');
   };
 
   /**

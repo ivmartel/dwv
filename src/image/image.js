@@ -4,6 +4,31 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
+ * Get the slice index of an input slice into a volume geometry.
+ *
+ * @param {dwv.image.Geometry} volumeGeometry The volume geometry.
+ * @param {dwv.image.Geometry} sliceGeometry The slice geometry.
+ * @returns {dwv.math.Index} The index of the slice in the volume geomtry.
+ */
+dwv.image.getSliceIndex = function (volumeGeometry, sliceGeometry) {
+  // possible time
+  var timeId = sliceGeometry.getInitialTime();
+  // index values
+  var values = [];
+  // x, y
+  values.push(0);
+  values.push(0);
+  // z
+  values.push(volumeGeometry.getSliceIndex(sliceGeometry.getOrigin(), timeId));
+  // time
+  if (typeof timeId !== 'undefined') {
+    values.push(timeId);
+  }
+  // return index
+  return new dwv.math.Index(values);
+};
+
+/**
  * Image class.
  * Usable once created, optional are:
  * - rescale slope and intercept (default 1:0),
@@ -401,12 +426,8 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
    * Append a slice to the image.
    *
    * @param {Image} rhs The slice to append.
-   * @param {number} timeId An optional time ID.
    */
-  this.appendSlice = function (rhs, timeId) {
-    if (typeof timeId === 'undefined') {
-      timeId = 0;
-    }
+  this.appendSlice = function (rhs) {
     // check input
     if (rhs === null) {
       throw new Error('Cannot append null slice');
@@ -440,6 +461,26 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       }
     }
 
+    // possible time
+    var timeId = rhs.getGeometry().getInitialTime();
+
+    // append frame if needed
+    var isNewFrame = false;
+    if (typeof timeId !== 'undefined' && !geometry.hasSlicesAtTime(timeId)) {
+      // update grometry
+      this.appendFrame(rhs.getGeometry().getOrigin(), timeId);
+      // update size
+      size = geometry.getSize();
+      // update flag
+      isNewFrame = true;
+    }
+
+    // get slice index
+    var index = dwv.image.getSliceIndex(geometry, rhs.getGeometry());
+
+    // set slice index
+    var newSliceIndex = index.get(2);
+
     // calculate slice size
     var sliceSize = numberOfComponents * size.getDimSize(2);
 
@@ -448,65 +489,43 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       throw new Error('Missing number of files for buffer manipulation.');
     }
     var fullBufferSize = sliceSize * meta.numberOfFiles;
-    if (size.length() === 4) {
-      fullBufferSize *= size.get(3);
-    }
     if (buffer.length !== fullBufferSize) {
       realloc(fullBufferSize);
     }
 
-    var newSliceIndex = geometry.getSliceIndex(rhs.getGeometry().getOrigin());
-    var values = new Array(geometry.getSize().length());
-    values.fill(0);
-    values[2] = newSliceIndex;
-    if (size.length() === 4) {
-      values[3] = timeId;
+    // current number of slices
+    var numberOfSlices = newSliceIndex;
+    if (typeof timeId !== 'undefined') {
+      numberOfSlices += geometry.getCurrentNumberOfSlicesBeforeTime(timeId);
     }
-    var index = new dwv.math.Index(values);
-    var primaryOffset = size.indexToOffset(index) * numberOfComponents;
-    var secondaryOffset = this.getSecondaryOffset(index) * numberOfComponents;
-
-    // first frame special slice by slice append
-    if (timeId === 0) {
-      // store slice
-      var oldNumberOfSlices = size.get(2);
-      // move content if needed
-      var start = primaryOffset;
-      var end;
-      if (newSliceIndex === 0) {
-        // insert slice before current data
-        end = start + oldNumberOfSlices * sliceSize;
-        buffer.set(
-          buffer.subarray(start, end),
-          primaryOffset + sliceSize
-        );
-      } else if (newSliceIndex < oldNumberOfSlices) {
-        // insert slice in between current data
-        end = start + (oldNumberOfSlices - newSliceIndex) * sliceSize;
-        buffer.set(
-          buffer.subarray(start, end),
-          primaryOffset + sliceSize
-        );
-      }
+    // offset of the input slice
+    var indexOffset = numberOfSlices * sliceSize;
+    var maxOffset = geometry.getCurrentTotalNumberOfSlices() * sliceSize;
+    // move content if needed
+    if (indexOffset < maxOffset) {
+      buffer.set(
+        buffer.subarray(indexOffset, maxOffset),
+        indexOffset + sliceSize
+      );
     }
-
     // add new slice content
-    buffer.set(rhs.getBuffer(), primaryOffset);
+    buffer.set(rhs.getBuffer(), indexOffset);
 
     // update geometry
-    if (timeId === 0) {
-      geometry.appendOrigin(rhs.getGeometry().getOrigin(), newSliceIndex);
+    if (!isNewFrame) {
+      geometry.appendOrigin(
+        rhs.getGeometry().getOrigin(), newSliceIndex, timeId);
     }
     // update rsi
     // (rhs should just have one rsi)
     this.setRescaleSlopeAndIntercept(
-      rhs.getRescaleSlopeAndIntercept(), secondaryOffset);
+      rhs.getRescaleSlopeAndIntercept(), numberOfSlices);
 
     // current number of images
     var numberOfImages = imageUids.length;
 
     // insert sop instance UIDs
-    imageUids.splice(secondaryOffset, 0, rhs.getImageUid());
+    imageUids.splice(numberOfSlices, 0, rhs.getImageUid());
 
     // update window presets
     if (typeof meta.windowPresets !== 'undefined') {
@@ -536,7 +555,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
           if (typeof windowPreset.perslice !== 'undefined' &&
             windowPreset.perslice === true) {
             windowPresets[pkey].wl.splice(
-              secondaryOffset, 0, rhsPreset.wl[0]);
+              numberOfSlices, 0, rhsPreset.wl[0]);
           }
         } else {
           // if not defined (it should be), store all
@@ -575,9 +594,12 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
 
   /**
    * Append a frame to the image.
+   *
+   * @param {number} time The frame time value.
+   * @param {dwv.math.Point3D} origin The origin of the frame.
    */
-  this.appendFrame = function () {
-    geometry.appendFrame();
+  this.appendFrame = function (time, origin) {
+    geometry.appendFrame(time, origin);
     fireEvent({type: 'appendframe'});
     // memory will be updated at the first appendSlice or appendFrameBuffer
   };

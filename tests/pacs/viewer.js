@@ -18,6 +18,12 @@ var _tools = null;
 var _mode = 0;
 var _dicomWeb = false;
 
+// example private logic for time value retrieval
+// dwv.getTimeValue = function (elements) {
+//   var time = elements.getFromKey('xABCD0123');
+//   return parseInt(time, 10);
+// };
+
 /**
  * Setup simple dwv app.
  */
@@ -65,9 +71,6 @@ dwv.test.viewerSetup = function () {
         }
       ]
     };
-  } else if (_mode === 3) {
-    // timepoint mode
-    dataViewConfigs = prepareAndGetSimpleDataViewConfig();
   }
 
   // tools
@@ -128,9 +131,7 @@ dwv.test.viewerSetup = function () {
       // log meta data
       console.log('metadata', _app.getMetaData(event.loadid));
       // add data row
-      if (_mode !== 3) {
-        addDataRow(event.loadid);
-      }
+      addDataRow(event.loadid);
       ++dataLoad;
       // init gui
       if (dataLoad === numberOfDataToLoad) {
@@ -248,17 +249,11 @@ dwv.test.onDOMContentLoadedViewer = function () {
   setupToolsCheckboxes();
 
   // bind app to input files
-  var timeId = -1;
   var fileinput = document.getElementById('fileinput');
   fileinput.addEventListener('change', function (event) {
-    ++timeId;
     console.log('%c ----------------', 'color: teal;');
     console.log(event.target.files);
-    var options = {};
-    if (_mode === 3) {
-      options = {timepoint: {id: timeId, dataId: 0}};
-    }
-    _app.loadFiles(event.target.files, options);
+    _app.loadFiles(event.target.files);
   });
 };
 
