@@ -168,10 +168,10 @@ dwv.image.Size.prototype.equals = function (rhs) {
  * Check that an index is within bounds.
  *
  * @param {dwv.math.Index} index The index to check.
- * @param {number} dir Optional direction to check.
+ * @param {Array} dirs Optional list of directions to check.
  * @returns {boolean} True if the given coordinates are within bounds.
  */
-dwv.image.Size.prototype.isInBounds = function (index, dir) {
+dwv.image.Size.prototype.isInBounds = function (index, dirs) {
   // check input
   if (!index) {
     return false;
@@ -181,19 +181,27 @@ dwv.image.Size.prototype.isInBounds = function (index, dir) {
   if (length !== index.length()) {
     return false;
   }
+  // create dirs if not there
+  if (typeof dirs === 'undefined') {
+    dirs = [];
+    for (var j = 0; j < length; ++j) {
+      dirs.push(j);
+    }
+  } else {
+    for (var k = 0; k < length; ++k) {
+      if (dirs[k] > length - 1) {
+        throw new Error('Wrong input dir value: ' + dirs[k]);
+      }
+    }
+  }
   // check values is 0 <= v < size
   var inBound = function (value, size) {
     return value >= 0 && value < size;
   };
-  if (typeof dir !== 'undefined') {
-    if (!inBound(index.get(dir), this.get(dir))) {
+  // check
+  for (var i = 0; i < dirs.length; ++i) {
+    if (!inBound(index.get(dirs[i]), this.get(dirs[i]))) {
       return false;
-    }
-  } else {
-    for (var i = 0; i < length; ++i) {
-      if (!inBound(index.get(i), this.get(i))) {
-        return false;
-      }
     }
   }
   // seems ok!
