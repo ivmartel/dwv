@@ -120,7 +120,7 @@ dwv.tool.ZoomAndPan = function (app) {
       }
     } else {
       // zoom mode
-      var zoom = (lineRatio - 1) / 2;
+      var zoom = (lineRatio - 1) / 10;
       if (Math.abs(zoom) % 0.1 <= 0.05) {
         var planePos = viewLayer.displayToMainPlanePos(
           self.midPoint.getX(), self.midPoint.getY());
