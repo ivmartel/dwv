@@ -453,7 +453,8 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     }
     // all meta should be equal
     for (var key in meta) {
-      if (key === 'windowPresets' || key === 'numberOfFiles') {
+      if (key === 'windowPresets' || key === 'numberOfFiles' ||
+        key === 'custom') {
         continue;
       }
       if (meta[key] !== rhs.getMeta()[key]) {

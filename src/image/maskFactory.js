@@ -354,11 +354,12 @@ dwv.image.MaskFactory.prototype.create = function (
   var meta = {
     Modality: 'SEG',
     BitsStored: 8,
-    labels: labels,
-    frameInfos: frameInfos,
     SeriesInstanceUID: dicomElements.getFromKey('x0020000E'),
-    SOPInstanceUID: dicomElements.getFromKey('x00080018'),
-    ImageOrientationPatient: imageOrientationPatient
+    ImageOrientationPatient: imageOrientationPatient,
+    custom: {
+      labels: labels,
+      frameInfos: frameInfos
+    }
   };
   image.setMeta(meta);
 
