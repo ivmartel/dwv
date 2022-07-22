@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-beta.8 2022-07-18 12:43:16 */
+/*! dwv 0.31.0-beta.9 2022-07-22 15:14:31 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -1005,7 +1005,9 @@ dwv.App = function () {
       } else {
         layer = layerGroup.getActiveViewLayer();
       }
-      toolboxController.bindLayer(layer);
+      if (layer) {
+        toolboxController.bindLayer(layer);
+      }
     }
 
     // set toolbox tool
@@ -4602,7 +4604,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.0-beta.8';
+  return '0.31.0-beta.9';
 };
 
 /**
@@ -16502,7 +16504,8 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     }
     // all meta should be equal
     for (var key in meta) {
-      if (key === 'windowPresets' || key === 'numberOfFiles') {
+      if (key === 'windowPresets' || key === 'numberOfFiles' ||
+        key === 'custom') {
         continue;
       }
       if (meta[key] !== rhs.getMeta()[key]) {
@@ -16527,9 +16530,6 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     // get slice index
     var index = dwv.image.getSliceIndex(geometry, rhs.getGeometry());
 
-    // set slice index
-    var newSliceIndex = index.get(2);
-
     // calculate slice size
     var sliceSize = numberOfComponents * size.getDimSize(2);
 
@@ -16542,13 +16542,16 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       realloc(fullBufferSize);
     }
 
-    // current number of slices
-    var numberOfSlices = newSliceIndex;
+    // slice index
+    var sliceIndex = index.get(2);
+
+    // slice index including possible 4D
+    var fullSliceIndex = sliceIndex;
     if (typeof timeId !== 'undefined') {
-      numberOfSlices += geometry.getCurrentNumberOfSlicesBeforeTime(timeId);
+      fullSliceIndex += geometry.getCurrentNumberOfSlicesBeforeTime(timeId);
     }
     // offset of the input slice
-    var indexOffset = numberOfSlices * sliceSize;
+    var indexOffset = fullSliceIndex * sliceSize;
     var maxOffset = geometry.getCurrentTotalNumberOfSlices() * sliceSize;
     // move content if needed
     if (indexOffset < maxOffset) {
@@ -16563,18 +16566,18 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     // update geometry
     if (!isNewFrame) {
       geometry.appendOrigin(
-        rhs.getGeometry().getOrigin(), newSliceIndex, timeId);
+        rhs.getGeometry().getOrigin(), sliceIndex, timeId);
     }
     // update rsi
     // (rhs should just have one rsi)
     this.setRescaleSlopeAndIntercept(
-      rhs.getRescaleSlopeAndIntercept(), numberOfSlices);
+      rhs.getRescaleSlopeAndIntercept(), fullSliceIndex);
 
     // current number of images
     var numberOfImages = imageUids.length;
 
     // insert sop instance UIDs
-    imageUids.splice(numberOfSlices, 0, rhs.getImageUid());
+    imageUids.splice(fullSliceIndex, 0, rhs.getImageUid());
 
     // update window presets
     if (typeof meta.windowPresets !== 'undefined') {
@@ -16604,7 +16607,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
           if (typeof windowPreset.perslice !== 'undefined' &&
             windowPreset.perslice === true) {
             windowPresets[pkey].wl.splice(
-              numberOfSlices, 0, rhsPreset.wl[0]);
+              fullSliceIndex, 0, rhsPreset.wl[0]);
           }
         } else {
           // if not defined (it should be), store all
@@ -18666,11 +18669,12 @@ dwv.image.MaskFactory.prototype.create = function (
   var meta = {
     Modality: 'SEG',
     BitsStored: 8,
-    labels: labels,
-    frameInfos: frameInfos,
     SeriesInstanceUID: dicomElements.getFromKey('x0020000E'),
-    SOPInstanceUID: dicomElements.getFromKey('x00080018'),
-    ImageOrientationPatient: imageOrientationPatient
+    ImageOrientationPatient: imageOrientationPatient,
+    custom: {
+      labels: labels,
+      frameInfos: frameInfos
+    }
   };
   image.setMeta(meta);
 
@@ -28384,10 +28388,23 @@ dwv.tool.Draw = function (app) {
       var drawLayer = layerGroup.getActiveDrawLayer();
       // validate the group position
       dwv.tool.validateGroupPosition(drawLayer.getBaseSize(), this);
+      // get appropriate factory
+      var factory;
+      var keys = Object.keys(self.shapeFactoryList);
+      for (var i = 0; i < keys.length; ++i) {
+        factory = new self.shapeFactoryList[keys[i]];
+        if (factory.isFactoryGroup(shapeGroup)) {
+          // stop at first find
+          break;
+        }
+      }
+      if (typeof factory === 'undefined') {
+        throw new Error('Cannot find factory to update quantification.');
+      }
       // update quantification if possible
-      if (typeof currentFactory.updateQuantification !== 'undefined') {
+      if (typeof factory.updateQuantification !== 'undefined') {
         var vc = layerGroup.getActiveViewLayer().getViewController();
-        currentFactory.updateQuantification(this, vc);
+        factory.updateQuantification(this, vc);
       }
       // highlight trash when on it
       var offset = dwv.gui.getEventOffset(event.evt)[0];
@@ -33608,7 +33625,7 @@ dwv.tool.ZoomAndPan = function (app) {
       }
     } else {
       // zoom mode
-      var zoom = (lineRatio - 1) / 2;
+      var zoom = (lineRatio - 1) / 10;
       if (Math.abs(zoom) % 0.1 <= 0.05) {
         var planePos = viewLayer.displayToMainPlanePos(
           self.midPoint.getX(), self.midPoint.getY());
