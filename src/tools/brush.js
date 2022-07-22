@@ -21,14 +21,32 @@ dwv.tool.getCircleIndices = function (geometry, position, radiuses, dims) {
  * Get the data origins that correspond to input indices.
  *
  * @param {dwv.image.Geometry} geometry The geometry.
+ * @param {Array} allOrigins All orign array.
  * @param {Array} indices An array of dwv.math.Index.
  * @returns {Array} An array of origins (dwv.math.Point3D).
  */
-dwv.tool.getOriginsFromIndices = function (geometry, indices) {
+dwv.tool.getOriginsFromIndices = function (geometry, allOrigins, indices) {
   var sorted = indices.sort(dwv.math.getIndexCompareFunction(2));
-  var iStart = sorted[0].get(2);
-  var iEnd = sorted[sorted.length - 1].get(2);
-  return geometry.getOrigins().slice(iStart, iEnd + 1);
+
+  var origin0 = geometry.indexToWorld(sorted[0]);
+  var origin1 = geometry.indexToWorld(sorted[sorted.length - 1]);
+
+  var getEqualZ = function (point) {
+    return function equalZ(x) {
+      return x.getZ() === point.get(2);
+    };
+  };
+
+  var iStart = allOrigins.findIndex(getEqualZ(origin0));
+  if (iStart === -1) {
+    iStart = 0;
+  }
+  var iEnd = allOrigins.findIndex(getEqualZ(origin1));
+  if (iEnd === -1) {
+    iEnd = allOrigins.length - 1;
+  }
+
+  return allOrigins.slice(iStart, iEnd + 1);
 };
 
 /**
@@ -85,7 +103,7 @@ dwv.tool.Brush = function (app) {
    * @param {dwv.math.Point3D} origin The slice origin.
    * @returns {dwv.image.Image} The slice.
    */
-  function createMaskImage(geometry, origin) {
+  function createMaskImage(geometry, origin, meta) {
     // create data
     var sizeValues = geometry.getSize().getValues();
     sizeValues[2] = 1;
@@ -100,87 +118,36 @@ dwv.tool.Brush = function (app) {
     ++uid;
     var uids = [uid];
     var maskSlice = new dwv.image.Image(maskGeometry, values, uids);
-    maskSlice.setMeta({
-      Modality: 'SEG',
-      IsSigned: false,
-      numberOfFiles: 1
-    });
+    maskSlice.setMeta(meta);
     maskSlice.setPhotometricInterpretation('RGB');
 
     return maskSlice;
   }
 
   /**
-   * Paint the mask at the given offsets.
+   * Add slices to mask if needed.
    *
-   * @param {Array} offsets The mask offsets.
+   * @param {dww.image.Geometry} baseGeometry The base geometry.
+   * @param {Array} allOrigins All orign array.
+   * @param {dww.image.Geometry} maskGeometry The mask geometry.
+   * @param {dwv.math.Point3D} position The circle center.
+   * @param {Array} circleDims The circle dimensions.
+   * @param {Array} radiuses The circle radiuses.
+   * @returns {boolean} True if slices were added.
    */
-  function paintMaskAtOffsets(offsets) {
-    var buff = mask.getBuffer();
-    for (var i = 0; i < offsets.length; ++i) {
-      var offset = offsets[i] * 3;
-      buff[offset] = brushMode === 'add' ? brushColor.r : 0;
-      buff[offset + 1] = brushMode === 'add' ? brushColor.g : 0;
-      buff[offset + 2] = brushMode === 'add' ? brushColor.b : 0;
-    }
-    // update app image
-    app.setImage(maskId, mask);
-    // render
-    app.render(maskId);
-  }
-
-  /**
-   * Get the mask offset for an event.
-   *
-   * @param {object} event The event containing the mask position.
-   * @returns {Array} The array of offset to paint.
-   */
-  function getMaskOffsets(event) {
-    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
-    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
-
-    // reference image related vars
-    var viewLayer = layerGroup.getActiveViewLayer();
-    var planePos = viewLayer.displayToPlanePos(event._x, event._y);
-    var viewController = viewLayer.getViewController();
-    var position = viewController.getPositionFromPlanePoint(planePos);
-
-    // create mask if not done yet
-    var imageGeometry = app.getImage(0).getGeometry();
-    if (!mask) {
-      var imgK = imageGeometry.worldToIndex(position).get(2);
-      mask = createMaskImage(imageGeometry, imageGeometry.getOrigins()[imgK]);
-      // fires load events and renders data
-      maskId = app.addNewImage(mask, {});
-    }
-
-    var scrollIndex = viewController.getScrollIndex();
-    var circleDims;
-    var radiuses;
-    var spacing = imageGeometry.getSpacing(imageGeometry.getOrientation());
-    var r0 = Math.round(brushSize / spacing.get(0));
-    var r1 = Math.round(brushSize / spacing.get(1));
-    var r2 = Math.round(brushSize / spacing.get(2));
-    if (scrollIndex === 0) {
-      circleDims = [1, 2];
-      radiuses = [r1, r2];
-    } else if (scrollIndex === 1) {
-      circleDims = [0, 2];
-      radiuses = [r0, r2];
-    } else if (scrollIndex === 2) {
-      circleDims = [0, 1];
-      radiuses = [r0, r1];
-    }
-
+  function addMaskSlices(
+    baseGeometry, allOrigins,
+    maskGeometry, position, circleDims, radiuses, sliceMeta) {
     // circle indices in the image geometry
     var circleIndices =
-      dwv.tool.getCircleIndices(imageGeometry, position, radiuses, circleDims);
-    var origins = dwv.tool.getOriginsFromIndices(imageGeometry, circleIndices);
+      dwv.tool.getCircleIndices(baseGeometry, position, radiuses, circleDims);
+    var origins =
+      dwv.tool.getOriginsFromIndices(baseGeometry, allOrigins, circleIndices);
     if (origins.length === 0) {
       throw new Error('No brush origins...');
     }
+
     // get origins that need to be added
-    var maskGeometry = mask.getGeometry();
     var origins0 = [];
     var originsBelow = [];
     var isAbove = true;
@@ -244,21 +211,128 @@ dwv.tool.Brush = function (app) {
     for (var l = 0; l < originsToAdd.length; ++l) {
       mask.getMeta().numberOfFiles += 1;
       mask.appendSlice(
-        createMaskImage(maskGeometry, originsToAdd[l]));
+        createMaskImage(maskGeometry, originsToAdd[l], sliceMeta));
     }
 
-    // mask related vars
-    var maskViewLayers = layerGroup.searchViewLayers({
+    return originsToAdd.length !== 0;
+  }
+
+  /**
+   * Paint the mask at the given offsets.
+   *
+   * @param {Array} offsets The mask offsets.
+   */
+  function paintMaskAtOffsets(offsets) {
+    var buff = mask.getBuffer();
+    for (var i = 0; i < offsets.length; ++i) {
+      var offset = offsets[i] * 3;
+      buff[offset] = brushMode === 'add' ? brushColor.r : 0;
+      buff[offset + 1] = brushMode === 'add' ? brushColor.g : 0;
+      buff[offset + 2] = brushMode === 'add' ? brushColor.b : 0;
+    }
+    // update app image
+    app.setImage(maskId, mask);
+    // render
+    app.render(maskId);
+  }
+
+  /**
+   * Get the mask offset for an event.
+   *
+   * @param {object} event The event containing the mask position.
+   * @returns {Array} The array of offset to paint.
+   */
+  function getMaskOffsets(event) {
+    var layerDetails = dwv.gui.getLayerDetailsFromEvent(event);
+    var layerGroup = app.getLayerGroupById(layerDetails.groupId);
+
+    // reference image related vars
+    var viewLayer = layerGroup.getActiveViewLayer();
+    var planePos = viewLayer.displayToPlanePos(event._x, event._y);
+    var viewController = viewLayer.getViewController();
+    var position = viewController.getPositionFromPlanePoint(planePos);
+
+    var sliceMeta = {
+      Modality: 'SEG',
+      IsSigned: false,
+      numberOfFiles: 1,
+      BitsStored: 8
+    };
+
+    var searchMaskMeta = {
       Modality: 'SEG'
-    });
-    if (maskViewLayers.length !== 1) {
-      console.warn('Too many mask view layers', maskViewLayers.length);
-    }
-    var maskVl = maskViewLayers[0];
-    var maskVc = maskVl.getViewController();
+    };
+    var isMaskVc = viewController.equalImageMeta(searchMaskMeta);
 
-    // update mask position if new slices
-    if (originsToAdd.length !== 0) {
+    // base image geometry
+    var baseImage = app.getImage(0);
+    var baseGeometry = baseImage.getGeometry();
+
+    if (isMaskVc) {
+      // udpate an existing mask
+      mask = app.getImage(1);
+      maskId = 1;
+      baseGeometry = mask.getGeometry();
+    }
+
+    // create mask if not done yet
+    var maskVl = viewLayer;
+    var maskVc = viewController;
+    if (!mask) {
+      var imgK = baseGeometry.worldToIndex(position).get(2);
+
+      var firstSliceMeta = sliceMeta;
+      firstSliceMeta.SeriesInstanceUID =
+        baseImage.getMeta().SeriesInstanceUID;
+      firstSliceMeta.ImageOrientationPatient =
+        baseImage.getMeta().ImageOrientationPatient;
+
+      mask = createMaskImage(
+        baseGeometry, baseGeometry.getOrigins()[imgK], firstSliceMeta);
+      // fires load events and renders data
+      maskId = app.addNewImage(mask, {});
+
+      // newly create mask case: find the SEG view layer
+      var maskViewLayers = layerGroup.searchViewLayers(searchMaskMeta);
+      if (maskViewLayers.length === 0) {
+        console.warn('No mask view layers');
+      } else if (maskViewLayers.length !== 1) {
+        console.warn('Too many mask view layers', maskViewLayers.length);
+      }
+      maskVl = maskViewLayers[0];
+      maskVc = maskVl.getViewController();
+    }
+
+    sliceMeta.SeriesInstanceUID = mask.getMeta().SeriesInstanceUID;
+    sliceMeta.ImageOrientationPatient =
+      mask.getMeta().ImageOrientationPatient;
+
+    var maskGeometry = mask.getGeometry();
+
+    var scrollIndex = viewController.getScrollIndex();
+    var circleDims;
+    var radiuses;
+    var spacing = baseGeometry.getSpacing(baseGeometry.getOrientation());
+    var r0 = Math.round(brushSize / spacing.get(0));
+    var r1 = Math.round(brushSize / spacing.get(1));
+    var r2 = Math.round(brushSize / spacing.get(2));
+    if (scrollIndex === 0) {
+      circleDims = [1, 2];
+      radiuses = [r1, r2];
+    } else if (scrollIndex === 1) {
+      circleDims = [0, 2];
+      radiuses = [r0, r2];
+    } else if (scrollIndex === 2) {
+      circleDims = [0, 1];
+      radiuses = [r0, r1];
+    }
+
+    var addedSlices = addMaskSlices(
+      baseGeometry, baseImage.getGeometry().getOrigins(),
+      maskGeometry, position, circleDims, radiuses, sliceMeta);
+
+    if (addedSlices) {
+      // update mask position if new slices
       maskVc.setCurrentPosition(position);
     }
 
