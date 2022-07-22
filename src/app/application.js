@@ -931,7 +931,9 @@ dwv.App = function () {
       } else {
         layer = layerGroup.getActiveViewLayer();
       }
-      toolboxController.bindLayer(layer);
+      if (layer) {
+        toolboxController.bindLayer(layer);
+      }
     }
 
     // set toolbox tool

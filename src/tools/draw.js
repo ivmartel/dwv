@@ -653,10 +653,23 @@ dwv.tool.Draw = function (app) {
       var drawLayer = layerGroup.getActiveDrawLayer();
       // validate the group position
       dwv.tool.validateGroupPosition(drawLayer.getBaseSize(), this);
+      // get appropriate factory
+      var factory;
+      var keys = Object.keys(self.shapeFactoryList);
+      for (var i = 0; i < keys.length; ++i) {
+        factory = new self.shapeFactoryList[keys[i]];
+        if (factory.isFactoryGroup(shapeGroup)) {
+          // stop at first find
+          break;
+        }
+      }
+      if (typeof factory === 'undefined') {
+        throw new Error('Cannot find factory to update quantification.');
+      }
       // update quantification if possible
-      if (typeof currentFactory.updateQuantification !== 'undefined') {
+      if (typeof factory.updateQuantification !== 'undefined') {
         var vc = layerGroup.getActiveViewLayer().getViewController();
-        currentFactory.updateQuantification(this, vc);
+        factory.updateQuantification(this, vc);
       }
       // highlight trash when on it
       var offset = dwv.gui.getEventOffset(event.evt)[0];

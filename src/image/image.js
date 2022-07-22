@@ -453,7 +453,8 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     }
     // all meta should be equal
     for (var key in meta) {
-      if (key === 'windowPresets' || key === 'numberOfFiles') {
+      if (key === 'windowPresets' || key === 'numberOfFiles' ||
+        key === 'custom') {
         continue;
       }
       if (meta[key] !== rhs.getMeta()[key]) {
@@ -478,9 +479,6 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     // get slice index
     var index = dwv.image.getSliceIndex(geometry, rhs.getGeometry());
 
-    // set slice index
-    var newSliceIndex = index.get(2);
-
     // calculate slice size
     var sliceSize = numberOfComponents * size.getDimSize(2);
 
@@ -493,13 +491,16 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
       realloc(fullBufferSize);
     }
 
-    // current number of slices
-    var numberOfSlices = newSliceIndex;
+    // slice index
+    var sliceIndex = index.get(2);
+
+    // slice index including possible 4D
+    var fullSliceIndex = sliceIndex;
     if (typeof timeId !== 'undefined') {
-      numberOfSlices += geometry.getCurrentNumberOfSlicesBeforeTime(timeId);
+      fullSliceIndex += geometry.getCurrentNumberOfSlicesBeforeTime(timeId);
     }
     // offset of the input slice
-    var indexOffset = numberOfSlices * sliceSize;
+    var indexOffset = fullSliceIndex * sliceSize;
     var maxOffset = geometry.getCurrentTotalNumberOfSlices() * sliceSize;
     // move content if needed
     if (indexOffset < maxOffset) {
@@ -514,18 +515,18 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
     // update geometry
     if (!isNewFrame) {
       geometry.appendOrigin(
-        rhs.getGeometry().getOrigin(), newSliceIndex, timeId);
+        rhs.getGeometry().getOrigin(), sliceIndex, timeId);
     }
     // update rsi
     // (rhs should just have one rsi)
     this.setRescaleSlopeAndIntercept(
-      rhs.getRescaleSlopeAndIntercept(), numberOfSlices);
+      rhs.getRescaleSlopeAndIntercept(), fullSliceIndex);
 
     // current number of images
     var numberOfImages = imageUids.length;
 
     // insert sop instance UIDs
-    imageUids.splice(numberOfSlices, 0, rhs.getImageUid());
+    imageUids.splice(fullSliceIndex, 0, rhs.getImageUid());
 
     // update window presets
     if (typeof meta.windowPresets !== 'undefined') {
@@ -555,7 +556,7 @@ dwv.image.Image = function (geometry, buffer, imageUids) {
           if (typeof windowPreset.perslice !== 'undefined' &&
             windowPreset.perslice === true) {
             windowPresets[pkey].wl.splice(
-              numberOfSlices, 0, rhsPreset.wl[0]);
+              fullSliceIndex, 0, rhsPreset.wl[0]);
           }
         } else {
           // if not defined (it should be), store all
