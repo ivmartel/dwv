@@ -270,8 +270,8 @@ dwv.tool.Brush = function (app) {
 
     if (isMaskVc) {
       // udpate an existing mask
-      mask = app.getImage(1);
-      maskId = 1;
+      mask = app.getImage(event.dataindex);
+      maskId = event.dataindex;
       baseGeometry = mask.getGeometry();
     }
 
