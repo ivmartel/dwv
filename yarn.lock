@@ -1535,9 +1535,9 @@ escape-string-regexp@^4.0.0:
   integrity sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==
 
 eslint-plugin-jsdoc@~39.3.3:
-  version "39.3.3"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-39.3.3.tgz#75dd67ce581e7527a69f27800138cc0f9c388236"
-  integrity sha512-K/DAjKRUNaUTf0KQhI9PvsF+Y3mGDx/j0pofXsJCQe/tmRsRweBIXR353c8nAro0lytZYEf7l0PluBpzKDiHxw==
+  version "39.3.4"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-39.3.4.tgz#6d18c5a071ada5babce9636b02a6c8355e9de2e8"
+  integrity sha512-dYWXhMMHJaq++bY2hyByhgiRzt5qQ7XdfQGiHrU9f3APSSVZ/HuOnXuvUUX7W0jO55Udsu4/7iRlpF/yLFQdSA==
   dependencies:
     "@es-joy/jsdoccomment" "~0.31.0"
     comment-parser "1.3.1"
@@ -2213,6 +2213,11 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.9.tgz#041b05df45755e587a24942279b9d113146e1c96"
   integrity sha512-NtNxqUcXgpW2iMrfqSfR73Glt39K+BLwWsPs94yR63v45T0Wbej7eRmL5cWfwEgqXnmjQp3zaJTshdRW/qC2ZQ==
 
+graceful-fs@^4.1.9:
+  version "4.2.10"
+  resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.10.tgz#147d3a006da4ca3ce14728c7aefc287c367d7a6c"
+  integrity sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==
+
 grunt-cli@^1.4.2, grunt-cli@~1.4.3:
   version "1.4.3"
   resolved "https://registry.yarnpkg.com/grunt-cli/-/grunt-cli-1.4.3.tgz#22c9f1a3d2780bf9b0d206e832e40f8f499175ff"
@@ -2479,9 +2484,9 @@ i18next-browser-languagedetector@~6.1.2:
     "@babel/runtime" "^7.14.6"
 
 i18next-http-backend@~1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/i18next-http-backend/-/i18next-http-backend-1.4.0.tgz#e6abef0615316e00837798d2385c13395096f963"
-  integrity sha512-wsvx7E/CT1pHmBM99Vu57YLJpsrHbVjxGxf25EIJ/6oTjsvCkZZ6c3SA4TejcK5jIHfv9oLxQX8l+DFKZHZ0Gg==
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/i18next-http-backend/-/i18next-http-backend-1.4.1.tgz#d8d308e7d8c5b89988446d0b83f469361e051bc0"
+  integrity sha512-s4Q9hK2jS29iyhniMP82z+yYY8riGTrWbnyvsSzi5TaF7Le4E7b5deTmtuaRuab9fdDcYXtcwdBgawZG+JCEjA==
   dependencies:
     cross-fetch "3.1.5"
 
@@ -2939,9 +2944,9 @@ jsdoc-type-pratt-parser@~3.1.0:
   integrity sha512-MgtD0ZiCDk9B+eI73BextfRrVQl0oyzRG8B2BjORts6jbunj4ScKPcyXGTbB6eXL4y9TzxCm6hyeLq/2ASzNdw==
 
 jsdoc@^3.6.7:
-  version "3.6.10"
-  resolved "https://registry.yarnpkg.com/jsdoc/-/jsdoc-3.6.10.tgz#dc903c44763b78afa7d94d63da475d20bc224cc4"
-  integrity sha512-IdQ8ppSo5LKZ9o3M+LKIIK8i00DIe5msDvG3G81Km+1dhy0XrOWD0Ji8H61ElgyEj/O9KRLokgKbAM9XX9CJAg==
+  version "3.6.11"
+  resolved "https://registry.yarnpkg.com/jsdoc/-/jsdoc-3.6.11.tgz#8bbb5747e6f579f141a5238cbad4e95e004458ce"
+  integrity sha512-8UCU0TYeIYD9KeLzEcAu2q8N/mx9O3phAGl32nmHlE0LpaJL71mMkP4d+QE5zWfNt50qheHtOZ0qoxVrsX5TUg==
   dependencies:
     "@babel/parser" "^7.9.4"
     "@types/markdown-it" "^12.2.3"
@@ -2949,7 +2954,7 @@ jsdoc@^3.6.7:
     catharsis "^0.9.0"
     escape-string-regexp "^2.0.0"
     js2xmlparser "^4.0.2"
-    klaw "^4.0.1"
+    klaw "^3.0.0"
     markdown-it "^12.3.2"
     markdown-it-anchor "^8.4.1"
     marked "^4.0.10"
@@ -3101,15 +3106,17 @@ kind-of@^6.0.2:
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.3.tgz#07c05034a6c349fa06e24fa35aa76db4580ce4dd"
   integrity sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==
 
-klaw@^4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/klaw/-/klaw-4.0.1.tgz#8dc6f5723f05894e8e931b516a8ff15c2976d368"
-  integrity sha512-pgsE40/SvC7st04AHiISNewaIMUbY5V/K8b21ekiPiFoYs/EYSdsGa+FJArB1d441uq4Q8zZyIxvAzkGNlBdRw==
+klaw@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/klaw/-/klaw-3.0.0.tgz#b11bec9cf2492f06756d6e809ab73a2910259146"
+  integrity sha512-0Fo5oir+O9jnXu5EefYbVK+mHMBeEVEy2cmctR1O1NECcCkPRreJKrS6Qt/j3KC2C148Dfo9i3pCmCMsdqGr0g==
+  dependencies:
+    graceful-fs "^4.1.9"
 
 konva@~8.3.0:
-  version "8.3.5"
-  resolved "https://registry.yarnpkg.com/konva/-/konva-8.3.5.tgz#017799db93f70ef6437eaa8e7776a4b32648344b"
-  integrity sha512-RjaZN8PwZN3n/AlqLmtPNozLRXd6pPo11UawTJpvuOAKEkSQSXI1EHntDRIPnrrJ/j4gU0VmPzWs7/ZgLZnAPQ==
+  version "8.3.10"
+  resolved "https://registry.yarnpkg.com/konva/-/konva-8.3.10.tgz#66e93815878c2d48f1b6076d5a06b18ec4eb3217"
+  integrity sha512-5zOynjWBG9wWgpA634SDH+764eyoISpmHLTOCfQ3GFN8OBVd83Genk6H0R4D3hXV0kEGIFAv7RDcSVDtQpPOMw==
 
 latest-version@^3.0.0:
   version "3.1.0"

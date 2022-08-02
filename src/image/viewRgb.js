@@ -20,7 +20,7 @@ dwv.image.generateImageDataRgb = function (
     array.data[index] = ival.value[0];
     array.data[index + 1] = ival.value[1];
     array.data[index + 2] = ival.value[2];
-    array.data[index + 3] = alphaFunc(ival.value);
+    array.data[index + 3] = alphaFunc(ival.value, ival.index);
     // increment
     index += 4;
     ival = iterator.next();

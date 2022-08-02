@@ -27,7 +27,7 @@ dwv.image.generateImageDataMonochrome = function (
     array.data[index] = colourMap.red[pxValue];
     array.data[index + 1] = colourMap.green[pxValue];
     array.data[index + 2] = colourMap.blue[pxValue];
-    array.data[index + 3] = alphaFunc(ival.value);
+    array.data[index + 3] = alphaFunc(ival.value, ival.index);
     // increment
     index += 4;
     ival = iterator.next();

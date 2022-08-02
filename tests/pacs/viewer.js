@@ -149,6 +149,21 @@ dwv.test.viewerSetup = function () {
         resetLayoutButton.disabled = false;
       }
     }
+    // example usage of a dicom SEG as data mask
+    // if (_app.getMetaData(event.loadid).Modality.value === 'SEG') {
+    //   var vls = _app.getViewLayersByDataIndex(0);
+    //   var vc = vls[0].getViewController();
+    //   var segImage = _app.getImage(event.loadid);
+    //   vc.setViewAlphaFunction(function (value, index) {
+    //     if (segImage.getValueAtOffset(3 * index) === 0 &&
+    //       segImage.getValueAtOffset(3 * index + 1) === 0 &&
+    //       segImage.getValueAtOffset(3 * index + 2) === 0) {
+    //       return 0;
+    //     } else {
+    //       return 0xff;
+    //     }
+    //   });
+    // }
   });
 
   _app.addEventListener('positionchange', function (event) {
