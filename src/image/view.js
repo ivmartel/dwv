@@ -177,9 +177,10 @@ dwv.image.View = function (image) {
    *
    * @param {*} _value The pixel value. Can be a number for monochrome
    *  data or an array for RGB data.
+   * @param {number} _index The data index of the value.
    * @returns {number} The coresponding alpha [0,255].
    */
-  var alphaFunction = function (_value) {
+  var alphaFunction = function (_value, _index) {
     // default always returns fully visible
     return 0xff;
   };

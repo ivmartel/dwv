@@ -23,7 +23,8 @@ dwv.image.simpleRange = function (dataAccessor, start, end, increment) {
       if (nextIndex < end) {
         var result = {
           value: dataAccessor(nextIndex),
-          done: false
+          done: false,
+          index: nextIndex
         };
         nextIndex += increment;
         return result;
@@ -93,7 +94,8 @@ dwv.image.range = function (dataAccessor, start, maxIter, increment,
       if (mainCount < maxIter) {
         var result = {
           value: dataAccessor(nextIndex),
-          done: false
+          done: false,
+          index: nextIndex
         };
         nextIndex += increment;
         ++mainCount;
@@ -134,7 +136,8 @@ dwv.image.rangeRegion = function (
       if (nextIndex < end) {
         var result = {
           value: dataAccessor(nextIndex),
-          done: false
+          done: false,
+          index: nextIndex
         };
         regionElementCount += 1;
         nextIndex += increment;
@@ -174,7 +177,8 @@ dwv.image.rangeRegions = function (
       if (nextIndex < end) {
         var result = {
           value: dataAccessor(nextIndex),
-          done: false
+          done: false,
+          index: nextIndex
         };
         regionElementCount += 1;
         nextIndex += increment;
@@ -240,7 +244,8 @@ dwv.image.simpleRange3d = function (
             dataAccessor(nextIndex1),
             dataAccessor(nextIndex2)
           ],
-          done: false
+          done: false,
+          index: [nextIndex, nextIndex1, nextIndex2]
         };
         nextIndex += increment;
         nextIndex1 += increment;
@@ -322,7 +327,12 @@ dwv.image.range3d = function (dataAccessor, start, maxIter, increment,
             r1.value,
             r2.value
           ],
-          done: false
+          done: false,
+          index: [
+            r0.index,
+            r1.index,
+            r2.index
+          ]
         };
       }
       return {
