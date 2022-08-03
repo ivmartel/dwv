@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-beta.9 2022-07-22 15:14:31 */
+/*! dwv 0.31.0-beta.10 2022-08-03 14:54:29 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -1015,46 +1015,12 @@ dwv.App = function () {
   };
 
   /**
-   * Set the draw shape.
+   * Set the tool live features.
    *
-   * @param {string} shape The draw shape.
+   * @param {object} list The list of features.
    */
-  this.setDrawShape = function (shape) {
-    toolboxController.setSelectedShape(shape);
-  };
-
-  /**
-   * Set the image filter
-   *
-   * @param {string} filter The image filter.
-   */
-  this.setImageFilter = function (filter) {
-    toolboxController.setSelectedFilter(filter);
-  };
-
-  /**
-   * Run the selected image filter.
-   */
-  this.runImageFilter = function () {
-    toolboxController.runSelectedFilter();
-  };
-
-  /**
-   * Set the draw line colour.
-   *
-   * @param {string} colour The line colour.
-   */
-  this.setDrawLineColour = function (colour) {
-    toolboxController.setLineColour(colour);
-  };
-
-  /**
-   * Set the filter min/max.
-   *
-   * @param {object} range The new range of the data: {min:a, max:b}.
-   */
-  this.setFilterMinMax = function (range) {
-    toolboxController.setRange(range);
+  this.setToolFeatures = function (list) {
+    toolboxController.setToolFeatures(list);
   };
 
   /**
@@ -1350,11 +1316,11 @@ dwv.App = function () {
     // make pixel of value 0 transparent for segmentation
     // (assuming RGB data)
     if (data.image.getMeta().Modality === 'SEG') {
-      view.setAlphaFunction(function (value) {
+      view.setAlphaFunction(function (value /*, index*/) {
         if (value[0] === 0 &&
           value[1] === 0 &&
           value[2] === 0) {
-          return 1;
+          return 0;
         } else {
           return 0xff;
         }
@@ -2471,50 +2437,13 @@ dwv.ctrl.ToolboxController = function (toolList) {
   };
 
   /**
-   * Set the selected shape.
+   * Set the selected tool live features.
    *
-   * @param {string} name The name of the shape.
+   * @param {object} list The list of features.
    */
-  this.setSelectedShape = function (name) {
-    this.getSelectedTool().setShapeName(name);
-  };
-
-  /**
-   * Set the selected filter.
-   *
-   * @param {string} name The name of the filter.
-   */
-  this.setSelectedFilter = function (name) {
-    this.getSelectedTool().setSelectedFilter(name);
-  };
-
-  /**
-   * Run the selected filter.
-   */
-  this.runSelectedFilter = function () {
-    this.getSelectedTool().getSelectedFilter().run();
-  };
-
-  /**
-   * Set the tool line colour.
-   *
-   * @param {string} colour The colour.
-   */
-  this.setLineColour = function (colour) {
-    this.getSelectedTool().setLineColour(colour);
-  };
-
-  /**
-   * Set the tool range.
-   *
-   * @param {object} range The new range of the data.
-   */
-  this.setRange = function (range) {
-    // seems like jquery is checking if the method exists before it
-    // is used...
-    if (this.getSelectedTool() &&
-      this.getSelectedTool().getSelectedFilter()) {
-      this.getSelectedTool().getSelectedFilter().run(range);
+  this.setToolFeatures = function (list) {
+    if (this.getSelectedTool()) {
+      this.getSelectedTool().setFeatures(list);
     }
   };
 
@@ -4604,7 +4533,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.0-beta.9';
+  return '0.31.0-beta.10';
 };
 
 /**
@@ -17489,7 +17418,8 @@ dwv.image.simpleRange = function (dataAccessor, start, end, increment) {
       if (nextIndex < end) {
         var result = {
           value: dataAccessor(nextIndex),
-          done: false
+          done: false,
+          index: nextIndex
         };
         nextIndex += increment;
         return result;
@@ -17559,7 +17489,8 @@ dwv.image.range = function (dataAccessor, start, maxIter, increment,
       if (mainCount < maxIter) {
         var result = {
           value: dataAccessor(nextIndex),
-          done: false
+          done: false,
+          index: nextIndex
         };
         nextIndex += increment;
         ++mainCount;
@@ -17600,7 +17531,8 @@ dwv.image.rangeRegion = function (
       if (nextIndex < end) {
         var result = {
           value: dataAccessor(nextIndex),
-          done: false
+          done: false,
+          index: nextIndex
         };
         regionElementCount += 1;
         nextIndex += increment;
@@ -17640,7 +17572,8 @@ dwv.image.rangeRegions = function (
       if (nextIndex < end) {
         var result = {
           value: dataAccessor(nextIndex),
-          done: false
+          done: false,
+          index: nextIndex
         };
         regionElementCount += 1;
         nextIndex += increment;
@@ -17706,7 +17639,8 @@ dwv.image.simpleRange3d = function (
             dataAccessor(nextIndex1),
             dataAccessor(nextIndex2)
           ],
-          done: false
+          done: false,
+          index: [nextIndex, nextIndex1, nextIndex2]
         };
         nextIndex += increment;
         nextIndex1 += increment;
@@ -17788,7 +17722,12 @@ dwv.image.range3d = function (dataAccessor, start, maxIter, increment,
             r1.value,
             r2.value
           ],
-          done: false
+          done: false,
+          index: [
+            r0.index,
+            r1.index,
+            r2.index
+          ]
         };
       }
       return {
@@ -19557,9 +19496,10 @@ dwv.image.View = function (image) {
    *
    * @param {*} _value The pixel value. Can be a number for monochrome
    *  data or an array for RGB data.
+   * @param {number} _index The data index of the value.
    * @returns {number} The coresponding alpha [0,255].
    */
-  var alphaFunction = function (_value) {
+  var alphaFunction = function (_value, _index) {
     // default always returns fully visible
     return 0xff;
   };
@@ -20389,7 +20329,7 @@ dwv.image.generateImageDataMonochrome = function (
     array.data[index] = colourMap.red[pxValue];
     array.data[index + 1] = colourMap.green[pxValue];
     array.data[index + 2] = colourMap.blue[pxValue];
-    array.data[index + 3] = alphaFunc(ival.value);
+    array.data[index + 3] = alphaFunc(ival.value, ival.index);
     // increment
     index += 4;
     ival = iterator.next();
@@ -20441,7 +20381,7 @@ dwv.image.generateImageDataPaletteColor = function (
       array.data[index + 1] = colourMap.green[pxValue];
       array.data[index + 2] = colourMap.blue[pxValue];
     }
-    array.data[index + 3] = alphaFunc(pxValue);
+    array.data[index + 3] = alphaFunc(pxValue, ival.index);
     // increment
     index += 4;
     ival = iterator.next();
@@ -20470,7 +20410,7 @@ dwv.image.generateImageDataRgb = function (
     array.data[index] = ival.value[0];
     array.data[index + 1] = ival.value[1];
     array.data[index + 2] = ival.value[2];
-    array.data[index + 3] = alphaFunc(ival.value);
+    array.data[index + 3] = alphaFunc(ival.value, ival.index);
     // increment
     index += 4;
     ival = iterator.next();
@@ -20503,7 +20443,7 @@ dwv.image.generateImageDataYbrFull = function (
     array.data[index] = rgb.r;
     array.data[index + 1] = rgb.g;
     array.data[index + 2] = rgb.b;
-    array.data[index + 3] = alphaFunc(ival.value);
+    array.data[index + 3] = alphaFunc(ival.value, ival.index);
     // increment
     index += 4;
     ival = iterator.next();
@@ -28250,7 +28190,7 @@ dwv.tool.Draw = function (app) {
         updateDrawLayer(layerGroup);
       });
       // same for colour
-      this.setLineColour(this.style.getLineColour());
+      this.setFeatures({lineColour: this.style.getLineColour()});
     } else {
       app.removeEventListener('positionchange', function () {
         updateDrawLayer(layerGroup);
@@ -28536,7 +28476,7 @@ dwv.tool.Draw = function (app) {
   };
 
   /**
-   * Set the tool options.
+   * Set the tool configuration options.
    *
    * @param {object} options The list of shape names amd classes.
    */
@@ -28545,6 +28485,24 @@ dwv.tool.Draw = function (app) {
     this.shapeFactoryList = options;
     // pass them to the editor
     shapeEditor.setFactoryList(options);
+  };
+
+  /**
+   * Set the tool live features: shape colour and shape name.
+   *
+   * @param {object} features The list of features.
+   */
+  this.setFeatures = function (features) {
+    if (typeof features.shapeColour !== 'undefined') {
+      this.style.setLineColour(features.shapeColour);
+    }
+    if (typeof features.shapeName !== 'undefined') {
+      // check if we have it
+      if (!this.hasShape(features.shapeName)) {
+        throw new Error('Unknown shape: \'' + features.shapeName + '\'');
+      }
+      this.shapeName = features.shapeName;
+    }
   };
 
   /**
@@ -28586,15 +28544,6 @@ dwv.tool.Draw = function (app) {
     }
   };
 
-  /**
-   * Set the line colour of the drawing.
-   *
-   * @param {string} colour The colour to set
-   */
-  this.setLineColour = function (colour) {
-    this.style.setLineColour(colour);
-  };
-
   // Private Methods -----------------------------------------------------------
 
   /**
@@ -28630,19 +28579,6 @@ dwv.tool.Draw.prototype.getHelpKeys = function () {
       touch_drag: 'tool.Draw.touch_drag'
     }
   };
-};
-
-/**
- * Set the shape name of the drawing.
- *
- * @param {string} name The name of the shape.
- */
-dwv.tool.Draw.prototype.setShapeName = function (name) {
-  // check if we have it
-  if (!this.hasShape(name)) {
-    throw new Error('Unknown shape: \'' + name + '\'');
-  }
-  this.shapeName = name;
 };
 
 /**
@@ -30019,23 +29955,32 @@ dwv.tool.Filter.prototype.getSelectedFilter = function () {
 };
 
 /**
- * Set the selected filter.
+ * Set the tool live features: filter name.
  *
- * @param {string} name The name of the filter to select.
+ * @param {object} features The list of features.
  */
-dwv.tool.Filter.prototype.setSelectedFilter = function (name) {
-  // check if we have it
-  if (!this.hasFilter(name)) {
-    throw new Error('Unknown filter: \'' + name + '\'');
+dwv.tool.Filter.prototype.setFeatures = function (features) {
+  if (typeof features.filterName !== 'undefined') {
+    // check if we have it
+    if (!this.hasFilter(features.filterName)) {
+      throw new Error('Unknown filter: \'' + features.filterName + '\'');
+    }
+    // de-activate last selected
+    if (this.selectedFilter) {
+      this.selectedFilter.activate(false);
+    }
+    // enable new one
+    this.selectedFilter = this.filterList[features.filterName];
+    // activate the selected filter
+    this.selectedFilter.activate(true);
   }
-  // de-activate last selected
-  if (this.selectedFilter) {
-    this.selectedFilter.activate(false);
+  if (typeof features.run !== 'undefined' && features.run) {
+    var args = {};
+    if (typeof features.runArgs !== 'undefined') {
+      args = features.runArgs;
+    }
+    this.getSelectedFilter().run(args);
   }
-  // enable new one
-  this.selectedFilter = this.filterList[name];
-  // activate the selected filter
-  this.selectedFilter.activate(true);
 };
 
 /**
@@ -30875,7 +30820,7 @@ dwv.tool.Floodfill = function (app) {
       // init with the app window scale
       this.style.setBaseScale(app.getBaseScale());
       // set the default to the first in the list
-      this.setLineColour(this.style.getLineColour());
+      this.setFeatures({shapeColour: this.style.getLineColour()});
     }
   };
 
@@ -30937,13 +30882,14 @@ dwv.tool.Floodfill.prototype.getHelpKeys = function () {
 };
 
 /**
- * Set the line colour of the drawing.
+ * Set the tool live features: shape colour.
  *
- * @param {string} colour The colour to set.
+ * @param {object} features The list of features.
  */
-dwv.tool.Floodfill.prototype.setLineColour = function (colour) {
-  // set style var
-  this.style.setLineColour(colour);
+dwv.tool.Floodfill.prototype.setFeatures = function (features) {
+  if (typeof features.shapeColour !== 'undefined') {
+    this.style.setLineColour(features.shapeColour);
+  }
 };
 
 // namespaces
@@ -31487,7 +31433,7 @@ dwv.tool.Livewire = function (app) {
       // init with the app window scale
       this.style.setBaseScale(app.getBaseScale());
       // set the default to the first in the list
-      this.setLineColour(this.style.getLineColour());
+      this.setFeatures({shapeColour: this.style.getLineColour()});
     }
   };
 
@@ -31543,14 +31489,16 @@ dwv.tool.Livewire.prototype.getHelpKeys = function () {
 };
 
 /**
- * Set the line colour of the drawing.
+ * Set the tool live features: shape colour.
  *
- * @param {string} colour The colour to set.
+ * @param {object} features The list of features.
  */
-dwv.tool.Livewire.prototype.setLineColour = function (colour) {
-  // set style var
-  this.style.setLineColour(colour);
+dwv.tool.Livewire.prototype.setFeatures = function (features) {
+  if (typeof features.shapeColour !== 'undefined') {
+    this.style.setLineColour(features.shapeColour);
+  }
 };
+
 
 // namespaces
 var dwv = dwv || {};
