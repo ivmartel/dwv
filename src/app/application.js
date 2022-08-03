@@ -941,46 +941,12 @@ dwv.App = function () {
   };
 
   /**
-   * Set the draw shape.
+   * Set the tool live features.
    *
-   * @param {string} shape The draw shape.
+   * @param {object} list The list of features.
    */
-  this.setDrawShape = function (shape) {
-    toolboxController.setSelectedShape(shape);
-  };
-
-  /**
-   * Set the image filter
-   *
-   * @param {string} filter The image filter.
-   */
-  this.setImageFilter = function (filter) {
-    toolboxController.setSelectedFilter(filter);
-  };
-
-  /**
-   * Run the selected image filter.
-   */
-  this.runImageFilter = function () {
-    toolboxController.runSelectedFilter();
-  };
-
-  /**
-   * Set the draw line colour.
-   *
-   * @param {string} colour The line colour.
-   */
-  this.setDrawLineColour = function (colour) {
-    toolboxController.setLineColour(colour);
-  };
-
-  /**
-   * Set the filter min/max.
-   *
-   * @param {object} range The new range of the data: {min:a, max:b}.
-   */
-  this.setFilterMinMax = function (range) {
-    toolboxController.setRange(range);
+  this.setToolFeatures = function (list) {
+    toolboxController.setToolFeatures(list);
   };
 
   /**
