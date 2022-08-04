@@ -515,7 +515,7 @@ dwv.tool.Draw = function (app) {
         updateDrawLayer(layerGroup);
       });
       // same for colour
-      this.setLineColour(this.style.getLineColour());
+      this.setFeatures({lineColour: this.style.getLineColour()});
     } else {
       app.removeEventListener('positionchange', function () {
         updateDrawLayer(layerGroup);
@@ -801,7 +801,7 @@ dwv.tool.Draw = function (app) {
   };
 
   /**
-   * Set the tool options.
+   * Set the tool configuration options.
    *
    * @param {object} options The list of shape names amd classes.
    */
@@ -810,6 +810,24 @@ dwv.tool.Draw = function (app) {
     this.shapeFactoryList = options;
     // pass them to the editor
     shapeEditor.setFactoryList(options);
+  };
+
+  /**
+   * Set the tool live features: shape colour and shape name.
+   *
+   * @param {object} features The list of features.
+   */
+  this.setFeatures = function (features) {
+    if (typeof features.shapeColour !== 'undefined') {
+      this.style.setLineColour(features.shapeColour);
+    }
+    if (typeof features.shapeName !== 'undefined') {
+      // check if we have it
+      if (!this.hasShape(features.shapeName)) {
+        throw new Error('Unknown shape: \'' + features.shapeName + '\'');
+      }
+      this.shapeName = features.shapeName;
+    }
   };
 
   /**
@@ -851,15 +869,6 @@ dwv.tool.Draw = function (app) {
     }
   };
 
-  /**
-   * Set the line colour of the drawing.
-   *
-   * @param {string} colour The colour to set
-   */
-  this.setLineColour = function (colour) {
-    this.style.setLineColour(colour);
-  };
-
   // Private Methods -----------------------------------------------------------
 
   /**
@@ -895,19 +904,6 @@ dwv.tool.Draw.prototype.getHelpKeys = function () {
       touch_drag: 'tool.Draw.touch_drag'
     }
   };
-};
-
-/**
- * Set the shape name of the drawing.
- *
- * @param {string} name The name of the shape.
- */
-dwv.tool.Draw.prototype.setShapeName = function (name) {
-  // check if we have it
-  if (!this.hasShape(name)) {
-    throw new Error('Unknown shape: \'' + name + '\'');
-  }
-  this.shapeName = name;
 };
 
 /**

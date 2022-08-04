@@ -341,7 +341,7 @@ dwv.tool.Livewire = function (app) {
       // init with the app window scale
       this.style.setBaseScale(app.getBaseScale());
       // set the default to the first in the list
-      this.setLineColour(this.style.getLineColour());
+      this.setFeatures({shapeColour: this.style.getLineColour()});
     }
   };
 
@@ -397,11 +397,13 @@ dwv.tool.Livewire.prototype.getHelpKeys = function () {
 };
 
 /**
- * Set the line colour of the drawing.
+ * Set the tool live features: shape colour.
  *
- * @param {string} colour The colour to set.
+ * @param {object} features The list of features.
  */
-dwv.tool.Livewire.prototype.setLineColour = function (colour) {
-  // set style var
-  this.style.setLineColour(colour);
+dwv.tool.Livewire.prototype.setFeatures = function (features) {
+  if (typeof features.shapeColour !== 'undefined') {
+    this.style.setLineColour(features.shapeColour);
+  }
 };
+

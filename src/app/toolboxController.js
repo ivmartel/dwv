@@ -96,50 +96,13 @@ dwv.ctrl.ToolboxController = function (toolList) {
   };
 
   /**
-   * Set the selected shape.
+   * Set the selected tool live features.
    *
-   * @param {string} name The name of the shape.
+   * @param {object} list The list of features.
    */
-  this.setSelectedShape = function (name) {
-    this.getSelectedTool().setShapeName(name);
-  };
-
-  /**
-   * Set the selected filter.
-   *
-   * @param {string} name The name of the filter.
-   */
-  this.setSelectedFilter = function (name) {
-    this.getSelectedTool().setSelectedFilter(name);
-  };
-
-  /**
-   * Run the selected filter.
-   */
-  this.runSelectedFilter = function () {
-    this.getSelectedTool().getSelectedFilter().run();
-  };
-
-  /**
-   * Set the tool line colour.
-   *
-   * @param {string} colour The colour.
-   */
-  this.setLineColour = function (colour) {
-    this.getSelectedTool().setLineColour(colour);
-  };
-
-  /**
-   * Set the tool range.
-   *
-   * @param {object} range The new range of the data.
-   */
-  this.setRange = function (range) {
-    // seems like jquery is checking if the method exists before it
-    // is used...
-    if (this.getSelectedTool() &&
-      this.getSelectedTool().getSelectedFilter()) {
-      this.getSelectedTool().getSelectedFilter().run(range);
+  this.setToolFeatures = function (list) {
+    if (this.getSelectedTool()) {
+      this.getSelectedTool().setFeatures(list);
     }
   };
 

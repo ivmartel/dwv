@@ -136,23 +136,32 @@ dwv.tool.Filter.prototype.getSelectedFilter = function () {
 };
 
 /**
- * Set the selected filter.
+ * Set the tool live features: filter name.
  *
- * @param {string} name The name of the filter to select.
+ * @param {object} features The list of features.
  */
-dwv.tool.Filter.prototype.setSelectedFilter = function (name) {
-  // check if we have it
-  if (!this.hasFilter(name)) {
-    throw new Error('Unknown filter: \'' + name + '\'');
+dwv.tool.Filter.prototype.setFeatures = function (features) {
+  if (typeof features.filterName !== 'undefined') {
+    // check if we have it
+    if (!this.hasFilter(features.filterName)) {
+      throw new Error('Unknown filter: \'' + features.filterName + '\'');
+    }
+    // de-activate last selected
+    if (this.selectedFilter) {
+      this.selectedFilter.activate(false);
+    }
+    // enable new one
+    this.selectedFilter = this.filterList[features.filterName];
+    // activate the selected filter
+    this.selectedFilter.activate(true);
   }
-  // de-activate last selected
-  if (this.selectedFilter) {
-    this.selectedFilter.activate(false);
+  if (typeof features.run !== 'undefined' && features.run) {
+    var args = {};
+    if (typeof features.runArgs !== 'undefined') {
+      args = features.runArgs;
+    }
+    this.getSelectedFilter().run(args);
   }
-  // enable new one
-  this.selectedFilter = this.filterList[name];
-  // activate the selected filter
-  this.selectedFilter.activate(true);
 };
 
 /**
