@@ -476,6 +476,23 @@ dwv.tool.Brush = function (app) {
   };
 
   /**
+   * Set the tool live features.
+   *
+   * @param {object} features The list of features.
+   */
+  this.setFeatures = function (features) {
+    if (typeof features.brushSize !== 'undefined') {
+      brushSize = features.brushSize;
+    }
+    if (typeof features.brushColor !== 'undefined') {
+      brushColor = features.brushColor;
+    }
+    if (typeof features.brushMode !== 'undefined') {
+      brushMode = features.brushMode;
+    }
+  };
+
+  /**
    * Initialise the tool.
    */
   this.init = function () {
