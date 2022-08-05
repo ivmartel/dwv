@@ -149,6 +149,13 @@ dwv.test.viewerSetup = function () {
         resetLayoutButton.disabled = false;
       }
     }
+
+    // TODO: hack... to fix
+    // if data was created internally, the tools need rebinding
+    if (event.source === 'internal') {
+      _app.setTool(getSelectedTool());
+    }
+
     // example usage of a dicom SEG as data mask
     // if (_app.getMetaData(event.loadid).Modality.value === 'SEG') {
     //   var vls = _app.getViewLayersByDataIndex(0);
