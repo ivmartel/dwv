@@ -140,7 +140,7 @@ dwv.test.viewerSetup = function () {
       // init gui
       if (dataLoad === numberOfDataToLoad) {
         // select tool
-        _app.setTool('Scroll');
+        _app.setTool(getSelectedTool());
 
         var changeLayoutSelect = document.getElementById('changelayout');
         changeLayoutSelect.disabled = false;
@@ -252,15 +252,7 @@ dwv.test.onDOMContentLoadedViewer = function () {
     }
 
     // need to set tool after config change
-    var toolsInput = document.getElementsByName('tools');
-    var toolIndex = null;
-    for (var j = 0; j < toolsInput.length; ++j) {
-      if (toolsInput[j].checked) {
-        toolIndex = j;
-        break;
-      }
-    }
-    _app.setTool(Object.keys(_tools)[toolIndex]);
+    _app.setTool(getSelectedTool());
   });
 
   setupBindersCheckboxes();
@@ -507,6 +499,23 @@ function setupToolsCheckboxes() {
     // keyboard shortcut
     window.addEventListener('keydown', getKeyCheck(key.charCodeAt(0), input));
   }
+}
+
+/**
+ * Get the selected tool
+ *
+ * @returns {string} The tool name.
+ */
+function getSelectedTool() {
+  var toolsInput = document.getElementsByName('tools');
+  var toolIndex = null;
+  for (var j = 0; j < toolsInput.length; ++j) {
+    if (toolsInput[j].checked) {
+      toolIndex = j;
+      break;
+    }
+  }
+  return Object.keys(_tools)[toolIndex];
 }
 
 /**
