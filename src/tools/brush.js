@@ -349,6 +349,35 @@ dwv.tool.Brush = function (app) {
     return dwv.tool.getOffsetsFromIndices(maskGeometry, maskCircleIndices);
   }
 
+  function saveSeg() {
+    const fac = new dwv.image.MaskFactory();
+    const dicomElements = fac.toDicom(mask);
+
+    // create writer with default rules
+    const writer = new dwv.dicom.DicomWriter();
+    let dicomBuffer = null;
+    try {
+      dicomBuffer = writer.getBuffer(dicomElements);
+    } catch (error) {
+      console.error(error);
+      alert(error.message);
+    }
+    // view as Blob to allow download
+    const blob = new Blob([dicomBuffer], {type: 'application/dicom'});
+    // update generate button
+    const element = document.createElement('a');
+    element.href = window.URL.createObjectURL(blob);
+    element.download = 'seg-save.dcm';
+    // trigger download
+    element.click();
+    URL.revokeObjectURL(element.href);
+
+    // var element = document.getElementById('save');
+    // element.href = URL.createObjectURL(blob);
+    // element.download = 'brush-' + _dicomFile.name;
+
+  }
+
   /**
    * Handle mouse down event.
    *
@@ -462,6 +491,9 @@ dwv.tool.Brush = function (app) {
     } else if (event.key === 'd') {
       brushMode = 'del';
       console.log('Brush mode', brushMode);
+    } else if (event.key === 's') {
+      console.log('Saving...');
+      saveSeg();
     }
 
   };
