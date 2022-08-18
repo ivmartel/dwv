@@ -95,8 +95,29 @@ dwv.tool.Brush = function (app) {
   let maskId = null;
 
   let brushSize = 2;
-  let brushColor = {r: 255, g: 0, b: 0};
   let brushMode = 'add';
+
+  let segments = [
+    {
+      number: 1,
+      label: 'Red',
+      algorithmType: 'MANUAL',
+      displayValue: {r: 255, g: 0, b: 0}
+    },
+    {
+      number: 2,
+      label: 'Green',
+      algorithmType: 'MANUAL',
+      displayValue: {r: 0, g: 255, b: 0}
+    },
+    {
+      number: 3,
+      label: 'Blue',
+      algorithmType: 'MANUAL',
+      displayValue: {r: 0, g: 0, b: 255}
+    }
+  ];
+  let selectedSegment = 0;
 
   let uid = 0;
 
@@ -228,11 +249,12 @@ dwv.tool.Brush = function (app) {
    */
   function paintMaskAtOffsets(offsets) {
     const buff = mask.getBuffer();
+    const colour = segments[selectedSegment].displayValue;
     for (let i = 0; i < offsets.length; ++i) {
       const offset = offsets[i] * 3;
-      buff[offset] = brushMode === 'add' ? brushColor.r : 0;
-      buff[offset + 1] = brushMode === 'add' ? brushColor.g : 0;
-      buff[offset + 2] = brushMode === 'add' ? brushColor.b : 0;
+      buff[offset] = brushMode === 'add' ? colour.r : 0;
+      buff[offset + 1] = brushMode === 'add' ? colour.g : 0;
+      buff[offset + 2] = brushMode === 'add' ? colour.b : 0;
     }
     // update app image
     app.setImage(maskId, mask);
@@ -277,6 +299,10 @@ dwv.tool.Brush = function (app) {
       mask = app.getImage(event.dataindex);
       maskId = event.dataindex;
       baseGeometry = mask.getGeometry();
+      // update segments
+      // TODO: check equal
+      segments = mask.getMeta().segments;
+      selectedSegment = 0;
     }
 
     // create mask if not done yet
@@ -351,7 +377,7 @@ dwv.tool.Brush = function (app) {
 
   function saveSeg() {
     const fac = new dwv.image.MaskFactory();
-    const dicomElements = fac.toDicom(mask);
+    const dicomElements = fac.toDicom(mask, segments);
 
     // create writer with default rules
     const writer = new dwv.dicom.DicomWriter();
@@ -476,15 +502,24 @@ dwv.tool.Brush = function (app) {
     } else if (event.key === '-') {
       brushSize -= 1;
       console.log('Brush size:', brushSize);
-    } else if (event.key === 'r') {
-      brushColor = {r: 255, g: 0, b: 0};
-      console.log('Brush color:', brushColor);
-    } else if (event.key === 'g') {
-      brushColor = {r: 0, g: 255, b: 0};
-      console.log('Brush color', brushColor);
-    } else if (event.key === 'b') {
-      brushColor = {r: 0, g: 0, b: 255};
-      console.log('Brush color', brushColor);
+    } else if (!isNaN(parseInt(event.key, 10))) {
+      let index = parseInt(event.key, 10);
+      if (index >= segments.length) {
+        index = segments.length;
+        segments.push({
+          number: index + 1,
+          label: 'new' + index,
+          algorithmType: 'MANUAL',
+          displayValue: {
+            r: Math.floor(255 * Math.random()),
+            g: Math.floor(255 * Math.random()),
+            b: Math.floor(255 * Math.random())
+          }
+        });
+        console.log(segments);
+      }
+      selectedSegment = index;
+      console.log('segment:', segments[selectedSegment].label);
     } else if (event.key === 'a') {
       brushMode = 'add';
       console.log('Brush mode', brushMode);
@@ -516,11 +551,14 @@ dwv.tool.Brush = function (app) {
     if (typeof features.brushSize !== 'undefined') {
       brushSize = features.brushSize;
     }
-    if (typeof features.brushColor !== 'undefined') {
-      brushColor = features.brushColor;
-    }
     if (typeof features.brushMode !== 'undefined') {
       brushMode = features.brushMode;
+    }
+    if (typeof features.segments !== 'undefined') {
+      segments = features.segments;
+    }
+    if (typeof features.selectedSegment !== 'undefined') {
+      selectedSegment = features.selectedSegment;
     }
   };
 
