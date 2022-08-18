@@ -397,11 +397,6 @@ dwv.tool.Brush = function (app) {
     // trigger download
     element.click();
     URL.revokeObjectURL(element.href);
-
-    // var element = document.getElementById('save');
-    // element.href = URL.createObjectURL(blob);
-    // element.download = 'brush-' + _dicomFile.name;
-
   }
 
   /**
