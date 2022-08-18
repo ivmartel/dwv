@@ -500,18 +500,19 @@ dwv.tool.Brush = function (app) {
     } else if (!isNaN(parseInt(event.key, 10))) {
       let index = parseInt(event.key, 10);
       if (index >= segments.length) {
-        index = segments.length;
-        segments.push({
-          number: index + 1,
-          label: 'new' + index,
-          algorithmType: 'MANUAL',
-          displayValue: {
-            r: Math.floor(255 * Math.random()),
-            g: Math.floor(255 * Math.random()),
-            b: Math.floor(255 * Math.random())
-          }
-        });
-        console.log(segments);
+        console.warn('Selected segment does not exist.');
+        // // add random segment
+        // index = segments.length;
+        // segments.push({
+        //   number: index + 1,
+        //   label: 'new' + index,
+        //   algorithmType: 'MANUAL',
+        //   displayValue: {
+        //     r: Math.floor(255 * Math.random()),
+        //     g: Math.floor(255 * Math.random()),
+        //     b: Math.floor(255 * Math.random())
+        //   }
+        // });
       }
       selectedSegment = index;
       console.log('segment:', segments[selectedSegment].label);
@@ -552,7 +553,8 @@ dwv.tool.Brush = function (app) {
     if (typeof features.segments !== 'undefined') {
       segments = features.segments;
     }
-    if (typeof features.selectedSegment !== 'undefined') {
+    if (typeof features.selectedSegment !== 'undefined' &&
+      features.selectedSegment < segments.length) {
       selectedSegment = features.selectedSegment;
     }
   };
