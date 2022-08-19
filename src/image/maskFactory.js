@@ -2,11 +2,24 @@
 var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
-// position patient utility functions
+/**
+ * Check two position patients for equality.
+ *
+ * @param {*} pos1 The first position patient.
+ * @param {*} pos2 The second position patient.
+ * @returns {boolean} True is equal.
+ */
 dwv.dicom.equalPosPat = function (pos1, pos2) {
   return JSON.stringify(pos1) === JSON.stringify(pos2);
 };
 
+/**
+ * Compare two position patients.
+ *
+ * @param {*} pos1 The first position patient.
+ * @param {*} pos2 The second position patient.
+ * @returns {number|null} A number used to sort elements.
+ */
 dwv.dicom.comparePosPat = function (pos1, pos2) {
   var diff = null;
   var posLen = pos1.length;
@@ -21,6 +34,12 @@ dwv.dicom.comparePosPat = function (pos1, pos2) {
   return diff;
 };
 
+/**
+ * Get a segment object from a dicom element.
+ *
+ * @param {object} element The dicom element.
+ * @returns {object} A segment object.
+ */
 dwv.dicom.getSegment = function (element) {
   // number -> SegmentNumber
   // label -> SegmentLabel
@@ -52,37 +71,12 @@ dwv.dicom.getSegment = function (element) {
   return segment;
 };
 
-dwv.dicom.getSegmentElement = function (segment) {
-  var algoType = segment.algorithmType;
-  if (typeof algoType === 'undefined') {
-    algoType = 'MANUAL';
-  }
-  var segmentElement = {
-    SegmentNumber: segment.number,
-    SegmentLabel: segment.label,
-    SegmentAlgorithmType: algoType
-  };
-  // display value
-  if (typeof segment.displayValue.r !== 'undefined' &&
-    typeof segment.displayValue.g !== 'undefined' &&
-    typeof segment.displayValue.b !== 'undefined') {
-    var cieLab = dwv.utils.labToUintLab(
-      dwv.utils.srgbToCielab(segment.displayValue));
-    segmentElement.RecommendedDisplayCIELabValue = new Uint16Array([
-      Math.round(cieLab.l),
-      Math.round(cieLab.a),
-      Math.round(cieLab.b)
-    ]);
-  } else {
-    segmentElement.RecommendedDisplayGrayscaleValue = segment.displayValue;
-  }
-  // algo name
-  if (typeof segment.algorithmName !== 'undefined') {
-    segmentElement.SegmentAlgorithmName = segment.algorithmName;
-  }
-  return segmentElement;
-};
-
+/**
+ * Get a spacing object from a dicom measure element.
+ *
+ * @param {object} element The dicom element.
+ * @returns {dwv.image.Spacing} A spacing object.
+ */
 dwv.dicom.getSpacingFromMeasure = function (measure) {
   // Pixel Spacing
   if (typeof measure.x00280030 === 'undefined') {
@@ -101,6 +95,12 @@ dwv.dicom.getSpacingFromMeasure = function (measure) {
   return new dwv.image.Spacing(spacingValues);
 };
 
+/**
+ * Get a frame information object from a dicom element.
+ *
+ * @param {object} groupItem The dicom element.
+ * @returns {object} A frame information object.
+ */
 dwv.dicom.getSegmentFrameInfo = function (groupItem) {
   // Derivation Image Sequence
   var referencedSOPInstanceUID;
@@ -161,26 +161,6 @@ dwv.dicom.getSegmentFrameInfo = function (groupItem) {
   }
 
   return frameInfo;
-};
-
-dwv.dicom.getSegmentFrameInfoElement = function (frameInfo) {
-  return {
-    FrameContentSequence: {
-      item0: {
-        DimensionIndexValues: frameInfo.dimIndex
-      }
-    },
-    PlanePositionSequence: {
-      item0: {
-        ImagePositionPatient: frameInfo.imagePosPat
-      }
-    },
-    SegmentIdentificationSequence: {
-      item0: {
-        ReferencedSegmentNumber: frameInfo.dimIndex[0].toString()
-      }
-    }
-  };
 };
 
 /**
@@ -463,6 +443,75 @@ dwv.image.MaskFactory.prototype.create = function (
   image.setMeta(meta);
 
   return image;
+};
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// Save methods
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+/**
+ * Get a dicom element from a segment object.
+ *
+ * @param {object} segment The segment object.
+ * @returns {object} The dicom element.
+ */
+dwv.dicom.getSegmentElement = function (segment) {
+  var algoType = segment.algorithmType;
+  if (typeof algoType === 'undefined') {
+    algoType = 'MANUAL';
+  }
+  var segmentElement = {
+    SegmentNumber: segment.number,
+    SegmentLabel: segment.label,
+    SegmentAlgorithmType: algoType
+  };
+  // display value
+  if (typeof segment.displayValue.r !== 'undefined' &&
+    typeof segment.displayValue.g !== 'undefined' &&
+    typeof segment.displayValue.b !== 'undefined') {
+    var cieLab = dwv.utils.labToUintLab(
+      dwv.utils.srgbToCielab(segment.displayValue));
+    segmentElement.RecommendedDisplayCIELabValue = new Uint16Array([
+      Math.round(cieLab.l),
+      Math.round(cieLab.a),
+      Math.round(cieLab.b)
+    ]);
+  } else {
+    segmentElement.RecommendedDisplayGrayscaleValue = segment.displayValue;
+  }
+  // algo name
+  if (typeof segment.algorithmName !== 'undefined') {
+    segmentElement.SegmentAlgorithmName = segment.algorithmName;
+  }
+  return segmentElement;
+};
+
+/**
+ * Get a dicom element from a frame information object.
+ *
+ * @param {object} frameInfo The frame information object.
+ * @returns {object} The dicom element.
+ */
+dwv.dicom.getSegmentFrameInfoElement = function (frameInfo) {
+  return {
+    FrameContentSequence: {
+      item0: {
+        DimensionIndexValues: frameInfo.dimIndex
+      }
+    },
+    PlanePositionSequence: {
+      item0: {
+        ImagePositionPatient: frameInfo.imagePosPat
+      }
+    },
+    SegmentIdentificationSequence: {
+      item0: {
+        ReferencedSegmentNumber: frameInfo.dimIndex[0].toString()
+      }
+    }
+  };
 };
 
 /**
