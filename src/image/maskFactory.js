@@ -3,6 +3,167 @@ var dwv = dwv || {};
 dwv.image = dwv.image || {};
 
 /**
+ * Check two position patients for equality.
+ *
+ * @param {*} pos1 The first position patient.
+ * @param {*} pos2 The second position patient.
+ * @returns {boolean} True is equal.
+ */
+dwv.dicom.equalPosPat = function (pos1, pos2) {
+  return JSON.stringify(pos1) === JSON.stringify(pos2);
+};
+
+/**
+ * Compare two position patients.
+ *
+ * @param {*} pos1 The first position patient.
+ * @param {*} pos2 The second position patient.
+ * @returns {number|null} A number used to sort elements.
+ */
+dwv.dicom.comparePosPat = function (pos1, pos2) {
+  var diff = null;
+  var posLen = pos1.length;
+  var index = posLen;
+  for (var i = 0; i < posLen; ++i) {
+    --index;
+    diff = pos2[index] - pos1[index];
+    if (diff !== 0) {
+      return diff;
+    }
+  }
+  return diff;
+};
+
+/**
+ * Get a segment object from a dicom element.
+ *
+ * @param {object} element The dicom element.
+ * @returns {object} A segment object.
+ */
+dwv.dicom.getSegment = function (element) {
+  // number -> SegmentNumber
+  // label -> SegmentLabel
+  // algorithmType -> SegmentAlgorithmType
+  var segment = {
+    number: element.x00620004.value[0],
+    label: dwv.dicom.cleanString(element.x00620005.value[0]),
+    algorithmType: dwv.dicom.cleanString(element.x00620008.value[0])
+  };
+  // algorithmName -> SegmentAlgorithmName
+  if (element.x00620009) {
+    segment.algorithmName =
+      dwv.dicom.cleanString(element.x00620009.value[0]);
+  }
+  // displayValue ->
+  // - RecommendedDisplayGrayscaleValue
+  // - RecommendedDisplayCIELabValue converted to RGB
+  if (typeof element.x0062000C !== 'undefined') {
+    segment.displayValue = element.x006200C.value;
+  } else if (typeof element.x0062000D !== 'undefined') {
+    var cielabElement = element.x0062000D.value;
+    var rgb = dwv.utils.cielabToSrgb(dwv.utils.uintLabToLab({
+      l: cielabElement[0],
+      a: cielabElement[1],
+      b: cielabElement[2]
+    }));
+    segment.displayValue = rgb;
+  }
+  return segment;
+};
+
+/**
+ * Get a spacing object from a dicom measure element.
+ *
+ * @param {object} element The dicom element.
+ * @returns {dwv.image.Spacing} A spacing object.
+ */
+dwv.dicom.getSpacingFromMeasure = function (measure) {
+  // Pixel Spacing
+  if (typeof measure.x00280030 === 'undefined') {
+    return null;
+  }
+  var pixelSpacing = measure.x00280030;
+  var spacingValues = [
+    parseFloat(pixelSpacing.value[0]),
+    parseFloat(pixelSpacing.value[1])
+  ];
+  // Spacing Between Slices
+  if (typeof measure.x00180088 !== 'undefined') {
+    var sliceThickness = measure.x00180088;
+    spacingValues.push(parseFloat(sliceThickness.value[0]));
+  }
+  return new dwv.image.Spacing(spacingValues);
+};
+
+/**
+ * Get a frame information object from a dicom element.
+ *
+ * @param {object} groupItem The dicom element.
+ * @returns {object} A frame information object.
+ */
+dwv.dicom.getSegmentFrameInfo = function (groupItem) {
+  // Derivation Image Sequence
+  var referencedSOPInstanceUID;
+  if (typeof groupItem.x00089124 !== 'undefined') {
+    var derivationImageSq = groupItem.x00089124.value;
+    // Source Image Sequence
+    if (typeof derivationImageSq[0].x00082112 !== 'undefined') {
+      var sourceImageSq = derivationImageSq[0].x00082112.value;
+      // Referenced SOP Instance UID
+      if (typeof sourceImageSq[0].x00081155 !== 'undefined') {
+        referencedSOPInstanceUID = sourceImageSq[0].x00081155.value[0];
+      }
+    }
+  }
+  // Frame Content Sequence
+  var frameContentSq = groupItem.x00209111.value;
+  // Dimension Index Value
+  // (not using Segment Identification Sequence)
+  var dimIndex = frameContentSq[0].x00209157.value;
+  // Plane Position Sequence
+  var planePosSq = groupItem.x00209113.value;
+  // Image Position (Patient)
+  var imagePosPat = planePosSq[0].x00200032.value;
+  for (var p = 0; p < imagePosPat.length; ++p) {
+    imagePosPat[p] = parseFloat(imagePosPat[p], 10);
+  }
+  var frameInfo = {
+    dimIndex: dimIndex,
+    imagePosPat: imagePosPat,
+    referencedSOPInstanceUID: referencedSOPInstanceUID
+  };
+  // Plane Orientation Sequence
+  if (typeof groupItem.x00209116 !== 'undefined') {
+    var framePlaneOrientationSeq = groupItem.x00209116;
+    if (framePlaneOrientationSeq.value.length !== 0) {
+      // should only be one Image Orientation (Patient)
+      var frameImageOrientation =
+        framePlaneOrientationSeq.value[0].x00200037.value;
+      if (typeof frameImageOrientation !== 'undefined') {
+        frameInfo.imageOrientationPatient = frameImageOrientation;
+      }
+    }
+  }
+  // Pixel Measures Sequence
+  if (typeof groupItem.x00289110 !== 'undefined') {
+    var framePixelMeasuresSeq = groupItem.x00289110;
+    if (framePixelMeasuresSeq.value.length !== 0) {
+      // should only be one
+      var frameSpacing =
+        dwv.dicom.getSpacingFromMeasure(framePixelMeasuresSeq.value[0]);
+      if (typeof frameSpacing !== 'undefined') {
+        frameInfo.spacing = frameSpacing;
+      }
+    } else {
+      dwv.logger.warn(
+        'No shared functional group pixel measure sequence items.');
+    }
+  }
+
+  return frameInfo;
+};
+
+/**
  * Mask {@link dwv.image.Image} factory.
  *
  * @class
@@ -40,7 +201,8 @@ dwv.image.MaskFactory.prototype.create = function (
 
   if (frames !== pixelBuffer.length / sliceSize) {
     throw new Error(
-      'Buffer and numberOfFrames meta are not equal.');
+      'Buffer and numberOfFrames meta are not equal.' +
+      frames + ' ' + pixelBuffer.length / sliceSize);
   }
 
   // Segmentation Type
@@ -66,61 +228,28 @@ dwv.image.MaskFactory.prototype.create = function (
   if (!segSequence || typeof segSequence === 'undefined') {
     throw new Error('Missing or empty segmentation sequence');
   }
-  var labels = [];
+  var segments = [];
   var storeAsRGB = false;
   for (var i = 0; i < segSequence.length; ++i) {
-    // value -> Segment Number
-    // name -> Segment Label
-    var label = {
-      value: segSequence[i].x00620004.value[0],
-      name: dwv.dicom.cleanString(segSequence[i].x00620005.value[0]),
-      algorithmType: dwv.dicom.cleanString(segSequence[i].x00620008.value[0])
-    };
-    // Segment Algorithm Name
-    if (segSequence[i].x00620009) {
-      label.algorithmName =
-        dwv.dicom.cleanString(segSequence[i].x00620009.value[0]);
-    }
-    // Recommended Display CIELab Value
-    if (typeof segSequence[i].x0062000D !== 'undefined') {
-      var cielabElement = segSequence[i].x0062000D.value;
-      var rgb = dwv.utils.cielabToSrgb(dwv.utils.uintLabToLab({
-        l: cielabElement[0],
-        a: cielabElement[1],
-        b: cielabElement[2]
-      }));
-      label.colour = rgb;
+    var segment = dwv.dicom.getSegment(segSequence[i]);
+    if (typeof segment.displayValue.r !== 'undefined' &&
+      typeof segment.displayValue.g !== 'undefined' &&
+      typeof segment.displayValue.b !== 'undefined') {
       // create rgb image
       storeAsRGB = true;
     }
     // store
-    labels.push(label);
+    segments.push(segment);
   }
 
   // image size
   var size = dicomElements.getImageSize();
 
-  var getSpacingFromMeasure = function (measure) {
-    if (typeof measure.x00280030 === 'undefined') {
-      return null;
-    }
-    var pixelSpacing = measure.x00280030;
-    var spacingValues = [
-      parseFloat(pixelSpacing.value[0]),
-      parseFloat(pixelSpacing.value[1])
-    ];
-    if (typeof measure.x00180088 !== 'undefined') {
-      var sliceThickness = measure.x00180088;
-      spacingValues.push(parseFloat(sliceThickness.value[0]));
-    }
-    return new dwv.image.Spacing(spacingValues);
-  };
-
   // Shared Functional Groups Sequence
   var spacing;
   var imageOrientationPatient;
   var sharedFunctionalGroupsSeq = dicomElements.getFromKey('x52009229', true);
-  if (sharedFunctionalGroupsSeq.length !== 0) {
+  if (sharedFunctionalGroupsSeq && sharedFunctionalGroupsSeq.length !== 0) {
     // should be only one
     var funcGroup0 = sharedFunctionalGroupsSeq[0];
     // Plane Orientation Sequence
@@ -128,7 +257,12 @@ dwv.image.MaskFactory.prototype.create = function (
       var planeOrientationSeq = funcGroup0.x00209116;
       if (planeOrientationSeq.value.length !== 0) {
         // should be only one
-        imageOrientationPatient = planeOrientationSeq.value[0].x00200037.value;
+        var orientArray = planeOrientationSeq.value[0].x00200037.value;
+        imageOrientationPatient = orientArray.map(
+          function (x) {
+            return parseFloat(x);
+          }
+        );
       } else {
         dwv.logger.warn(
           'No shared functional group plane orientation sequence items.');
@@ -139,7 +273,7 @@ dwv.image.MaskFactory.prototype.create = function (
       var pixelMeasuresSeq = funcGroup0.x00289110;
       if (pixelMeasuresSeq.value.length !== 0) {
         // should be only one
-        spacing = getSpacingFromMeasure(pixelMeasuresSeq.value[0]);
+        spacing = dwv.dicom.getSpacingFromMeasure(pixelMeasuresSeq.value[0]);
       } else {
         dwv.logger.warn(
           'No shared functional group pixel measure sequence items.');
@@ -147,34 +281,15 @@ dwv.image.MaskFactory.prototype.create = function (
     }
   }
 
-  // position patient utility functions
-  var equalPosPat = function (pos1, pos2) {
-    return JSON.stringify(pos1) === JSON.stringify(pos2);
-  };
-
-  var comparePosPat = function (pos1, pos2) {
-    var diff = null;
-    var posLen = pos1.length;
-    var index = posLen;
-    for (var i = 0; i < posLen; ++i) {
-      --index;
-      diff = pos2[index] - pos1[index];
-      if (diff !== 0) {
-        return diff;
-      }
-    }
-    return diff;
-  };
-
   var includesPosPat = function (arr, val) {
     return arr.some(function (arrVal) {
-      return equalPosPat(val, arrVal);
+      return dwv.dicom.equalPosPat(val, arrVal);
     });
   };
 
   var findIndexPosPat = function (arr, val) {
     return arr.findIndex(function (arrVal) {
-      return equalPosPat(val, arrVal);
+      return dwv.dicom.equalPosPat(val, arrVal);
     });
   };
 
@@ -202,79 +317,49 @@ dwv.image.MaskFactory.prototype.create = function (
   }
   // create frame info object from per frame func
   var frameInfos = [];
-  var framePosPats = [];
   for (var j = 0; j < perFrameFuncGroupSequence.length; ++j) {
-    var frameFunc = perFrameFuncGroupSequence[j];
-    // Derivation Image Sequence
-    var referencedSOPInstanceUID;
-    if (typeof frameFunc.x00089124 !== 'undefined') {
-      var derivationImageSq = frameFunc.x00089124.value;
-      // Source Image Sequence
-      if (typeof derivationImageSq[0].x00082112 !== 'undefined') {
-        var sourceImageSq = derivationImageSq[0].x00082112.value;
-        // Referenced SOP Instance UID
-        if (typeof sourceImageSq[0].x00081155 !== 'undefined') {
-          referencedSOPInstanceUID = sourceImageSq[0].x00081155.value[0];
-        }
-      }
+    frameInfos.push(
+      dwv.dicom.getSegmentFrameInfo(perFrameFuncGroupSequence[j]));
+  }
+
+  // check frame infos
+  var framePosPats = [];
+  for (var ii = 0; ii < frameInfos.length; ++ii) {
+    if (!includesPosPat(framePosPats, frameInfos[ii].imagePosPat)) {
+      framePosPats.push(frameInfos[ii].imagePosPat);
     }
-    // Frame Content Sequence
-    var frameContentSq = frameFunc.x00209111.value;
-    // Dimension Index Value
-    var dimIndex = frameContentSq[0].x00209157.value;
-    // Plane Position Sequence
-    var planePosSq = frameFunc.x00209113.value;
-    // Image Position (Patient)
-    var imagePosPat = planePosSq[0].x00200032.value;
-    for (var p = 0; p < imagePosPat.length; ++p) {
-      imagePosPat[p] = parseFloat(imagePosPat[p], 10);
-    }
-    if (!includesPosPat(framePosPats, imagePosPat)) {
-      framePosPats.push(imagePosPat);
-    }
-    frameInfos.push({
-      dimIndex: dimIndex,
-      imagePosPat: imagePosPat,
-      referencedSOPInstanceUID: referencedSOPInstanceUID
-    });
-    // Plane Orientation Sequence
-    if (typeof frameFunc.x00209116 !== 'undefined') {
-      var framePlaneOrientationSeq = frameFunc.x00209116;
-      if (framePlaneOrientationSeq.value.length !== 0) {
-        // should only be one
-        var frameImageOrientation =
-          framePlaneOrientationSeq.value[0].x00200037.value;
-        if (typeof imageOrientationPatient === 'undefined') {
-          imageOrientationPatient = frameImageOrientation;
-        } else {
-          if (!arrayEquals(frameImageOrientation, imageOrientationPatient)) {
-            throw new Error('Unsupported multi orientation dicom seg.');
-          }
-        }
-      }
-    }
-    // Pixel Measures Sequence
-    if (typeof frameFunc.x00289110 !== 'undefined') {
-      var framePixelMeasuresSeq = frameFunc.x00289110;
-      if (framePixelMeasuresSeq.value.length !== 0) {
-        // should only be one
-        var frameSpacing =
-          getSpacingFromMeasure(framePixelMeasuresSeq.value[0]);
-        if (typeof spacing === 'undefined') {
-          spacing = frameSpacing;
-        } else {
-          if (!spacing.equals(frameSpacing)) {
-            throw new Error('Unsupported multi resolution dicom seg.');
-          }
-        }
+    // store orientation if needed, avoid multi
+    if (typeof frameInfos[ii].imageOrientationPatient !== 'undefined') {
+      if (typeof imageOrientationPatient === 'undefined') {
+        imageOrientationPatient = frameInfos[ii].imageOrientationPatient;
       } else {
-        dwv.logger.warn(
-          'No shared functional group pixel measure sequence items.');
+        if (!arrayEquals(
+          imageOrientationPatient, frameInfos[ii].imageOrientationPatient)) {
+          throw new Error('Unsupported multi orientation dicom seg.');
+        }
+      }
+    }
+    // store spacing if needed, avoid multi
+    if (typeof frameInfos[ii].spacing !== 'undefined') {
+      if (typeof spacing === 'undefined') {
+        spacing = frameInfos[ii].spacing;
+      } else {
+        if (!spacing.equals(frameInfos[ii].spacing)) {
+          throw new Error('Unsupported multi resolution dicom seg.');
+        }
       }
     }
   }
   // sort positions patient
-  framePosPats.sort(comparePosPat);
+  framePosPats.sort(dwv.dicom.comparePosPat);
+
+  // check spacing and orientation
+  if (typeof spacing === 'undefined') {
+    throw new Error('No spacing found for DICOM SEG');
+  }
+  if (typeof imageOrientationPatient === 'undefined') {
+    throw new Error('No imageOrientationPatient found for DICOM SEG');
+  }
 
   // add missing posPats
   var posPats = [];
@@ -283,7 +368,7 @@ dwv.image.MaskFactory.prototype.create = function (
     posPats.push(framePosPats[g]);
     var nextZ = framePosPats[g][2] - sliceSpacing;
     var diff = Math.abs(nextZ - framePosPats[g + 1][2]);
-    while (diff > sliceSpacing) {
+    while (diff >= sliceSpacing) {
       posPats.push([framePosPats[g][0], framePosPats[g][1], nextZ]);
       nextZ -= sliceSpacing;
       diff = Math.abs(nextZ - framePosPats[g + 1][2]);
@@ -292,7 +377,7 @@ dwv.image.MaskFactory.prototype.create = function (
   posPats.push(framePosPats[framePosPats.length - 1]);
 
   // create output buffer
-  // as many slices as posPats -> gap slices between groups are not represented
+  // as many slices as posPats
   var numberOfSlices = posPats.length;
   var mul = storeAsRGB ? 3 : 1;
   var buffer = new pixelBuffer.constructor(mul * sliceSize * numberOfSlices);
@@ -301,19 +386,14 @@ dwv.image.MaskFactory.prototype.create = function (
   var sliceOffset = null;
   var sliceIndex = null;
   var frameOffset = null;
-  var labelIndex = null;
+  var segmentIndex = null;
   for (var f = 0; f < frameInfos.length; ++f) {
     // get the slice index from the position in the posPat array
     sliceIndex = findIndexPosPat(posPats, frameInfos[f].imagePosPat);
     frameOffset = sliceSize * f;
-    labelIndex = frameInfos[f].dimIndex[0] - 1;
+    segmentIndex = frameInfos[f].dimIndex[0] - 1;
     sliceOffset = sliceSize * sliceIndex;
-    var pixelValue;
-    if (storeAsRGB) {
-      pixelValue = labels[labelIndex].colour;
-    } else {
-      pixelValue = labels[labelIndex].value;
-    }
+    var pixelValue = segments[segmentIndex].displayValue;
     for (var l = 0; l < sliceSize; ++l) {
       if (pixelBuffer[frameOffset + l] !== 0) {
         var offset = mul * (sliceOffset + l);
@@ -357,7 +437,7 @@ dwv.image.MaskFactory.prototype.create = function (
     SeriesInstanceUID: dicomElements.getFromKey('x0020000E'),
     ImageOrientationPatient: imageOrientationPatient,
     custom: {
-      labels: labels,
+      segments: segments,
       frameInfos: frameInfos
     }
   };
