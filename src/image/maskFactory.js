@@ -74,7 +74,7 @@ dwv.dicom.getSegment = function (element) {
 /**
  * Get a spacing object from a dicom measure element.
  *
- * @param {object} element The dicom element.
+ * @param {object} measure The dicom element.
  * @returns {dwv.image.Spacing} A spacing object.
  */
 dwv.dicom.getSpacingFromMeasure = function (measure) {
