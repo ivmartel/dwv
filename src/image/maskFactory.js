@@ -74,7 +74,7 @@ dwv.dicom.getSegment = function (element) {
 /**
  * Get a spacing object from a dicom measure element.
  *
- * @param {object} element The dicom element.
+ * @param {object} measure The dicom element.
  * @returns {dwv.image.Spacing} A spacing object.
  */
 dwv.dicom.getSpacingFromMeasure = function (measure) {
@@ -434,11 +434,12 @@ dwv.image.MaskFactory.prototype.create = function (
   var meta = {
     Modality: 'SEG',
     BitsStored: 8,
-    segments: segments,
-    frameInfos: frameInfos,
     SeriesInstanceUID: dicomElements.getFromKey('x0020000E'),
-    SOPInstanceUID: dicomElements.getFromKey('x00080018'),
-    ImageOrientationPatient: imageOrientationPatient
+    ImageOrientationPatient: imageOrientationPatient,
+    custom: {
+      segments: segments,
+      frameInfos: frameInfos
+    }
   };
   image.setMeta(meta);
 

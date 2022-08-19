@@ -301,7 +301,7 @@ dwv.tool.Brush = function (app) {
       baseGeometry = mask.getGeometry();
       // update segments
       // TODO: check equal
-      segments = mask.getMeta().segments;
+      segments = mask.getMeta().custom.segments;
       selectedSegment = 0;
     }
 
