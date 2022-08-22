@@ -2,6 +2,243 @@
 // import * as DicomWebViewer from 'dwv';
 // export const dwv = DicomWebViewer || {};
 
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// Save methods
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+/**
+ * Get a dicom element from a segment object.
+ *
+ * @param {object} segment The segment object.
+ * @returns {object} The dicom element.
+ */
+dwv.dicom.getSegmentElement = function (segment) {
+  var algoType = segment.algorithmType;
+  if (typeof algoType === 'undefined') {
+    algoType = 'MANUAL';
+  }
+  var segmentElement = {
+    SegmentNumber: segment.number,
+    SegmentLabel: segment.label,
+    SegmentAlgorithmType: algoType
+  };
+  // display value
+  if (typeof segment.displayValue.r !== 'undefined' &&
+    typeof segment.displayValue.g !== 'undefined' &&
+    typeof segment.displayValue.b !== 'undefined') {
+    var cieLab = dwv.utils.labToUintLab(
+      dwv.utils.srgbToCielab(segment.displayValue));
+    segmentElement.RecommendedDisplayCIELabValue = new Uint16Array([
+      Math.round(cieLab.l),
+      Math.round(cieLab.a),
+      Math.round(cieLab.b)
+    ]);
+  } else {
+    segmentElement.RecommendedDisplayGrayscaleValue = segment.displayValue;
+  }
+  // algo name
+  if (typeof segment.algorithmName !== 'undefined') {
+    segmentElement.SegmentAlgorithmName = segment.algorithmName;
+  }
+  return segmentElement;
+};
+
+/**
+ * Get a dicom element from a frame information object.
+ *
+ * @param {object} frameInfo The frame information object.
+ * @returns {object} The dicom element.
+ */
+dwv.dicom.getSegmentFrameInfoElement = function (frameInfo) {
+  return {
+    FrameContentSequence: {
+      item0: {
+        DimensionIndexValues: frameInfo.dimIndex
+      }
+    },
+    PlanePositionSequence: {
+      item0: {
+        ImagePositionPatient: frameInfo.imagePosPat
+      }
+    },
+    SegmentIdentificationSequence: {
+      item0: {
+        ReferencedSegmentNumber: frameInfo.dimIndex[0].toString()
+      }
+    }
+  };
+};
+
+/**
+ * Convert a mask image into a DICOM segmentation object.
+ * @param {dwv.image.Image} image The mask image.
+ * @param {Array} segments The mask segments.
+ * @returns {object} A list of dicom elements.
+ */
+dwv.image.MaskFactory.prototype.toDicom = function (image, segments) {
+
+  if (typeof segments === 'undefined') {
+    segments = image.getMeta().segments;
+  }
+
+  var geometry = image.getGeometry();
+  var size = geometry.getSize();
+  var spacing = geometry.getSpacing();
+  var numberOfComponents = image.getNumberOfComponents();
+  var isRGB = numberOfComponents === 3;
+
+  // base tags
+  var tags = {
+    TransferSyntaxUID: '1.2.840.10008.1.2.1',
+    Modality: 'SEG',
+    SegmentationType: 'BINARY',
+    PhotometricInterpretation: 'MONOCHROME2',
+    SamplesPerPixel: 1,
+    PixelRepresentation: 0,
+    Rows: size.get(1),
+    Columns: size.get(0),
+    BitsAllocated: 1
+  };
+
+  // segments
+  var segmentsTag = {};
+  for (var l = 0; l < segments.length; ++l) {
+    segmentsTag['item' + l] = dwv.dicom.getSegmentElement(segments[l]);
+  }
+  tags.SegmentSequence = segmentsTag;
+
+  // Shared Functional Groups Sequence
+  tags.SharedFunctionalGroupsSequence = {
+    item0: {
+      PlaneOrientationSequence: {
+        item0: {
+          ImageOrientationPatient: image.getMeta().ImageOrientationPatient
+        }
+      },
+      PixelMeasuresSequence: {
+        item0: {
+          PixelSpacing: [spacing.get(1), spacing.get(0)],
+          SpacingBetweenSlices: spacing.get(2).toString()
+        }
+      }
+    }
+  };
+
+  var getPixelValue;
+  var equalValues;
+  if (isRGB) {
+    getPixelValue = function (inputOffset) {
+      return {
+        r: image.getValueAtOffset(inputOffset, 0),
+        g: image.getValueAtOffset(inputOffset + 1, 0),
+        b: image.getValueAtOffset(inputOffset + 2, 0)
+      };
+    };
+    equalValues = function (a, b) {
+      return a.r === b.r &&
+        a.g === b.g &&
+        a.b === b.b;
+    };
+  } else {
+    getPixelValue = function (inputOffset) {
+      return image.getValueAtOffset(inputOffset, 0);
+    };
+    equalValues = function (a, b) {
+      return a === b;
+    };
+  }
+
+  // image buffer to multi frame
+  var sliceSize = size.getDimSize(2);
+  var roiBuffers = {};
+  for (var k = 0; k < size.get(2); ++k) {
+    var sliceOffset = k * sliceSize;
+    // initialise buffers
+    var buffers = {};
+    // search pixels
+    for (var o = 0; o < sliceSize; ++o) {
+      var inputOffset = (sliceOffset + o) * numberOfComponents;
+      var pixelValue = getPixelValue(inputOffset);
+      for (var n2 = 0; n2 < segments.length; ++n2) {
+        var number2 = segments[n2].number - 1;
+        if (equalValues(pixelValue, segments[n2].displayValue)) {
+          if (typeof buffers[number2] === 'undefined') {
+            buffers[number2] = new Uint8Array(sliceSize);
+          }
+          buffers[number2][o] = 1;
+        }
+      }
+    }
+
+    // store slice buffers
+    var keys0 = Object.keys(buffers);
+    for (var k0 = 0; k0 < keys0.length; ++k0) {
+      var key0 = keys0[k0];
+      if (typeof roiBuffers[key0] === 'undefined') {
+        roiBuffers[key0] = {};
+      }
+      // ordering by slice index (follows posPat)
+      roiBuffers[key0][k] = buffers[key0];
+    }
+  }
+
+  var frameInfos = [];
+
+  // flatten buffer array
+  var finalBuffers = [];
+  for (var n4 = 0; n4 < segments.length; ++n4) {
+    var number40 = segments[n4].number;
+    var number4 = number40 - 1;
+    var keys1 = Object.keys(roiBuffers[number4]);
+    // revert slice order
+    for (var k1 = keys1.length - 1; k1 >= 0; --k1) {
+      var key1 = keys1[k1];
+      finalBuffers.push(roiBuffers[number4][key1]);
+      // frame info
+      var posPat = image.getGeometry().getOrigins()[key1];
+      frameInfos.push({
+        dimIndex: [number40, keys1.length - k1],
+        imagePosPat: [posPat.getX(), posPat.getY(), posPat.getZ()]
+      });
+    }
+  }
+
+  tags.NumberOfFrames = finalBuffers.length.toString();
+
+  // frame infos
+  var frameInfosTag = {};
+  for (var f = 0; f < frameInfos.length; ++f) {
+    frameInfosTag['item' + f] =
+      dwv.dicom.getSegmentFrameInfoElement(frameInfos[f]);
+  }
+  tags.PerFrameFunctionalGroupsSequence = frameInfosTag;
+
+  // convert JSON to DICOM element object
+  var res = dwv.dicom.getElementsFromJSONTags(tags);
+  var dicomElements = res.elements;
+
+  // pixel value length: divide by 8 to trigger binary write
+  var pixVl = finalBuffers.length * sliceSize / 8;
+  dicomElements.x7FE00010 = {
+    tag: {group: '0x7FE0', element: '0x0010', name: 'x7FE00010'},
+    vr: 'OB',
+    vl: pixVl,
+    value: finalBuffers,
+    startOffset: res.offset,
+    endOffset: res.offset + pixVl
+  };
+
+  return dicomElements;
+};
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
 // namespaces
 // var dwv = dwv || {};
 dwv.tool = dwv.tool || {};
