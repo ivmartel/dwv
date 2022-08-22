@@ -23,7 +23,7 @@ dwv.image.validateWindowWidth = function (value) {
  * WindowLevel class.
  * <br>Pseudo-code:
  * <pre>
- *  if (x <= c - 0.5 - (w-1)/2), then y = ymin
+ *  if (x &lt;= c - 0.5 - (w-1)/2), then y = ymin
  *  else if (x > c - 0.5 + (w-1)/2), then y = ymax,
  *  else y = ((x - (c - 0.5)) / (w-1) + 0.5) * (ymax - ymin) + ymin
  * </pre>

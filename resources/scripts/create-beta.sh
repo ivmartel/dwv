@@ -59,6 +59,10 @@ then
   a1="  return '[0-9]+\.[0-9]+\.[0-9]+-beta\.[0-9]+';"
   b1="  return '${betaVersion}';"
   sed -i -r "s/${a1}/${b1}/g" src/dicom/dicomParser.js
+  a2="[0-9]+\.[0-9]+\.[0-9]+-beta\.[0-9]+"
+  b2="${betaVersion};"
+  sed -i -r "s/${a2}/${b2}/g" resources/doc/jsdoc.conf.json
+
 
   ((step++))
 fi

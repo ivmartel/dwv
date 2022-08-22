@@ -7,6 +7,65 @@ dwv.tool = dwv.tool || {};
  *
  * @class
  * @param {dwv.App} app The associated application.
+ * @example
+ * // create the dwv app
+ * var app = new dwv.App();
+ * // initialise
+ * app.init({
+ *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
+ *   tools: {Scroll: {}}
+ * });
+ * // activate tool
+ * app.addEventListener('load', function () {
+ *   app.setTool('Scroll');
+ * });
+ * // load dicom data
+ * app.loadURLs([
+ *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm',
+ *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323707.dcm',
+ *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323563.dcm'
+ * ]);
+ * @example <caption>Example with slider</caption>
+ * // create the dwv app
+ * var app = new dwv.App();
+ * // initialise
+ * app.init({
+ *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
+ *   tools: {Scroll: {}}
+ * });
+ * // create range
+ * var range = document.createElement('input');
+ * range.type = 'range';
+ * range.min = 0;
+ * range.id = 'sliceRange';
+ * document.body.appendChild(range);
+ * // update app on slider change
+ * range.oninput = function () {
+ *   var lg = app.getLayerGroupById(0);
+ *   var vc = lg.getActiveViewLayer().getViewController();
+ *   var index = vc.getCurrentIndex();
+ *   var values = index.getValues();
+ *   values[2] = this.value;
+ *   vc.setCurrentIndex(new dwv.math.Index(values));
+ * }
+ * // activate tool and update range max on load
+ * app.addEventListener('load', function () {
+ *   app.setTool('Scroll');
+ *   var size = app.getImage(0).getGeometry().getSize();
+ *   range.max = size.get(2) - 1;
+ * });
+ * // update slider on slice change (for ex via mouse wheel)
+ * app.addEventListener('positionchange', function () {
+ *   var lg = app.getLayerGroupById(0);
+ *   var vc = lg.getActiveViewLayer().getViewController();
+ *   range.value = vc.getCurrentIndex().get(2);
+ * });
+ * // load dicom data
+ * app.loadURLs([
+ *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm',
+ *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323707.dcm',
+ *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323563.dcm'
+ * ]);
  */
 dwv.tool.Scroll = function (app) {
   /**
