@@ -1,11 +1,11 @@
-DWV API documentation
-======================
+DWV documentation
+=================
 
 DWV (DICOM Web Viewer) is an open source zero footprint medical image viewer. It uses _only_ javascript and HTML5 technologies, meaning that it can be run on any platform that provides a modern browser (laptop, tablet, phone and even modern TVs). It can load local or remote data in DICOM format (the standard for medical imaging data such as MR, CT, Echo, Mammo, NM...) and  provides standard tools for its manipulation such as contrast, zoom, drag, possibility to draw regions on top of the image and imaging filters such as threshold and sharpening.
 
 The DWV home page is: [github.com/ivmartel/dwv](https://github.com/ivmartel/dwv).
 
-Try a [live demo](https://ivmartel.github.io/dwv/) and find more information on the [wiki](https://github.com/ivmartel/dwv/wiki) (such as [Dicom-Support](https://github.com/ivmartel/dwv/wiki/Dicom-Support) or [Pacs-Support](https://github.com/ivmartel/dwv/wiki/Pacs-Support)). You can also check out the [example viewers](https://github.com/ivmartel/dwv/wiki/Examples#viewers-and-integrations) based on dwv.
+Try a [live demo](https://ivmartel.github.io/dwv/) and find more information on the [docs](https://ivmartel.github.io/dwv/doc/stable/index.html) (such as [examples](https://ivmartel.github.io/dwv/doc/stable/tutorial-examples.html), [dicom conformance](https://ivmartel.github.io/dwv/doc/stable/tutorial-conformance.html), [pacs integrations](https://ivmartel.github.io/dwv/doc/stable/tutorial-integrations.html)). You can also check out the [wiki](https://github.com/ivmartel/dwv/wiki).
 
  - All coding/implementation contributions and comments are welcome.
  - DWV is not certified for diagnostic use.<sup>[1](#footnote1)</sup>

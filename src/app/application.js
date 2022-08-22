@@ -6,6 +6,17 @@ var dwv = dwv || {};
  *
  * @class
  * @tutorial examples
+ * @example
+ * // create the dwv app
+ * var app = new dwv.App();
+ * // initialise
+ * app.init({
+ *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]}
+ * });
+ * // load dicom data
+ * app.loadURLs([
+ *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
+ * ]);
  */
 dwv.App = function () {
   // closure to self
@@ -283,6 +294,31 @@ dwv.App = function () {
    *   after the first loaded data or not
    * - `defaultCharacterSet`: the default chraracter set string used for DICOM
    *   parsing
+   * @example
+   * // create the dwv app
+   * var app = new dwv.App();
+   * // initialise
+   * app.init({
+   *   dataViewConfigs: {'*': [{divId: 'layerGroup0'}]},
+   *   viewOnFirstLoadItem: false
+   * });
+   * // render button
+   * var button = document.createElement('button');
+   * button.id = 'render';
+   * button.appendChild(document.createTextNode('render'));
+   * document.body.appendChild(button);
+   * app.addEventListener('load', function () {
+   *   var button = document.getElementById('render');
+   *   button.disabled = false;
+   *   button.onclick = function () {
+   *     // render data #0
+   *     app.render(0);
+   *   };
+   * });
+   * // load dicom data
+   * app.loadURLs([
+   *   'https://raw.githubusercontent.com/ivmartel/dwv/master/tests/data/bbmri-53323851.dcm'
+   * ]);
    */
   this.init = function (opt) {
     // store
