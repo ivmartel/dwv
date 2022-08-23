@@ -35,6 +35,97 @@ dwv.dicom.comparePosPat = function (pos1, pos2) {
 };
 
 /**
+ * Check the required and supported tags.
+ *
+ * @param {object} rootElement The root dicom element.
+ */
+dwv.dicom.checkDicomSeg = function (rootElement) {
+  // Transfer Syntax
+  var syntax = dwv.dicom.cleanString(rootElement.getFromKey('x00020010'));
+  var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
+  if (algoName !== null) {
+    throw new Error('Unsupported compressed segmentation: ' + algoName);
+  }
+
+  // Segmentation Type (required)
+  var segmentationType = rootElement.getFromKey('x00620001');
+  if (!segmentationType) {
+    throw new Error('Missing or empty DICOM segmentation type');
+  }
+  segmentationType = dwv.dicom.cleanString(segmentationType);
+  if (segmentationType !== 'BINARY') {
+    throw new Error('Unsupported segmentation type: ' + segmentationType);
+  }
+
+  // Dimension Organization Type (optional)
+  var dimOrgType = rootElement.getFromKey('x00209311');
+  if (dimOrgType) {
+    dimOrgType = dwv.dicom.cleanString(dimOrgType);
+    if (dimOrgType !== '3D') {
+      throw new Error('Unsupported dimension organization type: ' + dimOrgType);
+    }
+  }
+};
+
+/**
+ * Check the dimension organization from a dicom element.
+ *
+ * @param {object} rootElement The root dicom element.
+ * @returns {object} The dimension organizations and indices.
+ */
+dwv.dicom.getDimensionOrganization = function (rootElement) {
+  // Dimension Organization Sequence (required)
+  var orgSq = rootElement.getFromKey('x00209221', true);
+  if (!orgSq || orgSq.length !== 1) {
+    throw new Error('Unsupported dimension organization sequence length');
+  }
+  // Dimension Organization UID
+  var orgs = [dwv.dicom.cleanString(orgSq[0].x00209164.value[0])];
+
+  // Dimension Index Sequence (conditionally required)
+  var indices = [];
+  var indexSq = rootElement.getFromKey('x00209222', true);
+  if (indexSq) {
+    // expecting 2D index
+    if (indexSq.length !== 2) {
+      throw new Error('Unsupported dimension index sequence length');
+    }
+    for (var i = 0; i < indexSq.length; ++i) {
+      // Dimension Organization UID (required)
+      var indexOrg = dwv.dicom.cleanString(indexSq[i].x00209164.value[0]);
+      if (indexOrg !== orgs[0]) {
+        throw new Error(
+          'Dimension Index Sequence contains a unknown Dimension Organization');
+      }
+      // Dimension Index Pointer (required)
+      var indexPointer =
+        dwv.dicom.cleanString(indexSq[i].x00209165.value[0]);
+
+      var index = {
+        organization: indexOrg,
+        pointer: indexPointer
+      };
+      // Dimension Description Label (optional)
+      if (typeof indexSq[i].x00209421 !== 'undefined') {
+        index.label =
+          dwv.dicom.cleanString(indexSq[i].x00209421.value[0]);
+      }
+      // store
+      indices.push(index);
+    }
+    // expecting Image Position at last position
+    if (indices[1].pointer !== '(0020,0032)') {
+      throw new Error('Unsupported non image position as last index');
+    }
+  }
+
+  return {
+    organizations: orgs,
+    indices: indices
+  };
+};
+
+/**
  * Get a segment object from a dicom element.
  *
  * @param {object} element The dicom element.
@@ -103,26 +194,43 @@ dwv.dicom.getSpacingFromMeasure = function (measure) {
  */
 dwv.dicom.getSegmentFrameInfo = function (groupItem) {
   // Derivation Image Sequence
-  var referencedSOPInstanceUID;
+  var derivationImages = [];
   if (typeof groupItem.x00089124 !== 'undefined') {
     var derivationImageSq = groupItem.x00089124.value;
     // Source Image Sequence
-    if (typeof derivationImageSq[0].x00082112 !== 'undefined') {
-      var sourceImageSq = derivationImageSq[0].x00082112.value;
-      // Referenced SOP Instance UID
-      if (typeof sourceImageSq[0].x00081155 !== 'undefined') {
-        referencedSOPInstanceUID = sourceImageSq[0].x00081155.value[0];
+    for (var i = 0; i < derivationImageSq.length; ++i) {
+      var sourceImages = [];
+      if (typeof derivationImageSq[i].x00082112 !== 'undefined') {
+        var sourceImageSq = derivationImageSq[i].x00082112.value;
+        for (var j = 0; j < sourceImageSq.length; ++j) {
+          var sourceImage = {};
+          // Referenced SOP Class UID
+          if (typeof sourceImageSq[j].x00081150 !== 'undefined') {
+            sourceImage.referencedSOPClassUID =
+              sourceImageSq[j].x00081150.value[0];
+          }
+          // Referenced SOP Instance UID
+          if (typeof sourceImageSq[j].x00081155 !== 'undefined') {
+            sourceImage.referencedSOPInstanceUID =
+              sourceImageSq[j].x00081155.value[0];
+          }
+          sourceImages.push(sourceImage);
+        }
       }
+      derivationImages.push(sourceImages);
     }
   }
-  // Frame Content Sequence
+  // Frame Content Sequence (required, only one)
   var frameContentSq = groupItem.x00209111.value;
   // Dimension Index Value
-  // (not using Segment Identification Sequence)
   var dimIndex = frameContentSq[0].x00209157.value;
-  // Plane Position Sequence
+  // Segment Identification Sequence (required, only one)
+  var segmentIdSq = groupItem.x0062000A.value;
+  // Referenced Segment Number
+  var refSegmentNumber = segmentIdSq[0].x0062000B.value[0];
+  // Plane Position Sequence (required, only one)
   var planePosSq = groupItem.x00209113.value;
-  // Image Position (Patient)
+  // Image Position (Patient) (conditionally required)
   var imagePosPat = planePosSq[0].x00200032.value;
   for (var p = 0; p < imagePosPat.length; ++p) {
     imagePosPat[p] = parseFloat(imagePosPat[p], 10);
@@ -130,7 +238,8 @@ dwv.dicom.getSegmentFrameInfo = function (groupItem) {
   var frameInfo = {
     dimIndex: dimIndex,
     imagePosPat: imagePosPat,
-    referencedSOPInstanceUID: referencedSOPInstanceUID
+    derivationImages: derivationImages,
+    refSegmentNumber: refSegmentNumber
   };
   // Plane Orientation Sequence
   if (typeof groupItem.x00209116 !== 'undefined') {
@@ -179,6 +288,9 @@ dwv.image.MaskFactory = function () {};
  */
 dwv.image.MaskFactory.prototype.create = function (
   dicomElements, pixelBuffer) {
+  // check required and supported tags
+  dwv.dicom.checkDicomSeg(dicomElements);
+
   // columns
   var columns = dicomElements.getFromKey('x00280011');
   if (!columns) {
@@ -205,23 +317,8 @@ dwv.image.MaskFactory.prototype.create = function (
       frames + ' ' + pixelBuffer.length / sliceSize);
   }
 
-  // Segmentation Type
-  var segType = dicomElements.getFromKey('x00620001');
-  if (!segType) {
-    throw new Error('Missing or empty DICOM segmentation type');
-  } else {
-    segType = dwv.dicom.cleanString(segType);
-  }
-  if (segType !== 'BINARY') {
-    throw new Error('Unsupported segmentation type: ' + segType);
-  }
-
-  // check if compressed
-  var syntax = dwv.dicom.cleanString(dicomElements.getFromKey('x00020010'));
-  var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
-  if (algoName !== null) {
-    throw new Error('Unsupported compressed segmentation: ' + algoName);
-  }
+  // Dimension Organization and Index
+  var dimension = dwv.dicom.getDimensionOrganization(dicomElements);
 
   // Segment Sequence
   var segSequence = dicomElements.getFromKey('x00620002', true);
@@ -376,6 +473,12 @@ dwv.image.MaskFactory.prototype.create = function (
   }
   posPats.push(framePosPats[framePosPats.length - 1]);
 
+  var getFindSegmentFunc = function (number) {
+    return function (item) {
+      return item.number === number;
+    };
+  };
+
   // create output buffer
   // as many slices as posPats
   var numberOfSlices = posPats.length;
@@ -386,14 +489,16 @@ dwv.image.MaskFactory.prototype.create = function (
   var sliceOffset = null;
   var sliceIndex = null;
   var frameOffset = null;
-  var segmentIndex = null;
   for (var f = 0; f < frameInfos.length; ++f) {
     // get the slice index from the position in the posPat array
     sliceIndex = findIndexPosPat(posPats, frameInfos[f].imagePosPat);
     frameOffset = sliceSize * f;
-    segmentIndex = frameInfos[f].dimIndex[0] - 1;
     sliceOffset = sliceSize * sliceIndex;
-    var pixelValue = segments[segmentIndex].displayValue;
+    // get the frame display value
+    var frameSegment = segments.find(
+      getFindSegmentFunc(frameInfos[f].refSegmentNumber)
+    );
+    var pixelValue = frameSegment.displayValue;
     for (var l = 0; l < sliceSize; ++l) {
       if (pixelBuffer[frameOffset + l] !== 0) {
         var offset = mul * (sliceOffset + l);
@@ -433,6 +538,10 @@ dwv.image.MaskFactory.prototype.create = function (
   // image meta
   var meta = {
     Modality: 'SEG',
+    SegmentationType: 'BINARY',
+    DimensionOrganizationType: '3D',
+    DimensionOrganizations: dimension.organizations,
+    DimensionIndices: dimension.indices,
     BitsStored: 8,
     SeriesInstanceUID: dicomElements.getFromKey('x0020000E'),
     ImageOrientationPatient: imageOrientationPatient,
