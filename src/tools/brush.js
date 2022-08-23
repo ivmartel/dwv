@@ -47,6 +47,23 @@ dwv.dicom.getSegmentElement = function (segment) {
 };
 
 /**
+ * Get a dicom element from a dimension index object.
+ *
+ * @param {object} dimensionIndex The dimension index object.
+ * @returns {object} The dicom element.
+ */
+dwv.dicom.getDimensionIndexElement = function (dimensionIndex) {
+  var indexElement = {
+    DimensionOrganizationUID: dimensionIndex.organization,
+    DimensionIndexPointer: [dimensionIndex.pointer]
+  };
+  if (typeof dimensionIndex.label !== 'undefined') {
+    indexElement.DimensionDescriptionLabel = dimensionIndex.label;
+  }
+  return indexElement;
+};
+
+/**
  * Get a dicom element from a frame information object.
  *
  * @param {object} frameInfo The frame information object.
@@ -66,7 +83,24 @@ dwv.dicom.getSegmentFrameInfoElement = function (frameInfo) {
     },
     SegmentIdentificationSequence: {
       item0: {
-        ReferencedSegmentNumber: frameInfo.dimIndex[0].toString()
+        ReferencedSegmentNumber: frameInfo.refSegmentNumber.toString()
+      }
+    }
+  };
+};
+
+/**
+ * Get a dicom element from a frame information object.
+ *
+ * @param {object} frameInfo The frame information object.
+ * @returns {object} The dicom element.
+ */
+dwv.dicom.getMeasureSequenceElement = function (spacing) {
+  return {
+    PixelMeasuresSequence: {
+      item0: {
+        PixelSpacing: [spacing.get(1), spacing.get(0)],
+        SpacingBetweenSlices: spacing.get(2).toString()
       }
     }
   };
@@ -79,7 +113,7 @@ dwv.dicom.getSegmentFrameInfoElement = function (frameInfo) {
  * @returns {object} A list of dicom elements.
  */
 dwv.image.MaskFactory.prototype.toDicom = function (image, segments) {
-
+  // use image segments if not provided as input
   if (typeof segments === 'undefined') {
     segments = image.getMeta().segments;
   }
@@ -89,12 +123,14 @@ dwv.image.MaskFactory.prototype.toDicom = function (image, segments) {
   var spacing = geometry.getSpacing();
   var numberOfComponents = image.getNumberOfComponents();
   var isRGB = numberOfComponents === 3;
+  var orientationPatient = image.getMeta().ImageOrientationPatient;
 
   // base tags
   var tags = {
     TransferSyntaxUID: '1.2.840.10008.1.2.1',
     Modality: 'SEG',
     SegmentationType: 'BINARY',
+    DimensionOrganizationType: '3D',
     PhotometricInterpretation: 'MONOCHROME2',
     SamplesPerPixel: 1,
     PixelRepresentation: 0,
@@ -102,6 +138,27 @@ dwv.image.MaskFactory.prototype.toDicom = function (image, segments) {
     Columns: size.get(0),
     BitsAllocated: 1
   };
+
+  // use existing dimension organization if present
+  if (typeof image.getMeta().DimensionOrganizations !== 'undefined') {
+    var orgs = image.getMeta().DimensionOrganizations;
+    // should be only one
+    tags.DimensionOrganizationSequence = {
+      item0: {
+        DimensionOrganizationUID: orgs[0]
+      }
+    };
+  }
+  // use existing dimension organization if present
+  if (typeof image.getMeta().DimensionIndices !== 'undefined') {
+    var indices = image.getMeta().DimensionIndices;
+    var indicesTag = {};
+    for (var m = 0; m < indices.length; ++m) {
+      indicesTag['item' + m] = dwv.dicom.getDimensionIndexElement(indices[m]);
+    }
+    console.log(indicesTag);
+    tags.DimensionIndexSequence = indicesTag;
+  }
 
   // segments
   var segmentsTag = {};
@@ -115,15 +172,10 @@ dwv.image.MaskFactory.prototype.toDicom = function (image, segments) {
     item0: {
       PlaneOrientationSequence: {
         item0: {
-          ImageOrientationPatient: image.getMeta().ImageOrientationPatient
+          ImageOrientationPatient: orientationPatient
         }
       },
-      PixelMeasuresSequence: {
-        item0: {
-          PixelSpacing: [spacing.get(1), spacing.get(0)],
-          SpacingBetweenSlices: spacing.get(2).toString()
-        }
-      }
+      PixelMeasuresSequence: dwv.dicom.getMeasureSequenceElement(spacing)
     }
   };
 
@@ -201,7 +253,8 @@ dwv.image.MaskFactory.prototype.toDicom = function (image, segments) {
       var posPat = image.getGeometry().getOrigins()[key1];
       frameInfos.push({
         dimIndex: [number40, keys1.length - k1],
-        imagePosPat: [posPat.getX(), posPat.getY(), posPat.getZ()]
+        imagePosPat: [posPat.getX(), posPat.getY(), posPat.getZ()],
+        refSegmentNumber: number40
       });
     }
   }
