@@ -97,11 +97,9 @@ dwv.dicom.getSegmentFrameInfoElement = function (frameInfo) {
  */
 dwv.dicom.getMeasureSequenceElement = function (spacing) {
   return {
-    PixelMeasuresSequence: {
-      item0: {
-        PixelSpacing: [spacing.get(1), spacing.get(0)],
-        SpacingBetweenSlices: spacing.get(2).toString()
-      }
+    item0: {
+      PixelSpacing: [spacing.get(1), spacing.get(0)],
+      SpacingBetweenSlices: spacing.get(2).toString()
     }
   };
 };
@@ -156,7 +154,6 @@ dwv.image.MaskFactory.prototype.toDicom = function (image, segments) {
     for (var m = 0; m < indices.length; ++m) {
       indicesTag['item' + m] = dwv.dicom.getDimensionIndexElement(indices[m]);
     }
-    console.log(indicesTag);
     tags.DimensionIndexSequence = indicesTag;
   }
 
