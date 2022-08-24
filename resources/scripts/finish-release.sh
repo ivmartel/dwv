@@ -98,7 +98,7 @@ then
   b1="  return '${nextVersion}-beta.0';"
   sed -i -r "s/${a1}/${b1}/g" src/dicom/dicomParser.js
   a2="[0-9]+\.[0-9]+\.[0-9]+"
-  b2="${nextVersion};"
+  b2="${nextVersion}"
   sed -i -r "s/${a2}/${b2}/g" resources/doc/jsdoc.conf.json
   # commit
   git commit -a -m "Bumped version number to v${nextVersion}-beta.0"
