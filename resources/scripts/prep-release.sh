@@ -82,7 +82,7 @@ then
   b1="  return '${releaseVersion}';"
   sed -i -r "s/${a1}/${b1}/g" src/dicom/dicomParser.js
   a2="[0-9]+\.[0-9]+\.[0-9]+-beta\.[0-9]+"
-  b2="${releaseVersion};"
+  b2="${releaseVersion}"
   sed -i -r "s/${a2}/${b2}/g" resources/doc/jsdoc.conf.json
 
   ((step++))
