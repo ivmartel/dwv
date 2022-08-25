@@ -163,6 +163,82 @@ dwv.dicom.getSegment = function (element) {
 };
 
 /**
+ * Check if two segment objects are equal.
+ *
+ * @param {object} seg1 The first segment.
+ * @param {object} seg2 The second segment.
+ * @returns {boolean} True if both segment are equal.
+ */
+dwv.dicom.isEqualSegment = function (seg1, seg2) {
+  // basics
+  if (typeof seg1 === 'undefined' ||
+    typeof seg2 === 'undefined' ||
+    seg1 === null ||
+    seg2 === null) {
+    return false;
+  }
+  var isEqual = seg1.number === seg2.number &&
+    seg1.label === seg2.label &&
+    seg1.algorithmType === seg2.algorithmType;
+  // rgb
+  if (typeof seg1.displayValue.r !== 'undefined') {
+    if (typeof seg2.displayValue.r === 'undefined') {
+      isEqual = false;
+    } else {
+      isEqual = isEqual &&
+        dwv.utils.isEqualRgb(seg1.displayValue, seg2.displayValue);
+    }
+  } else {
+    isEqual = isEqual &&
+      seg1.displayValue === seg2.displayValue;
+  }
+  // algorithmName
+  if (typeof seg1.algorithmName !== 'undefined') {
+    if (typeof seg2.algorithmName === 'undefined') {
+      isEqual = false;
+    } else {
+      isEqual = isEqual &&
+        seg1.algorithmName === seg2.algorithmName;
+    }
+  }
+
+  return isEqual;
+};
+
+/**
+ * Check if two segment objects are similar: either the
+ * number or the displayValue are equal.
+ *
+ * @param {object} seg1 The first segment.
+ * @param {object} seg2 The second segment.
+ * @returns {boolean} True if both segment are similar.
+ */
+dwv.dicom.isSimilarSegment = function (seg1, seg2) {
+  // basics
+  if (typeof seg1 === 'undefined' ||
+    typeof seg2 === 'undefined' ||
+    seg1 === null ||
+    seg2 === null) {
+    return false;
+  }
+  var isSimilar = seg1.number === seg2.number;
+  // rgb
+  if (typeof seg1.displayValue.r !== 'undefined') {
+    if (typeof seg2.displayValue.r === 'undefined') {
+      isSimilar = false;
+    } else {
+      isSimilar = isSimilar ||
+        dwv.utils.isEqualRgb(seg1.displayValue, seg2.displayValue);
+    }
+  } else {
+    isSimilar = isSimilar ||
+      seg1.displayValue === seg2.displayValue;
+  }
+
+  return isSimilar;
+};
+
+/**
  * Get a spacing object from a dicom measure element.
  *
  * @param {object} measure The dicom element.
