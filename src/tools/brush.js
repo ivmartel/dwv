@@ -90,9 +90,9 @@ dwv.dicom.getSegmentFrameInfoElement = function (frameInfo) {
 };
 
 /**
- * Get a dicom element from a frame information object.
+ * Get a dicom element from a spacing object.
  *
- * @param {object} frameInfo The frame information object.
+ * @param {object} spacing The spacing object.
  * @returns {object} The dicom element.
  */
 dwv.dicom.getMeasureSequenceElement = function (spacing) {
@@ -106,6 +106,7 @@ dwv.dicom.getMeasureSequenceElement = function (spacing) {
 
 /**
  * Convert a mask image into a DICOM segmentation object.
+ *
  * @param {dwv.image.Image} image The mask image.
  * @param {Array} segments The mask segments.
  * @returns {object} A list of dicom elements.
@@ -415,6 +416,7 @@ dwv.tool.Brush = function (app) {
    *
    * @param {object} geometry The mask geometry.
    * @param {dwv.math.Point3D} origin The slice origin.
+   * @param {object} meta The mask meta.
    * @returns {dwv.image.Image} The slice.
    */
   function createMaskImage(geometry, origin, meta) {
@@ -441,12 +443,13 @@ dwv.tool.Brush = function (app) {
   /**
    * Add slices to mask if needed.
    *
-   * @param {dww.image.Geometry} baseGeometry The base geometry.
+   * @param {dwv.image.Geometry} baseGeometry The base geometry.
    * @param {Array} allOrigins All orign array.
-   * @param {dww.image.Geometry} maskGeometry The mask geometry.
+   * @param {dwv.image.Geometry} maskGeometry The mask geometry.
    * @param {dwv.math.Point3D} position The circle center.
    * @param {Array} circleDims The circle dimensions.
    * @param {Array} radiuses The circle radiuses.
+   * @param {object} sliceMeta The slice meta.
    * @returns {boolean} True if slices were added.
    */
   function addMaskSlices(
