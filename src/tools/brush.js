@@ -405,6 +405,8 @@ dwv.tool.Brush = function (app) {
     }
   ];
   let selectedSegment = 0;
+  // undefined, 'replace' or 'add'
+  let newSegmentBehaviour = 'replace';
 
   let uid = 0;
 
@@ -586,10 +588,10 @@ dwv.tool.Brush = function (app) {
       mask = app.getImage(event.dataindex);
       maskId = event.dataindex;
       baseGeometry = mask.getGeometry();
-      // update segments
-      // TODO: check equal
-      segments = mask.getMeta().custom.segments;
-      selectedSegment = 0;
+      // update segments if needed
+      if (typeof newSegmentBehaviour !== 'undefined') {
+        updateSegments(mask.getMeta().custom.segments);
+      }
     }
 
     // create mask if not done yet
@@ -662,6 +664,52 @@ dwv.tool.Brush = function (app) {
     return dwv.tool.getOffsetsFromIndices(maskGeometry, maskCircleIndices);
   }
 
+  /**
+   * Update the internal segment list.
+   *
+   * @param {Array} newSegments The array of new segments.
+   */
+  function updateSegments(newSegments) {
+    if (newSegmentBehaviour === 'replace') {
+      segments = newSegments;
+      if (selectedSegment >= segments.length) {
+        console.warn('Updating selectedSegment to fit new segments');
+        selectedSegment = 0;
+      }
+    } else if (newSegmentBehaviour === 'add') {
+      const getEqualSegFunc = function (segment) {
+        return function (item) {
+          return dwv.dicom.isEqualSegment(item, segment);
+        };
+      };
+      const getSimilarSegFunc = function (segment) {
+        return function (item) {
+          return dwv.dicom.isSimilarSegment(item, segment);
+        };
+      };
+      for (let i = 0; i < newSegments.length; ++i) {
+        const equalSeg = segments.find(getEqualSegFunc(newSegments[i]));
+        // if no equal, check if the segment can be added
+        if (typeof equalSeg === 'undefined') {
+          const similarSeg =
+            segments.find(getSimilarSegFunc(newSegments[i]));
+          // only accept non similar
+          if (typeof similarSeg === 'undefined') {
+            segments.push(newSegments[i]);
+          } else {
+            console.warn(
+              'Not adding segment since a similar one is already present.');
+          }
+        }
+      }
+    } else {
+      console.warn('Unknown newSegmentBehaviour:' + newSegmentBehaviour);
+    }
+  }
+
+  /**
+   * Save the current mask as a DICOM seg object.
+   */
   function saveSeg() {
     const fac = new dwv.image.MaskFactory();
     const dicomElements = fac.toDicom(mask, segments);
@@ -786,23 +834,12 @@ dwv.tool.Brush = function (app) {
       console.log('Brush size:', brushSize);
     } else if (!isNaN(parseInt(event.key, 10))) {
       let index = parseInt(event.key, 10);
-      if (index >= segments.length) {
+      if (index < segments.length) {
+        selectedSegment = index;
+        console.log('segment:', segments[selectedSegment].label);
+      } else {
         console.warn('Selected segment does not exist.');
-        // // add random segment
-        // index = segments.length;
-        // segments.push({
-        //   number: index + 1,
-        //   label: 'new' + index,
-        //   algorithmType: 'MANUAL',
-        //   displayValue: {
-        //     r: Math.floor(255 * Math.random()),
-        //     g: Math.floor(255 * Math.random()),
-        //     b: Math.floor(255 * Math.random())
-        //   }
-        // });
       }
-      selectedSegment = index;
-      console.log('segment:', segments[selectedSegment].label);
     } else if (event.key === 'a') {
       brushMode = 'add';
       console.log('Brush mode', brushMode);
