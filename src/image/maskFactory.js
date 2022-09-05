@@ -459,18 +459,6 @@ dwv.image.MaskFactory.prototype.create = function (
     });
   };
 
-  var arrayEquals = function (arr0, arr1) {
-    if (arr0 === null || arr1 === null) {
-      return false;
-    }
-    if (arr0.length !== arr1.length) {
-      return false;
-    }
-    return arr0.every(function (element, index) {
-      return element === arr1[index];
-    });
-  };
-
   // Per-frame Functional Groups Sequence
   var perFrameFuncGroupSequence = dicomElements.getFromKey('x52009230', true);
   if (!perFrameFuncGroupSequence ||
@@ -499,7 +487,7 @@ dwv.image.MaskFactory.prototype.create = function (
       if (typeof imageOrientationPatient === 'undefined') {
         imageOrientationPatient = frameInfos[ii].imageOrientationPatient;
       } else {
-        if (!arrayEquals(
+        if (!dwv.utils.arrayEquals(
           imageOrientationPatient, frameInfos[ii].imageOrientationPatient)) {
           throw new Error('Unsupported multi orientation dicom seg.');
         }
