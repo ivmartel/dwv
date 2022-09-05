@@ -356,8 +356,8 @@ dwv.image.MaskFactory = function () {};
 dwv.image.MaskFactory.prototype.create = function (
   dicomElements, pixelBuffer) {
   // check required and supported tags
-  for (var i = 0; i < dwv.dicom.requiredSegDicomTags.length; ++i) {
-    dwv.dicom.checkTag(dicomElements, dwv.dicom.requiredSegDicomTags[i]);
+  for (var d = 0; d < dwv.dicom.requiredSegDicomTags.length; ++d) {
+    dwv.dicom.checkTag(dicomElements, dwv.dicom.requiredSegDicomTags[d]);
   }
 
   // columns
