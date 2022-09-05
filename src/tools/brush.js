@@ -10,6 +10,42 @@
 // -----------------------------------------------------------------------------
 
 /**
+ * Pad an input string with a '0' to form a 2 digit one.
+ *
+ * @param {string} str The string to pad.
+ * @returns {string} The padded string.
+ */
+function padZeroTwoDigit(str) {
+  return ('0' + str).slice(-2);
+}
+
+/**
+ * Get a DICOM formated date.
+ *
+ * @param {Date} date The date to format.
+ * @returns {string} The formated date.
+ */
+dwv.dicom.getFormatedDate = function (date) {
+  // YYYYMMDD
+  return date.getFullYear().toString() +
+    padZeroTwoDigit((date.getMonth() + 1).toString()) +
+    padZeroTwoDigit(date.getDate().toString());
+};
+
+/**
+ * Get a DICOM formated time.
+ *
+ * @param {Date} date The date to format.
+ * @returns {string} The formated time.
+ */
+dwv.dicom.getFormatedTime = function (date) {
+  // HHMMSS
+  return padZeroTwoDigit(date.getHours().toString()) +
+    padZeroTwoDigit(date.getMinutes().toString()) +
+    padZeroTwoDigit(date.getSeconds().toString());
+};
+
+/**
  * Get a dicom element from a segment object.
  *
  * @param {object} segment The segment object.
@@ -124,6 +160,8 @@ dwv.image.MaskFactory.prototype.toDicom = function (image, segments) {
   var isRGB = numberOfComponents === 3;
   var orientationPatient = image.getMeta().ImageOrientationPatient;
 
+  var now = new Date();
+
   // base tags
   var tags = {
     TransferSyntaxUID: '1.2.840.10008.1.2.1',
@@ -139,6 +177,8 @@ dwv.image.MaskFactory.prototype.toDicom = function (image, segments) {
     BitsAllocated: 1,
     BitsStored: 1,
     HighBit: 0,
+    ContentDate: dwv.dicom.getFormatedDate(now),
+    ContentTime: dwv.dicom.getFormatedTime(now),
     Rows: size.get(1),
     Columns: size.get(0)
   };
