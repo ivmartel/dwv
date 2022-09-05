@@ -127,15 +127,19 @@ dwv.image.MaskFactory.prototype.toDicom = function (image, segments) {
   // base tags
   var tags = {
     TransferSyntaxUID: '1.2.840.10008.1.2.1',
+    MediaStorageSOPClassUID: '1.2.840.10008.5.1.4.1.1.66.4',
+    SOPClassUID: '1.2.840.10008.5.1.4.1.1.66.4',
     Modality: 'SEG',
     SegmentationType: 'BINARY',
     DimensionOrganizationType: '3D',
     PhotometricInterpretation: 'MONOCHROME2',
     SamplesPerPixel: 1,
     PixelRepresentation: 0,
+    BitsAllocated: 1,
+    BitsStored: 1,
+    HighBit: 0,
     Rows: size.get(1),
-    Columns: size.get(0),
-    BitsAllocated: 1
+    Columns: size.get(0)
   };
 
   // use existing dimension organization if present

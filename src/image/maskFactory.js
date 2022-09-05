@@ -35,37 +35,104 @@ dwv.dicom.comparePosPat = function (pos1, pos2) {
 };
 
 /**
- * Check the required and supported tags.
+ * Check that a DICOM tag definition is present in a parsed element.
  *
  * @param {object} rootElement The root dicom element.
+ * @param {object} tagDefinition The tag definition as {name, tag, type, enum}.
  */
-dwv.dicom.checkDicomSeg = function (rootElement) {
-  // Transfer Syntax
-  var syntax = dwv.dicom.cleanString(rootElement.getFromKey('x00020010'));
-  var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
-  if (algoName !== null) {
-    throw new Error('Unsupported compressed segmentation: ' + algoName);
+dwv.dicom.checkTag = function (rootElement, tagDefinition) {
+  var tagValue = rootElement.getFromKey(tagDefinition.tag);
+  if (tagDefinition.type === 1 &&
+    tagValue === null &&
+    typeof tagValue === 'undefined') {
+    throw new Error('Missing or empty ' + tagDefinition.name);
   }
-
-  // Segmentation Type (required)
-  var segmentationType = rootElement.getFromKey('x00620001');
-  if (!segmentationType) {
-    throw new Error('Missing or empty DICOM segmentation type');
+  if (typeof tagValue === 'string') {
+    tagValue = dwv.dicom.cleanString(tagValue);
   }
-  segmentationType = dwv.dicom.cleanString(segmentationType);
-  if (segmentationType !== 'BINARY') {
-    throw new Error('Unsupported segmentation type: ' + segmentationType);
-  }
-
-  // Dimension Organization Type (optional)
-  var dimOrgType = rootElement.getFromKey('x00209311');
-  if (dimOrgType) {
-    dimOrgType = dwv.dicom.cleanString(dimOrgType);
-    if (dimOrgType !== '3D') {
-      throw new Error('Unsupported dimension organization type: ' + dimOrgType);
-    }
+  if (!tagDefinition.enum.includes(tagValue)) {
+    throw new Error(
+      'Unsupported ' + tagDefinition.name + ' value: ' + tagValue);
   }
 };
+
+/**
+ * List of DICOM Seg required tags.
+ */
+dwv.dicom.requiredSegDicomTags = [
+  {
+    name: 'Transfer Syntax UID',
+    tag: 'x00020010',
+    type: '1',
+    enum: ['1.2.840.10008.1.2.1']
+  },
+  {
+    name: 'Media Storage SOP Class UID',
+    tag: 'x00020002',
+    type: '1',
+    enum: ['1.2.840.10008.5.1.4.1.1.66.4']
+  },
+  {
+    name: 'SOP Class UID',
+    tag: 'x00020002',
+    type: '1',
+    enum: ['1.2.840.10008.5.1.4.1.1.66.4']
+  },
+  {
+    name: 'Modality',
+    tag: 'x00080060',
+    type: '1',
+    enum: ['SEG']
+  },
+  {
+    name: 'Segmentation Type',
+    tag: 'x00620001',
+    type: '1',
+    enum: ['BINARY']
+  },
+  {
+    name: 'Dimension Organization Type',
+    tag: 'x00209311',
+    type: '1',
+    enum: ['3D']
+  },
+  {
+    name: 'Samples Per Pixel',
+    tag: 'x00280002',
+    type: '1',
+    enum: [1]
+  },
+  {
+    name: 'Photometric Interpretation',
+    tag: 'x00280004',
+    type: '1',
+    enum: ['MONOCHROME2']
+  },
+  {
+    name: 'Pixel Representation',
+    tag: 'x00280103',
+    type: '1',
+    enum: [0]
+  },
+  {
+    name: 'Bits Allocated',
+    tag: 'x00280100',
+    type: '1',
+    enum: [1]
+  },
+  {
+    name: 'Bits Stored',
+    tag: 'x00280101',
+    type: '1',
+    enum: [1]
+  },
+  {
+    name: 'High Bit',
+    tag: 'x00280102',
+    type: '1',
+    enum: [0]
+  },
+];
 
 /**
  * Check the dimension organization from a dicom element.
@@ -289,7 +356,9 @@ dwv.image.MaskFactory = function () {};
 dwv.image.MaskFactory.prototype.create = function (
   dicomElements, pixelBuffer) {
   // check required and supported tags
-  dwv.dicom.checkDicomSeg(dicomElements);
+  for (var i = 0; i < dwv.dicom.requiredSegDicomTags.length; ++i) {
+    dwv.dicom.checkTag(dicomElements, dwv.dicom.requiredSegDicomTags[i]);
+  }
 
   // columns
   var columns = dicomElements.getFromKey('x00280011');
