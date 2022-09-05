@@ -133,6 +133,7 @@ dwv.image.MaskFactory.prototype.toDicom = function (image, segments) {
     SegmentationType: 'BINARY',
     DimensionOrganizationType: '3D',
     PhotometricInterpretation: 'MONOCHROME2',
+    ImageType: ['DERIVED', 'PRIMARY'],
     SamplesPerPixel: 1,
     PixelRepresentation: 0,
     BitsAllocated: 1,

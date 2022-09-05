@@ -42,15 +42,41 @@ dwv.dicom.comparePosPat = function (pos1, pos2) {
  */
 dwv.dicom.checkTag = function (rootElement, tagDefinition) {
   var tagValue = rootElement.getFromKey(tagDefinition.tag);
-  if (tagDefinition.type === 1 &&
-    tagValue === null &&
-    typeof tagValue === 'undefined') {
-    throw new Error('Missing or empty ' + tagDefinition.name);
+  // check null and undefined
+  if (tagDefinition.type === 1 || tagDefinition.type === 2) {
+    if (tagValue === null || typeof tagValue === 'undefined') {
+      throw new Error('Missing or empty ' + tagDefinition.name);
+    }
+  } else {
+    if (tagValue === null || typeof tagValue === 'undefined') {
+      // non mandatory value, exit
+      return;
+    }
   }
-  if (typeof tagValue === 'string') {
-    tagValue = dwv.dicom.cleanString(tagValue);
+  var includes = false;
+  if (Array.isArray(tagValue)) {
+    // trim
+    tagValue = tagValue.map(function (item) {
+      return dwv.dicom.cleanString(item);
+    });
+    for (var i = 0; i < tagDefinition.enum.length; ++i) {
+      if (!Array.isArray(tagDefinition.enum[i])) {
+        throw new Error('Cannot compare array and non array tag value.');
+      }
+      if (dwv.utils.arrayEquals(tagDefinition.enum[i], tagValue)) {
+        includes = true;
+        break;
+      }
+    }
+  } else {
+    // trim
+    if (typeof tagValue === 'string') {
+      tagValue = dwv.dicom.cleanString(tagValue);
+    }
+
+    includes = tagDefinition.enum.includes(tagValue);
   }
-  if (!tagDefinition.enum.includes(tagValue)) {
+  if (!includes) {
     throw new Error(
       'Unsupported ' + tagDefinition.name + ' value: ' + tagValue);
   }
@@ -93,8 +119,14 @@ dwv.dicom.requiredSegDicomTags = [
   {
     name: 'Dimension Organization Type',
     tag: 'x00209311',
-    type: '1',
+    type: '3',
     enum: ['3D']
+  },
+  {
+    name: 'Image Type',
+    tag: 'x00080008',
+    type: '1',
+    enum: [['DERIVED', 'PRIMARY']]
   },
   {
     name: 'Samples Per Pixel',
