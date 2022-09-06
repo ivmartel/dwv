@@ -689,7 +689,9 @@ dwv.image.MaskFactory.prototype.create = function (
     DimensionOrganizations: dimension.organizations,
     DimensionIndices: dimension.indices,
     BitsStored: 8,
+    StudyInstanceUID: dicomElements.getFromKey('x0020000D'),
     SeriesInstanceUID: dicomElements.getFromKey('x0020000E'),
+    SeriesNumber: dicomElements.getFromKey('x00200011'),
     ImageOrientationPatient: imageOrientationPatient,
     custom: {
       segments: segments,

@@ -209,9 +209,14 @@ dwv.image.MaskFactory.prototype.toDicom = function (image, segments) {
     ContentDate: dwv.dicom.getFormatedDate(now),
     ContentTime: dwv.dicom.getFormatedTime(now),
     ContentLabel: 'QUIBIM edited prostate segmentation',
+    StudyInstanceUID: image.getMeta().StudyInstanceUID,
     Rows: size.get(1),
     Columns: size.get(0)
   };
+
+  // TODO: update numbers
+  tags.SeriesInstanceUID = image.getMeta().SeriesInstanceUID;
+  tags.SeriesNumber = image.getMeta().SeriesNumber;
 
   // TODO: get from original file
   tags.LossyImageCompression = '00';
