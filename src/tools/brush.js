@@ -622,6 +622,9 @@ dwv.tool.Brush = function (app) {
       buff[offset + 1] = brushMode === 'add' ? colour.g : 0;
       buff[offset + 2] = brushMode === 'add' ? colour.b : 0;
     }
+    // update segment
+    segments[selectedSegment].algorithmType = 'MANUAL';
+    delete segments[selectedSegment].algorithmName;
     // update app image
     app.setImage(maskId, mask);
     // render
