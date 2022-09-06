@@ -46,6 +46,29 @@ dwv.dicom.getFormatedTime = function (date) {
 };
 
 /**
+ * Get a dicom element from a code object.
+ *
+ * @param {object} code The code object.
+ * @returns {object} The dicom element.
+ */
+dwv.dicom.getCodeElement = function (code) {
+  var codeElement = {
+    CodeMeaning: code.meaning
+  };
+  if (typeof code.value !== 'undefined') {
+    codeElement.CodeValue = code.value;
+  } else if (typeof code.longValue !== 'undefined') {
+    codeElement.LongCodeValue = code.longValue;
+  } else if (typeof code.urnValue !== 'undefined') {
+    codeElement.URNCodeValue = code.longVaurnValuelue;
+  }
+  if (typeof code.schemeDesignator !== 'undefined') {
+    codeElement.CodingSchemeDesignator = code.schemeDesignator;
+  }
+  return codeElement;
+};
+
+/**
  * Get a dicom element from a segment object.
  *
  * @param {object} segment The segment object.
@@ -59,7 +82,13 @@ dwv.dicom.getSegmentElement = function (segment) {
   var segmentElement = {
     SegmentNumber: segment.number,
     SegmentLabel: segment.label,
-    SegmentAlgorithmType: algoType
+    SegmentAlgorithmType: algoType,
+    SegmentedPropertyCategoryCodeSequence: {
+      item0: dwv.dicom.getCodeElement(segment.propertyCategoryCode)
+    },
+    SegmentedPropertyTypeCodeSequence: {
+      item0: dwv.dicom.getCodeElement(segment.propertyTypeCode)
+    }
   };
   // display value
   if (typeof segment.displayValue.r !== 'undefined' &&
@@ -76,7 +105,7 @@ dwv.dicom.getSegmentElement = function (segment) {
     segmentElement.RecommendedDisplayGrayscaleValue = segment.displayValue;
   }
   // algo name
-  if (typeof segment.algorithmName !== 'undefined') {
+  if (algoType !== 'MANUAL' && typeof segment.algorithmName !== 'undefined') {
     segmentElement.SegmentAlgorithmName = segment.algorithmName;
   }
   return segmentElement;
