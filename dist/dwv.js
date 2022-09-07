@@ -1,4 +1,4 @@
-/*! dwv 0.31.0-beta.11 2022-08-24 09:19:36 */
+/*! dwv 0.31.0-beta.13 2022-09-07 12:27:46 */
 // Inspired from umdjs
 // See https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function (root, factory) {
@@ -4569,7 +4569,7 @@ dwv.dicom = dwv.dicom || {};
  * @returns {string} The version of the library.
  */
 dwv.getVersion = function () {
-  return '0.31.0-beta.11';
+  return '0.31.0-beta.13';
 };
 
 /**
@@ -18325,37 +18325,136 @@ dwv.dicom.comparePosPat = function (pos1, pos2) {
 };
 
 /**
- * Check the required and supported tags.
+ * Check that a DICOM tag definition is present in a parsed element.
  *
  * @param {object} rootElement The root dicom element.
+ * @param {object} tagDefinition The tag definition as {name, tag, type, enum}.
  */
-dwv.dicom.checkDicomSeg = function (rootElement) {
-  // Transfer Syntax
-  var syntax = dwv.dicom.cleanString(rootElement.getFromKey('x00020010'));
-  var algoName = dwv.dicom.getSyntaxDecompressionName(syntax);
-  if (algoName !== null) {
-    throw new Error('Unsupported compressed segmentation: ' + algoName);
-  }
-
-  // Segmentation Type (required)
-  var segmentationType = rootElement.getFromKey('x00620001');
-  if (!segmentationType) {
-    throw new Error('Missing or empty DICOM segmentation type');
-  }
-  segmentationType = dwv.dicom.cleanString(segmentationType);
-  if (segmentationType !== 'BINARY') {
-    throw new Error('Unsupported segmentation type: ' + segmentationType);
-  }
-
-  // Dimension Organization Type (optional)
-  var dimOrgType = rootElement.getFromKey('x00209311');
-  if (dimOrgType) {
-    dimOrgType = dwv.dicom.cleanString(dimOrgType);
-    if (dimOrgType !== '3D') {
-      throw new Error('Unsupported dimension organization type: ' + dimOrgType);
+dwv.dicom.checkTag = function (rootElement, tagDefinition) {
+  var tagValue = rootElement.getFromKey(tagDefinition.tag);
+  // check null and undefined
+  if (tagDefinition.type === 1 || tagDefinition.type === 2) {
+    if (tagValue === null || typeof tagValue === 'undefined') {
+      throw new Error('Missing or empty ' + tagDefinition.name);
+    }
+  } else {
+    if (tagValue === null || typeof tagValue === 'undefined') {
+      // non mandatory value, exit
+      return;
     }
   }
+  var includes = false;
+  if (Array.isArray(tagValue)) {
+    // trim
+    tagValue = tagValue.map(function (item) {
+      return dwv.dicom.cleanString(item);
+    });
+    for (var i = 0; i < tagDefinition.enum.length; ++i) {
+      if (!Array.isArray(tagDefinition.enum[i])) {
+        throw new Error('Cannot compare array and non array tag value.');
+      }
+      if (dwv.utils.arrayEquals(tagDefinition.enum[i], tagValue)) {
+        includes = true;
+        break;
+      }
+    }
+  } else {
+    // trim
+    if (typeof tagValue === 'string') {
+      tagValue = dwv.dicom.cleanString(tagValue);
+    }
+
+    includes = tagDefinition.enum.includes(tagValue);
+  }
+  if (!includes) {
+    throw new Error(
+      'Unsupported ' + tagDefinition.name + ' value: ' + tagValue);
+  }
 };
+
+/**
+ * List of DICOM Seg required tags.
+ */
+dwv.dicom.requiredSegDicomTags = [
+  {
+    name: 'Transfer Syntax UID',
+    tag: 'x00020010',
+    type: '1',
+    enum: ['1.2.840.10008.1.2.1']
+  },
+  {
+    name: 'Media Storage SOP Class UID',
+    tag: 'x00020002',
+    type: '1',
+    enum: ['1.2.840.10008.5.1.4.1.1.66.4']
+  },
+  {
+    name: 'SOP Class UID',
+    tag: 'x00020002',
+    type: '1',
+    enum: ['1.2.840.10008.5.1.4.1.1.66.4']
+  },
+  {
+    name: 'Modality',
+    tag: 'x00080060',
+    type: '1',
+    enum: ['SEG']
+  },
+  {
+    name: 'Segmentation Type',
+    tag: 'x00620001',
+    type: '1',
+    enum: ['BINARY']
+  },
+  {
+    name: 'Dimension Organization Type',
+    tag: 'x00209311',
+    type: '3',
+    enum: ['3D']
+  },
+  {
+    name: 'Image Type',
+    tag: 'x00080008',
+    type: '1',
+    enum: [['DERIVED', 'PRIMARY']]
+  },
+  {
+    name: 'Samples Per Pixel',
+    tag: 'x00280002',
+    type: '1',
+    enum: [1]
+  },
+  {
+    name: 'Photometric Interpretation',
+    tag: 'x00280004',
+    type: '1',
+    enum: ['MONOCHROME2']
+  },
+  {
+    name: 'Pixel Representation',
+    tag: 'x00280103',
+    type: '1',
+    enum: [0]
+  },
+  {
+    name: 'Bits Allocated',
+    tag: 'x00280100',
+    type: '1',
+    enum: [1]
+  },
+  {
+    name: 'Bits Stored',
+    tag: 'x00280101',
+    type: '1',
+    enum: [1]
+  },
+  {
+    name: 'High Bit',
+    tag: 'x00280102',
+    type: '1',
+    enum: [0]
+  },
+];
 
 /**
  * Check the dimension organization from a dicom element.
@@ -18416,25 +18515,67 @@ dwv.dicom.getDimensionOrganization = function (rootElement) {
 };
 
 /**
+ * Get a code object from a dicom element.
+ *
+ * @param {object} element The dicom element.
+ * @returns {object} A code object.
+ */
+dwv.dicom.getCode = function (element) {
+  // meaning -> CodeMeaning (type1)
+  var code = {
+    meaning: dwv.dicom.cleanString(element.x00080104.value[0])
+  };
+  // value -> CodeValue (type1C)
+  // longValue -> LongCodeValue (type1C)
+  // urnValue -> URNCodeValue (type1C)
+  if (element.x00080100) {
+    code.value = element.x00080100.value[0];
+  } else if (element.x00080119) {
+    code.longValue = element.x00080119.value[0];
+  } else if (element.x00080120) {
+    code.urnValue = element.x00080120.value[0];
+  } else {
+    throw Error('Invalid code with no value, no long value and no urn value.');
+  }
+  // schemeDesignator -> CodingSchemeDesignator (type1C)
+  if (typeof code.value !== 'undefined' ||
+    typeof code.longValue !== 'undefined') {
+    if (element.x00080102) {
+      code.schemeDesignator = element.x00080102.value[0];
+    } else {
+      throw Error(
+        'No coding sheme designator when code value or long value is present');
+    }
+  }
+  return code;
+};
+
+/**
  * Get a segment object from a dicom element.
  *
  * @param {object} element The dicom element.
  * @returns {object} A segment object.
  */
 dwv.dicom.getSegment = function (element) {
-  // number -> SegmentNumber
-  // label -> SegmentLabel
-  // algorithmType -> SegmentAlgorithmType
+  // number -> SegmentNumber (type1)
+  // label -> SegmentLabel (type1)
+  // algorithmType -> SegmentAlgorithmType (type1)
   var segment = {
     number: element.x00620004.value[0],
     label: dwv.dicom.cleanString(element.x00620005.value[0]),
     algorithmType: dwv.dicom.cleanString(element.x00620008.value[0])
   };
-  // algorithmName -> SegmentAlgorithmName
+  // algorithmName -> SegmentAlgorithmName (type1C)
   if (element.x00620009) {
     segment.algorithmName =
       dwv.dicom.cleanString(element.x00620009.value[0]);
   }
+  // // required if type is not MANUAL
+  // if (segment.algorithmType !== 'MANUAL' &&
+  //   (typeof segment.algorithmName === 'undefined' ||
+  //   segment.algorithmName.length === 0)) {
+  //   throw new Error('Empty algorithm name for non MANUAL algorithm type.');
+  // }
   // displayValue ->
   // - RecommendedDisplayGrayscaleValue
   // - RecommendedDisplayCIELabValue converted to RGB
@@ -18449,7 +18590,98 @@ dwv.dicom.getSegment = function (element) {
     }));
     segment.displayValue = rgb;
   }
+  // Segmented Property Category Code Sequence (type1, only one)
+  if (element.x00620003) {
+    segment.propertyCategoryCode =
+      dwv.dicom.getCode(element.x00620003.value[0]);
+  } else {
+    throw Error('Missing Segmented Property Category Code Sequence.');
+  }
+  // Segmented Property Type Code Sequence (type1)
+  if (element.x0062000F) {
+    segment.propertyTypeCode =
+      dwv.dicom.getCode(element.x0062000F.value[0]);
+  } else {
+    throw Error('Missing Segmented Property Type Code Sequence.');
+  }
+
   return segment;
+};
+
+/**
+ * Check if two segment objects are equal.
+ *
+ * @param {object} seg1 The first segment.
+ * @param {object} seg2 The second segment.
+ * @returns {boolean} True if both segment are equal.
+ */
+dwv.dicom.isEqualSegment = function (seg1, seg2) {
+  // basics
+  if (typeof seg1 === 'undefined' ||
+    typeof seg2 === 'undefined' ||
+    seg1 === null ||
+    seg2 === null) {
+    return false;
+  }
+  var isEqual = seg1.number === seg2.number &&
+    seg1.label === seg2.label &&
+    seg1.algorithmType === seg2.algorithmType;
+  // rgb
+  if (typeof seg1.displayValue.r !== 'undefined') {
+    if (typeof seg2.displayValue.r === 'undefined') {
+      isEqual = false;
+    } else {
+      isEqual = isEqual &&
+        dwv.utils.isEqualRgb(seg1.displayValue, seg2.displayValue);
+    }
+  } else {
+    isEqual = isEqual &&
+      seg1.displayValue === seg2.displayValue;
+  }
+  // algorithmName
+  if (typeof seg1.algorithmName !== 'undefined') {
+    if (typeof seg2.algorithmName === 'undefined') {
+      isEqual = false;
+    } else {
+      isEqual = isEqual &&
+        seg1.algorithmName === seg2.algorithmName;
+    }
+  }
+
+  return isEqual;
+};
+
+/**
+ * Check if two segment objects are similar: either the
+ * number or the displayValue are equal.
+ *
+ * @param {object} seg1 The first segment.
+ * @param {object} seg2 The second segment.
+ * @returns {boolean} True if both segment are similar.
+ */
+dwv.dicom.isSimilarSegment = function (seg1, seg2) {
+  // basics
+  if (typeof seg1 === 'undefined' ||
+    typeof seg2 === 'undefined' ||
+    seg1 === null ||
+    seg2 === null) {
+    return false;
+  }
+  var isSimilar = seg1.number === seg2.number;
+  // rgb
+  if (typeof seg1.displayValue.r !== 'undefined') {
+    if (typeof seg2.displayValue.r === 'undefined') {
+      isSimilar = false;
+    } else {
+      isSimilar = isSimilar ||
+        dwv.utils.isEqualRgb(seg1.displayValue, seg2.displayValue);
+    }
+  } else {
+    isSimilar = isSimilar ||
+      seg1.displayValue === seg2.displayValue;
+  }
+
+  return isSimilar;
 };
 
 /**
@@ -18579,7 +18811,9 @@ dwv.image.MaskFactory = function () {};
 dwv.image.MaskFactory.prototype.create = function (
   dicomElements, pixelBuffer) {
   // check required and supported tags
-  dwv.dicom.checkDicomSeg(dicomElements);
+  for (var d = 0; d < dwv.dicom.requiredSegDicomTags.length; ++d) {
+    dwv.dicom.checkTag(dicomElements, dwv.dicom.requiredSegDicomTags[d]);
+  }
 
   // columns
   var columns = dicomElements.getFromKey('x00280011');
@@ -18680,18 +18914,6 @@ dwv.image.MaskFactory.prototype.create = function (
     });
   };
 
-  var arrayEquals = function (arr0, arr1) {
-    if (arr0 === null || arr1 === null) {
-      return false;
-    }
-    if (arr0.length !== arr1.length) {
-      return false;
-    }
-    return arr0.every(function (element, index) {
-      return element === arr1[index];
-    });
-  };
-
   // Per-frame Functional Groups Sequence
   var perFrameFuncGroupSequence = dicomElements.getFromKey('x52009230', true);
   if (!perFrameFuncGroupSequence ||
@@ -18720,7 +18942,7 @@ dwv.image.MaskFactory.prototype.create = function (
       if (typeof imageOrientationPatient === 'undefined') {
         imageOrientationPatient = frameInfos[ii].imageOrientationPatient;
       } else {
-        if (!arrayEquals(
+        if (!dwv.utils.arrayEquals(
           imageOrientationPatient, frameInfos[ii].imageOrientationPatient)) {
           throw new Error('Unsupported multi orientation dicom seg.');
         }
@@ -18832,12 +19054,19 @@ dwv.image.MaskFactory.prototype.create = function (
     DimensionOrganizationType: '3D',
     DimensionOrganizations: dimension.organizations,
     DimensionIndices: dimension.indices,
-    BitsStored: 8,
+    BitsStored: 1,
+    PatientName: dwv.dicom.cleanString(dicomElements.getFromKey('x00100010')),
+    PatientID: dwv.dicom.cleanString(dicomElements.getFromKey('x00100020')),
+    PatientBirthDate: dicomElements.getFromKey('x00100030'),
+    PatientSex: dwv.dicom.cleanString(dicomElements.getFromKey('x00100040')),
+    StudyInstanceUID: dicomElements.getFromKey('x0020000D'),
     SeriesInstanceUID: dicomElements.getFromKey('x0020000E'),
+    SeriesNumber: dicomElements.getFromKey('x00200011'),
     ImageOrientationPatient: imageOrientationPatient,
     custom: {
       segments: segments,
-      frameInfos: frameInfos
+      frameInfos: frameInfos,
+      SOPInstanceUID: dicomElements.getFromKey('x00080018')
     }
   };
   image.setMeta(meta);
@@ -33997,6 +34226,30 @@ var dwv = dwv || {};
 dwv.utils = dwv.utils || {};
 
 /**
+ * Check for array equality.
+ *
+ * @param {Array} arr0 First array.
+ * @param {*} arr1 Second array.
+ * @returns {boolean} True if both array are defined and contain same values.
+ */
+dwv.utils.arrayEquals = function (arr0, arr1) {
+  if (arr0 === null ||
+    arr1 === null ||
+    typeof arr0 === 'undefined' ||
+    typeof arr1 === 'undefined') {
+    return false;
+  }
+  if (arr0.length !== arr1.length) {
+    return false;
+  }
+  var arr0sorted = arr0.slice().sort();
+  var arr1sorted = arr1.slice().sort();
+  return arr0sorted.every(function (element, index) {
+    return element === arr1sorted[index];
+  });
+};
+
+/**
  * Convert a Uint8Array to a string.
  *
  * @param {Uint8Array} arr The array to convert.
@@ -34219,6 +34472,23 @@ dwv.utils = dwv.utils || {};
 
 // example implementation: dcmtk/dcmiod/libsrc/cielabutil.cc
 // https://github.com/DCMTK/dcmtk/blob/DCMTK-3.6.6/dcmiod/libsrc/cielabutil.cc
+
+/**
+ * Check if two rgb objects are equal.
+ *
+ * @param {object} c1 The first colour.
+ * @param {object} c2 The second colour.
+ * @returns {boolean} True if both colour are equal.
+ */
+dwv.utils.isEqualRgb = function (c1, c2) {
+  return c1 !== null &&
+    c2 !== null &&
+    typeof c1 !== 'undefined' &&
+    typeof c2 !== 'undefined' &&
+    c1.r === c2.r &&
+    c1.g === c2.g &&
+    c1.b === c2.b;
+};
 
 /**
  * Convert YBR to RGB.
