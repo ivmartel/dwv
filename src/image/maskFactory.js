@@ -782,4 +782,3 @@ dwv.image.MaskFactory.prototype.create = function (
 
   return image;
 };
-
