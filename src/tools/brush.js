@@ -661,7 +661,7 @@ dwv.tool.Brush = function (app) {
       Modality: 'SEG',
       IsSigned: false,
       numberOfFiles: 1,
-      BitsStored: 8
+      BitsStored: 1
     };
 
     const searchMaskMeta = {

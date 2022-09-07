@@ -688,7 +688,7 @@ dwv.image.MaskFactory.prototype.create = function (
     DimensionOrganizationType: '3D',
     DimensionOrganizations: dimension.organizations,
     DimensionIndices: dimension.indices,
-    BitsStored: 8,
+    BitsStored: 1,
     StudyInstanceUID: dicomElements.getFromKey('x0020000D'),
     SeriesInstanceUID: dicomElements.getFromKey('x0020000E'),
     SeriesNumber: dicomElements.getFromKey('x00200011'),
