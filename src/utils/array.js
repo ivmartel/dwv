@@ -7,7 +7,7 @@ dwv.utils = dwv.utils || {};
  *
  * @param {Array} arr0 First array.
  * @param {*} arr1 Second array.
- * @returns True if both array are defined and contain same values.
+ * @returns {boolean} True if both array are defined and contain same values.
  */
 dwv.utils.arrayEquals = function (arr0, arr1) {
   if (arr0 === null || arr1 === null) {
