@@ -6,6 +6,50 @@
 /* global QUnit */
 QUnit.module('utils');
 
+/**
+ * Tests for {@link dwv.utils.arrayEquals}.
+ *
+ * @function module:tests/utils~arrayEquals
+ */
+QUnit.test('Test arrayEquals.', function (assert) {
+  // null
+  assert.notOk(dwv.utils.arrayEquals(null, null), '2 null arrays');
+  assert.notOk(dwv.utils.arrayEquals(null, [1, 2, 3]), 'left null array');
+  assert.notOk(dwv.utils.arrayEquals([1, 2, 3], null), 'right null array');
+
+  // undefined
+  assert.notOk(dwv.utils.arrayEquals(undefined, undefined),
+    '2 undefined arrays');
+  assert.notOk(dwv.utils.arrayEquals(undefined, [1, 2, 3]),
+    'left undefined arrays');
+  assert.notOk(dwv.utils.arrayEquals([1, 2, 3], undefined),
+    'right undefined arrays');
+
+  // empty
+  assert.notOk(dwv.utils.arrayEquals([1], []), 'right empty array');
+  assert.notOk(dwv.utils.arrayEquals([], [1]), 'left empty array');
+  assert.ok(dwv.utils.arrayEquals([], []), '2 empty arrays');
+
+  // simple arrays
+  var arr00 = [1, 2, 3];
+  assert.ok(dwv.utils.arrayEquals(arr00, arr00), 'array equal #0');
+  var arr01 = [3, 2, 1];
+  assert.ok(dwv.utils.arrayEquals(arr00, arr01), 'array equal #1');
+  var arr02 = [1, 2, 3, 4];
+  assert.notOk(dwv.utils.arrayEquals(arr00, arr02), 'array equal #2');
+  var arr03 = [1, 'a', null, undefined];
+  assert.ok(dwv.utils.arrayEquals(arr03, arr03), 'array equal #3');
+
+  // array of object
+  var arr10 = [{a: 0}];
+  var arr11 = [{a: 0}];
+  assert.notOk(dwv.utils.arrayEquals(arr10, arr11), 'array of object equal #0');
+  var obj = {a: 0};
+  var arr12 = [obj];
+  var arr13 = [obj];
+  assert.ok(dwv.utils.arrayEquals(arr12, arr13), 'array of object equal #1');
+});
+
 // test data
 var multipart01 = 'preamble\r\n';
 multipart01 += '--boundary\r\n';

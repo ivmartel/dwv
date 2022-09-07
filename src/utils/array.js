@@ -10,7 +10,10 @@ dwv.utils = dwv.utils || {};
  * @returns {boolean} True if both array are defined and contain same values.
  */
 dwv.utils.arrayEquals = function (arr0, arr1) {
-  if (arr0 === null || arr1 === null) {
+  if (arr0 === null ||
+    arr1 === null ||
+    typeof arr0 === 'undefined' ||
+    typeof arr1 === 'undefined') {
     return false;
   }
   if (arr0.length !== arr1.length) {
