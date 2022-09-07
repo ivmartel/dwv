@@ -18,6 +18,38 @@ var isSimilar = function (a, b, tol) {
 };
 
 /**
+ * Tests for {@link dwv.utils.isEqualRgb}.
+ *
+ * @function module:tests/utils~isEqualRgb
+ */
+QUnit.test('Test isEqualRgb.', function (assert) {
+  var rgb00 = {r: 0, g: 0, b: 0};
+  var rgb01;
+  assert.ok(!dwv.utils.isEqualRgb(rgb00, rgb01), 'equal undefined #0');
+  assert.ok(!dwv.utils.isEqualRgb(rgb01, rgb00), 'equal undefined #1');
+  assert.ok(!dwv.utils.isEqualRgb(rgb01, rgb01), 'equal undefined #2');
+  var rgb02 = null;
+  assert.ok(!dwv.utils.isEqualRgb(rgb00, rgb02), 'equal null #0');
+  assert.ok(!dwv.utils.isEqualRgb(rgb02, rgb00), 'equal null #0');
+  assert.ok(!dwv.utils.isEqualRgb(rgb02, rgb02), 'equal null #2');
+
+  var rgb03 = {r: undefined, g: undefined, b: undefined};
+  assert.ok(!dwv.utils.isEqualRgb(rgb00, rgb03), 'equal undefined prop #0');
+  assert.ok(dwv.utils.isEqualRgb(rgb03, rgb03), 'equal undefined prop #1');
+
+  assert.ok(dwv.utils.isEqualRgb(rgb00, rgb00), 'equal #0');
+
+  var rgb20 = {r: 1, g: 0, b: 0};
+  assert.ok(!dwv.utils.isEqualRgb(rgb00, rgb20), 'not equal #0');
+  var rgb21 = {r: 0, g: 1, b: 0};
+  assert.ok(!dwv.utils.isEqualRgb(rgb00, rgb21), 'not equal #1');
+  var rgb22 = {r: 0, g: 0, b: 1};
+  assert.ok(!dwv.utils.isEqualRgb(rgb00, rgb22), 'not equal #2');
+  var rgb23 = {r: 1, g: 1, b: 1};
+  assert.ok(!dwv.utils.isEqualRgb(rgb00, rgb23), 'not equal #3');
+});
+
+/**
  * Tests for {@link dwv.utils.ybrToRgb}.
  *
  * @function module:tests/utils~ybrToRgb

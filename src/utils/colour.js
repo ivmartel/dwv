@@ -6,6 +6,23 @@ dwv.utils = dwv.utils || {};
 // https://github.com/DCMTK/dcmtk/blob/DCMTK-3.6.6/dcmiod/libsrc/cielabutil.cc
 
 /**
+ * Check if two rgb objects are equal.
+ *
+ * @param {object} c1 The first colour.
+ * @param {object} c2 The second colour.
+ * @returns {boolean} True if both colour are equal.
+ */
+dwv.utils.isEqualRgb = function (c1, c2) {
+  return c1 !== null &&
+    c2 !== null &&
+    typeof c1 !== 'undefined' &&
+    typeof c2 !== 'undefined' &&
+    c1.r === c2.r &&
+    c1.g === c2.g &&
+    c1.b === c2.b;
+};
+
+/**
  * Convert YBR to RGB.
  *
  * @see http://dicom.nema.org/dicom/2013/output/chtml/part03/sect_C.7.html#sect_C.7.6.3.1.2
