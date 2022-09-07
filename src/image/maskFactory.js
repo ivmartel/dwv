@@ -775,7 +775,8 @@ dwv.image.MaskFactory.prototype.create = function (
     ImageOrientationPatient: imageOrientationPatient,
     custom: {
       segments: segments,
-      frameInfos: frameInfos
+      frameInfos: frameInfos,
+      SOPInstanceUID: dicomElements.getFromKey('x00080018')
     }
   };
   image.setMeta(meta);
